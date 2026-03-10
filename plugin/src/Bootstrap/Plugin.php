@@ -53,12 +53,14 @@ final class Plugin {
 
 	/**
 	 * Runtime entry point. Runs after WordPress has loaded.
+	 * Identity and version come from Constants; contract versions from Versions (Infrastructure\Config).
 	 * Future: register hooks, enqueue assets, register REST/AJAX, admin menus, and domain services.
 	 *
 	 * @return void
 	 */
 	public function run(): void {
-		// Stub: no logic yet. Later prompts extend run() with service registration.
+		// Stub: no logic yet. Bootstrap consumes Constants as single source of truth for identity.
+		Constants::plugin_file();
 	}
 
 	/*
@@ -68,5 +70,11 @@ final class Plugin {
 	 * - [ ] Deactivate: no fatal error; deactivation completes.
 	 * - [ ] Direct access to uninstall.php: exits without defining WP_UNINSTALL_PLUGIN (safe).
 	 * - [ ] No options, capabilities, or content deleted by root/bootstrap/uninstall stubs.
+	 *
+	 * Manual verification checklist (Prompt 003):
+	 * - [ ] Constants load before plugin run (root calls Constants::init() before bootstrap).
+	 * - [ ] No duplicate version/path definitions in root file.
+	 * - [ ] Min WP 6.6, min PHP 8.1 (Constants::min_wp_version(), min_php_version()).
+	 * - [ ] Versions::all() returns plugin, global_schema, table_schema, registry_schema, export_schema.
 	 */
 }

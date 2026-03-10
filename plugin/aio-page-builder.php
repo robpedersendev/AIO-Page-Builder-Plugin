@@ -19,24 +19,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/*
- * Runtime constants — for later extraction to a dedicated constants loader (e.g. Prompt 003).
- * Path and URL are required for bootstrap; version is runtime-only until versioning contract exists.
- */
-if ( ! defined( 'AIO_PAGE_BUILDER_FILE' ) ) {
-	define( 'AIO_PAGE_BUILDER_FILE', __FILE__ );
-}
-if ( ! defined( 'AIO_PAGE_BUILDER_DIR' ) ) {
-	define( 'AIO_PAGE_BUILDER_DIR', plugin_dir_path( __FILE__ ) );
-}
-if ( ! defined( 'AIO_PAGE_BUILDER_URL' ) ) {
-	define( 'AIO_PAGE_BUILDER_URL', plugin_dir_url( __FILE__ ) );
-}
-if ( ! defined( 'AIO_PAGE_BUILDER_VERSION' ) ) {
-	define( 'AIO_PAGE_BUILDER_VERSION', '0.1.0' );
-}
-
+require_once __DIR__ . '/src/Bootstrap/Constants.php';
 require_once __DIR__ . '/src/Bootstrap/Plugin.php';
+
+\AIOPageBuilder\Bootstrap\Constants::init();
 
 use AIOPageBuilder\Bootstrap\Plugin;
 
