@@ -33,6 +33,24 @@ require_once $plugin_root . '/src/Infrastructure/Container/Providers/Capability_
 require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Type_Keys.php';
 require_once $plugin_root . '/src/Domain/Storage/Objects/Post_Type_Registrar.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Object_Registration_Provider.php';
+require_once $plugin_root . '/src/Domain/Storage/Tables/Table_Names.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_Table_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Status_Families.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Section_Template_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Page_Template_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Composition_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Documentation_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Version_Snapshot_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Build_Plan_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/AI_Run_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Job_Queue_Repository.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/Repositories_Provider.php';
+require_once $plugin_root . '/src/Domain/Storage/Assignments/Assignment_Types.php';
+require_once $plugin_root . '/src/Domain/Storage/Assignments/Assignment_Map_Service.php';
+require_once $plugin_root . '/src/Infrastructure/Files/Plugin_Path_Manager.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/Storage_Services_Provider.php';
 require_once $plugin_root . '/src/Bootstrap/Module_Registrar.php';
 
 /**

@@ -12,6 +12,9 @@ require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/wordpress/' );
 }
+if ( ! defined( 'ARRAY_A' ) ) {
+	define( 'ARRAY_A', 'ARRAY_A' );
+}
 // WordPress helpers when not in WP context (e.g. unit tests for Constants, Settings_Service).
 if ( ! function_exists( 'trailingslashit' ) ) {
 	function trailingslashit( $path ) {
@@ -154,5 +157,17 @@ if ( ! class_exists( 'WP_Query' ) ) {
 		public function get_posts() {
 			return isset( $GLOBALS['_aio_wp_query_posts'] ) ? $GLOBALS['_aio_wp_query_posts'] : array();
 		}
+	}
+}
+// * Stubs for Plugin_Path_Manager tests. Set $GLOBALS['_aio_wp_upload_dir'] to control wp_upload_dir().
+if ( ! function_exists( 'wp_upload_dir' ) ) {
+	function wp_upload_dir() {
+		$dir = isset( $GLOBALS['_aio_wp_upload_dir'] ) ? $GLOBALS['_aio_wp_upload_dir'] : array( 'basedir' => sys_get_temp_dir(), 'error' => false );
+		return is_array( $dir ) ? $dir : array( 'basedir' => sys_get_temp_dir(), 'error' => false );
+	}
+}
+if ( ! function_exists( 'wp_mkdir_p' ) ) {
+	function wp_mkdir_p( $path ) {
+		return is_dir( $path ) || @mkdir( $path, 0755, true );
 	}
 }

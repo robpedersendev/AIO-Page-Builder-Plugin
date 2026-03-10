@@ -49,6 +49,9 @@ require_once $bootstrap_dir . '/../Domain/Storage/Repositories/Version_Snapshot_
 require_once $bootstrap_dir . '/../Domain/Storage/Repositories/Build_Plan_Repository.php';
 require_once $bootstrap_dir . '/../Domain/Storage/Repositories/AI_Run_Repository.php';
 require_once $bootstrap_dir . '/../Domain/Storage/Repositories/Job_Queue_Repository.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Assignments/Assignment_Types.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Assignments/Assignment_Map_Service.php';
+require_once $bootstrap_dir . '/../Infrastructure/Files/Plugin_Path_Manager.php';
 require_once $bootstrap_dir . '/../Support/Logging/Log_Severities.php';
 require_once $bootstrap_dir . '/../Support/Logging/Log_Categories.php';
 require_once $bootstrap_dir . '/../Support/Logging/Error_Record.php';
@@ -60,6 +63,7 @@ require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Admin_Rout
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Capability_Provider.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Object_Registration_Provider.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Repositories_Provider.php';
+require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Storage_Services_Provider.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
 require_once $bootstrap_dir . '/Lifecycle_Manager.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Dashboard_Screen.php';
