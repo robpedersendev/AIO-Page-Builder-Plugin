@@ -43,14 +43,14 @@
 | Provider config reference | human | options (metadata only) | site | permanent until user deletion | privileged restricted | No | Yes | remove on uninstall | Secrets in separate storage; option holds ref/non-secret only | §9.4, §43.13 |
 | Brand profile | human | options (or dedicated option under same root) | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | Schema: profile-schema.md, profile-snapshot-schema.md; §22 | §8.3, §52.4 |
 | Business profile | human | options | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | Schema: profile-schema.md, profile-snapshot-schema.md; §22 | §8.3, §52.4 |
-| Section templates | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice / export-before-remove | CPT schema versioned; post meta for template metadata | §9.1 |
-| Page templates | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | As above | §9.1 |
-| Compositions | human | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | CPT + post meta | §9.1, §9.3 |
-| Helper docs / one-pagers | system (generated) | CPT | site | long-lived operational | admin-visible restricted | Yes (optional) | No | preserve by choice | Documentation CPT schema | §9.1, §52.5 |
-| AI run (metadata/identity) | system | CPT | site | long-lived operational | admin-visible restricted | Yes (optional) | No | preserve by choice | CPT schema; links to artifacts table | §9.1 |
-| Prompt packs | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | CPT schema | §9.1 |
+| Section templates | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice / export-before-remove | Object schema: object-model-schema.md §3.1; post meta for template metadata | §9.1 |
+| Page templates | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | Object schema: object-model-schema.md §3.2 | §9.1 |
+| Compositions | human | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | Object schema: object-model-schema.md §3.3; CPT + post meta | §9.1, §9.3 |
+| Helper docs / one-pagers | system (generated) | CPT | site | long-lived operational | admin-visible restricted | Yes (optional) | No | preserve by choice | Object schema: object-model-schema.md §3.7 (Documentation) | §9.1, §52.5 |
+| AI run (metadata/identity) | system | CPT | site | long-lived operational | admin-visible restricted | Yes (optional) | No | preserve by choice | Object schema: object-model-schema.md §3.5; links to artifacts table | §9.1 |
+| Prompt packs | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | Object schema: object-model-schema.md §3.6 | §9.1 |
 | AI artifacts (raw payloads) | system | custom table | site | long-lived operational | admin-visible restricted | Optional | No | preserve by choice / retention policy | Table schema versioned; redaction on export | §9.5, §29 |
-| Build Plans | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | CPT + post meta for status/provenance | §9.1, §9.3 |
+| Build Plans | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | Object schema: object-model-schema.md §3.4; CPT + post meta for status/provenance | §9.1, §9.3 |
 | Crawl snapshots | system | custom table | site | medium-lived operational | internal operational | Optional | No | retention-managed / remove by policy | Table schema versioned | §9.5, §8.5 |
 | Execution logs | system | custom table | site | medium-lived operational | internal operational | Optional | No | retention-managed | Table schema; no secrets in logs | §9.5, §45 |
 | Rollback records | system | custom table | site | long-lived operational | admin-visible restricted | Optional | No | preserve by choice / retention | Table schema | §9.5 |
