@@ -45,3 +45,27 @@ if ( ! function_exists( 'sanitize_text_field' ) ) {
 		return trim( (string) $str );
 	}
 }
+if ( ! function_exists( 'add_action' ) ) {
+	function add_action( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
+		// No-op for unit tests; CPT registration runs in WP context.
+	}
+}
+if ( ! function_exists( 'register_post_type' ) ) {
+	function register_post_type( $post_type, $args = array() ) {
+		if ( ! isset( $GLOBALS['_aio_registered_post_types'] ) ) {
+			$GLOBALS['_aio_registered_post_types'] = array();
+		}
+		$GLOBALS['_aio_registered_post_types'][ $post_type ] = $args;
+		return $post_type;
+	}
+}
+if ( ! function_exists( '_x' ) ) {
+	function _x( $text, $context, $domain = 'default' ) {
+		return $text;
+	}
+}
+if ( ! function_exists( '__' ) ) {
+	function __( $text, $domain = 'default' ) {
+		return $text;
+	}
+}

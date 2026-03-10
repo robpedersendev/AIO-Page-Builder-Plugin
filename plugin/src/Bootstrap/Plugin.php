@@ -30,6 +30,9 @@ require_once $bootstrap_dir . '/../Domain/Storage/Profile/Profile_Validation_Res
 require_once $bootstrap_dir . '/../Domain/Storage/Profile/Profile_Normalizer.php';
 require_once $bootstrap_dir . '/../Domain/Storage/Profile/Profile_Store.php';
 require_once $bootstrap_dir . '/../Domain/Storage/Profile/Profile_Snapshot_Helper.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Objects/Object_Type_Keys.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Objects/Object_Status_Families.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Objects/Post_Type_Registrar.php';
 require_once $bootstrap_dir . '/../Support/Logging/Log_Severities.php';
 require_once $bootstrap_dir . '/../Support/Logging/Log_Categories.php';
 require_once $bootstrap_dir . '/../Support/Logging/Error_Record.php';
@@ -39,6 +42,7 @@ require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Config_Pro
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Diagnostics_Provider.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Admin_Router_Provider.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Capability_Provider.php';
+require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Object_Registration_Provider.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
 require_once $bootstrap_dir . '/Lifecycle_Manager.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Dashboard_Screen.php';

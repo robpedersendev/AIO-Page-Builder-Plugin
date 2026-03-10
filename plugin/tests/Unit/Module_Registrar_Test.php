@@ -21,10 +21,18 @@ require_once $plugin_root . '/src/Infrastructure/Container/Service_Provider_Inte
 require_once $plugin_root . '/src/Infrastructure/Container/Service_Container.php';
 require_once $plugin_root . '/src/Infrastructure/Config/Versions.php';
 require_once $plugin_root . '/src/Infrastructure/Config/Plugin_Config.php';
+require_once $plugin_root . '/src/Support/Logging/Log_Severities.php';
+require_once $plugin_root . '/src/Support/Logging/Log_Categories.php';
+require_once $plugin_root . '/src/Support/Logging/Error_Record.php';
+require_once $plugin_root . '/src/Support/Logging/Logger_Interface.php';
+require_once $plugin_root . '/src/Support/Logging/Null_Logger.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Config_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Diagnostics_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Admin_Router_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Capability_Provider.php';
+require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Type_Keys.php';
+require_once $plugin_root . '/src/Domain/Storage/Objects/Post_Type_Registrar.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/Object_Registration_Provider.php';
 require_once $plugin_root . '/src/Bootstrap/Module_Registrar.php';
 
 /**
@@ -40,6 +48,7 @@ final class Module_Registrar_Test extends TestCase {
 		$this->assertTrue( $container->has( 'diagnostics' ) );
 		$this->assertTrue( $container->has( 'admin_router' ) );
 		$this->assertTrue( $container->has( 'capabilities' ) );
+		$this->assertTrue( $container->has( 'post_type_registrar' ) );
 	}
 
 	public function test_config_service_resolves_and_exposes_versions(): void {

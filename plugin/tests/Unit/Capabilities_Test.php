@@ -23,9 +23,9 @@ final class Capabilities_Test extends TestCase {
 	public function test_get_all_returns_full_list_in_stable_order(): void {
 		$all = Capabilities::getAll();
 		$this->assertIsArray( $all );
-		$this->assertCount( 22, $all );
+		$this->assertCount( 26, $all );
 		$this->assertSame( Capabilities::MANAGE_SETTINGS, $all[0] );
-		$this->assertSame( Capabilities::MANAGE_REPORTING_AND_PRIVACY, $all[21] );
+		$this->assertSame( Capabilities::VIEW_VERSION_SNAPSHOTS, $all[25] );
 	}
 
 	public function test_constants_are_stable_strings(): void {

@@ -39,6 +39,12 @@ final class Capabilities {
 	public const EXECUTE_ROLLBACKS              = 'aio_execute_rollbacks';
 	public const MANAGE_REPORTING_AND_PRIVACY   = 'aio_manage_reporting_and_privacy';
 
+	/** CPT-level: Prompt Pack, Documentation, AI Run metadata, Version Snapshot (spec §10, §44.3). */
+	public const MANAGE_PROMPT_PACKS    = 'aio_manage_prompt_packs';
+	public const MANAGE_DOCUMENTATION   = 'aio_manage_documentation';
+	public const VIEW_AI_RUNS           = 'aio_view_ai_runs';
+	public const VIEW_VERSION_SNAPSHOTS = 'aio_view_version_snapshots';
+
 	/** @var array<string>|null Full list cached for getAll(). */
 	private static ?array $all = null;
 
@@ -74,6 +80,10 @@ final class Capabilities {
 			self::IMPORT_DATA,
 			self::EXECUTE_ROLLBACKS,
 			self::MANAGE_REPORTING_AND_PRIVACY,
+			self::MANAGE_PROMPT_PACKS,
+			self::MANAGE_DOCUMENTATION,
+			self::VIEW_AI_RUNS,
+			self::VIEW_VERSION_SNAPSHOTS,
 		);
 		return self::$all;
 	}
