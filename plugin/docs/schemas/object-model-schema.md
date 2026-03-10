@@ -70,6 +70,8 @@ No status values such as `misc`, `done`, or other arbitrary labels. Only the enu
 | **Migration** | Version metadata and compatibility metadata support schema upgrades. |
 | **Sensitivity** | Admin-visible; no secrets. |
 
+For the full implementation-grade section schema (required/optional fields, sub-manifests, validation, completeness rules), see **section-registry-schema.md**.
+
 ---
 
 ### 3.2 Page Template (§10.2)
