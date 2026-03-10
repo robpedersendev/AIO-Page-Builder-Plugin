@@ -91,6 +91,8 @@ For the full implementation-grade section schema (required/optional fields, sub-
 | **Migration** | Version metadata; section refs are keys, stable across exports. |
 | **Sensitivity** | Admin-visible. |
 
+For the full implementation-grade page template schema (required/optional fields, ordered sections, one-pager metadata, compatibility, version/deprecation), see **page-template-registry-schema.md**.
+
 ---
 
 ### 3.3 Custom Template Composition (§10.3)
