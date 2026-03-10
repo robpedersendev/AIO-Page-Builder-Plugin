@@ -17,6 +17,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Capability_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Config_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Diagnostics_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Object_Registration_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\Repositories_Provider;
 
 /**
  * Loads and runs only bootstrap-level providers. Domain providers are registered in later prompts.
@@ -46,6 +47,7 @@ final class Module_Registrar {
 			new Admin_Router_Provider(),
 			new Capability_Provider(),
 			new Object_Registration_Provider(),
+			new Repositories_Provider(),
 		);
 		foreach ( $providers as $provider ) {
 			$provider->register( $this->container );
