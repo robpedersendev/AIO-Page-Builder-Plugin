@@ -159,15 +159,24 @@ if ( ! class_exists( 'WP_Query' ) ) {
 		}
 	}
 }
-// * Stubs for Plugin_Path_Manager tests. Set $GLOBALS['_aio_wp_upload_dir'] to control wp_upload_dir().
+// * Stubs for Plugin_Path_Manager tests. Control via $GLOBALS['_aio_wp_upload_dir'].
 if ( ! function_exists( 'wp_upload_dir' ) ) {
 	function wp_upload_dir() {
-		$dir = isset( $GLOBALS['_aio_wp_upload_dir'] ) ? $GLOBALS['_aio_wp_upload_dir'] : array( 'basedir' => sys_get_temp_dir(), 'error' => false );
-		return is_array( $dir ) ? $dir : array( 'basedir' => sys_get_temp_dir(), 'error' => false );
+		if ( isset( $GLOBALS['_aio_wp_upload_dir'] ) && is_array( $GLOBALS['_aio_wp_upload_dir'] ) ) {
+			return array_merge(
+				array( 'basedir' => '', 'baseurl' => '', 'error' => false ),
+				$GLOBALS['_aio_wp_upload_dir']
+			);
+		}
+		return array( 'basedir' => rtrim( sys_get_temp_dir(), '/\\' ), 'baseurl' => '', 'error' => false );
 	}
 }
 if ( ! function_exists( 'wp_mkdir_p' ) ) {
-	function wp_mkdir_p( $path ) {
-		return is_dir( $path ) || @mkdir( $path, 0755, true );
+	function wp_mkdir_p( $target ) {
+		$target = rtrim( $target, '/\\' );
+		if ( is_dir( $target ) ) {
+			return true;
+		}
+		return @mkdir( $target, 0755, true );
 	}
 }
