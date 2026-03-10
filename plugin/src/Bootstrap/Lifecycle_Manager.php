@@ -12,6 +12,9 @@ namespace AIOPageBuilder\Bootstrap;
 
 defined( 'ABSPATH' ) || exit;
 
+require_once __DIR__ . '/../Infrastructure/Config/Dependency_Requirements.php';
+require_once __DIR__ . '/Environment_Validator.php';
+
 /**
  * Result status for a lifecycle phase or overall run.
  */
@@ -178,12 +181,14 @@ final class Lifecycle_Manager {
 	// ----- Activation phase placeholders (spec §53.1, §53.2) -----
 
 	private function validate_environment(): Lifecycle_Result {
-		// Placeholder: later prompt implements WP/PHP version checks. Blocking if failed.
-		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'validate_environment' );
+		$validator = new Environment_Validator();
+		$validator->validate();
+		return $validator->to_lifecycle_result( 'validate_environment' );
 	}
 
 	private function check_dependencies(): Lifecycle_Result {
-		// Placeholder: later prompt implements required-plugin checks. Blocking if failed.
+		// Required/optional dependency checks are run in validate_environment via Environment_Validator.
+		// This phase remains for future dependency logic that runs after environment (e.g. version handshakes).
 		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'check_dependencies' );
 	}
 
