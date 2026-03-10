@@ -55,7 +55,7 @@ final class Constants {
 			return;
 		}
 		$root = dirname( __DIR__, 2 );
-		self::$plugin_dir  = trailingslashit( $root );
+		self::$plugin_dir  = \trailingslashit( $root );
 		self::$plugin_file  = self::$plugin_dir . self::MAIN_FILE;
 		$dir_const  = 'AIO_PAGE_BUILDER_DIR';
 		$file_const = 'AIO_PAGE_BUILDER_FILE';
