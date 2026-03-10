@@ -1,0 +1,95 @@
+At the end of every successful agent task in this WordPress plugin repository, automatically complete the Git workflow for the work that was just finished.
+
+Repository context:
+- This is a privately distributed WordPress plugin project.
+- Commits must stay clean, scoped, reviewable, and aligned with WordPress-style engineering standards.
+- Only commit files related to the completed task.
+
+Required workflow after each completed task:
+1. Review all changed files.
+2. Exclude unrelated files, accidental files, temporary files, secrets, credentials, machine-specific files, caches, logs, and dependency directories unless explicitly intended.
+3. Stage only the files relevant to the completed task.
+4. Create a clear, accurate Git commit message using the commit format defined below.
+5. Commit the staged files.
+6. Push the commit to the current branch's configured remote.
+
+Commit message format:
+- Use conventional commits.
+- Prefer one of:
+  - feat(...)
+  - fix(...)
+  - refactor(...)
+  - docs(...)
+  - chore(...)
+  - test(...)
+  - perf(...)
+  - build(...)
+  - ci(...)
+  - security(...)
+- Use a WordPress-plugin-relevant scope when useful.
+
+Preferred scopes:
+- plugin
+- admin
+- settings
+- rest
+- ajax
+- reporting
+- diagnostics
+- security
+- bootstrap
+- uninstall
+- tests
+- docs
+- ci
+- build
+
+Examples:
+- feat(plugin): scaffold base plugin architecture
+- fix(security): add capability and nonce checks to admin actions
+- refactor(settings): separate settings registration from admin rendering
+- docs(plugin): document private distribution reporting behavior
+- test(rest): add coverage for permission callbacks
+- chore(build): align composer and wp-env configuration
+- security(reporting): redact sensitive fields from outbound payloads
+- fix(uninstall): preserve generated content during cleanup
+
+Commit quality rules:
+- The message must describe what changed.
+- The message should imply why the change was made when useful.
+- Keep the subject line concise and specific.
+- Do not use vague messages like:
+  - update files
+  - misc fixes
+  - changes
+  - working version
+  - final
+  - cleanup
+
+Safety rules:
+- Do not commit or push if there are no changes.
+- Do not commit partial work unless the user explicitly asked for a partial checkpoint.
+- Do not commit broken placeholder code when the goal was working code.
+- Do not commit TODO-only scaffolds unless clearly requested.
+- Do not commit secrets, tokens, API keys, .env files, credentials, private certificates, or local override files.
+- Do not commit vendor directories, node_modules, logs, coverage output, cache files, or OS/editor junk unless explicitly intended.
+- Do not use force push.
+- Do not rewrite history.
+- Do not amend prior commits unless explicitly instructed.
+- Do not bypass hooks with --no-verify unless explicitly instructed.
+- If Git identity, authentication, remote configuration, branch protections, merge conflicts, or hooks block completion, stop and report the exact issue.
+
+Before committing:
+- Confirm the task is actually complete.
+- Confirm the changed files match the requested task.
+- Confirm no unrelated files are included.
+- Confirm the code and docs are internally consistent.
+- Confirm WordPress-specific work includes appropriate lifecycle, capability, validation, sanitization, escaping, and uninstall considerations where relevant.
+
+After committing:
+- Push to the current branch.
+- Report:
+  - the files committed
+  - the final commit message
+  - whether the push succeeded
+  - any Git issue that blocked completion
