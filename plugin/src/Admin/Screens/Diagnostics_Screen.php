@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Placeholder Diagnostics screen. Renders title and not-yet-implemented notice.
+ * Structured logging bootstrap (Logger_Interface, Error_Record) is available via container key `logger` / `diagnostics`; see diagnostics-contract.md.
  */
 final class Diagnostics_Screen {
 
@@ -38,7 +39,7 @@ final class Diagnostics_Screen {
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-diagnostics">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
-			<p class="aio-page-builder-notice"><?php \esc_html_e( 'Not yet implemented. This screen will show environment validation and diagnostics.', 'aio-page-builder' ); ?></p>
+			<p class="aio-page-builder-notice"><?php \esc_html_e( 'Not yet implemented. This screen will show environment validation and diagnostics. Structured logging is available for internal use.', 'aio-page-builder' ); ?></p>
 		</div>
 		<?php
 	}
