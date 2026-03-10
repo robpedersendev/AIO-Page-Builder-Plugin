@@ -113,6 +113,8 @@ For the full implementation-grade page template schema (required/optional fields
 | **Migration** | Snapshot reference preserves registry state at creation. |
 | **Sensitivity** | Admin-visible. |
 
+For the composition validation state machine (lifecycle statuses, validation result, validation codes, transitions, provenance, snapshot and duplication/import rules), see **composition-validation-state-machine.md**.
+
 ---
 
 ### 3.4 Build Plan (§10.4)
