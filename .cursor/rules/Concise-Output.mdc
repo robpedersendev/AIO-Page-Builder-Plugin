@@ -1,0 +1,32 @@
+---
+alwaysApply: true
+---
+Do not print full file contents, large code blocks, or rewritten whole files in agent output.
+
+Default behavior:
+- Make the file edits directly.
+- Summarize what changed in plain English.
+- Reference file paths and functions/classes changed.
+- Keep output concise and action-focused.
+- Prefer short bullets over long pasted code.
+
+When reporting results:
+- Do not echo entire files.
+- Do not paste large code sections that were already written into files.
+- Show only small snippets when absolutely necessary.
+- If a snippet is needed, keep it to the minimum relevant lines.
+
+For code changes:
+- Use the editor diff as the primary source of truth.
+- After editing, tell me which files changed and what changed at a high level.
+- Only provide full file contents if I explicitly say things like:
+  - show me the file
+  - paste the full code
+  - output the entire file
+
+For debugging:
+- Summarize the root cause and fix without dumping full files.
+- Prefer “changed X in file Y” over printing the entire implementation.
+
+For documentation:
+- Summarize generated docs unless I explicitly ask for the full text in agent output.
