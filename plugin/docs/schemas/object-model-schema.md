@@ -210,6 +210,8 @@ For the composition validation state machine (lifecycle statuses, validation res
 | **Migration** | schema_version and scope identify snapshot; payload format versioned. |
 | **Sensitivity** | Depends on payload; profile/registry snapshots admin-visible. |
 
+For the full version snapshot object schema (scope types, root fields, object_refs, version/provenance/compatibility blocks, retention, examples), see **version-snapshot-schema.md**.
+
 ---
 
 ## 4. Relationship map
