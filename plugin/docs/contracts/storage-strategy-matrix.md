@@ -49,16 +49,16 @@
 | Helper docs / one-pagers | system (generated) | CPT | site | long-lived operational | admin-visible restricted | Yes (optional) | No | preserve by choice | Object schema: object-model-schema.md §3.7 (Documentation) | §9.1, §52.5 |
 | AI run (metadata/identity) | system | CPT | site | long-lived operational | admin-visible restricted | Yes (optional) | No | preserve by choice | Object schema: object-model-schema.md §3.5; links to artifacts table | §9.1 |
 | Prompt packs | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | Object schema: object-model-schema.md §3.6 | §9.1 |
-| AI artifacts (raw payloads) | system | custom table | site | long-lived operational | admin-visible restricted | Optional | No | preserve by choice / retention policy | Table schema versioned; redaction on export | §9.5, §29 |
+| AI artifacts (raw payloads) | system | custom table | site | long-lived operational | admin-visible restricted | Optional | No | preserve by choice / retention policy | custom-table-manifest.md §3.2; redaction on export | §9.5, §29 |
 | Build Plans | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | Object schema: object-model-schema.md §3.4; CPT + post meta for status/provenance | §9.1, §9.3 |
-| Crawl snapshots | system | custom table | site | medium-lived operational | internal operational | Optional | No | retention-managed / remove by policy | Table schema versioned | §9.5, §8.5 |
-| Execution logs | system | custom table | site | medium-lived operational | internal operational | Optional | No | retention-managed | Table schema; no secrets in logs | §9.5, §45 |
-| Rollback records | system | custom table | site | long-lived operational | admin-visible restricted | Optional | No | preserve by choice / retention | Table schema | §9.5 |
-| Queue records | system | custom table | site | short-lived operational | internal operational | No | Yes | routine cleanup | Table schema | §9.5, §8.5 |
-| Token sets | human/system | custom table | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | Table schema | §9.5, §52.4 |
-| Assignment maps | system | custom table | site | long-lived operational | admin-visible restricted | Yes | No | preserve by choice | Table schema | §9.5 |
+| Crawl snapshots | system | custom table | site | medium-lived operational | internal operational | Optional | No | retention-managed / remove by policy | custom-table-manifest.md §3.1 | §9.5, §8.5 |
+| Execution logs | system | custom table | site | medium-lived operational | internal operational | Optional | No | retention-managed | custom-table-manifest.md §3.4; no secrets in logs | §9.5, §45 |
+| Rollback records | system | custom table | site | long-lived operational | admin-visible restricted | Optional | No | preserve by choice / retention | custom-table-manifest.md §3.5 | §9.5 |
+| Queue records | system | custom table | site | short-lived operational | internal operational | No | Yes | routine cleanup | custom-table-manifest.md §3.3 | §9.5, §8.5 |
+| Token sets | human/system | custom table | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | custom-table-manifest.md §3.6 | §9.5, §52.4 |
+| Assignment maps | system | custom table | site | long-lived operational | admin-visible restricted | Yes | No | preserve by choice | custom-table-manifest.md §3.7 | §9.5 |
 | Field assignments (per-object) | human/system | post meta | object | permanent until user deletion | admin-visible restricted | Yes (with parent) | No | with parent CPT | Meta key stability | §9.3 |
-| Reporting delivery records | system | custom table | site | long-lived operational | internal operational | No | Yes | retention-managed | Table schema; no secrets | §9.5 |
+| Reporting delivery records | system | custom table | site | long-lived operational | internal operational | No | Yes | retention-managed | custom-table-manifest.md §3.8; no secrets | §9.5 |
 | User view preferences | human | user meta | user | permanent until user deletion | admin-visible restricted | No | Yes | remove with user or leave | Key namespaced | §9.6 |
 | User dismissed notices | human | user meta | user | medium-lived operational | internal operational | No | Yes | remove with user or leave | Key namespaced | §9.6 |
 | Transient caches (crawl summary, provider capability, etc.) | system | transient | site | ephemeral cache | internal operational | No | Yes | expire naturally | No migration | §9.7 |
