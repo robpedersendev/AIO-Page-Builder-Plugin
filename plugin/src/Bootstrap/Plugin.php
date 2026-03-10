@@ -27,6 +27,7 @@ require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Diagnostic
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Admin_Router_Provider.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Capability_Provider.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
+require_once $bootstrap_dir . '/Lifecycle_Manager.php';
 
 /**
  * Plugin bootstrap. Activation, deactivation, and run() are the only public entrypoints.
@@ -48,24 +49,34 @@ final class Plugin {
 	}
 
 	/**
-	 * Activation hook. Future: environment validation, dependency check, option init,
-	 * table/schema check, capability registration, schedule registration, install notification.
-	 * Must not perform destructive or user-facing writes until those flows are specified.
+	 * Activation hook. Delegates to Lifecycle_Manager; aborts on blocking failure.
 	 *
 	 * @return void
 	 */
 	public static function activate(): void {
-		// Stub: no logic yet. Later prompts add validation and setup.
+		$manager = new Lifecycle_Manager();
+		$result  = $manager->activate();
+		if ( $result->is_blocking() ) {
+			if ( function_exists( 'deactivate_plugins' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+				deactivate_plugins( Constants::plugin_basename() );
+			}
+			\wp_die(
+				\esc_html( $result->message ?: 'Plugin activation failed.' ),
+				'Activation Failed',
+				array( 'response' => 500, 'back_link' => true )
+			);
+		}
 	}
 
 	/**
-	 * Deactivation hook. Future: unschedule cron, stop queue workers, flush caches as needed.
-	 * Must not delete content or options; uninstall owns cleanup.
+	 * Deactivation hook. Delegates to Lifecycle_Manager; non-destructive.
 	 *
 	 * @return void
 	 */
 	public static function deactivate(): void {
-		// Stub: no logic yet. Later prompts add teardown.
+		$manager = new Lifecycle_Manager();
+		$manager->deactivate();
 	}
 
 	/**
@@ -95,5 +106,10 @@ final class Plugin {
 	 * - [ ] No duplicate version/path definitions in root file.
 	 * - [ ] Min WP 6.6, min PHP 8.1 (Constants::min_wp_version(), min_php_version()).
 	 * - [ ] Versions::all() returns plugin, global_schema, table_schema, registry_schema, export_schema.
+	 *
+	 * Manual verification checklist (Prompt 005):
+	 * - [ ] Activation calls Lifecycle_Manager::activate(); deactivation calls Lifecycle_Manager::deactivate().
+	 * - [ ] Blocking failure from a phase aborts activation (plugin deactivated, message shown) without fatal.
+	 * - [ ] Uninstall file guarded by WP_UNINSTALL_PLUGIN; uninstall runs Lifecycle_Manager::uninstall(); no deletion.
 	 */
 }

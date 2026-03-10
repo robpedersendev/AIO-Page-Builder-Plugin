@@ -3,13 +3,19 @@
  * Uninstall handler.
  *
  * Runs only when the plugin is uninstalled via WordPress (WP_UNINSTALL_PLUGIN defined).
- * Currently performs no data deletion. Preserves built-page survivability.
- * Future: may remove plugin-owned operational data only; must not delete user content or built pages.
+ * Delegates to Lifecycle_Manager::uninstall() for orchestration. Currently non-destructive;
+ * preserves built-page survivability and export-before-cleanup pathway (see lifecycle-contract.md).
  *
  * @package AIOPageBuilder
  */
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
-// Stub: no destructive behavior. Capability removal, option deletion, and table cleanup
-// will be implemented in a later prompt with explicit uninstall contract and survivability rules.
+require_once __DIR__ . '/src/Bootstrap/Constants.php';
+\AIOPageBuilder\Bootstrap\Constants::init();
+require_once __DIR__ . '/src/Bootstrap/Lifecycle_Manager.php';
+
+$lifecycle = new \AIOPageBuilder\Bootstrap\Lifecycle_Manager();
+$lifecycle->uninstall();
+
+// No deletion in this implementation. Cleanup will be added when export/restore contract exists.
