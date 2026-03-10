@@ -32,6 +32,7 @@ final class Module_Registrar {
 
 	/**
 	 * Registers all bootstrap providers in order. Call once from Plugin::run().
+	 * Admin menu and screen routing are registered separately in Plugin::register_admin_menu().
 	 *
 	 * @return void
 	 */

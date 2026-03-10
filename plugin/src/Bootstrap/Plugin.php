@@ -28,6 +28,10 @@ require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Admin_Rout
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Capability_Provider.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
 require_once $bootstrap_dir . '/Lifecycle_Manager.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Dashboard_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Settings_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Diagnostics_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Admin_Menu.php';
 
 /**
  * Plugin bootstrap. Activation, deactivation, and run() are the only public entrypoints.
@@ -91,6 +95,19 @@ final class Plugin {
 		$registrar = new Module_Registrar( $container );
 		$registrar->register_bootstrap();
 		$this->container = $registrar->container();
+		if ( is_admin() ) {
+			add_action( 'admin_menu', array( $this, 'register_admin_menu' ), 10 );
+		}
+	}
+
+	/**
+	 * Registers the plugin admin menu and routes to screen classes.
+	 *
+	 * @return void
+	 */
+	public function register_admin_menu(): void {
+		$menu = new \AIOPageBuilder\Admin\Admin_Menu();
+		$menu->register();
 	}
 
 	/*
