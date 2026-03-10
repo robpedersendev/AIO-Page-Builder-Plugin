@@ -41,8 +41,8 @@
 | Dependency notice dismissals | human/system | options | site | medium-lived operational | internal operational | No | Yes | remove on uninstall | Optional | §9.4 |
 | Uninstall preferences | human | options | site | permanent until user deletion | user-configured | Yes | No | N/A (prefs govern cleanup) | Option structure | §9.4 |
 | Provider config reference | human | options (metadata only) | site | permanent until user deletion | privileged restricted | No | Yes | remove on uninstall | Secrets in separate storage; option holds ref/non-secret only | §9.4, §43.13 |
-| Brand profile | human | options (or dedicated option under same root) | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | Schema under main settings or dedicated key | §8.3, §52.4 |
-| Business profile | human | options | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | As above | §8.3, §52.4 |
+| Brand profile | human | options (or dedicated option under same root) | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | Schema: profile-schema.md, profile-snapshot-schema.md; §22 | §8.3, §52.4 |
+| Business profile | human | options | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | Schema: profile-schema.md, profile-snapshot-schema.md; §22 | §8.3, §52.4 |
 | Section templates | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice / export-before-remove | CPT schema versioned; post meta for template metadata | §9.1 |
 | Page templates | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | As above | §9.1 |
 | Compositions | human | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | CPT + post meta | §9.1, §9.3 |
