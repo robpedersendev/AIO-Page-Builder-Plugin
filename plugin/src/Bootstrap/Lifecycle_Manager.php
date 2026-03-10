@@ -14,6 +14,11 @@ defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/../Infrastructure/Config/Dependency_Requirements.php';
 require_once __DIR__ . '/../Infrastructure/Config/Capabilities.php';
+require_once __DIR__ . '/../Infrastructure/Config/Option_Names.php';
+require_once __DIR__ . '/../Infrastructure/Config/Versions.php';
+require_once __DIR__ . '/../Infrastructure/Settings/Settings_Service.php';
+require_once __DIR__ . '/../Domain/Storage/Migrations/Migration_Contract.php';
+require_once __DIR__ . '/../Domain/Storage/Migrations/Schema_Version_Tracker.php';
 require_once __DIR__ . '/Environment_Validator.php';
 require_once __DIR__ . '/Capability_Registrar.php';
 
@@ -200,7 +205,23 @@ final class Lifecycle_Manager {
 	}
 
 	private function check_tables_schema(): Lifecycle_Result {
-		// Placeholder: no table creation. Later prompt owns schema/table checks.
+		// Consult schema version tracker; no migration execution yet (see migration-contract.md).
+		$settings = new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+		$tracker  = new \AIOPageBuilder\Domain\Storage\Migrations\Schema_Version_Tracker( $settings );
+		$tracker->get_installed_versions();
+		foreach ( \AIOPageBuilder\Infrastructure\Config\Versions::version_keys() as $key ) {
+			if ( $key === 'plugin' ) {
+				continue;
+			}
+			if ( $tracker->is_installed_version_future( $key ) ) {
+				return new Lifecycle_Result(
+					Lifecycle_Result::STATUS_BLOCKING_FAILURE,
+					__( 'Unsupported schema: installed version is newer than this plugin supports. Upgrade the plugin or contact support.', 'aio-page-builder' ),
+					'check_tables_schema',
+					array( 'version_key' => $key )
+				);
+			}
+		}
 		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'check_tables_schema' );
 	}
 

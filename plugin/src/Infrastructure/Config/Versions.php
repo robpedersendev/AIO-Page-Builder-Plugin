@@ -82,4 +82,14 @@ final class Versions {
 		$all = self::all();
 		return $all['export_schema'];
 	}
+
+	/**
+	 * Returns the list of version keys used in the stored version map (migration-contract.md).
+	 * Do not rename; append only for new domains.
+	 *
+	 * @return list<string>
+	 */
+	public static function version_keys(): array {
+		return array( 'plugin', 'global_schema', 'table_schema', 'registry_schema', 'export_schema' );
+	}
 }
