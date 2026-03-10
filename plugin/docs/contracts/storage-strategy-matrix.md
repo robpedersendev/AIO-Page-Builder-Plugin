@@ -20,7 +20,7 @@
 
 | Primitive | Use for |
 |-----------|--------|
-| **Options** | Global plugin configuration, version/migration markers, reporting settings, dependency dismissals, uninstall prefs, provider config reference (no secrets in exportable option values). |
+| **Options** | Global plugin configuration, version/migration markers, reporting settings, dependency dismissals, uninstall prefs, provider config reference, current brand/business profile (`aio_page_builder_profile_current`; no secrets in exportable option values). |
 | **CPT** | Section templates, page templates, compositions, Build Plans, AI run metadata, prompt packs, helper docs / one-pagers (human-meaningful, inspectable objects). |
 | **Post meta** | Object-level data attached to a CPT or built page: template metadata, composition metadata, field assignment references, execution provenance, status markers. |
 | **Custom tables** | Crawl snapshots, AI artifacts (raw), queue records, execution logs, rollback records, token sets, assignment maps, reporting delivery records (volume/structure/retention). |
@@ -41,8 +41,8 @@
 | Dependency notice dismissals | human/system | options | site | medium-lived operational | internal operational | No | Yes | remove on uninstall | Optional | §9.4 |
 | Uninstall preferences | human | options | site | permanent until user deletion | user-configured | Yes | No | N/A (prefs govern cleanup) | Option structure | §9.4 |
 | Provider config reference | human | options (metadata only) | site | permanent until user deletion | privileged restricted | No | Yes | remove on uninstall | Secrets in separate storage; option holds ref/non-secret only | §9.4, §43.13 |
-| Brand profile | human | options (or dedicated option under same root) | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | Schema: profile-schema.md, profile-snapshot-schema.md; §22 | §8.3, §52.4 |
-| Business profile | human | options | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | Schema: profile-schema.md, profile-snapshot-schema.md; §22 | §8.3, §52.4 |
+| Brand profile | human | options | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | Option `aio_page_builder_profile_current` key `brand_profile`; profile-schema.md, §22 | §8.3, §52.4 |
+| Business profile | human | options | site | permanent until user deletion | admin-visible restricted | Yes | No | remove if uninstall-prefs say so | Option `aio_page_builder_profile_current` key `business_profile`; profile-schema.md, §22 | §8.3, §52.4 |
 | Section templates | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice / export-before-remove | Object schema: object-model-schema.md §3.1; post meta for template metadata | §9.1 |
 | Page templates | human/system | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | Object schema: object-model-schema.md §3.2 | §9.1 |
 | Compositions | human | CPT | site | permanent until user deletion | admin-visible restricted | Yes | No | preserve by choice | Object schema: object-model-schema.md §3.3; CPT + post meta | §9.1, §9.3 |

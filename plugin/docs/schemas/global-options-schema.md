@@ -23,6 +23,7 @@ All plugin options use the prefix `aio_page_builder_`. Keys are defined as const
 | `aio_page_builder_dependency_notices` | Dismissed dependency notices | internal operational | No | `{}` | bootstrap / diagnostics |
 | `aio_page_builder_uninstall_prefs` | Uninstall/restore preferences | user-configured | Yes | `{}` | bootstrap / uninstall |
 | `aio_page_builder_provider_config` | Provider config reference only; secrets in separate storage | privileged restricted / secret elsewhere | No | `{}` | AI provider (future) |
+| `aio_page_builder_profile_current` | Current editable brand and business profile (single option; shape: `{ brand_profile, business_profile }` per profile-schema.md) | admin-visible restricted | Yes | `{}` | storage / profile |
 
 ---
 
@@ -38,7 +39,7 @@ All plugin options use the prefix `aio_page_builder_`. Keys are defined as const
 
 | Classification | Options |
 |----------------|---------|
-| User-configurable | `aio_page_builder_settings`, `aio_page_builder_reporting`, `aio_page_builder_uninstall_prefs` |
+| User-configurable | `aio_page_builder_settings`, `aio_page_builder_reporting`, `aio_page_builder_uninstall_prefs`, `aio_page_builder_profile_current` |
 | Runtime / internal | `aio_page_builder_version_markers`, `aio_page_builder_dependency_notices` |
 | Reference / future | `aio_page_builder_provider_config` |
 

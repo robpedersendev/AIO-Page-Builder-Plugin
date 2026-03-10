@@ -49,6 +49,12 @@ final class Profile_Schema {
 	/** Asset reference role enum. */
 	public const ASSET_ROLES = array( 'logo', 'visual_identity', 'color_reference', 'typography_reference', 'other' );
 
+	/** Service/offer dedicated_pages_likely enum. */
+	public const DEDICATED_PAGES_LIKELY = array( 'yes', 'no', 'optional', 'not_applicable' );
+
+	/** Geography in_person_vs_remote enum. */
+	public const IN_PERSON_VS_REMOTE = array( 'in_person', 'remote', 'both', 'not_applicable' );
+
 	/** Snapshot scope types. */
 	public const SNAPSHOT_SCOPE_TYPES = array( 'ai_run', 'onboarding_session', 'plan', 'other' );
 }

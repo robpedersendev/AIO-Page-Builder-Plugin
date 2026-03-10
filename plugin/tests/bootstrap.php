@@ -29,3 +29,19 @@ if ( ! function_exists( 'update_option' ) ) {
 		return true;
 	}
 }
+if ( ! function_exists( 'esc_url_raw' ) ) {
+	function esc_url_raw( $url ) {
+		$url = trim( (string) $url );
+		return ( $url !== '' && preg_match( '#^https?://#i', $url ) ) ? $url : '';
+	}
+}
+if ( ! function_exists( 'wp_strip_all_tags' ) ) {
+	function wp_strip_all_tags( $string ) {
+		return preg_replace( '@<[^>]*?>@s', '', (string) $string );
+	}
+}
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+	function sanitize_text_field( $str ) {
+		return trim( (string) $str );
+	}
+}

@@ -36,6 +36,9 @@ final class Option_Names {
 	/** Provider config reference only; secrets live in separate storage (not in exportable blob). */
 	public const PROVIDER_CONFIG_REF = self::PREFIX . 'provider_config';
 
+	/** Current editable brand and business profile (single option; shape per profile-schema.md). */
+	public const PROFILE_CURRENT = self::PREFIX . 'profile_current';
+
 	/** @var array<string>|null */
 	private static ?array $all = null;
 
@@ -55,6 +58,7 @@ final class Option_Names {
 			self::DEPENDENCY_NOTICE_DISMISSALS,
 			self::UNINSTALL_PREFS,
 			self::PROVIDER_CONFIG_REF,
+			self::PROFILE_CURRENT,
 		);
 		return self::$all;
 	}
