@@ -1,0 +1,60 @@
+<?php
+/**
+ * Unit tests for Capabilities config (spec §44.3). Verifies stable capability list and helper accessors.
+ *
+ * @package AIOPageBuilder
+ */
+
+namespace AIOPageBuilder\Tests\Unit;
+
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use PHPUnit\Framework\TestCase;
+
+defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
+
+$plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Infrastructure/Config/Capabilities.php';
+
+/**
+ * Capability source-of-truth: constants, getAll(), get_editor_defaults(), is_plugin_capability().
+ */
+final class Capabilities_Test extends TestCase {
+
+	public function test_get_all_returns_full_list_in_stable_order(): void {
+		$all = Capabilities::getAll();
+		$this->assertIsArray( $all );
+		$this->assertCount( 22, $all );
+		$this->assertSame( Capabilities::MANAGE_SETTINGS, $all[0] );
+		$this->assertSame( Capabilities::MANAGE_REPORTING_AND_PRIVACY, $all[21] );
+	}
+
+	public function test_constants_are_stable_strings(): void {
+		$this->assertSame( 'aio_manage_settings', Capabilities::MANAGE_SETTINGS );
+		$this->assertSame( 'aio_view_build_plans', Capabilities::VIEW_BUILD_PLANS );
+		$this->assertSame( 'aio_approve_build_plans', Capabilities::APPROVE_BUILD_PLANS );
+		$this->assertSame( 'aio_view_logs', Capabilities::VIEW_LOGS );
+		$this->assertSame( 'aio_manage_reporting_and_privacy', Capabilities::MANAGE_REPORTING_AND_PRIVACY );
+	}
+
+	public function test_get_editor_defaults_returns_only_allowed_subset(): void {
+		$editor = Capabilities::get_editor_defaults();
+		$this->assertCount( 3, $editor );
+		$this->assertContains( Capabilities::VIEW_BUILD_PLANS, $editor );
+		$this->assertContains( Capabilities::APPROVE_BUILD_PLANS, $editor );
+		$this->assertContains( Capabilities::VIEW_LOGS, $editor );
+		$this->assertNotContains( Capabilities::MANAGE_AI_PROVIDERS, $editor );
+		$this->assertNotContains( Capabilities::EXECUTE_ROLLBACKS, $editor );
+	}
+
+	public function test_is_plugin_capability_returns_true_for_all_registered(): void {
+		foreach ( Capabilities::getAll() as $cap ) {
+			$this->assertTrue( Capabilities::is_plugin_capability( $cap ), "Expected {$cap} to be a plugin capability" );
+		}
+	}
+
+	public function test_is_plugin_capability_returns_false_for_unknown(): void {
+		$this->assertFalse( Capabilities::is_plugin_capability( 'manage_options' ) );
+		$this->assertFalse( Capabilities::is_plugin_capability( 'aio_fake_cap' ) );
+		$this->assertFalse( Capabilities::is_plugin_capability( '' ) );
+	}
+}

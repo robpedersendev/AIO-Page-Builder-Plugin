@@ -13,9 +13,13 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 require_once __DIR__ . '/src/Bootstrap/Constants.php';
 \AIOPageBuilder\Bootstrap\Constants::init();
+require_once __DIR__ . '/src/Infrastructure/Config/Capabilities.php';
+require_once __DIR__ . '/src/Bootstrap/Capability_Registrar.php';
 require_once __DIR__ . '/src/Bootstrap/Lifecycle_Manager.php';
 
 $lifecycle = new \AIOPageBuilder\Bootstrap\Lifecycle_Manager();
 $lifecycle->uninstall();
 
-// No deletion in this implementation. Cleanup will be added when export/restore contract exists.
+\AIOPageBuilder\Bootstrap\Capability_Registrar::remove_from_all_roles();
+
+// No other deletion in this implementation. Cleanup will be added when export/restore contract exists.

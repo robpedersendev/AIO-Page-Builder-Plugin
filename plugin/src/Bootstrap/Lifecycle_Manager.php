@@ -13,7 +13,9 @@ namespace AIOPageBuilder\Bootstrap;
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/../Infrastructure/Config/Dependency_Requirements.php';
+require_once __DIR__ . '/../Infrastructure/Config/Capabilities.php';
 require_once __DIR__ . '/Environment_Validator.php';
+require_once __DIR__ . '/Capability_Registrar.php';
 
 /**
  * Result status for a lifecycle phase or overall run.
@@ -203,7 +205,7 @@ final class Lifecycle_Manager {
 	}
 
 	private function register_capabilities(): Lifecycle_Result {
-		// Placeholder: later prompt registers capabilities.
+		Capability_Registrar::register();
 		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'register_capabilities' );
 	}
 
