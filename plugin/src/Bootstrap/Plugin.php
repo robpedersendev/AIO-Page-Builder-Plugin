@@ -1,0 +1,72 @@
+<?php
+/**
+ * Root bootstrap plugin class.
+ *
+ * Single controlled entry point for activation, deactivation, and runtime.
+ * Wires lifecycle hooks and delegates to domain only via services added in later prompts.
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Bootstrap;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Plugin bootstrap. Activation, deactivation, and run() are the only public entrypoints.
+ */
+final class Plugin {
+
+	/**
+	 * Called on plugins_loaded. Instantiates the plugin and runs it.
+	 * Future: will register autoloader, environment check, and service wiring here.
+	 *
+	 * @return void
+	 */
+	public static function bootstrap(): void {
+		$plugin = new self();
+		$plugin->run();
+	}
+
+	/**
+	 * Activation hook. Future: environment validation, dependency check, option init,
+	 * table/schema check, capability registration, schedule registration, install notification.
+	 * Must not perform destructive or user-facing writes until those flows are specified.
+	 *
+	 * @return void
+	 */
+	public static function activate(): void {
+		// Stub: no logic yet. Later prompts add validation and setup.
+	}
+
+	/**
+	 * Deactivation hook. Future: unschedule cron, stop queue workers, flush caches as needed.
+	 * Must not delete content or options; uninstall owns cleanup.
+	 *
+	 * @return void
+	 */
+	public static function deactivate(): void {
+		// Stub: no logic yet. Later prompts add teardown.
+	}
+
+	/**
+	 * Runtime entry point. Runs after WordPress has loaded.
+	 * Future: register hooks, enqueue assets, register REST/AJAX, admin menus, and domain services.
+	 *
+	 * @return void
+	 */
+	public function run(): void {
+		// Stub: no logic yet. Later prompts extend run() with service registration.
+	}
+
+	/*
+	 * Manual verification checklist (Prompt 002):
+	 * - [ ] Plugin appears in WP admin Plugins list.
+	 * - [ ] Activate: no fatal error; activation completes.
+	 * - [ ] Deactivate: no fatal error; deactivation completes.
+	 * - [ ] Direct access to uninstall.php: exits without defining WP_UNINSTALL_PLUGIN (safe).
+	 * - [ ] No options, capabilities, or content deleted by root/bootstrap/uninstall stubs.
+	 */
+}

@@ -2,19 +2,14 @@
 /**
  * Uninstall handler.
  *
- * Removes plugin-owned operational data only. Preserves built content.
+ * Runs only when the plugin is uninstalled via WordPress (WP_UNINSTALL_PLUGIN defined).
+ * Currently performs no data deletion. Preserves built-page survivability.
+ * Future: may remove plugin-owned operational data only; must not delete user content or built pages.
  *
- * @package PrivatePluginBase
+ * @package AIOPageBuilder
  */
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
-// Remove capability from all roles.
-require_once dirname( __DIR__ ) . '/vendor/autoload.php';
-\PrivatePluginBase\Security\Capabilities::remove_from_all();
-
-// Remove plugin options.
-delete_option( 'private_plugin_base_meta' );
-delete_option( 'private_plugin_base_options' );
-
-// Intentionally preserve built content. No user-created data removed.
+// Stub: no destructive behavior. Capability removal, option deletion, and table cleanup
+// will be implemented in a later prompt with explicit uninstall contract and survivability rules.
