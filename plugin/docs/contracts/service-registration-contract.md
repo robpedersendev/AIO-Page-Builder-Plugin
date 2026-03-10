@@ -24,7 +24,8 @@
   | ID             | Purpose                              |
   |----------------|--------------------------------------|
   | `config`       | Constants-aware config (Constants + Versions). |
-  | `diagnostics`  | Diagnostics/logging bootstrap (placeholder).    |
+  | `settings`     | Global options get/set (Option_Names, Settings_Service; see global-options-schema.md). |
+  | `diagnostics`  | Diagnostics/logging bootstrap.    |
   | `admin_router` | Admin menu/screen routing (placeholder).        |
   | `capabilities` | Capability registration (placeholder).         |
 

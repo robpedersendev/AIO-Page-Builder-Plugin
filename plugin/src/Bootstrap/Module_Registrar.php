@@ -32,6 +32,7 @@ final class Module_Registrar {
 
 	/**
 	 * Registers all bootstrap providers in order. Call once from Plugin::run().
+	 * Config_Provider registers config and settings (see global-options-schema.md).
 	 * Diagnostics_Provider registers logger and diagnostics helper (see diagnostics-contract.md).
 	 * Admin menu and screen routing are registered separately in Plugin::register_admin_menu().
 	 *

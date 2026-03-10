@@ -22,6 +22,8 @@ require_once $bootstrap_dir . '/../Infrastructure/Container/Service_Provider_Int
 require_once $bootstrap_dir . '/../Infrastructure/Container/Service_Container.php';
 require_once $bootstrap_dir . '/../Infrastructure/Config/Versions.php';
 require_once $bootstrap_dir . '/../Infrastructure/Config/Plugin_Config.php';
+require_once $bootstrap_dir . '/../Infrastructure/Config/Option_Names.php';
+require_once $bootstrap_dir . '/../Infrastructure/Settings/Settings_Service.php';
 require_once $bootstrap_dir . '/../Support/Logging/Log_Severities.php';
 require_once $bootstrap_dir . '/../Support/Logging/Log_Categories.php';
 require_once $bootstrap_dir . '/../Support/Logging/Error_Record.php';
