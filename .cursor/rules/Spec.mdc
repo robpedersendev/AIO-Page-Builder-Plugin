@@ -1,0 +1,17 @@
+---
+description: Master specification authority for AIO Page Builder
+alwaysApply: true
+---
+
+The governing product specification for this project is:
+
+/docs/specs/aio-page-builder-master-spec.md
+
+This file is the authoritative source of truth for product behavior, architecture, constraints, and implementation boundaries.
+
+When working on this project:
+- Read the master spec before making architectural or implementation decisions.
+- Treat numbered section references in prompts as references to this spec file.
+- Do not simplify, redesign, or reinterpret hard requirements unless an explicit revision document in the repo overrides the spec.
+- Prefer the spec over assumptions.
+- If implementation docs or code appear to conflict with the spec, flag the conflict rather than silently choosing a shortcut.

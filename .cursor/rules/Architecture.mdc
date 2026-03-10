@@ -1,0 +1,15 @@
+---
+alwaysApply: true
+---
+
+Separate bootstrap, admin UI, REST/AJAX, domain services, persistence, reporting, and diagnostics.
+
+Keep planner logic separate from executor logic.
+
+Do not couple generated content survival to plugin activation unless explicitly approved.
+
+Prefer native WordPress storage and APIs.
+
+Use namespaces and autoloading for new code.
+
+Avoid giant god classes and procedural sprawl.

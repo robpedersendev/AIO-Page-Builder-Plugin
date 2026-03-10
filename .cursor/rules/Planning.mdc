@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+
+Before major implementation, produce a concise plan covering files changed, risks, data model impact, security impact, rollback/uninstall impact, and test strategy.
+
+For destructive or irreversible behavior, produce a preflight checklist before coding.

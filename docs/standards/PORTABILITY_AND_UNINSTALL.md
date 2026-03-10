@@ -1,0 +1,27 @@
+# Portability and Uninstall
+
+This document defines policy for content survivability and plugin uninstall behavior. It is designed to be explicit, reviewable, and reusable for future unrelated WordPress plugins.
+
+## Survivability
+
+Generated content must not depend on plugin activation for survival unless explicitly approved.
+
+- Do not couple generated content (pages, blocks, layouts, user-created data) to plugin activation. Content created by the plugin for users should survive plugin deactivation and, where appropriate, uninstall.
+- Exceptions require explicit approval and must be documented in [DECISION_LOG.md](../decisions/DECISION_LOG.md).
+
+## Storage
+
+- Prefer native WordPress storage for user-created content: posts, post meta, options, taxonomies.
+- Content stored in standard WP structures is portable and survives plugin lifecycle changes. Custom tables or proprietary formats may reduce portability.
+
+## Uninstall Policy
+
+- **Preserve built content by default.** User-created pages, posts, blocks, and similar content must remain intact after uninstall unless the user explicitly requests removal.
+- **Remove only plugin-owned operational data.** Options, transients, cron jobs, and other data used solely for plugin operation may be removed in `uninstall.php`.
+- Document what is removed vs preserved. Include rationale in feature design and in this document when policies change.
+
+## Implementation
+
+- `uninstall.php` runs only when the plugin is deleted via the WordPress admin (not on deactivation).
+- Check `defined( 'WP_UNINSTALL_PLUGIN' )` before any uninstall logic.
+- Do not remove content that users may have invested in. When in doubt, preserve.

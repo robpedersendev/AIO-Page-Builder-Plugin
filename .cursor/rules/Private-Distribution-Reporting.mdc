@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+
+Outbound install notifications, heartbeat messages, and diagnostics are allowed only because this product is privately distributed.
+
+Reporting code must be isolated in its own domain.
+
+All payloads require schema definitions, redaction rules, retry rules, timeout rules, and audit logs.
+
+Reporting failure must never take down core plugin behavior.
+
+Reporting must be disclosed in admin-facing documentation and settings/help content.

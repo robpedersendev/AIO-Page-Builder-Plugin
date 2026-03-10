@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+
+Admin pages must feel native to WordPress.
+
+REST routes must register explicit permission callbacks.
+
+AJAX handlers must verify intent, capability, and payload shape.
+
+Return structured errors and actionable messages.
+
+Long-running work must be queued, chunked, or scheduled.

@@ -1,0 +1,17 @@
+{
+  "name": "private-wp-plugin-base",
+  "private": true,
+  "scripts": {
+    "wp-env:start": "wp-env start",
+    "wp-env:stop": "wp-env stop",
+    "wp-env:destroy": "wp-env destroy",
+    "wp-env:clean": "wp-env clean all",
+    "lint:php": "composer run phpcs",
+    "fix:php": "composer run phpcbf",
+    "test:php": "composer run phpunit",
+    "analyse:php": "composer run phpstan"
+  },
+  "devDependencies": {
+    "@wordpress/env": "^11.1.0"
+  }
+}

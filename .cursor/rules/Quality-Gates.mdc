@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+---
+
+No code is complete until it passes linting, static analysis, and relevant tests.
+
+Treat Plugin Check findings as required review items even for private distribution.
+
+Treat WordPress Coding Standards warnings as design feedback, not optional decoration.
+
+Every feature must include failure handling, logging, and uninstall/cleanup reasoning.

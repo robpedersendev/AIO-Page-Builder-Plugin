@@ -1,0 +1,22 @@
+{
+    "name": "steadyhandmarketing/private-plugin-base",
+    "description": "Private WordPress plugin base",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Steady Hand Marketing"
+        }
+    ],
+    "minimum-stability": "stable",
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "require-dev": {
+        "wp-coding-standards/wpcs": "^3.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^13.0"
+    }
+}

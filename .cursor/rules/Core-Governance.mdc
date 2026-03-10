@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+---
+
+This repository builds privately distributed WordPress plugins.
+
+Follow WordPress plugin architecture, security, lifecycle, portability, and admin conventions by default.
+
+The only standing exception to wordpress.org-style behavior is approved private-distribution operational reporting.
+
+Never broaden that exception without a documented decision.
+
+Prefer stable contracts, deterministic behavior, and maintainable code over cleverness.
+
+Do not introduce hidden behavior.
+
+Explain architectural tradeoffs before implementing major changes.

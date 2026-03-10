@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+---
+
+Every privileged action requires a capability check.
+
+Use nonces for state-changing admin requests.
+
+Validate first, sanitize when needed, escape on output.
+
+Never expose secrets client-side.
+
+Never log or transmit secrets, tokens, passwords, or raw API keys.
+
+For outbound reporting, minimize payloads, document fields, and log delivery outcomes.
+
+Any personal data handling must consider export/erase integration and privacy disclosure.
