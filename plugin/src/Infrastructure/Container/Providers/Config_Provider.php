@@ -14,6 +14,9 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
+use AIOPageBuilder\Domain\Storage\Migrations\Schema_Version_Tracker;
+use AIOPageBuilder\Domain\Storage\Tables\DbDelta_Runner;
+use AIOPageBuilder\Domain\Storage\Tables\Table_Installer;
 use AIOPageBuilder\Infrastructure\Config\Plugin_Config;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
@@ -44,6 +47,20 @@ final class Config_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'profile_snapshot_helper', function (): Profile_Snapshot_Helper {
 			return new Profile_Snapshot_Helper();
+		} );
+		$container->register( 'schema_version_tracker', function () use ( $container ): Schema_Version_Tracker {
+			return new Schema_Version_Tracker( $container->get( 'settings' ) );
+		} );
+		$container->register( 'db_delta_runner', function (): DbDelta_Runner {
+			return new DbDelta_Runner();
+		} );
+		$container->register( 'table_installer', function () use ( $container ): Table_Installer {
+			global $wpdb;
+			return new Table_Installer(
+				$wpdb,
+				$container->get( 'db_delta_runner' ),
+				$container->get( 'schema_version_tracker' )
+			);
 		} );
 	}
 }

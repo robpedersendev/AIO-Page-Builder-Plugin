@@ -69,3 +69,8 @@ if ( ! function_exists( '__' ) ) {
 		return $text;
 	}
 }
+if ( ! function_exists( 'dbDelta' ) ) {
+	function dbDelta( $sql ) {
+		// No-op for unit tests; real table creation runs in WP context.
+	}
+}

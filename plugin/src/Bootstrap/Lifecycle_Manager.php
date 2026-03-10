@@ -19,6 +19,10 @@ require_once __DIR__ . '/../Infrastructure/Config/Versions.php';
 require_once __DIR__ . '/../Infrastructure/Settings/Settings_Service.php';
 require_once __DIR__ . '/../Domain/Storage/Migrations/Migration_Contract.php';
 require_once __DIR__ . '/../Domain/Storage/Migrations/Schema_Version_Tracker.php';
+require_once __DIR__ . '/../Domain/Storage/Tables/Table_Names.php';
+require_once __DIR__ . '/../Domain/Storage/Tables/Table_Schema_Definitions.php';
+require_once __DIR__ . '/../Domain/Storage/Tables/DbDelta_Runner.php';
+require_once __DIR__ . '/../Domain/Storage/Tables/Table_Installer.php';
 require_once __DIR__ . '/Environment_Validator.php';
 require_once __DIR__ . '/Capability_Registrar.php';
 
@@ -205,10 +209,28 @@ final class Lifecycle_Manager {
 	}
 
 	private function check_tables_schema(): Lifecycle_Result {
-		// Consult schema version tracker; no migration execution yet (see migration-contract.md).
-		$settings = new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
-		$tracker  = new \AIOPageBuilder\Domain\Storage\Migrations\Schema_Version_Tracker( $settings );
-		$tracker->get_installed_versions();
+		$wpdb = isset( $GLOBALS['wpdb'] ) && $GLOBALS['wpdb'] instanceof \wpdb ? $GLOBALS['wpdb'] : null;
+		if ( ! $wpdb ) {
+			return new Lifecycle_Result(
+				Lifecycle_Result::STATUS_BLOCKING_FAILURE,
+				__( 'Database unavailable. Table verification skipped.', 'aio-page-builder' ),
+				'check_tables_schema',
+				array()
+			);
+		}
+		$settings  = new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+		$tracker   = new \AIOPageBuilder\Domain\Storage\Migrations\Schema_Version_Tracker( $settings );
+		$db_delta  = new \AIOPageBuilder\Domain\Storage\Tables\DbDelta_Runner();
+		$installer = new \AIOPageBuilder\Domain\Storage\Tables\Table_Installer( $wpdb, $db_delta, $tracker );
+		$result    = $installer->install_or_upgrade();
+		if ( ! $result['success'] ) {
+			return new Lifecycle_Result(
+				Lifecycle_Result::STATUS_BLOCKING_FAILURE,
+				\esc_html( $result['message'] ?: __( 'Custom table installation or upgrade failed.', 'aio-page-builder' ) ),
+				'check_tables_schema',
+				array( 'failed_table' => $result['failed_table'] )
+			);
+		}
 		foreach ( \AIOPageBuilder\Infrastructure\Config\Versions::version_keys() as $key ) {
 			if ( $key === 'plugin' ) {
 				continue;

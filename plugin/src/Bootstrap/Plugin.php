@@ -30,6 +30,11 @@ require_once $bootstrap_dir . '/../Domain/Storage/Profile/Profile_Validation_Res
 require_once $bootstrap_dir . '/../Domain/Storage/Profile/Profile_Normalizer.php';
 require_once $bootstrap_dir . '/../Domain/Storage/Profile/Profile_Store.php';
 require_once $bootstrap_dir . '/../Domain/Storage/Profile/Profile_Snapshot_Helper.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Migrations/Schema_Version_Tracker.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Tables/Table_Names.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Tables/Table_Schema_Definitions.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Tables/DbDelta_Runner.php';
+require_once $bootstrap_dir . '/../Domain/Storage/Tables/Table_Installer.php';
 require_once $bootstrap_dir . '/../Domain/Storage/Objects/Object_Type_Keys.php';
 require_once $bootstrap_dir . '/../Domain/Storage/Objects/Object_Status_Families.php';
 require_once $bootstrap_dir . '/../Domain/Storage/Objects/Post_Type_Registrar.php';
