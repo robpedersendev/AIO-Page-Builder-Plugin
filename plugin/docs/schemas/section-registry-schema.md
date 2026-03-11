@@ -425,3 +425,4 @@ Use this checklist to verify every required field from §12.2 is represented:
 - **Exportability:** All fields in this schema are exportable in manifests and registry exports unless marked internal by implementation. No secrets in section definitions.
 - **Capability:** Schema supports later capability-gated editing by admins only; no permission logic is defined in this document.
 - **References:** Asset declarations and blueprint/helper/CSS refs are references only; no executable code or user-controlled paths without validation.
+- **Helper paragraphs:** Section helper content is stored as documentation objects (documentation_type = section_helper); see **documentation-object-schema.md**.

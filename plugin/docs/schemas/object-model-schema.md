@@ -191,6 +191,8 @@ For the composition validation state machine (lifecycle statuses, validation res
 | **Migration** | Version marker and source refs. |
 | **Sensitivity** | Admin-visible. |
 
+For the full documentation object schema (types, source references, content body, generated vs human-edited, version and export metadata), see **documentation-object-schema.md**.
+
 ---
 
 ### 3.8 Version Snapshot (§10.8)

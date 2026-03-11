@@ -380,3 +380,4 @@ Use this checklist to verify every required field from the page template object 
 - **Exportability:** All fields in this schema are exportable in manifests and registry exports unless marked internal by implementation. No secrets in template definitions.
 - **Capability:** Schema supports capability-gated editing by admins only; no permission logic is defined in this document.
 - **References:** Section keys are references only; they must resolve to the section registry. No executable code or arbitrary user-supplied refs.
+- **One-pagers:** Page-template one-pagers are documentation objects (documentation_type = page_template_one_pager); see **documentation-object-schema.md**.
