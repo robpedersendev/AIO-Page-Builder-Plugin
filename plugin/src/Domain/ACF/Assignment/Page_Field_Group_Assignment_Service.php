@@ -2,6 +2,7 @@
 /**
  * Page-to-field-group assignment service (spec §20.10, §20.11, §20.12).
  * Derives and applies page-specific ACF field-group visibility. Uses assignment map for persistence.
+ * Use Field_Assignment_Compatibility_Service for compatibility notes and retention advice.
  *
  * @package AIOPageBuilder
  */
