@@ -151,11 +151,61 @@ if ( ! function_exists( 'is_wp_error' ) ) {
 }
 if ( ! class_exists( 'WP_Query' ) ) {
 	class WP_Query {
+		/** @var array<string, mixed> */
+		public $query;
+
 		public function __construct( $query = array() ) {
-			// Stub: posts are provided by tests via $GLOBALS['_aio_wp_query_posts'].
+			$this->query = is_array( $query ) ? $query : array();
 		}
+
 		public function get_posts() {
-			return isset( $GLOBALS['_aio_wp_query_posts'] ) ? $GLOBALS['_aio_wp_query_posts'] : array();
+			$posts      = isset( $GLOBALS['_aio_wp_query_posts'] ) ? $GLOBALS['_aio_wp_query_posts'] : array();
+			$post_type  = $this->query['post_type'] ?? '';
+			$meta_query = $this->query['meta_query'] ?? null;
+
+			if ( $post_type !== '' ) {
+				$by_type = array();
+				foreach ( $posts as $post ) {
+					$pt = is_object( $post ) ? ( $post->post_type ?? '' ) : ( $post['post_type'] ?? '' );
+					if ( $pt === $post_type ) {
+						$by_type[] = $post;
+					}
+				}
+				$posts = $by_type;
+			}
+
+			if ( ! is_array( $meta_query ) || empty( $posts ) ) {
+				return $posts;
+			}
+			$key_val = null;
+			foreach ( $meta_query as $mq ) {
+				if ( is_array( $mq ) && ( $mq['key'] ?? '' ) === '_aio_internal_key' && array_key_exists( 'value', $mq ) ) {
+					$key_val = $mq['value'];
+					break;
+				}
+			}
+			if ( $key_val === null ) {
+				return $posts;
+			}
+			$filtered = array();
+			$meta     = $GLOBALS['_aio_post_meta'] ?? array();
+			foreach ( $posts as $post ) {
+				$id  = is_object( $post ) ? $post->ID : ( $post['ID'] ?? 0 );
+				$row = $meta[ (string) $id ] ?? array();
+				$ik  = $row['_aio_internal_key'] ?? '';
+				if ( $ik === '' && ! empty( $row['_aio_section_definition'] ) ) {
+					$dec = json_decode( $row['_aio_section_definition'], true );
+					$ik  = isset( $dec['internal_key'] ) ? (string) $dec['internal_key'] : '';
+				}
+				if ( $ik === '' && ! empty( $row['_aio_page_template_definition'] ) ) {
+					$dec = json_decode( $row['_aio_page_template_definition'], true );
+					$ik  = isset( $dec['internal_key'] ) ? (string) $dec['internal_key'] : '';
+				}
+				if ( $ik === (string) $key_val ) {
+					$filtered[] = $post;
+				}
+			}
+			return $filtered;
 		}
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers section registry services (spec §12, §59.4).
+ * Registers section and page template registry services (spec §12, §13, §59.4).
  *
  * @package AIOPageBuilder
  */
@@ -11,6 +11,9 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer;
+use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Registry_Service;
+use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer;
 use AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Validator;
@@ -18,7 +21,7 @@ use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Registers section registry domain services. Callers must perform capability and nonce checks before mutating.
+ * Registers section and page template registry domain services. Callers must perform capability and nonce checks before mutating.
  */
 final class Registries_Provider implements Service_Provider_Interface {
 
@@ -37,6 +40,22 @@ final class Registries_Provider implements Service_Provider_Interface {
 			return new Section_Registry_Service(
 				$container->get( 'section_validator' ),
 				$container->get( 'section_template_repository' )
+			);
+		} );
+		$container->register( 'page_template_normalizer', function (): Page_Template_Normalizer {
+			return new Page_Template_Normalizer();
+		} );
+		$container->register( 'page_template_validator', function () use ( $container ): Page_Template_Validator {
+			return new Page_Template_Validator(
+				$container->get( 'page_template_normalizer' ),
+				$container->get( 'page_template_repository' ),
+				$container->get( 'section_registry_service' )
+			);
+		} );
+		$container->register( 'page_template_registry_service', function () use ( $container ): Page_Template_Registry_Service {
+			return new Page_Template_Registry_Service(
+				$container->get( 'page_template_validator' ),
+				$container->get( 'page_template_repository' )
 			);
 		} );
 	}
