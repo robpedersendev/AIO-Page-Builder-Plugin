@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for section templates (spec §12, §10.1).  
 **Governs:** Required/optional fields, sub-manifests, validation rules, and completeness for registry implementation.  
-**Related:** object-model-schema.md (§3.1 Section Template), master spec §12.1–12.15. Page templates reference section templates by `internal_key`; see **page-template-registry-schema.md** for the page template schema.
+**Related:** object-model-schema.md (§3.1 Section Template), master spec §12.1–12.15. Page templates reference section templates by `internal_key`; see **page-template-registry-schema.md** for the page template schema. The `field_blueprint_ref` points to a blueprint defined per **acf-field-blueprint-schema.md**.
 
 ---
 
@@ -31,7 +31,7 @@ Every section template **shall** include the following. Absence of any required 
 | `purpose_summary` | string | Yes | — | Non-empty; max 1024 chars | Yes | What the section is for. |
 | `category` | string | Yes | — | One of allowed category slugs (§2.1 Categories) | Yes | Section category. |
 | `structural_blueprint_ref` | string | Yes | — | Non-empty reference to structural blueprint; max 255 chars | Yes | Defines wrapper, containers, regions, slots, variant logic (§12.8). |
-| `field_blueprint_ref` | string | Yes | — | Non-empty reference to field-group blueprint; max 255 chars | Yes | Field-to-slot mapping, ACF alignment (§12.8). |
+| `field_blueprint_ref` | string | Yes | — | Non-empty reference to field-group blueprint; max 255 chars | Yes | Field-to-slot mapping, ACF alignment (§12.8). Must equal `blueprint_id` in **acf-field-blueprint-schema.md**. |
 | `helper_ref` | string | Yes | — | Non-empty reference to helper paragraph/block set; max 255 chars | Yes | Usage guidance (§12.9). |
 | `css_contract_ref` | string | Yes | — | Non-empty reference to CSS contract manifest; max 255 chars | Yes | Selector/styling contract (§12.11). May be same as manifest id. |
 | `default_variant` | string | Yes | — | Non-empty; must be one of `variants` keys or the sole variant key | Yes | Baseline variant for render (§12.7). |
