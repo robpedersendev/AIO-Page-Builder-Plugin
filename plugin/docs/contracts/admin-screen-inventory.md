@@ -55,14 +55,22 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 | `aio-page-builder-documentation-edit` | Edit Documentation | Domain: Registries | `aio_manage_documentation` | Save, Cancel | Not implemented |
 | `aio-page-builder-snapshots` | Version Snapshots | Domain: Registries | `aio_view_version_snapshots` | List, Filter, View detail (read-only) | Not implemented |
 
-### 2.4 Future screens (locked slugs)
+### 2.4 Build Plan screens (locked slugs)
+
+**Contract:** Build Plan list/detail entry points, three-zone layout, stepper order, context rail, step workspace, row/detail, status/error/progress/completion patterns, and capabilities are defined in [build-plan-admin-ia-contract.md](build-plan-admin-ia-contract.md). Do not invent Build Plan slugs or layout/stepper behavior elsewhere.
+
+| Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
+|-------------|--------|----------------|----------------------|-----------------|--------|
+| `aio-page-builder-build-plans` | Build Plans | Domain: BuildPlan | `aio_view_build_plans` (placeholder; view/approve/execute/finalize/artifact distinct per IA contract) | List plans; open plan detail (stepper); Create Build Plan from AI Runs | Not implemented |
+| (detail via `plan_id` or `id`) | Build Plan detail (stepper) | Domain: BuildPlan | Same as list; approve/execute gated by separate capabilities | Three-zone layout: context rail, stepper, step workspace; row/detail; status and completion per IA contract | Not implemented |
+
+### 2.5 Other future screens (locked slugs)
 
 | Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
 |-------------|--------|----------------|----------------------|-----------------|--------|
 | `aio-page-builder-onboarding` | Onboarding & Profile | Admin / Onboarding | `manage_options` | First-time setup, brand/business profile; steps, draft, prefill, readiness; shell implemented (Onboarding_Screen); steps, draft, prefill, and handoff governed by [onboarding-state-machine.md](onboarding-state-machine.md) | Implemented (shell) |
 | `aio-page-builder-ai-runs` | AI Runs | Domain: AI | `aio_view_ai_runs` | List runs; view run detail (metadata + artifact summaries); raw prompts/responses gated by `aio_view_sensitive_diagnostics` | Implemented |
 | (detail via `run_id`) | AI Run Detail | Domain: AI | `aio_view_ai_runs` | View run metadata (redacted), artifact summary; raw content requires `aio_view_sensitive_diagnostics` | Implemented |
-| `aio-page-builder-build-plans` | Build Plans | Domain: BuildPlan | TBD | Review and execute build plans | Not implemented |
 | `aio-page-builder-logs` | Logs | Infrastructure / Reporting | TBD | View operational logs | Not implemented |
 | `aio-page-builder-reporting` | Reporting | Domain: Reporting | TBD | Reporting disclosure, heartbeat status | Not implemented |
 | `aio-page-builder-export-restore` | Export & Restore | Domain: ExportRestore | TBD | Export backup, restore, survivability | Not implemented |
@@ -73,6 +81,7 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 
 - **Stable slugs:** Do not rename or reuse the slugs above. New screens require a new row and a new slug following the pattern `aio-page-builder-{name}`.
 - **Registry screens:** Section templates, page templates, compositions, documentation, and snapshots are fully specified in registry-admin-screen-contract.md (panels, actions, validation, deprecation, documentation/snapshot visibility). Implementations must follow that contract.
+- **Build Plan screens:** List/detail slugs, three-zone layout, stepper, context rail, step workspace, row/detail, status/error/progress/completion, and capability separation are specified in build-plan-admin-ia-contract.md. Implementations must follow that contract.
 - **Routing:** Screen rendering is handled by dedicated screen classes; no anonymous callbacks that embed logic. Menu registration only wires slug → screen class render method.
 - **Capability:** Current screens use `manage_options` as a placeholder until capability mapping is finalized. All menu and screen access must remain capability-aware.
 - **First-run:** Dashboard (and optionally Onboarding) are the intended first-run redirect targets; no implementation in this contract.
