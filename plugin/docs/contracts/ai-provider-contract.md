@@ -234,5 +234,5 @@ This table is filled when providers are implemented; the contract only requires 
 
 - **Secrets:** §43.13 Secrets Handling Rules — credentials never in logs, exports, reports, or front-end.
 - **Logging:** §43.14 Logging Redaction — redact secrets, tokens, and excessive payloads.
-- **Prompt packs and input artifacts:** §26 — prompt pack structure and injection rules; input artifacts pass through redaction before submission.
+- **Prompt packs and input artifacts:** §26 — prompt pack structure and injection rules; input artifacts pass through redaction before submission. Full prompt-pack schema (identity, versioning, segments, placeholders, repair linkage) is defined in docs/schemas/prompt-pack-schema.md.
 - **AI and planning phase:** §59.8 — provider drivers, credential handling, prompt packs, output validation, artifact storage are later deliverables; this contract defines the interface they conform to.
