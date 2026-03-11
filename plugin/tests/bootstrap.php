@@ -53,6 +53,11 @@ if ( ! function_exists( 'sanitize_textarea_field' ) ) {
 		return trim( (string) $str );
 	}
 }
+if ( ! function_exists( 'sanitize_title' ) ) {
+	function sanitize_title( $str ) {
+		return preg_replace( '/[^a-z0-9\-]/', '-', strtolower( (string) $str ) );
+	}
+}
 if ( ! function_exists( 'esc_attr' ) ) {
 	function esc_attr( $text ) {
 		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
