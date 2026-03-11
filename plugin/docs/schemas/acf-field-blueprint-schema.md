@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for section-owned ACF field blueprints (spec §7.3, §20, §21, §59.5).  
 **Governs:** Field blueprint structure, supported field types, validation metadata, nested/repeatable rules, LPagery compatibility annotations.  
-**Related:** section-registry-schema.md (`field_blueprint_ref`), master spec §12.8 Section Blueprint Structure, §20 ACF Architecture, §21 LPagery Token Compatibility, §22.10 Asset Intake Rules.
+**Related:** section-registry-schema.md (`field_blueprint_ref`), master spec §12.8 Section Blueprint Structure, §20 ACF Architecture, §21 LPagery Token Compatibility, §22.10 Asset Intake Rules. Key generation follows **acf-key-naming-contract.md**.
 
 ---
 
@@ -60,7 +60,7 @@ Each element in `fields` has this shape:
 
 | Field | Type | Required | Validation | Notes |
 |-------|------|----------|------------|--------|
-| `key` | string | Yes | Pattern `^field_[a-z0-9_]+$`; max 64 chars; unique within blueprint | Deterministic field key. Namespace with section identity. |
+| `key` | string | Yes | Pattern `^field_[a-z0-9_]+$`; max 64 chars; unique within blueprint | Deterministic field key per **acf-key-naming-contract.md**. |
 | `name` | string | Yes | Non-empty; pattern `^[a-z0-9_]+$`; max 64 chars | ACF field name (often same as key stem). |
 | `label` | string | Yes | Non-empty; max 255 chars | Display label. |
 | `type` | string | Yes | One of supported types (§5) | ACF field type. |
