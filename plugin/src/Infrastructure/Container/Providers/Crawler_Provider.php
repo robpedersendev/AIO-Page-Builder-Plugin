@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers crawler bucket services: snapshot repository, snapshot service, URL discovery (spec §11.1, §24.15, §24.8–24.9).
+ * Registers crawler bucket services: snapshot, discovery, fetch (spec §11.1, §24.15, §24.7–24.8).
  *
  * @package AIOPageBuilder
  */
@@ -13,13 +13,15 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Discovery_Service;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Normalizer;
+use AIOPageBuilder\Domain\Crawler\Fetch\Fetch_Request_Policy;
+use AIOPageBuilder\Domain\Crawler\Fetch\HTML_Fetcher;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Repository;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Crawler bucket: snapshot storage and URL discovery. No fetcher.
+ * Crawler bucket: snapshot storage, URL discovery, HTML fetcher.
  */
 final class Crawler_Provider implements Service_Provider_Interface {
 
@@ -33,7 +35,6 @@ final class Crawler_Provider implements Service_Provider_Interface {
 			$repository = $container->get( 'crawl_snapshot_repository' );
 			return new Crawl_Snapshot_Service( $repository );
 		} );
-		// * URL normalizer bound to current site host (for same-site crawl). For other hosts, instantiate URL_Normalizer directly.
 		$container->register( 'url_normalizer', function (): URL_Normalizer {
 			$home = \home_url( '/', 'https' );
 			$host = parse_url( $home, PHP_URL_HOST );
@@ -41,6 +42,17 @@ final class Crawler_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'url_discovery_service', function () use ( $container ): URL_Discovery_Service {
 			return new URL_Discovery_Service( $container->get( 'url_normalizer' ) );
+		} );
+		$container->register( 'fetch_request_policy', function (): Fetch_Request_Policy {
+			return new Fetch_Request_Policy();
+		} );
+		$container->register( 'html_fetcher', function () use ( $container ): HTML_Fetcher {
+			$policy  = $container->get( 'fetch_request_policy' );
+			$normalizer = $container->get( 'url_normalizer' );
+			$allowed = function ( string $url ) use ( $normalizer ): bool {
+				return $normalizer->normalize( $url ) === $url;
+			};
+			return new HTML_Fetcher( $policy, $allowed );
 		} );
 	}
 }

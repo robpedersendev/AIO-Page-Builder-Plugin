@@ -177,6 +177,12 @@ if ( ! class_exists( 'WP_Error' ) ) {
 			$this->code    = $code;
 			$this->message = $message;
 		}
+		public function get_error_code() {
+			return $this->code;
+		}
+		public function get_error_message() {
+			return $this->message;
+		}
 	}
 }
 if ( ! function_exists( 'is_wp_error' ) ) {
@@ -288,5 +294,41 @@ if ( ! function_exists( 'wp_mkdir_p' ) ) {
 if ( ! function_exists( 'wp_json_encode' ) ) {
 	function wp_json_encode( $data, $options = 0, $depth = 512 ) {
 		return json_encode( $data, $options | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE, $depth );
+	}
+}
+// * Stubs for HTML_Fetcher tests. Set $GLOBALS['_aio_wp_remote_get_return'] to callable( $url, $args ) => array|WP_Error.
+if ( ! function_exists( 'wp_remote_get' ) ) {
+	function wp_remote_get( $url, $args = array() ) {
+		if ( isset( $GLOBALS['_aio_wp_remote_get_return'] ) && is_callable( $GLOBALS['_aio_wp_remote_get_return'] ) ) {
+			return $GLOBALS['_aio_wp_remote_get_return']( $url, $args );
+		}
+		return new \WP_Error( 'no_mock', 'Set _aio_wp_remote_get_return' );
+	}
+}
+if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
+	function wp_remote_retrieve_response_code( $response ) {
+		return is_array( $response ) && isset( $response['response']['code'] ) ? (int) $response['response']['code'] : 0;
+	}
+}
+if ( ! function_exists( 'wp_remote_retrieve_headers' ) ) {
+	function wp_remote_retrieve_headers( $response ) {
+		return is_array( $response ) && isset( $response['headers'] ) ? $response['headers'] : array();
+	}
+}
+if ( ! function_exists( 'wp_remote_retrieve_body' ) ) {
+	function wp_remote_retrieve_body( $response ) {
+		return is_array( $response ) && array_key_exists( 'body', $response ) ? $response['body'] : '';
+	}
+}
+if ( ! function_exists( 'wp_remote_retrieve_header' ) ) {
+	function wp_remote_retrieve_header( $response, $header ) {
+		$headers = is_array( $response ) && isset( $response['headers'] ) ? $response['headers'] : array();
+		$header  = strtolower( $header );
+		foreach ( $headers as $k => $v ) {
+			if ( strtolower( (string) $k ) === $header ) {
+				return is_array( $v ) ? ( $v[0] ?? '' ) : (string) $v;
+			}
+		}
+		return '';
 	}
 }
