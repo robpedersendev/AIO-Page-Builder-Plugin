@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard_Screen;
@@ -43,6 +44,7 @@ final class Admin_Menu {
 		$dashboard   = new Dashboard_Screen();
 		$settings    = new Settings_Screen();
 		$diagnostics = new Diagnostics_Screen();
+		$onboarding  = new Onboarding_Screen( $this->container );
 		$crawler_sessions  = new Crawler_Sessions_Screen( $this->container );
 		$crawler_comparison = new Crawler_Comparison_Screen( $this->container );
 
@@ -81,6 +83,15 @@ final class Admin_Menu {
 			$diagnostics->get_capability(),
 			Diagnostics_Screen::SLUG,
 			array( $diagnostics, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$onboarding->get_title(),
+			__( 'Onboarding & Profile', 'aio-page-builder' ),
+			$onboarding->get_capability(),
+			Onboarding_Screen::SLUG,
+			array( $onboarding, 'render' )
 		);
 
 		add_submenu_page(

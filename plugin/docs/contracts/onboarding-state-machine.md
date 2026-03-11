@@ -186,15 +186,77 @@ Prefill order: load draft first (if any), then overlay current profile and provi
 - **Profile:** profile-schema.md (required fields, validation); global-options-schema.md (`aio_page_builder_profile_current`).
 - **Provider:** provider-secret-storage-contract.md (credential states, no secrets in config); ai-provider-contract.md (request/response shapes; credentials via separate path).
 - **Crawl:** §24; crawler-admin-screen-contract.md (sessions, run id).
-- **Admin screen:** admin-screen-inventory.md (`aio-page-builder-onboarding` — Onboarding & Profile; not implemented).
+- **Admin screen:** admin-screen-inventory.md (`aio-page-builder-onboarding` — Onboarding & Profile; shell implemented).
 - **Build Plan / AI run:** §10.4, §10.5; Build Plan prerequisites are satisfied when onboarding delivers validated profile, crawl ref, and provider readiness; actual plan creation is out of scope for this contract.
 
 ---
 
 ## 14. Out of scope for this contract
 
-- Onboarding UI implementation.
+- Full onboarding UI implementation (step forms, validation UI) — implemented incrementally; shell and draft/prefill are in scope for Prompt 060.
 - Provider driver calls or connection tests.
 - AI submission or Build Plan generation.
 - Export/restore of onboarding draft (draft may be excluded or included under export rules elsewhere).
 - Definition of admin routes beyond the referenced screen slug.
+
+---
+
+## 15. Example payloads
+
+### 15.1 Example onboarding draft payload (stored)
+
+```json
+{
+  "version": 1,
+  "overall_status": "draft_saved",
+  "current_step_key": "brand_profile",
+  "step_statuses": {
+    "welcome": "completed",
+    "business_profile": "completed",
+    "brand_profile": "in_progress",
+    "audience_offers": "not_started",
+    "geography_competitors": "not_started",
+    "asset_intake": "not_started",
+    "existing_site": "not_started",
+    "crawl_preferences": "not_started",
+    "provider_setup": "not_started",
+    "review": "not_started",
+    "submission": "not_started"
+  },
+  "profile_snapshot_ref": "current",
+  "crawl_run_id_ref": null,
+  "provider_refs": [
+    { "provider_id": "openai", "credential_state": "absent" }
+  ],
+  "goal_or_intent_text": "",
+  "updated_at": "2025-07-15T12:00:00Z"
+}
+```
+
+### 15.2 Example UI state payload (for screen render)
+
+```json
+{
+  "current_step_key": "brand_profile",
+  "steps": [
+    { "key": "welcome", "label": "Welcome", "status": "completed", "is_current": false },
+    { "key": "business_profile", "label": "Business Profile", "status": "completed", "is_current": false },
+    { "key": "brand_profile", "label": "Brand Profile", "status": "in_progress", "is_current": true }
+  ],
+  "overall_status": "in_progress",
+  "is_blocked": false,
+  "blockers": [],
+  "prefill": {
+    "profile": { "brand_profile": {}, "business_profile": { "business_name": "Acme", "current_site_url": "https://example.com" } },
+    "current_site_url": "https://example.com",
+    "crawl_run_ids": ["run_abc123"],
+    "latest_crawl_run_id": "run_abc123",
+    "provider_refs": [{ "provider_id": "openai", "credential_state": "absent" }]
+  },
+  "nonce": "...",
+  "nonce_action": "aio_onboarding_save",
+  "can_save_draft": true,
+  "resume_message": "You have saved draft progress. You can continue below.",
+  "is_provider_ready": false
+}
+```

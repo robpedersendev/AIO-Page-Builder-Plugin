@@ -27,6 +27,7 @@ final class Settings_Service {
 		Option_Names::UNINSTALL_PREFS               => array(),
 		Option_Names::PROVIDER_CONFIG_REF           => array(),
 		Option_Names::PROFILE_CURRENT               => array(),
+		Option_Names::ONBOARDING_DRAFT              => array(),
 	);
 
 	/**

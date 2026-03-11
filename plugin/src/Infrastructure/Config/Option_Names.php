@@ -39,6 +39,9 @@ final class Option_Names {
 	/** Current editable brand and business profile (single option; shape per profile-schema.md). */
 	public const PROFILE_CURRENT = self::PREFIX . 'profile_current';
 
+	/** Onboarding draft state (secret-free; shape per onboarding-state-machine.md §7). */
+	public const ONBOARDING_DRAFT = self::PREFIX . 'onboarding_draft';
+
 	/** @var array<string>|null */
 	private static ?array $all = null;
 
@@ -59,6 +62,7 @@ final class Option_Names {
 			self::UNINSTALL_PREFS,
 			self::PROVIDER_CONFIG_REF,
 			self::PROFILE_CURRENT,
+			self::ONBOARDING_DRAFT,
 		);
 		return self::$all;
 	}

@@ -296,6 +296,11 @@ if ( ! function_exists( 'wp_json_encode' ) ) {
 		return json_encode( $data, $options | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE, $depth );
 	}
 }
+if ( ! function_exists( 'wp_create_nonce' ) ) {
+	function wp_create_nonce( $action = '' ) {
+		return 'test-nonce-' . $action;
+	}
+}
 // * Stubs for HTML_Fetcher tests. Set $GLOBALS['_aio_wp_remote_get_return'] to callable( $url, $args ) => array|WP_Error.
 if ( ! function_exists( 'wp_remote_get' ) ) {
 	function wp_remote_get( $url, $args = array() ) {
