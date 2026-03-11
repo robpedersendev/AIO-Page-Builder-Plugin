@@ -17,6 +17,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Assignment_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Compatibility_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Diagnostics_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Registration_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\Rendering_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Admin_Router_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Capability_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Config_Provider;
@@ -60,6 +61,7 @@ final class Module_Registrar {
 			new ACF_Assignment_Provider(),
 			new ACF_Compatibility_Provider(),
 			new ACF_Diagnostics_Provider(),
+			new Rendering_Provider(),
 			new Registries_Provider(),
 			new Storage_Services_Provider(),
 		);
