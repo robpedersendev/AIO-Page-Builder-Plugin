@@ -106,6 +106,34 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 		return $out;
 	}
 
+	/**
+	 * Lists all composition definitions (any status). For export and diagnostics.
+	 *
+	 * @param int $limit
+	 * @param int $offset
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_all_definitions( int $limit = 0, int $offset = 0 ): array {
+		$limit  = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
+		$query  = new \WP_Query(
+			array(
+				'post_type'      => $this->get_post_type(),
+				'posts_per_page' => $limit,
+				'offset'         => $offset,
+				'no_found_rows'  => true,
+				'post_status'    => 'any',
+			)
+		);
+		$out = array();
+		foreach ( $query->get_posts() as $post ) {
+			$record = $this->post_to_record( $post, $this->get_meta( $post->ID ) );
+			if ( isset( $record['definition'] ) && is_array( $record['definition'] ) ) {
+				$out[] = $record['definition'];
+			}
+		}
+		return $out;
+	}
+
 	/** @inheritdoc */
 	protected function get_meta( int $post_id ): array {
 		$base = parent::get_meta( $post_id );

@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Duplicator;
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Registry_Service;
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Validator;
+use AIOPageBuilder\Domain\Registries\Export\Registry_Export_Serializer;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Registry_Service;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator;
@@ -101,6 +102,15 @@ final class Registries_Provider implements Service_Provider_Interface {
 				$container->get( 'page_template_registry_service' ),
 				$container->get( 'version_snapshot_repository' ),
 				$container->get( 'composition_repository' )
+			);
+		} );
+		$container->register( 'registry_export_serializer', function () use ( $container ): Registry_Export_Serializer {
+			return new Registry_Export_Serializer(
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' ),
+				$container->get( 'composition_repository' ),
+				$container->get( 'documentation_repository' ),
+				$container->get( 'version_snapshot_repository' )
 			);
 		} );
 	}
