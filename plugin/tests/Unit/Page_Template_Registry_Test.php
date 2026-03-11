@@ -31,6 +31,7 @@ require_once $plugin_root . '/src/Domain/Registries/Section/Section_Schema.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/Section_Definition_Normalizer.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/Section_Validation_Result.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/Section_Registry_Result.php';
+require_once $plugin_root . '/src/Domain/Registries/Shared/Deprecation_Metadata.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/Section_Validator.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/Section_Registry_Service.php';
 require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Type_Keys.php';

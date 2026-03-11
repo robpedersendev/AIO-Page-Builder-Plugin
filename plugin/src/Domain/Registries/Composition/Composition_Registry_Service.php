@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Domain\Registries\Composition;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Registries\Shared\Registry_Integrity_Validator;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Map_Service;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Types;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
@@ -31,14 +32,19 @@ final class Composition_Registry_Service {
 	/** @var Assignment_Map_Service */
 	private Assignment_Map_Service $assignment_map;
 
+	/** @var Registry_Integrity_Validator|null */
+	private ?Registry_Integrity_Validator $integrity_validator;
+
 	public function __construct(
 		Composition_Validator $validator,
 		Composition_Repository $repository,
-		Assignment_Map_Service $assignment_map
+		Assignment_Map_Service $assignment_map,
+		?Registry_Integrity_Validator $integrity_validator = null
 	) {
-		$this->validator     = $validator;
-		$this->repository    = $repository;
-		$this->assignment_map = $assignment_map;
+		$this->validator          = $validator;
+		$this->repository         = $repository;
+		$this->assignment_map     = $assignment_map;
+		$this->integrity_validator = $integrity_validator;
 	}
 
 	/**
@@ -190,6 +196,20 @@ final class Composition_Registry_Service {
 	 */
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_definitions_by_status( $status, $limit, $offset );
+	}
+
+	/**
+	 * Returns read-time warnings for deprecated section dependencies in a composition.
+	 *
+	 * @param string $composition_id
+	 * @return list<string>
+	 */
+	public function get_deprecation_warnings( string $composition_id ): array {
+		$definition = $this->repository->get_definition_by_key( $composition_id );
+		if ( $definition === null || $this->integrity_validator === null ) {
+			return array();
+		}
+		return $this->integrity_validator->get_deprecation_warnings( $definition, 'composition' );
 	}
 
 	/**

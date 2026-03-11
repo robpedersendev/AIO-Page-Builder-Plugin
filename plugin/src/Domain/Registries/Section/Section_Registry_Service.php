@@ -1,7 +1,7 @@
 <?php
 /**
- * Section registry service: create, read, update, deprecate (spec §12, §10.1).
- * Validates via Section_Validator; persists via Section_Template_Repository.
+ * Section registry service: create, read, update, deprecate (spec §12, §10.1, §12.15).
+ * Validates via Section_Validator; deprecation via Registry_Deprecation_Service.
  * Callers must perform capability checks and nonces before mutating.
  *
  * @package AIOPageBuilder
@@ -13,13 +13,15 @@ namespace AIOPageBuilder\Domain\Registries\Section;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Registries\Shared\Deprecation_Metadata;
+use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 
 /**
  * Section templates are foundational reusable building blocks. This service provides:
  * - create/read/update with validation
  * - status transitions (active/deprecated) with deprecation reason and replacement reference
- * - query by key, status, category
+ * - query by key, status, category; list_eligible_for_new_selection excludes deprecated
  * - immutable internal_key after creation (no runtime mutation).
  */
 final class Section_Registry_Service {
@@ -30,12 +32,17 @@ final class Section_Registry_Service {
 	/** @var Section_Template_Repository */
 	private Section_Template_Repository $repository;
 
+	/** @var Registry_Deprecation_Service|null */
+	private ?Registry_Deprecation_Service $deprecation_service;
+
 	public function __construct(
 		Section_Validator $validator,
-		Section_Template_Repository $repository
+		Section_Template_Repository $repository,
+		?Registry_Deprecation_Service $deprecation_service = null
 	) {
-		$this->validator  = $validator;
-		$this->repository = $repository;
+		$this->validator          = $validator;
+		$this->repository         = $repository;
+		$this->deprecation_service = $deprecation_service;
 	}
 
 	/**
@@ -87,30 +94,36 @@ final class Section_Registry_Service {
 
 	/**
 	 * Transitions section to deprecated status with reason and optional replacement reference.
+	 * Uses Registry_Deprecation_Service when available for validation.
 	 *
 	 * @param int    $post_id Section template post ID.
-	 * @param string $reason  Reason for deprecation.
+	 * @param string $reason  Reason for deprecation (required).
 	 * @param string $replacement_key Optional replacement section internal_key.
 	 * @return Section_Registry_Result
 	 */
 	public function deprecate( int $post_id, string $reason, string $replacement_key = '' ): Section_Registry_Result {
+		if ( $this->deprecation_service !== null ) {
+			$validation = $this->deprecation_service->validate_section_deprecation( $post_id, $reason, $replacement_key );
+			if ( ! $validation->valid ) {
+				return Section_Registry_Result::failure( $validation->errors, 0 );
+			}
+		} elseif ( \sanitize_text_field( $reason ) === '' ) {
+			return Section_Registry_Result::failure( array( 'Deprecation reason is required' ), 0 );
+		}
+
 		$existing = $this->repository->get_definition_by_id( $post_id );
 		if ( $existing === null ) {
 			return Section_Registry_Result::failure( array( 'Section not found' ), 0 );
 		}
 		$existing[ Section_Schema::FIELD_STATUS ] = 'deprecated';
-		$existing['deprecation'] = array(
-			'deprecated'                 => true,
-			'reason'                     => \sanitize_text_field( $reason ),
-			'replacement_section_key'    => $this->sanitize_key( $replacement_key ),
-			'retain_existing_references' => true,
-			'exclude_from_new_selection' => true,
-			'preserve_rendered_pages'    => true,
-		);
+		$existing['deprecation'] = $this->deprecation_service !== null
+			? $this->deprecation_service->get_section_deprecation_block( $reason, $replacement_key )
+			: Deprecation_Metadata::for_section( $reason, $replacement_key );
 		if ( $replacement_key !== '' ) {
+			$key = $this->sanitize_key( $replacement_key );
 			$existing['replacement_section_suggestions'] = array_merge(
 				(array) ( $existing['replacement_section_suggestions'] ?? array() ),
-				array( $this->sanitize_key( $replacement_key ) )
+				array( $key )
 			);
 		}
 		$result = $this->validator->validate_completeness( $existing );
@@ -166,6 +179,19 @@ final class Section_Registry_Service {
 	 */
 	public function list_by_category( string $category, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_by_category( $category, $limit, $offset );
+	}
+
+	/**
+	 * Lists section definitions eligible for new selection (excludes deprecated).
+	 *
+	 * @param string $status Optional filter by status (e.g. 'active'); empty = all non-deprecated.
+	 * @param int    $limit
+	 * @param int    $offset
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_eligible_for_new_selection( string $status = 'active', int $limit = 0, int $offset = 0 ): array {
+		$list = $status !== '' ? $this->repository->list_definitions_by_status( $status, $limit, $offset ) : $this->repository->list_all_definitions( $limit, $offset );
+		return array_values( array_filter( $list, [ Deprecation_Metadata::class, 'is_eligible_for_new_use' ] ) );
 	}
 
 	/**

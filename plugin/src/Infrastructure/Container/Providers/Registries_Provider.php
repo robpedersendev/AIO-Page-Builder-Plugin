@@ -20,6 +20,8 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer;
 use AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Validator;
+use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
+use AIOPageBuilder\Domain\Registries\Shared\Registry_Integrity_Validator;
 use AIOPageBuilder\Domain\Registries\Snapshots\Version_Snapshot_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
@@ -40,10 +42,17 @@ final class Registries_Provider implements Service_Provider_Interface {
 				$container->get( 'section_template_repository' )
 			);
 		} );
+		$container->register( 'registry_deprecation_service', function () use ( $container ): Registry_Deprecation_Service {
+			return new Registry_Deprecation_Service(
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' )
+			);
+		} );
 		$container->register( 'section_registry_service', function () use ( $container ): Section_Registry_Service {
 			return new Section_Registry_Service(
 				$container->get( 'section_validator' ),
-				$container->get( 'section_template_repository' )
+				$container->get( 'section_template_repository' ),
+				$container->get( 'registry_deprecation_service' )
 			);
 		} );
 		$container->register( 'page_template_normalizer', function (): Page_Template_Normalizer {
@@ -59,7 +68,14 @@ final class Registries_Provider implements Service_Provider_Interface {
 		$container->register( 'page_template_registry_service', function () use ( $container ): Page_Template_Registry_Service {
 			return new Page_Template_Registry_Service(
 				$container->get( 'page_template_validator' ),
-				$container->get( 'page_template_repository' )
+				$container->get( 'page_template_repository' ),
+				$container->get( 'registry_deprecation_service' )
+			);
+		} );
+		$container->register( 'registry_integrity_validator', function () use ( $container ): Registry_Integrity_Validator {
+			return new Registry_Integrity_Validator(
+				$container->get( 'section_registry_service' ),
+				$container->get( 'page_template_registry_service' )
 			);
 		} );
 		$container->register( 'composition_validator', function () use ( $container ): Composition_Validator {
@@ -72,7 +88,8 @@ final class Registries_Provider implements Service_Provider_Interface {
 			return new Composition_Registry_Service(
 				$container->get( 'composition_validator' ),
 				$container->get( 'composition_repository' ),
-				$container->get( 'assignment_map_service' )
+				$container->get( 'assignment_map_service' ),
+				$container->get( 'registry_integrity_validator' )
 			);
 		} );
 		$container->register( 'composition_duplicator', function () use ( $container ): Composition_Duplicator {

@@ -29,6 +29,7 @@ require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Status_Families.
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repository.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Section_Template_Repository.php';
+require_once $plugin_root . '/src/Domain/Registries/Shared/Deprecation_Metadata.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/Section_Validator.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/Section_Registry_Service.php';
 

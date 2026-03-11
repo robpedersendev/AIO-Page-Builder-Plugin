@@ -1,7 +1,7 @@
 <?php
 /**
- * Page template registry service: create, read, update, deprecate (spec §13, §10.2).
- * Validates via Page_Template_Validator; persists via Page_Template_Repository.
+ * Page template registry service: create, read, update, deprecate (spec §13, §10.2, §13.13).
+ * Validates via Page_Template_Validator; deprecation via Registry_Deprecation_Service.
  * Callers must perform capability and nonce checks before mutating.
  *
  * @package AIOPageBuilder
@@ -13,6 +13,8 @@ namespace AIOPageBuilder\Domain\Registries\PageTemplate;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Registries\Shared\Deprecation_Metadata;
+use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 
 /**
@@ -26,12 +28,17 @@ final class Page_Template_Registry_Service {
 	/** @var Page_Template_Repository */
 	private Page_Template_Repository $repository;
 
+	/** @var Registry_Deprecation_Service|null */
+	private ?Registry_Deprecation_Service $deprecation_service;
+
 	public function __construct(
 		Page_Template_Validator $validator,
-		Page_Template_Repository $repository
+		Page_Template_Repository $repository,
+		?Registry_Deprecation_Service $deprecation_service = null
 	) {
-		$this->validator  = $validator;
-		$this->repository = $repository;
+		$this->validator          = $validator;
+		$this->repository         = $repository;
+		$this->deprecation_service = $deprecation_service;
 	}
 
 	/**
@@ -83,6 +90,7 @@ final class Page_Template_Registry_Service {
 
 	/**
 	 * Transitions page template to deprecated status.
+	 * Uses Registry_Deprecation_Service when available for validation.
 	 *
 	 * @param int    $post_id
 	 * @param string $reason
@@ -90,22 +98,28 @@ final class Page_Template_Registry_Service {
 	 * @return Page_Template_Registry_Result
 	 */
 	public function deprecate( int $post_id, string $reason, string $replacement_key = '' ): Page_Template_Registry_Result {
+		if ( $this->deprecation_service !== null ) {
+			$validation = $this->deprecation_service->validate_page_template_deprecation( $post_id, $reason, $replacement_key );
+			if ( ! $validation->valid ) {
+				return Page_Template_Registry_Result::failure( $validation->errors, 0 );
+			}
+		} elseif ( \sanitize_text_field( $reason ) === '' ) {
+			return Page_Template_Registry_Result::failure( array( 'Deprecation reason is required' ), 0 );
+		}
+
 		$existing = $this->repository->get_definition_by_id( $post_id );
 		if ( $existing === null ) {
 			return Page_Template_Registry_Result::failure( array( 'Page template not found' ), 0 );
 		}
 		$existing[ Page_Template_Schema::FIELD_STATUS ] = 'deprecated';
-		$existing['deprecation'] = array(
-			'deprecated'                     => true,
-			'reason'                         => \sanitize_text_field( $reason ),
-			'replacement_template_key'       => $this->sanitize_key( $replacement_key ),
-			'interpretability_of_old_plans'  => true,
-			'exclude_from_new_build_selection' => true,
-		);
+		$existing['deprecation'] = $this->deprecation_service !== null
+			? $this->deprecation_service->get_page_template_deprecation_block( $reason, $replacement_key )
+			: Deprecation_Metadata::for_page_template( $reason, $replacement_key );
 		if ( $replacement_key !== '' ) {
+			$key = $this->sanitize_key( $replacement_key );
 			$existing['replacement_template_refs'] = array_merge(
 				(array) ( $existing['replacement_template_refs'] ?? array() ),
-				array( $this->sanitize_key( $replacement_key ) )
+				array( $key )
 			);
 		}
 		$errors = $this->validator->validate_completeness( $existing );
@@ -161,6 +175,19 @@ final class Page_Template_Registry_Service {
 	 */
 	public function list_by_archetype( string $archetype, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_by_archetype( $archetype, $limit, $offset );
+	}
+
+	/**
+	 * Lists page template definitions eligible for new selection (excludes deprecated).
+	 *
+	 * @param string $status Optional filter (e.g. 'active'); empty = all non-deprecated.
+	 * @param int    $limit
+	 * @param int    $offset
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_eligible_for_new_selection( string $status = 'active', int $limit = 0, int $offset = 0 ): array {
+		$list = $status !== '' ? $this->repository->list_definitions_by_status( $status, $limit, $offset ) : $this->repository->list_all_definitions( $limit, $offset );
+		return array_values( array_filter( $list, [ Deprecation_Metadata::class, 'is_eligible_for_new_use' ] ) );
 	}
 
 	/**
