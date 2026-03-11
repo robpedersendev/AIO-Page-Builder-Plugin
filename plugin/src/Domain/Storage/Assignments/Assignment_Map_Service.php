@@ -198,6 +198,22 @@ final class Assignment_Map_Service {
 	}
 
 	/**
+	 * Returns the first target_ref for a source_ref and map_type, or null.
+	 *
+	 * @param string $map_type   One of Assignment_Types constants.
+	 * @param string $source_ref Source identifier (e.g. page id).
+	 * @return string|null
+	 */
+	public function get_target_for_source( string $map_type, string $source_ref ): ?string {
+		$rows = $this->list_by_source( $map_type, $source_ref, 1 );
+		if ( empty( $rows ) ) {
+			return null;
+		}
+		$target = $rows[0]['target_ref'] ?? null;
+		return $target !== null && $target !== '' ? (string) $target : null;
+	}
+
+	/**
 	 * Deletes all rows matching map_type and source_ref.
 	 *
 	 * @param string $map_type   One of Assignment_Types constants.

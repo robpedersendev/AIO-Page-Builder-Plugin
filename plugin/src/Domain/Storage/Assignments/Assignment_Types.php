@@ -32,6 +32,9 @@ final class Assignment_Types {
 	/** Composition → section (composition to section template ref). */
 	public const COMPOSITION_SECTION = 'composition_section';
 
+	/** Page → composition (page post ID to composition_id). Used when page is composition-driven. */
+	public const PAGE_COMPOSITION = 'page_composition';
+
 	/** @var list<string>|null */
 	private static ?array $all = null;
 
@@ -47,6 +50,7 @@ final class Assignment_Types {
 		self::$all = array(
 			self::PAGE_FIELD_GROUP,
 			self::PAGE_TEMPLATE,
+			self::PAGE_COMPOSITION,
 			self::PLAN_OBJECT,
 			self::TEMPLATE_DEPENDENCY,
 			self::COMPOSITION_SECTION,
