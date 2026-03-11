@@ -25,7 +25,6 @@ use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
  * - immutable internal_key after creation (no runtime mutation).
  */
 final class Section_Registry_Service {
-
 	/** @var Section_Validator */
 	private Section_Validator $validator;
 
@@ -34,6 +33,9 @@ final class Section_Registry_Service {
 
 	/** @var Registry_Deprecation_Service|null */
 	private ?Registry_Deprecation_Service $deprecation_service;
+
+	/** @var \AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service|null */
+	private $blueprint_service;
 
 	public function __construct(
 		Section_Validator $validator,
@@ -192,6 +194,29 @@ final class Section_Registry_Service {
 	public function list_eligible_for_new_selection( string $status = 'active', int $limit = 0, int $offset = 0 ): array {
 		$list = $status !== '' ? $this->repository->list_definitions_by_status( $status, $limit, $offset ) : $this->repository->list_all_definitions( $limit, $offset );
 		return array_values( array_filter( $list, [ Deprecation_Metadata::class, 'is_eligible_for_new_use' ] ) );
+	}
+
+	/**
+	 * Returns normalized field blueprint for section when blueprint service is available and section has embedded blueprint.
+	 *
+	 * @param string      $section_key Section internal_key.
+	 * @param string|null $version     Optional version filter.
+	 * @return array<string, mixed>|null
+	 */
+	public function get_blueprint_for_section( string $section_key, ?string $version = null ): ?array {
+		if ( $this->blueprint_service === null ) {
+			return null;
+		}
+		return $this->blueprint_service->get_blueprint_for_section( $section_key, $version );
+	}
+
+	/**
+	 * Injects blueprint service for get_blueprint_for_section. Call from provider after both services exist.
+	 *
+	 * @param \AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service $service
+	 */
+	public function set_blueprint_service( \AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service $service ): void {
+		$this->blueprint_service = $service;
 	}
 
 	/**

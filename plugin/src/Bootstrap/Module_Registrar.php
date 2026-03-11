@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Bootstrap;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Blueprints_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Admin_Router_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Capability_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Config_Provider;
@@ -50,6 +51,7 @@ final class Module_Registrar {
 			new Capability_Provider(),
 			new Object_Registration_Provider(),
 			new Repositories_Provider(),
+			new ACF_Blueprints_Provider(),
 			new Registries_Provider(),
 			new Storage_Services_Provider(),
 		);

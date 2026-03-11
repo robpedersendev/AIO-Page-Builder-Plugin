@@ -50,11 +50,15 @@ final class Registries_Provider implements Service_Provider_Interface {
 			);
 		} );
 		$container->register( 'section_registry_service', function () use ( $container ): Section_Registry_Service {
-			return new Section_Registry_Service(
+			$service = new Section_Registry_Service(
 				$container->get( 'section_validator' ),
 				$container->get( 'section_template_repository' ),
 				$container->get( 'registry_deprecation_service' )
 			);
+			if ( $container->has( 'section_field_blueprint_service' ) ) {
+				$service->set_blueprint_service( $container->get( 'section_field_blueprint_service' ) );
+			}
+			return $service;
 		} );
 		$container->register( 'page_template_normalizer', function (): Page_Template_Normalizer {
 			return new Page_Template_Normalizer();
