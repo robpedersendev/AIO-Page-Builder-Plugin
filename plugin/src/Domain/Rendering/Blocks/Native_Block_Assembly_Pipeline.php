@@ -2,6 +2,7 @@
 /**
  * Converts ordered section render results into durable native block content (spec §7.5, §17.5, §18, rendering-contract §6.2, §6.3).
  * Produces save-ready block markup only; does not create or save pages.
+ * When a GenerateBlocks compatibility layer is provided and available, eligible sections may be emitted as GB blocks.
  *
  * @package AIOPageBuilder
  */
@@ -12,16 +13,28 @@ namespace AIOPageBuilder\Domain\Rendering\Blocks;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Render_Result;
 
 /**
  * Assembles ordered Section_Render_Result instances into a single block content string.
  * Uses core/html for section wrappers and semantic HTML for field content (durable, no render callbacks).
+ * Optional GenerateBlocks_Compatibility_Layer: when set and available, eligible sections use GB container/headline.
  */
 final class Native_Block_Assembly_Pipeline {
 
 	/** Field keys treated as primary heading (h2). */
 	private const HEADING_KEYS = array( 'headline', 'title' );
+
+	/** @var GenerateBlocks_Compatibility_Layer|null */
+	private $gb_layer;
+
+	/**
+	 * @param GenerateBlocks_Compatibility_Layer|null $gb_layer Optional; when set and available, eligible sections emit GenerateBlocks-compatible markup.
+	 */
+	public function __construct( ?GenerateBlocks_Compatibility_Layer $gb_layer = null ) {
+		$this->gb_layer = $gb_layer;
+	}
 
 	/**
 	 * Assembles ordered section results into page-level block content.
@@ -33,8 +46,9 @@ final class Native_Block_Assembly_Pipeline {
 	 */
 	public function assemble( string $source_type, string $source_key, array $ordered_section_results ): Page_Block_Assembly_Result {
 		$section_payloads = array();
-		$blocks            = array();
-		$errors            = array();
+		$blocks           = array();
+		$errors           = array();
+		$used_gb          = false;
 
 		foreach ( $ordered_section_results as $item ) {
 			$result = $this->normalize_section_result( $item );
@@ -46,11 +60,25 @@ final class Native_Block_Assembly_Pipeline {
 				$errors[] = sprintf( 'Section %s at position %d has errors: %s', $result->get_section_key(), $result->get_position(), implode( '; ', $result->get_errors() ) );
 			}
 			$section_payloads[] = $result->to_array();
-			$blocks[]           = $this->section_to_block_markup( $result );
+
+			$block_markup = null;
+			if ( $this->gb_layer !== null ) {
+				$block_markup = $this->gb_layer->section_to_gb_markup( $result );
+				if ( $block_markup !== null ) {
+					$used_gb = true;
+				}
+			}
+			if ( $block_markup === null ) {
+				$block_markup = $this->section_to_block_markup( $result );
+			}
+			$blocks[] = $block_markup;
 		}
 
 		$block_content = implode( "\n\n", $blocks );
 		$notes         = array( 'durable_native_blocks' );
+		if ( $used_gb ) {
+			$notes[] = 'generateblocks_compatible';
+		}
 		if ( ! empty( $errors ) ) {
 			$notes[] = 'partial_or_warning';
 		}

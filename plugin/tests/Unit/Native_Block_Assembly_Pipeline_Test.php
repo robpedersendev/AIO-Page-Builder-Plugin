@@ -10,6 +10,7 @@ namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Blocks\Page_Block_Assembly_Result;
+use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Render_Result;
 use PHPUnit\Framework\TestCase;
 
@@ -19,6 +20,8 @@ $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Rendering/Section/Section_Render_Result.php';
 require_once $plugin_root . '/src/Domain/Rendering/Blocks/Page_Block_Assembly_Result.php';
 require_once $plugin_root . '/src/Domain/Rendering/Blocks/Native_Block_Assembly_Pipeline.php';
+require_once $plugin_root . '/src/Domain/Rendering/GenerateBlocks/GenerateBlocks_Mapping_Rules.php';
+require_once $plugin_root . '/src/Domain/Rendering/GenerateBlocks/GenerateBlocks_Compatibility_Layer.php';
 
 final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 
@@ -227,5 +230,59 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 		$this->assertArrayHasKey( 'survivability_notes', $arr );
 		$this->assertArrayHasKey( 'errors', $arr );
 		$this->assertSame( 'tpl_x', $arr['source_key'] );
+	}
+
+	public function test_with_gb_layer_available_and_eligible_section_emits_gb_and_note(): void {
+		$gb_layer = new GenerateBlocks_Compatibility_Layer( function (): bool { return true; } );
+		$pipeline = new Native_Block_Assembly_Pipeline( $gb_layer );
+		$s       = $this->section_result( 'st01_hero', 0, array( 'headline' => 'Hero Title', 'subheadline' => 'Sub' ) );
+
+		$result = $pipeline->assemble(
+			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
+			'tpl_landing',
+			array( $s )
+		);
+
+		$this->assertContains( 'generateblocks_compatible', $result->get_survivability_notes() );
+		$this->assertStringContainsString( 'wp:generateblocks/container', $result->get_block_content() );
+		$this->assertStringContainsString( 'wp:generateblocks/headline', $result->get_block_content() );
+		$this->assertStringContainsString( 'aio-s-st01_hero', $result->get_block_content() );
+		$this->assertCount( 1, $result->get_ordered_sections() );
+	}
+
+	public function test_with_gb_layer_unavailable_emits_native_only_no_gb_note(): void {
+		$gb_layer = new GenerateBlocks_Compatibility_Layer( function (): bool { return false; } );
+		$pipeline = new Native_Block_Assembly_Pipeline( $gb_layer );
+		$s       = $this->section_result( 'st01_hero', 0, array( 'headline' => 'Title' ) );
+
+		$result = $pipeline->assemble(
+			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
+			'tpl',
+			array( $s )
+		);
+
+		$this->assertNotContains( 'generateblocks_compatible', $result->get_survivability_notes() );
+		$this->assertStringContainsString( '<!-- wp:html -->', $result->get_block_content() );
+		$this->assertStringNotContainsString( 'wp:generateblocks/container', $result->get_block_content() );
+	}
+
+	public function test_with_gb_layer_unsupported_pattern_section_uses_native_ordering_preserved(): void {
+		$gb_layer = new GenerateBlocks_Compatibility_Layer( function (): bool { return true; } );
+		$pipeline = new Native_Block_Assembly_Pipeline( $gb_layer );
+		$eligible = $this->section_result( 'st01_hero', 0, array( 'headline' => 'First' ) );
+		$ineligible = $this->section_result( 'st05_faq', 1, array( 'items' => array( array( 'q' => 'Q', 'a' => 'A' ) ) ) );
+
+		$result = $pipeline->assemble(
+			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
+			'tpl',
+			array( $eligible, $ineligible )
+		);
+
+		$content = $result->get_block_content();
+		$this->assertStringContainsString( 'wp:generateblocks/container', $content, 'First section eligible -> GB' );
+		$this->assertStringContainsString( '<!-- wp:html -->', $content, 'Second section ineligible -> native' );
+		$ordered = $result->get_ordered_sections();
+		$this->assertSame( 'st01_hero', $ordered[0]['section_key'] );
+		$this->assertSame( 'st05_faq', $ordered[1]['section_key'] );
 	}
 }
