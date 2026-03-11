@@ -118,6 +118,24 @@ final class Section_Field_Blueprint_Service {
 	}
 
 	/**
+	 * Returns all normalized blueprints from sections that have embedded field_blueprint.
+	 * Used by ACF Group Registrar for bulk registration.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	public function get_all_blueprints(): array {
+		$definitions = $this->section_repository->list_all_definitions( 9999, 0 );
+		$out = array();
+		foreach ( $definitions as $def ) {
+			$bp = $this->get_blueprint_from_definition( $def );
+			if ( $bp !== null ) {
+				$out[] = $bp;
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * Returns the group key for a section per acf-key-naming-contract.
 	 *
 	 * @param string $section_key
