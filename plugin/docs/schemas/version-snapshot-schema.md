@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for version snapshot objects (spec §10.8, §14.8, §58.4–58.5).  
 **Governs:** Snapshot scope types, root fields, preserved object references, version metadata, provenance, retention, and lifecycle before snapshot capture services are implemented.  
-**Related:** object-model-schema.md (§3.8 Version Snapshot), composition-validation-state-machine.md (composition registry_snapshot_ref_at_creation).
+**Related:** object-model-schema.md (§3.8 Version Snapshot), composition-validation-state-machine.md (composition registry_snapshot_ref_at_creation); ai-input-artifact-schema.md (input artifact registry section may reference registry version snapshots).
 
 ---
 

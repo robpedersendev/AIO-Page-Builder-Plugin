@@ -2,7 +2,7 @@
 
 **Document type:** Authoritative contract for profile data captured at AI-run time (§22.11).  
 **Governs:** Snapshot identity, immutability, inclusion rules, and relationship to current profile.  
-**Related:** profile-schema.md (current editable state); storage-strategy-matrix.md.
+**Related:** profile-schema.md (current editable state); storage-strategy-matrix.md; ai-input-artifact-schema.md (input artifact profile section may reference profile snapshots).
 
 ---
 
