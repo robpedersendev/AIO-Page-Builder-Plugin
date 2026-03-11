@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
@@ -47,6 +48,7 @@ final class Admin_Menu {
 		$onboarding  = new Onboarding_Screen( $this->container );
 		$crawler_sessions  = new Crawler_Sessions_Screen( $this->container );
 		$crawler_comparison = new Crawler_Comparison_Screen( $this->container );
+		$ai_runs            = new AI_Runs_Screen( $this->container );
 
 		add_menu_page(
 			__( 'AIO Page Builder', 'aio-page-builder' ),
@@ -110,6 +112,15 @@ final class Admin_Menu {
 			$crawler_comparison->get_capability(),
 			Crawler_Comparison_Screen::SLUG,
 			array( $crawler_comparison, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$ai_runs->get_title(),
+			__( 'AI Runs', 'aio-page-builder' ),
+			$ai_runs->get_capability(),
+			AI_Runs_Screen::SLUG,
+			array( $ai_runs, 'render' )
 		);
 	}
 }

@@ -70,6 +70,10 @@ require_once $plugin_root . '/src/Domain/AI/PromptPacks/Prompt_Package_Result.ph
 require_once $plugin_root . '/src/Domain/AI/PromptPacks/Normalized_Prompt_Package_Builder.php';
 require_once $plugin_root . '/src/Domain/AI/PromptPacks/Prompt_Pack_Registry_Service.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/AI_Prompt_Pack_Provider.php';
+require_once $plugin_root . '/src/Domain/AI/Runs/Artifact_Category_Keys.php';
+require_once $plugin_root . '/src/Domain/AI/Runs/AI_Run_Artifact_Service.php';
+require_once $plugin_root . '/src/Domain/AI/Runs/AI_Run_Service.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/AI_Runs_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Onboarding_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Storage_Services_Provider.php';
 require_once $plugin_root . '/src/Bootstrap/Module_Registrar.php';
@@ -97,6 +101,8 @@ final class Module_Registrar_Test extends TestCase {
 		$this->assertTrue( $container->has( 'prompt_pack_registry_service' ) );
 		$this->assertTrue( $container->has( 'input_artifact_builder' ) );
 		$this->assertTrue( $container->has( 'normalized_prompt_package_builder' ) );
+		$this->assertTrue( $container->has( 'ai_run_artifact_service' ) );
+		$this->assertTrue( $container->has( 'ai_run_service' ) );
 	}
 
 	public function test_config_service_resolves_and_exposes_versions(): void {

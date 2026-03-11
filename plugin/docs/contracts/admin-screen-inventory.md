@@ -60,7 +60,8 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 | Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
 |-------------|--------|----------------|----------------------|-----------------|--------|
 | `aio-page-builder-onboarding` | Onboarding & Profile | Admin / Onboarding | `manage_options` | First-time setup, brand/business profile; steps, draft, prefill, readiness; shell implemented (Onboarding_Screen); steps, draft, prefill, and handoff governed by [onboarding-state-machine.md](onboarding-state-machine.md) | Implemented (shell) |
-| `aio-page-builder-ai-runs` | AI Runs | Domain: AI | TBD | View AI runs, artifacts, validation | Not implemented |
+| `aio-page-builder-ai-runs` | AI Runs | Domain: AI | `aio_view_ai_runs` | List runs; view run detail (metadata + artifact summaries); raw prompts/responses gated by `aio_view_sensitive_diagnostics` | Implemented |
+| (detail via `run_id`) | AI Run Detail | Domain: AI | `aio_view_ai_runs` | View run metadata (redacted), artifact summary; raw content requires `aio_view_sensitive_diagnostics` | Implemented |
 | `aio-page-builder-build-plans` | Build Plans | Domain: BuildPlan | TBD | Review and execute build plans | Not implemented |
 | `aio-page-builder-logs` | Logs | Infrastructure / Reporting | TBD | View operational logs | Not implemented |
 | `aio-page-builder-reporting` | Reporting | Domain: Reporting | TBD | Reporting disclosure, heartbeat status | Not implemented |
