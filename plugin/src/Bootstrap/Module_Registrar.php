@@ -45,7 +45,7 @@ final class Module_Registrar {
 	 * Registers all bootstrap providers in order. Call once from Plugin::run().
 	 * Config_Provider registers config and settings (see global-options-schema.md).
 	 * Diagnostics_Provider registers logger and diagnostics helper (see diagnostics-contract.md).
-	 * Crawler_Provider registers snapshot, discovery, fetch, classification, extraction, and recrawl comparison (spec §24.12–24.17).
+	 * Crawler_Provider registers snapshot, discovery, fetch, classification, extraction, and recrawl comparison (spec §24.12–24.17). Crawler admin screens (Sessions, Comparison) are registered in Admin_Menu and documented in crawler-admin-screen-contract.md.
 	 * Admin menu and screen routing are registered separately in Plugin::register_admin_menu().
 	 *
 	 * @return void

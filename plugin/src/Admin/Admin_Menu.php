@@ -12,9 +12,12 @@ namespace AIOPageBuilder\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
+use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
+use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
  * Registers admin menu and submenus. Screen rendering is delegated to screen classes.
@@ -23,16 +26,25 @@ final class Admin_Menu {
 
 	private const PARENT_SLUG = 'aio-page-builder';
 
+	/** @var Service_Container|null */
+	private $container;
+
+	public function __construct( ?Service_Container $container = null ) {
+		$this->container = $container;
+	}
+
 	/**
-	 * Registers the top-level menu and Dashboard, Settings, Diagnostics submenus.
+	 * Registers the top-level menu and Dashboard, Settings, Diagnostics, Crawler submenus.
 	 * Call from admin_menu action. Capability-aware; no mutation actions.
 	 *
 	 * @return void
 	 */
 	public function register(): void {
-		$dashboard  = new Dashboard_Screen();
-		$settings  = new Settings_Screen();
+		$dashboard   = new Dashboard_Screen();
+		$settings    = new Settings_Screen();
 		$diagnostics = new Diagnostics_Screen();
+		$crawler_sessions  = new Crawler_Sessions_Screen( $this->container );
+		$crawler_comparison = new Crawler_Comparison_Screen( $this->container );
 
 		add_menu_page(
 			__( 'AIO Page Builder', 'aio-page-builder' ),
@@ -69,6 +81,24 @@ final class Admin_Menu {
 			$diagnostics->get_capability(),
 			Diagnostics_Screen::SLUG,
 			array( $diagnostics, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$crawler_sessions->get_title(),
+			__( 'Crawl Sessions', 'aio-page-builder' ),
+			$crawler_sessions->get_capability(),
+			Crawler_Sessions_Screen::SLUG,
+			array( $crawler_sessions, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$crawler_comparison->get_title(),
+			__( 'Crawl Comparison', 'aio-page-builder' ),
+			$crawler_comparison->get_capability(),
+			Crawler_Comparison_Screen::SLUG,
+			array( $crawler_comparison, 'render' )
 		);
 	}
 }

@@ -29,7 +29,17 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 | `aio-page-builder-settings` | Settings | Bootstrap / Admin | `manage_options` (placeholder) | Plugin settings, reporting disclosure | Placeholder |
 | `aio-page-builder-diagnostics` | Diagnostics | Bootstrap / Admin | `manage_options` (placeholder) | Environment status, validation summary | Placeholder |
 
-### 2.2 Registry screens (locked slugs)
+### 2.2 Crawler screens (locked slugs)
+
+**Contract:** Crawler list/detail/comparison, readiness copy, diagnostics panels, and action placeholders are defined in [crawler-admin-screen-contract.md](crawler-admin-screen-contract.md). Do not invent crawler slugs or panels elsewhere.
+
+| Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
+|-------------|--------|----------------|----------------------|-----------------|--------|
+| `aio-page-builder-crawler-sessions` | Crawl Sessions | Domain: Crawler | `manage_options` (placeholder) | List runs; View pages (detail); future crawl start/retry placeholder | Implemented |
+| (detail via `run_id`) | Crawl Session Detail | Domain: Crawler | `manage_options` (placeholder) | View page snapshots (URL, title, classification, nav, status) | Implemented |
+| `aio-page-builder-crawler-comparison` | Crawl Comparison | Domain: Crawler | `manage_options` (placeholder) | Select prior/new run; Compare; view summary and page changes | Implemented |
+
+### 2.3 Registry screens (locked slugs)
 
 **Contract:** Full screen IA, list/detail/create/edit flows, validation, deprecation, documentation and snapshot visibility are defined in [registry-admin-screen-contract.md](registry-admin-screen-contract.md). Do not invent slugs or panels elsewhere.
 
@@ -45,7 +55,7 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 | `aio-page-builder-documentation-edit` | Edit Documentation | Domain: Registries | `aio_manage_documentation` | Save, Cancel | Not implemented |
 | `aio-page-builder-snapshots` | Version Snapshots | Domain: Registries | `aio_view_version_snapshots` | List, Filter, View detail (read-only) | Not implemented |
 
-### 2.3 Future screens (locked slugs)
+### 2.4 Future screens (locked slugs)
 
 | Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
 |-------------|--------|----------------|----------------------|-----------------|--------|

@@ -111,6 +111,28 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		return $out;
 	}
 
+	/**
+	 * Lists distinct crawl run ids from the snapshot table (most recent first).
+	 *
+	 * @param int $limit Max number of run ids (0 = no limit).
+	 * @return list<string>
+	 */
+	public function list_crawl_run_ids( int $limit = 50 ): array {
+		$table = $this->get_table_name();
+		$sql   = "SELECT crawl_run_id FROM `{$table}` GROUP BY crawl_run_id ORDER BY MAX(id) DESC";
+		if ( $limit > 0 ) {
+			$sql   .= " LIMIT %d";
+			$prepared = $this->wpdb->prepare( $sql, $limit );
+		} else {
+			$prepared = $sql;
+		}
+		$col = $this->wpdb->get_col( $prepared );
+		if ( ! is_array( $col ) ) {
+			return array();
+		}
+		return array_values( array_filter( array_map( 'strval', $col ) ) );
+	}
+
 	/** @inheritdoc */
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		$table = $this->get_table_name();

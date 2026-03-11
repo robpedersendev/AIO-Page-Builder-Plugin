@@ -71,6 +71,42 @@ final class Crawl_Snapshot_Service {
 	}
 
 	/**
+	 * Lists crawl sessions (runs that have at least one page record). Merges option-stored session payloads where present.
+	 *
+	 * @param int $limit Max sessions to return (default 50).
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_sessions( int $limit = 50 ): array {
+		$run_ids = $this->repository->list_crawl_run_ids( $limit );
+		$sessions = array();
+		foreach ( $run_ids as $run_id ) {
+			$payload = $this->get_session( $run_id );
+			if ( $payload !== null ) {
+				$payload['crawl_run_id'] = $run_id;
+				$sessions[] = $payload;
+			} else {
+				$sessions[] = array(
+					'crawl_run_id'     => $run_id,
+					'site_host'        => '',
+					'started_at'       => null,
+					'ended_at'         => null,
+					'final_status'     => 'unknown',
+					'total_discovered' => 0,
+					'accepted_count'   => 0,
+					'excluded_count'   => 0,
+					'failed_count'     => 0,
+				);
+			}
+		}
+		usort( $sessions, function ( $a, $b ) {
+			$t1 = $a['started_at'] ?? '';
+			$t2 = $b['started_at'] ?? '';
+			return strcmp( (string) $t2, (string) $t1 );
+		} );
+		return $sessions;
+	}
+
+	/**
 	 * Returns session payload for a crawl run, or null if not found.
 	 *
 	 * @param string $crawl_run_id Crawl run identifier.

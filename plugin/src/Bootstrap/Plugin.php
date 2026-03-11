@@ -69,6 +69,9 @@ require_once $bootstrap_dir . '/Lifecycle_Manager.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Dashboard_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Settings_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Diagnostics_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Crawler/Crawler_Sessions_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Crawler/Crawler_Session_Detail_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Crawler/Crawler_Comparison_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Admin_Menu.php';
 
 /**
@@ -144,7 +147,7 @@ final class Plugin {
 	 * @return void
 	 */
 	public function register_admin_menu(): void {
-		$menu = new \AIOPageBuilder\Admin\Admin_Menu();
+		$menu = new \AIOPageBuilder\Admin\Admin_Menu( $this->container );
 		$menu->register();
 	}
 
@@ -166,5 +169,12 @@ final class Plugin {
 	 * - [ ] Activation calls Lifecycle_Manager::activate(); deactivation calls Lifecycle_Manager::deactivate().
 	 * - [ ] Blocking failure from a phase aborts activation (plugin deactivated, message shown) without fatal.
 	 * - [ ] Uninstall file guarded by WP_UNINSTALL_PLUGIN; uninstall runs Lifecycle_Manager::uninstall(); no deletion.
+	 *
+	 * Manual verification checklist (Prompt 056 – Crawler admin):
+	 * - [ ] AIO Page Builder menu shows submenus: Dashboard, Settings, Diagnostics, Crawl Sessions, Crawl Comparison.
+	 * - [ ] Crawl Sessions: list view shows run ID, site host, status, counts, Started, View pages link (or "No crawl sessions yet").
+	 * - [ ] Crawl Sessions: clicking View pages opens session detail with Run ID, Site host, Status, Page snapshots table (URL, Title, Classification, Nav, Status) or "No page records".
+	 * - [ ] Crawl Comparison: form with Prior run and New run dropdowns, Compare button; after submit shows summary table and page changes table when two runs selected.
+	 * - [ ] No raw HTML or unbounded content in list/detail; errors are user-friendly (e.g. Invalid run ID).
 	 */
 }
