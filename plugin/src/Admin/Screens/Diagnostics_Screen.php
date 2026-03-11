@@ -40,6 +40,8 @@ final class Diagnostics_Screen {
 		<div class="wrap aio-page-builder-screen aio-page-builder-diagnostics">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="aio-page-builder-notice"><?php \esc_html_e( 'Not yet implemented. This screen will show environment validation and diagnostics. Structured logging is available for internal use.', 'aio-page-builder' ); ?></p>
+			<?php /* Future: ACF diagnostics panel surface via acf_diagnostics_service->get_full_payload(). */ ?>
+			<div id="aio-diagnostics-acf-placeholder" class="aio-diagnostics-placeholder" data-acf-diagnostics="future" aria-hidden="true"></div>
 		</div>
 		<?php
 	}
