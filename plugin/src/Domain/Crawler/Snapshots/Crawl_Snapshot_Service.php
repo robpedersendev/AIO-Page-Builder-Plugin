@@ -1,0 +1,194 @@
+<?php
+/**
+ * Crawl snapshot service: session creation, page record persistence, read by session/URL/status (spec §11.1, §24.15, §24.16, §58.4).
+ * No URL discovery or fetching; storage and payload building only.
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Domain\Crawler\Snapshots;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Creates crawl sessions (metadata in options), stores and retrieves page snapshot records (table).
+ * Schema-version aware; diagnostics hooks can be wired by callers.
+ */
+final class Crawl_Snapshot_Service {
+
+	/** Option key prefix for session metadata (one option per run: {prefix}{crawl_run_id}). */
+	private const SESSION_OPTION_PREFIX = 'aio_page_builder_crawl_session_';
+
+	/** Max length for crawl_run_id used in option key. */
+	private const RUN_ID_OPTION_MAX = 64;
+
+	/** @var Crawl_Snapshot_Repository */
+	private $repository;
+
+	public function __construct( Crawl_Snapshot_Repository $repository ) {
+		$this->repository = $repository;
+	}
+
+	/**
+	 * Creates a new crawl session: generates run id, stores session payload in options.
+	 *
+	 * @param string $site_host Canonical host for the crawl.
+	 * @param array<string, mixed> $settings Optional crawl settings (no secrets).
+	 * @return string Crawl run id, or empty string on failure.
+	 */
+	public function create_session( string $site_host, array $settings = array() ): string {
+		$crawl_run_id = $this->generate_run_id();
+		if ( $crawl_run_id === '' ) {
+			return '';
+		}
+		$now    = $this->iso8601_now();
+		$payload = Crawl_Snapshot_Payload_Builder::build_session_payload(
+			$crawl_run_id,
+			$site_host,
+			$now,
+			null,
+			$settings,
+			0,
+			0,
+			0,
+			0,
+			Crawl_Snapshot_Payload_Builder::SESSION_STATUS_RUNNING
+		);
+		$option_key = $this->session_option_key( $crawl_run_id );
+		if ( $option_key === '' ) {
+			return '';
+		}
+		$saved = \update_option( $option_key, $payload, false );
+		if ( ! $saved ) {
+			return '';
+		}
+		return $crawl_run_id;
+	}
+
+	/**
+	 * Returns session payload for a crawl run, or null if not found.
+	 *
+	 * @param string $crawl_run_id Crawl run identifier.
+	 * @return array<string, mixed>|null Session record.
+	 */
+	public function get_session( string $crawl_run_id ): ?array {
+		$key = $this->session_option_key( $crawl_run_id );
+		if ( $key === '' ) {
+			return null;
+		}
+		$payload = \get_option( $key, null );
+		if ( ! is_array( $payload ) ) {
+			return null;
+		}
+		return $payload;
+	}
+
+	/**
+	 * Updates session metadata (e.g. ended_at, counts, final_status).
+	 *
+	 * @param string              $crawl_run_id Crawl run identifier.
+	 * @param array<string, mixed> $overrides    Keys from Crawl_Snapshot_Payload_Builder::SESSION_*.
+	 * @return bool True if option updated.
+	 */
+	public function update_session( string $crawl_run_id, array $overrides ): bool {
+		$existing = $this->get_session( $crawl_run_id );
+		if ( $existing === null ) {
+			return false;
+		}
+		$allowed = array(
+			Crawl_Snapshot_Payload_Builder::SESSION_ENDED_AT,
+			Crawl_Snapshot_Payload_Builder::SESSION_TOTAL_DISCOVERED,
+			Crawl_Snapshot_Payload_Builder::SESSION_ACCEPTED_COUNT,
+			Crawl_Snapshot_Payload_Builder::SESSION_EXCLUDED_COUNT,
+			Crawl_Snapshot_Payload_Builder::SESSION_FAILED_COUNT,
+			Crawl_Snapshot_Payload_Builder::SESSION_FINAL_STATUS,
+		);
+		foreach ( $allowed as $k ) {
+			if ( array_key_exists( $k, $overrides ) ) {
+				$existing[ $k ] = $overrides[ $k ];
+			}
+		}
+		$option_key = $this->session_option_key( $crawl_run_id );
+		return $option_key !== '' && \update_option( $option_key, $existing, false );
+	}
+
+	/**
+	 * Stores a page snapshot record (insert or update by run_id + url).
+	 *
+	 * @param string              $crawl_run_id Crawl run identifier.
+	 * @param string              $url         Normalized URL.
+	 * @param array<string, mixed> $overrides   Optional field overrides (title_snapshot, crawl_status, etc.).
+	 * @return int Inserted or updated row id; 0 on failure.
+	 */
+	public function store_page_record( string $crawl_run_id, string $url, array $overrides = array() ): int {
+		$payload = Crawl_Snapshot_Payload_Builder::build_page_payload( $crawl_run_id, $url, $overrides );
+		if ( empty( $payload ) ) {
+			return 0;
+		}
+		return $this->repository->save( $payload );
+	}
+
+	/**
+	 * Returns a single page record by crawl run and URL.
+	 *
+	 * @param string $crawl_run_id Crawl run identifier.
+	 * @param string $url          Normalized URL.
+	 * @return array<string, mixed>|null Page record.
+	 */
+	public function get_page_by_run_and_url( string $crawl_run_id, string $url ): ?array {
+		return $this->repository->get_by_run_and_url( $crawl_run_id, $url );
+	}
+
+	/**
+	 * Lists page records for a crawl run.
+	 *
+	 * @param string   $crawl_run_id Crawl run identifier.
+	 * @param string|null $status     Optional filter by crawl_status.
+	 * @param int      $limit       Max rows (0 = no limit).
+	 * @param int      $offset      Offset.
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_pages_by_run( string $crawl_run_id, ?string $status = null, int $limit = 0, int $offset = 0 ): array {
+		return $this->repository->list_by_run_id( $crawl_run_id, $status, $limit, $offset );
+	}
+
+	/**
+	 * Lists page records by crawl_status across all runs.
+	 *
+	 * @param string $status crawl_status value (pending, completed, error).
+	 * @param int    $limit  Max rows (0 = no limit).
+	 * @param int    $offset Offset.
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_pages_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
+		return $this->repository->list_by_status( $status, $limit, $offset );
+	}
+
+	/**
+	 * Returns current schema version for snapshot records (spec §58.4).
+	 *
+	 * @return string
+	 */
+	public static function get_schema_version(): string {
+		return Crawl_Snapshot_Payload_Builder::SCHEMA_VERSION;
+	}
+
+	private function generate_run_id(): string {
+		$raw = \wp_generate_uuid4();
+		return \sanitize_text_field( substr( $raw, 0, self::RUN_ID_OPTION_MAX ) );
+	}
+
+	private function session_option_key( string $crawl_run_id ): string {
+		$id = \sanitize_text_field( substr( $crawl_run_id, 0, self::RUN_ID_OPTION_MAX ) );
+		if ( $id === '' ) {
+			return '';
+		}
+		return self::SESSION_OPTION_PREFIX . $id;
+	}
+
+	private function iso8601_now(): string {
+		return \gmdate( 'Y-m-d\TH:i:s\Z' );
+	}
+}

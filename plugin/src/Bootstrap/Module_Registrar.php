@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Blueprints_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Assignment_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\Crawler_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Compatibility_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Diagnostics_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\ACF_Registration_Provider;
@@ -52,6 +53,7 @@ final class Module_Registrar {
 		$providers = array(
 			new Config_Provider(),
 			new Diagnostics_Provider(),
+			new Crawler_Provider(),
 			new Admin_Router_Provider(),
 			new Capability_Provider(),
 			new Object_Registration_Provider(),

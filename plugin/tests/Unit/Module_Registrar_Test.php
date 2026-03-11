@@ -33,6 +33,22 @@ require_once $plugin_root . '/src/Infrastructure/Container/Providers/Capability_
 require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Type_Keys.php';
 require_once $plugin_root . '/src/Domain/Storage/Objects/Post_Type_Registrar.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Object_Registration_Provider.php';
+require_once $plugin_root . '/src/Domain/Storage/Tables/Table_Names.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_Table_Repository.php';
+require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Payload_Builder.php';
+require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Repository.php';
+require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Service.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/Crawler_Provider.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/Repositories_Provider.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/ACF_Blueprints_Provider.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/ACF_Registration_Provider.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/ACF_Assignment_Provider.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/ACF_Compatibility_Provider.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/ACF_Diagnostics_Provider.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/Rendering_Provider.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/Registries_Provider.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/Storage_Services_Provider.php';
 require_once $plugin_root . '/src/Bootstrap/Module_Registrar.php';
 
 /**

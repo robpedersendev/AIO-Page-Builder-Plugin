@@ -9,6 +9,7 @@ namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
+use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Documentation_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Repository;
@@ -35,6 +36,8 @@ require_once $plugin_root . '/src/Domain/Storage/Repositories/Version_Snapshot_R
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Build_Plan_Repository.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/AI_Run_Repository.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Job_Queue_Repository.php';
+require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Payload_Builder.php';
+require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Repository.php';
 
 final class Repository_Interface_Conformance_Test extends TestCase {
 
@@ -53,6 +56,7 @@ final class Repository_Interface_Conformance_Test extends TestCase {
 			new Build_Plan_Repository(),
 			new AI_Run_Repository(),
 			new Job_Queue_Repository( $wpdb ),
+			new Crawl_Snapshot_Repository( $wpdb ),
 		);
 	}
 
