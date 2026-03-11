@@ -11,6 +11,8 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Crawler\Classification\Duplicate_Detector;
+use AIOPageBuilder\Domain\Crawler\Classification\Meaningful_Page_Classifier;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Discovery_Service;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Normalizer;
 use AIOPageBuilder\Domain\Crawler\Fetch\Fetch_Request_Policy;
@@ -53,6 +55,12 @@ final class Crawler_Provider implements Service_Provider_Interface {
 				return $normalizer->normalize( $url ) === $url;
 			};
 			return new HTML_Fetcher( $policy, $allowed );
+		} );
+		$container->register( 'duplicate_detector', function (): Duplicate_Detector {
+			return new Duplicate_Detector();
+		} );
+		$container->register( 'meaningful_page_classifier', function () use ( $container ): Meaningful_Page_Classifier {
+			return new Meaningful_Page_Classifier( $container->get( 'duplicate_detector' ) );
 		} );
 	}
 }

@@ -7,6 +7,7 @@
 
 namespace AIOPageBuilder\Tests\Unit;
 
+use AIOPageBuilder\Domain\Crawler\Classification\Classification_Result;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Repository;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Domain/Crawler/Classification/Classification_Result.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Payload_Builder.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_Table_Repository.php';
@@ -50,6 +52,36 @@ final class Crawl_Snapshot_Service_Test extends TestCase {
 		$svc  = new Crawl_Snapshot_Service( $repo );
 		$id   = $svc->store_page_record( 'run-1', 'https://example.com/' );
 		$this->assertSame( 100, $id );
+	}
+
+	public function test_record_classification_returns_id_from_repository(): void {
+		$repo = $this->create_repository_stub_save( 201 );
+		$svc  = new Crawl_Snapshot_Service( $repo );
+		$result = new Classification_Result(
+			Classification_Result::CLASSIFICATION_MEANINGFUL,
+			array( Classification_Result::REASON_CONTENT_WEIGHT ),
+			null,
+			array( 'has_h1' => true, 'word_count' => 200, 'in_nav' => false, 'link_count' => 0 ),
+			Classification_Result::RETENTION_RETAIN,
+			'content_hash_abc'
+		);
+		$id = $svc->record_classification( 'run-1', 'https://example.com/page', $result );
+		$this->assertSame( 201, $id );
+	}
+
+	public function test_record_classification_with_title_snapshot_returns_id(): void {
+		$repo = $this->create_repository_stub_save( 202 );
+		$svc  = new Crawl_Snapshot_Service( $repo );
+		$result = new Classification_Result(
+			Classification_Result::CLASSIFICATION_MEANINGFUL,
+			array( Classification_Result::REASON_LIKELY_ROLE ),
+			null,
+			array(),
+			Classification_Result::RETENTION_RETAIN,
+			null
+		);
+		$id = $svc->record_classification( 'run-1', 'https://example.com/about', $result, 'About Us' );
+		$this->assertSame( 202, $id );
 	}
 
 	public function test_create_session_returns_non_empty_run_id_and_get_session_returns_payload(): void {

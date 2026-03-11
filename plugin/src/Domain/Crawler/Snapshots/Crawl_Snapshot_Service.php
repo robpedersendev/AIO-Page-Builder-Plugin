@@ -1,7 +1,7 @@
 <?php
 /**
  * Crawl snapshot service: session creation, page record persistence, read by session/URL/status (spec §11.1, §24.15, §24.16, §58.4).
- * No URL discovery or fetching; storage and payload building only.
+ * No URL discovery or fetching; storage and payload building only. Supports classification result persistence.
  *
  * @package AIOPageBuilder
  */
@@ -11,6 +11,8 @@ declare( strict_types=1 );
 namespace AIOPageBuilder\Domain\Crawler\Snapshots;
 
 defined( 'ABSPATH' ) || exit;
+
+use AIOPageBuilder\Domain\Crawler\Classification\Classification_Result;
 
 /**
  * Creates crawl sessions (metadata in options), stores and retrieves page snapshot records (table).
@@ -128,6 +130,28 @@ final class Crawl_Snapshot_Service {
 			return 0;
 		}
 		return $this->repository->save( $payload );
+	}
+
+	/**
+	 * Stores classification outcome for a page (updates page_classification, indexability_flags, content_hash).
+	 *
+	 * @param string               $crawl_run_id   Crawl run identifier.
+	 * @param string               $url            Normalized URL.
+	 * @param Classification_Result $result         Classification result from Meaningful_Page_Classifier.
+	 * @param string|null          $title_snapshot  Optional title to store with the record.
+	 * @return int Updated row id; 0 on failure.
+	 */
+	public function record_classification( string $crawl_run_id, string $url, Classification_Result $result, ?string $title_snapshot = null ): int {
+		$reasons_str = implode( ',', $result->reason_codes );
+		$overrides   = array(
+			Crawl_Snapshot_Payload_Builder::PAGE_CLASSIFICATION     => $result->classification,
+			Crawl_Snapshot_Payload_Builder::PAGE_INDEXABILITY_FLAGS  => $reasons_str !== '' ? $reasons_str : null,
+			Crawl_Snapshot_Payload_Builder::PAGE_CONTENT_HASH        => $result->content_hash,
+		);
+		if ( $title_snapshot !== null && $title_snapshot !== '' ) {
+			$overrides[ Crawl_Snapshot_Payload_Builder::PAGE_TITLE_SNAPSHOT ] = $title_snapshot;
+		}
+		return $this->store_page_record( $crawl_run_id, $url, $overrides );
 	}
 
 	/**
