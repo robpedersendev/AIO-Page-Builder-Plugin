@@ -1,0 +1,43 @@
+<?php
+/**
+ * Registers section registry services (spec §12, §59.4).
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Infrastructure\Container\Providers;
+
+defined( 'ABSPATH' ) || exit;
+
+use AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer;
+use AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service;
+use AIOPageBuilder\Domain\Registries\Section\Section_Validator;
+use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
+
+/**
+ * Registers section registry domain services. Callers must perform capability and nonce checks before mutating.
+ */
+final class Registries_Provider implements Service_Provider_Interface {
+
+	/** @inheritdoc */
+	public function register( Service_Container $container ): void {
+		$container->register( 'section_definition_normalizer', function (): Section_Definition_Normalizer {
+			return new Section_Definition_Normalizer();
+		} );
+		$container->register( 'section_validator', function () use ( $container ): Section_Validator {
+			return new Section_Validator(
+				$container->get( 'section_definition_normalizer' ),
+				$container->get( 'section_template_repository' )
+			);
+		} );
+		$container->register( 'section_registry_service', function () use ( $container ): Section_Registry_Service {
+			return new Section_Registry_Service(
+				$container->get( 'section_validator' ),
+				$container->get( 'section_template_repository' )
+			);
+		} );
+	}
+}

@@ -17,6 +17,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Capability_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Config_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Diagnostics_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Object_Registration_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\Registries_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Repositories_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Storage_Services_Provider;
 
@@ -49,6 +50,7 @@ final class Module_Registrar {
 			new Capability_Provider(),
 			new Object_Registration_Provider(),
 			new Repositories_Provider(),
+			new Registries_Provider(),
 			new Storage_Services_Provider(),
 		);
 		foreach ( $providers as $provider ) {

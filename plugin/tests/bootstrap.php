@@ -180,3 +180,8 @@ if ( ! function_exists( 'wp_mkdir_p' ) ) {
 		return @mkdir( $target, 0755, true );
 	}
 }
+if ( ! function_exists( 'wp_json_encode' ) ) {
+	function wp_json_encode( $data, $options = 0, $depth = 512 ) {
+		return json_encode( $data, $options | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE, $depth );
+	}
+}
