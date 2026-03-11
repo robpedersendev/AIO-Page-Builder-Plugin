@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Domain\Crawler\Snapshots;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Crawler\Classification\Classification_Result;
+use AIOPageBuilder\Domain\Crawler\Extraction\Extraction_Result;
 
 /**
  * Creates crawl sessions (metadata in options), stores and retrieves page snapshot records (table).
@@ -150,6 +151,29 @@ final class Crawl_Snapshot_Service {
 		);
 		if ( $title_snapshot !== null && $title_snapshot !== '' ) {
 			$overrides[ Crawl_Snapshot_Payload_Builder::PAGE_TITLE_SNAPSHOT ] = $title_snapshot;
+		}
+		return $this->store_page_record( $crawl_run_id, $url, $overrides );
+	}
+
+	/**
+	 * Stores extraction outcome for a page (summary_data, optional title_snapshot and meta_snapshot from page_summary).
+	 *
+	 * @param string          $crawl_run_id Crawl run identifier.
+	 * @param string          $url          Normalized URL.
+	 * @param Extraction_Result $result     Extraction result from Navigation_Extractor + Content_Summary_Extractor.
+	 * @return int Updated row id; 0 on failure.
+	 */
+	public function record_extraction( string $crawl_run_id, string $url, Extraction_Result $result ): int {
+		$overrides = array(
+			Crawl_Snapshot_Payload_Builder::PAGE_SUMMARY_DATA => $result->to_summary_data_json(),
+		);
+		$title = $result->page_summary['title'] ?? '';
+		if ( $title !== '' ) {
+			$overrides[ Crawl_Snapshot_Payload_Builder::PAGE_TITLE_SNAPSHOT ] = $title;
+		}
+		$meta = $result->page_summary['meta_description'] ?? '';
+		if ( $meta !== '' ) {
+			$overrides[ Crawl_Snapshot_Payload_Builder::PAGE_META_SNAPSHOT ] = $meta;
 		}
 		return $this->store_page_record( $crawl_run_id, $url, $overrides );
 	}

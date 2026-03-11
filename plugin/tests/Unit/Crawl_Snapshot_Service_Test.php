@@ -8,6 +8,7 @@
 namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\Crawler\Classification\Classification_Result;
+use AIOPageBuilder\Domain\Crawler\Extraction\Extraction_Result;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Repository;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Crawler/Classification/Classification_Result.php';
+require_once $plugin_root . '/src/Domain/Crawler/Extraction/Extraction_Result.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Payload_Builder.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_Table_Repository.php';
@@ -82,6 +84,23 @@ final class Crawl_Snapshot_Service_Test extends TestCase {
 		);
 		$id = $svc->record_classification( 'run-1', 'https://example.com/about', $result, 'About Us' );
 		$this->assertSame( 202, $id );
+	}
+
+	public function test_record_extraction_returns_id_from_repository(): void {
+		$repo = $this->create_repository_stub_save( 301 );
+		$svc  = new Crawl_Snapshot_Service( $repo );
+		$page_summary = array(
+			'title'                => 'Extracted Title',
+			'meta_description'     => 'Meta desc',
+			'h1'                  => 'H1',
+			'h2_outline'          => array(),
+			'word_count'          => 50,
+			'content_excerpt'     => 'Excerpt.',
+			'internal_link_count' => 2,
+		);
+		$result = new Extraction_Result( $page_summary, array(), array(), array() );
+		$id = $svc->record_extraction( 'run-1', 'https://example.com/page', $result );
+		$this->assertSame( 301, $id );
 	}
 
 	public function test_create_session_returns_non_empty_run_id_and_get_session_returns_payload(): void {

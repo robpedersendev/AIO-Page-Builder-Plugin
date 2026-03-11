@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers crawler bucket services: snapshot, discovery, fetch (spec §11.1, §24.15, §24.7–24.8).
+ * Registers crawler bucket services: snapshot, discovery, fetch, classification, extraction (spec §11.1, §24.12–24.15).
  *
  * @package AIOPageBuilder
  */
@@ -14,6 +14,8 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Crawler\Classification\Duplicate_Detector;
 use AIOPageBuilder\Domain\Crawler\Classification\Meaningful_Page_Classifier;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Discovery_Service;
+use AIOPageBuilder\Domain\Crawler\Extraction\Content_Summary_Extractor;
+use AIOPageBuilder\Domain\Crawler\Extraction\Navigation_Extractor;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Normalizer;
 use AIOPageBuilder\Domain\Crawler\Fetch\Fetch_Request_Policy;
 use AIOPageBuilder\Domain\Crawler\Fetch\HTML_Fetcher;
@@ -61,6 +63,12 @@ final class Crawler_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'meaningful_page_classifier', function () use ( $container ): Meaningful_Page_Classifier {
 			return new Meaningful_Page_Classifier( $container->get( 'duplicate_detector' ) );
+		} );
+		$container->register( 'navigation_extractor', function (): Navigation_Extractor {
+			return new Navigation_Extractor();
+		} );
+		$container->register( 'content_summary_extractor', function (): Content_Summary_Extractor {
+			return new Content_Summary_Extractor();
 		} );
 	}
 }
