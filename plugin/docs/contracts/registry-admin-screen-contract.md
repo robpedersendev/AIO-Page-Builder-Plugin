@@ -2,7 +2,7 @@
 
 **Document type:** Authoritative contract for registry management screens (spec §62.10, §59.4, §49.6–49.7).  
 **Governs:** Screen slugs, menu placement, list/detail/create/edit flows, validation presentation, deprecation/duplication, documentation and snapshot visibility before any registry UI implementation.  
-**Related:** admin-screen-inventory.md, section-registry-schema.md, page-template-registry-schema.md, composition-validation-state-machine.md, documentation-object-schema.md, version-snapshot-schema.md, Capabilities.php.
+**Related:** admin-screen-inventory.md, section-registry-schema.md, page-template-registry-schema.md, composition-validation-state-machine.md, documentation-object-schema.md, version-snapshot-schema.md, acf-page-visibility-contract.md (field-group visibility on pages from templates/compositions), Capabilities.php.
 
 ---
 
