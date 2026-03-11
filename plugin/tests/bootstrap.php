@@ -201,6 +201,10 @@ if ( ! class_exists( 'WP_Query' ) ) {
 					$dec = json_decode( $row['_aio_page_template_definition'], true );
 					$ik  = isset( $dec['internal_key'] ) ? (string) $dec['internal_key'] : '';
 				}
+				if ( $ik === '' && ! empty( $row['_aio_composition_definition'] ) ) {
+					$dec = json_decode( $row['_aio_composition_definition'], true );
+					$ik  = isset( $dec['composition_id'] ) ? (string) $dec['composition_id'] : '';
+				}
 				if ( $ik === (string) $key_val ) {
 					$filtered[] = $post;
 				}

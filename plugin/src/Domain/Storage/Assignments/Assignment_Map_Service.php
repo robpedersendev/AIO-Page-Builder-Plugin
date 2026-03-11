@@ -198,6 +198,27 @@ final class Assignment_Map_Service {
 	}
 
 	/**
+	 * Deletes all rows matching map_type and source_ref.
+	 *
+	 * @param string $map_type   One of Assignment_Types constants.
+	 * @param string $source_ref Source identifier.
+	 * @return int Number of rows deleted.
+	 */
+	public function delete_by_source_and_type( string $map_type, string $source_ref ): int {
+		$map_type   = $this->sanitize_map_type( $map_type );
+		$source_ref = $this->sanitize_ref( $source_ref );
+		if ( $map_type === '' || $source_ref === '' ) {
+			return 0;
+		}
+		$result = $this->wpdb->delete(
+			$this->table,
+			array( 'map_type' => $map_type, 'source_ref' => $source_ref ),
+			array( '%s', '%s' )
+		);
+		return is_int( $result ) ? $result : 0;
+	}
+
+	/**
 	 * Lists rows by map_type and target_ref.
 	 *
 	 * @param string $map_type   One of Assignment_Types constants.
