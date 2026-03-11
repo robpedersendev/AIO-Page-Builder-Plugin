@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
+use AIOPageBuilder\Domain\Rendering\Diagnostics\Content_Survivability_Checker;
 use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiation_Payload_Builder;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiator;
@@ -51,6 +52,10 @@ final class Rendering_Provider implements Service_Provider_Interface {
 		$container->register( 'page_instantiator', function () use ( $container ): Page_Instantiator {
 			$builder = $container->get( 'page_instantiation_payload_builder' );
 			return new Page_Instantiator( $builder );
+		} );
+
+		$container->register( 'content_survivability_checker', function (): Content_Survivability_Checker {
+			return new Content_Survivability_Checker();
 		} );
 	}
 }
