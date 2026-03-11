@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers crawler bucket services: snapshot, discovery, fetch, classification, extraction (spec §11.1, §24.12–24.15).
+ * Registers crawler bucket services: snapshot, discovery, fetch, classification, extraction, comparison (spec §11.1, §24.12–24.17).
  *
  * @package AIOPageBuilder
  */
@@ -15,6 +15,7 @@ use AIOPageBuilder\Domain\Crawler\Classification\Duplicate_Detector;
 use AIOPageBuilder\Domain\Crawler\Classification\Meaningful_Page_Classifier;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Discovery_Service;
 use AIOPageBuilder\Domain\Crawler\Extraction\Content_Summary_Extractor;
+use AIOPageBuilder\Domain\Crawler\Comparison\Recrawl_Comparison_Service;
 use AIOPageBuilder\Domain\Crawler\Extraction\Navigation_Extractor;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Normalizer;
 use AIOPageBuilder\Domain\Crawler\Fetch\Fetch_Request_Policy;
@@ -69,6 +70,9 @@ final class Crawler_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'content_summary_extractor', function (): Content_Summary_Extractor {
 			return new Content_Summary_Extractor();
+		} );
+		$container->register( 'recrawl_comparison_service', function () use ( $container ): Recrawl_Comparison_Service {
+			return new Recrawl_Comparison_Service( $container->get( 'crawl_snapshot_service' ) );
 		} );
 	}
 }
