@@ -53,6 +53,16 @@ if ( ! function_exists( 'sanitize_textarea_field' ) ) {
 		return trim( (string) $str );
 	}
 }
+if ( ! function_exists( 'esc_attr' ) ) {
+	function esc_attr( $text ) {
+		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+	}
+}
+if ( ! function_exists( 'esc_html' ) ) {
+	function esc_html( $text ) {
+		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+	}
+}
 if ( ! function_exists( 'add_action' ) ) {
 	function add_action( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
 		// No-op for unit tests; CPT registration runs in WP context.
