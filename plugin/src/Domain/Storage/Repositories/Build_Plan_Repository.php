@@ -28,6 +28,34 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository {
 	}
 
 	/**
+	 * Lists plans by most recent first (any status). For admin list screen.
+	 *
+	 * @param int $limit  Max items (default 50).
+	 * @param int $offset Offset for pagination.
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_recent( int $limit = 50, int $offset = 0 ): array {
+		$limit = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
+		$query = new \WP_Query(
+			array(
+				'post_type'              => $this->get_post_type(),
+				'posts_per_page'         => $limit,
+				'offset'                 => $offset,
+				'orderby'                => 'date',
+				'order'                  => 'DESC',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => true,
+			)
+		);
+		$out = array();
+		foreach ( $query->get_posts() as $post ) {
+			$meta = $this->get_meta( $post->ID );
+			$out[] = $this->post_to_record( $post, $meta );
+		}
+		return $out;
+	}
+
+	/**
 	 * Returns the full plan definition (root payload with steps) for a plan post.
 	 *
 	 * @param int $post_id Plan post ID.

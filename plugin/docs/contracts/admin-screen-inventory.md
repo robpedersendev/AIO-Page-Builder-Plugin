@@ -61,8 +61,8 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 
 | Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
 |-------------|--------|----------------|----------------------|-----------------|--------|
-| `aio-page-builder-build-plans` | Build Plans | Domain: BuildPlan | `aio_view_build_plans` (placeholder; view/approve/execute/finalize/artifact distinct per IA contract) | List plans; open plan detail (stepper); Create Build Plan from AI Runs | Not implemented |
-| (detail via `plan_id` or `id`) | Build Plan detail (stepper) | Domain: BuildPlan | Same as list; approve/execute gated by separate capabilities | Three-zone layout: context rail, stepper, step workspace; row/detail; status and completion per IA contract | Not implemented |
+| `aio-page-builder-build-plans` | Build Plans | Domain: BuildPlan | `aio_view_build_plans` (view/approve/execute/finalize/artifact distinct per IA contract) | List plans; open plan detail (stepper); Create Build Plan from AI Runs | Implemented (shell) |
+| (detail via `plan_id` or `id`) | Build Plan detail (stepper) | Domain: BuildPlan | Same as list; approve/execute gated by separate capabilities | Three-zone layout: context rail, stepper, step workspace; empty-state shells; row/detail in later prompts | Implemented (shell) |
 
 ### 2.5 Other future screens (locked slugs)
 
