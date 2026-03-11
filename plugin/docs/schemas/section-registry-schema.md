@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for section templates (spec §12, §10.1).  
 **Governs:** Required/optional fields, sub-manifests, validation rules, and completeness for registry implementation.  
-**Related:** object-model-schema.md (§3.1 Section Template), master spec §12.1–12.15. Page templates reference section templates by `internal_key`; see **page-template-registry-schema.md** for the page template schema. The `field_blueprint_ref` points to a blueprint defined per **acf-field-blueprint-schema.md**.
+**Related:** object-model-schema.md (§3.1 Section Template), master spec §12.1–12.15. Page templates reference section templates by `internal_key`; see **page-template-registry-schema.md** for the page template schema. The `field_blueprint_ref` points to a blueprint defined per **acf-field-blueprint-schema.md**. The `css_contract_ref` points to a section CSS manifest that **must** conform to the global **css-selector-contract.md** (docs/contracts/).
 
 ---
 
@@ -135,22 +135,22 @@ Categories are controlled slugs. Suggested set (extensible by registry policy):
 
 ## 6. CSS contract manifest reference block (spec §12.11)
 
-The section references a **CSS contract manifest** (by ref id). The manifest itself defines (documented here for contract clarity; stored or referenced elsewhere):
+The section references a **CSS contract manifest** (by ref id). The manifest content **must align with the global selector contract**: see **docs/contracts/css-selector-contract.md** for stable naming rules, approved data attributes, token hook points, prohibited patterns, and the compliance checklist. The manifest defines (per that contract):
 
 | Concept | Description |
-|---------|--------------|
-| Base section class | Primary wrapper class. |
-| Section ID strategy | How section IDs are generated, if applicable. |
-| Inner wrapper classes | Inner container class names. |
-| Major structural child classes | Child region classes. |
-| Modifier classes | BEM-style or equivalent modifiers. |
+|---------|-------------|
+| Base section class | Primary wrapper class; pattern `aio-s-{section_key}` (global contract). |
+| Section ID strategy | How section IDs are generated, if applicable; pattern per global contract. |
+| Inner wrapper classes | Inner container; pattern `aio-s-{section_key}__inner` when used. |
+| Major structural child classes | Child region classes; approved element roles only (global contract §3.4). |
+| Modifier classes | Explicit modifiers; variant pattern `aio-s-{section_key}--variant-{variant_key}`. |
 | Variant class rules | Class rules per variant. |
-| State classes | e.g. expanded, collapsed. |
-| Approved data attributes | Allowed `data-*` attributes. |
-| Token hook points | Design token / variable hook points. |
-| Prohibited selector patterns | Selectors the section must not use. |
+| State classes | e.g. expanded, collapsed; pattern `aio-s-{section_key}--is-{state}`. |
+| Approved data attributes | Only `data-aio-*` from global contract approved list. |
+| Token hook points | Design token variable names (`--aio-*`); values are variable. |
+| Prohibited selector patterns | As defined in global contract; no override. |
 
-The schema only requires `css_contract_ref` (string); the manifest content is a separate structural contract.
+The schema only requires `css_contract_ref` (string); the manifest content is a separate structural contract and must comply with **css-selector-contract.md**.
 
 ---
 
