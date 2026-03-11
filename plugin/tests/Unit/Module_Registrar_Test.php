@@ -54,6 +54,11 @@ require_once $plugin_root . '/src/Domain/AI/Validation/Validation_Report.php';
 require_once $plugin_root . '/src/Domain/AI/Validation/Normalized_Output_Builder.php';
 require_once $plugin_root . '/src/Domain/AI/Validation/AI_Output_Validator.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/AI_Validation_Provider.php';
+require_once $plugin_root . '/src/Domain/AI/Providers/Provider_Response_Normalizer.php';
+require_once $plugin_root . '/src/Domain/AI/Providers/Provider_Error_Normalizer.php';
+require_once $plugin_root . '/src/Domain/AI/Providers/Provider_Request_Context_Builder.php';
+require_once $plugin_root . '/src/Domain/AI/Providers/Provider_Capability_Resolver.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/AI_Provider_Base_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Onboarding_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Storage_Services_Provider.php';
 require_once $plugin_root . '/src/Bootstrap/Module_Registrar.php';
@@ -74,6 +79,10 @@ final class Module_Registrar_Test extends TestCase {
 		$this->assertTrue( $container->has( 'post_type_registrar' ) );
 		$this->assertTrue( $container->has( 'ai_output_validator' ) );
 		$this->assertTrue( $container->has( 'normalized_output_builder' ) );
+		$this->assertTrue( $container->has( 'provider_response_normalizer' ) );
+		$this->assertTrue( $container->has( 'provider_error_normalizer' ) );
+		$this->assertTrue( $container->has( 'provider_request_context_builder' ) );
+		$this->assertTrue( $container->has( 'provider_capability_resolver' ) );
 	}
 
 	public function test_config_service_resolves_and_exposes_versions(): void {
