@@ -11,11 +11,14 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Rendering\Assets\Render_Asset_Controller;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Diagnostics\Content_Survivability_Checker;
+use AIOPageBuilder\Domain\Rendering\Diagnostics\Rendering_Diagnostics_Service;
 use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiation_Payload_Builder;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiator;
+use AIOPageBuilder\Domain\Rendering\Preview\Render_Preview_Helper;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Renderer_Base;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -56,6 +59,18 @@ final class Rendering_Provider implements Service_Provider_Interface {
 
 		$container->register( 'content_survivability_checker', function (): Content_Survivability_Checker {
 			return new Content_Survivability_Checker();
+		} );
+
+		$container->register( 'rendering_diagnostics_service', function (): Rendering_Diagnostics_Service {
+			return new Rendering_Diagnostics_Service();
+		} );
+
+		$container->register( 'render_preview_helper', function (): Render_Preview_Helper {
+			return new Render_Preview_Helper();
+		} );
+
+		$container->register( 'render_asset_controller', function (): Render_Asset_Controller {
+			return new Render_Asset_Controller();
 		} );
 	}
 }

@@ -42,6 +42,8 @@ final class Diagnostics_Screen {
 			<p class="aio-page-builder-notice"><?php \esc_html_e( 'Not yet implemented. This screen will show environment validation and diagnostics. Structured logging is available for internal use.', 'aio-page-builder' ); ?></p>
 			<?php /* Future: ACF diagnostics panel surface via acf_diagnostics_service->get_full_payload(). */ ?>
 			<div id="aio-diagnostics-acf-placeholder" class="aio-diagnostics-placeholder" data-acf-diagnostics="future" aria-hidden="true"></div>
+			<?php /* Future: Rendering diagnostics (render_summary, assembly_summary, instantiation_readiness) via rendering_diagnostics_service. */ ?>
+			<div id="aio-diagnostics-rendering-placeholder" class="aio-diagnostics-placeholder" data-rendering-diagnostics="future" aria-hidden="true"></div>
 		</div>
 		<?php
 	}
