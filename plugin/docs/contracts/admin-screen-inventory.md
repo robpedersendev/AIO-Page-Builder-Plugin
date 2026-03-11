@@ -59,7 +59,7 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 
 | Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
 |-------------|--------|----------------|----------------------|-----------------|--------|
-| `aio-page-builder-onboarding` | Onboarding & Profile | Admin / Onboarding | TBD | First-time setup, brand/business profile | Not implemented |
+| `aio-page-builder-onboarding` | Onboarding & Profile | Admin / Onboarding | TBD | First-time setup, brand/business profile; steps, draft, prefill, and handoff governed by [onboarding-state-machine.md](onboarding-state-machine.md) | Not implemented |
 | `aio-page-builder-ai-runs` | AI Runs | Domain: AI | TBD | View AI runs, artifacts, validation | Not implemented |
 | `aio-page-builder-build-plans` | Build Plans | Domain: BuildPlan | TBD | Review and execute build plans | Not implemented |
 | `aio-page-builder-logs` | Logs | Infrastructure / Reporting | TBD | View operational logs | Not implemented |
