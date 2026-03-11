@@ -177,14 +177,20 @@ if ( ! class_exists( 'WP_Query' ) ) {
 			if ( ! is_array( $meta_query ) || empty( $posts ) ) {
 				return $posts;
 			}
-			$key_val = null;
+			$filter_meta_key   = null;
+			$filter_meta_value = null;
 			foreach ( $meta_query as $mq ) {
-				if ( is_array( $mq ) && ( $mq['key'] ?? '' ) === '_aio_internal_key' && array_key_exists( 'value', $mq ) ) {
-					$key_val = $mq['value'];
+				if ( ! is_array( $mq ) || ! array_key_exists( 'value', $mq ) ) {
+					continue;
+				}
+				$k = $mq['key'] ?? '';
+				if ( $k === '_aio_internal_key' || $k === '_aio_scope_type' || $k === '_aio_scope_id' || $k === '_aio_status' ) {
+					$filter_meta_key   = $k;
+					$filter_meta_value = $mq['value'];
 					break;
 				}
 			}
-			if ( $key_val === null ) {
+			if ( $filter_meta_key === null ) {
 				return $posts;
 			}
 			$filtered = array();
@@ -192,20 +198,30 @@ if ( ! class_exists( 'WP_Query' ) ) {
 			foreach ( $posts as $post ) {
 				$id  = is_object( $post ) ? $post->ID : ( $post['ID'] ?? 0 );
 				$row = $meta[ (string) $id ] ?? array();
-				$ik  = $row['_aio_internal_key'] ?? '';
-				if ( $ik === '' && ! empty( $row['_aio_section_definition'] ) ) {
-					$dec = json_decode( $row['_aio_section_definition'], true );
-					$ik  = isset( $dec['internal_key'] ) ? (string) $dec['internal_key'] : '';
+				$val = $row[ $filter_meta_key ] ?? '';
+				if ( $val === '' && $filter_meta_key === '_aio_internal_key' ) {
+					if ( ! empty( $row['_aio_section_definition'] ) ) {
+						$dec = json_decode( $row['_aio_section_definition'], true );
+						$val = isset( $dec['internal_key'] ) ? (string) $dec['internal_key'] : '';
+					}
+					if ( $val === '' && ! empty( $row['_aio_page_template_definition'] ) ) {
+						$dec = json_decode( $row['_aio_page_template_definition'], true );
+						$val = isset( $dec['internal_key'] ) ? (string) $dec['internal_key'] : '';
+					}
+					if ( $val === '' && ! empty( $row['_aio_composition_definition'] ) ) {
+						$dec = json_decode( $row['_aio_composition_definition'], true );
+						$val = isset( $dec['composition_id'] ) ? (string) $dec['composition_id'] : '';
+					}
+					if ( $val === '' && ! empty( $row['_aio_snapshot_definition'] ) ) {
+						$dec = json_decode( $row['_aio_snapshot_definition'], true );
+						$val = isset( $dec['snapshot_id'] ) ? (string) $dec['snapshot_id'] : '';
+					}
 				}
-				if ( $ik === '' && ! empty( $row['_aio_page_template_definition'] ) ) {
-					$dec = json_decode( $row['_aio_page_template_definition'], true );
-					$ik  = isset( $dec['internal_key'] ) ? (string) $dec['internal_key'] : '';
+				if ( $val === '' && in_array( $filter_meta_key, array( '_aio_scope_type', '_aio_scope_id' ), true ) && ! empty( $row['_aio_snapshot_definition'] ) ) {
+					$dec  = json_decode( $row['_aio_snapshot_definition'], true );
+					$val  = $filter_meta_key === '_aio_scope_type' ? ( (string) ( $dec['scope_type'] ?? '' ) ) : ( (string) ( $dec['scope_id'] ?? '' ) );
 				}
-				if ( $ik === '' && ! empty( $row['_aio_composition_definition'] ) ) {
-					$dec = json_decode( $row['_aio_composition_definition'], true );
-					$ik  = isset( $dec['composition_id'] ) ? (string) $dec['composition_id'] : '';
-				}
-				if ( $ik === (string) $key_val ) {
+				if ( (string) $val === (string) $filter_meta_value ) {
 					$filtered[] = $post;
 				}
 			}

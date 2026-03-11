@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers section, page template, and composition registry services (spec §12, §13, §10.3, §59.4).
+ * Registers section, page template, composition, and version snapshot registry services (spec §12, §13, §10.3, §10.8, §59.4).
  *
  * @package AIOPageBuilder
  */
@@ -20,11 +20,12 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer;
 use AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Validator;
+use AIOPageBuilder\Domain\Registries\Snapshots\Version_Snapshot_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Registers section, page template, and composition registry domain services. Callers must perform capability and nonce checks before mutating.
+ * Registers section, page template, composition, and version snapshot registry domain services. Callers must perform capability and nonce checks before mutating.
  */
 final class Registries_Provider implements Service_Provider_Interface {
 
@@ -76,6 +77,14 @@ final class Registries_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'composition_duplicator', function () use ( $container ): Composition_Duplicator {
 			return new Composition_Duplicator( $container->get( 'composition_registry_service' ) );
+		} );
+		$container->register( 'version_snapshot_service', function () use ( $container ): Version_Snapshot_Service {
+			return new Version_Snapshot_Service(
+				$container->get( 'section_registry_service' ),
+				$container->get( 'page_template_registry_service' ),
+				$container->get( 'version_snapshot_repository' ),
+				$container->get( 'composition_repository' )
+			);
 		} );
 	}
 }

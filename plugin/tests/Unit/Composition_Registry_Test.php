@@ -271,6 +271,27 @@ final class Composition_Registry_Test extends TestCase {
 		$this->assertSame( 'compact', $mappings[1]['variant'] );
 	}
 
+	public function test_attach_registry_snapshot_ref(): void {
+		$this->seed_sections_st01_and_st05();
+		$GLOBALS['_aio_wp_insert_post_return'] = 7010;
+
+		$create_result = $this->registry->create( $this->valid_minimal_composition( 'comp_attach_snap' ) );
+		$this->assertTrue( $create_result->success );
+
+		$comp_post = new \WP_Post( array( 'ID' => 7010, 'post_type' => Object_Type_Keys::COMPOSITION, 'post_title' => 'Test', 'post_status' => 'publish', 'post_name' => 'comp_attach_snap' ) );
+		$GLOBALS['_aio_get_post_return']  = $comp_post;
+		$GLOBALS['_aio_post_meta']['7010'] = array(
+			'_aio_internal_key'           => 'comp_attach_snap',
+			'_aio_status'                 => 'draft',
+			'_aio_composition_definition' => wp_json_encode( $create_result->definition ),
+		);
+
+		$attach_result = $this->registry->attach_registry_snapshot_ref( $create_result->post_id, 'snap_manual_ref' );
+
+		$this->assertTrue( $attach_result->success );
+		$this->assertSame( 'snap_manual_ref', $attach_result->definition[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] ?? '' );
+	}
+
 	public function test_snapshot_reference_field_persistence(): void {
 		$this->seed_sections_st01_and_st05();
 		$GLOBALS['_aio_wp_insert_post_return'] = 7005;

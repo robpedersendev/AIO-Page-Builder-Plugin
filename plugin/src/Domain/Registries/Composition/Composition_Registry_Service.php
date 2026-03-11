@@ -193,6 +193,30 @@ final class Composition_Registry_Service {
 	}
 
 	/**
+	 * Attaches a registry snapshot reference to a composition (spec §14.8).
+	 *
+	 * @param int    $post_id     Composition CPT post ID.
+	 * @param string $snapshot_id Valid snapshot_id from Version_Snapshot_Service.
+	 * @return Composition_Registry_Result
+	 */
+	public function attach_registry_snapshot_ref( int $post_id, string $snapshot_id ): Composition_Registry_Result {
+		$existing = $this->repository->get_definition_by_id( $post_id );
+		if ( $existing === null ) {
+			return Composition_Registry_Result::failure( array( 'Composition not found' ), 0 );
+		}
+		$ref = $this->sanitize_ref( $snapshot_id );
+		if ( $ref === '' ) {
+			return Composition_Registry_Result::failure( array( 'Invalid snapshot_id' ), 0 );
+		}
+		$existing[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] = $ref;
+		$id = $this->repository->save_definition( $existing );
+		if ( $id <= 0 ) {
+			return Composition_Registry_Result::failure( array( 'Persistence failed' ), 0 );
+		}
+		return Composition_Registry_Result::success( $id, $existing );
+	}
+
+	/**
 	 * Returns ordered section mappings from assignment map for a composition.
 	 *
 	 * @param string $composition_id
