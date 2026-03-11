@@ -124,15 +124,17 @@ For the composition validation state machine (lifecycle statuses, validation res
 | **Object name** | Build Plan |
 | **Proposed storage** | CPT |
 | **Internal key** | plan_id (e.g. UUID); immutable |
-| **Required fields** | plan_id, ai_run_ref, generated_site_purpose_summary, step_based_recommendations, approval_denial_state, remaining_work_status, execution_status, created_at |
-| **Optional fields** | profile_context_ref, affected_page_refs, completed_at, actor_refs |
+| **Required fields** | plan_id, ai_run_ref, normalized_output_ref, plan_title, plan_summary, site_purpose_summary, site_flow_summary, steps, created_at (see **build-plan-schema.md** for full root, step, and item schema). |
+| **Optional fields** | profile_context_ref, crawl_snapshot_ref, registry_snapshot_ref, affected_page_refs, completed_at, actor_refs, approval_denial_state, remaining_work_status, execution_status, warnings, assumptions, confidence, execution_history_anchor, history_retention, schema_version |
 | **Status enum** | `pending_review` \| `approved` \| `rejected` \| `in_progress` \| `completed` \| `superseded` |
-| **Relationships** | References AI Run (one). May reference pages (created or affected). May reference profile snapshot (context). |
+| **Relationships** | References AI Run (one). References normalized output (one). May reference profile snapshot, crawl snapshot, registry snapshot. May reference pages (created or affected). |
 | **Lifecycle** | Created in pending_review. Allowed transitions: pending_review → approved \| rejected; approved → in_progress → completed \| superseded. rejected and superseded are terminal for workflow. |
 | **Deletion/archive** | Operational record; archive or retain per policy. Do not delete while execution or rollback depends on it. |
 | **Export** | Exportable (operational state exportable under permissions). |
-| **Migration** | Timestamps and status markers; ai_run_ref is stable. |
+| **Migration** | Timestamps and status markers; ai_run_ref and normalized_output_ref are stable. |
 | **Sensitivity** | **Tighter access:** Approval state and execution status are operational; restrict to users with appropriate capabilities. No raw provider secrets in plan. |
+
+**Full schema:** Implementation-grade root, step, and item schema (source references, step grouping, item dependency/blocking, warning/confidence, completion/history) are defined in **build-plan-schema.md**. Code-level constants: `AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema`, `Build_Plan_Item_Schema`.
 
 ---
 
