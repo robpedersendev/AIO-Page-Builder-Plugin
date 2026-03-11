@@ -17,6 +17,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Documentation_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\Prompt_Pack_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Version_Snapshot_Repository;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -45,6 +46,9 @@ final class Repositories_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'composition_repository', function (): Composition_Repository {
 			return new Composition_Repository();
+		} );
+		$container->register( 'prompt_pack_repository', function (): Prompt_Pack_Repository {
+			return new Prompt_Pack_Repository();
 		} );
 		$container->register( 'documentation_repository', function (): Documentation_Repository {
 			return new Documentation_Repository();

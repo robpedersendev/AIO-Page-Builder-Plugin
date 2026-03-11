@@ -25,6 +25,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Config_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Diagnostics_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Object_Registration_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Provider_Base_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\AI_Prompt_Pack_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Validation_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Onboarding_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Registries_Provider;
@@ -71,6 +72,7 @@ final class Module_Registrar {
 			new Registries_Provider(),
 			new AI_Validation_Provider(),
 			new AI_Provider_Base_Provider(),
+			new AI_Prompt_Pack_Provider(),
 			new Storage_Services_Provider(),
 			new Onboarding_Provider(),
 		);

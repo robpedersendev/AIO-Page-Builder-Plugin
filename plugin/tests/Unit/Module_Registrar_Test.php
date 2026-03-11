@@ -40,6 +40,11 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Payloa
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Repository.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Service.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Crawler_Provider.php';
+require_once $plugin_root . '/src/Domain/AI/PromptPacks/Prompt_Pack_Registry_Repository_Interface.php';
+require_once $plugin_root . '/src/Domain/AI/PromptPacks/Prompt_Pack_Schema.php';
+require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Status_Families.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Prompt_Pack_Repository.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Repositories_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/ACF_Blueprints_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/ACF_Registration_Provider.php';
@@ -59,6 +64,12 @@ require_once $plugin_root . '/src/Domain/AI/Providers/Provider_Error_Normalizer.
 require_once $plugin_root . '/src/Domain/AI/Providers/Provider_Request_Context_Builder.php';
 require_once $plugin_root . '/src/Domain/AI/Providers/Provider_Capability_Resolver.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/AI_Provider_Base_Provider.php';
+require_once $plugin_root . '/src/Domain/AI/InputArtifacts/Input_Artifact_Schema.php';
+require_once $plugin_root . '/src/Domain/AI/InputArtifacts/Input_Artifact_Builder.php';
+require_once $plugin_root . '/src/Domain/AI/PromptPacks/Prompt_Package_Result.php';
+require_once $plugin_root . '/src/Domain/AI/PromptPacks/Normalized_Prompt_Package_Builder.php';
+require_once $plugin_root . '/src/Domain/AI/PromptPacks/Prompt_Pack_Registry_Service.php';
+require_once $plugin_root . '/src/Infrastructure/Container/Providers/AI_Prompt_Pack_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Onboarding_Provider.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Providers/Storage_Services_Provider.php';
 require_once $plugin_root . '/src/Bootstrap/Module_Registrar.php';
@@ -83,6 +94,9 @@ final class Module_Registrar_Test extends TestCase {
 		$this->assertTrue( $container->has( 'provider_error_normalizer' ) );
 		$this->assertTrue( $container->has( 'provider_request_context_builder' ) );
 		$this->assertTrue( $container->has( 'provider_capability_resolver' ) );
+		$this->assertTrue( $container->has( 'prompt_pack_registry_service' ) );
+		$this->assertTrue( $container->has( 'input_artifact_builder' ) );
+		$this->assertTrue( $container->has( 'normalized_prompt_package_builder' ) );
 	}
 
 	public function test_config_service_resolves_and_exposes_versions(): void {
