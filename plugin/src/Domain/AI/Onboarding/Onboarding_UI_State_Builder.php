@@ -86,19 +86,37 @@ final class Onboarding_UI_State_Builder {
 			? __( 'You have saved draft progress. You can continue below.', 'aio-page-builder' )
 			: '';
 
+		$submission_warnings = $this->build_submission_warnings( $draft, $prefill );
+
 		return array(
-			'current_step_key'  => $current_step_key,
-			'steps'             => $steps,
-			'overall_status'    => $effective_status,
-			'is_blocked'        => $is_blocked,
-			'blockers'          => $blockers,
-			'prefill'           => $prefill,
-			'draft'             => $draft,
-			'nonce'             => \wp_create_nonce( 'aio_onboarding_save' ),
-			'nonce_action'      => 'aio_onboarding_save',
-			'can_save_draft'    => true,
-			'resume_message'    => $resume_message,
-			'is_provider_ready' => $is_provider_ready,
+			'current_step_key'     => $current_step_key,
+			'steps'                => $steps,
+			'overall_status'       => $effective_status,
+			'is_blocked'           => $is_blocked,
+			'blockers'             => $blockers,
+			'prefill'              => $prefill,
+			'draft'                => $draft,
+			'nonce'                => \wp_create_nonce( 'aio_onboarding_save' ),
+			'nonce_action'         => 'aio_onboarding_save',
+			'can_save_draft'       => true,
+			'resume_message'       => $resume_message,
+			'is_provider_ready'    => $is_provider_ready,
+			'submission_warnings'  => $submission_warnings,
+			'last_planning_run_id' => $draft['last_planning_run_id'] ?? null,
+			'last_planning_run_post_id' => $draft['last_planning_run_post_id'] ?? null,
 		);
+	}
+
+	/**
+	 * Builds change-detection and stale-crawl warnings for submission step. Surface only; does not block.
+	 *
+	 * @param array<string, mixed> $draft
+	 * @param array<string, mixed> $prefill
+	 * @return list<array{category: string, message: string, severity?: string}>
+	 */
+	private function build_submission_warnings( array $draft, array $prefill ): array {
+		$warnings = array();
+		// * Placeholder for change-detection (e.g. profile updated since last crawl) and stale-crawl age.
+		return $warnings;
 	}
 }

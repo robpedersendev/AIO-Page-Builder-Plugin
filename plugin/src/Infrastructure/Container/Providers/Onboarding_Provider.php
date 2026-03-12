@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Planning_Request_Orchestrator;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -36,6 +37,21 @@ final class Onboarding_Provider implements Service_Provider_Interface {
 			return new Onboarding_UI_State_Builder(
 				$container->get( 'onboarding_draft_service' ),
 				$container->get( 'onboarding_prefill_service' )
+			);
+		} );
+		$container->register( 'onboarding_planning_request_orchestrator', function () use ( $container ): Onboarding_Planning_Request_Orchestrator {
+			return new Onboarding_Planning_Request_Orchestrator(
+				$container->get( 'onboarding_draft_service' ),
+				$container->get( 'onboarding_prefill_service' ),
+				$container->get( 'prompt_pack_registry_service' ),
+				$container->get( 'input_artifact_builder' ),
+				$container->get( 'normalized_prompt_package_builder' ),
+				$container->get( 'provider_request_context_builder' ),
+				$container->get( 'provider_capability_resolver' ),
+				$container->get( 'ai_output_validator' ),
+				$container->get( 'ai_run_service' ),
+				$container->get( 'provider_connection_test_service' ),
+				$container
 			);
 		} );
 	}

@@ -16,6 +16,8 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
+use AIOPageBuilder\Domain\AI\Onboarding\Planning_Request_Result;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
@@ -124,6 +126,26 @@ final class Onboarding_Screen {
 			return $url;
 		}
 
+		if ( $action === 'submit_planning_request' ) {
+			if ( ! \current_user_can( Capabilities::RUN_ONBOARDING ) || ! \current_user_can( Capabilities::RUN_AI_PLANS ) ) {
+				$url = \add_query_arg( array( 'page' => self::SLUG, 'planning_result' => 'blocked', 'planning_message' => rawurlencode( __( 'You do not have permission to submit a planning request.', 'aio-page-builder' ) ) ), \admin_url( 'admin.php' ) );
+				return $url;
+			}
+			if ( $this->container->has( 'onboarding_planning_request_orchestrator' ) ) {
+				$orchestrator = $this->container->get( 'onboarding_planning_request_orchestrator' );
+				$result = $orchestrator->submit();
+				$arr = $result->to_array();
+				$transient_key = 'aio_onboarding_planning_result_' . \get_current_user_id();
+				\set_transient( $transient_key, $arr, 60 );
+				$url = \add_query_arg( array(
+					'page'            => self::SLUG,
+					'planning_result' => $arr['status'],
+					'run_id'          => $arr['run_id'] !== '' ? rawurlencode( $arr['run_id'] ) : '',
+				), \admin_url( 'admin.php' ) );
+				return $url;
+			}
+		}
+
 		return null;
 	}
 
@@ -185,6 +207,18 @@ final class Onboarding_Screen {
 		$nonce = $state['nonce'] ?? '';
 		$nonce_action = $state['nonce_action'] ?? self::NONCE_ACTION;
 		$saved = isset( $_GET['saved'] ) && $_GET['saved'] === '1';
+		$planning_result_status = isset( $_GET['planning_result'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['planning_result'] ) ) : '';
+		$planning_result_message = '';
+		if ( $planning_result_status !== '' ) {
+			$transient_key = 'aio_onboarding_planning_result_' . \get_current_user_id();
+			$stored = \get_transient( $transient_key );
+			if ( is_array( $stored ) && isset( $stored['user_message'] ) && is_string( $stored['user_message'] ) ) {
+				$planning_result_message = $stored['user_message'];
+				\delete_transient( $transient_key );
+			} else {
+				$planning_result_message = isset( $_GET['planning_message'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['planning_message'] ) ) : __( 'Planning request completed. Check the result below.', 'aio-page-builder' );
+			}
+		}
 		?>
 		<div class="wrap aio-page-builder-screen aio-onboarding" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -192,6 +226,22 @@ final class Onboarding_Screen {
 			<?php if ( $saved ) : ?>
 				<div class="notice notice-success is-dismissible" role="status">
 					<p><?php \esc_html_e( 'Draft saved. You can return later to continue.', 'aio-page-builder' ); ?></p>
+				</div>
+			<?php endif; ?>
+
+			<?php if ( $planning_result_status !== '' && $planning_result_message !== '' ) : ?>
+				<?php
+				$notice_class = 'notice-info';
+				if ( $planning_result_status === Planning_Request_Result::STATUS_SUCCESS ) {
+					$notice_class = 'notice-success';
+				} elseif ( in_array( $planning_result_status, array( Planning_Request_Result::STATUS_VALIDATION_FAILED, Planning_Request_Result::STATUS_PROVIDER_FAILED ), true ) ) {
+					$notice_class = 'notice-warning';
+				} elseif ( $planning_result_status === Planning_Request_Result::STATUS_BLOCKED ) {
+					$notice_class = 'notice-warning';
+				}
+				?>
+				<div class="notice <?php echo \esc_attr( $notice_class ); ?> is-dismissible" role="status">
+					<p><?php echo \esc_html( $planning_result_message ); ?></p>
 				</div>
 			<?php endif; ?>
 
@@ -239,7 +289,11 @@ final class Onboarding_Screen {
 							<button type="submit" name="aio_onboarding_action" value="advance_step" class="button button-primary"><?php \esc_html_e( 'Next', 'aio-page-builder' ); ?></button>
 						<?php endif; ?>
 					<?php else : ?>
-						<p class="aio-onboarding-ready"><?php \esc_html_e( 'Ready for AI planning. Submission will be available in a future update.', 'aio-page-builder' ); ?></p>
+						<?php if ( ! empty( $state['is_blocked'] ) ) : ?>
+							<p class="aio-onboarding-ready"><?php \esc_html_e( 'Complete the required steps above before requesting a plan.', 'aio-page-builder' ); ?></p>
+						<?php else : ?>
+							<button type="submit" name="aio_onboarding_action" value="submit_planning_request" class="button button-primary"><?php \esc_html_e( 'Request AI plan', 'aio-page-builder' ); ?></button>
+						<?php endif; ?>
 					<?php endif; ?>
 				</p>
 			</form>
@@ -268,6 +322,16 @@ final class Onboarding_Screen {
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::PROVIDER_SETUP ) : ?>
 				<p><?php \esc_html_e( 'Configure at least one AI provider (API key) to use AI planning. Credentials are stored securely and never shown here.', 'aio-page-builder' ); ?></p>
 				<p><?php \esc_html_e( 'Provider setup UI will be added in a future update. Current readiness:', 'aio-page-builder' ); ?> <?php echo $is_provider_ready ? \esc_html__( 'At least one provider configured.', 'aio-page-builder' ) : \esc_html__( 'No provider configured.', 'aio-page-builder' ); ?></p>
+			<?php elseif ( $current_step_key === Onboarding_Step_Keys::SUBMISSION ) : ?>
+				<p><?php \esc_html_e( 'Request an AI-generated plan from your profile and context. The plan will appear in AI Runs; you can then create a Build Plan from it.', 'aio-page-builder' ); ?></p>
+				<?php
+				$last_run_id = $state['last_planning_run_id'] ?? null;
+				$last_run_post_id = $state['last_planning_run_post_id'] ?? null;
+				if ( $last_run_id !== null && $last_run_post_id !== null && (int) $last_run_post_id > 0 ) :
+					$run_url = \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs', 'run_id' => $last_run_id ), \admin_url( 'admin.php' ) );
+					?>
+					<p><?php \esc_html_e( 'Last run:', 'aio-page-builder' ); ?> <a href="<?php echo \esc_url( $run_url ); ?>"><?php echo \esc_html( $last_run_id ); ?></a></p>
+				<?php endif; ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::REVIEW ) : ?>
 				<p><?php \esc_html_e( 'Review your inputs before proceeding. Profile and provider readiness are checked here.', 'aio-page-builder' ); ?></p>
 				<?php if ( count( $provider_refs ) > 0 ) : ?>

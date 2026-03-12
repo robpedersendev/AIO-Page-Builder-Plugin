@@ -71,15 +71,17 @@ final class Onboarding_Draft_Service {
 			$steps[ $key ] = Onboarding_Statuses::STEP_NOT_STARTED;
 		}
 		return array(
-			'version'               => self::DRAFT_VERSION,
-			'overall_status'       => Onboarding_Statuses::NOT_STARTED,
-			'current_step_key'      => Onboarding_Step_Keys::WELCOME,
-			'step_statuses'         => $steps,
-			'profile_snapshot_ref'  => null,
-			'crawl_run_id_ref'      => null,
-			'provider_refs'         => array(),
-			'goal_or_intent_text'  => '',
-			'updated_at'            => $this->iso8601_now(),
+			'version'                    => self::DRAFT_VERSION,
+			'overall_status'            => Onboarding_Statuses::NOT_STARTED,
+			'current_step_key'          => Onboarding_Step_Keys::WELCOME,
+			'step_statuses'             => $steps,
+			'profile_snapshot_ref'      => null,
+			'crawl_run_id_ref'          => null,
+			'provider_refs'             => array(),
+			'goal_or_intent_text'       => '',
+			'last_planning_run_id'      => null,
+			'last_planning_run_post_id'  => null,
+			'updated_at'                 => $this->iso8601_now(),
 		);
 	}
 
@@ -116,16 +118,23 @@ final class Onboarding_Draft_Service {
 				}
 			}
 		}
+		$last_run_id   = isset( $raw['last_planning_run_id'] ) && ( is_string( $raw['last_planning_run_id'] ) || $raw['last_planning_run_id'] === null ) ? $raw['last_planning_run_id'] : $default['last_planning_run_id'];
+		$last_run_post = isset( $raw['last_planning_run_post_id'] ) && ( is_int( $raw['last_planning_run_post_id'] ) || ( is_string( $raw['last_planning_run_post_id'] ) && $raw['last_planning_run_post_id'] !== '' ) ) ? (int) $raw['last_planning_run_post_id'] : ( $default['last_planning_run_post_id'] ?? null );
+		if ( $last_run_post === 0 && $last_run_id === null ) {
+			$last_run_post = null;
+		}
 		return array(
-			'version'               => isset( $raw['version'] ) && ( is_int( $raw['version'] ) || is_string( $raw['version'] ) ) ? $raw['version'] : $default['version'],
-			'overall_status'        => $overall,
-			'current_step_key'      => $current,
-			'step_statuses'         => $step_statuses,
-			'profile_snapshot_ref'  => isset( $raw['profile_snapshot_ref'] ) && ( is_string( $raw['profile_snapshot_ref'] ) || $raw['profile_snapshot_ref'] === null ) ? $raw['profile_snapshot_ref'] : $default['profile_snapshot_ref'],
-			'crawl_run_id_ref'      => isset( $raw['crawl_run_id_ref'] ) && ( is_string( $raw['crawl_run_id_ref'] ) || $raw['crawl_run_id_ref'] === null ) ? ( $raw['crawl_run_id_ref'] ? \sanitize_text_field( (string) $raw['crawl_run_id_ref'] ) : null ) : $default['crawl_run_id_ref'],
-			'provider_refs'        => $provider_refs,
-			'goal_or_intent_text'   => isset( $raw['goal_or_intent_text'] ) && is_string( $raw['goal_or_intent_text'] ) ? \sanitize_textarea_field( $raw['goal_or_intent_text'] ) : $default['goal_or_intent_text'],
-			'updated_at'            => isset( $raw['updated_at'] ) && is_string( $raw['updated_at'] ) ? $raw['updated_at'] : $default['updated_at'],
+			'version'                    => isset( $raw['version'] ) && ( is_int( $raw['version'] ) || is_string( $raw['version'] ) ) ? $raw['version'] : $default['version'],
+			'overall_status'             => $overall,
+			'current_step_key'           => $current,
+			'step_statuses'              => $step_statuses,
+			'profile_snapshot_ref'       => isset( $raw['profile_snapshot_ref'] ) && ( is_string( $raw['profile_snapshot_ref'] ) || $raw['profile_snapshot_ref'] === null ) ? $raw['profile_snapshot_ref'] : $default['profile_snapshot_ref'],
+			'crawl_run_id_ref'           => isset( $raw['crawl_run_id_ref'] ) && ( is_string( $raw['crawl_run_id_ref'] ) || $raw['crawl_run_id_ref'] === null ) ? ( $raw['crawl_run_id_ref'] ? \sanitize_text_field( (string) $raw['crawl_run_id_ref'] ) : null ) : $default['crawl_run_id_ref'],
+			'provider_refs'              => $provider_refs,
+			'goal_or_intent_text'        => isset( $raw['goal_or_intent_text'] ) && is_string( $raw['goal_or_intent_text'] ) ? \sanitize_textarea_field( $raw['goal_or_intent_text'] ) : $default['goal_or_intent_text'],
+			'last_planning_run_id'       => $last_run_id,
+			'last_planning_run_post_id'  => $last_run_post,
+			'updated_at'                 => isset( $raw['updated_at'] ) && is_string( $raw['updated_at'] ) ? $raw['updated_at'] : $default['updated_at'],
 		);
 	}
 
