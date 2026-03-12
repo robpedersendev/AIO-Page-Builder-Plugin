@@ -100,7 +100,7 @@ final class Queue_Logs_Screen {
 
 	private function render_header( string $tab ): void {
 		?>
-		<div class="wrap aio-page-builder-screen aio-queue-logs">
+		<div class="wrap aio-page-builder-screen aio-queue-logs" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="aio-queue-logs-description"><?php \esc_html_e( 'Monitor queue state, execution logs, reporting delivery, and critical errors. Row links open related plans or runs.', 'aio-page-builder' ); ?></p>
 		<?php

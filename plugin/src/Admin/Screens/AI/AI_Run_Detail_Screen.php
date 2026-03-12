@@ -65,7 +65,7 @@ final class AI_Run_Detail_Screen {
 		$meta_safe = AI_Run_Artifact_Service::redact_sensitive_values( $meta );
 		$list_url = \admin_url( 'admin.php?page=' . self::SLUG );
 		?>
-		<div class="wrap aio-page-builder-screen aio-ai-run-detail">
+		<div class="wrap aio-page-builder-screen aio-ai-run-detail" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p><a href="<?php echo \esc_url( $list_url ); ?>"><?php \esc_html_e( '&larr; Back to AI Runs', 'aio-page-builder' ); ?></a></p>
 			<?php if ( $run === null ) : ?>

@@ -65,7 +65,7 @@ final class Build_Plans_Screen {
 			}
 		}
 		?>
-		<div class="wrap aio-page-builder-screen aio-build-plans-list">
+		<div class="wrap aio-page-builder-screen aio-build-plans-list" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="aio-build-plans-description"><?php \esc_html_e( 'Review and manage build plans. Open a plan to review steps and items.', 'aio-page-builder' ); ?></p>
 			<?php if ( count( $plans ) === 0 ) : ?>

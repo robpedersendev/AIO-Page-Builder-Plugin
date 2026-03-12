@@ -62,7 +62,7 @@ final class Crawler_Sessions_Screen {
 			}
 		}
 		?>
-		<div class="wrap aio-page-builder-screen aio-crawler-sessions">
+		<div class="wrap aio-page-builder-screen aio-crawler-sessions" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="aio-crawler-readiness" aria-describedby="aio-crawler-rules"><?php \esc_html_e( 'Crawler runs are scoped to this site only. Sessions below are from the crawl snapshot table.', 'aio-page-builder' ); ?></p>
 			<div id="aio-crawler-rules" class="screen-reader-text"><?php \esc_html_e( 'Public-only, normalized URL identity, meaningful-page focus. No arbitrary host input.', 'aio-page-builder' ); ?></div>

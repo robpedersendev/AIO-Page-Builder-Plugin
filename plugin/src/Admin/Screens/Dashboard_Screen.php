@@ -36,7 +36,7 @@ final class Dashboard_Screen {
 	 */
 	public function render(): void {
 		?>
-		<div class="wrap aio-page-builder-screen aio-page-builder-dashboard">
+		<div class="wrap aio-page-builder-screen aio-page-builder-dashboard" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="aio-page-builder-notice"><?php \esc_html_e( 'Not yet implemented. This screen will show the plugin dashboard and first-run guidance.', 'aio-page-builder' ); ?></p>
 		</div>

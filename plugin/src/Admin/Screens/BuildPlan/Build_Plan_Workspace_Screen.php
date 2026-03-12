@@ -396,7 +396,7 @@ final class Build_Plan_Workspace_Screen {
 	private function render_not_found( string $plan_id ): void {
 		$list_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
 		?>
-		<div class="wrap aio-page-builder-screen aio-build-plan-workspace">
+		<div class="wrap aio-page-builder-screen aio-build-plan-workspace" role="main" aria-label="<?php \esc_attr_e( 'Build Plan', 'aio-page-builder' ); ?>">
 			<h1><?php \esc_html_e( 'Build Plan', 'aio-page-builder' ); ?></h1>
 			<p class="aio-admin-notice"><?php \esc_html_e( 'Plan not found.', 'aio-page-builder' ); ?></p>
 			<p><a href="<?php echo \esc_url( $list_url ); ?>"><?php \esc_html_e( 'Back to Build Plans', 'aio-page-builder' ); ?></a></p>
@@ -415,17 +415,17 @@ final class Build_Plan_Workspace_Screen {
 		$can_view_artifacts = \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
 		?>
 		<div class="wrap aio-page-builder-screen aio-build-plan-workspace aio-build-plan-three-zone">
-			<div class="aio-build-plan-context-rail">
+			<aside class="aio-build-plan-context-rail" role="complementary" aria-label="<?php \esc_attr_e( 'Plan context and actions', 'aio-page-builder' ); ?>">
 				<?php $this->render_context_rail( $rail, $plan_id, $base_url, $can_export, $can_view_artifacts ); ?>
-			</div>
-			<div class="aio-build-plan-main">
+			</aside>
+			<main class="aio-build-plan-main" id="aio-build-plan-main" aria-label="<?php \esc_attr_e( 'Build Plan steps and content', 'aio-page-builder' ); ?>">
 				<div class="aio-build-plan-stepper">
 					<?php $this->render_stepper( $steps, $active_step_index, $base_url ); ?>
 				</div>
 				<div class="aio-build-plan-workspace-content">
 					<?php $this->render_step_workspace( $state, $current_step, $active_step_index, $definition, $base_url ); ?>
 				</div>
-			</div>
+			</main>
 		</div>
 		<?php
 	}
@@ -463,7 +463,7 @@ final class Build_Plan_Workspace_Screen {
 			<div class="aio-context-rail-actions">
 				<p><a href="<?php echo \esc_url( $list_url ); ?>" class="button"><?php \esc_html_e( 'Save and exit', 'aio-page-builder' ); ?></a></p>
 				<?php if ( $can_export ) : ?>
-					<p><span class="button button-secondary" aria-disabled="true"><?php \esc_html_e( 'Export plan', 'aio-page-builder' ); ?></span> <span class="description"><?php \esc_html_e( '(Coming soon)', 'aio-page-builder' ); ?></span></p>
+					<p><span class="button button-secondary" role="button" aria-disabled="true"><?php \esc_html_e( 'Export plan', 'aio-page-builder' ); ?></span> <span class="description"><?php \esc_html_e( '(Coming soon)', 'aio-page-builder' ); ?></span></p>
 				<?php endif; ?>
 				<?php if ( $can_view_artifacts && (string) ( $rail['ai_run_ref'] ?? '' ) !== '' ) : ?>
 					<p><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=aio-page-builder-ai-runs&run_id=' . \rawurlencode( (string) $rail['ai_run_ref'] ) ) ); ?>" class="button button-secondary"><?php \esc_html_e( 'View source artifacts', 'aio-page-builder' ); ?></a></p>
@@ -618,8 +618,10 @@ final class Build_Plan_Workspace_Screen {
 		$step1_bulk_nonce  = $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ? \wp_nonce_field( self::NONCE_ACTION_STEP1_REVIEW, '_wpnonce', false, false ) : '';
 		$step2_bulk_nonce  = $step_type === Build_Plan_Schema::STEP_TYPE_NEW_PAGES ? \wp_nonce_field( self::NONCE_ACTION_STEP2_REVIEW, '_wpnonce', false, false ) : '';
 		$nav_bulk_nonce    = $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION ? \wp_nonce_field( self::NONCE_ACTION_NAVIGATION_REVIEW, '_wpnonce', false, false ) : '';
+		$step_title        = (string) ( $current_step['title'] ?? $current_step['step_type'] ?? __( 'Step', 'aio-page-builder' ) );
 		?>
-		<div class="aio-step-workspace-actionable">
+		<div class="aio-step-workspace-actionable" role="region" aria-labelledby="aio-step-workspace-heading">
+			<h2 id="aio-step-workspace-heading" class="screen-reader-text"><?php echo \esc_html( $step_title ); ?></h2>
 			<?php $message_component->render_list( $step_messages ); ?>
 			<?php
 			if ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION && ! empty( $workspace['validation_summary']['messages'] ) ) {

@@ -78,14 +78,15 @@ final class Step_Item_List_Component {
 
 		$first_row = reset( $rows );
 		$columns   = ! empty( $order ) ? $order : ( is_array( $first_row ) ? array_keys( (array) ( $first_row[ self::ROW_KEY_SUMMARY_COLUMNS ] ?? array() ) ) : array() );
+		$select_all_id = $list_id . '-select-all';
 		?>
 		<div class="aio-step-item-list-wrapper" id="<?php echo \esc_attr( $list_id ); ?>">
 			<table class="aio-step-item-list widefat striped" role="grid">
 				<thead>
 					<tr>
 						<th class="aio-col-select" scope="col">
-							<label class="screen-reader-text"><?php \esc_html_e( 'Select', 'aio-page-builder' ); ?></label>
-							<input type="checkbox" class="aio-row-select-all" aria-label="<?php \esc_attr_e( 'Select all rows', 'aio-page-builder' ); ?>" />
+							<label for="<?php echo \esc_attr( $select_all_id ); ?>" class="screen-reader-text"><?php \esc_html_e( 'Select all rows', 'aio-page-builder' ); ?></label>
+							<input type="checkbox" id="<?php echo \esc_attr( $select_all_id ); ?>" class="aio-row-select-all" aria-label="<?php \esc_attr_e( 'Select all rows', 'aio-page-builder' ); ?>" />
 						</th>
 						<?php foreach ( $columns as $col_key ) : ?>
 							<th scope="col" class="aio-col-<?php echo \esc_attr( \sanitize_html_class( $col_key ) ); ?>"><?php echo \esc_html( $this->column_header_label( $col_key ) ); ?></th>

@@ -62,7 +62,7 @@ final class AI_Runs_Screen {
 			}
 		}
 		?>
-		<div class="wrap aio-page-builder-screen aio-ai-runs">
+		<div class="wrap aio-page-builder-screen aio-ai-runs" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="aio-ai-runs-description"><?php \esc_html_e( 'Review AI runs and their artifact summaries. Raw prompts and provider responses are restricted.', 'aio-page-builder' ); ?></p>
 			<?php if ( count( $runs ) === 0 ) : ?>

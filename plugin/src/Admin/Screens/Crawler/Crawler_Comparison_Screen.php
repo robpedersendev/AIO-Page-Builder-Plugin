@@ -60,7 +60,7 @@ final class Crawler_Comparison_Screen {
 			}
 		}
 		?>
-		<div class="wrap aio-page-builder-screen aio-crawler-comparison">
+		<div class="wrap aio-page-builder-screen aio-crawler-comparison" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="aio-crawler-readiness"><?php \esc_html_e( 'Compare two crawl runs to see added, removed, and changed pages. Select prior (baseline) and new run.', 'aio-page-builder' ); ?></p>
 			<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-crawler-comparison-form">

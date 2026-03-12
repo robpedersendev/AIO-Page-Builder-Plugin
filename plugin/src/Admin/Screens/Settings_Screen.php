@@ -36,7 +36,7 @@ final class Settings_Screen {
 	 */
 	public function render(): void {
 		?>
-		<div class="wrap aio-page-builder-screen aio-page-builder-settings">
+		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="aio-page-builder-notice"><?php \esc_html_e( 'Not yet implemented. This screen will show plugin settings and reporting disclosure.', 'aio-page-builder' ); ?></p>
 		</div>
