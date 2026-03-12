@@ -332,6 +332,16 @@ if ( ! function_exists( 'wp_create_nonce' ) ) {
 		return 'test-nonce-' . $action;
 	}
 }
+if ( ! function_exists( 'current_time' ) ) {
+	function current_time( $type = 'mysql', $gmt = false ) {
+		return $type === 'mysql' ? gmdate( 'Y-m-d H:i:s' ) : (string) time();
+	}
+}
+if ( ! function_exists( 'wp_rand' ) ) {
+	function wp_rand( $min = 0, $max = null ) {
+		return $max === null ? mt_rand() : mt_rand( (int) $min, (int) $max );
+	}
+}
 // * Stubs for HTML_Fetcher tests. Set $GLOBALS['_aio_wp_remote_get_return'] to callable( $url, $args ) => array|WP_Error.
 if ( ! function_exists( 'wp_remote_get' ) ) {
 	function wp_remote_get( $url, $args = array() ) {
