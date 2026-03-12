@@ -3,7 +3,7 @@
 **Document type:** Authoritative contract for plugin-owned WordPress options (spec §8.2, §8.7, §8.8, §9.4, §52.4, §52.6, §62.3).  
 **Governs:** Option key names, sensitivity, exportability, default structures, ownership.  
 **Rule:** Future prompts may add fields within approved option structures; option roots must not be renamed without a migration.  
-**Related:** storage-strategy-matrix.md defines which data classes use options vs CPT, custom tables, user meta, etc. Provider credentials and secret storage (location, redaction, exclusion) are defined in docs/contracts/provider-secret-storage-contract.md.
+**Related:** storage-strategy-matrix.md defines which data classes use options vs CPT, custom tables, user meta, etc. Provider credentials and secret storage (location, redaction, exclusion) are defined in docs/contracts/provider-secret-storage-contract.md. Export package layout, manifest schema, and category inclusion/exclusion are defined in docs/contracts/export-bundle-structure-contract.md.
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Document type:** Authoritative contract for placement of every major data class (spec §8, §9).  
 **Governs:** Which storage primitive (options, CPT, post meta, custom tables, user meta, transients, uploads/ZIP) is used for each data class before any CPT, table, or repository is implemented.  
-**Reference:** global-options-schema.md for option keys; spec §8.2–8.10, §9.1–9.9.
+**Reference:** global-options-schema.md for option keys; spec §8.2–8.10, §9.1–9.9. Export bundle ZIP layout, manifest schema, and category rules: docs/contracts/export-bundle-structure-contract.md.
 
 ---
 
