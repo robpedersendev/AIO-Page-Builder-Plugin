@@ -24,6 +24,7 @@ Use this checklist before each release. It is designed to be explicit, reviewabl
 ## Security
 
 - [ ] Nonce and capability checks verified on all new or modified REST/AJAX endpoints.
+- [ ] Security and redaction review completed: [security-redaction-review.md](security-redaction-review.md) (capability, nonce, import/export safety, redaction).
 - [ ] No secrets committed; placeholders are used and documented.
 
 ## Uninstall and Data
