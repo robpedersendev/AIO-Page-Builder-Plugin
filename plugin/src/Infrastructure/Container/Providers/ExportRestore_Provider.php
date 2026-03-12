@@ -13,6 +13,8 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Generator;
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Manifest_Builder;
+use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Cleanup_Service;
+use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Export_Prompt_Service;
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Token_Set_Reader;
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Zip_Packager;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -71,6 +73,15 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'export_manifest_builder' ),
 				$container->get( 'export_zip_packager' ),
 				$container->has( 'logger' ) ? $container->get( 'logger' ) : null
+			);
+		} );
+		$container->register( 'uninstall_cleanup_service', function (): Uninstall_Cleanup_Service {
+			return new Uninstall_Cleanup_Service();
+		} );
+		$container->register( 'uninstall_export_prompt_service', function () use ( $container ): Uninstall_Export_Prompt_Service {
+			return new Uninstall_Export_Prompt_Service(
+				$container->get( 'export_generator' ),
+				$container->get( 'uninstall_cleanup_service' )
 			);
 		} );
 	}

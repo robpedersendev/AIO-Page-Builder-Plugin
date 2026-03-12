@@ -32,6 +32,8 @@ require_once __DIR__ . '/../Domain/Reporting/Install/Install_Notification_Transp
 require_once __DIR__ . '/../Domain/Reporting/Install/Wp_Mail_Install_Transport.php';
 require_once __DIR__ . '/../Domain/Reporting/Install/Install_Notification_Service.php';
 require_once __DIR__ . '/../Domain/Reporting/Heartbeat/Heartbeat_Scheduler.php';
+require_once __DIR__ . '/../Domain/Storage/Objects/Object_Type_Keys.php';
+require_once __DIR__ . '/../Domain/ExportRestore/Uninstall/Uninstall_Cleanup_Service.php';
 
 /**
  * Result status for a lifecycle phase or overall run.
@@ -294,12 +296,12 @@ final class Lifecycle_Manager {
 	// ----- Uninstall phase placeholders (spec §52.11, §9.12) -----
 
 	private function export_reminder_integration(): void {
-		// Placeholder: export-before-uninstall prompt and choices (full backup, settings only, skip, cancel).
-		// Uninstall screen must state that built pages will remain. Non-destructive.
+		// * Export choices are presented on the admin Uninstall screen (Uninstall_Export_Prompt_Service).
+		// This phase runs only from uninstall.php (no UI); no reminder here. Built pages remain.
 	}
 
 	private function cleanup_plugin_data(): void {
-		// Placeholder: no deletion in this prompt. Later prompt removes only plugin-owned operational data
-		// after export pathway exists; must not delete built pages or user content.
+		$cleanup = new \AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Cleanup_Service();
+		$cleanup->cleanup_plugin_owned_data( \AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Cleanup_Service::SCOPE_FULL );
 	}
 }

@@ -221,6 +221,11 @@ final class Export_Generator {
 				$excluded = array( 'settings', 'profiles', 'registries', 'compositions', 'uninstall_restore_metadata' );
 				$excluded = array_merge( $excluded, array( 'raw_ai_artifacts', 'crawl_snapshots', 'logs', 'reporting_history', 'rollback_snapshots' ) );
 				break;
+			case Export_Mode_Keys::UNINSTALL_SETTINGS_PROFILE_ONLY:
+				$included = array( 'settings', 'profiles', 'uninstall_restore_metadata' );
+				$excluded = array( 'registries', 'compositions', 'plans', 'token_sets' );
+				$excluded = array_merge( $excluded, Export_Bundle_Schema::OPTIONAL_CATEGORIES );
+				break;
 			default:
 				$excluded = Export_Bundle_Schema::EXCLUDED_CATEGORIES;
 		}

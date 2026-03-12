@@ -33,6 +33,9 @@ final class Export_Mode_Keys {
 	/** Plan/artifact export; plans, token sets, optional normalized AI outputs. */
 	public const PLAN_ARTIFACT_EXPORT = 'plan_artifact_export';
 
+	/** Uninstall settings/profile only; only settings, profiles, uninstall_restore_metadata (spec §52.11). */
+	public const UNINSTALL_SETTINGS_PROFILE_ONLY = 'uninstall_settings_profile_only';
+
 	/** @var list<string>|null */
 	private static ?array $all = null;
 
@@ -51,6 +54,7 @@ final class Export_Mode_Keys {
 			self::SUPPORT_BUNDLE,
 			self::TEMPLATE_ONLY_EXPORT,
 			self::PLAN_ARTIFACT_EXPORT,
+			self::UNINSTALL_SETTINGS_PROFILE_ONLY,
 		);
 		return self::$all;
 	}

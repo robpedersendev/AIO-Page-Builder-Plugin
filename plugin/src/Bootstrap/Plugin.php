@@ -77,6 +77,9 @@ require_once $bootstrap_dir . '/../Domain/ExportRestore/Import/Restore_Result.ph
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Import/Conflict_Resolution_Service.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Import/Import_Validator.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Import/Restore_Pipeline.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Uninstall/Uninstall_Result.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Uninstall/Uninstall_Cleanup_Service.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Uninstall/Uninstall_Export_Prompt_Service.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/ExportRestore_Provider.php';
 require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_Statuses.php';
 require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_Step_Keys.php';

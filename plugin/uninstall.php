@@ -22,4 +22,5 @@ $lifecycle->uninstall();
 
 \AIOPageBuilder\Bootstrap\Capability_Registrar::remove_from_all_roles();
 
-// No other deletion in this implementation. Cleanup will be added when export/restore contract exists.
+// Cleanup (scheduled events, plugin options, custom tables, plugin CPTs) runs in Lifecycle_Manager::uninstall().
+// Built pages (post type 'page') are never deleted. Export prompt runs from admin Uninstall screen only.
