@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for execution, diff, and rollback snapshots (spec §41.1–41.3, §41.8, §11.5, §59.11).  
 **Governs:** Snapshot type families, object scopes, pre-change and post-change structures, identity and reference conventions, payload depth rules, storage references, retention metadata, rollback-capability markers, and relationships to execution logs, jobs, and Build Plans.  
-**Related:** version-snapshot-schema.md (registry/version snapshots are distinct); build-plan-schema.md (Build Plan state transitions); execution-action-contract.md (envelope and execution references).
+**Related:** version-snapshot-schema.md (registry/version snapshots are distinct); build-plan-schema.md (Build Plan state transitions); execution-action-contract.md (envelope and execution references). **Diff output:** diff-service-contract.md defines how pre-change and post-change snapshots are consumed to produce diff results (content, structure, navigation, token families) and how rollback/snapshot refs attach to diffs.
 
 ---
 
@@ -360,3 +360,5 @@ Retention rules consider action importance, plan relationship, storage volume, a
 ## 18. Relation to version snapshot schema
 
 **Version snapshots** (version-snapshot-schema.md) preserve **registry state, schema versions, build context, and composition-linked state**. They are used for traceability, migration, and composition validation. **Operational snapshots** preserve **execution-relevant before/after state** for pages, menus, tokens, hierarchy, and Build Plan transitions, and are used for diff and rollback. Both may coexist; capture services and storage may be separated by schema type.
+
+**Relation to diff service:** The diff service (diff-service-contract.md) consumes operational snapshots (or equivalent state) and produces diff results by family (content, structure, navigation, token). Diff results reference snapshots via `rollback.pre_snapshot_id` and `rollback.post_snapshot_id`; rollback availability is explicit on the diff result, not inferred from snapshot presence alone.
