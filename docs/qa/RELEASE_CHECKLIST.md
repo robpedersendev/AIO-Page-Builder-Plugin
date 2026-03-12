@@ -11,12 +11,14 @@ Use this checklist before each release. It is designed to be explicit, reviewabl
 - [ ] All unit and integration tests pass.
 - [ ] Plugin Check is run; critical and warning findings are addressed.
 - [ ] Compatibility matrix is executed and updated: [compatibility-matrix.md](compatibility-matrix.md) (WP/PHP/dependency combinations; release-note snippet).
+- [ ] Migration/upgrade matrix is executed and updated: [migration-coverage-matrix.md](migration-coverage-matrix.md) (supported transitions, import/restore, retry; release-note migration/compatibility notes).
 
 ## Documentation
 
 - [ ] Changelog is updated.
 - [ ] README is updated (installation, requirements, known changes).
 - [ ] Release notes include compatibility notes per §58.6 (tested WP/PHP range, required plugins, limitations; see [compatibility-matrix.md](compatibility-matrix.md) §9).
+- [ ] Release notes include migrations or compatibility notes per §58.6 (table/export schema, same-major import, breaking changes if any; see [migration-coverage-matrix.md](migration-coverage-matrix.md) §7).
 - [ ] If reporting is implemented: disclosure is present in admin docs, settings, and help content.
 
 ## Security
