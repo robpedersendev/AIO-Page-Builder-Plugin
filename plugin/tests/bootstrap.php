@@ -166,6 +166,16 @@ if ( ! function_exists( 'get_post' ) ) {
 		return isset( $GLOBALS['_aio_get_post_return'] ) ? $GLOBALS['_aio_get_post_return'] : null;
 	}
 }
+if ( ! function_exists( 'get_term' ) ) {
+	function get_term( $term_id, $taxonomy = '' ) {
+		return isset( $GLOBALS['_aio_get_term_return'] ) ? $GLOBALS['_aio_get_term_return'] : null;
+	}
+}
+if ( ! function_exists( 'current_user_can' ) ) {
+	function current_user_can( $capability, ...$args ) {
+		return isset( $GLOBALS['_aio_current_user_can_return'] ) ? (bool) $GLOBALS['_aio_current_user_can_return'] : false;
+	}
+}
 if ( ! function_exists( 'get_post_meta' ) ) {
 	function get_post_meta( $post_id, $key = '', $single = false ) {
 		$store = $GLOBALS['_aio_post_meta'] ?? array();

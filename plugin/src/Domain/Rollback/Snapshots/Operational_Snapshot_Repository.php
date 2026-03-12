@@ -68,6 +68,38 @@ final class Operational_Snapshot_Repository implements Operational_Snapshot_Repo
 	}
 
 	/**
+	 * Returns snapshot_id => created_at (unix timestamp) for snapshots with the given target_ref.
+	 *
+	 * @param string $target_ref
+	 * @return array<string, int>
+	 */
+	public function list_snapshot_created_times_for_target( string $target_ref ): array {
+		$target_ref = trim( $target_ref );
+		if ( $target_ref === '' ) {
+			return array();
+		}
+		$store = \get_option( self::OPTION_KEY, array() );
+		if ( ! is_array( $store ) ) {
+			$store = array();
+		}
+		$out = array();
+		foreach ( $store as $id => $snap ) {
+			if ( ! is_array( $snap ) ) {
+				continue;
+			}
+			$ref = isset( $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) ? trim( (string) $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) : '';
+			if ( $ref !== $target_ref ) {
+				continue;
+			}
+			$ts = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+				? strtotime( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+				: 0;
+			$out[ $id ] = $ts;
+		}
+		return $out;
+	}
+
+	/**
 	 * Keeps at most MAX_SNAPSHOTS entries; evicts oldest by created_at.
 	 *
 	 * @param array<string, array<string, mixed>> $store

@@ -31,6 +31,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\AI_Runs_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Validation_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Onboarding_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Registries_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\Rollback_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Build_Plan_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Repositories_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Storage_Services_Provider;
@@ -68,6 +69,7 @@ final class Module_Registrar {
 			new Repositories_Provider(),
 			new Build_Plan_Provider(),
 			new Execution_Provider(),
+			new Rollback_Provider(),
 			new ACF_Blueprints_Provider(),
 			new ACF_Registration_Provider(),
 			new ACF_Assignment_Provider(),

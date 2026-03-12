@@ -31,4 +31,13 @@ interface Operational_Snapshot_Repository_Interface {
 	 * @return array<string, mixed>|null Full snapshot or null if not found.
 	 */
 	public function get_by_id( string $snapshot_id ): ?array;
+
+	/**
+	 * Returns snapshot_id => created_at (unix timestamp) for all snapshots with the given target_ref.
+	 * Used to detect newer-change conflicts (spec §38.4, §41.9).
+	 *
+	 * @param string $target_ref Target ref (e.g. post_id, menu term_id, token_set id).
+	 * @return array<string, int> Map of snapshot_id to created_at timestamp.
+	 */
+	public function list_snapshot_created_times_for_target( string $target_ref ): array;
 }
