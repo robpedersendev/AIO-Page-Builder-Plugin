@@ -127,7 +127,8 @@ final class Single_Action_Executor {
 				if ( $plan_item_id !== '' && $action_type !== Execution_Action_Types::FINALIZE_PLAN && $action_type !== Execution_Action_Types::ROLLBACK_ACTION ) {
 					$step_index = $this->plan_state->find_step_index_for_item( $definition, $plan_item_id );
 					if ( $step_index !== null ) {
-						$this->plan_state->update_plan_item_status( $plan_post_id, $step_index, $plan_item_id, Build_Plan_Item_Statuses::COMPLETED );
+						$artifacts = isset( $handler_result['artifacts'] ) && is_array( $handler_result['artifacts'] ) ? $handler_result['artifacts'] : null;
+						$this->plan_state->update_plan_item_status( $plan_post_id, $step_index, $plan_item_id, Build_Plan_Item_Statuses::COMPLETED, $artifacts );
 						$build_plan_updates = array( 'plan_id' => $plan_id, 'plan_item_id' => $plan_item_id, 'item_status' => Build_Plan_Item_Statuses::COMPLETED );
 					}
 				}

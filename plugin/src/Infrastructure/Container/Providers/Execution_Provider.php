@@ -17,8 +17,10 @@ use AIOPageBuilder\Domain\Execution\Executor\Single_Action_Executor;
 use AIOPageBuilder\Domain\Execution\Handlers\Apply_Menu_Change_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Apply_Token_Set_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Create_Page_Handler;
+use AIOPageBuilder\Domain\Execution\Handlers\Finalize_Plan_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Replace_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Jobs\Create_Page_Job_Service;
+use AIOPageBuilder\Domain\Execution\Jobs\Finalization_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Menu_Change_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Replace_Page_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Token_Set_Job_Service;
@@ -66,6 +68,9 @@ final class Execution_Provider implements Service_Provider_Interface {
 		$container->register( 'token_set_job_service', function (): Token_Set_Job_Service {
 			return new Token_Set_Job_Service();
 		} );
+		$container->register( 'finalization_job_service', function () use ( $container ): Finalization_Job_Service {
+			return new Finalization_Job_Service( $container->get( 'build_plan_repository' ) );
+		} );
 		$container->register( 'execution_dispatcher', function () use ( $container ): Execution_Dispatcher {
 			$dispatcher = new Execution_Dispatcher();
 			$dispatcher->register_handler(
@@ -83,6 +88,10 @@ final class Execution_Provider implements Service_Provider_Interface {
 			$dispatcher->register_handler(
 				Execution_Action_Types::APPLY_TOKEN_SET,
 				new Apply_Token_Set_Handler( $container->get( 'token_set_job_service' ) )
+			);
+			$dispatcher->register_handler(
+				Execution_Action_Types::FINALIZE_PLAN,
+				new Finalize_Plan_Handler( $container->get( 'finalization_job_service' ) )
 			);
 			return $dispatcher;
 		} );

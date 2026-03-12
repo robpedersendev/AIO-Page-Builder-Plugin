@@ -22,7 +22,7 @@ use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
  * Full plan definition (steps, items, etc.) stored in _aio_plan_definition meta.
  * Implements Plan_State_For_Execution_Interface for single-action executor.
  */
-final class Build_Plan_Repository extends Abstract_CPT_Repository implements Plan_State_For_Execution_Interface {
+final class Build_Plan_Repository extends Abstract_CPT_Repository implements Build_Plan_Repository_Interface, Plan_State_For_Execution_Interface {
 
 	public const META_PLAN_DEFINITION = '_aio_plan_definition';
 
@@ -117,15 +117,16 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Pla
 	}
 
 	/**
-	 * Updates a single plan item's status and persists the definition (spec §32.5, plan history).
+	 * Updates a single plan item's status and optionally execution artifact (spec §32.5, §37.6, plan history).
 	 *
 	 * @param int    $post_id    Plan post ID.
 	 * @param int    $step_index Step index in steps array.
 	 * @param string $item_id    Item id to update.
-	 * @param string $new_status New status (e.g. approved, rejected).
+	 * @param string $new_status New status (e.g. approved, completed).
+	 * @param array<string, mixed>|null $execution_artifact Optional artifact (e.g. post_id, target_post_id) for finalization publish.
 	 * @return bool True if item was found and updated; false otherwise.
 	 */
-	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status ): bool {
+	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null ): bool {
 		$definition = $this->get_plan_definition( $post_id );
 		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
@@ -142,8 +143,11 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Pla
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			if ( (string) ( $item['item_id'] ?? '' ) === $item_id ) {
+			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ) === $item_id ) {
 				$items[ $i ]['status'] = $new_status;
+				if ( $execution_artifact !== null ) {
+					$items[ $i ]['execution_artifact'] = $execution_artifact;
+				}
 				$updated = true;
 				break;
 			}

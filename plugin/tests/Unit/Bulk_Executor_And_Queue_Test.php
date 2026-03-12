@@ -79,8 +79,8 @@ final class Stub_Plan_State_For_Executor_Queue implements Plan_State_For_Executi
 		return $this->find_step_index_return;
 	}
 
-	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status ): bool {
-		$this->last_update_call = array( 'post_id' => $post_id, 'step_index' => $step_index, 'item_id' => $item_id, 'new_status' => $new_status );
+	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null ): bool {
+		$this->last_update_call = array( 'post_id' => $post_id, 'step_index' => $step_index, 'item_id' => $item_id, 'new_status' => $new_status, 'execution_artifact' => $execution_artifact );
 		return $this->update_plan_item_status_return;
 	}
 }

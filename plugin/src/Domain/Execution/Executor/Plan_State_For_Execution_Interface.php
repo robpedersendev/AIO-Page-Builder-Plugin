@@ -45,13 +45,14 @@ interface Plan_State_For_Execution_Interface {
 	public function find_step_index_for_item( array $definition, string $plan_item_id ): ?int;
 
 	/**
-	 * Updates a single plan item's status.
+	 * Updates a single plan item's status and optionally execution artifact (for finalization publish).
 	 *
 	 * @param int    $post_id    Plan post ID.
 	 * @param int    $step_index Step index.
 	 * @param string $item_id    Item id.
 	 * @param string $new_status New status.
+	 * @param array<string, mixed>|null $execution_artifact Optional artifact (e.g. post_id) to store on item.
 	 * @return bool Success.
 	 */
-	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status ): bool;
+	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null ): bool;
 }

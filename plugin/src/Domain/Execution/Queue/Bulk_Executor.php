@@ -228,6 +228,44 @@ final class Bulk_Executor {
 		return $envelopes;
 	}
 
+	/**
+	 * Builds a single finalization envelope for the plan (spec §37, §40.1). Plan-level action; no plan_item_id.
+	 *
+	 * @param string               $plan_id       Plan ID (internal key).
+	 * @param array<string, mixed> $definition    Full plan definition (for approval state).
+	 * @param array<string, mixed> $actor_context Actor context.
+	 * @param string               $batch_id      Optional batch identifier.
+	 * @return array<string, mixed> One envelope with action_type finalize_plan.
+	 */
+	public function build_finalization_envelope(
+		string $plan_id,
+		array $definition,
+		array $actor_context,
+		string $batch_id = ''
+	): array {
+		$batch_id    = $batch_id !== '' ? $batch_id : $this->generate_batch_id();
+		$plan_status = isset( $definition[ Build_Plan_Schema::KEY_STATUS ] ) && is_string( $definition[ Build_Plan_Schema::KEY_STATUS ] ) ? $definition[ Build_Plan_Schema::KEY_STATUS ] : '';
+		$executable  = in_array( $plan_status, Execution_Action_Contract::EXECUTABLE_PLAN_STATUSES, true );
+		$now         = gmdate( 'c' );
+		$action_id   = 'exec_finalize_' . $plan_id . '_' . $batch_id;
+		return array(
+			Execution_Action_Contract::ENVELOPE_ACTION_ID        => $action_id,
+			Execution_Action_Contract::ENVELOPE_ACTION_TYPE     => Execution_Action_Types::FINALIZE_PLAN,
+			Execution_Action_Contract::ENVELOPE_PLAN_ID         => $plan_id,
+			Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID    => '',
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'plan_id' => $plan_id ),
+			Execution_Action_Contract::ENVELOPE_APPROVAL_STATE  => array(
+				Execution_Action_Contract::APPROVAL_PLAN_STATUS => $executable ? $plan_status : 'approved',
+				Execution_Action_Contract::APPROVAL_ITEM_STATUS => Execution_Action_Contract::EXECUTABLE_ITEM_STATUS,
+				Execution_Action_Contract::APPROVAL_VERIFIED_AT => $now,
+			),
+			Execution_Action_Contract::ENVELOPE_ACTOR_CONTEXT   => $actor_context,
+			Execution_Action_Contract::ENVELOPE_CREATED_AT      => $now,
+			'dependency_manifest' => array( 'resolved' => true, 'resolution_errors' => array(), 'depends_on_item_ids' => array() ),
+			'snapshot_required'  => false,
+		);
+	}
+
 	private function generate_batch_id(): string {
 		return gmdate( 'Ymd\THis' ) . '_' . wp_rand( 1000, 9999 );
 	}
