@@ -203,8 +203,9 @@ final class Bulk_Executor {
 				$target_reference['template_key']  = $template_key;
 			}
 
-			// * Spec §32.9, §41.2: pre-change snapshot required for existing-page mutation.
-			$snapshot_required = ( $action_type === Execution_Action_Types::REPLACE_PAGE );
+			// * Spec §32.9, §41.2: pre-change snapshot for existing-page mutation; §41.1 token snapshot for rollback-capable token apply.
+			$snapshot_required = ( $action_type === Execution_Action_Types::REPLACE_PAGE )
+				|| ( $action_type === Execution_Action_Types::APPLY_TOKEN_SET );
 
 			$envelope = array(
 				Execution_Action_Contract::ENVELOPE_ACTION_ID        => $action_id,
