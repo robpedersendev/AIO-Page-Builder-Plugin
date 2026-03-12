@@ -22,6 +22,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Rendering_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Admin_Router_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Capability_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Config_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\Execution_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Diagnostics_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Object_Registration_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Provider_Base_Provider;
@@ -66,6 +67,7 @@ final class Module_Registrar {
 			new Object_Registration_Provider(),
 			new Repositories_Provider(),
 			new Build_Plan_Provider(),
+			new Execution_Provider(),
 			new ACF_Blueprints_Provider(),
 			new ACF_Registration_Provider(),
 			new ACF_Assignment_Provider(),

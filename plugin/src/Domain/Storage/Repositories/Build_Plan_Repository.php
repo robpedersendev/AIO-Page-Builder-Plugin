@@ -13,14 +13,16 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
+use AIOPageBuilder\Domain\Execution\Executor\Plan_State_For_Execution_Interface;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 
 /**
  * Repository → storage: Object_Type_Keys::BUILD_PLAN (CPT).
  * Internal key: plan_id (e.g. UUID). Status: pending_review | approved | rejected | in_progress | completed | superseded.
  * Full plan definition (steps, items, etc.) stored in _aio_plan_definition meta.
+ * Implements Plan_State_For_Execution_Interface for single-action executor.
  */
-final class Build_Plan_Repository extends Abstract_CPT_Repository {
+final class Build_Plan_Repository extends Abstract_CPT_Repository implements Plan_State_For_Execution_Interface {
 
 	public const META_PLAN_DEFINITION = '_aio_plan_definition';
 
@@ -82,6 +84,36 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository {
 	public function save_plan_definition( int $post_id, array $definition ): bool {
 		$json = \wp_json_encode( $definition );
 		return $json !== false && \update_post_meta( $post_id, self::META_PLAN_DEFINITION, $json ) !== false;
+	}
+
+	/**
+	 * Finds the step index that contains the given plan item id (for executor state updates).
+	 *
+	 * @param array<string, mixed> $definition Plan definition (steps array).
+	 * @param string               $plan_item_id Item id to find.
+	 * @return int|null Step index (0-based) or null if not found.
+	 */
+	public function find_step_index_for_item( array $definition, string $plan_item_id ): ?int {
+		if ( $plan_item_id === '' ) {
+			return null;
+		}
+		$steps = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+		foreach ( $steps as $idx => $step ) {
+			if ( ! is_array( $step ) ) {
+				continue;
+			}
+			$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+				? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+				: array();
+			foreach ( $items as $item ) {
+				if ( is_array( $item ) && (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ) === $plan_item_id ) {
+					return $idx;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
