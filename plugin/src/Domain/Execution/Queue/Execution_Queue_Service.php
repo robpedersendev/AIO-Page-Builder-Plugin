@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\Execution\Executor\Plan_State_For_Execution_Interface;
 
 /**
  * Bulk execution request intake; delegates to Bulk_Executor and Execution_Job_Dispatcher.
+ * Supports rollback job enqueue (spec §38.5, §59.11).
  */
 final class Execution_Queue_Service {
 
@@ -94,6 +95,56 @@ final class Execution_Queue_Service {
 			'partial_failure' => false,
 			'results_summary' => array(),
 			'message'         => __( 'Actions queued.', 'aio-page-builder' ),
+		);
+	}
+
+	/**
+	 * Enqueues a single rollback job. Caller must have validated eligibility and built payload (pre_snapshot_id, post_snapshot_id, rollback_handler_key, target_ref, optional execution_ref, build_plan_ref, plan_item_ref).
+	 *
+	 * @param array<string, mixed> $payload       Rollback payload from eligibility result.
+	 * @param array<string, mixed> $actor_context actor_type, actor_id.
+	 * @param array<string, mixed> $options      run_immediately (bool), priority (int).
+	 * @return array<string, mixed> job_ref, status (queued|completed|failed), message, rollback_result (if run_immediately).
+	 */
+	public function request_rollback( array $payload, array $actor_context, array $options = array() ): array {
+		$pre_id  = isset( $payload['pre_snapshot_id'] ) && is_string( $payload['pre_snapshot_id'] ) ? trim( $payload['pre_snapshot_id'] ) : '';
+		$post_id = isset( $payload['post_snapshot_id'] ) && is_string( $payload['post_snapshot_id'] ) ? trim( $payload['post_snapshot_id'] ) : '';
+		if ( $pre_id === '' || $post_id === '' ) {
+			return array(
+				'job_ref'  => '',
+				'status'   => 'error',
+				'message'  => __( 'Missing pre or post snapshot ID.', 'aio-page-builder' ),
+				'rollback_result' => null,
+			);
+		}
+		$actor_ref = $this->actor_ref_from_context( $actor_context );
+		$priority  = isset( $options['priority'] ) && is_numeric( $options['priority'] ) ? (int) $options['priority'] : 0;
+		$job_ref   = $this->job_dispatcher->enqueue_rollback_job( $payload, $actor_ref, $priority );
+		if ( $job_ref === '' ) {
+			return array(
+				'job_ref'  => '',
+				'status'   => 'error',
+				'message'  => __( 'Failed to enqueue rollback job.', 'aio-page-builder' ),
+				'rollback_result' => null,
+			);
+		}
+		$run_immediately = ! empty( $options['run_immediately'] );
+		if ( $run_immediately ) {
+			$job_result = $this->job_dispatcher->process_job( $job_ref );
+			$status = $job_result !== null ? $job_result->get_status() : 'failed';
+			$summary = $job_result !== null ? $job_result->to_array() : array();
+			return array(
+				'job_ref'  => $job_ref,
+				'status'   => $status,
+				'message'  => $status === 'completed' ? __( 'Rollback completed.', 'aio-page-builder' ) : ( $job_result !== null ? $job_result->get_failure_reason() : __( 'Rollback job failed.', 'aio-page-builder' ) ),
+				'rollback_result' => $summary,
+			);
+		}
+		return array(
+			'job_ref'  => $job_ref,
+			'status'   => 'queued',
+			'message'  => __( 'Rollback queued.', 'aio-page-builder' ),
+			'rollback_result' => null,
 		);
 	}
 

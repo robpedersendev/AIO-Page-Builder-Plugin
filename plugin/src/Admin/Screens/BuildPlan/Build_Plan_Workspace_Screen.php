@@ -51,6 +51,9 @@ final class Build_Plan_Workspace_Screen {
 	/** Nonce action for Step 3 (navigation) approve/deny and bulk actions. */
 	public const NONCE_ACTION_NAVIGATION_REVIEW = 'aio_build_plan_navigation_review';
 
+	/** Nonce action for Step 7 (logs/rollback) rollback request. */
+	public const NONCE_ACTION_ROLLBACK = 'aio_build_plan_rollback_request';
+
 	/**
 	 * Renders workspace for the given plan_id. Exits with not-found message if plan missing.
 	 * Handles Step 2 then Step 1 actions before rendering.
@@ -68,6 +71,10 @@ final class Build_Plan_Workspace_Screen {
 			return;
 		}
 		$handled = $this->maybe_handle_navigation_action( $plan_id );
+		if ( $handled ) {
+			return;
+		}
+		$handled = $this->maybe_handle_rollback_request( $plan_id );
 		if ( $handled ) {
 			return;
 		}
@@ -296,6 +303,67 @@ final class Build_Plan_Workspace_Screen {
 		return false;
 	}
 
+	/**
+	 * Handles Step 7 rollback request: validates permission and eligibility, enqueues rollback job, redirects (spec §38.5, §41.10).
+	 *
+	 * @param string $plan_id Plan ID.
+	 * @return bool True if request was handled and redirect sent; false to continue render.
+	 */
+	private function maybe_handle_rollback_request( string $plan_id ): bool {
+		if ( ! \current_user_can( Capabilities::EXECUTE_ROLLBACKS ) ) {
+			return false;
+		}
+		$plan_id = \sanitize_text_field( $plan_id );
+		if ( $plan_id === '' ) {
+			return false;
+		}
+		$step_7_index = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
+		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_7_index );
+
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_rollback_request'] ) ) {
+			$nonce = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
+			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_ROLLBACK ) ) {
+				\wp_safe_redirect( \add_query_arg( 'rollback_error', 'nonce', $redirect_url ) );
+				exit;
+			}
+			$pre_snapshot_id  = isset( $_POST['pre_snapshot_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['pre_snapshot_id'] ) ) : '';
+			$post_snapshot_id = isset( $_POST['post_snapshot_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['post_snapshot_id'] ) ) : '';
+			if ( $pre_snapshot_id === '' || $post_snapshot_id === '' ) {
+				\wp_safe_redirect( \add_query_arg( 'rollback_error', 'missing_snapshots', $redirect_url ) );
+				exit;
+			}
+			if ( ! $this->container || ! $this->container->has( 'rollback_eligibility_service' ) || ! $this->container->has( 'execution_queue_service' ) ) {
+				\wp_safe_redirect( \add_query_arg( 'rollback_error', 'unavailable', $redirect_url ) );
+				exit;
+			}
+			$eligibility = $this->container->get( 'rollback_eligibility_service' )->evaluate( $pre_snapshot_id, $post_snapshot_id, array() );
+			if ( ! $eligibility->is_eligible() ) {
+				\wp_safe_redirect( \add_query_arg( 'rollback_error', 'ineligible', $redirect_url ) );
+				exit;
+			}
+			$target_ref = $eligibility->get_execution_ref() !== '' ? $eligibility->get_execution_ref() : ( $eligibility->get_pre_snapshot_id() . ':' . $eligibility->get_post_snapshot_id() );
+			$payload    = array(
+				'pre_snapshot_id'      => $pre_snapshot_id,
+				'post_snapshot_id'     => $post_snapshot_id,
+				'rollback_handler_key' => $eligibility->get_rollback_handler_key(),
+				'target_ref'           => $target_ref,
+				'execution_ref'        => $eligibility->get_execution_ref(),
+				'build_plan_ref'       => $plan_id,
+				'plan_item_ref'        => '',
+			);
+			$actor_context = array( 'actor_type' => 'user', 'actor_id' => (string) \get_current_user_id() );
+			$result = $this->container->get( 'execution_queue_service' )->request_rollback( $payload, $actor_context, array( 'run_immediately' => true ) );
+			if ( isset( $result['status'] ) && $result['status'] === 'completed' ) {
+				\wp_safe_redirect( \add_query_arg( 'rollback_done', '1', $redirect_url ) );
+				exit;
+			}
+			$msg = isset( $result['message'] ) ? \rawurlencode( (string) $result['message'] ) : 'failed';
+			\wp_safe_redirect( \add_query_arg( 'rollback_error', $msg, $redirect_url ) );
+			exit;
+		}
+		return false;
+	}
+
 	private function get_state( string $plan_id ): ?array {
 		if ( ! $this->container || ! $this->container->has( 'build_plan_ui_state_builder' ) ) {
 			return null;
@@ -516,6 +584,7 @@ final class Build_Plan_Workspace_Screen {
 			'can_approve'         => \current_user_can( Capabilities::APPROVE_BUILD_PLANS ),
 			'can_execute'         => \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ),
 			'can_view_artifacts'  => \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ),
+			'can_rollback'        => \current_user_can( Capabilities::EXECUTE_ROLLBACKS ),
 		);
 		$builder = $this->container->get( 'build_plan_ui_state_builder' );
 		$workspace = $builder->build_step_workspace( $plan_id, $active_step_index, $capabilities, $detail_item_id, $selected_ids );
@@ -529,6 +598,9 @@ final class Build_Plan_Workspace_Screen {
 		}
 		if ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION ) {
 			$this->inject_navigation_action_urls( $workspace, $plan_id );
+		}
+		if ( $step_type === Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK ) {
+			$this->inject_rollback_entry_data( $workspace, $plan_id );
 		}
 
 		$step_messages = $workspace['step_messages'] ?? array();
@@ -655,6 +727,55 @@ final class Build_Plan_Workspace_Screen {
 			$detail_item_id = (string) ( $detail['item_id'] ?? '' );
 			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
 		}
+	}
+
+	/**
+	 * Injects rollback nonce, action URL, and per-row form data for Step 7 (spec §41.10). Surfaces rollback_done/rollback_error.
+	 *
+	 * @param array<string, mixed> $workspace Workspace payload (mutated).
+	 * @param string               $plan_id  Plan ID.
+	 */
+	private function inject_rollback_entry_data( array &$workspace, string $plan_id ): void {
+		$step_7_index = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
+		$workspace['rollback_nonce']      = \wp_create_nonce( self::NONCE_ACTION_ROLLBACK );
+		$workspace['rollback_action_url'] = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_7_index );
+		$rows = &$workspace['step_list_rows'];
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $i => $row ) {
+				$pre_id  = isset( $row['pre_snapshot_id'] ) ? (string) $row['pre_snapshot_id'] : '';
+				$post_id = isset( $row['post_snapshot_id'] ) ? (string) $row['post_snapshot_id'] : '';
+				$actions = isset( $row['row_actions'] ) && is_array( $row['row_actions'] ) ? $row['row_actions'] : array();
+				foreach ( $actions as $j => $action ) {
+					if ( ( (string) ( $action['action_id'] ?? '' ) ) === 'request_rollback' && $pre_id !== '' && $post_id !== '' ) {
+						$actions[ $j ]['form_post']   = true;
+						$actions[ $j ]['form_action'] = $workspace['rollback_action_url'];
+						$actions[ $j ]['hidden_fields'] = array(
+							'_wpnonce'            => $workspace['rollback_nonce'],
+							'aio_rollback_request' => '1',
+							'pre_snapshot_id'     => $pre_id,
+							'post_snapshot_id'    => $post_id,
+						);
+						break;
+					}
+				}
+				$workspace['step_list_rows'][ $i ]['row_actions'] = $actions;
+			}
+		}
+		$rollback_done = isset( $_GET['rollback_done'] ) && $_GET['rollback_done'] === '1';
+		$rollback_err  = isset( $_GET['rollback_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['rollback_error'] ) ) : '';
+		$step_messages = isset( $workspace['step_messages'] ) && is_array( $workspace['step_messages'] ) ? $workspace['step_messages'] : array();
+		if ( $rollback_done ) {
+			array_unshift( $step_messages, array( 'severity' => 'success', 'message' => \__( 'Rollback completed successfully.', 'aio-page-builder' ), 'level' => 'step' ) );
+		}
+		if ( $rollback_err !== '' ) {
+			$err_msg = $rollback_err === 'nonce' ? \__( 'Security check failed. Please try again.', 'aio-page-builder' )
+				: ( $rollback_err === 'missing_snapshots' ? \__( 'Missing snapshot references.', 'aio-page-builder' )
+				: ( $rollback_err === 'ineligible' ? \__( 'Rollback is not eligible for this pair.', 'aio-page-builder' )
+				: ( $rollback_err === 'unavailable' ? \__( 'Rollback service unavailable.', 'aio-page-builder' )
+				: \__( 'Rollback failed.', 'aio-page-builder' ) ) ) );
+			array_unshift( $step_messages, array( 'severity' => 'error', 'message' => $err_msg, 'level' => 'step' ) );
+		}
+		$workspace['step_messages'] = $step_messages;
 	}
 
 	/**

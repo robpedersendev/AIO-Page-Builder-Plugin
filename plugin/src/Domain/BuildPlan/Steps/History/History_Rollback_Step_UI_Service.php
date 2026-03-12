@@ -68,9 +68,10 @@ final class History_Rollback_Step_UI_Service {
 			return $this->empty_workspace();
 		}
 
-		$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
+		$can_rollback = ! empty( $capabilities['can_rollback'] ) || ! empty( $capabilities['can_execute'] );
 		$rows = array();
 		foreach ( $items as $i => $item ) {
 			if ( ! is_array( $item ) ) {
@@ -78,18 +79,31 @@ final class History_Rollback_Step_UI_Service {
 			}
 			$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? 'hist_' . $i );
 			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+			$pre_snapshot_id  = isset( $payload['pre_snapshot_id'] ) ? (string) $payload['pre_snapshot_id'] : '';
+			$post_snapshot_id = isset( $payload['post_snapshot_id'] ) ? (string) $payload['post_snapshot_id'] : '';
+			$rollback_eligible = ( $pre_snapshot_id !== '' && $post_snapshot_id !== '' ) ? 'yes' : (string) ( $payload['rollback_eligible'] ?? 'no' );
+			$row_actions = array();
+			if ( $can_rollback && $pre_snapshot_id !== '' && $post_snapshot_id !== '' ) {
+				$row_actions[] = array(
+					'action_id' => 'request_rollback',
+					'label'     => \__( 'Request rollback', 'aio-page-builder' ),
+					'enabled'   => true,
+				);
+			}
 			$rows[] = array(
 				Step_Item_List_Component::ROW_KEY_ITEM_ID          => $item_id,
 				Step_Item_List_Component::ROW_KEY_STATUS           => (string) ( $item['status'] ?? '' ),
 				Step_Item_List_Component::ROW_KEY_STATUS_BADGE   => 'completed',
+				'pre_snapshot_id'                                 => $pre_snapshot_id,
+				'post_snapshot_id'                                => $post_snapshot_id,
 				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => array(
 					'event_at'         => (string) ( $payload['event_at'] ?? '—' ),
 					'action_type'      => (string) ( $payload['action_type'] ?? '—' ),
 					'scope'            => (string) ( $payload['scope'] ?? '—' ),
 					'before_after'     => (string) ( $payload['before_after'] ?? '—' ),
-					'rollback_eligible' => (string) ( $payload['rollback_eligible'] ?? 'no' ),
+					'rollback_eligible' => $rollback_eligible,
 				),
-				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS     => array(),
+				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS     => $row_actions,
 				Step_Item_List_Component::ROW_KEY_IS_SELECTED     => false,
 			);
 		}
@@ -125,10 +139,10 @@ final class History_Rollback_Step_UI_Service {
 			'row_actions' => array(),
 		);
 		$step_messages = array(
-			array( 'severity' => 'info', 'message' => \__( 'Logs and history are read-only. Rollback is a deliberate recovery workflow (not implemented in this shell).', 'aio-page-builder' ), 'level' => 'step' ),
+			array( 'severity' => 'info', 'message' => \__( 'Logs and history are read-only. Use "Request rollback" for eligible rows to run a deliberate rollback (queued and revalidated at execution).', 'aio-page-builder' ), 'level' => 'step' ),
 		);
 		$history_summary = array( 'total_events' => count( $rows ), 'grouped_by' => 'action_type' );
-		$rollback_eligibility_placeholder = array( 'eligible_count' => 0, 'can_rollback' => ! empty( $capabilities['can_execute'] ) );
+		$rollback_eligibility_placeholder = array( 'eligible_count' => 0, 'can_rollback' => $can_rollback );
 
 		return array(
 			'step_list_rows'                 => $rows,

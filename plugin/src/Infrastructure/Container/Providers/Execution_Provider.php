@@ -161,9 +161,11 @@ final class Execution_Provider implements Service_Provider_Interface {
 			return new Bulk_Executor();
 		} );
 		$container->register( 'execution_job_dispatcher', function () use ( $container ): Execution_Job_Dispatcher {
+			$rollback_executor = $container->has( 'rollback_executor' ) ? $container->get( 'rollback_executor' ) : null;
 			return new Execution_Job_Dispatcher(
 				$container->get( 'job_queue_repository' ),
-				$container->get( 'single_action_executor' )
+				$container->get( 'single_action_executor' ),
+				$rollback_executor
 			);
 		} );
 		$container->register( 'execution_queue_service', function () use ( $container ): Execution_Queue_Service {

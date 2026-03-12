@@ -182,9 +182,9 @@ final class Step_Item_List_Component {
 	}
 
 	/**
-	 * Renders row action links/buttons. Only actions present in payload are shown; enabled state from payload.
+	 * Renders row action links/buttons/forms. Supports form_post for POST submit (e.g. rollback request).
 	 *
-	 * @param array<int, array<string, mixed>> $actions Each: action_id, label, enabled, url (optional).
+	 * @param array<int, array<string, mixed>> $actions Each: action_id, label, enabled, url (optional), form_post (optional), form_action, hidden_fields.
 	 * @param string                           $item_id Item id for data attributes.
 	 * @return void
 	 */
@@ -193,23 +193,30 @@ final class Step_Item_List_Component {
 			echo '—';
 			return;
 		}
-		$links = array();
+		$out = array();
 		foreach ( $actions as $action ) {
-			$action_id = (string) ( $action['action_id'] ?? '' );
-			$label    = (string) ( $action['label'] ?? $action_id );
-			$enabled  = ! empty( $action['enabled'] );
-			$url      = isset( $action['url'] ) ? (string) $action['url'] : '';
-			$css_class = 'aio-row-action aio-row-action-' . \sanitize_html_class( $action_id );
+			$action_id  = (string) ( $action['action_id'] ?? '' );
+			$label      = (string) ( $action['label'] ?? $action_id );
+			$enabled    = ! empty( $action['enabled'] );
+			$url        = isset( $action['url'] ) ? (string) $action['url'] : '';
+			$form_post  = ! empty( $action['form_post'] );
+			$form_action = isset( $action['form_action'] ) ? (string) $action['form_action'] : '';
+			$hidden     = isset( $action['hidden_fields'] ) && is_array( $action['hidden_fields'] ) ? $action['hidden_fields'] : array();
+			$css_class  = 'aio-row-action aio-row-action-' . \sanitize_html_class( $action_id );
 			if ( ! $enabled ) {
-				$links[] = '<span class="' . \esc_attr( $css_class . ' aio-row-action-disabled' ) . '" aria-disabled="true">' . \esc_html( $label ) . '</span>';
+				$out[] = '<span class="' . \esc_attr( $css_class . ' aio-row-action-disabled' ) . '" aria-disabled="true">' . \esc_html( $label ) . '</span>';
+			} elseif ( $form_post && $form_action !== '' ) {
+				$h = '';
+				foreach ( $hidden as $name => $value ) {
+					$h .= '<input type="hidden" name="' . \esc_attr( (string) $name ) . '" value="' . \esc_attr( (string) $value ) . '" />';
+				}
+				$out[] = '<form method="post" action="' . \esc_url( $form_action ) . '" class="aio-row-action-form" style="display:inline;">' . $h . '<button type="submit" class="button button-small ' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button></form>';
 			} elseif ( $url !== '' ) {
-				$links[] = '<a href="' . \esc_url( $url ) . '" class="' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</a>';
+				$out[] = '<a href="' . \esc_url( $url ) . '" class="' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</a>';
 			} else {
-				$links[] = '<button type="button" class="button button-small ' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button>';
+				$out[] = '<button type="button" class="button button-small ' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button>';
 			}
 		}
-		echo implode( ' ', array_map( function ( $link ) {
-			return $link;
-		}, $links ) );
+		echo implode( ' ', $out );
 	}
 }

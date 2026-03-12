@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers rollback validation and eligibility services (spec §38.4, §41.9, §59.11).
+ * Registers rollback validation, eligibility, and execution services (spec §38.4, §38.5, §41.9, §59.11).
  *
  * @package AIOPageBuilder
  */
@@ -11,12 +11,13 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Rollback\Execution\Rollback_Executor;
 use AIOPageBuilder\Domain\Rollback\Validation\Rollback_Eligibility_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Registers rollback_eligibility_service. Depends on operational_snapshot_repository.
+ * Registers rollback_eligibility_service and rollback_executor. Depends on operational_snapshot_repository.
  */
 final class Rollback_Provider implements Service_Provider_Interface {
 
@@ -24,6 +25,12 @@ final class Rollback_Provider implements Service_Provider_Interface {
 	public function register( Service_Container $container ): void {
 		$container->register( 'rollback_eligibility_service', function () use ( $container ): Rollback_Eligibility_Service {
 			return new Rollback_Eligibility_Service(
+				$container->get( 'operational_snapshot_repository' )
+			);
+		} );
+		$container->register( 'rollback_executor', function () use ( $container ): Rollback_Executor {
+			return new Rollback_Executor(
+				$container->get( 'rollback_eligibility_service' ),
 				$container->get( 'operational_snapshot_repository' )
 			);
 		} );
