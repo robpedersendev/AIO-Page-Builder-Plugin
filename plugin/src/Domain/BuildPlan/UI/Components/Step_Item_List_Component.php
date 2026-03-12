@@ -130,6 +130,11 @@ final class Step_Item_List_Component {
 			'hierarchy_position'    => \__( 'Hierarchy position', 'aio-page-builder' ),
 			'page_type'             => \__( 'Page type', 'aio-page-builder' ),
 			'confidence'            => \__( 'Confidence', 'aio-page-builder' ),
+			'menu_context'          => \__( 'Navigation context', 'aio-page-builder' ),
+			'action'                 => \__( 'Action', 'aio-page-builder' ),
+			'current_menu_name'      => \__( 'Current menu name', 'aio-page-builder' ),
+			'proposed_menu_name'     => \__( 'Proposed menu name', 'aio-page-builder' ),
+			'diff_summary'           => \__( 'Differences', 'aio-page-builder' ),
 		);
 		return $labels[ $col_key ] ?? str_replace( '_', ' ', ucfirst( $col_key ) );
 	}

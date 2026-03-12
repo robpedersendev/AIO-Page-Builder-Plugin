@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Bulk_Action_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
@@ -47,6 +48,9 @@ final class Build_Plan_Workspace_Screen {
 	/** Nonce action for Step 2 build-intent and bulk actions. */
 	public const NONCE_ACTION_STEP2_REVIEW = 'aio_build_plan_step2_review';
 
+	/** Nonce action for Step 3 (navigation) approve/deny and bulk actions. */
+	public const NONCE_ACTION_NAVIGATION_REVIEW = 'aio_build_plan_navigation_review';
+
 	/**
 	 * Renders workspace for the given plan_id. Exits with not-found message if plan missing.
 	 * Handles Step 2 then Step 1 actions before rendering.
@@ -60,6 +64,10 @@ final class Build_Plan_Workspace_Screen {
 			return;
 		}
 		$handled = $this->maybe_handle_step1_action( $plan_id );
+		if ( $handled ) {
+			return;
+		}
+		$handled = $this->maybe_handle_navigation_action( $plan_id );
 		if ( $handled ) {
 			return;
 		}
@@ -210,6 +218,78 @@ final class Build_Plan_Workspace_Screen {
 				$service->approve_item( $plan_post_id, $item_id );
 			}
 			// Deny (reject) for Step 2: not implemented in bulk service; no-op to avoid broken link.
+			\wp_safe_redirect( $redirect_url );
+			exit;
+		}
+		return false;
+	}
+
+	/**
+	 * Handles Step 3 (navigation) single approve/deny or bulk Apply All / Deny All; redirects on success.
+	 *
+	 * @param string $plan_id Plan ID.
+	 * @return bool True if request was handled and redirect sent (exit); false to continue render.
+	 */
+	private function maybe_handle_navigation_action( string $plan_id ): bool {
+		if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+			return false;
+		}
+		$plan_id = \sanitize_text_field( $plan_id );
+		if ( $plan_id === '' ) {
+			return false;
+		}
+		$nav_step_index = Navigation_Bulk_Action_Service::STEP_INDEX_NAVIGATION;
+		$redirect_url   = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $nav_step_index );
+
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
+			$action = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
+			$nonce  = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
+			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_NAVIGATION_REVIEW ) ) {
+				return false;
+			}
+			if ( $action !== 'bulk_approve_navigation' && $action !== 'bulk_deny_navigation' ) {
+				return false;
+			}
+			if ( ! $this->container || ! $this->container->has( 'navigation_bulk_action_service' ) ) {
+				return false;
+			}
+			$state = $this->get_state( $plan_id );
+			if ( $state === null ) {
+				return false;
+			}
+			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
+			if ( $plan_post_id <= 0 ) {
+				return false;
+			}
+			$service = $this->container->get( 'navigation_bulk_action_service' );
+			if ( $action === 'bulk_approve_navigation' ) {
+				$service->bulk_approve_all_eligible( $plan_post_id );
+			} else {
+				$service->bulk_deny_all_eligible( $plan_post_id );
+			}
+			\wp_safe_redirect( $redirect_url );
+			exit;
+		}
+
+		$get_step   = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
+		$get_action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
+		$item_id    = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
+		$nonce      = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
+		if ( $get_step === (string) $nav_step_index && ( $get_action === 'approve_item' || $get_action === 'deny_item' ) && $item_id !== '' && \wp_verify_nonce( $nonce, self::NONCE_ACTION_NAVIGATION_REVIEW ) ) {
+			$state = $this->get_state( $plan_id );
+			if ( $state === null ) {
+				return false;
+			}
+			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
+			if ( $plan_post_id <= 0 || ! $this->container || ! $this->container->has( 'navigation_bulk_action_service' ) ) {
+				return false;
+			}
+			$service = $this->container->get( 'navigation_bulk_action_service' );
+			if ( $get_action === 'approve_item' ) {
+				$service->approve_item( $plan_post_id, $item_id );
+			} else {
+				$service->deny_item( $plan_post_id, $item_id );
+			}
 			\wp_safe_redirect( $redirect_url );
 			exit;
 		}
@@ -446,6 +526,9 @@ final class Build_Plan_Workspace_Screen {
 		if ( $step_type === Build_Plan_Schema::STEP_TYPE_NEW_PAGES ) {
 			$this->inject_step2_action_urls( $workspace, $plan_id );
 		}
+		if ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION ) {
+			$this->inject_navigation_action_urls( $workspace, $plan_id );
+		}
 
 		$step_messages = $workspace['step_messages'] ?? array();
 		$list_payload  = array(
@@ -461,14 +544,20 @@ final class Build_Plan_Workspace_Screen {
 		$detail_component  = new Detail_Panel_Component();
 		$step1_bulk_nonce  = $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ? \wp_nonce_field( self::NONCE_ACTION_STEP1_REVIEW, '_wpnonce', false, false ) : '';
 		$step2_bulk_nonce  = $step_type === Build_Plan_Schema::STEP_TYPE_NEW_PAGES ? \wp_nonce_field( self::NONCE_ACTION_STEP2_REVIEW, '_wpnonce', false, false ) : '';
+		$nav_bulk_nonce    = $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION ? \wp_nonce_field( self::NONCE_ACTION_NAVIGATION_REVIEW, '_wpnonce', false, false ) : '';
 		?>
 		<div class="aio-step-workspace-actionable">
 			<?php $message_component->render_list( $step_messages ); ?>
 			<?php
+			if ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION && ! empty( $workspace['validation_summary']['messages'] ) ) {
+				echo '<div class="aio-navigation-validation-notice notice notice-warning"><p>' . \esc_html__( 'Validation messages:', 'aio-page-builder' ) . ' ' . \esc_html( implode( ' ', array_slice( $workspace['validation_summary']['messages'], 0, 3 ) ) ) . '</p></div>';
+			}
 			if ( $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ) {
 				$this->render_step1_bulk_forms( $workspace['bulk_action_states'] ?? array(), $step1_bulk_nonce );
 			} elseif ( $step_type === Build_Plan_Schema::STEP_TYPE_NEW_PAGES ) {
 				$this->render_step2_bulk_forms( $workspace['bulk_action_states'] ?? array(), $step2_bulk_nonce, $selected_ids );
+			} elseif ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION ) {
+				$this->render_navigation_bulk_forms( $workspace['bulk_action_states'] ?? array(), $nav_bulk_nonce );
 			} else {
 				$bulk_component->render( $bulk_payload );
 			}
@@ -521,6 +610,34 @@ final class Build_Plan_Workspace_Screen {
 	private function inject_step2_action_urls( array &$workspace, string $plan_id ): void {
 		$base  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
 		$nonce = \wp_create_nonce( self::NONCE_ACTION_STEP2_REVIEW );
+		$rows  = &$workspace['step_list_rows'];
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $i => $row ) {
+				$item_id = (string) ( $row['item_id'] ?? '' );
+				if ( $item_id === '' ) {
+					continue;
+				}
+				$actions = isset( $row['row_actions'] ) && is_array( $row['row_actions'] ) ? $row['row_actions'] : array();
+				$workspace['step_list_rows'][ $i ]['row_actions'] = $this->add_urls_to_approve_deny( $actions, $item_id, $base, $nonce );
+			}
+		}
+		$detail = &$workspace['detail_panel'];
+		if ( is_array( $detail ) && isset( $detail['row_actions'] ) && is_array( $detail['row_actions'] ) ) {
+			$detail_item_id = (string) ( $detail['item_id'] ?? '' );
+			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
+		}
+	}
+
+	/**
+	 * Injects approve/deny action URLs with nonce into Step 3 (navigation) workspace payload.
+	 *
+	 * @param array<string, mixed> $workspace Workspace payload (mutated).
+	 * @param string               $plan_id  Plan ID.
+	 */
+	private function inject_navigation_action_urls( array &$workspace, string $plan_id ): void {
+		$nav_step_index = Navigation_Bulk_Action_Service::STEP_INDEX_NAVIGATION;
+		$base  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $nav_step_index );
+		$nonce = \wp_create_nonce( self::NONCE_ACTION_NAVIGATION_REVIEW );
 		$rows  = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
@@ -653,6 +770,50 @@ final class Build_Plan_Workspace_Screen {
 			<?php else : ?>
 				<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Clear selection', 'aio-page-builder' ); ?></button>
 			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Renders Step 3 (navigation) bulk action forms: Apply All, Deny All, Apply to selected, Clear selection.
+	 *
+	 * @param array<string, array<string, mixed>> $bulk_states From workspace bulk_action_states.
+	 * @param string                              $nonce_html  Escaped nonce field HTML.
+	 */
+	private function render_navigation_bulk_forms( array $bulk_states, string $nonce_html ): void {
+		$apply_all = $bulk_states['apply_to_all_eligible'] ?? array();
+		$deny_all  = $bulk_states['deny_all_eligible'] ?? array();
+		$apply_sel = $bulk_states['apply_to_selected'] ?? array();
+		$clear_sel = $bulk_states['clear_selection'] ?? array();
+		$apply_enabled = ! empty( $apply_all['enabled'] );
+		$deny_enabled  = ! empty( $deny_all['enabled'] );
+		$clear_enabled = ! empty( $clear_sel['enabled'] );
+		$apply_count   = (int) ( $apply_all['count_eligible'] ?? 0 );
+		$deny_count    = (int) ( $deny_all['count_eligible'] ?? 0 );
+		?>
+		<div class="aio-bulk-action-bar aio-navigation-bulk-bar">
+			<form method="post" class="aio-bulk-form aio-bulk-approve-navigation" style="display:inline">
+				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<input type="hidden" name="aio_build_plan_action" value="bulk_approve_navigation" />
+				<button type="submit" class="button button-secondary" <?php echo $apply_enabled ? '' : ' disabled="disabled"'; ?>>
+					<?php \esc_html_e( 'Apply All Navigation Changes', 'aio-page-builder' ); ?>
+					<?php if ( $apply_count > 0 ) : ?>
+						<span class="aio-bulk-count">(<?php echo (int) $apply_count; ?>)</span>
+					<?php endif; ?>
+				</button>
+			</form>
+			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Apply to selected', 'aio-page-builder' ); ?></button>
+			<form method="post" class="aio-bulk-form aio-bulk-deny-navigation" style="display:inline">
+				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<input type="hidden" name="aio_build_plan_action" value="bulk_deny_navigation" />
+				<button type="submit" class="button button-secondary" <?php echo $deny_enabled ? '' : ' disabled="disabled"'; ?>>
+					<?php \esc_html_e( 'Deny All Navigation Changes', 'aio-page-builder' ); ?>
+					<?php if ( $deny_count > 0 ) : ?>
+						<span class="aio-bulk-count">(<?php echo (int) $deny_count; ?>)</span>
+					<?php endif; ?>
+				</button>
+			</form>
+			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Clear selection', 'aio-page-builder' ); ?></button>
 		</div>
 		<?php
 	}
