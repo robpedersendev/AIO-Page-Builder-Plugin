@@ -17,6 +17,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 /**
  * Consumes plan_id; loads plan via repository; returns structured payload for context rail and shell.
  * No raw repository calls in screen templates; screen uses this payload only.
+ * Optional Step_Workspace_Payload_Builder enables build_step_workspace() for actionable steps.
  */
 final class Build_Plan_UI_State_Builder {
 
@@ -26,9 +27,13 @@ final class Build_Plan_UI_State_Builder {
 	/** @var Build_Plan_Stepper_Builder */
 	private $stepper_builder;
 
-	public function __construct( Build_Plan_Repository $repository, Build_Plan_Stepper_Builder $stepper_builder ) {
-		$this->repository     = $repository;
-		$this->stepper_builder = $stepper_builder;
+	/** @var Step_Workspace_Payload_Builder|null */
+	private $step_workspace_builder;
+
+	public function __construct( Build_Plan_Repository $repository, Build_Plan_Stepper_Builder $stepper_builder, ?Step_Workspace_Payload_Builder $step_workspace_builder = null ) {
+		$this->repository            = $repository;
+		$this->stepper_builder        = $stepper_builder;
+		$this->step_workspace_builder = $step_workspace_builder;
 	}
 
 	/**
@@ -61,6 +66,41 @@ final class Build_Plan_UI_State_Builder {
 			'context_rail'     => $context_rail,
 			'stepper_steps'    => $stepper_steps,
 		);
+	}
+
+	/**
+	 * Builds step workspace payload for an actionable step (list rows, bulk bar, detail panel, messages).
+	 * Returns empty payload when plan not found or step_workspace_builder not set.
+	 *
+	 * @param string $plan_id Plan ID.
+	 * @param int    $step_index Step index in stepper.
+	 * @param array<string, bool> $capabilities can_approve, can_execute, can_view_artifacts (from current user).
+	 * @param string|null $selected_item_id Item id for detail panel.
+	 * @param array<int, string> $selected_item_ids Item ids for bulk selection.
+	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages.
+	 */
+	public function build_step_workspace(
+		string $plan_id,
+		int $step_index,
+		array $capabilities,
+		?string $selected_item_id = null,
+		array $selected_item_ids = array()
+	): array {
+		if ( $this->step_workspace_builder === null ) {
+			return array(
+				'step_list_rows'     => array(),
+				'column_order'       => array(),
+				'bulk_action_states' => array(),
+				'detail_panel'       => array( 'item_id' => '', 'sections' => array(), 'row_actions' => array() ),
+				'step_messages'      => array(),
+			);
+		}
+		$state = $this->build( $plan_id );
+		if ( $state === null ) {
+			return $this->step_workspace_builder->build( array(), 0, $capabilities, $selected_item_id, $selected_item_ids );
+		}
+		$definition = $state['plan_definition'] ?? array();
+		return $this->step_workspace_builder->build( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
 	}
 
 	/**

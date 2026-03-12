@@ -83,6 +83,32 @@ if ( ! function_exists( 'esc_html' ) ) {
 		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
 	}
 }
+if ( ! function_exists( 'esc_attr_e' ) ) {
+	function esc_attr_e( $text, $domain = 'default' ) {
+		echo esc_attr( __( $text, $domain ) );
+	}
+}
+if ( ! function_exists( 'esc_html_e' ) ) {
+	function esc_html_e( $text, $domain = 'default' ) {
+		echo esc_html( __( $text, $domain ) );
+	}
+}
+if ( ! function_exists( 'sanitize_html_class' ) ) {
+	function sanitize_html_class( $class ) {
+		return preg_replace( '/[^a-z0-9_-]/', '', strtolower( (string) $class ) );
+	}
+}
+if ( ! function_exists( 'wp_kses_post' ) ) {
+	function wp_kses_post( $data ) {
+		return is_string( $data ) ? strip_tags( $data ) : '';
+	}
+}
+if ( ! function_exists( 'esc_url' ) ) {
+	function esc_url( $url ) {
+		$url = trim( (string) $url );
+		return ( $url !== '' && preg_match( '#^https?://#i', $url ) ) ? $url : '';
+	}
+}
 if ( ! function_exists( 'add_action' ) ) {
 	function add_action( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
 		// No-op for unit tests; CPT registration runs in WP context.
@@ -105,6 +131,11 @@ if ( ! function_exists( '_x' ) ) {
 if ( ! function_exists( '__' ) ) {
 	function __( $text, $domain = 'default' ) {
 		return $text;
+	}
+}
+if ( ! function_exists( '_n' ) ) {
+	function _n( $single, $plural, $number, $domain = 'default' ) {
+		return ( (int) $number === 1 ) ? $single : $plural;
 	}
 }
 if ( ! function_exists( 'dbDelta' ) ) {

@@ -14,6 +14,10 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
+use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
+use AIOPageBuilder\Domain\BuildPlan\UI\Components\Detail_Panel_Component;
+use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
+use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Message_Component;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -109,7 +113,7 @@ final class Build_Plan_Workspace_Screen {
 					<?php $this->render_stepper( $steps, $active_step_index, $base_url ); ?>
 				</div>
 				<div class="aio-build-plan-workspace-content">
-					<?php $this->render_step_workspace( $current_step, $active_step_index, $definition, $base_url ); ?>
+					<?php $this->render_step_workspace( $state, $current_step, $active_step_index, $definition, $base_url ); ?>
 				</div>
 			</div>
 		</div>
@@ -201,7 +205,7 @@ final class Build_Plan_Workspace_Screen {
 		<?php
 	}
 
-	private function render_step_workspace( ?array $current_step, int $active_step_index, array $definition, string $base_url ): void {
+	private function render_step_workspace( array $state, ?array $current_step, int $active_step_index, array $definition, string $base_url ): void {
 		if ( $current_step === null ) {
 			echo '<p class="aio-empty-state">' . \esc_html__( 'No step selected.', 'aio-page-builder' ) . '</p>';
 			return;
@@ -230,15 +234,75 @@ final class Build_Plan_Workspace_Screen {
 			case Build_Plan_Schema::STEP_TYPE_NAVIGATION:
 			case Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS:
 			case Build_Plan_Schema::STEP_TYPE_SEO:
-				if ( $unresolved === 0 ) {
-					echo '<div class="aio-empty-state"><p>' . \esc_html__( 'All recommendations in this step have already been resolved.', 'aio-page-builder' ) . '</p></div>';
-				} else {
-					echo '<div class="aio-empty-state aio-step-placeholder"><p>' . \esc_html__( 'Item list and detail view will be implemented in a later prompt.', 'aio-page-builder' ) . '</p></div>';
-				}
+				$this->render_actionable_step_workspace( $state, $current_step, $active_step_index, $definition );
 				break;
 			default:
 				echo '<div class="aio-empty-state"><p>' . \esc_html__( 'No recommendations were generated for this step.', 'aio-page-builder' ) . '</p></div>';
 		}
+	}
+
+	/**
+	 * Renders table + detail + bulk bar for an actionable step using shared components.
+	 *
+	 * @param array<string, mixed> $state Full UI state (plan_id, plan_definition, etc.).
+	 * @param array<string, mixed> $current_step Current stepper step data.
+	 * @param int                  $active_step_index Step index.
+	 * @param array<string, mixed> $definition Plan definition.
+	 */
+	private function render_actionable_step_workspace( array $state, array $current_step, int $active_step_index, array $definition ): void {
+		$plan_id = (string) ( $state['plan_id'] ?? $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' );
+		$unresolved = (int) ( $current_step['unresolved_count'] ?? 0 );
+		if ( $unresolved === 0 ) {
+			echo '<div class="aio-empty-state"><p>' . \esc_html__( 'All recommendations in this step have already been resolved.', 'aio-page-builder' ) . '</p></div>';
+			return;
+		}
+		if ( ! $this->container || ! $this->container->has( 'build_plan_ui_state_builder' ) ) {
+			echo '<div class="aio-empty-state"><p>' . \esc_html__( 'Item list is not available.', 'aio-page-builder' ) . '</p></div>';
+			return;
+		}
+		$detail_item_id = isset( $_GET['detail'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['detail'] ) ) : null;
+		if ( $detail_item_id === '' ) {
+			$detail_item_id = null;
+		}
+		$selected_ids = array();
+		if ( ! empty( $_GET['selected'] ) && is_array( $_GET['selected'] ) ) {
+			$selected_ids = array_map( 'sanitize_text_field', array_map( 'wp_unslash', $_GET['selected'] ) );
+			$selected_ids = array_values( array_filter( $selected_ids ) );
+		}
+		$capabilities = array(
+			'can_approve'         => \current_user_can( Capabilities::APPROVE_BUILD_PLANS ),
+			'can_execute'         => \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ),
+			'can_view_artifacts'  => \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ),
+		);
+		$builder = $this->container->get( 'build_plan_ui_state_builder' );
+		$workspace = $builder->build_step_workspace( $plan_id, $active_step_index, $capabilities, $detail_item_id, $selected_ids );
+
+		$step_messages = $workspace['step_messages'] ?? array();
+		$list_payload  = array(
+			Step_Item_List_Component::KEY_STEP_LIST_ROWS => $workspace['step_list_rows'] ?? array(),
+			Step_Item_List_Component::KEY_COLUMN_ORDER   => $workspace['column_order'] ?? array(),
+		);
+		$bulk_payload  = array( Bulk_Action_Bar_Component::KEY_BULK_ACTION_STATES => $workspace['bulk_action_states'] ?? array() );
+		$detail_payload = $workspace['detail_panel'] ?? array();
+
+		$message_component = new Step_Message_Component();
+		$bulk_component    = new Bulk_Action_Bar_Component();
+		$list_component    = new Step_Item_List_Component();
+		$detail_component  = new Detail_Panel_Component();
+		?>
+		<div class="aio-step-workspace-actionable">
+			<?php $message_component->render_list( $step_messages ); ?>
+			<?php $bulk_component->render( $bulk_payload ); ?>
+			<div class="aio-step-workspace-list-detail">
+				<div class="aio-step-workspace-list">
+					<?php $list_component->render( $list_payload, $detail_item_id ); ?>
+				</div>
+				<div class="aio-step-workspace-detail">
+					<?php $detail_component->render( $detail_payload ); ?>
+				</div>
+			</div>
+		</div>
+		<?php
 	}
 
 	private function render_overview_shell( array $definition ): void {
