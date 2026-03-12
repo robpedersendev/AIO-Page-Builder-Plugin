@@ -144,6 +144,14 @@ final class Provider_Driver_Base_Test extends TestCase {
 		$this->assertSame( 'stub-model', $model );
 	}
 
+	public function test_capability_resolver_resolve_default_model_for_connection_test(): void {
+		$store    = new Driver_Test_Secret_Store();
+		$driver   = new Stub_AI_Provider_Driver( $store );
+		$resolver = new Provider_Capability_Resolver();
+		$model    = $resolver->resolve_default_model_for_connection_test( $driver );
+		$this->assertSame( 'stub-model', $model );
+	}
+
 	public function test_request_context_builder_produces_normalized_request(): void {
 		$builder = new Provider_Request_Context_Builder();
 		$ctx = $builder->build( 'req-1', 'gpt-4o', 'You are a planner.', 'Analyze this.', array(

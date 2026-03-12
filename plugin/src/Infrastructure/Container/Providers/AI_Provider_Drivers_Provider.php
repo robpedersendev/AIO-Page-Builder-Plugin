@@ -1,0 +1,47 @@
+<?php
+/**
+ * Registers concrete AI provider driver(s) and connection test service (spec §25, §49.9).
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Infrastructure\Container\Providers;
+
+defined( 'ABSPATH' ) || exit;
+
+use AIOPageBuilder\Domain\AI\Providers\Drivers\Concrete_AI_Provider_Driver;
+use AIOPageBuilder\Domain\AI\Providers\Drivers\Provider_Connection_Test_Service;
+use AIOPageBuilder\Domain\AI\Secrets\Option_Based_Provider_Secret_Store;
+use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
+
+/**
+ * Registers OpenAI driver, provider secret store, and connection test service.
+ */
+final class AI_Provider_Drivers_Provider implements Service_Provider_Interface {
+
+	/** @inheritdoc */
+	public function register( Service_Container $container ): void {
+		$container->register( 'provider_secret_store', function (): Option_Based_Provider_Secret_Store {
+			return new Option_Based_Provider_Secret_Store();
+		} );
+
+		$container->register( 'openai_provider_driver', function () use ( $container ): Concrete_AI_Provider_Driver {
+			return new Concrete_AI_Provider_Driver(
+				$container->get( 'provider_error_normalizer' ),
+				$container->get( 'provider_response_normalizer' ),
+				$container->get( 'provider_secret_store' )
+			);
+		} );
+
+		$container->register( 'provider_connection_test_service', function () use ( $container ): Provider_Connection_Test_Service {
+			return new Provider_Connection_Test_Service(
+				$container->get( 'provider_request_context_builder' ),
+				$container->get( 'provider_capability_resolver' ),
+				$container->get( 'settings' )
+			);
+		} );
+	}
+}

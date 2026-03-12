@@ -84,4 +84,27 @@ final class Provider_Capability_Resolver {
 		}
 		return isset( $models[0]['id'] ) ? (string) $models[0]['id'] : null;
 	}
+
+	/**
+	 * Picks a default model for connection test (no schema required). Prefers default_for_planning, else first model.
+	 *
+	 * @param AI_Provider_Interface $driver Provider driver.
+	 * @return string|null Model id or null if none.
+	 */
+	public function resolve_default_model_for_connection_test( AI_Provider_Interface $driver ): ?string {
+		$cap    = $driver->get_capabilities();
+		$models = $cap['models'] ?? array();
+		if ( ! is_array( $models ) || empty( $models ) ) {
+			return null;
+		}
+		foreach ( $models as $m ) {
+			if ( ! is_array( $m ) ) {
+				continue;
+			}
+			if ( ! empty( $m['default_for_planning'] ) && isset( $m['id'] ) ) {
+				return (string) $m['id'];
+			}
+		}
+		return isset( $models[0]['id'] ) ? (string) $models[0]['id'] : null;
+	}
 }

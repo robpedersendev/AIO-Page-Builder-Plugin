@@ -48,6 +48,9 @@ final class Option_Names {
 	/** Provider config reference only; secrets live in separate storage (not in exportable blob). */
 	public const PROVIDER_CONFIG_REF = self::PREFIX . 'provider_config';
 
+	/** Provider health: connection_test_result and last_successful_use per provider (no secrets; spec §49.9). */
+	public const PROVIDER_HEALTH_STATE = self::PREFIX . 'provider_health_state';
+
 	/** Current editable brand and business profile (single option; shape per profile-schema.md). */
 	public const PROFILE_CURRENT = self::PREFIX . 'profile_current';
 
@@ -77,6 +80,7 @@ final class Option_Names {
 			self::DEPENDENCY_NOTICE_DISMISSALS,
 			self::UNINSTALL_PREFS,
 			self::PROVIDER_CONFIG_REF,
+			self::PROVIDER_HEALTH_STATE,
 			self::PROFILE_CURRENT,
 			self::ONBOARDING_DRAFT,
 		);
