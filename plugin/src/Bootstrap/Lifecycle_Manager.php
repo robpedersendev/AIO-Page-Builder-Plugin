@@ -98,6 +98,7 @@ final class Lifecycle_Manager {
 			'check_tables_schema',
 			'register_capabilities',
 			'register_schedules',
+			'seed_form_templates',
 			'install_notification_eligibility',
 			'first_run_redirect_readiness',
 		);
@@ -167,6 +168,8 @@ final class Lifecycle_Manager {
 				return $this->install_notification_eligibility();
 			case 'first_run_redirect_readiness':
 				return $this->first_run_redirect_readiness();
+			case 'seed_form_templates':
+				return $this->seed_form_templates();
 			default:
 				return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', $phase );
 		}
@@ -281,6 +284,48 @@ final class Lifecycle_Manager {
 	private function first_run_redirect_readiness(): Lifecycle_Result {
 		// Placeholder: no redirect. Later prompt owns first-time setup / redirect to Dashboard or Onboarding.
 		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'first_run_redirect_readiness' );
+	}
+
+	/**
+	 * Seeds form section and request page template (form-provider-integration-contract).
+	 * Registers CPTs if needed, then saves definitions. Non-blocking on failure.
+	 *
+	 * @return Lifecycle_Result
+	 */
+	private function seed_form_templates(): Lifecycle_Result {
+		$base = __DIR__ . '/../Domain';
+		$infra = __DIR__ . '/../Infrastructure';
+		require_once $base . '/Storage/Repositories/Repository_Interface.php';
+		require_once $base . '/Storage/Objects/Object_Status_Families.php';
+		require_once $base . '/Storage/Repositories/Abstract_CPT_Repository.php';
+		require_once $base . '/Storage/Objects/Object_Type_Keys.php';
+		require_once $base . '/Registries/Section/Section_Schema.php';
+		require_once $base . '/Registries/PageTemplate/Page_Template_Schema.php';
+		require_once $base . '/Storage/Repositories/Section_Template_Repository.php';
+		require_once $base . '/Storage/Repositories/Page_Template_Repository.php';
+		require_once $infra . '/Config/Capabilities.php';
+		require_once $base . '/Storage/Objects/Post_Type_Registrar.php';
+		require_once $base . '/FormProvider/Form_Integration_Definitions.php';
+		require_once $base . '/FormProvider/Form_Template_Seeder.php';
+
+		$registrar = new \AIOPageBuilder\Domain\Storage\Objects\Post_Type_Registrar();
+		$registrar->register();
+
+		$section_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
+		$page_repo    = new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
+		$result       = \AIOPageBuilder\Domain\FormProvider\Form_Template_Seeder::run( $section_repo, $page_repo );
+
+		return new Lifecycle_Result(
+			Lifecycle_Result::STATUS_SUCCESS,
+			'',
+			'seed_form_templates',
+			array(
+				'form_templates_seeded' => $result['success'],
+				'section_id'            => $result['section_id'],
+				'page_id'               => $result['page_id'],
+				'errors'                => $result['errors'],
+			)
+		);
 	}
 
 	// ----- Deactivation phase placeholders -----

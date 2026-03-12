@@ -8,6 +8,7 @@
 
 namespace AIOPageBuilder\Tests\Unit;
 
+use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Blocks\Page_Block_Assembly_Result;
 use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Domain/FormProvider/Form_Provider_Registry.php';
 require_once $plugin_root . '/src/Domain/Rendering/Section/Section_Render_Result.php';
 require_once $plugin_root . '/src/Domain/Rendering/Blocks/Page_Block_Assembly_Result.php';
 require_once $plugin_root . '/src/Domain/Rendering/Blocks/Native_Block_Assembly_Pipeline.php';
@@ -284,5 +286,32 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 		$ordered = $result->get_ordered_sections();
 		$this->assertSame( 'st01_hero', $ordered[0]['section_key'] );
 		$this->assertSame( 'st05_faq', $ordered[1]['section_key'] );
+	}
+
+	/**
+	 * When form_provider_registry is set and section has form_provider + form_id, output contains form shortcode (form-provider-integration-contract).
+	 */
+	public function test_form_section_emits_shortcode_when_registry_present(): void {
+		$registry = new Form_Provider_Registry();
+		$pipeline = new Native_Block_Assembly_Pipeline( null, $registry );
+		$section = $this->section_result(
+			'form_section_ndr',
+			0,
+			array(
+				'form_provider' => 'ndr_forms',
+				'form_id'       => 'contact',
+				'headline'      => 'Get in touch',
+			)
+		);
+
+		$result = $pipeline->assemble(
+			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
+			'pt_request_form',
+			array( $section )
+		);
+
+		$content = $result->get_block_content();
+		$this->assertStringContainsString( '[ndr_forms id="contact"]', $content, 'Form shortcode must be emitted' );
+		$this->assertStringContainsString( '<h2>Get in touch</h2>', $content, 'Headline must be emitted' );
 	}
 }

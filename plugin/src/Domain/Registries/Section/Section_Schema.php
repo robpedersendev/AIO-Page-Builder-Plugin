@@ -154,6 +154,7 @@ final class Section_Schema {
 			'media_gallery'       => 'Media / gallery',
 			'comparison'          => 'Comparison',
 			'cta_conversion'      => 'CTA / conversion',
+			'form_embed'          => 'Form embed (form provider shortcode/block)',
 			'directory_listing'   => 'Directory / listing',
 			'profile_bio'         => 'Profile / bio',
 			'stats_highlights'    => 'Stats / highlights',

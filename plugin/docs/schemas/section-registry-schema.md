@@ -58,6 +58,7 @@ Categories are controlled slugs. Suggested set (extensible by registry policy):
 | `media_gallery` | Media / gallery |
 | `comparison` | Comparison |
 | `cta_conversion` | CTA / conversion |
+| `form_embed` | Form embed (form provider shortcode/block) |
 | `directory_listing` | Directory / listing |
 | `profile_bio` | Profile / bio |
 | `stats_highlights` | Stats / highlights |

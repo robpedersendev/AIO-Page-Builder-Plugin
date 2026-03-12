@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Domain\Rendering\Blocks;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
 use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Render_Result;
 
@@ -29,11 +30,16 @@ final class Native_Block_Assembly_Pipeline {
 	/** @var GenerateBlocks_Compatibility_Layer|null */
 	private $gb_layer;
 
+	/** @var Form_Provider_Registry|null */
+	private $form_provider_registry;
+
 	/**
 	 * @param GenerateBlocks_Compatibility_Layer|null $gb_layer Optional; when set and available, eligible sections emit GenerateBlocks-compatible markup.
+	 * @param Form_Provider_Registry|null            $form_provider_registry Optional; when set, sections with form_provider + form_id emit form shortcode (form-provider-integration-contract.md).
 	 */
-	public function __construct( ?GenerateBlocks_Compatibility_Layer $gb_layer = null ) {
-		$this->gb_layer = $gb_layer;
+	public function __construct( ?GenerateBlocks_Compatibility_Layer $gb_layer = null, ?Form_Provider_Registry $form_provider_registry = null ) {
+		$this->gb_layer               = $gb_layer;
+		$this->form_provider_registry = $form_provider_registry;
 	}
 
 	/**
@@ -156,7 +162,7 @@ final class Native_Block_Assembly_Pipeline {
 		$inner_open = $inner_class !== '' ? '<div class="' . esc_attr( $inner_class ) . '">' : '';
 		$inner_close = $inner_class !== '' ? '</div>' : '';
 
-		$content = $this->field_values_to_inner_html( $section->get_field_values() );
+		$content = $this->field_values_to_inner_html( $section->get_field_values(), $section->get_section_key() );
 
 		$inner = $inner_open . $content . $inner_close;
 		$html  = $open . $inner . '</div>';
@@ -166,13 +172,37 @@ final class Native_Block_Assembly_Pipeline {
 
 	/**
 	 * Maps field values to semantic HTML (h2 for headline/title, p for rest). Escapes output.
+	 * When form_provider_registry is set and field_values contains form_provider + form_id, emits form shortcode (form-provider-integration-contract.md).
 	 *
 	 * @param array<string, mixed> $field_values
+	 * @param string               $section_key  Section internal_key (for form section detection; unused when no registry).
 	 * @return string
 	 */
-	private function field_values_to_inner_html( array $field_values ): string {
+	private function field_values_to_inner_html( array $field_values, string $section_key = '' ): string {
 		$out = array();
+
+		$form_shortcode = null;
+		if ( $this->form_provider_registry !== null ) {
+			$provider = isset( $field_values[ Form_Provider_Registry::FIELD_FORM_PROVIDER ] )
+				? trim( (string) $field_values[ Form_Provider_Registry::FIELD_FORM_PROVIDER ] )
+				: '';
+			$form_id = isset( $field_values[ Form_Provider_Registry::FIELD_FORM_ID ] )
+				? trim( (string) $field_values[ Form_Provider_Registry::FIELD_FORM_ID ] )
+				: '';
+			if ( $provider !== '' && $form_id !== '' ) {
+				$form_shortcode = $this->form_provider_registry->build_shortcode( $provider, $form_id );
+			}
+		}
+
+		$skip_keys = array(
+			Form_Provider_Registry::FIELD_FORM_PROVIDER,
+			Form_Provider_Registry::FIELD_FORM_ID,
+		);
+
 		foreach ( $field_values as $key => $value ) {
+			if ( in_array( $key, $skip_keys, true ) ) {
+				continue;
+			}
 			if ( is_array( $value ) ) {
 				continue;
 			}
@@ -187,6 +217,11 @@ final class Native_Block_Assembly_Pipeline {
 				$out[] = '<p>' . $escaped . '</p>';
 			}
 		}
+
+		if ( $form_shortcode !== null && $form_shortcode !== '' ) {
+			$out[] = $form_shortcode;
+		}
+
 		return implode( "\n", $out );
 	}
 }

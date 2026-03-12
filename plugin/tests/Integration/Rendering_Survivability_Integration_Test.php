@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Domain/FormProvider/Form_Provider_Registry.php';
 require_once $plugin_root . '/src/Domain/Rendering/Section/Section_Render_Result.php';
 require_once $plugin_root . '/src/Domain/Rendering/Blocks/Page_Block_Assembly_Result.php';
 require_once $plugin_root . '/src/Domain/Rendering/Blocks/Native_Block_Assembly_Pipeline.php';

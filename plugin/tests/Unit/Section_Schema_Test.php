@@ -59,12 +59,14 @@ final class Section_Schema_Test extends TestCase {
 		$this->assertArrayHasKey( 'hero_intro', $categories );
 		$this->assertArrayHasKey( 'faq', $categories );
 		$this->assertArrayHasKey( 'cta_conversion', $categories );
+		$this->assertArrayHasKey( 'form_embed', $categories );
 		$this->assertArrayHasKey( 'utility_structural', $categories );
 	}
 
 	public function test_is_allowed_category_accepts_valid_rejects_invalid(): void {
 		$this->assertTrue( Section_Schema::is_allowed_category( 'hero_intro' ) );
 		$this->assertTrue( Section_Schema::is_allowed_category( 'faq' ) );
+		$this->assertTrue( Section_Schema::is_allowed_category( 'form_embed' ) );
 		$this->assertFalse( Section_Schema::is_allowed_category( 'unknown' ) );
 		$this->assertFalse( Section_Schema::is_allowed_category( '' ) );
 	}

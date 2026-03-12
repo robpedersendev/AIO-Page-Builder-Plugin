@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
 use AIOPageBuilder\Domain\Rendering\Assets\Render_Asset_Controller;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Diagnostics\Content_Survivability_Checker;
@@ -43,9 +44,14 @@ final class Rendering_Provider implements Service_Provider_Interface {
 			return new GenerateBlocks_Compatibility_Layer( GenerateBlocks_Compatibility_Layer::default_availability_check() );
 		} );
 
+		$container->register( 'form_provider_registry', function (): Form_Provider_Registry {
+			return new Form_Provider_Registry();
+		} );
+
 		$container->register( 'native_block_assembly_pipeline', function () use ( $container ): Native_Block_Assembly_Pipeline {
-			$gb_layer = $container->get( 'generateblocks_compatibility_layer' );
-			return new Native_Block_Assembly_Pipeline( $gb_layer );
+			$gb_layer   = $container->get( 'generateblocks_compatibility_layer' );
+			$form_registry = $container->get( 'form_provider_registry' );
+			return new Native_Block_Assembly_Pipeline( $gb_layer, $form_registry );
 		} );
 
 		$container->register( 'page_instantiation_payload_builder', function (): Page_Instantiation_Payload_Builder {
