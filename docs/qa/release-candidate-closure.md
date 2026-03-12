@@ -73,7 +73,7 @@
 - **Compatibility:** Tested WordPress 6.6+; PHP 8.1–8.3; required plugins ACF Pro 6.2+, GenerateBlocks 2.0+; preferred theme GeneratePress. See [compatibility-matrix.md](compatibility-matrix.md) §9.
 - **Migration:** Table and export schema at 1; same-major import; no breaking schema change. See [migration-coverage-matrix.md](migration-coverage-matrix.md) §7.
 - **Known limitations:** See [known-risk-register.md](../release/known-risk-register.md).
-- **Changelog draft:** Maintain in repo (e.g. CHANGELOG.md or docs/release/) or in release notes; update with version and changes for the release.
+- **Changelog draft:** [changelog.md](../release/changelog.md) with RC1 entry; [release-notes-rc1.md](../release/release-notes-rc1.md) for full operator notes. Update version and date when cutting release. Perform release-note accuracy pass against implementation, compatibility matrix, migration matrix, and known-risk register; record mismatches and correct in docs or (if blocking) via tiny code fix.
 
 ---
 

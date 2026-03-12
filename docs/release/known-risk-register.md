@@ -42,6 +42,7 @@ Use this section for risks or limitations specific to a release (e.g. "Export of
 - **Hardening:** [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) (waiver process, sign-off).
 - **QA closure:** [release-candidate-closure.md](../qa/release-candidate-closure.md).
 - **Compatibility / migration:** [compatibility-matrix.md](../qa/compatibility-matrix.md), [migration-coverage-matrix.md](../qa/migration-coverage-matrix.md).
+- **Release notes / changelog:** [release-notes-rc1.md](release-notes-rc1.md), [changelog.md](changelog.md) (operator-facing release content; do not duplicate internal risk detail here).
 
 ---
 
