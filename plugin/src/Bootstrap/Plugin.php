@@ -72,6 +72,11 @@ require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Zip_Packag
 require_once $bootstrap_dir . '/../Domain/Registries/Export/Registry_Export_Fragment_Builder.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Token_Set_Reader.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Generator.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Import/Import_Validation_Result.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Import/Restore_Result.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Import/Conflict_Resolution_Service.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Import/Import_Validator.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Import/Restore_Pipeline.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/ExportRestore_Provider.php';
 require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_Statuses.php';
 require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_Step_Keys.php';

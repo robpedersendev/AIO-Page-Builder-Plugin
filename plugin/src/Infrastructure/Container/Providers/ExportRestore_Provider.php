@@ -19,12 +19,37 @@ use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Registers export generator, manifest builder, ZIP packager, and token set reader.
+ * Registers export generator, import validator, restore pipeline, and related services.
  */
 final class ExportRestore_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
+		$container->register( 'import_validator', function () use ( $container ): \AIOPageBuilder\Domain\ExportRestore\Import\Import_Validator {
+			return new \AIOPageBuilder\Domain\ExportRestore\Import\Import_Validator(
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' ),
+				$container->get( 'composition_repository' ),
+				$container->get( 'build_plan_repository' ),
+				$container->get( 'export_token_set_reader' )
+			);
+		} );
+		$container->register( 'conflict_resolution_service', function (): \AIOPageBuilder\Domain\ExportRestore\Import\Conflict_Resolution_Service {
+			return new \AIOPageBuilder\Domain\ExportRestore\Import\Conflict_Resolution_Service();
+		} );
+		$container->register( 'restore_pipeline', function () use ( $container ): \AIOPageBuilder\Domain\ExportRestore\Import\Restore_Pipeline {
+			global $wpdb;
+			return new \AIOPageBuilder\Domain\ExportRestore\Import\Restore_Pipeline(
+				$container->get( 'settings' ),
+				$container->get( 'profile_store' ),
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' ),
+				$container->get( 'composition_repository' ),
+				$container->get( 'build_plan_repository' ),
+				$wpdb,
+				$container->has( 'logger' ) ? $container->get( 'logger' ) : null
+			);
+		} );
 		$container->register( 'export_manifest_builder', function (): Export_Manifest_Builder {
 			return new Export_Manifest_Builder();
 		} );
