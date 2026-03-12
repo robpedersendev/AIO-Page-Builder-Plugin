@@ -27,6 +27,12 @@ final class Option_Names {
 	/** Reporting settings placeholder; no secrets (exportable). */
 	public const REPORTING_SETTINGS = self::PREFIX . 'reporting';
 
+	/** Install notification sent state (dedupe); internal, spec §46.2. */
+	public const INSTALL_NOTICE_STATE = self::PREFIX . 'install_notice_state';
+
+	/** Reporting log (attempts and delivery status); internal, spec §46.12. */
+	public const REPORTING_LOG = self::PREFIX . 'reporting_log';
+
 	/** Dependency notice dismissals (internal, runtime). */
 	public const DEPENDENCY_NOTICE_DISMISSALS = self::PREFIX . 'dependency_notices';
 
@@ -58,6 +64,8 @@ final class Option_Names {
 			self::MAIN_SETTINGS,
 			self::VERSION_MARKERS,
 			self::REPORTING_SETTINGS,
+			self::INSTALL_NOTICE_STATE,
+			self::REPORTING_LOG,
 			self::DEPENDENCY_NOTICE_DISMISSALS,
 			self::UNINSTALL_PREFS,
 			self::PROVIDER_CONFIG_REF,

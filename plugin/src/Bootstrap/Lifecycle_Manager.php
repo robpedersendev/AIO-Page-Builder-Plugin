@@ -25,6 +25,12 @@ require_once __DIR__ . '/../Domain/Storage/Tables/DbDelta_Runner.php';
 require_once __DIR__ . '/../Domain/Storage/Tables/Table_Installer.php';
 require_once __DIR__ . '/Environment_Validator.php';
 require_once __DIR__ . '/Capability_Registrar.php';
+require_once __DIR__ . '/../Domain/Reporting/Contracts/Reporting_Event_Types.php';
+require_once __DIR__ . '/../Domain/Reporting/Contracts/Reporting_Payload_Schema.php';
+require_once __DIR__ . '/../Domain/Reporting/Install/Install_Notification_Result.php';
+require_once __DIR__ . '/../Domain/Reporting/Install/Install_Notification_Transport_Interface.php';
+require_once __DIR__ . '/../Domain/Reporting/Install/Wp_Mail_Install_Transport.php';
+require_once __DIR__ . '/../Domain/Reporting/Install/Install_Notification_Service.php';
 
 /**
  * Result status for a lifecycle phase or overall run.
@@ -258,8 +264,15 @@ final class Lifecycle_Manager {
 	}
 
 	private function install_notification_eligibility(): Lifecycle_Result {
-		// Placeholder: no reporting send. Later prompt owns install notification eligibility.
-		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'install_notification_eligibility' );
+		$service = new \AIOPageBuilder\Domain\Reporting\Install\Install_Notification_Service();
+		$result  = $service->maybe_send( __( 'all ready', 'aio-page-builder' ) );
+		// * Never block activation on delivery failure (spec §46.10).
+		return new Lifecycle_Result(
+			Lifecycle_Result::STATUS_SUCCESS,
+			'',
+			'install_notification_eligibility',
+			array( 'install_notification_result' => $result->to_array() )
+		);
 	}
 
 	private function first_run_redirect_readiness(): Lifecycle_Result {
