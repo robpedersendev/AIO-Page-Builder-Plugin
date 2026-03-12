@@ -97,7 +97,27 @@ final class Import_Validation_Result {
 	}
 
 	/**
-	 * Payload for UI/API (no secrets).
+	 * Rebuilds instance from stored payload and manifest (e.g. transient for restore flow). Server-side only.
+	 *
+	 * @param array{payload: array{validation_passed: bool, blocking_failures: list<string>, conflicts: list<array>, warnings: list<string>, package_path: string, checksum_verified: bool}, manifest: array<string, mixed>} $stored
+	 * @return self
+	 */
+	public static function from_stored( array $stored ): self {
+		$p = $stored['payload'] ?? array();
+		$manifest = isset( $stored['manifest'] ) && is_array( $stored['manifest'] ) ? $stored['manifest'] : array();
+		return new self(
+			(bool) ( $p['validation_passed'] ?? false ),
+			isset( $p['blocking_failures'] ) && is_array( $p['blocking_failures'] ) ? $p['blocking_failures'] : array(),
+			isset( $p['conflicts'] ) && is_array( $p['conflicts'] ) ? $p['conflicts'] : array(),
+			isset( $p['warnings'] ) && is_array( $p['warnings'] ) ? $p['warnings'] : array(),
+			$manifest,
+			isset( $p['package_path'] ) ? (string) $p['package_path'] : '',
+			(bool) ( $p['checksum_verified'] ?? false )
+		);
+	}
+
+	/**
+	 * Payload for UI/API (no secrets). Omit package_path when sending to client.
 	 *
 	 * @return array{validation_passed: bool, blocking_failures: list<string>, conflicts: list<array>, warnings: list<string>, package_path: string, checksum_verified: bool}
 	 */

@@ -21,6 +21,7 @@ use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
+use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Domain\FormProvider\Form_Template_Seeder;
@@ -62,6 +63,7 @@ final class Admin_Menu {
 		$build_plans        = new Build_Plans_Screen( $this->container );
 		$queue_logs         = new Queue_Logs_Screen( $this->container );
 		$privacy_reporting  = new Privacy_Reporting_Settings_Screen( $this->container );
+		$import_export     = new Import_Export_Screen( $this->container );
 
 		add_menu_page(
 			__( 'AIO Page Builder', 'aio-page-builder' ),
@@ -170,6 +172,15 @@ final class Admin_Menu {
 			$privacy_reporting->get_capability(),
 			Privacy_Reporting_Settings_Screen::SLUG,
 			array( $privacy_reporting, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$import_export->get_title(),
+			__( 'Import / Export', 'aio-page-builder' ),
+			$import_export->get_capability(),
+			Import_Export_Screen::SLUG,
+			array( $import_export, 'render' )
 		);
 	}
 
