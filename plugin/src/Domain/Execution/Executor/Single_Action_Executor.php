@@ -110,6 +110,7 @@ final class Single_Action_Executor {
 				return Execution_Result::refused( $action_id, $action_type, Execution_Action_Contract::ERROR_SNAPSHOT_REQUIRED, __( 'Snapshot required but not available.', 'aio-page-builder' ) );
 			}
 			$snapshot_ref = $preflight_ref;
+			$envelope['snapshot_ref'] = $snapshot_ref;
 		}
 
 		$scope_keys = $this->scope_keys_for_envelope( $envelope );

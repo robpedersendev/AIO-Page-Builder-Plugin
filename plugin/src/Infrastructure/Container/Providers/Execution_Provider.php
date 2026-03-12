@@ -15,7 +15,9 @@ use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
 use AIOPageBuilder\Domain\Execution\Executor\Execution_Dispatcher;
 use AIOPageBuilder\Domain\Execution\Executor\Single_Action_Executor;
 use AIOPageBuilder\Domain\Execution\Handlers\Create_Page_Handler;
+use AIOPageBuilder\Domain\Execution\Handlers\Replace_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Jobs\Create_Page_Job_Service;
+use AIOPageBuilder\Domain\Execution\Jobs\Replace_Page_Job_Service;
 use AIOPageBuilder\Domain\Execution\Queue\Bulk_Executor;
 use AIOPageBuilder\Domain\Execution\Queue\Execution_Job_Dispatcher;
 use AIOPageBuilder\Domain\Execution\Queue\Execution_Queue_Service;
@@ -42,11 +44,27 @@ final class Execution_Provider implements Service_Provider_Interface {
 				$container->get( 'page_field_group_assignment_service' )
 			);
 		} );
+		$container->register( 'replace_page_job_service', function () use ( $container ): Replace_Page_Job_Service {
+			return new Replace_Page_Job_Service(
+				$container->get( 'page_template_repository' ),
+				$container->get( 'section_template_repository' ),
+				$container->get( 'section_render_context_builder' ),
+				$container->get( 'section_renderer_base' ),
+				$container->get( 'native_block_assembly_pipeline' ),
+				$container->get( 'page_instantiation_payload_builder' ),
+				$container->get( 'page_instantiator' ),
+				$container->get( 'page_field_group_assignment_service' )
+			);
+		} );
 		$container->register( 'execution_dispatcher', function () use ( $container ): Execution_Dispatcher {
 			$dispatcher = new Execution_Dispatcher();
 			$dispatcher->register_handler(
 				Execution_Action_Types::CREATE_PAGE,
 				new Create_Page_Handler( $container->get( 'create_page_job_service' ) )
+			);
+			$dispatcher->register_handler(
+				Execution_Action_Types::REPLACE_PAGE,
+				new Replace_Page_Handler( $container->get( 'replace_page_job_service' ) )
 			);
 			return $dispatcher;
 		} );

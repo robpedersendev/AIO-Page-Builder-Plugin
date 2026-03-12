@@ -195,9 +195,16 @@ final class Bulk_Executor {
 
 			$target_reference = array_merge( array( 'plan_item_id' => $item_id ), $payload );
 			$template_key = isset( $payload['template_key'] ) && is_string( $payload['template_key'] ) ? trim( $payload['template_key'] ) : '';
-			if ( $template_key !== '' && $action_type === Execution_Action_Types::CREATE_PAGE ) {
-				$target_reference['template_ref'] = array( 'type' => 'internal_key', 'value' => $template_key );
+			if ( $template_key === '' && isset( $payload['target_template_key'] ) && is_string( $payload['target_template_key'] ) ) {
+				$template_key = trim( $payload['target_template_key'] );
 			}
+			if ( $template_key !== '' && ( $action_type === Execution_Action_Types::CREATE_PAGE || $action_type === Execution_Action_Types::REPLACE_PAGE ) ) {
+				$target_reference['template_ref'] = array( 'type' => 'internal_key', 'value' => $template_key );
+				$target_reference['template_key']  = $template_key;
+			}
+
+			// * Spec §32.9, §41.2: pre-change snapshot required for existing-page mutation.
+			$snapshot_required = ( $action_type === Execution_Action_Types::REPLACE_PAGE );
 
 			$envelope = array(
 				Execution_Action_Contract::ENVELOPE_ACTION_ID        => $action_id,
@@ -213,6 +220,7 @@ final class Bulk_Executor {
 				Execution_Action_Contract::ENVELOPE_ACTOR_CONTEXT     => $actor_context,
 				Execution_Action_Contract::ENVELOPE_CREATED_AT       => $now,
 				'dependency_manifest' => $dependency_manifest,
+				'snapshot_required'  => $snapshot_required,
 			);
 			$envelopes[] = $envelope;
 		}

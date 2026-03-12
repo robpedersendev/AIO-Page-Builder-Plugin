@@ -87,18 +87,29 @@ final class Build_Plan_Item_Generator {
 				$omitted[] = Omitted_Recommendation_Report::entry( Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES, $i, self::REASON_INSUFFICIENT_DATA, 'Invalid action', $rec );
 				continue;
 			}
+			$payload = array(
+				'current_page_url'   => (string) ( $rec['current_page_url'] ?? '' ),
+				'current_page_title' => (string) ( $rec['current_page_title'] ?? '' ),
+				'action'             => (string) $action,
+				'reason'             => (string) ( $rec['reason'] ?? '' ),
+				'risk_level'         => (string) ( $rec['risk_level'] ?? 'low' ),
+				'confidence'         => (string) ( $rec[ Build_Plan_Draft_Schema::EPC_CONFIDENCE ] ?? 'medium' ),
+			);
+			if ( isset( $rec['target_page_title'] ) && is_string( $rec['target_page_title'] ) && trim( $rec['target_page_title'] ) !== '' ) {
+				$payload['target_page_title'] = trim( $rec['target_page_title'] );
+			}
+			if ( isset( $rec['target_slug'] ) && is_string( $rec['target_slug'] ) && trim( $rec['target_slug'] ) !== '' ) {
+				$payload['target_slug'] = trim( $rec['target_slug'] );
+			}
+			if ( isset( $rec['target_template_key'] ) && is_string( $rec['target_template_key'] ) && trim( $rec['target_template_key'] ) !== '' ) {
+				$payload['target_template_key'] = trim( $rec['target_template_key'] );
+				$payload['template_key']         = trim( $rec['target_template_key'] );
+			}
 			$item_id = $prefix . '_epc_' . $i;
 			$items[] = $this->build_item(
 				$item_id,
 				Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE,
-				array(
-					'current_page_url'   => (string) ( $rec['current_page_url'] ?? '' ),
-					'current_page_title' => (string) ( $rec['current_page_title'] ?? '' ),
-					'action'             => (string) $action,
-					'reason'             => (string) ( $rec['reason'] ?? '' ),
-					'risk_level'         => (string) ( $rec['risk_level'] ?? 'low' ),
-					'confidence'         => (string) ( $rec[ Build_Plan_Draft_Schema::EPC_CONFIDENCE ] ?? 'medium' ),
-				),
+				$payload,
 				Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES,
 				$i,
 				$rec
