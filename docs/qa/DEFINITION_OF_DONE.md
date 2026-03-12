@@ -2,6 +2,8 @@
 
 A feature or change is not complete until all of the following are satisfied. This document is designed to be explicit, reviewable, and reusable for future unrelated WordPress plugins.
 
+**Release and hardening gates:** For milestone exit criteria, issue severity, waiver rules, and release sign-off, see [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md).
+
 ## Code Quality
 
 - [ ] Code passes linting (e.g. `npm run lint:php` / phpcs).
