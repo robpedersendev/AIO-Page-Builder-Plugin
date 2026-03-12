@@ -82,3 +82,9 @@ Severity influences UI messaging, logging prominence, and (future) developer rep
 - **Resolver:** Container key `logger` resolves to the bootstrap logger. Container key `diagnostics` may expose logger and message helper for callers.
 
 No persistence assumptions are hard-coded. Local logging remains separable from future outbound reporting.
+
+---
+
+## 7. Relationship to reporting
+
+Outbound developer error reporting consumes **already-redacted** log data (e.g. `Error_Record`). The report payload links to the local log via a log reference (log_id). Payload shape, inclusion/exclusion rules, and redaction for reports are defined in **Reporting Payload Contract** (`docs/contracts/reporting-payload-contract.md`). Severity and category values in this contract align with developer reporting rules (spec §45.7, §46.7).
