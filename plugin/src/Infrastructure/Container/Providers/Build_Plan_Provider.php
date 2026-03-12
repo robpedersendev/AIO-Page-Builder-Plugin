@@ -16,6 +16,9 @@ use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Item_Generator;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Detail_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Updates_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Bulk_Action_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Detail_Builder;
+use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_UI_State_Builder;
@@ -64,12 +67,26 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 				$container->get( 'existing_page_update_bulk_action_service' )
 			);
 		} );
+		$container->register( 'new_page_creation_detail_builder', function (): New_Page_Creation_Detail_Builder {
+			return new New_Page_Creation_Detail_Builder();
+		} );
+		$container->register( 'new_page_creation_bulk_action_service', function () use ( $container ): New_Page_Creation_Bulk_Action_Service {
+			return new New_Page_Creation_Bulk_Action_Service( $container->get( 'build_plan_repository' ) );
+		} );
+		$container->register( 'new_page_creation_ui_service', function () use ( $container ): New_Page_Creation_UI_Service {
+			return new New_Page_Creation_UI_Service(
+				$container->get( 'build_plan_row_action_resolver' ),
+				$container->get( 'new_page_creation_detail_builder' ),
+				$container->get( 'new_page_creation_bulk_action_service' )
+			);
+		} );
 		$container->register( 'build_plan_ui_state_builder', function () use ( $container ): Build_Plan_UI_State_Builder {
 			return new Build_Plan_UI_State_Builder(
 				$container->get( 'build_plan_repository' ),
 				$container->get( 'build_plan_stepper_builder' ),
 				$container->get( 'build_plan_step_workspace_payload_builder' ),
-				$container->get( 'existing_page_updates_ui_service' )
+				$container->get( 'existing_page_updates_ui_service' ),
+				$container->get( 'new_page_creation_ui_service' )
 			);
 		} );
 	}

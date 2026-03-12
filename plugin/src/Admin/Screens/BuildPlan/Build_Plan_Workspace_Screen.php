@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Bulk_Action_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
@@ -43,14 +44,21 @@ final class Build_Plan_Workspace_Screen {
 	/** Nonce action for Step 1 approve/deny and bulk actions. */
 	public const NONCE_ACTION_STEP1_REVIEW = 'aio_build_plan_step1_review';
 
+	/** Nonce action for Step 2 build-intent and bulk actions. */
+	public const NONCE_ACTION_STEP2_REVIEW = 'aio_build_plan_step2_review';
+
 	/**
 	 * Renders workspace for the given plan_id. Exits with not-found message if plan missing.
-	 * Handles Step 1 approve/deny (GET) and bulk approve/deny (POST) before rendering.
+	 * Handles Step 2 then Step 1 actions before rendering.
 	 *
 	 * @param string $plan_id Plan ID from request.
 	 * @return void
 	 */
 	public function render( string $plan_id ): void {
+		$handled = $this->maybe_handle_step2_action( $plan_id );
+		if ( $handled ) {
+			return;
+		}
 		$handled = $this->maybe_handle_step1_action( $plan_id );
 		if ( $handled ) {
 			return;
@@ -128,6 +136,80 @@ final class Build_Plan_Workspace_Screen {
 			} else {
 				$service->deny_item( $plan_post_id, $item_id );
 			}
+			\wp_safe_redirect( $redirect_url );
+			exit;
+		}
+		return false;
+	}
+
+	/**
+	 * Handles Step 2 single approve (build-intent) or bulk Build All / Build Selected; redirects on success.
+	 *
+	 * @param string $plan_id Plan ID.
+	 * @return bool True if request was handled and redirect sent (exit); false to continue render.
+	 */
+	private function maybe_handle_step2_action( string $plan_id ): bool {
+		if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+			return false;
+		}
+		$plan_id = \sanitize_text_field( $plan_id );
+		if ( $plan_id === '' ) {
+			return false;
+		}
+		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
+
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
+			$action = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
+			$nonce  = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
+			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_STEP2_REVIEW ) ) {
+				return false;
+			}
+			if ( $action !== 'bulk_build_all_step2' && $action !== 'bulk_build_selected_step2' ) {
+				return false;
+			}
+			if ( ! $this->container || ! $this->container->has( 'new_page_creation_bulk_action_service' ) ) {
+				return false;
+			}
+			$state = $this->get_state( $plan_id );
+			if ( $state === null ) {
+				return false;
+			}
+			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
+			if ( $plan_post_id <= 0 ) {
+				return false;
+			}
+			$service = $this->container->get( 'new_page_creation_bulk_action_service' );
+			if ( $action === 'bulk_build_all_step2' ) {
+				$service->bulk_approve_all_eligible( $plan_post_id );
+			} else {
+				$selected = isset( $_POST['aio_step2_selected_ids'] ) && is_array( $_POST['aio_step2_selected_ids'] )
+					? array_map( 'sanitize_text_field', array_map( 'wp_unslash', $_POST['aio_step2_selected_ids'] ) )
+					: array();
+				$selected = array_values( array_filter( $selected ) );
+				$service->bulk_approve_selected( $plan_post_id, $selected );
+			}
+			\wp_safe_redirect( $redirect_url );
+			exit;
+		}
+
+		$get_step   = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
+		$get_action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
+		$item_id    = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
+		$nonce      = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
+		if ( $get_step === '2' && ( $get_action === 'approve_item' || $get_action === 'deny_item' ) && $item_id !== '' && \wp_verify_nonce( $nonce, self::NONCE_ACTION_STEP2_REVIEW ) ) {
+			$state = $this->get_state( $plan_id );
+			if ( $state === null ) {
+				return false;
+			}
+			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
+			if ( $plan_post_id <= 0 || ! $this->container || ! $this->container->has( 'new_page_creation_bulk_action_service' ) ) {
+				return false;
+			}
+			$service = $this->container->get( 'new_page_creation_bulk_action_service' );
+			if ( $get_action === 'approve_item' ) {
+				$service->approve_item( $plan_post_id, $item_id );
+			}
+			// Deny (reject) for Step 2: not implemented in bulk service; no-op to avoid broken link.
 			\wp_safe_redirect( $redirect_url );
 			exit;
 		}
@@ -361,6 +443,9 @@ final class Build_Plan_Workspace_Screen {
 		if ( $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ) {
 			$this->inject_step1_action_urls( $workspace, $plan_id );
 		}
+		if ( $step_type === Build_Plan_Schema::STEP_TYPE_NEW_PAGES ) {
+			$this->inject_step2_action_urls( $workspace, $plan_id );
+		}
 
 		$step_messages = $workspace['step_messages'] ?? array();
 		$list_payload  = array(
@@ -375,12 +460,15 @@ final class Build_Plan_Workspace_Screen {
 		$list_component    = new Step_Item_List_Component();
 		$detail_component  = new Detail_Panel_Component();
 		$step1_bulk_nonce  = $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ? \wp_nonce_field( self::NONCE_ACTION_STEP1_REVIEW, '_wpnonce', false, false ) : '';
+		$step2_bulk_nonce  = $step_type === Build_Plan_Schema::STEP_TYPE_NEW_PAGES ? \wp_nonce_field( self::NONCE_ACTION_STEP2_REVIEW, '_wpnonce', false, false ) : '';
 		?>
 		<div class="aio-step-workspace-actionable">
 			<?php $message_component->render_list( $step_messages ); ?>
 			<?php
 			if ( $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ) {
 				$this->render_step1_bulk_forms( $workspace['bulk_action_states'] ?? array(), $step1_bulk_nonce );
+			} elseif ( $step_type === Build_Plan_Schema::STEP_TYPE_NEW_PAGES ) {
+				$this->render_step2_bulk_forms( $workspace['bulk_action_states'] ?? array(), $step2_bulk_nonce, $selected_ids );
 			} else {
 				$bulk_component->render( $bulk_payload );
 			}
@@ -407,6 +495,33 @@ final class Build_Plan_Workspace_Screen {
 		$base = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
 		$nonce = \wp_create_nonce( self::NONCE_ACTION_STEP1_REVIEW );
 		$rows = &$workspace['step_list_rows'];
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $i => $row ) {
+				$item_id = (string) ( $row['item_id'] ?? '' );
+				if ( $item_id === '' ) {
+					continue;
+				}
+				$actions = isset( $row['row_actions'] ) && is_array( $row['row_actions'] ) ? $row['row_actions'] : array();
+				$workspace['step_list_rows'][ $i ]['row_actions'] = $this->add_urls_to_approve_deny( $actions, $item_id, $base, $nonce );
+			}
+		}
+		$detail = &$workspace['detail_panel'];
+		if ( is_array( $detail ) && isset( $detail['row_actions'] ) && is_array( $detail['row_actions'] ) ) {
+			$detail_item_id = (string) ( $detail['item_id'] ?? '' );
+			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
+		}
+	}
+
+	/**
+	 * Injects approve action URLs with nonce into Step 2 workspace payload (row_actions and detail_panel).
+	 *
+	 * @param array<string, mixed> $workspace Workspace payload (mutated).
+	 * @param string               $plan_id  Plan ID.
+	 */
+	private function inject_step2_action_urls( array &$workspace, string $plan_id ): void {
+		$base  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
+		$nonce = \wp_create_nonce( self::NONCE_ACTION_STEP2_REVIEW );
+		$rows  = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
 				$item_id = (string) ( $row['item_id'] ?? '' );
@@ -486,6 +601,58 @@ final class Build_Plan_Workspace_Screen {
 				</button>
 			</form>
 			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Clear selection', 'aio-page-builder' ); ?></button>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Renders Step 2 bulk action forms (Build All Pages, Build Selected Pages) and Clear selection link.
+	 *
+	 * @param array<string, array<string, mixed>> $bulk_states From workspace bulk_action_states.
+	 * @param string                              $nonce_html  Escaped nonce field HTML.
+	 * @param array<int, string>                  $selected_ids Currently selected item IDs from request.
+	 */
+	private function render_step2_bulk_forms( array $bulk_states, string $nonce_html, array $selected_ids ): void {
+		$build_all   = $bulk_states['apply_to_all_eligible'] ?? array();
+		$build_sel   = $bulk_states['apply_to_selected'] ?? array();
+		$clear_sel   = $bulk_states['clear_selection'] ?? array();
+		$build_all_enabled = ! empty( $build_all['enabled'] );
+		$build_sel_enabled = ! empty( $build_sel['enabled'] );
+		$clear_enabled    = ! empty( $clear_sel['enabled'] );
+		$build_all_count  = (int) ( $build_all['count_eligible'] ?? 0 );
+		$build_sel_count  = (int) ( $build_sel['count_selected'] ?? 0 );
+		$plan_id = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
+		$base_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
+		?>
+		<div class="aio-bulk-action-bar aio-step2-bulk-bar">
+			<form method="post" class="aio-bulk-form aio-bulk-build-all-step2" style="display:inline">
+				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<input type="hidden" name="aio_build_plan_action" value="bulk_build_all_step2" />
+				<button type="submit" class="button button-secondary" <?php echo $build_all_enabled ? '' : ' disabled="disabled"'; ?>>
+					<?php \esc_html_e( 'Build All Pages', 'aio-page-builder' ); ?>
+					<?php if ( $build_all_count > 0 ) : ?>
+						<span class="aio-bulk-count">(<?php echo (int) $build_all_count; ?>)</span>
+					<?php endif; ?>
+				</button>
+			</form>
+			<form method="post" class="aio-bulk-form aio-bulk-build-selected-step2" style="display:inline">
+				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<input type="hidden" name="aio_build_plan_action" value="bulk_build_selected_step2" />
+				<?php foreach ( $selected_ids as $id ) : ?>
+					<input type="hidden" name="aio_step2_selected_ids[]" value="<?php echo \esc_attr( $id ); ?>" />
+				<?php endforeach; ?>
+				<button type="submit" class="button button-secondary" <?php echo $build_sel_enabled ? '' : ' disabled="disabled"'; ?>>
+					<?php \esc_html_e( 'Build Selected Pages', 'aio-page-builder' ); ?>
+					<?php if ( $build_sel_count > 0 ) : ?>
+						<span class="aio-bulk-count">(<?php echo (int) $build_sel_count; ?>)</span>
+					<?php endif; ?>
+				</button>
+			</form>
+			<?php if ( $clear_enabled ) : ?>
+				<a href="<?php echo \esc_url( $base_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Clear selection', 'aio-page-builder' ); ?></a>
+			<?php else : ?>
+				<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Clear selection', 'aio-page-builder' ); ?></button>
+			<?php endif; ?>
 		</div>
 		<?php
 	}

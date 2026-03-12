@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Updates_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_UI_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 
 /**
@@ -35,16 +36,21 @@ final class Build_Plan_UI_State_Builder {
 	/** @var Existing_Page_Updates_UI_Service|null */
 	private $existing_page_updates_ui_service;
 
+	/** @var New_Page_Creation_UI_Service|null */
+	private $new_page_creation_ui_service;
+
 	public function __construct(
 		Build_Plan_Repository $repository,
 		Build_Plan_Stepper_Builder $stepper_builder,
 		?Step_Workspace_Payload_Builder $step_workspace_builder = null,
-		?Existing_Page_Updates_UI_Service $existing_page_updates_ui_service = null
+		?Existing_Page_Updates_UI_Service $existing_page_updates_ui_service = null,
+		?New_Page_Creation_UI_Service $new_page_creation_ui_service = null
 	) {
-		$this->repository                     = $repository;
-		$this->stepper_builder                 = $stepper_builder;
-		$this->step_workspace_builder         = $step_workspace_builder;
+		$this->repository                      = $repository;
+		$this->stepper_builder                  = $stepper_builder;
+		$this->step_workspace_builder          = $step_workspace_builder;
 		$this->existing_page_updates_ui_service = $existing_page_updates_ui_service;
+		$this->new_page_creation_ui_service     = $new_page_creation_ui_service;
 	}
 
 	/**
@@ -118,6 +124,9 @@ final class Build_Plan_UI_State_Builder {
 		$step_type  = is_array( $step ) ? (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' ) : '';
 		if ( $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES && $this->existing_page_updates_ui_service !== null ) {
 			return $this->existing_page_updates_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
+		}
+		if ( $step_type === Build_Plan_Schema::STEP_TYPE_NEW_PAGES && $this->new_page_creation_ui_service !== null ) {
+			return $this->new_page_creation_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
 		}
 		if ( $this->step_workspace_builder !== null ) {
 			return $this->step_workspace_builder->build( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );

@@ -119,7 +119,7 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository {
 		if ( ! $updated ) {
 			return false;
 		}
-		$definition['steps'][ $step_index ]['items'] = $items;
+		$definition[ Build_Plan_Schema::KEY_STEPS ][ $step_index ][ Build_Plan_Item_Schema::KEY_ITEMS ] = $items;
 		return $this->save_plan_definition( $post_id, $definition );
 	}
 
@@ -153,6 +153,55 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository {
 				$items[ $i ]['status'] = $to_status;
 				++$count;
 			}
+		}
+		if ( $count > 0 ) {
+			$definition[ Build_Plan_Schema::KEY_STEPS ][ $step_index ][ Build_Plan_Item_Schema::KEY_ITEMS ] = $items;
+			$this->save_plan_definition( $post_id, $definition );
+		}
+		return $count;
+	}
+
+	/**
+	 * Updates status for specific item IDs in a step (e.g. Build Selected for Step 2).
+	 * Only items with from_status are updated. Ids not found or wrong status are skipped.
+	 *
+	 * @param int    $post_id     Plan post ID.
+	 * @param int    $step_index  Step index.
+	 * @param array  $item_ids    Item ids to update (e.g. selected).
+	 * @param string $new_status  New status to set.
+	 * @param string $from_status Only change items with this status (default pending).
+	 * @return int Number of items updated.
+	 */
+	public function update_plan_items_by_ids( int $post_id, int $step_index, array $item_ids, string $new_status, string $from_status = 'pending' ): int {
+		if ( empty( $item_ids ) ) {
+			return 0;
+		}
+		$definition = $this->get_plan_definition( $post_id );
+		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+		$step       = $steps[ $step_index ] ?? null;
+		if ( ! is_array( $step ) ) {
+			return 0;
+		}
+		$items  = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+			: array();
+		$id_set = array_flip( array_map( 'strval', $item_ids ) );
+		$count  = 0;
+		foreach ( $items as $i => $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			$id = (string) ( $item['item_id'] ?? '' );
+			if ( $id === '' || ! isset( $id_set[ $id ] ) ) {
+				continue;
+			}
+			if ( (string) ( $item['status'] ?? '' ) !== $from_status ) {
+				continue;
+			}
+			$items[ $i ]['status'] = $new_status;
+			++$count;
 		}
 		if ( $count > 0 ) {
 			$definition[ Build_Plan_Schema::KEY_STEPS ][ $step_index ][ Build_Plan_Item_Schema::KEY_ITEMS ] = $items;
