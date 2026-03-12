@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
+use AIOPageBuilder\Domain\Reporting\Logs\Log_Export_Service;
 use AIOPageBuilder\Domain\Reporting\UI\Logs_Monitoring_State_Builder;
 use AIOPageBuilder\Domain\Reporting\UI\Reporting_Health_Summary_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -47,8 +48,13 @@ final class Queue_Logs_Screen {
 	/** @var Service_Container|null */
 	private $container;
 
+	private const NONCE_EXPORT_LOGS = 'aio_export_logs';
+	private const NONCE_DOWNLOAD_LOG = 'aio_download_log_export';
+
 	public function __construct( ?Service_Container $container = null ) {
 		$this->container = $container;
+		\add_action( 'admin_post_aio_export_logs', array( $this, 'handle_export_logs' ), 10 );
+		\add_action( 'admin_post_aio_download_log_export', array( $this, 'handle_download_log_export' ), 10 );
 	}
 
 	public function get_title(): string {
@@ -73,6 +79,7 @@ final class Queue_Logs_Screen {
 		$health = ( new Reporting_Health_Summary_Builder() )->build();
 		$this->render_header( $tab );
 		$this->render_reporting_health( $health );
+		$this->render_log_export_section( $state );
 		$this->render_tab_nav( $tab );
 		$this->render_tab_content( $tab, $state, $health );
 	}
@@ -123,6 +130,53 @@ final class Queue_Logs_Screen {
 				<p class="aio-reporting-health-failures"><?php echo \esc_html( (string) ( $health['recent_failures_count'] ?? 0 ) . ' ' . \__( 'recent delivery failure(s).', 'aio-page-builder' ) ); ?></p>
 			<?php endif; ?>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Renders log export form for authorized users (spec §48.10). Only when aio_export_data.
+	 *
+	 * @param array<string, mixed> $state Full state including log_export.exportable_log_types.
+	 */
+	private function render_log_export_section( array $state ): void {
+		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) ) {
+			return;
+		}
+		$log_export = $state['log_export'] ?? array();
+		$types      = $log_export['exportable_log_types'] ?? array();
+		$status     = isset( $_GET['aio_log_export'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_log_export'] ) ) : '';
+		$file       = isset( $_GET['aio_log_file'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_log_file'] ) ) : '';
+		if ( $status === 'success' && $file !== '' ) {
+			$dl_url = \wp_nonce_url( \add_query_arg( array( 'action' => 'aio_download_log_export', 'file' => $file ), \admin_url( 'admin-post.php' ) ), self::NONCE_DOWNLOAD_LOG );
+			echo '<div class="notice notice-success is-dismissible"><p>' . \esc_html__( 'Log export completed.', 'aio-page-builder' ) . ' <a href="' . \esc_url( $dl_url ) . '">' . \esc_html__( 'Download', 'aio-page-builder' ) . '</a></p></div>';
+		} elseif ( $status === 'error' ) {
+			$msg = isset( $_GET['aio_log_message'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_log_message'] ) ) : __( 'Export failed.', 'aio-page-builder' );
+			echo '<div class="notice notice-error is-dismissible"><p>' . \esc_html( $msg ) . '</p></div>';
+		}
+		?>
+		<section class="aio-log-export" aria-labelledby="aio-log-export-heading">
+			<h2 id="aio-log-export-heading"><?php \esc_html_e( 'Export logs', 'aio-page-builder' ); ?></h2>
+			<p class="description"><?php \esc_html_e( 'Export selected log categories in structured JSON format. Data is redacted and filtered. Authorized use only.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="aio_export_logs" />
+				<?php \wp_nonce_field( self::NONCE_EXPORT_LOGS ); ?>
+				<fieldset class="aio-log-export-types">
+					<legend><?php \esc_html_e( 'Log types', 'aio-page-builder' ); ?></legend>
+					<?php foreach ( $types as $opt ) : ?>
+						<label><input type="checkbox" name="log_types[]" value="<?php echo \esc_attr( $opt['value'] ?? '' ); ?>" /> <?php echo \esc_html( $opt['label'] ?? '' ); ?></label><br />
+					<?php endforeach; ?>
+				</fieldset>
+				<p>
+					<label for="aio-log-date-from"><?php \esc_html_e( 'Date from (optional)', 'aio-page-builder' ); ?></label>
+					<input type="date" id="aio-log-date-from" name="date_from" />
+					<label for="aio-log-date-to"><?php \esc_html_e( 'Date to (optional)', 'aio-page-builder' ); ?></label>
+					<input type="date" id="aio-log-date-to" name="date_to" />
+				</p>
+				<p class="submit">
+					<button type="submit" class="button button-primary"><?php \esc_html_e( 'Export logs', 'aio-page-builder' ); ?></button>
+				</p>
+			</form>
+		</section>
 		<?php
 	}
 
@@ -380,5 +434,103 @@ final class Queue_Logs_Screen {
 			</tbody>
 		</table>
 		<?php
+	}
+
+	/**
+	 * Handles log export request. Nonce and capability checked; redirects with result.
+	 *
+	 * @return void
+	 */
+	public function handle_export_logs(): void {
+		if ( ! isset( $_POST['_wpnonce'] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['_wpnonce'] ) ), self::NONCE_EXPORT_LOGS ) ) {
+			\wp_safe_redirect( $this->logs_url( 'error', __( 'Security check failed.', 'aio-page-builder' ) ) );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) ) {
+			\wp_safe_redirect( $this->logs_url( 'error', __( 'You do not have permission to export logs.', 'aio-page-builder' ) ) );
+			exit;
+		}
+		$log_types = array();
+		if ( ! empty( $_POST['log_types'] ) && is_array( $_POST['log_types'] ) ) {
+			foreach ( $_POST['log_types'] as $t ) {
+				$v = \sanitize_text_field( \wp_unslash( $t ) );
+				if ( in_array( $v, Log_Export_Service::ALLOWED_LOG_TYPES, true ) ) {
+					$log_types[] = $v;
+				}
+			}
+		}
+		$filters = array();
+		if ( ! empty( $_POST['date_from'] ) && is_string( $_POST['date_from'] ) ) {
+			$filters['date_from'] = \sanitize_text_field( \wp_unslash( $_POST['date_from'] ) );
+		}
+		if ( ! empty( $_POST['date_to'] ) && is_string( $_POST['date_to'] ) ) {
+			$filters['date_to'] = \sanitize_text_field( \wp_unslash( $_POST['date_to'] ) );
+		}
+		$service = $this->get_log_export_service();
+		$result  = $service->export( $log_types, $filters );
+		if ( $result->is_success() ) {
+			\wp_safe_redirect( $this->logs_url( 'success', '', $result->get_export_file_reference() ) );
+		} else {
+			\wp_safe_redirect( $this->logs_url( 'error', $result->get_message() ) );
+		}
+		exit;
+	}
+
+	/**
+	 * Serves log export file download. Nonce and capability checked; filename validated.
+	 *
+	 * @return void
+	 */
+	public function handle_download_log_export(): void {
+		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ), self::NONCE_DOWNLOAD_LOG ) ) {
+			\wp_die( \esc_html__( 'Invalid request.', 'aio-page-builder' ), 403 );
+		}
+		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) ) {
+			\wp_die( \esc_html__( 'You do not have permission to download log exports.', 'aio-page-builder' ), 403 );
+		}
+		$file = isset( $_GET['file'] ) ? \sanitize_file_name( \wp_unslash( $_GET['file'] ) ) : '';
+		if ( $file === '' || preg_match( '#^aio-log-export-\d{8}-\d{6}\.json$#', $file ) !== 1 ) {
+			\wp_die( \esc_html__( 'Invalid file.', 'aio-page-builder' ), 400 );
+		}
+		if ( ! $this->container || ! $this->container->has( 'plugin_path_manager' ) ) {
+			\wp_die( \esc_html__( 'Service unavailable.', 'aio-page-builder' ), 503 );
+		}
+		$path_manager = $this->container->get( 'plugin_path_manager' );
+		$exports_dir  = $path_manager->get_exports_dir();
+		if ( $exports_dir === '' ) {
+			\wp_die( \esc_html__( 'File not found.', 'aio-page-builder' ), 404 );
+		}
+		$path = rtrim( $exports_dir, '/\\' ) . '/' . $file;
+		if ( ! is_file( $path ) || ! is_readable( $path ) ) {
+			\wp_die( \esc_html__( 'File not found.', 'aio-page-builder' ), 404 );
+		}
+		\header( 'Content-Type: application/json' );
+		\header( 'Content-Disposition: attachment; filename="' . \esc_attr( $file ) . '"' );
+		\header( 'Content-Length: ' . (string) filesize( $path ) );
+		readfile( $path );
+		exit;
+	}
+
+	private function logs_url( string $status, string $message = '', string $file = '' ): string {
+		$args = array( 'page' => self::SLUG, 'aio_log_export' => $status );
+		if ( $message !== '' ) {
+			$args['aio_log_message'] = $message;
+		}
+		if ( $file !== '' ) {
+			$args['aio_log_file'] = $file;
+		}
+		return \add_query_arg( $args, \admin_url( 'admin.php' ) );
+	}
+
+	private function get_log_export_service(): Log_Export_Service {
+		if ( $this->container && $this->container->has( 'log_export_service' ) ) {
+			return $this->container->get( 'log_export_service' );
+		}
+		$path_manager = $this->container && $this->container->has( 'plugin_path_manager' ) ? $this->container->get( 'plugin_path_manager' ) : new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager();
+		$redaction    = $this->container && $this->container->has( 'reporting_redaction_service' ) ? $this->container->get( 'reporting_redaction_service' ) : new \AIOPageBuilder\Domain\Reporting\Errors\Reporting_Redaction_Service();
+		$logger       = $this->container && $this->container->has( 'logger' ) ? $this->container->get( 'logger' ) : null;
+		$job_repo     = $this->container && $this->container->has( 'job_queue_repository' ) ? $this->container->get( 'job_queue_repository' ) : null;
+		$ai_repo      = $this->container && $this->container->has( 'ai_run_repository' ) ? $this->container->get( 'ai_run_repository' ) : null;
+		return new Log_Export_Service( $path_manager, $redaction, $logger, $job_repo, $ai_repo );
 	}
 }

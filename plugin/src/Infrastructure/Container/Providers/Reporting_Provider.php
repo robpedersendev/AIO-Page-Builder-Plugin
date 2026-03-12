@@ -13,10 +13,12 @@ defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Heartbeat_Scheduler.php';
 
+use AIOPageBuilder\Domain\Reporting\Errors\Reporting_Redaction_Service;
 use AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler;
 use AIOPageBuilder\Domain\Reporting\Install\Install_Notification_Service;
 use AIOPageBuilder\Domain\Reporting\Install\Install_Notification_Transport_Interface;
 use AIOPageBuilder\Domain\Reporting\Install\Wp_Mail_Install_Transport;
+use AIOPageBuilder\Domain\Reporting\Logs\Log_Export_Service;
 use AIOPageBuilder\Domain\Reporting\UI\Privacy_Settings_State_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
@@ -42,6 +44,21 @@ final class Reporting_Provider implements Service_Provider_Interface {
 		Heartbeat_Scheduler::register_hook();
 
 		$this->register_developer_error_reporting( $container );
+
+		$logs_dir = __DIR__ . '/../../../Domain/Reporting/Logs';
+		require_once $logs_dir . '/Log_Export_Result.php';
+		require_once $logs_dir . '/Log_Export_Service.php';
+
+		$container->register( 'log_export_service', function () use ( $container ): Log_Export_Service {
+			$redaction = new Reporting_Redaction_Service();
+			return new Log_Export_Service(
+				$container->get( 'plugin_path_manager' ),
+				$redaction,
+				$container->has( 'logger' ) ? $container->get( 'logger' ) : null,
+				$container->has( 'job_queue_repository' ) ? $container->get( 'job_queue_repository' ) : null,
+				$container->has( 'ai_run_repository' ) ? $container->get( 'ai_run_repository' ) : null
+			);
+		} );
 
 		$container->register( 'privacy_settings_state_builder', function () use ( $container ): Privacy_Settings_State_Builder {
 			return new Privacy_Settings_State_Builder( $container->get( 'settings' ) );

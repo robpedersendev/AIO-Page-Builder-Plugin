@@ -15,6 +15,7 @@ namespace AIOPageBuilder\Domain\Reporting\UI;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Reporting\Contracts\Reporting_Event_Types;
+use AIOPageBuilder\Domain\Reporting\Logs\Log_Export_Service;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
@@ -48,7 +49,8 @@ final class Logs_Monitoring_State_Builder {
 	 *   ai_runs: list<array{run_id: string, status: string, created_at: string}>,
 	 *   reporting_logs: list<array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}>,
 	 *   import_export_logs: list<array{id: string, type: string, created_at: string, status: string}>,
-	 *   critical_errors: list<array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}>
+	 *   critical_errors: list<array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}>,
+	 *   log_export: array{exportable_log_types: list<array{value: string, label: string}>}
 	 * }
 	 */
 	public function build(): array {
@@ -59,6 +61,24 @@ final class Logs_Monitoring_State_Builder {
 			'reporting_logs'     => $this->build_reporting_logs(),
 			'import_export_logs' => $this->build_import_export_logs(),
 			'critical_errors'    => $this->build_critical_errors(),
+			'log_export'         => $this->build_log_export_options(),
+		);
+	}
+
+	/**
+	 * Options for log export (spec §48.10). Used by Queue & Logs screen for export form.
+	 *
+	 * @return array{exportable_log_types: list<array{value: string, label: string}>}
+	 */
+	public function build_log_export_options(): array {
+		return array(
+			'exportable_log_types' => array(
+				array( 'value' => Log_Export_Service::LOG_TYPE_QUEUE, 'label' => __( 'Queue', 'aio-page-builder' ) ),
+				array( 'value' => Log_Export_Service::LOG_TYPE_EXECUTION, 'label' => __( 'Execution logs', 'aio-page-builder' ) ),
+				array( 'value' => Log_Export_Service::LOG_TYPE_REPORTING, 'label' => __( 'Reporting logs', 'aio-page-builder' ) ),
+				array( 'value' => Log_Export_Service::LOG_TYPE_CRITICAL, 'label' => __( 'Critical errors', 'aio-page-builder' ) ),
+				array( 'value' => Log_Export_Service::LOG_TYPE_AI_RUNS, 'label' => __( 'AI runs', 'aio-page-builder' ) ),
+			),
 		);
 	}
 
