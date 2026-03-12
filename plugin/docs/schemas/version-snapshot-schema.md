@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for version snapshot objects (spec §10.8, §14.8, §58.4–58.5).  
 **Governs:** Snapshot scope types, root fields, preserved object references, version metadata, provenance, retention, and lifecycle before snapshot capture services are implemented.  
-**Related:** object-model-schema.md (§3.8 Version Snapshot), composition-validation-state-machine.md (composition registry_snapshot_ref_at_creation); ai-input-artifact-schema.md (input artifact registry section may reference registry version snapshots).
+**Related:** object-model-schema.md (§3.8 Version Snapshot), composition-validation-state-machine.md (composition registry_snapshot_ref_at_creation); ai-input-artifact-schema.md (input artifact registry section may reference registry version snapshots). **Distinct from:** operational-snapshot-schema.md (execution/diff/rollback pre-change and post-change snapshots for pages, menus, tokens, etc.; see §18 of this doc).
 
 ---
 
@@ -19,6 +19,8 @@ The **Version Snapshot** object represents a **preserved record of a relevant sy
 - **Prompt-pack snapshots** — (Future) Prompt pack state at a version; referenced by AI runs.
 
 No secrets may be embedded in snapshot bodies. Payload references must avoid raw secret-bearing content. Snapshots may include operationally sensitive history and remain **admin-governed** later.
+
+**Operational snapshots** (see **operational-snapshot-schema.md**) are a separate schema for execution, diff, and rollback: they capture pre-change and post-change state for pages, page metadata, hierarchy, menus, token sets, and Build Plan transitions. Version snapshots (this document) are for registry, schema, and build-context state; operational snapshots are for before/after execution state and rollback-capability markers.
 
 ---
 

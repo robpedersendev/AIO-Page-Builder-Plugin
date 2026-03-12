@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for Build Plan objects (spec §10.4, §30.1–30.5, §30.11–30.12, §59.9).  
 **Governs:** Root plan identity, source references, step grouping, item records, dependency/blocking fields, warning/confidence representation, approval/denial and completion semantics, and historical retention before any Build Plan generation or UI is implemented.  
-**Related:** object-model-schema.md (§3.4 Build Plan), ai-output-validation-contract.md (normalized output handoff), Build_Plan_Draft_Schema (normalized AI output shape), **build-plan-state-machine.md** (status model, step/item statuses, transitions, completion and denial logic).
+**Related:** object-model-schema.md (§3.4 Build Plan), ai-output-validation-contract.md (normalized output handoff), Build_Plan_Draft_Schema (normalized AI output shape), **build-plan-state-machine.md** (status model, step/item statuses, transitions, completion and denial logic). **Execution/rollback state:** operational-snapshot-schema.md defines pre-change and post-change snapshots that may reference Build Plans (build_plan_ref, plan_item_ref) and Build Plan state transitions (object_family build_plan_transition).
 
 ---
 
