@@ -59,6 +59,7 @@ final class Module_Registrar {
 	 * Diagnostics_Provider registers logger and diagnostics helper (see diagnostics-contract.md).
 	 * Crawler_Provider registers snapshot, discovery, fetch, classification, extraction, and recrawl comparison (spec §24.12–24.17). Crawler admin screens (Sessions, Comparison) are registered in Admin_Menu and documented in crawler-admin-screen-contract.md.
 	 * Queue & Logs screen (Queue_Logs_Screen) and reporting monitoring are registered in Admin_Menu; state from Logs_Monitoring_State_Builder and Reporting_Health_Summary_Builder (spec §49.11).
+	 * ExportRestore_Provider registers export_generator, support_package_generator (spec §59.15), import validator, restore pipeline, and import/export state builder.
 	 * Admin menu and screen routing are registered separately in Plugin::register_admin_menu().
 	 *
 	 * @return void

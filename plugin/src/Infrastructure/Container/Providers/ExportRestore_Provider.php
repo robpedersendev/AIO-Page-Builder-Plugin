@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Generator;
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Manifest_Builder;
+use AIOPageBuilder\Domain\ExportRestore\Export\Support_Package_Generator;
 use AIOPageBuilder\Domain\ExportRestore\UI\Import_Export_State_Builder;
 use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Cleanup_Service;
 use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Export_Prompt_Service;
@@ -63,6 +64,19 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 			global $wpdb;
 			return new Export_Token_Set_Reader( $wpdb );
 		} );
+		$container->register( 'support_package_generator', function () use ( $container ): Support_Package_Generator {
+			return new Support_Package_Generator(
+				$container->get( 'plugin_path_manager' ),
+				$container->get( 'settings' ),
+				$container->get( 'profile_store' ),
+				$container->get( 'registry_export_serializer' ),
+				$container->get( 'build_plan_repository' ),
+				$container->get( 'export_token_set_reader' ),
+				$container->get( 'export_manifest_builder' ),
+				$container->get( 'export_zip_packager' ),
+				$container->has( 'logger' ) ? $container->get( 'logger' ) : null
+			);
+		} );
 		$container->register( 'export_generator', function () use ( $container ): Export_Generator {
 			return new Export_Generator(
 				$container->get( 'plugin_path_manager' ),
@@ -73,7 +87,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'export_token_set_reader' ),
 				$container->get( 'export_manifest_builder' ),
 				$container->get( 'export_zip_packager' ),
-				$container->has( 'logger' ) ? $container->get( 'logger' ) : null
+				$container->has( 'logger' ) ? $container->get( 'logger' ) : null,
+				$container->get( 'support_package_generator' )
 			);
 		} );
 		$container->register( 'uninstall_cleanup_service', function (): Uninstall_Cleanup_Service {

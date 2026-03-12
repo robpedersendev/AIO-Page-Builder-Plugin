@@ -58,6 +58,9 @@ final class Export_Generator {
 	/** @var Logger_Interface|null */
 	private ?Logger_Interface $logger;
 
+	/** @var Support_Package_Generator|null When set, support_bundle mode delegates to this (spec §59.15). */
+	private ?Support_Package_Generator $support_package_generator;
+
 	public function __construct(
 		Plugin_Path_Manager $path_manager,
 		Settings_Service $settings,
@@ -67,17 +70,19 @@ final class Export_Generator {
 		Export_Token_Set_Reader $token_set_reader,
 		Export_Manifest_Builder $manifest_builder,
 		Export_Zip_Packager $packager,
-		?Logger_Interface $logger = null
+		?Logger_Interface $logger = null,
+		?Support_Package_Generator $support_package_generator = null
 	) {
-		$this->path_manager        = $path_manager;
-		$this->settings            = $settings;
-		$this->profile_store       = $profile_store;
-		$this->registry_serializer = $registry_serializer;
-		$this->plan_repository     = $plan_repository;
-		$this->token_set_reader    = $token_set_reader;
-		$this->manifest_builder    = $manifest_builder;
-		$this->packager            = $packager;
-		$this->logger              = $logger;
+		$this->path_manager               = $path_manager;
+		$this->settings                   = $settings;
+		$this->profile_store              = $profile_store;
+		$this->registry_serializer        = $registry_serializer;
+		$this->plan_repository            = $plan_repository;
+		$this->token_set_reader           = $token_set_reader;
+		$this->manifest_builder           = $manifest_builder;
+		$this->packager                   = $packager;
+		$this->logger                     = $logger;
+		$this->support_package_generator  = $support_package_generator;
 	}
 
 	/**
@@ -91,6 +96,28 @@ final class Export_Generator {
 	public function generate( string $mode, array $optional_included = array() ): Export_Result {
 		if ( ! Export_Mode_Keys::is_valid( $mode ) ) {
 			return Export_Result::failure( 'Invalid export mode.', $mode, array(), array() );
+		}
+
+		if ( $mode === Export_Mode_Keys::SUPPORT_BUNDLE && $this->support_package_generator !== null ) {
+			$sp_result = $this->support_package_generator->generate( $optional_included );
+			return $sp_result->is_success()
+				? Export_Result::success(
+					$sp_result->get_package_path(),
+					Export_Mode_Keys::SUPPORT_BUNDLE,
+					$sp_result->get_included_support_categories(),
+					$sp_result->get_excluded_categories(),
+					$sp_result->get_checksum_count(),
+					$sp_result->get_package_size_bytes(),
+					$sp_result->get_package_filename(),
+					$sp_result->get_generation_log_reference()
+				)
+				: Export_Result::failure(
+					$sp_result->get_message(),
+					Export_Mode_Keys::SUPPORT_BUNDLE,
+					$sp_result->get_included_support_categories(),
+					$sp_result->get_excluded_categories(),
+					$sp_result->get_generation_log_reference()
+				);
 		}
 
 		$matrix = $this->get_categories_for_mode( $mode );
