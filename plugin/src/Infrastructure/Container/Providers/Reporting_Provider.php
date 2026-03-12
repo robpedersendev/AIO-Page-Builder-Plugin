@@ -21,7 +21,7 @@ use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Registers install notification service and transport for use by lifecycle or diagnostics.
+ * Registers install notification, heartbeat, and developer error reporting (spec §46, §59.12).
  */
 final class Reporting_Provider implements Service_Provider_Interface {
 
@@ -39,5 +39,34 @@ final class Reporting_Provider implements Service_Provider_Interface {
 		} );
 
 		Heartbeat_Scheduler::register_hook();
+
+		$this->register_developer_error_reporting( $container );
+	}
+
+	/**
+	 * Registers developer error reporting service and dependencies.
+	 *
+	 * @param Service_Container $container
+	 * @return void
+	 */
+	private function register_developer_error_reporting( Service_Container $container ): void {
+		$errors_dir = __DIR__ . '/../../../Domain/Reporting/Errors';
+		require_once $errors_dir . '/Developer_Report_Result.php';
+		require_once $errors_dir . '/Reporting_Redaction_Service.php';
+		require_once $errors_dir . '/Reporting_Eligibility_Evaluator.php';
+		require_once $errors_dir . '/Developer_Error_Transport_Interface.php';
+		require_once $errors_dir . '/Wp_Mail_Developer_Error_Transport.php';
+		require_once $errors_dir . '/Developer_Error_Reporting_Service.php';
+
+		$container->register( 'developer_error_transport', function (): \AIOPageBuilder\Domain\Reporting\Errors\Developer_Error_Transport_Interface {
+			return new \AIOPageBuilder\Domain\Reporting\Errors\Wp_Mail_Developer_Error_Transport();
+		} );
+
+		$container->register( 'developer_error_reporting_service', function () use ( $container ): \AIOPageBuilder\Domain\Reporting\Errors\Developer_Error_Reporting_Service {
+			$transport = $container->has( 'developer_error_transport' )
+				? $container->get( 'developer_error_transport' )
+				: null;
+			return new \AIOPageBuilder\Domain\Reporting\Errors\Developer_Error_Reporting_Service( null, null, $transport );
+		} );
 	}
 }
