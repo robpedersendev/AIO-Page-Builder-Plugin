@@ -87,6 +87,9 @@
 |----------|---------|
 | [demo-review-walkthrough.md](demo-review-walkthrough.md) | Script or walkthrough outline for formal review/demo to Product Owner (§60.7). QA review for release milestone. |
 | [sign-off-checklist.md](sign-off-checklist.md) | Role-by-role approval (Product Owner, Technical Lead, QA, Security where applicable); gate status (blocked/waived/approved); waiver references. |
+| [release-candidate-packaging-checklist.md](release-candidate-packaging-checklist.md) | Production ZIP build and validation; required files, exclusions, installability. |
+| [private-distribution-handoff.md](private-distribution-handoff.md) | Handoff checklist for private delivery modes (direct ZIP, manual deploy, private update, environment-specific). |
+| [final-approval-runbook.md](final-approval-runbook.md) | Go/no-go procedure before packaging and handoff; references sign-off and release notes. |
 
 ---
 

@@ -111,6 +111,7 @@ See [known-risk-register.md](known-risk-register.md) for internal risk register 
 | Reporting exception | [REPORTING_EXCEPTION.md](../standards/REPORTING_EXCEPTION.md) |
 | Portability and uninstall | [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md) |
 | Admin and support guidance | [admin-operator-guide.md](../guides/admin-operator-guide.md), [support-triage-guide.md](../guides/support-triage-guide.md) |
+| Release packaging and approval (internal) | [release-candidate-packaging-checklist.md](release-candidate-packaging-checklist.md), [final-approval-runbook.md](final-approval-runbook.md), [private-distribution-handoff.md](private-distribution-handoff.md) |
 
 ---
 
