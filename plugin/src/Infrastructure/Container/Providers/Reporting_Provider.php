@@ -17,11 +17,12 @@ use AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler;
 use AIOPageBuilder\Domain\Reporting\Install\Install_Notification_Service;
 use AIOPageBuilder\Domain\Reporting\Install\Install_Notification_Transport_Interface;
 use AIOPageBuilder\Domain\Reporting\Install\Wp_Mail_Install_Transport;
+use AIOPageBuilder\Domain\Reporting\UI\Privacy_Settings_State_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Registers install notification, heartbeat, and developer error reporting (spec §46, §59.12).
+ * Registers install notification, heartbeat, developer error reporting, and Privacy & Settings screen state builder (spec §46, §49.12, §59.12).
  */
 final class Reporting_Provider implements Service_Provider_Interface {
 
@@ -41,6 +42,10 @@ final class Reporting_Provider implements Service_Provider_Interface {
 		Heartbeat_Scheduler::register_hook();
 
 		$this->register_developer_error_reporting( $container );
+
+		$container->register( 'privacy_settings_state_builder', function () use ( $container ): Privacy_Settings_State_Builder {
+			return new Privacy_Settings_State_Builder( $container->get( 'settings' ) );
+		} );
 	}
 
 	/**

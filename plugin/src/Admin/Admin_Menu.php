@@ -21,7 +21,11 @@ use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
+use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
+use AIOPageBuilder\Domain\FormProvider\Form_Template_Seeder;
+use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
@@ -45,6 +49,8 @@ final class Admin_Menu {
 	 * @return void
 	 */
 	public function register(): void {
+		\add_action( 'admin_post_aio_seed_form_templates', array( $this, 'handle_seed_form_templates' ), 10 );
+
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
 		$diagnostics = new Diagnostics_Screen();
@@ -55,6 +61,7 @@ final class Admin_Menu {
 		$ai_providers       = new AI_Providers_Screen( $this->container );
 		$build_plans        = new Build_Plans_Screen( $this->container );
 		$queue_logs         = new Queue_Logs_Screen( $this->container );
+		$privacy_reporting  = new Privacy_Reporting_Settings_Screen( $this->container );
 
 		add_menu_page(
 			__( 'AIO Page Builder', 'aio-page-builder' ),
@@ -155,5 +162,46 @@ final class Admin_Menu {
 			Queue_Logs_Screen::SLUG,
 			array( $queue_logs, 'render' )
 		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$privacy_reporting->get_title(),
+			__( 'Privacy, Reporting & Settings', 'aio-page-builder' ),
+			$privacy_reporting->get_capability(),
+			Privacy_Reporting_Settings_Screen::SLUG,
+			array( $privacy_reporting, 'render' )
+		);
+	}
+
+	/**
+	 * Handles admin-post request to seed form section and request page template (form-provider-integration-contract).
+	 * Verifies nonce and capability; redirects back to Settings with result.
+	 *
+	 * @return void
+	 */
+	public function handle_seed_form_templates(): void {
+		if ( ! isset( $_POST['aio_seed_form_templates_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_form_templates_nonce'] ) ), 'aio_seed_form_templates' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
+			exit;
+		}
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
+			exit;
+		}
+		if ( ! $this->container instanceof Service_Container ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
+			exit;
+		}
+		$section_repo = $this->container->get( 'section_template_repository' );
+		$page_repo    = $this->container->get( 'page_template_repository' );
+		if ( ! $section_repo instanceof Section_Template_Repository || ! $page_repo instanceof Page_Template_Repository ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
+			exit;
+		}
+		$result = Form_Template_Seeder::run( $section_repo, $page_repo );
+		$query  = $result['success'] ? 'aio_seed_result=success' : 'aio_seed_result=error';
+		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
+		exit;
 	}
 }

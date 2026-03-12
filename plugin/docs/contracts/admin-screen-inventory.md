@@ -73,6 +73,7 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 | (detail via `run_id`) | AI Run Detail | Domain: AI | `aio_view_ai_runs` | View run metadata (redacted), artifact summary; raw content requires `aio_view_sensitive_diagnostics` | Implemented |
 | `aio-page-builder-ai-providers` | AI Providers | Domain: AI | `aio_manage_ai_providers` | Provider list; credential status (redacted); model defaults; connection test result; last successful use; disclosure (external transfer/cost); Test connection / Update credential placeholders; link to AI Runs | Implemented |
 | `aio-page-builder-logs` | Logs | Infrastructure / Reporting | TBD | View operational logs | Not implemented |
+| `aio-page-builder-privacy-reporting` | Privacy, Reporting & Settings | Domain: Reporting | `aio_manage_reporting_and_privacy` | Reporting disclosure (mandatory); retention state; uninstall/export behavior; environment & version summary; report destination (no secrets); privacy-policy helper text; diagnostics verbosity only if allowed | Implemented |
 | `aio-page-builder-reporting` | Reporting | Domain: Reporting | TBD | Reporting disclosure, heartbeat status | Not implemented |
 | `aio-page-builder-export-restore` | Export & Restore | Domain: ExportRestore | TBD | Export backup, restore, survivability | Not implemented |
 

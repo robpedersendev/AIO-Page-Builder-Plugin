@@ -67,6 +67,7 @@ require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Repositori
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Storage_Services_Provider.php';
 require_once $bootstrap_dir . '/../Domain/FormProvider/Form_Provider_Registry.php';
 require_once $bootstrap_dir . '/../Domain/FormProvider/Form_Integration_Definitions.php';
+require_once $bootstrap_dir . '/../Domain/FormProvider/Form_Template_Seeder.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Bundle_Schema.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Mode_Keys.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Result.php';
@@ -103,7 +104,9 @@ require_once $bootstrap_dir . '/../Admin/Screens/Crawler/Crawler_Comparison_Scre
 require_once $bootstrap_dir . '/../Domain/Reporting/Contracts/Reporting_Event_Types.php';
 require_once $bootstrap_dir . '/../Domain/Reporting/UI/Reporting_Health_Summary_Builder.php';
 require_once $bootstrap_dir . '/../Domain/Reporting/UI/Logs_Monitoring_State_Builder.php';
+require_once $bootstrap_dir . '/../Domain/Reporting/UI/Privacy_Settings_State_Builder.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Logs/Queue_Logs_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Settings/Privacy_Reporting_Settings_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Admin_Menu.php';
 
 /**
