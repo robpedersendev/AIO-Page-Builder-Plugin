@@ -42,13 +42,17 @@ final class Single_Action_Executor {
 	/** @var callable(): void Lock release. */
 	private $lock_release;
 
+	/** @var callable(array, array): void|null Optional post-success snapshot capture (envelope, handler_result). */
+	private $post_capture_snapshot;
+
 	public function __construct(
 		Execution_Dispatcher $dispatcher,
 		Plan_State_For_Execution_Interface $plan_state,
 		?callable $capability_checker = null,
 		?callable $snapshot_preflight = null,
 		?callable $lock_acquire = null,
-		?callable $lock_release = null
+		?callable $lock_release = null,
+		?callable $post_capture_snapshot = null
 	) {
 		$this->dispatcher  = $dispatcher;
 		$this->plan_state  = $plan_state;
@@ -56,6 +60,7 @@ final class Single_Action_Executor {
 		$this->snapshot_preflight    = $snapshot_preflight ?? array( $this, 'default_snapshot_preflight' );
 		$this->lock_acquire          = $lock_acquire ?? array( $this, 'default_lock_acquire' );
 		$this->lock_release          = $lock_release ?? array( $this, 'default_lock_release' );
+		$this->post_capture_snapshot = $post_capture_snapshot;
 	}
 
 	/**
@@ -106,11 +111,12 @@ final class Single_Action_Executor {
 		$snapshot_ref      = isset( $envelope['snapshot_ref'] ) && is_string( $envelope['snapshot_ref'] ) ? trim( $envelope['snapshot_ref'] ) : '';
 		if ( $snapshot_required && $snapshot_ref === '' ) {
 			$preflight_ref = ( $this->snapshot_preflight )( $envelope );
-			if ( $preflight_ref === null || $preflight_ref === '' ) {
-				return Execution_Result::refused( $action_id, $action_type, Execution_Action_Contract::ERROR_SNAPSHOT_REQUIRED, __( 'Snapshot required but not available.', 'aio-page-builder' ) );
+			if ( $preflight_ref !== null && $preflight_ref !== '' ) {
+				$snapshot_ref = $preflight_ref;
+				$envelope['snapshot_ref'] = $snapshot_ref;
+				$envelope['operational_pre_snapshot_id'] = $snapshot_ref;
 			}
-			$snapshot_ref = $preflight_ref;
-			$envelope['snapshot_ref'] = $snapshot_ref;
+			// * Fail safely: if preflight returns null (e.g. capture failed), log and proceed without blocking execution (spec §41.2, Prompt 087).
 		}
 
 		$scope_keys = $this->scope_keys_for_envelope( $envelope );
@@ -123,6 +129,9 @@ final class Single_Action_Executor {
 			$success        = ! empty( $handler_result['success'] );
 
 			if ( $success ) {
+				if ( $this->post_capture_snapshot !== null ) {
+					( $this->post_capture_snapshot )( $envelope, $handler_result );
+				}
 				$build_plan_updates = array();
 				if ( $plan_item_id !== '' && $action_type !== Execution_Action_Types::FINALIZE_PLAN && $action_type !== Execution_Action_Types::ROLLBACK_ACTION ) {
 					$step_index = $this->plan_state->find_step_index_for_item( $definition, $plan_item_id );

@@ -186,7 +186,8 @@ final class Single_Action_Executor_Test extends TestCase {
 		$this->assertSame( Execution_Action_Contract::ERROR_DEPENDENCY_FAILED, $result->get_error_code() );
 	}
 
-	public function test_snapshot_required_refusal_when_preflight_returns_null(): void {
+	// * Spec §41.2, Prompt 087: when preflight returns null (e.g. capture failed), executor proceeds without blocking (fail safely); handler may then fail.
+	public function test_snapshot_required_proceeds_when_preflight_returns_null_fail_safely(): void {
 		$repo = new Stub_Plan_State_For_Executor();
 		$repo->get_by_key_return = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
@@ -198,8 +199,9 @@ final class Single_Action_Executor_Test extends TestCase {
 		$envelope['snapshot_required'] = true;
 		$envelope['snapshot_ref']      = '';
 		$result = $executor->execute( $envelope );
-		$this->assertSame( Execution_Action_Contract::STATUS_REFUSED, $result->get_execution_status() );
-		$this->assertSame( Execution_Action_Contract::ERROR_SNAPSHOT_REQUIRED, $result->get_error_code() );
+		// Executor does not refuse; dispatch runs (stub returns failure when no handler registered).
+		$this->assertSame( Execution_Action_Contract::STATUS_FAILED, $result->get_execution_status() );
+		$this->assertSame( Execution_Action_Contract::ERROR_EXECUTION_FAILED, $result->get_error_code() );
 	}
 
 	public function test_lock_acquire_failure_returns_refused(): void {

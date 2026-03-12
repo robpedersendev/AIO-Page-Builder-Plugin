@@ -27,6 +27,11 @@ use AIOPageBuilder\Domain\Execution\Jobs\Token_Set_Job_Service;
 use AIOPageBuilder\Domain\Execution\Queue\Bulk_Executor;
 use AIOPageBuilder\Domain\Execution\Queue\Execution_Job_Dispatcher;
 use AIOPageBuilder\Domain\Execution\Queue\Execution_Queue_Service;
+use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Repository;
+use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Repository_Interface;
+use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Service;
+use AIOPageBuilder\Domain\Rollback\Snapshots\Post_Change_Result_Builder;
+use AIOPageBuilder\Domain\Rollback\Snapshots\Pre_Change_Snapshot_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
@@ -71,6 +76,22 @@ final class Execution_Provider implements Service_Provider_Interface {
 		$container->register( 'finalization_job_service', function () use ( $container ): Finalization_Job_Service {
 			return new Finalization_Job_Service( $container->get( 'build_plan_repository' ) );
 		} );
+		$container->register( 'operational_snapshot_repository', function (): Operational_Snapshot_Repository {
+			return new Operational_Snapshot_Repository();
+		} );
+		$container->register( 'pre_change_snapshot_builder', function (): Pre_Change_Snapshot_Builder {
+			return new Pre_Change_Snapshot_Builder();
+		} );
+		$container->register( 'post_change_result_builder', function (): Post_Change_Result_Builder {
+			return new Post_Change_Result_Builder();
+		} );
+		$container->register( 'operational_snapshot_service', function () use ( $container ): Operational_Snapshot_Service {
+			return new Operational_Snapshot_Service(
+				$container->get( 'operational_snapshot_repository' ),
+				$container->get( 'pre_change_snapshot_builder' ),
+				$container->get( 'post_change_result_builder' )
+			);
+		} );
 		$container->register( 'execution_dispatcher', function () use ( $container ): Execution_Dispatcher {
 			$dispatcher = new Execution_Dispatcher();
 			$dispatcher->register_handler(
@@ -96,9 +117,23 @@ final class Execution_Provider implements Service_Provider_Interface {
 			return $dispatcher;
 		} );
 		$container->register( 'single_action_executor', function () use ( $container ): Single_Action_Executor {
+			$snapshot_service = $container->get( 'operational_snapshot_service' );
+			$snapshot_preflight = function ( array $envelope ) use ( $snapshot_service ): ?string {
+				$result = $snapshot_service->capture_pre_change( $envelope );
+				return $result->is_success() ? $result->get_snapshot_id() : null;
+			};
+			$post_capture_snapshot = function ( array $envelope, array $handler_result ) use ( $snapshot_service ): void {
+				$pre_id = isset( $envelope['operational_pre_snapshot_id'] ) && is_string( $envelope['operational_pre_snapshot_id'] ) ? $envelope['operational_pre_snapshot_id'] : ( isset( $envelope['snapshot_ref'] ) && is_string( $envelope['snapshot_ref'] ) ? $envelope['snapshot_ref'] : '' );
+				$snapshot_service->capture_post_change( $envelope, $handler_result, $pre_id );
+			};
 			return new Single_Action_Executor(
 				$container->get( 'execution_dispatcher' ),
-				$container->get( 'build_plan_repository' )
+				$container->get( 'build_plan_repository' ),
+				null,
+				$snapshot_preflight,
+				null,
+				null,
+				$post_capture_snapshot
 			);
 		} );
 		$container->register( 'bulk_executor', function (): Bulk_Executor {
