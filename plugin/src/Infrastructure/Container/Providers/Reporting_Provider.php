@@ -11,6 +11,9 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Heartbeat_Scheduler.php';
+
+use AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler;
 use AIOPageBuilder\Domain\Reporting\Install\Install_Notification_Service;
 use AIOPageBuilder\Domain\Reporting\Install\Install_Notification_Transport_Interface;
 use AIOPageBuilder\Domain\Reporting\Install\Wp_Mail_Install_Transport;
@@ -34,5 +37,7 @@ final class Reporting_Provider implements Service_Provider_Interface {
 				: null;
 			return new Install_Notification_Service( $transport );
 		} );
+
+		Heartbeat_Scheduler::register_hook();
 	}
 }

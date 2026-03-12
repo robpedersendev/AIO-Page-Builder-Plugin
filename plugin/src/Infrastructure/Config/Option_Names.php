@@ -33,6 +33,9 @@ final class Option_Names {
 	/** Reporting log (attempts and delivery status); internal, spec §46.12. */
 	public const REPORTING_LOG = self::PREFIX . 'reporting_log';
 
+	/** Heartbeat state (last_successful_month, retry state); internal, spec §46.4. */
+	public const HEARTBEAT_STATE = self::PREFIX . 'heartbeat_state';
+
 	/** Dependency notice dismissals (internal, runtime). */
 	public const DEPENDENCY_NOTICE_DISMISSALS = self::PREFIX . 'dependency_notices';
 
@@ -66,6 +69,7 @@ final class Option_Names {
 			self::REPORTING_SETTINGS,
 			self::INSTALL_NOTICE_STATE,
 			self::REPORTING_LOG,
+			self::HEARTBEAT_STATE,
 			self::DEPENDENCY_NOTICE_DISMISSALS,
 			self::UNINSTALL_PREFS,
 			self::PROVIDER_CONFIG_REF,

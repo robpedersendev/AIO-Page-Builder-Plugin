@@ -114,6 +114,28 @@ if ( ! function_exists( 'add_action' ) ) {
 		// No-op for unit tests; CPT registration runs in WP context.
 	}
 }
+// * Stubs for heartbeat scheduler tests (spec §46.4, §53.5). Track scheduled state in $GLOBALS['_aio_cron_scheduled'].
+if ( ! function_exists( 'wp_next_scheduled' ) ) {
+	function wp_next_scheduled( $hook, $args = array() ) {
+		return ! empty( $GLOBALS['_aio_cron_scheduled'][ $hook ] );
+	}
+}
+if ( ! function_exists( 'wp_schedule_event' ) ) {
+	function wp_schedule_event( $timestamp, $recurrence, $hook, $args = array() ) {
+		if ( ! isset( $GLOBALS['_aio_cron_scheduled'] ) ) {
+			$GLOBALS['_aio_cron_scheduled'] = array();
+		}
+		$GLOBALS['_aio_cron_scheduled'][ $hook ] = true;
+		return true;
+	}
+}
+if ( ! function_exists( 'wp_clear_scheduled_hook' ) ) {
+	function wp_clear_scheduled_hook( $hook ) {
+		if ( isset( $GLOBALS['_aio_cron_scheduled'][ $hook ] ) ) {
+			unset( $GLOBALS['_aio_cron_scheduled'][ $hook ] );
+		}
+	}
+}
 if ( ! function_exists( 'register_post_type' ) ) {
 	function register_post_type( $post_type, $args = array() ) {
 		if ( ! isset( $GLOBALS['_aio_registered_post_types'] ) ) {

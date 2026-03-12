@@ -31,6 +31,7 @@ require_once __DIR__ . '/../Domain/Reporting/Install/Install_Notification_Result
 require_once __DIR__ . '/../Domain/Reporting/Install/Install_Notification_Transport_Interface.php';
 require_once __DIR__ . '/../Domain/Reporting/Install/Wp_Mail_Install_Transport.php';
 require_once __DIR__ . '/../Domain/Reporting/Install/Install_Notification_Service.php';
+require_once __DIR__ . '/../Domain/Reporting/Heartbeat/Heartbeat_Scheduler.php';
 
 /**
  * Result status for a lifecycle phase or overall run.
@@ -259,7 +260,7 @@ final class Lifecycle_Manager {
 	}
 
 	private function register_schedules(): Lifecycle_Result {
-		// Placeholder: no WP-Cron registration yet. Later prompt owns recurring schedule registration.
+		\AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler::schedule();
 		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'register_schedules' );
 	}
 
@@ -283,7 +284,7 @@ final class Lifecycle_Manager {
 	// ----- Deactivation phase placeholders -----
 
 	private function unschedule(): void {
-		// Placeholder: later prompt unschedules cron jobs and queue workers.
+		\AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler::unschedule();
 	}
 
 	private function teardown_runtime(): void {
