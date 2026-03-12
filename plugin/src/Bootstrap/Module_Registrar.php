@@ -23,6 +23,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Admin_Router_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Capability_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Config_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Execution_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\ExportRestore_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Diagnostics_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Object_Registration_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Provider_Base_Provider;
@@ -85,6 +86,7 @@ final class Module_Registrar {
 			new AI_Prompt_Pack_Provider(),
 			new AI_Runs_Provider(),
 			new Storage_Services_Provider(),
+			new ExportRestore_Provider(),
 			new Onboarding_Provider(),
 		);
 		foreach ( $providers as $provider ) {

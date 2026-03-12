@@ -64,6 +64,15 @@ require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Capability
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Object_Registration_Provider.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Repositories_Provider.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Storage_Services_Provider.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Bundle_Schema.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Mode_Keys.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Result.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Manifest_Builder.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Zip_Packager.php';
+require_once $bootstrap_dir . '/../Domain/Registries/Export/Registry_Export_Fragment_Builder.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Token_Set_Reader.php';
+require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Generator.php';
+require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/ExportRestore_Provider.php';
 require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_Statuses.php';
 require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_Step_Keys.php';
 require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_Draft_Service.php';

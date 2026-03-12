@@ -201,6 +201,32 @@ final class Plugin_Path_Manager {
 	}
 
 	/**
+	 * Returns the exports directory path (trailing slash). Export packages (ZIP) are written here (spec §52.2).
+	 *
+	 * @return string Absolute path or empty if base unavailable.
+	 */
+	public function get_exports_dir(): string {
+		return $this->get_child_path( self::CHILD_EXPORTS );
+	}
+
+	/**
+	 * Returns absolute path for an export package filename under exports dir. Validates filename (aio-export-*).
+	 *
+	 * @param string $filename Package filename (e.g. aio-export-full_operational_backup-20250715-120000-site.zip).
+	 * @return string Full path or empty if filename invalid or exports dir unavailable.
+	 */
+	public function get_export_package_path( string $filename ): string {
+		if ( preg_match( '#^aio-export-[a-z0-9_]+-\d{8}-\d{6}-[a-zA-Z0-9_.-]+\.zip$#', $filename ) !== 1 ) {
+			return '';
+		}
+		$dir = $this->get_exports_dir();
+		if ( $dir === '' ) {
+			return '';
+		}
+		return rtrim( $dir, '/\\' ) . '/' . $filename;
+	}
+
+	/**
 	 * Returns WordPress uploads basedir. Internal.
 	 *
 	 * @return string Absolute path without trailing slash, or empty if uploads unavailable.
