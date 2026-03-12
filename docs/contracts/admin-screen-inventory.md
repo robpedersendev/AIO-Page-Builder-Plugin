@@ -1,7 +1,8 @@
 # Admin Screen Inventory
 
 **Document type:** Contract for admin menu and screen routing (spec §49, §49.11).  
-**Governs:** Submenu slugs, screen classes, capability mapping, and Queue & Logs tabs.
+**Governs:** Submenu slugs, screen classes, capability mapping, and Queue & Logs tabs.  
+**Guidance:** For operator and support workflows, see [admin-operator-guide.md](../guides/admin-operator-guide.md) and [support-triage-guide.md](../guides/support-triage-guide.md).
 
 ---
 

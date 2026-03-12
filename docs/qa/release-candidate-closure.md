@@ -48,7 +48,7 @@
 | 4 | Migration | Migrations updated; version consistent; upgrade path tested or N/A. | Evidence in migration-coverage-matrix.md. |
 | 5 | Compatibility | WP/PHP matrix current; Plugin Check critical/warning addressed. | Evidence in compatibility-matrix.md. |
 | 6 | Redaction | Logs, exports, reports, diagnostics free of secrets; rules applied. | Evidence in security-redaction-review.md. |
-| 7 | Documentation | §60.6 artifacts; release notes cover §58.6. | Changelog draft and release notes inputs; see §5. |
+| 7 | Documentation | §60.6 artifacts; release notes cover §58.6; user/admin/support guidance. | Changelog draft and release notes inputs; see §5. Documentation completeness: see §7. |
 | 8 | Rollback / reporting / portability | Per product promises. | Rollback queued; reporting disclosed; export/restore/uninstall documented. |
 
 **Sign-off:** Per §60.8, M12 requires Product Owner, Technical Lead, QA, and Security (where applicable). See [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) §6.
@@ -89,6 +89,20 @@
 
 ---
 
-## 7. Closure Statement
+## 7. Documentation Completeness Checklist (§60.6)
+
+For release readiness, the following durable guidance docs exist and should be checked for doc-to-UI consistency:
+
+| Doc | Purpose |
+|-----|--------|
+| [admin-operator-guide.md](../guides/admin-operator-guide.md) | Operator-facing: onboarding, provider setup, crawler, AI runs, Build Plans, execution/rollback, Queue & Logs, Privacy/Reporting/Uninstall, Import/Export. |
+| [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md) | End-user: onboarding/profile, Build Plan review steps. |
+| [support-triage-guide.md](../guides/support-triage-guide.md) | Support: logs, log export, support bundle, redaction, issue triage. |
+
+**Doc-to-UI consistency pass:** Before release, verify screen names, action labels, tab names, and capability names in these guides match the implemented admin UI (menu labels, Queue & Logs tabs, Build Plan stepper, Privacy/Reporting screen sections, Import/Export modes). Record any mismatches and fix in docs or (if blocking) in code per prompt scope.
+
+---
+
+## 8. Closure Statement
 
 This document completes the hardening-phase QA closure deliverables for the release candidate. Performance posture is documented; list and log volumes are bounded; queue offloading is in place. QA evidence (unit, integration, E2E, migration, compatibility, security, accessibility) is referenced; final run results are to be recorded in §2. Release-note inputs, known-risk register, and sign-off requirements are in place. No unresolved high-severity issue may remain without formal waiver. Once RELEASE_CHECKLIST is completed and sign-off is recorded, the plugin is ready for production-readiness approval under the spec’s hardening gate.
