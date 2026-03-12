@@ -18,7 +18,7 @@ use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
-use AIOPageBuilder\Admin\Screens\Dashboard_Screen;
+use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
@@ -45,7 +45,7 @@ final class Admin_Menu {
 	 * @return void
 	 */
 	public function register(): void {
-		$dashboard   = new Dashboard_Screen();
+		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
 		$diagnostics = new Diagnostics_Screen();
 		$onboarding  = new Onboarding_Screen( $this->container );

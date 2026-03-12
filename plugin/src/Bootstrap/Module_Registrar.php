@@ -22,6 +22,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Rendering_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Admin_Router_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Capability_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Config_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\Dashboard_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Execution_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\ExportRestore_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Diagnostics_Provider;
@@ -65,6 +66,7 @@ final class Module_Registrar {
 	public function register_bootstrap(): void {
 		$providers = array(
 			new Config_Provider(),
+			new Dashboard_Provider(),
 			new Diagnostics_Provider(),
 			new Crawler_Provider(),
 			new Admin_Router_Provider(),

@@ -25,7 +25,7 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 
 | Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
 |-------------|--------|----------------|----------------------|-----------------|--------|
-| `aio-page-builder` | Dashboard | Bootstrap / Admin | `manage_options` (placeholder) | Landing; future first-run redirect target | Placeholder |
+| `aio-page-builder` | Dashboard | Bootstrap / Admin | `manage_options` (placeholder) | Overview: environment/dependency/provider readiness; last crawl, last AI run, active Build Plans; queue warnings; critical errors; quick actions (Start/Resume Onboarding, Crawl Sessions, AI Runs, Build Plans, Queue & Logs, AI Providers, Import/Export); welcome/first-run and resume state | Implemented |
 | `aio-page-builder-settings` | Settings | Bootstrap / Admin | `manage_options` (placeholder) | Plugin settings, reporting disclosure | Placeholder |
 | `aio-page-builder-diagnostics` | Diagnostics | Bootstrap / Admin | `manage_options` (placeholder) | Environment status, validation summary | Placeholder |
 
