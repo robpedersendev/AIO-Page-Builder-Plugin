@@ -19,6 +19,7 @@ use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
+use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -51,6 +52,7 @@ final class Admin_Menu {
 		$crawler_comparison = new Crawler_Comparison_Screen( $this->container );
 		$ai_runs            = new AI_Runs_Screen( $this->container );
 		$build_plans        = new Build_Plans_Screen( $this->container );
+		$queue_logs         = new Queue_Logs_Screen( $this->container );
 
 		add_menu_page(
 			__( 'AIO Page Builder', 'aio-page-builder' ),
@@ -132,6 +134,15 @@ final class Admin_Menu {
 			$build_plans->get_capability(),
 			Build_Plans_Screen::SLUG,
 			array( $build_plans, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$queue_logs->get_title(),
+			__( 'Queue & Logs', 'aio-page-builder' ),
+			$queue_logs->get_capability(),
+			Queue_Logs_Screen::SLUG,
+			array( $queue_logs, 'render' )
 		);
 	}
 }

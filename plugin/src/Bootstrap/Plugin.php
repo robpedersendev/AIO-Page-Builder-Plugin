@@ -79,6 +79,10 @@ require_once $bootstrap_dir . '/../Admin/Screens/AI/Onboarding_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Crawler/Crawler_Sessions_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Crawler/Crawler_Session_Detail_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Crawler/Crawler_Comparison_Screen.php';
+require_once $bootstrap_dir . '/../Domain/Reporting/Contracts/Reporting_Event_Types.php';
+require_once $bootstrap_dir . '/../Domain/Reporting/UI/Reporting_Health_Summary_Builder.php';
+require_once $bootstrap_dir . '/../Domain/Reporting/UI/Logs_Monitoring_State_Builder.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Logs/Queue_Logs_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Admin_Menu.php';
 
 /**
