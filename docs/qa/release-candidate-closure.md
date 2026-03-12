@@ -84,6 +84,7 @@
 - **Support package:** Per internal process (e.g. export bundle, docs).
 - **Known-risk register:** [known-risk-register.md](../release/known-risk-register.md).
 - **Sign-off checklist:** [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) §6 — Product Owner, Technical Lead, QA (and Security where applicable) approve release.
+- **Release-review packet and sign-off:** [release-review-packet.md](../release/release-review-packet.md) (evidence summaries, traceability, exit criteria); [sign-off-checklist.md](../release/sign-off-checklist.md) (role-based approval, gate status blocked/waived/approved, waiver list); [demo-review-walkthrough.md](../release/demo-review-walkthrough.md) (demo/review script for §60.7).
 
 **Acceptance gate (§59.15):** Product Owner, QA, and technical lead approve release.
 
