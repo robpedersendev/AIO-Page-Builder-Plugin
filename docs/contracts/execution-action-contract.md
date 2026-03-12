@@ -350,6 +350,7 @@ Missing required approval_state; item_status would not be approved.
 - **Build Plan state**: Approval state in the envelope is derived from the Build Plan (plan and item status). See Build Plan schema and state machine for status values. Execution does not change plan state arbitrarily; it updates state only as defined by the execution flow (e.g. mark item completed after success).
 - **Capabilities**: `aio_execute_build_plans`, `aio_approve_build_plans` (spec §39.7). Nonce and capability checks are required at any HTTP endpoint that submits or triggers execution.
 - **Queue**: Envelopes with `queue_eligible: true` may be placed in a queue. Queue consumers must re-validate the envelope before execution.
+- **Locking and idempotency**: Lock acquisition, idempotency keys, duplicate suppression, retry eligibility, and stale-lock recovery are defined in **executor-locking-idempotency-contract.md**. Executors must release any acquired lock on completion, refusal, or failure.
 
 ---
 
