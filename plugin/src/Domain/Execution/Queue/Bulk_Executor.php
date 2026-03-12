@@ -193,12 +193,18 @@ final class Bulk_Executor {
 				'depends_on_item_ids' => $dep_ids,
 			);
 
+			$target_reference = array_merge( array( 'plan_item_id' => $item_id ), $payload );
+			$template_key = isset( $payload['template_key'] ) && is_string( $payload['template_key'] ) ? trim( $payload['template_key'] ) : '';
+			if ( $template_key !== '' && $action_type === Execution_Action_Types::CREATE_PAGE ) {
+				$target_reference['template_ref'] = array( 'type' => 'internal_key', 'value' => $template_key );
+			}
+
 			$envelope = array(
 				Execution_Action_Contract::ENVELOPE_ACTION_ID        => $action_id,
 				Execution_Action_Contract::ENVELOPE_ACTION_TYPE       => $action_type,
 				Execution_Action_Contract::ENVELOPE_PLAN_ID           => $plan_id,
 				Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID      => $item_id,
-				Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE  => array_merge( array( 'plan_item_id' => $item_id ), $payload ),
+				Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE  => $target_reference,
 				Execution_Action_Contract::ENVELOPE_APPROVAL_STATE    => array(
 					Execution_Action_Contract::APPROVAL_PLAN_STATUS => $executable_plan ? $plan_status : 'approved',
 					Execution_Action_Contract::APPROVAL_ITEM_STATUS => $item_status,
