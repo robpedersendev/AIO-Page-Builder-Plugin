@@ -468,14 +468,13 @@ final class Build_Plan_Workspace_Screen {
 			case Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW:
 				$this->render_hierarchy_shell( $definition );
 				break;
-			case Build_Plan_Schema::STEP_TYPE_CONFIRMATION:
-				$this->render_confirmation_shell( $definition );
-				break;
 			case Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES:
 			case Build_Plan_Schema::STEP_TYPE_NEW_PAGES:
 			case Build_Plan_Schema::STEP_TYPE_NAVIGATION:
 			case Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS:
 			case Build_Plan_Schema::STEP_TYPE_SEO:
+			case Build_Plan_Schema::STEP_TYPE_CONFIRMATION:
+			case Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK:
 				$this->render_actionable_step_workspace( $state, $current_step, $active_step_index, $definition );
 				break;
 			default:
@@ -494,7 +493,9 @@ final class Build_Plan_Workspace_Screen {
 	private function render_actionable_step_workspace( array $state, array $current_step, int $active_step_index, array $definition ): void {
 		$plan_id = (string) ( $state['plan_id'] ?? $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' );
 		$unresolved = (int) ( $current_step['unresolved_count'] ?? 0 );
-		if ( $unresolved === 0 ) {
+		$step_type = (string) ( $current_step['step_type'] ?? '' );
+		$always_show_shell = in_array( $step_type, array( Build_Plan_Schema::STEP_TYPE_CONFIRMATION, Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK ), true );
+		if ( $unresolved === 0 && ! $always_show_shell ) {
 			echo '<div class="aio-empty-state"><p>' . \esc_html__( 'All recommendations in this step have already been resolved.', 'aio-page-builder' ) . '</p></div>';
 			return;
 		}

@@ -14,8 +14,12 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Updates_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\Finalization\Finalization_Step_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Media_Step_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 
 /**
@@ -43,20 +47,40 @@ final class Build_Plan_UI_State_Builder {
 	/** @var Navigation_Step_UI_Service|null */
 	private $navigation_step_ui_service;
 
+	/** @var Tokens_Step_UI_Service|null */
+	private $tokens_step_ui_service;
+
+	/** @var SEO_Media_Step_UI_Service|null */
+	private $seo_media_step_ui_service;
+
+	/** @var Finalization_Step_UI_Service|null */
+	private $finalization_step_ui_service;
+
+	/** @var History_Rollback_Step_UI_Service|null */
+	private $history_rollback_step_ui_service;
+
 	public function __construct(
 		Build_Plan_Repository $repository,
 		Build_Plan_Stepper_Builder $stepper_builder,
 		?Step_Workspace_Payload_Builder $step_workspace_builder = null,
 		?Existing_Page_Updates_UI_Service $existing_page_updates_ui_service = null,
 		?New_Page_Creation_UI_Service $new_page_creation_ui_service = null,
-		?Navigation_Step_UI_Service $navigation_step_ui_service = null
+		?Navigation_Step_UI_Service $navigation_step_ui_service = null,
+		?Tokens_Step_UI_Service $tokens_step_ui_service = null,
+		?SEO_Media_Step_UI_Service $seo_media_step_ui_service = null,
+		?Finalization_Step_UI_Service $finalization_step_ui_service = null,
+		?History_Rollback_Step_UI_Service $history_rollback_step_ui_service = null
 	) {
-		$this->repository                      = $repository;
-		$this->stepper_builder                 = $stepper_builder;
-		$this->step_workspace_builder          = $step_workspace_builder;
-		$this->existing_page_updates_ui_service = $existing_page_updates_ui_service;
+		$this->repository                        = $repository;
+		$this->stepper_builder                   = $stepper_builder;
+		$this->step_workspace_builder            = $step_workspace_builder;
+		$this->existing_page_updates_ui_service  = $existing_page_updates_ui_service;
 		$this->new_page_creation_ui_service     = $new_page_creation_ui_service;
-		$this->navigation_step_ui_service       = $navigation_step_ui_service;
+		$this->navigation_step_ui_service        = $navigation_step_ui_service;
+		$this->tokens_step_ui_service            = $tokens_step_ui_service;
+		$this->seo_media_step_ui_service         = $seo_media_step_ui_service;
+		$this->finalization_step_ui_service     = $finalization_step_ui_service;
+		$this->history_rollback_step_ui_service  = $history_rollback_step_ui_service;
 	}
 
 	/**
@@ -136,6 +160,18 @@ final class Build_Plan_UI_State_Builder {
 		}
 		if ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION && $this->navigation_step_ui_service !== null ) {
 			return $this->navigation_step_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
+		}
+		if ( $step_type === Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS && $this->tokens_step_ui_service !== null ) {
+			return $this->tokens_step_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
+		}
+		if ( $step_type === Build_Plan_Schema::STEP_TYPE_SEO && $this->seo_media_step_ui_service !== null ) {
+			return $this->seo_media_step_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
+		}
+		if ( $step_type === Build_Plan_Schema::STEP_TYPE_CONFIRMATION && $this->finalization_step_ui_service !== null ) {
+			return $this->finalization_step_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
+		}
+		if ( $step_type === Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK && $this->history_rollback_step_ui_service !== null ) {
+			return $this->history_rollback_step_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
 		}
 		if ( $this->step_workspace_builder !== null ) {
 			return $this->step_workspace_builder->build( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );

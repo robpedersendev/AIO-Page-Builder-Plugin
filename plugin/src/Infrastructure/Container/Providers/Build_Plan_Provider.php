@@ -16,12 +16,16 @@ use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Item_Generator;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Detail_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Updates_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\Finalization\Finalization_Step_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Detail_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Detail_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Media_Step_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_UI_State_Builder;
@@ -96,6 +100,18 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 				$container->get( 'navigation_bulk_action_service' )
 			);
 		} );
+		$container->register( 'tokens_step_ui_service', function () use ( $container ): Tokens_Step_UI_Service {
+			return new Tokens_Step_UI_Service( $container->get( 'build_plan_row_action_resolver' ) );
+		} );
+		$container->register( 'seo_media_step_ui_service', function () use ( $container ): SEO_Media_Step_UI_Service {
+			return new SEO_Media_Step_UI_Service( $container->get( 'build_plan_row_action_resolver' ) );
+		} );
+		$container->register( 'finalization_step_ui_service', function (): Finalization_Step_UI_Service {
+			return new Finalization_Step_UI_Service();
+		} );
+		$container->register( 'history_rollback_step_ui_service', function (): History_Rollback_Step_UI_Service {
+			return new History_Rollback_Step_UI_Service();
+		} );
 		$container->register( 'build_plan_ui_state_builder', function () use ( $container ): Build_Plan_UI_State_Builder {
 			return new Build_Plan_UI_State_Builder(
 				$container->get( 'build_plan_repository' ),
@@ -103,7 +119,11 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 				$container->get( 'build_plan_step_workspace_payload_builder' ),
 				$container->get( 'existing_page_updates_ui_service' ),
 				$container->get( 'new_page_creation_ui_service' ),
-				$container->get( 'navigation_step_ui_service' )
+				$container->get( 'navigation_step_ui_service' ),
+				$container->get( 'tokens_step_ui_service' ),
+				$container->get( 'seo_media_step_ui_service' ),
+				$container->get( 'finalization_step_ui_service' ),
+				$container->get( 'history_rollback_step_ui_service' )
 			);
 		} );
 	}

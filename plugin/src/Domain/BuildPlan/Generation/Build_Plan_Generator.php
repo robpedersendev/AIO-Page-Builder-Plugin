@@ -34,6 +34,7 @@ final class Build_Plan_Generator {
 		Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS        => 'Design tokens',
 		Build_Plan_Schema::STEP_TYPE_SEO                  => 'SEO',
 		Build_Plan_Schema::STEP_TYPE_CONFIRMATION         => 'Confirm',
+		Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK        => 'Logs & rollback',
 	);
 
 	/** @var Build_Plan_Repository */
@@ -81,11 +82,20 @@ final class Build_Plan_Generator {
 		$steps = $built['steps'];
 		$all_omitted = $built['omitted'];
 
-		// Confirmation step.
+		// Confirmation (finalization) step.
 		$steps[] = array(
 			Build_Plan_Item_Schema::KEY_STEP_ID   => $plan_id . '_step_confirm',
 			Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_CONFIRMATION,
 			Build_Plan_Item_Schema::KEY_TITLE     => self::STEP_TITLES[ Build_Plan_Schema::STEP_TYPE_CONFIRMATION ],
+			Build_Plan_Item_Schema::KEY_ORDER     => count( $steps ),
+			Build_Plan_Item_Schema::KEY_ITEMS     => array(),
+		);
+
+		// Logs, history, and rollback step (shell only; no execution).
+		$steps[] = array(
+			Build_Plan_Item_Schema::KEY_STEP_ID   => $plan_id . '_step_logs_rollback',
+			Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK,
+			Build_Plan_Item_Schema::KEY_TITLE     => self::STEP_TITLES[ Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK ],
 			Build_Plan_Item_Schema::KEY_ORDER     => count( $steps ),
 			Build_Plan_Item_Schema::KEY_ITEMS     => array(),
 		);

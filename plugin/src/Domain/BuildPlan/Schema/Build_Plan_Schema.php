@@ -73,6 +73,7 @@ final class Build_Plan_Schema {
 	public const STEP_TYPE_DESIGN_TOKENS        = 'design_tokens';
 	public const STEP_TYPE_SEO                  = 'seo';
 	public const STEP_TYPE_CONFIRMATION         = 'confirmation';
+	public const STEP_TYPE_LOGS_ROLLBACK        = 'logs_rollback';
 
 	public const STEP_TYPES = array(
 		self::STEP_TYPE_OVERVIEW,
@@ -83,6 +84,7 @@ final class Build_Plan_Schema {
 		self::STEP_TYPE_DESIGN_TOKENS,
 		self::STEP_TYPE_SEO,
 		self::STEP_TYPE_CONFIRMATION,
+		self::STEP_TYPE_LOGS_ROLLBACK,
 	);
 
 	/** Required root field keys for plan eligibility. */
