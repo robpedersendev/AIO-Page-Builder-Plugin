@@ -33,6 +33,12 @@ Use this checklist before each release. It is designed to be explicit, reviewabl
 - [ ] Data retention policy is confirmed (preserve built content; remove only plugin-owned operational data).
 - [ ] See [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md).
 
+## Release Candidate and Sign-Off
+
+- [ ] Release-candidate closure completed: [release-candidate-closure.md](release-candidate-closure.md) (performance posture, QA evidence, gate status, release-note inputs).
+- [ ] Known-risk register updated: [known-risk-register.md](../release/known-risk-register.md).
+- [ ] Sign-off obtained per hardening matrix §6 (Product Owner, Technical Lead, QA; Security where applicable).
+
 ## Version and Metadata
 
 - [ ] Plugin header version is bumped.
