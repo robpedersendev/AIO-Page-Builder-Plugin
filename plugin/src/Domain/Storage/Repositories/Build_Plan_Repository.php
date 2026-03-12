@@ -11,6 +11,8 @@ namespace AIOPageBuilder\Domain\Storage\Repositories;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
+use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 
 /**
@@ -78,8 +80,85 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository {
 	 * @return bool Success.
 	 */
 	public function save_plan_definition( int $post_id, array $definition ): bool {
-		$json = wp_json_encode( $definition );
+		$json = \wp_json_encode( $definition );
 		return $json !== false && \update_post_meta( $post_id, self::META_PLAN_DEFINITION, $json ) !== false;
+	}
+
+	/**
+	 * Updates a single plan item's status and persists the definition (spec §32.5, plan history).
+	 *
+	 * @param int    $post_id    Plan post ID.
+	 * @param int    $step_index Step index in steps array.
+	 * @param string $item_id    Item id to update.
+	 * @param string $new_status New status (e.g. approved, rejected).
+	 * @return bool True if item was found and updated; false otherwise.
+	 */
+	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status ): bool {
+		$definition = $this->get_plan_definition( $post_id );
+		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+		$step       = $steps[ $step_index ] ?? null;
+		if ( ! is_array( $step ) ) {
+			return false;
+		}
+		$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+			: array();
+		$updated = false;
+		foreach ( $items as $i => $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			if ( (string) ( $item['item_id'] ?? '' ) === $item_id ) {
+				$items[ $i ]['status'] = $new_status;
+				$updated = true;
+				break;
+			}
+		}
+		if ( ! $updated ) {
+			return false;
+		}
+		$definition['steps'][ $step_index ]['items'] = $items;
+		return $this->save_plan_definition( $post_id, $definition );
+	}
+
+	/**
+	 * Updates all items in a step that match a status predicate to a new status (e.g. bulk approve/deny).
+	 *
+	 * @param int    $post_id     Plan post ID.
+	 * @param int    $step_index  Step index.
+	 * @param string $from_status Only change items with this status (e.g. pending).
+	 * @param string $to_status   New status to set.
+	 * @return int Number of items updated.
+	 */
+	public function update_plan_step_items_by_status( int $post_id, int $step_index, string $from_status, string $to_status ): int {
+		$definition = $this->get_plan_definition( $post_id );
+		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+		$step       = $steps[ $step_index ] ?? null;
+		if ( ! is_array( $step ) ) {
+			return 0;
+		}
+		$items  = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+			: array();
+		$count  = 0;
+		foreach ( $items as $i => $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			if ( (string) ( $item['status'] ?? '' ) === $from_status ) {
+				$items[ $i ]['status'] = $to_status;
+				++$count;
+			}
+		}
+		if ( $count > 0 ) {
+			$definition[ Build_Plan_Schema::KEY_STEPS ][ $step_index ][ Build_Plan_Item_Schema::KEY_ITEMS ] = $items;
+			$this->save_plan_definition( $post_id, $definition );
+		}
+		return $count;
 	}
 
 	/** @inheritdoc */

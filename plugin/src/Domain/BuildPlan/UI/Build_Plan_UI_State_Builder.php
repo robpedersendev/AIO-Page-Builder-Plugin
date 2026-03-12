@@ -11,7 +11,9 @@ namespace AIOPageBuilder\Domain\BuildPlan\UI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
+use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Updates_UI_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 
 /**
@@ -30,10 +32,19 @@ final class Build_Plan_UI_State_Builder {
 	/** @var Step_Workspace_Payload_Builder|null */
 	private $step_workspace_builder;
 
-	public function __construct( Build_Plan_Repository $repository, Build_Plan_Stepper_Builder $stepper_builder, ?Step_Workspace_Payload_Builder $step_workspace_builder = null ) {
-		$this->repository            = $repository;
-		$this->stepper_builder        = $stepper_builder;
-		$this->step_workspace_builder = $step_workspace_builder;
+	/** @var Existing_Page_Updates_UI_Service|null */
+	private $existing_page_updates_ui_service;
+
+	public function __construct(
+		Build_Plan_Repository $repository,
+		Build_Plan_Stepper_Builder $stepper_builder,
+		?Step_Workspace_Payload_Builder $step_workspace_builder = null,
+		?Existing_Page_Updates_UI_Service $existing_page_updates_ui_service = null
+	) {
+		$this->repository                     = $repository;
+		$this->stepper_builder                 = $stepper_builder;
+		$this->step_workspace_builder         = $step_workspace_builder;
+		$this->existing_page_updates_ui_service = $existing_page_updates_ui_service;
 	}
 
 	/**
@@ -97,10 +108,42 @@ final class Build_Plan_UI_State_Builder {
 		}
 		$state = $this->build( $plan_id );
 		if ( $state === null ) {
-			return $this->step_workspace_builder->build( array(), 0, $capabilities, $selected_item_id, $selected_item_ids );
+			return $this->empty_step_workspace( $capabilities, $selected_item_id, $selected_item_ids );
 		}
 		$definition = $state['plan_definition'] ?? array();
-		return $this->step_workspace_builder->build( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
+		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+		$step       = $steps[ $step_index ] ?? null;
+		$step_type  = is_array( $step ) ? (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' ) : '';
+		if ( $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES && $this->existing_page_updates_ui_service !== null ) {
+			return $this->existing_page_updates_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
+		}
+		if ( $this->step_workspace_builder !== null ) {
+			return $this->step_workspace_builder->build( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
+		}
+		return $this->empty_step_workspace( $capabilities, $selected_item_id, $selected_item_ids );
+	}
+
+	/**
+	 * Returns empty step workspace shape when no builder available or plan not found.
+	 *
+	 * @param array<string, bool> $capabilities
+	 * @param string|null         $selected_item_id
+	 * @param array<int, string>  $selected_item_ids
+	 * @return array<string, mixed>
+	 */
+	private function empty_step_workspace( array $capabilities, ?string $selected_item_id, array $selected_item_ids ): array {
+		if ( $this->step_workspace_builder === null ) {
+			return array(
+				'step_list_rows'     => array(),
+				'column_order'       => array(),
+				'bulk_action_states'  => array(),
+				'detail_panel'        => array( 'item_id' => '', 'sections' => array(), 'row_actions' => array() ),
+				'step_messages'      => array(),
+			);
+		}
+		return $this->step_workspace_builder->build( array(), 0, $capabilities, $selected_item_id, $selected_item_ids );
 	}
 
 	/**

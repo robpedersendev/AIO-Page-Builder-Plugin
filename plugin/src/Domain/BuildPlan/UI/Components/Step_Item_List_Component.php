@@ -112,11 +112,17 @@ final class Step_Item_List_Component {
 	 */
 	private function column_header_label( string $col_key ): string {
 		$labels = array(
-			'title'       => \__( 'Title', 'aio-page-builder' ),
-			'url'         => \__( 'URL', 'aio-page-builder' ),
-			'action_type' => \__( 'Action', 'aio-page-builder' ),
-			'rationale'   => \__( 'Rationale', 'aio-page-builder' ),
-			'risk'        => \__( 'Risk', 'aio-page-builder' ),
+			'title'               => \__( 'Title', 'aio-page-builder' ),
+			'url'                 => \__( 'URL', 'aio-page-builder' ),
+			'action_type'         => \__( 'Action', 'aio-page-builder' ),
+			'rationale'           => \__( 'Rationale', 'aio-page-builder' ),
+			'risk'                => \__( 'Risk', 'aio-page-builder' ),
+			'current_page_title' => \__( 'Current page title', 'aio-page-builder' ),
+			'current_page_url'    => \__( 'Current URL / slug', 'aio-page-builder' ),
+			'action'              => \__( 'Suggested action', 'aio-page-builder' ),
+			'target_template'     => \__( 'Target template', 'aio-page-builder' ),
+			'reason'              => \__( 'Reason', 'aio-page-builder' ),
+			'risk_level'          => \__( 'Risk level', 'aio-page-builder' ),
 		);
 		return $labels[ $col_key ] ?? str_replace( '_', ' ', ucfirst( $col_key ) );
 	}
