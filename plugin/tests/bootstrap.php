@@ -109,6 +109,31 @@ if ( ! function_exists( 'esc_url' ) ) {
 		return ( $url !== '' && preg_match( '#^https?://#i', $url ) ) ? $url : '';
 	}
 }
+if ( ! function_exists( 'admin_url' ) ) {
+	function admin_url( $path = '', $scheme = 'admin' ) {
+		return 'http://example.org/wp-admin/' . ltrim( (string) $path, '/' );
+	}
+}
+if ( ! function_exists( 'add_query_arg' ) ) {
+	function add_query_arg( $key_or_array, $value = false, $url = false ) {
+		if ( $url === false ) {
+			$url = 'http://example.org/wp-admin/admin.php';
+		}
+		$url = (string) $url;
+		if ( is_array( $key_or_array ) ) {
+			$query = array();
+			$parsed = parse_url( $url );
+			if ( ! empty( $parsed['query'] ) ) {
+				parse_str( $parsed['query'], $query );
+			}
+			$query = array_merge( $query, $key_or_array );
+			$base = ( isset( $parsed['scheme'] ) ? $parsed['scheme'] . '://' : '' ) . ( $parsed['host'] ?? '' ) . ( $parsed['path'] ?? '' );
+			return $base . '?' . http_build_query( $query );
+		}
+		$sep = strpos( $url, '?' ) !== false ? '&' : '?';
+		return $url . $sep . rawurlencode( (string) $key_or_array ) . ( $value !== false ? '=' . rawurlencode( (string) $value ) : '' );
+	}
+}
 if ( ! function_exists( 'add_action' ) ) {
 	function add_action( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
 		// No-op for unit tests; CPT registration runs in WP context.

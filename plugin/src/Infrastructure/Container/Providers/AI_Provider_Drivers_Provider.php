@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers concrete AI provider driver(s) and connection test service (spec §25, §49.9).
+ * Registers concrete AI provider driver(s), connection test service, and AI Providers UI state builder (spec §25, §49.9).
  *
  * @package AIOPageBuilder
  */
@@ -14,11 +14,12 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Concrete_AI_Provider_Driver;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Provider_Connection_Test_Service;
 use AIOPageBuilder\Domain\AI\Secrets\Option_Based_Provider_Secret_Store;
+use AIOPageBuilder\Domain\AI\UI\AI_Providers_UI_State_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Registers OpenAI driver, provider secret store, and connection test service.
+ * Registers OpenAI driver, provider secret store, connection test service, and AI Providers screen state builder.
  */
 final class AI_Provider_Drivers_Provider implements Service_Provider_Interface {
 
@@ -41,6 +42,16 @@ final class AI_Provider_Drivers_Provider implements Service_Provider_Interface {
 				$container->get( 'provider_request_context_builder' ),
 				$container->get( 'provider_capability_resolver' ),
 				$container->get( 'settings' )
+			);
+		} );
+
+		$container->register( 'ai_providers_ui_state_builder', function () use ( $container ): AI_Providers_UI_State_Builder {
+			return new AI_Providers_UI_State_Builder(
+				$container->get( 'provider_connection_test_service' ),
+				$container->get( 'provider_secret_store' ),
+				$container->get( 'provider_capability_resolver' ),
+				$container->get( 'settings' ),
+				$container
 			);
 		} );
 	}
