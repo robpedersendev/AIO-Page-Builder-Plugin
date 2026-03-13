@@ -2,7 +2,7 @@
 
 **Document type:** Authoritative contract for Build Plan UI structure, layout, navigation, and state presentation.  
 **Governs:** Build Plan list/detail screens, stepper, context rail, list/detail views, status/error/progress/completion patterns (spec §31, §59.9).  
-**Reference:** Master Specification §31.1–31.12, §49.2–49.6, §59.9; Build Plan schema (Build_Plan_Schema, Build_Plan_Item_Schema); build-plan-state-machine.
+**Reference:** Master Specification §31.1–31.12, §49.2–49.6, §59.9; Build Plan schema (Build_Plan_Schema, Build_Plan_Item_Schema); build-plan-state-machine. **Template library scale:** When the registry is extended to the large-library targets (250 section templates, 500 page templates), template selection and Build Plan integration remain governed by this IA and by **template-library-scale-extension-contract.md** (docs/contracts/); the scale contract enhances prior prompts and does not replace them.
 
 **Out of scope for this contract:** UI class implementation, execution handlers, queue monitoring UI beyond IA placeholders, rollback UI, export package UI implementation.
 

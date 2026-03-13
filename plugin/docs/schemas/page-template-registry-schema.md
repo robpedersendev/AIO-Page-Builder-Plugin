@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for page templates (spec §13, §10.2, §16.1).  
 **Governs:** Required/optional fields, ordered section composition, one-pager metadata, compatibility, versioning, and deprecation for registry implementation.  
-**Related:** object-model-schema.md (§3.2 Page Template), section-registry-schema.md (section templates referenced by page templates), master spec §13.1–13.13, §16.1–16.5.
+**Related:** object-model-schema.md (§3.2 Page Template), section-registry-schema.md (section templates referenced by page templates), master spec §13.1–13.13, §16.1–16.5. **Large-library scale:** Minimum targets, variation philosophy, template-family and category coverage, and scale-governance rules for page templates are defined in **template-library-scale-extension-contract.md** (docs/contracts/); that contract enhances this schema and does not replace it.
 
 ---
 

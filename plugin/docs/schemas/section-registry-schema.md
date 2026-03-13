@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for section templates (spec §12, §10.1).  
 **Governs:** Required/optional fields, sub-manifests, validation rules, and completeness for registry implementation.  
-**Related:** object-model-schema.md (§3.1 Section Template), master spec §12.1–12.15. Page templates reference section templates by `internal_key`; see **page-template-registry-schema.md** for the page template schema. The `field_blueprint_ref` points to a blueprint defined per **acf-field-blueprint-schema.md**. The `css_contract_ref` points to a section CSS manifest that **must** conform to the global **css-selector-contract.md** (docs/contracts/).
+**Related:** object-model-schema.md (§3.1 Section Template), master spec §12.1–12.15. Page templates reference section templates by `internal_key`; see **page-template-registry-schema.md** for the page template schema. The `field_blueprint_ref` points to a blueprint defined per **acf-field-blueprint-schema.md**. The `css_contract_ref` points to a section CSS manifest that **must** conform to the global **css-selector-contract.md** (docs/contracts/). **Large-library scale:** Minimum targets, variation philosophy, category coverage, and scale-governance rules for section templates are defined in **template-library-scale-extension-contract.md** (docs/contracts/); that contract enhances this schema and does not replace it.
 
 ---
 
