@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for section templates (spec §12, §10.1).  
 **Governs:** Required/optional fields, sub-manifests, validation rules, and completeness for registry implementation.  
-**Related:** object-model-schema.md (§3.1 Section Template), master spec §12.1–12.15. Page templates reference section templates by `internal_key`; see **page-template-registry-schema.md** for the page template schema. The `field_blueprint_ref` points to a blueprint defined per **acf-field-blueprint-schema.md**. The `css_contract_ref` points to a section CSS manifest that **must** conform to the global **css-selector-contract.md** (docs/contracts/). **Large-library scale:** Minimum targets, variation philosophy, category coverage, and scale-governance rules for section templates are defined in **template-library-scale-extension-contract.md** (docs/contracts/); that contract enhances this schema and does not replace it.
+**Related:** object-model-schema.md (§3.1 Section Template), master spec §12.1–12.15. Page templates reference section templates by `internal_key`; see **page-template-registry-schema.md** for the page template schema. The `field_blueprint_ref` points to a blueprint defined per **acf-field-blueprint-schema.md**. The `css_contract_ref` points to a section CSS manifest that **must** conform to the global **css-selector-contract.md** (docs/contracts/). **Large-library scale:** Minimum targets, variation philosophy, category coverage, and scale-governance rules for section templates are defined in **template-library-scale-extension-contract.md** (docs/contracts/); that contract enhances this schema and does not replace it. **Category taxonomy:** Section-purpose families, placement tendency, CTA classification, and variation family for directory browsing and placement-aware composition are defined in **section-template-category-taxonomy-contract.md** (docs/contracts/); taxonomy fields below are additive optional metadata.
 
 ---
 
@@ -215,6 +215,11 @@ See §5. Required at top level: `version` object with at least `version` string.
 | `deprecation_notes` | string | — | Max 512 chars | Yes | Deprecation notes (narrative). |
 | `replacement_section_suggestions` | array of strings | — | Each: internal_key; max 64 chars | Yes | Alternative replacement keys. |
 | `dependencies_sections_or_context` | array of strings | — | Each max 256 chars | Yes | Dependencies on other sections or layout context. |
+| `section_purpose_family` | string | — | One of purpose-family slugs (e.g. hero, proof, cta, legal) per section-template-category-taxonomy-contract §2 | Yes | Primary purpose family for directory and placement. |
+| `section_category_tags` | array of strings | — | Each: category slug from §2.1; no duplicates required | Yes | Additional category tags for filtering and compatibility. |
+| `placement_tendency` | string | — | One of: opener, mid_page, comparison, legal_footer_adjacent, cta_ending, utility_any, related_any, other per taxonomy contract §4 | Yes | Typical placement in page flow. |
+| `cta_classification` | string | — | One of: primary_cta, contact_cta, navigation_cta, none per taxonomy contract §5 | Yes | CTA classification for CTA-aware composition. |
+| `variation_family_key` | string | — | Pattern `^[a-z0-9_]+$`; max 64 chars | Yes | Groups variant sections for browsing and coverage QA. |
 
 ---
 

@@ -36,6 +36,8 @@
 
 When admin screens list or browse **page templates** (e.g. registry, template picker, or Build Plan template selection), **directory and browse grouping** must follow **page-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `template_category_class` (top_level, hub, nested_hub, child_detail), `template_family` (e.g. home, services, locations), and `hierarchy_role`. Preview grouping aligns with the same taxonomy so that “Services”, “Locations”, etc. map to contract-defined family slugs. Category labels are server-authoritative, not ad-hoc UI strings.
 
+When admin screens list or browse **section templates**, **directory and browse grouping** must follow **section-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `section_purpose_family` (e.g. hero, proof, cta, legal), `placement_tendency` (opener, mid_page, cta_ending, legal_footer_adjacent), and `cta_classification`. Section preview grouping aligns with the same taxonomy. All taxonomy values are validated and deterministic.
+
 ---
 
 ## 3. Support Triage screen (spec §49.11, §59.12)
