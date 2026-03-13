@@ -52,6 +52,7 @@ final class Settings_Screen {
 		$hub_page_seed_result = isset( $_GET['aio_hub_page_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_page_seed_result'] ) : '';
 		$geographic_hub_seed_result = isset( $_GET['aio_geographic_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_geographic_hub_seed_result'] ) : '';
 		$nested_hub_seed_result     = isset( $_GET['aio_nested_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_nested_hub_seed_result'] ) : '';
+		$hub_nested_hub_variant_expansion_seed_result = isset( $_GET['aio_hub_nested_hub_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_nested_hub_variant_expansion_seed_result'] ) : '';
 		$child_detail_seed_result   = isset( $_GET['aio_child_detail_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_seed_result'] ) : '';
 		$child_detail_product_seed_result = isset( $_GET['aio_child_detail_product_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_product_seed_result'] ) : '';
 		$child_detail_profile_entity_seed_result = isset( $_GET['aio_child_detail_profile_entity_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_profile_entity_seed_result'] ) : '';
@@ -296,6 +297,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_nested_hub_templates" />
 				<?php \wp_nonce_field( 'aio_seed_nested_hub_templates', 'aio_seed_nested_hub_nonce' ); ?>
 				<?php \submit_button( __( 'Seed nested hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_nested_hub_submit', false ); ?>
+			</form>
+
+			<?php if ( $hub_nested_hub_variant_expansion_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Hub and nested hub variant expansion super-batch (PT-12) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $hub_nested_hub_variant_expansion_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding hub and nested hub variant expansion super-batch failed. Seed section and hub/geographic/nested hub batches first.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Hub and nested hub variant expansion super-batch (PT-12)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed additional hub and nested hub variants for services, products, offerings, directories, locations, and geographic families. Materially distinct listing strategy, comparison depth, proof density. ~10 non-CTA, ≥4 CTA, bottom CTA, no adjacent CTAs. Synthetic preview only. Idempotent.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_hub_nested_hub_variant_expansion_templates" />
+				<?php \wp_nonce_field( 'aio_seed_hub_nested_hub_variant_expansion_templates', 'aio_seed_hub_nested_hub_variant_expansion_nonce' ); ?>
+				<?php \submit_button( __( 'Seed hub and nested hub variant expansion super-batch', 'aio-page-builder' ), 'secondary', 'aio_seed_hub_nested_hub_variant_expansion_submit', false ); ?>
 			</form>
 
 			<?php if ( $child_detail_seed_result === 'success' ) : ?>
