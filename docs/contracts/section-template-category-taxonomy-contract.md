@@ -106,7 +106,7 @@ Sections do **not** have a required page-template class; pages are built from se
 - **child_detail:** Sections with purpose_family `listing`, `comparison`, `profile`, `faq` are commonly used in child/detail pages.
 - **Legal and CTA:** Sections with purpose_family `legal` or `cta` and placement_tendency `legal_footer_adjacent` or `cta_ending` support page-level composition rules (e.g. “one primary CTA block”, “legal near footer”).
 
-This contract does **not** define CTA adjacency or sequencing logic; it defines the **metadata** (cta_classification, placement_tendency, purpose_family) that such logic can use.
+This contract defines the **metadata** (cta_classification, placement_tendency, purpose_family) that composition logic uses. **Mandatory CTA sequencing** (minimum CTA counts by page class, bottom-of-page CTA, non-adjacency of CTA sections) is defined in **cta-sequencing-and-placement-contract.md** (Prompt 135); section templates with cta_classification in { primary_cta, contact_cta, navigation_cta } are subject to those rules.
 
 ---
 
@@ -205,5 +205,6 @@ This contract **enhances** (and does not replace) the following:
 | 042, 043 | Composition, helper system; taxonomy supports placement and compatibility. |
 | 122 | Diagnostics; taxonomy supports coverage reporting. |
 | 132 | Scale extension; taxonomy implements section category coverage and variation structure. |
+| 135 | CTA sequencing; CTA-classified sections (cta_classification ≠ none) are subject to mandatory sequencing and placement rules in **cta-sequencing-and-placement-contract.md**. |
 
 Sections remain **registry-driven**, **versioned** (§12.14), **selector-contract-bound** (§17, §57.6), **ACF-owned** in field logic (§20), and **helper-documented** (§15). This contract adds **purpose family, placement tendency, CTA classification, and variation family** metadata on top of that foundation.

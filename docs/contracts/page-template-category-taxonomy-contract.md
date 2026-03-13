@@ -2,7 +2,7 @@
 
 **Document type:** Authoritative contract for page-template category taxonomy, hierarchy roles, and directory structure (Prompt 133).  
 **Governs:** Four major category classes, subfamilies, hierarchy-role metadata, purpose/CTA-orientation, admin directory/browse grouping, and variation-family rules.  
-**Spec refs:** §13 Page Template Registry; §13.11 Compatibility; §13.12 Versioning; §14.3 Allowed Section Ordering; §16.1 One-Pager Purpose; §16.5 Template-Wide Editing Notes; §49.3 Screen Hierarchy; template-library-scale-extension-contract (Prompt 132).
+**Spec refs:** §13 Page Template Registry; §13.11 Compatibility; §13.12 Versioning; §14.3 Allowed Section Ordering; §16.1 One-Pager Purpose; §16.5 Template-Wide Editing Notes; §49.3 Screen Hierarchy; template-library-scale-extension-contract (Prompt 132); **cta-sequencing-and-placement-contract** (Prompt 135) for mandatory CTA counts, bottom-of-page CTA, and non-adjacency rules.
 
 **Enhancement policy:** This contract **enhances** and does **not replace** Prompts 022, 028, 029, 070, 071, 111, 123, or Prompt 132. Page templates remain registry objects with ordered section references, one-pager support, and compatibility metadata. Taxonomy adds **structure and metadata**; it does not replace purpose, archetype, or section-order logic.
 
@@ -208,6 +208,7 @@ This contract **enhances** (and does not replace) the following:
 | 070, 071 | Registry admin screens; taxonomy supplies grouping semantics. |
 | 111 | Build Plan / template selection; taxonomy can drive filters. |
 | 123 | Diagnostics/reporting; taxonomy can drive coverage reporting. |
-| 132 | Scale extension; taxonomy implements “template-family” and “category coverage” structure. |
+| 132 | Scale extension; taxonomy implements "template-family" and "category coverage" structure. |
+| 135 | CTA sequencing; mandatory CTA counts by category, bottom-of-page CTA, and non-adjacency of CTA sections are enforced per **cta-sequencing-and-placement-contract.md**. |
 
-Page templates remain **registry objects** with ordered section references, one-pager support (§16.1, §16.5), and compatibility metadata (§13.11, §13.12). This contract adds **category taxonomy and hierarchy metadata** and **directory/browse semantics** on top of that foundation.
+Page templates remain **registry objects** with ordered section references, one-pager support (§16.1, §16.5), and compatibility metadata (§13.11, §13.12). This contract adds **category taxonomy and hierarchy metadata** and **directory/browse semantics** on top of that foundation. **CTA composition rules** (minimum CTA sections, last-section CTA, no adjacent CTAs, target non-CTA range) are defined in **cta-sequencing-and-placement-contract.md** (Prompt 135); validators and template-generation must enforce that contract.
