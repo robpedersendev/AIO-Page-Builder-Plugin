@@ -250,9 +250,20 @@ Each batch (e.g. SEC-01–SEC-09, PT-01–PT-10 per template-library-inventory-m
 | SEC-07 | ☑ | ☑ | N/A | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | 2025-03 | Legal_Policy_Utility_Library_Batch_Test |
 | SEC-08 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | 2025-03 | CTA_Super_Library_Batch_Test; CTA metadata checks |
 | SEC-09 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | _____ | _____ |
-| *(page batches)* | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | _____ | _____ |
+| PT-01 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Top_Level_Marketing_Page_Template_Test; page-template-batch-validation-report.md |
+| PT-02 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Top_Level_Legal_Utility_Page_Template_Test |
+| PT-03 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Hub_Page_Template_Test |
+| PT-04 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Geographic_Hub_Page_Template_Test |
+| PT-06 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Nested_Hub_Page_Template_Test |
+| PT-07 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Child_Detail_Page_Template_Test |
+| PT-08 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Child_Detail_Product_Page_Template_Test |
+| PT-09 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Child_Detail_Profile_Entity_Page_Template_Test |
+| PT-10 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Top_Level_Educational_Resource_Authority_Page_Template_Test |
+| PT-11 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Top_Level_Variant_Expansion_Page_Template_Test |
+| PT-12 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Hub_Nested_Hub_Variant_Expansion_Page_Template_Test |
+| PT-13 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☐ | ☐ | ☐ | ☑ | 2025-03 | Child_Detail_Variant_Expansion_Page_Template_Test |
 
-**Rule:** All checkboxes must be checked (or N/A with rationale) for the batch to be considered compliant. Sign-off is recorded per hardening-release-gate-matrix §6. Section batches SEC-01–SEC-08 filled after Prompt 154.
+**Rule:** All checkboxes must be checked (or N/A with rationale) for the batch to be considered compliant. Sign-off is recorded per hardening-release-gate-matrix §6. Section batches SEC-01–SEC-08 filled after Prompt 154. Page batches PT-01–PT-13 filled after Prompt 167; COUNT/CATEGORY/CTA_*/EXPORT evidenced by unit tests and page-template-batch-validation-report.md; SEMANTIC/ANIMATION/OMISSION/ACF/LPAGERY remain implementation-level (markup, renderer, blueprint) and are ☐ until markup/renderer review.
 
 ---
 

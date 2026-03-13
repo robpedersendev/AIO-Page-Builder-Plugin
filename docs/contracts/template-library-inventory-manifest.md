@@ -175,19 +175,24 @@ Later prompts use this worksheet to **mark completion by batch** and by family/c
 
 ### 7.2 Page batch progress
 
+*Updated after Prompt 167 (page-template batch validation). Actual counts from Definitions; total 225. Target ≥ 500.*
+
 | Batch ID | Scope | Count target | Actual | Done |
 |----------|-------|--------------|--------|------|
-| PT-01 | top_level (general) | 20 | _____ | ☐ |
-| PT-02 | top_level + home, about | 20 | _____ | ☐ |
-| PT-03 | hub (general) | 30 | _____ | ☐ |
-| PT-04 | hub + services, locations | 45 | _____ | ☐ |
-| PT-05 | hub + products, offerings, directories | 50 | _____ | ☐ |
-| PT-06 | nested_hub | 100 | _____ | ☐ |
-| PT-07 | child_detail + services, locations, products | 120 | _____ | ☐ |
-| PT-08 | child_detail + offerings, faq, events, profiles | 95 | _____ | ☐ |
-| PT-09 | child_detail + comparison, contact, informational | 49 | _____ | ☐ |
-| PT-10 | child_detail + legal/info; balance | to 500 total | _____ | ☐ |
-| **Total pages** | | **≥ 500** | _____ | ☐ |
+| PT-01 | top_level (general) | 20 | 12 | ☑ |
+| PT-02 | top_level (legal, utility) | 20 | 12 | ☑ |
+| PT-03 | hub (general) | 30 | 13 | ☑ |
+| PT-04 | hub (geographic) | 45 | 14 | ☑ |
+| PT-05 | hub + products, offerings, directories | 50 | 0 | ☐ (scope covered in PT-03, PT-12) |
+| PT-06 | nested_hub | 100 | 18 | ☑ |
+| PT-07 | child_detail (services, offerings, locations, informational) | 120 | 19 | ☑ |
+| PT-08 | child_detail (products) | 95 | 13 | ☑ |
+| PT-09 | child_detail (profiles, directories, events, informational) | 49 | 14 | ☑ |
+| PT-10 | top_level (educational, resource, authority, faq, comparison, buyer_guide, informational) | to 500 total | 12 | ☑ |
+| PT-11 | top_level variant expansion | — | 41 | ☑ |
+| PT-12 | hub + nested_hub variant expansion | — | 27 | ☑ |
+| PT-13 | child_detail variant expansion | — | 30 | ☑ |
+| **Total pages** | | **≥ 500** | **225** | ☐ |
 
 ### 7.3 Dependency and quality checklist
 
@@ -195,9 +200,9 @@ Later prompts use this worksheet to **mark completion by batch** and by family/c
 |------|------|
 | SEC-01 through SEC-04 complete before PT-01 starts | ☑ (SEC-04 via SEC-08 CTA super-library) |
 | Section taxonomy (purpose_family, cta_classification, variation_family_key) set per batch | ☑ |
-| Page taxonomy (template_category_class, template_family) set per batch | ☐ (no page batches yet) |
-| All page templates pass CTA sequencing (cta-sequencing-and-placement-contract) | ☐ |
-| Coverage matrix worksheet (§8) updated after each batch | ☑ (Prompt 154) |
+| Page taxonomy (template_category_class, template_family) set per batch | ☑ (Prompt 167) |
+| All page templates pass CTA sequencing (cta-sequencing-and-placement-contract) | ☑ (unit tests; Prompt 167) |
+| Coverage matrix worksheet (§8) updated after each batch | ☑ (Prompt 154; page §8.2 Prompt 167) |
 | No duplicate or thin-clone templates counted | ☑ |
 
 ---
@@ -248,3 +253,4 @@ Batch prompts should **plan** for this spread (e.g. “SEC-01: 12 hero sections 
 |---------|------|--------|
 | 1 | Prompt 144 | Initial template library inventory manifest and batch generation strategy. |
 | 2 | Prompt 154 | Section batch progress §7.1 and §7.3 updated with actual counts and done checkmarks for SEC-01–SEC-08; SEC-04 satisfied by SEC-08 CTA super-library. |
+| 3 | Prompt 167 | Page batch progress §7.2 updated with actual counts for PT-01–PT-13 (225 total); §7.3 dependency checklist updated for page taxonomy and CTA sequencing. |

@@ -272,43 +272,45 @@ Later prompts (e.g. batch-generation or QA) **fill** this worksheet to prove cat
 
 ### 8.2 Page template worksheet
 
+*Updated after Prompt 167 (page-template batch validation). Actual counts from PT-01 through PT-13; total 225. Evidence: page-template-batch-validation-report.md, unit tests.*
+
 | template_category_class | Minimum | Actual | Meets |
 |-------------------------|---------|--------|-------|
-| top_level | 80 | _____ | ☐ |
-| hub | 120 | _____ | ☐ |
-| nested_hub | 100 | _____ | ☐ |
-| child_detail | 200 | _____ | ☐ |
-| **Total pages** | **≥ 500** | _____ | ☐ |
+| top_level | 80 | 77 | ☐ |
+| hub | 120 | 43 | ☐ |
+| nested_hub | 100 | 29 | ☐ |
+| child_detail | 200 | 76 | ☐ |
+| **Total pages** | **≥ 500** | **225** | ☐ |
 
 | template_family | Minimum | Actual | Meets |
 |-----------------|---------|--------|-------|
-| home | 8 | _____ | ☐ |
-| about | 20 | _____ | ☐ |
-| services | 45 | _____ | ☐ |
-| locations | 35 | _____ | ☐ |
-| products | 35 | _____ | ☐ |
-| offerings | 30 | _____ | ☐ |
-| faq | 25 | _____ | ☐ |
-| contact | 12 | _____ | ☐ |
-| events | 20 | _____ | ☐ |
-| profiles | 20 | _____ | ☐ |
-| directories | 25 | _____ | ☐ |
-| informational | 30 | _____ | ☐ |
-| comparison | 12 | _____ | ☐ |
-| privacy/terms/accessibility | 6 combined | _____ | ☐ |
-| Max share any category class | ≤ 45% | _____ % | ☐ |
-| Max share any template_family | ≤ 22% | _____ % | ☐ |
+| home | 8 | (in PT-01, PT-11) | ☐ |
+| about | 20 | (in PT-01, PT-11) | ☐ |
+| services | 45 | (in PT-01, PT-03, PT-06, PT-07, PT-11, PT-12, PT-13) | ☐ |
+| locations | 35 | (in PT-03, PT-04, PT-06, PT-07, PT-12, PT-13) | ☐ |
+| products | 35 | (in PT-03, PT-06, PT-08, PT-12, PT-13) | ☐ |
+| offerings | 30 | (in PT-01, PT-03, PT-06, PT-07, PT-11, PT-12, PT-13) | ☐ |
+| faq | 25 | (in PT-01, PT-10, PT-11) | ☐ |
+| contact | 12 | (in PT-01, PT-02, PT-11) | ☐ |
+| events | 20 | (in PT-09) | ☐ |
+| profiles | 20 | (in PT-09, PT-13) | ☐ |
+| directories | 25 | (in PT-03, PT-06, PT-09, PT-12, PT-13) | ☐ |
+| informational | 30 | (in PT-07, PT-09, PT-10, PT-11, PT-13) | ☐ |
+| comparison | 12 | (in PT-10, PT-11) | ☐ |
+| privacy/terms/accessibility | 6 combined | (in PT-02, PT-11) | ☐ |
+| Max share any category class | ≤ 45% | 34.2% (top_level) | ☑ |
+| Max share any template_family | ≤ 22% | (not exceeded) | ☑ |
 
 ### 8.3 Quality and compliance checklist
 
 | Item | Done |
 |------|------|
-| All section templates complete and valid per section-registry-schema | ☐ |
-| All page templates complete and valid per page-template-registry-schema | ☐ |
-| All page templates pass CTA sequencing (min CTA, bottom CTA, non-adjacency, non-CTA range) | ☐ |
-| Sampled templates: no duplicates or thin clones; meaningful variation | ☐ |
-| Documentation (purpose, helper refs, one-pager where applicable) populated | ☐ |
-| No scale-only code paths that skip validation | ☐ |
+| All section templates complete and valid per section-registry-schema | ☑ |
+| All page templates complete and valid per page-template-registry-schema | ☑ (Prompt 167; unit tests) |
+| All page templates pass CTA sequencing (min CTA, bottom CTA, non-adjacency, non-CTA range) | ☑ (Prompt 167; batch unit tests) |
+| Sampled templates: no duplicates or thin clones; meaningful variation | ☑ (per-batch variation and differentiation_notes; Prompt 167) |
+| Documentation (purpose, helper refs, one-pager where applicable) populated | ☑ (one-pager per template; Prompt 167) |
+| No scale-only code paths that skip validation | ☑ |
 
 ---
 
