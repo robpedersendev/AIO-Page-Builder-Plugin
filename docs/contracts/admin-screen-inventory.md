@@ -32,6 +32,10 @@
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
 | **Post-Release Health**| `Post_Release_Health_Screen` / `aio-page-builder-post-release-health` | `aio_view_logs`         |
 
+### 2.1 Page template directory and taxonomy (spec §49.3, §62.10; Prompt 133)
+
+When admin screens list or browse **page templates** (e.g. registry, template picker, or Build Plan template selection), **directory and browse grouping** must follow **page-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `template_category_class` (top_level, hub, nested_hub, child_detail), `template_family` (e.g. home, services, locations), and `hierarchy_role`. Preview grouping aligns with the same taxonomy so that “Services”, “Locations”, etc. map to contract-defined family slugs. Category labels are server-authoritative, not ad-hoc UI strings.
+
 ---
 
 ## 3. Support Triage screen (spec §49.11, §59.12)

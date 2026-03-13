@@ -2,7 +2,7 @@
 
 **Document type:** Implementation-grade schema contract for page templates (spec §13, §10.2, §16.1).  
 **Governs:** Required/optional fields, ordered section composition, one-pager metadata, compatibility, versioning, and deprecation for registry implementation.  
-**Related:** object-model-schema.md (§3.2 Page Template), section-registry-schema.md (section templates referenced by page templates), master spec §13.1–13.13, §16.1–16.5. **Large-library scale:** Minimum targets, variation philosophy, template-family and category coverage, and scale-governance rules for page templates are defined in **template-library-scale-extension-contract.md** (docs/contracts/); that contract enhances this schema and does not replace it.
+**Related:** object-model-schema.md (§3.2 Page Template), section-registry-schema.md (section templates referenced by page templates), master spec §13.1–13.13, §16.1–16.5. **Large-library scale:** Minimum targets, variation philosophy, template-family and category coverage, and scale-governance rules for page templates are defined in **template-library-scale-extension-contract.md** (docs/contracts/); that contract enhances this schema and does not replace it. **Category taxonomy:** Four major category classes, subfamilies, hierarchy roles, and purpose/CTA metadata for directory browsing and preview grouping are defined in **page-template-category-taxonomy-contract.md** (docs/contracts/); taxonomy fields below are additive optional metadata.
 
 ---
 
@@ -113,6 +113,11 @@ Optionality must be explicit, not guessed at runtime. This distinction is used f
 | `replacement_template_refs` | array of strings | — | Each: internal_key; max 64 chars | Yes | Replacement template references when deprecated. |
 | `seo_defaults` | object | — | Shape per §9 | Yes | SEO default reference block (§13.9). |
 | `deprecation` | object | — | Shape per §10 | Yes | Deprecation block when status is deprecated (§13.13). |
+| `template_category_class` | string | — | One of: `top_level`, `hub`, `nested_hub`, `child_detail` (per page-template-category-taxonomy-contract) | Yes | Major category class for directory and hierarchy; required when taxonomy is applied. |
+| `template_family` | string | — | One of allowed family slugs (e.g. `home`, `services`, `locations`) per taxonomy contract §3 | Yes | Subfamily for directory browsing and preview grouping. |
+| `hierarchy_role` | string | — | One of: `root`, `standalone`, `hub`, `nested_hub`, `leaf`, `intermediate` per taxonomy contract §4 | Yes | Hierarchy role; must be consistent with template_category_class. |
+| `page_purpose_family` | string | — | One of purpose slugs (e.g. `informational`, `conversion`, `support`) per taxonomy contract §5.1 | Yes | Primary page intent. |
+| `cta_intent_family` | string | — | One of CTA slugs (e.g. `primary_conversion`, `contact_request`) per taxonomy contract §5.2 | Yes | Primary CTA orientation for taxonomy/filtering. |
 
 ### 5.1 Hierarchy hints object (optional)
 
