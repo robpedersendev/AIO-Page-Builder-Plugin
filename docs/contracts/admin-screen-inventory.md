@@ -28,7 +28,7 @@
 | Prompt Experiments      | `Prompt_Experiments_Screen` / `aio-page-builder-prompt-experiments` | `aio_manage_ai_providers` |
 | Build Plans             | `Build_Plans_Screen` / `aio-page-builder-build-plans` | `aio_view_build_plans`  |
 | Build Plan Analytics   | `Build_Plan_Analytics_Screen` / `aio-page-builder-build-plan-analytics` | `aio_view_build_plans`  |
-| **Page Templates**     | Page template directory (see §2.2) / `aio-page-builder-page-templates`   | `aio_view_build_plans` (or dedicated template cap) |
+| **Page Templates**     | `Page_Templates_Directory_Screen` / `aio-page-builder-page-templates`   | `aio_view_build_plans` |
 | **Section Templates**  | Section template directory (see §2.3) / `aio-page-builder-section-templates` | `aio_view_build_plans` (or dedicated template cap) |
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
@@ -40,7 +40,52 @@ When admin screens list or browse **page templates** (e.g. registry, template pi
 
 ### 2.2 Page template directory IA (spec §49.7; Prompt 141)
 
-The **page template directory** is a dedicated browse experience for page templates. Its **information architecture** (hierarchical tree, breadcrumbs, category/family filters, list/detail, one-pager/preview links) is defined in **page-template-directory-ia-extension.md**. Tree structure: **Page Templates** (root) → **Category class** (Top Level, Hub, Nested Hub, Child/Detail) → **Family** (e.g. Home Page Templates, Services Page Templates) → **Template option list** → **Template detail**. Screen slug: `aio-page-builder-page-templates` (or as specified in that contract). Directory is capability-gated; preview uses preview-safe data only. Build Plan template selection may deep-link into the directory; directory does not replace Build Plan or composition workflows.
+The **page template directory** is a dedicated browse experience for page templates. Its **information architecture** (hierarchical tree, breadcrumbs, category/family filters, list/detail, one-pager/preview links) is defined in **page-template-directory-ia-extension.md**. Tree structure: **Page Templates** (root) → **Category class** (Top Level, Hub, Nested Hub, Child/Detail) → **Family** (e.g. Home Page Templates, Services Page Templates) → **Template option list** → **Template detail**. Screen slug: `aio-page-builder-page-templates` (or as specified in that contract). Directory is capability-gated; preview uses preview-safe data only. Build Plan template selection may deep-link into the directory; directory does not replace Build Plan or composition workflows. State is built by `Page_Template_Directory_State_Builder`.
+
+**Example page-template directory state payload** (list view, one row):
+
+```json
+{
+  "view": "list",
+  "breadcrumbs": [
+    { "label": "Page Templates", "url": "https://example.com/wp-admin/admin.php?page=aio-page-builder-page-templates" },
+    { "label": "Top Level Page Templates", "url": "...&category_class=top_level" },
+    { "label": "Home Page Templates", "url": "" }
+  ],
+  "tree": [
+    { "slug": "top_level", "label": "Top Level Page Templates", "count": 12, "url": "..." },
+    { "slug": "hub", "label": "Hub Page Templates", "count": 8, "url": "..." },
+    { "slug": "nested_hub", "label": "Nested Hub Page Templates", "count": 6, "url": "..." },
+    { "slug": "child_detail", "label": "Child/Detail Page Templates", "count": 20, "url": "..." }
+  ],
+  "families": [],
+  "list_result": {
+    "rows": [
+      {
+        "internal_key": "pt_home_landing",
+        "name": "Home Landing",
+        "status": "stable",
+        "template_category_class": "top_level",
+        "template_family": "home",
+        "section_count": 7,
+        "version": "1",
+        "preview_available": false
+      }
+    ],
+    "pagination": { "page": 1, "per_page": 25, "total": 1, "total_pages": 1, "offset": 0 },
+    "total_matching": 1
+  },
+  "filters": { "category_class": "top_level", "family": "home", "status": "", "search": "", "paged": 1, "per_page": 25 },
+  "base_url": "https://example.com/wp-admin/admin.php?page=aio-page-builder-page-templates",
+  "can_manage_templates": true,
+  "category_labels": {
+    "top_level": "Top Level Page Templates",
+    "hub": "Hub Page Templates",
+    "nested_hub": "Nested Hub Page Templates",
+    "child_detail": "Child/Detail Page Templates"
+  }
+}
+```
 
 When admin screens list or browse **section templates**, **directory and browse grouping** must follow **section-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `section_purpose_family` (e.g. hero, proof, cta, legal), `placement_tendency` (opener, mid_page, cta_ending, legal_footer_adjacent), and `cta_classification`. Section preview grouping aligns with the same taxonomy. All taxonomy values are validated and deterministic.
 

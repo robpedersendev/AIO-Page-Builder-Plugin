@@ -58,6 +58,11 @@ if ( ! function_exists( 'wp_strip_all_tags' ) ) {
 		return preg_replace( '@<[^>]*?>@s', '', (string) $string );
 	}
 }
+if ( ! function_exists( 'sanitize_key' ) ) {
+	function sanitize_key( $key ) {
+		return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) );
+	}
+}
 if ( ! function_exists( 'sanitize_text_field' ) ) {
 	function sanitize_text_field( $str ) {
 		return trim( (string) $str );

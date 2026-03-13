@@ -312,6 +312,10 @@ final class Large_Library_Query_Service {
 		foreach ( $defs as $def ) {
 			$pm = $def['preview_metadata'] ?? array();
 			$preview_ref = is_array( $pm ) ? ( $pm['preview_image_ref'] ?? $pm['preview_ref'] ?? '' ) : '';
+			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+			$section_count = is_array( $ordered ) ? count( $ordered ) : 0;
+			$version_arr = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
+			$version = is_array( $version_arr ) ? (string) ( $version_arr['version'] ?? '1' ) : '1';
 			$rows[] = array(
 				'internal_key'           => (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' ),
 				'name'                   => (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? '' ),
@@ -321,6 +325,8 @@ final class Large_Library_Query_Service {
 				'template_category_class' => (string) ( $def['template_category_class'] ?? '' ),
 				'template_family'        => (string) ( $def['template_family'] ?? '' ),
 				'preview_available'      => ( $preview_ref !== '' ),
+				'section_count'          => $section_count,
+				'version'                => $version,
 			);
 		}
 		return $rows;
