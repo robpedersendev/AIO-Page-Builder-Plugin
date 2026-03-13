@@ -291,6 +291,32 @@ final class Section_Field_Blueprint_Test extends TestCase {
 		$this->assertTrue( $field['required'] );
 	}
 
+	public function test_get_lpagery_compatible_field_keys_returns_supported_types_only(): void {
+		$validator = new Section_Field_Blueprint_Validator();
+		$normalizer = new Section_Field_Blueprint_Normalizer( $validator );
+		$repo    = new Section_Template_Repository();
+		$service = new Section_Field_Blueprint_Service( $repo, $validator, $normalizer );
+		$result  = $normalizer->normalize( $this->valid_minimal_blueprint(), 'st01_hero', 'acf_blueprint_st01' );
+		$this->assertEmpty( $result['errors'] );
+		$blueprint = $result['normalized'];
+
+		$keys = $service->get_lpagery_compatible_field_keys( $blueprint );
+		$this->assertIsArray( $keys );
+		$this->assertContains( 'field_st01_hero_headline', $keys );
+		$this->assertContains( 'field_st01_hero_subheadline', $keys );
+		$this->assertContains( 'field_st01_hero_cta', $keys );
+		$this->assertCount( 3, $keys );
+	}
+
+	public function test_get_lpagery_compatible_field_keys_empty_when_no_fields(): void {
+		$repo    = new Section_Template_Repository();
+		$validator = new Section_Field_Blueprint_Validator();
+		$normalizer = new Section_Field_Blueprint_Normalizer( $validator );
+		$service = new Section_Field_Blueprint_Service( $repo, $validator, $normalizer );
+		$keys   = $service->get_lpagery_compatible_field_keys( array( 'section_key' => 'st01_hero' ) );
+		$this->assertSame( array(), $keys );
+	}
+
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_post_meta'] = array();

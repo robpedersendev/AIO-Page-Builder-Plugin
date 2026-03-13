@@ -17,6 +17,7 @@ use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Diagnostics\Content_Survivability_Checker;
 use AIOPageBuilder\Domain\Rendering\Diagnostics\Rendering_Diagnostics_Service;
 use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
+use AIOPageBuilder\Domain\Rendering\LPagery\LPagery_Token_Compatibility_Service;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiation_Payload_Builder;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiator;
 use AIOPageBuilder\Domain\Rendering\Preview\Render_Preview_Helper;
@@ -77,6 +78,10 @@ final class Rendering_Provider implements Service_Provider_Interface {
 
 		$container->register( 'render_asset_controller', function (): Render_Asset_Controller {
 			return new Render_Asset_Controller();
+		} );
+
+		$container->register( 'lpagery_token_compatibility_service', function (): LPagery_Token_Compatibility_Service {
+			return new LPagery_Token_Compatibility_Service();
 		} );
 	}
 }

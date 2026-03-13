@@ -144,4 +144,33 @@ final class Section_Field_Blueprint_Service {
 	public function get_group_key_for_section( string $section_key ): string {
 		return Field_Key_Generator::group_key( $section_key );
 	}
+
+	/**
+	 * Returns field keys (name or key) that are LPagery token-compatible per field type (spec §20.7, §21.3).
+	 * Additive compatibility annotation; does not change blueprint validation or registration.
+	 *
+	 * @param array<string, mixed> $blueprint Normalized blueprint (must contain Field_Blueprint_Schema::FIELDS).
+	 * @return list<string> Field keys/names whose type is in LPAGERY_SUPPORTED_TYPES.
+	 */
+	public function get_lpagery_compatible_field_keys( array $blueprint ): array {
+		$fields = $blueprint[ Field_Blueprint_Schema::FIELDS ] ?? null;
+		if ( ! is_array( $fields ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $fields as $field ) {
+			if ( ! is_array( $field ) ) {
+				continue;
+			}
+			$type = (string) ( $field[ Field_Blueprint_Schema::FIELD_TYPE ] ?? '' );
+			if ( ! in_array( $type, Field_Blueprint_Schema::LPAGERY_SUPPORTED_TYPES, true ) ) {
+				continue;
+			}
+			$key = (string) ( $field[ Field_Blueprint_Schema::FIELD_KEY ] ?? $field[ Field_Blueprint_Schema::FIELD_NAME ] ?? '' );
+			if ( $key !== '' ) {
+				$out[] = $key;
+			}
+		}
+		return $out;
+	}
 }
