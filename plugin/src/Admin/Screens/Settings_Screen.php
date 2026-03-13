@@ -52,6 +52,7 @@ final class Settings_Screen {
 		$nested_hub_seed_result     = isset( $_GET['aio_nested_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_nested_hub_seed_result'] ) : '';
 		$child_detail_seed_result   = isset( $_GET['aio_child_detail_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_seed_result'] ) : '';
 		$child_detail_product_seed_result = isset( $_GET['aio_child_detail_product_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_product_seed_result'] ) : '';
+		$child_detail_profile_entity_seed_result = isset( $_GET['aio_child_detail_profile_entity_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_profile_entity_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -293,6 +294,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_child_detail_product_templates" />
 				<?php \wp_nonce_field( 'aio_seed_child_detail_product_templates', 'aio_seed_child_detail_product_nonce' ); ?>
 				<?php \submit_button( __( 'Seed product/catalog child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_product_submit', false ); ?>
+			</form>
+
+			<?php if ( $child_detail_profile_entity_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Directory/profile/entity/resource child/detail page template batch (PT-09) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $child_detail_profile_entity_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding directory/profile/entity/resource child/detail page template batch failed. Seed section and other template batches first.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Directory/profile/entity/resource child/detail page template batch (PT-09)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed child/detail page templates for directory members, staff/provider profiles, place/entity detail, organization profile, article/resource detail. ~10 non-CTA, ≥5 CTA, mandatory bottom CTA, no adjacent CTAs. Synthetic preview only.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_child_detail_profile_entity_templates" />
+				<?php \wp_nonce_field( 'aio_seed_child_detail_profile_entity_templates', 'aio_seed_child_detail_profile_entity_nonce' ); ?>
+				<?php \submit_button( __( 'Seed directory/profile/entity/resource child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_profile_entity_submit', false ); ?>
 			</form>
 		</div>
 		<?php
