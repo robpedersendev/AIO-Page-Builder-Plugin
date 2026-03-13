@@ -84,11 +84,55 @@ final class AI_Run_Detail_Screen {
 						<tr><th scope="row"><?php \esc_html_e( 'Completed', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['completed_at'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Provider', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['provider_id'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Model', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['model_used'] ?? '' ) ); ?></td></tr>
+						<?php
+						$attempts = isset( $meta_safe['failover_attempt'] ) && is_array( $meta_safe['failover_attempt'] ) ? $meta_safe['failover_attempt'] : array();
+						$effective = isset( $meta_safe['effective_provider_used'] ) && is_array( $meta_safe['effective_provider_used'] )
+							? $meta_safe['effective_provider_used']
+							: null;
+						if ( count( $attempts ) > 1 && $effective !== null && ( (string) ( $effective['provider_id'] ?? '' ) ) !== '' ) :
+							?>
+						<tr><th scope="row"><?php \esc_html_e( 'Effective provider used', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $effective['provider_id'] ?? '' ) ); ?> (<?php echo \esc_html( (string) ( $effective['model_used'] ?? '' ) ); ?>)</td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Failover', 'aio-page-builder' ); ?></th><td><?php \esc_html_e( 'Primary failed; fallback was attempted. See attempt log below.', 'aio-page-builder' ); ?></td></tr>
+						<?php endif; ?>
 						<tr><th scope="row"><?php \esc_html_e( 'Prompt pack', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['prompt_pack_ref'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Retry count', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['retry_count'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Build plan ref', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['build_plan_ref'] ?? '' ) ); ?></td></tr>
 					</tbody>
 				</table>
+				<?php
+				if ( ! empty( $attempts ) ) :
+					?>
+				<h3 id="aio-failover-heading"><?php \esc_html_e( 'Failover attempt log', 'aio-page-builder' ); ?></h3>
+				<table class="widefat striped" aria-describedby="aio-failover-heading">
+					<thead>
+						<tr>
+							<th scope="col"><?php \esc_html_e( 'Provider', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Model', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Outcome', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Time', 'aio-page-builder' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ( $attempts as $a ) : ?>
+							<?php
+							if ( ! is_array( $a ) ) {
+								continue;
+							}
+							$p = isset( $a['provider_id'] ) ? \esc_html( (string) $a['provider_id'] ) : '';
+							$m = isset( $a['model_used'] ) ? \esc_html( (string) $a['model_used'] ) : '';
+							$c = isset( $a['category'] ) ? \esc_html( (string) $a['category'] ) : '';
+							$t = isset( $a['attempted_at'] ) ? \esc_html( (string) $a['attempted_at'] ) : '';
+							?>
+						<tr>
+							<td><code><?php echo $p; ?></code></td>
+							<td><?php echo $m; ?></td>
+							<td><?php echo $c; ?></td>
+							<td><?php echo $t; ?></td>
+						</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<?php endif; ?>
 			</section>
 
 			<section class="aio-artifact-summary" aria-labelledby="aio-artifact-heading">

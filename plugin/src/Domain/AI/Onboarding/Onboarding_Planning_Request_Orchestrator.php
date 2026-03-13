@@ -18,6 +18,8 @@ use AIOPageBuilder\Domain\AI\PromptPacks\Normalized_Prompt_Package_Builder;
 use AIOPageBuilder\Domain\AI\PromptPacks\Prompt_Pack_Registry_Service;
 use AIOPageBuilder\Domain\AI\PromptPacks\Prompt_Pack_Schema;
 use AIOPageBuilder\Domain\AI\Providers\AI_Provider_Interface;
+use AIOPageBuilder\Domain\AI\Providers\Failover\Failover_Result;
+use AIOPageBuilder\Domain\AI\Providers\Failover\Provider_Failover_Service;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Capability_Resolver;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Request_Context_Builder;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
@@ -68,6 +70,9 @@ final class Onboarding_Planning_Request_Orchestrator {
 	/** @var Provider_Connection_Test_Service */
 	private Provider_Connection_Test_Service $connection_test_service;
 
+	/** @var Provider_Failover_Service */
+	private Provider_Failover_Service $failover_service;
+
 	/** @var Service_Container */
 	private Service_Container $container;
 
@@ -82,6 +87,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		AI_Output_Validator $validator,
 		AI_Run_Service $run_service,
 		Provider_Connection_Test_Service $connection_test_service,
+		Provider_Failover_Service $failover_service,
 		Service_Container $container
 	) {
 		$this->draft_service           = $draft_service;
@@ -94,6 +100,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$this->validator                = $validator;
 		$this->run_service              = $run_service;
 		$this->connection_test_service  = $connection_test_service;
+		$this->failover_service         = $failover_service;
 		$this->container                = $container;
 	}
 
@@ -245,17 +252,40 @@ final class Onboarding_Planning_Request_Orchestrator {
 
 		$response = $driver->request( $normalized_request );
 
+		$policy = $this->failover_service->get_policy_for_primary( $provider_id );
+		$failover_result = null;
+
+		if ( ! empty( $response['success'] ) ) {
+			$failover_result = Failover_Result::primary_success( $provider_id, $model, $policy->to_metadata_snapshot() );
+		} else {
+			$fallback_bag = $this->failover_service->try_fallback(
+				$policy,
+				$provider_id,
+				$model,
+				$response,
+				$normalized_request,
+				$schema_ref,
+				$this->container
+			);
+			$response        = $fallback_bag['response'];
+			$failover_result = $fallback_bag['result'];
+		}
+
+		$effective_provider_id = $failover_result->get_effective_provider_id();
+		$effective_model       = $failover_result->get_effective_model_used();
+
 		$run_id = 'aio-run-' . uniqid( '', true );
 		$created_at = gmdate( 'Y-m-d\TH:i:s\Z' );
 		$metadata = array(
 			'actor'            => (string) ( \get_current_user_id() ),
 			'created_at'       => $created_at,
-			'provider_id'     => $provider_id,
-			'model_used'       => $model,
+			'provider_id'      => $effective_provider_id,
+			'model_used'       => $effective_model,
 			'prompt_pack_ref'  => $prompt_pack_ref,
 			'retry_count'      => 0,
 			'request_id'       => $request_id,
 		);
+		$metadata = array_merge( $metadata, $failover_result->to_run_metadata() );
 
 		$raw_prompt_capture = $package['raw_prompt_capture_ready'] ?? array( 'system_prompt' => $system_prompt, 'user_message' => $user_message );
 		$artifacts = array(
@@ -281,7 +311,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 				$artifacts[ Artifact_Category_Keys::NORMALIZED_OUTPUT ] = $normalized;
 				$metadata['completed_at'] = gmdate( 'Y-m-d\TH:i:s\Z' );
 				$post_id = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_COMPLETED, $artifacts );
-				$this->connection_test_service->record_last_successful_use( $provider_id, $created_at );
+				$this->connection_test_service->record_last_successful_use( $effective_provider_id, $created_at );
 				$this->link_run_to_draft( $draft, $run_id, $post_id );
 				return new Planning_Request_Result(
 					true,

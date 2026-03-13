@@ -17,6 +17,7 @@ use AIOPageBuilder\Domain\AI\Validation\AI_Output_Validator;
 use AIOPageBuilder\Domain\AI\InputArtifacts\Input_Artifact_Builder;
 use AIOPageBuilder\Domain\AI\PromptPacks\Normalized_Prompt_Package_Builder;
 use AIOPageBuilder\Domain\AI\PromptPacks\Prompt_Pack_Registry_Service;
+use AIOPageBuilder\Domain\AI\Providers\Failover\Provider_Failover_Service;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Capability_Resolver;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Request_Context_Builder;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Provider_Connection_Test_Service;
@@ -57,6 +58,10 @@ require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repos
 require_once $plugin_root . '/src/Domain/Storage/Repositories/AI_Run_Repository.php';
 require_once $plugin_root . '/src/Domain/AI/Runs/AI_Run_Artifact_Service.php';
 require_once $plugin_root . '/src/Domain/AI/Providers/Drivers/Provider_Connection_Test_Result.php';
+require_once $plugin_root . '/src/Domain/AI/Providers/Provider_Response_Normalizer.php';
+require_once $plugin_root . '/src/Domain/AI/Providers/Failover/Provider_Failover_Policy.php';
+require_once $plugin_root . '/src/Domain/AI/Providers/Failover/Failover_Result.php';
+require_once $plugin_root . '/src/Domain/AI/Providers/Failover/Provider_Failover_Service.php';
 
 /** Stub repository: no packs, so select_for_planning returns null when we get that far. */
 final class Stub_Prompt_Pack_Repo_For_Orchestrator implements \AIOPageBuilder\Domain\AI\PromptPacks\Prompt_Pack_Registry_Repository_Interface {
@@ -93,6 +98,7 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 		$request_context_builder = new Provider_Request_Context_Builder();
 		$capability_resolver = new Provider_Capability_Resolver();
 		$connection_test_service = new Provider_Connection_Test_Service( $request_context_builder, $capability_resolver, $settings );
+		$failover_service = new Provider_Failover_Service( $settings, $capability_resolver );
 		return new Onboarding_Planning_Request_Orchestrator(
 			$draft_service,
 			$prefill,
@@ -104,6 +110,7 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 			new AI_Output_Validator(),
 			$ai_run_service,
 			$connection_test_service,
+			$failover_service,
 			$container
 		);
 	}

@@ -51,6 +51,7 @@ final class Onboarding_Provider implements Service_Provider_Interface {
 				$container->get( 'ai_output_validator' ),
 				$container->get( 'ai_run_service' ),
 				$container->get( 'provider_connection_test_service' ),
+				$container->get( 'provider_failover_service' ),
 				$container
 			);
 		} );
