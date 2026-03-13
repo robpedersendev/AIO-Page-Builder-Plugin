@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Providers\Drivers\Additional_AI_Provider_Driver;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Concrete_AI_Provider_Driver;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Provider_Connection_Test_Service;
 use AIOPageBuilder\Domain\AI\Secrets\Option_Based_Provider_Secret_Store;
@@ -19,7 +20,7 @@ use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Registers OpenAI driver, provider secret store, connection test service, and AI Providers screen state builder.
+ * Registers OpenAI and Anthropic provider drivers, provider secret store, connection test service, and AI Providers screen state builder.
  */
 final class AI_Provider_Drivers_Provider implements Service_Provider_Interface {
 
@@ -31,6 +32,14 @@ final class AI_Provider_Drivers_Provider implements Service_Provider_Interface {
 
 		$container->register( 'openai_provider_driver', function () use ( $container ): Concrete_AI_Provider_Driver {
 			return new Concrete_AI_Provider_Driver(
+				$container->get( 'provider_error_normalizer' ),
+				$container->get( 'provider_response_normalizer' ),
+				$container->get( 'provider_secret_store' )
+			);
+		} );
+
+		$container->register( 'anthropic_provider_driver', function () use ( $container ): Additional_AI_Provider_Driver {
+			return new Additional_AI_Provider_Driver(
 				$container->get( 'provider_error_normalizer' ),
 				$container->get( 'provider_response_normalizer' ),
 				$container->get( 'provider_secret_store' )

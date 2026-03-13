@@ -17,6 +17,18 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Provider_Capability_Resolver {
 
+	/** Provider IDs that have registered drivers (for UI and orchestration). */
+	private const KNOWN_PROVIDER_IDS = array( 'openai', 'anthropic' );
+
+	/**
+	 * Returns the list of known provider IDs with registered drivers.
+	 *
+	 * @return list<string>
+	 */
+	public static function get_known_provider_ids(): array {
+		return array_values( self::KNOWN_PROVIDER_IDS );
+	}
+
 	/**
 	 * Returns full capability array for the driver. No secrets; metadata only.
 	 *

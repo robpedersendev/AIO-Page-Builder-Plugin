@@ -353,6 +353,9 @@ final class Onboarding_Planning_Request_Orchestrator {
 		if ( $provider_id === 'openai' && $this->container->has( 'openai_provider_driver' ) ) {
 			return $this->container->get( 'openai_provider_driver' );
 		}
+		if ( $provider_id === 'anthropic' && $this->container->has( 'anthropic_provider_driver' ) ) {
+			return $this->container->get( 'anthropic_provider_driver' );
+		}
 		return null;
 	}
 

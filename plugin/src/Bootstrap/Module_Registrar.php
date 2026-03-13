@@ -62,6 +62,7 @@ final class Module_Registrar {
 	 * ExportRestore_Provider registers export_generator, support_package_generator (spec §59.15), import validator, restore pipeline, and import/export state builder.
 	 * Reporting_Provider registers log_export_service (spec §48.10, §59.12) for structured log export from Queue & Logs screen.
 	 * Admin menu and screen routing are registered separately in Plugin::register_admin_menu().
+	 * AI_Provider_Drivers_Provider registers openai and anthropic provider drivers (spec §25, §49.9).
 	 *
 	 * @return void
 	 */

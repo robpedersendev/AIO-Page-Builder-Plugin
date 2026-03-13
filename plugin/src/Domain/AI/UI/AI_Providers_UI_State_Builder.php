@@ -27,9 +27,6 @@ use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
  */
 final class AI_Providers_UI_State_Builder {
 
-	/** Default provider IDs when config has none (drivers available in container). */
-	private const DEFAULT_PROVIDER_IDS = array( 'openai' );
-
 	/** @var Provider_Connection_Test_Service */
 	private Provider_Connection_Test_Service $connection_test_service;
 
@@ -92,8 +89,9 @@ final class AI_Providers_UI_State_Builder {
 				}
 			}
 		}
-		$merged = array_merge( self::DEFAULT_PROVIDER_IDS, $from_config );
-		$unique = array_unique( $merged );
+		$defaults = Provider_Capability_Resolver::get_known_provider_ids();
+		$merged   = array_merge( $defaults, $from_config );
+		$unique   = array_unique( $merged );
 		return array_values( $unique );
 	}
 
@@ -175,12 +173,16 @@ final class AI_Providers_UI_State_Builder {
 		if ( $provider_id === 'openai' && $this->container->has( 'openai_provider_driver' ) ) {
 			return $this->container->get( 'openai_provider_driver' );
 		}
+		if ( $provider_id === 'anthropic' && $this->container->has( 'anthropic_provider_driver' ) ) {
+			return $this->container->get( 'anthropic_provider_driver' );
+		}
 		return null;
 	}
 
 	private function get_provider_label( string $provider_id ): string {
 		$labels = array(
-			'openai' => 'OpenAI',
+			'openai'     => 'OpenAI',
+			'anthropic'  => 'Anthropic',
 		);
 		return $labels[ $provider_id ] ?? $provider_id;
 	}
