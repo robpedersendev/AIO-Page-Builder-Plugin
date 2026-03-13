@@ -50,6 +50,7 @@ final class Settings_Screen {
 		$hub_page_seed_result = isset( $_GET['aio_hub_page_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_page_seed_result'] ) : '';
 		$geographic_hub_seed_result = isset( $_GET['aio_geographic_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_geographic_hub_seed_result'] ) : '';
 		$nested_hub_seed_result     = isset( $_GET['aio_nested_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_nested_hub_seed_result'] ) : '';
+		$child_detail_seed_result   = isset( $_GET['aio_child_detail_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -263,6 +264,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_nested_hub_templates" />
 				<?php \wp_nonce_field( 'aio_seed_nested_hub_templates', 'aio_seed_nested_hub_nonce' ); ?>
 				<?php \submit_button( __( 'Seed nested hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_nested_hub_submit', false ); ?>
+			</form>
+
+			<?php if ( $child_detail_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Child/detail page template batch (PT-07) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $child_detail_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding child/detail page template batch failed. Seed section and nested hub batches first.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Child/detail page template batch (PT-07)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed child/detail page templates for services, offerings, locations, and informational detail pages (e.g. Gel Manicure, Signature Massage, Salt Lake City). ~10 non-CTA, ≥5 CTA, mandatory bottom CTA, no adjacent CTAs. Idempotent.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_child_detail_templates" />
+				<?php \wp_nonce_field( 'aio_seed_child_detail_templates', 'aio_seed_child_detail_nonce' ); ?>
+				<?php \submit_button( __( 'Seed child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_submit', false ); ?>
 			</form>
 		</div>
 		<?php
