@@ -232,6 +232,7 @@ Evidence that the thresholds are met **shall** include:
 | cta-sequencing-and-placement-contract (135) | Page templates must satisfy CTA rules; section library must include enough CTA-classified sections (§2.3). |
 | 122–123, 145–146 | Diagnostics and batch-generation prompts use this matrix to plan and prove coverage. |
 | **template-library-inventory-manifest.md** (144) | **Implements** batch sequencing: section batches (SEC-01–SEC-09) and page batches (PT-01–PT-10), naming, dependencies, and batch-progress worksheet. Production prompts **reference this matrix** for counts and **the manifest** for which batch to fill. |
+| **template-library-compliance-matrix.md** (146) | **Acceptance gate** for all template production. The compliance matrix defines COUNT and CATEGORY rule families, pass/fail criteria, evidence requirements, and batch sign-off. Coverage worksheet (§8) and distribution reports produced under this matrix **feed** the compliance matrix COUNT and CATEGORY checks. Production prompts must satisfy both this coverage matrix (targets) and the compliance matrix (quality and rule compliance). |
 
 ---
 

@@ -206,6 +206,7 @@ Release gate (M12) and production readiness (§59.15) require:
 - **Spec:** §59.14 Hardening and QA Phase; §59.15 Production Readiness Phase; §60.2–60.8 Milestones and sign-off.
 - **Docs:** §57.9 Documentation standards; §58.6 Release notes standards.
 - **Project:** [RELEASE_CHECKLIST.md](../qa/RELEASE_CHECKLIST.md), [DEFINITION_OF_DONE.md](../qa/DEFINITION_OF_DONE.md), [SECURITY_STANDARD.md](../standards/SECURITY_STANDARD.md).
+- **Template library QA:** [template-library-compliance-matrix.md](../qa/template-library-compliance-matrix.md) — acceptance gate for section/page template production (Prompt 146); rule families, severity, evidence, and batch sign-off. Library-expansion prompts must satisfy the compliance matrix; hard-fail items block template acceptance.
 
 ---
 
