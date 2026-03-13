@@ -21,6 +21,7 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer;
 use AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Validator;
+use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Integrity_Validator;
 use AIOPageBuilder\Domain\Registries\Snapshots\Version_Snapshot_Service;
@@ -49,6 +50,12 @@ final class Registries_Provider implements Service_Provider_Interface {
 				$container->get( 'page_template_repository' )
 			);
 		} );
+		$container->register( 'large_library_query_service', function () use ( $container ): Large_Library_Query_Service {
+			return new Large_Library_Query_Service(
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' )
+			);
+		} );
 		$container->register( 'section_registry_service', function () use ( $container ): Section_Registry_Service {
 			$service = new Section_Registry_Service(
 				$container->get( 'section_validator' ),
@@ -58,6 +65,7 @@ final class Registries_Provider implements Service_Provider_Interface {
 			if ( $container->has( 'section_field_blueprint_service' ) ) {
 				$service->set_blueprint_service( $container->get( 'section_field_blueprint_service' ) );
 			}
+			$service->set_large_library_query_service( $container->get( 'large_library_query_service' ) );
 			return $service;
 		} );
 		$container->register( 'page_template_normalizer', function (): Page_Template_Normalizer {
@@ -71,11 +79,13 @@ final class Registries_Provider implements Service_Provider_Interface {
 			);
 		} );
 		$container->register( 'page_template_registry_service', function () use ( $container ): Page_Template_Registry_Service {
-			return new Page_Template_Registry_Service(
+			$service = new Page_Template_Registry_Service(
 				$container->get( 'page_template_validator' ),
 				$container->get( 'page_template_repository' ),
 				$container->get( 'registry_deprecation_service' )
 			);
+			$service->set_large_library_query_service( $container->get( 'large_library_query_service' ) );
+			return $service;
 		} );
 		$container->register( 'registry_integrity_validator', function () use ( $container ): Registry_Integrity_Validator {
 			return new Registry_Integrity_Validator(

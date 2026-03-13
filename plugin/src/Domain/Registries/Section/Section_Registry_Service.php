@@ -14,6 +14,9 @@ namespace AIOPageBuilder\Domain\Registries\Section;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Shared\Deprecation_Metadata;
+use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Filter_Result;
+use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Pagination;
+use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 
@@ -36,6 +39,9 @@ final class Section_Registry_Service {
 
 	/** @var \AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service|null */
 	private $blueprint_service;
+
+	/** @var Large_Library_Query_Service|null */
+	private ?Large_Library_Query_Service $large_library_query_service = null;
 
 	public function __construct(
 		Section_Validator $validator,
@@ -217,6 +223,31 @@ final class Section_Registry_Service {
 	 */
 	public function set_blueprint_service( \AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service $service ): void {
 		$this->blueprint_service = $service;
+	}
+
+	/**
+	 * Injects large-library query service for filtered, paginated directory queries (spec §55.8).
+	 *
+	 * @param Large_Library_Query_Service $service
+	 */
+	public function set_large_library_query_service( Large_Library_Query_Service $service ): void {
+		$this->large_library_query_service = $service;
+	}
+
+	/**
+	 * Returns filtered, paginated section list for directory IA. Uses Large_Library_Query_Service when set.
+	 *
+	 * @param array<string, mixed> $filters  status, category, section_purpose_family, cta_classification, variation_family_key, compatibility_tags, preview_available, search.
+	 * @param int                  $page    1-based page.
+	 * @param int                  $per_page Items per page.
+	 * @return Large_Library_Filter_Result
+	 */
+	public function list_filtered_paginated( array $filters, int $page = 1, int $per_page = 25 ): Large_Library_Filter_Result {
+		if ( $this->large_library_query_service !== null ) {
+			return $this->large_library_query_service->query_sections( $filters, $page, $per_page );
+		}
+		$pagination = Large_Library_Pagination::from_page_size( $page, $per_page, 0 );
+		return new Large_Library_Filter_Result( array(), $pagination, array(), 0 );
 	}
 
 	/**

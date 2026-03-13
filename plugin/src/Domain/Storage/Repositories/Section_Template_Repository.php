@@ -153,6 +153,49 @@ final class Section_Template_Repository extends Abstract_CPT_Repository {
 	}
 
 	/**
+	 * Returns total count of section template posts (any status). Used for large-library pagination.
+	 *
+	 * @return int
+	 */
+	public function count_definitions(): int {
+		$query = new \WP_Query(
+			array(
+				'post_type'      => $this->get_post_type(),
+				'posts_per_page' => 1,
+				'no_found_rows'  => false,
+				'post_status'    => 'any',
+				'fields'         => 'ids',
+			)
+		);
+		return (int) $query->found_posts;
+	}
+
+	/**
+	 * Lists all section definitions up to a cap (for in-memory filtering; spec §55.8).
+	 *
+	 * @param int $max Maximum definitions to load (bounded for large libraries).
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_all_definitions_capped( int $max = 1000 ): array {
+		$chunk_size = min( 200, max( 1, $max ) );
+		$out        = array();
+		$offset     = 0;
+		while ( count( $out ) < $max ) {
+			$limit = min( $chunk_size, $max - count( $out ) );
+			$batch = $this->list_all_definitions( $limit, $offset );
+			if ( empty( $batch ) ) {
+				break;
+			}
+			$out = array_merge( $out, $batch );
+			$offset += $limit;
+			if ( count( $batch ) < $limit ) {
+				break;
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * Returns all unique internal keys in the registry (for uniqueness checks).
 	 *
 	 * @return list<string>

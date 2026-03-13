@@ -283,6 +283,9 @@ if ( ! class_exists( 'WP_Query' ) ) {
 		/** @var array<string, mixed> */
 		public $query;
 
+		/** @var int Set in get_posts() for count_definitions and pagination (when no_found_rows is false). */
+		public $found_posts = 0;
+
 		public function __construct( $query = array() ) {
 			$this->query = is_array( $query ) ? $query : array();
 		}
@@ -291,6 +294,8 @@ if ( ! class_exists( 'WP_Query' ) ) {
 			$posts      = isset( $GLOBALS['_aio_wp_query_posts'] ) ? $GLOBALS['_aio_wp_query_posts'] : array();
 			$post_type  = $this->query['post_type'] ?? '';
 			$meta_query = $this->query['meta_query'] ?? null;
+			$offset     = (int) ( $this->query['offset'] ?? 0 );
+			$per_page   = (int) ( $this->query['posts_per_page'] ?? 0 );
 
 			if ( $post_type !== '' ) {
 				$by_type = array();
@@ -303,7 +308,13 @@ if ( ! class_exists( 'WP_Query' ) ) {
 				$posts = $by_type;
 			}
 
-			if ( ! is_array( $meta_query ) || empty( $posts ) ) {
+			if ( ! is_array( $meta_query ) || empty( $meta_query ) ) {
+				$this->found_posts = count( $posts );
+				if ( $per_page > 0 ) {
+					$posts = array_slice( $posts, $offset, $per_page );
+				} elseif ( $offset > 0 ) {
+					$posts = array_slice( $posts, $offset );
+				}
 				return $posts;
 			}
 			$filter_meta_key   = null;
@@ -320,6 +331,12 @@ if ( ! class_exists( 'WP_Query' ) ) {
 				}
 			}
 			if ( $filter_meta_key === null ) {
+				$this->found_posts = count( $posts );
+				if ( $per_page > 0 ) {
+					$posts = array_slice( $posts, $offset, $per_page );
+				} elseif ( $offset > 0 ) {
+					$posts = array_slice( $posts, $offset );
+				}
 				return $posts;
 			}
 			$filtered = array();
@@ -353,6 +370,12 @@ if ( ! class_exists( 'WP_Query' ) ) {
 				if ( (string) $val === (string) $filter_meta_value ) {
 					$filtered[] = $post;
 				}
+			}
+			$this->found_posts = count( $filtered );
+			if ( $per_page > 0 ) {
+				$filtered = array_slice( $filtered, $offset, $per_page );
+			} elseif ( $offset > 0 ) {
+				$filtered = array_slice( $filtered, $offset );
 			}
 			return $filtered;
 		}

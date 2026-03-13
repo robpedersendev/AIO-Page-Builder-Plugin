@@ -14,6 +14,9 @@ namespace AIOPageBuilder\Domain\Registries\PageTemplate;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Shared\Deprecation_Metadata;
+use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Filter_Result;
+use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Pagination;
+use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 
@@ -30,6 +33,9 @@ final class Page_Template_Registry_Service {
 
 	/** @var Registry_Deprecation_Service|null */
 	private ?Registry_Deprecation_Service $deprecation_service;
+
+	/** @var Large_Library_Query_Service|null */
+	private ?Large_Library_Query_Service $large_library_query_service = null;
 
 	public function __construct(
 		Page_Template_Validator $validator,
@@ -199,6 +205,31 @@ final class Page_Template_Registry_Service {
 	public function get_one_pager_metadata( array $definition ): array {
 		$op = $definition[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? array();
 		return is_array( $op ) ? $op : array();
+	}
+
+	/**
+	 * Injects large-library query service for filtered, paginated directory queries (spec §55.8).
+	 *
+	 * @param Large_Library_Query_Service $service
+	 */
+	public function set_large_library_query_service( Large_Library_Query_Service $service ): void {
+		$this->large_library_query_service = $service;
+	}
+
+	/**
+	 * Returns filtered, paginated page template list for directory IA. Uses Large_Library_Query_Service when set.
+	 *
+	 * @param array<string, mixed> $filters  status, archetype, template_category_class, template_family, preview_available, search.
+	 * @param int                  $page    1-based page.
+	 * @param int                  $per_page Items per page.
+	 * @return Large_Library_Filter_Result
+	 */
+	public function list_filtered_paginated( array $filters, int $page = 1, int $per_page = 25 ): Large_Library_Filter_Result {
+		if ( $this->large_library_query_service !== null ) {
+			return $this->large_library_query_service->query_page_templates( $filters, $page, $per_page );
+		}
+		$pagination = Large_Library_Pagination::from_page_size( $page, $per_page, 0 );
+		return new Large_Library_Filter_Result( array(), $pagination, array(), 0 );
 	}
 
 	private function sanitize_key( string $key ): string {
