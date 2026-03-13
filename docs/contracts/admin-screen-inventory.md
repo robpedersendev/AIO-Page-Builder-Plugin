@@ -28,10 +28,21 @@
 | Prompt Experiments      | `Prompt_Experiments_Screen` / `aio-page-builder-prompt-experiments` | `aio_manage_ai_providers` |
 | Build Plans             | `Build_Plans_Screen` / `aio-page-builder-build-plans` | `aio_view_build_plans`  |
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
+| **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
 
 ---
 
-## 3. Queue & Logs screen (spec §49.11)
+## 3. Support Triage screen (spec §49.11, §59.12)
+
+- **Slug:** `aio-page-builder-support-triage`
+- **Capability:** `aio_view_logs`
+- **Purpose:** Aggregate support view: critical issues, degraded systems, recent failed workflows, plans needing attention, rollback candidates, import/export context, recommended links. No mutation; deep links to Queue & Logs, Build Plans, AI Runs, Import/Export.
+- **State:** Built by `Support_Triage_State_Builder` (critical_issues, degraded_systems, recent_failed_workflows, rollback_candidates, import_export_failures, recommended_links, stale_plans). Optional filter by `domain` or `severity` (query args).
+- **Redaction:** All data from existing redacted summaries; no secrets.
+
+---
+
+## 4. Queue & Logs screen (spec §49.11)
 
 - **Slug:** `aio-page-builder-queue-logs`
 - **Capability:** `aio_view_logs`
@@ -43,7 +54,7 @@
 
 ---
 
-## 4. Example payloads (monitoring state)
+## 5. Example payloads (monitoring state)
 
 **Queue tab (one row):**
 ```json
@@ -66,5 +77,29 @@
   "reporting_degraded": false,
   "summary_message": "Reporting current. Heartbeat sent this month.",
   "failed_events_by_type": {}
+}
+```
+
+**Support triage payload (excerpt):**
+```json
+{
+  "critical_issues": [
+    {
+      "severity": "critical",
+      "domain": "reporting",
+      "title": "Critical error delivery failures",
+      "message": "2 developer error report(s) failed to deliver.",
+      "link_url": ".../admin.php?page=aio-page-builder-queue-logs&tab=critical",
+      "link_label": "View critical errors"
+    }
+  ],
+  "degraded_systems": [],
+  "recent_failed_workflows": [],
+  "rollback_candidates": [],
+  "import_export_failures": [],
+  "recommended_links": [
+    { "label": "Queue & Logs", "url": "...", "description": "Queue health, execution logs, reporting logs." }
+  ],
+  "stale_plans": []
 }
 ```

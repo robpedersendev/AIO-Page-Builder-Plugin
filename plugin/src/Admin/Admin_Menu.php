@@ -22,6 +22,7 @@ use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
+use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
@@ -69,6 +70,7 @@ final class Admin_Menu {
 		$prompt_experiments = new Prompt_Experiments_Screen( $this->container );
 		$build_plans        = new Build_Plans_Screen( $this->container );
 		$queue_logs         = new Queue_Logs_Screen( $this->container );
+		$support_triage     = new Support_Triage_Dashboard_Screen( $this->container );
 		$privacy_reporting  = new Privacy_Reporting_Settings_Screen( $this->container );
 		$import_export     = new Import_Export_Screen( $this->container );
 
@@ -179,6 +181,15 @@ final class Admin_Menu {
 			$queue_logs->get_capability(),
 			Queue_Logs_Screen::SLUG,
 			array( $queue_logs, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$support_triage->get_title(),
+			__( 'Support Triage', 'aio-page-builder' ),
+			$support_triage->get_capability(),
+			Support_Triage_Dashboard_Screen::SLUG,
+			array( $support_triage, 'render' )
 		);
 
 		add_submenu_page(
