@@ -9,6 +9,8 @@ namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\Crawler\Classification\Classification_Result;
 use AIOPageBuilder\Domain\Crawler\Extraction\Extraction_Result;
+use AIOPageBuilder\Domain\Crawler\Profiles\Crawl_Profile_Keys;
+use AIOPageBuilder\Domain\Crawler\Profiles\Crawl_Profile_Service;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Repository;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +20,8 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Crawler/Classification/Classification_Result.php';
 require_once $plugin_root . '/src/Domain/Crawler/Extraction/Extraction_Result.php';
+require_once $plugin_root . '/src/Domain/Crawler/Profiles/Crawl_Profile_Keys.php';
+require_once $plugin_root . '/src/Domain/Crawler/Profiles/Crawl_Profile_Service.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Payload_Builder.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_Table_Repository.php';
@@ -25,7 +29,11 @@ require_once $plugin_root . '/src/Domain/Storage/Tables/Table_Names.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Repository.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Service.php';
 
-final class Crawl_Snapshot_Service_Test extends TestCase {
+	final class Crawl_Snapshot_Service_Test extends TestCase {
+
+	private function profile_service(): Crawl_Profile_Service {
+		return new Crawl_Profile_Service();
+	}
 
 	public function test_get_schema_version_returns_one(): void {
 		$this->assertSame( '1', Crawl_Snapshot_Service::get_schema_version() );
@@ -33,32 +41,32 @@ final class Crawl_Snapshot_Service_Test extends TestCase {
 
 	public function test_list_pages_by_run_delegates_to_repository(): void {
 		$repo = $this->create_repository_stub_list( array() );
-		$svc  = new Crawl_Snapshot_Service( $repo );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
 		$this->assertSame( array(), $svc->list_pages_by_run( 'run-1' ) );
 	}
 
 	public function test_list_pages_by_status_delegates_to_repository(): void {
 		$repo = $this->create_repository_stub_list( array() );
-		$svc  = new Crawl_Snapshot_Service( $repo );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
 		$this->assertSame( array(), $svc->list_pages_by_status( 'pending' ) );
 	}
 
 	public function test_get_page_by_run_and_url_returns_null_when_repo_returns_null(): void {
 		$repo = $this->create_repository_stub_get( null );
-		$svc  = new Crawl_Snapshot_Service( $repo );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
 		$this->assertNull( $svc->get_page_by_run_and_url( 'run-1', 'https://example.com/' ) );
 	}
 
 	public function test_store_page_record_returns_id_from_repository(): void {
 		$repo = $this->create_repository_stub_save( 100 );
-		$svc  = new Crawl_Snapshot_Service( $repo );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
 		$id   = $svc->store_page_record( 'run-1', 'https://example.com/' );
 		$this->assertSame( 100, $id );
 	}
 
 	public function test_record_classification_returns_id_from_repository(): void {
 		$repo = $this->create_repository_stub_save( 201 );
-		$svc  = new Crawl_Snapshot_Service( $repo );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
 		$result = new Classification_Result(
 			Classification_Result::CLASSIFICATION_MEANINGFUL,
 			array( Classification_Result::REASON_CONTENT_WEIGHT ),
@@ -73,7 +81,7 @@ final class Crawl_Snapshot_Service_Test extends TestCase {
 
 	public function test_record_classification_with_title_snapshot_returns_id(): void {
 		$repo = $this->create_repository_stub_save( 202 );
-		$svc  = new Crawl_Snapshot_Service( $repo );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
 		$result = new Classification_Result(
 			Classification_Result::CLASSIFICATION_MEANINGFUL,
 			array( Classification_Result::REASON_LIKELY_ROLE ),
@@ -88,7 +96,7 @@ final class Crawl_Snapshot_Service_Test extends TestCase {
 
 	public function test_record_extraction_returns_id_from_repository(): void {
 		$repo = $this->create_repository_stub_save( 301 );
-		$svc  = new Crawl_Snapshot_Service( $repo );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
 		$page_summary = array(
 			'title'                => 'Extracted Title',
 			'meta_description'     => 'Meta desc',
@@ -114,16 +122,54 @@ final class Crawl_Snapshot_Service_Test extends TestCase {
 			public function update( $t, $d, $w, $f = null, $wf = null ) { return 0; }
 		};
 		$repo = new Crawl_Snapshot_Repository( $wpdb );
-		$svc  = new Crawl_Snapshot_Service( $repo );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
 		$run_id = $svc->create_session( 'example.com', array() );
 		$this->assertNotSame( '', $run_id );
 		$session = $svc->get_session( $run_id );
 		$this->assertIsArray( $session );
 		$this->assertArrayHasKey( 'crawl_run_id', $session );
 		$this->assertArrayHasKey( 'site_host', $session );
+		$this->assertArrayHasKey( 'crawl_profile_key', $session );
 		$this->assertArrayHasKey( 'final_status', $session );
 		$this->assertSame( $run_id, $session['crawl_run_id'] );
 		$this->assertSame( 'example.com', $session['site_host'] );
+		$this->assertSame( Crawl_Profile_Keys::DEFAULT, $session['crawl_profile_key'] );
+	}
+
+	public function test_create_session_with_approved_profile_stores_profile_in_session(): void {
+		$wpdb = new class() {
+			public string $prefix = 'wp_';
+			public int $insert_id = 0;
+			public function get_row( string $q, $o = OBJECT ) { return null; }
+			public function get_results( string $q, $o = OBJECT ) { return array(); }
+			public function query( string $q ) { return 0; }
+			public function prepare( string $q, ...$a ) { return $q; }
+			public function update( $t, $d, $w, $f = null, $wf = null ) { return 0; }
+		};
+		$repo = new Crawl_Snapshot_Repository( $wpdb );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
+		$run_id = $svc->create_session( 'example.com', array( 'crawl_profile_key' => 'quick_context_refresh' ) );
+		$this->assertNotSame( '', $run_id );
+		$session = $svc->get_session( $run_id );
+		$this->assertSame( 'quick_context_refresh', $session['crawl_profile_key'] );
+	}
+
+	public function test_create_session_with_unsupported_profile_resolves_to_default(): void {
+		$wpdb = new class() {
+			public string $prefix = 'wp_';
+			public int $insert_id = 0;
+			public function get_row( string $q, $o = OBJECT ) { return null; }
+			public function get_results( string $q, $o = OBJECT ) { return array(); }
+			public function query( string $q ) { return 0; }
+			public function prepare( string $q, ...$a ) { return $q; }
+			public function update( $t, $d, $w, $f = null, $wf = null ) { return 0; }
+		};
+		$repo = new Crawl_Snapshot_Repository( $wpdb );
+		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service() );
+		$run_id = $svc->create_session( 'example.com', array( 'crawl_profile_key' => 'custom_unbounded' ) );
+		$this->assertNotSame( '', $run_id );
+		$session = $svc->get_session( $run_id );
+		$this->assertSame( Crawl_Profile_Keys::DEFAULT, $session['crawl_profile_key'] );
 	}
 
 	private function create_repository_stub_list( array $rows ): Crawl_Snapshot_Repository {

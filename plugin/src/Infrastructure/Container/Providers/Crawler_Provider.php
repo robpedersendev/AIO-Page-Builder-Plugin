@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\Crawler\Extraction\Navigation_Extractor;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Normalizer;
 use AIOPageBuilder\Domain\Crawler\Fetch\Fetch_Request_Policy;
 use AIOPageBuilder\Domain\Crawler\Fetch\HTML_Fetcher;
+use AIOPageBuilder\Domain\Crawler\Profiles\Crawl_Profile_Service;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Repository;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -36,9 +37,13 @@ final class Crawler_Provider implements Service_Provider_Interface {
 			global $wpdb;
 			return new Crawl_Snapshot_Repository( $wpdb );
 		} );
+		$container->register( 'crawl_profile_service', function (): Crawl_Profile_Service {
+			return new Crawl_Profile_Service();
+		} );
 		$container->register( 'crawl_snapshot_service', function () use ( $container ): Crawl_Snapshot_Service {
 			$repository = $container->get( 'crawl_snapshot_repository' );
-			return new Crawl_Snapshot_Service( $repository );
+			$profile_service = $container->get( 'crawl_profile_service' );
+			return new Crawl_Snapshot_Service( $repository, $profile_service );
 		} );
 		$container->register( 'url_normalizer', function (): URL_Normalizer {
 			$home = \home_url( '/', 'https' );

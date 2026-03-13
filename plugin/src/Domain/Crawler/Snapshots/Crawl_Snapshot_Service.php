@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Crawler\Classification\Classification_Result;
 use AIOPageBuilder\Domain\Crawler\Extraction\Extraction_Result;
+use AIOPageBuilder\Domain\Crawler\Profiles\Crawl_Profile_Service;
 
 /**
  * Creates crawl sessions (metadata in options), stores and retrieves page snapshot records (table).
@@ -30,8 +31,12 @@ final class Crawl_Snapshot_Service {
 	/** @var Crawl_Snapshot_Repository */
 	private $repository;
 
-	public function __construct( Crawl_Snapshot_Repository $repository ) {
-		$this->repository = $repository;
+	/** @var Crawl_Profile_Service */
+	private $profile_service;
+
+	public function __construct( Crawl_Snapshot_Repository $repository, Crawl_Profile_Service $profile_service ) {
+		$this->repository      = $repository;
+		$this->profile_service  = $profile_service;
 	}
 
 	/**
@@ -46,6 +51,9 @@ final class Crawl_Snapshot_Service {
 		if ( $crawl_run_id === '' ) {
 			return '';
 		}
+		$profile_key = $this->profile_service->resolve_profile_key(
+			(string) ( $settings['crawl_profile_key'] ?? '' )
+		);
 		$now    = $this->iso8601_now();
 		$payload = Crawl_Snapshot_Payload_Builder::build_session_payload(
 			$crawl_run_id,
@@ -57,7 +65,8 @@ final class Crawl_Snapshot_Service {
 			0,
 			0,
 			0,
-			Crawl_Snapshot_Payload_Builder::SESSION_STATUS_RUNNING
+			Crawl_Snapshot_Payload_Builder::SESSION_STATUS_RUNNING,
+			$profile_key
 		);
 		$option_key = $this->session_option_key( $crawl_run_id );
 		if ( $option_key === '' ) {
@@ -86,15 +95,16 @@ final class Crawl_Snapshot_Service {
 				$sessions[] = $payload;
 			} else {
 				$sessions[] = array(
-					'crawl_run_id'     => $run_id,
-					'site_host'        => '',
-					'started_at'       => null,
-					'ended_at'         => null,
-					'final_status'     => 'unknown',
-					'total_discovered' => 0,
-					'accepted_count'   => 0,
-					'excluded_count'   => 0,
-					'failed_count'     => 0,
+					'crawl_run_id'       => $run_id,
+					'site_host'          => '',
+					'crawl_profile_key'  => 'full_public_baseline',
+					'started_at'         => null,
+					'ended_at'           => null,
+					'final_status'       => 'unknown',
+					'total_discovered'   => 0,
+					'accepted_count'     => 0,
+					'excluded_count'     => 0,
+					'failed_count'       => 0,
 				);
 			}
 		}

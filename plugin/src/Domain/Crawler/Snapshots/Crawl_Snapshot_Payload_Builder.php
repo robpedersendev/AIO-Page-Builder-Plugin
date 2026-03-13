@@ -1,7 +1,7 @@
 <?php
 /**
- * Builds normalized crawl session and page snapshot payloads (spec §11.1, §24.9–24.11, §24.15, §58.4).
- * Aligned to custom-table-manifest §3.1; no fetcher or discovery logic.
+ * Builds normalized crawl session and page snapshot payloads (spec ?11.1, ?24.9���24.11, ?24.15, ?58.4).
+ * Aligned to custom-table-manifest ?3.1; no fetcher or discovery logic.
  *
  * @package AIOPageBuilder
  */
@@ -18,13 +18,14 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Crawl_Snapshot_Payload_Builder {
 
-	/** Schema version for snapshot records (spec §58.4). */
+	/** Schema version for snapshot records (spec ?58.4). */
 	public const SCHEMA_VERSION = '1';
 
 	// --- Session payload keys (stored in options; not in crawl_snapshots table) ---
 
 	public const SESSION_CRAWL_RUN_ID   = 'crawl_run_id';
 	public const SESSION_SITE_HOST       = 'site_host';
+	public const SESSION_CRAWL_PROFILE_KEY = 'crawl_profile_key';
 	public const SESSION_STARTED_AT     = 'started_at';
 	public const SESSION_ENDED_AT        = 'ended_at';
 	public const SESSION_SETTINGS       = 'crawl_settings';
@@ -53,12 +54,12 @@ final class Crawl_Snapshot_Payload_Builder {
 	public const PAGE_CRAWLED_AT         = 'crawled_at';
 	public const PAGE_SCHEMA_VERSION     = 'schema_version';
 
-	/** Allowed crawl_status values (manifest §3.1; spec §24.16). */
+	/** Allowed crawl_status values (manifest ?3.1; spec ?24.16). */
 	public const STATUS_PENDING   = 'pending';
 	public const STATUS_COMPLETED = 'completed';
 	public const STATUS_ERROR    = 'error';
 
-	/** Final session status values (spec §24.15, §24.16). */
+	/** Final session status values (spec ?24.15, ?24.16). */
 	public const SESSION_STATUS_RUNNING  = 'running';
 	public const SESSION_STATUS_PARTIAL = 'partial';
 	public const SESSION_STATUS_COMPLETED = 'completed';
@@ -71,6 +72,9 @@ final class Crawl_Snapshot_Payload_Builder {
 	private const ERROR_STATE_MAX_LENGTH = 255;
 	private const INDEXABILITY_MAX_LENGTH = 255;
 	private const CLASSIFICATION_MAX_LENGTH = 64;
+
+	/** Max length for crawl_profile_key (bounded, spec ?24). */
+	private const PROFILE_KEY_MAX_LENGTH = 64;
 
 	/**
 	 * Builds a normalized crawl session payload for storage (e.g. option).
@@ -85,6 +89,7 @@ final class Crawl_Snapshot_Payload_Builder {
 	 * @param int         $excluded_count  Excluded pages.
 	 * @param int         $failed_count    Failed requests.
 	 * @param string      $final_status   One of SESSION_STATUS_*.
+	 * @param string      $crawl_profile_key Approved profile key (stored with session; default full_public_baseline).
 	 * @return array<string, mixed> Session record; safe to store server-side.
 	 */
 	public static function build_session_payload(
@@ -97,14 +102,20 @@ final class Crawl_Snapshot_Payload_Builder {
 		int $accepted_count = 0,
 		int $excluded_count = 0,
 		int $failed_count = 0,
-		string $final_status = self::SESSION_STATUS_RUNNING
+		string $final_status = self::SESSION_STATUS_RUNNING,
+		string $crawl_profile_key = 'full_public_baseline'
 	): array {
 		$run_id = self::sanitize_run_id( $crawl_run_id );
 		$host   = self::sanitize_host( $site_host );
 		$status = self::normalize_session_status( $final_status );
+		$profile_key = \sanitize_text_field( self::truncate( trim( $crawl_profile_key ), self::PROFILE_KEY_MAX_LENGTH ) );
+		if ( $profile_key === '' ) {
+			$profile_key = 'full_public_baseline';
+		}
 		return array(
 			self::SESSION_CRAWL_RUN_ID    => $run_id,
 			self::SESSION_SITE_HOST       => $host,
+			self::SESSION_CRAWL_PROFILE_KEY => $profile_key,
 			self::SESSION_STARTED_AT      => $started_at !== null && $started_at !== '' ? $started_at : null,
 			self::SESSION_ENDED_AT       => $ended_at !== null && $ended_at !== '' ? $ended_at : null,
 			self::SESSION_SETTINGS        => self::sanitize_settings( $settings ),
@@ -118,7 +129,7 @@ final class Crawl_Snapshot_Payload_Builder {
 	}
 
 	/**
-	 * Builds a normalized page snapshot payload for table insert (manifest §3.1).
+	 * Builds a normalized page snapshot payload for table insert (manifest ?3.1).
 	 *
 	 * @param string      $crawl_run_id   Crawl run identifier.
 	 * @param string      $url            Discovered URL (normalized).

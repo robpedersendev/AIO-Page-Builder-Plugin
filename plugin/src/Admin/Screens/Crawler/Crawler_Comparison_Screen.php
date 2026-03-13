@@ -38,6 +38,24 @@ final class Crawler_Comparison_Screen {
 	}
 
 	/**
+	 * Returns profile label for a session's crawl_profile_key (profile-aware diagnostics).
+	 *
+	 * @param string $profile_key
+	 * @return string
+	 */
+	private function get_profile_label( string $profile_key ): string {
+		if ( $profile_key === '' || ! $this->container || ! $this->container->has( 'crawl_profile_service' ) ) {
+			return $profile_key !== '' ? $profile_key : '—';
+		}
+		try {
+			$payload = $this->container->get( 'crawl_profile_service' )->get_profile_payload( $profile_key );
+			return $payload['label'] ?? $profile_key;
+		} catch ( \Throwable $e ) {
+			return $profile_key;
+		}
+	}
+
+	/**
 	 * Renders comparison screen: run selectors and optional result table.
 	 *
 	 * @return void
@@ -87,10 +105,23 @@ final class Crawler_Comparison_Screen {
 					<button type="submit" class="button button-primary"><?php \esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>
 				</p>
 			</form>
-			<?php if ( $result !== null ) : ?>
+			<?php
+			$prior_profile = '';
+			$new_profile   = '';
+			if ( $result !== null && $prior_run_id !== '' && $new_run_id !== '' && $this->container && $this->container->has( 'crawl_snapshot_service' ) ) {
+				$svc = $this->container->get( 'crawl_snapshot_service' );
+				$prior_session = $svc->get_session( $prior_run_id );
+				$new_session   = $svc->get_session( $new_run_id );
+				$prior_profile = $this->get_profile_label( (string) ( $prior_session['crawl_profile_key'] ?? '' ) );
+				$new_profile   = $this->get_profile_label( (string) ( $new_session['crawl_profile_key'] ?? '' ) );
+			}
+			if ( $result !== null ) :
+				?>
 				<h2><?php \esc_html_e( 'Comparison summary', 'aio-page-builder' ); ?></h2>
 				<table class="widefat striped">
 					<tbody>
+						<tr><th scope="row"><?php \esc_html_e( 'Prior run profile', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( $prior_profile ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'New run profile', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( $new_profile ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Added', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) $result->added_count ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Removed', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) $result->removed_count ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Changed', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) $result->changed_count ); ?></td></tr>
