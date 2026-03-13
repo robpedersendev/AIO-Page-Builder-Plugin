@@ -39,6 +39,7 @@ final class Settings_Screen {
 		$expansion_seed_result = isset( $_GET['aio_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_expansion_seed_result'] ) : '';
 		$hero_intro_batch_seed_result = isset( $_GET['aio_hero_intro_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hero_intro_batch_seed_result'] ) : '';
 		$trust_proof_batch_seed_result = isset( $_GET['aio_trust_proof_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_trust_proof_batch_seed_result'] ) : '';
+		$fb_value_batch_seed_result = isset( $_GET['aio_fb_value_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_fb_value_batch_seed_result'] ) : '';
 		$pt_comp_expansion_seed_result = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -99,6 +100,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_trust_proof_library_batch" />
 				<?php \wp_nonce_field( 'aio_seed_trust_proof_library_batch', 'aio_seed_trust_proof_batch_nonce' ); ?>
 				<?php \submit_button( __( 'Seed trust/proof library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_trust_proof_batch_submit', false ); ?>
+			</form>
+
+			<?php if ( $fb_value_batch_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Feature/benefit/value library batch (SEC-03) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $fb_value_batch_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding feature/benefit/value library batch failed. Check that the plugin can create section template posts.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Feature/benefit/value library batch (SEC-03)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed feature, benefit, offer, package, differentiator, and value-proposition section templates (feature grid, benefit band, offer comparison, package summary, differentiator, before/after, why choose us, product spec, service offering, value prop, compact feature, benefit detail, offer highlight, local/directory value, resource explainer) with field blueprints and metadata. Idempotent.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_feature_benefit_value_batch" />
+				<?php \wp_nonce_field( 'aio_seed_feature_benefit_value_batch', 'aio_seed_fb_value_batch_nonce' ); ?>
+				<?php \submit_button( __( 'Seed feature/benefit/value library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_fb_value_batch_submit', false ); ?>
 			</form>
 
 			<?php if ( $pt_comp_expansion_seed_result === 'success' ) : ?>

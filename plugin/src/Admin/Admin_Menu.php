@@ -32,6 +32,7 @@ use AIOPageBuilder\Domain\FormProvider\Form_Template_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\ExpansionPack\Page_Template_And_Composition_Expansion_Pack_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\ExpansionPack\Section_Expansion_Pack_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\HeroBatch\Hero_Intro_Library_Batch_Seeder;
+use AIOPageBuilder\Domain\Registries\Section\FeatureBenefitBatch\Feature_Benefit_Value_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\TrustProofBatch\Trust_Proof_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
@@ -63,6 +64,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_seed_section_expansion_pack', array( $this, 'handle_seed_section_expansion_pack' ), 10 );
 		\add_action( 'admin_post_aio_seed_hero_intro_library_batch', array( $this, 'handle_seed_hero_intro_library_batch' ), 10 );
 		\add_action( 'admin_post_aio_seed_trust_proof_library_batch', array( $this, 'handle_seed_trust_proof_library_batch' ), 10 );
+		\add_action( 'admin_post_aio_seed_feature_benefit_value_batch', array( $this, 'handle_seed_feature_benefit_value_batch' ), 10 );
 		\add_action( 'admin_post_aio_seed_page_composition_expansion_pack', array( $this, 'handle_seed_page_composition_expansion_pack' ), 10 );
 
 		$dashboard   = new Dashboard_Screen( $this->container );
@@ -355,6 +357,36 @@ final class Admin_Menu {
 		}
 		$result = Trust_Proof_Library_Batch_Seeder::run( $section_repo );
 		$query  = $result['success'] ? 'aio_trust_proof_batch_seed_result=success' : 'aio_trust_proof_batch_seed_result=error';
+		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
+		exit;
+	}
+
+	/**
+	 * Handles admin-post request to seed the feature/benefit/value library batch (SEC-03, Prompt 149).
+	 *
+	 * @return void
+	 */
+	public function handle_seed_feature_benefit_value_batch(): void {
+		if ( ! isset( $_POST['aio_seed_fb_value_batch_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_fb_value_batch_nonce'] ) ), 'aio_seed_feature_benefit_value_batch' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
+			exit;
+		}
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
+			exit;
+		}
+		if ( ! $this->container instanceof Service_Container ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
+			exit;
+		}
+		$section_repo = $this->container->get( 'section_template_repository' );
+		if ( ! $section_repo instanceof Section_Template_Repository ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
+			exit;
+		}
+		$result = Feature_Benefit_Value_Library_Batch_Seeder::run( $section_repo );
+		$query  = $result['success'] ? 'aio_fb_value_batch_seed_result=success' : 'aio_fb_value_batch_seed_result=error';
 		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
 		exit;
 	}
