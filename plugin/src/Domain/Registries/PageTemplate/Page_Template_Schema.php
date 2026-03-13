@@ -111,6 +111,8 @@ final class Page_Template_Schema {
 			return self::$optional_fields;
 		}
 		self::$optional_fields = array(
+			'template_category_class',
+			'template_family',
 			'display_description',
 			'recommended_industries',
 			'recommended_audience_types',
@@ -148,6 +150,7 @@ final class Page_Template_Schema {
 			'hub_page'              => 'Hub page',
 			'sub_hub_page'          => 'Sub-hub page',
 			'landing_page'          => 'Landing page',
+			'about_page'            => 'About page',
 			'location_page'        => 'Location page',
 			'event_page'            => 'Event page',
 			'request_page'          => 'Request page',

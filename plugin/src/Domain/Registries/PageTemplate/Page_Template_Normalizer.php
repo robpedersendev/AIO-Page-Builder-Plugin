@@ -255,6 +255,8 @@ final class Page_Template_Normalizer {
 	 */
 	private function normalize_optional_field( string $name, mixed $value ): mixed {
 		$str_limits = array(
+			'template_category_class'   => 64,
+			'template_family'           => 64,
 			'display_description'       => 1024,
 			'internal_linking_hints'    => 512,
 			'default_token_affinity_notes' => 512,

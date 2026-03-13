@@ -73,6 +73,8 @@ require_once $bootstrap_dir . '/../Domain/Registries/Section/ExpansionPack/Secti
 require_once $bootstrap_dir . '/../Domain/Registries/Section/ExpansionPack/Section_Expansion_Pack_Seeder.php';
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/ExpansionPack/Page_Template_And_Composition_Expansion_Pack_Definitions.php';
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/ExpansionPack/Page_Template_And_Composition_Expansion_Pack_Seeder.php';
+require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/TopLevelBatch/Top_Level_Marketing_Page_Template_Definitions.php';
+require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/TopLevelBatch/Top_Level_Marketing_Page_Template_Seeder.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Bundle_Schema.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Mode_Keys.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Result.php';

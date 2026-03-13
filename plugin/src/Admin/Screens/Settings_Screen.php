@@ -45,6 +45,7 @@ final class Settings_Screen {
 		$lpu_batch_seed_result = isset( $_GET['aio_lpu_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_lpu_batch_seed_result'] ) : '';
 		$cta_super_seed_result = isset( $_GET['aio_cta_super_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_cta_super_seed_result'] ) : '';
 		$pt_comp_expansion_seed_result = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
+		$top_level_marketing_seed_result = isset( $_GET['aio_top_level_marketing_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_marketing_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -188,6 +189,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_page_composition_expansion_pack" />
 				<?php \wp_nonce_field( 'aio_seed_page_composition_expansion_pack', 'aio_seed_pt_comp_expansion_nonce' ); ?>
 				<?php \submit_button( __( 'Seed page template and composition expansion pack', 'aio-page-builder' ), 'secondary', 'aio_seed_pt_comp_expansion_submit', false ); ?>
+			</form>
+
+			<?php if ( $top_level_marketing_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Top-level marketing page template batch (PT-01) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $top_level_marketing_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding top-level marketing page template batch failed. Seed all section batches and page template expansion pack first.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Top-level marketing page template batch (PT-01)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed top-level marketing and core business page templates: Home, About, FAQ, Contact, Services overview, Offerings overview (multiple variants each). Each template has ~10 non-CTA sections, ≥3 CTA sections, last section CTA, no adjacent CTAs. Requires section library and page template expansion pack. Idempotent.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_top_level_marketing_templates" />
+				<?php \wp_nonce_field( 'aio_seed_top_level_marketing_templates', 'aio_seed_top_level_marketing_nonce' ); ?>
+				<?php \submit_button( __( 'Seed top-level marketing page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_top_level_marketing_submit', false ); ?>
 			</form>
 		</div>
 		<?php
