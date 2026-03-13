@@ -2,7 +2,7 @@
 
 **Governs:** Spec §51.5–51.10, §50.1, §56.6; Hardening matrix §59.14, category `accessibility`.  
 **Purpose:** Audit and remediation evidence for admin workflows and controlled front-end output.  
-**Scope:** Dashboard, Onboarding, AI Runs, Build Plans, Queue & Logs, Privacy/Reporting, crawler screens, confirmation/modals.
+**Scope:** Dashboard, Onboarding, AI Runs, Build Plans, Queue & Logs, Privacy/Reporting, crawler screens, confirmation/modals; **front-end generated pages** (section/page-template output) are governed by **semantic-seo-accessibility-extension-contract.md** for semantic HTML, heading hierarchy, landmarks, CTA/link/image/list/form rules, and preview/QA expectations.
 
 ---
 
@@ -106,3 +106,9 @@
 
 - **Modal behavior:** When confirmation or other modals are implemented, they must implement §51.10 (focus trap, return, ESC, title/content semantics). Tracked in product backlog.
 - **Plugin-specific focus styling:** Visible focus currently relies on WordPress admin CSS. If plugin admin CSS is added, include `:focus-visible` styles and do not remove outline.
+
+---
+
+## 6. Front-end generated pages (templates)
+
+**Contract:** **semantic-seo-accessibility-extension-contract.md** defines enforceable semantic and accessibility rules for section and page-template output (heading hierarchy, single h1, landmarks, CTA/link label clarity, image alt, list/table/accordion/form semantics). QA for **generated page** accessibility must use that contract’s §10.3 checklist and invalid examples (§3.3, §4.3, §5.3, §6.3, §7.5). Scope aligns with §56.6 “front-end section accessibility in generated pages”.

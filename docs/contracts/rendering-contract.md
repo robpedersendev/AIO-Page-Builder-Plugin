@@ -4,6 +4,8 @@
 
 **Upstream Authorities**: Section_Schema, Page_Template_Schema, Composition_Schema (see plugin src/Domain/Registries/), registry-export-basics-contract.md
 
+**Extension**: semantic-seo-accessibility-extension-contract.md — semantic HTML, heading hierarchy, landmarks, CTA/link/image rules, and preview/QA expectations for section and page-template output.
+
 **Status**: Contract definition only; no renderer implementation.
 
 ---
@@ -206,7 +208,7 @@ The section renderer is responsible for:
 | Token application | Replace LPagery tokens in values before output |
 | Class and ID assignment | Per section CSS contract |
 | Omission logic | Skip optional empty fields per section rules |
-| Accessibility | Apply ARIA, semantics per structural blueprint |
+| Accessibility | Apply ARIA, semantics per structural blueprint and **semantic-seo-accessibility-extension-contract.md** (heading hierarchy, landmarks, CTA/link/image/list/form rules) |
 
 The section renderer must **not**:
 
@@ -356,6 +358,7 @@ A built page is **meaningful** after plugin deactivation when:
 - **Field_Blueprint_Schema**: `plugin/src/Domain/ACF/Blueprints/Field_Blueprint_Schema.php`
 - **registry-export-basics-contract.md**: Export fragment shapes; composition ordered_section_list
 - **PORTABILITY_AND_UNINSTALL.md**: Survivability and uninstall policy
+- **semantic-seo-accessibility-extension-contract.md**: Semantic HTML, heading hierarchy, landmarks, link/button/image/list/form rules, and preview/QA expectations for generated templates
 
 ---
 
@@ -364,3 +367,4 @@ A built page is **meaningful** after plugin deactivation when:
 | Version | Date | Change |
 |---------|------|--------|
 | 1 | Prompt 041 | Initial contract definition |
+| 2 | Prompt 137 | Cross-reference to semantic-seo-accessibility-extension-contract; section renderer accessibility responsibility extended. |
