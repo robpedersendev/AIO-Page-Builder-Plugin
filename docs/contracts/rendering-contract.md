@@ -4,7 +4,7 @@
 
 **Upstream Authorities**: Section_Schema, Page_Template_Schema, Composition_Schema (see plugin src/Domain/Registries/), registry-export-basics-contract.md
 
-**Extension**: semantic-seo-accessibility-extension-contract.md — semantic HTML, heading hierarchy, landmarks, CTA/link/image rules, and preview/QA expectations for section and page-template output.
+**Extensions**: semantic-seo-accessibility-extension-contract.md (semantic HTML, heading hierarchy, landmarks, CTA/link/image rules, preview/QA); animation-support-and-fallback-contract.md (animation tiers, families, reduced-motion, fallbacks; animation is optional progressive enhancement).
 
 **Status**: Contract definition only; no renderer implementation.
 
@@ -359,6 +359,7 @@ A built page is **meaningful** after plugin deactivation when:
 - **registry-export-basics-contract.md**: Export fragment shapes; composition ordered_section_list
 - **PORTABILITY_AND_UNINSTALL.md**: Survivability and uninstall policy
 - **semantic-seo-accessibility-extension-contract.md**: Semantic HTML, heading hierarchy, landmarks, link/button/image/list/form rules, and preview/QA expectations for generated templates
+- **animation-support-and-fallback-contract.md**: Animation tiers, families, reduced-motion, and fallbacks; templates must render correctly without animation (progressive enhancement)
 
 ---
 
@@ -368,3 +369,4 @@ A built page is **meaningful** after plugin deactivation when:
 |---------|------|--------|
 | 1 | Prompt 041 | Initial contract definition |
 | 2 | Prompt 137 | Cross-reference to semantic-seo-accessibility-extension-contract; section renderer accessibility responsibility extended. |
+| 3 | Prompt 138 | Cross-reference to animation-support-and-fallback-contract; animation as optional progressive enhancement. |

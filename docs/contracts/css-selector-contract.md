@@ -2,7 +2,7 @@
 
 **Spec**: §7.7 CSS and Asset Delivery Strategy; §12.11 Section CSS Contract Manifest; §17 Rendering Architecture; §18 CSS, ID, Class, and Attribute Contract; §57.6 CSS Naming Conventions; §59.5 Rendering and ACF Phase
 
-**Related**: rendering-contract.md (markup output); section-registry-schema.md (§6 CSS contract manifest reference); PORTABILITY_AND_UNINSTALL.md; **semantic-seo-accessibility-extension-contract.md** (semantic HTML and accessibility rules that apply to the same markup; selectors and element roles here align with semantic requirements there).
+**Related**: rendering-contract.md (markup output); section-registry-schema.md (§6 CSS contract manifest reference); PORTABILITY_AND_UNINSTALL.md; **semantic-seo-accessibility-extension-contract.md** (semantic HTML and accessibility rules that apply to the same markup; selectors and element roles here align with semantic requirements there); **animation-support-and-fallback-contract.md** (animation state classes and optional animation hooks must follow this contract’s state/modifier patterns; no new structural selectors for animation).
 
 **Status**: Contract definition only; no CSS files, asset loaders, or renderer implementation.
 
@@ -329,6 +329,7 @@ Use this checklist to verify a section’s CSS contract manifest complies with t
 - **rendering-contract.md**: Markup output and wrapper_attrs; class and ID assignment follow this contract.
 - **Spec §18.10**: AI may influence values, not structure-defining identifiers; this contract defines those identifiers.
 - **semantic-seo-accessibility-extension-contract.md**: Semantic HTML patterns by section purpose family, heading/landmark/CTA/image/list/form rules; element roles in §3.4 align with semantic structure required there.
+- **animation-support-and-fallback-contract.md**: Animation tiers and families; animation state uses §3.6 state-class pattern; no new structural selectors introduced by animation.
 
 ---
 
@@ -338,3 +339,4 @@ Use this checklist to verify a section’s CSS contract manifest complies with t
 |---------|------|--------|
 | 1 | Prompt 042 | Initial selector and attribute contract. |
 | 2 | Prompt 137 | Cross-reference to semantic-seo-accessibility-extension-contract. |
+| 3 | Prompt 138 | Cross-reference to animation-support-and-fallback-contract. |

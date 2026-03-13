@@ -2,7 +2,7 @@
 
 **Governs:** Spec §51.5–51.10, §50.1, §56.6; Hardening matrix §59.14, category `accessibility`.  
 **Purpose:** Audit and remediation evidence for admin workflows and controlled front-end output.  
-**Scope:** Dashboard, Onboarding, AI Runs, Build Plans, Queue & Logs, Privacy/Reporting, crawler screens, confirmation/modals; **front-end generated pages** (section/page-template output) are governed by **semantic-seo-accessibility-extension-contract.md** for semantic HTML, heading hierarchy, landmarks, CTA/link/image/list/form rules, and preview/QA expectations.
+**Scope:** Dashboard, Onboarding, AI Runs, Build Plans, Queue & Logs, Privacy/Reporting, crawler screens, confirmation/modals; **front-end generated pages** (section/page-template output) are governed by **semantic-seo-accessibility-extension-contract.md** for semantic HTML, heading hierarchy, landmarks, CTA/link/image/list/form rules, and preview/QA expectations; **animation** on generated pages is governed by **animation-support-and-fallback-contract.md** (reduced-motion, fallbacks, no broken layout).
 
 ---
 
@@ -112,3 +112,5 @@
 ## 6. Front-end generated pages (templates)
 
 **Contract:** **semantic-seo-accessibility-extension-contract.md** defines enforceable semantic and accessibility rules for section and page-template output (heading hierarchy, single h1, landmarks, CTA/link label clarity, image alt, list/table/accordion/form semantics). QA for **generated page** accessibility must use that contract’s §10.3 checklist and invalid examples (§3.3, §4.3, §5.3, §6.3, §7.5). Scope aligns with §56.6 “front-end section accessibility in generated pages”.
+
+**Animation and reduced motion:** **animation-support-and-fallback-contract.md** §5 and §9.2 require honoring `prefers-reduced-motion: reduce` and QA verification that no decorative animation runs when that preference is set. Use that contract’s reduced-motion QA checklist for front-end template output; hardening (§59.14) includes reduced-motion accessibility.
