@@ -4,7 +4,7 @@
 
 **Upstream Authorities**: Section_Schema, Page_Template_Schema, Composition_Schema (see plugin src/Domain/Registries/), registry-export-basics-contract.md
 
-**Extensions**: semantic-seo-accessibility-extension-contract.md (semantic HTML, heading hierarchy, landmarks, CTA/link/image rules, preview/QA); animation-support-and-fallback-contract.md (animation tiers, families, reduced-motion, fallbacks; animation is optional progressive enhancement).
+**Extensions**: semantic-seo-accessibility-extension-contract.md (semantic HTML, heading hierarchy, landmarks, CTA/link/image rules, preview/QA); animation-support-and-fallback-contract.md (animation tiers, families, reduced-motion, fallbacks); **smart-omission-rendering-contract.md** (when to suppress empty optional elements; required vs optional nodes; no omission of mandatory structure).
 
 **Status**: Contract definition only; no renderer implementation.
 
@@ -207,7 +207,7 @@ The section renderer is responsible for:
 | Field-to-markup mapping | Map each field value to appropriate block or HTML |
 | Token application | Replace LPagery tokens in values before output |
 | Class and ID assignment | Per section CSS contract |
-| Omission logic | Skip optional empty fields per section rules |
+| Omission logic | Skip optional empty fields per **smart-omission-rendering-contract.md** (eligibility by field/render-node, required-node preservation, wrapper collapse, token fallbacks) |
 | Accessibility | Apply ARIA, semantics per structural blueprint and **semantic-seo-accessibility-extension-contract.md** (heading hierarchy, landmarks, CTA/link/image/list/form rules) |
 
 The section renderer must **not**:
@@ -360,6 +360,7 @@ A built page is **meaningful** after plugin deactivation when:
 - **PORTABILITY_AND_UNINSTALL.md**: Survivability and uninstall policy
 - **semantic-seo-accessibility-extension-contract.md**: Semantic HTML, heading hierarchy, landmarks, link/button/image/list/form rules, and preview/QA expectations for generated templates
 - **animation-support-and-fallback-contract.md**: Animation tiers, families, reduced-motion, and fallbacks; templates must render correctly without animation (progressive enhancement)
+- **smart-omission-rendering-contract.md**: When empty optional elements may be omitted; required vs optional nodes; nested/wrapper collapse; cases where omission is disabled for safety
 
 ---
 
@@ -370,3 +371,4 @@ A built page is **meaningful** after plugin deactivation when:
 | 1 | Prompt 041 | Initial contract definition |
 | 2 | Prompt 137 | Cross-reference to semantic-seo-accessibility-extension-contract; section renderer accessibility responsibility extended. |
 | 3 | Prompt 138 | Cross-reference to animation-support-and-fallback-contract; animation as optional progressive enhancement. |
+| 4 | Prompt 139 | Cross-reference to smart-omission-rendering-contract; section renderer omission logic defined there. |
