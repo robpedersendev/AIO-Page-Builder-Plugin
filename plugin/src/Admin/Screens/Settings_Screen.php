@@ -43,6 +43,7 @@ final class Settings_Screen {
 		$ptf_batch_seed_result = isset( $_GET['aio_ptf_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_ptf_batch_seed_result'] ) : '';
 		$mlp_batch_seed_result = isset( $_GET['aio_mlp_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_mlp_batch_seed_result'] ) : '';
 		$lpu_batch_seed_result = isset( $_GET['aio_lpu_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_lpu_batch_seed_result'] ) : '';
+		$cta_super_seed_result = isset( $_GET['aio_cta_super_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_cta_super_seed_result'] ) : '';
 		$pt_comp_expansion_seed_result = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -159,6 +160,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_legal_policy_utility_batch" />
 				<?php \wp_nonce_field( 'aio_seed_legal_policy_utility_batch', 'aio_seed_lpu_batch_nonce' ); ?>
 				<?php \submit_button( __( 'Seed legal/policy/utility library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_lpu_batch_submit', false ); ?>
+			</form>
+
+			<?php if ( $cta_super_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'CTA super-library (SEC-08) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $cta_super_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding CTA super-library failed. Check that the plugin can create section template posts.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'CTA super-library (SEC-08)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed the CTA super-library: consultation, booking, purchase, inquiry, contact, quote, directory nav, compare, trust, local, service/product detail, support, and policy/utility CTAs across subtle, strong, media-backed, proof-backed, and minimalist variants. Idempotent.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_cta_super_library_batch" />
+				<?php \wp_nonce_field( 'aio_seed_cta_super_library_batch', 'aio_seed_cta_super_nonce' ); ?>
+				<?php \submit_button( __( 'Seed CTA super-library', 'aio-page-builder' ), 'secondary', 'aio_seed_cta_super_submit', false ); ?>
 			</form>
 
 			<?php if ( $pt_comp_expansion_seed_result === 'success' ) : ?>
