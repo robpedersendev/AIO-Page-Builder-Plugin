@@ -29,6 +29,7 @@
 | Build Plans             | `Build_Plans_Screen` / `aio-page-builder-build-plans` | `aio_view_build_plans`  |
 | Build Plan Analytics   | `Build_Plan_Analytics_Screen` / `aio-page-builder-build-plan-analytics` | `aio_view_build_plans`  |
 | **Page Templates**     | Page template directory (see §2.2) / `aio-page-builder-page-templates`   | `aio_view_build_plans` (or dedicated template cap) |
+| **Section Templates**  | Section template directory (see §2.3) / `aio-page-builder-section-templates` | `aio_view_build_plans` (or dedicated template cap) |
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
 | **Post-Release Health**| `Post_Release_Health_Screen` / `aio-page-builder-post-release-health` | `aio_view_logs`         |
@@ -42,6 +43,10 @@ When admin screens list or browse **page templates** (e.g. registry, template pi
 The **page template directory** is a dedicated browse experience for page templates. Its **information architecture** (hierarchical tree, breadcrumbs, category/family filters, list/detail, one-pager/preview links) is defined in **page-template-directory-ia-extension.md**. Tree structure: **Page Templates** (root) → **Category class** (Top Level, Hub, Nested Hub, Child/Detail) → **Family** (e.g. Home Page Templates, Services Page Templates) → **Template option list** → **Template detail**. Screen slug: `aio-page-builder-page-templates` (or as specified in that contract). Directory is capability-gated; preview uses preview-safe data only. Build Plan template selection may deep-link into the directory; directory does not replace Build Plan or composition workflows.
 
 When admin screens list or browse **section templates**, **directory and browse grouping** must follow **section-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `section_purpose_family` (e.g. hero, proof, cta, legal), `placement_tendency` (opener, mid_page, cta_ending, legal_footer_adjacent), and `cta_classification`. Section preview grouping aligns with the same taxonomy. All taxonomy values are validated and deterministic.
+
+### 2.3 Section template directory IA (spec §49.6; Prompt 142)
+
+The **section template directory** is a dedicated browse experience for section templates. Its **information architecture** (hierarchical tree by purpose family, CTA/variant grouping, breadcrumbs, list/detail, helper-doc and field blueprint links, preview) is defined in **section-template-directory-ia-extension.md**. Tree structure: **Section Templates** (root) → **Purpose family** (Hero, Proof, CTA, FAQ, etc.) → **CTA classification** (for cta/contact) or **Variant family** (e.g. Hero primary) → **Section option list** → **Section detail**. Screen slug: `aio-page-builder-section-templates`. Directory is capability-gated; preview uses preview-safe data only. Build Plan and composition section pickers may deep-link into the directory. Section directory does not replace Build Plan or composition workflows and emphasizes purpose-family, CTA classification, and variant families for section reuse.
 
 ---
 
