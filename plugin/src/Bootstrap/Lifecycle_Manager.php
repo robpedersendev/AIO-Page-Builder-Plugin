@@ -99,6 +99,7 @@ final class Lifecycle_Manager {
 			'register_capabilities',
 			'register_schedules',
 			'seed_form_templates',
+			'seed_section_expansion_pack',
 			'install_notification_eligibility',
 			'first_run_redirect_readiness',
 		);
@@ -170,6 +171,8 @@ final class Lifecycle_Manager {
 				return $this->first_run_redirect_readiness();
 			case 'seed_form_templates':
 				return $this->seed_form_templates();
+			case 'seed_section_expansion_pack':
+				return $this->seed_section_expansion_pack();
 			default:
 				return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', $phase );
 		}
@@ -324,6 +327,37 @@ final class Lifecycle_Manager {
 				'section_id'            => $result['section_id'],
 				'page_id'               => $result['page_id'],
 				'errors'                => $result['errors'],
+			)
+		);
+	}
+
+	/**
+	 * Seeds the curated section expansion pack (Prompt 122). Runs after form templates; CPTs already registered.
+	 *
+	 * @return Lifecycle_Result
+	 */
+	private function seed_section_expansion_pack(): Lifecycle_Result {
+		$base  = __DIR__ . '/../Domain';
+		require_once $base . '/Storage/Repositories/Repository_Interface.php';
+		require_once $base . '/Storage/Objects/Object_Status_Families.php';
+		require_once $base . '/Storage/Repositories/Abstract_CPT_Repository.php';
+		require_once $base . '/Storage/Objects/Object_Type_Keys.php';
+		require_once $base . '/Registries/Section/Section_Schema.php';
+		require_once $base . '/Storage/Repositories/Section_Template_Repository.php';
+		require_once $base . '/Registries/Section/ExpansionPack/Section_Expansion_Pack_Definitions.php';
+		require_once $base . '/Registries/Section/ExpansionPack/Section_Expansion_Pack_Seeder.php';
+
+		$section_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
+		$result      = \AIOPageBuilder\Domain\Registries\Section\ExpansionPack\Section_Expansion_Pack_Seeder::run( $section_repo );
+
+		return new Lifecycle_Result(
+			Lifecycle_Result::STATUS_SUCCESS,
+			'',
+			'seed_section_expansion_pack',
+			array(
+				'expansion_pack_seeded' => $result['success'],
+				'section_ids'          => $result['section_ids'],
+				'errors'               => $result['errors'],
 			)
 		);
 	}
