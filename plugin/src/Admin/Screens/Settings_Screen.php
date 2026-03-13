@@ -37,6 +37,7 @@ final class Settings_Screen {
 	public function render(): void {
 		$seed_result           = isset( $_GET['aio_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_result'] ) : '';
 		$expansion_seed_result = isset( $_GET['aio_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_expansion_seed_result'] ) : '';
+		$hero_intro_batch_seed_result = isset( $_GET['aio_hero_intro_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hero_intro_batch_seed_result'] ) : '';
 		$pt_comp_expansion_seed_result = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -69,6 +70,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_section_expansion_pack" />
 				<?php \wp_nonce_field( 'aio_seed_section_expansion_pack', 'aio_seed_expansion_pack_nonce' ); ?>
 				<?php \submit_button( __( 'Seed section expansion pack', 'aio-page-builder' ), 'secondary', 'aio_seed_expansion_pack_submit', false ); ?>
+			</form>
+
+			<?php if ( $hero_intro_batch_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Hero/intro library batch (SEC-01) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $hero_intro_batch_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding hero/intro library batch failed. Check that the plugin can create section template posts.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Hero/intro library batch (SEC-01)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed the hero and introductory section templates (conversion, credibility, educational, local, directory, product, legal, editorial, compact, media-forward, split) with field blueprints and metadata. Idempotent.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_hero_intro_library_batch" />
+				<?php \wp_nonce_field( 'aio_seed_hero_intro_library_batch', 'aio_seed_hero_intro_batch_nonce' ); ?>
+				<?php \submit_button( __( 'Seed hero/intro library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_hero_intro_batch_submit', false ); ?>
 			</form>
 
 			<?php if ( $pt_comp_expansion_seed_result === 'success' ) : ?>

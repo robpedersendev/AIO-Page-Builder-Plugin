@@ -277,6 +277,11 @@ final class Section_Definition_Normalizer {
 			'short_label'                         => 64,
 			'preview_description'                  => 512,
 			'preview_image_ref'                   => 255,
+			'section_purpose_family'              => 64,
+			'cta_classification'                  => 64,
+			'variation_family_key'                => 64,
+			'animation_tier'                      => 32,
+			'accessibility_contract_ref'           => 255,
 			'notes_for_ai_planning'                => 1024,
 			'hierarchy_role_hints'                 => 256,
 			'seo_relevance_notes'                  => 512,
@@ -287,6 +292,14 @@ final class Section_Definition_Normalizer {
 			'deprecation_notes'                    => 512,
 			'accessibility_contract_ref'           => 255,
 		);
+		if ( $name === 'animation_families' ) {
+			return is_array( $value )
+				? array_values( array_filter( array_map( fn( $v ) => $this->sanitize_string( (string) $v, 64 ), $value ) ) )
+				: array();
+		}
+		if ( $name === 'preview_defaults' ) {
+			return is_array( $value ) ? $value : array();
+		}
 		if ( $name === 'suggested_use_cases' || $name === 'prohibited_use_cases' || $name === 'dependencies_sections_or_context' ) {
 			return is_array( $value )
 				? array_map( fn( $v ) => $this->sanitize_string( (string) $v, 256 ), $value )
