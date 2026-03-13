@@ -77,6 +77,8 @@ require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/TopLevelBatch/
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/TopLevelBatch/Top_Level_Marketing_Page_Template_Seeder.php';
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/TopLevelLegalUtilityBatch/Top_Level_Legal_Utility_Page_Template_Definitions.php';
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/TopLevelLegalUtilityBatch/Top_Level_Legal_Utility_Page_Template_Seeder.php';
+require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/HubBatch/Hub_Page_Template_Definitions.php';
+require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/HubBatch/Hub_Page_Template_Seeder.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Bundle_Schema.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Mode_Keys.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Result.php';
