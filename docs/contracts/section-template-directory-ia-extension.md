@@ -191,9 +191,10 @@ At L4 (section option list), each **row or card** displays a bounded set of fiel
 | Rule | Description |
 |------|-------------|
 | **Placement** | Section detail (L5); optionally thumbnail or “Preview” on list row (L4). |
-| **Target** | Preview view for the section template (preview rendering is out of scope; link **target** is defined so that when preview is implemented, the directory can link to it). |
-| **Safety** | Preview uses **preview-safe dummy data** (large-scale-acf-lpagery-binding-contract); no raw secret or unsafe content. |
+| **Target** | Preview view for the section template. Preview **rendering** and **dummy-data** rules are defined in **template-preview-and-dummy-data-contract.md**: real section renderer with synthetic ACF data, realistic content by purpose family, preview-safe omission and animation. |
+| **Safety** | Preview uses **synthetic dummy data** only (template-preview-and-dummy-data-contract, large-scale-acf-lpagery-binding-contract); no raw secret or unsafe content. |
 | **Capability** | Preview access respects same capability as directory. |
+| **Detail screen metadata** | Alongside preview, detail screen must show name, description, purpose family/CTA, placement, variants, field blueprint summary, and helper link per **template-preview-and-dummy-data-contract.md** §4.2. |
 
 ---
 
@@ -273,6 +274,7 @@ The following scenarios must be supported by the IA:
 - **template-library-scale-extension-contract.md**: 250 section target; scale does not relax schema.
 - **template-library-coverage-matrix.md**: Section coverage and counts; directory must support browsing the full library.
 - **page-template-directory-ia-extension.md**: Parallel structure (tree, list/detail, breadcrumbs, pagination); section directory is distinct and purpose/CTA/variant-oriented.
+- **template-preview-and-dummy-data-contract.md**: Preview fidelity, synthetic data by purpose family, required detail-screen metadata (§4.2), animation and omission in preview.
 - **Spec §15**: Helper paragraph system; linkage from directory to helper docs.
 - **large-scale-acf-lpagery-binding-contract.md**: Preview dummy-data and preview-safe fallbacks for section preview.
 

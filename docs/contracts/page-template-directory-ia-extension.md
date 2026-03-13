@@ -191,9 +191,10 @@ Breadcrumbs reflect the **current location** in the directory and support one-cl
 | Rule | Description |
 |------|-------------|
 | **Placement** | Template detail (L5); optionally thumbnail or “Preview” on list row (L4). |
-| **Target** | Preview view for the page template (preview rendering is out of scope for this contract; link **target** is defined so that when preview is implemented, the directory can link to it). |
-| **Safety** | Preview must use **preview-safe dummy data** (large-scale-acf-lpagery-binding-contract); no raw secret-bearing preview data. |
+| **Target** | Preview view for the page template. Preview **rendering** and **dummy-data** rules are defined in **template-preview-and-dummy-data-contract.md**: real renderer with synthetic ACF data, realistic content by family, preview-safe omission and animation. |
+| **Safety** | Preview must use **synthetic dummy data** only (template-preview-and-dummy-data-contract, large-scale-acf-lpagery-binding-contract); no raw secret-bearing or production data. |
 | **Capability** | Preview access respects same capability as directory (template-management). |
+| **Detail screen metadata** | Alongside preview, detail screen must show name, description, used sections, differentiation notes, purpose/CTA direction, and one-pager link per **template-preview-and-dummy-data-contract.md** §4.1. |
 
 ### 7.4 Composition provenance
 
@@ -279,6 +280,7 @@ The following scenarios must be supported by the IA (implementation will verify)
 - **template-library-scale-extension-contract.md**: 500 page template target; scale does not relax schema.
 - **template-library-coverage-matrix.md**: Coverage and counts; directory must support browsing the full library.
 - **build-plan-admin-ia-contract.md**: Build Plan entry points; template selection may link to directory; directory does not replace Build Plan workflow.
+- **template-preview-and-dummy-data-contract.md**: Preview fidelity, synthetic data, required detail-screen metadata (§4.1), animation and omission in preview.
 - **Spec §16**: One-pager purpose and linkage.
 
 ---

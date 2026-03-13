@@ -61,6 +61,8 @@ For internal demo environments:
 - **No vanity metrics** – Fixture data is minimal and representative, not high-volume test data.
 - **Security** – No real credentials, no customer PII, no raw secrets in summaries or payloads.
 
+**Preview and dummy data:** For **template previews** in the admin directory (section and page templates), synthetic data and preview fidelity are defined in **template-preview-and-dummy-data-contract.md** (docs/contracts). That contract governs realistic dummy ACF data, preview-safe omission and animation, and required detail-screen metadata. Fixture data and preview dummy data share the same “no production, no secrets” policy; the preview contract adds preview-specific rules (real renderer, category-aware realism, reduced-motion).
+
 ## Files
 
 - `src/Domain/Fixtures/Demo_Fixture_Generator.php` – Generator.
