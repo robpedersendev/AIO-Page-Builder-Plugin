@@ -27,6 +27,8 @@ use AIOPageBuilder\Domain\Execution\Jobs\Token_Set_Job_Service;
 use AIOPageBuilder\Domain\Execution\Queue\Bulk_Executor;
 use AIOPageBuilder\Domain\Execution\Queue\Execution_Job_Dispatcher;
 use AIOPageBuilder\Domain\Execution\Queue\Execution_Queue_Service;
+use AIOPageBuilder\Domain\Execution\Queue\Queue_Health_Summary_Builder;
+use AIOPageBuilder\Domain\Execution\Queue\Queue_Recovery_Service;
 use AIOPageBuilder\Domain\Rollback\Diffs\Diff_Summarizer_Service;
 use AIOPageBuilder\Domain\Rollback\Diffs\Navigation_Diff_Summarizer;
 use AIOPageBuilder\Domain\Rollback\Diffs\Page_Diff_Summarizer;
@@ -173,6 +175,17 @@ final class Execution_Provider implements Service_Provider_Interface {
 				$container->get( 'build_plan_repository' ),
 				$container->get( 'bulk_executor' ),
 				$container->get( 'execution_job_dispatcher' )
+			);
+		} );
+		$container->register( 'queue_health_summary_builder', function () use ( $container ): Queue_Health_Summary_Builder {
+			$repo = $container->has( 'job_queue_repository' ) ? $container->get( 'job_queue_repository' ) : null;
+			return new Queue_Health_Summary_Builder( $repo );
+		} );
+		$container->register( 'queue_recovery_service', function () use ( $container ): Queue_Recovery_Service {
+			$logger = $container->has( 'logger' ) ? $container->get( 'logger' ) : null;
+			return new Queue_Recovery_Service(
+				$container->get( 'job_queue_repository' ),
+				$logger
 			);
 		} );
 	}

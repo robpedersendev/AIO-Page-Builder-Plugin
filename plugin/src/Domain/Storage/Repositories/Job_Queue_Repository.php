@@ -12,14 +12,15 @@ namespace AIOPageBuilder\Domain\Storage\Repositories;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Execution\Queue\Job_Queue_Repository_Interface;
+use AIOPageBuilder\Domain\Execution\Queue\Queue_Recovery_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Status;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
 
 /**
  * Repository → storage: Table_Names::JOB_QUEUE (custom table).
- * Key column: job_ref. Supports insert, update status, and list by status (Prompt 080).
+ * Key column: job_ref. Supports insert, update status, list by status, and recovery reset (Prompt 080, 124).
  */
-final class Job_Queue_Repository extends Abstract_Table_Repository implements Job_Queue_Repository_Interface {
+final class Job_Queue_Repository extends Abstract_Table_Repository implements Job_Queue_Repository_Interface, Queue_Recovery_Repository_Interface {
 
 	/** @inheritdoc */
 	protected function get_table_suffix(): string {
@@ -80,6 +81,28 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 			$updates['completed_at'] = $completed_at;
 		}
 		return $this->update_row( $id, $updates );
+	}
+
+	/**
+	 * Resets a failed job for manual retry: sets queue_status to pending and clears lock (spec §42.4, §42.5).
+	 * Caller must enforce retry eligibility and capability. Does not increment retry_count.
+	 *
+	 * @param string $job_ref
+	 * @return bool
+	 */
+	public function reset_for_retry( string $job_ref ): bool {
+		$existing = $this->get_by_key( $job_ref );
+		if ( $existing === null ) {
+			return false;
+		}
+		$id = (int) ( $existing['id'] ?? 0 );
+		if ( $id <= 0 ) {
+			return false;
+		}
+		return $this->update_row( $id, array(
+			'queue_status' => Job_Queue_Status::PENDING,
+			'lock_token'   => '',
+		) );
 	}
 
 	/**

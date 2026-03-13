@@ -14,6 +14,7 @@ namespace AIOPageBuilder\Domain\Reporting\UI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Execution\Queue\Queue_Health_Summary_Builder;
 use AIOPageBuilder\Domain\Reporting\Contracts\Reporting_Event_Types;
 use AIOPageBuilder\Domain\Reporting\Logs\Log_Export_Service;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
@@ -50,12 +51,15 @@ final class Logs_Monitoring_State_Builder {
 	 *   reporting_logs: list<array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}>,
 	 *   import_export_logs: list<array{id: string, type: string, created_at: string, status: string}>,
 	 *   critical_errors: list<array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}>,
-	 *   log_export: array{exportable_log_types: list<array{value: string, label: string}>}
+	 *   log_export: array{exportable_log_types: list<array{value: string, label: string}>},
+	 *   queue_health: array{total_pending: int, stale_lock_count: int, ...}
 	 * }
 	 */
 	public function build(): array {
+		$queue_health_builder = new Queue_Health_Summary_Builder( $this->job_queue_repository );
 		return array(
 			'queue'              => $this->build_queue_tab(),
+			'queue_health'       => $queue_health_builder->build(),
 			'execution_logs'     => $this->build_execution_logs(),
 			'ai_runs'            => $this->build_ai_runs_tab(),
 			'reporting_logs'     => $this->build_reporting_logs(),
@@ -223,9 +227,22 @@ final class Logs_Monitoring_State_Builder {
 		return $out;
 	}
 
+	private const RETRY_ELIGIBLE_MAX_COUNT = 5;
+
+	/** @var array<string> Job types that allow manual retry (spec §42.4). */
+	private const RETRYABLE_JOB_TYPES = array(
+		'create_page',
+		'replace_page',
+		'update_page_metadata',
+		'update_menu',
+		'apply_token_set',
+		'finalize_plan',
+		'rollback_action',
+	);
+
 	/**
 	 * @param array<string, mixed> $row
-	 * @return array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}
+	 * @return array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, can_cancel: bool}
 	 */
 	private function normalize_queue_row( array $row ): array {
 		$related = (string) ( $row['related_object_refs'] ?? '' );
@@ -235,14 +252,24 @@ final class Logs_Monitoring_State_Builder {
 		} elseif ( $related !== '' ) {
 			$plan_id = trim( substr( $related, 0, 64 ) );
 		}
+		$queue_status = (string) ( $row['queue_status'] ?? '' );
+		$job_type     = (string) ( $row['job_type'] ?? '' );
+		$retry_count  = isset( $row['retry_count'] ) && is_numeric( $row['retry_count'] ) ? (int) $row['retry_count'] : 0;
+		$retry_eligible = $queue_status === 'failed'
+			&& $retry_count < self::RETRY_ELIGIBLE_MAX_COUNT
+			&& in_array( $job_type, self::RETRYABLE_JOB_TYPES, true );
+		$can_cancel = in_array( $queue_status, array( 'pending', 'retrying', 'running', 'failed' ), true );
+
 		return array(
 			'job_ref'        => (string) ( $row['job_ref'] ?? '' ),
-			'job_type'       => (string) ( $row['job_type'] ?? '' ),
-			'queue_status'   => (string) ( $row['queue_status'] ?? '' ),
+			'job_type'       => $job_type,
+			'queue_status'   => $queue_status,
 			'created_at'     => (string) ( $row['created_at'] ?? '' ),
 			'completed_at'   => (string) ( $row['completed_at'] ?? '' ),
 			'failure_reason' => (string) ( $row['failure_reason'] ?? '' ),
 			'related_plan_id' => $plan_id,
+			'retry_eligible' => $retry_eligible,
+			'can_cancel'     => $can_cancel,
 		);
 	}
 }

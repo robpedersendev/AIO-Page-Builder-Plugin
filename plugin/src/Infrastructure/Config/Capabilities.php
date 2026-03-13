@@ -32,6 +32,7 @@ final class Capabilities {
 	public const MANAGE_TOKEN_CHANGES          = 'aio_manage_token_changes';
 	public const FINALIZE_PLAN_ACTIONS         = 'aio_finalize_plan_actions';
 	public const VIEW_LOGS                     = 'aio_view_logs';
+	public const MANAGE_QUEUE_RECOVERY        = 'aio_manage_queue_recovery';
 	public const VIEW_SENSITIVE_DIAGNOSTICS    = 'aio_view_sensitive_diagnostics';
 	public const DOWNLOAD_ARTIFACTS             = 'aio_download_artifacts';
 	public const EXPORT_DATA                   = 'aio_export_data';
@@ -74,6 +75,7 @@ final class Capabilities {
 			self::MANAGE_TOKEN_CHANGES,
 			self::FINALIZE_PLAN_ACTIONS,
 			self::VIEW_LOGS,
+			self::MANAGE_QUEUE_RECOVERY,
 			self::VIEW_SENSITIVE_DIAGNOSTICS,
 			self::DOWNLOAD_ARTIFACTS,
 			self::EXPORT_DATA,
