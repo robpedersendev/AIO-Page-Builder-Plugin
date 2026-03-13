@@ -1,0 +1,48 @@
+{
+  "fixture_version": "1",
+  "prompt_pack_ref": {
+    "internal_key": "aio/build-plan-draft",
+    "version": "1.0.0"
+  },
+  "schema_ref": "aio/build-plan-draft-v1",
+  "input": {
+    "schema_version": "aio/build-plan-draft-v1",
+    "run_summary": {
+      "summary_text": "Minimal regression fixture.",
+      "planning_mode": "new_site",
+      "overall_confidence": "high"
+    },
+    "site_purpose": {},
+    "site_structure": {},
+    "existing_page_changes": [],
+    "new_pages_to_create": [],
+    "menu_change_plan": [],
+    "design_token_recommendations": [],
+    "seo_recommendations": [],
+    "warnings": [],
+    "assumptions": [],
+    "confidence": {}
+  },
+  "expected": {
+    "final_validation_state": "passed",
+    "normalized_output": {
+      "schema_version": "aio/build-plan-draft-v1",
+      "run_summary": {
+        "summary_text": "Minimal regression fixture.",
+        "planning_mode": "new_site",
+        "overall_confidence": "high"
+      },
+      "site_purpose": {},
+      "site_structure": {},
+      "existing_page_changes": [],
+      "new_pages_to_create": [],
+      "menu_change_plan": [],
+      "design_token_recommendations": [],
+      "seo_recommendations": [],
+      "warnings": [],
+      "assumptions": [],
+      "confidence": {}
+    },
+    "dropped_records": []
+  }
+}

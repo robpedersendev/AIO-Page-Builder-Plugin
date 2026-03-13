@@ -1,0 +1,13 @@
+{
+  "fixture_version": "1",
+  "prompt_pack_ref": {
+    "internal_key": "aio/build-plan-draft",
+    "version": "1.0.0"
+  },
+  "schema_ref": "aio/build-plan-draft-v1",
+  "input": "",
+  "expected": {
+    "final_validation_state": "failed",
+    "blocking_failure_stage": "raw_capture"
+  }
+}

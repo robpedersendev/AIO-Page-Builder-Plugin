@@ -119,4 +119,19 @@ final class Prompt_Pack_Registry_Service {
 		}
 		return true;
 	}
+
+	/**
+	 * Suggested fixture filename base for regression (spec §58.3, Prompt 120). Tied to prompt-pack version.
+	 * Used to place or discover golden fixtures under tests/fixtures/prompt-packs/.
+	 *
+	 * @param string $internal_key Pack internal_key (e.g. aio/build-plan-draft).
+	 * @param string $version     Pack version (e.g. 1.0.0).
+	 * @return string Sanitized base name without extension (e.g. aio-build-plan-draft-1.0.0).
+	 */
+	public static function get_suggested_fixture_basename( string $internal_key, string $version ): string {
+		$safe = preg_replace( '#[^a-zA-Z0-9/-]#', '-', $internal_key );
+		$safe = trim( str_replace( '/', '-', $safe ), '-' );
+		$ver  = preg_replace( '#[^0-9.]+#', '', $version );
+		return $safe !== '' ? $safe . '-' . $ver : 'fixture-' . $ver;
+	}
 }

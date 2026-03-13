@@ -31,6 +31,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\AI_Provider_Base_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Failover_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Provider_Drivers_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Prompt_Pack_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\AI_Regression_Harness_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Runs_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\AI_Validation_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Onboarding_Provider;
@@ -93,6 +94,7 @@ final class Module_Registrar {
 			new AI_Failover_Provider(),
 			new AI_Provider_Drivers_Provider(),
 			new AI_Prompt_Pack_Provider(),
+			new AI_Regression_Harness_Provider(),
 			new AI_Runs_Provider(),
 			new Storage_Services_Provider(),
 			new ExportRestore_Provider(),
