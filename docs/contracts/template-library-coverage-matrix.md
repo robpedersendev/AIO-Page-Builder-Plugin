@@ -231,6 +231,7 @@ Evidence that the thresholds are met **shall** include:
 | section-template-category-taxonomy-contract (134) | Uses section_purpose_family, cta_classification, variation_family_key for section targets. |
 | cta-sequencing-and-placement-contract (135) | Page templates must satisfy CTA rules; section library must include enough CTA-classified sections (§2.3). |
 | 122–123, 145–146 | Diagnostics and batch-generation prompts use this matrix to plan and prove coverage. |
+| **template-library-inventory-manifest.md** (144) | **Implements** batch sequencing: section batches (SEC-01–SEC-09) and page batches (PT-01–PT-10), naming, dependencies, and batch-progress worksheet. Production prompts **reference this matrix** for counts and **the manifest** for which batch to fill. |
 
 ---
 
