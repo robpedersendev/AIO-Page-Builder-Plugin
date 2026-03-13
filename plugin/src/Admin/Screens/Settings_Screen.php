@@ -56,6 +56,7 @@ final class Settings_Screen {
 		$child_detail_seed_result   = isset( $_GET['aio_child_detail_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_seed_result'] ) : '';
 		$child_detail_product_seed_result = isset( $_GET['aio_child_detail_product_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_product_seed_result'] ) : '';
 		$child_detail_profile_entity_seed_result = isset( $_GET['aio_child_detail_profile_entity_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_profile_entity_seed_result'] ) : '';
+		$child_detail_variant_expansion_seed_result = isset( $_GET['aio_child_detail_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_variant_expansion_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -353,6 +354,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_child_detail_profile_entity_templates" />
 				<?php \wp_nonce_field( 'aio_seed_child_detail_profile_entity_templates', 'aio_seed_child_detail_profile_entity_nonce' ); ?>
 				<?php \submit_button( __( 'Seed directory/profile/entity/resource child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_profile_entity_submit', false ); ?>
+			</form>
+
+			<?php if ( $child_detail_variant_expansion_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Child/detail variant expansion super-batch (PT-13) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $child_detail_variant_expansion_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding child/detail variant expansion super-batch failed. Seed section and child/detail batches first.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Child/detail variant expansion super-batch (PT-13)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed child/detail variant expansion page templates for services, offerings, locations, products, directories, profiles, and resource detail. ~10 non-CTA, ≥5 CTA, mandatory bottom CTA, no adjacent CTAs. Synthetic preview only.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_child_detail_variant_expansion_templates" />
+				<?php \wp_nonce_field( 'aio_seed_child_detail_variant_expansion_templates', 'aio_seed_child_detail_variant_expansion_nonce' ); ?>
+				<?php \submit_button( __( 'Seed child/detail variant expansion super-batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_variant_expansion_submit', false ); ?>
 			</form>
 		</div>
 		<?php

@@ -95,6 +95,8 @@ require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/ChildDetailPro
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/ChildDetailProductBatch/Child_Detail_Product_Page_Template_Seeder.php';
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/ChildDetailProfileEntityBatch/Child_Detail_Profile_Entity_Page_Template_Definitions.php';
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/ChildDetailProfileEntityBatch/Child_Detail_Profile_Entity_Page_Template_Seeder.php';
+require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/ChildDetailVariantExpansionBatch/Child_Detail_Variant_Expansion_Page_Template_Definitions.php';
+require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/ChildDetailVariantExpansionBatch/Child_Detail_Variant_Expansion_Page_Template_Seeder.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Bundle_Schema.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Mode_Keys.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Result.php';
