@@ -19,6 +19,7 @@ $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Bootstrap/Constants.php';
 \AIOPageBuilder\Bootstrap\Constants::init();
 require_once $plugin_root . '/src/Infrastructure/Config/Dependency_Requirements.php';
+require_once $plugin_root . '/src/Bootstrap/Lifecycle_Manager.php';
 require_once $plugin_root . '/src/Bootstrap/Environment_Validator.php';
 
 /**
@@ -122,5 +123,18 @@ final class Environment_Validator_Test extends TestCase {
 		$this->assertArrayHasKey( 'code', $arr );
 		$this->assertArrayHasKey( 'message', $arr );
 		$this->assertArrayHasKey( 'is_blocking', $arr );
+	}
+
+	public function test_extension_pack_results_are_never_blocking(): void {
+		$GLOBALS['wp_version'] = '6.6';
+		$v = new Environment_Validator();
+		$v->validate();
+		$all_extension_pack_non_blocking = true;
+		foreach ( $v->get_results() as $r ) {
+			if ( $r->category === Environment_Validator::CATEGORY_EXTENSION_PACK ) {
+				$all_extension_pack_non_blocking = $all_extension_pack_non_blocking && ! $r->is_blocking;
+			}
+		}
+		$this->assertTrue( $all_extension_pack_non_blocking, 'Extension-pack results must be informational only, never blocking' );
 	}
 }

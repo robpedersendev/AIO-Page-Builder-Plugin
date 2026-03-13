@@ -63,11 +63,21 @@ final class Environment_Validator {
 	public const SEVERITY_WARNING  = 'warning';
 	public const SEVERITY_INFO     = 'informational';
 
-	public const CATEGORY_PLATFORM            = 'platform';
+	public const CATEGORY_PLATFORM             = 'platform';
 	public const CATEGORY_REQUIRED_DEPENDENCY = 'required_dependency';
 	public const CATEGORY_OPTIONAL_INTEGRATION = 'optional_integration';
 	public const CATEGORY_THEME_POSTURE       = 'theme_posture';
 	public const CATEGORY_RUNTIME_READINESS   = 'runtime_readiness';
+	public const CATEGORY_EXTENSION_PACK      = 'extension_pack';
+
+	/** Theme slugs that are in the extension-pack additional-tested set (spec §54, Prompt 127). Informational only. */
+	private const EXTENSION_PACK_THEMES = array( 'generatepress', 'astra', 'kadence' );
+
+	/** Plugin basenames that are in the extension-pack additional-tested set. Informational only. */
+	private const EXTENSION_PACK_PLUGINS = array( 'wordpress-seo/wp-seo.php' );
+
+	/** Display names for extension-pack plugins (plugin_file => name). */
+	private const EXTENSION_PACK_PLUGIN_NAMES = array( 'wordpress-seo/wp-seo.php' => 'Yoast SEO' );
 
 	/** @var Validation_Result[] */
 	private array $results = array();
@@ -84,6 +94,7 @@ final class Environment_Validator {
 		$this->run_required_dependency_checks();
 		$this->run_optional_dependency_checks();
 		$this->run_theme_posture_checks();
+		$this->run_extension_pack_detection();
 		$this->run_runtime_readiness_checks();
 	}
 
@@ -224,6 +235,42 @@ final class Environment_Validator {
 	private function run_theme_posture_checks(): void {
 		// Placeholder: theme compatibility / GeneratePress posture. Later prompt.
 		// No add() unless we have a concrete check; avoids noise.
+	}
+
+	/**
+	 * Adds informational results when current theme or plugins are in the extension-pack tested set (spec §54, Prompt 127).
+	 * Non-blocking; for diagnostics and environment summary only.
+	 */
+	private function run_extension_pack_detection(): void {
+		if ( function_exists( 'wp_get_theme' ) ) {
+			$theme = wp_get_theme();
+			$slug  = $theme->get_stylesheet();
+			if ( $slug !== '' && in_array( strtolower( $slug ), self::EXTENSION_PACK_THEMES, true ) ) {
+				$name = $theme->get( 'Name' ) ?: $slug;
+				$this->add( new Validation_Result(
+					self::CATEGORY_EXTENSION_PACK,
+					self::SEVERITY_INFO,
+					'extension_pack_theme_detected',
+					sprintf( 'Theme "%s" is in the extension-pack tested set. See compatibility matrix.', $name ),
+					false
+				) );
+			}
+		}
+		$this->load_plugin_api();
+		if ( function_exists( 'is_plugin_active' ) ) {
+			foreach ( self::EXTENSION_PACK_PLUGINS as $plugin_file ) {
+				if ( ! is_plugin_active( $plugin_file ) || ! isset( self::EXTENSION_PACK_PLUGIN_NAMES[ $plugin_file ] ) ) {
+					continue;
+				}
+				$this->add( new Validation_Result(
+					self::CATEGORY_EXTENSION_PACK,
+					self::SEVERITY_INFO,
+					'extension_pack_plugin_detected',
+					sprintf( 'Plugin "%s" detected; extension-pack coexistence tested. See compatibility matrix.', self::EXTENSION_PACK_PLUGIN_NAMES[ $plugin_file ] ),
+					false
+				) );
+			}
+		}
 	}
 
 	private function run_runtime_readiness_checks(): void {
