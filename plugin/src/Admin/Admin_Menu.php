@@ -16,6 +16,7 @@ use AIOPageBuilder\Admin\Screens\AI\AI_Providers_Screen;
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Prompt_Experiments_Screen;
+use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Analytics_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
@@ -69,6 +70,7 @@ final class Admin_Menu {
 		$ai_providers       = new AI_Providers_Screen( $this->container );
 		$prompt_experiments = new Prompt_Experiments_Screen( $this->container );
 		$build_plans        = new Build_Plans_Screen( $this->container );
+		$build_plan_analytics = new Build_Plan_Analytics_Screen( $this->container );
 		$queue_logs         = new Queue_Logs_Screen( $this->container );
 		$support_triage     = new Support_Triage_Dashboard_Screen( $this->container );
 		$privacy_reporting  = new Privacy_Reporting_Settings_Screen( $this->container );
@@ -172,6 +174,15 @@ final class Admin_Menu {
 			$build_plans->get_capability(),
 			Build_Plans_Screen::SLUG,
 			array( $build_plans, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$build_plan_analytics->get_title(),
+			__( 'Build Plan Analytics', 'aio-page-builder' ),
+			$build_plan_analytics->get_capability(),
+			Build_Plan_Analytics_Screen::SLUG,
+			array( $build_plan_analytics, 'render' )
 		);
 
 		add_submenu_page(

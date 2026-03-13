@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Domain\Storage\Repositories;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_List_Provider_Interface;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\Execution\Executor\Plan_State_For_Execution_Interface;
@@ -20,9 +21,9 @@ use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
  * Repository → storage: Object_Type_Keys::BUILD_PLAN (CPT).
  * Internal key: plan_id (e.g. UUID). Status: pending_review | approved | rejected | in_progress | completed | superseded.
  * Full plan definition (steps, items, etc.) stored in _aio_plan_definition meta.
- * Implements Plan_State_For_Execution_Interface for single-action executor.
+ * Implements Plan_State_For_Execution_Interface for single-action executor; Build_Plan_List_Provider_Interface for analytics.
  */
-final class Build_Plan_Repository extends Abstract_CPT_Repository implements Build_Plan_Repository_Interface, Plan_State_For_Execution_Interface {
+final class Build_Plan_Repository extends Abstract_CPT_Repository implements Build_Plan_Repository_Interface, Plan_State_For_Execution_Interface, Build_Plan_List_Provider_Interface {
 
 	public const META_PLAN_DEFINITION = '_aio_plan_definition';
 
@@ -256,6 +257,8 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	/** @inheritdoc */
 	protected function post_to_record( $post, array $meta ): array {
 		$base = parent::post_to_record( $post, $meta );
+		$p    = is_array( $post ) ? $post : (array) $post;
+		$base['post_date'] = (string) ( $p['post_date'] ?? '' );
 		if ( ! empty( $meta['plan_definition'] ) && is_array( $meta['plan_definition'] ) ) {
 			$base = array_merge( $base, $meta['plan_definition'] );
 		}

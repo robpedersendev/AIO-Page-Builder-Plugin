@@ -27,6 +27,7 @@
 | AI Providers            | `AI_Providers_Screen` / `aio-page-builder-ai-providers` | `aio_manage_ai_providers` |
 | Prompt Experiments      | `Prompt_Experiments_Screen` / `aio-page-builder-prompt-experiments` | `aio_manage_ai_providers` |
 | Build Plans             | `Build_Plans_Screen` / `aio-page-builder-build-plans` | `aio_view_build_plans`  |
+| Build Plan Analytics   | `Build_Plan_Analytics_Screen` / `aio-page-builder-build-plan-analytics` | `aio_view_build_plans`  |
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
 
@@ -42,7 +43,17 @@
 
 ---
 
-## 4. Queue & Logs screen (spec §49.11)
+## 4. Build Plan Analytics screen (spec §30, §45, §49.11, §59.12; Prompt 129)
+
+- **Slug:** `aio-page-builder-build-plan-analytics`
+- **Capability:** `aio_view_build_plans`
+- **Purpose:** Observational analytics over Build Plans: plan review trends (approval/denial rates), common blockers (rejected/failed by category), execution failure trends, rollback frequency summary. Read-only; no mutation. Date-range and plan-type filtering. Links back to Build Plans.
+- **State:** Built by `Build_Plan_Analytics_Service` (plan_review_trends, common_blockers, execution_failure_trends, rollback_frequency_summary). Uses existing plan history as authority.
+- **Redaction:** Summaries only; no raw secrets or sensitive payloads.
+
+---
+
+## 5. Queue & Logs screen (spec §49.11)
 
 - **Slug:** `aio-page-builder-queue-logs`
 - **Capability:** `aio_view_logs`
@@ -54,7 +65,7 @@
 
 ---
 
-## 5. Example payloads (monitoring state)
+## 6. Example payloads (monitoring state)
 
 **Queue tab (one row):**
 ```json
