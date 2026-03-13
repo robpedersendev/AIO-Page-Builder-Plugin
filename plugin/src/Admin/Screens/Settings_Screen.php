@@ -35,8 +35,9 @@ final class Settings_Screen {
 	 * @return void
 	 */
 	public function render(): void {
-		$seed_result         = isset( $_GET['aio_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_result'] ) : '';
+		$seed_result           = isset( $_GET['aio_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_result'] ) : '';
 		$expansion_seed_result = isset( $_GET['aio_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_expansion_seed_result'] ) : '';
+		$pt_comp_expansion_seed_result = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -68,6 +69,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_section_expansion_pack" />
 				<?php \wp_nonce_field( 'aio_seed_section_expansion_pack', 'aio_seed_expansion_pack_nonce' ); ?>
 				<?php \submit_button( __( 'Seed section expansion pack', 'aio-page-builder' ), 'secondary', 'aio_seed_expansion_pack_submit', false ); ?>
+			</form>
+
+			<?php if ( $pt_comp_expansion_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Page template and composition expansion pack seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $pt_comp_expansion_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding page template and composition expansion pack failed. Seed the section expansion pack first.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Page template and composition expansion pack', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed curated page templates (landing with stats/CTA/FAQ, FAQ page) and example compositions with one-pager metadata. Requires section expansion pack. Idempotent.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_page_composition_expansion_pack" />
+				<?php \wp_nonce_field( 'aio_seed_page_composition_expansion_pack', 'aio_seed_pt_comp_expansion_nonce' ); ?>
+				<?php \submit_button( __( 'Seed page template and composition expansion pack', 'aio-page-builder' ), 'secondary', 'aio_seed_pt_comp_expansion_submit', false ); ?>
 			</form>
 		</div>
 		<?php

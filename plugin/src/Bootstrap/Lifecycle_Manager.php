@@ -100,6 +100,7 @@ final class Lifecycle_Manager {
 			'register_schedules',
 			'seed_form_templates',
 			'seed_section_expansion_pack',
+			'seed_page_composition_expansion_pack',
 			'install_notification_eligibility',
 			'first_run_redirect_readiness',
 		);
@@ -173,6 +174,8 @@ final class Lifecycle_Manager {
 				return $this->seed_form_templates();
 			case 'seed_section_expansion_pack':
 				return $this->seed_section_expansion_pack();
+			case 'seed_page_composition_expansion_pack':
+				return $this->seed_page_composition_expansion_pack();
 			default:
 				return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', $phase );
 		}
@@ -358,6 +361,44 @@ final class Lifecycle_Manager {
 				'expansion_pack_seeded' => $result['success'],
 				'section_ids'          => $result['section_ids'],
 				'errors'               => $result['errors'],
+			)
+		);
+	}
+
+	/**
+	 * Seeds the curated page template and composition expansion pack (Prompt 123). Runs after section expansion pack.
+	 *
+	 * @return Lifecycle_Result
+	 */
+	private function seed_page_composition_expansion_pack(): Lifecycle_Result {
+		$base = __DIR__ . '/../Domain';
+		require_once $base . '/Storage/Repositories/Repository_Interface.php';
+		require_once $base . '/Storage/Objects/Object_Status_Families.php';
+		require_once $base . '/Storage/Repositories/Abstract_CPT_Repository.php';
+		require_once $base . '/Storage/Objects/Object_Type_Keys.php';
+		require_once $base . '/Registries/Section/Section_Schema.php';
+		require_once $base . '/Registries/Section/ExpansionPack/Section_Expansion_Pack_Definitions.php';
+		require_once $base . '/Registries/PageTemplate/Page_Template_Schema.php';
+		require_once $base . '/Registries/PageTemplate/Page_Template_Normalizer.php';
+		require_once $base . '/Storage/Repositories/Page_Template_Repository.php';
+		require_once $base . '/Registries/Composition/Composition_Schema.php';
+		require_once $base . '/Storage/Repositories/Composition_Repository.php';
+		require_once $base . '/Registries/PageTemplate/ExpansionPack/Page_Template_And_Composition_Expansion_Pack_Definitions.php';
+		require_once $base . '/Registries/PageTemplate/ExpansionPack/Page_Template_And_Composition_Expansion_Pack_Seeder.php';
+
+		$page_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
+		$comp_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository();
+		$result    = \AIOPageBuilder\Domain\Registries\PageTemplate\ExpansionPack\Page_Template_And_Composition_Expansion_Pack_Seeder::run( $page_repo, $comp_repo );
+
+		return new Lifecycle_Result(
+			Lifecycle_Result::STATUS_SUCCESS,
+			'',
+			'seed_page_composition_expansion_pack',
+			array(
+				'page_composition_expansion_pack_seeded' => $result['success'],
+				'page_template_ids'                      => $result['page_template_ids'],
+				'composition_ids'                        => $result['composition_ids'],
+				'errors'                                 => $result['errors'],
 			)
 		);
 	}

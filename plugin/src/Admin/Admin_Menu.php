@@ -26,7 +26,9 @@ use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Domain\FormProvider\Form_Template_Seeder;
+use AIOPageBuilder\Domain\Registries\PageTemplate\ExpansionPack\Page_Template_And_Composition_Expansion_Pack_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\ExpansionPack\Section_Expansion_Pack_Seeder;
+use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -54,6 +56,7 @@ final class Admin_Menu {
 	public function register(): void {
 		\add_action( 'admin_post_aio_seed_form_templates', array( $this, 'handle_seed_form_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_section_expansion_pack', array( $this, 'handle_seed_section_expansion_pack' ), 10 );
+		\add_action( 'admin_post_aio_seed_page_composition_expansion_pack', array( $this, 'handle_seed_page_composition_expansion_pack' ), 10 );
 
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
@@ -255,6 +258,37 @@ final class Admin_Menu {
 		}
 		$result = Section_Expansion_Pack_Seeder::run( $section_repo );
 		$query  = $result['success'] ? 'aio_expansion_seed_result=success' : 'aio_expansion_seed_result=error';
+		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
+		exit;
+	}
+
+	/**
+	 * Handles admin-post request to seed the page template and composition expansion pack (Prompt 123).
+	 *
+	 * @return void
+	 */
+	public function handle_seed_page_composition_expansion_pack(): void {
+		if ( ! isset( $_POST['aio_seed_pt_comp_expansion_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_pt_comp_expansion_nonce'] ) ), 'aio_seed_page_composition_expansion_pack' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
+			exit;
+		}
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
+			exit;
+		}
+		if ( ! $this->container instanceof Service_Container ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
+			exit;
+		}
+		$page_repo = $this->container->get( 'page_template_repository' );
+		$comp_repo = $this->container->get( 'composition_repository' );
+		if ( ! $page_repo instanceof Page_Template_Repository || ! $comp_repo instanceof Composition_Repository ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
+			exit;
+		}
+		$result = Page_Template_And_Composition_Expansion_Pack_Seeder::run( $page_repo, $comp_repo );
+		$query  = $result['success'] ? 'aio_pt_comp_expansion_seed_result=success' : 'aio_pt_comp_expansion_seed_result=error';
 		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
 		exit;
 	}
