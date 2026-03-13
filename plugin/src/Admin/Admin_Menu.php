@@ -31,6 +31,7 @@ use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Domain\FormProvider\Form_Template_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\ExpansionPack\Page_Template_And_Composition_Expansion_Pack_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\TopLevelBatch\Top_Level_Marketing_Page_Template_Seeder;
+use AIOPageBuilder\Domain\Registries\PageTemplate\TopLevelLegalUtilityBatch\Top_Level_Legal_Utility_Page_Template_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\ExpansionPack\Section_Expansion_Pack_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\HeroBatch\Hero_Intro_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\FeatureBenefitBatch\Feature_Benefit_Value_Library_Batch_Seeder;
@@ -76,6 +77,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_seed_cta_super_library_batch', array( $this, 'handle_seed_cta_super_library_batch' ), 10 );
 		\add_action( 'admin_post_aio_seed_page_composition_expansion_pack', array( $this, 'handle_seed_page_composition_expansion_pack' ), 10 );
 		\add_action( 'admin_post_aio_seed_top_level_marketing_templates', array( $this, 'handle_seed_top_level_marketing_templates' ), 10 );
+		\add_action( 'admin_post_aio_seed_top_level_legal_utility_templates', array( $this, 'handle_seed_top_level_legal_utility_templates' ), 10 );
 
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
@@ -578,6 +580,36 @@ final class Admin_Menu {
 		}
 		$result = Top_Level_Marketing_Page_Template_Seeder::run( $page_repo );
 		$query  = $result['success'] ? 'aio_top_level_marketing_seed_result=success' : 'aio_top_level_marketing_seed_result=error';
+		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
+		exit;
+	}
+
+	/**
+	 * Handles admin-post request to seed the top-level legal/utility page template batch (Prompt 156).
+	 *
+	 * @return void
+	 */
+	public function handle_seed_top_level_legal_utility_templates(): void {
+		if ( ! isset( $_POST['aio_seed_top_level_legal_utility_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_top_level_legal_utility_nonce'] ) ), 'aio_seed_top_level_legal_utility_templates' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
+			exit;
+		}
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
+			exit;
+		}
+		if ( ! $this->container instanceof Service_Container ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
+			exit;
+		}
+		$page_repo = $this->container->get( 'page_template_repository' );
+		if ( ! $page_repo instanceof Page_Template_Repository ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
+			exit;
+		}
+		$result = Top_Level_Legal_Utility_Page_Template_Seeder::run( $page_repo );
+		$query  = $result['success'] ? 'aio_top_level_legal_utility_seed_result=success' : 'aio_top_level_legal_utility_seed_result=error';
 		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
 		exit;
 	}
