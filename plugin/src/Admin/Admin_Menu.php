@@ -23,6 +23,7 @@ use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
+use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
 use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
@@ -73,6 +74,7 @@ final class Admin_Menu {
 		$build_plan_analytics = new Build_Plan_Analytics_Screen( $this->container );
 		$queue_logs         = new Queue_Logs_Screen( $this->container );
 		$support_triage     = new Support_Triage_Dashboard_Screen( $this->container );
+		$post_release_health = new Post_Release_Health_Screen( $this->container );
 		$privacy_reporting  = new Privacy_Reporting_Settings_Screen( $this->container );
 		$import_export     = new Import_Export_Screen( $this->container );
 
@@ -201,6 +203,15 @@ final class Admin_Menu {
 			$support_triage->get_capability(),
 			Support_Triage_Dashboard_Screen::SLUG,
 			array( $support_triage, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$post_release_health->get_title(),
+			__( 'Post-Release Health', 'aio-page-builder' ),
+			$post_release_health->get_capability(),
+			Post_Release_Health_Screen::SLUG,
+			array( $post_release_health, 'render' )
 		);
 
 		add_submenu_page(

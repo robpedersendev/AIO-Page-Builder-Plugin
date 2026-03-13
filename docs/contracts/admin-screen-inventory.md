@@ -30,6 +30,7 @@
 | Build Plan Analytics   | `Build_Plan_Analytics_Screen` / `aio-page-builder-build-plan-analytics` | `aio_view_build_plans`  |
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
+| **Post-Release Health**| `Post_Release_Health_Screen` / `aio-page-builder-post-release-health` | `aio_view_logs`         |
 
 ---
 
@@ -43,7 +44,17 @@
 
 ---
 
-## 4. Build Plan Analytics screen (spec §30, §45, §49.11, §59.12; Prompt 129)
+## 4. Post-Release Health screen (spec §45, §49.11, §59.15, §60.8; Prompt 131)
+
+- **Slug:** `aio-page-builder-post-release-health`
+- **Capability:** `aio_view_logs`
+- **Purpose:** Internal post-release operational review: reporting health, queue backlog/failures, Build Plan approval/denial trends, AI run validity rates, rollback usage, import/export and support-package context. Observational only; no automatic product changes. Date-range filter; optional export of summary to JSON (support-safe). Deep links to Queue & Logs, Build Plan Analytics, Support Triage, AI Runs, Import/Export.
+- **State:** Built by `Post_Release_Health_State_Builder` (post_release_health_summary, domain_health_scores, recommended_investigation_items). Uses existing structured records only.
+- **Redaction:** No secrets or prohibited data in summaries; same rules as existing monitoring screens.
+
+---
+
+## 5. Build Plan Analytics screen (spec §30, §45, §49.11, §59.12; Prompt 129)
 
 - **Slug:** `aio-page-builder-build-plan-analytics`
 - **Capability:** `aio_view_build_plans`
@@ -53,7 +64,7 @@
 
 ---
 
-## 5. Queue & Logs screen (spec §49.11)
+## 6. Queue & Logs screen (spec §49.11)
 
 - **Slug:** `aio-page-builder-queue-logs`
 - **Capability:** `aio_view_logs`
@@ -65,7 +76,7 @@
 
 ---
 
-## 6. Example payloads (monitoring state)
+## 7. Example payloads (monitoring state)
 
 **Queue tab (one row):**
 ```json
@@ -112,5 +123,22 @@
     { "label": "Queue & Logs", "url": "...", "description": "Queue health, execution logs, reporting logs." }
   ],
   "stale_plans": []
+}
+```
+
+**Post-release health summary (excerpt):**
+```json
+{
+  "post_release_health_summary": {
+    "period_start": "2025-02-15",
+    "period_end": "2025-03-15",
+    "overall_status": "ok",
+    "summary_message": "Operational health good across domains for the selected period."
+  },
+  "domain_health_scores": {
+    "reporting": { "status": "ok", "score_label": "OK", "message": "Reporting current. Heartbeat sent this month.", "link_url": "...", "link_label": "Queue & Logs → Reporting" },
+    "queue": { "status": "ok", "score_label": "OK", "message": "...", "link_url": "...", "link_label": "Queue & Logs" }
+  },
+  "recommended_investigation_items": []
 }
 ```
