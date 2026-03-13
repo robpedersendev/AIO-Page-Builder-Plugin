@@ -97,6 +97,9 @@ final class AI_Run_Detail_Screen {
 						<tr><th scope="row"><?php \esc_html_e( 'Prompt pack', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['prompt_pack_ref'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Retry count', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['retry_count'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Build plan ref', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['build_plan_ref'] ?? '' ) ); ?></td></tr>
+						<?php if ( ! empty( $meta_safe['is_experiment'] ) ) : ?>
+						<tr><th scope="row"><?php \esc_html_e( 'Experiment', 'aio-page-builder' ); ?></th><td><span class="aio-run-badge"><?php \esc_html_e( 'Experiment run', 'aio-page-builder' ); ?></span> <?php echo \esc_html( (string) ( $meta_safe['experiment_id'] ?? '' ) ); ?> — <?php echo \esc_html( (string) ( $meta_safe['experiment_variant_label'] ?? $meta_safe['experiment_variant_id'] ?? '' ) ); ?></td></tr>
+						<?php endif; ?>
 					</tbody>
 				</table>
 				<?php

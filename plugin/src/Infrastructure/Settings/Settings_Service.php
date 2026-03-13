@@ -29,6 +29,7 @@ final class Settings_Service {
 		Option_Names::PROVIDER_HEALTH_STATE         => array(),
 		Option_Names::PROFILE_CURRENT               => array(),
 		Option_Names::ONBOARDING_DRAFT              => array(),
+		Option_Names::PROMPT_EXPERIMENTS            => array( 'definitions' => array() ),
 	);
 
 	/**

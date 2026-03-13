@@ -57,6 +57,9 @@ final class Option_Names {
 	/** Onboarding draft state (secret-free; shape per onboarding-state-machine.md §7). */
 	public const ONBOARDING_DRAFT = self::PREFIX . 'onboarding_draft';
 
+	/** Prompt experiment definitions (Prompt 121; no secrets). */
+	public const PROMPT_EXPERIMENTS = self::PREFIX . 'prompt_experiments';
+
 	/** @var array<string>|null */
 	private static ?array $all = null;
 
@@ -83,6 +86,7 @@ final class Option_Names {
 			self::PROVIDER_HEALTH_STATE,
 			self::PROFILE_CURRENT,
 			self::ONBOARDING_DRAFT,
+			self::PROMPT_EXPERIMENTS,
 		);
 		return self::$all;
 	}

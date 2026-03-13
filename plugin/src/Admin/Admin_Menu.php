@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Admin\Screens\AI\AI_Providers_Screen;
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
+use AIOPageBuilder\Admin\Screens\AI\Prompt_Experiments_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
@@ -60,6 +61,7 @@ final class Admin_Menu {
 		$crawler_comparison = new Crawler_Comparison_Screen( $this->container );
 		$ai_runs            = new AI_Runs_Screen( $this->container );
 		$ai_providers       = new AI_Providers_Screen( $this->container );
+		$prompt_experiments = new Prompt_Experiments_Screen( $this->container );
 		$build_plans        = new Build_Plans_Screen( $this->container );
 		$queue_logs         = new Queue_Logs_Screen( $this->container );
 		$privacy_reporting  = new Privacy_Reporting_Settings_Screen( $this->container );
@@ -145,6 +147,15 @@ final class Admin_Menu {
 			$ai_providers->get_capability(),
 			AI_Providers_Screen::SLUG,
 			array( $ai_providers, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$prompt_experiments->get_title(),
+			__( 'Prompt Experiments', 'aio-page-builder' ),
+			$prompt_experiments->get_capability(),
+			Prompt_Experiments_Screen::SLUG,
+			array( $prompt_experiments, 'render' )
 		);
 
 		add_submenu_page(

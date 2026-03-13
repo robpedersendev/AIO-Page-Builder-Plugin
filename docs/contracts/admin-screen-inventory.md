@@ -24,6 +24,8 @@
 | Crawl Sessions          | `Crawler_Sessions_Screen` / slug            | (crawler cap)           |
 | Crawl Comparison        | `Crawler_Comparison_Screen` / slug          | (crawler cap)           |
 | AI Runs                 | `AI_Runs_Screen` / `aio-page-builder-ai-runs` | `aio_view_ai_runs`      |
+| AI Providers            | `AI_Providers_Screen` / `aio-page-builder-ai-providers` | `aio_manage_ai_providers` |
+| Prompt Experiments      | `Prompt_Experiments_Screen` / `aio-page-builder-prompt-experiments` | `aio_manage_ai_providers` |
 | Build Plans             | `Build_Plans_Screen` / `aio-page-builder-build-plans` | `aio_view_build_plans`  |
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
 
