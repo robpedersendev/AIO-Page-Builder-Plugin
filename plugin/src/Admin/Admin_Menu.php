@@ -36,6 +36,7 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\HubBatch\Hub_Page_Template_See
 use AIOPageBuilder\Domain\Registries\PageTemplate\GeographicHubBatch\Geographic_Hub_Page_Template_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\NestedHubBatch\Nested_Hub_Page_Template_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\ChildDetailBatch\Child_Detail_Page_Template_Seeder;
+use AIOPageBuilder\Domain\Registries\PageTemplate\ChildDetailProductBatch\Child_Detail_Product_Page_Template_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\ExpansionPack\Section_Expansion_Pack_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\HeroBatch\Hero_Intro_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\FeatureBenefitBatch\Feature_Benefit_Value_Library_Batch_Seeder;
@@ -86,6 +87,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_seed_geographic_hub_templates', array( $this, 'handle_seed_geographic_hub_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_nested_hub_templates', array( $this, 'handle_seed_nested_hub_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_child_detail_templates', array( $this, 'handle_seed_child_detail_templates' ), 10 );
+		\add_action( 'admin_post_aio_seed_child_detail_product_templates', array( $this, 'handle_seed_child_detail_product_templates' ), 10 );
 
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
@@ -738,6 +740,36 @@ final class Admin_Menu {
 		}
 		$result = Child_Detail_Page_Template_Seeder::run( $page_repo );
 		$query  = $result['success'] ? 'aio_child_detail_seed_result=success' : 'aio_child_detail_seed_result=error';
+		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
+		exit;
+	}
+
+	/**
+	 * Handles seed request for product/catalog child/detail page template batch (PT-08). Capability and nonce checked.
+	 *
+	 * @return void
+	 */
+	public function handle_seed_child_detail_product_templates(): void {
+		if ( ! isset( $_POST['aio_seed_child_detail_product_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_child_detail_product_nonce'] ) ), 'aio_seed_child_detail_product_templates' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
+			exit;
+		}
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
+			exit;
+		}
+		if ( ! $this->container instanceof Service_Container ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
+			exit;
+		}
+		$page_repo = $this->container->get( 'page_template_repository' );
+		if ( ! $page_repo instanceof Page_Template_Repository ) {
+			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
+			exit;
+		}
+		$result = Child_Detail_Product_Page_Template_Seeder::run( $page_repo );
+		$query  = $result['success'] ? 'aio_child_detail_product_seed_result=success' : 'aio_child_detail_product_seed_result=error';
 		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
 		exit;
 	}
