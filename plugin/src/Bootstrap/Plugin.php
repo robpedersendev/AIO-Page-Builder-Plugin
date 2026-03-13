@@ -81,6 +81,8 @@ require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/HubBatch/Hub_P
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/HubBatch/Hub_Page_Template_Seeder.php';
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/GeographicHubBatch/Geographic_Hub_Page_Template_Definitions.php';
 require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/GeographicHubBatch/Geographic_Hub_Page_Template_Seeder.php';
+require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/NestedHubBatch/Nested_Hub_Page_Template_Definitions.php';
+require_once $bootstrap_dir . '/../Domain/Registries/PageTemplate/NestedHubBatch/Nested_Hub_Page_Template_Seeder.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Bundle_Schema.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Contracts/Export_Mode_Keys.php';
 require_once $bootstrap_dir . '/../Domain/ExportRestore/Export/Export_Result.php';

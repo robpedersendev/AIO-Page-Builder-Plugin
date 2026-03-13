@@ -49,6 +49,7 @@ final class Settings_Screen {
 		$top_level_legal_utility_seed_result = isset( $_GET['aio_top_level_legal_utility_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_legal_utility_seed_result'] ) : '';
 		$hub_page_seed_result = isset( $_GET['aio_hub_page_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_page_seed_result'] ) : '';
 		$geographic_hub_seed_result = isset( $_GET['aio_geographic_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_geographic_hub_seed_result'] ) : '';
+		$nested_hub_seed_result     = isset( $_GET['aio_nested_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_nested_hub_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -248,6 +249,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_geographic_hub_templates" />
 				<?php \wp_nonce_field( 'aio_seed_geographic_hub_templates', 'aio_seed_geographic_hub_nonce' ); ?>
 				<?php \submit_button( __( 'Seed geographic hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_geographic_hub_submit', false ); ?>
+			</form>
+
+			<?php if ( $nested_hub_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Nested hub page template batch (PT-06) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $nested_hub_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding nested hub page template batch failed. Seed section and hub batches first.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Nested hub page template batch (PT-06)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed nested hub (sub-hub) page templates for service, product, directory, and location subcategories. Sits beneath hub pages; ~10 non-CTA, ≥4 CTA, last CTA, no adjacent CTAs. Parent-family compatibility metadata. Idempotent.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_nested_hub_templates" />
+				<?php \wp_nonce_field( 'aio_seed_nested_hub_templates', 'aio_seed_nested_hub_nonce' ); ?>
+				<?php \submit_button( __( 'Seed nested hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_nested_hub_submit', false ); ?>
 			</form>
 		</div>
 		<?php
