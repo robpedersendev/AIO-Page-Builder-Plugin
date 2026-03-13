@@ -1,7 +1,7 @@
 # Template Library Scale Extension Contract
 
 **Document type:** Authoritative extension contract for large-scale template library targets and governance (Prompt 132).  
-**Governs:** Minimum library counts, variation philosophy, category coverage, scale-governance rules, and enhancement boundaries.  
+**Governs:** Minimum library counts, variation philosophy, category coverage, scale-governance rules, and enhancement boundaries. **Concrete counts by category and family:** **template-library-coverage-matrix.md** (Prompt 136) defines the inventory targets and coverage matrix that implement this contract’s minimums with category-balanced, measurable targets.  
 **Spec refs:** §1.9.1 Template Registry Pillar, §1.9.2 Field and Content Architecture Pillar, §1.9.3 Rendering and Portability Pillar; §12 Section Template Registry; §13 Page Template Registry; §14 Custom Page Template Composition; §16 Page Template One-Pager System; §59.4 Registry and Content Model Phase; §60.4 Exit Criteria.
 
 **Enhancement policy:** This contract **enhances** and does **not replace** the architecture and contracts established in Prompts 021–032, 033–040, 041–048, 070–076, 109–111, and 122–123. All prior registry, ACF, rendering, portability, documentation, validation, and export/restore rules remain in force.
@@ -112,12 +112,16 @@ The section registry schema defines allowed category slugs (e.g. hero_intro, tru
 - **Spread across categories:** No single category shall dominate. A minimum spread (e.g. no category &gt; 25% of section count unless justified by product scope) should be defined at library planning time.
 - **Coverage of high-value categories:** Hero/intro, CTA/conversion, trust/proof, feature/benefit, FAQ, and form/embed (where applicable) must have sufficient section options to support diverse page templates without over-reuse of the same section in every template.
 
+**Concrete minimums and max-share rules:** The **template-library-coverage-matrix.md** (Prompt 136) defines minimum counts by section_purpose_family, CTA-section-family minimums, maximum share per family (e.g. 25%), and variation-family spread. Verification uses that matrix and its completion worksheet.
+
 ### 5.2 Page template archetypes and families
 
 The page template registry schema defines allowed archetypes (e.g. service_page, hub_page, landing_page, etc.). The **large library** must achieve:
 
 - **Top-level / hub / nested hub / child balance:** Page templates must cover top-level, hub, nested hub, and child (detail) families so that real sites can be planned and built across hierarchy levels.
 - **Archetype spread:** No single archetype shall dominate. Templates should support service, offer, hub, landing, location, event, profile, FAQ, directory, comparison, and informational-detail use cases where in scope.
+
+**Concrete minimums and max-share rules:** The **template-library-coverage-matrix.md** (Prompt 136) defines minimum counts by template_category_class (top_level, hub, nested_hub, child_detail) and by template_family (home, services, locations, etc.), and maximum share per class and family. Verification uses that matrix and its completion worksheet.
 
 **Failure condition:** Reaching 500 page templates by adding only slight variants of one archetype (e.g. 400 “landing” clones) or 250 sections in one category fails the **coverage** requirement even if count is met.
 
@@ -185,7 +189,7 @@ The following conditions **fail** the large-library extension even if the numeri
 
 ## 9. Coverage checklist (for later verification)
 
-Use this checklist when verifying that the large-library target is met and that enhancement boundaries are respected. It does not replace acceptance tests; it supplements them.
+Use this checklist when verifying that the large-library target is met and that enhancement boundaries are respected. It does not replace acceptance tests; it supplements them. **Detailed counts by category and family, completion thresholds, and a fillable completion worksheet** are in **template-library-coverage-matrix.md** (Prompt 136); use that document to prove category coverage and count sufficiency.
 
 ### 9.1 Counts
 
@@ -232,5 +236,6 @@ Future work that produces or curates the large library must **enhance** (and not
 | 070–076        | Admin screens, registry UI, versioning, export/import. |
 | 109–111        | Build Plan, planning integration, template selection. |
 | 122–123        | Diagnostics, reporting, registry-related diagnostics. |
+| 136            | Template library coverage matrix; concrete inventory targets by category, subfamily, and variation family; completion worksheet. |
 
-Category taxonomies, CTA rules, animation rules, or mass library production prompts must align with this contract and with the existing registry, ACF, rendering, and portability pillars (§1.9.1–1.9.3) and specs §12, §13, §14, §16, §59.4, §60.4.
+Category taxonomies, CTA rules, animation rules, or mass library production prompts must align with this contract and with the existing registry, ACF, rendering, and portability pillars (§1.9.1–1.9.3) and specs §12, §13, §14, §16, §59.4, §60.4. **Inventory and coverage verification** must use **template-library-coverage-matrix.md** for category-balanced targets and acceptance evidence.
