@@ -41,6 +41,7 @@ final class Settings_Screen {
 		$trust_proof_batch_seed_result = isset( $_GET['aio_trust_proof_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_trust_proof_batch_seed_result'] ) : '';
 		$fb_value_batch_seed_result = isset( $_GET['aio_fb_value_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_fb_value_batch_seed_result'] ) : '';
 		$ptf_batch_seed_result = isset( $_GET['aio_ptf_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_ptf_batch_seed_result'] ) : '';
+		$mlp_batch_seed_result = isset( $_GET['aio_mlp_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_mlp_batch_seed_result'] ) : '';
 		$pt_comp_expansion_seed_result = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -129,6 +130,20 @@ final class Settings_Screen {
 				<input type="hidden" name="action" value="aio_seed_process_timeline_faq_batch" />
 				<?php \wp_nonce_field( 'aio_seed_process_timeline_faq_batch', 'aio_seed_ptf_batch_nonce' ); ?>
 				<?php \submit_button( __( 'Seed process/timeline/FAQ library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_ptf_batch_submit', false ); ?>
+			</form>
+
+			<?php if ( $mlp_batch_seed_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Media/listing/profile/detail library batch (SEC-06) seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $mlp_batch_seed_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding media/listing/profile/detail library batch failed. Check that the plugin can create section template posts.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Media/listing/profile/detail library batch (SEC-06)', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Seed cards, grids, listings, profiles, place highlights, recommendation bands, galleries, media bands, detail specs, comparison cards, related content, location info, directory entries, team grids, and product cards. Idempotent.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
+				<input type="hidden" name="action" value="aio_seed_media_listing_profile_batch" />
+				<?php \wp_nonce_field( 'aio_seed_media_listing_profile_batch', 'aio_seed_mlp_batch_nonce' ); ?>
+				<?php \submit_button( __( 'Seed media/listing/profile/detail library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_mlp_batch_submit', false ); ?>
 			</form>
 
 			<?php if ( $pt_comp_expansion_seed_result === 'success' ) : ?>
