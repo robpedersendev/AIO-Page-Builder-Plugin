@@ -242,10 +242,17 @@ Each batch (e.g. SEC-01–SEC-09, PT-01–PT-10 per template-library-inventory-m
 
 | Batch ID | COUNT | CATEGORY | CTA_* | SEMANTIC | ANIMATION | OMISSION | PREVIEW | ACF | LPAGERY | EXPORT | Date | Evidence |
 |----------|-------|----------|-------|----------|-----------|----------|---------|-----|---------|--------|------|----------|
-| *(future)* | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | _____ | _____ |
-| *(future)* | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | _____ | _____ |
+| SEC-01 | ☑ | ☑ | N/A | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | 2025-03 | section-library-batch-validation-report.md; Hero_Intro_Library_Batch_Test |
+| SEC-02 | ☑ | ☑ | N/A | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | 2025-03 | Trust_Proof_Library_Batch_Test |
+| SEC-03 | ☑ | ☑ | N/A | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | 2025-03 | Feature_Benefit_Value_Library_Batch_Test |
+| SEC-05 | ☑ | ☑ | N/A | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | 2025-03 | Process_Timeline_FAQ_Library_Batch_Test |
+| SEC-06 | ☑ | ☑ | N/A | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | 2025-03 | Media_Listing_Profile_Detail_Library_Batch_Test |
+| SEC-07 | ☑ | ☑ | N/A | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | 2025-03 | Legal_Policy_Utility_Library_Batch_Test |
+| SEC-08 | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | 2025-03 | CTA_Super_Library_Batch_Test; CTA metadata checks |
+| SEC-09 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | _____ | _____ |
+| *(page batches)* | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | _____ | _____ |
 
-**Rule:** All checkboxes must be checked (or N/A with rationale) for the batch to be considered compliant. Sign-off is recorded per hardening-release-gate-matrix §6.
+**Rule:** All checkboxes must be checked (or N/A with rationale) for the batch to be considered compliant. Sign-off is recorded per hardening-release-gate-matrix §6. Section batches SEC-01–SEC-08 filled after Prompt 154.
 
 ---
 

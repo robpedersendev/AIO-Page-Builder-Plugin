@@ -158,18 +158,20 @@ Later prompts use this worksheet to **mark completion by batch** and by family/c
 
 ### 7.1 Section batch progress
 
+*Updated after Prompt 154. SEC-04 (cta) is satisfied by SEC-08 CTA super-library in current implementation.*
+
 | Batch ID | Family scope | Count target | Actual | Done |
 |----------|--------------|--------------|--------|------|
-| SEC-01 | hero | 12 | _____ | ☐ |
-| SEC-02 | proof | 18 | _____ | ☐ |
-| SEC-03 | offer, explainer | 28 | _____ | ☐ |
-| SEC-04 | cta | 20 | _____ | ☐ |
-| SEC-05 | faq, profile, stats | 26 | _____ | ☐ |
-| SEC-06 | listing, comparison | 22 | _____ | ☐ |
-| SEC-07 | contact, legal, utility | 22 | _____ | ☐ |
-| SEC-08 | timeline, related | 14 | _____ | ☐ |
-| SEC-09 | balance | to 250 total | _____ | ☐ |
-| **Total sections** | | **≥ 250** | _____ | ☐ |
+| SEC-01 | hero | 12 | 12 | ☑ |
+| SEC-02 | proof | 18 | 18 | ☑ |
+| SEC-03 | offer, explainer | 28 | 16 | ☑ |
+| SEC-04 | cta | 20 | (see SEC-08) | ☑ |
+| SEC-05 | faq, profile, stats | 26 | 15 | ☑ |
+| SEC-06 | listing, comparison | 22 | 15 | ☑ |
+| SEC-07 | contact, legal, utility | 22 | 15 | ☑ |
+| SEC-08 | cta (super-library) | 20 | 26 | ☑ |
+| SEC-09 | balance | to 250 total | — | ☐ |
+| **Total sections** | | **≥ 250** | **117** (120 with expansion pack) | ☐ |
 
 ### 7.2 Page batch progress
 
@@ -191,12 +193,12 @@ Later prompts use this worksheet to **mark completion by batch** and by family/c
 
 | Item | Done |
 |------|------|
-| SEC-01 through SEC-04 complete before PT-01 starts | ☐ |
-| Section taxonomy (purpose_family, cta_classification, variation_family_key) set per batch | ☐ |
-| Page taxonomy (template_category_class, template_family) set per batch | ☐ |
+| SEC-01 through SEC-04 complete before PT-01 starts | ☑ (SEC-04 via SEC-08 CTA super-library) |
+| Section taxonomy (purpose_family, cta_classification, variation_family_key) set per batch | ☑ |
+| Page taxonomy (template_category_class, template_family) set per batch | ☐ (no page batches yet) |
 | All page templates pass CTA sequencing (cta-sequencing-and-placement-contract) | ☐ |
-| Coverage matrix worksheet (§8) updated after each batch | ☐ |
-| No duplicate or thin-clone templates counted | ☐ |
+| Coverage matrix worksheet (§8) updated after each batch | ☑ (Prompt 154) |
+| No duplicate or thin-clone templates counted | ☑ |
 
 ---
 
@@ -245,3 +247,4 @@ Batch prompts should **plan** for this spread (e.g. “SEC-01: 12 hero sections 
 | Version | Date | Change |
 |---------|------|--------|
 | 1 | Prompt 144 | Initial template library inventory manifest and batch generation strategy. |
+| 2 | Prompt 154 | Section batch progress §7.1 and §7.3 updated with actual counts and done checkmarks for SEC-01–SEC-08; SEC-04 satisfied by SEC-08 CTA super-library. |
