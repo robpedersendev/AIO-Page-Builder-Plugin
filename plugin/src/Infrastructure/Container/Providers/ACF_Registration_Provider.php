@@ -34,7 +34,8 @@ final class ACF_Registration_Provider implements Service_Provider_Interface {
 		$container->register( 'acf_group_registrar', function () use ( $container ): ACF_Group_Registrar {
 			return new ACF_Group_Registrar(
 				$container->get( 'section_field_blueprint_service' ),
-				$container->get( 'acf_group_builder' )
+				$container->get( 'acf_group_builder' ),
+				$container->get( 'section_template_repository' )
 			);
 		} );
 

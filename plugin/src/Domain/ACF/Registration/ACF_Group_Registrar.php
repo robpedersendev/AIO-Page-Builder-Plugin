@@ -14,9 +14,13 @@ namespace AIOPageBuilder\Domain\ACF\Registration;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service;
+use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
+use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
+
 /**
  * Registers local field groups from normalized section blueprints.
  * Fail-safe when acf_add_local_field_group is not available.
+ * Supports deterministic registration by section list (page-level) or by variation family (large-scale §6.2–6.3).
  */
 final class ACF_Group_Registrar {
 
@@ -26,12 +30,17 @@ final class ACF_Group_Registrar {
 	/** @var ACF_Group_Builder */
 	private ACF_Group_Builder $group_builder;
 
+	/** @var Section_Template_Repository|null Used for register_by_family. */
+	private ?Section_Template_Repository $section_repository;
+
 	public function __construct(
 		Section_Field_Blueprint_Service $blueprint_service,
-		ACF_Group_Builder $group_builder
+		ACF_Group_Builder $group_builder,
+		?Section_Template_Repository $section_repository = null
 	) {
-		$this->blueprint_service = $blueprint_service;
-		$this->group_builder     = $group_builder;
+		$this->blueprint_service   = $blueprint_service;
+		$this->group_builder       = $group_builder;
+		$this->section_repository = $section_repository;
 	}
 
 	/**
@@ -55,7 +64,7 @@ final class ACF_Group_Registrar {
 	}
 
 	/**
-	 * Registers groups for the given section keys only.
+	 * Registers groups for the given section keys only (deterministic; use for page-level visibility: only sections on the page).
 	 *
 	 * @param list<string> $section_keys
 	 * @return int Number of groups registered.
@@ -72,6 +81,44 @@ final class ACF_Group_Registrar {
 			}
 		}
 		return $count;
+	}
+
+	/**
+	 * Registers groups only for sections that appear on the given page (deterministic; §6.2–6.3).
+	 *
+	 * @param list<string> $section_keys Section keys from page template composition.
+	 * @return int Number of groups registered.
+	 */
+	public function register_sections_for_page( array $section_keys ): int {
+		return $this->register_sections( $section_keys );
+	}
+
+	/**
+	 * Registers groups for all sections in a variation family. No-op when section repository is not set.
+	 *
+	 * @param string $variation_family_key variation_family_key from section definitions.
+	 * @return int Number of groups registered.
+	 */
+	public function register_by_family( string $variation_family_key ): int {
+		if ( ! $this->is_acf_available() || $this->section_repository === null ) {
+			return 0;
+		}
+		$family_key = \sanitize_key( $variation_family_key );
+		if ( $family_key === '' ) {
+			return 0;
+		}
+		$definitions = $this->section_repository->list_all_definitions( 9999, 0 );
+		$section_keys = array();
+		foreach ( $definitions as $def ) {
+			$def_family = \sanitize_key( (string) ( $def['variation_family_key'] ?? '' ) );
+			if ( $def_family === $family_key ) {
+				$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+				if ( $key !== '' ) {
+					$section_keys[] = $key;
+				}
+			}
+		}
+		return $this->register_sections( $section_keys );
 	}
 
 	/**

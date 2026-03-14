@@ -17,7 +17,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 
 /**
  * Exposes blueprint retrieval by section key and version.
- * Blueprints are extracted from section definitions (embedded field_blueprint) or provided via resolver.
+ * Blueprints are extracted from section definitions (embedded field_blueprint) or resolved via Blueprint_Family_Resolver when applicable.
  */
 final class Section_Field_Blueprint_Service {
 
@@ -33,14 +33,19 @@ final class Section_Field_Blueprint_Service {
 	/** @var Section_Field_Blueprint_Normalizer */
 	private Section_Field_Blueprint_Normalizer $normalizer;
 
+	/** @var Blueprint_Family_Resolver|null */
+	private ?Blueprint_Family_Resolver $family_resolver;
+
 	public function __construct(
 		Section_Template_Repository $section_repository,
 		Section_Field_Blueprint_Validator $validator,
-		Section_Field_Blueprint_Normalizer $normalizer
+		Section_Field_Blueprint_Normalizer $normalizer,
+		?Blueprint_Family_Resolver $family_resolver = null
 	) {
 		$this->section_repository = $section_repository;
-		$this->validator         = $validator;
+		$this->validator          = $validator;
 		$this->normalizer        = $normalizer;
+		$this->family_resolver   = $family_resolver;
 	}
 
 	/**
@@ -98,7 +103,11 @@ final class Section_Field_Blueprint_Service {
 		if ( ! empty( $result['errors'] ) ) {
 			return null;
 		}
-		return $result['normalized'];
+		$normalized = $result['normalized'];
+		if ( $this->family_resolver !== null ) {
+			$normalized = $this->family_resolver->resolve( $definition, $normalized );
+		}
+		return $normalized;
 	}
 
 	/**

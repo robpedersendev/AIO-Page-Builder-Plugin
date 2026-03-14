@@ -83,13 +83,13 @@ final class ACF_Registration_Test extends TestCase {
 		return $result['normalized'];
 	}
 
-	private function create_registrar(): ACF_Group_Registrar {
+	private function create_registrar( bool $with_section_repo = false ): ACF_Group_Registrar {
 		$validator  = new Section_Field_Blueprint_Validator();
 		$normalizer = new Section_Field_Blueprint_Normalizer( $validator );
 		$repo       = new Section_Template_Repository();
 		$service    = new Section_Field_Blueprint_Service( $repo, $validator, $normalizer );
 		$builder    = new ACF_Group_Builder( new ACF_Field_Builder() );
-		return new ACF_Group_Registrar( $service, $builder );
+		return new ACF_Group_Registrar( $service, $builder, $with_section_repo ? $repo : null );
 	}
 
 	public function test_field_builder_produces_deterministic_field(): void {
@@ -201,6 +201,17 @@ final class ACF_Registration_Test extends TestCase {
 		$registrar = $this->create_registrar();
 		$count = $registrar->register_all();
 		$this->assertSame( 0, $count );
+	}
+
+	public function test_registrar_register_sections_for_page_equals_register_sections(): void {
+		$registrar = $this->create_registrar();
+		$keys = array( 'st01_hero', 'st05_faq' );
+		$this->assertSame( $registrar->register_sections( $keys ), $registrar->register_sections_for_page( $keys ) );
+	}
+
+	public function test_registrar_register_by_family_returns_zero_when_no_section_repo(): void {
+		$registrar = $this->create_registrar( false );
+		$this->assertSame( 0, $registrar->register_by_family( 'hero_primary' ) );
 	}
 
 	public function test_example_assembled_acf_group_array(): void {
