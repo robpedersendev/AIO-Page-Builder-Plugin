@@ -19,6 +19,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
+use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Restore_Validator;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
@@ -67,6 +68,9 @@ final class Restore_Pipeline {
 	/** @var Logger_Interface|null */
 	private ?Logger_Interface $logger;
 
+	/** @var Template_Library_Restore_Validator|null Template-library coherence after restore (Prompt 185). */
+	private ?Template_Library_Restore_Validator $template_library_restore_validator;
+
 	public function __construct(
 		Settings_Service $settings,
 		Profile_Store $profile_store,
@@ -75,16 +79,18 @@ final class Restore_Pipeline {
 		Composition_Repository $composition_repo,
 		Build_Plan_Repository $plan_repo,
 		\wpdb $wpdb,
-		?Logger_Interface $logger = null
+		?Logger_Interface $logger = null,
+		?Template_Library_Restore_Validator $template_library_restore_validator = null
 	) {
-		$this->settings          = $settings;
-		$this->profile_store     = $profile_store;
-		$this->section_repo      = $section_repo;
-		$this->page_template_repo = $page_template_repo;
-		$this->composition_repo  = $composition_repo;
-		$this->plan_repo         = $plan_repo;
-		$this->wpdb              = $wpdb;
-		$this->logger            = $logger;
+		$this->settings                           = $settings;
+		$this->profile_store                      = $profile_store;
+		$this->section_repo                       = $section_repo;
+		$this->page_template_repo                 = $page_template_repo;
+		$this->composition_repo                   = $composition_repo;
+		$this->plan_repo                          = $plan_repo;
+		$this->wpdb                               = $wpdb;
+		$this->logger                             = $logger;
+		$this->template_library_restore_validator = $template_library_restore_validator;
 	}
 
 	/**
@@ -143,8 +149,20 @@ final class Restore_Pipeline {
 				}
 			}
 			$zip->close();
+
+			$template_library_summary = array();
+			if ( $this->template_library_restore_validator !== null ) {
+				$template_library_summary = $this->template_library_restore_validator->validate( $restored, $manifest );
+				if ( ! empty( $template_library_summary['errors'] ) ) {
+					$this->log( 'Template library restore validation had errors.', array(
+						'errors' => $template_library_summary['errors'],
+						'ref'    => $template_library_summary['log_reference'] ?? '',
+					), $log_ref, Log_Severities::WARNING );
+				}
+			}
+
 			$this->log( 'Restore completed.', array( 'restored' => $restored ), $log_ref );
-			return Restore_Result::success( $restored, $resolved_actions_log, $log_ref );
+			return Restore_Result::success( $restored, $resolved_actions_log, $log_ref, 'Restore completed.', $template_library_summary );
 		} catch ( \Throwable $e ) {
 			$zip->close();
 			$this->log( 'Restore failed: ' . $e->getMessage(), array(), $log_ref, Log_Severities::ERROR );

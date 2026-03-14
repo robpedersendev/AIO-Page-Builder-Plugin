@@ -2,6 +2,7 @@
 /**
  * Generates the Page Template Inventory Appendix from registry data (spec §62.12, §57.9, §60.6).
  * Deterministic, repeatable; output is markdown suitable for docs/appendices/page-template-inventory.md.
+ * Used by Template_Library_Export_Validator and Template_Library_Restore_Validator for appendix coherence (Prompt 185).
  *
  * @package AIOPageBuilder
  */

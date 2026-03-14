@@ -14,6 +14,8 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Generator;
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Manifest_Builder;
 use AIOPageBuilder\Domain\ExportRestore\Export\Support_Package_Generator;
+use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Export_Validator;
+use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Restore_Validator;
 use AIOPageBuilder\Domain\ExportRestore\UI\Import_Export_State_Builder;
 use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Cleanup_Service;
 use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Export_Prompt_Service;
@@ -41,8 +43,25 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 		$container->register( 'conflict_resolution_service', function (): \AIOPageBuilder\Domain\ExportRestore\Import\Conflict_Resolution_Service {
 			return new \AIOPageBuilder\Domain\ExportRestore\Import\Conflict_Resolution_Service();
 		} );
+		$container->register( 'template_library_export_validator', function () use ( $container ): Template_Library_Export_Validator {
+			$section_appendix = $container->has( 'section_inventory_appendix_generator' ) ? $container->get( 'section_inventory_appendix_generator' ) : null;
+			$page_appendix    = $container->has( 'page_template_inventory_appendix_generator' ) ? $container->get( 'page_template_inventory_appendix_generator' ) : null;
+			return new Template_Library_Export_Validator( $section_appendix, $page_appendix );
+		} );
+		$container->register( 'template_library_restore_validator', function () use ( $container ): Template_Library_Restore_Validator {
+			$section_appendix = $container->has( 'section_inventory_appendix_generator' ) ? $container->get( 'section_inventory_appendix_generator' ) : null;
+			$page_appendix    = $container->has( 'page_template_inventory_appendix_generator' ) ? $container->get( 'page_template_inventory_appendix_generator' ) : null;
+			return new Template_Library_Restore_Validator(
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' ),
+				$container->get( 'composition_repository' ),
+				$section_appendix,
+				$page_appendix
+			);
+		} );
 		$container->register( 'restore_pipeline', function () use ( $container ): \AIOPageBuilder\Domain\ExportRestore\Import\Restore_Pipeline {
 			global $wpdb;
+			$restore_validator = $container->has( 'template_library_restore_validator' ) ? $container->get( 'template_library_restore_validator' ) : null;
 			return new \AIOPageBuilder\Domain\ExportRestore\Import\Restore_Pipeline(
 				$container->get( 'settings' ),
 				$container->get( 'profile_store' ),
@@ -51,7 +70,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'composition_repository' ),
 				$container->get( 'build_plan_repository' ),
 				$wpdb,
-				$container->has( 'logger' ) ? $container->get( 'logger' ) : null
+				$container->has( 'logger' ) ? $container->get( 'logger' ) : null,
+				$restore_validator
 			);
 		} );
 		$container->register( 'export_manifest_builder', function (): Export_Manifest_Builder {
@@ -78,6 +98,7 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 			);
 		} );
 		$container->register( 'export_generator', function () use ( $container ): Export_Generator {
+			$template_library_validator = $container->has( 'template_library_export_validator' ) ? $container->get( 'template_library_export_validator' ) : null;
 			return new Export_Generator(
 				$container->get( 'plugin_path_manager' ),
 				$container->get( 'settings' ),
@@ -88,7 +109,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'export_manifest_builder' ),
 				$container->get( 'export_zip_packager' ),
 				$container->has( 'logger' ) ? $container->get( 'logger' ) : null,
-				$container->get( 'support_package_generator' )
+				$container->get( 'support_package_generator' ),
+				$template_library_validator
 			);
 		} );
 		$container->register( 'uninstall_cleanup_service', function (): Uninstall_Cleanup_Service {

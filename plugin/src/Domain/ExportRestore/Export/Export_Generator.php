@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Bundle_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Mode_Keys;
+use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Export_Validator;
 use AIOPageBuilder\Domain\Registries\Export\Registry_Export_Serializer;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
@@ -61,6 +62,9 @@ final class Export_Generator {
 	/** @var Support_Package_Generator|null When set, support_bundle mode delegates to this (spec §59.15). */
 	private ?Support_Package_Generator $support_package_generator;
 
+	/** @var Template_Library_Export_Validator|null Template-library coherence validation (Prompt 185). */
+	private ?Template_Library_Export_Validator $template_library_export_validator;
+
 	public function __construct(
 		Plugin_Path_Manager $path_manager,
 		Settings_Service $settings,
@@ -71,18 +75,20 @@ final class Export_Generator {
 		Export_Manifest_Builder $manifest_builder,
 		Export_Zip_Packager $packager,
 		?Logger_Interface $logger = null,
-		?Support_Package_Generator $support_package_generator = null
+		?Support_Package_Generator $support_package_generator = null,
+		?Template_Library_Export_Validator $template_library_export_validator = null
 	) {
-		$this->path_manager               = $path_manager;
-		$this->settings                   = $settings;
-		$this->profile_store              = $profile_store;
-		$this->registry_serializer        = $registry_serializer;
-		$this->plan_repository            = $plan_repository;
-		$this->token_set_reader           = $token_set_reader;
-		$this->manifest_builder           = $manifest_builder;
-		$this->packager                   = $packager;
-		$this->logger                     = $logger;
-		$this->support_package_generator  = $support_package_generator;
+		$this->path_manager                       = $path_manager;
+		$this->settings                           = $settings;
+		$this->profile_store                      = $profile_store;
+		$this->registry_serializer                 = $registry_serializer;
+		$this->plan_repository                    = $plan_repository;
+		$this->token_set_reader                   = $token_set_reader;
+		$this->manifest_builder                   = $manifest_builder;
+		$this->packager                           = $packager;
+		$this->logger                             = $logger;
+		$this->support_package_generator          = $support_package_generator;
+		$this->template_library_export_validator  = $template_library_export_validator;
 	}
 
 	/**
@@ -190,6 +196,19 @@ final class Export_Generator {
 				return Export_Result::failure( $pack_result['error'], $mode, $included, $excluded );
 			}
 
+			$template_library_summary = array();
+			if ( $this->template_library_export_validator !== null && ( in_array( 'registries', $included, true ) || in_array( 'compositions', $included, true ) ) ) {
+				$bundle = $this->registry_serializer->build_registry_bundle( 0 );
+				$template_library_summary = $this->template_library_export_validator->validate( $bundle, $included );
+				if ( ! empty( $template_library_summary['errors'] ) ) {
+					$this->log( 'Template library export validation had errors.', array(
+						'mode'   => $mode,
+						'errors' => $template_library_summary['errors'],
+						'ref'    => $template_library_summary['log_reference'] ?? '',
+					), Log_Severities::WARNING );
+				}
+			}
+
 			$cleanup = false;
 			$result = Export_Result::success(
 				$destination,
@@ -199,7 +218,8 @@ final class Export_Generator {
 				count( $pack_result['checksum_list'] ),
 				$pack_result['size_bytes'],
 				$filename,
-				'export-' . $mode . '-' . gmdate( 'Y-m-d\TH:i:s\Z' )
+				'export-' . $mode . '-' . gmdate( 'Y-m-d\TH:i:s\Z' ),
+				$template_library_summary
 			);
 			$this->log( 'Export completed.', array(
 				'mode'       => $mode,

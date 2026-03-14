@@ -48,6 +48,9 @@ final class Export_Result {
 	/** @var string Package filename only (no path). */
 	private string $package_filename;
 
+	/** @var array<string, mixed> Template-library export validation summary (Prompt 185). */
+	private array $template_library_export_summary;
+
 	/**
 	 * @param bool         $success              Whether export completed successfully.
 	 * @param string       $message              Human-readable outcome message.
@@ -59,6 +62,7 @@ final class Export_Result {
 	 * @param int          $package_size_bytes   Size of package file.
 	 * @param string       $log_reference        Optional log reference.
 	 * @param string       $package_filename     Filename only.
+	 * @param array<string, mixed> $template_library_export_summary Optional template-library validation summary.
 	 */
 	public function __construct(
 		bool $success,
@@ -70,18 +74,20 @@ final class Export_Result {
 		int $checksum_count,
 		int $package_size_bytes,
 		string $log_reference,
-		string $package_filename
+		string $package_filename,
+		array $template_library_export_summary = array()
 	) {
-		$this->success              = $success;
-		$this->message              = $message;
-		$this->package_path         = $package_path;
-		$this->export_mode          = $export_mode;
-		$this->included_categories  = $included_categories;
-		$this->excluded_categories  = $excluded_categories;
-		$this->checksum_count       = $checksum_count;
-		$this->package_size_bytes   = $package_size_bytes;
-		$this->log_reference        = $log_reference;
-		$this->package_filename     = $package_filename;
+		$this->success                        = $success;
+		$this->message                        = $message;
+		$this->package_path                   = $package_path;
+		$this->export_mode                    = $export_mode;
+		$this->included_categories            = $included_categories;
+		$this->excluded_categories            = $excluded_categories;
+		$this->checksum_count                 = $checksum_count;
+		$this->package_size_bytes             = $package_size_bytes;
+		$this->log_reference                  = $log_reference;
+		$this->package_filename               = $package_filename;
+		$this->template_library_export_summary = $template_library_export_summary;
 	}
 
 	/** @return bool */
@@ -134,6 +140,11 @@ final class Export_Result {
 		return $this->package_filename;
 	}
 
+	/** @return array<string, mixed> */
+	public function get_template_library_export_summary(): array {
+		return $this->template_library_export_summary;
+	}
+
 	/**
 	 * Returns a payload suitable for UI or API (no secrets).
 	 *
@@ -141,16 +152,17 @@ final class Export_Result {
 	 */
 	public function to_payload(): array {
 		return array(
-			'success'              => $this->success,
-			'message'              => $this->message,
-			'package_path'         => $this->package_path,
-			'export_mode'          => $this->export_mode,
-			'included_categories'  => $this->included_categories,
-			'excluded_categories'  => $this->excluded_categories,
-			'checksum_count'       => $this->checksum_count,
-			'package_size_bytes'   => $this->package_size_bytes,
-			'log_reference'       => $this->log_reference,
-			'package_filename'    => $this->package_filename,
+			'success'                        => $this->success,
+			'message'                        => $this->message,
+			'package_path'                   => $this->package_path,
+			'export_mode'                    => $this->export_mode,
+			'included_categories'            => $this->included_categories,
+			'excluded_categories'            => $this->excluded_categories,
+			'checksum_count'                 => $this->checksum_count,
+			'package_size_bytes'             => $this->package_size_bytes,
+			'log_reference'                  => $this->log_reference,
+			'package_filename'               => $this->package_filename,
+			'template_library_export_summary' => $this->template_library_export_summary,
 		);
 	}
 
@@ -165,6 +177,7 @@ final class Export_Result {
 	 * @param int          $package_size   Size in bytes.
 	 * @param string       $filename       Package filename.
 	 * @param string       $log_ref        Optional log reference.
+	 * @param array<string, mixed> $template_library_export_summary Optional template-library validation summary.
 	 * @return self
 	 */
 	public static function success(
@@ -175,7 +188,8 @@ final class Export_Result {
 		int $checksum_count,
 		int $package_size,
 		string $filename,
-		string $log_ref = ''
+		string $log_ref = '',
+		array $template_library_export_summary = array()
 	): self {
 		return new self(
 			true,
@@ -187,7 +201,8 @@ final class Export_Result {
 			$checksum_count,
 			$package_size,
 			$log_ref,
-			$filename
+			$filename,
+			$template_library_export_summary
 		);
 	}
 
@@ -218,7 +233,8 @@ final class Export_Result {
 			0,
 			0,
 			$log_ref,
-			''
+			'',
+			array()
 		);
 	}
 }
