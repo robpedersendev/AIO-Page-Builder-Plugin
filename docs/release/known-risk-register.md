@@ -31,6 +31,9 @@
 | ID | Category | Description | Mitigation / waiver |
 |----|----------|-------------|----------------------|
 | TLE-1 | Template library | Large expanded library (254 sections, 580 page templates) may stress admin directory, compare, composition builder, or appendix generation on constrained hosting. | Performance hardening in place: MAX_PER_PAGE 50, preview cache cap 800, compare list 10, compositions list 100; directory/query/preview tuning. See [template-admin-performance-hardening-report.md](../qa/template-admin-performance-hardening-report.md) and [template-library-expansion-review-packet.md](template-library-expansion-review-packet.md) §6. Appendices regenerable from registries. |
+| TLE-2 | Template library / compatibility | Compatibility claims for the expanded library (directory, previews, builds, ACF at scale, GenerateBlocks/native, LPagery, themes) require run and recorded checklist. Claiming a template family or environment compatible without testing representative previews and builds is not permitted. | [template-library-compatibility-report.md](../qa/template-library-compatibility-report.md) checklist; [compatibility-matrix.md](../qa/compatibility-matrix.md) §13. Document test date and result; do not overclaim. |
+| TLE-3 | Template library / QA | Compliance (CTA, category, count, preview, ACF, LPAGERY, export) and migration/upgrade evidence must exist for sign-off. Automated compliance and accessibility audits support but do not replace human review where required. | [template-library-compliance-matrix.md](../qa/template-library-compliance-matrix.md); [template-library-expansion-review-packet.md](template-library-expansion-review-packet.md); [template-library-expansion-sign-off-checklist.md](template-library-expansion-sign-off-checklist.md); [template-library-accessibility-audit-report.md](../qa/template-library-accessibility-audit-report.md). |
+| TLE-4 | Template library / maintenance | Deprecated templates have no automatic replacement; users must select replacement explicitly. Appendix is generated from live registry (no persisted store); regeneration is implicit on export or on demand after upgrade. Version/deprecation continuity depends on registry CPTs not being reset. | Document in operator and support guides; [template-library-migration-coverage-report.md](../plugin/docs/qa/template-library-migration-coverage-report.md). Decision log and changelog deprecation sync per §58.8. |
 | *(add further per release)* | — | — | — |
 
 Use this section for risks or limitations specific to a release (e.g. "Export of very large plans may timeout on constrained hosting") with mitigation or formal waiver reference.
@@ -44,6 +47,7 @@ Use this section for risks or limitations specific to a release (e.g. "Export of
 - **QA closure:** [release-candidate-closure.md](../qa/release-candidate-closure.md).
 - **Compatibility / migration:** [compatibility-matrix.md](../qa/compatibility-matrix.md), [migration-coverage-matrix.md](../qa/migration-coverage-matrix.md).
 - **Release notes / changelog:** [release-notes-rc1.md](release-notes-rc1.md), [changelog.md](changelog.md) (operator-facing release content; do not duplicate internal risk detail here).
+- **Template library release addendum:** [template-library-release-notes-addendum.md](template-library-release-notes-addendum.md) (counts, screens, compatibility, migration, limitations).
 
 ---
 

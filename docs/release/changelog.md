@@ -10,6 +10,7 @@
 
 ### Added
 - (Add items as work completes.)
+- **Template library:** For expansion counts, screens, compatibility, and limitations, see [template-library-release-notes-addendum.md](template-library-release-notes-addendum.md).
 
 ### Changed
 - (None.)
@@ -40,6 +41,7 @@
 - **Reporting:** Mandatory operational reporting (install, heartbeat, error reports); disclosed on Privacy/Reporting screen; failure does not break core.
 - **Export modes:** Full operational backup, pre-uninstall backup, support bundle, template only, plan/artifact export, uninstall settings/profile only. Redacted support bundle and log export.
 - **Documentation:** Admin operator guide, end-user workflow guide, support triage guide. Documentation completeness checklist in QA closure.
+- **Template library expansion:** 254 section templates and 580 page templates (coverage matrix and compliance evidenced). Section Templates directory (hierarchical by purpose family and CTA/variant; filters, pagination, View, Add/Remove compare, helper link). Page Templates directory (by category/family; same actions). Section and Page Template Detail screens (metadata, version/deprecation, rendered preview with synthetic data; no menu entry, via View). Template Compare workspace (section or page type; max 10 per type; observational only; user meta). Compositions (list and Build composition with CTA-aware section selection; governed builder; list cap 100). CTA-rule enforcement (min CTA per page class, bottom-of-page CTA, non-adjacent CTAs). Preview cache cap (800); directory per-page cap (50). Template_Library_Upgrade_Helper (registry_schema in version_markers); versioning/deprecation services and decision log; ACF assignment at scale; optional LPagery compatibility. Template library operator, editor, and support guides; in-product help refs on directory/compare/compositions. See [template-library-release-notes-addendum.md](template-library-release-notes-addendum.md).
 
 ### Changed
 

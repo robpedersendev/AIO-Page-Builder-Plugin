@@ -14,6 +14,7 @@ This release candidate delivers the core AIO Page Builder workflow for privately
 
 ## 2. Major feature areas (implemented)
 
+- **Template library (expanded):** Section Templates directory (254 templates, hierarchical browse by purpose family and CTA/variant), Page Templates directory (580 templates, by category/family), Section/Page Template Detail screens (metadata, preview with synthetic data, version/deprecation, compare links), Template Compare workspace (side-by-side, max 10 per type, observational only), Compositions (list and CTA-aware builder). CTA-rule enforcement; preview cache and performance caps; versioning/deprecation and decision log; ACF assignment at scale; optional LPagery. See **[template-library-release-notes-addendum.md](template-library-release-notes-addendum.md)** for counts, screens, compatibility, migration, and limitations.
 - **Dashboard:** Entry point with readiness cards, quick actions, last activity, queue warnings, critical error summary.
 - **Onboarding & Profile:** Guided steps for brand/business profile; draft save; data used by planner and AI.
 - **AI Providers:** Configure providers; credential status (no raw keys in UI); connection test per provider.
@@ -81,6 +82,7 @@ See [REPORTING_EXCEPTION.md](../standards/REPORTING_EXCEPTION.md) for the docume
 
 ## 8. Known limitations and support caveats
 
+- **Template library:** Compare list capped at 10 per type; detail previews use synthetic data only; compositions are governed (registry sections only, CTA rules enforced); no edit-in-place of template definition from detail; deprecated templates have no automatic replacement. Large library may stress directory/preview on constrained hosting (pagination and caps in place). See [template-library-release-notes-addendum.md](template-library-release-notes-addendum.md) §10.
 - **Diagnostics screen:** Placeholder only; full environment validation and support-package UI may come in a later release.
 - **Multisite:** Site-level operation supported; network-wide centralized management not supported; network activation not officially validated unless separately tested.
 - **Theme detection:** No runtime check for GeneratePress vs other themes; preferred-theme messaging is documentation-only until theme posture checks are added.
@@ -111,6 +113,8 @@ See [known-risk-register.md](known-risk-register.md) for internal risk register 
 | Reporting exception | [REPORTING_EXCEPTION.md](../standards/REPORTING_EXCEPTION.md) |
 | Portability and uninstall | [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md) |
 | Admin and support guidance | [admin-operator-guide.md](../guides/admin-operator-guide.md), [support-triage-guide.md](../guides/support-triage-guide.md) |
+| Template library expansion (counts, screens, compatibility, limitations) | [template-library-release-notes-addendum.md](template-library-release-notes-addendum.md) |
+| Template library operator/editor/support guides | [template-library-operator-guide.md](../guides/template-library-operator-guide.md), [template-library-editor-guide.md](../guides/template-library-editor-guide.md), [template-library-support-guide.md](../guides/template-library-support-guide.md) |
 | Release packaging and approval (internal) | [release-candidate-packaging-checklist.md](release-candidate-packaging-checklist.md), [final-approval-runbook.md](final-approval-runbook.md), [private-distribution-handoff.md](private-distribution-handoff.md) |
 
 ---
