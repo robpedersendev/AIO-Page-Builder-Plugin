@@ -32,6 +32,7 @@ use AIOPageBuilder\Domain\Execution\Queue\Execution_Job_Dispatcher;
 use AIOPageBuilder\Domain\Execution\Queue\Execution_Queue_Service;
 use AIOPageBuilder\Domain\Execution\Queue\Queue_Health_Summary_Builder;
 use AIOPageBuilder\Domain\Execution\Queue\Queue_Recovery_Service;
+use AIOPageBuilder\Domain\Rollback\Diff\Template_Diff_Summary_Builder;
 use AIOPageBuilder\Domain\Rollback\Diffs\Diff_Summarizer_Service;
 use AIOPageBuilder\Domain\Rollback\Diffs\Navigation_Diff_Summarizer;
 use AIOPageBuilder\Domain\Rollback\Diffs\Page_Diff_Summarizer;
@@ -129,12 +130,16 @@ final class Execution_Provider implements Service_Provider_Interface {
 		$container->register( 'token_diff_summarizer', function (): Token_Diff_Summarizer {
 			return new Token_Diff_Summarizer();
 		} );
+		$container->register( 'template_diff_summary_builder', function (): Template_Diff_Summary_Builder {
+			return new Template_Diff_Summary_Builder();
+		} );
 		$container->register( 'diff_summarizer_service', function () use ( $container ): Diff_Summarizer_Service {
 			return new Diff_Summarizer_Service(
 				$container->get( 'operational_snapshot_repository' ),
 				$container->get( 'page_diff_summarizer' ),
 				$container->get( 'navigation_diff_summarizer' ),
-				$container->get( 'token_diff_summarizer' )
+				$container->get( 'token_diff_summarizer' ),
+				$container->get( 'template_diff_summary_builder' )
 			);
 		} );
 		$container->register( 'execution_dispatcher', function () use ( $container ): Execution_Dispatcher {

@@ -57,6 +57,26 @@ final class Stub_Operational_Snapshot_Repository implements Operational_Snapshot
 		$snapshot_id = trim( $snapshot_id );
 		return isset( $this->store[ $snapshot_id ] ) ? $this->store[ $snapshot_id ] : null;
 	}
+
+	/** @inheritDoc */
+	public function list_snapshot_created_times_for_target( string $target_ref ): array {
+		$target_ref = trim( $target_ref );
+		$out = array();
+		foreach ( $this->store as $id => $snap ) {
+			if ( ! is_array( $snap ) ) {
+				continue;
+			}
+			$ref = isset( $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) ? trim( (string) $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) : '';
+			if ( $ref !== $target_ref ) {
+				continue;
+			}
+			$ts = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+				? strtotime( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+				: 0;
+			$out[ $id ] = $ts;
+		}
+		return $out;
+	}
 }
 
 final class Operational_Snapshot_Capture_Test extends TestCase {
@@ -215,5 +235,36 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 		$this->assertArrayHasKey( Operational_Snapshot_Schema::FIELD_POST_CHANGE, $snap );
 		$this->assertArrayHasKey( 'result_snapshot', $snap[ Operational_Snapshot_Schema::FIELD_POST_CHANGE ] );
 		$this->assertArrayHasKey( 'pre_snapshot_id', $snap );
+	}
+
+	/** Template-aware snapshot: result_snapshot includes template_context when artifacts have template_replacement_execution_result (Prompt 197). */
+	public function test_post_change_result_builder_sets_template_context_from_template_replacement_artifacts(): void {
+		$GLOBALS['_aio_get_post_return'] = new \WP_Post( array( 'ID' => 42, 'post_type' => 'page', 'post_title' => 'Test', 'post_name' => 'test', 'post_status' => 'publish' ) );
+		$envelope = array(
+			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::REPLACE_PAGE,
+		);
+		$handler_result = array(
+			'success'   => true,
+			'message'   => 'Replaced.',
+			'artifacts' => array(
+				'target_post_id' => 42,
+				'template_replacement_execution_result' => array(
+					'template_key'    => 'tpl_services_hub',
+					'template_family'  => 'services',
+					'section_count'   => 5,
+				),
+			),
+		);
+		$builder = new Post_Change_Result_Builder();
+		$out = $builder->build( $envelope, $handler_result );
+		unset( $GLOBALS['_aio_get_post_return'] );
+		$this->assertNotNull( $out );
+		$this->assertArrayHasKey( 'post_change', $out );
+		$this->assertArrayHasKey( 'result_snapshot', $out['post_change'] );
+		$result_snapshot = $out['post_change']['result_snapshot'];
+		$this->assertArrayHasKey( 'template_context', $result_snapshot );
+		$this->assertSame( 'tpl_services_hub', $result_snapshot['template_context']['template_key'] );
+		$this->assertSame( 'services', $result_snapshot['template_context']['template_family'] );
+		$this->assertSame( 5, $result_snapshot['template_context']['section_count'] );
 	}
 }

@@ -13,11 +13,13 @@ namespace AIOPageBuilder\Domain\Rollback\Diffs;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Rollback\Diff\Template_Diff_Summary_Builder;
 use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Repository_Interface;
 use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Schema;
 
 /**
  * Builds diff results from pre_snapshot_id and post_snapshot_id using captured snapshots.
+ * For page family, enriches with template_diff_summary when Template_Diff_Summary_Builder is provided (Prompt 197).
  */
 final class Diff_Summarizer_Service {
 
@@ -33,16 +35,21 @@ final class Diff_Summarizer_Service {
 	/** @var Token_Diff_Summarizer */
 	private Token_Diff_Summarizer $token_summarizer;
 
+	/** @var Template_Diff_Summary_Builder|null */
+	private $template_diff_summary_builder;
+
 	public function __construct(
 		Operational_Snapshot_Repository_Interface $repository,
 		Page_Diff_Summarizer $page_summarizer,
 		Navigation_Diff_Summarizer $navigation_summarizer,
-		Token_Diff_Summarizer $token_summarizer
+		Token_Diff_Summarizer $token_summarizer,
+		?Template_Diff_Summary_Builder $template_diff_summary_builder = null
 	) {
-		$this->repository          = $repository;
-		$this->page_summarizer      = $page_summarizer;
-		$this->navigation_summarizer = $navigation_summarizer;
-		$this->token_summarizer    = $token_summarizer;
+		$this->repository                   = $repository;
+		$this->page_summarizer              = $page_summarizer;
+		$this->navigation_summarizer        = $navigation_summarizer;
+		$this->token_summarizer             = $token_summarizer;
+		$this->template_diff_summary_builder = $template_diff_summary_builder;
 	}
 
 	/**
@@ -102,7 +109,13 @@ final class Diff_Summarizer_Service {
 		$family = (string) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY ] ?? $post_snapshot[ Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY ] ?? '' );
 		switch ( $family ) {
 			case Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE:
-				return $this->page_summarizer->summarize( $pre_snapshot, $post_snapshot, $level );
+				$result = $this->page_summarizer->summarize( $pre_snapshot, $post_snapshot, $level );
+				if ( $this->template_diff_summary_builder !== null && $result->is_success() ) {
+					$diff = $result->get_diff();
+					$diff['template_diff_summary'] = $this->template_diff_summary_builder->build( $pre_snapshot, $post_snapshot );
+					return Diff_Summary_Result::with_diff( $diff, $result->get_message() );
+				}
+				return $result;
 			case Operational_Snapshot_Schema::OBJECT_FAMILY_MENU:
 				return $this->navigation_summarizer->summarize( $pre_snapshot, $post_snapshot, $level );
 			case Operational_Snapshot_Schema::OBJECT_FAMILY_TOKEN_SET:

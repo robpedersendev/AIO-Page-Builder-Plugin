@@ -5,6 +5,8 @@
  * Central service for capturing before/after state around rollback-capable execution.
  * Fails safely; logs capture problems without blocking execution. For replace_page, pre-change
  * capture preserves original page state for rollback and template-replacement traceability.
+ * For replace_page and create_page, template metadata is captured in post_change when the
+ * handler result includes template execution result (Prompt 197).
  *
  * @package AIOPageBuilder
  */

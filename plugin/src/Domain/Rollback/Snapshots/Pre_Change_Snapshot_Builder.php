@@ -78,6 +78,11 @@ final class Pre_Change_Snapshot_Builder {
 			'content_hash'  => $content_hash,
 			'excerpt'       => $excerpt,
 		);
+		// * Replace intent: intended_template_key for template-aware diff (spec §59.11; Prompt 197).
+		$intended_key = $this->resolve_intended_template_key( $target );
+		if ( $intended_key !== '' ) {
+			$state_snapshot['intended_template_key'] = $intended_key;
+		}
 		$now = gmdate( 'c' );
 		return array(
 			'target_ref'     => (string) $post_id,
@@ -87,6 +92,23 @@ final class Pre_Change_Snapshot_Builder {
 				'state_snapshot'  => $state_snapshot,
 			),
 		);
+	}
+
+	/**
+	 * Resolves intended template key from target (replace intent) for template-aware diff.
+	 *
+	 * @param array<string, mixed> $target
+	 * @return string
+	 */
+	private function resolve_intended_template_key( array $target ): string {
+		if ( isset( $target['template_key'] ) && is_string( $target['template_key'] ) && trim( $target['template_key'] ) !== '' ) {
+			return trim( $target['template_key'] );
+		}
+		$ref = $target['template_ref'] ?? null;
+		if ( is_array( $ref ) && isset( $ref['type'] ) && (string) $ref['type'] === 'internal_key' && isset( $ref['value'] ) && is_string( $ref['value'] ) ) {
+			return trim( $ref['value'] );
+		}
+		return '';
 	}
 
 	/**

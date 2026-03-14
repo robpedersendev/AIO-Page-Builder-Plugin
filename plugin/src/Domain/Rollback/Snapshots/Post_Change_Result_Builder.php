@@ -68,6 +68,11 @@ final class Post_Change_Result_Builder {
 		if ( isset( $artifacts['superseded_post_id'] ) && (int) $artifacts['superseded_post_id'] > 0 ) {
 			$result_snapshot['previous_post_id'] = (int) $artifacts['superseded_post_id'];
 		}
+		// * Template-aware snapshot metadata for diff/rollback (spec §59.11; Prompt 197). Permission-safe; no secrets.
+		$template_context = $this->extract_template_context_from_artifacts( $artifacts );
+		if ( ! empty( $template_context ) ) {
+			$result_snapshot['template_context'] = $template_context;
+		}
 		$message = isset( $handler_result['message'] ) && is_string( $handler_result['message'] ) ? $handler_result['message'] : '';
 		return array(
 			'target_ref'    => (string) $post_id,
@@ -78,6 +83,34 @@ final class Post_Change_Result_Builder {
 				'outcome'         => $success ? 'success' : 'failed',
 				'message'         => substr( $message, 0, 512 ),
 			),
+		);
+	}
+
+	/**
+	 * Extracts safe template metadata from execution artifacts for snapshot (template_key, template_family, section_count).
+	 *
+	 * @param array<string, mixed> $artifacts
+	 * @return array<string, mixed>
+	 */
+	private function extract_template_context_from_artifacts( array $artifacts ): array {
+		$ctx = isset( $artifacts['template_replacement_execution_result'] ) && is_array( $artifacts['template_replacement_execution_result'] )
+			? $artifacts['template_replacement_execution_result']
+			: ( isset( $artifacts['template_build_execution_result'] ) && is_array( $artifacts['template_build_execution_result'] ) ? $artifacts['template_build_execution_result'] : array() );
+		if ( empty( $ctx ) ) {
+			$template_key = isset( $artifacts['template_key'] ) && is_string( $artifacts['template_key'] ) ? trim( $artifacts['template_key'] ) : '';
+			if ( $template_key === '' ) {
+				return array();
+			}
+			return array(
+				'template_key'    => $template_key,
+				'template_family' => '',
+				'section_count'  => isset( $artifacts['assignment_count'] ) && is_numeric( $artifacts['assignment_count'] ) ? (int) $artifacts['assignment_count'] : 0,
+			);
+		}
+		return array(
+			'template_key'     => (string) ( $ctx['template_key'] ?? '' ),
+			'template_family'  => (string) ( $ctx['template_family'] ?? '' ),
+			'section_count'   => isset( $ctx['section_count'] ) && is_numeric( $ctx['section_count'] ) ? (int) $ctx['section_count'] : ( isset( $ctx['field_assignment_count'] ) && is_numeric( $ctx['field_assignment_count'] ) ? (int) $ctx['field_assignment_count'] : 0 ),
 		);
 	}
 
