@@ -356,6 +356,10 @@ final class Compositions_Screen {
 			$query_service = new \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service( $section_repo, $page_repo );
 		}
 		$section_repo = $section_repo ?: new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
-		return new Composition_Builder_State_Builder( $query_service, $section_repo );
+		$builder = new Composition_Builder_State_Builder( $query_service, $section_repo );
+		if ( $this->container && $this->container->has( 'large_composition_validator' ) ) {
+			$builder->set_large_validator( $this->container->get( 'large_composition_validator' ) );
+		}
+		return $builder;
 	}
 }

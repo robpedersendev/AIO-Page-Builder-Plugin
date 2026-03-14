@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Domain\Registries\Compositions\UI;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Schema;
+use AIOPageBuilder\Domain\Registries\Compositions\Validation\Large_Composition_Validator;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Filter_Result;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
@@ -32,12 +33,25 @@ final class Composition_Builder_State_Builder {
 	private Large_Library_Query_Service $query_service;
 	private Section_Template_Repository $section_repository;
 
+	/** @var Large_Composition_Validator|null When set, full validation result is included in state (Prompt 178). */
+	private ?Large_Composition_Validator $large_validator = null;
+
 	public function __construct(
 		Large_Library_Query_Service $query_service,
 		Section_Template_Repository $section_repository
 	) {
 		$this->query_service      = $query_service;
 		$this->section_repository  = $section_repository;
+	}
+
+	/**
+	 * Sets the large-library validator so build_state includes full validation_result (blockers, warnings, CTA/compatibility/preview).
+	 *
+	 * @param Large_Composition_Validator|null $validator
+	 * @return void
+	 */
+	public function set_large_validator( ?Large_Composition_Validator $validator ): void {
+		$this->large_validator = $validator;
 	}
 
 	/**
@@ -101,13 +115,18 @@ final class Composition_Builder_State_Builder {
 			$insertion_hint = __( 'Add a section to start. Prefer a hero or opener first; end with a CTA section.', 'aio-page-builder' );
 		}
 
-		$validation_status = '';
-		$validation_codes  = array();
+		$validation_status  = '';
+		$validation_codes   = array();
+		$validation_result  = null;
 		if ( $current_composition !== null ) {
 			$validation_status = (string) ( $current_composition[ Composition_Schema::FIELD_VALIDATION_STATUS ] ?? '' );
 			$validation_codes  = $current_composition[ Composition_Schema::FIELD_VALIDATION_CODES ] ?? array();
 			if ( ! is_array( $validation_codes ) ) {
 				$validation_codes = array();
+			}
+			if ( $this->large_validator !== null ) {
+				$result = $this->large_validator->validate( $current_composition );
+				$validation_result = $result->to_array();
 			}
 		}
 
@@ -128,6 +147,7 @@ final class Composition_Builder_State_Builder {
 			'insertion_hint'           => $insertion_hint,
 			'validation_status'       => $validation_status,
 			'validation_codes'         => $validation_codes,
+			'validation_result'        => $validation_result,
 			'preview_readiness'        => $preview_readiness,
 			'one_pager_ready'          => $one_pager_ready,
 			'base_url'                 => $base_url,

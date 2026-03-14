@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Domain\Registries\Composition;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Registries\Compositions\Validation\Large_Composition_Validator;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Integrity_Validator;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Map_Service;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Types;
@@ -35,6 +36,9 @@ final class Composition_Registry_Service {
 	/** @var Registry_Integrity_Validator|null */
 	private ?Registry_Integrity_Validator $integrity_validator;
 
+	/** @var Large_Composition_Validator|null When set, used for full CTA/compatibility/preview enforcement (Prompt 178). */
+	private ?Large_Composition_Validator $large_validator = null;
+
 	public function __construct(
 		Composition_Validator $validator,
 		Composition_Repository $repository,
@@ -45,6 +49,16 @@ final class Composition_Registry_Service {
 		$this->repository         = $repository;
 		$this->assignment_map     = $assignment_map;
 		$this->integrity_validator = $integrity_validator;
+	}
+
+	/**
+	 * Sets the large-library validator for CTA and preview enforcement (Prompt 178). Optional.
+	 *
+	 * @param Large_Composition_Validator|null $validator
+	 * @return void
+	 */
+	public function set_large_validator( ?Large_Composition_Validator $validator ): void {
+		$this->large_validator = $validator;
 	}
 
 	/**
@@ -69,9 +83,18 @@ final class Composition_Registry_Service {
 		}
 
 		$definition = $this->normalize_definition( $input, $comp_id );
-		$validation = $this->validator->validate( $definition );
-		$definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] = $validation['result'];
-		$definition[ Composition_Schema::FIELD_VALIDATION_CODES ] = $validation['codes'];
+		if ( $this->large_validator !== null ) {
+			$result = $this->large_validator->validate( $definition );
+			$definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] = $result->is_valid()
+				? ( count( $result->get_warnings() ) > 0 ? Composition_Validation_Result::WARNING : Composition_Validation_Result::VALID )
+				: Composition_Validation_Result::VALIDATION_FAILED;
+			$codes = array_merge( $result->get_legacy_codes(), array_column( $result->get_blockers(), 'code' ) );
+			$definition[ Composition_Schema::FIELD_VALIDATION_CODES ] = array_values( array_unique( $codes ) );
+		} else {
+			$validation = $this->validator->validate( $definition );
+			$definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] = $validation['result'];
+			$definition[ Composition_Schema::FIELD_VALIDATION_CODES ] = $validation['codes'];
+		}
 
 		$id = $this->repository->save_definition( $definition );
 		if ( $id <= 0 ) {
@@ -101,9 +124,18 @@ final class Composition_Registry_Service {
 		$merged[ Composition_Schema::FIELD_COMPOSITION_ID ] = $comp_id;
 
 		$definition = $this->normalize_definition( $merged, $comp_id );
-		$validation = $this->validator->validate( $definition );
-		$definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] = $validation['result'];
-		$definition[ Composition_Schema::FIELD_VALIDATION_CODES ] = $validation['codes'];
+		if ( $this->large_validator !== null ) {
+			$result = $this->large_validator->validate( $definition );
+			$definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] = $result->is_valid()
+				? ( count( $result->get_warnings() ) > 0 ? Composition_Validation_Result::WARNING : Composition_Validation_Result::VALID )
+				: Composition_Validation_Result::VALIDATION_FAILED;
+			$codes = array_merge( $result->get_legacy_codes(), array_column( $result->get_blockers(), 'code' ) );
+			$definition[ Composition_Schema::FIELD_VALIDATION_CODES ] = array_values( array_unique( $codes ) );
+		} else {
+			$validation = $this->validator->validate( $definition );
+			$definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] = $validation['result'];
+			$definition[ Composition_Schema::FIELD_VALIDATION_CODES ] = $validation['codes'];
+		}
 
 		$id = $this->repository->save_definition( $definition );
 		if ( $id <= 0 ) {
