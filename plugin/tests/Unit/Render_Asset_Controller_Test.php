@@ -97,4 +97,39 @@ final class Render_Asset_Controller_Test extends TestCase {
 		$this->assertTrue( $controller->should_load_for_context( Render_Asset_Requirements::SCOPE_ADMIN, 'admin' ) );
 		$this->assertTrue( $controller->should_load_for_context( Render_Asset_Requirements::SCOPE_SECTION, 'frontend' ) );
 	}
+
+	public function test_apply_preview_asset_budget_list_caps_handles(): void {
+		$controller = new Render_Asset_Controller();
+		$reqs = array();
+		for ( $i = 0; $i < 20; $i++ ) {
+			$reqs[] = new Render_Asset_Requirements( 'handle-' . $i, 'st_' . $i, Render_Asset_Requirements::SCOPE_FRONTEND, array() );
+		}
+		$trimmed = $controller->apply_preview_asset_budget( $reqs, Render_Asset_Controller::PREVIEW_CONTEXT_LIST );
+		$this->assertLessThanOrEqual( 12, \count( $trimmed ) );
+		$this->assertGreaterThanOrEqual( 1, \count( $trimmed ) );
+	}
+
+	public function test_apply_preview_asset_budget_detail_caps_handles(): void {
+		$controller = new Render_Asset_Controller();
+		$reqs = array();
+		for ( $i = 0; $i < 100; $i++ ) {
+			$reqs[] = new Render_Asset_Requirements( 'handle-' . $i, 'st_' . $i, Render_Asset_Requirements::SCOPE_FRONTEND, array() );
+		}
+		$trimmed = $controller->apply_preview_asset_budget( $reqs, Render_Asset_Controller::PREVIEW_CONTEXT_DETAIL );
+		$this->assertLessThanOrEqual( 60, \count( $trimmed ) );
+		$this->assertSame( 60, \count( $trimmed ) );
+	}
+
+	public function test_apply_preview_asset_budget_custom_max_handles(): void {
+		$controller = new Render_Asset_Controller();
+		$reqs = array(
+			new Render_Asset_Requirements( 'h1', 'st1', Render_Asset_Requirements::SCOPE_FRONTEND, array() ),
+			new Render_Asset_Requirements( 'h2', 'st2', Render_Asset_Requirements::SCOPE_FRONTEND, array() ),
+			new Render_Asset_Requirements( 'h3', 'st3', Render_Asset_Requirements::SCOPE_FRONTEND, array() ),
+		);
+		$trimmed = $controller->apply_preview_asset_budget( $reqs, Render_Asset_Controller::PREVIEW_CONTEXT_DETAIL, 2 );
+		$this->assertCount( 2, $trimmed );
+		$this->assertSame( 'h1', $trimmed[0]->get_handle() );
+		$this->assertSame( 'h2', $trimmed[1]->get_handle() );
+	}
 }

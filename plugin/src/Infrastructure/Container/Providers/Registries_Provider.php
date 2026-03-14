@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Preview\Preview_Cache_Service;
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Duplicator;
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Registry_Service;
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Validator;
@@ -150,10 +151,15 @@ final class Registries_Provider implements Service_Provider_Interface {
 			);
 		} );
 		$container->register( 'template_compare_state_builder', function () use ( $container ): Template_Compare_State_Builder {
+			$preview_cache = $container->has( 'preview_cache_service' ) ? $container->get( 'preview_cache_service' ) : null;
 			return new Template_Compare_State_Builder(
 				new Section_Template_Repository_Adapter( $container->get( 'section_template_repository' ) ),
-				new Page_Template_Repository_Adapter( $container->get( 'page_template_repository' ) )
+				new Page_Template_Repository_Adapter( $container->get( 'page_template_repository' ) ),
+				$preview_cache instanceof Preview_Cache_Service ? $preview_cache : null
 			);
+		} );
+		$container->register( 'preview_cache_service', function (): Preview_Cache_Service {
+			return new Preview_Cache_Service();
 		} );
 		$container->register( 'section_inventory_appendix_generator', function () use ( $container ): Section_Inventory_Appendix_Generator {
 			return new Section_Inventory_Appendix_Generator( $container->get( 'section_template_repository' ) );

@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Generates preview-safe, deterministic ACF-style field values by purpose family.
  * No real data; no secrets; no misleading legal text. All content is clearly synthetic.
+ * Output is deterministic for a given context so preview snapshot cache keys remain stable (Prompt 184).
  */
 final class Synthetic_Preview_Data_Generator {
 

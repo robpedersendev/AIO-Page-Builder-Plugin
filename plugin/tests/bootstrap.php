@@ -32,6 +32,14 @@ if ( ! function_exists( 'update_option' ) ) {
 		return true;
 	}
 }
+if ( ! function_exists( 'delete_option' ) ) {
+	function delete_option( $key ) {
+		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
+			unset( $GLOBALS['_aio_test_options'][ $key ] );
+		}
+		return true;
+	}
+}
 if ( ! function_exists( 'wp_generate_uuid4' ) ) {
 	function wp_generate_uuid4() {
 		return sprintf(

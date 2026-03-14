@@ -14,6 +14,8 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ACF\Blueprints\Field_Blueprint_Schema;
 use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service;
+use AIOPageBuilder\Domain\Preview\Preview_Cache_Record;
+use AIOPageBuilder\Domain\Preview\Preview_Cache_Service;
 use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Context;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator;
@@ -54,6 +56,9 @@ final class Section_Template_Detail_State_Builder {
 	/** @var Library_LPagery_Compatibility_Service|null */
 	private ?Library_LPagery_Compatibility_Service $lpagery_compatibility;
 
+	/** @var Preview_Cache_Service|null */
+	private ?Preview_Cache_Service $preview_cache;
+
 	public function __construct(
 		Section_Definition_Provider $section_provider,
 		Synthetic_Preview_Data_Generator $preview_generator,
@@ -62,7 +67,8 @@ final class Section_Template_Detail_State_Builder {
 		Section_Renderer_Base $section_renderer,
 		Native_Block_Assembly_Pipeline $assembly_pipeline,
 		?Section_Field_Blueprint_Service $blueprint_service = null,
-		?Library_LPagery_Compatibility_Service $lpagery_compatibility = null
+		?Library_LPagery_Compatibility_Service $lpagery_compatibility = null,
+		?Preview_Cache_Service $preview_cache = null
 	) {
 		$this->section_provider    = $section_provider;
 		$this->preview_generator   = $preview_generator;
@@ -72,6 +78,7 @@ final class Section_Template_Detail_State_Builder {
 		$this->assembly_pipeline   = $assembly_pipeline;
 		$this->blueprint_service   = $blueprint_service;
 		$this->lpagery_compatibility = $lpagery_compatibility;
+		$this->preview_cache       = $preview_cache;
 	}
 
 	/**
@@ -119,7 +126,34 @@ final class Section_Template_Detail_State_Builder {
 			$lpagery_compatibility_state = $lpagery_result->to_array();
 		}
 
-		$rendered_preview_html = $this->render_preview_html( $definition, $field_values, array( 'reduced_motion' => $reduced_motion ) );
+		$preview_cache_hit = false;
+		$rendered_preview_html = '';
+		$cache_key = $this->preview_cache !== null ? $this->preview_cache->get_cache_key( $context, $definition ) : '';
+		if ( $cache_key !== '' && $this->preview_cache !== null ) {
+			$cached = $this->preview_cache->get( $cache_key );
+			if ( $cached !== null ) {
+				$rendered_preview_html = $cached->get_html();
+				$preview_cache_hit = true;
+			}
+		}
+		if ( $rendered_preview_html === '' ) {
+			$rendered_preview_html = $this->render_preview_html( $definition, $field_values, array( 'reduced_motion' => $reduced_motion ) );
+			if ( $cache_key !== '' && $this->preview_cache !== null && $rendered_preview_html !== '' ) {
+				$version_hash = $this->preview_cache->definition_version_hash( $definition, Synthetic_Preview_Context::TYPE_SECTION );
+				$record = new Preview_Cache_Record(
+					$cache_key,
+					Preview_Cache_Record::TYPE_SECTION,
+					$section_key,
+					$version_hash,
+					$rendered_preview_html,
+					\time(),
+					$reduced_motion,
+					$context->get_animation_tier()
+				);
+				$this->preview_cache->set( $record );
+			}
+		}
+
 		$breadcrumbs = $this->build_breadcrumbs( $definition, $purpose_family );
 
 		return array(
@@ -133,6 +167,7 @@ final class Section_Template_Detail_State_Builder {
 			'lpagery_compatibility_state' => $lpagery_compatibility_state,
 			'preview_payload'             => $preview_payload,
 			'rendered_preview_html'       => $rendered_preview_html,
+			'preview_cache_hit'           => $preview_cache_hit,
 			'breadcrumbs'                 => $breadcrumbs,
 			'not_found'                   => false,
 		);
@@ -246,6 +281,7 @@ final class Section_Template_Detail_State_Builder {
 			'lpagery_compatibility_state' => null,
 			'preview_payload'             => array(),
 			'rendered_preview_html'       => '',
+			'preview_cache_hit'           => false,
 			'breadcrumbs'                 => array( array( 'label' => __( 'Section Templates', 'aio-page-builder' ), 'url' => $base_url ) ),
 			'not_found'                   => true,
 		);

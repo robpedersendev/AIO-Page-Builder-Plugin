@@ -273,6 +273,13 @@ final class Section_Template_Detail_Screen {
 		if ( $this->container && $this->container->has( 'library_lpagery_compatibility_service' ) ) {
 			$lpagery_compatibility = $this->container->get( 'library_lpagery_compatibility_service' );
 		}
+		$preview_cache = null;
+		if ( $this->container && $this->container->has( 'preview_cache_service' ) ) {
+			$preview_cache = $this->container->get( 'preview_cache_service' );
+		}
+		if ( $preview_cache !== null && ! $preview_cache instanceof \AIOPageBuilder\Domain\Preview\Preview_Cache_Service ) {
+			$preview_cache = null;
+		}
 
 		return new Section_Template_Detail_State_Builder(
 			$section_provider,
@@ -282,7 +289,8 @@ final class Section_Template_Detail_Screen {
 			$section_renderer,
 			$assembly_pipeline,
 			$blueprint_service,
-			$lpagery_compatibility
+			$lpagery_compatibility,
+			$preview_cache
 		);
 	}
 }

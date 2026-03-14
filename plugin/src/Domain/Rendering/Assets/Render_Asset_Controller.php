@@ -1,7 +1,8 @@
 <?php
 /**
- * Asset loading controls and requirement derivation for rendering (spec §7.7, §17).
+ * Asset loading controls and requirement derivation for rendering (spec §7.7, §17, §55.5, §55.8).
  * Declarative, bounded, selector-contract-aware. Does not enqueue or build assets.
+ * Preview contexts enforce asset budgets for list/detail to keep admin responsive.
  *
  * @package AIOPageBuilder
  */
@@ -25,6 +26,18 @@ final class Render_Asset_Controller {
 
 	/** Prefix for logical section asset handles. */
 	private const SECTION_HANDLE_PREFIX = 'aio-render-section-';
+
+	/** Preview context: list (directory row, compare cell). */
+	public const PREVIEW_CONTEXT_LIST = 'list';
+
+	/** Preview context: detail (single template full preview). */
+	public const PREVIEW_CONTEXT_DETAIL = 'detail';
+
+	/** Default max asset handles for list preview (spec §55.8). */
+	private const DEFAULT_MAX_HANDLES_PREVIEW_LIST = 12;
+
+	/** Default max asset handles for detail preview (spec §55.8). */
+	private const DEFAULT_MAX_HANDLES_PREVIEW_DETAIL = 60;
 
 	/**
 	 * Collects asset requirements from ordered section render results.
@@ -144,5 +157,28 @@ final class Render_Asset_Controller {
 			return false;
 		}
 		return false;
+	}
+
+	/**
+	 * Applies asset budget for preview contexts (list/detail). Trims requirements to max handles (spec §55.5, §55.8).
+	 *
+	 * @param list<Render_Asset_Requirements> $requirements    Full list from get_requirements_from_sections or get_requirements_from_assembly.
+	 * @param string                          $preview_context PREVIEW_CONTEXT_LIST | PREVIEW_CONTEXT_DETAIL.
+	 * @param int                             $max_handles     Optional. 0 = use default for context.
+	 * @return list<Render_Asset_Requirements>
+	 */
+	public function apply_preview_asset_budget( array $requirements, string $preview_context, int $max_handles = 0 ): array {
+		if ( $max_handles <= 0 ) {
+			$max_handles = $preview_context === self::PREVIEW_CONTEXT_DETAIL
+				? self::DEFAULT_MAX_HANDLES_PREVIEW_DETAIL
+				: self::DEFAULT_MAX_HANDLES_PREVIEW_LIST;
+		}
+		$list = array();
+		foreach ( $requirements as $req ) {
+			if ( $req instanceof Render_Asset_Requirements ) {
+				$list[] = $req;
+			}
+		}
+		return \array_slice( $list, 0, $max_handles );
 	}
 }
