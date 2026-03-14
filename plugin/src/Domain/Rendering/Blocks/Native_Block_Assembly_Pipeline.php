@@ -172,6 +172,7 @@ final class Native_Block_Assembly_Pipeline {
 
 	/**
 	 * Maps field values to semantic HTML (h2 for headline/title, p for rest). Escapes output.
+	 * field_values may already be omission-filtered by Smart_Omission_Service in the section renderer (smart-omission-rendering-contract).
 	 * When form_provider_registry is set and field_values contains form_provider + form_id, emits form shortcode (form-provider-integration-contract.md).
 	 *
 	 * @param array<string, mixed> $field_values

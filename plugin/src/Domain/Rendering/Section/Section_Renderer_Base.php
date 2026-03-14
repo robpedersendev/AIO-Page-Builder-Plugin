@@ -2,6 +2,7 @@
 /**
  * Base section renderer: transforms validated section context into render-ready structure (spec §17, §12, css-selector-contract).
  * Produces Section_Render_Result only; no block serialization or page assembly.
+ * When Smart_Omission_Service is provided, applies smart omission to field_values (smart-omission-rendering-contract).
  *
  * @package AIOPageBuilder
  */
@@ -12,7 +13,9 @@ namespace AIOPageBuilder\Domain\Rendering\Section;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
+use AIOPageBuilder\Domain\Rendering\Omission\Smart_Omission_Service;
 
 /**
  * Transforms Section_Render_Context into Section_Render_Result.
@@ -22,6 +25,13 @@ final class Section_Renderer_Base {
 
 	/** Class prefix per css-selector-contract. */
 	private const PREFIX = 'aio-';
+
+	/** @var Smart_Omission_Service|null */
+	private ?Smart_Omission_Service $omission_service;
+
+	public function __construct( ?Smart_Omission_Service $omission_service = null ) {
+		$this->omission_service = $omission_service;
+	}
 
 	/** Section wrapper class pattern: aio-s-{section_key}. */
 	private const WRAPPER_CLASS_PATTERN = 'aio-s-%s';
@@ -104,13 +114,58 @@ final class Section_Renderer_Base {
 			'accessibility_notes'  => $accessibility_notes,
 		);
 
+		$field_values = $context->get_field_values();
+		$omission_result = null;
+
+		if ( $this->omission_service !== null ) {
+			$blueprint_raw = $definition[ Section_Field_Blueprint_Service::EMBEDDED_BLUEPRINT_KEY ] ?? null;
+			$eligibility = is_array( $blueprint_raw ) && ! empty( $blueprint_raw['fields'] )
+				? $this->omission_service->eligibility_from_blueprint( $blueprint_raw )
+				: array();
+			$cta_classification = (string) ( $definition['cta_classification'] ?? '' );
+			$primary_cta_key = $this->infer_primary_cta_key( $eligibility, $field_values );
+			$context_omission = array(
+				'section_key'       => $section_key,
+				'position'          => $position,
+				'is_cta_classified' => $cta_classification === 'primary_cta' || $cta_classification === 'contact_cta' || $cta_classification === 'cta',
+				'supplies_h1'       => $position === 0,
+				'primary_cta_key'   => $primary_cta_key,
+			);
+			$applied = $this->omission_service->apply( $field_values, $eligibility, $context_omission );
+			$field_values   = $applied['field_values'];
+			$omission_result = $applied['omission_result'];
+		}
+
 		return new Section_Render_Result(
 			$section_key,
 			$variant,
 			$position,
-			$context->get_field_values(),
+			$field_values,
 			$structure,
-			array()
+			array(),
+			$omission_result
 		);
+	}
+
+	/**
+	 * Infers primary CTA field key from eligibility (first cta role) or common names.
+	 *
+	 * @param array<string, array{optional: bool, role: string}> $eligibility
+	 * @param array<string, mixed>                               $field_values
+	 * @return string
+	 */
+	private function infer_primary_cta_key( array $eligibility, array $field_values ): string {
+		foreach ( $eligibility as $key => $el ) {
+			if ( is_array( $el ) && ( $el['role'] ?? '' ) === 'cta' ) {
+				return $key;
+			}
+		}
+		if ( array_key_exists( 'primary_cta', $field_values ) ) {
+			return 'primary_cta';
+		}
+		if ( array_key_exists( 'cta', $field_values ) ) {
+			return 'cta';
+		}
+		return '';
 	}
 }

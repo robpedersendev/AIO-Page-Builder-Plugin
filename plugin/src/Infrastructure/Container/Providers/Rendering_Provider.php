@@ -18,6 +18,7 @@ use AIOPageBuilder\Domain\Rendering\Diagnostics\Content_Survivability_Checker;
 use AIOPageBuilder\Domain\Rendering\Diagnostics\Rendering_Diagnostics_Service;
 use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
 use AIOPageBuilder\Domain\Rendering\LPagery\LPagery_Token_Compatibility_Service;
+use AIOPageBuilder\Domain\Rendering\Omission\Smart_Omission_Service;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiation_Payload_Builder;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiator;
 use AIOPageBuilder\Domain\Rendering\Preview\Render_Preview_Helper;
@@ -37,8 +38,12 @@ final class Rendering_Provider implements Service_Provider_Interface {
 			return new Section_Render_Context_Builder();
 		} );
 
-		$container->register( 'section_renderer_base', function (): Section_Renderer_Base {
-			return new Section_Renderer_Base();
+		$container->register( 'smart_omission_service', function (): Smart_Omission_Service {
+			return new Smart_Omission_Service();
+		} );
+
+		$container->register( 'section_renderer_base', function () use ( $container ): Section_Renderer_Base {
+			return new Section_Renderer_Base( $container->get( 'smart_omission_service' ) );
 		} );
 
 		$container->register( 'generateblocks_compatibility_layer', function (): GenerateBlocks_Compatibility_Layer {

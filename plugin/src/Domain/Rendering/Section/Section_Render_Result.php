@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Domain\Rendering\Section;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Rendering\Omission\Omission_Result;
+
 /**
  * Immutable value object. Payload keys are stable; do not rename.
  *
@@ -26,6 +28,7 @@ defined( 'ABSPATH' ) || exit;
  * - asset_hints: From section asset_declaration.
  * - accessibility_notes: Optional notes from section.
  * - errors: Non-empty when result is invalid; no payload use.
+ * - omission_result: Optional (smart-omission-rendering-contract); omitted/refused/fallbacks for tests and debugging.
  *
  * Example render-ready section payload (from to_array()):
  *
@@ -71,13 +74,17 @@ final class Section_Render_Result {
 	/** @var list<string> */
 	private array $errors;
 
+	/** @var Omission_Result|null */
+	private ?Omission_Result $omission_result;
+
 	/**
-	 * @param string                   $section_key   Section internal_key.
-	 * @param string                   $variant       Resolved variant key.
-	 * @param int                      $position      Zero-based position on page.
-	 * @param array<string, mixed>     $field_values  Sanitized field name => value.
-	 * @param array<string, mixed>     $structure     wrapper_attrs, selector_map, structural_nodes, structural_hint, asset_hints, accessibility_notes.
-	 * @param list<string>             $errors        Validation/render errors; non-empty when invalid.
+	 * @param string                   $section_key     Section internal_key.
+	 * @param string                   $variant         Resolved variant key.
+	 * @param int                      $position        Zero-based position on page.
+	 * @param array<string, mixed>     $field_values    Sanitized field name => value (may be omission-filtered).
+	 * @param array<string, mixed>     $structure       wrapper_attrs, selector_map, structural_nodes, structural_hint, asset_hints, accessibility_notes.
+	 * @param list<string>             $errors          Validation/render errors; non-empty when invalid.
+	 * @param Omission_Result|null     $omission_result Optional; set when Smart_Omission_Service was applied.
 	 */
 	public function __construct(
 		string $section_key,
@@ -85,14 +92,21 @@ final class Section_Render_Result {
 		int $position,
 		array $field_values,
 		array $structure,
-		array $errors = array()
+		array $errors = array(),
+		?Omission_Result $omission_result = null
 	) {
-		$this->section_key  = $section_key;
-		$this->variant      = $variant;
-		$this->position     = $position;
-		$this->field_values = $field_values;
-		$this->structure    = $structure;
-		$this->errors       = $errors;
+		$this->section_key     = $section_key;
+		$this->variant         = $variant;
+		$this->position        = $position;
+		$this->field_values    = $field_values;
+		$this->structure       = $structure;
+		$this->errors          = $errors;
+		$this->omission_result = $omission_result;
+	}
+
+	/** @return Omission_Result|null */
+	public function get_omission_result(): ?Omission_Result {
+		return $this->omission_result;
 	}
 
 	public function get_section_key(): string {
@@ -164,7 +178,7 @@ final class Section_Render_Result {
 	 * @return array<string, mixed>
 	 */
 	public function to_array(): array {
-		return array(
+		$out = array(
 			'section_key'        => $this->section_key,
 			'variant'            => $this->variant,
 			'position'           => $this->position,
@@ -177,5 +191,9 @@ final class Section_Render_Result {
 			'accessibility_notes' => $this->get_accessibility_notes(),
 			'errors'             => $this->errors,
 		);
+		if ( $this->omission_result !== null ) {
+			$out['omission_result'] = $this->omission_result->to_array();
+		}
+		return $out;
 	}
 }
