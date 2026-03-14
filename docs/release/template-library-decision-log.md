@@ -1,10 +1,14 @@
 # Template Library Decision Log
 
-**Spec**: §61.9 Decision Log Structure; §58.2 Template Registry Versioning; §12.14–12.15, §13.12–13.13.
+**Spec**: §61.9 Decision Log Structure; §58.2 Template Registry Versioning; §12.14–12.15, §13.12–13.13; §61.10 Escalation Rules.
 
 This log records major template-family and registry decisions. Each entry contains: Decision ID, Date, Owner, Status, Summary, Rationale, Alternatives considered, Impacted sections/templates, Effective version.
 
 **Status values**: proposed | approved | superseded | rejected.
+
+**Escalation:** Implementation issue → Technical Lead; product/scope → Product Owner; security/privacy → Product Owner + security reviewer; release-blocking → formal milestone review (spec §61.10). No critical unresolved issue may be silently carried into release.
+
+**How to append entries:** Use `Template_Deprecation_Service::build_decision_log_entry()` to generate a consistent payload; paste or sync the result into the Entries section below. See [template-ecosystem-maintenance-runbook.md](../operations/template-ecosystem-maintenance-runbook.md) §5.1.
 
 ---
 

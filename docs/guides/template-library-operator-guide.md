@@ -51,7 +51,7 @@ Under **AIO Page Builder**:
 
 - **Screen:** **AIO Page Builder → Template Compare** (`aio-page-builder-template-compare`).
 - **Type:** Section templates or Page templates (switcher at top).
-- **Compare list:** Stored in user meta (`_aio_compare_section_templates` or `_aio_compare_page_templates`). **Maximum 10 items** per type for performance; adding when full does not add.
+- **Compare list:** Stored in user meta (site-scoped in multisite; see [template-ecosystem-multisite-site-isolation-report.md](../qa/template-ecosystem-multisite-site-isolation-report.md)). **Maximum 10 items** per type for performance; adding when full does not add.
 - **Adding/removing:** From directory rows or detail screen: **Add to compare** / **Remove from compare**. URLs use nonce; list updates on load.
 - **Content:** Side-by-side metadata and compact preview excerpts. **Observational only** — no execution, no Build Plan mutation, no apply-to-page.
 - **Links:** Quick links to Section Templates directory and Page Templates directory.
@@ -114,7 +114,20 @@ Under **AIO Page Builder**:
 
 ---
 
-## 10. Cross-references
+## 10. Maintenance and release (operators and maintainers)
+
+Template ecosystem maintenance is **revision-driven, decision-logged, appendix-aware, and compliance-gated**. Day-to-day operation (browse, compare, preview, compose) is covered above; the following apply when **adding, deprecating, or versioning** templates or preparing a release:
+
+| Need | Doc |
+|------|-----|
+| How to add/deprecate/version templates safely; regenerate appendices; run compliance/accessibility/animation reports; escalation; decision log and changelog | [template-ecosystem-maintenance-runbook.md](../operations/template-ecosystem-maintenance-runbook.md) |
+| Pre-release appendix regen, compliance gate, sign-off, release notes, and post-release evidence | [template-ecosystem-release-sop.md](../operations/template-ecosystem-release-sop.md) |
+
+No shortcut may silently override the approved architecture; changes that affect governed rules or inventory must follow the runbook and SOP.
+
+---
+
+## 11. Cross-references
 
 | Need | Doc or screen |
 |------|----------------|
@@ -126,7 +139,7 @@ Under **AIO Page Builder**:
 
 ---
 
-## 11. Limitations (do not assume otherwise)
+## 12. Limitations (do not assume otherwise)
 
 - **Compare:** Observational only; no "apply to page" or "use in plan" from compare screen. Use Build Plans to select and execute.
 - **Detail:** No edit-in-place of template definition from the detail screen; definitions are registry/CPT-backed and updated through governed flows.
