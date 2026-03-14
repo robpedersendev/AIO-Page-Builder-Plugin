@@ -160,13 +160,14 @@ final class Demo_Fixture_Generator_Test extends TestCase {
 			'message'   => 'Demo fixture generation completed. All data is synthetic.',
 			'synthetic' => true,
 			'counts'    => array(
-				'registries'     => 5,
-				'profile'        => 1,
-				'crawl_summary'  => 2,
-				'ai_runs'        => 1,
-				'build_plans'    => 1,
-				'logs'           => 2,
-				'export_example' => 1,
+				'registries'          => 5,
+				'profile'             => 1,
+				'crawl_summary'        => 2,
+				'ai_runs'              => 1,
+				'build_plans'          => 1,
+				'logs'                 => 2,
+				'export_example'       => 1,
+				'template_showcase'    => 0,
 			),
 			'summary' => array(
 				'seed_result' => array(

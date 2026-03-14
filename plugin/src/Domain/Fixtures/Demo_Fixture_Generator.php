@@ -45,26 +45,28 @@ final class Demo_Fixture_Generator {
 	/**
 	 * Runs full fixture generation and returns a result with counts and summary.
 	 *
-	 * @param array{include_registries?: bool, include_profile?: bool, include_crawl?: bool, include_ai_runs?: bool, include_build_plans?: bool, include_logs?: bool, include_export?: bool} $options Optional flags to include/exclude domains (default all true).
+	 * @param array{include_registries?: bool, include_profile?: bool, include_crawl?: bool, include_ai_runs?: bool, include_build_plans?: bool, include_logs?: bool, include_export?: bool, include_template_showcase?: bool} $options Optional flags to include/exclude domains (default all true).
 	 * @return Demo_Fixture_Result
 	 */
 	public function generate( array $options = array() ): Demo_Fixture_Result {
-		$include_registries   = $options['include_registries'] ?? true;
-		$include_profile      = $options['include_profile'] ?? true;
-		$include_crawl        = $options['include_crawl'] ?? true;
-		$include_ai_runs      = $options['include_ai_runs'] ?? true;
-		$include_build_plans  = $options['include_build_plans'] ?? true;
-		$include_logs         = $options['include_logs'] ?? true;
-		$include_export       = $options['include_export'] ?? true;
+		$include_registries        = $options['include_registries'] ?? true;
+		$include_profile           = $options['include_profile'] ?? true;
+		$include_crawl             = $options['include_crawl'] ?? true;
+		$include_ai_runs           = $options['include_ai_runs'] ?? true;
+		$include_build_plans       = $options['include_build_plans'] ?? true;
+		$include_logs              = $options['include_logs'] ?? true;
+		$include_export            = $options['include_export'] ?? true;
+		$include_template_showcase = $options['include_template_showcase'] ?? false;
 
 		$counts  = array(
-			'registries'     => 0,
-			'profile'        => 0,
-			'crawl_summary'   => 0,
-			'ai_runs'        => 0,
-			'build_plans'     => 0,
-			'logs'           => 0,
-			'export_example'  => 0,
+			'registries'          => 0,
+			'profile'             => 0,
+			'crawl_summary'        => 0,
+			'ai_runs'              => 0,
+			'build_plans'          => 0,
+			'logs'                 => 0,
+			'export_example'       => 0,
+			'template_showcase'    => 0,
 		);
 		$payload = array(
 			'seed_result' => array(
@@ -114,6 +116,16 @@ final class Demo_Fixture_Generator {
 			$export = $this->get_export_example();
 			$counts['export_example'] = 1;
 			$payload['export_example'] = $this->tag_synthetic( $export );
+		}
+
+		if ( $include_template_showcase ) {
+			$showcase_gen = new Template_Showcase_Fixture_Generator();
+			$showcase     = $showcase_gen->generate();
+			$counts['template_showcase'] = ( $showcase['manifest']['counts']['sections'] ?? 0 )
+				+ ( $showcase['manifest']['counts']['page_templates'] ?? 0 )
+				+ ( $showcase['manifest']['counts']['compositions'] ?? 0 )
+				+ ( $showcase['manifest']['counts']['build_plan_recommendation_items'] ?? 0 );
+			$payload['template_showcase'] = $this->tag_synthetic( $showcase );
 		}
 
 		return new Demo_Fixture_Result(
