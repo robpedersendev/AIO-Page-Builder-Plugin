@@ -315,6 +315,7 @@ The following are **example** filled rows showing how a future prompt will prove
 - **Release gate:** [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) — waivers and sign-off process; [template-library-coverage-matrix.md](../contracts/template-library-coverage-matrix.md) — count and category targets.
 - **Automated pass (Prompt 176):** [template-library-automated-compliance-report.md](template-library-automated-compliance-report.md) — executable validation and result payload; `Template_Library_Compliance_Service` implements this matrix as the library-wide enforcement gate.
 - **Semantic/accessibility audit (Prompt 186):** [template-library-accessibility-audit-report.md](template-library-accessibility-audit-report.md) — machine-checkable semantic, accessibility, and CTA rules over section and page registries; `Template_Accessibility_Audit_Service`; evidence for SEMANTIC/CTA families and §56.6.
+- **Animation/fallback QA (Prompt 187):** [template-library-animation-fallback-report.md](template-library-animation-fallback-report.md) — animation tier/fallback metadata and reduced-motion resolution at library scale; `Animation_QA_Service`; evidence for ANIMATION family and §59.14.
 
 ---
 

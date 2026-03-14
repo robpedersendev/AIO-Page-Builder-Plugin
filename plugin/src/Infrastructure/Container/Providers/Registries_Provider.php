@@ -25,6 +25,7 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer;
 use AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Validator;
+use AIOPageBuilder\Domain\Registries\QA\Animation_QA_Service;
 use AIOPageBuilder\Domain\Registries\QA\Template_Accessibility_Audit_Service;
 use AIOPageBuilder\Domain\Registries\QA\Template_Library_Compliance_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
@@ -155,6 +156,14 @@ final class Registries_Provider implements Service_Provider_Interface {
 			return new Template_Accessibility_Audit_Service(
 				$container->get( 'section_template_repository' ),
 				$container->get( 'page_template_repository' )
+			);
+		} );
+		$container->register( 'animation_qa_service', function () use ( $container ): Animation_QA_Service {
+			return new Animation_QA_Service(
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' ),
+				$container->get( 'animation_fallback_service' ),
+				$container->get( 'animation_tier_resolver' )
 			);
 		} );
 		$container->register( 'template_compare_state_builder', function () use ( $container ): Template_Compare_State_Builder {

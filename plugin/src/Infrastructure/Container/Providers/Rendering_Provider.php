@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\Rendering\Assets\Render_Asset_Controller;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Diagnostics\Content_Survivability_Checker;
 use AIOPageBuilder\Domain\Rendering\Diagnostics\Rendering_Diagnostics_Service;
+use AIOPageBuilder\Domain\Rendering\Animation\Animation_Fallback_Service;
 use AIOPageBuilder\Domain\Rendering\Animation\Animation_Tier_Resolver;
 use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
 use AIOPageBuilder\Domain\Rendering\LPagery\Library_LPagery_Compatibility_Service;
@@ -42,6 +43,10 @@ final class Rendering_Provider implements Service_Provider_Interface {
 
 		$container->register( 'smart_omission_service', function (): Smart_Omission_Service {
 			return new Smart_Omission_Service();
+		} );
+
+		$container->register( 'animation_fallback_service', function (): Animation_Fallback_Service {
+			return new Animation_Fallback_Service();
 		} );
 
 		$container->register( 'animation_tier_resolver', function (): Animation_Tier_Resolver {
