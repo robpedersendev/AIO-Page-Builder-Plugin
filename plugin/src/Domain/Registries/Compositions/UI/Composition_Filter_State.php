@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Domain\Registries\Compositions\UI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
+
 /**
  * Immutable filter state for large-library section selection during composition assembly.
  */
@@ -58,7 +60,7 @@ final class Composition_Filter_State {
 		$this->search             = $search;
 		$this->status             = $status;
 		$this->paged              = max( 1, $paged );
-		$this->per_page           = max( 1, min( 100, $per_page ) );
+		$this->per_page           = max( 1, min( Large_Library_Query_Service::MAX_PER_PAGE, $per_page ) );
 	}
 
 	public function get_purpose_family(): string {

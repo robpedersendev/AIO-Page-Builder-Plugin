@@ -64,7 +64,7 @@ final class Section_Template_Directory_State_Builder {
 		$status              = isset( $request_params['status'] ) ? \sanitize_key( (string) $request_params['status'] ) : '';
 		$search              = isset( $request_params['search'] ) ? \sanitize_text_field( (string) $request_params['search'] ) : '';
 		$paged               = isset( $request_params['paged'] ) ? max( 1, (int) $request_params['paged'] ) : 1;
-		$per_page            = isset( $request_params['per_page'] ) ? max( 1, min( 100, (int) $request_params['per_page'] ) ) : Large_Library_Query_Service::DEFAULT_PER_PAGE;
+		$per_page            = isset( $request_params['per_page'] ) ? max( 1, min( Large_Library_Query_Service::MAX_PER_PAGE, (int) $request_params['per_page'] ) ) : Large_Library_Query_Service::DEFAULT_PER_PAGE;
 
 		$base_url = \admin_url( 'admin.php?page=' . self::SCREEN_SLUG );
 

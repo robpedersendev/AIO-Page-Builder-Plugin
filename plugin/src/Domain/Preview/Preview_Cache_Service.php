@@ -160,6 +160,24 @@ final class Preview_Cache_Service {
 	}
 
 	/**
+	 * Returns the configured maximum cache entries (for performance reporting; Prompt 188).
+	 *
+	 * @return int
+	 */
+	public function get_max_entries(): int {
+		return $this->max_entries;
+	}
+
+	/**
+	 * Returns the current number of cache entries (for QA/performance report; internal only).
+	 *
+	 * @return int
+	 */
+	public function get_cache_entry_count(): int {
+		return count( $this->load_store() );
+	}
+
+	/**
 	 * @return array<string, array<string, mixed>>
 	 */
 	private function load_store(): array {

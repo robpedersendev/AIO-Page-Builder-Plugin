@@ -2,6 +2,7 @@
 /**
  * Template Compare workspace: side-by-side comparison of section or page templates (Prompt 180, spec §49.6, §49.7, §50.1–50.3).
  * Observational only; no execution, Build Plan mutation, or apply-to-page flow. Compare-list stored in user meta.
+ * Compare list size capped at Template_Compare_State_Builder::MAX_COMPARE_ITEMS (10) for performance (Prompt 188, template-admin-performance-hardening-report).
  *
  * @package AIOPageBuilder
  */

@@ -127,4 +127,20 @@ final class Preview_Cache_Service_Test extends TestCase {
 		$this->assertSame( 'none', $cached->get_animation_tier() );
 		$this->service->invalidate_all();
 	}
+
+	/** get_max_entries and get_cache_entry_count for performance reporting (Prompt 188). */
+	public function test_get_max_entries_returns_configured_value(): void {
+		$this->assertSame( 800, $this->service->get_max_entries() );
+		$small = new Preview_Cache_Service( 100 );
+		$this->assertSame( 100, $small->get_max_entries() );
+	}
+
+	public function test_get_cache_entry_count_reflects_store(): void {
+		$this->service->invalidate_all();
+		$this->assertSame( 0, $this->service->get_cache_entry_count() );
+		$record = new Preview_Cache_Record( 'aio_preview_count', Preview_Cache_Record::TYPE_SECTION, 'st_x', 'v1', '<div>x</div>', \time(), false, 'none' );
+		$this->service->set( $record );
+		$this->assertSame( 1, $this->service->get_cache_entry_count() );
+		$this->service->invalidate_all();
+	}
 }

@@ -25,6 +25,7 @@ final class Compositions_Screen {
 
 	public const SLUG = 'aio-page-builder-compositions';
 
+	/** List view cap for performance at scale (Prompt 188, template-admin-performance-hardening-report). */
 	private const LIST_LIMIT = 100;
 
 	/** @var Service_Container|null */

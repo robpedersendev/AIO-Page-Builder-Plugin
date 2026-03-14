@@ -362,6 +362,39 @@ final class Large_Library_Query_Test extends TestCase {
 		$this->assertSame( 'pt_landing', $result->get_rows()[0]['internal_key'] );
 	}
 
+	/**
+	 * Per-page is clamped to MAX_PER_PAGE so directory never returns more than 50 rows (Prompt 188).
+	 */
+	public function test_per_page_clamped_to_max_per_page(): void {
+		$posts = array();
+		$meta  = array();
+		for ( $i = 0; $i < 80; $i++ ) {
+			$def = $this->minimal_section_definition( 'st_' . $i, 'hero_intro' );
+			$id  = 13000 + $i;
+			$posts[] = new \WP_Post( array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+				'post_title'  => $def['name'],
+				'post_status' => 'publish',
+				'post_name'   => $def['internal_key'],
+			) );
+			$meta[ (string) $id ] = array(
+				'_aio_internal_key'       => $def['internal_key'],
+				'_aio_status'             => $def['status'],
+				'_aio_section_definition' => wp_json_encode( $def ),
+			);
+		}
+		$GLOBALS['_aio_wp_query_posts'] = $posts;
+		$GLOBALS['_aio_post_meta']      = $meta;
+
+		$result = $this->query_service->query_sections( array(), 1, 100 );
+		$this->assertSame( 80, $result->get_total_matching() );
+		$this->assertLessThanOrEqual( Large_Library_Query_Service::MAX_PER_PAGE, count( $result->get_rows() ) );
+		$this->assertSame( Large_Library_Query_Service::MAX_PER_PAGE, $result->get_pagination()->get_per_page() );
+		$rows = $result->get_rows();
+		$this->assertCount( 50, $rows );
+	}
+
 	public function test_large_result_stability_many_sections(): void {
 		$posts = array();
 		$meta  = array();

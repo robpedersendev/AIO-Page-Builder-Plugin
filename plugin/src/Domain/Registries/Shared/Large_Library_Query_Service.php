@@ -26,8 +26,11 @@ final class Large_Library_Query_Service {
 	/** Max definitions to load in memory for filtering (spec §55.8). */
 	public const MAX_LIBRARY_LOAD = 1000;
 
-	/** Default per-page size for directory views. */
+	/** Default per-page size for directory views (spec §55.8). */
 	public const DEFAULT_PER_PAGE = 25;
+
+	/** Maximum per-page for directory/list requests to keep admin responsive at scale (Prompt 188). */
+	public const MAX_PER_PAGE = 50;
 
 	/** Filter key: status (section or page). */
 	public const FILTER_STATUS = 'status';
@@ -85,6 +88,7 @@ final class Large_Library_Query_Service {
 	 * @return Large_Library_Filter_Result
 	 */
 	public function query_sections( array $filters, int $page = 1, int $per_page = self::DEFAULT_PER_PAGE ): Large_Library_Filter_Result {
+		$per_page = min( max( 1, $per_page ), self::MAX_PER_PAGE );
 		$all    = $this->section_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
 		$filtered = $this->filter_sections( $all, $filters );
 		$total   = count( $filtered );
@@ -104,6 +108,7 @@ final class Large_Library_Query_Service {
 	 * @return Large_Library_Filter_Result
 	 */
 	public function query_page_templates( array $filters, int $page = 1, int $per_page = self::DEFAULT_PER_PAGE ): Large_Library_Filter_Result {
+		$per_page = min( max( 1, $per_page ), self::MAX_PER_PAGE );
 		$all     = $this->page_template_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
 		$filtered = $this->filter_page_templates( $all, $filters );
 		$total   = count( $filtered );

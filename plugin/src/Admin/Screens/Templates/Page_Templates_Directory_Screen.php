@@ -57,7 +57,7 @@ final class Page_Templates_Directory_Screen {
 			'status'         => isset( $_GET['status'] ) ? \sanitize_key( (string) $_GET['status'] ) : '',
 			'search'         => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['search'] ) ) : '',
 			'paged'          => isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1,
-			'per_page'       => isset( $_GET['per_page'] ) ? max( 1, min( 100, (int) $_GET['per_page'] ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
+			'per_page'       => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $_GET['per_page'] ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
 		);
 		$state = $state_builder->build_state( $request );
 
