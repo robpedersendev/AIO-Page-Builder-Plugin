@@ -50,6 +50,12 @@ A section template that uses **form_provider** and **form_id** to reference an e
 **request-form page template**  
 A page template that includes one or more provider-backed form sections in its ordered_section_keys (e.g. `pt_request_form`). Structure is defined in the page template registry; the form provider does not define page structure.
 
+**form provider picker adapter**  
+Per-provider contract (Form_Provider_Picker_Adapter_Interface) for admin UI: display label, availability, optional form-list API, normalized picker items, stale-item reporting, and fallback when no list. See [form-provider-picker-adapter-contract.md](../contracts/form-provider-picker-adapter-contract.md).
+
+**form provider discovery**  
+Form_Provider_Picker_Discovery_Service: resolves which providers support the picker contract and returns normalized, sanitized state (dropdown vs manual form_id entry). Capability checks are the caller’s responsibility.
+
 ---
 
 ## CTA-law and compliance terms

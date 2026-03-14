@@ -11,6 +11,7 @@
 ### Added
 - (Add items as work completes.)
 - **Template library:** For expansion counts, screens, compatibility, and limitations, see [template-library-release-notes-addendum.md](template-library-release-notes-addendum.md).
+- **Form provider integration:** Provider-backed form sections (category form_embed) and request-form page template (`pt_request_form`). Form_Provider_Registry (provider_id + form_id); shortcode assembly; Build Plan/execution dependency validation (block when provider missing); finalization form_dependency; security validation and hardening; E2E acceptance structure. Operator guide: [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md). Release gate and extension backlog: [form-provider-integration-review-packet.md](form-provider-integration-review-packet.md), [form-provider-extension-backlog.md](form-provider-extension-backlog.md).
 
 ### Changed
 - (None.)

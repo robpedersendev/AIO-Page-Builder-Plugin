@@ -34,7 +34,7 @@ Under **AIO Page Builder**:
 - **Breadcrumbs:** Navigate back up the hierarchy.
 - **Actions per row:** **View** (detail), **Add to compare** / **Remove from compare**, helper-doc link when template has a helper reference.
 - **No execution:** Directory is observational. Building pages happens from Build Plans, not from this screen.
-- **Form sections:** Section templates with category **form_embed** (e.g. Form section) embed a form from a registered provider. On the **Section Template Detail** screen, a **Form binding** panel shows the current form provider, form identifier, and shortcode preview when valid. Set form_provider and form_id when editing a page that uses the form section (ACF fields). See [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md).
+- **Form sections:** Section templates with category **form_embed** (e.g. Form section) embed a form from a registered provider. On the **Section Template Detail** screen, a **Form binding** panel shows the current form provider, form identifier, and shortcode preview when valid. Set form_provider and form_id when editing a page that uses the form section (ACF fields). See [form-provider-operator-guide.md](form-provider-operator-guide.md) and [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md).
 
 ---
 

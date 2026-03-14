@@ -230,6 +230,7 @@ Provider-backed form sections store which form to render using two stable ACF fi
 | form_embed | string (section category) | Section template category for sections whose primary content is an embedded form. Provider-backed variant uses form_provider + form_id. |
 | Page-template aggregation | ordered_section_keys | Request-form page template (e.g. `pt_request_form`) includes provider-backed form section(s) in ordered_section_keys like any other section. |
 | Export/import | Registry + content | Form references persist via section/page definitions and ACF field values; no separate form-reference export schema. |
+| Picker adapter (additive) | Non-canonical | Form_Provider_Picker_Discovery_Service and Form_Provider_Picker_Adapter_Interface expose provider display label, availability, optional form list, and fallback entry label for UI. Canonical storage remains form_provider and form_id. See [form-provider-picker-adapter-contract.md](../contracts/form-provider-picker-adapter-contract.md). |
 
 ---
 

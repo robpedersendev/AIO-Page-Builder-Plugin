@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
+use AIOPageBuilder\Domain\Integrations\FormProviders\Form_Provider_Picker_Discovery_Service;
+use AIOPageBuilder\Domain\Integrations\FormProviders\Ndr_Form_Provider_Picker_Adapter;
 use AIOPageBuilder\Domain\Rendering\Assets\Render_Asset_Controller;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Diagnostics\Content_Survivability_Checker;
@@ -66,6 +68,12 @@ final class Rendering_Provider implements Service_Provider_Interface {
 
 		$container->register( 'form_provider_registry', function (): Form_Provider_Registry {
 			return new Form_Provider_Registry();
+		} );
+
+		$container->register( 'form_provider_picker_discovery', function () use ( $container ): Form_Provider_Picker_Discovery_Service {
+			$registry = $container->get( 'form_provider_registry' );
+			$ndr      = new Ndr_Form_Provider_Picker_Adapter( $registry );
+			return new Form_Provider_Picker_Discovery_Service( $registry, array( $ndr->get_provider_key() => $ndr ) );
 		} );
 
 		$container->register( 'native_block_assembly_pipeline', function () use ( $container ): Native_Block_Assembly_Pipeline {

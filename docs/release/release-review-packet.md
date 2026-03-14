@@ -81,6 +81,14 @@
 | Sign-off (expansion-specific) | Criteria and role approval for template-library expansion only. | [template-library-expansion-sign-off-checklist.md](template-library-expansion-sign-off-checklist.md). |
 | Packaging and approval addendum | Template-library packaging completeness and go/no-go runbook for the expansion. | [template-library-release-candidate-addendum.md](template-library-release-candidate-addendum.md). |
 
+### 2.8 Form provider integration (extension pack)
+
+| Area | Summary | Artifact |
+|------|---------|----------|
+| Release gate and evidence | Form provider release checklist; UI, functionality, security, diagnostics, export/restore, docs, acceptance. | [form-provider-integration-review-packet.md](form-provider-integration-review-packet.md). |
+| Operator and support | Operator guide; support references; known-risk FPR-1, FPR-2. | [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md); [template-library-support-guide.md](../guides/template-library-support-guide.md); [known-risk-register.md](known-risk-register.md). |
+| Extension backlog | Next-wave prompts (additional providers, form-list API, auto-provisioning, survivability, maintenance). | [form-provider-extension-backlog.md](form-provider-extension-backlog.md). |
+
 ---
 
 ## 3. Unresolved and waived items
