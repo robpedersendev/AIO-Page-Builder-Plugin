@@ -98,6 +98,8 @@ Execute **after** the main [final-approval-runbook.md](final-approval-runbook.md
 | [template-library-expansion-review-packet.md](template-library-expansion-review-packet.md) | Expansion evidence (counts, category, CTA, preview, appendix, a11y, performance, versioning, planner). |
 | [template-library-expansion-sign-off-checklist.md](template-library-expansion-sign-off-checklist.md) | Expansion-specific criteria and role approval. |
 | [known-risk-register.md](known-risk-register.md) | TLE-1–TLE-4 and addendum reference. |
+| [template-ecosystem-archived-evidence-index.md](template-ecosystem-archived-evidence-index.md) | Final closure bundle: index of all archived evidence for audit and maintenance. |
+| [template-ecosystem-final-closure-summary.md](template-ecosystem-final-closure-summary.md) | Final closure summary: what was built, validated, approved; unresolved/waived/deferred explicit. |
 
 ---
 

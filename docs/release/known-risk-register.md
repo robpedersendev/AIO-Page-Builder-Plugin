@@ -48,6 +48,7 @@ Use this section for risks or limitations specific to a release (e.g. "Export of
 - **Compatibility / migration:** [compatibility-matrix.md](../qa/compatibility-matrix.md), [migration-coverage-matrix.md](../qa/migration-coverage-matrix.md).
 - **Release notes / changelog:** [release-notes-rc1.md](release-notes-rc1.md), [changelog.md](changelog.md) (operator-facing release content; do not duplicate internal risk detail here).
 - **Template library release addendum:** [template-library-release-notes-addendum.md](template-library-release-notes-addendum.md) (counts, screens, compatibility, migration, limitations).
+- **Template ecosystem closure bundle:** [template-ecosystem-archived-evidence-index.md](template-ecosystem-archived-evidence-index.md) (index of all archived evidence); [template-ecosystem-final-closure-summary.md](template-ecosystem-final-closure-summary.md) (closure summary; unresolved items marked waived, deferred, or blocked). Use for internal audit and future maintenance.
 
 ---
 

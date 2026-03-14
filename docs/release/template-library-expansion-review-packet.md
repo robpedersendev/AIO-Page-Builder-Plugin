@@ -91,6 +91,8 @@
 
 ## 8. Evidence completeness and traceability
 
+**Final closure bundle:** All evidence for the expanded template ecosystem is archived and indexed for internal audit and future maintenance. See [template-ecosystem-archived-evidence-index.md](template-ecosystem-archived-evidence-index.md) (full artifact index) and [template-ecosystem-final-closure-summary.md](template-ecosystem-final-closure-summary.md) (closure summary, including unresolved/waived/deferred). Unresolved issues must be explicitly marked in the sign-off checklist or closure summary; no false completion claims.
+
 | Required artifact | Location | Linked |
 |-------------------|----------|--------|
 | Coverage matrix | [template-library-coverage-matrix.md](../contracts/template-library-coverage-matrix.md) | §2 |
@@ -102,6 +104,8 @@
 | Template library decision log | [template-library-decision-log.md](template-library-decision-log.md) | §7 |
 | Section / page inventory appendices | [section-template-inventory.md](../appendices/section-template-inventory.md), [page-template-inventory.md](../appendices/page-template-inventory.md) | §4 |
 | Sign-off checklist (expansion-specific) | [template-library-expansion-sign-off-checklist.md](template-library-expansion-sign-off-checklist.md) | — |
+| Archived evidence index (closure bundle) | [template-ecosystem-archived-evidence-index.md](template-ecosystem-archived-evidence-index.md) | §8 |
+| Final closure summary | [template-ecosystem-final-closure-summary.md](template-ecosystem-final-closure-summary.md) | §8 |
 
 **Rule:** Every unresolved issue for this expansion must be explicitly marked **Blocked**, **Waived** (with waiver_id), or **Fixed** in the sign-off checklist. No silent waivers.
 
