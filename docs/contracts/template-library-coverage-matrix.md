@@ -272,15 +272,15 @@ Later prompts (e.g. batch-generation or QA) **fill** this worksheet to prove cat
 
 ### 8.2 Page template worksheet
 
-*Updated after Prompt 167 (page-template batch validation). Actual counts from PT-01 through PT-13; total 225. Evidence: page-template-batch-validation-report.md, unit tests.*
+*Updated after Prompt 183 (PT-14 gap-closing super-batch). Actual counts from PT-01–PT-13 (225) + PT-14 (355); total 580. Evidence: unit tests, Page_Template_Gap_Closing_Super_Batch_Test.*
 
 | template_category_class | Minimum | Actual | Meets |
 |-------------------------|---------|--------|-------|
-| top_level | 80 | 77 | ☐ |
-| hub | 120 | 43 | ☐ |
-| nested_hub | 100 | 29 | ☐ |
-| child_detail | 200 | 76 | ☐ |
-| **Total pages** | **≥ 500** | **225** | ☐ |
+| top_level | 80 | 147 | ☑ |
+| hub | 120 | 123 | ☑ |
+| nested_hub | 100 | 104 | ☑ |
+| child_detail | 200 | 206 | ☑ |
+| **Total pages** | **≥ 500** | **580** | ☑ |
 
 | template_family | Minimum | Actual | Meets |
 |-----------------|---------|--------|-------|

@@ -175,7 +175,7 @@ Later prompts use this worksheet to **mark completion by batch** and by family/c
 
 ### 7.2 Page batch progress
 
-*Updated after Prompt 167 (page-template batch validation). Actual counts from Definitions; total 225. Target ≥ 500.*
+*Updated after Prompt 183 (PT-14 gap-closing super-batch). Actual counts from Definitions; total 580 (225 prior + 355 PT-14). Target ≥ 500.*
 
 | Batch ID | Scope | Count target | Actual | Done |
 |----------|-------|--------------|--------|------|
@@ -192,7 +192,8 @@ Later prompts use this worksheet to **mark completion by batch** and by family/c
 | PT-11 | top_level variant expansion | — | 41 | ☑ |
 | PT-12 | hub + nested_hub variant expansion | — | 27 | ☑ |
 | PT-13 | child_detail variant expansion | — | 30 | ☑ |
-| **Total pages** | | **≥ 500** | **225** | ☐ |
+| PT-14 | gap-closing (balance to 500) | to 500 total | 355 | ☑ |
+| **Total pages** | | **≥ 500** | **580** (225 prior + 355 PT-14) | ☑ |
 
 ### 7.3 Dependency and quality checklist
 
@@ -268,3 +269,4 @@ Regenerate after library expansion batches or taxonomy changes. Required fields 
 | 2 | Prompt 154 | Section batch progress §7.1 and §7.3 updated with actual counts and done checkmarks for SEC-01–SEC-08; SEC-04 satisfied by SEC-08 CTA super-library. |
 | 3 | Prompt 167 | Page batch progress §7.2 updated with actual counts for PT-01–PT-13 (225 total); §7.3 dependency checklist updated for page taxonomy and CTA sequencing. |
 | 4 | Prompt 182 | Section batch progress §7.1: SEC-09 Actual 134, Done ☑; Total sections 254, Done ☑. Gap-closing super-batch (SEC-09) seeds via Lifecycle_Manager. |
+| 5 | Prompt 183 | Page batch progress §7.2: PT-14 Actual 355, Done ☑; Total pages 580, Done ☑. Gap-closing super-batch (PT-14) seeds via Lifecycle_Manager. |

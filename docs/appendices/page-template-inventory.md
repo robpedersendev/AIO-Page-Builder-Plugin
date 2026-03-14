@@ -4,7 +4,7 @@
 
 This appendix is **generated** from the live page template registry. Do not edit by hand; regenerate after library changes (see `Page_Template_Inventory_Appendix_Generator`).
 
-**Total page templates**: *(run generator to refresh)*
+**Total page templates**: *(run generator to refresh; after PT-14 gap-closing batch expect 580)*
 
 ---
 

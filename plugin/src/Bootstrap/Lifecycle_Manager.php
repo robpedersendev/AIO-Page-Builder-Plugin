@@ -102,6 +102,7 @@ final class Lifecycle_Manager {
 			'seed_section_expansion_pack',
 			'seed_section_gap_closing_batch',
 			'seed_page_composition_expansion_pack',
+			'seed_page_gap_closing_batch',
 			'install_notification_eligibility',
 			'first_run_redirect_readiness',
 		);
@@ -179,6 +180,8 @@ final class Lifecycle_Manager {
 				return $this->seed_section_gap_closing_batch();
 			case 'seed_page_composition_expansion_pack':
 				return $this->seed_page_composition_expansion_pack();
+			case 'seed_page_gap_closing_batch':
+				return $this->seed_page_gap_closing_batch();
 			default:
 				return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', $phase );
 		}
@@ -434,6 +437,38 @@ final class Lifecycle_Manager {
 				'page_template_ids'                      => $result['page_template_ids'],
 				'composition_ids'                        => $result['composition_ids'],
 				'errors'                                 => $result['errors'],
+			)
+		);
+	}
+
+	/**
+	 * Seeds the gap-closing page template super-batch PT-14 (Prompt 183). Runs after page composition expansion pack to reach 500-template minimum.
+	 *
+	 * @return Lifecycle_Result
+	 */
+	private function seed_page_gap_closing_batch(): Lifecycle_Result {
+		$base = __DIR__ . '/../Domain';
+		require_once $base . '/Storage/Repositories/Repository_Interface.php';
+		require_once $base . '/Storage/Objects/Object_Status_Families.php';
+		require_once $base . '/Storage/Repositories/Abstract_CPT_Repository.php';
+		require_once $base . '/Storage/Objects/Object_Type_Keys.php';
+		require_once $base . '/Registries/PageTemplate/Page_Template_Schema.php';
+		require_once $base . '/Storage/Repositories/Page_Template_Repository.php';
+		require_once $base . '/Registries/PageTemplate/GapClosingSuperBatch/Page_Template_Gap_Closing_Super_Batch_Definitions.php';
+		require_once $base . '/Registries/PageTemplate/GapClosingSuperBatch/Page_Template_Gap_Closing_Super_Batch_Seeder.php';
+
+		$page_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
+		$result    = \AIOPageBuilder\Domain\Registries\PageTemplate\GapClosingSuperBatch\Page_Template_Gap_Closing_Super_Batch_Seeder::run( $page_repo );
+
+		return new Lifecycle_Result(
+			Lifecycle_Result::STATUS_SUCCESS,
+			'',
+			'seed_page_gap_closing_batch',
+			array(
+				'gap_closing_seeded'   => $result['success'],
+				'page_template_ids'    => $result['page_template_ids'],
+				'errors'               => $result['errors'],
+				'template_keys'        => $result['template_keys'],
 			)
 		);
 	}
