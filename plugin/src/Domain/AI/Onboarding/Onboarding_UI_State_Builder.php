@@ -43,6 +43,7 @@ final class Onboarding_UI_State_Builder {
 			Onboarding_Step_Keys::EXISTING_SITE         => __( 'Existing Site', 'aio-page-builder' ),
 			Onboarding_Step_Keys::CRAWL_PREFERENCES     => __( 'Crawl Preferences', 'aio-page-builder' ),
 			Onboarding_Step_Keys::PROVIDER_SETUP        => __( 'AI Provider Setup', 'aio-page-builder' ),
+			Onboarding_Step_Keys::TEMPLATE_PREFERENCES   => __( 'Page & template preferences', 'aio-page-builder' ),
 			Onboarding_Step_Keys::REVIEW                => __( 'Review', 'aio-page-builder' ),
 			Onboarding_Step_Keys::SUBMISSION           => __( 'Submission', 'aio-page-builder' ),
 		);

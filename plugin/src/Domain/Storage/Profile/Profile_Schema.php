@@ -22,6 +22,9 @@ final class Profile_Schema {
 	/** Root key for current business profile (single object). */
 	public const ROOT_BUSINESS = 'business_profile';
 
+	/** Root key for template-style preference signals (Prompt 212; advisory only). */
+	public const ROOT_TEMPLATE_PREFERENCE_PROFILE = 'template_preference_profile';
+
 	/** Key for voice/tone sub-object under brand profile. */
 	public const BRAND_VOICE_TONE = 'voice_tone';
 

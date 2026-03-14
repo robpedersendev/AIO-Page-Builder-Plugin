@@ -17,6 +17,8 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
 use AIOPageBuilder\Domain\AI\Onboarding\Planning_Request_Result;
+use AIOPageBuilder\Domain\Profile\Template_Preference_Profile;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -88,6 +90,7 @@ final class Onboarding_Screen {
 		$draft = $draft_service->get_draft();
 
 		if ( $action === 'save_draft' ) {
+			$this->persist_template_preferences_from_post( $draft );
 			$draft['overall_status'] = Onboarding_Statuses::DRAFT_SAVED;
 			$draft_service->save_draft( $draft );
 			$url = \add_query_arg( array( 'page' => self::SLUG, 'saved' => '1' ), \admin_url( 'admin.php' ) );
@@ -95,6 +98,7 @@ final class Onboarding_Screen {
 		}
 
 		if ( $action === 'advance_step' ) {
+			$this->persist_template_preferences_from_post( $draft );
 			$ordered = Onboarding_Step_Keys::ordered();
 			$idx = array_search( $draft['current_step_key'], $ordered, true );
 			if ( $idx !== false && $idx < count( $ordered ) - 1 ) {
@@ -147,6 +151,30 @@ final class Onboarding_Screen {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Persists template preference profile from POST when current step is template_preferences. Capability already checked at render.
+	 *
+	 * @param array<string, mixed> $draft Current draft (for step key).
+	 * @return void
+	 */
+	private function persist_template_preferences_from_post( array $draft ): void {
+		$current = $draft['current_step_key'] ?? '';
+		if ( $current !== Onboarding_Step_Keys::TEMPLATE_PREFERENCES || $this->container === null || ! $this->container->has( 'profile_store' ) ) {
+			return;
+		}
+		$raw = array(
+			'page_emphasis'             => isset( $_POST['aio_template_preference_page_emphasis'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_template_preference_page_emphasis'] ) ) : '',
+			'conversion_posture'        => isset( $_POST['aio_template_preference_conversion_posture'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_template_preference_conversion_posture'] ) ) : '',
+			'proof_style'               => isset( $_POST['aio_template_preference_proof_style'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_template_preference_proof_style'] ) ) : '',
+			'content_density'           => isset( $_POST['aio_template_preference_content_density'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_template_preference_content_density'] ) ) : '',
+			'animation_preference'      => isset( $_POST['aio_template_preference_animation'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_template_preference_animation'] ) ) : '',
+			'cta_intensity_preference'  => isset( $_POST['aio_template_preference_cta_intensity'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_template_preference_cta_intensity'] ) ) : '',
+			'reduced_motion_preference' => isset( $_POST['aio_template_preference_reduced_motion'] ) && (string) $_POST['aio_template_preference_reduced_motion'] === '1',
+		);
+		$profile_store = $this->container->get( 'profile_store' );
+		$profile_store->set_template_preference_profile( $raw );
 	}
 
 	/**
@@ -332,6 +360,8 @@ final class Onboarding_Screen {
 					?>
 					<p><?php \esc_html_e( 'Last run:', 'aio-page-builder' ); ?> <a href="<?php echo \esc_url( $run_url ); ?>"><?php echo \esc_html( $last_run_id ); ?></a></p>
 				<?php endif; ?>
+			<?php elseif ( $current_step_key === Onboarding_Step_Keys::TEMPLATE_PREFERENCES ) : ?>
+				<?php $this->render_template_preferences_step( $state ); ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::REVIEW ) : ?>
 				<p><?php \esc_html_e( 'Review your inputs before proceeding. Profile and provider readiness are checked here.', 'aio-page-builder' ); ?></p>
 				<?php if ( count( $provider_refs ) > 0 ) : ?>
@@ -345,6 +375,110 @@ final class Onboarding_Screen {
 				<p><?php echo \esc_html( sprintf( __( 'Step “%s” — form fields will be added in a future update. Use Next to advance or Save draft to leave.', 'aio-page-builder' ), $label ) ); ?></p>
 			<?php endif; ?>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Renders bounded template preference fields (Prompt 212). Advisory only; prefill from profile.
+	 *
+	 * @param array<string, mixed> $state UI state (prefill.profile.template_preference_profile).
+	 * @return void
+	 */
+	private function render_template_preferences_step( array $state ): void {
+		$prefill = $state['prefill'] ?? array();
+		$profile = $prefill['profile'] ?? array();
+		$prefs = $profile[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ?? array();
+		$prefs = is_array( $prefs ) ? $prefs : array();
+		$page_emphasis = isset( $prefs['page_emphasis'] ) ? (string) $prefs['page_emphasis'] : '';
+		$conversion_posture = isset( $prefs['conversion_posture'] ) ? (string) $prefs['conversion_posture'] : '';
+		$proof_style = isset( $prefs['proof_style'] ) ? (string) $prefs['proof_style'] : '';
+		$content_density = isset( $prefs['content_density'] ) ? (string) $prefs['content_density'] : '';
+		$animation = isset( $prefs['animation_preference'] ) ? (string) $prefs['animation_preference'] : '';
+		$cta_intensity = isset( $prefs['cta_intensity_preference'] ) ? (string) $prefs['cta_intensity_preference'] : '';
+		$reduced_motion = ! empty( $prefs['reduced_motion_preference'] );
+		?>
+		<p><?php \esc_html_e( 'These preferences help guide template and page-style recommendations. They are advisory only and do not override structural or CTA rules.', 'aio-page-builder' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="aio_template_preference_page_emphasis"><?php \esc_html_e( 'Page emphasis', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<select name="aio_template_preference_page_emphasis" id="aio_template_preference_page_emphasis" aria-describedby="aio-page-emphasis-desc">
+						<option value="" <?php selected( $page_emphasis, '' ); ?>><?php \esc_html_e( 'Not specified', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::PAGE_EMPHASIS_INFORMATIONAL ); ?>" <?php selected( $page_emphasis, Template_Preference_Profile::PAGE_EMPHASIS_INFORMATIONAL ); ?>><?php \esc_html_e( 'Informational', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::PAGE_EMPHASIS_CONVERSION ); ?>" <?php selected( $page_emphasis, Template_Preference_Profile::PAGE_EMPHASIS_CONVERSION ); ?>><?php \esc_html_e( 'Conversion', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::PAGE_EMPHASIS_BALANCED ); ?>" <?php selected( $page_emphasis, Template_Preference_Profile::PAGE_EMPHASIS_BALANCED ); ?>><?php \esc_html_e( 'Balanced', 'aio-page-builder' ); ?></option>
+					</select>
+					<p id="aio-page-emphasis-desc" class="description"><?php \esc_html_e( 'Preferred focus: information vs. conversion vs. balanced.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_template_preference_conversion_posture"><?php \esc_html_e( 'Conversion posture', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<select name="aio_template_preference_conversion_posture" id="aio_template_preference_conversion_posture">
+						<option value="" <?php selected( $conversion_posture, '' ); ?>><?php \esc_html_e( 'Not specified', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::CONVERSION_POSTURE_SOFT ); ?>" <?php selected( $conversion_posture, Template_Preference_Profile::CONVERSION_POSTURE_SOFT ); ?>><?php \esc_html_e( 'Soft', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::CONVERSION_POSTURE_MODERATE ); ?>" <?php selected( $conversion_posture, Template_Preference_Profile::CONVERSION_POSTURE_MODERATE ); ?>><?php \esc_html_e( 'Moderate', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::CONVERSION_POSTURE_STRONG ); ?>" <?php selected( $conversion_posture, Template_Preference_Profile::CONVERSION_POSTURE_STRONG ); ?>><?php \esc_html_e( 'Strong', 'aio-page-builder' ); ?></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_template_preference_proof_style"><?php \esc_html_e( 'Proof style', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<select name="aio_template_preference_proof_style" id="aio_template_preference_proof_style">
+						<option value="" <?php selected( $proof_style, '' ); ?>><?php \esc_html_e( 'Not specified', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::PROOF_STYLE_SOCIAL ); ?>" <?php selected( $proof_style, Template_Preference_Profile::PROOF_STYLE_SOCIAL ); ?>><?php \esc_html_e( 'Social proof', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::PROOF_STYLE_CREDENTIALS ); ?>" <?php selected( $proof_style, Template_Preference_Profile::PROOF_STYLE_CREDENTIALS ); ?>><?php \esc_html_e( 'Credentials', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::PROOF_STYLE_TESTIMONIALS ); ?>" <?php selected( $proof_style, Template_Preference_Profile::PROOF_STYLE_TESTIMONIALS ); ?>><?php \esc_html_e( 'Testimonials', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::PROOF_STYLE_MINIMAL ); ?>" <?php selected( $proof_style, Template_Preference_Profile::PROOF_STYLE_MINIMAL ); ?>><?php \esc_html_e( 'Minimal', 'aio-page-builder' ); ?></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_template_preference_content_density"><?php \esc_html_e( 'Content density', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<select name="aio_template_preference_content_density" id="aio_template_preference_content_density">
+						<option value="" <?php selected( $content_density, '' ); ?>><?php \esc_html_e( 'Not specified', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::CONTENT_DENSITY_COMPACT ); ?>" <?php selected( $content_density, Template_Preference_Profile::CONTENT_DENSITY_COMPACT ); ?>><?php \esc_html_e( 'Compact', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::CONTENT_DENSITY_MODERATE ); ?>" <?php selected( $content_density, Template_Preference_Profile::CONTENT_DENSITY_MODERATE ); ?>><?php \esc_html_e( 'Moderate', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::CONTENT_DENSITY_SPACIOUS ); ?>" <?php selected( $content_density, Template_Preference_Profile::CONTENT_DENSITY_SPACIOUS ); ?>><?php \esc_html_e( 'Spacious', 'aio-page-builder' ); ?></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_template_preference_animation"><?php \esc_html_e( 'Animation preference', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<select name="aio_template_preference_animation" id="aio_template_preference_animation">
+						<option value="" <?php selected( $animation, '' ); ?>><?php \esc_html_e( 'Not specified', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::ANIMATION_FULL ); ?>" <?php selected( $animation, Template_Preference_Profile::ANIMATION_FULL ); ?>><?php \esc_html_e( 'Full', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::ANIMATION_REDUCED ); ?>" <?php selected( $animation, Template_Preference_Profile::ANIMATION_REDUCED ); ?>><?php \esc_html_e( 'Reduced', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::ANIMATION_MINIMAL ); ?>" <?php selected( $animation, Template_Preference_Profile::ANIMATION_MINIMAL ); ?>><?php \esc_html_e( 'Minimal', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::ANIMATION_NONE ); ?>" <?php selected( $animation, Template_Preference_Profile::ANIMATION_NONE ); ?>><?php \esc_html_e( 'None', 'aio-page-builder' ); ?></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_template_preference_cta_intensity"><?php \esc_html_e( 'CTA intensity (advisory)', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<select name="aio_template_preference_cta_intensity" id="aio_template_preference_cta_intensity">
+						<option value="" <?php selected( $cta_intensity, '' ); ?>><?php \esc_html_e( 'Not specified', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::CTA_INTENSITY_LOW ); ?>" <?php selected( $cta_intensity, Template_Preference_Profile::CTA_INTENSITY_LOW ); ?>><?php \esc_html_e( 'Low', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::CTA_INTENSITY_MEDIUM ); ?>" <?php selected( $cta_intensity, Template_Preference_Profile::CTA_INTENSITY_MEDIUM ); ?>><?php \esc_html_e( 'Medium', 'aio-page-builder' ); ?></option>
+						<option value="<?php echo \esc_attr( Template_Preference_Profile::CTA_INTENSITY_HIGH ); ?>" <?php selected( $cta_intensity, Template_Preference_Profile::CTA_INTENSITY_HIGH ); ?>><?php \esc_html_e( 'High', 'aio-page-builder' ); ?></option>
+					</select>
+					<p class="description"><?php \esc_html_e( 'Does not override CTA rules.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php \esc_html_e( 'Reduced motion', 'aio-page-builder' ); ?></th>
+				<td>
+					<label for="aio_template_preference_reduced_motion">
+						<input type="checkbox" name="aio_template_preference_reduced_motion" id="aio_template_preference_reduced_motion" value="1" <?php checked( $reduced_motion ); ?> />
+						<?php \esc_html_e( 'Prefer reduced motion in templates', 'aio-page-builder' ); ?>
+					</label>
+				</td>
+			</tr>
+		</table>
 		<?php
 	}
 }

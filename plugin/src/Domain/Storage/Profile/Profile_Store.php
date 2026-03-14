@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Domain\Storage\Profile;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Profile\Template_Preference_Profile;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 
@@ -60,15 +61,82 @@ final class Profile_Store {
 	}
 
 	/**
-	 * Returns full current profile with both roots normalized.
+	 * Returns full current profile with brand, business, and template_preference_profile normalized.
 	 *
-	 * @return array{brand_profile: array<string, mixed>, business_profile: array<string, mixed>}
+	 * @return array{brand_profile: array<string, mixed>, business_profile: array<string, mixed>, template_preference_profile: array<string, mixed>}
 	 */
 	public function get_full_profile(): array {
 		return array(
-			Profile_Schema::ROOT_BRAND    => $this->get_brand_profile(),
-			Profile_Schema::ROOT_BUSINESS => $this->get_business_profile(),
+			Profile_Schema::ROOT_BRAND                   => $this->get_brand_profile(),
+			Profile_Schema::ROOT_BUSINESS                => $this->get_business_profile(),
+			Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE => $this->get_template_preference_profile_array(),
 		);
+	}
+
+	/**
+	 * Returns template preference profile as array (template_preference_profile payload). Advisory only; no secrets.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function get_template_preference_profile_array(): array {
+		$raw = $this->get_full_profile_raw();
+		$block = $raw[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ?? null;
+		if ( ! is_array( $block ) ) {
+			return ( new Template_Preference_Profile() )->to_array();
+		}
+		return ( Template_Preference_Profile::from_array( $block ) )->to_array();
+	}
+
+	/**
+	 * Returns template preference profile as value object.
+	 */
+	public function get_template_preference_profile(): Template_Preference_Profile {
+		$raw = $this->get_full_profile_raw();
+		$block = $raw[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ?? null;
+		if ( ! is_array( $block ) ) {
+			return new Template_Preference_Profile();
+		}
+		return Template_Preference_Profile::from_array( $block );
+	}
+
+	/**
+	 * Replaces template preference profile with normalized input. Callers must enforce capability and nonce.
+	 *
+	 * @param array<string, mixed> $preferences Raw or partial template_preference_profile.
+	 * @return void
+	 */
+	public function set_template_preference_profile( array $preferences ): void {
+		$profile = Template_Preference_Profile::from_array( $preferences );
+		$full = $this->get_full_profile_raw();
+		$full[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] = $profile->to_array();
+		if ( ! isset( $full[ Profile_Schema::ROOT_BRAND ] ) || ! is_array( $full[ Profile_Schema::ROOT_BRAND ] ) ) {
+			$full[ Profile_Schema::ROOT_BRAND ] = $this->normalizer->normalize_brand_profile( array() );
+		}
+		if ( ! isset( $full[ Profile_Schema::ROOT_BUSINESS ] ) || ! is_array( $full[ Profile_Schema::ROOT_BUSINESS ] ) ) {
+			$full[ Profile_Schema::ROOT_BUSINESS ] = $this->normalizer->normalize_business_profile( array() );
+		}
+		$this->settings->set( self::OPTION_KEY, $full );
+	}
+
+	/**
+	 * Merges partial template preference profile into current; only keys present in $partial update.
+	 *
+	 * @param array<string, mixed> $partial
+	 * @return void
+	 */
+	public function merge_template_preference_profile( array $partial ): void {
+		$current = $this->get_template_preference_profile_array();
+		$merged = $current;
+		$keys = array( 'page_emphasis', 'conversion_posture', 'proof_style', 'content_density', 'animation_preference', 'cta_intensity_preference' );
+		foreach ( $keys as $key ) {
+			if ( array_key_exists( $key, $partial ) ) {
+				$merged[ $key ] = $partial[ $key ];
+			}
+		}
+		if ( array_key_exists( 'reduced_motion_preference', $partial ) ) {
+			$merged['reduced_motion_preference'] = (bool) $partial['reduced_motion_preference'];
+		}
+		$this->set_template_preference_profile( $merged );
 	}
 
 	/**
@@ -104,9 +172,9 @@ final class Profile_Store {
 	}
 
 	/**
-	 * Replaces entire current profile with normalized brand and business.
+	 * Replaces entire current profile with normalized brand and business. Preserves template_preference_profile when not supplied.
 	 *
-	 * @param array<string, mixed> $full Must contain brand_profile and/or business_profile keys.
+	 * @param array<string, mixed> $full Must contain brand_profile and/or business_profile keys; may include template_preference_profile.
 	 * @return void
 	 */
 	public function set_full_profile( array $full ): void {
@@ -118,6 +186,11 @@ final class Profile_Store {
 			Profile_Schema::ROOT_BRAND    => $this->normalizer->normalize_brand_profile( $brand ),
 			Profile_Schema::ROOT_BUSINESS => $this->normalizer->normalize_business_profile( $business ),
 		);
+		if ( isset( $full[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ) && is_array( $full[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ) ) {
+			$payload[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] = ( Template_Preference_Profile::from_array( $full[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ) )->to_array();
+		} else {
+			$payload[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] = $this->get_template_preference_profile_array();
+		}
 		$this->settings->set( self::OPTION_KEY, $payload );
 	}
 

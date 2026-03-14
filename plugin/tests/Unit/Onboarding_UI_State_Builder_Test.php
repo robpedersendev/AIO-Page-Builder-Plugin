@@ -12,8 +12,9 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 use PHPUnit\Framework\TestCase;
 
@@ -22,6 +23,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Infrastructure/Config/Option_Names.php';
 require_once $plugin_root . '/src/Infrastructure/Settings/Settings_Service.php';
+require_once $plugin_root . '/src/Domain/Profile/Template_Preference_Profile.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Validation_Result.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Normalizer.php';
@@ -63,7 +65,9 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 		$this->assertArrayHasKey( 'nonce', $state );
 		$this->assertArrayHasKey( 'is_provider_ready', $state );
 		$this->assertSame( Onboarding_Step_Keys::WELCOME, $state['current_step_key'] );
-		$this->assertCount( 11, $state['steps'] );
+		$this->assertCount( 12, $state['steps'] );
+		$this->assertArrayHasKey( 'profile', $state['prefill'] );
+		$this->assertArrayHasKey( Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE, $state['prefill']['profile'] );
 	}
 
 	public function test_at_review_without_provider_sets_blocked(): void {

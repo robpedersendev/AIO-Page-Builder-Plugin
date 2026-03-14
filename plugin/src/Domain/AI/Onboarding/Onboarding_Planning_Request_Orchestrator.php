@@ -192,11 +192,18 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$profile = $prefill['profile'] ?? array();
 		$goal = isset( $draft['goal_or_intent_text'] ) && is_string( $draft['goal_or_intent_text'] ) ? $draft['goal_or_intent_text'] : '';
 		$registry = array();
+		$template_preference_profile = isset( $profile['template_preference_profile'] ) && is_array( $profile['template_preference_profile'] ) ? $profile['template_preference_profile'] : array();
 		if ( $this->container->has( 'template_recommendation_context_builder' ) ) {
 			$ctx_builder = $this->container->get( 'template_recommendation_context_builder' );
 			if ( $ctx_builder instanceof Template_Recommendation_Context_Builder ) {
-				$built = $ctx_builder->build( array( 'max_templates' => Template_Recommendation_Context_Builder::DEFAULT_MAX_TEMPLATES ) );
+				$built = $ctx_builder->build( array(
+					'max_templates'             => Template_Recommendation_Context_Builder::DEFAULT_MAX_TEMPLATES,
+					'template_preference_profile' => $template_preference_profile,
+				) );
 				$registry['template_recommendation_context'] = $built['template_recommendation_context'];
+				if ( isset( $built['template_preference_profile'] ) && is_array( $built['template_preference_profile'] ) ) {
+					$registry['template_preference_profile'] = $built['template_preference_profile'];
+				}
 			}
 		}
 		$input_artifact = $this->input_artifact_builder->build( $artifact_id, $prompt_pack_ref, array(

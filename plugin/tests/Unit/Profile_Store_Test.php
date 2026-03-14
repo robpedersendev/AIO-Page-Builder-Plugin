@@ -19,6 +19,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Infrastructure/Config/Option_Names.php';
 require_once $plugin_root . '/src/Infrastructure/Settings/Settings_Service.php';
+require_once $plugin_root . '/src/Domain/Profile/Template_Preference_Profile.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Validation_Result.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Normalizer.php';
@@ -107,6 +108,56 @@ final class Profile_Store_Test extends TestCase {
 		$this->assertArrayHasKey( Profile_Schema::ROOT_BUSINESS, $full );
 		$this->assertSame( 'A', $full[ Profile_Schema::ROOT_BRAND ]['brand_voice_summary'] );
 		$this->assertSame( 'B', $full[ Profile_Schema::ROOT_BUSINESS ]['business_name'] );
+	}
+
+	public function test_get_full_profile_includes_template_preference_profile(): void {
+		$full = $this->store->get_full_profile();
+		$this->assertArrayHasKey( Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE, $full );
+		$prefs = $full[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ];
+		$this->assertIsArray( $prefs );
+		$this->assertArrayHasKey( 'page_emphasis', $prefs );
+		$this->assertArrayHasKey( 'reduced_motion_preference', $prefs );
+	}
+
+	public function test_set_and_get_template_preference_profile(): void {
+		$this->store->set_template_preference_profile( array(
+			'page_emphasis'       => 'conversion',
+			'conversion_posture'  => 'moderate',
+			'reduced_motion_preference' => true,
+		) );
+		$arr = $this->store->get_template_preference_profile_array();
+		$this->assertSame( 'conversion', $arr['page_emphasis'] );
+		$this->assertSame( 'moderate', $arr['conversion_posture'] );
+		$this->assertTrue( $arr['reduced_motion_preference'] );
+	}
+
+	public function test_merge_template_preference_profile(): void {
+		$this->store->set_template_preference_profile( array(
+			'page_emphasis' => 'balanced',
+			'proof_style'   => 'testimonials',
+		) );
+		$this->store->merge_template_preference_profile( array( 'content_density' => 'spacious' ) );
+		$arr = $this->store->get_template_preference_profile_array();
+		$this->assertSame( 'balanced', $arr['page_emphasis'] );
+		$this->assertSame( 'testimonials', $arr['proof_style'] );
+		$this->assertSame( 'spacious', $arr['content_density'] );
+	}
+
+	public function test_example_template_preference_profile_payload(): void {
+		$example = array(
+			'page_emphasis'             => 'conversion',
+			'conversion_posture'        => 'moderate',
+			'proof_style'               => 'social_proof',
+			'content_density'           => 'moderate',
+			'animation_preference'      => 'reduced',
+			'cta_intensity_preference'  => 'medium',
+			'reduced_motion_preference' => true,
+		);
+		$this->store->set_template_preference_profile( $example );
+		$payload = $this->store->get_template_preference_profile_array();
+		$this->assertSame( $example, $payload );
+		$this->assertArrayHasKey( 'page_emphasis', $payload );
+		$this->assertArrayHasKey( 'reduced_motion_preference', $payload );
 	}
 
 	public function test_option_root_is_profile_current(): void {

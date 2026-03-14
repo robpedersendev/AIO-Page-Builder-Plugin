@@ -57,9 +57,10 @@ final class Template_Recommendation_Context_Builder {
 	/**
 	 * Builds template recommendation context for planning (input artifact registry or prompt context).
 	 * Only active, non-deprecated templates; capped count. Safe for inclusion in artifact (no secrets).
+	 * When options include template_preference_profile (Prompt 212), attaches it for advisory recommendation guidance.
 	 *
-	 * @param array<string, mixed> $options Optional: max_templates (int), template_category_class (string), template_family (string), crawl_run_id (string) to attach crawl_page_hints from snapshot hierarchy_clues.
-	 * @return array{template_recommendation_context: list<array<string, mixed>>, total_active: int, crawl_page_hints?: list<array<string, mixed>>}
+	 * @param array<string, mixed> $options Optional: max_templates (int), template_category_class (string), template_family (string), crawl_run_id (string), template_preference_profile (array).
+	 * @return array{template_recommendation_context: list<array<string, mixed>>, total_active: int, crawl_page_hints?: list<array<string, mixed>>, template_preference_profile?: array<string, mixed>}
 	 */
 	public function build( array $options = array() ): array {
 		$max = (int) ( $options['max_templates'] ?? self::DEFAULT_MAX_TEMPLATES );
@@ -96,6 +97,9 @@ final class Template_Recommendation_Context_Builder {
 		$crawl_run_id = isset( $options['crawl_run_id'] ) ? (string) $options['crawl_run_id'] : '';
 		if ( $crawl_run_id !== '' && $this->crawl_snapshot_service !== null ) {
 			$out['crawl_page_hints'] = $this->load_crawl_page_hints( $crawl_run_id );
+		}
+		if ( isset( $options['template_preference_profile'] ) && is_array( $options['template_preference_profile'] ) ) {
+			$out['template_preference_profile'] = $options['template_preference_profile'];
 		}
 		return $out;
 	}

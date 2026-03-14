@@ -46,6 +46,21 @@ final class Template_Recommendation_Context_Builder_Test extends TestCase {
 		$this->assertLessThanOrEqual( 5, count( $result['template_recommendation_context'] ) );
 	}
 
+	public function test_build_includes_template_preference_profile_when_provided(): void {
+		$prefs = array(
+			'page_emphasis'             => 'conversion',
+			'conversion_posture'        => 'moderate',
+			'proof_style'               => 'social_proof',
+			'content_density'           => 'moderate',
+			'animation_preference'      => 'reduced',
+			'cta_intensity_preference'  => 'medium',
+			'reduced_motion_preference' => true,
+		);
+		$result = $this->builder->build( array( 'max_templates' => 1, 'template_preference_profile' => $prefs ) );
+		$this->assertArrayHasKey( 'template_preference_profile', $result );
+		$this->assertSame( $prefs, $result['template_preference_profile'] );
+	}
+
 	public function test_get_recommended_template_summary_unknown_key_returns_empty_summary(): void {
 		$summary = $this->builder->get_recommended_template_summary( 'pt_nonexistent_xyz' );
 		$this->assertSame( 'pt_nonexistent_xyz', $summary['template_key'] );

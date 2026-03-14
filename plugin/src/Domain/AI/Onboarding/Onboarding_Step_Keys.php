@@ -25,6 +25,8 @@ final class Onboarding_Step_Keys {
 	public const EXISTING_SITE         = 'existing_site';
 	public const CRAWL_PREFERENCES     = 'crawl_preferences';
 	public const PROVIDER_SETUP        = 'provider_setup';
+	/** Template-style preference signals (Prompt 212); advisory only. */
+	public const TEMPLATE_PREFERENCES  = 'template_preferences';
 	public const REVIEW                = 'review';
 	public const SUBMISSION            = 'submission';
 
@@ -44,6 +46,7 @@ final class Onboarding_Step_Keys {
 			self::EXISTING_SITE,
 			self::CRAWL_PREFERENCES,
 			self::PROVIDER_SETUP,
+			self::TEMPLATE_PREFERENCES,
 			self::REVIEW,
 			self::SUBMISSION,
 		);
