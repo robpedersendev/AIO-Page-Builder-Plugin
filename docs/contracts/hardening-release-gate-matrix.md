@@ -98,7 +98,7 @@ Each of the following must be satisfied or explicitly N/A with rationale:
 
 | # | Gate | Criterion | Owner |
 |---|------|-----------|--------|
-| 1 | Security | All new/modified REST/AJAX have nonce + capability; no secrets in logs/exports; permission callbacks explicit. | Technical lead |
+| 1 | Security | All new/modified REST/AJAX have nonce + capability; no secrets in logs/exports; permission callbacks explicit. Form-provider integration: [form-provider-security-checklist.md](../qa/form-provider-security-checklist.md), [form-provider-security-review.md](../qa/form-provider-security-review.md). | Technical lead |
 | 2 | Accessibility | Admin UI passes agreed a11y checklist or audit; no critical a11y defects open. Template library semantic/accessibility audit (Prompt 186, template-library-accessibility-audit-report.md) supplies machine-checkable evidence for SEMANTIC/CTA and §56.6; manual markup review still required for rendered output. Animation/fallback QA (Prompt 187, template-library-animation-fallback-report.md) verifies reduced-motion and tier-none fallback at library scale; manual checklist for tier-none layout and no broken rendering. | QA / a11y owner |
 | 3 | Performance | No blocking regressions; long-running work queued/chunked/scheduled; Plugin Check run. | Technical lead |
 | 4 | Migration | Migrations updated if needed; version logic consistent; upgrade path tested or N/A. | Technical lead |

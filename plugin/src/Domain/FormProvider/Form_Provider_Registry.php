@@ -137,4 +137,53 @@ final class Form_Provider_Registry {
 		}
 		return $form_id;
 	}
+
+	/**
+	 * Validates provider_id against the registry (for save/input validation; spec §0.10.9, Prompt 233).
+	 *
+	 * @param string $provider_id Raw input.
+	 * @return bool True if non-empty and registered.
+	 */
+	public function is_valid_provider_id( string $provider_id ): bool {
+		$id = $this->sanitize_provider_id( $provider_id );
+		return $id !== '' && $this->has_provider( $id );
+	}
+
+	/**
+	 * Validates form_id format only (alphanumeric, underscore, hyphen). Does not check provider existence.
+	 *
+	 * @param string $form_id Raw input.
+	 * @return bool True if matches allowed pattern.
+	 */
+	public function is_valid_form_id_format( string $form_id ): bool {
+		return $this->sanitize_form_id( $form_id ) !== '';
+	}
+
+	/**
+	 * Validates both provider and form_id for persistence/display (registry + format).
+	 *
+	 * @param string $provider_id
+	 * @param string $form_id
+	 * @return array{ valid: bool, errors: list<string> }
+	 */
+	public function validate_provider_and_form( string $provider_id, string $form_id ): array {
+		$errors = array();
+		$p      = $this->sanitize_provider_id( $provider_id );
+		if ( $p === '' ) {
+			$errors[] = __( 'Form provider is required and must be alphanumeric.', 'aio-page-builder' );
+		} elseif ( ! $this->has_provider( $p ) ) {
+			$errors[] = sprintf(
+				/* translators: 1: provider id */
+				__( 'Form provider "%1$s" is not registered.', 'aio-page-builder' ),
+				$p
+			);
+		}
+		if ( $this->sanitize_form_id( $form_id ) === '' ) {
+			$errors[] = __( 'Form ID is required and may only contain letters, numbers, hyphens, and underscores.', 'aio-page-builder' );
+		}
+		return array(
+			'valid'  => empty( $errors ),
+			'errors' => $errors,
+		);
+	}
 }
