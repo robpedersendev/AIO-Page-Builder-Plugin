@@ -37,7 +37,14 @@
 
 - [ ] **Missing provider:** When form_provider value is not in the registry, a warning/message is shown; shortcode preview is not shown.
 - [ ] **Missing form:** When form_id is empty, message indicates form ID is required.
-- [ ] **Stale form:** (Optional) If a provider form list API is added later, stale-form state can be surfaced; not required for current scope.
+- [ ] **Stale form:** When Form_Provider_Availability_Service is used, picker_states include `stale_binding`; UI shows when current form_id is no longer in provider list (Prompt 237).
+- [ ] **Provider availability:** Picker state exposes `availability_status` (available, unavailable, no_forms, provider_error, cached_fallback) and optional `availability_message` / `from_cache` so admin sees real-time vs cached and error states.
+
+### 2.7 Availability and cache (Prompt 237)
+
+- [ ] **Bounded cache:** Form-list responses use Form_Provider_Picker_Cache_Service (TTL, max entries); admin remains responsive when provider is slow or temporarily unavailable.
+- [ ] **Cached fallback:** When provider fetch fails, cached form list is shown when available with status `cached_fallback` and clear message (e.g. "Provider temporarily unavailable; showing cached form list.").
+- [ ] **State visibility:** Diagnostics/support summary includes `form_provider_availability` when Template_Library_Support_Summary_Builder has availability service (provider_key, status, message per provider); no secrets in payload.
 
 ### 2.5 Permission and safety
 

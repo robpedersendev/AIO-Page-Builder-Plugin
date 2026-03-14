@@ -325,7 +325,8 @@ final class Section_Template_Detail_Screen {
 			$reg = $this->container->get( 'form_provider_registry' );
 			if ( $reg instanceof \AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry ) {
 				$discovery = $this->container->has( 'form_provider_picker_discovery' ) ? $this->container->get( 'form_provider_picker_discovery' ) : null;
-				$form_section_field_state_builder = new \AIOPageBuilder\Domain\Registries\Section\UI\Form_Section_Field_State_Builder( $reg, $discovery );
+				$availability = $this->container->has( 'form_provider_availability_service' ) ? $this->container->get( 'form_provider_availability_service' ) : null;
+				$form_section_field_state_builder = new \AIOPageBuilder\Domain\Registries\Section\UI\Form_Section_Field_State_Builder( $reg, $discovery, $availability );
 			}
 		}
 

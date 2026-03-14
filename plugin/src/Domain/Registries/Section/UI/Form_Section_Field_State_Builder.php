@@ -13,13 +13,15 @@ namespace AIOPageBuilder\Domain\Registries\Section\UI;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
+use AIOPageBuilder\Domain\Integrations\FormProviders\Form_Provider_Availability_Service;
 use AIOPageBuilder\Domain\Integrations\FormProviders\Form_Provider_Picker_Discovery_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
 
 /**
  * Produces state for form section fields: registered provider list, current values, validation flags,
  * and messages for missing-provider, missing-form, or stale-form. Optional picker discovery adds
- * picker_states for adapter-driven UI (Prompt 236). Additive; does not change stored values.
+ * picker_states (Prompt 236); optional availability service adds availability_status, from_cache,
+ * stale_binding (Prompt 237). Additive; does not change stored values.
  */
 final class Form_Section_Field_State_Builder {
 
@@ -29,12 +31,17 @@ final class Form_Section_Field_State_Builder {
 	/** @var Form_Provider_Picker_Discovery_Service|null */
 	private ?Form_Provider_Picker_Discovery_Service $picker_discovery;
 
+	/** @var Form_Provider_Availability_Service|null */
+	private ?Form_Provider_Availability_Service $availability_service;
+
 	public function __construct(
 		Form_Provider_Registry $provider_registry,
-		?Form_Provider_Picker_Discovery_Service $picker_discovery = null
+		?Form_Provider_Picker_Discovery_Service $picker_discovery = null,
+		?Form_Provider_Availability_Service $availability_service = null
 	) {
-		$this->provider_registry = $provider_registry;
-		$this->picker_discovery  = $picker_discovery;
+		$this->provider_registry   = $provider_registry;
+		$this->picker_discovery    = $picker_discovery;
+		$this->availability_service = $availability_service;
 	}
 
 	/**
@@ -108,7 +115,28 @@ final class Form_Section_Field_State_Builder {
 		if ( $this->picker_discovery !== null && $is_form_section ) {
 			$picker_states = array();
 			foreach ( $registered as $pid ) {
-				$picker_states[ $pid ] = $this->picker_discovery->get_picker_state_for_provider( $pid );
+				if ( $this->availability_service !== null ) {
+					$meta = $this->picker_discovery->get_picker_metadata_for_provider( $pid );
+					$av   = $this->availability_service->get_availability_state( $pid, $form_id );
+					$base = array(
+						'provider_key'          => $meta['provider_key'],
+						'display_label'         => $meta['display_label'],
+						'available'             => $meta['available'],
+						'supports_form_list'    => $meta['supports_form_list'],
+						'picker_items'          => $meta['supports_form_list'] && isset( $av['picker_items'] ) ? $av['picker_items'] : array(),
+						'fallback_entry_label'  => $meta['fallback_entry_label'],
+						'empty_state_message'   => $meta['empty_state_message'],
+						'availability_status'   => $av['status'],
+						'from_cache'            => $av['from_cache'],
+						'stale_binding'         => $av['stale_binding'],
+					);
+					if ( $av['message'] !== null ) {
+						$base['availability_message'] = $av['message'];
+					}
+				} else {
+					$base = $this->picker_discovery->get_picker_state_for_provider( $pid );
+				}
+				$picker_states[ $pid ] = $base;
 			}
 			$state['picker_states'] = $picker_states;
 		}

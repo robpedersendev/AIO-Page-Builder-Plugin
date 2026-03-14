@@ -14,6 +14,7 @@ namespace AIOPageBuilder\Domain\ExportRestore\Export;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Integrations\FormProviders\Form_Provider_Availability_Service;
 use AIOPageBuilder\Domain\Registries\Docs\Page_Template_Inventory_Appendix_Generator;
 use AIOPageBuilder\Domain\Registries\Docs\Section_Inventory_Appendix_Generator;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
@@ -53,6 +54,9 @@ final class Template_Library_Support_Summary_Builder {
 	/** @var Reporting_Redaction_Service|null */
 	private ?Reporting_Redaction_Service $redaction;
 
+	/** @var Form_Provider_Availability_Service|null */
+	private ?Form_Provider_Availability_Service $form_provider_availability;
+
 	public function __construct(
 		?Template_Library_Compliance_Service $compliance_service = null,
 		?Section_Inventory_Appendix_Generator $section_appendix = null,
@@ -60,15 +64,17 @@ final class Template_Library_Support_Summary_Builder {
 		?Template_Deprecation_Service $deprecation_service = null,
 		?Section_Template_Repository $section_repository = null,
 		?Page_Template_Repository $page_repository = null,
-		?Reporting_Redaction_Service $redaction = null
+		?Reporting_Redaction_Service $redaction = null,
+		?Form_Provider_Availability_Service $form_provider_availability = null
 	) {
-		$this->compliance_service  = $compliance_service;
-		$this->section_appendix   = $section_appendix;
-		$this->page_appendix      = $page_appendix;
-		$this->deprecation_service = $deprecation_service;
-		$this->section_repository = $section_repository;
-		$this->page_repository    = $page_repository;
-		$this->redaction          = $redaction;
+		$this->compliance_service   = $compliance_service;
+		$this->section_appendix     = $section_appendix;
+		$this->page_appendix        = $page_appendix;
+		$this->deprecation_service  = $deprecation_service;
+		$this->section_repository   = $section_repository;
+		$this->page_repository      = $page_repository;
+		$this->redaction            = $redaction;
+		$this->form_provider_availability = $form_provider_availability;
 	}
 
 	/**
@@ -95,7 +101,7 @@ final class Template_Library_Support_Summary_Builder {
 			$preview_issues      = $this->extract_preview_issues( $health );
 		}
 
-		return array(
+		$payload = array(
 			'health'             => $health,
 			'validation_failures' => $validation_failures,
 			'cta_violations'      => $this->redact_violation_messages( $cta_violations ),
@@ -104,6 +110,19 @@ final class Template_Library_Support_Summary_Builder {
 			'appendix_sync'       => $appendix_sync,
 			'version_summary'     => $version_summary,
 		);
+		if ( $this->form_provider_availability !== null ) {
+			$payload['form_provider_availability'] = $this->build_form_provider_availability();
+		}
+		return $payload;
+	}
+
+	/**
+	 * Bounded provider availability summary for diagnostics/support (Prompt 237). No secrets.
+	 *
+	 * @return list<array{provider_key: string, status: string, message: string|null}>
+	 */
+	private function build_form_provider_availability(): array {
+		return $this->form_provider_availability->get_summary_for_admin();
 	}
 
 	/**

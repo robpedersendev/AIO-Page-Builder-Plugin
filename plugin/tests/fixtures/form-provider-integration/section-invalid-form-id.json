@@ -1,0 +1,16 @@
+{
+	"scenario_id": "section-invalid-form-id",
+	"fixture_version": "1",
+	"description": "Form section with invalid form_id (empty or invalid chars)",
+	"section": {
+		"template_key": "form_section_ndr",
+		"form_provider": "ndr_forms",
+		"form_id": "",
+		"headline": ""
+	},
+	"expected": {
+		"shortcode_builds": false,
+		"provider_registered": true,
+		"form_id_valid": false
+	}
+}

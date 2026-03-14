@@ -98,7 +98,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->has( 'template_deprecation_service' ) ? $container->get( 'template_deprecation_service' ) : null,
 				$container->get( 'section_template_repository' ),
 				$container->get( 'page_template_repository' ),
-				new Reporting_Redaction_Service()
+				new Reporting_Redaction_Service(),
+				$container->has( 'form_provider_availability_service' ) ? $container->get( 'form_provider_availability_service' ) : null
 			);
 		} );
 

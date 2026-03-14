@@ -111,6 +111,33 @@ final class Form_Provider_Picker_Discovery_Service {
 	}
 
 	/**
+	 * Metadata-only picker info (no form list fetch). Use with availability layer to avoid double fetch.
+	 *
+	 * @param string $provider_key
+	 * @return array{provider_key: string, display_label: string, available: bool, supports_form_list: bool, fallback_entry_label: string, empty_state_message: string}
+	 */
+	public function get_picker_metadata_for_provider( string $provider_key ): array {
+		$provider_key = $this->sanitize_provider_key( $provider_key );
+		$adapter      = $this->adapters[ $provider_key ] ?? null;
+		$available    = $adapter !== null && $this->registry->has_provider( $provider_key ) && $adapter->is_available();
+		$display_label = $adapter !== null ? $adapter->get_display_label() : $provider_key;
+		$supports_form_list = $adapter !== null && $adapter->supports_form_list();
+		$fallback_label = $adapter !== null ? $adapter->get_fallback_entry_label() : __( 'Form ID', 'aio-page-builder' );
+		$empty_state_message = $adapter !== null && ! $supports_form_list
+			? __( 'Enter the form identifier from your form manager.', 'aio-page-builder' )
+			: ( $supports_form_list ? __( 'No forms available from this provider.', 'aio-page-builder' ) : '' );
+
+		return array(
+			'provider_key'          => $provider_key,
+			'display_label'        => $display_label,
+			'available'             => $available,
+			'supports_form_list'    => $supports_form_list,
+			'fallback_entry_label' => $fallback_label,
+			'empty_state_message'  => $empty_state_message,
+		);
+	}
+
+	/**
 	 * Whether the provider has a registered picker adapter.
 	 *
 	 * @param string $provider_key
@@ -118,6 +145,28 @@ final class Form_Provider_Picker_Discovery_Service {
 	 */
 	public function has_adapter( string $provider_key ): bool {
 		return isset( $this->adapters[ $this->sanitize_provider_key( $provider_key ) ] );
+	}
+
+	/**
+	 * Returns the adapter for a provider (for use by availability/cache layer).
+	 *
+	 * @param string $provider_key
+	 * @return Form_Provider_Picker_Adapter_Interface|null
+	 */
+	public function get_adapter( string $provider_key ): ?Form_Provider_Picker_Adapter_Interface {
+		$key = $this->sanitize_provider_key( $provider_key );
+		return $this->adapters[ $key ] ?? null;
+	}
+
+	/**
+	 * Normalizes raw form list items for a provider (item_id pattern, escaped label). Public for availability/cache layer.
+	 *
+	 * @param string $provider_key
+	 * @param list<array{provider_key?: string, item_id: string, item_label: string, status_hint?: string}> $items
+	 * @return list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}>
+	 */
+	public function normalize_picker_items_for_provider( string $provider_key, array $items ): array {
+		return $this->normalize_picker_items( $this->sanitize_provider_key( $provider_key ), $items );
 	}
 
 	/**

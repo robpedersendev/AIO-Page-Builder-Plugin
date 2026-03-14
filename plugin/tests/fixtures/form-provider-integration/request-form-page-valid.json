@@ -1,0 +1,16 @@
+{
+	"scenario_id": "request-form-page-valid",
+	"fixture_version": "1",
+	"description": "Request-form page template with valid form reference",
+	"page_template": {
+		"template_key": "pt_request_form_01",
+		"page_class": "request_form",
+		"form_provider": "ndr_forms",
+		"form_id": "contact"
+	},
+	"expected": {
+		"shortcode_builds": true,
+		"provider_registered": true,
+		"form_id_valid": true
+	}
+}

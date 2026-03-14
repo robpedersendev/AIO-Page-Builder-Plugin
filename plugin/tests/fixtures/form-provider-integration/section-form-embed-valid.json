@@ -1,0 +1,17 @@
+{
+	"scenario_id": "section-form-embed-valid",
+	"fixture_version": "1",
+	"description": "Form section with registered provider and valid form_id",
+	"section": {
+		"template_key": "form_section_ndr",
+		"form_provider": "ndr_forms",
+		"form_id": "contact",
+		"headline": ""
+	},
+	"expected": {
+		"shortcode_builds": true,
+		"shortcode_contains": "ndr_forms",
+		"provider_registered": true,
+		"form_id_valid": true
+	}
+}

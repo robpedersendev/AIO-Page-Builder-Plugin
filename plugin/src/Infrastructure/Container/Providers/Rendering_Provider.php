@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
+use AIOPageBuilder\Domain\Integrations\FormProviders\Form_Provider_Availability_Service;
+use AIOPageBuilder\Domain\Integrations\FormProviders\Form_Provider_Picker_Cache_Service;
 use AIOPageBuilder\Domain\Integrations\FormProviders\Form_Provider_Picker_Discovery_Service;
 use AIOPageBuilder\Domain\Integrations\FormProviders\Ndr_Form_Provider_Picker_Adapter;
 use AIOPageBuilder\Domain\Rendering\Assets\Render_Asset_Controller;
@@ -74,6 +76,17 @@ final class Rendering_Provider implements Service_Provider_Interface {
 			$registry = $container->get( 'form_provider_registry' );
 			$ndr      = new Ndr_Form_Provider_Picker_Adapter( $registry );
 			return new Form_Provider_Picker_Discovery_Service( $registry, array( $ndr->get_provider_key() => $ndr ) );
+		} );
+
+		$container->register( 'form_provider_picker_cache', function (): Form_Provider_Picker_Cache_Service {
+			return new Form_Provider_Picker_Cache_Service();
+		} );
+
+		$container->register( 'form_provider_availability_service', function () use ( $container ): Form_Provider_Availability_Service {
+			$registry = $container->get( 'form_provider_registry' );
+			$discovery = $container->get( 'form_provider_picker_discovery' );
+			$cache = $container->has( 'form_provider_picker_cache' ) ? $container->get( 'form_provider_picker_cache' ) : null;
+			return new Form_Provider_Availability_Service( $registry, $discovery, $cache );
 		} );
 
 		$container->register( 'native_block_assembly_pipeline', function () use ( $container ): Native_Block_Assembly_Pipeline {

@@ -1,0 +1,16 @@
+{
+	"scenario_id": "section-missing-provider",
+	"fixture_version": "1",
+	"description": "Form section with provider not in registry",
+	"section": {
+		"template_key": "form_section_ndr",
+		"form_provider": "unknown_provider",
+		"form_id": "contact",
+		"headline": ""
+	},
+	"expected": {
+		"shortcode_builds": false,
+		"provider_registered": false,
+		"safe_fallback": true
+	}
+}
