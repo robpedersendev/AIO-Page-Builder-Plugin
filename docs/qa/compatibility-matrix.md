@@ -1,8 +1,8 @@
 # Compatibility and Interoperability Test Matrix
 
-**Governs:** Spec §6.7, §6.8, §6.9, §6.10, §54, §56.3, §56.4, §56.10, §59.14, §58.6.  
+**Governs:** Spec §6.7, §6.8, §6.9, §6.10, §54, §55.8, §56.3, §56.4, §56.10, §59.14, §58.6; Prompt 203.  
 **Purpose:** Evidence for supported environment claims; release-gate compatibility (hardening matrix gate 5).  
-**Scope:** WordPress version, PHP version, required/optional dependencies, preferred theme/block environment, coexistence.
+**Scope:** WordPress version, PHP version, required/optional dependencies, preferred theme/block environment, coexistence; expanded template library compatibility (directory, previews, builds, ACF, GenerateBlocks, LPagery, themes).
 
 **Baseline vs extension pack:** The **baseline** supported environment (below) is the primary reference and is required for release. The **extension pack** (Section 6) lists additional themes/plugins that have been explicitly tested and documented; these are additive only and do not replace or weaken baseline claims. Unsupported environments remain unsupported.
 
@@ -140,3 +140,22 @@ Extension-pack targets require run and recorded compatibility tests before being
 - **Integration / E2E:** At least one fully supported stack (WP 6.6+, PHP 8.1+, ACF Pro 6.2+, GenerateBlocks 2.0+) should pass: install → onboarding → Build Plan → execution path (or current scope). Record in matrix and in release checklist.
 - **Manual:** Plugin Check run; critical/warning findings addressed (hardening gate 5). Compatibility matrix updated with test date and results before release.
 - **Extension pack:** For each added extension-pack target, run and record tests in extension-pack-evidence.md; add compatibility shims only when a verified issue requires them (Prompt 127, spec §59.14).
+- **Expanded template library:** Compatibility pass for the enlarged registry (250+ section, 500+ page templates, compositions) is documented in [template-library-compatibility-report.md](template-library-compatibility-report.md). Run the checklist there (directory, previews, built pages, ACF at scale, GenerateBlocks/native output, optional LPagery, theme coexistence) and record results; do not claim a template family compatible without testing representative previews and builds (Prompt 203, spec §55.8, §56.3, §56.4, §59.14).
+
+---
+
+## 13. Expanded Template Library Compatibility (Prompt 203)
+
+The expanded template library (section/page registries, compositions, one-pagers) must be validated in the supported environment at library scale. This is separate from baseline activation and dependency checks.
+
+| Area | What is validated | Report |
+|------|-------------------|--------|
+| Directory browsing | Section/Page/Composition directories at 250+/500+ scale; pagination, filter, search | [template-library-compatibility-report.md](template-library-compatibility-report.md) §3.1 |
+| Detail previews | Section and page template detail previews; synthetic data; GenerateBlocks vs native | §3.2 |
+| Built-page rendering | Pages created from templates; survivability; theme-agnostic block output | §3.3 |
+| ACF at scale | Field group assignment and visibility; no broken/orphan groups | §3.4 |
+| GenerateBlocks / native | GB when present; native fallback; no theme lock-in | §3.5 |
+| Optional LPagery | Token workflows when present; graceful degradation when absent | §3.6 |
+| Theme / coexistence | Preferred theme (GeneratePress); extension pack; Class C coexistence | §3.7 |
+
+**Bounded degradations** (documented in report §4): LPagery missing → warning only; non-preferred themes → general compatibility target; themes that break block behavior → unsupported. No narrow fixes applied without evidence; validated issues are fixed or explicitly documented in the report §6.
