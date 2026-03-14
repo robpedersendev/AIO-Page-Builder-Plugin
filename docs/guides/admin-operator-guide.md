@@ -9,9 +9,9 @@
 ## 1. Quick start and menu
 
 - **Menu:** WordPress admin → **AIO Page Builder** (top-level).
-- **Submenus:** Dashboard, Settings, Diagnostics, Onboarding & Profile, Crawl Sessions, Crawl Comparison, AI Runs, AI Providers, Build Plans, Queue & Logs, Privacy, Reporting & Settings, Import / Export.
+- **Submenus:** Dashboard, Settings, Diagnostics, Onboarding & Profile, Crawl Sessions, Crawl Comparison, AI Runs, AI Providers, Build Plans, **Page Templates**, **Section Templates**, **Template Compare**, **Compositions**, Build Plan Analytics, Template Analytics, Queue & Logs, Support Triage, Privacy, Reporting & Settings, Import / Export.
 
-Start at **Dashboard** for readiness and quick links. Use **Onboarding & Profile** to complete brand/business profile before running AI planning. Use **AI Providers** to configure and test the AI connection.
+Start at **Dashboard** for readiness and quick links. Use **Onboarding & Profile** to complete brand/business profile before running AI planning. Use **AI Providers** to configure and test the AI connection. For the expanded template library (directories, compare, compositions, previews), see [template-library-operator-guide.md](template-library-operator-guide.md).
 
 ---
 
@@ -128,10 +128,21 @@ Support bundle and other modes are defined in the export-bundle-structure contra
 
 ---
 
-## 12. Cross-references
+## 12. Template library (expanded)
+
+- **Screens:** **Page Templates** (`aio-page-builder-page-templates`), **Section Templates** (`aio-page-builder-section-templates`), **Template Compare** (`aio-page-builder-template-compare`), **Compositions** (`aio-page-builder-compositions`). Detail screens are reached via **View** from directories (no menu entry).
+- **Purpose:** Browse section and page templates, compare up to 10 per type side-by-side, build governed compositions from section templates. All observational except composition save; page creation is via Build Plans.
+- **Guides:** [template-library-operator-guide.md](template-library-operator-guide.md) (operators), [template-library-editor-guide.md](template-library-editor-guide.md) (editors: choosing templates, one-pagers, helper docs), [template-library-support-guide.md](template-library-support-guide.md) (support: diagnostics, appendices, compliance).
+
+---
+
+## 13. Cross-references
 
 | Need | Screen or doc |
 |------|----------------|
+| Template library operation | [template-library-operator-guide.md](template-library-operator-guide.md) |
+| Template choice and one-pagers (editors) | [template-library-editor-guide.md](template-library-editor-guide.md) |
+| Template library support and diagnostics | [template-library-support-guide.md](template-library-support-guide.md) |
 | Reporting disclosure wording | Privacy, Reporting & Settings |
 | Uninstall choices and built-page survivability | Privacy, Reporting & Settings; [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md) |
 | Export modes and bundle structure | Import / Export screen; [export-bundle-structure-contract.md](../contracts/export-bundle-structure-contract.md) |
@@ -140,7 +151,7 @@ Support bundle and other modes are defined in the export-bundle-structure contra
 
 ---
 
-## 13. Security and permissions
+## 14. Security and permissions
 
 - Every privileged action requires a capability check; state-changing admin requests use nonces.  
 - Documentation must not include raw secrets, debug credentials, or unsafe shortcuts.  

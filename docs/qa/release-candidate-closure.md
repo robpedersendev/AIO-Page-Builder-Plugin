@@ -98,11 +98,14 @@ For release readiness, the following durable guidance docs exist and should be c
 
 | Doc | Purpose |
 |-----|--------|
-| [admin-operator-guide.md](../guides/admin-operator-guide.md) | Operator-facing: onboarding, provider setup, crawler, AI runs, Build Plans, execution/rollback, Queue & Logs, Privacy/Reporting/Uninstall, Import/Export. |
+| [admin-operator-guide.md](../guides/admin-operator-guide.md) | Operator-facing: onboarding, provider setup, crawler, AI runs, Build Plans, execution/rollback, Queue & Logs, Privacy/Reporting/Uninstall, Import/Export; template library menu and cross-refs. |
+| [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | Template library: Section/Page Templates directories, Template Compare, Compositions, detail screens, CTA rules, preview behavior, large-library behavior. |
+| [template-library-editor-guide.md](../guides/template-library-editor-guide.md) | Editor-facing: choosing templates, one-pagers, compositions, helper docs, version/deprecation. |
+| [template-library-support-guide.md](../guides/template-library-support-guide.md) | Support: template-library diagnostics, appendices, compliance/compatibility reports, support bundles, known limitations. |
 | [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md) | End-user: onboarding/profile, Build Plan review steps. |
 | [support-triage-guide.md](../guides/support-triage-guide.md) | Support: logs, log export, support bundle, redaction, issue triage. |
 
-**Doc-to-UI consistency pass:** Before release, verify screen names, action labels, tab names, and capability names in these guides match the implemented admin UI (menu labels, Queue & Logs tabs, Build Plan stepper, Privacy/Reporting screen sections, Import/Export modes). Record any mismatches and fix in docs or (if blocking) in code per prompt scope.
+**Doc-to-UI consistency pass:** Before release, verify screen names, action labels, tab names, and capability names in these guides match the implemented admin UI (menu labels, Queue & Logs tabs, Build Plan stepper, Privacy/Reporting screen sections, Import/Export modes). For the template library: verify Section Templates, Page Templates, Template Compare, and Compositions screen slugs, hierarchy (root/purpose/category/list), compare list cap (10), and help links on directory/compare/compositions screens. Record any mismatches and fix in docs or (if blocking) in code per prompt scope.
 
 ---
 

@@ -20,7 +20,7 @@ Use this checklist before each release. It is designed to be explicit, reviewabl
 - [ ] Release notes include compatibility notes per §58.6 (tested WP/PHP range, required plugins, limitations; see [compatibility-matrix.md](compatibility-matrix.md) §9).
 - [ ] Release notes include migrations or compatibility notes per §58.6 (table/export schema, same-major import, breaking changes if any; see [migration-coverage-matrix.md](migration-coverage-matrix.md) §7).
 - [ ] If reporting is implemented: disclosure is present in admin docs, settings, and help content.
-- [ ] User/admin/support guidance: [admin-operator-guide.md](../guides/admin-operator-guide.md), [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md), [support-triage-guide.md](../guides/support-triage-guide.md) exist and doc-to-UI consistency pass is done (see [release-candidate-closure.md](release-candidate-closure.md) §7).
+- [ ] User/admin/support guidance: [admin-operator-guide.md](../guides/admin-operator-guide.md), [template-library-operator-guide.md](../guides/template-library-operator-guide.md), [template-library-editor-guide.md](../guides/template-library-editor-guide.md), [template-library-support-guide.md](../guides/template-library-support-guide.md), [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md), [support-triage-guide.md](../guides/support-triage-guide.md) exist and doc-to-UI consistency pass is done (see [release-candidate-closure.md](release-candidate-closure.md) §7).
 
 ## Security
 

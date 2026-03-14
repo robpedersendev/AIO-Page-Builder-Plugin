@@ -71,6 +71,13 @@ final class Compositions_Screen {
 			<p class="aio-description">
 				<?php \esc_html_e( 'Governed custom page-template compositions assembled from section templates. Use Build to create or edit with category and CTA-aware section selection.', 'aio-page-builder' ); ?>
 			</p>
+			<?php
+			$docs_base = \apply_filters( 'aio_page_builder_docs_base_url', '' );
+			$guide_ref = ( is_string( $docs_base ) && $docs_base !== '' )
+				? '<a href="' . \esc_url( rtrim( $docs_base, '/' ) . '/guides/template-library-operator-guide.md' ) . '" target="_blank" rel="noopener">' . \esc_html__( 'Template Library Operator Guide', 'aio-page-builder' ) . '</a>'
+				: \esc_html__( 'Template Library Operator Guide (docs/guides/template-library-operator-guide.md)', 'aio-page-builder' );
+			?>
+			<p class="aio-description" aria-label="<?php \esc_attr_e( 'Help reference', 'aio-page-builder' ); ?>"><?php echo \wp_kses( sprintf( /* translators: %s: link or path to operator guide */ __( 'For full guidance, see the %s.', 'aio-page-builder' ), $guide_ref ), array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ) ) ); ?></p>
 			<p>
 				<a href="<?php echo \esc_url( $build_url ); ?>" class="button button-primary"><?php \esc_html_e( 'Build composition', 'aio-page-builder' ); ?></a>
 			</p>
