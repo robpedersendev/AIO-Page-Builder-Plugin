@@ -16,7 +16,7 @@ use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
 /**
  * Assignment map table access. Callers must be authorized. All identifiers sanitized; prepared statements for SQL.
  */
-final class Assignment_Map_Service {
+final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 
 	private const SCHEMA_VERSION = '1';
 

@@ -22,7 +22,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
  * Fail-safe when acf_add_local_field_group is not available.
  * Supports deterministic registration by section list (page-level) or by variation family (large-scale §6.2–6.3).
  */
-final class ACF_Group_Registrar {
+final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 
 	/** @var Section_Field_Blueprint_Service */
 	private Section_Field_Blueprint_Service $blueprint_service;

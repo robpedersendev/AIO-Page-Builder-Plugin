@@ -19,7 +19,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
  * Exposes blueprint retrieval by section key and version.
  * Blueprints are extracted from section definitions (embedded field_blueprint) or resolved via Blueprint_Family_Resolver when applicable.
  */
-final class Section_Field_Blueprint_Service {
+final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_Service_Interface {
 
 	/** Key for embedded blueprint in section definition. */
 	public const EMBEDDED_BLUEPRINT_KEY = 'field_blueprint';
