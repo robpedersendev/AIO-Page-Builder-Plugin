@@ -9,6 +9,7 @@ namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
+use AIOPageBuilder\Domain\Registries\Shared\Deprecation_Metadata;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
@@ -136,5 +137,25 @@ final class Template_Deprecation_Service_Test extends TestCase {
 		$result = $this->service->validate_section_deprecation( 999, '', '' );
 		$this->assertFalse( $result->valid );
 		$this->assertStringContainsString( 'reason', strtolower( implode( ' ', $result->errors ) ) );
+	}
+
+	/**
+	 * Deprecation continuity: definition with deprecation metadata yields correct summary after upgrade (Prompt 202).
+	 */
+	public function test_deprecation_continuity_section_definition_with_deprecation_metadata(): void {
+		$def = array(
+			Section_Schema::FIELD_STATUS => 'deprecated',
+			'deprecation'                => array(
+				Deprecation_Metadata::IS_DEPRECATED   => true,
+				Deprecation_Metadata::DEPRECATED_REASON => 'Replaced by st02_hero',
+				Deprecation_Metadata::DEPRECATED_AT  => '2025-03-01T00:00:00Z',
+			),
+			'replacement_section_suggestions' => array( 'st02_hero' ),
+		);
+		$summary = $this->service->get_deprecation_summary( $def, 'section' );
+		$this->assertTrue( $summary['is_deprecated'] );
+		$this->assertSame( 'Replaced by st02_hero', $summary['reason'] );
+		$this->assertSame( array( 'st02_hero' ), $summary['replacement_keys'] );
+		$this->assertSame( '2025-03-01T00:00:00Z', $summary['deprecated_at'] );
 	}
 }

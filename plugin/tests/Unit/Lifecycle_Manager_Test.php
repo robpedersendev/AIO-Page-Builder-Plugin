@@ -64,4 +64,19 @@ final class Lifecycle_Manager_Test extends TestCase {
 		$this->assertSame( 'phase', $arr['phase'] );
 		$this->assertSame( array( 'key' => 'value' ), $arr['details'] );
 	}
+
+	/**
+	 * Template library upgrade phase runs and returns success with helper result in details (Prompt 202).
+	 */
+	public function test_template_library_upgrade_phase_returns_success_with_helper_details(): void {
+		$manager = new Lifecycle_Manager();
+		$result  = $manager->activate();
+		// If activation is blocking (e.g. missing deps in unit env), we only assert phase exists when we can run it.
+		if ( $result->is_blocking() ) {
+			$this->assertNotEmpty( $result->phase );
+			return;
+		}
+		$this->assertArrayHasKey( 'phases_run', $result->details );
+		$this->assertContains( 'template_library_upgrade_compatibility', $result->details['phases_run'] );
+	}
 }

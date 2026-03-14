@@ -77,4 +77,23 @@ final class Template_Versioning_Service_Test extends TestCase {
 		$this->assertSame( '1', $summary['version'] );
 		$this->assertTrue( $summary['stable_key_retained'] );
 	}
+
+	/**
+	 * Version continuity: definition with version metadata yields correct summary after upgrade (Prompt 202).
+	 */
+	public function test_version_continuity_page_definition_with_version_block(): void {
+		$def = array(
+			\AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema::FIELD_VERSION => array(
+				'version'             => '3',
+				'stable_key_retained'  => true,
+				'changelog_ref'        => 'release-3',
+				'breaking'             => false,
+			),
+		);
+		$summary = $this->service->get_version_summary( $def, 'page' );
+		$this->assertSame( '3', $summary['version'] );
+		$this->assertTrue( $summary['stable_key_retained'] );
+		$this->assertSame( 'release-3', $summary['changelog_ref'] );
+		$this->assertFalse( $summary['breaking'] );
+	}
 }

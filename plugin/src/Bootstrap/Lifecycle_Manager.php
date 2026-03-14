@@ -19,6 +19,7 @@ require_once __DIR__ . '/../Infrastructure/Config/Versions.php';
 require_once __DIR__ . '/../Infrastructure/Settings/Settings_Service.php';
 require_once __DIR__ . '/../Domain/Storage/Migrations/Migration_Contract.php';
 require_once __DIR__ . '/../Domain/Storage/Migrations/Schema_Version_Tracker.php';
+require_once __DIR__ . '/../Domain/Storage/Migrations/Template_Library_Upgrade_Helper.php';
 require_once __DIR__ . '/../Domain/Storage/Tables/Table_Names.php';
 require_once __DIR__ . '/../Domain/Storage/Tables/Table_Schema_Definitions.php';
 require_once __DIR__ . '/../Domain/Storage/Tables/DbDelta_Runner.php';
@@ -96,6 +97,7 @@ final class Lifecycle_Manager {
 			'check_dependencies',
 			'init_options',
 			'check_tables_schema',
+			'template_library_upgrade_compatibility',
 			'register_capabilities',
 			'register_schedules',
 			'seed_form_templates',
@@ -164,6 +166,8 @@ final class Lifecycle_Manager {
 				return $this->init_options();
 			case 'check_tables_schema':
 				return $this->check_tables_schema();
+			case 'template_library_upgrade_compatibility':
+				return $this->template_library_upgrade_compatibility();
 			case 'register_capabilities':
 				return $this->register_capabilities();
 			case 'register_schedules':
@@ -269,6 +273,27 @@ final class Lifecycle_Manager {
 			}
 		}
 		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'check_tables_schema' );
+	}
+
+	/**
+	 * Ensures registry_schema is recorded for template library upgrade compatibility (spec §58.2, §58.5; Prompt 202).
+	 * Non-blocking; idempotent and retry-safe.
+	 *
+	 * @return Lifecycle_Result
+	 */
+	private function template_library_upgrade_compatibility(): Lifecycle_Result {
+		$settings = new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+		$helper   = new \AIOPageBuilder\Domain\Storage\Migrations\Template_Library_Upgrade_Helper( $settings );
+		$result   = $helper->run();
+		return new Lifecycle_Result(
+			Lifecycle_Result::STATUS_SUCCESS,
+			$result['message'],
+			'template_library_upgrade_compatibility',
+			array(
+				'validated'                => $result['validated'],
+				'registry_schema_recorded' => $result['registry_schema_recorded'],
+			)
+		);
 	}
 
 	private function register_capabilities(): Lifecycle_Result {

@@ -137,4 +137,44 @@ final class Section_Inventory_Appendix_Generator_Test extends TestCase {
 		$this->assertArrayHasKey( 'deprecation_status', $row );
 		$this->assertArrayHasKey( 'version', $row );
 	}
+
+	/**
+	 * Same-version regen: identical definitions produce identical markdown (Prompt 202; migration appendix safety).
+	 */
+	public function test_same_version_regen_produces_identical_markdown(): void {
+		$defs = array(
+			array(
+				Section_Schema::FIELD_INTERNAL_KEY   => 'st_same',
+				Section_Schema::FIELD_NAME          => 'Same',
+				Section_Schema::FIELD_CATEGORY      => 'cta',
+				Section_Schema::FIELD_VERSION       => array( 'version' => '1' ),
+			),
+		);
+		$gen = $this->get_generator();
+		$md1 = $gen->generate_from_definitions( $defs );
+		$md2 = $gen->generate_from_definitions( $defs );
+		$this->assertSame( $md1, $md2, 'Same definitions must yield identical appendix markdown (deterministic regen)' );
+	}
+
+	/**
+	 * Appendix regeneration after migration: generator builds valid result from definitions (Prompt 202).
+	 * No stored appendix; "regen" is running the generator after upgrade.
+	 */
+	public function test_appendix_regen_after_migration_produces_valid_result(): void {
+		$defs = array(
+			array(
+				Section_Schema::FIELD_INTERNAL_KEY => 'st_post_upgrade',
+				Section_Schema::FIELD_NAME        => 'Post Upgrade',
+				Section_Schema::FIELD_CATEGORY    => 'hero_intro',
+				Section_Schema::FIELD_VERSION     => array( 'version' => '1' ),
+			),
+		);
+		$gen    = $this->get_generator();
+		$result = $gen->build_result_from_definitions( $defs );
+		$this->assertArrayHasKey( 'rows', $result );
+		$this->assertArrayHasKey( 'total', $result );
+		$this->assertSame( 1, $result['total'] );
+		$this->assertCount( 1, $result['rows'] );
+		$this->assertSame( 'st_post_upgrade', $result['rows'][0]['key'] );
+	}
 }
