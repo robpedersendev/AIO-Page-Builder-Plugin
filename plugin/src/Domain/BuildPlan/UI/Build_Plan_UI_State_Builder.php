@@ -28,6 +28,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
  * Optional Step_Workspace_Payload_Builder enables build_step_workspace() for actionable steps.
  * New-pages step detail panel includes template rationale (Build_Plan_Template_Explanation_Builder) when registered (Prompt 190).
  * New-pages step rows are enriched with family/hierarchy grouping and template links via New_Page_Template_Recommendation_Builder when registered (Prompt 192).
+ * Existing-page step rows are enriched with template-change and replacement-reason summaries via Existing_Page_Template_Change_Builder when registered (Prompt 193).
  */
 final class Build_Plan_UI_State_Builder {
 

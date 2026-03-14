@@ -235,7 +235,7 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 		}
 	}
 
-	/** Column order is Step 1 specific. */
+	/** Column order is Step 1 specific and includes template_links (Prompt 193). */
 	public function test_step1_column_order(): void {
 		$resolver = new Build_Plan_Row_Action_Resolver();
 		$detail   = new Existing_Page_Update_Detail_Builder();
@@ -245,5 +245,32 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 		$workspace = $ui->build_workspace( $def, 1, array( 'can_approve' => true ), null, array() );
 		$this->assertSame( Existing_Page_Updates_UI_Service::COLUMN_ORDER, $workspace['column_order'] );
 		$this->assertSame( 'current_page_title', $workspace['column_order'][0] );
+		$this->assertContains( 'template_links', $workspace['column_order'] );
+	}
+
+	/** With template change builder, rows have existing_page_template_change_summary and replacement_reason_summary (Prompt 193). */
+	public function test_step1_with_template_change_builder_enriches_rows(): void {
+		require_once dirname( __DIR__, 2 ) . '/src/Domain/BuildPlan/Recommendations/Template_Explanation_Builder_Interface.php';
+		require_once dirname( __DIR__, 2 ) . '/src/Domain/BuildPlan/UI/Existing_Page_Template_Change_Builder.php';
+		$stub = new class() implements \AIOPageBuilder\Domain\BuildPlan\Recommendations\Template_Explanation_Builder_Interface {
+			public function build_explanation( string $template_key, array $item_payload = array() ): array {
+				return $template_key !== '' ? array( 'template_key' => $template_key, 'name' => 'Test', 'template_family' => 'home', 'template_category_class' => 'top_level', 'cta_direction_summary' => 'CTA', 'section_count' => 5, 'deprecation_status' => 'active' ) : array();
+			}
+		};
+		$change_builder = new \AIOPageBuilder\Domain\BuildPlan\UI\Existing_Page_Template_Change_Builder( $stub );
+		$resolver = new Build_Plan_Row_Action_Resolver();
+		$detail   = new Existing_Page_Update_Detail_Builder( $change_builder );
+		$bulk     = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui       = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk, $change_builder );
+		$def = $this->step1_plan_definition( 1 );
+		$def[ Build_Plan_Schema::KEY_STEPS ][1][ Build_Plan_Item_Schema::KEY_ITEMS ][0][ Build_Plan_Item_Schema::KEY_PAYLOAD ]['template_key'] = 'pt_home_01';
+		$workspace = $ui->build_workspace( $def, 1, array( 'can_approve' => true ), null, array() );
+		$this->assertCount( 1, $workspace['step_list_rows'] );
+		$row = $workspace['step_list_rows'][0];
+		$this->assertArrayHasKey( 'existing_page_template_change_summary', $row );
+		$this->assertArrayHasKey( 'replacement_reason_summary', $row );
+		$this->assertSame( 'pt_home_01', $row['existing_page_template_change_summary']['template_key'] );
+		$this->assertTrue( $row['replacement_reason_summary']['is_replacement'] );
+		$this->assertArrayHasKey( 'template_links', $row['summary_columns'] );
 	}
 }

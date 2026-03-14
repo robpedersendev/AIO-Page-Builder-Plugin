@@ -669,6 +669,14 @@ final class Build_Plan_Workspace_Screen {
 				}
 				$actions = isset( $row['row_actions'] ) && is_array( $row['row_actions'] ) ? $row['row_actions'] : array();
 				$workspace['step_list_rows'][ $i ]['row_actions'] = $this->add_urls_to_approve_deny( $actions, $item_id, $base, $nonce );
+				$template_key = (string) ( $row['summary_columns']['target_template'] ?? $row['existing_page_template_change_summary']['template_key'] ?? '' );
+				if ( $template_key !== '' ) {
+					$detail_url = \add_query_arg( array( 'page' => Page_Template_Detail_Screen::SLUG, 'template' => $template_key ), \admin_url( 'admin.php' ) );
+					$compare_url = Template_Compare_Screen::get_compare_add_url( 'page', $template_key );
+					$workspace['step_list_rows'][ $i ]['template_detail_url']     = $detail_url;
+					$workspace['step_list_rows'][ $i ]['template_compare_add_url'] = $compare_url;
+					$workspace['step_list_rows'][ $i ]['summary_columns']['template_links'] = '<a href="' . \esc_url( $detail_url ) . '">' . \esc_html__( 'View template', 'aio-page-builder' ) . '</a> | <a href="' . \esc_url( $compare_url ) . '">' . \esc_html__( 'Add to compare', 'aio-page-builder' ) . '</a>';
+				}
 			}
 		}
 		$detail = &$workspace['detail_panel'];

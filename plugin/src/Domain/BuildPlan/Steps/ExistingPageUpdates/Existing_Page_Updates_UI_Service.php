@@ -21,18 +21,20 @@ use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
+use AIOPageBuilder\Domain\BuildPlan\UI\Existing_Page_Template_Change_Builder;
 
 /**
  * Produces step_list_rows, column_order, bulk_action_states, detail_panel, step_messages for Step 1 only.
  */
 final class Existing_Page_Updates_UI_Service {
 
-	/** Step 1 column order per spec §32.3. */
+	/** Step 1 column order per spec §32.3, Prompt 193: add template_links for compare/detail. */
 	public const COLUMN_ORDER = array(
 		'current_page_title',
 		'current_page_url',
 		'action',
 		'target_template',
+		'template_links',
 		'reason',
 		'risk_level',
 	);
@@ -49,14 +51,19 @@ final class Existing_Page_Updates_UI_Service {
 	/** @var Existing_Page_Update_Bulk_Action_Service */
 	private $bulk_action_service;
 
+	/** @var Existing_Page_Template_Change_Builder|null */
+	private $template_change_builder;
+
 	public function __construct(
 		Build_Plan_Row_Action_Resolver $row_action_resolver,
 		Existing_Page_Update_Detail_Builder $detail_builder,
-		Existing_Page_Update_Bulk_Action_Service $bulk_action_service
+		Existing_Page_Update_Bulk_Action_Service $bulk_action_service,
+		?Existing_Page_Template_Change_Builder $template_change_builder = null
 	) {
-		$this->row_action_resolver = $row_action_resolver;
-		$this->detail_builder     = $detail_builder;
-		$this->bulk_action_service = $bulk_action_service;
+		$this->row_action_resolver    = $row_action_resolver;
+		$this->detail_builder         = $detail_builder;
+		$this->bulk_action_service    = $bulk_action_service;
+		$this->template_change_builder = $template_change_builder;
 	}
 
 	/**
@@ -104,15 +111,27 @@ final class Existing_Page_Updates_UI_Service {
 				++$eligible_count;
 			}
 			$row_actions = $this->row_action_resolver->resolve( $item, $capabilities );
-			$rows[] = array(
+			$summary_columns = $this->summary_columns_for_item( $item );
+			$row = array(
 				Step_Item_List_Component::ROW_KEY_ITEM_ID          => $item_id,
 				Step_Item_List_Component::ROW_KEY_STATUS           => $status,
 				Step_Item_List_Component::ROW_KEY_STATUS_BADGE     => $this->status_to_badge( $status ),
-				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS  => $this->summary_columns_for_item( $item ),
+				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS  => $summary_columns,
 				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS       => $row_actions,
 				Step_Item_List_Component::ROW_KEY_IS_SELECTED      => in_array( $item_id, $selected_item_ids, true ),
 				'snapshot_required'                                => true,
 			);
+			if ( $this->template_change_builder !== null ) {
+				$change = $this->template_change_builder->build_for_item( $item );
+				$template_summary = $change[ Existing_Page_Template_Change_Builder::KEY_EXISTING_PAGE_TEMPLATE_CHANGE_SUMMARY ];
+				$row[ Existing_Page_Template_Change_Builder::KEY_EXISTING_PAGE_TEMPLATE_CHANGE_SUMMARY ] = $template_summary;
+				$row[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ] = $change[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ];
+				$row['summary_columns']['template_links'] = '';
+				if ( ! empty( $template_summary['template_key'] ) && ( $row['summary_columns']['target_template'] ?? '' ) === '' ) {
+					$row['summary_columns']['target_template'] = $template_summary['template_key'];
+				}
+			}
+			$rows[] = $row;
 		}
 
 		$eligibility = $this->bulk_action_service->get_bulk_eligibility( $plan_definition );

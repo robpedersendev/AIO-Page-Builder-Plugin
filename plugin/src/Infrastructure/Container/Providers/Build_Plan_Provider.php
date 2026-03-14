@@ -31,6 +31,7 @@ use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_UI_State_Builder;
+use AIOPageBuilder\Domain\BuildPlan\UI\Existing_Page_Template_Change_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\New_Page_Template_Recommendation_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\Step_Workspace_Payload_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -64,8 +65,11 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 				$container->get( 'build_plan_row_action_resolver' )
 			);
 		} );
-		$container->register( 'existing_page_update_detail_builder', function (): Existing_Page_Update_Detail_Builder {
-			return new Existing_Page_Update_Detail_Builder();
+		$container->register( 'existing_page_template_change_builder', function () use ( $container ): Existing_Page_Template_Change_Builder {
+			return new Existing_Page_Template_Change_Builder( $container->get( 'build_plan_template_explanation_builder' ) );
+		} );
+		$container->register( 'existing_page_update_detail_builder', function () use ( $container ): Existing_Page_Update_Detail_Builder {
+			return new Existing_Page_Update_Detail_Builder( $container->get( 'existing_page_template_change_builder' ) );
 		} );
 		$container->register( 'existing_page_update_bulk_action_service', function () use ( $container ): Existing_Page_Update_Bulk_Action_Service {
 			return new Existing_Page_Update_Bulk_Action_Service( $container->get( 'build_plan_repository' ) );
@@ -74,7 +78,8 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 			return new Existing_Page_Updates_UI_Service(
 				$container->get( 'build_plan_row_action_resolver' ),
 				$container->get( 'existing_page_update_detail_builder' ),
-				$container->get( 'existing_page_update_bulk_action_service' )
+				$container->get( 'existing_page_update_bulk_action_service' ),
+				$container->get( 'existing_page_template_change_builder' )
 			);
 		} );
 		$container->register( 'build_plan_template_explanation_builder', function () use ( $container ): Build_Plan_Template_Explanation_Builder {
