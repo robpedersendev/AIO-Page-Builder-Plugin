@@ -25,6 +25,7 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer;
 use AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Validator;
+use AIOPageBuilder\Domain\Registries\QA\Template_Accessibility_Audit_Service;
 use AIOPageBuilder\Domain\Registries\QA\Template_Library_Compliance_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
@@ -146,6 +147,12 @@ final class Registries_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'template_library_compliance_service', function () use ( $container ): Template_Library_Compliance_Service {
 			return new Template_Library_Compliance_Service(
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' )
+			);
+		} );
+		$container->register( 'template_accessibility_audit_service', function () use ( $container ): Template_Accessibility_Audit_Service {
+			return new Template_Accessibility_Audit_Service(
 				$container->get( 'section_template_repository' ),
 				$container->get( 'page_template_repository' )
 			);
