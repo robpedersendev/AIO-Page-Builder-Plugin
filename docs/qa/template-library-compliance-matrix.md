@@ -313,6 +313,7 @@ The following are **example** filled rows showing how a future prompt will prove
 - **Spec:** §15.9, §15.10, §16.3, §20, §21.9, §31.11, §55.8, §56.2, §56.3, §56.6, §60.4.
 - **Contracts:** template-library-coverage-matrix.md, template-library-inventory-manifest.md, cta-sequencing-and-placement-contract.md, semantic-seo-accessibility-extension-contract.md, animation-support-and-fallback-contract.md, smart-omission-rendering-contract.md, template-preview-and-dummy-data-contract.md, large-scale-acf-lpagery-binding-contract.md.
 - **Release gate:** [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) — waivers and sign-off process; [template-library-coverage-matrix.md](../contracts/template-library-coverage-matrix.md) — count and category targets.
+- **Automated pass (Prompt 176):** [template-library-automated-compliance-report.md](template-library-automated-compliance-report.md) — executable validation and result payload; `Template_Library_Compliance_Service` implements this matrix as the library-wide enforcement gate.
 
 ---
 

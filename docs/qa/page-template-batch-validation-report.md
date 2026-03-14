@@ -2,7 +2,7 @@
 
 **Document type:** Validation and reconciliation report for page-template batches (Prompts 155–166).  
 **Spec refs:** §13 Page Template Registry; §16 One-Pager System; §56.2 Unit Test Scope; §60.4 Exit Criteria; §60.5 Acceptance Test Requirements.  
-**Contracts:** template-library-coverage-matrix.md, template-library-inventory-manifest.md, cta-sequencing-and-placement-contract.md, template-library-compliance-matrix.md.
+**Contracts:** template-library-coverage-matrix.md, template-library-inventory-manifest.md, cta-sequencing-and-placement-contract.md, template-library-compliance-matrix.md. **Automated gate:** Prompt 176 — library-wide compliance pass (`Template_Library_Compliance_Service`) validates page counts, class/family coverage, CTA rules, one-pager, and export; see template-library-automated-compliance-report.md.
 
 ---
 

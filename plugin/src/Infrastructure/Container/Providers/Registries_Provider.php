@@ -21,6 +21,7 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer;
 use AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Validator;
+use AIOPageBuilder\Domain\Registries\QA\Template_Library_Compliance_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Integrity_Validator;
@@ -125,6 +126,12 @@ final class Registries_Provider implements Service_Provider_Interface {
 				$container->get( 'composition_repository' ),
 				$container->get( 'documentation_repository' ),
 				$container->get( 'version_snapshot_repository' )
+			);
+		} );
+		$container->register( 'template_library_compliance_service', function () use ( $container ): Template_Library_Compliance_Service {
+			return new Template_Library_Compliance_Service(
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' )
 			);
 		} );
 	}

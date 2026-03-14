@@ -2,7 +2,7 @@
 
 **Document type:** Validation and compliance summary for section-library batches (Prompts 147–153).  
 **Spec refs:** §12 Section Template Registry; §15.11 Reusability Rules; §17.6 Section Instance Rendering Rules; §56.2 Unit Test Scope; §56.3 Integration Test Scope; §60.4 Exit Criteria.  
-**Contracts:** template-library-coverage-matrix.md, template-library-inventory-manifest.md, template-library-compliance-matrix.md.
+**Contracts:** template-library-coverage-matrix.md, template-library-inventory-manifest.md, template-library-compliance-matrix.md. **Automated gate:** Prompt 176 — library-wide compliance pass (`Template_Library_Compliance_Service`) validates section counts, category coverage, preview, metadata, and export; see template-library-automated-compliance-report.md.
 
 ---
 

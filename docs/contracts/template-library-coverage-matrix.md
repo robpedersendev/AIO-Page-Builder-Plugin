@@ -312,6 +312,8 @@ Later prompts (e.g. batch-generation or QA) **fill** this worksheet to prove cat
 | Documentation (purpose, helper refs, one-pager where applicable) populated | ☑ (one-pager per template; Prompt 167) |
 | No scale-only code paths that skip validation | ☑ |
 
+**Automated enforcement (Prompt 176):** Library-wide validation is implemented in `Template_Library_Compliance_Service`. It validates counts, category coverage, CTA rules, preview/one-pager, metadata, and export against this matrix and the compliance matrix. See [template-library-automated-compliance-report.md](../qa/template-library-automated-compliance-report.md).
+
 ---
 
 **End of Template Library Coverage Matrix.**
