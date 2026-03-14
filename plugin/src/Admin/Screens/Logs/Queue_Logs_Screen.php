@@ -99,6 +99,7 @@ final class Queue_Logs_Screen {
 		$job_repo = null;
 		$ai_repo  = null;
 		$plan_repo = null;
+		$acf_diagnostics_builder = null;
 		if ( $this->container ) {
 			if ( $this->container->has( 'job_queue_repository' ) ) {
 				$job_repo = $this->container->get( 'job_queue_repository' );
@@ -109,8 +110,11 @@ final class Queue_Logs_Screen {
 			if ( $this->container->has( 'build_plan_repository' ) ) {
 				$plan_repo = $this->container->get( 'build_plan_repository' );
 			}
+			if ( $this->container->has( 'acf_diagnostics_state_builder' ) ) {
+				$acf_diagnostics_builder = $this->container->get( 'acf_diagnostics_state_builder' );
+			}
 		}
-		$builder = new Logs_Monitoring_State_Builder( $job_repo, $ai_repo, $plan_repo );
+		$builder = new Logs_Monitoring_State_Builder( $job_repo, $ai_repo, $plan_repo, $acf_diagnostics_builder );
 		return $builder->build();
 	}
 

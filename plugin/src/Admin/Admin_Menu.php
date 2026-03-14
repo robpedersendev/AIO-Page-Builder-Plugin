@@ -28,6 +28,7 @@ use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
+use AIOPageBuilder\Admin\Screens\Diagnostics\ACF_Architecture_Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
@@ -110,6 +111,7 @@ final class Admin_Menu {
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
 		$diagnostics = new Diagnostics_Screen();
+		$acf_diagnostics = new ACF_Architecture_Diagnostics_Screen( $this->container );
 		$onboarding  = new Onboarding_Screen( $this->container );
 		$crawler_sessions  = new Crawler_Sessions_Screen( $this->container );
 		$crawler_comparison = new Crawler_Comparison_Screen( $this->container );
@@ -166,6 +168,15 @@ final class Admin_Menu {
 			$diagnostics->get_capability(),
 			Diagnostics_Screen::SLUG,
 			array( $diagnostics, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$acf_diagnostics->get_title(),
+			__( 'ACF Field Architecture', 'aio-page-builder' ),
+			$acf_diagnostics->get_capability(),
+			ACF_Architecture_Diagnostics_Screen::SLUG,
+			array( $acf_diagnostics, 'render' )
 		);
 
 		add_submenu_page(

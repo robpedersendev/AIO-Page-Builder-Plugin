@@ -40,14 +40,19 @@ final class Logs_Monitoring_State_Builder {
 	/** @var object|null Build plan repository (get_by_key, get_plan_definition); for run_completion_state on finalize_plan rows. */
 	private $build_plan_repository;
 
+	/** @var object|null Optional ACF_Diagnostics_State_Builder for diagnostics bundle (build_for_bundle). */
+	private $acf_diagnostics_state_builder;
+
 	public function __construct(
 		?object $job_queue_repository = null,
 		?object $ai_run_repository = null,
-		?object $build_plan_repository = null
+		?object $build_plan_repository = null,
+		?object $acf_diagnostics_state_builder = null
 	) {
-		$this->job_queue_repository   = $job_queue_repository;
-		$this->ai_run_repository      = $ai_run_repository;
-		$this->build_plan_repository   = $build_plan_repository;
+		$this->job_queue_repository         = $job_queue_repository;
+		$this->ai_run_repository            = $ai_run_repository;
+		$this->build_plan_repository        = $build_plan_repository;
+		$this->acf_diagnostics_state_builder = $acf_diagnostics_state_builder;
 	}
 
 	/**
@@ -66,7 +71,7 @@ final class Logs_Monitoring_State_Builder {
 	 */
 	public function build(): array {
 		$queue_health_builder = new Queue_Health_Summary_Builder( $this->job_queue_repository );
-		return array(
+		$state = array(
 			'queue'              => $this->build_queue_tab(),
 			'queue_health'       => $queue_health_builder->build(),
 			'execution_logs'     => $this->build_execution_logs(),
@@ -76,6 +81,10 @@ final class Logs_Monitoring_State_Builder {
 			'critical_errors'    => $this->build_critical_errors(),
 			'log_export'         => $this->build_log_export_options(),
 		);
+		if ( $this->acf_diagnostics_state_builder !== null && method_exists( $this->acf_diagnostics_state_builder, 'build_for_bundle' ) ) {
+			$state['acf_diagnostics_summary'] = $this->acf_diagnostics_state_builder->build_for_bundle();
+		}
+		return $state;
 	}
 
 	/**
