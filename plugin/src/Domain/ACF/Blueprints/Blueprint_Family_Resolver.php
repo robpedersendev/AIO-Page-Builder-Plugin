@@ -18,6 +18,7 @@ use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
 /**
  * Applies family-level variant overrides (add_fields, hide_field_names) to a normalized blueprint.
  * Does not replace blueprint content; keeps relationships explicit.
+ * Used by Library_LPagery_Compatibility_Service to resolve effective blueprint for LPagery mapping summary (Prompt 179).
  */
 final class Blueprint_Family_Resolver {
 
@@ -77,6 +78,16 @@ final class Blueprint_Family_Resolver {
 
 		$effective[ Field_Blueprint_Schema::FIELDS ] = $fields;
 		return $effective;
+	}
+
+	/**
+	 * Returns variation_family_key from a section definition for use by LPagery compatibility (family-level token maps).
+	 *
+	 * @param array<string, mixed> $definition Section definition.
+	 * @return string Sanitized family key or empty string.
+	 */
+	public function get_variation_family_key( array $definition ): string {
+		return \sanitize_key( (string) ( $definition['variation_family_key'] ?? '' ) );
 	}
 
 	/**

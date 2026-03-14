@@ -18,6 +18,7 @@ use AIOPageBuilder\Domain\Rendering\Diagnostics\Content_Survivability_Checker;
 use AIOPageBuilder\Domain\Rendering\Diagnostics\Rendering_Diagnostics_Service;
 use AIOPageBuilder\Domain\Rendering\Animation\Animation_Tier_Resolver;
 use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_Layer;
+use AIOPageBuilder\Domain\Rendering\LPagery\Library_LPagery_Compatibility_Service;
 use AIOPageBuilder\Domain\Rendering\LPagery\LPagery_Token_Compatibility_Service;
 use AIOPageBuilder\Domain\Rendering\Omission\Smart_Omission_Service;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiation_Payload_Builder;
@@ -95,6 +96,13 @@ final class Rendering_Provider implements Service_Provider_Interface {
 
 		$container->register( 'lpagery_token_compatibility_service', function (): LPagery_Token_Compatibility_Service {
 			return new LPagery_Token_Compatibility_Service();
+		} );
+
+		$container->register( 'library_lpagery_compatibility_service', function () use ( $container ): Library_LPagery_Compatibility_Service {
+			$token = $container->get( 'lpagery_token_compatibility_service' );
+			$blueprint = $container->has( 'section_field_blueprint_service' ) ? $container->get( 'section_field_blueprint_service' ) : null;
+			$resolver = $container->has( 'blueprint_family_resolver' ) ? $container->get( 'blueprint_family_resolver' ) : null;
+			return new Library_LPagery_Compatibility_Service( $token, $blueprint, $resolver );
 		} );
 	}
 }

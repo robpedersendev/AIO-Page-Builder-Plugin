@@ -224,6 +224,10 @@ final class Page_Template_Detail_Screen {
 		if ( ! $assembly_pipeline instanceof \AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline ) {
 			$assembly_pipeline = new \AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline( null, null );
 		}
+		$lpagery_compatibility = null;
+		if ( $this->container && $this->container->has( 'library_lpagery_compatibility_service' ) ) {
+			$lpagery_compatibility = $this->container->get( 'library_lpagery_compatibility_service' );
+		}
 
 		return new Page_Template_Detail_State_Builder(
 			$page_provider,
@@ -232,7 +236,8 @@ final class Page_Template_Detail_Screen {
 			$side_panel_builder,
 			$context_builder,
 			$section_renderer,
-			$assembly_pipeline
+			$assembly_pipeline,
+			$lpagery_compatibility
 		);
 	}
 }

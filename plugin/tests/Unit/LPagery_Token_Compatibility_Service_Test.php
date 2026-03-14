@@ -167,4 +167,19 @@ final class LPagery_Token_Compatibility_Service_Test extends TestCase {
 		$this->assertTrue( $result->is_supported() );
 		$this->assertSame( 'color.primary-accent_2', $result->get_lpagery_key() );
 	}
+
+	/** Prompt 179: validate_token_key supported and unsupported. */
+	public function test_validate_token_key_supported(): void {
+		$service = new LPagery_Token_Compatibility_Service();
+		$out = $service->validate_token_key( 'color.primary' );
+		$this->assertTrue( $out['supported'] );
+		$this->assertSame( '', $out['reason'] );
+	}
+
+	public function test_validate_token_key_unsupported(): void {
+		$service = new LPagery_Token_Compatibility_Service();
+		$out = $service->validate_token_key( 'no-dot' );
+		$this->assertFalse( $out['supported'] );
+		$this->assertNotEmpty( $out['reason'] );
+	}
 }

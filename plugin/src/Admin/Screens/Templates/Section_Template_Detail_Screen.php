@@ -256,6 +256,10 @@ final class Section_Template_Detail_Screen {
 				$blueprint_service = $svc;
 			}
 		}
+		$lpagery_compatibility = null;
+		if ( $this->container && $this->container->has( 'library_lpagery_compatibility_service' ) ) {
+			$lpagery_compatibility = $this->container->get( 'library_lpagery_compatibility_service' );
+		}
 
 		return new Section_Template_Detail_State_Builder(
 			$section_provider,
@@ -264,7 +268,8 @@ final class Section_Template_Detail_Screen {
 			$context_builder,
 			$section_renderer,
 			$assembly_pipeline,
-			$blueprint_service
+			$blueprint_service,
+			$lpagery_compatibility
 		);
 	}
 }

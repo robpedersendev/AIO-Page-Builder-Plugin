@@ -163,6 +163,23 @@ final class LPagery_Token_Compatibility_Service {
 	}
 
 	/**
+	 * Validates an LPagery token key. Returns supported flag and reason for unsupported cases (Prompt 179).
+	 *
+	 * @param string $lpagery_key LPagery key (e.g. color.primary).
+	 * @return array{supported: bool, reason: string}
+	 */
+	public function validate_token_key( string $lpagery_key ): array {
+		$result = $this->map_lpagery_to_core( $lpagery_key );
+		if ( $result->is_supported() ) {
+			return array( 'supported' => true, 'reason' => '' );
+		}
+		return array(
+			'supported' => false,
+			'reason'   => $result->get_warning() ?? __( 'LPagery key is not supported or invalid.', 'aio-page-builder' ),
+		);
+	}
+
+	/**
 	 * Sanitizes token name for use in LPagery key: alphanumeric, underscore, hyphen only; bounded length.
 	 *
 	 * @param string $name

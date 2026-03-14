@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Context;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
+use AIOPageBuilder\Domain\Rendering\LPagery\Library_LPagery_Compatibility_Service;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Blocks\Page_Block_Assembly_Result;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder;
@@ -48,6 +49,9 @@ final class Page_Template_Detail_State_Builder {
 	/** @var Native_Block_Assembly_Pipeline */
 	private Native_Block_Assembly_Pipeline $assembly_pipeline;
 
+	/** @var Library_LPagery_Compatibility_Service|null */
+	private ?Library_LPagery_Compatibility_Service $lpagery_compatibility;
+
 	public function __construct(
 		Page_Template_Definition_Provider $page_template_provider,
 		Section_Definition_Provider_For_Preview $section_provider,
@@ -55,15 +59,17 @@ final class Page_Template_Detail_State_Builder {
 		Preview_Side_Panel_Builder $side_panel_builder,
 		Section_Render_Context_Builder $context_builder,
 		Section_Renderer_Base $section_renderer,
-		Native_Block_Assembly_Pipeline $assembly_pipeline
+		Native_Block_Assembly_Pipeline $assembly_pipeline,
+		?Library_LPagery_Compatibility_Service $lpagery_compatibility = null
 	) {
 		$this->page_template_provider = $page_template_provider;
 		$this->section_provider       = $section_provider;
 		$this->preview_generator      = $preview_generator;
-		$this->side_panel_builder    = $side_panel_builder;
-		$this->context_builder       = $context_builder;
-		$this->section_renderer      = $section_renderer;
-		$this->assembly_pipeline     = $assembly_pipeline;
+		$this->side_panel_builder     = $side_panel_builder;
+		$this->context_builder        = $context_builder;
+		$this->section_renderer       = $section_renderer;
+		$this->assembly_pipeline      = $assembly_pipeline;
+		$this->lpagery_compatibility  = $lpagery_compatibility;
 	}
 
 	/**
@@ -113,18 +119,43 @@ final class Page_Template_Detail_State_Builder {
 			'page_template'  => $definition,
 		) );
 
+		$section_compatibilities = array();
+		if ( $this->lpagery_compatibility !== null ) {
+			foreach ( $ordered_sections as $item ) {
+				if ( ! \is_array( $item ) ) {
+					continue;
+				}
+				$sec_key = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
+				if ( $sec_key === '' ) {
+					continue;
+				}
+				$section_def = $this->section_provider->get_definition_by_key( $sec_key );
+				$comp = $this->lpagery_compatibility->get_compatibility_for_section( $sec_key, \is_array( $section_def ) ? $section_def : null );
+				$section_compatibilities[] = array(
+					'section_key'        => $sec_key,
+					'lpagery_state'      => $comp->get_compatibility_state(),
+					'compatibility_state' => $comp->get_compatibility_state(),
+				);
+			}
+			$page_comp = $this->lpagery_compatibility->get_compatibility_for_page_template( $template_key, $definition, $section_compatibilities );
+			$lpagery_compatibility_state = $page_comp->to_array();
+		} else {
+			$lpagery_compatibility_state = null;
+		}
+
 		$breadcrumbs = $this->build_breadcrumbs( $definition, $category_class, $family );
 
 		return array(
-			'template_key'            => $template_key,
-			'definition'              => $definition,
-			'side_panel'              => $side_panel,
-			'used_sections'           => $used_sections,
-			'one_pager_link'           => $one_pager_link,
-			'preview_payload'          => $preview_payload,
-			'rendered_preview_html'    => $rendered_preview_html,
-			'breadcrumbs'              => $breadcrumbs,
-			'not_found'               => false,
+			'template_key'                 => $template_key,
+			'definition'                   => $definition,
+			'side_panel'                   => $side_panel,
+			'used_sections'                => $used_sections,
+			'one_pager_link'               => $one_pager_link,
+			'lpagery_compatibility_state'  => $lpagery_compatibility_state,
+			'preview_payload'              => $preview_payload,
+			'rendered_preview_html'        => $rendered_preview_html,
+			'breadcrumbs'                  => $breadcrumbs,
+			'not_found'                    => false,
 		);
 	}
 
@@ -257,15 +288,16 @@ final class Page_Template_Detail_State_Builder {
 	private function not_found_state( string $template_key, array $request_params ): array {
 		$base_url = \admin_url( 'admin.php?page=' . Page_Template_Directory_State_Builder::SCREEN_SLUG );
 		return array(
-			'template_key'            => $template_key,
-			'definition'              => array(),
-			'side_panel'              => array(),
-			'used_sections'           => array(),
-			'one_pager_link'          => '',
-			'preview_payload'         => array(),
-			'rendered_preview_html'   => '',
-			'breadcrumbs'             => array( array( 'label' => __( 'Page Templates', 'aio-page-builder' ), 'url' => $base_url ) ),
-			'not_found'               => true,
+			'template_key'                 => $template_key,
+			'definition'                   => array(),
+			'side_panel'                   => array(),
+			'used_sections'                => array(),
+			'one_pager_link'               => '',
+			'lpagery_compatibility_state'  => null,
+			'preview_payload'              => array(),
+			'rendered_preview_html'        => '',
+			'breadcrumbs'                  => array( array( 'label' => __( 'Page Templates', 'aio-page-builder' ), 'url' => $base_url ) ),
+			'not_found'                    => true,
 		);
 	}
 }

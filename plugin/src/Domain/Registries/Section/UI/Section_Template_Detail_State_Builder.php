@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Blocks\Page_Block_Assembly_Result;
+use AIOPageBuilder\Domain\Rendering\LPagery\Library_LPagery_Compatibility_Service;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Renderer_Base;
 
@@ -50,6 +51,9 @@ final class Section_Template_Detail_State_Builder {
 	/** @var Section_Field_Blueprint_Service|null */
 	private ?Section_Field_Blueprint_Service $blueprint_service;
 
+	/** @var Library_LPagery_Compatibility_Service|null */
+	private ?Library_LPagery_Compatibility_Service $lpagery_compatibility;
+
 	public function __construct(
 		Section_Definition_Provider $section_provider,
 		Synthetic_Preview_Data_Generator $preview_generator,
@@ -57,15 +61,17 @@ final class Section_Template_Detail_State_Builder {
 		Section_Render_Context_Builder $context_builder,
 		Section_Renderer_Base $section_renderer,
 		Native_Block_Assembly_Pipeline $assembly_pipeline,
-		?Section_Field_Blueprint_Service $blueprint_service = null
+		?Section_Field_Blueprint_Service $blueprint_service = null,
+		?Library_LPagery_Compatibility_Service $lpagery_compatibility = null
 	) {
-		$this->section_provider   = $section_provider;
-		$this->preview_generator  = $preview_generator;
-		$this->side_panel_builder = $side_panel_builder;
-		$this->context_builder    = $context_builder;
-		$this->section_renderer   = $section_renderer;
-		$this->assembly_pipeline  = $assembly_pipeline;
-		$this->blueprint_service  = $blueprint_service;
+		$this->section_provider    = $section_provider;
+		$this->preview_generator   = $preview_generator;
+		$this->side_panel_builder  = $side_panel_builder;
+		$this->context_builder     = $context_builder;
+		$this->section_renderer    = $section_renderer;
+		$this->assembly_pipeline   = $assembly_pipeline;
+		$this->blueprint_service   = $blueprint_service;
+		$this->lpagery_compatibility = $lpagery_compatibility;
 	}
 
 	/**
@@ -107,21 +113,28 @@ final class Section_Template_Detail_State_Builder {
 		$compatibility  = $definition['compatibility'] ?? array();
 		$compatibility_notes = \is_array( $compatibility ) ? $compatibility : array();
 
+		$lpagery_compatibility_state = null;
+		if ( $this->lpagery_compatibility !== null ) {
+			$lpagery_result = $this->lpagery_compatibility->get_compatibility_for_section( $section_key, $definition );
+			$lpagery_compatibility_state = $lpagery_result->to_array();
+		}
+
 		$rendered_preview_html = $this->render_preview_html( $definition, $field_values, array( 'reduced_motion' => $reduced_motion ) );
 		$breadcrumbs = $this->build_breadcrumbs( $definition, $purpose_family );
 
 		return array(
-			'section_key'            => $section_key,
-			'definition'             => $definition,
-			'side_panel'             => $side_panel,
-			'field_summary'          => $field_summary,
-			'helper_ref'             => $helper_ref,
-			'helper_doc_url'         => $helper_doc_url,
-			'compatibility_notes'    => $compatibility_notes,
-			'preview_payload'        => $preview_payload,
-			'rendered_preview_html'  => $rendered_preview_html,
-			'breadcrumbs'            => $breadcrumbs,
-			'not_found'              => false,
+			'section_key'                 => $section_key,
+			'definition'                  => $definition,
+			'side_panel'                  => $side_panel,
+			'field_summary'               => $field_summary,
+			'helper_ref'                  => $helper_ref,
+			'helper_doc_url'              => $helper_doc_url,
+			'compatibility_notes'         => $compatibility_notes,
+			'lpagery_compatibility_state' => $lpagery_compatibility_state,
+			'preview_payload'             => $preview_payload,
+			'rendered_preview_html'       => $rendered_preview_html,
+			'breadcrumbs'                 => $breadcrumbs,
+			'not_found'                   => false,
 		);
 	}
 
@@ -223,17 +236,18 @@ final class Section_Template_Detail_State_Builder {
 	private function not_found_state( string $section_key ): array {
 		$base_url = \admin_url( 'admin.php?page=' . Section_Template_Directory_State_Builder::SCREEN_SLUG );
 		return array(
-			'section_key'           => $section_key,
-			'definition'            => array(),
-			'side_panel'            => array(),
-			'field_summary'         => array(),
-			'helper_ref'            => '',
-			'helper_doc_url'        => '',
-			'compatibility_notes'   => array(),
-			'preview_payload'        => array(),
-			'rendered_preview_html' => '',
-			'breadcrumbs'           => array( array( 'label' => __( 'Section Templates', 'aio-page-builder' ), 'url' => $base_url ) ),
-			'not_found'             => true,
+			'section_key'                 => $section_key,
+			'definition'                  => array(),
+			'side_panel'                  => array(),
+			'field_summary'               => array(),
+			'helper_ref'                  => '',
+			'helper_doc_url'              => '',
+			'compatibility_notes'         => array(),
+			'lpagery_compatibility_state' => null,
+			'preview_payload'             => array(),
+			'rendered_preview_html'       => '',
+			'breadcrumbs'                 => array( array( 'label' => __( 'Section Templates', 'aio-page-builder' ), 'url' => $base_url ) ),
+			'not_found'                   => true,
 		);
 	}
 }
