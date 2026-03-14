@@ -18,6 +18,7 @@ use AIOPageBuilder\Domain\ACF\Blueprints\Preview_Family_Mapping;
 use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Normalizer;
 use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service;
 use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Validator;
+use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
@@ -47,12 +48,19 @@ final class ACF_Blueprints_Provider implements Service_Provider_Interface {
 			return new Preview_Family_Mapping();
 		} );
 		$container->register( 'section_field_blueprint_service', function () use ( $container ): Section_Field_Blueprint_Service {
-			return new Section_Field_Blueprint_Service(
+			$service = new Section_Field_Blueprint_Service(
 				$container->get( 'section_template_repository' ),
 				$container->get( 'section_field_blueprint_validator' ),
 				$container->get( 'section_field_blueprint_normalizer' ),
 				$container->get( 'blueprint_family_resolver' )
 			);
+			if ( $container->has( 'form_provider_registry' ) ) {
+				$reg = $container->get( 'form_provider_registry' );
+				if ( $reg instanceof Form_Provider_Registry ) {
+					$service->set_form_provider_registry( $reg );
+				}
+			}
+			return $service;
 		} );
 	}
 }

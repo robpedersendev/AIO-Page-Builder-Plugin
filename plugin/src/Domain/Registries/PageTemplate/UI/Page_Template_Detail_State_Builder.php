@@ -18,6 +18,7 @@ use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Context;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
+use AIOPageBuilder\Domain\Rendering\FormProviders\Page_Form_Reference_Aggregator;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Versioning_Service;
 use AIOPageBuilder\Domain\Rendering\LPagery\Library_LPagery_Compatibility_Service;
@@ -65,6 +66,9 @@ final class Page_Template_Detail_State_Builder {
 	/** @var Template_Deprecation_Service|null */
 	private ?Template_Deprecation_Service $deprecation_service;
 
+	/** @var Page_Form_Reference_Aggregator|null */
+	private ?Page_Form_Reference_Aggregator $form_reference_aggregator;
+
 	public function __construct(
 		Page_Template_Definition_Provider $page_template_provider,
 		Section_Definition_Provider_For_Preview $section_provider,
@@ -76,7 +80,8 @@ final class Page_Template_Detail_State_Builder {
 		?Library_LPagery_Compatibility_Service $lpagery_compatibility = null,
 		?Preview_Cache_Service $preview_cache = null,
 		?Template_Versioning_Service $versioning_service = null,
-		?Template_Deprecation_Service $deprecation_service = null
+		?Template_Deprecation_Service $deprecation_service = null,
+		?Page_Form_Reference_Aggregator $form_reference_aggregator = null
 	) {
 		$this->page_template_provider = $page_template_provider;
 		$this->section_provider       = $section_provider;
@@ -89,6 +94,7 @@ final class Page_Template_Detail_State_Builder {
 		$this->preview_cache          = $preview_cache;
 		$this->versioning_service     = $versioning_service;
 		$this->deprecation_service    = $deprecation_service;
+		$this->form_reference_aggregator = $form_reference_aggregator;
 	}
 
 	/**
@@ -188,6 +194,14 @@ final class Page_Template_Detail_State_Builder {
 			$lpagery_compatibility_state = null;
 		}
 
+		$page_form_references = array();
+		if ( $this->form_reference_aggregator !== null ) {
+			$items = array_map( function ( $e ) {
+				return array( 'field_values' => isset( $e['field_values'] ) && is_array( $e['field_values'] ) ? $e['field_values'] : array() );
+			}, $section_field_values );
+			$page_form_references = $this->form_reference_aggregator->aggregate( $items );
+		}
+
 		$breadcrumbs = $this->build_breadcrumbs( $definition, $category_class, $family );
 		$version_summary = $this->versioning_service !== null
 			? $this->versioning_service->get_version_summary( $definition, 'page' )
@@ -208,6 +222,7 @@ final class Page_Template_Detail_State_Builder {
 			'preview_payload'              => $preview_payload,
 			'rendered_preview_html'        => $rendered_preview_html,
 			'preview_cache_hit'            => $preview_cache_hit,
+			'page_form_references'         => $page_form_references,
 			'breadcrumbs'                  => $breadcrumbs,
 			'not_found'                    => false,
 		);
@@ -401,6 +416,7 @@ final class Page_Template_Detail_State_Builder {
 			'preview_payload'              => array(),
 			'rendered_preview_html'        => '',
 			'preview_cache_hit'            => false,
+			'page_form_references'         => array(),
 			'breadcrumbs'                  => array( array( 'label' => __( 'Page Templates', 'aio-page-builder' ), 'url' => $base_url ) ),
 			'not_found'                    => true,
 		);

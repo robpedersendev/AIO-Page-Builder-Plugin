@@ -6,7 +6,7 @@ This appendix is **generated** from the live page template registry. Do not edit
 
 **See also**: [Glossary](glossary.md) for **page template**, **template_family**, **template_category_class**, **version block**, **deprecation block**, **one-pager**; [Data Schema Appendix](data-schema-appendix.md) for page template CPT schema and version/deprecation block shapes.
 
-**Total page templates**: *(run generator to refresh; after PT-14 gap-closing batch expect 580)*
+**Total page templates**: *(run generator to refresh; after PT-14 gap-closing batch expect 580)*. Bundled request-form template `pt_request_form` (archetype request_page) is included when seeded via Form_Template_Seeder or Page_Template_Registry_Service::ensure_bundled_form_templates (Prompt 227).
 
 ---
 

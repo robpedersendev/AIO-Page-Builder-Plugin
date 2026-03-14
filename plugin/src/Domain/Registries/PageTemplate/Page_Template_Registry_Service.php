@@ -18,7 +18,10 @@ use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Filter_Result;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Pagination;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
+use AIOPageBuilder\Domain\FormProvider\Form_Integration_Definitions;
+use AIOPageBuilder\Domain\FormProvider\Form_Template_Seeder;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 
 /**
  * Page templates are ordered reusable patterns. Section references must exist in section registry.
@@ -214,6 +217,27 @@ final class Page_Template_Registry_Service {
 	 */
 	public function set_large_library_query_service( Large_Library_Query_Service $service ): void {
 		$this->large_library_query_service = $service;
+	}
+
+	/**
+	 * Ensures bundled form section and request page template exist in the registries (spec §53.1, Prompt 227).
+	 * Idempotent: overwrites existing definitions for form_section_ndr and pt_request_form.
+	 * Call from activation, first-time setup, or admin seed action. Requires the section template repository.
+	 *
+	 * @param Section_Template_Repository $section_repo Section template repository (for form_section_ndr).
+	 * @return array{ success: bool, section_id: int, page_id: int, errors: list<string> }
+	 */
+	public function ensure_bundled_form_templates( Section_Template_Repository $section_repo ): array {
+		return Form_Template_Seeder::run( $section_repo, $this->repository );
+	}
+
+	/**
+	 * Returns whether the bundled request-form page template exists in the registry (by internal key).
+	 *
+	 * @return bool
+	 */
+	public function has_bundled_request_form_template(): bool {
+		return $this->get_by_key( Form_Integration_Definitions::REQUEST_PAGE_TEMPLATE_KEY ) !== null;
 	}
 
 	/**

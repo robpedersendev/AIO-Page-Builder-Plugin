@@ -262,6 +262,13 @@ final class Page_Template_Detail_Screen {
 				$deprecation_service = $d;
 			}
 		}
+		$form_reference_aggregator = null;
+		if ( $this->container && $this->container->has( 'form_provider_registry' ) ) {
+			$reg = $this->container->get( 'form_provider_registry' );
+			if ( $reg instanceof \AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry ) {
+				$form_reference_aggregator = new \AIOPageBuilder\Domain\Rendering\FormProviders\Page_Form_Reference_Aggregator( $reg );
+			}
+		}
 
 		return new Page_Template_Detail_State_Builder(
 			$page_provider,
@@ -274,7 +281,8 @@ final class Page_Template_Detail_Screen {
 			$lpagery_compatibility,
 			$preview_cache,
 			$versioning_service,
-			$deprecation_service
+			$deprecation_service,
+			$form_reference_aggregator
 		);
 	}
 }

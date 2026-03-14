@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\ACF\Blueprints;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 
@@ -35,6 +36,9 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 
 	/** @var Blueprint_Family_Resolver|null */
 	private ?Blueprint_Family_Resolver $family_resolver;
+
+	/** @var Form_Provider_Registry|null Optional; when set, form_embed blueprints get form_provider choices (Prompt 228). */
+	private ?Form_Provider_Registry $form_provider_registry = null;
 
 	public function __construct(
 		Section_Template_Repository $section_repository,
@@ -107,7 +111,56 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 		if ( $this->family_resolver !== null ) {
 			$normalized = $this->family_resolver->resolve( $definition, $normalized );
 		}
+		if ( $this->form_provider_registry !== null && (string) ( $definition[ Section_Schema::FIELD_CATEGORY ] ?? '' ) === 'form_embed' ) {
+			$normalized = $this->augment_form_provider_choices( $normalized );
+		}
 		return $normalized;
+	}
+
+	/**
+	 * Injects form_provider choices from the registry for form_embed blueprints (Prompt 228).
+	 *
+	 * @param array<string, mixed> $blueprint Normalized blueprint with FIELDS.
+	 * @return array<string, mixed>
+	 */
+	private function augment_form_provider_choices( array $blueprint ): array {
+		$fields = $blueprint[ Field_Blueprint_Schema::FIELDS ] ?? null;
+		if ( ! is_array( $fields ) ) {
+			return $blueprint;
+		}
+		$ids = $this->form_provider_registry->get_registered_provider_ids();
+		if ( empty( $ids ) ) {
+			return $blueprint;
+		}
+		$choices = array();
+		foreach ( $ids as $id ) {
+			$choices[ $id ] = $id;
+		}
+		$out = array();
+		foreach ( $fields as $field ) {
+			if ( ! is_array( $field ) ) {
+				$out[] = $field;
+				continue;
+			}
+			$name = (string) ( $field[ Field_Blueprint_Schema::FIELD_NAME ] ?? $field[ Field_Blueprint_Schema::FIELD_KEY ] ?? '' );
+			if ( $name === Form_Provider_Registry::FIELD_FORM_PROVIDER ) {
+				$field['choices'] = $choices;
+				$field['type']    = Field_Blueprint_Schema::TYPE_SELECT;
+			}
+			$out[] = $field;
+		}
+		$blueprint[ Field_Blueprint_Schema::FIELDS ] = $out;
+		return $blueprint;
+	}
+
+	/**
+	 * Sets the form provider registry for augmenting form_provider field with choices (Prompt 228). Call from container after construction.
+	 *
+	 * @param Form_Provider_Registry $registry
+	 * @return void
+	 */
+	public function set_form_provider_registry( Form_Provider_Registry $registry ): void {
+		$this->form_provider_registry = $registry;
 	}
 
 	/**

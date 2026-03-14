@@ -36,7 +36,6 @@ use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
-use AIOPageBuilder\Domain\FormProvider\Form_Template_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\ExpansionPack\Page_Template_And_Composition_Expansion_Pack_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\TopLevelBatch\Top_Level_Marketing_Page_Template_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\TopLevelLegalUtilityBatch\Top_Level_Legal_Utility_Page_Template_Seeder;
@@ -382,13 +381,13 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
 			exit;
 		}
-		$section_repo = $this->container->get( 'section_template_repository' );
-		$page_repo    = $this->container->get( 'page_template_repository' );
-		if ( ! $section_repo instanceof Section_Template_Repository || ! $page_repo instanceof Page_Template_Repository ) {
+		$section_registry = $this->container->get( 'section_registry_service' );
+		$page_repo        = $this->container->get( 'page_template_repository' );
+		if ( ! $section_registry instanceof \AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service || ! $page_repo instanceof Page_Template_Repository ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
 			exit;
 		}
-		$result = Form_Template_Seeder::run( $section_repo, $page_repo );
+		$result = $section_registry->ensure_bundled_form_templates( $page_repo );
 		$query  = $result['success'] ? 'aio_seed_result=success' : 'aio_seed_result=error';
 		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
 		exit;

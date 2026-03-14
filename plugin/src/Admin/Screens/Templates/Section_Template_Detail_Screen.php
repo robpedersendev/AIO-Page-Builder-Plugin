@@ -220,6 +220,32 @@ final class Section_Template_Detail_Screen {
 					</tbody>
 				</table>
 			<?php endif; ?>
+			<?php
+			$form_state = $state['form_section_field_state'] ?? null;
+			if ( \is_array( $form_state ) && ! empty( $form_state['is_form_section'] ) ) :
+				$labels = $form_state['labels'] ?? array();
+				$prov_label = $labels['form_provider'] ?? __( 'Form provider', 'aio-page-builder' );
+				$id_label   = $labels['form_id'] ?? __( 'Form identifier', 'aio-page-builder' );
+				?>
+				<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Form binding', 'aio-page-builder' ); ?></h3>
+				<dl class="aio-metadata-list aio-form-binding-list">
+					<dt><?php echo \esc_html( $prov_label ); ?></dt>
+					<dd><code><?php echo \esc_html( (string) ( $form_state['form_provider'] ?? '' ) ); ?></code><?php echo ! empty( $form_state['registered_provider_ids'] ) ? ' <span class="aio-meta-hint">(' . \esc_html( implode( ', ', $form_state['registered_provider_ids'] ) ) . ')</span>' : ''; ?></dd>
+					<dt><?php echo \esc_html( $id_label ); ?></dt>
+					<dd><code><?php echo \esc_html( (string) ( $form_state['form_id'] ?? '' ) ); ?></code></dd>
+					<?php if ( ! empty( $form_state['shortcode_preview'] ) ) : ?>
+						<dt><?php \esc_html_e( 'Shortcode', 'aio-page-builder' ); ?></dt>
+						<dd><code><?php echo \esc_html( (string) $form_state['shortcode_preview'] ); ?></code></dd>
+					<?php endif; ?>
+				</dl>
+				<?php if ( ! empty( $form_state['messages'] ) ) : ?>
+					<ul class="aio-form-binding-messages" role="alert">
+						<?php foreach ( (array) $form_state['messages'] as $msg ) : ?>
+							<li class="aio-notice-warning"><?php echo \esc_html( $msg ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+			<?php endif; ?>
 		</section>
 		<?php
 	}
@@ -294,6 +320,13 @@ final class Section_Template_Detail_Screen {
 				$deprecation_service = $d;
 			}
 		}
+		$form_section_field_state_builder = null;
+		if ( $this->container && $this->container->has( 'form_provider_registry' ) ) {
+			$reg = $this->container->get( 'form_provider_registry' );
+			if ( $reg instanceof \AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry ) {
+				$form_section_field_state_builder = new \AIOPageBuilder\Domain\Registries\Section\UI\Form_Section_Field_State_Builder( $reg );
+			}
+		}
 
 		return new Section_Template_Detail_State_Builder(
 			$section_provider,
@@ -306,7 +339,8 @@ final class Section_Template_Detail_Screen {
 			$lpagery_compatibility,
 			$preview_cache,
 			$versioning_service,
-			$deprecation_service
+			$deprecation_service,
+			$form_section_field_state_builder
 		);
 	}
 }

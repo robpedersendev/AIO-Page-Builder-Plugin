@@ -67,6 +67,9 @@ final class Section_Template_Detail_State_Builder {
 	/** @var Template_Deprecation_Service|null */
 	private ?Template_Deprecation_Service $deprecation_service;
 
+	/** @var Form_Section_Field_State_Builder|null */
+	private ?Form_Section_Field_State_Builder $form_section_field_state_builder;
+
 	public function __construct(
 		Section_Definition_Provider $section_provider,
 		Synthetic_Preview_Data_Generator $preview_generator,
@@ -78,7 +81,8 @@ final class Section_Template_Detail_State_Builder {
 		?Library_LPagery_Compatibility_Service $lpagery_compatibility = null,
 		?Preview_Cache_Service $preview_cache = null,
 		?Template_Versioning_Service $versioning_service = null,
-		?Template_Deprecation_Service $deprecation_service = null
+		?Template_Deprecation_Service $deprecation_service = null,
+		?Form_Section_Field_State_Builder $form_section_field_state_builder = null
 	) {
 		$this->section_provider    = $section_provider;
 		$this->preview_generator   = $preview_generator;
@@ -91,6 +95,7 @@ final class Section_Template_Detail_State_Builder {
 		$this->preview_cache       = $preview_cache;
 		$this->versioning_service  = $versioning_service;
 		$this->deprecation_service = $deprecation_service;
+		$this->form_section_field_state_builder = $form_section_field_state_builder;
 	}
 
 	/**
@@ -166,6 +171,11 @@ final class Section_Template_Detail_State_Builder {
 			}
 		}
 
+		$form_section_field_state = null;
+		if ( $this->form_section_field_state_builder !== null ) {
+			$form_section_field_state = $this->form_section_field_state_builder->build_state( $definition, $field_values );
+		}
+
 		$breadcrumbs = $this->build_breadcrumbs( $definition, $purpose_family );
 		$version_summary = $this->versioning_service !== null
 			? $this->versioning_service->get_version_summary( $definition, 'section' )
@@ -189,6 +199,7 @@ final class Section_Template_Detail_State_Builder {
 			'rendered_preview_html'       => $rendered_preview_html,
 			'preview_cache_hit'           => $preview_cache_hit,
 			'breadcrumbs'                 => $breadcrumbs,
+			'form_section_field_state'    => $form_section_field_state,
 			'not_found'                   => false,
 		);
 	}
@@ -364,6 +375,7 @@ final class Section_Template_Detail_State_Builder {
 			'rendered_preview_html'       => '',
 			'preview_cache_hit'           => false,
 			'breadcrumbs'                 => array( array( 'label' => __( 'Section Templates', 'aio-page-builder' ), 'url' => $base_url ) ),
+			'form_section_field_state'    => null,
 			'not_found'                   => true,
 		);
 	}

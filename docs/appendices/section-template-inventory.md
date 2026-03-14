@@ -6,7 +6,7 @@ This appendix is **generated** from the live section template registry. Do not e
 
 **See also**: [Glossary](glossary.md) for **section template**, **section_purpose_family**, **version block**, **deprecation block**; [Data Schema Appendix](data-schema-appendix.md) for section CPT schema and version/deprecation block shapes.
 
-**Total section templates**: *(run generator to refresh; after SEC-09 gap-closing batch expect 254)*
+**Total section templates**: *(run generator to refresh; after SEC-09 gap-closing batch expect 254)*. Bundled form template `form_section_ndr` (category form_embed) is included when seeded via Form_Template_Seeder or Section_Registry_Service::ensure_bundled_form_templates (Prompt 227).
 
 ---
 
