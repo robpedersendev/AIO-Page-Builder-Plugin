@@ -18,6 +18,7 @@ use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Prompt_Experiments_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Analytics_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
+use AIOPageBuilder\Admin\Screens\Templates\Page_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Templates_Directory_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Section_Templates_Directory_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
@@ -112,6 +113,7 @@ final class Admin_Menu {
 		$prompt_experiments = new Prompt_Experiments_Screen( $this->container );
 		$build_plans        = new Build_Plans_Screen( $this->container );
 		$page_templates_dir   = new Page_Templates_Directory_Screen( $this->container );
+		$page_template_detail = new Page_Template_Detail_Screen( $this->container );
 		$section_templates_dir = new Section_Templates_Directory_Screen( $this->container );
 		$build_plan_analytics = new Build_Plan_Analytics_Screen( $this->container );
 		$queue_logs         = new Queue_Logs_Screen( $this->container );
@@ -228,6 +230,16 @@ final class Admin_Menu {
 			Page_Templates_Directory_Screen::SLUG,
 			array( $page_templates_dir, 'render' )
 		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$page_template_detail->get_title(),
+			'', // * Hidden from menu; reachable via View link from directory.
+			$page_template_detail->get_capability(),
+			Page_Template_Detail_Screen::SLUG,
+			array( $page_template_detail, 'render' )
+		);
+		\remove_submenu_page( self::PARENT_SLUG, Page_Template_Detail_Screen::SLUG );
 
 		add_submenu_page(
 			self::PARENT_SLUG,

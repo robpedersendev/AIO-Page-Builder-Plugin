@@ -108,6 +108,12 @@ if ( ! function_exists( 'wp_kses_post' ) ) {
 		return is_string( $data ) ? strip_tags( $data ) : '';
 	}
 }
+// * Stub for page template detail preview (do_blocks). Unit tests get block markup as-is.
+if ( ! function_exists( 'do_blocks' ) ) {
+	function do_blocks( $content ) {
+		return is_string( $content ) ? $content : '';
+	}
+}
 if ( ! function_exists( 'esc_url' ) ) {
 	function esc_url( $url ) {
 		$url = trim( (string) $url );

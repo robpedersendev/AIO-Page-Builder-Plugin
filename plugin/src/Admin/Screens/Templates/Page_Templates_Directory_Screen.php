@@ -255,8 +255,15 @@ final class Page_Templates_Directory_Screen {
 					$status = (string) ( $row['status'] ?? '' );
 					$version = (string) ( $row['version'] ?? '1' );
 					$section_count = (int) ( $row['section_count'] ?? 0 );
-					$one_pager_url = ''; // * One-pager link: placeholder until detail/one-pager screen exists.
-					$view_url = \add_query_arg( array_merge( $query_args, array( 'template' => $key ) ), $base_url );
+					$one_pager_url = ''; // * One-pager link: populated from template definition on detail screen.
+					$detail_args = array( 'page' => Page_Template_Detail_Screen::SLUG, 'template' => $key );
+					if ( $cat !== '' ) {
+						$detail_args['category_class'] = $cat;
+					}
+					if ( $family !== '' ) {
+						$detail_args['family'] = $family;
+					}
+					$view_url = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
 					?>
 					<tr>
 						<td><?php echo \esc_html( $name ); ?></td>
