@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_Analytics_Service;
+use AIOPageBuilder\Domain\Registries\Analytics\Template_Analytics_Service;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Item_Generator;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Bulk_Action_Service;
@@ -152,6 +153,15 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'build_plan_analytics_service', function () use ( $container ): Build_Plan_Analytics_Service {
 			return new Build_Plan_Analytics_Service( $container->get( 'build_plan_repository' ) );
+		} );
+		$analytics_dir = __DIR__ . '/../../../Domain/Registries/Analytics';
+		require_once $analytics_dir . '/Template_Analytics_Service.php';
+		$container->register( 'template_analytics_service', function () use ( $container ): Template_Analytics_Service {
+			return new Template_Analytics_Service(
+				$container->get( 'build_plan_repository' ),
+				$container->has( 'job_queue_repository' ) ? $container->get( 'job_queue_repository' ) : null,
+				$container->has( 'composition_repository' ) ? $container->get( 'composition_repository' ) : null
+			);
 		} );
 	}
 }

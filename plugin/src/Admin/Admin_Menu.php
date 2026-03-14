@@ -16,6 +16,7 @@ use AIOPageBuilder\Admin\Screens\AI\AI_Providers_Screen;
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Prompt_Experiments_Screen;
+use AIOPageBuilder\Admin\Screens\Analytics\Template_Analytics_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Analytics_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Compositions_Screen;
@@ -122,7 +123,8 @@ final class Admin_Menu {
 		$template_compare_screen  = new Template_Compare_Screen( $this->container );
 		$compositions_screen     = new Compositions_Screen( $this->container );
 		$build_plan_analytics = new Build_Plan_Analytics_Screen( $this->container );
-		$queue_logs         = new Queue_Logs_Screen( $this->container );
+		$template_analytics   = new Template_Analytics_Screen( $this->container );
+		$queue_logs           = new Queue_Logs_Screen( $this->container );
 		$support_triage     = new Support_Triage_Dashboard_Screen( $this->container );
 		$post_release_health = new Post_Release_Health_Screen( $this->container );
 		$privacy_reporting  = new Privacy_Reporting_Settings_Screen( $this->container );
@@ -291,6 +293,15 @@ final class Admin_Menu {
 			$build_plan_analytics->get_capability(),
 			Build_Plan_Analytics_Screen::SLUG,
 			array( $build_plan_analytics, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$template_analytics->get_title(),
+			__( 'Template Analytics', 'aio-page-builder' ),
+			$template_analytics->get_capability(),
+			Template_Analytics_Screen::SLUG,
+			array( $template_analytics, 'render' )
 		);
 
 		add_submenu_page(

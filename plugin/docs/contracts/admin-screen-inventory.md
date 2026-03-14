@@ -76,6 +76,8 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 | `aio-page-builder-privacy-reporting` | Privacy, Reporting & Settings | Domain: Reporting | `aio_manage_reporting_and_privacy` | Reporting disclosure (mandatory); retention state; uninstall/export behavior; environment & version summary; report destination (no secrets); privacy-policy helper text; diagnostics verbosity only if allowed | Implemented |
 | `aio-page-builder-reporting` | Reporting | Domain: Reporting | TBD | Reporting disclosure, heartbeat status | Not implemented |
 | `aio-page-builder-export-restore` | Import / Export | Domain: ExportRestore | `aio_export_data` (export); `aio_import_data` (restore/validate) | Create export (mode selection); export history; upload ZIP, validate, conflict summary, confirm restore; link to uninstall/export behavior | Implemented |
+| `aio-page-builder-build-plan-analytics` | Build Plan Analytics | Domain: BuildPlan | `aio_view_build_plans` | View plan review trends, common blockers, execution failure trends, rollback frequency; filter by date; link to Build Plans | Implemented |
+| `aio-page-builder-template-analytics` | Template Analytics | Domain: Registries / Reporting | `aio_view_build_plans` | View template usage by family/class, recommendation acceptance, rejection reasons, execution outcomes by family, rollback frequency, composition usage; filter by date, template family, page class; links to Build Plans, Queue & Logs, Page Templates, Compositions (spec §49.11, §59.12; Prompt 199) | Implemented |
 
 ---
 
