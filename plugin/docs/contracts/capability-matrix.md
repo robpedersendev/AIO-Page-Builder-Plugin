@@ -58,7 +58,24 @@
 
 ---
 
-## 4. Implementation
+## 4. Template workflows (expanded ecosystem, §49.6, §49.7, §62.2)
+
+Template-related screens and actions use the following capability mapping. UI visibility and server-side checks both enforce these; no screen relies on hiding alone.
+
+| Surface | Capability | Notes |
+|--------|------------|-------|
+| Section Templates directory & detail | `aio_manage_section_templates` | Browsing, metadata, helper-doc; §44.5. |
+| Page Templates directory & detail | `aio_manage_page_templates` | Browsing, metadata, one-pager; §44.5. |
+| Template Compare | `aio_manage_page_templates` | Compare list add/remove; nonce + capability in handler. |
+| Compositions list & builder | `aio_manage_compositions` | List, build, create/edit; §44.5. |
+| Template Analytics | `aio_view_logs` | Observational dashboard; support-oriented. |
+| Build Plan Analytics | `aio_view_build_plans` | Plan-focused; unchanged. |
+
+Versioning, deprecation, and export for templates/compositions are gated by the same MANAGE_* caps via CPT map_cap and screen capability. See `docs/qa/template-capability-audit-report.md` for the full audit table.
+
+---
+
+## 5. Implementation
 
 - **Source of truth:** `src/Infrastructure/Config/Capabilities.php` defines constants and `getAll()`, `get_editor_defaults()`, `is_plugin_capability()`.
 - **Registration:** `src/Bootstrap/Capability_Registrar.php` registers capabilities at activation via `Lifecycle_Manager::register_capabilities`. `register()` adds all caps to Administrator and editor subset to Editor. `remove_from_all_roles()` used at uninstall.
@@ -66,13 +83,13 @@
 
 ---
 
-## 5. Future roles
+## 6. Future roles
 
 The matrix may be extended with additional columns for custom or support roles. Internal capability names remain unchanged; only mappings change.
 
 ---
 
-## 6. Verification
+## 7. Verification
 
 - **Stable capability strings:** Unit test `Capabilities_Test` asserts that `Capabilities::getAll()` returns 22 items, constants match expected strings, `get_editor_defaults()` returns exactly the three Editor caps, and `is_plugin_capability()` behaves correctly.
 - **Role mappings (post-activation):** After activating the plugin in a WordPress environment, verify: (1) Administrator has all plugin capabilities; (2) Editor has only `aio_view_build_plans`, `aio_approve_build_plans`, `aio_view_logs`; (3) Author, Contributor, and Subscriber have no plugin capabilities. Use `Capability_Registrar::role_has_cap( $role_key, $cap )` or role inspection in admin to confirm.

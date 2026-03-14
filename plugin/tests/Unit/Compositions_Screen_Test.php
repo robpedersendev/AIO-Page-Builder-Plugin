@@ -34,9 +34,9 @@ require_once $plugin_root . '/src/Admin/Screens/Templates/Compositions_Screen.ph
 
 final class Compositions_Screen_Test extends TestCase {
 
-	public function test_get_capability_returns_view_build_plans(): void {
+	public function test_get_capability_returns_manage_compositions(): void {
 		$screen = new Compositions_Screen( null );
-		$this->assertSame( Capabilities::VIEW_BUILD_PLANS, $screen->get_capability() );
+		$this->assertSame( Capabilities::MANAGE_COMPOSITIONS, $screen->get_capability() );
 	}
 
 	public function test_get_title_returns_translated_string(): void {

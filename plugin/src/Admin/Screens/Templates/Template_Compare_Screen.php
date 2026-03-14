@@ -45,7 +45,7 @@ final class Template_Compare_Screen {
 	}
 
 	public function get_capability(): string {
-		return Capabilities::VIEW_BUILD_PLANS;
+		return Capabilities::MANAGE_PAGE_TEMPLATES;
 	}
 
 	/**
@@ -174,6 +174,9 @@ final class Template_Compare_Screen {
 		$add    = isset( $_GET['add'] ) ? \sanitize_key( (string) $_GET['add'] ) : '';
 		$remove = isset( $_GET['remove'] ) ? \sanitize_key( (string) $_GET['remove'] ) : '';
 		if ( $add === '' && $remove === '' ) {
+			return null;
+		}
+		if ( ! \current_user_can( $this->get_capability() ) ) {
 			return null;
 		}
 		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ), self::NONCE_ACTION ) ) {

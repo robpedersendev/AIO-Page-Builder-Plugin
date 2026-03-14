@@ -60,6 +60,7 @@ use AIOPageBuilder\Domain\Registries\Section\TrustProofBatch\Trust_Proof_Library
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
@@ -362,7 +363,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) || ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
 			exit;
 		}
@@ -393,7 +394,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_expansion_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_expansion_seed_result=error' ) );
 			exit;
 		}
@@ -423,7 +424,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hero_intro_batch_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hero_intro_batch_seed_result=error' ) );
 			exit;
 		}
@@ -453,7 +454,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_trust_proof_batch_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_trust_proof_batch_seed_result=error' ) );
 			exit;
 		}
@@ -483,7 +484,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
 			exit;
 		}
@@ -513,7 +514,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_ptf_batch_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_ptf_batch_seed_result=error' ) );
 			exit;
 		}
@@ -543,7 +544,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_mlp_batch_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_mlp_batch_seed_result=error' ) );
 			exit;
 		}
@@ -573,7 +574,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_lpu_batch_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_lpu_batch_seed_result=error' ) );
 			exit;
 		}
@@ -603,7 +604,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_cta_super_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_cta_super_seed_result=error' ) );
 			exit;
 		}
@@ -633,7 +634,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) || ! \current_user_can( Capabilities::MANAGE_COMPOSITIONS ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
 			exit;
 		}
@@ -664,7 +665,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_marketing_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_marketing_seed_result=error' ) );
 			exit;
 		}
@@ -694,7 +695,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
 			exit;
 		}
@@ -724,7 +725,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_edu_resource_authority_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_edu_resource_authority_seed_result=error' ) );
 			exit;
 		}
@@ -754,7 +755,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_variant_expansion_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_variant_expansion_seed_result=error' ) );
 			exit;
 		}
@@ -784,7 +785,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_page_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_page_seed_result=error' ) );
 			exit;
 		}
@@ -814,7 +815,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_geographic_hub_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_geographic_hub_seed_result=error' ) );
 			exit;
 		}
@@ -844,7 +845,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_nested_hub_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_nested_hub_seed_result=error' ) );
 			exit;
 		}
@@ -874,7 +875,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_nested_hub_variant_expansion_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_nested_hub_variant_expansion_seed_result=error' ) );
 			exit;
 		}
@@ -904,7 +905,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_seed_result=error' ) );
 			exit;
 		}
@@ -934,7 +935,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
 			exit;
 		}
@@ -964,7 +965,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_profile_entity_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_profile_entity_seed_result=error' ) );
 			exit;
 		}
@@ -994,7 +995,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_variant_expansion_seed_result=error' ) );
 			exit;
 		}
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_variant_expansion_seed_result=error' ) );
 			exit;
 		}

@@ -39,7 +39,7 @@ final class Template_Analytics_Screen {
 	}
 
 	public function get_capability(): string {
-		return Capabilities::VIEW_BUILD_PLANS;
+		return Capabilities::VIEW_LOGS;
 	}
 
 	/**

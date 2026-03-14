@@ -45,11 +45,12 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 
 | Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
 |-------------|--------|----------------|----------------------|-----------------|--------|
-| `aio-page-builder-section-templates` | Section Templates | Domain: Registries | `aio_manage_section_templates` | List, Add, Edit, Filter, Search | Not implemented |
-| `aio-page-builder-section-template-edit` | Add / Edit Section Template | Domain: Registries | `aio_manage_section_templates` | Save, Activate, Deprecate, Cancel | Not implemented |
-| `aio-page-builder-page-templates` | Page Templates | Domain: Registries | `aio_manage_page_templates` | List, Add, Edit, Filter, Search | Not implemented |
-| `aio-page-builder-page-template-edit` | Add / Edit Page Template | Domain: Registries | `aio_manage_page_templates` | Save, Activate, Deprecate, Cancel | Not implemented |
-| `aio-page-builder-compositions` | Compositions | Domain: Registries | `aio_manage_compositions` | List, Add, Edit, Duplicate, Filter | Not implemented |
+| `aio-page-builder-section-templates` | Section Templates | Domain: Registries | `aio_manage_section_templates` | List, View detail, Filter, Search, helper-doc (Prompt 200) | Implemented |
+| (detail via link) | Section Template detail | Domain: Registries | `aio_manage_section_templates` | View metadata, compatibility, Add to compare (Prompt 200) | Implemented |
+| `aio-page-builder-page-templates` | Page Templates | Domain: Registries | `aio_manage_page_templates` | List, View detail, Filter, Search (Prompt 200) | Implemented |
+| (detail via link) | Page Template detail | Domain: Registries | `aio_manage_page_templates` | View metadata, one-pager, Add to compare (Prompt 200) | Implemented |
+| `aio-page-builder-template-compare` | Template Compare | Domain: Registries | `aio_manage_page_templates` | Side-by-side compare; add/remove from compare list (Prompt 200) | Implemented |
+| `aio-page-builder-compositions` | Compositions | Domain: Registries | `aio_manage_compositions` | List, Build composition, Filter (Prompt 200) | Implemented |
 | `aio-page-builder-composition-edit` | Add / Edit Composition | Domain: Registries | `aio_manage_compositions` | Save, Validate, Duplicate, Archive, Cancel | Not implemented |
 | `aio-page-builder-documentation` | Documentation | Domain: Registries | `aio_manage_documentation` | List, Filter, Edit | Not implemented |
 | `aio-page-builder-documentation-edit` | Edit Documentation | Domain: Registries | `aio_manage_documentation` | Save, Cancel | Not implemented |
@@ -77,7 +78,7 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 | `aio-page-builder-reporting` | Reporting | Domain: Reporting | TBD | Reporting disclosure, heartbeat status | Not implemented |
 | `aio-page-builder-export-restore` | Import / Export | Domain: ExportRestore | `aio_export_data` (export); `aio_import_data` (restore/validate) | Create export (mode selection); export history; upload ZIP, validate, conflict summary, confirm restore; link to uninstall/export behavior | Implemented |
 | `aio-page-builder-build-plan-analytics` | Build Plan Analytics | Domain: BuildPlan | `aio_view_build_plans` | View plan review trends, common blockers, execution failure trends, rollback frequency; filter by date; link to Build Plans | Implemented |
-| `aio-page-builder-template-analytics` | Template Analytics | Domain: Registries / Reporting | `aio_view_build_plans` | View template usage by family/class, recommendation acceptance, rejection reasons, execution outcomes by family, rollback frequency, composition usage; filter by date, template family, page class; links to Build Plans, Queue & Logs, Page Templates, Compositions (spec §49.11, §59.12; Prompt 199) | Implemented |
+| `aio-page-builder-template-analytics` | Template Analytics | Domain: Registries / Reporting | `aio_view_logs` | View template usage by family/class, recommendation acceptance, rejection reasons, execution outcomes by family, rollback frequency, composition usage; filter by date, template family, page class; links to Build Plans, Queue & Logs, Page Templates, Compositions (spec §49.11, §59.12; Prompt 199, 200) | Implemented |
 
 ---
 

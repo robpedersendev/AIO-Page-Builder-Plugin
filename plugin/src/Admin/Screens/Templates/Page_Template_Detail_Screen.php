@@ -37,7 +37,7 @@ final class Page_Template_Detail_Screen {
 	}
 
 	public function get_capability(): string {
-		return Capabilities::VIEW_BUILD_PLANS;
+		return Capabilities::MANAGE_PAGE_TEMPLATES;
 	}
 
 	/**
