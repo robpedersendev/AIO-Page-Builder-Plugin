@@ -100,6 +100,7 @@ final class Lifecycle_Manager {
 			'register_schedules',
 			'seed_form_templates',
 			'seed_section_expansion_pack',
+			'seed_section_gap_closing_batch',
 			'seed_page_composition_expansion_pack',
 			'install_notification_eligibility',
 			'first_run_redirect_readiness',
@@ -174,6 +175,8 @@ final class Lifecycle_Manager {
 				return $this->seed_form_templates();
 			case 'seed_section_expansion_pack':
 				return $this->seed_section_expansion_pack();
+			case 'seed_section_gap_closing_batch':
+				return $this->seed_section_gap_closing_batch();
 			case 'seed_page_composition_expansion_pack':
 				return $this->seed_page_composition_expansion_pack();
 			default:
@@ -361,6 +364,38 @@ final class Lifecycle_Manager {
 				'expansion_pack_seeded' => $result['success'],
 				'section_ids'          => $result['section_ids'],
 				'errors'               => $result['errors'],
+			)
+		);
+	}
+
+	/**
+	 * Seeds the gap-closing section super-batch SEC-09 (Prompt 182). Runs after section expansion pack to reach 250-section minimum.
+	 *
+	 * @return Lifecycle_Result
+	 */
+	private function seed_section_gap_closing_batch(): Lifecycle_Result {
+		$base  = __DIR__ . '/../Domain';
+		require_once $base . '/Storage/Repositories/Repository_Interface.php';
+		require_once $base . '/Storage/Objects/Object_Status_Families.php';
+		require_once $base . '/Storage/Repositories/Abstract_CPT_Repository.php';
+		require_once $base . '/Storage/Objects/Object_Type_Keys.php';
+		require_once $base . '/Registries/Section/Section_Schema.php';
+		require_once $base . '/Storage/Repositories/Section_Template_Repository.php';
+		require_once $base . '/Registries/Section/GapClosingSuperBatch/Section_Gap_Closing_Super_Batch_Definitions.php';
+		require_once $base . '/Registries/Section/GapClosingSuperBatch/Section_Gap_Closing_Super_Batch_Seeder.php';
+
+		$section_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
+		$result       = \AIOPageBuilder\Domain\Registries\Section\GapClosingSuperBatch\Section_Gap_Closing_Super_Batch_Seeder::run( $section_repo );
+
+		return new Lifecycle_Result(
+			Lifecycle_Result::STATUS_SUCCESS,
+			'',
+			'seed_section_gap_closing_batch',
+			array(
+				'gap_closing_seeded' => $result['success'],
+				'section_ids'       => $result['section_ids'],
+				'errors'            => $result['errors'],
+				'section_keys'      => $result['section_keys'],
 			)
 		);
 	}

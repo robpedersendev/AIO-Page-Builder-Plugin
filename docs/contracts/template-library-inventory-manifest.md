@@ -170,8 +170,8 @@ Later prompts use this worksheet to **mark completion by batch** and by family/c
 | SEC-06 | listing, comparison | 22 | 15 | ☑ |
 | SEC-07 | contact, legal, utility | 22 | 15 | ☑ |
 | SEC-08 | cta (super-library) | 20 | 26 | ☑ |
-| SEC-09 | balance | to 250 total | — | ☐ |
-| **Total sections** | | **≥ 250** | **117** (120 with expansion pack) | ☐ |
+| SEC-09 | balance | to 250 total | 134 | ☑ |
+| **Total sections** | | **≥ 250** | **254** (120 prior + 134 SEC-09) | ☑ |
 
 ### 7.2 Page batch progress
 
@@ -267,3 +267,4 @@ Regenerate after library expansion batches or taxonomy changes. Required fields 
 | 1 | Prompt 144 | Initial template library inventory manifest and batch generation strategy. |
 | 2 | Prompt 154 | Section batch progress §7.1 and §7.3 updated with actual counts and done checkmarks for SEC-01–SEC-08; SEC-04 satisfied by SEC-08 CTA super-library. |
 | 3 | Prompt 167 | Page batch progress §7.2 updated with actual counts for PT-01–PT-13 (225 total); §7.3 dependency checklist updated for page taxonomy and CTA sequencing. |
+| 4 | Prompt 182 | Section batch progress §7.1: SEC-09 Actual 134, Done ☑; Total sections 254, Done ☑. Gap-closing super-batch (SEC-09) seeds via Lifecycle_Manager. |

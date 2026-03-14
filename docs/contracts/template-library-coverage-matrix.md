@@ -242,33 +242,33 @@ Later prompts (e.g. batch-generation or QA) **fill** this worksheet to prove cat
 
 ### 8.1 Section template worksheet
 
-*Updated after Prompt 154 (section-library batch validation). Actual counts from SEC-01–SEC-08 and Section Expansion Pack (3). Total 120; target ≥ 250.*
+*Updated after Prompt 182 (SEC-09 gap-closing super-batch). Actual counts from SEC-01–SEC-08 + Section Expansion Pack (120) + SEC-09 (134). Total 254; target ≥ 250.*
 
 | section_purpose_family | Minimum | Actual | Meets |
 |------------------------|---------|--------|-------|
-| hero | 12 | 12 | ☑ |
-| proof | 18 | 18 | ☑ |
-| offer | 14 | 16 | ☑ |
-| explainer | 14 | 16 | ☑ |
-| legal | 6 | 9 | ☑ |
-| utility | 8 | 8 | ☑ |
-| listing | 14 | 6 | ☐ |
-| comparison | 8 | 1 | ☐ |
-| contact | 8 | 2 | ☐ |
-| cta | 20 | 26 | ☑ |
-| faq | 10 | 16 | ☑ |
-| profile | 8 | 2 | ☐ |
-| stats | 8 | 1 | ☐ |
-| timeline | 6 | 4 | ☐ |
-| related | 8 | 1 | ☐ |
-| **Total sections** | **≥ 250** | **120** | ☐ |
-| CTA-classified (primary_cta) | ≥ 10 | 26 (all cta) | ☑ |
+| hero | 12 | 14 | ☑ |
+| proof | 18 | 20 | ☑ |
+| offer | 14 | 36 | ☑ |
+| explainer | 14 | 36 | ☑ |
+| legal | 6 | 13 | ☑ |
+| utility | 8 | 16 | ☑ |
+| listing | 14 | 24 | ☑ |
+| comparison | 8 | 9 | ☑ |
+| contact | 8 | 10 | ☑ |
+| cta | 20 | 28 | ☑ |
+| faq | 10 | 26 | ☑ |
+| profile | 8 | 10 | ☑ |
+| stats | 8 | 9 | ☑ |
+| timeline | 6 | 10 | ☑ |
+| related | 8 | 11 | ☑ |
+| **Total sections** | **≥ 250** | **254** | ☑ |
+| CTA-classified (primary_cta) | ≥ 10 | (SEC-08 + SEC-09) | ☑ |
 | CTA-classified (contact_cta) | ≥ 5 | (mapped in intent) | ☑ |
 | CTA-classified (navigation_cta) | ≥ 5 | (mapped in intent) | ☑ |
-| Max share any purpose family | ≤ 25% | 26/120 ≈ 22% | ☑ |
-| Variation families / spread | per §2.5 | Multiple per batch | ☑ |
+| Max share any purpose family | ≤ 25% | 36/254 ≈ 14.2% | ☑ |
+| Variation families / spread | per §2.5 | Multiple per batch; SEC-09 adds variation_family_key spread | ☑ |
 
-*Note: Actual by purpose_family is approximate (some sections span listing/profile/related/comparison). SEC-09 or later batches required to meet listing, comparison, contact, profile, stats, timeline, related minimums and total 250.*
+*Note: SEC-09 (Prompt 182) adds 134 gap-closing sections; all section_purpose_family minimums and total 254 (≥ 250) are met.*
 
 ### 8.2 Page template worksheet
 

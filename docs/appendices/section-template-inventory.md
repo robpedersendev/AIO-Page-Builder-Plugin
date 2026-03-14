@@ -4,7 +4,7 @@
 
 This appendix is **generated** from the live section template registry. Do not edit by hand; regenerate after library changes (see `Section_Inventory_Appendix_Generator`).
 
-**Total section templates**: *(run generator to refresh)*
+**Total section templates**: *(run generator to refresh; after SEC-09 gap-closing batch expect 254)*
 
 ---
 
