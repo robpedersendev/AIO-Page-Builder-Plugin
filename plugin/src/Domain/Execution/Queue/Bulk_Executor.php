@@ -1,9 +1,11 @@
 <?php
 /**
- * Builds dependency-ordered action envelopes from approved Build Plan items (spec §40.3; Prompt 080).
+ * Builds dependency-ordered action envelopes from approved Build Plan items (spec §40.3, §33.6, §33.8; Prompt 080, 195).
  *
  * Collects eligible actions, maps item types to action types, orders by dependencies and step order,
- * and returns a sequence of governed envelopes. Does not execute; used by Execution_Queue_Service.
+ * and returns a sequence of governed envelopes. Does not execute; used by Execution_Queue_Service
+ * and Bulk_Template_Page_Build_Service. Dependency ordering (depends_on_item_ids) ensures parent-first
+ * creation for new-page items when child pages reference parent plan items.
  *
  * @package AIOPageBuilder
  */
@@ -104,8 +106,9 @@ final class Bulk_Executor {
 	}
 
 	/**
-	 * Orders eligible items: dependency order (depends_on_item_ids) then step index.
+	 * Orders eligible items: dependency order (depends_on_item_ids) then step index (spec §33.8).
 	 * Simple topological sort: items with no deps first; then items whose deps are already in the list.
+	 * For new-page bulk builds this yields parent-first order so hierarchy dependencies are satisfied.
 	 *
 	 * @param array<int, array{item: array<string, mixed>, step_index: int}> $eligible
 	 * @param array<int, array<string, mixed>>                               $steps

@@ -1,10 +1,11 @@
 <?php
 /**
- * Creates queue jobs from action envelopes and dispatches them via Single_Action_Executor (spec §40.3, §42; Prompt 080).
+ * Creates queue jobs from action envelopes and dispatches them via Single_Action_Executor (spec §40.3, §42, §33.10; Prompt 080, 195).
  * Supports rollback job type (spec §38.5, §59.11; Prompt 090).
  *
  * Enqueues batches with stable job metadata; processes one job at a time through the single-action executor.
- * Records per-job status and result; supports retry metadata. No queue monitoring UI.
+ * Records per-job status and result; supports retry metadata. Bulk template builds carry envelope payload
+ * (plan_id, plan_item_id, batch_id in envelope) for retry-safe grouping and per-item traceability.
  *
  * @package AIOPageBuilder
  */
@@ -50,19 +51,24 @@ final class Execution_Job_Dispatcher {
 	/**
 	 * Creates one queue job per envelope and persists them in dependency order.
 	 * Job payload stores envelope JSON in related_object_refs; payload_ref = action_id.
+	 * Optional bulk_batch_id is merged into each envelope before persist for retry-safe traceability (Prompt 195).
 	 *
-	 * @param array<int, array<string, mixed>> $envelopes Ordered action envelopes.
-	 * @param string                           $actor_ref Actor reference for the batch.
-	 * @param int                              $priority  Optional priority (higher = earlier).
+	 * @param array<int, array<string, mixed>> $envelopes    Ordered action envelopes.
+	 * @param string                           $actor_ref    Actor reference for the batch.
+	 * @param int                              $priority     Optional priority (higher = earlier).
+	 * @param string                           $bulk_batch_id Optional bulk batch ID for bulk_template_build_plan traceability.
 	 * @return array<int, string> List of job_refs in order.
 	 */
-	public function enqueue_batch( array $envelopes, string $actor_ref, int $priority = 0 ): array {
+	public function enqueue_batch( array $envelopes, string $actor_ref, int $priority = 0, string $bulk_batch_id = '' ): array {
 		$job_refs = array();
 		foreach ( $envelopes as $envelope ) {
 			$action_id   = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] : '';
 			$action_type = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] : '';
 			if ( $action_id === '' || $action_type === '' ) {
 				continue;
+			}
+			if ( $bulk_batch_id !== '' ) {
+				$envelope['bulk_batch_id'] = $bulk_batch_id;
 			}
 			$job_ref = $this->generate_job_ref( $action_id );
 			$payload_json = \wp_json_encode( $envelope );

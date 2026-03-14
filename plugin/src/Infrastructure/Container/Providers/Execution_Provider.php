@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\Execution\Handlers\Create_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Finalize_Plan_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Replace_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Jobs\Create_Page_Job_Service;
+use AIOPageBuilder\Domain\Execution\Pages\Bulk_Template_Page_Build_Service;
 use AIOPageBuilder\Domain\Execution\Pages\Template_Page_Build_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Finalization_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Menu_Change_Job_Service;
@@ -66,6 +67,13 @@ final class Execution_Provider implements Service_Provider_Interface {
 			return new Template_Page_Build_Service(
 				$container->get( 'create_page_job_service' ),
 				$container->get( 'page_template_repository' )
+			);
+		} );
+		$container->register( 'bulk_template_page_build_service', function () use ( $container ): Bulk_Template_Page_Build_Service {
+			return new Bulk_Template_Page_Build_Service(
+				$container->get( 'build_plan_repository' ),
+				$container->get( 'bulk_executor' ),
+				$container->get( 'execution_job_dispatcher' )
 			);
 		} );
 		$container->register( 'replace_page_job_service', function () use ( $container ): Replace_Page_Job_Service {
