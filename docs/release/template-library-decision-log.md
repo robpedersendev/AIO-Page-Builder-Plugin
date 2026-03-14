@@ -10,6 +10,8 @@ This log records major template-family and registry decisions. Each entry contai
 
 **How to append entries:** Use `Template_Deprecation_Service::build_decision_log_entry()` to generate a consistent payload; paste or sync the result into the Entries section below. See [template-ecosystem-maintenance-runbook.md](../operations/template-ecosystem-maintenance-runbook.md) §5.1.
 
+**Post-release revisions:** When a change is proposed from post-release feedback (support, analytics, compatibility, QA), use the [template-ecosystem-revision-intake-template.md](../operations/template-ecosystem-revision-intake-template.md). Approved intakes must result in a decision log entry here (link Decision ID to revision intake ID) and, when the change affects the spec or an authoritative contract, a revision history entry per §0.13. See [template-ecosystem-post-release-review-cadence.md](../operations/template-ecosystem-post-release-review-cadence.md).
+
 ---
 
 ## Entry format (per §61.9)

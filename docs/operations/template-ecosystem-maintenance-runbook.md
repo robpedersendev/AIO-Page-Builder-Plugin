@@ -131,5 +131,41 @@
 | Run animation QA | Animation_QA_Service::run(); template-library-animation-fallback-report.md |
 | Support triage | template-library-support-guide.md; Support_Package_Generator, Template_Library_Support_Summary_Builder |
 | Escalation | Spec §61.10 (implementation → Technical Lead; product → PO; security/privacy → PO + security; release-blocking → milestone review) |
+| Post-release revision intake | template-ecosystem-revision-intake-template.md; template-ecosystem-post-release-review-cadence.md; decision log + revision history (§0.13) |
+| Post-release review cadence | post-release-health-review-template.md; template-ecosystem-post-release-review-cadence.md; support guide, analytics, compatibility |
 
 No step in this runbook references a screen, service, or doc that does not exist in the codebase or docs. If a new tool is added, update this runbook and the procedural consistency table.
+
+---
+
+## 8. Post-release review and revision intake
+
+Post-release findings (support pain, analytics, compatibility issues, recommendation quality) must become **governed revisions**, not ad hoc changes. Spec §0.14, §61.9, §61.10; §59.15 Production Readiness Phase.
+
+### 8.1 Revision intake
+
+- **Template:** [template-ecosystem-revision-intake-template.md](template-ecosystem-revision-intake-template.md). Use it for every proposed change that affects template families, registry rules, compliance, or documented template behavior.
+- **Sources:** Analytics (Build Plan Analytics, Template Analytics, exported summaries); support findings (support guide §2, support bundle, template_library_support_summary); QA reports (compliance, accessibility, compatibility); recommendation feedback.
+- **Evidence:** Each intake must reference at least one concrete evidence (support ref, analytics date range, QA report path, compatibility run). For template-family changes, evidence requirements in the intake template §7 apply (compliance run, coverage alignment, appendix regen, decision log entry).
+
+### 8.2 Escalation categories
+
+| Category | Escalate to | Do not |
+|----------|-------------|--------|
+| Security / privacy | Product Owner + security reviewer | Mix into generic backlog. |
+| Compatibility | Technical Lead (PO if scope) | Ignore theme/plugin/env evidence. |
+| UX | Product Owner | Bypass intake for “quick” UX tweaks. |
+| Release-blocking | Formal milestone review | Carry silently into release. |
+| Other | Technical Lead or PO | Skip decision log when approved. |
+
+### 8.3 Flow: finding → intake → decision log / revision history
+
+1. Capture finding with evidence (support, analytics, QA, compatibility).
+2. Triage by escalation category; security/privacy escalated explicitly.
+3. Fill revision intake template; propose change and impacted keys.
+4. Approval per §0.14 (change type determines authority).
+5. When approved: add decision log entry to [template-library-decision-log.md](../release/template-library-decision-log.md); link Decision ID to revision intake ID.
+6. If spec or contract changes: update revision history per §0.13.
+7. Implement per runbook §1–§3 (add/deprecate/version, appendices, compliance); no shortcut may silently override the approved specification.
+
+**Cadence:** [template-ecosystem-post-release-review-cadence.md](template-ecosystem-post-release-review-cadence.md) defines review timing, what to collect, and a full procedural traceability example (support finding → intake → decision log and revision history).
