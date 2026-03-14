@@ -108,7 +108,7 @@ Narrow fixes applied in this pass: none required. Environment_Validator already 
 
 ## 9. Known Limitations and Caveats
 
-- **Multisite:** Site-level operation supported; network-wide centralized management not supported (spec §54.9). Network activation not officially validated unless separately tested.
+- **Multisite:** Site-level operation supported; network-wide centralized management not supported (spec §54.9). Network activation not officially validated unless separately tested. Template ecosystem (registries, previews, compare list, compositions, execution, export/restore, reporting) is verified site-local; evidence and any narrow fixes are in [template-ecosystem-multisite-site-isolation-report.md](template-ecosystem-multisite-site-isolation-report.md).
 - **Theme detection:** No runtime check for GeneratePress vs other themes; preferred-theme messaging is documentation-only until theme_posture checks are added.
 - **PHP 8.4+:** Not yet in validated set; add to matrix when routinely tested.
 

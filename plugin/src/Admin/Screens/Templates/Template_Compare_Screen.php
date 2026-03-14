@@ -24,10 +24,10 @@ final class Template_Compare_Screen {
 
 	public const SLUG = 'aio-page-builder-template-compare';
 
-	/** User meta key for section template compare list (array of keys). */
+	/** Base user meta key for section template compare list (array of keys). Site-scoped in multisite via get_compare_meta_key(). */
 	public const USER_META_SECTION = '_aio_compare_section_templates';
 
-	/** User meta key for page template compare list (array of keys). */
+	/** Base user meta key for page template compare list (array of keys). Site-scoped in multisite via get_compare_meta_key(). */
 	public const USER_META_PAGE = '_aio_compare_page_templates';
 
 	/** Nonce action for add/remove. */
@@ -49,13 +49,31 @@ final class Template_Compare_Screen {
 	}
 
 	/**
+	 * Returns the user meta key for the compare list (site-scoped in multisite to avoid cross-site leakage).
+	 *
+	 * @param string   $type   'section' or 'page'.
+	 * @param int|null $blog_id Optional. For tests only; when null uses current blog in multisite.
+	 * @return string
+	 */
+	public static function get_compare_meta_key( string $type, ?int $blog_id = null ): string {
+		$base = $type === 'page' ? self::USER_META_PAGE : self::USER_META_SECTION;
+		if ( $blog_id !== null ) {
+			return $base . '_blog_' . $blog_id;
+		}
+		if ( \function_exists( 'is_multisite' ) && \is_multisite() && \function_exists( 'get_current_blog_id' ) ) {
+			return $base . '_blog_' . \get_current_blog_id();
+		}
+		return $base;
+	}
+
+	/**
 	 * Returns the current user's compare list for the given type (for directory/detail link display).
 	 *
 	 * @param string $type 'section' or 'page'.
 	 * @return list<string>
 	 */
 	public static function get_compare_list( string $type ): array {
-		$meta_key = $type === 'page' ? self::USER_META_PAGE : self::USER_META_SECTION;
+		$meta_key = self::get_compare_meta_key( $type );
 		$user_id  = \get_current_user_id();
 		if ( $user_id <= 0 ) {
 			return array();
@@ -193,7 +211,7 @@ final class Template_Compare_Screen {
 		if ( $user_id <= 0 ) {
 			return null;
 		}
-		$meta_key = $type === 'page' ? self::USER_META_PAGE : self::USER_META_SECTION;
+		$meta_key = self::get_compare_meta_key( $type );
 		$list     = self::get_compare_list( $type );
 		if ( $add !== '' ) {
 			if ( ! \in_array( $add, $list, true ) && count( $list ) < Template_Compare_State_Builder::MAX_COMPARE_ITEMS ) {
