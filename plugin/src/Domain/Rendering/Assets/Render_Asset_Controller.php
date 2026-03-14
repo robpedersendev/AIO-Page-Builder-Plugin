@@ -57,6 +57,11 @@ final class Render_Asset_Controller {
 			if ( ! empty( $hints['none'] ) ) {
 				$meta['none'] = true;
 			}
+			$anim = $result->get_animation_resolution();
+			if ( $anim !== null ) {
+				$meta['animation_tier']     = $anim['effective_tier'] ?? 'none';
+				$meta['animation_families'] = $anim['effective_families'] ?? array();
+			}
 			$out[] = new Render_Asset_Requirements( $handle, $section_key, $scope, $meta );
 		}
 		return $out;
@@ -90,6 +95,11 @@ final class Render_Asset_Controller {
 			}
 			if ( is_array( $hints ) && ! empty( $hints['none'] ) ) {
 				$meta['none'] = true;
+			}
+			$anim = $s['animation_resolution'] ?? null;
+			if ( is_array( $anim ) ) {
+				$meta['animation_tier']     = $anim['effective_tier'] ?? 'none';
+				$meta['animation_families'] = $anim['effective_families'] ?? array();
 			}
 			$out[] = new Render_Asset_Requirements( $handle, $section_key, $scope, $meta );
 		}

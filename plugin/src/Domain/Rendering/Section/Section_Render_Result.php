@@ -163,6 +163,15 @@ final class Section_Render_Result {
 		return $this->structure['accessibility_notes'] ?? array();
 	}
 
+	/**
+	 * Animation resolution (effective_tier, effective_families, reduced_motion_applied) when Animation_Tier_Resolver was used.
+	 *
+	 * @return array{effective_tier: string, effective_families: list<string>, reduced_motion_applied: bool, resolution_reason: string}|null
+	 */
+	public function get_animation_resolution(): ?array {
+		return isset( $this->structure['animation_resolution'] ) && is_array( $this->structure['animation_resolution'] ) ? $this->structure['animation_resolution'] : null;
+	}
+
 	/** @return list<string> */
 	public function get_errors(): array {
 		return $this->errors;
@@ -193,6 +202,10 @@ final class Section_Render_Result {
 		);
 		if ( $this->omission_result !== null ) {
 			$out['omission_result'] = $this->omission_result->to_array();
+		}
+		$anim = $this->get_animation_resolution();
+		if ( $anim !== null ) {
+			$out['animation_resolution'] = $anim;
 		}
 		return $out;
 	}

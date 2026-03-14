@@ -108,7 +108,10 @@ final class Page_Template_Detail_State_Builder {
 		$one_pager     = $definition['one_pager'] ?? array();
 		$one_pager_link = \is_array( $one_pager ) && isset( $one_pager['link'] ) ? (string) $one_pager['link'] : '';
 
-		$rendered_preview_html = $this->render_preview_html( $definition, $section_field_values );
+		$rendered_preview_html = $this->render_preview_html( $definition, $section_field_values, array(
+			'reduced_motion' => $reduced_motion,
+			'page_template'  => $definition,
+		) );
 
 		$breadcrumbs = $this->build_breadcrumbs( $definition, $category_class, $family );
 
@@ -163,9 +166,10 @@ final class Page_Template_Detail_State_Builder {
 	 *
 	 * @param array<string, mixed> $definition
 	 * @param list<array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values
+	 * @param array<string, mixed> $options Optional: reduced_motion (bool), page_template (array) for animation resolution.
 	 * @return string HTML safe for admin output (escaped later if needed; block content is run through do_blocks).
 	 */
-	private function render_preview_html( array $definition, array $section_field_values ): string {
+	private function render_preview_html( array $definition, array $section_field_values, array $options = array() ): string {
 		$ordered = $definition[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 		$section_results = array();
 		$position = 0;
@@ -188,7 +192,7 @@ final class Page_Template_Detail_State_Builder {
 			if ( $built['context'] === null ) {
 				continue;
 			}
-			$section_results[] = $this->section_renderer->render( $built['context'] );
+			$section_results[] = $this->section_renderer->render( $built['context'], $options );
 			++$position;
 		}
 

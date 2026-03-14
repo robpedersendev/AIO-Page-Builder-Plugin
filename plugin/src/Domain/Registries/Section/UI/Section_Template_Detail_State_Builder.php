@@ -107,7 +107,7 @@ final class Section_Template_Detail_State_Builder {
 		$compatibility  = $definition['compatibility'] ?? array();
 		$compatibility_notes = \is_array( $compatibility ) ? $compatibility : array();
 
-		$rendered_preview_html = $this->render_preview_html( $definition, $field_values );
+		$rendered_preview_html = $this->render_preview_html( $definition, $field_values, array( 'reduced_motion' => $reduced_motion ) );
 		$breadcrumbs = $this->build_breadcrumbs( $definition, $purpose_family );
 
 		return array(
@@ -180,14 +180,15 @@ final class Section_Template_Detail_State_Builder {
 	 *
 	 * @param array<string, mixed> $definition
 	 * @param array<string, mixed> $field_values
+	 * @param array<string, mixed> $options Optional: reduced_motion (bool), page_template (array) for animation resolution.
 	 * @return string
 	 */
-	private function render_preview_html( array $definition, array $field_values ): string {
+	private function render_preview_html( array $definition, array $field_values, array $options = array() ): string {
 		$built = $this->context_builder->build( $definition, $field_values, 0, null );
 		if ( $built['context'] === null ) {
 			return '';
 		}
-		$result = $this->section_renderer->render( $built['context'] );
+		$result = $this->section_renderer->render( $built['context'], $options );
 		$assembly = $this->assembly_pipeline->assemble(
 			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
 			(string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' ),

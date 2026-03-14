@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
+use AIOPageBuilder\Domain\Rendering\Animation\Animation_Tier_Resolver;
 use AIOPageBuilder\Domain\Rendering\Omission\Smart_Omission_Service;
 
 /**
@@ -29,8 +30,15 @@ final class Section_Renderer_Base {
 	/** @var Smart_Omission_Service|null */
 	private ?Smart_Omission_Service $omission_service;
 
-	public function __construct( ?Smart_Omission_Service $omission_service = null ) {
-		$this->omission_service = $omission_service;
+	/** @var Animation_Tier_Resolver|null */
+	private ?Animation_Tier_Resolver $animation_tier_resolver;
+
+	public function __construct(
+		?Smart_Omission_Service $omission_service = null,
+		?Animation_Tier_Resolver $animation_tier_resolver = null
+	) {
+		$this->omission_service       = $omission_service;
+		$this->animation_tier_resolver = $animation_tier_resolver;
 	}
 
 	/** Section wrapper class pattern: aio-s-{section_key}. */
@@ -47,11 +55,13 @@ final class Section_Renderer_Base {
 
 	/**
 	 * Renders context to a structured result. Context must be valid (use Section_Render_Context_Builder to build/validate).
+	 * Optional $options['reduced_motion'] (bool) and $options['page_template'] (array) for animation resolution.
 	 *
 	 * @param Section_Render_Context $context Valid render context.
+	 * @param array<string, mixed>   $options Optional: reduced_motion (bool), page_template (array) for animation tier resolution.
 	 * @return Section_Render_Result
 	 */
-	public function render( Section_Render_Context $context ): Section_Render_Result {
+	public function render( Section_Render_Context $context, array $options = array() ): Section_Render_Result {
 		$definition = $context->get_section_definition();
 		$section_key = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 		$variants = (array) ( $definition[ Section_Schema::FIELD_VARIANTS ] ?? array() );
@@ -77,14 +87,25 @@ final class Section_Renderer_Base {
 			}
 		}
 
+		$data_attributes = array(
+			'data-aio-section'  => $section_key,
+			'data-aio-variant'  => $variant,
+			'data-aio-position' => (string) $position,
+		);
+
+		$animation_resolution = null;
+		if ( $this->animation_tier_resolver !== null ) {
+			$reduced_motion = ! empty( $options['reduced_motion'] );
+			$page_template  = isset( $options['page_template'] ) && is_array( $options['page_template'] ) ? $options['page_template'] : null;
+			$animation_resolution = $this->animation_tier_resolver->resolve( $definition, $page_template, $reduced_motion );
+			$data_attributes['data-aio-animation-tier'] = $animation_resolution['effective_tier'];
+			$data_attributes['data-aio-reduced-motion'] = $animation_resolution['reduced_motion_applied'] ? '1' : '0';
+		}
+
 		$wrapper_attrs = array(
 			'class'           => array_values( array_unique( $classes ) ),
 			'id'              => $section_id,
-			'data_attributes' => array(
-				'data-aio-section'  => $section_key,
-				'data-aio-variant'  => $variant,
-				'data-aio-position' => (string) $position,
-			),
+			'data_attributes' => $data_attributes,
 		);
 
 		$selector_map = array(
@@ -106,13 +127,16 @@ final class Section_Renderer_Base {
 		}
 
 		$structure = array(
-			'wrapper_attrs'       => $wrapper_attrs,
-			'selector_map'        => $selector_map,
+			'wrapper_attrs'        => $wrapper_attrs,
+			'selector_map'         => $selector_map,
 			'structural_nodes'     => $structural_nodes,
-			'structural_hint'     => $structural_hint,
-			'asset_hints'         => $asset_hints,
+			'structural_hint'      => $structural_hint,
+			'asset_hints'          => $asset_hints,
 			'accessibility_notes'  => $accessibility_notes,
 		);
+		if ( $animation_resolution !== null ) {
+			$structure['animation_resolution'] = $animation_resolution;
+		}
 
 		$field_values = $context->get_field_values();
 		$omission_result = null;
