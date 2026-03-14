@@ -26,6 +26,7 @@ use AIOPageBuilder\Domain\Execution\Pages\Template_Page_Replacement_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Finalization_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Menu_Change_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Replace_Page_Job_Service;
+use AIOPageBuilder\Domain\Execution\Menus\Template_Menu_Apply_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Token_Set_Job_Service;
 use AIOPageBuilder\Domain\Execution\Queue\Bulk_Executor;
 use AIOPageBuilder\Domain\Execution\Queue\Execution_Job_Dispatcher;
@@ -99,6 +100,9 @@ final class Execution_Provider implements Service_Provider_Interface {
 		$container->register( 'menu_change_job_service', function (): Menu_Change_Job_Service {
 			return new Menu_Change_Job_Service();
 		} );
+		$container->register( 'template_menu_apply_service', function () use ( $container ): Template_Menu_Apply_Service {
+			return new Template_Menu_Apply_Service( $container->get( 'menu_change_job_service' ) );
+		} );
 		$container->register( 'token_set_job_service', function (): Token_Set_Job_Service {
 			return new Token_Set_Job_Service();
 		} );
@@ -154,7 +158,7 @@ final class Execution_Provider implements Service_Provider_Interface {
 			);
 			$dispatcher->register_handler(
 				Execution_Action_Types::UPDATE_MENU,
-				new Apply_Menu_Change_Handler( $container->get( 'menu_change_job_service' ) )
+				new Apply_Menu_Change_Handler( $container->get( 'menu_change_job_service' ), $container->get( 'template_menu_apply_service' ) )
 			);
 			$dispatcher->register_handler(
 				Execution_Action_Types::APPLY_TOKEN_SET,

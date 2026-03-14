@@ -1,8 +1,9 @@
 <?php
 /**
- * Unit tests for Menu_Change_Result, Apply_Menu_Change_Handler (spec §34, §40.2; Prompt 083).
+ * Unit tests for Menu_Change_Result, Apply_Menu_Change_Handler (spec §34, §40.2, §59.10; Prompt 083, 207).
  *
- * Covers result DTO, handler delegation, invalid target rejection, and example menu-change result payload.
+ * Covers result DTO, handler delegation, invalid target rejection, template-aware delegation when
+ * envelope has page_class or template_aware_menu, and example menu-change result payload.
  *
  * @package AIOPageBuilder
  */
@@ -13,6 +14,8 @@ use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract;
 use AIOPageBuilder\Domain\Execution\Handlers\Apply_Menu_Change_Handler;
 use AIOPageBuilder\Domain\Execution\Jobs\Menu_Change_Result;
 use AIOPageBuilder\Domain\Execution\Jobs\Menu_Change_Job_Service_Interface;
+use AIOPageBuilder\Domain\Execution\Menus\Template_Menu_Apply_Result;
+use AIOPageBuilder\Domain\Execution\Menus\Template_Menu_Apply_Service_Interface;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -21,6 +24,8 @@ $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Execution/Executor/Execution_Handler_Interface.php';
 require_once $plugin_root . '/src/Domain/Execution/Jobs/Menu_Change_Result.php';
 require_once $plugin_root . '/src/Domain/Execution/Jobs/Menu_Change_Job_Service_Interface.php';
+require_once $plugin_root . '/src/Domain/Execution/Menus/Template_Menu_Apply_Result.php';
+require_once $plugin_root . '/src/Domain/Execution/Menus/Template_Menu_Apply_Service_Interface.php';
 require_once $plugin_root . '/src/Domain/Execution/Handlers/Apply_Menu_Change_Handler.php';
 require_once $plugin_root . '/src/Domain/Execution/Contracts/Execution_Action_Contract.php';
 
@@ -38,6 +43,23 @@ final class Stub_Menu_Change_Job_Service implements Menu_Change_Job_Service_Inte
 
 	public function run( array $envelope ): Menu_Change_Result {
 		return $this->run_result;
+	}
+}
+
+/**
+ * Stub template menu apply service for handler tests (Prompt 207).
+ */
+final class Stub_Template_Menu_Apply_Service implements Template_Menu_Apply_Service_Interface {
+
+	/** @var Template_Menu_Apply_Result */
+	public $apply_result;
+
+	public function __construct( Template_Menu_Apply_Result $apply_result ) {
+		$this->apply_result = $apply_result;
+	}
+
+	public function apply( array $envelope ): Template_Menu_Apply_Result {
+		return $this->apply_result;
 	}
 }
 
@@ -112,5 +134,56 @@ final class Apply_Menu_Change_Handler_Test extends TestCase {
 		$this->assertArrayHasKey( 'action', $payload['artifacts'] );
 		$this->assertArrayHasKey( 'location_assigned', $payload['artifacts'] );
 		$this->assertTrue( $payload['success'] );
+	}
+
+	/** When envelope has page_class in items and template_menu_apply_service is set, handler delegates to it (Prompt 207). */
+	public function test_handler_uses_template_menu_apply_service_when_envelope_has_page_class(): void {
+		$job_stub = new Stub_Menu_Change_Job_Service();
+		$job_stub->run_result = Menu_Change_Result::success( 88, 'update_existing', 'Legacy', 'footer' );
+		$template_result = Template_Menu_Apply_Result::success(
+			20,
+			array( 'valid' => true, 'location_slug' => 'primary' ),
+			array( 'items_ordered_by_class' => array(), 'applied_count' => 2, 'warnings' => array() ),
+			array( array( 'status' => 'applied' ), array( 'status' => 'applied' ) ),
+			array( 'location_assigned' => 'primary' )
+		);
+		$template_stub = new Stub_Template_Menu_Apply_Service( $template_result );
+		$handler = new Apply_Menu_Change_Handler( $job_stub, $template_stub );
+		$envelope = array(
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
+				'menu_context' => 'header',
+				'action'      => 'update_existing',
+				'items'       => array(
+					array( 'title' => 'A', 'object_id' => 1, 'page_class' => 'top_level' ),
+					array( 'title' => 'B', 'object_id' => 2, 'page_class' => 'hub' ),
+				),
+			),
+		);
+		$out = $handler->execute( $envelope );
+		$this->assertTrue( $out['success'] );
+		$this->assertSame( 20, $out['artifacts']['menu_id'] ?? 0 );
+		$this->assertArrayHasKey( 'menu_apply_execution_result', $out['artifacts'] );
+		$this->assertArrayHasKey( 'navigation_hierarchy_summary', $out['artifacts'] );
+	}
+
+	/** When envelope has no template/hierarchy context, handler uses job_service even if template service is set. */
+	public function test_handler_uses_job_service_when_no_template_context(): void {
+		$job_stub = new Stub_Menu_Change_Job_Service();
+		$job_stub->run_result = Menu_Change_Result::success( 77, 'create', 'Plain Menu', 'sidebar' );
+		$template_result = Template_Menu_Apply_Result::failure( 'Should not be used', array() );
+		$template_stub = new Stub_Template_Menu_Apply_Service( $template_result );
+		$handler = new Apply_Menu_Change_Handler( $job_stub, $template_stub );
+		$envelope = array(
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
+				'menu_context'       => 'sidebar',
+				'action'            => 'create',
+				'proposed_menu_name' => 'Plain Menu',
+				'items'             => array( array( 'title' => 'X', 'url' => '/x' ) ),
+			),
+		);
+		$out = $handler->execute( $envelope );
+		$this->assertTrue( $out['success'] );
+		$this->assertSame( 77, $out['artifacts']['menu_id'] ?? 0 );
+		$this->assertSame( 'sidebar', $out['artifacts']['location_assigned'] ?? '' );
 	}
 }

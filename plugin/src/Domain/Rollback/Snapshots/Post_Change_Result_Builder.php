@@ -132,6 +132,16 @@ final class Post_Change_Result_Builder {
 		if ( isset( $artifacts['location_assigned'] ) ) {
 			$result_snapshot['location'] = $artifacts['location_assigned'];
 		}
+		// * Template-aware menu apply trace for diff/rollback (spec §59.10; Prompt 207).
+		if ( isset( $artifacts['menu_apply_execution_result'] ) && is_array( $artifacts['menu_apply_execution_result'] ) ) {
+			$result_snapshot['menu_apply_execution_result'] = $artifacts['menu_apply_execution_result'];
+		}
+		if ( isset( $artifacts['navigation_hierarchy_summary'] ) && is_array( $artifacts['navigation_hierarchy_summary'] ) ) {
+			$result_snapshot['navigation_hierarchy_summary'] = $artifacts['navigation_hierarchy_summary'];
+		}
+		if ( isset( $artifacts['menu_target_validation_result'] ) && is_array( $artifacts['menu_target_validation_result'] ) ) {
+			$result_snapshot['menu_target_validation_result'] = $artifacts['menu_target_validation_result'];
+		}
 		$message = isset( $handler_result['message'] ) && is_string( $handler_result['message'] ) ? $handler_result['message'] : '';
 		return array(
 			'target_ref'    => (string) $menu_id,

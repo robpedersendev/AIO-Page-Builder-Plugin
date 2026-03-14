@@ -267,4 +267,41 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 		$this->assertSame( 'services', $result_snapshot['template_context']['template_family'] );
 		$this->assertSame( 5, $result_snapshot['template_context']['section_count'] );
 	}
+
+	/** Menu post_change includes menu_apply_execution_result and navigation_hierarchy_summary when present (Prompt 207). */
+	public function test_post_change_menu_includes_template_menu_apply_trace(): void {
+		$envelope = array(
+			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::UPDATE_MENU,
+		);
+		$handler_result = array(
+			'success'   => true,
+			'message'   => 'Template-aware menu apply completed.',
+			'artifacts' => array(
+				'menu_id'                        => 10,
+				'menu_name'                      => 'Primary',
+				'location_assigned'              => 'primary',
+				'menu_apply_execution_result'   => array(
+					'success'   => true,
+					'menu_id'   => 10,
+					'per_item_status' => array( array( 'status' => 'applied', 'title' => 'Home' ) ),
+				),
+				'navigation_hierarchy_summary'  => array(
+					'items_ordered_by_class' => array( array( 'title' => 'Home', 'page_class' => 'top_level' ) ),
+					'applied_count' => 1,
+					'warnings' => array(),
+				),
+				'menu_target_validation_result'  => array( 'valid' => true, 'location_slug' => 'primary' ),
+			),
+		);
+		$builder = new Post_Change_Result_Builder();
+		$out = $builder->build( $envelope, $handler_result );
+		$this->assertNotNull( $out );
+		$this->assertSame( Operational_Snapshot_Schema::OBJECT_FAMILY_MENU, $out['object_family'] );
+		$snap = $out['post_change']['result_snapshot'];
+		$this->assertArrayHasKey( 'menu_apply_execution_result', $snap );
+		$this->assertArrayHasKey( 'navigation_hierarchy_summary', $snap );
+		$this->assertArrayHasKey( 'menu_target_validation_result', $snap );
+		$this->assertSame( 10, $snap['menu_apply_execution_result']['menu_id'] ?? 0 );
+		$this->assertSame( 1, $snap['navigation_hierarchy_summary']['applied_count'] ?? 0 );
+	}
 }
