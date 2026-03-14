@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\Execution\Handlers\Create_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Finalize_Plan_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Replace_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Jobs\Create_Page_Job_Service;
+use AIOPageBuilder\Domain\Execution\Pages\Template_Page_Build_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Finalization_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Menu_Change_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Replace_Page_Job_Service;
@@ -59,6 +60,12 @@ final class Execution_Provider implements Service_Provider_Interface {
 				$container->get( 'page_instantiation_payload_builder' ),
 				$container->get( 'page_instantiator' ),
 				$container->get( 'page_field_group_assignment_service' )
+			);
+		} );
+		$container->register( 'template_page_build_service', function () use ( $container ): Template_Page_Build_Service {
+			return new Template_Page_Build_Service(
+				$container->get( 'create_page_job_service' ),
+				$container->get( 'page_template_repository' )
 			);
 		} );
 		$container->register( 'replace_page_job_service', function () use ( $container ): Replace_Page_Job_Service {
@@ -119,7 +126,7 @@ final class Execution_Provider implements Service_Provider_Interface {
 			$dispatcher = new Execution_Dispatcher();
 			$dispatcher->register_handler(
 				Execution_Action_Types::CREATE_PAGE,
-				new Create_Page_Handler( $container->get( 'create_page_job_service' ) )
+				new Create_Page_Handler( $container->get( 'template_page_build_service' ) )
 			);
 			$dispatcher->register_handler(
 				Execution_Action_Types::REPLACE_PAGE,
