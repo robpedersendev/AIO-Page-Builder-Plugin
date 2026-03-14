@@ -72,3 +72,77 @@ Results are machine-readable:
 
 - **In scope**: Golden fixtures, validator comparison, machine-readable pass/fail/regression, fixture versioning tied to prompt-pack version.
 - **Out of scope**: Live provider cost optimization, self-modifying prompts, automatic prompt-pack promotion, Build Plan execution.
+
+---
+
+## Template-Recommendation Regression (Prompt 211)
+
+A separate regression harness targets **template-family recommendations** (spec §58.3, §60.5). It compares recommendation payloads (class, family, CTA-law, explanation) against golden cases so prompt-pack and planning changes can be tested without execution. Internal QA only.
+
+### Fixture Location and Shape
+
+- Fixtures live under **`plugin/tests/fixtures/template-recommendations/`**.
+- Naming: e.g. `golden-top-level.json`, `golden-hub.json`, `golden-nested-hub.json`, `golden-child-detail.json`.
+- Each fixture has: `case_id`, `scenario`, `fixture_version`, `recommendation`, `expected`, and optionally `template_metadata` for CTA checks.
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `case_id` | string | Case identifier. |
+| `scenario` | string | `top_level`, `hub`, `nested_hub`, or `child_detail`. |
+| `fixture_version` | string | Fixture schema version. |
+| `recommendation` | object | Actual or synthetic recommendation (may include `proposed_template_summary`). |
+| `expected` | object | Expected constraints. |
+| `template_metadata` | object, optional | When CTA-law is checked: `min_cta`, `last_section_cta`. |
+
+### Recommendation Object
+
+- Top-level or under `proposed_template_summary`: `template_key`, `template_category_class`, `template_family`, and optionally `template_selection_reason`.
+
+### Expected Object
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `template_category_class` | string or string[] | Required class or list of allowed classes. |
+| `allowed_template_families` | string[], optional | Allowed template families; omitted means no family check. |
+| `cta_law_aligned` | bool, optional | When set, CTA-law alignment is checked (using `template_metadata` when present). |
+| `require_explanation` | bool, optional | When true, non-empty `template_selection_reason` is required. |
+
+### How to Run
+
+1. **From code**: Instantiate `Template_Recommendation_Regression_Harness` with optional `fixtures_base_path`. Call `run( $fixture_array )` or `run( 'template-recommendations/golden-top-level.json' )`.
+2. **Fixtures base path**: Set to `plugin/tests/fixtures` (or absolute equivalent) when loading by relative path.
+
+### Result Shape (template_recommendation_regression_result)
+
+Machine-readable payload from `Template_Recommendation_Regression_Result::to_array()`:
+
+- **outcome**: `pass` | `fail` | `regression`
+- **regression_run**: `case_id`, `scenario`, `fixture_version`, `ran_at`
+- **class_fit**: bool
+- **family_fit**: bool
+- **cta_law_aligned**: bool | null (null when not checked)
+- **explanation_fit**: bool
+- **message**: string
+- **details**: object (e.g. `class_mismatch`, `family_mismatch`, `cta_law`, `explanation_missing`, `fixture_invalid`)
+
+### Example template_recommendation_regression_result Payload
+
+```json
+{
+  "outcome": "pass",
+  "regression_run": {
+    "case_id": "golden-top-level",
+    "scenario": "top_level",
+    "fixture_version": "1",
+    "ran_at": "2025-07-15T12:00:00Z"
+  },
+  "class_fit": true,
+  "family_fit": true,
+  "cta_law_aligned": true,
+  "explanation_fit": true,
+  "message": "Template recommendation regression pass: class, family, and explanation fit.",
+  "details": {}
+}
+```
+
+Evaluation is not limited to exact template_key: family fit, hierarchy class fit, and CTA-law awareness (when applicable) are checked. Fixtures must be synthetic and versioned; no secrets or real customer data.

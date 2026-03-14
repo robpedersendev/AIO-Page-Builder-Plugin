@@ -1,0 +1,28 @@
+{
+  "fixture_version": "1",
+  "case_id": "golden-hub",
+  "scenario": "hub",
+  "recommendation": {
+    "template_key": "pt_services_hub_01",
+    "template_category_class": "hub",
+    "template_family": "services",
+    "template_selection_reason": "Services category hub; listing and entry point for service detail pages.",
+    "proposed_template_summary": {
+      "template_key": "pt_services_hub_01",
+      "name": "Services hub",
+      "template_category_class": "hub",
+      "template_family": "services",
+      "section_count": 14
+    }
+  },
+  "expected": {
+    "template_category_class": "hub",
+    "allowed_template_families": ["services", "products", "offerings", "directories", "locations"],
+    "cta_law_aligned": true,
+    "require_explanation": true
+  },
+  "template_metadata": {
+    "min_cta": 4,
+    "last_section_cta": true
+  }
+}

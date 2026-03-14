@@ -1,0 +1,28 @@
+{
+  "fixture_version": "1",
+  "case_id": "golden-nested-hub",
+  "scenario": "nested_hub",
+  "recommendation": {
+    "template_key": "pt_locations_hub_01",
+    "template_category_class": "nested_hub",
+    "template_family": "locations",
+    "template_selection_reason": "Locations sub-hub; regional listing before location detail.",
+    "proposed_template_summary": {
+      "template_key": "pt_locations_hub_01",
+      "name": "Locations hub",
+      "template_category_class": "nested_hub",
+      "template_family": "locations",
+      "section_count": 14
+    }
+  },
+  "expected": {
+    "template_category_class": "nested_hub",
+    "allowed_template_families": ["services", "products", "locations", "offerings"],
+    "cta_law_aligned": true,
+    "require_explanation": true
+  },
+  "template_metadata": {
+    "min_cta": 4,
+    "last_section_cta": true
+  }
+}

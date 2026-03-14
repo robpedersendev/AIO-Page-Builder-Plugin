@@ -69,6 +69,7 @@ final class Module_Registrar {
 	 * ACF_Blueprints_Provider and ACF_Registration_Provider: blueprint_family_registry, blueprint_family_resolver, preview_family_mapping; deterministic registration (register_sections_for_page, register_by_family) per large-scale-acf-lpagery-binding-contract.
 	 * Admin menu and screen routing are registered separately in Plugin::register_admin_menu().
 	 * AI_Provider_Drivers_Provider registers openai and anthropic provider drivers (spec §25, §49.9). Prompt packs (Prompt 210): Prompt_Pack_Registry_Service exposes get_planning_guidance_content() for template-family taxonomy, CTA-law rules, and hierarchy-role guidance; planning_guidance placeholders and optional segments (template_family_guidance, cta_law_guidance, hierarchy_role_guidance) inject this into planning prompts per template-family-planning-prompt-pack-addendum; prompt-schema and ai-output-schema appendices document structure and versioning.
+	 * Template-recommendation regression (Prompt 211): Template_Recommendation_Regression_Harness and Template_Recommendation_Regression_Result under Domain\AI\Regression provide golden-case regression for template-family recommendations (class/family fit, CTA-law alignment, explanation); fixtures under tests/fixtures/template-recommendations; see docs/qa/prompt-pack-regression-guide.md.
 	 *
 	 * @return void
 	 */

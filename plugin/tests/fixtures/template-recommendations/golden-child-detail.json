@@ -1,0 +1,28 @@
+{
+  "fixture_version": "1",
+  "case_id": "golden-child-detail",
+  "scenario": "child_detail",
+  "recommendation": {
+    "template_key": "pt_service_detail_01",
+    "template_category_class": "child_detail",
+    "template_family": "service_detail",
+    "template_selection_reason": "Individual service detail page; child of services hub.",
+    "proposed_template_summary": {
+      "template_key": "pt_service_detail_01",
+      "name": "Service detail",
+      "template_category_class": "child_detail",
+      "template_family": "service_detail",
+      "section_count": 16
+    }
+  },
+  "expected": {
+    "template_category_class": "child_detail",
+    "allowed_template_families": ["product_detail", "service_detail", "profile_entity", "location_detail"],
+    "cta_law_aligned": true,
+    "require_explanation": true
+  },
+  "template_metadata": {
+    "min_cta": 5,
+    "last_section_cta": true
+  }
+}
