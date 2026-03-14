@@ -22,6 +22,7 @@ use AIOPageBuilder\Domain\Execution\Handlers\Replace_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Jobs\Create_Page_Job_Service;
 use AIOPageBuilder\Domain\Execution\Pages\Bulk_Template_Page_Build_Service;
 use AIOPageBuilder\Domain\Execution\Pages\Template_Page_Build_Service;
+use AIOPageBuilder\Domain\Execution\Pages\Template_Page_Replacement_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Finalization_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Menu_Change_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Replace_Page_Job_Service;
@@ -88,6 +89,12 @@ final class Execution_Provider implements Service_Provider_Interface {
 				$container->get( 'page_field_group_assignment_service' )
 			);
 		} );
+		$container->register( 'template_page_replacement_service', function () use ( $container ): Template_Page_Replacement_Service {
+			return new Template_Page_Replacement_Service(
+				$container->get( 'replace_page_job_service' ),
+				$container->get( 'page_template_repository' )
+			);
+		} );
 		$container->register( 'menu_change_job_service', function (): Menu_Change_Job_Service {
 			return new Menu_Change_Job_Service();
 		} );
@@ -138,7 +145,7 @@ final class Execution_Provider implements Service_Provider_Interface {
 			);
 			$dispatcher->register_handler(
 				Execution_Action_Types::REPLACE_PAGE,
-				new Replace_Page_Handler( $container->get( 'replace_page_job_service' ) )
+				new Replace_Page_Handler( $container->get( 'template_page_replacement_service' ) )
 			);
 			$dispatcher->register_handler(
 				Execution_Action_Types::UPDATE_MENU,

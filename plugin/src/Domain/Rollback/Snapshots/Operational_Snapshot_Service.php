@@ -1,9 +1,10 @@
 <?php
 /**
- * Operational snapshot capture: pre-change and post-change (spec §41.2, §41.3, §38.3).
+ * Operational snapshot capture: pre-change and post-change (spec §41.2, §41.3, §38.3, §32.9; Prompt 196).
  *
  * Central service for capturing before/after state around rollback-capable execution.
- * Fails safely; logs capture problems without blocking execution.
+ * Fails safely; logs capture problems without blocking execution. For replace_page, pre-change
+ * capture preserves original page state for rollback and template-replacement traceability.
  *
  * @package AIOPageBuilder
  */

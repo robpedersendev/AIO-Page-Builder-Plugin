@@ -1,10 +1,11 @@
 <?php
 /**
- * Single-action executor: validate, lock, dispatch, record, update plan (spec §39.3–39.8, §40.2; Prompt 079).
+ * Single-action executor: validate, lock, dispatch, record, update plan (spec §39.3–39.8, §40.2, §32.9; Prompt 079, 196).
  *
  * Consumes governed action envelopes; validates authorization and dependencies; acquires locks;
  * invokes snapshot preflight where required; delegates to Execution_Dispatcher; records outcomes;
- * updates Build Plan item state. No bulk orchestration or queue.
+ * updates Build Plan item state. For replace_page, handler result artifacts include
+ * template_replacement_execution_result and replacement_trace_record when Template_Page_Replacement_Service is used.
  *
  * @package AIOPageBuilder
  */
