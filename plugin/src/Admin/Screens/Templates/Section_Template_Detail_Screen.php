@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Registries\Section\UI\Section_Template_Detail_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 
 /**
  * Renders a single section template detail: name, description, purpose family, CTA classification,
@@ -132,6 +133,7 @@ final class Section_Template_Detail_Screen {
 	private function render_metadata_panel( array $state ): void {
 		$side_panel   = $state['side_panel'] ?? array();
 		$name         = (string) ( $side_panel['name'] ?? $state['section_key'] ?? '' );
+		$section_key  = (string) ( $state['section_key'] ?? '' );
 		$desc         = (string) ( $side_panel['description'] ?? '' );
 		$purpose      = (string) ( $side_panel['purpose_family'] ?? '' );
 		$cta          = (string) ( $side_panel['cta_classification'] ?? '' );
@@ -141,9 +143,20 @@ final class Section_Template_Detail_Screen {
 		$helper_url   = (string) ( $state['helper_doc_url'] ?? '' );
 		$compat       = $state['compatibility_notes'] ?? array();
 		$field_summary = $state['field_summary'] ?? array();
+		$in_compare   = $section_key !== '' && \in_array( $section_key, Template_Compare_Screen::get_compare_list( 'section' ), true );
 		?>
 		<section class="aio-metadata-section">
 			<h2 class="aio-metadata-title"><?php echo \esc_html( $name ); ?></h2>
+			<?php if ( $section_key !== '' ) : ?>
+				<p class="aio-compare-actions">
+					<a href="<?php echo \esc_url( \add_query_arg( array( 'page' => Template_Compare_Screen::SLUG, 'type' => 'section' ), \admin_url( 'admin.php' ) ) ); ?>"><?php \esc_html_e( 'Compare workspace', 'aio-page-builder' ); ?></a>
+					<?php if ( $in_compare ) : ?>
+						| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'section', $section_key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
+					<?php else : ?>
+						| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'section', $section_key ) ); ?>"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
+					<?php endif; ?>
+				</p>
+			<?php endif; ?>
 			<?php if ( $desc !== '' ) : ?>
 				<p class="aio-metadata-description"><?php echo \esc_html( $desc ); ?></p>
 			<?php endif; ?>

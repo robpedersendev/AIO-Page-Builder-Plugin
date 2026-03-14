@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Registries\Section\UI\Section_Template_Directory_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 
 /**
  * Renders the Section Templates directory: root (purpose tree), purpose (L3 CTA/variant nodes), or list (section rows).
@@ -283,6 +284,7 @@ final class Section_Templates_Directory_Screen {
 					}
 					$view_url   = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
 					$helper_url = ''; // * Helper-doc link: populated on detail screen when helper_doc_url resolver exists.
+					$in_compare = \in_array( $key, Template_Compare_Screen::get_compare_list( 'section' ), true );
 					?>
 					<tr>
 						<td><?php echo \esc_html( $name ); ?></td>
@@ -307,6 +309,11 @@ final class Section_Templates_Directory_Screen {
 						</td>
 						<td>
 							<a href="<?php echo \esc_url( $view_url ); ?>"><?php \esc_html_e( 'View', 'aio-page-builder' ); ?></a>
+							<?php if ( $in_compare ) : ?>
+								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'section', $key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
+							<?php else : ?>
+								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'section', $key ) ); ?>"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
+							<?php endif; ?>
 						</td>
 					</tr>
 				<?php endforeach; ?>

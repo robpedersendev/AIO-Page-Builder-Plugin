@@ -23,6 +23,7 @@ use AIOPageBuilder\Admin\Screens\Templates\Page_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Templates_Directory_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Section_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Section_Templates_Directory_Screen;
+use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
@@ -118,6 +119,7 @@ final class Admin_Menu {
 		$page_template_detail   = new Page_Template_Detail_Screen( $this->container );
 		$section_templates_dir  = new Section_Templates_Directory_Screen( $this->container );
 		$section_template_detail = new Section_Template_Detail_Screen( $this->container );
+		$template_compare_screen  = new Template_Compare_Screen( $this->container );
 		$compositions_screen     = new Compositions_Screen( $this->container );
 		$build_plan_analytics = new Build_Plan_Analytics_Screen( $this->container );
 		$queue_logs         = new Queue_Logs_Screen( $this->container );
@@ -263,6 +265,15 @@ final class Admin_Menu {
 			array( $section_template_detail, 'render' )
 		);
 		\remove_submenu_page( self::PARENT_SLUG, Section_Template_Detail_Screen::SLUG );
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$template_compare_screen->get_title(),
+			__( 'Template Compare', 'aio-page-builder' ),
+			$template_compare_screen->get_capability(),
+			Template_Compare_Screen::SLUG,
+			array( $template_compare_screen, 'render' )
+		);
 
 		add_submenu_page(
 			self::PARENT_SLUG,
