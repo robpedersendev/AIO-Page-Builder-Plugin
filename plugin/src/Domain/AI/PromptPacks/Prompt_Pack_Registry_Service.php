@@ -13,8 +13,12 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Retrieves prompt packs from repository; filters by status, pack_type, schema_target_ref, provider compatibility.
+ * Exposes planning guidance content for template-family and CTA-law injection (Prompt 210, template-family-planning-prompt-pack-addendum).
  */
 final class Prompt_Pack_Registry_Service {
+
+	/** Schema version for planning guidance payload (traceability). */
+	public const PLANNING_GUIDANCE_SCHEMA_VERSION = '1';
 
 	/** @var Prompt_Pack_Registry_Repository_Interface */
 	private Prompt_Pack_Registry_Repository_Interface $repository;
@@ -118,6 +122,77 @@ final class Prompt_Pack_Registry_Service {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Returns planning guidance content for template-family taxonomy, CTA-law rules, and hierarchy roles (Prompt 210).
+	 * Used to populate input_artifact.planning_guidance so placeholder resolution can inject into pack segments.
+	 * Authority: page-template-directory-ia-extension, cta-sequencing-and-placement-contract.
+	 *
+	 * @return array{template_family_guidance: string, cta_law_rules: string, hierarchy_role_guidance: string, schema_version: string}
+	 */
+	public function get_planning_guidance_content(): array {
+		return array(
+			'template_family_guidance'   => $this->get_template_family_guidance_text(),
+			'cta_law_rules'              => $this->get_cta_law_rules_text(),
+			'hierarchy_role_guidance'    => $this->get_hierarchy_role_guidance_text(),
+			'schema_version'             => self::PLANNING_GUIDANCE_SCHEMA_VERSION,
+		);
+	}
+
+	/**
+	 * Page-template category classes and family examples (governed taxonomy).
+	 *
+	 * @return string
+	 */
+	private function get_template_family_guidance_text(): string {
+		$lines = array(
+			'Page templates are grouped by template_category_class and template_family.',
+			'',
+			'template_category_class (hierarchy):',
+			'- top_level: Home, about, contact, key landing pages.',
+			'- hub: Category/listing pages (e.g. services, products, locations, offerings).',
+			'- nested_hub: Sub-category or regional hub pages.',
+			'- child_detail: Individual item or detail pages (product, service, location, profile).',
+			'',
+			'template_family examples (within a class): home, about, contact, services, products, offerings, directories, locations, product_detail, service_detail, profile_entity, location_detail.',
+			'Recommendations must use template_key and template_family from the governed library; do not invent keys.',
+		);
+		return implode( "\n", $lines );
+	}
+
+	/**
+	 * CTA sequencing and placement rules (cta-sequencing-and-placement-contract).
+	 *
+	 * @return string
+	 */
+	private function get_cta_law_rules_text(): string {
+		$lines = array(
+			'CTA rules (mandatory for every page template):',
+			'- Minimum CTA-classified sections by template_category_class: top_level 3, hub 4, nested_hub 4, child_detail 5.',
+			'- The last section of every page must be CTA-classified (bottom-of-page CTA).',
+			'- No two CTA-classified sections may be adjacent; at least one non-CTA section between any two CTAs.',
+			'- Non-CTA section count target: 8–14 per page (below 8 = error, above 14 = warning).',
+			'When recommending templates, ensure the chosen template satisfies these rules.',
+		);
+		return implode( "\n", $lines );
+	}
+
+	/**
+	 * Hierarchy role expectations for planning.
+	 *
+	 * @return string
+	 */
+	private function get_hierarchy_role_guidance_text(): string {
+		$lines = array(
+			'Hierarchy roles:',
+			'- top_level: Shallow path, often in main nav; home, about, contact, primary landing.',
+			'- hub: Path depth 1–2; category or listing; may be in nav (e.g. /services, /products).',
+			'- nested_hub: Path depth 2; sub-category or regional hub; may or may not be in nav.',
+			'- child_detail: Path depth 3+ or slug suggests single item; product/service/location/profile detail.',
+			'Match suggested page class to URL structure and crawl hints when available.',
+		);
+		return implode( "\n", $lines );
 	}
 
 	/**

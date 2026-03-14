@@ -39,6 +39,12 @@ final class Prompt_Pack_Schema {
 	public const SEGMENT_SAFETY_INSTRUCTIONS       = 'safety_instructions';
 	public const SEGMENT_NORMALIZATION_EXPECTATIONS = 'normalization_expectations';
 	public const SEGMENT_PROVIDER_NOTES            = 'provider_notes';
+	/** Optional (Prompt 210): template taxonomy and family examples. */
+	public const SEGMENT_TEMPLATE_FAMILY_GUIDANCE  = 'template_family_guidance';
+	/** Optional (Prompt 210): CTA count, bottom-CTA, non-adjacency rules. */
+	public const SEGMENT_CTA_LAW_GUIDANCE         = 'cta_law_guidance';
+	/** Optional (Prompt 210): hierarchy role expectations. */
+	public const SEGMENT_HIERARCHY_ROLE_GUIDANCE  = 'hierarchy_role_guidance';
 
 	public const STATUS_ACTIVE     = 'active';
 	public const STATUS_INACTIVE   = 'inactive';
@@ -54,6 +60,8 @@ final class Prompt_Pack_Schema {
 	public const PLACEHOLDER_SOURCE_CRAWL     = 'crawl';
 	public const PLACEHOLDER_SOURCE_GOAL      = 'goal';
 	public const PLACEHOLDER_SOURCE_CUSTOM    = 'custom';
+	/** Prompt 210: template-family and CTA-law content from planning_guidance. */
+	public const PLACEHOLDER_SOURCE_PLANNING_GUIDANCE = 'planning_guidance';
 
 	/** @return array<int, string> */
 	public static function required_root_keys(): array {
@@ -90,6 +98,7 @@ final class Prompt_Pack_Schema {
 			self::PLACEHOLDER_SOURCE_CRAWL,
 			self::PLACEHOLDER_SOURCE_GOAL,
 			self::PLACEHOLDER_SOURCE_CUSTOM,
+			self::PLACEHOLDER_SOURCE_PLANNING_GUIDANCE,
 		);
 	}
 }

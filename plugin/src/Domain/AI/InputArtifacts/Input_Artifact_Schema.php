@@ -28,6 +28,8 @@ final class Input_Artifact_Schema {
 	public const ROOT_REDACTION        = 'redaction';
 	public const ROOT_INCLUSION_RATIONALE = 'inclusion_rationale';
 	public const ROOT_COMPATIBILITY    = 'compatibility';
+	/** Optional (Prompt 210): template-family and CTA-law guidance for placeholder injection. */
+	public const ROOT_PLANNING_GUIDANCE = 'planning_guidance';
 
 	public const PROMPT_PACK_REF_INTERNAL_KEY = 'internal_key';
 	public const PROMPT_PACK_REF_VERSION       = 'version';

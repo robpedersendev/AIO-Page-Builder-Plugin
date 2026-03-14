@@ -49,7 +49,18 @@ final class Normalized_Prompt_Package_Builder {
 
 		$system_parts = array();
 		$user_parts   = array();
-		foreach ( array( Prompt_Pack_Schema::SEGMENT_SYSTEM_BASE, Prompt_Pack_Schema::SEGMENT_ROLE_FRAMING, Prompt_Pack_Schema::SEGMENT_SAFETY_INSTRUCTIONS, Prompt_Pack_Schema::SEGMENT_SCHEMA_REQUIREMENTS, Prompt_Pack_Schema::SEGMENT_NORMALIZATION_EXPECTATIONS, Prompt_Pack_Schema::SEGMENT_PROVIDER_NOTES ) as $seg_key ) {
+		$system_segment_keys = array(
+			Prompt_Pack_Schema::SEGMENT_SYSTEM_BASE,
+			Prompt_Pack_Schema::SEGMENT_ROLE_FRAMING,
+			Prompt_Pack_Schema::SEGMENT_SAFETY_INSTRUCTIONS,
+			Prompt_Pack_Schema::SEGMENT_SCHEMA_REQUIREMENTS,
+			Prompt_Pack_Schema::SEGMENT_NORMALIZATION_EXPECTATIONS,
+			Prompt_Pack_Schema::SEGMENT_TEMPLATE_FAMILY_GUIDANCE,
+			Prompt_Pack_Schema::SEGMENT_CTA_LAW_GUIDANCE,
+			Prompt_Pack_Schema::SEGMENT_HIERARCHY_ROLE_GUIDANCE,
+			Prompt_Pack_Schema::SEGMENT_PROVIDER_NOTES,
+		);
+		foreach ( $system_segment_keys as $seg_key ) {
 			$content = $this->get_segment_content( $segments, $seg_key );
 			if ( $content !== '' ) {
 				$content = $this->substitute_placeholders( $content, $placeholder_values );
@@ -113,6 +124,7 @@ final class Normalized_Prompt_Package_Builder {
 		$crawl_summary   = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_CRAWL ] ?? array() );
 		$registry_summary = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_REGISTRY ] ?? array() );
 		$goal_text       = $this->extract_goal( $input_artifact );
+		$planning_guidance = $this->extract_planning_guidance( $input_artifact );
 
 		$values = array(
 			'{{profile_summary}}'   => $profile_summary,
@@ -120,6 +132,9 @@ final class Normalized_Prompt_Package_Builder {
 			'{{registry_summary}}'  => $registry_summary,
 			'{{goal}}'              => $goal_text,
 			'{{goal_or_intent}}'    => $goal_text,
+			'{{template_family_guidance}}'   => $planning_guidance['template_family_guidance'],
+			'{{cta_law_rules}}'              => $planning_guidance['cta_law_rules'],
+			'{{hierarchy_role_guidance}}'    => $planning_guidance['hierarchy_role_guidance'],
 		);
 
 		foreach ( $rules as $placeholder => $rule ) {
@@ -142,6 +157,8 @@ final class Normalized_Prompt_Package_Builder {
 				$val = $registry_summary;
 			} elseif ( $source === Prompt_Pack_Schema::PLACEHOLDER_SOURCE_GOAL ) {
 				$val = $goal_text;
+			} elseif ( $source === Prompt_Pack_Schema::PLACEHOLDER_SOURCE_PLANNING_GUIDANCE ) {
+				$val = $this->resolve_planning_guidance_placeholder( $placeholder, $planning_guidance );
 			}
 			if ( $max_len > 0 && strlen( $val ) > $max_len ) {
 				$val = substr( $val, 0, $max_len ) . '...';
@@ -159,7 +176,7 @@ final class Normalized_Prompt_Package_Builder {
 		if ( ! is_array( $section ) ) {
 			return is_string( $section ) ? $section : '';
 		}
-		$json = wp_json_encode( $section );
+		$json = function_exists( 'wp_json_encode' ) ? wp_json_encode( $section ) : json_encode( $section );
 		return $json !== false ? $json : '';
 	}
 
@@ -170,6 +187,42 @@ final class Normalized_Prompt_Package_Builder {
 		}
 		if ( is_array( $goal ) && isset( $goal['text'] ) ) {
 			return (string) $goal['text'];
+		}
+		return '';
+	}
+
+	/**
+	 * Extracts planning_guidance from artifact (Prompt 210). Returns empty strings when absent.
+	 *
+	 * @param array<string, mixed> $input_artifact
+	 * @return array{template_family_guidance: string, cta_law_rules: string, hierarchy_role_guidance: string}
+	 */
+	private function extract_planning_guidance( array $input_artifact ): array {
+		$block = $input_artifact[ Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE ] ?? null;
+		if ( ! is_array( $block ) ) {
+			return array(
+				'template_family_guidance' => '',
+				'cta_law_rules'           => '',
+				'hierarchy_role_guidance'  => '',
+			);
+		}
+		return array(
+			'template_family_guidance' => (string) ( $block['template_family_guidance'] ?? '' ),
+			'cta_law_rules'           => (string) ( $block['cta_law_rules'] ?? '' ),
+			'hierarchy_role_guidance'  => (string) ( $block['hierarchy_role_guidance'] ?? '' ),
+		);
+	}
+
+	/**
+	 * Resolves a single planning_guidance placeholder by name.
+	 *
+	 * @param string $placeholder Placeholder name (e.g. template_family_guidance).
+	 * @param array{template_family_guidance: string, cta_law_rules: string, hierarchy_role_guidance: string} $planning_guidance
+	 * @return string
+	 */
+	private function resolve_planning_guidance_placeholder( string $placeholder, array $planning_guidance ): string {
+		if ( isset( $planning_guidance[ $placeholder ] ) && is_string( $planning_guidance[ $placeholder ] ) ) {
+			return $planning_guidance[ $placeholder ];
 		}
 		return '';
 	}

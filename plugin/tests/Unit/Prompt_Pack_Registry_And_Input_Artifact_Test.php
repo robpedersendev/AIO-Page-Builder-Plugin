@@ -190,4 +190,98 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 		$this->assertSame( array( 'missing_segments' ), $arr['validation_errors'] );
 		$this->assertFalse( $arr['has_package'] );
 	}
+
+	/** Prompt 210: get_planning_guidance_content returns template-family, CTA-law, hierarchy guidance and schema_version. */
+	public function test_registry_get_planning_guidance_content_returns_structure(): void {
+		$repo = new Test_Prompt_Pack_Repo();
+		$registry = new Prompt_Pack_Registry_Service( $repo );
+		$guidance = $registry->get_planning_guidance_content();
+		$this->assertArrayHasKey( 'template_family_guidance', $guidance );
+		$this->assertArrayHasKey( 'cta_law_rules', $guidance );
+		$this->assertArrayHasKey( 'hierarchy_role_guidance', $guidance );
+		$this->assertArrayHasKey( 'schema_version', $guidance );
+		$this->assertSame( Prompt_Pack_Registry_Service::PLANNING_GUIDANCE_SCHEMA_VERSION, $guidance['schema_version'] );
+		$this->assertStringContainsString( 'top_level', $guidance['template_family_guidance'] );
+		$this->assertStringContainsString( 'hub', $guidance['template_family_guidance'] );
+		$this->assertStringContainsString( 'child_detail', $guidance['template_family_guidance'] );
+		$this->assertStringContainsString( 'CTA', $guidance['cta_law_rules'] );
+		$this->assertStringContainsString( 'bottom', $guidance['cta_law_rules'] );
+		$this->assertStringContainsString( 'adjacent', $guidance['cta_law_rules'] );
+		$this->assertStringContainsString( 'top_level', $guidance['hierarchy_role_guidance'] );
+	}
+
+	/** Prompt 210: planning_guidance placeholders are substituted when artifact contains planning_guidance. */
+	public function test_normalized_prompt_package_injects_planning_guidance_placeholders(): void {
+		$pack = array(
+			Prompt_Pack_Schema::ROOT_INTERNAL_KEY      => 'aio/build-plan-draft',
+			Prompt_Pack_Schema::ROOT_NAME             => 'Build Plan Draft',
+			Prompt_Pack_Schema::ROOT_VERSION          => '1.0.0',
+			Prompt_Pack_Schema::ROOT_PACK_TYPE        => Prompt_Pack_Schema::PACK_TYPE_PLANNING,
+			Prompt_Pack_Schema::ROOT_STATUS           => Prompt_Pack_Schema::STATUS_ACTIVE,
+			Prompt_Pack_Schema::ROOT_SCHEMA_TARGET_REF => 'aio/build-plan-draft-v1',
+			Prompt_Pack_Schema::ROOT_SEGMENTS         => array(
+				Prompt_Pack_Schema::SEGMENT_SYSTEM_BASE => 'You are a planning assistant.',
+				Prompt_Pack_Schema::SEGMENT_TEMPLATE_FAMILY_GUIDANCE => 'Taxonomy: {{template_family_guidance}}',
+				Prompt_Pack_Schema::SEGMENT_CTA_LAW_GUIDANCE => 'Rules: {{cta_law_rules}}',
+			),
+		);
+		$artifact = array(
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'art-1',
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION  => '1',
+			Input_Artifact_Schema::ROOT_CREATED_AT      => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
+			Input_Artifact_Schema::ROOT_REDACTION       => array( 'redaction_applied' => false ),
+			Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE => array(
+				'template_family_guidance' => 'Page classes: top_level, hub, nested_hub, child_detail.',
+				'cta_law_rules'           => 'Min 3 CTAs for top_level; last section must be CTA.',
+				'hierarchy_role_guidance'  => 'Match hierarchy to URL depth.',
+			),
+		);
+		$builder = new Normalized_Prompt_Package_Builder();
+		$result = $builder->build( $pack, $artifact );
+		$this->assertTrue( $result->is_success() );
+		$pkg = $result->get_normalized_prompt_package();
+		$this->assertNotNull( $pkg );
+		$this->assertStringContainsString( 'Page classes: top_level, hub, nested_hub, child_detail.', $pkg['system_prompt'] );
+		$this->assertStringContainsString( 'Min 3 CTAs for top_level; last section must be CTA.', $pkg['system_prompt'] );
+	}
+
+	/** Prompt 210: artifact builder accepts planning_guidance in options. */
+	public function test_input_artifact_builder_accepts_planning_guidance_option(): void {
+		$guidance = array(
+			'template_family_guidance' => 'Taxonomy summary.',
+			'cta_law_rules'            => 'CTA rules.',
+			'hierarchy_role_guidance'  => 'Hierarchy roles.',
+			'schema_version'           => '1',
+		);
+		$builder = new Input_Artifact_Builder();
+		$artifact = $builder->build( 'art-1', array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ), array(
+			'redaction'        => array( 'redaction_applied' => false ),
+			'planning_guidance' => $guidance,
+		) );
+		$this->assertNotNull( $artifact );
+		$this->assertArrayHasKey( Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE, $artifact );
+		$this->assertSame( $guidance, $artifact[ Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE ] );
+	}
+
+	/** Prompt 210: fixture prompt-pack has template-family and CTA-law segments and schema version traceability. */
+	public function test_template_family_cta_fixture_has_expected_structure(): void {
+		$fixture_path = dirname( __DIR__ ) . '/fixtures/prompt-packs/prompt-pack-template-family-cta-example.json';
+		$this->assertFileExists( $fixture_path );
+		$json = file_get_contents( $fixture_path );
+		$this->assertNotFalse( $json );
+		$pack = json_decode( $json, true );
+		$this->assertIsArray( $pack );
+		$this->assertArrayHasKey( Prompt_Pack_Schema::ROOT_SEGMENTS, $pack );
+		$segments = $pack[ Prompt_Pack_Schema::ROOT_SEGMENTS ];
+		$this->assertArrayHasKey( Prompt_Pack_Schema::SEGMENT_TEMPLATE_FAMILY_GUIDANCE, $segments );
+		$this->assertArrayHasKey( Prompt_Pack_Schema::SEGMENT_CTA_LAW_GUIDANCE, $segments );
+		$this->assertArrayHasKey( Prompt_Pack_Schema::SEGMENT_HIERARCHY_ROLE_GUIDANCE, $segments );
+		$this->assertStringContainsString( '{{template_family_guidance}}', $segments[ Prompt_Pack_Schema::SEGMENT_TEMPLATE_FAMILY_GUIDANCE ] );
+		$this->assertStringContainsString( '{{cta_law_rules}}', $segments[ Prompt_Pack_Schema::SEGMENT_CTA_LAW_GUIDANCE ] );
+		$this->assertArrayHasKey( 'placeholder_rules', $pack );
+		$this->assertSame( 'planning_guidance', $pack['placeholder_rules']['template_family_guidance']['source'] ?? '' );
+		$this->assertArrayHasKey( 'changelog', $pack );
+		$this->assertSame( '1.1.0', $pack[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '' );
+	}
 }

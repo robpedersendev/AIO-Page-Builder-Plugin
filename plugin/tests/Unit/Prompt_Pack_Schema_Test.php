@@ -69,6 +69,14 @@ final class Prompt_Pack_Schema_Test extends TestCase {
 		$this->assertContains( Prompt_Pack_Schema::STATUS_DEPRECATED, Prompt_Pack_Schema::valid_statuses() );
 		$this->assertContains( Prompt_Pack_Schema::PACK_TYPE_REPAIR, Prompt_Pack_Schema::valid_pack_types() );
 		$this->assertContains( Prompt_Pack_Schema::PLACEHOLDER_SOURCE_PROFILE, Prompt_Pack_Schema::valid_placeholder_sources() );
+		$this->assertContains( Prompt_Pack_Schema::PLACEHOLDER_SOURCE_PLANNING_GUIDANCE, Prompt_Pack_Schema::valid_placeholder_sources() );
+	}
+
+	/** Prompt 210: optional segment keys for template-family and CTA-law guidance. */
+	public function test_template_family_and_cta_law_segment_keys_defined(): void {
+		$this->assertSame( 'template_family_guidance', Prompt_Pack_Schema::SEGMENT_TEMPLATE_FAMILY_GUIDANCE );
+		$this->assertSame( 'cta_law_guidance', Prompt_Pack_Schema::SEGMENT_CTA_LAW_GUIDANCE );
+		$this->assertSame( 'hierarchy_role_guidance', Prompt_Pack_Schema::SEGMENT_HIERARCHY_ROLE_GUIDANCE );
 	}
 
 	public function test_version_parse(): void {

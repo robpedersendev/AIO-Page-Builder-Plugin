@@ -1,0 +1,23 @@
+{
+  "internal_key": "aio/build-plan-draft",
+  "name": "Build Plan Draft (template-family and CTA aware)",
+  "version": "1.1.0",
+  "pack_type": "planning",
+  "status": "active",
+  "schema_target_ref": "aio/build-plan-draft-v1",
+  "segments": {
+    "system_base": "You are a site planning assistant. Output valid JSON per schema.",
+    "template_family_guidance": "Page template taxonomy and hierarchy:\n{{template_family_guidance}}",
+    "cta_law_guidance": "CTA rules (must be satisfied by recommended templates):\n{{cta_law_rules}}",
+    "hierarchy_role_guidance": "Hierarchy roles:\n{{hierarchy_role_guidance}}",
+    "planning_instructions": "Use the context. Recommend templates that match hierarchy and satisfy CTA rules."
+  },
+  "placeholder_rules": {
+    "template_family_guidance": { "source": "planning_guidance", "required": false },
+    "cta_law_rules": { "source": "planning_guidance", "required": false },
+    "hierarchy_role_guidance": { "source": "planning_guidance", "required": false }
+  },
+  "changelog": [
+    { "version": "1.1.0", "note": "Prompt 210: Add template-family and CTA-law guidance segments and placeholders." }
+  ]
+}

@@ -68,7 +68,7 @@ final class Module_Registrar {
 	 * Rendering_Provider registers smart_omission_service, animation_tier_resolver, and wires both into section_renderer_base (smart-omission-rendering-contract; animation-support-and-fallback-contract).
 	 * ACF_Blueprints_Provider and ACF_Registration_Provider: blueprint_family_registry, blueprint_family_resolver, preview_family_mapping; deterministic registration (register_sections_for_page, register_by_family) per large-scale-acf-lpagery-binding-contract.
 	 * Admin menu and screen routing are registered separately in Plugin::register_admin_menu().
-	 * AI_Provider_Drivers_Provider registers openai and anthropic provider drivers (spec §25, §49.9).
+	 * AI_Provider_Drivers_Provider registers openai and anthropic provider drivers (spec §25, §49.9). Prompt packs (Prompt 210): Prompt_Pack_Registry_Service exposes get_planning_guidance_content() for template-family taxonomy, CTA-law rules, and hierarchy-role guidance; planning_guidance placeholders and optional segments (template_family_guidance, cta_law_guidance, hierarchy_role_guidance) inject this into planning prompts per template-family-planning-prompt-pack-addendum; prompt-schema and ai-output-schema appendices document structure and versioning.
 	 *
 	 * @return void
 	 */

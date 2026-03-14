@@ -27,7 +27,7 @@ final class Input_Artifact_Builder {
 	 *
 	 * @param string               $artifact_id    Unique artifact id (e.g. UUID).
 	 * @param array<string, mixed> $prompt_pack_ref Must contain internal_key and version.
-	 * @param array<string, mixed> $options        Optional: profile, crawl, registry, goal, attachment_manifest, redaction, inclusion_rationale, compatibility.
+	 * @param array<string, mixed> $options        Optional: profile, crawl, registry, goal, planning_guidance, attachment_manifest, redaction, inclusion_rationale, compatibility.
 	 * @return array<string, mixed>|null Input artifact or null on validation failure.
 	 */
 	public function build( string $artifact_id, array $prompt_pack_ref, array $options = array() ): ?array {
@@ -70,6 +70,9 @@ final class Input_Artifact_Builder {
 		}
 		if ( array_key_exists( 'goal', $options ) ) {
 			$artifact[ Input_Artifact_Schema::ROOT_GOAL ] = $options['goal'];
+		}
+		if ( isset( $options['planning_guidance'] ) && is_array( $options['planning_guidance'] ) ) {
+			$artifact[ Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE ] = $options['planning_guidance'];
 		}
 		if ( isset( $options['attachment_manifest'] ) && is_array( $options['attachment_manifest'] ) ) {
 			$artifact[ Input_Artifact_Schema::ROOT_ATTACHMENT_MANIFEST ] = $options['attachment_manifest'];
