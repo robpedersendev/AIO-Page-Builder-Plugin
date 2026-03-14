@@ -277,8 +277,12 @@ final class Section_Templates_Directory_Screen {
 					$variant_count = (int) ( $row['variant_count'] ?? 0 );
 					$helper_ref  = (string) ( $row['helper_ref'] ?? '' );
 					$field_ref  = (string) ( $row['field_blueprint_ref'] ?? '' );
-					$view_url   = \add_query_arg( array_merge( $query_args, array( 'section' => $key ) ), $base_url );
-					$helper_url = ''; // * Helper-doc link: placeholder until helper doc URL builder exists.
+					$detail_args = array( 'page' => Section_Template_Detail_Screen::SLUG, 'section' => $key );
+					if ( $pf_slug !== '' ) {
+						$detail_args['purpose_family'] = $pf_slug;
+					}
+					$view_url   = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
+					$helper_url = ''; // * Helper-doc link: populated on detail screen when helper_doc_url resolver exists.
 					?>
 					<tr>
 						<td><?php echo \esc_html( $name ); ?></td>
