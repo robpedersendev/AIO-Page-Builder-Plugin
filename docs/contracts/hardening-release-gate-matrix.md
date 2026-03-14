@@ -207,6 +207,7 @@ Release gate (M12) and production readiness (§59.15) require:
 - **Docs:** §57.9 Documentation standards; §58.6 Release notes standards.
 - **Project:** [RELEASE_CHECKLIST.md](../qa/RELEASE_CHECKLIST.md), [DEFINITION_OF_DONE.md](../qa/DEFINITION_OF_DONE.md), [SECURITY_STANDARD.md](../standards/SECURITY_STANDARD.md).
 - **Template library QA:** [template-library-compliance-matrix.md](../qa/template-library-compliance-matrix.md) — acceptance gate for section/page template production (Prompt 146); rule families, severity, evidence, and batch sign-off. Library-expansion prompts must satisfy the compliance matrix; hard-fail items block template acceptance.
+- **Template ecosystem E2E acceptance (Prompt 216):** [template-ecosystem-end-to-end-acceptance-report.md](../qa/template-ecosystem-end-to-end-acceptance-report.md) — end-to-end acceptance suite for the expanded template ecosystem (directory, detail, compare, compositions, Build Plan visibility, new-page, replacement, menu apply, diff/rollback, export/restore, reporting, capability). Scenario manifest: [tests/e2e/template-ecosystem/SCENARIO_MANIFEST.md](../../tests/e2e/template-ecosystem/SCENARIO_MANIFEST.md). Evidence table in the report must be completed; critical-path scenarios Pass or Waived for milestone exit.
 
 ---
 

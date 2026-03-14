@@ -28,6 +28,7 @@
 | **Unit tests** (§56.2) | Plugin test suite (e.g. Environment_Validator, Schema_Version_Tracker, Migration_Result, Build_Plan_Schema, etc.). | *Execute and record.* |
 | **Integration** (§56.3) | Cross-subsystem tests (onboarding→AI, validation→Build Plan, template→ACF, execution→snapshot/log). | *Execute and record.* |
 | **End-to-end** (§56.4) | Install→onboarding, AI run→Build Plan, approval→page creation, export/import round-trip, uninstall export. | *Execute and record.* |
+| **Template ecosystem E2E** (Prompt 216, §56.4) | Directory browsing, detail previews, compare, compositions, Build Plan recommendation visibility, new-page/replacement/menu apply, diff/rollback, export/restore, reporting enrichments, capability restrictions. | [template-ecosystem-end-to-end-acceptance-report.md](template-ecosystem-end-to-end-acceptance-report.md); scenario manifest: [tests/e2e/template-ecosystem/SCENARIO_MANIFEST.md](../../tests/e2e/template-ecosystem/SCENARIO_MANIFEST.md). *Execute scenarios; record pass/fail/waiver in report.* |
 | **Migration/compatibility** | [migration-coverage-matrix.md](migration-coverage-matrix.md), [compatibility-matrix.md](compatibility-matrix.md). | *Execute scenarios; fill Observed.* |
 | **Role/capability** | [security-redaction-review.md](security-redaction-review.md); capability and nonce audit. | Audited; negative tests recommended. |
 | **Accessibility** | [accessibility-remediation-checklist.md](accessibility-remediation-checklist.md). | Remediation applied; manual QA recommended. |
