@@ -30,6 +30,7 @@
 | Build Plan Analytics   | `Build_Plan_Analytics_Screen` / `aio-page-builder-build-plan-analytics` | `aio_view_build_plans`  |
 | **Page Templates**     | `Page_Templates_Directory_Screen` / `aio-page-builder-page-templates`   | `aio_view_build_plans` |
 | **Section Templates**  | `Section_Templates_Directory_Screen` / `aio-page-builder-section-templates` | `aio_view_build_plans` |
+| **Compositions**       | `Compositions_Screen` / `aio-page-builder-compositions` | `aio_view_build_plans` |
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
 | **Post-Release Health**| `Post_Release_Health_Screen` / `aio-page-builder-post-release-health` | `aio_view_logs`         |
@@ -89,7 +90,30 @@ The **page template directory** is a dedicated browse experience for page templa
 
 When admin screens list or browse **section templates**, **directory and browse grouping** must follow **section-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `section_purpose_family` (e.g. hero, proof, cta, legal), `placement_tendency` (opener, mid_page, cta_ending, legal_footer_adjacent), and `cta_classification`. Section preview grouping aligns with the same taxonomy. All taxonomy values are validated and deterministic.
 
-### 2.3 Section template directory IA (spec §49.6; Prompt 142)
+### 2.3 Compositions screen (spec §14, §49.6; Prompt 177)
+
+The **Compositions** screen lists governed custom compositions and provides a **composition builder** view for large-library assembly. Views: **list** (compositions table; Build composition link) and **build** (filtered section library, current ordered sections, CTA count/proximity warnings, insertion hint, preview and one-pager readiness). State is built by `Composition_Builder_State_Builder`; filter state by `Composition_Filter_State`. Screen slug: `aio-page-builder-compositions`. Capability: `aio_view_build_plans`. No freeform drag-and-drop; section ordering and CTA rules remain governed. Mutation (create/update composition) is server-validated and out of scope for this screen’s initial implementation; builder shows state and guidance only.
+
+**Example composition-builder state payload** (build view, one composition with two sections):
+
+```json
+{
+  "filter_state": { "purpose_family": "hero", "category": "", "cta_classification": "", "variation_family_key": "", "search": "", "status": "", "paged": 1, "per_page": 25 },
+  "section_result": { "rows": [ { "internal_key": "st_hero", "name": "Section st_hero", "category": "hero_intro", "section_purpose_family": "hero", "cta_classification": "", "status": "active" } ], "pagination": { "page": 1, "per_page": 25, "total": 2, "total_pages": 1, "offset": 0 }, "total_matching": 2 },
+  "ordered_sections_display": [ { "section_key": "st_hero", "name": "Section st_hero", "position": 0, "cta_classification": "none", "is_cta": false }, { "section_key": "st_cta", "name": "Section st_cta", "position": 1, "cta_classification": "primary_cta", "is_cta": true } ],
+  "cta_warnings": [],
+  "insertion_hint": "Next section should be non-CTA to avoid adjacent CTAs. Add content (proof, feature, FAQ, etc.) then another CTA later.",
+  "validation_status": "valid",
+  "validation_codes": [],
+  "preview_readiness": true,
+  "one_pager_ready": true,
+  "base_url": "https://example.com/wp-admin/admin.php?page=aio-page-builder-compositions",
+  "category_labels": { "hero_intro": "Hero / Intro", "trust_proof": "Trust / Proof", "cta_conversion": "CTA", "faq": "FAQ", "legal_disclaimer": "Legal" },
+  "cta_labels": { "primary_cta": "Primary CTA", "contact_cta": "Contact CTA", "navigation_cta": "Navigation CTA", "none": "None" }
+}
+```
+
+### 2.4 Section template directory IA (spec §49.6; Prompt 142)
 
 The **section template directory** is a dedicated browse experience for section templates. Its **information architecture** (hierarchical tree by purpose family, CTA/variant grouping, breadcrumbs, list/detail, helper-doc and field blueprint links, preview) is defined in **section-template-directory-ia-extension.md**. Tree structure: **Section Templates** (root) → **Purpose family** (Hero, Proof, CTA, FAQ, etc.) → **CTA classification** (for cta/contact) or **Variant family** (e.g. Hero primary) → **Section option list** → **Section detail**. Screen slug: `aio-page-builder-section-templates`. Directory is capability-gated; preview uses preview-safe data only. Build Plan and composition section pickers may deep-link into the directory. Section directory does not replace Build Plan or composition workflows and emphasizes purpose-family, CTA classification, and variant families for section reuse. State is built by `Section_Template_Directory_State_Builder`.
 
