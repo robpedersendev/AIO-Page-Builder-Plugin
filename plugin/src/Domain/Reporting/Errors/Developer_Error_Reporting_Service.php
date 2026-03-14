@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Reporting\Contracts\Reporting_Event_Types;
 use AIOPageBuilder\Domain\Reporting\Contracts\Reporting_Payload_Schema;
+use AIOPageBuilder\Domain\Reporting\Payloads\Template_Library_Report_Summary_Builder;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Config\Versions;
 use AIOPageBuilder\Support\Logging\Error_Record;
@@ -39,14 +40,19 @@ final class Developer_Error_Reporting_Service {
 	/** @var Developer_Error_Transport_Interface */
 	private Developer_Error_Transport_Interface $transport;
 
+	/** @var Template_Library_Report_Summary_Builder|null */
+	private ?Template_Library_Report_Summary_Builder $template_library_report_summary_builder;
+
 	public function __construct(
 		?Reporting_Eligibility_Evaluator $evaluator = null,
 		?Reporting_Redaction_Service $redaction = null,
-		?Developer_Error_Transport_Interface $transport = null
+		?Developer_Error_Transport_Interface $transport = null,
+		?Template_Library_Report_Summary_Builder $template_library_report_summary_builder = null
 	) {
 		$this->evaluator = $evaluator ?? new Reporting_Eligibility_Evaluator();
 		$this->redaction = $redaction ?? new Reporting_Redaction_Service();
 		$this->transport = $transport ?? new Wp_Mail_Developer_Error_Transport();
+		$this->template_library_report_summary_builder = $template_library_report_summary_builder;
 	}
 
 	/**
@@ -234,6 +240,9 @@ final class Developer_Error_Reporting_Service {
 			'related_job_id'             => isset( $context['related_job_id'] ) ? (string) $context['related_job_id'] : '',
 			'related_run_id'             => isset( $context['related_run_id'] ) ? (string) $context['related_run_id'] : '',
 		);
+		if ( $this->template_library_report_summary_builder !== null ) {
+			$payload['template_library_report_summary'] = $this->template_library_report_summary_builder->build();
+		}
 
 		return array(
 			'schema_version' => Reporting_Payload_Schema::SCHEMA_VERSION,

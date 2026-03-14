@@ -58,12 +58,21 @@ final class Heartbeat_Scheduler {
 		}
 	}
 
+	/** Filter name for container-provided Heartbeat_Service (Prompt 214). */
+	public const HEARTBEAT_SERVICE_FILTER = 'aio_page_builder_heartbeat_service';
+
 	/**
-	 * Cron callback: runs heartbeat service. Must not throw (WordPress cron).
+	 * Cron callback: runs heartbeat service. Uses container service when available (template-library enrichment).
+	 * Must not throw (WordPress cron).
 	 *
 	 * @return void
 	 */
 	public static function run_heartbeat(): void {
+		$service = apply_filters( self::HEARTBEAT_SERVICE_FILTER, null );
+		if ( $service instanceof Heartbeat_Service ) {
+			$service->maybe_send();
+			return;
+		}
 		$service = new Heartbeat_Service();
 		$service->maybe_send();
 	}

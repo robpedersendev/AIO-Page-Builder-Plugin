@@ -130,6 +130,23 @@ final class Reporting_Payload_Schema_Test extends TestCase {
 		$this->assertFalse( Reporting_Payload_Schema::has_no_prohibited_keys( $data ) );
 	}
 
+	/** Prompt 214: optional template_library_report_summary in payload must pass redaction. */
+	public function test_has_no_prohibited_keys_passes_with_template_library_report_summary(): void {
+		$payload = array(
+			'website_address' => 'https://example.com',
+			Reporting_Payload_Schema::OPTIONAL_TEMPLATE_LIBRARY_REPORT_SUMMARY_KEY => array(
+				'section_template_count'   => 10,
+				'page_template_count'     => 20,
+				'composition_count'       => 5,
+				'library_version_marker'   => '1',
+				'plugin_version_marker'    => '1.0.0',
+				'appendices_available'     => true,
+				'compliance_summary'       => 'unknown',
+			),
+		);
+		$this->assertTrue( Reporting_Payload_Schema::has_no_prohibited_keys( $payload, true ) );
+	}
+
 	public function test_dedupe_key_install_format(): void {
 		$key = Reporting_Payload_Schema::dedupe_key_install( 'example.com', '2025-03-15T14:00:00Z' );
 		$this->assertStringStartsWith( 'install_', $key );

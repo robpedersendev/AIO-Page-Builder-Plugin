@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Reporting\Contracts\Reporting_Event_Types;
 use AIOPageBuilder\Domain\Reporting\Contracts\Reporting_Payload_Schema;
+use AIOPageBuilder\Domain\Reporting\Payloads\Template_Library_Report_Summary_Builder;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Config\Versions;
 
@@ -34,12 +35,17 @@ final class Heartbeat_Service {
 	/** @var Heartbeat_Health_Provider_Interface */
 	private Heartbeat_Health_Provider_Interface $health_provider;
 
+	/** @var Template_Library_Report_Summary_Builder|null */
+	private ?Template_Library_Report_Summary_Builder $template_library_report_summary_builder;
+
 	public function __construct(
 		?Heartbeat_Transport_Interface $transport = null,
-		?Heartbeat_Health_Provider_Interface $health_provider = null
+		?Heartbeat_Health_Provider_Interface $health_provider = null,
+		?Template_Library_Report_Summary_Builder $template_library_report_summary_builder = null
 	) {
-		$this->transport       = $transport ?? new Wp_Mail_Heartbeat_Transport();
+		$this->transport = $transport ?? new Wp_Mail_Heartbeat_Transport();
 		$this->health_provider = $health_provider ?? new Default_Heartbeat_Health_Provider();
+		$this->template_library_report_summary_builder = $template_library_report_summary_builder;
 	}
 
 	/**
@@ -176,6 +182,9 @@ final class Heartbeat_Service {
 			'current_unresolved_critical_error_count'    => (int) ( $health['current_unresolved_critical_error_count'] ?? 0 ),
 			'timestamp'                                 => $timestamp,
 		);
+		if ( $this->template_library_report_summary_builder !== null ) {
+			$payload['template_library_report_summary'] = $this->template_library_report_summary_builder->build();
+		}
 
 		return array(
 			'schema_version' => Reporting_Payload_Schema::SCHEMA_VERSION,

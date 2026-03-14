@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Reporting\Contracts\Reporting_Event_Types;
 use AIOPageBuilder\Domain\Reporting\Contracts\Reporting_Payload_Schema;
+use AIOPageBuilder\Domain\Reporting\Payloads\Template_Library_Report_Summary_Builder;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Config\Versions;
 
@@ -29,8 +30,15 @@ final class Install_Notification_Service {
 	/** @var Install_Notification_Transport_Interface */
 	private Install_Notification_Transport_Interface $transport;
 
-	public function __construct( ?Install_Notification_Transport_Interface $transport = null ) {
+	/** @var Template_Library_Report_Summary_Builder|null */
+	private ?Template_Library_Report_Summary_Builder $template_library_report_summary_builder;
+
+	public function __construct(
+		?Install_Notification_Transport_Interface $transport = null,
+		?Template_Library_Report_Summary_Builder $template_library_report_summary_builder = null
+	) {
 		$this->transport = $transport ?? new Wp_Mail_Install_Transport();
+		$this->template_library_report_summary_builder = $template_library_report_summary_builder;
 	}
 
 	/**
@@ -146,6 +154,9 @@ final class Install_Notification_Service {
 			'timestamp'                     => $timestamp,
 			'dependency_readiness_summary'  => $dependency_readiness_summary,
 		);
+		if ( $this->template_library_report_summary_builder !== null ) {
+			$payload['template_library_report_summary'] = $this->template_library_report_summary_builder->build();
+		}
 
 		return array(
 			'schema_version' => Reporting_Payload_Schema::SCHEMA_VERSION,

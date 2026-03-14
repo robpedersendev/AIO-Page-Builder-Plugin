@@ -46,6 +46,9 @@ final class Reporting_Payload_Schema {
 		'secret',
 	);
 
+	/** Optional payload key for template-library health context (Prompt 214). When present, value is template_library_report_summary structure. */
+	public const OPTIONAL_TEMPLATE_LIBRARY_REPORT_SUMMARY_KEY = 'template_library_report_summary';
+
 	/** Required payload body keys per event type (payload only, not envelope). */
 	private const INSTALL_PAYLOAD_KEYS = array(
 		'website_address',

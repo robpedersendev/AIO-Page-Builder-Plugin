@@ -12,13 +12,19 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Heartbeat_Scheduler.php';
+require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Heartbeat_Service.php';
+require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Default_Heartbeat_Health_Provider.php';
+require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Wp_Mail_Heartbeat_Transport.php';
+require_once __DIR__ . '/../../../Domain/Reporting/Payloads/Template_Library_Report_Summary_Builder.php';
 
 use AIOPageBuilder\Domain\Reporting\Errors\Reporting_Redaction_Service;
+use AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Service;
 use AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler;
 use AIOPageBuilder\Domain\Reporting\Install\Install_Notification_Service;
 use AIOPageBuilder\Domain\Reporting\Install\Install_Notification_Transport_Interface;
 use AIOPageBuilder\Domain\Reporting\Install\Wp_Mail_Install_Transport;
 use AIOPageBuilder\Domain\Reporting\Logs\Log_Export_Service;
+use AIOPageBuilder\Domain\Reporting\Payloads\Template_Library_Report_Summary_Builder;
 use AIOPageBuilder\Domain\Reporting\UI\Privacy_Settings_State_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
@@ -34,12 +40,19 @@ final class Reporting_Provider implements Service_Provider_Interface {
 			return new Wp_Mail_Install_Transport();
 		} );
 
+		$this->register_template_library_report_summary_builder( $container );
+
 		$container->register( 'install_notification_service', function () use ( $container ): Install_Notification_Service {
 			$transport = $container->has( 'install_notification_transport' )
 				? $container->get( 'install_notification_transport' )
 				: null;
-			return new Install_Notification_Service( $transport );
+			$summary_builder = $container->has( 'template_library_report_summary_builder' )
+				? $container->get( 'template_library_report_summary_builder' )
+				: null;
+			return new Install_Notification_Service( $transport, $summary_builder );
 		} );
+
+		$this->register_heartbeat_service( $container );
 
 		Heartbeat_Scheduler::register_hook();
 
@@ -66,6 +79,46 @@ final class Reporting_Provider implements Service_Provider_Interface {
 	}
 
 	/**
+	 * Registers template_library_report_summary_builder for install, heartbeat, and error report enrichment (Prompt 214).
+	 *
+	 * @param Service_Container $container
+	 * @return void
+	 */
+	private function register_template_library_report_summary_builder( Service_Container $container ): void {
+		$container->register( 'template_library_report_summary_builder', function () use ( $container ): Template_Library_Report_Summary_Builder {
+			$section_repo = $container->has( 'section_template_repository' ) ? $container->get( 'section_template_repository' ) : null;
+			$page_repo    = $container->has( 'page_template_repository' ) ? $container->get( 'page_template_repository' ) : null;
+			$comp_repo   = $container->has( 'composition_repository' ) ? $container->get( 'composition_repository' ) : null;
+			$appendices  = $container->has( 'section_inventory_appendix_generator' ) && $container->has( 'page_template_inventory_appendix_generator' );
+			return new Template_Library_Report_Summary_Builder( $section_repo, $page_repo, $comp_repo, $appendices, null );
+		} );
+	}
+
+	/**
+	 * Registers heartbeat_service and filter for cron callback (Prompt 214).
+	 *
+	 * @param Service_Container $container
+	 * @return void
+	 */
+	private function register_heartbeat_service( Service_Container $container ): void {
+		$container->register( 'heartbeat_transport', function (): \AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Transport_Interface {
+			return new \AIOPageBuilder\Domain\Reporting\Heartbeat\Wp_Mail_Heartbeat_Transport();
+		} );
+		$container->register( 'heartbeat_health_provider', function (): \AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Health_Provider_Interface {
+			return new \AIOPageBuilder\Domain\Reporting\Heartbeat\Default_Heartbeat_Health_Provider();
+		} );
+		$container->register( 'heartbeat_service', function () use ( $container ): Heartbeat_Service {
+			$transport = $container->get( 'heartbeat_transport' );
+			$health   = $container->get( 'heartbeat_health_provider' );
+			$summary  = $container->has( 'template_library_report_summary_builder' ) ? $container->get( 'template_library_report_summary_builder' ) : null;
+			return new Heartbeat_Service( $transport, $health, $summary );
+		} );
+		add_filter( Heartbeat_Scheduler::HEARTBEAT_SERVICE_FILTER, function () use ( $container ): ?Heartbeat_Service {
+			return $container->get( 'heartbeat_service' );
+		}, 10, 0 );
+	}
+
+	/**
 	 * Registers developer error reporting service and dependencies.
 	 *
 	 * @param Service_Container $container
@@ -88,7 +141,10 @@ final class Reporting_Provider implements Service_Provider_Interface {
 			$transport = $container->has( 'developer_error_transport' )
 				? $container->get( 'developer_error_transport' )
 				: null;
-			return new \AIOPageBuilder\Domain\Reporting\Errors\Developer_Error_Reporting_Service( null, null, $transport );
+			$summary_builder = $container->has( 'template_library_report_summary_builder' )
+				? $container->get( 'template_library_report_summary_builder' )
+				: null;
+			return new \AIOPageBuilder\Domain\Reporting\Errors\Developer_Error_Reporting_Service( null, null, $transport, $summary_builder );
 		} );
 	}
 }
