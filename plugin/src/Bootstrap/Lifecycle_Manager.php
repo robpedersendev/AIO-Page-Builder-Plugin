@@ -81,7 +81,8 @@ final class Lifecycle_Result {
 
 /**
  * Orchestrates activation, deactivation, and uninstall in named phases.
- * Placeholder implementations only; later prompts own real logic.
+ * Built pages remain; export-before-cleanup pathway preserved.
+ * Template-library lifecycle guidance for operators is provided by Template_Library_Lifecycle_Summary_Builder (Prompt 213); see Privacy and Import/Export screens.
  */
 final class Lifecycle_Manager {
 
@@ -513,6 +514,7 @@ final class Lifecycle_Manager {
 	private function export_reminder_integration(): void {
 		// * Export choices are presented on the admin Uninstall screen (Uninstall_Export_Prompt_Service).
 		// This phase runs only from uninstall.php (no UI); no reminder here. Built pages remain.
+		// Template-library lifecycle summaries (what survives, exportable, regenerable, restore guidance) are on Privacy and Import/Export screens (Template_Library_Lifecycle_Summary_Builder, Prompt 213).
 	}
 
 	private function cleanup_plugin_data(): void {

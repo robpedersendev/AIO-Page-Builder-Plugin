@@ -61,7 +61,7 @@ final class Reporting_Provider implements Service_Provider_Interface {
 		} );
 
 		$container->register( 'privacy_settings_state_builder', function () use ( $container ): Privacy_Settings_State_Builder {
-			return new Privacy_Settings_State_Builder( $container->get( 'settings' ) );
+			return new Privacy_Settings_State_Builder( $container->get( 'settings' ), $container );
 		} );
 	}
 

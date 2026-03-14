@@ -79,6 +79,36 @@ final class Privacy_Reporting_Settings_Screen {
 						<li><strong><?php echo \esc_html( $choice['label'] ); ?></strong> — <?php echo \esc_html( $choice['description'] ); ?></li>
 					<?php endforeach; ?>
 				</ul>
+				<?php if ( ! empty( $state['uninstall_export_state']['template_library_lifecycle_summary'] ) ) : ?>
+					<?php $lifecycle = $state['uninstall_export_state']['template_library_lifecycle_summary']; ?>
+					<div class="aio-template-library-lifecycle" aria-labelledby="aio-lifecycle-heading" style="margin-top: 1.5em; padding: 1em; background: #f9f9f9; border-left: 4px solid #0073aa;">
+						<h3 id="aio-lifecycle-heading"><?php \esc_html_e( 'Template library: deactivation, export & restore', 'aio-page-builder' ); ?></h3>
+						<p><strong><?php \esc_html_e( 'On deactivation', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( $lifecycle['deactivation_message'] ?? '' ); ?></p>
+						<p><strong><?php \esc_html_e( 'Built pages', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( $lifecycle['built_pages_description'] ?? '' ); ?></p>
+						<p><strong><?php \esc_html_e( 'Template registries', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( $lifecycle['template_registry_description'] ?? '' ); ?></p>
+						<p><strong><?php \esc_html_e( 'One-pagers', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( $lifecycle['one_pagers_description'] ?? '' ); ?></p>
+						<p><strong><?php \esc_html_e( 'Appendices', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( $lifecycle['appendices_description'] ?? '' ); ?></p>
+						<p><strong><?php \esc_html_e( 'Previews', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( $lifecycle['previews_description'] ?? '' ); ?></p>
+						<p><strong><?php \esc_html_e( 'Restore guidance', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( $lifecycle['restore_guidance'] ?? '' ); ?></p>
+						<?php if ( ! empty( $lifecycle['section_template_count'] ) || ! empty( $lifecycle['page_template_count'] ) || ! empty( $lifecycle['composition_count'] ) ) : ?>
+							<p class="description"><?php \esc_html_e( 'Current library size:', 'aio-page-builder' ); ?>
+								<?php
+								$parts = array();
+								if ( isset( $lifecycle['section_template_count'] ) ) {
+									$parts[] = sprintf( /* translators: %d: count */ __( '%d section templates', 'aio-page-builder' ), (int) $lifecycle['section_template_count'] );
+								}
+								if ( isset( $lifecycle['page_template_count'] ) ) {
+									$parts[] = sprintf( /* translators: %d: count */ __( '%d page templates', 'aio-page-builder' ), (int) $lifecycle['page_template_count'] );
+								}
+								if ( isset( $lifecycle['composition_count'] ) ) {
+									$parts[] = sprintf( /* translators: %d: count */ __( '%d compositions', 'aio-page-builder' ), (int) $lifecycle['composition_count'] );
+								}
+								echo \esc_html( implode( ', ', $parts ) );
+								?>
+							</p>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
 			</section>
 
 			<section class="aio-environment-version" aria-labelledby="aio-env-heading">

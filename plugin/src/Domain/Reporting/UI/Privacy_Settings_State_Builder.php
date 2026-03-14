@@ -14,19 +14,25 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Bootstrap\Constants;
 use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Result;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
+use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 
 /**
  * Assembles disclosure, retention, uninstall/export, environment, version, report destination, privacy helper.
  * No secrets or raw credentials in any payload.
+ * When container provides template_library_lifecycle_summary_builder, uninstall_export_state includes template_library_lifecycle_summary (Prompt 213).
  */
 final class Privacy_Settings_State_Builder {
 
 	/** @var Settings_Service */
 	private Settings_Service $settings;
 
-	public function __construct( Settings_Service $settings ) {
-		$this->settings = $settings;
+	/** @var Service_Container|null */
+	private ?Service_Container $container;
+
+	public function __construct( Settings_Service $settings, ?Service_Container $container = null ) {
+		$this->settings   = $settings;
+		$this->container  = $container;
 	}
 
 	/**
@@ -93,7 +99,7 @@ final class Privacy_Settings_State_Builder {
 	}
 
 	/**
-	 * @return array{choices: list<array{value: string, label: string, description: string}>, prefs_summary: string, built_pages_message: string}
+	 * @return array{choices: list<array>, prefs_summary: string, built_pages_message: string, template_library_lifecycle_summary?: array<string, mixed>}
 	 */
 	private function build_uninstall_export_state(): array {
 		$choices = array(
@@ -123,11 +129,16 @@ final class Privacy_Settings_State_Builder {
 			? __( 'No uninstall preference saved. On uninstall you will be offered export choices.', 'aio-page-builder' )
 			: __( 'Uninstall/export preferences are stored. Use the Uninstall flow to export or remove plugin data.', 'aio-page-builder' );
 		$built_pages_message = __( 'Built pages (content created with the builder) will remain on your site. Only plugin-owned data (settings, templates, plans, logs) will be removed when you continue.', 'aio-page-builder' );
-		return array(
+		$out = array(
 			'choices'             => $choices,
-			'prefs_summary'       => $prefs_summary,
-			'built_pages_message' => $built_pages_message,
+			'prefs_summary'        => $prefs_summary,
+			'built_pages_message'  => $built_pages_message,
 		);
+		if ( $this->container !== null && $this->container->has( 'template_library_lifecycle_summary_builder' ) ) {
+			$builder = $this->container->get( 'template_library_lifecycle_summary_builder' );
+			$out['template_library_lifecycle_summary'] = $builder->build();
+		}
+		return $out;
 	}
 
 	/**

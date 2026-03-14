@@ -13,23 +13,29 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Mode_Keys;
 use AIOPageBuilder\Domain\ExportRestore\Import\Conflict_Resolution_Service;
+use AIOPageBuilder\Domain\Lifecycle\Template_Library_Lifecycle_Summary_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager;
 
 /**
  * Produces stable view-state for export mode selection, export history, import validation, and restore flows.
  * No writes; no exposure of full server paths or raw extracted content.
+ * When Template_Library_Lifecycle_Summary_Builder is provided, includes template_library_lifecycle_summary (Prompt 213).
  */
 final class Import_Export_State_Builder {
 
 	/** @var Plugin_Path_Manager */
 	private Plugin_Path_Manager $path_manager;
 
+	/** @var Template_Library_Lifecycle_Summary_Builder|null */
+	private ?Template_Library_Lifecycle_Summary_Builder $lifecycle_summary_builder;
+
 	/** Maximum number of export history rows to return. */
 	private const EXPORT_HISTORY_LIMIT = 50;
 
-	public function __construct( Plugin_Path_Manager $path_manager ) {
+	public function __construct( Plugin_Path_Manager $path_manager, ?Template_Library_Lifecycle_Summary_Builder $lifecycle_summary_builder = null ) {
 		$this->path_manager = $path_manager;
+		$this->lifecycle_summary_builder = $lifecycle_summary_builder;
 	}
 
 	/**
@@ -89,7 +95,7 @@ final class Import_Export_State_Builder {
 
 		$privacy_screen_url = \add_query_arg( 'page', 'aio-page-builder-privacy-reporting', \admin_url( 'admin.php' ) );
 
-		return array(
+		$state = array(
 			'export_mode_options'       => $this->export_mode_options(),
 			'export_history_rows'       => $this->export_history_rows(),
 			'import_validation_summary' => $import_summary,
@@ -104,6 +110,10 @@ final class Import_Export_State_Builder {
 			'can_import'                => $can_import,
 			'privacy_screen_url'        => $privacy_screen_url,
 		);
+		if ( $this->lifecycle_summary_builder !== null ) {
+			$state['template_library_lifecycle_summary'] = $this->lifecycle_summary_builder->build();
+		}
+		return $state;
 	}
 
 	/**

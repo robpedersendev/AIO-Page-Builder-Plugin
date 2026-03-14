@@ -283,6 +283,12 @@ final class Import_Export_Screen {
 			<section class="aio-uninstall-link" aria-labelledby="aio-uninstall-link-heading">
 				<h2 id="aio-uninstall-link-heading"><?php \esc_html_e( 'Uninstall / export behavior', 'aio-page-builder' ); ?></h2>
 				<p><a href="<?php echo \esc_url( $state['privacy_screen_url'] ); ?>"><?php \esc_html_e( 'Privacy, Reporting & Settings', 'aio-page-builder' ); ?></a> <?php \esc_html_e( 'describes uninstall choices and export behavior.', 'aio-page-builder' ); ?></p>
+				<?php if ( ! empty( $state['template_library_lifecycle_summary'] ) ) : ?>
+					<?php $lifecycle = $state['template_library_lifecycle_summary']; ?>
+					<p class="aio-lifecycle-summary"><?php echo \esc_html( $lifecycle['built_pages_description'] ?? '' ); ?></p>
+					<p class="aio-lifecycle-summary"><?php echo \esc_html( $lifecycle['template_registry_description'] ?? '' ); ?></p>
+					<p><a href="<?php echo \esc_url( $state['privacy_screen_url'] ); ?>#aio-lifecycle-heading"><?php \esc_html_e( 'Full template library lifecycle and restore guidance', 'aio-page-builder' ); ?></a></p>
+				<?php endif; ?>
 			</section>
 		</div>
 		<?php

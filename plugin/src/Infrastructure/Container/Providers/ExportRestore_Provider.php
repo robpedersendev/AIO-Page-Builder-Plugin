@@ -15,6 +15,7 @@ use AIOPageBuilder\Domain\ExportRestore\Export\Export_Generator;
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Manifest_Builder;
 use AIOPageBuilder\Domain\ExportRestore\Export\Support_Package_Generator;
 use AIOPageBuilder\Domain\ExportRestore\Export\Template_Library_Support_Summary_Builder;
+use AIOPageBuilder\Domain\Lifecycle\Template_Library_Lifecycle_Summary_Builder;
 use AIOPageBuilder\Domain\Reporting\Errors\Reporting_Redaction_Service;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Export_Validator;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Restore_Validator;
@@ -140,8 +141,19 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'uninstall_cleanup_service' )
 			);
 		} );
+		require_once __DIR__ . '/../../../Domain/Lifecycle/Template_Library_Lifecycle_Summary_Builder.php';
+		$container->register( 'template_library_lifecycle_summary_builder', function () use ( $container ): Template_Library_Lifecycle_Summary_Builder {
+			return new Template_Library_Lifecycle_Summary_Builder(
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' ),
+				$container->get( 'composition_repository' )
+			);
+		} );
 		$container->register( 'import_export_state_builder', function () use ( $container ): Import_Export_State_Builder {
-			return new Import_Export_State_Builder( $container->get( 'plugin_path_manager' ) );
+			return new Import_Export_State_Builder(
+				$container->get( 'plugin_path_manager' ),
+				$container->has( 'template_library_lifecycle_summary_builder' ) ? $container->get( 'template_library_lifecycle_summary_builder' ) : null
+			);
 		} );
 	}
 }
