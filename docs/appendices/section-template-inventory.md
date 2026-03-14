@@ -4,6 +4,8 @@
 
 This appendix is **generated** from the live section template registry. Do not edit by hand; regenerate after library changes (see `Section_Inventory_Appendix_Generator`). Regenerate after version or deprecation workflow updates so version and deprecation columns stay aligned (Prompt 189).
 
+**See also**: [Glossary](glossary.md) for **section template**, **section_purpose_family**, **version block**, **deprecation block**; [Data Schema Appendix](data-schema-appendix.md) for section CPT schema and version/deprecation block shapes.
+
 **Total section templates**: *(run generator to refresh; after SEC-09 gap-closing batch expect 254)*
 
 ---

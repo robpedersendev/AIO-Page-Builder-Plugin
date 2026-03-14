@@ -4,6 +4,8 @@
 
 This appendix is **generated** from the live page template registry. Do not edit by hand; regenerate after library changes (see `Page_Template_Inventory_Appendix_Generator`). Regenerate after version or deprecation workflow updates so version and deprecation columns stay aligned (Prompt 189).
 
+**See also**: [Glossary](glossary.md) for **page template**, **template_family**, **template_category_class**, **version block**, **deprecation block**, **one-pager**; [Data Schema Appendix](data-schema-appendix.md) for page template CPT schema and version/deprecation block shapes.
+
 **Total page templates**: *(run generator to refresh; after PT-14 gap-closing batch expect 580)*
 
 ---
