@@ -17,9 +17,11 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\BuildPlan\Recommendations\Template_Explanation_Builder_Interface;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
+use AIOPageBuilder\Domain\Execution\Pages\Form_Provider_Dependency_Validator;
 
 /**
  * Enriches new_page plan items with family-aware, hierarchy-aware recommendation data for list and detail.
+ * When Form_Provider_Dependency_Validator is provided, form-provider dependency errors/warnings appear in dependency_warnings (Prompt 230).
  */
 final class New_Page_Template_Recommendation_Builder {
 
@@ -53,8 +55,15 @@ final class New_Page_Template_Recommendation_Builder {
 	/** @var Template_Explanation_Builder_Interface */
 	private Template_Explanation_Builder_Interface $template_explanation_builder;
 
-	public function __construct( Template_Explanation_Builder_Interface $template_explanation_builder ) {
-		$this->template_explanation_builder = $template_explanation_builder;
+	/** @var Form_Provider_Dependency_Validator|null */
+	private ?Form_Provider_Dependency_Validator $form_provider_dependency_validator;
+
+	public function __construct(
+		Template_Explanation_Builder_Interface $template_explanation_builder,
+		?Form_Provider_Dependency_Validator $form_provider_dependency_validator = null
+	) {
+		$this->template_explanation_builder       = $template_explanation_builder;
+		$this->form_provider_dependency_validator = $form_provider_dependency_validator;
 	}
 
 	/**
@@ -96,6 +105,10 @@ final class New_Page_Template_Recommendation_Builder {
 
 		$hierarchy_context_summary = $this->build_hierarchy_context_summary( $payload );
 		$dependency_warnings       = $this->collect_dependency_warnings( $payload );
+		if ( $template_key !== '' && $this->form_provider_dependency_validator !== null ) {
+			$validation = $this->form_provider_dependency_validator->validate_for_template( $template_key );
+			$dependency_warnings = array_merge( $dependency_warnings, $validation['errors'], $validation['warnings'] );
+		}
 		$confidence_note           = $this->confidence_note( $payload );
 		$group_label               = $this->format_group_label( $group_hierarchy_role, $group_template_family );
 

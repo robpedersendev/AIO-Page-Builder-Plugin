@@ -18,11 +18,21 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
+use AIOPageBuilder\Domain\Execution\Pages\Form_Provider_Dependency_Validator;
+use AIOPageBuilder\Domain\FormProvider\Form_Integration_Definitions;
 
 /**
  * Builds template-aware finalization summaries from a plan definition.
+ * When Form_Provider_Dependency_Validator is provided, closure records include form_dependency for request-form / form_embed templates (Prompt 230).
  */
 final class Template_Finalization_Service {
+
+	/** @var Form_Provider_Dependency_Validator|null */
+	private ?Form_Provider_Dependency_Validator $form_provider_dependency_validator;
+
+	public function __construct( ?Form_Provider_Dependency_Validator $form_provider_dependency_validator = null ) {
+		$this->form_provider_dependency_validator = $form_provider_dependency_validator;
+	}
 
 	/**
 	 * Builds finalization summary, template closure record, and run completion state from plan definition.
@@ -162,6 +172,11 @@ final class Template_Finalization_Service {
 					$one_pager_ref = trim( $artifact['template_build_execution_result']['one_pager_ref'] );
 				}
 				$action_taken = $item_type === Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ? 'create' : ( $item_type === Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE ? 'replace' : 'update' );
+				$form_dependency = false;
+				if ( $template_key !== '' && $this->form_provider_dependency_validator !== null ) {
+					$form_dependency = $template_key === Form_Integration_Definitions::REQUEST_PAGE_TEMPLATE_KEY
+						|| $this->form_provider_dependency_validator->template_uses_form_sections( $template_key );
+				}
 				$record[] = array_filter( array(
 					'plan_item_id'    => (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ),
 					'item_type'       => $item_type,
@@ -170,6 +185,7 @@ final class Template_Finalization_Service {
 					'template_family' => $template_family !== '' ? $template_family : null,
 					'post_id'         => $post_id > 0 ? $post_id : null,
 					'one_pager_ref'   => $one_pager_ref !== '' ? $one_pager_ref : null,
+					'form_dependency' => $form_dependency ? true : null,
 				), function ( $v ) {
 					return $v !== null && $v !== '';
 				} );

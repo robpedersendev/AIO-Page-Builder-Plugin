@@ -31,12 +31,17 @@ final class Template_Page_Build_Service implements Create_Page_Job_Service_Inter
 	/** @var Page_Template_Repository */
 	private $page_template_repository;
 
+	/** @var Form_Provider_Dependency_Validator|null */
+	private $form_provider_dependency_validator;
+
 	public function __construct(
 		Create_Page_Job_Service_Interface $job_service,
-		Page_Template_Repository $page_template_repository
+		Page_Template_Repository $page_template_repository,
+		?Form_Provider_Dependency_Validator $form_provider_dependency_validator = null
 	) {
 		$this->job_service              = $job_service;
-		$this->page_template_repository  = $page_template_repository;
+		$this->page_template_repository   = $page_template_repository;
+		$this->form_provider_dependency_validator = $form_provider_dependency_validator;
 	}
 
 	/**
@@ -46,12 +51,21 @@ final class Template_Page_Build_Service implements Create_Page_Job_Service_Inter
 	 * @return Create_Page_Result Result with artifacts containing template_build_execution_result.
 	 */
 	public function run( array $envelope ): Create_Page_Result {
-		$result = $this->job_service->run( $envelope );
 		$target = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
 			: array();
+		$template_key = $this->resolve_template_key_from_target( $target );
 
-		$template_key = $result->get_artifacts()['template_key'] ?? $this->resolve_template_key_from_target( $target );
+		if ( $template_key !== '' && $this->form_provider_dependency_validator !== null ) {
+			$validation = $this->form_provider_dependency_validator->validate_for_template( $template_key );
+			if ( ! $validation['valid'] ) {
+				$message = isset( $validation['errors'][0] ) ? $validation['errors'][0] : __( 'Form provider dependency check failed.', 'aio-page-builder' );
+				return Create_Page_Result::failure( $message, $validation['errors'] );
+			}
+		}
+
+		$result = $this->job_service->run( $envelope );
+		$template_key = $result->get_artifacts()['template_key'] ?? $template_key;
 		$parent_post_id = $this->resolve_parent_from_target( $target );
 
 		if ( $result->is_success() ) {

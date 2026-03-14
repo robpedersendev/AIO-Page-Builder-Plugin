@@ -25,6 +25,7 @@ require_once $plugin_root . '/src/Domain/Execution/Contracts/Execution_Action_Co
 require_once $plugin_root . '/src/Domain/Execution/Jobs/Create_Page_Result.php';
 require_once $plugin_root . '/src/Domain/Execution/Jobs/Create_Page_Job_Service_Interface.php';
 require_once $plugin_root . '/src/Domain/Execution/Pages/Template_Page_Build_Result.php';
+require_once $plugin_root . '/src/Domain/Execution/Pages/Form_Provider_Dependency_Validator.php';
 require_once $plugin_root . '/src/Domain/Execution/Pages/Template_Page_Build_Service.php';
 require_once $plugin_root . '/src/Domain/Registries/PageTemplate/Page_Template_Schema.php';
 
@@ -138,6 +139,36 @@ final class Template_Page_Build_Service_Test extends TestCase {
 		$tbr = $result->get_artifacts()['template_build_execution_result'];
 		$this->assertSame( true, $tbr['hierarchy_applied'] );
 		$this->assertSame( 7, $tbr['parent_post_id'] );
+	}
+
+	public function test_run_returns_failure_when_form_provider_validator_fails(): void {
+		$stub_job = new Stub_Template_Build_Job_Service();
+		$stub_job->run_result = Create_Page_Result::success( 100, 'pt_request_form', 1 );
+
+		$template_def = array(
+			Page_Template_Schema::FIELD_INTERNAL_KEY => 'pt_request_form',
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(),
+		);
+		$repo = $this->createMock( Page_Template_Repository::class );
+		$repo->method( 'get_definition_by_key' )->willReturn( $template_def );
+
+		$validator = $this->createMock( Form_Provider_Dependency_Validator::class );
+		$validator->method( 'validate_for_template' )->with( 'pt_request_form' )->willReturn( array(
+			'valid'    => false,
+			'errors'   => array( 'Form provider "ndr_forms" is not registered.' ),
+			'warnings' => array(),
+		) );
+
+		$service = new Template_Page_Build_Service( $stub_job, $repo, $validator );
+		$envelope = array(
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'template_key' => 'pt_request_form', 'proposed_page_title' => 'Contact' ),
+		);
+		$result = $service->run( $envelope );
+
+		$this->assertFalse( $result->is_success() );
+		$this->assertSame( 0, $result->get_post_id() );
+		$this->assertStringContainsString( 'ndr_forms', $result->get_message() );
+		$this->assertSame( array( 'Form provider "ndr_forms" is not registered.' ), $result->get_errors() );
 	}
 
 	public function test_run_no_parent_sets_hierarchy_applied_false(): void {

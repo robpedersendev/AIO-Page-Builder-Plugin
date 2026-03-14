@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\Execution\Handlers\Create_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Finalize_Plan_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Replace_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Jobs\Create_Page_Job_Service;
+use AIOPageBuilder\Domain\Execution\Pages\Form_Provider_Dependency_Validator;
 use AIOPageBuilder\Domain\Execution\Pages\Bulk_Template_Page_Build_Service;
 use AIOPageBuilder\Domain\Execution\Pages\Template_Page_Build_Service;
 use AIOPageBuilder\Domain\Execution\Pages\Template_Page_Replacement_Service;
@@ -67,10 +68,18 @@ final class Execution_Provider implements Service_Provider_Interface {
 				$container->get( 'page_field_group_assignment_service' )
 			);
 		} );
+		$container->register( 'form_provider_dependency_validator', function () use ( $container ): Form_Provider_Dependency_Validator {
+			return new Form_Provider_Dependency_Validator(
+				$container->get( 'form_provider_registry' ),
+				$container->get( 'page_template_repository' ),
+				$container->get( 'section_template_repository' )
+			);
+		} );
 		$container->register( 'template_page_build_service', function () use ( $container ): Template_Page_Build_Service {
 			return new Template_Page_Build_Service(
 				$container->get( 'create_page_job_service' ),
-				$container->get( 'page_template_repository' )
+				$container->get( 'page_template_repository' ),
+				$container->get( 'form_provider_dependency_validator' )
 			);
 		} );
 		$container->register( 'bulk_template_page_build_service', function () use ( $container ): Bulk_Template_Page_Build_Service {
@@ -95,7 +104,8 @@ final class Execution_Provider implements Service_Provider_Interface {
 		$container->register( 'template_page_replacement_service', function () use ( $container ): Template_Page_Replacement_Service {
 			return new Template_Page_Replacement_Service(
 				$container->get( 'replace_page_job_service' ),
-				$container->get( 'page_template_repository' )
+				$container->get( 'page_template_repository' ),
+				$container->get( 'form_provider_dependency_validator' )
 			);
 		} );
 		$container->register( 'menu_change_job_service', function (): Menu_Change_Job_Service {
@@ -107,8 +117,9 @@ final class Execution_Provider implements Service_Provider_Interface {
 		$container->register( 'token_set_job_service', function (): Token_Set_Job_Service {
 			return new Token_Set_Job_Service();
 		} );
-		$container->register( 'template_finalization_service', function (): Template_Finalization_Service {
-			return new Template_Finalization_Service();
+		$container->register( 'template_finalization_service', function () use ( $container ): Template_Finalization_Service {
+			$validator = $container->has( 'form_provider_dependency_validator' ) ? $container->get( 'form_provider_dependency_validator' ) : null;
+			return new Template_Finalization_Service( $validator );
 		} );
 		$container->register( 'finalization_job_service', function () use ( $container ): Finalization_Job_Service {
 			return new Finalization_Job_Service(

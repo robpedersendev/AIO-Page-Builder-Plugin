@@ -30,12 +30,17 @@ final class Template_Page_Replacement_Service implements Replace_Page_Job_Servic
 	/** @var Page_Template_Repository */
 	private $page_template_repository;
 
+	/** @var Form_Provider_Dependency_Validator|null */
+	private $form_provider_dependency_validator;
+
 	public function __construct(
 		Replace_Page_Job_Service_Interface $job_service,
-		Page_Template_Repository $page_template_repository
+		Page_Template_Repository $page_template_repository,
+		?Form_Provider_Dependency_Validator $form_provider_dependency_validator = null
 	) {
 		$this->job_service             = $job_service;
 		$this->page_template_repository = $page_template_repository;
+		$this->form_provider_dependency_validator = $form_provider_dependency_validator;
 	}
 
 	/**
@@ -45,13 +50,30 @@ final class Template_Page_Replacement_Service implements Replace_Page_Job_Servic
 	 * @return Replace_Page_Result Result with artifacts containing template_replacement_execution_result and replacement_trace_record.
 	 */
 	public function run( array $envelope ): Replace_Page_Result {
-		$result = $this->job_service->run( $envelope );
+		$target = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
+			? $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
+			: array();
+		$template_key = $this->resolve_template_key_from_target( $target );
 
-		$template_key = $result->get_artifacts()['template_key'] ?? '';
+		if ( $template_key !== '' && $this->form_provider_dependency_validator !== null ) {
+			$validation = $this->form_provider_dependency_validator->validate_for_template( $template_key );
+			if ( ! $validation['valid'] ) {
+				$message = isset( $validation['errors'][0] ) ? $validation['errors'][0] : __( 'Form provider dependency check failed.', 'aio-page-builder' );
+				return new Replace_Page_Result(
+					false,
+					0,
+					0,
+					'',
+					$message,
+					$validation['errors'],
+					array_merge( array( 'template_key' => $template_key ), array( 'template_replacement_execution_result' => Template_Page_Replacement_Result::failure( $message, $validation['errors'], '', $template_key )->to_array() ) )
+				);
+			}
+		}
+
+		$result = $this->job_service->run( $envelope );
+		$template_key = $result->get_artifacts()['template_key'] ?? $template_key;
 		if ( $template_key === '' ) {
-			$target = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
-				? $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
-				: array();
 			$template_key = $this->resolve_template_key_from_target( $target );
 		}
 

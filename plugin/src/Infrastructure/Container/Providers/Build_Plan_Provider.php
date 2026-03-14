@@ -102,7 +102,8 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 			return new New_Page_Creation_Bulk_Action_Service( $container->get( 'build_plan_repository' ) );
 		} );
 		$container->register( 'new_page_template_recommendation_builder', function () use ( $container ): New_Page_Template_Recommendation_Builder {
-			return new New_Page_Template_Recommendation_Builder( $container->get( 'build_plan_template_explanation_builder' ) );
+			$validator = $container->has( 'form_provider_dependency_validator' ) ? $container->get( 'form_provider_dependency_validator' ) : null;
+			return new New_Page_Template_Recommendation_Builder( $container->get( 'build_plan_template_explanation_builder' ), $validator );
 		} );
 		$container->register( 'new_page_creation_ui_service', function () use ( $container ): New_Page_Creation_UI_Service {
 			return new New_Page_Creation_UI_Service(
