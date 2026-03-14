@@ -67,6 +67,19 @@
 
 **Rule:** Sensitive or internal-only risk detail stays in the register; release notes and this packet reference it without duplicating confidential content.
 
+### 2.7 Template library expansion
+
+| Area | Summary | Artifact |
+|------|---------|----------|
+| Counts and capacity | Section templates ≥ 250 (achieved 254); page templates ≥ 500 (achieved 580). | [template-library-expansion-review-packet.md](template-library-expansion-review-packet.md) §1; [template-library-inventory-manifest.md](../contracts/template-library-inventory-manifest.md). |
+| Category coverage | Section purpose-family and page template_category_class / template_family minimums; max share rules. | [template-library-coverage-matrix.md](../contracts/template-library-coverage-matrix.md); review packet §2. |
+| CTA-law compliance | CTA count, bottom CTA, non-adjacent CTAs, non-CTA range. | [template-library-compliance-matrix.md](../qa/template-library-compliance-matrix.md); [template-library-accessibility-audit-report.md](../qa/template-library-accessibility-audit-report.md); review packet §3. |
+| Preview, appendix, export | Synthetic preview and cache; section/page inventory appendices; export/restore validators. | Review packet §4; [section-template-inventory.md](../appendices/section-template-inventory.md), [page-template-inventory.md](../appendices/page-template-inventory.md). |
+| Accessibility and animation QA | Semantic/a11y audit; animation tier/fallback/reduced-motion QA. | [template-library-accessibility-audit-report.md](../qa/template-library-accessibility-audit-report.md); [template-library-animation-fallback-report.md](../qa/template-library-animation-fallback-report.md); review packet §5. |
+| Admin performance hardening | MAX_PER_PAGE 50; preview cache cap; compare/compositions limits. | [template-admin-performance-hardening-report.md](../qa/template-admin-performance-hardening-report.md); review packet §6. |
+| Decision log and planner/Build Plan | Versioning/deprecation; Template_Recommendation_Context_Builder; Build_Plan_Template_Explanation_Builder. | [template-library-decision-log.md](template-library-decision-log.md); review packet §7. |
+| Sign-off (expansion-specific) | Criteria and role approval for template-library expansion only. | [template-library-expansion-sign-off-checklist.md](template-library-expansion-sign-off-checklist.md). |
+
 ---
 
 ## 3. Unresolved and waived items

@@ -33,6 +33,7 @@
 | **Accessibility** | [accessibility-remediation-checklist.md](accessibility-remediation-checklist.md). | Remediation applied; manual QA recommended. |
 | **Security/redaction** | [security-redaction-review.md](security-redaction-review.md). | Audited; no open high-severity. |
 | **Performance** | Bounded list sizes and queue offloading (above). | No unbounded loads; formal load test optional. |
+| **Template library expansion** | Counts (254 sections, 580 pages), category coverage, CTA-law compliance, preview/appendix/export readiness, accessibility and animation QA, admin performance hardening, planner/Build Plan integration. | [template-library-expansion-review-packet.md](../release/template-library-expansion-review-packet.md); [template-library-expansion-sign-off-checklist.md](../release/template-library-expansion-sign-off-checklist.md). Coverage: [template-library-coverage-matrix.md](../contracts/template-library-coverage-matrix.md); compliance: [template-library-compliance-matrix.md](template-library-compliance-matrix.md); accessibility: [template-library-accessibility-audit-report.md](template-library-accessibility-audit-report.md); animation: [template-library-animation-fallback-report.md](template-library-animation-fallback-report.md); performance: [template-admin-performance-hardening-report.md](template-admin-performance-hardening-report.md). |
 
 **Final run:** Before release candidate, complete [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) and record pass/fail/waiver in this section (e.g. "Unit: pass; Integration: pass; E2E: pass; Migration: pass; Compatibility: pass; Security: audited; A11y: checklist complete; Performance: bounded.").
 
@@ -85,6 +86,7 @@
 - **Known-risk register:** [known-risk-register.md](../release/known-risk-register.md).
 - **Sign-off checklist:** [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) §6 — Product Owner, Technical Lead, QA (and Security where applicable) approve release.
 - **Release-review packet and sign-off:** [release-review-packet.md](../release/release-review-packet.md) (evidence summaries, traceability, exit criteria); [sign-off-checklist.md](../release/sign-off-checklist.md) (role-based approval, gate status blocked/waived/approved, waiver list); [demo-review-walkthrough.md](../release/demo-review-walkthrough.md) (demo/review script for §60.7).
+- **Template library expansion:** [template-library-expansion-review-packet.md](../release/template-library-expansion-review-packet.md) (evidence packet for 250+ sections, 500+ page templates: counts, category, CTA-law, preview, a11y/animation QA, hardening, appendices, planner integration); [template-library-expansion-sign-off-checklist.md](../release/template-library-expansion-sign-off-checklist.md) (expansion-specific criteria and role approval).
 
 **Acceptance gate (§59.15):** Product Owner, QA, and technical lead approve release.
 

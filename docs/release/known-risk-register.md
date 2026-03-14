@@ -30,7 +30,8 @@
 
 | ID | Category | Description | Mitigation / waiver |
 |----|----------|-------------|----------------------|
-| *(add per release)* | — | — | — |
+| TLE-1 | Template library | Large expanded library (254 sections, 580 page templates) may stress admin directory, compare, composition builder, or appendix generation on constrained hosting. | Performance hardening in place: MAX_PER_PAGE 50, preview cache cap 800, compare list 10, compositions list 100; directory/query/preview tuning. See [template-admin-performance-hardening-report.md](../qa/template-admin-performance-hardening-report.md) and [template-library-expansion-review-packet.md](template-library-expansion-review-packet.md) §6. Appendices regenerable from registries. |
+| *(add further per release)* | — | — | — |
 
 Use this section for risks or limitations specific to a release (e.g. "Export of very large plans may timeout on constrained hosting") with mitigation or formal waiver reference.
 
