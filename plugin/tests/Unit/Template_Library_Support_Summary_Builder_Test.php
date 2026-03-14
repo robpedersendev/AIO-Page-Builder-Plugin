@@ -19,12 +19,14 @@
 namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\ExportRestore\Export\Template_Library_Support_Summary_Builder;
+use AIOPageBuilder\Domain\Reporting\Contracts\Reporting_Payload_Schema;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/ExportRestore/Export/Template_Library_Support_Summary_Builder.php';
+require_once $plugin_root . '/src/Domain/Reporting/Contracts/Reporting_Payload_Schema.php';
 
 final class Template_Library_Support_Summary_Builder_Test extends TestCase {
 
@@ -69,5 +71,15 @@ final class Template_Library_Support_Summary_Builder_Test extends TestCase {
 		$this->assertArrayNotHasKey( 'definitions', $payload );
 		$this->assertArrayNotHasKey( 'raw_registry', $payload );
 		$this->assertArrayNotHasKey( 'api_key', $payload );
+	}
+
+	/** Prompt 217: support summary output must pass redaction / prohibited-keys check for support bundle safety. */
+	public function test_build_output_has_no_prohibited_keys(): void {
+		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null );
+		$payload = $builder->build();
+		$this->assertTrue(
+			Reporting_Payload_Schema::has_no_prohibited_keys( $payload, true ),
+			'template_library_support_summary must not contain prohibited keys (support bundle redaction)'
+		);
 	}
 }

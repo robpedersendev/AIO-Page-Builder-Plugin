@@ -119,6 +119,34 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 		$this->assertIsArray( Synthetic_Preview_Data_Generator::fallback_for_field_type( 'repeater' ) );
 	}
 
+	/** Prompt 217: synthetic preview output must not contain secret-like or unsafe content. */
+	public function test_synthetic_output_contains_no_secret_like_content(): void {
+		$families = array( 'hero', 'proof', 'cta', 'faq', 'offer', 'explainer', 'legal', 'listing', 'comparison', 'profile', 'stats', 'timeline', 'locations', 'other' );
+		$all_strings = array();
+		foreach ( $families as $family ) {
+			$out = $this->generator->generate_field_values_for_family( $family, 'default', '' );
+			$this->collect_strings_recursive( $out, $all_strings );
+		}
+		$combined = implode( ' ', $all_strings );
+		$forbidden = array( 'api_key', 'password', 'bearer', 'secret', 'nonce', 'sk-', 'sk_', 'credential', 'auth_token' );
+		$lower = strtolower( $combined );
+		foreach ( $forbidden as $sub ) {
+			$this->assertStringNotContainsString( strtolower( $sub ), $lower, "Synthetic output must not contain secret-like substring: {$sub}" );
+		}
+	}
+
+	/** @param array<string, mixed> $arr
+	 * @param list<string> $out */
+	private function collect_strings_recursive( array $arr, array &$out ): void {
+		foreach ( $arr as $v ) {
+			if ( is_string( $v ) ) {
+				$out[] = $v;
+			} elseif ( is_array( $v ) ) {
+				$this->collect_strings_recursive( $v, $out );
+			}
+		}
+	}
+
 	public function test_side_panel_for_section_includes_required_metadata(): void {
 		$def = array(
 			'internal_key'           => 'st_hero_01',
