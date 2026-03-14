@@ -43,7 +43,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
  *   ],
  * ]
  */
-final class Build_Plan_Template_Explanation_Builder {
+final class Build_Plan_Template_Explanation_Builder implements Template_Explanation_Builder_Interface {
 
 	/** @var Template_Recommendation_Context_Builder|null */
 	private ?Template_Recommendation_Context_Builder $context_builder;

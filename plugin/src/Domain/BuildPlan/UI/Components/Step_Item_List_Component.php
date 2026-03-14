@@ -79,6 +79,11 @@ final class Step_Item_List_Component {
 		$first_row = reset( $rows );
 		$columns   = ! empty( $order ) ? $order : ( is_array( $first_row ) ? array_keys( (array) ( $first_row[ self::ROW_KEY_SUMMARY_COLUMNS ] ?? array() ) ) : array() );
 		$select_all_id = $list_id . '-select-all';
+		$colspan = 1 + count( $columns ) + 1 + 1; // select + columns + status + actions
+		$has_group_headers = isset( $first_row['group_label'] ) && (string) $first_row['group_label'] !== '';
+		if ( $has_group_headers ) {
+			$rows = $this->sort_rows_for_group_headers( $rows );
+		}
 		?>
 		<div class="aio-step-item-list-wrapper" id="<?php echo \esc_attr( $list_id ); ?>">
 			<table class="aio-step-item-list widefat striped" role="grid">
@@ -96,13 +101,44 @@ final class Step_Item_List_Component {
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ( $rows as $row ) : ?>
-						<?php $this->render_row( $row, $columns, $detail_item_id ); ?>
-					<?php endforeach; ?>
+					<?php
+					$prev_group = '';
+					foreach ( $rows as $row ) :
+						$group_label = $has_group_headers ? (string) ( $row['group_label'] ?? '' ) : '';
+						if ( $group_label !== '' && $group_label !== $prev_group ) {
+							$prev_group = $group_label;
+							?>
+							<tr class="aio-group-header" role="row"><td colspan="<?php echo (int) $colspan; ?>" scope="rowgroup"><?php echo \esc_html( $group_label ); ?></td></tr>
+							<?php
+						}
+						$this->render_row( $row, $columns, $detail_item_id );
+					endforeach;
+					?>
 				</tbody>
 			</table>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Sorts rows by group_label then item_id when group headers are used (Prompt 192).
+	 *
+	 * @param array<int, array<string, mixed>> $rows
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function sort_rows_for_group_headers( array $rows ): array {
+		usort( $rows, function ( array $a, array $b ): int {
+			$label_a = (string) ( $a['group_label'] ?? '' );
+			$label_b = (string) ( $b['group_label'] ?? '' );
+			$cmp = strcmp( $label_a, $label_b );
+			if ( $cmp !== 0 ) {
+				return $cmp;
+			}
+			$id_a = (string) ( $a[ self::ROW_KEY_ITEM_ID ] ?? '' );
+			$id_b = (string) ( $b[ self::ROW_KEY_ITEM_ID ] ?? '' );
+			return strcmp( $id_a, $id_b );
+		} );
+		return array_values( $rows );
 	}
 
 	/**
@@ -128,6 +164,7 @@ final class Step_Item_List_Component {
 			'proposed_slug'            => \__( 'Proposed slug', 'aio-page-builder' ),
 			'purpose'                  => \__( 'Purpose', 'aio-page-builder' ),
 			'template_key'             => \__( 'Target template / composition', 'aio-page-builder' ),
+			'template_links'           => \__( 'Template', 'aio-page-builder' ),
 			'hierarchy_position'       => \__( 'Hierarchy position', 'aio-page-builder' ),
 			'page_type'                => \__( 'Page type', 'aio-page-builder' ),
 			'confidence'               => \__( 'Confidence', 'aio-page-builder' ),

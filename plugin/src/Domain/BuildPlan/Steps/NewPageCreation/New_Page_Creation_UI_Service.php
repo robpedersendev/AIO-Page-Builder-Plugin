@@ -21,18 +21,20 @@ use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
+use AIOPageBuilder\Domain\BuildPlan\UI\New_Page_Template_Recommendation_Builder;
 
 /**
  * Produces step_list_rows, column_order, bulk_action_states, detail_panel, step_messages for Step 2 only.
  */
 final class New_Page_Creation_UI_Service {
 
-	/** Step 2 column order per spec §33.3: title, slug, purpose, template, hierarchy position, page-type, warnings/confidence, current state. */
+	/** Step 2 column order per spec §33.3, Prompt 192: title, slug, purpose, template, template links, hierarchy, page-type, confidence. */
 	public const COLUMN_ORDER = array(
 		'proposed_page_title',
 		'proposed_slug',
 		'purpose',
 		'template_key',
+		'template_links',
 		'hierarchy_position',
 		'page_type',
 		'confidence',
@@ -50,14 +52,19 @@ final class New_Page_Creation_UI_Service {
 	/** @var New_Page_Creation_Bulk_Action_Service */
 	private $bulk_action_service;
 
+	/** @var New_Page_Template_Recommendation_Builder|null */
+	private $recommendation_builder;
+
 	public function __construct(
 		Build_Plan_Row_Action_Resolver $row_action_resolver,
 		New_Page_Creation_Detail_Builder $detail_builder,
-		New_Page_Creation_Bulk_Action_Service $bulk_action_service
+		New_Page_Creation_Bulk_Action_Service $bulk_action_service,
+		?New_Page_Template_Recommendation_Builder $recommendation_builder = null
 	) {
-		$this->row_action_resolver  = $row_action_resolver;
-		$this->detail_builder      = $detail_builder;
-		$this->bulk_action_service = $bulk_action_service;
+		$this->row_action_resolver   = $row_action_resolver;
+		$this->detail_builder       = $detail_builder;
+		$this->bulk_action_service  = $bulk_action_service;
+		$this->recommendation_builder = $recommendation_builder;
 	}
 
 	/**
@@ -108,16 +115,34 @@ final class New_Page_Creation_UI_Service {
 			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
-			$rows[] = array(
+			$summary_columns = $this->summary_columns_for_item( $item );
+			$row = array(
 				Step_Item_List_Component::ROW_KEY_ITEM_ID          => $item_id,
 				Step_Item_List_Component::ROW_KEY_STATUS           => $status,
 				Step_Item_List_Component::ROW_KEY_STATUS_BADGE     => $this->status_to_badge( $status ),
-				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS  => $this->summary_columns_for_item( $item ),
+				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS  => $summary_columns,
 				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS       => $row_actions,
 				Step_Item_List_Component::ROW_KEY_IS_SELECTED      => in_array( $item_id, $selected_item_ids, true ),
 				'dependency_validation'                            => $this->dependency_validation_summary( $payload ),
 				'post_build_status'                                => (string) ( $payload['post_build_status'] ?? '' ),
 			);
+			if ( $this->recommendation_builder !== null ) {
+				$recommendation = $this->recommendation_builder->build_for_item( $item );
+				$row[ New_Page_Template_Recommendation_Builder::KEY_PROPOSED_TEMPLATE_SUMMARY ]  = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_PROPOSED_TEMPLATE_SUMMARY ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_HIERARCHY_CONTEXT_SUMMARY ]  = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_HIERARCHY_CONTEXT_SUMMARY ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_TEMPLATE_SELECTION_REASON ] = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_TEMPLATE_SELECTION_REASON ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ]                = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_GROUP_HIERARCHY_ROLE ]      = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_GROUP_HIERARCHY_ROLE ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_GROUP_TEMPLATE_FAMILY ]     = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_GROUP_TEMPLATE_FAMILY ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_DEPENDENCY_WARNINGS ]       = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_DEPENDENCY_WARNINGS ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_DEPRECATION_AWARE ]         = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_DEPRECATION_AWARE ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_CONFIDENCE_NOTE ]           = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_CONFIDENCE_NOTE ];
+				$row['summary_columns']['template_links'] = ''; // Filled by Screen with detail/compare URLs.
+			}
+			$rows[] = $row;
+		}
+		if ( $this->recommendation_builder !== null && ! empty( $rows ) ) {
+			$rows = $this->sort_rows_by_group( $rows );
 		}
 
 		$eligibility = $this->bulk_action_service->get_bulk_eligibility( $plan_definition );
@@ -277,6 +302,27 @@ final class New_Page_Creation_UI_Service {
 				'level'    => 'step',
 			),
 		);
+	}
+
+	/**
+	 * Sorts rows by group_label then item_id for scannable hierarchy/family grouping (Prompt 192).
+	 *
+	 * @param array<int, array<string, mixed>> $rows
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function sort_rows_by_group( array $rows ): array {
+		usort( $rows, function ( array $a, array $b ): int {
+			$label_a = (string) ( $a[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ] ?? '' );
+			$label_b = (string) ( $b[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ] ?? '' );
+			$cmp = strcmp( $label_a, $label_b );
+			if ( $cmp !== 0 ) {
+				return $cmp;
+			}
+			$id_a = (string) ( $a[ Step_Item_List_Component::ROW_KEY_ITEM_ID ] ?? '' );
+			$id_b = (string) ( $b[ Step_Item_List_Component::ROW_KEY_ITEM_ID ] ?? '' );
+			return strcmp( $id_a, $id_b );
+		} );
+		return array_values( $rows );
 	}
 
 	private function empty_workspace(): array {

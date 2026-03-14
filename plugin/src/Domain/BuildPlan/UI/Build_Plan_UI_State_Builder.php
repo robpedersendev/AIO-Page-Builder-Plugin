@@ -27,6 +27,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
  * No raw repository calls in screen templates; screen uses this payload only.
  * Optional Step_Workspace_Payload_Builder enables build_step_workspace() for actionable steps.
  * New-pages step detail panel includes template rationale (Build_Plan_Template_Explanation_Builder) when registered (Prompt 190).
+ * New-pages step rows are enriched with family/hierarchy grouping and template links via New_Page_Template_Recommendation_Builder when registered (Prompt 192).
  */
 final class Build_Plan_UI_State_Builder {
 

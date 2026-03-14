@@ -31,6 +31,7 @@ use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_UI_State_Builder;
+use AIOPageBuilder\Domain\BuildPlan\UI\New_Page_Template_Recommendation_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\Step_Workspace_Payload_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
@@ -94,11 +95,15 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 		$container->register( 'new_page_creation_bulk_action_service', function () use ( $container ): New_Page_Creation_Bulk_Action_Service {
 			return new New_Page_Creation_Bulk_Action_Service( $container->get( 'build_plan_repository' ) );
 		} );
+		$container->register( 'new_page_template_recommendation_builder', function () use ( $container ): New_Page_Template_Recommendation_Builder {
+			return new New_Page_Template_Recommendation_Builder( $container->get( 'build_plan_template_explanation_builder' ) );
+		} );
 		$container->register( 'new_page_creation_ui_service', function () use ( $container ): New_Page_Creation_UI_Service {
 			return new New_Page_Creation_UI_Service(
 				$container->get( 'build_plan_row_action_resolver' ),
 				$container->get( 'new_page_creation_detail_builder' ),
-				$container->get( 'new_page_creation_bulk_action_service' )
+				$container->get( 'new_page_creation_bulk_action_service' ),
+				$container->get( 'new_page_template_recommendation_builder' )
 			);
 		} );
 		$container->register( 'navigation_detail_builder', function (): Navigation_Detail_Builder {

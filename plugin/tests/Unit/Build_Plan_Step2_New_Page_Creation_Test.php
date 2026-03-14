@@ -290,7 +290,7 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$this->assertStringContainsString( 'built_successfully', implode( ' ', $post_section['content_lines'] ?? array() ) );
 	}
 
-	/** Column order is Step 2 specific. */
+	/** Column order is Step 2 specific and includes template_links (Prompt 192). */
 	public function test_step2_column_order(): void {
 		$resolver  = new Build_Plan_Row_Action_Resolver();
 		$detail    = new New_Page_Creation_Detail_Builder();
@@ -300,6 +300,31 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
 		$this->assertSame( New_Page_Creation_UI_Service::COLUMN_ORDER, $workspace['column_order'] );
 		$this->assertSame( 'proposed_page_title', $workspace['column_order'][0] );
+		$this->assertContains( 'template_links', $workspace['column_order'] );
+	}
+
+	/** With recommendation builder, rows have proposed_template_summary, group_label, template_links column (Prompt 192). */
+	public function test_step2_with_recommendation_builder_enriches_rows(): void {
+		require_once dirname( __DIR__, 2 ) . '/src/Domain/BuildPlan/Recommendations/Build_Plan_Template_Explanation_Builder.php';
+		require_once dirname( __DIR__, 2 ) . '/src/Domain/BuildPlan/UI/New_Page_Template_Recommendation_Builder.php';
+		require_once dirname( __DIR__, 2 ) . '/src/Domain/Registries/PageTemplate/Page_Template_Schema.php';
+		require_once dirname( __DIR__, 2 ) . '/src/Domain/Storage/Repositories/Page_Template_Repository.php';
+		$explanation = new \AIOPageBuilder\Domain\BuildPlan\Recommendations\Build_Plan_Template_Explanation_Builder( new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository(), null );
+		$recommendation_builder = new \AIOPageBuilder\Domain\BuildPlan\UI\New_Page_Template_Recommendation_Builder( $explanation );
+		$resolver  = new Build_Plan_Row_Action_Resolver();
+		$detail    = new New_Page_Creation_Detail_Builder();
+		$bulk      = new New_Page_Creation_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk, $recommendation_builder );
+		$def       = $this->step2_plan_definition( 1 );
+		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
+		$this->assertCount( 1, $workspace['step_list_rows'] );
+		$row = $workspace['step_list_rows'][0];
+		$this->assertArrayHasKey( 'proposed_template_summary', $row );
+		$this->assertArrayHasKey( 'group_label', $row );
+		$this->assertArrayHasKey( 'hierarchy_context_summary', $row );
+		$this->assertArrayHasKey( 'template_selection_reason', $row );
+		$this->assertArrayHasKey( 'summary_columns', $row );
+		$this->assertArrayHasKey( 'template_links', $row['summary_columns'] );
 	}
 
 	/** Approve item (build-intent) updates status via repository. */
