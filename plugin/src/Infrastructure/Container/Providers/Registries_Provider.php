@@ -27,6 +27,8 @@ use AIOPageBuilder\Domain\Registries\Section\Section_Validator;
 use AIOPageBuilder\Domain\Registries\QA\Template_Library_Compliance_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Deprecation_Service;
+use AIOPageBuilder\Domain\Registries\Docs\Page_Template_Inventory_Appendix_Generator;
+use AIOPageBuilder\Domain\Registries\Docs\Section_Inventory_Appendix_Generator;
 use AIOPageBuilder\Domain\Registries\Shared\UI\Template_Compare_State_Builder;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Integrity_Validator;
 use AIOPageBuilder\Domain\Registries\Snapshots\Version_Snapshot_Service;
@@ -152,6 +154,12 @@ final class Registries_Provider implements Service_Provider_Interface {
 				new Section_Template_Repository_Adapter( $container->get( 'section_template_repository' ) ),
 				new Page_Template_Repository_Adapter( $container->get( 'page_template_repository' ) )
 			);
+		} );
+		$container->register( 'section_inventory_appendix_generator', function () use ( $container ): Section_Inventory_Appendix_Generator {
+			return new Section_Inventory_Appendix_Generator( $container->get( 'section_template_repository' ) );
+		} );
+		$container->register( 'page_template_inventory_appendix_generator', function () use ( $container ): Page_Template_Inventory_Appendix_Generator {
+			return new Page_Template_Inventory_Appendix_Generator( $container->get( 'page_template_repository' ) );
 		} );
 	}
 }

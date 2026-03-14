@@ -236,7 +236,20 @@ Batch prompts should **plan** for this spread (e.g. “SEC-01: 12 hero sections 
 
 ---
 
-## 10. Cross-references
+## 10. Generated inventory appendices
+
+The **Section Template Inventory Appendix** (spec §62.11) and **Page Template Inventory Appendix** (spec §62.12) are **generated** from the live registries and must not be maintained by hand.
+
+| Appendix | Generator class | Output path |
+|----------|-----------------|-------------|
+| Section Template Inventory | `AIOPageBuilder\Domain\Registries\Docs\Section_Inventory_Appendix_Generator` | `docs/appendices/section-template-inventory.md` |
+| Page Template Inventory | `AIOPageBuilder\Domain\Registries\Docs\Page_Template_Inventory_Appendix_Generator` | `docs/appendices/page-template-inventory.md` |
+
+Regenerate after library expansion batches or taxonomy changes. Required fields per spec: section (key, name, purpose, category, variants, helper status, deprecation status, version); page (key, name, purpose, ordered sections, optional sections, hierarchy hint, one-pager status, version, deprecation status).
+
+---
+
+## 11. Cross-references
 
 - **template-library-coverage-matrix.md**: Minimum counts by section_purpose_family and template_category_class/template_family; completion thresholds (§6); worksheet (§8). This manifest **implements** the sequencing of how those counts are filled (batches).
 - **template-library-scale-extension-contract.md**: 250/500 minimums; variation philosophy; category-coverage expectations.
@@ -247,7 +260,7 @@ Batch prompts should **plan** for this spread (e.g. “SEC-01: 12 hero sections 
 
 ---
 
-## 11. Revision history
+## 12. Revision history
 
 | Version | Date | Change |
 |---------|------|--------|
