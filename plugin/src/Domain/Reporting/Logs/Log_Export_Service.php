@@ -28,11 +28,13 @@ use AIOPageBuilder\Support\Logging\Log_Severities;
 final class Log_Export_Service {
 
 	/** Approved log type keys for export. */
-	public const LOG_TYPE_QUEUE     = 'queue';
-	public const LOG_TYPE_EXECUTION = 'execution';
-	public const LOG_TYPE_REPORTING = 'reporting';
-	public const LOG_TYPE_CRITICAL  = 'critical';
-	public const LOG_TYPE_AI_RUNS  = 'ai_runs';
+	public const LOG_TYPE_QUEUE             = 'queue';
+	public const LOG_TYPE_EXECUTION         = 'execution';
+	public const LOG_TYPE_REPORTING         = 'reporting';
+	public const LOG_TYPE_CRITICAL          = 'critical';
+	public const LOG_TYPE_AI_RUNS           = 'ai_runs';
+	public const LOG_TYPE_TEMPLATE_FAMILY   = 'template_family';
+	public const LOG_TYPE_TEMPLATE_OPERATION = 'template_operation';
 
 	/** @var list<string> */
 	public const ALLOWED_LOG_TYPES = array(
@@ -41,7 +43,12 @@ final class Log_Export_Service {
 		self::LOG_TYPE_REPORTING,
 		self::LOG_TYPE_CRITICAL,
 		self::LOG_TYPE_AI_RUNS,
+		self::LOG_TYPE_TEMPLATE_FAMILY,
+		self::LOG_TYPE_TEMPLATE_OPERATION,
 	);
+
+	/** Job types considered template-related for template_operation / template_family export (spec §48.10, Prompt 198). */
+	private const TEMPLATE_RELATED_JOB_TYPES = array( 'create_page', 'replace_page' );
 
 	private const EXPORT_CAP = 500;
 
@@ -103,16 +110,18 @@ final class Log_Export_Service {
 		$payload = array(
 			'export_metadata' => array(
 				'export_timestamp'   => gmdate( 'Y-m-d\TH:i:s\Z' ),
-				'exported_log_types' => $requested,
-				'filter_summary'     => $filter_summary,
-				'redaction_applied'  => true,
-				'label'              => 'AIO Page Builder log export',
+				'exported_log_types'  => $requested,
+				'filter_summary'      => $filter_summary,
+				'redaction_applied'   => true,
+				'label'               => 'AIO Page Builder log export',
 			),
-			'queue'          => array(),
-			'execution'      => array(),
-			'reporting'      => array(),
-			'critical'       => array(),
-			'ai_runs'        => array(),
+			'queue'             => array(),
+			'execution'         => array(),
+			'reporting'         => array(),
+			'critical'          => array(),
+			'ai_runs'           => array(),
+			'template_family'   => array(),
+			'template_operation' => array(),
 		);
 
 		if ( in_array( self::LOG_TYPE_QUEUE, $requested, true ) ) {
@@ -129,6 +138,12 @@ final class Log_Export_Service {
 		}
 		if ( in_array( self::LOG_TYPE_AI_RUNS, $requested, true ) ) {
 			$payload['ai_runs'] = $this->collect_ai_runs_rows( $filter_summary );
+		}
+		if ( in_array( self::LOG_TYPE_TEMPLATE_FAMILY, $requested, true ) ) {
+			$payload['template_family'] = $this->collect_template_family_rows( $filter_summary );
+		}
+		if ( in_array( self::LOG_TYPE_TEMPLATE_OPERATION, $requested, true ) ) {
+			$payload['template_operation'] = $this->collect_template_operation_rows( $filter_summary );
 		}
 
 		$filename = 'aio-log-export-' . gmdate( 'Ymd-His' ) . '.json';
@@ -163,6 +178,12 @@ final class Log_Export_Service {
 		}
 		if ( ! empty( $filters['job_ref'] ) && is_string( $filters['job_ref'] ) ) {
 			$out['job_ref'] = \sanitize_text_field( $filters['job_ref'] );
+		}
+		if ( ! empty( $filters['template_family'] ) && is_string( $filters['template_family'] ) ) {
+			$out['template_family'] = \sanitize_text_field( $filters['template_family'] );
+		}
+		if ( ! empty( $filters['template_operation'] ) && is_string( $filters['template_operation'] ) ) {
+			$out['template_operation'] = \sanitize_text_field( $filters['template_operation'] );
 		}
 		return $out;
 	}
@@ -286,6 +307,68 @@ final class Log_Export_Service {
 	}
 
 	/**
+	 * Template-operation rows: execution-style rows for create_page/replace_page only (spec §48.10, Prompt 198).
+	 *
+	 * @param array<string, mixed> $filter_summary
+	 * @return list<array<string, string>>
+	 */
+	private function collect_template_operation_rows( array $filter_summary ): array {
+		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
+			return array();
+		}
+		$completed = $this->job_queue_repository->list_by_status( 'completed', self::EXPORT_CAP, 0 );
+		$failed    = $this->job_queue_repository->list_by_status( 'failed', self::EXPORT_CAP, 0 );
+		$out       = array();
+		foreach ( array_merge( $completed, $failed ) as $row ) {
+			$normalized = $this->normalize_queue_row( $row );
+			if ( ! in_array( $normalized['job_type'], self::TEMPLATE_RELATED_JOB_TYPES, true ) ) {
+				continue;
+			}
+			if ( $this->row_passes_filters( $normalized, $filter_summary, 'template_operation' ) ) {
+				$redacted = $this->redact_queue_row( $normalized );
+				$redacted['template_key']   = $normalized['template_key'];
+				$redacted['template_family'] = $normalized['template_family'];
+				$out[] = $redacted;
+			}
+		}
+		usort( $out, function ( $a, $b ) {
+			return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
+		} );
+		return array_slice( $out, 0, self::EXPORT_CAP );
+	}
+
+	/**
+	 * Template-family rows: same as template_operation but optionally filtered by template_family (spec §48.10, Prompt 198).
+	 *
+	 * @param array<string, mixed> $filter_summary
+	 * @return list<array<string, string>>
+	 */
+	private function collect_template_family_rows( array $filter_summary ): array {
+		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
+			return array();
+		}
+		$completed = $this->job_queue_repository->list_by_status( 'completed', self::EXPORT_CAP, 0 );
+		$failed    = $this->job_queue_repository->list_by_status( 'failed', self::EXPORT_CAP, 0 );
+		$out       = array();
+		foreach ( array_merge( $completed, $failed ) as $row ) {
+			$normalized = $this->normalize_queue_row( $row );
+			if ( ! in_array( $normalized['job_type'], self::TEMPLATE_RELATED_JOB_TYPES, true ) ) {
+				continue;
+			}
+			if ( $this->row_passes_filters( $normalized, $filter_summary, 'template_family' ) ) {
+				$redacted = $this->redact_queue_row( $normalized );
+				$redacted['template_key']   = $normalized['template_key'];
+				$redacted['template_family'] = $normalized['template_family'];
+				$out[] = $redacted;
+			}
+		}
+		usort( $out, function ( $a, $b ) {
+			return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
+		} );
+		return array_slice( $out, 0, self::EXPORT_CAP );
+	}
+
+	/**
 	 * @param array<string, mixed> $filter_summary
 	 * @return list<array<string, string>>
 	 */
@@ -312,7 +395,7 @@ final class Log_Export_Service {
 
 	/**
 	 * @param array<string, mixed> $row
-	 * @return array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}
+	 * @return array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string, template_key: string, template_family: string}
 	 */
 	private function normalize_queue_row( array $row ): array {
 		$related = (string) ( $row['related_object_refs'] ?? '' );
@@ -322,14 +405,28 @@ final class Log_Export_Service {
 		} elseif ( $related !== '' ) {
 			$plan_id = trim( substr( $related, 0, 64 ) );
 		}
+		$template_key   = '';
+		$template_family = '';
+		if ( $related !== '' ) {
+			$decoded = json_decode( $related, true );
+			if ( is_array( $decoded ) ) {
+				$target = $decoded['target_reference'] ?? $decoded['target'] ?? $decoded;
+				if ( is_array( $target ) ) {
+					$template_key   = (string) ( $target['template_key'] ?? $target['template_ref'] ?? '' );
+					$template_family = (string) ( $target['template_family'] ?? '' );
+				}
+			}
+		}
 		return array(
-			'job_ref'         => (string) ( $row['job_ref'] ?? '' ),
-			'job_type'        => (string) ( $row['job_type'] ?? '' ),
-			'queue_status'    => (string) ( $row['queue_status'] ?? '' ),
-			'created_at'      => (string) ( $row['created_at'] ?? '' ),
-			'completed_at'    => (string) ( $row['completed_at'] ?? '' ),
-			'failure_reason'   => (string) ( $row['failure_reason'] ?? '' ),
-			'related_plan_id' => $plan_id,
+			'job_ref'          => (string) ( $row['job_ref'] ?? '' ),
+			'job_type'         => (string) ( $row['job_type'] ?? '' ),
+			'queue_status'     => (string) ( $row['queue_status'] ?? '' ),
+			'created_at'       => (string) ( $row['created_at'] ?? '' ),
+			'completed_at'     => (string) ( $row['completed_at'] ?? '' ),
+			'failure_reason'    => (string) ( $row['failure_reason'] ?? '' ),
+			'related_plan_id'  => $plan_id,
+			'template_key'     => $template_key,
+			'template_family'  => $template_family,
 		);
 	}
 
@@ -347,7 +444,7 @@ final class Log_Export_Service {
 	/**
 	 * @param array<string, string> $row
 	 * @param array<string, mixed>  $filter_summary
-	 * @param string                $family queue|execution|reporting|critical|ai_runs
+	 * @param string                $family queue|execution|reporting|critical|ai_runs|template_operation|template_family
 	 * @return bool
 	 */
 	private function row_passes_filters( array $row, array $filter_summary, string $family ): bool {
@@ -363,18 +460,28 @@ final class Log_Export_Service {
 				return false;
 			}
 		}
-		if ( isset( $filter_summary['plan_id'] ) && $filter_summary['plan_id'] !== '' && ( $family === 'queue' || $family === 'execution' ) ) {
+		if ( isset( $filter_summary['plan_id'] ) && $filter_summary['plan_id'] !== '' && ( $family === 'queue' || $family === 'execution' || $family === 'template_operation' || $family === 'template_family' ) ) {
 			if ( (string) ( $row['related_plan_id'] ?? '' ) !== $filter_summary['plan_id'] ) {
 				return false;
 			}
 		}
-		if ( isset( $filter_summary['job_ref'] ) && $filter_summary['job_ref'] !== '' && ( $family === 'queue' || $family === 'execution' ) ) {
+		if ( isset( $filter_summary['job_ref'] ) && $filter_summary['job_ref'] !== '' && ( $family === 'queue' || $family === 'execution' || $family === 'template_operation' || $family === 'template_family' ) ) {
 			if ( (string) ( $row['job_ref'] ?? '' ) !== $filter_summary['job_ref'] ) {
 				return false;
 			}
 		}
 		if ( isset( $filter_summary['run_id'] ) && $filter_summary['run_id'] !== '' && $family === 'ai_runs' ) {
 			if ( (string) ( $row['run_id'] ?? '' ) !== $filter_summary['run_id'] ) {
+				return false;
+			}
+		}
+		if ( isset( $filter_summary['template_family'] ) && $filter_summary['template_family'] !== '' && $family === 'template_family' ) {
+			if ( (string) ( $row['template_family'] ?? '' ) !== $filter_summary['template_family'] ) {
+				return false;
+			}
+		}
+		if ( isset( $filter_summary['template_operation'] ) && $filter_summary['template_operation'] !== '' && ( $family === 'template_operation' || $family === 'template_family' ) ) {
+			if ( (string) ( $row['job_type'] ?? '' ) !== $filter_summary['template_operation'] ) {
 				return false;
 			}
 		}

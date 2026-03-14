@@ -34,6 +34,40 @@ final class Log_Export_Service_Test extends TestCase {
 		$this->assertContains( Log_Export_Service::LOG_TYPE_CRITICAL, Log_Export_Service::ALLOWED_LOG_TYPES );
 	}
 
+	/**
+	 * Template-family and template-operation log types are allowed (Prompt 198).
+	 */
+	public function test_allowed_log_types_include_template_family_and_operation(): void {
+		$this->assertContains( Log_Export_Service::LOG_TYPE_TEMPLATE_FAMILY, Log_Export_Service::ALLOWED_LOG_TYPES );
+		$this->assertContains( Log_Export_Service::LOG_TYPE_TEMPLATE_OPERATION, Log_Export_Service::ALLOWED_LOG_TYPES );
+	}
+
+	/**
+	 * Export with template_operation type returns success and payload includes template_operation key.
+	 */
+	public function test_export_with_template_operation_type_includes_payload_key(): void {
+		$path_manager = new Plugin_Path_Manager();
+		$exports_dir  = $path_manager->get_exports_dir();
+		if ( $exports_dir === '' || ! is_dir( $exports_dir ) ) {
+			$this->markTestSkipped( 'Exports directory not available.' );
+		}
+		$redaction = new Reporting_Redaction_Service();
+		$service   = new Log_Export_Service( $path_manager, $redaction, null, null, null );
+		$result    = $service->export( array( Log_Export_Service::LOG_TYPE_TEMPLATE_OPERATION ), array() );
+		if ( ! $result->is_success() ) {
+			$this->markTestSkipped( 'Export failed (e.g. directory not writable).' );
+		}
+		$this->assertContains( Log_Export_Service::LOG_TYPE_TEMPLATE_OPERATION, $result->get_exported_log_types() );
+		$path = rtrim( $exports_dir, '/\\' ) . '/' . $result->get_export_file_reference();
+		if ( is_file( $path ) && is_readable( $path ) ) {
+			$json = file_get_contents( $path );
+			$data = json_decode( $json, true );
+			$this->assertIsArray( $data );
+			$this->assertArrayHasKey( 'template_operation', $data );
+			$this->assertIsArray( $data['template_operation'] );
+		}
+	}
+
 	public function test_export_with_no_valid_types_returns_failure(): void {
 		$path_manager = new Plugin_Path_Manager();
 		$redaction    = new Reporting_Redaction_Service();

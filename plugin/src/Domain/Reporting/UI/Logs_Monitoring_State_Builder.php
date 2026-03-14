@@ -82,6 +82,8 @@ final class Logs_Monitoring_State_Builder {
 				array( 'value' => Log_Export_Service::LOG_TYPE_REPORTING, 'label' => __( 'Reporting logs', 'aio-page-builder' ) ),
 				array( 'value' => Log_Export_Service::LOG_TYPE_CRITICAL, 'label' => __( 'Critical errors', 'aio-page-builder' ) ),
 				array( 'value' => Log_Export_Service::LOG_TYPE_AI_RUNS, 'label' => __( 'AI runs', 'aio-page-builder' ) ),
+				array( 'value' => Log_Export_Service::LOG_TYPE_TEMPLATE_FAMILY, 'label' => __( 'Template family', 'aio-page-builder' ) ),
+				array( 'value' => Log_Export_Service::LOG_TYPE_TEMPLATE_OPERATION, 'label' => __( 'Template operation', 'aio-page-builder' ) ),
 			),
 		);
 	}

@@ -210,6 +210,16 @@ final class Queue_Logs_Screen {
 					<label for="aio-log-date-to"><?php \esc_html_e( 'Date to (optional)', 'aio-page-builder' ); ?></label>
 					<input type="date" id="aio-log-date-to" name="date_to" />
 				</p>
+				<p>
+					<label for="aio-log-template-family"><?php \esc_html_e( 'Template family (optional)', 'aio-page-builder' ); ?></label>
+					<input type="text" id="aio-log-template-family" name="template_family" class="regular-text" placeholder="<?php \esc_attr_e( 'e.g. services, hub', 'aio-page-builder' ); ?>" />
+					<label for="aio-log-template-operation"><?php \esc_html_e( 'Template operation (optional)', 'aio-page-builder' ); ?></label>
+					<select id="aio-log-template-operation" name="template_operation">
+						<option value=""><?php \esc_html_e( 'Any', 'aio-page-builder' ); ?></option>
+						<option value="create_page"><?php \esc_html_e( 'create_page', 'aio-page-builder' ); ?></option>
+						<option value="replace_page"><?php \esc_html_e( 'replace_page', 'aio-page-builder' ); ?></option>
+					</select>
+				</p>
 				<p class="submit">
 					<button type="submit" class="button button-primary"><?php \esc_html_e( 'Export logs', 'aio-page-builder' ); ?></button>
 				</p>
@@ -575,6 +585,12 @@ final class Queue_Logs_Screen {
 		}
 		if ( ! empty( $_POST['date_to'] ) && is_string( $_POST['date_to'] ) ) {
 			$filters['date_to'] = \sanitize_text_field( \wp_unslash( $_POST['date_to'] ) );
+		}
+		if ( ! empty( $_POST['template_family'] ) && is_string( $_POST['template_family'] ) ) {
+			$filters['template_family'] = \sanitize_text_field( \wp_unslash( $_POST['template_family'] ) );
+		}
+		if ( ! empty( $_POST['template_operation'] ) && is_string( $_POST['template_operation'] ) ) {
+			$filters['template_operation'] = \sanitize_text_field( \wp_unslash( $_POST['template_operation'] ) );
 		}
 		$service = $this->get_log_export_service();
 		$result  = $service->export( $log_types, $filters );

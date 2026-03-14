@@ -14,6 +14,8 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Generator;
 use AIOPageBuilder\Domain\ExportRestore\Export\Export_Manifest_Builder;
 use AIOPageBuilder\Domain\ExportRestore\Export\Support_Package_Generator;
+use AIOPageBuilder\Domain\ExportRestore\Export\Template_Library_Support_Summary_Builder;
+use AIOPageBuilder\Domain\Reporting\Errors\Reporting_Redaction_Service;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Export_Validator;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Restore_Validator;
 use AIOPageBuilder\Domain\ExportRestore\UI\Import_Export_State_Builder;
@@ -84,6 +86,21 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 			global $wpdb;
 			return new Export_Token_Set_Reader( $wpdb );
 		} );
+		$export_dir = __DIR__ . '/../../../Domain/ExportRestore/Export';
+		require_once $export_dir . '/Template_Library_Support_Summary_Builder.php';
+
+		$container->register( 'template_library_support_summary_builder', function () use ( $container ): Template_Library_Support_Summary_Builder {
+			return new Template_Library_Support_Summary_Builder(
+				$container->has( 'template_library_compliance_service' ) ? $container->get( 'template_library_compliance_service' ) : null,
+				$container->has( 'section_inventory_appendix_generator' ) ? $container->get( 'section_inventory_appendix_generator' ) : null,
+				$container->has( 'page_template_inventory_appendix_generator' ) ? $container->get( 'page_template_inventory_appendix_generator' ) : null,
+				$container->has( 'template_deprecation_service' ) ? $container->get( 'template_deprecation_service' ) : null,
+				$container->get( 'section_template_repository' ),
+				$container->get( 'page_template_repository' ),
+				new Reporting_Redaction_Service()
+			);
+		} );
+
 		$container->register( 'support_package_generator', function () use ( $container ): Support_Package_Generator {
 			return new Support_Package_Generator(
 				$container->get( 'plugin_path_manager' ),
@@ -94,7 +111,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'export_token_set_reader' ),
 				$container->get( 'export_manifest_builder' ),
 				$container->get( 'export_zip_packager' ),
-				$container->has( 'logger' ) ? $container->get( 'logger' ) : null
+				$container->has( 'logger' ) ? $container->get( 'logger' ) : null,
+				$container->has( 'template_library_support_summary_builder' ) ? $container->get( 'template_library_support_summary_builder' ) : null
 			);
 		} );
 		$container->register( 'export_generator', function () use ( $container ): Export_Generator {
