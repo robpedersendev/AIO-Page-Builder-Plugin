@@ -35,6 +35,8 @@ use AIOPageBuilder\Domain\Registries\Docs\Section_Inventory_Appendix_Generator;
 use AIOPageBuilder\Domain\Registries\Shared\UI\Template_Compare_State_Builder;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_Integrity_Validator;
 use AIOPageBuilder\Domain\Registries\Snapshots\Version_Snapshot_Service;
+use AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service;
+use AIOPageBuilder\Domain\Registries\Versioning\Template_Versioning_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
@@ -59,6 +61,12 @@ final class Registries_Provider implements Service_Provider_Interface {
 				$container->get( 'section_template_repository' ),
 				$container->get( 'page_template_repository' )
 			);
+		} );
+		$container->register( 'template_versioning_service', function (): Template_Versioning_Service {
+			return new Template_Versioning_Service();
+		} );
+		$container->register( 'template_deprecation_service', function () use ( $container ): Template_Deprecation_Service {
+			return new Template_Deprecation_Service( $container->get( 'registry_deprecation_service' ) );
 		} );
 		$container->register( 'large_library_query_service', function () use ( $container ): Large_Library_Query_Service {
 			return new Large_Library_Query_Service(

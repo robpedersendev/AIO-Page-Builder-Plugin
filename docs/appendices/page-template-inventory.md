@@ -2,7 +2,7 @@
 
 **Spec**: §62.12 Page Template Inventory Appendix; §57.9 Documentation Standards; §60.6 Documentation Completion Requirements.
 
-This appendix is **generated** from the live page template registry. Do not edit by hand; regenerate after library changes (see `Page_Template_Inventory_Appendix_Generator`).
+This appendix is **generated** from the live page template registry. Do not edit by hand; regenerate after library changes (see `Page_Template_Inventory_Appendix_Generator`). Regenerate after version or deprecation workflow updates so version and deprecation columns stay aligned (Prompt 189).
 
 **Total page templates**: *(run generator to refresh; after PT-14 gap-closing batch expect 580)*
 

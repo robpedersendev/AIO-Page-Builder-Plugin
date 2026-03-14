@@ -280,6 +280,20 @@ final class Section_Template_Detail_Screen {
 		if ( $preview_cache !== null && ! $preview_cache instanceof \AIOPageBuilder\Domain\Preview\Preview_Cache_Service ) {
 			$preview_cache = null;
 		}
+		$versioning_service = null;
+		$deprecation_service = null;
+		if ( $this->container && $this->container->has( 'template_versioning_service' ) ) {
+			$v = $this->container->get( 'template_versioning_service' );
+			if ( $v instanceof \AIOPageBuilder\Domain\Registries\Versioning\Template_Versioning_Service ) {
+				$versioning_service = $v;
+			}
+		}
+		if ( $this->container && $this->container->has( 'template_deprecation_service' ) ) {
+			$d = $this->container->get( 'template_deprecation_service' );
+			if ( $d instanceof \AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service ) {
+				$deprecation_service = $d;
+			}
+		}
 
 		return new Section_Template_Detail_State_Builder(
 			$section_provider,
@@ -290,7 +304,9 @@ final class Section_Template_Detail_Screen {
 			$assembly_pipeline,
 			$blueprint_service,
 			$lpagery_compatibility,
-			$preview_cache
+			$preview_cache,
+			$versioning_service,
+			$deprecation_service
 		);
 	}
 }

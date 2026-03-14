@@ -20,6 +20,8 @@ use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Context;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
+use AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service;
+use AIOPageBuilder\Domain\Registries\Versioning\Template_Versioning_Service;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Blocks\Page_Block_Assembly_Result;
 use AIOPageBuilder\Domain\Rendering\LPagery\Library_LPagery_Compatibility_Service;
@@ -59,6 +61,12 @@ final class Section_Template_Detail_State_Builder {
 	/** @var Preview_Cache_Service|null */
 	private ?Preview_Cache_Service $preview_cache;
 
+	/** @var Template_Versioning_Service|null */
+	private ?Template_Versioning_Service $versioning_service;
+
+	/** @var Template_Deprecation_Service|null */
+	private ?Template_Deprecation_Service $deprecation_service;
+
 	public function __construct(
 		Section_Definition_Provider $section_provider,
 		Synthetic_Preview_Data_Generator $preview_generator,
@@ -68,7 +76,9 @@ final class Section_Template_Detail_State_Builder {
 		Native_Block_Assembly_Pipeline $assembly_pipeline,
 		?Section_Field_Blueprint_Service $blueprint_service = null,
 		?Library_LPagery_Compatibility_Service $lpagery_compatibility = null,
-		?Preview_Cache_Service $preview_cache = null
+		?Preview_Cache_Service $preview_cache = null,
+		?Template_Versioning_Service $versioning_service = null,
+		?Template_Deprecation_Service $deprecation_service = null
 	) {
 		$this->section_provider    = $section_provider;
 		$this->preview_generator   = $preview_generator;
@@ -79,6 +89,8 @@ final class Section_Template_Detail_State_Builder {
 		$this->blueprint_service   = $blueprint_service;
 		$this->lpagery_compatibility = $lpagery_compatibility;
 		$this->preview_cache       = $preview_cache;
+		$this->versioning_service  = $versioning_service;
+		$this->deprecation_service = $deprecation_service;
 	}
 
 	/**
@@ -155,10 +167,18 @@ final class Section_Template_Detail_State_Builder {
 		}
 
 		$breadcrumbs = $this->build_breadcrumbs( $definition, $purpose_family );
+		$version_summary = $this->versioning_service !== null
+			? $this->versioning_service->get_version_summary( $definition, 'section' )
+			: $this->build_version_summary_from_definition( $definition, 'section' );
+		$deprecation_summary = $this->deprecation_service !== null
+			? $this->deprecation_service->get_deprecation_summary( $definition, 'section' )
+			: $this->build_deprecation_summary_from_definition( $definition, 'section' );
 
 		return array(
 			'section_key'                 => $section_key,
 			'definition'                  => $definition,
+			'version_summary'             => $version_summary,
+			'deprecation_summary'         => $deprecation_summary,
 			'side_panel'                  => $side_panel,
 			'field_summary'               => $field_summary,
 			'helper_ref'                  => $helper_ref,
@@ -250,6 +270,65 @@ final class Section_Template_Detail_State_Builder {
 	}
 
 	/**
+	 * Builds version summary from definition when versioning service is not injected (Prompt 189).
+	 *
+	 * @param array<string, mixed> $definition
+	 * @param string $type 'section' or 'page'
+	 * @return array{version: string, stable_key_retained: bool, changelog_ref: string, breaking: bool}
+	 */
+	private function build_version_summary_from_definition( array $definition, string $type ): array {
+		$field = $type === 'page' ? \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema::FIELD_VERSION : Section_Schema::FIELD_VERSION;
+		$version_data = $definition[ $field ] ?? array();
+		if ( ! \is_array( $version_data ) ) {
+			$version_data = array();
+		}
+		return array(
+			'version'              => isset( $version_data['version'] ) ? (string) $version_data['version'] : '1',
+			'stable_key_retained'  => (bool) ( $version_data['stable_key_retained'] ?? true ),
+			'changelog_ref'        => (string) ( $version_data['changelog_ref'] ?? '' ),
+			'breaking'             => (bool) ( $version_data['breaking'] ?? false ),
+		);
+	}
+
+	/**
+	 * Builds deprecation summary from definition when deprecation service is not injected (Prompt 189).
+	 *
+	 * @param array<string, mixed> $definition
+	 * @param string $type 'section' or 'page'
+	 * @return array{is_deprecated: bool, reason: string, replacement_keys: list<string>, deprecated_at: string}
+	 */
+	private function build_deprecation_summary_from_definition( array $definition, string $type ): array {
+		$status_field = $type === 'page' ? \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema::FIELD_STATUS : Section_Schema::FIELD_STATUS;
+		$status = (string) ( $definition[ $status_field ] ?? '' );
+		$dep = $definition['deprecation'] ?? array();
+		if ( ! \is_array( $dep ) ) {
+			$dep = array();
+		}
+		$replacement_keys = array();
+		if ( $type === 'page' ) {
+			$refs = $definition['replacement_template_refs'] ?? $dep['replacement_template_key'] ?? '';
+			if ( \is_array( $refs ) ) {
+				$replacement_keys = array_values( array_filter( array_map( 'strval', $refs ) ) );
+			} elseif ( (string) $refs !== '' ) {
+				$replacement_keys = array( (string) $refs );
+			}
+		} else {
+			$refs = $definition['replacement_section_suggestions'] ?? $dep['replacement_section_key'] ?? '';
+			if ( \is_array( $refs ) ) {
+				$replacement_keys = array_values( array_filter( array_map( 'strval', $refs ) ) );
+			} elseif ( (string) $refs !== '' ) {
+				$replacement_keys = array( (string) $refs );
+			}
+		}
+		return array(
+			'is_deprecated'   => $status === 'deprecated' || (bool) ( $dep['deprecated'] ?? false ),
+			'reason'          => (string) ( $dep['reason'] ?? '' ),
+			'replacement_keys' => $replacement_keys,
+			'deprecated_at'   => (string) ( $dep['deprecated_at'] ?? '' ),
+		);
+	}
+
+	/**
 	 * Breadcrumb segments: Section Templates → [Purpose family] → Section name.
 	 *
 	 * @param array<string, mixed> $definition
@@ -273,6 +352,8 @@ final class Section_Template_Detail_State_Builder {
 		return array(
 			'section_key'                 => $section_key,
 			'definition'                  => array(),
+			'version_summary'             => array( 'version' => '1', 'stable_key_retained' => true, 'changelog_ref' => '', 'breaking' => false ),
+			'deprecation_summary'         => array( 'is_deprecated' => false, 'reason' => '', 'replacement_keys' => array(), 'deprecated_at' => '' ),
 			'side_panel'                  => array(),
 			'field_summary'               => array(),
 			'helper_ref'                  => '',

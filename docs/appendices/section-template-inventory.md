@@ -2,7 +2,7 @@
 
 **Spec**: §62.11 Section Template Inventory Appendix; §57.9 Documentation Standards; §60.6 Documentation Completion Requirements.
 
-This appendix is **generated** from the live section template registry. Do not edit by hand; regenerate after library changes (see `Section_Inventory_Appendix_Generator`).
+This appendix is **generated** from the live section template registry. Do not edit by hand; regenerate after library changes (see `Section_Inventory_Appendix_Generator`). Regenerate after version or deprecation workflow updates so version and deprecation columns stay aligned (Prompt 189).
 
 **Total section templates**: *(run generator to refresh; after SEC-09 gap-closing batch expect 254)*
 

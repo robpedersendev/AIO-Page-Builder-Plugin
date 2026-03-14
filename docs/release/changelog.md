@@ -22,6 +22,7 @@
 
 ### Deprecations
 - (None unless announced.)
+- *Template library:* Sync deprecations with [template-library-decision-log.md](template-library-decision-log.md); add lines via `Template_Deprecation_Service::build_changelog_snippet_for_deprecation()`. Example line: `- **Section template** \`st_old_hero\` deprecated. Superseded by layout variant. Recommended replacement(s): \`st01_hero_intro\`.`
 
 ### Known limitations
 - See [known-risk-register.md](known-risk-register.md).

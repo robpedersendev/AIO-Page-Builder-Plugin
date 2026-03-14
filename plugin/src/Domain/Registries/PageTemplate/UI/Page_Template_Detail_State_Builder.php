@@ -18,6 +18,8 @@ use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Context;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
+use AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service;
+use AIOPageBuilder\Domain\Registries\Versioning\Template_Versioning_Service;
 use AIOPageBuilder\Domain\Rendering\LPagery\Library_LPagery_Compatibility_Service;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Blocks\Page_Block_Assembly_Result;
@@ -57,6 +59,12 @@ final class Page_Template_Detail_State_Builder {
 	/** @var Preview_Cache_Service|null */
 	private ?Preview_Cache_Service $preview_cache;
 
+	/** @var Template_Versioning_Service|null */
+	private ?Template_Versioning_Service $versioning_service;
+
+	/** @var Template_Deprecation_Service|null */
+	private ?Template_Deprecation_Service $deprecation_service;
+
 	public function __construct(
 		Page_Template_Definition_Provider $page_template_provider,
 		Section_Definition_Provider_For_Preview $section_provider,
@@ -66,7 +74,9 @@ final class Page_Template_Detail_State_Builder {
 		Section_Renderer_Base $section_renderer,
 		Native_Block_Assembly_Pipeline $assembly_pipeline,
 		?Library_LPagery_Compatibility_Service $lpagery_compatibility = null,
-		?Preview_Cache_Service $preview_cache = null
+		?Preview_Cache_Service $preview_cache = null,
+		?Template_Versioning_Service $versioning_service = null,
+		?Template_Deprecation_Service $deprecation_service = null
 	) {
 		$this->page_template_provider = $page_template_provider;
 		$this->section_provider       = $section_provider;
@@ -77,6 +87,8 @@ final class Page_Template_Detail_State_Builder {
 		$this->assembly_pipeline     = $assembly_pipeline;
 		$this->lpagery_compatibility  = $lpagery_compatibility;
 		$this->preview_cache          = $preview_cache;
+		$this->versioning_service     = $versioning_service;
+		$this->deprecation_service    = $deprecation_service;
 	}
 
 	/**
@@ -177,10 +189,18 @@ final class Page_Template_Detail_State_Builder {
 		}
 
 		$breadcrumbs = $this->build_breadcrumbs( $definition, $category_class, $family );
+		$version_summary = $this->versioning_service !== null
+			? $this->versioning_service->get_version_summary( $definition, 'page' )
+			: $this->build_version_summary_from_definition( $definition, 'page' );
+		$deprecation_summary = $this->deprecation_service !== null
+			? $this->deprecation_service->get_deprecation_summary( $definition, 'page' )
+			: $this->build_deprecation_summary_from_definition( $definition, 'page' );
 
 		return array(
 			'template_key'                 => $template_key,
 			'definition'                   => $definition,
+			'version_summary'              => $version_summary,
+			'deprecation_summary'          => $deprecation_summary,
 			'side_panel'                   => $side_panel,
 			'used_sections'                => $used_sections,
 			'one_pager_link'               => $one_pager_link,
@@ -281,6 +301,54 @@ final class Page_Template_Detail_State_Builder {
 	}
 
 	/**
+	 * Builds version summary from definition when versioning service is not injected (Prompt 189).
+	 *
+	 * @param array<string, mixed> $definition
+	 * @param string $type 'section' or 'page'
+	 * @return array{version: string, stable_key_retained: bool, changelog_ref: string, breaking: bool}
+	 */
+	private function build_version_summary_from_definition( array $definition, string $type ): array {
+		$version_data = $definition[ Page_Template_Schema::FIELD_VERSION ] ?? array();
+		if ( ! \is_array( $version_data ) ) {
+			$version_data = array();
+		}
+		return array(
+			'version'              => isset( $version_data['version'] ) ? (string) $version_data['version'] : '1',
+			'stable_key_retained'  => (bool) ( $version_data['stable_key_retained'] ?? true ),
+			'changelog_ref'        => (string) ( $version_data['changelog_ref'] ?? '' ),
+			'breaking'             => (bool) ( $version_data['breaking'] ?? false ),
+		);
+	}
+
+	/**
+	 * Builds deprecation summary from definition when deprecation service is not injected (Prompt 189).
+	 *
+	 * @param array<string, mixed> $definition
+	 * @param string $type 'section' or 'page'
+	 * @return array{is_deprecated: bool, reason: string, replacement_keys: list<string>, deprecated_at: string}
+	 */
+	private function build_deprecation_summary_from_definition( array $definition, string $type ): array {
+		$status = (string) ( $definition[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
+		$dep = $definition['deprecation'] ?? array();
+		if ( ! \is_array( $dep ) ) {
+			$dep = array();
+		}
+		$refs = $definition['replacement_template_refs'] ?? $dep['replacement_template_key'] ?? '';
+		$replacement_keys = array();
+		if ( \is_array( $refs ) ) {
+			$replacement_keys = array_values( array_filter( array_map( 'strval', $refs ) ) );
+		} elseif ( (string) $refs !== '' ) {
+			$replacement_keys = array( (string) $refs );
+		}
+		return array(
+			'is_deprecated'   => $status === 'deprecated' || (bool) ( $dep['deprecated'] ?? false ),
+			'reason'          => (string) ( $dep['reason'] ?? '' ),
+			'replacement_keys' => $replacement_keys,
+			'deprecated_at'   => (string) ( $dep['deprecated_at'] ?? '' ),
+		);
+	}
+
+	/**
 	 * Breadcrumb segments for detail view: Page Templates → [Category] → [Family] → Template name.
 	 *
 	 * @param array<string, mixed> $definition
@@ -324,6 +392,8 @@ final class Page_Template_Detail_State_Builder {
 		return array(
 			'template_key'                 => $template_key,
 			'definition'                   => array(),
+			'version_summary'              => array( 'version' => '1', 'stable_key_retained' => true, 'changelog_ref' => '', 'breaking' => false ),
+			'deprecation_summary'          => array( 'is_deprecated' => false, 'reason' => '', 'replacement_keys' => array(), 'deprecated_at' => '' ),
 			'side_panel'                   => array(),
 			'used_sections'                => array(),
 			'one_pager_link'               => '',
