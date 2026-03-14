@@ -9,10 +9,11 @@
 
 Before running the final approval:
 
-- [ ] All work for the release candidate (code, docs, evidence) is complete per Prompts 100–116.
+- [ ] All work for the release candidate (code, docs, evidence) is complete per Prompts 100–116 (and template-library Prompts 132–206 when the release includes the expansion).
 - [ ] [release-candidate-packaging-checklist.md](release-candidate-packaging-checklist.md) is available and understood.
 - [ ] [release-review-packet.md](release-review-packet.md), [sign-off-checklist.md](sign-off-checklist.md), and [demo-review-walkthrough.md](demo-review-walkthrough.md) exist and are current.
 - [ ] [release-notes-rc1.md](release-notes-rc1.md) and [changelog.md](changelog.md) are updated with version and date for the release.
+- [ ] When the release includes the **template-library expansion:** [template-library-release-candidate-addendum.md](template-library-release-candidate-addendum.md) is available; [template-library-expansion-review-packet.md](template-library-expansion-review-packet.md) and [template-library-expansion-sign-off-checklist.md](template-library-expansion-sign-off-checklist.md) exist and are current.
 
 ---
 
@@ -30,6 +31,9 @@ Execute in order. **No-go** at any step stops the runbook until the issue is res
 | 2.6 | Packaging | [release-candidate-packaging-checklist.md](release-candidate-packaging-checklist.md) completed for the build; required files present, exclusions verified, ZIP installability confirmed. | ☐ Go ☐ No-go |
 | 2.7 | No secrets in package | ZIP and any attached operator docs contain no credentials, local paths, or internal-only diagnostics. | ☐ Go ☐ No-go |
 | 2.8 | Handoff ready | [private-distribution-handoff.md](private-distribution-handoff.md) pre-handoff checklist complete; delivery mode and recipient documented. | ☐ Go ☐ No-go |
+| 2.9 | Template library (if in scope) | [template-library-release-candidate-addendum.md](template-library-release-candidate-addendum.md) §1–§3 completed; expansion packaging and go/no-go **Go**; expansion sign-off checklist Met or Waived. | ☐ Go ☐ No-go ☐ N/A |
+
+**Note:** Step 2.9 is **N/A** only when the release does not include the template-library expansion. When it does, 2.9 must be **Go**.
 
 ---
 
@@ -71,7 +75,8 @@ Execute in order. **No-go** at any step stops the runbook until the issue is res
 | [release-candidate-packaging-checklist.md](release-candidate-packaging-checklist.md) | ZIP validation; §2.6, §4.1. |
 | [private-distribution-handoff.md](private-distribution-handoff.md) | Handoff steps; §2.8, §4.4. |
 | [known-risk-register.md](known-risk-register.md) | Known limitations; no duplication of internal risk detail in runbook. |
+| [template-library-release-candidate-addendum.md](template-library-release-candidate-addendum.md) | Template-library packaging completeness and expansion go/no-go; §2.9. |
 
 ---
 
-*This runbook closes the production-readiness gap between “implemented and reviewed” and “actually shippable.” Do not skip steps; document any waiver or exception.*
+*This runbook closes the production-readiness gap between “implemented and reviewed” and “actually shippable.” Do not skip steps; document any waiver or exception. When the release includes the template-library expansion, complete the template-library addendum and step 2.9 before Go.*

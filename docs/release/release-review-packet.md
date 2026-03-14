@@ -79,6 +79,7 @@
 | Admin performance hardening | MAX_PER_PAGE 50; preview cache cap; compare/compositions limits. | [template-admin-performance-hardening-report.md](../qa/template-admin-performance-hardening-report.md); review packet §6. |
 | Decision log and planner/Build Plan | Versioning/deprecation; Template_Recommendation_Context_Builder; Build_Plan_Template_Explanation_Builder. | [template-library-decision-log.md](template-library-decision-log.md); review packet §7. |
 | Sign-off (expansion-specific) | Criteria and role approval for template-library expansion only. | [template-library-expansion-sign-off-checklist.md](template-library-expansion-sign-off-checklist.md). |
+| Packaging and approval addendum | Template-library packaging completeness and go/no-go runbook for the expansion. | [template-library-release-candidate-addendum.md](template-library-release-candidate-addendum.md). |
 
 ---
 
@@ -100,9 +101,10 @@
 |----------|---------|
 | [demo-review-walkthrough.md](demo-review-walkthrough.md) | Script or walkthrough outline for formal review/demo to Product Owner (§60.7). QA review for release milestone. |
 | [sign-off-checklist.md](sign-off-checklist.md) | Role-by-role approval (Product Owner, Technical Lead, QA, Security where applicable); gate status (blocked/waived/approved); waiver references. |
-| [release-candidate-packaging-checklist.md](release-candidate-packaging-checklist.md) | Production ZIP build and validation; required files, exclusions, installability. |
+| [release-candidate-packaging-checklist.md](release-candidate-packaging-checklist.md) | Production ZIP build and validation; required files, exclusions, installability; §7 template-library expansion. |
+| [template-library-release-candidate-addendum.md](template-library-release-candidate-addendum.md) | Template-library packaging completeness and expansion go/no-go; run as part of final approval when release includes expansion. |
 | [private-distribution-handoff.md](private-distribution-handoff.md) | Handoff checklist for private delivery modes (direct ZIP, manual deploy, private update, environment-specific). |
-| [final-approval-runbook.md](final-approval-runbook.md) | Go/no-go procedure before packaging and handoff; references sign-off and release notes. |
+| [final-approval-runbook.md](final-approval-runbook.md) | Go/no-go procedure before packaging and handoff; references sign-off and release notes; §2.9 template-library when in scope. |
 
 ---
 
