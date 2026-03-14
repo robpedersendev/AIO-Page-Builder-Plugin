@@ -37,6 +37,7 @@ use AIOPageBuilder\Domain\Registries\Shared\Registry_Integrity_Validator;
 use AIOPageBuilder\Domain\Registries\Snapshots\Version_Snapshot_Service;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Versioning_Service;
+use AIOPageBuilder\Domain\AI\Planning\Template_Recommendation_Context_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
@@ -190,6 +191,9 @@ final class Registries_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'page_template_inventory_appendix_generator', function () use ( $container ): Page_Template_Inventory_Appendix_Generator {
 			return new Page_Template_Inventory_Appendix_Generator( $container->get( 'page_template_repository' ) );
+		} );
+		$container->register( 'template_recommendation_context_builder', function () use ( $container ): Template_Recommendation_Context_Builder {
+			return new Template_Recommendation_Context_Builder( $container->get( 'page_template_repository' ) );
 		} );
 	}
 }

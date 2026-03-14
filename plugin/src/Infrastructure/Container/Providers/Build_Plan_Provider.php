@@ -22,6 +22,7 @@ use AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Servi
 use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Detail_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Step_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Recommendations\Build_Plan_Template_Explanation_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Detail_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_UI_Service;
@@ -75,8 +76,20 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 				$container->get( 'existing_page_update_bulk_action_service' )
 			);
 		} );
-		$container->register( 'new_page_creation_detail_builder', function (): New_Page_Creation_Detail_Builder {
-			return new New_Page_Creation_Detail_Builder();
+		$container->register( 'build_plan_template_explanation_builder', function () use ( $container ): Build_Plan_Template_Explanation_Builder {
+			$ctx_builder = $container->has( 'template_recommendation_context_builder' )
+				? $container->get( 'template_recommendation_context_builder' )
+				: null;
+			return new Build_Plan_Template_Explanation_Builder(
+				$container->get( 'page_template_repository' ),
+				$ctx_builder
+			);
+		} );
+		$container->register( 'new_page_creation_detail_builder', function () use ( $container ): New_Page_Creation_Detail_Builder {
+			$explanation_builder = $container->has( 'build_plan_template_explanation_builder' )
+				? $container->get( 'build_plan_template_explanation_builder' )
+				: null;
+			return new New_Page_Creation_Detail_Builder( $explanation_builder );
 		} );
 		$container->register( 'new_page_creation_bulk_action_service', function () use ( $container ): New_Page_Creation_Bulk_Action_Service {
 			return new New_Page_Creation_Bulk_Action_Service( $container->get( 'build_plan_repository' ) );

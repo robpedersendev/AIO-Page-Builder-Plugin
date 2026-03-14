@@ -25,6 +25,7 @@ use AIOPageBuilder\Domain\AI\Providers\Provider_Request_Context_Builder;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
 use AIOPageBuilder\Domain\AI\Validation\AI_Output_Validator;
+use AIOPageBuilder\Domain\AI\Planning\Template_Recommendation_Context_Builder;
 use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
 use AIOPageBuilder\Domain\AI\Validation\Validation_Report;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Provider_Connection_Test_Service;
@@ -190,10 +191,18 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$artifact_id = 'aio-artifact-' . uniqid( '', true );
 		$profile = $prefill['profile'] ?? array();
 		$goal = isset( $draft['goal_or_intent_text'] ) && is_string( $draft['goal_or_intent_text'] ) ? $draft['goal_or_intent_text'] : '';
+		$registry = array();
+		if ( $this->container->has( 'template_recommendation_context_builder' ) ) {
+			$ctx_builder = $this->container->get( 'template_recommendation_context_builder' );
+			if ( $ctx_builder instanceof Template_Recommendation_Context_Builder ) {
+				$built = $ctx_builder->build( array( 'max_templates' => Template_Recommendation_Context_Builder::DEFAULT_MAX_TEMPLATES ) );
+				$registry['template_recommendation_context'] = $built['template_recommendation_context'];
+			}
+		}
 		$input_artifact = $this->input_artifact_builder->build( $artifact_id, $prompt_pack_ref, array(
 			'profile' => $profile,
 			'crawl'   => array(),
-			'registry' => array(),
+			'registry' => $registry,
 			'goal'    => $goal,
 			'redaction' => array( Input_Artifact_Schema::REDACTION_APPLIED => false ),
 		) );

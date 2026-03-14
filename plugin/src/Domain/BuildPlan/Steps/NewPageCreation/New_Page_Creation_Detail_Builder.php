@@ -14,6 +14,7 @@ namespace AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\BuildPlan\Recommendations\Build_Plan_Template_Explanation_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Detail_Panel_Component;
 
@@ -21,8 +22,16 @@ use AIOPageBuilder\Domain\BuildPlan\UI\Components\Detail_Panel_Component;
  * Produces detail_panel sections for one new_page item.
  * Payload: proposed_page_title, proposed_slug, purpose, template_key, menu_eligible, section_guidance, confidence;
  * optional: page_type, parent_ref, hierarchy_position, intended_parent, intended_children, dependency_blocking_reasons, post_build_status, retry_message.
+ * When Build_Plan_Template_Explanation_Builder is provided, adds a "Template rationale" section (Prompt 190).
  */
 final class New_Page_Creation_Detail_Builder {
+
+	/** @var Build_Plan_Template_Explanation_Builder|null */
+	private ?Build_Plan_Template_Explanation_Builder $template_explanation_builder;
+
+	public function __construct( ?Build_Plan_Template_Explanation_Builder $template_explanation_builder = null ) {
+		$this->template_explanation_builder = $template_explanation_builder;
+	}
 
 	/**
 	 * Builds sections for the detail panel. Escapes output; no raw AI artifacts.
@@ -38,6 +47,10 @@ final class New_Page_Creation_Detail_Builder {
 		$sections = array();
 
 		$sections[] = $this->section_metadata( $payload );
+		$template_rationale = $this->section_template_rationale( $payload );
+		if ( $template_rationale !== null ) {
+			$sections[] = $template_rationale;
+		}
 		$sections[] = $this->section_parent_child_hierarchy( $payload );
 		$sections[] = $this->section_dependency_validation( $payload, $item );
 		$sections[] = $this->section_post_build_status( $status, $payload );
@@ -46,6 +59,34 @@ final class New_Page_Creation_Detail_Builder {
 		return array_filter( $sections, static function ( $s ) {
 			return $s !== null && is_array( $s );
 		} );
+	}
+
+	/**
+	 * Template rationale section from Build_Plan_Template_Explanation_Builder when template_key is set (Prompt 190).
+	 *
+	 * @param array<string, mixed> $payload
+	 * @return array<string, mixed>|null Section or null when no template_key or no builder.
+	 */
+	private function section_template_rationale( array $payload ): ?array {
+		$template_key = (string) ( $payload['template_key'] ?? '' );
+		if ( $template_key === '' || $this->template_explanation_builder === null ) {
+			return null;
+		}
+		$explanation = $this->template_explanation_builder->build_explanation( $template_key, $payload );
+		$lines = isset( $explanation['explanation_lines'] ) && is_array( $explanation['explanation_lines'] )
+			? $explanation['explanation_lines']
+			: array();
+		$escaped = array_map( function ( $line ) {
+			return \esc_html( (string) $line );
+		}, $lines );
+		if ( $escaped === array() ) {
+			$escaped[] = \esc_html( $explanation['template_key'] ?? $template_key );
+		}
+		return array(
+			Detail_Panel_Component::SECTION_KEY_HEADING       => \__( 'Template rationale', 'aio-page-builder' ),
+			Detail_Panel_Component::SECTION_KEY_KEY           => 'template_rationale',
+			Detail_Panel_Component::SECTION_KEY_CONTENT_LINES => $escaped,
+		);
 	}
 
 	private function section_metadata( array $payload ): array {

@@ -26,6 +26,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
  * Consumes plan_id; loads plan via repository; returns structured payload for context rail and shell.
  * No raw repository calls in screen templates; screen uses this payload only.
  * Optional Step_Workspace_Payload_Builder enables build_step_workspace() for actionable steps.
+ * New-pages step detail panel includes template rationale (Build_Plan_Template_Explanation_Builder) when registered (Prompt 190).
  */
 final class Build_Plan_UI_State_Builder {
 
