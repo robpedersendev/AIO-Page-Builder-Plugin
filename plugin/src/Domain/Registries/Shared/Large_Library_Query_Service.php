@@ -286,6 +286,10 @@ final class Large_Library_Query_Service {
 	private function section_rows_for_directory( array $defs ): array {
 		$rows = array();
 		foreach ( $defs as $def ) {
+			$variants = $def[ Section_Schema::FIELD_VARIANTS ] ?? array();
+			$variant_count = is_array( $variants ) ? count( $variants ) : 0;
+			$version_arr = $def[ Section_Schema::FIELD_VERSION ] ?? array();
+			$version = is_array( $version_arr ) ? (string) ( $version_arr['version'] ?? '1' ) : '1';
 			$rows[] = array(
 				'internal_key'         => (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' ),
 				'name'                 => (string) ( $def[ Section_Schema::FIELD_NAME ] ?? '' ),
@@ -294,8 +298,13 @@ final class Large_Library_Query_Service {
 				'purpose_summary'      => (string) ( $def[ Section_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' ),
 				'section_purpose_family' => (string) ( $def['section_purpose_family'] ?? '' ),
 				'cta_classification'   => (string) ( $def['cta_classification'] ?? '' ),
-				'variation_family_key' => (string) ( $def['variation_family_key'] ?? '' ),
-				'preview_available'    => ( ( $def['preview_image_ref'] ?? $def['preview_description'] ?? '' ) !== '' ),
+				'variation_family_key'  => (string) ( $def['variation_family_key'] ?? '' ),
+				'placement_tendency'    => (string) ( $def['placement_tendency'] ?? '' ),
+				'helper_ref'           => (string) ( $def[ Section_Schema::FIELD_HELPER_REF ] ?? '' ),
+				'field_blueprint_ref'  => (string) ( $def[ Section_Schema::FIELD_FIELD_BLUEPRINT_REF ] ?? '' ),
+				'preview_available'     => ( ( $def['preview_image_ref'] ?? $def['preview_description'] ?? '' ) !== '' ),
+				'version'              => $version,
+				'variant_count'        => $variant_count,
 			);
 		}
 		return $rows;
@@ -341,6 +350,7 @@ final class Large_Library_Query_Service {
 		$by_category = array();
 		$by_purpose_family = array();
 		$by_cta = array();
+		$by_variation_family = array();
 		foreach ( $filtered as $def ) {
 			$s = (string) ( $def[ Section_Schema::FIELD_STATUS ] ?? '' );
 			if ( $s !== '' ) {
@@ -358,12 +368,17 @@ final class Large_Library_Query_Service {
 			if ( $cta !== '' ) {
 				$by_cta[ $cta ] = ( $by_cta[ $cta ] ?? 0 ) + 1;
 			}
+			$vf = (string) ( $def['variation_family_key'] ?? '' );
+			if ( $vf !== '' ) {
+				$by_variation_family[ $vf ] = ( $by_variation_family[ $vf ] ?? 0 ) + 1;
+			}
 		}
 		return array(
-			'status'                 => $by_status,
-			'category'               => $by_category,
-			'section_purpose_family' => $by_purpose_family,
-			'cta_classification'    => $by_cta,
+			'status'                  => $by_status,
+			'category'                => $by_category,
+			'section_purpose_family'  => $by_purpose_family,
+			'cta_classification'      => $by_cta,
+			'variation_family_key'     => $by_variation_family,
 		);
 	}
 

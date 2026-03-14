@@ -29,7 +29,7 @@
 | Build Plans             | `Build_Plans_Screen` / `aio-page-builder-build-plans` | `aio_view_build_plans`  |
 | Build Plan Analytics   | `Build_Plan_Analytics_Screen` / `aio-page-builder-build-plan-analytics` | `aio_view_build_plans`  |
 | **Page Templates**     | `Page_Templates_Directory_Screen` / `aio-page-builder-page-templates`   | `aio_view_build_plans` |
-| **Section Templates**  | Section template directory (see §2.3) / `aio-page-builder-section-templates` | `aio_view_build_plans` (or dedicated template cap) |
+| **Section Templates**  | `Section_Templates_Directory_Screen` / `aio-page-builder-section-templates` | `aio_view_build_plans` |
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
 | **Post-Release Health**| `Post_Release_Health_Screen` / `aio-page-builder-post-release-health` | `aio_view_logs`         |
@@ -91,7 +91,52 @@ When admin screens list or browse **section templates**, **directory and browse 
 
 ### 2.3 Section template directory IA (spec §49.6; Prompt 142)
 
-The **section template directory** is a dedicated browse experience for section templates. Its **information architecture** (hierarchical tree by purpose family, CTA/variant grouping, breadcrumbs, list/detail, helper-doc and field blueprint links, preview) is defined in **section-template-directory-ia-extension.md**. Tree structure: **Section Templates** (root) → **Purpose family** (Hero, Proof, CTA, FAQ, etc.) → **CTA classification** (for cta/contact) or **Variant family** (e.g. Hero primary) → **Section option list** → **Section detail**. Screen slug: `aio-page-builder-section-templates`. Directory is capability-gated; preview uses preview-safe data only. Build Plan and composition section pickers may deep-link into the directory. Section directory does not replace Build Plan or composition workflows and emphasizes purpose-family, CTA classification, and variant families for section reuse.
+The **section template directory** is a dedicated browse experience for section templates. Its **information architecture** (hierarchical tree by purpose family, CTA/variant grouping, breadcrumbs, list/detail, helper-doc and field blueprint links, preview) is defined in **section-template-directory-ia-extension.md**. Tree structure: **Section Templates** (root) → **Purpose family** (Hero, Proof, CTA, FAQ, etc.) → **CTA classification** (for cta/contact) or **Variant family** (e.g. Hero primary) → **Section option list** → **Section detail**. Screen slug: `aio-page-builder-section-templates`. Directory is capability-gated; preview uses preview-safe data only. Build Plan and composition section pickers may deep-link into the directory. Section directory does not replace Build Plan or composition workflows and emphasizes purpose-family, CTA classification, and variant families for section reuse. State is built by `Section_Template_Directory_State_Builder`.
+
+**Example section-template directory state payload** (list view, one row):
+
+```json
+{
+  "view": "list",
+  "breadcrumbs": [
+    { "label": "Section Templates", "url": "https://example.com/wp-admin/admin.php?page=aio-page-builder-section-templates" },
+    { "label": "Hero", "url": "...&purpose_family=hero" },
+    { "label": "Hero primary", "url": "" }
+  ],
+  "tree": [
+    { "slug": "hero", "label": "Hero", "count": 24, "url": "..." },
+    { "slug": "proof", "label": "Proof", "count": 18, "url": "..." },
+    { "slug": "cta", "label": "Cta", "count": 32, "url": "..." }
+  ],
+  "l3_nodes": [],
+  "list_result": {
+    "rows": [
+      {
+        "internal_key": "st_hero_01",
+        "name": "Hero with CTA",
+        "status": "active",
+        "category": "hero_intro",
+        "section_purpose_family": "hero",
+        "cta_classification": "",
+        "variation_family_key": "hero_primary",
+        "placement_tendency": "opener",
+        "helper_ref": "hero_helper",
+        "field_blueprint_ref": "acf_hero",
+        "preview_available": true,
+        "version": "1",
+        "variant_count": 2
+      }
+    ],
+    "pagination": { "page": 1, "per_page": 25, "total": 1, "total_pages": 1, "offset": 0 },
+    "total_matching": 1
+  },
+  "filters": { "purpose_family": "hero", "cta_classification": "", "variation_family_key": "hero_primary", "all": false, "status": "", "search": "", "paged": 1, "per_page": 25 },
+  "base_url": "https://example.com/wp-admin/admin.php?page=aio-page-builder-section-templates",
+  "can_manage_templates": true,
+  "purpose_labels": { "hero": "Hero", "proof": "Proof", "cta": "Cta" },
+  "cta_labels": { "primary_cta": "Primary CTA", "contact_cta": "Contact CTA", "navigation_cta": "Navigation CTA", "none": "None" }
+}
+```
 
 ---
 
