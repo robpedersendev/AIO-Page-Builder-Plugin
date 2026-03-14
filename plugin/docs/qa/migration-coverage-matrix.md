@@ -42,7 +42,19 @@
 
 ---
 
-## 4. Lifecycle phase order (activation)
+## 4. ACF field architecture (Prompt 225)
+
+| Surface | Storage / source | Upgrade behavior | Document |
+|---------|-------------------|------------------|----------|
+| Field keys / group keys | Blueprints + Field_Key_Generator | Deterministic; verified by ACF migration verification harness. | acf-migration-verification-report.md |
+| Registry-to-group mapping | Blueprints, ACF registration | Programmatic registration survives; harness verifies stability. | acf-migration-verification-report.md |
+| Page assignments (PAGE_TEMPLATE, PAGE_COMPOSITION) | assignment_map | Relevance verified (target_ref in registry); orphaned flagged. | acf-migration-verification-report.md §3.3 |
+| Local JSON mirror | Generated at export / debug | Coherence with registry verified; version drift flagged. | acf-local-json-mirror-contract.md, acf-migration-verification-report.md |
+| Regeneration/repair | ACF_Regeneration_Service | Plan buildable after version change; repair candidates consistent. | acf-migration-verification-report.md §3.1 |
+
+---
+
+## 5. Lifecycle phase order (activation)
 
 1. validate_environment  
 2. check_dependencies  
@@ -57,7 +69,7 @@
 
 ---
 
-## 5. Known limitations
+## 6. Known limitations
 
 - No live page content migration in template-library pass.
 - registry_schema migrations (N → N+1) are not yet implemented; when added, they will run in dependency order and record results via Schema_Version_Tracker.
