@@ -56,6 +56,8 @@ Every section that counts must satisfy required fields and validation. Incomplet
 | `related` | 8 | Related, recommended content. |
 | `other` | 0 (prefer 0) | Fallback only; do not inflate with "other". |
 
+**Form-bearing templates:** The section category `form_embed` (form section template `form_section_ndr`) and the request-form page template `pt_request_form` are provider-backed form templates. They are tracked in the section and page template registries and count toward inventory and compliance where applicable. Contract and retrofit analysis: [form-provider-integration-contract.md](form-provider-integration-contract.md), [form-provider-retrofit-impact-analysis.md](form-provider-retrofit-impact-analysis.md).
+
 **Sum of minimums:** 154. The remaining 96+ sections are distributed across families to reach 250 total while respecting **maximum share per family** (§2.4).
 
 ### 2.3 CTA-section-family minimums

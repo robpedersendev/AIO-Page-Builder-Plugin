@@ -219,9 +219,24 @@ Template_Preference_Profile::to_array(). Stored in Profile_Store. Fields: page_e
 
 ---
 
+## 21. Form provider integration (form_provider, form_id)
+
+Provider-backed form sections store which form to render using two stable ACF field names. Schema is defined in [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md).
+
+| Field / concept | Type / location | Description |
+|-----------------|-----------------|-------------|
+| form_provider | string (ACF field) | Provider identifier (e.g. `ndr_forms`). Must be registered in Form_Provider_Registry. Sanitized per registry. |
+| form_id | string (ACF field) | Form identifier within the provider. Sanitized per registry; format provider-defined. |
+| form_embed | string (section category) | Section template category for sections whose primary content is an embedded form. Provider-backed variant uses form_provider + form_id. |
+| Page-template aggregation | ordered_section_keys | Request-form page template (e.g. `pt_request_form`) includes provider-backed form section(s) in ordered_section_keys like any other section. |
+| Export/import | Registry + content | Form references persist via section/page definitions and ACF field values; no separate form-reference export schema. |
+
+---
+
 ## Cross-references
 
 - Section/page template field details: [Section Template Inventory](section-template-inventory.md), [Page Template Inventory](page-template-inventory.md).
+- Form provider: [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md), [form-provider-retrofit-impact-analysis.md](../contracts/form-provider-retrofit-impact-analysis.md).
 - Planning output and AI schema: [Prompt Schema Appendix](prompt-schema-appendix.md), [AI Output Schema Appendix](ai-output-schema-appendix.md).
 - Reporting payloads: [Error Email Templates](error-email-templates.md), [Heartbeat Email Templates](heartbeat-email-templates.md), [Install Notification Email Template](install-notification-email-template.md).
 - Terms: [Glossary](glossary.md).

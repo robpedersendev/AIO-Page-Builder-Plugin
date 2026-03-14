@@ -26,7 +26,7 @@ All submenu pages use parent slug `aio-page-builder`. Screen slugs below are the
 | Screen slug | Title | Owning domain | Intended capability | Primary actions | Status |
 |-------------|--------|----------------|----------------------|-----------------|--------|
 | `aio-page-builder` | Dashboard | Bootstrap / Admin | `manage_options` (placeholder) | Overview: environment/dependency/provider readiness; last crawl, last AI run, active Build Plans; queue warnings; critical errors; quick actions (Start/Resume Onboarding, Crawl Sessions, AI Runs, Build Plans, Queue & Logs, AI Providers, Import/Export); welcome/first-run and resume state | Implemented |
-| `aio-page-builder-settings` | Settings | Bootstrap / Admin | `manage_options` (placeholder) | Plugin settings, reporting disclosure | Placeholder |
+| `aio-page-builder-settings` | Settings | Bootstrap / Admin | `manage_options` (placeholder) | Plugin settings, reporting disclosure; **Seed form section and request page template** (form-provider; nonce `aio_seed_form_templates`; capability TBD—align with registry management). See [form-provider-integration-contract.md](../../docs/contracts/form-provider-integration-contract.md). | Implemented (partial) |
 | `aio-page-builder-diagnostics` | Diagnostics | Bootstrap / Admin | `manage_options` (placeholder) | Environment status, validation summary | Placeholder |
 | `aio-page-builder-acf-diagnostics` | ACF Field Architecture | Domain: ACF / Diagnostics | `aio_view_logs` | Field-architecture health, registration status, assignment mismatches, LPagery compatibility, regeneration readiness; filtered views; repair entry (capability-gated) | Implemented |
 

@@ -32,6 +32,24 @@ The hierarchy role applied when a page is created from a page template (e.g. top
 **variation_family**  
 Optional sub-family for page template variants (e.g. conversion_01, conversion_02) within a **template_family**. Used in directory filtering and compare.
 
+**form provider**  
+An external plugin or service that provides forms (e.g. NDR Form Manager). Registered in Form_Provider_Registry with a provider_id, shortcode_tag, and id_attr. The AIO Page Builder stores **form_provider** and **form_id** in section field values and renders the form via the provider’s shortcode. See [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md).
+
+**form_provider**  
+Stable ACF field name: the provider identifier (e.g. `ndr_forms`) for a provider-backed form section. Must be registered in Form_Provider_Registry. Stored with **form_id** as the canonical storage contract for “which form to render.”
+
+**form_id**  
+Stable ACF field name: the form identifier within the provider (e.g. form post ID or slug). Stored with **form_provider**; format is provider-defined. Sanitized and validated before render or save.
+
+**form_embed**  
+Section template category (Section_Schema) for sections whose primary content is an embedded form. The **provider-backed** variant uses form_provider and form_id and renders via Form_Provider_Registry; other uses (e.g. free-text shortcode slot) may have different field semantics.
+
+**provider-backed form section**  
+A section template that uses **form_provider** and **form_id** to reference an external form and renders it via Form_Provider_Registry::build_shortcode(). Example: `form_section_ndr`. Governed by form-provider-integration-contract.
+
+**request-form page template**  
+A page template that includes one or more provider-backed form sections in its ordered_section_keys (e.g. `pt_request_form`). Structure is defined in the page template registry; the form provider does not define page structure.
+
 ---
 
 ## CTA-law and compliance terms
