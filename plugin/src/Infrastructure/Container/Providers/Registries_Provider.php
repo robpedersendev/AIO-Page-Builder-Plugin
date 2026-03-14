@@ -193,7 +193,9 @@ final class Registries_Provider implements Service_Provider_Interface {
 			return new Page_Template_Inventory_Appendix_Generator( $container->get( 'page_template_repository' ) );
 		} );
 		$container->register( 'template_recommendation_context_builder', function () use ( $container ): Template_Recommendation_Context_Builder {
-			return new Template_Recommendation_Context_Builder( $container->get( 'page_template_repository' ) );
+			$page_repo = $container->get( 'page_template_repository' );
+			$crawl_snapshot = $container->has( 'crawl_snapshot_service' ) ? $container->get( 'crawl_snapshot_service' ) : null;
+			return new Template_Recommendation_Context_Builder( $page_repo, $crawl_snapshot );
 		} );
 	}
 }

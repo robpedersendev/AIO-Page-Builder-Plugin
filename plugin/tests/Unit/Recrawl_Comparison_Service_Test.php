@@ -26,6 +26,7 @@ require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interfa
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_Table_Repository.php';
 require_once $plugin_root . '/src/Domain/Storage/Tables/Table_Names.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Payload_Builder.php';
+require_once $plugin_root . '/src/Domain/Crawler/Classification/Crawl_Template_Family_Matcher.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Repository.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Service.php';
 
@@ -86,7 +87,7 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 			(object) $this->page_record( 'https://example.com/only-new', 'meaningful' ),
 		);
 		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service() );
+		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
 		$result = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 1, $result->added_count );
@@ -106,7 +107,7 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 		$prior = array( $row );
 		$new   = array( clone $row );
 		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service() );
+		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
 		$result = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 0, $result->added_count );
@@ -120,7 +121,7 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 		$prior = array( (object) $this->page_record( 'https://example.com/page', 'low_value', 'Page' ) );
 		$new   = array( (object) $this->page_record( 'https://example.com/page', 'meaningful', 'Page' ) );
 		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service() );
+		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
 		$result = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 1, $result->changed_count );
@@ -133,7 +134,7 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 		$prior = array( (object) $this->page_record( 'https://example.com/page', 'meaningful', 'Old Title' ) );
 		$new   = array( (object) $this->page_record( 'https://example.com/page', 'meaningful', 'New Title' ) );
 		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service() );
+		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
 		$result = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 1, $result->changed_count );
@@ -150,7 +151,7 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 			(object) $this->page_record( 'https://example.com/b', 'meaningful' ),
 		);
 		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service() );
+		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
 		$result = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 1, $result->meaningful_count_prior );

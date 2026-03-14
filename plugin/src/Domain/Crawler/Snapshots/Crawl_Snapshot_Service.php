@@ -13,6 +13,8 @@ namespace AIOPageBuilder\Domain\Crawler\Snapshots;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Crawler\Classification\Classification_Result;
+use AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher;
+use AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Match_Result;
 use AIOPageBuilder\Domain\Crawler\Extraction\Extraction_Result;
 use AIOPageBuilder\Domain\Crawler\Profiles\Crawl_Profile_Service;
 
@@ -34,9 +36,17 @@ final class Crawl_Snapshot_Service {
 	/** @var Crawl_Profile_Service */
 	private $profile_service;
 
-	public function __construct( Crawl_Snapshot_Repository $repository, Crawl_Profile_Service $profile_service ) {
-		$this->repository      = $repository;
-		$this->profile_service  = $profile_service;
+	/** @var Crawl_Template_Family_Matcher */
+	private $template_family_matcher;
+
+	public function __construct(
+		Crawl_Snapshot_Repository $repository,
+		Crawl_Profile_Service $profile_service,
+		Crawl_Template_Family_Matcher $template_family_matcher
+	) {
+		$this->repository             = $repository;
+		$this->profile_service        = $profile_service;
+		$this->template_family_matcher = $template_family_matcher;
 	}
 
 	/**
@@ -222,6 +232,55 @@ final class Crawl_Snapshot_Service {
 			$overrides[ Crawl_Snapshot_Payload_Builder::PAGE_META_SNAPSHOT ] = $meta;
 		}
 		return $this->store_page_record( $crawl_run_id, $url, $overrides );
+	}
+
+	/**
+	 * Enriches a page snapshot with advisory template-family matching hints (Prompt 209).
+	 * Loads the page record, runs the matcher, persists the result into hierarchy_clues (merged with existing if present).
+	 *
+	 * @param string $crawl_run_id Crawl run identifier.
+	 * @param string $url          Normalized URL.
+	 * @return int Updated row id; 0 if page not found or save failed.
+	 */
+	public function enrich_page_with_template_hint( string $crawl_run_id, string $url ): int {
+		$page = $this->repository->get_by_run_and_url( $crawl_run_id, $url );
+		if ( $page === null ) {
+			return 0;
+		}
+		$match_result = $this->template_family_matcher->match( $page );
+		$existing_json = isset( $page['hierarchy_clues'] ) && $page['hierarchy_clues'] !== null && (string) $page['hierarchy_clues'] !== ''
+			? (string) $page['hierarchy_clues']
+			: null;
+		$merged = $this->merge_hierarchy_clues_with_hint( $existing_json, $match_result );
+		$overrides = array(
+			Crawl_Snapshot_Payload_Builder::PAGE_HIERARCHY_CLUES => $merged,
+		);
+		return $this->store_page_record( $crawl_run_id, $url, $overrides );
+	}
+
+	/**
+	 * Merges template-family hint payload into existing hierarchy_clues JSON, or returns new JSON.
+	 *
+	 * @param string|null                $existing_json Current hierarchy_clues value.
+	 * @param Crawl_Template_Match_Result $match_result  Matcher result to persist.
+	 * @return string JSON string for hierarchy_clues column.
+	 */
+	private function merge_hierarchy_clues_with_hint( ?string $existing_json, Crawl_Template_Match_Result $match_result ): string {
+		$hint_payload = $match_result->to_payload();
+		if ( $existing_json === null || trim( $existing_json ) === '' ) {
+			$json = \wp_json_encode( $hint_payload );
+			return is_string( $json ) ? $json : '{}';
+		}
+		$decoded = json_decode( $existing_json, true );
+		if ( ! is_array( $decoded ) ) {
+			$json = \wp_json_encode( $hint_payload );
+			return is_string( $json ) ? $json : '{}';
+		}
+		foreach ( $hint_payload as $key => $value ) {
+			$decoded[ $key ] = $value;
+		}
+		$json = \wp_json_encode( $decoded );
+		return is_string( $json ) ? $json : '{}';
 	}
 
 	/**

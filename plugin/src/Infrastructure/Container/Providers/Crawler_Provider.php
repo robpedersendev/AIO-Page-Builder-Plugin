@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher;
 use AIOPageBuilder\Domain\Crawler\Classification\Duplicate_Detector;
 use AIOPageBuilder\Domain\Crawler\Classification\Meaningful_Page_Classifier;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Discovery_Service;
@@ -40,10 +41,14 @@ final class Crawler_Provider implements Service_Provider_Interface {
 		$container->register( 'crawl_profile_service', function (): Crawl_Profile_Service {
 			return new Crawl_Profile_Service();
 		} );
+		$container->register( 'crawl_template_family_matcher', function (): Crawl_Template_Family_Matcher {
+			return new Crawl_Template_Family_Matcher();
+		} );
 		$container->register( 'crawl_snapshot_service', function () use ( $container ): Crawl_Snapshot_Service {
-			$repository = $container->get( 'crawl_snapshot_repository' );
-			$profile_service = $container->get( 'crawl_profile_service' );
-			return new Crawl_Snapshot_Service( $repository, $profile_service );
+			$repository   = $container->get( 'crawl_snapshot_repository' );
+			$profile      = $container->get( 'crawl_profile_service' );
+			$matcher      = $container->get( 'crawl_template_family_matcher' );
+			return new Crawl_Snapshot_Service( $repository, $profile, $matcher );
 		} );
 		$container->register( 'url_normalizer', function (): URL_Normalizer {
 			$home = \home_url( '/', 'https' );

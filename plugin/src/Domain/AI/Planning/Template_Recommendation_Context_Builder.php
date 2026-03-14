@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Domain\AI\Planning;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Match_Result;
+use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 use AIOPageBuilder\Domain\Registries\Shared\Deprecation_Metadata;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
@@ -44,16 +46,20 @@ final class Template_Recommendation_Context_Builder {
 	/** @var Page_Template_Repository */
 	private Page_Template_Repository $page_template_repository;
 
-	public function __construct( Page_Template_Repository $page_template_repository ) {
+	/** @var Crawl_Snapshot_Service|null Optional; when set, build() can attach crawl_page_hints when options['crawl_run_id'] is provided (Prompt 209). */
+	private ?Crawl_Snapshot_Service $crawl_snapshot_service;
+
+	public function __construct( Page_Template_Repository $page_template_repository, ?Crawl_Snapshot_Service $crawl_snapshot_service = null ) {
 		$this->page_template_repository = $page_template_repository;
+		$this->crawl_snapshot_service   = $crawl_snapshot_service;
 	}
 
 	/**
 	 * Builds template recommendation context for planning (input artifact registry or prompt context).
 	 * Only active, non-deprecated templates; capped count. Safe for inclusion in artifact (no secrets).
 	 *
-	 * @param array<string, mixed> $options Optional: max_templates (int), template_category_class (string), template_family (string).
-	 * @return array{template_recommendation_context: list<array<string, mixed>>, total_active: int}
+	 * @param array<string, mixed> $options Optional: max_templates (int), template_category_class (string), template_family (string), crawl_run_id (string) to attach crawl_page_hints from snapshot hierarchy_clues.
+	 * @return array{template_recommendation_context: list<array<string, mixed>>, total_active: int, crawl_page_hints?: list<array<string, mixed>>}
 	 */
 	public function build( array $options = array() ): array {
 		$max = (int) ( $options['max_templates'] ?? self::DEFAULT_MAX_TEMPLATES );
@@ -83,10 +89,45 @@ final class Template_Recommendation_Context_Builder {
 				break;
 			}
 		}
-		return array(
+		$out = array(
 			'template_recommendation_context' => $list,
 			'total_active'                   => count( $list ),
 		);
+		$crawl_run_id = isset( $options['crawl_run_id'] ) ? (string) $options['crawl_run_id'] : '';
+		if ( $crawl_run_id !== '' && $this->crawl_snapshot_service !== null ) {
+			$out['crawl_page_hints'] = $this->load_crawl_page_hints( $crawl_run_id );
+		}
+		return $out;
+	}
+
+	/**
+	 * Loads crawl snapshot pages for a run and extracts template-family hints from hierarchy_clues (Prompt 209).
+	 *
+	 * @param string $crawl_run_id
+	 * @return list<array<string, mixed>> Each item: url, crawl_template_family_hint, section_family_match_summary, page_rebuild_signal_summary.
+	 */
+	private function load_crawl_page_hints( string $crawl_run_id ): array {
+		$pages = $this->crawl_snapshot_service->list_pages_by_run( $crawl_run_id, 'completed', 500, 0 );
+		$hints = array();
+		foreach ( $pages as $page ) {
+			$url = (string) ( $page['url'] ?? '' );
+			if ( $url === '' ) {
+				continue;
+			}
+			$payload = Crawl_Template_Match_Result::from_hierarchy_clues_json(
+				isset( $page['hierarchy_clues'] ) ? (string) $page['hierarchy_clues'] : null
+			);
+			if ( $payload === null ) {
+				continue;
+			}
+			$hints[] = array(
+				'url'                          => $url,
+				'crawl_template_family_hint'   => $payload['crawl_template_family_hint'] ?? array(),
+				'section_family_match_summary' => $payload['section_family_match_summary'] ?? array(),
+				'page_rebuild_signal_summary'  => $payload['page_rebuild_signal_summary'] ?? array(),
+			);
+		}
+		return $hints;
 	}
 
 	/**
