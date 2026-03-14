@@ -233,7 +233,8 @@ final class Bulk_Executor {
 	}
 
 	/**
-	 * Builds a single finalization envelope for the plan (spec §37, §40.1). Plan-level action; no plan_item_id.
+	 * Builds a single finalization envelope for the plan (spec §37, §40.1, §59.10; Prompt 208). Plan-level action; no plan_item_id.
+	 * Consumed by Finalization_Job_Service which produces template-aware finalization_summary, run_completion_state, and closure record.
 	 *
 	 * @param string               $plan_id       Plan ID (internal key).
 	 * @param array<string, mixed> $definition    Full plan definition (for approval state).

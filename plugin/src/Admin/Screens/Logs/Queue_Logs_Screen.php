@@ -98,6 +98,7 @@ final class Queue_Logs_Screen {
 	private function build_state(): array {
 		$job_repo = null;
 		$ai_repo  = null;
+		$plan_repo = null;
 		if ( $this->container ) {
 			if ( $this->container->has( 'job_queue_repository' ) ) {
 				$job_repo = $this->container->get( 'job_queue_repository' );
@@ -105,8 +106,11 @@ final class Queue_Logs_Screen {
 			if ( $this->container->has( 'ai_run_repository' ) ) {
 				$ai_repo = $this->container->get( 'ai_run_repository' );
 			}
+			if ( $this->container->has( 'build_plan_repository' ) ) {
+				$plan_repo = $this->container->get( 'build_plan_repository' );
+			}
 		}
-		$builder = new Logs_Monitoring_State_Builder( $job_repo, $ai_repo );
+		$builder = new Logs_Monitoring_State_Builder( $job_repo, $ai_repo, $plan_repo );
 		return $builder->build();
 	}
 

@@ -91,6 +91,14 @@ final class Finalization_Step_UI_Service {
 			array( 'severity' => 'info', 'message' => \__( 'Review approved items and confirm when ready. Execution is not performed in this step.', 'aio-page-builder' ), 'level' => 'step' ),
 		);
 
+		$plan_status = (string) ( $plan_definition[ Build_Plan_Schema::KEY_STATUS ] ?? '' );
+		$run_completion_state = '';
+		$finalization_summary = null;
+		if ( $plan_status === Build_Plan_Schema::STATUS_COMPLETED ) {
+			$run_completion_state = isset( $plan_definition['run_completion_state'] ) && is_string( $plan_definition['run_completion_state'] ) ? $plan_definition['run_completion_state'] : '';
+			$finalization_summary = isset( $plan_definition['finalization_summary'] ) && is_array( $plan_definition['finalization_summary'] ) ? $plan_definition['finalization_summary'] : ( isset( $plan_definition['completion_summary'] ) && is_array( $plan_definition['completion_summary'] ) ? $plan_definition['completion_summary'] : null );
+		}
+
 		return array(
 			'step_list_rows'              => $step_list_rows,
 			'column_order'                => $column_order,
@@ -100,6 +108,8 @@ final class Finalization_Step_UI_Service {
 			'finalization_buckets'        => $finalization_buckets,
 			'conflict_summary_placeholder' => $conflict_summary_placeholder,
 			'preview_link_placeholder'    => $preview_link_placeholder,
+			'run_completion_state'        => $run_completion_state,
+			'finalization_summary'         => $finalization_summary,
 		);
 	}
 
@@ -118,6 +128,8 @@ final class Finalization_Step_UI_Service {
 			'finalization_buckets'        => array( 'publish_ready' => 0, 'blocked' => 0, 'failed' => 0, 'deferred' => 0 ),
 			'conflict_summary_placeholder' => array( 'count' => 0, 'messages' => array() ),
 			'preview_link_placeholder'    => array( 'url' => '', 'label' => '' ),
+			'run_completion_state'        => '',
+			'finalization_summary'         => null,
 		);
 	}
 }

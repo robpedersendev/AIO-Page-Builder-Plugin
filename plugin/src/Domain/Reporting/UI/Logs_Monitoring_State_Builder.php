@@ -21,6 +21,7 @@ use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Builds monitoring view state from queue repository, AI run repository, and options.
+ * When build_plan_repository is provided, finalize_plan execution log rows include run_completion_state (Prompt 208).
  */
 final class Logs_Monitoring_State_Builder {
 
@@ -36,9 +37,17 @@ final class Logs_Monitoring_State_Builder {
 	/** @var object|null AI run repository (list_recent). */
 	private $ai_run_repository;
 
-	public function __construct( ?object $job_queue_repository = null, ?object $ai_run_repository = null ) {
-		$this->job_queue_repository = $job_queue_repository;
-		$this->ai_run_repository     = $ai_run_repository;
+	/** @var object|null Build plan repository (get_by_key, get_plan_definition); for run_completion_state on finalize_plan rows. */
+	private $build_plan_repository;
+
+	public function __construct(
+		?object $job_queue_repository = null,
+		?object $ai_run_repository = null,
+		?object $build_plan_repository = null
+	) {
+		$this->job_queue_repository   = $job_queue_repository;
+		$this->ai_run_repository      = $ai_run_repository;
+		$this->build_plan_repository   = $build_plan_repository;
 	}
 
 	/**
@@ -244,15 +253,21 @@ final class Logs_Monitoring_State_Builder {
 
 	/**
 	 * @param array<string, mixed> $row
-	 * @return array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, can_cancel: bool}
+	 * @return array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, can_cancel: bool, run_completion_state?: string}
 	 */
 	private function normalize_queue_row( array $row ): array {
 		$related = (string) ( $row['related_object_refs'] ?? '' );
 		$plan_id = '';
-		if ( $related !== '' && preg_match( '/plan[_\s]?id[=:]\s*([a-zA-Z0-9_-]+)/i', $related, $m ) ) {
-			$plan_id = $m[1];
-		} elseif ( $related !== '' ) {
-			$plan_id = trim( substr( $related, 0, 64 ) );
+		if ( $related !== '' ) {
+			$decoded = json_decode( $related, true );
+			if ( is_array( $decoded ) && isset( $decoded['plan_id'] ) && is_string( $decoded['plan_id'] ) ) {
+				$plan_id = trim( $decoded['plan_id'] );
+			}
+			if ( $plan_id === '' && preg_match( '/plan[_\s]?id[=:]\s*([a-zA-Z0-9_-]+)/i', $related, $m ) ) {
+				$plan_id = $m[1];
+			} elseif ( $plan_id === '' ) {
+				$plan_id = trim( substr( $related, 0, 64 ) );
+			}
 		}
 		$queue_status = (string) ( $row['queue_status'] ?? '' );
 		$job_type     = (string) ( $row['job_type'] ?? '' );
@@ -262,16 +277,28 @@ final class Logs_Monitoring_State_Builder {
 			&& in_array( $job_type, self::RETRYABLE_JOB_TYPES, true );
 		$can_cancel = in_array( $queue_status, array( 'pending', 'retrying', 'running', 'failed' ), true );
 
-		return array(
-			'job_ref'        => (string) ( $row['job_ref'] ?? '' ),
-			'job_type'       => $job_type,
-			'queue_status'   => $queue_status,
-			'created_at'     => (string) ( $row['created_at'] ?? '' ),
-			'completed_at'   => (string) ( $row['completed_at'] ?? '' ),
-			'failure_reason' => (string) ( $row['failure_reason'] ?? '' ),
+		$out = array(
+			'job_ref'         => (string) ( $row['job_ref'] ?? '' ),
+			'job_type'        => $job_type,
+			'queue_status'    => $queue_status,
+			'created_at'      => (string) ( $row['created_at'] ?? '' ),
+			'completed_at'    => (string) ( $row['completed_at'] ?? '' ),
+			'failure_reason'  => (string) ( $row['failure_reason'] ?? '' ),
 			'related_plan_id' => $plan_id,
-			'retry_eligible' => $retry_eligible,
-			'can_cancel'     => $can_cancel,
+			'retry_eligible'  => $retry_eligible,
+			'can_cancel'      => $can_cancel,
 		);
+
+		if ( $job_type === 'finalize_plan' && $plan_id !== '' && $this->build_plan_repository !== null && method_exists( $this->build_plan_repository, 'get_by_key' ) && method_exists( $this->build_plan_repository, 'get_plan_definition' ) ) {
+			$record = $this->build_plan_repository->get_by_key( $plan_id );
+			if ( is_array( $record ) && isset( $record['id'] ) && is_numeric( $record['id'] ) ) {
+				$definition = $this->build_plan_repository->get_plan_definition( (int) $record['id'] );
+				if ( isset( $definition['run_completion_state'] ) && is_string( $definition['run_completion_state'] ) ) {
+					$out['run_completion_state'] = $definition['run_completion_state'];
+				}
+			}
+		}
+
+		return $out;
 	}
 }

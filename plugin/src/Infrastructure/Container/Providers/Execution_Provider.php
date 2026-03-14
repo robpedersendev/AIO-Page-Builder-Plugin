@@ -23,6 +23,7 @@ use AIOPageBuilder\Domain\Execution\Jobs\Create_Page_Job_Service;
 use AIOPageBuilder\Domain\Execution\Pages\Bulk_Template_Page_Build_Service;
 use AIOPageBuilder\Domain\Execution\Pages\Template_Page_Build_Service;
 use AIOPageBuilder\Domain\Execution\Pages\Template_Page_Replacement_Service;
+use AIOPageBuilder\Domain\Execution\Finalize\Template_Finalization_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Finalization_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Menu_Change_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Replace_Page_Job_Service;
@@ -106,8 +107,14 @@ final class Execution_Provider implements Service_Provider_Interface {
 		$container->register( 'token_set_job_service', function (): Token_Set_Job_Service {
 			return new Token_Set_Job_Service();
 		} );
+		$container->register( 'template_finalization_service', function (): Template_Finalization_Service {
+			return new Template_Finalization_Service();
+		} );
 		$container->register( 'finalization_job_service', function () use ( $container ): Finalization_Job_Service {
-			return new Finalization_Job_Service( $container->get( 'build_plan_repository' ) );
+			return new Finalization_Job_Service(
+				$container->get( 'build_plan_repository' ),
+				$container->get( 'template_finalization_service' )
+			);
 		} );
 		$container->register( 'operational_snapshot_repository', function (): Operational_Snapshot_Repository {
 			return new Operational_Snapshot_Repository();

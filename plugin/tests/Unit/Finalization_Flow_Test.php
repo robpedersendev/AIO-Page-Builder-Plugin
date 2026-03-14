@@ -19,6 +19,7 @@ use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
 use AIOPageBuilder\Domain\Execution\Handlers\Finalize_Plan_Handler;
 use AIOPageBuilder\Domain\Execution\Jobs\Finalization_Job_Service;
 use AIOPageBuilder\Domain\Execution\Jobs\Finalization_Result;
+use AIOPageBuilder\Domain\Execution\Finalize\Template_Finalization_Service;
 use AIOPageBuilder\Domain\Execution\Queue\Bulk_Executor;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository_Interface;
 use PHPUnit\Framework\TestCase;
@@ -37,6 +38,8 @@ require_once $plugin_root . '/src/Domain/Execution/Jobs/Finalization_Result.php'
 require_once $plugin_root . '/src/Domain/Execution/Jobs/Finalization_Job_Service.php';
 require_once $plugin_root . '/src/Domain/Execution/Handlers/Finalize_Plan_Handler.php';
 require_once $plugin_root . '/src/Domain/Execution/Queue/Bulk_Executor.php';
+require_once $plugin_root . '/src/Domain/Execution/Finalize/Template_Finalization_Result.php';
+require_once $plugin_root . '/src/Domain/Execution/Finalize/Template_Finalization_Service.php';
 
 /**
  * Stub Build Plan Repository for finalization tests (implements Build_Plan_Repository_Interface).
@@ -294,5 +297,42 @@ final class Finalization_Flow_Test extends TestCase {
 		$this->assertSame( 2, $summary['published'] );
 		$this->assertSame( 1, $summary['completed_without_publication'] );
 		$this->assertSame( 0, $summary['blocked'] );
+	}
+
+	/** With Template_Finalization_Service injected, success artifacts include finalization_summary and run_completion_state (Prompt 208). */
+	public function test_finalization_job_service_with_template_service_includes_finalization_summary(): void {
+		$repo = new Stub_Build_Plan_Repository_Finalization();
+		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo->get_plan_definition_return = array(
+			Build_Plan_Schema::KEY_STATUS => Build_Plan_Schema::STATUS_APPROVED,
+			Build_Plan_Schema::KEY_STEPS  => array(
+				array(
+					Build_Plan_Item_Schema::KEY_ITEMS => array(
+						array(
+							Build_Plan_Item_Schema::KEY_ITEM_ID   => 'item-1',
+							Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE,
+							Build_Plan_Item_Schema::KEY_STATUS     => Build_Plan_Item_Statuses::COMPLETED,
+						),
+					),
+				),
+			),
+		);
+		$template_svc = new Template_Finalization_Service();
+		$svc = new Finalization_Job_Service( $repo, $template_svc );
+		$env = array(
+			Execution_Action_Contract::ENVELOPE_PLAN_ID => 'plan-tpl',
+			Execution_Action_Contract::ENVELOPE_ACTOR_CONTEXT => array( Execution_Action_Contract::ACTOR_ACTOR_ID => 'user:1' ),
+		);
+		$result = $svc->run( $env );
+		$this->assertTrue( $result->is_success() );
+		$artifacts = $result->get_artifacts();
+		$this->assertArrayHasKey( 'finalization_summary', $artifacts );
+		$this->assertArrayHasKey( 'run_completion_state', $artifacts );
+		$this->assertArrayHasKey( 'template_execution_closure_record', $artifacts );
+		$this->assertSame( 'complete', $artifacts['run_completion_state'] );
+		$this->assertSame( 1, $artifacts['finalization_summary']['created'] ?? 0 );
+		$def = $repo->last_save['definition'];
+		$this->assertArrayHasKey( 'run_completion_state', $def );
+		$this->assertSame( 'complete', $def['run_completion_state'] );
 	}
 }

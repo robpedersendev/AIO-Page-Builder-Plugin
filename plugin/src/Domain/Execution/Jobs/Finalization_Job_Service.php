@@ -1,9 +1,11 @@
 <?php
 /**
- * Finalization execution: publish-ready validation, conflict detection, publish/complete, plan state update (spec §37, §40.10; Prompt 084).
+ * Finalization execution: publish-ready validation, conflict detection, publish/complete, plan state update (spec §37, §40.10, §59.10; Prompt 084, 208).
  *
  * Validates publish readiness; detects conflicts; performs publish transitions for page items
  * with execution_artifact; updates Build Plan to completed with completion summary.
+ * Uses Template_Finalization_Service for finalization_summary, template_execution_closure_record,
+ * run_completion_state, and one_pager_retention_summary when available.
  *
  * @package AIOPageBuilder
  */
@@ -18,6 +20,7 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract;
+use AIOPageBuilder\Domain\Execution\Finalize\Template_Finalization_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository_Interface;
 
 /**
@@ -34,8 +37,15 @@ final class Finalization_Job_Service {
 	/** @var Build_Plan_Repository_Interface */
 	private $plan_repository;
 
-	public function __construct( Build_Plan_Repository_Interface $plan_repository ) {
+	/** @var Template_Finalization_Service|null */
+	private $template_finalization_service;
+
+	public function __construct(
+		Build_Plan_Repository_Interface $plan_repository,
+		?Template_Finalization_Service $template_finalization_service = null
+	) {
 		$this->plan_repository = $plan_repository;
+		$this->template_finalization_service = $template_finalization_service;
 	}
 
 	/**
@@ -76,6 +86,11 @@ final class Finalization_Job_Service {
 
 		$counts = $this->count_items_by_outcome( $definition );
 		$conflicts = $this->detect_conflicts( $definition );
+
+		$template_result = $this->template_finalization_service !== null
+			? $this->template_finalization_service->build( $definition, $conflicts )
+			: null;
+
 		if ( ! empty( $conflicts ) ) {
 			$summary = array(
 				'published'                        => 0,
@@ -85,15 +100,22 @@ final class Finalization_Job_Service {
 				'failed'                           => $counts['failed'],
 			);
 			$actor_ref = $this->resolve_actor_ref( $envelope );
+			$artifacts = array(
+				'completion_summary' => $summary,
+				'conflicts'         => $conflicts,
+				'finalized_at'      => '',
+				'actor_ref'         => $actor_ref,
+			);
+			if ( $template_result !== null ) {
+				$artifacts['finalization_summary']              = $template_result->get_finalization_summary();
+				$artifacts['template_execution_closure_record'] = $template_result->get_template_execution_closure_record();
+				$artifacts['run_completion_state']              = $template_result->get_run_completion_state();
+				$artifacts['one_pager_retention_summary']       = $template_result->get_one_pager_retention_summary();
+			}
 			return Finalization_Result::failure(
 				__( 'Conflicts detected; finalization blocked.', 'aio-page-builder' ),
 				array( 'conflicts_block' ),
-				array(
-					'completion_summary' => $summary,
-					'conflicts'         => $conflicts,
-					'finalized_at'      => '',
-					'actor_ref'         => $actor_ref,
-				)
+				$artifacts
 			);
 		}
 
@@ -111,14 +133,26 @@ final class Finalization_Job_Service {
 			'denied'                           => $counts['rejected'],
 			'failed'                           => $counts['failed'],
 		);
+
+		if ( $template_result !== null ) {
+			$definition['finalization_summary']              = $template_result->get_finalization_summary();
+			$definition['template_execution_closure_record'] = $template_result->get_template_execution_closure_record();
+			$definition['run_completion_state']              = $template_result->get_run_completion_state();
+			$definition['one_pager_retention_summary']       = $template_result->get_one_pager_retention_summary();
+		}
+
 		if ( ! isset( $definition['finalization_history'] ) || ! is_array( $definition['finalization_history'] ) ) {
 			$definition['finalization_history'] = array();
 		}
-		$definition['finalization_history'][] = array(
+		$history_entry = array(
 			'finalized_at' => $finalized_at,
 			'actor_ref'    => $actor_ref,
 			'completion_summary' => $definition['completion_summary'],
 		);
+		if ( $template_result !== null ) {
+			$history_entry['run_completion_state'] = $template_result->get_run_completion_state();
+		}
+		$definition['finalization_history'][] = $history_entry;
 
 		$saved = $this->plan_repository->save_plan_definition( $plan_post_id, $definition );
 		if ( ! $saved ) {
@@ -126,7 +160,14 @@ final class Finalization_Job_Service {
 		}
 
 		$summary = $definition['completion_summary'];
-		return Finalization_Result::success( $finalized_at, $summary, array(), $actor_ref );
+		$extra = array();
+		if ( $template_result !== null ) {
+			$extra['finalization_summary']              = $template_result->get_finalization_summary();
+			$extra['template_execution_closure_record'] = $template_result->get_template_execution_closure_record();
+			$extra['run_completion_state']              = $template_result->get_run_completion_state();
+			$extra['one_pager_retention_summary']       = $template_result->get_one_pager_retention_summary();
+		}
+		return Finalization_Result::success( $finalized_at, $summary, array(), $actor_ref, $extra );
 	}
 
 	/**
