@@ -17,6 +17,7 @@ use AIOPageBuilder\Domain\ACF\Assignment\Page_Field_Group_Assignment_Service_Int
 use AIOPageBuilder\Domain\ACF\Blueprints\Field_Blueprint_Schema;
 use AIOPageBuilder\Domain\ACF\Blueprints\Field_Key_Generator;
 use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service_Interface;
+use AIOPageBuilder\Domain\ACF\Debug\ACF_Local_JSON_Mirror_Service;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Registrar_Interface;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
@@ -51,13 +52,21 @@ final class ACF_Regeneration_Service {
 	/** @var Page_Template_Repository_Interface */
 	private Page_Template_Repository_Interface $page_template_repository;
 
+	/** @var ACF_Local_JSON_Mirror_Service|null Optional mirror refresh after repair (Prompt 224). */
+	private ?ACF_Local_JSON_Mirror_Service $mirror_service = null;
+
+	/** @var string|null Path to refresh mirror after successful repair when mirror_service is set. */
+	private ?string $mirror_refresh_path = null;
+
 	public function __construct(
 		Section_Field_Blueprint_Service_Interface $blueprint_service,
 		ACF_Group_Registrar_Interface $group_registrar,
 		Page_Field_Group_Assignment_Service_Interface $page_assignment_service,
 		Assignment_Map_Service_Interface $assignment_map,
 		Section_Template_Repository_Interface $section_repository,
-		Page_Template_Repository_Interface $page_template_repository
+		Page_Template_Repository_Interface $page_template_repository,
+		?ACF_Local_JSON_Mirror_Service $mirror_service = null,
+		?string $mirror_refresh_path = null
 	) {
 		$this->blueprint_service         = $blueprint_service;
 		$this->group_registrar           = $group_registrar;
@@ -65,6 +74,8 @@ final class ACF_Regeneration_Service {
 		$this->assignment_map            = $assignment_map;
 		$this->section_repository        = $section_repository;
 		$this->page_template_repository  = $page_template_repository;
+		$this->mirror_service            = $mirror_service;
+		$this->mirror_refresh_path       = $mirror_refresh_path !== '' ? $mirror_refresh_path : null;
 	}
 
 	/**
@@ -160,6 +171,10 @@ final class ACF_Regeneration_Service {
 			} elseif ( ( $m['status'] ?? '' ) === ACF_Regeneration_Plan::MISMATCH_STATUS_VERSION_STALE ) {
 				++$version_stale_count;
 			}
+		}
+
+		if ( $this->mirror_service !== null && $this->mirror_refresh_path !== null && ( $groups_regenerated > 0 || $page_repaired > 0 ) ) {
+			$this->mirror_service->generate_mirror_to_directory( $this->mirror_refresh_path );
 		}
 
 		return new ACF_Regeneration_Result(

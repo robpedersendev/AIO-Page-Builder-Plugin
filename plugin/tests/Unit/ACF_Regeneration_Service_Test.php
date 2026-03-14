@@ -16,6 +16,9 @@ use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Registrar_Interface;
 use AIOPageBuilder\Domain\ACF\Repair\ACF_Regeneration_Plan;
 use AIOPageBuilder\Domain\ACF\Repair\ACF_Regeneration_Result;
 use AIOPageBuilder\Domain\ACF\Repair\ACF_Regeneration_Service;
+use AIOPageBuilder\Domain\ACF\Debug\ACF_Local_JSON_Mirror_Service;
+use AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder;
+use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Map_Service_Interface;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Types;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository_Interface;
@@ -25,6 +28,8 @@ use PHPUnit\Framework\TestCase;
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Bootstrap/Constants.php';
+\AIOPageBuilder\Bootstrap\Constants::init();
 require_once $plugin_root . '/src/Domain/ACF/Blueprints/Field_Blueprint_Schema.php';
 require_once $plugin_root . '/src/Domain/ACF/Blueprints/Field_Key_Generator.php';
 require_once $plugin_root . '/src/Domain/ACF/Blueprints/Section_Field_Blueprint_Validator.php';
@@ -53,6 +58,8 @@ require_once $plugin_root . '/src/Domain/ACF/Registration/ACF_Group_Builder.php'
 require_once $plugin_root . '/src/Domain/ACF/Registration/ACF_Group_Registrar.php';
 require_once $plugin_root . '/src/Domain/ACF/Assignment/Page_Field_Group_Assignment_Service_Interface.php';
 require_once $plugin_root . '/src/Domain/ACF/Assignment/Page_Field_Group_Assignment_Service.php';
+require_once $plugin_root . '/src/Infrastructure/Config/Versions.php';
+require_once $plugin_root . '/src/Domain/ACF/Debug/ACF_Local_JSON_Mirror_Service.php';
 
 final class ACF_Regeneration_Service_Test extends TestCase {
 
@@ -281,5 +288,49 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 		$this->assertContains( 'st01_hero', $section_keys );
 		$this->assertContains( 'st02_hero_alt', $section_keys );
 		$this->assertNotContains( 'st_faq', $section_keys );
+	}
+
+	/**
+	 * When mirror service and path are provided and execute_repair regenerates groups, mirror is refreshed (Prompt 224).
+	 */
+	public function test_execute_repair_refreshes_mirror_when_provided_and_repair_did_work(): void {
+		$blueprint_service = $this->create_blueprint_service_mock( array( $this->blueprint_st01() ) );
+		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$registrar->method( 'register_blueprint' )->willReturn( true );
+		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$assignment_map = $this->create_assignment_map_mock( array(), array() );
+		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
+		$page_repo = $this->createMock( Page_Template_Repository_Interface::class );
+
+		$group_builder = new ACF_Group_Builder( new ACF_Field_Builder() );
+		$mirror = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$mirror_refresh_path = sys_get_temp_dir() . '/aio-regen-mirror-' . uniqid( '', true );
+		$this->assertTrue( mkdir( $mirror_refresh_path, 0755, true ), 'Temp mirror dir must be created' );
+
+		try {
+			$service = new ACF_Regeneration_Service(
+				$blueprint_service,
+				$registrar,
+				$assignment_svc,
+				$assignment_map,
+				$section_repo,
+				$page_repo,
+				$mirror,
+				$mirror_refresh_path
+			);
+
+			$plan = $service->build_plan( false, ACF_Regeneration_Plan::SCOPE_FULL, array() );
+			$result = $service->execute_repair( $plan );
+
+			$this->assertSame( 1, $result->get_groups_regenerated() );
+			$this->assertFileExists( $mirror_refresh_path . '/group_aio_st01_hero.json', 'Mirror must be written after repair' );
+		} finally {
+			if ( is_dir( $mirror_refresh_path ) ) {
+				foreach ( glob( $mirror_refresh_path . '/*' ) ?: array() as $f ) {
+					@unlink( $f );
+				}
+				@rmdir( $mirror_refresh_path );
+			}
+		}
 	}
 }

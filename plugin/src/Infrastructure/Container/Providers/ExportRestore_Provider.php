@@ -118,6 +118,7 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'export_generator', function () use ( $container ): Export_Generator {
 			$template_library_validator = $container->has( 'template_library_export_validator' ) ? $container->get( 'template_library_export_validator' ) : null;
+			$acf_mirror_service = $container->has( 'acf_local_json_mirror_service' ) ? $container->get( 'acf_local_json_mirror_service' ) : null;
 			return new Export_Generator(
 				$container->get( 'plugin_path_manager' ),
 				$container->get( 'settings' ),
@@ -129,7 +130,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'export_zip_packager' ),
 				$container->has( 'logger' ) ? $container->get( 'logger' ) : null,
 				$container->get( 'support_package_generator' ),
-				$template_library_validator
+				$template_library_validator,
+				$acf_mirror_service
 			);
 		} );
 		$container->register( 'uninstall_cleanup_service', function (): Uninstall_Cleanup_Service {

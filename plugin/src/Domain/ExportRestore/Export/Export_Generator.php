@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Domain\ExportRestore\Export;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\ACF\Debug\ACF_Local_JSON_Mirror_Service;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Bundle_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Mode_Keys;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Export_Validator;
@@ -65,6 +66,9 @@ final class Export_Generator {
 	/** @var Template_Library_Export_Validator|null Template-library coherence validation (Prompt 185). */
 	private ?Template_Library_Export_Validator $template_library_export_validator;
 
+	/** @var ACF_Local_JSON_Mirror_Service|null Optional ACF field groups mirror for debug/support export (Prompt 224). */
+	private ?ACF_Local_JSON_Mirror_Service $acf_mirror_service;
+
 	public function __construct(
 		Plugin_Path_Manager $path_manager,
 		Settings_Service $settings,
@@ -76,7 +80,8 @@ final class Export_Generator {
 		Export_Zip_Packager $packager,
 		?Logger_Interface $logger = null,
 		?Support_Package_Generator $support_package_generator = null,
-		?Template_Library_Export_Validator $template_library_export_validator = null
+		?Template_Library_Export_Validator $template_library_export_validator = null,
+		?ACF_Local_JSON_Mirror_Service $acf_mirror_service = null
 	) {
 		$this->path_manager                       = $path_manager;
 		$this->settings                           = $settings;
@@ -89,6 +94,7 @@ final class Export_Generator {
 		$this->logger                             = $logger;
 		$this->support_package_generator          = $support_package_generator;
 		$this->template_library_export_validator  = $template_library_export_validator;
+		$this->acf_mirror_service                 = $acf_mirror_service;
 	}
 
 	/**
@@ -254,7 +260,7 @@ final class Export_Generator {
 				break;
 			case Export_Mode_Keys::SUPPORT_BUNDLE:
 				$redact = true;
-				$optional_allowed = array( 'logs', 'reporting_history' );
+				$optional_allowed = array( 'logs', 'reporting_history', 'acf_field_groups_mirror' );
 				$excluded = array( 'raw_ai_artifacts', 'normalized_ai_outputs', 'crawl_snapshots', 'rollback_snapshots' );
 				break;
 			case Export_Mode_Keys::TEMPLATE_ONLY_EXPORT:
@@ -338,6 +344,11 @@ final class Export_Generator {
 		if ( in_array( 'uninstall_restore_metadata', $included, true ) ) {
 			$prefs = $this->settings->get( Option_Names::UNINSTALL_PREFS );
 			$this->write_json_dir( $staging_dir . 'settings', 'uninstall_restore_metadata.json', $prefs );
+		}
+		if ( in_array( 'acf_field_groups_mirror', $included, true ) && $this->acf_mirror_service !== null ) {
+			$mirror_dir = $staging_dir . 'acf_field_groups_mirror';
+			$manifest = $this->acf_mirror_service->generate_mirror_to_directory( $mirror_dir );
+			$this->write_json_file( $mirror_dir . '/manifest.json', $manifest );
 		}
 	}
 

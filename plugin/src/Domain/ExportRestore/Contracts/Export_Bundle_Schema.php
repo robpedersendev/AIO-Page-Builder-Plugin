@@ -51,6 +51,7 @@ final class Export_Bundle_Schema {
 		'logs',
 		'reporting_history',
 		'rollback_snapshots',
+		'acf_field_groups_mirror',
 	);
 
 	/** Permanently excluded; must never appear in export (spec §52.6). */
@@ -74,6 +75,7 @@ final class Export_Bundle_Schema {
 		'artifacts',
 		'logs',
 		'docs',
+		'acf_field_groups_mirror',
 	);
 
 	/**
