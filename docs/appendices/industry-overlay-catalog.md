@@ -43,7 +43,9 @@ Base section helpers live in the Documentation_Registry (section_template_key in
 
 - **Registry**: Industry_Page_OnePager_Overlay_Registry. Keyed by industry_key + page_template_key.
 - **Industries**: cosmetology_nail, realtor, plumber, disaster_recovery.
-- **Page families covered**: Home (pt_home_conversion_01), About (pt_about_story_01), Contact (pt_contact_request_01), Services (pt_services_overview_01).
+- **Page families covered (seeded)**: Home (pt_home_conversion_01), About (pt_about_story_01), Contact (pt_contact_request_01), Services (pt_services_overview_01).
+- **Pending families**: See [industry-page-overlay-coverage-matrix.md](industry-page-overlay-coverage-matrix.md) (booking, valuation, emergency/local, neighborhood, gallery, financing, trust/certification).
+- **Expansion**: [industry-page-onepager-overlay-expansion-plan.md](../operations/industry-page-onepager-overlay-expansion-plan.md).
 - **Source directory**: `plugin/src/Domain/Industry/Docs/PageOnePagerOverlays/`.
 - **Loading**: `Industry_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions()`. Bootstrap registers under `CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY`.
 - **Allowed regions**: hierarchy_hints, cta_strategy, lpagery_seo_notes, compliance_cautions, additive_blocks. Base one-pager content_body unchanged.

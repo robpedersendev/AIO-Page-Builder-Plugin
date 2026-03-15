@@ -78,6 +78,8 @@ final class Section_Template_Detail_Screen {
 			}
 		}
 
+		$state = $this->merge_industry_preview_state( $state );
+
 		?>
 		<div class="wrap aio-page-builder-screen aio-section-template-detail" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<?php $this->render_breadcrumbs( $state['breadcrumbs'] ); ?>
@@ -200,6 +202,12 @@ final class Section_Template_Detail_Screen {
 					<p><span class="aio-helper-ref" title="<?php echo \esc_attr( $helper_ref ); ?>"><?php echo \esc_html( $helper_ref ); ?></span></p>
 				<?php endif; ?>
 			<?php endif; ?>
+			<?php
+			$industry_preview = $state['industry_preview'] ?? null;
+			if ( \is_array( $industry_preview ) && ! empty( $industry_preview['has_industry'] ) ) {
+				$this->render_industry_preview_block( $industry_preview );
+			}
+			?>
 			<?php if ( \is_array( $compat ) && count( $compat ) > 0 ) : ?>
 				<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Compatibility notes', 'aio-page-builder' ); ?></h3>
 				<ul class="aio-compatibility-list">
@@ -431,6 +439,86 @@ final class Section_Template_Detail_Screen {
 		$ui_builder  = new Entity_Style_UI_State_Builder( $form_builder, $payload_repo );
 		$result_obj  = $last_result instanceof \AIOPageBuilder\Domain\Styling\Style_Validation_Result ? $last_result : null;
 		return $ui_builder->build_state( 'section_template', $section_key, $result_obj );
+	}
+
+	/**
+	 * Merges industry-aware preview view model into state when resolver is available (Prompt 384).
+	 *
+	 * @param array<string, mixed> $state
+	 * @return array<string, mixed>
+	 */
+	private function merge_industry_preview_state( array $state ): array {
+		$section_key  = (string) ( $state['section_key'] ?? '' );
+		$definition   = $state['definition'] ?? array();
+		if ( $section_key === '' || ! \is_array( $definition ) ) {
+			return $state;
+		}
+		$resolver = null;
+		if ( $this->container && $this->container->has( 'industry_section_preview_resolver' ) ) {
+			$resolver = $this->container->get( 'industry_section_preview_resolver' );
+		}
+		if ( ! $resolver instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Preview_Resolver ) {
+			return $state;
+		}
+		$state['industry_preview'] = $resolver->resolve( $section_key, $definition, array() )->to_array();
+		return $state;
+	}
+
+	/**
+	 * Renders industry fit and helper guidance block (fit, composed helper excerpt, warnings, substitutes). Escape on output.
+	 *
+	 * @param array<string, mixed> $industry_preview View model to_array().
+	 * @return void
+	 */
+	private function render_industry_preview_block( array $industry_preview ): void {
+		$fit       = (string) ( $industry_preview['recommendation_fit'] ?? '' );
+		$helper    = $industry_preview['composed_helper'] ?? array();
+		$warnings  = $industry_preview['warning_flags'] ?? array();
+		$substitutes = $industry_preview['substitute_suggestions'] ?? array();
+		$primary   = (string) ( $industry_preview['primary_industry_key'] ?? '' );
+		?>
+		<section class="aio-industry-preview-section" aria-label="<?php \esc_attr_e( 'Industry fit and guidance', 'aio-page-builder' ); ?>">
+			<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Industry fit', 'aio-page-builder' ); ?></h3>
+			<?php if ( $primary !== '' ) : ?>
+				<p class="aio-industry-primary"><span class="aio-industry-label"><?php \esc_html_e( 'Industry', 'aio-page-builder' ); ?>:</span> <?php echo \esc_html( \ucfirst( \str_replace( array( '_', '-' ), ' ', $primary ) ) ); ?></p>
+			<?php endif; ?>
+			<?php if ( $fit !== '' && $fit !== 'neutral' ) : ?>
+				<p class="aio-industry-fit"><span class="aio-industry-label"><?php \esc_html_e( 'Fit', 'aio-page-builder' ); ?>:</span> <span class="aio-industry-fit-<?php echo \esc_attr( \sanitize_key( $fit ) ); ?>"><?php echo \esc_html( \ucfirst( \str_replace( array( '_', '-' ), ' ', $fit ) ) ); ?></span></p>
+			<?php endif; ?>
+			<?php if ( \is_array( $helper ) && ( ( $helper['overlay_applied'] ?? false ) || ( $helper['cta_usage_notes'] ?? '' ) !== '' || ( $helper['tone_notes'] ?? '' ) !== '' ) ) : ?>
+				<div class="aio-industry-helper-excerpt">
+					<?php if ( ! empty( $helper['tone_notes'] ) ) : ?>
+						<p><strong><?php \esc_html_e( 'Tone', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( (string) $helper['tone_notes'] ); ?></p>
+					<?php endif; ?>
+					<?php if ( ! empty( $helper['cta_usage_notes'] ) ) : ?>
+						<p><strong><?php \esc_html_e( 'CTA notes', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( (string) $helper['cta_usage_notes'] ); ?></p>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
+			<?php if ( \is_array( $warnings ) && count( $warnings ) > 0 ) : ?>
+				<ul class="aio-industry-warnings" role="alert">
+					<?php foreach ( $warnings as $flag ) : ?>
+						<li class="aio-notice-warning"><?php echo \esc_html( \is_string( $flag ) ? $flag : '' ); ?></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+			<?php if ( \is_array( $substitutes ) && count( $substitutes ) > 0 ) : ?>
+				<p class="aio-industry-substitutes-label"><?php \esc_html_e( 'Suggested alternatives', 'aio-page-builder' ); ?>:</p>
+				<ul class="aio-industry-substitutes-list">
+					<?php foreach ( array_slice( $substitutes, 0, 5 ) as $sug ) : ?>
+						<?php
+						$sug_key = isset( $sug['suggested_replacement_key'] ) ? (string) $sug['suggested_replacement_key'] : '';
+						if ( $sug_key === '' ) {
+							continue;
+						}
+						$detail_url = \add_query_arg( array( 'page' => self::SLUG, 'section' => $sug_key ), \admin_url( 'admin.php' ) );
+						?>
+						<li><a href="<?php echo \esc_url( $detail_url ); ?>"><?php echo \esc_html( $sug_key ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</section>
+		<?php
 	}
 
 	private function get_state_builder(): Section_Template_Detail_State_Builder {

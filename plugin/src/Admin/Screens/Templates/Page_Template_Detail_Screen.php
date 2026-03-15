@@ -67,6 +67,8 @@ final class Page_Template_Detail_Screen {
 			return;
 		}
 
+		$state = $this->merge_industry_preview_state( $state );
+
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-template-detail" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<?php $this->render_breadcrumbs( $state['breadcrumbs'] ); ?>
@@ -192,6 +194,10 @@ final class Page_Template_Detail_Screen {
 				</p>
 			<?php endif; ?>
 			<?php
+			$industry_preview = $state['industry_preview'] ?? null;
+			if ( \is_array( $industry_preview ) && ! empty( $industry_preview['has_industry'] ) ) {
+				$this->render_industry_preview_block( $industry_preview );
+			}
 			$entity_style = $state['entity_style'] ?? null;
 			if ( \is_array( $entity_style ) && ! empty( $entity_style ) ) {
 				$this->render_entity_style_panel( $entity_style );
@@ -362,6 +368,94 @@ final class Page_Template_Detail_Screen {
 		$ui_builder   = new Entity_Style_UI_State_Builder( $form_builder, $payload_repo );
 		$result_obj   = $last_result instanceof \AIOPageBuilder\Domain\Styling\Style_Validation_Result ? $last_result : null;
 		return $ui_builder->build_state( 'page_template', $template_key, $result_obj );
+	}
+
+	/**
+	 * Merges industry-aware preview view model into state when resolver is available (Prompt 383).
+	 *
+	 * @param array<string, mixed> $state
+	 * @return array<string, mixed>
+	 */
+	private function merge_industry_preview_state( array $state ): array {
+		$template_key = (string) ( $state['template_key'] ?? '' );
+		$definition   = $state['definition'] ?? array();
+		if ( $template_key === '' || ! \is_array( $definition ) ) {
+			return $state;
+		}
+		$resolver = null;
+		if ( $this->container && $this->container->has( 'industry_page_template_preview_resolver' ) ) {
+			$resolver = $this->container->get( 'industry_page_template_preview_resolver' );
+		}
+		if ( ! $resolver instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Preview_Resolver ) {
+			return $state;
+		}
+		$state['industry_preview'] = $resolver->resolve( $template_key, $definition, array() )->to_array();
+		return $state;
+	}
+
+	/**
+	 * Renders industry fit and guidance block (fit, hierarchy, LPagery, one-pager excerpt, warnings, substitutes). Escape on output.
+	 *
+	 * @param array<string, mixed> $industry_preview View model to_array().
+	 * @return void
+	 */
+	private function render_industry_preview_block( array $industry_preview ): void {
+		$fit    = (string) ( $industry_preview['recommendation_fit'] ?? '' );
+		$hierarchy = (string) ( $industry_preview['hierarchy_fit'] ?? '' );
+		$lpagery = (string) ( $industry_preview['lpagery_posture'] ?? '' );
+		$one_pager = $industry_preview['composed_one_pager'] ?? array();
+		$warnings = $industry_preview['warning_flags'] ?? array();
+		$substitutes = $industry_preview['substitute_suggestions'] ?? array();
+		$primary = (string) ( $industry_preview['primary_industry_key'] ?? '' );
+		?>
+		<section class="aio-industry-preview-section" aria-label="<?php \esc_attr_e( 'Industry fit and guidance', 'aio-page-builder' ); ?>">
+			<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Industry fit', 'aio-page-builder' ); ?></h3>
+			<?php if ( $primary !== '' ) : ?>
+				<p class="aio-industry-primary"><span class="aio-industry-label"><?php \esc_html_e( 'Industry', 'aio-page-builder' ); ?>:</span> <?php echo \esc_html( \ucfirst( \str_replace( array( '_', '-' ), ' ', $primary ) ) ); ?></p>
+			<?php endif; ?>
+			<?php if ( $fit !== '' && $fit !== 'neutral' ) : ?>
+				<p class="aio-industry-fit"><span class="aio-industry-label"><?php \esc_html_e( 'Fit', 'aio-page-builder' ); ?>:</span> <span class="aio-industry-fit-<?php echo \esc_attr( \sanitize_key( $fit ) ); ?>"><?php echo \esc_html( \ucfirst( \str_replace( array( '_', '-' ), ' ', $fit ) ) ); ?></span></p>
+			<?php endif; ?>
+			<?php if ( $hierarchy !== '' ) : ?>
+				<p class="aio-industry-hierarchy"><span class="aio-industry-label"><?php \esc_html_e( 'Hierarchy', 'aio-page-builder' ); ?>:</span> <?php echo \esc_html( $hierarchy ); ?></p>
+			<?php endif; ?>
+			<?php if ( $lpagery !== '' ) : ?>
+				<p class="aio-industry-lpagery"><span class="aio-industry-label"><?php \esc_html_e( 'LPagery', 'aio-page-builder' ); ?>:</span> <?php echo \esc_html( $lpagery ); ?></p>
+			<?php endif; ?>
+			<?php if ( \is_array( $one_pager ) && ( ( $one_pager['overlay_applied'] ?? false ) || ( $one_pager['cta_strategy'] ?? '' ) !== '' || ( $one_pager['hierarchy_hints'] ?? '' ) !== '' ) ) : ?>
+				<div class="aio-industry-one-pager-excerpt">
+					<?php if ( ! empty( $one_pager['hierarchy_hints'] ) ) : ?>
+						<p><strong><?php \esc_html_e( 'Hierarchy notes', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( (string) $one_pager['hierarchy_hints'] ); ?></p>
+					<?php endif; ?>
+					<?php if ( ! empty( $one_pager['cta_strategy'] ) ) : ?>
+						<p><strong><?php \esc_html_e( 'CTA strategy', 'aio-page-builder' ); ?></strong>: <?php echo \esc_html( (string) $one_pager['cta_strategy'] ); ?></p>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
+			<?php if ( \is_array( $warnings ) && count( $warnings ) > 0 ) : ?>
+				<ul class="aio-industry-warnings" role="alert">
+					<?php foreach ( $warnings as $flag ) : ?>
+						<li class="aio-notice-warning"><?php echo \esc_html( \is_string( $flag ) ? $flag : '' ); ?></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+			<?php if ( \is_array( $substitutes ) && count( $substitutes ) > 0 ) : ?>
+				<p class="aio-industry-substitutes-label"><?php \esc_html_e( 'Suggested alternatives', 'aio-page-builder' ); ?>:</p>
+				<ul class="aio-industry-substitutes-list">
+					<?php foreach ( array_slice( $substitutes, 0, 5 ) as $sug ) : ?>
+						<?php
+						$sug_key = isset( $sug['suggested_replacement_key'] ) ? (string) $sug['suggested_replacement_key'] : '';
+						if ( $sug_key === '' ) {
+							continue;
+						}
+						$detail_url = \add_query_arg( array( 'page' => self::SLUG, 'template' => $sug_key ), \admin_url( 'admin.php' ) );
+						?>
+						<li><a href="<?php echo \esc_url( $detail_url ); ?>"><?php echo \esc_html( $sug_key ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</section>
+		<?php
 	}
 
 	private function get_state_builder(): Page_Template_Detail_State_Builder {

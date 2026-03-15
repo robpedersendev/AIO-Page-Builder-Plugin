@@ -10,3 +10,9 @@ if ( ! function_exists( 'sanitize_text_field' ) ) {
 		return trim( preg_replace( '/[\x00-\x1F\x7F]/u', '', (string) $str ) );
 	}
 }
+
+if ( ! function_exists( 'sanitize_key' ) ) {
+	function sanitize_key( $key ) {
+		return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) );
+	}
+}

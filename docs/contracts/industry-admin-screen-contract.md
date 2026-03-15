@@ -68,15 +68,31 @@
 
 ---
 
-## 4.2 Industry create-page-from-template assistant (Prompt 376)
+## 4.2 Industry-aware page template detail preview (Prompt 383)
+
+- **Industry_Page_Template_Preview_Resolver**: Resolves industry-aware preview context for a single page template (recommendation fit, composed one-pager, hierarchy fit, LPagery posture, substitute suggestions). Read-only; safe when no industry profile.
+- **Industry_Page_Template_Preview_View_Model**: DTO for the detail screen: has_industry, recommendation_fit, hierarchy_fit, lpagery_posture, composed_one_pager (allowed regions), substitute_suggestions, warning_flags, explanation_reasons.
+- **Page template detail screen**: When the industry preview resolver is available (container key `industry_page_template_preview_resolver`), the screen merges `industry_preview` (view model to_array()) into state and renders an industry fit block in the metadata panel: industry label, fit badge, hierarchy/LPagery notes, one-pager excerpt (hierarchy_hints, cta_strategy), warnings, and substitute suggestion links. Substitute suggestions are populated only when the resolver is called with a full template list; otherwise the list is empty. Generic fallback: when no industry profile or resolver unavailable, no industry block is shown.
+
+---
+
+## 4.3 Industry create-page-from-template assistant (Prompt 376)
 
 - **Industry_Create_Page_Assistant**: Provides industry-aware guidance for the create-page-from-template flow. Call `build_state( $page_templates )` with the current template list, then use `has_industry_guidance()`, `get_recommended_template_keys()`, `get_fit_for_template( $key )`, `get_warning_flags_for_template( $key )`, and `get_substitute_template_keys( $key )` to show recommended templates first, weak-fit/discouraged warnings before page creation, and substitute suggestions. Full template library access and explicit override selection remain; actual template application logic is unchanged. Safe fallback when no industry profile.
 
 ---
 
-## 4.3 Industry composition builder assistant (Prompt 377)
+## 4.4 Industry composition builder assistant (Prompt 377)
 
 - **Industry_Composition_Assistant**: Provides industry-aware section guidance in the composition builder. Call `build_state( $sections )` with the section list, then use `has_industry_guidance()`, `get_recommended_section_keys()`, `get_fit_for_section( $key )`, `get_warning_flags_for_section( $key )`, and `get_substitute_section_keys( $key )` to surface recommended sections, warnings for weak-fit/discouraged choices, and substitute suggestions. CTA/purpose guidance continues to use existing composition builder validation and insertion hints. Manual selection control preserved; no auto-swap. Safe fallback when no industry profile.
+
+---
+
+## 4.5 Industry-aware section detail preview (Prompt 384)
+
+- **Industry_Section_Preview_Resolver**: Resolves industry-aware preview context for a single section (recommendation fit, composed helper, warnings, substitute suggestions). Read-only; safe when no industry profile.
+- **Industry_Section_Preview_View_Model**: DTO for the section detail screen: has_industry, recommendation_fit, composed_helper (allowed regions), substitute_suggestions, warning_flags, explanation_reasons.
+- **Section template detail screen**: When the industry section preview resolver is available (container key `industry_section_preview_resolver`), the screen merges `industry_preview` (view model to_array()) into state and renders an industry fit block in the metadata panel: industry label, fit badge, composed helper excerpt (tone_notes, cta_usage_notes), warnings, and substitute suggestion links. Substitute suggestions are populated only when the resolver is called with a full section list; otherwise the list is empty. Generic fallback: when no industry profile or resolver unavailable, no industry block is shown.
 
 ---
 
@@ -94,6 +110,8 @@
 - **Form**: `plugin/src/Admin/Forms/Industry_Profile_Form_Builder.php`
 - **Section filter**: `plugin/src/Admin/Screens/Sections/Industry_Section_Library_Filter_Controller.php`; view: `plugin/src/Admin/Views/sections/industry-section-badges.php`
 - **Page template filter**: `plugin/src/Admin/Screens/PageTemplates/Industry_Page_Template_Filter_Controller.php`; view: `plugin/src/Admin/Views/page-templates/industry-template-badges.php`
+- **Page template preview resolver**: `plugin/src/Domain/Industry/Registry/Industry_Page_Template_Preview_Resolver.php`; view model: `plugin/src/Admin/ViewModels/PageTemplates/Industry_Page_Template_Preview_View_Model.php` (Prompt 383).
+- **Section preview resolver**: `plugin/src/Domain/Industry/Registry/Industry_Section_Preview_Resolver.php`; view model: `plugin/src/Admin/ViewModels/Sections/Industry_Section_Preview_View_Model.php` (Prompt 384).
 - **Create-page assistant**: `plugin/src/Admin/Screens/PageTemplates/Industry_Create_Page_Assistant.php` (Prompt 376).
 - **Composition assistant**: `plugin/src/Admin/Screens/Compositions/Industry_Composition_Assistant.php` (Prompt 377).
 - **Inventory**: admin-screen-inventory.md lists Industry Profile screen and notes industry filter/badge behavior for section and page template directories.

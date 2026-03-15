@@ -124,6 +124,42 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$preset_app instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service ? $preset_app : null
 			);
 		} );
+		$container->register( 'industry_section_preview_resolver', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Preview_Resolver {
+			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			$section_overlay = $container->has( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) : null;
+			$doc_registry = new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry( new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Loader( __DIR__ . '/../Domain/Registries/Docs' ) );
+			$helper_composer = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Helper_Doc_Composer(
+				$doc_registry,
+				$section_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry ? $section_overlay : new \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry()
+			);
+			$substitute_engine = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine();
+			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Preview_Resolver(
+				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
+				new \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Recommendation_Resolver(),
+				$helper_composer,
+				$substitute_engine
+			);
+		} );
+		$container->register( 'industry_page_template_preview_resolver', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Preview_Resolver {
+			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			$page_overlay = $container->has( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) : null;
+			$doc_registry = new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry( new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Loader( __DIR__ . '/../Domain/Registries/Docs' ) );
+			$one_pager_composer = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Composer(
+				$doc_registry,
+				$page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry ? $page_overlay : new \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry()
+			);
+			$substitute_engine = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine();
+			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Preview_Resolver(
+				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
+				new \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver(),
+				$one_pager_composer,
+				$substitute_engine
+			);
+		} );
 		$container->register( 'industry_style_preset_application_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service {
 			$preset_registry = $container->has( 'industry_style_preset_registry' ) ? $container->get( 'industry_style_preset_registry' ) : null;
 			$style_repo      = $container->has( 'global_style_settings_repository' ) ? $container->get( 'global_style_settings_repository' ) : null;
