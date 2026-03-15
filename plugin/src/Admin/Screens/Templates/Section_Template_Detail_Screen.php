@@ -335,15 +335,41 @@ final class Section_Template_Detail_Screen {
 	 */
 	private function render_preview_panel( array $state ): void {
 		$html = (string) ( $state['rendered_preview_html'] ?? '' );
+		$section_key = (string) ( $state['section_key'] ?? '' );
+		$style_context = $this->get_preview_style_context( 'section', $section_key );
 		?>
 		<section class="aio-preview-section" aria-label="<?php \esc_attr_e( 'Rendered preview', 'aio-page-builder' ); ?>">
 			<h2 class="aio-preview-title"><?php \esc_html_e( 'Preview', 'aio-page-builder' ); ?></h2>
 			<p class="aio-preview-notice"><?php \esc_html_e( 'This preview uses synthetic data and the same section renderer as live pages. Omission and animation behavior apply.', 'aio-page-builder' ); ?></p>
+			<?php if ( $style_context !== null ) : ?>
+				<link rel="stylesheet" href="<?php echo \esc_url( $style_context['base_stylesheet_url'] ); ?>" />
+				<?php if ( $style_context['inline_css'] !== '' ) : ?>
+					<style type="text/css" id="aio-preview-style-context"><?php echo /* Safe: from sanitized emitters only */ $style_context['inline_css']; ?></style>
+				<?php endif; ?>
+			<?php endif; ?>
 			<div class="aio-preview-content">
 				<?php echo \wp_kses_post( $html ); ?>
 			</div>
 		</section>
 		<?php
+	}
+
+	/**
+	 * Returns preview style context (base URL + inline CSS) for the given type and entity key, or null if builder unavailable.
+	 *
+	 * @param string $context_type 'section' or 'page'.
+	 * @param string $entity_key   Section or page template key.
+	 * @return array{base_stylesheet_url: string, inline_css: string}|null
+	 */
+	private function get_preview_style_context( string $context_type, string $entity_key ): ?array {
+		if ( $this->container === null || ! $this->container->has( 'preview_style_context_builder' ) ) {
+			return null;
+		}
+		$builder = $this->container->get( 'preview_style_context_builder' );
+		if ( ! $builder instanceof \AIOPageBuilder\Domain\Preview\Styling\Preview_Style_Context_Builder ) {
+			return null;
+		}
+		return $builder->build_for_preview( $context_type, $entity_key );
 	}
 
 	private const ENTITY_STYLE_QUERY_MSG = 'aio_entity_style_msg';

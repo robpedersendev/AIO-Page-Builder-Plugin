@@ -59,9 +59,11 @@ final class Rendering_Provider implements Service_Provider_Interface {
 		} );
 
 		$container->register( 'section_renderer_base', function () use ( $container ): Section_Renderer_Base {
+			$section_style_emitter = $container->has( 'section_style_emitter' ) ? $container->get( 'section_style_emitter' ) : null;
 			return new Section_Renderer_Base(
 				$container->get( 'smart_omission_service' ),
-				$container->get( 'animation_tier_resolver' )
+				$container->get( 'animation_tier_resolver' ),
+				$section_style_emitter
 			);
 		} );
 

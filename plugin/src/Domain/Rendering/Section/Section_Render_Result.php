@@ -126,13 +126,18 @@ final class Section_Render_Result {
 		return $this->field_values;
 	}
 
-	/** @return array{class: list<string>, id: string, data_attributes: array<string, string>} */
+	/** @return array{class: list<string>, id: string, data_attributes: array<string, string>, style?: string} */
 	public function get_wrapper_attrs(): array {
 		return $this->structure['wrapper_attrs'] ?? array(
 			'class'            => array(),
 			'id'               => '',
 			'data_attributes'  => array(),
 		);
+	}
+
+	/** Section-scoped component override style block (Prompt 254). Empty when not set. */
+	public function get_section_style_block(): string {
+		return (string) ( $this->structure['section_style_block'] ?? '' );
 	}
 
 	/** @return array{wrapper_class: string, inner_class: string, element_classes: array<string, string>} */
@@ -188,17 +193,18 @@ final class Section_Render_Result {
 	 */
 	public function to_array(): array {
 		$out = array(
-			'section_key'        => $this->section_key,
-			'variant'            => $this->variant,
-			'position'           => $this->position,
-			'field_values'       => $this->field_values,
-			'wrapper_attrs'      => $this->get_wrapper_attrs(),
-			'selector_map'       => $this->get_selector_map(),
-			'structural_nodes'   => $this->get_structural_nodes(),
+			'section_key'         => $this->section_key,
+			'variant'             => $this->variant,
+			'position'            => $this->position,
+			'field_values'        => $this->field_values,
+			'wrapper_attrs'       => $this->get_wrapper_attrs(),
+			'selector_map'        => $this->get_selector_map(),
+			'structural_nodes'    => $this->get_structural_nodes(),
 			'structural_hint'     => $this->get_structural_hint(),
-			'asset_hints'        => $this->get_asset_hints(),
-			'accessibility_notes' => $this->get_accessibility_notes(),
-			'errors'             => $this->errors,
+			'asset_hints'         => $this->get_asset_hints(),
+			'accessibility_notes'  => $this->get_accessibility_notes(),
+			'errors'              => $this->errors,
+			'section_style_block' => $this->get_section_style_block(),
 		);
 		if ( $this->omission_result !== null ) {
 			$out['omission_result'] = $this->omission_result->to_array();

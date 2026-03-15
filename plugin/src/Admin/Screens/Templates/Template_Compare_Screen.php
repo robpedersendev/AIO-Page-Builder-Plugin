@@ -270,6 +270,13 @@ final class Template_Compare_Screen {
 		if ( count( $rows ) === 0 ) {
 			return;
 		}
+		$style_context = $this->get_preview_style_context( $type, '' );
+		if ( $style_context !== null ) {
+			echo '<link rel="stylesheet" href="' . \esc_url( $style_context['base_stylesheet_url'] ) . '" />';
+			if ( $style_context['inline_css'] !== '' ) {
+				echo '<style type="text/css" id="aio-compare-preview-style">' . /* Safe: from sanitized emitters only */ $style_context['inline_css'] . '</style>';
+			}
+		}
 		$labels = array(
 			'name'                 => __( 'Name', 'aio-page-builder' ),
 			'purpose_family'       => $type === 'page' ? __( 'Category / Purpose', 'aio-page-builder' ) : __( 'Purpose', 'aio-page-builder' ),
@@ -341,5 +348,23 @@ final class Template_Compare_Screen {
 			return;
 		}
 		echo '—';
+	}
+
+	/**
+	 * Returns preview style context (base URL + inline CSS) for compare screen, or null if builder unavailable.
+	 *
+	 * @param string $context_type 'section' or 'page'.
+	 * @param string $entity_key   Empty for compare (global only).
+	 * @return array{base_stylesheet_url: string, inline_css: string}|null
+	 */
+	private function get_preview_style_context( string $context_type, string $entity_key ): ?array {
+		if ( $this->container === null || ! $this->container->has( 'preview_style_context_builder' ) ) {
+			return null;
+		}
+		$builder = $this->container->get( 'preview_style_context_builder' );
+		if ( ! $builder instanceof \AIOPageBuilder\Domain\Preview\Styling\Preview_Style_Context_Builder ) {
+			return null;
+		}
+		return $builder->build_for_preview( $context_type, $entity_key );
 	}
 }

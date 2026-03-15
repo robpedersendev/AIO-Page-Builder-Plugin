@@ -20,6 +20,9 @@ use AIOPageBuilder\Domain\Styling\Global_Token_Variable_Emitter;
 use AIOPageBuilder\Domain\Styling\Render_Surface_Style_Registry;
 use AIOPageBuilder\Domain\Styling\Style_Spec_Loader;
 use AIOPageBuilder\Domain\Styling\Style_Token_Registry;
+use AIOPageBuilder\Domain\Preview\Styling\Preview_Style_Context_Builder;
+use AIOPageBuilder\Domain\Styling\Page_Style_Emitter;
+use AIOPageBuilder\Domain\Styling\Section_Style_Emitter;
 use AIOPageBuilder\Domain\Styling\Styles_JSON_Normalizer;
 use AIOPageBuilder\Domain\Styling\Styles_JSON_Sanitizer;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -90,10 +93,32 @@ final class Styling_Provider implements Service_Provider_Interface {
 			return new Global_Component_Override_Emitter( $repo, $registry );
 		} );
 
+		$container->register( 'page_style_emitter', function () use ( $container ): Page_Style_Emitter {
+			$repo     = $container->get( 'entity_style_payload_repository' );
+			$token    = $container->has( 'style_token_registry' ) ? $container->get( 'style_token_registry' ) : null;
+			$comp     = $container->has( 'component_override_registry' ) ? $container->get( 'component_override_registry' ) : null;
+			return new Page_Style_Emitter( $repo, $token, $comp );
+		} );
+
+		$container->register( 'section_style_emitter', function () use ( $container ): Section_Style_Emitter {
+			$repo  = $container->get( 'entity_style_payload_repository' );
+			$token = $container->has( 'style_token_registry' ) ? $container->get( 'style_token_registry' ) : null;
+			$comp  = $container->has( 'component_override_registry' ) ? $container->get( 'component_override_registry' ) : null;
+			return new Section_Style_Emitter( $repo, $token, $comp );
+		} );
+
+		$container->register( 'preview_style_context_builder', function () use ( $container ): Preview_Style_Context_Builder {
+			$token_emitter    = $container->has( 'global_token_variable_emitter' ) ? $container->get( 'global_token_variable_emitter' ) : null;
+			$override_emitter = $container->has( 'global_component_override_emitter' ) ? $container->get( 'global_component_override_emitter' ) : null;
+			$page_emitter     = $container->has( 'page_style_emitter' ) ? $container->get( 'page_style_emitter' ) : null;
+			return new Preview_Style_Context_Builder( $container->get( 'config' ), $token_emitter, $override_emitter, $page_emitter );
+		} );
+
 		$container->register( 'frontend_style_enqueue_service', function () use ( $container ): Frontend_Style_Enqueue_Service {
 			$token_emitter    = $container->has( 'global_token_variable_emitter' ) ? $container->get( 'global_token_variable_emitter' ) : null;
 			$override_emitter = $container->has( 'global_component_override_emitter' ) ? $container->get( 'global_component_override_emitter' ) : null;
-			return new Frontend_Style_Enqueue_Service( $container->get( 'config' ), $token_emitter, $override_emitter );
+			$page_emitter     = $container->has( 'page_style_emitter' ) ? $container->get( 'page_style_emitter' ) : null;
+			return new Frontend_Style_Enqueue_Service( $container->get( 'config' ), $token_emitter, $override_emitter, $page_emitter );
 		} );
 
 		\add_action( 'wp_enqueue_scripts', function () use ( $container ): void {

@@ -132,6 +132,7 @@ final class Native_Block_Assembly_Pipeline {
 			'structural_hint'     => $hint,
 			'asset_hints'         => $assets,
 			'accessibility_notes'  => $a11y,
+			'section_style_block' => isset( $item['section_style_block'] ) && is_string( $item['section_style_block'] ) ? $item['section_style_block'] : '',
 		);
 		return new Section_Render_Result( $key, $variant, $position, $fields, $structure, $errs );
 	}
@@ -143,6 +144,8 @@ final class Native_Block_Assembly_Pipeline {
 		$classes       = isset( $wrapper_attrs['class'] ) && is_array( $wrapper_attrs['class'] ) ? $wrapper_attrs['class'] : array();
 		$id            = isset( $wrapper_attrs['id'] ) && is_string( $wrapper_attrs['id'] ) ? $wrapper_attrs['id'] : '';
 		$data_attrs    = isset( $wrapper_attrs['data_attributes'] ) && is_array( $wrapper_attrs['data_attributes'] ) ? $wrapper_attrs['data_attributes'] : array();
+		$style_attr    = isset( $wrapper_attrs['style'] ) && is_string( $wrapper_attrs['style'] ) ? trim( $wrapper_attrs['style'] ) : '';
+		$style_block   = $section->get_section_style_block();
 
 		$class_attr = implode( ' ', array_map( 'esc_attr', $classes ) );
 		$open       = '<div';
@@ -152,6 +155,9 @@ final class Native_Block_Assembly_Pipeline {
 		if ( $id !== '' ) {
 			$open .= ' id="' . esc_attr( $id ) . '"';
 		}
+		if ( $style_attr !== '' ) {
+			$open .= ' style="' . esc_attr( $style_attr ) . '"';
+		}
 		foreach ( $data_attrs as $name => $value ) {
 			if ( is_string( $name ) && is_string( $value ) && $name !== '' ) {
 				$open .= ' ' . esc_attr( $name ) . '="' . esc_attr( $value ) . '"';
@@ -159,12 +165,12 @@ final class Native_Block_Assembly_Pipeline {
 		}
 		$open .= '>';
 
-		$inner_open = $inner_class !== '' ? '<div class="' . esc_attr( $inner_class ) . '">' : '';
+		$inner_open  = $inner_class !== '' ? '<div class="' . esc_attr( $inner_class ) . '">' : '';
 		$inner_close = $inner_class !== '' ? '</div>' : '';
 
 		$content = $this->field_values_to_inner_html( $section->get_field_values(), $section->get_section_key() );
 
-		$inner = $inner_open . $content . $inner_close;
+		$inner = ( $style_block !== '' ? $style_block : '' ) . $inner_open . $content . $inner_close;
 		$html  = $open . $inner . '</div>';
 
 		return "<!-- wp:html -->\n" . $html . "\n<!-- /wp:html -->";

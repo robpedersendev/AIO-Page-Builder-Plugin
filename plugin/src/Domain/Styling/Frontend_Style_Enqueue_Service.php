@@ -35,14 +35,19 @@ final class Frontend_Style_Enqueue_Service {
 	/** @var Global_Component_Override_Emitter|null */
 	private ?Global_Component_Override_Emitter $component_override_emitter;
 
+	/** @var Page_Style_Emitter|null Per-page style emission (Prompt 254). */
+	private ?Page_Style_Emitter $page_style_emitter;
+
 	public function __construct(
 		Plugin_Config $config,
 		?Global_Token_Variable_Emitter $emitter = null,
-		?Global_Component_Override_Emitter $component_override_emitter = null
+		?Global_Component_Override_Emitter $component_override_emitter = null,
+		?Page_Style_Emitter $page_style_emitter = null
 	) {
 		$this->config                    = $config;
 		$this->emitter                   = $emitter;
 		$this->component_override_emitter = $component_override_emitter;
+		$this->page_style_emitter        = $page_style_emitter;
 	}
 
 	/**
@@ -83,6 +88,16 @@ final class Frontend_Style_Enqueue_Service {
 			$css = $this->component_override_emitter->emit();
 			if ( $css !== '' ) {
 				$inline_parts[] = $css;
+			}
+		}
+		if ( $this->page_style_emitter !== null ) {
+			$post = \get_queried_object();
+			$template_key = (string) \apply_filters( 'aio_page_builder_current_template_key', '', $post );
+			if ( $template_key !== '' ) {
+				$page_css = $this->page_style_emitter->emit_for_page( $template_key );
+				if ( $page_css !== '' ) {
+					$inline_parts[] = $page_css;
+				}
 			}
 		}
 		if ( ! empty( $inline_parts ) ) {

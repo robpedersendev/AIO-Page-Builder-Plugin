@@ -17,6 +17,7 @@ use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
 use AIOPageBuilder\Domain\Rendering\Animation\Animation_Tier_Resolver;
 use AIOPageBuilder\Domain\Rendering\Omission\Smart_Omission_Service;
+use AIOPageBuilder\Domain\Styling\Section_Style_Emitter;
 
 /**
  * Transforms Section_Render_Context into Section_Render_Result.
@@ -33,12 +34,17 @@ final class Section_Renderer_Base {
 	/** @var Animation_Tier_Resolver|null */
 	private ?Animation_Tier_Resolver $animation_tier_resolver;
 
+	/** @var Section_Style_Emitter|null Per-section style emission (Prompt 254). */
+	private ?Section_Style_Emitter $section_style_emitter;
+
 	public function __construct(
 		?Smart_Omission_Service $omission_service = null,
-		?Animation_Tier_Resolver $animation_tier_resolver = null
+		?Animation_Tier_Resolver $animation_tier_resolver = null,
+		?Section_Style_Emitter $section_style_emitter = null
 	) {
-		$this->omission_service       = $omission_service;
+		$this->omission_service        = $omission_service;
 		$this->animation_tier_resolver = $animation_tier_resolver;
+		$this->section_style_emitter   = $section_style_emitter;
 	}
 
 	/** Section wrapper class pattern: aio-s-{section_key}. */
@@ -107,6 +113,12 @@ final class Section_Renderer_Base {
 			'id'              => $section_id,
 			'data_attributes' => $data_attributes,
 		);
+		if ( $this->section_style_emitter !== null ) {
+			$inline_style = $this->section_style_emitter->get_inline_style_for_section( $section_key );
+			if ( $inline_style !== '' ) {
+				$wrapper_attrs['style'] = $inline_style;
+			}
+		}
 
 		$selector_map = array(
 			'wrapper_class'    => $wrapper_class,
@@ -136,6 +148,12 @@ final class Section_Renderer_Base {
 		);
 		if ( $animation_resolution !== null ) {
 			$structure['animation_resolution'] = $animation_resolution;
+		}
+		if ( $this->section_style_emitter !== null ) {
+			$style_block = $this->section_style_emitter->get_component_override_style_block( $section_key );
+			if ( $style_block !== '' ) {
+				$structure['section_style_block'] = $style_block;
+			}
 		}
 
 		$field_values = $context->get_field_values();
