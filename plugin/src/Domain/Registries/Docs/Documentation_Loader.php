@@ -1,0 +1,108 @@
+<?php
+/**
+ * Loads documentation objects from file-based section helper batches (spec §10.7, §15, documentation-object-schema).
+ * Discovers doc-helper-{section_key}.php under SectionHelpers/Hero_Batch and SectionHelpers/CTA_Batch.
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Domain\Registries\Docs;
+
+defined( 'ABSPATH' ) || exit;
+
+use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
+
+/**
+ * Loads section_helper documentation from dedicated batch directories.
+ * Each doc file must return a single documentation array (schema-compliant).
+ */
+final class Documentation_Loader {
+
+	/** Relative batch dirs under Docs (SectionHelpers subdir). */
+	private const BATCH_DIRS = array(
+		'SectionHelpers/Hero_Batch',
+		'SectionHelpers/CTA_Batch',
+	);
+
+	/** @var string Base path (Docs directory). */
+	private string $base_path;
+
+	/** @var list<array<string, mixed>>|null Loaded doc objects. */
+	private ?array $loaded = null;
+
+	public function __construct( string $base_path = '' ) {
+		$this->base_path = $base_path !== '' ? rtrim( $base_path, '/\\' ) : __DIR__;
+	}
+
+	/**
+	 * Loads all section helper docs from batch directories.
+	 * Safe: skips non-array return values and missing files.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	public function load_section_helpers(): array {
+		if ( $this->loaded !== null ) {
+			return $this->loaded;
+		}
+		$docs = array();
+		foreach ( self::BATCH_DIRS as $batch_dir ) {
+			$dir = $this->base_path . '/' . $batch_dir;
+			if ( ! is_dir( $dir ) ) {
+				continue;
+			}
+			$files = glob( $dir . '/doc-helper-*.php' );
+			if ( $files === false ) {
+				continue;
+			}
+			foreach ( $files as $path ) {
+				$doc = $this->include_doc_file( $path );
+				if ( is_array( $doc ) && $this->is_valid_section_helper( $doc ) ) {
+					$docs[] = $doc;
+				}
+			}
+		}
+		$this->loaded = $docs;
+		return $docs;
+	}
+
+	/**
+	 * Includes a single doc-helper PHP file and returns its return value.
+	 *
+	 * @param string $path Absolute path to the file.
+	 * @return mixed Return value of the file (expected array).
+	 */
+	private function include_doc_file( string $path ) {
+		if ( ! is_file( $path ) || ! is_readable( $path ) ) {
+			return null;
+		}
+		try {
+			return include $path;
+		} catch ( \Throwable $e ) {
+			return null;
+		}
+	}
+
+	/**
+	 * Checks that the array has required section_helper shape.
+	 *
+	 * @param array<string, mixed> $doc
+	 * @return bool
+	 */
+	private function is_valid_section_helper( array $doc ): bool {
+		$id = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '';
+		$type = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '';
+		$body = $doc[ Documentation_Schema::FIELD_CONTENT_BODY ] ?? '';
+		$status = $doc[ Documentation_Schema::FIELD_STATUS ] ?? '';
+		if ( $id === '' || $type !== Documentation_Schema::TYPE_SECTION_HELPER || $body === '' || $status === '' ) {
+			return false;
+		}
+		$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+		if ( ! is_array( $ref ) ) {
+			return false;
+		}
+		$section_key = $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '';
+		return $section_key !== '';
+	}
+}
