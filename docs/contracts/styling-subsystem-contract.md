@@ -73,10 +73,10 @@ The styling subsystem **extends** this model under a single contract: same token
 
 ## 6. Global vs Per-Entity Styling
 
-| Scope | Purpose | Storage (future) | Notes |
-|-------|---------|-------------------|-------|
-| **Global** | Site-wide token set, theme mode, defaults | Options or equivalent | Aligns with existing `aio_applied_design_tokens`; may add version/cache marker. |
-| **Per-entity** | Page/composition/section overrides | Separate from post_content; plugin-owned | Optional; must be bounded and sanitized. No structural change to content. |
+| Scope | Purpose | Storage | Notes |
+|-------|---------|---------|-------|
+| **Global** | Site-wide token values and global component overrides | Option `aio_global_style_settings` (version, global_tokens, global_component_overrides). See [global-styling-settings-contract.md](global-styling-settings-contract.md). | Separate from `aio_applied_design_tokens` (build plan/rollback). |
+| **Per-entity** | Page/composition/section overrides | Separate from post_content; plugin-owned (future) | Optional; must be bounded and sanitized. No structural change to content. |
 
 ---
 

@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Styling\Component_Override_Registry;
 use AIOPageBuilder\Domain\Styling\Frontend_Style_Enqueue_Service;
+use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Repository;
 use AIOPageBuilder\Domain\Styling\Render_Surface_Style_Registry;
 use AIOPageBuilder\Domain\Styling\Style_Spec_Loader;
 use AIOPageBuilder\Domain\Styling\Style_Token_Registry;
@@ -48,6 +49,12 @@ final class Styling_Provider implements Service_Provider_Interface {
 
 		$container->register( 'render_surface_style_registry', function () use ( $container ): Render_Surface_Style_Registry {
 			return new Render_Surface_Style_Registry( $container->get( 'style_spec_loader' ) );
+		} );
+
+		$container->register( 'global_style_settings_repository', function () use ( $container ): Global_Style_Settings_Repository {
+			$token_registry = $container->has( 'style_token_registry' ) ? $container->get( 'style_token_registry' ) : null;
+			$component_registry = $container->has( 'component_override_registry' ) ? $container->get( 'component_override_registry' ) : null;
+			return new Global_Style_Settings_Repository( $token_registry, $component_registry );
 		} );
 
 		$container->register( 'frontend_style_enqueue_service', function () use ( $container ): Frontend_Style_Enqueue_Service {

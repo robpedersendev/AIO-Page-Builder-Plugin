@@ -236,9 +236,7 @@ Provider-backed form sections store which form to render using two stable ACF fi
 
 ---
 
-## 22. Styling subsystem (specs and registry)
-
-Machine-readable style specs and style registry are defined by contract; no runtime schema in this appendix until storage is implemented.
+## 22. Styling subsystem (specs, registry, global settings)
 
 | Artifact | Location | Description |
 |----------|----------|-------------|
@@ -246,7 +244,8 @@ Machine-readable style specs and style registry are defined by contract; no runt
 | Component override spec | [pb-style-components-spec.json](../specs/pb-style-components-spec.json) | spec_version, components (id, element_role, selector_pattern, allowed_token_overrides). Aligns with css-selector-contract §3.4. |
 | Render surfaces spec | [pb-style-render-surfaces-spec.json](../specs/pb-style-render-surfaces-spec.json) | spec_version, render_surfaces (id, selector, scope, allowed_output). Surfaces: :root, .aio-page, section wrapper. |
 | Style registry | [style-registry-contract.md](../contracts/style-registry-contract.md) | Read-only lookup over the three specs; spec versioning; plugin-local loading. No new selectors or token names. |
-| Applied design tokens (existing) | Option `aio_applied_design_tokens` | [ group => [ name => value ] ]; see Token_Set_Job_Service. Styling subsystem extends value source only; names remain from contract. |
+| Applied design tokens (existing) | Option `aio_applied_design_tokens` | [ group => [ name => value ] ]; see Token_Set_Job_Service. Build plan and rollback only; not repurposed as runtime styling store. |
+| Global styling settings | Option `aio_global_style_settings` | version, global_tokens, global_component_overrides. See [global-styling-settings-contract.md](../contracts/global-styling-settings-contract.md) and Global_Style_Settings_Repository. Separate from aio_applied_design_tokens. |
 
 ---
 
