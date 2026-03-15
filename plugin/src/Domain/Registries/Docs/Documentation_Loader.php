@@ -2,7 +2,7 @@
 /**
  * Loads documentation objects from file-based section helper and one-pager batches (spec §10.7, §15, §16, documentation-object-schema).
  * Section helpers: doc-helper-{section_key}.php under SectionHelpers (Hero_Batch, CTA_Batch, Proof_Batch, Legal_Policy_Batch, Process_FAQ_Batch, Feature_Benefit_Batch, Media_Listing_Profile_Batch, Gap_Closing_Batch, Contact_Form_Conversion_Batch, Pricing_Offer_Batch).
- * One-pagers: doc-onepager-{page_template_key}.php under PageTemplateOnePagers (Top_Level_Home_Batch, Top_Level_About_Batch, Top_Level_Contact_Batch, Top_Level_FAQ_Help_Batch, Top_Level_Legal_Policy_Batch, Hub_Services_Batch).
+ * One-pagers: doc-onepager-{page_template_key}.php under PageTemplateOnePagers (Top_Level_Home/About/Contact/FAQ_Help/Legal_Policy_Batch, Hub_Services/Hub_Locations_Batch, Nested_Hub_Services_Batch, Child_Detail_Services_Batch).
  *
  * @package AIOPageBuilder
  */
@@ -43,6 +43,9 @@ final class Documentation_Loader {
 		'PageTemplateOnePagers/Top_Level_FAQ_Help_Batch',
 		'PageTemplateOnePagers/Top_Level_Legal_Policy_Batch',
 		'PageTemplateOnePagers/Hub_Services_Batch',
+		'PageTemplateOnePagers/Hub_Locations_Batch',
+		'PageTemplateOnePagers/Nested_Hub_Services_Batch',
+		'PageTemplateOnePagers/Child_Detail_Services_Batch',
 	);
 
 	/** @var string Base path (Docs directory). */
