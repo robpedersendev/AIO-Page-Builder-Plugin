@@ -9,6 +9,7 @@ namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Repository;
 use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
+use AIOPageBuilder\Domain\Styling\Style_Validation_Result;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -16,6 +17,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Styling/Entity_Style_Payload_Schema.php';
 require_once $plugin_root . '/src/Domain/Styling/Entity_Style_Payload_Repository.php';
+require_once $plugin_root . '/src/Domain/Styling/Style_Validation_Result.php';
 
 final class Entity_Style_Payload_Repository_Test extends TestCase {
 
@@ -98,5 +100,29 @@ final class Entity_Style_Payload_Repository_Test extends TestCase {
 		$all2 = $repo->get_all_payloads_for_type( 'section_template' );
 		$this->assertCount( 1, $all2 );
 		$this->assertArrayHasKey( 'sec_b', $all2 );
+	}
+
+	/**
+	 * persist_entity_payload_result persists only when result is valid (Prompt 252).
+	 */
+	public function test_persist_entity_payload_result_valid_persists(): void {
+		$repo = new Entity_Style_Payload_Repository();
+		$payload = array(
+			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => '1',
+			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'primary' => '#222' ) ),
+			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => array(),
+		);
+		$result = new Style_Validation_Result( true, array(), $payload );
+		$this->assertTrue( $repo->persist_entity_payload_result( 'section_template', 'styling_test', $result ) );
+		$read = $repo->get_payload( 'section_template', 'styling_test' );
+		$this->assertSame( array( 'color' => array( 'primary' => '#222' ) ), $read[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] );
+	}
+
+	public function test_persist_entity_payload_result_invalid_does_not_persist(): void {
+		$repo   = new Entity_Style_Payload_Repository();
+		$result = new Style_Validation_Result( false, array( 'Invalid' ), array() );
+		$this->assertFalse( $repo->persist_entity_payload_result( 'section_template', 'key', $result ) );
+		$read = $repo->get_payload( 'section_template', 'key' );
+		$this->assertSame( array(), $read[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] );
 	}
 }

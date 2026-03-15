@@ -106,6 +106,7 @@ final class Global_Style_Settings_Repository {
 
 	/**
 	 * Persists global token values. Invalid groups/names are stripped; values are length-capped.
+	 * For full security (prohibited-pattern checks), use persist_global_tokens_result with a Style_Validation_Result from the sanitizer.
 	 *
 	 * @param array<string, array<string, string>> $tokens
 	 * @return bool True if option was updated.
@@ -115,6 +116,19 @@ final class Global_Style_Settings_Repository {
 		$full     = $this->get_full();
 		$full[ Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS ] = $filtered;
 		return \update_option( Global_Style_Settings_Schema::OPTION_KEY, $full );
+	}
+
+	/**
+	 * Persists global tokens only when the validation result is valid (sanitizer-approved). Use after Styles_JSON_Normalizer + Styles_JSON_Sanitizer.
+	 *
+	 * @param Style_Validation_Result $result
+	 * @return bool True if result was valid and option was updated.
+	 */
+	public function persist_global_tokens_result( Style_Validation_Result $result ): bool {
+		if ( ! $result->is_valid() ) {
+			return false;
+		}
+		return $this->set_global_tokens( $result->get_sanitized() );
 	}
 
 	/**
@@ -152,6 +166,7 @@ final class Global_Style_Settings_Repository {
 
 	/**
 	 * Persists global component overrides. Invalid component ids or token names are stripped.
+	 * For full security (prohibited-pattern checks), use persist_global_component_overrides_result with a Style_Validation_Result from the sanitizer.
 	 *
 	 * @param array<string, array<string, string>> $overrides
 	 * @return bool
@@ -161,6 +176,19 @@ final class Global_Style_Settings_Repository {
 		$full     = $this->get_full();
 		$full[ Global_Style_Settings_Schema::KEY_GLOBAL_COMPONENT_OVERRIDES ] = $filtered;
 		return \update_option( Global_Style_Settings_Schema::OPTION_KEY, $full );
+	}
+
+	/**
+	 * Persists global component overrides only when the validation result is valid (sanitizer-approved). Use after normalizer + sanitizer.
+	 *
+	 * @param Style_Validation_Result $result
+	 * @return bool True if result was valid and option was updated.
+	 */
+	public function persist_global_component_overrides_result( Style_Validation_Result $result ): bool {
+		if ( ! $result->is_valid() ) {
+			return false;
+		}
+		return $this->set_global_component_overrides( $result->get_sanitized() );
 	}
 
 	/**

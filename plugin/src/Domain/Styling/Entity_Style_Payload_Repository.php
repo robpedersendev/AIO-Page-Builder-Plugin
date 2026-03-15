@@ -68,6 +68,7 @@ final class Entity_Style_Payload_Repository {
 
 	/**
 	 * Persists payload for an entity. Invalid type/key or invalid payload shape are rejected (no write).
+	 * For full security (prohibited-pattern checks), use persist_entity_payload_result with a Style_Validation_Result from the sanitizer.
 	 *
 	 * @param string $entity_type One of Entity_Style_Payload_Schema::ENTITY_TYPES.
 	 * @param string $entity_key  Stable key.
@@ -86,6 +87,21 @@ final class Entity_Style_Payload_Repository {
 		$full       = $this->get_full();
 		$full[ Entity_Style_Payload_Schema::KEY_PAYLOADS ][ $entity_type ][ $key ] = $normalized;
 		return \update_option( Entity_Style_Payload_Schema::OPTION_KEY, $full );
+	}
+
+	/**
+	 * Persists entity payload only when the validation result is valid (sanitizer-approved). Use after Styles_JSON_Normalizer + Styles_JSON_Sanitizer.
+	 *
+	 * @param string                 $entity_type
+	 * @param string                 $entity_key
+	 * @param Style_Validation_Result $result
+	 * @return bool True if result was valid and option was updated.
+	 */
+	public function persist_entity_payload_result( string $entity_type, string $entity_key, Style_Validation_Result $result ): bool {
+		if ( ! $result->is_valid() ) {
+			return false;
+		}
+		return $this->set_payload( $entity_type, $entity_key, $result->get_sanitized() );
 	}
 
 	/**

@@ -11,6 +11,7 @@ use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Repository;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
 use AIOPageBuilder\Domain\Styling\Style_Spec_Loader;
 use AIOPageBuilder\Domain\Styling\Style_Token_Registry;
+use AIOPageBuilder\Domain\Styling\Style_Validation_Result;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -20,6 +21,7 @@ require_once $plugin_root . '/src/Domain/Styling/Global_Style_Settings_Schema.ph
 require_once $plugin_root . '/src/Domain/Styling/Global_Style_Settings_Repository.php';
 require_once $plugin_root . '/src/Domain/Styling/Style_Spec_Loader.php';
 require_once $plugin_root . '/src/Domain/Styling/Style_Token_Registry.php';
+require_once $plugin_root . '/src/Domain/Styling/Style_Validation_Result.php';
 
 final class Global_Style_Settings_Repository_Test extends TestCase {
 
@@ -105,6 +107,31 @@ final class Global_Style_Settings_Repository_Test extends TestCase {
 	public function test_without_registry_set_global_tokens_persists_nothing(): void {
 		$repo = new Global_Style_Settings_Repository( null, null );
 		$repo->set_global_tokens( array( 'color' => array( 'primary' => '#000' ) ) );
+		$this->assertSame( array(), $repo->get_global_tokens() );
+	}
+
+	/**
+	 * persist_global_tokens_result persists only when result is valid (Prompt 252).
+	 */
+	public function test_persist_global_tokens_result_valid_persists(): void {
+		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$registry = new Style_Token_Registry( $loader );
+		$repo     = new Global_Style_Settings_Repository( $registry, null );
+		$sanitized = array( 'color' => array( 'primary' => '#111' ) );
+		$result   = new Style_Validation_Result( true, array(), $sanitized );
+		$this->assertTrue( $repo->persist_global_tokens_result( $result ) );
+		$this->assertSame( $sanitized, $repo->get_global_tokens() );
+	}
+
+	/**
+	 * persist_global_tokens_result does not persist when result is invalid.
+	 */
+	public function test_persist_global_tokens_result_invalid_does_not_persist(): void {
+		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$registry = new Style_Token_Registry( $loader );
+		$repo     = new Global_Style_Settings_Repository( $registry, null );
+		$result   = new Style_Validation_Result( false, array( 'Invalid token group' ), array() );
+		$this->assertFalse( $repo->persist_global_tokens_result( $result ) );
 		$this->assertSame( array(), $repo->get_global_tokens() );
 	}
 }

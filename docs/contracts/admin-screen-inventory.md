@@ -168,6 +168,10 @@ The **section template directory** is a dedicated browse experience for section 
 }
 ```
 
+### 2.5.1 Section and page template detail screens — per-entity styling (Prompt 253)
+
+The **Section Template Detail** screen (`Section_Template_Detail_Screen` / `aio-page-builder-section-template-detail`) and **Page Template Detail** screen (`Page_Template_Detail_Screen` / `aio-page-builder-page-template-detail`) each include a **Per-entity styling** panel when viewing a single section or page template. The panel is built by `Entity_Style_UI_State_Builder` and `Entity_Style_Form_Builder`; save is capability- and nonce-gated and passes through the styles_json sanitization pipeline. No freeform CSS; only approved token and component override fields from the style specs. Validation errors are shown when save fails.
+
 ---
 
 ## 2.6 Form Provider Health screen (Prompt 239, spec §0.10.11, §49.11, §59.12)

@@ -20,6 +20,8 @@ use AIOPageBuilder\Domain\Styling\Global_Token_Variable_Emitter;
 use AIOPageBuilder\Domain\Styling\Render_Surface_Style_Registry;
 use AIOPageBuilder\Domain\Styling\Style_Spec_Loader;
 use AIOPageBuilder\Domain\Styling\Style_Token_Registry;
+use AIOPageBuilder\Domain\Styling\Styles_JSON_Normalizer;
+use AIOPageBuilder\Domain\Styling\Styles_JSON_Sanitizer;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
@@ -56,6 +58,18 @@ final class Styling_Provider implements Service_Provider_Interface {
 
 		$container->register( 'entity_style_payload_repository', function (): Entity_Style_Payload_Repository {
 			return new Entity_Style_Payload_Repository();
+		} );
+
+		$container->register( 'styles_json_normalizer', function (): Styles_JSON_Normalizer {
+			return new Styles_JSON_Normalizer();
+		} );
+
+		$container->register( 'styles_json_sanitizer', function () use ( $container ): Styles_JSON_Sanitizer {
+			return new Styles_JSON_Sanitizer(
+				$container->get( 'style_token_registry' ),
+				$container->get( 'component_override_registry' ),
+				$container->get( 'styles_json_normalizer' )
+			);
 		} );
 
 		$container->register( 'global_style_settings_repository', function () use ( $container ): Global_Style_Settings_Repository {

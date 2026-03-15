@@ -12,10 +12,12 @@ namespace AIOPageBuilder\Admin\Screens\Templates;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Forms\Entity_Style_Form_Builder;
+use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Domain\Registries\Section\UI\Section_Template_Detail_State_Builder;
+use AIOPageBuilder\Domain\Styling\Entity_Style_UI_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
-use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 
 /**
  * Renders a single section template detail: name, description, purpose family, CTA classification,
@@ -56,12 +58,24 @@ final class Section_Template_Detail_Screen {
 			'reduced_motion' => isset( $_GET['reduced_motion'] ) && (string) $_GET['reduced_motion'] === '1',
 		);
 
+		$entity_style_last_result = null;
+		if ( $section_key !== '' && $this->process_entity_style_save( $section_key, $entity_style_last_result ) ) {
+			return;
+		}
+
 		$state_builder = $this->get_state_builder();
 		$state = $state_builder->build_state( $section_key, $request );
 
 		if ( ! empty( $state['not_found'] ) ) {
 			$this->render_not_found( $state );
 			return;
+		}
+
+		if ( $section_key !== '' ) {
+			$entity_style_state = $this->get_entity_style_state( $section_key, $entity_style_last_result );
+			if ( $entity_style_state !== null ) {
+				$state['entity_style'] = $entity_style_state;
+			}
 		}
 
 		?>
@@ -246,7 +260,72 @@ final class Section_Template_Detail_Screen {
 					</ul>
 				<?php endif; ?>
 			<?php endif; ?>
+			<?php
+			$entity_style = $state['entity_style'] ?? null;
+			if ( \is_array( $entity_style ) && ! empty( $entity_style ) ) {
+				$this->render_entity_style_panel( $entity_style );
+			}
+			?>
 		</section>
+		<?php
+	}
+
+	/**
+	 * Renders per-entity styling form (Prompt 253). Save via sanitizer; no raw CSS.
+	 *
+	 * @param array<string, mixed> $entity_style State from Entity_Style_UI_State_Builder.
+	 * @return void
+	 */
+	private function render_entity_style_panel( array $entity_style ): void {
+		$save_action   = (string) ( $entity_style['save_action'] ?? '' );
+		$nonce_action  = (string) ( $entity_style['nonce_action'] ?? '' );
+		$errors        = $entity_style['validation_errors'] ?? array();
+		$token_by_group = $entity_style['token_fields_by_group'] ?? array();
+		$comp_by_comp   = $entity_style['component_fields_by_component'] ?? array();
+		$entity_key    = (string) ( $entity_style['entity_key'] ?? '' );
+		$detail_url    = \add_query_arg( array( 'page' => self::SLUG, 'section' => $entity_key ), \admin_url( 'admin.php' ) );
+		?>
+		<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Per-entity styling', 'aio-page-builder' ); ?></h3>
+		<?php
+		$style_msg = isset( $_GET[ self::ENTITY_STYLE_QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::ENTITY_STYLE_QUERY_MSG ] ) ) : '';
+		if ( $style_msg === 'saved' ) :
+			?>
+			<p class="notice notice-success is-dismissible" style="margin: 0.5em 0;"><span><?php \esc_html_e( 'Styling saved.', 'aio-page-builder' ); ?></span></p>
+		<?php endif; ?>
+		<?php if ( \is_array( $errors ) && count( $errors ) > 0 ) : ?>
+			<ul class="aio-entity-style-errors" role="alert">
+				<?php foreach ( $errors as $msg ) : ?>
+					<li class="aio-notice-warning"><?php echo \esc_html( \is_string( $msg ) ? $msg : '' ); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
+		<form method="post" action="<?php echo \esc_url( $detail_url ); ?>" class="aio-entity-style-form">
+			<?php \wp_nonce_field( $nonce_action, $nonce_action ); ?>
+			<input type="hidden" name="action" value="<?php echo \esc_attr( $save_action ); ?>" />
+			<?php foreach ( $token_by_group as $group => $fields ) : ?>
+				<fieldset class="aio-entity-style-group">
+					<legend><?php echo \esc_html( \ucfirst( $group ) ); ?></legend>
+					<?php foreach ( $fields as $field ) : ?>
+						<p>
+							<label for="<?php echo \esc_attr( \sanitize_key( ( $field['name_attr'] ?? '' ) ) ); ?>"><?php echo \esc_html( $field['label'] ?? '' ); ?></label>
+							<input type="text" id="<?php echo \esc_attr( \sanitize_key( ( $field['name_attr'] ?? '' ) ) ); ?>" name="<?php echo \esc_attr( $field['name_attr'] ?? '' ); ?>" value="<?php echo \esc_attr( $field['value'] ?? '' ); ?>" maxlength="<?php echo \esc_attr( (string) ( $field['max_length'] ?? 256 ) ); ?>" class="regular-text" />
+						</p>
+					<?php endforeach; ?>
+				</fieldset>
+			<?php endforeach; ?>
+			<?php foreach ( $comp_by_comp as $component_id => $fields ) : ?>
+				<fieldset class="aio-entity-style-component">
+					<legend><?php echo \esc_html( \ucfirst( \str_replace( array( '-', '_' ), ' ', $component_id ) ) ); ?></legend>
+					<?php foreach ( $fields as $field ) : ?>
+						<p>
+							<label for="<?php echo \esc_attr( \sanitize_key( ( $field['name_attr'] ?? '' ) ) ); ?>"><?php echo \esc_html( $field['label'] ?? '' ); ?></label>
+							<input type="text" id="<?php echo \esc_attr( \sanitize_key( ( $field['name_attr'] ?? '' ) ) ); ?>" name="<?php echo \esc_attr( $field['name_attr'] ?? '' ); ?>" value="<?php echo \esc_attr( $field['value'] ?? '' ); ?>" maxlength="<?php echo \esc_attr( (string) ( $field['max_length'] ?? 256 ) ); ?>" class="regular-text" />
+						</p>
+					<?php endforeach; ?>
+				</fieldset>
+			<?php endforeach; ?>
+			<p><button type="submit" class="button button-primary"><?php \esc_html_e( 'Save styling', 'aio-page-builder' ); ?></button></p>
+		</form>
 		<?php
 	}
 
@@ -265,6 +344,64 @@ final class Section_Template_Detail_Screen {
 			</div>
 		</section>
 		<?php
+	}
+
+	private const ENTITY_STYLE_QUERY_MSG = 'aio_entity_style_msg';
+
+	/**
+	 * Processes POST save for per-entity styling. Redirects on success; sets $last_result on validation failure.
+	 *
+	 * @param string                $section_key
+	 * @param \AIOPageBuilder\Domain\Styling\Style_Validation_Result|null $last_result Set when validation fails (by reference).
+	 * @return bool True if redirect was sent (caller should return); false to continue rendering.
+	 */
+	private function process_entity_style_save( string $section_key, &$last_result ): bool {
+		if ( ! isset( $_POST['action'] ) || \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) !== Entity_Style_UI_State_Builder::SAVE_ACTION ) {
+			return false;
+		}
+		$nonce_key = Entity_Style_UI_State_Builder::NONCE_ACTION;
+		if ( ! isset( $_POST[ $nonce_key ] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ $nonce_key ] ) ), $nonce_key ) ) {
+			return false;
+		}
+		$raw = isset( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] ) && \is_array( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] )
+			? \wp_unslash( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] )
+			: array();
+		$normalizer = $this->container && $this->container->has( 'styles_json_normalizer' ) ? $this->container->get( 'styles_json_normalizer' ) : null;
+		$sanitizer  = $this->container && $this->container->has( 'styles_json_sanitizer' ) ? $this->container->get( 'styles_json_sanitizer' ) : null;
+		$repo       = $this->container && $this->container->has( 'entity_style_payload_repository' ) ? $this->container->get( 'entity_style_payload_repository' ) : null;
+		if ( $normalizer === null || $sanitizer === null || $repo === null ) {
+			return false;
+		}
+		$normalized = $normalizer->normalize_entity_payload( $raw );
+		$result     = $sanitizer->sanitize_entity_payload( $normalized );
+		if ( $result->is_valid() ) {
+			$repo->persist_entity_payload_result( 'section_template', $section_key, $result );
+			$url = \add_query_arg( array( 'page' => self::SLUG, 'section' => $section_key, self::ENTITY_STYLE_QUERY_MSG => 'saved' ), \admin_url( 'admin.php' ) );
+			\wp_safe_redirect( $url );
+			exit;
+		}
+		$last_result = $result;
+		return false;
+	}
+
+	/**
+	 * Builds entity style UI state for the given section. Returns null if styling services unavailable.
+	 *
+	 * @param string                                                                 $section_key
+	 * @param \AIOPageBuilder\Domain\Styling\Style_Validation_Result|null $last_result
+	 * @return array<string, mixed>|null
+	 */
+	private function get_entity_style_state( string $section_key, $last_result ): ?array {
+		$token_registry   = $this->container && $this->container->has( 'style_token_registry' ) ? $this->container->get( 'style_token_registry' ) : null;
+		$comp_registry    = $this->container && $this->container->has( 'component_override_registry' ) ? $this->container->get( 'component_override_registry' ) : null;
+		$payload_repo     = $this->container && $this->container->has( 'entity_style_payload_repository' ) ? $this->container->get( 'entity_style_payload_repository' ) : null;
+		if ( $token_registry === null || $comp_registry === null || $payload_repo === null ) {
+			return null;
+		}
+		$form_builder = new Entity_Style_Form_Builder( $token_registry, $comp_registry, $payload_repo );
+		$ui_builder  = new Entity_Style_UI_State_Builder( $form_builder, $payload_repo );
+		$result_obj  = $last_result instanceof \AIOPageBuilder\Domain\Styling\Style_Validation_Result ? $last_result : null;
+		return $ui_builder->build_state( 'section_template', $section_key, $result_obj );
 	}
 
 	private function get_state_builder(): Section_Template_Detail_State_Builder {

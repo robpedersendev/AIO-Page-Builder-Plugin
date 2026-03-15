@@ -3,7 +3,7 @@
 **Spec**: §17.10 Rendered Content Independence from Plugin; §18 CSS, ID, Class, and Attribute Contract; §18.11 Tokenized Styling Model  
 **Upstream**: [css-selector-contract.md](css-selector-contract.md), [rendering-contract.md](rendering-contract.md)  
 **Standards**: [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md)  
-**Status**: Storage, registries, admin UI (global tokens, component overrides), and global token emission implemented (Prompts 246–249).
+**Status**: Storage, registries, admin UI (global tokens, component overrides), global token emission (Prompts 246–250), per-entity payload schema (Prompt 251), and styles_json normalization/sanitization pipeline (Prompt 252) implemented.
 
 ---
 
@@ -83,7 +83,9 @@ The styling subsystem **extends** this model under a single contract: same token
 ## 7. styles_json Meaning and Sanitization
 
 - **styles_json** (or equivalent) is a **machine-readable** structure for global and/or per-entity style payloads.
-- **Sanitization**: Whitelist-based only. Allowed keys and value types come from the style specs (core token spec, component spec); no arbitrary CSS text storage and no arbitrary selector injection.
+- **Normalization**: Raw input is normalized via **Styles_JSON_Normalizer** into deterministic shapes (global tokens, global component overrides, entity payload). See [styling-sanitization-rules.md](../security/styling-sanitization-rules.md).
+- **Sanitization**: Whitelist-based only via **Styles_JSON_Sanitizer**. Allowed keys and value types come from the style specs (core token spec, component spec); no arbitrary CSS text storage and no arbitrary selector injection. Prohibited value patterns (e.g. `url(`, `expression(`, `javascript:`, `<`, `>`, `{`, `}`) are rejected. **Style_Validation_Result** carries valid flag, bounded errors, and sanitized payload.
+- **Integration**: All style editing and emission flows must pass input through the normalizer and sanitizer before persistence. Repositories expose `persist_*_result(Style_Validation_Result)` to persist only when valid.
 - **Invalid input**: Safe failure: reject or strip invalid entries; never emit unsanitized data to the front end.
 - **Secrets**: No secret-bearing data in styling storage.
 
@@ -134,7 +136,7 @@ Later work may add, in order, without breaking this contract:
 
 - **Storage**: Global options and optional per-entity style payload schema; version/cache markers.
 - **Registry implementation**: Runtime loader that reads the three spec files and exposes lookup per style-registry-contract.md.
-- **Sanitizers**: Whitelist-based validation and normalization against the machine-readable specs.
+- **Sanitizers**: **Styles_JSON_Normalizer**, **Styles_JSON_Sanitizer**, and **Style_Validation_Result** (Prompt 252). Whitelist-based validation and normalization against the machine-readable specs; see styling-sanitization-rules.md.
 - **Emitters**: Stylesheet or scoped inline output from approved token/spec data only.
 - **Admin UI**: Screens to view/edit global styling and optionally per-entity overrides; no editing of selector/token **names**.
 - **Export/restore and diagnostics**: Inclusion of styling metadata in support bundles and export manifests; bounded and redacted.
@@ -147,7 +149,7 @@ No later prompt may:
 
 ---
 
-## 11. Cross-References
+## 12. Cross-References
 
 - **Spec**: §17.10, §18, §18.11; [aio-page-builder-master-spec.md](../specs/aio-page-builder-master-spec.md).
 - **CSS/selector contract**: [css-selector-contract.md](css-selector-contract.md).
@@ -163,3 +165,4 @@ No later prompt may:
 | Version | Date | Change |
 |---------|------|--------|
 | 1 | Prompt 242 | Initial styling subsystem contract (Option A). |
+| 2 | Prompt 252 | §7: normalizer, sanitizer, Style_Validation_Result; persist_*_result; link to styling-sanitization-rules.md. §11: sanitizers extension. |
