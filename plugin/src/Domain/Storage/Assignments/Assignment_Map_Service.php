@@ -198,6 +198,42 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 	}
 
 	/**
+	 * Lists target_ref values only by map_type and source_ref (read-path optimization; Prompt 295).
+	 * Fetches minimal column data for visible-group resolution without full row load.
+	 *
+	 * @param string $map_type   One of Assignment_Types constants.
+	 * @param string $source_ref Source identifier (e.g. page id).
+	 * @param int    $limit     Max rows (0 = 500).
+	 * @return list<string>
+	 */
+	public function list_target_refs_by_source( string $map_type, string $source_ref, int $limit = 0 ): array {
+		$map_type   = $this->sanitize_map_type( $map_type );
+		$source_ref = $this->sanitize_ref( $source_ref );
+		if ( $map_type === '' || $source_ref === '' ) {
+			return array();
+		}
+		$limit = $limit > 0 ? min( 500, $limit ) : 500;
+		$rows = $this->wpdb->get_col(
+			$this->wpdb->prepare(
+				"SELECT target_ref FROM `{$this->table}` WHERE map_type = %s AND source_ref = %s ORDER BY id ASC LIMIT %d",
+				$map_type,
+				$source_ref,
+				$limit
+			)
+		);
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $rows as $ref ) {
+			if ( is_string( $ref ) && $ref !== '' ) {
+				$out[] = $ref;
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * Returns the first target_ref for a source_ref and map_type, or null.
 	 *
 	 * @param string $map_type   One of Assignment_Types constants.

@@ -2,7 +2,12 @@
 /**
  * Central entrypoint for ACF field-group registration at bootstrap (acf/init).
  * Decouples generic request bootstrap from unconditional full registration so
- * context-aware registration can be applied in later prompts (acf-conditional-registration-contract).
+ * context-aware registration can be applied (acf-conditional-registration-contract).
+ *
+ * Hook timing (Prompt 294): Run from acf/init priority 5 so groups are registered
+ * before ACF builds its field-group list for the edit screen. Context (admin, pagenow,
+ * post id) and assignment map are available at that point. If context or section keys
+ * cannot be resolved, register zero groups; do not fall back to full registration.
  *
  * @package AIOPageBuilder
  */
@@ -35,6 +40,9 @@ final class ACF_Registration_Bootstrap_Controller {
 	/** @var New_Page_ACF_Registration_Context_Resolver */
 	private New_Page_ACF_Registration_Context_Resolver $new_page_resolver;
 
+	/** @var Admin_Post_Edit_Context_Resolver */
+	private Admin_Post_Edit_Context_Resolver $admin_post_edit_context_resolver;
+
 	/** @var ACF_Registration_Diagnostics_Service|null */
 	private ?ACF_Registration_Diagnostics_Service $diagnostics;
 
@@ -44,23 +52,26 @@ final class ACF_Registration_Bootstrap_Controller {
 		Group_Key_Section_Key_Resolver $group_key_resolver,
 		Existing_Page_ACF_Registration_Context_Resolver $existing_page_resolver,
 		New_Page_ACF_Registration_Context_Resolver $new_page_resolver,
+		Admin_Post_Edit_Context_Resolver $admin_post_edit_context_resolver,
 		?ACF_Registration_Diagnostics_Service $diagnostics = null
 	) {
-		$this->group_registrar        = $group_registrar;
-		$this->request_context        = $request_context;
-		$this->group_key_resolver     = $group_key_resolver;
-		$this->existing_page_resolver = $existing_page_resolver;
-		$this->new_page_resolver      = $new_page_resolver;
-		$this->diagnostics            = $diagnostics;
+		$this->group_registrar                 = $group_registrar;
+		$this->request_context                 = $request_context;
+		$this->group_key_resolver              = $group_key_resolver;
+		$this->existing_page_resolver          = $existing_page_resolver;
+		$this->new_page_resolver               = $new_page_resolver;
+		$this->admin_post_edit_context_resolver = $admin_post_edit_context_resolver;
+		$this->diagnostics                     = $diagnostics;
 	}
 
 	/**
 	 * Runs ACF registration for the current request. Called from acf/init.
-	 * Front-end: skip. Existing-page: register only that page's sections. New-page: register template/composition sections or none. Non-page admin: register 0 (acf-admin-context-registration-matrix).
+	 * Uses Admin_Post_Edit_Context_Resolver as the canonical context; front-end skips; unsupported contexts fail safe to no full registration.
 	 *
 	 * @return int Number of groups registered (0 if skipped or ACF unavailable).
 	 */
 	public function run_registration(): int {
+		// Sequencing: run_registration() is called from acf/init (priority 5). Do not call register_all() here.
 		if ( $this->request_context->should_skip_registration() ) {
 			if ( $this->diagnostics !== null ) {
 				$this->diagnostics->record_registration(
@@ -72,32 +83,42 @@ final class ACF_Registration_Bootstrap_Controller {
 			}
 			return 0;
 		}
-		$section_keys = $this->existing_page_resolver->get_section_keys_for_current_request();
-		if ( $section_keys !== null ) {
-			$count = $this->group_registrar->register_sections( $section_keys );
-			if ( $this->diagnostics !== null ) {
-				$this->diagnostics->record_registration(
-					ACF_Registration_Diagnostics_Service::MODE_EXISTING_PAGE,
-					count( $section_keys ),
-					$this->diagnostics->get_request_cache_used(),
-					false
-				);
+
+		$admin_context = $this->admin_post_edit_context_resolver->resolve();
+
+		if ( $admin_context->is_existing_page_edit() ) {
+			$section_keys = $this->existing_page_resolver->get_section_keys_for_current_request();
+			if ( $section_keys !== null ) {
+				$count = $this->group_registrar->register_sections( $section_keys );
+				if ( $this->diagnostics !== null ) {
+					$this->diagnostics->record_registration(
+						ACF_Registration_Diagnostics_Service::MODE_EXISTING_PAGE,
+						count( $section_keys ),
+						$this->diagnostics->get_request_cache_used(),
+						false
+					);
+				}
+				return $count;
 			}
-			return $count;
 		}
-		$section_keys = $this->new_page_resolver->get_section_keys_for_current_request();
-		if ( $section_keys !== null ) {
-			$count = $this->group_registrar->register_sections( $section_keys );
-			if ( $this->diagnostics !== null ) {
-				$this->diagnostics->record_registration(
-					ACF_Registration_Diagnostics_Service::MODE_NEW_PAGE,
-					count( $section_keys ),
-					$this->diagnostics->get_request_cache_used(),
-					false
-				);
+
+		if ( $admin_context->is_new_page_edit() ) {
+			$section_keys = $this->new_page_resolver->get_section_keys_for_current_request();
+			if ( $section_keys !== null ) {
+				$count = $this->group_registrar->register_sections( $section_keys );
+				if ( $this->diagnostics !== null ) {
+					$this->diagnostics->record_registration(
+						ACF_Registration_Diagnostics_Service::MODE_NEW_PAGE,
+						count( $section_keys ),
+						$this->diagnostics->get_request_cache_used(),
+						false
+					);
+				}
+				return $count;
 			}
-			return $count;
 		}
+
+		// Non-page admin or unsupported: do not trigger full registration (acf-admin-context-registration-matrix).
 		if ( $this->diagnostics !== null ) {
 			$this->diagnostics->record_registration(
 				ACF_Registration_Diagnostics_Service::MODE_NON_PAGE_ADMIN,
@@ -106,7 +127,6 @@ final class ACF_Registration_Bootstrap_Controller {
 				false
 			);
 		}
-		// Non-page admin: do not trigger full registration (see acf-admin-context-registration-matrix).
 		return 0;
 	}
 

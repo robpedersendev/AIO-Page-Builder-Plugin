@@ -1,0 +1,67 @@
+<?php
+/**
+ * Canonical resolver for admin post-edit context (Prompt 293, acf-conditional-registration-contract).
+ * Determines whether the current request is existing-page edit, new-page edit, non-page admin, or unsupported.
+ * Used by ACF_Registration_Bootstrap_Controller to choose the downstream section-key resolver.
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Domain\ACF\Registration;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Resolves current admin request into a typed context. Conditions documented in acf-page-visibility-contract.
+ * Unsupported contexts fail safe toward no full registration.
+ */
+final class Admin_Post_Edit_Context_Resolver {
+
+	/**
+	 * Resolves the current request into an admin post-edit context.
+	 * Call only when is_admin(); for non-admin use Registration_Request_Context::should_skip_registration().
+	 *
+	 * Conditions:
+	 * - post.php + valid post ID + post type 'page' → EXISTING_PAGE_EDIT (with page_id).
+	 * - post.php + invalid/missing post or non-page type → UNSUPPORTED_ADMIN (fail safe).
+	 * - post-new.php + post_type=page → NEW_PAGE_EDIT.
+	 * - post-new.php + other post type → NON_PAGE_ADMIN.
+	 * - Any other admin screen → NON_PAGE_ADMIN.
+	 *
+	 * @return Admin_Post_Edit_Context_Result
+	 */
+	public function resolve(): Admin_Post_Edit_Context_Result {
+		global $pagenow;
+
+		if ( ! is_admin() ) {
+			return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NO_REGISTRATION_REQUIRED, 0 );
+		}
+
+		if ( $pagenow === 'post.php' ) {
+			$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0;
+			if ( $post_id <= 0 ) {
+				return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::UNSUPPORTED_ADMIN, 0 );
+			}
+			$post_type = get_post_type( $post_id );
+			if ( $post_type !== 'page' ) {
+				return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::UNSUPPORTED_ADMIN, 0 );
+			}
+			return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::EXISTING_PAGE_EDIT, $post_id );
+		}
+
+		if ( $pagenow === 'post-new.php' ) {
+			$post_type = isset( $_GET['post_type'] ) ? \sanitize_key( (string) $_GET['post_type'] ) : '';
+			if ( $post_type === '' ) {
+				$post_type = get_post_type_object( 'page' ) ? 'page' : '';
+			}
+			if ( $post_type === 'page' ) {
+				return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NEW_PAGE_EDIT, 0 );
+			}
+			return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NON_PAGE_ADMIN, 0 );
+		}
+
+		return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NON_PAGE_ADMIN, 0 );
+	}
+}

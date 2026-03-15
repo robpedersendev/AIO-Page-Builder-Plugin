@@ -36,6 +36,7 @@ require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repos
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Section_Template_Repository.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Page_Template_Repository.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Composition_Repository.php';
+require_once $plugin_root . '/src/Domain/Pages/Visible_Group_Key_Query_Result.php';
 require_once $plugin_root . '/src/Domain/ACF/Assignment/Field_Group_Derivation_Service.php';
 require_once $plugin_root . '/src/Domain/ACF/Assignment/Page_Field_Group_Assignment_Service.php';
 
@@ -103,6 +104,19 @@ final class Assignment_Map_Wpdb_Stub {
 		}
 		if ( preg_match( '/LIMIT\s+(\d+)/', $query, $m ) ) {
 			$out = array_slice( $out, 0, (int) $m[1] );
+		}
+		return $out;
+	}
+
+	/** Supports list_target_refs_by_source (SELECT target_ref). */
+	public function get_col( string $query ): array {
+		$rows = $this->get_results( $query, \ARRAY_A );
+		$out  = array();
+		foreach ( $rows as $row ) {
+			$ref = $row['target_ref'] ?? '';
+			if ( $ref !== '' ) {
+				$out[] = $ref;
+			}
 		}
 		return $out;
 	}
@@ -366,6 +380,22 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 	public function test_get_visible_groups_for_page_returns_empty_when_no_assignment(): void {
 		$result = $this->service->get_visible_groups_for_page( 9999 );
 		$this->assertSame( array(), $result );
+	}
+
+	public function test_get_visible_groups_result_for_page_matches_get_visible_groups_for_page(): void {
+		$page_id = 42;
+		$this->seed_page_template( 'pt_landing' );
+		$this->seed_page( $page_id );
+		$assign = $this->service->assign_from_template( $page_id, 'pt_landing', true );
+		$this->assertGreaterThan( 0, $assign['assigned'] );
+		$list  = $this->service->get_visible_groups_for_page( $page_id );
+		$result = $this->service->get_visible_groups_result_for_page( $page_id );
+		$this->assertSame( $list, $result->get_group_keys() );
+	}
+
+	public function test_get_visible_groups_result_for_page_returns_empty_for_invalid_page_id(): void {
+		$result = $this->service->get_visible_groups_result_for_page( 0 );
+		$this->assertSame( array(), $result->get_group_keys() );
 	}
 
 	public function test_get_structural_source_for_page_returns_null_when_no_source(): void {

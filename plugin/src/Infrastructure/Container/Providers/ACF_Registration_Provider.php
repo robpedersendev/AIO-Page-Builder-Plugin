@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Registrar;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Registration_Bootstrap_Controller;
+use AIOPageBuilder\Domain\ACF\Registration\Admin_Post_Edit_Context_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\Existing_Page_ACF_Registration_Context_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\Group_Key_Section_Key_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\New_Page_ACF_Registration_Context_Resolver;
@@ -74,6 +75,9 @@ final class ACF_Registration_Provider implements Service_Provider_Interface {
 				$container->get( 'acf_registration_diagnostics_service' )
 			);
 		} );
+		$container->register( 'admin_post_edit_context_resolver', function (): Admin_Post_Edit_Context_Resolver {
+			return new Admin_Post_Edit_Context_Resolver();
+		} );
 		$container->register( 'acf_registration_bootstrap_controller', function () use ( $container ): ACF_Registration_Bootstrap_Controller {
 			return new ACF_Registration_Bootstrap_Controller(
 				$container->get( 'acf_group_registrar' ),
@@ -81,10 +85,12 @@ final class ACF_Registration_Provider implements Service_Provider_Interface {
 				$container->get( 'acf_group_key_section_key_resolver' ),
 				$container->get( 'acf_existing_page_registration_context_resolver' ),
 				$container->get( 'acf_new_page_registration_context_resolver' ),
+				$container->get( 'admin_post_edit_context_resolver' ),
 				$container->get( 'acf_registration_diagnostics_service' )
 			);
 		} );
 
+		// acf/init priority 5: scoped registration runs before ACF builds field-group list for edit screens (see docs/qa/acf-registration-hook-timing-report.md).
 		add_action( 'acf/init', function () use ( $container ): void {
 			if ( $container->has( 'page_section_key_cache_service' ) ) {
 				$container->get( 'page_section_key_cache_service' )->listen_for_assignment_changes();

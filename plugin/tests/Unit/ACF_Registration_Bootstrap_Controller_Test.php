@@ -10,6 +10,8 @@ namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Registrar_Interface;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Registration_Bootstrap_Controller;
+use AIOPageBuilder\Domain\ACF\Registration\Admin_Post_Edit_Context_Result;
+use AIOPageBuilder\Domain\ACF\Registration\Admin_Post_Edit_Context_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\Existing_Page_ACF_Registration_Context_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\Group_Key_Section_Key_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\New_Page_ACF_Registration_Context_Resolver;
@@ -21,6 +23,8 @@ require_once $plugin_root . '/src/Domain/ACF/Registration/ACF_Group_Registrar_In
 require_once $plugin_root . '/src/Domain/ACF/Registration/Registration_Request_Context.php';
 require_once $plugin_root . '/src/Domain/ACF/Blueprints/Field_Key_Generator.php';
 require_once $plugin_root . '/src/Domain/ACF/Registration/Group_Key_Section_Key_Resolver.php';
+require_once $plugin_root . '/src/Domain/ACF/Registration/Admin_Post_Edit_Context_Result.php';
+require_once $plugin_root . '/src/Domain/ACF/Registration/Admin_Post_Edit_Context_Resolver.php';
 require_once $plugin_root . '/src/Domain/ACF/Registration/Existing_Page_ACF_Registration_Context_Resolver.php';
 require_once $plugin_root . '/src/Domain/ACF/Registration/New_Page_ACF_Registration_Context_Resolver.php';
 require_once $plugin_root . '/src/Domain/ACF/Registration/ACF_Registration_Bootstrap_Controller.php';
@@ -45,13 +49,24 @@ final class ACF_Registration_Bootstrap_Controller_Test extends TestCase {
 		return $mock;
 	}
 
-	private function controller_args( $registrar, $context, $existing_page_resolver = null, $new_page_resolver = null ): array {
+	private function create_admin_context_resolver_returning( Admin_Post_Edit_Context_Result $result ): Admin_Post_Edit_Context_Resolver {
+		$mock = $this->createMock( Admin_Post_Edit_Context_Resolver::class );
+		$mock->method( 'resolve' )->willReturn( $result );
+		return $mock;
+	}
+
+	private function controller_args( $registrar, $context, $existing_page_resolver = null, $new_page_resolver = null, ?Admin_Post_Edit_Context_Resolver $admin_context_resolver = null ): array {
+		$admin = $admin_context_resolver ?? $this->create_admin_context_resolver_returning(
+			new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NON_PAGE_ADMIN, 0 )
+		);
 		return array(
 			$registrar,
 			$context,
 			$this->create_resolver(),
 			$existing_page_resolver ?? $this->create_existing_page_resolver_returning_null(),
 			$new_page_resolver ?? $this->create_new_page_resolver_returning_null(),
+			$admin,
+			null,
 		);
 	}
 
@@ -81,7 +96,8 @@ final class ACF_Registration_Bootstrap_Controller_Test extends TestCase {
 		$context->method( 'should_skip_registration' )->willReturn( false );
 		$existing = $this->createMock( Existing_Page_ACF_Registration_Context_Resolver::class );
 		$existing->method( 'get_section_keys_for_current_request' )->willReturn( array( 'st01_hero', 'st05_faq' ) );
-		$controller = new ACF_Registration_Bootstrap_Controller( ...$this->controller_args( $registrar, $context, $existing ) );
+		$admin_ctx = $this->create_admin_context_resolver_returning( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::EXISTING_PAGE_EDIT, 1 ) );
+		$controller = new ACF_Registration_Bootstrap_Controller( ...$this->controller_args( $registrar, $context, $existing, null, $admin_ctx ) );
 		$this->assertSame( 2, $controller->run_registration() );
 	}
 
@@ -93,7 +109,8 @@ final class ACF_Registration_Bootstrap_Controller_Test extends TestCase {
 		$context->method( 'should_skip_registration' )->willReturn( false );
 		$new_page = $this->createMock( New_Page_ACF_Registration_Context_Resolver::class );
 		$new_page->method( 'get_section_keys_for_current_request' )->willReturn( array( 'st01_hero' ) );
-		$controller = new ACF_Registration_Bootstrap_Controller( ...$this->controller_args( $registrar, $context, null, $new_page ) );
+		$admin_ctx = $this->create_admin_context_resolver_returning( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NEW_PAGE_EDIT, 0 ) );
+		$controller = new ACF_Registration_Bootstrap_Controller( ...$this->controller_args( $registrar, $context, null, $new_page, $admin_ctx ) );
 		$this->assertSame( 1, $controller->run_registration() );
 	}
 
@@ -109,7 +126,8 @@ final class ACF_Registration_Bootstrap_Controller_Test extends TestCase {
 		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
 		$context = $this->createMock( Registration_Request_Context::class );
 		$resolver = $this->create_resolver();
-		$controller = new ACF_Registration_Bootstrap_Controller( $registrar, $context, $resolver, $this->create_existing_page_resolver_returning_null(), $this->create_new_page_resolver_returning_null() );
+		$admin_ctx = $this->create_admin_context_resolver_returning( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NON_PAGE_ADMIN, 0 ) );
+		$controller = new ACF_Registration_Bootstrap_Controller( $registrar, $context, $resolver, $this->create_existing_page_resolver_returning_null(), $this->create_new_page_resolver_returning_null(), $admin_ctx, null );
 		$this->assertSame( $registrar, $controller->get_registrar() );
 	}
 
@@ -117,7 +135,8 @@ final class ACF_Registration_Bootstrap_Controller_Test extends TestCase {
 		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
 		$context = $this->createMock( Registration_Request_Context::class );
 		$resolver = $this->create_resolver();
-		$controller = new ACF_Registration_Bootstrap_Controller( $registrar, $context, $resolver, $this->create_existing_page_resolver_returning_null(), $this->create_new_page_resolver_returning_null() );
+		$admin_ctx = $this->create_admin_context_resolver_returning( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NON_PAGE_ADMIN, 0 ) );
+		$controller = new ACF_Registration_Bootstrap_Controller( $registrar, $context, $resolver, $this->create_existing_page_resolver_returning_null(), $this->create_new_page_resolver_returning_null(), $admin_ctx, null );
 		$this->assertSame( $resolver, $controller->get_group_key_section_key_resolver() );
 	}
 }

@@ -47,16 +47,23 @@ This contract formalizes:
 
 **Result**: On every request, the plugin loads all section definitions and registers all section-owned ACF groups, regardless of whether the current page uses any of them.
 
-### 3.2 Files and entrypoints
+### 3.2 Hook timing (post-retrofit; Prompt 294)
+
+Scoped registration runs on **acf/init** at **priority 5**. At that point:
+- Request context (`is_admin()`, `$pagenow`, `$_GET['post']` / `post_type`) and assignment map reads are available.
+- Registration completes before ACF builds its field-group list for the edit screen.
+- No duplicate or late full registration is triggered from generic bootstrap. See **docs/qa/acf-registration-hook-timing-report.md**.
+
+### 3.3 Files and entrypoints
 
 | Location | Role |
 |----------|------|
-| `Infrastructure/Container/Providers/ACF_Registration_Provider.php` | Registers `acf_group_registrar` and hooks `acf/init` → `register_all()`. |
+| `Infrastructure/Container/Providers/ACF_Registration_Provider.php` | Hooks `acf/init` (priority 5) → controller `run_registration()` (scoped or skip). |
 | `Domain/ACF/Registration/ACF_Group_Registrar.php` | `register_all()` calls `get_all_blueprints()` then registers each blueprint. |
 | `Domain/ACF/Blueprints/Section_Field_Blueprint_Service.php` | `get_all_blueprints()` calls `list_all_definitions( 9999, 0 )`. |
 | `Domain/Storage/Repositories/Section_Template_Repository.php` | `list_all_definitions()` performs the full section CPT query. |
 
-### 3.3 Other callers of full blueprint or definition load (for context only)
+### 3.4 Other callers of full blueprint or definition load (for context only)
 
 The following use `get_all_blueprints()` or `list_all_definitions( 9999, 0 )` for **non–request-bootstrap** purposes (debug, export, diagnostics, repair, migration, reporting). They are **not** on the critical path for every page load but must remain valid after the retrofit:
 
@@ -182,3 +189,4 @@ The following must be preserved by the retrofit and all downstream implementatio
 | Version | Date | Change |
 |---------|------|--------|
 | 1 | Prompt 281 | Initial conditional registration contract; hot path and target model. |
+| 2 | Prompt 294 | §3.2 Hook timing: acf/init priority 5; sequencing and timing report reference. |

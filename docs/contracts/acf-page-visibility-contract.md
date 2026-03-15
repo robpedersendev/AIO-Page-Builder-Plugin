@@ -27,7 +27,22 @@
 
 ---
 
-## 3. Cross-references
+## 3. Admin post-edit context (Prompt 293)
+
+**Admin_Post_Edit_Context_Resolver** is the canonical way the plugin decides whether scoped ACF registration runs and which downstream resolver to use. It resolves the current admin request into a typed result:
+
+| Context | Condition | Result |
+|---------|-----------|--------|
+| Existing-page edit | `post.php`, valid `post` ID, post type `page` | `EXISTING_PAGE_EDIT` (with page_id). |
+| New-page edit | `post-new.php`, `post_type=page` (or default page) | `NEW_PAGE_EDIT`. |
+| Unsupported admin | `post.php` but invalid/missing post or non-page post type | `UNSUPPORTED_ADMIN` (fail safe; no full registration). |
+| Non-page admin | `post-new.php` with other post type; or any other admin screen | `NON_PAGE_ADMIN`. |
+
+**Admin_Post_Edit_Context_Result** carries the context type and, for existing-page edit, the page ID. The ACF bootstrap controller uses this result to branch to the existing-page or new-page section-key resolver, or to register zero groups. No request-context logic is duplicated elsewhere after this resolver.
+
+---
+
+## 4. Cross-references
 
 - **large-scale-acf-lpagery-binding-contract.md**: Registration scaling, derivation from section list, performance (§6.2–6.3).
 - **acf-conditional-registration-contract.md**: Conditional registration by context; use of assignment map for resolving section keys on admin existing-page edit.

@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Domain\ACF\Assignment;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Pages\Visible_Group_Key_Query_Result;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Map_Service;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Types;
 
@@ -92,21 +93,28 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 
 	/**
 	 * Returns visible field group keys for a page (from stored assignments).
+	 * Uses optimized read path (target_ref only) per Prompt 295.
 	 *
 	 * @param int $page_id
 	 * @return list<string>
 	 */
 	public function get_visible_groups_for_page( int $page_id ): array {
+		return $this->get_visible_groups_result_for_page( $page_id )->get_group_keys();
+	}
+
+	/**
+	 * Returns visible group keys for a page as a typed result (read-path optimization; Prompt 295).
+	 *
+	 * @param int $page_id
+	 * @return Visible_Group_Key_Query_Result
+	 */
+	public function get_visible_groups_result_for_page( int $page_id ): Visible_Group_Key_Query_Result {
 		$page_ref = (string) $page_id;
-		$rows     = $this->assignment_map->list_by_source( Assignment_Types::PAGE_FIELD_GROUP, $page_ref, 500 );
-		$groups   = array();
-		foreach ( $rows as $row ) {
-			$target = (string) ( $row['target_ref'] ?? '' );
-			if ( $target !== '' ) {
-				$groups[] = $target;
-			}
+		if ( $page_id <= 0 ) {
+			return new Visible_Group_Key_Query_Result( array() );
 		}
-		return array_values( array_unique( $groups ) );
+		$target_refs = $this->assignment_map->list_target_refs_by_source( Assignment_Types::PAGE_FIELD_GROUP, $page_ref, 500 );
+		return new Visible_Group_Key_Query_Result( $target_refs );
 	}
 
 	/**
