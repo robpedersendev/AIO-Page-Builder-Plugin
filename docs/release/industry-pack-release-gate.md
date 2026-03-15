@@ -22,7 +22,7 @@
 ## 2. Blockers vs deferred
 
 - **Blocker:** Any criterion above that is not met and not formally waived. Release blocked until resolved or waiver recorded in sign-off checklist.
-- **Deferred:** Enhancements (e.g. additional industries, deeper LPagery rules) are out of scope for this gate; document in maintenance checklist or backlog.
+- **Deferred:** Enhancements (e.g. additional industries, deeper LPagery rules) are out of scope for this gate; document in maintenance checklist or backlog. **Future industries:** Use [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) and [industry-pack-author-checklist.md](../operations/industry-pack-author-checklist.md); satisfy gate criteria and update acceptance report when a new industry is in release scope.
 
 ---
 

@@ -4,12 +4,15 @@
 
 This appendix lists built-in industry section-helper overlays and page one-pager overlays. Overlays add or override allowed regions (tone_notes, cta_usage_notes, compliance_cautions, media_notes, seo_notes, additive_blocks) on top of base section helper docs. Base content_body remains authoritative.
 
+**Expansion**: For systematic expansion across more section families, see [industry-helper-overlay-expansion-plan.md](../operations/industry-helper-overlay-expansion-plan.md) and [industry-helper-overlay-coverage-matrix.md](industry-helper-overlay-coverage-matrix.md) (tiers, waves, consistency rules, coverage map).
+
 ---
 
 ## 1. Scope and section families
 
 - **Industries**: cosmetology_nail, realtor, plumber, disaster_recovery.
-- **Section families covered**: Hero (hero_conv_02), CTA (cta_booking_01), Proof/Trust (tp_badge_01), Contact/Form (gc_contact_form_01), Feature/benefit (gc_offer_value_01).
+- **Section families covered (seeded)**: Hero (hero_conv_02), CTA (cta_booking_01), Proof/Trust (tp_badge_01), Contact/Form (gc_contact_form_01), Feature/benefit (gc_offer_value_01).
+- **Pending families**: See industry-helper-overlay-coverage-matrix (listing/gallery/profile, pricing, comparison, process/FAQ, map/location, trust expansion).
 - **Source directory**: `plugin/src/Domain/Industry/Docs/SectionHelperOverlays/`.
 - **Files**: overlays-cosmetology-nail.php, overlays-realtor.php, overlays-plumber.php, overlays-disaster-recovery.php.
 

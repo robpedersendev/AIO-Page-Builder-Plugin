@@ -88,3 +88,4 @@ When Diagnostics is implemented, use it for environment and validation summaries
 | Export modes and bundle structure | [export-bundle-structure-contract.md](../contracts/export-bundle-structure-contract.md) |
 | Security and redaction review | [security-redaction-review.md](../qa/security-redaction-review.md) |
 | Admin screens and capabilities | [admin-screen-inventory.md](../contracts/admin-screen-inventory.md); [admin-operator-guide.md](admin-operator-guide.md) |
+| Industry diagnostics and lifecycle | [industry-subsystem-diagnostics-checklist.md](../qa/industry-subsystem-diagnostics-checklist.md); [industry-lifecycle-hardening-contract.md](../contracts/industry-lifecycle-hardening-contract.md); [industry-lifecycle-regression-guard.md](../qa/industry-lifecycle-regression-guard.md) |

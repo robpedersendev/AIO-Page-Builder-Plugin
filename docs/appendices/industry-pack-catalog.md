@@ -4,6 +4,8 @@
 
 This appendix lists built-in industry pack definitions loaded by the Industry Pack Registry. Packs are additive config; they reference CTA patterns, SEO guidance, style presets, and LPagery rules. Invalid refs fail safely at resolution time.
 
+**Adding a new pack:** Follow [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) and [industry-pack-author-checklist.md](../operations/industry-pack-author-checklist.md). Add a new section below and update §5 Loading when the pack is registered.
+
 ---
 
 ## 1. Cosmetology / Nail (`cosmetology_nail`)

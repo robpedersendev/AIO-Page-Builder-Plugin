@@ -2,6 +2,8 @@
 
 **Purpose:** Maintenance baseline for future industry packs, overlays, CTA patterns, and related integrations. Use when adding industries, changing overlays, or touching recommendation/scoring logic.
 
+**Adding a new industry:** Follow [industry-pack-authoring-guide.md](industry-pack-authoring-guide.md) and [industry-pack-author-checklist.md](industry-pack-author-checklist.md) for required objects, dependency order, validation, and release steps. The checklist below is the ongoing maintenance view; the authoring guide covers the full author workflow.
+
 ---
 
 ## 1. Adding a new industry pack

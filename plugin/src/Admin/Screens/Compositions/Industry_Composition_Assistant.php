@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Recommendation_Resolver;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
 
 /**
@@ -38,15 +39,28 @@ final class Industry_Composition_Assistant {
 	/** @var list<string>|null Cached recommended section keys (ranked). */
 	private $recommended_keys;
 
+	/** @var Industry_Substitute_Suggestion_Engine|null Optional engine for richer substitute suggestions. */
+	private $substitute_engine;
+
+	/** @var \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Recommendation_Result|null Cached from last build_state when substitute_engine is set. */
+	private $last_section_result;
+
+	/** @var array<int, array<string, mixed>>|null Section definitions from last build_state (for engine). */
+	private $section_definitions;
+
 	public function __construct(
 		Industry_Profile_Repository $profile_repository,
 		?Industry_Pack_Registry $pack_registry = null,
-		?Industry_Section_Recommendation_Resolver $resolver = null
+		?Industry_Section_Recommendation_Resolver $resolver = null,
+		?Industry_Substitute_Suggestion_Engine $substitute_engine = null
 	) {
-		$this->profile_repository = $profile_repository;
-		$this->pack_registry      = $pack_registry;
-		$this->resolver           = $resolver ?? new Industry_Section_Recommendation_Resolver();
-		$this->fit_by_key         = null;
+		$this->profile_repository  = $profile_repository;
+		$this->pack_registry       = $pack_registry;
+		$this->resolver            = $resolver ?? new Industry_Section_Recommendation_Resolver();
+		$this->substitute_engine   = $substitute_engine;
+		$this->last_section_result = null;
+		$this->section_definitions = null;
+		$this->fit_by_key          = null;
 		$this->recommended_keys   = null;
 	}
 
@@ -74,7 +88,10 @@ final class Industry_Composition_Assistant {
 		}
 
 		$result = $this->resolver->resolve( $profile, $primary_pack, $sections, array() );
-		$items  = $result->get_items();
+		if ( $this->substitute_engine !== null ) {
+			$this->last_section_result = $result;
+		}
+		$items = $result->get_items();
 
 		$this->fit_by_key = array();
 		$this->recommended_keys = array();
@@ -172,5 +189,26 @@ final class Industry_Composition_Assistant {
 		}
 		$merged = array_merge( $same_family, $other );
 		return array_slice( $merged, 0, $max );
+	}
+
+	/**
+	 * Returns structured substitute suggestions for a section (when substitute engine is set and section is discouraged/weak-fit).
+	 *
+	 * @param string $section_key Section internal key.
+	 * @param int    $max         Max suggestions (default 5).
+	 * @return array<int, array<string, mixed>> List of Industry_Substitute_Suggestion_Result shapes.
+	 */
+	public function get_substitute_suggestions_for_section( string $section_key, int $max = 5 ): array {
+		if ( $this->substitute_engine === null || $this->last_section_result === null || $this->section_definitions === null ) {
+			return array();
+		}
+		$fit = $this->get_fit_for_section( $section_key );
+		return $this->substitute_engine->suggest_section_substitutes(
+			$section_key,
+			$fit,
+			$this->last_section_result,
+			$this->section_definitions,
+			$max
+		);
 	}
 }

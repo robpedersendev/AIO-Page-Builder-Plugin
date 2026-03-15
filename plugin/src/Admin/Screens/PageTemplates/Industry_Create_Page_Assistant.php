@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 
 /**
@@ -41,16 +42,25 @@ final class Industry_Create_Page_Assistant {
 	/** @var list<string>|null Cached recommended keys (ranked). */
 	private $recommended_keys;
 
+	/** @var Industry_Substitute_Suggestion_Engine|null Optional engine for richer substitute suggestions. */
+	private $substitute_engine;
+
+	/** @var \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Result|null Cached from last build_state when substitute_engine is set. */
+	private $last_template_result;
+
 	public function __construct(
 		Industry_Profile_Repository $profile_repository,
 		?Industry_Pack_Registry $pack_registry = null,
-		?Industry_Page_Template_Recommendation_Resolver $resolver = null
+		?Industry_Page_Template_Recommendation_Resolver $resolver = null,
+		?Industry_Substitute_Suggestion_Engine $substitute_engine = null
 	) {
-		$this->profile_repository = $profile_repository;
-		$this->pack_registry      = $pack_registry;
-		$this->resolver           = $resolver ?? new Industry_Page_Template_Recommendation_Resolver();
+		$this->profile_repository   = $profile_repository;
+		$this->pack_registry        = $pack_registry;
+		$this->resolver             = $resolver ?? new Industry_Page_Template_Recommendation_Resolver();
+		$this->substitute_engine    = $substitute_engine;
+		$this->last_template_result = null;
 		$this->template_definitions = null;
-		$this->fit_by_key          = null;
+		$this->fit_by_key           = null;
 		$this->recommended_keys     = null;
 	}
 
@@ -61,9 +71,10 @@ final class Industry_Create_Page_Assistant {
 	 * @return void
 	 */
 	public function build_state( array $page_templates ): void {
-		$this->template_definitions = $page_templates;
-		$this->fit_by_key           = null;
-		$this->recommended_keys     = null;
+		$this->template_definitions  = $page_templates;
+		$this->fit_by_key            = null;
+		$this->recommended_keys      = null;
+		$this->last_template_result  = null;
 
 		$profile = $this->profile_repository->get_profile();
 		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
@@ -79,7 +90,10 @@ final class Industry_Create_Page_Assistant {
 		}
 
 		$result = $this->resolver->resolve( $profile, $primary_pack, $page_templates, array() );
-		$items  = $result->get_items();
+		if ( $this->substitute_engine !== null ) {
+			$this->last_template_result = $result;
+		}
+		$items = $result->get_items();
 
 		$this->fit_by_key = array();
 		$this->recommended_keys = array();
@@ -177,5 +191,26 @@ final class Industry_Create_Page_Assistant {
 		}
 		$merged = array_merge( $same_family, $other );
 		return array_slice( $merged, 0, $max );
+	}
+
+	/**
+	 * Returns structured substitute suggestions for a template (when substitute engine is set and template is discouraged/weak-fit).
+	 *
+	 * @param string $template_key Page template internal key.
+	 * @param int    $max          Max suggestions (default 5).
+	 * @return array<int, array<string, mixed>> List of Industry_Substitute_Suggestion_Result shapes.
+	 */
+	public function get_substitute_suggestions_for_template( string $template_key, int $max = 5 ): array {
+		if ( $this->substitute_engine === null || $this->last_template_result === null || $this->template_definitions === null ) {
+			return array();
+		}
+		$fit = $this->get_fit_for_template( $template_key );
+		return $this->substitute_engine->suggest_template_substitutes(
+			$template_key,
+			$fit,
+			$this->last_template_result,
+			$this->template_definitions,
+			$max
+		);
 	}
 }
