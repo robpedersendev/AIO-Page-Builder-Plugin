@@ -58,8 +58,11 @@ The following keys are registered by **Industry_Packs_Module**:
 | `industry_section_recommendation_resolver` | Scores and ranks section templates by industry fit (industry-section-recommendation-contract). | Industry_Section_Recommendation_Resolver; read-only; returns Industry_Section_Recommendation_Result. |
 | `industry_page_template_recommendation_resolver` | Scores and ranks page templates by industry fit (industry-page-template-recommendation-contract). | Industry_Page_Template_Recommendation_Resolver; read-only; returns Industry_Page_Template_Recommendation_Result. |
 | `industry_style_preset_registry` | Read-only registry of industry style presets (industry-style-preset-schema.md); token values and component override refs. | Industry_Style_Preset_Registry; load(), get(key), get_all(), list_by_industry(), list_by_status(). |
+| `industry_seo_guidance_registry` | Read-only registry of industry SEO/entity guidance rules (industry-seo-guidance-schema.md). | Industry_SEO_Guidance_Registry; load(), get(key), get_all(), list_by_industry(), list_by_status(). |
+| `industry_lpagery_rule_registry` | Read-only registry of industry LPagery rules (industry-lpagery-rule-schema.md); posture, token refs, hierarchy. | Industry_LPagery_Rule_Registry; load(), get(key), get_all(), list_by_industry(), list_by_status(). |
+| `industry_helper_doc_composer` | Composes base section helper + industry overlay into effective helper doc (industry-section-helper-overlay-schema). | Industry_Helper_Doc_Composer; compose(section_key, industry_key) → Composed_Helper_Doc_Result; depends on Documentation_Registry and Industry_Section_Helper_Overlay_Registry. |
 
-Additional keys (e.g. LPagery resolver) can be added in later prompts.
+Additional keys can be added in later prompts.
 
 ---
 
