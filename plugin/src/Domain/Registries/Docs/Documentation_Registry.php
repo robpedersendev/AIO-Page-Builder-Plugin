@@ -14,8 +14,8 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
 
 /**
- * Provides lookup of documentation objects loaded from file-based section helper batches.
- * Keyed by documentation_id and by source_reference.section_template_key for one-pager and detail-screen resolution.
+ * Provides lookup of documentation objects loaded from file-based section helper and one-pager batches.
+ * Keyed by documentation_id; by source_reference.section_template_key (section helpers); by source_reference.page_template_key (one-pagers).
  */
 final class Documentation_Registry {
 
@@ -27,6 +27,9 @@ final class Documentation_Registry {
 
 	/** @var array<string, array<string, mixed>>|null Index by section_template_key. */
 	private ?array $by_section_key = null;
+
+	/** @var array<string, array<string, mixed>>|null Index by page_template_key. */
+	private ?array $by_page_template_key = null;
 
 	public function __construct( ?Documentation_Loader $loader = null ) {
 		$this->loader = $loader ?? new Documentation_Loader();
@@ -56,6 +59,17 @@ final class Documentation_Registry {
 	}
 
 	/**
+	 * Returns the page_template_one_pager documentation for the given page template key, or null if not found.
+	 *
+	 * @param string $page_template_key Page template internal_key e.g. pt_home_conversion_01.
+	 * @return array<string, mixed>|null
+	 */
+	public function get_by_page_template_key( string $page_template_key ): ?array {
+		$this->ensure_indexed();
+		return $this->by_page_template_key[ $page_template_key ] ?? null;
+	}
+
+	/**
 	 * Returns all loaded section helper docs (for export or listing).
 	 *
 	 * @return list<array<string, mixed>>
@@ -70,6 +84,7 @@ final class Documentation_Registry {
 		}
 		$this->by_id = array();
 		$this->by_section_key = array();
+		$this->by_page_template_key = array();
 		foreach ( $this->loader->load_section_helpers() as $doc ) {
 			$id = (string) ( $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
 			if ( $id !== '' ) {
@@ -80,6 +95,19 @@ final class Documentation_Registry {
 				$section_key = (string) ( $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '' );
 				if ( $section_key !== '' ) {
 					$this->by_section_key[ $section_key ] = $doc;
+				}
+			}
+		}
+		foreach ( $this->loader->load_page_template_one_pagers() as $doc ) {
+			$id = (string) ( $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
+			if ( $id !== '' ) {
+				$this->by_id[ $id ] = $doc;
+			}
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			if ( is_array( $ref ) ) {
+				$page_key = (string) ( $ref[ Documentation_Schema::SOURCE_PAGE_TEMPLATE_KEY ] ?? '' );
+				if ( $page_key !== '' ) {
+					$this->by_page_template_key[ $page_key ] = $doc;
 				}
 			}
 		}

@@ -1,7 +1,7 @@
 <?php
 /**
- * Unit tests for Documentation Registry and section helper coverage (Prompts 261–268).
- * Verifies every Hero, CTA, Proof, Legal/Policy, Process/FAQ, Feature/Benefit, Media/Listing/Profile, and Gap-Closing section has a schema-compliant helper doc and registry resolution by section key.
+ * Unit tests for Documentation Registry and section helper coverage (Prompts 261–270).
+ * Verifies Hero, CTA, Proof, Legal/Policy, Process/FAQ, Feature/Benefit, Media/Listing/Profile, Gap-Closing, Contact/Form/Conversion, and Pricing/Offer section helpers, and page_template_one_pager resolution (Prompt 271).
  *
  * @package AIOPageBuilder
  */
@@ -233,5 +233,82 @@ final class Documentation_Registry_Test extends TestCase {
 		$by_id = $registry->get_by_id( $id );
 		$this->assertNotNull( $by_id );
 		$this->assertSame( $by_key[ Documentation_Schema::FIELD_CONTENT_BODY ] ?? '', $by_id[ Documentation_Schema::FIELD_CONTENT_BODY ] ?? '' );
+	}
+
+	/** Contact/Form/Conversion batch section keys (Prompt 269). */
+	private static function contact_form_conversion_section_keys(): array {
+		return array(
+			'cta_contact_01', 'cta_contact_02', 'cta_inquiry_01', 'cta_inquiry_02',
+			'cta_booking_01', 'cta_booking_02', 'cta_quote_request_01', 'cta_quote_request_02',
+			'cta_consultation_01', 'cta_consultation_02', 'cta_purchase_01', 'cta_purchase_02',
+			'cta_trust_confirm_01', 'cta_trust_confirm_02', 'cta_support_01', 'cta_support_02',
+			'lpu_contact_panel_01', 'lpu_contact_detail_01', 'lpu_inquiry_support_01',
+		);
+	}
+
+	/**
+	 * Every Contact/Form/Conversion batch section has a section_helper doc loadable by section key (Prompt 269).
+	 */
+	public function test_every_contact_form_conversion_section_has_helper_doc(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = self::contact_form_conversion_section_keys();
+		foreach ( $keys as $section_key ) {
+			$doc = $registry->get_by_section_key( $section_key );
+			$this->assertNotNull( $doc, "Contact/Form/Conversion section {$section_key} must have a helper doc." );
+			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
+			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $section_key, $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/** Pricing/Offer batch section keys (Prompt 270): fb_* + gc_offer_*. */
+	private static function pricing_offer_section_keys(): array {
+		return array(
+			'fb_offer_compare_01', 'fb_package_summary_01', 'fb_offer_highlight_01',
+			'gc_offer_value_01', 'gc_offer_value_02', 'gc_offer_pricing_01',
+			'gc_offer_feature_01', 'gc_offer_feature_02', 'gc_offer_local_01',
+			'gc_offer_product_01', 'gc_offer_product_02', 'gc_offer_bundle_01', 'gc_offer_compare_01',
+			'gc_offer_01', 'gc_offer_02', 'gc_offer_03', 'gc_offer_04', 'gc_offer_05',
+			'gc_offer_06', 'gc_offer_07', 'gc_offer_08', 'gc_offer_09', 'gc_offer_10',
+		);
+	}
+
+	/**
+	 * Every Pricing/Offer batch section has a section_helper doc loadable by section key (Prompt 270).
+	 */
+	public function test_every_pricing_offer_section_has_helper_doc(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = self::pricing_offer_section_keys();
+		foreach ( $keys as $section_key ) {
+			$doc = $registry->get_by_section_key( $section_key );
+			$this->assertNotNull( $doc, "Pricing/Offer section {$section_key} must have a helper doc." );
+			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
+			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $section_key, $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Top-Level Home page template has a page_template_one_pager loadable by page_template_key (Prompt 271).
+	 */
+	public function test_every_top_level_home_template_has_one_pager(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = array( 'pt_home_conversion_01', 'pt_home_trust_01' );
+		foreach ( $keys as $page_template_key ) {
+			$doc = $registry->get_by_page_template_key( $page_template_key );
+			$this->assertNotNull( $doc, "Home template {$page_template_key} must have a one-pager doc." );
+			$this->assertSame( 'doc-onepager-' . $page_template_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
+			$this->assertSame( Documentation_Schema::TYPE_PAGE_TEMPLATE_ONE_PAGER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $page_template_key, $ref[ Documentation_Schema::SOURCE_PAGE_TEMPLATE_KEY ] ?? '' );
+		}
 	}
 }
