@@ -219,10 +219,18 @@ The following must be preserved by the retrofit and all downstream implementatio
 - **acf-local-json-coexistence.md**: ACF local JSON and sync coexistence (Prompt 306).
 - **acf-legacy-assignment-verification.md**, **acf-legacy-page-repair-guide.md**: Legacy/incomplete assignment (Prompt 309).
 - **docs/qa/acf-registration-performance-impact-analysis.md**: Impact analysis and verification checklist.
+- **acf-uninstall-retention-contract.md**: Uninstall retention and handoff; value retention vs group preservation; default non-destructive uninstall (Prompt 313).
 
 ---
 
-## 15. Revision history
+## 15. Uninstall retention (Prompt 313)
+
+- Runtime-registered plugin-owned groups (`group_aio_*`) do **not** survive uninstall unless explicit preservation (handoff/export) is performed. Saved field values (post meta) are **retained by default** per PORTABILITY_AND_UNINSTALL and acf-uninstall-retention-contract.
+- Conditional registration behavior (when and which groups are registered) is unchanged by uninstall policy. Uninstall retention governs what is deleted or preserved when the plugin is removed; it does not alter registration logic.
+
+---
+
+## 16. Revision history
 
 | Version | Date | Change |
 |---------|------|--------|
@@ -232,3 +240,4 @@ The following must be preserved by the retrofit and all downstream implementatio
 | 4 | Prompt 305 | §10 Third-party admin compatibility; fail-safe resolver guards. |
 | 5 | Prompt 306 | §11 ACF local JSON/sync coexistence; acf-local-json-coexistence.md. |
 | 6 | Prompt 309 | §12 Legacy pages and incomplete assignment; verification and repair guides. |
+| 7 | Prompt 313 | §15 Uninstall retention; cross-reference acf-uninstall-retention-contract. |

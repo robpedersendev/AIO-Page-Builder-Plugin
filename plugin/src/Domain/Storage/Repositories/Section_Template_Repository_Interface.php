@@ -25,4 +25,11 @@ interface Section_Template_Repository_Interface {
 	 * @return list<array<string, mixed>> List of definitions keyed by internal_key etc.
 	 */
 	public function list_all_definitions( int $limit = 0, int $offset = 0 ): array;
+
+	/**
+	 * Returns all unique internal keys in the registry (for uniqueness checks and inventory).
+	 *
+	 * @return list<string>
+	 */
+	public function get_all_internal_keys(): array;
 }

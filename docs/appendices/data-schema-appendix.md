@@ -279,6 +279,21 @@ Entity keys are sanitized (sanitize_key, max 128 chars). Unsupported entity type
 
 ---
 
+## ACF uninstall inventory result (Prompt 314)
+
+Read-only manifest produced by **ACF_Uninstall_Inventory_Service** for handoff and uninstall. Shape matches **ACF_Uninstall_Inventory_Result** and [acf-uninstall-inventory-contract.md](../contracts/acf-uninstall-inventory-contract.md).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| plugin_runtime_group_keys | list&lt;string&gt; | Group keys `group_aio_{section_key}` for runtime-registered plugin groups. |
+| field_definitions | list&lt;{group_key, field_key, field_name}&gt; | Per-field entries from section blueprints. |
+| value_meta_keys | list&lt;string&gt; | Meta keys under which ACF values are stored (retained by default on uninstall). |
+| persistent_group_keys | list&lt;string&gt; | Plugin-origin native ACF group keys (empty until handoff creates them). |
+| cleanup_transient_prefixes | list&lt;string&gt; | Transient prefixes safe to remove (e.g. aio_acf_sk_p_, aio_acf_sk_t_, aio_acf_sk_c_). |
+| cleanup_option_keys | list&lt;string&gt; | Option keys safe to remove (plugin-operational only; empty until documented). |
+
+---
+
 ## Cross-references
 
 - Section/page template field details: [Section Template Inventory](section-template-inventory.md), [Page Template Inventory](page-template-inventory.md).
@@ -286,4 +301,5 @@ Entity keys are sanitized (sanitize_key, max 128 chars). Unsupported entity type
 - Styling subsystem: [styling-subsystem-contract.md](../contracts/styling-subsystem-contract.md), [style-registry-contract.md](../contracts/style-registry-contract.md), [per-entity-style-payload-contract.md](../contracts/per-entity-style-payload-contract.md), [styling-retrofit-impact-analysis.md](../qa/styling-retrofit-impact-analysis.md).
 - Planning output and AI schema: [Prompt Schema Appendix](prompt-schema-appendix.md), [AI Output Schema Appendix](ai-output-schema-appendix.md).
 - Reporting payloads: [Error Email Templates](error-email-templates.md), [Heartbeat Email Templates](heartbeat-email-templates.md), [Install Notification Email Template](install-notification-email-template.md).
+- ACF uninstall inventory: [acf-uninstall-inventory-contract.md](../contracts/acf-uninstall-inventory-contract.md), [acf-uninstall-retention-contract.md](../contracts/acf-uninstall-retention-contract.md).
 - Terms: [Glossary](glossary.md).

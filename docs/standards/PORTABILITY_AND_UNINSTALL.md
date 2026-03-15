@@ -20,6 +20,10 @@ Generated content must not depend on plugin activation for survival unless expli
 - **Remove only plugin-owned operational data.** Options, transients, cron jobs, and other data used solely for plugin operation may be removed in `uninstall.php`.
 - Document what is removed vs preserved. Include rationale in feature design and in this document when policies change.
 
+### ACF integration
+
+ACF field values (post meta) and assignment map data are preserved by default; see [ACF Uninstall Retention Contract](../contracts/acf-uninstall-retention-contract.md) and [ACF Uninstall Preservation Policy](../operations/acf-uninstall-preservation-policy.md). Field group definitions registered at runtime do not survive uninstall unless an explicit preservation step (handoff or export) is used.
+
 ## Implementation
 
 - `uninstall.php` runs only when the plugin is deleted via the WordPress admin (not on deactivation).
