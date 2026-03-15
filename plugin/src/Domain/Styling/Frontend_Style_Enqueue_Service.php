@@ -16,7 +16,7 @@ use AIOPageBuilder\Infrastructure\Config\Plugin_Config;
 
 /**
  * Registers and conditionally enqueues aio-page-builder-base.css on the front end.
- * When an emitter is provided, appends global token CSS variables to the base stylesheet (Prompt 249).
+ * When emitters are provided, appends global token variables (Prompt 249) and global component overrides (Prompt 250).
  */
 final class Frontend_Style_Enqueue_Service {
 
@@ -32,9 +32,17 @@ final class Frontend_Style_Enqueue_Service {
 	/** @var Global_Token_Variable_Emitter|null */
 	private ?Global_Token_Variable_Emitter $emitter;
 
-	public function __construct( Plugin_Config $config, ?Global_Token_Variable_Emitter $emitter = null ) {
-		$this->config  = $config;
-		$this->emitter = $emitter;
+	/** @var Global_Component_Override_Emitter|null */
+	private ?Global_Component_Override_Emitter $component_override_emitter;
+
+	public function __construct(
+		Plugin_Config $config,
+		?Global_Token_Variable_Emitter $emitter = null,
+		?Global_Component_Override_Emitter $component_override_emitter = null
+	) {
+		$this->config                    = $config;
+		$this->emitter                   = $emitter;
+		$this->component_override_emitter = $component_override_emitter;
 	}
 
 	/**
@@ -64,11 +72,21 @@ final class Frontend_Style_Enqueue_Service {
 		}
 		$this->register();
 		\wp_enqueue_style( self::HANDLE_BASE );
+		$inline_parts = array();
 		if ( $this->emitter !== null ) {
 			$css = $this->emitter->emit_for_root();
 			if ( $css !== '' ) {
-				\wp_add_inline_style( self::HANDLE_BASE, $css );
+				$inline_parts[] = $css;
 			}
+		}
+		if ( $this->component_override_emitter !== null ) {
+			$css = $this->component_override_emitter->emit();
+			if ( $css !== '' ) {
+				$inline_parts[] = $css;
+			}
+		}
+		if ( ! empty( $inline_parts ) ) {
+			\wp_add_inline_style( self::HANDLE_BASE, implode( ' ', $inline_parts ) );
 		}
 	}
 

@@ -76,7 +76,7 @@ The styling subsystem **extends** this model under a single contract: same token
 | Scope | Purpose | Storage | Notes |
 |-------|---------|---------|-------|
 | **Global** | Site-wide token values and global component overrides | Option `aio_global_style_settings` (version, global_tokens, global_component_overrides). See [global-styling-settings-contract.md](global-styling-settings-contract.md). | Separate from `aio_applied_design_tokens` (build plan/rollback). |
-| **Per-entity** | Page/composition/section overrides | Separate from post_content; plugin-owned (future) | Optional; must be bounded and sanitized. No structural change to content. |
+| **Per-entity** | Section template / page template style overrides | Option `aio_entity_style_payloads` (version, payloads keyed by entity_type and section_key/template_key). See [per-entity-style-payload-contract.md](per-entity-style-payload-contract.md). | Schema and repository implemented (Prompt 251); sanitization and emission in later prompts. No structural change to content. |
 
 ---
 
@@ -122,7 +122,9 @@ The styling subsystem uses versioned machine-readable specs and a read-only styl
 
 No new structural selectors or token names are introduced by the specs; they document and constrain the existing contract.
 
-**Global token emission (Prompt 249):** `Global_Token_Variable_Emitter` reads validated global token values from `aio_global_style_settings`, confirms names against the token registry, and emits only approved `--aio-*` custom properties. Emission is scoped to `:root` per render-surfaces spec. Invalid token names or values are omitted (fail closed). `Frontend_Style_Enqueue_Service` appends the emitted `:root { ... }` block as inline style when the base stylesheet is enqueued. No component override CSS is emitted by this path.
+**Global token emission (Prompt 249):** `Global_Token_Variable_Emitter` reads validated global token values from `aio_global_style_settings`, confirms names against the token registry, and emits only approved `--aio-*` custom properties. Emission is scoped to `:root` per render-surfaces spec. Invalid token names or values are omitted (fail closed). `Frontend_Style_Enqueue_Service` appends the emitted `:root { ... }` block as inline style when the base stylesheet is enqueued.
+
+**Global component override emission (Prompt 250):** `Global_Component_Override_Emitter` reads validated global component overrides from the same option, confirms component ids and token names against the component spec, and emits scoped CSS rules using only spec-derived selectors (e.g. `[class*="aio-s-"][class*="__card"]` for element role `card`). No new structural selectors or arbitrary declarations; invalid override data is omitted. Output is appended by `Frontend_Style_Enqueue_Service` together with the token block. Usable on front end and in preview contexts.
 
 ---
 

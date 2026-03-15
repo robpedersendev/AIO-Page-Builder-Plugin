@@ -128,6 +128,9 @@ require_once $bootstrap_dir . '/../Domain/Styling/Frontend_Style_Enqueue_Service
 require_once $bootstrap_dir . '/../Domain/Styling/Global_Style_Settings_Schema.php';
 require_once $bootstrap_dir . '/../Domain/Styling/Global_Style_Settings_Repository.php';
 require_once $bootstrap_dir . '/../Domain/Styling/Global_Token_Variable_Emitter.php';
+require_once $bootstrap_dir . '/../Domain/Styling/Global_Component_Override_Emitter.php';
+require_once $bootstrap_dir . '/../Domain/Styling/Entity_Style_Payload_Schema.php';
+require_once $bootstrap_dir . '/../Domain/Styling/Entity_Style_Payload_Repository.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Styling_Provider.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
 require_once $bootstrap_dir . '/Lifecycle_Manager.php';

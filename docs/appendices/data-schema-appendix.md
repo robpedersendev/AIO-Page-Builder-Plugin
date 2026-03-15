@@ -246,6 +246,23 @@ Provider-backed form sections store which form to render using two stable ACF fi
 | Style registry | [style-registry-contract.md](../contracts/style-registry-contract.md) | Read-only lookup over the three specs; spec versioning; plugin-local loading. No new selectors or token names. |
 | Applied design tokens (existing) | Option `aio_applied_design_tokens` | [ group => [ name => value ] ]; see Token_Set_Job_Service. Build plan and rollback only; not repurposed as runtime styling store. |
 | Global styling settings | Option `aio_global_style_settings` | version, global_tokens, global_component_overrides. See [global-styling-settings-contract.md](../contracts/global-styling-settings-contract.md) and Global_Style_Settings_Repository. Separate from aio_applied_design_tokens. |
+| Per-entity style payloads | Option `aio_entity_style_payloads` | version, payloads (section_template, page_template keyed by section_key / template_key). Each payload: version, token_overrides, component_overrides. See [per-entity-style-payload-contract.md](../contracts/per-entity-style-payload-contract.md) and Entity_Style_Payload_Repository. |
+
+---
+
+## 23. Per-entity style payload (aio_entity_style_payloads)
+
+Stored under option `aio_entity_style_payloads`. Keyed by entity type and stable entity key (section_key, template_key). No raw CSS; structured token_overrides and component_overrides only.
+
+| Level | Key | Type | Description |
+|-------|-----|------|-------------|
+| Option | version | string | Schema version for migration. |
+| Option | payloads | object | payloads.section_template[section_key], payloads.page_template[template_key]. |
+| Payload | version | string | Per-payload version. |
+| Payload | token_overrides | object | [ group => [ name => value ] ]. |
+| Payload | component_overrides | object | [ component_id => [ token_var_name => value ] ]. |
+
+Entity keys are sanitized (sanitize_key, max 128 chars). Unsupported entity types or invalid keys fail safely. See Entity_Style_Payload_Schema and [per-entity-style-payload-contract.md](../contracts/per-entity-style-payload-contract.md).
 
 ---
 
@@ -253,7 +270,7 @@ Provider-backed form sections store which form to render using two stable ACF fi
 
 - Section/page template field details: [Section Template Inventory](section-template-inventory.md), [Page Template Inventory](page-template-inventory.md).
 - Form provider: [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md), [form-provider-retrofit-impact-analysis.md](../contracts/form-provider-retrofit-impact-analysis.md).
-- Styling subsystem: [styling-subsystem-contract.md](../contracts/styling-subsystem-contract.md), [style-registry-contract.md](../contracts/style-registry-contract.md), [styling-retrofit-impact-analysis.md](../qa/styling-retrofit-impact-analysis.md).
+- Styling subsystem: [styling-subsystem-contract.md](../contracts/styling-subsystem-contract.md), [style-registry-contract.md](../contracts/style-registry-contract.md), [per-entity-style-payload-contract.md](../contracts/per-entity-style-payload-contract.md), [styling-retrofit-impact-analysis.md](../qa/styling-retrofit-impact-analysis.md).
 - Planning output and AI schema: [Prompt Schema Appendix](prompt-schema-appendix.md), [AI Output Schema Appendix](ai-output-schema-appendix.md).
 - Reporting payloads: [Error Email Templates](error-email-templates.md), [Heartbeat Email Templates](heartbeat-email-templates.md), [Install Notification Email Template](install-notification-email-template.md).
 - Terms: [Glossary](glossary.md).

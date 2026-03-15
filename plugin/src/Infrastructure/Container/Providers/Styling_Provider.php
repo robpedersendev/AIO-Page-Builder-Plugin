@@ -12,7 +12,9 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Styling\Component_Override_Registry;
+use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Repository;
 use AIOPageBuilder\Domain\Styling\Frontend_Style_Enqueue_Service;
+use AIOPageBuilder\Domain\Styling\Global_Component_Override_Emitter;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Repository;
 use AIOPageBuilder\Domain\Styling\Global_Token_Variable_Emitter;
 use AIOPageBuilder\Domain\Styling\Render_Surface_Style_Registry;
@@ -52,6 +54,10 @@ final class Styling_Provider implements Service_Provider_Interface {
 			return new Render_Surface_Style_Registry( $container->get( 'style_spec_loader' ) );
 		} );
 
+		$container->register( 'entity_style_payload_repository', function (): Entity_Style_Payload_Repository {
+			return new Entity_Style_Payload_Repository();
+		} );
+
 		$container->register( 'global_style_settings_repository', function () use ( $container ): Global_Style_Settings_Repository {
 			$token_registry = $container->has( 'style_token_registry' ) ? $container->get( 'style_token_registry' ) : null;
 			$component_registry = $container->has( 'component_override_registry' ) ? $container->get( 'component_override_registry' ) : null;
@@ -59,14 +65,21 @@ final class Styling_Provider implements Service_Provider_Interface {
 		} );
 
 		$container->register( 'global_token_variable_emitter', function () use ( $container ): Global_Token_Variable_Emitter {
-			$repo    = $container->get( 'global_style_settings_repository' );
+			$repo     = $container->get( 'global_style_settings_repository' );
 			$registry = $container->has( 'style_token_registry' ) ? $container->get( 'style_token_registry' ) : null;
 			return new Global_Token_Variable_Emitter( $repo, $registry );
 		} );
 
+		$container->register( 'global_component_override_emitter', function () use ( $container ): Global_Component_Override_Emitter {
+			$repo     = $container->get( 'global_style_settings_repository' );
+			$registry = $container->has( 'component_override_registry' ) ? $container->get( 'component_override_registry' ) : null;
+			return new Global_Component_Override_Emitter( $repo, $registry );
+		} );
+
 		$container->register( 'frontend_style_enqueue_service', function () use ( $container ): Frontend_Style_Enqueue_Service {
-			$emitter = $container->has( 'global_token_variable_emitter' ) ? $container->get( 'global_token_variable_emitter' ) : null;
-			return new Frontend_Style_Enqueue_Service( $container->get( 'config' ), $emitter );
+			$token_emitter    = $container->has( 'global_token_variable_emitter' ) ? $container->get( 'global_token_variable_emitter' ) : null;
+			$override_emitter = $container->has( 'global_component_override_emitter' ) ? $container->get( 'global_component_override_emitter' ) : null;
+			return new Frontend_Style_Enqueue_Service( $container->get( 'config' ), $token_emitter, $override_emitter );
 		} );
 
 		\add_action( 'wp_enqueue_scripts', function () use ( $container ): void {
