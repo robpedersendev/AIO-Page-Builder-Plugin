@@ -39,6 +39,8 @@
 | STY-1 | Styling / lifecycle | Styling options removed on uninstall; built content preserved. Theme override continuity depends on fixed selectors/token names (css-selector-contract). No guarantee of plugin-owned styling after uninstall unless exported and restored. | Documented in [styling-portability-and-uninstall.md](../guides/styling-portability-and-uninstall.md); QA checklist for deactivation/uninstall and theme continuity. |
 | *(add further per release)* | — | — | — |
 
+**Styling deferred enhancements (not blockers):** Extended format validation (e.g. stricter color format checks), styling-specific a11y audit for global/per-entity screens. Recorded in [styling-release-gate.md](styling-release-gate.md) §2.2. Do not block release.
+
 Use this section for risks or limitations specific to a release (e.g. "Export of very large plans may timeout on constrained hosting") with mitigation or formal waiver reference.
 
 ---
@@ -54,6 +56,7 @@ Use this section for risks or limitations specific to a release (e.g. "Export of
 - **Template ecosystem closure bundle:** [template-ecosystem-archived-evidence-index.md](template-ecosystem-archived-evidence-index.md) (index of all archived evidence); [template-ecosystem-final-closure-summary.md](template-ecosystem-final-closure-summary.md) (closure summary; unresolved items marked waived, deferred, or blocked). Use for internal audit and future maintenance.
 - **Form provider maintenance:** [form-provider-maintenance-sop.md](../operations/form-provider-maintenance-sop.md), [form-provider-upgrade-and-support-runbook.md](../operations/form-provider-upgrade-and-support-runbook.md). When provider-related incidents or upgrades introduce new limitations or mitigations, add or amend a row in §3 (e.g. FPR-1, FPR-2) and document in the SOP/runbook.
 - **Styling security:** [styling-security-checklist.md](../security/styling-security-checklist.md), [styling-security-review.md](../security/styling-security-review.md). Restore path sanitization and entity-save capability check per Prompt 259.
+- **Styling QA and release gate:** [styling-acceptance-report.md](../qa/styling-acceptance-report.md), [styling-release-gate.md](styling-release-gate.md). Evidence pack and blockers vs deferred per Prompt 260.
 
 ---
 

@@ -105,6 +105,12 @@ Under **AIO Page Builder**:
 - **Compare previews:** Compact excerpts from the same preview pipeline; observational only.
 - **Rendering:** When GenerateBlocks is available, section output may use GB container/grid where applicable; otherwise native block output. Preview reflects the same pipeline as built pages for consistency.
 
+### 8.1 Styling (operator)
+
+- **Global styling:** Managed via **Settings** (global design tokens and component overrides). Capability-gated; save/reset use nonces. Applies site-wide to surfaces that consume the styling subsystem.
+- **Per-entity styling:** Section Template Detail and Page Template Detail screens may show a **Styling** panel for token/component overrides scoped to that section or page template. Save is capability- and nonce-protected; only whitelist-valid values are persisted.
+- **Optional:** Styling is an enhancement; built pages remain meaningful without plugin CSS. On deactivation or uninstall, plugin CSS stops or styling options are removed; content and structure are preserved. Theme override continuity: [styling-portability-and-uninstall.md](styling-portability-and-uninstall.md). Release evidence: [styling-release-gate.md](../release/styling-release-gate.md), [styling-acceptance-report.md](../qa/styling-acceptance-report.md).
+
 ---
 
 ## 9. Large library behavior

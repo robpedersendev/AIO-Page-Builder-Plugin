@@ -89,6 +89,18 @@
 | Operator and support | Operator guide; support references; known-risk FPR-1, FPR-2. | [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md); [template-library-support-guide.md](../guides/template-library-support-guide.md); [known-risk-register.md](known-risk-register.md). |
 | Extension backlog | Next-wave prompts (additional providers, form-list API, auto-provisioning, survivability, maintenance). | [form-provider-extension-backlog.md](form-provider-extension-backlog.md). |
 
+### 2.9 Styling subsystem (Option A expansion)
+
+| Area | Summary | Artifact |
+|------|---------|----------|
+| Contract and scope | Plugin-owned token/component styling; global and per-entity; whitelist sanitization; no arbitrary CSS/selectors. | [styling-subsystem-contract.md](../contracts/styling-subsystem-contract.md); [css-selector-contract.md](../contracts/css-selector-contract.md). |
+| QA acceptance | Storage, UI, rendering, preview, compare, cache, export/restore, security, lifecycle. | [styling-acceptance-report.md](../qa/styling-acceptance-report.md). |
+| Release gate | Blockers vs deferred; evidence-based checklist; no overstatement of survivability or theme-override guarantees. | [styling-release-gate.md](styling-release-gate.md). |
+| Security | Capability/nonce; restore sanitization; security checklist and review. | [styling-security-checklist.md](../security/styling-security-checklist.md); [styling-security-review.md](../security/styling-security-review.md). |
+| Lifecycle and portability | Deactivation/uninstall; theme continuity; export/restore. | [styling-portability-and-uninstall.md](../guides/styling-portability-and-uninstall.md). |
+| Known risks and deferred | STY-1 lifecycle; deferred enhancements (e.g. format strictness, styling a11y audit) not blockers. | [known-risk-register.md](known-risk-register.md) §3, §4; [styling-release-gate.md](styling-release-gate.md) §2.2. |
+| Operator and support | Styling behavior, troubleshooting, removal/override expectations. | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) §8.1, §11, §12; [template-library-support-guide.md](../guides/template-library-support-guide.md) §2, §6, §7. |
+
 ---
 
 ## 3. Unresolved and waived items
@@ -112,7 +124,7 @@
 | [release-candidate-packaging-checklist.md](release-candidate-packaging-checklist.md) | Production ZIP build and validation; required files, exclusions, installability; §7 template-library expansion. |
 | [template-library-release-candidate-addendum.md](template-library-release-candidate-addendum.md) | Template-library packaging completeness and expansion go/no-go; run as part of final approval when release includes expansion. |
 | [private-distribution-handoff.md](private-distribution-handoff.md) | Handoff checklist for private delivery modes (direct ZIP, manual deploy, private update, environment-specific). |
-| [final-approval-runbook.md](final-approval-runbook.md) | Go/no-go procedure before packaging and handoff; references sign-off and release notes; §2.9 template-library when in scope. |
+| [final-approval-runbook.md](final-approval-runbook.md) | Go/no-go procedure before packaging and handoff; references sign-off and release notes; §2.9 template-library when in scope; §2.9 styling when in scope. |
 
 ---
 
