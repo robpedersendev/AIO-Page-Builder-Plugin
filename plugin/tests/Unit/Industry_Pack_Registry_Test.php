@@ -129,11 +129,11 @@ final class Industry_Pack_Registry_Test extends TestCase {
 		$this->assertSame( Industry_Pack_Schema::STATUS_ACTIVE, $meta['status'] );
 	}
 
-	/** Prompts 349–351: built-in cosmetology/nail, realtor, plumber packs load and validate. */
+	/** Prompts 349–352: built-in cosmetology/nail, realtor, plumber, disaster_recovery packs load and validate. */
 	public function test_builtin_pack_definitions_load_and_validate(): void {
 		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
 		$this->assertIsArray( $definitions );
-		$this->assertGreaterThanOrEqual( 3, count( $definitions ), 'Expected at least cosmetology_nail, realtor, plumber' );
+		$this->assertGreaterThanOrEqual( 4, count( $definitions ), 'Expected at least cosmetology_nail, realtor, plumber, disaster_recovery' );
 		$registry = new Industry_Pack_Registry();
 		$registry->load( $definitions );
 		$this->assertTrue( $registry->has_any() );
@@ -152,6 +152,25 @@ final class Industry_Pack_Registry_Test extends TestCase {
 		$this->assertNotNull( $plumber );
 		$this->assertSame( 'plumber', $plumber[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] );
 		$this->assertContains( 'call_now', $plumber[ Industry_Pack_Schema::FIELD_REQUIRED_CTA_PATTERNS ] ?? array() );
+		$disaster = $registry->get( 'disaster_recovery' );
+		$this->assertNotNull( $disaster );
+		$this->assertSame( 'disaster_recovery', $disaster[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] );
+		$this->assertContains( 'emergency_dispatch', $disaster[ Industry_Pack_Schema::FIELD_PREFERRED_CTA_PATTERNS ] ?? array() );
+	}
+
+	/** Disaster recovery pack: schema-valid, emergency/claims/trust refs (Prompt 352). */
+	public function test_disaster_recovery_pack_has_expected_structure(): void {
+		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
+		$registry = new Industry_Pack_Registry();
+		$registry->load( $definitions );
+		$pack = $registry->get( 'disaster_recovery' );
+		$this->assertNotNull( $pack );
+		$this->assertSame( 'active', $pack[ Industry_Pack_Schema::FIELD_STATUS ] );
+		$this->assertSame( 'disaster_recovery_01', $pack[ Industry_Pack_Schema::FIELD_LPAGERY_RULE_REF ] ?? '' );
+		$this->assertContains( 'emergency_dispatch', $pack[ Industry_Pack_Schema::FIELD_REQUIRED_CTA_PATTERNS ] ?? array() );
+		$this->assertContains( 'claim_assistance', $pack[ Industry_Pack_Schema::FIELD_PREFERRED_CTA_PATTERNS ] ?? array() );
+		$this->assertArrayHasKey( 'metadata', $pack );
+		$this->assertArrayHasKey( 'notes_insurance', $pack['metadata'] );
 	}
 
 	/** Cosmetology/nail pack: schema-valid, refs present (resolution is at use time). */

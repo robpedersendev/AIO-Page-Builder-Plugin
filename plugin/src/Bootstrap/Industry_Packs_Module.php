@@ -34,6 +34,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: CTA pattern registry (industry-cta-pattern-contract). */
 	public const CONTAINER_KEY_CTA_PATTERN_REGISTRY = 'industry_cta_pattern_registry';
 
+	/** Container key: industry section-helper overlay registry (industry-section-helper-overlay-schema). */
+	public const CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY = 'industry_section_helper_overlay_registry';
+
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
 		$container->register( self::CONTAINER_KEY_INDUSTRY_LOADED, function (): bool {
@@ -60,6 +63,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( self::CONTAINER_KEY_CTA_PATTERN_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry();
 			$registry->load( array() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
 			return $registry;
 		} );
 		$container->register( 'industry_question_pack_registry', function (): \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry {

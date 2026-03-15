@@ -113,4 +113,19 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 		$this->assertArrayHasKey( 'composed_doc_keys', $arr );
 		$this->assertSame( 'trace_sec_995', $arr['section_key'] );
 	}
+
+	/** Prompt 353: built-in overlays compose correctly; cosmetology_nail + hero_conv_02. */
+	public function test_builtin_overlay_composes_with_cosmetology_nail_hero(): void {
+		$doc_registry = new Documentation_Registry();
+		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
+		$overlay_registry->load( Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
+		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
+		$result = $composer->compose( 'hero_conv_02', 'cosmetology_nail' );
+		$this->assertTrue( $result->is_overlay_applied() );
+		$this->assertSame( 'cosmetology_nail', $result->get_overlay_industry_key() );
+		$doc = $result->get_composed_doc();
+		$this->assertArrayHasKey( 'tone_notes', $doc );
+		$this->assertStringContainsString( 'Warm', $doc['tone_notes'] );
+		$this->assertArrayHasKey( 'cta_usage_notes', $doc );
+	}
 }

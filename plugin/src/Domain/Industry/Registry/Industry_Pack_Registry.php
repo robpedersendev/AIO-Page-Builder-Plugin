@@ -41,6 +41,7 @@ final class Industry_Pack_Registry {
 			$dir . '/industry-pack-cosmetology-nail.php',
 			$dir . '/industry-pack-realtor.php',
 			$dir . '/industry-pack-plumber.php',
+			$dir . '/industry-pack-disaster-recovery.php',
 		);
 		$out = array();
 		foreach ( $files as $path ) {

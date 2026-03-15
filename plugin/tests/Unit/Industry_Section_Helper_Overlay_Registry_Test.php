@@ -82,4 +82,23 @@ final class Industry_Section_Helper_Overlay_Registry_Test extends TestCase {
 		$this->assertSame( 'First', $ov['tone_notes'] ?? '' );
 		$this->assertCount( 1, $registry->get_all() );
 	}
+
+	/** Prompt 353: built-in overlays load and validate for all four industries. */
+	public function test_builtin_overlay_definitions_load_and_validate(): void {
+		$definitions = Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions();
+		$this->assertIsArray( $definitions );
+		$this->assertGreaterThanOrEqual( 20, count( $definitions ), 'Expected 5 sections × 4 industries' );
+		$registry = new Industry_Section_Helper_Overlay_Registry();
+		$registry->load( $definitions );
+		$cosmetology = $registry->get_for_industry( 'cosmetology_nail' );
+		$this->assertCount( 5, $cosmetology );
+		$ov = $registry->get( 'cosmetology_nail', 'hero_conv_02' );
+		$this->assertNotNull( $ov );
+		$this->assertSame( 'section_helper_overlay', $ov[ Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE ] );
+		$this->assertSame( 'active', $ov[ Industry_Section_Helper_Overlay_Registry::FIELD_STATUS ] );
+		$this->assertArrayHasKey( 'tone_notes', $ov );
+		$disaster = $registry->get( 'disaster_recovery', 'cta_booking_01' );
+		$this->assertNotNull( $disaster );
+		$this->assertArrayHasKey( 'cta_usage_notes', $disaster );
+	}
 }

@@ -48,6 +48,35 @@ final class Industry_Section_Helper_Overlay_Registry {
 	private array $all = array();
 
 	/**
+	 * Returns built-in section-helper overlay definitions from SectionHelperOverlays/*.php (Prompt 353).
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_builtin_overlay_definitions(): array {
+		$dir   = __DIR__ . '/SectionHelperOverlays';
+		$files = array(
+			$dir . '/overlays-cosmetology-nail.php',
+			$dir . '/overlays-realtor.php',
+			$dir . '/overlays-plumber.php',
+			$dir . '/overlays-disaster-recovery.php',
+		);
+		$out = array();
+		foreach ( $files as $path ) {
+			if ( is_readable( $path ) ) {
+				$loaded = require $path;
+				if ( is_array( $loaded ) ) {
+					foreach ( $loaded as $ov ) {
+						if ( is_array( $ov ) ) {
+							$out[] = $ov;
+						}
+					}
+				}
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * Loads overlay definitions. Skips invalid or duplicate (industry_key, section_key). Safe: no throw.
 	 *
 	 * @param array<int, array<string, mixed>> $overlays List of overlay objects.
