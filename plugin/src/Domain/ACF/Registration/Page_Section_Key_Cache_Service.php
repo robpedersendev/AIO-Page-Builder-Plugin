@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Caches section-key lists only (no full definitions). Safe to miss; correctness over speed.
+ * Multisite (Prompt 303): cache keys are site-scoped via blog_id suffix so no cross-site bleed.
  */
 final class Page_Section_Key_Cache_Service {
 
@@ -37,6 +38,18 @@ final class Page_Section_Key_Cache_Service {
 	}
 
 	/**
+	 * Returns site-scoped suffix for transient keys (Prompt 303). Empty on single-site; blog id on multisite.
+	 *
+	 * @return string
+	 */
+	private function get_site_suffix(): string {
+		if ( ! \function_exists( 'is_multisite' ) || ! is_multisite() ) {
+			return '';
+		}
+		return \function_exists( 'get_current_blog_id' ) ? (string) get_current_blog_id() . '_' : '';
+	}
+
+	/**
 	 * Gets cached section keys for a page. Returns null on miss or invalid.
 	 *
 	 * @param int $page_id
@@ -46,7 +59,7 @@ final class Page_Section_Key_Cache_Service {
 		if ( $page_id <= 0 ) {
 			return null;
 		}
-		$key = self::PREFIX_PAGE . (string) $page_id;
+		$key = self::PREFIX_PAGE . $this->get_site_suffix() . (string) $page_id;
 		$raw = \get_transient( $key );
 		if ( ! is_array( $raw ) ) {
 			return null;
@@ -83,7 +96,7 @@ final class Page_Section_Key_Cache_Service {
 		if ( $page_id <= 0 ) {
 			return;
 		}
-		\delete_transient( self::PREFIX_PAGE . (string) $page_id );
+		\delete_transient( self::PREFIX_PAGE . $this->get_site_suffix() . (string) $page_id );
 	}
 
 	/**
@@ -122,7 +135,7 @@ final class Page_Section_Key_Cache_Service {
 		if ( $template_key === '' ) {
 			return;
 		}
-		\set_transient( self::PREFIX_TEMPLATE . $template_key, array_values( $section_keys ), $this->ttl );
+		\set_transient( self::PREFIX_TEMPLATE . $this->get_site_suffix() . $template_key, array_values( $section_keys ), $this->ttl );
 	}
 
 	/**
@@ -135,7 +148,7 @@ final class Page_Section_Key_Cache_Service {
 		if ( $template_key === '' ) {
 			return;
 		}
-		\delete_transient( self::PREFIX_TEMPLATE . $template_key );
+		\delete_transient( self::PREFIX_TEMPLATE . $this->get_site_suffix() . $template_key );
 	}
 
 	/**
@@ -173,7 +186,7 @@ final class Page_Section_Key_Cache_Service {
 		if ( $composition_id === '' ) {
 			return;
 		}
-		\set_transient( self::PREFIX_COMPOSITION . $composition_id, array_values( $section_keys ), $this->ttl );
+		\set_transient( self::PREFIX_COMPOSITION . $this->get_site_suffix() . $composition_id, array_values( $section_keys ), $this->ttl );
 	}
 
 	/**
@@ -186,7 +199,7 @@ final class Page_Section_Key_Cache_Service {
 		if ( $composition_id === '' ) {
 			return;
 		}
-		\delete_transient( self::PREFIX_COMPOSITION . $composition_id );
+		\delete_transient( self::PREFIX_COMPOSITION . $this->get_site_suffix() . $composition_id );
 	}
 
 	/**

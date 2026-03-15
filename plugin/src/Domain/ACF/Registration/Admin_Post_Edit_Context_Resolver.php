@@ -39,6 +39,11 @@ final class Admin_Post_Edit_Context_Resolver {
 			return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NO_REGISTRATION_REQUIRED, 0 );
 		}
 
+		// Prompt 305: third-party plugins can alter or unset $pagenow; fail safe to non-page admin.
+		if ( ! isset( $pagenow ) || ! \is_string( $pagenow ) || $pagenow === '' ) {
+			return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NON_PAGE_ADMIN, 0 );
+		}
+
 		if ( $pagenow === 'post.php' ) {
 			// Secondary admin request types: no scoped registration (acf-secondary-admin-request-matrix).
 			if ( $this->is_secondary_edit_request() ) {
@@ -49,6 +54,7 @@ final class Admin_Post_Edit_Context_Resolver {
 				return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::UNSUPPORTED_ADMIN, 0 );
 			}
 			$post_type = get_post_type( $post_id );
+			// Prompt 305: get_post_type can be false if post missing or third-party filter; fail safe.
 			if ( $post_type !== 'page' ) {
 				return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::UNSUPPORTED_ADMIN, 0 );
 			}

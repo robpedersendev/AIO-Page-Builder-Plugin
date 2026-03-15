@@ -167,7 +167,31 @@ The following must be preserved by the retrofit and all downstream implementatio
 
 ---
 
-## 9. Security and permissions
+## 9. Multisite and site-level isolation (Prompt 303)
+
+- The plugin operates at **site level** on multisite. No network-wide registration or assignment.
+- **Cache**: Section-key cache keys are prefixed with the current blog id when `is_multisite()` so there is no cross-site cache bleed. See docs/qa/acf-conditional-registration-multisite-verification.md.
+- **Assignment map**, page IDs, template/composition selections, and visible groups are local to the current site. WordPress APIs (get_post_meta, get_post_type, CPT queries) are current-blog scoped.
+- **Diagnostics**: Recorded payload includes `site_id` (get_current_blog_id()) so support sees which site the snapshot is from.
+- Single-site behavior is unchanged; multisite scoping is additive.
+
+---
+
+## 10. Third-party admin compatibility (Prompt 305)
+
+- Context resolution uses `$pagenow`, `$_GET['post']`, `$_GET['post_type']`, and `get_post_type()`. Third-party plugins can alter these; resolver fails safe to NON_PAGE_ADMIN or UNSUPPORTED_ADMIN when `$pagenow` is missing/empty or post type is not page.
+- No full registration fallback under ambiguous or unknown admin context. See **docs/qa/acf-third-party-admin-compatibility-matrix.md**.
+
+---
+
+## 11. ACF local JSON and sync coexistence (Prompt 306)
+
+- Plugin-owned groups (`group_aio_*`) are registered from the **registry/blueprints** only. The plugin does not load them from ACF’s native local JSON path.
+- The plugin’s **ACF_Local_JSON_Mirror_Service** writes JSON for debug/export only; that output is not used by ACF to load groups. See **acf-local-json-coexistence.md** for operator rules and no-go zones (e.g. do not save plugin-owned groups to ACF’s acf-json path).
+
+---
+
+## 12. Security and permissions
 
 - Selective registration must **not** expose groups in unauthorized contexts (e.g. no admin-only groups on front-end).
 - No public request parameter (e.g. query arg, cookie) may be used to force full or arbitrary ACF registration.
@@ -175,7 +199,7 @@ The following must be preserved by the retrofit and all downstream implementatio
 
 ---
 
-## 10. Cross-references
+## 13. Cross-references
 
 - **acf-page-visibility-contract.md**: Page-level assignment derivation; expanded by this contract for conditional registration.
 - **large-scale-acf-lpagery-binding-contract.md**: §6.2–6.3 registration scaling, performance, derivation from section list.
@@ -184,13 +208,17 @@ The following must be preserved by the retrofit and all downstream implementatio
 - **acf-registration-exception-matrix.md**: Approved tooling exceptions for full registration / broad load (Prompt 297).
 - **acf-preview-registration-behavior.md**: Preview and iframe registration behavior (Prompt 298).
 - **acf-secondary-admin-request-matrix.md**: Autosave, revision, quick-edit, bulk-edit guards (Prompt 299).
+- **acf-local-json-coexistence.md**: ACF local JSON and sync coexistence (Prompt 306).
 - **docs/qa/acf-registration-performance-impact-analysis.md**: Impact analysis and verification checklist.
 
 ---
 
-## 11. Revision history
+## 14. Revision history
 
 | Version | Date | Change |
 |---------|------|--------|
 | 1 | Prompt 281 | Initial conditional registration contract; hot path and target model. |
 | 2 | Prompt 294 | §3.2 Hook timing: acf/init priority 5; sequencing and timing report reference. |
+| 3 | Prompt 303 | §9 Multisite and site-level isolation; cache and diagnostics site scoping. |
+| 4 | Prompt 305 | §10 Third-party admin compatibility; fail-safe resolver guards. |
+| 5 | Prompt 306 | §11 ACF local JSON/sync coexistence; acf-local-json-coexistence.md. |

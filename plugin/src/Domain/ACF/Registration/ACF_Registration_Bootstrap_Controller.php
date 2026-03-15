@@ -74,12 +74,10 @@ final class ACF_Registration_Bootstrap_Controller {
 		// Sequencing: run_registration() is called from acf/init (priority 5). Do not call register_all() here.
 		if ( $this->request_context->should_skip_registration() ) {
 			if ( $this->diagnostics !== null ) {
-				$this->diagnostics->record_registration(
-					ACF_Registration_Diagnostics_Service::MODE_FRONT_END_SKIP,
-					0,
-					false,
-					false
-				);
+				$mode = $this->request_context->is_scripted_context()
+					? ACF_Registration_Diagnostics_Service::MODE_SCRIPTED_SKIP
+					: ACF_Registration_Diagnostics_Service::MODE_FRONT_END_SKIP;
+				$this->diagnostics->record_registration( $mode, 0, false, false );
 			}
 			return 0;
 		}

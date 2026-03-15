@@ -3,6 +3,7 @@
  * Bounded diagnostics for ACF conditional registration (Prompt 291).
  * Records registration mode, section-key count, cache usage, and full-registration path.
  * Admin/support only; no sensitive data or noisy public logging.
+ * Multisite (Prompt 303): payload includes site_id so diagnostics remain site-local in identity.
  *
  * @package AIOPageBuilder
  */
@@ -29,6 +30,9 @@ final class ACF_Registration_Diagnostics_Service {
 
 	/** Registration mode: non-page admin (zero groups). */
 	public const MODE_NON_PAGE_ADMIN = 'non_page_admin';
+
+	/** Registration mode: scripted context (WP-CLI, cron) — skip registration (Prompt 304). */
+	public const MODE_SCRIPTED_SKIP = 'scripted_skip';
 
 	/** @var bool Request-scoped: whether section-key cache was used for this resolution. */
 	private bool $request_cache_used = false;
@@ -81,6 +85,7 @@ final class ACF_Registration_Diagnostics_Service {
 			'section_key_count'           => $section_key_count,
 			'cache_used'                  => $cache_used,
 			'full_registration_invoked'   => $full_registration_invoked,
+			'site_id'                     => \function_exists( 'get_current_blog_id' ) ? get_current_blog_id() : 1,
 		);
 	}
 

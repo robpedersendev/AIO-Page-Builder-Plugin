@@ -28,4 +28,23 @@ final class Registration_Request_Context_Test extends TestCase {
 		$this->assertSame( ! is_admin(), $context->is_front_end() );
 		$this->assertSame( is_admin(), $context->is_admin() );
 	}
+
+	/** Prompt 304: scripted context triggers skip. */
+	public function test_should_skip_registration_true_when_scripted_context(): void {
+		$context = new class() extends Registration_Request_Context {
+			public function is_front_end(): bool {
+				return false;
+			}
+			public function is_scripted_context(): bool {
+				return true;
+			}
+		};
+		$this->assertTrue( $context->should_skip_registration() );
+	}
+
+	/** Prompt 304: is_scripted_context is false when not CLI or cron (normal run). */
+	public function test_is_scripted_context_false_when_not_cli_or_cron(): void {
+		$context = new Registration_Request_Context();
+		$this->assertFalse( $context->is_scripted_context() );
+	}
 }

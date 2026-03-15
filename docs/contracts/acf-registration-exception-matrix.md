@@ -40,8 +40,15 @@ Each of these uses `get_all_blueprints()` or equivalent broad load **only** when
 
 ---
 
-## 5. Cross-references
+## 5. Scripted contexts (Prompt 304)
+
+WP-CLI, cron, and other scripted runs do **not** get scoped or full registration from generic `acf/init`. `Registration_Request_Context::should_skip_registration()` returns true for CLI and cron. Tooling that must run in those contexts and needs full registration must invoke it from their own entry point (e.g. WP-CLI command). See **acf-scripted-context-matrix.md**.
+
+---
+
+## 6. Cross-references
 
 - acf-conditional-registration-contract.md §4.5 Tooling / explicit full registration
+- acf-scripted-context-matrix.md (WP-CLI, cron, scripted behavior)
 - docs/qa/acf-blueprint-bulk-load-elimination-report.md
 - Section_Field_Blueprint_Service::get_all_blueprints() docblock (reserved for explicit tooling)

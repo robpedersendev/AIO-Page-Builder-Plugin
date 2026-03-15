@@ -1,7 +1,7 @@
 <?php
 /**
  * Request context for ACF registration (acf-conditional-registration-contract).
- * Detects front-end vs admin so bootstrap can skip registration on public requests.
+ * Detects front-end vs admin and scripted contexts (WP-CLI, cron) so bootstrap skips registration when appropriate (Prompt 304).
  *
  * @package AIOPageBuilder
  */
@@ -13,8 +13,8 @@ namespace AIOPageBuilder\Domain\ACF\Registration;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Determines whether the current request is public/front-end (no ACF registration)
- * or admin/tooling (registration allowed). Non-final so tests can mock it.
+ * Determines whether the current request is public/front-end, scripted (CLI/cron), or admin.
+ * Non-final so tests can mock it.
  */
 class Registration_Request_Context {
 
@@ -37,12 +37,45 @@ class Registration_Request_Context {
 	}
 
 	/**
-	 * Returns true when ACF registration should be skipped for this request (e.g. front-end).
-	 * Extension point: later can add "admin but not a page edit screen" if needed.
+	 * Returns true when running under WP-CLI. Scripted context: no scoped registration unless explicit tooling (Prompt 304).
+	 *
+	 * @return bool
+	 */
+	public function is_cli(): bool {
+		return \defined( 'WP_CLI' ) && \WP_CLI;
+	}
+
+	/**
+	 * Returns true when the request is a cron run. Scripted context: skip registration (Prompt 304).
+	 *
+	 * @return bool
+	 */
+	public function is_cron(): bool {
+		return \defined( 'DOING_CRON' ) && \DOING_CRON;
+	}
+
+	/**
+	 * Returns true when the execution context is scripted/automation (CLI, cron). No full registration from generic bootstrap.
+	 *
+	 * @return bool
+	 */
+	public function is_scripted_context(): bool {
+		return $this->is_cli() || $this->is_cron();
+	}
+
+	/**
+	 * Returns true when ACF registration should be skipped for this request.
+	 * Skips: front-end, WP-CLI, cron. Admin page-edit gets scoped registration via bootstrap controller.
 	 *
 	 * @return bool
 	 */
 	public function should_skip_registration(): bool {
-		return $this->is_front_end();
+		if ( $this->is_front_end() ) {
+			return true;
+		}
+		if ( $this->is_scripted_context() ) {
+			return true;
+		}
+		return false;
 	}
 }
