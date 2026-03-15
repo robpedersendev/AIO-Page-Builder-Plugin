@@ -229,6 +229,7 @@ Use this checklist for preview implementation and QA:
 - [ ] Preview uses **real** section/page renderer (no mock HTML).
 - [ ] Synthetic data is **category-appropriate** (hero copy for hero, testimonials for proof, etc.).
 - [ ] Headings, lists, and CTAs look like plausible placeholders, not lorem-only or empty.
+- [ ] When an industry profile is set, section/page previews use **industry-appropriate** dummy overrides where available (see industry-preview-dummy-data-contract.md).
 
 **Safety**
 

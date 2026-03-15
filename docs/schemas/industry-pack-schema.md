@@ -43,6 +43,7 @@
 | **token_preset_ref** | string | Reference to industry style preset by key (Industry_Style_Preset_Registry; see industry-style-preset-schema.md). |
 | **lpagery_rule_ref** | string | Reference to industry LPagery rule key (Industry_LPagery_Rule_Registry; see industry-lpagery-rule-schema.md). |
 | **ai_rule_ref** | string | Reference to AI planning rule or prompt overlay for this industry. |
+| **starter_bundle_ref** | string | Optional reference to an industry starter bundle key (Industry_Starter_Bundle_Registry; see industry-starter-bundle-schema.md). The bundle's industry_key should match this pack's industry_key. |
 | **metadata** | map | Optional arbitrary metadata (e.g. label, sort order). Must not contain secrets. |
 
 ---
@@ -54,7 +55,7 @@
 - **status**: Must be one of `active`, `draft`, `deprecated`.
 - **version_marker**: Must match a supported schema version (e.g. `1`). Unsupported versions cause validation failure and safe rejection at load.
 - **supported_page_families**, **preferred_section_keys**, **discouraged_section_keys**: Arrays of non-empty strings; keys should exist in section/page registries when used (validation may be strict or advisory per implementation).
-- **Refs** (seo_guidance_ref, helper_overlay_refs, one_pager_overlay_refs, token_preset_ref, lpagery_rule_ref, ai_rule_ref): No secrets; safe for export. Format and resolution defined by respective subsystems.
+- **Refs** (seo_guidance_ref, helper_overlay_refs, one_pager_overlay_refs, token_preset_ref, lpagery_rule_ref, ai_rule_ref, starter_bundle_ref): No secrets; safe for export. Format and resolution defined by respective subsystems. starter_bundle_ref resolves to Industry_Starter_Bundle_Registry.
 
 Malformed or invalid pack definitions must be **rejected** by validation; no silent correction. Validation returns a list of error codes (e.g. `missing_required`, `invalid_status`, `unsupported_version`) with optional field reference.
 

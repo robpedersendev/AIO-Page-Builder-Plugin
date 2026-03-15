@@ -472,6 +472,18 @@ final class Page_Template_Detail_Screen {
 		$section_provider = new \AIOPageBuilder\Domain\Registries\PageTemplate\UI\Section_Template_Repository_Adapter( $section_repo );
 
 		$preview_generator = new \AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator();
+		$industry_dummy   = new \AIOPageBuilder\Domain\Industry\Preview\Industry_Dummy_Data_Generator();
+		$industry_key     = null;
+		if ( $this->container && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+			$store = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			if ( $store instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
+				$profile = $store->get_profile();
+				$primary = isset( $profile['primary_industry_key'] ) && \is_string( $profile['primary_industry_key'] ) ? \trim( $profile['primary_industry_key'] ) : '';
+				if ( $primary !== '' ) {
+					$industry_key = $primary;
+				}
+			}
+		}
 		$side_panel_builder = new \AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder();
 		$context_builder = $this->container && $this->container->has( 'section_render_context_builder' ) ? $this->container->get( 'section_render_context_builder' ) : null;
 		if ( ! $context_builder instanceof \AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder ) {
@@ -530,7 +542,9 @@ final class Page_Template_Detail_Screen {
 			$preview_cache,
 			$versioning_service,
 			$deprecation_service,
-			$form_reference_aggregator
+			$form_reference_aggregator,
+			$industry_dummy,
+			$industry_key
 		);
 	}
 }

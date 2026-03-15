@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\Registries\PageTemplate\UI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Industry\Preview\Industry_Dummy_Data_Generator;
 use AIOPageBuilder\Domain\Preview\Preview_Cache_Record;
 use AIOPageBuilder\Domain\Preview\Preview_Cache_Service;
 use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
@@ -69,6 +70,12 @@ final class Page_Template_Detail_State_Builder {
 	/** @var Page_Form_Reference_Aggregator|null */
 	private ?Page_Form_Reference_Aggregator $form_reference_aggregator;
 
+	/** @var Industry_Dummy_Data_Generator|null */
+	private ?Industry_Dummy_Data_Generator $industry_dummy_generator;
+
+	/** @var string|null */
+	private ?string $industry_key;
+
 	public function __construct(
 		Page_Template_Definition_Provider $page_template_provider,
 		Section_Definition_Provider_For_Preview $section_provider,
@@ -81,7 +88,9 @@ final class Page_Template_Detail_State_Builder {
 		?Preview_Cache_Service $preview_cache = null,
 		?Template_Versioning_Service $versioning_service = null,
 		?Template_Deprecation_Service $deprecation_service = null,
-		?Page_Form_Reference_Aggregator $form_reference_aggregator = null
+		?Page_Form_Reference_Aggregator $form_reference_aggregator = null,
+		?Industry_Dummy_Data_Generator $industry_dummy_generator = null,
+		?string $industry_key = null
 	) {
 		$this->page_template_provider = $page_template_provider;
 		$this->section_provider       = $section_provider;
@@ -95,6 +104,8 @@ final class Page_Template_Detail_State_Builder {
 		$this->versioning_service     = $versioning_service;
 		$this->deprecation_service    = $deprecation_service;
 		$this->form_reference_aggregator = $form_reference_aggregator;
+		$this->industry_dummy_generator = $industry_dummy_generator;
+		$this->industry_key = $industry_key !== null && $industry_key !== '' ? $industry_key : null;
 	}
 
 	/**
@@ -132,6 +143,9 @@ final class Page_Template_Detail_State_Builder {
 		$ordered_for_gen  = $this->build_ordered_sections_for_generator( $ordered_sections );
 
 		$section_field_values = $this->preview_generator->generate_for_page( $context, $ordered_for_gen );
+		if ( $this->industry_dummy_generator !== null && $this->industry_key !== null ) {
+			$section_field_values = $this->merge_industry_overrides_into_page_sections( $section_field_values, $ordered_for_gen );
+		}
 		$preview_payload       = $this->side_panel_builder->build_page_preview_payload( $definition, $section_field_values, $context );
 
 		$side_panel   = $preview_payload['side_panel'] ?? $this->side_panel_builder->build_for_page( $definition, $context );
@@ -257,6 +271,41 @@ final class Page_Template_Detail_State_Builder {
 			}
 			$out[] = array( 'section_key' => $section_key, 'position' => $position, 'purpose_family' => $purpose_family );
 			++$pos;
+		}
+		return $out;
+	}
+
+	/**
+	 * Merges industry dummy overrides onto each section's field_values (preview only; same order as ordered_for_gen).
+	 *
+	 * @param list<array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values
+	 * @param list<array{section_key: string, position: int, purpose_family: string}>               $ordered_for_gen
+	 * @return list<array{section_key: string, position: int, field_values: array<string, mixed>}>
+	 */
+	private function merge_industry_overrides_into_page_sections( array $section_field_values, array $ordered_for_gen ): array {
+		$out = array();
+		$gen = $this->industry_dummy_generator;
+		$key = $this->industry_key;
+		if ( $gen === null || $key === null ) {
+			return $section_field_values;
+		}
+		foreach ( $section_field_values as $i => $entry ) {
+			$field_values = isset( $entry['field_values'] ) && \is_array( $entry['field_values'] ) ? $entry['field_values'] : array();
+			$purpose_family = isset( $ordered_for_gen[ $i ]['purpose_family'] ) && \is_string( $ordered_for_gen[ $i ]['purpose_family'] )
+				? $ordered_for_gen[ $i ]['purpose_family']
+				: 'other';
+			if ( $purpose_family === '' ) {
+				$purpose_family = 'other';
+			}
+			$overrides = $gen->get_overrides_for_family( $purpose_family, $key );
+			if ( ! empty( $overrides ) ) {
+				$field_values = array_merge( $field_values, $overrides );
+			}
+			$out[] = array(
+				'section_key'   => isset( $entry['section_key'] ) ? (string) $entry['section_key'] : '',
+				'position'      => isset( $entry['position'] ) ? (int) $entry['position'] : $i,
+				'field_values'  => $field_values,
+			);
 		}
 		return $out;
 	}

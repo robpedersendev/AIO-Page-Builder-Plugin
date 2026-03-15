@@ -46,6 +46,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: industry LPagery rule registry (Prompt 360). */
 	public const CONTAINER_KEY_LPAGERY_RULE_REGISTRY = 'industry_lpagery_rule_registry';
 
+	/** Container key: industry starter bundle registry (Prompt 386; industry-starter-bundle-schema.md). */
+	public const CONTAINER_KEY_STARTER_BUNDLE_REGISTRY = 'industry_starter_bundle_registry';
+
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
 		$container->register( self::CONTAINER_KEY_INDUSTRY_LOADED, function (): bool {
@@ -92,6 +95,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( self::CONTAINER_KEY_LPAGERY_RULE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Rule_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Rule_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Rule_Registry::get_builtin_definitions() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry();
+			$registry->load( array() );
 			return $registry;
 		} );
 		$container->register( 'industry_question_pack_registry', function (): \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry {

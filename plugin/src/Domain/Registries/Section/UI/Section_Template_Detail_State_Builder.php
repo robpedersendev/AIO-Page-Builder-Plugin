@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ACF\Blueprints\Field_Blueprint_Schema;
 use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service;
+use AIOPageBuilder\Domain\Industry\Preview\Industry_Dummy_Data_Generator;
 use AIOPageBuilder\Domain\Preview\Preview_Cache_Record;
 use AIOPageBuilder\Domain\Preview\Preview_Cache_Service;
 use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
@@ -70,6 +71,12 @@ final class Section_Template_Detail_State_Builder {
 	/** @var Form_Section_Field_State_Builder|null */
 	private ?Form_Section_Field_State_Builder $form_section_field_state_builder;
 
+	/** @var Industry_Dummy_Data_Generator|null */
+	private ?Industry_Dummy_Data_Generator $industry_dummy_generator;
+
+	/** @var string|null */
+	private ?string $industry_key;
+
 	public function __construct(
 		Section_Definition_Provider $section_provider,
 		Synthetic_Preview_Data_Generator $preview_generator,
@@ -82,7 +89,9 @@ final class Section_Template_Detail_State_Builder {
 		?Preview_Cache_Service $preview_cache = null,
 		?Template_Versioning_Service $versioning_service = null,
 		?Template_Deprecation_Service $deprecation_service = null,
-		?Form_Section_Field_State_Builder $form_section_field_state_builder = null
+		?Form_Section_Field_State_Builder $form_section_field_state_builder = null,
+		?Industry_Dummy_Data_Generator $industry_dummy_generator = null,
+		?string $industry_key = null
 	) {
 		$this->section_provider    = $section_provider;
 		$this->preview_generator   = $preview_generator;
@@ -96,6 +105,8 @@ final class Section_Template_Detail_State_Builder {
 		$this->versioning_service  = $versioning_service;
 		$this->deprecation_service = $deprecation_service;
 		$this->form_section_field_state_builder = $form_section_field_state_builder;
+		$this->industry_dummy_generator = $industry_dummy_generator;
+		$this->industry_key = $industry_key !== null && $industry_key !== '' ? $industry_key : null;
 	}
 
 	/**
@@ -128,6 +139,12 @@ final class Section_Template_Detail_State_Builder {
 		);
 
 		$field_values   = $this->preview_generator->generate_for_section( $context );
+		if ( $this->industry_dummy_generator !== null && $this->industry_key !== null ) {
+			$overrides = $this->industry_dummy_generator->get_overrides_for_family( $purpose_family !== '' ? $purpose_family : 'other', $this->industry_key );
+			if ( ! empty( $overrides ) ) {
+				$field_values = array_merge( $field_values, $overrides );
+			}
+		}
 		$preview_payload = $this->side_panel_builder->build_section_preview_payload( $definition, $field_values, $context );
 		$side_panel     = $preview_payload['side_panel'] ?? $this->side_panel_builder->build_for_section( $definition, $context );
 
