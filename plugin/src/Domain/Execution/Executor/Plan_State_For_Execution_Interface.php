@@ -55,4 +55,13 @@ interface Plan_State_For_Execution_Interface {
 	 * @return bool Success.
 	 */
 	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null ): bool;
+
+	/**
+	 * Saves the full plan definition for a plan post (e.g. to persist industry approval snapshot).
+	 *
+	 * @param int                  $post_id    Plan post ID.
+	 * @param array<string, mixed> $definition Plan root payload.
+	 * @return bool Success.
+	 */
+	public function save_plan_definition( int $post_id, array $definition ): bool;
 }

@@ -88,5 +88,6 @@ Storage targets: industry pack definitions use registry-compatible storage (PHP 
 - **industry-pack-schema.md**: Industry Pack object schema and persistence (Prompt 320).
 - **data-schema-appendix.md**: Schema summary when industry objects are introduced.
 - **industry-override-contract.md**: Operator override model for section, page template, and Build Plan item recommendations (Prompt 366). Overrides are explicit and auditable; recommendations remain advisory by default.
+- **industry-conflict-resolution-contract.md**: Multi-industry conflict resolution and precedence (primary vs secondary); conflict classes, CTA/page-family/LPagery/style handling; Industry_Conflict_Result schema (Prompt 370).
 - **rendering-contract.md**, **large-scale-acf-lpagery-binding-contract.md**: No change to rendering or LPagery naming from industry overlays.
 - **PORTABILITY_AND_UNINSTALL**: Built content and portability unchanged; industry data, when added, must follow same preservation/export rules.

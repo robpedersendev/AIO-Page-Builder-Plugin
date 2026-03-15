@@ -96,7 +96,9 @@ final class Industry_Page_Template_Filter_Controller {
 			}
 		}
 
-		$item_views = $this->read_model_builder->build( $profile, $primary_pack, $templates, $industry_view );
+		$build_result = $this->read_model_builder->build_with_weighted( $profile, $primary_pack, $templates, $industry_view );
+		$item_views = isset( $build_result['items'] ) && is_array( $build_result['items'] ) ? $build_result['items'] : array();
+		$state['industry_weighted_by_key'] = isset( $build_result['weighted_by_key'] ) && is_array( $build_result['weighted_by_key'] ) ? $build_result['weighted_by_key'] : array();
 		$badges_by_key = array();
 		$ordered_keys = array();
 		foreach ( $item_views as $item ) {

@@ -220,10 +220,12 @@ final class Execution_Provider implements Service_Provider_Interface {
 			);
 		} );
 		$container->register( 'execution_queue_service', function () use ( $container ): Execution_Queue_Service {
+			$snapshot_builder = $container->has( 'industry_approval_snapshot_builder' ) ? $container->get( 'industry_approval_snapshot_builder' ) : null;
 			return new Execution_Queue_Service(
 				$container->get( 'build_plan_repository' ),
 				$container->get( 'bulk_executor' ),
-				$container->get( 'execution_job_dispatcher' )
+				$container->get( 'execution_job_dispatcher' ),
+				$snapshot_builder
 			);
 		} );
 		$container->register( 'queue_health_summary_builder', function () use ( $container ): Queue_Health_Summary_Builder {

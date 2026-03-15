@@ -3255,6 +3255,8 @@ It does not perform high-impact site mutation directly.**
 
 ### **The executor acts only on approved instructions and validated system inputs.**
 
+### **Industry context must not influence execution via live profile or pack reads; only approved plan artifacts and optional industry-approval snapshot apply (see docs/contracts/industry-execution-safeguard-contract.md).**
+
 #### **5.4.3 Why This Boundary Exists**
 
 ### **This boundary exists to:**

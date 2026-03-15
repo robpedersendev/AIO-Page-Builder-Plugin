@@ -15,12 +15,14 @@ namespace AIOPageBuilder\Domain\Execution\Queue;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract;
 use AIOPageBuilder\Domain\Execution\Executor\Plan_State_For_Execution_Interface;
+use AIOPageBuilder\Domain\Industry\AI\Industry_Approval_Snapshot_Builder;
 
 /**
  * Bulk execution request intake; delegates to Bulk_Executor and Execution_Job_Dispatcher.
- * Supports rollback job enqueue (spec §38.5, §59.11).
+ * Supports rollback job enqueue (spec §38.5, §59.11). Optionally captures industry approval snapshot (Prompt 374).
  */
 final class Execution_Queue_Service {
 
@@ -33,14 +35,19 @@ final class Execution_Queue_Service {
 	/** @var Execution_Job_Dispatcher */
 	private $job_dispatcher;
 
+	/** @var Industry_Approval_Snapshot_Builder|null */
+	private $industry_snapshot_builder;
+
 	public function __construct(
 		Plan_State_For_Execution_Interface $plan_state,
 		Bulk_Executor $bulk_executor,
-		Execution_Job_Dispatcher $job_dispatcher
+		Execution_Job_Dispatcher $job_dispatcher,
+		?Industry_Approval_Snapshot_Builder $industry_snapshot_builder = null
 	) {
-		$this->plan_state    = $plan_state;
-		$this->bulk_executor = $bulk_executor;
-		$this->job_dispatcher = $job_dispatcher;
+		$this->plan_state               = $plan_state;
+		$this->bulk_executor             = $bulk_executor;
+		$this->job_dispatcher           = $job_dispatcher;
+		$this->industry_snapshot_builder = $industry_snapshot_builder;
 	}
 
 	/**
@@ -66,6 +73,12 @@ final class Execution_Queue_Service {
 		$definition   = $this->plan_state->get_plan_definition( $plan_post_id );
 		if ( empty( $definition ) ) {
 			return $this->bulk_error_result( $plan_id, 'Plan definition not found.', array(), 0, 0, 0 );
+		}
+
+		if ( $this->industry_snapshot_builder !== null && ! isset( $definition[ Build_Plan_Schema::KEY_INDUSTRY_APPROVAL_SNAPSHOT ] ) ) {
+			$snapshot = $this->industry_snapshot_builder->build();
+			$definition[ Build_Plan_Schema::KEY_INDUSTRY_APPROVAL_SNAPSHOT ] = $snapshot;
+			$this->plan_state->save_plan_definition( $plan_post_id, $definition );
 		}
 
 		$batch_id = isset( $options['batch_id'] ) && is_string( $options['batch_id'] ) ? $options['batch_id'] : '';

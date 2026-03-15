@@ -83,6 +83,10 @@ final class Stub_Plan_State_For_Executor_Queue implements Plan_State_For_Executi
 		$this->last_update_call = array( 'post_id' => $post_id, 'step_index' => $step_index, 'item_id' => $item_id, 'new_status' => $new_status, 'execution_artifact' => $execution_artifact );
 		return $this->update_plan_item_status_return;
 	}
+
+	public function save_plan_definition( int $post_id, array $definition ): bool {
+		return true;
+	}
 }
 
 /**
@@ -141,6 +145,10 @@ final class Stub_Plan_State_For_Queue implements Plan_State_For_Execution_Interf
 
 	public function get_plan_definition( int $post_id ): array {
 		return $this->get_plan_definition_return;
+	}
+
+	public function save_plan_definition( int $post_id, array $definition ): bool {
+		return true;
 	}
 
 	public function find_step_index_for_item( array $definition, string $plan_item_id ): ?int {

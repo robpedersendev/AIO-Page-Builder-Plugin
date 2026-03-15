@@ -46,6 +46,8 @@ final class Build_Plan_Schema {
 	public const KEY_EXECUTION_HISTORY_ANCHOR = 'execution_history_anchor';
 	public const KEY_HISTORY_RETENTION     = 'history_retention';
 	public const KEY_SCHEMA_VERSION        = 'schema_version';
+	/** Industry context at approval/execution-request time (industry-approval-snapshot-contract.md). */
+	public const KEY_INDUSTRY_APPROVAL_SNAPSHOT = 'industry_approval_snapshot';
 
 	/** Status enum (spec §30.4, object-model §3.4). */
 	public const STATUS_PENDING_REVIEW = 'pending_review';

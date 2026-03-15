@@ -351,5 +351,14 @@ final class Build_Plan_Item_Generator {
 		if ( isset( $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ] ) && is_array( $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ] ) ) {
 			$payload['industry_warning_flags'] = $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ];
 		}
+		if ( isset( $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ] ) && is_array( $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ] ) ) {
+			$payload['industry_conflict_results'] = $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ];
+		}
+		if ( array_key_exists( Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_EXPLANATION_SUMMARY, $record ) && is_string( $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_EXPLANATION_SUMMARY ] ) ) {
+			$payload['industry_explanation_summary'] = $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_EXPLANATION_SUMMARY ];
+		}
+		if ( array_key_exists( Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_HAS_WARNING, $record ) ) {
+			$payload['industry_has_warning'] = (bool) $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_HAS_WARNING ];
+		}
 	}
 }

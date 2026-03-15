@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Domain\Industry\Registry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Weighted_Recommendation_Engine;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 
 /**
@@ -26,8 +28,15 @@ final class Industry_Page_Template_Directory_Read_Model_Builder {
 	/** @var Industry_Page_Template_Recommendation_Resolver */
 	private Industry_Page_Template_Recommendation_Resolver $resolver;
 
-	public function __construct( ?Industry_Page_Template_Recommendation_Resolver $resolver = null ) {
+	/** @var Industry_Weighted_Recommendation_Engine|null */
+	private ?Industry_Weighted_Recommendation_Engine $weighted_engine;
+
+	public function __construct(
+		?Industry_Page_Template_Recommendation_Resolver $resolver = null,
+		?Industry_Weighted_Recommendation_Engine $weighted_engine = null
+	) {
 		$this->resolver = $resolver ?? new Industry_Page_Template_Recommendation_Resolver();
+		$this->weighted_engine = $weighted_engine;
 	}
 
 	/**
@@ -80,5 +89,39 @@ final class Industry_Page_Template_Directory_Read_Model_Builder {
 			);
 		}
 		return array_values( $by_key );
+	}
+
+	/**
+	 * Builds the read model and weighted results by template key when profile has secondary industries (Prompt 371).
+	 *
+	 * @param array<string, mixed>       $industry_profile
+	 * @param array<string, mixed>|null  $primary_pack
+	 * @param array<int, array<string, mixed>> $page_templates
+	 * @param string                    $view_mode
+	 * @return array{items: list<Industry_Page_Template_Directory_Item_View>, weighted_by_key: array<string, array<string, mixed>>}
+	 */
+	public function build_with_weighted(
+		array $industry_profile,
+		?array $primary_pack,
+		array $page_templates,
+		string $view_mode = self::VIEW_FULL_LIBRARY
+	): array {
+		$items = $this->build( $industry_profile, $primary_pack, $page_templates, $view_mode );
+		$weighted_by_key = array();
+		if ( $this->weighted_engine !== null && $this->has_secondary_industries( $industry_profile ) ) {
+			$result = $this->resolver->resolve( $industry_profile, $primary_pack, $page_templates, array() );
+			foreach ( $result->get_items() as $item ) {
+				$key = $item['page_template_key'] ?? '';
+				if ( $key !== '' ) {
+					$weighted_by_key[ $key ] = $this->weighted_engine->for_template_item( $industry_profile, $item );
+				}
+			}
+		}
+		return array( 'items' => $items, 'weighted_by_key' => $weighted_by_key );
+	}
+
+	private function has_secondary_industries( array $profile ): bool {
+		$secondary = $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ?? $profile['secondary_industry_keys'] ?? array();
+		return is_array( $secondary ) && count( $secondary ) > 0;
 	}
 }

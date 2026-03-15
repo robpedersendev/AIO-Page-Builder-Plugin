@@ -69,6 +69,10 @@ final class Stub_Plan_State_For_Executor implements \AIOPageBuilder\Domain\Execu
 		$this->last_update_call = array( 'post_id' => $post_id, 'step_index' => $step_index, 'item_id' => $item_id, 'new_status' => $new_status, 'execution_artifact' => $execution_artifact );
 		return $this->update_plan_item_status_return;
 	}
+
+	public function save_plan_definition( int $post_id, array $definition ): bool {
+		return true;
+	}
 }
 
 final class Single_Action_Executor_Test extends TestCase {

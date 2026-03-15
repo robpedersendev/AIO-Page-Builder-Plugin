@@ -80,12 +80,24 @@ final class Industry_Build_Plan_Explanation_View_Model {
 
 		$fit_classification = self::derive_fit_classification( $fit_score, $warning_flags );
 
+		$conflict_results = isset( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ] ) && is_array( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ] )
+			? $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ]
+			: array();
+		$explanation_summary = isset( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_EXPLANATION_SUMMARY ] ) && is_string( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_EXPLANATION_SUMMARY ] )
+			? trim( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_EXPLANATION_SUMMARY ] )
+			: '';
+		if ( $conflict_results !== array() || $explanation_summary !== '' ) {
+			$has_data = true;
+		}
+
 		return array(
 			'has_industry_data'   => $has_data,
 			'summary_lines'       => $summary_lines,
 			'warning_badges'      => $warning_badges,
 			'fit_classification'  => $fit_classification,
 			'source_refs'         => array_slice( array_map( 'strval', $source_refs ), 0, self::MAX_SOURCE_REFS ),
+			'conflict_results'    => $conflict_results,
+			'explanation_summary' => $explanation_summary,
 		);
 	}
 

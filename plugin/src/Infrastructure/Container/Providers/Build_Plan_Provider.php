@@ -15,8 +15,13 @@ use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_Analytics_Service;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Item_Generator;
+use AIOPageBuilder\Domain\Industry\AI\Industry_Approval_Snapshot_Builder;
 use AIOPageBuilder\Domain\Industry\AI\Industry_Build_Plan_Scoring_Service;
+use AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Planning_Advisor;
+use AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Rule_Registry;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Weighted_Recommendation_Engine;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Registries\Analytics\Template_Analytics_Service;
@@ -69,7 +74,33 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 				new Industry_Page_Template_Recommendation_Resolver(),
 				$container->get( 'page_template_repository' ),
 				$profile_store,
-				$pack_registry instanceof Industry_Pack_Registry ? $pack_registry : null
+				$pack_registry instanceof Industry_Pack_Registry ? $pack_registry : null,
+				new Industry_Weighted_Recommendation_Engine()
+			);
+		} );
+		$container->register( 'industry_approval_snapshot_builder', function () use ( $container ): ?Industry_Approval_Snapshot_Builder {
+			if ( ! $container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+				return null;
+			}
+			$profile_store = $container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			if ( ! $profile_store instanceof Industry_Profile_Repository ) {
+				return null;
+			}
+			$pack_registry = $container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY )
+				? $container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY )
+				: null;
+			$preset_service = $container->has( 'industry_style_preset_application_service' ) ? $container->get( 'industry_style_preset_application_service' ) : null;
+			$lpagery_registry = $container->has( Industry_Packs_Module::CONTAINER_KEY_LPAGERY_RULE_REGISTRY )
+				? $container->get( Industry_Packs_Module::CONTAINER_KEY_LPAGERY_RULE_REGISTRY )
+				: null;
+			$lpagery_advisor = $lpagery_registry instanceof Industry_LPagery_Rule_Registry
+				? new Industry_LPagery_Planning_Advisor( $lpagery_registry )
+				: null;
+			return new Industry_Approval_Snapshot_Builder(
+				$profile_store,
+				$pack_registry instanceof Industry_Pack_Registry ? $pack_registry : null,
+				$preset_service instanceof Industry_Style_Preset_Application_Service ? $preset_service : null,
+				$lpagery_advisor
 			);
 		} );
 		$container->register( 'build_plan_generator', function () use ( $container ): Build_Plan_Generator {

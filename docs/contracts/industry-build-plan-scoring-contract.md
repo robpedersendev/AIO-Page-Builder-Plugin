@@ -71,3 +71,7 @@ Build Plan **items** (per Build_Plan_Item_Schema) gain optional payload or item-
 - **Contract**: docs/contracts/industry-build-plan-scoring-contract.md
 - **Build Plan generator**: Optional integration (inject scoring service; call enrich_output at start of generate()).
 - **Build Plan item generator**: Pass through industry_* keys from enriched records into item payload when building new_page and existing_page_change items.
+
+## 8. Industry approval snapshot
+
+- At execution-request time, a bounded industry context snapshot may be captured and stored in the plan definition (industry-approval-snapshot-contract.md). That snapshot is for traceability and execution safeguards; it does not replace scoring done at plan generation.

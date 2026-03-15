@@ -61,5 +61,14 @@ if ( $fit_classification === 'recommended' ) {
 				<?php echo \esc_html( implode( ', ', $source_refs ) ); ?>
 			</p>
 		<?php endif; ?>
+		<?php
+		$conflict_results = $view_model['conflict_results'] ?? array();
+		$explanation_summary = (string) ( $view_model['explanation_summary'] ?? '' );
+		if ( ! empty( $conflict_results ) || $explanation_summary !== '' ) :
+			?>
+			<div class="aio-industry-conflict-wrap">
+				<?php require \dirname( __DIR__ ) . '/industry/industry-conflict-badges.php'; ?>
+			</div>
+		<?php endif; ?>
 	</div>
 </div>

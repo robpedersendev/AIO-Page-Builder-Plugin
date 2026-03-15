@@ -60,6 +60,14 @@
 
 ---
 
+## 4.1 Multi-industry conflict and warning surfacing (Prompt 372)
+
+- **Section library**: When the read model is built with weighted resolution (primary + secondary industries), conflict/warning badges and short explanation snippets are shown per item where multi-industry resolution produced warning_worthy conflicts. Rendered via `industry-conflict-badges.php`; data from `industry_weighted_by_key` and item-level `conflict_results` / `explanation_summary`.
+- **Page template directory**: Same pattern—weighted read model may attach conflict results and explanation summary to items; conflict badges partial is included when present.
+- **Build Plan review UI**: Industry plan explanations view (industry-plan-explanations.php) shows conflict badges and explanation summary when item payload contains industry conflict results or explanation summary (from Industry_Build_Plan_Explanation_View_Model). Recommendation logic remains centralized in resolvers; views only surface metadata.
+
+---
+
 ## 5. Security and failure behavior
 
 - All industry admin surfaces are admin-only (capability as above or `aio_view_build_plans` for directory screens).

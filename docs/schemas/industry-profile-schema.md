@@ -33,7 +33,7 @@
 | **subtype** | string | No | `""` | Optional industry subtype (e.g. `plumber`, `realtor` within a broader vertical). |
 | **service_model** | string | No | `""` | Optional service model hint (e.g. `b2b`, `b2c`, `local_service`). |
 | **geo_model** | string | No | `""` | Optional geo model hint (e.g. `local`, `regional`, `national`). |
-| **derived_flags** | object | No | `{}` | Optional flags set by subsystems (e.g. multi_industry). Reserved for future use. |
+| **derived_flags** | object | No | `{}` | Optional flags set by subsystems. Use `multi_industry` (bool) when both primary and secondary industries are set; used for conflict-resolution and weighted recommendation (industry-conflict-resolution-contract.md). |
 | **question_pack_answers** | object | No | `{}` | Industry-specific question-pack answers: `{ [industry_key]: { [field_key]: scalar } }`. See industry-question-pack-contract.md. |
 
 - **primary_industry_key**: Must match an existing industry pack key when non-empty; validation may be advisory at storage time and strict at use time.

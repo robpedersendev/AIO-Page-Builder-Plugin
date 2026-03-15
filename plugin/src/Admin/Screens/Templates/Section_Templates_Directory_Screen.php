@@ -124,7 +124,7 @@ final class Section_Templates_Directory_Screen {
 				$pack_registry = $r;
 			}
 		}
-		$read_model_builder = new Industry_Section_Library_Read_Model_Builder();
+		$read_model_builder = new Industry_Section_Library_Read_Model_Builder( null, new \AIOPageBuilder\Domain\Industry\Profile\Industry_Weighted_Recommendation_Engine() );
 		$controller = new Industry_Section_Library_Filter_Controller( $read_model_builder, $profile_repo, $pack_registry );
 		return $controller->enrich_state( $state, $request );
 	}
@@ -308,6 +308,7 @@ final class Section_Templates_Directory_Screen {
 		}
 		$industry_badges_by_key             = $state['industry_badges_by_key'] ?? array();
 		$industry_section_overrides_by_key  = $state['industry_section_overrides_by_key'] ?? array();
+		$industry_weighted_by_key           = $state['industry_weighted_by_key'] ?? array();
 		?>
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
@@ -350,6 +351,9 @@ final class Section_Templates_Directory_Screen {
 					$item_view = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
 					$section_override = isset( $industry_section_overrides_by_key[ $key ] ) && is_array( $industry_section_overrides_by_key[ $key ] ) ? $industry_section_overrides_by_key[ $key ] : null;
 					$show_use_anyway = $item_view !== null && $section_override === null && \in_array( $item_view->get_recommendation_status(), array( Industry_Section_Recommendation_Resolver::FIT_DISCOURAGED, Industry_Section_Recommendation_Resolver::FIT_ALLOWED_WEAK ), true );
+					$weighted = isset( $industry_weighted_by_key[ $key ] ) && is_array( $industry_weighted_by_key[ $key ] ) ? $industry_weighted_by_key[ $key ] : null;
+					$conflict_results = ( $weighted !== null && ! empty( $weighted['conflict_results'] ) ) ? $weighted['conflict_results'] : array();
+					$explanation_summary = ( $weighted !== null && isset( $weighted['explanation_summary'] ) ) ? (string) $weighted['explanation_summary'] : '';
 					?>
 					<tr>
 						<td><?php echo \esc_html( $name ); ?></td>
@@ -357,6 +361,9 @@ final class Section_Templates_Directory_Screen {
 						<td>
 							<?php if ( $item_view !== null ) : ?>
 								<?php require \dirname( __DIR__, 2 ) . '/Views/sections/industry-section-badges.php'; ?>
+								<?php if ( ! empty( $conflict_results ) || $explanation_summary !== '' ) : ?>
+									<?php require \dirname( __DIR__, 2 ) . '/Views/industry/industry-conflict-badges.php'; ?>
+								<?php endif; ?>
 							<?php else : ?>
 								—
 							<?php endif; ?>

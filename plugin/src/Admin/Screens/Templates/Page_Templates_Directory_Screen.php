@@ -94,6 +94,40 @@ final class Page_Templates_Directory_Screen {
 		<?php
 	}
 
+	/**
+	 * Enriches state with industry badges and weighted conflict data (Prompt 372).
+	 *
+	 * @param array<string, mixed> $state
+	 * @param array<string, mixed> $request
+	 * @return array<string, mixed>
+	 */
+	private function enrich_state_with_industry( array $state, array $request ): array {
+		$view = (string) ( $state['view'] ?? 'root' );
+		if ( $view !== 'list' && $view !== 'search' ) {
+			$state['industry_view'] = Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY;
+			$state['industry_badges_by_key'] = array();
+			$state['industry_weighted_by_key'] = array();
+			return $state;
+		}
+		$profile_repo = null;
+		$pack_registry = null;
+		if ( $this->container && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+			$store = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			if ( $store instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
+				$profile_repo = $store;
+			}
+		}
+		if ( $this->container && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ) {
+			$r = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY );
+			if ( $r instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ) {
+				$pack_registry = $r;
+			}
+		}
+		$read_model_builder = new Industry_Page_Template_Directory_Read_Model_Builder( null, new \AIOPageBuilder\Domain\Industry\Profile\Industry_Weighted_Recommendation_Engine() );
+		$controller = new Industry_Page_Template_Filter_Controller( $read_model_builder, $profile_repo, $pack_registry );
+		return $controller->enrich_state( $state, $request );
+	}
+
 	private function get_state_builder(): Page_Template_Directory_State_Builder {
 		$query_service = null;
 		if ( $this->container && $this->container->has( 'large_library_query_service' ) ) {
@@ -236,6 +270,7 @@ final class Page_Templates_Directory_Screen {
 		$category_labels = $state['category_labels'] ?? array();
 		$industry_badges_by_key = $state['industry_badges_by_key'] ?? array();
 		$industry_page_template_overrides_by_key = $state['industry_page_template_overrides_by_key'] ?? array();
+		$industry_weighted_by_key = $state['industry_weighted_by_key'] ?? array();
 
 		$query_args = array( 'page' => self::SLUG );
 		if ( $cat !== '' ) {
@@ -296,6 +331,9 @@ final class Page_Templates_Directory_Screen {
 					$item_view = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
 					$template_override = isset( $industry_page_template_overrides_by_key[ $key ] ) && is_array( $industry_page_template_overrides_by_key[ $key ] ) ? $industry_page_template_overrides_by_key[ $key ] : null;
 					$show_use_anyway = $item_view !== null && $template_override === null && \in_array( $item_view->get_recommendation_status(), array( Industry_Page_Template_Recommendation_Resolver::FIT_DISCOURAGED, Industry_Page_Template_Recommendation_Resolver::FIT_ALLOWED_WEAK ), true );
+					$weighted = isset( $industry_weighted_by_key[ $key ] ) && is_array( $industry_weighted_by_key[ $key ] ) ? $industry_weighted_by_key[ $key ] : null;
+					$conflict_results = ( $weighted !== null && ! empty( $weighted['conflict_results'] ) ) ? $weighted['conflict_results'] : array();
+					$explanation_summary = ( $weighted !== null && isset( $weighted['explanation_summary'] ) ) ? (string) $weighted['explanation_summary'] : '';
 					?>
 					<tr>
 						<td><?php echo \esc_html( $name ); ?></td>
@@ -303,6 +341,9 @@ final class Page_Templates_Directory_Screen {
 						<td>
 							<?php if ( $item_view !== null ) : ?>
 								<?php require \dirname( __DIR__, 2 ) . '/Views/page-templates/industry-template-badges.php'; ?>
+								<?php if ( ! empty( $conflict_results ) || $explanation_summary !== '' ) : ?>
+									<?php require \dirname( __DIR__, 2 ) . '/Views/industry/industry-conflict-badges.php'; ?>
+								<?php endif; ?>
 							<?php else : ?>
 								—
 							<?php endif; ?>
