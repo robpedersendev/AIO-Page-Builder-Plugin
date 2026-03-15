@@ -55,7 +55,17 @@ Run the same scenarios before and after the retrofit; compare snapshot `mode` an
 
 ---
 
-## 6. References
+## 6. Query and memory profile (Prompt 310)
+
+- **Query count**: In a controlled run, after the scenario request, record `$wpdb->num_queries` (or use query logging). Correlate with registration mode: front-end and non-page admin should not run section/blueprint bulk queries.
+- **Memory**: Record `memory_get_peak_usage( true )` (bytes) at the same point. Compare before/after retrofit for each scenario.
+- **Snapshot with profile**: Call `ACF_Registration_Benchmark_Service::get_evidence_snapshot_with_profile()` from an admin context after the measured request to get `last_registration`, `timestamp`, `query_count` (if wpdb available), and `memory_peak_bytes`. Use for release review evidence.
+- **Report template**: [acf-memory-and-query-profile-report-template.md](acf-memory-and-query-profile-report-template.md) defines the table and interpretation. No sensitive data in reports.
+
+---
+
+## 7. References
 
 - [acf-conditional-registration-contract.md](../contracts/acf-conditional-registration-contract.md)
 - [acf-conditional-registration-acceptance-report.md](acf-conditional-registration-acceptance-report.md)
+- [acf-memory-and-query-profile-report-template.md](acf-memory-and-query-profile-report-template.md)

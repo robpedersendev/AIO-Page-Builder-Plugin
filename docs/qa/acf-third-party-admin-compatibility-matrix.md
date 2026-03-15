@@ -65,8 +65,19 @@ Under uncertainty (e.g. unexpected $pagenow), the resolver falls back to NON_PAG
 
 ---
 
-## 7. Cross-references
+## 7. Conflict verification (Prompt 311)
+
+A **plugin/theme conflict verification** pack exercises realistic interference scenarios (admin menu/redirect plugins, page builders, themes that alter admin, REST/headless, caching). Results are recorded in [acf-plugin-theme-conflict-verification.md](acf-plugin-theme-conflict-verification.md). Summary:
+
+- **Compatible**: Standard admin, themes that do not change $pagenow/post context, caching plugins (per-request decision unchanged).
+- **Fail-safe**: When $pagenow or post type is wrong or missing, resolver returns NON_PAGE_ADMIN or UNSUPPORTED_ADMIN; zero groups; no full registration.
+- **Unsupported**: Custom admin UIs that do not set core edit context; zero groups is the safe outcome; no bespoke integration.
+
+---
+
+## 8. Cross-references
 
 - acf-conditional-registration-contract.md
+- [acf-plugin-theme-conflict-verification.md](acf-plugin-theme-conflict-verification.md)
 - Admin_Post_Edit_Context_Resolver.php
 - acf-secondary-admin-request-matrix.md (autosave, heartbeat, etc.)

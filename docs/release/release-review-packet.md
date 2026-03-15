@@ -95,8 +95,11 @@
 |------|---------|----------|
 | Heavy-load elimination | Front-end and non-page admin skip registration; existing-page and new-page edit use scoped registration only. | [acf-registration-performance-impact-analysis.md](../qa/acf-registration-performance-impact-analysis.md); [acf-blueprint-bulk-load-elimination-report.md](../qa/acf-blueprint-bulk-load-elimination-report.md). |
 | Acceptance and release gate | QA checklist (front-end, existing-page, new-page, non-page admin); contract compliance (field values, LPagery, assignment map). | [acf-conditional-registration-acceptance-report.md](../qa/acf-conditional-registration-acceptance-report.md); [acf-registration-performance-release-gate.md](acf-registration-performance-release-gate.md). |
+| Benchmarks and profile | Timing, query count, memory profile; report template. | [acf-registration-benchmark-protocol.md](../qa/acf-registration-benchmark-protocol.md); [acf-memory-and-query-profile-report-template.md](../qa/acf-memory-and-query-profile-report-template.md). |
+| Regression guards and conflict verification | No register_all() on generic paths; plugin/theme conflict verification. | [acf-registration-regression-guard.md](../qa/acf-registration-regression-guard.md); [acf-plugin-theme-conflict-verification.md](../qa/acf-plugin-theme-conflict-verification.md). |
 | Diagnostics | Bounded registration mode/cache/full-registration diagnostics; admin/support only; no sensitive data. | [acf-conditional-registration-diagnostics-checklist.md](../qa/acf-conditional-registration-diagnostics-checklist.md). |
-| Known risk | ACF-1 (section-key cache; correctness over speed; invalidation on assignment change). | [known-risk-register.md](known-risk-register.md) §3. |
+| Final sign-off and maintenance | Production sign-off; long-term maintenance checklist for future ACF-related changes. | [acf-conditional-registration-final-signoff.md](acf-conditional-registration-final-signoff.md); [acf-conditional-registration-maintenance-checklist.md](../operations/acf-conditional-registration-maintenance-checklist.md). |
+| Known risks | ACF-1 (cache, invalidation, legacy); ACF-2 (plugin/theme conflict). | [known-risk-register.md](known-risk-register.md) §3. |
 
 ### 2.9 Styling subsystem (Option A expansion)
 

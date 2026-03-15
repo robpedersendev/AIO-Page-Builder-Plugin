@@ -57,4 +57,6 @@ Support-facing guide for the ACF conditional-registration performance retrofit: 
 - [acf-registration-exception-matrix.md](../contracts/acf-registration-exception-matrix.md)
 - [acf-registration-cache-invalidation-matrix.md](../contracts/acf-registration-cache-invalidation-matrix.md)
 - [acf-conditional-registration-rollback-playbook.md](acf-conditional-registration-rollback-playbook.md)
+- [acf-conditional-registration-maintenance-checklist.md](acf-conditional-registration-maintenance-checklist.md) (long-term; future ACF-related changes)
+- [acf-conditional-registration-final-signoff.md](../release/acf-conditional-registration-final-signoff.md)
 - [acf-registration-performance-release-gate.md](../release/acf-registration-performance-release-gate.md)

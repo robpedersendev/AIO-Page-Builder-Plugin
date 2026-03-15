@@ -24,6 +24,9 @@ Evidence-based release gate for the ACF conditional-registration performance ret
 | Support runbook | [acf-conditional-registration-support-runbook.md](../operations/acf-conditional-registration-support-runbook.md) |
 | Rollback playbook | [acf-conditional-registration-rollback-playbook.md](../operations/acf-conditional-registration-rollback-playbook.md) |
 | Regression guard (Prompt 307) | [acf-registration-regression-guard.md](../qa/acf-registration-regression-guard.md) |
+| Memory/query profile (Prompt 310) | [acf-memory-and-query-profile-report-template.md](../qa/acf-memory-and-query-profile-report-template.md) |
+| Plugin/theme conflict verification (Prompt 311) | [acf-plugin-theme-conflict-verification.md](../qa/acf-plugin-theme-conflict-verification.md) |
+| Final sign-off and maintenance (Prompt 312) | [acf-conditional-registration-final-signoff.md](acf-conditional-registration-final-signoff.md); [acf-conditional-registration-maintenance-checklist.md](../operations/acf-conditional-registration-maintenance-checklist.md) |
 | Contract | [acf-conditional-registration-contract.md](../contracts/acf-conditional-registration-contract.md) |
 
 ---
