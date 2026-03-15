@@ -48,6 +48,7 @@
 - **Known risks:** [known-risk-register.md](known-risk-register.md) FPR-1.
 - **Contract:** [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md).
 - **Picker contract (when added):** [form-provider-picker-adapter-contract.md](../contracts/form-provider-picker-adapter-contract.md).
+- **Additional provider onboarding (Prompt 240):** [additional-form-provider-onboarding-contract.md](../contracts/additional-form-provider-onboarding-contract.md), [form-provider-onboarding-checklist.md](../operations/form-provider-onboarding-checklist.md). All new providers (WPForms, CF7, etc.) must follow the contract and checklist; no ad hoc integration.
 
 ---
 

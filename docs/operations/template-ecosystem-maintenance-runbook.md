@@ -169,3 +169,14 @@ Post-release findings (support pain, analytics, compatibility issues, recommenda
 7. Implement per runbook §1–§3 (add/deprecate/version, appendices, compliance); no shortcut may silently override the approved specification.
 
 **Cadence:** [template-ecosystem-post-release-review-cadence.md](template-ecosystem-post-release-review-cadence.md) defines review timing, what to collect, and a full procedural traceability example (support finding → intake → decision log and revision history).
+
+---
+
+## 6. Form provider maintenance (Prompt 241)
+
+Provider-backed form sections and request-form page templates are maintained through a dedicated SOP and runbook so that provider API changes, picker drift, stale bindings, and support incidents are handled in a disciplined way.
+
+- **SOP:** [form-provider-maintenance-sop.md](form-provider-maintenance-sop.md) — Triage, provider API/picker evaluation, regression and diagnostics checks, escalation (security/privacy), when to update known-risk register/changelog/decision log, and rollback/release response.
+- **Runbook:** [form-provider-upgrade-and-support-runbook.md](form-provider-upgrade-and-support-runbook.md) — Step-by-step procedures for support incidents, provider plugin upgrades, and regression verification; includes a worked example (provider API regression → decision log → release).
+- **Evidence:** Form Provider Health screen, support bundle `form_provider_health_summary`, [FormProviderIntegrationRegressionHarness](../../plugin/tests/Regression/FormProviderIntegrationRegressionHarness.php), and [form-provider-security-checklist.md](../qa/form-provider-security-checklist.md). Provider-related decisions may be recorded in [template-library-decision-log.md](../release/template-library-decision-log.md) with a Decision ID prefix (e.g. DL-FP-001).
+- **Adding new providers:** [additional-form-provider-onboarding-contract.md](../contracts/additional-form-provider-onboarding-contract.md) and [form-provider-onboarding-checklist.md](form-provider-onboarding-checklist.md). No ad hoc provider integration.

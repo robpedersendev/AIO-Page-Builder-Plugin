@@ -20,6 +20,8 @@
 | Dashboard               | `Dashboard_Screen` / `aio-page-builder`    | (menu default)          |
 | Settings                | `Settings_Screen` / `aio-page-builder-settings` | `aio_manage_settings`   |
 | Diagnostics             | `Diagnostics_Screen` / `aio-page-builder-diagnostics` | `manage_options`        |
+| ACF Field Architecture  | `ACF_Architecture_Diagnostics_Screen` / `aio-page-builder-acf-diagnostics` | `aio_view_logs` |
+| Form Provider Health    | `Form_Provider_Health_Screen` / `aio-page-builder-form-provider-health` | `aio_view_logs` |
 | Onboarding & Profile    | `Onboarding_Screen` / `aio-page-builder-onboarding` | `aio_run_onboarding`    |
 | Crawl Sessions          | `Crawler_Sessions_Screen` / slug            | (crawler cap)           |
 | Crawl Comparison        | `Crawler_Comparison_Screen` / slug          | (crawler cap)           |
@@ -35,11 +37,15 @@
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
 | **Post-Release Health**| `Post_Release_Health_Screen` / `aio-page-builder-post-release-health` | `aio_view_logs`         |
 
-### 2.1 Page template directory and taxonomy (spec §49.3, §62.10; Prompt 133)
+### 2.1 Form provider seed (Settings; form-provider-integration-contract)
+
+The **Settings** screen (`Settings_Screen` / `aio-page-builder-settings`) hosts a **Seed form section and request page template** action that writes the form section template (`form_section_ndr`) and request page template (`pt_request_form`) to the section and page template registries. Action: `admin_post_aio_seed_form_templates`. Nonce: `aio_seed_form_templates`. Capability: `manage_options`. Handled by `Admin_Menu::handle_seed_form_templates()`; uses `Form_Template_Seeder::run()`. Form-bearing section and page templates appear in the section and page template directories like any other template; no separate form-provider admin screen.
+
+### 2.2 Page template directory and taxonomy (spec §49.3, §62.10; Prompt 133)
 
 When admin screens list or browse **page templates** (e.g. registry, template picker, or Build Plan template selection), **directory and browse grouping** must follow **page-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `template_category_class` (top_level, hub, nested_hub, child_detail), `template_family` (e.g. home, services, locations), and `hierarchy_role`. Preview grouping aligns with the same taxonomy so that “Services”, “Locations”, etc. map to contract-defined family slugs. Category labels are server-authoritative, not ad-hoc UI strings.
 
-### 2.2 Page template directory IA (spec §49.7; Prompt 141)
+### 2.3 Page template directory IA (spec §49.7; Prompt 141)
 
 The **page template directory** is a dedicated browse experience for page templates. Its **information architecture** (hierarchical tree, breadcrumbs, category/family filters, list/detail, one-pager/preview links) is defined in **page-template-directory-ia-extension.md**. Tree structure: **Page Templates** (root) → **Category class** (Top Level, Hub, Nested Hub, Child/Detail) → **Family** (e.g. Home Page Templates, Services Page Templates) → **Template option list** → **Template detail**. Screen slug: `aio-page-builder-page-templates` (or as specified in that contract). Directory is capability-gated; preview uses preview-safe data only. Build Plan template selection may deep-link into the directory; directory does not replace Build Plan or composition workflows. State is built by `Page_Template_Directory_State_Builder`.
 
@@ -90,7 +96,7 @@ The **page template directory** is a dedicated browse experience for page templa
 
 When admin screens list or browse **section templates**, **directory and browse grouping** must follow **section-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `section_purpose_family` (e.g. hero, proof, cta, legal), `placement_tendency` (opener, mid_page, cta_ending, legal_footer_adjacent), and `cta_classification`. Section preview grouping aligns with the same taxonomy. All taxonomy values are validated and deterministic.
 
-### 2.3 Compositions screen (spec §14, §49.6; Prompt 177)
+### 2.4 Compositions screen (spec §14, §49.6; Prompt 177)
 
 The **Compositions** screen lists governed custom compositions and provides a **composition builder** view for large-library assembly. Views: **list** (compositions table; Build composition link) and **build** (filtered section library, current ordered sections, CTA count/proximity warnings, insertion hint, preview and one-pager readiness). State is built by `Composition_Builder_State_Builder`; filter state by `Composition_Filter_State`. Screen slug: `aio-page-builder-compositions`. Capability: `aio_view_build_plans`. No freeform drag-and-drop; section ordering and CTA rules remain governed. Mutation (create/update composition) is server-validated and out of scope for this screen’s initial implementation; builder shows state and guidance only.
 
@@ -113,7 +119,7 @@ The **Compositions** screen lists governed custom compositions and provides a **
 }
 ```
 
-### 2.4 Section template directory IA (spec §49.6; Prompt 142)
+### 2.5 Section template directory IA (spec §49.6; Prompt 142)
 
 The **section template directory** is a dedicated browse experience for section templates. Its **information architecture** (hierarchical tree by purpose family, CTA/variant grouping, breadcrumbs, list/detail, helper-doc and field blueprint links, preview) is defined in **section-template-directory-ia-extension.md**. Tree structure: **Section Templates** (root) → **Purpose family** (Hero, Proof, CTA, FAQ, etc.) → **CTA classification** (for cta/contact) or **Variant family** (e.g. Hero primary) → **Section option list** → **Section detail**. Screen slug: `aio-page-builder-section-templates`. Directory is capability-gated; preview uses preview-safe data only. Build Plan and composition section pickers may deep-link into the directory. Section directory does not replace Build Plan or composition workflows and emphasizes purpose-family, CTA classification, and variant families for section reuse. State is built by `Section_Template_Directory_State_Builder`.
 
@@ -161,6 +167,16 @@ The **section template directory** is a dedicated browse experience for section 
   "cta_labels": { "primary_cta": "Primary CTA", "contact_cta": "Contact CTA", "navigation_cta": "Navigation CTA", "none": "None" }
 }
 ```
+
+---
+
+## 2.6 Form Provider Health screen (Prompt 239, spec §0.10.11, §49.11, §59.12)
+
+- **Slug:** `aio-page-builder-form-provider-health`
+- **Capability:** `aio_view_logs`
+- **Purpose:** Internal provider dependency health: provider availability, section/page template counts using provider-backed forms, provider-related attention items, links to Section/Page Template directories. Observational only; no secrets; for operators and support.
+- **State:** Built by `Form_Provider_Health_Summary_Service` (provider_availability, registered_provider_ids, section_templates_with_forms_count, page_templates_using_forms_count, recent_failures_summary, built_at). Support bundles may include `form_provider_health_summary` via Template_Library_Support_Summary_Builder when the service is available.
+- **Redaction:** Bounded; no secrets or raw provider config.
 
 ---
 

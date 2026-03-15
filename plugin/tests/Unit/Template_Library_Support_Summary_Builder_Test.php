@@ -31,7 +31,7 @@ require_once $plugin_root . '/src/Domain/Reporting/Contracts/Reporting_Payload_S
 final class Template_Library_Support_Summary_Builder_Test extends TestCase {
 
 	public function test_build_returns_stable_top_level_keys(): void {
-		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null );
+		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null, null );
 		$payload = $builder->build();
 		$this->assertIsArray( $payload );
 		$this->assertArrayHasKey( 'health', $payload );
@@ -44,7 +44,7 @@ final class Template_Library_Support_Summary_Builder_Test extends TestCase {
 	}
 
 	public function test_build_with_null_dependencies_inventory_is_bounded(): void {
-		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null );
+		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null, null );
 		$payload = $builder->build();
 		$this->assertSame( array( 'section_total' => 0, 'page_total' => 0 ), $payload['inventory'] );
 		$this->assertSame( array( 'deprecated_sections_count' => 0, 'deprecated_pages_count' => 0 ), $payload['version_summary'] );
@@ -54,7 +54,7 @@ final class Template_Library_Support_Summary_Builder_Test extends TestCase {
 	}
 
 	public function test_build_with_null_compliance_health_is_empty(): void {
-		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null );
+		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null, null );
 		$payload = $builder->build();
 		$this->assertSame( array(), $payload['health'] );
 		$this->assertSame( array(), $payload['validation_failures'] );
@@ -66,7 +66,7 @@ final class Template_Library_Support_Summary_Builder_Test extends TestCase {
 	}
 
 	public function test_boundedness_no_raw_registry_keys(): void {
-		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null );
+		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null, null );
 		$payload = $builder->build();
 		$this->assertArrayNotHasKey( 'definitions', $payload );
 		$this->assertArrayNotHasKey( 'raw_registry', $payload );
@@ -75,7 +75,7 @@ final class Template_Library_Support_Summary_Builder_Test extends TestCase {
 
 	/** Prompt 217: support summary output must pass redaction / prohibited-keys check for support bundle safety. */
 	public function test_build_output_has_no_prohibited_keys(): void {
-		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null );
+		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null, null );
 		$payload = $builder->build();
 		$this->assertTrue(
 			Reporting_Payload_Schema::has_no_prohibited_keys( $payload, true ),

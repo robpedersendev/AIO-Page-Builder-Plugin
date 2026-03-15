@@ -26,6 +26,7 @@ use AIOPageBuilder\Domain\Rendering\GenerateBlocks\GenerateBlocks_Compatibility_
 use AIOPageBuilder\Domain\Rendering\LPagery\Library_LPagery_Compatibility_Service;
 use AIOPageBuilder\Domain\Rendering\LPagery\LPagery_Token_Compatibility_Service;
 use AIOPageBuilder\Domain\Rendering\Omission\Smart_Omission_Service;
+use AIOPageBuilder\Domain\Reporting\FormProvider\Form_Provider_Health_Summary_Service;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiation_Payload_Builder;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiator;
 use AIOPageBuilder\Domain\Rendering\Preview\Render_Preview_Helper;
@@ -87,6 +88,15 @@ final class Rendering_Provider implements Service_Provider_Interface {
 			$discovery = $container->get( 'form_provider_picker_discovery' );
 			$cache = $container->has( 'form_provider_picker_cache' ) ? $container->get( 'form_provider_picker_cache' ) : null;
 			return new Form_Provider_Availability_Service( $registry, $discovery, $cache );
+		} );
+
+		$container->register( 'form_provider_health_summary_service', function () use ( $container ): Form_Provider_Health_Summary_Service {
+			$registry     = $container->get( 'form_provider_registry' );
+			$section_repo = $container->has( 'section_template_repository' ) ? $container->get( 'section_template_repository' ) : null;
+			$page_repo    = $container->has( 'page_template_repository' ) ? $container->get( 'page_template_repository' ) : null;
+			$availability = $container->has( 'form_provider_availability_service' ) ? $container->get( 'form_provider_availability_service' ) : null;
+			$validator    = $container->has( 'form_provider_dependency_validator' ) ? $container->get( 'form_provider_dependency_validator' ) : null;
+			return new Form_Provider_Health_Summary_Service( $registry, $section_repo, $page_repo, $availability, $validator );
 		} );
 
 		$container->register( 'native_block_assembly_pipeline', function () use ( $container ): Native_Block_Assembly_Pipeline {

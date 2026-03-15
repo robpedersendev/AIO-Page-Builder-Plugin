@@ -56,6 +56,9 @@ Per-provider contract (Form_Provider_Picker_Adapter_Interface) for admin UI: dis
 **form provider discovery**  
 Form_Provider_Picker_Discovery_Service: resolves which providers support the picker contract and returns normalized, sanitized state (dropdown vs manual form_id entry). Capability checks are the caller’s responsibility.
 
+**form provider onboarding**  
+Formal process for adding a second or subsequent form provider (e.g. WPForms, Contact Form 7). Governed by [additional-form-provider-onboarding-contract.md](../contracts/additional-form-provider-onboarding-contract.md) and [form-provider-onboarding-checklist.md](../operations/form-provider-onboarding-checklist.md). Requires registry registration, picker adapter, availability/caching integration, and compliance with security, export/restore, and QA obligations. Retrofit-first; no change to canonical storage.
+
 ---
 
 ## CTA-law and compliance terms

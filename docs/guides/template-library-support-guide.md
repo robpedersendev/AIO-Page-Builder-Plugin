@@ -61,7 +61,8 @@ Use these for **evidence-based** support: e.g. "per our compatibility report, pr
 
 ## 5. Support bundles and template data
 
-- **Support bundle** (Import / Export → Create export → **Support bundle**): Includes settings (redacted), profile (redacted), **registries** (section/page templates, compositions as defined in export-bundle-structure), plans, token sets; optional logs and reporting_history (redacted). No raw AI artifacts; no secrets.
+- **Support bundle** (Import / Export → Create export → **Support bundle**): Includes settings (redacted), profile (redacted), **registries** (section/page templates, compositions as defined in export-bundle-structure), plans, token sets; optional logs and reporting_history (redacted). When available, **template_library_support_summary** includes **form_provider_health_summary** (provider availability, section/page counts using forms, built_at). No raw AI artifacts; no secrets.
+- **Form Provider Health screen** (AIO Page Builder → Form Provider Health): Internal diagnostics for provider-backed forms—provider availability, section templates (form_embed) count, page templates using form sections count, and links to Section/Page Template directories. Capability: `aio_view_logs`. See [form-provider-health-dashboard-verification.md](../qa/form-provider-health-dashboard-verification.md).
 - **Template-only export:** Export mode **Template only** (if implemented) or full backup includes template/registry data for restore or diagnostics. Appendix content may be included for validation.
 - **Redaction:** Settings and profile in support bundle are redacted. Template definitions are structure and content (keys, names, field blueprints, composition order); no credentials. Do not request or ship full backups containing secrets.
 

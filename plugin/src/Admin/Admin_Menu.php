@@ -29,6 +29,7 @@ use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics\ACF_Architecture_Diagnostics_Screen;
+use AIOPageBuilder\Admin\Screens\Diagnostics\Form_Provider_Health_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
@@ -176,6 +177,15 @@ final class Admin_Menu {
 			$acf_diagnostics->get_capability(),
 			ACF_Architecture_Diagnostics_Screen::SLUG,
 			array( $acf_diagnostics, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$form_provider_health->get_title(),
+			__( 'Form Provider Health', 'aio-page-builder' ),
+			$form_provider_health->get_capability(),
+			Form_Provider_Health_Screen::SLUG,
+			array( $form_provider_health, 'render' )
 		);
 
 		add_submenu_page(

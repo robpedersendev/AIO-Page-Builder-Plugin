@@ -13,6 +13,7 @@
 2. **Run compliance pass:** Resolve `template_library_compliance_service` and call `run()`. Address all **hard-fail** findings per [template-library-compliance-matrix.md](../qa/template-library-compliance-matrix.md). Record warnings and any waivers in [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) or expansion sign-off checklist.
 3. **Run accessibility audit:** `Template_Accessibility_Audit_Service::run()`. Resolve or waive per compliance matrix and [template-library-accessibility-audit-report.md](../qa/template-library-accessibility-audit-report.md).
 4. **Run animation QA:** `Animation_QA_Service::run()`. Address per [template-library-animation-fallback-report.md](../qa/template-library-animation-fallback-report.md).
+5. **Form provider:** Run form-provider regression harness (`Form_Provider_Integration_Regression_Harness_Test`) and confirm Form Provider Health screen and support bundle (e.g. `form_provider_health_summary`) behave as expected. See [form-provider-maintenance-sop.md](form-provider-maintenance-sop.md) and [form-provider-regression-report.md](../qa/form-provider-regression-report.md).
 
 ---
 

@@ -99,7 +99,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'section_template_repository' ),
 				$container->get( 'page_template_repository' ),
 				new Reporting_Redaction_Service(),
-				$container->has( 'form_provider_availability_service' ) ? $container->get( 'form_provider_availability_service' ) : null
+				$container->has( 'form_provider_availability_service' ) ? $container->get( 'form_provider_availability_service' ) : null,
+				$container->has( 'form_provider_health_summary_service' ) ? $container->get( 'form_provider_health_summary_service' ) : null
 			);
 		} );
 
