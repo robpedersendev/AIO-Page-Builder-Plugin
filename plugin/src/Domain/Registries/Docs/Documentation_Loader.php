@@ -1,7 +1,7 @@
 <?php
 /**
  * Loads documentation objects from file-based section helper batches (spec §10.7, §15, documentation-object-schema).
- * Discovers doc-helper-{section_key}.php under SectionHelpers/Hero_Batch and SectionHelpers/CTA_Batch.
+ * Discovers doc-helper-{section_key}.php under SectionHelpers/Hero_Batch, CTA_Batch, Proof_Batch, Legal_Policy_Batch, Process_FAQ_Batch.
  *
  * @package AIOPageBuilder
  */
@@ -24,6 +24,9 @@ final class Documentation_Loader {
 	private const BATCH_DIRS = array(
 		'SectionHelpers/Hero_Batch',
 		'SectionHelpers/CTA_Batch',
+		'SectionHelpers/Proof_Batch',
+		'SectionHelpers/Legal_Policy_Batch',
+		'SectionHelpers/Process_FAQ_Batch',
 	);
 
 	/** @var string Base path (Docs directory). */

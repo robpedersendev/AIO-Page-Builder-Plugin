@@ -1,7 +1,7 @@
 <?php
 /**
- * Unit tests for Documentation Registry and section helper coverage (Prompts 261, 262).
- * Verifies every Hero and CTA section has a schema-compliant helper doc and registry resolution by section key.
+ * Unit tests for Documentation Registry and section helper coverage (Prompts 261–265).
+ * Verifies every Hero, CTA, Proof, Legal/Policy, and Process/FAQ section has a schema-compliant helper doc and registry resolution by section key.
  *
  * @package AIOPageBuilder
  */
@@ -13,6 +13,9 @@ use AIOPageBuilder\Domain\Registries\Docs\Documentation_Loader;
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\Section\CtaSuperLibraryBatch\CTA_Super_Library_Batch_Definitions;
 use AIOPageBuilder\Domain\Registries\Section\HeroBatch\Hero_Intro_Library_Batch_Definitions;
+use AIOPageBuilder\Domain\Registries\Section\LegalPolicyUtilityBatch\Legal_Policy_Utility_Library_Batch_Definitions;
+use AIOPageBuilder\Domain\Registries\Section\ProcessTimelineFaqBatch\Process_Timeline_FAQ_Library_Batch_Definitions;
+use AIOPageBuilder\Domain\Registries\Section\TrustProofBatch\Trust_Proof_Library_Batch_Definitions;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -23,6 +26,9 @@ require_once $plugin_root . '/src/Domain/Registries/Docs/Documentation_Loader.ph
 require_once $plugin_root . '/src/Domain/Registries/Docs/Documentation_Registry.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/HeroBatch/Hero_Intro_Library_Batch_Definitions.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/CtaSuperLibraryBatch/CTA_Super_Library_Batch_Definitions.php';
+require_once $plugin_root . '/src/Domain/Registries/Section/TrustProofBatch/Trust_Proof_Library_Batch_Definitions.php';
+require_once $plugin_root . '/src/Domain/Registries/Section/LegalPolicyUtilityBatch/Legal_Policy_Utility_Library_Batch_Definitions.php';
+require_once $plugin_root . '/src/Domain/Registries/Section/ProcessTimelineFaqBatch/Process_Timeline_FAQ_Library_Batch_Definitions.php';
 
 final class Documentation_Registry_Test extends TestCase {
 
@@ -62,6 +68,60 @@ final class Documentation_Registry_Test extends TestCase {
 		foreach ( $keys as $section_key ) {
 			$doc = $registry->get_by_section_key( $section_key );
 			$this->assertNotNull( $doc, "CTA section {$section_key} must have a helper doc." );
+			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '', "documentation_id must be doc-helper-{$section_key}" );
+			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $section_key, $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Proof/Trust batch section has a section_helper doc loadable by section key.
+	 */
+	public function test_every_proof_section_has_helper_doc(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = Trust_Proof_Library_Batch_Definitions::section_keys();
+		foreach ( $keys as $section_key ) {
+			$doc = $registry->get_by_section_key( $section_key );
+			$this->assertNotNull( $doc, "Proof section {$section_key} must have a helper doc." );
+			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '', "documentation_id must be doc-helper-{$section_key}" );
+			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $section_key, $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Legal/Policy batch section has a section_helper doc loadable by section key.
+	 */
+	public function test_every_legal_policy_section_has_helper_doc(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = Legal_Policy_Utility_Library_Batch_Definitions::section_keys();
+		foreach ( $keys as $section_key ) {
+			$doc = $registry->get_by_section_key( $section_key );
+			$this->assertNotNull( $doc, "Legal/Policy section {$section_key} must have a helper doc." );
+			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '', "documentation_id must be doc-helper-{$section_key}" );
+			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $section_key, $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Process/FAQ batch section has a section_helper doc loadable by section key.
+	 */
+	public function test_every_process_faq_section_has_helper_doc(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = Process_Timeline_FAQ_Library_Batch_Definitions::section_keys();
+		foreach ( $keys as $section_key ) {
+			$doc = $registry->get_by_section_key( $section_key );
+			$this->assertNotNull( $doc, "Process/FAQ section {$section_key} must have a helper doc." );
 			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '', "documentation_id must be doc-helper-{$section_key}" );
 			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
 			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
