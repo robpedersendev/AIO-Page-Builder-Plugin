@@ -32,6 +32,9 @@ final class Industry_Page_OnePager_Overlay_Registry {
 	/** Allowed scope for this overlay type. */
 	public const SCOPE_PAGE_ONEPAGER_OVERLAY = 'page_onepager_overlay';
 
+	/** Status: active overlays are used at resolution. */
+	public const STATUS_ACTIVE = 'active';
+
 	/** Pattern for industry_key. */
 	private const INDUSTRY_KEY_PATTERN = '#^[a-z0-9_-]+$#';
 

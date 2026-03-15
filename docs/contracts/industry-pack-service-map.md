@@ -61,6 +61,9 @@ The following keys are registered by **Industry_Packs_Module**:
 | `industry_seo_guidance_registry` | Read-only registry of industry SEO/entity guidance rules (industry-seo-guidance-schema.md). | Industry_SEO_Guidance_Registry; load(), get(key), get_all(), list_by_industry(), list_by_status(). |
 | `industry_lpagery_rule_registry` | Read-only registry of industry LPagery rules (industry-lpagery-rule-schema.md); posture, token refs, hierarchy. | Industry_LPagery_Rule_Registry; load(), get(key), get_all(), list_by_industry(), list_by_status(). |
 | `industry_helper_doc_composer` | Composes base section helper + industry overlay into effective helper doc (industry-section-helper-overlay-schema). | Industry_Helper_Doc_Composer; compose(section_key, industry_key) → Composed_Helper_Doc_Result; depends on Documentation_Registry and Industry_Section_Helper_Overlay_Registry. |
+| `industry_page_onepager_composer` | Composes base page one-pager + industry overlay (industry-page-onepager-overlay-schema). | Industry_Page_OnePager_Composer; compose(page_template_key, industry_key) → Composed_Page_OnePager_Result; depends on Documentation_Registry and Industry_Page_OnePager_Overlay_Registry. |
+| `industry_section_library_read_model_builder` | Admin read model for section library with recommendation state and view modes (industry-section-recommendation-contract). | Industry_Section_Library_Read_Model_Builder; build(profile, pack, sections, view_mode) → list of Industry_Section_Library_Item_View. |
+| `industry_page_template_directory_read_model_builder` | Admin read model for page template directory with recommendation, hierarchy/LPagery fit (industry-page-template-recommendation-contract). | Industry_Page_Template_Directory_Read_Model_Builder; build(profile, pack, page_templates, view_mode) → list of Industry_Page_Template_Directory_Item_View. |
 
 Additional keys can be added in later prompts.
 
