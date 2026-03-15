@@ -34,6 +34,7 @@
 | **service_model** | string | No | `""` | Optional service model hint (e.g. `b2b`, `b2c`, `local_service`). |
 | **geo_model** | string | No | `""` | Optional geo model hint (e.g. `local`, `regional`, `national`). |
 | **derived_flags** | object | No | `{}` | Optional flags set by subsystems (e.g. multi_industry). Reserved for future use. |
+| **question_pack_answers** | object | No | `{}` | Industry-specific question-pack answers: `{ [industry_key]: { [field_key]: scalar } }`. See industry-question-pack-contract.md. |
 
 - **primary_industry_key**: Must match an existing industry pack key when non-empty; validation may be advisory at storage time and strict at use time.
 - **secondary_industry_keys**: Array of non-empty strings; no duplicates; keys should exist in industry pack registry when used.
@@ -75,5 +76,6 @@
 ## 8. Implementation reference
 
 - **Industry_Profile_Schema**: Field constants, default empty array, validation helpers.
-- **Industry_Profile_Repository**: get_profile(), set_profile(), get_empty_profile(); uses Settings_Service and Option_Names::INDUSTRY_PROFILE.
+- **Industry_Profile_Repository**: get_profile(), set_profile(), merge_profile(), get_empty_profile(); uses Settings_Service and Option_Names::INDUSTRY_PROFILE.
+- **industry-onboarding-field-contract.md**: Field keys, storage mapping, and persistence flow for onboarding/profile intake; industry fields are additive and persist via this repository.
 - **data-schema-appendix.md**: Summary of industry profile schema.

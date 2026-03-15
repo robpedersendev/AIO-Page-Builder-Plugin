@@ -134,7 +134,19 @@ Industry pack definitions (industry-pack-extension-contract, industry-pack-schem
 
 ## 11.1 Industry profile (site-level)
 
-Site-level industry context (industry-profile-schema.md). Stored under Option_Names::INDUSTRY_PROFILE. Key fields (Industry_Profile_Schema): schema_version, primary_industry_key, secondary_industry_keys, subtype, service_model, geo_model, derived_flags. Empty state when not set or unsupported version; normalized via Industry_Profile_Schema::normalize(). Read/write via Industry_Profile_Repository (get_profile, set_profile, merge_profile). Additive to Profile_Store; export/restore includes this option. See [industry-profile-schema.md](../schemas/industry-profile-schema.md).
+Site-level industry context (industry-profile-schema.md). Stored under Option_Names::INDUSTRY_PROFILE. Key fields (Industry_Profile_Schema): schema_version, primary_industry_key, secondary_industry_keys, subtype, service_model, geo_model, derived_flags, question_pack_answers. Empty state when not set or unsupported version; normalized via Industry_Profile_Schema::normalize(). Read/write via Industry_Profile_Repository (get_profile, set_profile, merge_profile). Additive to Profile_Store; export/restore includes this option. Onboarding field definitions: [industry-onboarding-field-contract.md](../contracts/industry-onboarding-field-contract.md). Industry question-pack switching and question_pack_answers storage: [industry-question-pack-contract.md](../contracts/industry-question-pack-contract.md). See [industry-profile-schema.md](../schemas/industry-profile-schema.md).
+
+---
+
+## 11.2 Industry section-helper overlay
+
+Industry-specific section-helper overlays (industry-section-helper-overlay-schema.md). Keyed by (industry_key, section_key). Key fields: industry_key, section_key, scope (section_helper_overlay), status, version_marker, tone_notes, cta_usage_notes, compliance_cautions, media_notes, seo_notes, additive_blocks. Loaded via Industry_Section_Helper_Overlay_Registry (load, get, get_for_industry). Base section helpers unchanged; overlays additive or narrowly overriding. See [industry-section-helper-overlay-schema.md](../schemas/industry-section-helper-overlay-schema.md).
+
+---
+
+## 11.3 Industry page one-pager overlay
+
+Industry-specific page one-pager overlays (industry-page-onepager-overlay-schema.md). Keyed by (industry_key, page_template_key). Key fields: industry_key, page_template_key, scope (page_onepager_overlay), status, version_marker, hierarchy_hints, cta_strategy, lpagery_seo_notes, compliance_cautions, additive_blocks. Loaded via Industry_Page_OnePager_Overlay_Registry. Base one-pagers unchanged. See [industry-page-onepager-overlay-schema.md](../schemas/industry-page-onepager-overlay-schema.md).
 
 ---
 

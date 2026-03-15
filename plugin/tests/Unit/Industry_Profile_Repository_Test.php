@@ -94,4 +94,48 @@ final class Industry_Profile_Repository_Test extends TestCase {
 		$this->assertSame( 'realtor', $retrieved[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] );
 		$this->assertSame( array( 'legal', 'disaster_recovery' ), $retrieved[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] );
 	}
+
+	/**
+	 * Onboarding field persistence (industry-onboarding-field-contract): all five industry keys
+	 * merged via merge_profile persist and are returned by get_profile.
+	 */
+	public function test_onboarding_industry_fields_persist_via_merge_profile(): void {
+		$this->repository->merge_profile( array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY   => 'plumber',
+			Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => array( 'disaster_recovery' ),
+			Industry_Profile_Schema::FIELD_SUBTYPE                => 'residential',
+			Industry_Profile_Schema::FIELD_SERVICE_MODEL          => 'local_service',
+			Industry_Profile_Schema::FIELD_GEO_MODEL              => 'local',
+		) );
+		$profile = $this->repository->get_profile();
+		$this->assertSame( 'plumber', $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] );
+		$this->assertSame( array( 'disaster_recovery' ), $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] );
+		$this->assertSame( 'residential', $profile[ Industry_Profile_Schema::FIELD_SUBTYPE ] );
+		$this->assertSame( 'local_service', $profile[ Industry_Profile_Schema::FIELD_SERVICE_MODEL ] );
+		$this->assertSame( 'local', $profile[ Industry_Profile_Schema::FIELD_GEO_MODEL ] );
+	}
+
+	/**
+	 * Question-pack answers merge (industry-question-pack-contract): merge_profile with question_pack_answers
+	 * persists and get_profile returns them; merge by industry_key does not overwrite other industries.
+	 */
+	public function test_merge_profile_question_pack_answers_persists_and_merges_by_industry(): void {
+		$this->repository->merge_profile( array(
+			Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array(
+				'realtor' => array( 'market_focus' => 'residential', 'service_areas' => 'Boston' ),
+			),
+		) );
+		$profile = $this->repository->get_profile();
+		$this->assertSame( array( 'market_focus' => 'residential', 'service_areas' => 'Boston' ), $profile[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]['realtor'] ?? null );
+
+		$this->repository->merge_profile( array(
+			Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array(
+				'realtor' => array( 'listing_types' => 'both' ),
+				'plumber' => array( 'service_scope' => 'residential' ),
+			),
+		) );
+		$profile = $this->repository->get_profile();
+		$this->assertSame( array( 'market_focus' => 'residential', 'service_areas' => 'Boston', 'listing_types' => 'both' ), $profile[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]['realtor'] ?? null );
+		$this->assertSame( array( 'service_scope' => 'residential' ), $profile[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]['plumber'] ?? null );
+	}
 }

@@ -38,6 +38,9 @@ final class Industry_Profile_Schema {
 	/** Optional derived flags (reserved for subsystems). */
 	public const FIELD_DERIVED_FLAGS = 'derived_flags';
 
+	/** Optional question-pack answers keyed by industry_key then field_key (industry-question-pack-contract). */
+	public const FIELD_QUESTION_PACK_ANSWERS = 'question_pack_answers';
+
 	/** Supported schema version. */
 	public const SUPPORTED_SCHEMA_VERSION = '1';
 
@@ -48,13 +51,14 @@ final class Industry_Profile_Schema {
 	 */
 	public static function get_empty_profile(): array {
 		return array(
-			self::FIELD_SCHEMA_VERSION       => self::SUPPORTED_SCHEMA_VERSION,
-			self::FIELD_PRIMARY_INDUSTRY_KEY => '',
+			self::FIELD_SCHEMA_VERSION        => self::SUPPORTED_SCHEMA_VERSION,
+			self::FIELD_PRIMARY_INDUSTRY_KEY  => '',
 			self::FIELD_SECONDARY_INDUSTRY_KEYS => array(),
-			self::FIELD_SUBTYPE              => '',
-			self::FIELD_SERVICE_MODEL        => '',
-			self::FIELD_GEO_MODEL            => '',
+			self::FIELD_SUBTYPE               => '',
+			self::FIELD_SERVICE_MODEL         => '',
+			self::FIELD_GEO_MODEL             => '',
 			self::FIELD_DERIVED_FLAGS         => array(),
+			self::FIELD_QUESTION_PACK_ANSWERS => array(),
 		);
 	}
 
@@ -102,14 +106,45 @@ final class Industry_Profile_Schema {
 		$derived = isset( $raw[ self::FIELD_DERIVED_FLAGS ] ) && is_array( $raw[ self::FIELD_DERIVED_FLAGS ] )
 			? $raw[ self::FIELD_DERIVED_FLAGS ]
 			: array();
+		$qp_answers = isset( $raw[ self::FIELD_QUESTION_PACK_ANSWERS ] ) && is_array( $raw[ self::FIELD_QUESTION_PACK_ANSWERS ] )
+			? $raw[ self::FIELD_QUESTION_PACK_ANSWERS ]
+			: array();
+		$qp_answers = self::normalize_question_pack_answers( $qp_answers );
 		return array(
-			self::FIELD_SCHEMA_VERSION        => $version !== '' ? $version : self::SUPPORTED_SCHEMA_VERSION,
+			self::FIELD_SCHEMA_VERSION         => $version !== '' ? $version : self::SUPPORTED_SCHEMA_VERSION,
 			self::FIELD_PRIMARY_INDUSTRY_KEY   => $primary,
 			self::FIELD_SECONDARY_INDUSTRY_KEYS => $secondary,
 			self::FIELD_SUBTYPE                => $subtype,
-			self::FIELD_SERVICE_MODEL           => $service_model,
-			self::FIELD_GEO_MODEL               => $geo_model,
-			self::FIELD_DERIVED_FLAGS           => $derived,
+			self::FIELD_SERVICE_MODEL          => $service_model,
+			self::FIELD_GEO_MODEL              => $geo_model,
+			self::FIELD_DERIVED_FLAGS          => $derived,
+			self::FIELD_QUESTION_PACK_ANSWERS  => $qp_answers,
 		);
+	}
+
+	/**
+	 * Normalizes question_pack_answers to industry_key => array of field_key => scalar. Strips non-arrays and non-scalars.
+	 *
+	 * @param mixed $raw Raw question_pack_answers value.
+	 * @return array<string, array<string, mixed>>
+	 */
+	public static function normalize_question_pack_answers( $raw ): array {
+		if ( ! is_array( $raw ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $raw as $industry_key => $by_field ) {
+			if ( ! is_string( $industry_key ) || trim( $industry_key ) === '' || ! is_array( $by_field ) ) {
+				continue;
+			}
+			$clean = array();
+			foreach ( $by_field as $field_key => $value ) {
+				if ( is_string( $field_key ) && trim( $field_key ) !== '' && ( is_scalar( $value ) || $value === null ) ) {
+					$clean[ $field_key ] = $value === null ? '' : $value;
+				}
+			}
+			$out[ trim( $industry_key ) ] = $clean;
+		}
+		return $out;
 	}
 }

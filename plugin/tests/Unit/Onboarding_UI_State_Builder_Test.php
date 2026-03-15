@@ -12,9 +12,14 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
+use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Definitions;
+use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 use PHPUnit\Framework\TestCase;
 
@@ -33,6 +38,10 @@ require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Step_Keys.php'
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Draft_Service.php';
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Prefill_Service.php';
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_UI_State_Builder.php';
+require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Schema.php';
+require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Repository.php';
+require_once $plugin_root . '/src/Domain/Industry/Onboarding/Industry_Question_Pack_Registry.php';
+require_once $plugin_root . '/src/Domain/Industry/Onboarding/Industry_Question_Pack_Definitions.php';
 
 final class Onboarding_UI_State_Builder_Test extends TestCase {
 
@@ -99,5 +108,55 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 			$this->assertArrayNotHasKey( 'api_key', $ref );
 			$this->assertArrayNotHasKey( 'secret', $ref );
 		}
+	}
+
+	public function test_build_for_screen_includes_industry_question_pack_state_when_no_repo(): void {
+		$builder = $this->get_builder();
+		$state = $builder->build_for_screen();
+		$this->assertArrayHasKey( 'industry_question_pack', $state );
+		$this->assertArrayHasKey( 'industry_question_pack_answers', $state );
+		$this->assertNull( $state['industry_question_pack'] );
+		$this->assertSame( array(), $state['industry_question_pack_answers'] );
+	}
+
+	public function test_build_for_screen_includes_industry_question_pack_when_primary_set_and_supported(): void {
+		$settings = new Settings_Service();
+		$repo = new Industry_Profile_Repository( $settings );
+		$repo->merge_profile( array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor',
+			Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array( 'realtor' => array( 'market_focus' => 'residential' ) ),
+		) );
+		$qp_registry = new Industry_Question_Pack_Registry();
+		$qp_registry->load( Industry_Question_Pack_Definitions::default_packs() );
+		$normalizer = new Profile_Normalizer();
+		$profile_store = new Profile_Store( $settings, $normalizer );
+		$draft_svc = new Onboarding_Draft_Service( $settings );
+		$prefill_svc = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$builder = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc, $repo, $qp_registry );
+		$state = $builder->build_for_screen();
+		$this->assertIsArray( $state['industry_question_pack'] );
+		$this->assertSame( 'realtor', $state['industry_question_pack']['industry_key'] ?? '' );
+		$this->assertSame( array( 'market_focus' => 'residential' ), $state['industry_question_pack_answers'] );
+	}
+
+	public function test_build_for_screen_industry_question_pack_null_when_primary_unsupported(): void {
+		$settings = new Settings_Service();
+		$repo = new Industry_Profile_Repository( $settings );
+		$repo->merge_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'unknown_vertical' ) );
+		$qp_registry = new Industry_Question_Pack_Registry();
+		$qp_registry->load( Industry_Question_Pack_Definitions::default_packs() );
+		$normalizer = new Profile_Normalizer();
+		$profile_store = new Profile_Store( $settings, $normalizer );
+		$draft_svc = new Onboarding_Draft_Service( $settings );
+		$prefill_svc = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$builder = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc, $repo, $qp_registry );
+		$state = $builder->build_for_screen();
+		$this->assertNull( $state['industry_question_pack'] );
+		$this->assertSame( array(), $state['industry_question_pack_answers'] );
+	}
+
+	protected function tearDown(): void {
+		\delete_option( Option_Names::INDUSTRY_PROFILE );
+		parent::tearDown();
 	}
 }

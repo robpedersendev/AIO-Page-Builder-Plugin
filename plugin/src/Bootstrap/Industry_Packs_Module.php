@@ -59,5 +59,10 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( array() );
 			return $registry;
 		} );
+		$container->register( 'industry_question_pack_registry', function (): \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Definitions::default_packs() );
+			return $registry;
+		} );
 	}
 }

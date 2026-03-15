@@ -14,6 +14,9 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
+use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
 use AIOPageBuilder\Domain\AI\Onboarding\Planning_Request_Result;
@@ -91,6 +94,7 @@ final class Onboarding_Screen {
 
 		if ( $action === 'save_draft' ) {
 			$this->persist_template_preferences_from_post( $draft );
+			$this->persist_industry_profile_from_post();
 			$draft['overall_status'] = Onboarding_Statuses::DRAFT_SAVED;
 			$draft_service->save_draft( $draft );
 			$url = \add_query_arg( array( 'page' => self::SLUG, 'saved' => '1' ), \admin_url( 'admin.php' ) );
@@ -99,6 +103,7 @@ final class Onboarding_Screen {
 
 		if ( $action === 'advance_step' ) {
 			$this->persist_template_preferences_from_post( $draft );
+			$this->persist_industry_profile_from_post();
 			$ordered = Onboarding_Step_Keys::ordered();
 			$idx = array_search( $draft['current_step_key'], $ordered, true );
 			if ( $idx !== false && $idx < count( $ordered ) - 1 ) {
@@ -175,6 +180,78 @@ final class Onboarding_Screen {
 		);
 		$profile_store = $this->container->get( 'profile_store' );
 		$profile_store->set_template_preference_profile( $raw );
+	}
+
+	/**
+	 * Persists industry profile and question-pack answers from POST when industry_profile_store and registry are available (industry-question-pack-contract).
+	 *
+	 * @return void
+	 */
+	private function persist_industry_profile_from_post(): void {
+		if ( $this->container === null
+			|| ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE )
+			|| ! $this->container->has( 'industry_question_pack_registry' ) ) {
+			return;
+		}
+		$repo = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+		if ( ! $repo instanceof Industry_Profile_Repository ) {
+			return;
+		}
+		$partial = array();
+		if ( isset( $_POST['aio_primary_industry_key'] ) && is_string( $_POST['aio_primary_industry_key'] ) ) {
+			$partial[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] = \sanitize_text_field( \wp_unslash( $_POST['aio_primary_industry_key'] ) );
+		}
+		if ( isset( $_POST['aio_industry_subtype'] ) && is_string( $_POST['aio_industry_subtype'] ) ) {
+			$partial[ Industry_Profile_Schema::FIELD_SUBTYPE ] = \sanitize_text_field( \wp_unslash( $_POST['aio_industry_subtype'] ) );
+		}
+		if ( isset( $_POST['aio_industry_service_model'] ) && is_string( $_POST['aio_industry_service_model'] ) ) {
+			$partial[ Industry_Profile_Schema::FIELD_SERVICE_MODEL ] = \sanitize_text_field( \wp_unslash( $_POST['aio_industry_service_model'] ) );
+		}
+		if ( isset( $_POST['aio_industry_geo_model'] ) && is_string( $_POST['aio_industry_geo_model'] ) ) {
+			$partial[ Industry_Profile_Schema::FIELD_GEO_MODEL ] = \sanitize_text_field( \wp_unslash( $_POST['aio_industry_geo_model'] ) );
+		}
+		if ( isset( $_POST['aio_secondary_industry_keys'] ) && is_array( $_POST['aio_secondary_industry_keys'] ) ) {
+			$partial[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = array_filter( array_map( function ( $v ) {
+				return \is_string( $v ) ? \sanitize_text_field( \wp_unslash( $v ) ) : '';
+			}, $_POST['aio_secondary_industry_keys'] ) );
+		}
+		if ( ! empty( $partial ) ) {
+			$repo->merge_profile( $partial );
+		}
+		$primary = isset( $_POST['aio_primary_industry_key'] ) && is_string( $_POST['aio_primary_industry_key'] )
+			? \trim( \sanitize_text_field( \wp_unslash( $_POST['aio_primary_industry_key'] ) ) )
+			: '';
+		if ( $primary === '' ) {
+			$profile = $repo->get_profile();
+			$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+				? \trim( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+				: '';
+		}
+		if ( $primary !== '' ) {
+			$qp_registry = $this->container->get( 'industry_question_pack_registry' );
+			if ( $qp_registry instanceof Industry_Question_Pack_Registry ) {
+				$pack = $qp_registry->get( $primary );
+				if ( $pack !== null && isset( $pack['fields'] ) && \is_array( $pack['fields'] ) ) {
+					$by_field = array();
+					foreach ( $pack['fields'] as $field_def ) {
+						$field_key = isset( $field_def['key'] ) && \is_string( $field_def['key'] ) ? $field_def['key'] : '';
+						if ( $field_key === '' ) {
+							continue;
+						}
+						$post_key = 'aio_industry_qp_' . $field_key;
+						if ( isset( $_POST[ $post_key ] ) ) {
+							$val = $_POST[ $post_key ];
+							$by_field[ $field_key ] = \is_scalar( $val ) ? $val : ( \is_string( $val ) ? \sanitize_text_field( \wp_unslash( $val ) ) : '' );
+						}
+					}
+					if ( ! empty( $by_field ) ) {
+						$repo->merge_profile( array(
+							Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array( $primary => $by_field ),
+						) );
+					}
+				}
+			}
+		}
 	}
 
 	/**

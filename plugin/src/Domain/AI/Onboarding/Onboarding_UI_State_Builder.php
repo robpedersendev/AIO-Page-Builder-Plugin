@@ -11,8 +11,12 @@ namespace AIOPageBuilder\Domain\AI\Onboarding;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
+
 /**
  * Assembles everything the onboarding screen needs to render: step list, current step, blocked state, prefill, nonce.
+ * When industry profile and question pack registry are provided, adds industry_question_pack and industry_question_pack_answers to state.
  */
 final class Onboarding_UI_State_Builder {
 
@@ -22,9 +26,22 @@ final class Onboarding_UI_State_Builder {
 	/** @var Onboarding_Prefill_Service */
 	private Onboarding_Prefill_Service $prefill_service;
 
-	public function __construct( Onboarding_Draft_Service $draft_service, Onboarding_Prefill_Service $prefill_service ) {
-		$this->draft_service   = $draft_service;
-		$this->prefill_service = $prefill_service;
+	/** @var Industry_Profile_Repository|null */
+	private ?Industry_Profile_Repository $industry_profile_repository;
+
+	/** @var Industry_Question_Pack_Registry|null */
+	private ?Industry_Question_Pack_Registry $industry_question_pack_registry;
+
+	public function __construct(
+		Onboarding_Draft_Service $draft_service,
+		Onboarding_Prefill_Service $prefill_service,
+		?Industry_Profile_Repository $industry_profile_repository = null,
+		?Industry_Question_Pack_Registry $industry_question_pack_registry = null
+	) {
+		$this->draft_service                  = $draft_service;
+		$this->prefill_service                = $prefill_service;
+		$this->industry_profile_repository    = $industry_profile_repository;
+		$this->industry_question_pack_registry = $industry_question_pack_registry;
 	}
 
 	/**
@@ -89,7 +106,7 @@ final class Onboarding_UI_State_Builder {
 
 		$submission_warnings = $this->build_submission_warnings( $draft, $prefill );
 
-		return array(
+		$state = array(
 			'current_step_key'     => $current_step_key,
 			'steps'                => $steps,
 			'overall_status'       => $effective_status,
@@ -106,6 +123,46 @@ final class Onboarding_UI_State_Builder {
 			'last_planning_run_id' => $draft['last_planning_run_id'] ?? null,
 			'last_planning_run_post_id' => $draft['last_planning_run_post_id'] ?? null,
 		);
+
+		$state = $this->append_industry_question_pack_state( $state );
+		return $state;
+	}
+
+	/**
+	 * Appends industry_question_pack and industry_question_pack_answers when industry profile and registry are available.
+	 *
+	 * @param array<string, mixed> $state Current UI state.
+	 * @return array<string, mixed>
+	 */
+	private function append_industry_question_pack_state( array $state ): array {
+		if ( $this->industry_profile_repository === null || $this->industry_question_pack_registry === null ) {
+			$state['industry_question_pack']       = null;
+			$state['industry_question_pack_answers'] = array();
+			return $state;
+		}
+		$profile = $this->industry_profile_repository->get_profile();
+		$primary = isset( $profile['primary_industry_key'] ) && is_string( $profile['primary_industry_key'] )
+			? trim( $profile['primary_industry_key'] )
+			: '';
+		if ( $primary === '' ) {
+			$state['industry_question_pack']       = null;
+			$state['industry_question_pack_answers'] = array();
+			return $state;
+		}
+		$pack = $this->industry_question_pack_registry->get( $primary );
+		if ( $pack === null ) {
+			$state['industry_question_pack']       = null;
+			$state['industry_question_pack_answers'] = array();
+			return $state;
+		}
+		$qp_answers = isset( $profile['question_pack_answers'] ) && is_array( $profile['question_pack_answers'] )
+			? $profile['question_pack_answers']
+			: array();
+		$state['industry_question_pack'] = $pack;
+		$state['industry_question_pack_answers'] = isset( $qp_answers[ $primary ] ) && is_array( $qp_answers[ $primary ] )
+			? $qp_answers[ $primary ]
+			: array();
+		return $state;
 	}
 
 	/**

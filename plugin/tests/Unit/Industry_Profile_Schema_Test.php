@@ -26,10 +26,12 @@ final class Industry_Profile_Schema_Test extends TestCase {
 		$this->assertArrayHasKey( Industry_Profile_Schema::FIELD_SERVICE_MODEL, $empty );
 		$this->assertArrayHasKey( Industry_Profile_Schema::FIELD_GEO_MODEL, $empty );
 		$this->assertArrayHasKey( Industry_Profile_Schema::FIELD_DERIVED_FLAGS, $empty );
+		$this->assertArrayHasKey( Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS, $empty );
 		$this->assertSame( Industry_Profile_Schema::SUPPORTED_SCHEMA_VERSION, $empty[ Industry_Profile_Schema::FIELD_SCHEMA_VERSION ] );
 		$this->assertSame( '', $empty[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] );
 		$this->assertSame( array(), $empty[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] );
 		$this->assertIsArray( $empty[ Industry_Profile_Schema::FIELD_DERIVED_FLAGS ] );
+		$this->assertSame( array(), $empty[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] );
 	}
 
 	public function test_is_supported_version_accepts_1_rejects_other(): void {
@@ -74,5 +76,29 @@ final class Industry_Profile_Schema_Test extends TestCase {
 		);
 		$out = Industry_Profile_Schema::normalize( $raw );
 		$this->assertSame( array( 'a', 'b', 'c' ), $out[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] );
+	}
+
+	public function test_normalize_includes_question_pack_answers(): void {
+		$raw = array(
+			Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '1',
+			Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array(
+				'realtor' => array( 'market_focus' => 'residential', 'service_areas' => 'Boston' ),
+			),
+		);
+		$out = Industry_Profile_Schema::normalize( $raw );
+		$this->assertIsArray( $out[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] );
+		$this->assertSame( array( 'market_focus' => 'residential', 'service_areas' => 'Boston' ), $out[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]['realtor'] );
+	}
+
+	public function test_normalize_question_pack_answers_strips_invalid_entries(): void {
+		$raw = array(
+			'realtor' => array( 'market_focus' => 'residential', 'nested' => array( 'no' ) ),
+			''        => array( 'x' => 'y' ),
+			'plumber' => array( 'service_scope' => 'both' ),
+		);
+		$out = Industry_Profile_Schema::normalize_question_pack_answers( $raw );
+		$this->assertArrayNotHasKey( '', $out );
+		$this->assertSame( array( 'market_focus' => 'residential' ), $out['realtor'] );
+		$this->assertSame( array( 'service_scope' => 'both' ), $out['plumber'] );
 	}
 }

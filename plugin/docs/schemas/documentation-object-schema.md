@@ -82,6 +82,8 @@ Only one of the three is set per document; the others are absent or null. Legacy
 
 Content is **user-facing or admin-facing guidance only**. No API keys, secrets, or privileged operational notes. Generated content provenance must be transparent (use generated_or_human_edited and provenance).
 
+**Industry overlays:** Industry-specific section-helper and page one-pager overlays are defined in **industry-section-helper-overlay-schema.md** and **industry-page-onepager-overlay-schema.md** (docs/schemas). They are keyed by (industry_key, section_key) or (industry_key, page_template_key) and provide additive or narrowly overriding guidance; base documentation objects remain authoritative.
+
 ---
 
 ## 7. Provenance block

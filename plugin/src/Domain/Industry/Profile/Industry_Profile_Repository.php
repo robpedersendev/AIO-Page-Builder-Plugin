@@ -95,6 +95,18 @@ final class Industry_Profile_Repository {
 		if ( array_key_exists( Industry_Profile_Schema::FIELD_DERIVED_FLAGS, $partial ) && is_array( $partial[ Industry_Profile_Schema::FIELD_DERIVED_FLAGS ] ) ) {
 			$current[ Industry_Profile_Schema::FIELD_DERIVED_FLAGS ] = $partial[ Industry_Profile_Schema::FIELD_DERIVED_FLAGS ];
 		}
+		if ( array_key_exists( Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS, $partial ) && is_array( $partial[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] ) ) {
+			$incoming = Industry_Profile_Schema::normalize_question_pack_answers( $partial[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] );
+			$existing = isset( $current[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] ) && is_array( $current[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] )
+				? $current[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]
+				: array();
+			foreach ( $incoming as $industry_key => $by_field ) {
+				$existing[ $industry_key ] = isset( $existing[ $industry_key ] ) && is_array( $existing[ $industry_key ] )
+					? array_merge( $existing[ $industry_key ], $by_field )
+					: $by_field;
+			}
+			$current[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] = $existing;
+		}
 		$this->set_profile( $current );
 	}
 }
