@@ -22,7 +22,7 @@ Generated content must not depend on plugin activation for survival unless expli
 
 ### ACF integration
 
-ACF field values (post meta) and assignment map data are preserved by default; see [ACF Uninstall Retention Contract](../contracts/acf-uninstall-retention-contract.md) and [ACF Uninstall Preservation Policy](../operations/acf-uninstall-preservation-policy.md). Field group definitions registered at runtime do not survive uninstall unless an explicit preservation step (handoff or export) is used.
+ACF field values (post meta) and assignment map data are preserved by default; see [ACF Uninstall Retention Contract](../contracts/acf-uninstall-retention-contract.md) and [ACF Uninstall Preservation Policy](../operations/acf-uninstall-preservation-policy.md). Field group definitions registered at runtime do not survive uninstall unless an explicit preservation step (handoff or export) is used. Handed-off native ACF field groups (created by the handoff generator before uninstall) remain in ACF storage and are not deleted. Exact retained vs removed data: [ACF Uninstall Retained Data Matrix](../operations/acf-uninstall-retained-data-matrix.md).
 
 ## Implementation
 

@@ -294,6 +294,14 @@ Read-only manifest produced by **ACF_Uninstall_Inventory_Service** for handoff a
 
 ---
 
+## ACF native handoff (Prompt 315)
+
+**Handoff result** (returned by ACF_Native_Handoff_Generator::generate_handoff()): `imported` (count), `skipped_existing` (non–plugin-owned group with same key), `skipped_no_blueprint`, `errors` (list of message strings). See [acf-native-handoff-contract.md](../contracts/acf-native-handoff-contract.md).
+
+**Handoff group marker**: Additive key on handed-off ACF field group arrays: `_aio_handoff_origin` = `aio_page_builder`. Used to recognize and avoid overwriting handed-off groups.
+
+---
+
 ## Cross-references
 
 - Section/page template field details: [Section Template Inventory](section-template-inventory.md), [Page Template Inventory](page-template-inventory.md).
@@ -301,5 +309,5 @@ Read-only manifest produced by **ACF_Uninstall_Inventory_Service** for handoff a
 - Styling subsystem: [styling-subsystem-contract.md](../contracts/styling-subsystem-contract.md), [style-registry-contract.md](../contracts/style-registry-contract.md), [per-entity-style-payload-contract.md](../contracts/per-entity-style-payload-contract.md), [styling-retrofit-impact-analysis.md](../qa/styling-retrofit-impact-analysis.md).
 - Planning output and AI schema: [Prompt Schema Appendix](prompt-schema-appendix.md), [AI Output Schema Appendix](ai-output-schema-appendix.md).
 - Reporting payloads: [Error Email Templates](error-email-templates.md), [Heartbeat Email Templates](heartbeat-email-templates.md), [Install Notification Email Template](install-notification-email-template.md).
-- ACF uninstall inventory: [acf-uninstall-inventory-contract.md](../contracts/acf-uninstall-inventory-contract.md), [acf-uninstall-retention-contract.md](../contracts/acf-uninstall-retention-contract.md).
+- ACF uninstall inventory: [acf-uninstall-inventory-contract.md](../contracts/acf-uninstall-inventory-contract.md), [acf-uninstall-retention-contract.md](../contracts/acf-uninstall-retention-contract.md); ACF native handoff: [acf-native-handoff-contract.md](../contracts/acf-native-handoff-contract.md).
 - Terms: [Glossary](glossary.md).

@@ -18,7 +18,7 @@ This contract defines:
 - What **metadata must be retained** so saved values keep mapping to preserved fields.
 - What is **never deleted automatically** by default.
 
-**Out of scope**: Implementing the uninstall routine, handoff exporter, or native ACF field-group materialization. No deletion of field values, field groups, or assignments in this contract.
+**Out of scope**: Implementing the uninstall routine or deletion of field values, field groups, or assignments in this contract. Native ACF field-group materialization is defined and implemented in **acf-native-handoff-contract.md** and ACF_Native_Handoff_Generator (Prompt 315).
 
 ---
 
@@ -106,6 +106,7 @@ Classification and enumeration of plugin-owned groups, fields, and saved values 
 - **acf-page-visibility-contract.md**: Assignment and visibility.
 - **docs/operations/acf-uninstall-preservation-policy.md**: Operator-facing preservation policy.
 - **docs/contracts/acf-uninstall-inventory-contract.md**: Inventory result and classification for handoff/uninstall.
+- **docs/contracts/acf-native-handoff-contract.md**: Native ACF handoff generator; marker; overwrite protection (Prompt 315).
 
 ---
 
@@ -115,3 +116,4 @@ Classification and enumeration of plugin-owned groups, fields, and saved values 
 |---------|-----------|--------|
 | 1       | Prompt 313 | Initial uninstall retention and handoff contract. |
 | 2       | Prompt 314 | §9 Inventory dependency; cross-ref acf-uninstall-inventory-contract. |
+| 3       | Prompt 315 | Cross-ref acf-native-handoff-contract; handoff materialization in scope. |

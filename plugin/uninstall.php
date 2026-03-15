@@ -22,5 +22,5 @@ $lifecycle->uninstall();
 
 \AIOPageBuilder\Bootstrap\Capability_Registrar::remove_from_all_roles();
 
-// Cleanup (scheduled events, plugin options, custom tables, plugin CPTs) runs in Lifecycle_Manager::uninstall().
-// Built pages (post type 'page') are never deleted. Export prompt runs from admin Uninstall screen only.
+// Cleanup (scheduled events, plugin options, custom tables, plugin CPTs, ACF section-key cache transients) runs in Lifecycle_Manager::uninstall().
+// Built pages (post type 'page') are never deleted. ACF field values (post meta) and handed-off native ACF field groups are preserved; see docs/operations/acf-uninstall-retained-data-matrix.md and docs/contracts/acf-uninstall-retention-contract.md. Export prompt runs from admin Uninstall screen only.

@@ -17,12 +17,16 @@ use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler;
 
 /**
- * Removes scheduled events and plugin-owned options, tables, CPTs. Does not delete built pages (post type 'page').
+ * Removes scheduled events and plugin-owned options, tables, CPTs, and ACF section-key cache transients.
+ * Does not delete built pages (post type 'page'), post meta, or ACF field groups. Non-destructive for ACF values and handed-off groups (spec §53.5, §53.6, acf-uninstall-retention-contract, acf-uninstall-retained-data-matrix).
  */
 final class Uninstall_Cleanup_Service {
 
-	/** Cleanup scope: full plugin-owned (options, tables, CPTs, uploads subdir). */
+	/** Cleanup scope: full plugin-owned (options, tables, CPTs, ACF cache transients). */
 	public const SCOPE_FULL = 'full_plugin_owned';
+
+	/** Transient key prefixes for ACF section-key cache only (safe to remove; docs/operations/acf-uninstall-retained-data-matrix.md). */
+	private const ACF_CACHE_TRANSIENT_PREFIXES = array( 'aio_acf_sk_p_', 'aio_acf_sk_t_', 'aio_acf_sk_c_' );
 
 	/** @var \wpdb|null */
 	private $wpdb;
@@ -42,16 +46,18 @@ final class Uninstall_Cleanup_Service {
 	}
 
 	/**
-	 * Removes plugin-owned data: options, custom tables, plugin CPT posts. Does not remove built pages.
+	 * Removes plugin-owned data: options, custom tables, plugin CPT posts, ACF section-key cache transients.
+	 * Does not remove built pages, post meta, or ACF field groups. See acf-uninstall-retained-data-matrix.md.
 	 *
 	 * @param string $scope One of SCOPE_* (currently only SCOPE_FULL).
-	 * @return array{scheduled_removed: bool, options_removed: int, tables_dropped: int, cpt_posts_removed: int, built_pages_preserved: true}
+	 * @return array{scheduled_removed: bool, options_removed: int, tables_dropped: int, cpt_posts_removed: int, acf_transients_removed: int, built_pages_preserved: true}
 	 */
 	public function cleanup_plugin_owned_data( string $scope = self::SCOPE_FULL ): array {
-		$scheduled_removed = false;
-		$options_removed   = 0;
-		$tables_dropped    = 0;
-		$cpt_posts_removed = 0;
+		$scheduled_removed       = false;
+		$options_removed         = 0;
+		$tables_dropped          = 0;
+		$cpt_posts_removed       = 0;
+		$acf_transients_removed  = 0;
 
 		$this->clear_scheduled_events();
 		$scheduled_removed = true;
@@ -71,6 +77,8 @@ final class Uninstall_Cleanup_Service {
 					++$tables_dropped;
 				}
 			}
+
+			$acf_transients_removed = $this->clear_acf_section_key_cache_transients();
 		}
 
 		foreach ( Object_Type_Keys::all() as $post_type ) {
@@ -90,10 +98,47 @@ final class Uninstall_Cleanup_Service {
 
 		return array(
 			'scheduled_removed'       => $scheduled_removed,
-			'options_removed'        => $options_removed,
+			'options_removed'         => $options_removed,
 			'tables_dropped'          => $tables_dropped,
 			'cpt_posts_removed'       => $cpt_posts_removed,
+			'acf_transients_removed'  => $acf_transients_removed,
 			'built_pages_preserved'   => true,
 		);
+	}
+
+	/**
+	 * Deletes only ACF section-key cache transients (aio_acf_sk_*). Does not touch post meta or ACF field groups.
+	 *
+	 * @return int Number of transient options removed.
+	 */
+	private function clear_acf_section_key_cache_transients(): int {
+		if ( ! $this->wpdb instanceof \wpdb ) {
+			return 0;
+		}
+		$table = $this->wpdb->options;
+		$count = 0;
+		foreach ( self::ACF_CACHE_TRANSIENT_PREFIXES as $prefix ) {
+			$like = $this->wpdb->esc_like( '_transient_' . $prefix ) . '%';
+			$ids  = $this->wpdb->get_col( $this->wpdb->prepare( "SELECT option_id FROM `{$table}` WHERE option_name LIKE %s", $like ) );
+			if ( is_array( $ids ) ) {
+				foreach ( $ids as $id ) {
+					$this->wpdb->delete( $table, array( 'option_id' => $id ) );
+					if ( $this->wpdb->last_error === '' ) {
+						++$count;
+					}
+				}
+			}
+			$like_timeout = $this->wpdb->esc_like( '_transient_timeout_' . $prefix ) . '%';
+			$ids_timeout  = $this->wpdb->get_col( $this->wpdb->prepare( "SELECT option_id FROM `{$table}` WHERE option_name LIKE %s", $like_timeout ) );
+			if ( is_array( $ids_timeout ) ) {
+				foreach ( $ids_timeout as $id ) {
+					$this->wpdb->delete( $table, array( 'option_id' => $id ) );
+					if ( $this->wpdb->last_error === '' ) {
+						++$count;
+					}
+				}
+			}
+		}
+		return $count;
 	}
 }

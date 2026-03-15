@@ -169,4 +169,21 @@ final class Uninstall_Export_And_Cleanup_Test extends TestCase {
 	public function test_cleanup_scope_constant(): void {
 		$this->assertSame( 'full_plugin_owned', Uninstall_Cleanup_Service::SCOPE_FULL );
 	}
+
+	/**
+	 * Cleanup return shape includes ACF preservation contract: built_pages_preserved and acf_transients_removed (Prompt 316).
+	 * Full cleanup run requires Heartbeat_Scheduler and WP environment; see acf-uninstall-retained-data-matrix.md.
+	 */
+	public function test_cleanup_return_shape_includes_acf_preservation_keys(): void {
+		if ( ! class_exists( \AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler::class, false ) ) {
+			$this->markTestSkipped( 'Cleanup requires Heartbeat_Scheduler; verify return shape in integration or see acf-uninstall-retained-data-matrix.md.' );
+		}
+		$cleanup = new Uninstall_Cleanup_Service( null );
+		$result  = $cleanup->cleanup_plugin_owned_data( Uninstall_Cleanup_Service::SCOPE_FULL );
+
+		$this->assertArrayHasKey( 'built_pages_preserved', $result );
+		$this->assertTrue( $result['built_pages_preserved'], 'Uninstall must preserve built pages by default.' );
+		$this->assertArrayHasKey( 'acf_transients_removed', $result );
+		$this->assertIsInt( $result['acf_transients_removed'] );
+	}
 }
