@@ -2,7 +2,8 @@
 
 **Document type:** Authoritative contract for brand and business profile data (spec §22).  
 **Governs:** Field names, types, required/optional, repeatability, validation, sensitivity, exportability.  
-**Related:** profile-snapshot-schema.md (immutable run-time snapshots); storage-strategy-matrix.md (options storage).
+**Related:** profile-snapshot-schema.md (immutable run-time snapshots); storage-strategy-matrix.md (options storage).  
+**Additive:** Site-level industry context (primary/secondary industry, subtype, service/geo model) is stored separately per **industry-profile-schema.md** (docs/schemas/) and Industry_Profile_Repository; it does not replace brand_profile or business_profile.
 
 ---
 

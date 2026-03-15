@@ -42,17 +42,18 @@ plugin/src/Domain/Industry/
 
 ---
 
-## 3. Placeholder container keys (bootstrap)
+## 3. Container keys (bootstrap)
 
-The following keys are registered by **Industry_Packs_Module** as stable entry points. Until implemented, they resolve to `null` or a safe no-op. Callers must use `$container->has( $key )` and handle missing or null services.
+The following keys are registered by **Industry_Packs_Module**:
 
-| Key | Purpose | Current behavior |
-|-----|---------|-------------------|
+| Key | Purpose | Implementation |
+|-----|---------|----------------|
 | `industry_packs_loaded` | Dependency flag; industry subsystem is bootstrapped. | `true`. |
-| `industry_pack_registry` | Registry service: list packs, get by key, validate. | Placeholder; not yet implemented. |
-| `industry_profile_store` | Site/user industry profile (primary/secondary). | Placeholder; not yet implemented. |
+| `industry_pack_validator` | Validates single pack or bulk; duplicate-key detection. | Industry_Pack_Validator. |
+| `industry_pack_registry` | Registry: load(), get(key), get_all(), list_by_status(status). | Industry_Pack_Registry; loaded with empty list until a pack loader is added. |
+| `industry_profile_store` | Site industry profile (primary/secondary, subtype, service/geo model). | Industry_Profile_Repository when `settings` is available; else null. |
 
-Additional keys (e.g. overlay resolver, AI rule applier, LPagery resolver) can be added in later prompts when those features are implemented.
+Additional keys (e.g. overlay resolver, AI rule applier, LPagery resolver) can be added in later prompts.
 
 ---
 

@@ -52,6 +52,10 @@ final class Section_Schema_Test extends TestCase {
 		$this->assertContains( 'short_label', $optional );
 		$this->assertContains( 'notes_for_ai_planning', $optional );
 		$this->assertContains( 'deprecation', $optional );
+		$this->assertContains( Section_Schema::FIELD_INDUSTRY_AFFINITY, $optional );
+		$this->assertContains( Section_Schema::FIELD_INDUSTRY_DISCOURAGED, $optional );
+		$this->assertContains( Section_Schema::FIELD_INDUSTRY_CTA_FIT, $optional );
+		$this->assertContains( Section_Schema::FIELD_INDUSTRY_NOTES, $optional );
 	}
 
 	public function test_allowed_categories_include_spec_12_6_examples(): void {
@@ -129,6 +133,30 @@ final class Section_Schema_Test extends TestCase {
 		$this->assertMatchesRegularExpression( Section_Schema::INTERNAL_KEY_PATTERN, 'hero_intro' );
 		$this->assertDoesNotMatchRegularExpression( Section_Schema::INTERNAL_KEY_PATTERN, 'Hero-Intro' );
 		$this->assertDoesNotMatchRegularExpression( Section_Schema::INTERNAL_KEY_PATTERN, '' );
+	}
+
+	/** Section without any industry metadata is valid. */
+	public function test_validate_industry_affinity_metadata_returns_empty_when_no_industry_fields(): void {
+		$section = $this->get_valid_minimal_section_definition();
+		$this->assertSame( array(), Section_Schema::validate_industry_affinity_metadata( $section ) );
+	}
+
+	/** Valid industry_affinity and industry_discouraged pass. */
+	public function test_validate_industry_affinity_metadata_accepts_valid_keys(): void {
+		$section = $this->get_valid_minimal_section_definition();
+		$section[ Section_Schema::FIELD_INDUSTRY_AFFINITY ]    = array( 'legal', 'healthcare' );
+		$section[ Section_Schema::FIELD_INDUSTRY_DISCOURAGED ] = array( 'disaster_recovery' );
+		$this->assertSame( array(), Section_Schema::validate_industry_affinity_metadata( $section ) );
+	}
+
+	/** Invalid industry key (bad pattern) fails. */
+	public function test_validate_industry_affinity_metadata_rejects_invalid_industry_key(): void {
+		$section = $this->get_valid_minimal_section_definition();
+		$section[ Section_Schema::FIELD_INDUSTRY_DISCOURAGED ] = array( 'Invalid Key!' );
+		$errors = Section_Schema::validate_industry_affinity_metadata( $section );
+		$this->assertNotEmpty( $errors );
+		$codes = array_column( $errors, 'code' );
+		$this->assertContains( 'invalid_industry_key', $codes );
 	}
 
 	private function get_valid_minimal_section_definition(): array {

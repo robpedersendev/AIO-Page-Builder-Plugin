@@ -137,6 +137,10 @@ final class Section_Schema {
 			'dependencies_sections_or_context',
 			'accessibility_contract_ref',
 			'deprecation',
+			self::FIELD_INDUSTRY_AFFINITY,
+			self::FIELD_INDUSTRY_DISCOURAGED,
+			self::FIELD_INDUSTRY_CTA_FIT,
+			self::FIELD_INDUSTRY_NOTES,
 		);
 		return self::$optional_fields;
 	}
@@ -228,4 +232,93 @@ final class Section_Schema {
 
 	/** Max length for purpose_summary. */
 	public const PURPOSE_SUMMARY_MAX_LENGTH = 1024;
+
+	/** Optional: industry keys where this section is a strong/good fit (section-industry-affinity-contract). */
+	public const FIELD_INDUSTRY_AFFINITY = 'industry_affinity';
+
+	/** Optional: industry keys where this section is discouraged. */
+	public const FIELD_INDUSTRY_DISCOURAGED = 'industry_discouraged';
+
+	/** Optional: per-industry CTA fit note. */
+	public const FIELD_INDUSTRY_CTA_FIT = 'industry_cta_fit';
+
+	/** Optional: per-industry usage notes. */
+	public const FIELD_INDUSTRY_NOTES = 'industry_notes';
+
+	/** Pattern for industry_key (aligned with Industry_Pack_Schema). */
+	public const INDUSTRY_KEY_PATTERN = '#^[a-z0-9_-]+$#';
+
+	/** Max length for industry_key. */
+	public const INDUSTRY_KEY_MAX_LENGTH = 64;
+
+	/**
+	 * Validates optional industry-affinity metadata on a section definition. Returns errors; empty when valid or when no industry fields present.
+	 *
+	 * @param array<string, mixed> $section Section definition.
+	 * @return array<int, array{code: string, field?: string}> Empty if valid.
+	 */
+	public static function validate_industry_affinity_metadata( array $section ): array {
+		$errors = array();
+		$has_any = false;
+		$check_key = function ( string $key ): bool {
+			if ( $key === '' || strlen( $key ) > self::INDUSTRY_KEY_MAX_LENGTH ) {
+				return false;
+			}
+			return (bool) preg_match( self::INDUSTRY_KEY_PATTERN, $key );
+		};
+		if ( array_key_exists( self::FIELD_INDUSTRY_AFFINITY, $section ) ) {
+			$has_any = true;
+			$val = $section[ self::FIELD_INDUSTRY_AFFINITY ];
+			if ( is_array( $val ) ) {
+				foreach ( $val as $k => $v ) {
+					$key_str = is_string( $k ) ? $k : (string) $v;
+					if ( $key_str === '' && is_string( $v ) ) {
+						$key_str = $v;
+					}
+					if ( $key_str !== '' && ! $check_key( $key_str ) ) {
+						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => self::FIELD_INDUSTRY_AFFINITY );
+						break;
+					}
+				}
+			}
+		}
+		if ( array_key_exists( self::FIELD_INDUSTRY_DISCOURAGED, $section ) ) {
+			$has_any = true;
+			$val = $section[ self::FIELD_INDUSTRY_DISCOURAGED ];
+			if ( is_array( $val ) ) {
+				foreach ( $val as $v ) {
+					$key_str = is_string( $v ) ? trim( $v ) : '';
+					if ( $key_str !== '' && ! $check_key( $key_str ) ) {
+						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => self::FIELD_INDUSTRY_DISCOURAGED );
+						break;
+					}
+				}
+			}
+		}
+		if ( array_key_exists( self::FIELD_INDUSTRY_CTA_FIT, $section ) ) {
+			$has_any = true;
+			$val = $section[ self::FIELD_INDUSTRY_CTA_FIT ];
+			if ( is_array( $val ) ) {
+				foreach ( array_keys( $val ) as $k ) {
+					if ( is_string( $k ) && $k !== '' && ! $check_key( $k ) ) {
+						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => self::FIELD_INDUSTRY_CTA_FIT );
+						break;
+					}
+				}
+			}
+		}
+		if ( array_key_exists( self::FIELD_INDUSTRY_NOTES, $section ) ) {
+			$has_any = true;
+			$val = $section[ self::FIELD_INDUSTRY_NOTES ];
+			if ( is_array( $val ) ) {
+				foreach ( array_keys( $val ) as $k ) {
+					if ( is_string( $k ) && $k !== '' && ! $check_key( $k ) ) {
+						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => self::FIELD_INDUSTRY_NOTES );
+						break;
+					}
+				}
+			}
+		}
+		return $errors;
+	}
 }

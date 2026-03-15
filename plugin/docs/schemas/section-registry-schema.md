@@ -220,6 +220,14 @@ See §5. Required at top level: `version` object with at least `version` string.
 | `placement_tendency` | string | — | One of: opener, mid_page, comparison, legal_footer_adjacent, cta_ending, utility_any, related_any, other per taxonomy contract §4 | Yes | Typical placement in page flow. |
 | `cta_classification` | string | — | One of: primary_cta, contact_cta, navigation_cta, none per taxonomy contract §5 | Yes | CTA classification for CTA-aware composition. |
 | `variation_family_key` | string | — | Pattern `^[a-z0-9_]+$`; max 64 chars | Yes | Groups variant sections for browsing and coverage QA. |
+| `industry_affinity` | array of strings or map (industry_key => string) | — | Each key: pattern `^[a-z0-9_-]+$`; max 64 chars | Yes | Industry keys where this section is a strong/good fit (section-industry-affinity-contract). |
+| `industry_discouraged` | array of strings | — | Each: industry_key pattern; max 64 chars | Yes | Industry keys where this section is discouraged. |
+| `industry_cta_fit` | array of strings or map (industry_key => string) | — | Values max 512 chars | Yes | Per-industry CTA fit note. |
+| `industry_notes` | map (industry_key => string) or string | — | Keys: industry_key pattern; values max 1024 chars | Yes | Per-industry usage notes. |
+
+### 10.1 Industry affinity metadata (optional)
+
+Per **section-industry-affinity-contract.md**: sections may declare optional `industry_affinity`, `industry_discouraged`, `industry_cta_fit`, and `industry_notes` for filtering and AI planning. Industry keys must match pattern `^[a-z0-9_-]+$`. Sections without any industry metadata remain valid.
 
 ---
 

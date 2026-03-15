@@ -10,7 +10,7 @@ This appendix contains schema summaries for CPTs, key option structures, token s
 
 ### Section template (section template registry)
 
-Stored as custom post type. Key fields (Section_Schema): internal_key, name, purpose_summary, section_purpose_family, variation_family_key, category, status, version (version block), deprecation (deprecation block), field blueprints, helper_doc_ref, compatibility_notes. See [Section Template Inventory](section-template-inventory.md) and Section_Schema.
+Stored as custom post type. Key fields (Section_Schema): internal_key, name, purpose_summary, section_purpose_family, variation_family_key, category, status, version (version block), deprecation (deprecation block), field blueprints, helper_doc_ref, compatibility_notes. Optional industry-affinity metadata: industry_affinity, industry_discouraged, industry_cta_fit, industry_notes (section-industry-affinity-contract); validate via Section_Schema::validate_industry_affinity_metadata(). See [Section Template Inventory](section-template-inventory.md) and Section_Schema.
 
 ### Page template (page template registry)
 
@@ -129,6 +129,12 @@ Merged into definition when status => 'deprecated'. Built by Template_Deprecatio
 ## 11. Industry pack object schema
 
 Industry pack definitions (industry-pack-extension-contract, industry-pack-schema). Stored per persistence strategy (PHP definitions, option, or DB-backed registry). Key fields (Industry_Pack_Schema): industry_key, name, summary, supported_page_families, preferred_section_keys, discouraged_section_keys, default_cta_patterns, seo_guidance_ref, helper_overlay_refs, one_pager_overlay_refs, token_preset_ref, lpagery_rule_ref, ai_rule_ref, status, version_marker. Required: industry_key, name, summary, status, version_marker. Optional: all refs and key arrays. Validation via Industry_Pack_Schema::validate_pack(); version_marker must match supported schema version. See [industry-pack-schema.md](../schemas/industry-pack-schema.md) and Industry_Pack_Schema.
+
+---
+
+## 11.1 Industry profile (site-level)
+
+Site-level industry context (industry-profile-schema.md). Stored under Option_Names::INDUSTRY_PROFILE. Key fields (Industry_Profile_Schema): schema_version, primary_industry_key, secondary_industry_keys, subtype, service_model, geo_model, derived_flags. Empty state when not set or unsupported version; normalized via Industry_Profile_Schema::normalize(). Read/write via Industry_Profile_Repository (get_profile, set_profile, merge_profile). Additive to Profile_Store; export/restore includes this option. See [industry-profile-schema.md](../schemas/industry-profile-schema.md).
 
 ---
 

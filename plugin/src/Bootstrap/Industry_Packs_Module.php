@@ -36,12 +36,20 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( self::CONTAINER_KEY_INDUSTRY_LOADED, function (): bool {
 			return true;
 		} );
-		// * Placeholder entrypoints for future prompts (industry-pack-service-map). Resolve to null until implemented.
-		$container->register( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY, function () {
-			return null;
+		$container->register( 'industry_pack_validator', function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Validator {
+			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Validator();
 		} );
-		$container->register( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE, function () {
-			return null;
+		$container->register( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY, function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry {
+			$validator = $container->has( 'industry_pack_validator' ) ? $container->get( 'industry_pack_validator' ) : new \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Validator();
+			$registry  = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry( $validator );
+			$registry->load( array() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE, function () use ( $container ): ?\AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository {
+			if ( ! $container->has( 'settings' ) ) {
+				return null;
+			}
+			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository( $container->get( 'settings' ) );
 		} );
 	}
 }

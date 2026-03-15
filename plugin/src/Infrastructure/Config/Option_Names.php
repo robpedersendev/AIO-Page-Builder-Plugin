@@ -54,6 +54,9 @@ final class Option_Names {
 	/** Current editable brand and business profile (single option; shape per profile-schema.md). */
 	public const PROFILE_CURRENT = self::PREFIX . 'profile_current';
 
+	/** Site-level industry profile (primary/secondary industry, subtype, service/geo model; shape per industry-profile-schema.md). */
+	public const INDUSTRY_PROFILE = self::PREFIX . 'industry_profile';
+
 	/** Onboarding draft state (secret-free; shape per onboarding-state-machine.md §7). */
 	public const ONBOARDING_DRAFT = self::PREFIX . 'onboarding_draft';
 
@@ -94,6 +97,7 @@ final class Option_Names {
 			self::PROVIDER_CONFIG_REF,
 			self::PROVIDER_HEALTH_STATE,
 			self::PROFILE_CURRENT,
+			self::INDUSTRY_PROFILE,
 			self::ONBOARDING_DRAFT,
 			self::PROMPT_EXPERIMENTS,
 			self::GLOBAL_STYLE_SETTINGS,
