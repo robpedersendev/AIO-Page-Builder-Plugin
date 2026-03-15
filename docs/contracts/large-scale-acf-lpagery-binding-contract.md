@@ -201,9 +201,11 @@ Which ACF field groups are **assigned** to which page is derived from the **page
 | **Performance** | Registration and assignment logic must **not** load or register all 250 section groups on every page. Only groups for sections **on that page** are assigned. Lazy or on-demand assignment per page build is acceptable and recommended. |
 | **Determinism** | Given the same template and section list, assignment is **deterministic**. No random or environment-dependent assignment. |
 
+**Conditional registration contract**: The exact rules for **when** and **which** groups are registered (front-end none, admin page-scoped only) are defined in **acf-conditional-registration-contract.md**. That contract preserves the invariants of this section (derivation, performance, determinism) and adds request-context guards and section-scoped registration API.
+
 ### 6.3 Registration-scaling notes
 
-- **Group registration**: ACF group registration (PHP) may be **lazy**: register a group when first needed for a page that uses that section, or register all known groups at load from a registry. Either way, **naming** is deterministic and **key** is `group_aio_{section_key}`.
+- **Group registration**: ACF group registration (PHP) must be **conditional**: no registration on front-end; on admin, only groups for the current page context (existing-page visible groups or new-page template/composition sections) are registered. Full registration is reserved for explicit tooling only. **Naming** remains deterministic and **key** is `group_aio_{section_key}`. See acf-conditional-registration-contract.md.
 - **Preview context**: Preview (admin/directory) may need a **subset** of groups or **synthetic** field values without full registration of all 250 sections. Preview dummy-data and fallbacks (§3, §4) support this.
 - **Export/import**: At scale, export/import of templates and blueprints must remain **documented and versioned**; large-scale contract does not change export format but recommends that blueprint refs and variation_family_key are included so re-use and family mapping are restorable.
 

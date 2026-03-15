@@ -15,11 +15,14 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Registrar;
+use AIOPageBuilder\Domain\ACF\Registration\ACF_Registration_Bootstrap_Controller;
+use AIOPageBuilder\Domain\ACF\Registration\Registration_Request_Context;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
 /**
- * Registers ACF group registrar and wires acf/init. Depends on section_field_blueprint_service.
+ * Registers ACF group registrar, bootstrap controller, and acf/init.
+ * Depends on section_field_blueprint_service. Registration runs via controller (acf-conditional-registration-contract).
  */
 final class ACF_Registration_Provider implements Service_Provider_Interface {
 
@@ -38,10 +41,19 @@ final class ACF_Registration_Provider implements Service_Provider_Interface {
 				$container->get( 'section_template_repository' )
 			);
 		} );
+		$container->register( 'acf_registration_request_context', function (): Registration_Request_Context {
+			return new Registration_Request_Context();
+		} );
+		$container->register( 'acf_registration_bootstrap_controller', function () use ( $container ): ACF_Registration_Bootstrap_Controller {
+			return new ACF_Registration_Bootstrap_Controller(
+				$container->get( 'acf_group_registrar' ),
+				$container->get( 'acf_registration_request_context' )
+			);
+		} );
 
 		add_action( 'acf/init', function () use ( $container ): void {
-			if ( $container->has( 'acf_group_registrar' ) ) {
-				$container->get( 'acf_group_registrar' )->register_all();
+			if ( $container->has( 'acf_registration_bootstrap_controller' ) ) {
+				$container->get( 'acf_registration_bootstrap_controller' )->run_registration();
 			}
 		}, 5 );
 	}

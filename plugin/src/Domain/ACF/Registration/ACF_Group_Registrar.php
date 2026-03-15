@@ -13,7 +13,7 @@ namespace AIOPageBuilder\Domain\ACF\Registration;
 
 defined( 'ABSPATH' ) || exit;
 
-use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service;
+use AIOPageBuilder\Domain\ACF\Blueprints\Section_Field_Blueprint_Service_Interface;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 
@@ -24,8 +24,8 @@ use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
  */
 final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 
-	/** @var Section_Field_Blueprint_Service */
-	private Section_Field_Blueprint_Service $blueprint_service;
+	/** @var Section_Field_Blueprint_Service_Interface */
+	private Section_Field_Blueprint_Service_Interface $blueprint_service;
 
 	/** @var ACF_Group_Builder */
 	private ACF_Group_Builder $group_builder;
@@ -34,7 +34,7 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 	private ?Section_Template_Repository $section_repository;
 
 	public function __construct(
-		Section_Field_Blueprint_Service $blueprint_service,
+		Section_Field_Blueprint_Service_Interface $blueprint_service,
 		ACF_Group_Builder $group_builder,
 		?Section_Template_Repository $section_repository = null
 	) {
@@ -64,23 +64,45 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 	}
 
 	/**
-	 * Registers groups for the given section keys only (deterministic; use for page-level visibility: only sections on the page).
+	 * Registers groups for the given section keys only (deterministic; single-section blueprint lookup per key).
+	 * De-duplicates keys; skips invalid or missing section keys safely.
 	 *
 	 * @param list<string> $section_keys
 	 * @return int Number of groups registered.
 	 */
 	public function register_sections( array $section_keys ): int {
+		return $this->register_sections_with_result( $section_keys )->get_registered_count();
+	}
+
+	/**
+	 * Registers groups for the given section keys and returns a result summary (registered count, skipped keys).
+	 * De-duplicates keys; uses get_blueprint_for_section() per key (no full blueprint list load).
+	 *
+	 * @param list<string> $section_keys
+	 * @return Section_Scoped_Group_Registration_Result
+	 */
+	public function register_sections_with_result( array $section_keys ): Section_Scoped_Group_Registration_Result {
 		if ( ! $this->is_acf_available() ) {
-			return 0;
+			return new Section_Scoped_Group_Registration_Result( 0, array() );
 		}
-		$count = 0;
-		foreach ( $section_keys as $key ) {
-			$blueprint = $this->blueprint_service->get_blueprint_for_section( (string) $key );
-			if ( $blueprint !== null && $this->register_blueprint( $blueprint ) ) {
-				$count++;
+		$unique = array_values( array_unique( array_map( 'strval', $section_keys ) ) );
+		$registered = 0;
+		$skipped = array();
+		foreach ( $unique as $key ) {
+			$key = (string) $key;
+			if ( $key === '' ) {
+				continue;
+			}
+			$blueprint = $this->blueprint_service->get_blueprint_for_section( $key );
+			if ( $blueprint === null ) {
+				$skipped[] = $key;
+				continue;
+			}
+			if ( $this->register_blueprint( $blueprint ) ) {
+				$registered++;
 			}
 		}
-		return $count;
+		return new Section_Scoped_Group_Registration_Result( $registered, $skipped );
 	}
 
 	/**

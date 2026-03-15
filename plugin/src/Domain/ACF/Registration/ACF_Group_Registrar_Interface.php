@@ -13,7 +13,7 @@ namespace AIOPageBuilder\Domain\ACF\Registration;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers a single field group from a normalized section blueprint.
+ * Contract for ACF field group registration (single blueprint, all sections, or section-scoped).
  */
 interface ACF_Group_Registrar_Interface {
 
@@ -24,4 +24,19 @@ interface ACF_Group_Registrar_Interface {
 	 * @return bool True if registered, false if ACF unavailable or blueprint invalid.
 	 */
 	public function register_blueprint( array $blueprint ): bool;
+
+	/**
+	 * Registers all section-owned field groups (full registration). Used by bootstrap or explicit tooling.
+	 *
+	 * @return int Number of groups registered.
+	 */
+	public function register_all(): int;
+
+	/**
+	 * Registers only the given section keys (page-scoped registration).
+	 *
+	 * @param list<string> $section_keys
+	 * @return int Number of groups registered.
+	 */
+	public function register_sections( array $section_keys ): int;
 }

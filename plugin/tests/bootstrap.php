@@ -12,6 +12,16 @@ require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/wordpress/' );
 }
+if ( ! function_exists( 'is_admin' ) ) {
+	function is_admin() {
+		return false;
+	}
+}
+if ( ! function_exists( 'acf_add_local_field_group' ) ) {
+	function acf_add_local_field_group( $group ) {
+		// No-op for unit tests so ACF registration tests can run.
+	}
+}
 if ( ! defined( 'ARRAY_A' ) ) {
 	define( 'ARRAY_A', 'ARRAY_A' );
 }
