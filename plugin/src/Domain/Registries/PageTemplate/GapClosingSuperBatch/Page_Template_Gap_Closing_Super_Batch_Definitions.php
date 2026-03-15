@@ -27,6 +27,9 @@ final class Page_Template_Gap_Closing_Super_Batch_Definitions {
 	/** Target total page template count (template-library-coverage-matrix §3.1). */
 	public const PAGE_TARGET = 500;
 
+	/** Industry keys for first launch verticals (page-template-industry-affinity-contract; Prompt 364). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/** Section keys that are CTA-classified (must exist in section registry). */
 	private const CTA_SECTION_KEYS = array(
 		'cta_consultation_01', 'cta_contact_01', 'cta_booking_01', 'cta_inquiry_01', 'cta_quote_request_01',
@@ -201,6 +204,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Definitions {
 			'template_family'                                   => $spec['family'],
 			'differentiation_notes'                             => 'Fills ' . $spec['family'] . ' / ' . $spec['class'] . ' coverage for 500-template minimum.',
 			'preview_metadata'                                  => array( 'synthetic' => true ),
+			Page_Template_Schema::FIELD_INDUSTRY_AFFINITY       => self::LAUNCH_INDUSTRIES,
 		);
 	}
 

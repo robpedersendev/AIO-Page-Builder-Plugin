@@ -65,4 +65,29 @@ final class Industry_Question_Pack_Registry_Test extends TestCase {
 		$this->assertNull( $registry->get( 'cosmetology_nail' ) );
 		$this->assertSame( array(), $registry->get_supported_industry_keys() );
 	}
+
+	/** @see Prompt 362: seeded packs have expected structure; field keys map to question_pack_answers[industry_key][field_key]. */
+	public function test_seeded_packs_have_expected_structure_and_field_keys(): void {
+		$registry = new Industry_Question_Pack_Registry();
+		$registry->load( Industry_Question_Pack_Definitions::default_packs() );
+		$expected = array(
+			'cosmetology_nail' => array( 'service_types', 'booking_style', 'license_notes' ),
+			'realtor'          => array( 'market_focus', 'listing_types', 'service_areas' ),
+			'plumber'          => array( 'service_scope', 'emergency_offered', 'service_areas' ),
+			'disaster_recovery'=> array( 'response_type', 'emergency_24_7', 'coverage_areas' ),
+		);
+		foreach ( $expected as $industry_key => $field_keys ) {
+			$pack = $registry->get( $industry_key );
+			$this->assertNotNull( $pack, "Pack for {$industry_key} must load." );
+			$this->assertSame( $industry_key, $pack[ Industry_Question_Pack_Registry::FIELD_INDUSTRY_KEY ] );
+			$fields = $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ];
+			$actual_keys = array_column( $fields, 'key' );
+			$this->assertSame( $field_keys, $actual_keys, "Field keys for {$industry_key} must match storage mapping." );
+			foreach ( $fields as $field ) {
+				$this->assertArrayHasKey( 'label', $field );
+				$this->assertArrayHasKey( 'type', $field );
+				$this->assertContains( $field['type'], array( 'text', 'textarea', 'boolean' ), "Field type must be allowed: {$field['key']}" );
+			}
+		}
+	}
 }

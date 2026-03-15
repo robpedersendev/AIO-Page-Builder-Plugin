@@ -221,4 +221,15 @@ final class Hero_Intro_Library_Batch_Test extends TestCase {
 		$this->assertCount( 12, $result['section_ids'] );
 		$this->assertEmpty( $result['errors'] );
 	}
+
+	/** @see Prompt 363: industry_affinity metadata validates per Section_Schema. */
+	public function test_hero_batch_definitions_industry_affinity_validates(): void {
+		$launch = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+		foreach ( Hero_Intro_Library_Batch_Definitions::all_definitions() as $def ) {
+			$this->assertArrayHasKey( Section_Schema::FIELD_INDUSTRY_AFFINITY, $def, 'Hero batch sections must have industry_affinity (Prompt 363).' );
+			$this->assertSame( $launch, $def[ Section_Schema::FIELD_INDUSTRY_AFFINITY ], 'industry_affinity must be launch industries.' );
+			$errors = Section_Schema::validate_industry_affinity_metadata( $def );
+			$this->assertSame( array(), $errors, 'industry_affinity must pass schema validation: ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' ) );
+		}
+	}
 }

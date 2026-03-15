@@ -9,12 +9,14 @@
 namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry;
+use AIOPageBuilder\Domain\Industry\Registry\StylePresets\Builtin_Industry_Style_Presets;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Style_Preset_Registry.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/StylePresets/Builtin_Industry_Style_Presets.php';
 
 final class Industry_Style_Preset_Registry_Test extends TestCase {
 
@@ -119,5 +121,41 @@ final class Industry_Style_Preset_Registry_Test extends TestCase {
 		$this->assertNotNull( $preset );
 		$this->assertSame( 'First', $preset[ Industry_Style_Preset_Registry::FIELD_LABEL ] );
 		$this->assertCount( 1, $registry->get_all() );
+	}
+
+	/** @see Prompt 361: builtin presets load and validate; pack refs resolve. */
+	public function test_builtin_definitions_load_and_validate(): void {
+		$definitions = Builtin_Industry_Style_Presets::get_definitions();
+		$this->assertCount( 4, $definitions );
+		$registry = new Industry_Style_Preset_Registry();
+		$registry->load( $definitions );
+		$expected_keys = array( 'cosmetology_elegant', 'realtor_warm', 'plumber_trust', 'disaster_recovery_urgency' );
+		foreach ( $expected_keys as $key ) {
+			$preset = $registry->get( $key );
+			$this->assertNotNull( $preset, "Builtin preset {$key} must load." );
+			$this->assertSame( Industry_Style_Preset_Registry::STATUS_ACTIVE, $preset[ Industry_Style_Preset_Registry::FIELD_STATUS ] );
+			$this->assertSame( '1', $preset[ Industry_Style_Preset_Registry::FIELD_VERSION_MARKER ] );
+			if ( isset( $preset[ Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES ] ) && is_array( $preset[ Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES ] ) ) {
+				foreach ( array_keys( $preset[ Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES ] ) as $token_name ) {
+					$this->assertMatchesRegularExpression( '/^--aio-[a-z0-9_-]+$/', $token_name, "Token name must be sanctioned: {$token_name}" );
+				}
+			}
+		}
+		$this->assertCount( 1, $registry->list_by_industry( 'cosmetology_nail' ) );
+		$this->assertCount( 1, $registry->list_by_industry( 'realtor' ) );
+		$this->assertCount( 1, $registry->list_by_industry( 'plumber' ) );
+		$this->assertCount( 1, $registry->list_by_industry( 'disaster_recovery' ) );
+	}
+
+	/** @see Prompt 361: industry pack token_preset_ref values resolve to a builtin preset. */
+	public function test_pack_token_preset_refs_resolve(): void {
+		$registry = new Industry_Style_Preset_Registry();
+		$registry->load( Builtin_Industry_Style_Presets::get_definitions() );
+		$pack_refs = array( 'cosmetology_elegant', 'realtor_warm', 'plumber_trust', 'disaster_recovery_urgency' );
+		foreach ( $pack_refs as $ref ) {
+			$preset = $registry->get( $ref );
+			$this->assertNotNull( $preset, "Pack token_preset_ref '{$ref}' must resolve to a preset." );
+			$this->assertSame( $ref, $preset[ Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY ] ?? '' );
+		}
 	}
 }

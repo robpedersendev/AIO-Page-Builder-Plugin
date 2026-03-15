@@ -27,6 +27,9 @@ final class Hero_Intro_Library_Batch_Definitions {
 	/** Section purpose family for all in this batch. */
 	public const PURPOSE_FAMILY = 'hero';
 
+	/** Industry keys for first launch verticals (section-industry-affinity-contract; Prompt 363). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/**
 	 * Returns all hero/intro batch section definitions (order preserved for seeding).
 	 *
@@ -176,7 +179,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			'Hero with headline and two CTA options.',
 			self::common_hero_blueprint_fields(),
 			array( 'headline' => 'Welcome to our service', 'subheadline' => 'Learn more or get in touch.', 'eyebrow' => 'Your choice', 'primary_cta' => array( 'url' => '#', 'title' => 'Get started' ), 'secondary_cta' => array( 'url' => '#', 'title' => 'Contact us' ) ),
-			array( 'short_label' => 'Hero dual CTA', 'suggested_use_cases' => array( 'Service page', 'Dual conversion', 'Hub opener' ) )
+			array( 'short_label' => 'Hero dual CTA', 'suggested_use_cases' => array( 'Service page', 'Dual conversion', 'Hub opener' ), Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES )
 		);
 	}
 
@@ -190,7 +193,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			'Credibility-focused hero with space for trust messaging.',
 			self::common_hero_blueprint_fields(),
 			array( 'headline' => 'Trusted by teams everywhere', 'subheadline' => 'Supporting credibility message.', 'eyebrow' => 'Why choose us', 'primary_cta' => array(), 'secondary_cta' => array() ),
-			array( 'short_label' => 'Hero trust', 'suggested_use_cases' => array( 'About opener', 'Trust-led landing', 'Credibility page' ) )
+			array( 'short_label' => 'Hero trust', 'suggested_use_cases' => array( 'About opener', 'Trust-led landing', 'Credibility page' ), Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES )
 		);
 	}
 
@@ -204,7 +207,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			'Educational hero with clear headline and supporting copy.',
 			self::common_hero_blueprint_fields(),
 			array( 'headline' => 'How it works', 'subheadline' => 'A short explanation of what this page covers.', 'eyebrow' => 'Guide', 'primary_cta' => array( 'url' => '#', 'title' => 'Read more' ), 'secondary_cta' => array() ),
-			array( 'short_label' => 'Hero edu', 'suggested_use_cases' => array( 'Resource page', 'How-to opener', 'Educational hub' ) )
+			array( 'short_label' => 'Hero edu', 'suggested_use_cases' => array( 'Resource page', 'How-to opener', 'Educational hub' ), Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES )
 		);
 	}
 
@@ -218,7 +221,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			'Local or service intro hero.',
 			self::common_hero_blueprint_fields(),
 			array( 'headline' => 'Serving your area', 'subheadline' => 'We are here to help.', 'eyebrow' => 'Local', 'primary_cta' => array( 'url' => '#', 'title' => 'Find a location' ), 'secondary_cta' => array() ),
-			array( 'short_label' => 'Hero local', 'suggested_use_cases' => array( 'Location page', 'Service area', 'Regional hub' ) )
+			array( 'short_label' => 'Hero local', 'suggested_use_cases' => array( 'Location page', 'Service area', 'Regional hub' ), Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES )
 		);
 	}
 
@@ -246,7 +249,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			'Product-focused hero with CTA.',
 			self::common_hero_blueprint_fields(),
 			array( 'headline' => 'Introducing our product', 'subheadline' => 'Key benefit or tagline.', 'eyebrow' => 'Product', 'primary_cta' => array( 'url' => '#', 'title' => 'Learn more' ), 'secondary_cta' => array() ),
-			array( 'short_label' => 'Hero product', 'suggested_use_cases' => array( 'Product page', 'Offering detail', 'Detail opener' ) )
+			array( 'short_label' => 'Hero product', 'suggested_use_cases' => array( 'Product page', 'Offering detail', 'Detail opener' ), Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES )
 		);
 	}
 
@@ -260,7 +263,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			'Legal or trust intro with minimal styling.',
 			self::common_hero_blueprint_fields(),
 			array( 'headline' => 'Legal information', 'subheadline' => 'Please read the following.', 'eyebrow' => '', 'primary_cta' => array(), 'secondary_cta' => array() ),
-			array( 'short_label' => 'Hero legal', 'suggested_use_cases' => array( 'Privacy page', 'Terms opener', 'Policy page' ) )
+			array( 'short_label' => 'Hero legal', 'suggested_use_cases' => array( 'Privacy page', 'Terms opener', 'Policy page' ), Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES )
 		);
 	}
 
@@ -292,6 +295,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			array(
 				'short_label'             => 'Hero compact',
 				'suggested_use_cases'     => array( 'Sub-page', 'Dense layout', 'Secondary opener' ),
+				Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES,
 				Section_Schema::FIELD_VARIANTS => array(
 					'default' => array( 'label' => 'Default', 'description' => 'Compact block.', 'css_modifiers' => array() ),
 					'tighter' => array( 'label' => 'Tighter', 'description' => 'Minimal padding.', 'css_modifiers' => array( 'aio-s-hero_compact_01--tighter' ) ),
@@ -314,7 +318,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			'Hero with prominent image or media.',
 			$fields,
 			array( 'headline' => 'Headline with media', 'subheadline' => 'Supporting copy.', 'eyebrow' => '', 'primary_cta' => array( 'url' => '#', 'title' => 'Learn more' ), 'secondary_cta' => array(), 'hero_image' => array() ),
-			array( 'short_label' => 'Hero media', 'suggested_use_cases' => array( 'Visual landing', 'Media-led opener', 'Brand hero' ) )
+			array( 'short_label' => 'Hero media', 'suggested_use_cases' => array( 'Visual landing', 'Media-led opener', 'Brand hero' ), Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES )
 		);
 	}
 
@@ -335,6 +339,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			array(
 				'short_label' => 'Hero split',
 				'suggested_use_cases' => array( 'Balanced opener', 'Text and image', 'Split block' ),
+				Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES,
 				Section_Schema::FIELD_VARIANTS => array(
 					'default'     => array( 'label' => 'Default', 'description' => 'Text left, image right.', 'css_modifiers' => array() ),
 					'image_left'  => array( 'label' => 'Image left', 'description' => 'Image left, text right.', 'css_modifiers' => array( 'aio-s-hero_split_01--image-left' ) ),

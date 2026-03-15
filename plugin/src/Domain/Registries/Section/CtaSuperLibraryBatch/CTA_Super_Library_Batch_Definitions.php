@@ -25,6 +25,9 @@ final class CTA_Super_Library_Batch_Definitions {
 	/** Batch ID for CTA super-library (spec §14.3, §14.4). */
 	public const BATCH_ID = 'SEC-08';
 
+	/** Industry keys for first launch verticals (section-industry-affinity-contract; Prompt 363). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/**
 	 * Returns all CTA super-library section definitions (order preserved for seeding).
 	 *
@@ -151,6 +154,9 @@ final class CTA_Super_Library_Batch_Definitions {
 			'description'     => 'CTA content fields.',
 			'fields'          => $blueprint_fields,
 		);
+		if ( ! isset( $extra[ Section_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
+			$extra[ Section_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
+		}
 		return array_merge( $base, $extra );
 	}
 
@@ -206,7 +212,7 @@ final class CTA_Super_Library_Batch_Definitions {
 			array( 'heading' => 'Ready to get started?', 'body' => 'Book your consultation today.', 'primary_button_label' => 'Book now', 'primary_button_link' => array(), 'secondary_button_label' => 'Learn more', 'secondary_button_link' => array(), 'trust_line' => 'Trusted by 1,000+ clients' ),
 			'consultation',
 			'strong',
-			array( 'short_label' => 'Consultation CTA strong' )
+			array( 'short_label' => 'Consultation CTA strong', Section_Schema::FIELD_INDUSTRY_AFFINITY => self::LAUNCH_INDUSTRIES )
 		);
 	}
 

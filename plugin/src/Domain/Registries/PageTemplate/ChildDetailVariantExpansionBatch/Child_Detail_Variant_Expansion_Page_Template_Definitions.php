@@ -136,6 +136,7 @@ final class Child_Detail_Variant_Expansion_Page_Template_Definitions {
 				'common_parent_page_types' => 'hub, nested_hub',
 				'hierarchy_role'           => 'leaf',
 			),
+			Page_Template_Schema::FIELD_INDUSTRY_AFFINITY        => array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' ),
 		);
 	}
 

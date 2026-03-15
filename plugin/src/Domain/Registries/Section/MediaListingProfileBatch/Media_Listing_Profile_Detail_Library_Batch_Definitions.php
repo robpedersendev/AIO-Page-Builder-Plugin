@@ -25,6 +25,9 @@ final class Media_Listing_Profile_Detail_Library_Batch_Definitions {
 	/** Batch ID per template-library-inventory-manifest §3.1 (listing, comparison, media, profile scope). */
 	public const BATCH_ID = 'SEC-06';
 
+	/** Industry keys for first launch verticals (section-industry-affinity-contract; Prompt 363). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/**
 	 * Returns all media/listing/profile/detail batch section definitions (order preserved for seeding).
 	 *
@@ -144,6 +147,9 @@ final class Media_Listing_Profile_Detail_Library_Batch_Definitions {
 			'description'     => 'Media/listing/profile content fields.',
 			'fields'          => $blueprint_fields,
 		);
+		if ( ! isset( $extra[ Section_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
+			$extra[ Section_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
+		}
 		return array_merge( $base, $extra );
 	}
 

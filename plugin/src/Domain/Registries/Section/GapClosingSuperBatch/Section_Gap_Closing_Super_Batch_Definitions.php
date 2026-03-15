@@ -27,6 +27,9 @@ final class Section_Gap_Closing_Super_Batch_Definitions {
 	/** Target total section count (template-library-coverage-matrix §2.1). */
 	public const SECTION_TARGET = 250;
 
+	/** Industry keys for first launch verticals (section-industry-affinity-contract; Prompt 363). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/**
 	 * Spec rows: key, name, purpose_summary, category, section_purpose_family, variation_family_key.
 	 * Distribution aligns with coverage matrix minimums and remaining gaps (offer, explainer, faq, profile, stats, listing, comparison, contact, legal, utility, timeline, related, plus spread for proof, cta, hero).
@@ -300,6 +303,7 @@ final class Section_Gap_Closing_Super_Batch_Definitions {
 			'description'     => 'Gap-closing section content fields.',
 			'fields'          => $blueprint_fields,
 		);
+		$base[ Section_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
 		return $base;
 	}
 }

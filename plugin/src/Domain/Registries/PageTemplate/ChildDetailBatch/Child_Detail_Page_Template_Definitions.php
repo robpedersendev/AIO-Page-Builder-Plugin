@@ -24,6 +24,9 @@ final class Child_Detail_Page_Template_Definitions {
 	/** Batch ID for child/detail pages (template-library-inventory-manifest PT-07). */
 	public const BATCH_ID = 'PT-07';
 
+	/** Industry keys for first launch verticals (page-template-industry-affinity-contract; Prompt 364). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/**
 	 * Allowed template families for child_detail (page-template-category-taxonomy-contract).
 	 *
@@ -168,6 +171,9 @@ final class Child_Detail_Page_Template_Definitions {
 				'hierarchy_role'           => 'leaf',
 			),
 		);
+		if ( ! isset( $extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
+			$extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
+		}
 		return array_merge( $def, $extra );
 	}
 

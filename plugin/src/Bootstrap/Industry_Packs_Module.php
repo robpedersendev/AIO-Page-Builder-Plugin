@@ -107,7 +107,7 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		} );
 		$container->register( 'industry_style_preset_registry', function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry();
-			$registry->load( array() );
+			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\StylePresets\Builtin_Industry_Style_Presets::get_definitions() );
 			return $registry;
 		} );
 		$container->register( 'industry_diagnostics_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service {

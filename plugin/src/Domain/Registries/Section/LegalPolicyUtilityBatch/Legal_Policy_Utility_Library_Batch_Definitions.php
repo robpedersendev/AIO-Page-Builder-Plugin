@@ -1,6 +1,6 @@
 <?php
 /**
- * Legal, policy, utility, contact, and form-support section template definitions for SEC-07 library batch (spec §12, §15, §17, §51, Prompt 152).
+ * Legal, policy, utility, contact, and form-support section template definitions for SEC-07 library batch (spec ?12, ?15, ?17, ?51, Prompt 152).
  * Presentational sections for privacy, terms, accessibility, contact, support, disclosure, consent, and utility flows.
  * Does not persist; callers save via Section_Template_Repository or Legal_Policy_Utility_Library_Batch_Seeder.
  *
@@ -18,12 +18,15 @@ use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
 
 /**
  * Returns section definitions for the legal/policy/contact/utility library batch (SEC-07).
- * Each definition is schema-compliant with embedded field_blueprint and accessibility/form semantics (spec §51.9, §51.10).
+ * Each definition is schema-compliant with embedded field_blueprint and accessibility/form semantics (spec ?51.9, ?51.10).
  */
 final class Legal_Policy_Utility_Library_Batch_Definitions {
 
 	/** Batch ID per template-library-inventory (legal, policy, utility, contact scope). */
 	public const BATCH_ID = 'SEC-07';
+
+	/** Industry keys for first launch verticals (section-industry-affinity-contract; Prompt 363). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
 
 	/**
 	 * Returns all legal/policy/utility batch section definitions (order preserved for seeding).
@@ -133,8 +136,8 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'animation_tier'                             => 'none',
 			'animation_families'                         => array(),
 			'preview_defaults'                           => $preview_defaults,
-			'accessibility_warnings_or_enhancements'     => 'Use semantic headings and landmarks. Forms: visible labels, label-input association, required-field indication, no placeholder-only labeling (spec §51.9). Modals: keyboard open/close, focus trap, focus return (spec §51.10). Omit optional blocks when empty.',
-			'seo_relevance_notes'                       => 'Legal and utility content benefits from clear headings and structure (spec §15.9).',
+			'accessibility_warnings_or_enhancements'     => 'Use semantic headings and landmarks. Forms: visible labels, label-input association, required-field indication, no placeholder-only labeling (spec ?51.9). Modals: keyboard open/close, focus trap, focus return (spec ?51.10). Omit optional blocks when empty.',
+			'seo_relevance_notes'                       => 'Legal and utility content benefits from clear headings and structure (spec ?15.9).',
 		);
 		$base['field_blueprint'] = array(
 			'blueprint_id'    => $bp_id,
@@ -144,6 +147,9 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'description'     => 'Legal/policy/utility content fields.',
 			'fields'          => $blueprint_fields,
 		);
+		if ( ! isset( $extra[ Section_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
+			$extra[ Section_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
+		}
 		return array_merge( $base, $extra );
 	}
 
@@ -222,7 +228,7 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 		return self::lpu_definition(
 			$key,
 			'Consent note',
-			'Consent or acknowledgment note with optional checkbox label. Use with form-support; ensure visible labels (spec §51.9).',
+			'Consent or acknowledgment note with optional checkbox label. Use with form-support; ensure visible labels (spec ?51.9).',
 			'legal_disclaimer',
 			'legal',
 			'consent_note',
@@ -304,7 +310,7 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 		return self::lpu_definition(
 			$key,
 			'Inquiry support',
-			'Inquiry or support section with heading, intro, and form-embed slot. Form provider supplies actual form; ensure labels and required-field indication (spec §51.9).',
+			'Inquiry or support section with heading, intro, and form-embed slot. Form provider supplies actual form; ensure labels and required-field indication (spec ?51.9).',
 			'form_embed',
 			'form_support',
 			'inquiry_support',
@@ -413,7 +419,7 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 		return self::lpu_definition(
 			$key,
 			'Form intro',
-			'Intro or helper text above a form. Accessible helper text (spec §51.9); do not use as sole labeling.',
+			'Intro or helper text above a form. Accessible helper text (spec ?51.9); do not use as sole labeling.',
 			'form_embed',
 			'form_support',
 			'form_intro',
@@ -491,7 +497,7 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'footer_legal',
 			'Footer legal strip.',
 			$fields,
-			array( 'text' => '© 2025 Example. All rights reserved. Sample disclaimer.' ),
+			array( 'text' => '? 2025 Example. All rights reserved. Sample disclaimer.' ),
 			array( 'short_label' => 'Footer legal' )
 		);
 	}

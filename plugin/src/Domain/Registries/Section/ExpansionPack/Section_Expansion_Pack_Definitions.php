@@ -41,6 +41,9 @@ final class Section_Expansion_Pack_Definitions {
 	/** Section key: FAQ. */
 	public const KEY_FAQ = 'st_faq';
 
+	/** Industry keys for first launch verticals (section-industry-affinity-contract; Prompt 363). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/**
 	 * Returns all expansion-pack section definitions (order preserved for seeding).
 	 *
@@ -101,6 +104,7 @@ final class Section_Expansion_Pack_Definitions {
 			Section_Schema::FIELD_ASSET_DECLARATION      => array( 'none' => true ),
 			'short_label'                               => 'Stats',
 			'suggested_use_cases'                        => array( 'Landing page metrics', 'Outcome highlights', 'Feature counts', 'Social proof numbers' ),
+			Section_Schema::FIELD_INDUSTRY_AFFINITY      => self::LAUNCH_INDUSTRIES,
 			'accessibility_warnings_or_enhancements'    => 'Ensure numbers are announced meaningfully (e.g. aria-label or live region for dynamic updates). Prefer semantic list or grid for stat items.',
 			'field_blueprint'                            => array(
 				'blueprint_id'     => $bp_id,
@@ -191,6 +195,7 @@ final class Section_Expansion_Pack_Definitions {
 			Section_Schema::FIELD_ASSET_DECLARATION      => array( 'none' => true ),
 			'short_label'                                => 'CTA',
 			'suggested_use_cases'                        => array( 'End-of-page sign-up', 'Download or contact prompt', 'Next-step conversion' ),
+			Section_Schema::FIELD_INDUSTRY_AFFINITY       => self::LAUNCH_INDUSTRIES,
 			'accessibility_warnings_or_enhancements'    => 'Primary CTA should be a single clear link or button. Ensure link text describes destination (avoid "Click here"). Secondary link must be visually distinct.',
 			'field_blueprint'                            => array(
 				'blueprint_id'     => $bp_id,
@@ -270,6 +275,7 @@ final class Section_Expansion_Pack_Definitions {
 			Section_Schema::FIELD_ASSET_DECLARATION      => array( 'none' => true ),
 			'short_label'                                => 'FAQ',
 			'suggested_use_cases'                       => array( 'Product or service FAQs', 'Support pages', 'Pre-form clarification' ),
+			Section_Schema::FIELD_INDUSTRY_AFFINITY      => self::LAUNCH_INDUSTRIES,
 			'accessibility_warnings_or_enhancements'     => 'Use heading for section; each Q&A pair should use proper heading level for question and visible answer. For accordion, use disclosure/button pattern with aria-expanded and aria-controls.',
 			'field_blueprint'                            => array(
 				'blueprint_id'     => $bp_id,

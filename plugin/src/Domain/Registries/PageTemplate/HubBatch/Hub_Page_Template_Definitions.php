@@ -23,6 +23,9 @@ final class Hub_Page_Template_Definitions {
 	/** Batch ID for hub pages (template-library-inventory-manifest PT-03). */
 	public const BATCH_ID = 'PT-03';
 
+	/** Industry keys for first launch verticals (page-template-industry-affinity-contract; Prompt 364). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/**
 	 * Returns all hub page template definitions (order preserved for seeding).
 	 *
@@ -130,6 +133,9 @@ final class Hub_Page_Template_Definitions {
 			'template_category_class'                            => 'hub',
 			'template_family'                                     => $template_family,
 		);
+		if ( ! isset( $extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
+			$extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
+		}
 		return array_merge( $def, $extra );
 	}
 

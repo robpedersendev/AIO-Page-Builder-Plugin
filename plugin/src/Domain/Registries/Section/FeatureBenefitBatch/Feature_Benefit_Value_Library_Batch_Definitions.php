@@ -28,6 +28,9 @@ final class Feature_Benefit_Value_Library_Batch_Definitions {
 	/** Section purpose family for all in this batch. */
 	public const PURPOSE_FAMILY = 'feature_benefit';
 
+	/** Industry keys for first launch verticals (section-industry-affinity-contract; Prompt 363). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/**
 	 * Returns all feature/benefit/value batch section definitions (order preserved for seeding).
 	 *
@@ -145,6 +148,9 @@ final class Feature_Benefit_Value_Library_Batch_Definitions {
 			'description'     => 'Feature/benefit content fields.',
 			'fields'          => $blueprint_fields,
 		);
+		if ( ! isset( $extra[ Section_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
+			$extra[ Section_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
+		}
 		return array_merge( $base, $extra );
 	}
 

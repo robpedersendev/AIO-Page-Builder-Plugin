@@ -27,6 +27,9 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 	/** Allowed template_family values for this batch. */
 	public const ALLOWED_FAMILIES = array( 'resource', 'authority', 'educational', 'comparison', 'faq', 'buyer_guide' );
 
+	/** Industry keys for first launch verticals (page-template-industry-affinity-contract; Prompt 364). */
+	private const LAUNCH_INDUSTRIES = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
 	/**
 	 * Returns all top-level educational/resource/authority page template definitions (order preserved for seeding).
 	 *
@@ -135,6 +138,9 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'template_category_class'                           => 'top_level',
 			'template_family'                                    => $template_family,
 		);
+		if ( ! isset( $extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
+			$extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
+		}
 		return array_merge( $def, $extra );
 	}
 
