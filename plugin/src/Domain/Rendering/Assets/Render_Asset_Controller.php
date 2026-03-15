@@ -3,6 +3,8 @@
  * Asset loading controls and requirement derivation for rendering (spec §7.7, §17, §55.5, §55.8).
  * Declarative, bounded, selector-contract-aware. Does not enqueue or build assets.
  * Preview contexts enforce asset budgets for list/detail to keep admin responsive.
+ * Plugin base stylesheet (aio-page-builder-base) is registered and conditionally enqueued by
+ * Frontend_Style_Enqueue_Service (Prompt 245) on built pages and approved contexts.
  *
  * @package AIOPageBuilder
  */

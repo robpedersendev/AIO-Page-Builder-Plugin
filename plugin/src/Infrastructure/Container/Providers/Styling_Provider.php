@@ -1,0 +1,63 @@
+<?php
+/**
+ * Registers style spec loader, style registries (Prompt 244), and front-end base style enqueue (Prompt 245).
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Infrastructure\Container\Providers;
+
+defined( 'ABSPATH' ) || exit;
+
+use AIOPageBuilder\Domain\Styling\Component_Override_Registry;
+use AIOPageBuilder\Domain\Styling\Frontend_Style_Enqueue_Service;
+use AIOPageBuilder\Domain\Styling\Render_Surface_Style_Registry;
+use AIOPageBuilder\Domain\Styling\Style_Spec_Loader;
+use AIOPageBuilder\Domain\Styling\Style_Token_Registry;
+use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
+
+/**
+ * Registers style spec loader, read-only registries, and conditional front-end base stylesheet enqueue.
+ */
+final class Styling_Provider implements Service_Provider_Interface {
+
+	/** @inheritdoc */
+	public function register( Service_Container $container ): void {
+		$container->register( 'style_spec_loader', function () use ( $container ): Style_Spec_Loader {
+			$config = $container->get( 'config' );
+			$base   = $config->plugin_dir() . 'specs/';
+			if ( ! \is_readable( $base ) || ! @\is_file( $base . Style_Spec_Loader::CORE_SPEC_FILE ) ) {
+				$fallback = \dirname( $config->plugin_dir() ) . '/docs/specs/';
+				if ( \is_readable( $fallback ) && @\is_file( $fallback . Style_Spec_Loader::CORE_SPEC_FILE ) ) {
+					$base = $fallback;
+				}
+			}
+			return new Style_Spec_Loader( $base );
+		} );
+
+		$container->register( 'style_token_registry', function () use ( $container ): Style_Token_Registry {
+			return new Style_Token_Registry( $container->get( 'style_spec_loader' ) );
+		} );
+
+		$container->register( 'component_override_registry', function () use ( $container ): Component_Override_Registry {
+			return new Component_Override_Registry( $container->get( 'style_spec_loader' ) );
+		} );
+
+		$container->register( 'render_surface_style_registry', function () use ( $container ): Render_Surface_Style_Registry {
+			return new Render_Surface_Style_Registry( $container->get( 'style_spec_loader' ) );
+		} );
+
+		$container->register( 'frontend_style_enqueue_service', function () use ( $container ): Frontend_Style_Enqueue_Service {
+			return new Frontend_Style_Enqueue_Service( $container->get( 'config' ) );
+		} );
+
+		\add_action( 'wp_enqueue_scripts', function () use ( $container ): void {
+			if ( $container->has( 'frontend_style_enqueue_service' ) ) {
+				$container->get( 'frontend_style_enqueue_service' )->enqueue_when_needed();
+			}
+		}, 10 );
+	}
+}

@@ -2,7 +2,7 @@
 
 **Upstream**: [styling-subsystem-contract.md](styling-subsystem-contract.md), [css-selector-contract.md](css-selector-contract.md)  
 **Specs**: [pb-style-core-spec.json](../specs/pb-style-core-spec.json), [pb-style-components-spec.json](../specs/pb-style-components-spec.json), [pb-style-render-surfaces-spec.json](../specs/pb-style-render-surfaces-spec.json)  
-**Status**: Contract definition only; runtime loader implementation is out of scope for this document.
+**Status**: Contract and runtime implementation. Loader: `Style_Spec_Loader`; registries: `Style_Token_Registry`, `Component_Override_Registry`, `Render_Surface_Style_Registry`. Wired via `Styling_Provider`; specs loaded from plugin-owned path (plugin_dir() . 'specs/' with fallback to repo docs/specs/ when present).
 
 ---
 

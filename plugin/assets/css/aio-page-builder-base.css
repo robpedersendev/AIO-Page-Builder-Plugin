@@ -1,0 +1,25 @@
+/**
+ * AIO Page Builder — Base stylesheet (Prompt 245).
+ * Targets existing contract selectors only (css-selector-contract.md).
+ * Theme overrides apply; no structural changes to markup.
+ */
+
+/* Page wrapper (css-selector-contract §4) */
+.aio-page {
+	box-sizing: border-box;
+}
+
+/* Section wrapper and inner (css-selector-contract §3.1, §3.2) */
+[class^="aio-s-"] {
+	box-sizing: border-box;
+}
+
+[class*="__inner"] {
+	box-sizing: border-box;
+}
+
+/* Token hook scope: values supplied by theme or token layer */
+.aio-page,
+[class^="aio-s-"] {
+	/* Placeholder for future token variables; theme may override */
+}

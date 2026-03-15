@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AIO Page Builder — Core Style Token Spec",
+  "description": "Machine-readable core design token names and sanitization metadata. Token names are fixed per css-selector-contract.md §7; only values are variable.",
+  "spec_version": "1",
+  "spec_schema": "pb-style-core",
+  "token_prefix": "--aio-",
+  "token_groups": {
+    "color": {
+      "description": "Color token hook points",
+      "pattern": "--aio-color-{name}",
+      "allowed_names": ["primary", "surface", "text", "text-muted", "accent", "background"],
+      "sanitization": {
+        "value_type": "color",
+        "allowed_formats": ["hex", "rgb", "rgba", "hsl", "hsla", "css_named"],
+        "max_length": 128
+      }
+    },
+    "typography": {
+      "description": "Typography token hook points",
+      "pattern": "--aio-font-{name}",
+      "allowed_names": ["heading", "body", "eyebrow", "caption"],
+      "sanitization": {
+        "value_type": "font_family",
+        "allowed_formats": ["font_family_string", "css_font_stack"],
+        "max_length": 256
+      }
+    },
+    "spacing": {
+      "description": "Spacing token hook points",
+      "pattern": "--aio-space-{name}",
+      "allowed_names": ["md", "section", "block", "inline", "card", "tight", "loose"],
+      "sanitization": {
+        "value_type": "length",
+        "allowed_formats": ["px", "rem", "em", "ch", "percent"],
+        "max_length": 32
+      }
+    },
+    "radius": {
+      "description": "Border radius token hook points",
+      "pattern": "--aio-radius-{name}",
+      "allowed_names": ["card", "button", "badge", "input", "none"],
+      "sanitization": {
+        "value_type": "length",
+        "allowed_formats": ["px", "rem", "em", "percent"],
+        "max_length": 24
+      }
+    },
+    "shadow": {
+      "description": "Shadow token hook points",
+      "pattern": "--aio-shadow-{name}",
+      "allowed_names": ["card", "elevated", "none"],
+      "sanitization": {
+        "value_type": "shadow",
+        "allowed_formats": ["css_box_shadow"],
+        "max_length": 256
+      }
+    },
+    "component": {
+      "description": "Component-level token overrides; names align with component override spec",
+      "pattern": "--aio-*",
+      "allowed_names": [],
+      "sanitization": {
+        "value_type": "any_css_value",
+        "whitelist_from": "pb-style-components-spec.json",
+        "max_length": 256
+      }
+    }
+  },
+  "compatibility": {
+    "min_plugin_version": "1.0",
+    "css_contract_ref": "docs/contracts/css-selector-contract.md §7"
+  }
+}

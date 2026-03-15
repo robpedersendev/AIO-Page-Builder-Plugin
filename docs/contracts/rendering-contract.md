@@ -300,7 +300,11 @@ When a page is created or rebuilt from a template or composition:
 | Custom tables (assignment map) | Removed | Plugin-owned operational data |
 | Options, transients | Removed | Plugin operational data |
 
-### 8.3 Survivability Criteria
+### 8.3 Base Stylesheet and Conditional Loading
+
+The plugin may enqueue a baseline front-end stylesheet (aio-page-builder-base) that targets only existing contract selectors (aio-page, aio-s-*). It is registered and conditionally enqueued by **Frontend_Style_Enqueue_Service** only when the current request is a built page (content contains plugin markup) or an approved context (filter). The baseline is theme-overridable; no inline styles or markup are injected into post_content. See styling-subsystem-contract.md and css-selector-contract.md.
+
+### 8.4 Survivability Criteria
 
 A built page is **meaningful** after plugin deactivation when:
 
@@ -310,7 +314,7 @@ A built page is **meaningful** after plugin deactivation when:
 4. A human can edit the page in the block editor without errors.
 5. Front-end HTML renders without plugin PHP (assets may degrade gracefully).
 
-### 8.4 Survivability Test Scenarios
+### 8.5 Survivability Test Scenarios
 
 | Scenario | Expected Result | Acceptance |
 |----------|-----------------|------------|

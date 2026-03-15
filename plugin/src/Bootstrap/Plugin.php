@@ -120,6 +120,12 @@ require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_Draft_Service
 require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_Prefill_Service.php';
 require_once $bootstrap_dir . '/../Domain/AI/Onboarding/Onboarding_UI_State_Builder.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Onboarding_Provider.php';
+require_once $bootstrap_dir . '/../Domain/Styling/Style_Spec_Loader.php';
+require_once $bootstrap_dir . '/../Domain/Styling/Style_Token_Registry.php';
+require_once $bootstrap_dir . '/../Domain/Styling/Component_Override_Registry.php';
+require_once $bootstrap_dir . '/../Domain/Styling/Render_Surface_Style_Registry.php';
+require_once $bootstrap_dir . '/../Domain/Styling/Frontend_Style_Enqueue_Service.php';
+require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Styling_Provider.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
 require_once $bootstrap_dir . '/Lifecycle_Manager.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Dashboard/Dashboard_Screen.php';
