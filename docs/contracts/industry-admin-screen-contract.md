@@ -68,6 +68,18 @@
 
 ---
 
+## 4.2 Industry create-page-from-template assistant (Prompt 376)
+
+- **Industry_Create_Page_Assistant**: Provides industry-aware guidance for the create-page-from-template flow. Call `build_state( $page_templates )` with the current template list, then use `has_industry_guidance()`, `get_recommended_template_keys()`, `get_fit_for_template( $key )`, `get_warning_flags_for_template( $key )`, and `get_substitute_template_keys( $key )` to show recommended templates first, weak-fit/discouraged warnings before page creation, and substitute suggestions. Full template library access and explicit override selection remain; actual template application logic is unchanged. Safe fallback when no industry profile.
+
+---
+
+## 4.3 Industry composition builder assistant (Prompt 377)
+
+- **Industry_Composition_Assistant**: Provides industry-aware section guidance in the composition builder. Call `build_state( $sections )` with the section list, then use `has_industry_guidance()`, `get_recommended_section_keys()`, `get_fit_for_section( $key )`, `get_warning_flags_for_section( $key )`, and `get_substitute_section_keys( $key )` to surface recommended sections, warnings for weak-fit/discouraged choices, and substitute suggestions. CTA/purpose guidance continues to use existing composition builder validation and insertion hints. Manual selection control preserved; no auto-swap. Safe fallback when no industry profile.
+
+---
+
 ## 5. Security and failure behavior
 
 - All industry admin surfaces are admin-only (capability as above or `aio_view_build_plans` for directory screens).
@@ -82,4 +94,6 @@
 - **Form**: `plugin/src/Admin/Forms/Industry_Profile_Form_Builder.php`
 - **Section filter**: `plugin/src/Admin/Screens/Sections/Industry_Section_Library_Filter_Controller.php`; view: `plugin/src/Admin/Views/sections/industry-section-badges.php`
 - **Page template filter**: `plugin/src/Admin/Screens/PageTemplates/Industry_Page_Template_Filter_Controller.php`; view: `plugin/src/Admin/Views/page-templates/industry-template-badges.php`
+- **Create-page assistant**: `plugin/src/Admin/Screens/PageTemplates/Industry_Create_Page_Assistant.php` (Prompt 376).
+- **Composition assistant**: `plugin/src/Admin/Screens/Compositions/Industry_Composition_Assistant.php` (Prompt 377).
 - **Inventory**: admin-screen-inventory.md lists Industry Profile screen and notes industry filter/badge behavior for section and page template directories.
