@@ -98,6 +98,8 @@ This document is the authoritative source of truth for product planning, technic
 
 ### **plugin modules and responsibilities**
 
+### **industry pack extension layer (overlay on registries, onboarding, docs, AI, LPagery; see industry-pack-extension-contract)**
+
 ### **section template registry**
 
 ### **page template registry**

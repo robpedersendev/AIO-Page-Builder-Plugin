@@ -45,6 +45,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Build_Plan_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Repositories_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Storage_Services_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Styling_Provider;
+use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 
 /**
  * Loads and runs only bootstrap-level providers. Domain providers are registered in later prompts.
@@ -115,6 +116,7 @@ final class Module_Registrar {
 			new ExportRestore_Provider(),
 			new Onboarding_Provider(),
 			new Styling_Provider(),
+			new Industry_Packs_Module(),
 		);
 		foreach ( $providers as $provider ) {
 			$provider->register( $this->container );

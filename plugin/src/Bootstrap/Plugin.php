@@ -132,6 +132,7 @@ require_once $bootstrap_dir . '/../Domain/Styling/Global_Component_Override_Emit
 require_once $bootstrap_dir . '/../Domain/Styling/Entity_Style_Payload_Schema.php';
 require_once $bootstrap_dir . '/../Domain/Styling/Entity_Style_Payload_Repository.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Styling_Provider.php';
+require_once $bootstrap_dir . '/Industry_Packs_Module.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
 require_once $bootstrap_dir . '/Lifecycle_Manager.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Dashboard/Dashboard_Screen.php';
