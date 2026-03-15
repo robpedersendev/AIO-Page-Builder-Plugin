@@ -115,6 +115,7 @@ The following use `get_all_blueprints()` or `list_all_definitions( 9999, 0 )` fo
 |------|-------------|
 | **When** | Explicit code paths only (e.g. debug exporter, JSON mirror, regeneration, migration verification). Not tied to generic `acf/init` or request bootstrap. |
 | **How** | May call `register_all()` or equivalent only when invoked deliberately (e.g. from an admin tool or CLI). Document any such path. |
+| **Exception matrix** | **acf-registration-exception-matrix.md** (Prompt 297) enumerates approved full-registration/broad-load contexts. Only those contexts may call `run_full_registration()` or `get_all_blueprints()`; ordinary requests must not. |
 
 ---
 
@@ -180,6 +181,9 @@ The following must be preserved by the retrofit and all downstream implementatio
 - **large-scale-acf-lpagery-binding-contract.md**: §6.2–6.3 registration scaling, performance, derivation from section list.
 - **acf-key-naming-contract.md**: Group key format `group_aio_{section_key}`.
 - **acf-admin-context-registration-matrix.md**: Non-page admin registration behavior; no full registration on generic admin.
+- **acf-registration-exception-matrix.md**: Approved tooling exceptions for full registration / broad load (Prompt 297).
+- **acf-preview-registration-behavior.md**: Preview and iframe registration behavior (Prompt 298).
+- **acf-secondary-admin-request-matrix.md**: Autosave, revision, quick-edit, bulk-edit guards (Prompt 299).
 - **docs/qa/acf-registration-performance-impact-analysis.md**: Impact analysis and verification checklist.
 
 ---

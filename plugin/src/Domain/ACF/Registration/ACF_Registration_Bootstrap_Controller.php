@@ -141,7 +141,7 @@ final class ACF_Registration_Bootstrap_Controller {
 
 	/**
 	 * Registers all section-owned groups. For explicit tooling only (e.g. debug export, regeneration).
-	 * Do not call from generic request bootstrap.
+	 * Do not call from generic request bootstrap or acf/init. See acf-registration-exception-matrix.md.
 	 *
 	 * @return int Number of groups registered.
 	 */

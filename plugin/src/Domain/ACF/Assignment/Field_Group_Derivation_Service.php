@@ -19,6 +19,7 @@ use AIOPageBuilder\Domain\Registries\Shared\Deprecation_Metadata;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
+use AIOPageBuilder\Domain\Templates\Template_Section_Key_Derivation_Result;
 
 /**
  * Derives visible field group keys from structural source (template or composition).
@@ -78,6 +79,40 @@ final class Field_Group_Derivation_Service {
 	}
 
 	/**
+	 * Derives section keys from template for new-page ACF registration (Prompt 296). Narrow read path: single get_definition_by_key.
+	 *
+	 * @param string $template_key Page template internal_key.
+	 * @return Template_Section_Key_Derivation_Result
+	 */
+	public function derive_section_keys_from_template_for_registration( string $template_key ): Template_Section_Key_Derivation_Result {
+		$definition = $this->page_template_repository->get_definition_by_key( $template_key );
+		if ( $definition === null ) {
+			return new Template_Section_Key_Derivation_Result( array(), false );
+		}
+		$ordered  = $definition[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+		$raw_keys = $this->extract_section_keys( $ordered );
+		$filtered = $this->filter_section_keys_eligible_for_new_page( $raw_keys );
+		return new Template_Section_Key_Derivation_Result( $filtered, true );
+	}
+
+	/**
+	 * Derives section keys from composition for new-page ACF registration (Prompt 296). Narrow read path: single get_definition_by_key.
+	 *
+	 * @param string $composition_id Composition id.
+	 * @return Template_Section_Key_Derivation_Result
+	 */
+	public function derive_section_keys_from_composition_for_registration( string $composition_id ): Template_Section_Key_Derivation_Result {
+		$definition = $this->composition_repository->get_definition_by_key( $composition_id );
+		if ( $definition === null ) {
+			return new Template_Section_Key_Derivation_Result( array(), false );
+		}
+		$ordered  = $definition[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array();
+		$raw_keys = $this->extract_section_keys_from_composition( $ordered );
+		$filtered = $this->filter_section_keys_eligible_for_new_page( $raw_keys );
+		return new Template_Section_Key_Derivation_Result( $filtered, true );
+	}
+
+	/**
 	 * Merges derived groups with existing groups for refinement (preserves deprecated on existing pages).
 	 *
 	 * @param list<string> $derived  Newly derived group keys.
@@ -130,6 +165,24 @@ final class Field_Group_Derivation_Service {
 			}
 		}
 		return array_values( array_unique( $keys ) );
+	}
+
+	/**
+	 * Filters section keys to those eligible for new-page use (excludes deprecated).
+	 *
+	 * @param list<string> $section_keys
+	 * @return list<string>
+	 */
+	private function filter_section_keys_eligible_for_new_page( array $section_keys ): array {
+		$out = array();
+		foreach ( $section_keys as $sk ) {
+			$def = $this->section_repository->get_definition_by_key( $sk );
+			if ( $def !== null && ! Deprecation_Metadata::is_eligible_for_new_use( $def ) ) {
+				continue;
+			}
+			$out[] = $sk;
+		}
+		return array_values( array_unique( $out ) );
 	}
 
 	/**

@@ -40,6 +40,10 @@ final class Admin_Post_Edit_Context_Resolver {
 		}
 
 		if ( $pagenow === 'post.php' ) {
+			// Secondary admin request types: no scoped registration (acf-secondary-admin-request-matrix).
+			if ( $this->is_secondary_edit_request() ) {
+				return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::UNSUPPORTED_ADMIN, 0 );
+			}
 			$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0;
 			if ( $post_id <= 0 ) {
 				return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::UNSUPPORTED_ADMIN, 0 );
@@ -63,5 +67,25 @@ final class Admin_Post_Edit_Context_Resolver {
 		}
 
 		return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NON_PAGE_ADMIN, 0 );
+	}
+
+	/**
+	 * Whether the current request is a secondary edit type (autosave, heartbeat, quick-edit, revision) that must not get scoped registration (Prompt 299).
+	 *
+	 * @return bool
+	 */
+	private function is_secondary_edit_request(): bool {
+		if ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) {
+			$action = isset( $_REQUEST['action'] ) ? \sanitize_key( (string) $_REQUEST['action'] ) : '';
+			$no_reg = array( 'autosave', 'heartbeat', 'inline-save', 'wp-block-editor-autosave' );
+			if ( $action !== '' && in_array( $action, $no_reg, true ) ) {
+				return true;
+			}
+		}
+		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0;
+		if ( $post_id > 0 && get_post_type( $post_id ) === 'revision' ) {
+			return true;
+		}
+		return false;
 	}
 }

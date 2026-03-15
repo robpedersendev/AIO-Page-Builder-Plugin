@@ -90,9 +90,9 @@ class New_Page_ACF_Registration_Context_Resolver {
 			if ( $this->diagnostics !== null ) {
 				$this->diagnostics->set_request_cache_used( false );
 			}
-			$group_keys   = $this->derivation_service->derive_from_template( $template_key, true );
-			$section_keys = $this->group_key_resolver->group_keys_to_section_keys( $group_keys );
-			if ( $this->section_key_cache !== null ) {
+			$result = $this->derivation_service->derive_section_keys_from_template_for_registration( $template_key );
+			$section_keys = $result->get_section_keys();
+			if ( $this->section_key_cache !== null && $result->is_resolved() ) {
 				$this->section_key_cache->set_for_template( $template_key, $section_keys );
 			}
 			return $section_keys;
@@ -111,9 +111,9 @@ class New_Page_ACF_Registration_Context_Resolver {
 			if ( $this->diagnostics !== null ) {
 				$this->diagnostics->set_request_cache_used( false );
 			}
-			$group_keys   = $this->derivation_service->derive_from_composition( $composition_id, true );
-			$section_keys = $this->group_key_resolver->group_keys_to_section_keys( $group_keys );
-			if ( $this->section_key_cache !== null ) {
+			$result = $this->derivation_service->derive_section_keys_from_composition_for_registration( $composition_id );
+			$section_keys = $result->get_section_keys();
+			if ( $this->section_key_cache !== null && $result->is_resolved() ) {
 				$this->section_key_cache->set_for_composition( $composition_id, $section_keys );
 			}
 			return $section_keys;

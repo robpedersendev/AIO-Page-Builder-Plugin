@@ -31,6 +31,7 @@ require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repos
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Section_Template_Repository.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Page_Template_Repository.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Composition_Repository.php';
+require_once $plugin_root . '/src/Domain/Templates/Template_Section_Key_Derivation_Result.php';
 require_once $plugin_root . '/src/Domain/ACF/Assignment/Field_Group_Derivation_Service.php';
 
 final class Field_Group_Derivation_Service_Test extends TestCase {
@@ -221,5 +222,38 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 		) );
 		$result = $this->service->derive_from_template( 'pt_empty', true );
 		$this->assertSame( array(), $result );
+	}
+
+	public function test_derive_section_keys_from_template_for_registration_unresolved_when_not_found(): void {
+		$result = $this->service->derive_section_keys_from_template_for_registration( 'unknown_pt' );
+		$this->assertFalse( $result->is_resolved() );
+		$this->assertSame( array(), $result->get_section_keys() );
+	}
+
+	public function test_derive_section_keys_from_template_for_registration_matches_derive_from_template_section_keys(): void {
+		$this->seed_template( 'pt_landing_contact', array(
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
+				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
+			),
+		) );
+		$this->seed_section( 'st01_hero', array( 'status' => 'active' ) );
+		$this->seed_section( 'st05_faq', array( 'status' => 'active' ) );
+
+		$reg_result = $this->service->derive_section_keys_from_template_for_registration( 'pt_landing_contact' );
+		$group_keys = $this->service->derive_from_template( 'pt_landing_contact', true );
+
+		$this->assertTrue( $reg_result->is_resolved() );
+		$this->assertCount( 2, $reg_result->get_section_keys() );
+		$this->assertContains( 'st01_hero', $reg_result->get_section_keys() );
+		$this->assertContains( 'st05_faq', $reg_result->get_section_keys() );
+		$this->assertContains( 'group_aio_st01_hero', $group_keys );
+		$this->assertContains( 'group_aio_st05_faq', $group_keys );
+	}
+
+	public function test_derive_section_keys_from_composition_for_registration_unresolved_when_not_found(): void {
+		$result = $this->service->derive_section_keys_from_composition_for_registration( 'comp_missing' );
+		$this->assertFalse( $result->is_resolved() );
+		$this->assertSame( array(), $result->get_section_keys() );
 	}
 }
