@@ -126,6 +126,7 @@ final class Section_Template_Repository extends Abstract_CPT_Repository implemen
 
 	/**
 	 * Lists all section definitions (any status). Excludes records without valid definition.
+	 * Not used from ACF registration bootstrap (conditional registration uses get_definition_by_key per section). See docs/qa/acf-blueprint-bulk-load-elimination-report.md.
 	 *
 	 * @param int $limit
 	 * @param int $offset

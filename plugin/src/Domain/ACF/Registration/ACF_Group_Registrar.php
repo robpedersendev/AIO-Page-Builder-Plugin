@@ -44,8 +44,8 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 	}
 
 	/**
-	 * Registers all section-owned field groups that have embedded blueprints.
-	 * No-op when ACF is unavailable.
+	 * Registers all section-owned field groups (bulk load via get_all_blueprints).
+	 * Must not be called from the acf/init bootstrap path; use run_full_registration() only for explicit tooling. Normal request registration uses register_sections() with single-section lookup. See docs/qa/acf-blueprint-bulk-load-elimination-report.md.
 	 *
 	 * @return int Number of groups registered.
 	 */

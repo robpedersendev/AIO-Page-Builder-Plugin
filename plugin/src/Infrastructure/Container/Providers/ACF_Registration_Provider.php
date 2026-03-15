@@ -16,6 +16,9 @@ use AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Registrar;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Registration_Bootstrap_Controller;
+use AIOPageBuilder\Domain\ACF\Registration\Existing_Page_ACF_Registration_Context_Resolver;
+use AIOPageBuilder\Domain\ACF\Registration\Group_Key_Section_Key_Resolver;
+use AIOPageBuilder\Domain\ACF\Registration\New_Page_ACF_Registration_Context_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\Registration_Request_Context;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
@@ -44,10 +47,28 @@ final class ACF_Registration_Provider implements Service_Provider_Interface {
 		$container->register( 'acf_registration_request_context', function (): Registration_Request_Context {
 			return new Registration_Request_Context();
 		} );
+		$container->register( 'acf_group_key_section_key_resolver', function (): Group_Key_Section_Key_Resolver {
+			return new Group_Key_Section_Key_Resolver();
+		} );
+		$container->register( 'acf_existing_page_registration_context_resolver', function () use ( $container ): Existing_Page_ACF_Registration_Context_Resolver {
+			return new Existing_Page_ACF_Registration_Context_Resolver(
+				$container->get( 'page_field_group_assignment_service' ),
+				$container->get( 'acf_group_key_section_key_resolver' )
+			);
+		} );
+		$container->register( 'acf_new_page_registration_context_resolver', function () use ( $container ): New_Page_ACF_Registration_Context_Resolver {
+			return new New_Page_ACF_Registration_Context_Resolver(
+				$container->get( 'field_group_derivation_service' ),
+				$container->get( 'acf_group_key_section_key_resolver' )
+			);
+		} );
 		$container->register( 'acf_registration_bootstrap_controller', function () use ( $container ): ACF_Registration_Bootstrap_Controller {
 			return new ACF_Registration_Bootstrap_Controller(
 				$container->get( 'acf_group_registrar' ),
-				$container->get( 'acf_registration_request_context' )
+				$container->get( 'acf_registration_request_context' ),
+				$container->get( 'acf_group_key_section_key_resolver' ),
+				$container->get( 'acf_existing_page_registration_context_resolver' ),
+				$container->get( 'acf_new_page_registration_context_resolver' )
 			);
 		} );
 

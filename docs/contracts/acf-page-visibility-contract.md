@@ -14,7 +14,7 @@
 
 - Assignment is **derived** from page template or composition (ordered section list), not stored per-page in an unbounded way.
 - **Page_Field_Group_Assignment_Service** persists assignments via **Assignment_Map_Service**; `get_visible_groups_for_page( $post_id )` returns the list of ACF group keys (e.g. `group_aio_st01_hero`) for that page.
-- Group keys follow `group_aio_{section_key}` (acf-key-naming-contract). Section key is recoverable by stripping the `group_aio_` prefix.
+- Group keys follow `group_aio_{section_key}` (acf-key-naming-contract). Section key is recovered via **Group_Key_Section_Key_Resolver** (reverse mapping); invalid or non-plugin group keys are rejected.
 
 ---
 

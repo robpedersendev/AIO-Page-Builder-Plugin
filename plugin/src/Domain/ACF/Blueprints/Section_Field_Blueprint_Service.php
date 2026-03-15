@@ -53,7 +53,8 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 	}
 
 	/**
-	 * Retrieves normalized blueprint for a section by key.
+	 * Retrieves normalized blueprint for a section by key (single-section lookup; no bulk load).
+	 * Use this for conditional ACF registration (register_sections) per acf-conditional-registration-contract.
 	 *
 	 * @param string      $section_key Section internal_key.
 	 * @param string|null $version     Optional version filter; null = use section's current version.
@@ -181,7 +182,7 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 
 	/**
 	 * Returns all normalized blueprints from sections that have embedded field_blueprint.
-	 * Used by ACF Group Registrar for bulk registration.
+	 * Must not be used from the acf/init registration bootstrap path; use get_blueprint_for_section() per key for conditional registration. Reserved for explicit tooling (e.g. run_full_registration, debug export, diagnostics). See docs/qa/acf-blueprint-bulk-load-elimination-report.md.
 	 *
 	 * @return list<array<string, mixed>>
 	 */

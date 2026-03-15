@@ -100,6 +100,8 @@ The following use `get_all_blueprints()` or `list_all_definitions( 9999, 0 )` fo
 | **Registration** | Do **not** register all groups. Either register **no** groups or a **minimal/product-defined** set only. No `register_all()` on generic admin requests. |
 | **Blueprint loading** | No bulk section load for ACF registration on these contexts unless a specific feature (e.g. template directory preview) requires a bounded subset and documents it. |
 
+**Matrix**: **acf-admin-context-registration-matrix.md** enumerates admin context categories and documents that non-page admin registers no groups; full registration is reserved for explicit tooling only.
+
 ### 4.5 Tooling / explicit full registration
 
 | Rule | Requirement |
@@ -170,6 +172,7 @@ The following must be preserved by the retrofit and all downstream implementatio
 - **acf-page-visibility-contract.md**: Page-level assignment derivation; expanded by this contract for conditional registration.
 - **large-scale-acf-lpagery-binding-contract.md**: §6.2–6.3 registration scaling, performance, derivation from section list.
 - **acf-key-naming-contract.md**: Group key format `group_aio_{section_key}`.
+- **acf-admin-context-registration-matrix.md**: Non-page admin registration behavior; no full registration on generic admin.
 - **docs/qa/acf-registration-performance-impact-analysis.md**: Impact analysis and verification checklist.
 
 ---
