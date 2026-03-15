@@ -13,7 +13,9 @@ namespace AIOPageBuilder\Admin\Screens\Templates;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Screens\PageTemplates\Industry_Page_Template_Filter_Controller;
+use AIOPageBuilder\Domain\Industry\Overrides\Industry_Page_Template_Override_Service;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Directory_Read_Model_Builder;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver;
 use AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Directory_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -64,6 +66,7 @@ final class Page_Templates_Directory_Screen {
 		);
 		$state = $state_builder->build_state( $request );
 		$state = $this->enrich_state_with_industry( $state, $request );
+		$state['industry_page_template_overrides_by_key'] = ( new Industry_Page_Template_Override_Service() )->list_overrides();
 
 		$view = (string) ( $state['view'] ?? 'root' );
 		?>
@@ -232,6 +235,7 @@ final class Page_Templates_Directory_Screen {
 		$can_manage  = ! empty( $state['can_manage_templates'] );
 		$category_labels = $state['category_labels'] ?? array();
 		$industry_badges_by_key = $state['industry_badges_by_key'] ?? array();
+		$industry_page_template_overrides_by_key = $state['industry_page_template_overrides_by_key'] ?? array();
 
 		$query_args = array( 'page' => self::SLUG );
 		if ( $cat !== '' ) {
@@ -290,6 +294,8 @@ final class Page_Templates_Directory_Screen {
 					$view_url = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
 					$in_compare = \in_array( $key, Template_Compare_Screen::get_compare_list( 'page' ), true );
 					$item_view = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
+					$template_override = isset( $industry_page_template_overrides_by_key[ $key ] ) && is_array( $industry_page_template_overrides_by_key[ $key ] ) ? $industry_page_template_overrides_by_key[ $key ] : null;
+					$show_use_anyway = $item_view !== null && $template_override === null && \in_array( $item_view->get_recommendation_status(), array( Industry_Page_Template_Recommendation_Resolver::FIT_DISCOURAGED, Industry_Page_Template_Recommendation_Resolver::FIT_ALLOWED_WEAK ), true );
 					?>
 					<tr>
 						<td><?php echo \esc_html( $name ); ?></td>
@@ -316,6 +322,18 @@ final class Page_Templates_Directory_Screen {
 								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'page', $key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 							<?php else : ?>
 								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'page', $key ) ); ?>"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
+							<?php endif; ?>
+							<?php if ( $template_override !== null ) : ?>
+								| <span class="aio-template-overridden" title="<?php echo \esc_attr( (string) ( $template_override['reason'] ?? '' ) ); ?>"><?php \esc_html_e( 'Overridden', 'aio-page-builder' ); ?></span>
+							<?php elseif ( $show_use_anyway ) : ?>
+								| <form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" class="aio-inline-form" style="display:inline;">
+									<input type="hidden" name="action" value="aio_save_industry_page_template_override" />
+									<?php \wp_nonce_field( \AIOPageBuilder\Admin\Actions\Save_Industry_Page_Template_Override_Action::NONCE_ACTION, \AIOPageBuilder\Admin\Actions\Save_Industry_Page_Template_Override_Action::NONCE_NAME ); ?>
+									<input type="hidden" name="template_key" value="<?php echo \esc_attr( $key ); ?>" />
+									<input type="hidden" name="state" value="accepted" />
+									<input type="hidden" name="_wp_http_referer" value="<?php echo \esc_attr( \wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ); ?>" />
+									<button type="submit" class="button-link"><?php \esc_html_e( 'Use anyway', 'aio-page-builder' ); ?></button>
+								</form>
 							<?php endif; ?>
 							<?php if ( $can_manage ) : ?>
 								| <span class="aio-composition-control"><?php \esc_html_e( 'Composition', 'aio-page-builder' ); ?></span>

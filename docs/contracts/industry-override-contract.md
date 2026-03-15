@@ -57,7 +57,33 @@ Override identity is scoped by (target_type, target_key) and optionally by plan_
 
 ---
 
-## 7. Files
+## 7. UI and persistence (Prompts 367–369)
+
+### 7.1 Section library
+
+- **Screen**: Section Templates Directory. For each section row with industry fit `FIT_DISCOURAGED` or `FIT_ALLOWED_WEAK`, an override control is shown.
+- **Override state**: If an override exists for that section key, the actions column shows "Overridden" and the stored reason (e.g. in a title attribute). Otherwise a "Use anyway" inline form is shown (POST to `admin-post.php` with `action=aio_save_industry_section_override`, nonce `aio_section_override_nonce`, `section_key`, `state=accepted`, optional `reason`, `_wp_http_referer`).
+- **Persistence**: Option `Option_Names::INDUSTRY_SECTION_OVERRIDES` (array keyed by section_key). Write path: `Save_Industry_Section_Override_Action` (admin-post); capability `Capabilities::MANAGE_SECTION_TEMPLATES`. Read: `Industry_Section_Override_Service::list_overrides()` merged into screen state as `industry_section_overrides_by_key`.
+- **Recommendation metadata**: Industry badges and warnings remain visible after override; override does not remove or rewrite section registry data.
+
+### 7.2 Page template directory
+
+- **Screen**: Page Templates Directory. For each template row with fit `FIT_DISCOURAGED` or `FIT_ALLOWED_WEAK`, an override control is shown.
+- **Override state**: "Overridden" (with reason) or "Use anyway" form (POST `action=aio_save_industry_page_template_override`, nonce `aio_page_template_override_nonce`, `template_key`, `state`, `reason`, `_wp_http_referer`).
+- **Persistence**: Option `Option_Names::INDUSTRY_PAGE_TEMPLATE_OVERRIDES`. Write: `Save_Industry_Page_Template_Override_Action`; capability `Capabilities::MANAGE_PAGE_TEMPLATES`. Read: `Industry_Page_Template_Override_Service::list_overrides()` as `industry_page_template_overrides_by_key`.
+
+### 7.3 Build Plan item (review step)
+
+- **Context**: Build Plan workspace, step 2 (New pages) or step 2 (Existing page updates). Detail panel for a selected plan item.
+- **Override section**: When the item has industry warning flags (`industry_warning_flags` in payload) and a plan_id is available, the detail builder adds an "Industry override" section. If an override exists for (plan_id, item_id): shows "Overridden" and the reason. Otherwise shows an "Accept anyway" form with optional review note (textarea), POST `action=aio_save_industry_build_plan_override`, nonce `aio_save_industry_build_plan_override`, hidden `plan_id`, `item_id`, `state=accepted`, `_wp_http_referer`.
+- **Persistence**: Option `Option_Names::INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES` (nested: plan_id => item_id => override record). Write: `Save_Industry_Build_Plan_Override_Action`; capability `Capabilities::APPROVE_BUILD_PLANS`. Read: `Industry_Build_Plan_Item_Override_Service::get_override(plan_id, item_id)` / `list_for_plan(plan_id)`.
+- **Detail builders**: `New_Page_Creation_Detail_Builder::build_sections($item, $plan_id)` and `Existing_Page_Update_Detail_Builder::build_sections($item, $plan_id)` accept an optional `$plan_id` and render the override section when the item has industry warnings.
+
+---
+
+## 8. Files
 
 - **Schema**: plugin/src/Domain/Industry/Overrides/Industry_Override_Schema.php
+- **Services**: plugin/src/Domain/Industry/Overrides/Industry_Section_Override_Service.php, Industry_Page_Template_Override_Service.php, Industry_Build_Plan_Item_Override_Service.php
+- **Actions**: plugin/src/Admin/Actions/Save_Industry_Section_Override_Action.php, Save_Industry_Page_Template_Override_Action.php, Save_Industry_Build_Plan_Override_Action.php
 - **Contract**: docs/contracts/industry-override-contract.md

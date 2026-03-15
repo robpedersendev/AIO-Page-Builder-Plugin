@@ -116,6 +116,9 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_seed_child_detail_variant_expansion_templates', array( $this, 'handle_seed_child_detail_variant_expansion_templates' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_profile', array( $this, 'handle_save_industry_profile' ), 10 );
 		\add_action( 'admin_post_aio_apply_industry_style_preset', array( $this, 'handle_apply_industry_style_preset' ), 10 );
+		\add_action( 'admin_post_aio_save_industry_section_override', array( $this, 'handle_save_industry_section_override' ), 10 );
+		\add_action( 'admin_post_aio_save_industry_page_template_override', array( $this, 'handle_save_industry_page_template_override' ), 10 );
+		\add_action( 'admin_post_aio_save_industry_build_plan_override', array( $this, 'handle_save_industry_build_plan_override' ), 10 );
 
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
@@ -535,6 +538,33 @@ final class Admin_Menu {
 		$applied = $service->apply_preset( $preset_key );
 		\wp_safe_redirect( $redirect_url . ( $applied ? '&aio_style_preset_msg=applied' : '&aio_style_preset_msg=error' ) );
 		exit;
+	}
+
+	/**
+	 * Handles admin-post save of industry section override (Prompt 367). Delegates to Save_Industry_Section_Override_Action.
+	 *
+	 * @return void
+	 */
+	public function handle_save_industry_section_override(): void {
+		\AIOPageBuilder\Admin\Actions\Save_Industry_Section_Override_Action::handle();
+	}
+
+	/**
+	 * Handles admin-post save of industry page template override (Prompt 368).
+	 *
+	 * @return void
+	 */
+	public function handle_save_industry_page_template_override(): void {
+		\AIOPageBuilder\Admin\Actions\Save_Industry_Page_Template_Override_Action::handle();
+	}
+
+	/**
+	 * Handles admin-post save of industry Build Plan item override (Prompt 369).
+	 *
+	 * @return void
+	 */
+	public function handle_save_industry_build_plan_override(): void {
+		\AIOPageBuilder\Admin\Actions\Save_Industry_Build_Plan_Override_Action::handle();
 	}
 
 	/**

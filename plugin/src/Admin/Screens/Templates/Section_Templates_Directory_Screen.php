@@ -13,7 +13,9 @@ namespace AIOPageBuilder\Admin\Screens\Templates;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Screens\Sections\Industry_Section_Library_Filter_Controller;
+use AIOPageBuilder\Domain\Industry\Overrides\Industry_Section_Override_Service;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Library_Read_Model_Builder;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Recommendation_Resolver;
 use AIOPageBuilder\Domain\Registries\Section\UI\Section_Template_Directory_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -66,6 +68,7 @@ final class Section_Templates_Directory_Screen {
 		);
 		$state = $state_builder->build_state( $request );
 		$state = $this->enrich_state_with_industry( $state, $request );
+		$state['industry_section_overrides_by_key'] = ( new Industry_Section_Override_Service() )->list_overrides();
 
 		$view = (string) ( $state['view'] ?? 'root' );
 		?>
@@ -303,6 +306,8 @@ final class Section_Templates_Directory_Screen {
 			echo '<p class="aio-admin-notice">' . \esc_html__( 'No sections match the current filters.', 'aio-page-builder' ) . '</p>';
 			return;
 		}
+		$industry_badges_by_key             = $state['industry_badges_by_key'] ?? array();
+		$industry_section_overrides_by_key  = $state['industry_section_overrides_by_key'] ?? array();
 		?>
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
@@ -343,6 +348,8 @@ final class Section_Templates_Directory_Screen {
 					$helper_url = ''; // * Helper-doc link: populated on detail screen when helper_doc_url resolver exists.
 					$in_compare = \in_array( $key, Template_Compare_Screen::get_compare_list( 'section' ), true );
 					$item_view = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
+					$section_override = isset( $industry_section_overrides_by_key[ $key ] ) && is_array( $industry_section_overrides_by_key[ $key ] ) ? $industry_section_overrides_by_key[ $key ] : null;
+					$show_use_anyway = $item_view !== null && $section_override === null && \in_array( $item_view->get_recommendation_status(), array( Industry_Section_Recommendation_Resolver::FIT_DISCOURAGED, Industry_Section_Recommendation_Resolver::FIT_ALLOWED_WEAK ), true );
 					?>
 					<tr>
 						<td><?php echo \esc_html( $name ); ?></td>
@@ -378,6 +385,18 @@ final class Section_Templates_Directory_Screen {
 								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'section', $key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 							<?php else : ?>
 								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'section', $key ) ); ?>"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
+							<?php endif; ?>
+							<?php if ( $section_override !== null ) : ?>
+								| <span class="aio-section-overridden" title="<?php echo \esc_attr( (string) ( $section_override['reason'] ?? '' ) ); ?>"><?php \esc_html_e( 'Overridden', 'aio-page-builder' ); ?></span>
+							<?php elseif ( $show_use_anyway ) : ?>
+								| <form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" class="aio-inline-form" style="display:inline;">
+									<input type="hidden" name="action" value="aio_save_industry_section_override" />
+									<?php \wp_nonce_field( \AIOPageBuilder\Admin\Actions\Save_Industry_Section_Override_Action::NONCE_ACTION, \AIOPageBuilder\Admin\Actions\Save_Industry_Section_Override_Action::NONCE_NAME ); ?>
+									<input type="hidden" name="section_key" value="<?php echo \esc_attr( $key ); ?>" />
+									<input type="hidden" name="state" value="accepted" />
+									<input type="hidden" name="_wp_http_referer" value="<?php echo \esc_attr( \wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ); ?>" />
+									<button type="submit" class="button-link"><?php \esc_html_e( 'Use anyway', 'aio-page-builder' ); ?></button>
+								</form>
 							<?php endif; ?>
 						</td>
 					</tr>

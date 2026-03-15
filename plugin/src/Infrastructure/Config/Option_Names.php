@@ -75,6 +75,15 @@ final class Option_Names {
 	/** Applied industry style preset (preset_key, label?, applied_at); for revert/display (industry-style-preset-application-contract). */
 	public const APPLIED_INDUSTRY_PRESET = self::PREFIX . 'applied_industry_preset';
 
+	/** Industry section overrides (section_key => override record per industry-override-contract; Prompts 367–369). */
+	public const INDUSTRY_SECTION_OVERRIDES = self::PREFIX . 'industry_section_overrides';
+
+	/** Industry page template overrides (template_key => override record). */
+	public const INDUSTRY_PAGE_TEMPLATE_OVERRIDES = self::PREFIX . 'industry_page_template_overrides';
+
+	/** Industry Build Plan item overrides (plan_id => item_id => override record). */
+	public const INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES = self::PREFIX . 'industry_build_plan_item_overrides';
+
 	/** @var array<string>|null */
 	private static ?array $all = null;
 
@@ -107,6 +116,9 @@ final class Option_Names {
 			self::ENTITY_STYLE_PAYLOADS,
 			self::STYLE_CACHE_VERSION,
 			self::APPLIED_INDUSTRY_PRESET,
+			self::INDUSTRY_SECTION_OVERRIDES,
+			self::INDUSTRY_PAGE_TEMPLATE_OVERRIDES,
+			self::INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES,
 		);
 		return self::$all;
 	}
