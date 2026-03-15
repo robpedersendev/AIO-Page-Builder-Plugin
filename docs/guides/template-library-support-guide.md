@@ -36,6 +36,7 @@ It **complements** the general [support-triage-guide.md](support-triage-guide.md
 | Form provider not registered / build blocked | New-page or replace using request-form (or form_embed template) fails with "Form provider X is not registered." | User must activate the provider plugin (e.g. NDR Form Manager) or choose a template without form sections. [form-provider-operator-guide.md](form-provider-operator-guide.md) §4; [form-provider-security-review.md](../qa/form-provider-security-review.md). |
 | Form section shortcode not rendering | form_id invalid or empty; or provider deactivated after page was built. | Validate form_id (letters, numbers, hyphens, underscores only); confirm provider plugin active. [form-provider-operator-guide.md](form-provider-operator-guide.md) §4. |
 | Styling not applying or missing after deinstall | Plugin CSS stops on deactivation; styling options removed on uninstall. Built page content/structure preserved. | Set expectation: plugin-owned styling is not retained after uninstall unless exported and restored. Theme can target same selectors (`.aio-page`, `.aio-s-*`, `--aio-*`) per [styling-portability-and-uninstall.md](styling-portability-and-uninstall.md). Do not promise exact look; document selector/token continuity only. |
+| ACF field groups gone after uninstall; values still in DB | Section ACF groups are runtime-only. Uninstall removes the plugin, so those groups are no longer registered. Saved values (post meta) are retained by default. | **Values** (content) remain; **editable field groups** disappear unless the operator ran the handoff before uninstall. See [acf-uninstall-preservation-operator-guide.md](acf-uninstall-preservation-operator-guide.md) and [acf-uninstall-preservation-verification.md](../qa/acf-uninstall-preservation-verification.md). Do not promise editor continuity without handoff. |
 | Styling save fails or validation errors | Invalid token/component key or prohibited value (e.g. url(, expression(, &lt;&gt;). | User must use only allowed tokens and safe values. Refer to [styling-security-checklist.md](../security/styling-security-checklist.md) for support-safe guidance; do not expose internal validation detail. |
 
 **Security:** Diagnostics must remain admin-internal. Do not expose secrets, raw API keys, or unredacted payloads. Template definitions in exports/support bundles are structure and content only; no credentials.
@@ -84,6 +85,7 @@ When triaging template issues, a **Support bundle** is usually sufficient to see
 - **Appendix:** Generated from live registry; no stored appendix to "migrate." Regeneration is implicit on next export or on-demand run.
 - **Theme/dependencies:** Supported environment per [compatibility-matrix.md](../qa/compatibility-matrix.md). LPagery optional (warning only). Do not promise behavior in unsupported environments.
 - **Styling (deactivation/uninstall):** Plugin CSS stops on deactivation; styling options are removed on uninstall. Built page content and structure are preserved. Theme override continuity and export/restore behavior: [styling-portability-and-uninstall.md](styling-portability-and-uninstall.md).
+- **ACF (uninstall):** Saved ACF field values are retained by default. Section field **groups** (the definitions that make fields editable in the editor) are runtime-only and disappear when the plugin is removed. To keep groups editable after uninstall, the operator must run the handoff before uninstall. See [acf-uninstall-preservation-operator-guide.md](acf-uninstall-preservation-operator-guide.md).
 
 Use this list to set expectations and avoid over-promising.
 
@@ -99,6 +101,7 @@ Use this list to set expectations and avoid over-promising.
 | Export modes and bundle structure | [export-bundle-structure-contract.md](../contracts/export-bundle-structure-contract.md) |
 | Compatibility and environment claims | [compatibility-matrix.md](../qa/compatibility-matrix.md) |
 | Styling lifecycle, uninstall, portability | [styling-portability-and-uninstall.md](styling-portability-and-uninstall.md) |
+| ACF uninstall preservation (values vs groups, handoff) | [acf-uninstall-preservation-operator-guide.md](acf-uninstall-preservation-operator-guide.md); [acf-uninstall-preservation-verification.md](../qa/acf-uninstall-preservation-verification.md) |
 | Security and redaction | [security-redaction-review.md](../qa/security-redaction-review.md) |
 
 ---

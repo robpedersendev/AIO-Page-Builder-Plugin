@@ -99,7 +99,7 @@ final class Privacy_Settings_State_Builder {
 	}
 
 	/**
-	 * @return array{choices: list<array>, prefs_summary: string, built_pages_message: string, template_library_lifecycle_summary?: array<string, mixed>}
+	 * @return array{choices: list<array>, prefs_summary: string, built_pages_message: string, acf_preservation_message: string, template_library_lifecycle_summary?: array<string, mixed>}
 	 */
 	private function build_uninstall_export_state(): array {
 		$choices = array(
@@ -129,10 +129,12 @@ final class Privacy_Settings_State_Builder {
 			? __( 'No uninstall preference saved. On uninstall you will be offered export choices.', 'aio-page-builder' )
 			: __( 'Uninstall/export preferences are stored. Use the Uninstall flow to export or remove plugin data.', 'aio-page-builder' );
 		$built_pages_message = __( 'Built pages (content created with the builder) will remain on your site. Only plugin-owned data (settings, templates, plans, logs) will be removed when you continue.', 'aio-page-builder' );
+		$acf_preservation_message = __( 'ACF field values (section content) are retained. To keep section field groups editable in the editor after uninstall, run the handoff before uninstall. See the ACF Uninstall Preservation operator guide.', 'aio-page-builder' );
 		$out = array(
-			'choices'             => $choices,
-			'prefs_summary'        => $prefs_summary,
-			'built_pages_message'  => $built_pages_message,
+			'choices'                 => $choices,
+			'prefs_summary'            => $prefs_summary,
+			'built_pages_message'      => $built_pages_message,
+			'acf_preservation_message' => $acf_preservation_message,
 		);
 		if ( $this->container !== null && $this->container->has( 'template_library_lifecycle_summary_builder' ) ) {
 			$builder = $this->container->get( 'template_library_lifecycle_summary_builder' );

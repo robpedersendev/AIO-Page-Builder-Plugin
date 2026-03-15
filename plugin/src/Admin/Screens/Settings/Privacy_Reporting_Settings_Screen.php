@@ -73,6 +73,9 @@ final class Privacy_Reporting_Settings_Screen {
 				<h2 id="aio-uninstall-heading"><?php \esc_html_e( 'Uninstall / export behavior', 'aio-page-builder' ); ?></h2>
 				<p><?php echo \esc_html( $state['uninstall_export_state']['prefs_summary'] ); ?></p>
 				<p><?php echo \esc_html( $state['uninstall_export_state']['built_pages_message'] ); ?></p>
+				<?php if ( ! empty( $state['uninstall_export_state']['acf_preservation_message'] ) ) : ?>
+					<p class="description"><?php echo \esc_html( $state['uninstall_export_state']['acf_preservation_message'] ); ?></p>
+				<?php endif; ?>
 				<p><?php \esc_html_e( 'Uninstall choices:', 'aio-page-builder' ); ?></p>
 				<ul>
 					<?php foreach ( $state['uninstall_export_state']['choices'] as $choice ) : ?>

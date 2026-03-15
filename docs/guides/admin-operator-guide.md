@@ -107,7 +107,8 @@ All displayed data is from redacted or non-secret sources; no raw payloads or se
 
 **Uninstall/export behavior:**  
 - Built pages (content created with the builder) remain on the site. Only plugin-owned data (settings, templates, plans, logs) is removed when you continue.  
-- Uninstall choices: **Export full backup** (download full backup ZIP, then remove plugin data; built pages remain), **Export settings and profile only** (reduced bundle; built pages remain), **Skip export and continue** (remove plugin data; built pages remain), **Cancel uninstall**.
+- Uninstall choices: **Export full backup** (download full backup ZIP, then remove plugin data; built pages remain), **Export settings and profile only** (reduced bundle; built pages remain), **Skip export and continue** (remove plugin data; built pages remain), **Cancel uninstall**.  
+- **ACF:** Saved field values are retained. To keep section field groups editable after uninstall, run the handoff before uninstall; see [acf-uninstall-preservation-operator-guide.md](acf-uninstall-preservation-operator-guide.md).
 
 Disclosure and privacy-policy helper text are shown on this screen; use them in admin-facing documentation and help content.
 
@@ -145,6 +146,7 @@ Support bundle and other modes are defined in the export-bundle-structure contra
 | Template library support and diagnostics | [template-library-support-guide.md](template-library-support-guide.md) |
 | Reporting disclosure wording | Privacy, Reporting & Settings |
 | Uninstall choices and built-page survivability | Privacy, Reporting & Settings; [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md) |
+| ACF uninstall preservation (values vs groups, handoff) | [acf-uninstall-preservation-operator-guide.md](acf-uninstall-preservation-operator-guide.md); [acf-uninstall-preservation-verification.md](../qa/acf-uninstall-preservation-verification.md) |
 | Export modes and bundle structure | Import / Export screen; [export-bundle-structure-contract.md](../contracts/export-bundle-structure-contract.md) |
 | Admin screen list and capabilities | [admin-screen-inventory.md](../contracts/admin-screen-inventory.md) |
 | Reporting exception and payload rules | [REPORTING_EXCEPTION.md](../standards/REPORTING_EXCEPTION.md) |
