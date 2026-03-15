@@ -23,6 +23,7 @@ Evidence-based release gate for the ACF conditional-registration performance ret
 | Benchmark protocol | [acf-registration-benchmark-protocol.md](../qa/acf-registration-benchmark-protocol.md) |
 | Support runbook | [acf-conditional-registration-support-runbook.md](../operations/acf-conditional-registration-support-runbook.md) |
 | Rollback playbook | [acf-conditional-registration-rollback-playbook.md](../operations/acf-conditional-registration-rollback-playbook.md) |
+| Regression guard (Prompt 307) | [acf-registration-regression-guard.md](../qa/acf-registration-regression-guard.md) |
 | Contract | [acf-conditional-registration-contract.md](../contracts/acf-conditional-registration-contract.md) |
 
 ---
@@ -37,6 +38,7 @@ Evidence-based release gate for the ACF conditional-registration performance ret
 - [ ] **Assignment map**: Authority and semantics preserved; section-key cache invalidates on assignment, template, and composition change (see cache invalidation matrix).
 - [ ] **Diagnostics**: Bounded; admin/support only; no sensitive data (see diagnostics checklist).
 - [ ] **Support/rollback**: Support runbook and rollback playbook in place; release/support docs reflect conditional-registration behavior.
+- [ ] **Regression guards**: ACF_Registration_Regression_Guard_Test and bootstrap controller tests pass; no register_all() on generic request paths (see acf-registration-regression-guard.md).
 
 ---
 

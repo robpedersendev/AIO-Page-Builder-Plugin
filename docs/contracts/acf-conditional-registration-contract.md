@@ -191,7 +191,15 @@ The following must be preserved by the retrofit and all downstream implementatio
 
 ---
 
-## 12. Security and permissions
+## 12. Legacy pages and incomplete assignment (Prompt 309)
+
+- Pages with **no or incomplete assignment map** data: `get_visible_groups_for_page()` may return empty or only what can be derived from stored template/composition refs. Section keys then empty → **zero groups** registered. No silent fallback to full registration.
+- **Safe fallback**: Register no groups when section keys cannot be resolved; edit screen may show no section groups until assignment is (re)applied. Field values (post meta) are unchanged.
+- **Repair**: Use assign_from_template or assign_from_composition to backfill assignment (admin-only). See docs/qa/acf-legacy-assignment-verification.md and docs/operations/acf-legacy-page-repair-guide.md.
+
+---
+
+## 13. Security and permissions
 
 - Selective registration must **not** expose groups in unauthorized contexts (e.g. no admin-only groups on front-end).
 - No public request parameter (e.g. query arg, cookie) may be used to force full or arbitrary ACF registration.
@@ -199,7 +207,7 @@ The following must be preserved by the retrofit and all downstream implementatio
 
 ---
 
-## 13. Cross-references
+## 14. Cross-references
 
 - **acf-page-visibility-contract.md**: Page-level assignment derivation; expanded by this contract for conditional registration.
 - **large-scale-acf-lpagery-binding-contract.md**: §6.2–6.3 registration scaling, performance, derivation from section list.
@@ -209,11 +217,12 @@ The following must be preserved by the retrofit and all downstream implementatio
 - **acf-preview-registration-behavior.md**: Preview and iframe registration behavior (Prompt 298).
 - **acf-secondary-admin-request-matrix.md**: Autosave, revision, quick-edit, bulk-edit guards (Prompt 299).
 - **acf-local-json-coexistence.md**: ACF local JSON and sync coexistence (Prompt 306).
+- **acf-legacy-assignment-verification.md**, **acf-legacy-page-repair-guide.md**: Legacy/incomplete assignment (Prompt 309).
 - **docs/qa/acf-registration-performance-impact-analysis.md**: Impact analysis and verification checklist.
 
 ---
 
-## 14. Revision history
+## 15. Revision history
 
 | Version | Date | Change |
 |---------|------|--------|
@@ -222,3 +231,4 @@ The following must be preserved by the retrofit and all downstream implementatio
 | 3 | Prompt 303 | §9 Multisite and site-level isolation; cache and diagnostics site scoping. |
 | 4 | Prompt 305 | §10 Third-party admin compatibility; fail-safe resolver guards. |
 | 5 | Prompt 306 | §11 ACF local JSON/sync coexistence; acf-local-json-coexistence.md. |
+| 6 | Prompt 309 | §12 Legacy pages and incomplete assignment; verification and repair guides. |

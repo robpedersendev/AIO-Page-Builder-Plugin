@@ -24,6 +24,7 @@ use AIOPageBuilder\Domain\ACF\Registration\ACF_Registration_Benchmark_Service;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Registration_Diagnostics_Service;
 use AIOPageBuilder\Domain\ACF\Registration\Page_Section_Key_Cache_Service;
 use AIOPageBuilder\Domain\ACF\Registration\Registration_Request_Context;
+use AIOPageBuilder\Domain\ACF\Registration\Scoped_Registration_Inspection_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
@@ -81,6 +82,14 @@ final class ACF_Registration_Provider implements Service_Provider_Interface {
 		} );
 		$container->register( 'admin_post_edit_context_resolver', function (): Admin_Post_Edit_Context_Resolver {
 			return new Admin_Post_Edit_Context_Resolver();
+		} );
+		$container->register( 'scoped_registration_inspection_service', function () use ( $container ): Scoped_Registration_Inspection_Service {
+			return new Scoped_Registration_Inspection_Service(
+				$container->get( 'page_field_group_assignment_service' ),
+				$container->get( 'acf_group_key_section_key_resolver' ),
+				$container->get( 'field_group_derivation_service' ),
+				$container->has( 'page_section_key_cache_service' ) ? $container->get( 'page_section_key_cache_service' ) : null
+			);
 		} );
 		$container->register( 'acf_registration_bootstrap_controller', function () use ( $container ): ACF_Registration_Bootstrap_Controller {
 			return new ACF_Registration_Bootstrap_Controller(
