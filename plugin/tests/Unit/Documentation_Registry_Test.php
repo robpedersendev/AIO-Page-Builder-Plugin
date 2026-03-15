@@ -1,7 +1,7 @@
 <?php
 /**
  * Unit tests for Documentation Registry and section helper coverage (Prompts 261–270).
- * Verifies Hero, CTA, Proof, Legal/Policy, Process/FAQ, Feature/Benefit, Media/Listing/Profile, Gap-Closing, Contact/Form/Conversion, and Pricing/Offer section helpers, and page_template_one_pager resolution (Prompts 271–273).
+ * Verifies Hero, CTA, Proof, Legal/Policy, Process/FAQ, Feature/Benefit, Media/Listing/Profile, Gap-Closing, Contact/Form/Conversion, and Pricing/Offer section helpers, and page_template_one_pager resolution (Prompts 271–276).
  *
  * @package AIOPageBuilder
  */
@@ -340,6 +340,64 @@ final class Documentation_Registry_Test extends TestCase {
 		foreach ( $keys as $page_template_key ) {
 			$doc = $registry->get_by_page_template_key( $page_template_key );
 			$this->assertNotNull( $doc, "Contact template {$page_template_key} must have a one-pager doc." );
+			$this->assertSame( 'doc-onepager-' . $page_template_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
+			$this->assertSame( Documentation_Schema::TYPE_PAGE_TEMPLATE_ONE_PAGER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $page_template_key, $ref[ Documentation_Schema::SOURCE_PAGE_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Top-Level FAQ/Help page template has a page_template_one_pager loadable by page_template_key (Prompt 274).
+	 */
+	public function test_every_top_level_faq_help_template_has_one_pager(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = array( 'pt_faq_support_01', 'pt_faq_category_01' );
+		foreach ( $keys as $page_template_key ) {
+			$doc = $registry->get_by_page_template_key( $page_template_key );
+			$this->assertNotNull( $doc, "FAQ/Help template {$page_template_key} must have a one-pager doc." );
+			$this->assertSame( 'doc-onepager-' . $page_template_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
+			$this->assertSame( Documentation_Schema::TYPE_PAGE_TEMPLATE_ONE_PAGER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $page_template_key, $ref[ Documentation_Schema::SOURCE_PAGE_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Top-Level Legal/Policy page template has a page_template_one_pager loadable by page_template_key (Prompt 275).
+	 */
+	public function test_every_top_level_legal_policy_template_has_one_pager(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = array(
+			'pt_privacy_overview_01', 'pt_privacy_detail_01', 'pt_terms_overview_01', 'pt_terms_structure_01',
+			'pt_accessibility_commitment_01', 'pt_accessibility_help_01', 'pt_support_help_01', 'pt_support_escalation_01',
+			'pt_contact_utility_01', 'pt_disclosure_utility_01', 'pt_trust_disclosure_01', 'pt_utility_legal_01',
+		);
+		foreach ( $keys as $page_template_key ) {
+			$doc = $registry->get_by_page_template_key( $page_template_key );
+			$this->assertNotNull( $doc, "Legal/Policy template {$page_template_key} must have a one-pager doc." );
+			$this->assertSame( 'doc-onepager-' . $page_template_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
+			$this->assertSame( Documentation_Schema::TYPE_PAGE_TEMPLATE_ONE_PAGER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $page_template_key, $ref[ Documentation_Schema::SOURCE_PAGE_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Services hub page template has a page_template_one_pager loadable by page_template_key (Prompt 276).
+	 */
+	public function test_every_hub_services_template_has_one_pager(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = array( 'hub_services_proof_01', 'hub_services_listing_01', 'hub_services_conversion_01' );
+		foreach ( $keys as $page_template_key ) {
+			$doc = $registry->get_by_page_template_key( $page_template_key );
+			$this->assertNotNull( $doc, "Hub Services template {$page_template_key} must have a one-pager doc." );
 			$this->assertSame( 'doc-onepager-' . $page_template_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
 			$this->assertSame( Documentation_Schema::TYPE_PAGE_TEMPLATE_ONE_PAGER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
 			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
