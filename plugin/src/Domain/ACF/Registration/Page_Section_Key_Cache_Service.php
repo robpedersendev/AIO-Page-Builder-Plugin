@@ -195,4 +195,13 @@ final class Page_Section_Key_Cache_Service {
 	public function listen_for_assignment_changes(): void {
 		\add_action( 'aio_acf_assignment_changed', array( $this, 'invalidate_for_page' ), 10, 1 );
 	}
+
+	/**
+	 * Hooks into template/composition definition saves to invalidate derived section-key caches (Prompt 300).
+	 * Call from bootstrap or provider together with listen_for_assignment_changes.
+	 */
+	public function listen_for_definition_changes(): void {
+		\add_action( 'aio_page_template_definition_saved', array( $this, 'invalidate_for_template' ), 10, 1 );
+		\add_action( 'aio_composition_definition_saved', array( $this, 'invalidate_for_composition' ), 10, 1 );
+	}
 }

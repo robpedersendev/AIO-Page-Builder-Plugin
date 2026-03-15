@@ -77,4 +77,28 @@ final class Page_Section_Key_Cache_Service_Test extends TestCase {
 		$this->cache->invalidate_for_composition( 'comp_2' );
 		$this->assertNull( $this->cache->get_for_composition( 'comp_2' ) );
 	}
+
+	/** Prompt 300: assignment change hook invalidates page cache. */
+	public function test_assignment_changed_hook_invalidates_page_cache(): void {
+		$this->cache->set_for_page( 99, array( 'st_hero' ) );
+		$this->cache->listen_for_assignment_changes();
+		do_action( 'aio_acf_assignment_changed', 99 );
+		$this->assertNull( $this->cache->get_for_page( 99 ) );
+	}
+
+	/** Prompt 300: template definition saved hook invalidates template cache. */
+	public function test_template_definition_saved_hook_invalidates_template_cache(): void {
+		$this->cache->set_for_template( 'pt_test', array( 'st_hero' ) );
+		$this->cache->listen_for_definition_changes();
+		do_action( 'aio_page_template_definition_saved', 'pt_test' );
+		$this->assertNull( $this->cache->get_for_template( 'pt_test' ) );
+	}
+
+	/** Prompt 300: composition definition saved hook invalidates composition cache. */
+	public function test_composition_definition_saved_hook_invalidates_composition_cache(): void {
+		$this->cache->set_for_composition( 'comp_test', array( 'st_cta' ) );
+		$this->cache->listen_for_definition_changes();
+		do_action( 'aio_composition_definition_saved', 'comp_test' );
+		$this->assertNull( $this->cache->get_for_composition( 'comp_test' ) );
+	}
 }

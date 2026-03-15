@@ -62,6 +62,9 @@ final class Page_Template_Repository extends Abstract_CPT_Repository implements 
 			return 0;
 		}
 		\update_post_meta( $id, self::META_DEFINITION, $json );
+		if ( $key !== '' ) {
+			do_action( 'aio_page_template_definition_saved', $key );
+		}
 		return $id;
 	}
 

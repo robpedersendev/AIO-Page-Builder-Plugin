@@ -19,6 +19,10 @@ Evidence-based release gate for the ACF conditional-registration performance ret
 | Bulk-load elimination | [acf-blueprint-bulk-load-elimination-report.md](../qa/acf-blueprint-bulk-load-elimination-report.md) |
 | Acceptance report | [acf-conditional-registration-acceptance-report.md](../qa/acf-conditional-registration-acceptance-report.md) |
 | Diagnostics checklist | [acf-conditional-registration-diagnostics-checklist.md](../qa/acf-conditional-registration-diagnostics-checklist.md) |
+| Cache invalidation matrix | [acf-registration-cache-invalidation-matrix.md](../contracts/acf-registration-cache-invalidation-matrix.md) |
+| Benchmark protocol | [acf-registration-benchmark-protocol.md](../qa/acf-registration-benchmark-protocol.md) |
+| Support runbook | [acf-conditional-registration-support-runbook.md](../operations/acf-conditional-registration-support-runbook.md) |
+| Rollback playbook | [acf-conditional-registration-rollback-playbook.md](../operations/acf-conditional-registration-rollback-playbook.md) |
 | Contract | [acf-conditional-registration-contract.md](../contracts/acf-conditional-registration-contract.md) |
 
 ---
@@ -30,8 +34,9 @@ Evidence-based release gate for the ACF conditional-registration performance ret
 - [ ] **New-page template/composition**: Verified that new-page edit with template/composition chosen registers only those sections; without choice, no groups.
 - [ ] **Non-page admin**: Verified that non-page admin (e.g. Dashboard) does not trigger full registration; zero groups.
 - [ ] **Field values / LPagery**: No contract drift; field values and LPagery tokens/behavior unchanged.
-- [ ] **Assignment map**: Authority and semantics preserved; section-key cache invalidates on assignment change.
+- [ ] **Assignment map**: Authority and semantics preserved; section-key cache invalidates on assignment, template, and composition change (see cache invalidation matrix).
 - [ ] **Diagnostics**: Bounded; admin/support only; no sensitive data (see diagnostics checklist).
+- [ ] **Support/rollback**: Support runbook and rollback playbook in place; release/support docs reflect conditional-registration behavior.
 
 ---
 
@@ -40,7 +45,7 @@ Evidence-based release gate for the ACF conditional-registration performance ret
 | Risk | Mitigation |
 |------|------------|
 | Stale section-key cache | Cache invalidated on `aio_acf_assignment_changed`; on miss or invalid data, resolvers fall back to assignment-map/derivation. Correctness over speed. |
-| Template/composition cache | Template/composition-keyed cache TTL-bound; invalidation hooks can be added where definitions are saved if needed. |
+| Template/composition cache | Template/composition-keyed cache invalidated on `aio_page_template_definition_saved` and `aio_composition_definition_saved` (see cache invalidation matrix). |
 | Full-registration in tooling | Explicit `run_full_registration()` only for tooling (e.g. export/repair); not called from acf/init. |
 
 ---

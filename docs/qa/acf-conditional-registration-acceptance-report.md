@@ -41,7 +41,7 @@ Verify that the heavy-load regression (full ACF registration on every request) i
 | Admin page edit | Same bulk path as front-end | Scoped: assignment map + group_key→section_key; optional cache. |
 | Non-page admin | Same bulk path | No registration (0 groups). |
 
-Evidence: [acf-blueprint-bulk-load-elimination-report.md](acf-blueprint-bulk-load-elimination-report.md), [acf-registration-performance-impact-analysis.md](acf-registration-performance-impact-analysis.md).
+Evidence: [acf-blueprint-bulk-load-elimination-report.md](acf-blueprint-bulk-load-elimination-report.md), [acf-registration-performance-impact-analysis.md](acf-registration-performance-impact-analysis.md). Benchmark: [acf-registration-benchmark-protocol.md](acf-registration-benchmark-protocol.md).
 
 ---
 

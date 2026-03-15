@@ -62,6 +62,9 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 			return 0;
 		}
 		\update_post_meta( $id, self::META_DEFINITION, $json );
+		if ( $comp_id !== '' ) {
+			do_action( 'aio_composition_definition_saved', $comp_id );
+		}
 		return $id;
 	}
 

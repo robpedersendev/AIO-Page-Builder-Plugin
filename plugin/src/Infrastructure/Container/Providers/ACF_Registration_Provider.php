@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\ACF\Registration\Admin_Post_Edit_Context_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\Existing_Page_ACF_Registration_Context_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\Group_Key_Section_Key_Resolver;
 use AIOPageBuilder\Domain\ACF\Registration\New_Page_ACF_Registration_Context_Resolver;
+use AIOPageBuilder\Domain\ACF\Registration\ACF_Registration_Benchmark_Service;
 use AIOPageBuilder\Domain\ACF\Registration\ACF_Registration_Diagnostics_Service;
 use AIOPageBuilder\Domain\ACF\Registration\Page_Section_Key_Cache_Service;
 use AIOPageBuilder\Domain\ACF\Registration\Registration_Request_Context;
@@ -59,6 +60,9 @@ final class ACF_Registration_Provider implements Service_Provider_Interface {
 		$container->register( 'acf_registration_diagnostics_service', function (): ACF_Registration_Diagnostics_Service {
 			return new ACF_Registration_Diagnostics_Service();
 		} );
+		$container->register( 'acf_registration_benchmark_service', function () use ( $container ): ACF_Registration_Benchmark_Service {
+			return new ACF_Registration_Benchmark_Service( $container->get( 'acf_registration_diagnostics_service' ) );
+		} );
 		$container->register( 'acf_existing_page_registration_context_resolver', function () use ( $container ): Existing_Page_ACF_Registration_Context_Resolver {
 			return new Existing_Page_ACF_Registration_Context_Resolver(
 				$container->get( 'page_field_group_assignment_service' ),
@@ -93,7 +97,9 @@ final class ACF_Registration_Provider implements Service_Provider_Interface {
 		// acf/init priority 5: scoped registration runs before ACF builds field-group list for edit screens (see docs/qa/acf-registration-hook-timing-report.md).
 		add_action( 'acf/init', function () use ( $container ): void {
 			if ( $container->has( 'page_section_key_cache_service' ) ) {
-				$container->get( 'page_section_key_cache_service' )->listen_for_assignment_changes();
+				$cache = $container->get( 'page_section_key_cache_service' );
+				$cache->listen_for_assignment_changes();
+				$cache->listen_for_definition_changes();
 			}
 			if ( $container->has( 'acf_registration_bootstrap_controller' ) ) {
 				$container->get( 'acf_registration_bootstrap_controller' )->run_registration();
