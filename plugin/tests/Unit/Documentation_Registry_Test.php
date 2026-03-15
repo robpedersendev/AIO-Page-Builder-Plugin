@@ -1,7 +1,7 @@
 <?php
 /**
- * Unit tests for Documentation Registry and section helper coverage (Prompts 261–265).
- * Verifies every Hero, CTA, Proof, Legal/Policy, and Process/FAQ section has a schema-compliant helper doc and registry resolution by section key.
+ * Unit tests for Documentation Registry and section helper coverage (Prompts 261–268).
+ * Verifies every Hero, CTA, Proof, Legal/Policy, Process/FAQ, Feature/Benefit, Media/Listing/Profile, and Gap-Closing section has a schema-compliant helper doc and registry resolution by section key.
  *
  * @package AIOPageBuilder
  */
@@ -12,8 +12,11 @@ use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Loader;
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\Section\CtaSuperLibraryBatch\CTA_Super_Library_Batch_Definitions;
+use AIOPageBuilder\Domain\Registries\Section\FeatureBenefitBatch\Feature_Benefit_Value_Library_Batch_Definitions;
+use AIOPageBuilder\Domain\Registries\Section\GapClosingSuperBatch\Section_Gap_Closing_Super_Batch_Definitions;
 use AIOPageBuilder\Domain\Registries\Section\HeroBatch\Hero_Intro_Library_Batch_Definitions;
 use AIOPageBuilder\Domain\Registries\Section\LegalPolicyUtilityBatch\Legal_Policy_Utility_Library_Batch_Definitions;
+use AIOPageBuilder\Domain\Registries\Section\MediaListingProfileBatch\Media_Listing_Profile_Detail_Library_Batch_Definitions;
 use AIOPageBuilder\Domain\Registries\Section\ProcessTimelineFaqBatch\Process_Timeline_FAQ_Library_Batch_Definitions;
 use AIOPageBuilder\Domain\Registries\Section\TrustProofBatch\Trust_Proof_Library_Batch_Definitions;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +32,9 @@ require_once $plugin_root . '/src/Domain/Registries/Section/CtaSuperLibraryBatch
 require_once $plugin_root . '/src/Domain/Registries/Section/TrustProofBatch/Trust_Proof_Library_Batch_Definitions.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/LegalPolicyUtilityBatch/Legal_Policy_Utility_Library_Batch_Definitions.php';
 require_once $plugin_root . '/src/Domain/Registries/Section/ProcessTimelineFaqBatch/Process_Timeline_FAQ_Library_Batch_Definitions.php';
+require_once $plugin_root . '/src/Domain/Registries/Section/FeatureBenefitBatch/Feature_Benefit_Value_Library_Batch_Definitions.php';
+require_once $plugin_root . '/src/Domain/Registries/Section/MediaListingProfileBatch/Media_Listing_Profile_Detail_Library_Batch_Definitions.php';
+require_once $plugin_root . '/src/Domain/Registries/Section/GapClosingSuperBatch/Section_Gap_Closing_Super_Batch_Definitions.php';
 
 final class Documentation_Registry_Test extends TestCase {
 
@@ -122,6 +128,60 @@ final class Documentation_Registry_Test extends TestCase {
 		foreach ( $keys as $section_key ) {
 			$doc = $registry->get_by_section_key( $section_key );
 			$this->assertNotNull( $doc, "Process/FAQ section {$section_key} must have a helper doc." );
+			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '', "documentation_id must be doc-helper-{$section_key}" );
+			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $section_key, $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Feature/Benefit batch section has a section_helper doc loadable by section key.
+	 */
+	public function test_every_feature_benefit_section_has_helper_doc(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = Feature_Benefit_Value_Library_Batch_Definitions::section_keys();
+		foreach ( $keys as $section_key ) {
+			$doc = $registry->get_by_section_key( $section_key );
+			$this->assertNotNull( $doc, "Feature/Benefit section {$section_key} must have a helper doc." );
+			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '', "documentation_id must be doc-helper-{$section_key}" );
+			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $section_key, $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Media/Listing/Profile batch section has a section_helper doc loadable by section key.
+	 */
+	public function test_every_media_listing_profile_section_has_helper_doc(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = Media_Listing_Profile_Detail_Library_Batch_Definitions::section_keys();
+		foreach ( $keys as $section_key ) {
+			$doc = $registry->get_by_section_key( $section_key );
+			$this->assertNotNull( $doc, "Media/Listing/Profile section {$section_key} must have a helper doc." );
+			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '', "documentation_id must be doc-helper-{$section_key}" );
+			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
+			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
+			$this->assertIsArray( $ref );
+			$this->assertSame( $section_key, $ref[ Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY ] ?? '' );
+		}
+	}
+
+	/**
+	 * Every Gap-Closing batch section has a section_helper doc loadable by section key.
+	 */
+	public function test_every_gap_closing_section_has_helper_doc(): void {
+		$loader   = new Documentation_Loader( self::$docs_base_path );
+		$registry = new Documentation_Registry( $loader );
+		$keys     = Section_Gap_Closing_Super_Batch_Definitions::section_keys();
+		foreach ( $keys as $section_key ) {
+			$doc = $registry->get_by_section_key( $section_key );
+			$this->assertNotNull( $doc, "Gap-Closing section {$section_key} must have a helper doc." );
 			$this->assertSame( 'doc-helper-' . $section_key, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '', "documentation_id must be doc-helper-{$section_key}" );
 			$this->assertSame( Documentation_Schema::TYPE_SECTION_HELPER, $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' );
 			$ref = $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] ?? array();
