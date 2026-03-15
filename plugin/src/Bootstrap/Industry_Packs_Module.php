@@ -73,5 +73,27 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				: null;
 			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Prompt_Pack_Overlay_Service( $pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null );
 		} );
+		$container->register( 'industry_style_preset_registry', function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry();
+			$registry->load( array() );
+			return $registry;
+		} );
+		$container->register( 'industry_style_preset_application_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service {
+			$preset_registry = $container->has( 'industry_style_preset_registry' ) ? $container->get( 'industry_style_preset_registry' ) : null;
+			$style_repo      = $container->has( 'global_style_settings_repository' ) ? $container->get( 'global_style_settings_repository' ) : null;
+			$token_registry  = $container->has( 'style_token_registry' ) ? $container->get( 'style_token_registry' ) : null;
+			if ( $preset_registry === null || $style_repo === null ) {
+				return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service(
+					new \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry(),
+					$style_repo ?? new \AIOPageBuilder\Domain\Styling\Global_Style_Settings_Repository(),
+					$token_registry instanceof \AIOPageBuilder\Domain\Styling\Style_Token_Registry ? $token_registry : null
+				);
+			}
+			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service(
+				$preset_registry,
+				$style_repo,
+				$token_registry instanceof \AIOPageBuilder\Domain\Styling\Style_Token_Registry ? $token_registry : null
+			);
+		} );
 	}
 }

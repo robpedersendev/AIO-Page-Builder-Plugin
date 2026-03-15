@@ -36,7 +36,7 @@ Build Plan **items** (per Build_Plan_Item_Schema) gain optional payload or item-
 | **industry_warning_flags** | array | Warnings (e.g. cta_mismatch, discouraged_for_industry). |
 
 - Stored in item **payload** for new_page and existing_page_change items so UI and explanations can surface them. Other item types may omit industry metadata.
-- Plan-level: optional **industry_warnings** array in plan definition (e.g. "Required page family X not present") when Industry_Page_Family_Rule_Engine is used (Prompt 346).
+- Plan-level: optional **industry_warnings** array in plan definition (e.g. "Required page family X not present") when Industry_Page_Family_Rule_Engine is used (Prompt 346). LPagery planning warnings (e.g. required_tokens_for_central_lpagery, weak_fit_local_page) may be merged from Industry_LPagery_Planning_Advisor when present.
 
 ---
 
@@ -44,7 +44,7 @@ Build Plan **items** (per Build_Plan_Item_Schema) gain optional payload or item-
 
 - **Page template recommendations**: For each new_page and existing_page_change record with template_key (or target_template_key), resolve industry fit via Industry_Page_Template_Recommendation_Resolver; attach industry_source_refs, explanation_reasons, score, warning_flags to the record. Optionally reorder new_pages by fit (recommended first, then weak, then neutral, then discouraged).
 - **Section recommendations**: Where section_guidance or section keys are present, Industry_Section_Recommendation_Resolver can score section combinations; result reasons and flags may be merged into item metadata or plan-level warnings.
-- **CTA and LPagery**: CTA pattern preferences and LPagery posture from industry pack or planner input inform scoring; hierarchy_fit and lpagery_fit from page resolver are included in recommendation_reasons or explanation.
+- **CTA and LPagery**: CTA pattern preferences and LPagery posture from industry pack or planner input inform scoring; hierarchy_fit and lpagery_fit from page resolver are included in recommendation_reasons or explanation. **Industry_LPagery_Planning_Advisor** (industry-lpagery-planning-contract.md) may be consulted to attach plan-level LPagery guidance, required-token warnings, and weak-page cautions without mutating LPagery binding.
 - **Missing profile**: If industry profile is missing, minimal, or invalid, return normalized output unchanged; no throw. Downstream generation proceeds with no industry metadata.
 
 ---

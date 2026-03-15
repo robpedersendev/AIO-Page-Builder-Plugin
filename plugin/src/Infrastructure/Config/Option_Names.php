@@ -72,6 +72,9 @@ final class Option_Names {
 	/** Style cache version marker; plugin-owned, removed on uninstall. */
 	public const STYLE_CACHE_VERSION = 'aio_style_cache_version';
 
+	/** Applied industry style preset (preset_key, label?, applied_at); for revert/display (industry-style-preset-application-contract). */
+	public const APPLIED_INDUSTRY_PRESET = self::PREFIX . 'applied_industry_preset';
+
 	/** @var array<string>|null */
 	private static ?array $all = null;
 
@@ -103,6 +106,7 @@ final class Option_Names {
 			self::GLOBAL_STYLE_SETTINGS,
 			self::ENTITY_STYLE_PAYLOADS,
 			self::STYLE_CACHE_VERSION,
+			self::APPLIED_INDUSTRY_PRESET,
 		);
 		return self::$all;
 	}

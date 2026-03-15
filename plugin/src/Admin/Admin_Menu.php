@@ -36,6 +36,7 @@ use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
 use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Style_Preset_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Component_Override_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
@@ -114,6 +115,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_seed_child_detail_profile_entity_templates', array( $this, 'handle_seed_child_detail_profile_entity_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_child_detail_variant_expansion_templates', array( $this, 'handle_seed_child_detail_variant_expansion_templates' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_profile', array( $this, 'handle_save_industry_profile' ), 10 );
+		\add_action( 'admin_post_aio_apply_industry_style_preset', array( $this, 'handle_apply_industry_style_preset' ), 10 );
 
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
@@ -138,7 +140,8 @@ final class Admin_Menu {
 		$support_triage     = new Support_Triage_Dashboard_Screen( $this->container );
 		$post_release_health = new Post_Release_Health_Screen( $this->container );
 		$privacy_reporting   = new Privacy_Reporting_Settings_Screen( $this->container );
-		$industry_profile    = new Industry_Profile_Settings_Screen( $this->container );
+		$industry_profile     = new Industry_Profile_Settings_Screen( $this->container );
+		$industry_style_preset = new Industry_Style_Preset_Screen( $this->container );
 		$global_style_tokens = new Global_Style_Token_Settings_Screen( $this->container );
 		$global_component_overrides = new Global_Component_Override_Settings_Screen( $this->container );
 		$import_export       = new Import_Export_Screen( $this->container );
@@ -382,6 +385,15 @@ final class Admin_Menu {
 
 		add_submenu_page(
 			self::PARENT_SLUG,
+			$industry_style_preset->get_title(),
+			__( 'Industry Style Preset', 'aio-page-builder' ),
+			$industry_style_preset->get_capability(),
+			Industry_Style_Preset_Screen::SLUG,
+			array( $industry_style_preset, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
 			$global_style_tokens->get_title(),
 			__( 'Global Style Tokens', 'aio-page-builder' ),
 			$global_style_tokens->get_capability(),
@@ -480,6 +492,48 @@ final class Admin_Menu {
 		}
 		$repo->merge_profile( $partial );
 		\wp_safe_redirect( $redirect_url . '&aio_industry_result=saved' );
+		exit;
+	}
+
+	/**
+	 * Handles admin-post apply of Industry Style Preset (industry-style-preset-application-contract).
+	 * Verifies nonce and capability; applies preset via Industry_Style_Preset_Application_Service; redirects back to Industry Style Preset screen.
+	 *
+	 * @return void
+	 */
+	public function handle_apply_industry_style_preset(): void {
+		$redirect_url = \admin_url( 'admin.php?page=' . Industry_Style_Preset_Screen::SLUG );
+		if ( ! isset( $_POST['aio_industry_style_preset_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_style_preset_nonce'] ) ), 'aio_apply_industry_style_preset' ) ) {
+			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
+			exit;
+		}
+		if ( ! $this->container instanceof Service_Container ) {
+			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
+			exit;
+		}
+		$preset_key = isset( $_POST['preset_key'] ) && is_string( $_POST['preset_key'] )
+			? trim( \sanitize_text_field( \wp_unslash( $_POST['preset_key'] ) ) )
+			: '';
+		if ( $preset_key === '' ) {
+			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
+			exit;
+		}
+		if ( ! $this->container->has( 'industry_style_preset_application_service' ) ) {
+			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
+			exit;
+		}
+		$service = $this->container->get( 'industry_style_preset_application_service' );
+		if ( ! $service instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service ) {
+			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
+			exit;
+		}
+		$applied = $service->apply_preset( $preset_key );
+		\wp_safe_redirect( $redirect_url . ( $applied ? '&aio_style_preset_msg=applied' : '&aio_style_preset_msg=error' ) );
 		exit;
 	}
 
