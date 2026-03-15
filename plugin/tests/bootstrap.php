@@ -441,6 +441,18 @@ if ( ! function_exists( 'wp_create_nonce' ) ) {
 		return 'test-nonce-' . $action;
 	}
 }
+if ( ! function_exists( 'wp_nonce_field' ) ) {
+	function wp_nonce_field( $action = -1, $name = '_wpnonce', $referer = true ) {
+		echo '<input type="hidden" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( wp_create_nonce( $action ) ) . '" />';
+	}
+}
+if ( ! function_exists( 'selected' ) ) {
+	function selected( $selected, $current = true, $display = true ) {
+		if ( (string) $selected === (string) $current ) {
+			echo $display ? ' selected="selected"' : ' selected';
+		}
+	}
+}
 if ( ! function_exists( 'current_time' ) ) {
 	function current_time( $type = 'mysql', $gmt = false ) {
 		return $type === 'mysql' ? gmdate( 'Y-m-d H:i:s' ) : (string) time();

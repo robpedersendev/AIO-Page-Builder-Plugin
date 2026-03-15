@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Admin\Screens\Templates;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Screens\Sections\Industry_Section_Library_Filter_Controller;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Library_Read_Model_Builder;
 use AIOPageBuilder\Domain\Registries\Section\UI\Section_Template_Directory_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -60,8 +62,10 @@ final class Section_Templates_Directory_Screen {
 			'search'              => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['search'] ) ) : '',
 			'paged'               => isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1,
 			'per_page'            => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $_GET['per_page'] ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
+			'industry_view'       => isset( $_GET['industry_view'] ) ? \sanitize_key( (string) $_GET['industry_view'] ) : Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY,
 		);
 		$state = $state_builder->build_state( $request );
+		$state = $this->enrich_state_with_industry( $state, $request );
 
 		$view = (string) ( $state['view'] ?? 'root' );
 		?>
@@ -87,6 +91,39 @@ final class Section_Templates_Directory_Screen {
 			?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Enriches state with industry filter and badges when view is list or search. Safe fallback when industry unavailable.
+	 *
+	 * @param array<string, mixed> $state
+	 * @param array<string, mixed> $request
+	 * @return array<string, mixed>
+	 */
+	private function enrich_state_with_industry( array $state, array $request ): array {
+		$view = (string) ( $state['view'] ?? 'root' );
+		if ( $view !== 'list' && $view !== 'search' ) {
+			$state['industry_view'] = Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY;
+			$state['industry_badges_by_key'] = array();
+			return $state;
+		}
+		$profile_repo = null;
+		$pack_registry = null;
+		if ( $this->container && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+			$store = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			if ( $store instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
+				$profile_repo = $store;
+			}
+		}
+		if ( $this->container && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ) {
+			$r = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY );
+			if ( $r instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ) {
+				$pack_registry = $r;
+			}
+		}
+		$read_model_builder = new Industry_Section_Library_Read_Model_Builder();
+		$controller = new Industry_Section_Library_Filter_Controller( $read_model_builder, $profile_repo, $pack_registry );
+		return $controller->enrich_state( $state, $request );
 	}
 
 	private function get_state_builder(): Section_Template_Directory_State_Builder {
@@ -146,6 +183,9 @@ final class Section_Templates_Directory_Screen {
 		$status  = (string) ( $filters['status'] ?? '' );
 		$search  = (string) ( $filters['search'] ?? '' );
 		?>
+		<?php
+		$industry_view = (string) ( $state['industry_view'] ?? Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY );
+		?>
 		<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-directory-filters">
 			<input type="hidden" name="page" value="<?php echo \esc_attr( self::SLUG ); ?>" />
 			<?php if ( $purpose !== '' ) : ?>
@@ -157,6 +197,12 @@ final class Section_Templates_Directory_Screen {
 			<?php if ( $variant !== '' ) : ?>
 				<input type="hidden" name="variation_family_key" value="<?php echo \esc_attr( $variant ); ?>" />
 			<?php endif; ?>
+			<label for="aio-section-filter-industry"><?php \esc_html_e( 'Industry fit', 'aio-page-builder' ); ?></label>
+			<select id="aio-section-filter-industry" name="industry_view">
+				<option value="<?php echo \esc_attr( Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY ); ?>" <?php selected( $industry_view, Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY ); ?>><?php \esc_html_e( 'Show all', 'aio-page-builder' ); ?></option>
+				<option value="<?php echo \esc_attr( Industry_Section_Library_Read_Model_Builder::VIEW_RECOMMENDED_PLUS_WEAK ); ?>" <?php selected( $industry_view, Industry_Section_Library_Read_Model_Builder::VIEW_RECOMMENDED_PLUS_WEAK ); ?>><?php \esc_html_e( 'Recommended + weak fit', 'aio-page-builder' ); ?></option>
+				<option value="<?php echo \esc_attr( Industry_Section_Library_Read_Model_Builder::VIEW_RECOMMENDED_ONLY ); ?>" <?php selected( $industry_view, Industry_Section_Library_Read_Model_Builder::VIEW_RECOMMENDED_ONLY ); ?>><?php \esc_html_e( 'Recommended only', 'aio-page-builder' ); ?></option>
+			</select>
 			<label for="aio-section-filter-search"><?php \esc_html_e( 'Search', 'aio-page-builder' ); ?></label>
 			<input type="search" id="aio-section-filter-search" name="search" value="<?php echo \esc_attr( $search ); ?>" placeholder="<?php \esc_attr_e( 'Name or key…', 'aio-page-builder' ); ?>" />
 			<label for="aio-section-filter-status"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></label>
@@ -247,6 +293,10 @@ final class Section_Templates_Directory_Screen {
 		if ( $search !== '' ) {
 			$query_args['search'] = $search;
 		}
+		$industry_view = (string) ( $state['industry_view'] ?? '' );
+		if ( $industry_view !== '' ) {
+			$query_args['industry_view'] = $industry_view;
+		}
 		$query_args['per_page'] = $per_page;
 
 		if ( count( $rows ) === 0 ) {
@@ -292,10 +342,18 @@ final class Section_Templates_Directory_Screen {
 					$view_url   = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
 					$helper_url = ''; // * Helper-doc link: populated on detail screen when helper_doc_url resolver exists.
 					$in_compare = \in_array( $key, Template_Compare_Screen::get_compare_list( 'section' ), true );
+					$item_view = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
 					?>
 					<tr>
 						<td><?php echo \esc_html( $name ); ?></td>
 						<td><code><?php echo \esc_html( $key ); ?></code></td>
+						<td>
+							<?php if ( $item_view !== null ) : ?>
+								<?php require \dirname( __DIR__, 2 ) . '/Views/sections/industry-section-badges.php'; ?>
+							<?php else : ?>
+								—
+							<?php endif; ?>
+						</td>
 						<td><?php echo \esc_html( $pf_label ); ?></td>
 						<td><?php echo \esc_html( $cta_var ); ?></td>
 						<td><?php echo \esc_html( $status ); ?></td>

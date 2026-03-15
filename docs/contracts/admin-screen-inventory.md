@@ -36,16 +36,21 @@
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
 | **Post-Release Health**| `Post_Release_Health_Screen` / `aio-page-builder-post-release-health` | `aio_view_logs`         |
+| **Industry Profile**   | `Industry_Profile_Settings_Screen` / `aio-page-builder-industry-profile` | `aio_manage_settings`   |
 
-### 2.1 Form provider seed (Settings; form-provider-integration-contract)
+### 2.1 Industry Profile settings (industry-admin-screen-contract)
+
+The **Industry Profile** screen (`Industry_Profile_Settings_Screen` / `aio-page-builder-industry-profile`) lets admins view and edit the site Industry Profile: primary and secondary industry selection, readiness/completeness status, active pack reference and warnings. Save action: `admin_post_aio_save_industry_profile`. Nonce: `aio_industry_profile_nonce`; action `aio_save_industry_profile`. Capability: `aio_manage_settings`. Handled by `Admin_Menu::handle_save_industry_profile()`; uses `Industry_Profile_Repository::merge_profile()` and `Industry_Profile_Validator`. Section and page template directories may show industry-aware filters and badges per industry-admin-screen-contract.
+
+### 2.2 Form provider seed (Settings; form-provider-integration-contract)
 
 The **Settings** screen (`Settings_Screen` / `aio-page-builder-settings`) hosts a **Seed form section and request page template** action that writes the form section template (`form_section_ndr`) and request page template (`pt_request_form`) to the section and page template registries. Action: `admin_post_aio_seed_form_templates`. Nonce: `aio_seed_form_templates`. Capability: `manage_options`. Handled by `Admin_Menu::handle_seed_form_templates()`; uses `Form_Template_Seeder::run()`. Form-bearing section and page templates appear in the section and page template directories like any other template; no separate form-provider admin screen.
 
-### 2.2 Page template directory and taxonomy (spec §49.3, §62.10; Prompt 133)
+### 2.3 Page template directory and taxonomy (spec §49.3, §62.10; Prompt 133)
 
 When admin screens list or browse **page templates** (e.g. registry, template picker, or Build Plan template selection), **directory and browse grouping** must follow **page-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `template_category_class` (top_level, hub, nested_hub, child_detail), `template_family` (e.g. home, services, locations), and `hierarchy_role`. Preview grouping aligns with the same taxonomy so that “Services”, “Locations”, etc. map to contract-defined family slugs. Category labels are server-authoritative, not ad-hoc UI strings.
 
-### 2.3 Page template directory IA (spec §49.7; Prompt 141)
+### 2.4 Page template directory IA (spec §49.7; Prompt 141)
 
 The **page template directory** is a dedicated browse experience for page templates. Its **information architecture** (hierarchical tree, breadcrumbs, category/family filters, list/detail, one-pager/preview links) is defined in **page-template-directory-ia-extension.md**. Tree structure: **Page Templates** (root) → **Category class** (Top Level, Hub, Nested Hub, Child/Detail) → **Family** (e.g. Home Page Templates, Services Page Templates) → **Template option list** → **Template detail**. Screen slug: `aio-page-builder-page-templates` (or as specified in that contract). Directory is capability-gated; preview uses preview-safe data only. Build Plan template selection may deep-link into the directory; directory does not replace Build Plan or composition workflows. State is built by `Page_Template_Directory_State_Builder`.
 
@@ -96,7 +101,7 @@ The **page template directory** is a dedicated browse experience for page templa
 
 When admin screens list or browse **section templates**, **directory and browse grouping** must follow **section-template-category-taxonomy-contract.md**. Grouping and filtering use stable registry metadata: `section_purpose_family` (e.g. hero, proof, cta, legal), `placement_tendency` (opener, mid_page, cta_ending, legal_footer_adjacent), and `cta_classification`. Section preview grouping aligns with the same taxonomy. All taxonomy values are validated and deterministic.
 
-### 2.4 Compositions screen (spec §14, §49.6; Prompt 177)
+### 2.5 Compositions screen (spec §14, §49.6; Prompt 177)
 
 The **Compositions** screen lists governed custom compositions and provides a **composition builder** view for large-library assembly. Views: **list** (compositions table; Build composition link) and **build** (filtered section library, current ordered sections, CTA count/proximity warnings, insertion hint, preview and one-pager readiness). State is built by `Composition_Builder_State_Builder`; filter state by `Composition_Filter_State`. Screen slug: `aio-page-builder-compositions`. Capability: `aio_view_build_plans`. No freeform drag-and-drop; section ordering and CTA rules remain governed. Mutation (create/update composition) is server-validated and out of scope for this screen’s initial implementation; builder shows state and guidance only.
 
@@ -168,7 +173,7 @@ The **section template directory** is a dedicated browse experience for section 
 }
 ```
 
-### 2.5.1 Section and page template detail screens — per-entity styling (Prompt 253)
+### 2.6.1 Section and page template detail screens — per-entity styling (Prompt 253)
 
 The **Section Template Detail** screen (`Section_Template_Detail_Screen` / `aio-page-builder-section-template-detail`) and **Page Template Detail** screen (`Page_Template_Detail_Screen` / `aio-page-builder-page-template-detail`) each include a **Per-entity styling** panel when viewing a single section or page template. The panel is built by `Entity_Style_UI_State_Builder` and `Entity_Style_Form_Builder`; save is capability- and nonce-gated and passes through the styles_json sanitization pipeline. No freeform CSS; only approved token and component override fields from the style specs. Validation errors are shown when save fails.
 

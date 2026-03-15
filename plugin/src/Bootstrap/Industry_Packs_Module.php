@@ -48,6 +48,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( array() );
 			return $registry;
 		} );
+		$container->register( 'industry_profile_validator', function (): \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Validator {
+			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Validator();
+		} );
 		$container->register( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE, function () use ( $container ): ?\AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository {
 			if ( ! $container->has( 'settings' ) ) {
 				return null;

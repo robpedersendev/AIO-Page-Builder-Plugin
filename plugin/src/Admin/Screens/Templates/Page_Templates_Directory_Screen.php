@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Admin\Screens\Templates;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Screens\PageTemplates\Industry_Page_Template_Filter_Controller;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Directory_Read_Model_Builder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Directory_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -58,8 +60,10 @@ final class Page_Templates_Directory_Screen {
 			'search'         => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['search'] ) ) : '',
 			'paged'          => isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1,
 			'per_page'       => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $_GET['per_page'] ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
+			'industry_view'  => isset( $_GET['industry_view'] ) ? \sanitize_key( (string) $_GET['industry_view'] ) : Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY,
 		);
 		$state = $state_builder->build_state( $request );
+		$state = $this->enrich_state_with_industry( $state, $request );
 
 		$view = (string) ( $state['view'] ?? 'root' );
 		?>
@@ -141,6 +145,7 @@ final class Page_Templates_Directory_Screen {
 		$status   = (string) ( $filters['status'] ?? '' );
 		$search   = (string) ( $filters['search'] ?? '' );
 		$labels   = $state['category_labels'] ?? array();
+		$industry_view = (string) ( $state['industry_view'] ?? Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY );
 		?>
 		<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-directory-filters">
 			<input type="hidden" name="page" value="<?php echo \esc_attr( self::SLUG ); ?>" />
@@ -150,6 +155,12 @@ final class Page_Templates_Directory_Screen {
 			<?php if ( $family !== '' ) : ?>
 				<input type="hidden" name="family" value="<?php echo \esc_attr( $family ); ?>" />
 			<?php endif; ?>
+			<label for="aio-filter-industry"><?php \esc_html_e( 'Industry fit', 'aio-page-builder' ); ?></label>
+			<select id="aio-filter-industry" name="industry_view">
+				<option value="<?php echo \esc_attr( Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY ); ?>" <?php selected( $industry_view, Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY ); ?>><?php \esc_html_e( 'Show all', 'aio-page-builder' ); ?></option>
+				<option value="<?php echo \esc_attr( Industry_Page_Template_Directory_Read_Model_Builder::VIEW_RECOMMENDED_PLUS_WEAK ); ?>" <?php selected( $industry_view, Industry_Page_Template_Directory_Read_Model_Builder::VIEW_RECOMMENDED_PLUS_WEAK ); ?>><?php \esc_html_e( 'Recommended + weak fit', 'aio-page-builder' ); ?></option>
+				<option value="<?php echo \esc_attr( Industry_Page_Template_Directory_Read_Model_Builder::VIEW_RECOMMENDED_ONLY ); ?>" <?php selected( $industry_view, Industry_Page_Template_Directory_Read_Model_Builder::VIEW_RECOMMENDED_ONLY ); ?>><?php \esc_html_e( 'Recommended only', 'aio-page-builder' ); ?></option>
+			</select>
 			<label for="aio-filter-search"><?php \esc_html_e( 'Search', 'aio-page-builder' ); ?></label>
 			<input type="search" id="aio-filter-search" name="search" value="<?php echo \esc_attr( $search ); ?>" placeholder="<?php \esc_attr_e( 'Name or key…', 'aio-page-builder' ); ?>" />
 			<label for="aio-filter-status"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></label>
@@ -220,6 +231,7 @@ final class Page_Templates_Directory_Screen {
 		$search      = (string) ( $filters['search'] ?? '' );
 		$can_manage  = ! empty( $state['can_manage_templates'] );
 		$category_labels = $state['category_labels'] ?? array();
+		$industry_badges_by_key = $state['industry_badges_by_key'] ?? array();
 
 		$query_args = array( 'page' => self::SLUG );
 		if ( $cat !== '' ) {
@@ -230,6 +242,10 @@ final class Page_Templates_Directory_Screen {
 		}
 		if ( $search !== '' ) {
 			$query_args['search'] = $search;
+		}
+		$industry_view = (string) ( $state['industry_view'] ?? '' );
+		if ( $industry_view !== '' ) {
+			$query_args['industry_view'] = $industry_view;
 		}
 		$query_args['per_page'] = $per_page;
 
@@ -273,10 +289,18 @@ final class Page_Templates_Directory_Screen {
 					}
 					$view_url = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
 					$in_compare = \in_array( $key, Template_Compare_Screen::get_compare_list( 'page' ), true );
+					$item_view = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
 					?>
 					<tr>
 						<td><?php echo \esc_html( $name ); ?></td>
 						<td><code><?php echo \esc_html( $key ); ?></code></td>
+						<td>
+							<?php if ( $item_view !== null ) : ?>
+								<?php require \dirname( __DIR__, 2 ) . '/Views/page-templates/industry-template-badges.php'; ?>
+							<?php else : ?>
+								—
+							<?php endif; ?>
+						</td>
 						<td><?php echo \esc_html( $cat_label ); ?></td>
 						<td><?php echo \esc_html( $fam_label ); ?></td>
 						<td><?php echo \esc_html( $status ); ?></td>

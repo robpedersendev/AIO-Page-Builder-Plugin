@@ -35,6 +35,7 @@ use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
 use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Component_Override_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
@@ -58,6 +59,9 @@ use AIOPageBuilder\Domain\Registries\Section\FeatureBenefitBatch\Feature_Benefit
 use AIOPageBuilder\Domain\Registries\Section\CtaSuperLibraryBatch\CTA_Super_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\LegalPolicyUtilityBatch\Legal_Policy_Utility_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\MediaListingProfileBatch\Media_Listing_Profile_Detail_Library_Batch_Seeder;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Validator;
 use AIOPageBuilder\Domain\Registries\Section\ProcessTimelineFaqBatch\Process_Timeline_FAQ_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\TrustProofBatch\Trust_Proof_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
@@ -109,6 +113,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_seed_child_detail_product_templates', array( $this, 'handle_seed_child_detail_product_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_child_detail_profile_entity_templates', array( $this, 'handle_seed_child_detail_profile_entity_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_child_detail_variant_expansion_templates', array( $this, 'handle_seed_child_detail_variant_expansion_templates' ), 10 );
+		\add_action( 'admin_post_aio_save_industry_profile', array( $this, 'handle_save_industry_profile' ), 10 );
 
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
@@ -133,6 +138,7 @@ final class Admin_Menu {
 		$support_triage     = new Support_Triage_Dashboard_Screen( $this->container );
 		$post_release_health = new Post_Release_Health_Screen( $this->container );
 		$privacy_reporting   = new Privacy_Reporting_Settings_Screen( $this->container );
+		$industry_profile    = new Industry_Profile_Settings_Screen( $this->container );
 		$global_style_tokens = new Global_Style_Token_Settings_Screen( $this->container );
 		$global_component_overrides = new Global_Component_Override_Settings_Screen( $this->container );
 		$import_export       = new Import_Export_Screen( $this->container );
@@ -367,6 +373,15 @@ final class Admin_Menu {
 
 		add_submenu_page(
 			self::PARENT_SLUG,
+			$industry_profile->get_title(),
+			__( 'Industry Profile', 'aio-page-builder' ),
+			$industry_profile->get_capability(),
+			Industry_Profile_Settings_Screen::SLUG,
+			array( $industry_profile, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
 			$global_style_tokens->get_title(),
 			__( 'Global Style Tokens', 'aio-page-builder' ),
 			$global_style_tokens->get_capability(),
@@ -391,6 +406,81 @@ final class Admin_Menu {
 			Import_Export_Screen::SLUG,
 			array( $import_export, 'render' )
 		);
+	}
+
+	/**
+	 * Handles admin-post save of Industry Profile (industry-admin-screen-contract).
+	 * Verifies nonce and capability; validates then merges profile via Industry_Profile_Repository; redirects back to Industry Profile screen.
+	 *
+	 * @return void
+	 */
+	public function handle_save_industry_profile(): void {
+		$redirect_url = \admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG );
+		if ( ! isset( $_POST['aio_industry_profile_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_profile_nonce'] ) ), 'aio_save_industry_profile' ) ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
+			exit;
+		}
+		if ( ! $this->container instanceof Service_Container ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
+			exit;
+		}
+		$repo = null;
+		if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+			$store = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			if ( $store instanceof Industry_Profile_Repository ) {
+				$repo = $store;
+			}
+		}
+		if ( $repo === null ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
+			exit;
+		}
+		$primary = isset( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+			? trim( \sanitize_text_field( \wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) ) )
+			: '';
+		$secondary_raw = isset( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
+			? $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ]
+			: ( isset( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] ) ? $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] : array() );
+		$secondary = array();
+		if ( is_array( $secondary_raw ) ) {
+			foreach ( $secondary_raw as $v ) {
+				if ( is_string( $v ) ) {
+					$k = trim( \sanitize_text_field( \wp_unslash( $v ) ) );
+					if ( $k !== '' ) {
+						$secondary[] = $k;
+					}
+				}
+			}
+			$secondary = array_values( array_unique( $secondary ) );
+		}
+		$partial = array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY   => $primary,
+			Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => $secondary,
+		);
+		$current = $repo->get_profile();
+		$merged = array_merge( $current, $partial );
+		$merged[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = $secondary;
+		$pack_registry = null;
+		if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ) {
+			$r = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY );
+			if ( $r instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ) {
+				$pack_registry = $r;
+			}
+		}
+		$qp_registry = $this->container->has( 'industry_question_pack_registry' ) ? $this->container->get( 'industry_question_pack_registry' ) : null;
+		$validator = new Industry_Profile_Validator();
+		if ( ! $validator->validate( $merged, $pack_registry, $qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null ) ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
+			exit;
+		}
+		$repo->merge_profile( $partial );
+		\wp_safe_redirect( $redirect_url . '&aio_industry_result=saved' );
+		exit;
 	}
 
 	/**
