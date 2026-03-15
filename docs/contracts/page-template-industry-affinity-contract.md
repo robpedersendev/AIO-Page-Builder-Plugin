@@ -59,3 +59,4 @@
 - **Page_Template_Schema**: Optional field constants; **validate_industry_affinity_metadata( array $page_template ): array** returns list of errors; empty when valid or when no industry fields present.
 - **page-template-registry-schema.md**: §5 optional fields table and §5.2 industry affinity block.
 - **data-schema-appendix.md**: Summary of page template industry-affinity metadata.
+- **industry-page-template-recommendation-contract.md**: Resolver that consumes this metadata (and industry profile/pack) to produce scored, ranked page-template recommendations; page-template registry remains authoritative.

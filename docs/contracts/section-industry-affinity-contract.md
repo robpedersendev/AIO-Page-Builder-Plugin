@@ -57,3 +57,4 @@
 - **Section_Schema**: Optional field constants (industry_affinity, industry_discouraged, industry_cta_fit, industry_notes); **validate_industry_affinity_metadata( array $section ): array** returns list of errors; empty array when valid or when no industry fields present.
 - **section-registry-schema.md**: §10 optional fields table and §10.1 industry affinity block.
 - **data-schema-appendix.md**: Summary of section industry-affinity metadata.
+- **industry-section-recommendation-contract.md**: Resolver that consumes this metadata (and industry profile/pack) to produce scored, ranked section recommendations; section registry remains authoritative.

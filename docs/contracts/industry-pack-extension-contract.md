@@ -58,7 +58,7 @@ The subsystem **does not**:
 
 The following are **documented here** for later implementation; no persistent schema is created in this contract:
 
-- **Industry pack** – Definition object; canonical schema in [industry-pack-schema.md](../schemas/industry-pack-schema.md) and Industry_Pack_Schema (required: industry_key, name, summary, status, version_marker; optional: supported_page_families, preferred_section_keys, discouraged_section_keys, default_cta_patterns, seo_guidance_ref, helper_overlay_refs, one_pager_overlay_refs, token_preset_ref, lpagery_rule_ref, ai_rule_ref, metadata).
+- **Industry pack** – Definition object; canonical schema in [industry-pack-schema.md](../schemas/industry-pack-schema.md) and Industry_Pack_Schema (required: industry_key, name, summary, status, version_marker; optional: supported_page_families, preferred_section_keys, discouraged_section_keys, default_cta_patterns, seo_guidance_ref, helper_overlay_refs, one_pager_overlay_refs, token_preset_ref, lpagery_rule_ref, ai_rule_ref, metadata). **token_preset_ref** resolves to an Industry Style Preset per [industry-style-preset-schema.md](../schemas/industry-style-preset-schema.md) and Industry_Style_Preset_Registry.
 - **Industry site profile** – Site-level or user-level selection of primary/secondary industry (e.g. for onboarding or settings).
 - **Section/page industry affinity metadata** – Affinity or tags on section/page templates for filtering/ranking.
 - **Industry helper overlay** – Ref(s) to helper docs that apply when an industry pack is active.

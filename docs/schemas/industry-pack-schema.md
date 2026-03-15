@@ -40,7 +40,7 @@
 | **seo_guidance_ref** | string | Reference to SEO guidance doc or block. |
 | **helper_overlay_refs** | list&lt;string&gt; | Refs to helper docs applied when this pack is active (overlay on section helper refs). |
 | **one_pager_overlay_refs** | list&lt;string&gt; | Refs to one-pager docs applied when this pack is active (overlay on page one-pager refs). |
-| **token_preset_ref** | string | Reference to LPagery/token preset for this industry. |
+| **token_preset_ref** | string | Reference to industry style preset by key (Industry_Style_Preset_Registry; see industry-style-preset-schema.md). |
 | **lpagery_rule_ref** | string | Reference to LPagery rule set for this industry. |
 | **ai_rule_ref** | string | Reference to AI planning rule or prompt overlay for this industry. |
 | **metadata** | map | Optional arbitrary metadata (e.g. label, sort order). Must not contain secrets. |

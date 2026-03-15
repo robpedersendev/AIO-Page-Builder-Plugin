@@ -55,6 +55,9 @@ The following keys are registered by **Industry_Packs_Module**:
 | `industry_cta_pattern_registry` | CTA pattern definitions for industry packs (preferred/discouraged/required). | Industry_CTA_Pattern_Registry; loaded with empty list until patterns are added (industry-cta-pattern-contract). |
 | `industry_question_pack_registry` | Onboarding question packs per industry (cosmetology_nail, realtor, plumber, disaster_recovery). | Industry_Question_Pack_Registry; loads Industry_Question_Pack_Definitions::default_packs(). |
 | `industry_prompt_pack_overlay_service` | Builds industry overlay for prompt-pack assembly (industry-prompt-pack-overlay-contract). | Industry_Prompt_Pack_Overlay_Service; optional Industry_Pack_Registry. |
+| `industry_section_recommendation_resolver` | Scores and ranks section templates by industry fit (industry-section-recommendation-contract). | Industry_Section_Recommendation_Resolver; read-only; returns Industry_Section_Recommendation_Result. |
+| `industry_page_template_recommendation_resolver` | Scores and ranks page templates by industry fit (industry-page-template-recommendation-contract). | Industry_Page_Template_Recommendation_Resolver; read-only; returns Industry_Page_Template_Recommendation_Result. |
+| `industry_style_preset_registry` | Read-only registry of industry style presets (industry-style-preset-schema.md); token values and component override refs. | Industry_Style_Preset_Registry; load(), get(key), get_all(), list_by_industry(), list_by_status(). |
 
 Additional keys (e.g. LPagery resolver) can be added in later prompts.
 
