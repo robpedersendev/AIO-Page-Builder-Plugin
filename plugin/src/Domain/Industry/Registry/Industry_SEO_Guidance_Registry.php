@@ -46,6 +46,20 @@ final class Industry_SEO_Guidance_Registry {
 	private array $all = array();
 
 	/**
+	 * Returns built-in SEO guidance rule definitions from SEOGuidance/ (Prompt 359).
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_builtin_definitions(): array {
+		$path = __DIR__ . '/SEOGuidance/seo-guidance-definitions.php';
+		if ( ! is_readable( $path ) ) {
+			return array();
+		}
+		$loaded = require $path;
+		return is_array( $loaded ) ? $loaded : array();
+	}
+
+	/**
 	 * Loads guidance rule definitions. Skips invalid or duplicate keys (first wins). Safe: no throw.
 	 *
 	 * @param array<int, array<string, mixed>> $rules List of rule objects.

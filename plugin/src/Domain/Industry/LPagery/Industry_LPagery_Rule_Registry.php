@@ -48,6 +48,20 @@ final class Industry_LPagery_Rule_Registry {
 	private array $all = array();
 
 	/**
+	 * Returns built-in LPagery rule definitions from Rules/ (Prompt 360).
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_builtin_definitions(): array {
+		$path = __DIR__ . '/Rules/lpagery-rule-definitions.php';
+		if ( ! is_readable( $path ) ) {
+			return array();
+		}
+		$loaded = require $path;
+		return is_array( $loaded ) ? $loaded : array();
+	}
+
+	/**
 	 * Loads LPagery rule definitions. Skips invalid or duplicate keys (first wins). Safe: no throw.
 	 *
 	 * @param array<int, array<string, mixed>> $rules List of rule objects.

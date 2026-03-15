@@ -81,4 +81,22 @@ final class Industry_SEO_Guidance_Registry_Test extends TestCase {
 		$keys = array_column( $all, Industry_SEO_Guidance_Registry::FIELD_GUIDANCE_RULE_KEY );
 		$this->assertSame( $keys, array_values( array_unique( $keys ) ) );
 	}
+
+	/** Built-in definitions (Prompt 359): four industries; pack seo_guidance_ref keys resolve. */
+	public function test_builtin_definitions_load(): void {
+		$defs = Industry_SEO_Guidance_Registry::get_builtin_definitions();
+		$this->assertGreaterThanOrEqual( 4, count( $defs ) );
+		$registry = new Industry_SEO_Guidance_Registry();
+		$registry->load( $defs );
+		$this->assertGreaterThanOrEqual( 4, count( $registry->get_all() ) );
+	}
+
+	public function test_pack_seo_guidance_refs_resolve(): void {
+		$registry = new Industry_SEO_Guidance_Registry();
+		$registry->load( Industry_SEO_Guidance_Registry::get_builtin_definitions() );
+		$pack_refs = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+		foreach ( $pack_refs as $key ) {
+			$this->assertNotNull( $registry->get( $key ), "Pack seo_guidance_ref should resolve: {$key}" );
+		}
+	}
 }

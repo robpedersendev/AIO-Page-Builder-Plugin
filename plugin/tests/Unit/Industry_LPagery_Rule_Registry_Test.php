@@ -78,4 +78,22 @@ final class Industry_LPagery_Rule_Registry_Test extends TestCase {
 		$this->assertCount( 1, $registry->list_by_industry( 'realtor' ) );
 		$this->assertCount( 3, $registry->get_all() );
 	}
+
+	/** Built-in definitions (Prompt 360): four industries; pack lpagery_rule_ref keys resolve. */
+	public function test_builtin_definitions_load(): void {
+		$defs = Industry_LPagery_Rule_Registry::get_builtin_definitions();
+		$this->assertGreaterThanOrEqual( 4, count( $defs ) );
+		$registry = new Industry_LPagery_Rule_Registry();
+		$registry->load( $defs );
+		$this->assertGreaterThanOrEqual( 4, count( $registry->get_all() ) );
+	}
+
+	public function test_pack_lpagery_rule_refs_resolve(): void {
+		$registry = new Industry_LPagery_Rule_Registry();
+		$registry->load( Industry_LPagery_Rule_Registry::get_builtin_definitions() );
+		$pack_refs = array( 'cosmetology_nail_01', 'realtor_01', 'plumber_01', 'disaster_recovery_01' );
+		foreach ( $pack_refs as $key ) {
+			$this->assertNotNull( $registry->get( $key ), "Pack lpagery_rule_ref should resolve: {$key}" );
+		}
+	}
 }
