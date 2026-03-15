@@ -83,6 +83,9 @@ final class Input_Artifact_Builder {
 		if ( isset( $options['compatibility'] ) && is_array( $options['compatibility'] ) ) {
 			$artifact[ Input_Artifact_Schema::ROOT_COMPATIBILITY ] = $options['compatibility'];
 		}
+		if ( isset( $options['industry_context'] ) && is_array( $options['industry_context'] ) ) {
+			$artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ] = $options['industry_context'];
+		}
 
 		$prohibited = Input_Artifact_Schema::find_prohibited_keys_in_array( $artifact );
 		if ( $prohibited !== array() ) {

@@ -21,12 +21,14 @@ final class Normalized_Prompt_Package_Builder {
 
 	/**
 	 * Builds normalized prompt package. Fails when required placeholders are missing.
+	 * Optional industry_overlay (industry-prompt-pack-overlay-contract) is appended to system prompt when present.
 	 *
 	 * @param array<string, mixed> $selected_pack  Full prompt pack definition (from registry).
 	 * @param array<string, mixed> $input_artifact Built input artifact (from Input_Artifact_Builder).
+	 * @param array<string, mixed> $options        Optional: industry_overlay (array with industry_guidance_text, etc.).
 	 * @return Prompt_Package_Result Success with package or failure with validation_errors.
 	 */
-	public function build( array $selected_pack, array $input_artifact ): Prompt_Package_Result {
+	public function build( array $selected_pack, array $input_artifact, array $options = array() ): Prompt_Package_Result {
 		$errors = array();
 
 		$internal_key = (string) ( $selected_pack[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' );
@@ -73,6 +75,11 @@ final class Normalized_Prompt_Package_Builder {
 				$content = $this->substitute_placeholders( $content, $placeholder_values );
 				$user_parts[] = $content;
 			}
+		}
+
+		$industry_overlay = isset( $options['industry_overlay'] ) && is_array( $options['industry_overlay'] ) ? $options['industry_overlay'] : null;
+		if ( $industry_overlay !== null && isset( $industry_overlay['industry_guidance_text'] ) && is_string( $industry_overlay['industry_guidance_text'] ) && trim( $industry_overlay['industry_guidance_text'] ) !== '' ) {
+			$system_parts[] = "## Industry guidance\n\n" . trim( $industry_overlay['industry_guidance_text'] );
 		}
 
 		$system_prompt = implode( "\n\n", $system_parts );

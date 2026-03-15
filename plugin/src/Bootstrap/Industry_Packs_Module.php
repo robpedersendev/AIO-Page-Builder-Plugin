@@ -64,5 +64,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Definitions::default_packs() );
 			return $registry;
 		} );
+		$container->register( 'industry_prompt_pack_overlay_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\AI\Industry_Prompt_Pack_Overlay_Service {
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY )
+				? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY )
+				: null;
+			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Prompt_Pack_Overlay_Service( $pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null );
+		} );
 	}
 }

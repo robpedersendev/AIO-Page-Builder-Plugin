@@ -76,6 +76,9 @@
 ## 8. Implementation reference
 
 - **Industry_Profile_Schema**: Field constants, default empty array, validation helpers.
-- **Industry_Profile_Repository**: get_profile(), set_profile(), merge_profile(), get_empty_profile(); uses Settings_Service and Option_Names::INDUSTRY_PROFILE.
+- **Industry_Profile_Repository**: get_profile(), set_profile(), merge_profile(), get_empty_profile(), get_readiness(); uses Settings_Service and Option_Names::INDUSTRY_PROFILE.
+- **Industry_Profile_Validator**: validate(), get_readiness(); optional Industry_Pack_Registry and Industry_Question_Pack_Registry for strict validation and completeness.
+- **Industry_Profile_Readiness_Result**: state (none|minimal|partial|ready), score 0–100, validation_errors, validation_warnings, details; see industry-profile-validation-contract.md.
+- **industry-profile-validation-contract.md**: Validation rules, safe defaults, completeness/readiness scoring, exposure for downstream systems.
 - **industry-onboarding-field-contract.md**: Field keys, storage mapping, and persistence flow for onboarding/profile intake; industry fields are additive and persist via this repository.
 - **data-schema-appendix.md**: Summary of industry profile schema.

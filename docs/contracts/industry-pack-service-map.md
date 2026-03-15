@@ -53,8 +53,10 @@ The following keys are registered by **Industry_Packs_Module**:
 | `industry_pack_registry` | Registry: load(), get(key), get_all(), list_by_status(status). | Industry_Pack_Registry; loaded with empty list until a pack loader is added. |
 | `industry_profile_store` | Site industry profile (primary/secondary, subtype, service/geo model). | Industry_Profile_Repository when `settings` is available; else null. |
 | `industry_cta_pattern_registry` | CTA pattern definitions for industry packs (preferred/discouraged/required). | Industry_CTA_Pattern_Registry; loaded with empty list until patterns are added (industry-cta-pattern-contract). |
+| `industry_question_pack_registry` | Onboarding question packs per industry (cosmetology_nail, realtor, plumber, disaster_recovery). | Industry_Question_Pack_Registry; loads Industry_Question_Pack_Definitions::default_packs(). |
+| `industry_prompt_pack_overlay_service` | Builds industry overlay for prompt-pack assembly (industry-prompt-pack-overlay-contract). | Industry_Prompt_Pack_Overlay_Service; optional Industry_Pack_Registry. |
 
-Additional keys (e.g. overlay resolver, AI rule applier, LPagery resolver) can be added in later prompts.
+Additional keys (e.g. LPagery resolver) can be added in later prompts.
 
 ---
 

@@ -30,6 +30,8 @@ final class Input_Artifact_Schema {
 	public const ROOT_COMPATIBILITY    = 'compatibility';
 	/** Optional (Prompt 210): template-family and CTA-law guidance for placeholder injection. */
 	public const ROOT_PLANNING_GUIDANCE = 'planning_guidance';
+	/** Optional (Prompt 331): industry context for planner (industry-planner-input-contract). */
+	public const ROOT_INDUSTRY_CONTEXT = 'industry_context';
 
 	public const PROMPT_PACK_REF_INTERNAL_KEY = 'internal_key';
 	public const PROMPT_PACK_REF_VERSION       = 'version';

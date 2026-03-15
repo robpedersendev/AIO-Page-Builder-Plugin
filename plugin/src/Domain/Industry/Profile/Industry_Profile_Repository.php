@@ -109,4 +109,20 @@ final class Industry_Profile_Repository {
 		}
 		$this->set_profile( $current );
 	}
+
+	/**
+	 * Returns readiness/completeness for the current profile (industry-profile-validation-contract).
+	 * Uses Industry_Profile_Validator; optional registries improve validation and scoring.
+	 *
+	 * @param \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry|null           $pack_registry Optional; validates primary_industry_key.
+	 * @param \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry|null $qp_registry  Optional; validates question-pack answers.
+	 * @return Industry_Profile_Readiness_Result
+	 */
+	public function get_readiness(
+		?\AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry $pack_registry = null,
+		?\AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry $qp_registry = null
+	): Industry_Profile_Readiness_Result {
+		$validator = new Industry_Profile_Validator();
+		return $validator->get_readiness( $this->get_profile(), $pack_registry, $qp_registry );
+	}
 }

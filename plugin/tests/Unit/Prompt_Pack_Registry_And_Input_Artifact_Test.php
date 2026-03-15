@@ -183,6 +183,32 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 		$this->assertArrayHasKey( 'prompt_pack_ref', $pkg['raw_prompt_capture_ready'] );
 	}
 
+	/** Prompt 332: industry_overlay option appends industry_guidance_text to system_prompt. */
+	public function test_prompt_package_builder_appends_industry_overlay_guidance(): void {
+		$pack = $this->planning_pack();
+		$artifact = array(
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID => 'art-1',
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION => '1',
+			Input_Artifact_Schema::ROOT_CREATED_AT => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
+			Input_Artifact_Schema::ROOT_REDACTION => array( 'redaction_applied' => false ),
+			Input_Artifact_Schema::ROOT_PROFILE => array(),
+		);
+		$options = array(
+			'industry_overlay' => array(
+				'schema_version'         => '1',
+				'industry_guidance_text' => 'Prefer service and local page families for this vertical.',
+			),
+		);
+		$builder = new Normalized_Prompt_Package_Builder();
+		$result = $builder->build( $pack, $artifact, $options );
+		$this->assertTrue( $result->is_success() );
+		$pkg = $result->get_normalized_prompt_package();
+		$this->assertNotNull( $pkg );
+		$this->assertStringContainsString( 'Industry guidance', $pkg['system_prompt'] );
+		$this->assertStringContainsString( 'Prefer service and local page families for this vertical.', $pkg['system_prompt'] );
+	}
+
 	public function test_prompt_package_result_to_validation_result(): void {
 		$result = new Prompt_Package_Result( false, null, array( 'missing_segments' ), null );
 		$arr = $result->to_validation_result();
@@ -262,6 +288,36 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 		$this->assertNotNull( $artifact );
 		$this->assertArrayHasKey( Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE, $artifact );
 		$this->assertSame( $guidance, $artifact[ Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE ] );
+	}
+
+	/** Prompt 331: input artifact accepts optional industry_context; remains valid and exportable. */
+	public function test_input_artifact_builder_accepts_industry_context_option(): void {
+		$industry_context = array(
+			'schema_version'   => '1',
+			'readiness'        => array( 'state' => 'ready', 'score' => 100, 'validation_passed' => true ),
+			'industry_profile' => array( 'primary_industry_key' => 'realtor' ),
+		);
+		$builder = new Input_Artifact_Builder();
+		$artifact = $builder->build( 'art-1', array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ), array(
+			'redaction'        => array( 'redaction_applied' => false ),
+			'industry_context' => $industry_context,
+		) );
+		$this->assertNotNull( $artifact );
+		$this->assertArrayHasKey( Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT, $artifact );
+		$this->assertSame( $industry_context, $artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ] );
+		foreach ( Input_Artifact_Schema::required_root_keys() as $key ) {
+			$this->assertArrayHasKey( $key, $artifact );
+		}
+	}
+
+	/** Prompt 331: industry_context is optional; artifact valid without it. */
+	public function test_input_artifact_valid_without_industry_context(): void {
+		$builder = new Input_Artifact_Builder();
+		$artifact = $builder->build( 'art-1', array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ), array(
+			'redaction' => array( 'redaction_applied' => false ),
+		) );
+		$this->assertNotNull( $artifact );
+		$this->assertArrayNotHasKey( Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT, $artifact );
 	}
 
 	/** Prompt 210: fixture prompt-pack has template-family and CTA-law segments and schema version traceability. */

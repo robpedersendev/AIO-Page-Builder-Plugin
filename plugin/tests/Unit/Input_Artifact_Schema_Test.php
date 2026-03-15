@@ -25,6 +25,7 @@ final class Input_Artifact_Schema_Test extends TestCase {
 		$this->assertContains( Input_Artifact_Schema::ROOT_SCHEMA_VERSION, $keys );
 		$this->assertContains( Input_Artifact_Schema::ROOT_CREATED_AT, $keys );
 		$this->assertCount( 5, $keys );
+		$this->assertNotContains( Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT, $keys, 'industry_context is optional (Prompt 331)' );
 	}
 
 	public function test_valid_artifact_has_all_required_root_keys(): void {

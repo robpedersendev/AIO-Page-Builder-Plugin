@@ -206,13 +206,30 @@ final class Onboarding_Planning_Request_Orchestrator {
 				}
 			}
 		}
-		$input_artifact = $this->input_artifact_builder->build( $artifact_id, $prompt_pack_ref, array(
-			'profile' => $profile,
-			'crawl'   => array(),
-			'registry' => $registry,
-			'goal'    => $goal,
+		$artifact_options = array(
+			'profile'   => $profile,
+			'crawl'     => array(),
+			'registry'  => $registry,
+			'goal'      => $goal,
 			'redaction' => array( Input_Artifact_Schema::REDACTION_APPLIED => false ),
-		) );
+		);
+		if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+			$industry_repo = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			if ( $industry_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
+				$qp_registry = $this->container->has( 'industry_question_pack_registry' ) ? $this->container->get( 'industry_question_pack_registry' ) : null;
+				$pack_registry = $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+				$readiness = $industry_repo->get_readiness( $pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null, $qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null );
+				$industry_profile = $industry_repo->get_profile();
+				$artifact_options['industry_context'] = array(
+					'schema_version'   => '1',
+					'industry_profile' => array(
+						'primary_industry_key' => $industry_profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ?? '',
+					),
+					'readiness'        => $readiness->to_array(),
+				);
+			}
+		}
+		$input_artifact = $this->input_artifact_builder->build( $artifact_id, $prompt_pack_ref, $artifact_options );
 		if ( $input_artifact === null ) {
 			$errors = $this->input_artifact_builder->get_last_validation_errors();
 			return new Planning_Request_Result(
@@ -227,7 +244,14 @@ final class Onboarding_Planning_Request_Orchestrator {
 			);
 		}
 
-		$package_result = $this->prompt_package_builder->build( $pack, $input_artifact );
+		$build_options = array();
+		if ( $this->container->has( 'industry_prompt_pack_overlay_service' ) ) {
+			$overlay_svc = $this->container->get( 'industry_prompt_pack_overlay_service' );
+			if ( $overlay_svc instanceof \AIOPageBuilder\Domain\Industry\AI\Industry_Prompt_Pack_Overlay_Service ) {
+				$build_options['industry_overlay'] = $overlay_svc->get_overlay_for_artifact( $input_artifact );
+			}
+		}
+		$package_result = $this->prompt_package_builder->build( $pack, $input_artifact, $build_options );
 		if ( ! $package_result->is_success() || $package_result->get_normalized_prompt_package() === null ) {
 			$errors = $package_result->get_validation_errors();
 			return new Planning_Request_Result(
