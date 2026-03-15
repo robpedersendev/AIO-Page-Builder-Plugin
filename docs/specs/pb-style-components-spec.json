@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AIO Page Builder — Component Override Spec",
+  "description": "Component override rules: which token hook points may be overridden per component. Components map to css-selector-contract.md §3.4 element roles; no new selectors.",
+  "spec_version": "1",
+  "spec_schema": "pb-style-components",
+  "selector_authority": "docs/contracts/css-selector-contract.md",
+  "components": [
+    {
+      "id": "card",
+      "element_role": "card",
+      "selector_pattern": "aio-s-{section_key}__card",
+      "allowed_token_overrides": ["--aio-color-surface", "--aio-radius-card", "--aio-shadow-card", "--aio-space-md"],
+      "sanitization": "inherit_from_core_spec"
+    },
+    {
+      "id": "cta",
+      "element_role": "cta",
+      "selector_pattern": "aio-s-{section_key}__cta",
+      "allowed_token_overrides": ["--aio-color-primary", "--aio-color-accent", "--aio-radius-button", "--aio-font-heading"],
+      "sanitization": "inherit_from_core_spec"
+    },
+    {
+      "id": "badge",
+      "element_role": "badge",
+      "selector_pattern": "aio-s-{section_key}__badge",
+      "allowed_token_overrides": ["--aio-color-primary", "--aio-radius-badge", "--aio-font-eyebrow"],
+      "sanitization": "inherit_from_core_spec"
+    },
+    {
+      "id": "headline",
+      "element_role": "headline",
+      "selector_pattern": "aio-s-{section_key}__headline",
+      "allowed_token_overrides": ["--aio-font-heading", "--aio-color-text"],
+      "sanitization": "inherit_from_core_spec"
+    },
+    {
+      "id": "intro",
+      "element_role": "intro",
+      "selector_pattern": "aio-s-{section_key}__intro",
+      "allowed_token_overrides": ["--aio-font-body", "--aio-color-text", "--aio-space-block"],
+      "sanitization": "inherit_from_core_spec"
+    }
+  ],
+  "sanitization_metadata": {
+    "rule": "Whitelist-only: only allowed_token_overrides may receive values from user or AI input.",
+    "unknown_component": "reject",
+    "unknown_token_name": "reject"
+  },
+  "compatibility": {
+    "min_plugin_version": "1.0",
+    "element_roles_source": "css-selector-contract.md §3.4"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AIO Page Builder — Render Surfaces Spec",
+  "description": "Allowed surfaces where styling subsystem may emit CSS variables or rules. All selectors align with css-selector-contract.md; no new structural selectors.",
+  "spec_version": "1",
+  "spec_schema": "pb-style-render-surfaces",
+  "selector_authority": "docs/contracts/css-selector-contract.md",
+  "render_surfaces": [
+    {
+      "id": "root",
+      "selector": ":root",
+      "description": "Global scope; token values apply site-wide unless overridden by a more specific surface.",
+      "scope": "global",
+      "allowed_output": ["css_custom_properties"]
+    },
+    {
+      "id": "page",
+      "selector": ".aio-page",
+      "description": "Page wrapper per css-selector-contract.md §4; page-level token overrides.",
+      "scope": "page",
+      "allowed_output": ["css_custom_properties"]
+    },
+    {
+      "id": "section",
+      "selector": "[class^=\"aio-s-\"]",
+      "description": "Section wrapper aio-s-{section_key}; section-scoped overrides when supported.",
+      "scope": "section",
+      "allowed_output": ["css_custom_properties"]
+    }
+  ],
+  "rules": [
+    "No injection of styles or markup into post_content or block inner HTML.",
+    "Emission only at the surfaces listed; no arbitrary selector targets.",
+    "Output limited to CSS custom properties (and optionally one plugin-owned stylesheet) per styling-subsystem-contract."
+  ],
+  "compatibility": {
+    "min_plugin_version": "1.0"
+  }
+}

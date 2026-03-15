@@ -352,6 +352,7 @@ A built page is **meaningful** after plugin deactivation when:
 
 ## 11. Cross-References
 
+- **Styling subsystem**: Styling output (token values, optional stylesheet or scoped inline) is additive and does not modify post_content or structural markup. See [styling-subsystem-contract.md](styling-subsystem-contract.md) and [styling-retrofit-impact-analysis.md](../qa/styling-retrofit-impact-analysis.md).
 - **Section_Schema**: `plugin/src/Domain/Registries/Section/Section_Schema.php`
 - **Page_Template_Schema**: `plugin/src/Domain/Registries/PageTemplate/Page_Template_Schema.php`
 - **Composition_Schema**: `plugin/src/Domain/Registries/Composition/Composition_Schema.php`

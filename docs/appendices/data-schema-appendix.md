@@ -236,10 +236,25 @@ Provider-backed form sections store which form to render using two stable ACF fi
 
 ---
 
+## 22. Styling subsystem (specs and registry)
+
+Machine-readable style specs and style registry are defined by contract; no runtime schema in this appendix until storage is implemented.
+
+| Artifact | Location | Description |
+|----------|----------|-------------|
+| Core token spec | [pb-style-core-spec.json](../specs/pb-style-core-spec.json) | spec_version, token_groups (color, typography, spacing, radius, shadow, component), allowed_names, sanitization metadata. Token names are --aio-* per css-selector-contract. |
+| Component override spec | [pb-style-components-spec.json](../specs/pb-style-components-spec.json) | spec_version, components (id, element_role, selector_pattern, allowed_token_overrides). Aligns with css-selector-contract §3.4. |
+| Render surfaces spec | [pb-style-render-surfaces-spec.json](../specs/pb-style-render-surfaces-spec.json) | spec_version, render_surfaces (id, selector, scope, allowed_output). Surfaces: :root, .aio-page, section wrapper. |
+| Style registry | [style-registry-contract.md](../contracts/style-registry-contract.md) | Read-only lookup over the three specs; spec versioning; plugin-local loading. No new selectors or token names. |
+| Applied design tokens (existing) | Option `aio_applied_design_tokens` | [ group => [ name => value ] ]; see Token_Set_Job_Service. Styling subsystem extends value source only; names remain from contract. |
+
+---
+
 ## Cross-references
 
 - Section/page template field details: [Section Template Inventory](section-template-inventory.md), [Page Template Inventory](page-template-inventory.md).
 - Form provider: [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md), [form-provider-retrofit-impact-analysis.md](../contracts/form-provider-retrofit-impact-analysis.md).
+- Styling subsystem: [styling-subsystem-contract.md](../contracts/styling-subsystem-contract.md), [style-registry-contract.md](../contracts/style-registry-contract.md), [styling-retrofit-impact-analysis.md](../qa/styling-retrofit-impact-analysis.md).
 - Planning output and AI schema: [Prompt Schema Appendix](prompt-schema-appendix.md), [AI Output Schema Appendix](ai-output-schema-appendix.md).
 - Reporting payloads: [Error Email Templates](error-email-templates.md), [Heartbeat Email Templates](heartbeat-email-templates.md), [Install Notification Email Template](install-notification-email-template.md).
 - Terms: [Glossary](glossary.md).

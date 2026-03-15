@@ -7530,6 +7530,8 @@ Informational notices may be displayed without blocking action.**
 
 ### **Tokenization allows brand customization and AI-influenced visual changes without destabilizing the underlying markup contract.**
 
+### **A formal styling subsystem (Option A) is defined in docs/contracts/styling-subsystem-contract.md. It is additive, plugin-owned, and preserves the fixed aio-* selector and --aio-* token-name contract; only token values and optional styling metadata are extended. Retrofit impact is documented in docs/qa/styling-retrofit-impact-analysis.md.**
+
 ### 
 
 ### **18.12 Collision Avoidance Strategy**

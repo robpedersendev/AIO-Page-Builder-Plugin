@@ -324,6 +324,7 @@ Use this checklist to verify a section’s CSS contract manifest complies with t
 
 ## 13. Cross-References
 
+- **Styling subsystem**: The formal styling subsystem (Option A) extends token **values** and optional styling metadata only; selector and token **names** remain defined by this contract. See [styling-subsystem-contract.md](styling-subsystem-contract.md) and [styling-retrofit-impact-analysis.md](../qa/styling-retrofit-impact-analysis.md).
 - **Section_Schema** (`css_contract_ref`): `plugin/src/Domain/Registries/Section/Section_Schema.php`
 - **section-registry-schema.md** §6: CSS contract manifest reference block; section manifests must conform to this contract.
 - **rendering-contract.md**: Markup output and wrapper_attrs; class and ID assignment follow this contract.
