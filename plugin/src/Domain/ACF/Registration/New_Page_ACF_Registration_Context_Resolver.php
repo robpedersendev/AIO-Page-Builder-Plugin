@@ -32,12 +32,22 @@ class New_Page_ACF_Registration_Context_Resolver {
 	/** @var Group_Key_Section_Key_Resolver */
 	private Group_Key_Section_Key_Resolver $group_key_resolver;
 
+	/** @var Page_Section_Key_Cache_Service|null */
+	private ?Page_Section_Key_Cache_Service $section_key_cache;
+
+	/** @var ACF_Registration_Diagnostics_Service|null */
+	private ?ACF_Registration_Diagnostics_Service $diagnostics;
+
 	public function __construct(
 		Field_Group_Derivation_Service $derivation_service,
-		Group_Key_Section_Key_Resolver $group_key_resolver
+		Group_Key_Section_Key_Resolver $group_key_resolver,
+		?Page_Section_Key_Cache_Service $section_key_cache = null,
+		?ACF_Registration_Diagnostics_Service $diagnostics = null
 	) {
 		$this->derivation_service = $derivation_service;
-		$this->group_key_resolver = $group_key_resolver;
+		$this->group_key_resolver  = $group_key_resolver;
+		$this->section_key_cache  = $section_key_cache;
+		$this->diagnostics        = $diagnostics;
 	}
 
 	/**
@@ -68,13 +78,45 @@ class New_Page_ACF_Registration_Context_Resolver {
 		}
 		$template_key = (string) \apply_filters( self::FILTER_NEW_PAGE_TEMPLATE_KEY, '' );
 		if ( $template_key !== '' ) {
-			$group_keys = $this->derivation_service->derive_from_template( $template_key, true );
-			return $this->group_key_resolver->group_keys_to_section_keys( $group_keys );
+			if ( $this->section_key_cache !== null ) {
+				$cached = $this->section_key_cache->get_for_template( $template_key );
+				if ( $cached !== null ) {
+					if ( $this->diagnostics !== null ) {
+						$this->diagnostics->set_request_cache_used( true );
+					}
+					return $cached;
+				}
+			}
+			if ( $this->diagnostics !== null ) {
+				$this->diagnostics->set_request_cache_used( false );
+			}
+			$group_keys   = $this->derivation_service->derive_from_template( $template_key, true );
+			$section_keys = $this->group_key_resolver->group_keys_to_section_keys( $group_keys );
+			if ( $this->section_key_cache !== null ) {
+				$this->section_key_cache->set_for_template( $template_key, $section_keys );
+			}
+			return $section_keys;
 		}
 		$composition_id = (string) \apply_filters( self::FILTER_NEW_PAGE_COMPOSITION_ID, '' );
 		if ( $composition_id !== '' ) {
-			$group_keys = $this->derivation_service->derive_from_composition( $composition_id, true );
-			return $this->group_key_resolver->group_keys_to_section_keys( $group_keys );
+			if ( $this->section_key_cache !== null ) {
+				$cached = $this->section_key_cache->get_for_composition( $composition_id );
+				if ( $cached !== null ) {
+					if ( $this->diagnostics !== null ) {
+						$this->diagnostics->set_request_cache_used( true );
+					}
+					return $cached;
+				}
+			}
+			if ( $this->diagnostics !== null ) {
+				$this->diagnostics->set_request_cache_used( false );
+			}
+			$group_keys   = $this->derivation_service->derive_from_composition( $composition_id, true );
+			$section_keys = $this->group_key_resolver->group_keys_to_section_keys( $group_keys );
+			if ( $this->section_key_cache !== null ) {
+				$this->section_key_cache->set_for_composition( $composition_id, $section_keys );
+			}
+			return $section_keys;
 		}
 		return array();
 	}

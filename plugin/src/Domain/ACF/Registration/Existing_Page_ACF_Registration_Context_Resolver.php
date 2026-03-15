@@ -27,12 +27,22 @@ class Existing_Page_ACF_Registration_Context_Resolver {
 	/** @var Group_Key_Section_Key_Resolver */
 	private Group_Key_Section_Key_Resolver $group_key_resolver;
 
+	/** @var Page_Section_Key_Cache_Service|null */
+	private ?Page_Section_Key_Cache_Service $section_key_cache;
+
+	/** @var ACF_Registration_Diagnostics_Service|null */
+	private ?ACF_Registration_Diagnostics_Service $diagnostics;
+
 	public function __construct(
 		Page_Field_Group_Assignment_Service $assignment_service,
-		Group_Key_Section_Key_Resolver $group_key_resolver
+		Group_Key_Section_Key_Resolver $group_key_resolver,
+		?Page_Section_Key_Cache_Service $section_key_cache = null,
+		?ACF_Registration_Diagnostics_Service $diagnostics = null
 	) {
-		$this->assignment_service = $assignment_service;
-		$this->group_key_resolver = $group_key_resolver;
+		$this->assignment_service  = $assignment_service;
+		$this->group_key_resolver  = $group_key_resolver;
+		$this->section_key_cache  = $section_key_cache;
+		$this->diagnostics        = $diagnostics;
 	}
 
 	/**
@@ -78,7 +88,23 @@ class Existing_Page_ACF_Registration_Context_Resolver {
 		if ( $page_id <= 0 ) {
 			return array();
 		}
+		if ( $this->section_key_cache !== null ) {
+			$cached = $this->section_key_cache->get_for_page( $page_id );
+			if ( $cached !== null ) {
+				if ( $this->diagnostics !== null ) {
+					$this->diagnostics->set_request_cache_used( true );
+				}
+				return $cached;
+			}
+		}
+		if ( $this->diagnostics !== null ) {
+			$this->diagnostics->set_request_cache_used( false );
+		}
 		$group_keys = $this->assignment_service->get_visible_groups_for_page( $page_id );
-		return $this->group_key_resolver->group_keys_to_section_keys( $group_keys );
+		$section_keys = $this->group_key_resolver->group_keys_to_section_keys( $group_keys );
+		if ( $this->section_key_cache !== null ) {
+			$this->section_key_cache->set_for_page( $page_id, $section_keys );
+		}
+		return $section_keys;
 	}
 }

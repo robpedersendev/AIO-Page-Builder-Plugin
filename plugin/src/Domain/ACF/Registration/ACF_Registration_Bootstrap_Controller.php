@@ -35,18 +35,23 @@ final class ACF_Registration_Bootstrap_Controller {
 	/** @var New_Page_ACF_Registration_Context_Resolver */
 	private New_Page_ACF_Registration_Context_Resolver $new_page_resolver;
 
+	/** @var ACF_Registration_Diagnostics_Service|null */
+	private ?ACF_Registration_Diagnostics_Service $diagnostics;
+
 	public function __construct(
 		ACF_Group_Registrar_Interface $group_registrar,
 		Registration_Request_Context $request_context,
 		Group_Key_Section_Key_Resolver $group_key_resolver,
 		Existing_Page_ACF_Registration_Context_Resolver $existing_page_resolver,
-		New_Page_ACF_Registration_Context_Resolver $new_page_resolver
+		New_Page_ACF_Registration_Context_Resolver $new_page_resolver,
+		?ACF_Registration_Diagnostics_Service $diagnostics = null
 	) {
-		$this->group_registrar     = $group_registrar;
-		$this->request_context     = $request_context;
-		$this->group_key_resolver  = $group_key_resolver;
+		$this->group_registrar        = $group_registrar;
+		$this->request_context        = $request_context;
+		$this->group_key_resolver     = $group_key_resolver;
 		$this->existing_page_resolver = $existing_page_resolver;
-		$this->new_page_resolver   = $new_page_resolver;
+		$this->new_page_resolver      = $new_page_resolver;
+		$this->diagnostics            = $diagnostics;
 	}
 
 	/**
@@ -57,15 +62,49 @@ final class ACF_Registration_Bootstrap_Controller {
 	 */
 	public function run_registration(): int {
 		if ( $this->request_context->should_skip_registration() ) {
+			if ( $this->diagnostics !== null ) {
+				$this->diagnostics->record_registration(
+					ACF_Registration_Diagnostics_Service::MODE_FRONT_END_SKIP,
+					0,
+					false,
+					false
+				);
+			}
 			return 0;
 		}
 		$section_keys = $this->existing_page_resolver->get_section_keys_for_current_request();
 		if ( $section_keys !== null ) {
-			return $this->group_registrar->register_sections( $section_keys );
+			$count = $this->group_registrar->register_sections( $section_keys );
+			if ( $this->diagnostics !== null ) {
+				$this->diagnostics->record_registration(
+					ACF_Registration_Diagnostics_Service::MODE_EXISTING_PAGE,
+					count( $section_keys ),
+					$this->diagnostics->get_request_cache_used(),
+					false
+				);
+			}
+			return $count;
 		}
 		$section_keys = $this->new_page_resolver->get_section_keys_for_current_request();
 		if ( $section_keys !== null ) {
-			return $this->group_registrar->register_sections( $section_keys );
+			$count = $this->group_registrar->register_sections( $section_keys );
+			if ( $this->diagnostics !== null ) {
+				$this->diagnostics->record_registration(
+					ACF_Registration_Diagnostics_Service::MODE_NEW_PAGE,
+					count( $section_keys ),
+					$this->diagnostics->get_request_cache_used(),
+					false
+				);
+			}
+			return $count;
+		}
+		if ( $this->diagnostics !== null ) {
+			$this->diagnostics->record_registration(
+				ACF_Registration_Diagnostics_Service::MODE_NON_PAGE_ADMIN,
+				0,
+				false,
+				false
+			);
 		}
 		// Non-page admin: do not trigger full registration (see acf-admin-context-registration-matrix).
 		return 0;

@@ -59,6 +59,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 		}
 
 		$assigned = $this->persist_field_groups( $page_ref, $derived );
+		do_action( 'aio_acf_assignment_changed', $page_id );
 		return array( 'assigned' => $assigned, 'errors' => array() );
 	}
 
@@ -85,6 +86,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 		}
 
 		$assigned = $this->persist_field_groups( $page_ref, $derived );
+		do_action( 'aio_acf_assignment_changed', $page_id );
 		return array( 'assigned' => $assigned, 'errors' => array() );
 	}
 

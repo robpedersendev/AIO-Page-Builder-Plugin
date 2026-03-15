@@ -89,6 +89,15 @@
 | Operator and support | Operator guide; support references; known-risk FPR-1, FPR-2. | [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md); [template-library-support-guide.md](../guides/template-library-support-guide.md); [known-risk-register.md](known-risk-register.md). |
 | Extension backlog | Next-wave prompts (additional providers, form-list API, auto-provisioning, survivability, maintenance). | [form-provider-extension-backlog.md](form-provider-extension-backlog.md). |
 
+### 2.8a ACF conditional-registration performance retrofit
+
+| Area | Summary | Artifact |
+|------|---------|----------|
+| Heavy-load elimination | Front-end and non-page admin skip registration; existing-page and new-page edit use scoped registration only. | [acf-registration-performance-impact-analysis.md](../qa/acf-registration-performance-impact-analysis.md); [acf-blueprint-bulk-load-elimination-report.md](../qa/acf-blueprint-bulk-load-elimination-report.md). |
+| Acceptance and release gate | QA checklist (front-end, existing-page, new-page, non-page admin); contract compliance (field values, LPagery, assignment map). | [acf-conditional-registration-acceptance-report.md](../qa/acf-conditional-registration-acceptance-report.md); [acf-registration-performance-release-gate.md](acf-registration-performance-release-gate.md). |
+| Diagnostics | Bounded registration mode/cache/full-registration diagnostics; admin/support only; no sensitive data. | [acf-conditional-registration-diagnostics-checklist.md](../qa/acf-conditional-registration-diagnostics-checklist.md). |
+| Known risk | ACF-1 (section-key cache; correctness over speed; invalidation on assignment change). | [known-risk-register.md](known-risk-register.md) §3. |
+
 ### 2.9 Styling subsystem (Option A expansion)
 
 | Area | Summary | Artifact |
