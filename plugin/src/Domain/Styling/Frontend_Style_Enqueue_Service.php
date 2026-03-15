@@ -16,6 +16,7 @@ use AIOPageBuilder\Infrastructure\Config\Plugin_Config;
 
 /**
  * Registers and conditionally enqueues aio-page-builder-base.css on the front end.
+ * When an emitter is provided, appends global token CSS variables to the base stylesheet (Prompt 249).
  */
 final class Frontend_Style_Enqueue_Service {
 
@@ -28,8 +29,12 @@ final class Frontend_Style_Enqueue_Service {
 	/** @var Plugin_Config */
 	private Plugin_Config $config;
 
-	public function __construct( Plugin_Config $config ) {
-		$this->config = $config;
+	/** @var Global_Token_Variable_Emitter|null */
+	private ?Global_Token_Variable_Emitter $emitter;
+
+	public function __construct( Plugin_Config $config, ?Global_Token_Variable_Emitter $emitter = null ) {
+		$this->config  = $config;
+		$this->emitter = $emitter;
 	}
 
 	/**
@@ -59,6 +64,12 @@ final class Frontend_Style_Enqueue_Service {
 		}
 		$this->register();
 		\wp_enqueue_style( self::HANDLE_BASE );
+		if ( $this->emitter !== null ) {
+			$css = $this->emitter->emit_for_root();
+			if ( $css !== '' ) {
+				\wp_add_inline_style( self::HANDLE_BASE, $css );
+			}
+		}
 	}
 
 	/**

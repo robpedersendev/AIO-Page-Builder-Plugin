@@ -35,6 +35,7 @@ use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
 use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
+use AIOPageBuilder\Admin\Screens\Settings\Global_Component_Override_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
@@ -131,9 +132,10 @@ final class Admin_Menu {
 		$queue_logs           = new Queue_Logs_Screen( $this->container );
 		$support_triage     = new Support_Triage_Dashboard_Screen( $this->container );
 		$post_release_health = new Post_Release_Health_Screen( $this->container );
-		$privacy_reporting  = new Privacy_Reporting_Settings_Screen( $this->container );
+		$privacy_reporting   = new Privacy_Reporting_Settings_Screen( $this->container );
 		$global_style_tokens = new Global_Style_Token_Settings_Screen( $this->container );
-		$import_export     = new Import_Export_Screen( $this->container );
+		$global_component_overrides = new Global_Component_Override_Settings_Screen( $this->container );
+		$import_export       = new Import_Export_Screen( $this->container );
 
 		add_menu_page(
 			__( 'AIO Page Builder', 'aio-page-builder' ),
@@ -370,6 +372,15 @@ final class Admin_Menu {
 			$global_style_tokens->get_capability(),
 			Global_Style_Token_Settings_Screen::SLUG,
 			array( $global_style_tokens, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$global_component_overrides->get_title(),
+			__( 'Global Component Overrides', 'aio-page-builder' ),
+			$global_component_overrides->get_capability(),
+			Global_Component_Override_Settings_Screen::SLUG,
+			array( $global_component_overrides, 'render' )
 		);
 
 		add_submenu_page(

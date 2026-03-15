@@ -127,6 +127,7 @@ require_once $bootstrap_dir . '/../Domain/Styling/Render_Surface_Style_Registry.
 require_once $bootstrap_dir . '/../Domain/Styling/Frontend_Style_Enqueue_Service.php';
 require_once $bootstrap_dir . '/../Domain/Styling/Global_Style_Settings_Schema.php';
 require_once $bootstrap_dir . '/../Domain/Styling/Global_Style_Settings_Repository.php';
+require_once $bootstrap_dir . '/../Domain/Styling/Global_Token_Variable_Emitter.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Styling_Provider.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
 require_once $bootstrap_dir . '/Lifecycle_Manager.php';
@@ -144,7 +145,9 @@ require_once $bootstrap_dir . '/../Domain/Reporting/UI/Logs_Monitoring_State_Bui
 require_once $bootstrap_dir . '/../Domain/Reporting/UI/Privacy_Settings_State_Builder.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Logs/Queue_Logs_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Forms/Global_Style_Token_Form_Builder.php';
+require_once $bootstrap_dir . '/../Admin/Forms/Global_Component_Override_Form_Builder.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Settings/Global_Style_Token_Settings_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Settings/Global_Component_Override_Settings_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Settings/Privacy_Reporting_Settings_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Admin_Menu.php';
 

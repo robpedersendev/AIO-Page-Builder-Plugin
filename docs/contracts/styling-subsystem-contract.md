@@ -3,7 +3,7 @@
 **Spec**: §17.10 Rendered Content Independence from Plugin; §18 CSS, ID, Class, and Attribute Contract; §18.11 Tokenized Styling Model  
 **Upstream**: [css-selector-contract.md](css-selector-contract.md), [rendering-contract.md](rendering-contract.md)  
 **Standards**: [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md)  
-**Status**: Contract and retrofit definition only; no runtime styling, storage, UI, or emitters in this document.
+**Status**: Storage, registries, admin UI (global tokens, component overrides), and global token emission implemented (Prompts 246–249).
 
 ---
 
@@ -121,6 +121,8 @@ The styling subsystem uses versioned machine-readable specs and a read-only styl
 - **Style registry contract**: [style-registry-contract.md](style-registry-contract.md) — registry responsibilities, read-only lookup, spec versioning, loading and security rules.
 
 No new structural selectors or token names are introduced by the specs; they document and constrain the existing contract.
+
+**Global token emission (Prompt 249):** `Global_Token_Variable_Emitter` reads validated global token values from `aio_global_style_settings`, confirms names against the token registry, and emits only approved `--aio-*` custom properties. Emission is scoped to `:root` per render-surfaces spec. Invalid token names or values are omitted (fail closed). `Frontend_Style_Enqueue_Service` appends the emitted `:root { ... }` block as inline style when the base stylesheet is enqueued. No component override CSS is emitted by this path.
 
 ---
 

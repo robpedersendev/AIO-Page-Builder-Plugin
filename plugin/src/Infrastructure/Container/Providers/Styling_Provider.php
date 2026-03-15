@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Styling\Component_Override_Registry;
 use AIOPageBuilder\Domain\Styling\Frontend_Style_Enqueue_Service;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Repository;
+use AIOPageBuilder\Domain\Styling\Global_Token_Variable_Emitter;
 use AIOPageBuilder\Domain\Styling\Render_Surface_Style_Registry;
 use AIOPageBuilder\Domain\Styling\Style_Spec_Loader;
 use AIOPageBuilder\Domain\Styling\Style_Token_Registry;
@@ -57,8 +58,15 @@ final class Styling_Provider implements Service_Provider_Interface {
 			return new Global_Style_Settings_Repository( $token_registry, $component_registry );
 		} );
 
+		$container->register( 'global_token_variable_emitter', function () use ( $container ): Global_Token_Variable_Emitter {
+			$repo    = $container->get( 'global_style_settings_repository' );
+			$registry = $container->has( 'style_token_registry' ) ? $container->get( 'style_token_registry' ) : null;
+			return new Global_Token_Variable_Emitter( $repo, $registry );
+		} );
+
 		$container->register( 'frontend_style_enqueue_service', function () use ( $container ): Frontend_Style_Enqueue_Service {
-			return new Frontend_Style_Enqueue_Service( $container->get( 'config' ) );
+			$emitter = $container->has( 'global_token_variable_emitter' ) ? $container->get( 'global_token_variable_emitter' ) : null;
+			return new Frontend_Style_Enqueue_Service( $container->get( 'config' ), $emitter );
 		} );
 
 		\add_action( 'wp_enqueue_scripts', function () use ( $container ): void {
