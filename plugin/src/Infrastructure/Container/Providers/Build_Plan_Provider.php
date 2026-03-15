@@ -11,10 +11,15 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_Analytics_Service;
-use AIOPageBuilder\Domain\Registries\Analytics\Template_Analytics_Service;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Item_Generator;
+use AIOPageBuilder\Domain\Industry\AI\Industry_Build_Plan_Scoring_Service;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
+use AIOPageBuilder\Domain\Registries\Analytics\Template_Analytics_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Detail_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Updates_UI_Service;
@@ -49,10 +54,30 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 		$container->register( 'build_plan_item_generator', function (): Build_Plan_Item_Generator {
 			return new Build_Plan_Item_Generator();
 		} );
+		$container->register( 'industry_build_plan_scoring_service', function () use ( $container ): ?Industry_Build_Plan_Scoring_Service {
+			if ( ! $container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) || ! $container->has( 'page_template_repository' ) ) {
+				return null;
+			}
+			$profile_store = $container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			if ( ! $profile_store instanceof Industry_Profile_Repository ) {
+				return null;
+			}
+			$pack_registry = $container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY )
+				? $container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY )
+				: null;
+			return new Industry_Build_Plan_Scoring_Service(
+				new Industry_Page_Template_Recommendation_Resolver(),
+				$container->get( 'page_template_repository' ),
+				$profile_store,
+				$pack_registry instanceof Industry_Pack_Registry ? $pack_registry : null
+			);
+		} );
 		$container->register( 'build_plan_generator', function () use ( $container ): Build_Plan_Generator {
+			$scoring = $container->has( 'industry_build_plan_scoring_service' ) ? $container->get( 'industry_build_plan_scoring_service' ) : null;
 			return new Build_Plan_Generator(
 				$container->get( 'build_plan_repository' ),
-				$container->get( 'build_plan_item_generator' )
+				$container->get( 'build_plan_item_generator' ),
+				$scoring instanceof Industry_Build_Plan_Scoring_Service ? $scoring : null
 			);
 		} );
 		$container->register( 'build_plan_stepper_builder', function (): Build_Plan_Stepper_Builder {

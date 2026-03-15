@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
+use AIOPageBuilder\Domain\Industry\AI\Industry_Build_Plan_Scoring_Service;
 
 /**
  * Converts normalized output section records into plan items. Only produces items when enough data exists.
@@ -105,6 +106,7 @@ final class Build_Plan_Item_Generator {
 				$payload['target_template_key'] = trim( $rec['target_template_key'] );
 				$payload['template_key']         = trim( $rec['target_template_key'] );
 			}
+			$this->merge_industry_metadata_into_payload( $payload, $rec );
 			$item_id = $prefix . '_epc_' . $i;
 			$items[] = $this->build_item(
 				$item_id,
@@ -146,19 +148,21 @@ final class Build_Plan_Item_Generator {
 				);
 				continue;
 			}
+			$payload = array(
+				'proposed_page_title' => (string) ( $rec['proposed_page_title'] ?? '' ),
+				'proposed_slug'       => (string) ( $rec['proposed_slug'] ?? '' ),
+				'purpose'             => (string) ( $rec['purpose'] ?? '' ),
+				'template_key'        => (string) ( $rec['template_key'] ?? '' ),
+				'menu_eligible'       => (bool) ( $rec['menu_eligible'] ?? false ),
+				'section_guidance'    => (string) ( $rec['section_guidance'] ?? '' ),
+				'confidence'          => (string) ( $rec[ Build_Plan_Draft_Schema::NPC_CONFIDENCE ] ?? 'medium' ),
+			);
+			$this->merge_industry_metadata_into_payload( $payload, $rec );
 			$item_id = $prefix . '_npc_' . $i;
 			$items[] = $this->build_item(
 				$item_id,
 				Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE,
-				array(
-					'proposed_page_title' => (string) ( $rec['proposed_page_title'] ?? '' ),
-					'proposed_slug'       => (string) ( $rec['proposed_slug'] ?? '' ),
-					'purpose'             => (string) ( $rec['purpose'] ?? '' ),
-					'template_key'        => (string) ( $rec['template_key'] ?? '' ),
-					'menu_eligible'       => (bool) ( $rec['menu_eligible'] ?? false ),
-					'section_guidance'    => (string) ( $rec['section_guidance'] ?? '' ),
-					'confidence'          => (string) ( $rec[ Build_Plan_Draft_Schema::NPC_CONFIDENCE ] ?? 'medium' ),
-				),
+				$payload,
 				Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE,
 				$i,
 				$rec
@@ -325,5 +329,27 @@ final class Build_Plan_Item_Generator {
 			$item[ Build_Plan_Item_Schema::KEY_RISK_LEVEL ] = $payload['risk_level'];
 		}
 		return $item;
+	}
+
+	/**
+	 * Merges industry scoring metadata from enriched record into payload (industry-build-plan-scoring-contract.md).
+	 *
+	 * @param array<string, mixed> $payload Mutable payload to merge into.
+	 * @param array<string, mixed> $record Enriched record (may contain industry_source_refs, recommendation_reasons, industry_fit_score, industry_warning_flags).
+	 * @return void
+	 */
+	private function merge_industry_metadata_into_payload( array &$payload, array $record ): void {
+		if ( isset( $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_SOURCE_REFS ] ) && is_array( $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_SOURCE_REFS ] ) ) {
+			$payload['industry_source_refs'] = $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_SOURCE_REFS ];
+		}
+		if ( isset( $record[ Industry_Build_Plan_Scoring_Service::RECORD_RECOMMENDATION_REASONS ] ) && is_array( $record[ Industry_Build_Plan_Scoring_Service::RECORD_RECOMMENDATION_REASONS ] ) ) {
+			$payload['recommendation_reasons'] = $record[ Industry_Build_Plan_Scoring_Service::RECORD_RECOMMENDATION_REASONS ];
+		}
+		if ( array_key_exists( Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_FIT_SCORE, $record ) ) {
+			$payload['industry_fit_score'] = $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_FIT_SCORE ];
+		}
+		if ( isset( $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ] ) && is_array( $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ] ) ) {
+			$payload['industry_warning_flags'] = $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ];
+		}
 	}
 }
