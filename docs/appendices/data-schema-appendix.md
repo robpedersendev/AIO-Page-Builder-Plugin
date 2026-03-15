@@ -150,6 +150,12 @@ Industry-specific page one-pager overlays (industry-page-onepager-overlay-schema
 
 ---
 
+## 11.4 Industry recommendation override (Prompt 366)
+
+Override object for operator override of industry recommendations (section, page_template, build_plan_item). Schema: Industry_Override_Schema. Key fields: target_type, target_key, plan_id (optional, for build_plan_item), state (accepted | rejected), reason (sanitized, max 500 chars), created_at, updated_at, industry_context_ref. Validation via Industry_Override_Schema::validate(); reason sanitized via Industry_Override_Schema::sanitize_reason(). Storage and UI for overrides are defined in later prompts. See [industry-override-contract.md](../contracts/industry-override-contract.md).
+
+---
+
 ## 12. Template library compliance result payload
 
 Output of Template_Library_Compliance_Service::run() → Template_Library_Compliance_Result::to_array():

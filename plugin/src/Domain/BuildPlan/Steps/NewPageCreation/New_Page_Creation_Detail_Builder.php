@@ -14,6 +14,7 @@ namespace AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\ViewModels\BuildPlan\Industry_Build_Plan_Explanation_View_Model;
 use AIOPageBuilder\Domain\BuildPlan\Recommendations\Build_Plan_Template_Explanation_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Detail_Panel_Component;
@@ -51,6 +52,10 @@ final class New_Page_Creation_Detail_Builder {
 		if ( $template_rationale !== null ) {
 			$sections[] = $template_rationale;
 		}
+		$industry_section = $this->section_industry_explanation( $payload );
+		if ( $industry_section !== null ) {
+			$sections[] = $industry_section;
+		}
 		$sections[] = $this->section_parent_child_hierarchy( $payload );
 		$sections[] = $this->section_dependency_validation( $payload, $item );
 		$sections[] = $this->section_post_build_status( $status, $payload );
@@ -86,6 +91,31 @@ final class New_Page_Creation_Detail_Builder {
 			Detail_Panel_Component::SECTION_KEY_HEADING       => \__( 'Template rationale', 'aio-page-builder' ),
 			Detail_Panel_Component::SECTION_KEY_KEY           => 'template_rationale',
 			Detail_Panel_Component::SECTION_KEY_CONTENT_LINES => $escaped,
+		);
+	}
+
+	/**
+	 * Industry context section from item payload (Prompt 365). Renders rationale, fit, and warnings.
+	 *
+	 * @param array<string, mixed> $payload
+	 * @return array<string, mixed>|null Section or null when no industry data.
+	 */
+	private function section_industry_explanation( array $payload ): ?array {
+		$view_model = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
+		if ( empty( $view_model['has_industry_data'] ) ) {
+			return null;
+		}
+		\ob_start();
+		$view_model = $view_model;
+		require \dirname( __DIR__, 4 ) . '/Admin/Views/build-plan/industry-plan-explanations.php';
+		$content = (string) \ob_get_clean();
+		if ( $content === '' ) {
+			return null;
+		}
+		return array(
+			Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'Industry context', 'aio-page-builder' ),
+			Detail_Panel_Component::SECTION_KEY_KEY     => 'industry_explanation',
+			Detail_Panel_Component::SECTION_KEY_CONTENT => $content,
 		);
 	}
 

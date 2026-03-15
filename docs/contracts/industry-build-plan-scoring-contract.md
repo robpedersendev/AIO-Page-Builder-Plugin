@@ -36,11 +36,19 @@ Build Plan **items** (per Build_Plan_Item_Schema) gain optional payload or item-
 | **industry_warning_flags** | array | Warnings (e.g. cta_mismatch, discouraged_for_industry). |
 
 - Stored in item **payload** for new_page and existing_page_change items so UI and explanations can surface them. Other item types may omit industry metadata.
-- Plan-level: optional **industry_warnings** array in plan definition (e.g. "Required page family X not present") when Industry_Page_Family_Rule_Engine is used (Prompt 346). LPagery planning warnings (e.g. required_tokens_for_central_lpagery, weak_fit_local_page) may be merged from Industry_LPagery_Planning_Advisor when present.
+- Plan-level: optional **industry_warnings** array in plan definition (e.g. "Required page family X not present") when Industry_Page_Family_Rule_Engine is used (Prompt 346). LPagery planning warnings (e.g. required_tokens_for_central_lpagery, weak_fit_local_page) may be merged from Industry_LPagery_Planning_Advisor when present. These should be merged into the plan definition **warnings** (Build_Plan_Schema::KEY_WARNINGS) so the Build Plan review UI context rail displays them (build-plan-ui-contract.md §2).
 
 ---
 
-## 4. Behavior
+## 4. Review UI (Prompt 365)
+
+- Item-level industry metadata is surfaced in the **Build Plan detail panel** via Industry_Build_Plan_Explanation_View_Model and the industry-plan-explanations view. Users see rationale, fit classification, and warning badges per item when industry scoring has enriched the plan.
+- Plan-level industry/hierarchy/LPagery warnings appear in the workspace **context rail** when merged into definition.warnings. No separate industry-only block is required; the existing warnings_summary is used.
+- Generic fallback: when no industry context exists, no industry section is shown and the review flow behaves as before.
+
+---
+
+## 5. Behavior
 
 - **Page template recommendations**: For each new_page and existing_page_change record with template_key (or target_template_key), resolve industry fit via Industry_Page_Template_Recommendation_Resolver; attach industry_source_refs, explanation_reasons, score, warning_flags to the record. Optionally reorder new_pages by fit (recommended first, then weak, then neutral, then discouraged).
 - **Section recommendations**: Where section_guidance or section keys are present, Industry_Section_Recommendation_Resolver can score section combinations; result reasons and flags may be merged into item metadata or plan-level warnings.
@@ -49,7 +57,7 @@ Build Plan **items** (per Build_Plan_Item_Schema) gain optional payload or item-
 
 ---
 
-## 5. Security and constraints
+## 6. Security and constraints
 
 - No automatic execution; scoring must not create unsafe direct mutations.
 - Invalid or incomplete industry profile data must be handled safely (fallback to generic behavior).
@@ -57,7 +65,7 @@ Build Plan **items** (per Build_Plan_Item_Schema) gain optional payload or item-
 
 ---
 
-## 6. Files
+## 7. Files
 
 - **Service**: plugin/src/Domain/Industry/AI/Industry_Build_Plan_Scoring_Service.php
 - **Contract**: docs/contracts/industry-build-plan-scoring-contract.md

@@ -14,6 +14,7 @@ namespace AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\ViewModels\BuildPlan\Industry_Build_Plan_Explanation_View_Model;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Detail_Panel_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Existing_Page_Template_Change_Builder;
@@ -51,6 +52,10 @@ final class Existing_Page_Update_Detail_Builder {
 		if ( $template_change_section !== null ) {
 			$sections[] = $template_change_section;
 		}
+		$industry_section = $this->section_industry_explanation( $payload );
+		if ( $industry_section !== null ) {
+			$sections[] = $industry_section;
+		}
 		$sections[] = $this->section_rationale( $payload );
 		$sections[] = $this->section_proposed_outcome( $payload );
 		$sections[] = $this->section_target_title_slug( $payload );
@@ -61,6 +66,31 @@ final class Existing_Page_Update_Detail_Builder {
 		return array_filter( $sections, static function ( $s ) {
 			return $s !== null && is_array( $s );
 		} );
+	}
+
+	/**
+	 * Industry context section from item payload (Prompt 365).
+	 *
+	 * @param array<string, mixed> $payload
+	 * @return array<string, mixed>|null
+	 */
+	private function section_industry_explanation( array $payload ): ?array {
+		$view_model = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
+		if ( empty( $view_model['has_industry_data'] ) ) {
+			return null;
+		}
+		\ob_start();
+		$view_model = $view_model;
+		require \dirname( __DIR__, 4 ) . '/Admin/Views/build-plan/industry-plan-explanations.php';
+		$content = (string) \ob_get_clean();
+		if ( $content === '' ) {
+			return null;
+		}
+		return array(
+			Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'Industry context', 'aio-page-builder' ),
+			Detail_Panel_Component::SECTION_KEY_KEY     => 'industry_explanation',
+			Detail_Panel_Component::SECTION_KEY_CONTENT => $content,
+		);
 	}
 
 	private function section_page_identity( array $payload ): array {
