@@ -136,6 +136,7 @@ No shortcut may silently override the approved architecture; changes that affect
 | Support and diagnostics for template library | [template-library-support-guide.md](template-library-support-guide.md) |
 | Build Plans and execution | [admin-operator-guide.md](admin-operator-guide.md) §6–§7 |
 | Export/restore (templates included) | [admin-operator-guide.md](admin-operator-guide.md) §11 |
+| Styling lifecycle, uninstall, and theme continuity | [styling-portability-and-uninstall.md](styling-portability-and-uninstall.md) |
 | Capabilities and screen inventory | [admin-screen-inventory.md](../contracts/admin-screen-inventory.md) (if present) |
 
 ---
@@ -146,3 +147,4 @@ No shortcut may silently override the approved architecture; changes that affect
 - **Detail:** No edit-in-place of template definition from the detail screen; definitions are registry/CPT-backed and updated through governed flows.
 - **Compositions:** Governed builder only; no freeform HTML or arbitrary blocks. Section set must come from the section template registry.
 - **Preview:** Synthetic data only; not live site data. Reflects structure and layout, not real content.
+- **Styling lifecycle:** Global and per-entity styling are plugin-owned. On uninstall, styling options are removed; built page content is preserved. Theme CSS can continue to target the same selectors (`.aio-page`, `.aio-s-*`, `--aio-*`) after plugin removal. See [styling-portability-and-uninstall.md](styling-portability-and-uninstall.md).

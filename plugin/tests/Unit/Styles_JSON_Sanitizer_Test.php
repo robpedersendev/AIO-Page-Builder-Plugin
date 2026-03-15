@@ -116,4 +116,16 @@ final class Styles_JSON_Sanitizer_Test extends TestCase {
 		$this->assertIsArray( $result->get_errors() );
 		$this->assertIsArray( $result->get_sanitized() );
 	}
+
+	/** Rejected unsafe style payload (Prompt 259): entity payload with prohibited value must not be valid. */
+	public function test_entity_payload_unsafe_value_rejected(): void {
+		$normalized = array(
+			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => '1',
+			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'primary' => 'url(javascript:alert(1))' ) ),
+			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => array(),
+		);
+		$result = $this->sanitizer->sanitize_entity_payload( $normalized );
+		$this->assertFalse( $result->is_valid(), 'Entity payload with prohibited value must be rejected.' );
+		$this->assertNotEmpty( $result->get_errors() );
+	}
 }

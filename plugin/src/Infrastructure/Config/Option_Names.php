@@ -60,6 +60,15 @@ final class Option_Names {
 	/** Prompt experiment definitions (Prompt 121; no secrets). */
 	public const PROMPT_EXPERIMENTS = self::PREFIX . 'prompt_experiments';
 
+	/** Global styling settings (tokens, component overrides); plugin-owned, removed on uninstall (spec §17.10, styling contract §8). */
+	public const GLOBAL_STYLE_SETTINGS = 'aio_global_style_settings';
+
+	/** Per-entity style payloads (section/page template overrides); plugin-owned, removed on uninstall. */
+	public const ENTITY_STYLE_PAYLOADS = 'aio_entity_style_payloads';
+
+	/** Style cache version marker; plugin-owned, removed on uninstall. */
+	public const STYLE_CACHE_VERSION = 'aio_style_cache_version';
+
 	/** @var array<string>|null */
 	private static ?array $all = null;
 
@@ -87,6 +96,9 @@ final class Option_Names {
 			self::PROFILE_CURRENT,
 			self::ONBOARDING_DRAFT,
 			self::PROMPT_EXPERIMENTS,
+			self::GLOBAL_STYLE_SETTINGS,
+			self::ENTITY_STYLE_PAYLOADS,
+			self::STYLE_CACHE_VERSION,
 		);
 		return self::$all;
 	}

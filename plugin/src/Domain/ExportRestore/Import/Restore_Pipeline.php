@@ -24,6 +24,8 @@ use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
 use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
 use AIOPageBuilder\Domain\Styling\Style_Cache_Service;
+use AIOPageBuilder\Domain\Styling\Styles_JSON_Normalizer;
+use AIOPageBuilder\Domain\Styling\Styles_JSON_Sanitizer;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 use AIOPageBuilder\Support\Logging\Error_Record;
@@ -78,6 +80,12 @@ final class Restore_Pipeline {
 	/** @var Style_Cache_Service|null Post-restore style cache invalidation (Prompt 257). */
 	private ?Style_Cache_Service $style_cache_service;
 
+	/** @var Styles_JSON_Normalizer|null Styling restore: normalize before sanitize (Prompt 259). */
+	private ?Styles_JSON_Normalizer $styles_normalizer;
+
+	/** @var Styles_JSON_Sanitizer|null Styling restore: only persist sanitized data (Prompt 259). */
+	private ?Styles_JSON_Sanitizer $styles_sanitizer;
+
 	public function __construct(
 		Settings_Service $settings,
 		Profile_Store $profile_store,
@@ -88,7 +96,9 @@ final class Restore_Pipeline {
 		\wpdb $wpdb,
 		?Logger_Interface $logger = null,
 		?Template_Library_Restore_Validator $template_library_restore_validator = null,
-		?Style_Cache_Service $style_cache_service = null
+		?Style_Cache_Service $style_cache_service = null,
+		?Styles_JSON_Normalizer $styles_normalizer = null,
+		?Styles_JSON_Sanitizer $styles_sanitizer = null
 	) {
 		$this->settings                           = $settings;
 		$this->profile_store                      = $profile_store;
@@ -100,6 +110,8 @@ final class Restore_Pipeline {
 		$this->logger                             = $logger;
 		$this->template_library_restore_validator = $template_library_restore_validator;
 		$this->style_cache_service               = $style_cache_service;
+		$this->styles_normalizer                  = $styles_normalizer;
+		$this->styles_sanitizer                   = $styles_sanitizer;
 	}
 
 	/**
@@ -225,24 +237,61 @@ final class Restore_Pipeline {
 				return $actions;
 
 			case 'styling':
-				$global_json = $zip->getFromName( 'styling/global_settings.json' );
-				$entity_json = $zip->getFromName( 'styling/entity_payloads.json' );
 				$actions = array();
-				if ( $global_json !== false ) {
-					$data = json_decode( $global_json, true );
-					if ( \is_array( $data ) && $this->is_supported_global_style_version( $data ) ) {
-						\update_option( Global_Style_Settings_Schema::OPTION_KEY, $data, false );
-						$actions[] = array( 'category' => 'styling', 'action' => 'overwrite', 'key' => 'global_settings' );
+				if ( $this->styles_normalizer !== null && $this->styles_sanitizer !== null ) {
+					$global_json = $zip->getFromName( 'styling/global_settings.json' );
+					if ( $global_json !== false ) {
+						$data = json_decode( $global_json, true );
+						if ( \is_array( $data ) && $this->is_supported_global_style_version( $data ) ) {
+							$norm_tokens = $this->styles_normalizer->normalize_global_tokens( $data[ Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS ] ?? array() );
+							$norm_comps  = $this->styles_normalizer->normalize_global_component_overrides( $data[ Global_Style_Settings_Schema::KEY_GLOBAL_COMPONENT_OVERRIDES ] ?? array() );
+							$res_tokens  = $this->styles_sanitizer->sanitize_global_tokens( $norm_tokens );
+							$res_comps   = $this->styles_sanitizer->sanitize_global_component_overrides( $norm_comps );
+							if ( $res_tokens->is_valid() && $res_comps->is_valid() ) {
+								$safe = array(
+									Global_Style_Settings_Schema::KEY_VERSION                   => isset( $data[ Global_Style_Settings_Schema::KEY_VERSION ] ) && is_string( $data[ Global_Style_Settings_Schema::KEY_VERSION ] ) ? $data[ Global_Style_Settings_Schema::KEY_VERSION ] : Global_Style_Settings_Schema::SCHEMA_VERSION,
+									Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS             => $res_tokens->get_sanitized(),
+									Global_Style_Settings_Schema::KEY_GLOBAL_COMPONENT_OVERRIDES => $res_comps->get_sanitized(),
+								);
+								\update_option( Global_Style_Settings_Schema::OPTION_KEY, $safe, false );
+								$actions[] = array( 'category' => 'styling', 'action' => 'overwrite', 'key' => 'global_settings' );
+							} else {
+								$this->log( 'Styling restore: global_settings validation failed; skipped.', array( 'token_errors' => $res_tokens->get_errors(), 'comp_errors' => $res_comps->get_errors() ), 'restore-styling', Log_Severities::WARNING );
+							}
+						}
 					}
-				}
-				if ( $entity_json !== false ) {
-					$data = json_decode( $entity_json, true );
-					if ( \is_array( $data ) && $this->is_supported_entity_payload_version( $data ) ) {
-						\update_option( Entity_Style_Payload_Schema::OPTION_KEY, $data, false );
-						$actions[] = array( 'category' => 'styling', 'action' => 'overwrite', 'key' => 'entity_payloads' );
+					$entity_json = $zip->getFromName( 'styling/entity_payloads.json' );
+					if ( $entity_json !== false ) {
+						$data = json_decode( $entity_json, true );
+						if ( \is_array( $data ) && $this->is_supported_entity_payload_version( $data ) ) {
+							$payloads_raw = $data[ Entity_Style_Payload_Schema::KEY_PAYLOADS ] ?? array();
+							$version      = isset( $data[ Entity_Style_Payload_Schema::KEY_VERSION ] ) && is_string( $data[ Entity_Style_Payload_Schema::KEY_VERSION ] ) ? $data[ Entity_Style_Payload_Schema::KEY_VERSION ] : Entity_Style_Payload_Schema::SCHEMA_VERSION;
+							$out_payloads = array( 'section_template' => array(), 'page_template' => array() );
+							foreach ( Entity_Style_Payload_Schema::ENTITY_TYPES as $entity_type ) {
+								$by_key = isset( $payloads_raw[ $entity_type ] ) && is_array( $payloads_raw[ $entity_type ] ) ? $payloads_raw[ $entity_type ] : array();
+								foreach ( $by_key as $key => $raw_payload ) {
+									if ( ! is_string( $key ) || ! is_array( $raw_payload ) ) {
+										continue;
+									}
+									$normalized = $this->styles_normalizer->normalize_entity_payload( $raw_payload );
+									$result     = $this->styles_sanitizer->sanitize_entity_payload( $normalized );
+									if ( $result->is_valid() ) {
+										$out_payloads[ $entity_type ][ $key ] = $result->get_sanitized();
+									}
+								}
+							}
+							$safe = array(
+								Entity_Style_Payload_Schema::KEY_VERSION  => $version,
+								Entity_Style_Payload_Schema::KEY_PAYLOADS => $out_payloads,
+							);
+							\update_option( Entity_Style_Payload_Schema::OPTION_KEY, $safe, false );
+							$actions[] = array( 'category' => 'styling', 'action' => 'overwrite', 'key' => 'entity_payloads' );
+						}
 					}
+				} else {
+					$this->log( 'Styling restore skipped: normalizer or sanitizer not available.', array(), 'restore-styling', Log_Severities::WARNING );
 				}
-				if ( $this->style_cache_service !== null ) {
+				if ( $this->style_cache_service !== null && $actions !== array() ) {
 					$this->style_cache_service->invalidate();
 				}
 				return $actions !== array() ? $actions : null;

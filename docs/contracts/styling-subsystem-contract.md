@@ -93,11 +93,14 @@ The styling subsystem **extends** this model under a single contract: same token
 
 ## 8. Portability and Plugin Removal
 
+**Full lifecycle and QA:** [styling-portability-and-uninstall.md](../guides/styling-portability-and-uninstall.md).
+
 | Scenario | Styling behavior |
 |----------|------------------|
-| **Plugin deactivation** | Token-driven styles may no longer load; page structure and content remain. Built page is still meaningful (spec §17.10). |
-| **Plugin uninstall** | Per PORTABILITY_AND_UNINSTALL: plugin-owned options/transients removed; built post_content and user content preserved. Styling options are plugin-owned and may be removed. |
-| **Export/restore** | Styling metadata (if any) is exportable as documented; restore may reapply global/per-entity payloads within sanitization rules. |
+| **Plugin deactivation** | Token-driven styles may no longer load; page structure and content remain. Built page is still meaningful (spec §17.10). Styling options remain in DB but are unused. |
+| **Plugin uninstall** | Per PORTABILITY_AND_UNINSTALL: plugin-owned options removed (including `aio_global_style_settings`, `aio_entity_style_payloads`, `aio_style_cache_version` via Option_Names/Uninstall_Cleanup_Service); built post_content and user content preserved. Uninstall does not corrupt saved content. |
+| **Export/restore** | Styling data is exportable as documented; restore reapplies global/per-entity payloads within sanitization rules. No raw CSS or arbitrary selectors in export/restore. |
+| **Theme continuity** | After plugin removal, themes can continue to target the same selectors (`.aio-page`, `.aio-s-*`, etc.) and token names (`--aio-*`) per css-selector-contract.md; selector and token-name contracts are the bridge for theme styling. |
 
 ---
 

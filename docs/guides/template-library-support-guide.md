@@ -78,6 +78,7 @@ When triaging template issues, a **Support bundle** is usually sufficient to see
 - **Deprecated templates:** No automatic replacement. User must select replacement explicitly.
 - **Appendix:** Generated from live registry; no stored appendix to "migrate." Regeneration is implicit on next export or on-demand run.
 - **Theme/dependencies:** Supported environment per [compatibility-matrix.md](../qa/compatibility-matrix.md). LPagery optional (warning only). Do not promise behavior in unsupported environments.
+- **Styling (deactivation/uninstall):** Plugin CSS stops on deactivation; styling options are removed on uninstall. Built page content and structure are preserved. Theme override continuity and export/restore behavior: [styling-portability-and-uninstall.md](styling-portability-and-uninstall.md).
 
 Use this list to set expectations and avoid over-promising.
 
@@ -92,6 +93,7 @@ Use this list to set expectations and avoid over-promising.
 | Editor template choice and one-pagers | [template-library-editor-guide.md](template-library-editor-guide.md) |
 | Export modes and bundle structure | [export-bundle-structure-contract.md](../contracts/export-bundle-structure-contract.md) |
 | Compatibility and environment claims | [compatibility-matrix.md](../qa/compatibility-matrix.md) |
+| Styling lifecycle, uninstall, portability | [styling-portability-and-uninstall.md](styling-portability-and-uninstall.md) |
 | Security and redaction | [security-redaction-review.md](../qa/security-redaction-review.md) |
 
 ---

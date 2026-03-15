@@ -385,6 +385,9 @@ final class Section_Template_Detail_Screen {
 		if ( ! isset( $_POST['action'] ) || \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) !== Entity_Style_UI_State_Builder::SAVE_ACTION ) {
 			return false;
 		}
+		if ( ! \current_user_can( $this->get_capability() ) ) {
+			return false;
+		}
 		$nonce_key = Entity_Style_UI_State_Builder::NONCE_ACTION;
 		if ( ! isset( $_POST[ $nonce_key ] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ $nonce_key ] ) ), $nonce_key ) ) {
 			return false;
