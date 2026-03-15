@@ -2,7 +2,7 @@
 /**
  * Loads documentation objects from file-based section helper and one-pager batches (spec §10.7, §15, §16, documentation-object-schema).
  * Section helpers: doc-helper-{section_key}.php under SectionHelpers (Hero_Batch, CTA_Batch, Proof_Batch, Legal_Policy_Batch, Process_FAQ_Batch, Feature_Benefit_Batch, Media_Listing_Profile_Batch, Gap_Closing_Batch, Contact_Form_Conversion_Batch, Pricing_Offer_Batch).
- * One-pagers: doc-onepager-{page_template_key}.php under PageTemplateOnePagers (e.g. Top_Level_Home_Batch).
+ * One-pagers: doc-onepager-{page_template_key}.php under PageTemplateOnePagers (Top_Level_Home_Batch, Top_Level_About_Batch, Top_Level_Contact_Batch).
  *
  * @package AIOPageBuilder
  */
@@ -38,6 +38,8 @@ final class Documentation_Loader {
 	/** Relative batch dirs under Docs for page_template_one_pager (PageTemplateOnePagers subdir). */
 	private const ONEPAGER_BATCH_DIRS = array(
 		'PageTemplateOnePagers/Top_Level_Home_Batch',
+		'PageTemplateOnePagers/Top_Level_About_Batch',
+		'PageTemplateOnePagers/Top_Level_Contact_Batch',
 	);
 
 	/** @var string Base path (Docs directory). */
