@@ -118,6 +118,12 @@ Optionality must be explicit, not guessed at runtime. This distinction is used f
 | `hierarchy_role` | string | — | One of: `root`, `standalone`, `hub`, `nested_hub`, `leaf`, `intermediate` per taxonomy contract §4 | Yes | Hierarchy role; must be consistent with template_category_class. |
 | `page_purpose_family` | string | — | One of purpose slugs (e.g. `informational`, `conversion`, `support`) per taxonomy contract §5.1 | Yes | Primary page intent. |
 | `cta_intent_family` | string | — | One of CTA slugs (e.g. `primary_conversion`, `contact_request`) per taxonomy contract §5.2 | Yes | Primary CTA orientation for taxonomy/filtering. |
+| `industry_affinity` | array of strings or map (industry_key => string) | — | Each key: pattern `^[a-z0-9_-]+$`; max 64 chars | Yes | Industry keys where this page is a strong/good fit (page-template-industry-affinity-contract). |
+| `industry_required` | array of strings | — | Each: industry_key pattern; max 64 chars | Yes | Industry keys where this template is required or strongly recommended. |
+| `industry_discouraged` | array of strings | — | Each: industry_key pattern; max 64 chars | Yes | Industry keys where this template is discouraged. |
+| `industry_hierarchy_fit` | map (industry_key => string) or array of strings | — | Keys/elements: industry_key pattern; values max 512 chars | Yes | Per-industry hierarchy fit note. |
+| `industry_lpagery_fit` | map (industry_key => string) or string | — | Keys: industry_key pattern; values max 512 chars | Yes | Per-industry LPagery/token fit note. |
+| `industry_notes` | map (industry_key => string) or string | — | Keys: industry_key pattern; values max 1024 chars | Yes | Per-industry usage notes. |
 
 ### 5.1 Hierarchy hints object (optional)
 
@@ -128,6 +134,10 @@ Optionality must be explicit, not guessed at runtime. This distinction is used f
 | `common_parent_archetypes` | array of strings | Archetype slugs. |
 | `common_sibling_archetypes` | array of strings | Archetype slugs. |
 | `hierarchy_role` | string | e.g. `hub`, `leaf`, `intermediate`; max 64 chars. |
+
+### 5.2 Industry affinity metadata (optional)
+
+Per **page-template-industry-affinity-contract.md**: page templates may declare optional `industry_affinity`, `industry_required`, `industry_discouraged`, `industry_hierarchy_fit`, `industry_lpagery_fit`, and `industry_notes` for ranking, hierarchy planning, and AI recommendation. Industry keys must match pattern `^[a-z0-9_-]+$`. Page templates without any industry metadata remain valid.
 
 ---
 

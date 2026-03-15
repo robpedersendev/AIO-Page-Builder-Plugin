@@ -52,6 +52,7 @@ The following keys are registered by **Industry_Packs_Module**:
 | `industry_pack_validator` | Validates single pack or bulk; duplicate-key detection. | Industry_Pack_Validator. |
 | `industry_pack_registry` | Registry: load(), get(key), get_all(), list_by_status(status). | Industry_Pack_Registry; loaded with empty list until a pack loader is added. |
 | `industry_profile_store` | Site industry profile (primary/secondary, subtype, service/geo model). | Industry_Profile_Repository when `settings` is available; else null. |
+| `industry_cta_pattern_registry` | CTA pattern definitions for industry packs (preferred/discouraged/required). | Industry_CTA_Pattern_Registry; loaded with empty list until patterns are added (industry-cta-pattern-contract). |
 
 Additional keys (e.g. overlay resolver, AI rule applier, LPagery resolver) can be added in later prompts.
 

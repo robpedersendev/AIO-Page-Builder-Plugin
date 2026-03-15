@@ -41,8 +41,17 @@ final class Industry_Pack_Schema {
 	/** Optional: discouraged section template internal_keys. */
 	public const FIELD_DISCOURAGED_SECTION_KEYS = 'discouraged_section_keys';
 
-	/** Optional: default CTA pattern keys or config. */
+	/** Optional: default CTA pattern keys (preferred alias); see industry-cta-pattern-contract. */
 	public const FIELD_DEFAULT_CTA_PATTERNS = 'default_cta_patterns';
+
+	/** Optional: preferred CTA pattern keys (Industry_CTA_Pattern_Registry). */
+	public const FIELD_PREFERRED_CTA_PATTERNS = 'preferred_cta_patterns';
+
+	/** Optional: discouraged CTA pattern keys. */
+	public const FIELD_DISCOURAGED_CTA_PATTERNS = 'discouraged_cta_patterns';
+
+	/** Optional: required CTA pattern keys. */
+	public const FIELD_REQUIRED_CTA_PATTERNS = 'required_cta_patterns';
 
 	/** Optional: reference to SEO guidance. */
 	public const FIELD_SEO_GUIDANCE_REF = 'seo_guidance_ref';
@@ -131,6 +140,9 @@ final class Industry_Pack_Schema {
 			self::FIELD_PREFERRED_SECTION_KEYS,
 			self::FIELD_DISCOURAGED_SECTION_KEYS,
 			self::FIELD_DEFAULT_CTA_PATTERNS,
+			self::FIELD_PREFERRED_CTA_PATTERNS,
+			self::FIELD_DISCOURAGED_CTA_PATTERNS,
+			self::FIELD_REQUIRED_CTA_PATTERNS,
 			self::FIELD_SEO_GUIDANCE_REF,
 			self::FIELD_HELPER_OVERLAY_REFS,
 			self::FIELD_ONE_PAGER_OVERLAY_REFS,

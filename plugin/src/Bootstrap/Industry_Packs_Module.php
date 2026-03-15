@@ -28,8 +28,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: industry pack registry (list/get/validate). Placeholder until implemented. */
 	public const CONTAINER_KEY_INDUSTRY_PACK_REGISTRY = 'industry_pack_registry';
 
-	/** Container key: industry profile store (primary/secondary industry). Placeholder until implemented. */
+	/** Container key: industry profile store (primary/secondary industry). */
 	public const CONTAINER_KEY_INDUSTRY_PROFILE_STORE = 'industry_profile_store';
+
+	/** Container key: CTA pattern registry (industry-cta-pattern-contract). */
+	public const CONTAINER_KEY_CTA_PATTERN_REGISTRY = 'industry_cta_pattern_registry';
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
@@ -50,6 +53,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				return null;
 			}
 			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository( $container->get( 'settings' ) );
+		} );
+		$container->register( self::CONTAINER_KEY_CTA_PATTERN_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry();
+			$registry->load( array() );
+			return $registry;
 		} );
 	}
 }

@@ -49,6 +49,12 @@ final class Page_Template_Schema_Test extends TestCase {
 		$this->assertContains( 'notes_for_ai_planning', $optional );
 		$this->assertContains( 'seo_defaults', $optional );
 		$this->assertContains( 'deprecation', $optional );
+		$this->assertContains( Page_Template_Schema::FIELD_INDUSTRY_AFFINITY, $optional );
+		$this->assertContains( Page_Template_Schema::FIELD_INDUSTRY_REQUIRED, $optional );
+		$this->assertContains( Page_Template_Schema::FIELD_INDUSTRY_DISCOURAGED, $optional );
+		$this->assertContains( Page_Template_Schema::FIELD_INDUSTRY_HIERARCHY_FIT, $optional );
+		$this->assertContains( Page_Template_Schema::FIELD_INDUSTRY_LPAGERY_FIT, $optional );
+		$this->assertContains( Page_Template_Schema::FIELD_INDUSTRY_NOTES, $optional );
 	}
 
 	public function test_allowed_archetypes_include_spec_13_6_examples(): void {
@@ -119,6 +125,30 @@ final class Page_Template_Schema_Test extends TestCase {
 		$this->assertSame( 64, Page_Template_Schema::INTERNAL_KEY_MAX_LENGTH );
 		$this->assertMatchesRegularExpression( Page_Template_Schema::INTERNAL_KEY_PATTERN, 'pt_landing_contact' );
 		$this->assertDoesNotMatchRegularExpression( Page_Template_Schema::INTERNAL_KEY_PATTERN, 'Landing-Contact' );
+	}
+
+	/** Page template without any industry metadata is valid. */
+	public function test_validate_industry_affinity_metadata_returns_empty_when_no_industry_fields(): void {
+		$template = $this->get_valid_minimal_page_template();
+		$this->assertSame( array(), Page_Template_Schema::validate_industry_affinity_metadata( $template ) );
+	}
+
+	/** Valid industry_affinity and industry_discouraged pass. */
+	public function test_validate_industry_affinity_metadata_accepts_valid_keys(): void {
+		$template = $this->get_valid_minimal_page_template();
+		$template[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ]    = array( 'legal', 'healthcare' );
+		$template[ Page_Template_Schema::FIELD_INDUSTRY_DISCOURAGED ] = array( 'disaster_recovery' );
+		$this->assertSame( array(), Page_Template_Schema::validate_industry_affinity_metadata( $template ) );
+	}
+
+	/** Invalid industry key (bad pattern) fails. */
+	public function test_validate_industry_affinity_metadata_rejects_invalid_industry_key(): void {
+		$template = $this->get_valid_minimal_page_template();
+		$template[ Page_Template_Schema::FIELD_INDUSTRY_REQUIRED ] = array( 'Invalid Key!' );
+		$errors = Page_Template_Schema::validate_industry_affinity_metadata( $template );
+		$this->assertNotEmpty( $errors );
+		$codes = array_column( $errors, 'code' );
+		$this->assertContains( 'invalid_industry_key', $codes );
 	}
 
 	private function get_valid_minimal_page_template(): array {

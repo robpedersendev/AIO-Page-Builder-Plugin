@@ -14,7 +14,7 @@ Stored as custom post type. Key fields (Section_Schema): internal_key, name, pur
 
 ### Page template (page template registry)
 
-Stored as custom post type. Key fields (Page_Template_Schema): internal_key, name, purpose_summary, template_family, variation_family, template_category_class, ordered_section_keys, optional_section_keys, status, version (version block), deprecation (deprecation block), one_pager_ref, metadata. See [Page Template Inventory](page-template-inventory.md) and Page_Template_Schema.
+Stored as custom post type. Key fields (Page_Template_Schema): internal_key, name, purpose_summary, template_family, variation_family, template_category_class, ordered_section_keys, optional_section_keys, status, version (version block), deprecation (deprecation block), one_pager_ref, metadata. Optional industry-affinity metadata: industry_affinity, industry_required, industry_discouraged, industry_hierarchy_fit, industry_lpagery_fit, industry_notes (page-template-industry-affinity-contract); validate via Page_Template_Schema::validate_industry_affinity_metadata(). See [Page Template Inventory](page-template-inventory.md) and Page_Template_Schema.
 
 ### Composition
 

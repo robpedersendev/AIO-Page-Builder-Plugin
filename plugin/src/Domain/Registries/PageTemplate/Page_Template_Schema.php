@@ -129,6 +129,12 @@ final class Page_Template_Schema {
 			'replacement_template_refs',
 			'seo_defaults',
 			'deprecation',
+			self::FIELD_INDUSTRY_AFFINITY,
+			self::FIELD_INDUSTRY_REQUIRED,
+			self::FIELD_INDUSTRY_DISCOURAGED,
+			self::FIELD_INDUSTRY_HIERARCHY_FIT,
+			self::FIELD_INDUSTRY_LPAGERY_FIT,
+			self::FIELD_INDUSTRY_NOTES,
 		);
 		return self::$optional_fields;
 	}
@@ -201,4 +207,91 @@ final class Page_Template_Schema {
 
 	/** Max length for purpose_summary. */
 	public const PURPOSE_SUMMARY_MAX_LENGTH = 1024;
+
+	/** Optional: industry keys where this page is a strong/good fit (page-template-industry-affinity-contract). */
+	public const FIELD_INDUSTRY_AFFINITY = 'industry_affinity';
+
+	/** Optional: industry keys where this template is required or strongly recommended. */
+	public const FIELD_INDUSTRY_REQUIRED = 'industry_required';
+
+	/** Optional: industry keys where this template is discouraged. */
+	public const FIELD_INDUSTRY_DISCOURAGED = 'industry_discouraged';
+
+	/** Optional: per-industry hierarchy fit note. */
+	public const FIELD_INDUSTRY_HIERARCHY_FIT = 'industry_hierarchy_fit';
+
+	/** Optional: per-industry LPagery/token fit note. */
+	public const FIELD_INDUSTRY_LPAGERY_FIT = 'industry_lpagery_fit';
+
+	/** Optional: per-industry usage notes. */
+	public const FIELD_INDUSTRY_NOTES = 'industry_notes';
+
+	/** Pattern for industry_key (aligned with Industry_Pack_Schema). */
+	public const INDUSTRY_KEY_PATTERN = '#^[a-z0-9_-]+$#';
+
+	/** Max length for industry_key. */
+	public const INDUSTRY_KEY_MAX_LENGTH = 64;
+
+	/**
+	 * Validates optional industry-affinity metadata on a page template definition. Returns errors; empty when valid or when no industry fields present.
+	 *
+	 * @param array<string, mixed> $page_template Page template definition.
+	 * @return array<int, array{code: string, field?: string}> Empty if valid.
+	 */
+	public static function validate_industry_affinity_metadata( array $page_template ): array {
+		$errors = array();
+		$check_key = function ( string $key ): bool {
+			if ( $key === '' || strlen( $key ) > self::INDUSTRY_KEY_MAX_LENGTH ) {
+				return false;
+			}
+			return (bool) preg_match( self::INDUSTRY_KEY_PATTERN, $key );
+		};
+		$fields_with_array_values = array(
+			self::FIELD_INDUSTRY_AFFINITY,
+			self::FIELD_INDUSTRY_REQUIRED,
+			self::FIELD_INDUSTRY_DISCOURAGED,
+		);
+		foreach ( $fields_with_array_values as $field ) {
+			if ( ! array_key_exists( $field, $page_template ) ) {
+				continue;
+			}
+			$val = $page_template[ $field ];
+			if ( ! is_array( $val ) ) {
+				continue;
+			}
+			foreach ( $val as $k => $v ) {
+				$key_str = is_string( $k ) ? $k : (string) $v;
+				if ( $key_str === '' && is_string( $v ) ) {
+					$key_str = trim( $v );
+				}
+				if ( $key_str !== '' && ! $check_key( $key_str ) ) {
+					$errors[] = array( 'code' => 'invalid_industry_key', 'field' => $field );
+					break;
+				}
+			}
+		}
+		$fields_with_map_keys = array(
+			self::FIELD_INDUSTRY_HIERARCHY_FIT,
+			self::FIELD_INDUSTRY_LPAGERY_FIT,
+			self::FIELD_INDUSTRY_NOTES,
+		);
+		foreach ( $fields_with_map_keys as $field ) {
+			if ( ! array_key_exists( $field, $page_template ) ) {
+				continue;
+			}
+			$val = $page_template[ $field ];
+			if ( is_string( $val ) ) {
+				continue;
+			}
+			if ( is_array( $val ) ) {
+				foreach ( array_keys( $val ) as $k ) {
+					if ( is_string( $k ) && $k !== '' && ! $check_key( $k ) ) {
+						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => $field );
+						break;
+					}
+				}
+			}
+		}
+		return $errors;
+	}
 }

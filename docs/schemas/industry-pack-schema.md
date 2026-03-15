@@ -33,7 +33,10 @@
 | **supported_page_families** | list&lt;string&gt; | Page template families this pack supports; used for template ranking and filtering. |
 | **preferred_section_keys** | list&lt;string&gt; | Section template internal_keys preferred for this industry. |
 | **discouraged_section_keys** | list&lt;string&gt; | Section keys to deprioritize or warn for this industry. |
-| **default_cta_patterns** | list&lt;string&gt; or map | Default CTA pattern keys or config for this industry. |
+| **default_cta_patterns** | list&lt;string&gt; or map | Preferred CTA pattern keys (alias for preferred_cta_patterns); see industry-cta-pattern-contract. |
+| **preferred_cta_patterns** | list&lt;string&gt; | CTA pattern keys preferred for this industry (Industry_CTA_Pattern_Registry). |
+| **discouraged_cta_patterns** | list&lt;string&gt; | CTA pattern keys to deprioritize or avoid for this industry. |
+| **required_cta_patterns** | list&lt;string&gt; | CTA pattern keys required or strongly recommended for this industry. |
 | **seo_guidance_ref** | string | Reference to SEO guidance doc or block. |
 | **helper_overlay_refs** | list&lt;string&gt; | Refs to helper docs applied when this pack is active (overlay on section helper refs). |
 | **one_pager_overlay_refs** | list&lt;string&gt; | Refs to one-pager docs applied when this pack is active (overlay on page one-pager refs). |
