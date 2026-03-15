@@ -69,4 +69,21 @@ final class Industry_Page_OnePager_Overlay_Registry_Test extends TestCase {
 		$this->assertCount( 0, $registry->get_all() );
 		$this->assertNull( $registry->get( 'any', 'any_pt' ) );
 	}
+
+	/**
+	 * Built-in overlay definitions (Prompt 354): four industries × four page families = 16.
+	 */
+	public function test_builtin_overlay_definitions_load(): void {
+		$defs = Industry_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions();
+		$this->assertGreaterThanOrEqual( 16, count( $defs ), 'Expected at least 16 built-in page one-pager overlays' );
+		$registry = new Industry_Page_OnePager_Overlay_Registry();
+		$registry->load( $defs );
+		$this->assertGreaterThanOrEqual( 16, count( $registry->get_all() ) );
+		$realtor = $registry->get_for_industry( 'realtor' );
+		$this->assertCount( 4, $realtor, 'Realtor should have 4 page overlays' );
+		$home = $registry->get( 'realtor', 'pt_home_conversion_01' );
+		$this->assertNotNull( $home );
+		$this->assertSame( 'realtor', $home[ Industry_Page_OnePager_Overlay_Registry::FIELD_INDUSTRY_KEY ] );
+		$this->assertSame( 'pt_home_conversion_01', $home[ Industry_Page_OnePager_Overlay_Registry::FIELD_PAGE_TEMPLATE_KEY ] );
+	}
 }

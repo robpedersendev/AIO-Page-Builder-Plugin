@@ -141,7 +141,7 @@ Default for **full export** (all of these unless excluded by mode):
 | Category key | Description |
 |--------------|-------------|
 | `settings` | Plugin settings excluding secrets (per global-options/settings schema). |
-| `profiles` | Brand/business profile (secret-free). |
+| `profiles` | Brand/business profile (secret-free). When included, also writes `profiles/industry.json` (industry profile and applied preset; see industry-export-restore-contract.md). |
 | `registries` | Section template, page template, composition, documentation registry snapshots. |
 | `compositions` | Composition definitions. |
 | `plans` | Build plans and plan metadata. |

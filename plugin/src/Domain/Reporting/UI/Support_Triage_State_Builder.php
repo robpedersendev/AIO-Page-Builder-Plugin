@@ -47,14 +47,19 @@ final class Support_Triage_State_Builder {
 	/** @var object|null Build plan repository (list_recent). */
 	private $build_plan_repository;
 
+	/** @var \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service|null Optional industry diagnostics (Prompt 356). */
+	private $industry_diagnostics;
+
 	public function __construct(
 		?object $job_queue_repository = null,
 		?object $ai_run_repository = null,
-		?object $build_plan_repository = null
+		?object $build_plan_repository = null,
+		?\AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service $industry_diagnostics = null
 	) {
 		$this->job_queue_repository   = $job_queue_repository;
 		$this->ai_run_repository      = $ai_run_repository;
 		$this->build_plan_repository   = $build_plan_repository;
+		$this->industry_diagnostics   = $industry_diagnostics;
 	}
 
 	/**
@@ -82,8 +87,9 @@ final class Support_Triage_State_Builder {
 		$degraded_systems = $this->aggregate_degraded_systems( $reporting_health, $queue_health );
 		$recent_failed    = $this->aggregate_recent_failed_workflows( $critical_errors, $failed_ai_runs, $queue_health );
 		$recommended_links = $this->build_recommended_links( $critical_issues, $degraded_systems, $recent_failed );
+		$industry_snapshot = $this->industry_diagnostics !== null ? $this->industry_diagnostics->get_snapshot() : null;
 
-		return array(
+		$out = array(
 			'critical_issues'        => $critical_issues,
 			'degraded_systems'       => $degraded_systems,
 			'recent_failed_workflows' => $recent_failed,
@@ -92,6 +98,10 @@ final class Support_Triage_State_Builder {
 			'recommended_links'      => $recommended_links,
 			'stale_plans'            => $stale_plans,
 		);
+		if ( $industry_snapshot !== null ) {
+			$out['industry_snapshot'] = $industry_snapshot;
+		}
+		return $out;
 	}
 
 	/**

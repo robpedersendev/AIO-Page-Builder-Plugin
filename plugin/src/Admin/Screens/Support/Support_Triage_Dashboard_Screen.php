@@ -73,7 +73,8 @@ final class Support_Triage_Dashboard_Screen {
 		$job_repo  = $this->container && $this->container->has( 'job_queue_repository' ) ? $this->container->get( 'job_queue_repository' ) : null;
 		$ai_repo   = $this->container && $this->container->has( 'ai_run_repository' ) ? $this->container->get( 'ai_run_repository' ) : null;
 		$plan_repo = $this->container && $this->container->has( 'build_plan_repository' ) ? $this->container->get( 'build_plan_repository' ) : null;
-		$builder   = new Support_Triage_State_Builder( $job_repo, $ai_repo, $plan_repo );
+		$industry_diagnostics = $this->container && $this->container->has( 'industry_diagnostics_service' ) ? $this->container->get( 'industry_diagnostics_service' ) : null;
+		$builder   = new Support_Triage_State_Builder( $job_repo, $ai_repo, $plan_repo, $industry_diagnostics );
 		return $builder->build();
 	}
 

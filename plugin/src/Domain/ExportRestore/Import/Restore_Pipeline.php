@@ -19,7 +19,9 @@ use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
+use AIOPageBuilder\Domain\ExportRestore\Contracts\Industry_Export_Restore_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Restore_Validator;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
 use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
@@ -311,6 +313,26 @@ final class Restore_Pipeline {
 				}
 				$this->profile_store->set_full_profile( $data );
 				$actions[] = array( 'category' => 'profiles', 'action' => 'overwrite' );
+				$industry_json = $zip->getFromName( 'profiles/industry.json' );
+				if ( $industry_json !== false ) {
+					$industry_data = json_decode( $industry_json, true );
+					if ( is_array( $industry_data ) ) {
+						$version = isset( $industry_data[ Industry_Export_Restore_Schema::KEY_SCHEMA_VERSION ] ) && is_string( $industry_data[ Industry_Export_Restore_Schema::KEY_SCHEMA_VERSION ] )
+							? trim( $industry_data[ Industry_Export_Restore_Schema::KEY_SCHEMA_VERSION ] )
+							: '';
+						if ( Industry_Export_Restore_Schema::is_supported_version( $version ) ) {
+							$industry_profile = isset( $industry_data[ Industry_Export_Restore_Schema::KEY_INDUSTRY_PROFILE ] ) && is_array( $industry_data[ Industry_Export_Restore_Schema::KEY_INDUSTRY_PROFILE ] )
+								? Industry_Profile_Schema::normalize( $industry_data[ Industry_Export_Restore_Schema::KEY_INDUSTRY_PROFILE ] )
+								: Industry_Profile_Schema::get_empty_profile();
+							$this->settings->set( Option_Names::INDUSTRY_PROFILE, $industry_profile );
+							$applied = $industry_data[ Industry_Export_Restore_Schema::KEY_APPLIED_PRESET ] ?? null;
+							$this->settings->set( Option_Names::APPLIED_INDUSTRY_PRESET, is_array( $applied ) ? $applied : array() );
+							$actions[] = array( 'category' => 'profiles', 'action' => 'overwrite', 'key' => 'industry' );
+						} else {
+							$this->log( 'Industry restore skipped: unsupported or missing schema_version.', array( 'version' => $version ), 'restore-profiles', Log_Severities::WARNING );
+						}
+					}
+				}
 				return $actions;
 
 			case 'registries':

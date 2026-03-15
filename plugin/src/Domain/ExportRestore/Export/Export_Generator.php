@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\ACF\Debug\ACF_Local_JSON_Mirror_Service;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Bundle_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Mode_Keys;
+use AIOPageBuilder\Domain\ExportRestore\Contracts\Industry_Export_Restore_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Export_Validator;
 use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
@@ -326,6 +327,14 @@ final class Export_Generator {
 				$profile = $this->redact_profile( $profile );
 			}
 			$this->write_json_dir( $staging_dir . 'profiles', 'profile.json', $profile );
+			$industry_profile = $this->settings->get( Option_Names::INDUSTRY_PROFILE );
+			$applied_preset   = $this->settings->get( Option_Names::APPLIED_INDUSTRY_PRESET );
+			$industry_payload = array(
+				Industry_Export_Restore_Schema::KEY_SCHEMA_VERSION  => Industry_Export_Restore_Schema::SCHEMA_VERSION,
+				Industry_Export_Restore_Schema::KEY_INDUSTRY_PROFILE => is_array( $industry_profile ) ? $industry_profile : array(),
+				Industry_Export_Restore_Schema::KEY_APPLIED_PRESET  => $applied_preset,
+			);
+			$this->write_json_dir( $staging_dir . 'profiles', 'industry.json', $industry_payload );
 		}
 		if ( in_array( 'registries', $included, true ) || in_array( 'compositions', $included, true ) ) {
 			$bundle = $this->registry_serializer->build_registry_bundle( 0 );

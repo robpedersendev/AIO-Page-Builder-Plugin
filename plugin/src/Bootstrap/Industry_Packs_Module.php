@@ -37,6 +37,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: industry section-helper overlay registry (industry-section-helper-overlay-schema). */
 	public const CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY = 'industry_section_helper_overlay_registry';
 
+	/** Container key: industry page one-pager overlay registry (industry-page-onepager-overlay-schema). */
+	public const CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY = 'industry_page_onepager_overlay_registry';
+
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
 		$container->register( self::CONTAINER_KEY_INDUSTRY_LOADED, function (): bool {
@@ -70,6 +73,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
 			return $registry;
 		} );
+		$container->register( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions() );
+			return $registry;
+		} );
 		$container->register( 'industry_question_pack_registry', function (): \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Definitions::default_packs() );
@@ -85,6 +93,20 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry();
 			$registry->load( array() );
 			return $registry;
+		} );
+		$container->register( 'industry_diagnostics_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service {
+			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			$section_overlay = $container->has( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) : null;
+			$page_overlay = $container->has( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) : null;
+			$preset_app = $container->has( 'industry_style_preset_application_service' ) ? $container->get( 'industry_style_preset_application_service' ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service(
+				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
+				$section_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry ? $section_overlay : null,
+				$page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry ? $page_overlay : null,
+				$preset_app instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service ? $preset_app : null
+			);
 		} );
 		$container->register( 'industry_style_preset_application_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service {
 			$preset_registry = $container->has( 'industry_style_preset_registry' ) ? $container->get( 'industry_style_preset_registry' ) : null;

@@ -48,6 +48,35 @@ final class Industry_Page_OnePager_Overlay_Registry {
 	private array $all = array();
 
 	/**
+	 * Returns built-in page one-pager overlay definitions from PageOnePagerOverlays/*.php (Prompt 354).
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_builtin_overlay_definitions(): array {
+		$dir   = __DIR__ . '/PageOnePagerOverlays';
+		$files = array(
+			$dir . '/overlays-cosmetology-nail.php',
+			$dir . '/overlays-realtor.php',
+			$dir . '/overlays-plumber.php',
+			$dir . '/overlays-disaster-recovery.php',
+		);
+		$out = array();
+		foreach ( $files as $path ) {
+			if ( is_readable( $path ) ) {
+				$loaded = require $path;
+				if ( is_array( $loaded ) ) {
+					foreach ( $loaded as $ov ) {
+						if ( is_array( $ov ) ) {
+							$out[] = $ov;
+						}
+					}
+				}
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * Loads overlay definitions. Skips invalid or duplicate (industry_key, page_template_key). Safe: no throw.
 	 *
 	 * @param array<int, array<string, mixed>> $overlays List of overlay objects.
