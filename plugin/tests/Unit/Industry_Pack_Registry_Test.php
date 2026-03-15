@@ -128,4 +128,67 @@ final class Industry_Pack_Registry_Test extends TestCase {
 		$this->assertSame( Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION, $meta['version_marker'] );
 		$this->assertSame( Industry_Pack_Schema::STATUS_ACTIVE, $meta['status'] );
 	}
+
+	/** Prompts 349–351: built-in cosmetology/nail, realtor, plumber packs load and validate. */
+	public function test_builtin_pack_definitions_load_and_validate(): void {
+		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
+		$this->assertIsArray( $definitions );
+		$this->assertGreaterThanOrEqual( 3, count( $definitions ), 'Expected at least cosmetology_nail, realtor, plumber' );
+		$registry = new Industry_Pack_Registry();
+		$registry->load( $definitions );
+		$this->assertTrue( $registry->has_any() );
+		$cosmetology = $registry->get( 'cosmetology_nail' );
+		$this->assertNotNull( $cosmetology );
+		$this->assertSame( 'cosmetology_nail', $cosmetology[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] );
+		$this->assertArrayHasKey( Industry_Pack_Schema::FIELD_SUPPORTED_PAGE_FAMILIES, $cosmetology );
+		$this->assertArrayHasKey( Industry_Pack_Schema::FIELD_LPAGERY_RULE_REF, $cosmetology );
+		$this->assertSame( 'cosmetology_nail_01', $cosmetology[ Industry_Pack_Schema::FIELD_LPAGERY_RULE_REF ] );
+		$realtor = $registry->get( 'realtor' );
+		$this->assertNotNull( $realtor );
+		$this->assertSame( 'realtor', $realtor[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] );
+		$this->assertArrayHasKey( Industry_Pack_Schema::FIELD_REQUIRED_CTA_PATTERNS, $realtor );
+		$this->assertContains( 'valuation_request', $realtor[ Industry_Pack_Schema::FIELD_REQUIRED_CTA_PATTERNS ] );
+		$plumber = $registry->get( 'plumber' );
+		$this->assertNotNull( $plumber );
+		$this->assertSame( 'plumber', $plumber[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] );
+		$this->assertContains( 'call_now', $plumber[ Industry_Pack_Schema::FIELD_REQUIRED_CTA_PATTERNS ] ?? array() );
+	}
+
+	/** Cosmetology/nail pack: schema-valid, refs present (resolution is at use time). */
+	public function test_cosmetology_nail_pack_has_expected_structure(): void {
+		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
+		$registry = new Industry_Pack_Registry();
+		$registry->load( $definitions );
+		$pack = $registry->get( 'cosmetology_nail' );
+		$this->assertNotNull( $pack );
+		$this->assertSame( 'active', $pack[ Industry_Pack_Schema::FIELD_STATUS ] );
+		$this->assertSame( '1', $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] );
+		$this->assertContains( 'book_now', $pack[ Industry_Pack_Schema::FIELD_REQUIRED_CTA_PATTERNS ] ?? array() );
+		$this->assertArrayHasKey( 'metadata', $pack );
+		$this->assertArrayHasKey( 'notes_booking', $pack['metadata'] );
+	}
+
+	/** Realtor pack: schema-valid, valuation and hierarchy-oriented refs. */
+	public function test_realtor_pack_has_expected_structure(): void {
+		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
+		$registry = new Industry_Pack_Registry();
+		$registry->load( $definitions );
+		$pack = $registry->get( 'realtor' );
+		$this->assertNotNull( $pack );
+		$this->assertSame( 'realtor_01', $pack[ Industry_Pack_Schema::FIELD_LPAGERY_RULE_REF ] ?? '' );
+		$this->assertSame( 'realtor_warm', $pack[ Industry_Pack_Schema::FIELD_TOKEN_PRESET_REF ] ?? '' );
+		$this->assertContains( 'valuation_request', $pack[ Industry_Pack_Schema::FIELD_PREFERRED_CTA_PATTERNS ] ?? array() );
+	}
+
+	/** Plumber pack: schema-valid, emergency/direct-response refs. */
+	public function test_plumber_pack_has_expected_structure(): void {
+		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
+		$registry = new Industry_Pack_Registry();
+		$registry->load( $definitions );
+		$pack = $registry->get( 'plumber' );
+		$this->assertNotNull( $pack );
+		$this->assertSame( 'plumber_01', $pack[ Industry_Pack_Schema::FIELD_LPAGERY_RULE_REF ] ?? '' );
+		$this->assertContains( 'call_now', $pack[ Industry_Pack_Schema::FIELD_PREFERRED_CTA_PATTERNS ] ?? array() );
+		$this->assertContains( 'emergency_dispatch', $pack[ Industry_Pack_Schema::FIELD_PREFERRED_CTA_PATTERNS ] ?? array() );
+	}
 }

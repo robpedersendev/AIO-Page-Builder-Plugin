@@ -31,6 +31,34 @@ final class Industry_Pack_Registry {
 	}
 
 	/**
+	 * Returns built-in industry pack definitions from Packs/*.php. Used by bootstrap to load seed packs (Prompts 349–351).
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_builtin_pack_definitions(): array {
+		$dir = __DIR__ . '/Packs';
+		$files = array(
+			$dir . '/industry-pack-cosmetology-nail.php',
+			$dir . '/industry-pack-realtor.php',
+			$dir . '/industry-pack-plumber.php',
+		);
+		$out = array();
+		foreach ( $files as $path ) {
+			if ( is_readable( $path ) ) {
+				$loaded = require $path;
+				if ( is_array( $loaded ) ) {
+					foreach ( $loaded as $pack ) {
+						if ( is_array( $pack ) ) {
+							$out[] = $pack;
+						}
+					}
+				}
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * Loads pack definitions. Validates each; skips invalid and duplicate keys (first wins). Safe: no throw.
 	 *
 	 * @param array<int, array<string, mixed>> $definitions List of pack definitions.
