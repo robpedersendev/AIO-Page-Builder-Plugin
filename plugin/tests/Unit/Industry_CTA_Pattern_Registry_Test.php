@@ -105,4 +105,25 @@ final class Industry_CTA_Pattern_Registry_Test extends TestCase {
 		$this->assertNull( $registry->get( 'no_name' ) );
 		$this->assertCount( 0, $registry->get_all() );
 	}
+
+	/** Built-in definitions (Prompt 358): at least 9 patterns; pack-referenced keys resolve. */
+	public function test_builtin_definitions_load(): void {
+		$defs = Industry_CTA_Pattern_Registry::get_builtin_definitions();
+		$this->assertGreaterThanOrEqual( 9, count( $defs ) );
+		$registry = new Industry_CTA_Pattern_Registry();
+		$registry->load( $defs );
+		$this->assertGreaterThanOrEqual( 9, count( $registry->get_all() ) );
+	}
+
+	/** All CTA keys referenced by the first four industry packs must resolve. */
+	public function test_pack_referenced_keys_resolve(): void {
+		$registry = new Industry_CTA_Pattern_Registry();
+		$registry->load( Industry_CTA_Pattern_Registry::get_builtin_definitions() );
+		$pack_keys = array( 'book_now', 'gallery_to_booking', 'consult', 'valuation_request', 'call_now', 'emergency_dispatch', 'claim_assistance', 'scheduled_service', 'quote_request' );
+		foreach ( $pack_keys as $key ) {
+			$this->assertTrue( $registry->has( $key ), "Pack-referenced key should resolve: {$key}" );
+		}
+		$resolved = $registry->resolve_keys( $pack_keys );
+		$this->assertCount( count( $pack_keys ), $resolved );
+	}
 }

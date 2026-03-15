@@ -101,6 +101,17 @@
 | Final sign-off and maintenance | Production sign-off; long-term maintenance checklist for future ACF-related changes. | [acf-conditional-registration-final-signoff.md](acf-conditional-registration-final-signoff.md); [acf-conditional-registration-maintenance-checklist.md](../operations/acf-conditional-registration-maintenance-checklist.md). |
 | Known risks | ACF-1 (cache, invalidation, legacy); ACF-2 (plugin/theme conflict). | [known-risk-register.md](known-risk-register.md) §3. |
 
+### 2.10 Industry Pack subsystem (first release)
+
+| Area | Summary | Artifact |
+|------|---------|----------|
+| QA baseline | Acceptance checklist for first four industries; no-industry fallback; overlays, Build Plan scoring, diagnostics, export/restore. | [industry-subsystem-acceptance-report.md](../qa/industry-subsystem-acceptance-report.md). |
+| Release gate | Blockers vs deferred; evidence-based criteria; additive behavior and export/restore. | [industry-pack-release-gate.md](industry-pack-release-gate.md). |
+| Maintenance | Checklist for adding industries, overlays, CTA patterns, scoring, export/diagnostics. | [industry-pack-maintenance-checklist.md](../operations/industry-pack-maintenance-checklist.md). |
+| Diagnostics | Bounded industry snapshot; support triage integration. | [industry-subsystem-diagnostics-checklist.md](../qa/industry-subsystem-diagnostics-checklist.md). |
+| Export/restore | Industry profile and applied preset in profiles category. | [industry-export-restore-contract.md](../contracts/industry-export-restore-contract.md). |
+| Known risks | Industry-specific risks (if any) in register. | [known-risk-register.md](known-risk-register.md) §3. |
+
 ### 2.9 Styling subsystem (Option A expansion)
 
 | Area | Summary | Artifact |

@@ -24,7 +24,7 @@
 
 **Reporting health:** At top of Queue & Logs: last heartbeat month, recent delivery failures, and whether reporting is current or degraded.
 
-All data shown in the UI is from already-redacted or non-secret sources. No raw payloads or secrets are displayed in tables.
+All data shown in the UI is from already-redacted or non-secret sources. No raw payloads or secrets are displayed in tables. When the Industry Pack subsystem is loaded, the Support Triage state may include an **industry_snapshot** (primary industry, overlay counts, applied preset, recommendation mode, warnings); it is bounded and safe for support use. See [industry-subsystem-diagnostics-checklist.md](../qa/industry-subsystem-diagnostics-checklist.md) for verification.
 
 ---
 

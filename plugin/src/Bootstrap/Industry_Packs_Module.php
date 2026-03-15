@@ -65,7 +65,7 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		} );
 		$container->register( self::CONTAINER_KEY_CTA_PATTERN_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry();
-			$registry->load( array() );
+			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry::get_builtin_definitions() );
 			return $registry;
 		} );
 		$container->register( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry {

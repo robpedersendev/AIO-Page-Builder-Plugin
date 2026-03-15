@@ -48,6 +48,20 @@ final class Industry_CTA_Pattern_Registry {
 	private array $all = array();
 
 	/**
+	 * Returns built-in CTA pattern definitions from CTAPatterns/ (Prompt 358).
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_builtin_definitions(): array {
+		$path = __DIR__ . '/CTAPatterns/cta-pattern-definitions.php';
+		if ( ! is_readable( $path ) ) {
+			return array();
+		}
+		$loaded = require $path;
+		return is_array( $loaded ) ? $loaded : array();
+	}
+
+	/**
 	 * Loads CTA pattern definitions. Skips invalid or duplicate keys (first wins). Safe: no throw.
 	 *
 	 * @param array<int, array<string, mixed>> $definitions List of pattern definitions.
