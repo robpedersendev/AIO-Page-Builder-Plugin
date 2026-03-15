@@ -68,13 +68,26 @@ Single cache entry (Preview_Cache_Record). Keys:
 
 ---
 
-## 7. Synthetic preview context
+## 7. Styling export and restore (Prompt 257)
+
+When the export package includes the **styling** category, the following files are written under `styling/`:
+
+| File                     | Source option                         | Description |
+|--------------------------|----------------------------------------|-------------|
+| global_settings.json     | `aio_global_style_settings`           | Versioned global token values and global component overrides. Schema: version, global_tokens, global_component_overrides. See [global-styling-settings-contract.md](../contracts/global-styling-settings-contract.md). |
+| entity_payloads.json     | `aio_entity_style_payloads`           | Versioned per-entity style payloads keyed by entity_type and entity key. Schema: version, payloads (section_template, page_template). See [per-entity-style-payload-contract.md](../contracts/per-entity-style-payload-contract.md). |
+
+**Restore:** Restore pipeline applies `styling` after `settings`. Incoming global_settings and entity_payloads are validated for supported schema version (e.g. version `1`); unsupported versions are rejected at import validation. After restore, style cache and preview cache are invalidated so front end and preview reflect restored styling. Invalid or incompatible styling payloads are skipped (no overwrite); core content and other categories are unaffected.
+
+---
+
+## 8. Synthetic preview context
 
 Input to synthetic preview data generation (Synthetic_Preview_Context). Not stored; passed at render time. Type (section|page), key, purpose_family, template_category_class, variant, reduced_motion, animation_tier, omission_case. See template-preview-and-dummy-data-contract.
 
 ---
 
-## 8. Template compare state payload
+## 9. Template compare state payload
 
 Output of Template_Compare_State_Builder::build_state(type, compare_list_keys):
 
@@ -94,7 +107,7 @@ Each **template_compare_row** contains definition metadata (key, name, purpose, 
 
 ---
 
-## 9. Version block (section and page template)
+## 10. Version block (section and page template)
 
 Applied to definition[Section_Schema::FIELD_VERSION] or Page_Template_Schema::FIELD_VERSION. Built by Template_Versioning_Service.
 
@@ -113,7 +126,7 @@ Merged into definition when status => 'deprecated'. Built by Template_Deprecatio
 
 ---
 
-## 11. Template library compliance result payload
+## 12. Template library compliance result payload
 
 Output of Template_Library_Compliance_Service::run() → Template_Library_Compliance_Result::to_array():
 
@@ -129,7 +142,7 @@ Output of Template_Library_Compliance_Service::run() → Template_Library_Compli
 
 ---
 
-## 12. Template diff summary (template_diff_summary)
+## 13. Template diff summary (template_diff_summary)
 
 Output of Template_Diff_Summary_Builder::build(pre_snapshot, post_snapshot). Uses **intended_template_key** from pre_snapshot state when present to set template_key_before:
 
@@ -159,7 +172,7 @@ Template_Diff_Context::to_array(); embedded in template_diff_summary and diff/ro
 
 ---
 
-## 14. Template build execution result (template_build_execution_result)
+## 15. Template build execution result (template_build_execution_result)
 
 Template_Page_Build_Result::to_array(); attached to new-page creation artifacts:
 
@@ -183,25 +196,25 @@ Template_Page_Build_Result::to_array(); attached to new-page creation artifacts:
 
 ---
 
-## 15. Template replacement execution result (template_replacement_execution_result)
+## 16. Template replacement execution result (template_replacement_execution_result)
 
 Template_Page_Replacement_Result::to_array(); attached to replace-page artifacts. Fields include success, target_post_id, superseded_post_id, snapshot_ref, template_key, template_family, **replacement_trace_record** (object: target_post_id, superseded_post_id, snapshot_ref, template_key), assignment_count, errors.
 
 ---
 
-## 16. Replacement trace record (replacement_trace_record)
+## 17. Replacement trace record (replacement_trace_record)
 
 Sub-object in template_replacement_execution_result: target_post_id, superseded_post_id, snapshot_ref, template_key. Used for snapshot-backed audit and rollback.
 
 ---
 
-## 17. Finalization summary and template execution closure record
+## 18. Finalization summary and template execution closure record
 
 Template_Finalization_Result::to_array(): **finalization_summary** (counts and completion state), **template_execution_closure_record** (closure record for the run), **run_completion_state**, **one_pager_retention_summary**. Consumed by Finalization_Job_Service and stored in job/operational artifacts.
 
 ---
 
-## 18. Template library report summary (template_library_report_summary)
+## 19. Template library report summary (template_library_report_summary)
 
 Optional payload in install, heartbeat, and error report payloads (Template_Library_Report_Summary_Builder). Keys: section_template_count, page_template_count, composition_count, library_version_marker, plugin_version_marker, appendices_available, compliance_summary. See §62.7–62.9 and install-notification-email-template, heartbeat-email-templates, error-email-templates appendices.
 
@@ -213,13 +226,13 @@ Template_Library_Lifecycle_Summary_Builder::build(). Keys: built_pages_survive, 
 
 ---
 
-## 20. Template preference profile (template_preference_profile)
+## 21. Template preference profile (template_preference_profile)
 
 Template_Preference_Profile::to_array(). Stored in Profile_Store. Fields: page_emphasis, conversion_posture, proof_style, content_density, animation_preference, cta_intensity_preference, reduced_motion_preference. All optional; advisory for planning. See [Glossary](glossary.md#template_preference_profile).
 
 ---
 
-## 21. Form provider integration (form_provider, form_id)
+## 22. Form provider integration (form_provider, form_id)
 
 Provider-backed form sections store which form to render using two stable ACF field names. Schema is defined in [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md).
 
@@ -250,7 +263,7 @@ Provider-backed form sections store which form to render using two stable ACF fi
 
 ---
 
-## 23. Per-entity style payload (aio_entity_style_payloads)
+## 24. Per-entity style payload (aio_entity_style_payloads)
 
 Stored under option `aio_entity_style_payloads`. Keyed by entity type and stable entity key (section_key, template_key). No raw CSS; structured token_overrides and component_overrides only.
 

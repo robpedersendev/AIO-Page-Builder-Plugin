@@ -36,8 +36,8 @@ use AIOPageBuilder\Domain\Registries\Docs\Section_Inventory_Appendix_Generator;
  */
 final class Template_Library_Restore_Validator {
 
-	/** Expected restore order: registries before compositions (spec §52.8). */
-	private const EXPECTED_ORDER = array( 'settings', 'profiles', 'registries', 'compositions', 'token_sets', 'plans', 'uninstall_restore_metadata' );
+	/** Expected restore order: registries before compositions (spec §52.8). Styling after settings (Prompt 257). */
+	private const EXPECTED_ORDER = array( 'settings', 'styling', 'profiles', 'registries', 'compositions', 'token_sets', 'plans', 'uninstall_restore_metadata' );
 
 	/** @var Section_Template_Repository */
 	private Section_Template_Repository $section_repo;

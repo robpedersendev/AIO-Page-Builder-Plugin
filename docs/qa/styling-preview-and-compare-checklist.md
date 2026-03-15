@@ -48,4 +48,12 @@
 
 ---
 
-*Run this checklist after changes to Preview_Style_Context_Builder, detail/compare screens, or Preview_Cache_Service invalidation hooks.*
+## 6. Conditional asset loading and style cache version (Prompt 256)
+
+- [ ] **Base stylesheet loads only when needed**: On the front end, the base stylesheet is enqueued only when the page contains aio-page or aio-s- markers (or when a filter allows); unrelated pages do not load plugin styling assets.
+- [ ] **Version changes after style save**: After saving global style settings or per-entity styling, the style cache version is bumped; the next front-end request that enqueues the base stylesheet uses a new version parameter so browsers fetch fresh CSS.
+- [ ] **Preview cache cleared on style change**: When style data changes, the preview snapshot cache is cleared (via Style_Cache_Service); detail and compare screens show up-to-date styling on next load.
+
+---
+
+*Run this checklist after changes to Preview_Style_Context_Builder, detail/compare screens, Preview_Cache_Service, or Style_Cache_Service.*

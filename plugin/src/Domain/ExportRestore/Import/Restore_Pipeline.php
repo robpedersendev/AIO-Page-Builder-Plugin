@@ -21,6 +21,9 @@ use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Restore_Validator;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
+use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
+use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
+use AIOPageBuilder\Domain\Styling\Style_Cache_Service;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 use AIOPageBuilder\Support\Logging\Error_Record;
@@ -33,9 +36,10 @@ use AIOPageBuilder\Support\Logging\Log_Severities;
  */
 final class Restore_Pipeline {
 
-	/** Restore order (spec §52.8). */
+	/** Restore order (spec §52.8). Styling after settings (Prompt 257). */
 	private const RESTORE_ORDER = array(
 		'settings',
+		'styling',
 		'profiles',
 		'registries',
 		'compositions',
@@ -71,6 +75,9 @@ final class Restore_Pipeline {
 	/** @var Template_Library_Restore_Validator|null Template-library coherence after restore (Prompt 185). */
 	private ?Template_Library_Restore_Validator $template_library_restore_validator;
 
+	/** @var Style_Cache_Service|null Post-restore style cache invalidation (Prompt 257). */
+	private ?Style_Cache_Service $style_cache_service;
+
 	public function __construct(
 		Settings_Service $settings,
 		Profile_Store $profile_store,
@@ -80,7 +87,8 @@ final class Restore_Pipeline {
 		Build_Plan_Repository $plan_repo,
 		\wpdb $wpdb,
 		?Logger_Interface $logger = null,
-		?Template_Library_Restore_Validator $template_library_restore_validator = null
+		?Template_Library_Restore_Validator $template_library_restore_validator = null,
+		?Style_Cache_Service $style_cache_service = null
 	) {
 		$this->settings                           = $settings;
 		$this->profile_store                      = $profile_store;
@@ -91,6 +99,7 @@ final class Restore_Pipeline {
 		$this->wpdb                               = $wpdb;
 		$this->logger                             = $logger;
 		$this->template_library_restore_validator = $template_library_restore_validator;
+		$this->style_cache_service               = $style_cache_service;
 	}
 
 	/**
@@ -214,6 +223,29 @@ final class Restore_Pipeline {
 				$this->settings->set( Option_Names::MAIN_SETTINGS, $data );
 				$actions[] = array( 'category' => 'settings', 'action' => 'overwrite' );
 				return $actions;
+
+			case 'styling':
+				$global_json = $zip->getFromName( 'styling/global_settings.json' );
+				$entity_json = $zip->getFromName( 'styling/entity_payloads.json' );
+				$actions = array();
+				if ( $global_json !== false ) {
+					$data = json_decode( $global_json, true );
+					if ( \is_array( $data ) && $this->is_supported_global_style_version( $data ) ) {
+						\update_option( Global_Style_Settings_Schema::OPTION_KEY, $data, false );
+						$actions[] = array( 'category' => 'styling', 'action' => 'overwrite', 'key' => 'global_settings' );
+					}
+				}
+				if ( $entity_json !== false ) {
+					$data = json_decode( $entity_json, true );
+					if ( \is_array( $data ) && $this->is_supported_entity_payload_version( $data ) ) {
+						\update_option( Entity_Style_Payload_Schema::OPTION_KEY, $data, false );
+						$actions[] = array( 'category' => 'styling', 'action' => 'overwrite', 'key' => 'entity_payloads' );
+					}
+				}
+				if ( $this->style_cache_service !== null ) {
+					$this->style_cache_service->invalidate();
+				}
+				return $actions !== array() ? $actions : null;
 
 			case 'profiles':
 				$json = $zip->getFromName( 'profiles/profile.json' );
@@ -386,6 +418,28 @@ final class Restore_Pipeline {
 				return array( array( 'category' => 'uninstall_restore_metadata', 'action' => 'overwrite' ) );
 		}
 		return null;
+	}
+
+	/**
+	 * Returns whether the global style settings version is supported for restore (Prompt 257).
+	 *
+	 * @param array<string, mixed> $data Decoded global_settings.json.
+	 * @return bool
+	 */
+	private function is_supported_global_style_version( array $data ): bool {
+		$ver = isset( $data[ Global_Style_Settings_Schema::KEY_VERSION ] ) ? (string) $data[ Global_Style_Settings_Schema::KEY_VERSION ] : '';
+		return $ver === Global_Style_Settings_Schema::SCHEMA_VERSION;
+	}
+
+	/**
+	 * Returns whether the entity style payloads version is supported for restore (Prompt 257).
+	 *
+	 * @param array<string, mixed> $data Decoded entity_payloads.json.
+	 * @return bool
+	 */
+	private function is_supported_entity_payload_version( array $data ): bool {
+		$ver = isset( $data[ Entity_Style_Payload_Schema::KEY_VERSION ] ) ? (string) $data[ Entity_Style_Payload_Schema::KEY_VERSION ] : '';
+		return $ver === Entity_Style_Payload_Schema::SCHEMA_VERSION;
 	}
 
 	private function log( string $message, array $context, string $log_ref, string $severity = Log_Severities::INFO ): void {

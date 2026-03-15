@@ -23,6 +23,7 @@ use AIOPageBuilder\Domain\Styling\Style_Token_Registry;
 use AIOPageBuilder\Domain\Preview\Styling\Preview_Style_Context_Builder;
 use AIOPageBuilder\Domain\Styling\Page_Style_Emitter;
 use AIOPageBuilder\Domain\Styling\Section_Style_Emitter;
+use AIOPageBuilder\Domain\Styling\Style_Cache_Service;
 use AIOPageBuilder\Domain\Styling\Styles_JSON_Normalizer;
 use AIOPageBuilder\Domain\Styling\Styles_JSON_Sanitizer;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -114,12 +115,36 @@ final class Styling_Provider implements Service_Provider_Interface {
 			return new Preview_Style_Context_Builder( $container->get( 'config' ), $token_emitter, $override_emitter, $page_emitter );
 		} );
 
+		$container->register( 'style_cache_service', function () use ( $container ): Style_Cache_Service {
+			$preview_cache = $container->has( 'preview_cache_service' ) ? $container->get( 'preview_cache_service' ) : null;
+			return new Style_Cache_Service( $preview_cache instanceof \AIOPageBuilder\Domain\Preview\Preview_Cache_Service ? $preview_cache : null );
+		} );
+
 		$container->register( 'frontend_style_enqueue_service', function () use ( $container ): Frontend_Style_Enqueue_Service {
 			$token_emitter    = $container->has( 'global_token_variable_emitter' ) ? $container->get( 'global_token_variable_emitter' ) : null;
 			$override_emitter = $container->has( 'global_component_override_emitter' ) ? $container->get( 'global_component_override_emitter' ) : null;
 			$page_emitter     = $container->has( 'page_style_emitter' ) ? $container->get( 'page_style_emitter' ) : null;
-			return new Frontend_Style_Enqueue_Service( $container->get( 'config' ), $token_emitter, $override_emitter, $page_emitter );
+			$style_cache     = $container->has( 'style_cache_service' ) ? $container->get( 'style_cache_service' ) : null;
+			return new Frontend_Style_Enqueue_Service( $container->get( 'config' ), $token_emitter, $override_emitter, $page_emitter, $style_cache instanceof Style_Cache_Service ? $style_cache : null );
 		} );
+
+		// * Invalidate style cache (and preview cache) when style data changes (Prompt 256).
+		\add_action( 'update_option_aio_global_style_settings', function () use ( $container ): void {
+			if ( $container->has( 'style_cache_service' ) ) {
+				$svc = $container->get( 'style_cache_service' );
+				if ( $svc instanceof Style_Cache_Service ) {
+					$svc->invalidate();
+				}
+			}
+		}, 10, 0 );
+		\add_action( 'update_option_aio_entity_style_payloads', function () use ( $container ): void {
+			if ( $container->has( 'style_cache_service' ) ) {
+				$svc = $container->get( 'style_cache_service' );
+				if ( $svc instanceof Style_Cache_Service ) {
+					$svc->invalidate();
+				}
+			}
+		}, 10, 0 );
 
 		\add_action( 'wp_enqueue_scripts', function () use ( $container ): void {
 			if ( $container->has( 'frontend_style_enqueue_service' ) ) {

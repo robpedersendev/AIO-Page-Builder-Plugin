@@ -186,24 +186,6 @@ final class Registries_Provider implements Service_Provider_Interface {
 		$container->register( 'preview_cache_service', function (): Preview_Cache_Service {
 			return new Preview_Cache_Service();
 		} );
-
-		// * Invalidate preview cache when style data changes so cached previews reflect current styling (Prompt 255).
-		\add_action( 'update_option_aio_global_style_settings', function () use ( $container ): void {
-			if ( $container->has( 'preview_cache_service' ) ) {
-				$svc = $container->get( 'preview_cache_service' );
-				if ( $svc instanceof Preview_Cache_Service ) {
-					$svc->invalidate_all();
-				}
-			}
-		}, 10, 0 );
-		\add_action( 'update_option_aio_entity_style_payloads', function () use ( $container ): void {
-			if ( $container->has( 'preview_cache_service' ) ) {
-				$svc = $container->get( 'preview_cache_service' );
-				if ( $svc instanceof Preview_Cache_Service ) {
-					$svc->invalidate_all();
-				}
-			}
-		}, 10, 0 );
 		$container->register( 'section_inventory_appendix_generator', function () use ( $container ): Section_Inventory_Appendix_Generator {
 			return new Section_Inventory_Appendix_Generator( $container->get( 'section_template_repository' ) );
 		} );

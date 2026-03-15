@@ -91,10 +91,16 @@ final class Export_Bundle_Schema_Test extends TestCase {
 	public function test_zip_root_dirs_include_expected_entries(): void {
 		$dirs = Export_Bundle_Schema::ZIP_ROOT_DIRS;
 		$this->assertContains( 'settings', $dirs );
+		$this->assertContains( 'styling', $dirs );
 		$this->assertContains( 'registries', $dirs );
 		$this->assertContains( 'plans', $dirs );
 		$this->assertContains( 'tokens', $dirs );
 		$this->assertContains( 'artifacts', $dirs );
+	}
+
+	public function test_styling_is_included_category(): void {
+		$this->assertTrue( Export_Bundle_Schema::is_included_category( 'styling' ) );
+		$this->assertContains( 'styling', Export_Bundle_Schema::INCLUDED_CATEGORIES );
 	}
 
 	/**

@@ -32,9 +32,10 @@ final class Export_Bundle_Schema {
 		'compatibility_flags',
 	);
 
-	/** Included data category keys (spec §52.4). */
+	/** Included data category keys (spec §52.4). Styling (Prompt 257): global settings and per-entity payloads. */
 	public const INCLUDED_CATEGORIES = array(
 		'settings',
+		'styling',
 		'profiles',
 		'registries',
 		'compositions',
@@ -67,6 +68,7 @@ final class Export_Bundle_Schema {
 	/** ZIP root directory names (spec §52.2). */
 	public const ZIP_ROOT_DIRS = array(
 		'settings',
+		'styling',
 		'profiles',
 		'registries',
 		'compositions',

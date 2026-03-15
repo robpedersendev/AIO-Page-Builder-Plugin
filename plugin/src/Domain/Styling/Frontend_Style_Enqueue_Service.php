@@ -38,16 +38,21 @@ final class Frontend_Style_Enqueue_Service {
 	/** @var Page_Style_Emitter|null Per-page style emission (Prompt 254). */
 	private ?Page_Style_Emitter $page_style_emitter;
 
+	/** @var Style_Cache_Service|null When set, stylesheet version uses cache version for busting (Prompt 256). */
+	private ?Style_Cache_Service $style_cache;
+
 	public function __construct(
 		Plugin_Config $config,
 		?Global_Token_Variable_Emitter $emitter = null,
 		?Global_Component_Override_Emitter $component_override_emitter = null,
-		?Page_Style_Emitter $page_style_emitter = null
+		?Page_Style_Emitter $page_style_emitter = null,
+		?Style_Cache_Service $style_cache = null
 	) {
 		$this->config                    = $config;
 		$this->emitter                   = $emitter;
 		$this->component_override_emitter = $component_override_emitter;
 		$this->page_style_emitter        = $page_style_emitter;
+		$this->style_cache               = $style_cache;
 	}
 
 	/**
@@ -57,7 +62,7 @@ final class Frontend_Style_Enqueue_Service {
 	 */
 	public function register(): void {
 		$url = $this->config->plugin_url() . self::BASE_CSS_REL;
-		$ver = $this->config->plugin_version();
+		$ver = $this->style_cache !== null ? $this->style_cache->get_version() : $this->config->plugin_version();
 		\wp_register_style(
 			self::HANDLE_BASE,
 			$url,

@@ -24,6 +24,8 @@ require_once $plugin_root . '/src/Domain/ExportRestore/Import/Import_Validation_
 require_once $plugin_root . '/src/Domain/ExportRestore/Import/Restore_Result.php';
 require_once $plugin_root . '/src/Domain/ExportRestore/Import/Conflict_Resolution_Service.php';
 require_once $plugin_root . '/src/Domain/ExportRestore/Import/Import_Validator.php';
+require_once $plugin_root . '/src/Domain/Styling/Global_Style_Settings_Schema.php';
+require_once $plugin_root . '/src/Domain/Styling/Entity_Style_Payload_Schema.php';
 
 final class Import_Validator_And_Restore_Test extends TestCase {
 
@@ -166,6 +168,27 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 		$this->assertFalse( $result->validation_passed() );
 		$failures = implode( ' ', $result->get_blocking_failures() );
 		$this->assertStringContainsString( 'newer', strtolower( $failures ) );
+	}
+
+	public function test_validate_styling_unsupported_global_version_blocked(): void {
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			$this->markTestSkipped( 'ZipArchive not available.' );
+		}
+		$manifest = $this->minimal_manifest( \AIOPageBuilder\Infrastructure\Config\Versions::export_schema() );
+		$manifest['included_categories'] = array( 'settings', 'styling' );
+		$global_settings = array( 'version' => '2', 'global_tokens' => array(), 'global_component_overrides' => array() );
+		$tmp = sys_get_temp_dir() . '/aio-styling-unsup-' . uniqid() . '.zip';
+		$zip = new \ZipArchive();
+		$zip->open( $tmp, \ZipArchive::CREATE | \ZipArchive::OVERWRITE );
+		$zip->addFromString( 'manifest.json', wp_json_encode( $manifest ) );
+		$zip->addFromString( 'styling/global_settings.json', wp_json_encode( $global_settings ) );
+		$zip->close();
+		$validator = new Import_Validator( null, null, null, null, null );
+		$result = $validator->validate( $tmp );
+		unlink( $tmp );
+		$this->assertFalse( $result->validation_passed() );
+		$failures = implode( ' ', $result->get_blocking_failures() );
+		$this->assertStringContainsString( 'Unsupported global styling schema version', $failures );
 	}
 
 	public function test_validate_prohibited_path_rejected(): void {

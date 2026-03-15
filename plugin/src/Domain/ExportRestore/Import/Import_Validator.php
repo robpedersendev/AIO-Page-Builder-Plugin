@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Domain\ExportRestore\Import;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Bundle_Schema;
+use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
+use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
@@ -24,10 +26,11 @@ use AIOPageBuilder\Infrastructure\Config\Versions;
  */
 final class Import_Validator {
 
-	/** Allowed path prefixes inside ZIP (contract §52.2). No path traversal. */
+	/** Allowed path prefixes inside ZIP (contract §52.2). No path traversal. Styling (Prompt 257). */
 	private const ALLOWED_PREFIXES = array(
 		'manifest.json',
 		'settings/',
+		'styling/',
 		'profiles/',
 		'registries/',
 		'compositions/',
@@ -180,6 +183,36 @@ final class Import_Validator {
 		}
 		if ( $this->version_compare( $incoming, $current ) > 0 ) {
 			return 'Export schema version is newer than supported; import blocked.';
+		}
+		return '';
+	}
+
+	/**
+	 * Validates styling schema versions when styling category is included (Prompt 257). Returns failure message or empty.
+	 *
+	 * @param \ZipArchive $zip
+	 * @return string
+	 */
+	private function check_styling_schema_versions( \ZipArchive $zip ): string {
+		$global_json = $zip->getFromName( 'styling/global_settings.json' );
+		$entity_json = $zip->getFromName( 'styling/entity_payloads.json' );
+		if ( $global_json !== false ) {
+			$data = json_decode( $global_json, true );
+			if ( \is_array( $data ) ) {
+				$ver = isset( $data[ Global_Style_Settings_Schema::KEY_VERSION ] ) ? (string) $data[ Global_Style_Settings_Schema::KEY_VERSION ] : '';
+				if ( $ver !== Global_Style_Settings_Schema::SCHEMA_VERSION ) {
+					return 'Unsupported global styling schema version: ' . ( $ver !== '' ? $ver : 'missing' ) . '; expected ' . Global_Style_Settings_Schema::SCHEMA_VERSION . '.';
+				}
+			}
+		}
+		if ( $entity_json !== false ) {
+			$data = json_decode( $entity_json, true );
+			if ( \is_array( $data ) ) {
+				$ver = isset( $data[ Entity_Style_Payload_Schema::KEY_VERSION ] ) ? (string) $data[ Entity_Style_Payload_Schema::KEY_VERSION ] : '';
+				if ( $ver !== Entity_Style_Payload_Schema::SCHEMA_VERSION ) {
+					return 'Unsupported entity style payloads schema version: ' . ( $ver !== '' ? $ver : 'missing' ) . '; expected ' . Entity_Style_Payload_Schema::SCHEMA_VERSION . '.';
+				}
+			}
 		}
 		return '';
 	}

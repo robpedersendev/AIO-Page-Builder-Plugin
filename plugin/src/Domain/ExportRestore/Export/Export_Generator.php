@@ -17,6 +17,8 @@ use AIOPageBuilder\Domain\ACF\Debug\ACF_Local_JSON_Mirror_Service;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Bundle_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Mode_Keys;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Export_Validator;
+use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
+use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
 use AIOPageBuilder\Domain\Registries\Export\Registry_Export_Serializer;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
@@ -264,7 +266,7 @@ final class Export_Generator {
 				$excluded = array( 'raw_ai_artifacts', 'normalized_ai_outputs', 'crawl_snapshots', 'rollback_snapshots' );
 				break;
 			case Export_Mode_Keys::TEMPLATE_ONLY_EXPORT:
-				$included = array( 'registries', 'compositions' );
+				$included = array( 'registries', 'compositions', 'styling' );
 				$excluded = array( 'settings', 'profiles', 'plans', 'token_sets', 'uninstall_restore_metadata' );
 				$excluded = array_merge( $excluded, Export_Bundle_Schema::OPTIONAL_CATEGORIES );
 				break;
@@ -307,6 +309,16 @@ final class Export_Generator {
 				$settings = $this->redact_settings( $settings );
 			}
 			$this->write_json_dir( $staging_dir . 'settings', 'settings.json', $settings );
+		}
+		if ( in_array( 'styling', $included, true ) ) {
+			$global = \get_option( Global_Style_Settings_Schema::OPTION_KEY, array() );
+			$entity  = \get_option( Entity_Style_Payload_Schema::OPTION_KEY, array() );
+			$styling_dir = $staging_dir . 'styling';
+			if ( ! is_dir( $styling_dir ) ) {
+				wp_mkdir_p( $styling_dir );
+			}
+			$this->write_json_file( $styling_dir . '/global_settings.json', \is_array( $global ) ? $global : array() );
+			$this->write_json_file( $styling_dir . '/entity_payloads.json', \is_array( $entity ) ? $entity : array() );
 		}
 		if ( in_array( 'profiles', $included, true ) ) {
 			$profile = $this->profile_store->get_full_profile();

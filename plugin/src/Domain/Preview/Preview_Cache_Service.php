@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Manages cached preview HTML for section and page templates. Invalidates on template/version change.
+ * Also invalidated by Style_Cache_Service when global or per-entity style data changes (Prompt 256).
  */
 final class Preview_Cache_Service {
 

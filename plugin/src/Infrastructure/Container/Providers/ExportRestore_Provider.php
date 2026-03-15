@@ -65,6 +65,7 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 		$container->register( 'restore_pipeline', function () use ( $container ): \AIOPageBuilder\Domain\ExportRestore\Import\Restore_Pipeline {
 			global $wpdb;
 			$restore_validator = $container->has( 'template_library_restore_validator' ) ? $container->get( 'template_library_restore_validator' ) : null;
+			$style_cache = $container->has( 'style_cache_service' ) ? $container->get( 'style_cache_service' ) : null;
 			return new \AIOPageBuilder\Domain\ExportRestore\Import\Restore_Pipeline(
 				$container->get( 'settings' ),
 				$container->get( 'profile_store' ),
@@ -74,7 +75,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'build_plan_repository' ),
 				$wpdb,
 				$container->has( 'logger' ) ? $container->get( 'logger' ) : null,
-				$restore_validator
+				$restore_validator,
+				$style_cache instanceof \AIOPageBuilder\Domain\Styling\Style_Cache_Service ? $style_cache : null
 			);
 		} );
 		$container->register( 'export_manifest_builder', function (): Export_Manifest_Builder {
