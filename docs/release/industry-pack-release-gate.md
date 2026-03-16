@@ -9,12 +9,13 @@
 
 | Criterion | Requirement | Evidence |
 |-----------|-------------|----------|
-| **Additive behavior** | Industry Packs extend core; no industry = core unchanged. | [industry-subsystem-acceptance-report.md](../qa/industry-subsystem-acceptance-report.md) §2 row 14 (no-industry fallback). |
+| **Additive behavior** | Industry Packs extend core; no industry = core unchanged. | [industry-subsystem-acceptance-report.md](../qa/industry-subsystem-acceptance-report.md) §2 row 14; [industry-neutral-mode-audit.md](../qa/industry-neutral-mode-audit.md). |
 | **First four industries** | cosmetology_nail, realtor, plumber, disaster_recovery: onboarding, overlays, recommendations, presets, export/restore covered. | Acceptance report §2 rows 1–13. |
 | **Export/restore** | Industry profile and applied preset included in profiles category; restore validates and migrates; no secrets. | [industry-export-restore-contract.md](../contracts/industry-export-restore-contract.md); acceptance report §2 rows 12–13. |
 | **Diagnostics** | Bounded industry snapshot on Support Triage; admin/support only; no secrets. | [industry-subsystem-diagnostics-checklist.md](../qa/industry-subsystem-diagnostics-checklist.md); acceptance report §2 row 11. |
 | **CTA patterns** | Pack CTA pattern references resolve; registry loads seeded definitions. | Acceptance report §3 (Prompt 358); CTA pattern tests. |
 | **Documentation** | Operator/support guidance references industry where relevant (onboarding, diagnostics, export). | [release-review-packet.md](release-review-packet.md) §2.10; admin-operator-guide; support-triage-guide. |
+| **Recommendation quality** | Internal benchmark harness available for systematic evaluation of recommendation quality and metadata gaps (optional for first ship). | [industry-recommendation-benchmark-protocol.md](../qa/industry-recommendation-benchmark-protocol.md); acceptance report row 15. |
 | **Known risks** | Industry risks (if any) recorded in known-risk-register; mitigations or waiver. | [known-risk-register.md](known-risk-register.md) §3. |
 
 ---

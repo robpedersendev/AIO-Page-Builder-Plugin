@@ -27,3 +27,15 @@
 
 - [ ] Snapshot keys are fixed: `primary_industry`, `secondary_industries`, `profile_readiness`, `active_pack_refs`, `applied_preset_ref`, `section_overlay_count`, `page_overlay_count`, `recommendation_mode`, `warnings`, `industry_subsystem_available`.
 - [ ] No unbounded arrays of raw content; overlay counts are integers only.
+
+---
+
+## 4. Industry Health Report (Prompt 390)
+
+- [ ] **Screen:** Industry Health Report is available under AIO Page Builder menu; capability VIEW_LOGS; no public exposure.
+- [ ] **Health check service:** `Industry_Health_Check_Service::run()` returns `errors` and `warnings`; each issue has `object_type`, `key`, `severity`, `issue_summary`, `related_refs`.
+- [ ] **Pack refs:** Missing token_preset_ref, seo_guidance_ref, lpagery_rule_ref, starter_bundle_ref, or CTA refs produce errors; unresolved helper/one_pager overlay refs produce warnings.
+- [ ] **Profile:** Primary or secondary industry key not in pack registry produces error; disabled primary pack produces warning; selected_starter_bundle_key not found produces error; bundle industry mismatch with primary produces warning.
+- [ ] **Starter bundles:** Bundle industry_key with no matching pack produces warning.
+- [ ] **No auto-fix:** Report is observational only; no automatic repair or mutation.
+- [ ] **Empty/healthy:** When no issues, screen shows success notice and no error/warning tables.

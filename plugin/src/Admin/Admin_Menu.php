@@ -35,6 +35,7 @@ use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
 use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Health_Report_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Assistant;
@@ -147,6 +148,7 @@ final class Admin_Menu {
 		$post_release_health = new Post_Release_Health_Screen( $this->container );
 		$privacy_reporting   = new Privacy_Reporting_Settings_Screen( $this->container );
 		$industry_profile     = new Industry_Profile_Settings_Screen( $this->container );
+		$industry_health_report = new Industry_Health_Report_Screen( $this->container );
 		$industry_style_preset = new Industry_Style_Preset_Screen( $this->container );
 		$global_style_tokens = new Global_Style_Token_Settings_Screen( $this->container );
 		$global_component_overrides = new Global_Component_Override_Settings_Screen( $this->container );
@@ -387,6 +389,15 @@ final class Admin_Menu {
 			$industry_profile->get_capability(),
 			Industry_Profile_Settings_Screen::SLUG,
 			array( $industry_profile, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_health_report->get_title(),
+			__( 'Industry Health Report', 'aio-page-builder' ),
+			$industry_health_report->get_capability(),
+			Industry_Health_Report_Screen::SLUG,
+			array( $industry_health_report, 'render' )
 		);
 
 		add_submenu_page(

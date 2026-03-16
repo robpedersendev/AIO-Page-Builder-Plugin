@@ -203,6 +203,12 @@ final class Industry_Profile_Settings_Screen {
 				<?php endif; ?>
 			</section>
 
+			<?php if ( $active_pack === null ) : ?>
+			<section class="aio-neutral-mode-notice" aria-live="polite">
+				<p class="description"><?php \esc_html_e( 'No industry selected. Template and section recommendations use the generic library; set a primary industry below for industry-specific presets and guidance.', 'aio-page-builder' ); ?></p>
+			</section>
+			<?php endif; ?>
+
 			<?php if ( $active_pack !== null ) : ?>
 			<section class="aio-active-pack" aria-labelledby="aio-active-pack-heading">
 				<h2 id="aio-active-pack-heading"><?php \esc_html_e( 'Active industry pack', 'aio-page-builder' ); ?></h2>
