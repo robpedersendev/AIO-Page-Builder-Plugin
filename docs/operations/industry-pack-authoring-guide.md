@@ -1,8 +1,8 @@
 # Industry Pack Authoring Guide (Internal)
 
-**Spec**: industry-pack-extension-contract.md; industry-pack-schema.md; industry-pack-release-gate.md; all industry subsystem contracts and schemas (Prompts 318–378).
+**Spec**: industry-pack-extension-contract.md; industry-pack-schema.md; industry-pack-release-gate.md; industry-subsystem-roadmap-contract.md; all industry subsystem contracts and schemas (Prompts 318–378).
 
-**Purpose**: Internal workflow for adding new industry packs so expansion stays disciplined, registry-first, and consistent with subsystem contracts. Use with [industry-pack-author-checklist.md](industry-pack-author-checklist.md).
+**Purpose**: Internal workflow for adding new industry packs so expansion stays disciplined, registry-first, and consistent with subsystem contracts. Use with [industry-pack-author-checklist.md](industry-pack-author-checklist.md). Long-term extension boundaries and roadmap: [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md).
 
 ---
 
@@ -84,6 +84,7 @@
 
 - [industry-pack-author-checklist.md](industry-pack-author-checklist.md) – Concise checklist for each new pack.
 - [industry-pack-maintenance-checklist.md](industry-pack-maintenance-checklist.md) – Ongoing maintenance (overlays, CTA, resolvers, export, presets).
+- [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md) – Long-term extension seams, per-industry vs core, deprecation policy, roadmap categories.
 - [industry-pack-release-gate.md](../release/industry-pack-release-gate.md) – Release gate and sign-off.
 - [industry-pack-catalog.md](../appendices/industry-pack-catalog.md) – Built-in pack list; add new pack entry here.
 - [industry-pack-extension-contract.md](../contracts/industry-pack-extension-contract.md) – Subsystem boundary and terminology.

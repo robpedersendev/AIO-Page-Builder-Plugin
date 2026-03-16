@@ -34,4 +34,6 @@
 - **Technical lead:** Release gate criteria satisfied; no unmitigated risks.
 - **Product owner:** Industry scope and limitations accepted for first release.
 
+**Final signoff document:** [industry-subsystem-final-signoff.md](industry-subsystem-final-signoff.md) compiles evidence and records production signoff for the first industry-enabled release.
+
 *Reference this gate in [release-review-packet.md](release-review-packet.md) §2.10 and [sign-off-checklist.md](sign-off-checklist.md) when Industry Pack is in release scope.*

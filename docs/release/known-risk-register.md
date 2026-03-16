@@ -44,6 +44,8 @@
 | IND-2 | Industry Pack / profile change | When the active Industry Profile changes after plans have been approved or pages built, recommendations and snapshot context may diverge. No auto-rebuild or auto-rollback; change-impact is reported as non-destructive warnings only. | [industry-change-impact-contract.md](../contracts/industry-change-impact-contract.md). Built content remains stable; operators see divergence in admin/support contexts. |
 | *(add further per release)* | — | — | — |
 
+**Industry first-release signoff:** Evidence and production signoff for the first four industries are recorded in [industry-subsystem-final-signoff.md](industry-subsystem-final-signoff.md). IND-1 and IND-2 remain the standing industry risks for this release.
+
 **Styling deferred enhancements (not blockers):** Extended format validation (e.g. stricter color format checks), styling-specific a11y audit for global/per-entity screens. Recorded in [styling-release-gate.md](styling-release-gate.md) §2.2. Do not block release.
 
 Use this section for risks or limitations specific to a release (e.g. "Export of very large plans may timeout on constrained hosting") with mitigation or formal waiver reference.

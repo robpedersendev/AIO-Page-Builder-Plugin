@@ -20,21 +20,35 @@ This appendix shows which section purpose families and example section keys have
 
 ---
 
-## 2. Pending overlay coverage (T2 – next waves)
+## 2. Second-wave overlay coverage (T2 – authored Prompt 401)
+
+| Section purpose family | Example section_key (authored) | Industries with overlay | Notes |
+|------------------------|--------------------------------|-------------------------|------|
+| listing (gallery/media) | mlp_gallery_01 | cosmetology_nail | Gallery/media. |
+| offer (pricing/packages) | fb_package_summary_01 | cosmetology_nail, plumber | Pricing and package sections. |
+| profile (staff/profile) | mlp_profile_cards_01, mlp_profile_summary_01 | cosmetology_nail, realtor | Staff and profile sections. |
+| utility (map/location) | mlp_location_info_01 | cosmetology_nail, realtor, plumber, disaster_recovery | Map and location. |
+| listing (listing) | mlp_listing_01 | realtor | Listing-adjacent. |
+| proof (certification) | tp_certification_01 | realtor, plumber, disaster_recovery | Trust/certification expansion. |
+| proof (trust band) | tp_trust_band_01 | plumber, disaster_recovery | Trust band. |
+| comparison | mlp_comparison_cards_01 | plumber, disaster_recovery | Comparison/versus. |
+| proof (reassurance) | tp_reassurance_01 | disaster_recovery | Urgency-proof. |
+
+**Source**: SectionHelperOverlays/ overlays-{industry}.php (second-wave blocks). Section keys are from section registry (MediaListingProfileBatch, FeatureBenefitBatch, TrustProofBatch).
+
+---
+
+## 2b. Pending overlay coverage (T2 remainder – next waves)
 
 | Section purpose family | Target use | Example section_key (from registry) | Wave | Notes |
 |------------------------|------------|-------------------------------------|------|------|
-| listing | Gallery/media | (Use registry: directory_listing, media_gallery category) | 2a | Gallery and media sections. |
-| profile | Staff/profile | (Use registry: profile_bio category) | 2a | Staff and bio sections. |
-| offer | Pricing/packages | (Use registry: pricing_packages category) | 2b | Pricing and package sections. |
 | listing | Service-grid | (Use registry: service-grid or listing sections) | 2b | Service grid and listing. |
-| comparison | Comparison | (Use registry: comparison category) | 2c | Comparison/versus sections. |
-| timeline / explainer | Process/steps | (Use registry: timeline, process_steps) | 2c | Process and timeline. |
-| faq | FAQ | (Use registry: faq category) | 2c | FAQ sections. |
-| utility | Map/location | (Use registry: map/location utility sections) | 2d | Map and location. |
-| proof | Trust/certification (expand) | Additional proof section keys beyond tp_badge_01 | 2d | More trust/cert sections. |
+| timeline / explainer | Process/steps | ptf_steps_01, ptf_timeline_01, ptf_faq_01 | 2c | Process, timeline, FAQ. |
+| faq | FAQ | ptf_faq_01, ptf_faq_accordion_01 | 2c | FAQ sections. |
+| stats | Stats/highlights | (T3) | T3 | Stats/highlights. |
+| legal | Legal/disclaimer | (T3) | T3 | Legal/disclaimer. |
 
-**Example section_key values** must be resolved from the live section registry (Section_Schema, CPT). This matrix does not invent keys; it references category/purpose family. When authoring, look up actual internal_key for each section that has a base helper and add overlay entries for those keys.
+**Example section_key values** must be resolved from the live section registry (Section_Schema, CPT). When authoring additional overlays, look up actual internal_key for each section that has a base helper and add overlay entries for those keys.
 
 ---
 
@@ -51,16 +65,16 @@ This appendix shows which section purpose families and example section keys have
 
 ---
 
-## 4. Industry × family view (seeded only)
+## 4. Industry × family view (T1 + T2 second-wave)
 
-| Industry | hero | cta | proof | contact | offer |
-|----------|------|-----|-------|---------|-------|
-| cosmetology_nail | ✓ | ✓ | ✓ | ✓ | ✓ |
-| realtor | ✓ | ✓ | ✓ | ✓ | ✓ |
-| plumber | ✓ | ✓ | ✓ | ✓ | ✓ |
-| disaster_recovery | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Industry | hero | cta | proof | contact | offer | listing (gallery) | profile | location | pricing | comparison | proof (cert/trust) |
+|----------|------|-----|-------|---------|-------|-------------------|---------|----------|---------|------------|---------------------|
+| cosmetology_nail | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ (mlp_gallery_01) | ✓ (mlp_profile_cards_01) | ✓ | ✓ (fb_package_summary_01) | — | — |
+| realtor | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ (mlp_listing_01) | ✓ (mlp_profile_summary_01) | ✓ | — | — | ✓ (tp_certification_01) |
+| plumber | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | ✓ (fb_package_summary_01) | ✓ (mlp_comparison_cards_01) | ✓ (tp_trust_band_01, tp_certification_01) |
+| disaster_recovery | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | ✓ (mlp_comparison_cards_01) | ✓ (tp_trust_band_01, tp_certification_01, tp_reassurance_01) |
 
-**Pending**: All T2 families (listing, profile, offer-pricing, comparison, timeline/explainer, faq, utility-map, proof-expand) have no overlay rows yet. Add rows when overlays are authored per industry-helper-overlay-expansion-plan.
+**T2 second-wave** (Prompt 401): Gallery, pricing, profile, location, listing, comparison, and expanded proof (certification, trust band, reassurance) are now covered for the targeted industries. **Pending**: Additional T2/T3 families (timeline, FAQ, stats, legal) per industry-helper-overlay-expansion-plan.
 
 ---
 

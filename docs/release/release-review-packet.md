@@ -105,6 +105,7 @@
 
 | Area | Summary | Artifact |
 |------|---------|----------|
+| **Final signoff** | Production signoff package for first industry-enabled release; evidence from QA, benchmarks, diagnostics, export/restore, lifecycle, fallback. | [industry-subsystem-final-signoff.md](industry-subsystem-final-signoff.md). |
 | QA baseline | Acceptance checklist for first four industries; no-industry fallback; overlays, Build Plan scoring, diagnostics, export/restore. | [industry-subsystem-acceptance-report.md](../qa/industry-subsystem-acceptance-report.md). |
 | Release gate | Blockers vs deferred; evidence-based criteria; additive behavior and export/restore. | [industry-pack-release-gate.md](industry-pack-release-gate.md). |
 | Maintenance | Checklist for adding industries, overlays, CTA patterns, scoring, export/diagnostics. | [industry-pack-maintenance-checklist.md](../operations/industry-pack-maintenance-checklist.md). |

@@ -1,10 +1,10 @@
 # Industry Pack Catalog
 
-**Spec**: industry-pack-schema.md; industry-pack-extension-contract. **Prompts**: 349–352.
+**Spec**: industry-pack-schema.md; industry-pack-extension-contract; industry-subsystem-roadmap-contract. **Prompts**: 349–352.
 
 This appendix lists built-in industry pack definitions loaded by the Industry Pack Registry. Packs are additive config; they reference CTA patterns, SEO guidance, style presets, and LPagery rules. Invalid refs fail safely at resolution time.
 
-**Adding a new pack:** Follow [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) and [industry-pack-author-checklist.md](../operations/industry-pack-author-checklist.md). Add a new section below and update §5 Loading when the pack is registered.
+**Adding a new pack:** Follow [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) and [industry-pack-author-checklist.md](../operations/industry-pack-author-checklist.md). Extension boundaries and deprecation policy: [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md). Add a new section below and update §5 Loading when the pack is registered.
 
 ---
 

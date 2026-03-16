@@ -4,6 +4,8 @@
 
 **Adding a new industry:** Follow [industry-pack-authoring-guide.md](industry-pack-authoring-guide.md) and [industry-pack-author-checklist.md](industry-pack-author-checklist.md) for required objects, dependency order, validation, and release steps. The checklist below is the ongoing maintenance view; the authoring guide covers the full author workflow.
 
+**Extension boundaries and roadmap:** Long-term extension seams, deprecation policy, and roadmap categories are defined in [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md). New work must use approved seams only.
+
 ---
 
 ## 1. Adding a new industry pack
@@ -65,6 +67,14 @@
 - Core plugin must run correctly with **zero** industry packs or empty industry profile.
 - All new behavior must be **documented** (contracts, appendices, release/QA docs as appropriate).
 - **Secrets:** No API keys or credentials in industry definitions, overlays, or export payloads.
+
+---
+
+## 8. Deprecation (packs and overlays)
+
+- [ ] **Pack deprecation:** Set pack status to `deprecated`; do not remove from registry load until documented sunset. Update [industry-pack-catalog.md](../appendices/industry-pack-catalog.md); export/restore continues to support deprecated industry_key for existing profiles. See [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md) §4.
+- [ ] **Overlay deprecation:** Set overlay status to `archived` or `draft`; registry skips non-active. Remove from builtin definitions only when safe; document in changelog and coverage matrix.
+- [ ] **Ref deprecation:** Do not remove CTA/style/SEO/LPagery keys that packs still reference; migrate pack refs or deprecate pack first. Invalid refs fail safely at resolution.
 
 ---
 

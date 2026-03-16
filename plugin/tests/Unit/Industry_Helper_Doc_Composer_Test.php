@@ -128,4 +128,34 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 		$this->assertStringContainsString( 'Warm', $doc['tone_notes'] );
 		$this->assertArrayHasKey( 'cta_usage_notes', $doc );
 	}
+
+	/** Prompt 401: second-wave overlays load and are discoverable. */
+	public function test_builtin_overlays_include_second_wave_section_keys(): void {
+		$definitions = Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions();
+		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
+		$overlay_registry->load( $definitions );
+		$this->assertNotNull( $overlay_registry->get( 'cosmetology_nail', 'mlp_gallery_01' ), 'Second-wave cosmetology gallery overlay must be present.' );
+		$this->assertNotNull( $overlay_registry->get( 'realtor', 'mlp_location_info_01' ), 'Second-wave realtor location overlay must be present.' );
+		$this->assertNotNull( $overlay_registry->get( 'plumber', 'tp_certification_01' ), 'Second-wave plumber certification overlay must be present.' );
+		$this->assertNotNull( $overlay_registry->get( 'disaster_recovery', 'tp_reassurance_01' ), 'Second-wave disaster_recovery reassurance overlay must be present.' );
+		$ov = $overlay_registry->get( 'cosmetology_nail', 'mlp_gallery_01' );
+		$this->assertArrayHasKey( 'tone_notes', $ov );
+		$this->assertSame( 'section_helper_overlay', $ov['scope'] ?? '' );
+		$this->assertSame( 'active', $ov['status'] ?? '' );
+	}
+
+	/** Prompt 401: second-wave overlay composes (base + overlay). */
+	public function test_builtin_second_wave_overlay_composition_cosmetology_gallery(): void {
+		$doc_registry = new Documentation_Registry();
+		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
+		$overlay_registry->load( Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
+		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
+		$result = $composer->compose( 'mlp_gallery_01', 'cosmetology_nail' );
+		$this->assertTrue( $result->is_overlay_applied() );
+		$this->assertSame( 'cosmetology_nail', $result->get_overlay_industry_key() );
+		$doc = $result->get_composed_doc();
+		$this->assertArrayHasKey( 'tone_notes', $doc );
+		$this->assertStringContainsString( 'Warm', $doc['tone_notes'] );
+		$this->assertArrayHasKey( 'cta_usage_notes', $doc );
+	}
 }
