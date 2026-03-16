@@ -57,6 +57,7 @@
 
 - When profile has no industry_subtype_key (or empty), behavior is **parent industry only**. No subtype-specific overlays or emphasis apply.
 - When industry_subtype_key is set but invalid (unknown key or parent mismatch), behavior is **parent industry only**; invalid ref must not crash and may be reported in validation/diagnostics.
+- When industry_subtype_key references a subtype that is **deprecated** or **inactive** (status !== active), behavior is **parent industry only**. Resolvers and comparison services treat only STATUS_ACTIVE subtypes as valid. See [industry-subtype-fallback-audit.md](../qa/industry-subtype-fallback-audit.md).
 
 ---
 

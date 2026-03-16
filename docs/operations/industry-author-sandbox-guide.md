@@ -35,8 +35,15 @@
 
 ---
 
-## 4. Do not
+## 4. Promotion (sandbox to release-ready)
+
+- Dry-run results are for review only. To move validated candidates toward release, use **Industry_Sandbox_Promotion_Service**: check_prerequisites( dry_run_result ) and get_release_ready_summary( candidate_packs, candidate_bundles, dry_run_result ). Promotion does not auto-activate; it produces an audit summary. The actual copy of definitions into release-ready locations is an explicit operator step. See [industry-sandbox-promotion-workflow.md](industry-sandbox-promotion-workflow.md).
+
+---
+
+## 5. Do not
 
 - Do not use the sandbox to mutate live registries or profile.
 - Do not expose the sandbox to public or unauthenticated users.
 - Do not assume dry-run success implies live activation will succeed; other factors (e.g. profile, toggle state) apply at activation time.
+- Do not use promotion to auto-activate assets on any site; promotion is review-driven and non-activating.

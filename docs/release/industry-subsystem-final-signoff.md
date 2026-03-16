@@ -70,9 +70,11 @@
 
 - **Release packet:** [release-review-packet.md](release-review-packet.md) §2.10.
 - **Release gate:** [industry-pack-release-gate.md](industry-pack-release-gate.md).
+- **Release candidate manifest:** [industry-release-candidate-manifest-contract.md](../contracts/industry-release-candidate-manifest-contract.md) — Manifest and evidence bundle requirements for industry release candidates.
 - **Known risks:** [known-risk-register.md](known-risk-register.md) §3 (IND-1, IND-2).
 - **Maintenance:** [industry-pack-maintenance-checklist.md](../operations/industry-pack-maintenance-checklist.md).
 - **Extension contract:** [industry-pack-extension-contract.md](../contracts/industry-pack-extension-contract.md).
+- **Sandbox promotion:** [industry-sandbox-promotion-workflow.md](../operations/industry-sandbox-promotion-workflow.md) — Promotion from sandbox (no auto-activate).
 
 ---
 

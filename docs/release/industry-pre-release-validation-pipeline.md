@@ -27,6 +27,7 @@
 | 8. Dry-run sandbox (optional) | Industry_Author_Sandbox_Service::run_dry_run() for candidate packs/bundles | Lint/health errors = fix before promote | [industry-author-sandbox-guide.md](../operations/industry-author-sandbox-guide.md) |
 | 9. Release gate criteria | [industry-pack-release-gate.md](industry-pack-release-gate.md) | All criteria met or waived | Release gate §1 |
 | 10. Performance benchmark (optional) | Industry_Performance_Benchmark_Service::run_benchmark() | Informational; use before/after optimization | [industry-performance-benchmark-protocol.md](../qa/industry-performance-benchmark-protocol.md) |
+| 11. Sandbox promotion (optional) | Industry_Sandbox_Promotion_Service::check_prerequisites(), get_release_ready_summary() | Prerequisites must pass before promotion; promotion does not auto-activate | [industry-sandbox-promotion-workflow.md](../operations/industry-sandbox-promotion-workflow.md) |
 
 ---
 
@@ -61,4 +62,6 @@
 - [industry-pre-release-checklist.md](industry-pre-release-checklist.md) — Executable checklist.
 - [industry-pack-release-gate.md](industry-pack-release-gate.md) — Gate criteria and sign-off.
 - [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) — Author workflow.
+- [industry-sandbox-promotion-workflow.md](../operations/industry-sandbox-promotion-workflow.md) — Sandbox-to-release promotion (no auto-activate).
 - [industry-pack-maintenance-checklist.md](../operations/industry-pack-maintenance-checklist.md) — Ongoing maintenance.
+- [industry-release-candidate-manifest-contract.md](../contracts/industry-release-candidate-manifest-contract.md) — Release candidate evidence requirements.

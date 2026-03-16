@@ -105,7 +105,10 @@ final class Industry_Subtype_Comparison_Service {
 				$parent = isset( $def[ Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] ) && \is_string( $def[ Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] )
 					? \trim( $def[ Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] )
 					: '';
-				if ( $parent === $industry_key ) {
+				$status = isset( $def[ Industry_Subtype_Registry::FIELD_STATUS ] ) && \is_string( $def[ Industry_Subtype_Registry::FIELD_STATUS ] )
+					? $def[ Industry_Subtype_Registry::FIELD_STATUS ]
+					: '';
+				if ( $parent === $industry_key && $status === Industry_Subtype_Registry::STATUS_ACTIVE ) {
 					$has_subtype = true;
 					$subtype_label = isset( $def[ Industry_Subtype_Registry::FIELD_LABEL ] ) && \is_string( $def[ Industry_Subtype_Registry::FIELD_LABEL ] )
 						? \trim( $def[ Industry_Subtype_Registry::FIELD_LABEL ] )

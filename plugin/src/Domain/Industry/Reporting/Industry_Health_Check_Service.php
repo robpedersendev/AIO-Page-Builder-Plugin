@@ -104,6 +104,12 @@ final class Industry_Health_Check_Service {
 	 * @return array{errors: list<array{object_type: string, key: string, severity: string, issue_summary: string, related_refs: list<string>}>, warnings: list<array{object_type: string, key: string, severity: string, issue_summary: string, related_refs: list<string>}>}
 	 */
 	public function run(): array {
+		static $request_cache = array();
+		$id = \spl_object_id( $this );
+		if ( isset( $request_cache[ $id ] ) && \is_array( $request_cache[ $id ] ) ) {
+			return $request_cache[ $id ];
+		}
+
 		$errors   = array();
 		$warnings  = array();
 
@@ -260,7 +266,9 @@ final class Industry_Health_Check_Service {
 			}
 		}
 
-		return array( 'errors' => $errors, 'warnings' => $warnings );
+		$result = array( 'errors' => $errors, 'warnings' => $warnings );
+		$request_cache[ $id ] = $result;
+		return $result;
 	}
 
 	/**
