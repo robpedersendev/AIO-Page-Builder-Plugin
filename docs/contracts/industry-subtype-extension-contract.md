@@ -49,7 +49,7 @@
 
 - **Layering**: When a subtype is selected and valid, recommendation and overlay consumers may **merge** subtype overrides with parent pack data: e.g. subtype page_family_emphasis refines parent supported_page_families; subtype helper_overlay_refs add to or reorder parent overlay refs. Exact merge rules are implementation-defined but must remain deterministic and documented.
 - **Fallback**: When subtype ref is missing or invalid, **only parent industry pack** is used. No partial subtype application.
-- **Registry**: Subtype definitions are loaded via a subtype registry (or equivalent) keyed by subtype_key and optionally by parent_industry_key. Invalid or duplicate keys are skipped at load per schema validation.
+- **Registry**: Subtype definitions are loaded via Industry_Subtype_Registry keyed by subtype_key and by parent_industry_key. Invalid or duplicate keys are skipped at load per schema validation. Industry_Subtype_Validator validates single definitions (schema and optional parent-industry reference check); use for authoring and tests.
 
 ---
 

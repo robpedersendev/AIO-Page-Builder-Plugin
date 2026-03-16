@@ -255,6 +255,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			}
 			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Pack_Migration_Executor( $profile_repo, $pack_registry, $bundle_registry );
 		} );
+		$container->register( 'industry_subtype_validator', function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Validator {
+			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Validator();
+		} );
 		$container->register( self::CONTAINER_KEY_SUBTYPE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry::get_builtin_definitions() );

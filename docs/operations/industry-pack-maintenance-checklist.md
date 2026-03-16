@@ -4,7 +4,7 @@
 
 **Adding a new industry:** Follow [industry-pack-authoring-guide.md](industry-pack-authoring-guide.md) and [industry-pack-author-checklist.md](industry-pack-author-checklist.md) for required objects, dependency order, validation, and release steps. The checklist below is the ongoing maintenance view; the authoring guide covers the full author workflow.
 
-**Extension boundaries and roadmap:** Long-term extension seams, deprecation policy, and roadmap categories are defined in [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md). New work must use approved seams only.
+**Extension boundaries and roadmap:** Long-term extension seams, deprecation policy, and roadmap categories are defined in [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md). New work must use approved seams only. **New industry candidates** must be evaluated with [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md) and [future-industry-scorecard-template.md](future-industry-scorecard-template.md) before implementation.
 
 ---
 
@@ -77,6 +77,7 @@
 - [ ] **Overlay deprecation:** Set overlay status to `archived` or `draft`; registry skips non-active. Remove from builtin definitions only when safe; document in changelog and coverage matrix.
 - [ ] **Ref deprecation:** Do not remove CTA/style/SEO/LPagery keys that packs still reference; migrate pack refs or deprecate pack first. Invalid refs fail safely at resolution.
 - [ ] **Pack migration (Prompt 412):** Use Industry_Pack_Migration_Executor for deprecated-to-replacement transitions. Admin-only; nonce and capability required. See [industry-pack-migration-contract.md](../contracts/industry-pack-migration-contract.md). Do not rewrite Build Plan or approval snapshots.
+- [ ] **Pack version diff (Prompt 418):** Use Industry_Pack_Diff_Service to compare two pack states (e.g. built-in vs bundle) for release review and change summaries. See [industry-pack-diff-contract.md](../contracts/industry-pack-diff-contract.md). Read-only; no pack mutation.
 
 ---
 

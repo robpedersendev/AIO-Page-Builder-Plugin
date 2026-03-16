@@ -32,6 +32,8 @@
 | **explanation_reasons** | array | Short reason codes or messages (e.g. in_pack_preferred, section_affinity, in_pack_discouraged). |
 | **industry_source_refs** | array | Industry keys that contributed (primary, secondary). |
 | **warning_flags** | array | Optional warnings (e.g. cta_mismatch). |
+| **subtype_influence_applied** | bool | (Optional, when subtype context used.) True if subtype overlay adjusted this section’s score or fit. |
+| **subtype_reason_summary** | string | (Optional.) Short reason when subtype influence applied (e.g. subtype_overlay_priority). |
 
 ---
 
@@ -46,14 +48,19 @@
 
 ---
 
-## 5. API
+## 5. Subtype-aware extension (Prompt 422)
 
-- **Industry_Section_Recommendation_Resolver**: resolve( array $industry_profile, array|null $primary_pack, array $sections, array $options = [] ): Industry_Section_Recommendation_Result.
+- When a resolved subtype is available, callers may pass **options['subtype_definition']** (array) and **options['subtype_extender']** (Industry_Subtype_Section_Recommendation_Extender). The resolver then runs base resolution and applies subtype influence (e.g. score boost for sections in subtype helper_overlay_refs).
+- **Industry_Subtype_Section_Recommendation_Extender**: apply_subtype_influence( Industry_Section_Recommendation_Result $base_result, ?array $subtype_definition, array $sections ): Industry_Section_Recommendation_Result. Additive only; when subtype is null, returns result with subtype fields set to false/empty. Parent-industry logic remains the base layer; invalid subtype refs fall back to parent-only behavior at resolution (before the resolver is called).
+
+## 6. API
+
+- **Industry_Section_Recommendation_Resolver**: resolve( array $industry_profile, array|null $primary_pack, array $sections, array $options = [] ): Industry_Section_Recommendation_Result. Options may include subtype_definition and subtype_extender for subtype-aware scoring.
 - **Industry_Section_Recommendation_Result**: get_items() (list of per-section result objects), get_ranked_keys() (ordered section_key list), to_array().
 
 ---
 
-## 6. Implementation reference
+## 7. Implementation reference
 
 - **Section_Schema**: FIELD_INTERNAL_KEY, FIELD_INDUSTRY_AFFINITY, FIELD_INDUSTRY_DISCOURAGED, FIELD_INDUSTRY_CTA_FIT, FIELD_INDUSTRY_NOTES.
 - **Industry_Pack_Schema**: FIELD_PREFERRED_SECTION_KEYS, FIELD_DISCOURAGED_SECTION_KEYS.

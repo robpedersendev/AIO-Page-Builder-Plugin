@@ -40,7 +40,7 @@ final class Industry_Section_Recommendation_Resolver {
 	 * @param array<string, mixed>       $industry_profile Must contain primary_industry_key (string); optional secondary_industry_keys (array).
 	 * @param array<string, mixed>|null  $primary_pack     Industry pack definition (preferred_section_keys, discouraged_section_keys) or null.
 	 * @param array<int, array<string, mixed>> $sections   List of section definitions (each with internal_key; optional industry_affinity, industry_discouraged, industry_cta_fit, industry_notes).
-	 * @param array<string, mixed>      $options          Reserved for future (e.g. include_neutral).
+	 * @param array<string, mixed>      $options          Optional: subtype_definition (array|null), subtype_extender (Industry_Subtype_Section_Recommendation_Extender|null). When both set, subtype influence is applied after base resolution.
 	 * @return Industry_Section_Recommendation_Result
 	 */
 	public function resolve( array $industry_profile, ?array $primary_pack, array $sections, array $options = array() ): Industry_Section_Recommendation_Result {
@@ -161,7 +161,13 @@ final class Industry_Section_Recommendation_Resolver {
 			return strcmp( $a['section_key'] ?? '', $b['section_key'] ?? '' );
 		} );
 
-		return new Industry_Section_Recommendation_Result( $items );
+		$result = new Industry_Section_Recommendation_Result( $items );
+		$subtype_def = $options['subtype_definition'] ?? null;
+		$extender = $options['subtype_extender'] ?? null;
+		if ( is_array( $subtype_def ) && $extender instanceof Industry_Subtype_Section_Recommendation_Extender ) {
+			return $extender->apply_subtype_influence( $result, $subtype_def, $sections );
+		}
+		return $result;
 	}
 
 	/**

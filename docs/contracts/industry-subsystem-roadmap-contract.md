@@ -64,7 +64,18 @@ The following are **approved seams** for adding or extending industry behavior. 
 
 ---
 
-## 5. Roadmap categories for future expansion
+## 5. Future industry candidate evaluation
+
+Before adding a new industry, evaluate the candidate using the internal framework and scorecard so expansion stays rational and maintainable:
+
+- **Framework:** [future-industry-candidate-evaluation-framework.md](../operations/future-industry-candidate-evaluation-framework.md) — criteria (content-model fit, template overlap, LPagery posture, CTA complexity, documentation burden, styling needs, compliance/caution burden, starter bundle viability, subtype complexity, long-term maintenance cost), scoring, and go/no-go/review categories.
+- **Scorecard:** [future-industry-scorecard-template.md](../operations/future-industry-scorecard-template.md) — one scorecard per candidate; attach to backlog and use in planning and prompt generation.
+
+New industries should score above the team-defined threshold and must not require new core seams.
+
+---
+
+## 6. Roadmap categories for future expansion
 
 Concrete categories for prompt generation and backlog; expansion stays within approved seams.
 
@@ -93,7 +104,7 @@ Concrete categories for prompt generation and backlog; expansion stays within ap
 
 ---
 
-## 7. Cross-references
+## 8. Cross-references
 
 - [industry-pack-extension-contract.md](industry-pack-extension-contract.md) — Subsystem boundary and terminology.
 - [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) — Author workflow and required pieces.

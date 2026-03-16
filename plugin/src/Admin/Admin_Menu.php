@@ -35,6 +35,7 @@ use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
 use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Bundle_Import_Preview_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Health_Report_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
@@ -63,6 +64,9 @@ use AIOPageBuilder\Domain\Registries\Section\FeatureBenefitBatch\Feature_Benefit
 use AIOPageBuilder\Domain\Registries\Section\CtaSuperLibraryBatch\CTA_Super_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\LegalPolicyUtilityBatch\Legal_Policy_Utility_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\MediaListingProfileBatch\Media_Listing_Profile_Detail_Library_Batch_Seeder;
+use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
+use AIOPageBuilder\Domain\Industry\Export\Industry_Pack_Bundle_Service;
+use AIOPageBuilder\Domain\Industry\Export\Industry_Pack_Import_Conflict_Service;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Validator;
@@ -124,6 +128,8 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_save_industry_page_template_override', array( $this, 'handle_save_industry_page_template_override' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_build_plan_override', array( $this, 'handle_save_industry_build_plan_override' ), 10 );
 		\add_action( 'admin_post_aio_create_plan_from_bundle', array( $this, 'handle_create_plan_from_bundle' ), 10 );
+		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
+		\add_action( 'admin_post_aio_industry_bundle_confirm_import', array( $this, 'handle_industry_bundle_confirm_import' ), 10 );
 
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
@@ -150,6 +156,7 @@ final class Admin_Menu {
 		$privacy_reporting   = new Privacy_Reporting_Settings_Screen( $this->container );
 		$industry_profile     = new Industry_Profile_Settings_Screen( $this->container );
 		$industry_health_report = new Industry_Health_Report_Screen( $this->container );
+		$industry_bundle_import_preview = new Industry_Bundle_Import_Preview_Screen( $this->container );
 		$industry_style_preset = new Industry_Style_Preset_Screen( $this->container );
 		$global_style_tokens = new Global_Style_Token_Settings_Screen( $this->container );
 		$global_component_overrides = new Global_Component_Override_Settings_Screen( $this->container );
@@ -403,6 +410,15 @@ final class Admin_Menu {
 
 		add_submenu_page(
 			self::PARENT_SLUG,
+			$industry_bundle_import_preview->get_title(),
+			__( 'Industry Bundle Import', 'aio-page-builder' ),
+			$industry_bundle_import_preview->get_capability(),
+			Industry_Bundle_Import_Preview_Screen::SLUG,
+			array( $industry_bundle_import_preview, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
 			$industry_style_preset->get_title(),
 			__( 'Industry Style Preset', 'aio-page-builder' ),
 			$industry_style_preset->get_capability(),
@@ -644,6 +660,87 @@ final class Admin_Menu {
 	 */
 	public function handle_create_plan_from_bundle(): void {
 		\AIOPageBuilder\Admin\Actions\Create_Plan_From_Starter_Bundle_Action::handle( $this->container );
+	}
+
+	/**
+	 * Handles industry bundle preview: validate upload, analyze conflicts, store preview in transient, redirect.
+	 *
+	 * @return void
+	 */
+	public function handle_industry_bundle_preview(): void {
+		$redirect = \admin_url( 'admin.php?page=' . Industry_Bundle_Import_Preview_Screen::SLUG );
+		if ( ! isset( $_POST['aio_industry_bundle_preview_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_bundle_preview_nonce'] ) ), 'aio_industry_bundle_preview' ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Invalid request.', $redirect ) );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Permission denied.', $redirect ) );
+			exit;
+		}
+		if ( empty( $_FILES['aio_industry_bundle_file']['tmp_name'] ) || ! \is_uploaded_file( $_FILES['aio_industry_bundle_file']['tmp_name'] ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'No file uploaded.', $redirect ) );
+			exit;
+		}
+		$raw = \file_get_contents( $_FILES['aio_industry_bundle_file']['tmp_name'] );
+		if ( $raw === false ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Could not read file.', $redirect ) );
+			exit;
+		}
+		$bundle = \json_decode( $raw, true );
+		if ( ! \is_array( $bundle ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Invalid JSON.', $redirect ) );
+			exit;
+		}
+		$bundle_service = new Industry_Pack_Bundle_Service();
+		$errors = $bundle_service->validate_bundle( $bundle );
+		if ( $errors !== array() ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', \implode( ' ', $errors ), $redirect ) );
+			exit;
+		}
+		$screen = new Industry_Bundle_Import_Preview_Screen( $this->container );
+		$local_state = $screen->get_local_state_for_conflict();
+		$conflict_service = new Industry_Pack_Import_Conflict_Service();
+		$conflicts = $conflict_service->analyze( $bundle, $local_state );
+		$included = isset( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] ) && \is_array( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] )
+			? $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ]
+			: array();
+		$summary = array();
+		foreach ( $included as $cat ) {
+			if ( \is_string( $cat ) && isset( $bundle[ $cat ] ) && \is_array( $bundle[ $cat ] ) ) {
+				$summary[ $cat ] = \count( $bundle[ $cat ] );
+			}
+		}
+		$transient_key = \sprintf( 'aio_industry_bundle_preview_%d', \get_current_user_id() );
+		\set_transient( $transient_key, array(
+			'bundle'    => $bundle,
+			'conflicts' => $conflicts,
+			'included'  => $included,
+			'summary'   => $summary,
+		), 900 );
+		\wp_safe_redirect( $redirect );
+		exit;
+	}
+
+	/**
+	 * Handles industry bundle import confirmation: clear preview transient, redirect with message. Actual apply not implemented.
+	 *
+	 * @return void
+	 */
+	public function handle_industry_bundle_confirm_import(): void {
+		$redirect = \admin_url( 'admin.php?page=' . Industry_Bundle_Import_Preview_Screen::SLUG );
+		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ), 'aio_industry_bundle_confirm_import' ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Invalid request.', $redirect ) );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Permission denied.', $redirect ) );
+			exit;
+		}
+		$transient_key = \sprintf( 'aio_industry_bundle_preview_%d', \get_current_user_id() );
+		\delete_transient( $transient_key );
+		\wp_safe_redirect( \add_query_arg( 'aio_bundle_confirm', \__( 'Preview confirmed. Actual import application is not yet implemented; use full export/restore for site moves.', 'aio-page-builder' ), $redirect ) );
+		exit;
 	}
 
 	/**
