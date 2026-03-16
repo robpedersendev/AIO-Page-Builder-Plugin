@@ -156,6 +156,12 @@ Industry-specific page one-pager overlays (industry-page-onepager-overlay-schema
 
 ---
 
+## 11.3.1 Subtype page one-pager overlay (Prompt 426)
+
+Subtype-specific page one-pager overlays (subtype-page-onepager-overlay-schema.md). Keyed by (subtype_key, page_template_key). Key fields: subtype_key, page_template_key, scope (subtype_page_onepager_overlay), status, version_marker, hierarchy_hints, cta_strategy, lpagery_seo_notes, compliance_cautions, additive_blocks. Loaded via Subtype_Page_OnePager_Overlay_Registry (load, get, get_for_subtype). Composition order: base → industry overlay → subtype overlay. See [subtype-page-onepager-overlay-schema.md](../schemas/subtype-page-onepager-overlay-schema.md).
+
+---
+
 ## 11.4 Industry recommendation override (Prompt 366)
 
 Override object for operator override of industry recommendations (section, page_template, build_plan_item). Schema: Industry_Override_Schema. Key fields: target_type, target_key, plan_id (optional, for build_plan_item), state (accepted | rejected), reason (sanitized, max 500 chars), created_at, updated_at, industry_context_ref. Validation via Industry_Override_Schema::validate(); reason sanitized via Industry_Override_Schema::sanitize_reason(). Storage and UI for overrides are defined in later prompts. See [industry-override-contract.md](../contracts/industry-override-contract.md).

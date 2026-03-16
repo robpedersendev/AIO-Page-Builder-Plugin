@@ -37,3 +37,13 @@ The registry loads built-in definitions via `Subtype_Section_Helper_Overlay_Regi
 ## 4. Relation to industry overlays
 
 Parent-industry section-helper overlays remain the first overlay layer. Subtype overlays refine only where subtype nuance matters; they do not replace industry overlays. When no subtype is selected or subtype_key is invalid, composition is base + industry only (subtype overlay skipped). See [subtype-section-helper-overlay-schema.md](../schemas/subtype-section-helper-overlay-schema.md) and [industry-subtype-extension-contract.md](../contracts/industry-subtype-extension-contract.md).
+
+---
+
+## 5. Subtype page one-pager overlays (Prompt 427)
+
+- **Scope**: Subtype-specific **page** one-pager overlays layer on top of base page one-pagers and **industry** page one-pager overlays. Composition order: base → industry overlay → subtype overlay. Allowed regions match industry page overlays: hierarchy_hints, cta_strategy, lpagery_seo_notes, compliance_cautions, additive_blocks.
+- **Subtypes (launch set)**: Same as section overlays (§1). Page families in focus: home (pt_home_conversion_01), contact (pt_contact_request_01), services (pt_services_overview_01) where subtype nuance materially changes page-purpose or CTA emphasis.
+- **Source directory**: `plugin/src/Domain/Industry/Docs/SubtypePageOnePagerOverlays/`. Files: cosmetology-nail-subtype-onepager.php, realtor-subtype-onepager.php, plumber-subtype-onepager.php, disaster-recovery-subtype-onepager.php.
+- **Loading**: `Subtype_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions()` returns definitions from those files. Bootstrap registers the registry under `CONTAINER_KEY_SUBTYPE_PAGE_ONEPAGER_OVERLAY_REGISTRY` and passes it into `Industry_Page_OnePager_Composer`. The composer applies the subtype overlay when `compose($page_template_key, $industry_key, $subtype_key)` is called with a non-empty `$subtype_key` and the subtype registry is set. Invalid or duplicate (subtype_key, page_template_key) entries are skipped.
+- **Relation to industry page overlays**: Parent-industry page one-pager overlays remain the first overlay layer. Subtype page overlays refine only where subtype nuance matters (e.g. buyer vs seller, mobile vs luxury, residential vs commercial). When no subtype is selected or subtype_key is invalid, composition is base + industry only. See [subtype-page-onepager-overlay-schema.md](../schemas/subtype-page-onepager-overlay-schema.md) and [industry-subtype-extension-contract.md](../contracts/industry-subtype-extension-contract.md).

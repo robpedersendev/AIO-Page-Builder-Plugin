@@ -121,20 +121,62 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 		$this->assertSame( 'plumber_trust', $loaded[ Industry_Starter_Bundle_Registry::FIELD_TOKEN_PRESET_REF ] );
 	}
 
-	/** Prompt 387: builtin starter bundles load and validate; one per industry. */
+	public function test_subtype_scoped_bundle_loads_and_validates(): void {
+		$bundle = $this->valid_bundle( 'realtor_buyer_starter', 'realtor' );
+		$bundle[ Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY ] = 'realtor_buyer_agent';
+		$registry = new Industry_Starter_Bundle_Registry();
+		$registry->load( array( $bundle ) );
+		$loaded = $registry->get( 'realtor_buyer_starter' );
+		$this->assertNotNull( $loaded );
+		$this->assertSame( 'realtor_buyer_agent', $loaded[ Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY ] );
+		$this->assertEmpty( $registry->validate_bundle( $bundle ) );
+	}
+
+	public function test_get_for_industry_with_subtype_returns_subtype_bundles_when_present(): void {
+		$registry = new Industry_Starter_Bundle_Registry();
+		$industry_only = $this->valid_bundle( 'realtor_starter', 'realtor' );
+		$subtype_bundle = $this->valid_bundle( 'realtor_buyer_starter', 'realtor' );
+		$subtype_bundle[ Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY ] = 'realtor_buyer_agent';
+		$registry->load( array( $industry_only, $subtype_bundle ) );
+		$for_subtype = $registry->get_for_industry( 'realtor', 'realtor_buyer_agent' );
+		$this->assertCount( 1, $for_subtype );
+		$this->assertSame( 'realtor_buyer_starter', $for_subtype[0][ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] );
+		$this->assertSame( 'realtor_buyer_agent', $for_subtype[0][ Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY ] );
+	}
+
+	public function test_get_for_industry_with_subtype_falls_back_to_industry_bundles_when_no_subtype(): void {
+		$registry = new Industry_Starter_Bundle_Registry();
+		$registry->load( array(
+			$this->valid_bundle( 'realtor_starter', 'realtor' ),
+			$this->valid_bundle( 'realtor_second', 'realtor' ),
+		) );
+		$for_subtype = $registry->get_for_industry( 'realtor', 'realtor_buyer_agent' );
+		$this->assertCount( 2, $for_subtype );
+		$for_empty = $registry->get_for_industry( 'realtor', '' );
+		$this->assertCount( 2, $for_empty );
+	}
+
+	public function test_invalid_subtype_key_rejected(): void {
+		$bundle = $this->valid_bundle( 'bad_subtype', 'realtor' );
+		$bundle[ Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY ] = 'invalid key!';
+		$errors = ( new Industry_Starter_Bundle_Registry() )->validate_bundle( $bundle );
+		$this->assertContains( 'invalid_subtype_key', $errors );
+	}
+
+	/** Prompt 387/429: builtin starter bundles (industry + subtype) load and validate. */
 	public function test_builtin_definitions_load_and_validate(): void {
 		$definitions = Industry_Starter_Bundle_Registry::get_builtin_definitions();
-		$this->assertCount( 4, $definitions, 'Exactly four builtin starter bundles (cosmetology_nail, realtor, plumber, disaster_recovery).' );
+		$this->assertGreaterThanOrEqual( 4, count( $definitions ), 'At least four industry bundles plus optional subtype bundles (Prompt 429).' );
 
 		$registry = new Industry_Starter_Bundle_Registry();
 		$registry->load( $definitions );
 
-		$expected_bundles = array( 'cosmetology_nail_starter', 'realtor_starter', 'plumber_starter', 'disaster_recovery_starter' );
+		$expected_industry_bundles = array( 'cosmetology_nail_starter', 'realtor_starter', 'plumber_starter', 'disaster_recovery_starter' );
 		$expected_industries = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
 
-		foreach ( $expected_bundles as $key ) {
+		foreach ( $expected_industry_bundles as $key ) {
 			$bundle = $registry->get( $key );
-			$this->assertNotNull( $bundle, "Builtin bundle {$key} must load." );
+			$this->assertNotNull( $bundle, "Builtin industry bundle {$key} must load." );
 			$this->assertSame( Industry_Starter_Bundle_Registry::STATUS_ACTIVE, $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] );
 			$this->assertSame( '1', $bundle[ Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER ] );
 			$this->assertNotEmpty( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] );
@@ -143,7 +185,10 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 
 		foreach ( $expected_industries as $industry_key ) {
 			$for_industry = $registry->get_for_industry( $industry_key );
-			$this->assertCount( 1, $for_industry, "Exactly one bundle for industry {$industry_key}." );
+			$this->assertCount( 1, $for_industry, "Exactly one industry-scoped bundle for {$industry_key} when no subtype requested." );
 		}
+
+		$for_subtype = $registry->get_for_industry( 'realtor', 'realtor_buyer_agent' );
+		$this->assertGreaterThanOrEqual( 1, count( $for_subtype ), 'At least one subtype bundle for realtor_buyer_agent when seeded (Prompt 429).' );
 	}
 }

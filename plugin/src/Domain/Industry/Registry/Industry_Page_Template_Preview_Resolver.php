@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Admin\ViewModels\PageTemplates\Industry_Page_Template_Preview_View_Model;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Composer;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 
@@ -96,7 +97,10 @@ final class Industry_Page_Template_Preview_Resolver {
 		$warning_flags    = isset( $item['warning_flags'] ) && \is_array( $item['warning_flags'] ) ? array_values( array_filter( array_map( 'strval', $item['warning_flags'] ) ) ) : array();
 		$explanation_reasons = isset( $item['explanation_reasons'] ) && \is_array( $item['explanation_reasons'] ) ? array_values( array_filter( array_map( 'strval', $item['explanation_reasons'] ) ) ) : array();
 
-		$composed_result = $this->one_pager_composer->compose( $template_key, $primary );
+		$subtype_key = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			? \trim( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			: '';
+		$composed_result = $this->one_pager_composer->compose( $template_key, $primary, $subtype_key );
 		$composed_one_pager = $composed_result->get_composed_onepager();
 		$composed_for_view  = array(
 			'hierarchy_hints'   => $composed_one_pager['hierarchy_hints'] ?? '',

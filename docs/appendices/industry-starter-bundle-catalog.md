@@ -54,6 +54,25 @@ This appendix lists built-in starter bundle definitions loaded by the Industry S
 
 ---
 
-## 5. Loading
+## 5. Subtype starter bundles (Prompt 429)
 
-Bundles are loaded by **Industry_Packs_Module** via `Industry_Starter_Bundle_Registry::get_builtin_definitions()` (sourced from **StarterBundles/Builtin_Starter_Bundles.php**). Invalid definitions are skipped at load. Resolution of page/section refs and token/CTA/LPagery refs is done by consumers when applying a bundle; the registry only stores and serves definitions.
+Subtype-scoped bundles are loaded from **StarterBundles/Subtypes/*.php** and merged with industry bundles. They have an optional **subtype_key**; `get_for_industry(industry_key, subtype_key)` returns subtype-scoped bundles when any exist for that (industry, subtype), otherwise falls back to industry-scoped bundles. When `subtype_key` is empty, only industry-scoped bundles (no subtype_key) are returned.
+
+| Subtype | Bundle key | Label |
+|---------|------------|-------|
+| cosmetology_nail_luxury_salon | cosmetology_nail_luxury_salon_starter | Luxury Nail Salon Starter |
+| cosmetology_nail_mobile_tech | cosmetology_nail_mobile_tech_starter | Mobile Nail Tech Starter |
+| realtor_buyer_agent | realtor_buyer_agent_starter | Buyer Agent Starter |
+| realtor_listing_agent | realtor_listing_agent_starter | Listing Agent Starter |
+| plumber_residential | plumber_residential_starter | Residential Plumber Starter |
+| plumber_commercial | plumber_commercial_starter | Commercial Plumber Starter |
+| disaster_recovery_residential | disaster_recovery_residential_starter | Residential Restoration Starter |
+| disaster_recovery_commercial | disaster_recovery_commercial_starter | Commercial Restoration Starter |
+
+**Source directory**: `plugin/src/Domain/Industry/Registry/StarterBundles/Subtypes/`. See subtype-starter-bundle-contract.md.
+
+---
+
+## 6. Loading
+
+Bundles are loaded by **Industry_Packs_Module** via `Industry_Starter_Bundle_Registry::get_builtin_definitions()` (sourced from **StarterBundles/Builtin_Starter_Bundles.php**, which merges industry files and **Subtypes/*.php**). Invalid definitions are skipped at load. Resolution of page/section refs and token/CTA/LPagery refs is done by consumers when applying a bundle; the registry only stores and serves definitions.

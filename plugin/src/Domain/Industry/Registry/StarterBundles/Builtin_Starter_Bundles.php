@@ -26,13 +26,13 @@ final class Builtin_Starter_Bundles {
 	 */
 	public static function get_definitions(): array {
 		$dir   = __DIR__;
+		$out   = array();
 		$files = array(
 			$dir . '/cosmetology-nail-starter.php',
 			$dir . '/realtor-starter.php',
 			$dir . '/plumber-starter.php',
 			$dir . '/disaster-recovery-starter.php',
 		);
-		$out = array();
 		foreach ( $files as $path ) {
 			if ( ! \is_readable( $path ) ) {
 				continue;
@@ -42,6 +42,25 @@ final class Builtin_Starter_Bundles {
 				foreach ( $loaded as $bundle ) {
 					if ( \is_array( $bundle ) ) {
 						$out[] = $bundle;
+					}
+				}
+			}
+		}
+		$subtypes_dir = $dir . '/Subtypes';
+		if ( \is_dir( $subtypes_dir ) ) {
+			$subtype_files = \glob( $subtypes_dir . '/*.php' );
+			if ( \is_array( $subtype_files ) ) {
+				foreach ( $subtype_files as $path ) {
+					if ( ! \is_readable( $path ) ) {
+						continue;
+					}
+					$loaded = require $path;
+					if ( \is_array( $loaded ) ) {
+						foreach ( $loaded as $bundle ) {
+							if ( \is_array( $bundle ) ) {
+								$out[] = $bundle;
+							}
+						}
 					}
 				}
 			}

@@ -35,25 +35,36 @@ final class Industry_Page_OnePager_Composer {
 	/** @var Industry_Page_OnePager_Overlay_Registry */
 	private Industry_Page_OnePager_Overlay_Registry $overlay_registry;
 
+	/** @var Subtype_Page_OnePager_Overlay_Registry|null Optional; when set, compose() applies subtype overlay after industry (Prompt 427). */
+	private ?Subtype_Page_OnePager_Overlay_Registry $subtype_overlay_registry;
+
 	/** @var Industry_Compliance_Warning_Resolver|null Optional; when set, composed result includes compliance warnings (Prompt 407). */
 	private ?Industry_Compliance_Warning_Resolver $compliance_warning_resolver;
 
-	public function __construct( Documentation_Registry $documentation_registry, Industry_Page_OnePager_Overlay_Registry $overlay_registry, ?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null ) {
-		$this->documentation_registry      = $documentation_registry;
-		$this->overlay_registry            = $overlay_registry;
-		$this->compliance_warning_resolver = $compliance_warning_resolver;
+	public function __construct(
+		Documentation_Registry $documentation_registry,
+		Industry_Page_OnePager_Overlay_Registry $overlay_registry,
+		?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null,
+		?Subtype_Page_OnePager_Overlay_Registry $subtype_overlay_registry = null
+	) {
+		$this->documentation_registry       = $documentation_registry;
+		$this->overlay_registry             = $overlay_registry;
+		$this->compliance_warning_resolver  = $compliance_warning_resolver;
+		$this->subtype_overlay_registry     = $subtype_overlay_registry;
 	}
 
 	/**
-	 * Composes one-pager for the given page template and industry. Returns base-only when overlay missing or inactive.
+	 * Composes one-pager for the given page template, industry, and optional subtype. Order: base → industry overlay → subtype overlay.
 	 *
 	 * @param string $page_template_key Page template internal_key.
 	 * @param string $industry_key      Industry pack key. Empty = base-only, no overlay.
+	 * @param string $subtype_key       Optional subtype key (e.g. realtor_buyer_agent). Empty = no subtype overlay (Prompt 427).
 	 * @return Composed_Page_OnePager_Result
 	 */
-	public function compose( string $page_template_key, string $industry_key ): Composed_Page_OnePager_Result {
+	public function compose( string $page_template_key, string $industry_key, string $subtype_key = '' ): Composed_Page_OnePager_Result {
 		$page_template_key = trim( $page_template_key );
 		$industry_key      = trim( $industry_key );
+		$subtype_key       = trim( $subtype_key );
 		$base_doc          = $page_template_key !== '' ? $this->documentation_registry->get_by_page_template_key( $page_template_key ) : null;
 		$base_id           = '';
 		$composed          = array();
@@ -77,6 +88,21 @@ final class Industry_Page_OnePager_Composer {
 					}
 					$overlay_applied  = true;
 					$overlay_industry = $industry_key;
+				}
+			}
+		}
+		if ( $subtype_key !== '' && $page_template_key !== '' && $this->subtype_overlay_registry !== null ) {
+			$subtype_overlay = $this->subtype_overlay_registry->get( $subtype_key, $page_template_key );
+			if ( $subtype_overlay !== null && is_array( $subtype_overlay ) ) {
+				$status = isset( $subtype_overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ] ) && is_string( $subtype_overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ] )
+					? $subtype_overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ]
+					: '';
+				if ( $status === Subtype_Page_OnePager_Overlay_Registry::STATUS_ACTIVE ) {
+					foreach ( self::OVERLAY_MERGE_FIELDS as $field ) {
+						if ( array_key_exists( $field, $subtype_overlay ) ) {
+							$composed[ $field ] = $subtype_overlay[ $field ];
+						}
+					}
 				}
 			}
 		}

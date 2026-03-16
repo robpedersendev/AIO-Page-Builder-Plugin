@@ -19,6 +19,8 @@ final class Industry_Starter_Bundle_Registry {
 
 	public const FIELD_BUNDLE_KEY                   = 'bundle_key';
 	public const FIELD_INDUSTRY_KEY                 = 'industry_key';
+	/** Optional. When set, bundle is subtype-scoped (subtype-starter-bundle-contract.md). */
+	public const FIELD_SUBTYPE_KEY                 = 'subtype_key';
 	public const FIELD_LABEL                        = 'label';
 	public const FIELD_SUMMARY                      = 'summary';
 	public const FIELD_STATUS                       = 'status';
@@ -94,26 +96,42 @@ final class Industry_Starter_Bundle_Registry {
 	}
 
 	/**
-	 * Returns bundles for the given industry_key. Empty array if none.
+	 * Returns bundles for the given industry_key, optionally filtered by subtype. When subtype_key is non-empty,
+	 * returns subtype-scoped bundles for (industry_key, subtype_key) if any exist; otherwise returns industry bundles (fallback).
 	 *
 	 * @param string $industry_key Industry pack key.
+	 * @param string $subtype_key  Optional subtype key. Empty = industry bundles only (subtype-starter-bundle-contract.md).
 	 * @return list<array<string, mixed>>
 	 */
-	public function get_for_industry( string $industry_key ): array {
-		$want = \trim( $industry_key );
-		if ( $want === '' ) {
+	public function get_for_industry( string $industry_key, string $subtype_key = '' ): array {
+		$want_industry = \trim( $industry_key );
+		if ( $want_industry === '' ) {
 			return array();
 		}
-		$out = array();
+		$want_subtype = \trim( $subtype_key );
+		$industry_only_bundles = array();
+		$subtype_bundles = array();
 		foreach ( $this->all as $bundle ) {
 			$ik = isset( $bundle[ self::FIELD_INDUSTRY_KEY ] ) && \is_string( $bundle[ self::FIELD_INDUSTRY_KEY ] )
 				? \trim( $bundle[ self::FIELD_INDUSTRY_KEY ] )
 				: '';
-			if ( $ik === $want ) {
-				$out[] = $bundle;
+			if ( $ik !== $want_industry ) {
+				continue;
+			}
+			$sk = isset( $bundle[ self::FIELD_SUBTYPE_KEY ] ) && \is_string( $bundle[ self::FIELD_SUBTYPE_KEY ] )
+				? \trim( $bundle[ self::FIELD_SUBTYPE_KEY ] )
+				: '';
+			if ( $sk === '' ) {
+				$industry_only_bundles[] = $bundle;
+			}
+			if ( $want_subtype !== '' && $sk === $want_subtype ) {
+				$subtype_bundles[] = $bundle;
 			}
 		}
-		return $out;
+		if ( $want_subtype !== '' && $subtype_bundles !== array() ) {
+			return $subtype_bundles;
+		}
+		return $industry_only_bundles;
 	}
 
 	/**
@@ -193,6 +211,9 @@ final class Industry_Starter_Bundle_Registry {
 		$out = array(
 			self::FIELD_BUNDLE_KEY     => \trim( (string) ( $bundle[ self::FIELD_BUNDLE_KEY ] ?? '' ) ),
 			self::FIELD_INDUSTRY_KEY   => \trim( (string) ( $bundle[ self::FIELD_INDUSTRY_KEY ] ?? '' ) ),
+			self::FIELD_SUBTYPE_KEY   => isset( $bundle[ self::FIELD_SUBTYPE_KEY ] ) && \is_string( $bundle[ self::FIELD_SUBTYPE_KEY ] )
+				? \trim( $bundle[ self::FIELD_SUBTYPE_KEY ] )
+				: '',
 			self::FIELD_LABEL          => \trim( (string) ( $bundle[ self::FIELD_LABEL ] ?? '' ) ),
 			self::FIELD_SUMMARY        => \trim( (string) ( $bundle[ self::FIELD_SUMMARY ] ?? '' ) ),
 			self::FIELD_STATUS         => (string) ( $bundle[ self::FIELD_STATUS ] ?? self::STATUS_ACTIVE ),

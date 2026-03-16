@@ -31,6 +31,7 @@
 
 | Field | Type | Description |
 |-------|------|-------------|
+| **subtype_key** | string | Optional. When set, the bundle is subtype-scoped (subtype-starter-bundle-contract.md). Must match a valid subtype key whose parent_industry_key equals this bundle's industry_key. Omitted = industry-scoped only. |
 | **recommended_page_families** | list&lt;string&gt; | Page template families to emphasize as starting points. |
 | **recommended_page_template_refs** | list&lt;string&gt; | Page template internal_keys recommended in this bundle. |
 | **recommended_section_refs** | list&lt;string&gt; | Section template internal_keys to emphasize (section emphasis). |
@@ -48,6 +49,7 @@
 - **label**, **summary**: Non-empty when present; reasonable max length (e.g. 256 for label, 1024 for summary).
 - **status**: Must be one of `active`, `draft`, `deprecated`.
 - **version_marker**: Must match a supported schema version (e.g. `1`). Unsupported versions cause safe rejection at load.
+- **subtype_key** (optional): When present, pattern `^[a-z0-9_-]+$`; max length 64. Should resolve to a subtype whose parent_industry_key matches this bundle's industry_key when used (subtype-starter-bundle-contract.md). Invalid or unknown subtype_key may cause the bundle to be skipped at load or filtered at get_for_industry.
 - **recommended_*** refs: Arrays of non-empty strings; keys are advisory and should exist in section/page registries when applied.
 - **token_preset_ref**, **cta_guidance_ref**, **lpagery_guidance_ref**: No secrets; safe for export. Resolution defined by respective subsystems.
 
@@ -57,7 +59,7 @@ Invalid bundle definitions must be **skipped** at load (no throw); registry rema
 
 ## 5. Registry behavior
 
-- **Industry_Starter_Bundle_Registry**: Read-only. `load( array $definitions )`, `get( string $bundle_key ): ?array`, `get_for_industry( string $industry_key ): array`, `list_all(): array`.
+- **Industry_Starter_Bundle_Registry**: Read-only. `load( array $definitions )`, `get( string $bundle_key ): ?array`, `get_for_industry( string $industry_key, string $subtype_key = '' ): array` (when subtype_key is non-empty, returns subtype-scoped bundles for (industry, subtype) if any, else industry bundles; when subtype_key empty, returns industry bundles only), `list_all(): array`.
 - Invalid definitions are skipped during load; duplicate bundle_key (first wins) or invalid shape do not break the registry.
 - No arbitrary execution embedded in bundle data; refs are resolved by other subsystems when bundles are **applied** (out of scope for this schema).
 

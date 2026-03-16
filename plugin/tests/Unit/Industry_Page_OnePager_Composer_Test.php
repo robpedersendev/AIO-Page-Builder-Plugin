@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Tests\Unit;
 use AIOPageBuilder\Domain\Industry\Docs\Composed_Page_OnePager_Result;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Composer;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry;
+use AIOPageBuilder\Domain\Industry\Docs\Subtype_Page_OnePager_Overlay_Registry;
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +19,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Industry/Docs/Industry_Page_OnePager_Overlay_Registry.php';
+require_once $plugin_root . '/src/Domain/Industry/Docs/Subtype_Page_OnePager_Overlay_Registry.php';
 require_once $plugin_root . '/src/Domain/Industry/Docs/Composed_Page_OnePager_Result.php';
 require_once $plugin_root . '/src/Domain/Industry/Docs/Industry_Page_OnePager_Composer.php';
 require_once $plugin_root . '/src/Domain/Registries/Documentation/Documentation_Schema.php';
@@ -102,5 +104,63 @@ final class Industry_Page_OnePager_Composer_Test extends TestCase {
 		$this->assertArrayHasKey( 'base_documentation_id', $arr );
 		$this->assertArrayHasKey( 'overlay_applied', $arr );
 		$this->assertArrayHasKey( 'overlay_industry_key', $arr );
+	}
+
+	public function test_compose_with_subtype_overlay_merges_subtype_content(): void {
+		$doc_registry = new Documentation_Registry();
+		$industry_overlay = new Industry_Page_OnePager_Overlay_Registry();
+		$industry_overlay->load( array(
+			array(
+				Industry_Page_OnePager_Overlay_Registry::FIELD_INDUSTRY_KEY      => 'realtor',
+				Industry_Page_OnePager_Overlay_Registry::FIELD_PAGE_TEMPLATE_KEY => 'pt_home_conversion_01',
+				Industry_Page_OnePager_Overlay_Registry::FIELD_SCOPE            => Industry_Page_OnePager_Overlay_Registry::SCOPE_PAGE_ONEPAGER_OVERLAY,
+				Industry_Page_OnePager_Overlay_Registry::FIELD_STATUS           => Industry_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+				'cta_strategy' => 'Industry-level CTA.',
+			),
+		) );
+		$subtype_overlay = new Subtype_Page_OnePager_Overlay_Registry();
+		$subtype_overlay->load( array(
+			array(
+				Subtype_Page_OnePager_Overlay_Registry::FIELD_SUBTYPE_KEY       => 'realtor_buyer_agent',
+				Subtype_Page_OnePager_Overlay_Registry::FIELD_PAGE_TEMPLATE_KEY => 'pt_home_conversion_01',
+				Subtype_Page_OnePager_Overlay_Registry::FIELD_SCOPE            => Subtype_Page_OnePager_Overlay_Registry::SCOPE_SUBTYPE_PAGE_ONEPAGER_OVERLAY,
+				Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS           => Subtype_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+				'cta_strategy' => 'Primary: start your search, get buyer updates (subtype).',
+			),
+		) );
+		$composer = new Industry_Page_OnePager_Composer( $doc_registry, $industry_overlay, null, $subtype_overlay );
+		$result = $composer->compose( 'pt_home_conversion_01', 'realtor', 'realtor_buyer_agent' );
+		$onepager = $result->get_composed_onepager();
+		$this->assertSame( 'Primary: start your search, get buyer updates (subtype).', $onepager['cta_strategy'] ?? '' );
+		$this->assertTrue( $result->is_overlay_applied() );
+		$this->assertSame( 'realtor', $result->get_overlay_industry_key() );
+	}
+
+	public function test_compose_with_empty_subtype_key_skips_subtype_overlay(): void {
+		$doc_registry = new Documentation_Registry();
+		$industry_overlay = new Industry_Page_OnePager_Overlay_Registry();
+		$industry_overlay->load( array(
+			array(
+				Industry_Page_OnePager_Overlay_Registry::FIELD_INDUSTRY_KEY      => 'realtor',
+				Industry_Page_OnePager_Overlay_Registry::FIELD_PAGE_TEMPLATE_KEY => 'pt_home_conversion_01',
+				Industry_Page_OnePager_Overlay_Registry::FIELD_SCOPE            => Industry_Page_OnePager_Overlay_Registry::SCOPE_PAGE_ONEPAGER_OVERLAY,
+				Industry_Page_OnePager_Overlay_Registry::FIELD_STATUS           => Industry_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+				'cta_strategy' => 'Industry-level CTA only.',
+			),
+		) );
+		$subtype_overlay = new Subtype_Page_OnePager_Overlay_Registry();
+		$subtype_overlay->load( array(
+			array(
+				Subtype_Page_OnePager_Overlay_Registry::FIELD_SUBTYPE_KEY       => 'realtor_buyer_agent',
+				Subtype_Page_OnePager_Overlay_Registry::FIELD_PAGE_TEMPLATE_KEY => 'pt_home_conversion_01',
+				Subtype_Page_OnePager_Overlay_Registry::FIELD_SCOPE            => Subtype_Page_OnePager_Overlay_Registry::SCOPE_SUBTYPE_PAGE_ONEPAGER_OVERLAY,
+				Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS           => Subtype_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+				'cta_strategy' => 'Should not appear.',
+			),
+		) );
+		$composer = new Industry_Page_OnePager_Composer( $doc_registry, $industry_overlay, null, $subtype_overlay );
+		$result = $composer->compose( 'pt_home_conversion_01', 'realtor', '' );
+		$onepager = $result->get_composed_onepager();
+		$this->assertSame( 'Industry-level CTA only.', $onepager['cta_strategy'] ?? '' );
 	}
 }
