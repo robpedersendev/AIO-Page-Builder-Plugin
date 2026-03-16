@@ -520,12 +520,32 @@ final class Admin_Menu {
 			}
 		}
 
+		$subtype_raw = isset( $_POST[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $_POST[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			? trim( sanitize_text_field( wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) ) )
+			: '';
+		$current = $repo->get_profile();
+		$previous_primary = isset( $current[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $current[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+			? trim( $current[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+			: '';
+		$subtype_registry = $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_REGISTRY )
+			? $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_REGISTRY )
+			: null;
+		$subtype = '';
+		if ( $subtype_raw !== '' && $primary !== '' && strlen( $subtype_raw ) <= 64 && $subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ) {
+			$def = $subtype_registry->get( $subtype_raw );
+			if ( $def !== null && isset( $def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] ) && trim( (string) $def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] ) === $primary ) {
+				$subtype = $subtype_raw;
+			}
+		}
+		if ( $previous_primary !== '' && $previous_primary !== $primary ) {
+			$subtype = '';
+		}
 		$partial = array(
 			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY   => $primary,
 			Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => $secondary,
 			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => $selected_bundle,
+			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY   => $subtype,
 		);
-		$current = $repo->get_profile();
 		$merged = array_merge( $current, $partial );
 		$merged[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = $secondary;
 		$pack_registry = null;
@@ -537,7 +557,7 @@ final class Admin_Menu {
 		}
 		$qp_registry = $this->container->has( 'industry_question_pack_registry' ) ? $this->container->get( 'industry_question_pack_registry' ) : null;
 		$validator = new Industry_Profile_Validator();
-		if ( ! $validator->validate( $merged, $pack_registry, $qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null ) ) {
+		if ( ! $validator->validate( $merged, $pack_registry, $qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null, $subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null ) ) {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
 			exit;
 		}

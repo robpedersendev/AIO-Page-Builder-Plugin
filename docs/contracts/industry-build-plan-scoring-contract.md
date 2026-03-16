@@ -68,6 +68,7 @@ Build Plan **items** (per Build_Plan_Item_Schema) gain optional payload or item-
 ## 7. Files
 
 - **Service**: plugin/src/Domain/Industry/AI/Industry_Build_Plan_Scoring_Service.php
+- **Subtype layer** (Prompt 431): plugin/src/Domain/Industry/AI/Industry_Subtype_Build_Plan_Scoring_Service.php wraps the scoring service and injects subtype_definition and subtype_extender into context when profile has a valid subtype; Industry_Build_Plan_Scoring_Service passes them to Industry_Page_Template_Recommendation_Resolver so subtype influence is applied. Build_Plan_Scoring_Interface allows the generator to accept either service. See industry-subtype-ai-overlay-contract.md.
 - **Contract**: docs/contracts/industry-build-plan-scoring-contract.md
 - **Build Plan generator**: Optional integration (inject scoring service; call enrich_output at start of generate()).
 - **Build Plan item generator**: Pass through industry_* keys from enriched records into item payload when building new_page and existing_page_change items.

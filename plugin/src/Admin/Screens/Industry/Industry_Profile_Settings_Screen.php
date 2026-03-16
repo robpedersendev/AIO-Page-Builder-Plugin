@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Forms\Industry_Profile_Form_Builder;
+use AIOPageBuilder\Admin\Forms\Industry_Subtype_Form_Field;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Readiness_Result;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
@@ -82,6 +83,10 @@ final class Industry_Profile_Settings_Screen {
 				}
 			}
 			$form_builder = new Industry_Profile_Form_Builder( $pack_registry );
+			$subtype_registry = $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_REGISTRY )
+				? $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_REGISTRY )
+				: null;
+			$subtype_form_field = new Industry_Subtype_Form_Field( $subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null );
 			$bundle_registry = $this->get_starter_bundle_registry();
 			$starter_bundle_assistant = new Industry_Starter_Bundle_Assistant( $repo, $bundle_registry );
 			$starter_bundle_state = $starter_bundle_assistant->build_state( $profile );
@@ -89,6 +94,7 @@ final class Industry_Profile_Settings_Screen {
 			$primary_pack_is_disabled = $primary !== '' && $toggle_controller !== null && ! $toggle_controller->is_pack_active( $primary );
 		} else {
 			$form_builder = new Industry_Profile_Form_Builder( null );
+			$subtype_form_field = new Industry_Subtype_Form_Field( null );
 			$starter_bundle_assistant = null;
 			$starter_bundle_state = array( 'has_primary' => false, 'primary_industry_key' => '', 'bundles' => array(), 'selected_key' => '', 'field_name' => Industry_Starter_Bundle_Assistant::FIELD_NAME );
 			$toggle_controller = null;
@@ -108,6 +114,7 @@ final class Industry_Profile_Settings_Screen {
 			'toggle_controller'      => $toggle_controller,
 			'primary_pack_is_disabled' => $primary_pack_is_disabled,
 			'primary_industry_key'   => isset( $primary ) ? $primary : '',
+			'subtype_form_field'     => isset( $subtype_form_field ) ? $subtype_form_field : null,
 		);
 	}
 
@@ -278,6 +285,28 @@ final class Industry_Profile_Settings_Screen {
 										<option value="<?php echo \esc_attr( $value ); ?>" <?php selected( $current_primary, $value ); ?>><?php echo \esc_html( $label ); ?></option>
 									<?php endforeach; ?>
 								</select>
+							</td>
+						</tr>
+						<?php endif; ?>
+						<?php
+						$subtype_form_field = $state['subtype_form_field'] ?? null;
+						$primary_for_subtype = isset( $profile[ $primary_key ] ) && is_string( $profile[ $primary_key ] ) ? $profile[ $primary_key ] : '';
+						if ( $subtype_form_field instanceof Industry_Subtype_Form_Field && $primary_for_subtype !== '' && $subtype_form_field->industry_has_subtypes( $primary_for_subtype ) ) :
+							$subtype_config = $subtype_form_field->get_field_config();
+							$subtype_options = $subtype_form_field->get_options_for_industry( $primary_for_subtype );
+							$current_subtype = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) ? $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] : '';
+						?>
+						<tr>
+							<th scope="row"><label for="aio-industry-subtype"><?php echo \esc_html( $subtype_config['label'] ); ?></label></th>
+							<td>
+								<select name="<?php echo \esc_attr( $subtype_config['name'] ); ?>" id="aio-industry-subtype">
+									<?php foreach ( $subtype_options as $value => $label ) : ?>
+										<option value="<?php echo \esc_attr( $value ); ?>" <?php selected( $current_subtype, $value ); ?>><?php echo \esc_html( $label ); ?></option>
+									<?php endforeach; ?>
+								</select>
+								<?php if ( ! empty( $subtype_config['description'] ) ) : ?>
+									<p class="description"><?php echo \esc_html( $subtype_config['description'] ); ?></p>
+								<?php endif; ?>
 							</td>
 						</tr>
 						<?php endif; ?>

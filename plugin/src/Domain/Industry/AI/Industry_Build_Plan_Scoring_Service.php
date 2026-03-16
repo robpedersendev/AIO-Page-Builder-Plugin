@@ -25,7 +25,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository_Interfac
  * Enriches normalized Build Plan draft output with industry recommendation scores and explanation metadata.
  * Additive only; no automatic execution. Safe fallback when industry context is weak or missing.
  */
-final class Industry_Build_Plan_Scoring_Service {
+final class Industry_Build_Plan_Scoring_Service implements Build_Plan_Scoring_Interface {
 
 	/** Context key for industry profile (array with primary_industry_key, optional secondary_industry_keys). */
 	public const CONTEXT_INDUSTRY_PROFILE = 'industry_profile';
@@ -122,7 +122,12 @@ final class Industry_Build_Plan_Scoring_Service {
 			return $normalized_output;
 		}
 
-		$recommendation_result = $this->page_resolver->resolve( $profile, $primary_pack, $page_templates, array() );
+		$resolver_options = array();
+		if ( isset( $context['subtype_definition'] ) && is_array( $context['subtype_definition'] ) && isset( $context['subtype_extender'] ) && $context['subtype_extender'] !== null ) {
+			$resolver_options['subtype_definition'] = $context['subtype_definition'];
+			$resolver_options['subtype_extender']   = $context['subtype_extender'];
+		}
+		$recommendation_result = $this->page_resolver->resolve( $profile, $primary_pack, $page_templates, $resolver_options );
 		$score_by_key = $this->index_result_by_template_key( $recommendation_result );
 
 		$out = $normalized_output;

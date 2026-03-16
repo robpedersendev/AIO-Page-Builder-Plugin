@@ -29,6 +29,11 @@ The planner input artifact (Input_Artifact_Schema, Input_Artifact_Builder) gains
 | **cta_pattern_refs** | array | No | CTA pattern refs or ids preferred for this industry (from industry pack or profile). |
 | **lpagery_posture** | string | No | LPagery stance for planning (e.g. `prefer_local`, `neutral`, `defer`). Optional; from industry pack or default. |
 | **industry_guidance_refs** | array | No | Refs to industry-specific guidance (helper overlays, one-pager overlays, or rule refs). |
+| **industry_subtype_key** | string | No | Resolved subtype key when valid (e.g. realtor_buyer_agent). Empty when no subtype or invalid (Prompt 430; industry-subtype-ai-overlay-contract.md). |
+| **resolved_subtype_snapshot** | object | No | Sanitized snapshot for planning: label, summary only. Omitted when no valid subtype. |
+| **subtype_bundle_refs** | array | No | Optional list of starter bundle keys recommended for this subtype. |
+| **subtype_cta_posture_ref** | string | No | Optional CTA posture ref from subtype definition. |
+| **subtype_rule_refs** | array | No | Optional caution/rule refs from subtype definition. |
 
 - **Required** for artifact validity: none of these fields are required at artifact root; the existing required_root_keys remain unchanged.
 - **Optional**: All industry_context fields are optional. When industry profile is missing or not ready, industry_context may be omitted or contain only readiness with state `none`/`minimal`.

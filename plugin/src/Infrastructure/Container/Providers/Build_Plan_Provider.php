@@ -16,7 +16,9 @@ use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_Analytics_Service;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Item_Generator;
 use AIOPageBuilder\Domain\Industry\AI\Industry_Approval_Snapshot_Builder;
+use AIOPageBuilder\Domain\Industry\AI\Build_Plan_Scoring_Interface;
 use AIOPageBuilder\Domain\Industry\AI\Industry_Build_Plan_Scoring_Service;
+use AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Build_Plan_Scoring_Service;
 use AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Planning_Advisor;
 use AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Rule_Registry;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver;
@@ -24,7 +26,9 @@ use AIOPageBuilder\Domain\Industry\Profile\Industry_Weighted_Recommendation_Engi
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Page_Template_Recommendation_Extender;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver;
 use AIOPageBuilder\Domain\Registries\Analytics\Template_Analytics_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Detail_Builder;
@@ -114,12 +118,32 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 				$lpagery_advisor
 			);
 		} );
+		$container->register( 'industry_subtype_build_plan_scoring_service', function () use ( $container ): ?Industry_Subtype_Build_Plan_Scoring_Service {
+			if ( ! $container->has( 'industry_build_plan_scoring_service' ) || ! $container->has( Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_RESOLVER ) || ! $container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+				return null;
+			}
+			$inner = $container->get( 'industry_build_plan_scoring_service' );
+			$profile_store = $container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			$subtype_resolver = $container->get( Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_RESOLVER );
+			if ( ! $inner instanceof Industry_Build_Plan_Scoring_Service || ! $profile_store instanceof Industry_Profile_Repository || ! $subtype_resolver instanceof Industry_Subtype_Resolver ) {
+				return null;
+			}
+			return new Industry_Subtype_Build_Plan_Scoring_Service(
+				$inner,
+				$subtype_resolver,
+				$profile_store,
+				new Industry_Subtype_Page_Template_Recommendation_Extender()
+			);
+		} );
 		$container->register( 'build_plan_generator', function () use ( $container ): Build_Plan_Generator {
-			$scoring = $container->has( 'industry_build_plan_scoring_service' ) ? $container->get( 'industry_build_plan_scoring_service' ) : null;
+			$scoring = $container->has( 'industry_subtype_build_plan_scoring_service' ) ? $container->get( 'industry_subtype_build_plan_scoring_service' ) : null;
+			if ( $scoring === null && $container->has( 'industry_build_plan_scoring_service' ) ) {
+				$scoring = $container->get( 'industry_build_plan_scoring_service' );
+			}
 			return new Build_Plan_Generator(
 				$container->get( 'build_plan_repository' ),
 				$container->get( 'build_plan_item_generator' ),
-				$scoring instanceof Industry_Build_Plan_Scoring_Service ? $scoring : null
+				$scoring instanceof Build_Plan_Scoring_Interface ? $scoring : null
 			);
 		} );
 		$container->register( 'build_plan_stepper_builder', function (): Build_Plan_Stepper_Builder {

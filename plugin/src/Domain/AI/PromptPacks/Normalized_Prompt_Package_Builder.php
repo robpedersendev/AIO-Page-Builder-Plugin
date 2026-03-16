@@ -81,6 +81,10 @@ final class Normalized_Prompt_Package_Builder {
 		if ( $industry_overlay !== null && isset( $industry_overlay['industry_guidance_text'] ) && is_string( $industry_overlay['industry_guidance_text'] ) && trim( $industry_overlay['industry_guidance_text'] ) !== '' ) {
 			$system_parts[] = "## Industry guidance\n\n" . trim( $industry_overlay['industry_guidance_text'] );
 		}
+		$subtype_overlay = isset( $options['subtype_overlay'] ) && is_array( $options['subtype_overlay'] ) ? $options['subtype_overlay'] : null;
+		if ( $subtype_overlay !== null && isset( $subtype_overlay['subtype_guidance_text'] ) && is_string( $subtype_overlay['subtype_guidance_text'] ) && trim( $subtype_overlay['subtype_guidance_text'] ) !== '' ) {
+			$system_parts[] = "## Subtype guidance\n\n" . trim( $subtype_overlay['subtype_guidance_text'] );
+		}
 
 		$system_prompt = implode( "\n\n", $system_parts );
 		$user_message  = implode( "\n\n", $user_parts );

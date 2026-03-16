@@ -154,6 +154,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				: null;
 			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Prompt_Pack_Overlay_Service( $pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null );
 		} );
+		$container->register( 'industry_subtype_prompt_pack_overlay_service', function (): \AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Prompt_Pack_Overlay_Service {
+			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Prompt_Pack_Overlay_Service();
+		} );
 		$container->register( 'industry_style_preset_registry', function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\StylePresets\Builtin_Industry_Style_Presets::get_definitions() );

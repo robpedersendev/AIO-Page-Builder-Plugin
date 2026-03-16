@@ -16,7 +16,7 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Statuses;
-use AIOPageBuilder\Domain\Industry\AI\Industry_Build_Plan_Scoring_Service;
+use AIOPageBuilder\Domain\Industry\AI\Build_Plan_Scoring_Interface;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 
 /**
@@ -44,13 +44,13 @@ final class Build_Plan_Generator {
 	/** @var Build_Plan_Item_Generator */
 	private $item_generator;
 
-	/** @var Industry_Build_Plan_Scoring_Service|null */
+	/** @var Build_Plan_Scoring_Interface|null */
 	private $scoring_service;
 
 	public function __construct(
 		Build_Plan_Repository $repository,
 		Build_Plan_Item_Generator $item_generator,
-		?Industry_Build_Plan_Scoring_Service $scoring_service = null
+		?Build_Plan_Scoring_Interface $scoring_service = null
 	) {
 		$this->repository      = $repository;
 		$this->item_generator  = $item_generator;

@@ -220,13 +220,45 @@ final class Onboarding_Planning_Request_Orchestrator {
 				$pack_registry = $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
 				$readiness = $industry_repo->get_readiness( $pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null, $qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null );
 				$industry_profile = $industry_repo->get_profile();
-				$artifact_options['industry_context'] = array(
+				$industry_context = array(
 					'schema_version'   => '1',
 					'industry_profile' => array(
 						'primary_industry_key' => $industry_profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ?? '',
 					),
 					'readiness'        => $readiness->to_array(),
 				);
+				if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_RESOLVER ) ) {
+					$subtype_resolver = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_RESOLVER );
+					if ( $subtype_resolver instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver ) {
+						$resolved = $subtype_resolver->resolve_from_profile( $industry_profile );
+						if ( ! empty( $resolved['has_valid_subtype'] ) && $resolved['industry_subtype_key'] !== '' && is_array( $resolved['resolved_subtype'] ?? null ) ) {
+							$def = $resolved['resolved_subtype'];
+							$industry_context['industry_subtype_key'] = $resolved['industry_subtype_key'];
+							$industry_context['resolved_subtype_snapshot'] = array(
+								'label'   => trim( (string) ( $def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry::FIELD_LABEL ] ?? '' ) ),
+								'summary' => trim( (string) ( $def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry::FIELD_SUMMARY ] ?? '' ) ),
+							);
+							$primary = $resolved['primary_industry_key'];
+							if ( $primary !== '' && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ) {
+								$bundle_registry = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
+								if ( $bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ) {
+									$bundles = $bundle_registry->get_for_industry( $primary, $resolved['industry_subtype_key'] );
+									$refs = array();
+									foreach ( $bundles as $b ) {
+										$key = $b[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '';
+										if ( $key !== '' ) {
+											$refs[] = $key;
+										}
+									}
+									if ( $refs !== array() ) {
+										$industry_context['subtype_bundle_refs'] = $refs;
+									}
+								}
+							}
+						}
+					}
+				}
+				$artifact_options['industry_context'] = $industry_context;
 			}
 		}
 		$input_artifact = $this->input_artifact_builder->build( $artifact_id, $prompt_pack_ref, $artifact_options );
@@ -249,6 +281,12 @@ final class Onboarding_Planning_Request_Orchestrator {
 			$overlay_svc = $this->container->get( 'industry_prompt_pack_overlay_service' );
 			if ( $overlay_svc instanceof \AIOPageBuilder\Domain\Industry\AI\Industry_Prompt_Pack_Overlay_Service ) {
 				$build_options['industry_overlay'] = $overlay_svc->get_overlay_for_artifact( $input_artifact );
+			}
+		}
+		if ( $this->container->has( 'industry_subtype_prompt_pack_overlay_service' ) ) {
+			$subtype_overlay_svc = $this->container->get( 'industry_subtype_prompt_pack_overlay_service' );
+			if ( $subtype_overlay_svc instanceof \AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Prompt_Pack_Overlay_Service ) {
+				$build_options['subtype_overlay'] = $subtype_overlay_svc->get_overlay_for_artifact( $input_artifact );
 			}
 		}
 		$package_result = $this->prompt_package_builder->build( $pack, $input_artifact, $build_options );
