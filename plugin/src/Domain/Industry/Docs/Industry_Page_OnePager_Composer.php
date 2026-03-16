@@ -35,9 +35,13 @@ final class Industry_Page_OnePager_Composer {
 	/** @var Industry_Page_OnePager_Overlay_Registry */
 	private Industry_Page_OnePager_Overlay_Registry $overlay_registry;
 
-	public function __construct( Documentation_Registry $documentation_registry, Industry_Page_OnePager_Overlay_Registry $overlay_registry ) {
-		$this->documentation_registry = $documentation_registry;
-		$this->overlay_registry       = $overlay_registry;
+	/** @var Industry_Compliance_Warning_Resolver|null Optional; when set, composed result includes compliance warnings (Prompt 407). */
+	private ?Industry_Compliance_Warning_Resolver $compliance_warning_resolver;
+
+	public function __construct( Documentation_Registry $documentation_registry, Industry_Page_OnePager_Overlay_Registry $overlay_registry, ?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null ) {
+		$this->documentation_registry      = $documentation_registry;
+		$this->overlay_registry            = $overlay_registry;
+		$this->compliance_warning_resolver = $compliance_warning_resolver;
 	}
 
 	/**
@@ -76,6 +80,10 @@ final class Industry_Page_OnePager_Composer {
 				}
 			}
 		}
-		return new Composed_Page_OnePager_Result( $composed, $base_id, $overlay_applied, $overlay_industry, $page_template_key );
+		$compliance_warnings = array();
+		if ( $industry_key !== '' && $this->compliance_warning_resolver !== null ) {
+			$compliance_warnings = $this->compliance_warning_resolver->get_for_display( $industry_key );
+		}
+		return new Composed_Page_OnePager_Result( $composed, $base_id, $overlay_applied, $overlay_industry, $page_template_key, $compliance_warnings );
 	}
 }

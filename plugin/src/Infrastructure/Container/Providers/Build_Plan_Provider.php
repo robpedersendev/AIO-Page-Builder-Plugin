@@ -19,6 +19,7 @@ use AIOPageBuilder\Domain\Industry\AI\Industry_Approval_Snapshot_Builder;
 use AIOPageBuilder\Domain\Industry\AI\Industry_Build_Plan_Scoring_Service;
 use AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Planning_Advisor;
 use AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Rule_Registry;
+use AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Weighted_Recommendation_Engine;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service;
@@ -172,11 +173,15 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 			return new New_Page_Template_Recommendation_Builder( $container->get( 'build_plan_template_explanation_builder' ), $validator );
 		} );
 		$container->register( 'new_page_creation_ui_service', function () use ( $container ): New_Page_Creation_UI_Service {
+			$profile_repo = $container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			$warning_resolver = $container->has( 'industry_compliance_warning_resolver' ) ? $container->get( 'industry_compliance_warning_resolver' ) : null;
 			return new New_Page_Creation_UI_Service(
 				$container->get( 'build_plan_row_action_resolver' ),
 				$container->get( 'new_page_creation_detail_builder' ),
 				$container->get( 'new_page_creation_bulk_action_service' ),
-				$container->get( 'new_page_template_recommendation_builder' )
+				$container->get( 'new_page_template_recommendation_builder' ),
+				$profile_repo instanceof Industry_Profile_Repository ? $profile_repo : null,
+				$warning_resolver instanceof Industry_Compliance_Warning_Resolver ? $warning_resolver : null
 			);
 		} );
 		$container->register( 'navigation_detail_builder', function (): Navigation_Detail_Builder {

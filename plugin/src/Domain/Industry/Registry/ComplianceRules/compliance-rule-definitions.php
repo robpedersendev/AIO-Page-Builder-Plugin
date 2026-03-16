@@ -75,4 +75,64 @@ return array(
 		'guidance_text'   => 'Frame insurance/claims assistance as coordination support only. Do not guarantee outcomes or provide legal or insurance advice.',
 		'status'          => 'active',
 	),
+	// * Cosmetology/nail: wording and product claims (Prompt 406).
+	array(
+		'rule_key'        => 'cosmetology_product_claims',
+		'industry_key'    => 'cosmetology_nail',
+		'severity'        => 'caution',
+		'caution_summary' => 'Product and result claims must be accurate; avoid overclaiming outcomes.',
+		'guidance_text'   => 'Do not make unsubstantiated claims about products or results. Avoid absolute or guaranteed-outcome language. Follow applicable advertising standards.',
+		'status'          => 'active',
+	),
+	array(
+		'rule_key'        => 'cosmetology_pricing_disclosure',
+		'industry_key'    => 'cosmetology_nail',
+		'severity'        => 'info',
+		'caution_summary' => 'Pricing and package descriptions should be clear; avoid hidden fees.',
+		'guidance_text'   => 'Present pricing and packages clearly. Promotions and add-ons should be disclosed. Do not use misleading "from" or minimum pricing.',
+		'status'          => 'active',
+	),
+	// * Realtor: pricing/disclosure, review/testimonial (Prompt 406).
+	array(
+		'rule_key'        => 'realtor_pricing_valuation',
+		'industry_key'    => 'realtor',
+		'severity'        => 'caution',
+		'caution_summary' => 'Valuation and pricing language must be accurate; avoid misleading estimates.',
+		'guidance_text'   => 'CMA and valuation language must comply with board/MLS rules. Do not guarantee sale price or imply certainty. Disclose limitations of estimates.',
+		'status'          => 'active',
+	),
+	array(
+		'rule_key'        => 'realtor_testimonial_review',
+		'industry_key'    => 'realtor',
+		'severity'        => 'info',
+		'caution_summary' => 'Client testimonials and reviews should be genuine; avoid misleading success claims.',
+		'guidance_text'   => 'Use real client feedback where permitted. Do not overclaim results or imply endorsement. Verify consent for use of names or likeness.',
+		'status'          => 'active',
+	),
+	// * Plumber: emergency-service sensitivity, review/testimonial (Prompt 406).
+	array(
+		'rule_key'        => 'plumber_emergency_claims',
+		'industry_key'    => 'plumber',
+		'severity'        => 'warning',
+		'caution_summary' => 'Emergency and response-time claims must be accurate; avoid guaranteed response.',
+		'guidance_text'   => 'Do not guarantee response time or 24/7 availability unless you can deliver. Emergency service claims may be regulated; verify jurisdiction.',
+		'status'          => 'active',
+	),
+	array(
+		'rule_key'        => 'plumber_testimonial_disclosure',
+		'industry_key'    => 'plumber',
+		'severity'        => 'info',
+		'caution_summary' => 'Testimonials should be genuine; avoid misleading before/after or outcome claims.',
+		'guidance_text'   => 'Use real client feedback. Do not overclaim results or imply guarantees. Obtain consent where required.',
+		'status'          => 'active',
+	),
+	// * Disaster recovery: emergency-service sensitivity (Prompt 406).
+	array(
+		'rule_key'        => 'disaster_recovery_emergency_response',
+		'industry_key'    => 'disaster_recovery',
+		'severity'        => 'warning',
+		'caution_summary' => 'Emergency and response-time claims must be accurate; avoid guaranteed availability.',
+		'guidance_text'   => 'Do not guarantee 24/7 response or specific arrival times unless you can deliver. Emergency claims may be sensitive; verify insurance and contract language.',
+		'status'          => 'active',
+	),
 );

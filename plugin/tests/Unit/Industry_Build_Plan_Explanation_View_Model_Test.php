@@ -63,6 +63,16 @@ final class Industry_Build_Plan_Explanation_View_Model_Test extends TestCase {
 		$this->assertSame( 'discouraged', $vm['fit_classification'] );
 	}
 
+	/** Compliance warnings (Prompt 407) set has_industry_data and appear in compliance_cautions. */
+	public function test_from_item_payload_with_compliance_warnings(): void {
+		$warnings = array(
+			array( 'rule_key' => 'test_rule', 'severity' => 'caution', 'caution_summary' => 'Advisory note.' ),
+		);
+		$vm = Industry_Build_Plan_Explanation_View_Model::from_item_payload( array(), $warnings );
+		$this->assertTrue( $vm['has_industry_data'] );
+		$this->assertSame( $warnings, $vm['compliance_cautions'] );
+	}
+
 	/** Invalid reason codes are stripped; unknown codes humanized. */
 	public function test_from_item_payload_sanitizes_reasons(): void {
 		$payload = array(

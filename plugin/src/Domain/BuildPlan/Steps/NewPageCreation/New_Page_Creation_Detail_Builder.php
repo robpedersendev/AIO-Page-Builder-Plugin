@@ -19,6 +19,7 @@ use AIOPageBuilder\Domain\BuildPlan\Recommendations\Build_Plan_Template_Explanat
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Detail_Panel_Component;
 use AIOPageBuilder\Domain\Industry\AI\Industry_Build_Plan_Scoring_Service;
+use AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver;
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Build_Plan_Item_Override_Service;
 
 /**
@@ -41,9 +42,10 @@ final class New_Page_Creation_Detail_Builder {
 	 *
 	 * @param array<string, mixed> $item    Plan item (item_id, item_type, payload, status, ...).
 	 * @param string|null          $plan_id Optional plan ID for industry override section (Prompt 369).
+	 * @param array<string, mixed> $context Optional. Keys: primary_industry_key, compliance_warning_resolver (Prompt 407).
 	 * @return array<int, array<string, mixed>> Sections with heading, key, content or content_lines.
 	 */
-	public function build_sections( array $item, ?string $plan_id = null ): array {
+	public function build_sections( array $item, ?string $plan_id = null, array $context = array() ): array {
 		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
@@ -55,7 +57,7 @@ final class New_Page_Creation_Detail_Builder {
 		if ( $template_rationale !== null ) {
 			$sections[] = $template_rationale;
 		}
-		$industry_section = $this->section_industry_explanation( $payload );
+		$industry_section = $this->section_industry_explanation( $payload, $context );
 		if ( $industry_section !== null ) {
 			$sections[] = $industry_section;
 		}
@@ -104,13 +106,22 @@ final class New_Page_Creation_Detail_Builder {
 	}
 
 	/**
-	 * Industry context section from item payload (Prompt 365). Renders rationale, fit, and warnings.
+	 * Industry context section from item payload (Prompt 365). Renders rationale, fit, warnings, and advisory compliance cautions (Prompt 407).
 	 *
 	 * @param array<string, mixed> $payload
+	 * @param array<string, mixed> $context Optional. primary_industry_key (string), compliance_warning_resolver (Industry_Compliance_Warning_Resolver).
 	 * @return array<string, mixed>|null Section or null when no industry data.
 	 */
-	private function section_industry_explanation( array $payload ): ?array {
-		$view_model = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
+	private function section_industry_explanation( array $payload, array $context = array() ): ?array {
+		$compliance_warnings = array();
+		$primary_industry   = isset( $context['primary_industry_key'] ) && is_string( $context['primary_industry_key'] ) ? trim( $context['primary_industry_key'] ) : '';
+		$resolver           = isset( $context['compliance_warning_resolver'] ) && $context['compliance_warning_resolver'] instanceof Industry_Compliance_Warning_Resolver
+			? $context['compliance_warning_resolver']
+			: null;
+		if ( $primary_industry !== '' && $resolver !== null ) {
+			$compliance_warnings = $resolver->get_for_display( $primary_industry );
+		}
+		$view_model = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload, $compliance_warnings );
 		if ( empty( $view_model['has_industry_data'] ) ) {
 			return null;
 		}

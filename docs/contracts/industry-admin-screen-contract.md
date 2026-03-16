@@ -68,10 +68,21 @@
 
 ---
 
+## 4.1.1 Compliance and caution surfacing (Prompt 407)
+
+- **Advisory only**: Structured compliance/caution rules (Industry_Compliance_Rule_Registry, Industry_Compliance_Warning_Resolver) are surfaced as **advisory** hints only. They do not block content or claim legal compliance.
+- **Helper docs**: Composed_Helper_Doc_Result may include `compliance_warnings` (rule_key, severity, caution_summary). Consumers (e.g. section detail) may display these alongside composed_helper content.
+- **One-pagers**: Composed_Page_OnePager_Result may include `compliance_warnings` for the page template + industry context.
+- **Section detail preview**: Industry_Section_Preview_View_Model includes `compliance_warnings`; the section detail screen may show them in the industry fit block when present.
+- **Page template detail preview**: Industry_Page_Template_Preview_View_Model includes `compliance_warnings`; the template detail screen may show them in the industry fit block when present.
+- **Build Plan review**: New-page item detail panel "Industry context" section (industry-plan-explanations.php) shows an "Advisory" list of compliance cautions when primary industry is set and Industry_Compliance_Warning_Resolver is available. Warnings remain scoped and concise; no automatic blocking.
+
+---
+
 ## 4.2 Industry-aware page template detail preview (Prompt 383)
 
 - **Industry_Page_Template_Preview_Resolver**: Resolves industry-aware preview context for a single page template (recommendation fit, composed one-pager, hierarchy fit, LPagery posture, substitute suggestions). Read-only; safe when no industry profile.
-- **Industry_Page_Template_Preview_View_Model**: DTO for the detail screen: has_industry, recommendation_fit, hierarchy_fit, lpagery_posture, composed_one_pager (allowed regions), substitute_suggestions, warning_flags, explanation_reasons.
+- **Industry_Page_Template_Preview_View_Model**: DTO for the detail screen: has_industry, recommendation_fit, hierarchy_fit, lpagery_posture, composed_one_pager (allowed regions), substitute_suggestions, warning_flags, explanation_reasons, compliance_warnings (advisory; Prompt 407).
 - **Page template detail screen**: When the industry preview resolver is available (container key `industry_page_template_preview_resolver`), the screen merges `industry_preview` (view model to_array()) into state and renders an industry fit block in the metadata panel: industry label, fit badge, hierarchy/LPagery notes, one-pager excerpt (hierarchy_hints, cta_strategy), warnings, and substitute suggestion links. Substitute suggestions are populated only when the resolver is called with a full template list; otherwise the list is empty. Generic fallback: when no industry profile or resolver unavailable, no industry block is shown.
 
 ---
@@ -91,7 +102,7 @@
 ## 4.5 Industry-aware section detail preview (Prompt 384)
 
 - **Industry_Section_Preview_Resolver**: Resolves industry-aware preview context for a single section (recommendation fit, composed helper, warnings, substitute suggestions). Read-only; safe when no industry profile.
-- **Industry_Section_Preview_View_Model**: DTO for the section detail screen: has_industry, recommendation_fit, composed_helper (allowed regions), substitute_suggestions, warning_flags, explanation_reasons.
+- **Industry_Section_Preview_View_Model**: DTO for the section detail screen: has_industry, recommendation_fit, composed_helper (allowed regions), substitute_suggestions, warning_flags, explanation_reasons, compliance_warnings (advisory; Prompt 407).
 - **Section template detail screen**: When the industry section preview resolver is available (container key `industry_section_preview_resolver`), the screen merges `industry_preview` (view model to_array()) into state and renders an industry fit block in the metadata panel: industry label, fit badge, composed helper excerpt (tone_notes, cta_usage_notes), warnings, and substitute suggestion links. Substitute suggestions are populated only when the resolver is called with a full section list; otherwise the list is empty. Generic fallback: when no industry profile or resolver unavailable, no industry block is shown.
 
 ---

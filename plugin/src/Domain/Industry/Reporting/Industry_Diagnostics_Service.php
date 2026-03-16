@@ -41,18 +41,23 @@ final class Industry_Diagnostics_Service {
 	/** @var Industry_Style_Preset_Application_Service|null */
 	private $preset_application_service;
 
+	/** @var Industry_Content_Gap_Detector|null Optional; when set, snapshot includes content_gaps (Prompt 408). */
+	private $content_gap_detector;
+
 	public function __construct(
 		?Industry_Profile_Repository $profile_repository = null,
 		?Industry_Pack_Registry $pack_registry = null,
 		?Industry_Section_Helper_Overlay_Registry $section_overlay_registry = null,
 		?Industry_Page_OnePager_Overlay_Registry $page_overlay_registry = null,
-		?Industry_Style_Preset_Application_Service $preset_application_service = null
+		?Industry_Style_Preset_Application_Service $preset_application_service = null,
+		?Industry_Content_Gap_Detector $content_gap_detector = null
 	) {
 		$this->profile_repository         = $profile_repository;
 		$this->pack_registry              = $pack_registry;
 		$this->section_overlay_registry   = $section_overlay_registry;
 		$this->page_overlay_registry      = $page_overlay_registry;
 		$this->preset_application_service = $preset_application_service;
+		$this->content_gap_detector       = $content_gap_detector;
 	}
 
 	/**
@@ -122,7 +127,7 @@ final class Industry_Diagnostics_Service {
 		if ( $primary !== '' && $this->pack_registry !== null && $this->pack_registry->get( $primary ) === null ) {
 			$warnings[] = 'primary_industry_pack_not_found';
 		}
-		return array(
+		$out = array(
 			'primary_industry'             => $primary,
 			'secondary_industries'         => $secondary,
 			'profile_readiness'            => $profile_readiness,
@@ -134,5 +139,12 @@ final class Industry_Diagnostics_Service {
 			'warnings'                     => $warnings,
 			'industry_subsystem_available'  => true,
 		);
+		if ( $primary !== '' && $this->content_gap_detector !== null ) {
+			$bundle_key = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+				? trim( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+				: null;
+			$out['content_gaps'] = $this->content_gap_detector->detect( $profile, $bundle_key, array() );
+		}
+		return $out;
 	}
 }

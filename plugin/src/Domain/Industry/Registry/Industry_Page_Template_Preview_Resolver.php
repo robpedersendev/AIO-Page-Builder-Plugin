@@ -117,6 +117,8 @@ final class Industry_Page_Template_Preview_Resolver {
 			);
 		}
 
+		$compliance_warnings = $composed_result->get_compliance_warnings();
+
 		return new Industry_Page_Template_Preview_View_Model(
 			true,
 			$primary,
@@ -126,7 +128,8 @@ final class Industry_Page_Template_Preview_Resolver {
 			$composed_for_view,
 			$substitute_suggestions,
 			$warning_flags,
-			$explanation_reasons
+			$explanation_reasons,
+			$compliance_warnings
 		);
 	}
 
@@ -161,6 +164,7 @@ final class Industry_Page_Template_Preview_Resolver {
 			Industry_Page_Template_Recommendation_Resolver::FIT_NEUTRAL,
 			'',
 			'',
+			array(),
 			array(),
 			array(),
 			array(),

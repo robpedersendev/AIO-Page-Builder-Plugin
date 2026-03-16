@@ -24,6 +24,7 @@ final class Industry_Section_Preview_View_Model {
 	public const KEY_SUBSTITUTE_SUGGESTIONS  = 'substitute_suggestions';
 	public const KEY_WARNING_FLAGS           = 'warning_flags';
 	public const KEY_EXPLANATION_REASONS    = 'explanation_reasons';
+	public const KEY_COMPLIANCE_WARNINGS     = 'compliance_warnings';
 
 	/** @var bool */
 	private bool $has_industry;
@@ -46,6 +47,9 @@ final class Industry_Section_Preview_View_Model {
 	/** @var list<string> */
 	private array $explanation_reasons;
 
+	/** @var list<array{rule_key: string, severity: string, caution_summary: string}> Advisory compliance cautions (Prompt 407). */
+	private array $compliance_warnings;
+
 	public function __construct(
 		bool $has_industry,
 		string $primary_industry_key,
@@ -53,7 +57,8 @@ final class Industry_Section_Preview_View_Model {
 		array $composed_helper,
 		array $substitute_suggestions,
 		array $warning_flags,
-		array $explanation_reasons
+		array $explanation_reasons,
+		array $compliance_warnings = array()
 	) {
 		$this->has_industry           = $has_industry;
 		$this->primary_industry_key   = $primary_industry_key;
@@ -62,6 +67,7 @@ final class Industry_Section_Preview_View_Model {
 		$this->substitute_suggestions = $substitute_suggestions;
 		$this->warning_flags          = $warning_flags;
 		$this->explanation_reasons    = $explanation_reasons;
+		$this->compliance_warnings    = $compliance_warnings;
 	}
 
 	public function has_industry(): bool {
@@ -105,6 +111,15 @@ final class Industry_Section_Preview_View_Model {
 	}
 
 	/**
+	 * Returns advisory compliance/caution rules for display (Prompt 407).
+	 *
+	 * @return list<array{rule_key: string, severity: string, caution_summary: string}>
+	 */
+	public function get_compliance_warnings(): array {
+		return $this->compliance_warnings;
+	}
+
+	/**
 	 * For view layer (escape on output).
 	 *
 	 * @return array<string, mixed>
@@ -118,6 +133,7 @@ final class Industry_Section_Preview_View_Model {
 			self::KEY_SUBSTITUTE_SUGGESTIONS => $this->substitute_suggestions,
 			self::KEY_WARNING_FLAGS         => $this->warning_flags,
 			self::KEY_EXPLANATION_REASONS   => $this->explanation_reasons,
+			self::KEY_COMPLIANCE_WARNINGS   => $this->compliance_warnings,
 		);
 	}
 }

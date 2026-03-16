@@ -22,6 +22,8 @@ use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\New_Page_Template_Recommendation_Builder;
+use AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 
 /**
  * Produces step_list_rows, column_order, bulk_action_states, detail_panel, step_messages for Step 2 only.
@@ -55,16 +57,26 @@ final class New_Page_Creation_UI_Service {
 	/** @var New_Page_Template_Recommendation_Builder|null */
 	private $recommendation_builder;
 
+	/** @var Industry_Profile_Repository|null Optional; used for Build Plan compliance caution context (Prompt 407). */
+	private $profile_repository;
+
+	/** @var Industry_Compliance_Warning_Resolver|null Optional; used for Build Plan compliance caution surfacing (Prompt 407). */
+	private $compliance_warning_resolver;
+
 	public function __construct(
 		Build_Plan_Row_Action_Resolver $row_action_resolver,
 		New_Page_Creation_Detail_Builder $detail_builder,
 		New_Page_Creation_Bulk_Action_Service $bulk_action_service,
-		?New_Page_Template_Recommendation_Builder $recommendation_builder = null
+		?New_Page_Template_Recommendation_Builder $recommendation_builder = null,
+		?Industry_Profile_Repository $profile_repository = null,
+		?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null
 	) {
-		$this->row_action_resolver   = $row_action_resolver;
-		$this->detail_builder       = $detail_builder;
-		$this->bulk_action_service  = $bulk_action_service;
-		$this->recommendation_builder = $recommendation_builder;
+		$this->row_action_resolver        = $row_action_resolver;
+		$this->detail_builder             = $detail_builder;
+		$this->bulk_action_service        = $bulk_action_service;
+		$this->recommendation_builder     = $recommendation_builder;
+		$this->profile_repository        = $profile_repository;
+		$this->compliance_warning_resolver = $compliance_warning_resolver;
 	}
 
 	/**
@@ -186,7 +198,16 @@ final class New_Page_Creation_UI_Service {
 			}
 			if ( $selected_item !== null ) {
 				$plan_id = (string) ( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' );
-				$detail_panel['sections']    = $this->detail_builder->build_sections( $selected_item, $plan_id );
+				$context = array();
+				if ( $this->profile_repository !== null && $this->compliance_warning_resolver !== null ) {
+					$profile = $this->profile_repository->get_profile();
+					$primary = isset( $profile['primary_industry_key'] ) && is_string( $profile['primary_industry_key'] ) ? trim( $profile['primary_industry_key'] ) : '';
+					if ( $primary !== '' ) {
+						$context['primary_industry_key']       = $primary;
+						$context['compliance_warning_resolver'] = $this->compliance_warning_resolver;
+					}
+				}
+				$detail_panel['sections']    = $this->detail_builder->build_sections( $selected_item, $plan_id, $context );
 				$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $selected_item, $capabilities );
 			}
 		}

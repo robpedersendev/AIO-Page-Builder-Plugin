@@ -50,9 +50,10 @@ final class Industry_Build_Plan_Explanation_View_Model {
 	 * Builds view model from one plan item payload. Safe when payload has no industry keys.
 	 *
 	 * @param array<string, mixed> $item_payload Item payload (may contain industry_source_refs, recommendation_reasons, industry_fit_score, industry_warning_flags).
-	 * @return array{has_industry_data: bool, summary_lines: list<string>, warning_badges: list<array{code: string, label: string}>, fit_classification: string, source_refs: list<string>}
+	 * @param list<array{rule_key: string, severity: string, caution_summary: string}> $compliance_warnings Optional advisory compliance cautions from Industry_Compliance_Warning_Resolver (Prompt 407).
+	 * @return array{has_industry_data: bool, summary_lines: list<string>, warning_badges: list<array{code: string, label: string}>, fit_classification: string, source_refs: list<string>, compliance_cautions: list<array{rule_key: string, severity: string, caution_summary: string}>}
 	 */
-	public static function from_item_payload( array $item_payload ): array {
+	public static function from_item_payload( array $item_payload, array $compliance_warnings = array() ): array {
 		$source_refs   = self::sanitize_source_refs( $item_payload );
 		$reasons       = self::sanitize_reasons( $item_payload );
 		$warning_flags = self::sanitize_warning_flags( $item_payload );
@@ -89,6 +90,9 @@ final class Industry_Build_Plan_Explanation_View_Model {
 		if ( $conflict_results !== array() || $explanation_summary !== '' ) {
 			$has_data = true;
 		}
+		if ( $compliance_warnings !== array() ) {
+			$has_data = true;
+		}
 
 		return array(
 			'has_industry_data'   => $has_data,
@@ -98,6 +102,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 			'source_refs'         => array_slice( array_map( 'strval', $source_refs ), 0, self::MAX_SOURCE_REFS ),
 			'conflict_results'    => $conflict_results,
 			'explanation_summary' => $explanation_summary,
+			'compliance_cautions' => $compliance_warnings,
 		);
 	}
 

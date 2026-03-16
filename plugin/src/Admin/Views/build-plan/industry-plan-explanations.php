@@ -70,5 +70,25 @@ if ( $fit_classification === 'recommended' ) {
 				<?php require \dirname( __DIR__ ) . '/industry/industry-conflict-badges.php'; ?>
 			</div>
 		<?php endif; ?>
+		<?php
+		$compliance_cautions = $view_model['compliance_cautions'] ?? array();
+		if ( ! empty( $compliance_cautions ) && is_array( $compliance_cautions ) ) :
+			?>
+			<div class="aio-industry-compliance-cautions" role="group" aria-label="<?php \esc_attr_e( 'Advisory compliance notes', 'aio-page-builder' ); ?>">
+				<p class="aio-industry-compliance-cautions-intro description"><?php \esc_html_e( 'Advisory:', 'aio-page-builder' ); ?></p>
+				<ul class="aio-industry-compliance-cautions-list">
+					<?php foreach ( $compliance_cautions as $c ) : ?>
+						<?php
+						$summary = isset( $c['caution_summary'] ) && is_string( $c['caution_summary'] ) ? $c['caution_summary'] : '';
+						$severity = isset( $c['severity'] ) && is_string( $c['severity'] ) ? $c['severity'] : 'info';
+						if ( $summary === '' ) {
+							continue;
+						}
+						?>
+						<li class="aio-industry-compliance-caution aio-industry-compliance-caution--<?php echo \esc_attr( \sanitize_html_class( $severity ) ); ?>"><?php echo \esc_html( $summary ); ?></li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		<?php endif; ?>
 	</div>
 </div>

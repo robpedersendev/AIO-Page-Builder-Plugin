@@ -79,4 +79,22 @@ final class Industry_Compliance_Rule_Registry_Test extends TestCase {
 		$this->assertSame( 'warning', $rule[ Industry_Compliance_Rule_Registry::FIELD_SEVERITY ] );
 		$this->assertArrayHasKey( Industry_Compliance_Rule_Registry::FIELD_CAUTION_SUMMARY, $rule );
 	}
+
+	/**
+	 * Prompt 406: seeded rules exist for all four launch industries; registry loads and severity handling.
+	 */
+	public function test_seeded_rules_per_launch_industry(): void {
+		$defs = Industry_Compliance_Rule_Registry::get_builtin_definitions();
+		$registry = new Industry_Compliance_Rule_Registry();
+		$registry->load( $defs );
+		$launch = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+		foreach ( $launch as $industry_key ) {
+			$rules = $registry->get_for_industry( $industry_key );
+			$this->assertGreaterThanOrEqual( 2, count( $rules ), "Expected at least 2 rules for industry: {$industry_key}" );
+			foreach ( $rules as $rule ) {
+				$this->assertContains( $rule[ Industry_Compliance_Rule_Registry::FIELD_SEVERITY ], array( 'info', 'caution', 'warning' ), 'Severity must be allowed value' );
+				$this->assertNotEmpty( $rule[ Industry_Compliance_Rule_Registry::FIELD_CAUTION_SUMMARY ] ?? '' );
+			}
+		}
+	}
 }
