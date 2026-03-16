@@ -39,6 +39,15 @@ final class Industry_Subtype_Registry {
 	private array $by_parent = array();
 
 	/**
+	 * Returns built-in subtype definitions (Prompt 415). Used by bootstrap to load seed subtypes.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_builtin_definitions(): array {
+		return \AIOPageBuilder\Domain\Industry\Registry\Subtypes\Builtin_Subtypes::get_definitions();
+	}
+
+	/**
 	 * Loads subtype definitions. Skips invalid and duplicate keys (first wins). Safe: no throw.
 	 *
 	 * @param array<int, array<string, mixed>> $definitions List of subtype definitions.

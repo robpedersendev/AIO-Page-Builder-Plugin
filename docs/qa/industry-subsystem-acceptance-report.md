@@ -32,6 +32,7 @@
 | 13 | Restore | Restore of profiles category restores industry profile and applied preset when industry.json present and version supported; invalid version skipped with log. | |
 | 14 | No-industry fallback | With empty or no industry profile: onboarding, templates, Build Plan, overlays, diagnostics behave without industry; no errors. | |
 | 15 | Recommendation benchmark | Internal benchmark harness (Industry_Recommendation_Benchmark_Service) produces repeatable scenarios per launch industry; report structure supports human review of recommendation quality and metadata gaps. | |
+| 16 | AI prompt-pack evaluation | Internal evaluation fixtures (industry-ai-prompt-evaluation-fixtures.md) define representative launch-industry and subtype scenarios; overlay output (page-family, CTA, proof, LPagery) is structured and comparable; fixtures are actionable and not overly brittle. | |
 
 **Result:** Record pass/fail per row. Any fail is a candidate blocker for industry release gate.
 

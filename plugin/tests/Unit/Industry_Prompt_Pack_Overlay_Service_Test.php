@@ -19,6 +19,7 @@ $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/AI/InputArtifacts/Input_Artifact_Schema.php';
 require_once $plugin_root . '/src/Domain/Industry/AI/Industry_Prompt_Pack_Overlay_Service.php';
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Pack_Schema.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Pack_Validator.php';
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Pack_Registry.php';
 
 final class Industry_Prompt_Pack_Overlay_Service_Test extends TestCase {
@@ -90,5 +91,30 @@ final class Industry_Prompt_Pack_Overlay_Service_Test extends TestCase {
 		);
 		$overlay = $service->get_overlay_for_artifact( $artifact );
 		$this->assertSame( array( 'service', 'local' ), $overlay['required_page_families'] ?? array() );
+	}
+
+	/**
+	 * Evaluation fixtures (Prompt 416): all launch industries produce structured overlay with schema_version,
+	 * active_industry_key, and at least one of required_page_families or cta_priorities when pack is present.
+	 */
+	public function test_launch_industries_produce_structured_overlay_per_fixtures(): void {
+		$pack_registry = new Industry_Pack_Registry();
+		$pack_registry->load( Industry_Pack_Registry::get_builtin_pack_definitions() );
+		$service = new Industry_Prompt_Pack_Overlay_Service( $pack_registry );
+		$launch = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+		foreach ( $launch as $primary ) {
+			$artifact = array(
+				Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT => array(
+					'readiness' => array( 'state' => 'ready', 'score' => 100 ),
+					'industry_profile' => array( 'primary_industry_key' => $primary ),
+				),
+			);
+			$overlay = $service->get_overlay_for_artifact( $artifact );
+			$this->assertSame( '1', $overlay['schema_version'] ?? '', "{$primary}: schema_version" );
+			$this->assertSame( $primary, $overlay['active_industry_key'] ?? '', "{$primary}: active_industry_key" );
+			$has_families = ! empty( $overlay['required_page_families'] );
+			$has_cta = ! empty( $overlay['cta_priorities'] );
+			$this->assertTrue( $has_families || $has_cta, "{$primary}: overlay must have required_page_families or cta_priorities when pack present" );
+		}
 	}
 }

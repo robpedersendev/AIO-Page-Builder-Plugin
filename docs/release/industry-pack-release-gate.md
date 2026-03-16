@@ -17,6 +17,7 @@
 | **Documentation** | Operator/support guidance references industry where relevant (onboarding, diagnostics, export). | [release-review-packet.md](release-review-packet.md) §2.10; admin-operator-guide; support-triage-guide. |
 | **Recommendation quality** | Internal benchmark harness available for systematic evaluation of recommendation quality and metadata gaps (optional for first ship). | [industry-recommendation-benchmark-protocol.md](../qa/industry-recommendation-benchmark-protocol.md); acceptance report row 15. |
 | **Recommendation regression guards** | Regression guards protect critical pack/ref integrity, representative scoring, fallback behavior, and substitute quality for launch industries. | [industry-recommendation-regression-guard.md](../qa/industry-recommendation-regression-guard.md); Industry_Recommendation_Regression_Guard_Test. |
+| **AI prompt-pack evaluation** | Internal evaluation fixtures for industry overlays: page-family, CTA, proof, LPagery outputs on-target for launch industries; structured and repeatable. | [industry-ai-prompt-evaluation-fixtures.md](../qa/industry-ai-prompt-evaluation-fixtures.md); overlay service tests per fixtures. |
 | **Known risks** | Industry risks (if any) recorded in known-risk-register; mitigations or waiver. | [known-risk-register.md](known-risk-register.md) §3. |
 
 ---

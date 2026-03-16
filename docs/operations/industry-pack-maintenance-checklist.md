@@ -80,4 +80,11 @@
 
 ---
 
+## 9. Bad-fit recommendation troubleshooting (support)
+
+- [ ] **Playbook:** When users report wrong, generic, or mismatched recommendations, use [industry-bad-fit-recommendation-troubleshooting.md](industry-bad-fit-recommendation-troubleshooting.md) for diagnostic steps (profile completeness, pack activation, subtype selection, overlays, metadata, overrides, starter bundle, no-industry fallback).
+- [ ] **Evidence:** Use Industry_Diagnostics_Service snapshot, Industry_Health_Check_Service, and recommendation/overlay contracts; no secrets in support artifacts. Escalate to pack/overlay maintainers or engineering per playbook §4.
+
+---
+
 *Use this checklist when planning or implementing changes to the Industry Pack subsystem. Update the checklist if new subsystems or contracts are added.*
