@@ -71,7 +71,7 @@ final class Industry_Page_OnePager_Overlay_Registry_Test extends TestCase {
 	}
 
 	/**
-	 * Built-in overlay definitions (Prompt 354): four industries × four page families = 16.
+	 * Built-in overlay definitions (Prompt 354 T1 + Prompt 402 T2): at least 16 T1 + second-wave.
 	 */
 	public function test_builtin_overlay_definitions_load(): void {
 		$defs = Industry_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions();
@@ -80,10 +80,26 @@ final class Industry_Page_OnePager_Overlay_Registry_Test extends TestCase {
 		$registry->load( $defs );
 		$this->assertGreaterThanOrEqual( 16, count( $registry->get_all() ) );
 		$realtor = $registry->get_for_industry( 'realtor' );
-		$this->assertCount( 4, $realtor, 'Realtor should have 4 page overlays' );
+		$this->assertGreaterThanOrEqual( 4, count( $realtor ), 'Realtor should have at least 4 page overlays (T1 + T2)' );
 		$home = $registry->get( 'realtor', 'pt_home_conversion_01' );
 		$this->assertNotNull( $home );
 		$this->assertSame( 'realtor', $home[ Industry_Page_OnePager_Overlay_Registry::FIELD_INDUSTRY_KEY ] );
 		$this->assertSame( 'pt_home_conversion_01', $home[ Industry_Page_OnePager_Overlay_Registry::FIELD_PAGE_TEMPLATE_KEY ] );
+	}
+
+	/** Prompt 402: second-wave page overlays load and are discoverable. */
+	public function test_builtin_overlays_include_second_wave_page_keys(): void {
+		$definitions = Industry_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions();
+		$registry = new Industry_Page_OnePager_Overlay_Registry();
+		$registry->load( $definitions );
+		$this->assertNotNull( $registry->get( 'cosmetology_nail', 'child_detail_service_booking_01' ), 'Second-wave cosmetology booking overlay must be present.' );
+		$this->assertNotNull( $registry->get( 'realtor', 'hub_geo_neighborhood_01' ), 'Second-wave realtor neighborhood overlay must be present.' );
+		$this->assertNotNull( $registry->get( 'plumber', 'hub_geo_service_area_01' ), 'Second-wave plumber service-area overlay must be present.' );
+		$this->assertNotNull( $registry->get( 'disaster_recovery', 'pt_support_help_02' ), 'Second-wave disaster_recovery insurance-assistance overlay must be present.' );
+		$ov = $registry->get( 'cosmetology_nail', 'pt_home_media_01' );
+		$this->assertNotNull( $ov );
+		$this->assertArrayHasKey( 'hierarchy_hints', $ov );
+		$this->assertSame( 'page_onepager_overlay', $ov['scope'] ?? '' );
+		$this->assertSame( 'active', $ov['status'] ?? '' );
 	}
 }

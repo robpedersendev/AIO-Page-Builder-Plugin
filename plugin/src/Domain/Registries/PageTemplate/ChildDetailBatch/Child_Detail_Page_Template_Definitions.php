@@ -333,7 +333,16 @@ final class Child_Detail_Page_Template_Definitions {
 				'cta_direction_summary'  => 'Booking, consultation, service detail, quote, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Booking-first; early and repeated booking CTAs.' )
+			array(
+				'preview_metadata'       => array( 'synthetic' => true ),
+				'differentiation_notes'  => 'Booking-first; early and repeated booking CTAs.',
+				Page_Template_Schema::FIELD_INDUSTRY_NOTES => array(
+					'cosmetology_nail' => 'Strong fit for service or treatment booking flow.',
+					'realtor'          => 'Good for consultation or valuation booking.',
+					'plumber'          => 'Strong fit for schedule or callback booking.',
+					'disaster_recovery' => 'Good for assessment or non-emergency booking.',
+				),
+			)
 		);
 	}
 

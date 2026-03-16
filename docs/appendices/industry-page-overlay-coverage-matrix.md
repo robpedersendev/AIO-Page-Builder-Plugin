@@ -19,20 +19,35 @@ This appendix shows which page families and example template keys have **seeded*
 
 ---
 
-## 2. Pending overlay coverage (T2 – next waves)
+## 2. Second-wave overlay coverage (T2 – authored Prompt 402)
 
-| Page family / purpose | Target use | Example template keys (from registry) | Wave | Notes |
-|------------------------|------------|---------------------------------------|------|-------|
-| booking-focused | Booking, appointment pages | (Use registry: booking intent or template_family) | 2a | Booking and appointment flows. |
-| valuation-focused | Valuation, quote request | (Use registry: valuation/quote intent) | 2a | Valuation and quote CTAs. |
-| emergency / service | Emergency, 24/7, service-area | (Use registry: emergency/service-area) | 2b | Emergency and service-area pages. |
-| local / service-area | Location, service area, coverage | (Use registry: locations, service-area) | 2b | Local and service-area focus. |
-| neighborhood | Neighborhood, market area | (Use registry: realtor/neighborhood) | 2c | Neighborhood and market pages. |
-| gallery | Gallery, portfolio | (Use registry: gallery/portfolio) | 2c | Gallery and portfolio pages. |
-| financing | Financing, payment, trust | (Use registry: financing/trust) | 2c | Financing and trust pages. |
-| trust / certification | Trust-led, certification, authority | (Use registry: trust/certification child_detail) | 2d | Trust and certification pages. |
+| Page family / purpose | Example page_template_key (authored) | Industries with overlay | Notes |
+|------------------------|--------------------------------------|-------------------------|-------|
+| booking | child_detail_service_booking_01 | cosmetology_nail, plumber | Booking and appointment. |
+| pricing / offerings | pt_offerings_overview_01, pt_offerings_compare_01 | cosmetology_nail, plumber, realtor | Pricing and comparison. |
+| location / directions | pt_contact_directions_01 | cosmetology_nail | Location and directions. |
+| gallery | pt_home_media_01 | cosmetology_nail | Gallery and portfolio. |
+| service-detail | child_detail_treatment_detail_01, child_detail_service_conversion_01 | cosmetology_nail, plumber, disaster_recovery | Service/treatment detail. |
+| neighborhood | hub_geo_neighborhood_01 | realtor | Neighborhood and market area. |
+| buyer / seller | pt_buyer_guide_01, pt_services_value_01 | realtor | Buyer guide and seller value. |
+| local-market | hub_geo_coverage_listing_01 | realtor | Coverage and listing. |
+| service-area | hub_geo_service_area_01 | plumber, disaster_recovery | Service-area hub. |
+| financing / trust | pt_offerings_compare_01, hub_geo_area_trust_01 | plumber, disaster_recovery | Financing and trust. |
+| insurance-assistance | pt_support_help_02 | disaster_recovery | Insurance and claims help. |
 
-**Example page_template_key values** must be resolved from the live page template registry. This matrix references family/purpose; when authoring, look up actual internal_key for each template that has a base one-pager and add overlay entries for those keys.
+**Source**: PageOnePagerOverlays/ overlays-{industry}.php (second-wave blocks). Template keys from page template registry (Top Level, Child Detail, Geographic Hub).
+
+---
+
+## 2b. Pending overlay coverage (T2 remainder – next waves)
+
+| Page family / purpose | Target use | Wave | Notes |
+|------------------------|------------|------|-------|
+| trust / certification (dedicated) | Trust-led, certification child_detail | 2d | Additional trust/certification pages. |
+| locations, products, offerings | Hub and child_detail | T3 | As needed. |
+| faq, comparison, profiles, events | FAQ, comparison, profiles, events | T3 | As needed. |
+
+**Example page_template_key values** must be resolved from the live page template registry when authoring additional overlays.
 
 ---
 
@@ -47,16 +62,16 @@ This appendix shows which page families and example template keys have **seeded*
 
 ---
 
-## 4. Industry × family view (seeded only)
+## 4. Industry × family view (T1 + T2 second-wave)
 
-| Industry | home | about | contact | services |
-|----------|------|-------|---------|----------|
-| cosmetology_nail | ✓ | ✓ | ✓ | ✓ |
-| realtor | ✓ | ✓ | ✓ | ✓ |
-| plumber | ✓ | ✓ | ✓ | ✓ |
-| disaster_recovery | ✓ | ✓ | ✓ | ✓ |
+| Industry | home | about | contact | services | booking | pricing | location | gallery | service-detail | neighborhood | buyer/seller | local-market | service-area | financing/trust | insurance |
+|----------|------|-------|---------|----------|---------|---------|----------|---------|----------------|---------------|--------------|--------------|--------------|-----------------|-----------|
+| cosmetology_nail | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | — | — | — | — |
+| realtor | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — | — | ✓ | ✓ | ✓ | — | — | — |
+| plumber | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | ✓ | ✓ | — |
+| disaster_recovery | ✓ | ✓ | ✓ | ✓ | — | — | — | — | ✓ | — | — | — | ✓ | ✓ | ✓ |
 
-**Pending**: All T2 families (booking, valuation, emergency, local, neighborhood, gallery, financing, trust/certification) have no overlay rows yet. Add rows when overlays are authored per industry-page-onepager-overlay-expansion-plan.
+**T2 second-wave** (Prompt 402): Booking, pricing, location, gallery, service-detail, neighborhood, buyer/seller, local-market, service-area, financing/trust, and insurance-assistance overlays are now covered for the targeted industries.
 
 ---
 

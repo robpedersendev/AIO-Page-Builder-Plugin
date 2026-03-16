@@ -174,7 +174,15 @@ final class Geographic_Hub_Page_Template_Definitions {
 				'drill_down_intent'    => 'Local action and directory nav CTAs support drill-down to cities, regions, or sub–service areas. No real addresses; synthetic preview only.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ) )
+			array(
+				'preview_metadata' => array( 'synthetic' => true ),
+				Page_Template_Schema::FIELD_INDUSTRY_NOTES => array(
+					'cosmetology_nail' => 'Good for multi-location or area coverage.',
+					'realtor'          => 'Strong fit for service-area and coverage hierarchy.',
+					'plumber'          => 'Strong fit for service-area and 24/7 coverage.',
+					'disaster_recovery' => 'Strong fit for service-area and response coverage.',
+				),
+			)
 		);
 	}
 
@@ -534,7 +542,15 @@ final class Geographic_Hub_Page_Template_Definitions {
 				'drill_down_intent'    => 'Guides into neighborhood or sub-area pages. No real addresses; synthetic preview only.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ) )
+			array(
+				'preview_metadata' => array( 'synthetic' => true ),
+				Page_Template_Schema::FIELD_INDUSTRY_NOTES => array(
+					'cosmetology_nail' => 'Optional for neighborhood or area pages.',
+					'realtor'          => 'Strong fit for neighborhood and market-area hierarchy.',
+					'plumber'          => 'Good for area or coverage pages.',
+					'disaster_recovery' => 'Good for area or coverage pages.',
+				),
+			)
 		);
 	}
 

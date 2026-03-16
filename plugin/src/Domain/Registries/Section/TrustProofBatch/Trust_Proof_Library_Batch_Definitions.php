@@ -419,7 +419,16 @@ final class Trust_Proof_Library_Batch_Definitions {
 			'List of certification names.',
 			$fields,
 			array( 'headline' => 'Certifications', 'certifications' => array( array( 'name' => 'Cert A', 'url' => '' ) ) ),
-			array( 'short_label' => 'Cert list', 'suggested_use_cases' => array( 'Legal/trust', 'Compliance', 'About' ) )
+			array(
+				'short_label'       => 'Cert list',
+				'suggested_use_cases' => array( 'Legal/trust', 'Compliance', 'About' ),
+				Section_Schema::FIELD_INDUSTRY_NOTES => array(
+					'cosmetology_nail' => 'Strong fit for license and board certifications; keep current.',
+					'realtor'          => 'Good for designations and board compliance; MLS rules may apply.',
+					'plumber'          => 'Strong fit for license and trade certifications; jurisdiction applies.',
+					'disaster_recovery' => 'Strong fit for IICRC and restoration certifications; keep accurate.',
+				),
+			)
 		);
 	}
 

@@ -40,12 +40,13 @@ Base section helpers live in the Documentation_Registry (section_template_key in
 
 ---
 
-## 5. Page one-pager overlays (Prompt 354)
+## 5. Page one-pager overlays (Prompt 354, 402)
 
 - **Registry**: Industry_Page_OnePager_Overlay_Registry. Keyed by industry_key + page_template_key.
 - **Industries**: cosmetology_nail, realtor, plumber, disaster_recovery.
-- **Page families covered (seeded)**: Home (pt_home_conversion_01), About (pt_about_story_01), Contact (pt_contact_request_01), Services (pt_services_overview_01).
-- **Pending families**: See [industry-page-overlay-coverage-matrix.md](industry-page-overlay-coverage-matrix.md) (booking, valuation, emergency/local, neighborhood, gallery, financing, trust/certification).
+- **Page families covered (T1 seeded)**: Home (pt_home_conversion_01), About (pt_about_story_01), Contact (pt_contact_request_01), Services (pt_services_overview_01).
+- **Page families covered (T2 second-wave, Prompt 402)**: Booking (child_detail_service_booking_01), pricing/offerings (pt_offerings_overview_01, pt_offerings_compare_01), location (pt_contact_directions_01), gallery (pt_home_media_01), service-detail (child_detail_treatment_detail_01, child_detail_service_conversion_01), neighborhood (hub_geo_neighborhood_01), buyer/seller (pt_buyer_guide_01, pt_services_value_01), local-market (hub_geo_coverage_listing_01), service-area (hub_geo_service_area_01), financing (pt_offerings_compare_01), trust (hub_geo_area_trust_01), insurance-assistance (pt_support_help_02). See [industry-page-overlay-coverage-matrix.md](industry-page-overlay-coverage-matrix.md).
+- **Pending families**: Remaining T2/T3 per expansion plan.
 - **Expansion**: [industry-page-onepager-overlay-expansion-plan.md](../operations/industry-page-onepager-overlay-expansion-plan.md).
 - **Source directory**: `plugin/src/Domain/Industry/Docs/PageOnePagerOverlays/`.
 - **Loading**: `Industry_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions()`. Bootstrap registers under `CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY`.

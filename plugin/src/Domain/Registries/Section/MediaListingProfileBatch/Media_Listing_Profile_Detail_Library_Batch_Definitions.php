@@ -272,7 +272,16 @@ final class Media_Listing_Profile_Detail_Library_Batch_Definitions {
 			'Profile cards grid.',
 			$fields,
 			array( 'headline' => 'Our team', 'profiles' => array( array( 'name' => 'Name', 'role' => 'Role', 'image' => array(), 'short_bio' => '' ) ) ),
-			array( 'short_label' => 'Profile cards', 'suggested_use_cases' => array( 'Team page', 'About', 'Directory' ) )
+			array(
+				'short_label'       => 'Profile cards',
+				'suggested_use_cases' => array( 'Team page', 'About', 'Directory' ),
+				Section_Schema::FIELD_INDUSTRY_NOTES => array(
+					'cosmetology_nail' => 'Strong fit for stylist/technician profiles; support booking.',
+					'realtor'          => 'Good for agent/team profiles and credibility.',
+					'plumber'          => 'Good for licensed team and trust.',
+					'disaster_recovery' => 'Good for certified team and response capability.',
+				),
+			)
 		);
 	}
 
@@ -368,7 +377,16 @@ final class Media_Listing_Profile_Detail_Library_Batch_Definitions {
 			'Gallery with optional captions.',
 			$fields,
 			array( 'headline' => 'Gallery', 'gallery_items' => array( array( 'image' => array(), 'caption' => '' ) ) ),
-			array( 'short_label' => 'Gallery', 'suggested_use_cases' => array( 'Product', 'Portfolio', 'Media' ) )
+			array(
+				'short_label'       => 'Gallery',
+				'suggested_use_cases' => array( 'Product', 'Portfolio', 'Media' ),
+				Section_Schema::FIELD_INDUSTRY_NOTES => array(
+					'cosmetology_nail' => 'Strong fit for portfolio and service gallery; link to booking.',
+					'realtor'          => 'Good for listing or property gallery.',
+					'plumber'          => 'Good for before/after or project gallery.',
+					'disaster_recovery' => 'Good for project or response gallery.',
+				),
+			)
 		);
 	}
 
@@ -462,7 +480,16 @@ final class Media_Listing_Profile_Detail_Library_Batch_Definitions {
 			'Comparison cards.',
 			$fields,
 			array( 'headline' => 'Compare', 'cards' => array( array( 'title' => 'Option A', 'features' => '', 'link' => array() ) ) ),
-			array( 'short_label' => 'Comparison cards', 'suggested_use_cases' => array( 'Pricing', 'Plans', 'Options' ) )
+			array(
+				'short_label'       => 'Comparison cards',
+				'suggested_use_cases' => array( 'Pricing', 'Plans', 'Options' ),
+				Section_Schema::FIELD_INDUSTRY_NOTES => array(
+					'cosmetology_nail' => 'Good for package or service tier comparison.',
+					'realtor'          => 'Good for buyer/seller or service comparison.',
+					'plumber'          => 'Good for service tiers or financing options.',
+					'disaster_recovery' => 'Good for commercial vs residential or response-type comparison.',
+				),
+			)
 		);
 	}
 
@@ -517,7 +544,16 @@ final class Media_Listing_Profile_Detail_Library_Batch_Definitions {
 			'Location info block.',
 			$fields,
 			array( 'headline' => 'Find us', 'address' => 'Synthetic address.', 'hours' => '', 'contact_label' => '' ),
-			array( 'short_label' => 'Location info', 'suggested_use_cases' => array( 'Location page', 'Contact', 'Venue' ) )
+			array(
+				'short_label'       => 'Location info',
+				'suggested_use_cases' => array( 'Location page', 'Contact', 'Venue' ),
+				Section_Schema::FIELD_INDUSTRY_NOTES => array(
+					'cosmetology_nail' => 'Strong fit for salon location and directions.',
+					'realtor'          => 'Good for office or market-area location.',
+					'plumber'          => 'Good for service-area and coverage.',
+					'disaster_recovery' => 'Good for service-area and 24/7 coverage.',
+				),
+			)
 		);
 	}
 

@@ -269,7 +269,17 @@ final class Feature_Benefit_Value_Library_Batch_Definitions {
 			'Package summaries with highlights and CTA.',
 			$fields,
 			array( 'headline' => 'Packages', 'packages' => array( array( 'name' => 'Basic', 'highlights' => 'Synthetic highlights.', 'price_label' => '', 'cta' => array() ) ) ),
-			array( 'short_label' => 'Packages', 'cta_classification' => 'primary_cta', 'suggested_use_cases' => array( 'Pricing', 'Bundles', 'Tiers' ) )
+			array(
+				'short_label'        => 'Packages',
+				'cta_classification' => 'primary_cta',
+				'suggested_use_cases' => array( 'Pricing', 'Bundles', 'Tiers' ),
+				Section_Schema::FIELD_INDUSTRY_NOTES => array(
+					'cosmetology_nail' => 'Strong fit for service packages and pricing; one CTA per tier.',
+					'realtor'          => 'Good for service tiers; avoid misleading pricing claims.',
+					'plumber'          => 'Strong fit for service tiers and financing; disclose clearly.',
+					'disaster_recovery' => 'Good for response or service tiers; avoid overclaiming.',
+				),
+			)
 		);
 	}
 

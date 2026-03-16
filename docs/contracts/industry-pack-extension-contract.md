@@ -64,6 +64,7 @@ The following are **documented here** for later implementation; no persistent sc
 - **Industry helper overlay** – Ref(s) to helper docs that apply when an industry pack is active.
 - **Industry one-pager overlay** – Ref(s) to one-pager docs that apply when an industry pack is active.
 - **Industry starter bundle** – A curated overlay object (see [industry-starter-bundle-schema.md](../schemas/industry-starter-bundle-schema.md)) that describes a recommended starting set for an industry: recommended page families, page/template refs, section emphasis refs, and optional CTA/style/LPagery guidance refs. Bundles are **overlays**: they do not replace section or page template registries. The **Industry_Starter_Bundle_Registry** is read-only; it loads bundle definitions, exposes get by key, get_for_industry, and list_all; invalid definitions are skipped at load. An industry pack may reference a bundle via optional **starter_bundle_ref**. Bundles are not applied or executed in the core Build Plan by default; they are available for onboarding flows or guided entry points when implemented.
+- **Industry compliance and caution rules** – Structured advisory rules for claims language, certification wording, local-market sensitivity, testimonial/review cautions, pricing-disclosure, etc. (see [industry-compliance-rule-schema.md](../schemas/industry-compliance-rule-schema.md) and [industry-compliance-rule-contract.md](industry-compliance-rule-contract.md)). The **Industry_Compliance_Rule_Registry** is read-only; it loads rule definitions, exposes get(rule_key), get_for_industry(industry_key), get_all(). Rules are **advisory only**; no legal advice or enforcement. An industry pack may reference rules via optional **compliance_rule_refs**.
 
 Storage targets: industry pack definitions use registry-compatible storage (PHP definitions, option-backed, or DB-backed) per industry-pack-schema and industry-pack-service-map. Export/restore must include industry pack definitions and industry profile when implemented.
 
@@ -85,6 +86,7 @@ Storage targets: industry pack definitions use registry-compatible storage (PHP 
 
 ## 7. Cross-references
 
+- **industry-compliance-rule-contract.md**: Compliance/caution rule schema and registry (Prompt 405); advisory only.
 - **industry-pack-service-map.md**: Directory structure and service categories (Prompt 319).
 - **industry-pack-schema.md**: Industry Pack object schema and persistence (Prompt 320).
 - **data-schema-appendix.md**: Schema summary when industry objects are introduced.
