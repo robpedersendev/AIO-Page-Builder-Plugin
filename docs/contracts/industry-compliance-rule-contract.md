@@ -49,8 +49,15 @@ Consumers are **not** defined in this prompt; the registry and schema enable the
 
 ---
 
-## 6. Cross-references
+## 6. Subtype extension
+
+- **Subtype caution rules** layer on top of parent rules per [subtype-compliance-rule-contract.md](subtype-compliance-rule-contract.md). Parent-industry rules remain the base; subtype rules are additive or refinement-only. Resolution for (industry, subtype) returns parent rules plus subtype rules when subtype is valid; otherwise parent only.
+
+---
+
+## 7. Cross-references
 
 - [industry-compliance-rule-schema.md](../schemas/industry-compliance-rule-schema.md) — Full schema.
+- [subtype-compliance-rule-contract.md](subtype-compliance-rule-contract.md) — Subtype-scoped caution rule extension.
 - [industry-pack-extension-contract.md](industry-pack-extension-contract.md) — Subsystem boundary.
 - [industry-pack-schema.md](../schemas/industry-pack-schema.md) — Optional compliance_rule_refs when added.

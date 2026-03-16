@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Compliance_Rule_Registry.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/Subtype_Compliance_Rule_Registry.php';
 require_once $plugin_root . '/src/Domain/Industry/Docs/Industry_Compliance_Warning_Resolver.php';
 
 final class Industry_Compliance_Warning_Resolver_Test extends TestCase {
@@ -89,5 +90,39 @@ final class Industry_Compliance_Warning_Resolver_Test extends TestCase {
 			$this->assertNotEmpty( $item['rule_key'] );
 			$this->assertNotEmpty( $item['caution_summary'] );
 		}
+	}
+
+	/** Prompt 447: with subtype registry and subtype_key, display includes parent + subtype rules; fallback without subtype. */
+	public function test_get_for_display_with_subtype_merges_parent_and_subtype_rules(): void {
+		$parent = new Industry_Compliance_Rule_Registry();
+		$parent->load( array(
+			array(
+				Industry_Compliance_Rule_Registry::FIELD_RULE_KEY        => 'parent_rule',
+				Industry_Compliance_Rule_Registry::FIELD_INDUSTRY_KEY    => 'realtor',
+				Industry_Compliance_Rule_Registry::FIELD_SEVERITY        => 'caution',
+				Industry_Compliance_Rule_Registry::FIELD_CAUTION_SUMMARY => 'Parent summary.',
+				Industry_Compliance_Rule_Registry::FIELD_STATUS          => 'active',
+			),
+		) );
+		$subtype = new Subtype_Compliance_Rule_Registry();
+		$subtype->load( array(
+			array(
+				Subtype_Compliance_Rule_Registry::FIELD_SUBTYPE_RULE_KEY    => 'subtype_rule',
+				Subtype_Compliance_Rule_Registry::FIELD_SUBTYPE_KEY         => 'realtor_buyer_agent',
+				Subtype_Compliance_Rule_Registry::FIELD_PARENT_INDUSTRY_KEY => 'realtor',
+				Subtype_Compliance_Rule_Registry::FIELD_SEVERITY            => 'info',
+				Subtype_Compliance_Rule_Registry::FIELD_CAUTION_SUMMARY     => 'Subtype summary.',
+				Subtype_Compliance_Rule_Registry::FIELD_STATUS             => 'active',
+			),
+		) );
+		$resolver = new Industry_Compliance_Warning_Resolver( $parent, $subtype );
+		$with_subtype = $resolver->get_for_display( 'realtor', 'realtor_buyer_agent' );
+		$this->assertCount( 2, $with_subtype );
+		$rule_keys = array_column( $with_subtype, 'rule_key' );
+		$this->assertContains( 'parent_rule', $rule_keys );
+		$this->assertContains( 'subtype_rule', $rule_keys );
+		$without_subtype = $resolver->get_for_display( 'realtor', '' );
+		$this->assertCount( 1, $without_subtype );
+		$this->assertSame( 'parent_rule', $without_subtype[0]['rule_key'] );
 	}
 }

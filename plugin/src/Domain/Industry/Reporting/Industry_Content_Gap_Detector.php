@@ -56,6 +56,9 @@ final class Industry_Content_Gap_Detector {
 	/** Option key: available section internal_keys. */
 	public const OPT_AVAILABLE_SECTION_KEYS = 'available_section_keys';
 
+	/** Result key: optional subtype influence (refined_action_summary, additive_note) when subtype context refines this gap. */
+	public const RESULT_SUBTYPE_INFLUENCE = 'subtype_influence';
+
 	private const ACTION_SUMMARY_MAX = 256;
 
 	/** Per-industry expected content types (gap_type => severity). Empty = no industry-specific expectations. */
@@ -114,8 +117,15 @@ final class Industry_Content_Gap_Detector {
 	/** @var Industry_Starter_Bundle_Registry|null */
 	private ?Industry_Starter_Bundle_Registry $bundle_registry;
 
-	public function __construct( ?Industry_Starter_Bundle_Registry $bundle_registry = null ) {
-		$this->bundle_registry = $bundle_registry;
+	/** @var Industry_Subtype_Content_Gap_Extender|null When set, subtype context can refine expectations and gap explanations (Prompt 448). */
+	private ?Industry_Subtype_Content_Gap_Extender $subtype_extender;
+
+	public function __construct(
+		?Industry_Starter_Bundle_Registry $bundle_registry = null,
+		?Industry_Subtype_Content_Gap_Extender $subtype_extender = null
+	) {
+		$this->bundle_registry  = $bundle_registry;
+		$this->subtype_extender = $subtype_extender;
 	}
 
 	/**
@@ -124,7 +134,7 @@ final class Industry_Content_Gap_Detector {
 	 * @param array<string, mixed> $profile Normalized Industry Profile (primary_industry_key, selected_starter_bundle_key, etc.).
 	 * @param string|null          $bundle_key Override bundle key; when null, profile selected_starter_bundle_key is used.
 	 * @param array<string, mixed> $options Optional. content_hints (map of hint => bool), available_page_template_keys, available_section_keys.
-	 * @return list<array{gap_type: string, severity: string, related_page_families: list<string>, related_section_families: list<string>, recommended_action_summary: string}>
+	 * @return list<array{gap_type: string, severity: string, related_page_families: list<string>, related_section_families: list<string>, recommended_action_summary: string, subtype_influence?: array}>
 	 */
 	public function detect( array $profile, ?string $bundle_key = null, array $options = array() ): array {
 		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
@@ -134,6 +144,15 @@ final class Industry_Content_Gap_Detector {
 			return array();
 		}
 		$expectations = self::INDUSTRY_EXPECTATIONS[ $primary ] ?? array();
+		$subtype_key  = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			? trim( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			: '';
+		if ( $subtype_key !== '' && $this->subtype_extender !== null ) {
+			$subtype_expectations = $this->subtype_extender->get_expectations( $primary, $subtype_key );
+			foreach ( $subtype_expectations as $gap_type => $severity ) {
+				$expectations[ $gap_type ] = $severity;
+			}
+		}
 		if ( $expectations === array() ) {
 			return array();
 		}
@@ -155,16 +174,29 @@ final class Industry_Content_Gap_Detector {
 				continue;
 			}
 			$action = self::GAP_ACTIONS[ $gap_type ] ?? '';
+			if ( $this->subtype_extender !== null && $subtype_key !== '' ) {
+				$refinement = $this->subtype_extender->get_refinement( $primary, $subtype_key, $gap_type );
+				if ( $refinement !== null && isset( $refinement['refined_action_summary'] ) && $refinement['refined_action_summary'] !== '' ) {
+					$action = $refinement['refined_action_summary'];
+				}
+			}
 			if ( strlen( $action ) > self::ACTION_SUMMARY_MAX ) {
 				$action = substr( $action, 0, self::ACTION_SUMMARY_MAX - 3 ) . '...';
 			}
-			$gaps[] = array(
-				'gap_type'                  => $gap_type,
-				'severity'                  => $severity,
-				'related_page_families'     => self::GAP_PAGE_FAMILIES[ $gap_type ] ?? array(),
-				'related_section_families'  => self::GAP_SECTION_FAMILIES[ $gap_type ] ?? array(),
+			$item = array(
+				'gap_type'                   => $gap_type,
+				'severity'                   => $severity,
+				'related_page_families'      => self::GAP_PAGE_FAMILIES[ $gap_type ] ?? array(),
+				'related_section_families'   => self::GAP_SECTION_FAMILIES[ $gap_type ] ?? array(),
 				'recommended_action_summary' => $action,
 			);
+			if ( $this->subtype_extender !== null && $subtype_key !== '' ) {
+				$refinement = $this->subtype_extender->get_refinement( $primary, $subtype_key, $gap_type );
+				if ( $refinement !== null ) {
+					$item[ self::RESULT_SUBTYPE_INFLUENCE ] = $refinement;
+				}
+			}
+			$gaps[] = $item;
 		}
 		return $gaps;
 	}

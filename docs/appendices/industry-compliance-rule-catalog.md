@@ -52,5 +52,6 @@
 ## 5. Resolution
 
 - **Registry:** Industry_Compliance_Rule_Registry; definitions in `ComplianceRules/compliance-rule-definitions.php`.
+- **Subtype rules:** Subtype_Compliance_Rule_Registry; definitions in `SubtypeComplianceRules/subtype-compliance-rule-definitions.php`. When profile has a valid industry_subtype_key, Industry_Compliance_Warning_Resolver merges parent + subtype rules for display. See subtype-compliance-rule-contract.md.
 - **Consumers:** Helper docs, one-pagers, section/page previews, Build Plan review (advisory surfacing only).
 - **Industry pack refs:** Optional `compliance_rule_refs` in industry pack schema resolve to this registry.

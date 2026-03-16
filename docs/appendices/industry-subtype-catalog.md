@@ -53,3 +53,9 @@ This appendix lists built-in industry subtype definitions loaded by the Industry
 ## 5. Loading and validation
 
 Subtypes are loaded by **Industry_Packs_Module** via `Industry_Subtype_Registry::get_builtin_definitions()` (sourced from **Subtypes/Builtin_Subtypes.php**, which aggregates the four per-industry files). Invalid or duplicate subtype keys are skipped at load. Profile field `industry_subtype_key` must reference a subtype whose `parent_industry_key` matches the profile’s `primary_industry_key`; otherwise resolution falls back to parent industry only. See industry-subtype-extension-contract.md and Industry_Subtype_Resolver.
+
+---
+
+## 6. Subtype caution rules
+
+Subtype-specific compliance/caution rules (subtype-compliance-rule-schema.md, subtype-compliance-rule-contract.md) are seeded in **SubtypeComplianceRules/subtype-compliance-rule-definitions.php** and loaded via **Subtype_Compliance_Rule_Registry**. They refine or add to parent-industry rules for the launch subtype set (e.g. mobile service area, buyer/listing agent phrasing, residential/commercial plumber and disaster recovery). Resolution: parent rules base layer, then subtype rules when subtype is valid; fallback to parent only when no or invalid subtype.

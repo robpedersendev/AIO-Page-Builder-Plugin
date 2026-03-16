@@ -17,6 +17,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Industry/Reporting/Industry_Content_Gap_Detector.php';
+require_once $plugin_root . '/src/Domain/Industry/Reporting/Industry_Subtype_Content_Gap_Extender.php';
 
 final class Industry_Content_Gap_Detector_Test extends TestCase {
 
@@ -88,5 +89,48 @@ final class Industry_Content_Gap_Detector_Test extends TestCase {
 		);
 		$gaps = $detector->detect( $profile, null, $options );
 		$this->assertSame( array(), $gaps );
+	}
+
+	/** Prompt 448: with subtype extender and industry_subtype_key, gaps can include subtype_influence; parent-only fallback when no subtype. */
+	public function test_detect_with_subtype_extender_adds_subtype_influence_when_refinement_exists(): void {
+		$extender = new Industry_Subtype_Content_Gap_Extender();
+		$detector = new Industry_Content_Gap_Detector( null, $extender );
+		$profile = array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'cosmetology_nail',
+			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'cosmetology_nail_mobile_tech',
+		);
+		$gaps = $detector->detect( $profile, null, array() );
+		$this->assertGreaterThanOrEqual( 1, count( $gaps ) );
+		$service_area_gap = null;
+		foreach ( $gaps as $gap ) {
+			if ( ( $gap['gap_type'] ?? '' ) === Industry_Content_Gap_Detector::GAP_SERVICE_AREA ) {
+				$service_area_gap = $gap;
+				break;
+			}
+		}
+		$this->assertNotNull( $service_area_gap, 'Expected GAP_SERVICE_AREA for cosmetology_nail_mobile_tech' );
+		$this->assertArrayHasKey( Industry_Content_Gap_Detector::RESULT_SUBTYPE_INFLUENCE, $service_area_gap );
+		$this->assertArrayHasKey( 'refined_action_summary', $service_area_gap[ Industry_Content_Gap_Detector::RESULT_SUBTYPE_INFLUENCE ] );
+		$this->assertArrayHasKey( 'additive_note', $service_area_gap[ Industry_Content_Gap_Detector::RESULT_SUBTYPE_INFLUENCE ] );
+	}
+
+	/** Prompt 448: parent-only fallback when subtype empty or extender null; no subtype_influence. */
+	public function test_detect_without_subtype_has_no_subtype_influence(): void {
+		$extender = new Industry_Subtype_Content_Gap_Extender();
+		$detector = new Industry_Content_Gap_Detector( null, $extender );
+		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'cosmetology_nail' );
+		$gaps = $detector->detect( $profile, null, array() );
+		foreach ( $gaps as $gap ) {
+			$this->assertArrayNotHasKey( Industry_Content_Gap_Detector::RESULT_SUBTYPE_INFLUENCE, $gap );
+		}
+		$detector_no_extender = new Industry_Content_Gap_Detector( null, null );
+		$profile_with_subtype = array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'cosmetology_nail',
+			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'cosmetology_nail_mobile_tech',
+		);
+		$gaps2 = $detector_no_extender->detect( $profile_with_subtype, null, array() );
+		foreach ( $gaps2 as $gap ) {
+			$this->assertArrayNotHasKey( Industry_Content_Gap_Detector::RESULT_SUBTYPE_INFLUENCE, $gap );
+		}
 	}
 }

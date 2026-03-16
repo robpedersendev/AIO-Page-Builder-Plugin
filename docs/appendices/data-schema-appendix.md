@@ -168,6 +168,14 @@ Override object for operator override of industry recommendations (section, page
 
 ---
 
+## 11.5 Industry and subtype compliance/caution rules (Prompt 405, 446)
+
+**Industry compliance rules** (industry-compliance-rule-schema.md): rule_key, industry_key, scope, target_section_family, target_page_family, severity (info | caution | warning), caution_summary, guidance_text, status, version_marker. Loaded via Industry_Compliance_Rule_Registry (load, get, get_for_industry). Advisory only; no legal advice.
+
+**Subtype compliance rules** (subtype-compliance-rule-schema.md): subtype_rule_key, subtype_key, parent_industry_key, scope, target_section_family, target_page_family, severity, caution_summary, guidance_text, refinement_of_rule_key (optional), additive_note, status, version_marker. Loaded via Subtype_Compliance_Rule_Registry (load, get, get_for_subtype). Composition: parent rules base layer, then subtype rules for (parent_industry_key, subtype_key). Fallback: when no or invalid subtype, parent rules only. See [subtype-compliance-rule-contract.md](../contracts/subtype-compliance-rule-contract.md).
+
+---
+
 ## 12. Template library compliance result payload
 
 Output of Template_Library_Compliance_Service::run() → Template_Library_Compliance_Result::to_array():

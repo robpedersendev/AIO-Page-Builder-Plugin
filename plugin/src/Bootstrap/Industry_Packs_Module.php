@@ -156,9 +156,18 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_Compliance_Rule_Registry::get_builtin_definitions() );
 			return $registry;
 		} );
+		$container->register( 'subtype_compliance_rule_registry', function (): \AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry::get_builtin_definitions() );
+			return $registry;
+		} );
 		$container->register( 'industry_compliance_warning_resolver', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver {
-			$registry = $container->get( self::CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY );
-			return new \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver( $registry );
+			$registry         = $container->get( self::CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY );
+			$subtype_registry = $container->has( 'subtype_compliance_rule_registry' ) ? $container->get( 'subtype_compliance_rule_registry' ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver(
+				$registry,
+				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry ? $subtype_registry : null
+			);
 		} );
 		$container->register( 'industry_question_pack_registry', function (): \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry();
@@ -179,10 +188,15 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\StylePresets\Builtin_Industry_Style_Presets::get_definitions() );
 			return $registry;
 		} );
+		$container->register( 'industry_subtype_content_gap_extender', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Content_Gap_Extender {
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Content_Gap_Extender();
+		} );
 		$container->register( 'industry_content_gap_detector', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Content_Gap_Detector {
-			$starter = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+			$starter  = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+			$extender = $container->has( 'industry_subtype_content_gap_extender' ) ? $container->get( 'industry_subtype_content_gap_extender' ) : null;
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Content_Gap_Detector(
-				$starter instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $starter : null
+				$starter instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $starter : null,
+				$extender instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Content_Gap_Extender ? $extender : null
 			);
 		} );
 		$container->register( 'industry_override_audit_report_service', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service {
