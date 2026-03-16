@@ -42,6 +42,7 @@ use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Assistant;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Style_Preset_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Subtype_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Component_Override_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen;
@@ -429,6 +430,15 @@ final class Admin_Menu {
 			$industry_subtype_comparison->get_capability(),
 			Industry_Subtype_Comparison_Screen::SLUG,
 			array( $industry_subtype_comparison, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_bundle_comparison->get_title(),
+			__( 'Bundle comparison', 'aio-page-builder' ),
+			$industry_bundle_comparison->get_capability(),
+			Industry_Starter_Bundle_Comparison_Screen::SLUG,
+			array( $industry_bundle_comparison, 'render' )
 		);
 
 		add_submenu_page(

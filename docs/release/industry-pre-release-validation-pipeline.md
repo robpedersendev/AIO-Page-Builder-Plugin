@@ -26,6 +26,7 @@
 | 7. Lifecycle / fallback audit | Manual or script: no-industry path, deprecated pack handling | No regressions | industry-pack-deprecation-contract; industry-neutral-mode-audit |
 | 8. Dry-run sandbox (optional) | Industry_Author_Sandbox_Service::run_dry_run() for candidate packs/bundles | Lint/health errors = fix before promote | [industry-author-sandbox-guide.md](../operations/industry-author-sandbox-guide.md) |
 | 9. Release gate criteria | [industry-pack-release-gate.md](industry-pack-release-gate.md) | All criteria met or waived | Release gate §1 |
+| 10. Performance benchmark (optional) | Industry_Performance_Benchmark_Service::run_benchmark() | Informational; use before/after optimization | [industry-performance-benchmark-protocol.md](../qa/industry-performance-benchmark-protocol.md) |
 
 ---
 

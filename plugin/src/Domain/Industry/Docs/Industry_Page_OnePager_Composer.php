@@ -78,6 +78,20 @@ final class Industry_Page_OnePager_Composer {
 		$page_template_key = trim( $page_template_key );
 		$industry_key      = trim( $industry_key );
 		$subtype_key       = trim( $subtype_key );
+		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
+			$base_key = $this->cache_key_builder->for_page_onepager( $page_template_key, $industry_key, $subtype_key );
+			$cached   = $this->cache_service->get( $base_key );
+			if ( is_array( $cached ) && isset( $cached['composed_onepager'] ) && is_array( $cached['composed_onepager'] ) ) {
+				return new Composed_Page_OnePager_Result(
+					$cached['composed_onepager'],
+					(string) ( $cached['base_documentation_id'] ?? '' ),
+					(bool) ( $cached['overlay_applied'] ?? false ),
+					(string) ( $cached['overlay_industry_key'] ?? '' ),
+					(string) ( $cached['page_template_key'] ?? $page_template_key ),
+					is_array( $cached['compliance_warnings'] ?? null ) ? $cached['compliance_warnings'] : array()
+				);
+			}
+		}
 		$base_doc          = $page_template_key !== '' ? $this->documentation_registry->get_by_page_template_key( $page_template_key ) : null;
 		$base_id           = '';
 		$composed          = array();

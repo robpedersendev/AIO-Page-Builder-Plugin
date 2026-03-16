@@ -44,7 +44,15 @@
 
 ---
 
-## 5. CLI / scripted inspection (Prompt 398)
+## 5. Performance benchmark harness (Prompt 451)
+
+- [ ] **Service:** `Industry_Performance_Benchmark_Service` (container key `industry_performance_benchmark_service`) runs bounded timing scenarios: section preview resolution, page preview resolution, bundle comparison, health report.
+- [ ] **Use:** Internal only; no public dashboard. Run before/after optimization to compare timings. See [industry-performance-benchmark-protocol.md](industry-performance-benchmark-protocol.md).
+- [ ] **Result shape:** Per scenario: `iterations`, `total_ms`, `mean_ms`, `skipped`. Scenarios skip when the required service is not in the container.
+
+---
+
+## 6. CLI / scripted inspection (Prompt 398)
 
 - [ ] **Inspection service:** `Industry_Inspection_Command_Service` provides read-only `get_profile_summary()`, `get_health_summary()`, `get_diagnostics_snapshot()`, `get_recommendation_preview( industry_key, top_templates, top_sections )`, `get_starter_bundles_for_industry( industry_key )`. No mutation.
 - [ ] **Usage:** Internal/support only; see [industry-cli-inspection-guide.md](../operations/industry-cli-inspection-guide.md) for intended use from WP-CLI or scripts.

@@ -79,6 +79,20 @@ final class Industry_Helper_Doc_Composer {
 		$section_key  = trim( $section_key );
 		$industry_key = trim( $industry_key );
 		$subtype_key  = trim( $subtype_key );
+		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
+			$base_key = $this->cache_key_builder->for_helper_doc( $section_key, $industry_key, $subtype_key );
+			$cached   = $this->cache_service->get( $base_key );
+			if ( is_array( $cached ) && isset( $cached['composed_doc'] ) && is_array( $cached['composed_doc'] ) ) {
+				return new Composed_Helper_Doc_Result(
+					$cached['composed_doc'],
+					(string) ( $cached['base_documentation_id'] ?? '' ),
+					(bool) ( $cached['overlay_applied'] ?? false ),
+					(string) ( $cached['overlay_industry_key'] ?? '' ),
+					(string) ( $cached['section_key'] ?? $section_key ),
+					is_array( $cached['compliance_warnings'] ?? null ) ? $cached['compliance_warnings'] : array()
+				);
+			}
+		}
 		$base_doc     = $section_key !== '' ? $this->documentation_registry->get_by_section_key( $section_key ) : null;
 		$base_id      = '';
 		$composed     = array();

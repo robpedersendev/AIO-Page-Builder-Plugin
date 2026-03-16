@@ -202,6 +202,12 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( 'industry_override_audit_report_service', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service {
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service();
 		} );
+		$container->register( 'industry_starter_bundle_diff_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Starter_Bundle_Diff_Service {
+			$registry = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Starter_Bundle_Diff_Service(
+				$registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $registry : null
+			);
+		} );
 		$container->register( 'industry_diagnostics_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service {
 			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
 			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
@@ -245,6 +251,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$starter instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $starter : null,
 				$toggle
 			);
+		} );
+		$container->register( 'industry_performance_benchmark_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Performance_Benchmark_Service {
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Performance_Benchmark_Service( $container );
 		} );
 		$container->register( 'industry_section_preview_resolver', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Preview_Resolver {
 			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;

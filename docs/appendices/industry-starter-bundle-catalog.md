@@ -2,7 +2,7 @@
 
 **Spec**: industry-starter-bundle-schema.md; industry-pack-extension-contract. **Prompt**: 387.
 
-This appendix lists built-in starter bundle definitions loaded by the Industry Starter Bundle Registry. Bundles are curated overlays that recommend page families, template refs, section emphasis, and optional CTA/style/LPagery refs for each industry. They do not replace the core section or page template library.
+This appendix lists built-in starter bundle definitions loaded by the Industry Starter Bundle Registry. Bundles are curated overlays that recommend page families, template refs, section emphasis, and optional CTA/style/LPagery refs for each industry. They do not replace the core section or page template library. To compare two or more bundles side by side (parent, subtype, or alternate variants), use the **Bundle comparison** admin screen (Industry → Bundle comparison; Prompt 450).
 
 ---
 
