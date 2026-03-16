@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Bundle_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Mode_Keys;
+use AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service;
 use AIOPageBuilder\Domain\Registries\Export\Registry_Export_Serializer;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
@@ -87,6 +88,9 @@ final class Support_Package_Generator {
 	/** @var Template_Library_Support_Summary_Builder|null Optional; when set, support bundle includes template_library_support_summary (Prompt 198). */
 	private ?Template_Library_Support_Summary_Builder $template_library_summary_builder;
 
+	/** @var Industry_Override_Audit_Report_Service|null Optional; when set, support bundle includes industry_override_audit_summary (Prompt 437). */
+	private ?Industry_Override_Audit_Report_Service $override_audit_report_service;
+
 	public function __construct(
 		Plugin_Path_Manager $path_manager,
 		Settings_Service $settings,
@@ -97,10 +101,11 @@ final class Support_Package_Generator {
 		Export_Manifest_Builder $manifest_builder,
 		Export_Zip_Packager $packager,
 		?Logger_Interface $logger = null,
-		?Template_Library_Support_Summary_Builder $template_library_summary_builder = null
+		?Template_Library_Support_Summary_Builder $template_library_summary_builder = null,
+		?Industry_Override_Audit_Report_Service $override_audit_report_service = null
 	) {
-		$this->path_manager                   = $path_manager;
-		$this->settings                      = $settings;
+		$this->path_manager                    = $path_manager;
+		$this->settings                       = $settings;
 		$this->profile_store                  = $profile_store;
 		$this->registry_serializer            = $registry_serializer;
 		$this->plan_repository                = $plan_repository;
@@ -109,6 +114,7 @@ final class Support_Package_Generator {
 		$this->packager                       = $packager;
 		$this->logger                         = $logger;
 		$this->template_library_summary_builder = $template_library_summary_builder;
+		$this->override_audit_report_service  = $override_audit_report_service;
 	}
 
 	/**
@@ -200,6 +206,11 @@ final class Support_Package_Generator {
 			if ( $this->template_library_summary_builder !== null ) {
 				$template_summary = $this->template_library_summary_builder->build();
 				$this->write_json_dir( $staging_dir . 'docs', 'template_library_support_summary.json', $template_summary );
+			}
+
+			if ( $this->override_audit_report_service !== null ) {
+				$override_summary = $this->override_audit_report_service->build_report();
+				$this->write_json_dir( $staging_dir . 'docs', 'industry_override_audit_summary.json', $override_summary );
 			}
 
 			if ( in_array( 'reporting_history', $included, true ) ) {

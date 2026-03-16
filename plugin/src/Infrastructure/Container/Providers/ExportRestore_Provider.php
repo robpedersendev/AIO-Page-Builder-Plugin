@@ -116,6 +116,7 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 		} );
 
 		$container->register( 'support_package_generator', function () use ( $container ): Support_Package_Generator {
+			$override_audit = $container->has( 'industry_override_audit_report_service' ) ? $container->get( 'industry_override_audit_report_service' ) : null;
 			return new Support_Package_Generator(
 				$container->get( 'plugin_path_manager' ),
 				$container->get( 'settings' ),
@@ -126,7 +127,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$container->get( 'export_manifest_builder' ),
 				$container->get( 'export_zip_packager' ),
 				$container->has( 'logger' ) ? $container->get( 'logger' ) : null,
-				$container->has( 'template_library_support_summary_builder' ) ? $container->get( 'template_library_support_summary_builder' ) : null
+				$container->has( 'template_library_support_summary_builder' ) ? $container->get( 'template_library_support_summary_builder' ) : null,
+				$override_audit instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service ? $override_audit : null
 			);
 		} );
 		$container->register( 'export_generator', function () use ( $container ): Export_Generator {

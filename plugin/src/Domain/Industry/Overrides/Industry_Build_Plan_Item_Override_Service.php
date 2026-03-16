@@ -102,6 +102,59 @@ final class Industry_Build_Plan_Item_Override_Service {
 	}
 
 	/**
+	 * Returns all Build Plan item overrides across all plans (for listing/audit).
+	 * Each entry has plan_id, item_id, and override record.
+	 *
+	 * @return list<array{plan_id: string, item_id: string, override: array<string, mixed>}>
+	 */
+	public function list_all_overrides(): array {
+		$all = $this->get_all();
+		$out = array();
+		foreach ( $all as $plan_id => $items ) {
+			if ( ! is_string( $plan_id ) || $plan_id === '' || ! is_array( $items ) ) {
+				continue;
+			}
+			foreach ( $items as $item_id => $record ) {
+				if ( is_string( $item_id ) && $item_id !== '' && is_array( $record ) ) {
+					$out[] = array(
+						'plan_id'  => $plan_id,
+						'item_id'  => $item_id,
+						'override' => $record,
+					);
+				}
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Removes the override for a plan item. Bounded single-item removal for audit safety.
+	 *
+	 * @param string $plan_id Plan ID (internal_key or UUID).
+	 * @param string $item_id Plan item item_id.
+	 * @return bool True when removed or entry was absent; false when save failed.
+	 */
+	public function remove_override( string $plan_id, string $item_id ): bool {
+		$plan_id = trim( $plan_id );
+		$item_id = trim( $item_id );
+		if ( $plan_id === '' || $item_id === '' ) {
+			return true;
+		}
+		$all = $this->get_all();
+		$plan_overrides = $all[ $plan_id ] ?? array();
+		if ( ! is_array( $plan_overrides ) || ! isset( $plan_overrides[ $item_id ] ) ) {
+			return true;
+		}
+		unset( $plan_overrides[ $item_id ] );
+		if ( $plan_overrides === array() ) {
+			unset( $all[ $plan_id ] );
+		} else {
+			$all[ $plan_id ] = $plan_overrides;
+		}
+		return \update_option( Option_Names::INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES, $all, true ) !== false;
+	}
+
+	/**
 	 * @return array<string, array<string, array<string, mixed>>>
 	 */
 	private function get_all(): array {

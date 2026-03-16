@@ -74,6 +74,25 @@ final class Industry_Page_Template_Override_Service {
 	}
 
 	/**
+	 * Removes the override for a page template. Bounded single-key removal for audit safety.
+	 *
+	 * @param string $template_key Page template internal_key.
+	 * @return bool True when removed or key was absent; false when save failed.
+	 */
+	public function remove_override( string $template_key ): bool {
+		$template_key = trim( $template_key );
+		if ( $template_key === '' ) {
+			return true;
+		}
+		$all = $this->get_all();
+		if ( ! isset( $all[ $template_key ] ) ) {
+			return true;
+		}
+		unset( $all[ $template_key ] );
+		return \update_option( Option_Names::INDUSTRY_PAGE_TEMPLATE_OVERRIDES, $all, true ) !== false;
+	}
+
+	/**
 	 * @return array<string, array<string, mixed>>
 	 */
 	private function get_all(): array {

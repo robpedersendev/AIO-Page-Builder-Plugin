@@ -74,6 +74,25 @@ final class Industry_Section_Override_Service {
 	}
 
 	/**
+	 * Removes the override for a section. Bounded single-key removal for audit safety.
+	 *
+	 * @param string $section_key Section template internal_key.
+	 * @return bool True when removed or key was absent; false when save failed.
+	 */
+	public function remove_override( string $section_key ): bool {
+		$section_key = trim( $section_key );
+		if ( $section_key === '' ) {
+			return true;
+		}
+		$all = $this->get_all();
+		if ( ! isset( $all[ $section_key ] ) ) {
+			return true;
+		}
+		unset( $all[ $section_key ] );
+		return \update_option( Option_Names::INDUSTRY_SECTION_OVERRIDES, $all, true ) !== false;
+	}
+
+	/**
 	 * @return array<string, array<string, mixed>>
 	 */
 	private function get_all(): array {

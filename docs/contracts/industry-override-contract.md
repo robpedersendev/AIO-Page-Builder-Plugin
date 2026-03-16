@@ -81,9 +81,26 @@ Override identity is scoped by (target_type, target_key) and optionally by plan_
 
 ---
 
-## 8. Files
+## 8. Bulk override management (Prompt 436)
+
+- **Screen**: Industry Overrides (slug `aio-page-builder-industry-overrides`), under main AIO Page Builder menu. Lists all overrides across section, page template, and Build Plan item. Filter by type, state, reason presence, and optional industry_context_ref.
+- **Read model**: Industry_Override_Read_Model_Builder aggregates from the three override services and supports the same filters. Used by the management screen.
+- **Remove**: Bounded single-override removal via admin_post action `aio_remove_industry_override`; nonce and capability per scope (MANAGE_SECTION_TEMPLATES, MANAGE_PAGE_TEMPLATES, APPROVE_BUILD_PLANS). Redirects back to the management screen.
+- **Files**: plugin/src/Admin/Screens/Industry/Industry_Override_Management_Screen.php, plugin/src/Domain/Industry/Overrides/Industry_Override_Read_Model_Builder.php, plugin/src/Admin/Actions/Remove_Industry_Override_Action.php.
+
+---
+
+## 9. Override audit report (Prompt 437)
+
+- **Purpose**: Bounded, exportable summary for support/diagnostics. See docs/contracts/industry-override-audit-report-contract.md.
+- **Service**: Industry_Override_Audit_Report_Service builds a report grouped by target_type and optional industry_context_ref. Included in support packages (industry_override_audit_summary.json) and in industry diagnostics snapshot (override_summary) when the service is available.
+
+---
+
+## 10. Files
 
 - **Schema**: plugin/src/Domain/Industry/Overrides/Industry_Override_Schema.php
-- **Services**: plugin/src/Domain/Industry/Overrides/Industry_Section_Override_Service.php, Industry_Page_Template_Override_Service.php, Industry_Build_Plan_Item_Override_Service.php
-- **Actions**: plugin/src/Admin/Actions/Save_Industry_Section_Override_Action.php, Save_Industry_Page_Template_Override_Action.php, Save_Industry_Build_Plan_Override_Action.php
-- **Contract**: docs/contracts/industry-override-contract.md
+- **Services**: plugin/src/Domain/Industry/Overrides/Industry_Section_Override_Service.php, Industry_Page_Template_Override_Service.php, Industry_Build_Plan_Item_Override_Service.php, Industry_Override_Read_Model_Builder.php
+- **Actions**: plugin/src/Admin/Actions/Save_Industry_Section_Override_Action.php, Save_Industry_Page_Template_Override_Action.php, Save_Industry_Build_Plan_Override_Action.php, Remove_Industry_Override_Action.php
+- **Reporting**: plugin/src/Domain/Industry/Reporting/Industry_Override_Audit_Report_Service.php
+- **Contracts**: docs/contracts/industry-override-contract.md, docs/contracts/industry-override-audit-report-contract.md

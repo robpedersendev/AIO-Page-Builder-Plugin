@@ -67,4 +67,18 @@ final class Industry_Page_Template_Override_Service_Test extends TestCase {
 		$service = new Industry_Page_Template_Override_Service();
 		$this->assertFalse( $service->record_override( '', Industry_Override_Schema::STATE_ACCEPTED, '' ) );
 	}
+
+	public function test_remove_override_removes_and_returns_true(): void {
+		$service = new Industry_Page_Template_Override_Service();
+		$service->record_override( 'to_remove', Industry_Override_Schema::STATE_ACCEPTED, '' );
+		$this->assertNotNull( $service->get_override( 'to_remove' ) );
+		$ok = $service->remove_override( 'to_remove' );
+		$this->assertTrue( $ok );
+		$this->assertNull( $service->get_override( 'to_remove' ) );
+	}
+
+	public function test_remove_override_returns_true_when_key_absent(): void {
+		$service = new Industry_Page_Template_Override_Service();
+		$this->assertTrue( $service->remove_override( 'nonexistent' ) );
+	}
 }

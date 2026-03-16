@@ -185,6 +185,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$starter instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $starter : null
 			);
 		} );
+		$container->register( 'industry_override_audit_report_service', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service {
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service();
+		} );
 		$container->register( 'industry_diagnostics_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service {
 			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
 			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
@@ -192,13 +195,15 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$page_overlay = $container->has( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) : null;
 			$preset_app = $container->has( 'industry_style_preset_application_service' ) ? $container->get( 'industry_style_preset_application_service' ) : null;
 			$gap_detector = $container->has( 'industry_content_gap_detector' ) ? $container->get( 'industry_content_gap_detector' ) : null;
+			$override_audit = $container->has( 'industry_override_audit_report_service' ) ? $container->get( 'industry_override_audit_report_service' ) : null;
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service(
 				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
 				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
 				$section_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry ? $section_overlay : null,
 				$page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry ? $page_overlay : null,
 				$preset_app instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service ? $preset_app : null,
-				$gap_detector instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Content_Gap_Detector ? $gap_detector : null
+				$gap_detector instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Content_Gap_Detector ? $gap_detector : null,
+				$override_audit instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service ? $override_audit : null
 			);
 		} );
 		$container->register( 'industry_health_check_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service {

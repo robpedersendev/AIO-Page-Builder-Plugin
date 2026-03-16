@@ -83,4 +83,33 @@ final class Industry_Build_Plan_Item_Override_Service_Test extends TestCase {
 		$this->assertStringNotContainsString( '<', $reason );
 		$this->assertSame( 'Note', $reason );
 	}
+
+	public function test_list_all_overrides_returns_all_plans_and_items(): void {
+		$service = new Industry_Build_Plan_Item_Override_Service();
+		$service->record_override( 'plan-a', 'item-1', Industry_Override_Schema::STATE_ACCEPTED, '' );
+		$service->record_override( 'plan-a', 'item-2', Industry_Override_Schema::STATE_REJECTED, 'No' );
+		$service->record_override( 'plan-b', 'item-1', Industry_Override_Schema::STATE_ACCEPTED, '' );
+		$all = $service->list_all_overrides();
+		$this->assertCount( 3, $all );
+		$plan_ids = array_unique( array_column( $all, 'plan_id' ) );
+		$this->assertContains( 'plan-a', $plan_ids );
+		$this->assertContains( 'plan-b', $plan_ids );
+		$item_ids = array_column( $all, 'item_id' );
+		$this->assertContains( 'item-1', $item_ids );
+		$this->assertContains( 'item-2', $item_ids );
+	}
+
+	public function test_remove_override_removes_and_returns_true(): void {
+		$service = new Industry_Build_Plan_Item_Override_Service();
+		$service->record_override( 'plan-1', 'item-x', Industry_Override_Schema::STATE_ACCEPTED, '' );
+		$this->assertNotNull( $service->get_override( 'plan-1', 'item-x' ) );
+		$ok = $service->remove_override( 'plan-1', 'item-x' );
+		$this->assertTrue( $ok );
+		$this->assertNull( $service->get_override( 'plan-1', 'item-x' ) );
+	}
+
+	public function test_remove_override_returns_true_when_entry_absent(): void {
+		$service = new Industry_Build_Plan_Item_Override_Service();
+		$this->assertTrue( $service->remove_override( 'plan-1', 'nonexistent' ) );
+	}
 }

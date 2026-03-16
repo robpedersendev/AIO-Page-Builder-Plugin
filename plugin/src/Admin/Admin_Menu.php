@@ -37,6 +37,7 @@ use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Bundle_Import_Preview_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Health_Report_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Override_Management_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Assistant;
@@ -127,6 +128,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_save_industry_section_override', array( $this, 'handle_save_industry_section_override' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_page_template_override', array( $this, 'handle_save_industry_page_template_override' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_build_plan_override', array( $this, 'handle_save_industry_build_plan_override' ), 10 );
+		\add_action( 'admin_post_aio_remove_industry_override', array( $this, 'handle_remove_industry_override' ), 10 );
 		\add_action( 'admin_post_aio_create_plan_from_bundle', array( $this, 'handle_create_plan_from_bundle' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_confirm_import', array( $this, 'handle_industry_bundle_confirm_import' ), 10 );
@@ -397,6 +399,16 @@ final class Admin_Menu {
 			$industry_profile->get_capability(),
 			Industry_Profile_Settings_Screen::SLUG,
 			array( $industry_profile, 'render' )
+		);
+
+		$industry_override_management = new Industry_Override_Management_Screen();
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_override_management->get_title(),
+			__( 'Industry Overrides', 'aio-page-builder' ),
+			$industry_override_management->get_capability(),
+			Industry_Override_Management_Screen::SLUG,
+			array( $industry_override_management, 'render' )
 		);
 
 		add_submenu_page(
@@ -683,6 +695,15 @@ final class Admin_Menu {
 	 */
 	public function handle_save_industry_build_plan_override(): void {
 		\AIOPageBuilder\Admin\Actions\Save_Industry_Build_Plan_Override_Action::handle();
+	}
+
+	/**
+	 * Handles admin-post request to remove a single industry override (Prompt 436).
+	 *
+	 * @return void
+	 */
+	public function handle_remove_industry_override(): void {
+		\AIOPageBuilder\Admin\Actions\Remove_Industry_Override_Action::handle();
 	}
 
 	/**
