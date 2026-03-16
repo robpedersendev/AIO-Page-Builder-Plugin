@@ -21,11 +21,11 @@ This contract defines lifecycle and operational boundaries for the Industry Pack
 ## 2. Multisite scoping
 
 - **Policy**: The plugin operates at **site level** on WordPress multisite (spec §54.9). No network-wide centralized management. Industry Pack behavior is **site-local**.
-- **Industry profile and pack refs**: Stored in site options (`Option_Names::INDUSTRY_PROFILE`, `Option_Names::APPLIED_INDUSTRY_PRESET`). WordPress options are per-site in multisite; no change required for site locality.
-- **Caches**: Any industry-related caches (e.g. recommendation result caches, diagnostics snapshot) must use keys that include the current blog id when `is_multisite()` so there is no cross-site cache bleed. Pattern: prefix or suffix with `get_current_blog_id()` for transients/options used by industry code.
-- **Pack/overlay definitions**: Loaded from code/registry; same definitions on every site. No per-site pack storage; only profile and applied preset are per-site.
+- **Industry profile and pack refs**: Stored in site options (`Option_Names::INDUSTRY_PROFILE`, `Option_Names::APPLIED_INDUSTRY_PRESET`, and other industry options). WordPress options are per-site in multisite; no change required for site locality.
+- **Caches**: Any industry-related caches (e.g. recommendation result caches, diagnostics snapshot) must use keys that include the current blog id when `is_multisite()` so there is no cross-site cache bleed. Use **`Industry_Site_Scope_Helper::scope_cache_key( $base_key )`** for any new transient or cache key; see [industry-multisite-verification.md](../qa/industry-multisite-verification.md).
+- **Pack/overlay definitions**: Loaded from code/registry; same definitions on every site. No per-site pack storage; only profile, preset, overrides, and disabled list are per-site.
 - **Export/restore**: Export and restore run in the context of the current site. Industry profile and applied preset in an export bundle belong to that site; restore applies to the current site only.
-- **Documentation**: Multisite behavior is documented here and in [industry-lifecycle-regression-guard.md](../qa/industry-lifecycle-regression-guard.md). No network activation or network-wide industry management.
+- **Documentation**: Multisite behavior is documented here, in [industry-multisite-verification.md](../qa/industry-multisite-verification.md), and in [industry-lifecycle-regression-guard.md](../qa/industry-lifecycle-regression-guard.md). No network activation or network-wide industry management.
 
 ---
 

@@ -39,3 +39,11 @@
 - [ ] **Starter bundles:** Bundle industry_key with no matching pack produces warning.
 - [ ] **No auto-fix:** Report is observational only; no automatic repair or mutation.
 - [ ] **Empty/healthy:** When no issues, screen shows success notice and no error/warning tables.
+
+---
+
+## 5. CLI / scripted inspection (Prompt 398)
+
+- [ ] **Inspection service:** `Industry_Inspection_Command_Service` provides read-only `get_profile_summary()`, `get_health_summary()`, `get_diagnostics_snapshot()`, `get_recommendation_preview( industry_key, top_templates, top_sections )`, `get_starter_bundles_for_industry( industry_key )`. No mutation.
+- [ ] **Usage:** Internal/support only; see [industry-cli-inspection-guide.md](../operations/industry-cli-inspection-guide.md) for intended use from WP-CLI or scripts.
+- [ ] **Bounded output:** Summaries and previews are capped (e.g. sample_errors/sample_warnings up to 5, top_template_keys limited). No secrets in output.
