@@ -57,3 +57,12 @@
 - [ ] **Inspection service:** `Industry_Inspection_Command_Service` provides read-only `get_profile_summary()`, `get_health_summary()`, `get_diagnostics_snapshot()`, `get_recommendation_preview( industry_key, top_templates, top_sections )`, `get_starter_bundles_for_industry( industry_key )`. No mutation.
 - [ ] **Usage:** Internal/support only; see [industry-cli-inspection-guide.md](../operations/industry-cli-inspection-guide.md) for intended use from WP-CLI or scripts.
 - [ ] **Bounded output:** Summaries and previews are capped (e.g. sample_errors/sample_warnings up to 5, top_template_keys limited). No secrets in output.
+
+---
+
+## 7. Documentation summary export (Prompt 458)
+
+- [ ] **Service:** `Industry_Documentation_Summary_Export_Service` (container key `industry_documentation_summary_export_service`) produces a single bounded report via `generate()`: profile_state, active_pack_refs, override_summary (counts), health (error/warning counts and capped samples), major_warnings.
+- [ ] **Contract:** [industry-documentation-summary-export-contract.md](../contracts/industry-documentation-summary-export-contract.md). Admin/support-only; no secrets or raw payloads.
+- [ ] **Use:** Support handoffs, internal migration review; optional inclusion in support bundle or CLI. Composes diagnostics snapshot, health check, and override audit; does not replace them.
+- [ ] **Bounded output:** Capped sample_errors/sample_warnings and major_warnings; override_summary is counts only. No sensitive data in report shape.

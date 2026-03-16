@@ -153,6 +153,9 @@ final class Build_Plan_Generator {
 		if ( ! empty( $context['source_starter_bundle_key'] ) && is_string( $context['source_starter_bundle_key'] ) ) {
 			$definition[ Build_Plan_Schema::KEY_SOURCE_STARTER_BUNDLE ] = trim( $context['source_starter_bundle_key'] );
 		}
+		if ( ! empty( $context['industry_subtype_key'] ) && is_string( $context['industry_subtype_key'] ) ) {
+			$definition[ Build_Plan_Schema::KEY_SOURCE_INDUSTRY_SUBTYPE ] = trim( $context['industry_subtype_key'] );
+		}
 
 		$post_id = $this->repository->save( array( 'plan_definition' => $definition ) );
 		if ( $post_id === 0 ) {

@@ -52,6 +52,9 @@ final class Build_Plan_Schema {
 	/** Optional: starter bundle key when plan was generated from bundle (Prompt 409). */
 	public const KEY_SOURCE_STARTER_BUNDLE = 'source_starter_bundle_key';
 
+	/** Optional: industry subtype key when plan was generated from a subtype-scoped starter bundle (Prompt 462). */
+	public const KEY_SOURCE_INDUSTRY_SUBTYPE = 'source_industry_subtype_key';
+
 	/** Status enum (spec §30.4, object-model §3.4). */
 	public const STATUS_PENDING_REVIEW = 'pending_review';
 	public const STATUS_APPROVED       = 'approved';

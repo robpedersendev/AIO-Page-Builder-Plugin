@@ -19,7 +19,7 @@ The following are **approved seams** for adding or extending industry behavior. 
 
 | Seam | Description | Contract / registry |
 |------|-------------|---------------------|
-| **Pack definitions** | New industry_key with pack object (name, summary, status, version_marker, CTA refs, supported_page_families, optional refs). | industry-pack-schema.md; Industry_Pack_Registry; industry-pack-authoring-guide.md |
+| **Pack definitions** | New industry_key with pack object (name, summary, status, version_marker, CTA refs, supported_page_families, optional refs). | industry-pack-schema.md; Industry_Pack_Registry; industry-pack-authoring-guide.md. For candidate fit: Industry_Candidate_Template_Overlap_Analyzer (future-industry-candidate-evaluation-framework). |
 | **CTA patterns** | New pattern_key definitions; pack preferred/required/discouraged_cta_patterns reference them. | industry-cta-pattern-contract.md; Industry_CTA_Pattern_Registry |
 | **Section helper overlays** | Overlay definitions keyed by industry_key + section_key; allowed regions only (tone_notes, cta_usage_notes, seo_notes, compliance_cautions, media_notes). | industry-section-helper-overlay-schema.md; Industry_Section_Helper_Overlay_Registry; industry-helper-overlay-expansion-plan.md |
 | **Page one-pager overlays** | Overlay definitions keyed by industry_key + page_template_key; allowed regions per page-onepager schema. | industry-page-onepager-overlay-schema.md; Industry_Page_OnePager_Overlay_Registry |

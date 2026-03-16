@@ -20,7 +20,7 @@
 | Dimension | Score (1–5) | Notes |
 |-----------|-------------|--------|
 | **Content-model fit** | | Maps to supported_page_families and section keys without stretching the model. |
-| **Template overlap** | | High = reuses most section/page templates; Low = many net-new or one-off overlays. |
+| **Template overlap** | | High = reuses most section/page templates; Low = many net-new or one-off overlays. Optional: run Industry_Candidate_Template_Overlap_Analyzer::analyze() for overlap_score and weak_coverage_families. |
 | **LPagery posture** | | High = fits existing LPagery rule patterns; Low = conflicting or one-off local-page rules. |
 | **CTA complexity** | | High = few CTA patterns suffice; Low = many custom patterns or complex branching. |
 | **Documentation burden** | | High = minimal new docs; Low = large authoring/overlay/support doc set. |

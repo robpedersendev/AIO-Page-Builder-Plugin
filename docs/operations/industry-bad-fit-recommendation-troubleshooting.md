@@ -4,6 +4,8 @@
 
 **Purpose:** Support and operator playbook for when users report that industry-driven recommendations are wrong, too generic, too strict, or mismatched to their business. Diagnosis-first; no auto-fix; no user-facing complaint workflow.
 
+**Training:** For shared terminology and subsystem concepts, see [industry-support-training-packet.md](industry-support-training-packet.md) and [industry-operator-curriculum.md](industry-operator-curriculum.md).
+
 ---
 
 ## 1. Scope and principles

@@ -19,7 +19,7 @@
 | Dimension | Description | What to assess |
 |-----------|-------------|----------------|
 | **Content-model fit** | Alignment with existing section/page template library and industry affinity model. | Does the industry map cleanly to supported_page_families and existing section keys? Or does it require many new section/page concepts that don't exist? |
-| **Template overlap** | Reuse of existing section and page templates vs net-new content. | High overlap = lower authoring and QA burden. Low overlap = more overlays, more edge cases, higher regression risk. |
+| **Template overlap** | Reuse of existing section and page templates vs net-new content. | High overlap = lower authoring and QA burden. Low overlap = more overlays, more edge cases, higher regression risk. Use **Industry_Candidate_Template_Overlap_Analyzer** (container key `industry_candidate_template_overlap_analyzer`) to score candidate page_families and section_keys against existing packs; see overlap_score, strongest_reusable_families, weak_coverage_families, and notes for CTA/LPagery/proof. |
 | **LPagery posture** | Fit with local-page (LPagery) rules and location-based guidance. | Does the industry have clear local-page needs (service areas, locations, NAP) already covered by LPagery rule patterns? Or does it introduce conflicting or one-off rules? |
 | **CTA complexity** | Fit with existing CTA pattern registry and pack preferred/required/discouraged. | Can CTA needs be expressed with existing or few new CTA patterns? Or does the industry require many custom patterns and complex branching? |
 | **Documentation burden** | Authoring, overlay, and support documentation load. | How much new content is needed for industry-pack-authoring-guide, overlay catalogs, troubleshooting, and operator guides? |
@@ -60,7 +60,7 @@
 1. **Backlog:** When considering a new industry, fill [future-industry-scorecard-template.md](future-industry-scorecard-template.md) and attach to the candidate.
 2. **Planning:** Use score and categories to order “New industries” in roadmap (industry-subsystem-roadmap-contract §5) and to set expectations (e.g. “T1 overlays only” for Review candidates).
 3. **Prompt generation:** Scorecard and framework provide concrete inputs for future prompts (required pieces, overlays, subtypes, compliance notes).
-4. **Authoring:** Once approved, follow industry-pack-authoring-guide and industry-pack-maintenance-checklist; framework does not replace them.
+4. **Authoring:** Once approved, follow industry-pack-authoring-guide and industry-pack-maintenance-checklist; framework does not replace them. For consistent file and placeholder skeletons, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md).
 
 ---
 

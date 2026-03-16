@@ -63,3 +63,4 @@
 - **Schema**: industry-starter-bundle-schema.md (optional subtype_key).
 - **Subtype extension**: industry-subtype-extension-contract.md (starter bundle ref, overlay scope).
 - **Registry**: Industry_Starter_Bundle_Registry (get_for_industry with optional subtype_key).
+- **Bundle-to-Build Plan**: **Industry_Subtype_Starter_Bundle_To_Build_Plan_Service** converts a subtype or industry starter bundle into a draft Build Plan; when the bundle has subtype_key, the plan stores source_industry_subtype_key for rationale. Fallback to parent industry bundle when the requested bundle key is invalid or inactive and industry_key is in context. Plans remain reviewable and approval-gated.

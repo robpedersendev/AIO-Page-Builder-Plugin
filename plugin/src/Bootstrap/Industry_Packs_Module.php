@@ -252,8 +252,26 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$toggle
 			);
 		} );
+		$container->register( 'industry_documentation_summary_export_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Documentation_Summary_Export_Service {
+			$diagnostics = $container->has( 'industry_diagnostics_service' ) ? $container->get( 'industry_diagnostics_service' ) : null;
+			$health = $container->has( 'industry_health_check_service' ) ? $container->get( 'industry_health_check_service' ) : null;
+			$override_audit = $container->has( 'industry_override_audit_report_service' ) ? $container->get( 'industry_override_audit_report_service' ) : null;
+			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Documentation_Summary_Export_Service(
+				$diagnostics instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service ? $diagnostics : null,
+				$health instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service ? $health : null,
+				$override_audit instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service ? $override_audit : null,
+				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null
+			);
+		} );
 		$container->register( 'industry_performance_benchmark_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Performance_Benchmark_Service {
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Performance_Benchmark_Service( $container );
+		} );
+		$container->register( 'industry_candidate_template_overlap_analyzer', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Candidate_Template_Overlap_Analyzer {
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Candidate_Template_Overlap_Analyzer(
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null
+			);
 		} );
 		$container->register( 'industry_section_preview_resolver', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Preview_Resolver {
 			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
@@ -339,6 +357,14 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				);
 			}
 			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service( $bundle_registry, $plan_generator );
+		} );
+		$container->register( 'industry_subtype_starter_bundle_to_build_plan_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Starter_Bundle_To_Build_Plan_Service {
+			$bundle_registry = $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
+			$base_service   = $container->get( 'industry_starter_bundle_to_build_plan_service' );
+			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Starter_Bundle_To_Build_Plan_Service(
+				$bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $bundle_registry : new \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry(),
+				$base_service instanceof \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service ? $base_service : new \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service( $bundle_registry, $container->get( 'build_plan_generator' ) )
+			);
 		} );
 		$container->register( 'industry_pack_migration_executor', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Profile\Industry_Pack_Migration_Executor {
 			$profile_repo  = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;

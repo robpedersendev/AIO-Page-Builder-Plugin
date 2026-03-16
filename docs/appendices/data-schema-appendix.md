@@ -128,6 +128,8 @@ Merged into definition when status => 'deprecated'. Built by Template_Deprecatio
 
 ## 11. Industry pack object schema
 
+For cross-contract terminology and lifecycle alignment, see [industry-contract-consistency-audit.md](../contracts/industry-contract-consistency-audit.md).
+
 Industry pack definitions (industry-pack-extension-contract, industry-pack-schema). Stored per persistence strategy (PHP definitions, option, or DB-backed registry). Key fields (Industry_Pack_Schema): industry_key, name, summary, supported_page_families, preferred_section_keys, discouraged_section_keys, default_cta_patterns, seo_guidance_ref, helper_overlay_refs, one_pager_overlay_refs, token_preset_ref, lpagery_rule_ref, ai_rule_ref, status, version_marker. Required: industry_key, name, summary, status, version_marker. Optional: all refs and key arrays. Validation via Industry_Pack_Schema::validate_pack(); version_marker must match supported schema version. See [industry-pack-schema.md](../schemas/industry-pack-schema.md) and Industry_Pack_Schema.
 
 ---

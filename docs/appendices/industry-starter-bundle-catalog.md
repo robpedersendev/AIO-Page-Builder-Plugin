@@ -69,7 +69,7 @@ Subtype-scoped bundles are loaded from **StarterBundles/Subtypes/*.php** and mer
 | disaster_recovery_residential | disaster_recovery_residential_starter | Residential Restoration Starter |
 | disaster_recovery_commercial | disaster_recovery_commercial_starter | Commercial Restoration Starter |
 
-**Source directory**: `plugin/src/Domain/Industry/Registry/StarterBundles/Subtypes/`. See subtype-starter-bundle-contract.md.
+**Source directory**: `plugin/src/Domain/Industry/Registry/StarterBundles/Subtypes/`. See subtype-starter-bundle-contract.md. **Bundle-to-Build Plan:** Subtype-scoped bundles can be converted to draft Build Plans via **Industry_Subtype_Starter_Bundle_To_Build_Plan_Service** (container key `industry_subtype_starter_bundle_to_build_plan_service`); the plan stores `source_starter_bundle_key` and `source_industry_subtype_key` when the bundle is subtype-scoped. Parent-only fallback applies when the requested bundle is missing or inactive and `industry_key` is provided in context.
 
 ---
 

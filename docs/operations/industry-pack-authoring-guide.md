@@ -2,7 +2,7 @@
 
 **Spec**: industry-pack-extension-contract.md; industry-pack-schema.md; industry-pack-release-gate.md; industry-subsystem-roadmap-contract.md; all industry subsystem contracts and schemas (Prompts 318–378).
 
-**Purpose**: Internal workflow for adding new industry packs so expansion stays disciplined, registry-first, and consistent with subsystem contracts. Use with [industry-pack-author-checklist.md](industry-pack-author-checklist.md). Long-term extension boundaries and roadmap: [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md). **Before** adding a new industry, evaluate the candidate with [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md) and [future-industry-scorecard-template.md](future-industry-scorecard-template.md).
+**Purpose**: Internal workflow for adding new industry packs so expansion stays disciplined, registry-first, and consistent with subsystem contracts. Use with [industry-pack-author-checklist.md](industry-pack-author-checklist.md). Long-term extension boundaries and roadmap: [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md). **Before** adding a new industry, evaluate the candidate with [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md) and [future-industry-scorecard-template.md](future-industry-scorecard-template.md). To start from consistent file structures and schema-valid placeholders instead of ad hoc copying, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md) (scaffold scope, paths, placeholder markers, promotion path).
 
 ---
 
