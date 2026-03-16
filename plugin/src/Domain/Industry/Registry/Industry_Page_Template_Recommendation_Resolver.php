@@ -44,7 +44,7 @@ final class Industry_Page_Template_Recommendation_Resolver {
 	 * @param array<string, mixed>       $industry_profile Must contain primary_industry_key (string); optional secondary_industry_keys (array).
 	 * @param array<string, mixed>|null $primary_pack    Industry pack (supported_page_families) or null.
 	 * @param array<int, array<string, mixed>> $page_templates List of page template definitions (internal_key; optional industry_*, template_family).
-	 * @param array<string, mixed>      $options         Reserved for future.
+	 * @param array<string, mixed>      $options         Optional: subtype_definition (array|null), subtype_extender (Industry_Subtype_Page_Template_Recommendation_Extender|null). When both set, subtype influence is applied after base resolution.
 	 * @return Industry_Page_Template_Recommendation_Result
 	 */
 	public function resolve( array $industry_profile, ?array $primary_pack, array $page_templates, array $options = array() ): Industry_Page_Template_Recommendation_Result {
@@ -176,7 +176,13 @@ final class Industry_Page_Template_Recommendation_Resolver {
 			return strcmp( $a['page_template_key'] ?? '', $b['page_template_key'] ?? '' );
 		} );
 
-		return new Industry_Page_Template_Recommendation_Result( $items );
+		$result = new Industry_Page_Template_Recommendation_Result( $items );
+		$subtype_def = $options['subtype_definition'] ?? null;
+		$extender = $options['subtype_extender'] ?? null;
+		if ( is_array( $subtype_def ) && $extender instanceof Industry_Subtype_Page_Template_Recommendation_Extender ) {
+			return $extender->apply_subtype_influence( $result, $subtype_def, $page_templates );
+		}
+		return $result;
 	}
 
 	/**

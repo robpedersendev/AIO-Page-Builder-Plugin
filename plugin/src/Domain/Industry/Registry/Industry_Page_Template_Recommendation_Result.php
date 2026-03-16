@@ -17,11 +17,11 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Industry_Page_Template_Recommendation_Result {
 
-	/** @var array<int, array{page_template_key: string, score: int, fit_classification: string, explanation_reasons: array, industry_source_refs: array, hierarchy_fit: string, lpagery_fit: string, warning_flags: array}> */
+	/** @var array<int, array{page_template_key: string, score: int, fit_classification: string, explanation_reasons: array, industry_source_refs: array, hierarchy_fit: string, lpagery_fit: string, warning_flags: array, subtype_influence_applied?: bool, subtype_reason_summary?: string}> */
 	private array $items;
 
 	/**
-	 * @param array<int, array{page_template_key: string, score: int, fit_classification: string, explanation_reasons: array, industry_source_refs: array, hierarchy_fit: string, lpagery_fit: string, warning_flags: array}> $items
+	 * @param array<int, array{page_template_key: string, score: int, fit_classification: string, explanation_reasons: array, industry_source_refs: array, hierarchy_fit: string, lpagery_fit: string, warning_flags: array, subtype_influence_applied?: bool, subtype_reason_summary?: string}> $items
 	 */
 	public function __construct( array $items = array() ) {
 		$this->items = $items;
@@ -30,7 +30,7 @@ final class Industry_Page_Template_Recommendation_Result {
 	/**
 	 * Returns all recommendation items (order preserved: ranked by score desc, then by page_template_key).
 	 *
-	 * @return array<int, array{page_template_key: string, score: int, fit_classification: string, explanation_reasons: array, industry_source_refs: array, hierarchy_fit: string, lpagery_fit: string, warning_flags: array}>
+	 * @return array<int, array{page_template_key: string, score: int, fit_classification: string, explanation_reasons: array, industry_source_refs: array, hierarchy_fit: string, lpagery_fit: string, warning_flags: array, subtype_influence_applied?: bool, subtype_reason_summary?: string}>
 	 */
 	public function get_items(): array {
 		return $this->items;

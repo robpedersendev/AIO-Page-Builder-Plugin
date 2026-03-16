@@ -144,6 +144,12 @@ Industry-specific section-helper overlays (industry-section-helper-overlay-schem
 
 ---
 
+## 11.2.1 Subtype section-helper overlay (Prompt 424)
+
+Subtype-specific section-helper overlays (subtype-section-helper-overlay-schema.md). Keyed by (subtype_key, section_key). Key fields: subtype_key, section_key, scope (subtype_section_helper_overlay), status, version_marker, tone_notes, cta_usage_notes, compliance_cautions, media_notes, seo_notes, additive_blocks. Loaded via Subtype_Section_Helper_Overlay_Registry (load, get, get_for_subtype). Composition order: base → industry overlay → subtype overlay. See [subtype-section-helper-overlay-schema.md](../schemas/subtype-section-helper-overlay-schema.md).
+
+---
+
 ## 11.3 Industry page one-pager overlay
 
 Industry-specific page one-pager overlays (industry-page-onepager-overlay-schema.md). Keyed by (industry_key, page_template_key). Key fields: industry_key, page_template_key, scope (page_onepager_overlay), status, version_marker, hierarchy_hints, cta_strategy, lpagery_seo_notes, compliance_cautions, additive_blocks. Loaded via Industry_Page_OnePager_Overlay_Registry. Base one-pagers unchanged. See [industry-page-onepager-overlay-schema.md](../schemas/industry-page-onepager-overlay-schema.md).

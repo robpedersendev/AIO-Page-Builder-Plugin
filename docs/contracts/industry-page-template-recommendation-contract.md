@@ -34,10 +34,19 @@
 | **hierarchy_fit** | string | Per-industry hierarchy fit note when present (e.g. top-level, hub, child-detail). |
 | **lpagery_fit** | string | Per-industry LPagery fit note when present. |
 | **warning_flags** | array | Optional warnings. |
+| **subtype_influence_applied** | bool | (Optional, when subtype context used.) True if subtype overlay adjusted this template’s score or fit. |
+| **subtype_reason_summary** | string | (Optional.) Short reason when subtype influence applied (e.g. subtype_page_family_emphasis, subtype_one_pager_priority). |
 
 ---
 
-## 4. Resolver behavior
+## 4. Subtype-aware extension (Prompt 423)
+
+- When a resolved subtype is available, callers may pass **options['subtype_definition']** (array) and **options['subtype_extender']** (Industry_Subtype_Page_Template_Recommendation_Extender). The resolver then runs base resolution and applies subtype influence (e.g. score boost for templates in subtype page_family_emphasis or one_pager_overlay_refs).
+- **Industry_Subtype_Page_Template_Recommendation_Extender**: apply_subtype_influence( Industry_Page_Template_Recommendation_Result $base_result, ?array $subtype_definition, array $page_templates ): Industry_Page_Template_Recommendation_Result. Additive only; when subtype is null, returns result with subtype fields set to false/empty. Parent-industry logic remains the base layer; invalid subtype refs fall back to parent-only behavior at resolution (before the resolver is called).
+
+---
+
+## 5. Resolver behavior
 
 - **Recommended**: Template industry_affinity or industry_required contains primary; and/or template_family in pack supported_page_families; high score.
 - **Discouraged**: Template industry_discouraged contains primary; low/negative score.
@@ -48,14 +57,14 @@
 
 ---
 
-## 5. API
+## 6. API
 
-- **Industry_Page_Template_Recommendation_Resolver**: resolve( array $industry_profile, array|null $primary_pack, array $page_templates, array $options = [] ): Industry_Page_Template_Recommendation_Result.
+- **Industry_Page_Template_Recommendation_Resolver**: resolve( array $industry_profile, array|null $primary_pack, array $page_templates, array $options = [] ): Industry_Page_Template_Recommendation_Result. Options may include subtype_definition and subtype_extender for subtype-aware scoring.
 - **Industry_Page_Template_Recommendation_Result**: get_items(), get_ranked_keys(), to_array().
 
 ---
 
-## 6. Implementation reference
+## 7. Implementation reference
 
 - **Page_Template_Schema**: FIELD_INTERNAL_KEY, FIELD_INDUSTRY_AFFINITY, FIELD_INDUSTRY_REQUIRED, FIELD_INDUSTRY_DISCOURAGED, FIELD_INDUSTRY_HIERARCHY_FIT, FIELD_INDUSTRY_LPAGERY_FIT, template_family.
 - **Industry_Pack_Schema**: FIELD_SUPPORTED_PAGE_FAMILIES.

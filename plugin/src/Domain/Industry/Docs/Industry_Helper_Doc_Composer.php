@@ -1,7 +1,7 @@
 <?php
 /**
- * Composes final helper-doc output by combining base section helper with active industry section-helper overlay (industry-section-helper-overlay-schema).
- * Deterministic; fallback to base-only when overlay absent or invalid.
+ * Composes final helper-doc output by combining base section helper with active industry overlay and optional subtype overlay (industry-section-helper-overlay-schema; subtype-section-helper-overlay-schema).
+ * Composition order: base → industry overlay → subtype overlay. Deterministic; fallback when overlay absent or invalid.
  *
  * @package AIOPageBuilder
  */
@@ -16,7 +16,7 @@ use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
 
 /**
- * Resolves section_key + industry context into composed helper doc. Read-only; no mutation of base or overlay storage.
+ * Resolves section_key + industry (and optional subtype) into composed helper doc. Read-only; no mutation of base or overlay storage.
  */
 final class Industry_Helper_Doc_Composer {
 
@@ -39,22 +39,28 @@ final class Industry_Helper_Doc_Composer {
 	/** @var Industry_Compliance_Warning_Resolver|null Optional; when set, composed result includes compliance warnings (Prompt 407). */
 	private ?Industry_Compliance_Warning_Resolver $compliance_warning_resolver;
 
-	public function __construct( Documentation_Registry $documentation_registry, Industry_Section_Helper_Overlay_Registry $overlay_registry, ?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null ) {
-		$this->documentation_registry      = $documentation_registry;
-		$this->overlay_registry            = $overlay_registry;
+	/** @var Subtype_Section_Helper_Overlay_Registry|null Optional; when set, compose() can apply subtype overlay (Prompt 425). */
+	private ?Subtype_Section_Helper_Overlay_Registry $subtype_overlay_registry;
+
+	public function __construct( Documentation_Registry $documentation_registry, Industry_Section_Helper_Overlay_Registry $overlay_registry, ?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null, ?Subtype_Section_Helper_Overlay_Registry $subtype_overlay_registry = null ) {
+		$this->documentation_registry   = $documentation_registry;
+		$this->overlay_registry          = $overlay_registry;
 		$this->compliance_warning_resolver = $compliance_warning_resolver;
+		$this->subtype_overlay_registry  = $subtype_overlay_registry;
 	}
 
 	/**
-	 * Composes helper doc for the given section and industry. Returns base-only when overlay missing or inactive; overlay applied only when active.
+	 * Composes helper doc for the given section, industry, and optional subtype. Order: base → industry overlay → subtype overlay. Returns base-only when overlays missing or inactive.
 	 *
-	 * @param string $section_key  Section template internal_key.
-	 * @param string $industry_key Industry pack key (primary industry). Empty = base-only, no overlay.
+	 * @param string $section_key   Section template internal_key.
+	 * @param string $industry_key  Industry pack key (primary industry). Empty = base-only, no overlay.
+	 * @param string $subtype_key   Optional subtype key (e.g. from Industry_Subtype_Resolver). When empty or subtype registry not set, no subtype overlay is applied.
 	 * @return Composed_Helper_Doc_Result
 	 */
-	public function compose( string $section_key, string $industry_key ): Composed_Helper_Doc_Result {
+	public function compose( string $section_key, string $industry_key, string $subtype_key = '' ): Composed_Helper_Doc_Result {
 		$section_key  = trim( $section_key );
 		$industry_key = trim( $industry_key );
+		$subtype_key  = trim( $subtype_key );
 		$base_doc     = $section_key !== '' ? $this->documentation_registry->get_by_section_key( $section_key ) : null;
 		$base_id      = '';
 		$composed     = array();
@@ -62,7 +68,7 @@ final class Industry_Helper_Doc_Composer {
 			$composed = $base_doc;
 			$base_id  = (string) ( $base_doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
 		}
-		$overlay_applied = false;
+		$overlay_applied  = false;
 		$overlay_industry = '';
 		if ( $industry_key !== '' && $section_key !== '' ) {
 			$overlay = $this->overlay_registry->get( $industry_key, $section_key );
@@ -76,8 +82,24 @@ final class Industry_Helper_Doc_Composer {
 							$composed[ $field ] = $overlay[ $field ];
 						}
 					}
-					$overlay_applied = true;
+					$overlay_applied  = true;
 					$overlay_industry = $industry_key;
+				}
+			}
+		}
+		if ( $subtype_key !== '' && $section_key !== '' && $this->subtype_overlay_registry !== null ) {
+			$subtype_overlay = $this->subtype_overlay_registry->get( $subtype_key, $section_key );
+			if ( $subtype_overlay !== null && is_array( $subtype_overlay ) ) {
+				$status = isset( $subtype_overlay[ Subtype_Section_Helper_Overlay_Registry::FIELD_STATUS ] ) && is_string( $subtype_overlay[ Subtype_Section_Helper_Overlay_Registry::FIELD_STATUS ] )
+					? $subtype_overlay[ Subtype_Section_Helper_Overlay_Registry::FIELD_STATUS ]
+					: '';
+				if ( $status === Subtype_Section_Helper_Overlay_Registry::STATUS_ACTIVE ) {
+					foreach ( self::OVERLAY_MERGE_FIELDS as $field ) {
+						if ( array_key_exists( $field, $subtype_overlay ) ) {
+							$composed[ $field ] = $subtype_overlay[ $field ];
+						}
+					}
+					$overlay_applied = true;
 				}
 			}
 		}
