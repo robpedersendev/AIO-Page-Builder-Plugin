@@ -49,6 +49,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: industry starter bundle registry (Prompt 386; industry-starter-bundle-schema.md). */
 	public const CONTAINER_KEY_STARTER_BUNDLE_REGISTRY = 'industry_starter_bundle_registry';
 
+	/** Container key: industry pack toggle controller (Prompt 389; industry-pack-activation-contract.md). */
+	public const CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER = 'industry_pack_toggle_controller';
+
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
 		$container->register( self::CONTAINER_KEY_INDUSTRY_LOADED, function (): bool {
@@ -99,8 +102,12 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		} );
 		$container->register( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry();
-			$registry->load( array() );
+			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry::get_builtin_definitions() );
 			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER, function () use ( $container ): \AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller {
+			$settings = $container->has( 'settings' ) ? $container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+			return new \AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller( $settings );
 		} );
 		$container->register( 'industry_question_pack_registry', function (): \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry();

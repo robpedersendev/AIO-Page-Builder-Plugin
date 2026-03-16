@@ -31,6 +31,7 @@ final class Settings_Service {
 		Option_Names::INDUSTRY_PROFILE              => array(),
 		Option_Names::ONBOARDING_DRAFT              => array(),
 		Option_Names::PROMPT_EXPERIMENTS            => array( 'definitions' => array() ),
+		Option_Names::DISABLED_INDUSTRY_PACKS       => array(),
 	);
 
 	/**

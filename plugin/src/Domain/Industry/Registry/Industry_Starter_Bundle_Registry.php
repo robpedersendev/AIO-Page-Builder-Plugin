@@ -46,6 +46,15 @@ final class Industry_Starter_Bundle_Registry {
 	private array $all = array();
 
 	/**
+	 * Returns built-in starter bundle definitions (Prompt 387). Used by bootstrap to load seed bundles.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_builtin_definitions(): array {
+		return \AIOPageBuilder\Domain\Industry\Registry\StarterBundles\Builtin_Starter_Bundles::get_definitions();
+	}
+
+	/**
 	 * Loads bundle definitions. Validates each; skips invalid and duplicate keys (first wins). Safe: no throw.
 	 *
 	 * @param array<int, array<string, mixed>> $definitions List of bundle definitions.

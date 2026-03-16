@@ -1,6 +1,6 @@
 <?php
 /**
- * Stable global option keys. Single namespaced root; do not rename (spec §9.4, §62.3).
+ * Stable global option keys. Single namespaced root; do not rename (spec ?9.4, ?62.3).
  *
  * @package AIOPageBuilder
  */
@@ -27,16 +27,16 @@ final class Option_Names {
 	/** Reporting settings placeholder; no secrets (exportable). */
 	public const REPORTING_SETTINGS = self::PREFIX . 'reporting';
 
-	/** Install notification sent state (dedupe); internal, spec §46.2. */
+	/** Install notification sent state (dedupe); internal, spec ?46.2. */
 	public const INSTALL_NOTICE_STATE = self::PREFIX . 'install_notice_state';
 
-	/** Reporting log (attempts and delivery status); internal, spec §46.12. */
+	/** Reporting log (attempts and delivery status); internal, spec ?46.12. */
 	public const REPORTING_LOG = self::PREFIX . 'reporting_log';
 
-	/** Heartbeat state (last_successful_month, retry state); internal, spec §46.4. */
+	/** Heartbeat state (last_successful_month, retry state); internal, spec ?46.4. */
 	public const HEARTBEAT_STATE = self::PREFIX . 'heartbeat_state';
 
-	/** Error report state (sent dedupe keys, retry state); internal, spec §46.6, §46.12. */
+	/** Error report state (sent dedupe keys, retry state); internal, spec ?46.6, ?46.12. */
 	public const ERROR_REPORT_STATE = self::PREFIX . 'error_report_state';
 
 	/** Dependency notice dismissals (internal, runtime). */
@@ -48,7 +48,7 @@ final class Option_Names {
 	/** Provider config reference only; secrets live in separate storage (not in exportable blob). */
 	public const PROVIDER_CONFIG_REF = self::PREFIX . 'provider_config';
 
-	/** Provider health: connection_test_result and last_successful_use per provider (no secrets; spec §49.9). */
+	/** Provider health: connection_test_result and last_successful_use per provider (no secrets; spec ?49.9). */
 	public const PROVIDER_HEALTH_STATE = self::PREFIX . 'provider_health_state';
 
 	/** Current editable brand and business profile (single option; shape per profile-schema.md). */
@@ -57,13 +57,13 @@ final class Option_Names {
 	/** Site-level industry profile (primary/secondary industry, subtype, service/geo model; shape per industry-profile-schema.md). */
 	public const INDUSTRY_PROFILE = self::PREFIX . 'industry_profile';
 
-	/** Onboarding draft state (secret-free; shape per onboarding-state-machine.md §7). */
+	/** Onboarding draft state (secret-free; shape per onboarding-state-machine.md ?7). */
 	public const ONBOARDING_DRAFT = self::PREFIX . 'onboarding_draft';
 
 	/** Prompt experiment definitions (Prompt 121; no secrets). */
 	public const PROMPT_EXPERIMENTS = self::PREFIX . 'prompt_experiments';
 
-	/** Global styling settings (tokens, component overrides); plugin-owned, removed on uninstall (spec §17.10, styling contract §8). */
+	/** Global styling settings (tokens, component overrides); plugin-owned, removed on uninstall (spec ?17.10, styling contract ?8). */
 	public const GLOBAL_STYLE_SETTINGS = 'aio_global_style_settings';
 
 	/** Per-entity style payloads (section/page template overrides); plugin-owned, removed on uninstall. */
@@ -75,7 +75,7 @@ final class Option_Names {
 	/** Applied industry style preset (preset_key, label?, applied_at); for revert/display (industry-style-preset-application-contract). */
 	public const APPLIED_INDUSTRY_PRESET = self::PREFIX . 'applied_industry_preset';
 
-	/** Industry section overrides (section_key => override record per industry-override-contract; Prompts 367–369). */
+	/** Industry section overrides (section_key => override record per industry-override-contract; Prompts 367���369). */
 	public const INDUSTRY_SECTION_OVERRIDES = self::PREFIX . 'industry_section_overrides';
 
 	/** Industry page template overrides (template_key => override record). */
@@ -83,6 +83,9 @@ final class Option_Names {
 
 	/** Industry Build Plan item overrides (plan_id => item_id => override record). */
 	public const INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES = self::PREFIX . 'industry_build_plan_item_overrides';
+
+	/** Disabled industry pack keys (list of industry_key; admin toggle; industry-pack-activation-contract). */
+	public const DISABLED_INDUSTRY_PACKS = self::PREFIX . 'disabled_industry_packs';
 
 	/** @var array<string>|null */
 	private static ?array $all = null;
@@ -119,6 +122,7 @@ final class Option_Names {
 			self::INDUSTRY_SECTION_OVERRIDES,
 			self::INDUSTRY_PAGE_TEMPLATE_OVERRIDES,
 			self::INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES,
+			self::DISABLED_INDUSTRY_PACKS,
 		);
 		return self::$all;
 	}

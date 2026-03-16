@@ -41,6 +41,9 @@ final class Industry_Profile_Schema {
 	/** Optional question-pack answers keyed by industry_key then field_key (industry-question-pack-contract). */
 	public const FIELD_QUESTION_PACK_ANSWERS = 'question_pack_answers';
 
+	/** Optional selected starter bundle key (industry-starter-bundle-schema; Prompt 388). Advisory; used by recommendation/planning consumers. */
+	public const FIELD_SELECTED_STARTER_BUNDLE_KEY = 'selected_starter_bundle_key';
+
 	/** Supported schema version. */
 	public const SUPPORTED_SCHEMA_VERSION = '1';
 
@@ -59,6 +62,7 @@ final class Industry_Profile_Schema {
 			self::FIELD_GEO_MODEL             => '',
 			self::FIELD_DERIVED_FLAGS         => array(),
 			self::FIELD_QUESTION_PACK_ANSWERS => array(),
+			self::FIELD_SELECTED_STARTER_BUNDLE_KEY => '',
 		);
 	}
 
@@ -110,6 +114,12 @@ final class Industry_Profile_Schema {
 			? $raw[ self::FIELD_QUESTION_PACK_ANSWERS ]
 			: array();
 		$qp_answers = self::normalize_question_pack_answers( $qp_answers );
+		$selected_bundle = isset( $raw[ self::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $raw[ self::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+			? trim( $raw[ self::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+			: '';
+		if ( $selected_bundle !== '' && strlen( $selected_bundle ) > 64 ) {
+			$selected_bundle = '';
+		}
 		return array(
 			self::FIELD_SCHEMA_VERSION         => $version !== '' ? $version : self::SUPPORTED_SCHEMA_VERSION,
 			self::FIELD_PRIMARY_INDUSTRY_KEY   => $primary,
@@ -119,6 +129,7 @@ final class Industry_Profile_Schema {
 			self::FIELD_GEO_MODEL              => $geo_model,
 			self::FIELD_DERIVED_FLAGS          => $derived,
 			self::FIELD_QUESTION_PACK_ANSWERS  => $qp_answers,
+			self::FIELD_SELECTED_STARTER_BUNDLE_KEY => $selected_bundle,
 		);
 	}
 

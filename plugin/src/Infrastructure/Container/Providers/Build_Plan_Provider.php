@@ -70,12 +70,22 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 			$pack_registry = $container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY )
 				? $container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY )
 				: null;
+			$is_pack_active = null;
+			if ( $container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ) {
+				$toggle = $container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER );
+				$is_pack_active = $toggle !== null && method_exists( $toggle, 'is_pack_active' )
+					? static function ( string $key ) use ( $toggle ): bool {
+						return $toggle->is_pack_active( $key );
+					}
+					: null;
+			}
 			return new Industry_Build_Plan_Scoring_Service(
 				new Industry_Page_Template_Recommendation_Resolver(),
 				$container->get( 'page_template_repository' ),
 				$profile_store,
 				$pack_registry instanceof Industry_Pack_Registry ? $pack_registry : null,
-				new Industry_Weighted_Recommendation_Engine()
+				new Industry_Weighted_Recommendation_Engine(),
+				$is_pack_active
 			);
 		} );
 		$container->register( 'industry_approval_snapshot_builder', function () use ( $container ): ?Industry_Approval_Snapshot_Builder {

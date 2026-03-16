@@ -138,4 +138,18 @@ final class Industry_Profile_Repository_Test extends TestCase {
 		$this->assertSame( array( 'market_focus' => 'residential', 'service_areas' => 'Boston', 'listing_types' => 'both' ), $profile[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]['realtor'] ?? null );
 		$this->assertSame( array( 'service_scope' => 'residential' ), $profile[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]['plumber'] ?? null );
 	}
+
+	/** Prompt 388: selected_starter_bundle_key persists via merge_profile; safe for recommendation consumers. */
+	public function test_merge_profile_selected_starter_bundle_key_persists(): void {
+		$this->repository->merge_profile( array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor',
+			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => 'realtor_starter',
+		) );
+		$profile = $this->repository->get_profile();
+		$this->assertSame( 'realtor_starter', $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] );
+
+		$this->repository->merge_profile( array( Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => '' ) );
+		$profile = $this->repository->get_profile();
+		$this->assertSame( '', $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] );
+	}
 }

@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Starter_Bundle_Registry.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/StarterBundles/Builtin_Starter_Bundles.php';
 
 final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 
@@ -118,5 +119,31 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 		$this->assertSame( array( 'pt_home', 'pt_services' ), $loaded[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ] );
 		$this->assertSame( array( 'hero_01', 'cta_01' ), $loaded[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ] );
 		$this->assertSame( 'plumber_trust', $loaded[ Industry_Starter_Bundle_Registry::FIELD_TOKEN_PRESET_REF ] );
+	}
+
+	/** Prompt 387: builtin starter bundles load and validate; one per industry. */
+	public function test_builtin_definitions_load_and_validate(): void {
+		$definitions = Industry_Starter_Bundle_Registry::get_builtin_definitions();
+		$this->assertCount( 4, $definitions, 'Exactly four builtin starter bundles (cosmetology_nail, realtor, plumber, disaster_recovery).' );
+
+		$registry = new Industry_Starter_Bundle_Registry();
+		$registry->load( $definitions );
+
+		$expected_bundles = array( 'cosmetology_nail_starter', 'realtor_starter', 'plumber_starter', 'disaster_recovery_starter' );
+		$expected_industries = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+
+		foreach ( $expected_bundles as $key ) {
+			$bundle = $registry->get( $key );
+			$this->assertNotNull( $bundle, "Builtin bundle {$key} must load." );
+			$this->assertSame( Industry_Starter_Bundle_Registry::STATUS_ACTIVE, $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] );
+			$this->assertSame( '1', $bundle[ Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER ] );
+			$this->assertNotEmpty( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] );
+			$this->assertNotEmpty( $bundle[ Industry_Starter_Bundle_Registry::FIELD_SUMMARY ] );
+		}
+
+		foreach ( $expected_industries as $industry_key ) {
+			$for_industry = $registry->get_for_industry( $industry_key );
+			$this->assertCount( 1, $for_industry, "Exactly one bundle for industry {$industry_key}." );
+		}
 	}
 }

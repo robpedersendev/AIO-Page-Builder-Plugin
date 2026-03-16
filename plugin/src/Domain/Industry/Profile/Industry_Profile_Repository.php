@@ -107,6 +107,14 @@ final class Industry_Profile_Repository {
 			}
 			$current[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] = $existing;
 		}
+		if ( array_key_exists( Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY, $partial ) ) {
+			$current[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] = is_string( $partial[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+				? trim( $partial[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+				: '';
+			if ( strlen( $current[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) > 64 ) {
+				$current[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] = '';
+			}
+		}
 		$this->set_profile( $current );
 	}
 

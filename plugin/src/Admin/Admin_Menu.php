@@ -36,6 +36,8 @@ use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
 use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Assistant;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Style_Preset_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Component_Override_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen;
@@ -115,6 +117,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_seed_child_detail_profile_entity_templates', array( $this, 'handle_seed_child_detail_profile_entity_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_child_detail_variant_expansion_templates', array( $this, 'handle_seed_child_detail_variant_expansion_templates' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_profile', array( $this, 'handle_save_industry_profile' ), 10 );
+		\add_action( 'admin_post_aio_toggle_industry_pack', array( $this, 'handle_toggle_industry_pack' ), 10 );
 		\add_action( 'admin_post_aio_apply_industry_style_preset', array( $this, 'handle_apply_industry_style_preset' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_section_override', array( $this, 'handle_save_industry_section_override' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_page_template_override', array( $this, 'handle_save_industry_page_template_override' ), 10 );
@@ -473,9 +476,26 @@ final class Admin_Menu {
 			}
 			$secondary = array_values( array_unique( $secondary ) );
 		}
+		$selected_bundle_raw = isset( $_POST[ Industry_Starter_Bundle_Assistant::FIELD_NAME ] ) && \is_string( $_POST[ Industry_Starter_Bundle_Assistant::FIELD_NAME ] )
+			? \trim( \sanitize_text_field( \wp_unslash( $_POST[ Industry_Starter_Bundle_Assistant::FIELD_NAME ] ) ) )
+			: '';
+		$selected_bundle = '';
+		if ( $selected_bundle_raw !== '' && \strlen( $selected_bundle_raw ) <= 64 ) {
+			$bundle_registry = $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY )
+				? $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY )
+				: null;
+			if ( $bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ) {
+				$bundle_def = $bundle_registry->get( $selected_bundle_raw );
+				if ( $bundle_def !== null && isset( $bundle_def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] ) && (string) $bundle_def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] === $primary ) {
+					$selected_bundle = $selected_bundle_raw;
+				}
+			}
+		}
+
 		$partial = array(
 			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY   => $primary,
 			Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => $secondary,
+			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => $selected_bundle,
 		);
 		$current = $repo->get_profile();
 		$merged = array_merge( $current, $partial );
@@ -495,6 +515,44 @@ final class Admin_Menu {
 		}
 		$repo->merge_profile( $partial );
 		\wp_safe_redirect( $redirect_url . '&aio_industry_result=saved' );
+		exit;
+	}
+
+	/**
+	 * Handles admin-post toggle of industry pack (industry-pack-activation-contract). Nonce and capability required.
+	 *
+	 * @return void
+	 */
+	public function handle_toggle_industry_pack(): void {
+		$redirect_url = \admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG );
+		if ( ! isset( $_POST['aio_toggle_industry_pack_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_toggle_industry_pack_nonce'] ) ), 'aio_toggle_industry_pack' ) ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
+			exit;
+		}
+		$industry_key = isset( $_POST['aio_industry_pack_key'] ) && \is_string( $_POST['aio_industry_pack_key'] )
+			? \trim( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_pack_key'] ) ) )
+			: '';
+		$disable = isset( $_POST['aio_industry_pack_disable'] ) && (string) $_POST['aio_industry_pack_disable'] === '1';
+		if ( $industry_key === '' ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
+			exit;
+		}
+		if ( ! $this->container instanceof Service_Container || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
+			exit;
+		}
+		$controller = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER );
+		if ( ! $controller instanceof Industry_Pack_Toggle_Controller ) {
+			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
+			exit;
+		}
+		$controller->set_pack_disabled( $industry_key, $disable );
+		\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggled' );
 		exit;
 	}
 

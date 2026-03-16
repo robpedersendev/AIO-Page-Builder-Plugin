@@ -82,19 +82,49 @@ final class Industry_Profile_Settings_Screen {
 				}
 			}
 			$form_builder = new Industry_Profile_Form_Builder( $pack_registry );
+			$bundle_registry = $this->get_starter_bundle_registry();
+			$starter_bundle_assistant = new Industry_Starter_Bundle_Assistant( $repo, $bundle_registry );
+			$starter_bundle_state = $starter_bundle_assistant->build_state( $profile );
+			$toggle_controller = $this->get_pack_toggle_controller();
+			$primary_pack_is_disabled = $primary !== '' && $toggle_controller !== null && ! $toggle_controller->is_pack_active( $primary );
 		} else {
 			$form_builder = new Industry_Profile_Form_Builder( null );
+			$starter_bundle_assistant = null;
+			$starter_bundle_state = array( 'has_primary' => false, 'primary_industry_key' => '', 'bundles' => array(), 'selected_key' => '', 'field_name' => Industry_Starter_Bundle_Assistant::FIELD_NAME );
+			$toggle_controller = null;
+			$primary_pack_is_disabled = false;
 		}
 
 		return array(
-			'profile'       => $profile,
-			'readiness'     => $readiness,
-			'active_pack'   => $active_pack,
-			'warnings'      => $warnings,
-			'form_builder'  => $form_builder,
-			'form_action'   => \admin_url( 'admin-post.php' ),
-			'save_action'   => 'aio_save_industry_profile',
+			'profile'                 => $profile,
+			'readiness'               => $readiness,
+			'active_pack'             => $active_pack,
+			'warnings'                => $warnings,
+			'form_builder'            => $form_builder,
+			'form_action'             => \admin_url( 'admin-post.php' ),
+			'save_action'             => 'aio_save_industry_profile',
+			'starter_bundle_state'    => $starter_bundle_state,
+			'starter_bundle_assistant' => isset( $starter_bundle_assistant ) ? $starter_bundle_assistant : null,
+			'toggle_controller'      => $toggle_controller,
+			'primary_pack_is_disabled' => $primary_pack_is_disabled,
+			'primary_industry_key'   => isset( $primary ) ? $primary : '',
 		);
+	}
+
+	private function get_pack_toggle_controller(): ?\AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller {
+		if ( $this->container === null || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ) {
+			return null;
+		}
+		$c = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER );
+		return $c instanceof \AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller ? $c : null;
+	}
+
+	private function get_starter_bundle_registry(): ?\AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry {
+		if ( $this->container === null || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ) {
+			return null;
+		}
+		$r = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
+		return $r instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $r : null;
 	}
 
 	private function get_profile_repository(): ?Industry_Profile_Repository {
@@ -147,6 +177,10 @@ final class Industry_Profile_Settings_Screen {
 				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Industry profile saved.', 'aio-page-builder' ); ?></p></div>
 			<?php elseif ( $result_message === 'error' ) : ?>
 				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Industry profile could not be saved. Check validation messages below.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $result_message === 'toggled' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Industry pack setting updated.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $result_message === 'toggle_error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Industry pack toggle failed. Try again or check permissions.', 'aio-page-builder' ); ?></p></div>
 			<?php endif; ?>
 
 			<section class="aio-readiness" aria-labelledby="aio-industry-readiness-heading">
@@ -173,6 +207,34 @@ final class Industry_Profile_Settings_Screen {
 			<section class="aio-active-pack" aria-labelledby="aio-active-pack-heading">
 				<h2 id="aio-active-pack-heading"><?php \esc_html_e( 'Active industry pack', 'aio-page-builder' ); ?></h2>
 				<p><strong><?php echo \esc_html( $active_pack['name'] ); ?></strong> (<?php echo \esc_html( $active_pack['key'] ); ?>) — <?php echo \esc_html( $active_pack['status'] ); ?></p>
+				<?php if ( ! empty( $state['primary_pack_is_disabled'] ) ) : ?>
+				<div class="notice notice-warning inline" role="alert">
+					<p><?php \esc_html_e( 'This industry pack is currently disabled. Recommendations and overlays will use generic behavior until you re-enable it. Your profile selection is preserved.', 'aio-page-builder' ); ?></p>
+				</div>
+				<?php
+				$toggle_controller = $state['toggle_controller'] ?? null;
+				$primary_key = $state['primary_industry_key'] ?? '';
+				if ( $toggle_controller !== null && $primary_key !== '' ) :
+					$toggle_action = 'aio_toggle_industry_pack';
+					$toggle_nonce = \wp_create_nonce( $toggle_action );
+				?>
+				<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin-top: 0.5rem;">
+					<input type="hidden" name="action" value="<?php echo \esc_attr( $toggle_action ); ?>" />
+					<input type="hidden" name="aio_industry_pack_key" value="<?php echo \esc_attr( $primary_key ); ?>" />
+					<input type="hidden" name="aio_industry_pack_disable" value="0" />
+					<?php \wp_nonce_field( $toggle_action, 'aio_toggle_industry_pack_nonce', true ); ?>
+					<button type="submit" class="button button-secondary"><?php \esc_html_e( 'Re-enable this pack', 'aio-page-builder' ); ?></button>
+				</form>
+				<?php endif; ?>
+				<?php elseif ( ( $state['toggle_controller'] ?? null ) !== null && ( $state['primary_industry_key'] ?? '' ) !== '' ) : ?>
+				<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin-top: 0.5rem;">
+					<input type="hidden" name="action" value="aio_toggle_industry_pack" />
+					<input type="hidden" name="aio_industry_pack_key" value="<?php echo \esc_attr( $state['primary_industry_key'] ); ?>" />
+					<input type="hidden" name="aio_industry_pack_disable" value="1" />
+					<?php \wp_nonce_field( 'aio_toggle_industry_pack', 'aio_toggle_industry_pack_nonce', true ); ?>
+					<button type="submit" class="button button-secondary"><?php \esc_html_e( 'Disable this pack', 'aio-page-builder' ); ?></button>
+				</form>
+				<?php endif; ?>
 			</section>
 			<?php endif; ?>
 
@@ -229,6 +291,13 @@ final class Industry_Profile_Settings_Screen {
 							</td>
 						</tr>
 						<?php endif; ?>
+						<?php
+						$assistant = $state['starter_bundle_assistant'] ?? null;
+						$sb_state  = $state['starter_bundle_state'] ?? array();
+						if ( $assistant instanceof Industry_Starter_Bundle_Assistant && ! empty( $sb_state ) ) {
+							$assistant->render( $sb_state );
+						}
+						?>
 					</table>
 					<p class="submit">
 						<button type="submit" class="button button-primary"><?php \esc_html_e( 'Save industry profile', 'aio-page-builder' ); ?></button>

@@ -72,25 +72,31 @@ final class Industry_Build_Plan_Scoring_Service {
 	/** @var Industry_Weighted_Recommendation_Engine|null */
 	private $weighted_engine;
 
+	/** @var callable(string): bool|null Optional. When set, primary pack is used only if this returns true (industry-pack-activation-contract). */
+	private $is_pack_active;
+
 	/**
 	 * @param Industry_Page_Template_Recommendation_Resolver $page_resolver
 	 * @param Page_Template_Repository_Interface              $page_repo
 	 * @param Industry_Profile_Repository                    $profile_repo
 	 * @param Industry_Pack_Registry|null                   $pack_registry
 	 * @param Industry_Weighted_Recommendation_Engine|null   $weighted_engine Optional; when set and profile has secondary, adds conflict/explanation metadata (Prompt 371).
+	 * @param callable(string): bool|null                   $is_pack_active  Optional; when set, primary pack is skipped when this returns false (disabled pack fallback).
 	 */
 	public function __construct(
 		Industry_Page_Template_Recommendation_Resolver $page_resolver,
 		Page_Template_Repository_Interface $page_repo,
 		Industry_Profile_Repository $profile_repo,
 		?Industry_Pack_Registry $pack_registry = null,
-		?Industry_Weighted_Recommendation_Engine $weighted_engine = null
+		?Industry_Weighted_Recommendation_Engine $weighted_engine = null,
+		?callable $is_pack_active = null
 	) {
 		$this->page_resolver = $page_resolver;
 		$this->page_repo     = $page_repo;
 		$this->profile_repo = $profile_repo;
 		$this->pack_registry = $pack_registry;
 		$this->weighted_engine = $weighted_engine;
+		$this->is_pack_active = $is_pack_active;
 	}
 
 	/**
@@ -152,6 +158,9 @@ final class Industry_Build_Plan_Scoring_Service {
 	 * @return array<string, mixed>|null
 	 */
 	private function resolve_primary_pack( array $context, string $primary_key ): ?array {
+		if ( $this->is_pack_active !== null && ! ( $this->is_pack_active )( $primary_key ) ) {
+			return null;
+		}
 		if ( isset( $context[ self::CONTEXT_INDUSTRY_PRIMARY_PACK ] ) && is_array( $context[ self::CONTEXT_INDUSTRY_PRIMARY_PACK ] ) ) {
 			return $context[ self::CONTEXT_INDUSTRY_PRIMARY_PACK ];
 		}

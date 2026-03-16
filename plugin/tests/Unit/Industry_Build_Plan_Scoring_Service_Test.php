@@ -32,6 +32,9 @@ require_once $plugin_root . '/src/Domain/Storage/Repositories/Page_Template_Repo
 require_once $plugin_root . '/src/Infrastructure/Config/Option_Names.php';
 require_once $plugin_root . '/src/Infrastructure/Settings/Settings_Service.php';
 require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Repository.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Pack_Schema.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Pack_Validator.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Pack_Registry.php';
 
 final class Industry_Build_Plan_Scoring_Service_Test extends TestCase {
 
@@ -212,5 +215,46 @@ final class Industry_Build_Plan_Scoring_Service_Test extends TestCase {
 		$second_key = $new_pages[1]['template_key'] ?? '';
 		$this->assertSame( 'landing_legal', $first_key );
 		$this->assertSame( 'hub_generic', $second_key );
+	}
+
+	/**
+	 * When is_pack_active returns false for the primary industry key, scoring treats as no pack (generic fallback).
+	 */
+	public function test_enrich_output_uses_generic_fallback_when_is_pack_active_returns_false(): void {
+		$settings    = new Settings_Service();
+		$profile_repo = new Industry_Profile_Repository( $settings );
+		$profile_repo->set_profile( array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY   => 'legal',
+			Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => array(),
+		) );
+		$page_repo = $this->page_repo_stub( $this->page_templates_for_resolver() );
+		$pack_registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry();
+		$pack_registry->load( array(
+			array(
+				\AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'legal',
+				\AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Schema::FIELD_NAME           => 'Legal',
+				\AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Schema::FIELD_STATUS         => \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Schema::STATUS_ACTIVE,
+				\AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
+			),
+		) );
+		$is_pack_active = static function ( string $key ): bool {
+			return $key !== 'legal';
+		};
+		$service = new Industry_Build_Plan_Scoring_Service(
+			new Industry_Page_Template_Recommendation_Resolver(),
+			$page_repo,
+			$profile_repo,
+			$pack_registry,
+			null,
+			$is_pack_active
+		);
+		$input  = $this->valid_normalized_output();
+		$output = $service->enrich_output( $input, array() );
+		$this->assertIsArray( $output );
+		$this->assertArrayHasKey( Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE, $output );
+		$new_pages = $output[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ];
+		$this->assertCount( 2, $new_pages );
+		// With pack disabled, primary_pack is null so resolver gets (profile, null, templates). Behavior is generic; no exception.
+		$this->assertArrayHasKey( 'template_key', $new_pages[0] );
 	}
 }
