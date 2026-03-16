@@ -49,6 +49,9 @@ final class Build_Plan_Schema {
 	/** Industry context at approval/execution-request time (industry-approval-snapshot-contract.md). */
 	public const KEY_INDUSTRY_APPROVAL_SNAPSHOT = 'industry_approval_snapshot';
 
+	/** Optional: starter bundle key when plan was generated from bundle (Prompt 409). */
+	public const KEY_SOURCE_STARTER_BUNDLE = 'source_starter_bundle_key';
+
 	/** Status enum (spec §30.4, object-model §3.4). */
 	public const STATUS_PENDING_REVIEW = 'pending_review';
 	public const STATUS_APPROVED       = 'approved';

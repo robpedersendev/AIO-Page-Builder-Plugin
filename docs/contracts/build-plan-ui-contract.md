@@ -13,7 +13,15 @@
 
 ---
 
-## 2. Industry explanation integration (Prompt 365)
+## 2. Create draft from starter bundle (Prompt 409)
+
+- **Entry**: From the Industry starter bundle assistant, when a bundle is selected, a “Create draft Build Plan from this bundle” action is available. It links to `admin-post.php?action=aio_create_plan_from_bundle` with `bundle_key` and nonce.
+- **Flow**: **Create_Plan_From_Starter_Bundle_Action** handles the request (capability `APPROVE_BUILD_PLANS`, nonce `aio_create_plan_from_bundle`). **Industry_Starter_Bundle_To_Build_Plan_Service** converts the selected bundle into a normalized draft (run_summary, site_purpose, new_pages_to_create from bundle template/section refs) and calls **Build_Plan_Generator::generate()**. The resulting plan is stored as a normal Build Plan and remains **pending review**; approval gating is unchanged.
+- **Result**: On success, the user is redirected to the Build Plans screen with the new plan; on failure (invalid/missing/inactive bundle), redirect to Industry Profile with `aio_bundle_plan_result=error`. The plan is editable and reviewable like any other draft; it carries `source_starter_bundle_key` in its definition when created from a bundle.
+
+---
+
+## 3. Industry explanation integration (Prompt 365)
 
 - **Item-level**: Each plan item payload may contain additive industry metadata (`industry_source_refs`, `recommendation_reasons`, `industry_fit_score`, `industry_warning_flags`). The **Industry_Build_Plan_Explanation_View_Model** turns this into a UI-facing view (summary lines, warning badges, fit classification, source refs).
 - **Detail panel**: When an item has industry data, the detail builders add an **"Industry context"** section. The section is rendered via **plugin/src/Admin/Views/build-plan/industry-plan-explanations.php**, which shows fit badge, rationale lines, warning badges, and industry sources. When the item has no industry metadata, the section is omitted (generic fallback).
@@ -22,7 +30,7 @@
 
 ---
 
-## 3. Constraints
+## 4. Constraints
 
 - No auto-approval of plans; explanations are informational only.
 - Planner/executor separation unchanged; review UI does not mutate plan decisions by itself.

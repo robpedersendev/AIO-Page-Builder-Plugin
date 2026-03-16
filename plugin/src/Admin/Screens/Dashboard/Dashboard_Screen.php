@@ -11,6 +11,8 @@ namespace AIOPageBuilder\Admin\Screens\Dashboard;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Widgets\Industry_Status_Summary_Widget;
+use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Admin\Dashboard\Dashboard_State_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -54,6 +56,7 @@ final class Dashboard_Screen {
 		<?php
 		$this->render_welcome_or_resume( $state['welcome_state'] );
 		$this->render_quick_actions( $state['quick_actions'] );
+		$this->render_industry_summary_widget();
 		$this->render_readiness_cards( $state['readiness_cards'] );
 		$this->render_last_activity( $state['last_activity_cards'] );
 		$this->render_queue_warnings( $state['queue_warning_summary'] );
@@ -99,6 +102,21 @@ final class Dashboard_Screen {
 			<p><?php echo \esc_html( $message ); ?> <a href="<?php echo \esc_url( $welcome['onboarding_url'] ); ?>"><?php \esc_html_e( 'Start / Resume Onboarding', 'aio-page-builder' ); ?></a></p>
 		</div>
 		<?php
+	}
+
+	/**
+	 * @param list<array{label: string, url: string}> $actions
+	 * @return void
+	 */
+	/**
+	 * Renders the industry status summary widget when industry subsystem is loaded (Prompt 410).
+	 *
+	 * @return void
+	 */
+	private function render_industry_summary_widget(): void {
+		if ( $this->container && $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+			Industry_Status_Summary_Widget::render( $this->container );
+		}
 	}
 
 	/**

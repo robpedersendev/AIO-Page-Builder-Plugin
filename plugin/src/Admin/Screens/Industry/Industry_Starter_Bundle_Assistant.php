@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Actions\Create_Plan_From_Starter_Bundle_Action;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry;
@@ -101,6 +102,21 @@ final class Industry_Starter_Bundle_Assistant {
 				<p id="aio-starter-bundle-description" class="description">
 					<?php \esc_html_e( 'Optional. A starter bundle recommends page and section templates for your industry. Choosing one does not build pages; it guides recommendations and planning.', 'aio-page-builder' ); ?>
 				</p>
+				<?php
+				if ( $selected !== '' ) {
+					$create_plan_url = \add_query_arg(
+						array(
+							'action' => 'aio_create_plan_from_bundle',
+							Create_Plan_From_Starter_Bundle_Action::PARAM_BUNDLE_KEY => $selected,
+							Create_Plan_From_Starter_Bundle_Action::NONCE_NAME => \wp_create_nonce( Create_Plan_From_Starter_Bundle_Action::NONCE_ACTION ),
+						),
+						\admin_url( 'admin-post.php' )
+					);
+					?>
+					<p class="aio-starter-bundle-create-plan">
+						<a href="<?php echo \esc_url( $create_plan_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Create draft Build Plan from this bundle', 'aio-page-builder' ); ?></a>
+					</p>
+				<?php } ?>
 				<?php if ( ! empty( $bundles ) ) : ?>
 				<details class="aio-starter-bundle-details" style="margin-top: 0.5rem;">
 					<summary><?php \esc_html_e( 'What’s in each bundle?', 'aio-page-builder' ); ?></summary>

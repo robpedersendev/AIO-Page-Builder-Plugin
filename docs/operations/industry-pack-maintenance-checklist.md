@@ -72,7 +72,8 @@
 
 ## 8. Deprecation (packs and overlays)
 
-- [ ] **Pack deprecation:** Set pack status to `deprecated`; do not remove from registry load until documented sunset. Update [industry-pack-catalog.md](../appendices/industry-pack-catalog.md); export/restore continues to support deprecated industry_key for existing profiles. See [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md) §4.
+- [ ] **Policy:** Follow [industry-pack-deprecation-contract.md](../contracts/industry-pack-deprecation-contract.md) for lifecycle states (deprecated, inactive, superseded, removed), replacement refs, profile handling, and export/restore. No automatic destructive migration of profile data.
+- [ ] **Pack deprecation:** Set pack status to `deprecated`; set optional `deprecated_at`, `replacement_ref`, `deprecation_note` per schema. Do not remove from registry load until documented sunset. Update [industry-pack-catalog.md](../appendices/industry-pack-catalog.md); export/restore continues to support deprecated industry_key for existing profiles. See [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md) §4.
 - [ ] **Overlay deprecation:** Set overlay status to `archived` or `draft`; registry skips non-active. Remove from builtin definitions only when safe; document in changelog and coverage matrix.
 - [ ] **Ref deprecation:** Do not remove CTA/style/SEO/LPagery keys that packs still reference; migrate pack refs or deprecate pack first. Invalid refs fail safely at resolution.
 

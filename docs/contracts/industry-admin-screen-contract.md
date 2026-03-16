@@ -115,6 +115,14 @@
 
 ---
 
+## 5.1 Industry dashboard summary widget (Prompt 410)
+
+- **Industry_Status_Summary_Widget**: Compact card on the main plugin Dashboard (overview) summarizing industry state. Shown only when the industry subsystem is loaded (container has `industry_profile_store`).
+- **Content**: Primary and secondary industry labels, active pack or no-pack state, selected starter bundle label, profile readiness summary, and top health warning/error count. Links to Industry Profile settings and (when issues exist) to the Industry Health Report screen.
+- **Safety**: Admin-only (same capability as dashboard). No secrets or raw internals. When no industry is configured, the card shows "Not configured" and a link to set up Industry Profile. Detailed diagnostics remain on the dedicated Industry Health Report screen.
+
+---
+
 ## 6. Files and inventory
 
 - **Screen**: `plugin/src/Admin/Screens/Industry/Industry_Profile_Settings_Screen.php`
@@ -125,4 +133,5 @@
 - **Section preview resolver**: `plugin/src/Domain/Industry/Registry/Industry_Section_Preview_Resolver.php`; view model: `plugin/src/Admin/ViewModels/Sections/Industry_Section_Preview_View_Model.php` (Prompt 384).
 - **Create-page assistant**: `plugin/src/Admin/Screens/PageTemplates/Industry_Create_Page_Assistant.php` (Prompt 376).
 - **Composition assistant**: `plugin/src/Admin/Screens/Compositions/Industry_Composition_Assistant.php` (Prompt 377).
+- **Industry status summary widget**: `plugin/src/Admin/Widgets/Industry_Status_Summary_Widget.php` (Prompt 410). Rendered from Dashboard_Screen when industry profile store is present.
 - **Inventory**: admin-screen-inventory.md lists Industry Profile screen and notes industry filter/badge behavior for section and page template directories.

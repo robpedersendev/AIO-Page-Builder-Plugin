@@ -45,6 +45,9 @@
 | **ai_rule_ref** | string | Reference to AI planning rule or prompt overlay for this industry. |
 | **starter_bundle_ref** | string | Optional reference to an industry starter bundle key (Industry_Starter_Bundle_Registry; see industry-starter-bundle-schema.md). The bundle's industry_key should match this pack's industry_key. |
 | **compliance_rule_refs** | list&lt;string&gt; | Optional list of industry compliance/caution rule keys (Industry_Compliance_Rule_Registry; see industry-compliance-rule-schema.md). Rules are advisory only; no legal advice. |
+| **deprecated_at** | string | Optional. When status is deprecated/superseded: ISO 8601 timestamp or version marker for audit/support (Prompt 411; industry-pack-deprecation-contract.md). |
+| **replacement_ref** | string | Optional. When deprecated or superseded: industry_key or bundle key of the replacing pack/bundle. Used for warnings and migration guidance. |
+| **deprecation_note** | string | Optional. Short, stable note for operators (e.g. "Use realtor_v2 pack instead."). Bounded length; no secrets; safe for export. |
 | **metadata** | map | Optional arbitrary metadata (e.g. label, sort order). Must not contain secrets. |
 
 ---

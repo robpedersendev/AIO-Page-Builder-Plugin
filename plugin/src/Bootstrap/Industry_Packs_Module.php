@@ -225,6 +225,21 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$substitute_engine
 			);
 		} );
+		$container->register( 'industry_starter_bundle_to_build_plan_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service {
+			$bundle_registry = $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
+			$plan_generator  = $container->has( 'build_plan_generator' ) ? $container->get( 'build_plan_generator' ) : null;
+			if ( $plan_generator === null || ! $plan_generator instanceof \AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator ) {
+				return new \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service(
+					$bundle_registry,
+					new \AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator(
+						$container->get( 'build_plan_repository' ),
+						$container->get( 'build_plan_item_generator' ),
+						$container->has( 'industry_build_plan_scoring_service' ) ? $container->get( 'industry_build_plan_scoring_service' ) : null
+					)
+				);
+			}
+			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service( $bundle_registry, $plan_generator );
+		} );
 		$container->register( 'industry_style_preset_application_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service {
 			$preset_registry = $container->has( 'industry_style_preset_registry' ) ? $container->get( 'industry_style_preset_registry' ) : null;
 			$style_repo      = $container->has( 'global_style_settings_repository' ) ? $container->get( 'global_style_settings_repository' ) : null;

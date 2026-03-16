@@ -123,6 +123,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_save_industry_section_override', array( $this, 'handle_save_industry_section_override' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_page_template_override', array( $this, 'handle_save_industry_page_template_override' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_build_plan_override', array( $this, 'handle_save_industry_build_plan_override' ), 10 );
+		\add_action( 'admin_post_aio_create_plan_from_bundle', array( $this, 'handle_create_plan_from_bundle' ), 10 );
 
 		$dashboard   = new Dashboard_Screen( $this->container );
 		$settings    = new Settings_Screen();
@@ -634,6 +635,15 @@ final class Admin_Menu {
 	 */
 	public function handle_save_industry_build_plan_override(): void {
 		\AIOPageBuilder\Admin\Actions\Save_Industry_Build_Plan_Override_Action::handle();
+	}
+
+	/**
+	 * Handles admin-post create Build Plan from starter bundle (Prompt 409).
+	 *
+	 * @return void
+	 */
+	public function handle_create_plan_from_bundle(): void {
+		\AIOPageBuilder\Admin\Actions\Create_Plan_From_Starter_Bundle_Action::handle( $this->container );
 	}
 
 	/**

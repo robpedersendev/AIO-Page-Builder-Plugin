@@ -136,6 +136,7 @@ require_once $bootstrap_dir . '/Industry_Packs_Module.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
 require_once $bootstrap_dir . '/Lifecycle_Manager.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Dashboard/Dashboard_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Widgets/Industry_Status_Summary_Widget.php';
 require_once $bootstrap_dir . '/../Domain/Admin/Dashboard/Dashboard_State_Builder.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Settings_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Diagnostics_Screen.php';

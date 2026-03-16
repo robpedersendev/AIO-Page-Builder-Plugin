@@ -150,6 +150,9 @@ final class Build_Plan_Generator {
 		if ( ! empty( $context['registry_snapshot_ref'] ) ) {
 			$definition[ Build_Plan_Schema::KEY_REGISTRY_SNAPSHOT_REF ] = (string) $context['registry_snapshot_ref'];
 		}
+		if ( ! empty( $context['source_starter_bundle_key'] ) && is_string( $context['source_starter_bundle_key'] ) ) {
+			$definition[ Build_Plan_Schema::KEY_SOURCE_STARTER_BUNDLE ] = trim( $context['source_starter_bundle_key'] );
+		}
 
 		$post_id = $this->repository->save( array( 'plan_definition' => $definition ) );
 		if ( $post_id === 0 ) {
