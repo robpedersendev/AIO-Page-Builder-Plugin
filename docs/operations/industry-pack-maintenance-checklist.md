@@ -2,7 +2,7 @@
 
 **Purpose:** Maintenance baseline for future industry packs, overlays, CTA patterns, and related integrations. Use when adding industries, changing overlays, or touching recommendation/scoring logic.
 
-**Adding a new industry:** Follow [industry-pack-authoring-guide.md](industry-pack-authoring-guide.md) and [industry-pack-author-checklist.md](industry-pack-author-checklist.md) for required objects, dependency order, validation, and release steps. The checklist below is the ongoing maintenance view; the authoring guide covers the full author workflow.
+**Adding a new industry:** Follow [industry-pack-authoring-guide.md](industry-pack-authoring-guide.md) and [industry-pack-author-checklist.md](industry-pack-author-checklist.md) for required objects, dependency order, validation, and release steps. The checklist below is the ongoing maintenance view; the authoring guide covers the full author workflow. **Pre-release:** Use [industry-pre-release-validation-pipeline.md](../release/industry-pre-release-validation-pipeline.md) and [industry-pre-release-checklist.md](../release/industry-pre-release-checklist.md) for repeatable validation before shipping pack or overlay changes. **Coverage gaps:** Use [industry-coverage-gap-analysis-guide.md](industry-coverage-gap-analysis-guide.md) and Industry_Coverage_Gap_Analyzer to prioritize missing overlays, bundles, or metadata.
 
 **Extension boundaries and roadmap:** Long-term extension seams, deprecation policy, and roadmap categories are defined in [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md). New work must use approved seams only. **New industry candidates** must be evaluated with [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md) and [future-industry-scorecard-template.md](future-industry-scorecard-template.md) before implementation.
 
@@ -15,7 +15,8 @@
 - [ ] **CTA patterns:** Any new CTA pattern keys referenced by the pack must exist in Industry_CTA_Pattern_Registry (add to CTAPatterns definitions if new).
 - [ ] **Overlays:** If adding section helper or page one-pager overlays for the industry, add definitions under SectionHelperOverlays/ or PageOnePagerOverlays/; update overlay catalog appendices.
 - [ ] **Validation:** Industry_Profile_Validator and pack validator accept the new industry_key; no regression on existing industries.
-- [ ] **QA:** Run industry-subsystem-acceptance-report checks for the new industry; update release gate if in scope.
+- [ ] **Linting:** Run Industry_Definition_Linter after load; resolve errors (see [industry-definition-linting-guide.md](industry-definition-linting-guide.md)).
+- [ ] **QA:** Run industry-subsystem-acceptance-report checks for the new industry; update release gate if in scope. Run [industry-pre-release-checklist.md](../release/industry-pre-release-checklist.md) when releasing.
 
 ---
 

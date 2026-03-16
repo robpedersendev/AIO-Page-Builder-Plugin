@@ -55,6 +55,8 @@
 
 - **Schema validation**: Pack definition passes Industry_Pack_Schema validation (required fields, status enum, version_marker supported, refs non-empty and format-valid). Invalid packs must be rejected at load.
 - **Ref resolution**: All refs (seo_guidance_ref, token_preset_ref, lpagery_rule_ref, CTA pattern keys, overlay refs) resolve to existing registry entries at runtime. Missing refs fail safely (no crash; recommendation/overlay may skip).
+- **Definition linting**: Before release or import, run **Industry_Definition_Linter** (see [industry-definition-linting-guide.md](industry-definition-linting-guide.md)) to catch schema conformance, duplicate keys, and broken refs. Resolve errors; treat warnings as advisory.
+- **Pre-release pipeline**: For pack version or subtype releases, follow [industry-pre-release-validation-pipeline.md](../release/industry-pre-release-validation-pipeline.md) and [industry-pre-release-checklist.md](../release/industry-pre-release-checklist.md).
 - **No-industry fallback**: With zero industry packs or empty profile, core plugin behavior unchanged. Acceptance report documents no-industry path.
 - **Export/restore**: Export includes industry profile and applied preset; pack definitions are part of registry export when applicable. Restore validates industry schema version; unsupported version skips industry restore with log.
 - **Diagnostics**: Industry_Diagnostics_Service snapshot includes primary/secondary industries, active pack refs, applied preset ref; no secrets or unbounded payloads.

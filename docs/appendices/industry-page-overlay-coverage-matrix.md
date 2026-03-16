@@ -4,6 +4,8 @@
 
 This appendix shows which page families and example template keys have **seeded** industry page one-pager overlays vs **pending** (planned for expansion). Template keys are from the page template registry (internal_key); families from page-template-category-taxonomy-contract §3.
 
+To prioritize missing coverage per industry or subtype, use the internal **Industry_Coverage_Gap_Analyzer**; see [industry-coverage-gap-analysis-guide.md](../operations/industry-coverage-gap-analysis-guide.md).
+
 ---
 
 ## 1. Seeded overlay coverage (T1)

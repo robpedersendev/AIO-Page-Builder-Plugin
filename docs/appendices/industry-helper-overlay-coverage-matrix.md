@@ -4,6 +4,8 @@
 
 This appendix shows which section purpose families and example section keys have **seeded** industry section-helper overlays vs **pending** (planned for expansion). Section keys are from the section registry (internal_key); families from section-template-category-taxonomy-contract §2.
 
+To prioritize missing coverage per industry or subtype, use the internal **Industry_Coverage_Gap_Analyzer**; see [industry-coverage-gap-analysis-guide.md](../operations/industry-coverage-gap-analysis-guide.md).
+
 ---
 
 ## 1. Seeded overlay coverage (T1)

@@ -29,7 +29,13 @@
 
 ---
 
-## 3. Sign-off
+## 3. Pre-release validation
+
+Before release, run the **industry pre-release validation pipeline** so definition linting, health checks, coverage analysis, benchmarks, and regression guards are executed in a repeatable order. See [industry-pre-release-validation-pipeline.md](industry-pre-release-validation-pipeline.md) and [industry-pre-release-checklist.md](industry-pre-release-checklist.md). Lint and health errors must be resolved or waived; human review remains required.
+
+---
+
+## 4. Sign-off
 
 - **QA:** Acceptance report completed; all required rows pass or waived.
 - **Technical lead:** Release gate criteria satisfied; no unmitigated risks.
@@ -37,4 +43,4 @@
 
 **Final signoff document:** [industry-subsystem-final-signoff.md](industry-subsystem-final-signoff.md) compiles evidence and records production signoff for the first industry-enabled release.
 
-*Reference this gate in [release-review-packet.md](release-review-packet.md) §2.10 and [sign-off-checklist.md](sign-off-checklist.md) when Industry Pack is in release scope.*
+*Reference this gate in [release-review-packet.md](release-review-packet.md) §2.10 and [sign-off-checklist.md](sign-off-checklist.md) when Industry Pack is in release scope. Use [industry-pre-release-validation-pipeline.md](industry-pre-release-validation-pipeline.md) and [industry-pre-release-checklist.md](industry-pre-release-checklist.md) for repeatable pre-release validation.*

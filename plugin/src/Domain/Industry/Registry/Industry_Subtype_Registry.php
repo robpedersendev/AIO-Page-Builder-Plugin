@@ -106,6 +106,15 @@ final class Industry_Subtype_Registry {
 	}
 
 	/**
+	 * Returns all loaded subtype definitions (for linting and coverage analysis).
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	public function get_all(): array {
+		return array_values( $this->by_key );
+	}
+
+	/**
 	 * Returns subtypes for the given parent industry key. Only active by default.
 	 *
 	 * @param string $parent_industry_key Parent industry pack key.
