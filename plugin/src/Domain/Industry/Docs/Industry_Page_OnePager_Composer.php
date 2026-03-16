@@ -12,11 +12,14 @@ namespace AIOPageBuilder\Domain\Industry\Docs;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder;
+use AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service;
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
 
 /**
  * Resolves page_template_key + industry context into composed one-pager. Read-only; no mutation of base or overlay storage.
+ * When cache service and key builder are provided, results are cached (industry-cache-contract).
  */
 final class Industry_Page_OnePager_Composer {
 
@@ -41,16 +44,26 @@ final class Industry_Page_OnePager_Composer {
 	/** @var Industry_Compliance_Warning_Resolver|null Optional; when set, composed result includes compliance warnings (Prompt 407). */
 	private ?Industry_Compliance_Warning_Resolver $compliance_warning_resolver;
 
+	/** @var Industry_Read_Model_Cache_Service|null */
+	private ?Industry_Read_Model_Cache_Service $cache_service;
+
+	/** @var Industry_Cache_Key_Builder|null */
+	private ?Industry_Cache_Key_Builder $cache_key_builder;
+
 	public function __construct(
 		Documentation_Registry $documentation_registry,
 		Industry_Page_OnePager_Overlay_Registry $overlay_registry,
 		?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null,
-		?Subtype_Page_OnePager_Overlay_Registry $subtype_overlay_registry = null
+		?Subtype_Page_OnePager_Overlay_Registry $subtype_overlay_registry = null,
+		?Industry_Read_Model_Cache_Service $cache_service = null,
+		?Industry_Cache_Key_Builder $cache_key_builder = null
 	) {
 		$this->documentation_registry       = $documentation_registry;
 		$this->overlay_registry             = $overlay_registry;
 		$this->compliance_warning_resolver  = $compliance_warning_resolver;
 		$this->subtype_overlay_registry     = $subtype_overlay_registry;
+		$this->cache_service               = $cache_service;
+		$this->cache_key_builder           = $cache_key_builder;
 	}
 
 	/**
@@ -110,6 +123,18 @@ final class Industry_Page_OnePager_Composer {
 		if ( $industry_key !== '' && $this->compliance_warning_resolver !== null ) {
 			$compliance_warnings = $this->compliance_warning_resolver->get_for_display( $industry_key );
 		}
-		return new Composed_Page_OnePager_Result( $composed, $base_id, $overlay_applied, $overlay_industry, $page_template_key, $compliance_warnings );
+		$result = new Composed_Page_OnePager_Result( $composed, $base_id, $overlay_applied, $overlay_industry, $page_template_key, $compliance_warnings );
+		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
+			$base_key = $this->cache_key_builder->for_page_onepager( $page_template_key, $industry_key, $subtype_key );
+			$this->cache_service->set( $base_key, array(
+				'composed_onepager'     => $composed,
+				'base_documentation_id' => $base_id,
+				'overlay_applied'       => $overlay_applied,
+				'overlay_industry_key'  => $overlay_industry,
+				'page_template_key'    => $page_template_key,
+				'compliance_warnings'   => $compliance_warnings,
+			) );
+		}
+		return $result;
 	}
 }

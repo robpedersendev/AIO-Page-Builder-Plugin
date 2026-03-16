@@ -12,8 +12,12 @@ namespace AIOPageBuilder\Domain\Industry\Registry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder;
+use AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service;
+
 /**
  * Registry of industry starter bundle definitions. Read-only after load. Bundles are overlays; core registries remain authoritative.
+ * When cache service and key builder are provided, get_for_industry results are cached (industry-cache-contract).
  */
 final class Industry_Starter_Bundle_Registry {
 
@@ -48,6 +52,20 @@ final class Industry_Starter_Bundle_Registry {
 
 	/** @var list<array<string, mixed>> All valid bundles in load order. */
 	private array $all = array();
+
+	/** @var Industry_Read_Model_Cache_Service|null */
+	private ?Industry_Read_Model_Cache_Service $cache_service;
+
+	/** @var Industry_Cache_Key_Builder|null */
+	private ?Industry_Cache_Key_Builder $cache_key_builder;
+
+	public function __construct(
+		?Industry_Read_Model_Cache_Service $cache_service = null,
+		?Industry_Cache_Key_Builder $cache_key_builder = null
+	) {
+		$this->cache_service    = $cache_service;
+		$this->cache_key_builder = $cache_key_builder;
+	}
 
 	/**
 	 * Returns built-in starter bundle definitions (Prompt 387). Used by bootstrap to load seed bundles.
@@ -128,10 +146,12 @@ final class Industry_Starter_Bundle_Registry {
 				$subtype_bundles[] = $bundle;
 			}
 		}
-		if ( $want_subtype !== '' && $subtype_bundles !== array() ) {
-			return $subtype_bundles;
+		$result = ( $want_subtype !== '' && $subtype_bundles !== array() ) ? $subtype_bundles : $industry_only_bundles;
+		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
+			$base_key = $this->cache_key_builder->for_starter_bundle_list( $want_industry, $want_subtype );
+			$this->cache_service->set( $base_key, array( 'list' => $result ) );
 		}
-		return $industry_only_bundles;
+		return $result;
 	}
 
 	/**

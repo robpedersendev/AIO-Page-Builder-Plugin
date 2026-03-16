@@ -68,6 +68,10 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 			$style_cache = $container->has( 'style_cache_service' ) ? $container->get( 'style_cache_service' ) : null;
 			$styles_norm = $container->has( 'styles_json_normalizer' ) ? $container->get( 'styles_json_normalizer' ) : null;
 			$styles_san  = $container->has( 'styles_json_sanitizer' ) ? $container->get( 'styles_json_sanitizer' ) : null;
+			$industry_cache = null;
+			if ( $container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ) {
+				$industry_cache = $container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE );
+			}
 			return new \AIOPageBuilder\Domain\ExportRestore\Import\Restore_Pipeline(
 				$container->get( 'settings' ),
 				$container->get( 'profile_store' ),
@@ -80,7 +84,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$restore_validator,
 				$style_cache instanceof \AIOPageBuilder\Domain\Styling\Style_Cache_Service ? $style_cache : null,
 				$styles_norm,
-				$styles_san
+				$styles_san,
+				$industry_cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $industry_cache : null
 			);
 		} );
 		$container->register( 'export_manifest_builder', function (): Export_Manifest_Builder {

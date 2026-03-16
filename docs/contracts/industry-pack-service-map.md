@@ -39,6 +39,7 @@ plugin/src/Domain/Industry/
 | **AI**       | Apply industry AI rules (e.g. ai_rule_ref) in planning context; keep contract with existing AI pillar. |
 | **LPagery**  | Resolve token_preset_ref and lpagery_rule_ref for active industry; remain LPagery-compatible. |
 | **Docs**     | Industry-specific doc inventory or refs; link to existing docs system. |
+| **Cache**    | Bounded, site-local, invalidatable caching for high-cost read models (recommendations, overlay composition, starter bundle lookups). See [industry-cache-contract.md](industry-cache-contract.md). |
 
 ---
 
@@ -64,6 +65,8 @@ The following keys are registered by **Industry_Packs_Module**:
 | `industry_page_onepager_composer` | Composes base page one-pager + industry overlay (industry-page-onepager-overlay-schema). | Industry_Page_OnePager_Composer; compose(page_template_key, industry_key) → Composed_Page_OnePager_Result; depends on Documentation_Registry and Industry_Page_OnePager_Overlay_Registry. |
 | `industry_section_library_read_model_builder` | Admin read model for section library with recommendation state and view modes (industry-section-recommendation-contract). | Industry_Section_Library_Read_Model_Builder; build(profile, pack, sections, view_mode) → list of Industry_Section_Library_Item_View. |
 | `industry_page_template_directory_read_model_builder` | Admin read model for page template directory with recommendation, hierarchy/LPagery fit (industry-page-template-recommendation-contract). | Industry_Page_Template_Directory_Read_Model_Builder; build(profile, pack, page_templates, view_mode) → list of Industry_Page_Template_Directory_Item_View. |
+| `industry_cache_key_builder` | Builds deterministic, bounded cache base keys for industry read models (industry-cache-contract). | Industry_Cache_Key_Builder; scope + inputs → base_key. |
+| `industry_read_model_cache_service` | Site-local get/set/delete for industry read-model caches; TTL; safe fallback on miss (industry-cache-contract). | Industry_Read_Model_Cache_Service; uses Industry_Site_Scope_Helper for key scoping. |
 
 Additional keys can be added in later prompts.
 

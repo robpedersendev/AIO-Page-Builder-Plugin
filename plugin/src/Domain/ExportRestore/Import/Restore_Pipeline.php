@@ -21,6 +21,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Industry_Export_Restore_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Restore_Validator;
+use AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
 use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
@@ -88,6 +89,9 @@ final class Restore_Pipeline {
 	/** @var Styles_JSON_Sanitizer|null Styling restore: only persist sanitized data (Prompt 259). */
 	private ?Styles_JSON_Sanitizer $styles_sanitizer;
 
+	/** @var Industry_Read_Model_Cache_Service|null Invalidate industry read-model caches after industry profile restore (Prompt 435). */
+	private ?Industry_Read_Model_Cache_Service $industry_cache_service;
+
 	public function __construct(
 		Settings_Service $settings,
 		Profile_Store $profile_store,
@@ -100,7 +104,8 @@ final class Restore_Pipeline {
 		?Template_Library_Restore_Validator $template_library_restore_validator = null,
 		?Style_Cache_Service $style_cache_service = null,
 		?Styles_JSON_Normalizer $styles_normalizer = null,
-		?Styles_JSON_Sanitizer $styles_sanitizer = null
+		?Styles_JSON_Sanitizer $styles_sanitizer = null,
+		?Industry_Read_Model_Cache_Service $industry_cache_service = null
 	) {
 		$this->settings                           = $settings;
 		$this->profile_store                      = $profile_store;
@@ -114,6 +119,7 @@ final class Restore_Pipeline {
 		$this->style_cache_service               = $style_cache_service;
 		$this->styles_normalizer                  = $styles_normalizer;
 		$this->styles_sanitizer                   = $styles_sanitizer;
+		$this->industry_cache_service             = $industry_cache_service;
 	}
 
 	/**
@@ -327,6 +333,9 @@ final class Restore_Pipeline {
 							$this->settings->set( Option_Names::INDUSTRY_PROFILE, $industry_profile );
 							$applied = $industry_data[ Industry_Export_Restore_Schema::KEY_APPLIED_PRESET ] ?? null;
 							$this->settings->set( Option_Names::APPLIED_INDUSTRY_PRESET, is_array( $applied ) ? $applied : array() );
+							if ( $this->industry_cache_service !== null ) {
+								$this->industry_cache_service->invalidate_all_industry_read_models();
+							}
 							$actions[] = array( 'category' => 'profiles', 'action' => 'overwrite', 'key' => 'industry' );
 						} else {
 							$this->log( 'Industry restore skipped: unsupported or missing schema_version.', array( 'version' => $version ), 'restore-profiles', Log_Severities::WARNING );

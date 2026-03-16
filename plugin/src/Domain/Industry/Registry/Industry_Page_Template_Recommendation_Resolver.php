@@ -12,10 +12,13 @@ namespace AIOPageBuilder\Domain\Industry\Registry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder;
+use AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 
 /**
  * Resolves page-template recommendations by industry fit. Does not modify page-template registry.
+ * When cache service and key builder are provided, results are cached (industry-cache-contract).
  */
 final class Industry_Page_Template_Recommendation_Resolver {
 
@@ -48,6 +51,15 @@ final class Industry_Page_Template_Recommendation_Resolver {
 	 * @return Industry_Page_Template_Recommendation_Result
 	 */
 	public function resolve( array $industry_profile, ?array $primary_pack, array $page_templates, array $options = array() ): Industry_Page_Template_Recommendation_Result {
+		$options_for_key = array( 'subtype_key' => $industry_profile['industry_subtype_key'] ?? $options['subtype_key'] ?? '' );
+		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
+			$base_key = $this->cache_key_builder->for_page_template_recommendation( $industry_profile, $page_templates, $options_for_key );
+			$cached = $this->cache_service->get( $base_key );
+			if ( is_array( $cached ) && isset( $cached['items'] ) && is_array( $cached['items'] ) ) {
+				return new Industry_Page_Template_Recommendation_Result( $cached['items'] );
+			}
+		}
+
 		$primary = isset( $industry_profile['primary_industry_key'] ) && is_string( $industry_profile['primary_industry_key'] )
 			? trim( $industry_profile['primary_industry_key'] )
 			: '';
@@ -180,7 +192,11 @@ final class Industry_Page_Template_Recommendation_Resolver {
 		$subtype_def = $options['subtype_definition'] ?? null;
 		$extender = $options['subtype_extender'] ?? null;
 		if ( is_array( $subtype_def ) && $extender instanceof Industry_Subtype_Page_Template_Recommendation_Extender ) {
-			return $extender->apply_subtype_influence( $result, $subtype_def, $page_templates );
+			$result = $extender->apply_subtype_influence( $result, $subtype_def, $page_templates );
+		}
+		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
+			$base_key = $this->cache_key_builder->for_page_template_recommendation( $industry_profile, $page_templates, $options_for_key );
+			$this->cache_service->set( $base_key, $result->to_array() );
 		}
 		return $result;
 	}

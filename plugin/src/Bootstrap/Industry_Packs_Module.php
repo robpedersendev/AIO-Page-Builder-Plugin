@@ -67,6 +67,12 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: industry subtype resolver (Prompt 414). */
 	public const CONTAINER_KEY_SUBTYPE_RESOLVER = 'industry_subtype_resolver';
 
+	/** Container key: industry read-model cache key builder (industry-cache-contract; Prompt 434). */
+	public const CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER = 'industry_cache_key_builder';
+
+	/** Container key: industry read-model cache service (industry-cache-contract; Prompt 434). */
+	public const CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE = 'industry_read_model_cache_service';
+
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
 		$container->register( self::CONTAINER_KEY_INDUSTRY_LOADED, function (): bool {
@@ -125,8 +131,19 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( \AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Rule_Registry::get_builtin_definitions() );
 			return $registry;
 		} );
-		$container->register( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry {
-			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry();
+		$container->register( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER, function (): \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder {
+			return new \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder();
+		} );
+		$container->register( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE, function (): \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service {
+			return new \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service();
+		} );
+		$container->register( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY, function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry {
+			$cache = $container->has( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) : null;
+			$key_builder = $container->has( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) : null;
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry(
+				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
+				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
+			);
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry::get_builtin_definitions() );
 			return $registry;
 		} );
@@ -216,18 +233,26 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$section_overlay = $container->has( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) : null;
 			$subtype_overlay = $container->has( self::CONTAINER_KEY_SUBTYPE_SECTION_HELPER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_SECTION_HELPER_OVERLAY_REGISTRY ) : null;
 			$warning_resolver = $container->has( 'industry_compliance_warning_resolver' ) ? $container->get( 'industry_compliance_warning_resolver' ) : null;
+			$cache = $container->has( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) : null;
+			$key_builder = $container->has( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) : null;
 			$doc_registry = new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry( new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Loader( __DIR__ . '/../Domain/Registries/Docs' ) );
 			$helper_composer = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Helper_Doc_Composer(
 				$doc_registry,
 				$section_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry ? $section_overlay : new \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry(),
 				$warning_resolver instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver ? $warning_resolver : null,
-				$subtype_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry ? $subtype_overlay : null
+				$subtype_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry ? $subtype_overlay : null,
+				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
+				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
+			);
+			$section_resolver = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Recommendation_Resolver(
+				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
+				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
 			);
 			$substitute_engine = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine();
 			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Preview_Resolver(
 				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
 				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
-				new \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Recommendation_Resolver(),
+				$section_resolver,
 				$helper_composer,
 				$substitute_engine
 			);
@@ -238,18 +263,26 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$page_overlay = $container->has( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) : null;
 			$subtype_page_overlay = $container->has( self::CONTAINER_KEY_SUBTYPE_PAGE_ONEPAGER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_PAGE_ONEPAGER_OVERLAY_REGISTRY ) : null;
 			$warning_resolver = $container->has( 'industry_compliance_warning_resolver' ) ? $container->get( 'industry_compliance_warning_resolver' ) : null;
+			$cache = $container->has( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) : null;
+			$key_builder = $container->has( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) : null;
 			$doc_registry = new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry( new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Loader( __DIR__ . '/../Domain/Registries/Docs' ) );
 			$one_pager_composer = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Composer(
 				$doc_registry,
 				$page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry ? $page_overlay : new \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry(),
 				$warning_resolver instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver ? $warning_resolver : null,
-				$subtype_page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Page_OnePager_Overlay_Registry ? $subtype_page_overlay : null
+				$subtype_page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Page_OnePager_Overlay_Registry ? $subtype_page_overlay : null,
+				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
+				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
+			);
+			$page_resolver = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver(
+				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
+				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
 			);
 			$substitute_engine = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine();
 			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Preview_Resolver(
 				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
 				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
-				new \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver(),
+				$page_resolver,
 				$one_pager_composer,
 				$substitute_engine
 			);

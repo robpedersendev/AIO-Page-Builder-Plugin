@@ -24,7 +24,8 @@ This matrix documents what industry-related data is **removed** vs **preserved**
 | Industry page template overrides | `Option_Names::INDUSTRY_PAGE_TEMPLATE_OVERRIDES` | Override state; plugin-owned. |
 | Industry Build Plan item overrides | `Option_Names::INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES` | Override state; plugin-owned. |
 | Disabled industry packs list | `Option_Names::DISABLED_INDUSTRY_PACKS` | Admin toggle; plugin-owned. |
-| Industry-specific transients/caches | Any transient key pattern used by industry code (e.g. recommendation caches, diagnostics snapshots). | Operational cache; plugin-owned. If added in future, must use a documented key pattern so uninstall can remove without loading industry stack. |
+| Industry read-model cache version | `Option_Names::INDUSTRY_CACHE_VERSION` (aio_industry_cache_version) | Cache version for industry recommendation/overlay/bundle caches (industry-cache-contract); removed on uninstall. |
+| Industry-specific transients/caches | Any transient key pattern used by industry code (e.g. recommendation caches, diagnostics snapshots). | Operational cache; plugin-owned. Industry read-model transients use prefix per Industry_Site_Scope_Helper; version option removed above so orphaned transients expire. |
 
 **Implementation:** Options above are included in `Option_Names::all()` and are removed by `Uninstall_Cleanup_Service::cleanup_plugin_owned_data()` when `uninstall.php` runs. No separate industry uninstall routine is required unless industry-specific transients are introduced later; then document the key pattern and add removal in uninstall or in the cleanup service.
 

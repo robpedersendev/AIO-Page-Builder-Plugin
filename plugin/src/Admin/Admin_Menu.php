@@ -562,6 +562,12 @@ final class Admin_Menu {
 			exit;
 		}
 		$repo->merge_profile( $partial );
+		if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ) {
+			$cache = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE );
+			if ( $cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ) {
+				$cache->invalidate_all_industry_read_models();
+			}
+		}
 		\wp_safe_redirect( $redirect_url . '&aio_industry_result=saved' );
 		exit;
 	}
@@ -600,6 +606,12 @@ final class Admin_Menu {
 			exit;
 		}
 		$controller->set_pack_disabled( $industry_key, $disable );
+		if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ) {
+			$cache = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE );
+			if ( $cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ) {
+				$cache->invalidate_all_industry_read_models();
+			}
+		}
 		\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggled' );
 		exit;
 	}
