@@ -26,7 +26,7 @@ ACF field values (post meta) and assignment map data are preserved by default; s
 
 ### Industry Pack subsystem
 
-Industry Pack data is **additive** and site-preference only. **Removed on uninstall:** Industry profile option (`Option_Names::INDUSTRY_PROFILE`), applied industry preset option (`Option_Names::APPLIED_INDUSTRY_PRESET`), and any industry-specific cache keys/transients. **Preserved:** Built pages and content (industry does not own content; it guides selection). Pack and overlay definitions are built-in (code); they are not stored per site. See [Industry Lifecycle Hardening Contract](../contracts/industry-lifecycle-hardening-contract.md) and [Industry Lifecycle Regression Guard](../qa/industry-lifecycle-regression-guard.md) for full policy and QA.
+Industry Pack data is **additive** and site-preference only. **Removed on uninstall:** Industry profile option (`Option_Names::INDUSTRY_PROFILE`), applied industry preset option (`Option_Names::APPLIED_INDUSTRY_PRESET`), industry section/page/build-plan overrides (`INDUSTRY_SECTION_OVERRIDES`, `INDUSTRY_PAGE_TEMPLATE_OVERRIDES`, `INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES`), disabled packs list (`DISABLED_INDUSTRY_PACKS`), and any industry-specific cache keys/transients. **Preserved:** Built pages and content (industry does not own content; it guides selection). Pack and overlay definitions are built-in (code); they are not stored per site. Full retained vs removed matrix: [Industry Uninstall Retained Data Matrix](../operations/industry-uninstall-retained-data-matrix.md). See [Industry Lifecycle Hardening Contract](../contracts/industry-lifecycle-hardening-contract.md) and [Industry Lifecycle Regression Guard](../qa/industry-lifecycle-regression-guard.md) for full policy and QA.
 
 ## Implementation
 

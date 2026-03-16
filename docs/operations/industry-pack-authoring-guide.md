@@ -61,8 +61,8 @@
 
 ## 5. Export/restore, diagnostics, and release expectations
 
-- **Export**: Industry data (profile, applied preset) in profiles category per industry-export-restore-contract. Pack definitions follow registry export strategy (e.g. builtin packs are code; no separate export of builtin pack JSON unless product decides otherwise).
-- **Restore**: Restore pipeline supports industry profile and preset; schema_version checked; unsupported version skips with log. No silent overwrite of core data.
+- **Export**: Industry data (profile, applied preset) in profiles category per industry-export-restore-contract. Pack definitions follow registry export strategy (e.g. builtin packs are code; no separate export of builtin pack JSON unless product decides otherwise). **Portable pack bundle**: For internal workflows (versioning, moving industry-only config), use the industry pack bundle format and Industry_Pack_Bundle_Service; see [industry-pack-bundle-format-contract.md](../contracts/industry-pack-bundle-format-contract.md).
+- **Restore**: Restore pipeline supports industry profile and preset; schema_version checked; unsupported version skips with log. No silent overwrite of core data. Pack bundle import uses conflict resolution per [industry-pack-import-conflict-contract.md](../contracts/industry-pack-import-conflict-contract.md) when implemented.
 - **Diagnostics**: Bounded snapshot only; admin/support use. Document any new fields in industry-subsystem-diagnostics-checklist.
 - **Release**: For first release of a new pack, satisfy industry-pack-release-gate criteria (additive behavior, export/restore, diagnostics, known risks). New industries beyond the first four require acceptance report update and gate sign-off if in scope.
 

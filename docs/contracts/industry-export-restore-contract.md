@@ -77,3 +77,4 @@ When `profiles` is in included categories:
 
 - **Export bundle structure**: Industry data lives under `profiles/`; it does not introduce a new top-level category. Manifest `included_categories` still lists `profiles` only.
 - **Industry pack extension**: Aligns with “export/restore must include industry pack definitions and industry profile” by including industry **profile** and **applied preset**; pack/overlay definitions remain built-in or registry-backed.
+- **Portable pack bundle**: A separate, portable industry pack bundle format exists for exporting/importing pack definitions, overlays, rules, presets, and starter bundles independently of full site export. See [industry-pack-bundle-format-contract.md](industry-pack-bundle-format-contract.md). Full site export/restore remains authoritative for full-instance moves.
