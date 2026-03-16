@@ -75,6 +75,13 @@ New industries should score above the team-defined threshold and must not requir
 
 ---
 
+## 5.1 Phase-two checkpoint and backlog map (Prompt 445)
+
+- **Checkpoint**: Completed capability clusters (packs, profile, recommendation, overlays, subtypes, health, linting, repair suggestions, coverage analyzer, pre-release pipeline, sandbox) are documented in [industry-phase-two-backlog-map.md](../operations/industry-phase-two-backlog-map.md).
+- **Backlog map**: Remaining gaps, optional extensions, and future work clusters are grouped there for dependency-aware prompt generation. Use it to prioritize hardening vs content seeding vs new industry.
+
+---
+
 ## 6. Roadmap categories for future expansion
 
 Concrete categories for prompt generation and backlog; expansion stays within approved seams.
@@ -106,6 +113,7 @@ Concrete categories for prompt generation and backlog; expansion stays within ap
 
 ## 8. Cross-references
 
+- [industry-phase-two-backlog-map.md](../operations/industry-phase-two-backlog-map.md) — Phase-two checkpoint and backlog map (Prompt 445).
 - [industry-pack-extension-contract.md](industry-pack-extension-contract.md) — Subsystem boundary and terminology.
 - [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) — Author workflow and required pieces.
 - [industry-pack-maintenance-checklist.md](../operations/industry-pack-maintenance-checklist.md) — Ongoing maintenance.

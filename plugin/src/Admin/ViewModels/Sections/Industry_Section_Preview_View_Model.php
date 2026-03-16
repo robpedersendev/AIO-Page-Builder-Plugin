@@ -25,6 +25,7 @@ final class Industry_Section_Preview_View_Model {
 	public const KEY_WARNING_FLAGS           = 'warning_flags';
 	public const KEY_EXPLANATION_REASONS    = 'explanation_reasons';
 	public const KEY_COMPLIANCE_WARNINGS     = 'compliance_warnings';
+	public const KEY_SUBTYPE_INFLUENCE        = 'subtype_influence';
 
 	/** @var bool */
 	private bool $has_industry;
@@ -68,6 +69,7 @@ final class Industry_Section_Preview_View_Model {
 		$this->warning_flags          = $warning_flags;
 		$this->explanation_reasons    = $explanation_reasons;
 		$this->compliance_warnings    = $compliance_warnings;
+		$this->subtype_influence      = $subtype_influence;
 	}
 
 	public function has_industry(): bool {
@@ -120,6 +122,15 @@ final class Industry_Section_Preview_View_Model {
 	}
 
 	/**
+	 * Returns subtype influence for preview (Prompt 441). Empty when no subtype.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function get_subtype_influence(): array {
+		return $this->subtype_influence;
+	}
+
+	/**
 	 * For view layer (escape on output).
 	 *
 	 * @return array<string, mixed>
@@ -134,6 +145,7 @@ final class Industry_Section_Preview_View_Model {
 			self::KEY_WARNING_FLAGS         => $this->warning_flags,
 			self::KEY_EXPLANATION_REASONS   => $this->explanation_reasons,
 			self::KEY_COMPLIANCE_WARNINGS   => $this->compliance_warnings,
+			self::KEY_SUBTYPE_INFLUENCE     => $this->subtype_influence,
 		);
 	}
 }

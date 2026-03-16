@@ -12,11 +12,15 @@ namespace AIOPageBuilder\Domain\Industry\Registry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\ViewModels\Industry\Industry_Subtype_Preview_Influence_View_Model;
 use AIOPageBuilder\Admin\ViewModels\PageTemplates\Industry_Page_Template_Preview_View_Model;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Composer;
+use AIOPageBuilder\Domain\Industry\Docs\Subtype_Page_OnePager_Overlay_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 
 /**
@@ -100,6 +104,11 @@ final class Industry_Page_Template_Preview_Resolver {
 		$subtype_key = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			? \trim( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			: '';
+		$subtype_context = array( 'primary_industry_key' => $primary, 'industry_subtype_key' => $subtype_key, 'resolved_subtype' => null, 'has_valid_subtype' => false );
+		if ( $this->subtype_resolver !== null ) {
+			$subtype_context = $this->subtype_resolver->resolve();
+			$subtype_key = $subtype_context['industry_subtype_key'] ?? $subtype_key;
+		}
 		$composed_result = $this->one_pager_composer->compose( $template_key, $primary, $subtype_key );
 		$composed_one_pager = $composed_result->get_composed_onepager();
 		$composed_for_view  = array(
@@ -123,6 +132,8 @@ final class Industry_Page_Template_Preview_Resolver {
 
 		$compliance_warnings = $composed_result->get_compliance_warnings();
 
+		$subtype_influence = $this->build_subtype_influence_page( $subtype_context, $template_key );
+
 		return new Industry_Page_Template_Preview_View_Model(
 			true,
 			$primary,
@@ -133,8 +144,64 @@ final class Industry_Page_Template_Preview_Resolver {
 			$substitute_suggestions,
 			$warning_flags,
 			$explanation_reasons,
-			$compliance_warnings
+			$compliance_warnings,
+			$subtype_influence
 		);
+	}
+
+	/**
+	 * Builds subtype influence view model for page template (onepager refinement only).
+	 *
+	 * @param array{primary_industry_key: string, industry_subtype_key: string, resolved_subtype: array<string, mixed>|null, has_valid_subtype: bool} $subtype_context
+	 * @param string $template_key
+	 * @return array<string, mixed>
+	 */
+	private function build_subtype_influence_page( array $subtype_context, string $template_key ): array {
+		$has_valid = ! empty( $subtype_context['has_valid_subtype'] );
+		$subtype_key = isset( $subtype_context['industry_subtype_key'] ) && \is_string( $subtype_context['industry_subtype_key'] )
+			? \trim( $subtype_context['industry_subtype_key'] )
+			: '';
+		if ( ! $has_valid || $subtype_key === '' ) {
+			return Industry_Subtype_Preview_Influence_View_Model::none()->to_array();
+		}
+		$resolved = $subtype_context['resolved_subtype'] ?? null;
+		$label = '';
+		$summary = '';
+		if ( \is_array( $resolved ) && $this->subtype_registry !== null ) {
+			$label = isset( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] ) && \is_string( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] )
+				? \trim( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] )
+				: \ucfirst( \str_replace( array( '_', '-' ), ' ', $subtype_key ) );
+			$summary = isset( $resolved[ Industry_Subtype_Registry::FIELD_SUMMARY ] ) && \is_string( $resolved[ Industry_Subtype_Registry::FIELD_SUMMARY ] )
+				? \trim( $resolved[ Industry_Subtype_Registry::FIELD_SUMMARY ] )
+				: '';
+		} else {
+			$label = \ucfirst( \str_replace( array( '_', '-' ), ' ', $subtype_key ) );
+		}
+		$caution_notes = array();
+		if ( $summary !== '' ) {
+			$caution_notes[] = $summary;
+		}
+		$onepager_refinement = false;
+		if ( $this->subtype_onepager_overlay_registry !== null ) {
+			$overlay = $this->subtype_onepager_overlay_registry->get( $subtype_key, $template_key );
+			if ( $overlay !== null && \is_array( $overlay ) ) {
+				$status = isset( $overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ] ) && \is_string( $overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ] )
+					? $overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ]
+					: '';
+				$onepager_refinement = $status === Subtype_Page_OnePager_Overlay_Registry::STATUS_ACTIVE;
+			}
+		}
+		$vm = new Industry_Subtype_Preview_Influence_View_Model(
+			true,
+			$subtype_key,
+			$label,
+			$summary,
+			false,
+			$onepager_refinement,
+			$caution_notes,
+			''
+		);
+		return $vm->to_array();
 	}
 
 	/**
@@ -172,7 +239,8 @@ final class Industry_Page_Template_Preview_Resolver {
 			array(),
 			array(),
 			array(),
-			array()
+			array(),
+			Industry_Subtype_Preview_Influence_View_Model::none()->to_array()
 		);
 	}
 }

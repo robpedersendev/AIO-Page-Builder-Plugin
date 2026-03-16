@@ -454,6 +454,27 @@ final class Page_Template_Detail_Screen {
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>
+			<?php
+			$subtype_influence = $industry_preview['subtype_influence'] ?? array();
+			if ( \is_array( $subtype_influence ) && ! empty( $subtype_influence['has_subtype'] ) ) :
+				$st_label = isset( $subtype_influence['subtype_label'] ) ? \esc_html( (string) $subtype_influence['subtype_label'] ) : '';
+				$st_onepager = ! empty( $subtype_influence['onepager_refinement_applied'] );
+				$st_notes = isset( $subtype_influence['caution_notes'] ) && \is_array( $subtype_influence['caution_notes'] ) ? $subtype_influence['caution_notes'] : array();
+				?>
+				<div class="aio-industry-subtype-influence" aria-label="<?php \esc_attr_e( 'Subtype context', 'aio-page-builder' ); ?>">
+					<p class="aio-industry-subtype-label"><span class="aio-industry-label"><?php \esc_html_e( 'Subtype', 'aio-page-builder' ); ?>:</span> <?php echo $st_label; ?></p>
+					<?php if ( $st_onepager ) : ?>
+						<p class="aio-industry-subtype-refinement"><?php \esc_html_e( 'Subtype one-pager overlay applied for this template.', 'aio-page-builder' ); ?></p>
+					<?php endif; ?>
+					<?php if ( count( $st_notes ) > 0 ) : ?>
+						<ul class="aio-industry-subtype-notes">
+							<?php foreach ( $st_notes as $note ) : ?>
+								<li><?php echo \esc_html( \is_string( $note ) ? $note : '' ); ?></li>
+							<?php endforeach; ?>
+						</ul>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
 		</section>
 		<?php
 	}

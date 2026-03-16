@@ -14,6 +14,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service;
+use AIOPageBuilder\Domain\Industry\Reporting\Industry_Repair_Suggestion_Engine;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -56,6 +57,21 @@ final class Industry_Health_Report_Screen {
 			$result = $service->run();
 			$errors  = isset( $result['errors'] ) && is_array( $result['errors'] ) ? $result['errors'] : array();
 			$warnings = isset( $result['warnings'] ) && is_array( $result['warnings'] ) ? $result['warnings'] : array();
+		}
+
+		$repair_engine = null;
+		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_repair_suggestion_engine' ) ) {
+			$repair_engine = $this->container->get( 'industry_repair_suggestion_engine' );
+		}
+		if ( $repair_engine instanceof Industry_Repair_Suggestion_Engine ) {
+			foreach ( $errors as $i => $issue ) {
+				$suggestion = $repair_engine->suggest_for_issue( $issue );
+				$errors[ $i ]['repair_suggestion'] = $suggestion;
+			}
+			foreach ( $warnings as $i => $issue ) {
+				$suggestion = $repair_engine->suggest_for_issue( $issue );
+				$warnings[ $i ]['repair_suggestion'] = $suggestion;
+			}
 		}
 
 		return array(
@@ -101,6 +117,7 @@ final class Industry_Health_Report_Screen {
 								<th scope="col"><?php \esc_html_e( 'Key', 'aio-page-builder' ); ?></th>
 								<th scope="col"><?php \esc_html_e( 'Issue', 'aio-page-builder' ); ?></th>
 								<th scope="col"><?php \esc_html_e( 'Related refs', 'aio-page-builder' ); ?></th>
+								<th scope="col"><?php \esc_html_e( 'Suggested fix', 'aio-page-builder' ); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -110,6 +127,14 @@ final class Industry_Health_Report_Screen {
 									<td><code><?php echo \esc_html( $issue['key'] ?? '' ); ?></code></td>
 									<td><?php echo \esc_html( $issue['issue_summary'] ?? '' ); ?></td>
 									<td><?php echo \esc_html( implode( ', ', $issue['related_refs'] ?? array() ) ); ?></td>
+									<td><?php
+									$sug = $issue['repair_suggestion'] ?? null;
+									if ( \is_array( $sug ) && isset( $sug['suggested_ref'], $sug['explanation'] ) ) {
+										echo \esc_html( $sug['suggested_ref'] . ' — ' . $sug['explanation'] );
+									} else {
+										echo '—';
+									}
+									?></td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
@@ -128,6 +153,7 @@ final class Industry_Health_Report_Screen {
 								<th scope="col"><?php \esc_html_e( 'Key', 'aio-page-builder' ); ?></th>
 								<th scope="col"><?php \esc_html_e( 'Issue', 'aio-page-builder' ); ?></th>
 								<th scope="col"><?php \esc_html_e( 'Related refs', 'aio-page-builder' ); ?></th>
+								<th scope="col"><?php \esc_html_e( 'Suggested fix', 'aio-page-builder' ); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -137,6 +163,14 @@ final class Industry_Health_Report_Screen {
 									<td><code><?php echo \esc_html( $issue['key'] ?? '' ); ?></code></td>
 									<td><?php echo \esc_html( $issue['issue_summary'] ?? '' ); ?></td>
 									<td><?php echo \esc_html( implode( ', ', $issue['related_refs'] ?? array() ) ); ?></td>
+									<td><?php
+									$sug = $issue['repair_suggestion'] ?? null;
+									if ( \is_array( $sug ) && isset( $sug['suggested_ref'], $sug['explanation'] ) ) {
+										echo \esc_html( $sug['suggested_ref'] . ' — ' . $sug['explanation'] );
+									} else {
+										echo '—';
+									}
+									?></td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>

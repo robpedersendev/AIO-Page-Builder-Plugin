@@ -40,6 +40,7 @@
 - [ ] **No auto-fix:** Report is observational only; no automatic repair or mutation.
 - [ ] **Empty/healthy:** When no issues, screen shows success notice and no error/warning tables.
 - [ ] **Definition linting:** For authoring and release, run `Industry_Definition_Linter` before release to catch schema and ref issues; it complements the health check. See [industry-definition-linting-guide.md](../operations/industry-definition-linting-guide.md).
+- [ ] **Repair suggestions (Prompt 443):** When `Industry_Repair_Suggestion_Engine` is registered, the Health Report screen may show a "Suggested fix" column for issues (deprecated replacement, inactive activate, valid alternative, fallback bundle). Suggestions are advisory only; no auto-apply. See [industry-repair-suggestion-contract.md](../contracts/industry-repair-suggestion-contract.md).
 
 ---
 

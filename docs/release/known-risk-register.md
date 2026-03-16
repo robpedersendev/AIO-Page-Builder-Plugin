@@ -47,6 +47,8 @@
 
 **Industry first-release signoff:** Evidence and production signoff for the first four industries are recorded in [industry-subsystem-final-signoff.md](industry-subsystem-final-signoff.md). IND-1 and IND-2 remain the standing industry risks for this release.
 
+**Phase-two backlog:** Completed capability clusters and remaining work are documented in [industry-phase-two-backlog-map.md](../operations/industry-phase-two-backlog-map.md). Use for prioritization and dependency-aware prompt generation; no new risks added by the backlog map itself.
+
 **Styling deferred enhancements (not blockers):** Extended format validation (e.g. stricter color format checks), styling-specific a11y audit for global/per-entity screens. Recorded in [styling-release-gate.md](styling-release-gate.md) §2.2. Do not block release.
 
 Use this section for risks or limitations specific to a release (e.g. "Export of very large plans may timeout on constrained hosting") with mitigation or formal waiver reference.

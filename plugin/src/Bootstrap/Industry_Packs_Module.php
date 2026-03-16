@@ -254,12 +254,17 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
 			);
 			$substitute_engine = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine();
+			$subtype_resolver = $container->has( self::CONTAINER_KEY_SUBTYPE_RESOLVER ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_RESOLVER ) : null;
+			$subtype_registry = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
 			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Preview_Resolver(
 				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
 				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
 				$section_resolver,
 				$helper_composer,
-				$substitute_engine
+				$substitute_engine,
+				$subtype_resolver instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver ? $subtype_resolver : null,
+				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null,
+				$subtype_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry ? $subtype_overlay : null
 			);
 		} );
 		$container->register( 'industry_page_template_preview_resolver', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Preview_Resolver {
@@ -284,12 +289,17 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
 			);
 			$substitute_engine = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine();
+			$subtype_resolver = $container->has( self::CONTAINER_KEY_SUBTYPE_RESOLVER ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_RESOLVER ) : null;
+			$subtype_registry = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
 			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Preview_Resolver(
 				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
 				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
 				$page_resolver,
 				$one_pager_composer,
-				$substitute_engine
+				$substitute_engine,
+				$subtype_resolver instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver ? $subtype_resolver : null,
+				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null,
+				$subtype_page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Page_OnePager_Overlay_Registry ? $subtype_page_overlay : null
 			);
 		} );
 		$container->register( 'industry_starter_bundle_to_build_plan_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service {
@@ -331,6 +341,56 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$profile_repo = new \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository( $container->get( 'settings' ) );
 			}
 			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver( $profile_repo, $subtype_registry );
+		} );
+		$container->register( 'industry_subtype_comparison_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Comparison_Service {
+			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			$bundle_registry = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+			$subtype_registry = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
+			$cache = $container->has( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) : null;
+			$key_builder = $container->has( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) : null;
+			$page_resolver = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver(
+				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
+				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
+			);
+			$section_resolver = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Recommendation_Resolver(
+				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
+				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
+			);
+			$page_repo = $container->has( 'page_template_repository' ) ? $container->get( 'page_template_repository' ) : null;
+			$section_list_provider = null;
+			if ( $container->has( 'section_template_repository' ) ) {
+				$section_repo = $container->get( 'section_template_repository' );
+				$section_list_provider = static function () use ( $section_repo ): array {
+					return $section_repo instanceof \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository_Interface
+						? $section_repo->list_all_definitions( 200, 0 )
+						: array();
+				};
+			}
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Comparison_Service(
+				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
+				$bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $bundle_registry : null,
+				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null,
+				$page_resolver,
+				$section_resolver,
+				$page_repo instanceof \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository_Interface ? $page_repo : null,
+				$section_list_provider
+			);
+		} );
+		$container->register( 'industry_repair_suggestion_engine', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Repair_Suggestion_Engine {
+			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			$bundle_registry = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+			$subtype_registry = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
+			$toggle = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Repair_Suggestion_Engine(
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
+				$bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $bundle_registry : null,
+				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null,
+				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
+				$toggle
+			);
 		} );
 		$container->register( 'industry_style_preset_application_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service {
 			$preset_registry = $container->has( 'industry_style_preset_registry' ) ? $container->get( 'industry_style_preset_registry' ) : null;

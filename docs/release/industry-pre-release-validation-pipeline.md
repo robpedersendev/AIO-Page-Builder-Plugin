@@ -24,7 +24,8 @@
 | 5. Regression guards | Industry_Recommendation_Regression_Guard_Test | Unit tests must pass | [industry-recommendation-regression-guard.md](../qa/industry-recommendation-regression-guard.md) |
 | 6. AI prompt-pack evaluation | Evaluation fixtures for overlays (if in scope) | Per fixtures; document results | [industry-ai-prompt-evaluation-fixtures.md](../qa/industry-ai-prompt-evaluation-fixtures.md) |
 | 7. Lifecycle / fallback audit | Manual or script: no-industry path, deprecated pack handling | No regressions | industry-pack-deprecation-contract; industry-neutral-mode-audit |
-| 8. Release gate criteria | [industry-pack-release-gate.md](industry-pack-release-gate.md) | All criteria met or waived | Release gate §1 |
+| 8. Dry-run sandbox (optional) | Industry_Author_Sandbox_Service::run_dry_run() for candidate packs/bundles | Lint/health errors = fix before promote | [industry-author-sandbox-guide.md](../operations/industry-author-sandbox-guide.md) |
+| 9. Release gate criteria | [industry-pack-release-gate.md](industry-pack-release-gate.md) | All criteria met or waived | Release gate §1 |
 
 ---
 
