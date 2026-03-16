@@ -55,6 +55,12 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: industry compliance rule registry (Prompt 405); industry compliance warning resolver (Prompt 407). */
 	public const CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY = 'industry_compliance_rule_registry';
 
+	/** Container key: industry subtype registry (Prompt 413/414; industry-subtype-schema.md). */
+	public const CONTAINER_KEY_SUBTYPE_REGISTRY = 'industry_subtype_registry';
+
+	/** Container key: industry subtype resolver (Prompt 414). */
+	public const CONTAINER_KEY_SUBTYPE_RESOLVER = 'industry_subtype_resolver';
+
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
 		$container->register( self::CONTAINER_KEY_INDUSTRY_LOADED, function (): bool {
@@ -239,6 +245,28 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				);
 			}
 			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service( $bundle_registry, $plan_generator );
+		} );
+		$container->register( 'industry_pack_migration_executor', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Profile\Industry_Pack_Migration_Executor {
+			$profile_repo  = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			$pack_registry = $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY );
+			$bundle_registry = $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
+			if ( $profile_repo === null || ! $profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
+				$profile_repo = new \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository( $container->get( 'settings' ) );
+			}
+			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Pack_Migration_Executor( $profile_repo, $pack_registry, $bundle_registry );
+		} );
+		$container->register( self::CONTAINER_KEY_SUBTYPE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry();
+			$registry->load( array() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_SUBTYPE_RESOLVER, function () use ( $container ): \AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver {
+			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			$subtype_registry = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
+			if ( $profile_repo === null || ! $profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
+				$profile_repo = new \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository( $container->get( 'settings' ) );
+			}
+			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver( $profile_repo, $subtype_registry );
 		} );
 		$container->register( 'industry_style_preset_application_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service {
 			$preset_registry = $container->has( 'industry_style_preset_registry' ) ? $container->get( 'industry_style_preset_registry' ) : null;

@@ -77,6 +77,7 @@ Concrete categories for prompt generation and backlog; expansion stays within ap
 | **Recommendation rules** | Refine affinity/discouraged logic, scoring weights, or substitute quality per industry. | industry-section-recommendation-contract; industry-recommendation-regression-guard must pass. |
 | **Export/restore evolution** | New schema_version or new optional fields in industry profile/preset payload. | industry-export-restore-contract; backward compatibility or migration path required. |
 | **Question packs and onboarding** | New or updated question packs per industry. | industry-question-pack-contract; profile and onboarding flow only. |
+| **Industry subtypes** | Structured sub-variants per parent industry (e.g. buyer-agent/listing-agent realtor, residential/commercial plumber). Subtype schema and overlay scope per industry-subtype-schema.md and industry-subtype-extension-contract.md. Profile stores optional industry_subtype_key; resolver falls back to parent when invalid. | industry-subtype-extension-contract.md; industry-subtype-schema.md; Industry_Subtype_Resolver (Prompt 414). |
 
 ---
 

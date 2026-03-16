@@ -133,6 +133,10 @@ require_once $bootstrap_dir . '/../Domain/Styling/Entity_Style_Payload_Schema.ph
 require_once $bootstrap_dir . '/../Domain/Styling/Entity_Style_Payload_Repository.php';
 require_once $bootstrap_dir . '/../Infrastructure/Container/Providers/Styling_Provider.php';
 require_once $bootstrap_dir . '/Industry_Packs_Module.php';
+require_once $bootstrap_dir . '/../Domain/Industry/Profile/Industry_Pack_Migration_Result.php';
+require_once $bootstrap_dir . '/../Domain/Industry/Profile/Industry_Pack_Migration_Executor.php';
+require_once $bootstrap_dir . '/../Domain/Industry/Registry/Industry_Subtype_Registry.php';
+require_once $bootstrap_dir . '/../Domain/Industry/Profile/Industry_Subtype_Resolver.php';
 require_once $bootstrap_dir . '/Module_Registrar.php';
 require_once $bootstrap_dir . '/Lifecycle_Manager.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Dashboard/Dashboard_Screen.php';

@@ -29,6 +29,9 @@ final class Industry_Profile_Schema {
 	/** Optional industry subtype. */
 	public const FIELD_SUBTYPE = 'subtype';
 
+	/** Optional structured subtype key (industry-subtype-schema.md). Must match parent industry; invalid ref falls back to parent at resolution. */
+	public const FIELD_INDUSTRY_SUBTYPE_KEY = 'industry_subtype_key';
+
 	/** Optional service model hint. */
 	public const FIELD_SERVICE_MODEL = 'service_model';
 
@@ -58,6 +61,7 @@ final class Industry_Profile_Schema {
 			self::FIELD_PRIMARY_INDUSTRY_KEY  => '',
 			self::FIELD_SECONDARY_INDUSTRY_KEYS => array(),
 			self::FIELD_SUBTYPE               => '',
+			self::FIELD_INDUSTRY_SUBTYPE_KEY  => '',
 			self::FIELD_SERVICE_MODEL         => '',
 			self::FIELD_GEO_MODEL             => '',
 			self::FIELD_DERIVED_FLAGS         => array(),
@@ -101,6 +105,12 @@ final class Industry_Profile_Schema {
 		$subtype = isset( $raw[ self::FIELD_SUBTYPE ] ) && is_string( $raw[ self::FIELD_SUBTYPE ] )
 			? trim( $raw[ self::FIELD_SUBTYPE ] )
 			: '';
+		$industry_subtype_key = isset( $raw[ self::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $raw[ self::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			? trim( $raw[ self::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			: '';
+		if ( $industry_subtype_key !== '' && strlen( $industry_subtype_key ) > 64 ) {
+			$industry_subtype_key = '';
+		}
 		$service_model = isset( $raw[ self::FIELD_SERVICE_MODEL ] ) && is_string( $raw[ self::FIELD_SERVICE_MODEL ] )
 			? trim( $raw[ self::FIELD_SERVICE_MODEL ] )
 			: '';
@@ -125,6 +135,7 @@ final class Industry_Profile_Schema {
 			self::FIELD_PRIMARY_INDUSTRY_KEY   => $primary,
 			self::FIELD_SECONDARY_INDUSTRY_KEYS => $secondary,
 			self::FIELD_SUBTYPE                => $subtype,
+			self::FIELD_INDUSTRY_SUBTYPE_KEY   => $industry_subtype_key,
 			self::FIELD_SERVICE_MODEL          => $service_model,
 			self::FIELD_GEO_MODEL              => $geo_model,
 			self::FIELD_DERIVED_FLAGS          => $derived,

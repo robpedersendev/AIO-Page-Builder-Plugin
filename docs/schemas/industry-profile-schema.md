@@ -30,7 +30,8 @@
 | **schema_version** | string | Yes | `1` | Schema version for migration and validation. |
 | **primary_industry_key** | string | No | `""` | Industry pack key (e.g. `legal`, `healthcare`) that best matches the site. Empty when not set. |
 | **secondary_industry_keys** | list&lt;string&gt; | No | `[]` | Additional industry keys for broader filtering or fallback. |
-| **subtype** | string | No | `""` | Optional industry subtype (e.g. `plumber`, `realtor` within a broader vertical). |
+| **subtype** | string | No | `""` | Optional freeform subtype hint (legacy or display). |
+| **industry_subtype_key** | string | No | `""` | Optional structured subtype key (industry-subtype-schema.md). Must reference a subtype whose parent_industry_key matches primary_industry_key; otherwise invalid and resolution falls back to parent industry only. |
 | **service_model** | string | No | `""` | Optional service model hint (e.g. `b2b`, `b2c`, `local_service`). |
 | **geo_model** | string | No | `""` | Optional geo model hint (e.g. `local`, `regional`, `national`). |
 | **derived_flags** | object | No | `{}` | Optional flags set by subsystems. Use `multi_industry` (bool) when both primary and secondary industries are set; used for conflict-resolution and weighted recommendation (industry-conflict-resolution-contract.md). |
@@ -38,14 +39,15 @@
 
 - **primary_industry_key**: Must match an existing industry pack key when non-empty; validation may be advisory at storage time and strict at use time.
 - **secondary_industry_keys**: Array of non-empty strings; no duplicates; keys should exist in industry pack registry when used.
-- **subtype**, **service_model**, **geo_model**: Freeform or controlled per product; no secrets; exportable.
+- **subtype**: Freeform or legacy; no secrets; exportable. **industry_subtype_key**: When non-empty, must resolve to a valid subtype for the primary industry (see industry-subtype-extension-contract.md); invalid ref is ignored at resolution.
+- **service_model**, **geo_model**: Freeform or controlled per product; no secrets; exportable.
 
 ---
 
 ## 4. Empty state and defaults
 
 - **Initial empty state**: No option set, or option value not an array → treat as empty profile. Repository returns default shape with `schema_version`, empty `primary_industry_key`, empty `secondary_industry_keys`, and other optional fields at default.
-- **Default empty profile**: `{ schema_version: "1", primary_industry_key: "", secondary_industry_keys: [], subtype: "", service_model: "", geo_model: "", derived_flags: {} }`.
+- **Default empty profile**: `{ schema_version: "1", primary_industry_key: "", secondary_industry_keys: [], subtype: "", industry_subtype_key: "", service_model: "", geo_model: "", derived_flags: {} }`.
 
 ---
 

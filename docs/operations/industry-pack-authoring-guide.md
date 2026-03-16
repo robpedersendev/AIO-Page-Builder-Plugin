@@ -31,6 +31,7 @@
 | **Question packs** (optional) | Onboarding question-pack definitions for the industry; referenced by profile. | industry-question-pack-contract; industry-question-pack-catalog |
 | **Export/restore** | Industry profile and pack refs included in export; restore validates and migrates; no new secrets. | industry-export-restore-contract |
 | **Diagnostics** | Industry snapshot in Support Triage remains bounded; new pack refs appear in diagnostics only as refs, not raw content. | industry-pack-release-gate; industry-subsystem-diagnostics-checklist |
+| **Subtypes** (optional) | Structured sub-variants of a pack (e.g. realtor_buyer_agent, plumber_residential) per industry-subtype-schema.md. Profile may store industry_subtype_key; resolver falls back to parent when invalid. | industry-subtype-extension-contract.md; industry-subtype-schema.md |
 
 ---
 
@@ -46,6 +47,7 @@
 8. **Question packs** (if used) – Add question-pack definition; register in Industry_Question_Pack_Registry.
 9. **Catalog and docs** – Update industry-pack-catalog.md, industry-overlay-catalog.md, industry-cta-pattern-catalog.md, industry-style-preset-catalog.md, industry-seo-guidance-catalog.md, industry-lpagery-rule-catalog.md, industry-question-pack-catalog.md as applicable.
 10. **Validation and QA** – Run Industry_Profile_Validator and pack validation for the new industry_key; run industry-subsystem-acceptance-report checks; update release gate evidence if in scope.
+11. **Subtypes** (optional) – If adding subtypes for the industry, define subtype objects per industry-subtype-schema.md; register in subtype registry; ensure profile industry_subtype_key validation and resolver fallback (industry-subtype-extension-contract.md).
 
 ---
 

@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry;
 
 /**
  * Validates industry profile shape and content. Optionally uses registries for primary_industry_key and question-pack checks.
@@ -29,15 +30,17 @@ final class Industry_Profile_Validator {
 	/**
 	 * Validates profile. Populates last_errors and last_warnings; safe (no throw).
 	 *
-	 * @param array<string, mixed>                    $profile   Normalized or raw profile (will be normalized for validation).
-	 * @param Industry_Pack_Registry|null            $pack_registry Optional; used to check primary_industry_key.
-	 * @param Industry_Question_Pack_Registry|null   $qp_registry  Optional; used to validate question_pack_answers for primary.
+	 * @param array<string, mixed>                    $profile          Normalized or raw profile (will be normalized for validation).
+	 * @param Industry_Pack_Registry|null            $pack_registry    Optional; used to check primary_industry_key.
+	 * @param Industry_Question_Pack_Registry|null   $qp_registry      Optional; used to validate question_pack_answers for primary.
+	 * @param Industry_Subtype_Registry|null        $subtype_registry Optional; when set, validates industry_subtype_key matches primary.
 	 * @return bool True if no validation errors (warnings allowed).
 	 */
 	public function validate(
 		array $profile,
 		?Industry_Pack_Registry $pack_registry = null,
-		?Industry_Question_Pack_Registry $qp_registry = null
+		?Industry_Question_Pack_Registry $qp_registry = null,
+		?Industry_Subtype_Registry $subtype_registry = null
 	): bool {
 		$this->last_errors   = array();
 		$this->last_warnings = array();
@@ -55,6 +58,23 @@ final class Industry_Profile_Validator {
 		if ( $primary !== '' && $pack_registry !== null ) {
 			if ( $pack_registry->get( $primary ) === null ) {
 				$this->last_warnings[] = 'primary_industry_key_unknown: ' . $primary;
+			}
+		}
+
+		$subtype_key = isset( $normalized[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			? trim( $normalized[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			: '';
+		if ( $subtype_key !== '' && $subtype_registry !== null ) {
+			$def = $subtype_registry->get( $subtype_key );
+			if ( $def === null ) {
+				$this->last_warnings[] = 'industry_subtype_key_unknown: ' . $subtype_key;
+			} else {
+				$parent = isset( $def[ Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] ) && is_string( $def[ Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] )
+					? trim( $def[ Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] )
+					: '';
+				if ( $parent !== $primary ) {
+					$this->last_warnings[] = 'industry_subtype_key_parent_mismatch: ' . $subtype_key . ' (parent ' . $parent . ' != primary ' . $primary . ')';
+				}
 			}
 		}
 
@@ -113,9 +133,10 @@ final class Industry_Profile_Validator {
 	public function get_readiness(
 		array $profile,
 		?Industry_Pack_Registry $pack_registry = null,
-		?Industry_Question_Pack_Registry $qp_registry = null
+		?Industry_Question_Pack_Registry $qp_registry = null,
+		?Industry_Subtype_Registry $subtype_registry = null
 	): Industry_Profile_Readiness_Result {
-		$valid = $this->validate( $profile, $pack_registry, $qp_registry );
+		$valid = $this->validate( $profile, $pack_registry, $qp_registry, $subtype_registry );
 		$normalized = Industry_Profile_Schema::normalize( $profile );
 		$primary = isset( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )

@@ -82,6 +82,14 @@ final class Industry_Profile_Repository {
 				? trim( $partial[ Industry_Profile_Schema::FIELD_SUBTYPE ] )
 				: '';
 		}
+		if ( array_key_exists( Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY, $partial ) ) {
+			$current[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] = is_string( $partial[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+				? trim( $partial[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+				: '';
+			if ( strlen( $current[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) > 64 ) {
+				$current[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] = '';
+			}
+		}
 		if ( array_key_exists( Industry_Profile_Schema::FIELD_SERVICE_MODEL, $partial ) ) {
 			$current[ Industry_Profile_Schema::FIELD_SERVICE_MODEL ] = is_string( $partial[ Industry_Profile_Schema::FIELD_SERVICE_MODEL ] )
 				? trim( $partial[ Industry_Profile_Schema::FIELD_SERVICE_MODEL ] )

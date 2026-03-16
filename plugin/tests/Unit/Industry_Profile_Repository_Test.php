@@ -139,6 +139,20 @@ final class Industry_Profile_Repository_Test extends TestCase {
 		$this->assertSame( array( 'service_scope' => 'residential' ), $profile[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]['plumber'] ?? null );
 	}
 
+	/** Prompt 414: industry_subtype_key persists via merge_profile; normalized and length-capped. */
+	public function test_merge_profile_industry_subtype_key_persists(): void {
+		$this->repository->merge_profile( array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor',
+			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'realtor_buyer_agent',
+		) );
+		$profile = $this->repository->get_profile();
+		$this->assertSame( 'realtor_buyer_agent', $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] );
+
+		$this->repository->merge_profile( array( Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => '' ) );
+		$profile = $this->repository->get_profile();
+		$this->assertSame( '', $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] );
+	}
+
 	/** Prompt 388: selected_starter_bundle_key persists via merge_profile; safe for recommendation consumers. */
 	public function test_merge_profile_selected_starter_bundle_key_persists(): void {
 		$this->repository->merge_profile( array(

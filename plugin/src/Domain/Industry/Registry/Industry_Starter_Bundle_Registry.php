@@ -30,6 +30,8 @@ final class Industry_Starter_Bundle_Registry {
 	public const FIELD_CTA_GUIDANCE_REF             = 'cta_guidance_ref';
 	public const FIELD_LPAGERY_GUIDANCE_REF         = 'lpagery_guidance_ref';
 	public const FIELD_METADATA                     = 'metadata';
+	/** Optional: when deprecated, replacement bundle key (industry-pack-deprecation-contract.md). */
+	public const FIELD_REPLACEMENT_REF              = 'replacement_ref';
 
 	public const STATUS_ACTIVE    = 'active';
 	public const STATUS_DRAFT     = 'draft';
@@ -228,6 +230,9 @@ final class Industry_Starter_Bundle_Registry {
 		$out[ self::FIELD_METADATA ] = isset( $bundle[ self::FIELD_METADATA ] ) && \is_array( $bundle[ self::FIELD_METADATA ] )
 			? $bundle[ self::FIELD_METADATA ]
 			: array();
+		$out[ self::FIELD_REPLACEMENT_REF ] = isset( $bundle[ self::FIELD_REPLACEMENT_REF ] ) && \is_string( $bundle[ self::FIELD_REPLACEMENT_REF ] )
+			? \trim( $bundle[ self::FIELD_REPLACEMENT_REF ] )
+			: '';
 
 		return $out;
 	}

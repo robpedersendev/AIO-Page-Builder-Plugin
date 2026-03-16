@@ -74,6 +74,15 @@ final class Industry_Pack_Schema {
 	/** Optional: arbitrary metadata (no secrets). */
 	public const FIELD_METADATA = 'metadata';
 
+	/** Optional: when deprecated/superseded, replacement pack or bundle key (industry-pack-deprecation-contract.md). */
+	public const FIELD_REPLACEMENT_REF = 'replacement_ref';
+
+	/** Optional: when deprecated, ISO 8601 or version marker for audit. */
+	public const FIELD_DEPRECATED_AT = 'deprecated_at';
+
+	/** Optional: short operator note when deprecated. */
+	public const FIELD_DEPRECATION_NOTE = 'deprecation_note';
+
 	/** Status: pack is active and used for overlays/ranking. */
 	public const STATUS_ACTIVE = 'active';
 
@@ -150,6 +159,9 @@ final class Industry_Pack_Schema {
 			self::FIELD_LPAGERY_RULE_REF,
 			self::FIELD_AI_RULE_REF,
 			self::FIELD_METADATA,
+			self::FIELD_REPLACEMENT_REF,
+			self::FIELD_DEPRECATED_AT,
+			self::FIELD_DEPRECATION_NOTE,
 		);
 		return self::$optional_fields;
 	}

@@ -12,6 +12,7 @@ use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Readiness_Result;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Validator;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -20,6 +21,7 @@ $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Validator.php';
 require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Readiness_Result.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Subtype_Registry.php';
 require_once $plugin_root . '/src/Domain/Industry/Onboarding/Industry_Question_Pack_Registry.php';
 require_once $plugin_root . '/src/Domain/Industry/Onboarding/Industry_Question_Pack_Definitions.php';
 
@@ -110,5 +112,61 @@ final class Industry_Profile_Validator_Test extends TestCase {
 		$this->assertSame( 'ready', $arr['state'] );
 		$this->assertSame( 100, $arr['score'] );
 		$this->assertArrayHasKey( 'details', $arr );
+	}
+
+	/** Prompt 414: subtype_registry validates industry_subtype_key; matching parent yields no subtype warning. */
+	public function test_validate_with_subtype_registry_matching_parent_no_warning(): void {
+		$subtype_registry = new Industry_Subtype_Registry();
+		$subtype_registry->load( array(
+			array(
+				Industry_Subtype_Registry::FIELD_SUBTYPE_KEY         => 'realtor_buyer_agent',
+				Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY => 'realtor',
+				Industry_Subtype_Registry::FIELD_LABEL              => 'Buyer Agent',
+				Industry_Subtype_Registry::FIELD_SUMMARY            => 'Summary',
+				Industry_Subtype_Registry::FIELD_STATUS              => 'active',
+				Industry_Subtype_Registry::FIELD_VERSION_MARKER      => '1',
+			),
+		) );
+		$validator = new Industry_Profile_Validator();
+		$profile = Industry_Profile_Schema::normalize( array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY  => 'realtor',
+			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'realtor_buyer_agent',
+		) );
+		$this->assertTrue( $validator->validate( $profile, null, null, $subtype_registry ) );
+		$warnings = $validator->get_last_validation_warnings();
+		foreach ( $warnings as $w ) {
+			$this->assertStringNotContainsString( 'industry_subtype_key', $w );
+		}
+	}
+
+	/** Prompt 414: subtype_registry with parent mismatch adds warning. */
+	public function test_validate_with_subtype_registry_parent_mismatch_adds_warning(): void {
+		$subtype_registry = new Industry_Subtype_Registry();
+		$subtype_registry->load( array(
+			array(
+				Industry_Subtype_Registry::FIELD_SUBTYPE_KEY         => 'realtor_buyer_agent',
+				Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY => 'realtor',
+				Industry_Subtype_Registry::FIELD_LABEL              => 'Buyer Agent',
+				Industry_Subtype_Registry::FIELD_SUMMARY             => 'Summary',
+				Industry_Subtype_Registry::FIELD_STATUS              => 'active',
+				Industry_Subtype_Registry::FIELD_VERSION_MARKER      => '1',
+			),
+		) );
+		$validator = new Industry_Profile_Validator();
+		$profile = Industry_Profile_Schema::normalize( array(
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY  => 'plumber',
+			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'realtor_buyer_agent',
+		) );
+		$this->assertTrue( $validator->validate( $profile, null, null, $subtype_registry ) );
+		$warnings = $validator->get_last_validation_warnings();
+		$this->assertNotEmpty( $warnings );
+		$found = false;
+		foreach ( $warnings as $w ) {
+			if ( strpos( $w, 'industry_subtype_key_parent_mismatch' ) === 0 ) {
+				$found = true;
+				break;
+			}
+		}
+		$this->assertTrue( $found, 'Expected industry_subtype_key_parent_mismatch warning' );
 	}
 }
