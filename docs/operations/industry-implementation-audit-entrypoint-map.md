@@ -93,6 +93,7 @@ Do not use this map to add new runtime features. Use it to generate audits, test
 ## 6. Alignment with greenfield closure and roadmap
 
 - **Greenfield closure:** [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md) defines the boundary. Implementation-audit starts **after** that closure; it does not extend greenfield capability layers unless explicitly scoped elsewhere.
+- **Archive map:** [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) (Prompt 570) summarizes prompt ranges by capability cluster, authoritative contracts, and the transition into implementation-audit. Use it to trace capability to prompt range and to confirm which artifacts are authoritative.
 - **Roadmap:** [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md) and [industry-subsystem-v2-guardrails.md](../contracts/industry-subsystem-v2-guardrails.md) remain the authority for what may and may not be added. Audit prompts must not normalize unsafe shortcuts or reduced review rigor.
 - **Service map:** [industry-pack-service-map.md](../contracts/industry-pack-service-map.md) and bootstrap (Industry_Packs_Module) are the source of truth for container keys and dependency flow. Audit prompts should reference them for coverage.
 
@@ -101,6 +102,7 @@ Do not use this map to add new runtime features. Use it to generate audits, test
 ## 7. References
 
 - [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md)
+- [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) — Greenfield prompt archival map (Prompt 570); prompt ranges, authoritative contracts, transition point.
 - [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md)
 - [industry-pack-service-map.md](../contracts/industry-pack-service-map.md)
 - [industry-subsystem-maturity-matrix.md](industry-subsystem-maturity-matrix.md)

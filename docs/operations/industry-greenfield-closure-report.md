@@ -1,7 +1,7 @@
 # Industry Subsystem Late-Stage Greenfield Closure Report (Prompt 568)
 
 **Spec:** Roadmap contract; maturity matrix; next-phase prompt map; v2 guardrails.  
-**Purpose:** Formal closure artifact for the greenfield expansion prompt program (Prompts 318–567). Marks which capability layers are covered, which remain optional, and where implementation-audit work should begin. Enables handoff to implementation-audit prompt clusters without restarting discovery.
+**Purpose:** Formal closure artifact for the greenfield expansion prompt program (Prompts 318–567). Marks which capability layers are covered, which remain optional, and where implementation-audit work should begin. Enables handoff to implementation-audit prompt clusters without restarting discovery. For a full prompt-range-to-capability map and archival reference, see [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) (Prompt 570).
 
 ---
 
@@ -81,6 +81,7 @@ Audit clusters should be dependency-aware: e.g. profile and resolution before re
 ## 5. Transition and handoff
 
 - **Greenfield expansion:** Treated as **closed** for the purpose of this report. New “greenfield” prompts that add major capability layers should be explicitly scoped and aligned with the roadmap; the next-phase prompt map and backlog remain the place for optional expansion.
+- **Archive map:** For prompt ranges by capability cluster and authoritative contracts, see [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) (Prompt 570).
 - **Implementation-audit:** The next phase of prompt generation should use the implementation-audit entrypoint map and these clusters. Prompts should produce audits, tests, or doc updates—not new features—unless explicitly scoped elsewhere.
 - **Planning continuity:** Roadmap contract, maturity matrix, and v2 guardrails remain authoritative. Closure does not change them; it only marks the boundary between greenfield expansion and implementation-audit.
 
@@ -88,6 +89,7 @@ Audit clusters should be dependency-aware: e.g. profile and resolution before re
 
 ## 6. References
 
+- [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) — Final archival map (Prompt 570); prompt ranges by capability cluster, authoritative contracts, transition point.
 - [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md)
 - [industry-subsystem-maturity-matrix.md](industry-subsystem-maturity-matrix.md)
 - [industry-next-phase-prompt-map.md](industry-next-phase-prompt-map.md)

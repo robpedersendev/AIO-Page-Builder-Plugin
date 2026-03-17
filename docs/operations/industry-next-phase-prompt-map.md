@@ -115,6 +115,7 @@ Must-have hardening remains distinct from optional expansion; v2 guardrails forb
 ## 6. Greenfield closure and implementation-audit handoff
 
 - **Greenfield closure:** The late-stage greenfield program (through Prompts 318–567) is summarized in [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md) (Prompt 568). That report marks completed capability layers, remaining optional expansion, and the transition to implementation-audit.
+- **Archive map:** [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) (Prompt 570) is the final archival map: prompt ranges by capability cluster, authoritative contracts, core artifact families, and the transition point into implementation-audit. Use it to trace what built which capability and where to start audit work.
 - **Implementation-audit entrypoint:** The next phase of prompts should target **implementation audit** (correctness, safety, failure modes, test coverage) rather than new features. Use [industry-implementation-audit-entrypoint-map.md](industry-implementation-audit-entrypoint-map.md) (Prompt 569) for priority audit domains, high-risk codepaths, and audit clusters. Audit prompts must not add new runtime features unless explicitly scoped elsewhere; they produce audits, tests, or doc updates.
 
 ---
