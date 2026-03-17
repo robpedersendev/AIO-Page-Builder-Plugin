@@ -51,7 +51,13 @@ Use `message` and `related_refs` for human-readable output. `object_type` is one
 
 ---
 
-## 6. Do not
+## 6. Scaffold / incomplete-state assets
+
+- **Draft and placeholder refs:** Packs, subtypes, or bundles with `status` = `draft` (or overlay status inactive) and broken or placeholder refs produce lint errors or warnings like any other invalid definition. Scaffolded assets are not given a special bypass; they must pass schema and ref checks before promotion to active. Release-ready candidate flows exclude draft/incomplete assets per [scaffold-incomplete-state-guardrail-contract.md](../contracts/scaffold-incomplete-state-guardrail-contract.md).
+
+---
+
+## 7. Do not
 
 - Expose the linter on a public endpoint.
 - Auto-fix or mutate definition files from this tool.

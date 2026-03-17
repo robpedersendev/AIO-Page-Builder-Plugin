@@ -70,7 +70,7 @@ A simulation run returns a bounded result object:
 ## 7. Integration
 
 - **Comparison screen/services**: Industry_Subtype_Comparison_Service (or similar) can be called with simulated keys to produce comparison_simulated. What-if service composes these calls; it does not replace the comparison service.
-- **Support/admin docs**: Document that what-if is available for previewing industry/subtype/bundle changes; no apply step.
+- **Support/admin docs**: Document that what-if is available for previewing industry/subtype/bundle changes; no apply step. The Conversion goal comparison screen (Prompt 515) uses the simulation service to compare no-goal, current-goal, and alternate-goal scenarios for bundle and Build Plan posture.
 - **Cache/docs**: Document that simulation uses in-memory or isolated context so cache and docs can state simulation isolation clearly.
 
 ---

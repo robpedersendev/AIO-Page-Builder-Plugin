@@ -34,6 +34,7 @@ final class Industry_What_If_Simulation_Service_Test extends TestCase {
 			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor',
 			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => '',
 			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => '',
+			Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY => 'bookings',
 		);
 		\update_option( Option_Names::INDUSTRY_PROFILE, $profile );
 	}
@@ -52,6 +53,44 @@ final class Industry_What_If_Simulation_Service_Test extends TestCase {
 		$this->assertTrue( $result['valid'] );
 		$this->assertSame( 'realtor', $result['simulated_profile_summary']['primary'] );
 		$this->assertSame( array(), $result['invalid_refs'] );
+	}
+
+	/** No-goal override: simulated summary has goal empty; live unchanged (Prompt 515 comparison). */
+	public function test_run_simulation_no_goal_clears_goal_in_summary(): void {
+		$settings = new Settings_Service();
+		$repo     = new Industry_Profile_Repository( $settings );
+		$service  = new Industry_What_If_Simulation_Service( $repo );
+		$result   = $service->run_simulation( array(
+			Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => '',
+		) );
+		$this->assertTrue( $result['valid'] );
+		$this->assertSame( '', $result['simulated_profile_summary']['goal'] );
+		$this->assertSame( 'bookings', $result['live_profile_summary']['goal'] );
+	}
+
+	/** Alternate goal valid: simulated summary reflects goal key (Prompt 515 comparison). */
+	public function test_run_simulation_alternate_goal_valid(): void {
+		$settings = new Settings_Service();
+		$repo     = new Industry_Profile_Repository( $settings );
+		$service  = new Industry_What_If_Simulation_Service( $repo );
+		$result   = $service->run_simulation( array(
+			Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => 'lead_capture',
+		) );
+		$this->assertTrue( $result['valid'] );
+		$this->assertSame( 'lead_capture', $result['simulated_profile_summary']['goal'] );
+		$this->assertSame( 'bookings', $result['live_profile_summary']['goal'] );
+	}
+
+	/** Invalid goal key (disallowed chars): simulated goal cleared; safe fallback (Prompt 515). */
+	public function test_run_simulation_invalid_goal_key_sanitized(): void {
+		$settings = new Settings_Service();
+		$repo     = new Industry_Profile_Repository( $settings );
+		$service  = new Industry_What_If_Simulation_Service( $repo );
+		$result   = $service->run_simulation( array(
+			Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => 'invalid.goal!',
+		) );
+		$this->assertTrue( $result['valid'] );
+		$this->assertSame( '', $result['simulated_profile_summary']['goal'] );
 	}
 
 	/** Invalid primary ref yields valid=false and invalid_refs when pack registry present. */

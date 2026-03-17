@@ -21,6 +21,8 @@
 | **Known risks** | Industry risks (if any) recorded in known-risk-register; mitigations or waiver. | [known-risk-register.md](known-risk-register.md) §3. |
 | **Style preset quality** | Internal style preset benchmark available for distinctiveness, compatibility, and accessibility review (optional for first ship). | [industry-style-preset-benchmark-protocol.md](../qa/industry-style-preset-benchmark-protocol.md); Industry_Style_Preset_Benchmark_Service. |
 
+**Completeness (advisory):** Maintainers may use [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) to assess pack/subtype completeness. Score is advisory only; it does not replace gate criteria or sign-off.
+
 ---
 
 ## 2. Blockers vs deferred
@@ -44,4 +46,4 @@ Before release, run the **industry pre-release validation pipeline** so definiti
 
 **Final signoff document:** [industry-subsystem-final-signoff.md](industry-subsystem-final-signoff.md) compiles evidence and records production signoff for the first industry-enabled release.
 
-*Reference this gate in [release-review-packet.md](release-review-packet.md) §2.10 and [sign-off-checklist.md](sign-off-checklist.md) when Industry Pack is in release scope. Use [industry-pre-release-validation-pipeline.md](industry-pre-release-validation-pipeline.md) and [industry-pre-release-checklist.md](industry-pre-release-checklist.md) for repeatable pre-release validation. For promoting validated sandbox candidates to release-ready (no auto-activate), see [industry-sandbox-promotion-workflow.md](../operations/industry-sandbox-promotion-workflow.md) and [industry-release-candidate-manifest-contract.md](../contracts/industry-release-candidate-manifest-contract.md).*
+*Reference this gate in [release-review-packet.md](release-review-packet.md) §2.10 and [sign-off-checklist.md](sign-off-checklist.md) when Industry Pack is in release scope. Use [industry-pre-release-validation-pipeline.md](industry-pre-release-validation-pipeline.md) and [industry-pre-release-checklist.md](industry-pre-release-checklist.md) for repeatable pre-release validation. For promoting validated sandbox candidates to release-ready (no auto-activate), see [industry-sandbox-promotion-workflow.md](../operations/industry-sandbox-promotion-workflow.md) and [industry-release-candidate-manifest-contract.md](../contracts/industry-release-candidate-manifest-contract.md). **Scaffold/incomplete assets:** Draft or scaffold-incomplete packs, subtypes, and bundles are excluded from release-ready candidate flows; see [scaffold-incomplete-state-guardrail-contract.md](../contracts/scaffold-incomplete-state-guardrail-contract.md).*

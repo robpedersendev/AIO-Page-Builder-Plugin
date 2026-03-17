@@ -42,6 +42,7 @@ use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Assistant;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Style_Preset_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Conversion_Goal_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Subtype_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Global_Component_Override_Settings_Screen;
@@ -161,6 +162,8 @@ final class Admin_Menu {
 		$industry_profile     = new Industry_Profile_Settings_Screen( $this->container );
 		$industry_health_report = new Industry_Health_Report_Screen( $this->container );
 		$industry_subtype_comparison = new Industry_Subtype_Comparison_Screen( $this->container );
+		$industry_bundle_comparison   = new Industry_Starter_Bundle_Comparison_Screen( $this->container );
+		$industry_goal_comparison    = new Conversion_Goal_Comparison_Screen( $this->container );
 		$industry_bundle_import_preview = new Industry_Bundle_Import_Preview_Screen( $this->container );
 		$industry_style_preset = new Industry_Style_Preset_Screen( $this->container );
 		$global_style_tokens = new Global_Style_Token_Settings_Screen( $this->container );
@@ -439,6 +442,15 @@ final class Admin_Menu {
 			$industry_bundle_comparison->get_capability(),
 			Industry_Starter_Bundle_Comparison_Screen::SLUG,
 			array( $industry_bundle_comparison, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_goal_comparison->get_title(),
+			__( 'Conversion goal comparison', 'aio-page-builder' ),
+			$industry_goal_comparison->get_capability(),
+			Conversion_Goal_Comparison_Screen::SLUG,
+			array( $industry_goal_comparison, 'render' )
 		);
 
 		add_submenu_page(

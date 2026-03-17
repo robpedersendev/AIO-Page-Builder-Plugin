@@ -53,6 +53,7 @@
 - **Schema:** Scaffolded artifacts must pass **structural** validation (required fields present, types correct, version_marker supported). They may fail **ref resolution** (e.g. token_preset_ref pointing to a key that does not yet exist) until dependencies are added.
 - **Linting:** Industry_Definition_Linter may report errors for broken refs or missing dependencies; authors resolve these before promoting to active.
 - **Health check:** Industry_Health_Check_Service will report errors for pack refs that do not resolve; scaffolded packs with placeholder refs are expected to produce health errors until refs are filled. Do not activate scaffolded packs in production.
+- **Incomplete-state guardrails:** Scaffolded (incomplete) assets are excluded from release-ready candidate flows and must not be mistaken for releasable definitions. See [scaffold-incomplete-state-guardrail-contract.md](scaffold-incomplete-state-guardrail-contract.md) for validation behavior, release-gate exclusion, and how incomplete state is cleared through authoring.
 
 ---
 
@@ -77,7 +78,11 @@
 
 ## 8. References
 
+- [future-industry-scaffold-pack-template.md](../operations/future-industry-scaffold-pack-template.md) — Concrete file and artifact skeleton for a future industry pack (Prompt 516); required artifact classes, placement, placeholder markers, minimum docs/QA.
+- [future-subtype-scaffold-pack-template.md](../operations/future-subtype-scaffold-pack-template.md) — Concrete file and artifact skeleton for a future subtype pack (Prompt 517); subtype definitions, overlay/bundle/caution placeholders, docs/QA minimums.
 - [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) — Required pieces and implementation order.
 - [industry-pack-maintenance-checklist.md](../operations/industry-pack-maintenance-checklist.md) — Maintenance baseline.
 - [future-industry-candidate-evaluation-framework.md](../operations/future-industry-candidate-evaluation-framework.md) — Candidate evaluation before authoring.
 - [industry-contract-consistency-audit.md](industry-contract-consistency-audit.md) — Naming and lifecycle.
+- [scaffold-incomplete-state-guardrail-contract.md](scaffold-incomplete-state-guardrail-contract.md) — Incomplete-state validation, release-gate exclusion, linting integration (Prompt 518).
+- [industry-pack-completeness-scoring-contract.md](industry-pack-completeness-scoring-contract.md) — Advisory completeness dimensions for packs, subtypes, bundles, overlays, docs, QA (Prompt 519); use to assess scaffold progress toward release-grade.

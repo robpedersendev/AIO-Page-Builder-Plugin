@@ -61,7 +61,7 @@
 2. **Backlog:** When considering a new industry, fill [future-industry-scorecard-template.md](future-industry-scorecard-template.md) (from dossier evidence or via Future_Industry_Scorecard_Executor) and attach to the candidate.
 2. **Planning:** Use score and categories to order “New industries” in roadmap (industry-subsystem-roadmap-contract §5) and to set expectations (e.g. “T1 overlays only” for Review candidates).
 4. **Prompt generation:** Scorecard and framework provide concrete inputs for future prompts (required pieces, overlays, subtypes, compliance notes).
-5. **Authoring:** Once approved, follow industry-pack-authoring-guide and industry-pack-maintenance-checklist; framework does not replace them. For consistent file and placeholder skeletons, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md).
+5. **Authoring:** Once approved, follow industry-pack-authoring-guide and industry-pack-maintenance-checklist; framework does not replace them. For consistent file and placeholder skeletons, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md) and the concrete [future-industry-scaffold-pack-template.md](future-industry-scaffold-pack-template.md).
 
 ---
 
@@ -75,6 +75,7 @@
 - [future-industry-scorecard-template.md](future-industry-scorecard-template.md) — Scorecard template for each candidate; can be filled from dossier via scorecard executor (Prompt 472).
 - [future-industry-scorecard-executor-contract.md](../contracts/future-industry-scorecard-executor-contract.md) — Contract for Future_Industry_Scorecard_Executor (dossier → scorecard result).
 - [future-industry-comparison-matrix-template.md](future-industry-comparison-matrix-template.md) — Comparison matrix workflow and template; Future_Industry_Comparison_Matrix_Service (Prompt 473) for multi-candidate side-by-side comparison.
+- [future-industry-scaffold-pack-template.md](future-industry-scaffold-pack-template.md) — Concrete scaffold pack template for new industries (Prompt 516); artifact classes, placement, placeholders, docs/QA minimums.
 
 ---
 

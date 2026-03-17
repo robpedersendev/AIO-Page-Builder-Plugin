@@ -47,10 +47,17 @@
 
 ---
 
-## 4. References
+## 4. Completeness assessment
+
+- **Pack completeness scoring:** Maintainers can assess whether a pack or subtype asset set is minimally complete, strong, or release-grade using the advisory [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) (Prompt 519). Score is advisory only; it does not replace release gate or human review.
+
+---
+
+## 5. References
 
 - [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md)
 - [industry-phase-two-backlog-map.md](industry-phase-two-backlog-map.md)
 - [known-risk-register.md](../release/known-risk-register.md) §3 IND-1, IND-2, IND-3
 - [industry-subsystem-final-signoff.md](../release/industry-subsystem-final-signoff.md)
 - [industry-degraded-mode-contract.md](../contracts/industry-degraded-mode-contract.md)
+- [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) — Advisory completeness dimensions and bands for packs, subtypes, bundles, overlays, docs, QA.

@@ -66,7 +66,7 @@ Planning should produce:
 - **Priority order**: Ordered by prioritization factors (§3); optional go/review/defer per candidate.
 - **Documentation**: Update subtype catalog and extension contract references when a subtype is approved; update roadmap/backlog when deferred.
 
-These outputs support future prompt generation and backlog ordering; they do not auto-create subtypes.
+These outputs support future prompt generation and backlog ordering; they do not auto-create subtypes. When implementing an approved subtype, use the concrete [future-subtype-scaffold-pack-template.md](future-subtype-scaffold-pack-template.md) for the file and artifact skeleton (Prompt 517).
 
 ---
 
@@ -88,3 +88,4 @@ These outputs support future prompt generation and backlog ordering; they do not
 - [industry-subsystem-maturity-matrix.md](industry-subsystem-maturity-matrix.md)
 - [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md) (subtype complexity dimension)
 - [industry-subtype-benchmark-protocol.md](../qa/industry-subtype-benchmark-protocol.md) — Benchmark to measure meaningful vs weak subtype differentiation; can inform second-wave prioritization.
+- [future-subtype-scaffold-pack-template.md](future-subtype-scaffold-pack-template.md) — Concrete scaffold template for new subtypes (Prompt 517); artifact classes, placement, placeholders, docs/QA minimums.

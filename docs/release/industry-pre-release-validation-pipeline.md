@@ -65,3 +65,4 @@
 - [industry-sandbox-promotion-workflow.md](../operations/industry-sandbox-promotion-workflow.md) — Sandbox-to-release promotion (no auto-activate).
 - [industry-pack-maintenance-checklist.md](../operations/industry-pack-maintenance-checklist.md) — Ongoing maintenance.
 - [industry-release-candidate-manifest-contract.md](../contracts/industry-release-candidate-manifest-contract.md) — Release candidate evidence requirements.
+- [scaffold-incomplete-state-guardrail-contract.md](../contracts/scaffold-incomplete-state-guardrail-contract.md) — Scaffold/incomplete assets excluded from release-ready set; validation and authoring path.

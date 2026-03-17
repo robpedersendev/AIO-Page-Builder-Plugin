@@ -2,7 +2,7 @@
 
 **Spec**: industry-pack-extension-contract.md; industry-pack-schema.md; industry-pack-release-gate.md; industry-subsystem-roadmap-contract.md; all industry subsystem contracts and schemas (Prompts 318–378).
 
-**Purpose**: Internal workflow for adding new industry packs so expansion stays disciplined, registry-first, and consistent with subsystem contracts. Use with [industry-pack-author-checklist.md](industry-pack-author-checklist.md). Long-term extension boundaries and roadmap: [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md). **v2 guardrails** (Prompt 469): [industry-subsystem-v2-guardrails.md](../contracts/industry-subsystem-v2-guardrails.md) define unacceptable drift and acceptable seams; authoring must align. **Before** adding a new industry, evaluate the candidate with [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md) and [future-industry-scorecard-template.md](future-industry-scorecard-template.md). To start from consistent file structures and schema-valid placeholders instead of ad hoc copying, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md) (scaffold scope, paths, placeholder markers, promotion path).
+**Purpose**: Internal workflow for adding new industry packs so expansion stays disciplined, registry-first, and consistent with subsystem contracts. Use with [industry-pack-author-checklist.md](industry-pack-author-checklist.md). Long-term extension boundaries and roadmap: [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md). **v2 guardrails** (Prompt 469): [industry-subsystem-v2-guardrails.md](../contracts/industry-subsystem-v2-guardrails.md) define unacceptable drift and acceptable seams; authoring must align. **Before** adding a new industry, evaluate the candidate with [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md) and [future-industry-scorecard-template.md](future-industry-scorecard-template.md). To start from consistent file structures and schema-valid placeholders instead of ad hoc copying, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md) and the concrete [future-industry-scaffold-pack-template.md](future-industry-scaffold-pack-template.md) (required artifact classes, file placement, placeholder markers, minimum docs/QA, promotion path).
 
 ---
 
@@ -47,7 +47,7 @@
 8. **Question packs** (if used) – Add question-pack definition; register in Industry_Question_Pack_Registry.
 9. **Catalog and docs** – Update industry-pack-catalog.md, industry-overlay-catalog.md, industry-cta-pattern-catalog.md, industry-style-preset-catalog.md, industry-seo-guidance-catalog.md, industry-lpagery-rule-catalog.md, industry-question-pack-catalog.md as applicable.
 10. **Validation and QA** – Run Industry_Profile_Validator and pack validation for the new industry_key; run industry-subsystem-acceptance-report checks; update release gate evidence if in scope.
-11. **Subtypes** (optional) – If adding subtypes for the industry, define subtype objects per industry-subtype-schema.md; register in subtype registry; ensure profile industry_subtype_key validation and resolver fallback (industry-subtype-extension-contract.md).
+11. **Subtypes** (optional) – If adding subtypes for the industry, define subtype objects per industry-subtype-schema.md; register in subtype registry; ensure profile industry_subtype_key validation and resolver fallback (industry-subtype-extension-contract.md). To start from a consistent skeleton, use [future-subtype-scaffold-pack-template.md](future-subtype-scaffold-pack-template.md).
 
 ---
 
@@ -61,6 +61,7 @@
 - **No-industry fallback**: With zero industry packs or empty profile, core plugin behavior unchanged. Acceptance report documents no-industry path.
 - **Export/restore**: Export includes industry profile and applied preset; pack definitions are part of registry export when applicable. Restore validates industry schema version; unsupported version skips industry restore with log.
 - **Diagnostics**: Industry_Diagnostics_Service snapshot includes primary/secondary industries, active pack refs, applied preset ref; no secrets or unbounded payloads.
+- **Completeness (advisory):** Use [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) to assess whether a pack or subtype set is minimally complete, strong, or release-grade. Score does not replace validation or release gate.
 
 ---
 
