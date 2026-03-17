@@ -90,3 +90,4 @@ These outputs support future prompt generation and backlog ordering; they do not
 - [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md) (subtype complexity dimension)
 - [industry-subtype-benchmark-protocol.md](../qa/industry-subtype-benchmark-protocol.md) — Benchmark to measure meaningful vs weak subtype differentiation; can inform second-wave prioritization.
 - [future-subtype-scaffold-pack-template.md](future-subtype-scaffold-pack-template.md) — Concrete scaffold template for new subtypes (Prompt 517); artifact classes, placement, placeholders, docs/QA minimums.
+- **Future subtype readiness screen** (Prompt 567) — Internal admin screen aggregating subtype planning, subtype scaffold, and subtype promotion-readiness; linked from Industry Author Dashboard. Use to decide when subtype expansion work should proceed.

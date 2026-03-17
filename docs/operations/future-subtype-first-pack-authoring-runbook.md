@@ -90,3 +90,4 @@ Execute in order. Each step has a **signoff checkpoint** before proceeding.
 - [industry-pre-release-validation-pipeline.md](../release/industry-pre-release-validation-pipeline.md) — Validation steps and order.
 - [industry-pack-release-gate.md](../release/industry-pack-release-gate.md) — Gate criteria and sign-off.
 - [future-industry-first-pack-authoring-runbook.md](future-industry-first-pack-authoring-runbook.md) — First industry pack runbook; subtypes may be created as part of that or separately.
+- **Future subtype readiness screen** (Prompt 567) — Admin screen for subtype scaffold and promotion-readiness summary; use for planning and status before starting this runbook.

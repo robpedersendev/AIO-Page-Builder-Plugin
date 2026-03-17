@@ -77,6 +77,7 @@
 - [future-industry-scorecard-executor-contract.md](../contracts/future-industry-scorecard-executor-contract.md) — Contract for Future_Industry_Scorecard_Executor (dossier → scorecard result).
 - [future-industry-comparison-matrix-template.md](future-industry-comparison-matrix-template.md) — Comparison matrix workflow and template; Future_Industry_Comparison_Matrix_Service (Prompt 473) for multi-candidate side-by-side comparison.
 - [future-industry-scaffold-pack-template.md](future-industry-scaffold-pack-template.md) — Concrete scaffold pack template for new industries (Prompt 516); artifact classes, placement, placeholders, docs/QA minimums.
+- **Future industry readiness screen** (Prompt 566) — Internal admin screen aggregating candidate scorecard summary, scaffold readiness, promotion-readiness, and blockers; linked from Industry Author Dashboard. Use for planning when to start future-industry work.
 
 ---
 

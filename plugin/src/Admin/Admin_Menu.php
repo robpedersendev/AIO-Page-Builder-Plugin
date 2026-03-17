@@ -44,6 +44,8 @@ use AIOPageBuilder\Admin\Screens\Industry\Industry_Maturity_Delta_Report_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Scaffold_Promotion_Readiness_Report_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Family_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Stale_Content_Report_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Future_Industry_Readiness_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Future_Subtype_Readiness_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Override_Management_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
@@ -175,6 +177,8 @@ final class Admin_Menu {
 		$industry_health_report = new Industry_Health_Report_Screen( $this->container );
 		$industry_stale_content_report = new Industry_Stale_Content_Report_Screen( $this->container );
 		$industry_pack_family_comparison = new Industry_Pack_Family_Comparison_Screen( $this->container );
+		$industry_future_readiness = new Future_Industry_Readiness_Screen( $this->container );
+		$industry_future_subtype_readiness = new Future_Subtype_Readiness_Screen( $this->container );
 		$industry_maturity_delta_report = new Industry_Maturity_Delta_Report_Screen( $this->container );
 		$industry_drift_report = new Industry_Drift_Report_Screen( $this->container );
 		$industry_scaffold_promotion_readiness = new Industry_Scaffold_Promotion_Readiness_Report_Screen( $this->container );
@@ -469,6 +473,24 @@ final class Admin_Menu {
 			$industry_pack_family_comparison->get_capability(),
 			Industry_Pack_Family_Comparison_Screen::SLUG,
 			array( $industry_pack_family_comparison, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_future_readiness->get_title(),
+			__( 'Future industry readiness', 'aio-page-builder' ),
+			$industry_future_readiness->get_capability(),
+			Future_Industry_Readiness_Screen::SLUG,
+			array( $industry_future_readiness, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_future_subtype_readiness->get_title(),
+			__( 'Future subtype readiness', 'aio-page-builder' ),
+			$industry_future_subtype_readiness->get_capability(),
+			Future_Subtype_Readiness_Screen::SLUG,
+			array( $industry_future_subtype_readiness, 'render' )
 		);
 
 		add_submenu_page(

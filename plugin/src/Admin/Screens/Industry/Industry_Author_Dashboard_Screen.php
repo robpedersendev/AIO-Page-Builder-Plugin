@@ -119,8 +119,10 @@ final class Industry_Author_Dashboard_Screen {
 			'industry_profile'      => $base . '?page=' . Industry_Profile_Settings_Screen::SLUG,
 			'health_report'         => $base . '?page=' . Industry_Health_Report_Screen::SLUG,
 			'stale_content_report'   => $base . '?page=' . Industry_Stale_Content_Report_Screen::SLUG,
-			'pack_family_comparison'   => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
-			'maturity_delta_report'    => $base . '?page=' . Industry_Maturity_Delta_Report_Screen::SLUG,
+			'pack_family_comparison'      => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
+			'future_industry_readiness'   => $base . '?page=' . Future_Industry_Readiness_Screen::SLUG,
+			'future_subtype_readiness'    => $base . '?page=' . Future_Subtype_Readiness_Screen::SLUG,
+			'maturity_delta_report'       => $base . '?page=' . Industry_Maturity_Delta_Report_Screen::SLUG,
 			'drift_report'                    => $base . '?page=' . Industry_Drift_Report_Screen::SLUG,
 			'scaffold_promotion_readiness'    => $base . '?page=' . Industry_Scaffold_Promotion_Readiness_Report_Screen::SLUG,
 			'guided_repair'                    => $base . '?page=' . Industry_Guided_Repair_Screen::SLUG,
@@ -201,7 +203,9 @@ final class Industry_Author_Dashboard_Screen {
 
 		$base = admin_url( 'admin.php' );
 		$links = array(
-			'pack_family_comparison' => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
+			'pack_family_comparison'     => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
+			'future_industry_readiness'  => $base . '?page=' . Future_Industry_Readiness_Screen::SLUG,
+			'future_subtype_readiness'   => $base . '?page=' . Future_Subtype_Readiness_Screen::SLUG,
 		);
 
 		return new Future_Expansion_Readiness_Widget_View_Model(
@@ -279,7 +283,7 @@ final class Industry_Author_Dashboard_Screen {
 						<?php echo esc_html( (string) $expansion_vm->get_scaffold_incomplete_count() ); ?> <?php esc_html_e( 'scaffold incomplete', 'aio-page-builder' ); ?>
 					</p>
 					<p class="description"><?php echo esc_html( $expansion_vm->get_candidate_readiness_label() ); ?> · <?php echo esc_html( $expansion_vm->get_maturity_floor_label() ); ?></p>
-					<p><a href="<?php echo esc_url( $expansion_vm->get_links()['pack_family_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Pack family comparison', 'aio-page-builder' ); ?></a></p>
+					<p><a href="<?php echo esc_url( $expansion_vm->get_links()['pack_family_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Pack family comparison', 'aio-page-builder' ); ?></a> &middot; <a href="<?php echo esc_url( $expansion_vm->get_links()['future_industry_readiness'] ?? '#' ); ?>"><?php esc_html_e( 'Future industry readiness', 'aio-page-builder' ); ?></a> &middot; <a href="<?php echo esc_url( $expansion_vm->get_links()['future_subtype_readiness'] ?? '#' ); ?>"><?php esc_html_e( 'Future subtype readiness', 'aio-page-builder' ); ?></a></p>
 				</section>
 			</div>
 
@@ -290,6 +294,8 @@ final class Industry_Author_Dashboard_Screen {
 					<li><a href="<?php echo esc_url( $vm->get_links()['health_report'] ?? '#' ); ?>"><?php esc_html_e( 'Industry Health Report', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['stale_content_report'] ?? '#' ); ?>"><?php esc_html_e( 'Stale content report', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['pack_family_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Pack family comparison', 'aio-page-builder' ); ?></a></li>
+					<li><a href="<?php echo esc_url( $vm->get_links()['future_industry_readiness'] ?? '#' ); ?>"><?php esc_html_e( 'Future industry readiness', 'aio-page-builder' ); ?></a></li>
+					<li><a href="<?php echo esc_url( $vm->get_links()['future_subtype_readiness'] ?? '#' ); ?>"><?php esc_html_e( 'Future subtype readiness', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['maturity_delta_report'] ?? '#' ); ?>"><?php esc_html_e( 'Maturity delta report', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['drift_report'] ?? '#' ); ?>"><?php esc_html_e( 'Drift report', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['scaffold_promotion_readiness'] ?? '#' ); ?>"><?php esc_html_e( 'Scaffold promotion readiness', 'aio-page-builder' ); ?></a></li>

@@ -66,6 +66,8 @@ Severity grouping: **blocker** (health errors, completeness blocker_flags), **ma
 - **Bundle comparison** — Compare two or more starter bundles.
 - **Conversion goal comparison** — No-goal vs goal-aware comparison.
 - **Pack family comparison** — Internal comparison of launch-industry families, subtype families, and candidates (completeness, coverage, caution, bundle, preset, maturity) per [industry-pack-family-comparison-contract.md](industry-pack-family-comparison-contract.md) (Prompt 557–558).
+- **Future industry readiness** — Dedicated screen (Prompt 566) aggregating candidate scorecard summary, scaffold readiness, promotion-readiness summary, and blockers; links to pack family comparison and scaffold promotion readiness.
+- **Future subtype readiness** — Dedicated screen (Prompt 567) aggregating subtype planning, subtype scaffold, and subtype promotion-readiness; links to subtype comparison and scaffold promotion readiness.
 - **Maturity delta report** — Compare maturity snapshots over time (improvement/stagnation/regression); see [industry-maturity-delta-report-contract.md](industry-maturity-delta-report-contract.md).
 - **Drift report** — Internal drift detection (contract/schema/docs/convention); see [industry-subsystem-drift-detection-contract.md](industry-subsystem-drift-detection-contract.md).
 - **Scaffold promotion readiness** — Report of scaffolded assets by readiness tier (scaffold-complete, authored-near-ready, not-near-ready); see [industry-scaffold-promotion-readiness-contract.md](industry-scaffold-promotion-readiness-contract.md).

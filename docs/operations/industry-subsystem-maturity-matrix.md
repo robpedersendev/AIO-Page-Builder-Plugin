@@ -58,6 +58,7 @@
 
 ## 5. References
 
+- [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md) — Late-stage greenfield closure (Prompt 568); handoff to implementation-audit.
 - [industry-subtype-goal-benchmark-protocol.md](../qa/industry-subtype-goal-benchmark-protocol.md) — Combined subtype+goal benchmark (Prompt 535).
 - [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md)
 - [industry-phase-two-backlog-map.md](industry-phase-two-backlog-map.md)
