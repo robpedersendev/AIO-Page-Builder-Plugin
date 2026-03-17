@@ -182,6 +182,51 @@
       "status": "verified",
       "date_opened": "2025-03-16",
       "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-606",
+      "audit_prompt_number": "606",
+      "audit_domain": "reporting",
+      "summary": "No material defects found. Author dashboard and readiness screens audited; counts and links from report services, missing-data fallback correct. See docs/qa/industry-dashboard-reporting-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-607",
+      "audit_prompt_number": "607",
+      "audit_domain": "hardening",
+      "summary": "No material defects found. Performance and cache invalidation audited; lazy loading, version invalidation on profile/pack/style/restore verified. See docs/qa/industry-performance-cache-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-608",
+      "audit_prompt_number": "608",
+      "audit_domain": "hardening",
+      "summary": "No material defects found. Security and mutation paths audited; nonce and capability on all state-changing actions, preview/simulation non-mutating. See docs/qa/industry-security-mutation-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-609",
+      "audit_prompt_number": "609",
+      "audit_domain": "reporting",
+      "summary": "No material defects found. E2E regression matrix created; journeys and failure scenarios defined. See docs/qa/industry-end-to-end-regression-matrix.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-610",
+      "audit_prompt_number": "610",
+      "audit_domain": "hardening",
+      "summary": "Implementation-audit closure pack created; all domains 586-610 summarized, release gate and closure criteria defined. See docs/operations/industry-implementation-audit-closure-pack.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
     }
   ]
 }

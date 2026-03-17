@@ -134,6 +134,11 @@ Every audit prompt run must **append or update** the ledger (or JSON) before it 
 - [industry-shared-fragment-audit-report.md](../qa/industry-shared-fragment-audit-report.md) — Shared fragment resolver and adoption audit (Prompt 603).
 - [industry-export-restore-uninstall-audit-report.md](../qa/industry-export-restore-uninstall-audit-report.md) — Export, restore, deactivation, and uninstall audit (Prompt 604).
 - [industry-scaffold-promotion-audit-report.md](../qa/industry-scaffold-promotion-audit-report.md) — Scaffold, incomplete-state, and promotion-readiness audit (Prompt 605).
+- [industry-dashboard-reporting-audit-report.md](../qa/industry-dashboard-reporting-audit-report.md) — Author dashboard and report accuracy audit (Prompt 606).
+- [industry-performance-cache-audit-report.md](../qa/industry-performance-cache-audit-report.md) — Performance and cache invalidation audit (Prompt 607).
+- [industry-security-mutation-audit-report.md](../qa/industry-security-mutation-audit-report.md) — Capabilities, nonces, and unsafe-mutation security audit (Prompt 608).
+- [industry-end-to-end-regression-matrix.md](../qa/industry-end-to-end-regression-matrix.md) — E2E integration and regression matrix (Prompt 609).
+- [industry-implementation-audit-closure-pack.md](industry-implementation-audit-closure-pack.md) — Implementation-audit closure pack; release gate and remediation (Prompt 610).
 - [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) — Finding ledger (585A); must exist before audit 586+.
 - [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) — Audit → record → triage → remediate → verify.
 - [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md)
