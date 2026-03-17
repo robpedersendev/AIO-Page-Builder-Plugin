@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0",
+  "description": "Remediation entries linking findings to fix prompts (Prompt 585A). Used by the remediation prompt generation workflow (585B) to generate fix prompts from the ledger. See docs/operations/industry-audit-remediation-ledger.md, docs/operations/industry-remediation-prompt-generation-workflow.md, and docs/schemas/industry-remediation-entry-schema.md.",
+  "last_updated": null,
+  "remediation_entries": []
+}

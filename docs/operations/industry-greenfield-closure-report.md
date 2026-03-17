@@ -62,6 +62,8 @@ Implementation-audit prompts should **not** add new runtime features. They shoul
 
 **Entrypoint:** Use the [industry-implementation-audit-entrypoint-map.md](industry-implementation-audit-entrypoint-map.md) (Prompt 569) for priority audit domains, high-risk codepaths, and audit clusters. That map is the formal handoff for audit-phase prompt generation.
 
+**Finding ledger (585A):** Before running audit prompts (586+), the [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) and [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) must be in place. Every audit run must record findings (or no-finding) in the ledger; every remediation prompt must reference at least one finding_id.
+
 ---
 
 ## 4. Practical audit clusters (recommended grouping)
@@ -97,3 +99,5 @@ Audit clusters should be dependency-aware: e.g. profile and resolution before re
 - [industry-next-phase-prompt-map.md](industry-next-phase-prompt-map.md)
 - [industry-subsystem-v2-guardrails.md](../contracts/industry-subsystem-v2-guardrails.md)
 - [industry-implementation-audit-entrypoint-map.md](industry-implementation-audit-entrypoint-map.md)
+- [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) — Audit finding ledger (585A); required before audit 586+.
+- [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) — Audit → record → triage → remediate → verify.

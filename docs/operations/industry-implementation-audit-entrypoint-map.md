@@ -90,7 +90,19 @@ Do not use this map to add new runtime features. Use it to generate audits, test
 
 ---
 
-## 6. Alignment with greenfield closure and roadmap
+## 6. Audit finding ledger and remediation tracking (Prompt 585A)
+
+Before running any implementation-audit prompt (586+), the **audit finding ledger and remediation tracking system** must be in place:
+
+- **Ledger:** [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) — Human-readable ledger; finding ID format (IND-AUD-NNNN); severity and status taxonomy; grouping dimensions; release-blocker rules.
+- **Workflow:** [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) — Run audit → record findings (or no-finding) → triage → group into remediation prompts → implement → verify → close.
+- **Machine-readable:** `plugin/docs/internal/industry-audit-findings.json` (findings), `plugin/docs/internal/industry-remediation-tracker.json` (remediation entries). Schemas: [industry-audit-finding-schema.md](../schemas/industry-audit-finding-schema.md), [industry-remediation-entry-schema.md](../schemas/industry-remediation-entry-schema.md).
+
+Every audit prompt run must **append or update** the ledger (or JSON) before it is considered complete. Every remediation (fix) prompt later created must reference at least one finding_id from the ledger.
+
+---
+
+## 7. Alignment with greenfield closure and roadmap
 
 - **Greenfield closure:** [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md) defines the boundary. Implementation-audit starts **after** that closure; it does not extend greenfield capability layers unless explicitly scoped elsewhere.
 - **Archive map:** [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) (Prompt 570) summarizes prompt ranges by capability cluster, authoritative contracts, and the transition into implementation-audit. Use it to trace capability to prompt range and to confirm which artifacts are authoritative.
@@ -100,8 +112,10 @@ Do not use this map to add new runtime features. Use it to generate audits, test
 
 ---
 
-## 7. References
+## 8. References
 
+- [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) — Finding ledger (585A); must exist before audit 586+.
+- [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) — Audit → record → triage → remediate → verify.
 - [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md)
 - [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) — Greenfield prompt archival map (Prompt 570); prompt ranges, authoritative contracts, transition point.
 - [industry-optional-late-stage-greenfield-backlog.md](industry-optional-late-stage-greenfield-backlog.md) — Optional late-stage greenfield backlog (Prompt 585); Prompts 571–584; audit remains next priority.
