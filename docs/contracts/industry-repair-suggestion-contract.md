@@ -62,3 +62,7 @@ When no good suggestion exists (e.g. ambiguity too high), the engine returns `nu
 
 - **Engine**: `plugin/src/Domain/Industry/Reporting/Industry_Repair_Suggestion_Engine.php`
 - **Contract**: This document.
+
+## 7. Guided repair workflow
+
+For a step-by-step operator workflow from detection to bounded correction (missing refs, deprecated refs, inactive assets, stale overrides), see [industry-guided-repair-workflow-contract.md](industry-guided-repair-workflow-contract.md). The repair suggestion engine feeds into that workflow; no auto-apply.

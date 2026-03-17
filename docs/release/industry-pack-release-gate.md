@@ -21,7 +21,7 @@
 | **Known risks** | Industry risks (if any) recorded in known-risk-register; mitigations or waiver. | [known-risk-register.md](known-risk-register.md) §3. |
 | **Style preset quality** | Internal style preset benchmark available for distinctiveness, compatibility, and accessibility review (optional for first ship). | [industry-style-preset-benchmark-protocol.md](../qa/industry-style-preset-benchmark-protocol.md); Industry_Style_Preset_Benchmark_Service. |
 
-**Completeness (advisory):** Maintainers may use [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) to assess pack/subtype completeness. Score is advisory only; it does not replace gate criteria or sign-off.
+**Completeness (advisory):** Maintainers may use [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) and the completeness report generator (`Industry_Pack_Completeness_Report_Service::generate_report()`) to assess pack/subtype completeness. Score is advisory only; it does not replace gate criteria or sign-off. For a single maintenance queue from completeness, gap prioritization, and override conflicts, use [industry-author-task-queue-contract.md](../contracts/industry-author-task-queue-contract.md) and `Industry_Author_Task_Queue_Service::generate_queue()`.
 
 ---
 

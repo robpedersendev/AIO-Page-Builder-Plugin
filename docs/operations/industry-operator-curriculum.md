@@ -13,6 +13,7 @@
 3. **Diagnostics and health** — Use [industry-subsystem-diagnostics-checklist.md](../qa/industry-subsystem-diagnostics-checklist.md). Know snapshot shape, health report, documentation summary export, and bounded-output rules.
 4. **Troubleshooting** — Use [industry-bad-fit-recommendation-troubleshooting.md](industry-bad-fit-recommendation-troubleshooting.md) for recommendation issues; [support-triage-guide.md](../guides/support-triage-guide.md) for logs and support bundle.
 5. **Maintenance and release** — Use [industry-pack-maintenance-checklist.md](industry-pack-maintenance-checklist.md) and [industry-pack-authoring-guide.md](industry-pack-authoring-guide.md); [industry-pack-release-gate.md](../release/industry-pack-release-gate.md) and pre-release pipeline for release.
+6. **Guided repair** — For step-by-step repair of missing refs, deprecated refs, inactive assets, and override conflicts: [industry-guided-repair-workflow-contract.md](../contracts/industry-guided-repair-workflow-contract.md).
 
 ---
 

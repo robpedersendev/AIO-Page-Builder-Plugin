@@ -61,7 +61,7 @@
 - **No-industry fallback**: With zero industry packs or empty profile, core plugin behavior unchanged. Acceptance report documents no-industry path.
 - **Export/restore**: Export includes industry profile and applied preset; pack definitions are part of registry export when applicable. Restore validates industry schema version; unsupported version skips industry restore with log.
 - **Diagnostics**: Industry_Diagnostics_Service snapshot includes primary/secondary industries, active pack refs, applied preset ref; no secrets or unbounded payloads.
-- **Completeness (advisory):** Use [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) to assess whether a pack or subtype set is minimally complete, strong, or release-grade. Score does not replace validation or release gate.
+- **Completeness (advisory):** Use [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) and `Industry_Pack_Completeness_Report_Service::generate_report()` to assess whether a pack or subtype set is minimally complete, strong, or release-grade. Score does not replace validation or release gate.
 
 ---
 
@@ -94,3 +94,4 @@
 - [industry-pack-release-gate.md](../release/industry-pack-release-gate.md) – Release gate and sign-off.
 - [industry-pack-catalog.md](../appendices/industry-pack-catalog.md) – Built-in pack list; add new pack entry here.
 - [industry-pack-extension-contract.md](../contracts/industry-pack-extension-contract.md) – Subsystem boundary and terminology.
+- [industry-author-dashboard-contract.md](../contracts/industry-author-dashboard-contract.md) – Internal author dashboard (Prompt 521); single place for health, completeness, release readiness.

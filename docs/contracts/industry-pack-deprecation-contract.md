@@ -88,3 +88,4 @@
 - **Pack schema**: industry-pack-schema.md; industry-starter-bundle-schema.md.
 - **Export/restore**: industry-export-restore-contract; industry-lifecycle-hardening-contract.md.
 - **Maintenance**: industry-pack-maintenance-checklist.md §8; known-risk-register.md (industry deprecation risk).
+- **Guided repair workflow**: [industry-guided-repair-workflow-contract.md](industry-guided-repair-workflow-contract.md) — operator workflow for deprecated refs, replacement, and migration.

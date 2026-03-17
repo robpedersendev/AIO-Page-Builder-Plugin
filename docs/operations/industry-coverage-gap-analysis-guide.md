@@ -58,7 +58,14 @@ Priorities are bounded and explainable; author judgment still determines what to
 
 ---
 
-## 7. Do not
+## 7. Prioritization
+
+- **Prioritization model:** To rank gaps by impact (urgent, important, optional), use [industry-coverage-gap-prioritization-contract.md](../contracts/industry-coverage-gap-prioritization-contract.md).
+- **Report generator:** `Industry_Coverage_Gap_Prioritization_Service` (plugin/src/Domain/Industry/Reporting/Industry_Coverage_Gap_Prioritization_Service.php). Consumes analyzer output (or a `gaps` array) and produces `ranked`, `by_tier`, `release_blocker_cues`, and `summary`. Call `generate_report($gap_result)` or `run($include_subtypes)` when the analyzer is injected. Use for backlog and author dashboard.
+
+---
+
+## 8. Do not
 
 - Auto-generate missing artifacts from this tool.
 - Expose coverage reports on a public surface.

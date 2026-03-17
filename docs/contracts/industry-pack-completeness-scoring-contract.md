@@ -88,7 +88,13 @@ Exact thresholds (e.g. "minimal = 5+, strong = 12+, release-grade = 18+") are de
 
 ---
 
-## 9. Cross-references
+## 9. Report generator
+
+- **Service:** `Industry_Pack_Completeness_Report_Service` (plugin/src/Domain/Industry/Reporting/Industry_Pack_Completeness_Report_Service.php) applies the scoring model to current packs and subtypes. Call `generate_report($include_subtypes)` to get `pack_results` (per pack/subtype: dimension_scores, total, band, missing_assets, blocker_flags, notes) and `summary` (pack_count, subtype_count, release_grade_count, strong_count, minimal_count, below_minimal_count). Internal-only; no mutation. See Prompt 520.
+
+---
+
+## 10. Cross-references
 
 - [industry-subsystem-maturity-matrix.md](../operations/industry-subsystem-maturity-matrix.md) — Capability-area maturity; completeness score can inform "evidence gaps" for a pack or subtype.
 - [industry-pack-release-gate.md](../release/industry-pack-release-gate.md) — Release criteria; score does not replace gate.

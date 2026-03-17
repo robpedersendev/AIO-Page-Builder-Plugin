@@ -334,6 +334,37 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$toggle
 			);
 		} );
+		$container->register( 'industry_coverage_gap_analyzer', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Coverage_Gap_Analyzer {
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			$section_overlay = $container->has( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) : null;
+			$page_overlay = $container->has( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) : null;
+			$bundle_registry = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+			$preset = $container->has( 'industry_style_preset_registry' ) ? $container->get( 'industry_style_preset_registry' ) : null;
+			$compliance = $container->has( self::CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY ) : null;
+			$seo = $container->has( self::CONTAINER_KEY_SEO_GUIDANCE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SEO_GUIDANCE_REGISTRY ) : null;
+			$qp = $container->has( 'industry_question_pack_registry' ) ? $container->get( 'industry_question_pack_registry' ) : null;
+			$subtype_registry = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Coverage_Gap_Analyzer(
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
+				$section_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry ? $section_overlay : null,
+				$page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry ? $page_overlay : null,
+				$bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $bundle_registry : null,
+				$preset instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry ? $preset : null,
+				$compliance instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Compliance_Rule_Registry ? $compliance : null,
+				$seo instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry ? $seo : null,
+				$qp instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp : null,
+				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null
+			);
+		} );
+		$container->register( 'industry_coverage_gap_prioritization_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Coverage_Gap_Prioritization_Service {
+			$analyzer = $container->has( 'industry_coverage_gap_analyzer' ) ? $container->get( 'industry_coverage_gap_analyzer' ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Coverage_Gap_Prioritization_Service(
+				$analyzer instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Coverage_Gap_Analyzer ? $analyzer : null
+			);
+		} );
+		$container->register( 'industry_author_task_queue_service', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Author_Task_Queue_Service {
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Author_Task_Queue_Service();
+		} );
 		$container->register( 'industry_documentation_summary_export_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Documentation_Summary_Export_Service {
 			$diagnostics = $container->has( 'industry_diagnostics_service' ) ? $container->get( 'industry_diagnostics_service' ) : null;
 			$health = $container->has( 'industry_health_check_service' ) ? $container->get( 'industry_health_check_service' ) : null;
@@ -531,6 +562,32 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null,
 				$bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $bundle_registry : null,
 				$comparison instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Comparison_Service ? $comparison : null
+			);
+		} );
+		$container->register( 'industry_pack_completeness_report_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Pack_Completeness_Report_Service {
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			$bundle_registry = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+			$section_overlay = $container->has( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SECTION_HELPER_OVERLAY_REGISTRY ) : null;
+			$page_overlay = $container->has( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY ) : null;
+			$cta = $container->has( self::CONTAINER_KEY_CTA_PATTERN_REGISTRY ) ? $container->get( self::CONTAINER_KEY_CTA_PATTERN_REGISTRY ) : null;
+			$seo = $container->has( self::CONTAINER_KEY_SEO_GUIDANCE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SEO_GUIDANCE_REGISTRY ) : null;
+			$preset = $container->has( 'industry_style_preset_registry' ) ? $container->get( 'industry_style_preset_registry' ) : null;
+			$lpagery = $container->has( self::CONTAINER_KEY_LPAGERY_RULE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_LPAGERY_RULE_REGISTRY ) : null;
+			$compliance = $container->has( self::CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY ) : null;
+			$subtype_registry = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
+			$health = $container->has( 'industry_health_check_service' ) ? $container->get( 'industry_health_check_service' ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Pack_Completeness_Report_Service(
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
+				$bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $bundle_registry : null,
+				$section_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry ? $section_overlay : null,
+				$page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry ? $page_overlay : null,
+				$cta instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry ? $cta : null,
+				$seo instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry ? $seo : null,
+				$preset instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry ? $preset : null,
+				$lpagery instanceof \AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Rule_Registry ? $lpagery : null,
+				$compliance instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Compliance_Rule_Registry ? $compliance : null,
+				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null,
+				$health instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service ? $health : null
 			);
 		} );
 		$container->register( 'industry_repair_suggestion_engine', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Repair_Suggestion_Engine {

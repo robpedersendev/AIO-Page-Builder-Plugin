@@ -66,3 +66,4 @@
 - **Activation**: industry-pack-activation-contract.md (inactive packs; migration does not change disabled list).
 - **Profile**: industry-profile-schema.md; Industry_Profile_Repository.
 - **Export/restore**: Migrated profile is stored normally; export/restore includes updated profile.
+- **Guided repair workflow**: [industry-guided-repair-workflow-contract.md](industry-guided-repair-workflow-contract.md) — step-by-step operator workflow for deprecated refs and migration.
