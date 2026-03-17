@@ -58,10 +58,11 @@
 ## 5. Use in workflow
 
 1. **Intake (Prompt 471):** Before scorecard evaluation, gather evidence using the [future-industry-intake-dossier-workflow.md](future-industry-intake-dossier-workflow.md) and [future-industry-intake-dossier-template.md](future-industry-intake-dossier-template.md). Every proposed vertical starts from a consistent dossier; ad hoc notes are not sufficient.
-2. **Backlog:** When considering a new industry, fill [future-industry-scorecard-template.md](future-industry-scorecard-template.md) (from dossier evidence or via Future_Industry_Scorecard_Executor) and attach to the candidate.
+2. **After approval:** Once a candidate is Go (or Review with scope agreed), create a scaffold per [future-industry-scaffold-pack-template.md](future-industry-scaffold-pack-template.md) and follow [future-industry-first-pack-authoring-runbook.md](future-industry-first-pack-authoring-runbook.md) (Prompt 539) for authoring through validation and release readiness.
+3. **Backlog:** When considering a new industry, fill [future-industry-scorecard-template.md](future-industry-scorecard-template.md) (from dossier evidence or via Future_Industry_Scorecard_Executor) and attach to the candidate.
 2. **Planning:** Use score and categories to order “New industries” in roadmap (industry-subsystem-roadmap-contract §5) and to set expectations (e.g. “T1 overlays only” for Review candidates).
-4. **Prompt generation:** Scorecard and framework provide concrete inputs for future prompts (required pieces, overlays, subtypes, compliance notes).
-5. **Authoring:** Once approved, follow industry-pack-authoring-guide and industry-pack-maintenance-checklist; framework does not replace them. For consistent file and placeholder skeletons, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md) and the concrete [future-industry-scaffold-pack-template.md](future-industry-scaffold-pack-template.md).
+5. **Prompt generation:** Scorecard and framework provide concrete inputs for future prompts (required pieces, overlays, subtypes, compliance notes).
+6. **Authoring:** Once approved, follow industry-pack-authoring-guide and industry-pack-maintenance-checklist; framework does not replace them. For consistent file and placeholder skeletons, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md) and the concrete [future-industry-scaffold-pack-template.md](future-industry-scaffold-pack-template.md).
 
 ---
 

@@ -73,12 +73,13 @@ No substantive authoring content (overlay copy, CTA copy, SEO text) is required 
 ## 6. How a scaffold becomes authored and reviewable
 
 1. **Start from this template:** Create the file/artifact skeleton per §1–§4 (pack, bundle placeholders, overlay placeholders, rule placeholders, docs/QA placeholders).
-2. **Author content:** Replace placeholder name/summary/content_body with real content; add or fix refs (CTA, SEO, preset, overlays, bundle). Follow industry-pack-authoring-guide implementation order.
-3. **Validate:** Run Industry_Pack_Schema::validate_pack() (or equivalent per artifact); run Industry_Definition_Linter; fix errors.
-4. **Resolve refs:** Ensure all refs resolve; health check passes for the pack and profile.
-5. **Set status:** Change status from `draft` to `active` only when content and refs are complete and reviewed.
-6. **Register:** Ensure pack is in builtin definitions (or load path); add overlay refs to pack only when overlays are ready.
-7. **Release:** Follow industry-pack-release-gate and pre-release validation pipeline; scaffold contract does not replace release or pre-release validation.
+2. **Follow the first-pack runbook:** For a disciplined end-to-end workflow from scaffold through validation and release readiness, use [future-industry-first-pack-authoring-runbook.md](future-industry-first-pack-authoring-runbook.md) (Prompt 539).
+3. **Author content:** Replace placeholder name/summary/content_body with real content; add or fix refs (CTA, SEO, preset, overlays, bundle). Follow industry-pack-authoring-guide implementation order.
+4. **Validate:** Run Industry_Pack_Schema::validate_pack() (or equivalent per artifact); run Industry_Definition_Linter; fix errors.
+5. **Resolve refs:** Ensure all refs resolve; health check passes for the pack and profile.
+6. **Set status:** Change status from `draft` to `active` only when content and refs are complete and reviewed.
+7. **Register:** Ensure pack is in builtin definitions (or load path); add overlay refs to pack only when overlays are ready.
+8. **Release:** Follow industry-pack-release-gate and pre-release validation pipeline; scaffold contract does not replace release or pre-release validation. Use [future-industry-first-pack-authoring-runbook.md](future-industry-first-pack-authoring-runbook.md) for the full sequence and signoff checkpoints.
 
 Reviewability: any reviewer can confirm that (a) the scaffold matches this template’s artifact classes and placement, (b) incomplete-state markers are present and clear, and (c) the promotion path is documented.
 
@@ -86,6 +87,7 @@ Reviewability: any reviewer can confirm that (a) the scaffold matches this templ
 
 ## 7. Cross-references
 
+- [future-industry-first-pack-authoring-runbook.md](future-industry-first-pack-authoring-runbook.md) — End-to-end first-pack authoring runbook (Prompt 539).
 - [future-industry-starter-bundle-scaffold-template.md](future-industry-starter-bundle-scaffold-template.md) — Starter bundle scaffold structure and hook points (Prompt 536).
 - [future-industry-overlay-scaffold-template-set.md](future-industry-overlay-scaffold-template-set.md) — Helper/page overlay and caution/SEO/CTA rule scaffold templates (Prompt 537).
 - [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md) — Scaffold scope, validation expectations, promotion path, safety.

@@ -70,12 +70,13 @@ No substantive authoring content (overlay copy, CTA copy, caution text) is requi
 ## 6. How a subtype scaffold becomes authored and reviewable
 
 1. **Start from this template:** Create the file/artifact skeleton per §1–§4 (subtype definition, overlay placeholders, bundle placeholders, caution/CTA/SEO/LPagery placeholders as needed, docs/QA placeholders).
-2. **Confirm parent industry:** Ensure parent_industry_key exists and is active; subtype is justified per launch-subtype-second-wave-planning-framework (differentiation, no new core seams).
-3. **Author content:** Replace placeholder label/summary/content_body with real content; add or fix refs (starter_bundle_ref, overlay refs, caution_rule_refs). Follow industry-pack-authoring-guide and subtype extension contract.
-4. **Validate:** Run subtype schema validation and Industry_Definition_Linter; fix errors.
-5. **Resolve refs:** Ensure all refs resolve; parent_industry_key matches an active pack; health check passes for the subtype and profile when selected.
-6. **Set status:** Change status from `draft` to `active` only when content and refs are complete and reviewed.
-7. **Release:** Follow industry-pack-release-gate and pre-release validation pipeline; scaffold contract does not replace release or pre-release validation.
+2. **Follow the first subtype-pack runbook:** For a disciplined end-to-end workflow from scaffold through validation and release readiness, use [future-subtype-first-pack-authoring-runbook.md](future-subtype-first-pack-authoring-runbook.md) (Prompt 540).
+3. **Confirm parent industry:** Ensure parent_industry_key exists and is active; subtype is justified per launch-subtype-second-wave-planning-framework (differentiation, no new core seams).
+4. **Author content:** Replace placeholder label/summary/content_body with real content; add or fix refs (starter_bundle_ref, overlay refs, caution_rule_refs). Follow industry-pack-authoring-guide and subtype extension contract.
+5. **Validate:** Run subtype schema validation and Industry_Definition_Linter; fix errors.
+6. **Resolve refs:** Ensure all refs resolve; parent_industry_key matches an active pack; health check passes for the subtype and profile when selected.
+7. **Set status:** Change status from `draft` to `active` only when content and refs are complete and reviewed.
+8. **Release:** Follow industry-pack-release-gate and pre-release validation pipeline; scaffold contract does not replace release or pre-release validation. Use [future-subtype-first-pack-authoring-runbook.md](future-subtype-first-pack-authoring-runbook.md) for the full sequence and signoff checkpoints.
 
 Reviewability: any reviewer can confirm that (a) the scaffold matches this template’s artifact classes and placement, (b) incomplete-state markers are present and clear, and (c) the promotion path and parent-industry dependency are documented.
 
@@ -83,6 +84,7 @@ Reviewability: any reviewer can confirm that (a) the scaffold matches this templ
 
 ## 7. Cross-references
 
+- [future-subtype-first-pack-authoring-runbook.md](future-subtype-first-pack-authoring-runbook.md) — End-to-end first subtype-pack authoring runbook (Prompt 540).
 - [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md) — Scaffold scope (including subtype artifact types), validation expectations, promotion path, safety.
 - [scaffold-incomplete-state-guardrail-contract.md](../contracts/scaffold-incomplete-state-guardrail-contract.md) — Incomplete-state validation, release-gate exclusion, how to clear incomplete state through authoring (Prompt 518).
 - [industry-subtype-extension-contract.md](../contracts/industry-subtype-extension-contract.md) — Subtype object model, override scope, fallback, registry.

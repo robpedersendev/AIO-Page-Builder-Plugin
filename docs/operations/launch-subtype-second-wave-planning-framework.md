@@ -63,6 +63,7 @@ Planning should produce:
 
 - **Candidate list**: Proposed subtype_key, parent_industry_key, label, and one-line justification.
 - **Differentiation summary**: What differs from parent and from existing subtypes (CTA, overlays, bundle, caution).
+- **Authoring path**: Once a candidate is approved, create a subtype scaffold per [future-subtype-scaffold-pack-template.md](future-subtype-scaffold-pack-template.md) and follow [future-subtype-first-pack-authoring-runbook.md](future-subtype-first-pack-authoring-runbook.md) (Prompt 540) for authoring through release readiness.
 - **Priority order**: Ordered by prioritization factors (§3); optional go/review/defer per candidate.
 - **Documentation**: Update subtype catalog and extension contract references when a subtype is approved; update roadmap/backlog when deferred.
 

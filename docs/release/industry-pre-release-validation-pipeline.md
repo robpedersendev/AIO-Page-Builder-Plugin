@@ -62,6 +62,8 @@
 - [industry-pre-release-checklist.md](industry-pre-release-checklist.md) — Executable checklist.
 - [industry-pack-release-gate.md](industry-pack-release-gate.md) — Gate criteria and sign-off.
 - [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) — Author workflow.
+- [future-industry-first-pack-authoring-runbook.md](../operations/future-industry-first-pack-authoring-runbook.md) — First industry pack runbook (Prompt 539).
+- [future-subtype-first-pack-authoring-runbook.md](../operations/future-subtype-first-pack-authoring-runbook.md) — First subtype pack runbook (Prompt 540).
 - [industry-sandbox-promotion-workflow.md](../operations/industry-sandbox-promotion-workflow.md) — Sandbox-to-release promotion (no auto-activate).
 - [industry-pack-maintenance-checklist.md](../operations/industry-pack-maintenance-checklist.md) — Ongoing maintenance.
 - [industry-release-candidate-manifest-contract.md](../contracts/industry-release-candidate-manifest-contract.md) — Release candidate evidence requirements.
