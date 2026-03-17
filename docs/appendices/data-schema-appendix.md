@@ -152,6 +152,12 @@ Subtype-specific section-helper overlays (subtype-section-helper-overlay-schema.
 
 ---
 
+## 11.2.2 Secondary-goal section-helper overlay (Prompt 543)
+
+Secondary-goal section-helper overlays (secondary-goal-helper-overlay-schema.md). Keyed by (primary_goal_key, secondary_goal_key, section_key). Key fields: primary_goal_key, secondary_goal_key, section_key, scope (secondary_goal_section_helper_overlay), status, version_marker, tone_notes, cta_usage_notes, compliance_cautions, media_notes, seo_notes, additive_blocks. Loaded via Secondary_Goal_Section_Helper_Overlay_Registry (load, get, get_for_primary_secondary). Composition order: base → industry → subtype → conversion goal (primary) overlay → secondary goal overlay. Fallback: when no or invalid secondary goal, only prior layers apply. See [secondary-goal-helper-overlay-contract.md](../contracts/secondary-goal-helper-overlay-contract.md).
+
+---
+
 ## 11.3 Industry page one-pager overlay
 
 Industry-specific page one-pager overlays (industry-page-onepager-overlay-schema.md). Keyed by (industry_key, page_template_key). Key fields: industry_key, page_template_key, scope (page_onepager_overlay), status, version_marker, hierarchy_hints, cta_strategy, lpagery_seo_notes, compliance_cautions, additive_blocks. Loaded via Industry_Page_OnePager_Overlay_Registry. Base one-pagers unchanged. See [industry-page-onepager-overlay-schema.md](../schemas/industry-page-onepager-overlay-schema.md).
@@ -161,6 +167,12 @@ Industry-specific page one-pager overlays (industry-page-onepager-overlay-schema
 ## 11.3.1 Subtype page one-pager overlay (Prompt 426)
 
 Subtype-specific page one-pager overlays (subtype-page-onepager-overlay-schema.md). Keyed by (subtype_key, page_template_key). Key fields: subtype_key, page_template_key, scope (subtype_page_onepager_overlay), status, version_marker, hierarchy_hints, cta_strategy, lpagery_seo_notes, compliance_cautions, additive_blocks. Loaded via Subtype_Page_OnePager_Overlay_Registry (load, get, get_for_subtype). Composition order: base → industry overlay → subtype overlay. See [subtype-page-onepager-overlay-schema.md](../schemas/subtype-page-onepager-overlay-schema.md).
+
+---
+
+## 11.3.2 Secondary-goal page one-pager overlay (Prompt 545)
+
+Secondary-goal page one-pager overlays (secondary-goal-page-onepager-overlay-schema.md). Keyed by (primary_goal_key, secondary_goal_key, page_key). Key fields: primary_goal_key, secondary_goal_key, page_key, scope (secondary_goal_page_onepager_overlay), status, version_marker, structure_notes, funnel_notes, cta_placement_notes, allowed_override_regions. Loaded via Secondary_Goal_Page_OnePager_Overlay_Registry (load, get, get_for_primary_secondary). Composition order: base → industry → subtype → conversion goal (primary) overlay → secondary goal overlay. Fallback: when no or invalid secondary goal, only prior layers apply. See [secondary-goal-page-onepager-overlay-contract.md](../contracts/secondary-goal-page-onepager-overlay-contract.md).
 
 ---
 
@@ -189,6 +201,12 @@ Reusable cross-industry artifact fragments (industry-shared-fragment-schema.md).
 ## 11.7 Conversion-goal style preset overlays (Prompt 511)
 
 **Goal style preset overlays** (conversion-goal-style-preset-schema.md): goal_preset_key, goal_key, target_preset_ref, token_values (optional), component_override_refs (optional), status, version_marker. Loaded via goal style preset overlay registry (load, get, get_for_goal, get_overlays_for_preset). Composition: industry preset → goal overlay merge when conversion_goal_key set and overlay exists for applied preset. Fallback: when no or invalid goal, only base + industry/subtype preset apply. No raw CSS; same sanitization as industry presets. See [conversion-goal-style-preset-contract.md](../contracts/conversion-goal-style-preset-contract.md).
+
+---
+
+## 11.8 Secondary-goal starter bundle overlays (Prompt 541)
+
+**Secondary-goal starter bundle overlays** (secondary-goal-starter-bundle-schema.md): overlay_key, primary_goal_key, secondary_goal_key, target_bundle_ref (optional), allowed_overlay_regions, section_emphasis, cta_posture, funnel_shape, page_family_emphasis, precedence_marker (`secondary`), status, version_marker. Loaded via Secondary_Goal_Starter_Bundle_Overlay_Registry (load, get(primary_goal_key, secondary_goal_key, bundle_key?), get_for_primary_secondary). Composition: industry/subtype bundle → primary-goal overlay (when present) → secondary-goal overlay (when present and distinct). Fallback: when no or invalid secondary goal or overlay, primary-only or base bundle conversion. No execution logic in overlay data. See [secondary-goal-starter-bundle-contract.md](../contracts/secondary-goal-starter-bundle-contract.md).
 
 ---
 

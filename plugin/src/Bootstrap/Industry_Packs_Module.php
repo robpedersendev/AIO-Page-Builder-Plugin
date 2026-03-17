@@ -43,6 +43,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: goal section-helper overlay registry (conversion-goal-helper-overlay-schema; Prompt 506). */
 	public const CONTAINER_KEY_GOAL_SECTION_HELPER_OVERLAY_REGISTRY = 'goal_section_helper_overlay_registry';
 
+	/** Container key: secondary-goal section-helper overlay registry (Prompt 543, 544; secondary-goal-helper-overlay-schema.md). */
+	public const CONTAINER_KEY_SECONDARY_GOAL_SECTION_HELPER_OVERLAY_REGISTRY = 'secondary_goal_section_helper_overlay_registry';
+
 	/** Container key: industry page one-pager overlay registry (industry-page-onepager-overlay-schema). */
 	public const CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY = 'industry_page_onepager_overlay_registry';
 
@@ -60,6 +63,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 
 	/** Container key: industry starter bundle registry (Prompt 386; industry-starter-bundle-schema.md). */
 	public const CONTAINER_KEY_STARTER_BUNDLE_REGISTRY = 'industry_starter_bundle_registry';
+
+	/** Container key: secondary-goal starter-bundle overlay registry (Prompt 541/542; secondary-goal-starter-bundle-schema.md). */
+	public const CONTAINER_KEY_SECONDARY_GOAL_STARTER_BUNDLE_OVERLAY_REGISTRY = 'secondary_goal_starter_bundle_overlay_registry';
 
 	/** Container key: industry pack toggle controller (Prompt 389; industry-pack-activation-contract.md). */
 	public const CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER = 'industry_pack_toggle_controller';
@@ -144,6 +150,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Goal_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
 			return $registry;
 		} );
+		$container->register( self::CONTAINER_KEY_SECONDARY_GOAL_SECTION_HELPER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Secondary_Goal_Section_Helper_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Secondary_Goal_Section_Helper_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Secondary_Goal_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
+			return $registry;
+		} );
 		$container->register( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions() );
@@ -183,6 +194,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
 			);
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry::get_builtin_definitions() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_SECONDARY_GOAL_STARTER_BUNDLE_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Secondary_Goal_Starter_Bundle_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Secondary_Goal_Starter_Bundle_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Secondary_Goal_Starter_Bundle_Overlay_Registry::get_builtin_definitions() );
 			return $registry;
 		} );
 		$container->register( self::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER, function () use ( $container ): \AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller {

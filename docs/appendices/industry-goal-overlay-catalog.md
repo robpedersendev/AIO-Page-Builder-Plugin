@@ -61,3 +61,23 @@ Base, industry, and subtype section-helper overlays remain authoritative. Goal o
 - **Goals (launch set)**: calls, bookings, estimates, consultations, valuations, lead_capture.
 - **Source**: `plugin/src/Domain/Industry/Registry/StylePresets/GoalOverlays/goal-style-preset-overlay-definitions.php`.
 - **Registry**: Goal_Style_Preset_Overlay_Registry (load, get, get_for_goal, get_overlays_for_preset). Overlays refine target_preset_ref (e.g. realtor_warm, plumber_trust) with optional token_values and component_override_refs. Application merges goal overlay when conversion_goal_key is set and overlay exists for the applied preset. No raw CSS. See conversion-goal-style-preset-contract.md and industry-style-preset-catalog.md.
+
+---
+
+## 8. Secondary-goal starter-bundle overlays (Prompt 541, 542)
+
+- **Purpose:** Bounded mixed-funnel refinement when profile has both primary and secondary conversion goals. Primary-goal overlays remain authoritative; secondary adds low-weight nuance only.
+- **Seed pairs:** calls + lead_capture, bookings + consultations, estimates + calls, consultations + lead_capture.
+- **Source**: `plugin/src/Domain/Industry/Registry/StarterBundles/SecondaryGoalOverlays/` (calls-lead-capture.php, bookings-consultation.php, estimates-calls.php, consultation-lead-nurture.php).
+- **Registry**: Secondary_Goal_Starter_Bundle_Overlay_Registry (container key `secondary_goal_starter_bundle_overlay_registry`). load(array), get(primary_goal_key, secondary_goal_key, bundle_key?), get_for_primary_secondary(), list_all(). Invalid or duplicate overlays skipped at load.
+- **Fallback:** When no secondary goal or no matching overlay, primary-goal-only (or base) bundle behavior. See secondary-goal-starter-bundle-contract.md and secondary-goal-starter-bundle-schema.md.
+
+---
+
+## 9. Secondary-goal section-helper overlays (Prompt 543, 544)
+
+- **Purpose:** Mixed-funnel section guidance when profile has both primary and secondary conversion goals. Composition order: base → industry → subtype → primary goal overlay → **secondary goal overlay**.
+- **Seed pairs:** calls + lead_capture, bookings + consultations, estimates + calls, consultations + lead_capture. Sections: hero, CTA, contact, lead magnet, consultation, estimate-request families.
+- **Source**: `plugin/src/Domain/Industry/Docs/SecondaryGoalSectionHelperOverlays/` (calls-lead-capture.php, bookings-consultation.php, estimates-calls.php, consultation-lead-nurture.php).
+- **Registry**: Secondary_Goal_Section_Helper_Overlay_Registry (container key `secondary_goal_section_helper_overlay_registry`). load(array), get(primary_goal_key, secondary_goal_key, section_key), get_for_primary_secondary(), get_all(). Invalid or duplicate overlays skipped at load.
+- **Fallback:** When no secondary goal or no overlay for (primary, secondary, section), use prior layer (primary-goal or subtype/industry/base). See secondary-goal-helper-overlay-contract.md and secondary-goal-helper-overlay-schema.md.

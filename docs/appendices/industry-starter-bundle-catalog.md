@@ -73,6 +73,12 @@ Subtype-scoped bundles are loaded from **StarterBundles/Subtypes/*.php** and mer
 
 ---
 
-## 6. Loading
+## 6. Secondary-goal starter-bundle overlays (Prompt 541, 542)
+
+When a profile has both primary and secondary conversion goals, optional **secondary-goal starter-bundle overlays** add low-weight refinement (section emphasis, CTA posture, funnel shape). Primary-goal overlays remain authoritative. Seed overlays (bounded mixed-funnel pairs): calls + lead_capture, bookings + consultations, estimates + calls, consultations + lead_capture. **Source directory:** `plugin/src/Domain/Industry/Registry/StarterBundles/SecondaryGoalOverlays/`. **Registry:** Secondary_Goal_Starter_Bundle_Overlay_Registry (container key `secondary_goal_starter_bundle_overlay_registry`). See [secondary-goal-starter-bundle-contract.md](../contracts/secondary-goal-starter-bundle-contract.md) and [industry-goal-overlay-catalog.md](industry-goal-overlay-catalog.md).
+
+---
+
+## 7. Loading
 
 Bundles are loaded by **Industry_Packs_Module** via `Industry_Starter_Bundle_Registry::get_builtin_definitions()` (sourced from **StarterBundles/Builtin_Starter_Bundles.php**, which merges industry files and **Subtypes/*.php**). Invalid definitions are skipped at load. Resolution of page/section refs and token/CTA/LPagery refs is done by consumers when applying a bundle; the registry only stores and serves definitions.

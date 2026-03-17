@@ -55,3 +55,9 @@ When no goal overlay exists: output is subtype (or industry or base). Safe fallb
 - Missing overlay for (goal_key, page_key): skip.
 - No public mutation surfaces; invalid overlays fail safely.
 - Schema: docs/schemas/conversion-goal-page-onepager-overlay-schema.md.
+
+---
+
+## 6. Secondary-goal layer (Prompt 545)
+
+When a profile has both primary and secondary conversion goals, an optional **secondary-goal page one-pager overlay** layer may apply after the primary-goal overlay. Composition order: base → industry → subtype → conversion goal (primary) → **secondary goal**. See [secondary-goal-page-onepager-overlay-contract.md](secondary-goal-page-onepager-overlay-contract.md).

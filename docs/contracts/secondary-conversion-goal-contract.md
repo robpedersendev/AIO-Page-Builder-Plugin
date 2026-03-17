@@ -78,3 +78,6 @@
 - [conversion-goal-conflict-precedence-contract.md](conversion-goal-conflict-precedence-contract.md) — Layer precedence; goal refines within industry/subtype.
 - [industry-profile-schema.md](../schemas/industry-profile-schema.md) — Profile storage; additive field for secondary.
 - [secondary-conversion-goal-schema.md](../schemas/secondary-conversion-goal-schema.md) — Schema for secondary-goal state and validation.
+- [secondary-goal-starter-bundle-contract.md](secondary-goal-starter-bundle-contract.md) — Bounded secondary-goal starter-bundle overlay model (Prompt 541).
+- [secondary-goal-helper-overlay-contract.md](secondary-goal-helper-overlay-contract.md) — Secondary-goal section-helper overlay layer (Prompt 543).
+- [secondary-goal-page-onepager-overlay-contract.md](secondary-goal-page-onepager-overlay-contract.md) — Secondary-goal page one-pager overlay layer (Prompt 545).

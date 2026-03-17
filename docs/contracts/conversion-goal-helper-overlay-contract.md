@@ -68,3 +68,9 @@ When no goal overlay exists for (goal_key, section_key): output is subtype resul
 - No public mutation surfaces. Invalid goal helper overlays must fail safely.
 - No arbitrary freeform override regions outside approved areas.
 - Schema: docs/schemas/conversion-goal-helper-overlay-schema.md.
+
+---
+
+## 7. Secondary-goal layer (Prompt 543)
+
+When a profile has both primary and secondary conversion goals, an optional **secondary-goal helper overlay** layer may apply after the primary-goal overlay. Composition order: base → industry → subtype → conversion goal (primary) → **secondary goal**. See [secondary-goal-helper-overlay-contract.md](secondary-goal-helper-overlay-contract.md).

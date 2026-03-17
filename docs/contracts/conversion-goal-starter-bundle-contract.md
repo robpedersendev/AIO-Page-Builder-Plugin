@@ -54,3 +54,4 @@ Invalid or unknown goal_key or target_bundle_ref must result in **safe fallback*
 
 - Referenced by bundle-to-Build Plan conversion services and Build Plan explanation/view-model services.
 - Overlay registry or resolution is defined by implementation (e.g. registry keyed by goal_key and optional bundle_key).
+- **Secondary-goal overlays:** When a profile has both primary and secondary conversion goals, optional refinement is defined by [secondary-goal-starter-bundle-contract.md](secondary-goal-starter-bundle-contract.md) (Prompt 541). Primary-goal overlays remain authoritative; secondary overlays add low-weight nuance only.
