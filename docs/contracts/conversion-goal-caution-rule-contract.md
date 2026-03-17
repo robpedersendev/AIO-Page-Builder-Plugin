@@ -84,9 +84,16 @@ Consumers use the same advisory, non-blocking behavior as industry and subtype r
 
 ---
 
-## 9. Cross-references
+## 9. Secondary-goal layer (Prompt 547)
+
+When a profile has both primary and secondary conversion goals, an optional **secondary-goal caution rule** layer may apply after the primary-goal rules. Composition order: industry → subtype → goal (primary) → **secondary goal**. See [secondary-goal-caution-rule-contract.md](secondary-goal-caution-rule-contract.md).
+
+---
+
+## 10. Cross-references
 
 - [conversion-goal-caution-rule-schema.md](../schemas/conversion-goal-caution-rule-schema.md) — Full schema.
 - [industry-compliance-rule-contract.md](industry-compliance-rule-contract.md) — Parent industry caution rules.
 - [subtype-compliance-rule-contract.md](subtype-compliance-rule-contract.md) — Subtype caution rules.
 - [conversion-goal-profile-contract.md](conversion-goal-profile-contract.md) — Profile conversion_goal_key.
+- [secondary-goal-caution-rule-contract.md](secondary-goal-caution-rule-contract.md) — Secondary-goal caution rules (Prompt 547).

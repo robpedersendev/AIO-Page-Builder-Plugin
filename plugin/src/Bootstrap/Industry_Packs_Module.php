@@ -55,6 +55,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: goal page one-pager overlay registry (conversion-goal-page-onepager-overlay-schema; Prompt 508). */
 	public const CONTAINER_KEY_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY = 'goal_page_onepager_overlay_registry';
 
+	/** Container key: secondary-goal page one-pager overlay registry (Prompt 545, 546; secondary-goal-page-onepager-overlay-schema.md). */
+	public const CONTAINER_KEY_SECONDARY_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY = 'secondary_goal_page_onepager_overlay_registry';
+
 	/** Container key: industry SEO guidance registry (Prompt 359). */
 	public const CONTAINER_KEY_SEO_GUIDANCE_REGISTRY = 'industry_seo_guidance_registry';
 
@@ -75,6 +78,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 
 	/** Container key: goal caution rule registry (Prompt 510; conversion-goal-caution-rule-schema). */
 	public const CONTAINER_KEY_GOAL_CAUTION_RULE_REGISTRY = 'goal_caution_rule_registry';
+
+	/** Container key: secondary-goal caution rule registry (Prompt 547, 548; secondary-goal-caution-rule-schema.md). */
+	public const CONTAINER_KEY_SECONDARY_GOAL_CAUTION_RULE_REGISTRY = 'secondary_goal_caution_rule_registry';
 
 	/** Container key: industry subtype registry (Prompt 413/414; industry-subtype-schema.md). */
 	public const CONTAINER_KEY_SUBTYPE_REGISTRY = 'industry_subtype_registry';
@@ -170,6 +176,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Goal_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions() );
 			return $registry;
 		} );
+		$container->register( self::CONTAINER_KEY_SECONDARY_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Secondary_Goal_Page_OnePager_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Secondary_Goal_Page_OnePager_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Secondary_Goal_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions() );
+			return $registry;
+		} );
 		$container->register( self::CONTAINER_KEY_SEO_GUIDANCE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry::get_builtin_definitions() );
@@ -227,6 +238,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( self::CONTAINER_KEY_GOAL_CAUTION_RULE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Goal_Caution_Rule_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Goal_Caution_Rule_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Goal_Caution_Rule_Registry::get_builtin_definitions() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_SECONDARY_GOAL_CAUTION_RULE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Secondary_Goal_Caution_Rule_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Secondary_Goal_Caution_Rule_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Secondary_Goal_Caution_Rule_Registry::get_builtin_definitions() );
 			return $registry;
 		} );
 		$container->register( 'industry_compliance_warning_resolver', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver {

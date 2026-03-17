@@ -79,6 +79,12 @@ When a profile has both primary and secondary conversion goals, optional **secon
 
 ---
 
+## 6.1 Combined subtype+goal starter-bundle overlays (Prompt 551)
+
+For **exceptional** (subtype, goal) pairs, optional **combined subtype+goal starter-bundle overlays** may refine a bundle when both industry_subtype_key and conversion_goal_key are set. Combined overlays are **bounded and admission-gated**; they are not the default. Resolution order: subtype bundle → goal overlay(s) → combined overlay (when present). Fallback: when no or invalid combined overlay, use subtype + goal layers only. See [subtype-goal-starter-bundle-contract.md](../contracts/subtype-goal-starter-bundle-contract.md) and [subtype-goal-starter-bundle-schema.md](../schemas/subtype-goal-starter-bundle-schema.md).
+
+---
+
 ## 7. Loading
 
 Bundles are loaded by **Industry_Packs_Module** via `Industry_Starter_Bundle_Registry::get_builtin_definitions()` (sourced from **StarterBundles/Builtin_Starter_Bundles.php**, which merges industry files and **Subtypes/*.php**). Invalid definitions are skipped at load. Resolution of page/section refs and token/CTA/LPagery refs is done by consumers when applying a bundle; the registry only stores and serves definitions.

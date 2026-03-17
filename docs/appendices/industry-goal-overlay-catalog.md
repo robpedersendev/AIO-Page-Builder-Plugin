@@ -81,3 +81,23 @@ Base, industry, and subtype section-helper overlays remain authoritative. Goal o
 - **Source**: `plugin/src/Domain/Industry/Docs/SecondaryGoalSectionHelperOverlays/` (calls-lead-capture.php, bookings-consultation.php, estimates-calls.php, consultation-lead-nurture.php).
 - **Registry**: Secondary_Goal_Section_Helper_Overlay_Registry (container key `secondary_goal_section_helper_overlay_registry`). load(array), get(primary_goal_key, secondary_goal_key, section_key), get_for_primary_secondary(), get_all(). Invalid or duplicate overlays skipped at load.
 - **Fallback:** When no secondary goal or no overlay for (primary, secondary, section), use prior layer (primary-goal or subtype/industry/base). See secondary-goal-helper-overlay-contract.md and secondary-goal-helper-overlay-schema.md.
+
+---
+
+## 10. Secondary-goal page one-pager overlays (Prompt 545, 546)
+
+- **Purpose:** Mixed-funnel page-level guidance when profile has both primary and secondary conversion goals. Composition order: base → industry → subtype → primary goal overlay → **secondary goal overlay**.
+- **Seed pairs:** calls + lead_capture, bookings + consultations, estimates + calls, consultations + lead_capture. Pages: home (pt_home_conversion_01), contact (pt_contact_request_01).
+- **Source**: `plugin/src/Domain/Industry/Docs/SecondaryGoalPageOnePagerOverlays/` (calls-lead-capture.php, bookings-consultation.php, estimates-calls.php, consultation-lead-nurture.php).
+- **Registry**: Secondary_Goal_Page_OnePager_Overlay_Registry (container key `secondary_goal_page_onepager_overlay_registry`). load(array), get(primary_goal_key, secondary_goal_key, page_key), get_for_primary_secondary(), get_all(). Invalid or duplicate overlays skipped at load.
+- **Fallback:** When no secondary goal or no overlay for (primary, secondary, page), use prior layer. See secondary-goal-page-onepager-overlay-contract.md and secondary-goal-page-onepager-overlay-schema.md.
+
+---
+
+## 11. Secondary-goal caution rules (Prompt 547, 548)
+
+- **Purpose:** Mixed-funnel editorial warnings when profile has both primary and secondary conversion goals. Composition: industry → subtype → goal (primary) → **secondary goal**.
+- **Seed pairs:** calls + lead_capture, bookings + consultations, estimates + calls, consultations + lead_capture. **Refinement areas:** messaging_overload, cta_confusion, promise_ambiguity.
+- **Source**: `plugin/src/Domain/Industry/Registry/SecondaryGoalCautionRules/secondary-goal-caution-rule-definitions.php`.
+- **Registry**: Secondary_Goal_Caution_Rule_Registry (container key `secondary_goal_caution_rule_registry`). load(array), get(secondary_goal_rule_key), get_for_primary_secondary(primary_goal_key, secondary_goal_key), get_all(). Invalid or duplicate rules skipped at load.
+- **Fallback:** When no secondary goal or invalid/same-as-primary, only industry + subtype + primary-goal rules apply. See secondary-goal-caution-rule-contract.md and industry-compliance-rule-catalog.md.

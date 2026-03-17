@@ -46,7 +46,13 @@ The advisor returns an **Industry_LPagery_Planning_Result** with:
 
 ---
 
-## 5. Files
+## 5. Combined subtype + goal planning
+
+When both industry subtype and conversion goal are set, joint planning posture is defined by [subtype-goal-lpagery-planning-contract.md](subtype-goal-lpagery-planning-contract.md). Composition order: parent (industry) → subtype → goal. Conflict handling and fallback are specified there; this contract remains the base for industry-level rules only.
+
+---
+
+## 6. Files
 
 - **Advisor**: plugin/src/Domain/Industry/LPagery/Industry_LPagery_Planning_Advisor.php
 - **Result**: plugin/src/Domain/Industry/LPagery/Industry_LPagery_Planning_Result.php

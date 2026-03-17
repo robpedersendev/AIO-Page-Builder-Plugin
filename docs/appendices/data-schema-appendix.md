@@ -196,6 +196,8 @@ Reusable cross-industry artifact fragments (industry-shared-fragment-schema.md).
 
 **Conversion-goal caution rules** (conversion-goal-caution-rule-schema.md; Prompt 509): goal_rule_key, goal_key, scope, target_section_family, target_page_family, severity, caution_summary, guidance_text, refinement_area (optional), status, version_marker. Loaded via goal caution rule registry (load, get, get_for_goal). Composition: industry → subtype → goal. Fallback: when no or invalid conversion_goal_key, only industry + subtype rules apply. Advisory only. See [conversion-goal-caution-rule-contract.md](../contracts/conversion-goal-caution-rule-contract.md).
 
+**Secondary-goal caution rules** (secondary-goal-caution-rule-schema.md; Prompt 547): secondary_goal_rule_key, primary_goal_key, secondary_goal_key (distinct), scope, target_section_family, target_page_family, severity, caution_summary, guidance_text, refinement_area (optional), status, version_marker. Loaded via Secondary_Goal_Caution_Rule_Registry (load, get, get_for_primary_secondary). Composition: industry → subtype → goal (primary) → secondary goal. Fallback: when no or invalid secondary goal, only prior layers apply. Advisory only. See [secondary-goal-caution-rule-contract.md](../contracts/secondary-goal-caution-rule-contract.md).
+
 ---
 
 ## 11.7 Conversion-goal style preset overlays (Prompt 511)
@@ -207,6 +209,14 @@ Reusable cross-industry artifact fragments (industry-shared-fragment-schema.md).
 ## 11.8 Secondary-goal starter bundle overlays (Prompt 541)
 
 **Secondary-goal starter bundle overlays** (secondary-goal-starter-bundle-schema.md): overlay_key, primary_goal_key, secondary_goal_key, target_bundle_ref (optional), allowed_overlay_regions, section_emphasis, cta_posture, funnel_shape, page_family_emphasis, precedence_marker (`secondary`), status, version_marker. Loaded via Secondary_Goal_Starter_Bundle_Overlay_Registry (load, get(primary_goal_key, secondary_goal_key, bundle_key?), get_for_primary_secondary). Composition: industry/subtype bundle → primary-goal overlay (when present) → secondary-goal overlay (when present and distinct). Fallback: when no or invalid secondary goal or overlay, primary-only or base bundle conversion. No execution logic in overlay data. See [secondary-goal-starter-bundle-contract.md](../contracts/secondary-goal-starter-bundle-contract.md).
+
+**Combined subtype+goal LPagery planning** (Prompt 550): Planning-only. When both industry_subtype_key and conversion_goal_key are set, joint LPagery posture is resolved per [subtype-goal-lpagery-planning-contract.md](../contracts/subtype-goal-lpagery-planning-contract.md). Composition order: parent (industry) → subtype → goal. No schema for combined state; resolver semantics and conflict/fallback rules are in the contract. LPagery execution and token binding unchanged.
+
+---
+
+## 11.9 Combined subtype+goal starter bundle overlays (Prompt 551)
+
+**Combined subtype+goal starter bundle overlays** (subtype-goal-starter-bundle-schema.md): overlay_key, subtype_key, goal_key, target_bundle_ref (optional), allowed_override_regions, section_emphasis, cta_posture, funnel_shape, page_family_emphasis, status, version_marker. Exceptional overlay for specific (subtype, goal) pairs; admission criteria and bounded allowlist per product. Resolution: after subtype bundle and goal (and secondary-goal) overlays; fallback to independent layer resolution when no or invalid combined overlay. See [subtype-goal-starter-bundle-contract.md](../contracts/subtype-goal-starter-bundle-contract.md) and [subtype-goal-starter-bundle-schema.md](../schemas/subtype-goal-starter-bundle-schema.md).
 
 ---
 

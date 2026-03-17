@@ -81,3 +81,4 @@
 - [secondary-goal-starter-bundle-contract.md](secondary-goal-starter-bundle-contract.md) — Bounded secondary-goal starter-bundle overlay model (Prompt 541).
 - [secondary-goal-helper-overlay-contract.md](secondary-goal-helper-overlay-contract.md) — Secondary-goal section-helper overlay layer (Prompt 543).
 - [secondary-goal-page-onepager-overlay-contract.md](secondary-goal-page-onepager-overlay-contract.md) — Secondary-goal page one-pager overlay layer (Prompt 545).
+- [secondary-goal-caution-rule-contract.md](secondary-goal-caution-rule-contract.md) — Secondary-goal caution rules for mixed-funnel messaging (Prompt 547).

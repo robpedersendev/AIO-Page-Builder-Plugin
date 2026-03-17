@@ -55,10 +55,17 @@ Conversion-goal caution rules layer on industry and subtype. **Registry:** Goal_
 
 ---
 
+## 5.1 Secondary-goal caution rules (Prompt 547, 548)
+
+Secondary-goal caution rules layer after primary-goal rules when profile has both primary and secondary conversion goals (distinct). **Registry:** Secondary_Goal_Caution_Rule_Registry (container key `secondary_goal_caution_rule_registry`); definitions in `Registry/SecondaryGoalCautionRules/secondary-goal-caution-rule-definitions.php`. **Seed pairs:** calls + lead_capture, bookings + consultations, estimates + calls, consultations + lead_capture. **Refinement areas:** messaging_overload, cta_confusion, promise_ambiguity. Composition order: industry → subtype → goal (primary) → secondary goal. When no or invalid secondary goal, only prior layers apply. See secondary-goal-caution-rule-contract.md and industry-goal-overlay-catalog.md.
+
+---
+
 ## 6. Resolution
 
 - **Registry:** Industry_Compliance_Rule_Registry; definitions in `ComplianceRules/compliance-rule-definitions.php`.
 - **Subtype rules:** Subtype_Compliance_Rule_Registry; definitions in `SubtypeComplianceRules/subtype-compliance-rule-definitions.php`. When profile has a valid industry_subtype_key, Industry_Compliance_Warning_Resolver merges parent + subtype rules for display. See subtype-compliance-rule-contract.md.
 - **Goal rules:** Goal_Caution_Rule_Registry; when conversion_goal_key is set, pass it as third argument to get_for_display to append goal caution rules.
+- **Secondary-goal rules:** Secondary_Goal_Caution_Rule_Registry; when profile has both primary and secondary conversion goals (distinct), resolvers may merge secondary-goal rules after primary-goal rules (future resolver extension).
 - **Consumers:** Helper docs, one-pagers, section/page previews, Build Plan review (advisory surfacing only).
 - **Industry pack refs:** Optional `compliance_rule_refs` in industry pack schema resolve to this registry.

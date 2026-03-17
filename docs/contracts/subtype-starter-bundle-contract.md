@@ -64,3 +64,4 @@
 - **Subtype extension**: industry-subtype-extension-contract.md (starter bundle ref, overlay scope).
 - **Registry**: Industry_Starter_Bundle_Registry (get_for_industry with optional subtype_key).
 - **Bundle-to-Build Plan**: **Industry_Subtype_Starter_Bundle_To_Build_Plan_Service** converts a subtype or industry starter bundle into a draft Build Plan; when the bundle has subtype_key, the plan stores source_industry_subtype_key for rationale. Fallback to parent industry bundle when the requested bundle key is invalid or inactive and industry_key is in context. Plans remain reviewable and approval-gated.
+- **Combined subtype+goal overlays:** For exceptional (subtype, goal) pairs, optional joint overlays are defined by [subtype-goal-starter-bundle-contract.md](subtype-goal-starter-bundle-contract.md) (Prompt 551). Subtype bundles and goal overlays remain the primary layers; combined overlays are bounded and admission-gated.
