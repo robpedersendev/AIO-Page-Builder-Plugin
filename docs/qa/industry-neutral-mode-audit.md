@@ -47,5 +47,6 @@ When **no primary industry** is set (empty industry profile or primary_industry_
 
 ## 4. Reference
 
+- **Degraded mode:** [industry-degraded-mode-contract.md](../contracts/industry-degraded-mode-contract.md) — formal fail-safe and degraded-mode contract (Prompt 467).
 - **Release gate:** [industry-pack-release-gate.md](../release/industry-pack-release-gate.md) (no-industry fallback criterion).
 - **Acceptance report:** [industry-subsystem-acceptance-report.md](industry-subsystem-acceptance-report.md) row 14.

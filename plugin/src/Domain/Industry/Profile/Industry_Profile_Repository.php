@@ -12,11 +12,13 @@ namespace AIOPageBuilder\Domain\Industry\Profile;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Industry\Reporting\Industry_Profile_Audit_Trail_Service;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 
 /**
  * Repository for site-level industry profile. Mutations are admin/authorized-only by callers.
+ * Optional audit trail service records profile changes (Prompt 465).
  */
 final class Industry_Profile_Repository {
 
@@ -25,8 +27,12 @@ final class Industry_Profile_Repository {
 	/** @var Settings_Service */
 	private Settings_Service $settings;
 
-	public function __construct( Settings_Service $settings ) {
-		$this->settings = $settings;
+	/** @var Industry_Profile_Audit_Trail_Service|null */
+	private ?Industry_Profile_Audit_Trail_Service $audit_trail;
+
+	public function __construct( Settings_Service $settings, ?Industry_Profile_Audit_Trail_Service $audit_trail = null ) {
+		$this->settings   = $settings;
+		$this->audit_trail = $audit_trail;
 	}
 
 	/**
@@ -50,13 +56,18 @@ final class Industry_Profile_Repository {
 
 	/**
 	 * Replaces industry profile with normalized payload. Callers must enforce capability and nonce.
+	 * When audit trail service is set, records profile change (Prompt 465).
 	 *
 	 * @param array<string, mixed> $profile Profile shape (partial or full); will be normalized.
 	 * @return void
 	 */
 	public function set_profile( array $profile ): void {
+		$old        = $this->get_profile();
 		$normalized = Industry_Profile_Schema::normalize( $profile );
 		$this->settings->set( self::OPTION_KEY, $normalized );
+		if ( $this->audit_trail !== null ) {
+			$this->audit_trail->record_profile_change( $old, $normalized );
+		}
 	}
 
 	/**

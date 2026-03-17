@@ -90,11 +90,18 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( 'industry_profile_validator', function (): \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Validator {
 			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Validator();
 		} );
+		$container->register( 'industry_profile_audit_trail_service', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Profile_Audit_Trail_Service {
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Profile_Audit_Trail_Service();
+		} );
 		$container->register( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE, function () use ( $container ): ?\AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository {
 			if ( ! $container->has( 'settings' ) ) {
 				return null;
 			}
-			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository( $container->get( 'settings' ) );
+			$audit = $container->has( 'industry_profile_audit_trail_service' ) ? $container->get( 'industry_profile_audit_trail_service' ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository(
+				$container->get( 'settings' ),
+				$audit instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Profile_Audit_Trail_Service ? $audit : null
+			);
 		} );
 		$container->register( self::CONTAINER_KEY_CTA_PATTERN_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry();
@@ -208,6 +215,14 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $registry : null
 			);
 		} );
+		$container->register( 'industry_override_conflict_detector', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Conflict_Detector {
+			$read_model = $container->has( 'industry_override_read_model_builder' ) ? $container->get( 'industry_override_read_model_builder' ) : null;
+			$plan_repo = $container->has( 'build_plan_repository' ) ? $container->get( 'build_plan_repository' ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Conflict_Detector(
+				$read_model instanceof \AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Read_Model_Builder ? $read_model : null,
+				$plan_repo instanceof \AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository_Interface ? $plan_repo : null
+			);
+		} );
 		$container->register( 'industry_diagnostics_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service {
 			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
 			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
@@ -216,6 +231,7 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$preset_app = $container->has( 'industry_style_preset_application_service' ) ? $container->get( 'industry_style_preset_application_service' ) : null;
 			$gap_detector = $container->has( 'industry_content_gap_detector' ) ? $container->get( 'industry_content_gap_detector' ) : null;
 			$override_audit = $container->has( 'industry_override_audit_report_service' ) ? $container->get( 'industry_override_audit_report_service' ) : null;
+			$conflict_detector = $container->has( 'industry_override_conflict_detector' ) ? $container->get( 'industry_override_conflict_detector' ) : null;
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service(
 				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
 				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
@@ -223,7 +239,8 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry ? $page_overlay : null,
 				$preset_app instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Service ? $preset_app : null,
 				$gap_detector instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Content_Gap_Detector ? $gap_detector : null,
-				$override_audit instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service ? $override_audit : null
+				$override_audit instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service ? $override_audit : null,
+				$conflict_detector instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Conflict_Detector ? $conflict_detector : null
 			);
 		} );
 		$container->register( 'industry_health_check_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service {

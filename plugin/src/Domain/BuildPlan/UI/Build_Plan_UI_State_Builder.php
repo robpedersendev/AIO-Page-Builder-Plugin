@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Domain\BuildPlan\UI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\ViewModels\BuildPlan\Subtype_Build_Plan_Explanation_View_Model;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Updates_UI_Service;
@@ -224,6 +225,8 @@ final class Build_Plan_UI_State_Builder {
 			$warnings_summary[] = array( 'message' => sprintf( __( '+%d more', 'aio-page-builder' ), count( $warnings ) - 5 ) );
 		}
 
+		$subtype_context = Subtype_Build_Plan_Explanation_View_Model::from_plan_definition( $definition );
+
 		return array(
 			'plan_title'             => (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_TITLE ] ?? '' ),
 			'plan_id'                => (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' ),
@@ -234,6 +237,7 @@ final class Build_Plan_UI_State_Builder {
 			'site_flow_summary'      => (string) ( $definition[ Build_Plan_Schema::KEY_SITE_FLOW_SUMMARY ] ?? '' ),
 			'unresolved_counts_by_step' => $unresolved_by_step,
 			'warnings_summary'       => $warnings_summary,
+			'subtype_context'        => $subtype_context,
 		);
 	}
 }

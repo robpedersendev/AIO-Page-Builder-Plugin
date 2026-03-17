@@ -51,6 +51,7 @@ This contract defines lifecycle and operational boundaries for the Industry Pack
 
 ## 5. Cross-references
 
+- **Degraded mode**: [industry-degraded-mode-contract.md](industry-degraded-mode-contract.md) — fail-safe and degraded-mode behavior when registries, bundles, or caches are missing or invalid.
 - **PORTABILITY_AND_UNINSTALL**: [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md) — general policy; this contract adds industry-specific removal list.
 - **Export/restore**: [industry-export-restore-contract.md](industry-export-restore-contract.md) — what is exported/restored; uninstall removes the same options that restore writes.
 - **Known risks**: [known-risk-register.md](../release/known-risk-register.md) §3 IND-1, IND-2 — industry risks and mitigations.

@@ -79,6 +79,7 @@ New industries should score above the team-defined threshold and must not requir
 
 - **Checkpoint**: Completed capability clusters (packs, profile, recommendation, overlays, subtypes, health, linting, repair suggestions, coverage analyzer, pre-release pipeline, sandbox) are documented in [industry-phase-two-backlog-map.md](../operations/industry-phase-two-backlog-map.md).
 - **Backlog map**: Remaining gaps, optional extensions, and future work clusters are grouped there for dependency-aware prompt generation. Use it to prioritize hardening vs content seeding vs new industry.
+- **Maturity matrix** (Prompt 468): [industry-subsystem-maturity-matrix.md](../operations/industry-subsystem-maturity-matrix.md) classifies capability areas by maturity, risks, and evidence gaps. Use for release decisions and future planning.
 
 ---
 
@@ -113,6 +114,7 @@ Concrete categories for prompt generation and backlog; expansion stays within ap
 
 ## 8. Cross-references
 
+- [industry-subsystem-v2-guardrails.md](industry-subsystem-v2-guardrails.md) — v2 architectural guardrails (Prompt 469): unacceptable drift, acceptable seams, subtype/bundle/AI boundaries. Future expansion must stay within these guardrails.
 - [industry-phase-two-backlog-map.md](../operations/industry-phase-two-backlog-map.md) — Phase-two checkpoint and backlog map (Prompt 445).
 - [industry-pack-extension-contract.md](industry-pack-extension-contract.md) — Subsystem boundary and terminology.
 - [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) — Author workflow and required pieces.

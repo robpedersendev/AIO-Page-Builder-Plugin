@@ -176,7 +176,8 @@ final class Existing_Page_Updates_UI_Service {
 			}
 			if ( $selected_item !== null ) {
 				$plan_id = (string) ( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' );
-				$detail_panel['sections']    = $this->detail_builder->build_sections( $selected_item, $plan_id );
+				$context = array( 'plan_definition' => $plan_definition );
+				$detail_panel['sections']    = $this->detail_builder->build_sections( $selected_item, $plan_id, $context );
 				$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $selected_item, $capabilities );
 			}
 		}

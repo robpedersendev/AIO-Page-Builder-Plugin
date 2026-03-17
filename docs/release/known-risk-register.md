@@ -49,6 +49,8 @@
 
 **Phase-two backlog:** Completed capability clusters and remaining work are documented in [industry-phase-two-backlog-map.md](../operations/industry-phase-two-backlog-map.md). Use for prioritization and dependency-aware prompt generation; no new risks added by the backlog map itself.
 
+**Industry maturity matrix:** [industry-subsystem-maturity-matrix.md](../operations/industry-subsystem-maturity-matrix.md) classifies subsystem capability areas by maturity, risks, and evidence gaps (Prompt 468). Use for release and planning discipline; does not replace this risk register.
+
 **Styling deferred enhancements (not blockers):** Extended format validation (e.g. stricter color format checks), styling-specific a11y audit for global/per-entity screens. Recorded in [styling-release-gate.md](styling-release-gate.md) §2.2. Do not block release.
 
 Use this section for risks or limitations specific to a release (e.g. "Export of very large plans may timeout on constrained hosting") with mitigation or formal waiver reference.

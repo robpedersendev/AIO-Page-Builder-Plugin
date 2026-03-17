@@ -450,6 +450,22 @@ final class Build_Plan_Workspace_Screen {
 				<dd><?php echo \esc_html( (string) ( $rail['site_flow_summary'] ?? '' ) ); ?></dd>
 			</dl>
 			<?php
+			$subtype_context = $rail['subtype_context'] ?? array();
+			if ( ! empty( $subtype_context['has_subtype_context'] ) && ! empty( $subtype_context['subtype_bundle_rationale_line'] ) ) :
+				?>
+				<div class="aio-context-rail-subtype" role="group" aria-label="<?php \esc_attr_e( 'Industry subtype context', 'aio-page-builder' ); ?>">
+					<h3><?php \esc_html_e( 'Industry / subtype', 'aio-page-builder' ); ?></h3>
+					<p class="description"><?php echo \esc_html( (string) $subtype_context['subtype_bundle_rationale_line'] ); ?></p>
+					<?php if ( ! empty( $subtype_context['subtype_caution_notes'] ) && is_array( $subtype_context['subtype_caution_notes'] ) ) : ?>
+						<ul class="aio-subtype-caution-notes">
+							<?php foreach ( array_slice( $subtype_context['subtype_caution_notes'], 0, 3 ) as $note ) : ?>
+								<li><?php echo \esc_html( (string) $note ); ?></li>
+							<?php endforeach; ?>
+						</ul>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
+			<?php
 			$warnings = $rail['warnings_summary'] ?? array();
 			if ( ! empty( $warnings ) ) :
 				?>

@@ -46,6 +46,7 @@ Key construction MUST be deterministic: same inputs produce the same key. Inputs
 | Build Plan generation / scoring | No | Approval-gated; not a generic read model cache. |
 | Execution job state, rollback snapshots | No | Mutable execution state; never cached as read model. |
 | Diagnostics / health check snapshots | Optional | If cached, short TTL and explicit invalidation on profile/pack change. |
+| What-if simulation | No persistence | Industry_What_If_Simulation_Service does not persist profile or options. Comparison data during simulation may read or populate the same recommendation caches as live flows for the simulated keys; no separate simulation cache namespace required. See industry-what-if-simulation-contract. |
 
 ---
 

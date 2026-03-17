@@ -75,7 +75,7 @@ final class Option_Names {
 	/** Applied industry style preset (preset_key, label?, applied_at); for revert/display (industry-style-preset-application-contract). */
 	public const APPLIED_INDUSTRY_PRESET = self::PREFIX . 'applied_industry_preset';
 
-	/** Industry section overrides (section_key => override record per industry-override-contract; Prompts 367369). */
+	/** Industry section overrides (section_key => override record per industry-override-contract; Prompts 367ï¿½ï¿½ï¿½369). */
 	public const INDUSTRY_SECTION_OVERRIDES = self::PREFIX . 'industry_section_overrides';
 
 	/** Industry page template overrides (template_key => override record). */
@@ -89,6 +89,9 @@ final class Option_Names {
 
 	/** Industry read-model cache version; bump invalidates caches (industry-cache-contract; removed on uninstall). */
 	public const INDUSTRY_CACHE_VERSION = 'aio_industry_cache_version';
+
+	/** Bounded audit trail for industry profile changes (Prompt 465; industry-profile-audit-trail-contract). */
+	public const INDUSTRY_PROFILE_AUDIT_TRAIL = self::PREFIX . 'industry_profile_audit_trail';
 
 	/** @var array<string>|null */
 	private static ?array $all = null;
@@ -127,6 +130,7 @@ final class Option_Names {
 			self::INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES,
 			self::DISABLED_INDUSTRY_PACKS,
 			self::INDUSTRY_CACHE_VERSION,
+			self::INDUSTRY_PROFILE_AUDIT_TRAIL,
 		);
 		return self::$all;
 	}

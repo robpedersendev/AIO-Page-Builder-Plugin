@@ -49,6 +49,7 @@
 
 ## 5. References
 
+- [industry-degraded-mode-contract.md](../contracts/industry-degraded-mode-contract.md) — Fail-safe and degraded-mode contract (Prompt 467); subtype and bundle fallback categories.
 - [industry-subtype-extension-contract.md](../contracts/industry-subtype-extension-contract.md) — Fallback principles (§5, §6).
 - [industry-subtype-schema.md](../schemas/industry-subtype-schema.md) — Status values (active, draft, deprecated).
 - Industry_Subtype_Resolver, Industry_Starter_Bundle_Registry, Industry_Subtype_Comparison_Service, preview resolvers.

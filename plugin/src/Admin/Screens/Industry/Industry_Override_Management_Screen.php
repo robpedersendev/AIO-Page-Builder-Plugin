@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Read_Model_Builder;
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Schema;
+use AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Conflict_Detector;
 use AIOPageBuilder\Admin\Actions\Remove_Industry_Override_Action;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Templates_Directory_Screen;
@@ -68,6 +69,24 @@ final class Industry_Override_Management_Screen {
 			<?php if ( ( $message['text'] ?? '' ) !== '' ) : ?>
 				<div class="notice notice-<?php echo ( $message['type'] ?? '' ) === 'error' ? 'error' : 'success'; ?> is-dismissible">
 					<p><?php echo \esc_html( $message['text'] ); ?></p>
+				</div>
+			<?php endif; ?>
+
+			<?php
+			$conflict_detector = new Industry_Override_Conflict_Detector( $builder, new \AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository() );
+			$conflicts = $conflict_detector->detect();
+			if ( ! empty( $conflicts ) ) :
+				?>
+				<div class="notice notice-warning aio-override-conflicts-notice" role="region" aria-label="<?php \esc_attr_e( 'Override conflict suggestions', 'aio-page-builder' ); ?>">
+					<p><strong><?php \esc_html_e( 'Suggested review:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( sprintf( _n( '%d override may be stale or point to a missing plan/item.', '%d overrides may be stale or point to missing plans/items.', count( $conflicts ), 'aio-page-builder' ), count( $conflicts ) ) ); ?></p>
+					<ul class="aio-override-conflict-list" style="margin-left: 1.5em;">
+						<?php foreach ( array_slice( $conflicts, 0, 10 ) as $c ) : ?>
+							<li><?php echo \esc_html( (string) ( $c['override_ref'] ?? '' ) ); ?> — <?php echo \esc_html( (string) ( $c['suggested_review_action'] ?? '' ) ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+					<?php if ( count( $conflicts ) > 10 ) : ?>
+						<p class="description"><?php \esc_html_e( 'Additional conflicts appear in the diagnostics snapshot.', 'aio-page-builder' ); ?></p>
+					<?php endif; ?>
 				</div>
 			<?php endif; ?>
 

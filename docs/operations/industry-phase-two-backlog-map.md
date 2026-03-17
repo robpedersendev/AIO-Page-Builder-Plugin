@@ -46,10 +46,17 @@
 
 - **Hardening (must-have for stability)**: Regression guards, release gate criteria, deprecation handling, no-industry fallback, export/restore validation. Keep current; do not relax.
 - **Expansion (optional)**: New industries, new subtypes, deeper overlays, more bundles. All must use approved seams (roadmap contract §2); dependency-aware ordering.
+- **v2 guardrails** (Prompt 469): [industry-subsystem-v2-guardrails.md](../contracts/industry-subsystem-v2-guardrails.md) define unacceptable drift (e.g. separate product, AI auto-approve, freeform industry forks) and boundaries for subtype/bundle sprawl and AI authority. Future work must stay within these guardrails.
 
 ---
 
-## 5. References
+## 5. Maturity matrix (Prompt 468)
+
+- [industry-subsystem-maturity-matrix.md](industry-subsystem-maturity-matrix.md) — Classifies capability areas by maturity level, key risks, and recommended next steps. Use for evidence-based planning and release decisions.
+
+---
+
+## 6. References
 
 - [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md) — Extension seams and roadmap categories.
 - [industry-pack-maintenance-checklist.md](industry-pack-maintenance-checklist.md) — Ongoing maintenance.
