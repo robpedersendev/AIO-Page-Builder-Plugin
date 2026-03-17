@@ -64,6 +64,7 @@ Severity grouping: **blocker** (health errors, completeness blocker_flags), **ma
 - **Subtype comparison** — Parent vs subtype bundles and recommendations.
 - **Bundle comparison** — Compare two or more starter bundles.
 - **Conversion goal comparison** — No-goal vs goal-aware comparison.
+- **Pack family comparison** — Internal comparison of launch-industry families, subtype families, and candidates (completeness, coverage, caution, bundle, preset, maturity) per [industry-pack-family-comparison-contract.md](industry-pack-family-comparison-contract.md) (Prompt 557–558).
 - **Release gate / pre-release checklist** — Docs and pipeline for release validation.
 - **Maintenance checklist** — Ongoing maintenance tasks.
 - **Override Management** — Override conflict resolution (if applicable).
@@ -104,4 +105,6 @@ All links open existing admin screens or docs; dashboard does not replace them.
 - [industry-pack-release-gate.md](../release/industry-pack-release-gate.md) — Release criteria; dashboard surfaces blocker cues.
 - [industry-admin-screen-contract.md](industry-admin-screen-contract.md) — Industry screens; dashboard links to them.
 - [industry-coverage-gap-analysis-guide.md](../operations/industry-coverage-gap-analysis-guide.md) — Coverage gap analyzer and usage.
+- [industry-pack-family-comparison-contract.md](industry-pack-family-comparison-contract.md) — Internal pack-family comparison dimensions and view (Prompt 557–558).
+- [industry-maturity-delta-report-contract.md](industry-maturity-delta-report-contract.md) — Internal maturity delta (trend) reporting model for improvement/stagnation/regression over time (Prompt 559).
 - [scaffold-incomplete-state-guardrail-contract.md](scaffold-incomplete-state-guardrail-contract.md) — Scaffold/incomplete asset handling.

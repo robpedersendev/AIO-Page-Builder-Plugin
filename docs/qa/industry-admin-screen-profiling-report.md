@@ -12,6 +12,7 @@
 | Industry Overrides | Industry_Override_Management_Screen::render() | Industry_Override_Read_Model_Builder::build() → section_service::list_overrides(), page_template_service::list_overrides(), build_plan_service::list_all_overrides() |
 | Bundle comparison | Industry_Starter_Bundle_Comparison_Screen::render() → get_state() | Starter bundle registry list_all(); Industry_Starter_Bundle_Diff_Service::compare() when 2+ keys selected |
 | Subtype comparison | Industry_Subtype_Comparison_Screen::render() → get_state() | Profile repo get_profile(); Industry_Subtype_Comparison_Service::get_comparison() → bundle_list() x2, recommendation resolvers (parent + subtype) |
+| Pack family comparison | Industry_Pack_Family_Comparison_Screen::render() → get_state() | Industry_Pack_Completeness_Report_Service::generate_report(); Industry_Coverage_Gap_Analyzer::analyze() — by_scope merged with pack_results |
 | Industry Profile / Settings | Industry_Profile_Settings_Screen | Profile repo, pack registry, bundle registry, readiness |
 | Status summary widget (dashboard) | Industry_Status_Summary_Widget::build_view_model() | Profile, pack registry, bundle registry, toggle, readiness, **Industry_Health_Check_Service::run()** |
 

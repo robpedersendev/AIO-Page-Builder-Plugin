@@ -39,6 +39,8 @@ use AIOPageBuilder\Admin\Screens\Industry\Industry_Bundle_Import_Preview_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Author_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Guided_Repair_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Health_Report_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Family_Comparison_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Stale_Content_Report_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Override_Management_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
@@ -168,6 +170,8 @@ final class Admin_Menu {
 		$industry_profile     = new Industry_Profile_Settings_Screen( $this->container );
 		$industry_author_dashboard = new Industry_Author_Dashboard_Screen( $this->container );
 		$industry_health_report = new Industry_Health_Report_Screen( $this->container );
+		$industry_stale_content_report = new Industry_Stale_Content_Report_Screen( $this->container );
+		$industry_pack_family_comparison = new Industry_Pack_Family_Comparison_Screen( $this->container );
 		$industry_guided_repair = new Industry_Guided_Repair_Screen( $this->container );
 		$industry_subtype_comparison = new Industry_Subtype_Comparison_Screen( $this->container );
 		$industry_bundle_comparison   = new Industry_Starter_Bundle_Comparison_Screen( $this->container );
@@ -441,6 +445,24 @@ final class Admin_Menu {
 			$industry_health_report->get_capability(),
 			Industry_Health_Report_Screen::SLUG,
 			array( $industry_health_report, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_stale_content_report->get_title(),
+			__( 'Stale content report', 'aio-page-builder' ),
+			$industry_stale_content_report->get_capability(),
+			Industry_Stale_Content_Report_Screen::SLUG,
+			array( $industry_stale_content_report, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_pack_family_comparison->get_title(),
+			__( 'Pack family comparison', 'aio-page-builder' ),
+			$industry_pack_family_comparison->get_capability(),
+			Industry_Pack_Family_Comparison_Screen::SLUG,
+			array( $industry_pack_family_comparison, 'render' )
 		);
 
 		add_submenu_page(

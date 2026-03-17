@@ -684,6 +684,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null
 			);
 		} );
+		$container->register( 'industry_asset_aging_report_service', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Asset_Aging_Report_Service {
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Asset_Aging_Report_Service();
+		} );
 		$container->register( 'industry_repair_suggestion_engine', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Repair_Suggestion_Engine {
 			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
 			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;

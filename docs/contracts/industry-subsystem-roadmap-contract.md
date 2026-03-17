@@ -73,7 +73,7 @@ Before adding a new industry, evaluate the candidate using the internal framewor
 - **Framework:** [future-industry-candidate-evaluation-framework.md](../operations/future-industry-candidate-evaluation-framework.md) — criteria (content-model fit, template overlap, LPagery posture, CTA complexity, documentation burden, styling needs, compliance/caution burden, starter bundle viability, subtype complexity, long-term maintenance cost), scoring, and go/no-go/review categories.
 - **Scorecard:** [future-industry-scorecard-template.md](../operations/future-industry-scorecard-template.md) — one scorecard per candidate; attach to backlog and use in planning and prompt generation.
 
-New industries should score above the team-defined threshold and must not require new core seams.
+New industries should score above the team-defined threshold and must not require new core seams. **Pack family comparison:** For a side-by-side view of launch families, subtype families, and candidates (completeness, coverage, caution, bundle, preset, maturity), use the internal [industry-pack-family-comparison-contract.md](industry-pack-family-comparison-contract.md) (Prompt 557); implementation provides a bounded comparison screen (Prompt 558).
 
 ---
 
@@ -81,7 +81,7 @@ New industries should score above the team-defined threshold and must not requir
 
 - **Checkpoint**: Completed capability clusters (packs, profile, recommendation, overlays, subtypes, health, linting, repair suggestions, coverage analyzer, pre-release pipeline, sandbox) are documented in [industry-phase-two-backlog-map.md](../operations/industry-phase-two-backlog-map.md).
 - **Backlog map**: Remaining gaps, optional extensions, and future work clusters are grouped there for dependency-aware prompt generation. Use it to prioritize hardening vs content seeding vs new industry.
-- **Maturity matrix** (Prompt 468): [industry-subsystem-maturity-matrix.md](../operations/industry-subsystem-maturity-matrix.md) classifies capability areas by maturity, risks, and evidence gaps. Use for release decisions and future planning.
+- **Maturity matrix** (Prompt 468): [industry-subsystem-maturity-matrix.md](../operations/industry-subsystem-maturity-matrix.md) classifies capability areas by maturity, risks, and evidence gaps. Use for release decisions and future planning. **Maturity delta** (Prompt 559): [industry-maturity-delta-report-contract.md](industry-maturity-delta-report-contract.md) defines how to report maturity change over time (improvement, stagnation, regression) for roadmap review.
 - **Next-phase prompt map** (Prompt 470): [industry-next-phase-prompt-map.md](../operations/industry-next-phase-prompt-map.md) groups future prompts by subtype expansion, seeded content, performance, author tooling, future-industry onboarding, and optional reporting. Use for dependency-aware prompt generation handoff.
 
 ---
