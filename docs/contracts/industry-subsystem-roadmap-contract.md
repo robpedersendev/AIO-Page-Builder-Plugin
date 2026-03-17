@@ -28,6 +28,8 @@ The following are **approved seams** for adding or extending industry behavior. 
 | **LPagery rules** | New rule keys; pack lpagery_rule_ref. | industry-lpagery-rule-schema.md; Industry_LPagery_Rule_Registry |
 | **Starter bundles** | Bundle definitions (recommended page/section refs, CTA/style refs); pack starter_bundle_ref when implemented. | industry-starter-bundle-schema.md; Industry_Starter_Bundle_Registry |
 | **Question packs** | Onboarding question-pack definitions; profile reference. | industry-question-pack-contract.md; Industry_Question_Pack_Registry |
+| **Conversion goal (primary)** | Site-level conversion_goal_key in industry profile; single optional goal. | conversion-goal-profile-contract.md; industry-profile-schema. |
+| **Secondary conversion goal** | Optional secondary_conversion_goal_key; bounded (one secondary, distinct from primary). | secondary-conversion-goal-contract.md; secondary-conversion-goal-schema.md. |
 | **Recommendation resolvers** | Industry profile and pack drive affinity/discouraged scoring; no change to resolver API without contract update. | industry-section-recommendation-contract.md; industry-page-template-recommendation-contract.md |
 
 ---

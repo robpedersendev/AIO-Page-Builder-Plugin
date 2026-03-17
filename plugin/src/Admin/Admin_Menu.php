@@ -37,6 +37,7 @@ use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Bundle_Import_Preview_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Author_Dashboard_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Guided_Repair_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Health_Report_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Override_Management_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
@@ -133,6 +134,9 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_save_industry_page_template_override', array( $this, 'handle_save_industry_page_template_override' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_build_plan_override', array( $this, 'handle_save_industry_build_plan_override' ), 10 );
 		\add_action( 'admin_post_aio_remove_industry_override', array( $this, 'handle_remove_industry_override' ), 10 );
+		\add_action( 'admin_post_aio_guided_repair_migrate', array( $this, 'handle_guided_repair_migrate' ), 10 );
+		\add_action( 'admin_post_aio_guided_repair_apply_ref', array( $this, 'handle_guided_repair_apply_ref' ), 10 );
+		\add_action( 'admin_post_aio_guided_repair_activate', array( $this, 'handle_guided_repair_activate' ), 10 );
 		\add_action( 'admin_post_aio_create_plan_from_bundle', array( $this, 'handle_create_plan_from_bundle' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_confirm_import', array( $this, 'handle_industry_bundle_confirm_import' ), 10 );
@@ -163,6 +167,7 @@ final class Admin_Menu {
 		$industry_profile     = new Industry_Profile_Settings_Screen( $this->container );
 		$industry_author_dashboard = new Industry_Author_Dashboard_Screen( $this->container );
 		$industry_health_report = new Industry_Health_Report_Screen( $this->container );
+		$industry_guided_repair = new Industry_Guided_Repair_Screen( $this->container );
 		$industry_subtype_comparison = new Industry_Subtype_Comparison_Screen( $this->container );
 		$industry_bundle_comparison   = new Industry_Starter_Bundle_Comparison_Screen( $this->container );
 		$industry_goal_comparison    = new Conversion_Goal_Comparison_Screen( $this->container );
@@ -435,6 +440,15 @@ final class Admin_Menu {
 			$industry_health_report->get_capability(),
 			Industry_Health_Report_Screen::SLUG,
 			array( $industry_health_report, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_guided_repair->get_title(),
+			__( 'Guided Repair', 'aio-page-builder' ),
+			$industry_guided_repair->get_capability(),
+			Industry_Guided_Repair_Screen::SLUG,
+			array( $industry_guided_repair, 'render' )
 		);
 
 		add_submenu_page(
@@ -748,6 +762,115 @@ final class Admin_Menu {
 	 */
 	public function handle_remove_industry_override(): void {
 		\AIOPageBuilder\Admin\Actions\Remove_Industry_Override_Action::handle();
+	}
+
+	/**
+	 * Handles guided repair: migrate deprecated pack to replacement (Prompt 527). Nonce and capability required.
+	 *
+	 * @return void
+	 */
+	public function handle_guided_repair_migrate(): void {
+		$redirect = \admin_url( 'admin.php?page=' . Industry_Guided_Repair_Screen::SLUG );
+		if ( ! isset( $_POST['aio_guided_repair_migrate_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_guided_repair_migrate_nonce'] ) ), Industry_Guided_Repair_Screen::NONCE_ACTION_MIGRATE ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		$deprecated_key = isset( $_POST['deprecated_pack_key'] ) && \is_string( $_POST['deprecated_pack_key'] )
+			? \trim( \sanitize_text_field( \wp_unslash( $_POST['deprecated_pack_key'] ) ) )
+			: '';
+		if ( $deprecated_key === '' || ! $this->container instanceof Service_Container || ! $this->container->has( 'industry_pack_migration_executor' ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		$executor = $this->container->get( 'industry_pack_migration_executor' );
+		if ( ! $executor instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Pack_Migration_Executor ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		$result = $executor->run_migration_to_replacement( $deprecated_key );
+		\wp_safe_redirect( \add_query_arg( 'aio_repair_result', $result->is_success() ? 'migrated' : 'error', $redirect ) );
+		exit;
+	}
+
+	/**
+	 * Handles guided repair: apply suggested profile ref (e.g. selected_starter_bundle_key). Nonce and capability required.
+	 *
+	 * @return void
+	 */
+	public function handle_guided_repair_apply_ref(): void {
+		$redirect = \admin_url( 'admin.php?page=' . Industry_Guided_Repair_Screen::SLUG );
+		if ( ! isset( $_POST['aio_guided_repair_apply_ref_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_guided_repair_apply_ref_nonce'] ) ), Industry_Guided_Repair_Screen::NONCE_ACTION_APPLY_REF ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		$field = isset( $_POST['profile_field'] ) && \is_string( $_POST['profile_field'] )
+			? \trim( \sanitize_text_field( \wp_unslash( $_POST['profile_field'] ) ) )
+			: '';
+		$value = isset( $_POST['profile_value'] ) && \is_string( $_POST['profile_value'] )
+			? \trim( \sanitize_text_field( \wp_unslash( $_POST['profile_value'] ) ) )
+			: '';
+		$allowed = array( \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY );
+		if ( $field === '' || ! \in_array( $field, $allowed, true ) || ! $this->container instanceof Service_Container || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		$profile_repo = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+		if ( ! $profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		$profile_repo->merge_profile( array( $field => $value ) );
+		\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'applied', $redirect ) );
+		exit;
+	}
+
+	/**
+	 * Handles guided repair: enable (activate) industry pack. Nonce and capability required.
+	 *
+	 * @return void
+	 */
+	public function handle_guided_repair_activate(): void {
+		$redirect = \admin_url( 'admin.php?page=' . Industry_Guided_Repair_Screen::SLUG );
+		if ( ! isset( $_POST['aio_guided_repair_activate_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_guided_repair_activate_nonce'] ) ), Industry_Guided_Repair_Screen::NONCE_ACTION_ACTIVATE ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		$industry_key = isset( $_POST['industry_pack_key'] ) && \is_string( $_POST['industry_pack_key'] )
+			? \trim( \sanitize_text_field( \wp_unslash( $_POST['industry_pack_key'] ) ) )
+			: '';
+		if ( $industry_key === '' || ! $this->container instanceof Service_Container || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		$controller = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER );
+		if ( ! $controller instanceof Industry_Pack_Toggle_Controller ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
+			exit;
+		}
+		$controller->set_pack_disabled( $industry_key, false );
+		if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ) {
+			$cache = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE );
+			if ( $cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ) {
+				$cache->invalidate_all_industry_read_models();
+			}
+		}
+		\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'activated', $redirect ) );
+		exit;
 	}
 
 	/**

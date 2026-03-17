@@ -36,7 +36,8 @@
 | **geo_model** | string | No | `""` | Optional geo model hint (e.g. `local`, `regional`, `national`). |
 | **derived_flags** | object | No | `{}` | Optional flags set by subsystems. Use `multi_industry` (bool) when both primary and secondary industries are set; used for conflict-resolution and weighted recommendation (industry-conflict-resolution-contract.md). |
 | **question_pack_answers** | object | No | `{}` | Industry-specific question-pack answers: `{ [industry_key]: { [field_key]: scalar } }`. See industry-question-pack-contract.md. |
-| **conversion_goal_key** | string | No | `""` | Conversion goal key (conversion-goal-profile-contract): e.g. `calls`, `bookings`, `estimates`, `consultations`, `valuations`, `lead_capture`. Empty when not set. |
+| **conversion_goal_key** | string | No | `""` | Conversion goal key (conversion-goal-profile-contract): e.g. `calls`, `bookings`, `estimates`, `consultations`, `valuations`, `lead_capture`. Empty when not set. Primary goal. |
+| **secondary_conversion_goal_key** | string | No | `""` | Optional secondary conversion goal (secondary-conversion-goal-contract). Same key set as conversion_goal_key; must differ from primary. Empty when not set. |
 
 - **primary_industry_key**: Must match an existing industry pack key when non-empty; validation may be advisory at storage time and strict at use time.
 - **secondary_industry_keys**: Array of non-empty strings; no duplicates; keys should exist in industry pack registry when used.

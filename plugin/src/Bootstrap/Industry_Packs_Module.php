@@ -118,6 +118,12 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$audit instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Profile_Audit_Trail_Service ? $audit : null
 			);
 		} );
+		$container->register( 'industry_secondary_conversion_goal_resolver', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Profile\Secondary_Conversion_Goal_Resolver {
+			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Profile\Secondary_Conversion_Goal_Resolver(
+				$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null
+			);
+		} );
 		$container->register( self::CONTAINER_KEY_CTA_PATTERN_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_CTA_Pattern_Registry::get_builtin_definitions() );

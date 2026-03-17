@@ -116,6 +116,7 @@ final class Industry_Author_Dashboard_Screen {
 		$links = array(
 			'industry_profile'     => $base . '?page=' . Industry_Profile_Settings_Screen::SLUG,
 			'health_report'        => $base . '?page=' . Industry_Health_Report_Screen::SLUG,
+			'guided_repair'        => $base . '?page=' . Industry_Guided_Repair_Screen::SLUG,
 			'subtype_comparison'    => $base . '?page=' . Industry_Subtype_Comparison_Screen::SLUG,
 			'bundle_comparison'     => $base . '?page=' . Industry_Starter_Bundle_Comparison_Screen::SLUG,
 			'goal_comparison'       => $base . '?page=' . Conversion_Goal_Comparison_Screen::SLUG,
@@ -202,6 +203,7 @@ final class Industry_Author_Dashboard_Screen {
 				<ul>
 					<li><a href="<?php echo esc_url( $vm->get_links()['industry_profile'] ?? '#' ); ?>"><?php esc_html_e( 'Industry Profile', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['health_report'] ?? '#' ); ?>"><?php esc_html_e( 'Industry Health Report', 'aio-page-builder' ); ?></a></li>
+					<li><a href="<?php echo esc_url( $vm->get_links()['guided_repair'] ?? '#' ); ?>"><?php esc_html_e( 'Guided Repair', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['subtype_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Subtype comparison', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['bundle_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Bundle comparison', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['goal_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Conversion goal comparison', 'aio-page-builder' ); ?></a></li>

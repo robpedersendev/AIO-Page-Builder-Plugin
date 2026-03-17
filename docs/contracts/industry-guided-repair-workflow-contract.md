@@ -90,9 +90,17 @@
 
 ---
 
-## 7. Links to related reports and diagnostics
+## 7. Guided Repair review UI (Prompt 527)
+
+- **Screen:** Industry_Guided_Repair_Screen (plugin/src/Admin/Screens/Industry/Industry_Guided_Repair_Screen.php). Slug: `aio-page-builder-industry-guided-repair`. Capability: MANAGE_SETTINGS.
+- **Purpose:** Single place to inspect repair candidates (health errors/warnings with suggestions, override conflicts), see proposed replacements, and confirm actions: migrate to replacement, apply suggested ref (profile), enable pack. Override resolution links to Override Management.
+- **Actions:** Migrate (admin_post_aio_guided_repair_migrate), Apply ref (admin_post_aio_guided_repair_apply_ref), Activate pack (admin_post_aio_guided_repair_activate). All require nonce and capability; redirect back to Guided Repair with result message.
+- **Advisory-only:** Candidates with no clear suggestion or ambiguous alternatives show "Advisory only; choose manually in Industry Profile or Overrides." with no apply button.
+
+## 8. Links to related reports and diagnostics
 
 - **Health Report:** Full list of health errors/warnings and optional repair suggestions; entry point for missing/deprecated/inactive.
+- **Guided Repair:** Review and confirm safe repairs (migrate, apply ref, enable pack); link to Override Management for override conflicts.
 - **Override Management:** List overrides and conflict detector output; entry point for override conflicts.
 - **Industry Profile:** Where profile refs (primary industry, bundle) are edited; migration and ref fixes applied here or from Health Report links.
 - **Repair Suggestion Engine:** [industry-repair-suggestion-contract.md](industry-repair-suggestion-contract.md); suggest_for_issue().
@@ -103,7 +111,7 @@
 
 ---
 
-## 8. Do not
+## 9. Do not
 
 - Auto-repair data from the workflow contract; implementation must require explicit operator action.
 - Weaken auditability (e.g. silent overwrite without logging where audit is expected).

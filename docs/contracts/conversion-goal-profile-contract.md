@@ -16,14 +16,15 @@
 
 ## 2. Profile field
 
-- **conversion_goal_key** (string, optional): Stable key from the launch goal set. Stored in industry profile (or equivalent site-level store). Empty or missing = no conversion goal set.
+- **conversion_goal_key** (string, optional): Stable key from the launch goal set. Stored in industry profile (or equivalent site-level store). Empty or missing = no conversion goal set. This is the **primary** conversion goal.
 - **Launch goal set**: `calls`, `bookings`, `estimates`, `consultations`, `valuations`, `lead_capture` (exact set may be extended via schema/registry).
+- **Secondary goal:** An optional secondary conversion goal is defined in [secondary-conversion-goal-contract.md](secondary-conversion-goal-contract.md). Primary remains authoritative; secondary is bounded and optional.
 
 ---
 
 ## 3. Resolution and validation
 
-- **At read**: Normalized industry profile may include `conversion_goal_key`. Invalid or unknown keys are treated as empty (no goal).
+- **At read**: Normalized industry profile may include `conversion_goal_key` (primary) and optionally `secondary_conversion_goal_key`. Invalid or unknown keys are treated as empty (no goal). For resolved primary + secondary state, use **Secondary_Conversion_Goal_Resolver::resolve()** (Prompt 529); it returns `primary_goal_key` and `secondary_goal_key` with safe fallback (secondary empty when invalid or same as primary).
 - **At write**: Only keys from the allowed set (or registry) are persisted; invalid keys are rejected or stripped.
 - **No mutation** of other profile fields when goal is set or cleared.
 

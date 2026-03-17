@@ -83,6 +83,20 @@ final class Industry_Profile_Validator {
 			: array();
 		$this->validate_question_pack_answers( $qp_answers, $primary, $qp_registry );
 
+		$conversion_goal = isset( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			? trim( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			: '';
+		$secondary_goal = isset( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] )
+			? trim( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] )
+			: '';
+		if ( $secondary_goal !== '' ) {
+			if ( $secondary_goal === $conversion_goal ) {
+				$this->last_warnings[] = 'secondary_conversion_goal_key_same_as_primary';
+			} elseif ( ! in_array( $secondary_goal, array( 'calls', 'bookings', 'estimates', 'consultations', 'valuations', 'lead_capture' ), true ) ) {
+				$this->last_warnings[] = 'secondary_conversion_goal_key_unknown: ' . $secondary_goal;
+			}
+		}
+
 		return $this->last_errors === array();
 	}
 

@@ -134,6 +134,22 @@ final class Industry_Profile_Repository {
 				$current[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] = '';
 			}
 		}
+		if ( array_key_exists( Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY, $partial ) ) {
+			$current[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] = is_string( $partial[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+				? trim( $partial[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+				: '';
+			if ( strlen( $current[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) > 64 ) {
+				$current[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] = '';
+			}
+		}
+		if ( array_key_exists( Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY, $partial ) ) {
+			$current[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] = is_string( $partial[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] )
+				? trim( $partial[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] )
+				: '';
+			if ( strlen( $current[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] ) > 64 ) {
+				$current[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] = '';
+			}
+		}
 		$this->set_profile( $current );
 	}
 
