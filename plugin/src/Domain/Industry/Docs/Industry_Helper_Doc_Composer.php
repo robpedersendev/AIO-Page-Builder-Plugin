@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder;
 use AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Resolver;
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
 
@@ -51,13 +52,27 @@ final class Industry_Helper_Doc_Composer {
 	/** @var Industry_Cache_Key_Builder|null */
 	private ?Industry_Cache_Key_Builder $cache_key_builder;
 
+	/** @var Industry_Shared_Fragment_Resolver|null Optional; when set, overlay fragment refs are resolved (Prompt 477). */
+	private ?Industry_Shared_Fragment_Resolver $fragment_resolver;
+
+	/** Consumer scope for fragment resolution (section_helper_overlay). */
+	private const FRAGMENT_CONSUMER_SCOPE = 'section_helper_overlay';
+
+	/** Optional overlay keys: fragment_key; when set, resolved content is appended to the corresponding merge field. */
+	private const FRAGMENT_REF_FIELDS = array(
+		'cta_usage_fragment_ref'       => 'cta_usage_notes',
+		'seo_notes_fragment_ref'       => 'seo_notes',
+		'compliance_cautions_fragment_ref' => 'compliance_cautions',
+	);
+
 	public function __construct(
 		Documentation_Registry $documentation_registry,
 		Industry_Section_Helper_Overlay_Registry $overlay_registry,
 		?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null,
 		?Subtype_Section_Helper_Overlay_Registry $subtype_overlay_registry = null,
 		?Industry_Read_Model_Cache_Service $cache_service = null,
-		?Industry_Cache_Key_Builder $cache_key_builder = null
+		?Industry_Cache_Key_Builder $cache_key_builder = null,
+		?Industry_Shared_Fragment_Resolver $fragment_resolver = null
 	) {
 		$this->documentation_registry   = $documentation_registry;
 		$this->overlay_registry          = $overlay_registry;
@@ -65,6 +80,7 @@ final class Industry_Helper_Doc_Composer {
 		$this->subtype_overlay_registry  = $subtype_overlay_registry;
 		$this->cache_service            = $cache_service;
 		$this->cache_key_builder        = $cache_key_builder;
+		$this->fragment_resolver        = $fragment_resolver;
 	}
 
 	/**
@@ -114,6 +130,7 @@ final class Industry_Helper_Doc_Composer {
 							$composed[ $field ] = $overlay[ $field ];
 						}
 					}
+					$this->merge_fragment_refs_into_composed( $overlay, $composed );
 					$overlay_applied  = true;
 					$overlay_industry = $industry_key;
 				}
@@ -131,6 +148,7 @@ final class Industry_Helper_Doc_Composer {
 							$composed[ $field ] = $subtype_overlay[ $field ];
 						}
 					}
+					$this->merge_fragment_refs_into_composed( $subtype_overlay, $composed );
 					$overlay_applied = true;
 				}
 			}
@@ -152,5 +170,34 @@ final class Industry_Helper_Doc_Composer {
 			) );
 		}
 		return $result;
+	}
+
+	/**
+	 * Merges resolved fragment content into composed doc when overlay has fragment refs (Prompt 477).
+	 *
+	 * @param array<string, mixed> $overlay Overlay or subtype overlay array.
+	 * @param array<string, mixed> $composed Composed doc array (mutated).
+	 * @return void
+	 */
+	private function merge_fragment_refs_into_composed( array $overlay, array &$composed ): void {
+		if ( $this->fragment_resolver === null ) {
+			return;
+		}
+		foreach ( self::FRAGMENT_REF_FIELDS as $ref_key => $target_field ) {
+			$frag_key = isset( $overlay[ $ref_key ] ) && is_string( $overlay[ $ref_key ] )
+				? trim( $overlay[ $ref_key ] )
+				: '';
+			if ( $frag_key === '' ) {
+				continue;
+			}
+			$resolved = $this->fragment_resolver->resolve( $frag_key, self::FRAGMENT_CONSUMER_SCOPE );
+			if ( $resolved === null || $resolved === '' ) {
+				continue;
+			}
+			$existing = isset( $composed[ $target_field ] ) && is_string( $composed[ $target_field ] )
+				? trim( $composed[ $target_field ] )
+				: '';
+			$composed[ $target_field ] = $existing !== '' ? $existing . "\n\n" . $resolved : $resolved;
+		}
 	}
 }

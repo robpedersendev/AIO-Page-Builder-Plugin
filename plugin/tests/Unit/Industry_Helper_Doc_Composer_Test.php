@@ -11,6 +11,8 @@ namespace AIOPageBuilder\Tests\Unit;
 use AIOPageBuilder\Domain\Industry\Docs\Composed_Helper_Doc_Result;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Helper_Doc_Composer;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Registry;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Resolver;
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use PHPUnit\Framework\TestCase;
 
@@ -20,6 +22,8 @@ $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Industry/Docs/Industry_Section_Helper_Overlay_Registry.php';
 require_once $plugin_root . '/src/Domain/Industry/Docs/Composed_Helper_Doc_Result.php';
 require_once $plugin_root . '/src/Domain/Industry/Docs/Industry_Helper_Doc_Composer.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Shared_Fragment_Registry.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Shared_Fragment_Resolver.php';
 require_once $plugin_root . '/src/Domain/Registries/Documentation/Documentation_Schema.php';
 require_once $plugin_root . '/src/Domain/Registries/Docs/Documentation_Loader.php';
 require_once $plugin_root . '/src/Domain/Registries/Docs/Documentation_Registry.php';
@@ -157,5 +161,39 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 		$this->assertArrayHasKey( 'tone_notes', $doc );
 		$this->assertStringContainsString( 'Warm', $doc['tone_notes'] );
 		$this->assertArrayHasKey( 'cta_usage_notes', $doc );
+	}
+
+	/** Prompt 477: fragment ref in overlay appends resolved content to compliance_cautions. */
+	public function test_compose_with_fragment_ref_appends_resolved_content(): void {
+		$frag_registry = new Industry_Shared_Fragment_Registry();
+		$frag_registry->load( array(
+			array(
+				Industry_Shared_Fragment_Registry::FIELD_FRAGMENT_KEY      => 'caution_testimonial_genuine',
+				Industry_Shared_Fragment_Registry::FIELD_FRAGMENT_TYPE     => Industry_Shared_Fragment_Registry::TYPE_CAUTION_SNIPPET,
+				Industry_Shared_Fragment_Registry::FIELD_ALLOWED_CONSUMERS => array( 'section_helper_overlay' ),
+				Industry_Shared_Fragment_Registry::FIELD_CONTENT          => 'Testimonials must be genuine; obtain consent.',
+				Industry_Shared_Fragment_Registry::FIELD_STATUS           => Industry_Shared_Fragment_Registry::STATUS_ACTIVE,
+			),
+		) );
+		$resolver = new Industry_Shared_Fragment_Resolver( $frag_registry );
+		$doc_registry = new Documentation_Registry();
+		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
+		$overlay_registry->load( array(
+			array(
+				Industry_Section_Helper_Overlay_Registry::FIELD_INDUSTRY_KEY => 'test_ind',
+				Industry_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY  => 'sec_frag_994',
+				Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE        => Industry_Section_Helper_Overlay_Registry::SCOPE_SECTION_HELPER_OVERLAY,
+				Industry_Section_Helper_Overlay_Registry::FIELD_STATUS       => Industry_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+				'compliance_cautions' => 'Direct caution text.',
+				'compliance_cautions_fragment_ref' => 'caution_testimonial_genuine',
+			),
+		) );
+		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry, null, null, null, null, $resolver );
+		$result = $composer->compose( 'sec_frag_994', 'test_ind' );
+		$this->assertTrue( $result->is_overlay_applied() );
+		$doc = $result->get_composed_doc();
+		$this->assertArrayHasKey( 'compliance_cautions', $doc );
+		$this->assertStringContainsString( 'Direct caution text.', $doc['compliance_cautions'] );
+		$this->assertStringContainsString( 'Testimonials must be genuine', $doc['compliance_cautions'] );
 	}
 }

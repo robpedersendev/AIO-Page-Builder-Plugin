@@ -36,6 +36,7 @@ return array(
 		'status'       => 'active',
 		'tone_notes'   => 'Credible and reassuring. Use only real licenses, certifications, or awards.',
 		'compliance_cautions' => 'Do not imply endorsement without permission. License and compliance claims must be accurate and current.',
+		'compliance_cautions_fragment_ref' => 'caution_testimonial_genuine',
 		'media_notes'  => 'Badge images must match the named credential; provide meaningful alt text.',
 	),
 	array(

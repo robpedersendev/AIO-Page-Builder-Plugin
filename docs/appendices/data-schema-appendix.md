@@ -170,7 +170,13 @@ Override object for operator override of industry recommendations (section, page
 
 ---
 
-## 11.5 Industry and subtype compliance/caution rules (Prompt 405, 446)
+## 11.5 Industry shared fragments (Prompt 474)
+
+Reusable cross-industry artifact fragments (industry-shared-fragment-schema.md). Key fields: fragment_key, fragment_type (cta_notes, seo_segment, caution_snippet, helper_guidance, page_guidance), allowed_consumers, content, status, version_marker. Loaded via Industry_Shared_Fragment_Registry (load, get, get_by_type). Resolved via Industry_Shared_Fragment_Resolver::resolve(fragment_key, consumer_scope); invalid or out-of-scope refs return null. See [industry-shared-fragment-schema.md](../schemas/industry-shared-fragment-schema.md) and [industry-shared-fragment-contract.md](../contracts/industry-shared-fragment-contract.md).
+
+---
+
+## 11.6 Industry and subtype compliance/caution rules (Prompt 405, 446)
 
 **Industry compliance rules** (industry-compliance-rule-schema.md): rule_key, industry_key, scope, target_section_family, target_page_family, severity (info | caution | warning), caution_summary, guidance_text, status, version_marker. Loaded via Industry_Compliance_Rule_Registry (load, get, get_for_industry). Advisory only; no legal advice.
 

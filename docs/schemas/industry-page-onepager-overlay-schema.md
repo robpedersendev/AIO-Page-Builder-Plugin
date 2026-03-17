@@ -39,7 +39,7 @@
 Overlays may **add** or **override** only the following when merging with base one-pager content (future resolver):
 
 - hierarchy_hints, cta_strategy, lpagery_seo_notes, compliance_cautions, additive_blocks.
-- Base **content_body** of the one-pager is not replaced wholesale unless a future contract allows it.
+- Base **content_body** of the one-pager is not replaced wholesale unless a future contract allows it. Overlay regions may reference **shared fragments** (industry-shared-fragment-contract.md) when the consumer scope is `page_onepager_overlay`; resolution is via Industry_Shared_Fragment_Resolver.
 
 ---
 

@@ -46,7 +46,7 @@ Overlays may **add** or **override** only the following regions when merging wit
 - seo_notes → additive or override
 - additive_blocks → appended to base content in an agreed order
 
-Base **content_body** of the section helper is not replaced wholesale unless a future contract explicitly allows it.
+Base **content_body** of the section helper is not replaced wholesale unless a future contract explicitly allows it. Overlay regions may reference **shared fragments** (industry-shared-fragment-contract.md) when the consumer scope is `section_helper_overlay`; resolution is via Industry_Shared_Fragment_Resolver.
 
 ---
 

@@ -73,6 +73,12 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: industry read-model cache service (industry-cache-contract; Prompt 434). */
 	public const CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE = 'industry_read_model_cache_service';
 
+	/** Container key: industry shared fragment registry (Prompt 475; industry-shared-fragment-schema). */
+	public const CONTAINER_KEY_SHARED_FRAGMENT_REGISTRY = 'industry_shared_fragment_registry';
+
+	/** Container key: industry shared fragment resolver (Prompt 475). */
+	public const CONTAINER_KEY_SHARED_FRAGMENT_RESOLVER = 'industry_shared_fragment_resolver';
+
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
 		$container->register( self::CONTAINER_KEY_INDUSTRY_LOADED, function (): bool {
@@ -162,6 +168,15 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Compliance_Rule_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_Compliance_Rule_Registry::get_builtin_definitions() );
 			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_SHARED_FRAGMENT_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Registry::get_builtin_definitions() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_SHARED_FRAGMENT_RESOLVER, function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Resolver {
+			$registry = $container->get( self::CONTAINER_KEY_SHARED_FRAGMENT_REGISTRY );
+			return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Resolver( $registry );
 		} );
 		$container->register( 'subtype_compliance_rule_registry', function (): \AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry();
@@ -299,13 +314,15 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$cache = $container->has( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) : null;
 			$key_builder = $container->has( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) : null;
 			$doc_registry = new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry( new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Loader( __DIR__ . '/../Domain/Registries/Docs' ) );
+			$fragment_resolver = $container->has( self::CONTAINER_KEY_SHARED_FRAGMENT_RESOLVER ) ? $container->get( self::CONTAINER_KEY_SHARED_FRAGMENT_RESOLVER ) : null;
 			$helper_composer = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Helper_Doc_Composer(
 				$doc_registry,
 				$section_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry ? $section_overlay : new \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry(),
 				$warning_resolver instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver ? $warning_resolver : null,
 				$subtype_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry ? $subtype_overlay : null,
 				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
-				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
+				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null,
+				$fragment_resolver instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Resolver ? $fragment_resolver : null
 			);
 			$section_resolver = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Recommendation_Resolver(
 				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
