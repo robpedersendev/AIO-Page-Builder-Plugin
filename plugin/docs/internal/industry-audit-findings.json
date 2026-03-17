@@ -137,6 +137,51 @@
       "status": "verified",
       "date_opened": "2025-03-16",
       "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-601",
+      "audit_prompt_number": "601",
+      "audit_domain": "lpagery",
+      "summary": "No material defects found. LPagery planning and binding audited; advisory-only, token refs valid, no execution drift. See docs/qa/industry-lpagery-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-602",
+      "audit_prompt_number": "602",
+      "audit_domain": "conflict_caution_override",
+      "summary": "No material defects found. Conflict, caution, and override system audited; warnings bounded, precedence deterministic, repair advisory. See docs/qa/industry-conflict-caution-override-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-603",
+      "audit_prompt_number": "603",
+      "audit_domain": "registries",
+      "summary": "No material defects found. Shared fragment resolver and adoption audited; consumer-scope strict, fallback safe, deterministic. See docs/qa/industry-shared-fragment-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-604",
+      "audit_prompt_number": "604",
+      "audit_domain": "export_restore",
+      "summary": "No material defects found. Export, restore, deactivation, and uninstall audited; preservation honored, validation safe. See docs/qa/industry-export-restore-uninstall-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-605",
+      "audit_prompt_number": "605",
+      "audit_domain": "release",
+      "summary": "No material defects found. Scaffold, incomplete-state, and promotion-readiness audited; advisory only, no hidden promotion. See docs/qa/industry-scaffold-promotion-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
     }
   ]
 }

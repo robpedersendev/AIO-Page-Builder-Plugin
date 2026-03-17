@@ -129,6 +129,11 @@ Every audit prompt run must **append or update** the ledger (or JSON) before it 
 - [industry-what-if-simulation-audit-report.md](../qa/industry-what-if-simulation-audit-report.md) — What-if simulation integrity audit (Prompt 598).
 - [industry-ai-planner-audit-report.md](../qa/industry-ai-planner-audit-report.md) — AI planner and prompt-pack audit (Prompt 599).
 - [industry-styling-subsystem-audit-report.md](../qa/industry-styling-subsystem-audit-report.md) — Styling subsystem audit (Prompt 600).
+- [industry-lpagery-audit-report.md](../qa/industry-lpagery-audit-report.md) — LPagery planning and binding audit (Prompt 601).
+- [industry-conflict-caution-override-audit-report.md](../qa/industry-conflict-caution-override-audit-report.md) — Conflict, caution, and override-system audit (Prompt 602).
+- [industry-shared-fragment-audit-report.md](../qa/industry-shared-fragment-audit-report.md) — Shared fragment resolver and adoption audit (Prompt 603).
+- [industry-export-restore-uninstall-audit-report.md](../qa/industry-export-restore-uninstall-audit-report.md) — Export, restore, deactivation, and uninstall audit (Prompt 604).
+- [industry-scaffold-promotion-audit-report.md](../qa/industry-scaffold-promotion-audit-report.md) — Scaffold, incomplete-state, and promotion-readiness audit (Prompt 605).
 - [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) — Finding ledger (585A); must exist before audit 586+.
 - [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) — Audit → record → triage → remediate → verify.
 - [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md)
