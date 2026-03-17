@@ -60,7 +60,7 @@ Implementation-audit prompts should **not** add new runtime features. They shoul
 3. **Integration seams:** Registry load order, resolver composition, cache invalidation, admin screen data flow.
 4. **Test and QA coverage:** Gaps in unit/integration tests; regression guard coverage; diagnostics and health assertions.
 
-**Entrypoint:** Use the [industry-implementation-audit-entrypoint-map.md](industry-implementation-audit-entrypoint-map.md) (Prompt 569) for priority audit domains, high-risk codepaths, and audit clusters. That map is the formal handoff for audit-phase prompt generation.
+**Entrypoint:** Use the [industry-implementation-audit-entrypoint-map.md](industry-implementation-audit-entrypoint-map.md) (Prompt 569) for priority audit domains, high-risk codepaths, and audit clusters. The [industry-implementation-audit-service-map.md](industry-implementation-audit-service-map.md) (Prompt 586) documents **real** implementation entrypoints, registries, storage, admin screens, and reporting paths so audits 587+ target actual code.
 
 **Finding ledger (585A):** Before running audit prompts (586+), the [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) and [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) must be in place. Every audit run must record findings (or no-finding) in the ledger; every remediation prompt must reference at least one finding_id.
 
@@ -99,5 +99,6 @@ Audit clusters should be dependency-aware: e.g. profile and resolution before re
 - [industry-next-phase-prompt-map.md](industry-next-phase-prompt-map.md)
 - [industry-subsystem-v2-guardrails.md](../contracts/industry-subsystem-v2-guardrails.md)
 - [industry-implementation-audit-entrypoint-map.md](industry-implementation-audit-entrypoint-map.md)
+- [industry-implementation-audit-service-map.md](industry-implementation-audit-service-map.md) — Implementation service map (Prompt 586).
 - [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) — Audit finding ledger (585A); required before audit 586+.
 - [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) — Audit → record → triage → remediate → verify.

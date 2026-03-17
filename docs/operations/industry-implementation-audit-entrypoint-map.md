@@ -108,12 +108,16 @@ Every audit prompt run must **append or update** the ledger (or JSON) before it 
 - **Archive map:** [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) (Prompt 570) summarizes prompt ranges by capability cluster, authoritative contracts, and the transition into implementation-audit. Use it to trace capability to prompt range and to confirm which artifacts are authoritative.
 - **Optional backlog:** [industry-optional-late-stage-greenfield-backlog.md](industry-optional-late-stage-greenfield-backlog.md) (Prompt 585) lists Prompts 571–584 as optional; implementation-audit is the next priority, not these items.
 - **Roadmap:** [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md) and [industry-subsystem-v2-guardrails.md](../contracts/industry-subsystem-v2-guardrails.md) remain the authority for what may and may not be added. Audit prompts must not normalize unsafe shortcuts or reduced review rigor.
-- **Service map:** [industry-pack-service-map.md](../contracts/industry-pack-service-map.md) and bootstrap (Industry_Packs_Module) are the source of truth for container keys and dependency flow. Audit prompts should reference them for coverage.
+- **Service map:** [industry-pack-service-map.md](../contracts/industry-pack-service-map.md) and bootstrap (Industry_Packs_Module) are the source of truth for container keys and dependency flow. **[industry-implementation-audit-service-map.md](industry-implementation-audit-service-map.md)** (Prompt 586) is the **implementation** service map: real entrypoints, registries, resolvers, storage, admin screens, preview/Build Plan/export/reporting paths, and audit hotspots. Audit prompts 587+ should reference the implementation service map for real code locations.
 
 ---
 
 ## 8. References
 
+- [industry-implementation-audit-service-map.md](industry-implementation-audit-service-map.md) — Implementation service map (Prompt 586); real entrypoints and paths for audits 587+.
+- [industry-bootstrap-audit-report.md](../qa/industry-bootstrap-audit-report.md) — Bootstrap and container audit (Prompt 587).
+- [industry-registry-audit-report.md](../qa/industry-registry-audit-report.md) — Registry load and validation audit (Prompt 588).
+- [industry-profile-audit-report.md](../qa/industry-profile-audit-report.md) — Industry Profile persistence and resolver audit (Prompt 589).
 - [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) — Finding ledger (585A); must exist before audit 586+.
 - [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) — Audit → record → triage → remediate → verify.
 - [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md)
