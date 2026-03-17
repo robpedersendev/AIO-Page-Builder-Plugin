@@ -83,6 +83,60 @@
       "status": "verified",
       "date_opened": "2025-03-16",
       "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-595",
+      "audit_prompt_number": "595",
+      "audit_domain": "preview_detail",
+      "summary": "No material defects found. Preview/detail resolvers audited; composed state, fallback, read-only verified. See docs/qa/industry-preview-detail-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-596",
+      "audit_prompt_number": "596",
+      "audit_domain": "build_plan",
+      "summary": "No material defects found. Build Plan scoring and explanation audited; contextual inputs, rationale, approval-gating verified. See docs/qa/industry-build-plan-scoring-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-597",
+      "audit_prompt_number": "597",
+      "audit_domain": "release",
+      "summary": "No material defects found. Build Plan conversion and execution boundary audited; draft-only, approval gates verified. See docs/qa/industry-build-plan-execution-boundary-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-598",
+      "audit_prompt_number": "598",
+      "audit_domain": "simulation",
+      "summary": "No material defects found. What-if simulation audited; read-only, isolated, comparison parity verified. See docs/qa/industry-what-if-simulation-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-599",
+      "audit_prompt_number": "599",
+      "audit_domain": "ai",
+      "summary": "No material defects found. AI planner and prompt-pack overlay audited; validation, recommendation-only boundary verified. See docs/qa/industry-ai-planner-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
+    },
+    {
+      "finding_id": "IND-AUD-NO-600",
+      "audit_prompt_number": "600",
+      "audit_domain": "styling",
+      "summary": "No material defects found. Styling subsystem audited; sanitization, emission, preview parity verified. See docs/qa/industry-styling-subsystem-audit-report.md.",
+      "status": "verified",
+      "date_opened": "2025-03-16",
+      "date_updated": "2025-03-16"
     }
   ]
 }

@@ -123,6 +123,12 @@ Every audit prompt run must **append or update** the ledger (or JSON) before it 
 - [industry-page-template-recommendation-audit-report.md](../qa/industry-page-template-recommendation-audit-report.md) — Page template recommendation engine audit (Prompt 592).
 - [industry-starter-bundle-audit-report.md](../qa/industry-starter-bundle-audit-report.md) — Starter bundle resolution and overlay audit (Prompt 593).
 - [industry-doc-composition-audit-report.md](../qa/industry-doc-composition-audit-report.md) — Helper-doc and page one-pager composition audit (Prompt 594).
+- [industry-preview-detail-audit-report.md](../qa/industry-preview-detail-audit-report.md) — Preview and detail resolver audit (Prompt 595).
+- [industry-build-plan-scoring-audit-report.md](../qa/industry-build-plan-scoring-audit-report.md) — Build Plan scoring and explanation audit (Prompt 596).
+- [industry-build-plan-execution-boundary-audit-report.md](../qa/industry-build-plan-execution-boundary-audit-report.md) — Build Plan conversion and execution-boundary audit (Prompt 597).
+- [industry-what-if-simulation-audit-report.md](../qa/industry-what-if-simulation-audit-report.md) — What-if simulation integrity audit (Prompt 598).
+- [industry-ai-planner-audit-report.md](../qa/industry-ai-planner-audit-report.md) — AI planner and prompt-pack audit (Prompt 599).
+- [industry-styling-subsystem-audit-report.md](../qa/industry-styling-subsystem-audit-report.md) — Styling subsystem audit (Prompt 600).
 - [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) — Finding ledger (585A); must exist before audit 586+.
 - [industry-audit-remediation-workflow.md](industry-audit-remediation-workflow.md) — Audit → record → triage → remediate → verify.
 - [industry-greenfield-closure-report.md](industry-greenfield-closure-report.md)
