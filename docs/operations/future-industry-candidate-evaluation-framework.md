@@ -57,19 +57,24 @@
 
 ## 5. Use in workflow
 
-1. **Backlog:** When considering a new industry, fill [future-industry-scorecard-template.md](future-industry-scorecard-template.md) and attach to the candidate.
+1. **Intake (Prompt 471):** Before scorecard evaluation, gather evidence using the [future-industry-intake-dossier-workflow.md](future-industry-intake-dossier-workflow.md) and [future-industry-intake-dossier-template.md](future-industry-intake-dossier-template.md). Every proposed vertical starts from a consistent dossier; ad hoc notes are not sufficient.
+2. **Backlog:** When considering a new industry, fill [future-industry-scorecard-template.md](future-industry-scorecard-template.md) (from dossier evidence or via Future_Industry_Scorecard_Executor) and attach to the candidate.
 2. **Planning:** Use score and categories to order “New industries” in roadmap (industry-subsystem-roadmap-contract §5) and to set expectations (e.g. “T1 overlays only” for Review candidates).
-3. **Prompt generation:** Scorecard and framework provide concrete inputs for future prompts (required pieces, overlays, subtypes, compliance notes).
-4. **Authoring:** Once approved, follow industry-pack-authoring-guide and industry-pack-maintenance-checklist; framework does not replace them. For consistent file and placeholder skeletons, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md).
+4. **Prompt generation:** Scorecard and framework provide concrete inputs for future prompts (required pieces, overlays, subtypes, compliance notes).
+5. **Authoring:** Once approved, follow industry-pack-authoring-guide and industry-pack-maintenance-checklist; framework does not replace them. For consistent file and placeholder skeletons, use [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md).
 
 ---
 
 ## 6. Cross-references
 
+- [future-industry-intake-dossier-workflow.md](future-industry-intake-dossier-workflow.md) — Intake workflow and evidence expectations (Prompt 471).
+- [future-industry-intake-dossier-template.md](future-industry-intake-dossier-template.md) — Reusable dossier template per candidate.
 - [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md) — Extension seams, roadmap categories, “Adding a new industry”.
 - [industry-pack-authoring-guide.md](industry-pack-authoring-guide.md) — Required pieces and implementation order.
 - [industry-pack-maintenance-checklist.md](industry-pack-maintenance-checklist.md) — Ongoing maintenance and deprecation.
-- [future-industry-scorecard-template.md](future-industry-scorecard-template.md) — Scorecard template for each candidate.
+- [future-industry-scorecard-template.md](future-industry-scorecard-template.md) — Scorecard template for each candidate; can be filled from dossier via scorecard executor (Prompt 472).
+- [future-industry-scorecard-executor-contract.md](../contracts/future-industry-scorecard-executor-contract.md) — Contract for Future_Industry_Scorecard_Executor (dossier → scorecard result).
+- [future-industry-comparison-matrix-template.md](future-industry-comparison-matrix-template.md) — Comparison matrix workflow and template; Future_Industry_Comparison_Matrix_Service (Prompt 473) for multi-candidate side-by-side comparison.
 
 ---
 

@@ -1,6 +1,6 @@
 # Future Industry Scorecard Template (Prompt 420)
 
-**Purpose:** One scorecard per candidate industry. Use with [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md).
+**Purpose:** One scorecard per candidate industry. Use with [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md). Evidence is gathered via [future-industry-intake-dossier-workflow.md](future-industry-intake-dossier-workflow.md) and [future-industry-intake-dossier-template.md](future-industry-intake-dossier-template.md); this scorecard can be filled manually or by the Future_Industry_Scorecard_Executor (Prompt 472). Executor contract: [future-industry-scorecard-executor-contract.md](../contracts/future-industry-scorecard-executor-contract.md).
 
 ---
 
@@ -50,4 +50,4 @@
 
 ---
 
-*Attach this scorecard to the candidate in backlog and reference in planning.*
+*Attach this scorecard to the candidate in backlog and reference in planning. For multi-candidate comparison, use [future-industry-comparison-matrix-template.md](future-industry-comparison-matrix-template.md) and Future_Industry_Comparison_Matrix_Service (Prompt 473).*

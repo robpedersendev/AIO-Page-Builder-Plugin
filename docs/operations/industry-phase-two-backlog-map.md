@@ -56,7 +56,13 @@
 
 ---
 
-## 6. References
+## 6. Next-phase prompt map (Prompt 470)
+
+- [industry-next-phase-prompt-map.md](industry-next-phase-prompt-map.md) — Dependency-aware prompt map for the next phase: subtype expansion, seeded content, performance, author tooling, future-industry onboarding (intake dossier, scorecard executor, comparison matrix), and optional reporting. Use for structured handoff when generating future Cursor prompts.
+
+---
+
+## 7. References
 
 - [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md) — Extension seams and roadmap categories.
 - [industry-pack-maintenance-checklist.md](industry-pack-maintenance-checklist.md) — Ongoing maintenance.
