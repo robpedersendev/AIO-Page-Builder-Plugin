@@ -79,9 +79,20 @@ When a profile has both primary and secondary conversion goals, optional **secon
 
 ---
 
-## 6.1 Combined subtype+goal starter-bundle overlays (Prompt 551)
+## 6.1 Combined subtype+goal starter-bundle overlays (Prompt 551, 552)
 
-For **exceptional** (subtype, goal) pairs, optional **combined subtype+goal starter-bundle overlays** may refine a bundle when both industry_subtype_key and conversion_goal_key are set. Combined overlays are **bounded and admission-gated**; they are not the default. Resolution order: subtype bundle → goal overlay(s) → combined overlay (when present). Fallback: when no or invalid combined overlay, use subtype + goal layers only. See [subtype-goal-starter-bundle-contract.md](../contracts/subtype-goal-starter-bundle-contract.md) and [subtype-goal-starter-bundle-schema.md](../schemas/subtype-goal-starter-bundle-schema.md).
+For **exceptional** (subtype, goal) pairs, optional **combined subtype+goal starter-bundle overlays** may refine a bundle when both industry_subtype_key and conversion_goal_key are set. Combined overlays are **bounded and admission-gated**; they are not the default. Resolution order: subtype bundle → goal overlay(s) → combined overlay (when present). Fallback: when no or invalid combined overlay, use subtype + goal layers only.
+
+**Seed set (Prompt 552):** Mobile nail + booking, buyer-focused realtor + consultation, commercial plumber + estimate, commercial restoration + emergency-call posture.
+
+| Subtype | Goal | Overlay key | Admission rationale |
+|---------|------|--------------|----------------------|
+| cosmetology_nail_mobile_tech | bookings | cosmetology_nail_mobile_tech_bookings | Mobile nail tech + booking: mobile-first booking flow not expressed by subtype-only or goal-only alone. |
+| realtor_buyer_agent | consultations | realtor_buyer_agent_consultations | Buyer agent + consultation: buyer consultation/discovery flow is high-value joint scenario. |
+| plumber_commercial | estimates | plumber_commercial_estimates | Commercial plumber + estimate: project scoping, multi-site estimate flow. |
+| disaster_recovery_commercial | calls | disaster_recovery_commercial_calls | Commercial restoration + calls: emergency-call/24/7 dispatch posture. |
+
+**Source directory:** `plugin/src/Domain/Industry/Registry/StarterBundles/SubtypeGoalOverlays/`. **Registry:** Subtype_Goal_Starter_Bundle_Overlay_Registry (container key `subtype_goal_starter_bundle_overlay_registry`). See [subtype-goal-starter-bundle-contract.md](../contracts/subtype-goal-starter-bundle-contract.md) and [subtype-goal-starter-bundle-schema.md](../schemas/subtype-goal-starter-bundle-schema.md).
 
 ---
 

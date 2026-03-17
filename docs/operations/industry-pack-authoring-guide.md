@@ -12,6 +12,7 @@
 - **Additive only**: New packs extend the subsystem; they do not replace core registries or change core plugin behavior when no industry is set.
 - **No secrets**: Industry pack data (definitions, overlays, presets) must never contain API keys, credentials, or other secrets. Safe for export and support diagnostics.
 - **Validation and QA**: Every new pack and related artifact must pass schema validation and the release gate expectations (or documented waiver).
+- **Stale-content awareness:** Long-term maintenance can use the internal [industry-asset-aging-scoring-contract.md](../contracts/industry-asset-aging-scoring-contract.md) (Prompt 555) to identify aging overlays, rules, docs, and bundles for refresh; scoring is advisory and does not replace release review.
 
 ---
 

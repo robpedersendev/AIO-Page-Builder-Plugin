@@ -70,6 +70,12 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: secondary-goal starter-bundle overlay registry (Prompt 541/542; secondary-goal-starter-bundle-schema.md). */
 	public const CONTAINER_KEY_SECONDARY_GOAL_STARTER_BUNDLE_OVERLAY_REGISTRY = 'secondary_goal_starter_bundle_overlay_registry';
 
+	/** Container key: combined subtype+goal section-helper overlay registry (Prompt 553/554; subtype-goal-doc-overlay-schema.md). */
+	public const CONTAINER_KEY_SUBTYPE_GOAL_SECTION_HELPER_OVERLAY_REGISTRY = 'subtype_goal_section_helper_overlay_registry';
+
+	/** Container key: combined subtype+goal page one-pager overlay registry (Prompt 553/554; subtype-goal-doc-overlay-schema.md). */
+	public const CONTAINER_KEY_SUBTYPE_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY = 'subtype_goal_page_onepager_overlay_registry';
+
 	/** Container key: industry pack toggle controller (Prompt 389; industry-pack-activation-contract.md). */
 	public const CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER = 'industry_pack_toggle_controller';
 
@@ -179,6 +185,16 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( self::CONTAINER_KEY_SECONDARY_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Secondary_Goal_Page_OnePager_Overlay_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Secondary_Goal_Page_OnePager_Overlay_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Secondary_Goal_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_SUBTYPE_GOAL_SECTION_HELPER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Subtype_Goal_Section_Helper_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Subtype_Goal_Section_Helper_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Subtype_Goal_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_SUBTYPE_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Subtype_Goal_Page_OnePager_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Subtype_Goal_Page_OnePager_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Subtype_Goal_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions() );
 			return $registry;
 		} );
 		$container->register( self::CONTAINER_KEY_SEO_GUIDANCE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry {
@@ -460,11 +476,13 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$key_builder = $container->has( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) : null;
 			$doc_registry = new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry( new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Loader( __DIR__ . '/../Domain/Registries/Docs' ) );
 			$fragment_resolver = $container->has( self::CONTAINER_KEY_SHARED_FRAGMENT_RESOLVER ) ? $container->get( self::CONTAINER_KEY_SHARED_FRAGMENT_RESOLVER ) : null;
+			$subtype_goal_helper_overlay = $container->has( self::CONTAINER_KEY_SUBTYPE_GOAL_SECTION_HELPER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_GOAL_SECTION_HELPER_OVERLAY_REGISTRY ) : null;
 			$helper_composer = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Helper_Doc_Composer(
 				$doc_registry,
 				$section_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry ? $section_overlay : new \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry(),
 				$warning_resolver instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver ? $warning_resolver : null,
 				$subtype_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry ? $subtype_overlay : null,
+				$subtype_goal_helper_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Goal_Section_Helper_Overlay_Registry ? $subtype_goal_helper_overlay : null,
 				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
 				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null,
 				$fragment_resolver instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Resolver ? $fragment_resolver : null
@@ -496,11 +514,13 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$cache = $container->has( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) : null;
 			$key_builder = $container->has( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_CACHE_KEY_BUILDER ) : null;
 			$doc_registry = new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry( new \AIOPageBuilder\Domain\Registries\Docs\Documentation_Loader( __DIR__ . '/../Domain/Registries/Docs' ) );
+			$subtype_goal_page_overlay = $container->has( self::CONTAINER_KEY_SUBTYPE_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY ) : null;
 			$one_pager_composer = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Composer(
 				$doc_registry,
 				$page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry ? $page_overlay : new \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry(),
 				$warning_resolver instanceof \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver ? $warning_resolver : null,
 				$subtype_page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Page_OnePager_Overlay_Registry ? $subtype_page_overlay : null,
+				$subtype_goal_page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Goal_Page_OnePager_Overlay_Registry ? $subtype_goal_page_overlay : null,
 				$cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $cache : null,
 				$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
 			);

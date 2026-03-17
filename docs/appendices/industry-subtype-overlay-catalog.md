@@ -47,3 +47,20 @@ Parent-industry section-helper overlays remain the first overlay layer. Subtype 
 - **Source directory**: `plugin/src/Domain/Industry/Docs/SubtypePageOnePagerOverlays/`. Files: cosmetology-nail-subtype-onepager.php, realtor-subtype-onepager.php, plumber-subtype-onepager.php, disaster-recovery-subtype-onepager.php.
 - **Loading**: `Subtype_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions()` returns definitions from those files. Bootstrap registers the registry under `CONTAINER_KEY_SUBTYPE_PAGE_ONEPAGER_OVERLAY_REGISTRY` and passes it into `Industry_Page_OnePager_Composer`. The composer applies the subtype overlay when `compose($page_template_key, $industry_key, $subtype_key)` is called with a non-empty `$subtype_key` and the subtype registry is set. Invalid or duplicate (subtype_key, page_template_key) entries are skipped.
 - **Relation to industry page overlays**: Parent-industry page one-pager overlays remain the first overlay layer. Subtype page overlays refine only where subtype nuance matters (e.g. buyer vs seller, mobile vs luxury, residential vs commercial). When no subtype is selected or subtype_key is invalid, composition is base + industry only. See [subtype-page-onepager-overlay-schema.md](../schemas/subtype-page-onepager-overlay-schema.md) and [industry-subtype-extension-contract.md](../contracts/industry-subtype-extension-contract.md).
+
+---
+
+## 6. Combined subtype+goal starter-bundle overlays (Prompt 551, 552)
+
+Exceptional **combined subtype+goal starter-bundle overlays** (subtype_key + conversion_goal_key) refine starter bundles when both are set. They are **not** part of the section-helper or page one-pager overlay layers; they apply at **bundle-to-plan** conversion. Seed set: mobile nail + booking, buyer realtor + consultation, commercial plumber + estimate, commercial restoration + calls. See [industry-starter-bundle-catalog.md](industry-starter-bundle-catalog.md) §6.1 and [subtype-goal-starter-bundle-contract.md](../contracts/subtype-goal-starter-bundle-contract.md).
+
+---
+
+## 7. Combined subtype+goal doc overlays (Prompt 553, 554)
+
+Exceptional **combined subtype+goal section-helper** and **page one-pager** overlays apply when both subtype and conversion goal are set and a matching overlay exists. Composition order: base → industry → subtype → **combined subtype+goal** (when present). Seed set (bounded):
+
+- **Section-helper:** realtor_buyer_agent + consultations (hero, CTA); cosmetology_nail_mobile_tech + bookings (hero, CTA); disaster_recovery_commercial + calls (hero, CTA). Admission: buyer-consultation flows, mobile-booking flows, commercial emergency-response flows.
+- **Page one-pager:** realtor_buyer_agent + consultations (pt_contact_request_01); cosmetology_nail_mobile_tech + bookings (pt_contact_request_01); disaster_recovery_commercial + calls (pt_contact_request_01).
+
+**Source directory:** `plugin/src/Domain/Industry/Docs/SubtypeGoalOverlays/`. **Registries:** Subtype_Goal_Section_Helper_Overlay_Registry (CONTAINER_KEY_SUBTYPE_GOAL_SECTION_HELPER_OVERLAY_REGISTRY), Subtype_Goal_Page_OnePager_Overlay_Registry (CONTAINER_KEY_SUBTYPE_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY). Industry_Helper_Doc_Composer and Industry_Page_OnePager_Composer apply combined overlay when compose() is called with non-empty subtype_key and conversion_goal_key. **Fallback:** When no combined overlay exists for (subtype_key, goal_key, section_key or page_key), composition uses subtype + goal layers only. See [subtype-goal-doc-overlay-contract.md](../contracts/subtype-goal-doc-overlay-contract.md) and [subtype-goal-doc-overlay-schema.md](../schemas/subtype-goal-doc-overlay-schema.md).

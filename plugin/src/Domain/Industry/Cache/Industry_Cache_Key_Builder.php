@@ -66,14 +66,16 @@ final class Industry_Cache_Key_Builder {
 	 * @param string $section_key  Section internal_key.
 	 * @param string $industry_key Industry pack key.
 	 * @param string $subtype_key  Subtype key or empty.
+	 * @param string $goal_key     Conversion goal key or empty (Prompt 554; affects combined overlay).
 	 * @return string Base key.
 	 */
-	public function for_helper_doc( string $section_key, string $industry_key, string $subtype_key = '' ): string {
+	public function for_helper_doc( string $section_key, string $industry_key, string $subtype_key = '', string $goal_key = '' ): string {
 		$parts = array(
 			self::SCOPE_HELPER_DOC,
 			$this->normalize_string( $section_key ),
 			$this->normalize_string( $industry_key ),
 			$this->normalize_string( $subtype_key ),
+			$this->normalize_string( $goal_key ),
 		);
 		return $this->join_and_truncate( $parts );
 	}
@@ -84,14 +86,16 @@ final class Industry_Cache_Key_Builder {
 	 * @param string $page_template_key Page template internal_key.
 	 * @param string $industry_key      Industry pack key.
 	 * @param string $subtype_key       Subtype key or empty.
+	 * @param string $goal_key          Conversion goal key or empty (Prompt 554).
 	 * @return string Base key.
 	 */
-	public function for_page_onepager( string $page_template_key, string $industry_key, string $subtype_key = '' ): string {
+	public function for_page_onepager( string $page_template_key, string $industry_key, string $subtype_key = '', string $goal_key = '' ): string {
 		$parts = array(
 			self::SCOPE_PAGE_ONEPAGER,
 			$this->normalize_string( $page_template_key ),
 			$this->normalize_string( $industry_key ),
 			$this->normalize_string( $subtype_key ),
+			$this->normalize_string( $goal_key ),
 		);
 		return $this->join_and_truncate( $parts );
 	}

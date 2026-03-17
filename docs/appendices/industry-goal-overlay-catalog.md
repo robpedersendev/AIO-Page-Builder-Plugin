@@ -101,3 +101,9 @@ Base, industry, and subtype section-helper overlays remain authoritative. Goal o
 - **Source**: `plugin/src/Domain/Industry/Registry/SecondaryGoalCautionRules/secondary-goal-caution-rule-definitions.php`.
 - **Registry**: Secondary_Goal_Caution_Rule_Registry (container key `secondary_goal_caution_rule_registry`). load(array), get(secondary_goal_rule_key), get_for_primary_secondary(primary_goal_key, secondary_goal_key), get_all(). Invalid or duplicate rules skipped at load.
 - **Fallback:** When no secondary goal or invalid/same-as-primary, only industry + subtype + primary-goal rules apply. See secondary-goal-caution-rule-contract.md and industry-compliance-rule-catalog.md.
+
+---
+
+## 12. Combined subtype+goal doc overlays (Prompt 553, 554)
+
+Exceptional **combined subtype+goal section-helper** and **page one-pager** overlays refine helper/page guidance for specific (subtype_key, goal_key) pairs when joint nuance is stronger than independent subtype and goal overlays. Composition order: base → industry → subtype → **combined subtype+goal** (when present). Seed set: realtor_buyer_agent + consultations (buyer-consultation flows); cosmetology_nail_mobile_tech + bookings (mobile-booking flows); disaster_recovery_commercial + calls (commercial emergency-response flows). **Source:** `plugin/src/Domain/Industry/Docs/SubtypeGoalOverlays/`. **Registries:** Subtype_Goal_Section_Helper_Overlay_Registry, Subtype_Goal_Page_OnePager_Overlay_Registry. **Fallback:** No combined overlay → subtype + goal layers only. See [subtype-goal-doc-overlay-contract.md](../contracts/subtype-goal-doc-overlay-contract.md) and [industry-subtype-overlay-catalog.md](industry-subtype-overlay-catalog.md) §7.

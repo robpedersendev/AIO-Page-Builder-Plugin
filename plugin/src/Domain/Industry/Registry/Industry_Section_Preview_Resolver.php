@@ -97,7 +97,10 @@ final class Industry_Section_Preview_Resolver {
 			$subtype_context = $this->subtype_resolver->resolve();
 			$subtype_key = $subtype_context['industry_subtype_key'] ?? '';
 		}
-		$composed_result  = $this->helper_composer->compose( $section_key, $primary, $subtype_key );
+		$goal_key = isset( $profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			? trim( $profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			: '';
+		$composed_result  = $this->helper_composer->compose( $section_key, $primary, $subtype_key, $goal_key );
 		$composed_doc     = $composed_result->get_composed_doc();
 		$composed_for_view = array(
 			'tone_notes'         => $composed_doc['tone_notes'] ?? '',

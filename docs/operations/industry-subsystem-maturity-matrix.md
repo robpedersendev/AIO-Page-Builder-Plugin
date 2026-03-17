@@ -51,6 +51,7 @@
 ## 4. Completeness assessment
 
 - **Pack completeness scoring:** Maintainers can assess whether a pack or subtype asset set is minimally complete, strong, or release-grade using the advisory [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) (Prompt 519). Score is advisory only; it does not replace release gate or human review.
+- **Asset aging / stale-content scoring:** Maintainers can reason about stale but technically valid assets (overlays, rules, docs, bundles, presets, scaffolds) using the internal [industry-asset-aging-scoring-contract.md](../contracts/industry-asset-aging-scoring-contract.md) (Prompt 555). Stale score is advisory; no auto-edit, no public status; supports long-term maintenance planning.
 
 ---
 
@@ -63,3 +64,4 @@
 - [industry-subsystem-final-signoff.md](../release/industry-subsystem-final-signoff.md)
 - [industry-degraded-mode-contract.md](../contracts/industry-degraded-mode-contract.md)
 - [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) — Advisory completeness dimensions and bands for packs, subtypes, bundles, overlays, docs, QA.
+- [industry-asset-aging-scoring-contract.md](../contracts/industry-asset-aging-scoring-contract.md) — Internal stale-content scoring dimensions and intended use for maintenance planning (Prompt 555).

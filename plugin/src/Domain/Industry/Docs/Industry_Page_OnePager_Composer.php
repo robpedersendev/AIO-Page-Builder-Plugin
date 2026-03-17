@@ -41,6 +41,9 @@ final class Industry_Page_OnePager_Composer {
 	/** @var Subtype_Page_OnePager_Overlay_Registry|null Optional; when set, compose() applies subtype overlay after industry (Prompt 427). */
 	private ?Subtype_Page_OnePager_Overlay_Registry $subtype_overlay_registry;
 
+	/** @var Subtype_Goal_Page_OnePager_Overlay_Registry|null Optional; when set, compose() can apply combined subtype+goal overlay after subtype (Prompt 554). */
+	private ?Subtype_Goal_Page_OnePager_Overlay_Registry $subtype_goal_overlay_registry;
+
 	/** @var Industry_Compliance_Warning_Resolver|null Optional; when set, composed result includes compliance warnings (Prompt 407). */
 	private ?Industry_Compliance_Warning_Resolver $compliance_warning_resolver;
 
@@ -55,15 +58,17 @@ final class Industry_Page_OnePager_Composer {
 		Industry_Page_OnePager_Overlay_Registry $overlay_registry,
 		?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null,
 		?Subtype_Page_OnePager_Overlay_Registry $subtype_overlay_registry = null,
+		?Subtype_Goal_Page_OnePager_Overlay_Registry $subtype_goal_overlay_registry = null,
 		?Industry_Read_Model_Cache_Service $cache_service = null,
 		?Industry_Cache_Key_Builder $cache_key_builder = null
 	) {
-		$this->documentation_registry       = $documentation_registry;
-		$this->overlay_registry             = $overlay_registry;
-		$this->compliance_warning_resolver  = $compliance_warning_resolver;
-		$this->subtype_overlay_registry     = $subtype_overlay_registry;
-		$this->cache_service               = $cache_service;
-		$this->cache_key_builder           = $cache_key_builder;
+		$this->documentation_registry        = $documentation_registry;
+		$this->overlay_registry              = $overlay_registry;
+		$this->compliance_warning_resolver   = $compliance_warning_resolver;
+		$this->subtype_overlay_registry      = $subtype_overlay_registry;
+		$this->subtype_goal_overlay_registry = $subtype_goal_overlay_registry;
+		$this->cache_service                 = $cache_service;
+		$this->cache_key_builder             = $cache_key_builder;
 	}
 
 	/**
@@ -71,15 +76,17 @@ final class Industry_Page_OnePager_Composer {
 	 *
 	 * @param string $page_template_key Page template internal_key.
 	 * @param string $industry_key      Industry pack key. Empty = base-only, no overlay.
-	 * @param string $subtype_key       Optional subtype key (e.g. realtor_buyer_agent). Empty = no subtype overlay (Prompt 427).
+	 * @param string $subtype_key         Optional subtype key (e.g. realtor_buyer_agent). Empty = no subtype overlay (Prompt 427).
+	 * @param string $conversion_goal_key Optional conversion goal key (Prompt 554). When set with subtype, combined subtype+goal overlay may be applied.
 	 * @return Composed_Page_OnePager_Result
 	 */
-	public function compose( string $page_template_key, string $industry_key, string $subtype_key = '' ): Composed_Page_OnePager_Result {
-		$page_template_key = trim( $page_template_key );
-		$industry_key      = trim( $industry_key );
-		$subtype_key       = trim( $subtype_key );
+	public function compose( string $page_template_key, string $industry_key, string $subtype_key = '', string $conversion_goal_key = '' ): Composed_Page_OnePager_Result {
+		$page_template_key   = trim( $page_template_key );
+		$industry_key        = trim( $industry_key );
+		$subtype_key         = trim( $subtype_key );
+		$conversion_goal_key = trim( $conversion_goal_key );
 		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
-			$base_key = $this->cache_key_builder->for_page_onepager( $page_template_key, $industry_key, $subtype_key );
+			$base_key = $this->cache_key_builder->for_page_onepager( $page_template_key, $industry_key, $subtype_key, $conversion_goal_key );
 			$cached   = $this->cache_service->get( $base_key );
 			if ( is_array( $cached ) && isset( $cached['composed_onepager'] ) && is_array( $cached['composed_onepager'] ) ) {
 				return new Composed_Page_OnePager_Result(
@@ -133,13 +140,27 @@ final class Industry_Page_OnePager_Composer {
 				}
 			}
 		}
+		if ( $subtype_key !== '' && $conversion_goal_key !== '' && $page_template_key !== '' && $this->subtype_goal_overlay_registry !== null ) {
+			$combined = $this->subtype_goal_overlay_registry->get( $subtype_key, $conversion_goal_key, $page_template_key );
+			if ( $combined !== null && is_array( $combined ) ) {
+				$allowed = isset( $combined[ Subtype_Goal_Page_OnePager_Overlay_Registry::FIELD_ALLOWED_OVERRIDE_REGIONS ] ) && is_array( $combined[ Subtype_Goal_Page_OnePager_Overlay_Registry::FIELD_ALLOWED_OVERRIDE_REGIONS ] )
+					? $combined[ Subtype_Goal_Page_OnePager_Overlay_Registry::FIELD_ALLOWED_OVERRIDE_REGIONS ]
+					: array();
+				foreach ( self::OVERLAY_MERGE_FIELDS as $field ) {
+					if ( in_array( $field, $allowed, true ) && array_key_exists( $field, $combined ) ) {
+						$composed[ $field ] = $combined[ $field ];
+					}
+				}
+				$overlay_applied = true;
+			}
+		}
 		$compliance_warnings = array();
 		if ( $industry_key !== '' && $this->compliance_warning_resolver !== null ) {
 			$compliance_warnings = $this->compliance_warning_resolver->get_for_display( $industry_key );
 		}
 		$result = new Composed_Page_OnePager_Result( $composed, $base_id, $overlay_applied, $overlay_industry, $page_template_key, $compliance_warnings );
 		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
-			$base_key = $this->cache_key_builder->for_page_onepager( $page_template_key, $industry_key, $subtype_key );
+			$base_key = $this->cache_key_builder->for_page_onepager( $page_template_key, $industry_key, $subtype_key, $conversion_goal_key );
 			$this->cache_service->set( $base_key, array(
 				'composed_onepager'     => $composed,
 				'base_documentation_id' => $base_id,

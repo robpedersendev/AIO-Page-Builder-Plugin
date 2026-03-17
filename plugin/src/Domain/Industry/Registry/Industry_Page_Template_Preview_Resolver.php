@@ -110,7 +110,10 @@ final class Industry_Page_Template_Preview_Resolver {
 			$subtype_context = $this->subtype_resolver->resolve();
 			$subtype_key = $subtype_context['industry_subtype_key'] ?? $subtype_key;
 		}
-		$composed_result = $this->one_pager_composer->compose( $template_key, $primary, $subtype_key );
+		$goal_key = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			? \trim( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			: '';
+		$composed_result = $this->one_pager_composer->compose( $template_key, $primary, $subtype_key, $goal_key );
 		$composed_one_pager = $composed_result->get_composed_onepager();
 		$composed_for_view  = array(
 			'hierarchy_hints'   => $composed_one_pager['hierarchy_hints'] ?? '',

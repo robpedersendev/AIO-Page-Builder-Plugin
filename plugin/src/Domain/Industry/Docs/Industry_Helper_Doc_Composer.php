@@ -46,6 +46,9 @@ final class Industry_Helper_Doc_Composer {
 	/** @var Subtype_Section_Helper_Overlay_Registry|null Optional; when set, compose() can apply subtype overlay (Prompt 425). */
 	private ?Subtype_Section_Helper_Overlay_Registry $subtype_overlay_registry;
 
+	/** @var Subtype_Goal_Section_Helper_Overlay_Registry|null Optional; when set, compose() can apply combined subtype+goal overlay after subtype (Prompt 554). */
+	private ?Subtype_Goal_Section_Helper_Overlay_Registry $subtype_goal_overlay_registry;
+
 	/** @var Industry_Read_Model_Cache_Service|null */
 	private ?Industry_Read_Model_Cache_Service $cache_service;
 
@@ -70,17 +73,19 @@ final class Industry_Helper_Doc_Composer {
 		Industry_Section_Helper_Overlay_Registry $overlay_registry,
 		?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null,
 		?Subtype_Section_Helper_Overlay_Registry $subtype_overlay_registry = null,
+		?Subtype_Goal_Section_Helper_Overlay_Registry $subtype_goal_overlay_registry = null,
 		?Industry_Read_Model_Cache_Service $cache_service = null,
 		?Industry_Cache_Key_Builder $cache_key_builder = null,
 		?Industry_Shared_Fragment_Resolver $fragment_resolver = null
 	) {
-		$this->documentation_registry   = $documentation_registry;
-		$this->overlay_registry          = $overlay_registry;
-		$this->compliance_warning_resolver = $compliance_warning_resolver;
-		$this->subtype_overlay_registry  = $subtype_overlay_registry;
-		$this->cache_service            = $cache_service;
-		$this->cache_key_builder        = $cache_key_builder;
-		$this->fragment_resolver        = $fragment_resolver;
+		$this->documentation_registry       = $documentation_registry;
+		$this->overlay_registry             = $overlay_registry;
+		$this->compliance_warning_resolver   = $compliance_warning_resolver;
+		$this->subtype_overlay_registry     = $subtype_overlay_registry;
+		$this->subtype_goal_overlay_registry = $subtype_goal_overlay_registry;
+		$this->cache_service                = $cache_service;
+		$this->cache_key_builder            = $cache_key_builder;
+		$this->fragment_resolver            = $fragment_resolver;
 	}
 
 	/**
@@ -88,15 +93,17 @@ final class Industry_Helper_Doc_Composer {
 	 *
 	 * @param string $section_key   Section template internal_key.
 	 * @param string $industry_key  Industry pack key (primary industry). Empty = base-only, no overlay.
-	 * @param string $subtype_key   Optional subtype key (e.g. from Industry_Subtype_Resolver). When empty or subtype registry not set, no subtype overlay is applied.
+	 * @param string $subtype_key        Optional subtype key (e.g. from Industry_Subtype_Resolver). When empty or subtype registry not set, no subtype overlay is applied.
+	 * @param string $conversion_goal_key Optional conversion goal key (Prompt 554). When set with subtype, combined subtype+goal overlay may be applied.
 	 * @return Composed_Helper_Doc_Result
 	 */
-	public function compose( string $section_key, string $industry_key, string $subtype_key = '' ): Composed_Helper_Doc_Result {
-		$section_key  = trim( $section_key );
-		$industry_key = trim( $industry_key );
-		$subtype_key  = trim( $subtype_key );
+	public function compose( string $section_key, string $industry_key, string $subtype_key = '', string $conversion_goal_key = '' ): Composed_Helper_Doc_Result {
+		$section_key         = trim( $section_key );
+		$industry_key        = trim( $industry_key );
+		$subtype_key         = trim( $subtype_key );
+		$conversion_goal_key = trim( $conversion_goal_key );
 		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
-			$base_key = $this->cache_key_builder->for_helper_doc( $section_key, $industry_key, $subtype_key );
+			$base_key = $this->cache_key_builder->for_helper_doc( $section_key, $industry_key, $subtype_key, $conversion_goal_key );
 			$cached   = $this->cache_service->get( $base_key );
 			if ( is_array( $cached ) && isset( $cached['composed_doc'] ) && is_array( $cached['composed_doc'] ) ) {
 				return new Composed_Helper_Doc_Result(
@@ -153,13 +160,27 @@ final class Industry_Helper_Doc_Composer {
 				}
 			}
 		}
+		if ( $subtype_key !== '' && $conversion_goal_key !== '' && $section_key !== '' && $this->subtype_goal_overlay_registry !== null ) {
+			$combined = $this->subtype_goal_overlay_registry->get( $subtype_key, $conversion_goal_key, $section_key );
+			if ( $combined !== null && is_array( $combined ) ) {
+				$allowed = isset( $combined[ Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_ALLOWED_OVERRIDE_REGIONS ] ) && is_array( $combined[ Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_ALLOWED_OVERRIDE_REGIONS ] )
+					? $combined[ Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_ALLOWED_OVERRIDE_REGIONS ]
+					: array();
+				foreach ( self::OVERLAY_MERGE_FIELDS as $field ) {
+					if ( in_array( $field, $allowed, true ) && array_key_exists( $field, $combined ) ) {
+						$composed[ $field ] = $combined[ $field ];
+					}
+				}
+				$overlay_applied = true;
+			}
+		}
 		$compliance_warnings = array();
 		if ( $industry_key !== '' && $this->compliance_warning_resolver !== null ) {
 			$compliance_warnings = $this->compliance_warning_resolver->get_for_display( $industry_key );
 		}
 		$result = new Composed_Helper_Doc_Result( $composed, $base_id, $overlay_applied, $overlay_industry, $section_key, $compliance_warnings );
 		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
-			$base_key = $this->cache_key_builder->for_helper_doc( $section_key, $industry_key, $subtype_key );
+			$base_key = $this->cache_key_builder->for_helper_doc( $section_key, $industry_key, $subtype_key, $conversion_goal_key );
 			$this->cache_service->set( $base_key, array(
 				'composed_doc'          => $composed,
 				'base_documentation_id' => $base_id,
