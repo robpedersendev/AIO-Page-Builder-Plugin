@@ -258,6 +258,18 @@ final class Onboarding_Planning_Request_Orchestrator {
 						}
 					}
 				}
+				if ( $this->container->has( 'industry_secondary_conversion_goal_resolver' ) ) {
+					$goal_resolver = $this->container->get( 'industry_secondary_conversion_goal_resolver' );
+					if ( $goal_resolver instanceof \AIOPageBuilder\Domain\Industry\Profile\Secondary_Conversion_Goal_Resolver ) {
+						$goals = $goal_resolver->resolve( $industry_profile );
+						if ( isset( $goals['primary_goal_key'] ) && is_string( $goals['primary_goal_key'] ) && $goals['primary_goal_key'] !== '' ) {
+							$industry_context['primary_goal_key'] = $goals['primary_goal_key'];
+						}
+						if ( isset( $goals['secondary_goal_key'] ) && is_string( $goals['secondary_goal_key'] ) && $goals['secondary_goal_key'] !== '' ) {
+							$industry_context['secondary_goal_key'] = $goals['secondary_goal_key'];
+						}
+					}
+				}
 				$artifact_options['industry_context'] = $industry_context;
 			}
 		}
@@ -287,6 +299,12 @@ final class Onboarding_Planning_Request_Orchestrator {
 			$subtype_overlay_svc = $this->container->get( 'industry_subtype_prompt_pack_overlay_service' );
 			if ( $subtype_overlay_svc instanceof \AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Prompt_Pack_Overlay_Service ) {
 				$build_options['subtype_overlay'] = $subtype_overlay_svc->get_overlay_for_artifact( $input_artifact );
+			}
+		}
+		if ( $this->container->has( 'conversion_goal_prompt_pack_overlay_service' ) ) {
+			$goal_overlay_svc = $this->container->get( 'conversion_goal_prompt_pack_overlay_service' );
+			if ( $goal_overlay_svc instanceof \AIOPageBuilder\Domain\Industry\AI\Conversion_Goal_Prompt_Pack_Overlay_Service ) {
+				$build_options['goal_overlay'] = $goal_overlay_svc->get_overlay_for_artifact( $input_artifact );
 			}
 		}
 		$package_result = $this->prompt_package_builder->build( $pack, $input_artifact, $build_options );

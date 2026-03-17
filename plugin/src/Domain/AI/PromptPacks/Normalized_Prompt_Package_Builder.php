@@ -21,11 +21,11 @@ final class Normalized_Prompt_Package_Builder {
 
 	/**
 	 * Builds normalized prompt package. Fails when required placeholders are missing.
-	 * Optional industry_overlay (industry-prompt-pack-overlay-contract) is appended to system prompt when present.
+	 * Optional industry_overlay, subtype_overlay, and goal_overlay are appended to system prompt when present.
 	 *
 	 * @param array<string, mixed> $selected_pack  Full prompt pack definition (from registry).
 	 * @param array<string, mixed> $input_artifact Built input artifact (from Input_Artifact_Builder).
-	 * @param array<string, mixed> $options        Optional: industry_overlay (array with industry_guidance_text, etc.).
+	 * @param array<string, mixed> $options        Optional: industry_overlay, subtype_overlay, goal_overlay (conversion_goal_guidance_text, etc.).
 	 * @return Prompt_Package_Result Success with package or failure with validation_errors.
 	 */
 	public function build( array $selected_pack, array $input_artifact, array $options = array() ): Prompt_Package_Result {
@@ -84,6 +84,10 @@ final class Normalized_Prompt_Package_Builder {
 		$subtype_overlay = isset( $options['subtype_overlay'] ) && is_array( $options['subtype_overlay'] ) ? $options['subtype_overlay'] : null;
 		if ( $subtype_overlay !== null && isset( $subtype_overlay['subtype_guidance_text'] ) && is_string( $subtype_overlay['subtype_guidance_text'] ) && trim( $subtype_overlay['subtype_guidance_text'] ) !== '' ) {
 			$system_parts[] = "## Subtype guidance\n\n" . trim( $subtype_overlay['subtype_guidance_text'] );
+		}
+		$goal_overlay = isset( $options['goal_overlay'] ) && is_array( $options['goal_overlay'] ) ? $options['goal_overlay'] : null;
+		if ( $goal_overlay !== null && isset( $goal_overlay['conversion_goal_guidance_text'] ) && is_string( $goal_overlay['conversion_goal_guidance_text'] ) && trim( $goal_overlay['conversion_goal_guidance_text'] ) !== '' ) {
+			$system_parts[] = "## Conversion goal guidance\n\n" . trim( $goal_overlay['conversion_goal_guidance_text'] );
 		}
 
 		$system_prompt = implode( "\n\n", $system_parts );

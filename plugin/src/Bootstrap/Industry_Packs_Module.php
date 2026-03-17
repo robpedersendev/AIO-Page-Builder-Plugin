@@ -239,6 +239,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( 'industry_subtype_prompt_pack_overlay_service', function (): \AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Prompt_Pack_Overlay_Service {
 			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Prompt_Pack_Overlay_Service();
 		} );
+		$container->register( 'conversion_goal_prompt_pack_overlay_service', function (): \AIOPageBuilder\Domain\Industry\AI\Conversion_Goal_Prompt_Pack_Overlay_Service {
+			return new \AIOPageBuilder\Domain\Industry\AI\Conversion_Goal_Prompt_Pack_Overlay_Service();
+		} );
 		$container->register( 'industry_style_preset_registry', function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\StylePresets\Builtin_Industry_Style_Presets::get_definitions() );
@@ -272,6 +275,29 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$comparison = $container->has( 'industry_subtype_comparison_service' ) ? $container->get( 'industry_subtype_comparison_service' ) : null;
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_Benchmark_Service(
 				$comparison instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Comparison_Service ? $comparison : null
+			);
+		} );
+		$container->register( 'industry_subtype_goal_benchmark_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Goal_Benchmark_Service {
+			$goal_bench = $container->has( 'conversion_goal_benchmark_service' ) ? $container->get( 'conversion_goal_benchmark_service' ) : null;
+			$sub_bench  = null;
+			if ( $container->has( 'industry_subtype_registry' ) ) {
+				$sub_reg = $container->get( 'industry_subtype_registry' );
+				$sub_overlay = $container->has( self::CONTAINER_KEY_SUBTYPE_SECTION_HELPER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_SECTION_HELPER_OVERLAY_REGISTRY ) : null;
+				$page_overlay = $container->has( self::CONTAINER_KEY_SUBTYPE_PAGE_ONEPAGER_OVERLAY_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_PAGE_ONEPAGER_OVERLAY_REGISTRY ) : null;
+				$bundle_reg = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+				if ( $sub_reg instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ) {
+					$sub_bench = new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Benchmark_Service(
+						$sub_reg,
+						$sub_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry ? $sub_overlay : null,
+						$page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Page_OnePager_Overlay_Registry ? $page_overlay : null,
+						$bundle_reg instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $bundle_reg : null,
+						null
+					);
+				}
+			}
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Goal_Benchmark_Service(
+				$goal_bench instanceof \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_Benchmark_Service ? $goal_bench : null,
+				$sub_bench
 			);
 		} );
 		$container->register( 'conversion_goal_what_if_extender', function (): \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_What_If_Extender {
@@ -594,6 +620,16 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				$compliance instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Compliance_Rule_Registry ? $compliance : null,
 				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null,
 				$health instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service ? $health : null
+			);
+		} );
+		$container->register( 'industry_scaffold_completeness_report_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Scaffold_Completeness_Report_Service {
+			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			$bundle_registry = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+			$subtype_registry = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Scaffold_Completeness_Report_Service(
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
+				$bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $bundle_registry : null,
+				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null
 			);
 		} );
 		$container->register( 'industry_repair_suggestion_engine', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Repair_Suggestion_Engine {

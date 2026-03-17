@@ -22,7 +22,7 @@
 | 3. Coverage-gap analysis | Industry_Coverage_Gap_Analyzer::analyze() | Informational; use to prioritize backlog | [industry-coverage-gap-analysis-guide.md](../operations/industry-coverage-gap-analysis-guide.md) |
 | 4. Recommendation benchmarks | Industry_Recommendation_Benchmark_Service (if available) | Per benchmark protocol; regressions = fail or waive | [industry-recommendation-benchmark-protocol.md](../qa/industry-recommendation-benchmark-protocol.md) |
 | 5. Regression guards | Industry_Recommendation_Regression_Guard_Test | Unit tests must pass | [industry-recommendation-regression-guard.md](../qa/industry-recommendation-regression-guard.md) |
-| 6. AI prompt-pack evaluation | Evaluation fixtures for overlays (if in scope) | Per fixtures; document results | [industry-ai-prompt-evaluation-fixtures.md](../qa/industry-ai-prompt-evaluation-fixtures.md) |
+| 6. AI prompt-pack evaluation | Evaluation fixtures for industry, subtype, and goal overlays (if in scope) | Per fixtures; document results | [industry-ai-prompt-evaluation-fixtures.md](../qa/industry-ai-prompt-evaluation-fixtures.md); [conversion-goal-ai-prompt-evaluation-fixtures.md](../qa/conversion-goal-ai-prompt-evaluation-fixtures.md) |
 | 7. Lifecycle / fallback audit | Manual or script: no-industry path, deprecated pack handling | No regressions | industry-pack-deprecation-contract; industry-neutral-mode-audit |
 | 8. Dry-run sandbox (optional) | Industry_Author_Sandbox_Service::run_dry_run() for candidate packs/bundles | Lint/health errors = fix before promote | [industry-author-sandbox-guide.md](../operations/industry-author-sandbox-guide.md) |
 | 9. Release gate criteria | [industry-pack-release-gate.md](industry-pack-release-gate.md) | All criteria met or waived | Release gate §1 |

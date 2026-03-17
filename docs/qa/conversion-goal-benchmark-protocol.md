@@ -45,3 +45,4 @@
 ## 5. Integration
 
 - Release gate docs and maturity docs may reference this protocol. Benchmark findings can inform roadmap and future goal expansion.
+- **Combined subtype+goal benchmark:** [industry-subtype-goal-benchmark-protocol.md](industry-subtype-goal-benchmark-protocol.md) (Prompt 535) compares parent-only, subtype-only, goal-only, and combined scenarios using this service and the subtype benchmark.

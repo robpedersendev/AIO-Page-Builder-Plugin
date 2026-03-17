@@ -77,6 +77,7 @@ No automatic transition from incomplete to complete; no "approve scaffold" witho
 
 ## 8. Cross-references
 
+- [industry-scaffold-completeness-report-contract.md](industry-scaffold-completeness-report-contract.md) — Advisory scaffold progress report (missing vs scaffolded vs authored); no release implication (Prompt 538).
 - [industry-scaffold-generator-contract.md](industry-scaffold-generator-contract.md) — Scaffold scope, placeholder markers, promotion path.
 - [future-industry-scaffold-pack-template.md](../operations/future-industry-scaffold-pack-template.md) — Industry scaffold template; placeholder and incomplete-state markers.
 - [future-subtype-scaffold-pack-template.md](../operations/future-subtype-scaffold-pack-template.md) — Subtype scaffold template; placeholder and incomplete-state markers.

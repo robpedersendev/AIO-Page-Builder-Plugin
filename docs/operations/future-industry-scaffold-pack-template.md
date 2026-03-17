@@ -10,8 +10,8 @@
 | Artifact class | Purpose | Required in scaffold |
 |----------------|---------|----------------------|
 | **Pack definition** | Industry pack registry entry (industry_key, name, summary, status, version_marker; refs). | Yes; one pack file per future industry. |
-| **Starter bundle(s)** | At least one starter bundle placeholder for the industry (bundle_key, industry_key, label, status). | Yes; one or more bundle placeholders. |
-| **Section helper overlay placeholders** | Optional; placeholder files for section-helper overlays (industry_key, section_key, content_body, status). | Placeholder only; empty or minimal. |
+| **Starter bundle(s)** | At least one starter bundle placeholder for the industry (bundle_key, industry_key, label, status). | Yes; one or more bundle placeholders. See [future-industry-starter-bundle-scaffold-template.md](future-industry-starter-bundle-scaffold-template.md) for bundle-specific scaffold structure, parent/subtype/goal hook points, and promotion path. |
+| **Section helper overlay placeholders** | Optional; placeholder files for section-helper overlays (industry_key, section_key, content_body, status). | Placeholder only; empty or minimal. See [future-industry-overlay-scaffold-template-set.md](future-industry-overlay-scaffold-template-set.md) for overlay and rule scaffold structure. |
 | **Page one-pager overlay placeholders** | Optional; placeholder files for page one-pager overlays (industry_key, page_template_key, content_body, status). | Placeholder only; empty or minimal. |
 | **CTA pattern placeholders** | Optional; CTA pattern keys referenced by pack must exist; placeholders allowed. | If pack references CTAs; minimal definition. |
 | **Rule placeholders** | LPagery rules, SEO guidance, compliance rules per schema; optional. | Placeholder only when pack refs them. |
@@ -86,9 +86,12 @@ Reviewability: any reviewer can confirm that (a) the scaffold matches this templ
 
 ## 7. Cross-references
 
+- [future-industry-starter-bundle-scaffold-template.md](future-industry-starter-bundle-scaffold-template.md) — Starter bundle scaffold structure and hook points (Prompt 536).
+- [future-industry-overlay-scaffold-template-set.md](future-industry-overlay-scaffold-template-set.md) — Helper/page overlay and caution/SEO/CTA rule scaffold templates (Prompt 537).
 - [industry-scaffold-generator-contract.md](../contracts/industry-scaffold-generator-contract.md) — Scaffold scope, validation expectations, promotion path, safety.
 - [scaffold-incomplete-state-guardrail-contract.md](../contracts/scaffold-incomplete-state-guardrail-contract.md) — Incomplete-state validation, release-gate exclusion, how to clear incomplete state through authoring (Prompt 518).
 - [industry-pack-authoring-guide.md](industry-pack-authoring-guide.md) — Required pieces and implementation order once authoring starts.
 - [future-industry-candidate-evaluation-framework.md](future-industry-candidate-evaluation-framework.md) — Evaluate candidate before creating scaffold; use scorecard and dossier.
 - [industry-pack-release-gate.md](../release/industry-pack-release-gate.md) — Release criteria; scaffold assets are excluded until authored and gate-passed.
 - [industry-pack-completeness-scoring-contract.md](../contracts/industry-pack-completeness-scoring-contract.md) — Advisory completeness scoring; use to assess progress from scaffold (low score) to release-grade (Prompt 519).
+- [industry-scaffold-completeness-report-contract.md](../contracts/industry-scaffold-completeness-report-contract.md) — Scaffold-specific report: missing vs scaffolded vs authored per artifact class (Prompt 538).

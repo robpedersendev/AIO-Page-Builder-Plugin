@@ -79,6 +79,8 @@
 ## 8. References
 
 - [future-industry-scaffold-pack-template.md](../operations/future-industry-scaffold-pack-template.md) — Concrete file and artifact skeleton for a future industry pack (Prompt 516); required artifact classes, placement, placeholder markers, minimum docs/QA.
+- [future-industry-starter-bundle-scaffold-template.md](../operations/future-industry-starter-bundle-scaffold-template.md) — Starter bundle scaffold structure, parent/subtype/goal hook points, and promotion path (Prompt 536).
+- [future-industry-overlay-scaffold-template-set.md](../operations/future-industry-overlay-scaffold-template-set.md) — Overlay and rule scaffold templates: helper, page one-pager, caution, SEO, CTA (Prompt 537).
 - [future-subtype-scaffold-pack-template.md](../operations/future-subtype-scaffold-pack-template.md) — Concrete file and artifact skeleton for a future subtype pack (Prompt 517); subtype definitions, overlay/bundle/caution placeholders, docs/QA minimums.
 - [industry-pack-authoring-guide.md](../operations/industry-pack-authoring-guide.md) — Required pieces and implementation order.
 - [industry-pack-maintenance-checklist.md](../operations/industry-pack-maintenance-checklist.md) — Maintenance baseline.

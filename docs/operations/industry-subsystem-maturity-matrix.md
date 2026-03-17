@@ -36,6 +36,7 @@
 | **Support tooling** | Stable | Diagnostics snapshot; support package; override audit; conflict detector; audit trail; training packet. | Keep support docs updated with degraded-mode and runbooks. |
 | **Release and authoring tooling** | Stable | Pre-release pipeline; checklist; sandbox dry-run; promotion workflow; authoring guide; maintenance checklist. | Human review required; no auto-promotion. |
 | **What-if simulation** | Stable | Bounded service (466); no persistence; comparison integration. | Optional: surface in comparison or profile screen. |
+| **Subtype+goal combined benchmark** | Stable | Industry_Subtype_Goal_Benchmark_Service; compares parent vs subtype vs goal vs combined; protocol doc in place. | Run for launch subtype and goal sets; use for quality assessment. |
 | **Degraded mode** | Stable | Contract (467); lifecycle and fallback docs aligned. | Tests for representative degraded scenarios. |
 
 ---
@@ -55,6 +56,7 @@
 
 ## 5. References
 
+- [industry-subtype-goal-benchmark-protocol.md](../qa/industry-subtype-goal-benchmark-protocol.md) — Combined subtype+goal benchmark (Prompt 535).
 - [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md)
 - [industry-phase-two-backlog-map.md](industry-phase-two-backlog-map.md)
 - [known-risk-register.md](../release/known-risk-register.md) §3 IND-1, IND-2, IND-3

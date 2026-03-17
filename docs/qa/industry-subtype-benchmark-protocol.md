@@ -54,4 +54,5 @@
 - [industry-subtype-extension-contract.md](../contracts/industry-subtype-extension-contract.md)
 - [launch-subtype-second-wave-planning-framework.md](../operations/launch-subtype-second-wave-planning-framework.md)
 - [industry-recommendation-benchmark-protocol.md](industry-recommendation-benchmark-protocol.md)
+- [industry-subtype-goal-benchmark-protocol.md](industry-subtype-goal-benchmark-protocol.md) — Combined subtype+goal harness (Prompt 535).
 - Industry_Subtype_Benchmark_Service (Reporting)

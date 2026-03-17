@@ -33,6 +33,7 @@
 | 14 | No-industry fallback | With empty or no industry profile: onboarding, templates, Build Plan, overlays, diagnostics behave without industry; no errors. | |
 | 15 | Recommendation benchmark | Internal benchmark harness (Industry_Recommendation_Benchmark_Service) produces repeatable scenarios per launch industry; report structure supports human review of recommendation quality and metadata gaps. | |
 | 16 | AI prompt-pack evaluation | Internal evaluation fixtures (industry-ai-prompt-evaluation-fixtures.md) define representative launch-industry and subtype scenarios; overlay output (page-family, CTA, proof, LPagery) is structured and comparable; fixtures are actionable and not overly brittle. | |
+| 17 | Conversion-goal AI prompt evaluation | When conversion-goal overlays are in scope: evaluation fixtures (conversion-goal-ai-prompt-evaluation-fixtures.md) cover launch goals (calls, bookings, estimates, consultations, valuations, lead_capture) and optional mixed-goal; overlay output is structured and on-target; primary precedence and fallback behavior verified. | |
 
 **Result:** Record pass/fail per row. Any fail is a candidate blocker for industry release gate.
 

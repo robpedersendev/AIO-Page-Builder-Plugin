@@ -34,6 +34,8 @@ The planner input artifact (Input_Artifact_Schema, Input_Artifact_Builder) gains
 | **subtype_bundle_refs** | array | No | Optional list of starter bundle keys recommended for this subtype. |
 | **subtype_cta_posture_ref** | string | No | Optional CTA posture ref from subtype definition. |
 | **subtype_rule_refs** | array | No | Optional caution/rule refs from subtype definition. |
+| **primary_goal_key** | string | No | Resolved primary conversion goal (e.g. calls, bookings, estimates, consultations, valuations, lead_capture). Empty when no goal (Prompt 533). |
+| **secondary_goal_key** | string | No | Optional secondary conversion goal from same set; distinct from primary. Empty when not set or invalid. |
 
 - **Required** for artifact validity: none of these fields are required at artifact root; the existing required_root_keys remain unchanged.
 - **Optional**: All industry_context fields are optional. When industry profile is missing or not ready, industry_context may be omitted or contain only readiness with state `none`/`minimal`.

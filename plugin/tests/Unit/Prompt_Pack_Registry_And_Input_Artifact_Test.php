@@ -209,6 +209,33 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 		$this->assertStringContainsString( 'Prefer service and local page families for this vertical.', $pkg['system_prompt'] );
 	}
 
+	/** Prompt 533: goal_overlay option appends conversion_goal_guidance_text to system_prompt. */
+	public function test_prompt_package_builder_appends_goal_overlay_guidance(): void {
+		$pack = $this->planning_pack();
+		$artifact = array(
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID => 'art-1',
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION => '1',
+			Input_Artifact_Schema::ROOT_CREATED_AT => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
+			Input_Artifact_Schema::ROOT_REDACTION => array( 'redaction_applied' => false ),
+			Input_Artifact_Schema::ROOT_PROFILE => array(),
+		);
+		$options = array(
+			'goal_overlay' => array(
+				'schema_version' => '1',
+				'primary_goal_key' => 'calls',
+				'conversion_goal_guidance_text' => 'Prioritize phone-call conversions; include click-to-call.',
+			),
+		);
+		$builder = new Normalized_Prompt_Package_Builder();
+		$result = $builder->build( $pack, $artifact, $options );
+		$this->assertTrue( $result->is_success() );
+		$pkg = $result->get_normalized_prompt_package();
+		$this->assertNotNull( $pkg );
+		$this->assertStringContainsString( 'Conversion goal guidance', $pkg['system_prompt'] );
+		$this->assertStringContainsString( 'Prioritize phone-call conversions', $pkg['system_prompt'] );
+	}
+
 	public function test_prompt_package_result_to_validation_result(): void {
 		$result = new Prompt_Package_Result( false, null, array( 'missing_segments' ), null );
 		$arr = $result->to_validation_result();
