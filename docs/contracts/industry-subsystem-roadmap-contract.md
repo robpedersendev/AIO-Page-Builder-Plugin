@@ -118,6 +118,7 @@ Concrete categories for prompt generation and backlog; expansion stays within ap
 ## 8. Cross-references
 
 - [industry-greenfield-prompt-archive-map.md](../operations/industry-greenfield-prompt-archive-map.md) — Final greenfield prompt archival map (Prompt 570); prompt ranges by capability cluster, authoritative contracts, transition into implementation-audit.
+- [industry-optional-late-stage-greenfield-backlog.md](../operations/industry-optional-late-stage-greenfield-backlog.md) — Optional late-stage greenfield backlog (Prompt 585); Prompts 571–584; implementation-audit is next priority.
 - [industry-subsystem-v2-guardrails.md](industry-subsystem-v2-guardrails.md) — v2 architectural guardrails (Prompt 469): unacceptable drift, acceptable seams, subtype/bundle/AI boundaries. Future expansion must stay within these guardrails.
 - [industry-phase-two-backlog-map.md](../operations/industry-phase-two-backlog-map.md) — Phase-two checkpoint and backlog map (Prompt 445).
 - [industry-pack-extension-contract.md](industry-pack-extension-contract.md) — Subsystem boundary and terminology.

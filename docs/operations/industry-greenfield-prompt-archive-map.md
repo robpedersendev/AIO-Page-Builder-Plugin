@@ -38,6 +38,7 @@ The following table groups the greenfield prompt sequence by capability cluster.
 | **Drift detection and drift report** | 561–562 | industry-subsystem-drift-detection-contract.md; Industry_Drift_Report_Service and screen. |
 | **Future expansion readiness and promotion-readiness** | 563–567 | Future expansion readiness widget; scaffold promotion-readiness contract and report/screen; Future_Industry_Readiness_Screen; Future_Subtype_Readiness_Screen. |
 | **Greenfield closure and audit handoff** | 568–570 | industry-greenfield-closure-report.md; industry-implementation-audit-entrypoint-map.md; this archive map. |
+| **Optional late-stage backlog** | 571–585 | Prompts 571–584 (secondary-goal, variance, scaffold export, evidence packet) are optional; listed in [industry-optional-late-stage-greenfield-backlog.md](industry-optional-late-stage-greenfield-backlog.md) (585). Implementation-audit is next priority. |
 
 ---
 
@@ -92,3 +93,4 @@ Implementation-audit prompts must not add new runtime features unless explicitly
 - [industry-subsystem-v2-guardrails.md](../contracts/industry-subsystem-v2-guardrails.md) — Unacceptable drift and boundaries.
 - [industry-next-phase-prompt-map.md](industry-next-phase-prompt-map.md) — Next-phase clusters and greenfield/audit handoff (§6).
 - [industry-phase-two-backlog-map.md](industry-phase-two-backlog-map.md) — Phase-two checkpoint and backlog.
+- [industry-optional-late-stage-greenfield-backlog.md](industry-optional-late-stage-greenfield-backlog.md) — Optional late-stage backlog (Prompt 585); Prompts 571–584; audit first.

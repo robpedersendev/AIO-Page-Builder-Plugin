@@ -45,6 +45,7 @@ These are **not** required for closure. They are documented in the next-phase pr
 | Overlay coverage summary in diagnostics | Optional | Bounded fields. |
 | CLI/script wrappers for linter, health, sandbox | Low | Convenience only. |
 | Scorecard executor / comparison matrix automation | Should-have | Framework and templates exist; automation can follow. |
+| **Prompts 571–584 (optional late-stage)** | Optional | Secondary-goal preview/benchmark/what-if/style/bundle/conflict; variance report; scaffold export; evidence packet. See [industry-optional-late-stage-greenfield-backlog.md](industry-optional-late-stage-greenfield-backlog.md) (Prompt 585). |
 
 **Guardrails:** v2 guardrails and roadmap contract remain in force. No new core seams, no AI auto-approve, no unbounded sprawl.
 
@@ -90,6 +91,7 @@ Audit clusters should be dependency-aware: e.g. profile and resolution before re
 ## 6. References
 
 - [industry-greenfield-prompt-archive-map.md](industry-greenfield-prompt-archive-map.md) — Final archival map (Prompt 570); prompt ranges by capability cluster, authoritative contracts, transition point.
+- [industry-optional-late-stage-greenfield-backlog.md](industry-optional-late-stage-greenfield-backlog.md) — Optional late-stage backlog (Prompt 585); Prompts 571–584 listed as optional; implementation-audit remains next priority.
 - [industry-subsystem-roadmap-contract.md](../contracts/industry-subsystem-roadmap-contract.md)
 - [industry-subsystem-maturity-matrix.md](industry-subsystem-maturity-matrix.md)
 - [industry-next-phase-prompt-map.md](industry-next-phase-prompt-map.md)
