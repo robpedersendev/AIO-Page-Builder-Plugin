@@ -40,6 +40,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: subtype section-helper overlay registry (subtype-section-helper-overlay-schema; Prompt 424). */
 	public const CONTAINER_KEY_SUBTYPE_SECTION_HELPER_OVERLAY_REGISTRY = 'subtype_section_helper_overlay_registry';
 
+	/** Container key: goal section-helper overlay registry (conversion-goal-helper-overlay-schema; Prompt 506). */
+	public const CONTAINER_KEY_GOAL_SECTION_HELPER_OVERLAY_REGISTRY = 'goal_section_helper_overlay_registry';
+
 	/** Container key: industry page one-pager overlay registry (industry-page-onepager-overlay-schema). */
 	public const CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY = 'industry_page_onepager_overlay_registry';
 
@@ -122,6 +125,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( self::CONTAINER_KEY_SUBTYPE_SECTION_HELPER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
+			return $registry;
+		} );
+		$container->register( self::CONTAINER_KEY_GOAL_SECTION_HELPER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Goal_Section_Helper_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Goal_Section_Helper_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Goal_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
 			return $registry;
 		} );
 		$container->register( self::CONTAINER_KEY_PAGE_ONEPAGER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry {
@@ -213,13 +221,30 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( 'industry_subtype_content_gap_extender', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Content_Gap_Extender {
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Content_Gap_Extender();
 		} );
+		$container->register( 'conversion_goal_content_gap_extender', function (): \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_Content_Gap_Extender {
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_Content_Gap_Extender();
+		} );
 		$container->register( 'industry_content_gap_detector', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Content_Gap_Detector {
-			$starter  = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
-			$extender = $container->has( 'industry_subtype_content_gap_extender' ) ? $container->get( 'industry_subtype_content_gap_extender' ) : null;
+			$starter   = $container->has( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
+			$sub_ext   = $container->has( 'industry_subtype_content_gap_extender' ) ? $container->get( 'industry_subtype_content_gap_extender' ) : null;
+			$goal_ext  = $container->has( 'conversion_goal_content_gap_extender' ) ? $container->get( 'conversion_goal_content_gap_extender' ) : null;
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Content_Gap_Detector(
 				$starter instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ? $starter : null,
-				$extender instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Content_Gap_Extender ? $extender : null
+				$sub_ext instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Content_Gap_Extender ? $sub_ext : null,
+				$goal_ext instanceof \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_Content_Gap_Extender ? $goal_ext : null
 			);
+		} );
+		$container->register( 'conversion_goal_conflict_detector', function (): \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_Conflict_Detector {
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_Conflict_Detector();
+		} );
+		$container->register( 'conversion_goal_benchmark_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_Benchmark_Service {
+			$comparison = $container->has( 'industry_subtype_comparison_service' ) ? $container->get( 'industry_subtype_comparison_service' ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_Benchmark_Service(
+				$comparison instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Comparison_Service ? $comparison : null
+			);
+		} );
+		$container->register( 'conversion_goal_what_if_extender', function (): \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_What_If_Extender {
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Conversion_Goal_What_If_Extender();
 		} );
 		$container->register( 'industry_override_audit_report_service', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service {
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Audit_Report_Service();
@@ -391,6 +416,14 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 				);
 			}
 			return new \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service( $bundle_registry, $plan_generator );
+		} );
+		$container->register( 'conversion_goal_starter_bundle_to_build_plan_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\AI\Conversion_Goal_Starter_Bundle_To_Build_Plan_Service {
+			$base   = $container->get( 'industry_starter_bundle_to_build_plan_service' );
+			$bundle = $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
+			return new \AIOPageBuilder\Domain\Industry\AI\Conversion_Goal_Starter_Bundle_To_Build_Plan_Service(
+				$base instanceof \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service ? $base : new \AIOPageBuilder\Domain\Industry\AI\Industry_Starter_Bundle_To_Build_Plan_Service( $bundle, $container->get( 'build_plan_generator' ) ),
+				$bundle
+			);
 		} );
 		$container->register( 'industry_subtype_starter_bundle_to_build_plan_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\AI\Industry_Subtype_Starter_Bundle_To_Build_Plan_Service {
 			$bundle_registry = $container->get( self::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );

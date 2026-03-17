@@ -27,6 +27,7 @@ final class Industry_What_If_Simulation_Service {
 	public const PARAM_ALTERNATE_PRIMARY   = 'alternate_primary_industry_key';
 	public const PARAM_ALTERNATE_SUBTYPE  = 'alternate_subtype_key';
 	public const PARAM_ALTERNATE_BUNDLE   = 'alternate_starter_bundle_key';
+	public const PARAM_ALTERNATE_CONVERSION_GOAL = 'alternate_conversion_goal_key';
 
 	/** @var Industry_Profile_Repository */
 	private $profile_repo;
@@ -135,6 +136,13 @@ final class Industry_What_If_Simulation_Service {
 			$v = $params[ self::PARAM_ALTERNATE_BUNDLE ];
 			$out[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] = is_string( $v ) ? trim( $v ) : '';
 		}
+		if ( array_key_exists( self::PARAM_ALTERNATE_CONVERSION_GOAL, $params ) ) {
+			$v = $params[ self::PARAM_ALTERNATE_CONVERSION_GOAL ];
+			$goal = is_string( $v ) ? trim( $v ) : '';
+			if ( $goal === '' || ( strlen( $goal ) <= 64 && preg_match( '#^[a-z0-9_-]+$#', $goal ) ) ) {
+				$out[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] = $goal;
+			}
+		}
 		return $out;
 	}
 
@@ -177,13 +185,14 @@ final class Industry_What_If_Simulation_Service {
 
 	/**
 	 * @param array<string, mixed> $profile
-	 * @return array{primary: string, subtype: string, bundle: string}
+	 * @return array{primary: string, subtype: string, bundle: string, goal: string}
 	 */
 	private function profile_summary( array $profile ): array {
 		return array(
 			'primary'  => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ?? '' ) ),
 			'subtype'  => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ?? '' ) ),
 			'bundle'   => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ?? '' ) ),
+			'goal'     => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ?? '' ) ),
 		);
 	}
 }

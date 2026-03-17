@@ -156,6 +156,12 @@ final class Build_Plan_Generator {
 		if ( ! empty( $context['industry_subtype_key'] ) && is_string( $context['industry_subtype_key'] ) ) {
 			$definition[ Build_Plan_Schema::KEY_SOURCE_INDUSTRY_SUBTYPE ] = trim( $context['industry_subtype_key'] );
 		}
+		if ( ! empty( $context['conversion_goal_key'] ) && is_string( $context['conversion_goal_key'] ) ) {
+			$definition[ Build_Plan_Schema::KEY_GOAL_OVERLAY_SOURCE ] = array(
+				'conversion_goal_key' => trim( $context['conversion_goal_key'] ),
+				'applied'             => ! empty( $context['goal_overlay_applied'] ),
+			);
+		}
 
 		$post_id = $this->repository->save( array( 'plan_definition' => $definition ) );
 		if ( $post_id === 0 ) {

@@ -120,12 +120,17 @@ final class Industry_Content_Gap_Detector {
 	/** @var Industry_Subtype_Content_Gap_Extender|null When set, subtype context can refine expectations and gap explanations (Prompt 448). */
 	private ?Industry_Subtype_Content_Gap_Extender $subtype_extender;
 
+	/** @var Conversion_Goal_Content_Gap_Extender|null When set, conversion goal can refine gap severity/explanation (Prompt 504). */
+	private ?Conversion_Goal_Content_Gap_Extender $goal_extender;
+
 	public function __construct(
 		?Industry_Starter_Bundle_Registry $bundle_registry = null,
-		?Industry_Subtype_Content_Gap_Extender $subtype_extender = null
+		?Industry_Subtype_Content_Gap_Extender $subtype_extender = null,
+		?Conversion_Goal_Content_Gap_Extender $goal_extender = null
 	) {
 		$this->bundle_registry  = $bundle_registry;
 		$this->subtype_extender = $subtype_extender;
+		$this->goal_extender    = $goal_extender;
 	}
 
 	/**
@@ -195,6 +200,12 @@ final class Industry_Content_Gap_Detector {
 				if ( $refinement !== null ) {
 					$item[ self::RESULT_SUBTYPE_INFLUENCE ] = $refinement;
 				}
+			}
+			$goal_key = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+				? trim( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+				: '';
+			if ( $goal_key !== '' && $this->goal_extender !== null ) {
+				$item = $this->goal_extender->apply_to_gap_item( $item, $goal_key );
 			}
 			$gaps[] = $item;
 		}

@@ -55,6 +55,9 @@ final class Build_Plan_Schema {
 	/** Optional: industry subtype key when plan was generated from a subtype-scoped starter bundle (Prompt 462). */
 	public const KEY_SOURCE_INDUSTRY_SUBTYPE = 'source_industry_subtype_key';
 
+	/** Optional: conversion goal overlay source when plan was generated with conversion goal (Prompt 498). */
+	public const KEY_GOAL_OVERLAY_SOURCE = 'goal_overlay_source';
+
 	/** Status enum (spec §30.4, object-model §3.4). */
 	public const STATUS_PENDING_REVIEW = 'pending_review';
 	public const STATUS_APPROVED       = 'approved';

@@ -10,6 +10,7 @@ namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Content_Gap_Detector;
+use AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Content_Gap_Extender;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );

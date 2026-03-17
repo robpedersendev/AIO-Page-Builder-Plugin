@@ -47,6 +47,9 @@ final class Industry_Profile_Schema {
 	/** Optional selected starter bundle key (industry-starter-bundle-schema; Prompt 388). Advisory; used by recommendation/planning consumers. */
 	public const FIELD_SELECTED_STARTER_BUNDLE_KEY = 'selected_starter_bundle_key';
 
+	/** Optional conversion goal key (conversion-goal-profile-contract). e.g. calls, bookings, estimates. Empty = no goal. */
+	public const FIELD_CONVERSION_GOAL_KEY = 'conversion_goal_key';
+
 	/** Supported schema version. */
 	public const SUPPORTED_SCHEMA_VERSION = '1';
 
@@ -67,6 +70,7 @@ final class Industry_Profile_Schema {
 			self::FIELD_DERIVED_FLAGS         => array(),
 			self::FIELD_QUESTION_PACK_ANSWERS => array(),
 			self::FIELD_SELECTED_STARTER_BUNDLE_KEY => '',
+			self::FIELD_CONVERSION_GOAL_KEY => '',
 		);
 	}
 
@@ -130,6 +134,12 @@ final class Industry_Profile_Schema {
 		if ( $selected_bundle !== '' && strlen( $selected_bundle ) > 64 ) {
 			$selected_bundle = '';
 		}
+		$conversion_goal = isset( $raw[ self::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $raw[ self::FIELD_CONVERSION_GOAL_KEY ] )
+			? trim( $raw[ self::FIELD_CONVERSION_GOAL_KEY ] )
+			: '';
+		if ( $conversion_goal !== '' && strlen( $conversion_goal ) > 64 ) {
+			$conversion_goal = '';
+		}
 		return array(
 			self::FIELD_SCHEMA_VERSION         => $version !== '' ? $version : self::SUPPORTED_SCHEMA_VERSION,
 			self::FIELD_PRIMARY_INDUSTRY_KEY   => $primary,
@@ -141,6 +151,7 @@ final class Industry_Profile_Schema {
 			self::FIELD_DERIVED_FLAGS          => $derived,
 			self::FIELD_QUESTION_PACK_ANSWERS  => $qp_answers,
 			self::FIELD_SELECTED_STARTER_BUNDLE_KEY => $selected_bundle,
+			self::FIELD_CONVERSION_GOAL_KEY    => $conversion_goal,
 		);
 	}
 
