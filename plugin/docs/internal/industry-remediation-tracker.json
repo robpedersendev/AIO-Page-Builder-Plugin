@@ -1,6 +1,23 @@
 {
   "schema_version": "1.0",
   "description": "Remediation entries linking findings to fix prompts (Prompt 585A). Used by the remediation prompt generation workflow (585B) to generate fix prompts from the ledger. See docs/operations/industry-audit-remediation-ledger.md, docs/operations/industry-remediation-prompt-generation-workflow.md, and docs/schemas/industry-remediation-entry-schema.md.",
-  "last_updated": null,
-  "remediation_entries": []
+  "last_updated": "2025-03-16",
+  "remediation_entries": [
+    {
+      "remediation_id": "IND-REM-0001",
+      "title": "Prompt 611 first remediation batch",
+      "finding_ids": ["IND-AUD-NO-610"],
+      "severity_rollup": "informational",
+      "release_blocker_rollup": false,
+      "status": "deferred",
+      "implementation_scope": "None. No defect findings in ledger; all audit entries 586-610 are no-finding (verified).",
+      "grouping_rationale": "Batch 611 execution record only. No defect cluster selected.",
+      "root_cause_summary": "N/A — no defects to remediate.",
+      "verification_requirements": "N/A — no fix implemented.",
+      "notes": "Prompt 611 ran per workflow. Ledger contained only IND-AUD-NO-* entries with status verified. No open/triaged/blocked findings; therefore no remediation cluster selected and no code changes. See docs/operations/industry-remediation-batch-611.md.",
+      "remediation_prompt_number": "611",
+      "date_created": "2025-03-16",
+      "date_updated": "2025-03-16"
+    }
+  ]
 }
