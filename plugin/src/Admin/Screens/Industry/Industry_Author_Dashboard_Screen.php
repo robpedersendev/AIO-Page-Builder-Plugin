@@ -12,11 +12,13 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\ViewModels\Industry\Future_Expansion_Readiness_Widget_View_Model;
 use AIOPageBuilder\Admin\ViewModels\Industry\Industry_Author_Dashboard_View_Model;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Coverage_Gap_Analyzer;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Pack_Completeness_Report_Service;
+use AIOPageBuilder\Domain\Industry\Reporting\Industry_Scaffold_Completeness_Report_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -117,8 +119,11 @@ final class Industry_Author_Dashboard_Screen {
 			'industry_profile'      => $base . '?page=' . Industry_Profile_Settings_Screen::SLUG,
 			'health_report'         => $base . '?page=' . Industry_Health_Report_Screen::SLUG,
 			'stale_content_report'   => $base . '?page=' . Industry_Stale_Content_Report_Screen::SLUG,
-			'pack_family_comparison' => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
-			'guided_repair'          => $base . '?page=' . Industry_Guided_Repair_Screen::SLUG,
+			'pack_family_comparison'   => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
+			'maturity_delta_report'    => $base . '?page=' . Industry_Maturity_Delta_Report_Screen::SLUG,
+			'drift_report'                    => $base . '?page=' . Industry_Drift_Report_Screen::SLUG,
+			'scaffold_promotion_readiness'    => $base . '?page=' . Industry_Scaffold_Promotion_Readiness_Report_Screen::SLUG,
+			'guided_repair'                    => $base . '?page=' . Industry_Guided_Repair_Screen::SLUG,
 			'subtype_comparison'     => $base . '?page=' . Industry_Subtype_Comparison_Screen::SLUG,
 			'bundle_comparison'     => $base . '?page=' . Industry_Starter_Bundle_Comparison_Screen::SLUG,
 			'goal_comparison'       => $base . '?page=' . Conversion_Goal_Comparison_Screen::SLUG,
@@ -139,6 +144,71 @@ final class Industry_Author_Dashboard_Screen {
 			$gap_high,
 			$gap_medium,
 			$gap_low,
+			$links
+		);
+	}
+
+	/**
+	 * Builds the future-expansion readiness widget view model from completeness, gap, and scaffold data.
+	 *
+	 * @return Future_Expansion_Readiness_Widget_View_Model
+	 */
+	private function get_future_expansion_readiness_view_model(): Future_Expansion_Readiness_Widget_View_Model {
+		$expansion_blocker_count   = 0;
+		$scaffold_incomplete_count = 0;
+		$candidate_label           = __( 'Use future-industry evaluation framework', 'aio-page-builder' );
+		$maturity_label            = __( 'Stable', 'aio-page-builder' );
+
+		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_pack_completeness_report_service' ) ) {
+			$completeness = $this->container->get( 'industry_pack_completeness_report_service' );
+			if ( $completeness instanceof Industry_Pack_Completeness_Report_Service ) {
+				$report   = $completeness->generate_report( true );
+				$results  = isset( $report['pack_results'] ) && is_array( $report['pack_results'] ) ? $report['pack_results'] : array();
+				foreach ( $results as $r ) {
+					$flags = isset( $r['blocker_flags'] ) && is_array( $r['blocker_flags'] ) ? $r['blocker_flags'] : array();
+					$expansion_blocker_count += count( $flags );
+				}
+			}
+		}
+		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_coverage_gap_analyzer' ) ) {
+			$analyzer = $this->container->get( 'industry_coverage_gap_analyzer' );
+			if ( $analyzer instanceof Industry_Coverage_Gap_Analyzer ) {
+				$gap_result = $analyzer->analyze( true );
+				$gaps = isset( $gap_result['gaps'] ) && is_array( $gap_result['gaps'] ) ? $gap_result['gaps'] : array();
+				foreach ( $gaps as $g ) {
+					if ( ( $g['priority'] ?? '' ) === Industry_Coverage_Gap_Analyzer::PRIORITY_HIGH ) {
+						++$expansion_blocker_count;
+					}
+				}
+			}
+		}
+		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_scaffold_completeness_report_service' ) ) {
+			$scaffold = $this->container->get( 'industry_scaffold_completeness_report_service' );
+			if ( $scaffold instanceof Industry_Scaffold_Completeness_Report_Service ) {
+				$report = $scaffold->generate_report( array() );
+				$results = isset( $report['scaffold_results'] ) && is_array( $report['scaffold_results'] ) ? $report['scaffold_results'] : array();
+				foreach ( $results as $r ) {
+					$classes = isset( $r['artifact_classes'] ) && is_array( $r['artifact_classes'] ) ? $r['artifact_classes'] : array();
+					foreach ( $classes as $state ) {
+						if ( $state === 'missing' ) {
+							++$scaffold_incomplete_count;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		$base = admin_url( 'admin.php' );
+		$links = array(
+			'pack_family_comparison' => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
+		);
+
+		return new Future_Expansion_Readiness_Widget_View_Model(
+			$expansion_blocker_count,
+			$scaffold_incomplete_count,
+			$candidate_label,
+			$maturity_label,
 			$links
 		);
 	}
@@ -198,6 +268,19 @@ final class Industry_Author_Dashboard_Screen {
 					<p class="aio-widget-value"><?php echo esc_html( (string) $vm->get_gap_count() ); ?> <?php esc_html_e( 'total', 'aio-page-builder' ); ?></p>
 					<p class="description"><?php echo esc_html( (string) $vm->get_gap_high_count() ); ?> <?php esc_html_e( 'high', 'aio-page-builder' ); ?>, <?php echo esc_html( (string) $vm->get_gap_medium_count() ); ?> <?php esc_html_e( 'medium', 'aio-page-builder' ); ?>, <?php echo esc_html( (string) $vm->get_gap_low_count() ); ?> <?php esc_html_e( 'low', 'aio-page-builder' ); ?></p>
 				</section>
+
+				<?php
+				$expansion_vm = $this->get_future_expansion_readiness_view_model();
+				?>
+				<section class="aio-dashboard-widget aio-widget-future-expansion" aria-labelledby="aio-widget-future-expansion-heading">
+					<h2 id="aio-widget-future-expansion-heading" class="aio-widget-title"><?php esc_html_e( 'Future expansion readiness', 'aio-page-builder' ); ?></h2>
+					<p class="aio-widget-value">
+						<?php echo esc_html( (string) $expansion_vm->get_expansion_blocker_count() ); ?> <?php esc_html_e( 'expansion blockers', 'aio-page-builder' ); ?>,
+						<?php echo esc_html( (string) $expansion_vm->get_scaffold_incomplete_count() ); ?> <?php esc_html_e( 'scaffold incomplete', 'aio-page-builder' ); ?>
+					</p>
+					<p class="description"><?php echo esc_html( $expansion_vm->get_candidate_readiness_label() ); ?> · <?php echo esc_html( $expansion_vm->get_maturity_floor_label() ); ?></p>
+					<p><a href="<?php echo esc_url( $expansion_vm->get_links()['pack_family_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Pack family comparison', 'aio-page-builder' ); ?></a></p>
+				</section>
 			</div>
 
 			<section class="aio-dashboard-links" style="margin-top: 2em;" aria-labelledby="aio-dashboard-links-heading">
@@ -207,6 +290,9 @@ final class Industry_Author_Dashboard_Screen {
 					<li><a href="<?php echo esc_url( $vm->get_links()['health_report'] ?? '#' ); ?>"><?php esc_html_e( 'Industry Health Report', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['stale_content_report'] ?? '#' ); ?>"><?php esc_html_e( 'Stale content report', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['pack_family_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Pack family comparison', 'aio-page-builder' ); ?></a></li>
+					<li><a href="<?php echo esc_url( $vm->get_links()['maturity_delta_report'] ?? '#' ); ?>"><?php esc_html_e( 'Maturity delta report', 'aio-page-builder' ); ?></a></li>
+					<li><a href="<?php echo esc_url( $vm->get_links()['drift_report'] ?? '#' ); ?>"><?php esc_html_e( 'Drift report', 'aio-page-builder' ); ?></a></li>
+					<li><a href="<?php echo esc_url( $vm->get_links()['scaffold_promotion_readiness'] ?? '#' ); ?>"><?php esc_html_e( 'Scaffold promotion readiness', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['guided_repair'] ?? '#' ); ?>"><?php esc_html_e( 'Guided Repair', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['subtype_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Subtype comparison', 'aio-page-builder' ); ?></a></li>
 					<li><a href="<?php echo esc_url( $vm->get_links()['bundle_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Bundle comparison', 'aio-page-builder' ); ?></a></li>

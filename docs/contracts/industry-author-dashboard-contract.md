@@ -30,7 +30,8 @@
 | **Scaffold / incomplete asset warning** | Count or list of draft/incomplete scaffold assets (packs, subtypes, bundles with status draft or scaffold metadata). | Completeness report or dedicated filter on registries (draft status). Optional: Industry_Scaffold_Completeness_Report_Service::generate_report() for scaffold-only progress (missing vs scaffolded vs authored per artifact class); see industry-scaffold-completeness-report-contract.md. |
 | **Coverage gap summary** | Count of coverage gaps by priority (high/medium/low) or link to gap report. | Industry_Coverage_Gap_Analyzer::analyze() — gaps; optional prioritization report when available. |
 | **Subtype and goal support summary** | Count of active packs, active subtypes, goal-related assets (if in scope). | Pack registry, subtype registry; optional goal overlay/caution counts. |
-| **Quick links** | Links to Industry Profile, Health Report, Bundle comparison, Subtype comparison, Conversion goal comparison, release gate doc, pre-release checklist, maintenance checklist. | Static or config. |
+| **Quick links** | Links to Industry Profile, Health Report, Maturity delta report, Drift report, Scaffold promotion readiness, Bundle comparison, Subtype comparison, Conversion goal comparison, release gate doc, pre-release checklist, maintenance checklist. | Static or config. |
+| **Future expansion readiness** | Summary of expansion blockers, scaffold incomplete count, candidate/maturity labels; link to pack family comparison. | Completeness report, gap analyzer, scaffold completeness report; see Future_Expansion_Readiness_Widget_View_Model. |
 | **Maintenance task queue** | Optional: count of tasks by category (blocker, cleanup, expansion) and link to full queue or underlying reports. | Industry_Author_Task_Queue_Service::generate_queue() — summary. |
 
 Widgets are bounded: no unbounded lists on the dashboard; use counts and "View full report" links. Data is loaded on dashboard render (or cached per request); see §7 for refresh expectations.
@@ -65,6 +66,9 @@ Severity grouping: **blocker** (health errors, completeness blocker_flags), **ma
 - **Bundle comparison** — Compare two or more starter bundles.
 - **Conversion goal comparison** — No-goal vs goal-aware comparison.
 - **Pack family comparison** — Internal comparison of launch-industry families, subtype families, and candidates (completeness, coverage, caution, bundle, preset, maturity) per [industry-pack-family-comparison-contract.md](industry-pack-family-comparison-contract.md) (Prompt 557–558).
+- **Maturity delta report** — Compare maturity snapshots over time (improvement/stagnation/regression); see [industry-maturity-delta-report-contract.md](industry-maturity-delta-report-contract.md).
+- **Drift report** — Internal drift detection (contract/schema/docs/convention); see [industry-subsystem-drift-detection-contract.md](industry-subsystem-drift-detection-contract.md).
+- **Scaffold promotion readiness** — Report of scaffolded assets by readiness tier (scaffold-complete, authored-near-ready, not-near-ready); see [industry-scaffold-promotion-readiness-contract.md](industry-scaffold-promotion-readiness-contract.md).
 - **Release gate / pre-release checklist** — Docs and pipeline for release validation.
 - **Maintenance checklist** — Ongoing maintenance tasks.
 - **Override Management** — Override conflict resolution (if applicable).
@@ -107,4 +111,6 @@ All links open existing admin screens or docs; dashboard does not replace them.
 - [industry-coverage-gap-analysis-guide.md](../operations/industry-coverage-gap-analysis-guide.md) — Coverage gap analyzer and usage.
 - [industry-pack-family-comparison-contract.md](industry-pack-family-comparison-contract.md) — Internal pack-family comparison dimensions and view (Prompt 557–558).
 - [industry-maturity-delta-report-contract.md](industry-maturity-delta-report-contract.md) — Internal maturity delta (trend) reporting model for improvement/stagnation/regression over time (Prompt 559).
+- [industry-subsystem-drift-detection-contract.md](industry-subsystem-drift-detection-contract.md) — Drift detection model; drift report screen linked from dashboard.
+- [industry-scaffold-promotion-readiness-contract.md](industry-scaffold-promotion-readiness-contract.md) — Promotion-readiness scoring; report screen linked from dashboard.
 - [scaffold-incomplete-state-guardrail-contract.md](scaffold-incomplete-state-guardrail-contract.md) — Scaffold/incomplete asset handling.

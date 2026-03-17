@@ -687,6 +687,24 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( 'industry_asset_aging_report_service', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Asset_Aging_Report_Service {
 			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Asset_Aging_Report_Service();
 		} );
+		$container->register( 'industry_maturity_delta_report_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Maturity_Delta_Report_Service {
+			$completeness = $container->has( 'industry_pack_completeness_report_service' ) ? $container->get( 'industry_pack_completeness_report_service' ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Maturity_Delta_Report_Service(
+				$completeness instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Pack_Completeness_Report_Service ? $completeness : null
+			);
+		} );
+		$container->register( 'industry_drift_report_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Drift_Report_Service {
+			$pack_registry = $container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Drift_Report_Service(
+				$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null
+			);
+		} );
+		$container->register( 'industry_scaffold_promotion_readiness_report_service', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Scaffold_Promotion_Readiness_Report_Service {
+			$scaffold = $container->has( 'industry_scaffold_completeness_report_service' ) ? $container->get( 'industry_scaffold_completeness_report_service' ) : null;
+			return new \AIOPageBuilder\Domain\Industry\Reporting\Industry_Scaffold_Promotion_Readiness_Report_Service(
+				$scaffold instanceof \AIOPageBuilder\Domain\Industry\Reporting\Industry_Scaffold_Completeness_Report_Service ? $scaffold : null
+			);
+		} );
 		$container->register( 'industry_repair_suggestion_engine', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Repair_Suggestion_Engine {
 			$profile_repo = $container->has( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) : null;
 			$pack_registry = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;

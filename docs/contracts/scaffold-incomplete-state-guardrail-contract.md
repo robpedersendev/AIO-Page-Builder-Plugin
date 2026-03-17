@@ -41,7 +41,7 @@ Runtime registries remain **authoritative only for valid, active assets**. Draft
 
 - **Release gate:** Only **active** packs, subtypes, and bundles that pass definition lint and health check are eligible for release scope. Draft or scaffold-marked assets must **not** be included in the set of "release-ready" candidates. Pre-release validation pipeline (industry-pre-release-validation-pipeline.md) runs against the set of assets intended for release; scaffold-only or draft-only assets are out of scope until promoted per authoring flow.
 - **Sandbox promotion:** Industry_Sandbox_Promotion_Service (or equivalent) must not promote draft or incomplete scaffold assets to "release-ready" without authoring and status change. check_prerequisites() and get_release_ready_summary() should consider only active, validated assets (or explicitly include draft only when workflow documents "promote scaffold to authored" step).
-- **No silent promotion:** No code path may automatically set status from `draft` to `active` or add scaffold pack keys to builtin/default activation lists without explicit author or admin action and validation.
+- **No silent promotion:** No code path may automatically set status from `draft` to `active` or add scaffold pack keys to builtin/default activation lists without explicit author or admin action and validation. **Promotion-readiness scoring:** To measure progress toward authored-pack readiness (scaffold-complete vs authored-near-ready), use the internal [industry-scaffold-promotion-readiness-contract.md](industry-scaffold-promotion-readiness-contract.md) (Prompt 564). Scoring is advisory; it does not grant release-ready or trigger promotion.
 
 ---
 

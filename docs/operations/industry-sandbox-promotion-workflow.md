@@ -59,7 +59,13 @@ Industry_Sandbox_Promotion_Service::check_prerequisites( dry_run_result ) return
 
 ---
 
-## 7. References
+## 7. Promotion-readiness scoring
+
+Maintainers can assess how close a scaffold is to promotion using the internal [industry-scaffold-promotion-readiness-contract.md](../contracts/industry-scaffold-promotion-readiness-contract.md) (Prompt 564) and Industry_Scaffold_Promotion_Readiness_Report_Service (Prompt 565). The report is available from the Industry Author Dashboard and the "Scaffold promotion readiness" admin screen. Score indicates scaffold-complete vs authored-near-ready; it does not replace check_prerequisites() or the release gate.
+
+---
+
+## 8. References
 
 - [industry-author-sandbox-guide.md](industry-author-sandbox-guide.md) — Dry-run usage.
 - [industry-pre-release-validation-pipeline.md](../release/industry-pre-release-validation-pipeline.md) — Full validation steps.

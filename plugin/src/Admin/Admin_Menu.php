@@ -39,6 +39,9 @@ use AIOPageBuilder\Admin\Screens\Industry\Industry_Bundle_Import_Preview_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Author_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Guided_Repair_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Health_Report_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Drift_Report_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Maturity_Delta_Report_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Scaffold_Promotion_Readiness_Report_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Family_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Stale_Content_Report_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Override_Management_Screen;
@@ -172,6 +175,9 @@ final class Admin_Menu {
 		$industry_health_report = new Industry_Health_Report_Screen( $this->container );
 		$industry_stale_content_report = new Industry_Stale_Content_Report_Screen( $this->container );
 		$industry_pack_family_comparison = new Industry_Pack_Family_Comparison_Screen( $this->container );
+		$industry_maturity_delta_report = new Industry_Maturity_Delta_Report_Screen( $this->container );
+		$industry_drift_report = new Industry_Drift_Report_Screen( $this->container );
+		$industry_scaffold_promotion_readiness = new Industry_Scaffold_Promotion_Readiness_Report_Screen( $this->container );
 		$industry_guided_repair = new Industry_Guided_Repair_Screen( $this->container );
 		$industry_subtype_comparison = new Industry_Subtype_Comparison_Screen( $this->container );
 		$industry_bundle_comparison   = new Industry_Starter_Bundle_Comparison_Screen( $this->container );
@@ -463,6 +469,33 @@ final class Admin_Menu {
 			$industry_pack_family_comparison->get_capability(),
 			Industry_Pack_Family_Comparison_Screen::SLUG,
 			array( $industry_pack_family_comparison, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_maturity_delta_report->get_title(),
+			__( 'Maturity delta report', 'aio-page-builder' ),
+			$industry_maturity_delta_report->get_capability(),
+			Industry_Maturity_Delta_Report_Screen::SLUG,
+			array( $industry_maturity_delta_report, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_drift_report->get_title(),
+			__( 'Drift report', 'aio-page-builder' ),
+			$industry_drift_report->get_capability(),
+			Industry_Drift_Report_Screen::SLUG,
+			array( $industry_drift_report, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$industry_scaffold_promotion_readiness->get_title(),
+			__( 'Scaffold promotion readiness', 'aio-page-builder' ),
+			$industry_scaffold_promotion_readiness->get_capability(),
+			Industry_Scaffold_Promotion_Readiness_Report_Screen::SLUG,
+			array( $industry_scaffold_promotion_readiness, 'render' )
 		);
 
 		add_submenu_page(

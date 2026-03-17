@@ -22,7 +22,7 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry;
 /**
  * Produces advisory report on scaffold completeness: which artifact classes are missing, scaffolded, or authored.
  */
-final class Industry_Scaffold_Completeness_Report_Service {
+final class Industry_Scaffold_Completeness_Report_Service implements Industry_Scaffold_Completeness_Report_Provider_Interface {
 
 	public const STATE_MISSING    = 'missing';
 	public const STATE_SCAFFOLDED = 'scaffolded';
