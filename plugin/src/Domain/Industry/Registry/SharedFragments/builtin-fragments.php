@@ -81,6 +81,14 @@ return array(
 		Industry_Shared_Fragment_Registry::FIELD_STATUS           => Industry_Shared_Fragment_Registry::STATUS_ACTIVE,
 		Industry_Shared_Fragment_Registry::FIELD_VERSION_MARKER   => '1',
 	),
+	array(
+		Industry_Shared_Fragment_Registry::FIELD_FRAGMENT_KEY      => 'caution_urgency_accuracy',
+		Industry_Shared_Fragment_Registry::FIELD_FRAGMENT_TYPE     => Industry_Shared_Fragment_Registry::TYPE_CAUTION_SNIPPET,
+		Industry_Shared_Fragment_Registry::FIELD_ALLOWED_CONSUMERS => array( 'section_helper_overlay', 'page_onepager_overlay', 'compliance_caution' ),
+		Industry_Shared_Fragment_Registry::FIELD_CONTENT          => 'Urgency and response-time claims must be accurate; avoid guaranteed availability or specific response times unless you can deliver.',
+		Industry_Shared_Fragment_Registry::FIELD_STATUS           => Industry_Shared_Fragment_Registry::STATUS_ACTIVE,
+		Industry_Shared_Fragment_Registry::FIELD_VERSION_MARKER   => '1',
+	),
 	// Helper/page guidance
 	array(
 		Industry_Shared_Fragment_Registry::FIELD_FRAGMENT_KEY      => 'guidance_trust_proof',

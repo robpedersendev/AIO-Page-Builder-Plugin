@@ -538,6 +538,23 @@ final class Section_Template_Detail_Screen {
 					<?php endif; ?>
 				</div>
 			<?php endif; ?>
+			<?php
+			$goal_influence = $industry_preview['goal_influence'] ?? array();
+			if ( \is_array( $goal_influence ) && ! empty( $goal_influence['has_goal'] ) ) :
+				$goal_label = isset( $goal_influence['goal_label'] ) ? \esc_html( (string) $goal_influence['goal_label'] ) : '';
+				$goal_notes = isset( $goal_influence['goal_caution_notes'] ) && \is_array( $goal_influence['goal_caution_notes'] ) ? $goal_influence['goal_caution_notes'] : array();
+				?>
+				<div class="aio-industry-goal-influence" aria-label="<?php \esc_attr_e( 'Conversion goal context', 'aio-page-builder' ); ?>">
+					<p class="aio-industry-goal-label"><span class="aio-industry-label"><?php \esc_html_e( 'Conversion goal', 'aio-page-builder' ); ?>:</span> <?php echo $goal_label; ?></p>
+					<?php if ( count( $goal_notes ) > 0 ) : ?>
+						<ul class="aio-industry-goal-notes">
+							<?php foreach ( $goal_notes as $note ) : ?>
+								<li><?php echo \esc_html( \is_string( $note ) ? $note : '' ); ?></li>
+							<?php endforeach; ?>
+						</ul>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
 		</section>
 		<?php
 	}

@@ -35,3 +35,29 @@ The registry loads built-in definitions via `Goal_Section_Helper_Overlay_Registr
 ## 4. Relation to other overlays
 
 Base, industry, and subtype section-helper overlays remain authoritative. Goal overlays refine only where conversion goal changes section guidance; they do not replace prior layers. When no conversion goal is set or goal_key is invalid, composition is base + industry + subtype only (goal overlay skipped). See conversion-goal-helper-overlay-contract.md and conversion-goal-helper-overlay-schema.md.
+
+---
+
+## 5. Goal page one-pager overlays (Prompt 508)
+
+- **Goals (launch set)**: calls, bookings, estimates, consultations, valuations, lead_capture.
+- **Page keys covered**: pt_home_conversion_01, pt_contact_request_01, pt_offerings_compare_01 (high-impact home, contact, valuation/compare).
+- **Source directory**: `plugin/src/Domain/Industry/Docs/GoalPageOnePagerOverlays/`.
+- **Files**: calls-goal-onepager.php, bookings-goal-onepager.php, estimates-goal-onepager.php, consultations-goal-onepager.php, valuations-goal-onepager.php, lead-capture-goal-onepager.php.
+- **Registry**: Goal_Page_OnePager_Overlay_Registry (load, get(goal_key, page_key), get_for_goal). Composition order when composer is extended: base → industry → subtype → goal. See conversion-goal-page-onepager-overlay-contract.md and conversion-goal-page-onepager-overlay-schema.md.
+
+---
+
+## 6. Goal caution rules (Prompt 510)
+
+- **Goals (launch set)**: calls, bookings, estimates, consultations, valuations, lead_capture.
+- **Source**: `plugin/src/Domain/Industry/Registry/GoalCautionRules/goal-caution-rule-definitions.php`.
+- **Registry**: Goal_Caution_Rule_Registry (load, get(goal_rule_key), get_for_goal(goal_key), get_all). Industry_Compliance_Warning_Resolver::get_for_display( industry_key, subtype_key, goal_key ) appends goal rules when goal_key is non-empty and registry is set. Composition order: industry → subtype → goal. Refinement areas: urgency_language, conversion_pressure, claim_phrasing, form_promises, valuation_estimate_posture. See conversion-goal-caution-rule-contract.md and industry-compliance-rule-catalog.md.
+
+---
+
+## 7. Goal style preset overlays (Prompt 512)
+
+- **Goals (launch set)**: calls, bookings, estimates, consultations, valuations, lead_capture.
+- **Source**: `plugin/src/Domain/Industry/Registry/StylePresets/GoalOverlays/goal-style-preset-overlay-definitions.php`.
+- **Registry**: Goal_Style_Preset_Overlay_Registry (load, get, get_for_goal, get_overlays_for_preset). Overlays refine target_preset_ref (e.g. realtor_warm, plumber_trust) with optional token_values and component_override_refs. Application merges goal overlay when conversion_goal_key is set and overlay exists for the applied preset. No raw CSS. See conversion-goal-style-preset-contract.md and industry-style-preset-catalog.md.

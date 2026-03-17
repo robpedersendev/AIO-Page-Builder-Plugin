@@ -45,7 +45,13 @@
 
 ---
 
-## 6. Files
+## 6. Conversion-goal overlay extension (Prompt 511)
+
+- **Goal style preset overlays** layer on top of the applied industry (and subtype) preset per [conversion-goal-style-preset-contract.md](conversion-goal-style-preset-contract.md). When conversion_goal_key is set, application may merge goal overlay token_values and component_override_refs for the target preset before sanitization. When no goal or invalid goal, only industry/subtype preset apply.
+
+---
+
+## 7. Files
 
 - **Screen**: plugin/src/Admin/Screens/Industry/Industry_Style_Preset_Screen.php
 - **Application service**: plugin/src/Domain/Industry/Registry/Industry_Style_Preset_Application_Service.php

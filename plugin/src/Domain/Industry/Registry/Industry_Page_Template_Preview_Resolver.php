@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\Industry\Registry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\ViewModels\Industry\Conversion_Goal_Preview_Influence_View_Model;
 use AIOPageBuilder\Admin\ViewModels\Industry\Industry_Subtype_Preview_Influence_View_Model;
 use AIOPageBuilder\Admin\ViewModels\PageTemplates\Industry_Page_Template_Preview_View_Model;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Composer;
@@ -134,6 +135,8 @@ final class Industry_Page_Template_Preview_Resolver {
 
 		$subtype_influence = $this->build_subtype_influence_page( $subtype_context, $template_key );
 
+		$goal_influence = $this->build_goal_influence_page( $profile, $template_key );
+
 		return new Industry_Page_Template_Preview_View_Model(
 			true,
 			$primary,
@@ -145,7 +148,8 @@ final class Industry_Page_Template_Preview_Resolver {
 			$warning_flags,
 			$explanation_reasons,
 			$compliance_warnings,
-			$subtype_influence
+			$subtype_influence,
+			$goal_influence
 		);
 	}
 
@@ -205,6 +209,32 @@ final class Industry_Page_Template_Preview_Resolver {
 	}
 
 	/**
+	 * Builds conversion-goal influence for page template preview (Prompt 513). Fallback when no goal.
+	 *
+	 * @param array<string, mixed> $profile Normalized industry profile.
+	 * @param string               $template_key Page template internal_key.
+	 * @return array<string, mixed>
+	 */
+	private function build_goal_influence_page( array $profile, string $template_key ): array {
+		$goal_key = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			? \trim( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			: '';
+		if ( $goal_key === '' ) {
+			return Conversion_Goal_Preview_Influence_View_Model::none()->to_array();
+		}
+		$vm = new Conversion_Goal_Preview_Influence_View_Model(
+			true,
+			$goal_key,
+			Conversion_Goal_Preview_Influence_View_Model::goal_key_to_label( $goal_key ),
+			false,
+			false,
+			array(),
+			''
+		);
+		return $vm->to_array();
+	}
+
+	/**
 	 * @param Industry_Page_Template_Recommendation_Result $result
 	 * @param string $template_key
 	 * @return array{page_template_key: string, score: int, fit_classification: string, explanation_reasons: array, industry_source_refs: array, hierarchy_fit: string, lpagery_fit: string, warning_flags: array}
@@ -240,7 +270,8 @@ final class Industry_Page_Template_Preview_Resolver {
 			array(),
 			array(),
 			array(),
-			Industry_Subtype_Preview_Influence_View_Model::none()->to_array()
+			Industry_Subtype_Preview_Influence_View_Model::none()->to_array(),
+			Conversion_Goal_Preview_Influence_View_Model::none()->to_array()
 		);
 	}
 }

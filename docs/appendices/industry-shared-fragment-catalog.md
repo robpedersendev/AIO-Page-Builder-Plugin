@@ -32,6 +32,7 @@
 | caution_testimonial_genuine | section_helper_overlay, page_onepager_overlay, compliance_caution | Testimonials genuine; consent. |
 | caution_pricing_disclosure | section_helper_overlay, page_onepager_overlay, compliance_caution | Pricing clarity and conditions. |
 | caution_local_accuracy | section_helper_overlay, page_onepager_overlay, compliance_caution | Local/service-area accuracy; NAP. |
+| caution_urgency_accuracy | section_helper_overlay, page_onepager_overlay, compliance_caution | Urgency and response-time claims must be accurate; avoid guaranteed availability (Prompt 514, goal caution adoption). |
 
 ---
 
@@ -56,13 +57,19 @@ Resolution via **Industry_Shared_Fragment_Resolver::resolve( fragment_key, consu
 
 ---
 
-## 6. Bounded adoption (Prompt 477)
+## 6. Goal caution rule adoption (Prompt 514)
+
+- **Goal caution rules** goal_calls_urgency_language and goal_bookings_urgency_language use **guidance_text_fragment_ref** => `caution_urgency_accuracy`. Industry_Compliance_Warning_Resolver appends resolved fragment content to caution_summary at display when fragment resolver is set. See [goal-shared-fragment-adoption-review.md](../qa/goal-shared-fragment-adoption-review.md).
+
+---
+
+## 7. Bounded adoption (Prompt 477)
 
 - **cosmetology_nail** section-helper overlay: tp_badge_01 uses **compliance_cautions_fragment_ref** => `caution_testimonial_genuine`. Composed output appends fragment content to compliance_cautions. See [industry-shared-fragment-adoption-review.md](../qa/industry-shared-fragment-adoption-review.md).
 
 ---
 
-## 7. Cross-references
+## 8. Cross-references
 
 - [industry-shared-fragment-schema.md](../schemas/industry-shared-fragment-schema.md)
 - [industry-shared-fragment-contract.md](../contracts/industry-shared-fragment-contract.md)

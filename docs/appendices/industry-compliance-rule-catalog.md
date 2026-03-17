@@ -49,9 +49,16 @@
 
 ---
 
-## 5. Resolution
+## 5. Goal caution rules (Prompt 510)
+
+Conversion-goal caution rules layer on industry and subtype. **Registry:** Goal_Caution_Rule_Registry; definitions in `Registry/GoalCautionRules/goal-caution-rule-definitions.php`. **Goals (launch set):** calls, bookings, estimates, consultations, valuations, lead_capture. **Refinement areas:** urgency_language, conversion_pressure, claim_phrasing, form_promises, valuation_estimate_posture. When profile has a valid conversion_goal_key, callers may pass goal_key to Industry_Compliance_Warning_Resolver::get_for_display( industry_key, subtype_key, goal_key ) to include goal rules. See conversion-goal-caution-rule-contract.md and industry-goal-overlay-catalog.md.
+
+---
+
+## 6. Resolution
 
 - **Registry:** Industry_Compliance_Rule_Registry; definitions in `ComplianceRules/compliance-rule-definitions.php`.
 - **Subtype rules:** Subtype_Compliance_Rule_Registry; definitions in `SubtypeComplianceRules/subtype-compliance-rule-definitions.php`. When profile has a valid industry_subtype_key, Industry_Compliance_Warning_Resolver merges parent + subtype rules for display. See subtype-compliance-rule-contract.md.
+- **Goal rules:** Goal_Caution_Rule_Registry; when conversion_goal_key is set, pass it as third argument to get_for_display to append goal caution rules.
 - **Consumers:** Helper docs, one-pagers, section/page previews, Build Plan review (advisory surfacing only).
 - **Industry pack refs:** Optional `compliance_rule_refs` in industry pack schema resolve to this registry.

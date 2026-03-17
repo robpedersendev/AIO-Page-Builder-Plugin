@@ -19,7 +19,10 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 require_once __DIR__ . '/../bootstrap-sanitize.php';
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Admin/ViewModels/Industry/Industry_Subtype_Preview_Influence_View_Model.php';
+require_once $plugin_root . '/src/Admin/ViewModels/Industry/Conversion_Goal_Preview_Influence_View_Model.php';
 require_once $plugin_root . '/src/Admin/ViewModels/PageTemplates/Industry_Page_Template_Preview_View_Model.php';
+require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Page_Template_Preview_Resolver.php';
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Page_Template_Recommendation_Resolver.php';
 require_once $plugin_root . '/src/Domain/Registries/Docs/Documentation_Registry.php';

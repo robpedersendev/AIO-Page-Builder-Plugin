@@ -55,9 +55,16 @@ Consumers are **not** defined in this prompt; the registry and schema enable the
 
 ---
 
-## 7. Cross-references
+## 7. Conversion-goal extension
+
+- **Goal caution rules** layer on top of industry and subtype rules per [conversion-goal-caution-rule-contract.md](conversion-goal-caution-rule-contract.md). Industry and subtype rules remain the base; goal rules are additive refinements when a conversion goal is set. Resolution order: industry → subtype → goal. When no goal or invalid goal, only industry + subtype apply.
+
+---
+
+## 8. Cross-references
 
 - [industry-compliance-rule-schema.md](../schemas/industry-compliance-rule-schema.md) — Full schema.
 - [subtype-compliance-rule-contract.md](subtype-compliance-rule-contract.md) — Subtype-scoped caution rule extension.
+- [conversion-goal-caution-rule-contract.md](conversion-goal-caution-rule-contract.md) — Goal-scoped caution rule extension.
 - [industry-pack-extension-contract.md](industry-pack-extension-contract.md) — Subsystem boundary.
 - [industry-pack-schema.md](../schemas/industry-pack-schema.md) — Optional compliance_rule_refs when added.

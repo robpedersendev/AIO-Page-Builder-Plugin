@@ -32,3 +32,9 @@
 - **disaster_recovery** (industry-pack-disaster-recovery.php): token_preset_ref = `disaster_recovery_urgency`.
 
 All preset keys above must exist in the registry for pack references to resolve. Presets are optional overlays; application is reversible via the styling subsystem.
+
+---
+
+## 4. Goal style preset overlays (Prompt 512)
+
+Conversion-goal preset overlays refine industry presets by goal. **Registry:** Goal_Style_Preset_Overlay_Registry. **Source:** `plugin/src/Domain/Industry/Registry/StylePresets/GoalOverlays/goal-style-preset-overlay-definitions.php`. **Goals:** calls, bookings, estimates, consultations, valuations, lead_capture. **Target presets:** cosmetology_elegant, realtor_warm, plumber_trust, disaster_recovery_urgency. When conversion_goal_key is set, application may merge goal overlay token_values and component_override_refs for the applied preset. See conversion-goal-style-preset-contract.md and industry-goal-overlay-catalog.md.

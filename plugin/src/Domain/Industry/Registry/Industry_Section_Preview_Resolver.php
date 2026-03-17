@@ -12,8 +12,10 @@ namespace AIOPageBuilder\Domain\Industry\Registry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\ViewModels\Industry\Conversion_Goal_Preview_Influence_View_Model;
 use AIOPageBuilder\Admin\ViewModels\Industry\Industry_Subtype_Preview_Influence_View_Model;
 use AIOPageBuilder\Admin\ViewModels\Sections\Industry_Section_Preview_View_Model;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Helper_Doc_Composer;
 use AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
@@ -125,6 +127,8 @@ final class Industry_Section_Preview_Resolver {
 			true
 		);
 
+		$goal_influence = $this->build_goal_influence_section( $profile, $section_key );
+
 		return new Industry_Section_Preview_View_Model(
 			true,
 			$primary,
@@ -134,7 +138,8 @@ final class Industry_Section_Preview_Resolver {
 			$warning_flags,
 			$explanation_reasons,
 			$compliance_warnings,
-			$subtype_influence
+			$subtype_influence,
+			$goal_influence
 		);
 	}
 
@@ -226,7 +231,8 @@ final class Industry_Section_Preview_Resolver {
 			array(),
 			array(),
 			array(),
-			Industry_Subtype_Preview_Influence_View_Model::none()->to_array()
+			Industry_Subtype_Preview_Influence_View_Model::none()->to_array(),
+			Conversion_Goal_Preview_Influence_View_Model::none()->to_array()
 		);
 	}
 }

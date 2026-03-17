@@ -71,4 +71,5 @@ Consumers use the same advisory, non-blocking behavior as parent rules.
 
 - [subtype-compliance-rule-schema.md](../schemas/subtype-compliance-rule-schema.md) — Full schema.
 - [industry-compliance-rule-contract.md](industry-compliance-rule-contract.md) — Parent rule contract.
+- [conversion-goal-caution-rule-contract.md](conversion-goal-caution-rule-contract.md) — Goal-scoped caution rule extension (layers after subtype).
 - [industry-subtype-extension-contract.md](industry-subtype-extension-contract.md) — Subtype overlay scope.

@@ -43,3 +43,10 @@
 
 - **Admin/reviewer** only for setting and viewing. No public mutation.
 - **Export/restore**: conversion_goal_key included when industry profile is exported; restore validates key.
+
+---
+
+## 6. Related contracts
+
+- **Goal caution rules** ([conversion-goal-caution-rule-contract.md](conversion-goal-caution-rule-contract.md)): optional conversion-goal-aware caution rules layered on industry and subtype rules; resolution uses conversion_goal_key when set.
+- **Goal style preset overlays** ([conversion-goal-style-preset-contract.md](conversion-goal-style-preset-contract.md)): optional conversion-goal-aware style preset refinements layered on industry/subtype presets; application may merge goal overlay when conversion_goal_key is set.

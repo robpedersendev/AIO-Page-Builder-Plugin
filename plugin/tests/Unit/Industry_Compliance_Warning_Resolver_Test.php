@@ -9,7 +9,9 @@
 namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver;
+use AIOPageBuilder\Domain\Industry\Registry\Goal_Caution_Rule_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Compliance_Rule_Registry;
+use AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -17,6 +19,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Compliance_Rule_Registry.php';
 require_once $plugin_root . '/src/Domain/Industry/Registry/Subtype_Compliance_Rule_Registry.php';
+require_once $plugin_root . '/src/Domain/Industry/Registry/Goal_Caution_Rule_Registry.php';
 require_once $plugin_root . '/src/Domain/Industry/Docs/Industry_Compliance_Warning_Resolver.php';
 
 final class Industry_Compliance_Warning_Resolver_Test extends TestCase {
@@ -124,5 +127,38 @@ final class Industry_Compliance_Warning_Resolver_Test extends TestCase {
 		$without_subtype = $resolver->get_for_display( 'realtor', '' );
 		$this->assertCount( 1, $without_subtype );
 		$this->assertSame( 'parent_rule', $without_subtype[0]['rule_key'] );
+	}
+
+	/** Prompt 510: with goal registry and goal_key, display includes industry + goal rules; fallback without goal_key. */
+	public function test_get_for_display_with_goal_appends_goal_rules(): void {
+		$parent = new Industry_Compliance_Rule_Registry();
+		$parent->load( array(
+			array(
+				Industry_Compliance_Rule_Registry::FIELD_RULE_KEY        => 'parent_rule',
+				Industry_Compliance_Rule_Registry::FIELD_INDUSTRY_KEY     => 'realtor',
+				Industry_Compliance_Rule_Registry::FIELD_SEVERITY        => 'caution',
+				Industry_Compliance_Rule_Registry::FIELD_CAUTION_SUMMARY => 'Parent summary.',
+				Industry_Compliance_Rule_Registry::FIELD_STATUS          => 'active',
+			),
+		) );
+		$goal_registry = new Goal_Caution_Rule_Registry();
+		$goal_registry->load( array(
+			array(
+				Goal_Caution_Rule_Registry::FIELD_GOAL_RULE_KEY    => 'goal_valuations_valuation_posture',
+				Goal_Caution_Rule_Registry::FIELD_GOAL_KEY         => 'valuations',
+				Goal_Caution_Rule_Registry::FIELD_SEVERITY         => 'warning',
+				Goal_Caution_Rule_Registry::FIELD_CAUTION_SUMMARY  => 'Valuation language must not imply formal appraisal.',
+				Goal_Caution_Rule_Registry::FIELD_STATUS            => 'active',
+			),
+		) );
+		$resolver = new Industry_Compliance_Warning_Resolver( $parent, null, $goal_registry, null );
+		$with_goal = $resolver->get_for_display( 'realtor', '', 'valuations' );
+		$this->assertGreaterThanOrEqual( 2, count( $with_goal ) );
+		$rule_keys = array_column( $with_goal, 'rule_key' );
+		$this->assertContains( 'parent_rule', $rule_keys );
+		$this->assertContains( 'goal_valuations_valuation_posture', $rule_keys );
+		$without_goal = $resolver->get_for_display( 'realtor', '', '' );
+		$this->assertCount( 1, $without_goal );
+		$this->assertSame( 'parent_rule', $without_goal[0]['rule_key'] );
 	}
 }

@@ -182,6 +182,14 @@ Reusable cross-industry artifact fragments (industry-shared-fragment-schema.md).
 
 **Subtype compliance rules** (subtype-compliance-rule-schema.md): subtype_rule_key, subtype_key, parent_industry_key, scope, target_section_family, target_page_family, severity, caution_summary, guidance_text, refinement_of_rule_key (optional), additive_note, status, version_marker. Loaded via Subtype_Compliance_Rule_Registry (load, get, get_for_subtype). Composition: parent rules base layer, then subtype rules for (parent_industry_key, subtype_key). Fallback: when no or invalid subtype, parent rules only. See [subtype-compliance-rule-contract.md](../contracts/subtype-compliance-rule-contract.md).
 
+**Conversion-goal caution rules** (conversion-goal-caution-rule-schema.md; Prompt 509): goal_rule_key, goal_key, scope, target_section_family, target_page_family, severity, caution_summary, guidance_text, refinement_area (optional), status, version_marker. Loaded via goal caution rule registry (load, get, get_for_goal). Composition: industry → subtype → goal. Fallback: when no or invalid conversion_goal_key, only industry + subtype rules apply. Advisory only. See [conversion-goal-caution-rule-contract.md](../contracts/conversion-goal-caution-rule-contract.md).
+
+---
+
+## 11.7 Conversion-goal style preset overlays (Prompt 511)
+
+**Goal style preset overlays** (conversion-goal-style-preset-schema.md): goal_preset_key, goal_key, target_preset_ref, token_values (optional), component_override_refs (optional), status, version_marker. Loaded via goal style preset overlay registry (load, get, get_for_goal, get_overlays_for_preset). Composition: industry preset → goal overlay merge when conversion_goal_key set and overlay exists for applied preset. Fallback: when no or invalid goal, only base + industry/subtype preset apply. No raw CSS; same sanitization as industry presets. See [conversion-goal-style-preset-contract.md](../contracts/conversion-goal-style-preset-contract.md).
+
 ---
 
 ## 12. Template library compliance result payload

@@ -49,6 +49,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: subtype page one-pager overlay registry (subtype-page-onepager-overlay-schema; Prompt 426). */
 	public const CONTAINER_KEY_SUBTYPE_PAGE_ONEPAGER_OVERLAY_REGISTRY = 'subtype_page_onepager_overlay_registry';
 
+	/** Container key: goal page one-pager overlay registry (conversion-goal-page-onepager-overlay-schema; Prompt 508). */
+	public const CONTAINER_KEY_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY = 'goal_page_onepager_overlay_registry';
+
 	/** Container key: industry SEO guidance registry (Prompt 359). */
 	public const CONTAINER_KEY_SEO_GUIDANCE_REGISTRY = 'industry_seo_guidance_registry';
 
@@ -63,6 +66,9 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 
 	/** Container key: industry compliance rule registry (Prompt 405); industry compliance warning resolver (Prompt 407). */
 	public const CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY = 'industry_compliance_rule_registry';
+
+	/** Container key: goal caution rule registry (Prompt 510; conversion-goal-caution-rule-schema). */
+	public const CONTAINER_KEY_GOAL_CAUTION_RULE_REGISTRY = 'goal_caution_rule_registry';
 
 	/** Container key: industry subtype registry (Prompt 413/414; industry-subtype-schema.md). */
 	public const CONTAINER_KEY_SUBTYPE_REGISTRY = 'industry_subtype_registry';
@@ -142,6 +148,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Subtype_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions() );
 			return $registry;
 		} );
+		$container->register( self::CONTAINER_KEY_GOAL_PAGE_ONEPAGER_OVERLAY_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Docs\Goal_Page_OnePager_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Docs\Goal_Page_OnePager_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Docs\Goal_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions() );
+			return $registry;
+		} );
 		$container->register( self::CONTAINER_KEY_SEO_GUIDANCE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry::get_builtin_definitions() );
@@ -191,12 +202,21 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry::get_builtin_definitions() );
 			return $registry;
 		} );
+		$container->register( self::CONTAINER_KEY_GOAL_CAUTION_RULE_REGISTRY, function (): \AIOPageBuilder\Domain\Industry\Registry\Goal_Caution_Rule_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Goal_Caution_Rule_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Goal_Caution_Rule_Registry::get_builtin_definitions() );
+			return $registry;
+		} );
 		$container->register( 'industry_compliance_warning_resolver', function () use ( $container ): \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver {
-			$registry         = $container->get( self::CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY );
-			$subtype_registry = $container->has( 'subtype_compliance_rule_registry' ) ? $container->get( 'subtype_compliance_rule_registry' ) : null;
+			$registry          = $container->get( self::CONTAINER_KEY_COMPLIANCE_RULE_REGISTRY );
+			$subtype_registry  = $container->has( 'subtype_compliance_rule_registry' ) ? $container->get( 'subtype_compliance_rule_registry' ) : null;
+			$goal_registry     = $container->has( self::CONTAINER_KEY_GOAL_CAUTION_RULE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_GOAL_CAUTION_RULE_REGISTRY ) : null;
+			$fragment_resolver = $container->has( self::CONTAINER_KEY_SHARED_FRAGMENT_RESOLVER ) ? $container->get( self::CONTAINER_KEY_SHARED_FRAGMENT_RESOLVER ) : null;
 			return new \AIOPageBuilder\Domain\Industry\Docs\Industry_Compliance_Warning_Resolver(
 				$registry,
-				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry ? $subtype_registry : null
+				$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Subtype_Compliance_Rule_Registry ? $subtype_registry : null,
+				$goal_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Goal_Caution_Rule_Registry ? $goal_registry : null,
+				$fragment_resolver instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Shared_Fragment_Resolver ? $fragment_resolver : null
 			);
 		} );
 		$container->register( 'industry_question_pack_registry', function (): \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry {
@@ -216,6 +236,11 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 		$container->register( 'industry_style_preset_registry', function (): \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry {
 			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry();
 			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\StylePresets\Builtin_Industry_Style_Presets::get_definitions() );
+			return $registry;
+		} );
+		$container->register( 'goal_style_preset_overlay_registry', function (): \AIOPageBuilder\Domain\Industry\Registry\Goal_Style_Preset_Overlay_Registry {
+			$registry = new \AIOPageBuilder\Domain\Industry\Registry\Goal_Style_Preset_Overlay_Registry();
+			$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Goal_Style_Preset_Overlay_Registry::get_builtin_definitions() );
 			return $registry;
 		} );
 		$container->register( 'industry_subtype_content_gap_extender', function (): \AIOPageBuilder\Domain\Industry\Reporting\Industry_Subtype_Content_Gap_Extender {

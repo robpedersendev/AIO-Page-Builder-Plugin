@@ -26,6 +26,7 @@ final class Industry_Section_Preview_View_Model {
 	public const KEY_EXPLANATION_REASONS    = 'explanation_reasons';
 	public const KEY_COMPLIANCE_WARNINGS     = 'compliance_warnings';
 	public const KEY_SUBTYPE_INFLUENCE        = 'subtype_influence';
+	public const KEY_GOAL_INFLUENCE           = 'goal_influence';
 
 	/** @var bool */
 	private bool $has_industry;
@@ -51,6 +52,12 @@ final class Industry_Section_Preview_View_Model {
 	/** @var list<array{rule_key: string, severity: string, caution_summary: string}> Advisory compliance cautions (Prompt 407). */
 	private array $compliance_warnings;
 
+	/** @var array<string, mixed> Subtype influence (Industry_Subtype_Preview_Influence_View_Model::to_array()); empty when no subtype. */
+	private array $subtype_influence;
+
+	/** @var array<string, mixed> Conversion-goal influence (Conversion_Goal_Preview_Influence_View_Model::to_array()); empty when no goal (Prompt 513). */
+	private array $goal_influence;
+
 	public function __construct(
 		bool $has_industry,
 		string $primary_industry_key,
@@ -59,7 +66,9 @@ final class Industry_Section_Preview_View_Model {
 		array $substitute_suggestions,
 		array $warning_flags,
 		array $explanation_reasons,
-		array $compliance_warnings = array()
+		array $compliance_warnings = array(),
+		array $subtype_influence = array(),
+		array $goal_influence = array()
 	) {
 		$this->has_industry           = $has_industry;
 		$this->primary_industry_key   = $primary_industry_key;
@@ -70,6 +79,7 @@ final class Industry_Section_Preview_View_Model {
 		$this->explanation_reasons    = $explanation_reasons;
 		$this->compliance_warnings    = $compliance_warnings;
 		$this->subtype_influence      = $subtype_influence;
+		$this->goal_influence         = $goal_influence;
 	}
 
 	public function has_industry(): bool {
@@ -131,6 +141,15 @@ final class Industry_Section_Preview_View_Model {
 	}
 
 	/**
+	 * Returns conversion-goal influence for preview (Prompt 513). Empty when no goal.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function get_goal_influence(): array {
+		return $this->goal_influence;
+	}
+
+	/**
 	 * For view layer (escape on output).
 	 *
 	 * @return array<string, mixed>
@@ -146,6 +165,7 @@ final class Industry_Section_Preview_View_Model {
 			self::KEY_EXPLANATION_REASONS   => $this->explanation_reasons,
 			self::KEY_COMPLIANCE_WARNINGS   => $this->compliance_warnings,
 			self::KEY_SUBTYPE_INFLUENCE     => $this->subtype_influence,
+			self::KEY_GOAL_INFLUENCE        => $this->goal_influence,
 		);
 	}
 }
