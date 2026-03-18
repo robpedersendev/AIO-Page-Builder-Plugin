@@ -46,13 +46,13 @@ final class Process_Timeline_FAQ_Library_Batch_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']     = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$repo       = new Section_Template_Repository();
-		$normalizer = new Section_Definition_Normalizer();
-		$this->validator = new Section_Validator( $normalizer, $repo );
-		$bp_validator = new Section_Field_Blueprint_Validator();
-		$this->blueprint_service = new Section_Field_Blueprint_Service(
+		$repo                           = new Section_Template_Repository();
+		$normalizer                     = new Section_Definition_Normalizer();
+		$this->validator                = new Section_Validator( $normalizer, $repo );
+		$bp_validator                   = new Section_Field_Blueprint_Validator();
+		$this->blueprint_service        = new Section_Field_Blueprint_Service(
 			$repo,
 			$bp_validator,
 			new Section_Field_Blueprint_Normalizer( $bp_validator )
@@ -68,9 +68,21 @@ final class Process_Timeline_FAQ_Library_Batch_Test extends TestCase {
 		$keys = Process_Timeline_FAQ_Library_Batch_Definitions::section_keys();
 		$this->assertCount( 15, $keys );
 		$expected = array(
-			'ptf_steps_01', 'ptf_steps_horizontal_01', 'ptf_steps_vertical_01', 'ptf_buying_process_01', 'ptf_onboarding_01',
-			'ptf_service_flow_01', 'ptf_expectations_01', 'ptf_timeline_01', 'ptf_timeline_compact_01', 'ptf_policy_explainer_01',
-			'ptf_faq_01', 'ptf_faq_accordion_01', 'ptf_faq_by_category_01', 'ptf_how_it_works_01', 'ptf_comparison_steps_01',
+			'ptf_steps_01',
+			'ptf_steps_horizontal_01',
+			'ptf_steps_vertical_01',
+			'ptf_buying_process_01',
+			'ptf_onboarding_01',
+			'ptf_service_flow_01',
+			'ptf_expectations_01',
+			'ptf_timeline_01',
+			'ptf_timeline_compact_01',
+			'ptf_policy_explainer_01',
+			'ptf_faq_01',
+			'ptf_faq_accordion_01',
+			'ptf_faq_by_category_01',
+			'ptf_how_it_works_01',
+			'ptf_comparison_steps_01',
 		);
 		foreach ( $expected as $k ) {
 			$this->assertContains( $k, $keys );
@@ -86,7 +98,7 @@ final class Process_Timeline_FAQ_Library_Batch_Test extends TestCase {
 		$normalizer = new Section_Definition_Normalizer();
 		foreach ( Process_Timeline_FAQ_Library_Batch_Definitions::all_definitions() as $def ) {
 			$normalized = $normalizer->normalize( $def );
-			$errors = $this->validator->validate_completeness( $normalized );
+			$errors     = $this->validator->validate_completeness( $normalized );
 			$this->assertEmpty( $errors, 'Definition ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '?' ) . ' should pass completeness: ' . implode( ', ', $errors ) );
 		}
 	}
@@ -143,7 +155,7 @@ final class Process_Timeline_FAQ_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_accessibility_guidance_with_heading_or_aria(): void {
 		foreach ( Process_Timeline_FAQ_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$guidance = (string) ( $def['accessibility_warnings_or_enhancements'] ?? '' );
 			$this->assertNotEmpty( $guidance, "Section {$key} must have accessibility_warnings_or_enhancements" );
 			$this->assertMatchesRegularExpression( '/heading|aria|list|semantic|fallback/i', $guidance, "Section {$key} should reference heading, ARIA, list, or fallback (spec §51.6, §51.7)" );
@@ -166,7 +178,7 @@ final class Process_Timeline_FAQ_Library_Batch_Test extends TestCase {
 
 	public function test_preview_defaults_coverage(): void {
 		foreach ( Process_Timeline_FAQ_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$defaults = $def['preview_defaults'] ?? array();
 			$this->assertIsArray( $defaults );
 			$this->assertNotEmpty( $defaults, "Section {$key} must have non-empty preview_defaults" );
@@ -196,9 +208,9 @@ final class Process_Timeline_FAQ_Library_Batch_Test extends TestCase {
 
 	public function test_seeder_run_returns_success_and_fifteen_section_ids(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 400;
-		$GLOBALS['_aio_wp_query_posts']       = array();
-		$repo   = new Section_Template_Repository();
-		$result = Process_Timeline_FAQ_Library_Batch_Seeder::run( $repo );
+		$GLOBALS['_aio_wp_query_posts']        = array();
+		$repo                                  = new Section_Template_Repository();
+		$result                                = Process_Timeline_FAQ_Library_Batch_Seeder::run( $repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'section_ids', $result );

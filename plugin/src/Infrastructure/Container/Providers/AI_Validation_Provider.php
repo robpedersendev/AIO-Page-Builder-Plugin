@@ -23,11 +23,17 @@ final class AI_Validation_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'normalized_output_builder', function (): Normalized_Output_Builder {
-			return new Normalized_Output_Builder();
-		} );
-		$container->register( 'ai_output_validator', function () use ( $container ): AI_Output_Validator {
-			return new AI_Output_Validator( $container->get( 'normalized_output_builder' ) );
-		} );
+		$container->register(
+			'normalized_output_builder',
+			function (): Normalized_Output_Builder {
+				return new Normalized_Output_Builder();
+			}
+		);
+		$container->register(
+			'ai_output_validator',
+			function () use ( $container ): AI_Output_Validator {
+				return new AI_Output_Validator( $container->get( 'normalized_output_builder' ) );
+			}
+		);
 	}
 }

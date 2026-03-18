@@ -71,11 +71,11 @@ final class New_Page_Creation_UI_Service {
 		?Industry_Profile_Repository $profile_repository = null,
 		?Industry_Compliance_Warning_Resolver $compliance_warning_resolver = null
 	) {
-		$this->row_action_resolver        = $row_action_resolver;
-		$this->detail_builder             = $detail_builder;
-		$this->bulk_action_service        = $bulk_action_service;
-		$this->recommendation_builder     = $recommendation_builder;
-		$this->profile_repository        = $profile_repository;
+		$this->row_action_resolver         = $row_action_resolver;
+		$this->detail_builder              = $detail_builder;
+		$this->bulk_action_service         = $bulk_action_service;
+		$this->recommendation_builder      = $recommendation_builder;
+		$this->profile_repository          = $profile_repository;
 		$this->compliance_warning_resolver = $compliance_warning_resolver;
 	}
 
@@ -86,7 +86,7 @@ final class New_Page_Creation_UI_Service {
 	 * @param int                  $step_index Must be 2 for new_pages.
 	 * @param array<string, bool>  $capabilities can_approve, can_execute, can_view_artifacts.
 	 * @param string|null          $selected_item_id Item id for detail panel.
-	 * @param array<int, string>    $selected_item_ids Item ids for bulk selection.
+	 * @param array<int, string>   $selected_item_ids Item ids for bulk selection.
 	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages.
 	 */
 	public function build_workspace(
@@ -102,7 +102,7 @@ final class New_Page_Creation_UI_Service {
 		$steps_raw = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
-		$step = $steps_raw[ $step_index ] ?? null;
+		$step      = $steps_raw[ $step_index ] ?? null;
 		if ( ! is_array( $step ) ) {
 			return $this->empty_workspace();
 		}
@@ -111,8 +111,8 @@ final class New_Page_Creation_UI_Service {
 			return $this->empty_workspace();
 		}
 
-		$items = $this->eligible_items_from_step( $step );
-		$rows = array();
+		$items          = $this->eligible_items_from_step( $step );
+		$rows           = array();
 		$eligible_count = 0;
 		foreach ( $items as $item ) {
 			$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
@@ -123,33 +123,33 @@ final class New_Page_Creation_UI_Service {
 			if ( $status === Build_Plan_Item_Statuses::PENDING ) {
 				++$eligible_count;
 			}
-			$row_actions = $this->row_action_resolver->resolve( $item, $capabilities );
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+			$row_actions     = $this->row_action_resolver->resolve( $item, $capabilities );
+			$payload         = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
 			$summary_columns = $this->summary_columns_for_item( $item );
-			$row = array(
-				Step_Item_List_Component::ROW_KEY_ITEM_ID          => $item_id,
-				Step_Item_List_Component::ROW_KEY_STATUS           => $status,
-				Step_Item_List_Component::ROW_KEY_STATUS_BADGE     => $this->status_to_badge( $status ),
-				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS  => $summary_columns,
-				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS       => $row_actions,
-				Step_Item_List_Component::ROW_KEY_IS_SELECTED      => in_array( $item_id, $selected_item_ids, true ),
-				'dependency_validation'                            => $this->dependency_validation_summary( $payload ),
-				'post_build_status'                                => (string) ( $payload['post_build_status'] ?? '' ),
+			$row             = array(
+				Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
+				Step_Item_List_Component::ROW_KEY_STATUS  => $status,
+				Step_Item_List_Component::ROW_KEY_STATUS_BADGE => $this->status_to_badge( $status ),
+				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => $summary_columns,
+				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS => $row_actions,
+				Step_Item_List_Component::ROW_KEY_IS_SELECTED => in_array( $item_id, $selected_item_ids, true ),
+				'dependency_validation'                   => $this->dependency_validation_summary( $payload ),
+				'post_build_status'                       => (string) ( $payload['post_build_status'] ?? '' ),
 			);
 			if ( $this->recommendation_builder !== null ) {
 				$recommendation = $this->recommendation_builder->build_for_item( $item );
-				$row[ New_Page_Template_Recommendation_Builder::KEY_PROPOSED_TEMPLATE_SUMMARY ]  = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_PROPOSED_TEMPLATE_SUMMARY ];
-				$row[ New_Page_Template_Recommendation_Builder::KEY_HIERARCHY_CONTEXT_SUMMARY ]  = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_HIERARCHY_CONTEXT_SUMMARY ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_PROPOSED_TEMPLATE_SUMMARY ] = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_PROPOSED_TEMPLATE_SUMMARY ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_HIERARCHY_CONTEXT_SUMMARY ] = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_HIERARCHY_CONTEXT_SUMMARY ];
 				$row[ New_Page_Template_Recommendation_Builder::KEY_TEMPLATE_SELECTION_REASON ] = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_TEMPLATE_SELECTION_REASON ];
-				$row[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ]                = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ];
+				$row[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ]               = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ];
 				$row[ New_Page_Template_Recommendation_Builder::KEY_GROUP_HIERARCHY_ROLE ]      = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_GROUP_HIERARCHY_ROLE ];
 				$row[ New_Page_Template_Recommendation_Builder::KEY_GROUP_TEMPLATE_FAMILY ]     = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_GROUP_TEMPLATE_FAMILY ];
 				$row[ New_Page_Template_Recommendation_Builder::KEY_DEPENDENCY_WARNINGS ]       = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_DEPENDENCY_WARNINGS ];
 				$row[ New_Page_Template_Recommendation_Builder::KEY_DEPRECATION_AWARE ]         = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_DEPRECATION_AWARE ];
 				$row[ New_Page_Template_Recommendation_Builder::KEY_CONFIDENCE_NOTE ]           = $recommendation[ New_Page_Template_Recommendation_Builder::KEY_CONFIDENCE_NOTE ];
-				$row['summary_columns']['template_links'] = ''; // Filled by Screen with detail/compare URLs.
+				$row['summary_columns']['template_links']                                       = ''; // Filled by Screen with detail/compare URLs.
 			}
 			$rows[] = $row;
 		}
@@ -157,8 +157,8 @@ final class New_Page_Creation_UI_Service {
 			$rows = $this->sort_rows_by_group( $rows );
 		}
 
-		$eligibility = $this->bulk_action_service->get_bulk_eligibility( $plan_definition );
-		$pending_count = $eligibility['build_all_eligible'];
+		$eligibility    = $this->bulk_action_service->get_bulk_eligibility( $plan_definition );
+		$pending_count  = $eligibility['build_all_eligible'];
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
 
 		$bulk_states = array(
@@ -203,7 +203,7 @@ final class New_Page_Creation_UI_Service {
 					$profile = $this->profile_repository->get_profile();
 					$primary = isset( $profile['primary_industry_key'] ) && is_string( $profile['primary_industry_key'] ) ? trim( $profile['primary_industry_key'] ) : '';
 					if ( $primary !== '' ) {
-						$context['primary_industry_key']       = $primary;
+						$context['primary_industry_key']        = $primary;
 						$context['compliance_warning_resolver'] = $this->compliance_warning_resolver;
 					}
 				}
@@ -233,7 +233,7 @@ final class New_Page_Creation_UI_Service {
 		$items_raw = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
-		$out = array();
+		$out       = array();
 		foreach ( $items_raw as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -242,7 +242,7 @@ final class New_Page_Creation_UI_Service {
 			if ( $item_type !== Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ) {
 				continue;
 			}
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+			$payload    = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
 			$confidence = (string) ( $payload['confidence'] ?? 'medium' );
@@ -258,9 +258,9 @@ final class New_Page_Creation_UI_Service {
 		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
-		$cols = array();
+		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
-			$val = $payload[ $key ] ?? $item[ $key ] ?? '';
+			$val          = $payload[ $key ] ?? $item[ $key ] ?? '';
 			$cols[ $key ] = is_string( $val ) ? $val : (string) \wp_json_encode( $val );
 		}
 		return $cols;
@@ -269,13 +269,19 @@ final class New_Page_Creation_UI_Service {
 	private function dependency_validation_summary( array $payload ): array {
 		$reasons = $payload['dependency_blocking_reasons'] ?? $payload['blocking_reasons'] ?? array();
 		if ( ! is_array( $reasons ) ) {
-			return array( 'blocking' => false, 'messages' => array() );
+			return array(
+				'blocking' => false,
+				'messages' => array(),
+			);
 		}
 		return array(
 			'blocking' => ! empty( $reasons ),
-			'messages' => array_map( function ( $r ) {
-				return is_string( $r ) ? $r : (string) \wp_json_encode( $r );
-			}, $reasons ),
+			'messages' => array_map(
+				function ( $r ) {
+					return is_string( $r ) ? $r : (string) \wp_json_encode( $r );
+				},
+				$reasons
+			),
 		);
 	}
 
@@ -333,17 +339,20 @@ final class New_Page_Creation_UI_Service {
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function sort_rows_by_group( array $rows ): array {
-		usort( $rows, function ( array $a, array $b ): int {
-			$label_a = (string) ( $a[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ] ?? '' );
-			$label_b = (string) ( $b[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ] ?? '' );
-			$cmp = strcmp( $label_a, $label_b );
-			if ( $cmp !== 0 ) {
-				return $cmp;
+		usort(
+			$rows,
+			function ( array $a, array $b ): int {
+				$label_a = (string) ( $a[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ] ?? '' );
+				$label_b = (string) ( $b[ New_Page_Template_Recommendation_Builder::KEY_GROUP_LABEL ] ?? '' );
+				$cmp     = strcmp( $label_a, $label_b );
+				if ( $cmp !== 0 ) {
+					return $cmp;
+				}
+				$id_a = (string) ( $a[ Step_Item_List_Component::ROW_KEY_ITEM_ID ] ?? '' );
+				$id_b = (string) ( $b[ Step_Item_List_Component::ROW_KEY_ITEM_ID ] ?? '' );
+				return strcmp( $id_a, $id_b );
 			}
-			$id_a = (string) ( $a[ Step_Item_List_Component::ROW_KEY_ITEM_ID ] ?? '' );
-			$id_b = (string) ( $b[ Step_Item_List_Component::ROW_KEY_ITEM_ID ] ?? '' );
-			return strcmp( $id_a, $id_b );
-		} );
+		);
 		return array_values( $rows );
 	}
 
@@ -352,12 +361,31 @@ final class New_Page_Creation_UI_Service {
 			'step_list_rows'     => array(),
 			'column_order'       => self::COLUMN_ORDER,
 			'bulk_action_states' => array(
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array( 'enabled' => false, 'label' => \__( 'Build All Pages', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array( 'enabled' => false, 'label' => \__( 'Build Selected Pages', 'aio-page-builder' ), 'count_selected' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array( 'enabled' => false, 'label' => \__( 'Deny All', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array( 'enabled' => false, 'label' => \__( 'Clear selection', 'aio-page-builder' ) ),
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Build All Pages', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
+					'enabled'        => false,
+					'label'          => \__( 'Build Selected Pages', 'aio-page-builder' ),
+					'count_selected' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Deny All', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
+					'enabled' => false,
+					'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+				),
 			),
-			'detail_panel'       => array( 'item_id' => '', 'sections' => array(), 'row_actions' => array() ),
+			'detail_panel'       => array(
+				'item_id'     => '',
+				'sections'    => array(),
+				'row_actions' => array(),
+			),
 			'step_messages'      => array(),
 		);
 	}

@@ -32,12 +32,12 @@ final class HTML_Fetcher {
 	private $allowed_url_checker;
 
 	/**
-	 * @param Fetch_Request_Policy   $policy             Timeout, redirect cap, user-agent.
-	 * @param callable|null           $allowed_url_checker Optional. (string $url): bool — do not fetch if false.
+	 * @param Fetch_Request_Policy $policy             Timeout, redirect cap, user-agent.
+	 * @param callable|null        $allowed_url_checker Optional. (string $url): bool — do not fetch if false.
 	 */
 	public function __construct( Fetch_Request_Policy $policy, ?callable $allowed_url_checker = null ) {
 		$this->policy              = $policy;
-		$this->allowed_url_checker  = $allowed_url_checker;
+		$this->allowed_url_checker = $allowed_url_checker;
 	}
 
 	/**
@@ -55,8 +55,8 @@ final class HTML_Fetcher {
 		if ( $this->allowed_url_checker !== null && ! ( $this->allowed_url_checker )( $normalized_url ) ) {
 			return $this->disallowed_result( $normalized_url, Fetch_Result::ERROR_DISALLOWED_URL );
 		}
-		$start = microtime( true );
-		$response = $this->do_request( $normalized_url );
+		$start            = microtime( true );
+		$response         = $this->do_request( $normalized_url );
 		$response_time_ms = (int) ( ( microtime( true ) - $start ) * 1000 );
 		if ( is_wp_error( $response ) ) {
 			return $this->error_result( $normalized_url, $response, $response_time_ms );
@@ -82,18 +82,18 @@ final class HTML_Fetcher {
 	}
 
 	/**
-	 * @param string   $normalized_url
+	 * @param string    $normalized_url
 	 * @param \WP_Error $wp_error
-	 * @param int      $response_time_ms
+	 * @param int       $response_time_ms
 	 * @return Fetch_Result
 	 */
 	private function error_result( string $normalized_url, \WP_Error $wp_error, int $response_time_ms ): Fetch_Result {
-		$code = $wp_error->get_error_code();
-		$message = $wp_error->get_error_message();
-		$error_code = Fetch_Result::ERROR_TRANSPORT;
+		$code         = $wp_error->get_error_code();
+		$message      = $wp_error->get_error_message();
+		$error_code   = Fetch_Result::ERROR_TRANSPORT;
 		$fetch_status = Fetch_Result::FETCH_STATUS_FAILURE;
 		if ( strpos( strtolower( $message ), 'timeout' ) !== false || $code === 'http_request_failed' && strpos( strtolower( $message ), 'timed' ) !== false ) {
-			$error_code = Fetch_Result::ERROR_TIMEOUT;
+			$error_code   = Fetch_Result::ERROR_TIMEOUT;
 			$fetch_status = Fetch_Result::FETCH_STATUS_TIMEOUT;
 		} elseif ( strpos( strtolower( $message ), 'refused' ) !== false || strpos( strtolower( $message ), 'could not resolve' ) !== false ) {
 			$fetch_status = Fetch_Result::FETCH_STATUS_BLOCKED;
@@ -118,11 +118,11 @@ final class HTML_Fetcher {
 	 * @return Fetch_Result
 	 */
 	private function parse_response( string $normalized_url, array $response, int $response_time_ms ): Fetch_Result {
-		$code = (int) wp_remote_retrieve_response_code( $response );
-		$headers = wp_remote_retrieve_headers( $response );
+		$code         = (int) wp_remote_retrieve_response_code( $response );
+		$headers      = wp_remote_retrieve_headers( $response );
 		$content_type = isset( $headers['content-type'] ) ? $this->normalize_content_type( $headers['content-type'] ) : null;
-		$body = wp_remote_retrieve_body( $response );
-		$final_url = null;
+		$body         = wp_remote_retrieve_body( $response );
+		$final_url    = null;
 		if ( isset( $response['http_response'] ) && is_object( $response['http_response'] ) && method_exists( $response['http_response'], 'get_response_object' ) ) {
 			$obj = $response['http_response']->get_response_object();
 			if ( $obj !== null && isset( $obj->url ) && is_string( $obj->url ) ) {
@@ -216,7 +216,7 @@ final class HTML_Fetcher {
 		if ( is_array( $raw ) ) {
 			$raw = $raw[0] ?? '';
 		}
-		$s = trim( (string) $raw );
+		$s         = trim( (string) $raw );
 		$semicolon = strpos( $s, ';' );
 		if ( $semicolon !== false ) {
 			$s = trim( substr( $s, 0, $semicolon ) );

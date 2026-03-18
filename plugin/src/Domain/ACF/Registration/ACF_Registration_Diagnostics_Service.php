@@ -81,11 +81,11 @@ final class ACF_Registration_Diagnostics_Service {
 			return;
 		}
 		$this->last_registration = array(
-			'mode'                        => $mode,
-			'section_key_count'           => $section_key_count,
-			'cache_used'                  => $cache_used,
-			'full_registration_invoked'   => $full_registration_invoked,
-			'site_id'                     => \function_exists( 'get_current_blog_id' ) ? get_current_blog_id() : 1,
+			'mode'                      => $mode,
+			'section_key_count'         => $section_key_count,
+			'cache_used'                => $cache_used,
+			'full_registration_invoked' => $full_registration_invoked,
+			'site_id'                   => \function_exists( 'get_current_blog_id' ) ? get_current_blog_id() : 1,
 		);
 	}
 

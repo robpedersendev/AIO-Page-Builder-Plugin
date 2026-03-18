@@ -43,11 +43,11 @@ final class Table_Installer {
 	 * @return array{success: bool, message: string, failed_table: string|null} success false when any table fails; message sanitized.
 	 */
 	public function install_or_upgrade(): array {
-		$definitions = Table_Schema_Definitions::get_definitions( $this->wpdb );
+		$definitions  = Table_Schema_Definitions::get_definitions( $this->wpdb );
 		$code_version = Versions::table_schema();
 
 		foreach ( $definitions as $def ) {
-			$name = $def['name'];
+			$name   = $def['name'];
 			$result = $this->db_delta->run( $this->wpdb, $def['sql'] );
 			if ( ! $result['success'] ) {
 				return array(
@@ -73,7 +73,7 @@ final class Table_Installer {
 	 * @return bool
 	 */
 	public function table_exists( string $suffix ): bool {
-		$full = Table_Names::full_name( $this->wpdb, $suffix );
+		$full   = Table_Names::full_name( $this->wpdb, $suffix );
 		$result = $this->wpdb->get_var( $this->wpdb->prepare( 'SHOW TABLES LIKE %s', $full ) );
 		return $result === $full;
 	}

@@ -18,28 +18,52 @@ defined( 'ABSPATH' ) || exit;
 final class Crawl_Template_Family_Matcher {
 
 	/** Page hierarchy classes (spec page-template-directory-ia; stable ordering). */
-	public const PAGE_CLASS_TOP_LEVEL   = 'top_level';
-	public const PAGE_CLASS_HUB         = 'hub';
-	public const PAGE_CLASS_NESTED_HUB  = 'nested_hub';
+	public const PAGE_CLASS_TOP_LEVEL    = 'top_level';
+	public const PAGE_CLASS_HUB          = 'hub';
+	public const PAGE_CLASS_NESTED_HUB   = 'nested_hub';
 	public const PAGE_CLASS_CHILD_DETAIL = 'child_detail';
 
 	/** URL path segments or title keywords that suggest top-level (about, contact, home). */
 	private const TOP_LEVEL_SLUGS = array(
-		'about', 'contact', 'home', 'faq', 'pricing', 'team', 'support', 'request', 'legal', 'privacy', 'terms',
+		'about',
+		'contact',
+		'home',
+		'faq',
+		'pricing',
+		'team',
+		'support',
+		'request',
+		'legal',
+		'privacy',
+		'terms',
 	);
 
 	/** URL path segments that suggest hub (listing/category level). */
 	private const HUB_SLUGS = array(
-		'services', 'service', 'products', 'product', 'locations', 'location', 'events', 'event',
-		'blog', 'news', 'resources', 'offerings', 'offering', 'directory', 'categories', 'category',
+		'services',
+		'service',
+		'products',
+		'product',
+		'locations',
+		'location',
+		'events',
+		'event',
+		'blog',
+		'news',
+		'resources',
+		'offerings',
+		'offering',
+		'directory',
+		'categories',
+		'category',
 	);
 
 	/** Minimum word count for strong content signal; below suggests weak structure. */
 	private const MIN_WORDS_STRONG = 200;
 
 	/** Path depth threshold: 0–1 segments after host -> top_level candidate; 2 -> hub/nested_hub; 3+ -> child_detail. */
-	private const PATH_DEPTH_TOP = 1;
-	private const PATH_DEPTH_HUB_MAX = 2;
+	private const PATH_DEPTH_TOP       = 1;
+	private const PATH_DEPTH_HUB_MAX   = 2;
 	private const PATH_DEPTH_CHILD_MIN = 3;
 
 	/**
@@ -49,13 +73,13 @@ final class Crawl_Template_Family_Matcher {
 	 * @return Crawl_Template_Match_Result
 	 */
 	public function match( array $page_record ): Crawl_Template_Match_Result {
-		$url         = (string) ( $page_record['url'] ?? '' );
-		$title       = (string) ( $page_record['title_snapshot'] ?? '' );
+		$url            = (string) ( $page_record['url'] ?? '' );
+		$title          = (string) ( $page_record['title_snapshot'] ?? '' );
 		$classification = (string) ( $page_record['page_classification'] ?? '' );
-		$summary_json = (string) ( $page_record['summary_data'] ?? '' );
-		$in_nav       = (int) ( $page_record['navigation_participation'] ?? 0 ) > 0;
+		$summary_json   = (string) ( $page_record['summary_data'] ?? '' );
+		$in_nav         = (int) ( $page_record['navigation_participation'] ?? 0 ) > 0;
 
-		$summary = $this->decode_summary_data( $summary_json );
+		$summary    = $this->decode_summary_data( $summary_json );
 		$path_depth = $this->path_depth( $url );
 		$slug_hint  = $this->slug_hint_from_url_and_title( $url, $title );
 
@@ -67,24 +91,24 @@ final class Crawl_Template_Family_Matcher {
 			return $this->unsupported_result( 'duplicate_page' );
 		}
 
-		$word_count = (int) ( $summary['page_summary']['word_count'] ?? 0 );
-		$has_h1     = trim( (string) ( $summary['page_summary']['h1'] ?? '' ) ) !== '';
+		$word_count      = (int) ( $summary['page_summary']['word_count'] ?? 0 );
+		$has_h1          = trim( (string) ( $summary['page_summary']['h1'] ?? '' ) ) !== '';
 		$heading_outline = $summary['heading_outline'] ?? array();
 
-		$suggested_class = $this->infer_page_class( $path_depth, $slug_hint, $in_nav, $word_count, $has_h1 );
+		$suggested_class    = $this->infer_page_class( $path_depth, $slug_hint, $in_nav, $word_count, $has_h1 );
 		$suggested_families = $this->infer_template_families( $slug_hint, $suggested_class );
-		$confidence = $this->confidence( $path_depth, $slug_hint, $in_nav, $word_count, $has_h1 );
+		$confidence         = $this->confidence( $path_depth, $slug_hint, $in_nav, $word_count, $has_h1 );
 
 		$section_summary = $this->infer_section_family_summary( $heading_outline, $word_count );
 		$rebuild_summary = $this->build_rebuild_signal_summary( $classification, $word_count, $has_h1, $suggested_class, $slug_hint );
 
 		$hint = array(
-			'suggested_page_class'   => $suggested_class,
-			'suggested_families'     => $suggested_families,
-			'confidence'             => $confidence,
-			'path_depth'             => $path_depth,
-			'slug_hint'              => $slug_hint,
-			'in_navigation'          => $in_nav,
+			'suggested_page_class' => $suggested_class,
+			'suggested_families'   => $suggested_families,
+			'confidence'           => $confidence,
+			'path_depth'           => $path_depth,
+			'slug_hint'            => $slug_hint,
+			'in_navigation'        => $in_nav,
 		);
 		if ( $confidence === Crawl_Template_Match_Result::CONFIDENCE_UNSUPPORTED ) {
 			$hint['unsupported_reason'] = $rebuild_summary['mismatch_reasons'][0] ?? 'unsupported';
@@ -155,11 +179,11 @@ final class Crawl_Template_Family_Matcher {
 	 * Infers likely section-purpose-family patterns from heading outline (advisory).
 	 *
 	 * @param list<array{level: int, text: string}> $heading_outline
-	 * @param int                                  $word_count
+	 * @param int                                   $word_count
 	 * @return array<string, mixed> section_family_match_summary
 	 */
 	private function infer_section_family_summary( array $heading_outline, int $word_count ): array {
-		$matched = array();
+		$matched  = array();
 		$h1_count = 0;
 		$h2_count = 0;
 		$h3_count = 0;
@@ -187,7 +211,7 @@ final class Crawl_Template_Family_Matcher {
 		}
 		return array(
 			'matched_section_families' => array_values( array_unique( $matched ) ),
-			'confidence'              => count( $matched ) > 0 ? Crawl_Template_Match_Result::CONFIDENCE_MEDIUM : Crawl_Template_Match_Result::CONFIDENCE_LOW,
+			'confidence'               => count( $matched ) > 0 ? Crawl_Template_Match_Result::CONFIDENCE_MEDIUM : Crawl_Template_Match_Result::CONFIDENCE_LOW,
 		);
 	}
 
@@ -203,7 +227,7 @@ final class Crawl_Template_Family_Matcher {
 	 */
 	private function build_rebuild_signal_summary( string $classification, int $word_count, bool $has_h1, string $suggested_class, string $slug_hint ): array {
 		$mismatch_reasons = array();
-		$weak_signals = array();
+		$weak_signals     = array();
 		if ( ! $has_h1 ) {
 			$weak_signals[] = 'no_h1';
 		}
@@ -215,9 +239,9 @@ final class Crawl_Template_Family_Matcher {
 		}
 		$likely_rebuild = count( $weak_signals ) > 0 || count( $mismatch_reasons ) > 0;
 		return array(
-			'likely_rebuild'          => $likely_rebuild,
-			'mismatch_reasons'        => $mismatch_reasons,
-			'weak_structure_signals'  => $weak_signals,
+			'likely_rebuild'         => $likely_rebuild,
+			'mismatch_reasons'       => $mismatch_reasons,
+			'weak_structure_signals' => $weak_signals,
 		);
 	}
 
@@ -239,11 +263,11 @@ final class Crawl_Template_Family_Matcher {
 	 * @return string
 	 */
 	private function slug_hint_from_url_and_title( string $url, string $title ): string {
-		$parsed = parse_url( $url );
-		$path   = (string) ( is_array( $parsed ) && isset( $parsed['path'] ) ? $parsed['path'] : '/' );
-		$path   = strtolower( trim( $path, '/' ) );
+		$parsed   = parse_url( $url );
+		$path     = (string) ( is_array( $parsed ) && isset( $parsed['path'] ) ? $parsed['path'] : '/' );
+		$path     = strtolower( trim( $path, '/' ) );
 		$segments = array_filter( explode( '/', $path ) );
-		$last = (string) ( end( $segments ) ?? '' );
+		$last     = (string) ( end( $segments ) ?? '' );
 		$combined = $path . ' ' . strtolower( $title );
 
 		foreach ( self::TOP_LEVEL_SLUGS as $slug ) {
@@ -302,15 +326,22 @@ final class Crawl_Template_Family_Matcher {
 
 	private function unsupported_result( string $reason ): Crawl_Template_Match_Result {
 		$hint = array(
-			'suggested_page_class'   => '',
-			'suggested_families'    => array(),
-			'confidence'            => Crawl_Template_Match_Result::CONFIDENCE_UNSUPPORTED,
-			'unsupported_reason'    => $reason,
+			'suggested_page_class' => '',
+			'suggested_families'   => array(),
+			'confidence'           => Crawl_Template_Match_Result::CONFIDENCE_UNSUPPORTED,
+			'unsupported_reason'   => $reason,
 		);
 		return new Crawl_Template_Match_Result(
 			$hint,
-			array( 'matched_section_families' => array(), 'confidence' => Crawl_Template_Match_Result::CONFIDENCE_UNSUPPORTED ),
-			array( 'likely_rebuild' => false, 'mismatch_reasons' => array(), 'weak_structure_signals' => array() )
+			array(
+				'matched_section_families' => array(),
+				'confidence'               => Crawl_Template_Match_Result::CONFIDENCE_UNSUPPORTED,
+			),
+			array(
+				'likely_rebuild'         => false,
+				'mismatch_reasons'       => array(),
+				'weak_structure_signals' => array(),
+			)
 		);
 	}
 
@@ -320,14 +351,20 @@ final class Crawl_Template_Family_Matcher {
 	 */
 	private function decode_summary_data( string $summary_json ): array {
 		if ( trim( $summary_json ) === '' ) {
-			return array( 'page_summary' => array(), 'heading_outline' => array() );
+			return array(
+				'page_summary'    => array(),
+				'heading_outline' => array(),
+			);
 		}
 		$decoded = json_decode( $summary_json, true );
 		if ( ! is_array( $decoded ) ) {
-			return array( 'page_summary' => array(), 'heading_outline' => array() );
+			return array(
+				'page_summary'    => array(),
+				'heading_outline' => array(),
+			);
 		}
 		return array(
-			'page_summary'   => is_array( $decoded['page_summary'] ?? null ) ? $decoded['page_summary'] : array(),
+			'page_summary'    => is_array( $decoded['page_summary'] ?? null ) ? $decoded['page_summary'] : array(),
 			'heading_outline' => is_array( $decoded['heading_outline'] ?? null ) ? $decoded['heading_outline'] : array(),
 		);
 	}

@@ -22,8 +22,23 @@ final class Meaningful_Page_Classifier {
 
 	/** URL path segments or title keywords that suggest a likely role (contract §5). */
 	private const LIKELY_ROLE_SEGMENTS = array(
-		'about', 'contact', 'services', 'service', 'products', 'product', 'locations', 'location',
-		'faq', 'pricing', 'events', 'event', 'team', 'blog', 'news', 'support', 'request',
+		'about',
+		'contact',
+		'services',
+		'service',
+		'products',
+		'product',
+		'locations',
+		'location',
+		'faq',
+		'pricing',
+		'events',
+		'event',
+		'team',
+		'blog',
+		'news',
+		'support',
+		'request',
 	);
 
 	/** @var Duplicate_Detector */
@@ -36,9 +51,9 @@ final class Meaningful_Page_Classifier {
 	/**
 	 * Classifies a page from its HTML and optional context.
 	 *
-	 * @param string       $normalized_url   Page URL.
-	 * @param string       $html             Response body (HTML).
-	 * @param array{canonical_url?: string|null, final_url?: string|null, in_navigation?: bool, link_count?: int} $context Optional context.
+	 * @param string                                                                                                                              $normalized_url   Page URL.
+	 * @param string                                                                                                                              $html             Response body (HTML).
+	 * @param array{canonical_url?: string|null, final_url?: string|null, in_navigation?: bool, link_count?: int}                                 $context Optional context.
 	 * @param list<array{normalized_url: string, canonical_url?: string|null, title?: string|null, h1?: string|null, content_hash?: string|null}> $known_pages Already-accepted pages for duplicate check.
 	 * @return Classification_Result
 	 */
@@ -48,21 +63,21 @@ final class Meaningful_Page_Classifier {
 		array $context = array(),
 		array $known_pages = array()
 	): Classification_Result {
-		$extracted = $this->extract_minimal( $html );
-		$title     = $extracted['title'];
-		$h1        = $extracted['h1'];
-		$word_count = $extracted['word_count'];
-		$body_excerpt = $extracted['body_excerpt'];
-		$content_hash = Duplicate_Detector::content_hash( $title, $h1, $body_excerpt );
-		$in_nav    = $context['in_navigation'] ?? false;
-		$link_count = (int) ( $context['link_count'] ?? 0 );
-		$canonical_url = $context['canonical_url'] ?? $normalized_url;
-		$final_url    = $context['final_url'] ?? $normalized_url;
+		$extracted        = $this->extract_minimal( $html );
+		$title            = $extracted['title'];
+		$h1               = $extracted['h1'];
+		$word_count       = $extracted['word_count'];
+		$body_excerpt     = $extracted['body_excerpt'];
+		$content_hash     = Duplicate_Detector::content_hash( $title, $h1, $body_excerpt );
+		$in_nav           = $context['in_navigation'] ?? false;
+		$link_count       = (int) ( $context['link_count'] ?? 0 );
+		$canonical_url    = $context['canonical_url'] ?? $normalized_url;
+		$final_url        = $context['final_url'] ?? $normalized_url;
 		$meaningful_flags = array(
-			'has_h1'      => $h1 !== '',
-			'word_count'  => $word_count,
-			'in_nav'      => $in_nav,
-			'link_count'  => $link_count,
+			'has_h1'     => $h1 !== '',
+			'word_count' => $word_count,
+			'in_nav'     => $in_nav,
+			'link_count' => $link_count,
 		);
 		if ( $html === '' ) {
 			return new Classification_Result(
@@ -82,7 +97,7 @@ final class Meaningful_Page_Classifier {
 			'h1'             => $h1,
 			'content_hash'   => $content_hash,
 		);
-		$dup = $this->duplicate_detector->find_duplicate( $candidate, $known_pages );
+		$dup       = $this->duplicate_detector->find_duplicate( $candidate, $known_pages );
 		if ( $dup !== null ) {
 			return new Classification_Result(
 				Classification_Result::CLASSIFICATION_DUPLICATE,
@@ -93,7 +108,7 @@ final class Meaningful_Page_Classifier {
 				$content_hash
 			);
 		}
-		$reasons = array();
+		$reasons            = array();
 		$has_content_weight = $h1 !== '' && $word_count >= self::MIN_WORDS_CONTENT_WEIGHT;
 		if ( $has_content_weight ) {
 			$reasons[] = Classification_Result::REASON_CONTENT_WEIGHT;
@@ -143,11 +158,11 @@ final class Meaningful_Page_Classifier {
 		if ( preg_match( '#<h1[^>]*>([^<]+)</h1>#is', $html, $m ) ) {
 			$h1 = trim( wp_strip_all_tags( $m[1] ) );
 		}
-		$body = preg_replace( '#<script[^>]*>.*?</script>#is', ' ', $html );
-		$body = preg_replace( '#<style[^>]*>.*?</style>#is', ' ', $body );
-		$body = wp_strip_all_tags( $body );
-		$body = preg_replace( '/\s+/', ' ', $body );
-		$word_count = str_word_count( $body );
+		$body         = preg_replace( '#<script[^>]*>.*?</script>#is', ' ', $html );
+		$body         = preg_replace( '#<style[^>]*>.*?</style>#is', ' ', $body );
+		$body         = wp_strip_all_tags( $body );
+		$body         = preg_replace( '/\s+/', ' ', $body );
+		$word_count   = str_word_count( $body );
 		$body_excerpt = substr( $body, 0, 2000 );
 		return array(
 			'title'        => $title,
@@ -158,9 +173,9 @@ final class Meaningful_Page_Classifier {
 	}
 
 	private function likely_role( string $url, string $title ): bool {
-		$path = (string) parse_url( $url, PHP_URL_PATH );
-		$path = strtolower( trim( $path, '/' ) );
-		$segments = array_filter( explode( '/', $path ) );
+		$path        = (string) parse_url( $url, PHP_URL_PATH );
+		$path        = strtolower( trim( $path, '/' ) );
+		$segments    = array_filter( explode( '/', $path ) );
 		$title_lower = strtolower( $title );
 		foreach ( self::LIKELY_ROLE_SEGMENTS as $seg ) {
 			if ( in_array( $seg, $segments, true ) ) {

@@ -31,52 +31,63 @@ final class Prompt_Pack_Regression_Harness_Test extends TestCase {
 
 	private function harness( string $fixtures_base = '' ): Prompt_Pack_Regression_Harness {
 		$validator = new AI_Output_Validator();
-		$base = $fixtures_base !== '' ? $fixtures_base : dirname( __DIR__, 2 ) . '/tests/fixtures';
+		$base      = $fixtures_base !== '' ? $fixtures_base : dirname( __DIR__, 2 ) . '/tests/fixtures';
 		return new Prompt_Pack_Regression_Harness( $validator, $base );
 	}
 
 	private function golden_fixture_passed(): array {
 		return array(
-			'prompt_pack_ref' => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
+			'prompt_pack_ref' => array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
 			'schema_ref'      => 'aio/build-plan-draft-v1',
 			'input'           => array(
-				'schema_version' => 'aio/build-plan-draft-v1',
-				'run_summary'    => array( 'summary_text' => 'Minimal regression fixture.', 'planning_mode' => 'new_site', 'overall_confidence' => 'high' ),
-				'site_purpose'   => array(),
-				'site_structure' => array(),
-				'existing_page_changes' => array(),
-				'new_pages_to_create'   => array(),
-				'menu_change_plan'      => array(),
+				'schema_version'               => 'aio/build-plan-draft-v1',
+				'run_summary'                  => array(
+					'summary_text'       => 'Minimal regression fixture.',
+					'planning_mode'      => 'new_site',
+					'overall_confidence' => 'high',
+				),
+				'site_purpose'                 => array(),
+				'site_structure'               => array(),
+				'existing_page_changes'        => array(),
+				'new_pages_to_create'          => array(),
+				'menu_change_plan'             => array(),
 				'design_token_recommendations' => array(),
-				'seo_recommendations'  => array(),
-				'warnings'   => array(),
-				'assumptions' => array(),
-				'confidence' => array(),
+				'seo_recommendations'          => array(),
+				'warnings'                     => array(),
+				'assumptions'                  => array(),
+				'confidence'                   => array(),
 			),
-			'expected' => array(
+			'expected'        => array(
 				'final_validation_state' => 'passed',
 				'normalized_output'      => array(
-					'schema_version' => 'aio/build-plan-draft-v1',
-					'run_summary'    => array( 'summary_text' => 'Minimal regression fixture.', 'planning_mode' => 'new_site', 'overall_confidence' => 'high' ),
-					'site_purpose'   => array(),
-					'site_structure' => array(),
-					'existing_page_changes' => array(),
-					'new_pages_to_create'   => array(),
-					'menu_change_plan'      => array(),
+					'schema_version'               => 'aio/build-plan-draft-v1',
+					'run_summary'                  => array(
+						'summary_text'       => 'Minimal regression fixture.',
+						'planning_mode'      => 'new_site',
+						'overall_confidence' => 'high',
+					),
+					'site_purpose'                 => array(),
+					'site_structure'               => array(),
+					'existing_page_changes'        => array(),
+					'new_pages_to_create'          => array(),
+					'menu_change_plan'             => array(),
 					'design_token_recommendations' => array(),
-					'seo_recommendations'  => array(),
-					'warnings'   => array(),
-					'assumptions' => array(),
-					'confidence' => array(),
+					'seo_recommendations'          => array(),
+					'warnings'                     => array(),
+					'assumptions'                  => array(),
+					'confidence'                   => array(),
 				),
-				'dropped_records' => array(),
+				'dropped_records'        => array(),
 			),
 		);
 	}
 
 	public function test_exact_match_pass(): void {
 		$harness = $this->harness();
-		$result = $harness->run_from_array( $this->golden_fixture_passed() );
+		$result  = $harness->run_from_array( $this->golden_fixture_passed() );
 		$this->assertInstanceOf( Regression_Result::class, $result );
 		$this->assertTrue( $result->is_pass(), $result->get_message() );
 		$this->assertSame( Regression_Result::OUTCOME_PASS, $result->get_outcome() );
@@ -88,11 +99,14 @@ final class Prompt_Pack_Regression_Harness_Test extends TestCase {
 	}
 
 	public function test_validation_failed_fixture_matches(): void {
-		$fixture = $this->golden_fixture_passed();
-		$fixture['input'] = '';
-		$fixture['expected'] = array( 'final_validation_state' => 'failed', 'blocking_failure_stage' => 'raw_capture' );
-		$harness = $this->harness();
-		$result = $harness->run_from_array( $fixture );
+		$fixture             = $this->golden_fixture_passed();
+		$fixture['input']    = '';
+		$fixture['expected'] = array(
+			'final_validation_state' => 'failed',
+			'blocking_failure_stage' => 'raw_capture',
+		);
+		$harness             = $this->harness();
+		$result              = $harness->run_from_array( $fixture );
 		$this->assertTrue( $result->is_pass(), $result->get_message() );
 		$this->assertTrue( $result->get_validator_regression_summary()['final_validation_state_match'] );
 	}
@@ -100,12 +114,15 @@ final class Prompt_Pack_Regression_Harness_Test extends TestCase {
 	public function test_fixture_version_mismatch_handling(): void {
 		$harness = $this->harness();
 		$invalid = array(
-			'prompt_pack_ref' => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
+			'prompt_pack_ref' => array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
 			'schema_ref'      => '',
 			'input'           => array(),
-			'expected'       => array( 'final_validation_state' => 'passed' ),
+			'expected'        => array( 'final_validation_state' => 'passed' ),
 		);
-		$result = $harness->run_from_array( $invalid );
+		$result  = $harness->run_from_array( $invalid );
 		$this->assertSame( Regression_Result::OUTCOME_FAIL, $result->get_outcome() );
 		$this->assertStringContainsString( 'schema_ref', $result->get_message() );
 	}
@@ -114,7 +131,7 @@ final class Prompt_Pack_Regression_Harness_Test extends TestCase {
 		$fixture = $this->golden_fixture_passed();
 		$fixture['expected']['normalized_output']['run_summary']['summary_text'] = 'Different expected text';
 		$harness = $this->harness();
-		$result = $harness->run_from_array( $fixture );
+		$result  = $harness->run_from_array( $fixture );
 		$this->assertSame( Regression_Result::OUTCOME_REGRESSION, $result->get_outcome() );
 		$diff = $result->get_normalized_output_diff_summary();
 		$this->assertNotNull( $diff );
@@ -123,17 +140,17 @@ final class Prompt_Pack_Regression_Harness_Test extends TestCase {
 	}
 
 	public function test_run_from_file_golden(): void {
-		$base = dirname( __DIR__, 2 ) . '/tests/fixtures';
+		$base    = dirname( __DIR__, 2 ) . '/tests/fixtures';
 		$harness = $this->harness( $base );
-		$result = $harness->run( 'prompt-packs/aio-build-plan-draft-1.0.0-golden.json' );
+		$result  = $harness->run( 'prompt-packs/aio-build-plan-draft-1.0.0-golden.json' );
 		$this->assertInstanceOf( Regression_Result::class, $result );
 		$this->assertTrue( $result->is_pass(), $result->get_message() );
 	}
 
 	public function test_run_from_file_validation_failed(): void {
-		$base = dirname( __DIR__, 2 ) . '/tests/fixtures';
+		$base    = dirname( __DIR__, 2 ) . '/tests/fixtures';
 		$harness = $this->harness( $base );
-		$result = $harness->run( 'prompt-packs/aio-build-plan-draft-1.0.0-validation-failed.json' );
+		$result  = $harness->run( 'prompt-packs/aio-build-plan-draft-1.0.0-validation-failed.json' );
 		$this->assertTrue( $result->is_pass(), $result->get_message() );
 		$this->assertSame( Regression_Result::OUTCOME_PASS, $result->get_outcome() );
 	}
@@ -144,8 +161,8 @@ final class Prompt_Pack_Regression_Harness_Test extends TestCase {
 	}
 
 	public function test_partial_output_dropped_record_comparison(): void {
-		$fixture = $this->golden_fixture_passed();
-		$fixture['input']['existing_page_changes'] = array(
+		$fixture                                       = $this->golden_fixture_passed();
+		$fixture['input']['existing_page_changes']     = array(
 			array(
 				'current_page_url'   => '/valid/',
 				'current_page_title' => 'Valid',
@@ -174,18 +191,23 @@ final class Prompt_Pack_Regression_Harness_Test extends TestCase {
 				'confidence'         => 'high',
 			),
 		);
-		$fixture['expected']['dropped_records'] = array(
-			array( 'section' => 'existing_page_changes', 'index' => 1, 'reason' => 'invalid_enum', 'errors' => array() ),
+		$fixture['expected']['dropped_records']                            = array(
+			array(
+				'section' => 'existing_page_changes',
+				'index'   => 1,
+				'reason'  => 'invalid_enum',
+				'errors'  => array(),
+			),
 		);
 		$harness = $this->harness();
-		$result = $harness->run_from_array( $fixture );
+		$result  = $harness->run_from_array( $fixture );
 		$this->assertSame( Regression_Result::OUTCOME_PASS, $result->get_outcome(), $result->get_message() );
 		$this->assertTrue( $result->get_validator_regression_summary()['dropped_count_match'] );
 	}
 
 	public function test_example_regression_result_payload(): void {
 		$harness = $this->harness();
-		$result = $harness->run_from_array( $this->golden_fixture_passed() );
+		$result  = $harness->run_from_array( $this->golden_fixture_passed() );
 		$payload = $result->to_array();
 		$this->assertArrayHasKey( 'outcome', $payload );
 		$this->assertArrayHasKey( 'regression_run', $payload );

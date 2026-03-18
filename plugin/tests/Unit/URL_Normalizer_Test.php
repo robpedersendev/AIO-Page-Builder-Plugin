@@ -47,9 +47,9 @@ final class URL_Normalizer_Test extends TestCase {
 	}
 
 	public function test_dedup_key_deterministic(): void {
-		$n = new URL_Normalizer( self::HOST );
-		$url1 = 'https://example.com/about?utm_source=x';
-		$url2 = 'https://example.com/about#top';
+		$n     = new URL_Normalizer( self::HOST );
+		$url1  = 'https://example.com/about?utm_source=x';
+		$url2  = 'https://example.com/about#top';
 		$norm1 = $n->normalize( $url1 );
 		$norm2 = $n->normalize( $url2 );
 		$this->assertSame( $norm1, $norm2 );

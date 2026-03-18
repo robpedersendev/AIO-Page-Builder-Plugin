@@ -41,7 +41,7 @@ final class Industry_Pack_Family_Comparison_Screen_Test extends TestCase {
 		$screen = new Industry_Pack_Family_Comparison_Screen( null );
 		$method = new ReflectionMethod( Industry_Pack_Family_Comparison_Screen::class, 'get_state' );
 		$method->setAccessible( true );
-		$state = $method->invoke( $screen );
+		$state         = $method->invoke( $screen );
 		$required_keys = array( 'pack_key', 'subtype_key', 'scope_label', 'band', 'total', 'gap_count', 'blocker_count' );
 		foreach ( $state['rows'] as $row ) {
 			foreach ( $required_keys as $key ) {

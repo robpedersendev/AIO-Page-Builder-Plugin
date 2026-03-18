@@ -142,7 +142,7 @@ final class Subtype_Compliance_Rule_Registry {
 				continue;
 			}
 			$this->by_key[ $subtype_rule_key ] = $rule;
-			$this->all[]                      = $rule;
+			$this->all[]                       = $rule;
 		}
 	}
 
@@ -175,7 +175,7 @@ final class Subtype_Compliance_Rule_Registry {
 	 */
 	public function get_for_subtype( string $parent_industry_key, string $subtype_key ): array {
 		$parent = trim( $parent_industry_key );
-		$sub   = trim( $subtype_key );
+		$sub    = trim( $subtype_key );
 		if ( $parent === '' || $sub === '' ) {
 			return array();
 		}

@@ -30,14 +30,14 @@ final class Global_Token_Variable_Emitter_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->plugin_root = dirname( __DIR__, 2 );
-		$key = Global_Style_Settings_Schema::OPTION_KEY;
+		$key               = Global_Style_Settings_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
 		}
 	}
 
 	public function test_emit_for_root_without_registry_returns_empty(): void {
-		$repo = new Global_Style_Settings_Repository( null, null );
+		$repo    = new Global_Style_Settings_Repository( null, null );
 		$emitter = new Global_Token_Variable_Emitter( $repo, null );
 		$this->assertSame( '', $emitter->emit_for_root() );
 	}

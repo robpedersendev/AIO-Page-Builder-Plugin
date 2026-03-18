@@ -38,11 +38,11 @@ final class Conversion_Goal_Build_Plan_Explanation_View_Model {
 	/** Human-readable labels for launch goal keys. */
 	private const GOAL_LABELS = array(
 		'calls'         => 'Calls',
-		'bookings'     => 'Bookings',
-		'estimates'    => 'Estimates / quotes',
+		'bookings'      => 'Bookings',
+		'estimates'     => 'Estimates / quotes',
 		'consultations' => 'Consultations',
-		'valuations'   => 'Valuations',
-		'lead_capture' => 'Lead capture',
+		'valuations'    => 'Valuations',
+		'lead_capture'  => 'Lead capture',
 	);
 
 	/**
@@ -61,14 +61,14 @@ final class Conversion_Goal_Build_Plan_Explanation_View_Model {
 		$goal_source = isset( $plan_definition[ Build_Plan_Schema::KEY_GOAL_OVERLAY_SOURCE ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_GOAL_OVERLAY_SOURCE ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_GOAL_OVERLAY_SOURCE ]
 			: array();
-		$goal_key = isset( $goal_source['conversion_goal_key'] ) && is_string( $goal_source['conversion_goal_key'] )
+		$goal_key    = isset( $goal_source['conversion_goal_key'] ) && is_string( $goal_source['conversion_goal_key'] )
 			? trim( $goal_source['conversion_goal_key'] )
 			: '';
-		$applied = isset( $goal_source['applied'] ) && $goal_source['applied'] === true;
+		$applied     = isset( $goal_source['applied'] ) && $goal_source['applied'] === true;
 
 		$has_goal_context = $goal_key !== '';
 
-		$goal_label = $goal_key !== '' ? ( self::GOAL_LABELS[ $goal_key ] ?? self::humanize_goal_key( $goal_key ) ) : '';
+		$goal_label     = $goal_key !== '' ? ( self::GOAL_LABELS[ $goal_key ] ?? self::humanize_goal_key( $goal_key ) ) : '';
 		$rationale_line = '';
 		if ( $goal_key !== '' ) {
 			if ( $applied ) {
@@ -96,10 +96,10 @@ final class Conversion_Goal_Build_Plan_Explanation_View_Model {
 		}
 
 		return array(
-			self::KEY_HAS_GOAL_CONTEXT    => $has_goal_context,
-			self::KEY_CONVERSION_GOAL_KEY => $goal_key !== '' ? $goal_key : null,
+			self::KEY_HAS_GOAL_CONTEXT     => $has_goal_context,
+			self::KEY_CONVERSION_GOAL_KEY  => $goal_key !== '' ? $goal_key : null,
 			self::KEY_GOAL_OVERLAY_APPLIED => $applied,
-			self::KEY_GOAL_RATIONALE_LINE => $rationale_line,
+			self::KEY_GOAL_RATIONALE_LINE  => $rationale_line,
 			self::KEY_GOAL_INFLUENCE_NOTES => $goal_influence_notes,
 		);
 	}
@@ -115,7 +115,7 @@ final class Conversion_Goal_Build_Plan_Explanation_View_Model {
 		if ( empty( $goal_context[ self::KEY_HAS_GOAL_CONTEXT ] ) ) {
 			return $plan_view_model;
 		}
-		$plan_view_model['goal_context']    = $goal_context;
+		$plan_view_model['goal_context']     = $goal_context;
 		$plan_view_model['has_goal_context'] = true;
 		return $plan_view_model;
 	}

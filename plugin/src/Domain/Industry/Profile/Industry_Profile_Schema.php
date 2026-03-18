@@ -63,17 +63,17 @@ final class Industry_Profile_Schema {
 	 */
 	public static function get_empty_profile(): array {
 		return array(
-			self::FIELD_SCHEMA_VERSION        => self::SUPPORTED_SCHEMA_VERSION,
-			self::FIELD_PRIMARY_INDUSTRY_KEY  => '',
-			self::FIELD_SECONDARY_INDUSTRY_KEYS => array(),
-			self::FIELD_SUBTYPE               => '',
-			self::FIELD_INDUSTRY_SUBTYPE_KEY  => '',
-			self::FIELD_SERVICE_MODEL         => '',
-			self::FIELD_GEO_MODEL             => '',
-			self::FIELD_DERIVED_FLAGS         => array(),
-			self::FIELD_QUESTION_PACK_ANSWERS => array(),
-			self::FIELD_SELECTED_STARTER_BUNDLE_KEY => '',
-			self::FIELD_CONVERSION_GOAL_KEY => '',
+			self::FIELD_SCHEMA_VERSION                => self::SUPPORTED_SCHEMA_VERSION,
+			self::FIELD_PRIMARY_INDUSTRY_KEY          => '',
+			self::FIELD_SECONDARY_INDUSTRY_KEYS       => array(),
+			self::FIELD_SUBTYPE                       => '',
+			self::FIELD_INDUSTRY_SUBTYPE_KEY          => '',
+			self::FIELD_SERVICE_MODEL                 => '',
+			self::FIELD_GEO_MODEL                     => '',
+			self::FIELD_DERIVED_FLAGS                 => array(),
+			self::FIELD_QUESTION_PACK_ANSWERS         => array(),
+			self::FIELD_SELECTED_STARTER_BUNDLE_KEY   => '',
+			self::FIELD_CONVERSION_GOAL_KEY           => '',
 			self::FIELD_SECONDARY_CONVERSION_GOAL_KEY => '',
 		);
 	}
@@ -101,16 +101,25 @@ final class Industry_Profile_Schema {
 		if ( $version !== '' && ! self::is_supported_version( $version ) ) {
 			return self::get_empty_profile();
 		}
-		$primary = isset( $raw[ self::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $raw[ self::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$primary              = isset( $raw[ self::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $raw[ self::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( $raw[ self::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
-		$secondary = isset( $raw[ self::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $raw[ self::FIELD_SECONDARY_INDUSTRY_KEYS ] )
+		$secondary            = isset( $raw[ self::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $raw[ self::FIELD_SECONDARY_INDUSTRY_KEYS ] )
 			? $raw[ self::FIELD_SECONDARY_INDUSTRY_KEYS ]
 			: array();
-		$secondary = array_values( array_unique( array_filter( array_map( function ( $v ) {
-			return is_string( $v ) ? trim( $v ) : '';
-		}, $secondary ) ) ) );
-		$subtype = isset( $raw[ self::FIELD_SUBTYPE ] ) && is_string( $raw[ self::FIELD_SUBTYPE ] )
+		$secondary            = array_values(
+			array_unique(
+				array_filter(
+					array_map(
+						function ( $v ) {
+							return is_string( $v ) ? trim( $v ) : '';
+						},
+						$secondary
+					)
+				)
+			)
+		);
+		$subtype              = isset( $raw[ self::FIELD_SUBTYPE ] ) && is_string( $raw[ self::FIELD_SUBTYPE ] )
 			? trim( $raw[ self::FIELD_SUBTYPE ] )
 			: '';
 		$industry_subtype_key = isset( $raw[ self::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $raw[ self::FIELD_INDUSTRY_SUBTYPE_KEY ] )
@@ -119,19 +128,19 @@ final class Industry_Profile_Schema {
 		if ( $industry_subtype_key !== '' && strlen( $industry_subtype_key ) > 64 ) {
 			$industry_subtype_key = '';
 		}
-		$service_model = isset( $raw[ self::FIELD_SERVICE_MODEL ] ) && is_string( $raw[ self::FIELD_SERVICE_MODEL ] )
+		$service_model   = isset( $raw[ self::FIELD_SERVICE_MODEL ] ) && is_string( $raw[ self::FIELD_SERVICE_MODEL ] )
 			? trim( $raw[ self::FIELD_SERVICE_MODEL ] )
 			: '';
-		$geo_model = isset( $raw[ self::FIELD_GEO_MODEL ] ) && is_string( $raw[ self::FIELD_GEO_MODEL ] )
+		$geo_model       = isset( $raw[ self::FIELD_GEO_MODEL ] ) && is_string( $raw[ self::FIELD_GEO_MODEL ] )
 			? trim( $raw[ self::FIELD_GEO_MODEL ] )
 			: '';
-		$derived = isset( $raw[ self::FIELD_DERIVED_FLAGS ] ) && is_array( $raw[ self::FIELD_DERIVED_FLAGS ] )
+		$derived         = isset( $raw[ self::FIELD_DERIVED_FLAGS ] ) && is_array( $raw[ self::FIELD_DERIVED_FLAGS ] )
 			? $raw[ self::FIELD_DERIVED_FLAGS ]
 			: array();
-		$qp_answers = isset( $raw[ self::FIELD_QUESTION_PACK_ANSWERS ] ) && is_array( $raw[ self::FIELD_QUESTION_PACK_ANSWERS ] )
+		$qp_answers      = isset( $raw[ self::FIELD_QUESTION_PACK_ANSWERS ] ) && is_array( $raw[ self::FIELD_QUESTION_PACK_ANSWERS ] )
 			? $raw[ self::FIELD_QUESTION_PACK_ANSWERS ]
 			: array();
-		$qp_answers = self::normalize_question_pack_answers( $qp_answers );
+		$qp_answers      = self::normalize_question_pack_answers( $qp_answers );
 		$selected_bundle = isset( $raw[ self::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $raw[ self::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 			? trim( $raw[ self::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 			: '';
@@ -151,17 +160,17 @@ final class Industry_Profile_Schema {
 			$secondary_goal = '';
 		}
 		return array(
-			self::FIELD_SCHEMA_VERSION         => $version !== '' ? $version : self::SUPPORTED_SCHEMA_VERSION,
-			self::FIELD_PRIMARY_INDUSTRY_KEY   => $primary,
-			self::FIELD_SECONDARY_INDUSTRY_KEYS => $secondary,
-			self::FIELD_SUBTYPE                => $subtype,
-			self::FIELD_INDUSTRY_SUBTYPE_KEY   => $industry_subtype_key,
-			self::FIELD_SERVICE_MODEL          => $service_model,
-			self::FIELD_GEO_MODEL              => $geo_model,
-			self::FIELD_DERIVED_FLAGS          => $derived,
-			self::FIELD_QUESTION_PACK_ANSWERS  => $qp_answers,
-			self::FIELD_SELECTED_STARTER_BUNDLE_KEY => $selected_bundle,
-			self::FIELD_CONVERSION_GOAL_KEY    => $conversion_goal,
+			self::FIELD_SCHEMA_VERSION                => $version !== '' ? $version : self::SUPPORTED_SCHEMA_VERSION,
+			self::FIELD_PRIMARY_INDUSTRY_KEY          => $primary,
+			self::FIELD_SECONDARY_INDUSTRY_KEYS       => $secondary,
+			self::FIELD_SUBTYPE                       => $subtype,
+			self::FIELD_INDUSTRY_SUBTYPE_KEY          => $industry_subtype_key,
+			self::FIELD_SERVICE_MODEL                 => $service_model,
+			self::FIELD_GEO_MODEL                     => $geo_model,
+			self::FIELD_DERIVED_FLAGS                 => $derived,
+			self::FIELD_QUESTION_PACK_ANSWERS         => $qp_answers,
+			self::FIELD_SELECTED_STARTER_BUNDLE_KEY   => $selected_bundle,
+			self::FIELD_CONVERSION_GOAL_KEY           => $conversion_goal,
 			self::FIELD_SECONDARY_CONVERSION_GOAL_KEY => $secondary_goal,
 		);
 	}

@@ -127,7 +127,7 @@ final class Industry_Compliance_Rule_Registry {
 				continue;
 			}
 			$this->by_key[ $rule_key ] = $rule;
-			$this->all[]              = $rule;
+			$this->all[]               = $rule;
 		}
 	}
 
@@ -158,7 +158,7 @@ final class Industry_Compliance_Rule_Registry {
 	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_industry( string $industry_key ): array {
-		$i = trim( $industry_key );
+		$i   = trim( $industry_key );
 		$out = array();
 		foreach ( $this->all as $rule ) {
 			$ik = isset( $rule[ self::FIELD_INDUSTRY_KEY ] ) && is_string( $rule[ self::FIELD_INDUSTRY_KEY ] )

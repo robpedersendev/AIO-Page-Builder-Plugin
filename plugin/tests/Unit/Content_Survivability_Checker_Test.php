@@ -34,7 +34,7 @@ final class Content_Survivability_Checker_Test extends TestCase {
 	}
 
 	public function test_failing_content_with_plugin_shortcode_returns_not_survivable(): void {
-		$content = "<!-- wp:html --><div>Before [aio_some_widget] after</div><!-- /wp:html -->";
+		$content = '<!-- wp:html --><div>Before [aio_some_widget] after</div><!-- /wp:html -->';
 		$checker = new Content_Survivability_Checker();
 		$result  = $checker->check( $content );
 
@@ -44,7 +44,7 @@ final class Content_Survivability_Checker_Test extends TestCase {
 	}
 
 	public function test_failing_content_with_unreplaced_token_returns_not_survivable(): void {
-		$content = "<!-- wp:html --><p>Hello {{ first_name }} welcome</p><!-- /wp:html -->";
+		$content = '<!-- wp:html --><p>Hello {{ first_name }} welcome</p><!-- /wp:html -->';
 		$checker = new Content_Survivability_Checker();
 		$result  = $checker->check( $content );
 
@@ -53,7 +53,7 @@ final class Content_Survivability_Checker_Test extends TestCase {
 	}
 
 	public function test_check_with_context_sets_dynamic_output_flags(): void {
-		$content = "<!-- wp:generateblocks/container --><div>X</div><!-- /wp:generateblocks/container -->";
+		$content = '<!-- wp:generateblocks/container --><div>X</div><!-- /wp:generateblocks/container -->';
 		$context = array( 'survivability_notes' => array( 'durable_native_blocks', 'generateblocks_compatible' ) );
 		$checker = new Content_Survivability_Checker();
 		$result  = $checker->check( $content, $context );
@@ -72,8 +72,8 @@ final class Content_Survivability_Checker_Test extends TestCase {
 			array( 'durable_native_blocks' ),
 			array()
 		);
-		$checker = new Content_Survivability_Checker();
-		$result  = $checker->check_assembly_result( $assembly );
+		$checker  = new Content_Survivability_Checker();
+		$result   = $checker->check_assembly_result( $assembly );
 
 		$this->assertTrue( $result->is_survivable() );
 		$this->assertEmpty( $result->get_prohibited_runtime_dependencies() );

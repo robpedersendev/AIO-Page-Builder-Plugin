@@ -31,7 +31,7 @@ final class Global_Component_Override_Form_Builder_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->plugin_root = dirname( __DIR__, 2 );
-		$key = \AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema::OPTION_KEY;
+		$key               = \AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
 		}
@@ -42,12 +42,12 @@ final class Global_Component_Override_Form_Builder_Test extends TestCase {
 	}
 
 	public function test_field_definitions_include_only_approved_components(): void {
-		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
-		$comp_reg = new Component_Override_Registry( $loader );
-		$token_reg = new Style_Token_Registry( $loader );
-		$repo     = new Global_Style_Settings_Repository( null, $comp_reg );
-		$builder  = new Global_Component_Override_Form_Builder( $comp_reg, $repo, $token_reg );
-		$defs     = $builder->get_field_definitions();
+		$loader      = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$comp_reg    = new Component_Override_Registry( $loader );
+		$token_reg   = new Style_Token_Registry( $loader );
+		$repo        = new Global_Style_Settings_Repository( null, $comp_reg );
+		$builder     = new Global_Component_Override_Form_Builder( $comp_reg, $repo, $token_reg );
+		$defs        = $builder->get_field_definitions();
 		$allowed_ids = $comp_reg->get_component_ids();
 		foreach ( $defs as $def ) {
 			$this->assertContains( $def['component_id'], $allowed_ids );

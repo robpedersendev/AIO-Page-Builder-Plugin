@@ -22,7 +22,7 @@ final class Build_Plan_Statuses {
 	public const ROOT_REJECTED       = 'rejected';
 	public const ROOT_IN_PROGRESS    = 'in_progress';
 	public const ROOT_COMPLETED      = 'completed';
-	public const ROOT_SUPERSEDED    = 'superseded';
+	public const ROOT_SUPERSEDED     = 'superseded';
 
 	public const ROOT_STATUSES = array(
 		self::ROOT_PENDING_REVIEW,
@@ -41,12 +41,12 @@ final class Build_Plan_Statuses {
 	);
 
 	/** Step statuses (build-plan-state-machine.md §4). */
-	public const STEP_PENDING    = 'pending';
+	public const STEP_PENDING     = 'pending';
 	public const STEP_IN_PROGRESS = 'in_progress';
-	public const STEP_BLOCKED    = 'blocked';
-	public const STEP_REVIEWED   = 'reviewed';
-	public const STEP_COMPLETED  = 'completed';
-	public const STEP_SKIPPED    = 'skipped';
+	public const STEP_BLOCKED     = 'blocked';
+	public const STEP_REVIEWED    = 'reviewed';
+	public const STEP_COMPLETED   = 'completed';
+	public const STEP_SKIPPED     = 'skipped';
 
 	public const STEP_STATUSES = array(
 		self::STEP_PENDING,

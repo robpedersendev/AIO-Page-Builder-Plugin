@@ -48,13 +48,13 @@ final class Conversion_Goal_Preview_Influence_View_Model {
 	private string $goal_preset_context;
 
 	/**
-	 * @param bool   $has_goal
-	 * @param string $goal_key
-	 * @param string $goal_label
-	 * @param bool   $helper_refinement_applied
-	 * @param bool   $onepager_refinement_applied
+	 * @param bool         $has_goal
+	 * @param string       $goal_key
+	 * @param string       $goal_label
+	 * @param bool         $helper_refinement_applied
+	 * @param bool         $onepager_refinement_applied
 	 * @param list<string> $goal_caution_notes
-	 * @param string $goal_preset_context
+	 * @param string       $goal_preset_context
 	 */
 	public function __construct(
 		bool $has_goal,
@@ -129,7 +129,7 @@ final class Conversion_Goal_Preview_Influence_View_Model {
 			'valuations'    => 'Valuations',
 			'lead_capture'  => 'Lead capture',
 		);
-		$k = trim( $goal_key );
+		$k   = trim( $goal_key );
 		return $map[ $k ] ?? $k;
 	}
 

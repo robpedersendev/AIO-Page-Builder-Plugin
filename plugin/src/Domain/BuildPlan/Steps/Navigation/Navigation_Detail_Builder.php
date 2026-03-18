@@ -44,9 +44,12 @@ final class Navigation_Detail_Builder {
 		$sections[] = $this->section_location_assignment( $payload );
 		$sections[] = $this->section_validation( $payload );
 
-		return array_filter( $sections, static function ( $s ) {
-			return $s !== null && is_array( $s );
-		} );
+		return array_filter(
+			$sections,
+			static function ( $s ) {
+				return $s !== null && is_array( $s );
+			}
+		);
 	}
 
 	private function section_navigation_context( array $payload ): array {
@@ -60,11 +63,11 @@ final class Navigation_Detail_Builder {
 	}
 
 	private function section_current_vs_proposed( array $payload ): array {
-		$current   = $payload['current_structure'] ?? $payload['current_menu_name'] ?? '';
-		$proposed  = $payload['proposed_structure'] ?? $payload['proposed_menu_name'] ?? '';
-		$lines = array();
-		$lines[] = \__( 'Current:', 'aio-page-builder' ) . ' ' . ( is_string( $current ) ? \esc_html( $current ) : \esc_html( (string) \wp_json_encode( $current ) ) );
-		$lines[] = \__( 'Proposed:', 'aio-page-builder' ) . ' ' . ( is_string( $proposed ) ? \esc_html( $proposed ) : \esc_html( (string) \wp_json_encode( $proposed ) ) );
+		$current  = $payload['current_structure'] ?? $payload['current_menu_name'] ?? '';
+		$proposed = $payload['proposed_structure'] ?? $payload['proposed_menu_name'] ?? '';
+		$lines    = array();
+		$lines[]  = \__( 'Current:', 'aio-page-builder' ) . ' ' . ( is_string( $current ) ? \esc_html( $current ) : \esc_html( (string) \wp_json_encode( $current ) ) );
+		$lines[]  = \__( 'Proposed:', 'aio-page-builder' ) . ' ' . ( is_string( $proposed ) ? \esc_html( $proposed ) : \esc_html( (string) \wp_json_encode( $proposed ) ) );
 		return array(
 			Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'Current vs proposed navigation', 'aio-page-builder' ),
 			Detail_Panel_Component::SECTION_KEY_KEY     => 'current_vs_proposed',
@@ -92,11 +95,11 @@ final class Navigation_Detail_Builder {
 	}
 
 	private function section_menu_action( array $payload ): array {
-		$action    = (string) ( $payload['action'] ?? '' );
-		$current   = (string) ( $payload['current_menu_name'] ?? '' );
-		$proposed  = (string) ( $payload['proposed_menu_name'] ?? '' );
-		$lines = array();
-		$lines[] = \__( 'Action:', 'aio-page-builder' ) . ' ' . \esc_html( $action !== '' ? $action : '—' );
+		$action   = (string) ( $payload['action'] ?? '' );
+		$current  = (string) ( $payload['current_menu_name'] ?? '' );
+		$proposed = (string) ( $payload['proposed_menu_name'] ?? '' );
+		$lines    = array();
+		$lines[]  = \__( 'Action:', 'aio-page-builder' ) . ' ' . \esc_html( $action !== '' ? $action : '—' );
 		if ( $current !== '' ) {
 			$lines[] = \__( 'Current menu name:', 'aio-page-builder' ) . ' ' . \esc_html( $current );
 		}
@@ -144,7 +147,7 @@ final class Navigation_Detail_Builder {
 	}
 
 	private function section_location_assignment( array $payload ): array {
-		$loc = $payload['location_assignment'] ?? $payload['theme_location'] ?? '';
+		$loc   = $payload['location_assignment'] ?? $payload['theme_location'] ?? '';
 		$lines = array();
 		if ( is_string( $loc ) && $loc !== '' ) {
 			$lines[] = \esc_html( $loc );

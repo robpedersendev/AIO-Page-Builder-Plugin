@@ -53,14 +53,14 @@ final class Version_Snapshot_Service_Test extends TestCase {
 		parent::setUp();
 		$GLOBALS['_aio_post_meta'] = array();
 
-		$section_repo    = new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
-		$section_norm    = new \AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer();
-		$section_valid   = new \AIOPageBuilder\Domain\Registries\Section\Section_Validator( $section_norm, $section_repo );
+		$section_repo           = new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
+		$section_norm           = new \AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer();
+		$section_valid          = new \AIOPageBuilder\Domain\Registries\Section\Section_Validator( $section_norm, $section_repo );
 		$this->section_registry = new \AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service( $section_valid, $section_repo );
 
-		$page_repo  = new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
-		$page_norm  = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer();
-		$page_valid = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator( $page_norm, $page_repo, $this->section_registry );
+		$page_repo                    = new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
+		$page_norm                    = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer();
+		$page_valid                   = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator( $page_norm, $page_repo, $this->section_registry );
 		$this->page_template_registry = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Registry_Service( $page_valid, $page_repo );
 
 		$this->snapshot_repo    = new \AIOPageBuilder\Domain\Storage\Repositories\Version_Snapshot_Repository();
@@ -85,7 +85,7 @@ final class Version_Snapshot_Service_Test extends TestCase {
 	}
 
 	public function test_capture_section_registry_creates_snapshot(): void {
-		$GLOBALS['_aio_wp_query_posts'] = array();
+		$GLOBALS['_aio_wp_query_posts']        = array();
 		$GLOBALS['_aio_wp_insert_post_return'] = 8001;
 
 		$result = $this->service->capture_section_registry();
@@ -95,7 +95,15 @@ final class Version_Snapshot_Service_Test extends TestCase {
 		$this->assertSame( 8001, $result['post_id'] );
 		$this->assertEmpty( $result['errors'] );
 
-		$snap_post = new \WP_Post( array( 'ID' => 8001, 'post_type' => Object_Type_Keys::VERSION_SNAPSHOT, 'post_title' => 'Snap', 'post_status' => 'publish', 'post_name' => 'snap' ) );
+		$snap_post                      = new \WP_Post(
+			array(
+				'ID'          => 8001,
+				'post_type'   => Object_Type_Keys::VERSION_SNAPSHOT,
+				'post_title'  => 'Snap',
+				'post_status' => 'publish',
+				'post_name'   => 'snap',
+			)
+		);
 		$GLOBALS['_aio_wp_query_posts'] = array( $snap_post );
 
 		$def = $this->service->get_by_snapshot_id( $result['snapshot_id'] );
@@ -108,16 +116,24 @@ final class Version_Snapshot_Service_Test extends TestCase {
 	}
 
 	public function test_capture_page_template_registry_creates_snapshot(): void {
-		$GLOBALS['_aio_wp_query_posts'] = array();
+		$GLOBALS['_aio_wp_query_posts']        = array();
 		$GLOBALS['_aio_wp_insert_post_return'] = 8002;
 
 		$result = $this->service->capture_page_template_registry();
 
 		$this->assertTrue( $result['success'] );
 		$this->assertStringStartsWith( 'snap_', $result['snapshot_id'] );
-		$snap_post = new \WP_Post( array( 'ID' => 8002, 'post_type' => Object_Type_Keys::VERSION_SNAPSHOT, 'post_title' => 'Snap', 'post_status' => 'publish', 'post_name' => 'snap' ) );
+		$snap_post                      = new \WP_Post(
+			array(
+				'ID'          => 8002,
+				'post_type'   => Object_Type_Keys::VERSION_SNAPSHOT,
+				'post_title'  => 'Snap',
+				'post_status' => 'publish',
+				'post_name'   => 'snap',
+			)
+		);
 		$GLOBALS['_aio_wp_query_posts'] = array( $snap_post );
-		$def = $this->service->get_by_snapshot_id( $result['snapshot_id'] );
+		$def                            = $this->service->get_by_snapshot_id( $result['snapshot_id'] );
 		$this->assertNotNull( $def );
 		$this->assertSame( 'page_template_registry', $def[ Version_Snapshot_Schema::FIELD_SCOPE_ID ] );
 		$this->assertArrayHasKey( 'templates', $def['payload'] );
@@ -127,21 +143,32 @@ final class Version_Snapshot_Service_Test extends TestCase {
 		$GLOBALS['_aio_wp_insert_post_return'] = 8003;
 
 		$composition = array(
-			Composition_Schema::FIELD_COMPOSITION_ID   => 'comp_test_snap',
-			Composition_Schema::FIELD_NAME             => 'Test',
+			Composition_Schema::FIELD_COMPOSITION_ID       => 'comp_test_snap',
+			Composition_Schema::FIELD_NAME                 => 'Test',
 			Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(
-				array( Composition_Schema::SECTION_ITEM_KEY => 'st01_hero', Composition_Schema::SECTION_ITEM_POSITION => 0 ),
+				array(
+					Composition_Schema::SECTION_ITEM_KEY => 'st01_hero',
+					Composition_Schema::SECTION_ITEM_POSITION => 0,
+				),
 			),
-			Composition_Schema::FIELD_VALIDATION_STATUS => 'valid',
+			Composition_Schema::FIELD_VALIDATION_STATUS    => 'valid',
 		);
 
 		$result = $this->service->capture_composition_context( $composition );
 
 		$this->assertTrue( $result['success'] );
 		$this->assertStringStartsWith( 'snap_', $result['snapshot_id'] );
-		$snap_post = new \WP_Post( array( 'ID' => 8003, 'post_type' => Object_Type_Keys::VERSION_SNAPSHOT, 'post_title' => 'Snap', 'post_status' => 'publish', 'post_name' => 'snap' ) );
+		$snap_post                      = new \WP_Post(
+			array(
+				'ID'          => 8003,
+				'post_type'   => Object_Type_Keys::VERSION_SNAPSHOT,
+				'post_title'  => 'Snap',
+				'post_status' => 'publish',
+				'post_name'   => 'snap',
+			)
+		);
 		$GLOBALS['_aio_wp_query_posts'] = array( $snap_post );
-		$def = $this->service->get_by_snapshot_id( $result['snapshot_id'] );
+		$def                            = $this->service->get_by_snapshot_id( $result['snapshot_id'] );
 		$this->assertNotNull( $def );
 		$this->assertSame( 'comp_test_snap', $def[ Version_Snapshot_Schema::FIELD_SCOPE_ID ] );
 		$this->assertArrayHasKey( 'composition_id', $def['payload'] );
@@ -160,16 +187,18 @@ final class Version_Snapshot_Service_Test extends TestCase {
 
 	public function test_retrieval_by_id_and_snapshot_id(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 8004;
-		$capture = $this->service->capture_section_registry();
+		$capture                               = $this->service->capture_section_registry();
 		$this->assertTrue( $capture['success'] );
 
-		$snap_post = new \WP_Post( array(
-			'ID'          => 8004,
-			'post_type'   => Object_Type_Keys::VERSION_SNAPSHOT,
-			'post_title'  => 'Snap',
-			'post_status' => 'publish',
-			'post_name'   => 'snap_retrieval',
-		) );
+		$snap_post                       = new \WP_Post(
+			array(
+				'ID'          => 8004,
+				'post_type'   => Object_Type_Keys::VERSION_SNAPSHOT,
+				'post_title'  => 'Snap',
+				'post_status' => 'publish',
+				'post_name'   => 'snap_retrieval',
+			)
+		);
 		$GLOBALS['_aio_get_post_return'] = $snap_post;
 		$GLOBALS['_aio_wp_query_posts']  = array( $snap_post );
 
@@ -185,25 +214,35 @@ final class Version_Snapshot_Service_Test extends TestCase {
 		$GLOBALS['_aio_wp_insert_post_return'] = 8005;
 		$this->service->capture_section_registry();
 
-		$snap_post = new \WP_Post( array( 'ID' => 8005, 'post_type' => Object_Type_Keys::VERSION_SNAPSHOT, 'post_title' => 'Snap', 'post_status' => 'publish', 'post_name' => 'snap_abc' ) );
-		$GLOBALS['_aio_wp_query_posts'] = array( $snap_post );
+		$snap_post                         = new \WP_Post(
+			array(
+				'ID'          => 8005,
+				'post_type'   => Object_Type_Keys::VERSION_SNAPSHOT,
+				'post_title'  => 'Snap',
+				'post_status' => 'publish',
+				'post_name'   => 'snap_abc',
+			)
+		);
+		$GLOBALS['_aio_wp_query_posts']    = array( $snap_post );
 		$GLOBALS['_aio_post_meta']['8005'] = array(
-			'_aio_internal_key'       => 'snap_abc123',
+			'_aio_internal_key'        => 'snap_abc123',
 			'_aio_status'              => 'active',
 			'_aio_scope_type'          => Version_Snapshot_Schema::SCOPE_REGISTRY,
 			'_aio_scope_id'            => 'section_registry',
-			'_aio_snapshot_definition' => wp_json_encode( array(
-				'snapshot_id'   => 'snap_abc123',
-				'scope_type'    => Version_Snapshot_Schema::SCOPE_REGISTRY,
-				'scope_id'      => 'section_registry',
-				'created_at'    => '2025-07-15T10:00:00Z',
-				'schema_version' => '1',
-				'status'        => 'active',
-			) ),
+			'_aio_snapshot_definition' => wp_json_encode(
+				array(
+					'snapshot_id'    => 'snap_abc123',
+					'scope_type'     => Version_Snapshot_Schema::SCOPE_REGISTRY,
+					'scope_id'       => 'section_registry',
+					'created_at'     => '2025-07-15T10:00:00Z',
+					'schema_version' => '1',
+					'status'         => 'active',
+				)
+			),
 		);
 
 		$by_type = $this->service->list_by_scope_type( Version_Snapshot_Schema::SCOPE_REGISTRY, 10, 0 );
-		$by_id = $this->service->list_by_scope_id( 'section_registry', 10, 0 );
+		$by_id   = $this->service->list_by_scope_id( 'section_registry', 10, 0 );
 
 		$this->assertGreaterThanOrEqual( 0, count( $by_type ) );
 		$this->assertGreaterThanOrEqual( 0, count( $by_id ) );
@@ -211,19 +250,35 @@ final class Version_Snapshot_Service_Test extends TestCase {
 
 	public function test_attach_snapshot_reference_to_composition(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 8006;
-		$capture = $this->service->capture_section_registry();
+		$capture                               = $this->service->capture_section_registry();
 		$this->assertTrue( $capture['success'] );
 
-		$snap_post = new \WP_Post( array( 'ID' => 8006, 'post_type' => Object_Type_Keys::VERSION_SNAPSHOT, 'post_title' => 'Snap', 'post_status' => 'publish', 'post_name' => 'snap' ) );
-		$comp_post = new \WP_Post( array( 'ID' => 9001, 'post_type' => Object_Type_Keys::COMPOSITION, 'post_title' => 'Comp', 'post_status' => 'publish', 'post_name' => 'comp_attach' ) );
-		$comp_def = array(
-			Composition_Schema::FIELD_COMPOSITION_ID => 'comp_attach',
-			Composition_Schema::FIELD_NAME          => 'Attach Test',
-			Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(),
-			Composition_Schema::FIELD_STATUS        => 'draft',
+		$snap_post                         = new \WP_Post(
+			array(
+				'ID'          => 8006,
+				'post_type'   => Object_Type_Keys::VERSION_SNAPSHOT,
+				'post_title'  => 'Snap',
+				'post_status' => 'publish',
+				'post_name'   => 'snap',
+			)
 		);
-		$GLOBALS['_aio_get_post_return'] = $comp_post;
-		$GLOBALS['_aio_wp_query_posts']  = array( $snap_post, $comp_post );
+		$comp_post                         = new \WP_Post(
+			array(
+				'ID'          => 9001,
+				'post_type'   => Object_Type_Keys::COMPOSITION,
+				'post_title'  => 'Comp',
+				'post_status' => 'publish',
+				'post_name'   => 'comp_attach',
+			)
+		);
+		$comp_def                          = array(
+			Composition_Schema::FIELD_COMPOSITION_ID       => 'comp_attach',
+			Composition_Schema::FIELD_NAME                 => 'Attach Test',
+			Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(),
+			Composition_Schema::FIELD_STATUS               => 'draft',
+		);
+		$GLOBALS['_aio_get_post_return']   = $comp_post;
+		$GLOBALS['_aio_wp_query_posts']    = array( $snap_post, $comp_post );
 		$GLOBALS['_aio_post_meta']['9001'] = array(
 			'_aio_internal_key'           => 'comp_attach',
 			'_aio_status'                 => 'draft',
@@ -242,12 +297,12 @@ final class Version_Snapshot_Service_Test extends TestCase {
 		$sections = array(
 			array(
 				Section_Schema::FIELD_INTERNAL_KEY => 'st01_hero',
-				Section_Schema::FIELD_NAME        => 'Hero',
-				Section_Schema::FIELD_CATEGORY    => 'hero_intro',
-				Section_Schema::FIELD_STATUS      => 'active',
+				Section_Schema::FIELD_NAME         => 'Hero',
+				Section_Schema::FIELD_CATEGORY     => 'hero_intro',
+				Section_Schema::FIELD_STATUS       => 'active',
 			),
 		);
-		$payload = Snapshot_Payload_Builder::build_section_registry_payload( $sections );
+		$payload  = Snapshot_Payload_Builder::build_section_registry_payload( $sections );
 
 		$this->assertArrayHasKey( 'sections', $payload );
 		$this->assertArrayHasKey( 'captured_at', $payload );
@@ -258,8 +313,11 @@ final class Version_Snapshot_Service_Test extends TestCase {
 
 	public function test_prohibited_field_exclusion(): void {
 		$payload = array(
-			'sections' => array(
-				array( 'internal_key' => 'st01', 'api_key' => 'secret123' ),
+			'sections'    => array(
+				array(
+					'internal_key' => 'st01',
+					'api_key'      => 'secret123',
+				),
 			),
 			'captured_at' => '2025-07-15T10:00:00Z',
 		);
@@ -271,9 +329,15 @@ final class Version_Snapshot_Service_Test extends TestCase {
 	}
 
 	public function test_payload_without_prohibited_fields_passes(): void {
-		$payload = Snapshot_Payload_Builder::build_section_registry_payload( array(
-			array( 'internal_key' => 'st01', 'name' => 'Hero', 'status' => 'active' ),
-		) );
+		$payload = Snapshot_Payload_Builder::build_section_registry_payload(
+			array(
+				array(
+					'internal_key' => 'st01',
+					'name'         => 'Hero',
+					'status'       => 'active',
+				),
+			)
+		);
 		$this->assertTrue( Snapshot_Payload_Builder::has_no_prohibited_fields( $payload ) );
 	}
 

@@ -46,8 +46,8 @@ final class Operational_Snapshot_Service {
 		Pre_Change_Snapshot_Builder $pre_builder,
 		Post_Change_Result_Builder $post_builder
 	) {
-		$this->repository  = $repository;
-		$this->pre_builder = $pre_builder;
+		$this->repository   = $repository;
+		$this->pre_builder  = $pre_builder;
 		$this->post_builder = $post_builder;
 	}
 
@@ -80,7 +80,7 @@ final class Operational_Snapshot_Service {
 			return Operational_Snapshot_Result::failure( __( 'Could not build pre-change state.', 'aio-page-builder' ), array( 'build_failed' ) );
 		}
 
-		$action_id = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] )
+		$action_id   = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] )
 			? substr( preg_replace( '/[^a-zA-Z0-9_-]/', '', $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ), 0, 40 )
 			: 'pre';
 		$snapshot_id = 'op-snap-pre-' . $action_id . '-' . gmdate( 'Ymd\THis' ) . '-' . wp_rand( 100, 999 );
@@ -88,30 +88,30 @@ final class Operational_Snapshot_Service {
 			$snapshot_id = substr( $snapshot_id, 0, Operational_Snapshot_Schema::SNAPSHOT_ID_MAX_LENGTH );
 		}
 
-		$now = gmdate( 'c' );
-		$actor_ref = $this->resolve_actor_ref( $envelope );
-		$plan_id   = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] : '';
+		$now          = gmdate( 'c' );
+		$actor_ref    = $this->resolve_actor_ref( $envelope );
+		$plan_id      = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] : '';
 		$plan_item_id = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] : '';
 
 		$snapshot = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID     => $snapshot_id,
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE   => Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE,
-			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY  => $built['object_family'],
-			Operational_Snapshot_Schema::FIELD_TARGET_REF     => $built['target_ref'],
-			Operational_Snapshot_Schema::FIELD_CREATED_AT     => $now,
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => $snapshot_id,
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE,
+			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => $built['object_family'],
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => $built['target_ref'],
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => $now,
 			Operational_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
-			Operational_Snapshot_Schema::FIELD_PRE_CHANGE     => $built['pre_change'],
+			Operational_Snapshot_Schema::FIELD_PRE_CHANGE  => $built['pre_change'],
 			Operational_Snapshot_Schema::FIELD_EXECUTION_REF => $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ?? '',
 			Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF => $plan_id,
-			Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF  => $plan_item_id,
-			Operational_Snapshot_Schema::FIELD_ACTION_TYPE    => $action_type,
+			Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF => $plan_item_id,
+			Operational_Snapshot_Schema::FIELD_ACTION_TYPE => $action_type,
 			Operational_Snapshot_Schema::FIELD_ROLLBACK_ELIGIBLE => true,
-			Operational_Snapshot_Schema::FIELD_ROLLBACK_STATUS  => Operational_Snapshot_Schema::ROLLBACK_STATUS_AVAILABLE,
-			Operational_Snapshot_Schema::FIELD_RETENTION      => array(
+			Operational_Snapshot_Schema::FIELD_ROLLBACK_STATUS => Operational_Snapshot_Schema::ROLLBACK_STATUS_AVAILABLE,
+			Operational_Snapshot_Schema::FIELD_RETENTION   => array(
 				'retention_class' => Operational_Snapshot_Schema::RETENTION_CLASS_PLAN_LINKED,
 				'retention_notes' => 'Retain until plan archived',
 			),
-			Operational_Snapshot_Schema::FIELD_PROVENANCE     => array(
+			Operational_Snapshot_Schema::FIELD_PROVENANCE  => array(
 				'actor_ref'  => $actor_ref,
 				'trigger'    => 'pre_execution',
 				'source_ref' => $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ?? '',
@@ -146,7 +146,7 @@ final class Operational_Snapshot_Service {
 			return Operational_Snapshot_Result::failure( __( 'Could not build post-change result.', 'aio-page-builder' ), array( 'build_failed' ) );
 		}
 
-		$action_id = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] )
+		$action_id   = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] )
 			? substr( preg_replace( '/[^a-zA-Z0-9_-]/', '', $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ), 0, 40 )
 			: 'post';
 		$snapshot_id = 'op-snap-post-' . $action_id . '-' . gmdate( 'Ymd\THis' ) . '-' . wp_rand( 100, 999 );
@@ -154,30 +154,30 @@ final class Operational_Snapshot_Service {
 			$snapshot_id = substr( $snapshot_id, 0, Operational_Snapshot_Schema::SNAPSHOT_ID_MAX_LENGTH );
 		}
 
-		$now = gmdate( 'c' );
-		$actor_ref = $this->resolve_actor_ref( $envelope );
-		$plan_id   = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] : '';
+		$now          = gmdate( 'c' );
+		$actor_ref    = $this->resolve_actor_ref( $envelope );
+		$plan_id      = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] : '';
 		$plan_item_id = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] : '';
 
 		$snapshot = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID     => $snapshot_id,
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE   => Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE,
-			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY  => $built['object_family'],
-			Operational_Snapshot_Schema::FIELD_TARGET_REF     => $built['target_ref'],
-			Operational_Snapshot_Schema::FIELD_CREATED_AT     => $now,
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => $snapshot_id,
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE,
+			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => $built['object_family'],
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => $built['target_ref'],
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => $now,
 			Operational_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
-			Operational_Snapshot_Schema::FIELD_POST_CHANGE   => $built['post_change'],
+			Operational_Snapshot_Schema::FIELD_POST_CHANGE => $built['post_change'],
 			Operational_Snapshot_Schema::FIELD_EXECUTION_REF => $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ?? '',
 			Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF => $plan_id,
-			Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF  => $plan_item_id,
-			Operational_Snapshot_Schema::FIELD_ACTION_TYPE    => $action_type,
+			Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF => $plan_item_id,
+			Operational_Snapshot_Schema::FIELD_ACTION_TYPE => $action_type,
 			Operational_Snapshot_Schema::FIELD_ROLLBACK_ELIGIBLE => true,
-			Operational_Snapshot_Schema::FIELD_ROLLBACK_STATUS  => Operational_Snapshot_Schema::ROLLBACK_STATUS_AVAILABLE,
-			Operational_Snapshot_Schema::FIELD_RETENTION      => array(
+			Operational_Snapshot_Schema::FIELD_ROLLBACK_STATUS => Operational_Snapshot_Schema::ROLLBACK_STATUS_AVAILABLE,
+			Operational_Snapshot_Schema::FIELD_RETENTION   => array(
 				'retention_class' => Operational_Snapshot_Schema::RETENTION_CLASS_PLAN_LINKED,
 				'retention_notes' => 'Retain until plan archived',
 			),
-			Operational_Snapshot_Schema::FIELD_PROVENANCE     => array(
+			Operational_Snapshot_Schema::FIELD_PROVENANCE  => array(
 				'actor_ref'  => $actor_ref,
 				'trigger'    => 'post_execution',
 				'source_ref' => $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ?? '',

@@ -53,10 +53,10 @@ final class Template_Menu_Apply_Result {
 		array $per_item_status,
 		array $artifacts
 	) {
-		$this->success          = $success;
-		$this->message          = $message;
-		$this->errors           = $errors;
-		$this->menu_id          = $menu_id;
+		$this->success           = $success;
+		$this->message           = $message;
+		$this->errors            = $errors;
+		$this->menu_id           = $menu_id;
 		$this->validation_result = $validation_result;
 		$this->hierarchy_summary = $hierarchy_summary;
 		$this->per_item_status   = $per_item_status;
@@ -107,13 +107,13 @@ final class Template_Menu_Apply_Result {
 	 */
 	public function to_menu_apply_execution_result(): array {
 		return array(
-			'success'                    => $this->success,
-			'message'                    => $this->message,
-			'menu_id'                    => $this->menu_id,
+			'success'                       => $this->success,
+			'message'                       => $this->message,
+			'menu_id'                       => $this->menu_id,
 			'menu_target_validation_result' => $this->validation_result,
-			'navigation_hierarchy_summary'   => $this->hierarchy_summary,
-			'per_item_status'            => $this->per_item_status,
-			'errors'                     => $this->errors,
+			'navigation_hierarchy_summary'  => $this->hierarchy_summary,
+			'per_item_status'               => $this->per_item_status,
+			'errors'                        => $this->errors,
 		);
 	}
 
@@ -125,14 +125,14 @@ final class Template_Menu_Apply_Result {
 	public function to_handler_result(): array {
 		$artifacts = array_merge(
 			array(
-				'menu_id'                        => $this->menu_id,
-				'menu_apply_execution_result'    => $this->to_menu_apply_execution_result(),
-				'navigation_hierarchy_summary'   => $this->hierarchy_summary,
+				'menu_id'                       => $this->menu_id,
+				'menu_apply_execution_result'   => $this->to_menu_apply_execution_result(),
+				'navigation_hierarchy_summary'  => $this->hierarchy_summary,
 				'menu_target_validation_result' => $this->validation_result,
 			),
 			$this->artifacts
 		);
-		$out = array(
+		$out       = array(
 			'success'   => $this->success,
 			'message'   => $this->message,
 			'artifacts' => $artifacts,
@@ -146,11 +146,11 @@ final class Template_Menu_Apply_Result {
 	/**
 	 * Success factory.
 	 *
-	 * @param int                   $menu_id
-	 * @param array<string, mixed>   $validation_result
-	 * @param array<string, mixed>   $hierarchy_summary
+	 * @param int                        $menu_id
+	 * @param array<string, mixed>       $validation_result
+	 * @param array<string, mixed>       $hierarchy_summary
 	 * @param list<array<string, mixed>> $per_item_status
-	 * @param array<string, mixed>   $artifacts
+	 * @param array<string, mixed>       $artifacts
 	 * @return self
 	 */
 	public static function success(
@@ -175,10 +175,10 @@ final class Template_Menu_Apply_Result {
 	/**
 	 * Failure factory. Missing location must be visible (no silent skip).
 	 *
-	 * @param string    $message
-	 * @param list<string> $errors
-	 * @param array<string, mixed> $validation_result
-	 * @param array<string, mixed> $hierarchy_summary
+	 * @param string                     $message
+	 * @param list<string>               $errors
+	 * @param array<string, mixed>       $validation_result
+	 * @param array<string, mixed>       $hierarchy_summary
 	 * @param list<array<string, mixed>> $per_item_status
 	 * @return self
 	 */

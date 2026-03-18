@@ -20,18 +20,18 @@ final class Settings_Service {
 
 	/** @var array<string, array<string, mixed>|array> Default structure per option key. */
 	private const DEFAULTS = array(
-		Option_Names::MAIN_SETTINGS                 => array(),
-		Option_Names::VERSION_MARKERS               => array(),
-		Option_Names::REPORTING_SETTINGS            => array(),
-		Option_Names::DEPENDENCY_NOTICE_DISMISSALS  => array(),
-		Option_Names::UNINSTALL_PREFS               => array(),
-		Option_Names::PROVIDER_CONFIG_REF           => array(),
-		Option_Names::PROVIDER_HEALTH_STATE         => array(),
-		Option_Names::PROFILE_CURRENT               => array(),
-		Option_Names::INDUSTRY_PROFILE              => array(),
-		Option_Names::ONBOARDING_DRAFT              => array(),
-		Option_Names::PROMPT_EXPERIMENTS            => array( 'definitions' => array() ),
-		Option_Names::DISABLED_INDUSTRY_PACKS       => array(),
+		Option_Names::MAIN_SETTINGS                => array(),
+		Option_Names::VERSION_MARKERS              => array(),
+		Option_Names::REPORTING_SETTINGS           => array(),
+		Option_Names::DEPENDENCY_NOTICE_DISMISSALS => array(),
+		Option_Names::UNINSTALL_PREFS              => array(),
+		Option_Names::PROVIDER_CONFIG_REF          => array(),
+		Option_Names::PROVIDER_HEALTH_STATE        => array(),
+		Option_Names::PROFILE_CURRENT              => array(),
+		Option_Names::INDUSTRY_PROFILE             => array(),
+		Option_Names::ONBOARDING_DRAFT             => array(),
+		Option_Names::PROMPT_EXPERIMENTS           => array( 'definitions' => array() ),
+		Option_Names::DISABLED_INDUSTRY_PACKS      => array(),
 	);
 
 	/**

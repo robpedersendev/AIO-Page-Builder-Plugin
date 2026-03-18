@@ -18,7 +18,7 @@ require_once $plugin_root . '/src/Domain/Crawler/Discovery/Discovery_Result.php'
 final class Discovery_Result_Test extends TestCase {
 
 	public function test_to_array_contains_all_fields(): void {
-		$r = new Discovery_Result( 'https://example.com/', Discovery_Result::SOURCE_SEED, Discovery_Result::STATUS_ACCEPTED, null, 'https://example.com/' );
+		$r   = new Discovery_Result( 'https://example.com/', Discovery_Result::SOURCE_SEED, Discovery_Result::STATUS_ACCEPTED, null, 'https://example.com/' );
 		$arr = $r->to_array();
 		$this->assertSame( 'https://example.com/', $arr['normalized_url'] );
 		$this->assertSame( Discovery_Result::SOURCE_SEED, $arr['discovery_source'] );

@@ -199,7 +199,10 @@ final class Plugin {
 			\wp_die(
 				\esc_html( $result->message ?: 'Plugin activation failed.' ),
 				'Activation Failed',
-				array( 'response' => 500, 'back_link' => true )
+				array(
+					'response'  => 500,
+					'back_link' => true,
+				)
 			);
 		}
 	}

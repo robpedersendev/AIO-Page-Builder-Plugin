@@ -45,7 +45,7 @@ final class Industry_Section_Helper_Overlay_Registry_Test extends TestCase {
 
 	public function test_load_skips_invalid_scope(): void {
 		$registry = new Industry_Section_Helper_Overlay_Registry();
-		$ov = $this->valid_overlay();
+		$ov       = $this->valid_overlay();
 		$ov[ Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE ] = 'wrong_scope';
 		$registry->load( array( $ov ) );
 		$this->assertNull( $registry->get( 'legal', 'st01_hero' ) );
@@ -54,27 +54,29 @@ final class Industry_Section_Helper_Overlay_Registry_Test extends TestCase {
 
 	public function test_load_skips_invalid_industry_key(): void {
 		$registry = new Industry_Section_Helper_Overlay_Registry();
-		$ov = $this->valid_overlay( 'Invalid Key!', 'st01_hero' );
+		$ov       = $this->valid_overlay( 'Invalid Key!', 'st01_hero' );
 		$registry->load( array( $ov ) );
 		$this->assertCount( 0, $registry->get_all() );
 	}
 
 	public function test_get_for_industry_returns_only_that_industry(): void {
 		$registry = new Industry_Section_Helper_Overlay_Registry();
-		$registry->load( array(
-			$this->valid_overlay( 'legal', 'st01_hero' ),
-			$this->valid_overlay( 'healthcare', 'st01_hero' ),
-			$this->valid_overlay( 'legal', 'cta_contact_01' ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_overlay( 'legal', 'st01_hero' ),
+				$this->valid_overlay( 'healthcare', 'st01_hero' ),
+				$this->valid_overlay( 'legal', 'cta_contact_01' ),
+			)
+		);
 		$legal = $registry->get_for_industry( 'legal' );
 		$this->assertCount( 2, $legal );
 	}
 
 	public function test_load_duplicate_composite_key_first_wins(): void {
-		$registry = new Industry_Section_Helper_Overlay_Registry();
-		$first  = $this->valid_overlay( 'legal', 'st01_hero' );
-		$first['tone_notes'] = 'First';
-		$second = $this->valid_overlay( 'legal', 'st01_hero' );
+		$registry             = new Industry_Section_Helper_Overlay_Registry();
+		$first                = $this->valid_overlay( 'legal', 'st01_hero' );
+		$first['tone_notes']  = 'First';
+		$second               = $this->valid_overlay( 'legal', 'st01_hero' );
 		$second['tone_notes'] = 'Second';
 		$registry->load( array( $first, $second ) );
 		$ov = $registry->get( 'legal', 'st01_hero' );

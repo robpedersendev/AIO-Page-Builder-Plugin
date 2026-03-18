@@ -42,7 +42,7 @@ final class Provider_Connection_Test_Service_Test extends TestCase {
 
 	private function stub_store_with_credential(): Provider_Secret_Store_Interface {
 		$store = new class() implements Provider_Secret_Store_Interface {
-			private array $creds = array( 'stub' => 'key' );
+			private array $creds  = array( 'stub' => 'key' );
 			private array $states = array( 'stub' => Provider_Secret_Store_Interface::STATE_CONFIGURED );
 
 			public function get_credential_for_provider( string $provider_id ): ?string {
@@ -55,7 +55,7 @@ final class Provider_Connection_Test_Service_Test extends TestCase {
 				return isset( $this->creds[ $provider_id ] );
 			}
 			public function set_credential( string $provider_id, string $value ): bool {
-				$this->creds[ $provider_id ]   = $value;
+				$this->creds[ $provider_id ]  = $value;
 				$this->states[ $provider_id ] = self::STATE_PENDING_VALIDATION;
 				return true;
 			}

@@ -32,7 +32,7 @@ final class Entity_Style_Form_Builder_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->plugin_root = dirname( __DIR__, 2 );
-		$key = Entity_Style_Payload_Schema::OPTION_KEY;
+		$key               = Entity_Style_Payload_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
 		}
@@ -66,7 +66,7 @@ final class Entity_Style_Form_Builder_Test extends TestCase {
 	}
 
 	public function test_load_saved_payload_into_field_values(): void {
-		$repo = new Entity_Style_Payload_Repository();
+		$repo    = new Entity_Style_Payload_Repository();
 		$payload = array(
 			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => '1',
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'primary' => '#abc' ) ),

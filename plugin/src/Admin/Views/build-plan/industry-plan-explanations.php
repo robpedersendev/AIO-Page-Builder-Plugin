@@ -62,7 +62,7 @@ if ( $fit_classification === 'recommended' ) {
 			</p>
 		<?php endif; ?>
 		<?php
-		$conflict_results = $view_model['conflict_results'] ?? array();
+		$conflict_results    = $view_model['conflict_results'] ?? array();
 		$explanation_summary = (string) ( $view_model['explanation_summary'] ?? '' );
 		if ( ! empty( $conflict_results ) || $explanation_summary !== '' ) :
 			?>
@@ -79,7 +79,7 @@ if ( $fit_classification === 'recommended' ) {
 				<ul class="aio-industry-compliance-cautions-list">
 					<?php foreach ( $compliance_cautions as $c ) : ?>
 						<?php
-						$summary = isset( $c['caution_summary'] ) && is_string( $c['caution_summary'] ) ? $c['caution_summary'] : '';
+						$summary  = isset( $c['caution_summary'] ) && is_string( $c['caution_summary'] ) ? $c['caution_summary'] : '';
 						$severity = isset( $c['severity'] ) && is_string( $c['severity'] ) ? $c['severity'] : 'info';
 						if ( $summary === '' ) {
 							continue;

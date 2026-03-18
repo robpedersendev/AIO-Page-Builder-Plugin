@@ -46,7 +46,7 @@ final class Repository_Interface_Conformance_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$wpdb = (object) array( 'prefix' => 'wp_' );
+		$wpdb               = (object) array( 'prefix' => 'wp_' );
 		$this->repositories = array(
 			new Section_Template_Repository(),
 			new Page_Template_Repository(),

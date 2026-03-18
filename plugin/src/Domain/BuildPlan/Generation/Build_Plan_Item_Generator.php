@@ -22,17 +22,17 @@ use AIOPageBuilder\Domain\Industry\AI\Industry_Build_Plan_Scoring_Service;
  */
 final class Build_Plan_Item_Generator {
 
-	public const REASON_INSUFFICIENT_DATA   = 'insufficient_data';
-	public const REASON_INVALID_REFERENCE   = 'invalid_reference';
+	public const REASON_INSUFFICIENT_DATA    = 'insufficient_data';
+	public const REASON_INVALID_REFERENCE    = 'invalid_reference';
 	public const REASON_TEMPLATE_UNAVAILABLE = 'template_unavailable';
-	public const REASON_SKIPPED_BY_POLICY   = 'skipped_by_policy';
+	public const REASON_SKIPPED_BY_POLICY    = 'skipped_by_policy';
 
 	/**
 	 * Generates plan items for a normalized output section. Returns items and omitted entries.
 	 *
-	 * @param string               $section        Build_Plan_Draft_Schema section key (e.g. existing_page_changes).
+	 * @param string                           $section        Build_Plan_Draft_Schema section key (e.g. existing_page_changes).
 	 * @param array<int, array<string, mixed>> $records Array of record maps from normalized output.
-	 * @param string               $item_id_prefix Prefix for item_id (e.g. plan_xxx).
+	 * @param string                           $item_id_prefix Prefix for item_id (e.g. plan_xxx).
 	 * @return array{items: array<int, array<string, mixed>>, omitted: array<int, array<string, mixed>>}
 	 */
 	public function generate_for_section( string $section, array $records, string $item_id_prefix ): array {
@@ -51,7 +51,10 @@ final class Build_Plan_Item_Generator {
 			case Build_Plan_Draft_Schema::KEY_SEO_RECOMMENDATIONS:
 				return $this->map_seo( $records, $item_id_prefix );
 			default:
-				return array( 'items' => array(), 'omitted' => array() );
+				return array(
+					'items'   => array(),
+					'omitted' => array(),
+				);
 		}
 	}
 
@@ -104,7 +107,7 @@ final class Build_Plan_Item_Generator {
 			}
 			if ( isset( $rec['target_template_key'] ) && is_string( $rec['target_template_key'] ) && trim( $rec['target_template_key'] ) !== '' ) {
 				$payload['target_template_key'] = trim( $rec['target_template_key'] );
-				$payload['template_key']         = trim( $rec['target_template_key'] );
+				$payload['template_key']        = trim( $rec['target_template_key'] );
 			}
 			$this->merge_industry_metadata_into_payload( $payload, $rec );
 			$item_id = $prefix . '_epc_' . $i;
@@ -117,7 +120,10 @@ final class Build_Plan_Item_Generator {
 				$rec
 			);
 		}
-		return array( 'items' => $items, 'omitted' => $omitted );
+		return array(
+			'items'   => $items,
+			'omitted' => $omitted,
+		);
 	}
 
 	/**
@@ -168,7 +174,10 @@ final class Build_Plan_Item_Generator {
 				$rec
 			);
 		}
-		return array( 'items' => $items, 'omitted' => $omitted );
+		return array(
+			'items'   => $items,
+			'omitted' => $omitted,
+		);
 	}
 
 	/**
@@ -204,7 +213,7 @@ final class Build_Plan_Item_Generator {
 				$item_id,
 				Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE,
 				array(
-					'menu_context'        => (string) ( $rec[ Build_Plan_Draft_Schema::MCP_MENU_CONTEXT ] ?? '' ),
+					'menu_context'       => (string) ( $rec[ Build_Plan_Draft_Schema::MCP_MENU_CONTEXT ] ?? '' ),
 					'action'             => (string) ( $rec[ Build_Plan_Draft_Schema::MCP_ACTION ] ?? '' ),
 					'proposed_menu_name' => (string) ( $rec['proposed_menu_name'] ?? '' ),
 					'items'              => is_array( $rec['items'] ?? null ) ? $rec['items'] : array(),
@@ -214,7 +223,10 @@ final class Build_Plan_Item_Generator {
 				$rec
 			);
 		}
-		return array( 'items' => $items, 'omitted' => $omitted );
+		return array(
+			'items'   => $items,
+			'omitted' => $omitted,
+		);
 	}
 
 	/**
@@ -250,18 +262,21 @@ final class Build_Plan_Item_Generator {
 				$item_id,
 				Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN,
 				array(
-					'token_group'     => (string) ( $rec[ Build_Plan_Draft_Schema::DTR_TOKEN_GROUP ] ?? '' ),
-					'token_name'      => (string) ( $rec['token_name'] ?? '' ),
-					'proposed_value'  => $rec['proposed_value'] ?? '',
-					'rationale'       => (string) ( $rec['rationale'] ?? '' ),
-					'confidence'      => (string) ( $rec['confidence'] ?? 'medium' ),
+					'token_group'    => (string) ( $rec[ Build_Plan_Draft_Schema::DTR_TOKEN_GROUP ] ?? '' ),
+					'token_name'     => (string) ( $rec['token_name'] ?? '' ),
+					'proposed_value' => $rec['proposed_value'] ?? '',
+					'rationale'      => (string) ( $rec['rationale'] ?? '' ),
+					'confidence'     => (string) ( $rec['confidence'] ?? 'medium' ),
 				),
 				Build_Plan_Draft_Schema::KEY_DESIGN_TOKEN_RECOMMENDATIONS,
 				$i,
 				$rec
 			);
 		}
-		return array( 'items' => $items, 'omitted' => $omitted );
+		return array(
+			'items'   => $items,
+			'omitted' => $omitted,
+		);
 	}
 
 	/**
@@ -305,7 +320,10 @@ final class Build_Plan_Item_Generator {
 				$rec
 			);
 		}
-		return array( 'items' => $items, 'omitted' => $omitted );
+		return array(
+			'items'   => $items,
+			'omitted' => $omitted,
+		);
 	}
 
 	/**
@@ -315,12 +333,12 @@ final class Build_Plan_Item_Generator {
 	 */
 	private function build_item( string $item_id, string $item_type, array $payload, string $source_section, int $source_index, array $record_snapshot = array() ): array {
 		$item = array(
-			Build_Plan_Item_Schema::KEY_ITEM_ID   => $item_id,
-			Build_Plan_Item_Schema::KEY_ITEM_TYPE => $item_type,
-			Build_Plan_Item_Schema::KEY_PAYLOAD   => $payload,
+			Build_Plan_Item_Schema::KEY_ITEM_ID        => $item_id,
+			Build_Plan_Item_Schema::KEY_ITEM_TYPE      => $item_type,
+			Build_Plan_Item_Schema::KEY_PAYLOAD        => $payload,
 			Build_Plan_Item_Schema::KEY_SOURCE_SECTION => $source_section,
 			Build_Plan_Item_Schema::KEY_SOURCE_INDEX   => $source_index,
-			Build_Plan_Item_Schema::KEY_STATUS   => Build_Plan_Item_Statuses::PENDING,
+			Build_Plan_Item_Schema::KEY_STATUS         => Build_Plan_Item_Statuses::PENDING,
 		);
 		if ( isset( $payload['confidence'] ) ) {
 			$item[ Build_Plan_Item_Schema::KEY_CONFIDENCE ] = $payload['confidence'];

@@ -65,10 +65,10 @@ final class Animation_Runtime_Test extends TestCase {
 	 */
 	public function test_example_animation_resolution_payload(): void {
 		$resolver = new Animation_Tier_Resolver();
-		$section = array(
-			'animation_tier'             => 'subtle',
-			'animation_families'         => array( 'entrance', 'hover' ),
-			'reduced_motion_behavior'    => 'honor',
+		$section  = array(
+			'animation_tier'          => 'subtle',
+			'animation_families'      => array( 'entrance', 'hover' ),
+			'reduced_motion_behavior' => 'honor',
 		);
 		$resolved = $resolver->resolve( $section, null, false );
 		$this->assertSame( 'subtle', $resolved['effective_tier'] );
@@ -82,7 +82,7 @@ final class Animation_Runtime_Test extends TestCase {
 	 */
 	public function test_fallback_resolution_payload(): void {
 		$resolver = new Animation_Tier_Resolver();
-		$section = array(
+		$section  = array(
 			'animation_tier'          => 'enhanced',
 			'animation_families'      => array( 'entrance', 'scroll' ),
 			'reduced_motion_behavior' => 'honor',
@@ -96,11 +96,11 @@ final class Animation_Runtime_Test extends TestCase {
 
 	public function test_resolver_page_cap_limits_tier(): void {
 		$resolver = new Animation_Tier_Resolver();
-		$section = array(
-			'animation_tier'       => 'premium',
-			'animation_families'  => array( 'entrance', 'scroll' ),
+		$section  = array(
+			'animation_tier'     => 'premium',
+			'animation_families' => array( 'entrance', 'scroll' ),
 		);
-		$page = array( 'animation_tier_cap' => 'enhanced' );
+		$page     = array( 'animation_tier_cap' => 'enhanced' );
 		$resolved = $resolver->resolve( $section, $page, false );
 		$this->assertSame( 'enhanced', $resolved['effective_tier'] );
 		$this->assertSame( 'page_cap', $resolved['resolution_reason'] );
@@ -108,20 +108,20 @@ final class Animation_Runtime_Test extends TestCase {
 
 	public function test_resolver_page_families_allowed_filters(): void {
 		$resolver = new Animation_Tier_Resolver();
-		$section = array(
-			'animation_tier'      => 'subtle',
+		$section  = array(
+			'animation_tier'     => 'subtle',
 			'animation_families' => array( 'entrance', 'hover', 'scroll' ),
 		);
-		$page = array( 'animation_families_allowed' => array( 'entrance', 'hover' ) );
+		$page     = array( 'animation_families_allowed' => array( 'entrance', 'hover' ) );
 		$resolved = $resolver->resolve( $section, $page, false );
 		$this->assertSame( array( 'entrance', 'hover' ), $resolved['effective_families'] );
 	}
 
 	public function test_resolver_tier_none_yields_no_families(): void {
 		$resolver = new Animation_Tier_Resolver();
-		$section = array(
-			'animation_tier'      => 'none',
-			'animation_families'  => array( 'entrance' ),
+		$section  = array(
+			'animation_tier'     => 'none',
+			'animation_families' => array( 'entrance' ),
 		);
 		$resolved = $resolver->resolve( $section, null, false );
 		$this->assertSame( 'none', $resolved['effective_tier'] );

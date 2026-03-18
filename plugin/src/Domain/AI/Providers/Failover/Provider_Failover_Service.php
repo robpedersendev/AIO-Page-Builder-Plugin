@@ -31,7 +31,7 @@ final class Provider_Failover_Service {
 	private Provider_Capability_Resolver $capability_resolver;
 
 	public function __construct( Settings_Service $settings, Provider_Capability_Resolver $capability_resolver ) {
-		$this->settings           = $settings;
+		$this->settings            = $settings;
 		$this->capability_resolver = $capability_resolver;
 	}
 
@@ -43,7 +43,7 @@ final class Provider_Failover_Service {
 	 */
 	public function get_policy_for_primary( string $primary_provider_id ): Provider_Failover_Policy {
 		$config = $this->settings->get( Option_Names::PROVIDER_CONFIG_REF );
-		$slice = isset( $config['failover_policy'] ) && is_array( $config['failover_policy'] )
+		$slice  = isset( $config['failover_policy'] ) && is_array( $config['failover_policy'] )
 			? $config['failover_policy']
 			: array();
 		return Provider_Failover_Policy::from_config( $slice, $primary_provider_id );
@@ -54,12 +54,12 @@ final class Provider_Failover_Service {
 	 * Caller must apply the same validator pipeline to the returned response.
 	 *
 	 * @param Provider_Failover_Policy $policy              Resolved policy.
-	 * @param string                    $primary_provider_id Primary provider that failed.
-	 * @param string                    $primary_model       Model used on primary.
-	 * @param array<string, mixed>      $primary_response     Normalized response (success=false, normalized_error set).
-	 * @param array<string, mixed>      $normalized_request   Same request to send to fallback.
-	 * @param string                    $schema_ref          Schema ref for capability check.
-	 * @param Service_Container         $container           Container to resolve fallback driver.
+	 * @param string                   $primary_provider_id Primary provider that failed.
+	 * @param string                   $primary_model       Model used on primary.
+	 * @param array<string, mixed>     $primary_response     Normalized response (success=false, normalized_error set).
+	 * @param array<string, mixed>     $normalized_request   Same request to send to fallback.
+	 * @param string                   $schema_ref          Schema ref for capability check.
+	 * @param Service_Container        $container           Container to resolve fallback driver.
 	 * @return array{response: array<string, mixed>, result: Failover_Result}
 	 */
 	public function try_fallback(
@@ -71,13 +71,13 @@ final class Provider_Failover_Service {
 		string $schema_ref,
 		Service_Container $container
 	): array {
-		$category = isset( $primary_response['normalized_error']['category'] ) && is_string( $primary_response['normalized_error']['category'] )
+		$category        = isset( $primary_response['normalized_error']['category'] ) && is_string( $primary_response['normalized_error']['category'] )
 			? $primary_response['normalized_error']['category']
 			: 'provider_error';
 		$policy_snapshot = $policy->to_metadata_snapshot();
-		$attempts = array(
+		$attempts        = array(
 			array(
-				'provider_id'   => $primary_provider_id,
+				'provider_id'  => $primary_provider_id,
 				'model_used'   => $primary_model,
 				'category'     => $category,
 				'attempted_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
@@ -92,7 +92,7 @@ final class Provider_Failover_Service {
 		}
 
 		$fallback_id = $policy->get_fallback_provider_id();
-		$driver = $this->get_driver_for_provider( $fallback_id, $container );
+		$driver      = $this->get_driver_for_provider( $fallback_id, $container );
 		if ( $driver === null ) {
 			return array(
 				'response' => $primary_response,
@@ -116,13 +116,13 @@ final class Provider_Failover_Service {
 		}
 
 		// * Single fallback attempt; same request, model override for fallback.
-		$request_for_fallback = $normalized_request;
+		$request_for_fallback          = $normalized_request;
 		$request_for_fallback['model'] = $fallback_model;
 
 		$response = $driver->request( $request_for_fallback );
 
 		$attempts[] = array(
-			'provider_id'   => $fallback_id,
+			'provider_id'  => $fallback_id,
 			'model_used'   => $fallback_model,
 			'category'     => ! empty( $response['success'] ) ? 'success' : ( (string) ( $response['normalized_error']['category'] ?? 'provider_error' ) ),
 			'attempted_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
@@ -142,7 +142,7 @@ final class Provider_Failover_Service {
 	}
 
 	/**
-	 * @param string           $provider_id Provider id.
+	 * @param string            $provider_id Provider id.
 	 * @param Service_Container $container   Container.
 	 * @return AI_Provider_Interface|null
 	 */

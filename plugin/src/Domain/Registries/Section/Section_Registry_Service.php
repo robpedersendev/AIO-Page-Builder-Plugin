@@ -51,8 +51,8 @@ final class Section_Registry_Service {
 		Section_Template_Repository $repository,
 		?Registry_Deprecation_Service $deprecation_service = null
 	) {
-		$this->validator          = $validator;
-		$this->repository         = $repository;
+		$this->validator           = $validator;
+		$this->repository          = $repository;
 		$this->deprecation_service = $deprecation_service;
 	}
 
@@ -90,9 +90,9 @@ final class Section_Registry_Service {
 		if ( ! is_array( $existing_def ) ) {
 			return Section_Registry_Result::failure( array( 'Existing section has no definition' ), 0 );
 		}
-		$merged = array_merge( $existing_def, $input );
+		$merged                                       = array_merge( $existing_def, $input );
 		$merged[ Section_Schema::FIELD_INTERNAL_KEY ] = $existing_def[ Section_Schema::FIELD_INTERNAL_KEY ];
-		$result = $this->validator->validate_for_update( $merged, $post_id );
+		$result                                       = $this->validator->validate_for_update( $merged, $post_id );
 		if ( ! $result->valid || $result->normalized === null ) {
 			return Section_Registry_Result::failure( $result->errors, 0 );
 		}
@@ -127,7 +127,7 @@ final class Section_Registry_Service {
 			return Section_Registry_Result::failure( array( 'Section not found' ), 0 );
 		}
 		$existing[ Section_Schema::FIELD_STATUS ] = 'deprecated';
-		$existing['deprecation'] = $this->deprecation_service !== null
+		$existing['deprecation']                  = $this->deprecation_service !== null
 			? $this->deprecation_service->get_section_deprecation_block( $reason, $replacement_key )
 			: Deprecation_Metadata::for_section( $reason, $replacement_key );
 		if ( $replacement_key !== '' ) {
@@ -202,7 +202,7 @@ final class Section_Registry_Service {
 	 */
 	public function list_eligible_for_new_selection( string $status = 'active', int $limit = 0, int $offset = 0 ): array {
 		$list = $status !== '' ? $this->repository->list_definitions_by_status( $status, $limit, $offset ) : $this->repository->list_all_definitions( $limit, $offset );
-		return array_values( array_filter( $list, [ Deprecation_Metadata::class, 'is_eligible_for_new_use' ] ) );
+		return array_values( array_filter( $list, array( Deprecation_Metadata::class, 'is_eligible_for_new_use' ) ) );
 	}
 
 	/**
@@ -282,9 +282,9 @@ final class Section_Registry_Service {
 	 */
 	public function get_asset_and_doc_refs( array $definition ): array {
 		return array(
-			'asset_declaration'    => $definition[ Section_Schema::FIELD_ASSET_DECLARATION ] ?? array( 'none' => true ),
-			'helper_ref'          => (string) ( $definition[ Section_Schema::FIELD_HELPER_REF ] ?? '' ),
-			'css_contract_ref'    => (string) ( $definition[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' ),
+			'asset_declaration' => $definition[ Section_Schema::FIELD_ASSET_DECLARATION ] ?? array( 'none' => true ),
+			'helper_ref'        => (string) ( $definition[ Section_Schema::FIELD_HELPER_REF ] ?? '' ),
+			'css_contract_ref'  => (string) ( $definition[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' ),
 		);
 	}
 

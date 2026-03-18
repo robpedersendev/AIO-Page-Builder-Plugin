@@ -63,8 +63,8 @@ final class Industry_Helper_Doc_Composer {
 
 	/** Optional overlay keys: fragment_key; when set, resolved content is appended to the corresponding merge field. */
 	private const FRAGMENT_REF_FIELDS = array(
-		'cta_usage_fragment_ref'       => 'cta_usage_notes',
-		'seo_notes_fragment_ref'       => 'seo_notes',
+		'cta_usage_fragment_ref'           => 'cta_usage_notes',
+		'seo_notes_fragment_ref'           => 'seo_notes',
 		'compliance_cautions_fragment_ref' => 'compliance_cautions',
 	);
 
@@ -78,14 +78,14 @@ final class Industry_Helper_Doc_Composer {
 		?Industry_Cache_Key_Builder $cache_key_builder = null,
 		?Industry_Shared_Fragment_Resolver $fragment_resolver = null
 	) {
-		$this->documentation_registry       = $documentation_registry;
-		$this->overlay_registry             = $overlay_registry;
+		$this->documentation_registry        = $documentation_registry;
+		$this->overlay_registry              = $overlay_registry;
 		$this->compliance_warning_resolver   = $compliance_warning_resolver;
-		$this->subtype_overlay_registry     = $subtype_overlay_registry;
+		$this->subtype_overlay_registry      = $subtype_overlay_registry;
 		$this->subtype_goal_overlay_registry = $subtype_goal_overlay_registry;
-		$this->cache_service                = $cache_service;
-		$this->cache_key_builder            = $cache_key_builder;
-		$this->fragment_resolver            = $fragment_resolver;
+		$this->cache_service                 = $cache_service;
+		$this->cache_key_builder             = $cache_key_builder;
+		$this->fragment_resolver             = $fragment_resolver;
 	}
 
 	/**
@@ -116,9 +116,9 @@ final class Industry_Helper_Doc_Composer {
 				);
 			}
 		}
-		$base_doc     = $section_key !== '' ? $this->documentation_registry->get_by_section_key( $section_key ) : null;
-		$base_id      = '';
-		$composed     = array();
+		$base_doc = $section_key !== '' ? $this->documentation_registry->get_by_section_key( $section_key ) : null;
+		$base_id  = '';
+		$composed = array();
 		if ( $base_doc !== null && is_array( $base_doc ) ) {
 			$composed = $base_doc;
 			$base_id  = (string) ( $base_doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
@@ -181,14 +181,17 @@ final class Industry_Helper_Doc_Composer {
 		$result = new Composed_Helper_Doc_Result( $composed, $base_id, $overlay_applied, $overlay_industry, $section_key, $compliance_warnings );
 		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
 			$base_key = $this->cache_key_builder->for_helper_doc( $section_key, $industry_key, $subtype_key, $conversion_goal_key );
-			$this->cache_service->set( $base_key, array(
-				'composed_doc'          => $composed,
-				'base_documentation_id' => $base_id,
-				'overlay_applied'       => $overlay_applied,
-				'overlay_industry_key'  => $overlay_industry,
-				'section_key'           => $section_key,
-				'compliance_warnings'   => $compliance_warnings,
-			) );
+			$this->cache_service->set(
+				$base_key,
+				array(
+					'composed_doc'          => $composed,
+					'base_documentation_id' => $base_id,
+					'overlay_applied'       => $overlay_applied,
+					'overlay_industry_key'  => $overlay_industry,
+					'section_key'           => $section_key,
+					'compliance_warnings'   => $compliance_warnings,
+				)
+			);
 		}
 		return $result;
 	}
@@ -215,7 +218,7 @@ final class Industry_Helper_Doc_Composer {
 			if ( $resolved === null || $resolved === '' ) {
 				continue;
 			}
-			$existing = isset( $composed[ $target_field ] ) && is_string( $composed[ $target_field ] )
+			$existing                  = isset( $composed[ $target_field ] ) && is_string( $composed[ $target_field ] )
 				? trim( $composed[ $target_field ] )
 				: '';
 			$composed[ $target_field ] = $existing !== '' ? $existing . "\n\n" . $resolved : $resolved;

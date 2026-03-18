@@ -78,14 +78,17 @@ final class Provider_Secret_Store_Interface_Test extends TestCase {
 	}
 
 	public function test_credential_state_constants_are_safe_to_serialize(): void {
-		$states = array(
+		$states  = array(
 			Provider_Secret_Store_Interface::STATE_ABSENT,
 			Provider_Secret_Store_Interface::STATE_CONFIGURED,
 			Provider_Secret_Store_Interface::STATE_INVALID,
 			Provider_Secret_Store_Interface::STATE_ROTATED,
 			Provider_Secret_Store_Interface::STATE_PENDING_VALIDATION,
 		);
-		$payload = array( 'provider_id' => 'openai', 'credential_state' => $states[1] );
+		$payload = array(
+			'provider_id'      => 'openai',
+			'credential_state' => $states[1],
+		);
 		$json    = wp_json_encode( $payload );
 		$this->assertStringNotContainsString( 'sk-', $json );
 		$this->assertStringContainsString( 'configured', $json );
@@ -96,10 +99,10 @@ final class Provider_Secret_Store_Interface_Test extends TestCase {
 		$store->set_credential( 'openai', 'sk-never-export-this' );
 		// Simulate building export-safe config: only state and provider_id, never get_credential_for_provider.
 		$export_safe = array(
-			'provider_id'       => 'openai',
-			'credential_state'  => $store->get_credential_state( 'openai' ),
+			'provider_id'      => 'openai',
+			'credential_state' => $store->get_credential_state( 'openai' ),
 		);
-		$serialized = wp_json_encode( $export_safe );
+		$serialized  = wp_json_encode( $export_safe );
 		$this->assertStringNotContainsString( 'sk-never-export-this', $serialized );
 		$this->assertStringContainsString( 'openai', $serialized );
 		$this->assertStringContainsString( 'pending_validation', $serialized );

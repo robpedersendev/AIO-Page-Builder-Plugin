@@ -19,13 +19,13 @@ defined( 'ABSPATH' ) || exit;
 final class Industry_Subtype_Preview_Influence_View_Model {
 
 	public const KEY_HAS_SUBTYPE                 = 'has_subtype';
-	public const KEY_SUBTYPE_KEY                  = 'subtype_key';
-	public const KEY_SUBTYPE_LABEL                = 'subtype_label';
-	public const KEY_SUBTYPE_SUMMARY              = 'subtype_summary';
-	public const KEY_HELPER_REFINEMENT_APPLIED    = 'helper_refinement_applied';
-	public const KEY_ONEPAGER_REFINEMENT_APPLIED  = 'onepager_refinement_applied';
-	public const KEY_CAUTION_NOTES                = 'caution_notes';
-	public const KEY_BUNDLE_CONTEXT               = 'bundle_context';
+	public const KEY_SUBTYPE_KEY                 = 'subtype_key';
+	public const KEY_SUBTYPE_LABEL               = 'subtype_label';
+	public const KEY_SUBTYPE_SUMMARY             = 'subtype_summary';
+	public const KEY_HELPER_REFINEMENT_APPLIED   = 'helper_refinement_applied';
+	public const KEY_ONEPAGER_REFINEMENT_APPLIED = 'onepager_refinement_applied';
+	public const KEY_CAUTION_NOTES               = 'caution_notes';
+	public const KEY_BUNDLE_CONTEXT              = 'bundle_context';
 
 	/** @var bool */
 	private bool $has_subtype;
@@ -52,14 +52,14 @@ final class Industry_Subtype_Preview_Influence_View_Model {
 	private string $bundle_context;
 
 	/**
-	 * @param bool   $has_subtype
-	 * @param string $subtype_key
-	 * @param string $subtype_label
-	 * @param string $subtype_summary
-	 * @param bool   $helper_refinement_applied
-	 * @param bool   $onepager_refinement_applied
+	 * @param bool         $has_subtype
+	 * @param string       $subtype_key
+	 * @param string       $subtype_label
+	 * @param string       $subtype_summary
+	 * @param bool         $helper_refinement_applied
+	 * @param bool         $onepager_refinement_applied
 	 * @param list<string> $caution_notes
-	 * @param string $bundle_context
+	 * @param string       $bundle_context
 	 */
 	public function __construct(
 		bool $has_subtype,
@@ -132,14 +132,14 @@ final class Industry_Subtype_Preview_Influence_View_Model {
 	 */
 	public function to_array(): array {
 		return array(
-			self::KEY_HAS_SUBTYPE                => $this->has_subtype,
-			self::KEY_SUBTYPE_KEY               => $this->subtype_key,
-			self::KEY_SUBTYPE_LABEL             => $this->subtype_label,
-			self::KEY_SUBTYPE_SUMMARY           => $this->subtype_summary,
-			self::KEY_HELPER_REFINEMENT_APPLIED => $this->helper_refinement_applied,
+			self::KEY_HAS_SUBTYPE                 => $this->has_subtype,
+			self::KEY_SUBTYPE_KEY                 => $this->subtype_key,
+			self::KEY_SUBTYPE_LABEL               => $this->subtype_label,
+			self::KEY_SUBTYPE_SUMMARY             => $this->subtype_summary,
+			self::KEY_HELPER_REFINEMENT_APPLIED   => $this->helper_refinement_applied,
 			self::KEY_ONEPAGER_REFINEMENT_APPLIED => $this->onepager_refinement_applied,
-			self::KEY_CAUTION_NOTES              => $this->caution_notes,
-			self::KEY_BUNDLE_CONTEXT            => $this->bundle_context,
+			self::KEY_CAUTION_NOTES               => $this->caution_notes,
+			self::KEY_BUNDLE_CONTEXT              => $this->bundle_context,
 		);
 	}
 }

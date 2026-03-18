@@ -33,7 +33,7 @@ final class Support_Triage_Test extends TestCase {
 	/** Example support-triage payload (Support_Triage_State_Builder::build() shape). */
 	public static function example_support_triage_payload(): array {
 		return array(
-			'critical_issues'        => array(
+			'critical_issues'         => array(
 				array(
 					'severity'   => 'critical',
 					'domain'     => 'reporting',
@@ -43,7 +43,7 @@ final class Support_Triage_Test extends TestCase {
 					'link_label' => 'View critical errors',
 				),
 			),
-			'degraded_systems'       => array(
+			'degraded_systems'        => array(
 				array(
 					'domain'     => 'queue',
 					'title'      => 'Queue',
@@ -61,7 +61,7 @@ final class Support_Triage_Test extends TestCase {
 					'link_label' => 'View AI run',
 				),
 			),
-			'rollback_candidates'    => array(
+			'rollback_candidates'     => array(
 				array(
 					'job_ref'      => 'job_replace_plan_1_20250312100000_456',
 					'job_type'     => 'replace_page',
@@ -71,16 +71,20 @@ final class Support_Triage_Test extends TestCase {
 					'link_label'   => 'Open plan',
 				),
 			),
-			'import_export_failures' => array(),
-			'recommended_links'      => array(
+			'import_export_failures'  => array(),
+			'recommended_links'       => array(
 				array(
 					'label'       => 'Queue & Logs',
 					'url'         => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-queue-logs',
 					'description' => 'Queue health, execution logs, reporting logs.',
 				),
 			),
-			'stale_plans'            => array(
-				array( 'plan_id' => 'plan-xyz', 'status' => 'pending_review', 'title' => 'My Plan' ),
+			'stale_plans'             => array(
+				array(
+					'plan_id' => 'plan-xyz',
+					'status'  => 'pending_review',
+					'title'   => 'My Plan',
+				),
 			),
 		);
 	}

@@ -92,7 +92,7 @@ final class Snapshot_Type_Keys {
 			self::PAGE_TEMPLATE_REGISTRY  => Version_Snapshot_Schema::SCOPE_REGISTRY,
 			self::COMPOSITION_CONTEXT     => Version_Snapshot_Schema::SCOPE_REGISTRY,
 			self::SCHEMA_SECTION_REGISTRY => Version_Snapshot_Schema::SCOPE_SCHEMA,
-			self::COMPATIBILITY_STATE      => Version_Snapshot_Schema::SCOPE_COMPATIBILITY,
+			self::COMPATIBILITY_STATE     => Version_Snapshot_Schema::SCOPE_COMPATIBILITY,
 		);
 		return self::$type_to_scope;
 	}

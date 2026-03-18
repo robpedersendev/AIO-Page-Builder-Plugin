@@ -37,13 +37,13 @@ defined( 'ABSPATH' ) || exit;
  */
 final class ACF_Regeneration_Plan {
 
-	public const SCOPE_FULL               = 'full';
-	public const SCOPE_SECTION_FAMILY     = 'section_family';
+	public const SCOPE_FULL                 = 'full';
+	public const SCOPE_SECTION_FAMILY       = 'section_family';
 	public const SCOPE_PAGE_TEMPLATE_FAMILY = 'page_template_family';
 
-	public const MISMATCH_STATUS_OK             = 'ok';
-	public const MISMATCH_STATUS_MISSING        = 'missing';
-	public const MISMATCH_STATUS_VERSION_STALE  = 'version_stale';
+	public const MISMATCH_STATUS_OK            = 'ok';
+	public const MISMATCH_STATUS_MISSING       = 'missing';
+	public const MISMATCH_STATUS_VERSION_STALE = 'version_stale';
 
 	/** @var bool True when plan is for analysis only (no mutation). */
 	private bool $dry_run;
@@ -78,14 +78,14 @@ final class ACF_Regeneration_Plan {
 	private array $refused_cleanup;
 
 	/**
-	 * @param bool        $dry_run
-	 * @param string      $scope
-	 * @param string|null $section_family_key
-	 * @param string|null $page_template_family_key
-	 * @param bool        $include_page_assignments
+	 * @param bool                                                                $dry_run
+	 * @param string                                                              $scope
+	 * @param string|null                                                         $section_family_key
+	 * @param string|null                                                         $page_template_family_key
+	 * @param bool                                                                $include_page_assignments
 	 * @param list<array{section_key: string, group_key: string, status: string}> $field_group_mismatches
-	 * @param list<array{page_id: int, type: string, key: string}>                  $page_assignment_repair_candidates
-	 * @param list<string> $refused_cleanup
+	 * @param list<array{page_id: int, type: string, key: string}>                $page_assignment_repair_candidates
+	 * @param list<string>                                                        $refused_cleanup
 	 */
 	public function __construct(
 		bool $dry_run,
@@ -97,14 +97,14 @@ final class ACF_Regeneration_Plan {
 		array $page_assignment_repair_candidates,
 		array $refused_cleanup
 	) {
-		$this->dry_run                        = $dry_run;
-		$this->scope                          = $scope;
-		$this->section_family_key             = $section_family_key;
-		$this->page_template_family_key       = $page_template_family_key;
-		$this->include_page_assignments        = $include_page_assignments;
-		$this->field_group_mismatches          = $field_group_mismatches;
+		$this->dry_run                           = $dry_run;
+		$this->scope                             = $scope;
+		$this->section_family_key                = $section_family_key;
+		$this->page_template_family_key          = $page_template_family_key;
+		$this->include_page_assignments          = $include_page_assignments;
+		$this->field_group_mismatches            = $field_group_mismatches;
 		$this->page_assignment_repair_candidates = $page_assignment_repair_candidates;
-		$this->refused_cleanup                 = $refused_cleanup;
+		$this->refused_cleanup                   = $refused_cleanup;
 	}
 
 	public function is_dry_run(): bool {
@@ -148,9 +148,9 @@ final class ACF_Regeneration_Plan {
 	 * @return array{ dry_run: bool, scope: string, section_family_key: string|null, page_template_family_key: string|null, include_page_assignments: bool, field_group_mismatches: list<array>, page_assignment_repair_candidates: list<array>, refused_cleanup: list<string>, missing_count: int, version_stale_count: int, ok_count: int, candidate_count: int }
 	 */
 	public function to_array(): array {
-		$missing = 0;
+		$missing       = 0;
 		$version_stale = 0;
-		$ok = 0;
+		$ok            = 0;
 		foreach ( $this->field_group_mismatches as $m ) {
 			$s = $m['status'] ?? '';
 			if ( $s === self::MISMATCH_STATUS_MISSING ) {
@@ -162,18 +162,18 @@ final class ACF_Regeneration_Plan {
 			}
 		}
 		return array(
-			'dry_run'                        => $this->dry_run,
-			'scope'                          => $this->scope,
-			'section_family_key'             => $this->section_family_key,
-			'page_template_family_key'      => $this->page_template_family_key,
-			'include_page_assignments'       => $this->include_page_assignments,
-			'field_group_mismatches'         => $this->field_group_mismatches,
+			'dry_run'                           => $this->dry_run,
+			'scope'                             => $this->scope,
+			'section_family_key'                => $this->section_family_key,
+			'page_template_family_key'          => $this->page_template_family_key,
+			'include_page_assignments'          => $this->include_page_assignments,
+			'field_group_mismatches'            => $this->field_group_mismatches,
 			'page_assignment_repair_candidates' => $this->page_assignment_repair_candidates,
-			'refused_cleanup'                => $this->refused_cleanup,
-			'missing_count'                  => $missing,
-			'version_stale_count'            => $version_stale,
-			'ok_count'                       => $ok,
-			'candidate_count'                => count( $this->page_assignment_repair_candidates ),
+			'refused_cleanup'                   => $this->refused_cleanup,
+			'missing_count'                     => $missing,
+			'version_stale_count'               => $version_stale,
+			'ok_count'                          => $ok,
+			'candidate_count'                   => count( $this->page_assignment_repair_candidates ),
 		);
 	}
 }

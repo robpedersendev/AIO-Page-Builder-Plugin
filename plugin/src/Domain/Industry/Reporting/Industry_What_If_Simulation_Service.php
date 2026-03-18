@@ -24,9 +24,9 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry;
  */
 final class Industry_What_If_Simulation_Service {
 
-	public const PARAM_ALTERNATE_PRIMARY   = 'alternate_primary_industry_key';
-	public const PARAM_ALTERNATE_SUBTYPE  = 'alternate_subtype_key';
-	public const PARAM_ALTERNATE_BUNDLE   = 'alternate_starter_bundle_key';
+	public const PARAM_ALTERNATE_PRIMARY         = 'alternate_primary_industry_key';
+	public const PARAM_ALTERNATE_SUBTYPE         = 'alternate_subtype_key';
+	public const PARAM_ALTERNATE_BUNDLE          = 'alternate_starter_bundle_key';
 	public const PARAM_ALTERNATE_CONVERSION_GOAL = 'alternate_conversion_goal_key';
 
 	/** @var Industry_Profile_Repository */
@@ -73,23 +73,23 @@ final class Industry_What_If_Simulation_Service {
 	 * }
 	 */
 	public function run_simulation( array $params = array() ): array {
-		$live   = $this->profile_repo->get_profile();
-		$simulated = $this->build_simulated_profile( $live, $params );
+		$live         = $this->profile_repo->get_profile();
+		$simulated    = $this->build_simulated_profile( $live, $params );
 		$invalid_refs = $this->validate_simulated_refs( $simulated, $params );
-		$warnings = array();
+		$warnings     = array();
 
 		$live_summary = $this->profile_summary( $live );
 		$sim_summary  = $this->profile_summary( $simulated );
 
 		$comparison_simulated = null;
-		$comparison_live     = null;
-		$valid = empty( $invalid_refs );
+		$comparison_live      = null;
+		$valid                = empty( $invalid_refs );
 		if ( $valid && $this->comparison_service !== null ) {
 			$comparison_simulated = $this->comparison_service->get_comparison(
 				$sim_summary['primary'],
 				$sim_summary['subtype']
 			);
-			$comparison_live = $this->comparison_service->get_comparison(
+			$comparison_live      = $this->comparison_service->get_comparison(
 				$live_summary['primary'],
 				$live_summary['subtype']
 			);
@@ -104,7 +104,7 @@ final class Industry_What_If_Simulation_Service {
 		return array(
 			'valid'                     => $valid,
 			'invalid_refs'              => $invalid_refs,
-			'simulated_profile_summary'  => $sim_summary,
+			'simulated_profile_summary' => $sim_summary,
 			'live_profile_summary'      => $live_summary,
 			'comparison_simulated'      => $comparison_simulated,
 			'comparison_live'           => $comparison_live,
@@ -122,7 +122,7 @@ final class Industry_What_If_Simulation_Service {
 	private function build_simulated_profile( array $live, array $params ): array {
 		$out = $live;
 		if ( array_key_exists( self::PARAM_ALTERNATE_PRIMARY, $params ) ) {
-			$out[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] = is_string( $params[ self::PARAM_ALTERNATE_PRIMARY ] )
+			$out[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ]    = is_string( $params[ self::PARAM_ALTERNATE_PRIMARY ] )
 				? trim( $params[ self::PARAM_ALTERNATE_PRIMARY ] )
 				: '';
 			$out[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = array();
@@ -130,14 +130,14 @@ final class Industry_What_If_Simulation_Service {
 		if ( array_key_exists( self::PARAM_ALTERNATE_SUBTYPE, $params ) ) {
 			$v = $params[ self::PARAM_ALTERNATE_SUBTYPE ];
 			$out[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] = is_string( $v ) ? trim( $v ) : '';
-			$out[ Industry_Profile_Schema::FIELD_SUBTYPE ] = $out[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ];
+			$out[ Industry_Profile_Schema::FIELD_SUBTYPE ]              = $out[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ];
 		}
 		if ( array_key_exists( self::PARAM_ALTERNATE_BUNDLE, $params ) ) {
 			$v = $params[ self::PARAM_ALTERNATE_BUNDLE ];
 			$out[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] = is_string( $v ) ? trim( $v ) : '';
 		}
 		if ( array_key_exists( self::PARAM_ALTERNATE_CONVERSION_GOAL, $params ) ) {
-			$v = $params[ self::PARAM_ALTERNATE_CONVERSION_GOAL ];
+			$v    = $params[ self::PARAM_ALTERNATE_CONVERSION_GOAL ];
 			$goal = is_string( $v ) ? trim( $v ) : '';
 			if ( $goal === '' || ( strlen( $goal ) <= 64 && preg_match( '#^[a-z0-9_-]+$#', $goal ) ) ) {
 				$out[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] = $goal;
@@ -160,25 +160,40 @@ final class Industry_What_If_Simulation_Service {
 		$bundle  = trim( (string) ( $simulated[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ?? '' ) );
 
 		if ( $primary !== '' && $this->pack_registry !== null && $this->pack_registry->get( $primary ) === null ) {
-			$invalid[] = array( 'type' => 'primary_industry', 'key' => $primary );
+			$invalid[] = array(
+				'type' => 'primary_industry',
+				'key'  => $primary,
+			);
 		}
 		if ( $subtype !== '' ) {
 			if ( $this->subtype_registry === null ) {
-				$invalid[] = array( 'type' => 'subtype', 'key' => $subtype );
+				$invalid[] = array(
+					'type' => 'subtype',
+					'key'  => $subtype,
+				);
 			} else {
 				$def = $this->subtype_registry->get( $subtype );
 				if ( $def === null ) {
-					$invalid[] = array( 'type' => 'subtype', 'key' => $subtype );
+					$invalid[] = array(
+						'type' => 'subtype',
+						'key'  => $subtype,
+					);
 				} else {
 					$parent = trim( (string) ( $def[ Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] ?? '' ) );
 					if ( $parent !== $primary ) {
-						$invalid[] = array( 'type' => 'subtype_parent_mismatch', 'key' => $subtype );
+						$invalid[] = array(
+							'type' => 'subtype_parent_mismatch',
+							'key'  => $subtype,
+						);
 					}
 				}
 			}
 		}
 		if ( $bundle !== '' && $this->bundle_registry !== null && $this->bundle_registry->get( $bundle ) === null ) {
-			$invalid[] = array( 'type' => 'starter_bundle', 'key' => $bundle );
+			$invalid[] = array(
+				'type' => 'starter_bundle',
+				'key'  => $bundle,
+			);
 		}
 		return $invalid;
 	}
@@ -189,10 +204,10 @@ final class Industry_What_If_Simulation_Service {
 	 */
 	private function profile_summary( array $profile ): array {
 		return array(
-			'primary'  => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ?? '' ) ),
-			'subtype'  => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ?? '' ) ),
-			'bundle'   => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ?? '' ) ),
-			'goal'     => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ?? '' ) ),
+			'primary' => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ?? '' ) ),
+			'subtype' => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ?? '' ) ),
+			'bundle'  => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ?? '' ) ),
+			'goal'    => trim( (string) ( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ?? '' ) ),
 		);
 	}
 }

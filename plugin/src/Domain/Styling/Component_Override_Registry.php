@@ -110,8 +110,8 @@ final class Component_Override_Registry {
 	 * @return list<string>
 	 */
 	public function get_allowed_token_overrides( string $component_id ): array {
-		$c     = $this->get_component( $component_id );
-		$list  = $c['allowed_token_overrides'] ?? array();
+		$c    = $this->get_component( $component_id );
+		$list = $c['allowed_token_overrides'] ?? array();
 		if ( ! is_array( $list ) ) {
 			return array();
 		}

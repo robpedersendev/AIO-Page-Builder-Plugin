@@ -56,7 +56,10 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 			);
 		}
 		$steps = array(
-			array( 'step_type' => 'overview', 'items' => array() ),
+			array(
+				'step_type' => 'overview',
+				'items'     => array(),
+			),
 			array(
 				Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES,
 				Build_Plan_Item_Schema::KEY_ITEMS     => $items,
@@ -98,31 +101,31 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 				'confidence'         => 'low',
 			),
 		);
-		$resolver = new Build_Plan_Row_Action_Resolver();
-		$detail   = new Existing_Page_Update_Detail_Builder();
-		$bulk     = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
-		$ui       = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk );
+		$resolver  = new Build_Plan_Row_Action_Resolver();
+		$detail    = new Existing_Page_Update_Detail_Builder();
+		$bulk      = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui        = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk );
 		$workspace = $ui->build_workspace( $def, 1, array( 'can_approve' => true ), null, array() );
-		$ids = array_column( $workspace['step_list_rows'], 'item_id' );
+		$ids       = array_column( $workspace['step_list_rows'], 'item_id' );
 		$this->assertNotContains( 'plan_epc_low', $ids );
 	}
 
 	/** Example Step 1 row payload structure. */
 	public function test_example_step1_row_payload(): void {
 		$row = array(
-			'item_id'          => 'plan_epc_0',
-			'status'           => Build_Plan_Item_Statuses::PENDING,
-			'status_badge'     => 'pending',
-			'summary_columns'  => array(
+			'item_id'           => 'plan_epc_0',
+			'status'            => Build_Plan_Item_Statuses::PENDING,
+			'status_badge'      => 'pending',
+			'summary_columns'   => array(
 				'current_page_title' => 'Home',
 				'current_page_url'   => '/home',
 				'action'             => 'replace_with_new_page',
-				'target_template'     => '',
+				'target_template'    => '',
 				'reason'             => 'Refresh content',
 				'risk_level'         => 'low',
 			),
-			'row_actions'      => array(),
-			'is_selected'      => false,
+			'row_actions'       => array(),
+			'is_selected'       => false,
 			'snapshot_required' => true,
 		);
 		$this->assertSame( 'plan_epc_0', $row['item_id'] );
@@ -132,9 +135,9 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 
 	/** Detail builder produces sections per spec §32.4. */
 	public function test_detail_builder_sections(): void {
-		$item = array(
-			Build_Plan_Item_Schema::KEY_ITEM_ID   => 'plan_epc_0',
-			Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
+		$item     = array(
+			Build_Plan_Item_Schema::KEY_ITEM_ID => 'plan_epc_0',
+			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
 				'current_page_title' => 'About',
 				'current_page_url'   => '/about',
 				'action'             => 'rebuild_from_template',
@@ -156,11 +159,19 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 		$detail_panel = array(
 			'item_id'           => 'plan_epc_0',
 			'sections'          => array(
-				array( 'heading' => 'Current page identity', 'key' => 'page_identity', 'content_lines' => array( 'Title: Home', 'URL: /home' ) ),
-				array( 'heading' => 'Suggested action', 'key' => 'suggested_action', 'content_lines' => array( 'replace_with_new_page' ) ),
+				array(
+					'heading'       => 'Current page identity',
+					'key'           => 'page_identity',
+					'content_lines' => array( 'Title: Home', 'URL: /home' ),
+				),
+				array(
+					'heading'       => 'Suggested action',
+					'key'           => 'suggested_action',
+					'content_lines' => array( 'replace_with_new_page' ),
+				),
 			),
 			'row_actions'       => array(),
-			'snapshot_required'  => true,
+			'snapshot_required' => true,
 		);
 		$this->assertSame( 'plan_epc_0', $detail_panel['item_id'] );
 		$this->assertTrue( $detail_panel['snapshot_required'] );
@@ -180,23 +191,23 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 	public function test_bulk_disabled_when_no_eligible(): void {
 		$def = $this->step1_plan_definition( 0 );
 		$def[ Build_Plan_Schema::KEY_STEPS ][1][ Build_Plan_Item_Schema::KEY_ITEMS ][0]['status'] = Build_Plan_Item_Statuses::APPROVED;
-		$resolver = new Build_Plan_Row_Action_Resolver();
-		$detail   = new Existing_Page_Update_Detail_Builder();
-		$bulk     = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
-		$ui       = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk );
+		$resolver  = new Build_Plan_Row_Action_Resolver();
+		$detail    = new Existing_Page_Update_Detail_Builder();
+		$bulk      = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui        = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk );
 		$workspace = $ui->build_workspace( $def, 1, array( 'can_approve' => true ), null, array() );
-		$states = $workspace['bulk_action_states'];
+		$states    = $workspace['bulk_action_states'];
 		$this->assertFalse( $states['apply_to_all_eligible']['enabled'] );
 		$this->assertFalse( $states['deny_all_eligible']['enabled'] );
 	}
 
 	/** Unauthorized: can_approve false disables bulk and row approve/deny. */
 	public function test_unauthorized_bulk_disabled(): void {
-		$resolver = new Build_Plan_Row_Action_Resolver();
-		$detail   = new Existing_Page_Update_Detail_Builder();
-		$bulk     = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
-		$ui       = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk );
-		$def      = $this->step1_plan_definition( 1 );
+		$resolver  = new Build_Plan_Row_Action_Resolver();
+		$detail    = new Existing_Page_Update_Detail_Builder();
+		$bulk      = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui        = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk );
+		$def       = $this->step1_plan_definition( 1 );
 		$workspace = $ui->build_workspace( $def, 1, array( 'can_approve' => false ), null, array() );
 		$this->assertFalse( $workspace['bulk_action_states']['apply_to_all_eligible']['enabled'] );
 		$this->assertFalse( $workspace['bulk_action_states']['deny_all_eligible']['enabled'] );
@@ -217,12 +228,14 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 		try {
 			$repo    = new Build_Plan_Repository();
 			$def     = $this->step1_plan_definition( 1 );
-			$post_id = $repo->save( array(
-				'plan_definition' => $def,
-				'internal_key'    => 'test-plan-persist',
-				'post_title'      => 'Test Plan',
-				'status'          => 'publish',
-			) );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-persist',
+					'post_title'      => 'Test Plan',
+					'status'          => 'publish',
+				)
+			);
 			$this->assertGreaterThan( 0, $post_id );
 			$updated = $repo->update_plan_item_status( $post_id, 1, 'plan_epc_0', Build_Plan_Item_Statuses::REJECTED );
 			$this->assertTrue( $updated );
@@ -237,11 +250,11 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 
 	/** Column order is Step 1 specific and includes template_links (Prompt 193). */
 	public function test_step1_column_order(): void {
-		$resolver = new Build_Plan_Row_Action_Resolver();
-		$detail   = new Existing_Page_Update_Detail_Builder();
-		$bulk     = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
-		$ui       = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk );
-		$def      = $this->step1_plan_definition( 1 );
+		$resolver  = new Build_Plan_Row_Action_Resolver();
+		$detail    = new Existing_Page_Update_Detail_Builder();
+		$bulk      = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui        = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk );
+		$def       = $this->step1_plan_definition( 1 );
 		$workspace = $ui->build_workspace( $def, 1, array( 'can_approve' => true ), null, array() );
 		$this->assertSame( Existing_Page_Updates_UI_Service::COLUMN_ORDER, $workspace['column_order'] );
 		$this->assertSame( 'current_page_title', $workspace['column_order'][0] );
@@ -252,17 +265,25 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 	public function test_step1_with_template_change_builder_enriches_rows(): void {
 		require_once dirname( __DIR__, 2 ) . '/src/Domain/BuildPlan/Recommendations/Template_Explanation_Builder_Interface.php';
 		require_once dirname( __DIR__, 2 ) . '/src/Domain/BuildPlan/UI/Existing_Page_Template_Change_Builder.php';
-		$stub = new class() implements \AIOPageBuilder\Domain\BuildPlan\Recommendations\Template_Explanation_Builder_Interface {
+		$stub           = new class() implements \AIOPageBuilder\Domain\BuildPlan\Recommendations\Template_Explanation_Builder_Interface {
 			public function build_explanation( string $template_key, array $item_payload = array() ): array {
-				return $template_key !== '' ? array( 'template_key' => $template_key, 'name' => 'Test', 'template_family' => 'home', 'template_category_class' => 'top_level', 'cta_direction_summary' => 'CTA', 'section_count' => 5, 'deprecation_status' => 'active' ) : array();
+				return $template_key !== '' ? array(
+					'template_key'            => $template_key,
+					'name'                    => 'Test',
+					'template_family'         => 'home',
+					'template_category_class' => 'top_level',
+					'cta_direction_summary'   => 'CTA',
+					'section_count'           => 5,
+					'deprecation_status'      => 'active',
+				) : array();
 			}
 		};
 		$change_builder = new \AIOPageBuilder\Domain\BuildPlan\UI\Existing_Page_Template_Change_Builder( $stub );
-		$resolver = new Build_Plan_Row_Action_Resolver();
-		$detail   = new Existing_Page_Update_Detail_Builder( $change_builder );
-		$bulk     = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
-		$ui       = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk, $change_builder );
-		$def = $this->step1_plan_definition( 1 );
+		$resolver       = new Build_Plan_Row_Action_Resolver();
+		$detail         = new Existing_Page_Update_Detail_Builder( $change_builder );
+		$bulk           = new Existing_Page_Update_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui             = new Existing_Page_Updates_UI_Service( $resolver, $detail, $bulk, $change_builder );
+		$def            = $this->step1_plan_definition( 1 );
 		$def[ Build_Plan_Schema::KEY_STEPS ][1][ Build_Plan_Item_Schema::KEY_ITEMS ][0][ Build_Plan_Item_Schema::KEY_PAYLOAD ]['template_key'] = 'pt_home_01';
 		$workspace = $ui->build_workspace( $def, 1, array( 'can_approve' => true ), null, array() );
 		$this->assertCount( 1, $workspace['step_list_rows'] );

@@ -93,26 +93,26 @@ final class Section_Template_Detail_State_Builder {
 		?Industry_Dummy_Data_Generator $industry_dummy_generator = null,
 		?string $industry_key = null
 	) {
-		$this->section_provider    = $section_provider;
-		$this->preview_generator   = $preview_generator;
-		$this->side_panel_builder  = $side_panel_builder;
-		$this->context_builder     = $context_builder;
-		$this->section_renderer    = $section_renderer;
-		$this->assembly_pipeline   = $assembly_pipeline;
-		$this->blueprint_service   = $blueprint_service;
-		$this->lpagery_compatibility = $lpagery_compatibility;
-		$this->preview_cache       = $preview_cache;
-		$this->versioning_service  = $versioning_service;
-		$this->deprecation_service = $deprecation_service;
+		$this->section_provider                 = $section_provider;
+		$this->preview_generator                = $preview_generator;
+		$this->side_panel_builder               = $side_panel_builder;
+		$this->context_builder                  = $context_builder;
+		$this->section_renderer                 = $section_renderer;
+		$this->assembly_pipeline                = $assembly_pipeline;
+		$this->blueprint_service                = $blueprint_service;
+		$this->lpagery_compatibility            = $lpagery_compatibility;
+		$this->preview_cache                    = $preview_cache;
+		$this->versioning_service               = $versioning_service;
+		$this->deprecation_service              = $deprecation_service;
 		$this->form_section_field_state_builder = $form_section_field_state_builder;
-		$this->industry_dummy_generator = $industry_dummy_generator;
-		$this->industry_key = $industry_key !== null && $industry_key !== '' ? $industry_key : null;
+		$this->industry_dummy_generator         = $industry_dummy_generator;
+		$this->industry_key                     = $industry_key !== null && $industry_key !== '' ? $industry_key : null;
 	}
 
 	/**
 	 * Builds full detail state for the given section key. Returns not_found when section does not exist.
 	 *
-	 * @param string $section_key Section template internal_key.
+	 * @param string               $section_key Section template internal_key.
 	 * @param array<string, mixed> $request_params Optional: purpose_family (for breadcrumb), reduced_motion.
 	 * @return array<string, mixed> State: section_key, definition, side_panel, field_summary, helper_ref, helper_doc_url, compatibility_notes, preview_payload, rendered_preview_html, breadcrumbs, not_found.
 	 */
@@ -138,7 +138,7 @@ final class Section_Template_Detail_State_Builder {
 			$reduced_motion ? Synthetic_Preview_Context::ANIMATION_TIER_NONE : Synthetic_Preview_Context::ANIMATION_TIER_NONE
 		);
 
-		$field_values   = $this->preview_generator->generate_for_section( $context );
+		$field_values = $this->preview_generator->generate_for_section( $context );
 		if ( $this->industry_dummy_generator !== null && $this->industry_key !== null ) {
 			$overrides = $this->industry_dummy_generator->get_overrides_for_family( $purpose_family !== '' ? $purpose_family : 'other', $this->industry_key );
 			if ( ! empty( $overrides ) ) {
@@ -146,35 +146,35 @@ final class Section_Template_Detail_State_Builder {
 			}
 		}
 		$preview_payload = $this->side_panel_builder->build_section_preview_payload( $definition, $field_values, $context );
-		$side_panel     = $preview_payload['side_panel'] ?? $this->side_panel_builder->build_for_section( $definition, $context );
+		$side_panel      = $preview_payload['side_panel'] ?? $this->side_panel_builder->build_for_section( $definition, $context );
 
-		$field_summary = $this->build_field_summary( $section_key, $definition );
-		$helper_ref    = (string) ( $definition[ Section_Schema::FIELD_HELPER_REF ] ?? $side_panel['helper_ref'] ?? '' );
-		$helper_doc_url = $this->build_helper_doc_url( $helper_ref );
-		$compatibility  = $definition['compatibility'] ?? array();
+		$field_summary       = $this->build_field_summary( $section_key, $definition );
+		$helper_ref          = (string) ( $definition[ Section_Schema::FIELD_HELPER_REF ] ?? $side_panel['helper_ref'] ?? '' );
+		$helper_doc_url      = $this->build_helper_doc_url( $helper_ref );
+		$compatibility       = $definition['compatibility'] ?? array();
 		$compatibility_notes = \is_array( $compatibility ) ? $compatibility : array();
 
 		$lpagery_compatibility_state = null;
 		if ( $this->lpagery_compatibility !== null ) {
-			$lpagery_result = $this->lpagery_compatibility->get_compatibility_for_section( $section_key, $definition );
+			$lpagery_result              = $this->lpagery_compatibility->get_compatibility_for_section( $section_key, $definition );
 			$lpagery_compatibility_state = $lpagery_result->to_array();
 		}
 
-		$preview_cache_hit = false;
+		$preview_cache_hit     = false;
 		$rendered_preview_html = '';
-		$cache_key = $this->preview_cache !== null ? $this->preview_cache->get_cache_key( $context, $definition ) : '';
+		$cache_key             = $this->preview_cache !== null ? $this->preview_cache->get_cache_key( $context, $definition ) : '';
 		if ( $cache_key !== '' && $this->preview_cache !== null ) {
 			$cached = $this->preview_cache->get( $cache_key );
 			if ( $cached !== null ) {
 				$rendered_preview_html = $cached->get_html();
-				$preview_cache_hit = true;
+				$preview_cache_hit     = true;
 			}
 		}
 		if ( $rendered_preview_html === '' ) {
 			$rendered_preview_html = $this->render_preview_html( $definition, $field_values, array( 'reduced_motion' => $reduced_motion ) );
 			if ( $cache_key !== '' && $this->preview_cache !== null && $rendered_preview_html !== '' ) {
 				$version_hash = $this->preview_cache->definition_version_hash( $definition, Synthetic_Preview_Context::TYPE_SECTION );
-				$record = new Preview_Cache_Record(
+				$record       = new Preview_Cache_Record(
 					$cache_key,
 					Preview_Cache_Record::TYPE_SECTION,
 					$section_key,
@@ -193,8 +193,8 @@ final class Section_Template_Detail_State_Builder {
 			$form_section_field_state = $this->form_section_field_state_builder->build_state( $definition, $field_values );
 		}
 
-		$breadcrumbs = $this->build_breadcrumbs( $definition, $purpose_family );
-		$version_summary = $this->versioning_service !== null
+		$breadcrumbs         = $this->build_breadcrumbs( $definition, $purpose_family );
+		$version_summary     = $this->versioning_service !== null
 			? $this->versioning_service->get_version_summary( $definition, 'section' )
 			: $this->build_version_summary_from_definition( $definition, 'section' );
 		$deprecation_summary = $this->deprecation_service !== null
@@ -224,7 +224,7 @@ final class Section_Template_Detail_State_Builder {
 	/**
 	 * Builds field summary from blueprint (service or embedded in definition). Returns list of { name, label, type }.
 	 *
-	 * @param string $section_key
+	 * @param string               $section_key
 	 * @param array<string, mixed> $definition
 	 * @return list<array{name: string, label: string, type: string}>
 	 */
@@ -251,7 +251,11 @@ final class Section_Template_Detail_State_Builder {
 			$label = (string) ( $field[ Field_Blueprint_Schema::FIELD_LABEL ] ?? $name );
 			$type  = (string) ( $field[ Field_Blueprint_Schema::FIELD_TYPE ] ?? 'text' );
 			if ( $name !== '' ) {
-				$out[] = array( 'name' => $name, 'label' => $label !== '' ? $label : $name, 'type' => $type );
+				$out[] = array(
+					'name'  => $name,
+					'label' => $label !== '' ? $label : $name,
+					'type'  => $type,
+				);
 			}
 		}
 		return $out;
@@ -284,8 +288,8 @@ final class Section_Template_Detail_State_Builder {
 		if ( $built['context'] === null ) {
 			return '';
 		}
-		$result = $this->section_renderer->render( $built['context'], $options );
-		$assembly = $this->assembly_pipeline->assemble(
+		$result        = $this->section_renderer->render( $built['context'], $options );
+		$assembly      = $this->assembly_pipeline->assemble(
 			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
 			(string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' ),
 			array( $result )
@@ -301,20 +305,20 @@ final class Section_Template_Detail_State_Builder {
 	 * Builds version summary from definition when versioning service is not injected (Prompt 189).
 	 *
 	 * @param array<string, mixed> $definition
-	 * @param string $type 'section' or 'page'
+	 * @param string               $type 'section' or 'page'
 	 * @return array{version: string, stable_key_retained: bool, changelog_ref: string, breaking: bool}
 	 */
 	private function build_version_summary_from_definition( array $definition, string $type ): array {
-		$field = $type === 'page' ? \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema::FIELD_VERSION : Section_Schema::FIELD_VERSION;
+		$field        = $type === 'page' ? \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema::FIELD_VERSION : Section_Schema::FIELD_VERSION;
 		$version_data = $definition[ $field ] ?? array();
 		if ( ! \is_array( $version_data ) ) {
 			$version_data = array();
 		}
 		return array(
-			'version'              => isset( $version_data['version'] ) ? (string) $version_data['version'] : '1',
-			'stable_key_retained'  => (bool) ( $version_data['stable_key_retained'] ?? true ),
-			'changelog_ref'        => (string) ( $version_data['changelog_ref'] ?? '' ),
-			'breaking'             => (bool) ( $version_data['breaking'] ?? false ),
+			'version'             => isset( $version_data['version'] ) ? (string) $version_data['version'] : '1',
+			'stable_key_retained' => (bool) ( $version_data['stable_key_retained'] ?? true ),
+			'changelog_ref'       => (string) ( $version_data['changelog_ref'] ?? '' ),
+			'breaking'            => (bool) ( $version_data['breaking'] ?? false ),
 		);
 	}
 
@@ -322,13 +326,13 @@ final class Section_Template_Detail_State_Builder {
 	 * Builds deprecation summary from definition when deprecation service is not injected (Prompt 189).
 	 *
 	 * @param array<string, mixed> $definition
-	 * @param string $type 'section' or 'page'
+	 * @param string               $type 'section' or 'page'
 	 * @return array{is_deprecated: bool, reason: string, replacement_keys: list<string>, deprecated_at: string}
 	 */
 	private function build_deprecation_summary_from_definition( array $definition, string $type ): array {
 		$status_field = $type === 'page' ? \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema::FIELD_STATUS : Section_Schema::FIELD_STATUS;
-		$status = (string) ( $definition[ $status_field ] ?? '' );
-		$dep = $definition['deprecation'] ?? array();
+		$status       = (string) ( $definition[ $status_field ] ?? '' );
+		$dep          = $definition['deprecation'] ?? array();
 		if ( ! \is_array( $dep ) ) {
 			$dep = array();
 		}
@@ -349,10 +353,10 @@ final class Section_Template_Detail_State_Builder {
 			}
 		}
 		return array(
-			'is_deprecated'   => $status === 'deprecated' || (bool) ( $dep['deprecated'] ?? false ),
-			'reason'          => (string) ( $dep['reason'] ?? '' ),
+			'is_deprecated'    => $status === 'deprecated' || (bool) ( $dep['deprecated'] ?? false ),
+			'reason'           => (string) ( $dep['reason'] ?? '' ),
 			'replacement_keys' => $replacement_keys,
-			'deprecated_at'   => (string) ( $dep['deprecated_at'] ?? '' ),
+			'deprecated_at'    => (string) ( $dep['deprecated_at'] ?? '' ),
 		);
 	}
 
@@ -360,18 +364,29 @@ final class Section_Template_Detail_State_Builder {
 	 * Breadcrumb segments: Section Templates → [Purpose family] → Section name.
 	 *
 	 * @param array<string, mixed> $definition
-	 * @param string $purpose_family
+	 * @param string               $purpose_family
 	 * @return list<array{label: string, url: string}>
 	 */
 	private function build_breadcrumbs( array $definition, string $purpose_family ): array {
 		$base_url = \admin_url( 'admin.php?page=' . Section_Template_Directory_State_Builder::SCREEN_SLUG );
-		$segments = array( array( 'label' => __( 'Section Templates', 'aio-page-builder' ), 'url' => $base_url ) );
+		$segments = array(
+			array(
+				'label' => __( 'Section Templates', 'aio-page-builder' ),
+				'url'   => $base_url,
+			),
+		);
 		if ( $purpose_family !== '' ) {
 			$purpose_label = \ucfirst( \str_replace( array( '_', '-' ), ' ', $purpose_family ) );
-			$segments[] = array( 'label' => $purpose_label, 'url' => $base_url . '&purpose_family=' . \rawurlencode( $purpose_family ) );
+			$segments[]    = array(
+				'label' => $purpose_label,
+				'url'   => $base_url . '&purpose_family=' . \rawurlencode( $purpose_family ),
+			);
 		}
-		$name = (string) ( $definition['name'] ?? $definition['internal_key'] ?? '' );
-		$segments[] = array( 'label' => $name !== '' ? $name : (string) ( $definition['internal_key'] ?? '' ), 'url' => '' );
+		$name       = (string) ( $definition['name'] ?? $definition['internal_key'] ?? '' );
+		$segments[] = array(
+			'label' => $name !== '' ? $name : (string) ( $definition['internal_key'] ?? '' ),
+			'url'   => '',
+		);
 		return $segments;
 	}
 
@@ -380,8 +395,18 @@ final class Section_Template_Detail_State_Builder {
 		return array(
 			'section_key'                 => $section_key,
 			'definition'                  => array(),
-			'version_summary'             => array( 'version' => '1', 'stable_key_retained' => true, 'changelog_ref' => '', 'breaking' => false ),
-			'deprecation_summary'         => array( 'is_deprecated' => false, 'reason' => '', 'replacement_keys' => array(), 'deprecated_at' => '' ),
+			'version_summary'             => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+				'changelog_ref'       => '',
+				'breaking'            => false,
+			),
+			'deprecation_summary'         => array(
+				'is_deprecated'    => false,
+				'reason'           => '',
+				'replacement_keys' => array(),
+				'deprecated_at'    => '',
+			),
 			'side_panel'                  => array(),
 			'field_summary'               => array(),
 			'helper_ref'                  => '',
@@ -391,7 +416,12 @@ final class Section_Template_Detail_State_Builder {
 			'preview_payload'             => array(),
 			'rendered_preview_html'       => '',
 			'preview_cache_hit'           => false,
-			'breadcrumbs'                 => array( array( 'label' => __( 'Section Templates', 'aio-page-builder' ), 'url' => $base_url ) ),
+			'breadcrumbs'                 => array(
+				array(
+					'label' => __( 'Section Templates', 'aio-page-builder' ),
+					'url'   => $base_url,
+				),
+			),
 			'form_section_field_state'    => null,
 			'not_found'                   => true,
 		);

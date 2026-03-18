@@ -47,13 +47,13 @@ final class Industry_Subtype_Comparison_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function get_state(): array {
-		$primary = '';
+		$primary     = '';
 		$subtype_key = '';
 		if ( $this->container instanceof Service_Container && $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
 			$repo = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
 			if ( $repo instanceof Industry_Profile_Repository ) {
-				$profile = $repo->get_profile();
-				$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+				$profile     = $repo->get_profile();
+				$primary     = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 					? \trim( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 					: '';
 				$subtype_key = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
@@ -62,17 +62,17 @@ final class Industry_Subtype_Comparison_Screen {
 			}
 		}
 		$comparison = array(
-			'primary_industry_key'       => '',
-			'subtype_key'                => '',
-			'subtype_label'              => '',
-			'parent_bundles'             => array(),
-			'subtype_bundles'            => array(),
-			'parent_top_template_keys'   => array(),
-			'parent_top_section_keys'    => array(),
-			'subtype_top_template_keys'   => array(),
-			'subtype_top_section_keys'   => array(),
-			'pack_found'                 => false,
-			'has_subtype'                => false,
+			'primary_industry_key'      => '',
+			'subtype_key'               => '',
+			'subtype_label'             => '',
+			'parent_bundles'            => array(),
+			'subtype_bundles'           => array(),
+			'parent_top_template_keys'  => array(),
+			'parent_top_section_keys'   => array(),
+			'subtype_top_template_keys' => array(),
+			'subtype_top_section_keys'  => array(),
+			'pack_found'                => false,
+			'has_subtype'               => false,
 		);
 		if ( $primary !== '' && $this->container instanceof Service_Container && $this->container->has( 'industry_subtype_comparison_service' ) ) {
 			$service = $this->container->get( 'industry_subtype_comparison_service' );
@@ -97,10 +97,10 @@ final class Industry_Subtype_Comparison_Screen {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the subtype comparison screen.', 'aio-page-builder' ), 403 );
 		}
-		$state = $this->get_state();
-		$c = $state['comparison'];
-		$primary = $state['primary_industry_key'];
-		$parent_label = $primary !== '' ? \ucfirst( \str_replace( array( '_', '-' ), ' ', $primary ) ) : __( 'Parent industry', 'aio-page-builder' );
+		$state         = $this->get_state();
+		$c             = $state['comparison'];
+		$primary       = $state['primary_industry_key'];
+		$parent_label  = $primary !== '' ? \ucfirst( \str_replace( array( '_', '-' ), ' ', $primary ) ) : __( 'Parent industry', 'aio-page-builder' );
 		$subtype_label = isset( $c['subtype_label'] ) && $c['subtype_label'] !== '' ? $c['subtype_label'] : __( 'Subtype', 'aio-page-builder' );
 		?>
 		<div class="wrap aio-page-builder-screen aio-industry-subtype-comparison" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">

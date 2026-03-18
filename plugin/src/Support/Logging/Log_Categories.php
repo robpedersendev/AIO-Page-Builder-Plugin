@@ -17,13 +17,13 @@ defined( 'ABSPATH' ) || exit;
 final class Log_Categories {
 
 	public const VALIDATION    = 'validation';
-	public const DEPENDENCY   = 'dependency';
-	public const EXECUTION    = 'execution';
-	public const PROVIDER     = 'provider';
-	public const QUEUE        = 'queue';
-	public const REPORTING    = 'reporting';
+	public const DEPENDENCY    = 'dependency';
+	public const EXECUTION     = 'execution';
+	public const PROVIDER      = 'provider';
+	public const QUEUE         = 'queue';
+	public const REPORTING     = 'reporting';
 	public const IMPORT_EXPORT = 'import_export';
-	public const SECURITY     = 'security';
+	public const SECURITY      = 'security';
 	public const COMPATIBILITY = 'compatibility';
 
 	/** @var array<string>|null */

@@ -33,7 +33,7 @@ final class Style_Validation_Result_Test extends TestCase {
 	}
 
 	public function test_errors_are_bounded_in_length(): void {
-		$long = str_repeat( 'x', 400 );
+		$long   = str_repeat( 'x', 400 );
 		$result = new Style_Validation_Result( false, array( $long ) );
 		$errors = $result->get_errors();
 		$this->assertCount( 1, $errors );

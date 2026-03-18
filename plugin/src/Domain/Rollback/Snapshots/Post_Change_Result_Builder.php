@@ -32,8 +32,8 @@ final class Post_Change_Result_Builder {
 		$action_type = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ]
 			: '';
-		$artifacts = isset( $handler_result['artifacts'] ) && is_array( $handler_result['artifacts'] ) ? $handler_result['artifacts'] : array();
-		$success   = ! empty( $handler_result['success'] );
+		$artifacts   = isset( $handler_result['artifacts'] ) && is_array( $handler_result['artifacts'] ) ? $handler_result['artifacts'] : array();
+		$success     = ! empty( $handler_result['success'] );
 
 		if ( $action_type === Execution_Action_Types::REPLACE_PAGE ) {
 			return $this->build_page_post( $artifacts, $success, $handler_result );
@@ -59,11 +59,11 @@ final class Post_Change_Result_Builder {
 			return null;
 		}
 		$result_snapshot = array( 'post_id' => $post_id );
-		$post = \get_post( $post_id );
+		$post            = \get_post( $post_id );
 		if ( $post instanceof \WP_Post && $post->post_type === 'page' ) {
-			$result_snapshot['post_title']   = $post->post_title;
-			$result_snapshot['post_name']    = $post->post_name;
-			$result_snapshot['post_status']  = $post->post_status;
+			$result_snapshot['post_title']  = $post->post_title;
+			$result_snapshot['post_name']   = $post->post_name;
+			$result_snapshot['post_status'] = $post->post_status;
 		}
 		if ( isset( $artifacts['superseded_post_id'] ) && (int) $artifacts['superseded_post_id'] > 0 ) {
 			$result_snapshot['previous_post_id'] = (int) $artifacts['superseded_post_id'];
@@ -104,12 +104,12 @@ final class Post_Change_Result_Builder {
 			return array(
 				'template_key'    => $template_key,
 				'template_family' => '',
-				'section_count'  => isset( $artifacts['assignment_count'] ) && is_numeric( $artifacts['assignment_count'] ) ? (int) $artifacts['assignment_count'] : 0,
+				'section_count'   => isset( $artifacts['assignment_count'] ) && is_numeric( $artifacts['assignment_count'] ) ? (int) $artifacts['assignment_count'] : 0,
 			);
 		}
 		return array(
-			'template_key'     => (string) ( $ctx['template_key'] ?? '' ),
-			'template_family'  => (string) ( $ctx['template_family'] ?? '' ),
+			'template_key'    => (string) ( $ctx['template_key'] ?? '' ),
+			'template_family' => (string) ( $ctx['template_family'] ?? '' ),
 			'section_count'   => isset( $ctx['section_count'] ) && is_numeric( $ctx['section_count'] ) ? (int) $ctx['section_count'] : ( isset( $ctx['field_assignment_count'] ) && is_numeric( $ctx['field_assignment_count'] ) ? (int) $ctx['field_assignment_count'] : 0 ),
 		);
 	}
@@ -147,10 +147,10 @@ final class Post_Change_Result_Builder {
 			'target_ref'    => (string) $menu_id,
 			'object_family' => Operational_Snapshot_Schema::OBJECT_FAMILY_MENU,
 			'post_change'   => array(
-				'captured_at'      => gmdate( 'c' ),
-				'result_snapshot'  => $result_snapshot,
-				'outcome'          => $success ? 'success' : 'failed',
-				'message'          => substr( $message, 0, 512 ),
+				'captured_at'     => gmdate( 'c' ),
+				'result_snapshot' => $result_snapshot,
+				'outcome'         => $success ? 'success' : 'failed',
+				'message'         => substr( $message, 0, 512 ),
 			),
 		);
 	}
@@ -166,8 +166,8 @@ final class Post_Change_Result_Builder {
 		$target = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
 			: array();
-		$group = isset( $target['token_group'] ) && is_string( $target['token_group'] ) ? trim( $target['token_group'] ) : '';
-		$name  = isset( $target['token_name'] ) && is_string( $target['token_name'] ) ? trim( $target['token_name'] ) : '';
+		$group  = isset( $target['token_group'] ) && is_string( $target['token_group'] ) ? trim( $target['token_group'] ) : '';
+		$name   = isset( $target['token_name'] ) && is_string( $target['token_name'] ) ? trim( $target['token_name'] ) : '';
 		if ( $group === '' || $name === '' ) {
 			$group = isset( $artifacts['token_group'] ) && is_string( $artifacts['token_group'] ) ? trim( $artifacts['token_group'] ) : '';
 			$name  = isset( $artifacts['token_name'] ) && is_string( $artifacts['token_name'] ) ? trim( $artifacts['token_name'] ) : '';
@@ -175,7 +175,7 @@ final class Post_Change_Result_Builder {
 		if ( $group === '' || $name === '' ) {
 			return null;
 		}
-		$token_set_ref = $group . ':' . $name;
+		$token_set_ref   = $group . ':' . $name;
 		$result_snapshot = array(
 			'token_set_id' => $token_set_ref,
 			'tokens'       => array(),
@@ -188,10 +188,10 @@ final class Post_Change_Result_Builder {
 			'target_ref'    => $token_set_ref,
 			'object_family' => Operational_Snapshot_Schema::OBJECT_FAMILY_TOKEN_SET,
 			'post_change'   => array(
-				'captured_at'      => gmdate( 'c' ),
-				'result_snapshot'  => $result_snapshot,
-				'outcome'          => $success ? 'success' : 'failed',
-				'message'          => substr( $message, 0, 512 ),
+				'captured_at'     => gmdate( 'c' ),
+				'result_snapshot' => $result_snapshot,
+				'outcome'         => $success ? 'success' : 'failed',
+				'message'         => substr( $message, 0, 512 ),
 			),
 		);
 	}

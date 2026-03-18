@@ -37,27 +37,27 @@ final class Template_Finalization_Service {
 	/**
 	 * Builds finalization summary, template closure record, and run completion state from plan definition.
 	 *
-	 * @param array<string, mixed> $definition Full plan definition (after execution; items have status and optional execution_artifact).
+	 * @param array<string, mixed>             $definition Full plan definition (after execution; items have status and optional execution_artifact).
 	 * @param array<int, array<string, mixed>> $conflicts Optional conflicts from finalization gate (when blocked).
 	 * @return Template_Finalization_Result
 	 */
 	public function build( array $definition, array $conflicts = array() ): Template_Finalization_Result {
-		$counts = $this->count_by_action_and_outcome( $definition );
+		$counts         = $this->count_by_action_and_outcome( $definition );
 		$closure_record = $this->build_template_execution_closure_record( $definition );
-		$one_pager = $this->build_one_pager_retention_summary( $definition );
-		$run_state = $this->compute_run_completion_state( $counts, $conflicts );
+		$one_pager      = $this->build_one_pager_retention_summary( $definition );
+		$run_state      = $this->compute_run_completion_state( $counts, $conflicts );
 
 		$finalization_summary = array(
-			'created'   => $counts['created'],
-			'replaced'  => $counts['replaced'],
-			'updated'   => $counts['updated'],
-			'skipped'   => $counts['skipped'],
-			'failed'    => $counts['failed'],
-			'pending'   => $counts['pending'],
-			'published' => 0,
+			'created'                       => $counts['created'],
+			'replaced'                      => $counts['replaced'],
+			'updated'                       => $counts['updated'],
+			'skipped'                       => $counts['skipped'],
+			'failed'                        => $counts['failed'],
+			'pending'                       => $counts['pending'],
+			'published'                     => 0,
 			'completed_without_publication' => 0,
-			'blocked'   => count( $conflicts ),
-			'denied'    => $counts['skipped'],
+			'blocked'                       => count( $conflicts ),
+			'denied'                        => $counts['skipped'],
 		);
 
 		return new Template_Finalization_Result(
@@ -75,7 +75,7 @@ final class Template_Finalization_Service {
 	 * @return array{created: int, replaced: int, updated: int, skipped: int, failed: int, pending: int}
 	 */
 	private function count_by_action_and_outcome( array $definition ): array {
-		$out = array(
+		$out   = array(
 			'created'  => 0,
 			'replaced' => 0,
 			'updated'  => 0,
@@ -97,7 +97,7 @@ final class Template_Finalization_Service {
 				if ( ! is_array( $item ) ) {
 					continue;
 				}
-				$status   = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
+				$status    = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
 				$item_type = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' );
 				if ( $status === Build_Plan_Item_Statuses::COMPLETED ) {
 					if ( $item_type === Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ) {
@@ -129,7 +129,7 @@ final class Template_Finalization_Service {
 	 */
 	private function build_template_execution_closure_record( array $definition ): array {
 		$record = array();
-		$steps = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+		$steps  = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
 		foreach ( $steps as $step_index => $step ) {
@@ -143,20 +143,20 @@ final class Template_Finalization_Service {
 				if ( ! is_array( $item ) ) {
 					continue;
 				}
-				$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
+				$status    = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
 				$item_type = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' );
 				if ( $status !== Build_Plan_Item_Statuses::COMPLETED ) {
 					continue;
 				}
-				$artifact = isset( $item['execution_artifact'] ) && is_array( $item['execution_artifact'] ) ? $item['execution_artifact'] : array();
-				$payload  = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
-				$post_id = isset( $artifact['target_post_id'] ) && is_numeric( $artifact['target_post_id'] ) ? (int) $artifact['target_post_id'] : ( isset( $artifact['post_id'] ) && is_numeric( $artifact['post_id'] ) ? (int) $artifact['post_id'] : 0 );
+				$artifact     = isset( $item['execution_artifact'] ) && is_array( $item['execution_artifact'] ) ? $item['execution_artifact'] : array();
+				$payload      = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+				$post_id      = isset( $artifact['target_post_id'] ) && is_numeric( $artifact['target_post_id'] ) ? (int) $artifact['target_post_id'] : ( isset( $artifact['post_id'] ) && is_numeric( $artifact['post_id'] ) ? (int) $artifact['post_id'] : 0 );
 				$template_key = isset( $payload['template_key'] ) && is_string( $payload['template_key'] ) ? trim( $payload['template_key'] ) : '';
 				if ( $template_key === '' && isset( $payload['target_template_key'] ) && is_string( $payload['target_template_key'] ) ) {
 					$template_key = trim( $payload['target_template_key'] );
 				}
 				if ( $template_key === '' ) {
-					$ctx = isset( $artifact['template_build_execution_result'] ) && is_array( $artifact['template_build_execution_result'] ) ? $artifact['template_build_execution_result'] : ( isset( $artifact['template_replacement_execution_result'] ) && is_array( $artifact['template_replacement_execution_result'] ) ? $artifact['template_replacement_execution_result'] : array() );
+					$ctx          = isset( $artifact['template_build_execution_result'] ) && is_array( $artifact['template_build_execution_result'] ) ? $artifact['template_build_execution_result'] : ( isset( $artifact['template_replacement_execution_result'] ) && is_array( $artifact['template_replacement_execution_result'] ) ? $artifact['template_replacement_execution_result'] : array() );
 					$template_key = isset( $ctx['template_key'] ) && is_string( $ctx['template_key'] ) ? trim( $ctx['template_key'] ) : '';
 				}
 				$template_family = '';
@@ -171,24 +171,27 @@ final class Template_Finalization_Service {
 				} elseif ( isset( $artifact['template_build_execution_result']['one_pager_ref'] ) && is_string( $artifact['template_build_execution_result']['one_pager_ref'] ) ) {
 					$one_pager_ref = trim( $artifact['template_build_execution_result']['one_pager_ref'] );
 				}
-				$action_taken = $item_type === Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ? 'create' : ( $item_type === Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE ? 'replace' : 'update' );
+				$action_taken    = $item_type === Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ? 'create' : ( $item_type === Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE ? 'replace' : 'update' );
 				$form_dependency = false;
 				if ( $template_key !== '' && $this->form_provider_dependency_validator !== null ) {
 					$form_dependency = $template_key === Form_Integration_Definitions::REQUEST_PAGE_TEMPLATE_KEY
 						|| $this->form_provider_dependency_validator->template_uses_form_sections( $template_key );
 				}
-				$record[] = array_filter( array(
-					'plan_item_id'    => (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ),
-					'item_type'       => $item_type,
-					'action_taken'    => $action_taken,
-					'template_key'    => $template_key !== '' ? $template_key : null,
-					'template_family' => $template_family !== '' ? $template_family : null,
-					'post_id'         => $post_id > 0 ? $post_id : null,
-					'one_pager_ref'   => $one_pager_ref !== '' ? $one_pager_ref : null,
-					'form_dependency' => $form_dependency ? true : null,
-				), function ( $v ) {
-					return $v !== null && $v !== '';
-				} );
+				$record[] = array_filter(
+					array(
+						'plan_item_id'    => (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ),
+						'item_type'       => $item_type,
+						'action_taken'    => $action_taken,
+						'template_key'    => $template_key !== '' ? $template_key : null,
+						'template_family' => $template_family !== '' ? $template_family : null,
+						'post_id'         => $post_id > 0 ? $post_id : null,
+						'one_pager_ref'   => $one_pager_ref !== '' ? $one_pager_ref : null,
+						'form_dependency' => $form_dependency ? true : null,
+					),
+					function ( $v ) {
+						return $v !== null && $v !== '';
+					}
+				);
 			}
 		}
 		return $record;
@@ -202,7 +205,7 @@ final class Template_Finalization_Service {
 	 */
 	private function build_one_pager_retention_summary( array $definition ): array {
 		$by_template = array();
-		$steps = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+		$steps       = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
 		foreach ( $steps as $step ) {
@@ -216,7 +219,7 @@ final class Template_Finalization_Service {
 				if ( ! is_array( $item ) || (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' ) !== Build_Plan_Item_Statuses::COMPLETED ) {
 					continue;
 				}
-				$artifact = isset( $item['execution_artifact'] ) && is_array( $item['execution_artifact'] ) ? $item['execution_artifact'] : array();
+				$artifact     = isset( $item['execution_artifact'] ) && is_array( $item['execution_artifact'] ) ? $item['execution_artifact'] : array();
 				$template_key = '';
 				if ( isset( $artifact['template_build_execution_result']['template_key'] ) && is_string( $artifact['template_build_execution_result']['template_key'] ) ) {
 					$template_key = trim( $artifact['template_build_execution_result']['template_key'] );
@@ -224,14 +227,17 @@ final class Template_Finalization_Service {
 					$template_key = trim( $artifact['template_replacement_execution_result']['template_key'] );
 				}
 				if ( $template_key === '' ) {
-					$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+					$payload      = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
 					$template_key = isset( $payload['template_key'] ) && is_string( $payload['template_key'] ) ? trim( $payload['template_key'] ) : '';
 				}
 				if ( $template_key !== '' ) {
 					if ( ! isset( $by_template[ $template_key ] ) ) {
-						$by_template[ $template_key ] = array( 'count' => 0, 'one_pager_refs' => array() );
+						$by_template[ $template_key ] = array(
+							'count'          => 0,
+							'one_pager_refs' => array(),
+						);
 					}
-					$by_template[ $template_key ]['count']++;
+					++$by_template[ $template_key ]['count'];
 					$ref = isset( $artifact['one_pager_ref'] ) && is_string( $artifact['one_pager_ref'] ) ? trim( $artifact['one_pager_ref'] ) : ( isset( $artifact['template_build_execution_result']['one_pager_ref'] ) && is_string( $artifact['template_build_execution_result']['one_pager_ref'] ) ? trim( $artifact['template_build_execution_result']['one_pager_ref'] ) : '' );
 					if ( $ref !== '' && ! in_array( $ref, $by_template[ $template_key ]['one_pager_refs'], true ) ) {
 						$by_template[ $template_key ]['one_pager_refs'][] = $ref;
@@ -246,15 +252,15 @@ final class Template_Finalization_Service {
 	 * Computes run_completion_state: complete, warning, partial, failed.
 	 *
 	 * @param array{created: int, replaced: int, updated: int, skipped: int, failed: int, pending: int} $counts
-	 * @param array<int, array<string, mixed>> $conflicts
+	 * @param array<int, array<string, mixed>>                                                          $conflicts
 	 * @return string
 	 */
 	private function compute_run_completion_state( array $counts, array $conflicts ): string {
 		if ( count( $conflicts ) > 0 ) {
 			return Template_Finalization_Result::RUN_STATE_FAILED;
 		}
-		$total_done = $counts['created'] + $counts['replaced'] + $counts['updated'];
-		$has_failed = $counts['failed'] > 0;
+		$total_done  = $counts['created'] + $counts['replaced'] + $counts['updated'];
+		$has_failed  = $counts['failed'] > 0;
 		$has_pending = $counts['pending'] > 0;
 		if ( $has_failed && $total_done === 0 ) {
 			return Template_Finalization_Result::RUN_STATE_FAILED;

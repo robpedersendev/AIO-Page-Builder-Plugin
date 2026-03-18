@@ -118,16 +118,20 @@ final class Import_Export_State_Builder_Test extends TestCase {
 			$this->markTestSkipped( 'WordPress not loaded.' );
 		}
 		$validation_payload = array(
-			'validation_passed'  => true,
+			'validation_passed' => true,
 			'blocking_failures' => array(),
 			'conflicts'         => array(
-				array( 'category' => 'compositions', 'key' => 'my-comp', 'message' => 'Already exists.' ),
+				array(
+					'category' => 'compositions',
+					'key'      => 'my-comp',
+					'message'  => 'Already exists.',
+				),
 			),
-			'warnings'           => array(),
-			'checksum_verified'  => true,
+			'warnings'          => array(),
+			'checksum_verified' => true,
 		);
-		$builder = new Import_Export_State_Builder( $this->path_manager() );
-		$state   = $builder->build( $validation_payload, null );
+		$builder            = new Import_Export_State_Builder( $this->path_manager() );
+		$state              = $builder->build( $validation_payload, null );
 		$this->assertNotNull( $state['import_validation_summary'] );
 		$this->assertTrue( $state['import_validation_summary']['validation_passed'] );
 		$this->assertCount( 1, $state['restore_conflict_rows'] );

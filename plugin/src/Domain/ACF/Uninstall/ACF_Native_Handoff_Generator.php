@@ -40,7 +40,7 @@ final class ACF_Native_Handoff_Generator {
 	) {
 		$this->inventory_service = $inventory_service;
 		$this->blueprint_service = $blueprint_service;
-		$this->group_builder      = $group_builder;
+		$this->group_builder     = $group_builder;
 	}
 
 	/**
@@ -63,7 +63,7 @@ final class ACF_Native_Handoff_Generator {
 			return $result;
 		}
 
-		$inventory = $this->inventory_service->build_inventory();
+		$inventory  = $this->inventory_service->build_inventory();
 		$group_keys = $inventory->get_plugin_runtime_group_keys();
 
 		foreach ( $group_keys as $group_key ) {
@@ -91,7 +91,7 @@ final class ACF_Native_Handoff_Generator {
 			}
 
 			$group['location'] = ACF_Group_Builder::location_for_post_type( 'page' );
-			$group = ACF_Handoff_Group_Marker::mark( $group );
+			$group             = ACF_Handoff_Group_Marker::mark( $group );
 
 			$imported = acf_import_field_group( $group );
 			if ( is_array( $imported ) && ! empty( $imported['key'] ) ) {

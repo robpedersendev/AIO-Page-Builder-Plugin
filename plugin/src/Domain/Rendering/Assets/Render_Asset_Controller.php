@@ -45,18 +45,18 @@ final class Render_Asset_Controller {
 	 * Collects asset requirements from ordered section render results.
 	 *
 	 * @param array<int, Section_Render_Result> $section_results
-	 * @param string                             $scope SCOPE_FRONTEND | SCOPE_ADMIN | SCOPE_SECTION.
+	 * @param string                            $scope SCOPE_FRONTEND | SCOPE_ADMIN | SCOPE_SECTION.
 	 * @return list<Render_Asset_Requirements>
 	 */
 	public function get_requirements_from_sections( array $section_results, string $scope = Render_Asset_Requirements::SCOPE_FRONTEND ): array {
-		$out = array();
+		$out  = array();
 		$seen = array();
 		foreach ( $section_results as $result ) {
 			if ( ! $result instanceof Section_Render_Result ) {
 				continue;
 			}
 			$section_key = $result->get_section_key();
-			$hints = $result->get_asset_hints();
+			$hints       = $result->get_asset_hints();
 			if ( ! is_array( $hints ) ) {
 				$hints = array();
 			}
@@ -65,7 +65,7 @@ final class Render_Asset_Controller {
 				continue;
 			}
 			$seen[ $handle ] = true;
-			$meta = array();
+			$meta            = array();
 			if ( ! empty( $hints['frontend_css'] ) ) {
 				$meta['frontend_css'] = true;
 			}
@@ -91,8 +91,8 @@ final class Render_Asset_Controller {
 	 */
 	public function get_requirements_from_assembly( Page_Block_Assembly_Result $assembly, string $scope = Render_Asset_Requirements::SCOPE_FRONTEND ): array {
 		$ordered = $assembly->get_ordered_sections();
-		$out = array();
-		$seen = array();
+		$out     = array();
+		$seen    = array();
 		foreach ( $ordered as $s ) {
 			$section_key = $s['section_key'] ?? '';
 			if ( ! is_string( $section_key ) || $section_key === '' ) {
@@ -103,8 +103,8 @@ final class Render_Asset_Controller {
 				continue;
 			}
 			$seen[ $handle ] = true;
-			$hints = $s['asset_hints'] ?? array();
-			$meta = array();
+			$hints           = $s['asset_hints'] ?? array();
+			$meta            = array();
 			if ( is_array( $hints ) && ! empty( $hints['frontend_css'] ) ) {
 				$meta['frontend_css'] = true;
 			}

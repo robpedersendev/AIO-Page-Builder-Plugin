@@ -51,7 +51,7 @@ final class Subtype_Goal_Section_Helper_Overlay_Registry {
 	private const ALLOWED_REGIONS = array( 'tone_notes', 'cta_usage_notes', 'compliance_cautions', 'media_notes', 'seo_notes', 'additive_blocks' );
 
 	private const KEY_PATTERN = '#^[a-z0-9_-]+$#';
-	private const KEY_MAX_LEN  = 64;
+	private const KEY_MAX_LEN = 64;
 
 	/** @var array<string, array<string, mixed>> Composite "subtype|goal|section" => overlay. */
 	private array $by_composite = array();
@@ -84,7 +84,7 @@ final class Subtype_Goal_Section_Helper_Overlay_Registry {
 			$subtype = isset( $ov[ self::FIELD_SUBTYPE_KEY ] ) && is_string( $ov[ self::FIELD_SUBTYPE_KEY ] )
 				? trim( $ov[ self::FIELD_SUBTYPE_KEY ] )
 				: '';
-			$goal = isset( $ov[ self::FIELD_GOAL_KEY ] ) && is_string( $ov[ self::FIELD_GOAL_KEY ] )
+			$goal    = isset( $ov[ self::FIELD_GOAL_KEY ] ) && is_string( $ov[ self::FIELD_GOAL_KEY ] )
 				? trim( $ov[ self::FIELD_GOAL_KEY ] )
 				: '';
 			$section = isset( $ov[ self::FIELD_SECTION_KEY ] ) && is_string( $ov[ self::FIELD_SECTION_KEY ] )
@@ -133,7 +133,7 @@ final class Subtype_Goal_Section_Helper_Overlay_Registry {
 				continue;
 			}
 			$this->by_composite[ $composite ] = $ov;
-			$this->all[]                     = $ov;
+			$this->all[]                      = $ov;
 		}
 	}
 

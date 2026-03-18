@@ -27,9 +27,9 @@ use AIOPageBuilder\Support\Logging\Error_Record;
 final class Developer_Error_Reporting_Service {
 
 	private const REPORTING_LOG_MAX_ENTRIES = 50;
-	private const MAX_RETRIES = 3;
-	private const BACKOFF_BASE_SECONDS = 3600;
-	private const SENT_DEDUPE_KEYS_MAX = 500;
+	private const MAX_RETRIES               = 3;
+	private const BACKOFF_BASE_SECONDS      = 3600;
+	private const SENT_DEDUPE_KEYS_MAX      = 500;
 
 	/** @var Reporting_Eligibility_Evaluator */
 	private Reporting_Eligibility_Evaluator $evaluator;
@@ -49,9 +49,9 @@ final class Developer_Error_Reporting_Service {
 		?Developer_Error_Transport_Interface $transport = null,
 		?Template_Library_Report_Summary_Builder $template_library_report_summary_builder = null
 	) {
-		$this->evaluator = $evaluator ?? new Reporting_Eligibility_Evaluator();
-		$this->redaction = $redaction ?? new Reporting_Redaction_Service();
-		$this->transport = $transport ?? new Wp_Mail_Developer_Error_Transport();
+		$this->evaluator                               = $evaluator ?? new Reporting_Eligibility_Evaluator();
+		$this->redaction                               = $redaction ?? new Reporting_Redaction_Service();
+		$this->transport                               = $transport ?? new Wp_Mail_Developer_Error_Transport();
 		$this->template_library_report_summary_builder = $template_library_report_summary_builder;
 	}
 
@@ -104,10 +104,10 @@ final class Developer_Error_Reporting_Service {
 				}
 			}
 
-			$site_ref   = isset( $context['site_reference_override'] ) ? (string) $context['site_reference_override'] : $this->get_site_reference();
-			$timestamp  = gmdate( 'Y-m-d\TH:i:s\Z' );
-			$envelope   = $this->build_envelope( $record, $context, $summary, $site_ref, $timestamp, $dedupe_key );
-			$log_id     = 'report_error_' . uniqid( '', true );
+			$site_ref  = isset( $context['site_reference_override'] ) ? (string) $context['site_reference_override'] : $this->get_site_reference();
+			$timestamp = gmdate( 'Y-m-d\TH:i:s\Z' );
+			$envelope  = $this->build_envelope( $record, $context, $summary, $site_ref, $timestamp, $dedupe_key );
+			$log_id    = 'report_error_' . uniqid( '', true );
 
 			$outcome = $this->transport->send( $envelope );
 
@@ -142,8 +142,8 @@ final class Developer_Error_Reporting_Service {
 	}
 
 	private function record_sent( string $dedupe_key ): void {
-		$state = $this->get_error_report_state();
-		$sent  = isset( $state['sent_dedupe_keys'] ) && is_array( $state['sent_dedupe_keys'] ) ? $state['sent_dedupe_keys'] : array();
+		$state  = $this->get_error_report_state();
+		$sent   = isset( $state['sent_dedupe_keys'] ) && is_array( $state['sent_dedupe_keys'] ) ? $state['sent_dedupe_keys'] : array();
 		$sent[] = $dedupe_key;
 		$sent   = array_slice( array_unique( $sent ), -self::SENT_DEDUPE_KEYS_MAX );
 		\update_option( Option_Names::ERROR_REPORT_STATE, array_merge( $state, array( 'sent_dedupe_keys' => $sent ) ), false );
@@ -153,7 +153,7 @@ final class Developer_Error_Reporting_Service {
 		if ( ( (string) ( $state['retry_for_dedupe_key'] ?? '' ) ) !== $dedupe_key ) {
 			return;
 		}
-		$fresh = $this->get_error_report_state();
+		$fresh                          = $this->get_error_report_state();
 		$fresh['retry_for_dedupe_key']  = '';
 		$fresh['retry_attempt_count']   = 0;
 		$fresh['retry_last_attempt_at'] = '';
@@ -162,11 +162,18 @@ final class Developer_Error_Reporting_Service {
 
 	private function record_retry_failure( array $state, string $dedupe_key, int $previous_attempt_count, string $attempted_at ): void {
 		$state = $this->get_error_report_state();
-		\update_option( Option_Names::ERROR_REPORT_STATE, array_merge( $state, array(
-			'retry_for_dedupe_key'  => $dedupe_key,
-			'retry_attempt_count'  => $previous_attempt_count + 1,
-			'retry_last_attempt_at' => $attempted_at,
-		) ), false );
+		\update_option(
+			Option_Names::ERROR_REPORT_STATE,
+			array_merge(
+				$state,
+				array(
+					'retry_for_dedupe_key'  => $dedupe_key,
+					'retry_attempt_count'   => $previous_attempt_count + 1,
+					'retry_last_attempt_at' => $attempted_at,
+				)
+			),
+			false
+		);
 	}
 
 	private function get_site_reference(): string {
@@ -202,9 +209,9 @@ final class Developer_Error_Reporting_Service {
 		if ( $website === '' && function_exists( 'home_url' ) ) {
 			$website = (string) home_url( '/', 'http' );
 		}
-		$wp_version   = isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : '';
-		$admin_email  = \get_option( 'admin_email', '' );
-		$server_ip    = '';
+		$wp_version  = isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : '';
+		$admin_email = \get_option( 'admin_email', '' );
+		$server_ip   = '';
 		if ( isset( $_SERVER['SERVER_ADDR'] ) && is_string( $_SERVER['SERVER_ADDR'] ) ) {
 			$server_ip = sanitize_text_field( $_SERVER['SERVER_ADDR'] );
 		}
@@ -219,26 +226,26 @@ final class Developer_Error_Reporting_Service {
 		}
 
 		$payload = array(
-			'severity'                  => $record->severity,
-			'category'                  => $record->category,
-			'sanitized_error_summary'   => $sanitized_summary,
-			'expected_behavior'         => $expected,
-			'actual_behavior'           => $actual,
-			'website_address'           => $website !== '' ? $website : $site_ref,
-			'plugin_version'            => Versions::plugin(),
-			'wordpress_version'          => $wp_version,
-			'php_version'                => PHP_VERSION,
-			'admin_contact_email'        => is_string( $admin_email ) ? $admin_email : '',
-			'server_ip'                  => $server_ip,
-			'timestamp'                  => $timestamp,
-			'log_reference'              => array(
-				'log_id'        => $record->id,
-				'log_category'  => $record->category,
-				'log_severity'   => $record->severity,
+			'severity'                => $record->severity,
+			'category'                => $record->category,
+			'sanitized_error_summary' => $sanitized_summary,
+			'expected_behavior'       => $expected,
+			'actual_behavior'         => $actual,
+			'website_address'         => $website !== '' ? $website : $site_ref,
+			'plugin_version'          => Versions::plugin(),
+			'wordpress_version'       => $wp_version,
+			'php_version'             => PHP_VERSION,
+			'admin_contact_email'     => is_string( $admin_email ) ? $admin_email : '',
+			'server_ip'               => $server_ip,
+			'timestamp'               => $timestamp,
+			'log_reference'           => array(
+				'log_id'       => $record->id,
+				'log_category' => $record->category,
+				'log_severity' => $record->severity,
 			),
-			'related_plan_id'            => isset( $context['related_plan_id'] ) ? (string) $context['related_plan_id'] : '',
-			'related_job_id'             => isset( $context['related_job_id'] ) ? (string) $context['related_job_id'] : '',
-			'related_run_id'             => isset( $context['related_run_id'] ) ? (string) $context['related_run_id'] : '',
+			'related_plan_id'         => isset( $context['related_plan_id'] ) ? (string) $context['related_plan_id'] : '',
+			'related_job_id'          => isset( $context['related_job_id'] ) ? (string) $context['related_job_id'] : '',
+			'related_run_id'          => isset( $context['related_run_id'] ) ? (string) $context['related_run_id'] : '',
 		);
 		if ( $this->template_library_report_summary_builder !== null ) {
 			$payload['template_library_report_summary'] = $this->template_library_report_summary_builder->build();
@@ -264,7 +271,7 @@ final class Developer_Error_Reporting_Service {
 			'log_reference'   => $log_reference,
 			'failure_reason'  => $failure_reason,
 		);
-		$log = \get_option( Option_Names::REPORTING_LOG, array() );
+		$log   = \get_option( Option_Names::REPORTING_LOG, array() );
 		if ( ! is_array( $log ) ) {
 			$log = array();
 		}

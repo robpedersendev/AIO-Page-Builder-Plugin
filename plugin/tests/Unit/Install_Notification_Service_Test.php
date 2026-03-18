@@ -47,8 +47,14 @@ final class Stub_Install_Transport implements Install_Notification_Transport_Int
 
 	public function send( array $envelope ): array {
 		return $this->success
-			? array( 'success' => true, 'failure_reason' => '' )
-			: array( 'success' => false, 'failure_reason' => $this->failure_reason ?: 'Delivery failed.' );
+			? array(
+				'success'        => true,
+				'failure_reason' => '',
+			)
+			: array(
+				'success'        => false,
+				'failure_reason' => $this->failure_reason ?: 'Delivery failed.',
+			);
 	}
 }
 
@@ -76,10 +82,10 @@ final class Install_Notification_Service_Test extends TestCase {
 	}
 
 	public function test_first_successful_activation_sends(): void {
-		$transport = new Stub_Install_Transport();
+		$transport          = new Stub_Install_Transport();
 		$transport->success = true;
-		$service = new Install_Notification_Service( $transport );
-		$result  = $service->maybe_send( 'all ready', 'test-site.local' );
+		$service            = new Install_Notification_Service( $transport );
+		$result             = $service->maybe_send( 'all ready', 'test-site.local' );
 
 		$this->assertTrue( $result->is_eligible() );
 		$this->assertTrue( $result->was_attempted() );
@@ -119,11 +125,11 @@ final class Install_Notification_Service_Test extends TestCase {
 	}
 
 	public function test_failed_send_logs_and_returns_failed_result(): void {
-		$transport = new Stub_Install_Transport();
-		$transport->success = false;
+		$transport                 = new Stub_Install_Transport();
+		$transport->success        = false;
 		$transport->failure_reason = 'SMTP error.';
-		$service = new Install_Notification_Service( $transport );
-		$result  = $service->maybe_send( 'all ready', 'test.local' );
+		$service                   = new Install_Notification_Service( $transport );
+		$result                    = $service->maybe_send( 'all ready', 'test.local' );
 
 		$this->assertTrue( $result->was_attempted() );
 		$this->assertSame( 'failed', $result->get_delivery_status() );
@@ -139,10 +145,10 @@ final class Install_Notification_Service_Test extends TestCase {
 	}
 
 	public function test_activation_never_blocks_on_failure(): void {
-		$transport = new Stub_Install_Transport();
+		$transport          = new Stub_Install_Transport();
 		$transport->success = false;
-		$service = new Install_Notification_Service( $transport );
-		$result  = $service->maybe_send( 'all ready', 'test.local' );
+		$service            = new Install_Notification_Service( $transport );
+		$result             = $service->maybe_send( 'all ready', 'test.local' );
 
 		$this->assertTrue( $result->was_attempted() );
 		$this->assertSame( 'failed', $result->get_delivery_status() );
@@ -176,31 +182,34 @@ final class Install_Notification_Service_Test extends TestCase {
 	 * Example install-notification result payload (success) per prompt.
 	 */
 	public function test_example_install_notification_result_payload(): void {
-		$result = Install_Notification_Result::sent( 'report_install_abc123' );
+		$result  = Install_Notification_Result::sent( 'report_install_abc123' );
 		$example = $result->to_array();
-		$this->assertSame( array(
-			'eligible'        => true,
-			'attempted'       => true,
-			'delivery_status' => 'sent',
-			'dedupe_state'    => 'sent',
-			'log_reference'   => 'report_install_abc123',
-			'failure_reason'  => '',
-		), $example );
+		$this->assertSame(
+			array(
+				'eligible'        => true,
+				'attempted'       => true,
+				'delivery_status' => 'sent',
+				'dedupe_state'    => 'sent',
+				'log_reference'   => 'report_install_abc123',
+				'failure_reason'  => '',
+			),
+			$example
+		);
 	}
 
 	/**
 	 * Example failed-delivery log summary payload per prompt.
 	 */
 	public function test_example_failed_delivery_log_summary_payload(): void {
-		$transport = new Stub_Install_Transport();
-		$transport->success = false;
+		$transport                 = new Stub_Install_Transport();
+		$transport->success        = false;
 		$transport->failure_reason = 'Email delivery failed.';
-		$service = new Install_Notification_Service( $transport );
+		$service                   = new Install_Notification_Service( $transport );
 		$service->maybe_send( 'all ready', 'example.local' );
 		$log = \get_option( Option_Names::REPORTING_LOG, array() );
 		$this->assertNotEmpty( $log );
 		$failed_entry = end( $log );
-		$example = array(
+		$example      = array(
 			'event_type'      => $failed_entry['event_type'],
 			'dedupe_key'      => $failed_entry['dedupe_key'],
 			'attempted_at'    => $failed_entry['attempted_at'],

@@ -30,37 +30,55 @@ final class ACF_Blueprints_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'section_field_blueprint_validator', function (): Section_Field_Blueprint_Validator {
-			return new Section_Field_Blueprint_Validator();
-		} );
-		$container->register( 'section_field_blueprint_normalizer', function () use ( $container ): Section_Field_Blueprint_Normalizer {
-			return new Section_Field_Blueprint_Normalizer(
-				$container->get( 'section_field_blueprint_validator' )
-			);
-		} );
-		$container->register( 'blueprint_family_registry', function (): Blueprint_Family_Registry {
-			return new Blueprint_Family_Registry();
-		} );
-		$container->register( 'blueprint_family_resolver', function () use ( $container ): Blueprint_Family_Resolver {
-			return new Blueprint_Family_Resolver( $container->get( 'blueprint_family_registry' ) );
-		} );
-		$container->register( 'preview_family_mapping', function (): Preview_Family_Mapping {
-			return new Preview_Family_Mapping();
-		} );
-		$container->register( 'section_field_blueprint_service', function () use ( $container ): Section_Field_Blueprint_Service {
-			$service = new Section_Field_Blueprint_Service(
-				$container->get( 'section_template_repository' ),
-				$container->get( 'section_field_blueprint_validator' ),
-				$container->get( 'section_field_blueprint_normalizer' ),
-				$container->get( 'blueprint_family_resolver' )
-			);
-			if ( $container->has( 'form_provider_registry' ) ) {
-				$reg = $container->get( 'form_provider_registry' );
-				if ( $reg instanceof Form_Provider_Registry ) {
-					$service->set_form_provider_registry( $reg );
-				}
+		$container->register(
+			'section_field_blueprint_validator',
+			function (): Section_Field_Blueprint_Validator {
+				return new Section_Field_Blueprint_Validator();
 			}
-			return $service;
-		} );
+		);
+		$container->register(
+			'section_field_blueprint_normalizer',
+			function () use ( $container ): Section_Field_Blueprint_Normalizer {
+				return new Section_Field_Blueprint_Normalizer(
+					$container->get( 'section_field_blueprint_validator' )
+				);
+			}
+		);
+		$container->register(
+			'blueprint_family_registry',
+			function (): Blueprint_Family_Registry {
+				return new Blueprint_Family_Registry();
+			}
+		);
+		$container->register(
+			'blueprint_family_resolver',
+			function () use ( $container ): Blueprint_Family_Resolver {
+				return new Blueprint_Family_Resolver( $container->get( 'blueprint_family_registry' ) );
+			}
+		);
+		$container->register(
+			'preview_family_mapping',
+			function (): Preview_Family_Mapping {
+				return new Preview_Family_Mapping();
+			}
+		);
+		$container->register(
+			'section_field_blueprint_service',
+			function () use ( $container ): Section_Field_Blueprint_Service {
+				$service = new Section_Field_Blueprint_Service(
+					$container->get( 'section_template_repository' ),
+					$container->get( 'section_field_blueprint_validator' ),
+					$container->get( 'section_field_blueprint_normalizer' ),
+					$container->get( 'blueprint_family_resolver' )
+				);
+				if ( $container->has( 'form_provider_registry' ) ) {
+					$reg = $container->get( 'form_provider_registry' );
+					if ( $reg instanceof Form_Provider_Registry ) {
+						$service->set_form_provider_registry( $reg );
+					}
+				}
+				return $service;
+			}
+		);
 	}
 }

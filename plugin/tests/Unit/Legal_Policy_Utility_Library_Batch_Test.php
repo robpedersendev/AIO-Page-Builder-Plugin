@@ -46,13 +46,13 @@ final class Legal_Policy_Utility_Library_Batch_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']     = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$repo       = new Section_Template_Repository();
-		$normalizer = new Section_Definition_Normalizer();
-		$this->validator = new Section_Validator( $normalizer, $repo );
-		$bp_validator = new Section_Field_Blueprint_Validator();
-		$this->blueprint_service = new Section_Field_Blueprint_Service(
+		$repo                           = new Section_Template_Repository();
+		$normalizer                     = new Section_Definition_Normalizer();
+		$this->validator                = new Section_Validator( $normalizer, $repo );
+		$bp_validator                   = new Section_Field_Blueprint_Validator();
+		$this->blueprint_service        = new Section_Field_Blueprint_Service(
 			$repo,
 			$bp_validator,
 			new Section_Field_Blueprint_Normalizer( $bp_validator )
@@ -68,10 +68,21 @@ final class Legal_Policy_Utility_Library_Batch_Test extends TestCase {
 		$keys = Legal_Policy_Utility_Library_Batch_Definitions::section_keys();
 		$this->assertCount( 15, $keys );
 		$expected = array(
-			'lpu_disclosure_header_01', 'lpu_policy_body_01', 'lpu_legal_summary_01', 'lpu_consent_note_01',
-			'lpu_contact_panel_01', 'lpu_contact_detail_01', 'lpu_inquiry_support_01', 'lpu_support_escalation_01',
-			'lpu_accessibility_help_01', 'lpu_utility_cta_01', 'lpu_trust_disclosure_01', 'lpu_form_intro_01',
-			'lpu_privacy_highlight_01', 'lpu_terms_toc_01', 'lpu_footer_legal_01',
+			'lpu_disclosure_header_01',
+			'lpu_policy_body_01',
+			'lpu_legal_summary_01',
+			'lpu_consent_note_01',
+			'lpu_contact_panel_01',
+			'lpu_contact_detail_01',
+			'lpu_inquiry_support_01',
+			'lpu_support_escalation_01',
+			'lpu_accessibility_help_01',
+			'lpu_utility_cta_01',
+			'lpu_trust_disclosure_01',
+			'lpu_form_intro_01',
+			'lpu_privacy_highlight_01',
+			'lpu_terms_toc_01',
+			'lpu_footer_legal_01',
 		);
 		foreach ( $expected as $k ) {
 			$this->assertContains( $k, $keys );
@@ -87,7 +98,7 @@ final class Legal_Policy_Utility_Library_Batch_Test extends TestCase {
 		$normalizer = new Section_Definition_Normalizer();
 		foreach ( Legal_Policy_Utility_Library_Batch_Definitions::all_definitions() as $def ) {
 			$normalized = $normalizer->normalize( $def );
-			$errors = $this->validator->validate_completeness( $normalized );
+			$errors     = $this->validator->validate_completeness( $normalized );
 			$this->assertEmpty( $errors, 'Definition ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '?' ) . ' should pass completeness: ' . implode( ', ', $errors ) );
 		}
 	}
@@ -144,7 +155,7 @@ final class Legal_Policy_Utility_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_accessibility_guidance(): void {
 		foreach ( Legal_Policy_Utility_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$guidance = (string) ( $def['accessibility_warnings_or_enhancements'] ?? '' );
 			$this->assertNotEmpty( $guidance, "Section {$key} must have accessibility_warnings_or_enhancements" );
 			$this->assertMatchesRegularExpression( '/label|heading|semantic|omit|51\.9|51\.10|form|modal|keyboard|focus/i', $guidance, "Section {$key} should reference form/modal/label/heading (spec §51.9, §51.10)" );
@@ -153,7 +164,7 @@ final class Legal_Policy_Utility_Library_Batch_Test extends TestCase {
 
 	public function test_preview_defaults_non_empty(): void {
 		foreach ( Legal_Policy_Utility_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$defaults = $def['preview_defaults'] ?? array();
 			$this->assertIsArray( $defaults );
 			$this->assertNotEmpty( $defaults, "Section {$key} must have non-empty preview_defaults" );
@@ -161,7 +172,7 @@ final class Legal_Policy_Utility_Library_Batch_Test extends TestCase {
 	}
 
 	public function test_categories_are_allowed(): void {
-		$allowed = Section_Schema::get_allowed_categories();
+		$allowed  = Section_Schema::get_allowed_categories();
 		$lpu_cats = array( 'legal_disclaimer', 'utility_structural', 'form_embed', 'cta_conversion' );
 		foreach ( $lpu_cats as $c ) {
 			$this->assertArrayHasKey( $c, $allowed );
@@ -184,9 +195,9 @@ final class Legal_Policy_Utility_Library_Batch_Test extends TestCase {
 
 	public function test_seeder_run_returns_success_and_fifteen_section_ids(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 600;
-		$GLOBALS['_aio_wp_query_posts']       = array();
-		$repo   = new Section_Template_Repository();
-		$result = Legal_Policy_Utility_Library_Batch_Seeder::run( $repo );
+		$GLOBALS['_aio_wp_query_posts']        = array();
+		$repo                                  = new Section_Template_Repository();
+		$result                                = Legal_Policy_Utility_Library_Batch_Seeder::run( $repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'section_ids', $result );

@@ -20,32 +20,32 @@ final class Industry_Subtype_Content_Gap_Extender {
 
 	/** Subtype expectations: (industry_key, subtype_key) => [ gap_type => severity ]. Additive or override on parent. */
 	private const SUBTYPE_EXPECTATIONS = array(
-		'cosmetology_nail' => array(
-			'cosmetology_nail_mobile_tech' => array(
+		'cosmetology_nail'  => array(
+			'cosmetology_nail_mobile_tech'  => array(
 				Industry_Content_Gap_Detector::GAP_SERVICE_AREA => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 				Industry_Content_Gap_Detector::GAP_TRUST_PROOF  => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 			),
 			'cosmetology_nail_luxury_salon' => array(
 				Industry_Content_Gap_Detector::GAP_STAFF_BIOS => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
-				Industry_Content_Gap_Detector::GAP_GALLERY    => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
+				Industry_Content_Gap_Detector::GAP_GALLERY => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 			),
 		),
-		'realtor' => array(
-			'realtor_buyer_agent' => array(
+		'realtor'           => array(
+			'realtor_buyer_agent'   => array(
 				Industry_Content_Gap_Detector::GAP_VALUATION_CONVERSION => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 				Industry_Content_Gap_Detector::GAP_TRUST_PROOF           => Industry_Content_Gap_Detector::SEVERITY_INFO,
 			),
 			'realtor_listing_agent' => array(
-				Industry_Content_Gap_Detector::GAP_GALLERY     => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
+				Industry_Content_Gap_Detector::GAP_GALLERY => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 				Industry_Content_Gap_Detector::GAP_TRUST_PROOF => Industry_Content_Gap_Detector::SEVERITY_INFO,
 			),
 		),
-		'plumber' => array(
+		'plumber'           => array(
 			'plumber_residential' => array(
 				Industry_Content_Gap_Detector::GAP_EMERGENCY_RESPONSE => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 				Industry_Content_Gap_Detector::GAP_SERVICE_AREA       => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 			),
-			'plumber_commercial' => array(
+			'plumber_commercial'  => array(
 				Industry_Content_Gap_Detector::GAP_TRUST_PROOF   => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 				Industry_Content_Gap_Detector::GAP_SERVICE_AREA => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 			),
@@ -55,7 +55,7 @@ final class Industry_Subtype_Content_Gap_Extender {
 				Industry_Content_Gap_Detector::GAP_EMERGENCY_RESPONSE => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 				Industry_Content_Gap_Detector::GAP_TRUST_PROOF        => Industry_Content_Gap_Detector::SEVERITY_INFO,
 			),
-			'disaster_recovery_commercial' => array(
+			'disaster_recovery_commercial'  => array(
 				Industry_Content_Gap_Detector::GAP_EMERGENCY_RESPONSE => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 				Industry_Content_Gap_Detector::GAP_SERVICE_AREA       => Industry_Content_Gap_Detector::SEVERITY_CAUTION,
 			),
@@ -72,8 +72,8 @@ final class Industry_Subtype_Content_Gap_Extender {
 				),
 			),
 		),
-		'realtor' => array(
-			'realtor_buyer_agent' => array(
+		'realtor'          => array(
+			'realtor_buyer_agent'   => array(
 				Industry_Content_Gap_Detector::GAP_VALUATION_CONVERSION => array(
 					'additive_note' => 'Buyer-focused: CMA, search tools, and lead capture are especially relevant.',
 				),
@@ -84,7 +84,7 @@ final class Industry_Subtype_Content_Gap_Extender {
 				),
 			),
 		),
-		'plumber' => array(
+		'plumber'          => array(
 			'plumber_commercial' => array(
 				Industry_Content_Gap_Detector::GAP_TRUST_PROOF => array(
 					'additive_note' => 'Commercial clients often expect credentials, compliance, and maintenance capability proof.',

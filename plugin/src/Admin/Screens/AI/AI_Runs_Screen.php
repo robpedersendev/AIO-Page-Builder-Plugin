@@ -83,17 +83,21 @@ final class AI_Runs_Screen {
 					<tbody>
 						<?php foreach ( $runs as $run ) : ?>
 							<?php
-							$meta = $run['run_metadata'] ?? array();
+							$meta   = $run['run_metadata'] ?? array();
 							$run_id = (string) ( $run['internal_key'] ?? $run['post_title'] ?? '' );
 							?>
-						<?php
-							$is_experiment = ! empty( $meta['is_experiment'] );
+							<?php
+							$is_experiment    = ! empty( $meta['is_experiment'] );
 							$experiment_label = $is_experiment
 								? ( (string) ( $meta['experiment_variant_label'] ?? $meta['experiment_id'] ?? __( 'Experiment', 'aio-page-builder' ) ) )
 								: '';
-						?>
+							?>
 						<tr>
-							<td><code><?php echo \esc_html( $run_id ); ?></code><?php if ( $is_experiment ) : ?> <span class="aio-run-badge" aria-label="<?php esc_attr_e( 'Experiment run', 'aio-page-builder' ); ?>"><?php echo \esc_html( $experiment_label ? $experiment_label : __( 'Experiment', 'aio-page-builder' ) ); ?></span><?php endif; ?></td>
+							<td><code><?php echo \esc_html( $run_id ); ?></code>
+							<?php
+							if ( $is_experiment ) :
+								?>
+								<span class="aio-run-badge" aria-label="<?php esc_attr_e( 'Experiment run', 'aio-page-builder' ); ?>"><?php echo \esc_html( $experiment_label ? $experiment_label : __( 'Experiment', 'aio-page-builder' ) ); ?></span><?php endif; ?></td>
 								<td><?php echo \esc_html( (string) ( $run['status'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['provider_id'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['model_used'] ?? '' ) ); ?></td>

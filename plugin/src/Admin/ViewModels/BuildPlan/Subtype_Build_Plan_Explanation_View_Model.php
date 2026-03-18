@@ -48,7 +48,7 @@ final class Subtype_Build_Plan_Explanation_View_Model {
 	 * }
 	 */
 	public static function from_plan_definition( array $plan_definition ): array {
-		$bundle_key = isset( $plan_definition[ Build_Plan_Schema::KEY_SOURCE_STARTER_BUNDLE ] ) && is_string( $plan_definition[ Build_Plan_Schema::KEY_SOURCE_STARTER_BUNDLE ] )
+		$bundle_key  = isset( $plan_definition[ Build_Plan_Schema::KEY_SOURCE_STARTER_BUNDLE ] ) && is_string( $plan_definition[ Build_Plan_Schema::KEY_SOURCE_STARTER_BUNDLE ] )
 			? trim( $plan_definition[ Build_Plan_Schema::KEY_SOURCE_STARTER_BUNDLE ] )
 			: '';
 		$subtype_key = isset( $plan_definition[ Build_Plan_Schema::KEY_SOURCE_INDUSTRY_SUBTYPE ] ) && is_string( $plan_definition[ Build_Plan_Schema::KEY_SOURCE_INDUSTRY_SUBTYPE ] )
@@ -74,7 +74,7 @@ final class Subtype_Build_Plan_Explanation_View_Model {
 		}
 
 		$subtype_caution_notes = array();
-		$warnings = isset( $plan_definition[ Build_Plan_Schema::KEY_WARNINGS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_WARNINGS ] )
+		$warnings              = isset( $plan_definition[ Build_Plan_Schema::KEY_WARNINGS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_WARNINGS ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_WARNINGS ]
 			: array();
 		foreach ( array_slice( $warnings, 0, 5 ) as $w ) {
@@ -86,10 +86,10 @@ final class Subtype_Build_Plan_Explanation_View_Model {
 
 		return array(
 			self::KEY_HAS_SUBTYPE_CONTEXT           => $has_subtype_context,
-			self::KEY_SOURCE_STARTER_BUNDLE_KEY    => $bundle_key !== '' ? $bundle_key : null,
-			self::KEY_SOURCE_INDUSTRY_SUBTYPE_KEY  => $subtype_key !== '' ? $subtype_key : null,
+			self::KEY_SOURCE_STARTER_BUNDLE_KEY     => $bundle_key !== '' ? $bundle_key : null,
+			self::KEY_SOURCE_INDUSTRY_SUBTYPE_KEY   => $subtype_key !== '' ? $subtype_key : null,
 			self::KEY_SUBTYPE_BUNDLE_RATIONALE_LINE => $rationale_line,
-			self::KEY_SUBTYPE_CAUTION_NOTES        => $subtype_caution_notes,
+			self::KEY_SUBTYPE_CAUTION_NOTES         => $subtype_caution_notes,
 		);
 	}
 
@@ -104,7 +104,7 @@ final class Subtype_Build_Plan_Explanation_View_Model {
 		if ( empty( $subtype_context[ self::KEY_HAS_SUBTYPE_CONTEXT ] ) ) {
 			return $industry_view_model;
 		}
-		$industry_view_model['subtype_context'] = $subtype_context;
+		$industry_view_model['subtype_context']     = $subtype_context;
 		$industry_view_model['has_subtype_context'] = true;
 		return $industry_view_model;
 	}

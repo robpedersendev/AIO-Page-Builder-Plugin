@@ -14,12 +14,12 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry;
 
 return array(
 	array(
-		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => 'disaster_recovery_residential_starter',
+		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY => 'disaster_recovery_residential_starter',
 		Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => 'disaster_recovery',
 		Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY => 'disaster_recovery_residential',
-		Industry_Starter_Bundle_Registry::FIELD_LABEL       => 'Residential Restoration Starter',
-		Industry_Starter_Bundle_Registry::FIELD_SUMMARY     => 'Starting set for residential restoration: home, services, contact with emergency line, assessment, and claim-assistance emphasis. Homeowner and insurance focus.',
-		Industry_Starter_Bundle_Registry::FIELD_STATUS      => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
+		Industry_Starter_Bundle_Registry::FIELD_LABEL      => 'Residential Restoration Starter',
+		Industry_Starter_Bundle_Registry::FIELD_SUMMARY    => 'Starting set for residential restoration: home, services, contact with emergency line, assessment, and claim-assistance emphasis. Homeowner and insurance focus.',
+		Industry_Starter_Bundle_Registry::FIELD_STATUS     => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
 		Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => Industry_Starter_Bundle_Registry::SUPPORTED_SCHEMA_VERSION,
 		Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_FAMILIES => array( 'home', 'services', 'contact', 'support' ),
 		Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS => array(
@@ -39,15 +39,15 @@ return array(
 		Industry_Starter_Bundle_Registry::FIELD_TOKEN_PRESET_REF => 'disaster_recovery_urgency',
 		Industry_Starter_Bundle_Registry::FIELD_CTA_GUIDANCE_REF => 'emergency_dispatch',
 		Industry_Starter_Bundle_Registry::FIELD_LPAGERY_GUIDANCE_REF => 'disaster_recovery_01',
-		Industry_Starter_Bundle_Registry::FIELD_METADATA => array( 'sort_order' => 41 ),
+		Industry_Starter_Bundle_Registry::FIELD_METADATA   => array( 'sort_order' => 41 ),
 	),
 	array(
-		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => 'disaster_recovery_commercial_starter',
+		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY => 'disaster_recovery_commercial_starter',
 		Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => 'disaster_recovery',
 		Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY => 'disaster_recovery_commercial',
-		Industry_Starter_Bundle_Registry::FIELD_LABEL       => 'Commercial Restoration Starter',
-		Industry_Starter_Bundle_Registry::FIELD_SUMMARY     => 'Starting set for commercial restoration: landing, services, contact with 24/7 commercial line, commercial assessment, and business-continuity emphasis.',
-		Industry_Starter_Bundle_Registry::FIELD_STATUS      => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
+		Industry_Starter_Bundle_Registry::FIELD_LABEL      => 'Commercial Restoration Starter',
+		Industry_Starter_Bundle_Registry::FIELD_SUMMARY    => 'Starting set for commercial restoration: landing, services, contact with 24/7 commercial line, commercial assessment, and business-continuity emphasis.',
+		Industry_Starter_Bundle_Registry::FIELD_STATUS     => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
 		Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => Industry_Starter_Bundle_Registry::SUPPORTED_SCHEMA_VERSION,
 		Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_FAMILIES => array( 'home', 'services', 'contact', 'support' ),
 		Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS => array(
@@ -67,6 +67,6 @@ return array(
 		Industry_Starter_Bundle_Registry::FIELD_TOKEN_PRESET_REF => 'disaster_recovery_urgency',
 		Industry_Starter_Bundle_Registry::FIELD_CTA_GUIDANCE_REF => 'emergency_dispatch',
 		Industry_Starter_Bundle_Registry::FIELD_LPAGERY_GUIDANCE_REF => 'disaster_recovery_01',
-		Industry_Starter_Bundle_Registry::FIELD_METADATA => array( 'sort_order' => 42 ),
+		Industry_Starter_Bundle_Registry::FIELD_METADATA   => array( 'sort_order' => 42 ),
 	),
 );

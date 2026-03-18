@@ -17,11 +17,11 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Future_Expansion_Readiness_Widget_View_Model {
 
-	public const KEY_EXPANSION_BLOCKER_COUNT = 'expansion_blocker_count';
+	public const KEY_EXPANSION_BLOCKER_COUNT   = 'expansion_blocker_count';
 	public const KEY_SCAFFOLD_INCOMPLETE_COUNT = 'scaffold_incomplete_count';
 	public const KEY_CANDIDATE_READINESS_LABEL = 'candidate_readiness_label';
-	public const KEY_MATURITY_FLOOR_LABEL = 'maturity_floor_label';
-	public const KEY_LINKS = 'links';
+	public const KEY_MATURITY_FLOOR_LABEL      = 'maturity_floor_label';
+	public const KEY_LINKS                     = 'links';
 
 	/** @var int */
 	private int $expansion_blocker_count;
@@ -44,7 +44,7 @@ final class Future_Expansion_Readiness_Widget_View_Model {
 		$this->expansion_blocker_count   = $expansion_blocker_count;
 		$this->scaffold_incomplete_count = $scaffold_incomplete_count;
 		$this->candidate_readiness_label = $candidate_readiness_label;
-		$this->maturity_floor_label     = $maturity_floor_label;
+		$this->maturity_floor_label      = $maturity_floor_label;
 		$this->links                     = $links;
 	}
 
@@ -74,8 +74,8 @@ final class Future_Expansion_Readiness_Widget_View_Model {
 		return array(
 			self::KEY_EXPANSION_BLOCKER_COUNT   => $this->expansion_blocker_count,
 			self::KEY_SCAFFOLD_INCOMPLETE_COUNT => $this->scaffold_incomplete_count,
-			self::KEY_CANDIDATE_READINESS_LABEL  => $this->candidate_readiness_label,
-			self::KEY_MATURITY_FLOOR_LABEL       => $this->maturity_floor_label,
+			self::KEY_CANDIDATE_READINESS_LABEL => $this->candidate_readiness_label,
+			self::KEY_MATURITY_FLOOR_LABEL      => $this->maturity_floor_label,
 			self::KEY_LINKS                     => $this->links,
 		);
 	}

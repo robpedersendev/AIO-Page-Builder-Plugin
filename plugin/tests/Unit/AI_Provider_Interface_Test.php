@@ -28,11 +28,17 @@ final class Stub_Provider_For_Contract implements AI_Provider_Interface {
 
 	public function get_capabilities(): array {
 		return array(
-			'provider_id'                  => 'stub',
-			'structured_output_supported'  => true,
-			'file_attachment_supported'    => false,
-			'max_context_tokens'           => 4096,
-			'models'                       => array( array( 'id' => 'stub-model', 'supports_structured_output' => true, 'default_for_planning' => true ) ),
+			'provider_id'                 => 'stub',
+			'structured_output_supported' => true,
+			'file_attachment_supported'   => false,
+			'max_context_tokens'          => 4096,
+			'models'                      => array(
+				array(
+					'id'                         => 'stub-model',
+					'supports_structured_output' => true,
+					'default_for_planning'       => true,
+				),
+			),
 		);
 	}
 
@@ -66,7 +72,7 @@ final class AI_Provider_Interface_Test extends TestCase {
 
 	public function test_stub_get_capabilities_returns_contract_shape(): void {
 		$provider = new Stub_Provider_For_Contract();
-		$cap = $provider->get_capabilities();
+		$cap      = $provider->get_capabilities();
 		$this->assertSame( 'stub', $cap['provider_id'] );
 		$this->assertArrayHasKey( 'structured_output_supported', $cap );
 		$this->assertArrayHasKey( 'models', $cap );
@@ -75,10 +81,10 @@ final class AI_Provider_Interface_Test extends TestCase {
 	public function test_stub_request_returns_normalized_response_shape(): void {
 		$provider = new Stub_Provider_For_Contract();
 		$request  = array(
-			'request_id'   => 'req_test',
-			'model'        => 'stub-model',
+			'request_id'    => 'req_test',
+			'model'         => 'stub-model',
 			'system_prompt' => 'Test',
-			'user_message' => 'Test',
+			'user_message'  => 'Test',
 		);
 		$response = $provider->request( $request );
 		$this->assertArrayHasKey( 'request_id', $response );

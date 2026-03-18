@@ -33,17 +33,19 @@ final class Industry_Style_Layer_Diff_Service_Test extends TestCase {
 
 	public function test_compare_with_preset_only_returns_parent_present_combined_equals_parent(): void {
 		$preset_registry = new Industry_Style_Preset_Registry();
-		$preset_registry->load( array(
+		$preset_registry->load(
 			array(
-				Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => 'test_preset',
-				Industry_Style_Preset_Registry::FIELD_LABEL            => 'Test Preset',
-				Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => '1',
-				Industry_Style_Preset_Registry::FIELD_STATUS          => Industry_Style_Preset_Registry::STATUS_ACTIVE,
-				Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY    => 'test_industry',
-				Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES    => array( '--aio-color-primary' => '#111' ),
-				Industry_Style_Preset_Registry::FIELD_COMPONENT_OVERRIDE_REFS => array( 'button_primary' ),
-			),
-		) );
+				array(
+					Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => 'test_preset',
+					Industry_Style_Preset_Registry::FIELD_LABEL            => 'Test Preset',
+					Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => '1',
+					Industry_Style_Preset_Registry::FIELD_STATUS          => Industry_Style_Preset_Registry::STATUS_ACTIVE,
+					Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY    => 'test_industry',
+					Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES    => array( '--aio-color-primary' => '#111' ),
+					Industry_Style_Preset_Registry::FIELD_COMPONENT_OVERRIDE_REFS => array( 'button_primary' ),
+				),
+			)
+		);
 		$service = new Industry_Style_Layer_Diff_Service( $preset_registry, null );
 		$result  = $service->compare( 'test_preset', '' );
 		$this->assertTrue( $result[ Industry_Style_Layer_Diff_Service::RESULT_PARENT ]['present'] );
@@ -56,28 +58,32 @@ final class Industry_Style_Layer_Diff_Service_Test extends TestCase {
 
 	public function test_compare_with_preset_and_goal_overlay_merges_combined(): void {
 		$preset_registry = new Industry_Style_Preset_Registry();
-		$preset_registry->load( array(
+		$preset_registry->load(
 			array(
-				Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => 'test_preset',
-				Industry_Style_Preset_Registry::FIELD_LABEL            => 'Test Preset',
-				Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => '1',
-				Industry_Style_Preset_Registry::FIELD_STATUS          => Industry_Style_Preset_Registry::STATUS_ACTIVE,
-				Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY    => 'test_industry',
-				Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES    => array( '--aio-color-primary' => '#111' ),
-				Industry_Style_Preset_Registry::FIELD_COMPONENT_OVERRIDE_REFS => array(),
-			),
-		) );
+				array(
+					Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => 'test_preset',
+					Industry_Style_Preset_Registry::FIELD_LABEL            => 'Test Preset',
+					Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => '1',
+					Industry_Style_Preset_Registry::FIELD_STATUS          => Industry_Style_Preset_Registry::STATUS_ACTIVE,
+					Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY    => 'test_industry',
+					Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES    => array( '--aio-color-primary' => '#111' ),
+					Industry_Style_Preset_Registry::FIELD_COMPONENT_OVERRIDE_REFS => array(),
+				),
+			)
+		);
 		$overlay_registry = new Goal_Style_Preset_Overlay_Registry();
-		$overlay_registry->load( array(
+		$overlay_registry->load(
 			array(
-				Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY => 'calls_test',
-				Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY        => 'calls',
-				Goal_Style_Preset_Overlay_Registry::FIELD_TARGET_PRESET_REF => 'test_preset',
-				Goal_Style_Preset_Overlay_Registry::FIELD_STATUS         => Goal_Style_Preset_Overlay_Registry::STATUS_ACTIVE,
-				Goal_Style_Preset_Overlay_Registry::FIELD_TOKEN_VALUES   => array( '--aio-color-primary' => '#0066cc' ),
-				Goal_Style_Preset_Overlay_Registry::FIELD_COMPONENT_OVERRIDE_REFS => array( 'cta_phone' ),
-			),
-		) );
+				array(
+					Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY => 'calls_test',
+					Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY        => 'calls',
+					Goal_Style_Preset_Overlay_Registry::FIELD_TARGET_PRESET_REF => 'test_preset',
+					Goal_Style_Preset_Overlay_Registry::FIELD_STATUS         => Goal_Style_Preset_Overlay_Registry::STATUS_ACTIVE,
+					Goal_Style_Preset_Overlay_Registry::FIELD_TOKEN_VALUES   => array( '--aio-color-primary' => '#0066cc' ),
+					Goal_Style_Preset_Overlay_Registry::FIELD_COMPONENT_OVERRIDE_REFS => array( 'cta_phone' ),
+				),
+			)
+		);
 		$this->assertNotNull( $preset_registry->get( 'test_preset' ), 'Preset test_preset must be in registry' );
 		$overlays = $overlay_registry->get_overlays_for_preset( 'test_preset' );
 		$this->assertCount( 1, $overlays, 'Overlay for test_preset must be loaded' );
@@ -106,25 +112,29 @@ final class Industry_Style_Layer_Diff_Service_Test extends TestCase {
 
 	public function test_compare_goal_empty_skips_overlay(): void {
 		$preset_registry = new Industry_Style_Preset_Registry();
-		$preset_registry->load( array(
+		$preset_registry->load(
 			array(
-				Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => 'p1',
-				Industry_Style_Preset_Registry::FIELD_LABEL            => 'P1',
-				Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => '1',
-				Industry_Style_Preset_Registry::FIELD_STATUS          => Industry_Style_Preset_Registry::STATUS_ACTIVE,
-				Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY    => 'test_industry',
-				Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES    => array(),
-			),
-		) );
+				array(
+					Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => 'p1',
+					Industry_Style_Preset_Registry::FIELD_LABEL            => 'P1',
+					Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => '1',
+					Industry_Style_Preset_Registry::FIELD_STATUS          => Industry_Style_Preset_Registry::STATUS_ACTIVE,
+					Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY    => 'test_industry',
+					Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES    => array(),
+				),
+			)
+		);
 		$overlay_registry = new Goal_Style_Preset_Overlay_Registry();
-		$overlay_registry->load( array(
+		$overlay_registry->load(
 			array(
-				Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY => 'g1',
-				Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY        => 'calls',
-				Goal_Style_Preset_Overlay_Registry::FIELD_TARGET_PRESET_REF => 'p1',
-				Goal_Style_Preset_Overlay_Registry::FIELD_STATUS         => Goal_Style_Preset_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY => 'g1',
+					Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY        => 'calls',
+					Goal_Style_Preset_Overlay_Registry::FIELD_TARGET_PRESET_REF => 'p1',
+					Goal_Style_Preset_Overlay_Registry::FIELD_STATUS         => Goal_Style_Preset_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$service = new Industry_Style_Layer_Diff_Service( $preset_registry, $overlay_registry );
 		$result  = $service->compare( 'p1', '' );
 		$this->assertFalse( $result[ Industry_Style_Layer_Diff_Service::RESULT_GOAL ]['present'] );

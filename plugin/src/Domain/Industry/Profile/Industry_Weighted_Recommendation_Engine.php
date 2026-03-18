@@ -58,10 +58,10 @@ final class Industry_Weighted_Recommendation_Engine {
 	 * @return array<string, mixed> Industry_Weighted_Recommendation_Result shape.
 	 */
 	public function for_section_item( array $profile, array $item ): array {
-		$primary = $this->primary_key( $profile );
-		$secondary = $this->secondary_keys( $profile );
-		$score = (int) ( $item['score'] ?? 0 );
-		$reasons = isset( $item['explanation_reasons'] ) && is_array( $item['explanation_reasons'] )
+		$primary     = $this->primary_key( $profile );
+		$secondary   = $this->secondary_keys( $profile );
+		$score       = (int) ( $item['score'] ?? 0 );
+		$reasons     = isset( $item['explanation_reasons'] ) && is_array( $item['explanation_reasons'] )
 			? $item['explanation_reasons']
 			: array();
 		$source_refs = isset( $item['industry_source_refs'] ) && is_array( $item['industry_source_refs'] )
@@ -70,12 +70,12 @@ final class Industry_Weighted_Recommendation_Engine {
 
 		$conflicts = array();
 		if ( $primary !== '' && count( $secondary ) > 0 ) {
-			$primary_positive = $this->section_primary_positive( $reasons );
-			$primary_negative = $this->section_primary_negative( $reasons );
+			$primary_positive   = $this->section_primary_positive( $reasons );
+			$primary_negative   = $this->section_primary_negative( $reasons );
 			$secondary_positive = $this->section_secondary_positive( $reasons );
 			$secondary_negative = $this->section_secondary_negative( $reasons );
 			if ( ( $primary_positive && $secondary_negative ) || ( $primary_negative && $secondary_positive ) ) {
-				$industries = array_filter( array_merge( array( $primary ), $secondary ) );
+				$industries  = array_filter( array_merge( array( $primary ), $secondary ) );
 				$conflicts[] = Industry_Conflict_Result::create(
 					Industry_Conflict_Result::CONFLICT_TYPE_SECTION_FIT,
 					$industries,
@@ -100,10 +100,10 @@ final class Industry_Weighted_Recommendation_Engine {
 	 * @return array<string, mixed> Industry_Weighted_Recommendation_Result shape.
 	 */
 	public function for_template_item( array $profile, array $item ): array {
-		$primary = $this->primary_key( $profile );
-		$secondary = $this->secondary_keys( $profile );
-		$score = (int) ( $item['score'] ?? 0 );
-		$reasons = isset( $item['explanation_reasons'] ) && is_array( $item['explanation_reasons'] )
+		$primary     = $this->primary_key( $profile );
+		$secondary   = $this->secondary_keys( $profile );
+		$score       = (int) ( $item['score'] ?? 0 );
+		$reasons     = isset( $item['explanation_reasons'] ) && is_array( $item['explanation_reasons'] )
 			? $item['explanation_reasons']
 			: array();
 		$source_refs = isset( $item['industry_source_refs'] ) && is_array( $item['industry_source_refs'] )
@@ -112,12 +112,12 @@ final class Industry_Weighted_Recommendation_Engine {
 
 		$conflicts = array();
 		if ( $primary !== '' && count( $secondary ) > 0 ) {
-			$primary_positive = $this->template_primary_positive( $reasons );
-			$primary_negative = $this->template_primary_negative( $reasons );
+			$primary_positive   = $this->template_primary_positive( $reasons );
+			$primary_negative   = $this->template_primary_negative( $reasons );
 			$secondary_positive = $this->template_secondary_positive( $reasons );
 			$secondary_negative = $this->template_secondary_negative( $reasons );
 			if ( ( $primary_positive && $secondary_negative ) || ( $primary_negative && $secondary_positive ) ) {
-				$industries = array_filter( array_merge( array( $primary ), $secondary ) );
+				$industries  = array_filter( array_merge( array( $primary ), $secondary ) );
 				$conflicts[] = Industry_Conflict_Result::create(
 					Industry_Conflict_Result::CONFLICT_TYPE_TEMPLATE_FIT,
 					$industries,
@@ -142,10 +142,10 @@ final class Industry_Weighted_Recommendation_Engine {
 	 * @return array<string, mixed> Industry_Weighted_Recommendation_Result shape.
 	 */
 	public function for_build_plan_item( array $profile, array $item_payload ): array {
-		$primary = $this->primary_key( $profile );
-		$secondary = $this->secondary_keys( $profile );
-		$score = (int) ( $item_payload['industry_fit_score'] ?? 0 );
-		$reasons = isset( $item_payload['recommendation_reasons'] ) && is_array( $item_payload['recommendation_reasons'] )
+		$primary     = $this->primary_key( $profile );
+		$secondary   = $this->secondary_keys( $profile );
+		$score       = (int) ( $item_payload['industry_fit_score'] ?? 0 );
+		$reasons     = isset( $item_payload['recommendation_reasons'] ) && is_array( $item_payload['recommendation_reasons'] )
 			? $item_payload['recommendation_reasons']
 			: array();
 		$source_refs = isset( $item_payload['industry_source_refs'] ) && is_array( $item_payload['industry_source_refs'] )
@@ -154,12 +154,12 @@ final class Industry_Weighted_Recommendation_Engine {
 
 		$conflicts = array();
 		if ( $primary !== '' && count( $secondary ) > 0 ) {
-			$primary_positive = $this->template_primary_positive( $reasons ) || $this->section_primary_positive( $reasons );
-			$primary_negative = $this->template_primary_negative( $reasons ) || $this->section_primary_negative( $reasons );
+			$primary_positive   = $this->template_primary_positive( $reasons ) || $this->section_primary_positive( $reasons );
+			$primary_negative   = $this->template_primary_negative( $reasons ) || $this->section_primary_negative( $reasons );
 			$secondary_positive = $this->template_secondary_positive( $reasons ) || $this->section_secondary_positive( $reasons );
 			$secondary_negative = $this->template_secondary_negative( $reasons ) || $this->section_secondary_negative( $reasons );
 			if ( ( $primary_positive && $secondary_negative ) || ( $primary_negative && $secondary_positive ) ) {
-				$industries = array_filter( array_merge( array( $primary ), $secondary ) );
+				$industries  = array_filter( array_merge( array( $primary ), $secondary ) );
 				$conflicts[] = Industry_Conflict_Result::create(
 					Industry_Conflict_Result::CONFLICT_TYPE_BUILD_PLAN_ITEM,
 					$industries,
@@ -187,9 +187,16 @@ final class Industry_Weighted_Recommendation_Engine {
 		if ( ! is_array( $keys ) ) {
 			return array();
 		}
-		return array_values( array_filter( array_map( function ( $v ) {
-			return is_string( $v ) ? trim( $v ) : '';
-		}, $keys ) ) );
+		return array_values(
+			array_filter(
+				array_map(
+					function ( $v ) {
+						return is_string( $v ) ? trim( $v ) : '';
+					},
+					$keys
+				)
+			)
+		);
 	}
 
 	/**

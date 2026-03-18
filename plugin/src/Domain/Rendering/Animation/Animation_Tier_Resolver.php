@@ -43,7 +43,7 @@ final class Animation_Tier_Resolver {
 		$behavior      = (string) ( $section_definition['reduced_motion_behavior'] ?? Reduced_Motion_Service::BEHAVIOR_HONOR );
 
 		$effective_tier = $declared_tier;
-		$reason        = 'section_tier';
+		$reason         = 'section_tier';
 
 		if ( $reduced_motion ) {
 			$effective_tier = $reduced_service->apply_to_tier( $declared_tier, true, $behavior );
@@ -70,10 +70,10 @@ final class Animation_Tier_Resolver {
 		}
 
 		return array(
-			'effective_tier'          => $effective_tier,
-			'effective_families'      => $families,
-			'reduced_motion_applied'  => $reduced_motion,
-			'resolution_reason'       => $reason,
+			'effective_tier'         => $effective_tier,
+			'effective_families'     => $families,
+			'reduced_motion_applied' => $reduced_motion,
+			'resolution_reason'      => $reason,
 		);
 	}
 
@@ -83,7 +83,12 @@ final class Animation_Tier_Resolver {
 	}
 
 	private function tier_order( string $tier ): int {
-		$order = array( 'none' => 0, 'subtle' => 1, 'enhanced' => 2, 'premium' => 3 );
+		$order = array(
+			'none'     => 0,
+			'subtle'   => 1,
+			'enhanced' => 2,
+			'premium'  => 3,
+		);
 		return $order[ $tier ] ?? 0;
 	}
 }

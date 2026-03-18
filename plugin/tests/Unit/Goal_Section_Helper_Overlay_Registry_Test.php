@@ -20,14 +20,16 @@ final class Goal_Section_Helper_Overlay_Registry_Test extends TestCase {
 
 	public function test_load_and_get_returns_overlay(): void {
 		$registry = new Goal_Section_Helper_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY   => 'calls',
-				Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'hero_conv_02',
-				Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE    => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
-				Goal_Section_Helper_Overlay_Registry::FIELD_STATUS  => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY   => 'calls',
+					Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'hero_conv_02',
+					Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE    => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
+					Goal_Section_Helper_Overlay_Registry::FIELD_STATUS  => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$ov = $registry->get( 'calls', 'hero_conv_02' );
 		$this->assertNotNull( $ov );
 		$this->assertSame( 'calls', $ov[ Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY ] );

@@ -17,10 +17,10 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Industry_Profile_Readiness_Result {
 
-	public const STATE_NONE     = 'none';
-	public const STATE_MINIMAL  = 'minimal';
-	public const STATE_PARTIAL  = 'partial';
-	public const STATE_READY    = 'ready';
+	public const STATE_NONE    = 'none';
+	public const STATE_MINIMAL = 'minimal';
+	public const STATE_PARTIAL = 'partial';
+	public const STATE_READY   = 'ready';
 
 	public const SCORE_NONE    = 0;
 	public const SCORE_MINIMAL = 25;
@@ -56,7 +56,7 @@ final class Industry_Profile_Readiness_Result {
 		array $validation_warnings = array(),
 		array $details = array()
 	) {
-		$this->state              = $state;
+		$this->state               = $state;
 		$this->score               = max( 0, min( 100, $score ) );
 		$this->validation_errors   = $validation_errors;
 		$this->validation_warnings = $validation_warnings;

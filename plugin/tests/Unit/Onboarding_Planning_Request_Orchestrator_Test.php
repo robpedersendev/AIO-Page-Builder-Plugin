@@ -80,25 +80,25 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 
 	/** Builds orchestrator with real draft/prefill; provider config is empty so is_provider_ready() is false. */
 	private function orchestrator_with_real_services( string $current_step ): Onboarding_Planning_Request_Orchestrator {
-		$settings = new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
-		$draft_service = new Onboarding_Draft_Service( $settings );
-		$draft = $draft_service->get_draft();
+		$settings                  = new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+		$draft_service             = new Onboarding_Draft_Service( $settings );
+		$draft                     = $draft_service->get_draft();
 		$draft['current_step_key'] = $current_step;
 		$draft_service->save_draft( $draft );
 
 		$profile_normalizer = new \AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer();
-		$profile_store = new \AIOPageBuilder\Domain\Storage\Profile\Profile_Store( $settings, $profile_normalizer );
-		$prefill = new \AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$profile_store      = new \AIOPageBuilder\Domain\Storage\Profile\Profile_Store( $settings, $profile_normalizer );
+		$prefill            = new \AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service( $profile_store, $settings, null );
 
-		$prompt_pack_registry = new Prompt_Pack_Registry_Service( new Stub_Prompt_Pack_Repo_For_Orchestrator() );
-		$container = new Service_Container();
-		$run_repo = new AI_Run_Repository();
-		$artifact_service = new AI_Run_Artifact_Service( $run_repo );
-		$ai_run_service = new AI_Run_Service( $run_repo, $artifact_service );
+		$prompt_pack_registry    = new Prompt_Pack_Registry_Service( new Stub_Prompt_Pack_Repo_For_Orchestrator() );
+		$container               = new Service_Container();
+		$run_repo                = new AI_Run_Repository();
+		$artifact_service        = new AI_Run_Artifact_Service( $run_repo );
+		$ai_run_service          = new AI_Run_Service( $run_repo, $artifact_service );
 		$request_context_builder = new Provider_Request_Context_Builder();
-		$capability_resolver = new Provider_Capability_Resolver();
+		$capability_resolver     = new Provider_Capability_Resolver();
 		$connection_test_service = new Provider_Connection_Test_Service( $request_context_builder, $capability_resolver, $settings );
-		$failover_service = new Provider_Failover_Service( $settings, $capability_resolver );
+		$failover_service        = new Provider_Failover_Service( $settings, $capability_resolver );
 		return new Onboarding_Planning_Request_Orchestrator(
 			$draft_service,
 			$prefill,
@@ -117,7 +117,7 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 
 	public function test_submit_returns_blocked_when_not_on_submission_step(): void {
 		$orchestrator = $this->orchestrator_with_real_services( Onboarding_Step_Keys::REVIEW );
-		$result = $orchestrator->submit();
+		$result       = $orchestrator->submit();
 		$this->assertInstanceOf( Planning_Request_Result::class, $result );
 		$this->assertFalse( $result->is_success() );
 		$this->assertSame( Planning_Request_Result::STATUS_BLOCKED, $result->get_status() );
@@ -128,7 +128,7 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 
 	public function test_submit_returns_blocked_when_provider_not_ready(): void {
 		$orchestrator = $this->orchestrator_with_real_services( Onboarding_Step_Keys::SUBMISSION );
-		$result = $orchestrator->submit();
+		$result       = $orchestrator->submit();
 		$this->assertFalse( $result->is_success() );
 		$this->assertSame( Planning_Request_Result::STATUS_BLOCKED, $result->get_status() );
 		$this->assertSame( 'provider_not_ready', $result->get_blocking_reason() );
@@ -136,8 +136,8 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 
 	public function test_result_payload_is_ui_safe(): void {
 		$orchestrator = $this->orchestrator_with_real_services( Onboarding_Step_Keys::SUBMISSION );
-		$result = $orchestrator->submit();
-		$arr = $result->to_array();
+		$result       = $orchestrator->submit();
+		$arr          = $result->to_array();
 		$this->assertArrayHasKey( 'success', $arr );
 		$this->assertArrayHasKey( 'status', $arr );
 		$this->assertArrayHasKey( 'user_message', $arr );

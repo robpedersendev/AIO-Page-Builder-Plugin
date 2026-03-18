@@ -31,8 +31,8 @@ final class Privacy_Settings_State_Builder {
 	private ?Service_Container $container;
 
 	public function __construct( Settings_Service $settings, ?Service_Container $container = null ) {
-		$this->settings   = $settings;
-		$this->container  = $container;
+		$this->settings  = $settings;
+		$this->container = $container;
 	}
 
 	/**
@@ -51,13 +51,13 @@ final class Privacy_Settings_State_Builder {
 	 */
 	public function build(): array {
 		return array(
-			'reporting_disclosure'       => $this->build_reporting_disclosure(),
-			'retention_state'           => $this->build_retention_state(),
-			'uninstall_export_state'     => $this->build_uninstall_export_state(),
-			'environment_summary'        => $this->build_environment_summary(),
-			'version_summary'            => $this->build_version_summary(),
-			'report_destination_summary' => $this->build_report_destination_summary(),
-			'privacy_helper_text'        => $this->build_privacy_helper_text(),
+			'reporting_disclosure'          => $this->build_reporting_disclosure(),
+			'retention_state'               => $this->build_retention_state(),
+			'uninstall_export_state'        => $this->build_uninstall_export_state(),
+			'environment_summary'           => $this->build_environment_summary(),
+			'version_summary'               => $this->build_version_summary(),
+			'report_destination_summary'    => $this->build_report_destination_summary(),
+			'privacy_helper_text'           => $this->build_privacy_helper_text(),
 			'diagnostics_verbosity_allowed' => false,
 		);
 	}
@@ -84,8 +84,8 @@ final class Privacy_Settings_State_Builder {
 	 * @return array{reporting_log_summary: string, retention_note: string}
 	 */
 	private function build_retention_state(): array {
-		$log = \get_option( Option_Names::REPORTING_LOG, array() );
-		$count = is_array( $log ) ? count( $log ) : 0;
+		$log                   = \get_option( Option_Names::REPORTING_LOG, array() );
+		$count                 = is_array( $log ) ? count( $log ) : 0;
 		$reporting_log_summary = sprintf(
 			/* translators: %d: number of reporting log entries */
 			__( 'Reporting log: %d entry(ies) (delivery attempts and status).', 'aio-page-builder' ),
@@ -94,7 +94,7 @@ final class Privacy_Settings_State_Builder {
 		$retention_note = __( 'Log entries are retained for diagnostics. Retention is governed by product policy; local logs do not contain secrets.', 'aio-page-builder' );
 		return array(
 			'reporting_log_summary' => $reporting_log_summary,
-			'retention_note'       => $retention_note,
+			'retention_note'        => $retention_note,
 		);
 	}
 
@@ -102,7 +102,7 @@ final class Privacy_Settings_State_Builder {
 	 * @return array{choices: list<array>, prefs_summary: string, built_pages_message: string, acf_preservation_message: string, template_library_lifecycle_summary?: array<string, mixed>}
 	 */
 	private function build_uninstall_export_state(): array {
-		$choices = array(
+		$choices                  = array(
 			array(
 				'value'       => Uninstall_Result::CHOICE_FULL_BACKUP,
 				'label'       => __( 'Export full backup', 'aio-page-builder' ),
@@ -124,20 +124,20 @@ final class Privacy_Settings_State_Builder {
 				'description' => __( 'Do nothing and keep the plugin installed.', 'aio-page-builder' ),
 			),
 		);
-		$prefs = $this->settings->get( Option_Names::UNINSTALL_PREFS );
-		$prefs_summary = empty( $prefs ) || ! is_array( $prefs )
+		$prefs                    = $this->settings->get( Option_Names::UNINSTALL_PREFS );
+		$prefs_summary            = empty( $prefs ) || ! is_array( $prefs )
 			? __( 'No uninstall preference saved. On uninstall you will be offered export choices.', 'aio-page-builder' )
 			: __( 'Uninstall/export preferences are stored. Use the Uninstall flow to export or remove plugin data.', 'aio-page-builder' );
-		$built_pages_message = __( 'Built pages (content created with the builder) will remain on your site. Only plugin-owned data (settings, templates, plans, logs) will be removed when you continue.', 'aio-page-builder' );
+		$built_pages_message      = __( 'Built pages (content created with the builder) will remain on your site. Only plugin-owned data (settings, templates, plans, logs) will be removed when you continue.', 'aio-page-builder' );
 		$acf_preservation_message = __( 'ACF field values (section content) are retained. To keep section field groups editable in the editor after uninstall, run the handoff before uninstall. See the ACF Uninstall Preservation operator guide.', 'aio-page-builder' );
-		$out = array(
-			'choices'                 => $choices,
+		$out                      = array(
+			'choices'                  => $choices,
 			'prefs_summary'            => $prefs_summary,
 			'built_pages_message'      => $built_pages_message,
 			'acf_preservation_message' => $acf_preservation_message,
 		);
 		if ( $this->container !== null && $this->container->has( 'template_library_lifecycle_summary_builder' ) ) {
-			$builder = $this->container->get( 'template_library_lifecycle_summary_builder' );
+			$builder                                   = $this->container->get( 'template_library_lifecycle_summary_builder' );
 			$out['template_library_lifecycle_summary'] = $builder->build();
 		}
 		return $out;
@@ -148,7 +148,7 @@ final class Privacy_Settings_State_Builder {
 	 */
 	private function build_environment_summary(): array {
 		$php = PHP_VERSION;
-		$wp = $GLOBALS['wp_version'] ?? '';
+		$wp  = $GLOBALS['wp_version'] ?? '';
 		return array(
 			'php_version' => $php,
 			'wp_version'  => $wp !== '' ? $wp : __( 'Unknown', 'aio-page-builder' ),

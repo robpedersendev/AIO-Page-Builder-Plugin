@@ -77,8 +77,8 @@ final class Field_Key_Generator_Test extends TestCase {
 
 	public function test_naming_examples_matrix(): void {
 		$matrix = array(
-			'group_st01'   => Field_Key_Generator::group_key( 'st01_hero' ),
-			'field_headline' => Field_Key_Generator::field_key( 'st01_hero', 'headline' ),
+			'group_st01'        => Field_Key_Generator::group_key( 'st01_hero' ),
+			'field_headline'    => Field_Key_Generator::field_key( 'st01_hero', 'headline' ),
 			'subfield_question' => Field_Key_Generator::subfield_key( 'st05_faq', 'faq_items', 'question' ),
 		);
 		$this->assertSame( 'group_aio_st01_hero', $matrix['group_st01'] );
@@ -95,7 +95,7 @@ final class Field_Key_Generator_Test extends TestCase {
 
 	public function test_truncation_when_over_max(): void {
 		$long_section = str_repeat( 'a', 70 );
-		$key = Field_Key_Generator::field_key( $long_section, 'x' );
+		$key          = Field_Key_Generator::field_key( $long_section, 'x' );
 		$this->assertLessThanOrEqual( 64, strlen( $key ) );
 	}
 }

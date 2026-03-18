@@ -19,12 +19,12 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
  */
 final class Industry_Subtype_Page_Template_Recommendation_Extender {
 
-	private const SUBTYPE_BOOST_SCORE = 5;
+	private const SUBTYPE_BOOST_SCORE         = 5;
 	private const REASON_PAGE_FAMILY_EMPHASIS = 'subtype_page_family_emphasis';
-	private const REASON_ONE_PAGER_PRIORITY = 'subtype_one_pager_priority';
-	private const SCORE_RECOMMENDED_MIN = 20;
-	private const SCORE_DISCOURAGED_MAX = -10;
-	private const TEMPLATE_FAMILY_FIELD = 'template_family';
+	private const REASON_ONE_PAGER_PRIORITY   = 'subtype_one_pager_priority';
+	private const SCORE_RECOMMENDED_MIN       = 20;
+	private const SCORE_DISCOURAGED_MAX       = -10;
+	private const TEMPLATE_FAMILY_FIELD       = 'template_family';
 
 	/**
 	 * Applies subtype influence to the base result. When subtype is null or empty, returns result with subtype fields set to false/empty per item (no score change).
@@ -40,43 +40,46 @@ final class Industry_Subtype_Page_Template_Recommendation_Extender {
 		?array $subtype_definition,
 		array $page_templates = array()
 	): Industry_Page_Template_Recommendation_Result {
-		$items = $base_result->get_items();
-		$family_emphasis = $this->subtype_page_family_emphasis( $subtype_definition );
-		$one_pager_refs = $this->subtype_one_pager_overlay_refs( $subtype_definition );
+		$items                  = $base_result->get_items();
+		$family_emphasis        = $this->subtype_page_family_emphasis( $subtype_definition );
+		$one_pager_refs         = $this->subtype_one_pager_overlay_refs( $subtype_definition );
 		$template_family_by_key = $this->template_family_by_key( $page_templates );
-		$new_items = array();
+		$new_items              = array();
 		foreach ( $items as $item ) {
-			$template_key = $item['page_template_key'] ?? '';
-			$score = (int) ( $item['score'] ?? 0 );
+			$template_key      = $item['page_template_key'] ?? '';
+			$score             = (int) ( $item['score'] ?? 0 );
 			$influence_applied = false;
-			$reason_summary = '';
-			$family = $template_family_by_key[ $template_key ] ?? '';
+			$reason_summary    = '';
+			$family            = $template_family_by_key[ $template_key ] ?? '';
 			if ( $template_key !== '' ) {
 				if ( $family !== '' && $family_emphasis !== array() && in_array( $family, $family_emphasis, true ) ) {
-					$score += self::SUBTYPE_BOOST_SCORE;
+					$score            += self::SUBTYPE_BOOST_SCORE;
 					$influence_applied = true;
-					$reason_summary = $reason_summary === '' ? self::REASON_PAGE_FAMILY_EMPHASIS : $reason_summary . ';' . self::REASON_PAGE_FAMILY_EMPHASIS;
+					$reason_summary    = $reason_summary === '' ? self::REASON_PAGE_FAMILY_EMPHASIS : $reason_summary . ';' . self::REASON_PAGE_FAMILY_EMPHASIS;
 				}
 				if ( $one_pager_refs !== array() && in_array( $template_key, $one_pager_refs, true ) ) {
-					$score += self::SUBTYPE_BOOST_SCORE;
+					$score            += self::SUBTYPE_BOOST_SCORE;
 					$influence_applied = true;
-					$reason_summary = $reason_summary === '' ? self::REASON_ONE_PAGER_PRIORITY : $reason_summary . ';' . self::REASON_ONE_PAGER_PRIORITY;
+					$reason_summary    = $reason_summary === '' ? self::REASON_ONE_PAGER_PRIORITY : $reason_summary . ';' . self::REASON_ONE_PAGER_PRIORITY;
 				}
 			}
-			$new_item = array_merge( $item, array( 'score' => $score ) );
-			$new_item['fit_classification'] = $this->score_to_fit( $score );
+			$new_item                              = array_merge( $item, array( 'score' => $score ) );
+			$new_item['fit_classification']        = $this->score_to_fit( $score );
 			$new_item['subtype_influence_applied'] = $influence_applied;
-			$new_item['subtype_reason_summary'] = trim( $reason_summary, ';' );
-			$new_items[] = $new_item;
+			$new_item['subtype_reason_summary']    = trim( $reason_summary, ';' );
+			$new_items[]                           = $new_item;
 		}
-		usort( $new_items, function ( array $a, array $b ) {
-			$score_a = $a['score'] ?? 0;
-			$score_b = $b['score'] ?? 0;
-			if ( $score_b !== $score_a ) {
-				return $score_b <=> $score_a;
+		usort(
+			$new_items,
+			function ( array $a, array $b ) {
+				$score_a = $a['score'] ?? 0;
+				$score_b = $b['score'] ?? 0;
+				if ( $score_b !== $score_a ) {
+					return $score_b <=> $score_a;
+				}
+				return strcmp( $a['page_template_key'] ?? '', $b['page_template_key'] ?? '' );
 			}
-			return strcmp( $a['page_template_key'] ?? '', $b['page_template_key'] ?? '' );
-		} );
+		);
 		return new Industry_Page_Template_Recommendation_Result( $new_items );
 	}
 
@@ -130,7 +133,7 @@ final class Industry_Subtype_Page_Template_Recommendation_Extender {
 			if ( $key === '' ) {
 				continue;
 			}
-			$family = isset( $t[ self::TEMPLATE_FAMILY_FIELD ] ) && is_string( $t[ self::TEMPLATE_FAMILY_FIELD ] )
+			$family      = isset( $t[ self::TEMPLATE_FAMILY_FIELD ] ) && is_string( $t[ self::TEMPLATE_FAMILY_FIELD ] )
 				? trim( $t[ self::TEMPLATE_FAMILY_FIELD ] )
 				: '';
 			$out[ $key ] = $family;

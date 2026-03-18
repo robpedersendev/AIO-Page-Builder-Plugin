@@ -54,16 +54,16 @@ final class Constants {
 		if ( isset( self::$plugin_file ) ) {
 			return;
 		}
-		$root = dirname( __DIR__, 2 );
+		$root              = dirname( __DIR__, 2 );
 		self::$plugin_dir  = \trailingslashit( $root );
-		self::$plugin_file  = self::$plugin_dir . self::MAIN_FILE;
-		$dir_const  = 'AIO_PAGE_BUILDER_DIR';
-		$file_const = 'AIO_PAGE_BUILDER_FILE';
-		$url_const  = 'AIO_PAGE_BUILDER_URL';
-		$ver_const  = 'AIO_PAGE_BUILDER_VERSION';
-		$base_const = 'AIO_PAGE_BUILDER_BASENAME';
-		$min_wp     = 'AIO_PAGE_BUILDER_MIN_WP_VERSION';
-		$min_php    = 'AIO_PAGE_BUILDER_MIN_PHP_VERSION';
+		self::$plugin_file = self::$plugin_dir . self::MAIN_FILE;
+		$dir_const         = 'AIO_PAGE_BUILDER_DIR';
+		$file_const        = 'AIO_PAGE_BUILDER_FILE';
+		$url_const         = 'AIO_PAGE_BUILDER_URL';
+		$ver_const         = 'AIO_PAGE_BUILDER_VERSION';
+		$base_const        = 'AIO_PAGE_BUILDER_BASENAME';
+		$min_wp            = 'AIO_PAGE_BUILDER_MIN_WP_VERSION';
+		$min_php           = 'AIO_PAGE_BUILDER_MIN_PHP_VERSION';
 		if ( ! defined( $dir_const ) ) {
 			define( $dir_const, self::$plugin_dir );
 		}

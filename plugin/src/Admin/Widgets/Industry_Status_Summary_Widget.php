@@ -59,17 +59,17 @@ final class Industry_Status_Summary_Widget {
 	 */
 	public static function build_view_model( Service_Container $container ): array {
 		$empty = array(
-			'has_industry'        => false,
-			'primary_label'       => '',
-			'secondary_summary'   => '',
-			'pack_state'          => __( 'No pack', 'aio-page-builder' ),
+			'has_industry'         => false,
+			'primary_label'        => '',
+			'secondary_summary'    => '',
+			'pack_state'           => __( 'No pack', 'aio-page-builder' ),
 			'starter_bundle_label' => __( 'None', 'aio-page-builder' ),
-			'readiness_state'     => Industry_Profile_Readiness_Result::STATE_NONE,
-			'readiness_summary'   => __( 'Not configured', 'aio-page-builder' ),
-			'warning_count'       => 0,
-			'error_count'         => 0,
-			'profile_url'         => self::profile_url(),
-			'health_url'          => self::health_url(),
+			'readiness_state'      => Industry_Profile_Readiness_Result::STATE_NONE,
+			'readiness_summary'    => __( 'Not configured', 'aio-page-builder' ),
+			'warning_count'        => 0,
+			'error_count'          => 0,
+			'profile_url'          => self::profile_url(),
+			'health_url'           => self::health_url(),
 		);
 
 		if ( ! $container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
@@ -78,8 +78,8 @@ final class Industry_Status_Summary_Widget {
 
 		/** @var Industry_Profile_Repository $profile_repo */
 		$profile_repo = $container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
-		$profile     = $profile_repo->get_profile();
-		$primary     = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$profile      = $profile_repo->get_profile();
+		$primary      = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
 
@@ -95,12 +95,12 @@ final class Industry_Status_Summary_Widget {
 			? $container->get( Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) : null;
 		$qp_registry     = $container->has( 'industry_question_pack_registry' ) ? $container->get( 'industry_question_pack_registry' ) : null;
 
-		$primary_pack = $pack_registry instanceof Industry_Pack_Registry ? $pack_registry->get( $primary ) : null;
+		$primary_pack  = $pack_registry instanceof Industry_Pack_Registry ? $pack_registry->get( $primary ) : null;
 		$primary_label = $primary_pack !== null && isset( $primary_pack[ Industry_Pack_Schema::FIELD_NAME ] ) && is_string( $primary_pack[ Industry_Pack_Schema::FIELD_NAME ] )
 			? trim( $primary_pack[ Industry_Pack_Schema::FIELD_NAME ] )
 			: $primary;
 
-		$secondary_keys = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
+		$secondary_keys   = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
 			? $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ]
 			: array();
 		$secondary_labels = array();
@@ -109,7 +109,7 @@ final class Industry_Status_Summary_Widget {
 				if ( ! is_string( $key ) ) {
 					continue;
 				}
-				$pack = $pack_registry->get( trim( $key ) );
+				$pack               = $pack_registry->get( trim( $key ) );
 				$secondary_labels[] = $pack !== null && isset( $pack[ Industry_Pack_Schema::FIELD_NAME ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_NAME ] )
 					? trim( $pack[ Industry_Pack_Schema::FIELD_NAME ] )
 					: trim( $key );
@@ -135,7 +135,7 @@ final class Industry_Status_Summary_Widget {
 		}
 
 		$starter_bundle_label = __( 'None', 'aio-page-builder' );
-		$selected_bundle = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+		$selected_bundle      = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 			? trim( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 			: '';
 		if ( $selected_bundle !== '' && $bundle_registry instanceof Industry_Starter_Bundle_Registry ) {
@@ -145,7 +145,7 @@ final class Industry_Status_Summary_Widget {
 			}
 		}
 
-		$readiness = $profile_repo->get_readiness( $pack_registry instanceof Industry_Pack_Registry ? $pack_registry : null, $qp_registry );
+		$readiness         = $profile_repo->get_readiness( $pack_registry instanceof Industry_Pack_Registry ? $pack_registry : null, $qp_registry );
 		$readiness_state   = $readiness->get_state();
 		$readiness_summary = $readiness_state === Industry_Profile_Readiness_Result::STATE_READY
 			? __( 'Ready', 'aio-page-builder' )
@@ -158,7 +158,7 @@ final class Industry_Status_Summary_Widget {
 		if ( $container->has( 'industry_health_check_service' ) ) {
 			$service = $container->get( 'industry_health_check_service' );
 			if ( $service instanceof Industry_Health_Check_Service ) {
-				$health = $service->run();
+				$health        = $service->run();
 				$warning_count = isset( $health['warnings'] ) && is_array( $health['warnings'] ) ? count( $health['warnings'] ) : 0;
 				$error_count   = isset( $health['errors'] ) && is_array( $health['errors'] ) ? count( $health['errors'] ) : 0;
 			}
@@ -167,15 +167,15 @@ final class Industry_Status_Summary_Widget {
 		return array(
 			'has_industry'         => true,
 			'primary_label'        => $primary_label,
-			'secondary_summary'     => $secondary_summary,
-			'pack_state'            => $pack_state,
-			'starter_bundle_label'  => $starter_bundle_label,
-			'readiness_state'       => $readiness_state,
-			'readiness_summary'     => $readiness_summary,
-			'warning_count'         => $warning_count,
-			'error_count'           => $error_count,
-			'profile_url'           => self::profile_url(),
-			'health_url'            => self::health_url(),
+			'secondary_summary'    => $secondary_summary,
+			'pack_state'           => $pack_state,
+			'starter_bundle_label' => $starter_bundle_label,
+			'readiness_state'      => $readiness_state,
+			'readiness_summary'    => $readiness_summary,
+			'warning_count'        => $warning_count,
+			'error_count'          => $error_count,
+			'profile_url'          => self::profile_url(),
+			'health_url'           => self::health_url(),
 		);
 	}
 

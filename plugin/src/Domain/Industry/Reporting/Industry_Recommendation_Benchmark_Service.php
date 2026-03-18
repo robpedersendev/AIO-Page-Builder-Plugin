@@ -60,12 +60,12 @@ final class Industry_Recommendation_Benchmark_Service {
 		?Industry_Starter_Bundle_Registry $starter_bundle_registry = null,
 		?callable $section_list_provider = null
 	) {
-		$this->pack_registry            = $pack_registry;
-		$this->page_resolver            = $page_resolver;
-		$this->section_resolver         = $section_resolver;
-		$this->page_repo                = $page_repo;
-		$this->starter_bundle_registry  = $starter_bundle_registry;
-		$this->section_list_provider    = $section_list_provider;
+		$this->pack_registry           = $pack_registry;
+		$this->page_resolver           = $page_resolver;
+		$this->section_resolver        = $section_resolver;
+		$this->page_repo               = $page_repo;
+		$this->starter_bundle_registry = $starter_bundle_registry;
+		$this->section_list_provider   = $section_list_provider;
 	}
 
 	/**
@@ -85,9 +85,9 @@ final class Industry_Recommendation_Benchmark_Service {
 		}
 
 		return array(
-			'scenarios'          => $scenarios,
-			'run_at'             => gmdate( 'c' ),
-			'launch_industries'  => self::LAUNCH_INDUSTRIES,
+			'scenarios'         => $scenarios,
+			'run_at'            => gmdate( 'c' ),
+			'launch_industries' => self::LAUNCH_INDUSTRIES,
 		);
 	}
 
@@ -100,22 +100,27 @@ final class Industry_Recommendation_Benchmark_Service {
 	 * @return array<string, mixed>
 	 */
 	private function run_scenario( string $industry_key, int $template_cap, int $top_n ): array {
-		$profile = array(
-			'primary_industry_key'   => $industry_key,
+		$profile      = array(
+			'primary_industry_key'    => $industry_key,
 			'secondary_industry_keys' => array(),
 		);
 		$primary_pack = $this->pack_registry !== null ? $this->pack_registry->get( $industry_key ) : null;
 
 		$page_result = array(
-			'top_template_keys'    => array(),
-			'fit_distribution'     => array( 'recommended' => 0, 'neutral' => 0, 'discouraged' => 0, 'allowed_weak_fit' => 0 ),
-			'total_evaluated'     => 0,
+			'top_template_keys' => array(),
+			'fit_distribution'  => array(
+				'recommended'      => 0,
+				'neutral'          => 0,
+				'discouraged'      => 0,
+				'allowed_weak_fit' => 0,
+			),
+			'total_evaluated'   => 0,
 		);
 		if ( $this->page_resolver !== null && $this->page_repo !== null ) {
-			$templates = $this->page_repo->list_all_definitions( $template_cap, 0 );
-			$result    = $this->page_resolver->resolve( $profile, $primary_pack, $templates, array() );
+			$templates                      = $this->page_repo->list_all_definitions( $template_cap, 0 );
+			$result                         = $this->page_resolver->resolve( $profile, $primary_pack, $templates, array() );
 			$page_result['total_evaluated'] = count( $templates );
-			$items = $result->get_items();
+			$items                          = $result->get_items();
 			foreach ( $items as $item ) {
 				$status = $item['fit_classification'] ?? 'neutral';
 				if ( isset( $page_result['fit_distribution'][ $status ] ) ) {
@@ -124,20 +129,25 @@ final class Industry_Recommendation_Benchmark_Service {
 					$page_result['fit_distribution']['neutral'] = ( $page_result['fit_distribution']['neutral'] ?? 0 ) + 1;
 				}
 			}
-			$ordered_keys = $result->get_ranked_keys();
+			$ordered_keys                     = $result->get_ranked_keys();
 			$page_result['top_template_keys'] = array_slice( array_values( $ordered_keys ), 0, $top_n );
 		}
 
 		$section_result = array(
-			'top_section_keys'   => array(),
-			'fit_distribution'   => array( 'recommended' => 0, 'neutral' => 0, 'discouraged' => 0, 'allowed_weak_fit' => 0 ),
-			'total_evaluated'    => 0,
+			'top_section_keys' => array(),
+			'fit_distribution' => array(
+				'recommended'      => 0,
+				'neutral'          => 0,
+				'discouraged'      => 0,
+				'allowed_weak_fit' => 0,
+			),
+			'total_evaluated'  => 0,
 		);
 		if ( $this->section_resolver !== null && $this->section_list_provider !== null ) {
-			$sections = ( $this->section_list_provider )();
+			$sections                          = ( $this->section_list_provider )();
 			$section_result['total_evaluated'] = count( $sections );
-			$result = $this->section_resolver->resolve( $profile, $primary_pack, $sections, array() );
-			$items = $result->get_items();
+			$result                            = $this->section_resolver->resolve( $profile, $primary_pack, $sections, array() );
+			$items                             = $result->get_items();
 			foreach ( $items as $item ) {
 				$status = $item['fit_classification'] ?? 'neutral';
 				if ( isset( $section_result['fit_distribution'][ $status ] ) ) {
@@ -146,7 +156,7 @@ final class Industry_Recommendation_Benchmark_Service {
 					$section_result['fit_distribution']['neutral'] = ( $section_result['fit_distribution']['neutral'] ?? 0 ) + 1;
 				}
 			}
-			$ordered_keys = $result->get_ranked_keys();
+			$ordered_keys                       = $result->get_ranked_keys();
 			$section_result['top_section_keys'] = array_slice( array_values( $ordered_keys ), 0, $top_n );
 		}
 
@@ -172,12 +182,12 @@ final class Industry_Recommendation_Benchmark_Service {
 		}
 
 		return array(
-			'industry_key'        => $industry_key,
-			'pack_found'          => $primary_pack !== null,
-			'page_recommendations' => $page_result,
+			'industry_key'            => $industry_key,
+			'pack_found'              => $primary_pack !== null,
+			'page_recommendations'    => $page_result,
 			'section_recommendations' => $section_result,
-			'starter_bundle_keys' => $starter_bundles,
-			'metadata_gaps'       => $metadata_gaps,
+			'starter_bundle_keys'     => $starter_bundles,
+			'metadata_gaps'           => $metadata_gaps,
 		);
 	}
 }

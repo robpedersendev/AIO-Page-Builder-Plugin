@@ -32,7 +32,7 @@ final class Section_Style_Emitter_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->plugin_root = dirname( __DIR__, 2 );
-		$key = Entity_Style_Payload_Schema::OPTION_KEY;
+		$key               = Entity_Style_Payload_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
 		}
@@ -45,23 +45,23 @@ final class Section_Style_Emitter_Test extends TestCase {
 	}
 
 	public function test_get_inline_style_with_valid_payload_returns_declarations(): void {
-		$repo = new Entity_Style_Payload_Repository();
+		$repo    = new Entity_Style_Payload_Repository();
 		$payload = array(
 			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => '1',
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'primary' => '#222' ) ),
 			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => array(),
 		);
 		$repo->set_payload( 'section_template', 'hero_01', $payload );
-		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$loader    = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
 		$token_reg = new Style_Token_Registry( $loader );
-		$emit = new Section_Style_Emitter( $repo, $token_reg, null );
-		$inline = $emit->get_inline_style_for_section( 'hero_01' );
+		$emit      = new Section_Style_Emitter( $repo, $token_reg, null );
+		$inline    = $emit->get_inline_style_for_section( 'hero_01' );
 		$this->assertStringContainsString( '--aio-color-primary', $inline );
 		$this->assertStringContainsString( '#222', $inline );
 	}
 
 	public function test_get_component_override_style_block_empty_when_no_overrides(): void {
-		$repo = new Entity_Style_Payload_Repository();
+		$repo    = new Entity_Style_Payload_Repository();
 		$payload = array(
 			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => '1',
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array(),
@@ -69,22 +69,22 @@ final class Section_Style_Emitter_Test extends TestCase {
 		);
 		$repo->set_payload( 'section_template', 'card_sec', $payload );
 		$comp_reg = new Component_Override_Registry( new Style_Spec_Loader( $this->plugin_root . '/specs/' ) );
-		$emit = new Section_Style_Emitter( $repo, null, $comp_reg );
+		$emit     = new Section_Style_Emitter( $repo, null, $comp_reg );
 		$this->assertSame( '', $emit->get_component_override_style_block( 'card_sec' ) );
 	}
 
 	public function test_invalid_payload_omitted_from_inline(): void {
-		$repo = new Entity_Style_Payload_Repository();
+		$repo    = new Entity_Style_Payload_Repository();
 		$payload = array(
 			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => '1',
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'unknown_name' => '#fff' ) ),
 			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => array(),
 		);
 		$repo->set_payload( 'section_template', 'sec', $payload );
-		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$loader    = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
 		$token_reg = new Style_Token_Registry( $loader );
-		$emit = new Section_Style_Emitter( $repo, $token_reg, null );
-		$inline = $emit->get_inline_style_for_section( 'sec' );
+		$emit      = new Section_Style_Emitter( $repo, $token_reg, null );
+		$inline    = $emit->get_inline_style_for_section( 'sec' );
 		$this->assertSame( '', $inline );
 	}
 }

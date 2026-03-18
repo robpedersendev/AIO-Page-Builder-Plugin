@@ -41,12 +41,15 @@ final class Personal_Data_Exporter {
 	 * @return array{data: array<int, array{group_id: string, group_label: string, item_id: string, data: array<int, array{name: string, value: string}>}>, done: bool}
 	 */
 	public static function export( string $email_address, int $page = 1 ): array {
-		$user = \get_user_by( 'email', $email_address );
-		$page = max( 1, $page );
+		$user         = \get_user_by( 'email', $email_address );
+		$page         = max( 1, $page );
 		$export_items = array();
 
 		if ( ! $user instanceof \WP_User ) {
-			return array( 'data' => array(), 'done' => true );
+			return array(
+				'data' => array(),
+				'done' => true,
+			);
 		}
 
 		$user_id   = (int) $user->ID;
@@ -58,14 +61,14 @@ final class Personal_Data_Exporter {
 		}
 
 		$ai_run_repo = new AI_Run_Repository();
-		$runs = $ai_run_repo->list_recent_by_actor( $user_id, self::PER_PAGE, $offset );
+		$runs        = $ai_run_repo->list_recent_by_actor( $user_id, self::PER_PAGE, $offset );
 		foreach ( $runs as $run ) {
 			$export_items[] = self::run_to_export_item( $run );
 		}
 
 		global $wpdb;
 		$job_repo = new Job_Queue_Repository( $wpdb );
-		$jobs = $job_repo->list_by_actor_ref( $actor_ref, self::PER_PAGE, $offset );
+		$jobs     = $job_repo->list_by_actor_ref( $actor_ref, self::PER_PAGE, $offset );
 		foreach ( $jobs as $job ) {
 			$export_items[] = self::job_to_export_item( $job );
 		}
@@ -85,18 +88,21 @@ final class Personal_Data_Exporter {
 	 * @return list<array{group_id: string, group_label: string, item_id: string, data: array<int, array{name: string, value: string}>}>
 	 */
 	private static function export_user_prefs( int $user_id ): array {
-		$items = array();
-		$section_key = Template_Compare_Screen::get_compare_meta_key( 'section' );
-		$page_key = Template_Compare_Screen::get_compare_meta_key( 'page' );
+		$items        = array();
+		$section_key  = Template_Compare_Screen::get_compare_meta_key( 'section' );
+		$page_key     = Template_Compare_Screen::get_compare_meta_key( 'page' );
 		$section_list = \get_user_meta( $user_id, $section_key, true );
-		$page_list = \get_user_meta( $user_id, $page_key, true );
+		$page_list    = \get_user_meta( $user_id, $page_key, true );
 		if ( is_array( $section_list ) && ! empty( $section_list ) ) {
 			$items[] = array(
 				'group_id'    => self::GROUP_USER_PREFS,
 				'group_label' => __( 'AIO Page Builder – Template compare & preferences', 'aio-page-builder' ),
 				'item_id'     => 'compare-list-section',
 				'data'        => array(
-					array( 'name' => __( 'Section template compare list', 'aio-page-builder' ), 'value' => implode( ', ', array_map( 'sanitize_key', $section_list ) ) ),
+					array(
+						'name'  => __( 'Section template compare list', 'aio-page-builder' ),
+						'value' => implode( ', ', array_map( 'sanitize_key', $section_list ) ),
+					),
 				),
 			);
 		}
@@ -106,19 +112,25 @@ final class Personal_Data_Exporter {
 				'group_label' => __( 'AIO Page Builder – Template compare & preferences', 'aio-page-builder' ),
 				'item_id'     => 'compare-list-page',
 				'data'        => array(
-					array( 'name' => __( 'Page template compare list', 'aio-page-builder' ), 'value' => implode( ', ', array_map( 'sanitize_key', $page_list ) ) ),
+					array(
+						'name'  => __( 'Page template compare list', 'aio-page-builder' ),
+						'value' => implode( ', ', array_map( 'sanitize_key', $page_list ) ),
+					),
 				),
 			);
 		}
 		$transient_key = 'aio_industry_bundle_preview_' . $user_id;
-		$preview = \get_transient( $transient_key );
+		$preview       = \get_transient( $transient_key );
 		if ( $preview !== false ) {
 			$items[] = array(
 				'group_id'    => self::GROUP_USER_PREFS,
 				'group_label' => __( 'AIO Page Builder – Template compare & preferences', 'aio-page-builder' ),
 				'item_id'     => 'bundle-preview-cache',
 				'data'        => array(
-					array( 'name' => __( 'Industry bundle import preview cache', 'aio-page-builder' ), 'value' => __( 'Temporary cache (up to 15 minutes). Contains bundle structure and conflict summary; no secrets.', 'aio-page-builder' ) ),
+					array(
+						'name'  => __( 'Industry bundle import preview cache', 'aio-page-builder' ),
+						'value' => __( 'Temporary cache (up to 15 minutes). Contains bundle structure and conflict summary; no secrets.', 'aio-page-builder' ),
+					),
 				),
 			);
 		}
@@ -131,13 +143,28 @@ final class Personal_Data_Exporter {
 	 */
 	private static function run_to_export_item( array $run ): array {
 		$internal_key = $run['internal_key'] ?? (string) ( $run['id'] ?? '' );
-		$meta = $run['run_metadata'] ?? array();
-		$data = array(
-			array( 'name' => __( 'Run ID', 'aio-page-builder' ), 'value' => (string) $internal_key ),
-			array( 'name' => __( 'Status', 'aio-page-builder' ), 'value' => (string) ( $run['status'] ?? '' ) ),
-			array( 'name' => __( 'Created', 'aio-page-builder' ), 'value' => (string) ( $meta['created_at'] ?? '' ) ),
-			array( 'name' => __( 'Provider', 'aio-page-builder' ), 'value' => (string) ( $meta['provider_id'] ?? '' ) ),
-			array( 'name' => __( 'Model', 'aio-page-builder' ), 'value' => (string) ( $meta['model_used'] ?? '' ) ),
+		$meta         = $run['run_metadata'] ?? array();
+		$data         = array(
+			array(
+				'name'  => __( 'Run ID', 'aio-page-builder' ),
+				'value' => (string) $internal_key,
+			),
+			array(
+				'name'  => __( 'Status', 'aio-page-builder' ),
+				'value' => (string) ( $run['status'] ?? '' ),
+			),
+			array(
+				'name'  => __( 'Created', 'aio-page-builder' ),
+				'value' => (string) ( $meta['created_at'] ?? '' ),
+			),
+			array(
+				'name'  => __( 'Provider', 'aio-page-builder' ),
+				'value' => (string) ( $meta['provider_id'] ?? '' ),
+			),
+			array(
+				'name'  => __( 'Model', 'aio-page-builder' ),
+				'value' => (string) ( $meta['model_used'] ?? '' ),
+			),
 		);
 		return array(
 			'group_id'    => self::GROUP_AI_RUNS,
@@ -153,11 +180,23 @@ final class Personal_Data_Exporter {
 	 */
 	private static function job_to_export_item( array $job ): array {
 		$job_ref = (string) ( $job['job_ref'] ?? '' );
-		$data = array(
-			array( 'name' => __( 'Job reference', 'aio-page-builder' ), 'value' => $job_ref ),
-			array( 'name' => __( 'Job type', 'aio-page-builder' ), 'value' => (string) ( $job['job_type'] ?? '' ) ),
-			array( 'name' => __( 'Status', 'aio-page-builder' ), 'value' => (string) ( $job['queue_status'] ?? '' ) ),
-			array( 'name' => __( 'Created', 'aio-page-builder' ), 'value' => (string) ( $job['created_at'] ?? '' ) ),
+		$data    = array(
+			array(
+				'name'  => __( 'Job reference', 'aio-page-builder' ),
+				'value' => $job_ref,
+			),
+			array(
+				'name'  => __( 'Job type', 'aio-page-builder' ),
+				'value' => (string) ( $job['job_type'] ?? '' ),
+			),
+			array(
+				'name'  => __( 'Status', 'aio-page-builder' ),
+				'value' => (string) ( $job['queue_status'] ?? '' ),
+			),
+			array(
+				'name'  => __( 'Created', 'aio-page-builder' ),
+				'value' => (string) ( $job['created_at'] ?? '' ),
+			),
 		);
 		return array(
 			'group_id'    => self::GROUP_JOB_QUEUE,

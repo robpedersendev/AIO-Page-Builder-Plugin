@@ -49,7 +49,7 @@ final class Dashboard_State_Builder_Test extends TestCase {
 
 	public function test_readiness_cards_have_environment_dependency_provider(): void {
 		$state = $this->build_state();
-		$r = $state['readiness_cards'];
+		$r     = $state['readiness_cards'];
 		$this->assertArrayHasKey( 'environment', $r );
 		$this->assertArrayHasKey( 'dependency', $r );
 		$this->assertArrayHasKey( 'provider', $r );
@@ -61,7 +61,7 @@ final class Dashboard_State_Builder_Test extends TestCase {
 
 	public function test_last_activity_cards_have_expected_structure(): void {
 		$state = $this->build_state();
-		$a = $state['last_activity_cards'];
+		$a     = $state['last_activity_cards'];
 		$this->assertArrayHasKey( 'last_crawl', $a );
 		$this->assertArrayHasKey( 'last_ai_run', $a );
 		$this->assertArrayHasKey( 'active_build_plans', $a );
@@ -70,7 +70,7 @@ final class Dashboard_State_Builder_Test extends TestCase {
 
 	public function test_queue_warning_summary_has_required_keys(): void {
 		$state = $this->build_state();
-		$q = $state['queue_warning_summary'];
+		$q     = $state['queue_warning_summary'];
 		$this->assertArrayHasKey( 'has_warnings', $q );
 		$this->assertArrayHasKey( 'message', $q );
 		$this->assertArrayHasKey( 'queue_logs_url', $q );
@@ -78,7 +78,7 @@ final class Dashboard_State_Builder_Test extends TestCase {
 
 	public function test_critical_error_summary_has_count_and_items(): void {
 		$state = $this->build_state();
-		$c = $state['critical_error_summary'];
+		$c     = $state['critical_error_summary'];
 		$this->assertArrayHasKey( 'count', $c );
 		$this->assertArrayHasKey( 'items', $c );
 		$this->assertArrayHasKey( 'logs_url', $c );
@@ -87,7 +87,7 @@ final class Dashboard_State_Builder_Test extends TestCase {
 
 	public function test_welcome_state_has_is_first_run_and_onboarding_url(): void {
 		$state = $this->build_state();
-		$w = $state['welcome_state'];
+		$w     = $state['welcome_state'];
 		$this->assertArrayHasKey( 'is_first_run', $w );
 		$this->assertArrayHasKey( 'is_resume', $w );
 		$this->assertArrayHasKey( 'onboarding_url', $w );
@@ -99,7 +99,7 @@ final class Dashboard_State_Builder_Test extends TestCase {
 	 */
 	private function build_state(): array {
 		$settings = new Settings_Service();
-		$builder = new Dashboard_State_Builder( $settings, null, null, null, null );
+		$builder  = new Dashboard_State_Builder( $settings, null, null, null, null );
 		return $builder->build();
 	}
 }

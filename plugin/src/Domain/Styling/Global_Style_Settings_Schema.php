@@ -39,8 +39,8 @@ final class Global_Style_Settings_Schema {
 	 */
 	public static function get_defaults(): array {
 		return array(
-			self::KEY_VERSION                   => self::SCHEMA_VERSION,
-			self::KEY_GLOBAL_TOKENS             => array(),
+			self::KEY_VERSION                    => self::SCHEMA_VERSION,
+			self::KEY_GLOBAL_TOKENS              => array(),
 			self::KEY_GLOBAL_COMPONENT_OVERRIDES => array(),
 		);
 	}

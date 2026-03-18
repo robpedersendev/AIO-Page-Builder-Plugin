@@ -52,7 +52,7 @@ final class Conversion_Goal_Conflict_Detector {
 			return array();
 		}
 
-		$conflicts = array();
+		$conflicts  = array();
 		$bundle_key = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 			? trim( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 			: '';
@@ -60,9 +60,12 @@ final class Conversion_Goal_Conflict_Detector {
 		$bundle_goal_aware = isset( $options['bundle_goal_aware'] ) && $options['bundle_goal_aware'] === true;
 		if ( $bundle_key !== '' && ! $bundle_goal_aware ) {
 			$conflicts[] = array(
-				'conflict_type'            => self::CONFLICT_WEAK_BUNDLE_FIT,
+				'conflict_type'           => self::CONFLICT_WEAK_BUNDLE_FIT,
 				'severity'                => self::SEVERITY_INFO,
-				'related_refs'            => array( 'bundle_key' => $bundle_key, 'goal_key' => $goal ),
+				'related_refs'            => array(
+					'bundle_key' => $bundle_key,
+					'goal_key'   => $goal,
+				),
 				'explanation'             => __( 'Selected bundle may not have a goal overlay for this conversion goal; plan will use base bundle conversion.', 'aio-page-builder' ),
 				'suggested_review_action' => __( 'Review whether bundle choice aligns with conversion goal, or add a goal overlay for this bundle.', 'aio-page-builder' ),
 			);
@@ -71,7 +74,7 @@ final class Conversion_Goal_Conflict_Detector {
 		$overrides_snapshot = isset( $options['overrides_snapshot'] ) && is_array( $options['overrides_snapshot'] ) ? $options['overrides_snapshot'] : array();
 		if ( $overrides_snapshot !== array() ) {
 			$conflicts[] = array(
-				'conflict_type'            => self::CONFLICT_GOAL_OVERRIDE,
+				'conflict_type'           => self::CONFLICT_GOAL_OVERRIDE,
 				'severity'                => self::SEVERITY_CAUTION,
 				'related_refs'            => array( 'goal_key' => $goal ),
 				'explanation'             => __( 'Overrides are present; goal-based recommendations do not replace overrides.', 'aio-page-builder' ),
@@ -82,7 +85,7 @@ final class Conversion_Goal_Conflict_Detector {
 		$caution_flags = isset( $options['caution_flags'] ) && is_array( $options['caution_flags'] ) ? $options['caution_flags'] : array();
 		if ( $caution_flags !== array() ) {
 			$conflicts[] = array(
-				'conflict_type'            => self::CONFLICT_GOAL_CAUTION,
+				'conflict_type'           => self::CONFLICT_GOAL_CAUTION,
 				'severity'                => self::SEVERITY_INFO,
 				'related_refs'            => array( 'goal_key' => $goal ),
 				'explanation'             => __( 'Caution rules apply; goal does not suppress compliance or risk advisories.', 'aio-page-builder' ),

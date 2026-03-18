@@ -54,20 +54,20 @@ final class Section_Templates_Directory_Screen {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
-		$state_builder = $this->get_state_builder();
-		$request = array(
+		$state_builder                              = $this->get_state_builder();
+		$request                                    = array(
 			'purpose_family'       => isset( $_GET['purpose_family'] ) ? \sanitize_key( (string) $_GET['purpose_family'] ) : '',
-			'cta_classification'  => isset( $_GET['cta_classification'] ) ? \sanitize_key( (string) $_GET['cta_classification'] ) : '',
+			'cta_classification'   => isset( $_GET['cta_classification'] ) ? \sanitize_key( (string) $_GET['cta_classification'] ) : '',
 			'variation_family_key' => isset( $_GET['variation_family_key'] ) ? \sanitize_key( (string) $_GET['variation_family_key'] ) : '',
-			'all'                 => isset( $_GET['all'] ) && (string) $_GET['all'] === '1',
-			'status'              => isset( $_GET['status'] ) ? \sanitize_key( (string) $_GET['status'] ) : '',
-			'search'              => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['search'] ) ) : '',
-			'paged'               => isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1,
-			'per_page'            => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $_GET['per_page'] ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
-			'industry_view'       => isset( $_GET['industry_view'] ) ? \sanitize_key( (string) $_GET['industry_view'] ) : Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY,
+			'all'                  => isset( $_GET['all'] ) && (string) $_GET['all'] === '1',
+			'status'               => isset( $_GET['status'] ) ? \sanitize_key( (string) $_GET['status'] ) : '',
+			'search'               => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['search'] ) ) : '',
+			'paged'                => isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1,
+			'per_page'             => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $_GET['per_page'] ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
+			'industry_view'        => isset( $_GET['industry_view'] ) ? \sanitize_key( (string) $_GET['industry_view'] ) : Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY,
 		);
-		$state = $state_builder->build_state( $request );
-		$state = $this->enrich_state_with_industry( $state, $request );
+		$state                                      = $state_builder->build_state( $request );
+		$state                                      = $this->enrich_state_with_industry( $state, $request );
 		$state['industry_section_overrides_by_key'] = ( new Industry_Section_Override_Service() )->list_overrides();
 
 		$view = (string) ( $state['view'] ?? 'root' );
@@ -80,7 +80,20 @@ final class Section_Templates_Directory_Screen {
 				? '<a href="' . \esc_url( rtrim( $docs_base, '/' ) . '/guides/template-library-operator-guide.md' ) . '" target="_blank" rel="noopener">' . \esc_html__( 'Template Library Operator Guide', 'aio-page-builder' ) . '</a>'
 				: \esc_html__( 'Template Library Operator Guide (docs/guides/template-library-operator-guide.md)', 'aio-page-builder' );
 			?>
-			<p class="aio-description" aria-label="<?php \esc_attr_e( 'Help reference', 'aio-page-builder' ); ?>"><?php echo \wp_kses( sprintf( /* translators: %s: link or path to operator guide */ __( 'For full guidance on browsing, compare, and compositions, see the %s.', 'aio-page-builder' ), $guide_ref ), array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ) ) ); ?></p>
+			<p class="aio-description" aria-label="<?php \esc_attr_e( 'Help reference', 'aio-page-builder' ); ?>">
+			<?php
+			echo \wp_kses(
+				sprintf( /* translators: %s: link or path to operator guide */ __( 'For full guidance on browsing, compare, and compositions, see the %s.', 'aio-page-builder' ), $guide_ref ),
+				array(
+					'a' => array(
+						'href'   => true,
+						'target' => true,
+						'rel'    => true,
+					),
+				)
+			);
+			?>
+													</p>
 			<?php $this->render_breadcrumbs( $state ); ?>
 			<?php $this->render_filters( $state ); ?>
 			<?php
@@ -106,11 +119,11 @@ final class Section_Templates_Directory_Screen {
 	private function enrich_state_with_industry( array $state, array $request ): array {
 		$view = (string) ( $state['view'] ?? 'root' );
 		if ( $view !== 'list' && $view !== 'search' ) {
-			$state['industry_view'] = Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY;
+			$state['industry_view']          = Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY;
 			$state['industry_badges_by_key'] = array();
 			return $state;
 		}
-		$profile_repo = null;
+		$profile_repo  = null;
 		$pack_registry = null;
 		if ( $this->container && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
 			$store = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
@@ -125,7 +138,7 @@ final class Section_Templates_Directory_Screen {
 			}
 		}
 		$read_model_builder = new Industry_Section_Library_Read_Model_Builder( null, new \AIOPageBuilder\Domain\Industry\Profile\Industry_Weighted_Recommendation_Engine() );
-		$controller = new Industry_Section_Library_Filter_Controller( $read_model_builder, $profile_repo, $pack_registry );
+		$controller         = new Industry_Section_Library_Filter_Controller( $read_model_builder, $profile_repo, $pack_registry );
 		return $controller->enrich_state( $state, $request );
 	}
 
@@ -135,10 +148,10 @@ final class Section_Templates_Directory_Screen {
 			$query_service = $this->container->get( 'large_library_query_service' );
 		}
 		if ( ! $query_service instanceof \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service ) {
-			$section_repo = $this->container && $this->container->has( 'section_template_repository' )
+			$section_repo  = $this->container && $this->container->has( 'section_template_repository' )
 				? $this->container->get( 'section_template_repository' )
 				: new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
-			$page_repo = $this->container && $this->container->has( 'page_template_repository' )
+			$page_repo     = $this->container && $this->container->has( 'page_template_repository' )
 				? $this->container->get( 'page_template_repository' )
 				: new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
 			$query_service = new \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service( $section_repo, $page_repo );
@@ -266,19 +279,19 @@ final class Section_Templates_Directory_Screen {
 	 * @return void
 	 */
 	private function render_list( array $state ): void {
-		$list_result = $state['list_result'] ?? array();
-		$rows        = $list_result['rows'] ?? array();
-		$pagination  = $list_result['pagination'] ?? array();
-		$base_url    = (string) ( $state['base_url'] ?? '' );
-		$filters     = $state['filters'] ?? array();
-		$purpose     = (string) ( $filters['purpose_family'] ?? '' );
-		$cta         = (string) ( $filters['cta_classification'] ?? '' );
-		$variant     = (string) ( $filters['variation_family_key'] ?? '' );
-		$paged       = (int) ( $filters['paged'] ?? 1 );
-		$per_page    = (int) ( $filters['per_page'] ?? 25 );
-		$search      = (string) ( $filters['search'] ?? '' );
+		$list_result    = $state['list_result'] ?? array();
+		$rows           = $list_result['rows'] ?? array();
+		$pagination     = $list_result['pagination'] ?? array();
+		$base_url       = (string) ( $state['base_url'] ?? '' );
+		$filters        = $state['filters'] ?? array();
+		$purpose        = (string) ( $filters['purpose_family'] ?? '' );
+		$cta            = (string) ( $filters['cta_classification'] ?? '' );
+		$variant        = (string) ( $filters['variation_family_key'] ?? '' );
+		$paged          = (int) ( $filters['paged'] ?? 1 );
+		$per_page       = (int) ( $filters['per_page'] ?? 25 );
+		$search         = (string) ( $filters['search'] ?? '' );
 		$purpose_labels = $state['purpose_labels'] ?? array();
-		$cta_labels    = $state['cta_labels'] ?? array();
+		$cta_labels     = $state['cta_labels'] ?? array();
 
 		$query_args = array( 'page' => self::SLUG );
 		if ( $purpose !== '' ) {
@@ -306,9 +319,9 @@ final class Section_Templates_Directory_Screen {
 			echo '<p class="aio-admin-notice">' . \esc_html__( 'No sections match the current filters.', 'aio-page-builder' ) . '</p>';
 			return;
 		}
-		$industry_badges_by_key             = $state['industry_badges_by_key'] ?? array();
-		$industry_section_overrides_by_key  = $state['industry_section_overrides_by_key'] ?? array();
-		$industry_weighted_by_key           = $state['industry_weighted_by_key'] ?? array();
+		$industry_badges_by_key            = $state['industry_badges_by_key'] ?? array();
+		$industry_section_overrides_by_key = $state['industry_section_overrides_by_key'] ?? array();
+		$industry_weighted_by_key          = $state['industry_weighted_by_key'] ?? array();
 		?>
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
@@ -328,31 +341,34 @@ final class Section_Templates_Directory_Screen {
 			<tbody>
 				<?php foreach ( $rows as $row ) : ?>
 					<?php
-					$key        = (string) ( $row['internal_key'] ?? '' );
-					$name       = (string) ( $row['name'] ?? '' );
-					$pf_slug    = (string) ( $row['section_purpose_family'] ?? '' );
-					$pf_label   = isset( $purpose_labels[ $pf_slug ] ) ? $purpose_labels[ $pf_slug ] : $pf_slug;
-					$cta_slug   = (string) ( $row['cta_classification'] ?? '' );
-					$var_slug   = (string) ( $row['variation_family_key'] ?? '' );
-					$cta_var    = $cta_slug !== '' ? ( $cta_labels[ $cta_slug ] ?? $cta_slug ) : ( $var_slug !== '' ? \ucfirst( \str_replace( array( '_', '-' ), ' ', $var_slug ) ) : '—' );
-					$status     = (string) ( $row['status'] ?? '' );
-					$version    = (string) ( $row['version'] ?? '1' );
-					$placement  = (string) ( $row['placement_tendency'] ?? '' );
+					$key           = (string) ( $row['internal_key'] ?? '' );
+					$name          = (string) ( $row['name'] ?? '' );
+					$pf_slug       = (string) ( $row['section_purpose_family'] ?? '' );
+					$pf_label      = isset( $purpose_labels[ $pf_slug ] ) ? $purpose_labels[ $pf_slug ] : $pf_slug;
+					$cta_slug      = (string) ( $row['cta_classification'] ?? '' );
+					$var_slug      = (string) ( $row['variation_family_key'] ?? '' );
+					$cta_var       = $cta_slug !== '' ? ( $cta_labels[ $cta_slug ] ?? $cta_slug ) : ( $var_slug !== '' ? \ucfirst( \str_replace( array( '_', '-' ), ' ', $var_slug ) ) : '—' );
+					$status        = (string) ( $row['status'] ?? '' );
+					$version       = (string) ( $row['version'] ?? '1' );
+					$placement     = (string) ( $row['placement_tendency'] ?? '' );
 					$variant_count = (int) ( $row['variant_count'] ?? 0 );
-					$helper_ref  = (string) ( $row['helper_ref'] ?? '' );
-					$field_ref  = (string) ( $row['field_blueprint_ref'] ?? '' );
-					$detail_args = array( 'page' => Section_Template_Detail_Screen::SLUG, 'section' => $key );
+					$helper_ref    = (string) ( $row['helper_ref'] ?? '' );
+					$field_ref     = (string) ( $row['field_blueprint_ref'] ?? '' );
+					$detail_args   = array(
+						'page'    => Section_Template_Detail_Screen::SLUG,
+						'section' => $key,
+					);
 					if ( $pf_slug !== '' ) {
 						$detail_args['purpose_family'] = $pf_slug;
 					}
-					$view_url   = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
-					$helper_url = ''; // * Helper-doc link: populated on detail screen when helper_doc_url resolver exists.
-					$in_compare = \in_array( $key, Template_Compare_Screen::get_compare_list( 'section' ), true );
-					$item_view = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
-					$section_override = isset( $industry_section_overrides_by_key[ $key ] ) && is_array( $industry_section_overrides_by_key[ $key ] ) ? $industry_section_overrides_by_key[ $key ] : null;
-					$show_use_anyway = $item_view !== null && $section_override === null && \in_array( $item_view->get_recommendation_status(), array( Industry_Section_Recommendation_Resolver::FIT_DISCOURAGED, Industry_Section_Recommendation_Resolver::FIT_ALLOWED_WEAK ), true );
-					$weighted = isset( $industry_weighted_by_key[ $key ] ) && is_array( $industry_weighted_by_key[ $key ] ) ? $industry_weighted_by_key[ $key ] : null;
-					$conflict_results = ( $weighted !== null && ! empty( $weighted['conflict_results'] ) ) ? $weighted['conflict_results'] : array();
+					$view_url            = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
+					$helper_url          = ''; // * Helper-doc link: populated on detail screen when helper_doc_url resolver exists.
+					$in_compare          = \in_array( $key, Template_Compare_Screen::get_compare_list( 'section' ), true );
+					$item_view           = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
+					$section_override    = isset( $industry_section_overrides_by_key[ $key ] ) && is_array( $industry_section_overrides_by_key[ $key ] ) ? $industry_section_overrides_by_key[ $key ] : null;
+					$show_use_anyway     = $item_view !== null && $section_override === null && \in_array( $item_view->get_recommendation_status(), array( Industry_Section_Recommendation_Resolver::FIT_DISCOURAGED, Industry_Section_Recommendation_Resolver::FIT_ALLOWED_WEAK ), true );
+					$weighted            = isset( $industry_weighted_by_key[ $key ] ) && is_array( $industry_weighted_by_key[ $key ] ) ? $industry_weighted_by_key[ $key ] : null;
+					$conflict_results    = ( $weighted !== null && ! empty( $weighted['conflict_results'] ) ) ? $weighted['conflict_results'] : array();
 					$explanation_summary = ( $weighted !== null && isset( $weighted['explanation_summary'] ) ) ? (string) $weighted['explanation_summary'] : '';
 					?>
 					<tr>
@@ -377,7 +393,10 @@ final class Section_Templates_Directory_Screen {
 						<td>
 							<?php if ( $helper_ref !== '' ) : ?>
 								<span class="aio-helper-ref" title="<?php echo \esc_attr( $helper_ref ); ?>"><?php \esc_html_e( 'Helper', 'aio-page-builder' ); ?></span>
-								<?php if ( $field_ref !== '' ) : ?> | <?php endif; ?>
+								<?php
+								if ( $field_ref !== '' ) :
+									?>
+									| <?php endif; ?>
 							<?php endif; ?>
 							<?php if ( $field_ref !== '' ) : ?>
 								<span class="aio-field-ref" title="<?php echo \esc_attr( $field_ref ); ?>"><?php \esc_html_e( 'Field summary', 'aio-page-builder' ); ?></span>
@@ -416,8 +435,8 @@ final class Section_Templates_Directory_Screen {
 
 	/**
 	 * @param array{page?: int, total_pages?: int} $pagination
-	 * @param array<string, string|int> $query_args
-	 * @param string $base_url
+	 * @param array<string, string|int>            $query_args
+	 * @param string                               $base_url
 	 * @return void
 	 */
 	private function render_pagination( array $pagination, array $query_args, string $base_url ): void {

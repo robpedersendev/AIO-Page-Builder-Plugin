@@ -74,16 +74,19 @@ final class Prompt_Pack_Regression_Harness {
 	 * @return Regression_Result
 	 */
 	public function run_from_array( array $data ): Regression_Result {
-		$pack_ref  = $data[ self::FIXTURE_PROMPT_PACK_REF ] ?? null;
+		$pack_ref   = $data[ self::FIXTURE_PROMPT_PACK_REF ] ?? null;
 		$schema_ref = isset( $data[ self::FIXTURE_SCHEMA_REF ] ) && is_string( $data[ self::FIXTURE_SCHEMA_REF ] ) ? $data[ self::FIXTURE_SCHEMA_REF ] : '';
-		$input     = $data[ self::FIXTURE_INPUT ] ?? null;
-		$expected  = $data[ self::FIXTURE_EXPECTED ] ?? null;
+		$input      = $data[ self::FIXTURE_INPUT ] ?? null;
+		$expected   = $data[ self::FIXTURE_EXPECTED ] ?? null;
 
-		$run_id = 'regression-' . uniqid( '', true );
-		$ran_at = gmdate( 'Y-m-d\TH:i:s\Z' );
+		$run_id         = 'regression-' . uniqid( '', true );
+		$ran_at         = gmdate( 'Y-m-d\TH:i:s\Z' );
 		$regression_run = array(
 			'run_id'          => $run_id,
-			'prompt_pack_ref' => is_array( $pack_ref ) ? $pack_ref : array( 'internal_key' => '', 'version' => '' ),
+			'prompt_pack_ref' => is_array( $pack_ref ) ? $pack_ref : array(
+				'internal_key' => '',
+				'version'      => '',
+			),
 			'schema_ref'      => $schema_ref,
 			'ran_at'          => $ran_at,
 		);
@@ -100,42 +103,46 @@ final class Prompt_Pack_Regression_Harness {
 			return $this->result_fixture_invalid( $regression_run, 'Fixture schema_ref is required.' );
 		}
 
-		$report = $this->validator->validate( $input, $schema_ref, false );
-		$actual_state  = $report->get_final_validation_state();
-		$actual_block  = $report->get_blocking_failure_stage();
-		$actual_norm   = $report->get_normalized_output();
-		$actual_dropped = $report->get_dropped_records();
+		$report               = $this->validator->validate( $input, $schema_ref, false );
+		$actual_state         = $report->get_final_validation_state();
+		$actual_block         = $report->get_blocking_failure_stage();
+		$actual_norm          = $report->get_normalized_output();
+		$actual_dropped       = $report->get_dropped_records();
 		$actual_dropped_array = array();
 		foreach ( $actual_dropped as $d ) {
 			$actual_dropped_array[] = $d->to_array();
 		}
 
-		$state_match = $actual_state === $expected_state;
-		$expected_block = $expected['blocking_failure_stage'] ?? null;
-		$block_match = ( $expected_block === null && $actual_block === null ) || ( (string) $expected_block === (string) $actual_block );
-		$expected_dropped = $expected[ self::EXPECTED_DROPPED_RECORDS ] ?? array();
-		$expected_dropped = is_array( $expected_dropped ) ? $expected_dropped : array();
+		$state_match         = $actual_state === $expected_state;
+		$expected_block      = $expected['blocking_failure_stage'] ?? null;
+		$block_match         = ( $expected_block === null && $actual_block === null ) || ( (string) $expected_block === (string) $actual_block );
+		$expected_dropped    = $expected[ self::EXPECTED_DROPPED_RECORDS ] ?? array();
+		$expected_dropped    = is_array( $expected_dropped ) ? $expected_dropped : array();
 		$dropped_count_match = count( $actual_dropped_array ) === count( $expected_dropped );
 
 		$dropped_diffs = array();
-		$max_len = max( count( $actual_dropped_array ), count( $expected_dropped ) );
+		$max_len       = max( count( $actual_dropped_array ), count( $expected_dropped ) );
 		for ( $i = 0; $i < $max_len; $i++ ) {
 			$exp = $expected_dropped[ $i ] ?? null;
 			$act = $actual_dropped_array[ $i ] ?? null;
 			if ( $exp !== $act && ( is_array( $exp ) || is_array( $act ) ) ) {
-				$dropped_diffs[] = array( 'index' => $i, 'expected' => $exp, 'actual' => $act );
+				$dropped_diffs[] = array(
+					'index'    => $i,
+					'expected' => $exp,
+					'actual'   => $act,
+				);
 			}
 		}
 
 		$validator_summary = array(
 			'final_validation_state_match' => $state_match,
 			'blocking_stage_match'         => $block_match,
-			'dropped_count_match'         => $dropped_count_match,
-			'dropped_record_diffs'        => $dropped_diffs,
+			'dropped_count_match'          => $dropped_count_match,
+			'dropped_record_diffs'         => $dropped_diffs,
 		);
 
 		$expected_norm = $expected[ self::EXPECTED_NORMALIZED_OUTPUT ] ?? null;
-		$norm_diff = null;
+		$norm_diff     = null;
 		if ( $expected_norm !== null && is_array( $expected_norm ) ) {
 			$norm_diff = $this->diff_normalized_output( $expected_norm, $actual_norm );
 		} elseif ( $actual_norm !== null && $expected_state === Validation_Report::STATE_PASSED ) {
@@ -187,17 +194,28 @@ final class Prompt_Pack_Regression_Harness {
 	/**
 	 * Recursive diff of normalized output: added keys, removed keys, value diffs (top-level and one level deep for arrays).
 	 *
-	 * @param array<string, mixed> $expected
+	 * @param array<string, mixed>      $expected
 	 * @param array<string, mixed>|null $actual
 	 * @return array{match: bool, added_keys: array, removed_keys: array, value_diffs: array}
 	 */
 	private function diff_normalized_output( array $expected, ?array $actual ): array {
-		$added   = array();
-		$removed = array();
+		$added       = array();
+		$removed     = array();
 		$value_diffs = array();
 		if ( $actual === null ) {
 			$removed = array_keys( $expected );
-			return array( 'match' => false, 'added_keys' => $added, 'removed_keys' => $removed, 'value_diffs' => array( array( 'path' => '$', 'expected' => $expected, 'actual' => null ) ) );
+			return array(
+				'match'        => false,
+				'added_keys'   => $added,
+				'removed_keys' => $removed,
+				'value_diffs'  => array(
+					array(
+						'path'     => '$',
+						'expected' => $expected,
+						'actual'   => null,
+					),
+				),
+			);
 		}
 		$all_keys = array_unique( array_merge( array_keys( $expected ), array_keys( $actual ) ) );
 		foreach ( $all_keys as $key ) {
@@ -218,14 +236,27 @@ final class Prompt_Pack_Regression_Harness {
 			}
 			if ( is_array( $ev ) && is_array( $av ) && $this->is_list_like( $ev ) && $this->is_list_like( $av ) ) {
 				if ( json_encode( $ev ) !== json_encode( $av ) ) {
-					$value_diffs[] = array( 'path' => $key, 'expected' => $ev, 'actual' => $av );
+					$value_diffs[] = array(
+						'path'     => $key,
+						'expected' => $ev,
+						'actual'   => $av,
+					);
 				}
 			} else {
-				$value_diffs[] = array( 'path' => $key, 'expected' => $ev, 'actual' => $av );
+				$value_diffs[] = array(
+					'path'     => $key,
+					'expected' => $ev,
+					'actual'   => $av,
+				);
 			}
 		}
 		$match = empty( $added ) && empty( $removed ) && empty( $value_diffs );
-		return array( 'match' => $match, 'added_keys' => $added, 'removed_keys' => $removed, 'value_diffs' => $value_diffs );
+		return array(
+			'match'        => $match,
+			'added_keys'   => $added,
+			'removed_keys' => $removed,
+			'value_diffs'  => $value_diffs,
+		);
 	}
 
 	/**
@@ -240,17 +271,27 @@ final class Prompt_Pack_Regression_Harness {
 	}
 
 	/**
-	 * @param array $regression_run
+	 * @param array  $regression_run
 	 * @param string $message
 	 * @return Regression_Result
 	 */
 	private function result_fixture_invalid( $regression_run, string $message ): Regression_Result {
-		$run = is_array( $regression_run ) ? $regression_run : array( 'run_id' => 'regression-' . uniqid( '', true ), 'prompt_pack_ref' => array(), 'schema_ref' => '', 'ran_at' => gmdate( 'Y-m-d\TH:i:s\Z' ) );
+		$run = is_array( $regression_run ) ? $regression_run : array(
+			'run_id'          => 'regression-' . uniqid( '', true ),
+			'prompt_pack_ref' => array(),
+			'schema_ref'      => '',
+			'ran_at'          => gmdate( 'Y-m-d\TH:i:s\Z' ),
+		);
 		return new Regression_Result(
 			Regression_Result::OUTCOME_FAIL,
 			$run,
 			null,
-			array( 'final_validation_state_match' => false, 'blocking_stage_match' => false, 'dropped_count_match' => false, 'dropped_record_diffs' => array() ),
+			array(
+				'final_validation_state_match' => false,
+				'blocking_stage_match'         => false,
+				'dropped_count_match'          => false,
+				'dropped_record_diffs'         => array(),
+			),
 			$message
 		);
 	}

@@ -27,7 +27,10 @@ final class Industry_Profile_Change_Impact_Service_Test extends TestCase {
 	}
 
 	public function test_missing_snapshot_returns_snapshot_missing_and_info(): void {
-		$live = array( 'primary_industry_key' => 'legal', 'secondary_industry_keys' => array() );
+		$live   = array(
+			'primary_industry_key'    => 'legal',
+			'secondary_industry_keys' => array(),
+		);
 		$result = $this->service->evaluate( $live, null, array() );
 		$this->assertTrue( $result['snapshot_missing'] );
 		$this->assertFalse( $result['has_divergence'] );
@@ -36,16 +39,16 @@ final class Industry_Profile_Change_Impact_Service_Test extends TestCase {
 	}
 
 	public function test_matching_profile_returns_no_divergence(): void {
-		$live = array(
-			'primary_industry_key'   => 'legal',
+		$live     = array(
+			'primary_industry_key'    => 'legal',
 			'secondary_industry_keys' => array( 'healthcare' ),
 		);
 		$snapshot = array(
-			'primary_industry_key'   => 'legal',
+			'primary_industry_key'    => 'legal',
 			'secondary_industry_keys' => array( 'healthcare' ),
-			'style_preset_ref'       => null,
+			'style_preset_ref'        => null,
 		);
-		$result = $this->service->evaluate( $live, $snapshot, array( 'plan-1' ) );
+		$result   = $this->service->evaluate( $live, $snapshot, array( 'plan-1' ) );
 		$this->assertFalse( $result['has_divergence'] );
 		$this->assertFalse( $result['snapshot_missing'] );
 		$this->assertSame( Industry_Profile_Change_Impact_Service::SEVERITY_NONE, $result['severity'] );
@@ -53,38 +56,59 @@ final class Industry_Profile_Change_Impact_Service_Test extends TestCase {
 	}
 
 	public function test_primary_changed_returns_warning_divergence(): void {
-		$live = array( 'primary_industry_key' => 'healthcare', 'secondary_industry_keys' => array() );
-		$snapshot = array( 'primary_industry_key' => 'legal', 'secondary_industry_keys' => array() );
-		$result = $this->service->evaluate( $live, $snapshot, array() );
+		$live     = array(
+			'primary_industry_key'    => 'healthcare',
+			'secondary_industry_keys' => array(),
+		);
+		$snapshot = array(
+			'primary_industry_key'    => 'legal',
+			'secondary_industry_keys' => array(),
+		);
+		$result   = $this->service->evaluate( $live, $snapshot, array() );
 		$this->assertTrue( $result['has_divergence'] );
 		$this->assertSame( Industry_Profile_Change_Impact_Service::SEVERITY_WARNING, $result['severity'] );
 		$this->assertStringContainsString( 'Primary industry changed', $result['explanation_summary'] );
 	}
 
 	public function test_secondary_changed_returns_warning_divergence(): void {
-		$live = array( 'primary_industry_key' => 'legal', 'secondary_industry_keys' => array( 'retail' ) );
-		$snapshot = array( 'primary_industry_key' => 'legal', 'secondary_industry_keys' => array( 'healthcare' ) );
-		$result = $this->service->evaluate( $live, $snapshot, array() );
+		$live     = array(
+			'primary_industry_key'    => 'legal',
+			'secondary_industry_keys' => array( 'retail' ),
+		);
+		$snapshot = array(
+			'primary_industry_key'    => 'legal',
+			'secondary_industry_keys' => array( 'healthcare' ),
+		);
+		$result   = $this->service->evaluate( $live, $snapshot, array() );
 		$this->assertTrue( $result['has_divergence'] );
 		$this->assertSame( Industry_Profile_Change_Impact_Service::SEVERITY_WARNING, $result['severity'] );
 		$this->assertStringContainsString( 'Secondary', $result['explanation_summary'] );
 	}
 
 	public function test_style_preset_changed_returns_info_divergence(): void {
-		$live = array( 'primary_industry_key' => 'legal', 'secondary_industry_keys' => array() );
-		$snapshot = array( 'primary_industry_key' => 'legal', 'secondary_industry_keys' => array(), 'style_preset_ref' => 'legal_compact' );
-		$result = $this->service->evaluate( $live, $snapshot, array(), '' );
+		$live     = array(
+			'primary_industry_key'    => 'legal',
+			'secondary_industry_keys' => array(),
+		);
+		$snapshot = array(
+			'primary_industry_key'    => 'legal',
+			'secondary_industry_keys' => array(),
+			'style_preset_ref'        => 'legal_compact',
+		);
+		$result   = $this->service->evaluate( $live, $snapshot, array(), '' );
 		$this->assertTrue( $result['has_divergence'] );
 		$this->assertSame( Industry_Profile_Change_Impact_Service::SEVERITY_INFO, $result['severity'] );
 		$this->assertStringContainsString( 'Style preset', $result['explanation_summary'] );
 	}
 
 	public function test_empty_snapshot_array_with_live_primary_yields_divergence(): void {
-		$live = array( 'primary_industry_key' => 'legal', 'secondary_industry_keys' => array() );
+		$live   = array(
+			'primary_industry_key'    => 'legal',
+			'secondary_industry_keys' => array(),
+		);
 		$result = $this->service->evaluate( $live, array(), array() );
 		$this->assertFalse( $result['snapshot_missing'] );
 		$this->assertTrue( $result['has_divergence'] );
 		$this->assertSame( Industry_Profile_Change_Impact_Service::SEVERITY_WARNING, $result['severity'] );
 	}
 }
-

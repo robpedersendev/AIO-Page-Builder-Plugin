@@ -36,7 +36,7 @@ final class Conversion_Goal_What_If_Extender {
 		if ( ! array_key_exists( self::PARAM_ALTERNATE_CONVERSION_GOAL, $params ) ) {
 			return array();
 		}
-		$v = $params[ self::PARAM_ALTERNATE_CONVERSION_GOAL ];
+		$v    = $params[ self::PARAM_ALTERNATE_CONVERSION_GOAL ];
 		$goal = is_string( $v ) ? trim( $v ) : '';
 		if ( $goal === '' ) {
 			return array( Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY => '' );

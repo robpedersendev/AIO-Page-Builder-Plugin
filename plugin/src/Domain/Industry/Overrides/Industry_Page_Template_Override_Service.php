@@ -32,7 +32,7 @@ final class Industry_Page_Template_Override_Service {
 		if ( $template_key === '' || strlen( $template_key ) > Industry_Override_Schema::TARGET_KEY_MAX_LENGTH ) {
 			return false;
 		}
-		$reason = Industry_Override_Schema::sanitize_reason( $reason );
+		$reason   = Industry_Override_Schema::sanitize_reason( $reason );
 		$override = array(
 			Industry_Override_Schema::FIELD_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_PAGE_TEMPLATE,
 			Industry_Override_Schema::FIELD_TARGET_KEY  => $template_key,
@@ -44,7 +44,7 @@ final class Industry_Page_Template_Override_Service {
 		if ( Industry_Override_Schema::validate( $override ) !== array() ) {
 			return false;
 		}
-		$all = $this->get_all();
+		$all                  = $this->get_all();
 		$all[ $template_key ] = $override;
 		return \update_option( Option_Names::INDUSTRY_PAGE_TEMPLATE_OVERRIDES, $all, true ) !== false;
 	}

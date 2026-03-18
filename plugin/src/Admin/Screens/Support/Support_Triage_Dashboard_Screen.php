@@ -70,11 +70,11 @@ final class Support_Triage_Dashboard_Screen {
 
 	/** @return array<string, mixed> */
 	private function build_state(): array {
-		$job_repo  = $this->container && $this->container->has( 'job_queue_repository' ) ? $this->container->get( 'job_queue_repository' ) : null;
-		$ai_repo   = $this->container && $this->container->has( 'ai_run_repository' ) ? $this->container->get( 'ai_run_repository' ) : null;
-		$plan_repo = $this->container && $this->container->has( 'build_plan_repository' ) ? $this->container->get( 'build_plan_repository' ) : null;
+		$job_repo             = $this->container && $this->container->has( 'job_queue_repository' ) ? $this->container->get( 'job_queue_repository' ) : null;
+		$ai_repo              = $this->container && $this->container->has( 'ai_run_repository' ) ? $this->container->get( 'ai_run_repository' ) : null;
+		$plan_repo            = $this->container && $this->container->has( 'build_plan_repository' ) ? $this->container->get( 'build_plan_repository' ) : null;
 		$industry_diagnostics = $this->container && $this->container->has( 'industry_diagnostics_service' ) ? $this->container->get( 'industry_diagnostics_service' ) : null;
-		$builder   = new Support_Triage_State_Builder( $job_repo, $ai_repo, $plan_repo, $industry_diagnostics );
+		$builder              = new Support_Triage_State_Builder( $job_repo, $ai_repo, $plan_repo, $industry_diagnostics );
 		return $builder->build();
 	}
 
@@ -88,20 +88,40 @@ final class Support_Triage_Dashboard_Screen {
 		$domain   = isset( $_GET['domain'] ) ? \sanitize_key( (string) $_GET['domain'] ) : '';
 		$severity = isset( $_GET['severity'] ) ? \sanitize_key( (string) $_GET['severity'] ) : '';
 		if ( $domain !== '' ) {
-			$state['critical_issues'] = array_values( array_filter( $state['critical_issues'], function ( $item ) use ( $domain ) {
-				return ( $item['domain'] ?? '' ) === $domain;
-			} ) );
-			$state['degraded_systems'] = array_values( array_filter( $state['degraded_systems'], function ( $item ) use ( $domain ) {
-				return ( $item['domain'] ?? '' ) === $domain;
-			} ) );
-			$state['recent_failed_workflows'] = array_values( array_filter( $state['recent_failed_workflows'], function ( $item ) use ( $domain ) {
-				return ( $item['domain'] ?? '' ) === $domain;
-			} ) );
+			$state['critical_issues']         = array_values(
+				array_filter(
+					$state['critical_issues'],
+					function ( $item ) use ( $domain ) {
+						return ( $item['domain'] ?? '' ) === $domain;
+					}
+				)
+			);
+			$state['degraded_systems']        = array_values(
+				array_filter(
+					$state['degraded_systems'],
+					function ( $item ) use ( $domain ) {
+						return ( $item['domain'] ?? '' ) === $domain;
+					}
+				)
+			);
+			$state['recent_failed_workflows'] = array_values(
+				array_filter(
+					$state['recent_failed_workflows'],
+					function ( $item ) use ( $domain ) {
+						return ( $item['domain'] ?? '' ) === $domain;
+					}
+				)
+			);
 		}
 		if ( $severity !== '' ) {
-			$state['critical_issues'] = array_values( array_filter( $state['critical_issues'], function ( $item ) use ( $severity ) {
-				return ( $item['severity'] ?? '' ) === $severity;
-			} ) );
+			$state['critical_issues'] = array_values(
+				array_filter(
+					$state['critical_issues'],
+					function ( $item ) use ( $severity ) {
+						return ( $item['severity'] ?? '' ) === $severity;
+					}
+				)
+			);
 		}
 		return $state;
 	}
@@ -203,7 +223,19 @@ final class Support_Triage_Dashboard_Screen {
 				<ul style="list-style: none; padding-left: 0;">
 					<?php foreach ( $stale_plans as $plan ) : ?>
 						<?php $plan_id = (string) ( $plan['plan_id'] ?? '' ); ?>
-						<li><a href="<?php echo \esc_url( \add_query_arg( array( 'page' => 'aio-page-builder-build-plans', 'plan_id' => $plan_id ), $base ) ); ?>"><?php echo \esc_html( (string) ( $plan['title'] ?? $plan_id ) ); ?></a> — <?php echo \esc_html( (string) ( $plan['status'] ?? '' ) ); ?></li>
+						<li><a href="
+						<?php
+						echo \esc_url(
+							\add_query_arg(
+								array(
+									'page'    => 'aio-page-builder-build-plans',
+									'plan_id' => $plan_id,
+								),
+								$base
+							)
+						);
+						?>
+										"><?php echo \esc_html( (string) ( $plan['title'] ?? $plan_id ) ); ?></a> — <?php echo \esc_html( (string) ( $plan['status'] ?? '' ) ); ?></li>
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>

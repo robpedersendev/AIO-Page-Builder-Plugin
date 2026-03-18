@@ -47,25 +47,31 @@ final class Conflict_Resolution_Service {
 	 * Resolves conflicts with the given mode. Returns list of actions per conflict; if mode is cancel, returns cancelled flag.
 	 *
 	 * @param list<array{category: string, key: string, message: string}> $conflicts From validation.
-	 * @param string $mode One of MODE_OVERWRITE, MODE_KEEP_CURRENT, MODE_DUPLICATE, MODE_CANCEL.
+	 * @param string                                                      $mode One of MODE_OVERWRITE, MODE_KEEP_CURRENT, MODE_DUPLICATE, MODE_CANCEL.
 	 * @return array{resolved: list<array{category: string, key: string, action: string}>, cancelled: bool}
 	 */
 	public function resolve( array $conflicts, string $mode ): array {
 		if ( $mode === self::MODE_CANCEL ) {
-			return array( 'resolved' => array(), 'cancelled' => true );
+			return array(
+				'resolved'  => array(),
+				'cancelled' => true,
+			);
 		}
-		$action = self::mode_to_action( $mode );
+		$action   = self::mode_to_action( $mode );
 		$resolved = array();
 		foreach ( $conflicts as $c ) {
-			$key = isset( $c['key'] ) ? (string) $c['key'] : '';
-			$cat = isset( $c['category'] ) ? (string) $c['category'] : '';
+			$key        = isset( $c['key'] ) ? (string) $c['key'] : '';
+			$cat        = isset( $c['category'] ) ? (string) $c['category'] : '';
 			$resolved[] = array(
 				'category' => $cat,
 				'key'      => $key,
 				'action'   => $this->action_for_category( $cat, $action ),
 			);
 		}
-		return array( 'resolved' => $resolved, 'cancelled' => false );
+		return array(
+			'resolved'  => $resolved,
+			'cancelled' => false,
+		);
 	}
 
 	/**

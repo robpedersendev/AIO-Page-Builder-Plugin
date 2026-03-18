@@ -37,16 +37,16 @@ final class Recrawl_Comparison_Service {
 	 * @return Session_Comparison_Result
 	 */
 	public function compare( string $prior_run_id, string $new_run_id ): Session_Comparison_Result {
-		$prior_pages = $this->index_by_url( $this->snapshot_service->list_pages_by_run( $prior_run_id ) );
-		$new_pages   = $this->index_by_url( $this->snapshot_service->list_pages_by_run( $new_run_id ) );
-		$prior_urls  = array_keys( $prior_pages );
-		$new_urls    = array_keys( $new_pages );
+		$prior_pages  = $this->index_by_url( $this->snapshot_service->list_pages_by_run( $prior_run_id ) );
+		$new_pages    = $this->index_by_url( $this->snapshot_service->list_pages_by_run( $new_run_id ) );
+		$prior_urls   = array_keys( $prior_pages );
+		$new_urls     = array_keys( $new_pages );
 		$added_urls   = array_diff( $new_urls, $prior_urls );
 		$removed_urls = array_diff( $prior_urls, $new_urls );
 		$common_urls  = array_intersect( $prior_urls, $new_urls );
 
 		$meaningful_count_prior = $this->count_meaningful( $prior_pages );
-		$meaningful_count_new  = $this->count_meaningful( $new_pages );
+		$meaningful_count_new   = $this->count_meaningful( $new_pages );
 
 		$page_changes = array();
 		foreach ( $added_urls as $url ) {
@@ -73,16 +73,16 @@ final class Recrawl_Comparison_Service {
 		$reclassified_count = 0;
 
 		foreach ( $common_urls as $url ) {
-			$prior = $prior_pages[ $url ];
-			$new   = $new_pages[ $url ];
-			$reasons = $this->diff_reasons( $prior, $new );
+			$prior         = $prior_pages[ $url ];
+			$new           = $new_pages[ $url ];
+			$reasons       = $this->diff_reasons( $prior, $new );
 			$class_changed = in_array( Page_Change_Summary::REASON_CLASSIFICATION_CHANGED, $reasons, true );
 			if ( $class_changed ) {
-				$reclassified_count++;
+				++$reclassified_count;
 			}
 			if ( count( $reasons ) > 0 ) {
-				$changed_count++;
-				$category = $class_changed ? Page_Change_Summary::CATEGORY_RECLASSIFIED : Page_Change_Summary::CATEGORY_CHANGED;
+				++$changed_count;
+				$category       = $class_changed ? Page_Change_Summary::CATEGORY_RECLASSIFIED : Page_Change_Summary::CATEGORY_CHANGED;
 				$page_changes[] = new Page_Change_Summary(
 					$url,
 					$category,
@@ -91,7 +91,7 @@ final class Recrawl_Comparison_Service {
 					$this->snapshot_excerpt( $new )
 				);
 			} else {
-				$unchanged_count++;
+				++$unchanged_count;
 				$page_changes[] = new Page_Change_Summary(
 					$url,
 					Page_Change_Summary::CATEGORY_UNCHANGED,
@@ -124,7 +124,7 @@ final class Recrawl_Comparison_Service {
 		$n = 0;
 		foreach ( $index as $row ) {
 			if ( ( $row['page_classification'] ?? '' ) === self::CLASSIFICATION_MEANINGFUL ) {
-				$n++;
+				++$n;
 			}
 		}
 		return $n;
@@ -153,7 +153,7 @@ final class Recrawl_Comparison_Service {
 	 * @return list<string>
 	 */
 	private function diff_reasons( array $prior, array $new ): array {
-		$reasons = array();
+		$reasons     = array();
 		$title_prior = $prior['title_snapshot'] ?? null;
 		$title_new   = $new['title_snapshot'] ?? null;
 		if ( (string) $title_prior !== (string) $title_new ) {
@@ -190,12 +190,12 @@ final class Recrawl_Comparison_Service {
 	 */
 	private function snapshot_excerpt( array $record ): array {
 		return array(
-			'url'                    => $record['url'] ?? null,
-			'title_snapshot'         => $record['title_snapshot'] ?? null,
-			'page_classification'   => $record['page_classification'] ?? null,
-			'canonical_url'          => $record['canonical_url'] ?? null,
+			'url'                      => $record['url'] ?? null,
+			'title_snapshot'           => $record['title_snapshot'] ?? null,
+			'page_classification'      => $record['page_classification'] ?? null,
+			'canonical_url'            => $record['canonical_url'] ?? null,
 			'navigation_participation' => $record['navigation_participation'] ?? null,
-			'content_hash'          => $record['content_hash'] ?? null,
+			'content_hash'             => $record['content_hash'] ?? null,
 		);
 	}
 }

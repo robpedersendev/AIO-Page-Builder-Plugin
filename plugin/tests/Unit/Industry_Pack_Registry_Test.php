@@ -50,10 +50,12 @@ final class Industry_Pack_Registry_Test extends TestCase {
 
 	public function test_registry_list_by_status_returns_only_matching(): void {
 		$registry = new Industry_Pack_Registry();
-		$registry->load( array(
-			$this->valid_pack( 'legal' ),
-			array_merge( $this->valid_pack( 'healthcare' ), array( Industry_Pack_Schema::FIELD_STATUS => Industry_Pack_Schema::STATUS_DRAFT ) ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_pack( 'legal' ),
+				array_merge( $this->valid_pack( 'healthcare' ), array( Industry_Pack_Schema::FIELD_STATUS => Industry_Pack_Schema::STATUS_DRAFT ) ),
+			)
+		);
 		$active = $registry->list_by_status( Industry_Pack_Schema::STATUS_ACTIVE );
 		$this->assertCount( 1, $active );
 		$this->assertSame( 'legal', $active[0][ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] );
@@ -64,7 +66,10 @@ final class Industry_Pack_Registry_Test extends TestCase {
 
 	public function test_registry_skips_invalid_pack_and_loads_valid(): void {
 		$registry = new Industry_Pack_Registry();
-		$invalid = array( Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'bad', Industry_Pack_Schema::FIELD_NAME => 'Bad' );
+		$invalid  = array(
+			Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'bad',
+			Industry_Pack_Schema::FIELD_NAME         => 'Bad',
+		);
 		$registry->load( array( $invalid, $this->valid_pack( 'legal' ) ) );
 		$this->assertNull( $registry->get( 'bad' ) );
 		$this->assertNotNull( $registry->get( 'legal' ) );
@@ -72,10 +77,10 @@ final class Industry_Pack_Registry_Test extends TestCase {
 	}
 
 	public function test_registry_skips_duplicate_key_first_wins(): void {
-		$registry = new Industry_Pack_Registry();
-		$first   = $this->valid_pack( 'legal' );
-		$first[ Industry_Pack_Schema::FIELD_NAME ] = 'First';
-		$second  = $this->valid_pack( 'legal' );
+		$registry                                   = new Industry_Pack_Registry();
+		$first                                      = $this->valid_pack( 'legal' );
+		$first[ Industry_Pack_Schema::FIELD_NAME ]  = 'First';
+		$second                                     = $this->valid_pack( 'legal' );
 		$second[ Industry_Pack_Schema::FIELD_NAME ] = 'Second';
 		$registry->load( array( $first, $second ) );
 		$pack = $registry->get( 'legal' );
@@ -86,21 +91,28 @@ final class Industry_Pack_Registry_Test extends TestCase {
 
 	public function test_validator_bulk_reports_duplicate_keys(): void {
 		$validator = new Industry_Pack_Validator();
-		$result   = $validator->validate_bulk( array(
-			$this->valid_pack( 'legal' ),
-			$this->valid_pack( 'legal' ),
-			$this->valid_pack( 'healthcare' ),
-		) );
+		$result    = $validator->validate_bulk(
+			array(
+				$this->valid_pack( 'legal' ),
+				$this->valid_pack( 'legal' ),
+				$this->valid_pack( 'healthcare' ),
+			)
+		);
 		$this->assertCount( 2, $result['valid'] );
 		$this->assertContains( 'legal', $result['duplicate_keys'] );
 	}
 
 	public function test_validator_bulk_reports_invalid_schema_payloads(): void {
 		$validator = new Industry_Pack_Validator();
-		$result   = $validator->validate_bulk( array(
-			$this->valid_pack( 'legal' ),
-			array( Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'x', Industry_Pack_Schema::FIELD_STATUS => 'invalid_status' ),
-		) );
+		$result    = $validator->validate_bulk(
+			array(
+				$this->valid_pack( 'legal' ),
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'x',
+					Industry_Pack_Schema::FIELD_STATUS => 'invalid_status',
+				),
+			)
+		);
 		$this->assertCount( 1, $result['valid'] );
 		$this->assertCount( 1, $result['invalid'] );
 		$this->assertSame( 1, $result['invalid'][0]['index'] );
@@ -161,7 +173,7 @@ final class Industry_Pack_Registry_Test extends TestCase {
 	/** Disaster recovery pack: schema-valid, emergency/claims/trust refs (Prompt 352). */
 	public function test_disaster_recovery_pack_has_expected_structure(): void {
 		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
-		$registry = new Industry_Pack_Registry();
+		$registry    = new Industry_Pack_Registry();
 		$registry->load( $definitions );
 		$pack = $registry->get( 'disaster_recovery' );
 		$this->assertNotNull( $pack );
@@ -176,7 +188,7 @@ final class Industry_Pack_Registry_Test extends TestCase {
 	/** Cosmetology/nail pack: schema-valid, refs present (resolution is at use time). */
 	public function test_cosmetology_nail_pack_has_expected_structure(): void {
 		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
-		$registry = new Industry_Pack_Registry();
+		$registry    = new Industry_Pack_Registry();
 		$registry->load( $definitions );
 		$pack = $registry->get( 'cosmetology_nail' );
 		$this->assertNotNull( $pack );
@@ -190,7 +202,7 @@ final class Industry_Pack_Registry_Test extends TestCase {
 	/** Realtor pack: schema-valid, valuation and hierarchy-oriented refs. */
 	public function test_realtor_pack_has_expected_structure(): void {
 		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
-		$registry = new Industry_Pack_Registry();
+		$registry    = new Industry_Pack_Registry();
 		$registry->load( $definitions );
 		$pack = $registry->get( 'realtor' );
 		$this->assertNotNull( $pack );
@@ -202,7 +214,7 @@ final class Industry_Pack_Registry_Test extends TestCase {
 	/** Plumber pack: schema-valid, emergency/direct-response refs. */
 	public function test_plumber_pack_has_expected_structure(): void {
 		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
-		$registry = new Industry_Pack_Registry();
+		$registry    = new Industry_Pack_Registry();
 		$registry->load( $definitions );
 		$pack = $registry->get( 'plumber' );
 		$this->assertNotNull( $pack );

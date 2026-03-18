@@ -46,13 +46,13 @@ final class Feature_Benefit_Value_Library_Batch_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']     = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$repo       = new Section_Template_Repository();
-		$normalizer = new Section_Definition_Normalizer();
-		$this->validator = new Section_Validator( $normalizer, $repo );
-		$bp_validator = new Section_Field_Blueprint_Validator();
-		$this->blueprint_service = new Section_Field_Blueprint_Service(
+		$repo                           = new Section_Template_Repository();
+		$normalizer                     = new Section_Definition_Normalizer();
+		$this->validator                = new Section_Validator( $normalizer, $repo );
+		$bp_validator                   = new Section_Field_Blueprint_Validator();
+		$this->blueprint_service        = new Section_Field_Blueprint_Service(
 			$repo,
 			$bp_validator,
 			new Section_Field_Blueprint_Normalizer( $bp_validator )
@@ -68,9 +68,21 @@ final class Feature_Benefit_Value_Library_Batch_Test extends TestCase {
 		$keys = Feature_Benefit_Value_Library_Batch_Definitions::section_keys();
 		$this->assertCount( 16, $keys );
 		$expected = array(
-			'fb_feature_grid_01', 'fb_benefit_band_01', 'fb_offer_compare_01', 'fb_package_summary_01', 'fb_differentiator_01',
-			'fb_before_after_01', 'fb_why_choose_01', 'fb_product_spec_01', 'fb_service_offering_01', 'fb_value_prop_01',
-			'fb_feature_compact_01', 'fb_benefit_detail_01', 'fb_offer_highlight_01', 'fb_local_value_01', 'fb_directory_value_01',
+			'fb_feature_grid_01',
+			'fb_benefit_band_01',
+			'fb_offer_compare_01',
+			'fb_package_summary_01',
+			'fb_differentiator_01',
+			'fb_before_after_01',
+			'fb_why_choose_01',
+			'fb_product_spec_01',
+			'fb_service_offering_01',
+			'fb_value_prop_01',
+			'fb_feature_compact_01',
+			'fb_benefit_detail_01',
+			'fb_offer_highlight_01',
+			'fb_local_value_01',
+			'fb_directory_value_01',
 			'fb_resource_explainer_01',
 		);
 		foreach ( $expected as $k ) {
@@ -87,7 +99,7 @@ final class Feature_Benefit_Value_Library_Batch_Test extends TestCase {
 		$normalizer = new Section_Definition_Normalizer();
 		foreach ( Feature_Benefit_Value_Library_Batch_Definitions::all_definitions() as $def ) {
 			$normalized = $normalizer->normalize( $def );
-			$errors = $this->validator->validate_completeness( $normalized );
+			$errors     = $this->validator->validate_completeness( $normalized );
 			$this->assertEmpty( $errors, 'Definition ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '?' ) . ' should pass completeness: ' . implode( ', ', $errors ) );
 		}
 	}
@@ -117,9 +129,9 @@ final class Feature_Benefit_Value_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_helper_and_css_contract_refs(): void {
 		foreach ( Feature_Benefit_Value_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key        = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$helper_ref = (string) ( $def[ Section_Schema::FIELD_HELPER_REF ] ?? '' );
-			$css_ref = (string) ( $def[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' );
+			$css_ref    = (string) ( $def[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' );
 			$this->assertNotSame( '', $helper_ref, "Section {$key} must have non-empty helper_ref" );
 			$this->assertNotSame( '', $css_ref, "Section {$key} must have non-empty css_contract_ref" );
 		}
@@ -147,7 +159,7 @@ final class Feature_Benefit_Value_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_accessibility_and_omit_safety_guidance(): void {
 		foreach ( Feature_Benefit_Value_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$guidance = (string) ( $def['accessibility_warnings_or_enhancements'] ?? '' );
 			$this->assertNotEmpty( $guidance, "Section {$key} must have accessibility_warnings_or_enhancements" );
 			$this->assertMatchesRegularExpression( '/contrast|color|semantic|omit/i', $guidance, "Section {$key} should reference contrast, semantic, or omit-safe (spec §51.3)" );
@@ -156,7 +168,7 @@ final class Feature_Benefit_Value_Library_Batch_Test extends TestCase {
 
 	public function test_preview_defaults_coverage(): void {
 		foreach ( Feature_Benefit_Value_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$defaults = $def['preview_defaults'] ?? array();
 			$this->assertIsArray( $defaults, "Section {$key} must have preview_defaults array" );
 			$this->assertNotEmpty( $defaults, "Section {$key} preview_defaults must not be empty for preview realism" );
@@ -190,9 +202,9 @@ final class Feature_Benefit_Value_Library_Batch_Test extends TestCase {
 
 	public function test_seeder_run_returns_success_and_sixteen_section_ids(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 300;
-		$GLOBALS['_aio_wp_query_posts']       = array();
-		$repo   = new Section_Template_Repository();
-		$result = Feature_Benefit_Value_Library_Batch_Seeder::run( $repo );
+		$GLOBALS['_aio_wp_query_posts']        = array();
+		$repo                                  = new Section_Template_Repository();
+		$result                                = Feature_Benefit_Value_Library_Batch_Seeder::run( $repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'section_ids', $result );

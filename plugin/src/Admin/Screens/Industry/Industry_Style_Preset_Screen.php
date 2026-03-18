@@ -25,9 +25,9 @@ final class Industry_Style_Preset_Screen {
 	public const SLUG = 'aio-page-builder-industry-style-preset';
 
 	private const APPLY_ACTION = 'aio_apply_industry_style_preset';
-	private const NONCE_ACTION  = 'aio_apply_industry_style_preset';
-	private const NONCE_NAME    = 'aio_industry_style_preset_nonce';
-	private const QUERY_MSG     = 'aio_style_preset_msg';
+	private const NONCE_ACTION = 'aio_apply_industry_style_preset';
+	private const NONCE_NAME   = 'aio_industry_style_preset_nonce';
+	private const QUERY_MSG    = 'aio_style_preset_msg';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -50,11 +50,11 @@ final class Industry_Style_Preset_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function get_state(): array {
-		$primary    = '';
-		$presets    = array();
-		$applied    = null;
-		$profile_repo = null;
-		$preset_registry = null;
+		$primary             = '';
+		$presets             = array();
+		$applied             = null;
+		$profile_repo        = null;
+		$preset_registry     = null;
 		$application_service = null;
 
 		if ( $this->container instanceof Service_Container ) {
@@ -80,22 +80,25 @@ final class Industry_Style_Preset_Screen {
 		}
 		if ( $preset_registry !== null && $primary !== '' ) {
 			$presets = $preset_registry->list_by_industry( $primary );
-			$presets = array_filter( $presets, function ( $p ) {
-				return ( $p[ Industry_Style_Preset_Registry::FIELD_STATUS ] ?? '' ) === Industry_Style_Preset_Registry::STATUS_ACTIVE;
-			} );
+			$presets = array_filter(
+				$presets,
+				function ( $p ) {
+					return ( $p[ Industry_Style_Preset_Registry::FIELD_STATUS ] ?? '' ) === Industry_Style_Preset_Registry::STATUS_ACTIVE;
+				}
+			);
 		}
 		if ( $application_service !== null ) {
 			$applied = $application_service->get_applied_preset();
 		}
 
 		return array(
-			'primary_industry'   => $primary,
-			'presets'            => array_values( $presets ),
-			'applied_preset'     => $applied,
-			'form_action'        => \admin_url( 'admin-post.php' ),
-			'apply_action'       => self::APPLY_ACTION,
-			'nonce_action'       => self::NONCE_ACTION,
-			'nonce_name'         => self::NONCE_NAME,
+			'primary_industry' => $primary,
+			'presets'          => array_values( $presets ),
+			'applied_preset'   => $applied,
+			'form_action'      => \admin_url( 'admin-post.php' ),
+			'apply_action'     => self::APPLY_ACTION,
+			'nonce_action'     => self::NONCE_ACTION,
+			'nonce_name'       => self::NONCE_NAME,
 		);
 	}
 
@@ -108,8 +111,8 @@ final class Industry_Style_Preset_Screen {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage style presets.', 'aio-page-builder' ), 403 );
 		}
-		$state = $this->get_state();
-		$message = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
+		$state             = $this->get_state();
+		$message           = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
 		$global_tokens_url = \admin_url( 'admin.php?page=' . \AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen::SLUG );
 		?>
 		<div class="wrap aio-page-builder-screen aio-industry-style-preset" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -144,9 +147,10 @@ final class Industry_Style_Preset_Screen {
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ( $state['presets'] as $preset ) :
-							$key = $preset[ Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY ] ?? '';
-							$label = $preset[ Industry_Style_Preset_Registry::FIELD_LABEL ] ?? $key;
+						<?php
+						foreach ( $state['presets'] as $preset ) :
+							$key         = $preset[ Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY ] ?? '';
+							$label       = $preset[ Industry_Style_Preset_Registry::FIELD_LABEL ] ?? $key;
 							$description = $preset[ Industry_Style_Preset_Registry::FIELD_DESCRIPTION ] ?? '';
 							?>
 							<tr>

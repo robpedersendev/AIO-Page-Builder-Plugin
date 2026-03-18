@@ -78,7 +78,7 @@ final class Crawl_Profile_Service_Test extends TestCase {
 	}
 
 	public function test_list_profiles_for_selection_returns_key_and_label(): void {
-		$svc = new Crawl_Profile_Service();
+		$svc  = new Crawl_Profile_Service();
 		$list = $svc->list_profiles_for_selection();
 		$this->assertIsArray( $list );
 		$this->assertCount( count( Crawl_Profile_Keys::all() ), $list );
@@ -90,7 +90,7 @@ final class Crawl_Profile_Service_Test extends TestCase {
 	}
 
 	public function test_get_profile_payload_structure(): void {
-		$svc = new Crawl_Profile_Service();
+		$svc     = new Crawl_Profile_Service();
 		$payload = $svc->get_profile_payload( Crawl_Profile_Keys::QUICK_CONTEXT_REFRESH );
 		$this->assertArrayHasKey( 'key', $payload );
 		$this->assertArrayHasKey( 'label', $payload );
@@ -106,7 +106,7 @@ final class Crawl_Profile_Service_Test extends TestCase {
 	 * Example crawl_profile_summary payload (spec §24, §59.7; Prompt 128). No pseudocode.
 	 */
 	public function test_get_profile_summary_payload_example(): void {
-		$svc    = new Crawl_Profile_Service();
+		$svc     = new Crawl_Profile_Service();
 		$summary = $svc->get_profile_summary();
 		$this->assertArrayHasKey( 'profiles', $summary );
 		$this->assertArrayHasKey( 'contract_max_pages', $summary );
@@ -117,7 +117,7 @@ final class Crawl_Profile_Service_Test extends TestCase {
 		$this->assertCount( 3, $summary['profiles'] );
 
 		$example_crawl_profile_summary = array(
-			'profiles' => array(
+			'profiles'           => array(
 				array(
 					'key'         => 'quick_context_refresh',
 					'label'       => 'Quick context refresh',

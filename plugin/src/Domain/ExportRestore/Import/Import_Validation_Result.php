@@ -38,13 +38,13 @@ final class Import_Validation_Result {
 	private bool $checksum_verified;
 
 	/**
-	 * @param bool                  $validation_passed
-	 * @param list<string>          $blocking_failures
+	 * @param bool                        $validation_passed
+	 * @param list<string>                $blocking_failures
 	 * @param list<array<string, string>> $conflicts
-	 * @param list<string>          $warnings
-	 * @param array<string, mixed>  $manifest
-	 * @param string                $package_path
-	 * @param bool                  $checksum_verified
+	 * @param list<string>                $warnings
+	 * @param array<string, mixed>        $manifest
+	 * @param string                      $package_path
+	 * @param bool                        $checksum_verified
 	 */
 	public function __construct(
 		bool $validation_passed,
@@ -55,13 +55,13 @@ final class Import_Validation_Result {
 		string $package_path,
 		bool $checksum_verified = false
 	) {
-		$this->validation_passed  = $validation_passed;
-		$this->blocking_failures   = $blocking_failures;
-		$this->conflicts           = $conflicts;
-		$this->warnings            = $warnings;
-		$this->manifest            = $manifest;
-		$this->package_path        = $package_path;
-		$this->checksum_verified   = $checksum_verified;
+		$this->validation_passed = $validation_passed;
+		$this->blocking_failures = $blocking_failures;
+		$this->conflicts         = $conflicts;
+		$this->warnings          = $warnings;
+		$this->manifest          = $manifest;
+		$this->package_path      = $package_path;
+		$this->checksum_verified = $checksum_verified;
 	}
 
 	public function validation_passed(): bool {
@@ -103,7 +103,7 @@ final class Import_Validation_Result {
 	 * @return self
 	 */
 	public static function from_stored( array $stored ): self {
-		$p = $stored['payload'] ?? array();
+		$p        = $stored['payload'] ?? array();
 		$manifest = isset( $stored['manifest'] ) && is_array( $stored['manifest'] ) ? $stored['manifest'] : array();
 		return new self(
 			(bool) ( $p['validation_passed'] ?? false ),
@@ -123,7 +123,7 @@ final class Import_Validation_Result {
 	 */
 	public function to_payload(): array {
 		return array(
-			'validation_passed'  => $this->validation_passed,
+			'validation_passed' => $this->validation_passed,
 			'blocking_failures' => $this->blocking_failures,
 			'conflicts'         => $this->conflicts,
 			'warnings'          => $this->warnings,

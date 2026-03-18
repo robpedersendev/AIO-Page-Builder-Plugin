@@ -17,11 +17,11 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Future_Subtype_Readiness_View_Model {
 
-	public const KEY_SUBTYPE_SCAFFOLD_COUNT   = 'subtype_scaffold_count';
-	public const KEY_SUBTYPE_MISSING_COUNT    = 'subtype_missing_count';
-	public const KEY_PROMO_SUBTYPE_SUMMARY   = 'promotion_readiness_subtype_summary';
-	public const KEY_BLOCKER_COUNT           = 'blocker_count';
-	public const KEY_LINKS                   = 'links';
+	public const KEY_SUBTYPE_SCAFFOLD_COUNT = 'subtype_scaffold_count';
+	public const KEY_SUBTYPE_MISSING_COUNT  = 'subtype_missing_count';
+	public const KEY_PROMO_SUBTYPE_SUMMARY  = 'promotion_readiness_subtype_summary';
+	public const KEY_BLOCKER_COUNT          = 'blocker_count';
+	public const KEY_LINKS                  = 'links';
 
 	/** @var int */
 	private int $subtype_scaffold_count;
@@ -35,7 +35,7 @@ final class Future_Subtype_Readiness_View_Model {
 	private array $links;
 
 	/**
-	 * @param array<string, int> $promotion_readiness_subtype_summary Keys: total, scaffold_complete, authored_near_ready, not_near_ready (subtype-only).
+	 * @param array<string, int>    $promotion_readiness_subtype_summary Keys: total, scaffold_complete, authored_near_ready, not_near_ready (subtype-only).
 	 * @param array<string, string> $links
 	 */
 	public function __construct(
@@ -45,11 +45,11 @@ final class Future_Subtype_Readiness_View_Model {
 		int $blocker_count = 0,
 		array $links = array()
 	) {
-		$this->subtype_scaffold_count = $subtype_scaffold_count;
-		$this->subtype_missing_count = $subtype_missing_count;
+		$this->subtype_scaffold_count              = $subtype_scaffold_count;
+		$this->subtype_missing_count               = $subtype_missing_count;
 		$this->promotion_readiness_subtype_summary = $promotion_readiness_subtype_summary;
-		$this->blocker_count = $blocker_count;
-		$this->links = $links;
+		$this->blocker_count                       = $blocker_count;
+		$this->links                               = $links;
 	}
 
 	public function get_subtype_scaffold_count(): int {
@@ -81,7 +81,7 @@ final class Future_Subtype_Readiness_View_Model {
 			self::KEY_SUBTYPE_MISSING_COUNT  => $this->subtype_missing_count,
 			self::KEY_PROMO_SUBTYPE_SUMMARY  => $this->promotion_readiness_subtype_summary,
 			self::KEY_BLOCKER_COUNT          => $this->blocker_count,
-			self::KEY_LINKS                 => $this->links,
+			self::KEY_LINKS                  => $this->links,
 		);
 	}
 }

@@ -46,14 +46,14 @@ final class Template_Recommendation_Regression_Result {
 	private array $details;
 
 	/**
-	 * @param string   $outcome
-	 * @param array    $regression_run
-	 * @param bool     $class_fit
-	 * @param bool     $family_fit
+	 * @param string    $outcome
+	 * @param array     $regression_run
+	 * @param bool      $class_fit
+	 * @param bool      $family_fit
 	 * @param bool|null $cta_law_aligned
-	 * @param bool     $explanation_fit
-	 * @param string   $message
-	 * @param array    $details
+	 * @param bool      $explanation_fit
+	 * @param string    $message
+	 * @param array     $details
 	 */
 	public function __construct(
 		string $outcome,
@@ -65,14 +65,14 @@ final class Template_Recommendation_Regression_Result {
 		string $message,
 		array $details = array()
 	) {
-		$this->outcome          = $outcome;
-		$this->regression_run   = $regression_run;
-		$this->class_fit        = $class_fit;
-		$this->family_fit       = $family_fit;
-		$this->cta_law_aligned  = $cta_law_aligned;
-		$this->explanation_fit  = $explanation_fit;
-		$this->message          = $message;
-		$this->details          = $details;
+		$this->outcome         = $outcome;
+		$this->regression_run  = $regression_run;
+		$this->class_fit       = $class_fit;
+		$this->family_fit      = $family_fit;
+		$this->cta_law_aligned = $cta_law_aligned;
+		$this->explanation_fit = $explanation_fit;
+		$this->message         = $message;
+		$this->details         = $details;
 	}
 
 	public function get_outcome(): string {
@@ -120,14 +120,14 @@ final class Template_Recommendation_Regression_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'outcome'            => $this->outcome,
-			'regression_run'     => $this->regression_run,
-			'class_fit'          => $this->class_fit,
-			'family_fit'         => $this->family_fit,
-			'cta_law_aligned'    => $this->cta_law_aligned,
-			'explanation_fit'    => $this->explanation_fit,
-			'message'            => $this->message,
-			'details'            => $this->details,
+			'outcome'         => $this->outcome,
+			'regression_run'  => $this->regression_run,
+			'class_fit'       => $this->class_fit,
+			'family_fit'      => $this->family_fit,
+			'cta_law_aligned' => $this->cta_law_aligned,
+			'explanation_fit' => $this->explanation_fit,
+			'message'         => $this->message,
+			'details'         => $this->details,
 		);
 	}
 }

@@ -28,13 +28,13 @@ class Existing_Page_Template_Change_Builder_Test_Stub implements \AIOPageBuilder
 			return array();
 		}
 		return array(
-			'template_key'             => $template_key,
-			'name'                     => 'Services hub',
-			'template_family'          => 'services',
+			'template_key'            => $template_key,
+			'name'                    => 'Services hub',
+			'template_family'         => 'services',
 			'template_category_class' => 'hub',
 			'cta_direction_summary'   => 'Contact, request quote',
-			'section_count'            => 8,
-			'deprecation_status'       => 'active',
+			'section_count'           => 8,
+			'deprecation_status'      => 'active',
 		);
 	}
 }
@@ -56,19 +56,19 @@ final class Existing_Page_Template_Change_Builder_Test extends TestCase {
 				'reason'       => 'Align with new structure',
 			),
 		);
-		$out = $this->builder->build_for_item( $item );
+		$out  = $this->builder->build_for_item( $item );
 		$this->assertArrayHasKey( Existing_Page_Template_Change_Builder::KEY_EXISTING_PAGE_TEMPLATE_CHANGE_SUMMARY, $out );
 		$this->assertArrayHasKey( Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY, $out );
 	}
 
 	public function test_replacement_reason_summary_full_replacement(): void {
-		$item = array(
+		$item   = array(
 			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
 				'action' => 'replace_with_new_page',
 				'reason' => 'Full refresh needed',
 			),
 		);
-		$out = $this->builder->build_for_item( $item );
+		$out    = $this->builder->build_for_item( $item );
 		$reason = $out[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ];
 		$this->assertTrue( $reason['is_replacement'] );
 		$this->assertFalse( $reason['is_rebuild'] );
@@ -77,13 +77,13 @@ final class Existing_Page_Template_Change_Builder_Test extends TestCase {
 	}
 
 	public function test_replacement_reason_summary_in_place_rebuild(): void {
-		$item = array(
+		$item   = array(
 			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
 				'action' => 'rebuild_from_template',
 				'reason' => 'Update sections only',
 			),
 		);
-		$out = $this->builder->build_for_item( $item );
+		$out    = $this->builder->build_for_item( $item );
 		$reason = $out[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ];
 		$this->assertFalse( $reason['is_replacement'] );
 		$this->assertTrue( $reason['is_rebuild'] );
@@ -91,14 +91,14 @@ final class Existing_Page_Template_Change_Builder_Test extends TestCase {
 	}
 
 	public function test_existing_page_template_change_summary_has_family_and_cta(): void {
-		$item = array(
+		$item    = array(
 			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
 				'action'       => 'rebuild_from_template',
 				'template_key' => 'pt_services_01',
 				'reason'       => 'Test',
 			),
 		);
-		$out = $this->builder->build_for_item( $item );
+		$out     = $this->builder->build_for_item( $item );
 		$summary = $out[ Existing_Page_Template_Change_Builder::KEY_EXISTING_PAGE_TEMPLATE_CHANGE_SUMMARY ];
 		$this->assertSame( 'pt_services_01', $summary['template_key'] );
 		$this->assertSame( 'services', $summary['template_family'] );
@@ -114,7 +114,7 @@ final class Existing_Page_Template_Change_Builder_Test extends TestCase {
 				'reason' => 'No change',
 			),
 		);
-		$out = $this->builder->build_for_item( $item );
+		$out  = $this->builder->build_for_item( $item );
 		$this->assertSame( array(), $out[ Existing_Page_Template_Change_Builder::KEY_EXISTING_PAGE_TEMPLATE_CHANGE_SUMMARY ] );
 		$reason = $out[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ];
 		$this->assertFalse( $reason['is_replacement'] );
@@ -122,14 +122,14 @@ final class Existing_Page_Template_Change_Builder_Test extends TestCase {
 	}
 
 	public function test_reason_short_truncated_when_long(): void {
-		$long = str_repeat( 'a', 200 );
-		$item = array(
+		$long   = str_repeat( 'a', 200 );
+		$item   = array(
 			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
 				'action' => 'replace_with_new_page',
 				'reason' => $long,
 			),
 		);
-		$out = $this->builder->build_for_item( $item );
+		$out    = $this->builder->build_for_item( $item );
 		$reason = $out[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ];
 		$this->assertLessThanOrEqual( 120, strlen( $reason['reason_short'] ) );
 		$this->assertStringEndsWith( '...', $reason['reason_short'] );

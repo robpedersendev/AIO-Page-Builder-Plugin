@@ -48,8 +48,14 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 				'element_classes' => array( 'inner' => $inner_class ),
 			),
 			'structural_nodes'    => array(
-				array( 'role' => 'wrapper', 'class' => $wrapper_class ),
-				array( 'role' => 'inner', 'class' => $inner_class ),
+				array(
+					'role'  => 'wrapper',
+					'class' => $wrapper_class,
+				),
+				array(
+					'role'  => 'inner',
+					'class' => $inner_class,
+				),
 			),
 			'structural_hint'     => '',
 			'asset_hints'         => array(),
@@ -59,8 +65,22 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_assemble_produces_valid_result_from_ordered_sections(): void {
-		$s1 = $this->section_result( 'st01_hero', 0, array( 'headline' => 'Welcome', 'subheadline' => 'Intro text' ) );
-		$s2 = $this->section_result( 'st02_cta', 1, array( 'title' => 'Sign up', 'cta' => 'Get started' ) );
+		$s1       = $this->section_result(
+			'st01_hero',
+			0,
+			array(
+				'headline'    => 'Welcome',
+				'subheadline' => 'Intro text',
+			)
+		);
+		$s2       = $this->section_result(
+			'st02_cta',
+			1,
+			array(
+				'title' => 'Sign up',
+				'cta'   => 'Get started',
+			)
+		);
 		$pipeline = new Native_Block_Assembly_Pipeline();
 
 		$result = $pipeline->assemble(
@@ -78,8 +98,8 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_block_content_is_deterministic_and_section_order_preserved(): void {
-		$s1 = $this->section_result( 'st01_hero', 0, array( 'headline' => 'First' ) );
-		$s2 = $this->section_result( 'st02_cta', 1, array( 'title' => 'Second' ) );
+		$s1       = $this->section_result( 'st01_hero', 0, array( 'headline' => 'First' ) );
+		$s2       = $this->section_result( 'st02_cta', 1, array( 'title' => 'Second' ) );
 		$pipeline = new Native_Block_Assembly_Pipeline();
 
 		$result = $pipeline->assemble(
@@ -95,7 +115,7 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 		$this->assertStringContainsString( 'aio-s-st02_cta', $content );
 		$this->assertStringContainsString( 'First', $content );
 		$this->assertStringContainsString( 'Second', $content );
-		$pos_first = strpos( $content, 'aio-s-st01_hero' );
+		$pos_first  = strpos( $content, 'aio-s-st01_hero' );
 		$pos_second = strpos( $content, 'aio-s-st02_cta' );
 		$this->assertLessThan( $pos_second, $pos_first, 'Section order must be preserved' );
 
@@ -105,7 +125,7 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_survivability_friendly_output_and_no_dynamic_dependencies(): void {
-		$s1 = $this->section_result( 'st01_hero', 0, array( 'headline' => 'Hello' ) );
+		$s1       = $this->section_result( 'st01_hero', 0, array( 'headline' => 'Hello' ) );
 		$pipeline = new Native_Block_Assembly_Pipeline();
 
 		$result = $pipeline->assemble(
@@ -120,11 +140,15 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_headline_and_title_mapped_to_h2_others_to_p(): void {
-		$s = $this->section_result( 'st01_hero', 0, array(
-			'headline'    => 'Main Headline',
-			'subheadline' => 'Sub text',
-			'cta'         => 'Click here',
-		) );
+		$s        = $this->section_result(
+			'st01_hero',
+			0,
+			array(
+				'headline'    => 'Main Headline',
+				'subheadline' => 'Sub text',
+				'cta'         => 'Click here',
+			)
+		);
 		$pipeline = new Native_Block_Assembly_Pipeline();
 
 		$result = $pipeline->assemble(
@@ -140,7 +164,7 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_wrapper_attrs_preserved_in_block_markup(): void {
-		$s = $this->section_result( 'st01_hero', 2, array( 'headline' => 'X' ) );
+		$s        = $this->section_result( 'st01_hero', 2, array( 'headline' => 'X' ) );
 		$pipeline = new Native_Block_Assembly_Pipeline();
 
 		$result = $pipeline->assemble(
@@ -158,12 +182,12 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_assemble_accepts_array_section_payloads(): void {
-		$payload = array(
-			'section_key'        => 'st01_hero',
-			'variant'            => 'default',
-			'position'           => 0,
-			'field_values'       => array( 'headline' => 'From array' ),
-			'wrapper_attrs'      => array(
+		$payload  = array(
+			'section_key'         => 'st01_hero',
+			'variant'             => 'default',
+			'position'            => 0,
+			'field_values'        => array( 'headline' => 'From array' ),
+			'wrapper_attrs'       => array(
 				'class'           => array( 'aio-s-st01_hero', 'aio-s-st01_hero--variant-default' ),
 				'id'              => 'aio-section-st01_hero-0',
 				'data_attributes' => array(
@@ -180,7 +204,7 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 			'structural_nodes'    => array(),
 			'structural_hint'     => '',
 			'asset_hints'         => array(),
-			'accessibility_notes'  => array(),
+			'accessibility_notes' => array(),
 			'errors'              => array(),
 		);
 		$pipeline = new Native_Block_Assembly_Pipeline();
@@ -197,8 +221,8 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_invalid_section_item_skipped_and_error_recorded(): void {
-		$valid = $this->section_result( 'st01_hero', 0, array( 'headline' => 'OK' ) );
-		$invalid = array( 'not_section_key' => 'missing section_key' );
+		$valid    = $this->section_result( 'st01_hero', 0, array( 'headline' => 'OK' ) );
+		$invalid  = array( 'not_section_key' => 'missing section_key' );
 		$pipeline = new Native_Block_Assembly_Pipeline();
 
 		$result = $pipeline->assemble(
@@ -214,9 +238,9 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_to_array_returns_stable_page_assembly_shape(): void {
-		$s = $this->section_result( 'st01_hero', 0, array( 'headline' => 'T' ) );
+		$s        = $this->section_result( 'st01_hero', 0, array( 'headline' => 'T' ) );
 		$pipeline = new Native_Block_Assembly_Pipeline();
-		$result = $pipeline->assemble(
+		$result   = $pipeline->assemble(
 			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
 			'tpl_x',
 			array( $s )
@@ -235,9 +259,20 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_with_gb_layer_available_and_eligible_section_emits_gb_and_note(): void {
-		$gb_layer = new GenerateBlocks_Compatibility_Layer( function (): bool { return true; } );
+		$gb_layer = new GenerateBlocks_Compatibility_Layer(
+			function (): bool {
+				return true;
+			}
+		);
 		$pipeline = new Native_Block_Assembly_Pipeline( $gb_layer );
-		$s       = $this->section_result( 'st01_hero', 0, array( 'headline' => 'Hero Title', 'subheadline' => 'Sub' ) );
+		$s        = $this->section_result(
+			'st01_hero',
+			0,
+			array(
+				'headline'    => 'Hero Title',
+				'subheadline' => 'Sub',
+			)
+		);
 
 		$result = $pipeline->assemble(
 			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
@@ -253,9 +288,13 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_with_gb_layer_unavailable_emits_native_only_no_gb_note(): void {
-		$gb_layer = new GenerateBlocks_Compatibility_Layer( function (): bool { return false; } );
+		$gb_layer = new GenerateBlocks_Compatibility_Layer(
+			function (): bool {
+				return false;
+			}
+		);
 		$pipeline = new Native_Block_Assembly_Pipeline( $gb_layer );
-		$s       = $this->section_result( 'st01_hero', 0, array( 'headline' => 'Title' ) );
+		$s        = $this->section_result( 'st01_hero', 0, array( 'headline' => 'Title' ) );
 
 		$result = $pipeline->assemble(
 			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
@@ -269,10 +308,25 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	}
 
 	public function test_with_gb_layer_unsupported_pattern_section_uses_native_ordering_preserved(): void {
-		$gb_layer = new GenerateBlocks_Compatibility_Layer( function (): bool { return true; } );
-		$pipeline = new Native_Block_Assembly_Pipeline( $gb_layer );
-		$eligible = $this->section_result( 'st01_hero', 0, array( 'headline' => 'First' ) );
-		$ineligible = $this->section_result( 'st05_faq', 1, array( 'items' => array( array( 'q' => 'Q', 'a' => 'A' ) ) ) );
+		$gb_layer   = new GenerateBlocks_Compatibility_Layer(
+			function (): bool {
+				return true;
+			}
+		);
+		$pipeline   = new Native_Block_Assembly_Pipeline( $gb_layer );
+		$eligible   = $this->section_result( 'st01_hero', 0, array( 'headline' => 'First' ) );
+		$ineligible = $this->section_result(
+			'st05_faq',
+			1,
+			array(
+				'items' => array(
+					array(
+						'q' => 'Q',
+						'a' => 'A',
+					),
+				),
+			)
+		);
 
 		$result = $pipeline->assemble(
 			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
@@ -294,7 +348,7 @@ final class Native_Block_Assembly_Pipeline_Test extends TestCase {
 	public function test_form_section_emits_shortcode_when_registry_present(): void {
 		$registry = new Form_Provider_Registry();
 		$pipeline = new Native_Block_Assembly_Pipeline( null, $registry );
-		$section = $this->section_result(
+		$section  = $this->section_result(
 			'form_section_ndr',
 			0,
 			array(

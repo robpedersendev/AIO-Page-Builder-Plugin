@@ -61,7 +61,7 @@ final class Industry_Composition_Assistant {
 		$this->last_section_result = null;
 		$this->section_definitions = null;
 		$this->fit_by_key          = null;
-		$this->recommended_keys   = null;
+		$this->recommended_keys    = null;
 	}
 
 	/**
@@ -93,15 +93,15 @@ final class Industry_Composition_Assistant {
 		}
 		$items = $result->get_items();
 
-		$this->fit_by_key = array();
+		$this->fit_by_key       = array();
 		$this->recommended_keys = array();
 		foreach ( $items as $item ) {
 			$key = $item['section_key'] ?? '';
 			if ( $key === '' ) {
 				continue;
 			}
-			$fit = $item['fit_classification'] ?? Industry_Section_Recommendation_Resolver::FIT_NEUTRAL;
-			$warning_flags = isset( $item['warning_flags'] ) && is_array( $item['warning_flags'] ) ? $item['warning_flags'] : array();
+			$fit            = $item['fit_classification'] ?? Industry_Section_Recommendation_Resolver::FIT_NEUTRAL;
+			$warning_flags  = isset( $item['warning_flags'] ) && is_array( $item['warning_flags'] ) ? $item['warning_flags'] : array();
 			$purpose_family = '';
 			foreach ( $sections as $s ) {
 				if ( is_array( $s ) && trim( (string) ( $s[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' ) ) === $key ) {
@@ -109,7 +109,11 @@ final class Industry_Composition_Assistant {
 					break;
 				}
 			}
-			$this->fit_by_key[ $key ] = array( 'fit' => $fit, 'warning_flags' => $warning_flags, 'purpose_family' => $purpose_family );
+			$this->fit_by_key[ $key ] = array(
+				'fit'            => $fit,
+				'warning_flags'  => $warning_flags,
+				'purpose_family' => $purpose_family,
+			);
 			if ( $fit === Industry_Section_Recommendation_Resolver::FIT_RECOMMENDED ) {
 				$this->recommended_keys[] = $key;
 			}
@@ -174,8 +178,8 @@ final class Industry_Composition_Assistant {
 			return array();
 		}
 		$current_family = $this->fit_by_key[ $section_key ]['purpose_family'] ?? '';
-		$same_family = array();
-		$other = array();
+		$same_family    = array();
+		$other          = array();
 		foreach ( $this->recommended_keys as $key ) {
 			if ( $key === $section_key ) {
 				continue;

@@ -36,12 +36,12 @@ final class Preview_Cache_Service {
 	 * Builds a deterministic cache key from context and definition version.
 	 *
 	 * @param Synthetic_Preview_Context $context
-	 * @param array<string, mixed>     $definition Section or page definition (must include version and identity).
+	 * @param array<string, mixed>      $definition Section or page definition (must include version and identity).
 	 * @return string
 	 */
 	public function get_cache_key( Synthetic_Preview_Context $context, array $definition ): string {
 		$version_hash = $this->definition_version_hash( $definition, $context->get_type() );
-		$parts = array(
+		$parts        = array(
 			$context->get_type(),
 			$context->get_key(),
 			$context->get_purpose_family(),
@@ -69,9 +69,9 @@ final class Preview_Cache_Service {
 			$bp_ref = (string) ( $definition['field_blueprint_ref'] ?? '' );
 			return \md5( $key . \wp_json_encode( $ver ) . $bp_ref );
 		}
-		$key    = (string) ( $definition['internal_key'] ?? '' );
-		$ver    = $definition['version'] ?? array();
-		$ordered = $definition['ordered_sections'] ?? array();
+		$key          = (string) ( $definition['internal_key'] ?? '' );
+		$ver          = $definition['version'] ?? array();
+		$ordered      = $definition['ordered_sections'] ?? array();
 		$section_keys = array();
 		foreach ( $ordered as $item ) {
 			if ( \is_array( $item ) && isset( $item['section_key'] ) ) {
@@ -109,7 +109,7 @@ final class Preview_Cache_Service {
 		if ( $key === '' ) {
 			return false;
 		}
-		$store = $this->load_store();
+		$store         = $this->load_store();
 		$store[ $key ] = $record->to_array();
 		$this->evict_if_over_budget( $store );
 		return \update_option( self::OPTION_KEY, $store, false ) !== false;
@@ -126,7 +126,7 @@ final class Preview_Cache_Service {
 		if ( $template_key === '' ) {
 			return 0;
 		}
-		$store = $this->load_store();
+		$store   = $this->load_store();
 		$removed = 0;
 		foreach ( \array_keys( $store ) as $k ) {
 			$entry = $store[ $k ];
@@ -198,12 +198,18 @@ final class Preview_Cache_Service {
 		}
 		$by_time = array();
 		foreach ( $store as $k => $entry ) {
-			$created = isset( $entry['created_at'] ) ? (int) $entry['created_at'] : 0;
-			$by_time[] = array( 'key' => $k, 'created_at' => $created );
+			$created   = isset( $entry['created_at'] ) ? (int) $entry['created_at'] : 0;
+			$by_time[] = array(
+				'key'        => $k,
+				'created_at' => $created,
+			);
 		}
-		\usort( $by_time, function ( $a, $b ) {
-			return $a['created_at'] <=> $b['created_at'];
-		} );
+		\usort(
+			$by_time,
+			function ( $a, $b ) {
+				return $a['created_at'] <=> $b['created_at'];
+			}
+		);
 		$to_remove = \count( $store ) - $this->max_entries;
 		for ( $i = 0; $i < $to_remove && $i < \count( $by_time ); $i++ ) {
 			unset( $store[ $by_time[ $i ]['key'] ] );

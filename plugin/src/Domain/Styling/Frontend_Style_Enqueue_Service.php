@@ -48,11 +48,11 @@ final class Frontend_Style_Enqueue_Service {
 		?Page_Style_Emitter $page_style_emitter = null,
 		?Style_Cache_Service $style_cache = null
 	) {
-		$this->config                    = $config;
-		$this->emitter                   = $emitter;
+		$this->config                     = $config;
+		$this->emitter                    = $emitter;
 		$this->component_override_emitter = $component_override_emitter;
-		$this->page_style_emitter        = $page_style_emitter;
-		$this->style_cache               = $style_cache;
+		$this->page_style_emitter         = $page_style_emitter;
+		$this->style_cache                = $style_cache;
 	}
 
 	/**
@@ -96,7 +96,7 @@ final class Frontend_Style_Enqueue_Service {
 			}
 		}
 		if ( $this->page_style_emitter !== null ) {
-			$post = \get_queried_object();
+			$post         = \get_queried_object();
 			$template_key = (string) \apply_filters( 'aio_page_builder_current_template_key', '', $post );
 			if ( $template_key !== '' ) {
 				$page_css = $this->page_style_emitter->emit_for_page( $template_key );

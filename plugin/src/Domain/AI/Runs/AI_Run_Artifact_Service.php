@@ -69,10 +69,10 @@ final class AI_Run_Artifact_Service {
 	public function get_artifact_summary_for_review( int $run_post_id, bool $include_raw = false ): array {
 		$out = array();
 		foreach ( Artifact_Category_Keys::all() as $cat ) {
-			$payload = $this->get( $run_post_id, $cat );
-			$present = $payload !== null && $payload !== '';
-			$redact  = in_array( $cat, Artifact_Category_Keys::REDACT_BEFORE_DISPLAY, true );
-			$summary = $present ? $this->summarize_payload( $payload, $redact && ! $include_raw ) : '';
+			$payload     = $this->get( $run_post_id, $cat );
+			$present     = $payload !== null && $payload !== '';
+			$redact      = in_array( $cat, Artifact_Category_Keys::REDACT_BEFORE_DISPLAY, true );
+			$summary     = $present ? $this->summarize_payload( $payload, $redact && ! $include_raw ) : '';
 			$out[ $cat ] = array(
 				'present'  => $present,
 				'summary'  => $summary,
@@ -99,7 +99,10 @@ final class AI_Run_Artifact_Service {
 		}
 		if ( is_array( $payload ) ) {
 			$keys = array_keys( $payload );
-			return array( 'keys' => $keys, 'count' => count( $payload ) );
+			return array(
+				'keys'  => $keys,
+				'count' => count( $payload ),
+			);
 		}
 		return '[non-scalar]';
 	}
@@ -113,9 +116,9 @@ final class AI_Run_Artifact_Service {
 	 */
 	public static function redact_sensitive_values( array $data ): array {
 		$sensitive_keys = array( 'api_key', 'secret', 'token', 'password', 'authorization' );
-		$out = array();
+		$out            = array();
 		foreach ( $data as $k => $v ) {
-			$lower = strtolower( (string) $k );
+			$lower  = strtolower( (string) $k );
 			$redact = false;
 			foreach ( $sensitive_keys as $sk ) {
 				if ( str_contains( $lower, $sk ) ) {

@@ -8,21 +8,36 @@
 defined( 'ABSPATH' ) || exit;
 
 $sections = array(
-	'hero_dir_01' => 'Directory hero. See doc-helper-hero_dir_01.', 'mlp_card_grid_01' => 'Card grid. See doc-helper-mlp_card_grid_01.', 'mlp_listing_01' => 'Listing. See doc-helper-mlp_listing_01.', 'cta_service_detail_01' => 'Service detail CTA. See doc-helper-cta_service_detail_01.', 'fb_service_offering_01' => 'Service offering. See doc-helper-fb_service_offering_01.', 'tp_testimonial_02' => 'Testimonial. See doc-helper-tp_testimonial_02.', 'ptf_how_it_works_01' => 'How it works. See doc-helper-ptf_how_it_works_01.', 'cta_directory_nav_01' => 'Directory nav CTA. See doc-helper-cta_directory_nav_01.', 'fb_benefit_band_01' => 'Benefit band. See doc-helper-fb_benefit_band_01.', 'tp_trust_band_01' => 'Trust band. See doc-helper-tp_trust_band_01.', 'cta_consultation_01' => 'Consultation CTA. See doc-helper-cta_consultation_01.', 'lpu_contact_panel_01' => 'Contact panel. See doc-helper-lpu_contact_panel_01.', 'cta_booking_01' => 'Booking CTA. See doc-helper-cta_booking_01.',
+	'hero_dir_01'            => 'Directory hero. See doc-helper-hero_dir_01.',
+	'mlp_card_grid_01'       => 'Card grid. See doc-helper-mlp_card_grid_01.',
+	'mlp_listing_01'         => 'Listing. See doc-helper-mlp_listing_01.',
+	'cta_service_detail_01'  => 'Service detail CTA. See doc-helper-cta_service_detail_01.',
+	'fb_service_offering_01' => 'Service offering. See doc-helper-fb_service_offering_01.',
+	'tp_testimonial_02'      => 'Testimonial. See doc-helper-tp_testimonial_02.',
+	'ptf_how_it_works_01'    => 'How it works. See doc-helper-ptf_how_it_works_01.',
+	'cta_directory_nav_01'   => 'Directory nav CTA. See doc-helper-cta_directory_nav_01.',
+	'fb_benefit_band_01'     => 'Benefit band. See doc-helper-fb_benefit_band_01.',
+	'tp_trust_band_01'       => 'Trust band. See doc-helper-tp_trust_band_01.',
+	'cta_consultation_01'    => 'Consultation CTA. See doc-helper-cta_consultation_01.',
+	'lpu_contact_panel_01'   => 'Contact panel. See doc-helper-lpu_contact_panel_01.',
+	'cta_booking_01'         => 'Booking CTA. See doc-helper-cta_booking_01.',
 );
-$li = '';
+$li       = '';
 foreach ( $sections as $k => $v ) {
 	$li .= '<li><strong>' . $k . '</strong>: ' . $v . '</li>';
 }
 $purpose = 'Service subcategory filtered listing. Cards and listing; service CTA; offering and testimonial; how-it-works and directory nav CTA; benefit and trust; consultation CTA; contact panel; booking CTA.';
 $flow    = 'Filtered-listing emphasis; directory nav supports sibling subcategory navigation. Subcategory listing beneath Services hub; drill-down to detail or sibling subcategories.';
 return array(
-	'documentation_id'   => 'doc-onepager-nested_hub_services_listing_01',
-	'documentation_type' => 'page_template_one_pager',
-	'content_body'       => '<h3>Page purpose</h3><p>' . $purpose . '</p><h3>Page flow</h3><p>' . $flow . '</p><h3>CTA direction</h3><p>Nested hub: service detail CTA → directory nav CTA → consultation CTA → booking CTA. Page narrows from parent hub to child detail; directory nav for sibling subcategories.</p><h3>Section-by-section (ordered)</h3><ol>' . $li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO/FIFU:</strong> Container and spacing; map fields per section helper. <strong>Hierarchy:</strong> Nested hub under Services hub; parent to service detail pages. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs. <strong>Accessibility:</strong> One H1; logical heading order; contrast and focus order for CTAs.</p>',
-	'status'             => 'active',
-	'source_reference'   => array( 'page_template_key' => 'nested_hub_services_listing_01' ),
+	'documentation_id'          => 'doc-onepager-nested_hub_services_listing_01',
+	'documentation_type'        => 'page_template_one_pager',
+	'content_body'              => '<h3>Page purpose</h3><p>' . $purpose . '</p><h3>Page flow</h3><p>' . $flow . '</p><h3>CTA direction</h3><p>Nested hub: service detail CTA → directory nav CTA → consultation CTA → booking CTA. Page narrows from parent hub to child detail; directory nav for sibling subcategories.</p><h3>Section-by-section (ordered)</h3><ol>' . $li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO/FIFU:</strong> Container and spacing; map fields per section helper. <strong>Hierarchy:</strong> Nested hub under Services hub; parent to service detail pages. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs. <strong>Accessibility:</strong> One H1; logical heading order; contrast and focus order for CTAs.</p>',
+	'status'                    => 'active',
+	'source_reference'          => array( 'page_template_key' => 'nested_hub_services_listing_01' ),
 	'generated_or_human_edited' => 'human_edited',
-	'version_marker'     => '1',
-	'export_metadata'   => array( 'export_category' => 'documentation', 'include_in_full_export' => true ),
+	'version_marker'            => '1',
+	'export_metadata'           => array(
+		'export_category'        => 'documentation',
+		'include_in_full_export' => true,
+	),
 );

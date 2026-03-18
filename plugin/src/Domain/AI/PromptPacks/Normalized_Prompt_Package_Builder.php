@@ -49,8 +49,8 @@ final class Normalized_Prompt_Package_Builder {
 			return new Prompt_Package_Result( false, null, $errors, $selected_pack );
 		}
 
-		$system_parts = array();
-		$user_parts   = array();
+		$system_parts        = array();
+		$user_parts          = array();
 		$system_segment_keys = array(
 			Prompt_Pack_Schema::SEGMENT_SYSTEM_BASE,
 			Prompt_Pack_Schema::SEGMENT_ROLE_FRAMING,
@@ -65,14 +65,14 @@ final class Normalized_Prompt_Package_Builder {
 		foreach ( $system_segment_keys as $seg_key ) {
 			$content = $this->get_segment_content( $segments, $seg_key );
 			if ( $content !== '' ) {
-				$content = $this->substitute_placeholders( $content, $placeholder_values );
+				$content        = $this->substitute_placeholders( $content, $placeholder_values );
 				$system_parts[] = $content;
 			}
 		}
 		foreach ( array( Prompt_Pack_Schema::SEGMENT_PLANNING_INSTRUCTIONS, Prompt_Pack_Schema::SEGMENT_SITE_ANALYSIS_INSTRUCTIONS ) as $seg_key ) {
 			$content = $this->get_segment_content( $segments, $seg_key );
 			if ( $content !== '' ) {
-				$content = $this->substitute_placeholders( $content, $placeholder_values );
+				$content      = $this->substitute_placeholders( $content, $placeholder_values );
 				$user_parts[] = $content;
 			}
 		}
@@ -100,20 +100,23 @@ final class Normalized_Prompt_Package_Builder {
 		$repair_prompt_ref = (string) ( $selected_pack[ Prompt_Pack_Schema::ROOT_REPAIR_PROMPT_REF ] ?? '' );
 
 		$package = array(
-			'prompt_pack_ref'         => array(
+			'prompt_pack_ref'          => array(
 				Input_Artifact_Schema::PROMPT_PACK_REF_INTERNAL_KEY => $internal_key,
 				Input_Artifact_Schema::PROMPT_PACK_REF_VERSION       => $version,
 			),
-			'schema_target_ref'       => $schema_target_ref,
-			'repair_prompt_ref'       => $repair_prompt_ref,
-			'system_prompt'           => $system_prompt,
-			'user_message'            => $user_message,
-			'input_artifact_id'       => $input_artifact[ Input_Artifact_Schema::ROOT_ARTIFACT_ID ] ?? '',
-			'input_artifact'          => $input_artifact,
+			'schema_target_ref'        => $schema_target_ref,
+			'repair_prompt_ref'        => $repair_prompt_ref,
+			'system_prompt'            => $system_prompt,
+			'user_message'             => $user_message,
+			'input_artifact_id'        => $input_artifact[ Input_Artifact_Schema::ROOT_ARTIFACT_ID ] ?? '',
+			'input_artifact'           => $input_artifact,
 			'raw_prompt_capture_ready' => array(
-				'system_prompt' => $system_prompt,
-				'user_message'  => $user_message,
-				'prompt_pack_ref' => array( 'internal_key' => $internal_key, 'version' => $version ),
+				'system_prompt'     => $system_prompt,
+				'user_message'      => $user_message,
+				'prompt_pack_ref'   => array(
+					'internal_key' => $internal_key,
+					'version'      => $version,
+				),
 				'schema_target_ref' => $schema_target_ref,
 			),
 		);
@@ -135,21 +138,21 @@ final class Normalized_Prompt_Package_Builder {
 			$rules = array();
 		}
 
-		$profile_summary = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_PROFILE ] ?? array() );
-		$crawl_summary   = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_CRAWL ] ?? array() );
-		$registry_summary = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_REGISTRY ] ?? array() );
-		$goal_text       = $this->extract_goal( $input_artifact );
+		$profile_summary   = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_PROFILE ] ?? array() );
+		$crawl_summary     = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_CRAWL ] ?? array() );
+		$registry_summary  = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_REGISTRY ] ?? array() );
+		$goal_text         = $this->extract_goal( $input_artifact );
 		$planning_guidance = $this->extract_planning_guidance( $input_artifact );
 
 		$values = array(
-			'{{profile_summary}}'   => $profile_summary,
-			'{{crawl_summary}}'     => $crawl_summary,
-			'{{registry_summary}}'  => $registry_summary,
-			'{{goal}}'              => $goal_text,
-			'{{goal_or_intent}}'    => $goal_text,
-			'{{template_family_guidance}}'   => $planning_guidance['template_family_guidance'],
-			'{{cta_law_rules}}'              => $planning_guidance['cta_law_rules'],
-			'{{hierarchy_role_guidance}}'    => $planning_guidance['hierarchy_role_guidance'],
+			'{{profile_summary}}'          => $profile_summary,
+			'{{crawl_summary}}'            => $crawl_summary,
+			'{{registry_summary}}'         => $registry_summary,
+			'{{goal}}'                     => $goal_text,
+			'{{goal_or_intent}}'           => $goal_text,
+			'{{template_family_guidance}}' => $planning_guidance['template_family_guidance'],
+			'{{cta_law_rules}}'            => $planning_guidance['cta_law_rules'],
+			'{{hierarchy_role_guidance}}'  => $planning_guidance['hierarchy_role_guidance'],
 		);
 
 		foreach ( $rules as $placeholder => $rule ) {
@@ -217,13 +220,13 @@ final class Normalized_Prompt_Package_Builder {
 		if ( ! is_array( $block ) ) {
 			return array(
 				'template_family_guidance' => '',
-				'cta_law_rules'           => '',
+				'cta_law_rules'            => '',
 				'hierarchy_role_guidance'  => '',
 			);
 		}
 		return array(
 			'template_family_guidance' => (string) ( $block['template_family_guidance'] ?? '' ),
-			'cta_law_rules'           => (string) ( $block['cta_law_rules'] ?? '' ),
+			'cta_law_rules'            => (string) ( $block['cta_law_rules'] ?? '' ),
 			'hierarchy_role_guidance'  => (string) ( $block['hierarchy_role_guidance'] ?? '' ),
 		);
 	}
@@ -231,7 +234,7 @@ final class Normalized_Prompt_Package_Builder {
 	/**
 	 * Resolves a single planning_guidance placeholder by name.
 	 *
-	 * @param string $placeholder Placeholder name (e.g. template_family_guidance).
+	 * @param string                                                                                          $placeholder Placeholder name (e.g. template_family_guidance).
 	 * @param array{template_family_guidance: string, cta_law_rules: string, hierarchy_role_guidance: string} $planning_guidance
 	 * @return string
 	 */
@@ -254,7 +257,7 @@ final class Normalized_Prompt_Package_Builder {
 	}
 
 	/**
-	 * @param string               $content
+	 * @param string                $content
 	 * @param array<string, string> $values
 	 * @return string
 	 */

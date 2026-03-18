@@ -61,28 +61,28 @@ final class Template_Library_Restore_Validator {
 		?Section_Inventory_Appendix_Generator $section_appendix = null,
 		?Page_Template_Inventory_Appendix_Generator $page_appendix = null
 	) {
-		$this->section_repo      = $section_repo;
-		$this->page_repo         = $page_repo;
-		$this->composition_repo  = $composition_repo;
-		$this->section_appendix   = $section_appendix;
-		$this->page_appendix      = $page_appendix;
+		$this->section_repo     = $section_repo;
+		$this->page_repo        = $page_repo;
+		$this->composition_repo = $composition_repo;
+		$this->section_appendix = $section_appendix;
+		$this->page_appendix    = $page_appendix;
 	}
 
 	/**
 	 * Validates restored state for template-library coherence and appendix regenerability.
 	 *
-	 * @param list<string>        $restored_categories Categories that were restored (from Restore_Result).
+	 * @param list<string>         $restored_categories Categories that were restored (from Restore_Result).
 	 * @param array<string, mixed> $manifest           Decoded manifest (included_categories, etc.).
 	 * @return array{valid: bool, restore_order_ok: bool, section_count: int, page_template_count: int, composition_count: int, appendix_regenerable: bool, errors: list<string>, warnings: list<string>, log_reference: string} template_library_restore_summary
 	 */
 	public function validate( array $restored_categories, array $manifest ): array {
-		$log_ref = 'tlib-restore-' . gmdate( 'Y-m-d\TH:i:s\Z' );
-		$errors  = array();
-		$warnings = array();
-		$restore_order_ok = true;
+		$log_ref              = 'tlib-restore-' . gmdate( 'Y-m-d\TH:i:s\Z' );
+		$errors               = array();
+		$warnings             = array();
+		$restore_order_ok     = true;
 		$appendix_regenerable = true;
 
-		$included = isset( $manifest['included_categories'] ) && is_array( $manifest['included_categories'] )
+		$included     = isset( $manifest['included_categories'] ) && is_array( $manifest['included_categories'] )
 			? $manifest['included_categories']
 			: array();
 		$restored_set = array_flip( $restored_categories );
@@ -95,18 +95,18 @@ final class Template_Library_Restore_Validator {
 			if ( isset( $restored_set[ $cat ] ) ) {
 				if ( $idx < $last_index ) {
 					$restore_order_ok = false;
-					$errors[] = 'Restore order violation: ' . $cat . ' restored after a later category.';
+					$errors[]         = 'Restore order violation: ' . $cat . ' restored after a later category.';
 				}
 				$last_index = $idx;
 			}
 		}
 
-		$section_count = 0;
+		$section_count       = 0;
 		$page_template_count = 0;
-		$composition_count = 0;
+		$composition_count   = 0;
 
 		if ( in_array( 'registries', $restored_categories, true ) ) {
-			$section_count = count( $this->section_repo->list_all_definitions_capped( 5000 ) );
+			$section_count       = count( $this->section_repo->list_all_definitions_capped( 5000 ) );
 			$page_template_count = count( $this->page_repo->list_all_definitions_capped( 5000 ) );
 		}
 		if ( in_array( 'compositions', $restored_categories, true ) ) {
@@ -117,7 +117,7 @@ final class Template_Library_Restore_Validator {
 			try {
 				$this->section_appendix->build_result();
 			} catch ( \Throwable $e ) {
-				$errors[] = 'Section appendix regeneration failed after restore: ' . $e->getMessage();
+				$errors[]             = 'Section appendix regeneration failed after restore: ' . $e->getMessage();
 				$appendix_regenerable = false;
 			}
 		}
@@ -126,7 +126,7 @@ final class Template_Library_Restore_Validator {
 			try {
 				$this->page_appendix->build_result();
 			} catch ( \Throwable $e ) {
-				$errors[] = 'Page template appendix regeneration failed after restore: ' . $e->getMessage();
+				$errors[]             = 'Page template appendix regeneration failed after restore: ' . $e->getMessage();
 				$appendix_regenerable = false;
 			}
 		}

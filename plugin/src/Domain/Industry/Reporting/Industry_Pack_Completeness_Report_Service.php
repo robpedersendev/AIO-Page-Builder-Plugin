@@ -36,7 +36,7 @@ final class Industry_Pack_Completeness_Report_Service {
 	public const DIMENSION_RULES        = 'rules';
 	public const DIMENSION_DOCS         = 'docs';
 	public const DIMENSION_QA           = 'qa_evidence';
-	public const DIMENSION_SUBTYPE     = 'subtype';
+	public const DIMENSION_SUBTYPE      = 'subtype';
 	public const DIMENSION_GOAL_SUPPORT = 'goal_support';
 
 	public const BAND_MINIMAL_VIABLE = 'minimal_viable';
@@ -129,7 +129,7 @@ final class Industry_Pack_Completeness_Report_Service {
 	 * }
 	 */
 	public function generate_report( bool $include_subtypes = true ): array {
-		$pack_results = array();
+		$pack_results         = array();
 		$health_errors_by_key = $this->get_health_errors_by_pack();
 
 		if ( $this->pack_registry === null ) {
@@ -158,7 +158,7 @@ final class Industry_Pack_Completeness_Report_Service {
 				if ( $subtype_key === '' || $parent_key === '' ) {
 					continue;
 				}
-				$pack = $this->pack_registry->get( $parent_key );
+				$pack           = $this->pack_registry->get( $parent_key );
 				$pack_results[] = $this->score_scope( $parent_key, $subtype_key, $pack, $health_errors_by_key );
 			}
 		}
@@ -171,12 +171,12 @@ final class Industry_Pack_Completeness_Report_Service {
 
 	/**
 	 * @param array<string, mixed>|null $pack
-	 * @param array<string, bool>      $health_errors_by_key Pack/subtype keys that have health errors.
+	 * @param array<string, bool>       $health_errors_by_key Pack/subtype keys that have health errors.
 	 * @return array{pack_key: string, subtype_key: string, dimension_scores: array<string, int>, total: int, band: string, missing_assets: list<string>, blocker_flags: list<string>, notes: list<string>}
 	 */
 	private function score_scope( string $industry_key, string $subtype_key, ?array $pack, array $health_errors_by_key ): array {
-		$scope_key = $subtype_key !== '' ? $industry_key . '|' . $subtype_key : $industry_key;
-		$dimensions = array(
+		$scope_key      = $subtype_key !== '' ? $industry_key . '|' . $subtype_key : $industry_key;
+		$dimensions     = array(
 			self::DIMENSION_PACK         => 0,
 			self::DIMENSION_BUNDLE       => 0,
 			self::DIMENSION_OVERLAYS     => 0,
@@ -192,24 +192,24 @@ final class Industry_Pack_Completeness_Report_Service {
 
 		// Pack definition (industry-level only for pack dimension; subtype row reuses parent pack refs).
 		if ( $subtype_key === '' && is_array( $pack ) ) {
-			$status = trim( (string) ( $pack[ Industry_Pack_Schema::FIELD_STATUS ] ?? '' ) );
+			$status  = trim( (string) ( $pack[ Industry_Pack_Schema::FIELD_STATUS ] ?? '' ) );
 			$version = $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] ?? null;
-			$name = trim( (string) ( $pack[ Industry_Pack_Schema::FIELD_NAME ] ?? '' ) );
+			$name    = trim( (string) ( $pack[ Industry_Pack_Schema::FIELD_NAME ] ?? '' ) );
 			if ( $status !== Industry_Pack_Schema::STATUS_ACTIVE ) {
 				$dimensions[ self::DIMENSION_PACK ] = 0;
-				$missing_assets[] = 'pack not active';
-				$blocker_flags[] = 'pack_status_not_active';
+				$missing_assets[]                   = 'pack not active';
+				$blocker_flags[]                    = 'pack_status_not_active';
 			} elseif ( $name === '' ) {
 				$dimensions[ self::DIMENSION_PACK ] = 1;
-				$notes[] = 'Pack name placeholder';
+				$notes[]                            = 'Pack name placeholder';
 			} else {
 				$refs_ok = $this->pack_refs_resolve( $pack );
 				if ( $refs_ok ) {
 					$dimensions[ self::DIMENSION_PACK ] = $version !== null && $version !== '' ? 3 : 2;
 				} else {
 					$dimensions[ self::DIMENSION_PACK ] = 1;
-					$missing_assets[] = 'pack refs unresolved';
-					$blocker_flags[] = 'pack_refs_broken';
+					$missing_assets[]                   = 'pack refs unresolved';
+					$blocker_flags[]                    = 'pack_refs_broken';
 				}
 			}
 		} elseif ( $subtype_key !== '' ) {
@@ -218,14 +218,17 @@ final class Industry_Pack_Completeness_Report_Service {
 
 		// Starter bundle.
 		if ( $this->bundle_registry !== null ) {
-			$bundles = $this->bundle_registry->get_for_industry( $industry_key, $subtype_key );
-			$active_bundles = array_filter( $bundles, static function ( $b ) {
-				return ( $b[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] ?? '' ) === Industry_Starter_Bundle_Registry::STATUS_ACTIVE;
-			} );
+			$bundles        = $this->bundle_registry->get_for_industry( $industry_key, $subtype_key );
+			$active_bundles = array_filter(
+				$bundles,
+				static function ( $b ) {
+					return ( $b[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] ?? '' ) === Industry_Starter_Bundle_Registry::STATUS_ACTIVE;
+				}
+			);
 			if ( count( $active_bundles ) === 0 ) {
 				$dimensions[ self::DIMENSION_BUNDLE ] = 0;
-				$missing_assets[] = 'starter_bundle';
-				$blocker_flags[] = 'no_starter_bundle';
+				$missing_assets[]                     = 'starter_bundle';
+				$blocker_flags[]                      = 'no_starter_bundle';
 			} else {
 				$dimensions[ self::DIMENSION_BUNDLE ] = count( $active_bundles ) >= 1 ? 2 : 1;
 			}
@@ -244,7 +247,7 @@ final class Industry_Pack_Completeness_Report_Service {
 		}
 		if ( $section_count === 0 && $page_count === 0 ) {
 			$dimensions[ self::DIMENSION_OVERLAYS ] = 0;
-			$missing_assets[] = 'overlays';
+			$missing_assets[]                       = 'overlays';
 		} elseif ( $section_count > 0 && $page_count > 0 ) {
 			$dimensions[ self::DIMENSION_OVERLAYS ] = 2;
 		} else {
@@ -253,7 +256,7 @@ final class Industry_Pack_Completeness_Report_Service {
 
 		// Rules (CTA, SEO, LPagery, compliance) — pack-level when industry scope.
 		if ( $subtype_key === '' && is_array( $pack ) ) {
-			$refs_ok = $this->pack_refs_resolve( $pack );
+			$refs_ok                             = $this->pack_refs_resolve( $pack );
 			$dimensions[ self::DIMENSION_RULES ] = $refs_ok ? 2 : ( $this->pack_has_any_refs( $pack ) ? 1 : 0 );
 			if ( ! $refs_ok && $this->pack_has_any_refs( $pack ) ) {
 				$missing_assets[] = 'rules_refs_unresolved';
@@ -266,8 +269,8 @@ final class Industry_Pack_Completeness_Report_Service {
 		$dimensions[ self::DIMENSION_DOCS ] = 1;
 
 		// QA evidence: 1 if no health errors for this scope (pack or parent pack), else 0.
-		$health_key = $subtype_key !== '' ? $industry_key : $scope_key;
-		$has_health_error = isset( $health_errors_by_key[ $health_key ] ) && $health_errors_by_key[ $health_key ];
+		$health_key                       = $subtype_key !== '' ? $industry_key : $scope_key;
+		$has_health_error                 = isset( $health_errors_by_key[ $health_key ] ) && $health_errors_by_key[ $health_key ];
 		$dimensions[ self::DIMENSION_QA ] = $has_health_error ? 0 : 1;
 		if ( $has_health_error ) {
 			$blocker_flags[] = 'health_errors';
@@ -277,9 +280,12 @@ final class Industry_Pack_Completeness_Report_Service {
 		if ( $subtype_key !== '' ) {
 			$dimensions[ self::DIMENSION_SUBTYPE ] = -1;
 		} elseif ( $this->subtype_registry !== null ) {
-			$subtypes_for_pack = array_filter( $this->subtype_registry->get_all(), static function ( $s ) use ( $industry_key ) {
-				return trim( (string) ( $s[ Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] ?? '' ) ) === $industry_key;
-			} );
+			$subtypes_for_pack = array_filter(
+				$this->subtype_registry->get_all(),
+				static function ( $s ) use ( $industry_key ) {
+					return trim( (string) ( $s[ Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] ?? '' ) ) === $industry_key;
+				}
+			);
 			if ( count( $subtypes_for_pack ) === 0 ) {
 				$dimensions[ self::DIMENSION_SUBTYPE ] = -1;
 			} else {
@@ -290,21 +296,24 @@ final class Industry_Pack_Completeness_Report_Service {
 		// Goal support: optional; 1 if no broken goal refs, 0 or -1.
 		$dimensions[ self::DIMENSION_GOAL_SUPPORT ] = -1; // N/A unless goal overlays checked; leave as -1.
 
-		$scoreable = array_filter( $dimensions, static function ( $v ) {
-			return $v >= 0;
-		} );
-		$total = array_sum( $scoreable );
-		$band = $this->compute_band( $dimensions, $total, $blocker_flags );
+		$scoreable = array_filter(
+			$dimensions,
+			static function ( $v ) {
+				return $v >= 0;
+			}
+		);
+		$total     = array_sum( $scoreable );
+		$band      = $this->compute_band( $dimensions, $total, $blocker_flags );
 
 		return array(
-			'pack_key'        => $industry_key,
-			'subtype_key'     => $subtype_key,
+			'pack_key'         => $industry_key,
+			'subtype_key'      => $subtype_key,
 			'dimension_scores' => $dimensions,
-			'total'           => $total,
-			'band'            => $band,
-			'missing_assets'  => $missing_assets,
-			'blocker_flags'   => $blocker_flags,
-			'notes'           => $notes,
+			'total'            => $total,
+			'band'             => $band,
+			'missing_assets'   => $missing_assets,
+			'blocker_flags'    => $blocker_flags,
+			'notes'            => $notes,
 		);
 	}
 
@@ -372,7 +381,7 @@ final class Industry_Pack_Completeness_Report_Service {
 		$result = $this->health_check->run();
 		$errors = isset( $result['errors'] ) && is_array( $result['errors'] ) ? $result['errors'] : array();
 		foreach ( $errors as $issue ) {
-			$key = isset( $issue['key'] ) && is_string( $issue['key'] ) ? trim( $issue['key'] ) : '';
+			$key         = isset( $issue['key'] ) && is_string( $issue['key'] ) ? trim( $issue['key'] ) : '';
 			$object_type = isset( $issue['object_type'] ) && is_string( $issue['object_type'] ) ? trim( $issue['object_type'] ) : '';
 			if ( $key !== '' ) {
 				if ( $object_type === Industry_Health_Check_Service::OBJECT_TYPE_PACK ) {
@@ -390,47 +399,47 @@ final class Industry_Pack_Completeness_Report_Service {
 	 * @return array{pack_count: int, subtype_count: int, release_grade_count: int, strong_count: int, minimal_count: int, below_minimal_count: int}
 	 */
 	private function make_summary( array $pack_results ): array {
-		$pack_count = 0;
-		$subtype_count = 0;
+		$pack_count          = 0;
+		$subtype_count       = 0;
 		$release_grade_count = 0;
-		$strong_count = 0;
-		$minimal_count = 0;
+		$strong_count        = 0;
+		$minimal_count       = 0;
 		$below_minimal_count = 0;
-		$seen_packs = array();
+		$seen_packs          = array();
 		foreach ( $pack_results as $r ) {
 			$pk = $r['pack_key'] ?? '';
 			$sk = $r['subtype_key'] ?? '';
 			if ( $sk === '' ) {
 				if ( ! isset( $seen_packs[ $pk ] ) ) {
 					$seen_packs[ $pk ] = true;
-					$pack_count++;
+					++$pack_count;
 				}
 			} else {
-				$subtype_count++;
+				++$subtype_count;
 			}
 			$band = $r['band'] ?? self::BAND_BELOW_MINIMAL;
 			switch ( $band ) {
 				case self::BAND_RELEASE_GRADE:
-					$release_grade_count++;
+					++$release_grade_count;
 					break;
 				case self::BAND_STRONG:
-					$strong_count++;
+					++$strong_count;
 					break;
 				case self::BAND_MINIMAL_VIABLE:
-					$minimal_count++;
+					++$minimal_count;
 					break;
 				default:
-					$below_minimal_count++;
+					++$below_minimal_count;
 					break;
 			}
 		}
 		return array(
-			'pack_count'           => $pack_count,
-			'subtype_count'        => $subtype_count,
-			'release_grade_count'  => $release_grade_count,
-			'strong_count'         => $strong_count,
-			'minimal_count'        => $minimal_count,
-			'below_minimal_count'  => $below_minimal_count,
+			'pack_count'          => $pack_count,
+			'subtype_count'       => $subtype_count,
+			'release_grade_count' => $release_grade_count,
+			'strong_count'        => $strong_count,
+			'minimal_count'       => $minimal_count,
+			'below_minimal_count' => $below_minimal_count,
 		);
 	}
 }

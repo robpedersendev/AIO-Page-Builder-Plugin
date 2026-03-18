@@ -24,14 +24,14 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Application_Se
  */
 final class Industry_Approval_Snapshot_Builder {
 
-	private const KEY_PRIMARY           = 'primary_industry_key';
-	private const KEY_SECONDARY         = 'secondary_industry_keys';
-	private const KEY_ACTIVE_PACK_REFS  = 'active_pack_refs';
-	private const KEY_OVERRIDE_SUMMARY   = 'override_refs_summary';
-	private const KEY_WEIGHTED_SUMMARY   = 'weighted_resolution_summary';
-	private const KEY_STYLE_PRESET_REF   = 'style_preset_ref';
-	private const KEY_LPAGERY_SUMMARY    = 'lpagery_posture_summary';
-	private const KEY_CAPTURED_AT        = 'captured_at';
+	private const KEY_PRIMARY          = 'primary_industry_key';
+	private const KEY_SECONDARY        = 'secondary_industry_keys';
+	private const KEY_ACTIVE_PACK_REFS = 'active_pack_refs';
+	private const KEY_OVERRIDE_SUMMARY = 'override_refs_summary';
+	private const KEY_WEIGHTED_SUMMARY = 'weighted_resolution_summary';
+	private const KEY_STYLE_PRESET_REF = 'style_preset_ref';
+	private const KEY_LPAGERY_SUMMARY  = 'lpagery_posture_summary';
+	private const KEY_CAPTURED_AT      = 'captured_at';
 
 	/** @var Industry_Profile_Repository */
 	private $profile_repository;
@@ -64,7 +64,7 @@ final class Industry_Approval_Snapshot_Builder {
 	 */
 	public function build(): array {
 		$captured_at = gmdate( 'c' );
-		$empty = array(
+		$empty       = array(
 			self::KEY_PRIMARY          => '',
 			self::KEY_SECONDARY        => array(),
 			self::KEY_ACTIVE_PACK_REFS => array(),
@@ -75,16 +75,16 @@ final class Industry_Approval_Snapshot_Builder {
 			self::KEY_CAPTURED_AT      => $captured_at,
 		);
 
-		$profile = $this->profile_repository->get_profile();
-		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$profile   = $this->profile_repository->get_profile();
+		$primary   = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( (string) $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
 		$secondary = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
 			? array_values( array_filter( array_map( 'trim', array_map( 'strval', $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) ) ) )
 			: array();
 
-		$empty[ self::KEY_PRIMARY ]   = $primary;
-		$empty[ self::KEY_SECONDARY ]  = $secondary;
+		$empty[ self::KEY_PRIMARY ]          = $primary;
+		$empty[ self::KEY_SECONDARY ]        = $secondary;
 		$empty[ self::KEY_WEIGHTED_SUMMARY ] = $this->weighted_summary( $primary, $secondary );
 
 		$active_pack_refs = array_filter( array_merge( array( $primary ), $secondary ) );
@@ -104,14 +104,14 @@ final class Industry_Approval_Snapshot_Builder {
 		$empty[ self::KEY_ACTIVE_PACK_REFS ] = array_values( $active_pack_refs );
 
 		if ( $this->preset_service !== null ) {
-			$applied = $this->preset_service->get_applied_preset();
+			$applied                             = $this->preset_service->get_applied_preset();
 			$empty[ self::KEY_STYLE_PRESET_REF ] = ( $applied !== null && isset( $applied['preset_key'] ) && is_string( $applied['preset_key'] ) )
 				? trim( $applied['preset_key'] )
 				: null;
 		}
 
 		if ( $this->lpagery_advisor !== null && $primary !== '' ) {
-			$result = $this->lpagery_advisor->advise_from_profile( $profile );
+			$result                             = $this->lpagery_advisor->advise_from_profile( $profile );
 			$empty[ self::KEY_LPAGERY_SUMMARY ] = $result->get_lpagery_posture() !== '' ? $result->get_lpagery_posture() : null;
 		}
 

@@ -32,7 +32,7 @@ final class Form_Template_Seeder {
 		Section_Template_Repository $section_repo,
 		Page_Template_Repository $page_repo
 	): array {
-		$errors = array();
+		$errors     = array();
 		$section_id = 0;
 		$page_id    = 0;
 

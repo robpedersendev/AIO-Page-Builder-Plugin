@@ -34,7 +34,7 @@ final class Builtin_Goal_Section_Helper_Overlays {
 			$dir . '/valuations-goal-overlays.php',
 			$dir . '/lead-capture-goal-overlays.php',
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $files as $path ) {
 			if ( ! is_readable( $path ) ) {
 				continue;

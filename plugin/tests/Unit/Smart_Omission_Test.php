@@ -39,21 +39,37 @@ final class Smart_Omission_Test extends TestCase {
 	}
 
 	public function test_eligible_omission_optional_empty_omitted(): void {
-		$service = $this->create_service();
+		$service      = $this->create_service();
 		$field_values = array(
 			'headline'    => 'Welcome',
 			'subheadline' => '',
 			'eyebrow'     => '',
 			'intro'       => 'Some intro',
 		);
-		$eligibility = array(
-			'headline'    => array( 'optional' => false, 'role' => 'headline' ),
-			'subheadline' => array( 'optional' => true, 'role' => 'subheadline' ),
-			'eyebrow'     => array( 'optional' => true, 'role' => 'eyebrow' ),
-			'intro'       => array( 'optional' => true, 'role' => 'intro' ),
+		$eligibility  = array(
+			'headline'    => array(
+				'optional' => false,
+				'role'     => 'headline',
+			),
+			'subheadline' => array(
+				'optional' => true,
+				'role'     => 'subheadline',
+			),
+			'eyebrow'     => array(
+				'optional' => true,
+				'role'     => 'eyebrow',
+			),
+			'intro'       => array(
+				'optional' => true,
+				'role'     => 'intro',
+			),
 		);
-		$context = array( 'section_key' => 'hero_01', 'position' => 1, 'supplies_h1' => false );
-		$applied = $service->apply( $field_values, $eligibility, $context );
+		$context      = array(
+			'section_key' => 'hero_01',
+			'position'    => 1,
+			'supplies_h1' => false,
+		);
+		$applied      = $service->apply( $field_values, $eligibility, $context );
 
 		$fv = $applied['field_values'];
 		$this->assertArrayHasKey( 'headline', $fv );
@@ -69,21 +85,40 @@ final class Smart_Omission_Test extends TestCase {
 	 * Example omission result payload (real structure): optional subheadline and eyebrow omitted; headline and intro kept.
 	 */
 	public function test_example_omission_result_payload(): void {
-		$service = $this->create_service();
+		$service      = $this->create_service();
 		$field_values = array(
 			'headline'    => 'Our Services',
 			'subheadline' => '',
 			'eyebrow'     => '',
-			'cta'         => array( 'url' => '#', 'title' => 'Learn more' ),
+			'cta'         => array(
+				'url'   => '#',
+				'title' => 'Learn more',
+			),
 		);
-		$eligibility = array(
-			'headline'    => array( 'optional' => false, 'role' => 'headline' ),
-			'subheadline' => array( 'optional' => true, 'role' => 'subheadline' ),
-			'eyebrow'     => array( 'optional' => true, 'role' => 'eyebrow' ),
-			'cta'         => array( 'optional' => true, 'role' => 'cta' ),
+		$eligibility  = array(
+			'headline'    => array(
+				'optional' => false,
+				'role'     => 'headline',
+			),
+			'subheadline' => array(
+				'optional' => true,
+				'role'     => 'subheadline',
+			),
+			'eyebrow'     => array(
+				'optional' => true,
+				'role'     => 'eyebrow',
+			),
+			'cta'         => array(
+				'optional' => true,
+				'role'     => 'cta',
+			),
 		);
-		$context = array( 'section_key' => 'hero_02', 'position' => 0, 'supplies_h1' => true );
-		$applied = $service->apply( $field_values, $eligibility, $context );
+		$context      = array(
+			'section_key' => 'hero_02',
+			'position'    => 0,
+			'supplies_h1' => true,
+		);
+		$applied      = $service->apply( $field_values, $eligibility, $context );
 
 		$payload = $applied['omission_result']->to_array();
 		$this->assertArrayHasKey( 'omitted_keys', $payload );
@@ -92,32 +127,50 @@ final class Smart_Omission_Test extends TestCase {
 		$this->assertContains( 'subheadline', $payload['omitted_keys'] );
 		$this->assertContains( 'eyebrow', $payload['omitted_keys'] );
 		$this->assertArrayNotHasKey( 'headline', $payload['omitted_keys'] );
-		$this->assertSame( array( 'headline' => 'Our Services', 'cta' => array( 'url' => '#', 'title' => 'Learn more' ) ), $applied['field_values'] );
+		$this->assertSame(
+			array(
+				'headline' => 'Our Services',
+				'cta'      => array(
+					'url'   => '#',
+					'title' => 'Learn more',
+				),
+			),
+			$applied['field_values']
+		);
 	}
 
 	/**
 	 * Refused-omission case payload: required headline empty → refused, fallback applied; primary CTA empty in CTA section → refused, fallback applied.
 	 */
 	public function test_refused_omission_case_payload(): void {
-		$service = $this->create_service();
+		$service      = $this->create_service();
 		$field_values = array(
-			'headline'     => '',
-			'subheadline'  => '',
-			'primary_cta'  => array(),
+			'headline'    => '',
+			'subheadline' => '',
+			'primary_cta' => array(),
 		);
-		$eligibility = array(
-			'headline'     => array( 'optional' => false, 'role' => 'headline' ),
-			'subheadline'  => array( 'optional' => true, 'role' => 'subheadline' ),
-			'primary_cta'  => array( 'optional' => true, 'role' => 'cta' ),
+		$eligibility  = array(
+			'headline'    => array(
+				'optional' => false,
+				'role'     => 'headline',
+			),
+			'subheadline' => array(
+				'optional' => true,
+				'role'     => 'subheadline',
+			),
+			'primary_cta' => array(
+				'optional' => true,
+				'role'     => 'cta',
+			),
 		);
-		$context = array(
+		$context      = array(
 			'section_key'       => 'cta_hero',
 			'position'          => 0,
 			'is_cta_classified' => true,
 			'supplies_h1'       => true,
 			'primary_cta_key'   => 'primary_cta',
 		);
-		$applied = $service->apply( $field_values, $eligibility, $context );
+		$applied      = $service->apply( $field_values, $eligibility, $context );
 
 		$om = $applied['omission_result'];
 		$this->assertTrue( $om->was_refused( 'headline' ) );
@@ -131,56 +184,97 @@ final class Smart_Omission_Test extends TestCase {
 	}
 
 	public function test_structural_heading_refused_when_supplies_h1(): void {
-		$service = $this->create_service();
-		$field_values = array( 'headline' => '', 'subheadline' => '' );
-		$eligibility = array(
-			'headline'    => array( 'optional' => true, 'role' => 'headline' ),
-			'subheadline' => array( 'optional' => true, 'role' => 'subheadline' ),
+		$service      = $this->create_service();
+		$field_values = array(
+			'headline'    => '',
+			'subheadline' => '',
 		);
-		$context = array( 'section_key' => 'hero', 'position' => 0, 'supplies_h1' => true );
-		$applied = $service->apply( $field_values, $eligibility, $context );
-		$om = $applied['omission_result'];
+		$eligibility  = array(
+			'headline'    => array(
+				'optional' => true,
+				'role'     => 'headline',
+			),
+			'subheadline' => array(
+				'optional' => true,
+				'role'     => 'subheadline',
+			),
+		);
+		$context      = array(
+			'section_key' => 'hero',
+			'position'    => 0,
+			'supplies_h1' => true,
+		);
+		$applied      = $service->apply( $field_values, $eligibility, $context );
+		$om           = $applied['omission_result'];
 		$this->assertTrue( $om->was_refused( 'headline' ) );
 		$this->assertSame( 'structural_heading', $om->get_refusal_reason( 'headline' ) );
 		$this->assertSame( 'Untitled', $applied['field_values']['headline'] ?? '' );
 	}
 
 	public function test_primary_cta_preserved_in_cta_section(): void {
-		$service = $this->create_service();
-		$field_values = array( 'headline' => 'Title', 'cta' => '' );
-		$eligibility = array(
-			'headline' => array( 'optional' => false, 'role' => 'headline' ),
-			'cta'      => array( 'optional' => true, 'role' => 'cta' ),
+		$service      = $this->create_service();
+		$field_values = array(
+			'headline' => 'Title',
+			'cta'      => '',
 		);
-		$context = array( 'section_key' => 'cta_sec', 'is_cta_classified' => true, 'primary_cta_key' => 'cta' );
-		$applied = $service->apply( $field_values, $eligibility, $context );
+		$eligibility  = array(
+			'headline' => array(
+				'optional' => false,
+				'role'     => 'headline',
+			),
+			'cta'      => array(
+				'optional' => true,
+				'role'     => 'cta',
+			),
+		);
+		$context      = array(
+			'section_key'       => 'cta_sec',
+			'is_cta_classified' => true,
+			'primary_cta_key'   => 'cta',
+		);
+		$applied      = $service->apply( $field_values, $eligibility, $context );
 		$this->assertArrayHasKey( 'cta', $applied['field_values'] );
 		$this->assertSame( 'Learn more', $applied['field_values']['cta'] );
 		$this->assertTrue( $applied['omission_result']->was_refused( 'cta' ) );
 	}
 
 	public function test_repeater_empty_omitted_when_optional(): void {
-		$service = $this->create_service();
-		$field_values = array( 'headline' => 'Proof', 'cards' => array() );
-		$eligibility = array(
-			'headline' => array( 'optional' => false, 'role' => 'headline' ),
-			'cards'    => array( 'optional' => true, 'role' => 'cards' ),
+		$service      = $this->create_service();
+		$field_values = array(
+			'headline' => 'Proof',
+			'cards'    => array(),
 		);
-		$context = array( 'section_key' => 'proof_01' );
-		$applied = $service->apply( $field_values, $eligibility, $context );
+		$eligibility  = array(
+			'headline' => array(
+				'optional' => false,
+				'role'     => 'headline',
+			),
+			'cards'    => array(
+				'optional' => true,
+				'role'     => 'cards',
+			),
+		);
+		$context      = array( 'section_key' => 'proof_01' );
+		$applied      = $service->apply( $field_values, $eligibility, $context );
 		$this->assertArrayNotHasKey( 'cards', $applied['field_values'] );
 		$this->assertTrue( $applied['omission_result']->was_omitted( 'cards' ) );
 	}
 
 	public function test_eligibility_from_blueprint(): void {
-		$service = $this->create_service();
+		$service   = $this->create_service();
 		$blueprint = array(
 			'fields' => array(
-				array( 'name' => 'headline', 'required' => true ),
-				array( 'name' => 'eyebrow', 'required' => false ),
+				array(
+					'name'     => 'headline',
+					'required' => true,
+				),
+				array(
+					'name'     => 'eyebrow',
+					'required' => false,
+				),
 			),
 		);
-		$el = $service->eligibility_from_blueprint( $blueprint );
+		$el        = $service->eligibility_from_blueprint( $blueprint );
 		$this->assertFalse( $el['headline']['optional'] );
 		$this->assertTrue( $el['eyebrow']['optional'] );
 		$this->assertSame( 'headline', $el['headline']['role'] );
@@ -188,14 +282,26 @@ final class Smart_Omission_Test extends TestCase {
 	}
 
 	public function test_required_field_never_omitted(): void {
-		$service = $this->create_service();
-		$field_values = array( 'headline' => '', 'intro' => '' );
-		$eligibility = array(
-			'headline' => array( 'optional' => false, 'role' => 'headline' ),
-			'intro'    => array( 'optional' => false, 'role' => 'intro' ),
+		$service      = $this->create_service();
+		$field_values = array(
+			'headline' => '',
+			'intro'    => '',
 		);
-		$context = array( 'section_key' => 's1', 'supplies_h1' => false );
-		$applied = $service->apply( $field_values, $eligibility, $context );
+		$eligibility  = array(
+			'headline' => array(
+				'optional' => false,
+				'role'     => 'headline',
+			),
+			'intro'    => array(
+				'optional' => false,
+				'role'     => 'intro',
+			),
+		);
+		$context      = array(
+			'section_key' => 's1',
+			'supplies_h1' => false,
+		);
+		$applied      = $service->apply( $field_values, $eligibility, $context );
 		$this->assertArrayHasKey( 'headline', $applied['field_values'] );
 		$this->assertArrayHasKey( 'intro', $applied['field_values'] );
 		$this->assertSame( 'Untitled', $applied['field_values']['headline'] );

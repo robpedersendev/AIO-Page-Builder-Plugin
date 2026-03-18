@@ -25,10 +25,10 @@ use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository_Interface;
  */
 final class Industry_Override_Conflict_Detector {
 
-	public const CONFLICT_TYPE_MISSING_TARGET   = 'missing_target';
-	public const CONFLICT_TYPE_DEPRECATED_REF   = 'deprecated_ref';
-	public const CONFLICT_TYPE_REMOVED_REF      = 'removed_ref';
-	public const CONFLICT_TYPE_SUBTYPE_STALE    = 'subtype_context_stale';
+	public const CONFLICT_TYPE_MISSING_TARGET = 'missing_target';
+	public const CONFLICT_TYPE_DEPRECATED_REF = 'deprecated_ref';
+	public const CONFLICT_TYPE_REMOVED_REF    = 'removed_ref';
+	public const CONFLICT_TYPE_SUBTYPE_STALE  = 'subtype_context_stale';
 
 	public const SEVERITY_WARNING = 'warning';
 	public const SEVERITY_INFO    = 'info';
@@ -47,7 +47,7 @@ final class Industry_Override_Conflict_Detector {
 		?Build_Plan_Repository_Interface $plan_repository = null
 	) {
 		$this->read_model_builder = $read_model_builder ?? new Industry_Override_Read_Model_Builder();
-		$this->plan_repository   = $plan_repository;
+		$this->plan_repository    = $plan_repository;
 	}
 
 	/**
@@ -104,40 +104,40 @@ final class Industry_Override_Conflict_Detector {
 	private function check_build_plan_item_override( string $override_ref, string $item_id, ?string $plan_id ): ?array {
 		if ( $plan_id === null || $plan_id === '' ) {
 			return array(
-				'override_ref'             => $override_ref,
-				'conflict_type'            => self::CONFLICT_TYPE_MISSING_TARGET,
-				'severity'                 => self::SEVERITY_WARNING,
-				'target_type'              => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
-				'target_key'               => $item_id,
-				'plan_id'                  => null,
-				'related_refs'             => array(),
-				'suggested_review_action'  => __( 'Override has no plan_id; consider removing it.', 'aio-page-builder' ),
+				'override_ref'            => $override_ref,
+				'conflict_type'           => self::CONFLICT_TYPE_MISSING_TARGET,
+				'severity'                => self::SEVERITY_WARNING,
+				'target_type'             => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
+				'target_key'              => $item_id,
+				'plan_id'                 => null,
+				'related_refs'            => array(),
+				'suggested_review_action' => __( 'Override has no plan_id; consider removing it.', 'aio-page-builder' ),
 			);
 		}
 		$record = $this->plan_repository->get_by_key( $plan_id );
 		if ( $record === null ) {
 			return array(
-				'override_ref'             => $override_ref,
-				'conflict_type'            => self::CONFLICT_TYPE_MISSING_TARGET,
-				'severity'                 => self::SEVERITY_WARNING,
-				'target_type'              => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
-				'target_key'               => $item_id,
-				'plan_id'                  => $plan_id,
-				'related_refs'             => array( $plan_id ),
-				'suggested_review_action'  => __( 'Plan no longer exists; consider removing this override.', 'aio-page-builder' ),
+				'override_ref'            => $override_ref,
+				'conflict_type'           => self::CONFLICT_TYPE_MISSING_TARGET,
+				'severity'                => self::SEVERITY_WARNING,
+				'target_type'             => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
+				'target_key'              => $item_id,
+				'plan_id'                 => $plan_id,
+				'related_refs'            => array( $plan_id ),
+				'suggested_review_action' => __( 'Plan no longer exists; consider removing this override.', 'aio-page-builder' ),
 			);
 		}
 		$post_id = isset( $record['id'] ) ? (int) $record['id'] : 0;
 		if ( $post_id <= 0 ) {
 			return array(
-				'override_ref'             => $override_ref,
-				'conflict_type'            => self::CONFLICT_TYPE_MISSING_TARGET,
-				'severity'                 => self::SEVERITY_WARNING,
-				'target_type'              => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
-				'target_key'               => $item_id,
-				'plan_id'                  => $plan_id,
-				'related_refs'             => array(),
-				'suggested_review_action'  => __( 'Plan record invalid; consider removing this override.', 'aio-page-builder' ),
+				'override_ref'            => $override_ref,
+				'conflict_type'           => self::CONFLICT_TYPE_MISSING_TARGET,
+				'severity'                => self::SEVERITY_WARNING,
+				'target_type'             => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
+				'target_key'              => $item_id,
+				'plan_id'                 => $plan_id,
+				'related_refs'            => array(),
+				'suggested_review_action' => __( 'Plan record invalid; consider removing this override.', 'aio-page-builder' ),
 			);
 		}
 		$definition = $this->plan_repository->get_plan_definition( $post_id );
@@ -159,14 +159,14 @@ final class Industry_Override_Conflict_Detector {
 		}
 		if ( ! $item_found ) {
 			return array(
-				'override_ref'             => $override_ref,
-				'conflict_type'            => self::CONFLICT_TYPE_MISSING_TARGET,
-				'severity'                 => self::SEVERITY_WARNING,
-				'target_type'              => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
-				'target_key'               => $item_id,
-				'plan_id'                  => $plan_id,
-				'related_refs'             => array( $plan_id ),
-				'suggested_review_action'  => __( 'Item no longer in plan; consider removing this override.', 'aio-page-builder' ),
+				'override_ref'            => $override_ref,
+				'conflict_type'           => self::CONFLICT_TYPE_MISSING_TARGET,
+				'severity'                => self::SEVERITY_WARNING,
+				'target_type'             => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
+				'target_key'              => $item_id,
+				'plan_id'                 => $plan_id,
+				'related_refs'            => array( $plan_id ),
+				'suggested_review_action' => __( 'Item no longer in plan; consider removing this override.', 'aio-page-builder' ),
 			);
 		}
 		return null;

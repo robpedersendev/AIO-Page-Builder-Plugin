@@ -34,9 +34,9 @@ final class Profile_Store_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_test_options'] = array();
-		$this->settings   = new Settings_Service();
-		$this->normalizer = new Profile_Normalizer();
-		$this->store      = new Profile_Store( $this->settings, $this->normalizer );
+		$this->settings               = new Settings_Service();
+		$this->normalizer             = new Profile_Normalizer();
+		$this->store                  = new Profile_Store( $this->settings, $this->normalizer );
 	}
 
 	protected function tearDown(): void {
@@ -58,29 +58,35 @@ final class Profile_Store_Test extends TestCase {
 	}
 
 	public function test_valid_profile_write_then_read_back(): void {
-		$this->store->set_brand_profile( array(
-			'brand_positioning_summary' => 'We are the trusted local partner.',
-			'brand_voice_summary'       => 'Professional and approachable.',
-		) );
+		$this->store->set_brand_profile(
+			array(
+				'brand_positioning_summary' => 'We are the trusted local partner.',
+				'brand_voice_summary'       => 'Professional and approachable.',
+			)
+		);
 		$brand = $this->store->get_brand_profile();
 		$this->assertSame( 'We are the trusted local partner.', $brand['brand_positioning_summary'] );
 		$this->assertSame( 'Professional and approachable.', $brand['brand_voice_summary'] );
 
-		$this->store->set_business_profile( array(
-			'business_name'           => 'Acme LLC',
-			'primary_offers_summary'  => 'Tax and bookkeeping',
-			'core_geographic_market'   => 'Denver',
-		) );
+		$this->store->set_business_profile(
+			array(
+				'business_name'          => 'Acme LLC',
+				'primary_offers_summary' => 'Tax and bookkeeping',
+				'core_geographic_market' => 'Denver',
+			)
+		);
 		$business = $this->store->get_business_profile();
 		$this->assertSame( 'Acme LLC', $business['business_name'] );
 		$this->assertSame( 'Tax and bookkeeping', $business['primary_offers_summary'] );
 	}
 
 	public function test_partial_merge_brand_does_not_corrupt_unrelated_fields(): void {
-		$this->store->set_brand_profile( array(
-			'brand_positioning_summary' => 'Original positioning',
-			'preferred_cta_style'       => 'Soft CTA',
-		) );
+		$this->store->set_brand_profile(
+			array(
+				'brand_positioning_summary' => 'Original positioning',
+				'preferred_cta_style'       => 'Soft CTA',
+			)
+		);
 		$this->store->merge_brand_profile( array( 'brand_voice_summary' => 'Friendly only' ) );
 		$brand = $this->store->get_brand_profile();
 		$this->assertSame( 'Original positioning', $brand['brand_positioning_summary'] );
@@ -89,10 +95,12 @@ final class Profile_Store_Test extends TestCase {
 	}
 
 	public function test_partial_merge_business_does_not_corrupt_unrelated_fields(): void {
-		$this->store->set_business_profile( array(
-			'business_name'         => 'Acme',
-			'primary_offers_summary' => 'Services',
-		) );
+		$this->store->set_business_profile(
+			array(
+				'business_name'          => 'Acme',
+				'primary_offers_summary' => 'Services',
+			)
+		);
 		$this->store->merge_business_profile( array( 'core_geographic_market' => 'Boston' ) );
 		$business = $this->store->get_business_profile();
 		$this->assertSame( 'Acme', $business['business_name'] );
@@ -120,11 +128,13 @@ final class Profile_Store_Test extends TestCase {
 	}
 
 	public function test_set_and_get_template_preference_profile(): void {
-		$this->store->set_template_preference_profile( array(
-			'page_emphasis'       => 'conversion',
-			'conversion_posture'  => 'moderate',
-			'reduced_motion_preference' => true,
-		) );
+		$this->store->set_template_preference_profile(
+			array(
+				'page_emphasis'             => 'conversion',
+				'conversion_posture'        => 'moderate',
+				'reduced_motion_preference' => true,
+			)
+		);
 		$arr = $this->store->get_template_preference_profile_array();
 		$this->assertSame( 'conversion', $arr['page_emphasis'] );
 		$this->assertSame( 'moderate', $arr['conversion_posture'] );
@@ -132,10 +142,12 @@ final class Profile_Store_Test extends TestCase {
 	}
 
 	public function test_merge_template_preference_profile(): void {
-		$this->store->set_template_preference_profile( array(
-			'page_emphasis' => 'balanced',
-			'proof_style'   => 'testimonials',
-		) );
+		$this->store->set_template_preference_profile(
+			array(
+				'page_emphasis' => 'balanced',
+				'proof_style'   => 'testimonials',
+			)
+		);
 		$this->store->merge_template_preference_profile( array( 'content_density' => 'spacious' ) );
 		$arr = $this->store->get_template_preference_profile_array();
 		$this->assertSame( 'balanced', $arr['page_emphasis'] );

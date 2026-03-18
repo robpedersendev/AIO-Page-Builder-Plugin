@@ -40,7 +40,7 @@ final class Profile_Store {
 	 * @return array<string, mixed>
 	 */
 	public function get_brand_profile(): array {
-		$full = $this->get_full_profile_raw();
+		$full  = $this->get_full_profile_raw();
 		$brand = $full[ Profile_Schema::ROOT_BRAND ] ?? array();
 		return is_array( $brand )
 			? $this->normalizer->normalize_brand_profile( $brand )
@@ -53,7 +53,7 @@ final class Profile_Store {
 	 * @return array<string, mixed>
 	 */
 	public function get_business_profile(): array {
-		$full    = $this->get_full_profile_raw();
+		$full     = $this->get_full_profile_raw();
 		$business = $full[ Profile_Schema::ROOT_BUSINESS ] ?? array();
 		return is_array( $business )
 			? $this->normalizer->normalize_business_profile( $business )
@@ -67,8 +67,8 @@ final class Profile_Store {
 	 */
 	public function get_full_profile(): array {
 		return array(
-			Profile_Schema::ROOT_BRAND                   => $this->get_brand_profile(),
-			Profile_Schema::ROOT_BUSINESS                => $this->get_business_profile(),
+			Profile_Schema::ROOT_BRAND    => $this->get_brand_profile(),
+			Profile_Schema::ROOT_BUSINESS => $this->get_business_profile(),
 			Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE => $this->get_template_preference_profile_array(),
 		);
 	}
@@ -79,7 +79,7 @@ final class Profile_Store {
 	 * @return array<string, mixed>
 	 */
 	public function get_template_preference_profile_array(): array {
-		$raw = $this->get_full_profile_raw();
+		$raw   = $this->get_full_profile_raw();
 		$block = $raw[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ?? null;
 		if ( ! is_array( $block ) ) {
 			return ( new Template_Preference_Profile() )->to_array();
@@ -91,7 +91,7 @@ final class Profile_Store {
 	 * Returns template preference profile as value object.
 	 */
 	public function get_template_preference_profile(): Template_Preference_Profile {
-		$raw = $this->get_full_profile_raw();
+		$raw   = $this->get_full_profile_raw();
 		$block = $raw[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ?? null;
 		if ( ! is_array( $block ) ) {
 			return new Template_Preference_Profile();
@@ -107,7 +107,7 @@ final class Profile_Store {
 	 */
 	public function set_template_preference_profile( array $preferences ): void {
 		$profile = Template_Preference_Profile::from_array( $preferences );
-		$full = $this->get_full_profile_raw();
+		$full    = $this->get_full_profile_raw();
 		$full[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] = $profile->to_array();
 		if ( ! isset( $full[ Profile_Schema::ROOT_BRAND ] ) || ! is_array( $full[ Profile_Schema::ROOT_BRAND ] ) ) {
 			$full[ Profile_Schema::ROOT_BRAND ] = $this->normalizer->normalize_brand_profile( array() );
@@ -126,8 +126,8 @@ final class Profile_Store {
 	 */
 	public function merge_template_preference_profile( array $partial ): void {
 		$current = $this->get_template_preference_profile_array();
-		$merged = $current;
-		$keys = array( 'page_emphasis', 'conversion_posture', 'proof_style', 'content_density', 'animation_preference', 'cta_intensity_preference' );
+		$merged  = $current;
+		$keys    = array( 'page_emphasis', 'conversion_posture', 'proof_style', 'content_density', 'animation_preference', 'cta_intensity_preference' );
 		foreach ( $keys as $key ) {
 			if ( array_key_exists( $key, $partial ) ) {
 				$merged[ $key ] = $partial[ $key ];
@@ -146,8 +146,8 @@ final class Profile_Store {
 	 * @return void
 	 */
 	public function set_brand_profile( array $brand ): void {
-		$full   = $this->get_full_profile_raw();
-		$normal = $this->normalizer->normalize_brand_profile( $brand );
+		$full                               = $this->get_full_profile_raw();
+		$normal                             = $this->normalizer->normalize_brand_profile( $brand );
 		$full[ Profile_Schema::ROOT_BRAND ] = $normal;
 		if ( ! isset( $full[ Profile_Schema::ROOT_BUSINESS ] ) || ! is_array( $full[ Profile_Schema::ROOT_BUSINESS ] ) ) {
 			$full[ Profile_Schema::ROOT_BUSINESS ] = $this->normalizer->normalize_business_profile( array() );
@@ -162,8 +162,8 @@ final class Profile_Store {
 	 * @return void
 	 */
 	public function set_business_profile( array $business ): void {
-		$full   = $this->get_full_profile_raw();
-		$normal = $this->normalizer->normalize_business_profile( $business );
+		$full                                  = $this->get_full_profile_raw();
+		$normal                                = $this->normalizer->normalize_business_profile( $business );
 		$full[ Profile_Schema::ROOT_BUSINESS ] = $normal;
 		if ( ! isset( $full[ Profile_Schema::ROOT_BRAND ] ) || ! is_array( $full[ Profile_Schema::ROOT_BRAND ] ) ) {
 			$full[ Profile_Schema::ROOT_BRAND ] = $this->normalizer->normalize_brand_profile( array() );
@@ -182,7 +182,7 @@ final class Profile_Store {
 			? $full[ Profile_Schema::ROOT_BRAND ] : array();
 		$business = isset( $full[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $full[ Profile_Schema::ROOT_BUSINESS ] )
 			? $full[ Profile_Schema::ROOT_BUSINESS ] : array();
-		$payload = array(
+		$payload  = array(
 			Profile_Schema::ROOT_BRAND    => $this->normalizer->normalize_brand_profile( $brand ),
 			Profile_Schema::ROOT_BUSINESS => $this->normalizer->normalize_business_profile( $business ),
 		);

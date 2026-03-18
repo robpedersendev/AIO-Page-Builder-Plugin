@@ -150,20 +150,20 @@ final class Page_Template_Schema {
 		}
 		self::$allowed_archetypes = array(
 			'service_page'         => 'Service page',
-			'offer_page'            => 'Offer page',
-			'pricing_page'          => 'Pricing page',
-			'faq_page'              => 'FAQ page',
-			'hub_page'              => 'Hub page',
-			'sub_hub_page'          => 'Sub-hub page',
-			'landing_page'          => 'Landing page',
-			'about_page'            => 'About page',
+			'offer_page'           => 'Offer page',
+			'pricing_page'         => 'Pricing page',
+			'faq_page'             => 'FAQ page',
+			'hub_page'             => 'Hub page',
+			'sub_hub_page'         => 'Sub-hub page',
+			'landing_page'         => 'Landing page',
+			'about_page'           => 'About page',
 			'location_page'        => 'Location page',
-			'event_page'            => 'Event page',
-			'request_page'          => 'Request page',
-			'profile_page'          => 'Profile page',
-			'directory_page'        => 'Directory page',
-			'comparison_page'       => 'Comparison page',
-			'informational_detail'  => 'Informational detail page',
+			'event_page'           => 'Event page',
+			'request_page'         => 'Request page',
+			'profile_page'         => 'Profile page',
+			'directory_page'       => 'Directory page',
+			'comparison_page'      => 'Comparison page',
+			'informational_detail' => 'Informational detail page',
 		);
 		return self::$allowed_archetypes;
 	}
@@ -239,8 +239,8 @@ final class Page_Template_Schema {
 	 * @return array<int, array{code: string, field?: string}> Empty if valid.
 	 */
 	public static function validate_industry_affinity_metadata( array $page_template ): array {
-		$errors = array();
-		$check_key = function ( string $key ): bool {
+		$errors                   = array();
+		$check_key                = function ( string $key ): bool {
 			if ( $key === '' || strlen( $key ) > self::INDUSTRY_KEY_MAX_LENGTH ) {
 				return false;
 			}
@@ -265,7 +265,10 @@ final class Page_Template_Schema {
 					$key_str = trim( $v );
 				}
 				if ( $key_str !== '' && ! $check_key( $key_str ) ) {
-					$errors[] = array( 'code' => 'invalid_industry_key', 'field' => $field );
+					$errors[] = array(
+						'code'  => 'invalid_industry_key',
+						'field' => $field,
+					);
 					break;
 				}
 			}
@@ -286,7 +289,10 @@ final class Page_Template_Schema {
 			if ( is_array( $val ) ) {
 				foreach ( array_keys( $val ) as $k ) {
 					if ( is_string( $k ) && $k !== '' && ! $check_key( $k ) ) {
-						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => $field );
+						$errors[] = array(
+							'code'  => 'invalid_industry_key',
+							'field' => $field,
+						);
 						break;
 					}
 				}

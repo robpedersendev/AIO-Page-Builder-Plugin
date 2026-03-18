@@ -47,7 +47,7 @@ final class Template_Recommendation_Context_Builder_Test extends TestCase {
 	}
 
 	public function test_build_includes_template_preference_profile_when_provided(): void {
-		$prefs = array(
+		$prefs  = array(
 			'page_emphasis'             => 'conversion',
 			'conversion_posture'        => 'moderate',
 			'proof_style'               => 'social_proof',
@@ -56,7 +56,12 @@ final class Template_Recommendation_Context_Builder_Test extends TestCase {
 			'cta_intensity_preference'  => 'medium',
 			'reduced_motion_preference' => true,
 		);
-		$result = $this->builder->build( array( 'max_templates' => 1, 'template_preference_profile' => $prefs ) );
+		$result = $this->builder->build(
+			array(
+				'max_templates'               => 1,
+				'template_preference_profile' => $prefs,
+			)
+		);
 		$this->assertArrayHasKey( 'template_preference_profile', $result );
 		$this->assertSame( $prefs, $result['template_preference_profile'] );
 	}
@@ -69,8 +74,8 @@ final class Template_Recommendation_Context_Builder_Test extends TestCase {
 	}
 
 	public function test_recommended_template_summary_has_required_keys(): void {
-		$result = $this->builder->build( array( 'max_templates' => 1 ) );
-		$list = $result['template_recommendation_context'];
+		$result        = $this->builder->build( array( 'max_templates' => 1 ) );
+		$list          = $result['template_recommendation_context'];
 		$expected_keys = array( 'template_key', 'name', 'purpose_summary', 'template_category_class', 'template_family', 'archetype', 'hierarchy_hint', 'cta_direction_summary', 'section_count', 'version', 'deprecation_status', 'one_pager_available' );
 		if ( count( $list ) > 0 ) {
 			$first = $list[0];

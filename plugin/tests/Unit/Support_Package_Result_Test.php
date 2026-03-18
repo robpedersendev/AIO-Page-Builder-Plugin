@@ -36,7 +36,10 @@ final class Support_Package_Result_Test extends TestCase {
 			'aio-export-support_bundle-20250715-120000-site.zip',
 			array( 'settings', 'profiles', 'registries' ),
 			array( 'raw_ai_artifacts' ),
-			array( 'applied' => true, 'keys_redacted' => array( 'settings' ) ),
+			array(
+				'applied'       => true,
+				'keys_redacted' => array( 'settings' ),
+			),
 			5,
 			1024,
 			'support-pkg-1'
@@ -58,12 +61,15 @@ final class Support_Package_Result_Test extends TestCase {
 	}
 
 	public function test_redaction_summary_shape(): void {
-		$r = Support_Package_Result::success(
+		$r   = Support_Package_Result::success(
 			'/path',
 			'file.zip',
 			array(),
 			array(),
-			array( 'applied' => true, 'keys_redacted' => array( 'settings', 'profiles' ) ),
+			array(
+				'applied'       => true,
+				'keys_redacted' => array( 'settings', 'profiles' ),
+			),
 			0,
 			0
 		);
@@ -89,7 +95,10 @@ final class Support_Package_Result_Test extends TestCase {
 			'file.zip',
 			array( 'settings' ),
 			array(),
-			array( 'applied' => true, 'keys_redacted' => array() ),
+			array(
+				'applied'       => true,
+				'keys_redacted' => array(),
+			),
 			1,
 			100
 		);

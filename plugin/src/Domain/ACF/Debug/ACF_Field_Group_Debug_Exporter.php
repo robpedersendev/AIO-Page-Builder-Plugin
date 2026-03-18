@@ -60,20 +60,20 @@ final class ACF_Field_Group_Debug_Exporter {
 	 */
 	public function build_debug_export(): array {
 		$blueprints = $this->blueprint_service->get_all_blueprints();
-		$records = array();
+		$records    = array();
 		foreach ( $blueprints as $blueprint ) {
 			$section_key = (string) ( $blueprint[ Field_Blueprint_Schema::SECTION_KEY ] ?? '' );
 			if ( $section_key === '' ) {
 				continue;
 			}
-			$fields = $blueprint[ Field_Blueprint_Schema::FIELDS ] ?? array();
+			$fields      = $blueprint[ Field_Blueprint_Schema::FIELDS ] ?? array();
 			$field_count = is_array( $fields ) ? count( $fields ) : 0;
-			$records[] = array(
+			$records[]   = array(
 				'section_key'        => $section_key,
 				'group_key'          => Field_Key_Generator::group_key( $section_key ),
 				'section_version'    => (string) ( $blueprint[ Field_Blueprint_Schema::SECTION_VERSION ] ?? '' ),
 				'source'             => 'registry',
-				'field_count'       => $field_count,
+				'field_count'        => $field_count,
 				'registry_reference' => 'section_key:' . $section_key,
 			);
 		}
@@ -88,8 +88,8 @@ final class ACF_Field_Group_Debug_Exporter {
 	 * @return array<string, mixed> acf_mirror_diff_summary.
 	 */
 	public function build_diff_summary( array $registry_manifest, array $mirror_manifest ): array {
-		$registry_keys = array_fill_keys( $registry_manifest['group_keys'] ?? array(), true );
-		$mirror_keys = array_fill_keys( $mirror_manifest['group_keys'] ?? array(), true );
+		$registry_keys  = array_fill_keys( $registry_manifest['group_keys'] ?? array(), true );
+		$mirror_keys    = array_fill_keys( $mirror_manifest['group_keys'] ?? array(), true );
 		$registry_files = array();
 		foreach ( $registry_manifest['files'] ?? array() as $f ) {
 			$gk = (string) ( $f['group_key'] ?? '' );
@@ -106,7 +106,7 @@ final class ACF_Field_Group_Debug_Exporter {
 		}
 		$in_registry_not_mirror = array_values( array_diff( array_keys( $registry_keys ), array_keys( $mirror_keys ) ) );
 		$in_mirror_not_registry = array_values( array_diff( array_keys( $mirror_keys ), array_keys( $registry_keys ) ) );
-		$version_mismatch = array();
+		$version_mismatch       = array();
 		foreach ( array_keys( $registry_keys ) as $gk ) {
 			if ( ! isset( $mirror_files[ $gk ] ) ) {
 				continue;

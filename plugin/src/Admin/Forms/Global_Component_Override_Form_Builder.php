@@ -65,12 +65,12 @@ final class Global_Component_Override_Form_Builder {
 					? $current[ $component_id ][ $token_var_name ]
 					: '';
 				$out[] = array(
-					'component_id'    => $component_id,
-					'token_var_name'  => $token_var_name,
-					'name_attr'       => self::FORM_OVERRIDES_KEY . '[' . \esc_attr( $component_id ) . '][' . \esc_attr( $token_var_name ) . ']',
-					'label'           => $this->format_label( $component_id, $token_var_name ),
-					'value'           => $value,
-					'max_length'      => $this->get_max_length_for_single_token_var( $token_var_name ),
+					'component_id'   => $component_id,
+					'token_var_name' => $token_var_name,
+					'name_attr'      => self::FORM_OVERRIDES_KEY . '[' . \esc_attr( $component_id ) . '][' . \esc_attr( $token_var_name ) . ']',
+					'label'          => $this->format_label( $component_id, $token_var_name ),
+					'value'          => $value,
+					'max_length'     => $this->get_max_length_for_single_token_var( $token_var_name ),
 				);
 			}
 		}
@@ -83,7 +83,7 @@ final class Global_Component_Override_Form_Builder {
 	 * @return array<string, list<array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>>
 	 */
 	public function get_fields_by_component(): array {
-		$defs = $this->get_field_definitions();
+		$defs         = $this->get_field_definitions();
 		$by_component = array();
 		foreach ( $defs as $def ) {
 			$c = $def['component_id'];

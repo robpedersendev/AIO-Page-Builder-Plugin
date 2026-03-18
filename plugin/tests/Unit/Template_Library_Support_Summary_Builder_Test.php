@@ -46,8 +46,20 @@ final class Template_Library_Support_Summary_Builder_Test extends TestCase {
 	public function test_build_with_null_dependencies_inventory_is_bounded(): void {
 		$builder = new Template_Library_Support_Summary_Builder( null, null, null, null, null, null, null, null, null );
 		$payload = $builder->build();
-		$this->assertSame( array( 'section_total' => 0, 'page_total' => 0 ), $payload['inventory'] );
-		$this->assertSame( array( 'deprecated_sections_count' => 0, 'deprecated_pages_count' => 0 ), $payload['version_summary'] );
+		$this->assertSame(
+			array(
+				'section_total' => 0,
+				'page_total'    => 0,
+			),
+			$payload['inventory']
+		);
+		$this->assertSame(
+			array(
+				'deprecated_sections_count' => 0,
+				'deprecated_pages_count'    => 0,
+			),
+			$payload['version_summary']
+		);
 		$this->assertIsArray( $payload['appendix_sync'] );
 		$this->assertArrayHasKey( 'in_sync', $payload['appendix_sync'] );
 		$this->assertArrayHasKey( 'note', $payload['appendix_sync'] );

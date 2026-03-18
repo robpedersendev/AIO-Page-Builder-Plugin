@@ -23,17 +23,20 @@ final class Capability_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'capabilities', function (): object {
-			return new class() {
-				/** @return list<string> */
-				public function get_all(): array {
-					return Capabilities::getAll();
-				}
+		$container->register(
+			'capabilities',
+			function (): object {
+				return new class() {
+					/** @return list<string> */
+					public function get_all(): array {
+						return Capabilities::getAll();
+					}
 
-				public function role_has_cap( string $role_key, string $cap ): bool {
-					return Capability_Registrar::role_has_cap( $role_key, $cap );
-				}
-			};
-		} );
+					public function role_has_cap( string $role_key, string $cap ): bool {
+						return Capability_Registrar::role_has_cap( $role_key, $cap );
+					}
+				};
+			}
+		);
 	}
 }

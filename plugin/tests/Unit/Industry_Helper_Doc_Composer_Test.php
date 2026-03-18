@@ -31,11 +31,11 @@ require_once $plugin_root . '/src/Domain/Registries/Docs/Documentation_Registry.
 final class Industry_Helper_Doc_Composer_Test extends TestCase {
 
 	public function test_base_only_resolution_when_no_overlay(): void {
-		$doc_registry = new Documentation_Registry();
+		$doc_registry     = new Documentation_Registry();
 		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
 		$overlay_registry->load( array() );
 		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
-		$result = $composer->compose( 'test_sec_base_only_999', '' );
+		$result   = $composer->compose( 'test_sec_base_only_999', '' );
 		$this->assertInstanceOf( Composed_Helper_Doc_Result::class, $result );
 		$this->assertFalse( $result->is_overlay_applied() );
 		$this->assertSame( '', $result->get_overlay_industry_key() );
@@ -43,20 +43,22 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 	}
 
 	public function test_base_plus_one_overlay_composition(): void {
-		$doc_registry = new Documentation_Registry();
+		$doc_registry     = new Documentation_Registry();
 		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
-		$overlay_registry->load( array(
+		$overlay_registry->load(
 			array(
-				Industry_Section_Helper_Overlay_Registry::FIELD_INDUSTRY_KEY => 'legal',
-				Industry_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY  => 'test_sec_overlay_998',
-				Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE        => Industry_Section_Helper_Overlay_Registry::SCOPE_SECTION_HELPER_OVERLAY,
-				Industry_Section_Helper_Overlay_Registry::FIELD_STATUS       => Industry_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-				'tone_notes' => 'Legal tone guidance.',
-				'seo_notes'  => 'Legal SEO notes.',
-			),
-		) );
+				array(
+					Industry_Section_Helper_Overlay_Registry::FIELD_INDUSTRY_KEY => 'legal',
+					Industry_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'test_sec_overlay_998',
+					Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE => Industry_Section_Helper_Overlay_Registry::SCOPE_SECTION_HELPER_OVERLAY,
+					Industry_Section_Helper_Overlay_Registry::FIELD_STATUS => Industry_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+					'tone_notes' => 'Legal tone guidance.',
+					'seo_notes'  => 'Legal SEO notes.',
+				),
+			)
+		);
 		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
-		$result = $composer->compose( 'test_sec_overlay_998', 'legal' );
+		$result   = $composer->compose( 'test_sec_overlay_998', 'legal' );
 		$this->assertTrue( $result->is_overlay_applied() );
 		$this->assertSame( 'legal', $result->get_overlay_industry_key() );
 		$doc = $result->get_composed_doc();
@@ -65,19 +67,21 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 	}
 
 	public function test_invalid_or_draft_overlay_fails_safely(): void {
-		$doc_registry = new Documentation_Registry();
+		$doc_registry     = new Documentation_Registry();
 		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
-		$overlay_registry->load( array(
+		$overlay_registry->load(
 			array(
-				Industry_Section_Helper_Overlay_Registry::FIELD_INDUSTRY_KEY => 'legal',
-				Industry_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY  => 'test_sec_draft_997',
-				Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE        => Industry_Section_Helper_Overlay_Registry::SCOPE_SECTION_HELPER_OVERLAY,
-				Industry_Section_Helper_Overlay_Registry::FIELD_STATUS       => 'draft',
-				'tone_notes' => 'Should not apply.',
-			),
-		) );
+				array(
+					Industry_Section_Helper_Overlay_Registry::FIELD_INDUSTRY_KEY => 'legal',
+					Industry_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'test_sec_draft_997',
+					Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE => Industry_Section_Helper_Overlay_Registry::SCOPE_SECTION_HELPER_OVERLAY,
+					Industry_Section_Helper_Overlay_Registry::FIELD_STATUS => 'draft',
+					'tone_notes' => 'Should not apply.',
+				),
+			)
+		);
 		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
-		$result = $composer->compose( 'test_sec_draft_997', 'legal' );
+		$result   = $composer->compose( 'test_sec_draft_997', 'legal' );
 		$this->assertFalse( $result->is_overlay_applied() );
 		$this->assertSame( '', $result->get_overlay_industry_key() );
 		$doc = $result->get_composed_doc();
@@ -85,19 +89,21 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 	}
 
 	public function test_no_base_overlay_only_composed_doc_has_overlay_fields(): void {
-		$doc_registry = new Documentation_Registry();
+		$doc_registry     = new Documentation_Registry();
 		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
-		$overlay_registry->load( array(
+		$overlay_registry->load(
 			array(
-				Industry_Section_Helper_Overlay_Registry::FIELD_INDUSTRY_KEY => 'legal',
-				Industry_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY  => 'no_base_section_996',
-				Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE        => Industry_Section_Helper_Overlay_Registry::SCOPE_SECTION_HELPER_OVERLAY,
-				Industry_Section_Helper_Overlay_Registry::FIELD_STATUS       => Industry_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-				'cta_usage_notes' => 'CTA for legal.',
-			),
-		) );
+				array(
+					Industry_Section_Helper_Overlay_Registry::FIELD_INDUSTRY_KEY => 'legal',
+					Industry_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'no_base_section_996',
+					Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE => Industry_Section_Helper_Overlay_Registry::SCOPE_SECTION_HELPER_OVERLAY,
+					Industry_Section_Helper_Overlay_Registry::FIELD_STATUS => Industry_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+					'cta_usage_notes' => 'CTA for legal.',
+				),
+			)
+		);
 		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
-		$result = $composer->compose( 'no_base_section_996', 'legal' );
+		$result   = $composer->compose( 'no_base_section_996', 'legal' );
 		$this->assertTrue( $result->is_overlay_applied() );
 		$this->assertSame( '', $result->get_base_documentation_id() );
 		$doc = $result->get_composed_doc();
@@ -105,11 +111,11 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 	}
 
 	public function test_result_to_array_traceability(): void {
-		$doc_registry = new Documentation_Registry();
+		$doc_registry     = new Documentation_Registry();
 		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
-		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
-		$result = $composer->compose( 'trace_sec_995', '' );
-		$arr = $result->to_array();
+		$composer         = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
+		$result           = $composer->compose( 'trace_sec_995', '' );
+		$arr              = $result->to_array();
 		$this->assertArrayHasKey( 'section_key', $arr );
 		$this->assertArrayHasKey( 'base_documentation_id', $arr );
 		$this->assertArrayHasKey( 'overlay_applied', $arr );
@@ -120,11 +126,11 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 
 	/** Prompt 353: built-in overlays compose correctly; cosmetology_nail + hero_conv_02. */
 	public function test_builtin_overlay_composes_with_cosmetology_nail_hero(): void {
-		$doc_registry = new Documentation_Registry();
+		$doc_registry     = new Documentation_Registry();
 		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
 		$overlay_registry->load( Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
 		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
-		$result = $composer->compose( 'hero_conv_02', 'cosmetology_nail' );
+		$result   = $composer->compose( 'hero_conv_02', 'cosmetology_nail' );
 		$this->assertTrue( $result->is_overlay_applied() );
 		$this->assertSame( 'cosmetology_nail', $result->get_overlay_industry_key() );
 		$doc = $result->get_composed_doc();
@@ -135,7 +141,7 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 
 	/** Prompt 401: second-wave overlays load and are discoverable. */
 	public function test_builtin_overlays_include_second_wave_section_keys(): void {
-		$definitions = Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions();
+		$definitions      = Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions();
 		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
 		$overlay_registry->load( $definitions );
 		$this->assertNotNull( $overlay_registry->get( 'cosmetology_nail', 'mlp_gallery_01' ), 'Second-wave cosmetology gallery overlay must be present.' );
@@ -150,11 +156,11 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 
 	/** Prompt 401: second-wave overlay composes (base + overlay). */
 	public function test_builtin_second_wave_overlay_composition_cosmetology_gallery(): void {
-		$doc_registry = new Documentation_Registry();
+		$doc_registry     = new Documentation_Registry();
 		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
 		$overlay_registry->load( Industry_Section_Helper_Overlay_Registry::get_builtin_overlay_definitions() );
 		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry );
-		$result = $composer->compose( 'mlp_gallery_01', 'cosmetology_nail' );
+		$result   = $composer->compose( 'mlp_gallery_01', 'cosmetology_nail' );
 		$this->assertTrue( $result->is_overlay_applied() );
 		$this->assertSame( 'cosmetology_nail', $result->get_overlay_industry_key() );
 		$doc = $result->get_composed_doc();
@@ -166,30 +172,34 @@ final class Industry_Helper_Doc_Composer_Test extends TestCase {
 	/** Prompt 477: fragment ref in overlay appends resolved content to compliance_cautions. */
 	public function test_compose_with_fragment_ref_appends_resolved_content(): void {
 		$frag_registry = new Industry_Shared_Fragment_Registry();
-		$frag_registry->load( array(
+		$frag_registry->load(
 			array(
-				Industry_Shared_Fragment_Registry::FIELD_FRAGMENT_KEY      => 'caution_testimonial_genuine',
-				Industry_Shared_Fragment_Registry::FIELD_FRAGMENT_TYPE     => Industry_Shared_Fragment_Registry::TYPE_CAUTION_SNIPPET,
-				Industry_Shared_Fragment_Registry::FIELD_ALLOWED_CONSUMERS => array( 'section_helper_overlay' ),
-				Industry_Shared_Fragment_Registry::FIELD_CONTENT          => 'Testimonials must be genuine; obtain consent.',
-				Industry_Shared_Fragment_Registry::FIELD_STATUS           => Industry_Shared_Fragment_Registry::STATUS_ACTIVE,
-			),
-		) );
-		$resolver = new Industry_Shared_Fragment_Resolver( $frag_registry );
-		$doc_registry = new Documentation_Registry();
+				array(
+					Industry_Shared_Fragment_Registry::FIELD_FRAGMENT_KEY      => 'caution_testimonial_genuine',
+					Industry_Shared_Fragment_Registry::FIELD_FRAGMENT_TYPE     => Industry_Shared_Fragment_Registry::TYPE_CAUTION_SNIPPET,
+					Industry_Shared_Fragment_Registry::FIELD_ALLOWED_CONSUMERS => array( 'section_helper_overlay' ),
+					Industry_Shared_Fragment_Registry::FIELD_CONTENT          => 'Testimonials must be genuine; obtain consent.',
+					Industry_Shared_Fragment_Registry::FIELD_STATUS           => Industry_Shared_Fragment_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
+		$resolver         = new Industry_Shared_Fragment_Resolver( $frag_registry );
+		$doc_registry     = new Documentation_Registry();
 		$overlay_registry = new Industry_Section_Helper_Overlay_Registry();
-		$overlay_registry->load( array(
+		$overlay_registry->load(
 			array(
-				Industry_Section_Helper_Overlay_Registry::FIELD_INDUSTRY_KEY => 'test_ind',
-				Industry_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY  => 'sec_frag_994',
-				Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE        => Industry_Section_Helper_Overlay_Registry::SCOPE_SECTION_HELPER_OVERLAY,
-				Industry_Section_Helper_Overlay_Registry::FIELD_STATUS       => Industry_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-				'compliance_cautions' => 'Direct caution text.',
-				'compliance_cautions_fragment_ref' => 'caution_testimonial_genuine',
-			),
-		) );
+				array(
+					Industry_Section_Helper_Overlay_Registry::FIELD_INDUSTRY_KEY => 'test_ind',
+					Industry_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'sec_frag_994',
+					Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE => Industry_Section_Helper_Overlay_Registry::SCOPE_SECTION_HELPER_OVERLAY,
+					Industry_Section_Helper_Overlay_Registry::FIELD_STATUS => Industry_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+					'compliance_cautions'              => 'Direct caution text.',
+					'compliance_cautions_fragment_ref' => 'caution_testimonial_genuine',
+				),
+			)
+		);
 		$composer = new Industry_Helper_Doc_Composer( $doc_registry, $overlay_registry, null, null, null, null, $resolver );
-		$result = $composer->compose( 'sec_frag_994', 'test_ind' );
+		$result   = $composer->compose( 'sec_frag_994', 'test_ind' );
 		$this->assertTrue( $result->is_overlay_applied() );
 		$doc = $result->get_composed_doc();
 		$this->assertArrayHasKey( 'compliance_cautions', $doc );

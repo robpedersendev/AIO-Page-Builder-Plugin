@@ -61,7 +61,10 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 
 		$assigned = $this->persist_field_groups( $page_ref, $derived );
 		do_action( 'aio_acf_assignment_changed', $page_id );
-		return array( 'assigned' => $assigned, 'errors' => array() );
+		return array(
+			'assigned' => $assigned,
+			'errors'   => array(),
+		);
 	}
 
 	/**
@@ -88,7 +91,10 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 
 		$assigned = $this->persist_field_groups( $page_ref, $derived );
 		do_action( 'aio_acf_assignment_changed', $page_id );
-		return array( 'assigned' => $assigned, 'errors' => array() );
+		return array(
+			'assigned' => $assigned,
+			'errors'   => array(),
+		);
 	}
 
 	/**
@@ -133,7 +139,10 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 		if ( $composition !== null ) {
 			return $this->assign_from_composition( $page_id, $composition, true );
 		}
-		return array( 'assigned' => 0, 'errors' => array( 'No structural source found for page' ) );
+		return array(
+			'assigned' => 0,
+			'errors'   => array( 'No structural source found for page' ),
+		);
 	}
 
 	/**
@@ -144,8 +153,8 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 	 * @return array{assigned: int, errors: list<string>}
 	 */
 	public function sync_with_refinement( int $page_id ): array {
-		$page_ref   = (string) $page_id;
-		$template   = $this->assignment_map->get_target_for_source( Assignment_Types::PAGE_TEMPLATE, $page_ref );
+		$page_ref    = (string) $page_id;
+		$template    = $this->assignment_map->get_target_for_source( Assignment_Types::PAGE_TEMPLATE, $page_ref );
 		$composition = $this->assignment_map->get_target_for_source( Assignment_Types::PAGE_COMPOSITION, $page_ref );
 
 		if ( $composition !== null ) {
@@ -154,7 +163,10 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 		if ( $template !== null ) {
 			return $this->assign_from_template( $page_id, $template, false );
 		}
-		return array( 'assigned' => 0, 'errors' => array( 'No structural source found for page' ) );
+		return array(
+			'assigned' => 0,
+			'errors'   => array( 'No structural source found for page' ),
+		);
 	}
 
 	/**
@@ -167,11 +179,17 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 		$page_ref = (string) $page_id;
 		$template = $this->assignment_map->get_target_for_source( Assignment_Types::PAGE_TEMPLATE, $page_ref );
 		if ( $template !== null ) {
-			return array( 'type' => 'page_template', 'key' => $template );
+			return array(
+				'type' => 'page_template',
+				'key'  => $template,
+			);
 		}
 		$composition = $this->assignment_map->get_target_for_source( Assignment_Types::PAGE_COMPOSITION, $page_ref );
 		if ( $composition !== null ) {
-			return array( 'type' => 'page_composition', 'key' => $composition );
+			return array(
+				'type' => 'page_composition',
+				'key'  => $composition,
+			);
 		}
 		return null;
 	}
@@ -200,7 +218,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 			}
 			$id = $this->assignment_map->create( Assignment_Types::PAGE_FIELD_GROUP, $page_ref, $gk );
 			if ( $id > 0 ) {
-				$count++;
+				++$count;
 			}
 		}
 		return $count;

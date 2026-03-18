@@ -27,12 +27,21 @@ require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Subtype_Sect
 final class Industry_Subtype_Section_Recommendation_Extender_Test extends TestCase {
 
 	public function test_apply_subtype_influence_null_subtype_returns_result_with_subtype_fields_false(): void {
-		$base = new Industry_Section_Recommendation_Result( array(
-			array( 'section_key' => 'hero_01', 'score' => 10, 'fit_classification' => Industry_Section_Recommendation_Resolver::FIT_NEUTRAL, 'explanation_reasons' => array(), 'industry_source_refs' => array(), 'warning_flags' => array() ),
-		) );
+		$base     = new Industry_Section_Recommendation_Result(
+			array(
+				array(
+					'section_key'          => 'hero_01',
+					'score'                => 10,
+					'fit_classification'   => Industry_Section_Recommendation_Resolver::FIT_NEUTRAL,
+					'explanation_reasons'  => array(),
+					'industry_source_refs' => array(),
+					'warning_flags'        => array(),
+				),
+			)
+		);
 		$extender = new Industry_Subtype_Section_Recommendation_Extender();
-		$out = $extender->apply_subtype_influence( $base, null, array() );
-		$items = $out->get_items();
+		$out      = $extender->apply_subtype_influence( $base, null, array() );
+		$items    = $out->get_items();
 		$this->assertCount( 1, $items );
 		$this->assertFalse( $items[0]['subtype_influence_applied'] );
 		$this->assertSame( '', $items[0]['subtype_reason_summary'] );
@@ -40,14 +49,30 @@ final class Industry_Subtype_Section_Recommendation_Extender_Test extends TestCa
 	}
 
 	public function test_apply_subtype_influence_with_helper_overlay_refs_boosts_matching_sections(): void {
-		$base = new Industry_Section_Recommendation_Result( array(
-			array( 'section_key' => 'hero_01', 'score' => 10, 'fit_classification' => Industry_Section_Recommendation_Resolver::FIT_NEUTRAL, 'explanation_reasons' => array(), 'industry_source_refs' => array(), 'warning_flags' => array() ),
-			array( 'section_key' => 'cta_01', 'score' => 15, 'fit_classification' => Industry_Section_Recommendation_Resolver::FIT_ALLOWED_WEAK, 'explanation_reasons' => array(), 'industry_source_refs' => array(), 'warning_flags' => array() ),
-		) );
-		$subtype = array( 'helper_overlay_refs' => array( 'cta_01' ) );
+		$base     = new Industry_Section_Recommendation_Result(
+			array(
+				array(
+					'section_key'          => 'hero_01',
+					'score'                => 10,
+					'fit_classification'   => Industry_Section_Recommendation_Resolver::FIT_NEUTRAL,
+					'explanation_reasons'  => array(),
+					'industry_source_refs' => array(),
+					'warning_flags'        => array(),
+				),
+				array(
+					'section_key'          => 'cta_01',
+					'score'                => 15,
+					'fit_classification'   => Industry_Section_Recommendation_Resolver::FIT_ALLOWED_WEAK,
+					'explanation_reasons'  => array(),
+					'industry_source_refs' => array(),
+					'warning_flags'        => array(),
+				),
+			)
+		);
+		$subtype  = array( 'helper_overlay_refs' => array( 'cta_01' ) );
 		$extender = new Industry_Subtype_Section_Recommendation_Extender();
-		$out = $extender->apply_subtype_influence( $base, $subtype, array() );
-		$items = $out->get_items();
+		$out      = $extender->apply_subtype_influence( $base, $subtype, array() );
+		$items    = $out->get_items();
 		$this->assertCount( 2, $items );
 		$by_key = array();
 		foreach ( $items as $item ) {
@@ -64,10 +89,10 @@ final class Industry_Subtype_Section_Recommendation_Extender_Test extends TestCa
 
 	public function test_resolver_without_subtype_options_unchanged_behavior(): void {
 		$resolver = new Industry_Section_Recommendation_Resolver();
-		$profile = array( 'primary_industry_key' => 'realtor' );
+		$profile  = array( 'primary_industry_key' => 'realtor' );
 		$sections = array( array( 'internal_key' => 'hero_01' ) );
-		$result = $resolver->resolve( $profile, null, $sections, array() );
-		$items = $result->get_items();
+		$result   = $resolver->resolve( $profile, null, $sections, array() );
+		$items    = $result->get_items();
 		$this->assertCount( 1, $items );
 		$this->assertArrayNotHasKey( 'subtype_influence_applied', $items[0] );
 		$this->assertArrayNotHasKey( 'subtype_reason_summary', $items[0] );
@@ -76,11 +101,19 @@ final class Industry_Subtype_Section_Recommendation_Extender_Test extends TestCa
 	public function test_resolver_with_subtype_extender_adds_subtype_fields(): void {
 		$resolver = new Industry_Section_Recommendation_Resolver();
 		$extender = new Industry_Subtype_Section_Recommendation_Extender();
-		$profile = array( 'primary_industry_key' => 'realtor' );
+		$profile  = array( 'primary_industry_key' => 'realtor' );
 		$sections = array( array( 'internal_key' => 'hero_01' ) );
-		$subtype = array( 'helper_overlay_refs' => array( 'hero_01' ) );
-		$result = $resolver->resolve( $profile, null, $sections, array( 'subtype_definition' => $subtype, 'subtype_extender' => $extender ) );
-		$items = $result->get_items();
+		$subtype  = array( 'helper_overlay_refs' => array( 'hero_01' ) );
+		$result   = $resolver->resolve(
+			$profile,
+			null,
+			$sections,
+			array(
+				'subtype_definition' => $subtype,
+				'subtype_extender'   => $extender,
+			)
+		);
+		$items    = $result->get_items();
 		$this->assertCount( 1, $items );
 		$this->assertArrayHasKey( 'subtype_influence_applied', $items[0] );
 		$this->assertArrayHasKey( 'subtype_reason_summary', $items[0] );

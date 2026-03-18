@@ -107,9 +107,9 @@ final class GenerateBlocks_Compatibility_Layer {
 
 		$inner_html = $inner_open . "\n" . $content . "\n" . $inner_close;
 
-		return "<!-- wp:generateblocks/container " . $attrs_json . " -->\n"
+		return '<!-- wp:generateblocks/container ' . $attrs_json . " -->\n"
 			. $inner_html . "\n"
-		. "<!-- /wp:generateblocks/container -->";
+		. '<!-- /wp:generateblocks/container -->';
 	}
 
 	/**
@@ -128,12 +128,12 @@ final class GenerateBlocks_Compatibility_Layer {
 			if ( $text === '' ) {
 				continue;
 			}
-			$escaped = esc_html( $text );
-			$element = in_array( $key, GenerateBlocks_Mapping_Rules::HEADING_FIELD_KEYS, true )
+			$escaped     = esc_html( $text );
+			$element     = in_array( $key, GenerateBlocks_Mapping_Rules::HEADING_FIELD_KEYS, true )
 				? GenerateBlocks_Mapping_Rules::HEADLINE_ELEMENT_HEADING
 				: GenerateBlocks_Mapping_Rules::HEADLINE_ELEMENT_PARAGRAPH;
 			$block_attrs = wp_json_encode( array( 'element' => $element ) );
-			$out[] = "<!-- wp:generateblocks/headline " . $block_attrs . " -->" . $escaped . "<!-- /wp:generateblocks/headline -->";
+			$out[]       = '<!-- wp:generateblocks/headline ' . $block_attrs . ' -->' . $escaped . '<!-- /wp:generateblocks/headline -->';
 		}
 		return implode( "\n", $out );
 	}

@@ -31,13 +31,13 @@ final class Input_Artifact_Schema_Test extends TestCase {
 	public function test_valid_artifact_has_all_required_root_keys(): void {
 		$artifact = array(
 			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'art_001',
-			Input_Artifact_Schema::ROOT_SCHEMA_VERSION => '1.0',
-			Input_Artifact_Schema::ROOT_CREATED_AT     => '2025-07-15T12:00:00Z',
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION  => '1.0',
+			Input_Artifact_Schema::ROOT_CREATED_AT      => '2025-07-15T12:00:00Z',
 			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array(
 				Input_Artifact_Schema::PROMPT_PACK_REF_INTERNAL_KEY => 'aio/build-plan-draft',
 				Input_Artifact_Schema::PROMPT_PACK_REF_VERSION       => '1.0.0',
 			),
-			Input_Artifact_Schema::ROOT_REDACTION => array(
+			Input_Artifact_Schema::ROOT_REDACTION       => array(
 				Input_Artifact_Schema::REDACTION_APPLIED => true,
 			),
 		);
@@ -58,7 +58,7 @@ final class Input_Artifact_Schema_Test extends TestCase {
 	}
 
 	public function test_find_prohibited_keys_in_array(): void {
-		$data = array(
+		$data  = array(
 			'artifact_id' => 'art_1',
 			'profile'     => array(
 				'source'  => 'payload',
@@ -74,9 +74,12 @@ final class Input_Artifact_Schema_Test extends TestCase {
 	}
 
 	public function test_find_prohibited_keys_returns_empty_when_clean(): void {
-		$data = array(
+		$data  = array(
 			'artifact_id' => 'art_1',
-			'profile'     => array( 'source' => 'snapshot_ref', 'snapshot_id' => 's1' ),
+			'profile'     => array(
+				'source'      => 'snapshot_ref',
+				'snapshot_id' => 's1',
+			),
 			'redaction'   => array( 'redaction_applied' => true ),
 		);
 		$found = Input_Artifact_Schema::find_prohibited_keys_in_array( $data );
@@ -94,10 +97,10 @@ final class Input_Artifact_Schema_Test extends TestCase {
 
 	public function test_valid_attachment_entry_has_required_keys(): void {
 		$entry = array(
-			Input_Artifact_Schema::ATTACHMENT_FILE_ID          => 'att_1',
-			Input_Artifact_Schema::ATTACHMENT_FILE_TYPE        => 'image/png',
-			Input_Artifact_Schema::ATTACHMENT_SOURCE_CATEGORY  => Input_Artifact_Schema::SOURCE_CATEGORY_PROFILE_ASSET,
-			Input_Artifact_Schema::ATTACHMENT_PURPOSE          => 'Logo',
+			Input_Artifact_Schema::ATTACHMENT_FILE_ID   => 'att_1',
+			Input_Artifact_Schema::ATTACHMENT_FILE_TYPE => 'image/png',
+			Input_Artifact_Schema::ATTACHMENT_SOURCE_CATEGORY => Input_Artifact_Schema::SOURCE_CATEGORY_PROFILE_ASSET,
+			Input_Artifact_Schema::ATTACHMENT_PURPOSE   => 'Logo',
 			Input_Artifact_Schema::ATTACHMENT_REDACTION_STATUS => Input_Artifact_Schema::REDACTION_STATUS_NONE,
 			Input_Artifact_Schema::ATTACHMENT_ATTACHMENT_STATUS => Input_Artifact_Schema::ATTACHMENT_STATUS_ATTACHED,
 		);
@@ -109,9 +112,9 @@ final class Input_Artifact_Schema_Test extends TestCase {
 	public function test_invalid_artifact_missing_redaction_rejected(): void {
 		$artifact = array(
 			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'art_bad',
-			Input_Artifact_Schema::ROOT_SCHEMA_VERSION   => '1.0',
-			Input_Artifact_Schema::ROOT_CREATED_AT       => '2025-07-15T12:00:00Z',
-			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF  => array(
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION  => '1.0',
+			Input_Artifact_Schema::ROOT_CREATED_AT      => '2025-07-15T12:00:00Z',
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array(
 				Input_Artifact_Schema::PROMPT_PACK_REF_INTERNAL_KEY => 'aio/test',
 				Input_Artifact_Schema::PROMPT_PACK_REF_VERSION       => '1.0.0',
 			),

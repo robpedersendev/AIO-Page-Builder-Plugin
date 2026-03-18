@@ -42,16 +42,16 @@ final class Rollback_Eligibility_Service {
 	/**
 	 * Evaluates whether the action identified by pre/post snapshots is eligible for rollback.
 	 *
-	 * @param string $pre_snapshot_id  Pre-change snapshot ID.
-	 * @param string $post_snapshot_id Post-change snapshot ID.
+	 * @param string               $pre_snapshot_id  Pre-change snapshot ID.
+	 * @param string               $post_snapshot_id Post-change snapshot ID.
 	 * @param array<string, mixed> $options Optional: skip_permission_check (bool), user_id (int).
 	 * @return Rollback_Eligibility_Result
 	 */
 	public function evaluate( string $pre_snapshot_id, string $post_snapshot_id, array $options = array() ): Rollback_Eligibility_Result {
 		$pre_snapshot_id  = trim( $pre_snapshot_id );
 		$post_snapshot_id = trim( $post_snapshot_id );
-		$skip_permission = ! empty( $options['skip_permission_check'] );
-		$required_cap    = Capabilities::EXECUTE_ROLLBACKS;
+		$skip_permission  = ! empty( $options['skip_permission_check'] );
+		$required_cap     = Capabilities::EXECUTE_ROLLBACKS;
 
 		$pre = $this->repository->get_by_id( $pre_snapshot_id );
 		if ( $pre === null ) {
@@ -85,7 +85,7 @@ final class Rollback_Eligibility_Service {
 
 		$execution_ref = (string) ( $post[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? $pre[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? '' );
 
-		$pre_type = isset( $pre[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] ) ? (string) $pre[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] : '';
+		$pre_type  = isset( $pre[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] ) ? (string) $pre[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] : '';
 		$post_type = isset( $post[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] ) ? (string) $post[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] : '';
 		if ( $pre_type !== Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE ) {
 			return Rollback_Eligibility_Result::ineligible(

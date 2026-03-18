@@ -44,18 +44,18 @@ final class Global_Style_Settings_Repository {
 		if ( ! is_array( $raw ) ) {
 			return Global_Style_Settings_Schema::get_defaults();
 		}
-		$version = isset( $raw[ Global_Style_Settings_Schema::KEY_VERSION ] ) && is_string( $raw[ Global_Style_Settings_Schema::KEY_VERSION ] )
+		$version   = isset( $raw[ Global_Style_Settings_Schema::KEY_VERSION ] ) && is_string( $raw[ Global_Style_Settings_Schema::KEY_VERSION ] )
 			? $raw[ Global_Style_Settings_Schema::KEY_VERSION ]
 			: Global_Style_Settings_Schema::SCHEMA_VERSION;
-		$tokens = isset( $raw[ Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS ] ) && is_array( $raw[ Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS ] )
+		$tokens    = isset( $raw[ Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS ] ) && is_array( $raw[ Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS ] )
 			? $raw[ Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS ]
 			: array();
 		$overrides = isset( $raw[ Global_Style_Settings_Schema::KEY_GLOBAL_COMPONENT_OVERRIDES ] ) && is_array( $raw[ Global_Style_Settings_Schema::KEY_GLOBAL_COMPONENT_OVERRIDES ] )
 			? $raw[ Global_Style_Settings_Schema::KEY_GLOBAL_COMPONENT_OVERRIDES ]
 			: array();
 		return array(
-			Global_Style_Settings_Schema::KEY_VERSION                   => $version,
-			Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS             => $tokens,
+			Global_Style_Settings_Schema::KEY_VERSION => $version,
+			Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS => $tokens,
 			Global_Style_Settings_Schema::KEY_GLOBAL_COMPONENT_OVERRIDES => $overrides,
 		);
 	}
@@ -137,7 +137,7 @@ final class Global_Style_Settings_Repository {
 	 * @return array<string, array<string, string>>
 	 */
 	public function get_global_component_overrides(): array {
-		$full     = $this->get_full();
+		$full      = $this->get_full();
 		$overrides = $full[ Global_Style_Settings_Schema::KEY_GLOBAL_COMPONENT_OVERRIDES ] ?? array();
 		if ( ! is_array( $overrides ) ) {
 			return array();
@@ -215,9 +215,9 @@ final class Global_Style_Settings_Repository {
 				if ( ! is_string( $group ) || ! is_array( $names ) ) {
 					continue;
 				}
-				$allowed = $this->token_registry->get_allowed_names_for_group( $group );
-				$san     = $this->token_registry->get_sanitization_for_group( $group );
-				$cap     = isset( $san['max_length'] ) && is_numeric( $san['max_length'] ) ? (int) $san['max_length'] : $max_len;
+				$allowed       = $this->token_registry->get_allowed_names_for_group( $group );
+				$san           = $this->token_registry->get_sanitization_for_group( $group );
+				$cap           = isset( $san['max_length'] ) && is_numeric( $san['max_length'] ) ? (int) $san['max_length'] : $max_len;
 				$out[ $group ] = array();
 				foreach ( $names as $name => $value ) {
 					if ( is_string( $name ) && in_array( $name, $allowed, true ) && is_string( $value ) ) {

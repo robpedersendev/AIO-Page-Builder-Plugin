@@ -30,10 +30,14 @@ require_once $plugin_root . '/src/Domain/Storage/Migrations/Schema_Version_Track
  * Stub migration: applies when current is "0", moves to "1".
  */
 final class Stub_Migration_Table_0_To_1 implements Migration_Contract {
-	public function id(): string { return 'table_schema_0_to_1'; }
-	public function version_key(): string { return 'table_schema'; }
-	public function from_version(): string { return '0'; }
-	public function to_version(): string { return '1'; }
+	public function id(): string {
+		return 'table_schema_0_to_1'; }
+	public function version_key(): string {
+		return 'table_schema'; }
+	public function from_version(): string {
+		return '0'; }
+	public function to_version(): string {
+		return '1'; }
 	public function applies_to( string $current_installed_version ): bool {
 		return $current_installed_version === '0';
 	}
@@ -53,8 +57,8 @@ final class Schema_Version_Tracker_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_test_options'] = array();
-		$this->settings = new Settings_Service();
-		$this->tracker  = new Schema_Version_Tracker( $this->settings );
+		$this->settings               = new Settings_Service();
+		$this->tracker                = new Schema_Version_Tracker( $this->settings );
 	}
 
 	protected function tearDown(): void {

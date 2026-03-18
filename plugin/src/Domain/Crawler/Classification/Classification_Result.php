@@ -90,12 +90,12 @@ final class Classification_Result {
 	public $content_hash;
 
 	/**
-	 * @param string       $classification   One of CLASSIFICATION_*.
-	 * @param list<string> $reason_codes     Reason codes.
-	 * @param string|null  $duplicate_of     Duplicate target URL when classification is duplicate.
+	 * @param string                  $classification   One of CLASSIFICATION_*.
+	 * @param list<string>            $reason_codes     Reason codes.
+	 * @param string|null             $duplicate_of     Duplicate target URL when classification is duplicate.
 	 * @param array<string, bool|int> $meaningful_flags Optional flags (has_h1, word_count, in_nav, etc.).
-	 * @param string       $retention_decision One of RETENTION_*.
-	 * @param string|null  $content_hash       Optional content hash for snapshot storage.
+	 * @param string                  $retention_decision One of RETENTION_*.
+	 * @param string|null             $content_hash       Optional content hash for snapshot storage.
 	 */
 	public function __construct(
 		string $classification,

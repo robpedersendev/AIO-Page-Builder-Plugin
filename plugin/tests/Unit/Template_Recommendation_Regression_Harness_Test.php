@@ -26,22 +26,25 @@ final class Template_Recommendation_Regression_Harness_Test extends TestCase {
 
 	private function golden_fixture(): array {
 		return array(
-			'case_id'         => 'golden-top-level',
-			'scenario'        => 'top_level',
-			'fixture_version' => '1',
-			'recommendation'  => array(
-				'template_key'             => 'pt_home_marketing_01',
+			'case_id'           => 'golden-top-level',
+			'scenario'          => 'top_level',
+			'fixture_version'   => '1',
+			'recommendation'    => array(
+				'template_key'              => 'pt_home_marketing_01',
 				'template_category_class'   => 'top_level',
 				'template_family'           => 'home',
 				'template_selection_reason' => 'Home page for main landing.',
 			),
-			'expected'        => array(
+			'expected'          => array(
 				'template_category_class'   => 'top_level',
 				'allowed_template_families' => array( 'home', 'about', 'contact' ),
-				'cta_law_aligned'          => true,
+				'cta_law_aligned'           => true,
 				'require_explanation'       => true,
 			),
-			'template_metadata' => array( 'min_cta' => 3, 'last_section_cta' => true ),
+			'template_metadata' => array(
+				'min_cta'          => 3,
+				'last_section_cta' => true,
+			),
 		);
 	}
 
@@ -71,30 +74,36 @@ final class Template_Recommendation_Regression_Harness_Test extends TestCase {
 	}
 
 	public function test_family_fit_fail(): void {
-		$fixture = $this->golden_fixture();
+		$fixture                                      = $this->golden_fixture();
 		$fixture['recommendation']['template_family'] = 'unknown_family';
-		$harness = $this->harness();
-		$result  = $harness->run_from_array( $fixture );
+		$harness                                      = $this->harness();
+		$result                                       = $harness->run_from_array( $fixture );
 		$this->assertSame( Template_Recommendation_Regression_Result::OUTCOME_REGRESSION, $result->get_outcome() );
 		$this->assertFalse( $result->get_family_fit() );
 		$this->assertArrayHasKey( 'family_mismatch', $result->get_details() );
 	}
 
 	public function test_cta_law_aligned_with_metadata_compliant(): void {
-		$fixture = $this->golden_fixture();
-		$fixture['template_metadata'] = array( 'min_cta' => 4, 'last_section_cta' => true );
-		$harness = $this->harness();
-		$result  = $harness->run_from_array( $fixture );
+		$fixture                      = $this->golden_fixture();
+		$fixture['template_metadata'] = array(
+			'min_cta'          => 4,
+			'last_section_cta' => true,
+		);
+		$harness                      = $this->harness();
+		$result                       = $harness->run_from_array( $fixture );
 		$this->assertTrue( $result->is_pass(), $result->get_message() );
 		$this->assertTrue( $result->get_cta_law_aligned() );
 	}
 
 	public function test_cta_law_aligned_with_metadata_non_compliant(): void {
-		$fixture = $this->golden_fixture();
+		$fixture                                = $this->golden_fixture();
 		$fixture['expected']['cta_law_aligned'] = true;
-		$fixture['template_metadata']          = array( 'min_cta' => 2, 'last_section_cta' => true );
-		$harness = $this->harness();
-		$result  = $harness->run_from_array( $fixture );
+		$fixture['template_metadata']           = array(
+			'min_cta'          => 2,
+			'last_section_cta' => true,
+		);
+		$harness                                = $this->harness();
+		$result                                 = $harness->run_from_array( $fixture );
 		$this->assertSame( Template_Recommendation_Regression_Result::OUTCOME_REGRESSION, $result->get_outcome() );
 		$this->assertFalse( $result->get_cta_law_aligned() );
 		$this->assertArrayHasKey( 'cta_law', $result->get_details() );
@@ -126,17 +135,17 @@ final class Template_Recommendation_Regression_Harness_Test extends TestCase {
 	}
 
 	public function test_recommendation_normalized_from_proposed_template_summary(): void {
-		$fixture = $this->golden_fixture();
+		$fixture                   = $this->golden_fixture();
 		$fixture['recommendation'] = array(
-			'template_selection_reason'   => 'Reason at top level.',
-			'proposed_template_summary'   => array(
-				'template_key'           => 'pt_home_marketing_01',
+			'template_selection_reason' => 'Reason at top level.',
+			'proposed_template_summary' => array(
+				'template_key'            => 'pt_home_marketing_01',
 				'template_category_class' => 'top_level',
 				'template_family'         => 'home',
 			),
 		);
-		$harness = $this->harness();
-		$result  = $harness->run_from_array( $fixture );
+		$harness                   = $this->harness();
+		$result                    = $harness->run_from_array( $fixture );
 		$this->assertTrue( $result->is_pass(), $result->get_message() );
 		$this->assertTrue( $result->get_class_fit() );
 		$this->assertTrue( $result->get_family_fit() );

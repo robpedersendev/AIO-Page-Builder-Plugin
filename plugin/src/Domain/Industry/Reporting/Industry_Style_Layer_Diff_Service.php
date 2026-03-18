@@ -48,54 +48,54 @@ final class Industry_Style_Layer_Diff_Service {
 		?Industry_Style_Preset_Registry $preset_registry = null,
 		?Goal_Style_Preset_Overlay_Registry $overlay_registry = null
 	) {
-		$this->preset_registry = $preset_registry;
+		$this->preset_registry  = $preset_registry;
 		$this->overlay_registry = $overlay_registry;
 	}
 
 	/**
 	 * Builds comparison for one preset: parent, optional goal overlay, combined, and diff rows.
 	 *
-	 * @param string      $preset_key Industry style_preset_key.
-	 * @param string      $goal_key   Conversion goal key (empty to skip goal layer).
+	 * @param string $preset_key Industry style_preset_key.
+	 * @param string $goal_key   Conversion goal key (empty to skip goal layer).
 	 * @return array{parent: array<string, mixed>, subtype: array<string, mixed>|null, goal: array<string, mixed>|null, combined: array<string, mixed>, token_diff_rows: list<array<string, mixed>>, component_diff_rows: list<array<string, mixed>>}
 	 */
 	public function compare( string $preset_key, string $goal_key = '' ): array {
-		$parent  = array(
-			'preset_key'   => $preset_key,
-			'label'        => '',
-			'token_values' => array(),
+		$parent   = array(
+			'preset_key'              => $preset_key,
+			'label'                   => '',
+			'token_values'            => array(),
 			'component_override_refs' => array(),
-			'present'      => false,
+			'present'                 => false,
 		);
-		$subtype = null;
-		$goal    = array(
-			'goal_preset_key' => '',
-			'goal_key'        => $goal_key,
-			'token_values'    => array(),
+		$subtype  = null;
+		$goal     = array(
+			'goal_preset_key'         => '',
+			'goal_key'                => $goal_key,
+			'token_values'            => array(),
 			'component_override_refs' => array(),
-			'present'         => false,
+			'present'                 => false,
 		);
 		$combined = array(
-			'token_values' => array(),
+			'token_values'            => array(),
 			'component_override_refs' => array(),
 		);
 
 		if ( $this->preset_registry !== null && $preset_key !== '' ) {
 			$preset = $this->preset_registry->get( trim( $preset_key ) );
 			if ( $preset !== null ) {
-				$parent['present'] = true;
-				$parent['label']   = (string) ( $preset[ Industry_Style_Preset_Registry::FIELD_LABEL ] ?? $preset_key );
-				$parent['token_values'] = $this->normalize_token_values( $preset[ Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES ] ?? array() );
+				$parent['present']                 = true;
+				$parent['label']                   = (string) ( $preset[ Industry_Style_Preset_Registry::FIELD_LABEL ] ?? $preset_key );
+				$parent['token_values']            = $this->normalize_token_values( $preset[ Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES ] ?? array() );
 				$parent['component_override_refs'] = $this->normalize_component_refs( $preset[ Industry_Style_Preset_Registry::FIELD_COMPONENT_OVERRIDE_REFS ] ?? array() );
 			}
 		}
 
-		$combined['token_values'] = $parent['token_values'];
+		$combined['token_values']            = $parent['token_values'];
 		$combined['component_override_refs'] = $parent['component_override_refs'];
 
 		if ( $this->overlay_registry !== null && $goal_key !== '' && $parent['present'] ) {
-			$overlays = $this->overlay_registry->get_overlays_for_preset( trim( $preset_key ) );
-			$match    = null;
+			$overlays  = $this->overlay_registry->get_overlays_for_preset( trim( $preset_key ) );
+			$match     = null;
 			$goal_trim = trim( $goal_key );
 			foreach ( $overlays as $ov ) {
 				$gk = isset( $ov[ Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY ] ) && is_string( $ov[ Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY ] )
@@ -107,11 +107,11 @@ final class Industry_Style_Layer_Diff_Service {
 				}
 			}
 			if ( $match !== null ) {
-				$goal['present'] = true;
-				$goal['goal_preset_key'] = (string) ( $match[ Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY ] ?? '' );
-				$goal['token_values'] = $this->normalize_token_values( $match[ Goal_Style_Preset_Overlay_Registry::FIELD_TOKEN_VALUES ] ?? array() );
-				$goal['component_override_refs'] = $this->normalize_component_refs( $match[ Goal_Style_Preset_Overlay_Registry::FIELD_COMPONENT_OVERRIDE_REFS ] ?? array() );
-				$combined['token_values'] = array_merge( $parent['token_values'], $goal['token_values'] );
+				$goal['present']                     = true;
+				$goal['goal_preset_key']             = (string) ( $match[ Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY ] ?? '' );
+				$goal['token_values']                = $this->normalize_token_values( $match[ Goal_Style_Preset_Overlay_Registry::FIELD_TOKEN_VALUES ] ?? array() );
+				$goal['component_override_refs']     = $this->normalize_component_refs( $match[ Goal_Style_Preset_Overlay_Registry::FIELD_COMPONENT_OVERRIDE_REFS ] ?? array() );
+				$combined['token_values']            = array_merge( $parent['token_values'], $goal['token_values'] );
 				$combined['component_override_refs'] = array_values( array_unique( array_merge( $parent['component_override_refs'], $goal['component_override_refs'] ) ) );
 			}
 		}
@@ -120,11 +120,11 @@ final class Industry_Style_Layer_Diff_Service {
 		$component_diff_rows = $this->build_component_diff_rows( $parent, $goal, $combined );
 
 		return array(
-			self::RESULT_PARENT             => $parent,
-			self::RESULT_SUBTYPE            => $subtype,
-			self::RESULT_GOAL               => $goal,
-			self::RESULT_COMBINED           => $combined,
-			self::RESULT_TOKEN_DIFF_ROWS    => $token_diff_rows,
+			self::RESULT_PARENT              => $parent,
+			self::RESULT_SUBTYPE             => $subtype,
+			self::RESULT_GOAL                => $goal,
+			self::RESULT_COMBINED            => $combined,
+			self::RESULT_TOKEN_DIFF_ROWS     => $token_diff_rows,
 			self::RESULT_COMPONENT_DIFF_ROWS => $component_diff_rows,
 		);
 	}
@@ -184,11 +184,11 @@ final class Industry_Style_Layer_Diff_Service {
 		sort( $all_keys );
 		$rows = array();
 		foreach ( $all_keys as $token_key ) {
-			$p = $parent['token_values'][ $token_key ] ?? '';
-			$g = $goal['token_values'][ $token_key ] ?? '';
-			$c = $combined['token_values'][ $token_key ] ?? '';
+			$p       = $parent['token_values'][ $token_key ] ?? '';
+			$g       = $goal['token_values'][ $token_key ] ?? '';
+			$c       = $combined['token_values'][ $token_key ] ?? '';
 			$changed = ( $p !== $c ) || ( $g !== '' && $g !== $p );
-			$rows[] = array(
+			$rows[]  = array(
 				'token_key' => $token_key,
 				'parent'    => $p,
 				'goal'      => $g,
@@ -218,16 +218,16 @@ final class Industry_Style_Layer_Diff_Service {
 			}
 		}
 		sort( $all_refs );
-		$rows = array();
-		$parent_set = array_flip( $parent['component_override_refs'] );
-		$goal_set   = array_flip( $goal['component_override_refs'] );
+		$rows         = array();
+		$parent_set   = array_flip( $parent['component_override_refs'] );
+		$goal_set     = array_flip( $goal['component_override_refs'] );
 		$combined_set = array_flip( $combined['component_override_refs'] );
 		foreach ( $all_refs as $ref ) {
-			$p = isset( $parent_set[ $ref ] );
-			$g = isset( $goal_set[ $ref ] );
-			$c = isset( $combined_set[ $ref ] );
+			$p       = isset( $parent_set[ $ref ] );
+			$g       = isset( $goal_set[ $ref ] );
+			$c       = isset( $combined_set[ $ref ] );
 			$changed = $g; // Goal overlay adds or contributes this ref.
-			$rows[] = array(
+			$rows[]  = array(
 				'ref'      => $ref,
 				'parent'   => $p,
 				'goal'     => $g,

@@ -31,10 +31,10 @@ final class Future_Industry_Scorecard_Executor {
 		'long_term_maintenance_cost',
 	);
 
-	private const DEFAULT_GO_THRESHOLD   = 40;
+	private const DEFAULT_GO_THRESHOLD    = 40;
 	private const DEFAULT_NO_GO_THRESHOLD = 25;
-	private const MIN_DIMENSION          = 2;
-	private const NO_GO_DIMENSIONS       = array( 'template_overlap', 'long_term_maintenance_cost' );
+	private const MIN_DIMENSION           = 2;
+	private const NO_GO_DIMENSIONS        = array( 'template_overlap', 'long_term_maintenance_cost' );
 
 	/** @var int */
 	private $go_threshold;
@@ -43,7 +43,7 @@ final class Future_Industry_Scorecard_Executor {
 	private $no_go_threshold;
 
 	public function __construct( ?int $go_threshold = null, ?int $no_go_threshold = null ) {
-		$this->go_threshold   = $go_threshold ?? self::DEFAULT_GO_THRESHOLD;
+		$this->go_threshold    = $go_threshold ?? self::DEFAULT_GO_THRESHOLD;
 		$this->no_go_threshold = $no_go_threshold ?? self::DEFAULT_NO_GO_THRESHOLD;
 	}
 
@@ -63,31 +63,31 @@ final class Future_Industry_Scorecard_Executor {
 	 * }
 	 */
 	public function execute( array $dossier ): array {
-		$identity = isset( $dossier['candidate_identity'] ) && is_array( $dossier['candidate_identity'] )
+		$identity        = isset( $dossier['candidate_identity'] ) && is_array( $dossier['candidate_identity'] )
 			? $dossier['candidate_identity']
 			: array();
 		$candidate_label = isset( $identity['candidate_label'] ) && is_string( $identity['candidate_label'] )
 			? trim( $identity['candidate_label'] )
 			: 'Unknown';
-		$proposed_key = isset( $identity['proposed_industry_key'] ) && is_string( $identity['proposed_industry_key'] )
+		$proposed_key    = isset( $identity['proposed_industry_key'] ) && is_string( $identity['proposed_industry_key'] )
 			? trim( $identity['proposed_industry_key'] )
 			: '';
 
-		$scores = $this->resolve_dimension_scores( $dossier );
-		$aggregate = array_sum( $scores );
-		$risks = $this->collect_major_risks( $scores, $dossier );
+		$scores         = $this->resolve_dimension_scores( $dossier );
+		$aggregate      = array_sum( $scores );
+		$risks          = $this->collect_major_risks( $scores, $dossier );
 		$recommendation = $this->derive_recommendation( $scores, $aggregate, $risks );
-		$summary = $this->build_summary_text( $candidate_label, $aggregate, $recommendation, $risks );
+		$summary        = $this->build_summary_text( $candidate_label, $aggregate, $recommendation, $risks );
 
 		return array(
-			'candidate_label'   => $candidate_label,
+			'candidate_label'       => $candidate_label,
 			'proposed_industry_key' => $proposed_key,
-			'evaluated_at'      => gmdate( 'c' ),
-			'dimension_scores'   => $scores,
-			'aggregate_sum'     => $aggregate,
-			'major_risks'       => $risks,
-			'recommendation'    => $recommendation,
-			'summary_text'      => $summary,
+			'evaluated_at'          => gmdate( 'c' ),
+			'dimension_scores'      => $scores,
+			'aggregate_sum'         => $aggregate,
+			'major_risks'           => $risks,
+			'recommendation'        => $recommendation,
+			'summary_text'          => $summary,
 		);
 	}
 
@@ -105,7 +105,7 @@ final class Future_Industry_Scorecard_Executor {
 		if ( $prefilled !== null && $this->has_all_dimensions( $prefilled ) ) {
 			$out = array();
 			foreach ( self::DIMENSIONS as $dim ) {
-				$v = isset( $prefilled[ $dim ] ) ? (int) $prefilled[ $dim ] : 3;
+				$v           = isset( $prefilled[ $dim ] ) ? (int) $prefilled[ $dim ] : 3;
 				$out[ $dim ] = $this->clamp_score( $v );
 			}
 			return $out;
@@ -149,13 +149,13 @@ final class Future_Industry_Scorecard_Executor {
 		if ( isset( $dossier['template_overlap'] ) && is_array( $dossier['template_overlap'] ) ) {
 			$overlap = $dossier['template_overlap'];
 			if ( isset( $overlap['overlap_score'] ) && is_numeric( $overlap['overlap_score'] ) ) {
-				$s = (float) $overlap['overlap_score'];
+				$s                          = (float) $overlap['overlap_score'];
 				$scores['template_overlap'] = $this->clamp_score( (int) round( 1 + $s * 4 ) );
 			}
 			$weak = isset( $overlap['weak_coverage_families'] ) && is_array( $overlap['weak_coverage_families'] )
 				? count( $overlap['weak_coverage_families'] ) : 0;
 			if ( $weak > 5 && $scores['template_overlap'] > 2 ) {
-				$scores['template_overlap']--;
+				--$scores['template_overlap'];
 			}
 		}
 
@@ -227,7 +227,7 @@ final class Future_Industry_Scorecard_Executor {
 	/**
 	 * Collects major risks from scores and dossier.
 	 *
-	 * @param array<string, int> $scores
+	 * @param array<string, int>   $scores
 	 * @param array<string, mixed> $dossier
 	 * @return list<string>
 	 */

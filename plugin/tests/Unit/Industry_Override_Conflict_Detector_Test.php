@@ -30,12 +30,15 @@ final class Industry_Override_Conflict_Detector_Test extends TestCase {
 	public function test_detect_empty_when_no_overrides(): void {
 		$read_model = new Industry_Override_Read_Model_Builder();
 		$stub_repo  = new class() implements Build_Plan_Repository_Interface {
-			public function get_by_key( string $key ): ?array { return null; }
-			public function get_plan_definition( int $post_id ): array { return array(); }
-			public function save_plan_definition( int $post_id, array $definition ): bool { return false; }
+			public function get_by_key( string $key ): ?array {
+				return null; }
+			public function get_plan_definition( int $post_id ): array {
+				return array(); }
+			public function save_plan_definition( int $post_id, array $definition ): bool {
+				return false; }
 		};
-		$detector = new Industry_Override_Conflict_Detector( $read_model, $stub_repo );
-		$results  = $detector->detect();
+		$detector   = new Industry_Override_Conflict_Detector( $read_model, $stub_repo );
+		$results    = $detector->detect();
 		$this->assertIsArray( $results );
 		$this->assertCount( 0, $results );
 	}
@@ -46,12 +49,15 @@ final class Industry_Override_Conflict_Detector_Test extends TestCase {
 		$plan_service->record_override( 'non-existent-plan-id', 'item_1', Industry_Override_Schema::STATE_ACCEPTED, 'Test' );
 		$read_model = new Industry_Override_Read_Model_Builder( null, null, $plan_service );
 		$stub_repo  = new class() implements Build_Plan_Repository_Interface {
-			public function get_by_key( string $key ): ?array { return null; }
-			public function get_plan_definition( int $post_id ): array { return array(); }
-			public function save_plan_definition( int $post_id, array $definition ): bool { return false; }
+			public function get_by_key( string $key ): ?array {
+				return null; }
+			public function get_plan_definition( int $post_id ): array {
+				return array(); }
+			public function save_plan_definition( int $post_id, array $definition ): bool {
+				return false; }
 		};
-		$detector = new Industry_Override_Conflict_Detector( $read_model, $stub_repo );
-		$results  = $detector->detect();
+		$detector   = new Industry_Override_Conflict_Detector( $read_model, $stub_repo );
+		$results    = $detector->detect();
 		$this->assertCount( 1, $results );
 		$this->assertSame( Industry_Override_Conflict_Detector::CONFLICT_TYPE_MISSING_TARGET, $results[0]['conflict_type'] );
 		$this->assertSame( Industry_Override_Conflict_Detector::SEVERITY_WARNING, $results[0]['severity'] );

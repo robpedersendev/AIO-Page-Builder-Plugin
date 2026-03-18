@@ -34,7 +34,7 @@ final class Builtin_Goal_Page_OnePager_Overlays {
 			$dir . '/valuations-goal-onepager.php',
 			$dir . '/lead-capture-goal-onepager.php',
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $files as $path ) {
 			if ( ! is_readable( $path ) ) {
 				continue;

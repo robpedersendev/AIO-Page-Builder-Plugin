@@ -50,19 +50,22 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 				Build_Plan_Item_Schema::KEY_STEP_TYPE => 'existing_page_changes',
 				Build_Plan_Item_Schema::KEY_TITLE     => 'Step 1',
 				Build_Plan_Item_Schema::KEY_ORDER     => 1,
-				Build_Plan_Item_Schema::KEY_ITEMS     => array_map( function ( $s ) {
-					return array(
-						Build_Plan_Item_Schema::KEY_ITEM_ID   => 'item-' . uniqid( '', true ),
-						Build_Plan_Item_Schema::KEY_ITEM_TYPE => 'existing_page_change',
-						Build_Plan_Item_Schema::KEY_STATUS     => $s,
-						Build_Plan_Item_Schema::KEY_PAYLOAD   => array(),
-					);
-				}, $items_with_status ),
+				Build_Plan_Item_Schema::KEY_ITEMS     => array_map(
+					function ( $s ) {
+						return array(
+							Build_Plan_Item_Schema::KEY_ITEM_ID => 'item-' . uniqid( '', true ),
+							Build_Plan_Item_Schema::KEY_ITEM_TYPE => 'existing_page_change',
+							Build_Plan_Item_Schema::KEY_STATUS => $s,
+							Build_Plan_Item_Schema::KEY_PAYLOAD => array(),
+						);
+					},
+					$items_with_status
+				),
 			),
 		);
 		return array(
-			'id'          => 1,
-			'post_date'   => $post_date,
+			'id'                           => 1,
+			'post_date'                    => $post_date,
 			Build_Plan_Schema::KEY_PLAN_ID => 'plan-' . uniqid( '', true ),
 			Build_Plan_Schema::KEY_STATUS  => $root_status,
 			Build_Plan_Schema::KEY_STEPS   => $steps,
@@ -70,13 +73,13 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 	}
 
 	public function test_plan_review_trends_aggregates_by_root_status(): void {
-		$plans = array(
+		$plans  = array(
 			$this->make_plan( '2025-03-01 10:00:00', Build_Plan_Statuses::ROOT_APPROVED, array( 'approved' ) ),
 			$this->make_plan( '2025-03-02 10:00:00', Build_Plan_Statuses::ROOT_REJECTED, array( 'rejected' ) ),
 			$this->make_plan( '2025-03-03 10:00:00', Build_Plan_Statuses::ROOT_PENDING_REVIEW, array( 'pending' ) ),
 		);
-		$repo = new Build_Plan_Analytics_Stub_Repository( $plans );
-		$svc  = new Build_Plan_Analytics_Service( $repo );
+		$repo   = new Build_Plan_Analytics_Stub_Repository( $plans );
+		$svc    = new Build_Plan_Analytics_Service( $repo );
 		$trends = $svc->get_plan_review_trends( null, null );
 		$this->assertSame( 3, $trends['total_plans'] );
 		$this->assertSame( 1, $trends['approval_count'] );
@@ -89,13 +92,13 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 	}
 
 	public function test_date_range_filtering_limits_plans(): void {
-		$plans = array(
+		$plans  = array(
 			$this->make_plan( '2025-03-01 10:00:00', Build_Plan_Statuses::ROOT_APPROVED, array() ),
 			$this->make_plan( '2025-03-15 10:00:00', Build_Plan_Statuses::ROOT_APPROVED, array() ),
 			$this->make_plan( '2025-03-30 10:00:00', Build_Plan_Statuses::ROOT_PENDING_REVIEW, array() ),
 		);
-		$repo = new Build_Plan_Analytics_Stub_Repository( $plans );
-		$svc  = new Build_Plan_Analytics_Service( $repo );
+		$repo   = new Build_Plan_Analytics_Stub_Repository( $plans );
+		$svc    = new Build_Plan_Analytics_Service( $repo );
 		$trends = $svc->get_plan_review_trends( '2025-03-10', '2025-03-20' );
 		$this->assertSame( 1, $trends['total_plans'] );
 		$this->assertSame( '2025-03-10', $trends['date_from'] );
@@ -103,11 +106,11 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 	}
 
 	public function test_common_blockers_groups_rejected_and_failed_by_item_type(): void {
-		$plans = array(
+		$plans    = array(
 			$this->make_plan( '2025-03-01 10:00:00', Build_Plan_Statuses::ROOT_COMPLETED, array( 'rejected', 'rejected', 'failed' ) ),
 		);
-		$repo = new Build_Plan_Analytics_Stub_Repository( $plans );
-		$svc  = new Build_Plan_Analytics_Service( $repo );
+		$repo     = new Build_Plan_Analytics_Stub_Repository( $plans );
+		$svc      = new Build_Plan_Analytics_Service( $repo );
 		$blockers = $svc->get_common_blockers( null, null, 10 );
 		$this->assertArrayHasKey( 'blockers', $blockers );
 		$this->assertSame( 2, $blockers['total_rejected'] );
@@ -118,11 +121,11 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 	}
 
 	public function test_execution_failure_trends_counts_failed_items_by_type(): void {
-		$plans = array(
+		$plans  = array(
 			$this->make_plan( '2025-03-01 10:00:00', Build_Plan_Statuses::ROOT_COMPLETED, array( 'failed', 'completed', 'failed' ) ),
 		);
-		$repo = new Build_Plan_Analytics_Stub_Repository( $plans );
-		$svc  = new Build_Plan_Analytics_Service( $repo );
+		$repo   = new Build_Plan_Analytics_Stub_Repository( $plans );
+		$svc    = new Build_Plan_Analytics_Service( $repo );
 		$trends = $svc->get_execution_failure_trends( null, null );
 		$this->assertSame( 2, $trends['total_failed_items'] );
 		$this->assertArrayHasKey( 'failures_by_item_type', $trends );
@@ -130,8 +133,8 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 	}
 
 	public function test_rollback_frequency_summary_returns_stable_structure(): void {
-		$repo = new Build_Plan_Analytics_Stub_Repository( array() );
-		$svc  = new Build_Plan_Analytics_Service( $repo );
+		$repo    = new Build_Plan_Analytics_Stub_Repository( array() );
+		$svc     = new Build_Plan_Analytics_Service( $repo );
 		$summary = $svc->get_rollback_frequency_summary( null, null );
 		$this->assertArrayHasKey( 'total_rollbacks', $summary );
 		$this->assertArrayHasKey( 'by_month', $summary );
@@ -141,10 +144,12 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 	}
 
 	public function test_analytics_summary_returns_redacted_payloads_no_raw_secrets(): void {
-		$repo = new Build_Plan_Analytics_Stub_Repository( array(
-			$this->make_plan( '2025-03-01 10:00:00', Build_Plan_Statuses::ROOT_APPROVED, array( 'approved' ) ),
-		) );
-		$svc    = new Build_Plan_Analytics_Service( $repo );
+		$repo    = new Build_Plan_Analytics_Stub_Repository(
+			array(
+				$this->make_plan( '2025-03-01 10:00:00', Build_Plan_Statuses::ROOT_APPROVED, array( 'approved' ) ),
+			)
+		);
+		$svc     = new Build_Plan_Analytics_Service( $repo );
 		$summary = $svc->get_analytics_summary( null, null );
 		$this->assertArrayHasKey( 'plan_review_trends', $summary );
 		$this->assertArrayHasKey( 'common_blockers', $summary );
@@ -161,14 +166,16 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 	 * Example analytics summary payload (spec §45, §49.11; Prompt 129). No pseudocode.
 	 */
 	public function test_example_analytics_summary_payload(): void {
-		$repo = new Build_Plan_Analytics_Stub_Repository( array(
-			$this->make_plan( '2025-03-01 10:00:00', Build_Plan_Statuses::ROOT_APPROVED, array( 'approved', 'completed' ) ),
-			$this->make_plan( '2025-03-02 10:00:00', Build_Plan_Statuses::ROOT_REJECTED, array( 'rejected' ) ),
-		) );
-		$svc    = new Build_Plan_Analytics_Service( $repo );
+		$repo    = new Build_Plan_Analytics_Stub_Repository(
+			array(
+				$this->make_plan( '2025-03-01 10:00:00', Build_Plan_Statuses::ROOT_APPROVED, array( 'approved', 'completed' ) ),
+				$this->make_plan( '2025-03-02 10:00:00', Build_Plan_Statuses::ROOT_REJECTED, array( 'rejected' ) ),
+			)
+		);
+		$svc     = new Build_Plan_Analytics_Service( $repo );
 		$summary = $svc->get_analytics_summary( '2025-03-01', '2025-03-31' );
 		$example = array(
-			'plan_review_trends' => array(
+			'plan_review_trends'         => array(
 				'total_plans'     => 2,
 				'by_status'       => array(
 					'pending_review' => 0,
@@ -185,18 +192,23 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 				'date_from'       => '2025-03-01',
 				'date_to'         => '2025-03-31',
 			),
-			'common_blockers' => array(
-				'blockers'        => array( array( 'category' => 'existing_page_change', 'count' => 1 ) ),
-				'total_rejected'  => 1,
-				'total_failed'    => 0,
-				'date_from'       => '2025-03-01',
-				'date_to'         => '2025-03-31',
+			'common_blockers'            => array(
+				'blockers'       => array(
+					array(
+						'category' => 'existing_page_change',
+						'count'    => 1,
+					),
+				),
+				'total_rejected' => 1,
+				'total_failed'   => 0,
+				'date_from'      => '2025-03-01',
+				'date_to'        => '2025-03-31',
 			),
-			'execution_failure_trends' => array(
+			'execution_failure_trends'   => array(
 				'failures_by_item_type' => array(),
 				'total_failed_items'    => 0,
-				'date_from'            => '2025-03-01',
-				'date_to'              => '2025-03-31',
+				'date_from'             => '2025-03-01',
+				'date_to'               => '2025-03-31',
 			),
 			'rollback_frequency_summary' => array(
 				'total_rollbacks' => 0,

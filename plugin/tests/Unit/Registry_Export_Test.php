@@ -42,8 +42,8 @@ final class Registry_Export_Test extends TestCase {
 
 	public function test_deterministic_serialization_section(): void {
 		$section = Registry_Fixture_Builder::section();
-		$f1 = Registry_Export_Fragment_Builder::for_section( $section );
-		$f2 = Registry_Export_Fragment_Builder::for_section( $section );
+		$f1      = Registry_Export_Fragment_Builder::for_section( $section );
+		$f2      = Registry_Export_Fragment_Builder::for_section( $section );
 		$this->assertSame( json_encode( $f1 ), json_encode( $f2 ) );
 		$this->assertSame( Registry_Fixture_Builder::FIXTURE_SECTION_KEY, $f1[ Registry_Export_Fragment_Builder::KEY_OBJECT_KEY ] );
 		$this->assertSame( 'section_template', $f1[ Registry_Export_Fragment_Builder::KEY_OBJECT_TYPE ] );
@@ -51,13 +51,17 @@ final class Registry_Export_Test extends TestCase {
 
 	public function test_deterministic_serialization_composition(): void {
 		$comp = Registry_Fixture_Builder::composition();
-		$f1 = Registry_Export_Fragment_Builder::for_composition( $comp );
-		$f2 = Registry_Export_Fragment_Builder::for_composition( $comp );
+		$f1   = Registry_Export_Fragment_Builder::for_composition( $comp );
+		$f2   = Registry_Export_Fragment_Builder::for_composition( $comp );
 		$this->assertSame( json_encode( $f1 ), json_encode( $f2 ) );
 	}
 
 	public function test_exclusion_of_prohibited_fields(): void {
-		$payload = array( 'name' => 'Test', 'api_key' => 'secret123', 'internal_key' => 'st_test' );
+		$payload   = array(
+			'name'         => 'Test',
+			'api_key'      => 'secret123',
+			'internal_key' => 'st_test',
+		);
 		$sanitized = Registry_Export_Fragment_Builder::sanitize_payload( $payload );
 		$this->assertArrayNotHasKey( 'api_key', $sanitized );
 		$this->assertArrayHasKey( 'name', $sanitized );
@@ -65,14 +69,17 @@ final class Registry_Export_Test extends TestCase {
 	}
 
 	public function test_prohibited_password_stripped(): void {
-		$payload = array( 'password' => 'x', 'purpose_summary' => 'OK' );
+		$payload   = array(
+			'password'        => 'x',
+			'purpose_summary' => 'OK',
+		);
 		$sanitized = Registry_Export_Fragment_Builder::sanitize_payload( $payload );
 		$this->assertArrayNotHasKey( 'password', $sanitized );
 		$this->assertArrayHasKey( 'purpose_summary', $sanitized );
 	}
 
 	public function test_fixture_section_has_required_keys(): void {
-		$section = Registry_Fixture_Builder::section();
+		$section  = Registry_Fixture_Builder::section();
 		$required = Section_Schema::get_required_fields();
 		foreach ( $required as $field ) {
 			$this->assertArrayHasKey( $field, $section, "Fixture section missing required: {$field}" );
@@ -80,7 +87,7 @@ final class Registry_Export_Test extends TestCase {
 	}
 
 	public function test_fixture_composition_has_required_keys(): void {
-		$comp = Registry_Fixture_Builder::composition();
+		$comp     = Registry_Fixture_Builder::composition();
 		$required = Composition_Schema::get_required_fields();
 		foreach ( $required as $field ) {
 			$this->assertArrayHasKey( $field, $comp, "Fixture composition missing required: {$field}" );
@@ -97,7 +104,7 @@ final class Registry_Export_Test extends TestCase {
 	}
 
 	public function test_cross_reference_preservation_page_template(): void {
-		$pt = Registry_Fixture_Builder::page_template();
+		$pt   = Registry_Fixture_Builder::page_template();
 		$frag = Registry_Export_Fragment_Builder::for_page_template( $pt );
 		$rels = $frag[ Registry_Export_Fragment_Builder::KEY_RELATIONSHIPS ];
 		$this->assertArrayHasKey( 'section_keys', $rels );
@@ -106,8 +113,8 @@ final class Registry_Export_Test extends TestCase {
 
 	public function test_fragment_has_stable_shape(): void {
 		$section = Registry_Fixture_Builder::section();
-		$frag = Registry_Export_Fragment_Builder::for_section( $section );
-		$keys = array(
+		$frag    = Registry_Export_Fragment_Builder::for_section( $section );
+		$keys    = array(
 			Registry_Export_Fragment_Builder::KEY_EXPORT_SCHEMA_VERSION,
 			Registry_Export_Fragment_Builder::KEY_OBJECT_TYPE,
 			Registry_Export_Fragment_Builder::KEY_OBJECT_KEY,
@@ -124,16 +131,16 @@ final class Registry_Export_Test extends TestCase {
 	}
 
 	public function test_serializer_build_registry_bundle_structure(): void {
-		$GLOBALS['_aio_post_meta'] = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$serializer = new Registry_Export_Serializer(
+		$serializer                     = new Registry_Export_Serializer(
 			new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository(),
 			new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository(),
 			new \AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository(),
 			new \AIOPageBuilder\Domain\Storage\Repositories\Documentation_Repository(),
 			new \AIOPageBuilder\Domain\Storage\Repositories\Version_Snapshot_Repository()
 		);
-		$bundle = $serializer->build_registry_bundle( 10 );
+		$bundle                         = $serializer->build_registry_bundle( 10 );
 		$this->assertArrayHasKey( 'registries', $bundle );
 		$this->assertArrayHasKey( 'sections', $bundle['registries'] );
 		$this->assertArrayHasKey( 'page_templates', $bundle['registries'] );
@@ -151,7 +158,7 @@ final class Registry_Export_Test extends TestCase {
 			new \AIOPageBuilder\Domain\Storage\Repositories\Documentation_Repository(),
 			new \AIOPageBuilder\Domain\Storage\Repositories\Version_Snapshot_Repository()
 		);
-		$manifest = $serializer->build_manifest_fragment();
+		$manifest   = $serializer->build_manifest_fragment();
 		$this->assertArrayHasKey( 'export_schema_version', $manifest );
 		$this->assertArrayHasKey( 'object_types', $manifest );
 		$this->assertContains( 'section_template', $manifest['object_types'] );
@@ -170,10 +177,14 @@ final class Registry_Export_Test extends TestCase {
 	}
 
 	public function test_deprecation_extracted_when_present(): void {
-		$section = Registry_Fixture_Builder::section();
-		$section['deprecation'] = array( 'deprecated' => true, 'reason' => 'Superseded', 'replacement_section_key' => 'st02_new' );
-		$frag = Registry_Export_Fragment_Builder::for_section( $section );
-		$dep = $frag[ Registry_Export_Fragment_Builder::KEY_DEPRECATION ];
+		$section                = Registry_Fixture_Builder::section();
+		$section['deprecation'] = array(
+			'deprecated'              => true,
+			'reason'                  => 'Superseded',
+			'replacement_section_key' => 'st02_new',
+		);
+		$frag                   = Registry_Export_Fragment_Builder::for_section( $section );
+		$dep                    = $frag[ Registry_Export_Fragment_Builder::KEY_DEPRECATION ];
 		$this->assertTrue( $dep['deprecated'] );
 		$this->assertSame( 'Superseded', $dep['reason'] );
 		$this->assertSame( 'st02_new', $dep['replacement_section_key'] );

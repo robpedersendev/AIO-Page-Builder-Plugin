@@ -32,19 +32,19 @@ final class Industry_Section_Override_Service {
 		if ( $section_key === '' || strlen( $section_key ) > Industry_Override_Schema::TARGET_KEY_MAX_LENGTH ) {
 			return false;
 		}
-		$reason = Industry_Override_Schema::sanitize_reason( $reason );
+		$reason   = Industry_Override_Schema::sanitize_reason( $reason );
 		$override = array(
 			Industry_Override_Schema::FIELD_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_SECTION,
 			Industry_Override_Schema::FIELD_TARGET_KEY  => $section_key,
-			Industry_Override_Schema::FIELD_STATE     => $state,
-			Industry_Override_Schema::FIELD_REASON    => $reason,
-			Industry_Override_Schema::FIELD_CREATED_AT => time(),
-			Industry_Override_Schema::FIELD_UPDATED_AT => time(),
+			Industry_Override_Schema::FIELD_STATE       => $state,
+			Industry_Override_Schema::FIELD_REASON      => $reason,
+			Industry_Override_Schema::FIELD_CREATED_AT  => time(),
+			Industry_Override_Schema::FIELD_UPDATED_AT  => time(),
 		);
 		if ( Industry_Override_Schema::validate( $override ) !== array() ) {
 			return false;
 		}
-		$all = $this->get_all();
+		$all                 = $this->get_all();
 		$all[ $section_key ] = $override;
 		return \update_option( Option_Names::INDUSTRY_SECTION_OVERRIDES, $all, true ) !== false;
 	}

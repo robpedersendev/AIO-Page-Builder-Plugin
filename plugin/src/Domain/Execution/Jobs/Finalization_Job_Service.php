@@ -44,7 +44,7 @@ final class Finalization_Job_Service {
 		Build_Plan_Repository_Interface $plan_repository,
 		?Template_Finalization_Service $template_finalization_service = null
 	) {
-		$this->plan_repository = $plan_repository;
+		$this->plan_repository               = $plan_repository;
 		$this->template_finalization_service = $template_finalization_service;
 	}
 
@@ -84,7 +84,7 @@ final class Finalization_Job_Service {
 			);
 		}
 
-		$counts = $this->count_items_by_outcome( $definition );
+		$counts    = $this->count_items_by_outcome( $definition );
 		$conflicts = $this->detect_conflicts( $definition );
 
 		$template_result = $this->template_finalization_service !== null
@@ -92,19 +92,19 @@ final class Finalization_Job_Service {
 			: null;
 
 		if ( ! empty( $conflicts ) ) {
-			$summary = array(
-				'published'                        => 0,
-				'completed_without_publication'    => $counts['completed'],
-				'blocked'                          => count( $conflicts ),
-				'denied'                           => $counts['rejected'],
-				'failed'                           => $counts['failed'],
+			$summary   = array(
+				'published'                     => 0,
+				'completed_without_publication' => $counts['completed'],
+				'blocked'                       => count( $conflicts ),
+				'denied'                        => $counts['rejected'],
+				'failed'                        => $counts['failed'],
 			);
 			$actor_ref = $this->resolve_actor_ref( $envelope );
 			$artifacts = array(
 				'completion_summary' => $summary,
-				'conflicts'         => $conflicts,
-				'finalized_at'      => '',
-				'actor_ref'         => $actor_ref,
+				'conflicts'          => $conflicts,
+				'finalized_at'       => '',
+				'actor_ref'          => $actor_ref,
 			);
 			if ( $template_result !== null ) {
 				$artifacts['finalization_summary']              = $template_result->get_finalization_summary();
@@ -119,19 +119,19 @@ final class Finalization_Job_Service {
 			);
 		}
 
-		$published = $this->publish_ready_pages( $definition );
+		$published    = $this->publish_ready_pages( $definition );
 		$finalized_at = gmdate( 'c' );
-		$actor_ref = $this->resolve_actor_ref( $envelope );
+		$actor_ref    = $this->resolve_actor_ref( $envelope );
 
-		$definition[ Build_Plan_Schema::KEY_STATUS ]      = Build_Plan_Schema::STATUS_COMPLETED;
+		$definition[ Build_Plan_Schema::KEY_STATUS ]       = Build_Plan_Schema::STATUS_COMPLETED;
 		$definition[ Build_Plan_Schema::KEY_COMPLETED_AT ] = $finalized_at;
-		$definition[ Build_Plan_Schema::KEY_ACTOR_REFS ]  = array( $actor_ref );
-		$definition['completion_summary'] = array(
-			'published'                        => $published,
-			'completed_without_publication'    => max( 0, $counts['completed'] - $published ),
-			'blocked'                          => 0,
-			'denied'                           => $counts['rejected'],
-			'failed'                           => $counts['failed'],
+		$definition[ Build_Plan_Schema::KEY_ACTOR_REFS ]   = array( $actor_ref );
+		$definition['completion_summary']                  = array(
+			'published'                     => $published,
+			'completed_without_publication' => max( 0, $counts['completed'] - $published ),
+			'blocked'                       => 0,
+			'denied'                        => $counts['rejected'],
+			'failed'                        => $counts['failed'],
 		);
 
 		if ( $template_result !== null ) {
@@ -145,8 +145,8 @@ final class Finalization_Job_Service {
 			$definition['finalization_history'] = array();
 		}
 		$history_entry = array(
-			'finalized_at' => $finalized_at,
-			'actor_ref'    => $actor_ref,
+			'finalized_at'       => $finalized_at,
+			'actor_ref'          => $actor_ref,
 			'completion_summary' => $definition['completion_summary'],
 		);
 		if ( $template_result !== null ) {
@@ -160,7 +160,7 @@ final class Finalization_Job_Service {
 		}
 
 		$summary = $definition['completion_summary'];
-		$extra = array();
+		$extra   = array();
 		if ( $template_result !== null ) {
 			$extra['finalization_summary']              = $template_result->get_finalization_summary();
 			$extra['template_execution_closure_record'] = $template_result->get_template_execution_closure_record();
@@ -177,7 +177,13 @@ final class Finalization_Job_Service {
 	 * @return array{pending: int, approved: int, completed: int, rejected: int, failed: int}
 	 */
 	private function count_items_by_outcome( array $definition ): array {
-		$out = array( 'pending' => 0, 'approved' => 0, 'completed' => 0, 'rejected' => 0, 'failed' => 0 );
+		$out   = array(
+			'pending'   => 0,
+			'approved'  => 0,
+			'completed' => 0,
+			'rejected'  => 0,
+			'failed'    => 0,
+		);
 		$steps = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
@@ -217,8 +223,8 @@ final class Finalization_Job_Service {
 	 */
 	private function detect_conflicts( array $definition ): array {
 		$conflicts = array();
-		$slugs = array();
-		$steps = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+		$slugs     = array();
+		$steps     = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
 		foreach ( $steps as $step_index => $step ) {
@@ -237,7 +243,7 @@ final class Finalization_Job_Service {
 					continue;
 				}
 				$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
-				$slug = isset( $payload['page_slug_candidate'] ) && is_string( $payload['page_slug_candidate'] ) ? trim( $payload['page_slug_candidate'] ) : '';
+				$slug    = isset( $payload['page_slug_candidate'] ) && is_string( $payload['page_slug_candidate'] ) ? trim( $payload['page_slug_candidate'] ) : '';
 				if ( $slug === '' && isset( $payload['proposed_slug'] ) && is_string( $payload['proposed_slug'] ) ) {
 					$slug = trim( $payload['proposed_slug'] );
 				}
@@ -246,7 +252,11 @@ final class Finalization_Job_Service {
 				}
 				if ( $slug !== '' ) {
 					if ( isset( $slugs[ $slug ] ) ) {
-						$conflicts[] = array( 'type' => 'slug_conflict', 'slug' => $slug, 'message' => __( 'Duplicate slug in plan.', 'aio-page-builder' ) );
+						$conflicts[] = array(
+							'type'    => 'slug_conflict',
+							'slug'    => $slug,
+							'message' => __( 'Duplicate slug in plan.', 'aio-page-builder' ),
+						);
 					}
 					$slugs[ $slug ] = true;
 				}
@@ -263,7 +273,7 @@ final class Finalization_Job_Service {
 	 */
 	private function publish_ready_pages( array $definition ): int {
 		$published = 0;
-		$steps = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+		$steps     = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
 		foreach ( $steps as $step ) {
@@ -277,13 +287,13 @@ final class Finalization_Job_Service {
 				if ( ! is_array( $item ) ) {
 					continue;
 				}
-				$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
+				$status    = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
 				$item_type = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' );
 				if ( $status !== Build_Plan_Item_Statuses::COMPLETED || ! in_array( $item_type, self::PUBLISHABLE_ITEM_TYPES, true ) ) {
 					continue;
 				}
 				$artifact = isset( $item['execution_artifact'] ) && is_array( $item['execution_artifact'] ) ? $item['execution_artifact'] : array();
-				$post_id = isset( $artifact['post_id'] ) && is_numeric( $artifact['post_id'] ) ? (int) $artifact['post_id'] : ( isset( $artifact['target_post_id'] ) && is_numeric( $artifact['target_post_id'] ) ? (int) $artifact['target_post_id'] : 0 );
+				$post_id  = isset( $artifact['post_id'] ) && is_numeric( $artifact['post_id'] ) ? (int) $artifact['post_id'] : ( isset( $artifact['target_post_id'] ) && is_numeric( $artifact['target_post_id'] ) ? (int) $artifact['target_post_id'] : 0 );
 				if ( $post_id <= 0 ) {
 					continue;
 				}
@@ -294,7 +304,13 @@ final class Finalization_Job_Service {
 				if ( $post->post_status === 'publish' ) {
 					continue;
 				}
-				$updated = \wp_update_post( array( 'ID' => $post_id, 'post_status' => 'publish' ), true );
+				$updated = \wp_update_post(
+					array(
+						'ID'          => $post_id,
+						'post_status' => 'publish',
+					),
+					true
+				);
 				if ( ! \is_wp_error( $updated ) && $updated > 0 ) {
 					++$published;
 				}

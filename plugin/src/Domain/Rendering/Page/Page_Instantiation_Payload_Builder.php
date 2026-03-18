@@ -49,8 +49,8 @@ final class Page_Instantiation_Payload_Builder {
 	 * Builds a create-ready payload from assembly result and overrides.
 	 *
 	 * @param Page_Block_Assembly_Result $assembly  Completed assembly result (block_content used for post_content).
-	 * @param string                    $page_title Required page title.
-	 * @param array<string, mixed>      $overrides Optional: page_slug_candidate, post_status_candidate, source_version.
+	 * @param string                     $page_title Required page title.
+	 * @param array<string, mixed>       $overrides Optional: page_slug_candidate, post_status_candidate, source_version.
 	 * @return array<string, mixed> Payload for Page_Instantiator::create_page().
 	 */
 	public function build_create_payload( Page_Block_Assembly_Result $assembly, string $page_title, array $overrides = array() ): array {
@@ -71,8 +71,8 @@ final class Page_Instantiation_Payload_Builder {
 	 * Builds an update-ready payload from assembly result and target post ID.
 	 *
 	 * @param Page_Block_Assembly_Result $assembly       Completed assembly result.
-	 * @param int                       $target_post_id Existing page ID to update.
-	 * @param array<string, mixed>      $overrides      Optional: page_title, page_slug_candidate, post_status_candidate, source_version. Empty values mean keep existing.
+	 * @param int                        $target_post_id Existing page ID to update.
+	 * @param array<string, mixed>       $overrides      Optional: page_title, page_slug_candidate, post_status_candidate, source_version. Empty values mean keep existing.
 	 * @return array<string, mixed> Payload for Page_Instantiator::update_page().
 	 */
 	public function build_update_payload( Page_Block_Assembly_Result $assembly, int $target_post_id, array $overrides = array() ): array {
@@ -81,7 +81,7 @@ final class Page_Instantiation_Payload_Builder {
 		$status  = isset( $overrides['post_status_candidate'] ) && is_string( $overrides['post_status_candidate'] ) ? $this->sanitize_status( $overrides['post_status_candidate'] ) : '';
 		$version = isset( $overrides['source_version'] ) && is_string( $overrides['source_version'] ) ? sanitize_text_field( $overrides['source_version'] ) : '';
 
-		$payload = $this->build_payload( $assembly, $title, $slug, $status, $version, $target_post_id );
+		$payload                   = $this->build_payload( $assembly, $title, $slug, $status, $version, $target_post_id );
 		$payload['target_post_id'] = $target_post_id;
 		return $payload;
 	}
@@ -92,8 +92,8 @@ final class Page_Instantiation_Payload_Builder {
 	 * @return array<string, mixed>
 	 */
 	private function build_payload( Page_Block_Assembly_Result $assembly, string $page_title, string $page_slug_candidate, string $post_status_candidate, string $version, ?int $target_post_id ): array {
-		$source_type = $assembly->get_source_type();
-		$source_key  = $assembly->get_source_key();
+		$source_type  = $assembly->get_source_type();
+		$source_key   = $assembly->get_source_key();
 		$section_keys = array();
 		foreach ( $assembly->get_ordered_sections() as $section ) {
 			$key = $section['section_key'] ?? null;
@@ -104,14 +104,14 @@ final class Page_Instantiation_Payload_Builder {
 
 		$provenance_meta = array(
 			self::META_SOURCE_TYPE    => $source_type,
-			self::META_SOURCE_KEY    => $source_key,
+			self::META_SOURCE_KEY     => $source_key,
 			self::META_SOURCE_VERSION => $version,
 		);
 
 		$assignment_updates = array(
-			'source_type'   => $source_type,
-			'source_key'    => $source_key,
-			'section_keys'  => $section_keys,
+			'source_type'  => $source_type,
+			'source_key'   => $source_key,
+			'section_keys' => $section_keys,
 		);
 
 		$out = array(
@@ -138,7 +138,7 @@ final class Page_Instantiation_Payload_Builder {
 	}
 
 	private function sanitize_status( string $status ): string {
-		$status = sanitize_text_field( $status );
+		$status  = sanitize_text_field( $status );
 		$allowed = array( 'draft', 'publish', 'private', 'pending' );
 		return in_array( $status, $allowed, true ) ? $status : '';
 	}

@@ -50,13 +50,13 @@ final class Section_Gap_Closing_Super_Batch_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']       = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$repo       = new Section_Template_Repository();
-		$normalizer = new Section_Definition_Normalizer();
-		$this->validator = new Section_Validator( $normalizer, $repo );
-		$bp_validator = new Section_Field_Blueprint_Validator();
-		$this->blueprint_service = new Section_Field_Blueprint_Service(
+		$repo                           = new Section_Template_Repository();
+		$normalizer                     = new Section_Definition_Normalizer();
+		$this->validator                = new Section_Validator( $normalizer, $repo );
+		$bp_validator                   = new Section_Field_Blueprint_Validator();
+		$this->blueprint_service        = new Section_Field_Blueprint_Service(
 			$repo,
 			$bp_validator,
 			new Section_Field_Blueprint_Normalizer( $bp_validator )
@@ -90,7 +90,7 @@ final class Section_Gap_Closing_Super_Batch_Test extends TestCase {
 		$normalizer = new Section_Definition_Normalizer();
 		foreach ( Section_Gap_Closing_Super_Batch_Definitions::all_definitions() as $def ) {
 			$normalized = $normalizer->normalize( $def );
-			$errors = $this->validator->validate_completeness( $normalized );
+			$errors     = $this->validator->validate_completeness( $normalized );
 			$this->assertEmpty( $errors, 'Definition ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '?' ) . ' should pass completeness: ' . implode( ', ', $errors ) );
 		}
 	}
@@ -143,9 +143,9 @@ final class Section_Gap_Closing_Super_Batch_Test extends TestCase {
 
 	public function test_seeder_run_returns_success_and_gap_closing_section_ids(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 100;
-		$GLOBALS['_aio_wp_query_posts']       = array();
-		$repo   = new Section_Template_Repository();
-		$result = Section_Gap_Closing_Super_Batch_Seeder::run( $repo );
+		$GLOBALS['_aio_wp_query_posts']        = array();
+		$repo                                  = new Section_Template_Repository();
+		$result                                = Section_Gap_Closing_Super_Batch_Seeder::run( $repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'section_ids', $result );

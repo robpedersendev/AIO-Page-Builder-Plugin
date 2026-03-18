@@ -91,26 +91,26 @@ final class Industry_Pack_Import_Conflict_Service {
 
 	/** Default resolution for duplicate_key by category: replace or skip. Packs/starter_bundles default skip to avoid silent overwrite. */
 	private const DEFAULT_DUPLICATE_RESOLUTION = array(
-		Industry_Pack_Bundle_Service::PAYLOAD_PACKS                   => self::RESOLUTION_SKIP,
-		Industry_Pack_Bundle_Service::PAYLOAD_STARTER_BUNDLES         => self::RESOLUTION_SKIP,
-		Industry_Pack_Bundle_Service::PAYLOAD_STYLE_PRESETS           => self::RESOLUTION_SKIP,
-		Industry_Pack_Bundle_Service::PAYLOAD_CTA_PATTERNS             => self::RESOLUTION_SKIP,
-		Industry_Pack_Bundle_Service::PAYLOAD_SEO_GUIDANCE            => self::RESOLUTION_SKIP,
-		Industry_Pack_Bundle_Service::PAYLOAD_LPAGERY_RULES           => self::RESOLUTION_SKIP,
+		Industry_Pack_Bundle_Service::PAYLOAD_PACKS        => self::RESOLUTION_SKIP,
+		Industry_Pack_Bundle_Service::PAYLOAD_STARTER_BUNDLES => self::RESOLUTION_SKIP,
+		Industry_Pack_Bundle_Service::PAYLOAD_STYLE_PRESETS => self::RESOLUTION_SKIP,
+		Industry_Pack_Bundle_Service::PAYLOAD_CTA_PATTERNS => self::RESOLUTION_SKIP,
+		Industry_Pack_Bundle_Service::PAYLOAD_SEO_GUIDANCE => self::RESOLUTION_SKIP,
+		Industry_Pack_Bundle_Service::PAYLOAD_LPAGERY_RULES => self::RESOLUTION_SKIP,
 		Industry_Pack_Bundle_Service::PAYLOAD_SECTION_HELPER_OVERLAYS => self::RESOLUTION_SKIP,
 		Industry_Pack_Bundle_Service::PAYLOAD_PAGE_ONE_PAGER_OVERLAYS => self::RESOLUTION_SKIP,
-		Industry_Pack_Bundle_Service::PAYLOAD_QUESTION_PACKS         => self::RESOLUTION_SKIP,
-		Industry_Pack_Bundle_Service::PAYLOAD_SITE_PROFILE            => self::RESOLUTION_SKIP,
+		Industry_Pack_Bundle_Service::PAYLOAD_QUESTION_PACKS => self::RESOLUTION_SKIP,
+		Industry_Pack_Bundle_Service::PAYLOAD_SITE_PROFILE => self::RESOLUTION_SKIP,
 	);
 
 	/**
 	 * Analyzes bundle against local state and returns list of conflicts (no final_outcome set yet).
 	 *
-	 * @param array<string, mixed> $bundle Valid bundle (manifest + payload).
+	 * @param array<string, mixed>                $bundle Valid bundle (manifest + payload).
 	 * @param array<string, array<string, mixed>> $local_state Map of category => array of existing keys (e.g. packs => array( 'realtor', 'plumber' ), starter_bundles => array( 'realtor_essentials' )). Optional: version by key, e.g. packs_versions => array( 'realtor' => '1' ).
 	 * @return list<array<string, mixed>> Conflict items with object_key, category, conflict_type, proposed_resolution, warning_severity, message; final_outcome = null.
 	 */
-	public function analyze( array $bundle, array $local_state = [] ): array {
+	public function analyze( array $bundle, array $local_state = array() ): array {
 		$conflicts = array();
 		$included  = $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] ?? array();
 		if ( ! is_array( $included ) ) {
@@ -122,8 +122,8 @@ final class Industry_Pack_Import_Conflict_Service {
 				? $local_state[ $cat ]
 				: array();
 		}
-		$local_pack_versions    = isset( $local_state['pack_versions'] ) && is_array( $local_state['pack_versions'] ) ? $local_state['pack_versions'] : array();
-		$bundle_schema_version  = isset( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_SCHEMA_VERSION ] ) ? (string) $bundle[ Industry_Pack_Bundle_Service::MANIFEST_SCHEMA_VERSION ] : '';
+		$local_pack_versions   = isset( $local_state['pack_versions'] ) && is_array( $local_state['pack_versions'] ) ? $local_state['pack_versions'] : array();
+		$bundle_schema_version = isset( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_SCHEMA_VERSION ] ) ? (string) $bundle[ Industry_Pack_Bundle_Service::MANIFEST_SCHEMA_VERSION ] : '';
 
 		foreach ( $included as $category ) {
 			if ( $category === Industry_Pack_Bundle_Service::PAYLOAD_SITE_PROFILE ) {
@@ -149,7 +149,7 @@ final class Industry_Pack_Import_Conflict_Service {
 					$incoming_version = isset( $item[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] ) && is_string( $item[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] )
 						? trim( $item[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] )
 						: '';
-					$local_version = $local_pack_versions[ $key ] ?? '';
+					$local_version    = $local_pack_versions[ $key ] ?? '';
 					if ( $local_version !== '' && $incoming_version !== '' ) {
 						if ( version_compare( $incoming_version, $local_version, '>' ) ) {
 							$conflicts[] = $this->conflict_item( $key, $category, self::CONFLICT_NEWER_VERSION, self::RESOLUTION_REPLACE, self::SEVERITY_INFO, "Incoming pack {$key} has newer version; replace recommended." );
@@ -162,7 +162,7 @@ final class Industry_Pack_Import_Conflict_Service {
 					}
 				}
 				if ( $is_duplicate ) {
-					$proposed = self::DEFAULT_DUPLICATE_RESOLUTION[ $category ] ?? self::RESOLUTION_SKIP;
+					$proposed    = self::DEFAULT_DUPLICATE_RESOLUTION[ $category ] ?? self::RESOLUTION_SKIP;
 					$conflicts[] = $this->conflict_item( $key, $category, self::CONFLICT_DUPLICATE_KEY, $proposed, self::SEVERITY_WARNING, "Object {$key} already exists. Choose replace or skip." );
 				}
 			}
@@ -174,21 +174,21 @@ final class Industry_Pack_Import_Conflict_Service {
 	 * Applies resolution to conflict list and sets final_outcome per item. Operator can pass mode (e.g. replace_all) or leave default proposed_resolution.
 	 *
 	 * @param list<array<string, mixed>> $conflicts From analyze().
-	 * @param array<string, string> $operator_choices Optional. Map of "category|object_key" => RESOLUTION_* or mode key "default_duplicate" => replace|skip.
+	 * @param array<string, string>      $operator_choices Optional. Map of "category|object_key" => RESOLUTION_* or mode key "default_duplicate" => replace|skip.
 	 * @return list<array<string, mixed>> Same items with final_outcome set (applied, skipped, merged, failed).
 	 */
-	public function resolve( array $conflicts, array $operator_choices = [] ): array {
+	public function resolve( array $conflicts, array $operator_choices = array() ): array {
 		$default_duplicate = $operator_choices['default_duplicate'] ?? null;
-		$resolved = array();
+		$resolved          = array();
 		foreach ( $conflicts as $c ) {
-			$key      = $c[ self::RESULT_OBJECT_KEY ] ?? '';
-			$category = $c[ self::RESULT_CATEGORY ] ?? '';
-			$proposed = $c[ self::RESULT_PROPOSED_RESOLUTION ] ?? self::RESOLUTION_SKIP;
-			$choice_key = $category . '|' . $key;
-			$resolution = isset( $operator_choices[ $choice_key ] ) ? $operator_choices[ $choice_key ] : ( ( $default_duplicate !== null && ( $c[ self::RESULT_CONFLICT_TYPE ] ?? '' ) === self::CONFLICT_DUPLICATE_KEY ) ? $default_duplicate : $proposed );
-			$outcome = $this->resolution_to_outcome( $resolution );
+			$key                             = $c[ self::RESULT_OBJECT_KEY ] ?? '';
+			$category                        = $c[ self::RESULT_CATEGORY ] ?? '';
+			$proposed                        = $c[ self::RESULT_PROPOSED_RESOLUTION ] ?? self::RESOLUTION_SKIP;
+			$choice_key                      = $category . '|' . $key;
+			$resolution                      = isset( $operator_choices[ $choice_key ] ) ? $operator_choices[ $choice_key ] : ( ( $default_duplicate !== null && ( $c[ self::RESULT_CONFLICT_TYPE ] ?? '' ) === self::CONFLICT_DUPLICATE_KEY ) ? $default_duplicate : $proposed );
+			$outcome                         = $this->resolution_to_outcome( $resolution );
 			$c[ self::RESULT_FINAL_OUTCOME ] = $outcome;
-			$resolved[] = $c;
+			$resolved[]                      = $c;
 		}
 		return $resolved;
 	}
@@ -256,12 +256,12 @@ final class Industry_Pack_Import_Conflict_Service {
 
 	private function conflict_item( string $object_key, string $category, string $conflict_type, string $proposed_resolution, string $severity, string $message ): array {
 		return array(
-			self::RESULT_OBJECT_KEY         => $object_key,
-			self::RESULT_CATEGORY           => $category,
-			self::RESULT_CONFLICT_TYPE      => $conflict_type,
+			self::RESULT_OBJECT_KEY          => $object_key,
+			self::RESULT_CATEGORY            => $category,
+			self::RESULT_CONFLICT_TYPE       => $conflict_type,
 			self::RESULT_PROPOSED_RESOLUTION => $proposed_resolution,
-			self::RESULT_FINAL_OUTCOME      => null,
-			self::RESULT_WARNING_SEVERITY   => $severity,
+			self::RESULT_FINAL_OUTCOME       => null,
+			self::RESULT_WARNING_SEVERITY    => $severity,
 			self::RESULT_MESSAGE             => $message,
 		);
 	}

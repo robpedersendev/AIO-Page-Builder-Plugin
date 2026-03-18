@@ -102,11 +102,11 @@ final class Industry_Conflict_Result {
 		string $severity
 	): array {
 		return array(
-			self::KEY_CONFLICT_TYPE      => $conflict_type,
-			self::KEY_SOURCE_INDUSTRIES  => array_values( array_filter( array_map( 'strval', $source_industries ) ) ),
-			self::KEY_RESOLUTION_MODE    => $resolution_mode,
-			self::KEY_EXPLANATION        => trim( $explanation ),
-			self::KEY_SEVERITY           => $severity,
+			self::KEY_CONFLICT_TYPE     => $conflict_type,
+			self::KEY_SOURCE_INDUSTRIES => array_values( array_filter( array_map( 'strval', $source_industries ) ) ),
+			self::KEY_RESOLUTION_MODE   => $resolution_mode,
+			self::KEY_EXPLANATION       => trim( $explanation ),
+			self::KEY_SEVERITY          => $severity,
 		);
 	}
 
@@ -117,29 +117,36 @@ final class Industry_Conflict_Result {
 	 * @return array<string, mixed>
 	 */
 	public static function from_array( array $raw ): array {
-		$type = isset( $raw[ self::KEY_CONFLICT_TYPE ] ) && is_string( $raw[ self::KEY_CONFLICT_TYPE ] )
+		$type        = isset( $raw[ self::KEY_CONFLICT_TYPE ] ) && is_string( $raw[ self::KEY_CONFLICT_TYPE ] )
 			? trim( $raw[ self::KEY_CONFLICT_TYPE ] )
 			: self::CONFLICT_TYPE_GENERIC;
-		$sources = isset( $raw[ self::KEY_SOURCE_INDUSTRIES ] ) && is_array( $raw[ self::KEY_SOURCE_INDUSTRIES ] )
-			? array_values( array_filter( array_map( function ( $v ) {
-				return is_string( $v ) ? trim( $v ) : '';
-			}, $raw[ self::KEY_SOURCE_INDUSTRIES ] ) ) )
+		$sources     = isset( $raw[ self::KEY_SOURCE_INDUSTRIES ] ) && is_array( $raw[ self::KEY_SOURCE_INDUSTRIES ] )
+			? array_values(
+				array_filter(
+					array_map(
+						function ( $v ) {
+							return is_string( $v ) ? trim( $v ) : '';
+						},
+						$raw[ self::KEY_SOURCE_INDUSTRIES ]
+					)
+				)
+			)
 			: array();
-		$mode = isset( $raw[ self::KEY_RESOLUTION_MODE ] ) && is_string( $raw[ self::KEY_RESOLUTION_MODE ] )
+		$mode        = isset( $raw[ self::KEY_RESOLUTION_MODE ] ) && is_string( $raw[ self::KEY_RESOLUTION_MODE ] )
 			? trim( $raw[ self::KEY_RESOLUTION_MODE ] )
 			: self::RESOLUTION_NONE;
 		$explanation = isset( $raw[ self::KEY_EXPLANATION ] ) && is_string( $raw[ self::KEY_EXPLANATION ] )
 			? trim( $raw[ self::KEY_EXPLANATION ] )
 			: '';
-		$severity = isset( $raw[ self::KEY_SEVERITY ] ) && is_string( $raw[ self::KEY_SEVERITY ] )
+		$severity    = isset( $raw[ self::KEY_SEVERITY ] ) && is_string( $raw[ self::KEY_SEVERITY ] )
 			? trim( $raw[ self::KEY_SEVERITY ] )
 			: self::SEVERITY_INFO;
 		return array(
-			self::KEY_CONFLICT_TYPE      => $type,
-			self::KEY_SOURCE_INDUSTRIES  => $sources,
-			self::KEY_RESOLUTION_MODE    => $mode,
-			self::KEY_EXPLANATION        => $explanation,
-			self::KEY_SEVERITY           => $severity,
+			self::KEY_CONFLICT_TYPE     => $type,
+			self::KEY_SOURCE_INDUSTRIES => $sources,
+			self::KEY_RESOLUTION_MODE   => $mode,
+			self::KEY_EXPLANATION       => $explanation,
+			self::KEY_SEVERITY          => $severity,
 		);
 	}
 

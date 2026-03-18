@@ -90,15 +90,15 @@ final class Uninstall_Result {
 		bool $built_pages_preserved,
 		string $log_reference
 	) {
-		$this->success                   = $success;
-		$this->message                   = $message;
-		$this->export_choice              = $export_choice;
-		$this->export_result_reference    = $export_result_reference;
-		$this->cleanup_scope              = $cleanup_scope;
-		$this->scheduled_events_removed  = $scheduled_events_removed;
-		$this->plugin_data_removed       = $plugin_data_removed;
-		$this->built_pages_preserved     = $built_pages_preserved;
-		$this->log_reference              = $log_reference;
+		$this->success                  = $success;
+		$this->message                  = $message;
+		$this->export_choice            = $export_choice;
+		$this->export_result_reference  = $export_result_reference;
+		$this->cleanup_scope            = $cleanup_scope;
+		$this->scheduled_events_removed = $scheduled_events_removed;
+		$this->plugin_data_removed      = $plugin_data_removed;
+		$this->built_pages_preserved    = $built_pages_preserved;
+		$this->log_reference            = $log_reference;
 	}
 
 	public function is_success(): bool {
@@ -144,15 +144,15 @@ final class Uninstall_Result {
 	 */
 	public function to_payload(): array {
 		return array(
-			'success'                   => $this->success,
-			'message'                   => $this->message,
-			'export_choice'             => $this->export_choice,
-			'export_result_reference'   => $this->export_result_reference,
-			'cleanup_scope'             => $this->cleanup_scope,
-			'scheduled_events_removed'  => $this->scheduled_events_removed,
-			'plugin_data_removed'       => $this->plugin_data_removed,
-			'built_pages_preserved'     => $this->built_pages_preserved,
-			'log_reference'             => $this->log_reference,
+			'success'                  => $this->success,
+			'message'                  => $this->message,
+			'export_choice'            => $this->export_choice,
+			'export_result_reference'  => $this->export_result_reference,
+			'cleanup_scope'            => $this->cleanup_scope,
+			'scheduled_events_removed' => $this->scheduled_events_removed,
+			'plugin_data_removed'      => $this->plugin_data_removed,
+			'built_pages_preserved'    => $this->built_pages_preserved,
+			'log_reference'            => $this->log_reference,
 		);
 	}
 

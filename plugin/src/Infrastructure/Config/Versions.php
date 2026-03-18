@@ -44,11 +44,11 @@ final class Versions {
 			return self::$map;
 		}
 		self::$map = array(
-			'plugin'         => \AIOPageBuilder\Bootstrap\Constants::plugin_version(),
-			'global_schema'  => '1',  // Initial placeholder; advance when global schema contract is set.
-			'table_schema'   => '1',  // Initial placeholder; advance when custom tables are introduced.
+			'plugin'          => \AIOPageBuilder\Bootstrap\Constants::plugin_version(),
+			'global_schema'   => '1',  // Initial placeholder; advance when global schema contract is set.
+			'table_schema'    => '1',  // Initial placeholder; advance when custom tables are introduced.
 			'registry_schema' => '1',  // Initial placeholder; advance when registry format is locked.
-			'export_schema'  => '1',  // Initial placeholder; advance when export manifest is defined.
+			'export_schema'   => '1',  // Initial placeholder; advance when export manifest is defined.
 		);
 		return self::$map;
 	}

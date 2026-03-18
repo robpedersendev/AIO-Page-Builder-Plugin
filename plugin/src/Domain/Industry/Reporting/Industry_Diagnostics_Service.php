@@ -60,14 +60,14 @@ final class Industry_Diagnostics_Service {
 		?Industry_Override_Audit_Report_Service $override_audit_report_service = null,
 		?Industry_Override_Conflict_Detector $override_conflict_detector = null
 	) {
-		$this->profile_repository          = $profile_repository;
-		$this->pack_registry               = $pack_registry;
-		$this->section_overlay_registry   = $section_overlay_registry;
-		$this->page_overlay_registry       = $page_overlay_registry;
-		$this->preset_application_service  = $preset_application_service;
-		$this->content_gap_detector       = $content_gap_detector;
+		$this->profile_repository            = $profile_repository;
+		$this->pack_registry                 = $pack_registry;
+		$this->section_overlay_registry      = $section_overlay_registry;
+		$this->page_overlay_registry         = $page_overlay_registry;
+		$this->preset_application_service    = $preset_application_service;
+		$this->content_gap_detector          = $content_gap_detector;
 		$this->override_audit_report_service = $override_audit_report_service;
-		$this->override_conflict_detector  = $override_conflict_detector;
+		$this->override_conflict_detector    = $override_conflict_detector;
 	}
 
 	/**
@@ -88,28 +88,28 @@ final class Industry_Diagnostics_Service {
 	 */
 	public function get_snapshot(): array {
 		$empty = array(
-			'primary_industry'               => '',
-			'secondary_industries'           => array(),
-			'profile_readiness'              => 'none',
-			'active_pack_refs'                => array(),
-			'applied_preset_ref'              => null,
-			'section_overlay_count'          => 0,
-			'page_overlay_count'              => 0,
-			'recommendation_mode'             => 'inactive',
-			'warnings'                        => array(),
-			'industry_subsystem_available'   => $this->profile_repository !== null,
+			'primary_industry'             => '',
+			'secondary_industries'         => array(),
+			'profile_readiness'            => 'none',
+			'active_pack_refs'             => array(),
+			'applied_preset_ref'           => null,
+			'section_overlay_count'        => 0,
+			'page_overlay_count'           => 0,
+			'recommendation_mode'          => 'inactive',
+			'warnings'                     => array(),
+			'industry_subsystem_available' => $this->profile_repository !== null,
 		);
 		if ( $this->profile_repository === null ) {
 			return $empty;
 		}
-		$profile = $this->profile_repository->get_profile();
-		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$profile           = $this->profile_repository->get_profile();
+		$primary           = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
-		$secondary = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
+		$secondary         = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
 			? array_values( array_filter( array_map( 'trim', $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) ) )
 			: array();
-		$active_pack_refs = array_filter( array_merge( array( $primary ), $secondary ) );
+		$active_pack_refs  = array_filter( array_merge( array( $primary ), $secondary ) );
 		$profile_readiness = $primary !== '' ? 'partial' : 'none';
 		if ( $primary !== '' && $this->pack_registry !== null ) {
 			$pack = $this->pack_registry->get( $primary );
@@ -133,7 +133,7 @@ final class Industry_Diagnostics_Service {
 			}
 		}
 		$recommendation_mode = $primary !== '' ? 'active' : 'inactive';
-		$warnings = array();
+		$warnings            = array();
 		if ( $primary !== '' && $this->pack_registry !== null && $this->pack_registry->get( $primary ) === null ) {
 			$warnings[] = 'primary_industry_pack_not_found';
 		}
@@ -142,15 +142,15 @@ final class Industry_Diagnostics_Service {
 			'secondary_industries'         => $secondary,
 			'profile_readiness'            => $profile_readiness,
 			'active_pack_refs'             => array_values( $active_pack_refs ),
-			'applied_preset_ref'            => $applied_preset_ref,
+			'applied_preset_ref'           => $applied_preset_ref,
 			'section_overlay_count'        => $section_overlay_count,
 			'page_overlay_count'           => $page_overlay_count,
 			'recommendation_mode'          => $recommendation_mode,
 			'warnings'                     => $warnings,
-			'industry_subsystem_available'  => true,
+			'industry_subsystem_available' => true,
 		);
 		if ( $primary !== '' && $this->content_gap_detector !== null ) {
-			$bundle_key = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+			$bundle_key          = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 				? trim( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 				: null;
 			$out['content_gaps'] = $this->content_gap_detector->detect( $profile, $bundle_key, array() );

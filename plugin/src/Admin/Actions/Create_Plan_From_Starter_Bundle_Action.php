@@ -23,8 +23,8 @@ use AIOPageBuilder\Infrastructure\Container\Service_Container;
  */
 final class Create_Plan_From_Starter_Bundle_Action {
 
-	public const NONCE_NAME   = 'aio_create_plan_from_bundle_nonce';
-	public const NONCE_ACTION = 'aio_create_plan_from_bundle';
+	public const NONCE_NAME       = 'aio_create_plan_from_bundle_nonce';
+	public const NONCE_ACTION     = 'aio_create_plan_from_bundle';
 	public const PARAM_BUNDLE_KEY = 'bundle_key';
 
 	/**
@@ -72,7 +72,15 @@ final class Create_Plan_From_Starter_Bundle_Action {
 
 		$result = $service->convert_to_draft( $bundle_key, array() );
 		if ( $result->is_success() && $result->get_plan_id() !== null ) {
-			\wp_safe_redirect( \add_query_arg( array( 'plan_id' => $result->get_plan_id(), 'aio_bundle_plan_result' => 'created' ), $redirect_plans ) );
+			\wp_safe_redirect(
+				\add_query_arg(
+					array(
+						'plan_id'                => $result->get_plan_id(),
+						'aio_bundle_plan_result' => 'created',
+					),
+					$redirect_plans
+				)
+			);
 			exit;
 		}
 		\wp_safe_redirect( \add_query_arg( 'aio_bundle_plan_result', 'error', $redirect_profile ) );

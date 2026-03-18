@@ -97,14 +97,17 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 		$ordered      = array();
 		$requirements = array();
 		foreach ( $section_keys as $pos => $key ) {
-			$ordered[] = array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => $key,
+			$ordered[]            = array(
+				Page_Template_Schema::SECTION_ITEM_KEY => $key,
 				Page_Template_Schema::SECTION_ITEM_POSITION => $pos,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			);
 			$requirements[ $key ] = array( 'required' => true );
 		}
-		return array( 'ordered' => $ordered, 'requirements' => $requirements );
+		return array(
+			'ordered'      => $ordered,
+			'requirements' => $requirements,
+		);
 	}
 
 	/**
@@ -137,22 +140,25 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 		array $extra = array()
 	): array {
 		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY               => $internal_key,
-			Page_Template_Schema::FIELD_NAME                       => $name,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY            => $purpose_summary,
-			Page_Template_Schema::FIELD_ARCHETYPE                  => $archetype,
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS           => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS       => $section_requirements,
-			Page_Template_Schema::FIELD_COMPATIBILITY              => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                  => $one_pager,
-			Page_Template_Schema::FIELD_VERSION                    => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                     => 'active',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $internal_key,
+			Page_Template_Schema::FIELD_NAME             => $name,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => $purpose_summary,
+			Page_Template_Schema::FIELD_ARCHETYPE        => $archetype,
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_requirements,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => $one_pager,
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES    => $endpoint_notes,
-			'template_category_class'                             => 'child_detail',
-			'template_family'                                      => $template_family,
-			'parent_family_compatibility'                          => $parent_family_compatibility,
-			'hierarchy_hints'                                      => array(
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => $endpoint_notes,
+			'template_category_class'                    => 'child_detail',
+			'template_family'                            => $template_family,
+			'parent_family_compatibility'                => $parent_family_compatibility,
+			'hierarchy_hints'                            => array(
 				'common_parent_page_types' => 'hub, nested_hub',
 				'hierarchy_role'           => 'leaf',
 			),
@@ -182,7 +188,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'mlp_related_content_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_profile_first_01',
 			'Profile detail (profile-first)',
@@ -193,13 +199,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single profile with profile-first structure. Profile summary and team grid; consultation, contact, directory nav, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Profile-first; bio and team support authority. Synthetic preview only; no real staff data.',
-				'cta_direction_summary'  => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single profile with profile-first structure. Profile summary and team grid; consultation, contact, directory nav, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Profile-first; bio and team support authority. Synthetic preview only; no real staff data.',
+				'cta_direction_summary' => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Profile-first; profile summary and team grid lead.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Profile-first; profile summary and team grid lead.',
+			)
 		);
 	}
 
@@ -223,7 +232,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_profile_proof_01',
 			'Profile detail (proof-heavy)',
@@ -234,13 +243,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single profile proof-heavy. Trust band, testimonials, guarantee, logos; consultation, contact, directory nav, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Proof-dense; authority and social proof before CTAs.',
-				'cta_direction_summary'  => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single profile proof-heavy. Trust band, testimonials, guarantee, logos; consultation, contact, directory nav, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Proof-dense; authority and social proof before CTAs.',
+				'cta_direction_summary' => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Proof-heavy; testimonials, guarantee, logos.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Proof-heavy; testimonials, guarantee, logos.',
+			)
 		);
 	}
 
@@ -263,7 +275,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_directory_member_01',
 			'Directory member / provider detail',
@@ -274,13 +286,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single directory member/provider. Directory entry and profile summary; directory nav, contact, consultation, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Directory member detail; no dynamic directory engine. Synthetic preview only.',
-				'cta_direction_summary'  => 'Directory nav, contact, consultation, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single directory member/provider. Directory entry and profile summary; directory nav, contact, consultation, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Directory member detail; no dynamic directory engine. Synthetic preview only.',
+				'cta_direction_summary' => 'Directory nav, contact, consultation, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Directory member; directory entry and value.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Directory member; directory entry and value.',
+			)
 		);
 	}
 
@@ -303,7 +318,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_directory_entity_01',
 			'Directory entity detail',
@@ -314,13 +329,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single directory entity. Detail spec and place highlight; directory nav, contact, consultation, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Entity detail beneath directory hub; spec and listing support.',
-				'cta_direction_summary'  => 'Directory nav, contact, consultation, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single directory entity. Detail spec and place highlight; directory nav, contact, consultation, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Entity detail beneath directory hub; spec and listing support.',
+				'cta_direction_summary' => 'Directory nav, contact, consultation, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Directory entity; detail spec and place highlight.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Directory entity; detail spec and place highlight.',
+			)
 		);
 	}
 
@@ -343,7 +361,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_staff_provider_01',
 			'Staff / provider profile detail',
@@ -354,13 +372,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single staff/provider profile. Profile summary and team/profile cards; consultation, contact, directory nav, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Staff/provider profile; no user account system. Synthetic preview only.',
-				'cta_direction_summary'  => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single staff/provider profile. Profile summary and team/profile cards; consultation, contact, directory nav, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Staff/provider profile; no user account system. Synthetic preview only.',
+				'cta_direction_summary' => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Staff/provider profile; team and profile cards.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Staff/provider profile; team and profile cards.',
+			)
 		);
 	}
 
@@ -383,7 +404,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_organization_profile_01',
 			'Organization profile detail',
@@ -394,13 +415,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single organization profile. Value prop and team grid; contact, directory nav, consultation, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Organization profile; authority and team. Synthetic preview only.',
-				'cta_direction_summary'  => 'Contact, directory nav, consultation, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single organization profile. Value prop and team grid; contact, directory nav, consultation, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Organization profile; authority and team. Synthetic preview only.',
+				'cta_direction_summary' => 'Contact, directory nav, consultation, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Organization profile; value and team.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Organization profile; value and team.',
+			)
 		);
 	}
 
@@ -423,7 +447,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_place_entity_01',
 			'Place / entity detail',
@@ -434,13 +458,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single place/entity detail. Place highlight and location info; local, contact, directory nav, booking, local CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Place/entity beneath hub; no real addresses. Synthetic preview only.',
-				'cta_direction_summary'  => 'Local action, contact, directory nav, booking, local action; last CTA local.',
+				'page_purpose_summary'  => 'Single place/entity detail. Place highlight and location info; local, contact, directory nav, booking, local CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Place/entity beneath hub; no real addresses. Synthetic preview only.',
+				'cta_direction_summary' => 'Local action, contact, directory nav, booking, local action; last CTA local.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Place/entity; location and detail spec.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Place/entity; location and detail spec.',
+			)
 		);
 	}
 
@@ -463,7 +490,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_resource_article_01',
 			'Article / resource detail',
@@ -474,13 +501,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single article/resource detail. Related content and recommendation band; consultation, contact, directory nav, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Resource/article detail; no live publishing workflow. Synthetic preview only.',
-				'cta_direction_summary'  => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single article/resource detail. Related content and recommendation band; consultation, contact, directory nav, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Resource/article detail; no live publishing workflow. Synthetic preview only.',
+				'cta_direction_summary' => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Article/resource; related content and recommendation.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Article/resource; related content and recommendation.',
+			)
 		);
 	}
 
@@ -504,7 +534,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_resource_educational_01',
 			'Resource detail (educational deep-dive)',
@@ -515,13 +545,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single resource educational deep-dive. How-it-works, expectations, detail spec, service flow; consultation, contact, directory nav, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Educational emphasis; process and spec before CTAs.',
-				'cta_direction_summary'  => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single resource educational deep-dive. How-it-works, expectations, detail spec, service flow; consultation, contact, directory nav, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Educational emphasis; process and spec before CTAs.',
+				'cta_direction_summary' => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Educational deep-dive; process and spec lead.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Educational deep-dive; process and spec lead.',
+			)
 		);
 	}
 
@@ -544,7 +577,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_profile_media_01',
 			'Profile detail (media-led)',
@@ -555,13 +588,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single profile media-led. Gallery and media band; consultation, contact, directory nav, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Media-led; gallery and media band support profile.',
-				'cta_direction_summary'  => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single profile media-led. Gallery and media band; consultation, contact, directory nav, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Media-led; gallery and media band support profile.',
+				'cta_direction_summary' => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Media-led; gallery and media band.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Media-led; gallery and media band.',
+			)
 		);
 	}
 
@@ -584,7 +620,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_entity_local_01',
 			'Entity detail (local-detail emphasis)',
@@ -595,13 +631,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single local entity. Local value and place highlight; local, contact, directory nav, booking, local CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Local-detail emphasis; reassurance and contact detail. Synthetic only.',
-				'cta_direction_summary'  => 'Local action, contact, directory nav, booking, local action; last CTA local.',
+				'page_purpose_summary'  => 'Single local entity. Local value and place highlight; local, contact, directory nav, booking, local CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Local-detail emphasis; reassurance and contact detail. Synthetic only.',
+				'cta_direction_summary' => 'Local action, contact, directory nav, booking, local action; last CTA local.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Local-detail; location and place highlight.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Local-detail; location and place highlight.',
+			)
 		);
 	}
 
@@ -625,7 +664,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_authority_detail_01',
 			'Authority / expert profile detail',
@@ -636,13 +675,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single authority/expert profile. Trust band, logos, guarantee; consultation, contact, directory nav, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Authority-detail; credentials and proof lead.',
-				'cta_direction_summary'  => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single authority/expert profile. Trust band, logos, guarantee; consultation, contact, directory nav, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Authority-detail; credentials and proof lead.',
+				'cta_direction_summary' => 'Consultation, contact, directory nav, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Authority-detail; trust, logos, guarantee.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Authority-detail; trust, logos, guarantee.',
+			)
 		);
 	}
 
@@ -667,7 +709,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_profile_comparison_01',
 			'Profile detail (comparison-adjacent)',
@@ -678,13 +720,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single profile comparison-adjacent. Comparison cards and compare CTA; directory nav, consultation, contact, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Comparison-adjacent; supports decision vs alternatives.',
-				'cta_direction_summary'  => 'Directory nav, consultation, compare, contact, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single profile comparison-adjacent. Comparison cards and compare CTA; directory nav, consultation, contact, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Comparison-adjacent; supports decision vs alternatives.',
+				'cta_direction_summary' => 'Directory nav, consultation, compare, contact, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Comparison-adjacent; comparison cards.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Comparison-adjacent; comparison cards.',
+			)
 		);
 	}
 
@@ -707,7 +752,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_event_detail_01',
 			'Event detail',
@@ -718,13 +763,16 @@ final class Child_Detail_Profile_Entity_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single event detail. Detail spec and place highlight; booking, consultation, contact, directory nav, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Event detail beneath events hub; no live event engine. Synthetic preview only.',
-				'cta_direction_summary'  => 'Booking, consultation, contact, directory nav, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single event detail. Detail spec and place highlight; booking, consultation, contact, directory nav, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Event detail beneath events hub; no live event engine. Synthetic preview only.',
+				'cta_direction_summary' => 'Booking, consultation, contact, directory nav, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Event detail; spec and place.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Event detail; spec and place.',
+			)
 		);
 	}
 }

@@ -45,13 +45,13 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		if ( $run_id === '' || $url === '' ) {
 			return null;
 		}
-		$table   = $this->get_table_name();
+		$table    = $this->get_table_name();
 		$prepared = $this->wpdb->prepare(
 			"SELECT * FROM `{$table}` WHERE `crawl_run_id` = %s AND `url` = %s LIMIT 1",
 			$run_id,
 			$url
 		);
-		$row = $this->wpdb->get_row( $prepared );
+		$row      = $this->wpdb->get_row( $prepared );
 		if ( $row === null ) {
 			return null;
 		}
@@ -70,10 +70,10 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 	/**
 	 * Lists page records for a crawl run, optionally by status.
 	 *
-	 * @param string   $crawl_run_id Crawl run identifier.
+	 * @param string      $crawl_run_id Crawl run identifier.
 	 * @param string|null $status       Optional filter by crawl_status.
-	 * @param int      $limit         Max rows (0 = no limit).
-	 * @param int      $offset        Offset.
+	 * @param int         $limit         Max rows (0 = no limit).
+	 * @param int         $offset        Offset.
 	 * @return list<array<string, mixed>>
 	 */
 	public function list_by_run_id( string $crawl_run_id, ?string $status = null, int $limit = 0, int $offset = 0 ): array {
@@ -85,16 +85,16 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		$sql   = "SELECT * FROM `{$table}` WHERE `crawl_run_id` = %s";
 		$args  = array( $run_id );
 		if ( $status !== null && $status !== '' ) {
-			$sql   .= " AND `crawl_status` = %s";
+			$sql   .= ' AND `crawl_status` = %s';
 			$args[] = $status;
 		}
-		$sql .= " ORDER BY `id` ASC";
+		$sql .= ' ORDER BY `id` ASC';
 		if ( $limit > 0 ) {
-			$sql   .= " LIMIT %d";
+			$sql   .= ' LIMIT %d';
 			$args[] = $limit;
 		}
 		if ( $offset > 0 ) {
-			$sql   .= " OFFSET %d";
+			$sql   .= ' OFFSET %d';
 			$args[] = $offset;
 		}
 		$prepared = $this->wpdb->prepare( $sql, ...$args );
@@ -121,7 +121,7 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		$table = $this->get_table_name();
 		$sql   = "SELECT crawl_run_id FROM `{$table}` GROUP BY crawl_run_id ORDER BY MAX(id) DESC";
 		if ( $limit > 0 ) {
-			$sql   .= " LIMIT %d";
+			$sql     .= ' LIMIT %d';
 			$prepared = $this->wpdb->prepare( $sql, $limit );
 		} else {
 			$prepared = $sql;
@@ -139,11 +139,11 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		$sql   = "SELECT * FROM `{$table}` WHERE `crawl_status` = %s ORDER BY `crawled_at` DESC, `id` ASC";
 		$args  = array( $status );
 		if ( $limit > 0 ) {
-			$sql   .= " LIMIT %d";
+			$sql   .= ' LIMIT %d';
 			$args[] = $limit;
 		}
 		if ( $offset > 0 ) {
-			$sql   .= " OFFSET %d";
+			$sql   .= ' OFFSET %d';
 			$args[] = $offset;
 		}
 		$prepared = $this->wpdb->prepare( $sql, ...$args );
@@ -200,8 +200,8 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 	 * @return int Inserted row id or 0 on failure.
 	 */
 	private function insert_row( array $payload ): int {
-		$table = $this->get_table_name();
-		$values = array(
+		$table           = $this->get_table_name();
+		$values          = array(
 			$payload[ Crawl_Snapshot_Payload_Builder::PAGE_CRAWL_RUN_ID ],
 			$payload[ Crawl_Snapshot_Payload_Builder::PAGE_URL ],
 			$payload[ Crawl_Snapshot_Payload_Builder::PAGE_CANONICAL_URL ],
@@ -218,10 +218,10 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 			$payload[ Crawl_Snapshot_Payload_Builder::PAGE_CRAWLED_AT ],
 			$payload[ Crawl_Snapshot_Payload_Builder::PAGE_SCHEMA_VERSION ],
 		);
-		$col_list = '`crawl_run_id`,`url`,`canonical_url`,`title_snapshot`,`meta_snapshot`,`indexability_flags`,`page_classification`,`hierarchy_clues`,`navigation_participation`,`summary_data`,`content_hash`,`crawl_status`,`error_state`,`crawled_at`,`schema_version`';
-		$placeholders = implode( ', ', array_fill( 0, count( $values ), '%s' ) );
+		$col_list        = '`crawl_run_id`,`url`,`canonical_url`,`title_snapshot`,`meta_snapshot`,`indexability_flags`,`page_classification`,`hierarchy_clues`,`navigation_participation`,`summary_data`,`content_hash`,`crawl_status`,`error_state`,`crawled_at`,`schema_version`';
+		$placeholders    = implode( ', ', array_fill( 0, count( $values ), '%s' ) );
 		$prepared_values = $this->cast_values_for_prepare( $values );
-		$result = $this->wpdb->query(
+		$result          = $this->wpdb->query(
 			$this->wpdb->prepare(
 				"INSERT INTO `{$table}` ({$col_list}) VALUES ({$placeholders})",
 				...$prepared_values
@@ -241,21 +241,21 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 	 * @return bool True if one row updated.
 	 */
 	private function update_row( int $id, array $payload ): bool {
-		$table = $this->get_table_name();
-		$set   = array(
-			'canonical_url' => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CANONICAL_URL ],
-			'title_snapshot' => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_TITLE_SNAPSHOT ],
-			'meta_snapshot'  => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_META_SNAPSHOT ],
-			'indexability_flags' => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_INDEXABILITY_FLAGS ],
-			'page_classification' => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CLASSIFICATION ],
-			'hierarchy_clues' => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_HIERARCHY_CLUES ],
+		$table  = $this->get_table_name();
+		$set    = array(
+			'canonical_url'            => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CANONICAL_URL ],
+			'title_snapshot'           => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_TITLE_SNAPSHOT ],
+			'meta_snapshot'            => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_META_SNAPSHOT ],
+			'indexability_flags'       => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_INDEXABILITY_FLAGS ],
+			'page_classification'      => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CLASSIFICATION ],
+			'hierarchy_clues'          => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_HIERARCHY_CLUES ],
 			'navigation_participation' => (int) ( $payload[ Crawl_Snapshot_Payload_Builder::PAGE_NAVIGATION ] ?? 0 ),
-			'summary_data' => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_SUMMARY_DATA ],
-			'content_hash' => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CONTENT_HASH ],
-			'crawl_status' => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CRAWL_STATUS ],
-			'error_state'  => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_ERROR_STATE ],
-			'crawled_at'   => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CRAWLED_AT ],
-			'schema_version' => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_SCHEMA_VERSION ],
+			'summary_data'             => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_SUMMARY_DATA ],
+			'content_hash'             => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CONTENT_HASH ],
+			'crawl_status'             => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CRAWL_STATUS ],
+			'error_state'              => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_ERROR_STATE ],
+			'crawled_at'               => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CRAWLED_AT ],
+			'schema_version'           => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_SCHEMA_VERSION ],
 		);
 		$format = array( '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' );
 		$result = $this->wpdb->update( $table, $set, array( 'id' => $id ), $format, array( '%d' ) );

@@ -34,25 +34,39 @@ final class Industry_Pack_Validator {
 	 * @return array{valid: list<array<string, mixed>>, invalid: array<int, array{index: int, errors: array<int, array{code: string, field?: string}>}>, duplicate_keys: list<string>}
 	 */
 	public function validate_bulk( array $packs ): array {
-		$valid         = array();
-		$invalid      = array();
-		$seen_keys     = array();
+		$valid          = array();
+		$invalid        = array();
+		$seen_keys      = array();
 		$duplicate_keys = array();
 		foreach ( $packs as $index => $pack ) {
 			if ( ! is_array( $pack ) ) {
-				$invalid[] = array( 'index' => $index, 'errors' => array( array( 'code' => 'invalid_payload' ) ) );
+				$invalid[] = array(
+					'index'  => $index,
+					'errors' => array( array( 'code' => 'invalid_payload' ) ),
+				);
 				continue;
 			}
 			$errors = $this->validate_pack( $pack );
 			if ( $errors !== array() ) {
-				$invalid[] = array( 'index' => $index, 'errors' => $errors );
+				$invalid[] = array(
+					'index'  => $index,
+					'errors' => $errors,
+				);
 				continue;
 			}
 			$key = isset( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] )
 				? trim( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] )
 				: '';
 			if ( $key === '' ) {
-				$invalid[] = array( 'index' => $index, 'errors' => array( array( 'code' => 'missing_required', 'field' => Industry_Pack_Schema::FIELD_INDUSTRY_KEY ) ) );
+				$invalid[] = array(
+					'index'  => $index,
+					'errors' => array(
+						array(
+							'code'  => 'missing_required',
+							'field' => Industry_Pack_Schema::FIELD_INDUSTRY_KEY,
+						),
+					),
+				);
 				continue;
 			}
 			if ( isset( $seen_keys[ $key ] ) ) {
@@ -60,12 +74,12 @@ final class Industry_Pack_Validator {
 				continue;
 			}
 			$seen_keys[ $key ] = true;
-			$valid[] = $pack;
+			$valid[]           = $pack;
 		}
 		return array(
-			'valid'           => $valid,
-			'invalid'         => $invalid,
-			'duplicate_keys'  => array_values( array_unique( $duplicate_keys ) ),
+			'valid'          => $valid,
+			'invalid'        => $invalid,
+			'duplicate_keys' => array_values( array_unique( $duplicate_keys ) ),
 		);
 	}
 }

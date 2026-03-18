@@ -58,15 +58,15 @@ final class Page_Template_And_Composition_Expansion_Pack_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']    = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$section_repo   = new Section_Template_Repository();
-		$section_norm   = new Section_Definition_Normalizer();
-		$section_valid  = new Section_Validator( $section_norm, $section_repo );
-		$section_registry = new Section_Registry_Service( $section_valid, $section_repo );
-		$page_repo = new Page_Template_Repository();
-		$this->pt_normalizer = new Page_Template_Normalizer();
-		$this->pt_validator  = new Page_Template_Validator( $this->pt_normalizer, $page_repo, $section_registry );
+		$section_repo                   = new Section_Template_Repository();
+		$section_norm                   = new Section_Definition_Normalizer();
+		$section_valid                  = new Section_Validator( $section_norm, $section_repo );
+		$section_registry               = new Section_Registry_Service( $section_valid, $section_repo );
+		$page_repo                      = new Page_Template_Repository();
+		$this->pt_normalizer            = new Page_Template_Normalizer();
+		$this->pt_validator             = new Page_Template_Validator( $this->pt_normalizer, $page_repo, $section_registry );
 	}
 
 	protected function tearDown(): void {
@@ -88,8 +88,8 @@ final class Page_Template_And_Composition_Expansion_Pack_Test extends TestCase {
 	public function test_each_page_template_passes_completeness_after_normalize(): void {
 		foreach ( Page_Template_And_Composition_Expansion_Pack_Definitions::page_template_definitions() as $def ) {
 			$normalized = $this->pt_normalizer->normalize( $def );
-			$errors = $this->pt_validator->validate_completeness( $normalized );
-			$key = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '?' );
+			$errors     = $this->pt_validator->validate_completeness( $normalized );
+			$key        = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '?' );
 			$this->assertEmpty( $errors, "Page template {$key} should pass completeness: " . implode( ', ', $errors ) );
 		}
 	}
@@ -149,12 +149,12 @@ final class Page_Template_And_Composition_Expansion_Pack_Test extends TestCase {
 
 	public function test_template_keys_and_composition_ids_match_constants(): void {
 		$templates = Page_Template_And_Composition_Expansion_Pack_Definitions::page_template_definitions();
-		$keys = array_column( $templates, Page_Template_Schema::FIELD_INTERNAL_KEY );
+		$keys      = array_column( $templates, Page_Template_Schema::FIELD_INTERNAL_KEY );
 		$this->assertContains( Page_Template_And_Composition_Expansion_Pack_Definitions::PAGE_TEMPLATE_LANDING_STATS_CTA_FAQ, $keys );
 		$this->assertContains( Page_Template_And_Composition_Expansion_Pack_Definitions::PAGE_TEMPLATE_FAQ_PAGE, $keys );
 
 		$compositions = Page_Template_And_Composition_Expansion_Pack_Definitions::composition_definitions();
-		$ids = array_column( $compositions, Composition_Schema::FIELD_COMPOSITION_ID );
+		$ids          = array_column( $compositions, Composition_Schema::FIELD_COMPOSITION_ID );
 		$this->assertContains( Page_Template_And_Composition_Expansion_Pack_Definitions::COMPOSITION_LANDING_STATS_CTA_FAQ, $ids );
 		$this->assertContains( Page_Template_And_Composition_Expansion_Pack_Definitions::COMPOSITION_FAQ_CTA, $ids );
 	}

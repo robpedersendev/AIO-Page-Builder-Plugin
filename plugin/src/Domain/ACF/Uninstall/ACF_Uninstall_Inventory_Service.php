@@ -68,7 +68,7 @@ final class ACF_Uninstall_Inventory_Service {
 				continue;
 			}
 
-			$group_key = Field_Key_Generator::group_key( $section_key );
+			$group_key                   = Field_Key_Generator::group_key( $section_key );
 			$plugin_runtime_group_keys[] = $group_key;
 
 			$fields = $blueprint[ Field_Blueprint_Schema::FIELDS ] ?? null;
@@ -94,11 +94,11 @@ final class ACF_Uninstall_Inventory_Service {
 	/**
 	 * Recursively collects top-level and nested field key/name for definitions and value meta keys.
 	 *
-	 * @param string   $group_key
-	 * @param string   $section_key
-	 * @param array    $fields
-	 * @param array    $field_definitions By-ref accumulator.
-	 * @param array    $value_meta_keys   By-ref accumulator (unique names for value storage).
+	 * @param string $group_key
+	 * @param string $section_key
+	 * @param array  $fields
+	 * @param array  $field_definitions By-ref accumulator.
+	 * @param array  $value_meta_keys   By-ref accumulator (unique names for value storage).
 	 */
 	private function collect_fields_from_blueprint(
 		string $group_key,
@@ -126,7 +126,7 @@ final class ACF_Uninstall_Inventory_Service {
 				'field_key'  => $field_key,
 				'field_name' => $field_name,
 			);
-			$value_meta_keys[] = $field_name;
+			$value_meta_keys[]   = $field_name;
 
 			$sub_fields = $field['sub_fields'] ?? null;
 			if ( is_array( $sub_fields ) && ! empty( $sub_fields ) ) {

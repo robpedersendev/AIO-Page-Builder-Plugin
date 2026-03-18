@@ -89,12 +89,12 @@ final class Industry_CTA_Pattern_Registry {
 			if ( isset( $this->by_key[ $key ] ) ) {
 				continue;
 			}
-			$normalized = array(
-				self::FIELD_PATTERN_KEY   => $key,
-				self::FIELD_NAME          => $name,
-				self::FIELD_DESCRIPTION   => isset( $def[ self::FIELD_DESCRIPTION ] ) && is_string( $def[ self::FIELD_DESCRIPTION ] ) ? trim( $def[ self::FIELD_DESCRIPTION ] ) : '',
-				self::FIELD_URGENCY_NOTES => isset( $def[ self::FIELD_URGENCY_NOTES ] ) && is_string( $def[ self::FIELD_URGENCY_NOTES ] ) ? trim( $def[ self::FIELD_URGENCY_NOTES ] ) : '',
-				self::FIELD_TRUST_NOTES   => isset( $def[ self::FIELD_TRUST_NOTES ] ) && is_string( $def[ self::FIELD_TRUST_NOTES ] ) ? trim( $def[ self::FIELD_TRUST_NOTES ] ) : '',
+			$normalized           = array(
+				self::FIELD_PATTERN_KEY    => $key,
+				self::FIELD_NAME           => $name,
+				self::FIELD_DESCRIPTION    => isset( $def[ self::FIELD_DESCRIPTION ] ) && is_string( $def[ self::FIELD_DESCRIPTION ] ) ? trim( $def[ self::FIELD_DESCRIPTION ] ) : '',
+				self::FIELD_URGENCY_NOTES  => isset( $def[ self::FIELD_URGENCY_NOTES ] ) && is_string( $def[ self::FIELD_URGENCY_NOTES ] ) ? trim( $def[ self::FIELD_URGENCY_NOTES ] ) : '',
+				self::FIELD_TRUST_NOTES    => isset( $def[ self::FIELD_TRUST_NOTES ] ) && is_string( $def[ self::FIELD_TRUST_NOTES ] ) ? trim( $def[ self::FIELD_TRUST_NOTES ] ) : '',
 				self::FIELD_ACTION_FRAMING => isset( $def[ self::FIELD_ACTION_FRAMING ] ) && is_string( $def[ self::FIELD_ACTION_FRAMING ] ) ? trim( $def[ self::FIELD_ACTION_FRAMING ] ) : '',
 			);
 			$this->by_key[ $key ] = $normalized;

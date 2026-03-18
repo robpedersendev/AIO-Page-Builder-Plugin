@@ -32,7 +32,7 @@ final class Builtin_Subtype_Page_OnePager_Overlays {
 			$dir . '/plumber-subtype-onepager.php',
 			$dir . '/disaster-recovery-subtype-onepager.php',
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $files as $path ) {
 			if ( ! is_readable( $path ) ) {
 				continue;

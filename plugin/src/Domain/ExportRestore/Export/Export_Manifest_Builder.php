@@ -24,14 +24,14 @@ final class Export_Manifest_Builder {
 	/**
 	 * Builds the full manifest array for inclusion in the bundle.
 	 *
-	 * @param string               $export_type        Export mode key.
-	 * @param string               $source_site_url     Site URL (no credentials).
-	 * @param list<string>         $included_categories Categories present in bundle.
-	 * @param list<string>         $excluded_categories Categories explicitly excluded (audit).
+	 * @param string                $export_type        Export mode key.
+	 * @param string                $source_site_url     Site URL (no credentials).
+	 * @param list<string>          $included_categories Categories present in bundle.
+	 * @param list<string>          $excluded_categories Categories explicitly excluded (audit).
 	 * @param array<string, string> $package_checksum_list Path => "algo:hexdigest".
-	 * @param string               $restore_notes       Human-readable notes.
-	 * @param list<string>         $optional_included   Optional categories included (if any).
-	 * @param string               $package_filename   Optional filename (no path).
+	 * @param string                $restore_notes       Human-readable notes.
+	 * @param list<string>          $optional_included   Optional categories included (if any).
+	 * @param string                $package_filename   Optional filename (no path).
 	 * @return array<string, mixed> Manifest ready for JSON encoding.
 	 */
 	public function build(
@@ -44,25 +44,25 @@ final class Export_Manifest_Builder {
 		array $optional_included = array(),
 		string $package_filename = ''
 	): array {
-		$timestamp = gmdate( 'Y-m-d\TH:i:s\Z' );
+		$timestamp      = gmdate( 'Y-m-d\TH:i:s\Z' );
 		$plugin_version = Versions::plugin();
 		$schema_version = Versions::export_schema();
 
 		$manifest = array(
-			'export_type'            => $export_type,
-			'export_timestamp'       => $timestamp,
-			'plugin_version'         => $plugin_version,
-			'schema_version'         => $schema_version,
-			'source_site_url'         => $source_site_url,
-			'included_categories'    => $included_categories,
-			'excluded_categories'    => $excluded_categories,
-			'package_checksum_list'  => $package_checksum_list,
-			'restore_notes'          => $restore_notes,
-			'compatibility_flags'    => array(
-				'schema_version'                => $schema_version,
-				'same_major_required'           => true,
-				'migration_floor'                => $schema_version,
-				'max_supported_export_schema'   => $schema_version,
+			'export_type'           => $export_type,
+			'export_timestamp'      => $timestamp,
+			'plugin_version'        => $plugin_version,
+			'schema_version'        => $schema_version,
+			'source_site_url'       => $source_site_url,
+			'included_categories'   => $included_categories,
+			'excluded_categories'   => $excluded_categories,
+			'package_checksum_list' => $package_checksum_list,
+			'restore_notes'         => $restore_notes,
+			'compatibility_flags'   => array(
+				'schema_version'              => $schema_version,
+				'same_major_required'         => true,
+				'migration_floor'             => $schema_version,
+				'max_supported_export_schema' => $schema_version,
 			),
 		);
 

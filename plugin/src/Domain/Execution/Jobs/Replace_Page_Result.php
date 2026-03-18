@@ -58,13 +58,13 @@ final class Replace_Page_Result {
 		array $errors = array(),
 		array $artifacts = array()
 	) {
-		$this->success           = $success;
-		$this->target_post_id    = $target_post_id;
+		$this->success            = $success;
+		$this->target_post_id     = $target_post_id;
 		$this->superseded_post_id = $superseded_post_id;
-		$this->snapshot_ref      = $snapshot_ref;
-		$this->message           = $message;
-		$this->errors            = $errors;
-		$this->artifacts         = $artifacts;
+		$this->snapshot_ref       = $snapshot_ref;
+		$this->message            = $message;
+		$this->errors             = $errors;
+		$this->artifacts          = $artifacts;
 	}
 
 	public function is_success(): bool {
@@ -104,13 +104,13 @@ final class Replace_Page_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'success'             => $this->success,
-			'target_post_id'      => $this->target_post_id,
-			'superseded_post_id'  => $this->superseded_post_id,
-			'snapshot_ref'        => $this->snapshot_ref,
-			'message'             => $this->message,
-			'errors'              => $this->errors,
-			'artifacts'           => $this->artifacts,
+			'success'            => $this->success,
+			'target_post_id'     => $this->target_post_id,
+			'superseded_post_id' => $this->superseded_post_id,
+			'snapshot_ref'       => $this->snapshot_ref,
+			'message'            => $this->message,
+			'errors'             => $this->errors,
+			'artifacts'          => $this->artifacts,
 		);
 	}
 
@@ -128,8 +128,11 @@ final class Replace_Page_Result {
 			$this->artifacts
 		);
 		if ( $this->superseded_post_id > 0 ) {
-			$artifacts['superseded_post_id']   = $this->superseded_post_id;
-			$artifacts['superseded_page_ref']  = array( 'type' => 'post_id', 'value' => (string) $this->superseded_post_id );
+			$artifacts['superseded_post_id']  = $this->superseded_post_id;
+			$artifacts['superseded_page_ref'] = array(
+				'type'  => 'post_id',
+				'value' => (string) $this->superseded_post_id,
+			);
 		}
 		$out = array(
 			'success'   => $this->success,
@@ -150,9 +153,15 @@ final class Replace_Page_Result {
 		int $superseded_post_id = 0,
 		array $extra_artifacts = array()
 	): self {
-		$artifacts = array( 'template_key' => $template_key, 'assignment_count' => $assignment_count );
+		$artifacts = array(
+			'template_key'     => $template_key,
+			'assignment_count' => $assignment_count,
+		);
 		if ( $superseded_post_id > 0 ) {
-			$artifacts['superseded_page_ref'] = array( 'type' => 'post_id', 'value' => (string) $superseded_post_id );
+			$artifacts['superseded_page_ref'] = array(
+				'type'  => 'post_id',
+				'value' => (string) $superseded_post_id,
+			);
 		}
 		$artifacts = array_merge( $artifacts, $extra_artifacts );
 		return new self(

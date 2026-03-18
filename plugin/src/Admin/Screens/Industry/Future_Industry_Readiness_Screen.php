@@ -52,8 +52,16 @@ final class Future_Industry_Readiness_Screen {
 		$scaffold_incomplete_count = 0;
 		$candidate_label           = __( 'Use future-industry evaluation framework', 'aio-page-builder' );
 		$maturity_label            = __( 'Stable', 'aio-page-builder' );
-		$promo_summary             = array( 'total' => 0, 'scaffold_complete' => 0, 'authored_near_ready' => 0, 'not_near_ready' => 0 );
-		$scaffold_summary          = array( 'scaffold_count' => 0, 'missing_artifact_count' => 0 );
+		$promo_summary             = array(
+			'total'               => 0,
+			'scaffold_complete'   => 0,
+			'authored_near_ready' => 0,
+			'not_near_ready'      => 0,
+		);
+		$scaffold_summary          = array(
+			'scaffold_count'         => 0,
+			'missing_artifact_count' => 0,
+		);
 
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_pack_completeness_report_service' ) ) {
 			$completeness = $this->container->get( 'industry_pack_completeness_report_service' );
@@ -61,7 +69,7 @@ final class Future_Industry_Readiness_Screen {
 				$report  = $completeness->generate_report( true );
 				$results = isset( $report['pack_results'] ) && is_array( $report['pack_results'] ) ? $report['pack_results'] : array();
 				foreach ( $results as $r ) {
-					$flags = isset( $r['blocker_flags'] ) && is_array( $r['blocker_flags'] ) ? $r['blocker_flags'] : array();
+					$flags                    = isset( $r['blocker_flags'] ) && is_array( $r['blocker_flags'] ) ? $r['blocker_flags'] : array();
 					$expansion_blocker_count += count( $flags );
 				}
 			}
@@ -81,10 +89,10 @@ final class Future_Industry_Readiness_Screen {
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_scaffold_completeness_report_service' ) ) {
 			$scaffold = $this->container->get( 'industry_scaffold_completeness_report_service' );
 			if ( $scaffold instanceof Industry_Scaffold_Completeness_Report_Service ) {
-				$report  = $scaffold->generate_report( array() );
-				$results = isset( $report['scaffold_results'] ) && is_array( $report['scaffold_results'] ) ? $report['scaffold_results'] : array();
+				$report                             = $scaffold->generate_report( array() );
+				$results                            = isset( $report['scaffold_results'] ) && is_array( $report['scaffold_results'] ) ? $report['scaffold_results'] : array();
 				$scaffold_summary['scaffold_count'] = count( $results );
-				$missing = 0;
+				$missing                            = 0;
 				foreach ( $results as $r ) {
 					$classes = isset( $r['artifact_classes'] ) && is_array( $r['artifact_classes'] ) ? $r['artifact_classes'] : array();
 					foreach ( $classes as $state ) {
@@ -101,8 +109,8 @@ final class Future_Industry_Readiness_Screen {
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_scaffold_promotion_readiness_report_service' ) ) {
 			$promo = $this->container->get( 'industry_scaffold_promotion_readiness_report_service' );
 			if ( $promo instanceof Industry_Scaffold_Promotion_Readiness_Report_Service ) {
-				$report       = $promo->generate_report();
-				$sum          = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
+				$report        = $promo->generate_report();
+				$sum           = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
 				$promo_summary = array(
 					'total'               => (int) ( $sum['total'] ?? 0 ),
 					'scaffold_complete'   => (int) ( $sum['scaffold_complete'] ?? 0 ),
@@ -115,8 +123,8 @@ final class Future_Industry_Readiness_Screen {
 		$base  = admin_url( 'admin.php' );
 		$links = array(
 			'author_dashboard'       => $base . '?page=' . Industry_Author_Dashboard_Screen::SLUG,
-			'pack_family_comparison'  => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
-			'scaffold_promotion'      => $base . '?page=' . Industry_Scaffold_Promotion_Readiness_Report_Screen::SLUG,
+			'pack_family_comparison' => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
+			'scaffold_promotion'     => $base . '?page=' . Industry_Scaffold_Promotion_Readiness_Report_Screen::SLUG,
 		);
 
 		return new Future_Industry_Readiness_View_Model(
@@ -137,10 +145,10 @@ final class Future_Industry_Readiness_Screen {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Future industry readiness screen.', 'aio-page-builder' ), 403 );
 		}
-		$vm = $this->get_view_model();
-		$promo = $vm->get_promotion_readiness_summary();
+		$vm       = $this->get_view_model();
+		$promo    = $vm->get_promotion_readiness_summary();
 		$scaffold = $vm->get_scaffold_summary();
-		$links = $vm->get_links();
+		$links    = $vm->get_links();
 		?>
 		<div class="wrap aio-page-builder-screen aio-future-industry-readiness" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>

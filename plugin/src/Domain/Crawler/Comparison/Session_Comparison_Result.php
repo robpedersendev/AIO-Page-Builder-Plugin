@@ -48,15 +48,15 @@ final class Session_Comparison_Result {
 	public $page_changes;
 
 	/**
-	 * @param string                $prior_run_id         Prior crawl run id.
-	 * @param string                $new_run_id           New crawl run id.
-	 * @param int                   $added_count          Pages only in new.
-	 * @param int                   $removed_count         Pages only in prior.
-	 * @param int                   $changed_count         Pages in both with changes.
-	 * @param int                   $unchanged_count       Pages in both unchanged.
-	 * @param int                   $reclassified_count   Pages with classification change.
-	 * @param int                   $meaningful_count_prior Meaningful pages in prior.
-	 * @param int                   $meaningful_count_new  Meaningful pages in new.
+	 * @param string                    $prior_run_id         Prior crawl run id.
+	 * @param string                    $new_run_id           New crawl run id.
+	 * @param int                       $added_count          Pages only in new.
+	 * @param int                       $removed_count         Pages only in prior.
+	 * @param int                       $changed_count         Pages in both with changes.
+	 * @param int                       $unchanged_count       Pages in both unchanged.
+	 * @param int                       $reclassified_count   Pages with classification change.
+	 * @param int                       $meaningful_count_prior Meaningful pages in prior.
+	 * @param int                       $meaningful_count_new  Meaningful pages in new.
 	 * @param list<Page_Change_Summary> $page_changes      Per-page change summaries.
 	 */
 	public function __construct(
@@ -71,16 +71,16 @@ final class Session_Comparison_Result {
 		int $meaningful_count_new,
 		array $page_changes
 	) {
-		$this->prior_run_id          = $prior_run_id;
-		$this->new_run_id            = $new_run_id;
-		$this->added_count           = $added_count;
-		$this->removed_count         = $removed_count;
-		$this->changed_count         = $changed_count;
-		$this->unchanged_count       = $unchanged_count;
-		$this->reclassified_count    = $reclassified_count;
+		$this->prior_run_id           = $prior_run_id;
+		$this->new_run_id             = $new_run_id;
+		$this->added_count            = $added_count;
+		$this->removed_count          = $removed_count;
+		$this->changed_count          = $changed_count;
+		$this->unchanged_count        = $unchanged_count;
+		$this->reclassified_count     = $reclassified_count;
 		$this->meaningful_count_prior = $meaningful_count_prior;
-		$this->meaningful_count_new  = $meaningful_count_new;
-		$this->page_changes          = $page_changes;
+		$this->meaningful_count_new   = $meaningful_count_new;
+		$this->page_changes           = $page_changes;
 	}
 
 	/**
@@ -90,16 +90,20 @@ final class Session_Comparison_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'prior_run_id'          => $this->prior_run_id,
-			'new_run_id'            => $this->new_run_id,
-			'added_count'           => $this->added_count,
-			'removed_count'         => $this->removed_count,
-			'changed_count'         => $this->changed_count,
-			'unchanged_count'       => $this->unchanged_count,
-			'reclassified_count'    => $this->reclassified_count,
+			'prior_run_id'           => $this->prior_run_id,
+			'new_run_id'             => $this->new_run_id,
+			'added_count'            => $this->added_count,
+			'removed_count'          => $this->removed_count,
+			'changed_count'          => $this->changed_count,
+			'unchanged_count'        => $this->unchanged_count,
+			'reclassified_count'     => $this->reclassified_count,
 			'meaningful_count_prior' => $this->meaningful_count_prior,
-			'meaningful_count_new'  => $this->meaningful_count_new,
-			'page_changes'          => array_map( function ( Page_Change_Summary $p ) { return $p->to_array(); }, $this->page_changes ),
+			'meaningful_count_new'   => $this->meaningful_count_new,
+			'page_changes'           => array_map(
+				function ( Page_Change_Summary $p ) {
+					return $p->to_array(); },
+				$this->page_changes
+			),
 		);
 	}
 }

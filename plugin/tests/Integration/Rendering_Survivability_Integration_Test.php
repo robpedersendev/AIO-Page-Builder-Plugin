@@ -43,8 +43,12 @@ final class Rendering_Survivability_Integration_Test extends TestCase {
 					'data-aio-position' => (string) $position,
 				),
 			),
-			'selector_map'        => array( 'wrapper_class' => $wrapper_class, 'inner_class' => $inner_class, 'element_classes' => array() ),
-			'structural_nodes'   => array(),
+			'selector_map'        => array(
+				'wrapper_class'   => $wrapper_class,
+				'inner_class'     => $inner_class,
+				'element_classes' => array(),
+			),
+			'structural_nodes'    => array(),
 			'structural_hint'     => '',
 			'asset_hints'         => array(),
 			'accessibility_notes' => array(),
@@ -54,8 +58,22 @@ final class Rendering_Survivability_Integration_Test extends TestCase {
 
 	public function test_template_backed_assembly_passes_survivability(): void {
 		$pipeline = new Native_Block_Assembly_Pipeline();
-		$s1       = $this->section_result( 'st01_hero', 0, array( 'headline' => 'Landing', 'subheadline' => 'Intro' ) );
-		$s2       = $this->section_result( 'st02_cta', 1, array( 'title' => 'Sign up', 'cta' => 'Go' ) );
+		$s1       = $this->section_result(
+			'st01_hero',
+			0,
+			array(
+				'headline'    => 'Landing',
+				'subheadline' => 'Intro',
+			)
+		);
+		$s2       = $this->section_result(
+			'st02_cta',
+			1,
+			array(
+				'title' => 'Sign up',
+				'cta'   => 'Go',
+			)
+		);
 
 		$assembly = $pipeline->assemble(
 			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
@@ -91,7 +109,7 @@ final class Rendering_Survivability_Integration_Test extends TestCase {
 
 	public function test_negative_prohibited_shortcode_fails_survivability(): void {
 		$checker = new Content_Survivability_Checker();
-		$content = "<!-- wp:html --><div>Content with [aio_build_status] shortcode</div><!-- /wp:html -->";
+		$content = '<!-- wp:html --><div>Content with [aio_build_status] shortcode</div><!-- /wp:html -->';
 
 		$result = $checker->check( $content );
 
@@ -101,7 +119,7 @@ final class Rendering_Survivability_Integration_Test extends TestCase {
 
 	public function test_negative_unreplaced_token_fails_survivability(): void {
 		$checker = new Content_Survivability_Checker();
-		$content = "<!-- wp:html --><p>Hello {{ visitor_name }}</p><!-- /wp:html -->";
+		$content = '<!-- wp:html --><p>Hello {{ visitor_name }}</p><!-- /wp:html -->';
 
 		$result = $checker->check( $content );
 

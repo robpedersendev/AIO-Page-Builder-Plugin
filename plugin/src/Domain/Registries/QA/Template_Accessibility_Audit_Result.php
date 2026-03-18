@@ -45,11 +45,11 @@ final class Template_Accessibility_Audit_Result {
 	private array $human_review_required;
 
 	/**
-	 * @param bool $passed
+	 * @param bool                                                                                 $passed
 	 * @param list<array{scope: string, template_key: string, rule_code: string, message: string}> $semantic_rule_violations
-	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>} $section_audit_summary
-	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>} $page_audit_summary
-	 * @param list<string> $human_review_required
+	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>}               $section_audit_summary
+	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>}               $page_audit_summary
+	 * @param list<string>                                                                         $human_review_required
 	 */
 	public function __construct(
 		bool $passed,
@@ -58,11 +58,11 @@ final class Template_Accessibility_Audit_Result {
 		array $page_audit_summary,
 		array $human_review_required
 	) {
-		$this->passed                    = $passed;
-		$this->semantic_rule_violations  = $semantic_rule_violations;
-		$this->section_audit_summary     = $section_audit_summary;
-		$this->page_audit_summary        = $page_audit_summary;
-		$this->human_review_required     = $human_review_required;
+		$this->passed                   = $passed;
+		$this->semantic_rule_violations = $semantic_rule_violations;
+		$this->section_audit_summary    = $section_audit_summary;
+		$this->page_audit_summary       = $page_audit_summary;
+		$this->human_review_required    = $human_review_required;
 	}
 
 	public function is_passed(): bool {
@@ -96,11 +96,11 @@ final class Template_Accessibility_Audit_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'passed'                    => $this->passed,
-			'semantic_rule_violations'  => $this->semantic_rule_violations,
-			'section_audit_summary'      => $this->section_audit_summary,
-			'page_audit_summary'         => $this->page_audit_summary,
-			'human_review_required'      => $this->human_review_required,
+			'passed'                   => $this->passed,
+			'semantic_rule_violations' => $this->semantic_rule_violations,
+			'section_audit_summary'    => $this->section_audit_summary,
+			'page_audit_summary'       => $this->page_audit_summary,
+			'human_review_required'    => $this->human_review_required,
 		);
 	}
 
@@ -110,7 +110,7 @@ final class Template_Accessibility_Audit_Result {
 	 * @return list<string>
 	 */
 	public function to_summary_lines(): array {
-		$lines = array();
+		$lines   = array();
 		$lines[] = sprintf(
 			'Sections audited: %d (%d violations). Pages audited: %d (%d violations).',
 			$this->section_audit_summary['audited'],
@@ -121,12 +121,19 @@ final class Template_Accessibility_Audit_Result {
 		if ( ! empty( $this->semantic_rule_violations ) ) {
 			$by_code = array();
 			foreach ( $this->semantic_rule_violations as $v ) {
-				$code = $v['rule_code'] ?? 'unknown';
+				$code             = $v['rule_code'] ?? 'unknown';
 				$by_code[ $code ] = ( $by_code[ $code ] ?? 0 ) + 1;
 			}
-			$lines[] = 'Rule violations: ' . implode( ', ', array_map( function ( $c, $n ) {
-				return $c . '=' . $n;
-			}, array_keys( $by_code ), $by_code ) );
+			$lines[] = 'Rule violations: ' . implode(
+				', ',
+				array_map(
+					function ( $c, $n ) {
+						return $c . '=' . $n;
+					},
+					array_keys( $by_code ),
+					$by_code
+				)
+			);
 		}
 		$lines[] = $this->passed ? 'Accessibility audit: PASSED (machine-checkable rules).' : 'Accessibility audit: FAILED (resolve violations).';
 		if ( ! empty( $this->human_review_required ) ) {

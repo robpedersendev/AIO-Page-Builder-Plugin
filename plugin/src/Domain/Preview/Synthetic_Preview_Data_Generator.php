@@ -48,7 +48,7 @@ final class Synthetic_Preview_Data_Generator {
 	/**
 	 * Generates per-section field values for a page template preview.
 	 *
-	 * @param Synthetic_Preview_Context $context         Page context (template_key, category, family).
+	 * @param Synthetic_Preview_Context                                                $context         Page context (template_key, category, family).
 	 * @param list<array{section_key: string, position: int, purpose_family?: string}> $ordered_sections Each with section_key, position; purpose_family optional (default 'other').
 	 * @return list<array{section_key: string, position: int, field_values: array<string, mixed>}>
 	 */
@@ -64,9 +64,9 @@ final class Synthetic_Preview_Data_Generator {
 				$purpose_family = 'other';
 			}
 			$out[] = array(
-				'section_key'   => $section_key,
-				'position'      => $position,
-				'field_values'  => $this->generate_field_values_for_family( $purpose_family, $variant, $omission_case ),
+				'section_key'  => $section_key,
+				'position'     => $position,
+				'field_values' => $this->generate_field_values_for_family( $purpose_family, $variant, $omission_case ),
 			);
 		}
 		return $out;
@@ -138,11 +138,23 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function proof_fields( bool $empty_optional ): array {
 		$items = array(
-			array( 'name' => 'Client A', 'quote' => 'This service made a real difference.', 'role' => 'Customer' ),
-			array( 'name' => 'Jane D.', 'quote' => 'Professional and responsive.', 'role' => 'Client' ),
+			array(
+				'name'  => 'Client A',
+				'quote' => 'This service made a real difference.',
+				'role'  => 'Customer',
+			),
+			array(
+				'name'  => 'Jane D.',
+				'quote' => 'Professional and responsive.',
+				'role'  => 'Client',
+			),
 		);
 		if ( $empty_optional ) {
-			$items[] = array( 'name' => '', 'quote' => '', 'role' => '' );
+			$items[] = array(
+				'name'  => '',
+				'quote' => '',
+				'role'  => '',
+			);
 		}
 		return array(
 			'headline' => 'What Our Clients Say',
@@ -153,9 +165,9 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function cta_fields( bool $empty_optional ): array {
 		$out = array(
-			'headline'  => 'Ready to get started?',
-			'cta_text'  => 'Sign up now',
-			'cta_url'   => self::PLACEHOLDER_URL,
+			'headline' => 'Ready to get started?',
+			'cta_text' => 'Sign up now',
+			'cta_url'  => self::PLACEHOLDER_URL,
 		);
 		if ( ! $empty_optional ) {
 			$out['secondary_cta_text'] = 'Contact us';
@@ -167,11 +179,20 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function faq_fields( bool $empty_optional ): array {
 		$items = array(
-			array( 'question' => 'What is this service?', 'answer' => 'A short explanation in one or two sentences for preview.' ),
-			array( 'question' => 'How do I get started?', 'answer' => 'Steps are outlined in the documentation.' ),
+			array(
+				'question' => 'What is this service?',
+				'answer'   => 'A short explanation in one or two sentences for preview.',
+			),
+			array(
+				'question' => 'How do I get started?',
+				'answer'   => 'Steps are outlined in the documentation.',
+			),
 		);
 		if ( $empty_optional ) {
-			$items[] = array( 'question' => '', 'answer' => '' );
+			$items[] = array(
+				'question' => '',
+				'answer'   => '',
+			);
 		}
 		return array(
 			'headline' => 'Frequently Asked Questions',
@@ -182,8 +203,16 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function offer_fields( bool $empty_optional ): array {
 		$plans = array(
-			array( 'title' => 'Starter', 'price' => '$XX', 'features' => 'Feature one, feature two.' ),
-			array( 'title' => 'Pro', 'price' => '$YY', 'features' => 'All Starter plus more.' ),
+			array(
+				'title'    => 'Starter',
+				'price'    => '$XX',
+				'features' => 'Feature one, feature two.',
+			),
+			array(
+				'title'    => 'Pro',
+				'price'    => '$YY',
+				'features' => 'All Starter plus more.',
+			),
 		);
 		return array(
 			'headline' => 'Plans and Pricing',
@@ -195,8 +224,14 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function explainer_fields( bool $empty_optional ): array {
 		$steps = array(
-			array( 'title' => 'Step one', 'description' => 'Short description for this step.' ),
-			array( 'title' => 'Step two', 'description' => 'Next step description.' ),
+			array(
+				'title'       => 'Step one',
+				'description' => 'Short description for this step.',
+			),
+			array(
+				'title'       => 'Step two',
+				'description' => 'Next step description.',
+			),
 		);
 		return array(
 			'headline' => 'How It Works',
@@ -216,8 +251,16 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function listing_fields( bool $empty_optional ): array {
 		$items = array(
-			array( 'title' => 'Item one', 'description' => 'Short description.', 'link' => self::PLACEHOLDER_URL ),
-			array( 'title' => 'Item two', 'description' => 'Another item.', 'link' => self::PLACEHOLDER_URL ),
+			array(
+				'title'       => 'Item one',
+				'description' => 'Short description.',
+				'link'        => self::PLACEHOLDER_URL,
+			),
+			array(
+				'title'       => 'Item two',
+				'description' => 'Another item.',
+				'link'        => self::PLACEHOLDER_URL,
+			),
 		);
 		return array(
 			'headline' => 'Directory or Listing',
@@ -228,8 +271,16 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function comparison_fields( bool $empty_optional ): array {
 		$rows = array(
-			array( 'option' => 'Option A', 'pros' => 'Pro one.', 'cons' => 'Con one.' ),
-			array( 'option' => 'Option B', 'pros' => 'Pro two.', 'cons' => 'Con two.' ),
+			array(
+				'option' => 'Option A',
+				'pros'   => 'Pro one.',
+				'cons'   => 'Con one.',
+			),
+			array(
+				'option' => 'Option B',
+				'pros'   => 'Pro two.',
+				'cons'   => 'Con two.',
+			),
 		);
 		return array(
 			'headline' => 'Comparison',
@@ -240,7 +291,7 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function profile_fields( bool $empty_optional ): array {
 		return array(
-			'headline'   => 'Team',
+			'headline'  => 'Team',
 			'name'      => 'Team Member',
 			'role'      => 'Role title',
 			'bio'       => 'Short bio in one or two sentences for preview.',
@@ -251,8 +302,14 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function stats_fields( bool $empty_optional ): array {
 		$items = array(
-			array( 'label' => 'Projects', 'number' => '100+' ),
-			array( 'label' => 'Clients', 'number' => '50+' ),
+			array(
+				'label'  => 'Projects',
+				'number' => '100+',
+			),
+			array(
+				'label'  => 'Clients',
+				'number' => '50+',
+			),
 		);
 		return array(
 			'headline' => 'By the Numbers',
@@ -263,8 +320,14 @@ final class Synthetic_Preview_Data_Generator {
 	/** @return array<string, mixed> */
 	private function timeline_fields( bool $empty_optional ): array {
 		$items = array(
-			array( 'title' => 'Phase one', 'description' => 'Description for this phase.' ),
-			array( 'title' => 'Phase two', 'description' => 'Next phase.' ),
+			array(
+				'title'       => 'Phase one',
+				'description' => 'Description for this phase.',
+			),
+			array(
+				'title'       => 'Phase two',
+				'description' => 'Next phase.',
+			),
 		);
 		return array(
 			'headline' => 'Timeline',
@@ -276,7 +339,11 @@ final class Synthetic_Preview_Data_Generator {
 	private function locations_fields( bool $empty_optional ): array {
 		// * No real addresses (template-preview §3.2, §8).
 		$items = array(
-			array( 'name' => 'Main Office', 'address' => '123 Example St', 'link' => self::PLACEHOLDER_URL ),
+			array(
+				'name'    => 'Main Office',
+				'address' => '123 Example St',
+				'link'    => self::PLACEHOLDER_URL,
+			),
 		);
 		return array(
 			'headline' => 'Locations',
@@ -313,7 +380,12 @@ final class Synthetic_Preview_Data_Generator {
 			case 'image':
 				return '';
 			case 'repeater':
-				return array( array( 'title' => self::FALLBACK_HEADLINE, 'content' => self::FALLBACK_BODY ) );
+				return array(
+					array(
+						'title'   => self::FALLBACK_HEADLINE,
+						'content' => self::FALLBACK_BODY,
+					),
+				);
 			default:
 				return self::FALLBACK_HEADLINE;
 		}

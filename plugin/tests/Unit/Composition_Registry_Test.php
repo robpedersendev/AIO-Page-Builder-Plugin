@@ -71,17 +71,17 @@ final class Composition_Registry_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta'] = array();
+		$GLOBALS['_aio_post_meta']        = array();
 		$GLOBALS['_aio_assign_insert_id'] = 0;
 
-		$this->section_repo = new Section_Template_Repository();
-		$section_normalizer = new \AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer();
-		$section_validator = new \AIOPageBuilder\Domain\Registries\Section\Section_Validator( $section_normalizer, $this->section_repo );
+		$this->section_repo     = new Section_Template_Repository();
+		$section_normalizer     = new \AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer();
+		$section_validator      = new \AIOPageBuilder\Domain\Registries\Section\Section_Validator( $section_normalizer, $this->section_repo );
 		$this->section_registry = new Section_Registry_Service( $section_validator, $this->section_repo );
 
-		$this->page_repo = new Page_Template_Repository();
-		$page_normalizer = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer();
-		$page_validator = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator( $page_normalizer, $this->page_repo, $this->section_registry );
+		$this->page_repo              = new Page_Template_Repository();
+		$page_normalizer              = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer();
+		$page_validator               = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator( $page_normalizer, $this->page_repo, $this->section_registry );
 		$this->page_template_registry = new Page_Template_Registry_Service( $page_validator, $this->page_repo );
 
 		$this->composition_repo = new Composition_Repository();
@@ -123,7 +123,7 @@ final class Composition_Registry_Test extends TestCase {
 			public function query( string $sql ): int|false {
 				if ( strpos( $sql, 'INSERT' ) !== false ) {
 					$GLOBALS['_aio_assign_insert_id'] = ( $GLOBALS['_aio_assign_insert_id'] ?? 0 ) + 1;
-					$this->insert_id = $GLOBALS['_aio_assign_insert_id'];
+					$this->insert_id                  = $GLOBALS['_aio_assign_insert_id'];
 					return 1;
 				}
 				return 1;
@@ -141,31 +141,37 @@ final class Composition_Registry_Test extends TestCase {
 
 	private function valid_minimal_section( string $key = 'st01_hero', string $name = 'Hero' ): array {
 		return array(
-			Section_Schema::FIELD_INTERNAL_KEY           => $key,
-			Section_Schema::FIELD_NAME                  => $name,
-			Section_Schema::FIELD_PURPOSE_SUMMARY        => 'Section purpose.',
-			Section_Schema::FIELD_CATEGORY               => 'hero_intro',
+			Section_Schema::FIELD_INTERNAL_KEY             => $key,
+			Section_Schema::FIELD_NAME                     => $name,
+			Section_Schema::FIELD_PURPOSE_SUMMARY          => 'Section purpose.',
+			Section_Schema::FIELD_CATEGORY                 => 'hero_intro',
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp_st01',
-			Section_Schema::FIELD_FIELD_BLUEPRINT_REF    => 'acf_st01',
-			Section_Schema::FIELD_HELPER_REF             => 'helper_st01',
-			Section_Schema::FIELD_CSS_CONTRACT_REF      => 'css_st01',
-			Section_Schema::FIELD_DEFAULT_VARIANT        => 'default',
-			Section_Schema::FIELD_VARIANTS               => array( 'default' => array( 'label' => 'Default' ) ),
-			Section_Schema::FIELD_COMPATIBILITY          => array(),
-			Section_Schema::FIELD_VERSION                => array( 'version' => '1' ),
-			Section_Schema::FIELD_STATUS                 => 'active',
-			Section_Schema::FIELD_RENDER_MODE            => 'block',
-			Section_Schema::FIELD_ASSET_DECLARATION      => array( 'none' => true ),
+			Section_Schema::FIELD_FIELD_BLUEPRINT_REF      => 'acf_st01',
+			Section_Schema::FIELD_HELPER_REF               => 'helper_st01',
+			Section_Schema::FIELD_CSS_CONTRACT_REF         => 'css_st01',
+			Section_Schema::FIELD_DEFAULT_VARIANT          => 'default',
+			Section_Schema::FIELD_VARIANTS                 => array( 'default' => array( 'label' => 'Default' ) ),
+			Section_Schema::FIELD_COMPATIBILITY            => array(),
+			Section_Schema::FIELD_VERSION                  => array( 'version' => '1' ),
+			Section_Schema::FIELD_STATUS                   => 'active',
+			Section_Schema::FIELD_RENDER_MODE              => 'block',
+			Section_Schema::FIELD_ASSET_DECLARATION        => array( 'none' => true ),
 		);
 	}
 
 	private function valid_minimal_composition( string $comp_id = 'comp_test01' ): array {
 		return array(
-			Composition_Schema::FIELD_COMPOSITION_ID      => $comp_id,
-			Composition_Schema::FIELD_NAME               => 'Test Composition',
+			Composition_Schema::FIELD_COMPOSITION_ID       => $comp_id,
+			Composition_Schema::FIELD_NAME                 => 'Test Composition',
 			Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(
-				array( Composition_Schema::SECTION_ITEM_KEY => 'st01_hero', Composition_Schema::SECTION_ITEM_POSITION => 0 ),
-				array( Composition_Schema::SECTION_ITEM_KEY => 'st05_cta', Composition_Schema::SECTION_ITEM_POSITION => 1 ),
+				array(
+					Composition_Schema::SECTION_ITEM_KEY => 'st01_hero',
+					Composition_Schema::SECTION_ITEM_POSITION => 0,
+				),
+				array(
+					Composition_Schema::SECTION_ITEM_KEY => 'st05_cta',
+					Composition_Schema::SECTION_ITEM_POSITION => 1,
+				),
 			),
 			Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF => 'snap_v1',
 		);
@@ -175,7 +181,7 @@ final class Composition_Registry_Test extends TestCase {
 		$this->seed_sections_st01_and_st05();
 		$GLOBALS['_aio_wp_insert_post_return'] = 7000;
 
-		$input = $this->valid_minimal_composition();
+		$input  = $this->valid_minimal_composition();
 		$result = $this->registry->create( $input );
 
 		$this->assertInstanceOf( Composition_Registry_Result::class, $result );
@@ -195,7 +201,7 @@ final class Composition_Registry_Test extends TestCase {
 
 		$input = $this->valid_minimal_composition( 'comp_invalid' );
 		$input[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ][] = array(
-			Composition_Schema::SECTION_ITEM_KEY => 'st99_nonexistent',
+			Composition_Schema::SECTION_ITEM_KEY      => 'st99_nonexistent',
 			Composition_Schema::SECTION_ITEM_POSITION => 2,
 		);
 
@@ -213,20 +219,22 @@ final class Composition_Registry_Test extends TestCase {
 		$create_result = $this->registry->create( $this->valid_minimal_composition( 'comp_original' ) );
 		$this->assertTrue( $create_result->success );
 
-		$comp_post = new \WP_Post( array(
-			'ID'          => 7002,
-			'post_type'   => Object_Type_Keys::COMPOSITION,
-			'post_title'  => 'Test Composition',
-			'post_status' => 'publish',
-			'post_name'   => 'comp_original',
-		) );
-		$section_posts = $GLOBALS['_aio_wp_query_posts'] ?? array();
-		$GLOBALS['_aio_get_post_return']   = $comp_post;
-		$GLOBALS['_aio_wp_query_posts']   = array_merge( $section_posts, array( $comp_post ) );
-		$GLOBALS['_aio_post_meta']['7002'] = array(
-			'_aio_internal_key'            => 'comp_original',
-			'_aio_status'                  => 'draft',
-			'_aio_composition_definition'   => wp_json_encode( $create_result->definition ),
+		$comp_post                             = new \WP_Post(
+			array(
+				'ID'          => 7002,
+				'post_type'   => Object_Type_Keys::COMPOSITION,
+				'post_title'  => 'Test Composition',
+				'post_status' => 'publish',
+				'post_name'   => 'comp_original',
+			)
+		);
+		$section_posts                         = $GLOBALS['_aio_wp_query_posts'] ?? array();
+		$GLOBALS['_aio_get_post_return']       = $comp_post;
+		$GLOBALS['_aio_wp_query_posts']        = array_merge( $section_posts, array( $comp_post ) );
+		$GLOBALS['_aio_post_meta']['7002']     = array(
+			'_aio_internal_key'           => 'comp_original',
+			'_aio_status'                 => 'draft',
+			'_aio_composition_definition' => wp_json_encode( $create_result->definition ),
 		);
 		$GLOBALS['_aio_wp_insert_post_return'] = 7003;
 
@@ -249,15 +257,39 @@ final class Composition_Registry_Test extends TestCase {
 
 		$input = $this->valid_minimal_composition( 'comp_mapping' );
 		$input[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] = array(
-			array( Composition_Schema::SECTION_ITEM_KEY => 'st01_hero', Composition_Schema::SECTION_ITEM_POSITION => 0, Composition_Schema::SECTION_ITEM_VARIANT => 'default' ),
-			array( Composition_Schema::SECTION_ITEM_KEY => 'st05_cta', Composition_Schema::SECTION_ITEM_POSITION => 1, Composition_Schema::SECTION_ITEM_VARIANT => 'compact' ),
+			array(
+				Composition_Schema::SECTION_ITEM_KEY      => 'st01_hero',
+				Composition_Schema::SECTION_ITEM_POSITION => 0,
+				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
+			),
+			array(
+				Composition_Schema::SECTION_ITEM_KEY      => 'st05_cta',
+				Composition_Schema::SECTION_ITEM_POSITION => 1,
+				Composition_Schema::SECTION_ITEM_VARIANT  => 'compact',
+			),
 		);
 		$result = $this->registry->create( $input );
 		$this->assertTrue( $result->success );
 
 		$GLOBALS['_aio_assign_results'] = array(
-			array( 'target_ref' => 'st01_hero', 'payload' => wp_json_encode( array( 'position' => 0, 'variant' => 'default' ) ) ),
-			array( 'target_ref' => 'st05_cta', 'payload' => wp_json_encode( array( 'position' => 1, 'variant' => 'compact' ) ) ),
+			array(
+				'target_ref' => 'st01_hero',
+				'payload'    => wp_json_encode(
+					array(
+						'position' => 0,
+						'variant'  => 'default',
+					)
+				),
+			),
+			array(
+				'target_ref' => 'st05_cta',
+				'payload'    => wp_json_encode(
+					array(
+						'position' => 1,
+						'variant'  => 'compact',
+					)
+				),
+			),
 		);
 
 		$mappings = $this->registry->get_section_mappings( 'comp_mapping' );
@@ -278,8 +310,16 @@ final class Composition_Registry_Test extends TestCase {
 		$create_result = $this->registry->create( $this->valid_minimal_composition( 'comp_attach_snap' ) );
 		$this->assertTrue( $create_result->success );
 
-		$comp_post = new \WP_Post( array( 'ID' => 7010, 'post_type' => Object_Type_Keys::COMPOSITION, 'post_title' => 'Test', 'post_status' => 'publish', 'post_name' => 'comp_attach_snap' ) );
-		$GLOBALS['_aio_get_post_return']  = $comp_post;
+		$comp_post                         = new \WP_Post(
+			array(
+				'ID'          => 7010,
+				'post_type'   => Object_Type_Keys::COMPOSITION,
+				'post_title'  => 'Test',
+				'post_status' => 'publish',
+				'post_name'   => 'comp_attach_snap',
+			)
+		);
+		$GLOBALS['_aio_get_post_return']   = $comp_post;
 		$GLOBALS['_aio_post_meta']['7010'] = array(
 			'_aio_internal_key'           => 'comp_attach_snap',
 			'_aio_status'                 => 'draft',
@@ -302,12 +342,20 @@ final class Composition_Registry_Test extends TestCase {
 		$result = $this->registry->create( $input );
 		$this->assertTrue( $result->success );
 
-		$GLOBALS['_aio_wp_query_posts'] = array(
-			new \WP_Post( array( 'ID' => 7005, 'post_type' => Object_Type_Keys::COMPOSITION, 'post_title' => 'Test', 'post_status' => 'publish', 'post_name' => 'comp_snapshot' ) ),
+		$GLOBALS['_aio_wp_query_posts']    = array(
+			new \WP_Post(
+				array(
+					'ID'          => 7005,
+					'post_type'   => Object_Type_Keys::COMPOSITION,
+					'post_title'  => 'Test',
+					'post_status' => 'publish',
+					'post_name'   => 'comp_snapshot',
+				)
+			),
 		);
 		$GLOBALS['_aio_post_meta']['7005'] = array(
-			'_aio_internal_key'         => 'comp_snapshot',
-			'_aio_status'               => 'draft',
+			'_aio_internal_key'           => 'comp_snapshot',
+			'_aio_status'                 => 'draft',
 			'_aio_composition_definition' => wp_json_encode( $result->definition ),
 		);
 
@@ -322,19 +370,27 @@ final class Composition_Registry_Test extends TestCase {
 
 		$input = $this->valid_minimal_composition( 'comp_blocked' );
 		$input[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ][] = array(
-			Composition_Schema::SECTION_ITEM_KEY => 'st99_nonexistent',
+			Composition_Schema::SECTION_ITEM_KEY      => 'st99_nonexistent',
 			Composition_Schema::SECTION_ITEM_POSITION => 2,
 		);
 		$create_result = $this->registry->create( $input );
 		$this->assertTrue( $create_result->success );
 		$post_id = $create_result->post_id;
 
-		$comp_post = new \WP_Post( array( 'ID' => $post_id, 'post_type' => Object_Type_Keys::COMPOSITION, 'post_title' => 'Test', 'post_status' => 'publish', 'post_name' => 'comp_blocked' ) );
-		$GLOBALS['_aio_get_post_return']  = $comp_post;
-		$GLOBALS['_aio_wp_query_posts']  = array( $comp_post );
+		$comp_post                                      = new \WP_Post(
+			array(
+				'ID'          => $post_id,
+				'post_type'   => Object_Type_Keys::COMPOSITION,
+				'post_title'  => 'Test',
+				'post_status' => 'publish',
+				'post_name'   => 'comp_blocked',
+			)
+		);
+		$GLOBALS['_aio_get_post_return']                = $comp_post;
+		$GLOBALS['_aio_wp_query_posts']                 = array( $comp_post );
 		$GLOBALS['_aio_post_meta'][ (string) $post_id ] = array(
-			'_aio_internal_key'         => 'comp_blocked',
-			'_aio_status'               => 'draft',
+			'_aio_internal_key'           => 'comp_blocked',
+			'_aio_status'                 => 'draft',
 			'_aio_composition_definition' => wp_json_encode( $create_result->definition ),
 		);
 
@@ -357,15 +413,23 @@ final class Composition_Registry_Test extends TestCase {
 		$def[ Composition_Schema::FIELD_VALIDATION_STATUS ] = Composition_Validation_Result::VALID;
 		$post_id = $create_result->post_id;
 
-		$comp_post = new \WP_Post( array( 'ID' => $post_id, 'post_type' => Object_Type_Keys::COMPOSITION, 'post_title' => 'Test', 'post_status' => 'publish', 'post_name' => 'comp_activatable' ) );
-		$GLOBALS['_aio_get_post_return']  = $comp_post;
-		$GLOBALS['_aio_wp_query_posts']  = array( $comp_post );
+		$comp_post                                      = new \WP_Post(
+			array(
+				'ID'          => $post_id,
+				'post_type'   => Object_Type_Keys::COMPOSITION,
+				'post_title'  => 'Test',
+				'post_status' => 'publish',
+				'post_name'   => 'comp_activatable',
+			)
+		);
+		$GLOBALS['_aio_get_post_return']                = $comp_post;
+		$GLOBALS['_aio_wp_query_posts']                 = array( $comp_post );
 		$GLOBALS['_aio_post_meta'][ (string) $post_id ] = array(
-			'_aio_internal_key'         => 'comp_activatable',
-			'_aio_status'               => 'draft',
+			'_aio_internal_key'           => 'comp_activatable',
+			'_aio_status'                 => 'draft',
 			'_aio_composition_definition' => wp_json_encode( $def ),
 		);
-		$GLOBALS['_aio_wp_update_post_return'] = $post_id;
+		$GLOBALS['_aio_wp_update_post_return']          = $post_id;
 
 		$status_result = $this->registry->set_status( $post_id, 'active' );
 
@@ -376,9 +440,9 @@ final class Composition_Registry_Test extends TestCase {
 	public function test_empty_section_list_validation_failure(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 7008;
 
-		$input = array(
-			Composition_Schema::FIELD_COMPOSITION_ID      => 'comp_empty',
-			Composition_Schema::FIELD_NAME                => 'Empty',
+		$input  = array(
+			Composition_Schema::FIELD_COMPOSITION_ID       => 'comp_empty',
+			Composition_Schema::FIELD_NAME                 => 'Empty',
 			Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(),
 			Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF => 'snap',
 		);
@@ -390,18 +454,34 @@ final class Composition_Registry_Test extends TestCase {
 	}
 
 	private function seed_sections_st01_and_st05(): void {
-		$GLOBALS['_aio_wp_query_posts'] = array(
-			new \WP_Post( array( 'ID' => 9001, 'post_type' => Object_Type_Keys::SECTION_TEMPLATE, 'post_title' => 'Hero', 'post_status' => 'publish', 'post_name' => 'st01_hero' ) ),
-			new \WP_Post( array( 'ID' => 9002, 'post_type' => Object_Type_Keys::SECTION_TEMPLATE, 'post_title' => 'CTA', 'post_status' => 'publish', 'post_name' => 'st05_cta' ) ),
+		$GLOBALS['_aio_wp_query_posts']    = array(
+			new \WP_Post(
+				array(
+					'ID'          => 9001,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => 'Hero',
+					'post_status' => 'publish',
+					'post_name'   => 'st01_hero',
+				)
+			),
+			new \WP_Post(
+				array(
+					'ID'          => 9002,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => 'CTA',
+					'post_status' => 'publish',
+					'post_name'   => 'st05_cta',
+				)
+			),
 		);
 		$GLOBALS['_aio_post_meta']['9001'] = array(
-			'_aio_internal_key'      => 'st01_hero',
-			'_aio_status'            => 'active',
+			'_aio_internal_key'       => 'st01_hero',
+			'_aio_status'             => 'active',
 			'_aio_section_definition' => wp_json_encode( $this->valid_minimal_section( 'st01_hero', 'Hero' ) ),
 		);
 		$GLOBALS['_aio_post_meta']['9002'] = array(
-			'_aio_internal_key'      => 'st05_cta',
-			'_aio_status'            => 'active',
+			'_aio_internal_key'       => 'st05_cta',
+			'_aio_status'             => 'active',
 			'_aio_section_definition' => wp_json_encode( $this->valid_minimal_section( 'st05_cta', 'CTA' ) ),
 		);
 	}

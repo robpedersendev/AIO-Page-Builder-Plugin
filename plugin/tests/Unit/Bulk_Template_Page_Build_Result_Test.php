@@ -46,20 +46,20 @@ final class Bulk_Template_Page_Build_Result_Test extends TestCase {
 			array( 'job_1' ),
 			array(
 				'item_1' => array(
-					'status' => 'completed',
-					'job_ref' => 'job_1',
-					'post_id' => 10,
-					'template_key' => 'tpl_hub',
-					'slug_conflict' => false,
+					'status'         => 'completed',
+					'job_ref'        => 'job_1',
+					'post_id'        => 10,
+					'template_key'   => 'tpl_hub',
+					'slug_conflict'  => false,
 					'failure_reason' => '',
 					'retry_eligible' => false,
 				),
 				'item_2' => array(
-					'status' => 'refused',
-					'job_ref' => '',
-					'post_id' => 0,
-					'template_key' => 'tpl_child',
-					'slug_conflict' => true,
+					'status'         => 'refused',
+					'job_ref'        => '',
+					'post_id'        => 0,
+					'template_key'   => 'tpl_child',
+					'slug_conflict'  => true,
 					'failure_reason' => 'Slug conflict.',
 					'retry_eligible' => false,
 				),
@@ -73,7 +73,7 @@ final class Bulk_Template_Page_Build_Result_Test extends TestCase {
 			'1 completed. 1 refused.',
 			array( 'envelope_count' => 2 )
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 		$this->assertSame( 'plan_1', $arr['plan_id'] );
 		$this->assertSame( 'batch_1', $arr['batch_id'] );
 		$this->assertSame( array( 'item_2', 'about-us' ), $arr['slug_collisions'] );

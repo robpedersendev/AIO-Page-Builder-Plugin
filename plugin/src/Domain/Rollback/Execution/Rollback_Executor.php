@@ -44,14 +44,14 @@ final class Rollback_Executor {
 	}
 
 	private function register_default_handlers(): void {
-		$this->handlers[ Execution_Action_Types::REPLACE_PAGE ]  = new Rollback_Page_Replacement_Handler();
+		$this->handlers[ Execution_Action_Types::REPLACE_PAGE ]    = new Rollback_Page_Replacement_Handler();
 		$this->handlers[ Execution_Action_Types::APPLY_TOKEN_SET ] = new Rollback_Token_Set_Handler();
 	}
 
 	/**
 	 * Registers a handler for an action type (e.g. replace_page, apply_token_set). Navigation not supported by default.
 	 *
-	 * @param string                        $action_type
+	 * @param string                     $action_type
 	 * @param Rollback_Handler_Interface $handler
 	 * @return void
 	 */
@@ -66,11 +66,11 @@ final class Rollback_Executor {
 	 * @return Rollback_Result
 	 */
 	public function execute( array $payload ): Rollback_Result {
-		$job_id            = isset( $payload['job_id'] ) && is_string( $payload['job_id'] ) ? $payload['job_id'] : '';
-		$pre_snapshot_id   = isset( $payload['pre_snapshot_id'] ) && is_string( $payload['pre_snapshot_id'] ) ? trim( $payload['pre_snapshot_id'] ) : '';
-		$post_snapshot_id  = isset( $payload['post_snapshot_id'] ) && is_string( $payload['post_snapshot_id'] ) ? trim( $payload['post_snapshot_id'] ) : '';
-		$handler_key       = isset( $payload['rollback_handler_key'] ) && is_string( $payload['rollback_handler_key'] ) ? trim( $payload['rollback_handler_key'] ) : '';
-		$target_ref        = isset( $payload['target_ref'] ) && is_string( $payload['target_ref'] ) ? $payload['target_ref'] : '';
+		$job_id           = isset( $payload['job_id'] ) && is_string( $payload['job_id'] ) ? $payload['job_id'] : '';
+		$pre_snapshot_id  = isset( $payload['pre_snapshot_id'] ) && is_string( $payload['pre_snapshot_id'] ) ? trim( $payload['pre_snapshot_id'] ) : '';
+		$post_snapshot_id = isset( $payload['post_snapshot_id'] ) && is_string( $payload['post_snapshot_id'] ) ? trim( $payload['post_snapshot_id'] ) : '';
+		$handler_key      = isset( $payload['rollback_handler_key'] ) && is_string( $payload['rollback_handler_key'] ) ? trim( $payload['rollback_handler_key'] ) : '';
+		$target_ref       = isset( $payload['target_ref'] ) && is_string( $payload['target_ref'] ) ? $payload['target_ref'] : '';
 
 		if ( $pre_snapshot_id === '' || $post_snapshot_id === '' ) {
 			return Rollback_Result::ineligible(
@@ -110,7 +110,10 @@ final class Rollback_Executor {
 				$pre_snapshot_id,
 				$post_snapshot_id,
 				__( 'Unsupported rollback family.', 'aio-page-builder' ),
-				array( 'code' => 'no_handler', 'handler_key' => $handler_key )
+				array(
+					'code'        => 'no_handler',
+					'handler_key' => $handler_key,
+				)
 			);
 		}
 

@@ -48,23 +48,43 @@ final class Template_Analytics_Screen {
 	 * @return void
 	 */
 	public function render(): void {
-		$date_from = isset( $_GET['date_from'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_from'] ) ) : '';
-		$date_to   = isset( $_GET['date_to'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_to'] ) ) : '';
+		$date_from       = isset( $_GET['date_from'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_from'] ) ) : '';
+		$date_to         = isset( $_GET['date_to'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_to'] ) ) : '';
 		$template_family = isset( $_GET['template_family'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['template_family'] ) ) : '';
-		$page_class = isset( $_GET['page_class'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['page_class'] ) ) : '';
+		$page_class      = isset( $_GET['page_class'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['page_class'] ) ) : '';
 
 		$summary = array(
-			'template_usage_trends'          => array( 'by_family' => array(), 'by_class' => array(), 'total_items' => 0 ),
-			'recommendation_acceptance'      => array( 'by_family' => array(), 'by_class' => array() ),
-			'rejection_reasons'              => array( 'reasons' => array(), 'total' => 0 ),
-			'template_family_outcome_summary' => array( 'by_family' => array(), 'total_completed' => 0, 'total_failed' => 0 ),
-			'rollback_frequency'             => array( 'total_rollbacks' => 0, 'by_month' => array() ),
-			'composition_usage'              => array( 'by_status' => array(), 'total' => 0 ),
+			'template_usage_trends'           => array(
+				'by_family'   => array(),
+				'by_class'    => array(),
+				'total_items' => 0,
+			),
+			'recommendation_acceptance'       => array(
+				'by_family' => array(),
+				'by_class'  => array(),
+			),
+			'rejection_reasons'               => array(
+				'reasons' => array(),
+				'total'   => 0,
+			),
+			'template_family_outcome_summary' => array(
+				'by_family'       => array(),
+				'total_completed' => 0,
+				'total_failed'    => 0,
+			),
+			'rollback_frequency'              => array(
+				'total_rollbacks' => 0,
+				'by_month'        => array(),
+			),
+			'composition_usage'               => array(
+				'by_status' => array(),
+				'total'     => 0,
+			),
 		);
 
 		if ( $this->container && $this->container->has( 'template_analytics_service' ) ) {
 			try {
-				$svc = $this->container->get( 'template_analytics_service' );
+				$svc     = $this->container->get( 'template_analytics_service' );
 				$summary = $svc->get_analytics_summary(
 					$date_from !== '' ? $date_from : null,
 					$date_to !== '' ? $date_to : null,
@@ -76,9 +96,9 @@ final class Template_Analytics_Screen {
 			}
 		}
 
-		$build_plans_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
-		$queue_logs_url  = \admin_url( 'admin.php?page=' . Queue_Logs_Screen::SLUG );
-		$page_tpl_url    = \admin_url( 'admin.php?page=' . Page_Templates_Directory_Screen::SLUG );
+		$build_plans_url  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
+		$queue_logs_url   = \admin_url( 'admin.php?page=' . Queue_Logs_Screen::SLUG );
+		$page_tpl_url     = \admin_url( 'admin.php?page=' . Page_Templates_Directory_Screen::SLUG );
 		$compositions_url = \admin_url( 'admin.php?page=' . Compositions_Screen::SLUG );
 		?>
 		<div class="wrap aio-page-builder-screen aio-template-analytics" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -128,7 +148,7 @@ final class Template_Analytics_Screen {
 	}
 
 	private function render_usage_trends( array $data ): void {
-		$total = (int) ( $data['total_items'] ?? 0 );
+		$total     = (int) ( $data['total_items'] ?? 0 );
 		$by_family = isset( $data['by_family'] ) && is_array( $data['by_family'] ) ? $data['by_family'] : array();
 		$by_class  = isset( $data['by_class'] ) && is_array( $data['by_class'] ) ? $data['by_class'] : array();
 		?>
@@ -154,10 +174,13 @@ final class Template_Analytics_Screen {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
-		<?php endif;
-		if ( empty( $by_family ) && empty( $by_class ) && $total === 0 ) : ?>
+			<?php
+		endif;
+		if ( empty( $by_family ) && empty( $by_class ) && $total === 0 ) :
+			?>
 			<p><?php \esc_html_e( 'No template usage data in range.', 'aio-page-builder' ); ?></p>
-		<?php endif;
+			<?php
+		endif;
 	}
 
 	private function render_recommendation_acceptance( array $data ): void {
@@ -205,7 +228,7 @@ final class Template_Analytics_Screen {
 
 	private function render_rejection_reasons( array $data ): void {
 		$reasons = isset( $data['reasons'] ) && is_array( $data['reasons'] ) ? $data['reasons'] : array();
-		$total = (int) ( $data['total'] ?? 0 );
+		$total   = (int) ( $data['total'] ?? 0 );
 		?>
 		<p><?php echo \esc_html( sprintf( __( 'Total rejections/failures with recorded reason: %d.', 'aio-page-builder' ), $total ) ); ?></p>
 		<?php if ( empty( $reasons ) ) : ?>
@@ -219,15 +242,16 @@ final class Template_Analytics_Screen {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
-		<?php endif;
+			<?php
+		endif;
 	}
 
 	private function render_family_outcomes( array $data ): void {
-		$by_family = isset( $data['by_family'] ) && is_array( $data['by_family'] ) ? $data['by_family'] : array();
+		$by_family       = isset( $data['by_family'] ) && is_array( $data['by_family'] ) ? $data['by_family'] : array();
 		$total_completed = (int) ( $data['total_completed'] ?? 0 );
 		$total_failed    = (int) ( $data['total_failed'] ?? 0 );
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Execution completed: %d; failed: %d (create_page, replace_page).', 'aio-page-builder' ), $total_completed, $total_failed ) ); ?></p>
+		<p><?php echo \esc_html( sprintf( __( 'Execution completed: %1$d; failed: %2$d (create_page, replace_page).', 'aio-page-builder' ), $total_completed, $total_failed ) ); ?></p>
 		<?php if ( empty( $by_family ) ) : ?>
 			<p><?php \esc_html_e( 'No execution outcome data by family in range.', 'aio-page-builder' ); ?></p>
 		<?php else : ?>
@@ -243,11 +267,12 @@ final class Template_Analytics_Screen {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
-		<?php endif;
+			<?php
+		endif;
 	}
 
 	private function render_rollback_frequency( array $data ): void {
-		$total = (int) ( $data['total_rollbacks'] ?? 0 );
+		$total    = (int) ( $data['total_rollbacks'] ?? 0 );
 		$by_month = isset( $data['by_month'] ) && is_array( $data['by_month'] ) ? $data['by_month'] : array();
 		?>
 		<p><?php echo \esc_html( sprintf( __( 'Total rollbacks in range: %d.', 'aio-page-builder' ), $total ) ); ?></p>
@@ -262,12 +287,13 @@ final class Template_Analytics_Screen {
 		</table>
 		<?php else : ?>
 			<p><?php \esc_html_e( 'No rollback jobs in range.', 'aio-page-builder' ); ?></p>
-		<?php endif;
+			<?php
+		endif;
 	}
 
 	private function render_composition_usage( array $data ): void {
 		$by_status = isset( $data['by_status'] ) && is_array( $data['by_status'] ) ? $data['by_status'] : array();
-		$total = (int) ( $data['total'] ?? 0 );
+		$total     = (int) ( $data['total'] ?? 0 );
 		?>
 		<p><?php echo \esc_html( sprintf( __( 'Total compositions (inventory): %d.', 'aio-page-builder' ), $total ) ); ?></p>
 		<?php if ( ! empty( $by_status ) ) : ?>
@@ -281,6 +307,7 @@ final class Template_Analytics_Screen {
 		</table>
 		<?php else : ?>
 			<p><?php \esc_html_e( 'No composition data available.', 'aio-page-builder' ); ?></p>
-		<?php endif;
+			<?php
+		endif;
 	}
 }

@@ -36,17 +36,17 @@ final class Composed_Page_OnePager_Result {
 	private array $compliance_warnings;
 
 	/**
-	 * @param array<string, mixed> $composed_onepager   Effective one-pager (base + overlay in allowed regions).
-	 * @param string               $base_documentation_id Base doc id or empty.
-	 * @param bool                 $overlay_applied    True if an active overlay was merged.
-	 * @param string               $overlay_industry_key Industry key of overlay or empty.
-	 * @param string               $page_template_key  Page template key that was resolved.
+	 * @param array<string, mixed>                                                     $composed_onepager   Effective one-pager (base + overlay in allowed regions).
+	 * @param string                                                                   $base_documentation_id Base doc id or empty.
+	 * @param bool                                                                     $overlay_applied    True if an active overlay was merged.
+	 * @param string                                                                   $overlay_industry_key Industry key of overlay or empty.
+	 * @param string                                                                   $page_template_key  Page template key that was resolved.
 	 * @param list<array{rule_key: string, severity: string, caution_summary: string}> $compliance_warnings Advisory compliance cautions (default empty).
 	 */
 	public function __construct( array $composed_onepager, string $base_documentation_id, bool $overlay_applied, string $overlay_industry_key, string $page_template_key, array $compliance_warnings = array() ) {
 		$this->composed_onepager     = $composed_onepager;
 		$this->base_documentation_id = $base_documentation_id;
-		$this->overlay_applied      = $overlay_applied;
+		$this->overlay_applied       = $overlay_applied;
 		$this->overlay_industry_key  = $overlay_industry_key;
 		$this->page_template_key     = $page_template_key;
 		$this->compliance_warnings   = $compliance_warnings;
@@ -93,7 +93,7 @@ final class Composed_Page_OnePager_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'page_template_key'     => $this->page_template_key,
+			'page_template_key'      => $this->page_template_key,
 			'base_documentation_id'  => $this->base_documentation_id,
 			'overlay_applied'        => $this->overlay_applied,
 			'overlay_industry_key'   => $this->overlay_industry_key,

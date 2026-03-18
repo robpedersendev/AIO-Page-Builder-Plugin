@@ -69,7 +69,7 @@ final class Subtype_Page_OnePager_Overlay_Registry {
 			if ( ! is_array( $ov ) ) {
 				continue;
 			}
-			$subtype = isset( $ov[ self::FIELD_SUBTYPE_KEY ] ) && is_string( $ov[ self::FIELD_SUBTYPE_KEY ] )
+			$subtype  = isset( $ov[ self::FIELD_SUBTYPE_KEY ] ) && is_string( $ov[ self::FIELD_SUBTYPE_KEY ] )
 				? trim( $ov[ self::FIELD_SUBTYPE_KEY ] )
 				: '';
 			$page_key = isset( $ov[ self::FIELD_PAGE_TEMPLATE_KEY ] ) && is_string( $ov[ self::FIELD_PAGE_TEMPLATE_KEY ] )
@@ -101,7 +101,7 @@ final class Subtype_Page_OnePager_Overlay_Registry {
 				continue;
 			}
 			$this->by_composite[ $composite ] = $ov;
-			$this->all[]                     = $ov;
+			$this->all[]                      = $ov;
 		}
 	}
 
@@ -113,8 +113,8 @@ final class Subtype_Page_OnePager_Overlay_Registry {
 	 * @return array<string, mixed>|null
 	 */
 	public function get( string $subtype_key, string $page_template_key ): ?array {
-		$sub = trim( $subtype_key );
-		$p   = trim( $page_template_key );
+		$sub       = trim( $subtype_key );
+		$p         = trim( $page_template_key );
 		$composite = $sub . '|' . $p;
 		return $this->by_composite[ $composite ] ?? null;
 	}

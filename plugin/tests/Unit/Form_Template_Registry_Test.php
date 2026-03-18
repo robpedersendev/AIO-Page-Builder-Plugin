@@ -54,16 +54,16 @@ final class Form_Template_Registry_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']   = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$this->section_repo   = new Section_Template_Repository();
-		$section_normalizer   = new \AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer();
-		$section_validator   = new \AIOPageBuilder\Domain\Registries\Section\Section_Validator( $section_normalizer, $this->section_repo );
-		$this->section_registry = new Section_Registry_Service( $section_validator, $this->section_repo );
-		$this->page_repo    = new Page_Template_Repository();
-		$page_normalizer   = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer();
-		$page_validator    = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator( $page_normalizer, $this->page_repo, $this->section_registry );
-		$this->page_registry = new Page_Template_Registry_Service( $page_validator, $this->page_repo );
+		$this->section_repo             = new Section_Template_Repository();
+		$section_normalizer             = new \AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer();
+		$section_validator              = new \AIOPageBuilder\Domain\Registries\Section\Section_Validator( $section_normalizer, $this->section_repo );
+		$this->section_registry         = new Section_Registry_Service( $section_validator, $this->section_repo );
+		$this->page_repo                = new Page_Template_Repository();
+		$page_normalizer                = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer();
+		$page_validator                 = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator( $page_normalizer, $this->page_repo, $this->section_registry );
+		$this->page_registry            = new Page_Template_Registry_Service( $page_validator, $this->page_repo );
 	}
 
 	protected function tearDown(): void {
@@ -102,9 +102,9 @@ final class Form_Template_Registry_Test extends TestCase {
 	}
 
 	public function test_ensure_bundled_form_templates_returns_result_shape(): void {
-		$GLOBALS['_aio_wp_query_posts'] = array();
+		$GLOBALS['_aio_wp_query_posts']        = array();
 		$GLOBALS['_aio_wp_insert_post_return'] = 101;
-		$result = $this->section_registry->ensure_bundled_form_templates( $this->page_repo );
+		$result                                = $this->section_registry->ensure_bundled_form_templates( $this->page_repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'section_id', $result );

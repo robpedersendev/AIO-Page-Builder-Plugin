@@ -36,14 +36,14 @@ final class Industry_Pack_Registry {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function get_builtin_pack_definitions(): array {
-		$dir = __DIR__ . '/Packs';
+		$dir   = __DIR__ . '/Packs';
 		$files = array(
 			$dir . '/industry-pack-cosmetology-nail.php',
 			$dir . '/industry-pack-realtor.php',
 			$dir . '/industry-pack-plumber.php',
 			$dir . '/industry-pack-disaster-recovery.php',
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $files as $path ) {
 			if ( is_readable( $path ) ) {
 				$loaded = require $path;
@@ -139,7 +139,7 @@ final class Industry_Pack_Registry {
 			'version_marker' => isset( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] )
 				? $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ]
 				: '',
-			'status' => isset( $pack[ Industry_Pack_Schema::FIELD_STATUS ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_STATUS ] )
+			'status'         => isset( $pack[ Industry_Pack_Schema::FIELD_STATUS ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_STATUS ] )
 				? $pack[ Industry_Pack_Schema::FIELD_STATUS ]
 				: '',
 		);

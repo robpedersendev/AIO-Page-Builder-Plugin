@@ -45,7 +45,7 @@ final class Form_Provider_Registry {
 	private function register_ndr_forms(): void {
 		$this->providers['ndr_forms'] = array(
 			'shortcode_tag' => 'ndr_forms',
-			'id_attr'      => 'id',
+			'id_attr'       => 'id',
 		);
 	}
 
@@ -96,7 +96,7 @@ final class Form_Provider_Registry {
 		if ( $config === null ) {
 			return null;
 		}
-		$tag = $config['shortcode_tag'];
+		$tag  = $config['shortcode_tag'];
 		$attr = $config['id_attr'];
 		return '[' . $tag . ' ' . $attr . '="' . esc_attr( $form_id ) . '"]';
 	}

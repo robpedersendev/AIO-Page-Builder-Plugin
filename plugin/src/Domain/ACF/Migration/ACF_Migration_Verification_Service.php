@@ -66,13 +66,13 @@ final class ACF_Migration_Verification_Service {
 		ACF_Local_JSON_Mirror_Service $mirror_service,
 		ACF_Regeneration_Service $regeneration_service
 	) {
-		$this->blueprint_service         = $blueprint_service;
-		$this->assignment_map            = $assignment_map;
-		$this->page_template_repository  = $page_template_repository;
-		$this->composition_repository    = $composition_repository;
-		$this->debug_exporter            = $debug_exporter;
-		$this->mirror_service            = $mirror_service;
-		$this->regeneration_service      = $regeneration_service;
+		$this->blueprint_service        = $blueprint_service;
+		$this->assignment_map           = $assignment_map;
+		$this->page_template_repository = $page_template_repository;
+		$this->composition_repository   = $composition_repository;
+		$this->debug_exporter           = $debug_exporter;
+		$this->mirror_service           = $mirror_service;
+		$this->regeneration_service     = $regeneration_service;
 	}
 
 	/**
@@ -91,7 +91,7 @@ final class ACF_Migration_Verification_Service {
 		$mirror_coherence   = $this->build_mirror_coherence( $options );
 		$regeneration_safe  = $this->build_regeneration_safe();
 
-		$breaking   = array();
+		$breaking    = array();
 		$deprecation = array();
 
 		if ( ! empty( $field_stability['unstable_or_missing'] ) ) {
@@ -142,9 +142,9 @@ final class ACF_Migration_Verification_Service {
 	 * @return array<string, mixed> field_key_stability_summary
 	 */
 	public function build_field_key_stability_summary( array $options = array() ): array {
-		$blueprints = $this->blueprint_service->get_all_blueprints();
-		$stable_group_keys = array();
-		$stable_field_keys = array();
+		$blueprints          = $this->blueprint_service->get_all_blueprints();
+		$stable_group_keys   = array();
+		$stable_field_keys   = array();
 		$unstable_or_missing = array();
 
 		foreach ( $blueprints as $bp ) {
@@ -152,7 +152,7 @@ final class ACF_Migration_Verification_Service {
 			if ( $section_key === '' ) {
 				continue;
 			}
-			$group_key = Field_Key_Generator::group_key( $section_key );
+			$group_key           = Field_Key_Generator::group_key( $section_key );
 			$stable_group_keys[] = $group_key;
 
 			$fields = $bp[ Field_Blueprint_Schema::FIELDS ] ?? array();
@@ -218,7 +218,7 @@ final class ACF_Migration_Verification_Service {
 	 */
 	public function build_assignment_continuity_summary(): array {
 		$valid_pt_keys = array();
-		$defs = $this->page_template_repository->list_all_definitions( 9999, 0 );
+		$defs          = $this->page_template_repository->list_all_definitions( 9999, 0 );
 		foreach ( $defs as $d ) {
 			$k = (string) ( $d[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			if ( $k !== '' ) {
@@ -237,16 +237,16 @@ final class ACF_Migration_Verification_Service {
 			}
 		}
 
-		$assignments_checked   = 0;
-		$assignments_relevant  = 0;
-		$orphaned_or_invalid   = array();
+		$assignments_checked  = 0;
+		$assignments_relevant = 0;
+		$orphaned_or_invalid  = array();
 
 		$pt_rows = $this->assignment_map->list_by_type( Assignment_Types::PAGE_TEMPLATE, 500, 0 );
 		foreach ( $pt_rows as $row ) {
-			$assignments_checked++;
+			++$assignments_checked;
 			$target = (string) ( $row['target_ref'] ?? '' );
 			if ( isset( $valid_pt_keys[ $target ] ) ) {
-				$assignments_relevant++;
+				++$assignments_relevant;
 			} else {
 				$orphaned_or_invalid[] = 'page_template:' . $target;
 			}
@@ -254,10 +254,10 @@ final class ACF_Migration_Verification_Service {
 
 		$comp_rows = $this->assignment_map->list_by_type( Assignment_Types::PAGE_COMPOSITION, 500, 0 );
 		foreach ( $comp_rows as $row ) {
-			$assignments_checked++;
+			++$assignments_checked;
 			$target = (string) ( $row['target_ref'] ?? '' );
 			if ( $target === '' || isset( $valid_comp_ids[ $target ] ) ) {
-				$assignments_relevant++;
+				++$assignments_relevant;
 			} else {
 				$orphaned_or_invalid[] = 'page_composition:' . $target;
 			}
@@ -274,10 +274,10 @@ final class ACF_Migration_Verification_Service {
 			);
 
 		return array(
-			'assignments_checked'   => $assignments_checked,
-			'assignments_relevant'  => $assignments_relevant,
-			'orphaned_or_invalid'   => $orphaned_or_invalid,
-			'summary'               => $summary,
+			'assignments_checked'  => $assignments_checked,
+			'assignments_relevant' => $assignments_relevant,
+			'orphaned_or_invalid'  => $orphaned_or_invalid,
+			'summary'              => $summary,
 		);
 	}
 
@@ -289,8 +289,8 @@ final class ACF_Migration_Verification_Service {
 	 */
 	public function build_mirror_coherence( array $options = array() ): array {
 		$registry_manifest = $this->mirror_service->get_manifest_without_writing();
-		$simulated = $options['simulated_mirror_manifest'] ?? null;
-		$mirror_manifest = is_array( $simulated ) ? $simulated : $registry_manifest;
+		$simulated         = $options['simulated_mirror_manifest'] ?? null;
+		$mirror_manifest   = is_array( $simulated ) ? $simulated : $registry_manifest;
 
 		$diff = $this->debug_exporter->build_diff_summary( $registry_manifest, $mirror_manifest );
 
@@ -312,19 +312,19 @@ final class ACF_Migration_Verification_Service {
 	 * @return array<string, mixed>
 	 */
 	public function build_regeneration_safe(): array {
-		$plan_buildable = true;
+		$plan_buildable               = true;
 		$repair_candidates_consistent = true;
-		$summary = '';
+		$summary                      = '';
 
 		try {
-			$plan = $this->regeneration_service->build_plan( true, ACF_Regeneration_Plan::SCOPE_FULL, array( 'include_page_assignments' => true ) );
+			$plan    = $this->regeneration_service->build_plan( true, ACF_Regeneration_Plan::SCOPE_FULL, array( 'include_page_assignments' => true ) );
 			$refused = $plan->get_refused_cleanup();
 			if ( ! empty( $refused ) ) {
 				$repair_candidates_consistent = true;
 			}
 			$mismatches = $plan->get_field_group_mismatches();
 			$candidates = $plan->get_page_assignment_repair_candidates();
-			$summary = sprintf(
+			$summary    = sprintf(
 				/* translators: 1: mismatch count, 2: candidate count */
 				__( 'Regeneration plan buildable; %1$d mismatch(es), %2$d repair candidate(s).', 'aio-page-builder' ),
 				count( $mismatches ),
@@ -332,7 +332,7 @@ final class ACF_Migration_Verification_Service {
 			);
 		} catch ( \Throwable $e ) {
 			$plan_buildable = false;
-			$summary = __( 'Regeneration plan could not be built.', 'aio-page-builder' );
+			$summary        = __( 'Regeneration plan could not be built.', 'aio-page-builder' );
 		}
 
 		return array(

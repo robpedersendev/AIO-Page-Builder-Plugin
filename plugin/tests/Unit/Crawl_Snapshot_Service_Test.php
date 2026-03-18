@@ -31,7 +31,7 @@ require_once $plugin_root . '/src/Domain/Crawler/Classification/Crawl_Template_F
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Repository.php';
 require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Service.php';
 
-	final class Crawl_Snapshot_Service_Test extends TestCase {
+final class Crawl_Snapshot_Service_Test extends TestCase {
 
 	private function profile_service(): Crawl_Profile_Service {
 		return new Crawl_Profile_Service();
@@ -71,23 +71,28 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Servic
 	}
 
 	public function test_record_classification_returns_id_from_repository(): void {
-		$repo = $this->create_repository_stub_save( 201 );
-		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
+		$repo   = $this->create_repository_stub_save( 201 );
+		$svc    = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
 		$result = new Classification_Result(
 			Classification_Result::CLASSIFICATION_MEANINGFUL,
 			array( Classification_Result::REASON_CONTENT_WEIGHT ),
 			null,
-			array( 'has_h1' => true, 'word_count' => 200, 'in_nav' => false, 'link_count' => 0 ),
+			array(
+				'has_h1'     => true,
+				'word_count' => 200,
+				'in_nav'     => false,
+				'link_count' => 0,
+			),
 			Classification_Result::RETENTION_RETAIN,
 			'content_hash_abc'
 		);
-		$id = $svc->record_classification( 'run-1', 'https://example.com/page', $result );
+		$id     = $svc->record_classification( 'run-1', 'https://example.com/page', $result );
 		$this->assertSame( 201, $id );
 	}
 
 	public function test_record_classification_with_title_snapshot_returns_id(): void {
-		$repo = $this->create_repository_stub_save( 202 );
-		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
+		$repo   = $this->create_repository_stub_save( 202 );
+		$svc    = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
 		$result = new Classification_Result(
 			Classification_Result::CLASSIFICATION_MEANINGFUL,
 			array( Classification_Result::REASON_LIKELY_ROLE ),
@@ -96,24 +101,24 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Servic
 			Classification_Result::RETENTION_RETAIN,
 			null
 		);
-		$id = $svc->record_classification( 'run-1', 'https://example.com/about', $result, 'About Us' );
+		$id     = $svc->record_classification( 'run-1', 'https://example.com/about', $result, 'About Us' );
 		$this->assertSame( 202, $id );
 	}
 
 	public function test_record_extraction_returns_id_from_repository(): void {
-		$repo = $this->create_repository_stub_save( 301 );
-		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
+		$repo         = $this->create_repository_stub_save( 301 );
+		$svc          = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
 		$page_summary = array(
-			'title'                => 'Extracted Title',
-			'meta_description'     => 'Meta desc',
+			'title'               => 'Extracted Title',
+			'meta_description'    => 'Meta desc',
 			'h1'                  => 'H1',
 			'h2_outline'          => array(),
 			'word_count'          => 50,
 			'content_excerpt'     => 'Excerpt.',
 			'internal_link_count' => 2,
 		);
-		$result = new Extraction_Result( $page_summary, array(), array(), array() );
-		$id = $svc->record_extraction( 'run-1', 'https://example.com/page', $result );
+		$result       = new Extraction_Result( $page_summary, array(), array(), array() );
+		$id           = $svc->record_extraction( 'run-1', 'https://example.com/page', $result );
 		$this->assertSame( 301, $id );
 	}
 
@@ -128,36 +133,55 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Servic
 	/** Prompt 209: enrich_page_with_template_hint returns save id when page found and hint persisted. */
 	public function test_enrich_page_with_template_hint_returns_id_when_page_found(): void {
 		$page_record = array(
-			'id' => 1,
-			'crawl_run_id' => 'run-1',
-			'url' => 'https://example.com/about',
-			'title_snapshot' => 'About',
-			'page_classification' => Classification_Result::CLASSIFICATION_MEANINGFUL,
-			'summary_data' => json_encode( array(
-				'page_summary' => array( 'word_count' => 300, 'h1' => 'About', 'title' => 'About', 'meta_description' => '', 'content_excerpt' => '', 'internal_link_count' => 5 ),
-				'heading_outline' => array( array( 'level' => 1, 'text' => 'About' ) ),
-			) ),
-			'hierarchy_clues' => null,
+			'id'                       => 1,
+			'crawl_run_id'             => 'run-1',
+			'url'                      => 'https://example.com/about',
+			'title_snapshot'           => 'About',
+			'page_classification'      => Classification_Result::CLASSIFICATION_MEANINGFUL,
+			'summary_data'             => json_encode(
+				array(
+					'page_summary'    => array(
+						'word_count'          => 300,
+						'h1'                  => 'About',
+						'title'               => 'About',
+						'meta_description'    => '',
+						'content_excerpt'     => '',
+						'internal_link_count' => 5,
+					),
+					'heading_outline' => array(
+						array(
+							'level' => 1,
+							'text'  => 'About',
+						),
+					),
+				)
+			),
+			'hierarchy_clues'          => null,
 			'navigation_participation' => 1,
 		);
-		$repo = $this->create_repository_stub_get_and_save( $page_record, 302 );
-		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
-		$id   = $svc->enrich_page_with_template_hint( 'run-1', 'https://example.com/about' );
+		$repo        = $this->create_repository_stub_get_and_save( $page_record, 302 );
+		$svc         = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
+		$id          = $svc->enrich_page_with_template_hint( 'run-1', 'https://example.com/about' );
 		$this->assertSame( 302, $id );
 	}
 
 	public function test_create_session_returns_non_empty_run_id_and_get_session_returns_payload(): void {
-		$wpdb = new class() {
+		$wpdb   = new class() {
 			public string $prefix = 'wp_';
 			public int $insert_id = 0;
-			public function get_row( string $q, $o = OBJECT ) { return null; }
-			public function get_results( string $q, $o = OBJECT ) { return array(); }
-			public function query( string $q ) { return 0; }
-			public function prepare( string $q, ...$a ) { return $q; }
-			public function update( $t, $d, $w, $f = null, $wf = null ) { return 0; }
+			public function get_row( string $q, $o = OBJECT ) {
+				return null; }
+			public function get_results( string $q, $o = OBJECT ) {
+				return array(); }
+			public function query( string $q ) {
+				return 0; }
+			public function prepare( string $q, ...$a ) {
+				return $q; }
+			public function update( $t, $d, $w, $f = null, $wf = null ) {
+				return 0; }
 		};
-		$repo = new Crawl_Snapshot_Repository( $wpdb );
-		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
+		$repo   = new Crawl_Snapshot_Repository( $wpdb );
+		$svc    = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
 		$run_id = $svc->create_session( 'example.com', array() );
 		$this->assertNotSame( '', $run_id );
 		$session = $svc->get_session( $run_id );
@@ -172,17 +196,22 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Servic
 	}
 
 	public function test_create_session_with_approved_profile_stores_profile_in_session(): void {
-		$wpdb = new class() {
+		$wpdb   = new class() {
 			public string $prefix = 'wp_';
 			public int $insert_id = 0;
-			public function get_row( string $q, $o = OBJECT ) { return null; }
-			public function get_results( string $q, $o = OBJECT ) { return array(); }
-			public function query( string $q ) { return 0; }
-			public function prepare( string $q, ...$a ) { return $q; }
-			public function update( $t, $d, $w, $f = null, $wf = null ) { return 0; }
+			public function get_row( string $q, $o = OBJECT ) {
+				return null; }
+			public function get_results( string $q, $o = OBJECT ) {
+				return array(); }
+			public function query( string $q ) {
+				return 0; }
+			public function prepare( string $q, ...$a ) {
+				return $q; }
+			public function update( $t, $d, $w, $f = null, $wf = null ) {
+				return 0; }
 		};
-		$repo = new Crawl_Snapshot_Repository( $wpdb );
-		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
+		$repo   = new Crawl_Snapshot_Repository( $wpdb );
+		$svc    = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
 		$run_id = $svc->create_session( 'example.com', array( 'crawl_profile_key' => 'quick_context_refresh' ) );
 		$this->assertNotSame( '', $run_id );
 		$session = $svc->get_session( $run_id );
@@ -190,17 +219,22 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Servic
 	}
 
 	public function test_create_session_with_unsupported_profile_resolves_to_default(): void {
-		$wpdb = new class() {
+		$wpdb   = new class() {
 			public string $prefix = 'wp_';
 			public int $insert_id = 0;
-			public function get_row( string $q, $o = OBJECT ) { return null; }
-			public function get_results( string $q, $o = OBJECT ) { return array(); }
-			public function query( string $q ) { return 0; }
-			public function prepare( string $q, ...$a ) { return $q; }
-			public function update( $t, $d, $w, $f = null, $wf = null ) { return 0; }
+			public function get_row( string $q, $o = OBJECT ) {
+				return null; }
+			public function get_results( string $q, $o = OBJECT ) {
+				return array(); }
+			public function query( string $q ) {
+				return 0; }
+			public function prepare( string $q, ...$a ) {
+				return $q; }
+			public function update( $t, $d, $w, $f = null, $wf = null ) {
+				return 0; }
 		};
-		$repo = new Crawl_Snapshot_Repository( $wpdb );
-		$svc  = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
+		$repo   = new Crawl_Snapshot_Repository( $wpdb );
+		$svc    = new Crawl_Snapshot_Service( $repo, $this->profile_service(), $this->template_family_matcher() );
 		$run_id = $svc->create_session( 'example.com', array( 'crawl_profile_key' => 'custom_unbounded' ) );
 		$this->assertNotSame( '', $run_id );
 		$session = $svc->get_session( $run_id );
@@ -214,11 +248,16 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Servic
 			public function __construct( array $rows ) {
 				$this->rows = $rows;
 			}
-			public function get_row( string $q, $o = OBJECT ) { return null; }
-			public function get_results( string $q, $o = OBJECT ) { return $this->rows; }
-			public function query( string $q ) { return 0; }
-			public function prepare( string $q, ...$a ) { return $q; }
-			public function update( $t, $d, $w, $f = null, $wf = null ) { return 0; }
+			public function get_row( string $q, $o = OBJECT ) {
+				return null; }
+			public function get_results( string $q, $o = OBJECT ) {
+				return $this->rows; }
+			public function query( string $q ) {
+				return 0; }
+			public function prepare( string $q, ...$a ) {
+				return $q; }
+			public function update( $t, $d, $w, $f = null, $wf = null ) {
+				return 0; }
 		};
 		return new Crawl_Snapshot_Repository( $wpdb );
 	}
@@ -233,10 +272,14 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Servic
 			public function get_row( string $q, $o = OBJECT ) {
 				return $this->record !== null ? (object) $this->record : null;
 			}
-			public function get_results( string $q, $o = OBJECT ) { return array(); }
-			public function query( string $q ) { return 0; }
-			public function prepare( string $q, ...$a ) { return $q; }
-			public function update( $t, $d, $w, $f = null, $wf = null ) { return 0; }
+			public function get_results( string $q, $o = OBJECT ) {
+				return array(); }
+			public function query( string $q ) {
+				return 0; }
+			public function prepare( string $q, ...$a ) {
+				return $q; }
+			public function update( $t, $d, $w, $f = null, $wf = null ) {
+				return 0; }
 		};
 		return new Crawl_Snapshot_Repository( $wpdb );
 	}
@@ -249,21 +292,25 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Servic
 			public function __construct( int $return_id ) {
 				$this->return_id = $return_id;
 			}
-			public function get_row( string $q, $o = OBJECT ) { return null; }
-			public function get_results( string $q, $o = OBJECT ) { return array(); }
+			public function get_row( string $q, $o = OBJECT ) {
+				return null; }
+			public function get_results( string $q, $o = OBJECT ) {
+				return array(); }
 			public function query( string $q ) {
 				$this->insert_id = $this->return_id;
 				return 1;
 			}
-			public function prepare( string $q, ...$a ) { return $q; }
-			public function update( $t, $d, $w, $f = null, $wf = null ) { return 1; }
+			public function prepare( string $q, ...$a ) {
+				return $q; }
+			public function update( $t, $d, $w, $f = null, $wf = null ) {
+				return 1; }
 		};
 		return new Crawl_Snapshot_Repository( $wpdb );
 	}
 
 	/** Stub that returns a page record from get_row and accepts save (update) returning given id. */
 	private function create_repository_stub_get_and_save( array $page_record, int $return_id ): Crawl_Snapshot_Repository {
-		$row = (object) array_merge( $page_record, array( 'id' => $return_id ) );
+		$row  = (object) array_merge( $page_record, array( 'id' => $return_id ) );
 		$wpdb = new class( $row ) {
 			public string $prefix = 'wp_';
 			public int $insert_id = 0;
@@ -271,11 +318,16 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Servic
 			public function __construct( object $row ) {
 				$this->row = $row;
 			}
-			public function get_row( string $q, $o = OBJECT ) { return $this->row; }
-			public function get_results( string $q, $o = OBJECT ) { return array(); }
-			public function query( string $q ) { return 0; }
-			public function prepare( string $q, ...$a ) { return $q; }
-			public function update( $t, $d, $w, $f = null, $wf = null ) { return 1; }
+			public function get_row( string $q, $o = OBJECT ) {
+				return $this->row; }
+			public function get_results( string $q, $o = OBJECT ) {
+				return array(); }
+			public function query( string $q ) {
+				return 0; }
+			public function prepare( string $q, ...$a ) {
+				return $q; }
+			public function update( $t, $d, $w, $f = null, $wf = null ) {
+				return 1; }
 		};
 		return new Crawl_Snapshot_Repository( $wpdb );
 	}

@@ -51,10 +51,10 @@ final class Reporting_Eligibility_Evaluator {
 	/**
 	 * Evaluates eligibility for outbound developer error report.
 	 *
-	 * @param string   $severity One of Log_Severities (info, warning, error, critical).
-	 * @param string   $category One of Log_Categories (execution, queue, etc.).
-	 * @param int      $repetition_count_24h Number of times same/similar error in last 24 hours (0 if unknown).
-	 * @param string   $trigger_type Optional. One of TRIGGER_* constants; if set and applicable, can make eligible.
+	 * @param string $severity One of Log_Severities (info, warning, error, critical).
+	 * @param string $category One of Log_Categories (execution, queue, etc.).
+	 * @param int    $repetition_count_24h Number of times same/similar error in last 24 hours (0 if unknown).
+	 * @param string $trigger_type Optional. One of TRIGGER_* constants; if set and applicable, can make eligible.
 	 * @return array{eligible: bool, reason: string}
 	 */
 	public function evaluate(
@@ -65,7 +65,10 @@ final class Reporting_Eligibility_Evaluator {
 	): array {
 		// * Spec §46.7: critical => report immediately.
 		if ( $severity === Log_Severities::CRITICAL ) {
-			return array( 'eligible' => true, 'reason' => '' );
+			return array(
+				'eligible' => true,
+				'reason'   => '',
+			);
 		}
 
 		// * Spec §46.6: explicit trigger types (regardless of severity when tied to these events).
@@ -80,33 +83,54 @@ final class Reporting_Eligibility_Evaluator {
 		);
 		if ( $trigger_type !== '' && in_array( $trigger_type, $explicit_triggers, true ) ) {
 			if ( $trigger_type === self::TRIGGER_CRITICAL ) {
-				return array( 'eligible' => true, 'reason' => '' );
+				return array(
+					'eligible' => true,
+					'reason'   => '',
+				);
 			}
 			if ( $trigger_type === self::TRIGGER_REPEATED_3_24H && $repetition_count_24h >= self::REPEATED_ERROR_THRESHOLD ) {
-				return array( 'eligible' => true, 'reason' => '' );
+				return array(
+					'eligible' => true,
+					'reason'   => '',
+				);
 			}
 			// * Other trigger types (plan fail, import fail, queue dead, migration fail) => eligible.
 			if ( in_array( $trigger_type, array( self::TRIGGER_PAGE_REPLACEMENT_FINAL_FAIL, self::TRIGGER_PLAN_FINALIZATION_FAIL, self::TRIGGER_IMPORT_RESTORE_FAIL, self::TRIGGER_QUEUE_DEAD_15MIN, self::TRIGGER_MIGRATION_FAIL ), true ) ) {
-				return array( 'eligible' => true, 'reason' => '' );
+				return array(
+					'eligible' => true,
+					'reason'   => '',
+				);
 			}
 		}
 
 		// * Spec §46.7: same error repeats 3 times within 24 hours (even without explicit trigger_type).
 		if ( $repetition_count_24h >= self::REPEATED_ERROR_THRESHOLD ) {
-			return array( 'eligible' => true, 'reason' => '' );
+			return array(
+				'eligible' => true,
+				'reason'   => '',
+			);
 		}
 
 		// * Spec §46.7: info => local log only.
 		if ( $severity === Log_Severities::INFO ) {
-			return array( 'eligible' => false, 'reason' => 'local log only (info)' );
+			return array(
+				'eligible' => false,
+				'reason'   => 'local log only (info)',
+			);
 		}
 
 		// * Spec §46.7: warning => local log only unless 10+ in 24 hours.
 		if ( $severity === Log_Severities::WARNING ) {
 			if ( $repetition_count_24h >= self::WARNING_REPETITION_THRESHOLD ) {
-				return array( 'eligible' => true, 'reason' => '' );
+				return array(
+					'eligible' => true,
+					'reason'   => '',
+				);
 			}
-			return array( 'eligible' => false, 'reason' => 'local log only (warning below repetition threshold)' );
+			return array(
+				'eligible' => false,
+				'reason'   => 'local log only (warning below repetition threshold)',
+			);
 		}
 
 		// * Spec §46.7: error => report if tied to plan execution, restore, or queue failure.
@@ -118,15 +142,27 @@ final class Reporting_Eligibility_Evaluator {
 				self::TRIGGER_PAGE_REPLACEMENT_FINAL_FAIL,
 			);
 			if ( $trigger_type !== '' && in_array( $trigger_type, $plan_restore_queue_triggers, true ) ) {
-				return array( 'eligible' => true, 'reason' => '' );
+				return array(
+					'eligible' => true,
+					'reason'   => '',
+				);
 			}
 			$queue_or_execution = ( $category === 'queue' || $category === 'execution' );
 			if ( $queue_or_execution && in_array( $trigger_type, $plan_restore_queue_triggers, true ) ) {
-				return array( 'eligible' => true, 'reason' => '' );
+				return array(
+					'eligible' => true,
+					'reason'   => '',
+				);
 			}
-			return array( 'eligible' => false, 'reason' => 'error severity requires plan/restore/queue trigger' );
+			return array(
+				'eligible' => false,
+				'reason'   => 'error severity requires plan/restore/queue trigger',
+			);
 		}
 
-		return array( 'eligible' => false, 'reason' => 'severity below threshold' );
+		return array(
+			'eligible' => false,
+			'reason'   => 'severity below threshold',
+		);
 	}
 }

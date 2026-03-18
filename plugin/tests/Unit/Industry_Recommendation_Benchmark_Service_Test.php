@@ -33,8 +33,8 @@ final class Industry_Recommendation_Benchmark_Service_Test extends TestCase {
 		$templates = array();
 		for ( $i = 0; $i < $count; $i++ ) {
 			$templates[] = array(
-				'internal_key' => 'template_' . $i,
-				'name'         => 'Template ' . $i,
+				'internal_key'    => 'template_' . $i,
+				'name'            => 'Template ' . $i,
 				'template_family' => 'landing',
 			);
 		}
@@ -51,15 +51,17 @@ final class Industry_Recommendation_Benchmark_Service_Test extends TestCase {
 
 	private function minimal_pack_registry(): Industry_Pack_Registry {
 		$registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
-		$registry->load( array(
+		$registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'realtor',
-				Industry_Pack_Schema::FIELD_NAME           => 'Realtor',
-				Industry_Pack_Schema::FIELD_SUMMARY        => 'Realtor pack',
-				Industry_Pack_Schema::FIELD_STATUS         => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
-			),
-		) );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'realtor',
+					Industry_Pack_Schema::FIELD_NAME    => 'Realtor',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Realtor pack',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
+				),
+			)
+		);
 		return $registry;
 	}
 
@@ -74,7 +76,7 @@ final class Industry_Recommendation_Benchmark_Service_Test extends TestCase {
 			null,
 			null
 		);
-		$report = $service->run( 10, 5 );
+		$report        = $service->run( 10, 5 );
 		$this->assertArrayHasKey( 'scenarios', $report );
 		$this->assertArrayHasKey( 'run_at', $report );
 		$this->assertArrayHasKey( 'launch_industries', $report );
@@ -94,7 +96,7 @@ final class Industry_Recommendation_Benchmark_Service_Test extends TestCase {
 			null,
 			null
 		);
-		$report = $service->run( 10, 5 );
+		$report        = $service->run( 10, 5 );
 		foreach ( $report['scenarios'] as $scenario ) {
 			$this->assertArrayHasKey( 'industry_key', $scenario );
 			$this->assertArrayHasKey( 'pack_found', $scenario );

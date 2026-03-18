@@ -21,23 +21,23 @@ final class Section_Schema_Test extends TestCase {
 	 * Completeness checklist: every required field from spec §12.2 must be in get_required_fields().
 	 */
 	public function test_required_fields_include_all_spec_12_2_items(): void {
-		$required = Section_Schema::get_required_fields();
+		$required  = Section_Schema::get_required_fields();
 		$checklist = array(
-			'stable internal section key'        => Section_Schema::FIELD_INTERNAL_KEY,
-			'human-readable section name'        => Section_Schema::FIELD_NAME,
-			'purpose summary'                    => Section_Schema::FIELD_PURPOSE_SUMMARY,
-			'section category'                  => Section_Schema::FIELD_CATEGORY,
-			'blueprint definition reference'     => Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF,
-			'field-group blueprint reference'   => Section_Schema::FIELD_FIELD_BLUEPRINT_REF,
-			'helper paragraph reference'        => Section_Schema::FIELD_HELPER_REF,
-			'CSS contract manifest reference'    => Section_Schema::FIELD_CSS_CONTRACT_REF,
-			'default variant or baseline'       => Section_Schema::FIELD_DEFAULT_VARIANT,
-			'variants'                           => Section_Schema::FIELD_VARIANTS,
-			'compatibility metadata'            => Section_Schema::FIELD_COMPATIBILITY,
-			'version marker'                     => Section_Schema::FIELD_VERSION,
-			'active/deprecated status'          => Section_Schema::FIELD_STATUS,
-			'render mode classification'        => Section_Schema::FIELD_RENDER_MODE,
-			'asset dependency declaration'      => Section_Schema::FIELD_ASSET_DECLARATION,
+			'stable internal section key'     => Section_Schema::FIELD_INTERNAL_KEY,
+			'human-readable section name'     => Section_Schema::FIELD_NAME,
+			'purpose summary'                 => Section_Schema::FIELD_PURPOSE_SUMMARY,
+			'section category'                => Section_Schema::FIELD_CATEGORY,
+			'blueprint definition reference'  => Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF,
+			'field-group blueprint reference' => Section_Schema::FIELD_FIELD_BLUEPRINT_REF,
+			'helper paragraph reference'      => Section_Schema::FIELD_HELPER_REF,
+			'CSS contract manifest reference' => Section_Schema::FIELD_CSS_CONTRACT_REF,
+			'default variant or baseline'     => Section_Schema::FIELD_DEFAULT_VARIANT,
+			'variants'                        => Section_Schema::FIELD_VARIANTS,
+			'compatibility metadata'          => Section_Schema::FIELD_COMPATIBILITY,
+			'version marker'                  => Section_Schema::FIELD_VERSION,
+			'active/deprecated status'        => Section_Schema::FIELD_STATUS,
+			'render mode classification'      => Section_Schema::FIELD_RENDER_MODE,
+			'asset dependency declaration'    => Section_Schema::FIELD_ASSET_DECLARATION,
 		);
 		$this->assertCount( 15, $checklist, 'Checklist must cover all 12.2 required concepts' );
 		foreach ( $checklist as $label => $field_name ) {
@@ -90,7 +90,7 @@ final class Section_Schema_Test extends TestCase {
 
 	/** Example valid minimal section definition (all required keys present). */
 	public function test_example_valid_minimal_has_all_required_keys(): void {
-		$valid = $this->get_valid_minimal_section_definition();
+		$valid    = $this->get_valid_minimal_section_definition();
 		$required = Section_Schema::get_required_fields();
 		foreach ( $required as $field ) {
 			$this->assertArrayHasKey( $field, $valid, "Valid minimal example must have required field: {$field}" );
@@ -102,9 +102,12 @@ final class Section_Schema_Test extends TestCase {
 		$invalid = $this->get_valid_minimal_section_definition();
 		unset( $invalid[ Section_Schema::FIELD_HELPER_REF ] );
 		$required = Section_Schema::get_required_fields();
-		$missing = array_filter( $required, function ( $f ) use ( $invalid ) {
-			return ! array_key_exists( $f, $invalid ) || $invalid[ $f ] === '' || $invalid[ $f ] === array();
-		} );
+		$missing  = array_filter(
+			$required,
+			function ( $f ) use ( $invalid ) {
+				return ! array_key_exists( $f, $invalid ) || $invalid[ $f ] === '' || $invalid[ $f ] === array();
+			}
+		);
 		$this->assertNotEmpty( $missing, 'Example invalid definition must be missing at least one required field' );
 		$this->assertContains( Section_Schema::FIELD_HELPER_REF, $missing );
 	}
@@ -114,7 +117,7 @@ final class Section_Schema_Test extends TestCase {
 		$required = Section_Schema::get_required_fields();
 		$this->assertContains( Section_Schema::FIELD_DEFAULT_VARIANT, $required );
 		$this->assertContains( Section_Schema::FIELD_VARIANTS, $required );
-		$invalid = $this->get_valid_minimal_section_definition();
+		$invalid                                   = $this->get_valid_minimal_section_definition();
 		$invalid[ Section_Schema::FIELD_VARIANTS ] = array( 'other_variant' => array( 'label' => 'Other' ) );
 		$invalid[ Section_Schema::FIELD_DEFAULT_VARIANT ] = 'default';
 		$this->assertArrayNotHasKey( 'default', $invalid[ Section_Schema::FIELD_VARIANTS ] );
@@ -161,21 +164,29 @@ final class Section_Schema_Test extends TestCase {
 
 	private function get_valid_minimal_section_definition(): array {
 		return array(
-			Section_Schema::FIELD_INTERNAL_KEY           => 'st01_hero',
-			Section_Schema::FIELD_NAME                  => 'Hero',
-			Section_Schema::FIELD_PURPOSE_SUMMARY       => 'Primary hero section.',
-			Section_Schema::FIELD_CATEGORY              => 'hero_intro',
+			Section_Schema::FIELD_INTERNAL_KEY             => 'st01_hero',
+			Section_Schema::FIELD_NAME                     => 'Hero',
+			Section_Schema::FIELD_PURPOSE_SUMMARY          => 'Primary hero section.',
+			Section_Schema::FIELD_CATEGORY                 => 'hero_intro',
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'blueprint_st01',
-			Section_Schema::FIELD_FIELD_BLUEPRINT_REF  => 'acf_st01',
-			Section_Schema::FIELD_HELPER_REF           => 'helper_st01',
-			Section_Schema::FIELD_CSS_CONTRACT_REF     => 'css_st01',
-			Section_Schema::FIELD_DEFAULT_VARIANT      => 'default',
-			Section_Schema::FIELD_VARIANTS             => array( 'default' => array( 'label' => 'Default' ) ),
-			Section_Schema::FIELD_COMPATIBILITY        => array( 'may_precede' => array(), 'may_follow' => array(), 'avoid_adjacent' => array(), 'duplicate_purpose_of' => array() ),
-			Section_Schema::FIELD_VERSION              => array( 'version' => '1', 'stable_key_retained' => true ),
-			Section_Schema::FIELD_STATUS               => 'active',
-			Section_Schema::FIELD_RENDER_MODE          => 'block',
-			Section_Schema::FIELD_ASSET_DECLARATION    => array( 'none' => true ),
+			Section_Schema::FIELD_FIELD_BLUEPRINT_REF      => 'acf_st01',
+			Section_Schema::FIELD_HELPER_REF               => 'helper_st01',
+			Section_Schema::FIELD_CSS_CONTRACT_REF         => 'css_st01',
+			Section_Schema::FIELD_DEFAULT_VARIANT          => 'default',
+			Section_Schema::FIELD_VARIANTS                 => array( 'default' => array( 'label' => 'Default' ) ),
+			Section_Schema::FIELD_COMPATIBILITY            => array(
+				'may_precede'          => array(),
+				'may_follow'           => array(),
+				'avoid_adjacent'       => array(),
+				'duplicate_purpose_of' => array(),
+			),
+			Section_Schema::FIELD_VERSION                  => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Section_Schema::FIELD_STATUS                   => 'active',
+			Section_Schema::FIELD_RENDER_MODE              => 'block',
+			Section_Schema::FIELD_ASSET_DECLARATION        => array( 'none' => true ),
 		);
 	}
 }

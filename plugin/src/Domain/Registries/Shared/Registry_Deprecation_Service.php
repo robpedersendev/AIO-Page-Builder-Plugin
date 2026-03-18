@@ -32,7 +32,7 @@ final class Registry_Deprecation_Service {
 		Section_Template_Repository $section_repository,
 		Page_Template_Repository $page_template_repository
 	) {
-		$this->section_repository    = $section_repository;
+		$this->section_repository       = $section_repository;
 		$this->page_template_repository = $page_template_repository;
 	}
 
@@ -49,20 +49,20 @@ final class Registry_Deprecation_Service {
 		string $reason,
 		string $replacement_key = ''
 	): Registry_Validation_Result {
-		$codes = array();
+		$codes  = array();
 		$errors = array();
 
 		$reason = \sanitize_text_field( $reason );
 		if ( $reason === '' ) {
 			$errors[] = 'Deprecation reason is required';
-			$codes[] = Registry_Validation_Result::CODE_DEPRECATION_REASON_REQUIRED;
+			$codes[]  = Registry_Validation_Result::CODE_DEPRECATION_REASON_REQUIRED;
 			return Registry_Validation_Result::invalid( $errors, $codes );
 		}
 
 		$existing = $this->section_repository->get_definition_by_id( $post_id );
 		if ( $existing === null ) {
 			$errors[] = 'Section not found';
-			$codes[] = Registry_Validation_Result::CODE_REFERENCE_MISSING;
+			$codes[]  = Registry_Validation_Result::CODE_REFERENCE_MISSING;
 			return Registry_Validation_Result::invalid( $errors, $codes );
 		}
 
@@ -72,13 +72,13 @@ final class Registry_Deprecation_Service {
 				$replacement = $this->section_repository->get_definition_by_key( $replacement_key );
 				if ( $replacement === null ) {
 					$errors[] = 'Replacement section does not exist';
-					$codes[] = Registry_Validation_Result::CODE_REPLACEMENT_INVALID;
+					$codes[]  = Registry_Validation_Result::CODE_REPLACEMENT_INVALID;
 					return Registry_Validation_Result::invalid( $errors, $codes );
 				}
 				$rep_status = (string) ( $replacement['status'] ?? '' );
 				if ( $rep_status === 'deprecated' ) {
 					$errors[] = 'Replacement section must not be deprecated';
-					$codes[] = Registry_Validation_Result::CODE_REPLACEMENT_DEPRECATED;
+					$codes[]  = Registry_Validation_Result::CODE_REPLACEMENT_DEPRECATED;
 					return Registry_Validation_Result::invalid( $errors, $codes );
 				}
 			}
@@ -100,20 +100,20 @@ final class Registry_Deprecation_Service {
 		string $reason,
 		string $replacement_key = ''
 	): Registry_Validation_Result {
-		$codes = array();
+		$codes  = array();
 		$errors = array();
 
 		$reason = \sanitize_text_field( $reason );
 		if ( $reason === '' ) {
 			$errors[] = 'Deprecation reason is required';
-			$codes[] = Registry_Validation_Result::CODE_DEPRECATION_REASON_REQUIRED;
+			$codes[]  = Registry_Validation_Result::CODE_DEPRECATION_REASON_REQUIRED;
 			return Registry_Validation_Result::invalid( $errors, $codes );
 		}
 
 		$existing = $this->page_template_repository->get_definition_by_id( $post_id );
 		if ( $existing === null ) {
 			$errors[] = 'Page template not found';
-			$codes[] = Registry_Validation_Result::CODE_REFERENCE_MISSING;
+			$codes[]  = Registry_Validation_Result::CODE_REFERENCE_MISSING;
 			return Registry_Validation_Result::invalid( $errors, $codes );
 		}
 
@@ -123,13 +123,13 @@ final class Registry_Deprecation_Service {
 				$replacement = $this->page_template_repository->get_definition_by_key( $replacement_key );
 				if ( $replacement === null ) {
 					$errors[] = 'Replacement template does not exist';
-					$codes[] = Registry_Validation_Result::CODE_REPLACEMENT_INVALID;
+					$codes[]  = Registry_Validation_Result::CODE_REPLACEMENT_INVALID;
 					return Registry_Validation_Result::invalid( $errors, $codes );
 				}
 				$rep_status = (string) ( $replacement['status'] ?? '' );
 				if ( $rep_status === 'deprecated' ) {
 					$errors[] = 'Replacement template must not be deprecated';
-					$codes[] = Registry_Validation_Result::CODE_REPLACEMENT_DEPRECATED;
+					$codes[]  = Registry_Validation_Result::CODE_REPLACEMENT_DEPRECATED;
 					return Registry_Validation_Result::invalid( $errors, $codes );
 				}
 			}
@@ -148,7 +148,7 @@ final class Registry_Deprecation_Service {
 	public function get_section_deprecation_block( string $reason, string $replacement_key = '' ): array {
 		$block = Deprecation_Metadata::for_section( $reason, $replacement_key );
 		if ( $replacement_key !== '' ) {
-			$key = $this->sanitize_key( $replacement_key );
+			$key                                      = $this->sanitize_key( $replacement_key );
 			$block['replacement_section_suggestions'] = array( $key );
 		}
 		return $block;
@@ -164,7 +164,7 @@ final class Registry_Deprecation_Service {
 	public function get_page_template_deprecation_block( string $reason, string $replacement_key = '' ): array {
 		$block = Deprecation_Metadata::for_page_template( $reason, $replacement_key );
 		if ( $replacement_key !== '' ) {
-			$key = $this->sanitize_key( $replacement_key );
+			$key                                = $this->sanitize_key( $replacement_key );
 			$block['replacement_template_refs'] = array( $key );
 		}
 		return $block;

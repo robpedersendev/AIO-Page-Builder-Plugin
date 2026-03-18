@@ -45,10 +45,10 @@ final class Diff_Summarizer_Service {
 		Token_Diff_Summarizer $token_summarizer,
 		?Template_Diff_Summary_Builder $template_diff_summary_builder = null
 	) {
-		$this->repository                   = $repository;
-		$this->page_summarizer              = $page_summarizer;
-		$this->navigation_summarizer        = $navigation_summarizer;
-		$this->token_summarizer             = $token_summarizer;
+		$this->repository                    = $repository;
+		$this->page_summarizer               = $page_summarizer;
+		$this->navigation_summarizer         = $navigation_summarizer;
+		$this->token_summarizer              = $token_summarizer;
 		$this->template_diff_summary_builder = $template_diff_summary_builder;
 	}
 
@@ -111,7 +111,7 @@ final class Diff_Summarizer_Service {
 			case Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE:
 				$result = $this->page_summarizer->summarize( $pre_snapshot, $post_snapshot, $level );
 				if ( $this->template_diff_summary_builder !== null && $result->is_success() ) {
-					$diff = $result->get_diff();
+					$diff                          = $result->get_diff();
 					$diff['template_diff_summary'] = $this->template_diff_summary_builder->build( $pre_snapshot, $post_snapshot );
 					return Diff_Summary_Result::with_diff( $diff, $result->get_message() );
 				}

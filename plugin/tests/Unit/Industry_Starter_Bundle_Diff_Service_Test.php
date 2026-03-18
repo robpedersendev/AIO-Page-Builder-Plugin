@@ -23,7 +23,7 @@ final class Industry_Starter_Bundle_Diff_Service_Test extends TestCase {
 		$registry = new Industry_Starter_Bundle_Registry();
 		$registry->load( Industry_Starter_Bundle_Registry::get_builtin_definitions() );
 		$service = new Industry_Starter_Bundle_Diff_Service( $registry );
-		$result = $service->compare( array( 'plumber_starter' ) );
+		$result  = $service->compare( array( 'plumber_starter' ) );
 		$this->assertCount( 1, $result[ Industry_Starter_Bundle_Diff_Service::RESULT_BUNDLES ] );
 		$this->assertSame( array(), $result[ Industry_Starter_Bundle_Diff_Service::RESULT_DIFF_ROWS ] );
 	}
@@ -32,7 +32,7 @@ final class Industry_Starter_Bundle_Diff_Service_Test extends TestCase {
 		$registry = new Industry_Starter_Bundle_Registry();
 		$registry->load( Industry_Starter_Bundle_Registry::get_builtin_definitions() );
 		$service = new Industry_Starter_Bundle_Diff_Service( $registry );
-		$result = $service->compare( array( 'plumber_starter', 'plumber_residential_starter' ) );
+		$result  = $service->compare( array( 'plumber_starter', 'plumber_residential_starter' ) );
 		$this->assertCount( 2, $result[ Industry_Starter_Bundle_Diff_Service::RESULT_BUNDLES ] );
 		$bundles = $result[ Industry_Starter_Bundle_Diff_Service::RESULT_BUNDLES ];
 		$this->assertSame( 'plumber_starter', $bundles[0]['bundle_key'] );
@@ -52,14 +52,14 @@ final class Industry_Starter_Bundle_Diff_Service_Test extends TestCase {
 		$registry = new Industry_Starter_Bundle_Registry();
 		$registry->load( Industry_Starter_Bundle_Registry::get_builtin_definitions() );
 		$service = new Industry_Starter_Bundle_Diff_Service( $registry );
-		$result = $service->compare( array( 'nonexistent_bundle', 'plumber_starter' ) );
+		$result  = $service->compare( array( 'nonexistent_bundle', 'plumber_starter' ) );
 		$this->assertCount( 1, $result[ Industry_Starter_Bundle_Diff_Service::RESULT_BUNDLES ] );
 		$this->assertSame( array(), $result[ Industry_Starter_Bundle_Diff_Service::RESULT_DIFF_ROWS ] );
 	}
 
 	public function test_compare_with_null_registry_returns_empty(): void {
 		$service = new Industry_Starter_Bundle_Diff_Service( null );
-		$result = $service->compare( array( 'plumber_starter', 'realtor_starter' ) );
+		$result  = $service->compare( array( 'plumber_starter', 'realtor_starter' ) );
 		$this->assertSame( array(), $result[ Industry_Starter_Bundle_Diff_Service::RESULT_BUNDLES ] );
 		$this->assertSame( array(), $result[ Industry_Starter_Bundle_Diff_Service::RESULT_DIFF_ROWS ] );
 	}

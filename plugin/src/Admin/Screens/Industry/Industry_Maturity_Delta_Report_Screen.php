@@ -47,25 +47,43 @@ final class Industry_Maturity_Delta_Report_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function get_report(): array {
-		$baseline = get_option( self::OPTION_BASELINE_SNAPSHOT, null );
+		$baseline          = get_option( self::OPTION_BASELINE_SNAPSHOT, null );
 		$baseline_snapshot = is_array( $baseline ) ? $baseline : null;
 
 		if ( ! $this->container instanceof Service_Container || ! $this->container->has( 'industry_maturity_delta_report_service' ) ) {
 			return array(
-				'summary'           => array( 'improved' => 0, 'stagnated' => 0, 'regressed' => 0, 'no_baseline' => true ),
+				'summary'           => array(
+					'improved'    => 0,
+					'stagnated'   => 0,
+					'regressed'   => 0,
+					'no_baseline' => true,
+				),
 				'family_deltas'     => array(),
 				'capability_deltas' => array(),
-				'current_snapshot'  => array( 'families' => array(), 'capability_areas' => array(), 'captured_at' => gmdate( 'Y-m-d\TH:i:s\Z' ) ),
+				'current_snapshot'  => array(
+					'families'         => array(),
+					'capability_areas' => array(),
+					'captured_at'      => gmdate( 'Y-m-d\TH:i:s\Z' ),
+				),
 				'generated_at'      => gmdate( 'Y-m-d\TH:i:s\Z' ),
 			);
 		}
 		$service = $this->container->get( 'industry_maturity_delta_report_service' );
 		if ( ! $service instanceof Industry_Maturity_Delta_Report_Service ) {
 			return array(
-				'summary'           => array( 'improved' => 0, 'stagnated' => 0, 'regressed' => 0, 'no_baseline' => true ),
+				'summary'           => array(
+					'improved'    => 0,
+					'stagnated'   => 0,
+					'regressed'   => 0,
+					'no_baseline' => true,
+				),
 				'family_deltas'     => array(),
 				'capability_deltas' => array(),
-				'current_snapshot'  => array( 'families' => array(), 'capability_areas' => array(), 'captured_at' => gmdate( 'Y-m-d\TH:i:s\Z' ) ),
+				'current_snapshot'  => array(
+					'families'         => array(),
+					'capability_areas' => array(),
+					'captured_at'      => gmdate( 'Y-m-d\TH:i:s\Z' ),
+				),
 				'generated_at'      => gmdate( 'Y-m-d\TH:i:s\Z' ),
 			);
 		}
@@ -81,12 +99,12 @@ final class Industry_Maturity_Delta_Report_Screen {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Maturity delta report.', 'aio-page-builder' ), 403 );
 		}
-		$report = $this->get_report();
-		$summary = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
-		$no_baseline = ! empty( $summary['no_baseline'] );
-		$family_deltas = isset( $report['family_deltas'] ) && is_array( $report['family_deltas'] ) ? $report['family_deltas'] : array();
+		$report            = $this->get_report();
+		$summary           = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
+		$no_baseline       = ! empty( $summary['no_baseline'] );
+		$family_deltas     = isset( $report['family_deltas'] ) && is_array( $report['family_deltas'] ) ? $report['family_deltas'] : array();
 		$capability_deltas = isset( $report['capability_deltas'] ) && is_array( $report['capability_deltas'] ) ? $report['capability_deltas'] : array();
-		$generated_at = isset( $report['generated_at'] ) && is_string( $report['generated_at'] ) ? $report['generated_at'] : '';
+		$generated_at      = isset( $report['generated_at'] ) && is_string( $report['generated_at'] ) ? $report['generated_at'] : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-industry-maturity-delta-report" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>

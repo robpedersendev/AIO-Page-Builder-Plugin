@@ -42,10 +42,10 @@ final class Scoped_Registration_Inspection_Service {
 		Field_Group_Derivation_Service $derivation_service,
 		?Page_Section_Key_Cache_Service $cache = null
 	) {
-		$this->assignment_service  = $assignment_service;
-		$this->group_key_resolver  = $group_key_resolver;
+		$this->assignment_service = $assignment_service;
+		$this->group_key_resolver = $group_key_resolver;
 		$this->derivation_service = $derivation_service;
-		$this->cache               = $cache;
+		$this->cache              = $cache;
 	}
 
 	/**
@@ -68,9 +68,9 @@ final class Scoped_Registration_Inspection_Service {
 		if ( $this->cache !== null ) {
 			$cached = $this->cache->get_for_page( $page_id );
 			if ( $cached !== null ) {
-				$cache_used = true;
+				$cache_used   = true;
 				$section_keys = $cached;
-				$group_keys = $this->section_keys_to_group_keys( $section_keys );
+				$group_keys   = $this->section_keys_to_group_keys( $section_keys );
 				return array(
 					'mode'         => 'existing_page',
 					'section_keys' => $section_keys,

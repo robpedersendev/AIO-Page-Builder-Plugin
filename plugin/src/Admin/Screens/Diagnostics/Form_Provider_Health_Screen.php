@@ -76,12 +76,12 @@ final class Form_Provider_Health_Screen {
 			: null;
 		if ( ! $service instanceof Form_Provider_Health_Summary_Service ) {
 			return array(
-				'provider_availability'             => array(),
-				'registered_provider_ids'          => array(),
+				'provider_availability'              => array(),
+				'registered_provider_ids'            => array(),
 				'section_templates_with_forms_count' => 0,
 				'page_templates_using_forms_count'   => 0,
-				'recent_failures_summary'          => array(),
-				'built_at'                         => gmdate( 'Y-m-d\TH:i:s\Z' ),
+				'recent_failures_summary'            => array(),
+				'built_at'                           => gmdate( 'Y-m-d\TH:i:s\Z' ),
 			);
 		}
 		return $service->build_summary();
@@ -185,7 +185,7 @@ final class Form_Provider_Health_Screen {
 	 * @return void
 	 */
 	private function render_links( array $summary ): void {
-		$base = \admin_url( 'admin.php' );
+		$base        = \admin_url( 'admin.php' );
 		$section_url = \add_query_arg( array( 'page' => 'aio-page-builder-section-templates' ), $base );
 		$page_url    = \add_query_arg( array( 'page' => 'aio-page-builder-page-templates' ), $base );
 		?>

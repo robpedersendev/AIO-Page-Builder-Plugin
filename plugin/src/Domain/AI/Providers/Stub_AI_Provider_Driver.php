@@ -27,7 +27,7 @@ final class Stub_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 	/**
 	 * @param Provider_Secret_Store_Interface $secret_store Secret store (e.g. test double).
 	 * @param array<string, mixed>            $capabilities get_capabilities() return.
-	 * @param array<string, mixed>|null      $success_result Optional success payload for do_perform_request.
+	 * @param array<string, mixed>|null       $success_result Optional success payload for do_perform_request.
 	 * @param array<string, mixed>            $error_result  Optional error payload when success_result is null.
 	 */
 	public function __construct(
@@ -36,13 +36,22 @@ final class Stub_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		?array $success_result = null,
 		array $error_result = array()
 	) {
-		$capabilities = array_merge( array(
-			'provider_id'                  => 'stub',
-			'structured_output_supported'   => true,
-			'file_attachment_supported'    => false,
-			'max_context_tokens'           => 128000,
-			'models'                       => array( array( 'id' => 'stub-model', 'supports_structured_output' => true, 'default_for_planning' => true ) ),
-		), $capabilities );
+		$capabilities = array_merge(
+			array(
+				'provider_id'                 => 'stub',
+				'structured_output_supported' => true,
+				'file_attachment_supported'   => false,
+				'max_context_tokens'          => 128000,
+				'models'                      => array(
+					array(
+						'id'                         => 'stub-model',
+						'supports_structured_output' => true,
+						'default_for_planning'       => true,
+					),
+				),
+			),
+			$capabilities
+		);
 		parent::__construct(
 			'stub',
 			new Provider_Error_Normalizer( new Provider_Response_Normalizer() ),
@@ -61,7 +70,15 @@ final class Stub_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 	 * @return void
 	 */
 	public function set_success_result( array $result ): void {
-		$this->success_result = array_merge( array( 'success' => true, 'structured_payload' => array(), 'usage' => null, 'raw_provider_metadata' => null ), $result );
+		$this->success_result = array_merge(
+			array(
+				'success'               => true,
+				'structured_payload'    => array(),
+				'usage'                 => null,
+				'raw_provider_metadata' => null,
+			),
+			$result
+		);
 		$this->error_result   = array();
 	}
 

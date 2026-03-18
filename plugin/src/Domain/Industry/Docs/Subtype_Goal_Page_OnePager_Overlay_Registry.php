@@ -51,7 +51,7 @@ final class Subtype_Goal_Page_OnePager_Overlay_Registry {
 	private const ALLOWED_REGIONS = array( 'hierarchy_hints', 'cta_strategy', 'lpagery_seo_notes', 'compliance_cautions', 'additive_blocks', 'structure_notes', 'funnel_notes', 'cta_placement_notes' );
 
 	private const KEY_PATTERN = '#^[a-z0-9_-]+$#';
-	private const KEY_MAX_LEN  = 64;
+	private const KEY_MAX_LEN = 64;
 
 	/** @var array<string, array<string, mixed>> Composite "subtype|goal|page" => overlay. */
 	private array $by_composite = array();
@@ -84,10 +84,10 @@ final class Subtype_Goal_Page_OnePager_Overlay_Registry {
 			$subtype = isset( $ov[ self::FIELD_SUBTYPE_KEY ] ) && is_string( $ov[ self::FIELD_SUBTYPE_KEY ] )
 				? trim( $ov[ self::FIELD_SUBTYPE_KEY ] )
 				: '';
-			$goal = isset( $ov[ self::FIELD_GOAL_KEY ] ) && is_string( $ov[ self::FIELD_GOAL_KEY ] )
+			$goal    = isset( $ov[ self::FIELD_GOAL_KEY ] ) && is_string( $ov[ self::FIELD_GOAL_KEY ] )
 				? trim( $ov[ self::FIELD_GOAL_KEY ] )
 				: '';
-			$page = isset( $ov[ self::FIELD_PAGE_KEY ] ) && is_string( $ov[ self::FIELD_PAGE_KEY ] )
+			$page    = isset( $ov[ self::FIELD_PAGE_KEY ] ) && is_string( $ov[ self::FIELD_PAGE_KEY ] )
 				? trim( $ov[ self::FIELD_PAGE_KEY ] )
 				: '';
 			if ( $subtype === '' || $goal === '' || $page === '' ) {
@@ -133,7 +133,7 @@ final class Subtype_Goal_Page_OnePager_Overlay_Registry {
 				continue;
 			}
 			$this->by_composite[ $composite ] = $ov;
-			$this->all[]                     = $ov;
+			$this->all[]                      = $ov;
 		}
 	}
 

@@ -28,8 +28,8 @@ final class Wp_Mail_Developer_Error_Transport implements Developer_Error_Transpo
 	 * @return array{success: bool, failure_reason: string}
 	 */
 	public function send( array $envelope ): array {
-		$payload = isset( $envelope['payload'] ) && is_array( $envelope['payload'] ) ? $envelope['payload'] : array();
-		$website = isset( $payload['website_address'] ) ? (string) $payload['website_address'] : '';
+		$payload  = isset( $envelope['payload'] ) && is_array( $envelope['payload'] ) ? $envelope['payload'] : array();
+		$website  = isset( $payload['website_address'] ) ? (string) $payload['website_address'] : '';
 		$severity = isset( $payload['severity'] ) ? (string) $payload['severity'] : 'error';
 		$category = isset( $payload['category'] ) ? (string) $payload['category'] : '';
 
@@ -43,7 +43,10 @@ final class Wp_Mail_Developer_Error_Transport implements Developer_Error_Transpo
 		$body = $this->build_body( $payload );
 		$sent = \wp_mail( self::DESTINATION_EMAIL, $subject, $body );
 		if ( $sent ) {
-			return array( 'success' => true, 'failure_reason' => '' );
+			return array(
+				'success'        => true,
+				'failure_reason' => '',
+			);
 		}
 		return array(
 			'success'        => false,
@@ -61,7 +64,7 @@ final class Wp_Mail_Developer_Error_Transport implements Developer_Error_Transpo
 		$log_ref = isset( $payload['log_reference'] ) && is_array( $payload['log_reference'] )
 			? ( (string) ( $payload['log_reference']['log_id'] ?? '' ) )
 			: ( (string) ( $payload['log_reference'] ?? '' ) );
-		$lines = array(
+		$lines   = array(
 			'severity: ' . ( isset( $payload['severity'] ) ? (string) $payload['severity'] : '' ),
 			'category: ' . ( isset( $payload['category'] ) ? (string) $payload['category'] : '' ),
 			'sanitized_error_summary: ' . ( isset( $payload['sanitized_error_summary'] ) ? (string) $payload['sanitized_error_summary'] : '' ),

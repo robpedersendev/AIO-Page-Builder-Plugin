@@ -70,18 +70,18 @@ final class Execution_Job_Dispatcher {
 			if ( $bulk_batch_id !== '' ) {
 				$envelope['bulk_batch_id'] = $bulk_batch_id;
 			}
-			$job_ref = $this->generate_job_ref( $action_id );
+			$job_ref      = $this->generate_job_ref( $action_id );
 			$payload_json = \wp_json_encode( $envelope );
-			$data = array(
-				'job_ref'              => $job_ref,
-				'job_type'              => $action_type,
-				'queue_status'          => Job_Queue_Status::PENDING,
-				'priority'              => $priority,
-				'payload_ref'           => $action_id,
-				'actor_ref'             => $actor_ref,
-				'related_object_refs'   => $payload_json !== false ? $payload_json : '{}',
+			$data         = array(
+				'job_ref'             => $job_ref,
+				'job_type'            => $action_type,
+				'queue_status'        => Job_Queue_Status::PENDING,
+				'priority'            => $priority,
+				'payload_ref'         => $action_id,
+				'actor_ref'           => $actor_ref,
+				'related_object_refs' => $payload_json !== false ? $payload_json : '{}',
 			);
-			$inserted = $this->job_queue_repository->insert_job( $data );
+			$inserted     = $this->job_queue_repository->insert_job( $data );
 			if ( $inserted !== '' ) {
 				$job_refs[] = $inserted;
 			}
@@ -117,8 +117,8 @@ final class Execution_Job_Dispatcher {
 
 		$this->job_queue_repository->update_job_status( $job_ref, Job_Queue_Status::RUNNING, null, current_time( 'mysql' ), null );
 
-		$result = $this->single_action_executor->execute( $envelope );
-		$status = $result->get_execution_status();
+		$result  = $this->single_action_executor->execute( $envelope );
+		$status  = $result->get_execution_status();
 		$summary = $result->to_array();
 
 		if ( $status === Execution_Action_Contract::STATUS_COMPLETED ) {
@@ -151,8 +151,8 @@ final class Execution_Job_Dispatcher {
 			return null;
 		}
 		$payload['job_id'] = $job_ref;
-		$plan_item_id = isset( $payload['plan_item_ref'] ) && is_string( $payload['plan_item_ref'] ) ? $payload['plan_item_ref'] : '';
-		$execution_ref = isset( $payload['execution_ref'] ) && is_string( $payload['execution_ref'] ) ? $payload['execution_ref'] : $job_ref;
+		$plan_item_id      = isset( $payload['plan_item_ref'] ) && is_string( $payload['plan_item_ref'] ) ? $payload['plan_item_ref'] : '';
+		$execution_ref     = isset( $payload['execution_ref'] ) && is_string( $payload['execution_ref'] ) ? $payload['execution_ref'] : $job_ref;
 
 		if ( $this->rollback_executor === null ) {
 			$this->job_queue_repository->update_job_status( $job_ref, Job_Queue_Status::FAILED, 'Rollback executor not configured.', null, current_time( 'mysql' ) );
@@ -161,7 +161,7 @@ final class Execution_Job_Dispatcher {
 
 		$this->job_queue_repository->update_job_status( $job_ref, Job_Queue_Status::RUNNING, null, current_time( 'mysql' ), null );
 		$rollback_result = $this->rollback_executor->execute( $payload );
-		$summary = $rollback_result->to_array();
+		$summary         = $rollback_result->to_array();
 
 		if ( $rollback_result->is_success() ) {
 			$this->job_queue_repository->update_job_status( $job_ref, Job_Queue_Status::COMPLETED, null, null, current_time( 'mysql' ) );
@@ -169,7 +169,7 @@ final class Execution_Job_Dispatcher {
 		}
 
 		$failure_reason = $rollback_result->get_failure_reason() !== '' ? $rollback_result->get_failure_reason() : $rollback_result->get_message();
-		$refused = $rollback_result->get_status() === Rollback_Result::STATUS_INELIGIBLE;
+		$refused        = $rollback_result->get_status() === Rollback_Result::STATUS_INELIGIBLE;
 		$this->job_queue_repository->update_job_status( $job_ref, Job_Queue_Status::FAILED, $failure_reason, null, current_time( 'mysql' ) );
 		return $refused
 			? Execution_Job_Result::refused( $job_ref, Execution_Action_Types::ROLLBACK_ACTION, $execution_ref, $plan_item_id, $failure_reason, $summary )
@@ -190,19 +190,19 @@ final class Execution_Job_Dispatcher {
 		if ( $pre_id === '' || $post_id === '' ) {
 			return '';
 		}
-		$job_ref = 'job_rollback_' . substr( preg_replace( '/[^a-zA-Z0-9_-]/', '', $pre_id . '_' . $post_id ), 0, 30 ) . '_' . gmdate( 'YmdHis' ) . '_' . wp_rand( 100, 999 );
+		$job_ref           = 'job_rollback_' . substr( preg_replace( '/[^a-zA-Z0-9_-]/', '', $pre_id . '_' . $post_id ), 0, 30 ) . '_' . gmdate( 'YmdHis' ) . '_' . wp_rand( 100, 999 );
 		$payload['job_id'] = $job_ref;
-		$payload_json = \wp_json_encode( $payload );
-		$data = array(
-			'job_ref'              => $job_ref,
-			'job_type'              => Execution_Action_Types::ROLLBACK_ACTION,
-			'queue_status'          => Job_Queue_Status::PENDING,
-			'priority'              => $priority,
-			'payload_ref'           => $pre_id . ':' . $post_id,
-			'actor_ref'             => $actor_ref,
-			'related_object_refs'   => $payload_json !== false ? $payload_json : '{}',
+		$payload_json      = \wp_json_encode( $payload );
+		$data              = array(
+			'job_ref'             => $job_ref,
+			'job_type'            => Execution_Action_Types::ROLLBACK_ACTION,
+			'queue_status'        => Job_Queue_Status::PENDING,
+			'priority'            => $priority,
+			'payload_ref'         => $pre_id . ':' . $post_id,
+			'actor_ref'           => $actor_ref,
+			'related_object_refs' => $payload_json !== false ? $payload_json : '{}',
 		);
-		$inserted = $this->job_queue_repository->insert_job( $data );
+		$inserted          = $this->job_queue_repository->insert_job( $data );
 		return $inserted !== '' ? $inserted : '';
 	}
 
@@ -271,7 +271,7 @@ final class Execution_Job_Dispatcher {
 		if ( $result->is_refusable() ) {
 			return false;
 		}
-		$code = $result->get_error_code();
+		$code      = $result->get_error_code();
 		$retryable = array( Execution_Action_Contract::ERROR_CONFLICT );
 		return in_array( $code, $retryable, true );
 	}

@@ -68,8 +68,13 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 			Field_Blueprint_Schema::SECTION_KEY     => 'st01_hero',
 			Field_Blueprint_Schema::SECTION_VERSION => '1',
 			Field_Blueprint_Schema::LABEL           => 'Hero Fields',
-			Field_Blueprint_Schema::FIELDS           => array(
-				array( 'key' => 'field_st01_hero_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ),
+			Field_Blueprint_Schema::FIELDS          => array(
+				array(
+					'key'   => 'field_st01_hero_headline',
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
 			),
 		);
 	}
@@ -77,38 +82,42 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 	private function create_blueprint_service_mock( array $blueprints ): Section_Field_Blueprint_Service_Interface {
 		$mock = $this->createMock( Section_Field_Blueprint_Service_Interface::class );
 		$mock->method( 'get_all_blueprints' )->willReturn( $blueprints );
-		$mock->method( 'get_blueprint_for_section' )->willReturnCallback( function ( string $key ) use ( $blueprints ) {
-			foreach ( $blueprints as $bp ) {
-				if ( ( $bp[ Field_Blueprint_Schema::SECTION_KEY ] ?? '' ) === $key ) {
-					return $bp;
+		$mock->method( 'get_blueprint_for_section' )->willReturnCallback(
+			function ( string $key ) use ( $blueprints ) {
+				foreach ( $blueprints as $bp ) {
+					if ( ( $bp[ Field_Blueprint_Schema::SECTION_KEY ] ?? '' ) === $key ) {
+						return $bp;
+					}
 				}
+				return null;
 			}
-			return null;
-		} );
+		);
 		return $mock;
 	}
 
 	private function create_assignment_map_mock( array $page_template_rows = array(), array $page_composition_rows = array() ): Assignment_Map_Service_Interface {
 		$mock = $this->createMock( Assignment_Map_Service_Interface::class );
-		$mock->method( 'list_by_type' )->willReturnCallback( function ( string $type ) use ( $page_template_rows, $page_composition_rows ) {
-			if ( $type === Assignment_Types::PAGE_TEMPLATE ) {
-				return $page_template_rows;
+		$mock->method( 'list_by_type' )->willReturnCallback(
+			function ( string $type ) use ( $page_template_rows, $page_composition_rows ) {
+				if ( $type === Assignment_Types::PAGE_TEMPLATE ) {
+						return $page_template_rows;
+				}
+				if ( $type === Assignment_Types::PAGE_COMPOSITION ) {
+					return $page_composition_rows;
+				}
+				return array();
 			}
-			if ( $type === Assignment_Types::PAGE_COMPOSITION ) {
-				return $page_composition_rows;
-			}
-			return array();
-		} );
+		);
 		return $mock;
 	}
 
 	public function test_build_plan_dry_run_returns_plan_with_refused_cleanup(): void {
 		$blueprint_service = $this->create_blueprint_service_mock( array( $this->blueprint_st01() ) );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$assignment_map = $this->create_assignment_map_mock( array(), array() );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
-		$page_repo = $this->createMock( Page_Template_Repository_Interface::class );
+		$registrar         = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc    = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$assignment_map    = $this->create_assignment_map_mock( array(), array() );
+		$section_repo      = $this->createMock( Section_Template_Repository_Interface::class );
+		$page_repo         = $this->createMock( Page_Template_Repository_Interface::class );
 
 		$service = new ACF_Regeneration_Service(
 			$blueprint_service,
@@ -130,11 +139,11 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 
 	public function test_build_plan_full_scope_detects_mismatches_when_no_acf_groups(): void {
 		$blueprint_service = $this->create_blueprint_service_mock( array( $this->blueprint_st01() ) );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$assignment_map = $this->create_assignment_map_mock( array(), array() );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
-		$page_repo = $this->createMock( Page_Template_Repository_Interface::class );
+		$registrar         = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc    = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$assignment_map    = $this->create_assignment_map_mock( array(), array() );
+		$section_repo      = $this->createMock( Section_Template_Repository_Interface::class );
+		$page_repo         = $this->createMock( Page_Template_Repository_Interface::class );
 
 		$service = new ACF_Regeneration_Service(
 			$blueprint_service,
@@ -156,11 +165,11 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 
 	public function test_execute_repair_dry_run_returns_zero_mutations_and_warning(): void {
 		$blueprint_service = $this->create_blueprint_service_mock( array( $this->blueprint_st01() ) );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$assignment_map = $this->create_assignment_map_mock( array(), array() );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
-		$page_repo = $this->createMock( Page_Template_Repository_Interface::class );
+		$registrar         = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc    = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$assignment_map    = $this->create_assignment_map_mock( array(), array() );
+		$section_repo      = $this->createMock( Section_Template_Repository_Interface::class );
+		$page_repo         = $this->createMock( Page_Template_Repository_Interface::class );
 
 		$service = new ACF_Regeneration_Service(
 			$blueprint_service,
@@ -171,7 +180,7 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 			$page_repo
 		);
 
-		$plan = $service->build_plan( true, ACF_Regeneration_Plan::SCOPE_FULL, array() );
+		$plan   = $service->build_plan( true, ACF_Regeneration_Plan::SCOPE_FULL, array() );
 		$result = $service->execute_repair( $plan );
 
 		$this->assertSame( 0, $result->get_groups_regenerated() );
@@ -187,11 +196,23 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 			null,
 			null,
 			true,
-			array( array( 'section_key' => 'st01_hero', 'group_key' => 'group_aio_st01_hero', 'status' => 'missing' ) ),
-			array( array( 'page_id' => 42, 'type' => 'page_template', 'key' => 'pt_landing' ) ),
+			array(
+				array(
+					'section_key' => 'st01_hero',
+					'group_key'   => 'group_aio_st01_hero',
+					'status'      => 'missing',
+				),
+			),
+			array(
+				array(
+					'page_id' => 42,
+					'type'    => 'page_template',
+					'key'     => 'pt_landing',
+				),
+			),
 			array( 'Destructive cleanup not supported.' )
 		);
-		$arr = $plan->to_array();
+		$arr  = $plan->to_array();
 		$this->assertArrayHasKey( 'dry_run', $arr );
 		$this->assertArrayHasKey( 'scope', $arr );
 		$this->assertArrayHasKey( 'field_group_mismatches', $arr );
@@ -212,10 +233,18 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 			0,
 			array(),
 			array(),
-			array( 'missing' => 2, 'version_stale' => 0, 'repaired' => 2 ),
-			array( 'repaired' => 1, 'failed' => 0, 'skipped' => 0 )
+			array(
+				'missing'       => 2,
+				'version_stale' => 0,
+				'repaired'      => 2,
+			),
+			array(
+				'repaired' => 1,
+				'failed'   => 0,
+				'skipped'  => 0,
+			)
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 		$this->assertArrayHasKey( 'groups_regenerated', $arr );
 		$this->assertArrayHasKey( 'groups_skipped', $arr );
 		$this->assertArrayHasKey( 'page_assignments_repaired', $arr );
@@ -226,19 +255,31 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 		$this->assertArrayHasKey( 'page_assignment_repair_summary', $arr );
 		$this->assertSame( 2, $arr['groups_regenerated'] );
 		$this->assertSame( 1, $arr['page_assignments_repaired'] );
-		$this->assertSame( array( 'missing' => 2, 'version_stale' => 0, 'repaired' => 2 ), $arr['field_group_mismatch_summary'] );
+		$this->assertSame(
+			array(
+				'missing'       => 2,
+				'version_stale' => 0,
+				'repaired'      => 2,
+			),
+			$arr['field_group_mismatch_summary']
+		);
 	}
 
 	public function test_build_plan_includes_page_assignment_candidates_when_include_page_assignments(): void {
 		$blueprint_service = $this->create_blueprint_service_mock( array( $this->blueprint_st01() ) );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$assignment_map = $this->create_assignment_map_mock(
-			array( array( 'source_ref' => '100', 'target_ref' => 'pt_landing' ) ),
+		$registrar         = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc    = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$assignment_map    = $this->create_assignment_map_mock(
+			array(
+				array(
+					'source_ref' => '100',
+					'target_ref' => 'pt_landing',
+				),
+			),
 			array()
 		);
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
-		$page_repo = $this->createMock( Page_Template_Repository_Interface::class );
+		$section_repo      = $this->createMock( Section_Template_Repository_Interface::class );
+		$page_repo         = $this->createMock( Page_Template_Repository_Interface::class );
 
 		$service = new ACF_Regeneration_Service(
 			$blueprint_service,
@@ -249,7 +290,7 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 			$page_repo
 		);
 
-		$plan = $service->build_plan( false, ACF_Regeneration_Plan::SCOPE_FULL, array( 'include_page_assignments' => true ) );
+		$plan       = $service->build_plan( false, ACF_Regeneration_Plan::SCOPE_FULL, array( 'include_page_assignments' => true ) );
 		$candidates = $plan->get_page_assignment_repair_candidates();
 		$this->assertCount( 1, $candidates );
 		$this->assertSame( 100, $candidates[0]['page_id'] );
@@ -259,15 +300,26 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 
 	public function test_build_plan_section_family_scope_filters_by_variation_family(): void {
 		$blueprint_service = $this->create_blueprint_service_mock( array() );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$assignment_map = $this->create_assignment_map_mock( array(), array() );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
-		$section_repo->method( 'list_all_definitions' )->willReturn( array(
-			array( 'internal_key' => 'st01_hero', 'variation_family_key' => 'hero' ),
-			array( 'internal_key' => 'st02_hero_alt', 'variation_family_key' => 'hero' ),
-			array( 'internal_key' => 'st_faq', 'variation_family_key' => 'faq' ),
-		) );
+		$registrar         = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc    = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$assignment_map    = $this->create_assignment_map_mock( array(), array() );
+		$section_repo      = $this->createMock( Section_Template_Repository_Interface::class );
+		$section_repo->method( 'list_all_definitions' )->willReturn(
+			array(
+				array(
+					'internal_key'         => 'st01_hero',
+					'variation_family_key' => 'hero',
+				),
+				array(
+					'internal_key'         => 'st02_hero_alt',
+					'variation_family_key' => 'hero',
+				),
+				array(
+					'internal_key'         => 'st_faq',
+					'variation_family_key' => 'faq',
+				),
+			)
+		);
 		$page_repo = $this->createMock( Page_Template_Repository_Interface::class );
 
 		$blueprint_service->method( 'get_blueprint_for_section' )->willReturn( $this->blueprint_st01() );
@@ -281,7 +333,7 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 			$page_repo
 		);
 
-		$plan = $service->build_plan( false, ACF_Regeneration_Plan::SCOPE_SECTION_FAMILY, array( 'section_family_key' => 'hero' ) );
+		$plan       = $service->build_plan( false, ACF_Regeneration_Plan::SCOPE_SECTION_FAMILY, array( 'section_family_key' => 'hero' ) );
 		$mismatches = $plan->get_field_group_mismatches();
 		$this->assertCount( 2, $mismatches );
 		$section_keys = array_column( $mismatches, 'section_key' );
@@ -295,15 +347,15 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 	 */
 	public function test_execute_repair_refreshes_mirror_when_provided_and_repair_did_work(): void {
 		$blueprint_service = $this->create_blueprint_service_mock( array( $this->blueprint_st01() ) );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$registrar         = $this->createMock( ACF_Group_Registrar_Interface::class );
 		$registrar->method( 'register_blueprint' )->willReturn( true );
 		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
 		$assignment_map = $this->create_assignment_map_mock( array(), array() );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
-		$page_repo = $this->createMock( Page_Template_Repository_Interface::class );
+		$section_repo   = $this->createMock( Section_Template_Repository_Interface::class );
+		$page_repo      = $this->createMock( Page_Template_Repository_Interface::class );
 
-		$group_builder = new ACF_Group_Builder( new ACF_Field_Builder() );
-		$mirror = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$group_builder       = new ACF_Group_Builder( new ACF_Field_Builder() );
+		$mirror              = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
 		$mirror_refresh_path = sys_get_temp_dir() . '/aio-regen-mirror-' . uniqid( '', true );
 		$this->assertTrue( mkdir( $mirror_refresh_path, 0755, true ), 'Temp mirror dir must be created' );
 
@@ -319,7 +371,7 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 				$mirror_refresh_path
 			);
 
-			$plan = $service->build_plan( false, ACF_Regeneration_Plan::SCOPE_FULL, array() );
+			$plan   = $service->build_plan( false, ACF_Regeneration_Plan::SCOPE_FULL, array() );
 			$result = $service->execute_repair( $plan );
 
 			$this->assertSame( 1, $result->get_groups_regenerated() );

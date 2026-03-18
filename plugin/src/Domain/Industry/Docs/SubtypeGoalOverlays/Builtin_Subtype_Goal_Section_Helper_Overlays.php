@@ -23,8 +23,8 @@ final class Builtin_Subtype_Goal_Section_Helper_Overlays {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function get_definitions(): array {
-		$base = dirname( __FILE__ );
-		$out  = array();
+		$base  = __DIR__;
+		$out   = array();
 		$files = array(
 			$base . '/realtor-buyer-consultations-helper.php',
 			$base . '/cosmetology-nail-mobile-bookings-helper.php',

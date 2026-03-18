@@ -62,7 +62,7 @@ final class Industry_Pack_Schema_Test extends TestCase {
 
 	/** Valid minimal pack has all required keys; validate_pack returns empty. */
 	public function test_validate_pack_returns_empty_for_valid_minimal_pack(): void {
-		$pack = $this->get_valid_minimal_pack();
+		$pack   = $this->get_valid_minimal_pack();
 		$errors = Industry_Pack_Schema::validate_pack( $pack );
 		$this->assertSame( array(), $errors );
 	}
@@ -79,9 +79,9 @@ final class Industry_Pack_Schema_Test extends TestCase {
 
 	/** Invalid status yields invalid_status error. */
 	public function test_validate_pack_returns_invalid_status_for_bad_status(): void {
-		$pack = $this->get_valid_minimal_pack();
+		$pack                                       = $this->get_valid_minimal_pack();
 		$pack[ Industry_Pack_Schema::FIELD_STATUS ] = 'archived';
-		$errors = Industry_Pack_Schema::validate_pack( $pack );
+		$errors                                     = Industry_Pack_Schema::validate_pack( $pack );
 		$this->assertNotEmpty( $errors );
 		$codes = array_column( $errors, 'code' );
 		$this->assertContains( 'invalid_status', $codes );
@@ -120,9 +120,9 @@ final class Industry_Pack_Schema_Test extends TestCase {
 	private function get_valid_minimal_pack(): array {
 		return array(
 			Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'legal',
-			Industry_Pack_Schema::FIELD_NAME          => 'Legal',
-			Industry_Pack_Schema::FIELD_SUMMARY       => 'Legal services industry pack.',
-			Industry_Pack_Schema::FIELD_STATUS        => Industry_Pack_Schema::STATUS_ACTIVE,
+			Industry_Pack_Schema::FIELD_NAME           => 'Legal',
+			Industry_Pack_Schema::FIELD_SUMMARY        => 'Legal services industry pack.',
+			Industry_Pack_Schema::FIELD_STATUS         => Industry_Pack_Schema::STATUS_ACTIVE,
 			Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
 		);
 	}

@@ -34,7 +34,7 @@ final class Conversion_Goal_Build_Plan_Explanation_View_Model_Test extends TestC
 				'applied'             => true,
 			),
 		);
-		$vm = Conversion_Goal_Build_Plan_Explanation_View_Model::from_plan_definition( $plan );
+		$vm   = Conversion_Goal_Build_Plan_Explanation_View_Model::from_plan_definition( $plan );
 		$this->assertTrue( $vm[ Conversion_Goal_Build_Plan_Explanation_View_Model::KEY_HAS_GOAL_CONTEXT ] );
 		$this->assertSame( 'calls', $vm[ Conversion_Goal_Build_Plan_Explanation_View_Model::KEY_CONVERSION_GOAL_KEY ] );
 		$this->assertTrue( $vm[ Conversion_Goal_Build_Plan_Explanation_View_Model::KEY_GOAL_OVERLAY_APPLIED ] );

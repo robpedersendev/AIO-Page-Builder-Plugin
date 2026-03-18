@@ -32,9 +32,9 @@ final class Template_Accessibility_Audit_Service {
 	/** Min CTA sections per page class (contract §3). */
 	private const CTA_MIN_BY_CLASS = array(
 		'top_level'    => 3,
-		'hub'           => 4,
-		'nested_hub'    => 4,
-		'child_detail'  => 5,
+		'hub'          => 4,
+		'nested_hub'   => 4,
+		'child_detail' => 5,
 	);
 
 	private const NON_CTA_MIN = 8;
@@ -42,8 +42,22 @@ final class Template_Accessibility_Audit_Service {
 
 	/** Section purpose families that typically contribute to heading outline (semantic contract §3.2, §9.1). */
 	private const HEADING_RELEVANT_FAMILIES = array(
-		'hero', 'proof', 'offer', 'explainer', 'legal', 'utility', 'listing', 'comparison',
-		'contact', 'cta', 'faq', 'profile', 'stats', 'timeline', 'related', 'other',
+		'hero',
+		'proof',
+		'offer',
+		'explainer',
+		'legal',
+		'utility',
+		'listing',
+		'comparison',
+		'contact',
+		'cta',
+		'faq',
+		'profile',
+		'stats',
+		'timeline',
+		'related',
+		'other',
 	);
 
 	private Section_Template_Repository $section_repository;
@@ -82,31 +96,37 @@ final class Template_Accessibility_Audit_Service {
 			$this->audit_page_cta_rules( $page_def, $section_by_key, $violations );
 		}
 
-		$section_violations = array_filter( $violations, function ( $v ) {
-			return ( $v['scope'] ?? '' ) === 'section';
-		} );
-		$page_violations = array_filter( $violations, function ( $v ) {
-			return ( $v['scope'] ?? '' ) === 'page';
-		} );
+		$section_violations = array_filter(
+			$violations,
+			function ( $v ) {
+				return ( $v['scope'] ?? '' ) === 'section';
+			}
+		);
+		$page_violations    = array_filter(
+			$violations,
+			function ( $v ) {
+				return ( $v['scope'] ?? '' ) === 'page';
+			}
+		);
 
 		$section_by_code_summary = array();
 		foreach ( $section_violations as $v ) {
-			$code = $v['rule_code'] ?? 'unknown';
+			$code                             = $v['rule_code'] ?? 'unknown';
 			$section_by_code_summary[ $code ] = ( $section_by_code_summary[ $code ] ?? 0 ) + 1;
 		}
 		$page_by_code_summary = array();
 		foreach ( $page_violations as $v ) {
-			$code = $v['rule_code'] ?? 'unknown';
+			$code                          = $v['rule_code'] ?? 'unknown';
 			$page_by_code_summary[ $code ] = ( $page_by_code_summary[ $code ] ?? 0 ) + 1;
 		}
 
 		$section_audit_summary = array(
-			'audited'     => count( $sections ),
+			'audited'      => count( $sections ),
 			'violations'   => count( $section_violations ),
 			'by_rule_code' => $section_by_code_summary,
 		);
-		$page_audit_summary = array(
-			'audited'     => count( $pages ),
+		$page_audit_summary    = array(
+			'audited'      => count( $pages ),
 			'violations'   => count( $page_violations ),
 			'by_rule_code' => $page_by_code_summary,
 		);
@@ -131,7 +151,7 @@ final class Template_Accessibility_Audit_Service {
 	}
 
 	/**
-	 * @param array<string, mixed> $def
+	 * @param array<string, mixed>                                                                 $def
 	 * @param list<array{scope: string, template_key: string, rule_code: string, message: string}> $violations
 	 */
 	private function audit_section( array $def, array &$violations ): void {
@@ -140,10 +160,10 @@ final class Template_Accessibility_Audit_Service {
 			return;
 		}
 
-		$a11y = $def['accessibility_warnings_or_enhancements'] ?? null;
-		$a11y_empty = ( $a11y === null || $a11y === '' || ( is_string( $a11y ) && trim( (string) $a11y ) === '' ) );
+		$a11y               = $def['accessibility_warnings_or_enhancements'] ?? null;
+		$a11y_empty         = ( $a11y === null || $a11y === '' || ( is_string( $a11y ) && trim( (string) $a11y ) === '' ) );
 		$cta_classification = (string) ( $def['cta_classification'] ?? '' );
-		$is_cta = in_array( $cta_classification, self::CTA_CLASSIFIED, true );
+		$is_cta             = in_array( $cta_classification, self::CTA_CLASSIFIED, true );
 
 		if ( $is_cta && $a11y_empty ) {
 			$violations[] = array(
@@ -163,7 +183,7 @@ final class Template_Accessibility_Audit_Service {
 
 		$family = (string) ( $def['section_purpose_family'] ?? '' );
 		if ( $family !== '' && in_array( $family, self::HEADING_RELEVANT_FAMILIES, true ) ) {
-			$hints = $def['hierarchy_role_hints'] ?? null;
+			$hints       = $def['hierarchy_role_hints'] ?? null;
 			$hints_empty = ( $hints === null || $hints === '' || ( is_array( $hints ) && empty( $hints ) ) );
 			if ( $hints_empty ) {
 				$violations[] = array(
@@ -177,34 +197,37 @@ final class Template_Accessibility_Audit_Service {
 	}
 
 	/**
-	 * @param array<string, mixed> $page_def
-	 * @param array<string, array<string, mixed>> $section_by_key
+	 * @param array<string, mixed>                                                                 $page_def
+	 * @param array<string, array<string, mixed>>                                                  $section_by_key
 	 * @param list<array{scope: string, template_key: string, rule_code: string, message: string}> $violations
 	 */
 	private function audit_page_cta_rules( array $page_def, array $section_by_key, array &$violations ): void {
 		$template_key = (string) ( $page_def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-		$class = (string) ( $page_def['template_category_class'] ?? '' );
-		$min_cta = self::CTA_MIN_BY_CLASS[ $class ] ?? 3;
+		$class        = (string) ( $page_def['template_category_class'] ?? '' );
+		$min_cta      = self::CTA_MIN_BY_CLASS[ $class ] ?? 3;
 
 		$ordered = $page_def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 		if ( ! is_array( $ordered ) || empty( $ordered ) ) {
 			return;
 		}
 
-		usort( $ordered, function ( $a, $b ) {
-			$pa = isset( $a[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) ? (int) $a[ Page_Template_Schema::SECTION_ITEM_POSITION ] : 0;
-			$pb = isset( $b[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) ? (int) $b[ Page_Template_Schema::SECTION_ITEM_POSITION ] : 0;
-			return $pa <=> $pb;
-		} );
+		usort(
+			$ordered,
+			function ( $a, $b ) {
+				$pa = isset( $a[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) ? (int) $a[ Page_Template_Schema::SECTION_ITEM_POSITION ] : 0;
+				$pb = isset( $b[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) ? (int) $b[ Page_Template_Schema::SECTION_ITEM_POSITION ] : 0;
+				return $pa <=> $pb;
+			}
+		);
 
 		$cta_flags = array();
 		foreach ( $ordered as $item ) {
-			$sk  = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
-			$sec = $section_by_key[ $sk ] ?? null;
+			$sk          = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
+			$sec         = $section_by_key[ $sk ] ?? null;
 			$cta_flags[] = $sec !== null && $this->is_cta_classified( $sec );
 		}
 
-		$cta_count    = (int) array_sum( array_map( 'intval', $cta_flags ) );
+		$cta_count     = (int) array_sum( array_map( 'intval', $cta_flags ) );
 		$non_cta_count = count( $cta_flags ) - $cta_count;
 
 		if ( $cta_count < $min_cta ) {

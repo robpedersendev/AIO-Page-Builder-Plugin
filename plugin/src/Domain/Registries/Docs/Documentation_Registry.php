@@ -82,8 +82,8 @@ final class Documentation_Registry {
 		if ( $this->by_id !== null ) {
 			return;
 		}
-		$this->by_id = array();
-		$this->by_section_key = array();
+		$this->by_id                = array();
+		$this->by_section_key       = array();
 		$this->by_page_template_key = array();
 		foreach ( $this->loader->load_section_helpers() as $doc ) {
 			$id = (string) ( $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );

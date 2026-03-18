@@ -23,18 +23,24 @@ final class Service_Container_Test extends TestCase {
 
 	public function test_provider_can_register_service(): void {
 		$container = new Service_Container();
-		$container->register( 'test', function () {
-			return new \stdClass();
-		} );
+		$container->register(
+			'test',
+			function () {
+				return new \stdClass();
+			}
+		);
 		$this->assertTrue( $container->has( 'test' ) );
 		$this->assertInstanceOf( \stdClass::class, $container->get( 'test' ) );
 	}
 
 	public function test_services_resolve_once_as_singletons(): void {
 		$container = new Service_Container();
-		$container->register( 'single', function () {
-			return new \stdClass();
-		} );
+		$container->register(
+			'single',
+			function () {
+				return new \stdClass();
+			}
+		);
 		$first  = $container->get( 'single' );
 		$second = $container->get( 'single' );
 		$this->assertSame( $first, $second );

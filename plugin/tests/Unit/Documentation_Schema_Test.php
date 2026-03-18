@@ -64,7 +64,7 @@ final class Documentation_Schema_Test extends TestCase {
 
 	/** Example: section helper document has all required keys and source. */
 	public function test_example_section_helper_has_required_keys_and_source(): void {
-		$doc = $this->get_valid_section_helper_example();
+		$doc      = $this->get_valid_section_helper_example();
 		$required = Documentation_Schema::get_required_fields();
 		foreach ( $required as $field ) {
 			$this->assertArrayHasKey( $field, $doc, "Section helper example must have: {$field}" );
@@ -91,7 +91,7 @@ final class Documentation_Schema_Test extends TestCase {
 			Documentation_Schema::FIELD_DOCUMENTATION_TYPE => Documentation_Schema::TYPE_SECTION_HELPER,
 			Documentation_Schema::FIELD_CONTENT_BODY       => 'Text',
 			Documentation_Schema::FIELD_STATUS             => 'draft',
-			Documentation_Schema::FIELD_SOURCE_REFERENCE  => array(),
+			Documentation_Schema::FIELD_SOURCE_REFERENCE   => array(),
 		);
 		$this->assertArrayNotHasKey( Documentation_Schema::SOURCE_SECTION_TEMPLATE_KEY, $doc[ Documentation_Schema::FIELD_SOURCE_REFERENCE ] );
 	}

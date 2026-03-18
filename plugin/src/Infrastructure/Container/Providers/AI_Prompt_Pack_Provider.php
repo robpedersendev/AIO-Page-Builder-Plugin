@@ -24,14 +24,23 @@ final class AI_Prompt_Pack_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'prompt_pack_registry_service', function () use ( $container ): Prompt_Pack_Registry_Service {
-			return new Prompt_Pack_Registry_Service( $container->get( 'prompt_pack_repository' ) );
-		} );
-		$container->register( 'input_artifact_builder', function (): Input_Artifact_Builder {
-			return new Input_Artifact_Builder();
-		} );
-		$container->register( 'normalized_prompt_package_builder', function (): Normalized_Prompt_Package_Builder {
-			return new Normalized_Prompt_Package_Builder();
-		} );
+		$container->register(
+			'prompt_pack_registry_service',
+			function () use ( $container ): Prompt_Pack_Registry_Service {
+				return new Prompt_Pack_Registry_Service( $container->get( 'prompt_pack_repository' ) );
+			}
+		);
+		$container->register(
+			'input_artifact_builder',
+			function (): Input_Artifact_Builder {
+				return new Input_Artifact_Builder();
+			}
+		);
+		$container->register(
+			'normalized_prompt_package_builder',
+			function (): Normalized_Prompt_Package_Builder {
+				return new Normalized_Prompt_Package_Builder();
+			}
+		);
 	}
 }

@@ -66,13 +66,22 @@ final class Reporting_Redaction_Service {
 	 */
 	public function redact_context( array $context ): array {
 		$prohibited_keys = array(
-			'password', 'api_key', 'bearer_token', 'auth_cookie', 'nonce',
-			'database_credentials', 'raw_ai_payload', 'session_id', 'secret',
-			'token', 'credential', 'key',
+			'password',
+			'api_key',
+			'bearer_token',
+			'auth_cookie',
+			'nonce',
+			'database_credentials',
+			'raw_ai_payload',
+			'session_id',
+			'secret',
+			'token',
+			'credential',
+			'key',
 		);
-		$out = array();
+		$out             = array();
 		foreach ( $context as $key => $value ) {
-			$key_lower = strtolower( (string) $key );
+			$key_lower  = strtolower( (string) $key );
 			$prohibited = false;
 			foreach ( $prohibited_keys as $p ) {
 				if ( str_contains( $key_lower, $p ) || $key_lower === $p ) {

@@ -37,7 +37,7 @@ final class Page_Instantiation_Result {
 	/**
 	 * @param bool                 $success     Whether the operation succeeded.
 	 * @param int                  $post_id     Page ID (0 if failed).
-	 * @param array<string, mixed>  $payload_used Payload snapshot.
+	 * @param array<string, mixed> $payload_used Payload snapshot.
 	 * @param list<string>         $errors      Error or warning messages.
 	 */
 	public function __construct( bool $success, int $post_id, array $payload_used, array $errors = array() ) {

@@ -89,11 +89,17 @@ final class New_Page_Creation_Bulk_Action_Service {
 			: array();
 		$step  = $steps[ self::STEP_INDEX_NEW_PAGES ] ?? null;
 		if ( ! is_array( $step ) ) {
-			return array( 'build_all_eligible' => 0, 'build_selected_eligible' => 0 );
+			return array(
+				'build_all_eligible'      => 0,
+				'build_selected_eligible' => 0,
+			);
 		}
 		$step_type = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' );
 		if ( $step_type !== Build_Plan_Schema::STEP_TYPE_NEW_PAGES ) {
-			return array( 'build_all_eligible' => 0, 'build_selected_eligible' => 0 );
+			return array(
+				'build_all_eligible'      => 0,
+				'build_selected_eligible' => 0,
+			);
 		}
 		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) ? $step[ Build_Plan_Item_Schema::KEY_ITEMS ] : array();
 		$pending = 0;
@@ -109,8 +115,8 @@ final class New_Page_Creation_Bulk_Action_Service {
 			}
 		}
 		return array(
-			'build_all_eligible'       => $pending,
-			'build_selected_eligible'  => $pending,
+			'build_all_eligible'      => $pending,
+			'build_selected_eligible' => $pending,
 		);
 	}
 

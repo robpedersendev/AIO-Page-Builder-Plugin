@@ -23,7 +23,7 @@ use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
  */
 final class FormProviderIntegrationRegressionHarness {
 
-	public const SCENARIO_RENDERING        = 'rendering';
+	public const SCENARIO_RENDERING         = 'rendering';
 	public const SCENARIO_SAVE_LOAD         = 'save_load';
 	public const SCENARIO_MISSING_PROVIDER  = 'missing_provider';
 	public const SCENARIO_STALE_FORM        = 'stale_form';
@@ -39,7 +39,7 @@ final class FormProviderIntegrationRegressionHarness {
 
 	public function __construct( string $fixtures_base = '', ?Form_Provider_Registry $registry = null ) {
 		$this->fixtures_base = $fixtures_base !== '' ? rtrim( str_replace( '\\', '/', $fixtures_base ), '/' ) : dirname( __DIR__ ) . '/fixtures/form-provider-integration';
-		$this->registry     = $registry ?? new Form_Provider_Registry();
+		$this->registry      = $registry ?? new Form_Provider_Registry();
 	}
 
 	/**
@@ -51,12 +51,24 @@ final class FormProviderIntegrationRegressionHarness {
 		$results = array();
 		$files   = glob( $this->fixtures_base . '/*.json' );
 		if ( ! is_array( $files ) ) {
-			return array( array( 'scenario_id' => 'harness', 'pass' => false, 'message' => 'No fixtures path', 'details' => array() ) );
+			return array(
+				array(
+					'scenario_id' => 'harness',
+					'pass'        => false,
+					'message'     => 'No fixtures path',
+					'details'     => array(),
+				),
+			);
 		}
 		foreach ( $files as $path ) {
 			$data = $this->load_json( $path );
 			if ( ! is_array( $data ) ) {
-				$results[] = array( 'scenario_id' => basename( $path, '.json' ), 'pass' => false, 'message' => 'Invalid fixture', 'details' => array() );
+				$results[] = array(
+					'scenario_id' => basename( $path, '.json' ),
+					'pass'        => false,
+					'message'     => 'Invalid fixture',
+					'details'     => array(),
+				);
 				continue;
 			}
 			$results[] = $this->run_one( $data );
@@ -77,8 +89,8 @@ final class FormProviderIntegrationRegressionHarness {
 		$provider    = (string) ( $section['form_provider'] ?? '' );
 		$form_id     = (string) ( $section['form_id'] ?? '' );
 
-		$details = array();
-		$provider_registered = $this->registry->has_provider( $provider );
+		$details                        = array();
+		$provider_registered            = $this->registry->has_provider( $provider );
 		$details['provider_registered'] = $provider_registered;
 
 		$expect_registered = (bool) ( $expected['provider_registered'] ?? true );
@@ -91,8 +103,8 @@ final class FormProviderIntegrationRegressionHarness {
 			);
 		}
 
-		$shortcode = $this->registry->build_shortcode( $provider, $form_id );
-		$shortcode_builds = $shortcode !== null;
+		$shortcode                   = $this->registry->build_shortcode( $provider, $form_id );
+		$shortcode_builds            = $shortcode !== null;
 		$details['shortcode_builds'] = $shortcode_builds;
 		if ( $shortcode !== null ) {
 			$details['shortcode'] = $shortcode;
@@ -119,7 +131,7 @@ final class FormProviderIntegrationRegressionHarness {
 			}
 		}
 
-		$form_id_valid = $form_id !== '' && preg_match( '/^[a-zA-Z0-9_\-]+$/', $form_id );
+		$form_id_valid            = $form_id !== '' && preg_match( '/^[a-zA-Z0-9_\-]+$/', $form_id );
 		$details['form_id_valid'] = $form_id_valid;
 		if ( isset( $expected['form_id_valid'] ) && (bool) $expected['form_id_valid'] !== $form_id_valid ) {
 			return array(
@@ -145,7 +157,14 @@ final class FormProviderIntegrationRegressionHarness {
 	 * @return array{ran_at: string, total: int, passed: int, failed: int, results: array}
 	 */
 	public static function summary( array $results ): array {
-		$passed = count( array_filter( $results, static function ( $r ) { return $r['pass']; } ) );
+		$passed = count(
+			array_filter(
+				$results,
+				static function ( $r ) {
+					return $r['pass'];
+				}
+			)
+		);
 		return array(
 			'ran_at'  => gmdate( 'Y-m-d\TH:i:s\Z' ),
 			'total'   => count( $results ),

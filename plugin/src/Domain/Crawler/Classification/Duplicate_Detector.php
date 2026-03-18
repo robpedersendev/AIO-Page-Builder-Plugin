@@ -28,7 +28,7 @@ final class Duplicate_Detector {
 	 * Checks whether the candidate duplicates any known page. Returns duplicate URL and reason or null.
 	 *
 	 * @param array{normalized_url: string, canonical_url?: string|null, title?: string|null, h1?: string|null, content_hash?: string|null, final_url?: string|null} $candidate Candidate page data.
-	 * @param list<array{normalized_url: string, canonical_url?: string|null, title?: string|null, h1?: string|null, content_hash?: string|null}> $known_pages Already-accepted pages (same run).
+	 * @param list<array{normalized_url: string, canonical_url?: string|null, title?: string|null, h1?: string|null, content_hash?: string|null}>                    $known_pages Already-accepted pages (same run).
 	 * @return array{duplicate_of: string, reason: string}|null Null if no duplicate found.
 	 */
 	public function find_duplicate( array $candidate, array $known_pages ): ?array {
@@ -42,7 +42,7 @@ final class Duplicate_Detector {
 			return null;
 		}
 		foreach ( $known_pages as $known ) {
-			$k_url   = $this->norm( $known['normalized_url'] ?? '' );
+			$k_url = $this->norm( $known['normalized_url'] ?? '' );
 			if ( $k_url === '' ) {
 				continue;
 			}
@@ -54,16 +54,28 @@ final class Duplicate_Detector {
 			$k_h1    = $this->norm( $known['h1'] ?? '' );
 			$k_hash  = $this->norm( $known['content_hash'] ?? '' );
 			if ( $c_canon !== '' && $k_canon !== '' && $c_canon === $k_canon ) {
-				return array( 'duplicate_of' => $k_url, 'reason' => Classification_Result::REASON_DUPLICATE_CANONICAL );
+				return array(
+					'duplicate_of' => $k_url,
+					'reason'       => Classification_Result::REASON_DUPLICATE_CANONICAL,
+				);
 			}
 			if ( $c_final !== '' && $c_final === $k_url ) {
-				return array( 'duplicate_of' => $k_url, 'reason' => Classification_Result::REASON_DUPLICATE_REDIRECT );
+				return array(
+					'duplicate_of' => $k_url,
+					'reason'       => Classification_Result::REASON_DUPLICATE_REDIRECT,
+				);
 			}
 			if ( $c_hash !== '' && $k_hash !== '' && $c_hash === $k_hash ) {
 				if ( $c_title === $k_title && $c_h1 === $k_h1 ) {
-					return array( 'duplicate_of' => $k_url, 'reason' => Classification_Result::REASON_DUPLICATE_CONTENT_HASH );
+					return array(
+						'duplicate_of' => $k_url,
+						'reason'       => Classification_Result::REASON_DUPLICATE_CONTENT_HASH,
+					);
 				}
-				return array( 'duplicate_of' => $k_url, 'reason' => Classification_Result::REASON_DUPLICATE_CONTENT_HASH );
+				return array(
+					'duplicate_of' => $k_url,
+					'reason'       => Classification_Result::REASON_DUPLICATE_CONTENT_HASH,
+				);
 			}
 		}
 		return null;
@@ -79,9 +91,9 @@ final class Duplicate_Detector {
 	 * @return string Hash string (e.g. sha256 hex).
 	 */
 	public static function content_hash( string $title, string $h1, string $body_excerpt, int $excerpt_len = 2000 ): string {
-		$t = trim( $title );
-		$h = trim( $h1 );
-		$b = trim( substr( $body_excerpt, 0, $excerpt_len ) );
+		$t        = trim( $title );
+		$h        = trim( $h1 );
+		$b        = trim( substr( $body_excerpt, 0, $excerpt_len ) );
 		$combined = $t . "\n" . $h . "\n" . $b;
 		return hash( 'sha256', $combined );
 	}

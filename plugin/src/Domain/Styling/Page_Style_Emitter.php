@@ -33,8 +33,8 @@ final class Page_Style_Emitter {
 		?Style_Token_Registry $token_registry = null,
 		?Component_Override_Registry $component_registry = null
 	) {
-		$this->payload_repository  = $payload_repository;
-		$this->token_registry      = $token_registry;
+		$this->payload_repository = $payload_repository;
+		$this->token_registry     = $token_registry;
 		$this->component_registry = $component_registry;
 	}
 
@@ -48,11 +48,11 @@ final class Page_Style_Emitter {
 		if ( $template_key === '' ) {
 			return '';
 		}
-		$payload = $this->payload_repository->get_payload( 'page_template', $template_key );
+		$payload             = $this->payload_repository->get_payload( 'page_template', $template_key );
 		$token_overrides     = $payload[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] ?? array();
 		$component_overrides = $payload[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] ?? array();
-		$parts = array();
-		$declarations = $this->emit_token_declarations( $token_overrides );
+		$parts               = array();
+		$declarations        = $this->emit_token_declarations( $token_overrides );
 		if ( $declarations !== '' ) {
 			$parts[] = self::PAGE_SELECTOR . ' { ' . $declarations . ' }';
 		}
@@ -112,7 +112,7 @@ final class Page_Style_Emitter {
 			if ( ! is_string( $component_id ) || ! is_array( $pairs ) ) {
 				continue;
 			}
-			$allowed = $this->component_registry->get_allowed_token_overrides( $component_id );
+			$allowed      = $this->component_registry->get_allowed_token_overrides( $component_id );
 			$element_role = $this->component_registry->get_element_role( $component_id );
 			if ( $element_role === '' || empty( $allowed ) ) {
 				continue;

@@ -42,7 +42,7 @@ final class AI_Providers_UI_State_Builder_Test extends TestCase {
 	}
 
 	public function test_build_disclosure_blocks_contain_external_transfer_and_cost(): void {
-		$state = $this->build_state_with_mocks();
+		$state    = $this->build_state_with_mocks();
 		$headings = array_column( $state['disclosure_blocks'], 'heading' );
 		$this->assertContains( 'External transfer', $headings );
 		$this->assertContains( 'Cost', $headings );

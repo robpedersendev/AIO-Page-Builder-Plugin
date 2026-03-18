@@ -21,7 +21,7 @@ final class Page_Template_Schema_Test extends TestCase {
 	 * Completeness checklist: every required field from spec §13.2 / object contract §10.2 must be in get_required_fields().
 	 */
 	public function test_required_fields_include_all_spec_13_2_items(): void {
-		$required = Page_Template_Schema::get_required_fields();
+		$required  = Page_Template_Schema::get_required_fields();
 		$checklist = array(
 			'stable internal page-template key'   => Page_Template_Schema::FIELD_INTERNAL_KEY,
 			'human-readable name'                 => Page_Template_Schema::FIELD_NAME,
@@ -32,8 +32,8 @@ final class Page_Template_Schema_Test extends TestCase {
 			'compatibility metadata'              => Page_Template_Schema::FIELD_COMPATIBILITY,
 			'one-pager generation metadata'       => Page_Template_Schema::FIELD_ONE_PAGER,
 			'version marker'                      => Page_Template_Schema::FIELD_VERSION,
-			'active/deprecated status'           => Page_Template_Schema::FIELD_STATUS,
-			'default structural assumptions'     => Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS,
+			'active/deprecated status'            => Page_Template_Schema::FIELD_STATUS,
+			'default structural assumptions'      => Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS,
 			'endpoint or usage notes'             => Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES,
 		);
 		$this->assertCount( 12, $checklist );
@@ -82,7 +82,7 @@ final class Page_Template_Schema_Test extends TestCase {
 
 	/** Example valid minimal page template has all required keys. */
 	public function test_example_valid_minimal_has_all_required_keys(): void {
-		$valid = $this->get_valid_minimal_page_template();
+		$valid    = $this->get_valid_minimal_page_template();
 		$required = Page_Template_Schema::get_required_fields();
 		foreach ( $required as $field ) {
 			$this->assertArrayHasKey( $field, $valid, "Valid minimal example must have required field: {$field}" );
@@ -153,34 +153,34 @@ final class Page_Template_Schema_Test extends TestCase {
 
 	private function get_valid_minimal_page_template(): array {
 		return array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY           => 'pt_landing_contact',
-			Page_Template_Schema::FIELD_NAME                   => 'Landing – Contact',
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY        => 'Single-purpose landing for contact.',
-			Page_Template_Schema::FIELD_ARCHETYPE              => 'landing_page',
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS        => array(
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => 'pt_landing_contact',
+			Page_Template_Schema::FIELD_NAME             => 'Landing – Contact',
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => 'Single-purpose landing for contact.',
+			Page_Template_Schema::FIELD_ARCHETYPE        => 'landing_page',
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
 				array(
 					'section_key' => 'st01_hero',
 					'position'    => 0,
 					'required'    => true,
 				),
 			),
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS    => array(
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => array(
 				'st01_hero' => array( 'required' => true ),
 			),
-			Page_Template_Schema::FIELD_COMPATIBILITY           => array(
-				'site_contexts_appropriate' => array(),
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(
+				'site_contexts_appropriate'   => array(),
 				'site_contexts_inappropriate' => array(),
-				'conflicts_with_purposes'   => array(),
+				'conflicts_with_purposes'     => array(),
 			),
-			Page_Template_Schema::FIELD_ONE_PAGER               => array(
+			Page_Template_Schema::FIELD_ONE_PAGER        => array(
 				'page_purpose_summary' => 'Contact-focused landing: hero plus CTA.',
 				'section_helper_order' => 'same_as_template',
 			),
-			Page_Template_Schema::FIELD_VERSION                 => array(
+			Page_Template_Schema::FIELD_VERSION          => array(
 				'version'             => '1',
 				'stable_key_retained' => true,
 			),
-			Page_Template_Schema::FIELD_STATUS                  => 'active',
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => 'Single column.',
 			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => 'Campaign landing.',
 		);

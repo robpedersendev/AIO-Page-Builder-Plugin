@@ -18,6 +18,7 @@ defined( 'ABSPATH' ) || exit;
  * Immutable template page-build execution result. Convertible to array for artifacts and logging.
  *
  * Example template_build_execution_result payload (success):
+ *
  * @code
  * array(
  *   'success'                  => true,
@@ -206,21 +207,21 @@ final class Template_Page_Build_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'success'                  => $this->success,
-			'post_id'                  => $this->post_id,
-			'template_key'             => $this->template_key,
-			'template_family'          => $this->template_family,
-			'template_category_class'  => $this->template_category_class,
-			'hierarchy_applied'        => $this->hierarchy_applied,
-			'parent_post_id'            => $this->parent_post_id,
-			'one_pager_available'      => $this->one_pager_available,
-			'one_pager_metadata'       => $this->one_pager_metadata,
-			'section_count'            => $this->section_count,
-			'field_assignment_count'   => $this->field_assignment_count,
-			'warnings'                 => $this->warnings,
-			'errors'                   => $this->errors,
-			'log_ref'                  => $this->log_ref,
-			'message'                  => $this->message,
+			'success'                 => $this->success,
+			'post_id'                 => $this->post_id,
+			'template_key'            => $this->template_key,
+			'template_family'         => $this->template_family,
+			'template_category_class' => $this->template_category_class,
+			'hierarchy_applied'       => $this->hierarchy_applied,
+			'parent_post_id'          => $this->parent_post_id,
+			'one_pager_available'     => $this->one_pager_available,
+			'one_pager_metadata'      => $this->one_pager_metadata,
+			'section_count'           => $this->section_count,
+			'field_assignment_count'  => $this->field_assignment_count,
+			'warnings'                => $this->warnings,
+			'errors'                  => $this->errors,
+			'log_ref'                 => $this->log_ref,
+			'message'                 => $this->message,
 		);
 	}
 
@@ -310,21 +311,21 @@ final class Template_Page_Build_Result {
 	 */
 	public static function example_payload(): array {
 		return array(
-			'success'                  => true,
-			'post_id'                  => 42,
-			'template_key'             => 'tpl_services_hub',
-			'template_family'          => 'services',
-			'template_category_class'  => 'hub',
-			'hierarchy_applied'        => true,
-			'parent_post_id'            => 10,
-			'one_pager_available'      => true,
-			'one_pager_metadata'       => array( 'doc_ref' => 'one-pager-services-hub' ),
-			'section_count'            => 5,
-			'field_assignment_count'   => 3,
-			'warnings'                 => array(),
-			'errors'                   => array(),
-			'log_ref'                  => 'log_abc',
-			'message'                  => __( 'Page created.', 'aio-page-builder' ),
+			'success'                 => true,
+			'post_id'                 => 42,
+			'template_key'            => 'tpl_services_hub',
+			'template_family'         => 'services',
+			'template_category_class' => 'hub',
+			'hierarchy_applied'       => true,
+			'parent_post_id'          => 10,
+			'one_pager_available'     => true,
+			'one_pager_metadata'      => array( 'doc_ref' => 'one-pager-services-hub' ),
+			'section_count'           => 5,
+			'field_assignment_count'  => 3,
+			'warnings'                => array(),
+			'errors'                  => array(),
+			'log_ref'                 => 'log_abc',
+			'message'                 => __( 'Page created.', 'aio-page-builder' ),
 		);
 	}
 }

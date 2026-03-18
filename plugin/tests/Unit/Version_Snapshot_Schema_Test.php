@@ -21,7 +21,7 @@ final class Version_Snapshot_Schema_Test extends TestCase {
 	 * Completeness checklist: all spec §10.8 snapshot use cases have a scope_type.
 	 */
 	public function test_scope_types_cover_spec_10_8_use_cases(): void {
-		$types = Version_Snapshot_Schema::get_scope_types();
+		$types     = Version_Snapshot_Schema::get_scope_types();
 		$checklist = array(
 			'template registry snapshots' => Version_Snapshot_Schema::SCOPE_REGISTRY,
 			'schema snapshots'            => Version_Snapshot_Schema::SCOPE_SCHEMA,
@@ -68,7 +68,7 @@ final class Version_Snapshot_Schema_Test extends TestCase {
 
 	/** Valid example: composition-linked registry snapshot. */
 	public function test_example_valid_registry_snapshot_has_all_required_keys(): void {
-		$valid = $this->get_valid_registry_snapshot_example();
+		$valid    = $this->get_valid_registry_snapshot_example();
 		$required = Version_Snapshot_Schema::get_required_fields();
 		foreach ( $required as $field ) {
 			$this->assertArrayHasKey( $field, $valid, "Valid example must have required field: {$field}" );
@@ -78,7 +78,7 @@ final class Version_Snapshot_Schema_Test extends TestCase {
 
 	/** Valid example: schema snapshot. */
 	public function test_example_valid_schema_snapshot_has_all_required_keys(): void {
-		$valid = $this->get_valid_schema_snapshot_example();
+		$valid    = $this->get_valid_schema_snapshot_example();
 		$required = Version_Snapshot_Schema::get_required_fields();
 		foreach ( $required as $field ) {
 			$this->assertArrayHasKey( $field, $valid, "Valid schema example must have required field: {$field}" );
@@ -105,23 +105,23 @@ final class Version_Snapshot_Schema_Test extends TestCase {
 
 	private function get_valid_registry_snapshot_example(): array {
 		return array(
-			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID   => 'snap-a1b2c3d4-registry',
-			Version_Snapshot_Schema::FIELD_SCOPE_TYPE   => Version_Snapshot_Schema::SCOPE_REGISTRY,
-			Version_Snapshot_Schema::FIELD_SCOPE_ID     => 'comp-uuid-12345',
-			Version_Snapshot_Schema::FIELD_CREATED_AT   => '2025-07-15T10:30:00Z',
+			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID    => 'snap-a1b2c3d4-registry',
+			Version_Snapshot_Schema::FIELD_SCOPE_TYPE     => Version_Snapshot_Schema::SCOPE_REGISTRY,
+			Version_Snapshot_Schema::FIELD_SCOPE_ID       => 'comp-uuid-12345',
+			Version_Snapshot_Schema::FIELD_CREATED_AT     => '2025-07-15T10:30:00Z',
 			Version_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
-			Version_Snapshot_Schema::FIELD_STATUS      => Version_Snapshot_Schema::STATUS_ACTIVE,
+			Version_Snapshot_Schema::FIELD_STATUS         => Version_Snapshot_Schema::STATUS_ACTIVE,
 		);
 	}
 
 	private function get_valid_schema_snapshot_example(): array {
 		return array(
-			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID   => 'snap-schema-section-v1',
-			Version_Snapshot_Schema::FIELD_SCOPE_TYPE   => Version_Snapshot_Schema::SCOPE_SCHEMA,
-			Version_Snapshot_Schema::FIELD_SCOPE_ID     => 'section_registry_v1',
-			Version_Snapshot_Schema::FIELD_CREATED_AT   => '2025-07-01T00:00:00Z',
+			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID    => 'snap-schema-section-v1',
+			Version_Snapshot_Schema::FIELD_SCOPE_TYPE     => Version_Snapshot_Schema::SCOPE_SCHEMA,
+			Version_Snapshot_Schema::FIELD_SCOPE_ID       => 'section_registry_v1',
+			Version_Snapshot_Schema::FIELD_CREATED_AT     => '2025-07-01T00:00:00Z',
 			Version_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
-			Version_Snapshot_Schema::FIELD_STATUS      => Version_Snapshot_Schema::STATUS_ACTIVE,
+			Version_Snapshot_Schema::FIELD_STATUS         => Version_Snapshot_Schema::STATUS_ACTIVE,
 		);
 	}
 }

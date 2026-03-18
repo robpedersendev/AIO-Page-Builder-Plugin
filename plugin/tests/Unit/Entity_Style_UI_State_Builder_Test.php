@@ -36,7 +36,7 @@ final class Entity_Style_UI_State_Builder_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->plugin_root = dirname( __DIR__, 2 );
-		$key = Entity_Style_Payload_Schema::OPTION_KEY;
+		$key               = Entity_Style_Payload_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
 		}

@@ -38,47 +38,81 @@ require_once $plugin_root . '/src/Domain/Storage/Repositories/Section_Template_R
 final class ACF_Registration_Test extends TestCase {
 
 	private function normalized_hero_blueprint(): array {
-		$validator = new Section_Field_Blueprint_Validator();
+		$validator  = new Section_Field_Blueprint_Validator();
 		$normalizer = new Section_Field_Blueprint_Normalizer( $validator );
-		$blueprint = array(
+		$blueprint  = array(
 			'blueprint_id'    => 'acf_blueprint_st01',
 			'section_key'     => 'st01_hero',
 			'section_version' => '1',
 			'label'           => 'Hero Section Fields',
 			'fields'          => array(
-				array( 'key' => 'field_st01_hero_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => true ),
-				array( 'key' => 'field_st01_hero_subheadline', 'name' => 'subheadline', 'label' => 'Subheadline', 'type' => 'textarea' ),
-				array( 'key' => 'field_st01_hero_cta', 'name' => 'cta', 'label' => 'CTA Link', 'type' => 'link' ),
+				array(
+					'key'      => 'field_st01_hero_headline',
+					'name'     => 'headline',
+					'label'    => 'Headline',
+					'type'     => 'text',
+					'required' => true,
+				),
+				array(
+					'key'   => 'field_st01_hero_subheadline',
+					'name'  => 'subheadline',
+					'label' => 'Subheadline',
+					'type'  => 'textarea',
+				),
+				array(
+					'key'   => 'field_st01_hero_cta',
+					'name'  => 'cta',
+					'label' => 'CTA Link',
+					'type'  => 'link',
+				),
 			),
 		);
-		$result = $normalizer->normalize( $blueprint );
+		$result     = $normalizer->normalize( $blueprint );
 		$this->assertEmpty( $result['errors'] );
 		return $result['normalized'];
 	}
 
 	private function normalized_repeater_blueprint(): array {
-		$validator = new Section_Field_Blueprint_Validator();
+		$validator  = new Section_Field_Blueprint_Validator();
 		$normalizer = new Section_Field_Blueprint_Normalizer( $validator );
-		$blueprint = array(
+		$blueprint  = array(
 			'blueprint_id'    => 'acf_blueprint_st05_faq',
 			'section_key'     => 'st05_faq',
 			'section_version' => '1',
 			'label'           => 'FAQ Section Fields',
 			'fields'          => array(
-				array( 'key' => 'field_st05_faq_section_title', 'name' => 'section_title', 'label' => 'Section Title', 'type' => 'text', 'required' => true ),
+				array(
+					'key'      => 'field_st05_faq_section_title',
+					'name'     => 'section_title',
+					'label'    => 'Section Title',
+					'type'     => 'text',
+					'required' => true,
+				),
 				array(
 					'key'        => 'field_st05_faq_faq_items',
 					'name'       => 'faq_items',
 					'label'      => 'FAQ Items',
 					'type'       => 'repeater',
 					'sub_fields' => array(
-						array( 'key' => 'field_st05_faq_faq_items_question', 'name' => 'question', 'label' => 'Question', 'type' => 'text', 'required' => true ),
-						array( 'key' => 'field_st05_faq_faq_items_answer', 'name' => 'answer', 'label' => 'Answer', 'type' => 'wysiwyg', 'required' => true ),
+						array(
+							'key'      => 'field_st05_faq_faq_items_question',
+							'name'     => 'question',
+							'label'    => 'Question',
+							'type'     => 'text',
+							'required' => true,
+						),
+						array(
+							'key'      => 'field_st05_faq_faq_items_answer',
+							'name'     => 'answer',
+							'label'    => 'Answer',
+							'type'     => 'wysiwyg',
+							'required' => true,
+						),
 					),
 				),
 			),
 		);
-		$result = $normalizer->normalize( $blueprint );
+		$result     = $normalizer->normalize( $blueprint );
 		$this->assertEmpty( $result['errors'] );
 		return $result['normalized'];
 	}
@@ -94,14 +128,14 @@ final class ACF_Registration_Test extends TestCase {
 
 	public function test_field_builder_produces_deterministic_field(): void {
 		$builder = new ACF_Field_Builder();
-		$field = array(
-			'key'   => 'field_st01_hero_headline',
-			'name'  => 'headline',
-			'label' => 'Headline',
-			'type'  => 'text',
+		$field   = array(
+			'key'      => 'field_st01_hero_headline',
+			'name'     => 'headline',
+			'label'    => 'Headline',
+			'type'     => 'text',
 			'required' => true,
 		);
-		$acf = $builder->build_field( $field, 'group_aio_st01_hero' );
+		$acf     = $builder->build_field( $field, 'group_aio_st01_hero' );
 		$this->assertSame( 'field_st01_hero_headline', $acf['key'] );
 		$this->assertSame( 'headline', $acf['name'] );
 		$this->assertSame( 'Headline', $acf['label'] );
@@ -111,18 +145,28 @@ final class ACF_Registration_Test extends TestCase {
 	}
 
 	public function test_field_builder_supports_nested_subfields(): void {
-		$builder = new ACF_Field_Builder();
+		$builder  = new ACF_Field_Builder();
 		$repeater = array(
-			'key' => 'field_st05_faq_faq_items',
-			'name' => 'faq_items',
-			'label' => 'FAQ Items',
-			'type' => 'repeater',
+			'key'        => 'field_st05_faq_faq_items',
+			'name'       => 'faq_items',
+			'label'      => 'FAQ Items',
+			'type'       => 'repeater',
 			'sub_fields' => array(
-				array( 'key' => 'field_st05_faq_faq_items_question', 'name' => 'question', 'label' => 'Question', 'type' => 'text' ),
-				array( 'key' => 'field_st05_faq_faq_items_answer', 'name' => 'answer', 'label' => 'Answer', 'type' => 'wysiwyg' ),
+				array(
+					'key'   => 'field_st05_faq_faq_items_question',
+					'name'  => 'question',
+					'label' => 'Question',
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'field_st05_faq_faq_items_answer',
+					'name'  => 'answer',
+					'label' => 'Answer',
+					'type'  => 'wysiwyg',
+				),
 			),
 		);
-		$acf = $builder->build_field( $repeater, 'group_aio_st05_faq' );
+		$acf      = $builder->build_field( $repeater, 'group_aio_st05_faq' );
 		$this->assertArrayHasKey( 'sub_fields', $acf );
 		$this->assertCount( 2, $acf['sub_fields'] );
 		$this->assertSame( 'field_st05_faq_faq_items_question', $acf['sub_fields'][0]['key'] );
@@ -131,9 +175,9 @@ final class ACF_Registration_Test extends TestCase {
 	}
 
 	public function test_group_builder_produces_deterministic_group(): void {
-		$builder = new ACF_Group_Builder( new ACF_Field_Builder() );
+		$builder   = new ACF_Group_Builder( new ACF_Field_Builder() );
 		$blueprint = $this->normalized_hero_blueprint();
-		$group = $builder->build_group( $blueprint );
+		$group     = $builder->build_group( $blueprint );
 		$this->assertNotNull( $group );
 		$this->assertSame( 'group_aio_st01_hero', $group['key'] );
 		$this->assertSame( 'Hero Section Fields', $group['title'] );
@@ -145,9 +189,9 @@ final class ACF_Registration_Test extends TestCase {
 	}
 
 	public function test_group_builder_includes_nested_repeater(): void {
-		$builder = new ACF_Group_Builder( new ACF_Field_Builder() );
+		$builder   = new ACF_Group_Builder( new ACF_Field_Builder() );
 		$blueprint = $this->normalized_repeater_blueprint();
-		$group = $builder->build_group( $blueprint );
+		$group     = $builder->build_group( $blueprint );
 		$this->assertNotNull( $group );
 		$this->assertSame( 'group_aio_st05_faq', $group['key'] );
 		$repeater = null;
@@ -164,15 +208,15 @@ final class ACF_Registration_Test extends TestCase {
 
 	public function test_group_builder_rejects_invalid_blueprint(): void {
 		$builder = new ACF_Group_Builder( new ACF_Field_Builder() );
-		$bad = array( 'section_key' => 'x' );
+		$bad     = array( 'section_key' => 'x' );
 		$this->assertNull( $builder->build_group( $bad ) );
 
 		$empty_fields = array(
-			'blueprint_id' => 'acf_x',
-			'section_key'  => 'st99_x',
+			'blueprint_id'    => 'acf_x',
+			'section_key'     => 'st99_x',
 			'section_version' => '1',
-			'label' => 'X',
-			'fields' => array(),
+			'label'           => 'X',
+			'fields'          => array(),
 		);
 		$this->assertNull( $builder->build_group( $empty_fields ) );
 	}
@@ -180,7 +224,7 @@ final class ACF_Registration_Test extends TestCase {
 	public function test_registrar_assembles_group_without_registering(): void {
 		$registrar = $this->create_registrar();
 		$blueprint = $this->normalized_hero_blueprint();
-		$group = $registrar->assemble_group( $blueprint );
+		$group     = $registrar->assemble_group( $blueprint );
 		$this->assertNotNull( $group );
 		$this->assertSame( 'group_aio_st01_hero', $group['key'] );
 		$this->assertCount( 3, $group['fields'] );
@@ -199,13 +243,13 @@ final class ACF_Registration_Test extends TestCase {
 
 	public function test_registrar_register_all_returns_zero_without_acf(): void {
 		$registrar = $this->create_registrar();
-		$count = $registrar->register_all();
+		$count     = $registrar->register_all();
 		$this->assertSame( 0, $count );
 	}
 
 	public function test_registrar_register_sections_for_page_equals_register_sections(): void {
 		$registrar = $this->create_registrar();
-		$keys = array( 'st01_hero', 'st05_faq' );
+		$keys      = array( 'st01_hero', 'st05_faq' );
 		$this->assertSame( $registrar->register_sections( $keys ), $registrar->register_sections_for_page( $keys ) );
 	}
 
@@ -217,7 +261,7 @@ final class ACF_Registration_Test extends TestCase {
 	public function test_example_assembled_acf_group_array(): void {
 		$registrar = $this->create_registrar();
 		$blueprint = $this->normalized_hero_blueprint();
-		$group = $registrar->assemble_group( $blueprint );
+		$group     = $registrar->assemble_group( $blueprint );
 		$this->assertIsArray( $group );
 		$this->assertArrayHasKey( 'key', $group );
 		$this->assertArrayHasKey( 'title', $group );

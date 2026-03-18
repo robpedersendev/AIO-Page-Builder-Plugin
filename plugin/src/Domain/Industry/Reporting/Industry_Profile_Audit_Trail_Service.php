@@ -21,15 +21,15 @@ use AIOPageBuilder\Infrastructure\Config\Option_Names;
  */
 final class Industry_Profile_Audit_Trail_Service {
 
-	public const EVENT_PRIMARY_INDUSTRY_CHANGED   = 'primary_industry_changed';
+	public const EVENT_PRIMARY_INDUSTRY_CHANGED     = 'primary_industry_changed';
 	public const EVENT_SECONDARY_INDUSTRIES_CHANGED = 'secondary_industries_changed';
-	public const EVENT_SUBTYPE_CHANGED            = 'subtype_changed';
-	public const EVENT_STARTER_BUNDLE_CHANGED     = 'starter_bundle_changed';
-	public const EVENT_PROFILE_REPLACED           = 'profile_replaced';
+	public const EVENT_SUBTYPE_CHANGED              = 'subtype_changed';
+	public const EVENT_STARTER_BUNDLE_CHANGED       = 'starter_bundle_changed';
+	public const EVENT_PROFILE_REPLACED             = 'profile_replaced';
 
-	private const OPTION_KEY   = Option_Names::INDUSTRY_PROFILE_AUDIT_TRAIL;
-	private const MAX_EVENTS   = 100;
-	private const SUMMARY_MAX  = 256;
+	private const OPTION_KEY  = Option_Names::INDUSTRY_PROFILE_AUDIT_TRAIL;
+	private const MAX_EVENTS  = 100;
+	private const SUMMARY_MAX = 256;
 
 	/**
 	 * Records profile change by diffing old and new; appends one or more events. Call after successful profile write.
@@ -123,15 +123,15 @@ final class Industry_Profile_Audit_Trail_Service {
 	 * @return array<string, mixed>
 	 */
 	private function event( string $event_type, string $old_summary, string $new_summary, array $related_refs ): array {
-		$old_summary = substr( $old_summary, 0, self::SUMMARY_MAX );
-		$new_summary = substr( $new_summary, 0, self::SUMMARY_MAX );
+		$old_summary  = substr( $old_summary, 0, self::SUMMARY_MAX );
+		$new_summary  = substr( $new_summary, 0, self::SUMMARY_MAX );
 		$related_refs = array_values( array_unique( array_slice( array_map( 'strval', $related_refs ), 0, 20 ) ) );
 		return array(
-			'event_type'    => $event_type,
-			'timestamp'     => gmdate( 'c' ),
-			'old_summary'   => $old_summary,
-			'new_summary'   => $new_summary,
-			'related_refs'  => $related_refs,
+			'event_type'   => $event_type,
+			'timestamp'    => gmdate( 'c' ),
+			'old_summary'  => $old_summary,
+			'new_summary'  => $new_summary,
+			'related_refs' => $related_refs,
 		);
 	}
 

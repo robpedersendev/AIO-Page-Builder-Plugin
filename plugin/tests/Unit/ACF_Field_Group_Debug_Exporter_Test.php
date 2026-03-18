@@ -38,7 +38,12 @@ final class ACF_Field_Group_Debug_Exporter_Test extends TestCase {
 			Field_Blueprint_Schema::SECTION_VERSION => '1',
 			Field_Blueprint_Schema::LABEL           => 'Hero Fields',
 			Field_Blueprint_Schema::FIELDS          => array(
-				array( 'key' => 'field_st01_hero_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ),
+				array(
+					'key'   => 'field_st01_hero_headline',
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
 			),
 		);
 	}
@@ -59,11 +64,11 @@ final class ACF_Field_Group_Debug_Exporter_Test extends TestCase {
 	}
 
 	public function test_build_debug_export_returns_record_per_blueprint(): void {
-		$blueprints = array( $this->blueprint_st01(), $this->blueprint_st05() );
+		$blueprints        = array( $this->blueprint_st01(), $this->blueprint_st05() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$group_builder = new ACF_Group_Builder( new ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$group_builder     = new ACF_Group_Builder( new ACF_Field_Builder() );
+		$mirror_service    = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$exporter          = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
 
 		$records = $exporter->build_debug_export();
 
@@ -88,17 +93,20 @@ final class ACF_Field_Group_Debug_Exporter_Test extends TestCase {
 	}
 
 	public function test_build_diff_summary_detects_in_registry_not_mirror(): void {
-		$blueprints = array( $this->blueprint_st01(), $this->blueprint_st05() );
+		$blueprints        = array( $this->blueprint_st01(), $this->blueprint_st05() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$group_builder = new ACF_Group_Builder( new ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$group_builder     = new ACF_Group_Builder( new ACF_Field_Builder() );
+		$mirror_service    = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$exporter          = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
 
 		$registry_manifest = $mirror_service->get_manifest_without_writing();
-		$mirror_manifest = array(
+		$mirror_manifest   = array(
 			'group_keys' => array( 'group_aio_st01_hero' ),
-			'files'     => array(
-				array( 'group_key' => 'group_aio_st01_hero', 'section_version' => '1' ),
+			'files'      => array(
+				array(
+					'group_key'       => 'group_aio_st01_hero',
+					'section_version' => '1',
+				),
 			),
 		);
 
@@ -113,17 +121,20 @@ final class ACF_Field_Group_Debug_Exporter_Test extends TestCase {
 	}
 
 	public function test_build_diff_summary_detects_version_mismatch(): void {
-		$blueprints = array( $this->blueprint_st01() );
+		$blueprints        = array( $this->blueprint_st01() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$group_builder = new ACF_Group_Builder( new ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$group_builder     = new ACF_Group_Builder( new ACF_Field_Builder() );
+		$mirror_service    = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$exporter          = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
 
 		$registry_manifest = $mirror_service->get_manifest_without_writing();
-		$mirror_manifest = array(
+		$mirror_manifest   = array(
 			'group_keys' => array( 'group_aio_st01_hero' ),
 			'files'      => array(
-				array( 'group_key' => 'group_aio_st01_hero', 'section_version' => '0' ),
+				array(
+					'group_key'       => 'group_aio_st01_hero',
+					'section_version' => '0',
+				),
 			),
 		);
 
@@ -137,14 +148,14 @@ final class ACF_Field_Group_Debug_Exporter_Test extends TestCase {
 	}
 
 	public function test_build_diff_summary_in_sync_when_manifests_match(): void {
-		$blueprints = array( $this->blueprint_st01() );
+		$blueprints        = array( $this->blueprint_st01() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$group_builder = new ACF_Group_Builder( new ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$group_builder     = new ACF_Group_Builder( new ACF_Field_Builder() );
+		$mirror_service    = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$exporter          = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
 
 		$registry_manifest = $mirror_service->get_manifest_without_writing();
-		$diff = $exporter->build_diff_summary( $registry_manifest, $registry_manifest );
+		$diff              = $exporter->build_diff_summary( $registry_manifest, $registry_manifest );
 
 		$this->assertEmpty( $diff['in_registry_not_mirror'] );
 		$this->assertEmpty( $diff['in_mirror_not_registry'] );

@@ -382,7 +382,7 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$def       = $this->plan_definition_with_step_at( Finalization_Step_UI_Service::STEP_INDEX_CONFIRMATION, Build_Plan_Schema::STEP_TYPE_CONFIRMATION, array() );
 		$workspace = $service->build_workspace( $def, Finalization_Step_UI_Service::STEP_INDEX_CONFIRMATION, array( 'can_execute' => false ), null, array() );
 
-		$queue_section = null;
+		$queue_section     = null;
 		$conflicts_section = null;
 		foreach ( $workspace['detail_panel']['sections'] as $sec ) {
 			if ( ( $sec['key'] ?? '' ) === 'queue' ) {

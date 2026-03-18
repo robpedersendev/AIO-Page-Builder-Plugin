@@ -82,10 +82,10 @@ final class Dashboard_Screen {
 			return $this->container->get( 'dashboard_state_builder' );
 		}
 		$settings = $this->container && $this->container->has( 'settings' ) ? $this->container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
-		$crawl   = $this->container && $this->container->has( 'crawl_snapshot_service' ) ? $this->container->get( 'crawl_snapshot_service' ) : null;
-		$ai      = $this->container && $this->container->has( 'ai_run_repository' ) ? $this->container->get( 'ai_run_repository' ) : null;
-		$plans   = $this->container && $this->container->has( 'build_plan_repository' ) ? $this->container->get( 'build_plan_repository' ) : null;
-		$queue   = $this->container && $this->container->has( 'job_queue_repository' ) ? $this->container->get( 'job_queue_repository' ) : null;
+		$crawl    = $this->container && $this->container->has( 'crawl_snapshot_service' ) ? $this->container->get( 'crawl_snapshot_service' ) : null;
+		$ai       = $this->container && $this->container->has( 'ai_run_repository' ) ? $this->container->get( 'ai_run_repository' ) : null;
+		$plans    = $this->container && $this->container->has( 'build_plan_repository' ) ? $this->container->get( 'build_plan_repository' ) : null;
+		$queue    = $this->container && $this->container->has( 'job_queue_repository' ) ? $this->container->get( 'job_queue_repository' ) : null;
 		return new Dashboard_State_Builder( $settings, $crawl, $ai, $plans, $queue );
 	}
 
@@ -198,7 +198,19 @@ final class Dashboard_Screen {
 					<h3 style="margin-top: 0;"><?php \esc_html_e( 'Last crawl', 'aio-page-builder' ); ?></h3>
 					<?php if ( $activity['last_crawl'] !== null ) : ?>
 						<p><?php echo \esc_html( $activity['last_crawl']['final_status'] ); ?> — <?php echo \esc_html( (string) $activity['last_crawl']['total_discovered'] ); ?> <?php \esc_html_e( 'pages', 'aio-page-builder' ); ?></p>
-						<p><a href="<?php echo \esc_url( \add_query_arg( array( 'page' => 'aio-page-builder-crawler-sessions', 'run_id' => $activity['last_crawl']['run_id'] ), \admin_url( 'admin.php' ) ) ); ?>"><?php \esc_html_e( 'View session', 'aio-page-builder' ); ?></a></p>
+						<p><a href="
+						<?php
+						echo \esc_url(
+							\add_query_arg(
+								array(
+									'page'   => 'aio-page-builder-crawler-sessions',
+									'run_id' => $activity['last_crawl']['run_id'],
+								),
+								\admin_url( 'admin.php' )
+							)
+						);
+						?>
+									"><?php \esc_html_e( 'View session', 'aio-page-builder' ); ?></a></p>
 					<?php else : ?>
 						<p><?php \esc_html_e( 'No crawl yet.', 'aio-page-builder' ); ?></p>
 					<?php endif; ?>
@@ -207,7 +219,19 @@ final class Dashboard_Screen {
 					<h3 style="margin-top: 0;"><?php \esc_html_e( 'Last AI run', 'aio-page-builder' ); ?></h3>
 					<?php if ( $activity['last_ai_run'] !== null ) : ?>
 						<p><?php echo \esc_html( $activity['last_ai_run']['status'] ); ?> — <?php echo \esc_html( $activity['last_ai_run']['created_at'] ); ?></p>
-						<p><a href="<?php echo \esc_url( \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs', 'run_id' => $activity['last_ai_run']['run_id'] ), \admin_url( 'admin.php' ) ) ); ?>"><?php \esc_html_e( 'View run', 'aio-page-builder' ); ?></a></p>
+						<p><a href="
+						<?php
+						echo \esc_url(
+							\add_query_arg(
+								array(
+									'page'   => 'aio-page-builder-ai-runs',
+									'run_id' => $activity['last_ai_run']['run_id'],
+								),
+								\admin_url( 'admin.php' )
+							)
+						);
+						?>
+									"><?php \esc_html_e( 'View run', 'aio-page-builder' ); ?></a></p>
 					<?php else : ?>
 						<p><?php \esc_html_e( 'No AI run yet.', 'aio-page-builder' ); ?></p>
 					<?php endif; ?>
@@ -217,7 +241,19 @@ final class Dashboard_Screen {
 					<?php if ( count( $activity['active_build_plans'] ) > 0 ) : ?>
 						<ul style="margin: 0; padding-left: 1.2em;">
 							<?php foreach ( array_slice( $activity['active_build_plans'], 0, 3 ) as $plan ) : ?>
-								<li><a href="<?php echo \esc_url( \add_query_arg( array( 'page' => 'aio-page-builder-build-plans', 'plan_id' => $plan['plan_id'] ), \admin_url( 'admin.php' ) ) ); ?>"><?php echo \esc_html( $plan['title'] ?: $plan['plan_id'] ); ?></a> (<?php echo \esc_html( $plan['status'] ); ?>)</li>
+								<li><a href="
+								<?php
+								echo \esc_url(
+									\add_query_arg(
+										array(
+											'page'    => 'aio-page-builder-build-plans',
+											'plan_id' => $plan['plan_id'],
+										),
+										\admin_url( 'admin.php' )
+									)
+								);
+								?>
+												"><?php echo \esc_html( $plan['title'] ?: $plan['plan_id'] ); ?></a> (<?php echo \esc_html( $plan['status'] ); ?>)</li>
 							<?php endforeach; ?>
 						</ul>
 						<p><a href="<?php echo \esc_url( \add_query_arg( array( 'page' => 'aio-page-builder-build-plans' ), \admin_url( 'admin.php' ) ) ); ?>"><?php \esc_html_e( 'View all', 'aio-page-builder' ); ?></a></p>

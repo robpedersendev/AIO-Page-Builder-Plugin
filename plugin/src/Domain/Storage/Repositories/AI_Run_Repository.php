@@ -119,16 +119,16 @@ final class AI_Run_Repository extends Abstract_CPT_Repository {
 				'no_found_rows'  => true,
 				'meta_query'     => array(
 					array(
-						'key'   => '_aio_run_actor',
-						'value' => (string) $user_id,
+						'key'     => '_aio_run_actor',
+						'value'   => (string) $user_id,
 						'compare' => '=',
 					),
 				),
 			)
 		);
-		$out = array();
+		$out    = array();
 		foreach ( $query->get_posts() as $post ) {
-			$meta = $this->get_meta( $post->ID );
+			$meta  = $this->get_meta( $post->ID );
 			$out[] = $this->post_to_record( $post, $meta );
 		}
 		return $out;
@@ -142,8 +142,8 @@ final class AI_Run_Repository extends Abstract_CPT_Repository {
 	 * @return list<array<string, mixed>>
 	 */
 	public function list_recent( int $limit = 50, int $offset = 0 ): array {
-		$limit  = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
-		$query  = new \WP_Query(
+		$limit = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
+		$query = new \WP_Query(
 			array(
 				'post_type'              => $this->get_post_type(),
 				'posts_per_page'         => $limit,
@@ -154,9 +154,9 @@ final class AI_Run_Repository extends Abstract_CPT_Repository {
 				'update_post_meta_cache' => true,
 			)
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $query->get_posts() as $post ) {
-			$meta = $this->get_meta( $post->ID );
+			$meta  = $this->get_meta( $post->ID );
 			$out[] = $this->post_to_record( $post, $meta );
 		}
 		return $out;
@@ -164,7 +164,7 @@ final class AI_Run_Repository extends Abstract_CPT_Repository {
 
 	/** @inheritdoc */
 	protected function get_meta( int $post_id ): array {
-		$base = parent::get_meta( $post_id );
+		$base                 = parent::get_meta( $post_id );
 		$base['run_metadata'] = $this->get_run_metadata( $post_id );
 		return $base;
 	}

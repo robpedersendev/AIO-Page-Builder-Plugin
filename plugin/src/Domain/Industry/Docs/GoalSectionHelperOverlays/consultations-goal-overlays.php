@@ -13,25 +13,25 @@ use AIOPageBuilder\Domain\Industry\Docs\Goal_Section_Helper_Overlay_Registry;
 
 return array(
 	array(
-		Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY   => 'consultations',
+		Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY => 'consultations',
 		Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'hero_conv_02',
-		Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE    => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
-		Goal_Section_Helper_Overlay_Registry::FIELD_STATUS  => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-		'cta_usage_notes' => 'Primary CTA: schedule consultation, book a call, or free consultation. Emphasize value of the session.',
-		'tone_notes'      => 'Consultative and clear; position the consultation as the next logical step.',
+		Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE  => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
+		Goal_Section_Helper_Overlay_Registry::FIELD_STATUS => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+		'cta_usage_notes'                                  => 'Primary CTA: schedule consultation, book a call, or free consultation. Emphasize value of the session.',
+		'tone_notes'                                       => 'Consultative and clear; position the consultation as the next logical step.',
 	),
 	array(
-		Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY   => 'consultations',
+		Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY => 'consultations',
 		Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'cta_booking_01',
-		Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE    => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
-		Goal_Section_Helper_Overlay_Registry::FIELD_STATUS  => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-		'cta_usage_notes' => 'Single CTA to schedule or request consultation; link to scheduler or contact for consultation.',
+		Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE  => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
+		Goal_Section_Helper_Overlay_Registry::FIELD_STATUS => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+		'cta_usage_notes'                                  => 'Single CTA to schedule or request consultation; link to scheduler or contact for consultation.',
 	),
 	array(
-		Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY   => 'consultations',
+		Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY => 'consultations',
 		Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'gc_contact_form_01',
-		Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE    => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
-		Goal_Section_Helper_Overlay_Registry::FIELD_STATUS  => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-		'cta_usage_notes' => 'Use for consultation request; set expectation for who will reach out and how.',
+		Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE  => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
+		Goal_Section_Helper_Overlay_Registry::FIELD_STATUS => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+		'cta_usage_notes'                                  => 'Use for consultation request; set expectation for who will reach out and how.',
 	),
 );

@@ -12,7 +12,7 @@ if ( ! isset( $item_view ) && ! isset( $badge_data ) ) {
 	return;
 }
 
-$status = '';
+$status  = '';
 $snippet = '';
 if ( isset( $item_view ) && $item_view instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Library_Item_View ) {
 	$status  = $item_view->get_recommendation_status();

@@ -22,9 +22,11 @@ final class ACF_Registration_Diagnostics_Service_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		// Record in tests (production uses is_admin() by default).
-		$this->diagnostics = new ACF_Registration_Diagnostics_Service( function (): bool {
-			return true;
-		} );
+		$this->diagnostics = new ACF_Registration_Diagnostics_Service(
+			function (): bool {
+				return true;
+			}
+		);
 	}
 
 	public function test_get_last_registration_initially_null(): void {
@@ -53,7 +55,7 @@ final class ACF_Registration_Diagnostics_Service_Test extends TestCase {
 			false,
 			false
 		);
-		$last = $this->diagnostics->get_last_registration();
+		$last    = $this->diagnostics->get_last_registration();
 		$allowed = array( 'mode', 'section_key_count', 'cache_used', 'full_registration_invoked' );
 		$this->assertSame( $allowed, array_keys( $last ) );
 	}

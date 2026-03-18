@@ -23,7 +23,7 @@ final class Personal_Data_Privacy_Test extends TestCase {
 
 	public function test_export_returns_data_and_done_when_user_unknown(): void {
 		$GLOBALS['_aio_get_user_by_return'] = null;
-		$result = Personal_Data_Exporter::export( 'nobody@example.com', 1 );
+		$result                             = Personal_Data_Exporter::export( 'nobody@example.com', 1 );
 		$this->assertArrayHasKey( 'data', $result );
 		$this->assertArrayHasKey( 'done', $result );
 		$this->assertIsArray( $result['data'] );
@@ -33,7 +33,7 @@ final class Personal_Data_Privacy_Test extends TestCase {
 
 	public function test_erase_returns_required_keys_when_user_unknown(): void {
 		$GLOBALS['_aio_get_user_by_return'] = null;
-		$result = Personal_Data_Eraser::erase( 'nobody@example.com', 1 );
+		$result                             = Personal_Data_Eraser::erase( 'nobody@example.com', 1 );
 		$this->assertArrayHasKey( 'items_removed', $result );
 		$this->assertArrayHasKey( 'items_retained', $result );
 		$this->assertArrayHasKey( 'messages', $result );
@@ -46,7 +46,7 @@ final class Personal_Data_Privacy_Test extends TestCase {
 	/** Asserts exporter fulfills WP privacy exporter callback contract (data + done). */
 	public function test_exporter_fulfills_wp_privacy_exporter_contract(): void {
 		$GLOBALS['_aio_get_user_by_return'] = null;
-		$result = Personal_Data_Exporter::export( 'contract@example.com', 1 );
+		$result                             = Personal_Data_Exporter::export( 'contract@example.com', 1 );
 		$this->assertArrayHasKey( 'data', $result );
 		$this->assertArrayHasKey( 'done', $result );
 		$this->assertIsArray( $result['data'] );
@@ -56,7 +56,7 @@ final class Personal_Data_Privacy_Test extends TestCase {
 	/** Asserts eraser fulfills WP privacy eraser callback contract (items_removed, items_retained, messages, done). */
 	public function test_eraser_fulfills_wp_privacy_eraser_contract(): void {
 		$GLOBALS['_aio_get_user_by_return'] = null;
-		$result = Personal_Data_Eraser::erase( 'contract@example.com', 1 );
+		$result                             = Personal_Data_Eraser::erase( 'contract@example.com', 1 );
 		$this->assertArrayHasKey( 'items_removed', $result );
 		$this->assertArrayHasKey( 'items_retained', $result );
 		$this->assertArrayHasKey( 'messages', $result );

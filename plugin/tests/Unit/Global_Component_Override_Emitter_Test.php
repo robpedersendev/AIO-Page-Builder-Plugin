@@ -30,7 +30,7 @@ final class Global_Component_Override_Emitter_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->plugin_root = dirname( __DIR__, 2 );
-		$key = Global_Style_Settings_Schema::OPTION_KEY;
+		$key               = Global_Style_Settings_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
 		}
@@ -46,9 +46,11 @@ final class Global_Component_Override_Emitter_Test extends TestCase {
 		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
 		$comp_reg = new Component_Override_Registry( $loader );
 		$repo     = new Global_Style_Settings_Repository( null, $comp_reg );
-		$repo->set_global_component_overrides( array(
-			'card' => array( '--aio-color-surface' => '#f5f5f5' ),
-		) );
+		$repo->set_global_component_overrides(
+			array(
+				'card' => array( '--aio-color-surface' => '#f5f5f5' ),
+			)
+		);
 		$emitter = new Global_Component_Override_Emitter( $repo, $comp_reg );
 		$css     = $emitter->emit();
 		$this->assertStringContainsString( 'aio-s-', $css );
@@ -61,9 +63,11 @@ final class Global_Component_Override_Emitter_Test extends TestCase {
 		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
 		$comp_reg = new Component_Override_Registry( $loader );
 		$repo     = new Global_Style_Settings_Repository( null, $comp_reg );
-		$repo->set_global_component_overrides( array(
-			'cta' => array( '--aio-color-primary' => '#0066cc' ),
-		) );
+		$repo->set_global_component_overrides(
+			array(
+				'cta' => array( '--aio-color-primary' => '#0066cc' ),
+			)
+		);
 		$emitter = new Global_Component_Override_Emitter( $repo, $comp_reg );
 		$css     = $emitter->emit();
 		$this->assertStringContainsString( '[class*="', $css );

@@ -98,11 +98,17 @@ final class Navigation_Bulk_Action_Service {
 			: array();
 		$step  = $steps[ self::STEP_INDEX_NAVIGATION ] ?? null;
 		if ( ! is_array( $step ) ) {
-			return array( 'approve_all_eligible' => 0, 'deny_all_eligible' => 0 );
+			return array(
+				'approve_all_eligible' => 0,
+				'deny_all_eligible'    => 0,
+			);
 		}
 		$step_type = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' );
 		if ( $step_type !== Build_Plan_Schema::STEP_TYPE_NAVIGATION ) {
-			return array( 'approve_all_eligible' => 0, 'deny_all_eligible' => 0 );
+			return array(
+				'approve_all_eligible' => 0,
+				'deny_all_eligible'    => 0,
+			);
 		}
 		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) ? $step[ Build_Plan_Item_Schema::KEY_ITEMS ] : array();
 		$pending = 0;
@@ -119,7 +125,7 @@ final class Navigation_Bulk_Action_Service {
 		}
 		return array(
 			'approve_all_eligible' => $pending,
-			'deny_all_eligible'   => $pending,
+			'deny_all_eligible'    => $pending,
 		);
 	}
 

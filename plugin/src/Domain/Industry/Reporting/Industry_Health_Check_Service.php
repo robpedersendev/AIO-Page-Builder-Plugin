@@ -33,10 +33,10 @@ use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
 final class Industry_Health_Check_Service {
 
 	public const SEVERITY_ERROR   = 'error';
-	public const SEVERITY_WARNING  = 'warning';
+	public const SEVERITY_WARNING = 'warning';
 
-	public const OBJECT_TYPE_PACK       = 'pack';
-	public const OBJECT_TYPE_PROFILE    = 'profile';
+	public const OBJECT_TYPE_PACK           = 'pack';
+	public const OBJECT_TYPE_PROFILE        = 'profile';
 	public const OBJECT_TYPE_STARTER_BUNDLE = 'starter_bundle';
 
 	/** @var Industry_Profile_Repository|null */
@@ -105,30 +105,30 @@ final class Industry_Health_Check_Service {
 	 */
 	public function run(): array {
 		static $request_cache = array();
-		$id = \spl_object_id( $this );
+		$id                   = \spl_object_id( $this );
 		if ( isset( $request_cache[ $id ] ) && \is_array( $request_cache[ $id ] ) ) {
 			return $request_cache[ $id ];
 		}
 
 		$errors   = array();
-		$warnings  = array();
+		$warnings = array();
 
-		$add_error = static function ( string $object_type, string $key, string $summary, array $refs = array() ) use ( &$errors ): void {
+		$add_error   = static function ( string $object_type, string $key, string $summary, array $refs = array() ) use ( &$errors ): void {
 			$errors[] = array(
-				'object_type'    => $object_type,
-				'key'            => $key,
-				'severity'       => self::SEVERITY_ERROR,
-				'issue_summary'  => $summary,
-				'related_refs'   => $refs,
+				'object_type'   => $object_type,
+				'key'           => $key,
+				'severity'      => self::SEVERITY_ERROR,
+				'issue_summary' => $summary,
+				'related_refs'  => $refs,
 			);
 		};
 		$add_warning = static function ( string $object_type, string $key, string $summary, array $refs = array() ) use ( &$warnings ): void {
 			$warnings[] = array(
-				'object_type'    => $object_type,
-				'key'            => $key,
-				'severity'       => self::SEVERITY_WARNING,
-				'issue_summary'  => $summary,
-				'related_refs'   => $refs,
+				'object_type'   => $object_type,
+				'key'           => $key,
+				'severity'      => self::SEVERITY_WARNING,
+				'issue_summary' => $summary,
+				'related_refs'  => $refs,
 			);
 		};
 
@@ -215,14 +215,21 @@ final class Industry_Health_Check_Service {
 
 		// Profile: primary/secondary pack resolution and selected starter bundle.
 		if ( $this->profile_repo !== null ) {
-			$profile = $this->profile_repo->get_profile();
-			$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+			$profile         = $this->profile_repo->get_profile();
+			$primary         = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 				? trim( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 				: '';
-			$secondary = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
-				? array_values( array_filter( array_map( function ( $v ) {
-					return is_string( $v ) ? trim( $v ) : '';
-				}, $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) ) )
+			$secondary       = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
+				? array_values(
+					array_filter(
+						array_map(
+							function ( $v ) {
+								return is_string( $v ) ? trim( $v ) : '';
+							},
+							$profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ]
+						)
+					)
+				)
 				: array();
 			$selected_bundle = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 				? trim( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
@@ -246,7 +253,7 @@ final class Industry_Health_Check_Service {
 				if ( $this->starter_bundle_registry === null || $this->starter_bundle_registry->get( $selected_bundle ) === null ) {
 					$add_error( self::OBJECT_TYPE_PROFILE, 'selected_starter_bundle_key', 'Profile selected starter bundle not found.', array( $selected_bundle ) );
 				} else {
-					$bundle = $this->starter_bundle_registry->get( $selected_bundle );
+					$bundle          = $this->starter_bundle_registry->get( $selected_bundle );
 					$bundle_industry = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] ) ? trim( (string) $bundle[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] ) : '';
 					if ( $primary !== '' && $bundle_industry !== '' && $bundle_industry !== $primary ) {
 						$add_warning( self::OBJECT_TYPE_PROFILE, 'selected_starter_bundle_key', 'Selected bundle belongs to a different industry than primary.', array( $selected_bundle, $primary ) );
@@ -258,7 +265,7 @@ final class Industry_Health_Check_Service {
 		// Starter bundles: industry_key must resolve to pack; optional refs advisory.
 		if ( $this->starter_bundle_registry !== null && $this->pack_registry !== null ) {
 			foreach ( $this->starter_bundle_registry->list_all() as $bundle ) {
-				$bundle_key = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ) ? trim( (string) $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ) : '';
+				$bundle_key      = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ) ? trim( (string) $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ) : '';
 				$bundle_industry = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] ) ? trim( (string) $bundle[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] ) : '';
 				if ( $bundle_industry !== '' && $this->pack_registry->get( $bundle_industry ) === null ) {
 					$add_warning( self::OBJECT_TYPE_STARTER_BUNDLE, $bundle_key, 'Starter bundle industry_key has no matching pack.', array( $bundle_industry ) );
@@ -266,7 +273,10 @@ final class Industry_Health_Check_Service {
 			}
 		}
 
-		$result = array( 'errors' => $errors, 'warnings' => $warnings );
+		$result               = array(
+			'errors'   => $errors,
+			'warnings' => $warnings,
+		);
 		$request_cache[ $id ] = $result;
 		return $result;
 	}
@@ -276,7 +286,7 @@ final class Industry_Health_Check_Service {
 	 * @return list<string>
 	 */
 	private function collect_pack_cta_refs( array $pack ): array {
-		$out = array();
+		$out    = array();
 		$fields = array(
 			Industry_Pack_Schema::FIELD_PREFERRED_CTA_PATTERNS,
 			Industry_Pack_Schema::FIELD_DISCOURAGED_CTA_PATTERNS,

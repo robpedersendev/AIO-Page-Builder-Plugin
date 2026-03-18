@@ -23,14 +23,32 @@ final class Render_Preview_Helper_Test extends TestCase {
 
 	private function section_result(): Section_Render_Result {
 		$structure = array(
-			'wrapper_attrs'       => array( 'class' => array( 'aio-s-st01_hero', 'aio-s-st01_hero--variant-default' ), 'id' => 'aio-section-st01_hero-0', 'data_attributes' => array() ),
-			'selector_map'       => array( 'wrapper_class' => 'aio-s-st01_hero', 'inner_class' => 'aio-s-st01_hero__inner', 'element_classes' => array() ),
-			'structural_nodes'   => array(),
-			'structural_hint'    => 'bp_st01',
-			'asset_hints'        => array(),
+			'wrapper_attrs'       => array(
+				'class'           => array( 'aio-s-st01_hero', 'aio-s-st01_hero--variant-default' ),
+				'id'              => 'aio-section-st01_hero-0',
+				'data_attributes' => array(),
+			),
+			'selector_map'        => array(
+				'wrapper_class'   => 'aio-s-st01_hero',
+				'inner_class'     => 'aio-s-st01_hero__inner',
+				'element_classes' => array(),
+			),
+			'structural_nodes'    => array(),
+			'structural_hint'     => 'bp_st01',
+			'asset_hints'         => array(),
 			'accessibility_notes' => array(),
 		);
-		return new Section_Render_Result( 'st01_hero', 'default', 0, array( 'headline' => 'Welcome', 'subheadline' => 'Intro' ), $structure, array() );
+		return new Section_Render_Result(
+			'st01_hero',
+			'default',
+			0,
+			array(
+				'headline'    => 'Welcome',
+				'subheadline' => 'Intro',
+			),
+			$structure,
+			array()
+		);
 	}
 
 	public function test_build_section_preview(): void {
@@ -54,15 +72,23 @@ final class Render_Preview_Helper_Test extends TestCase {
 			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
 			'tpl_landing',
 			array(
-				array( 'section_key' => 'st01_hero', 'variant' => 'default', 'position' => 0 ),
-				array( 'section_key' => 'st02_cta', 'variant' => 'default', 'position' => 1 ),
+				array(
+					'section_key' => 'st01_hero',
+					'variant'     => 'default',
+					'position'    => 0,
+				),
+				array(
+					'section_key' => 'st02_cta',
+					'variant'     => 'default',
+					'position'    => 1,
+				),
 			),
 			'<!-- wp:html --><div class="aio-s-st01_hero">Content</div><!-- /wp:html -->',
 			array(),
 			array( 'durable_native_blocks', 'generateblocks_compatible' ),
 			array()
 		);
-		$helper = new Render_Preview_Helper();
+		$helper   = new Render_Preview_Helper();
 
 		$payload = $helper->build_page_preview( $assembly, true );
 

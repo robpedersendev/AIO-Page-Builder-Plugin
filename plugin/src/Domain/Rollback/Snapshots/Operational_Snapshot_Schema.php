@@ -76,23 +76,23 @@ final class Operational_Snapshot_Schema {
 
 	public const FIELD_SNAPSHOT_ID       = 'snapshot_id';
 	public const FIELD_SNAPSHOT_TYPE     = 'snapshot_type';
-	public const FIELD_OBJECT_FAMILY    = 'object_family';
-	public const FIELD_TARGET_REF       = 'target_ref';
-	public const FIELD_CREATED_AT       = 'created_at';
-	public const FIELD_SCHEMA_VERSION   = 'schema_version';
-	public const FIELD_PAYLOAD_REF      = 'payload_ref';
+	public const FIELD_OBJECT_FAMILY     = 'object_family';
+	public const FIELD_TARGET_REF        = 'target_ref';
+	public const FIELD_CREATED_AT        = 'created_at';
+	public const FIELD_SCHEMA_VERSION    = 'schema_version';
+	public const FIELD_PAYLOAD_REF       = 'payload_ref';
 	public const FIELD_SCOPE_OBJECTS     = 'scope_objects';
-	public const FIELD_EXECUTION_REF    = 'execution_ref';
-	public const FIELD_JOB_REF          = 'job_ref';
-	public const FIELD_BUILD_PLAN_REF   = 'build_plan_ref';
-	public const FIELD_PLAN_ITEM_REF    = 'plan_item_ref';
-	public const FIELD_ACTION_TYPE      = 'action_type';
-	public const FIELD_RETENTION        = 'retention';
+	public const FIELD_EXECUTION_REF     = 'execution_ref';
+	public const FIELD_JOB_REF           = 'job_ref';
+	public const FIELD_BUILD_PLAN_REF    = 'build_plan_ref';
+	public const FIELD_PLAN_ITEM_REF     = 'plan_item_ref';
+	public const FIELD_ACTION_TYPE       = 'action_type';
+	public const FIELD_RETENTION         = 'retention';
 	public const FIELD_ROLLBACK_ELIGIBLE = 'rollback_eligible';
-	public const FIELD_ROLLBACK_STATUS  = 'rollback_status';
-	public const FIELD_PROVENANCE       = 'provenance';
-	public const FIELD_PRE_CHANGE      = 'pre_change';
-	public const FIELD_POST_CHANGE     = 'post_change';
+	public const FIELD_ROLLBACK_STATUS   = 'rollback_status';
+	public const FIELD_PROVENANCE        = 'provenance';
+	public const FIELD_PRE_CHANGE        = 'pre_change';
+	public const FIELD_POST_CHANGE       = 'post_change';
 
 	/** @var list<string> Required root field names. */
 	private static ?array $required_root_fields = null;
@@ -234,28 +234,46 @@ final class Operational_Snapshot_Schema {
 		foreach ( self::get_required_root_fields() as $field ) {
 			$val = $snapshot[ $field ] ?? null;
 			if ( $val === null || ( is_string( $val ) && trim( $val ) === '' ) ) {
-				$errors[] = array( 'code' => 'missing_required', 'field' => $field );
+				$errors[] = array(
+					'code'  => 'missing_required',
+					'field' => $field,
+				);
 			}
 		}
 		$type = isset( $snapshot[ self::FIELD_SNAPSHOT_TYPE ] ) && is_string( $snapshot[ self::FIELD_SNAPSHOT_TYPE ] ) ? $snapshot[ self::FIELD_SNAPSHOT_TYPE ] : '';
 		if ( $type !== '' && ! self::is_valid_snapshot_type( $type ) ) {
-			$errors[] = array( 'code' => 'invalid_snapshot_type', 'field' => self::FIELD_SNAPSHOT_TYPE );
+			$errors[] = array(
+				'code'  => 'invalid_snapshot_type',
+				'field' => self::FIELD_SNAPSHOT_TYPE,
+			);
 		}
 		$family = isset( $snapshot[ self::FIELD_OBJECT_FAMILY ] ) && is_string( $snapshot[ self::FIELD_OBJECT_FAMILY ] ) ? $snapshot[ self::FIELD_OBJECT_FAMILY ] : '';
 		if ( $family !== '' && ! self::is_valid_object_family( $family ) ) {
-			$errors[] = array( 'code' => 'invalid_object_family', 'field' => self::FIELD_OBJECT_FAMILY );
+			$errors[] = array(
+				'code'  => 'invalid_object_family',
+				'field' => self::FIELD_OBJECT_FAMILY,
+			);
 		}
 		$st = isset( $snapshot[ self::FIELD_ROLLBACK_STATUS ] ) && is_string( $snapshot[ self::FIELD_ROLLBACK_STATUS ] ) ? $snapshot[ self::FIELD_ROLLBACK_STATUS ] : '';
 		if ( $st !== '' && ! in_array( $st, self::get_rollback_statuses(), true ) ) {
-			$errors[] = array( 'code' => 'invalid_rollback_status', 'field' => self::FIELD_ROLLBACK_STATUS );
+			$errors[] = array(
+				'code'  => 'invalid_rollback_status',
+				'field' => self::FIELD_ROLLBACK_STATUS,
+			);
 		}
-		$pre = $snapshot[ self::FIELD_PRE_CHANGE ] ?? null;
+		$pre  = $snapshot[ self::FIELD_PRE_CHANGE ] ?? null;
 		$post = $snapshot[ self::FIELD_POST_CHANGE ] ?? null;
 		if ( $type === self::SNAPSHOT_TYPE_PRE_CHANGE && ( ! is_array( $pre ) || empty( $pre ) ) ) {
-			$errors[] = array( 'code' => 'missing_pre_change_block', 'field' => self::FIELD_PRE_CHANGE );
+			$errors[] = array(
+				'code'  => 'missing_pre_change_block',
+				'field' => self::FIELD_PRE_CHANGE,
+			);
 		}
 		if ( $type === self::SNAPSHOT_TYPE_POST_CHANGE && ( ! is_array( $post ) || empty( $post ) ) ) {
-			$errors[] = array( 'code' => 'missing_post_change_block', 'field' => self::FIELD_POST_CHANGE );
+			$errors[] = array(
+				'code'  => 'missing_post_change_block',
+				'field' => self::FIELD_POST_CHANGE,
+			);
 		}
 		return $errors;
 	}

@@ -43,13 +43,13 @@ final class ACF_Native_Handoff_Generator_Test extends TestCase {
 	 * When ACF import/get functions are not available, generate_handoff returns errors and zero imported.
 	 */
 	public function test_generate_handoff_when_acf_unavailable_returns_errors_and_zero_imported(): void {
-		$repo      = $this->createMock( Section_Template_Repository_Interface::class );
+		$repo = $this->createMock( Section_Template_Repository_Interface::class );
 		$repo->method( 'get_all_internal_keys' )->willReturn( array( 'st01_hero' ) );
 		$blueprint = $this->createMock( Section_Field_Blueprint_Service_Interface::class );
 		$blueprint->method( 'get_blueprint_for_section' )->willReturn( $this->minimal_blueprint() );
-		$inventory = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
+		$inventory     = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
 		$group_builder = new ACF_Group_Builder( new ACF_Field_Builder() );
-		$generator = new ACF_Native_Handoff_Generator( $inventory, $blueprint, $group_builder );
+		$generator     = new ACF_Native_Handoff_Generator( $inventory, $blueprint, $group_builder );
 
 		$result = $generator->generate_handoff();
 
@@ -70,7 +70,12 @@ final class ACF_Native_Handoff_Generator_Test extends TestCase {
 			Field_Blueprint_Schema::SECTION_VERSION => '1',
 			Field_Blueprint_Schema::LABEL           => 'Hero Fields',
 			Field_Blueprint_Schema::FIELDS          => array(
-				array( 'key' => 'field_st01_hero_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ),
+				array(
+					'key'   => 'field_st01_hero_headline',
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
 			),
 		);
 	}

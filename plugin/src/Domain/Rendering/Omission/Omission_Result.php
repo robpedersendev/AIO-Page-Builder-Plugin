@@ -27,9 +27,9 @@ final class Omission_Result {
 	private array $fallbacks_applied;
 
 	/**
-	 * @param list<string>           $omitted_keys     Keys omitted (optional + empty).
-	 * @param array<string, string>  $refused          Key => reason when omission was refused.
-	 * @param array<string, string>  $fallbacks_applied Key => fallback value applied.
+	 * @param list<string>          $omitted_keys     Keys omitted (optional + empty).
+	 * @param array<string, string> $refused          Key => reason when omission was refused.
+	 * @param array<string, string> $fallbacks_applied Key => fallback value applied.
 	 */
 	public function __construct(
 		array $omitted_keys = array(),

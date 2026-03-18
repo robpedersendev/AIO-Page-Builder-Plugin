@@ -87,7 +87,10 @@ final class Menu_Change_Result {
 	}
 
 	public static function success( int $menu_id, string $action, string $menu_name, string $location_slug = '', array $extra = array() ): self {
-		$artifacts = array( 'action' => $action, 'menu_name' => $menu_name );
+		$artifacts = array(
+			'action'    => $action,
+			'menu_name' => $menu_name,
+		);
 		if ( $location_slug !== '' ) {
 			$artifacts['location_assigned'] = $location_slug;
 		}

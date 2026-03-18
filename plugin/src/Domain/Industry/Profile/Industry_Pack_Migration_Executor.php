@@ -36,8 +36,8 @@ final class Industry_Pack_Migration_Executor {
 		Industry_Pack_Registry $pack_registry,
 		Industry_Starter_Bundle_Registry $bundle_registry
 	) {
-		$this->profile_repo   = $profile_repo;
-		$this->pack_registry  = $pack_registry;
+		$this->profile_repo    = $profile_repo;
+		$this->pack_registry   = $pack_registry;
 		$this->bundle_registry = $bundle_registry;
 	}
 
@@ -130,11 +130,11 @@ final class Industry_Pack_Migration_Executor {
 			return new Industry_Pack_Migration_Result( false, $migrated_refs, $warnings, $errors, '' );
 		}
 
-		$profile = $this->profile_repo->get_profile();
-		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$profile         = $this->profile_repo->get_profile();
+		$primary         = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
-		$secondary = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
+		$secondary       = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
 			? $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ]
 			: array();
 		$selected_bundle = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
@@ -155,14 +155,14 @@ final class Industry_Pack_Migration_Executor {
 		}
 
 		$has_secondary_change = false;
-		$new_secondary       = array();
+		$new_secondary        = array();
 		foreach ( $secondary as $key ) {
 			if ( ! is_string( $key ) ) {
 				continue;
 			}
 			$k = trim( $key );
 			if ( $k === $from_pack_key ) {
-				$new_secondary[] = $to_pack_key;
+				$new_secondary[]      = $to_pack_key;
 				$has_secondary_change = true;
 			} else {
 				$new_secondary[] = $k;
@@ -170,7 +170,7 @@ final class Industry_Pack_Migration_Executor {
 		}
 		if ( $has_secondary_change ) {
 			$updated_secondary = array_values( array_unique( $new_secondary ) );
-			$migrated_refs[] = array(
+			$migrated_refs[]   = array(
 				'object_type' => Industry_Pack_Migration_Result::OBJECT_TYPE_SECONDARY_INDUSTRY,
 				'old_ref'     => $from_pack_key,
 				'new_ref'     => $to_pack_key,
@@ -178,7 +178,7 @@ final class Industry_Pack_Migration_Executor {
 		}
 
 		if ( $selected_bundle !== '' ) {
-			$bundle_def = $this->bundle_registry->get( $selected_bundle );
+			$bundle_def      = $this->bundle_registry->get( $selected_bundle );
 			$bundle_industry = $bundle_def !== null && isset( $bundle_def[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] ) && is_string( $bundle_def[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] )
 				? trim( $bundle_def[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] )
 				: '';
@@ -186,11 +186,11 @@ final class Industry_Pack_Migration_Executor {
 				$replacement_bundle = $this->get_replacement_bundle_ref( $selected_bundle );
 				if ( $replacement_bundle !== null ) {
 					$repl_bundle_def = $this->bundle_registry->get( $replacement_bundle );
-					$repl_industry = $repl_bundle_def !== null && isset( $repl_bundle_def[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] ) && is_string( $repl_bundle_def[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] )
+					$repl_industry   = $repl_bundle_def !== null && isset( $repl_bundle_def[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] ) && is_string( $repl_bundle_def[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] )
 						? trim( $repl_bundle_def[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] )
 						: '';
 					if ( $repl_industry === $to_pack_key ) {
-						$updated_bundle = $replacement_bundle;
+						$updated_bundle  = $replacement_bundle;
 						$migrated_refs[] = array(
 							'object_type' => Industry_Pack_Migration_Result::OBJECT_TYPE_STARTER_BUNDLE,
 							'old_ref'     => $selected_bundle,
@@ -198,11 +198,11 @@ final class Industry_Pack_Migration_Executor {
 						);
 					} else {
 						$updated_bundle = '';
-						$warnings[] = __( 'Selected starter bundle was cleared; replacement bundle does not belong to the new industry.', 'aio-page-builder' );
+						$warnings[]     = __( 'Selected starter bundle was cleared; replacement bundle does not belong to the new industry.', 'aio-page-builder' );
 					}
 				} else {
 					$updated_bundle = '';
-					$warnings[] = __( 'Selected starter bundle was cleared; no valid replacement bundle defined.', 'aio-page-builder' );
+					$warnings[]     = __( 'Selected starter bundle was cleared; no valid replacement bundle defined.', 'aio-page-builder' );
 				}
 			}
 		}
@@ -213,11 +213,13 @@ final class Industry_Pack_Migration_Executor {
 			return new Industry_Pack_Migration_Result( true, $migrated_refs, $warnings, $errors, $audit_note );
 		}
 
-		$this->profile_repo->merge_profile( array(
-			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => $updated_primary,
-			Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => $updated_secondary,
-			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => $updated_bundle,
-		) );
+		$this->profile_repo->merge_profile(
+			array(
+				Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => $updated_primary,
+				Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => $updated_secondary,
+				Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => $updated_bundle,
+			)
+		);
 
 		$audit_note = sprintf( /* translators: 1: from key, 2: to key, 3: count */ __( 'Migrated %1$s → %2$s (%3$d ref(s) updated).', 'aio-page-builder' ), $from_pack_key, $to_pack_key, count( $migrated_refs ) );
 		return new Industry_Pack_Migration_Result( true, $migrated_refs, $warnings, $errors, $audit_note );

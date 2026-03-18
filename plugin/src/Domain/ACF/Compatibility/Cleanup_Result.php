@@ -40,11 +40,11 @@ final class Cleanup_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'stale_assignments'       => $this->stale_assignments,
+			'stale_assignments'      => $this->stale_assignments,
 			'deprecated_groups'      => $this->deprecated_groups,
 			'safe_to_remove'         => $this->safe_to_remove,
 			'requires_manual_review' => $this->requires_manual_review,
-			'compatibility_notes'   => $this->compatibility_notes,
+			'compatibility_notes'    => $this->compatibility_notes,
 		);
 	}
 }

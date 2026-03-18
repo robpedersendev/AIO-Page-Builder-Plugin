@@ -79,17 +79,20 @@ final class Hub_Page_Template_Definitions {
 	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
-		$ordered = array();
+		$ordered      = array();
 		$requirements = array();
 		foreach ( $section_keys as $pos => $key ) {
-			$ordered[] = array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => $key,
+			$ordered[]            = array(
+				Page_Template_Schema::SECTION_ITEM_KEY => $key,
 				Page_Template_Schema::SECTION_ITEM_POSITION => $pos,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			);
 			$requirements[ $key ] = array( 'required' => true );
 		}
-		return array( 'ordered' => $ordered, 'requirements' => $requirements );
+		return array(
+			'ordered'      => $ordered,
+			'requirements' => $requirements,
+		);
 	}
 
 	/**
@@ -118,20 +121,23 @@ final class Hub_Page_Template_Definitions {
 		array $extra = array()
 	): array {
 		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY             => $internal_key,
-			Page_Template_Schema::FIELD_NAME                     => $name,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY           => $purpose_summary,
-			Page_Template_Schema::FIELD_ARCHETYPE                 => 'hub_page',
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS          => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS      => $section_requirements,
-			Page_Template_Schema::FIELD_COMPATIBILITY             => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                 => $one_pager,
-			Page_Template_Schema::FIELD_VERSION                   => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                    => 'active',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $internal_key,
+			Page_Template_Schema::FIELD_NAME             => $name,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => $purpose_summary,
+			Page_Template_Schema::FIELD_ARCHETYPE        => 'hub_page',
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_requirements,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => $one_pager,
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES   => $endpoint_notes,
-			'template_category_class'                            => 'hub',
-			'template_family'                                     => $template_family,
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => $endpoint_notes,
+			'template_category_class'                    => 'hub',
+			'template_family'                            => $template_family,
 		);
 		if ( ! isset( $extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
 			$extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
@@ -156,7 +162,7 @@ final class Hub_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_services_proof_01',
 			'Services hub (proof-led)',
@@ -165,10 +171,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Services hub with strong proof. Trust and testimonial before first service CTA; offering and logos; flow and consultation CTA; why choose and case; cards and booking CTA; contact panel; contact CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Services hub with strong proof. Trust and testimonial before first service CTA; offering and logos; flow and consultation CTA; why choose and case; cards and booking CTA; contact panel; contact CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Category-wide value and proof; drill-down CTAs to service detail pages. Semantic headings per section (spec §51.6).',
-				'drill_down_intent'    => 'Supports drilling into individual service or offering detail pages via service-detail and consultation CTAs.',
+				'drill_down_intent'     => 'Supports drilling into individual service or offering detail pages via service-detail and consultation CTAs.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -192,7 +198,7 @@ final class Hub_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_booking_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_services_listing_01',
 			'Services hub (listing-led)',
@@ -201,10 +207,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Services hub with listing prominence. Card grid and offering; service CTA; listing and testimonial; how-it-works and directory nav CTA; benefits and trust; steps and consultation CTA; contact panel; booking CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Services hub with listing prominence. Card grid and offering; service CTA; listing and testimonial; how-it-works and directory nav CTA; benefits and trust; steps and consultation CTA; contact panel; booking CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Listing and category navigation; drill-down via service and directory CTAs.',
-				'drill_down_intent'    => 'Cards and listing support drill-down; directory nav CTA for category browsing.',
+				'drill_down_intent'     => 'Cards and listing support drill-down; directory nav CTA for category browsing.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -228,7 +234,7 @@ final class Hub_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_booking_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_services_conversion_01',
 			'Services hub (conversion-led)',
@@ -237,10 +243,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Services hub conversion-led. Value prop and flow; consultation CTA; benefits and testimonial; cards and service CTA; expectations and guarantee; differentiator and quote CTA; contact panel; booking CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Services hub conversion-led. Value prop and flow; consultation CTA; benefits and testimonial; cards and service CTA; expectations and guarantee; differentiator and quote CTA; contact panel; booking CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Conversion posture with four CTAs; drill-down and booking intent.',
-				'drill_down_intent'    => 'Service-detail and consultation/quote/booking CTAs support category-to-detail conversion.',
+				'drill_down_intent'     => 'Service-detail and consultation/quote/booking CTAs support category-to-detail conversion.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -264,7 +270,7 @@ final class Hub_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_product_detail_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_products_comparison_01',
 			'Products hub (comparison)',
@@ -273,10 +279,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Products hub with comparison depth. Offer compare and comparison steps; compare CTA; comparison cards and differentiator; rating and product CTA; buying process and highlight; product cards and purchase CTA; consent; product CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Products hub with comparison depth. Offer compare and comparison steps; compare CTA; comparison cards and differentiator; rating and product CTA; buying process and highlight; product cards and purchase CTA; consent; product CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Comparison depth; category navigation and product-detail drill-down.',
-				'drill_down_intent'    => 'Product-detail and compare CTAs support drilling into product or comparison flows.',
+				'drill_down_intent'     => 'Product-detail and compare CTAs support drilling into product or comparison flows.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -300,7 +306,7 @@ final class Hub_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_purchase_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_products_media_01',
 			'Products hub (media-led)',
@@ -309,10 +315,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Products hub media-led. Product cards and gallery; product CTA; benefit detail and testimonial; media band and purchase CTA; spec and buying process; guarantee and compare CTA; contact panel; purchase CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Products hub media-led. Product cards and gallery; product CTA; benefit detail and testimonial; media band and purchase CTA; spec and buying process; guarantee and compare CTA; contact panel; purchase CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Media richness; product and purchase drill-down.',
-				'drill_down_intent'    => 'Product-detail and purchase CTAs; gallery and cards support category browsing.',
+				'drill_down_intent'     => 'Product-detail and purchase CTAs; gallery and cards support category browsing.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -336,7 +342,7 @@ final class Hub_Page_Template_Definitions {
 			'lpu_trust_disclosure_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_products_value_01',
 			'Products hub (value-led)',
@@ -345,10 +351,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Products hub value-led. Why choose and value prop; product CTA; listing and testimonial; benefit band and quote CTA; buying process and logos; offer highlight and purchase CTA; trust disclosure; contact CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Products hub value-led. Why choose and value prop; product CTA; listing and testimonial; benefit band and quote CTA; buying process and logos; offer highlight and purchase CTA; trust disclosure; contact CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Value and proof; product and quote/purchase/contact CTAs.',
-				'drill_down_intent'    => 'Product-detail, quote, purchase, contact CTAs support category-to-detail and conversion.',
+				'drill_down_intent'     => 'Product-detail, quote, purchase, contact CTAs support category-to-detail and conversion.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -372,7 +378,7 @@ final class Hub_Page_Template_Definitions {
 			'mlp_card_grid_01',
 			'cta_purchase_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_offerings_overview_01',
 			'Offerings hub (overview)',
@@ -381,10 +387,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Offerings hub overview. Package summary and offer compare; purchase CTA; product cards and testimonial; benefit detail and product CTA; buying process and guarantee; consent and quote CTA; card grid; purchase CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Offerings hub overview. Package summary and offer compare; purchase CTA; product cards and testimonial; benefit detail and product CTA; buying process and guarantee; consent and quote CTA; card grid; purchase CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Category-wide offerings; purchase and product-detail drill-down.',
-				'drill_down_intent'    => 'Product-detail, quote, purchase CTAs support drill-down into offering detail.',
+				'drill_down_intent'     => 'Product-detail, quote, purchase CTAs support drill-down into offering detail.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -408,7 +414,7 @@ final class Hub_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_purchase_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_offerings_compare_01',
 			'Offerings hub (compare)',
@@ -417,10 +423,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Offerings hub compare-led. Offer compare and comparison steps; compare CTA; comparison cards and differentiator; rating and product CTA; buying process and highlight; listing and quote CTA; contact panel; purchase CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Offerings hub compare-led. Offer compare and comparison steps; compare CTA; comparison cards and differentiator; rating and product CTA; buying process and highlight; listing and quote CTA; contact panel; purchase CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Comparison depth; category navigation and product/quote/purchase CTAs.',
-				'drill_down_intent'    => 'Compare-next and product-detail CTAs support comparison and detail drill-down.',
+				'drill_down_intent'     => 'Compare-next and product-detail CTAs support comparison and detail drill-down.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -444,7 +450,7 @@ final class Hub_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_directory_nav_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_directory_browse_01',
 			'Directory hub (browse-led)',
@@ -453,10 +459,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Directory hub browse-led. Card grid and listing; directory nav CTA; directory value and entry; how-it-works and compare CTA; reassurance and related content; feature compact and contact CTA; contact panel; directory nav CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Directory hub browse-led. Card grid and listing; directory nav CTA; directory value and entry; how-it-works and compare CTA; reassurance and related content; feature compact and contact CTA; contact panel; directory nav CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Browse and category navigation; directory nav and contact CTAs. Semantic headings for list/grid (spec §51.6).',
-				'drill_down_intent'    => 'Directory nav CTAs support drilling into categories or entries; listing and cards support browse.',
+				'drill_down_intent'     => 'Directory nav CTAs support drilling into categories or entries; listing and cards support browse.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -480,7 +486,7 @@ final class Hub_Page_Template_Definitions {
 			'tp_reassurance_01',
 			'cta_directory_nav_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_directory_category_01',
 			'Directory hub (category-led)',
@@ -489,10 +495,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Directory hub category-led. Directory value and card grid; directory nav CTA; listing and logos; steps and service CTA; related content and benefit band; contact panel and contact CTA; reassurance; directory nav CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Directory hub category-led. Directory value and card grid; directory nav CTA; listing and logos; steps and service CTA; related content and benefit band; contact panel and contact CTA; reassurance; directory nav CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Category structure; directory nav and service/contact CTAs.',
-				'drill_down_intent'    => 'Directory nav and service-detail CTAs support category and entry drill-down.',
+				'drill_down_intent'     => 'Directory nav and service-detail CTAs support category and entry drill-down.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -516,7 +522,7 @@ final class Hub_Page_Template_Definitions {
 			'fb_directory_value_01',
 			'cta_compare_next_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_directory_listing_01',
 			'Directory hub (listing-led)',
@@ -525,10 +531,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Directory hub listing-led. Listing and card grid; directory nav CTA; feature grid and detail spec; how-it-works and product CTA; related content and reassurance; contact panel and contact CTA; directory value; compare CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Directory hub listing-led. Listing and card grid; directory nav CTA; feature grid and detail spec; how-it-works and product CTA; related content and reassurance; contact panel and contact CTA; directory value; compare CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Listing prominence; directory nav, product, contact, compare CTAs.',
-				'drill_down_intent'    => 'Listing and cards support search/browse; directory nav and product CTAs for drill-down.',
+				'drill_down_intent'     => 'Listing and cards support search/browse; directory nav and product CTAs for drill-down.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -552,7 +558,7 @@ final class Hub_Page_Template_Definitions {
 			'mlp_listing_01',
 			'cta_directory_nav_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_locations_overview_01',
 			'Locations hub (overview)',
@@ -561,10 +567,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Locations hub overview. Location info and place highlight; local CTA; local value and card grid; trust band and contact CTA; contact detail and expectations; contact panel and local CTA; listing; directory nav CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Locations hub overview. Location info and place highlight; local CTA; local value and card grid; trust band and contact CTA; contact detail and expectations; contact panel and local CTA; listing; directory nav CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Locations-overview; local and contact and directory CTAs. Semantic headings (spec §51.6).',
-				'drill_down_intent'    => 'Local action and directory nav CTAs support drill-down to location or region pages.',
+				'drill_down_intent'     => 'Local action and directory nav CTAs support drill-down to location or region pages.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -588,7 +594,7 @@ final class Hub_Page_Template_Definitions {
 			'mlp_listing_01',
 			'cta_directory_nav_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_locations_regional_01',
 			'Locations hub (regional)',
@@ -597,10 +603,10 @@ final class Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Locations hub regional. Local value and location info; local CTA; place highlight and card grid; reassurance and local CTA; contact detail and panel; expectations and contact CTA; listing; directory nav CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Locations hub regional. Local value and location info; local CTA; place highlight and card grid; reassurance and local CTA; contact detail and panel; expectations and contact CTA; listing; directory nav CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Regional emphasis; local and contact and directory CTAs for drill-down.',
-				'drill_down_intent'    => 'Local action, contact, directory nav CTAs support regional and location drill-down.',
+				'drill_down_intent'     => 'Local action, contact, directory nav CTAs support regional and location drill-down.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )

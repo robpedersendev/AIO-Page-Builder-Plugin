@@ -91,9 +91,13 @@ final class Page_Template_Directory_State_Builder {
 			$families = $this->build_families_for_category( $category_class, $base_url );
 		}
 
-		$list_result = array( 'rows' => array(), 'pagination' => array(), 'total_matching' => 0 );
+		$list_result = array(
+			'rows'           => array(),
+			'pagination'     => array(),
+			'total_matching' => 0,
+		);
 		if ( $view === 'list' || $view === 'search' ) {
-			$result = $this->query_service->query_page_templates( $filters, $paged, $per_page );
+			$result      = $this->query_service->query_page_templates( $filters, $paged, $per_page );
 			$list_result = array(
 				'rows'           => $result->get_rows(),
 				'pagination'     => $result->get_pagination()->to_array(),
@@ -104,12 +108,12 @@ final class Page_Template_Directory_State_Builder {
 		$can_manage = \current_user_can( 'aio_view_build_plans' );
 
 		return array(
-			'view'                => $view,
-			'breadcrumbs'         => $breadcrumbs,
-			'tree'                => $tree,
-			'families'            => $families,
-			'list_result'         => $list_result,
-			'filters'             => array(
+			'view'                 => $view,
+			'breadcrumbs'          => $breadcrumbs,
+			'tree'                 => $tree,
+			'families'             => $families,
+			'list_result'          => $list_result,
+			'filters'              => array(
 				'category_class' => $category_class,
 				'family'         => $family,
 				'status'         => $status,
@@ -117,9 +121,9 @@ final class Page_Template_Directory_State_Builder {
 				'paged'          => $paged,
 				'per_page'       => $per_page,
 			),
-			'base_url'            => $base_url,
+			'base_url'             => $base_url,
 			'can_manage_templates' => $can_manage,
-			'category_labels'     => self::CATEGORY_LABELS,
+			'category_labels'      => self::CATEGORY_LABELS,
 		);
 	}
 
@@ -134,10 +138,18 @@ final class Page_Template_Directory_State_Builder {
 	 * @return list<array{label: string, url: string}>
 	 */
 	private function build_breadcrumbs( string $view, string $category_class, string $family, string $search, string $base_url ): array {
-		$segments = array( array( 'label' => __( 'Page Templates', 'aio-page-builder' ), 'url' => $base_url ) );
+		$segments = array(
+			array(
+				'label' => __( 'Page Templates', 'aio-page-builder' ),
+				'url'   => $base_url,
+			),
+		);
 
 		if ( $search !== '' ) {
-			$segments[] = array( 'label' => sprintf( __( 'Search: %s', 'aio-page-builder' ), \esc_html( $search ) ), 'url' => '' );
+			$segments[] = array(
+				'label' => sprintf( __( 'Search: %s', 'aio-page-builder' ), \esc_html( $search ) ),
+				'url'   => '',
+			);
 			return $segments;
 		}
 
@@ -145,17 +157,23 @@ final class Page_Template_Directory_State_Builder {
 			return $segments;
 		}
 
-		$cat_label = self::CATEGORY_LABELS[ $category_class ] ?? $category_class;
-		$cat_url = $base_url . '&category_class=' . \rawurlencode( $category_class );
-		$segments[] = array( 'label' => $cat_label, 'url' => $cat_url );
+		$cat_label  = self::CATEGORY_LABELS[ $category_class ] ?? $category_class;
+		$cat_url    = $base_url . '&category_class=' . \rawurlencode( $category_class );
+		$segments[] = array(
+			'label' => $cat_label,
+			'url'   => $cat_url,
+		);
 
 		if ( $family === '' ) {
 			return $segments;
 		}
 
 		$family_label = $this->family_to_label( $family );
-		$family_url = $cat_url . '&family=' . \rawurlencode( $family );
-		$segments[] = array( 'label' => $family_label, 'url' => $view === 'list' ? $family_url : '' );
+		$family_url   = $cat_url . '&family=' . \rawurlencode( $family );
+		$segments[]   = array(
+			'label' => $family_label,
+			'url'   => $view === 'list' ? $family_url : '',
+		);
 		return $segments;
 	}
 
@@ -167,13 +185,13 @@ final class Page_Template_Directory_State_Builder {
 	 */
 	private function build_tree( string $base_url ): array {
 		$empty_filters = array();
-		$result = $this->query_service->query_page_templates( $empty_filters, 1, 1 );
-		$counts = $result->get_filter_counts();
-		$by_cat = $counts[ 'template_category_class' ] ?? array();
+		$result        = $this->query_service->query_page_templates( $empty_filters, 1, 1 );
+		$counts        = $result->get_filter_counts();
+		$by_cat        = $counts['template_category_class'] ?? array();
 
 		$tree = array();
 		foreach ( self::CATEGORY_ORDER as $slug ) {
-			$count = (int) ( $by_cat[ $slug ] ?? 0 );
+			$count  = (int) ( $by_cat[ $slug ] ?? 0 );
 			$tree[] = array(
 				'slug'  => $slug,
 				'label' => self::CATEGORY_LABELS[ $slug ] ?? $slug,
@@ -193,9 +211,9 @@ final class Page_Template_Directory_State_Builder {
 	 */
 	private function build_families_for_category( string $category_class, string $base_url ): array {
 		$filters = array( Large_Library_Query_Service::FILTER_TEMPLATE_CATEGORY_CLASS => $category_class );
-		$result = $this->query_service->query_page_templates( $filters, 1, 1 );
-		$counts = $result->get_filter_counts();
-		$by_fam = $counts[ 'template_family' ] ?? array();
+		$result  = $this->query_service->query_page_templates( $filters, 1, 1 );
+		$counts  = $result->get_filter_counts();
+		$by_fam  = $counts['template_family'] ?? array();
 		\ksort( $by_fam );
 
 		$families = array();

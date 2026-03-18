@@ -34,15 +34,15 @@ final class Industry_Build_Plan_Item_Override_Service {
 		if ( $plan_id === '' || $item_id === '' || strlen( $item_id ) > Industry_Override_Schema::TARGET_KEY_MAX_LENGTH ) {
 			return false;
 		}
-		$reason = Industry_Override_Schema::sanitize_reason( $reason );
+		$reason   = Industry_Override_Schema::sanitize_reason( $reason );
 		$override = array(
-			Industry_Override_Schema::FIELD_TARGET_TYPE  => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
-			Industry_Override_Schema::FIELD_TARGET_KEY   => $item_id,
-			Industry_Override_Schema::FIELD_PLAN_ID      => $plan_id,
-			Industry_Override_Schema::FIELD_STATE        => $state,
-			Industry_Override_Schema::FIELD_REASON       => $reason,
-			Industry_Override_Schema::FIELD_CREATED_AT   => time(),
-			Industry_Override_Schema::FIELD_UPDATED_AT   => time(),
+			Industry_Override_Schema::FIELD_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
+			Industry_Override_Schema::FIELD_TARGET_KEY  => $item_id,
+			Industry_Override_Schema::FIELD_PLAN_ID     => $plan_id,
+			Industry_Override_Schema::FIELD_STATE       => $state,
+			Industry_Override_Schema::FIELD_REASON      => $reason,
+			Industry_Override_Schema::FIELD_CREATED_AT  => time(),
+			Industry_Override_Schema::FIELD_UPDATED_AT  => time(),
 		);
 		if ( Industry_Override_Schema::validate( $override ) !== array() ) {
 			return false;
@@ -68,7 +68,7 @@ final class Industry_Build_Plan_Item_Override_Service {
 		if ( $plan_id === '' || $item_id === '' ) {
 			return null;
 		}
-		$all = $this->get_all();
+		$all            = $this->get_all();
 		$plan_overrides = $all[ $plan_id ] ?? array();
 		if ( ! is_array( $plan_overrides ) ) {
 			return null;
@@ -87,7 +87,7 @@ final class Industry_Build_Plan_Item_Override_Service {
 		if ( $plan_id === '' ) {
 			return array();
 		}
-		$all = $this->get_all();
+		$all            = $this->get_all();
 		$plan_overrides = $all[ $plan_id ] ?? array();
 		if ( ! is_array( $plan_overrides ) ) {
 			return array();
@@ -140,7 +140,7 @@ final class Industry_Build_Plan_Item_Override_Service {
 		if ( $plan_id === '' || $item_id === '' ) {
 			return true;
 		}
-		$all = $this->get_all();
+		$all            = $this->get_all();
 		$plan_overrides = $all[ $plan_id ] ?? array();
 		if ( ! is_array( $plan_overrides ) || ! isset( $plan_overrides[ $item_id ] ) ) {
 			return true;

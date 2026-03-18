@@ -19,8 +19,8 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Rollback_Result {
 
-	public const STATUS_SUCCESS   = 'success';
-	public const STATUS_FAILED    = 'failed';
+	public const STATUS_SUCCESS    = 'success';
+	public const STATUS_FAILED     = 'failed';
 	public const STATUS_INELIGIBLE = 'ineligible';
 
 	/** @var string */
@@ -69,17 +69,17 @@ final class Rollback_Result {
 		string $message,
 		array $result_summary
 	) {
-		$this->job_id                = $job_id;
-		$this->target_ref            = $target_ref;
-		$this->status                = $status;
-		$this->partial_rollback      = $partial_rollback;
-		$this->failure_reason        = $failure_reason;
-		$this->log_ref               = $log_ref;
-		$this->pre_snapshot_id       = $pre_snapshot_id;
-		$this->post_snapshot_id      = $post_snapshot_id;
-		$this->next_action_guidance  = $next_action_guidance;
-		$this->message               = $message;
-		$this->result_summary        = $result_summary;
+		$this->job_id               = $job_id;
+		$this->target_ref           = $target_ref;
+		$this->status               = $status;
+		$this->partial_rollback     = $partial_rollback;
+		$this->failure_reason       = $failure_reason;
+		$this->log_ref              = $log_ref;
+		$this->pre_snapshot_id      = $pre_snapshot_id;
+		$this->post_snapshot_id     = $post_snapshot_id;
+		$this->next_action_guidance = $next_action_guidance;
+		$this->message              = $message;
+		$this->result_summary       = $result_summary;
 	}
 
 	/**
@@ -251,17 +251,17 @@ final class Rollback_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'job_id'                => $this->job_id,
-			'target_ref'            => $this->target_ref,
-			'status'                => $this->status,
-			'partial_rollback'      => $this->partial_rollback,
-			'failure_reason'        => $this->failure_reason,
-			'log_ref'               => $this->log_ref,
-			'pre_snapshot_id'       => $this->pre_snapshot_id,
-			'post_snapshot_id'      => $this->post_snapshot_id,
-			'next_action_guidance'  => $this->next_action_guidance,
-			'message'               => $this->message,
-			'result_summary'        => $this->result_summary,
+			'job_id'               => $this->job_id,
+			'target_ref'           => $this->target_ref,
+			'status'               => $this->status,
+			'partial_rollback'     => $this->partial_rollback,
+			'failure_reason'       => $this->failure_reason,
+			'log_ref'              => $this->log_ref,
+			'pre_snapshot_id'      => $this->pre_snapshot_id,
+			'post_snapshot_id'     => $this->post_snapshot_id,
+			'next_action_guidance' => $this->next_action_guidance,
+			'message'              => $this->message,
+			'result_summary'       => $this->result_summary,
 		);
 	}
 }

@@ -52,12 +52,12 @@ final class Animation_QA_Result {
 	private array $manual_qa_checklist;
 
 	/**
-	 * @param bool $passed
-	 * @param list<array{scope: string, template_key: string, code: string, message: string}> $fallback_violation_summary
+	 * @param bool                                                                                  $passed
+	 * @param list<array{scope: string, template_key: string, code: string, message: string}>       $fallback_violation_summary
 	 * @param array{sections_checked: int, all_resolve_safe_tier: bool, sections_capped_count: int} $reduced_motion_check_result
-	 * @param array{audited: int, by_tier: array<string, int>, violations: int} $section_summary
-	 * @param array{audited: int, with_tier_cap: int, violations: int} $page_summary
-	 * @param list<string> $manual_qa_checklist
+	 * @param array{audited: int, by_tier: array<string, int>, violations: int}                     $section_summary
+	 * @param array{audited: int, with_tier_cap: int, violations: int}                              $page_summary
+	 * @param list<string>                                                                          $manual_qa_checklist
 	 */
 	public function __construct(
 		bool $passed,
@@ -126,7 +126,7 @@ final class Animation_QA_Result {
 	 * @return list<string>
 	 */
 	public function to_summary_lines(): array {
-		$lines = array();
+		$lines   = array();
 		$lines[] = sprintf(
 			'Sections audited: %d (%d violations). Pages audited: %d (%d violations).',
 			$this->section_summary['audited'],
@@ -134,7 +134,7 @@ final class Animation_QA_Result {
 			$this->page_summary['audited'],
 			$this->page_summary['violations']
 		);
-		$rm = $this->reduced_motion_check_result;
+		$rm      = $this->reduced_motion_check_result;
 		$lines[] = sprintf(
 			'Reduced-motion check: %d sections, all resolve to safe tier: %s; %d sections capped when reduced motion applied.',
 			$rm['sections_checked'],
@@ -144,12 +144,19 @@ final class Animation_QA_Result {
 		if ( ! empty( $this->fallback_violation_summary ) ) {
 			$by_code = array();
 			foreach ( $this->fallback_violation_summary as $v ) {
-				$c = $v['code'] ?? 'unknown';
+				$c             = $v['code'] ?? 'unknown';
 				$by_code[ $c ] = ( $by_code[ $c ] ?? 0 ) + 1;
 			}
-			$lines[] = 'Fallback violations: ' . implode( ', ', array_map( function ( $c, $n ) {
-				return $c . '=' . $n;
-			}, array_keys( $by_code ), $by_code ) );
+			$lines[] = 'Fallback violations: ' . implode(
+				', ',
+				array_map(
+					function ( $c, $n ) {
+						return $c . '=' . $n;
+					},
+					array_keys( $by_code ),
+					$by_code
+				)
+			);
 		}
 		$lines[] = $this->passed ? 'Animation QA: PASSED (machine-checkable).' : 'Animation QA: FAILED (resolve fallback/metadata violations).';
 		$lines[] = 'Manual checklist: ' . count( $this->manual_qa_checklist ) . ' items (tier none, reduced-motion, no broken layout).';

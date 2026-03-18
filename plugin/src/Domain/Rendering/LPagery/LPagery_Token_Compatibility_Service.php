@@ -127,7 +127,7 @@ final class LPagery_Token_Compatibility_Service {
 	 * }
 	 */
 	public function get_compatibility_summary(): array {
-		$sample = array();
+		$sample  = array();
 		$samples = array(
 			array( 'color', 'primary' ),
 			array( 'typography', 'heading' ),
@@ -137,7 +137,7 @@ final class LPagery_Token_Compatibility_Service {
 			array( 'component', 'button' ),
 		);
 		foreach ( $samples as $s ) {
-			$result = $this->map_core_to_lpagery( $s[0], $s[1] );
+			$result   = $this->map_core_to_lpagery( $s[0], $s[1] );
 			$sample[] = array(
 				'canonical_group' => $result->get_canonical_token_group(),
 				'canonical_name'  => $result->get_canonical_token_name(),
@@ -171,11 +171,14 @@ final class LPagery_Token_Compatibility_Service {
 	public function validate_token_key( string $lpagery_key ): array {
 		$result = $this->map_lpagery_to_core( $lpagery_key );
 		if ( $result->is_supported() ) {
-			return array( 'supported' => true, 'reason' => '' );
+			return array(
+				'supported' => true,
+				'reason'    => '',
+			);
 		}
 		return array(
 			'supported' => false,
-			'reason'   => $result->get_warning() ?? __( 'LPagery key is not supported or invalid.', 'aio-page-builder' ),
+			'reason'    => $result->get_warning() ?? __( 'LPagery key is not supported or invalid.', 'aio-page-builder' ),
 		);
 	}
 

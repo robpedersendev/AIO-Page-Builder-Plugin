@@ -49,10 +49,10 @@ final class Template_Finalization_Result {
 		string $run_completion_state,
 		array $one_pager_retention_summary = array()
 	) {
-		$this->finalization_summary             = $finalization_summary;
+		$this->finalization_summary              = $finalization_summary;
 		$this->template_execution_closure_record = $template_execution_closure_record;
-		$this->run_completion_state             = $run_completion_state;
-		$this->one_pager_retention_summary      = $one_pager_retention_summary;
+		$this->run_completion_state              = $run_completion_state;
+		$this->one_pager_retention_summary       = $one_pager_retention_summary;
 	}
 
 	/** @return array<string, mixed> */

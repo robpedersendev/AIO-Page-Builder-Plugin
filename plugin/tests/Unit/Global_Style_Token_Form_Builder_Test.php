@@ -29,7 +29,7 @@ final class Global_Style_Token_Form_Builder_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->plugin_root = dirname( __DIR__, 2 );
-		$key = \AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema::OPTION_KEY;
+		$key               = \AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
 		}
@@ -66,13 +66,13 @@ final class Global_Style_Token_Form_Builder_Test extends TestCase {
 	}
 
 	public function test_fields_by_group_matches_definitions(): void {
-		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
-		$registry = new Style_Token_Registry( $loader );
-		$repo     = new Global_Style_Settings_Repository( $registry, null );
-		$builder  = new Global_Style_Token_Form_Builder( $registry, $repo );
-		$defs     = $builder->get_field_definitions();
-		$by_group = $builder->get_fields_by_group();
-		$count_defs = count( $defs );
+		$loader         = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$registry       = new Style_Token_Registry( $loader );
+		$repo           = new Global_Style_Settings_Repository( $registry, null );
+		$builder        = new Global_Style_Token_Form_Builder( $registry, $repo );
+		$defs           = $builder->get_field_definitions();
+		$by_group       = $builder->get_fields_by_group();
+		$count_defs     = count( $defs );
 		$count_by_group = 0;
 		foreach ( $by_group as $fields ) {
 			$count_by_group += count( $fields );

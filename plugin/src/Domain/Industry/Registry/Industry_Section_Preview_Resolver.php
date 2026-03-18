@@ -49,18 +49,18 @@ final class Industry_Section_Preview_Resolver {
 		Industry_Helper_Doc_Composer $helper_composer,
 		?Industry_Substitute_Suggestion_Engine $substitute_engine = null
 	) {
-		$this->profile_repository     = $profile_repository;
-		$this->pack_registry          = $pack_registry;
+		$this->profile_repository      = $profile_repository;
+		$this->pack_registry           = $pack_registry;
 		$this->recommendation_resolver = $recommendation_resolver;
-		$this->helper_composer        = $helper_composer;
-		$this->substitute_engine      = $substitute_engine;
+		$this->helper_composer         = $helper_composer;
+		$this->substitute_engine       = $substitute_engine;
 	}
 
 	/**
 	 * Resolves industry-aware preview view model for the given section. Safe when no profile or invalid key.
 	 *
-	 * @param string               $section_key        Section template internal_key.
-	 * @param array<string, mixed>  $section_definition  Single section definition (internal_key, section_purpose_family, etc.).
+	 * @param string                           $section_key        Section template internal_key.
+	 * @param array<string, mixed>             $section_definition  Single section definition (internal_key, section_purpose_family, etc.).
 	 * @param array<int, array<string, mixed>> $all_sections Optional. When provided with substitute_engine, substitute suggestions are filled.
 	 * @return Industry_Section_Preview_View_Model
 	 */
@@ -87,28 +87,33 @@ final class Industry_Section_Preview_Resolver {
 		$result                = $this->recommendation_resolver->resolve( $profile, $primary_pack, $sections_for_resolver, array() );
 		$item                  = $this->get_item_by_key( $result, $section_key );
 
-		$fit               = $item['fit_classification'] ?? Industry_Section_Recommendation_Resolver::FIT_NEUTRAL;
-		$warning_flags     = isset( $item['warning_flags'] ) && \is_array( $item['warning_flags'] ) ? array_values( array_filter( array_map( 'strval', $item['warning_flags'] ) ) ) : array();
+		$fit                 = $item['fit_classification'] ?? Industry_Section_Recommendation_Resolver::FIT_NEUTRAL;
+		$warning_flags       = isset( $item['warning_flags'] ) && \is_array( $item['warning_flags'] ) ? array_values( array_filter( array_map( 'strval', $item['warning_flags'] ) ) ) : array();
 		$explanation_reasons = isset( $item['explanation_reasons'] ) && \is_array( $item['explanation_reasons'] ) ? array_values( array_filter( array_map( 'strval', $item['explanation_reasons'] ) ) ) : array();
 
-		$subtype_key = '';
-		$subtype_context = array( 'primary_industry_key' => $primary, 'industry_subtype_key' => '', 'resolved_subtype' => null, 'has_valid_subtype' => false );
+		$subtype_key     = '';
+		$subtype_context = array(
+			'primary_industry_key' => $primary,
+			'industry_subtype_key' => '',
+			'resolved_subtype'     => null,
+			'has_valid_subtype'    => false,
+		);
 		if ( $this->subtype_resolver !== null ) {
 			$subtype_context = $this->subtype_resolver->resolve();
-			$subtype_key = $subtype_context['industry_subtype_key'] ?? '';
+			$subtype_key     = $subtype_context['industry_subtype_key'] ?? '';
 		}
-		$goal_key = isset( $profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+		$goal_key          = isset( $profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 			? trim( $profile[ \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 			: '';
-		$composed_result  = $this->helper_composer->compose( $section_key, $primary, $subtype_key, $goal_key );
-		$composed_doc     = $composed_result->get_composed_doc();
+		$composed_result   = $this->helper_composer->compose( $section_key, $primary, $subtype_key, $goal_key );
+		$composed_doc      = $composed_result->get_composed_doc();
 		$composed_for_view = array(
-			'tone_notes'         => $composed_doc['tone_notes'] ?? '',
-			'cta_usage_notes'    => $composed_doc['cta_usage_notes'] ?? '',
+			'tone_notes'          => $composed_doc['tone_notes'] ?? '',
+			'cta_usage_notes'     => $composed_doc['cta_usage_notes'] ?? '',
 			'compliance_cautions' => $composed_doc['compliance_cautions'] ?? '',
-			'media_notes'        => $composed_doc['media_notes'] ?? '',
-			'seo_notes'          => $composed_doc['seo_notes'] ?? '',
-			'overlay_applied'    => $composed_result->is_overlay_applied(),
+			'media_notes'         => $composed_doc['media_notes'] ?? '',
+			'seo_notes'           => $composed_doc['seo_notes'] ?? '',
+			'overlay_applied'     => $composed_result->is_overlay_applied(),
 		);
 
 		$substitute_suggestions = array();
@@ -150,12 +155,12 @@ final class Industry_Section_Preview_Resolver {
 	 * Builds subtype influence view model for section (helper refinement only).
 	 *
 	 * @param array{primary_industry_key: string, industry_subtype_key: string, resolved_subtype: array<string, mixed>|null, has_valid_subtype: bool} $subtype_context
-	 * @param string $section_key
-	 * @param bool   $for_section True for section (helper); false would be page (onepager).
+	 * @param string                                                                                                                                  $section_key
+	 * @param bool                                                                                                                                    $for_section True for section (helper); false would be page (onepager).
 	 * @return array<string, mixed>
 	 */
 	private function build_subtype_influence_section( array $subtype_context, string $section_key, bool $for_section ): array {
-		$has_valid = ! empty( $subtype_context['has_valid_subtype'] );
+		$has_valid   = ! empty( $subtype_context['has_valid_subtype'] );
 		$subtype_key = isset( $subtype_context['industry_subtype_key'] ) && \is_string( $subtype_context['industry_subtype_key'] )
 			? \trim( $subtype_context['industry_subtype_key'] )
 			: '';
@@ -163,10 +168,10 @@ final class Industry_Section_Preview_Resolver {
 			return Industry_Subtype_Preview_Influence_View_Model::none()->to_array();
 		}
 		$resolved = $subtype_context['resolved_subtype'] ?? null;
-		$label = '';
-		$summary = '';
+		$label    = '';
+		$summary  = '';
 		if ( \is_array( $resolved ) && $this->subtype_registry !== null ) {
-			$label = isset( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] ) && \is_string( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] )
+			$label   = isset( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] ) && \is_string( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] )
 				? \trim( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] )
 				: \ucfirst( \str_replace( array( '_', '-' ), ' ', $subtype_key ) );
 			$summary = isset( $resolved[ Industry_Subtype_Registry::FIELD_SUMMARY ] ) && \is_string( $resolved[ Industry_Subtype_Registry::FIELD_SUMMARY ] )
@@ -183,7 +188,7 @@ final class Industry_Section_Preview_Resolver {
 		if ( $for_section && $this->subtype_helper_overlay_registry !== null ) {
 			$overlay = $this->subtype_helper_overlay_registry->get( $subtype_key, $section_key );
 			if ( $overlay !== null && \is_array( $overlay ) ) {
-				$status = isset( $overlay[ Subtype_Section_Helper_Overlay_Registry::FIELD_STATUS ] ) && \is_string( $overlay[ Subtype_Section_Helper_Overlay_Registry::FIELD_STATUS ] )
+				$status            = isset( $overlay[ Subtype_Section_Helper_Overlay_Registry::FIELD_STATUS ] ) && \is_string( $overlay[ Subtype_Section_Helper_Overlay_Registry::FIELD_STATUS ] )
 					? $overlay[ Subtype_Section_Helper_Overlay_Registry::FIELD_STATUS ]
 					: '';
 				$helper_refinement = $status === Subtype_Section_Helper_Overlay_Registry::STATUS_ACTIVE;
@@ -204,7 +209,7 @@ final class Industry_Section_Preview_Resolver {
 
 	/**
 	 * @param Industry_Section_Recommendation_Result $result
-	 * @param string $section_key
+	 * @param string                                 $section_key
 	 * @return array{section_key: string, score: int, fit_classification: string, explanation_reasons: array, industry_source_refs: array, warning_flags: array}
 	 */
 	private function get_item_by_key( Industry_Section_Recommendation_Result $result, string $section_key ): array {
@@ -215,12 +220,12 @@ final class Industry_Section_Preview_Resolver {
 			}
 		}
 		return array(
-			'section_key'         => $section_key,
-			'score'               => 0,
-			'fit_classification'  => Industry_Section_Recommendation_Resolver::FIT_NEUTRAL,
-			'explanation_reasons' => array(),
+			'section_key'          => $section_key,
+			'score'                => 0,
+			'fit_classification'   => Industry_Section_Recommendation_Resolver::FIT_NEUTRAL,
+			'explanation_reasons'  => array(),
 			'industry_source_refs' => array(),
-			'warning_flags'       => array(),
+			'warning_flags'        => array(),
 		);
 	}
 

@@ -40,16 +40,16 @@ final class Render_Asset_Requirements {
 	private array $meta;
 
 	/**
-	 * @param string              $handle    Logical handle.
-	 * @param string              $source_ref Section or template reference.
-	 * @param string              $scope     SCOPE_FRONTEND | SCOPE_ADMIN | SCOPE_SECTION.
+	 * @param string               $handle    Logical handle.
+	 * @param string               $source_ref Section or template reference.
+	 * @param string               $scope     SCOPE_FRONTEND | SCOPE_ADMIN | SCOPE_SECTION.
 	 * @param array<string, mixed> $meta     Optional metadata.
 	 */
 	public function __construct( string $handle, string $source_ref, string $scope, array $meta = array() ) {
-		$this->handle    = $handle;
+		$this->handle     = $handle;
 		$this->source_ref = $source_ref;
-		$this->scope     = $scope;
-		$this->meta      = $meta;
+		$this->scope      = $scope;
+		$this->meta       = $meta;
 	}
 
 	public function get_handle(): string {

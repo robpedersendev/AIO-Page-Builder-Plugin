@@ -36,7 +36,7 @@ final class Apply_Menu_Change_Handler implements Execution_Handler_Interface {
 		Menu_Change_Job_Service_Interface $job_service,
 		?Template_Menu_Apply_Service_Interface $template_menu_apply_service = null
 	) {
-		$this->job_service = $job_service;
+		$this->job_service                 = $job_service;
 		$this->template_menu_apply_service = $template_menu_apply_service;
 	}
 

@@ -57,36 +57,36 @@ final class Template_Library_Export_Validator {
 	 * Validates the registry bundle for template-library export coherence.
 	 *
 	 * @param array{registries: array{sections?: list<array>, page_templates?: list<array>, compositions?: list<array>}} $bundle Bundle from Registry_Export_Serializer::build_registry_bundle().
-	 * @param list<string>                                                                                              $included_categories Categories included in this export.
+	 * @param list<string>                                                                                               $included_categories Categories included in this export.
 	 * @return array{valid: bool, section_count: int, page_template_count: int, composition_count: int, one_pager_included_count: int, one_pager_missing_keys: list<string>, appendix_regenerable: bool, appendix_section_row_count: int, appendix_page_row_count: int, errors: list<string>, warnings: list<string>, log_reference: string} template_library_export_summary
 	 */
 	public function validate( array $bundle, array $included_categories ): array {
-		$log_ref = 'tlib-export-' . gmdate( 'Y-m-d\TH:i:s\Z' );
-		$errors  = array();
-		$warnings = array();
-		$section_count = 0;
-		$page_template_count = 0;
-		$composition_count = 0;
-		$one_pager_included_count = 0;
-		$one_pager_missing_keys = array();
-		$appendix_regenerable = true;
+		$log_ref                    = 'tlib-export-' . gmdate( 'Y-m-d\TH:i:s\Z' );
+		$errors                     = array();
+		$warnings                   = array();
+		$section_count              = 0;
+		$page_template_count        = 0;
+		$composition_count          = 0;
+		$one_pager_included_count   = 0;
+		$one_pager_missing_keys     = array();
+		$appendix_regenerable       = true;
 		$appendix_section_row_count = 0;
-		$appendix_page_row_count = 0;
+		$appendix_page_row_count    = 0;
 
-		$has_registries = in_array( 'registries', $included_categories, true );
+		$has_registries   = in_array( 'registries', $included_categories, true );
 		$has_compositions = in_array( 'compositions', $included_categories, true );
 
 		if ( ! $has_registries && ! $has_compositions ) {
 			return $this->summary( true, 0, 0, 0, 0, array(), true, 0, 0, array(), array(), $log_ref );
 		}
 
-		$registries = $bundle['registries'] ?? array();
-		$sections   = $registries['sections'] ?? array();
+		$registries     = $bundle['registries'] ?? array();
+		$sections       = $registries['sections'] ?? array();
 		$page_templates = $registries['page_templates'] ?? array();
 		$compositions   = $registries['compositions'] ?? array();
 
 		if ( $has_registries ) {
-			$section_count = count( $sections );
+			$section_count       = count( $sections );
 			$page_template_count = count( $page_templates );
 			foreach ( $sections as $frag ) {
 				$payload = isset( $frag[ Registry_Export_Fragment_Builder::KEY_PAYLOAD ] ) && is_array( $frag[ Registry_Export_Fragment_Builder::KEY_PAYLOAD ] )
@@ -100,7 +100,7 @@ final class Template_Library_Export_Validator {
 				$payload = isset( $frag[ Registry_Export_Fragment_Builder::KEY_PAYLOAD ] ) && is_array( $frag[ Registry_Export_Fragment_Builder::KEY_PAYLOAD ] )
 					? $frag[ Registry_Export_Fragment_Builder::KEY_PAYLOAD ]
 					: array();
-				$key = (string) ( $payload[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? $frag[ Registry_Export_Fragment_Builder::KEY_OBJECT_KEY ] ?? '' );
+				$key     = (string) ( $payload[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? $frag[ Registry_Export_Fragment_Builder::KEY_OBJECT_KEY ] ?? '' );
 				if ( $key === '' ) {
 					$errors[] = 'Page template fragment missing internal_key in payload.';
 					continue;
@@ -126,28 +126,28 @@ final class Template_Library_Export_Validator {
 
 		if ( $this->section_appendix !== null && count( $section_defs ) > 0 ) {
 			try {
-				$section_result = $this->section_appendix->build_result_from_definitions( $section_defs );
+				$section_result             = $this->section_appendix->build_result_from_definitions( $section_defs );
 				$appendix_section_row_count = $section_result['total'] ?? 0;
 				if ( $appendix_section_row_count !== count( $section_defs ) ) {
-					$warnings[] = 'Section appendix row count mismatch: expected ' . count( $section_defs ) . ', got ' . $appendix_section_row_count;
+					$warnings[]           = 'Section appendix row count mismatch: expected ' . count( $section_defs ) . ', got ' . $appendix_section_row_count;
 					$appendix_regenerable = false;
 				}
 			} catch ( \Throwable $e ) {
-				$errors[] = 'Section appendix regeneration failed: ' . $e->getMessage();
+				$errors[]             = 'Section appendix regeneration failed: ' . $e->getMessage();
 				$appendix_regenerable = false;
 			}
 		}
 
 		if ( $this->page_appendix !== null && count( $page_defs ) > 0 ) {
 			try {
-				$page_result = $this->page_appendix->build_result_from_definitions( $page_defs );
+				$page_result             = $this->page_appendix->build_result_from_definitions( $page_defs );
 				$appendix_page_row_count = $page_result['total'] ?? 0;
 				if ( $appendix_page_row_count !== count( $page_defs ) ) {
-					$warnings[] = 'Page template appendix row count mismatch: expected ' . count( $page_defs ) . ', got ' . $appendix_page_row_count;
+					$warnings[]           = 'Page template appendix row count mismatch: expected ' . count( $page_defs ) . ', got ' . $appendix_page_row_count;
 					$appendix_regenerable = false;
 				}
 			} catch ( \Throwable $e ) {
-				$errors[] = 'Page template appendix regeneration failed: ' . $e->getMessage();
+				$errors[]             = 'Page template appendix regeneration failed: ' . $e->getMessage();
 				$appendix_regenerable = false;
 			}
 		}

@@ -63,35 +63,44 @@ final class Rollback_Eligibility_Test extends TestCase {
 
 	private static function pre_snapshot( string $id, string $target_ref, string $object_family, string $action_type, string $created_at = '2025-03-12T10:00:00+00:00', string $rollback_status = 'available' ): array {
 		return array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID     => $id,
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE   => Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE,
-			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY   => $object_family,
-			Operational_Snapshot_Schema::FIELD_TARGET_REF     => $target_ref,
-			Operational_Snapshot_Schema::FIELD_CREATED_AT     => $created_at,
-			Operational_Snapshot_Schema::FIELD_ACTION_TYPE   => $action_type,
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => $id,
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE,
+			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => $object_family,
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => $target_ref,
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => $created_at,
+			Operational_Snapshot_Schema::FIELD_ACTION_TYPE => $action_type,
 			Operational_Snapshot_Schema::FIELD_ROLLBACK_STATUS => $rollback_status,
-			Operational_Snapshot_Schema::FIELD_EXECUTION_REF  => 'exec_' . $id,
+			Operational_Snapshot_Schema::FIELD_EXECUTION_REF => 'exec_' . $id,
 		);
 	}
 
 	private static function post_snapshot( string $id, string $target_ref ): array {
 		return array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID   => $id,
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => $id,
 			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE,
-			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY  => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
-			Operational_Snapshot_Schema::FIELD_TARGET_REF    => $target_ref,
+			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => $target_ref,
 			Operational_Snapshot_Schema::FIELD_EXECUTION_REF => 'exec_' . $id,
-			Operational_Snapshot_Schema::FIELD_POST_CHANGE   => array( 'result_snapshot' => array() ),
+			Operational_Snapshot_Schema::FIELD_POST_CHANGE => array( 'result_snapshot' => array() ),
 		);
 	}
 
 	public function test_eligible_page_rollback_when_snapshots_present_and_target_resolved(): void {
-		$repo = new Stub_Rollback_Repo();
+		$repo                   = new Stub_Rollback_Repo();
 		$repo->store['pre-42']  = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::REPLACE_PAGE );
 		$repo->store['post-42'] = self::post_snapshot( 'post-42', '42' );
-		$repo->list_for_target  = array( 'pre-42' => strtotime( '2025-03-12T10:00:00+00:00' ), 'post-42' => strtotime( '2025-03-12T10:01:00+00:00' ) );
+		$repo->list_for_target  = array(
+			'pre-42'  => strtotime( '2025-03-12T10:00:00+00:00' ),
+			'post-42' => strtotime( '2025-03-12T10:01:00+00:00' ),
+		);
 
-		$GLOBALS['_aio_get_post_return'] = new \WP_Post( array( 'ID' => 42, 'post_type' => 'page', 'post_title' => 'Test' ) );
+		$GLOBALS['_aio_get_post_return'] = new \WP_Post(
+			array(
+				'ID'         => 42,
+				'post_type'  => 'page',
+				'post_title' => 'Test',
+			)
+		);
 
 		$service = new Rollback_Eligibility_Service( $repo );
 		$result  = $service->evaluate( 'pre-42', 'post-42', array( 'skip_permission_check' => true ) );
@@ -106,7 +115,7 @@ final class Rollback_Eligibility_Test extends TestCase {
 	}
 
 	public function test_ineligible_when_pre_snapshot_missing(): void {
-		$repo = new Stub_Rollback_Repo();
+		$repo                   = new Stub_Rollback_Repo();
 		$repo->store['post-42'] = self::post_snapshot( 'post-42', '42' );
 
 		$service = new Rollback_Eligibility_Service( $repo );
@@ -117,7 +126,7 @@ final class Rollback_Eligibility_Test extends TestCase {
 	}
 
 	public function test_ineligible_when_post_snapshot_missing(): void {
-		$repo = new Stub_Rollback_Repo();
+		$repo                  = new Stub_Rollback_Repo();
 		$repo->store['pre-42'] = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::REPLACE_PAGE );
 
 		$service = new Rollback_Eligibility_Service( $repo );
@@ -128,12 +137,17 @@ final class Rollback_Eligibility_Test extends TestCase {
 	}
 
 	public function test_ineligible_when_no_handler_for_action_type(): void {
-		$repo = new Stub_Rollback_Repo();
+		$repo                   = new Stub_Rollback_Repo();
 		$repo->store['pre-42']  = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::CREATE_PAGE );
 		$repo->store['post-42'] = self::post_snapshot( 'post-42', '42' );
 		$repo->list_for_target  = array();
 
-		$GLOBALS['_aio_get_post_return'] = new \WP_Post( array( 'ID' => 42, 'post_type' => 'page' ) );
+		$GLOBALS['_aio_get_post_return'] = new \WP_Post(
+			array(
+				'ID'        => 42,
+				'post_type' => 'page',
+			)
+		);
 
 		$service = new Rollback_Eligibility_Service( $repo );
 		$result  = $service->evaluate( 'pre-42', 'post-42', array( 'skip_permission_check' => true ) );
@@ -143,7 +157,7 @@ final class Rollback_Eligibility_Test extends TestCase {
 	}
 
 	public function test_ineligible_when_newer_change_conflict(): void {
-		$repo = new Stub_Rollback_Repo();
+		$repo                   = new Stub_Rollback_Repo();
 		$repo->store['pre-42']  = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::REPLACE_PAGE, '2025-03-12T10:00:00+00:00' );
 		$repo->store['post-42'] = self::post_snapshot( 'post-42', '42' );
 		$repo->list_for_target  = array(
@@ -152,7 +166,12 @@ final class Rollback_Eligibility_Test extends TestCase {
 			'pre-43'  => strtotime( '2025-03-12T11:00:00+00:00' ),
 		);
 
-		$GLOBALS['_aio_get_post_return'] = new \WP_Post( array( 'ID' => 42, 'post_type' => 'page' ) );
+		$GLOBALS['_aio_get_post_return'] = new \WP_Post(
+			array(
+				'ID'        => 42,
+				'post_type' => 'page',
+			)
+		);
 
 		$service = new Rollback_Eligibility_Service( $repo );
 		$result  = $service->evaluate( 'pre-42', 'post-42', array( 'skip_permission_check' => true ) );
@@ -162,12 +181,17 @@ final class Rollback_Eligibility_Test extends TestCase {
 	}
 
 	public function test_ineligible_when_permission_denied(): void {
-		$repo = new Stub_Rollback_Repo();
+		$repo                   = new Stub_Rollback_Repo();
 		$repo->store['pre-42']  = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::REPLACE_PAGE );
 		$repo->store['post-42'] = self::post_snapshot( 'post-42', '42' );
 		$repo->list_for_target  = array();
 
-		$GLOBALS['_aio_get_post_return']       = new \WP_Post( array( 'ID' => 42, 'post_type' => 'page' ) );
+		$GLOBALS['_aio_get_post_return']         = new \WP_Post(
+			array(
+				'ID'        => 42,
+				'post_type' => 'page',
+			)
+		);
 		$GLOBALS['_aio_current_user_can_return'] = false;
 
 		$service = new Rollback_Eligibility_Service( $repo );
@@ -178,12 +202,20 @@ final class Rollback_Eligibility_Test extends TestCase {
 	}
 
 	public function test_eligible_when_permission_granted(): void {
-		$repo = new Stub_Rollback_Repo();
+		$repo                   = new Stub_Rollback_Repo();
 		$repo->store['pre-42']  = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::REPLACE_PAGE );
 		$repo->store['post-42'] = self::post_snapshot( 'post-42', '42' );
-		$repo->list_for_target  = array( 'pre-42' => 1000, 'post-42' => 1001 );
+		$repo->list_for_target  = array(
+			'pre-42'  => 1000,
+			'post-42' => 1001,
+		);
 
-		$GLOBALS['_aio_get_post_return']       = new \WP_Post( array( 'ID' => 42, 'post_type' => 'page' ) );
+		$GLOBALS['_aio_get_post_return']         = new \WP_Post(
+			array(
+				'ID'        => 42,
+				'post_type' => 'page',
+			)
+		);
 		$GLOBALS['_aio_current_user_can_return'] = true;
 
 		$service = new Rollback_Eligibility_Service( $repo );
@@ -194,7 +226,7 @@ final class Rollback_Eligibility_Test extends TestCase {
 	}
 
 	public function test_ineligible_when_snapshot_used(): void {
-		$repo = new Stub_Rollback_Repo();
+		$repo                   = new Stub_Rollback_Repo();
 		$repo->store['pre-42']  = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::REPLACE_PAGE, '2025-03-12T10:00:00+00:00', Operational_Snapshot_Schema::ROLLBACK_STATUS_USED );
 		$repo->store['post-42'] = self::post_snapshot( 'post-42', '42' );
 
@@ -206,7 +238,7 @@ final class Rollback_Eligibility_Test extends TestCase {
 	}
 
 	public function test_ineligible_when_target_unresolvable(): void {
-		$repo = new Stub_Rollback_Repo();
+		$repo                   = new Stub_Rollback_Repo();
 		$repo->store['pre-42']  = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::REPLACE_PAGE );
 		$repo->store['post-42'] = self::post_snapshot( 'post-42', '42' );
 		$repo->list_for_target  = array();
@@ -222,11 +254,16 @@ final class Rollback_Eligibility_Test extends TestCase {
 	}
 
 	public function test_result_to_array_has_contract_shape(): void {
-		$repo = new Stub_Rollback_Repo();
-		$repo->store['pre-42']  = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::REPLACE_PAGE );
-		$repo->store['post-42'] = self::post_snapshot( 'post-42', '42' );
-		$repo->list_for_target  = array();
-		$GLOBALS['_aio_get_post_return'] = new \WP_Post( array( 'ID' => 42, 'post_type' => 'page' ) );
+		$repo                            = new Stub_Rollback_Repo();
+		$repo->store['pre-42']           = self::pre_snapshot( 'pre-42', '42', Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE, Execution_Action_Types::REPLACE_PAGE );
+		$repo->store['post-42']          = self::post_snapshot( 'post-42', '42' );
+		$repo->list_for_target           = array();
+		$GLOBALS['_aio_get_post_return'] = new \WP_Post(
+			array(
+				'ID'        => 42,
+				'post_type' => 'page',
+			)
+		);
 
 		$service = new Rollback_Eligibility_Service( $repo );
 		$result  = $service->evaluate( 'pre-42', 'post-42', array( 'skip_permission_check' => true ) );

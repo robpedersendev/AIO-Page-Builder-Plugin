@@ -60,9 +60,9 @@ final class Existing_Page_Updates_UI_Service {
 		Existing_Page_Update_Bulk_Action_Service $bulk_action_service,
 		?Existing_Page_Template_Change_Builder $template_change_builder = null
 	) {
-		$this->row_action_resolver    = $row_action_resolver;
-		$this->detail_builder         = $detail_builder;
-		$this->bulk_action_service    = $bulk_action_service;
+		$this->row_action_resolver     = $row_action_resolver;
+		$this->detail_builder          = $detail_builder;
+		$this->bulk_action_service     = $bulk_action_service;
 		$this->template_change_builder = $template_change_builder;
 	}
 
@@ -73,7 +73,7 @@ final class Existing_Page_Updates_UI_Service {
 	 * @param int                  $step_index Must be 1 for existing_page_changes.
 	 * @param array<string, bool>  $capabilities can_approve, can_execute, can_view_artifacts.
 	 * @param string|null          $selected_item_id Item id for detail panel.
-	 * @param array<int, string>    $selected_item_ids Item ids for bulk selection.
+	 * @param array<int, string>   $selected_item_ids Item ids for bulk selection.
 	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages.
 	 */
 	public function build_workspace(
@@ -89,7 +89,7 @@ final class Existing_Page_Updates_UI_Service {
 		$steps_raw = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
-		$step = $steps_raw[ $step_index ] ?? null;
+		$step      = $steps_raw[ $step_index ] ?? null;
 		if ( ! is_array( $step ) ) {
 			return $this->empty_workspace();
 		}
@@ -98,8 +98,8 @@ final class Existing_Page_Updates_UI_Service {
 			return $this->empty_workspace();
 		}
 
-		$items = $this->eligible_items_from_step( $step );
-		$rows = array();
+		$items          = $this->eligible_items_from_step( $step );
+		$rows           = array();
 		$eligible_count = 0;
 		foreach ( $items as $item ) {
 			$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
@@ -110,22 +110,22 @@ final class Existing_Page_Updates_UI_Service {
 			if ( $status === Build_Plan_Item_Statuses::PENDING ) {
 				++$eligible_count;
 			}
-			$row_actions = $this->row_action_resolver->resolve( $item, $capabilities );
+			$row_actions     = $this->row_action_resolver->resolve( $item, $capabilities );
 			$summary_columns = $this->summary_columns_for_item( $item );
-			$row = array(
-				Step_Item_List_Component::ROW_KEY_ITEM_ID          => $item_id,
-				Step_Item_List_Component::ROW_KEY_STATUS           => $status,
-				Step_Item_List_Component::ROW_KEY_STATUS_BADGE     => $this->status_to_badge( $status ),
-				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS  => $summary_columns,
-				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS       => $row_actions,
-				Step_Item_List_Component::ROW_KEY_IS_SELECTED      => in_array( $item_id, $selected_item_ids, true ),
-				'snapshot_required'                                => true,
+			$row             = array(
+				Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
+				Step_Item_List_Component::ROW_KEY_STATUS  => $status,
+				Step_Item_List_Component::ROW_KEY_STATUS_BADGE => $this->status_to_badge( $status ),
+				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => $summary_columns,
+				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS => $row_actions,
+				Step_Item_List_Component::ROW_KEY_IS_SELECTED => in_array( $item_id, $selected_item_ids, true ),
+				'snapshot_required'                       => true,
 			);
 			if ( $this->template_change_builder !== null ) {
-				$change = $this->template_change_builder->build_for_item( $item );
+				$change           = $this->template_change_builder->build_for_item( $item );
 				$template_summary = $change[ Existing_Page_Template_Change_Builder::KEY_EXISTING_PAGE_TEMPLATE_CHANGE_SUMMARY ];
 				$row[ Existing_Page_Template_Change_Builder::KEY_EXISTING_PAGE_TEMPLATE_CHANGE_SUMMARY ] = $template_summary;
-				$row[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ] = $change[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ];
+				$row[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ]            = $change[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ];
 				$row['summary_columns']['template_links'] = '';
 				if ( ! empty( $template_summary['template_key'] ) && ( $row['summary_columns']['target_template'] ?? '' ) === '' ) {
 					$row['summary_columns']['target_template'] = $template_summary['template_key'];
@@ -134,8 +134,8 @@ final class Existing_Page_Updates_UI_Service {
 			$rows[] = $row;
 		}
 
-		$eligibility = $this->bulk_action_service->get_bulk_eligibility( $plan_definition );
-		$pending_count = $eligibility['approve_all_eligible'];
+		$eligibility    = $this->bulk_action_service->get_bulk_eligibility( $plan_definition );
+		$pending_count  = $eligibility['approve_all_eligible'];
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
 
 		$bulk_states = array(
@@ -161,9 +161,9 @@ final class Existing_Page_Updates_UI_Service {
 		);
 
 		$detail_panel = array(
-			'item_id'     => $selected_item_id ?? '',
-			'sections'    => array(),
-			'row_actions' => array(),
+			'item_id'           => $selected_item_id ?? '',
+			'sections'          => array(),
+			'row_actions'       => array(),
 			'snapshot_required' => true,
 		);
 		if ( $selected_item_id !== null && $selected_item_id !== '' ) {
@@ -175,8 +175,8 @@ final class Existing_Page_Updates_UI_Service {
 				}
 			}
 			if ( $selected_item !== null ) {
-				$plan_id = (string) ( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' );
-				$context = array( 'plan_definition' => $plan_definition );
+				$plan_id                     = (string) ( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' );
+				$context                     = array( 'plan_definition' => $plan_definition );
 				$detail_panel['sections']    = $this->detail_builder->build_sections( $selected_item, $plan_id, $context );
 				$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $selected_item, $capabilities );
 			}
@@ -203,7 +203,7 @@ final class Existing_Page_Updates_UI_Service {
 		$items_raw = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
-		$out = array();
+		$out       = array();
 		foreach ( $items_raw as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -212,7 +212,7 @@ final class Existing_Page_Updates_UI_Service {
 			if ( $item_type !== Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE ) {
 				continue;
 			}
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+			$payload    = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
 			$confidence = (string) ( $payload['confidence'] ?? 'medium' );
@@ -228,9 +228,9 @@ final class Existing_Page_Updates_UI_Service {
 		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
-		$cols = array();
+		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
-			$val = $payload[ $key ] ?? $item[ $key ] ?? '';
+			$val          = $payload[ $key ] ?? $item[ $key ] ?? '';
 			$cols[ $key ] = is_string( $val ) ? $val : (string) \wp_json_encode( $val );
 		}
 		return $cols;
@@ -282,12 +282,32 @@ final class Existing_Page_Updates_UI_Service {
 			'step_list_rows'     => array(),
 			'column_order'       => self::COLUMN_ORDER,
 			'bulk_action_states' => array(
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array( 'enabled' => false, 'label' => \__( 'Make All Updates', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array( 'enabled' => false, 'label' => \__( 'Apply to selected', 'aio-page-builder' ), 'count_selected' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array( 'enabled' => false, 'label' => \__( 'Deny All Updates', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array( 'enabled' => false, 'label' => \__( 'Clear selection', 'aio-page-builder' ) ),
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Make All Updates', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
+					'enabled'        => false,
+					'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
+					'count_selected' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Deny All Updates', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
+					'enabled' => false,
+					'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+				),
 			),
-			'detail_panel'       => array( 'item_id' => '', 'sections' => array(), 'row_actions' => array(), 'snapshot_required' => true ),
+			'detail_panel'       => array(
+				'item_id'           => '',
+				'sections'          => array(),
+				'row_actions'       => array(),
+				'snapshot_required' => true,
+			),
 			'step_messages'      => array(),
 		);
 	}

@@ -58,8 +58,14 @@ final class Stub_Developer_Error_Transport implements Developer_Error_Transport_
 
 	public function send( array $envelope ): array {
 		return $this->success
-			? array( 'success' => true, 'failure_reason' => '' )
-			: array( 'success' => false, 'failure_reason' => $this->failure_reason ?: 'Delivery failed.' );
+			? array(
+				'success'        => true,
+				'failure_reason' => '',
+			)
+			: array(
+				'success'        => false,
+				'failure_reason' => $this->failure_reason ?: 'Delivery failed.',
+			);
 	}
 }
 
@@ -91,10 +97,10 @@ final class Developer_Error_Reporting_Test extends TestCase {
 	}
 
 	public function test_critical_immediate_reporting(): void {
-		$transport = new Stub_Developer_Error_Transport();
+		$transport          = new Stub_Developer_Error_Transport();
 		$transport->success = true;
-		$service = new Developer_Error_Reporting_Service( null, null, $transport );
-		$record  = $this->make_record( 'err-critical-1', Log_Severities::CRITICAL, Log_Categories::EXECUTION, 'Build Plan finalization failed at publish stage.' );
+		$service            = new Developer_Error_Reporting_Service( null, null, $transport );
+		$record             = $this->make_record( 'err-critical-1', Log_Severities::CRITICAL, Log_Categories::EXECUTION, 'Build Plan finalization failed at publish stage.' );
 
 		$result = $service->maybe_report( $record, array( 'site_reference_override' => 'test.local' ) );
 
@@ -109,10 +115,13 @@ final class Developer_Error_Reporting_Test extends TestCase {
 		$service   = new Developer_Error_Reporting_Service( null, null, $transport );
 		$record    = $this->make_record( 'err-repeated-1', Log_Severities::ERROR, Log_Categories::QUEUE, 'Queue job failed.' );
 
-		$result = $service->maybe_report( $record, array(
-			'site_reference_override' => 'test.local',
-			'repetition_count_24h'     => 3,
-		) );
+		$result = $service->maybe_report(
+			$record,
+			array(
+				'site_reference_override' => 'test.local',
+				'repetition_count_24h'    => 3,
+			)
+		);
 
 		$this->assertTrue( $result->is_report_eligible() );
 		$this->assertSame( Developer_Report_Result::DELIVERY_SENT, $result->get_delivery_status() );
@@ -123,7 +132,13 @@ final class Developer_Error_Reporting_Test extends TestCase {
 		$service   = new Developer_Error_Reporting_Service( null, null, $transport );
 		$record    = $this->make_record( 'err-warn-1', Log_Severities::WARNING, Log_Categories::VALIDATION, 'Validation warning.' );
 
-		$result = $service->maybe_report( $record, array( 'site_reference_override' => 'test.local', 'repetition_count_24h' => 2 ) );
+		$result = $service->maybe_report(
+			$record,
+			array(
+				'site_reference_override' => 'test.local',
+				'repetition_count_24h'    => 2,
+			)
+		);
 
 		$this->assertFalse( $result->is_report_eligible() );
 		$this->assertSame( Developer_Report_Result::DELIVERY_SKIPPED, $result->get_delivery_status() );
@@ -141,11 +156,11 @@ final class Developer_Error_Reporting_Test extends TestCase {
 	}
 
 	public function test_failed_send_retry_state(): void {
-		$transport = new Stub_Developer_Error_Transport();
-		$transport->success = false;
+		$transport                 = new Stub_Developer_Error_Transport();
+		$transport->success        = false;
 		$transport->failure_reason = 'SMTP error.';
-		$service = new Developer_Error_Reporting_Service( null, null, $transport );
-		$record  = $this->make_record( 'err-fail-1', Log_Severities::CRITICAL, Log_Categories::EXECUTION, 'Critical failure.' );
+		$service                   = new Developer_Error_Reporting_Service( null, null, $transport );
+		$record                    = $this->make_record( 'err-fail-1', Log_Severities::CRITICAL, Log_Categories::EXECUTION, 'Critical failure.' );
 
 		$result = $service->maybe_report( $record, array( 'site_reference_override' => 'test.local' ) );
 
@@ -186,9 +201,9 @@ final class Developer_Error_Reporting_Test extends TestCase {
 	 * Example eligible redacted report payload (payload shape only) per prompt.
 	 */
 	public function test_example_eligible_redacted_report_payload(): void {
-		$captured = new \stdClass();
+		$captured           = new \stdClass();
 		$captured->envelope = null;
-		$stub    = new class( $captured ) implements Developer_Error_Transport_Interface {
+		$stub               = new class( $captured ) implements Developer_Error_Transport_Interface {
 			/** @var \stdClass */
 			public $ref;
 			public function __construct( \stdClass $ref ) {
@@ -196,17 +211,23 @@ final class Developer_Error_Reporting_Test extends TestCase {
 			}
 			public function send( array $envelope ): array {
 				$this->ref->envelope = $envelope;
-				return array( 'success' => true, 'failure_reason' => '' );
+				return array(
+					'success'        => true,
+					'failure_reason' => '',
+				);
 			}
 		};
-		$service = new Developer_Error_Reporting_Service( null, null, $stub );
-		$record  = $this->make_record( 'err-a1b2c3', Log_Severities::CRITICAL, Log_Categories::EXECUTION, 'Build Plan finalization failed at publish stage.' );
+		$service            = new Developer_Error_Reporting_Service( null, null, $stub );
+		$record             = $this->make_record( 'err-a1b2c3', Log_Severities::CRITICAL, Log_Categories::EXECUTION, 'Build Plan finalization failed at publish stage.' );
 
-		$service->maybe_report( $record, array(
-			'site_reference_override' => 'example.com',
-			'expected_behavior'        => 'Plan state transitions to finalized; changes published.',
-			'actual_behavior'          => 'Publish step returned error; plan left in confirmation state.',
-		) );
+		$service->maybe_report(
+			$record,
+			array(
+				'site_reference_override' => 'example.com',
+				'expected_behavior'       => 'Plan state transitions to finalized; changes published.',
+				'actual_behavior'         => 'Publish step returned error; plan left in confirmation state.',
+			)
+		);
 
 		$this->assertNotNull( $captured->envelope );
 		$payload = $captured->envelope['payload'] ?? array();

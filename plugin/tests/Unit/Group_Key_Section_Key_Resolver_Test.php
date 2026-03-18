@@ -30,7 +30,7 @@ final class Group_Key_Section_Key_Resolver_Test extends TestCase {
 	}
 
 	public function test_resolution_consistent_with_forward_generator(): void {
-		$r = $this->resolver();
+		$r            = $this->resolver();
 		$section_keys = array( 'st01_hero', 'st05_faq', 'child_detail_location_local_01' );
 		foreach ( $section_keys as $sk ) {
 			$group_key = Field_Key_Generator::group_key( $sk );
@@ -61,8 +61,8 @@ final class Group_Key_Section_Key_Resolver_Test extends TestCase {
 	}
 
 	public function test_group_keys_to_section_keys_deduplicates_and_skips_invalid(): void {
-		$r = $this->resolver();
-		$group_keys = array( 'group_aio_st01_hero', 'group_aio_st05_faq', 'group_aio_st01_hero', 'group_foreign_xyz', 'invalid' );
+		$r            = $this->resolver();
+		$group_keys   = array( 'group_aio_st01_hero', 'group_aio_st05_faq', 'group_aio_st01_hero', 'group_foreign_xyz', 'invalid' );
 		$section_keys = $r->group_keys_to_section_keys( $group_keys );
 		$this->assertSame( array( 'st01_hero', 'st05_faq' ), $section_keys );
 	}

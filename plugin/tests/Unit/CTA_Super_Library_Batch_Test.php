@@ -46,13 +46,13 @@ final class CTA_Super_Library_Batch_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']     = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$repo       = new Section_Template_Repository();
-		$normalizer = new Section_Definition_Normalizer();
-		$this->validator = new Section_Validator( $normalizer, $repo );
-		$bp_validator = new Section_Field_Blueprint_Validator();
-		$this->blueprint_service = new Section_Field_Blueprint_Service(
+		$repo                           = new Section_Template_Repository();
+		$normalizer                     = new Section_Definition_Normalizer();
+		$this->validator                = new Section_Validator( $normalizer, $repo );
+		$bp_validator                   = new Section_Field_Blueprint_Validator();
+		$this->blueprint_service        = new Section_Field_Blueprint_Service(
 			$repo,
 			$bp_validator,
 			new Section_Field_Blueprint_Normalizer( $bp_validator )
@@ -68,13 +68,32 @@ final class CTA_Super_Library_Batch_Test extends TestCase {
 		$keys = CTA_Super_Library_Batch_Definitions::section_keys();
 		$this->assertCount( 26, $keys );
 		$expected = array(
-			'cta_consultation_01', 'cta_consultation_02', 'cta_booking_01', 'cta_booking_02',
-			'cta_purchase_01', 'cta_purchase_02', 'cta_inquiry_01', 'cta_inquiry_02',
-			'cta_contact_01', 'cta_contact_02', 'cta_quote_request_01', 'cta_quote_request_02',
-			'cta_directory_nav_01', 'cta_compare_next_01', 'cta_trust_confirm_01', 'cta_trust_confirm_02',
-			'cta_local_action_01', 'cta_local_action_02', 'cta_service_detail_01', 'cta_service_detail_02',
-			'cta_product_detail_01', 'cta_product_detail_02', 'cta_support_01', 'cta_support_02',
-			'cta_policy_utility_01', 'cta_policy_utility_02',
+			'cta_consultation_01',
+			'cta_consultation_02',
+			'cta_booking_01',
+			'cta_booking_02',
+			'cta_purchase_01',
+			'cta_purchase_02',
+			'cta_inquiry_01',
+			'cta_inquiry_02',
+			'cta_contact_01',
+			'cta_contact_02',
+			'cta_quote_request_01',
+			'cta_quote_request_02',
+			'cta_directory_nav_01',
+			'cta_compare_next_01',
+			'cta_trust_confirm_01',
+			'cta_trust_confirm_02',
+			'cta_local_action_01',
+			'cta_local_action_02',
+			'cta_service_detail_01',
+			'cta_service_detail_02',
+			'cta_product_detail_01',
+			'cta_product_detail_02',
+			'cta_support_01',
+			'cta_support_02',
+			'cta_policy_utility_01',
+			'cta_policy_utility_02',
 		);
 		foreach ( $expected as $k ) {
 			$this->assertContains( $k, $keys );
@@ -90,7 +109,7 @@ final class CTA_Super_Library_Batch_Test extends TestCase {
 		$normalizer = new Section_Definition_Normalizer();
 		foreach ( CTA_Super_Library_Batch_Definitions::all_definitions() as $def ) {
 			$normalized = $normalizer->normalize( $def );
-			$errors = $this->validator->validate_completeness( $normalized );
+			$errors     = $this->validator->validate_completeness( $normalized );
 			$this->assertEmpty( $errors, 'Definition ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '?' ) . ' should pass completeness: ' . implode( ', ', $errors ) );
 		}
 	}
@@ -127,7 +146,7 @@ final class CTA_Super_Library_Batch_Test extends TestCase {
 	}
 
 	public function test_cta_metadata_completeness(): void {
-		$allowed_intent = array( 'consultation', 'booking', 'purchase', 'inquiry', 'contact', 'quote_request', 'directory_nav', 'compare_next', 'trust_confirm', 'local_action', 'service_detail', 'product_detail', 'support', 'policy_utility' );
+		$allowed_intent   = array( 'consultation', 'booking', 'purchase', 'inquiry', 'contact', 'quote_request', 'directory_nav', 'compare_next', 'trust_confirm', 'local_action', 'service_detail', 'product_detail', 'support', 'policy_utility' );
 		$allowed_strength = array( 'subtle', 'strong', 'media_backed', 'proof_backed', 'minimalist' );
 		foreach ( CTA_Super_Library_Batch_Definitions::all_definitions() as $def ) {
 			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
@@ -153,7 +172,7 @@ final class CTA_Super_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_accessibility_guidance(): void {
 		foreach ( CTA_Super_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$guidance = (string) ( $def['accessibility_warnings_or_enhancements'] ?? '' );
 			$this->assertNotEmpty( $guidance, "Section {$key} must have accessibility_warnings_or_enhancements" );
 			$this->assertMatchesRegularExpression( '/label|contrast|focus|omit|51\.3/i', $guidance, "Section {$key} should reference label, contrast, or focus (spec §51.3)" );
@@ -162,7 +181,7 @@ final class CTA_Super_Library_Batch_Test extends TestCase {
 
 	public function test_preview_defaults_non_empty_and_include_primary_button_label(): void {
 		foreach ( CTA_Super_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$defaults = $def['preview_defaults'] ?? array();
 			$this->assertIsArray( $defaults );
 			$this->assertNotEmpty( $defaults, "Section {$key} must have non-empty preview_defaults" );
@@ -188,9 +207,9 @@ final class CTA_Super_Library_Batch_Test extends TestCase {
 
 	public function test_seeder_run_returns_success_and_twenty_six_section_ids(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 700;
-		$GLOBALS['_aio_wp_query_posts']       = array();
-		$repo   = new Section_Template_Repository();
-		$result = CTA_Super_Library_Batch_Seeder::run( $repo );
+		$GLOBALS['_aio_wp_query_posts']        = array();
+		$repo                                  = new Section_Template_Repository();
+		$result                                = CTA_Super_Library_Batch_Seeder::run( $repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'section_ids', $result );

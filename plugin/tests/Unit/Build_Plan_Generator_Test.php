@@ -39,34 +39,34 @@ final class Build_Plan_Generator_Test extends TestCase {
 
 	private function valid_normalized_output(): array {
 		return array(
-			Build_Plan_Draft_Schema::KEY_SCHEMA_VERSION => '1',
-			Build_Plan_Draft_Schema::KEY_RUN_SUMMARY => array(
+			Build_Plan_Draft_Schema::KEY_SCHEMA_VERSION   => '1',
+			Build_Plan_Draft_Schema::KEY_RUN_SUMMARY      => array(
 				Build_Plan_Draft_Schema::RUN_SUMMARY_SUMMARY_TEXT => 'Draft plan for contact focus.',
 				Build_Plan_Draft_Schema::RUN_SUMMARY_PLANNING_MODE => 'mixed',
 				Build_Plan_Draft_Schema::RUN_SUMMARY_OVERALL_CONFIDENCE => 'medium',
 			),
-			Build_Plan_Draft_Schema::KEY_SITE_PURPOSE => array( 'summary' => 'Local firm.' ),
-			Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE => array(
+			Build_Plan_Draft_Schema::KEY_SITE_PURPOSE     => array( 'summary' => 'Local firm.' ),
+			Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE   => array(
 				'recommended_top_level_pages' => array( 'Home', 'About' ),
-				'navigation_summary' => 'Home, About, Contact.',
+				'navigation_summary'          => 'Home, About, Contact.',
 			),
 			Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES => array(
 				array(
-					'current_page_url' => '/',
+					'current_page_url'   => '/',
 					'current_page_title' => 'Home',
-					'action' => 'keep',
-					'reason' => 'Keep as is.',
-					'risk_level' => 'low',
-					'confidence' => 'high',
+					'action'             => 'keep',
+					'reason'             => 'Keep as is.',
+					'risk_level'         => 'low',
+					'confidence'         => 'high',
 				),
 			),
 			Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE => array(),
 			Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN => array(),
 			Build_Plan_Draft_Schema::KEY_DESIGN_TOKEN_RECOMMENDATIONS => array(),
 			Build_Plan_Draft_Schema::KEY_SEO_RECOMMENDATIONS => array(),
-			Build_Plan_Draft_Schema::KEY_WARNINGS => array(),
-			Build_Plan_Draft_Schema::KEY_ASSUMPTIONS => array(),
-			Build_Plan_Draft_Schema::KEY_CONFIDENCE => array( 'overall' => 'medium' ),
+			Build_Plan_Draft_Schema::KEY_WARNINGS         => array(),
+			Build_Plan_Draft_Schema::KEY_ASSUMPTIONS      => array(),
+			Build_Plan_Draft_Schema::KEY_CONFIDENCE       => array( 'overall' => 'medium' ),
 		);
 	}
 
@@ -94,10 +94,10 @@ final class Build_Plan_Generator_Test extends TestCase {
 
 	public function test_generate_succeeds_with_valid_normalized_output_and_persists_plan(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 42;
-		$repo   = new Build_Plan_Repository();
-		$item   = new Build_Plan_Item_Generator();
-		$gen    = new Build_Plan_Generator( $repo, $item );
-		$result = $gen->generate( $this->valid_normalized_output(), 'run-1', 'run-1:normalized_output', array() );
+		$repo                                  = new Build_Plan_Repository();
+		$item                                  = new Build_Plan_Item_Generator();
+		$gen                                   = new Build_Plan_Generator( $repo, $item );
+		$result                                = $gen->generate( $this->valid_normalized_output(), 'run-1', 'run-1:normalized_output', array() );
 		$this->assertTrue( $result->is_success(), implode( ', ', $result->get_errors() ) );
 		$this->assertNotNull( $result->get_plan_id() );
 		$this->assertStringStartsWith( 'aio-plan-', $result->get_plan_id() );
@@ -112,9 +112,9 @@ final class Build_Plan_Generator_Test extends TestCase {
 
 	public function test_generated_plan_has_overview_and_confirmation_steps(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 1;
-		$repo   = new Build_Plan_Repository();
-		$gen    = new Build_Plan_Generator( $repo, new Build_Plan_Item_Generator() );
-		$result = $gen->generate( $this->valid_normalized_output(), 'run-1', 'run-1:out', array() );
+		$repo                                  = new Build_Plan_Repository();
+		$gen                                   = new Build_Plan_Generator( $repo, new Build_Plan_Item_Generator() );
+		$result                                = $gen->generate( $this->valid_normalized_output(), 'run-1', 'run-1:out', array() );
 		$this->assertTrue( $result->is_success() );
 		$steps = $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ];
 		$types = array_column( $steps, Build_Plan_Item_Schema::KEY_STEP_TYPE );
@@ -124,9 +124,11 @@ final class Build_Plan_Generator_Test extends TestCase {
 	}
 
 	public function test_omitted_report_structure(): void {
-		$report = Omitted_Recommendation_Report::report( array(
-			Omitted_Recommendation_Report::entry( 'existing_page_changes', 0, 'insufficient_data', 'Missing: action', null ),
-		) );
+		$report = Omitted_Recommendation_Report::report(
+			array(
+				Omitted_Recommendation_Report::entry( 'existing_page_changes', 0, 'insufficient_data', 'Missing: action', null ),
+			)
+		);
 		$this->assertArrayHasKey( 'omitted', $report );
 		$this->assertArrayHasKey( 'count', $report );
 		$this->assertSame( 1, $report['count'] );
@@ -136,7 +138,12 @@ final class Build_Plan_Generator_Test extends TestCase {
 
 	public function test_item_generator_omits_record_with_missing_required_fields(): void {
 		$item_gen = new Build_Plan_Item_Generator();
-		$records  = array( array( 'current_page_url' => '/', 'current_page_title' => 'Home' ) );
+		$records  = array(
+			array(
+				'current_page_url'   => '/',
+				'current_page_title' => 'Home',
+			),
+		);
 		$out      = $item_gen->generate_for_section( Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES, $records, 'plan-x' );
 		$this->assertEmpty( $out['items'] );
 		$this->assertCount( 1, $out['omitted'] );
@@ -145,15 +152,17 @@ final class Build_Plan_Generator_Test extends TestCase {
 
 	public function test_item_generator_produces_item_with_source_section_and_index(): void {
 		$item_gen = new Build_Plan_Item_Generator();
-		$records  = array( array(
-			'current_page_url' => '/',
-			'current_page_title' => 'Home',
-			'action' => 'keep',
-			'reason' => 'Keep.',
-			'risk_level' => 'low',
-			'confidence' => 'high',
-		) );
-		$out = $item_gen->generate_for_section( Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES, $records, 'plan-x' );
+		$records  = array(
+			array(
+				'current_page_url'   => '/',
+				'current_page_title' => 'Home',
+				'action'             => 'keep',
+				'reason'             => 'Keep.',
+				'risk_level'         => 'low',
+				'confidence'         => 'high',
+			),
+		);
+		$out      = $item_gen->generate_for_section( Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES, $records, 'plan-x' );
 		$this->assertCount( 1, $out['items'] );
 		$this->assertSame( Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES, $out['items'][0]['source_section'] );
 		$this->assertSame( 0, $out['items'][0]['source_index'] );
@@ -165,11 +174,16 @@ final class Build_Plan_Generator_Test extends TestCase {
 	 */
 	public function test_example_generated_plan_root_payload(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 100;
-		$repo   = new Build_Plan_Repository();
-		$gen    = new Build_Plan_Generator( $repo, new Build_Plan_Item_Generator() );
-		$result = $gen->generate( $this->valid_normalized_output(), 'run-1', 'run-1:normalized_output', array(
-			'crawl_snapshot_ref' => 'crawl-123',
-		) );
+		$repo                                  = new Build_Plan_Repository();
+		$gen                                   = new Build_Plan_Generator( $repo, new Build_Plan_Item_Generator() );
+		$result                                = $gen->generate(
+			$this->valid_normalized_output(),
+			'run-1',
+			'run-1:normalized_output',
+			array(
+				'crawl_snapshot_ref' => 'crawl-123',
+			)
+		);
 		$this->assertTrue( $result->is_success() );
 		$payload = $result->get_plan_payload();
 		// Root keys (example shape for spec §30.1).
@@ -200,7 +214,7 @@ final class Build_Plan_Generator_Test extends TestCase {
 			Omitted_Recommendation_Report::entry( 'existing_page_changes', 0, 'insufficient_data', 'Missing: action', null ),
 			Omitted_Recommendation_Report::entry( 'new_pages_to_create', 1, 'invalid_reference', 'Unknown template_key', array( 'proposed_page_title' => 'Extra' ) ),
 		);
-		$report = Omitted_Recommendation_Report::report( $entries );
+		$report  = Omitted_Recommendation_Report::report( $entries );
 		$this->assertSame( array( 'omitted', 'count' ), array_keys( $report ) );
 		$this->assertCount( 2, $report['omitted'] );
 		$this->assertSame( 2, $report['count'] );

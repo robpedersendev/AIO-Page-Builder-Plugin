@@ -31,7 +31,7 @@ require_once $plugin_root . '/src/Domain/AI/Providers/Stub_AI_Provider_Driver.ph
  * In-memory secret store for tests. No secrets in logs.
  */
 final class Driver_Test_Secret_Store implements Provider_Secret_Store_Interface {
-	private array $creds = array();
+	private array $creds  = array();
 	private array $states = array();
 
 	public function get_credential_for_provider( string $provider_id ): ?string {
@@ -47,7 +47,7 @@ final class Driver_Test_Secret_Store implements Provider_Secret_Store_Interface 
 	}
 
 	public function set_credential( string $provider_id, string $value ): bool {
-		$this->creds[ $provider_id ]   = $value;
+		$this->creds[ $provider_id ]  = $value;
 		$this->states[ $provider_id ] = self::STATE_CONFIGURED;
 		return true;
 	}
@@ -62,7 +62,7 @@ final class Driver_Test_Secret_Store implements Provider_Secret_Store_Interface 
 final class Provider_Driver_Base_Test extends TestCase {
 
 	public function test_error_normalizer_maps_401_to_auth_failure(): void {
-		$n = new Provider_Error_Normalizer();
+		$n   = new Provider_Error_Normalizer();
 		$cat = $n->map_to_category( 401, null, null );
 		$this->assertSame( Provider_Response_Normalizer::ERROR_AUTH_FAILURE, $cat );
 	}
@@ -89,7 +89,7 @@ final class Provider_Driver_Base_Test extends TestCase {
 	}
 
 	public function test_error_normalizer_build_error_response_has_normalized_envelope(): void {
-		$n = new Provider_Error_Normalizer();
+		$n   = new Provider_Error_Normalizer();
 		$res = $n->build_error_response( 'req-1', 'openai', 'gpt-4o', Provider_Response_Normalizer::ERROR_RATE_LIMIT, 'Rate limit exceeded' );
 		$this->assertFalse( $res['success'] );
 		$this->assertSame( 'req-1', $res['request_id'] );
@@ -102,16 +102,21 @@ final class Provider_Driver_Base_Test extends TestCase {
 	}
 
 	public function test_redact_provider_message_strips_sk_prefix(): void {
-		$n = new Provider_Error_Normalizer();
+		$n        = new Provider_Error_Normalizer();
 		$redacted = $n->redact_provider_message( 'Invalid key: sk-abc123def456ghi789jqxyz012345' );
 		$this->assertStringNotContainsString( 'sk-abc', $redacted ?? '' );
 		$this->assertStringContainsString( '[REDACTED]', $redacted ?? '' );
 	}
 
 	public function test_safe_failure_when_credentials_absent(): void {
-		$store = new Driver_Test_Secret_Store();
-		$driver = new Stub_AI_Provider_Driver( $store, array(), array( 'structured_payload' => array() ) );
-		$request = array( 'request_id' => 'r1', 'model' => 'stub-model', 'system_prompt' => 'Hi', 'user_message' => 'Hi' );
+		$store    = new Driver_Test_Secret_Store();
+		$driver   = new Stub_AI_Provider_Driver( $store, array(), array( 'structured_payload' => array() ) );
+		$request  = array(
+			'request_id'    => 'r1',
+			'model'         => 'stub-model',
+			'system_prompt' => 'Hi',
+			'user_message'  => 'Hi',
+		);
 		$response = $driver->request( $request );
 		$this->assertFalse( $response['success'] );
 		$this->assertSame( Provider_Response_Normalizer::ERROR_AUTH_FAILURE, $response['normalized_error']['category'] );
@@ -121,26 +126,26 @@ final class Provider_Driver_Base_Test extends TestCase {
 	public function test_capability_resolver_returns_driver_capabilities(): void {
 		$store = new Driver_Test_Secret_Store();
 		$store->set_credential( 'stub', 'test-key' );
-		$driver = new Stub_AI_Provider_Driver( $store );
+		$driver   = new Stub_AI_Provider_Driver( $store );
 		$resolver = new Provider_Capability_Resolver();
-		$cap = $resolver->get_capabilities( $driver );
+		$cap      = $resolver->get_capabilities( $driver );
 		$this->assertSame( 'stub', $cap['provider_id'] );
 		$this->assertTrue( $cap['structured_output_supported'] );
 		$this->assertArrayHasKey( 'models', $cap );
 	}
 
 	public function test_capability_resolver_supports_schema(): void {
-		$store = new Driver_Test_Secret_Store();
-		$driver = new Stub_AI_Provider_Driver( $store );
+		$store    = new Driver_Test_Secret_Store();
+		$driver   = new Stub_AI_Provider_Driver( $store );
 		$resolver = new Provider_Capability_Resolver();
 		$this->assertTrue( $resolver->supports_schema( $driver, 'aio/build-plan-draft-v1' ) );
 	}
 
 	public function test_capability_resolver_resolve_default_model_for_planning(): void {
-		$store = new Driver_Test_Secret_Store();
-		$driver = new Stub_AI_Provider_Driver( $store );
+		$store    = new Driver_Test_Secret_Store();
+		$driver   = new Stub_AI_Provider_Driver( $store );
 		$resolver = new Provider_Capability_Resolver();
-		$model = $resolver->resolve_default_model_for_planning( $driver, 'aio/build-plan-draft-v1' );
+		$model    = $resolver->resolve_default_model_for_planning( $driver, 'aio/build-plan-draft-v1' );
 		$this->assertSame( 'stub-model', $model );
 	}
 
@@ -154,11 +159,17 @@ final class Provider_Driver_Base_Test extends TestCase {
 
 	public function test_request_context_builder_produces_normalized_request(): void {
 		$builder = new Provider_Request_Context_Builder();
-		$ctx = $builder->build( 'req-1', 'gpt-4o', 'You are a planner.', 'Analyze this.', array(
-			'structured_output_schema_ref' => 'aio/build-plan-draft-v1',
-			'max_tokens' => 4096,
-			'timeout_seconds' => 60,
-		) );
+		$ctx     = $builder->build(
+			'req-1',
+			'gpt-4o',
+			'You are a planner.',
+			'Analyze this.',
+			array(
+				'structured_output_schema_ref' => 'aio/build-plan-draft-v1',
+				'max_tokens'                   => 4096,
+				'timeout_seconds'              => 60,
+			)
+		);
 		$this->assertSame( 'req-1', $ctx['request_id'] );
 		$this->assertSame( 'gpt-4o', $ctx['model'] );
 		$this->assertSame( 'You are a planner.', $ctx['system_prompt'] );
@@ -173,11 +184,26 @@ final class Provider_Driver_Base_Test extends TestCase {
 		$store = new Driver_Test_Secret_Store();
 		$store->set_credential( 'stub', 'key' );
 		$driver = new Stub_AI_Provider_Driver( $store );
-		$driver->set_success_result( array(
-			'structured_payload' => array( 'schema_version' => '1', 'run_summary' => array() ),
-			'usage' => array( 'prompt_tokens' => 100, 'completion_tokens' => 50, 'total_tokens' => 150, 'cost_placeholder' => null ),
-		) );
-		$request = array( 'request_id' => 'req-ok', 'model' => 'stub-model', 'system_prompt' => '', 'user_message' => '' );
+		$driver->set_success_result(
+			array(
+				'structured_payload' => array(
+					'schema_version' => '1',
+					'run_summary'    => array(),
+				),
+				'usage'              => array(
+					'prompt_tokens'     => 100,
+					'completion_tokens' => 50,
+					'total_tokens'      => 150,
+					'cost_placeholder'  => null,
+				),
+			)
+		);
+		$request  = array(
+			'request_id'    => 'req-ok',
+			'model'         => 'stub-model',
+			'system_prompt' => '',
+			'user_message'  => '',
+		);
 		$response = $driver->request( $request );
 		$this->assertTrue( $response['success'] );
 		$this->assertSame( 'req-ok', $response['request_id'] );
@@ -195,7 +221,12 @@ final class Provider_Driver_Base_Test extends TestCase {
 		$store->set_credential( 'stub', 'key' );
 		$driver = new Stub_AI_Provider_Driver( $store );
 		$driver->set_error_result( 429, 'rate_limit_exceeded', 'Rate limit exceeded' );
-		$request = array( 'request_id' => 'req-err', 'model' => 'stub-model', 'system_prompt' => '', 'user_message' => '' );
+		$request  = array(
+			'request_id'    => 'req-err',
+			'model'         => 'stub-model',
+			'system_prompt' => '',
+			'user_message'  => '',
+		);
 		$response = $driver->request( $request );
 		$this->assertFalse( $response['success'] );
 		$this->assertSame( 'req-err', $response['request_id'] );
@@ -212,7 +243,12 @@ final class Provider_Driver_Base_Test extends TestCase {
 		$store->set_credential( 'stub', 'key' );
 		$driver = new Stub_AI_Provider_Driver( $store );
 		$driver->set_success_result( array( 'structured_payload' => array( 'schema_version' => '1' ) ) );
-		$request = array( 'request_id' => 'r', 'model' => 'm', 'system_prompt' => '', 'user_message' => '' );
+		$request  = array(
+			'request_id'    => 'r',
+			'model'         => 'm',
+			'system_prompt' => '',
+			'user_message'  => '',
+		);
 		$response = $driver->request( $request );
 		$this->assertArrayHasKey( 'request_id', $response );
 		$this->assertArrayHasKey( 'success', $response );
@@ -233,7 +269,7 @@ final class Provider_Driver_Base_Test extends TestCase {
 
 	public function test_build_from_segments_concatenates_system_and_user(): void {
 		$builder = new Provider_Request_Context_Builder();
-		$ctx = $builder->build_from_segments( 'r2', 'gpt-4o', array( 'system_base' => 'You are helpful.' ), array( 'planning' => 'Plan this.' ), array() );
+		$ctx     = $builder->build_from_segments( 'r2', 'gpt-4o', array( 'system_base' => 'You are helpful.' ), array( 'planning' => 'Plan this.' ), array() );
 		$this->assertSame( 'You are helpful.', $ctx['system_prompt'] );
 		$this->assertSame( 'Plan this.', $ctx['user_message'] );
 		$this->assertSame( 'r2', $ctx['request_id'] );

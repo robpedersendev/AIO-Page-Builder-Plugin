@@ -26,16 +26,16 @@ final class Industry_LPagery_Planning_Advisor_Test extends TestCase {
 	private function valid_rule( string $key, string $industry, string $posture ): array {
 		return array(
 			Industry_LPagery_Rule_Registry::FIELD_LPAGERY_RULE_KEY => $key,
-			Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY    => $industry,
-			Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER   => Industry_LPagery_Rule_Registry::SUPPORTED_SCHEMA_VERSION,
-			Industry_LPagery_Rule_Registry::FIELD_STATUS           => Industry_LPagery_Rule_Registry::STATUS_ACTIVE,
-			Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE  => $posture,
+			Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY => $industry,
+			Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => Industry_LPagery_Rule_Registry::SUPPORTED_SCHEMA_VERSION,
+			Industry_LPagery_Rule_Registry::FIELD_STATUS => Industry_LPagery_Rule_Registry::STATUS_ACTIVE,
+			Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE => $posture,
 		);
 	}
 
 	public function test_advise_returns_optional_when_no_registry(): void {
 		$advisor = new Industry_LPagery_Planning_Advisor( null );
-		$result = $advisor->advise( 'legal' );
+		$result  = $advisor->advise( 'legal' );
 		$this->assertInstanceOf( Industry_LPagery_Planning_Result::class, $result );
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL, $result->get_lpagery_posture() );
 		$this->assertSame( array(), $result->get_required_tokens() );
@@ -46,7 +46,7 @@ final class Industry_LPagery_Planning_Advisor_Test extends TestCase {
 		$registry = new Industry_LPagery_Rule_Registry();
 		$registry->load( array( $this->valid_rule( 'legal_01', 'legal', Industry_LPagery_Rule_Registry::POSTURE_CENTRAL ) ) );
 		$advisor = new Industry_LPagery_Planning_Advisor( $registry );
-		$result = $advisor->advise( '' );
+		$result  = $advisor->advise( '' );
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL, $result->get_lpagery_posture() );
 		$this->assertContains( 'no_industry_key', $result->get_warning_flags() );
 	}
@@ -55,7 +55,7 @@ final class Industry_LPagery_Planning_Advisor_Test extends TestCase {
 		$registry = new Industry_LPagery_Rule_Registry();
 		$registry->load( array( $this->valid_rule( 'legal_01', 'legal', Industry_LPagery_Rule_Registry::POSTURE_CENTRAL ) ) );
 		$advisor = new Industry_LPagery_Planning_Advisor( $registry );
-		$result = $advisor->advise( 'legal' );
+		$result  = $advisor->advise( 'legal' );
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_CENTRAL, $result->get_lpagery_posture() );
 		$this->assertSame( array(), $result->get_required_tokens() );
 	}
@@ -64,7 +64,7 @@ final class Industry_LPagery_Planning_Advisor_Test extends TestCase {
 		$registry = new Industry_LPagery_Rule_Registry();
 		$registry->load( array( $this->valid_rule( 'realtor_01', 'realtor', Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL ) ) );
 		$advisor = new Industry_LPagery_Planning_Advisor( $registry );
-		$result = $advisor->advise( 'realtor' );
+		$result  = $advisor->advise( 'realtor' );
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL, $result->get_lpagery_posture() );
 	}
 
@@ -72,18 +72,18 @@ final class Industry_LPagery_Planning_Advisor_Test extends TestCase {
 		$registry = new Industry_LPagery_Rule_Registry();
 		$registry->load( array( $this->valid_rule( 'cosmetic_01', 'cosmetology', Industry_LPagery_Rule_Registry::POSTURE_DISCOURAGED ) ) );
 		$advisor = new Industry_LPagery_Planning_Advisor( $registry );
-		$result = $advisor->advise( 'cosmetology' );
+		$result  = $advisor->advise( 'cosmetology' );
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_DISCOURAGED, $result->get_lpagery_posture() );
 	}
 
 	public function test_advise_aggregates_required_tokens_and_adds_warning_flag(): void {
 		$rule = $this->valid_rule( 'legal_01', 'legal', Industry_LPagery_Rule_Registry::POSTURE_CENTRAL );
 		$rule[ Industry_LPagery_Rule_Registry::FIELD_REQUIRED_TOKEN_REFS ] = array( '{{location_name}}', '{{service_title}}' );
-		$rule[ Industry_LPagery_Rule_Registry::FIELD_HIERARCHY_GUIDANCE ] = 'Use service-area hubs.';
+		$rule[ Industry_LPagery_Rule_Registry::FIELD_HIERARCHY_GUIDANCE ]  = 'Use service-area hubs.';
 		$registry = new Industry_LPagery_Rule_Registry();
 		$registry->load( array( $rule ) );
 		$advisor = new Industry_LPagery_Planning_Advisor( $registry );
-		$result = $advisor->advise( 'legal' );
+		$result  = $advisor->advise( 'legal' );
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_CENTRAL, $result->get_lpagery_posture() );
 		$this->assertSame( array( '{{location_name}}', '{{service_title}}' ), $result->get_required_tokens() );
 		$this->assertSame( 'Use service-area hubs.', $result->get_hierarchy_guidance() );
@@ -96,13 +96,13 @@ final class Industry_LPagery_Planning_Advisor_Test extends TestCase {
 		$registry->load( array( $this->valid_rule( 'legal_01', 'legal', Industry_LPagery_Rule_Registry::POSTURE_CENTRAL ) ) );
 		$advisor = new Industry_LPagery_Planning_Advisor( $registry );
 		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'legal' );
-		$result = $advisor->advise_from_profile( $profile );
+		$result  = $advisor->advise_from_profile( $profile );
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_CENTRAL, $result->get_lpagery_posture() );
 	}
 
 	public function test_advise_from_profile_returns_optional_when_primary_empty(): void {
 		$advisor = new Industry_LPagery_Planning_Advisor( null );
-		$result = $advisor->advise_from_profile( array() );
+		$result  = $advisor->advise_from_profile( array() );
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL, $result->get_lpagery_posture() );
 	}
 
@@ -116,7 +116,7 @@ final class Industry_LPagery_Planning_Advisor_Test extends TestCase {
 			'Guidance text',
 			array( 'weak_type' )
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_CENTRAL, $arr['lpagery_posture'] );
 		$this->assertSame( array( '{{loc}}' ), $arr['required_tokens'] );
 		$this->assertSame( array( '{{opt}}' ), $arr['optional_tokens'] );
@@ -132,7 +132,7 @@ final class Industry_LPagery_Planning_Advisor_Test extends TestCase {
 		$registry = new Industry_LPagery_Rule_Registry();
 		$registry->load( array( $rule ) );
 		$advisor = new Industry_LPagery_Planning_Advisor( $registry );
-		$result = $advisor->advise( 'legal' );
+		$result  = $advisor->advise( 'legal' );
 		$this->assertSame( Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL, $result->get_lpagery_posture() );
 		$this->assertSame( array(), $result->get_required_tokens() );
 		$this->assertContains( 'no_active_lpagery_rules', $result->get_warning_flags() );

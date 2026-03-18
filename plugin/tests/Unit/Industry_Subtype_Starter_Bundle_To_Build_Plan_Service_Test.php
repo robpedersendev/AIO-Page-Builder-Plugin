@@ -48,18 +48,18 @@ final class Industry_Subtype_Starter_Bundle_To_Build_Plan_Service_Test extends T
 
 	private function valid_bundle( string $bundle_key = 'realtor_starter', string $industry_key = 'realtor', string $subtype_key = '' ): array {
 		$bundle = array(
-			Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => $bundle_key,
+			Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY => $bundle_key,
 			Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => $industry_key,
-			Industry_Starter_Bundle_Registry::FIELD_LABEL        => 'Realtor Starter',
-			Industry_Starter_Bundle_Registry::FIELD_SUMMARY      => 'Curated starting set.',
-			Industry_Starter_Bundle_Registry::FIELD_STATUS       => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
+			Industry_Starter_Bundle_Registry::FIELD_LABEL  => 'Realtor Starter',
+			Industry_Starter_Bundle_Registry::FIELD_SUMMARY => 'Curated starting set.',
+			Industry_Starter_Bundle_Registry::FIELD_STATUS => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
 			Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => Industry_Starter_Bundle_Registry::SUPPORTED_SCHEMA_VERSION,
 		);
 		if ( $subtype_key !== '' ) {
 			$bundle[ Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY ] = $subtype_key;
 		}
 		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ] = array( 'pt_home' );
-		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ]     = array( 'hero_01' );
+		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ]       = array( 'hero_01' );
 		return $bundle;
 	}
 
@@ -93,7 +93,7 @@ final class Industry_Subtype_Starter_Bundle_To_Build_Plan_Service_Test extends T
 
 	public function test_convert_to_draft_with_valid_subtype_bundle_delegates_and_succeeds(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 43;
-		$registry = new Industry_Starter_Bundle_Registry();
+		$registry                              = new Industry_Starter_Bundle_Registry();
 		$registry->load( array( $this->valid_bundle( 'realtor_buyer_starter', 'realtor', 'realtor_buyer_agent' ) ) );
 		$service = $this->create_subtype_service( $registry );
 		$result  = $service->convert_to_draft( 'realtor_buyer_starter', array() );
@@ -111,7 +111,7 @@ final class Industry_Subtype_Starter_Bundle_To_Build_Plan_Service_Test extends T
 
 	public function test_convert_to_draft_falls_back_to_parent_bundle_when_bundle_missing_but_industry_key_provided(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 44;
-		$registry = new Industry_Starter_Bundle_Registry();
+		$registry                              = new Industry_Starter_Bundle_Registry();
 		$registry->load( array( $this->valid_bundle( 'realtor_starter', 'realtor', '' ) ) );
 		$service = $this->create_subtype_service( $registry );
 		$result  = $service->convert_to_draft( 'nonexistent_subtype_bundle', array( 'industry_key' => 'realtor' ) );

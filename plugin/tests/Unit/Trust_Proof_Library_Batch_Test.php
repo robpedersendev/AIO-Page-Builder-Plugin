@@ -46,13 +46,13 @@ final class Trust_Proof_Library_Batch_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']     = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$repo       = new Section_Template_Repository();
-		$normalizer = new Section_Definition_Normalizer();
-		$this->validator = new Section_Validator( $normalizer, $repo );
-		$bp_validator = new Section_Field_Blueprint_Validator();
-		$this->blueprint_service = new Section_Field_Blueprint_Service(
+		$repo                           = new Section_Template_Repository();
+		$normalizer                     = new Section_Definition_Normalizer();
+		$this->validator                = new Section_Validator( $normalizer, $repo );
+		$bp_validator                   = new Section_Field_Blueprint_Validator();
+		$this->blueprint_service        = new Section_Field_Blueprint_Service(
 			$repo,
 			$bp_validator,
 			new Section_Field_Blueprint_Normalizer( $bp_validator )
@@ -68,10 +68,24 @@ final class Trust_Proof_Library_Batch_Test extends TestCase {
 		$keys = Trust_Proof_Library_Batch_Definitions::section_keys();
 		$this->assertCount( 18, $keys );
 		$expected = array(
-			'tp_testimonial_01', 'tp_testimonial_02', 'tp_review_01', 'tp_credential_01', 'tp_credential_02',
-			'tp_guarantee_01', 'tp_case_teaser_01', 'tp_outcome_01', 'tp_badge_01', 'tp_certification_01',
-			'tp_client_logo_01', 'tp_authority_01', 'tp_reassurance_01', 'tp_faq_microproof_01', 'tp_partner_01',
-			'tp_rating_01', 'tp_quote_01', 'tp_trust_band_01',
+			'tp_testimonial_01',
+			'tp_testimonial_02',
+			'tp_review_01',
+			'tp_credential_01',
+			'tp_credential_02',
+			'tp_guarantee_01',
+			'tp_case_teaser_01',
+			'tp_outcome_01',
+			'tp_badge_01',
+			'tp_certification_01',
+			'tp_client_logo_01',
+			'tp_authority_01',
+			'tp_reassurance_01',
+			'tp_faq_microproof_01',
+			'tp_partner_01',
+			'tp_rating_01',
+			'tp_quote_01',
+			'tp_trust_band_01',
 		);
 		foreach ( $expected as $k ) {
 			$this->assertContains( $k, $keys );
@@ -87,7 +101,7 @@ final class Trust_Proof_Library_Batch_Test extends TestCase {
 		$normalizer = new Section_Definition_Normalizer();
 		foreach ( Trust_Proof_Library_Batch_Definitions::all_definitions() as $def ) {
 			$normalized = $normalizer->normalize( $def );
-			$errors = $this->validator->validate_completeness( $normalized );
+			$errors     = $this->validator->validate_completeness( $normalized );
 			$this->assertEmpty( $errors, 'Definition ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '?' ) . ' should pass completeness: ' . implode( ', ', $errors ) );
 		}
 	}
@@ -117,9 +131,9 @@ final class Trust_Proof_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_helper_and_css_contract_refs(): void {
 		foreach ( Trust_Proof_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key        = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$helper_ref = (string) ( $def[ Section_Schema::FIELD_HELPER_REF ] ?? '' );
-			$css_ref = (string) ( $def[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' );
+			$css_ref    = (string) ( $def[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' );
 			$this->assertNotSame( '', $helper_ref, "Section {$key} must have non-empty helper_ref" );
 			$this->assertNotSame( '', $css_ref, "Section {$key} must have non-empty css_contract_ref" );
 		}
@@ -147,7 +161,7 @@ final class Trust_Proof_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_accessibility_and_contrast_guidance(): void {
 		foreach ( Trust_Proof_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$guidance = (string) ( $def['accessibility_warnings_or_enhancements'] ?? '' );
 			$this->assertNotEmpty( $guidance, "Section {$key} must have accessibility_warnings_or_enhancements" );
 			$this->assertMatchesRegularExpression( '/contrast|color/i', $guidance, "Section {$key} should reference contrast or color (spec §51.8)" );
@@ -156,7 +170,7 @@ final class Trust_Proof_Library_Batch_Test extends TestCase {
 
 	public function test_preview_defaults_coverage(): void {
 		foreach ( Trust_Proof_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$defaults = $def['preview_defaults'] ?? array();
 			$this->assertIsArray( $defaults, "Section {$key} must have preview_defaults array" );
 			$this->assertNotEmpty( $defaults, "Section {$key} preview_defaults must not be empty for preview realism" );
@@ -190,9 +204,9 @@ final class Trust_Proof_Library_Batch_Test extends TestCase {
 
 	public function test_seeder_run_returns_success_and_eighteen_section_ids(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 200;
-		$GLOBALS['_aio_wp_query_posts']       = array();
-		$repo   = new Section_Template_Repository();
-		$result = Trust_Proof_Library_Batch_Seeder::run( $repo );
+		$GLOBALS['_aio_wp_query_posts']        = array();
+		$repo                                  = new Section_Template_Repository();
+		$result                                = Trust_Proof_Library_Batch_Seeder::run( $repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'section_ids', $result );

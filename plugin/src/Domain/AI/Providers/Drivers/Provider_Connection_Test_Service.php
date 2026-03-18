@@ -45,7 +45,7 @@ final class Provider_Connection_Test_Service {
 		Settings_Service $settings
 	) {
 		$this->request_context_builder = $request_context_builder;
-		$this->capability_resolver      = $capability_resolver;
+		$this->capability_resolver     = $capability_resolver;
 		$this->settings                = $settings;
 	}
 
@@ -66,9 +66,9 @@ final class Provider_Connection_Test_Service {
 				array(
 					'category'      => 'unsupported_feature',
 					'user_message'  => 'No model available for connection test.',
-					'internal_code'  => 'unsupported_feature',
-					'provider_raw'   => null,
-					'retry_posture'  => 'no_retry',
+					'internal_code' => 'unsupported_feature',
+					'provider_raw'  => null,
+					'retry_posture' => 'no_retry',
 				),
 				gmdate( 'c' ),
 				'No model available for connection test.'
@@ -84,12 +84,12 @@ final class Provider_Connection_Test_Service {
 			'',
 			'Connection test.',
 			array(
-				'max_tokens'       => self::CONNECTION_TEST_MAX_TOKENS,
-				'timeout_seconds'  => self::CONNECTION_TEST_TIMEOUT,
+				'max_tokens'      => self::CONNECTION_TEST_MAX_TOKENS,
+				'timeout_seconds' => self::CONNECTION_TEST_TIMEOUT,
 			)
 		);
 
-		$response = $driver->request( $request );
+		$response  = $driver->request( $request );
 		$tested_at = gmdate( 'c' );
 
 		if ( ! empty( $response['success'] ) ) {
@@ -154,9 +154,9 @@ final class Provider_Connection_Test_Service {
 	/**
 	 * Persists connection test result and optionally last_successful_use. No secrets.
 	 *
-	 * @param string                        $provider_id        Provider id.
+	 * @param string                          $provider_id        Provider id.
 	 * @param Provider_Connection_Test_Result $result           Test result.
-	 * @param string|null                  $last_successful_use ISO 8601 when test succeeded; null to leave unchanged.
+	 * @param string|null                     $last_successful_use ISO 8601 when test succeeded; null to leave unchanged.
 	 * @return void
 	 */
 	private function persist_result( string $provider_id, Provider_Connection_Test_Result $result, ?string $last_successful_use ): void {
@@ -193,7 +193,7 @@ final class Provider_Connection_Test_Service {
 			$entry = array();
 		}
 		$entry['last_successful_use'] = $timestamp;
-		$health[ $provider_id ]      = $entry;
+		$health[ $provider_id ]       = $entry;
 		$this->settings->set( Option_Names::PROVIDER_HEALTH_STATE, $health );
 	}
 }

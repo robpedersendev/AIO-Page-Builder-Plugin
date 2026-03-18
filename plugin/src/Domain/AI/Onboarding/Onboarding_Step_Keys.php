@@ -26,9 +26,9 @@ final class Onboarding_Step_Keys {
 	public const CRAWL_PREFERENCES     = 'crawl_preferences';
 	public const PROVIDER_SETUP        = 'provider_setup';
 	/** Template-style preference signals (Prompt 212); advisory only. */
-	public const TEMPLATE_PREFERENCES  = 'template_preferences';
-	public const REVIEW                = 'review';
-	public const SUBMISSION            = 'submission';
+	public const TEMPLATE_PREFERENCES = 'template_preferences';
+	public const REVIEW               = 'review';
+	public const SUBMISSION           = 'submission';
 
 	/**
 	 * Ordered list of step keys (canonical order).

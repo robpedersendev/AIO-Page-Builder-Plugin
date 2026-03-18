@@ -66,9 +66,9 @@ final class Entity_Style_Form_Builder {
 			if ( $group === 'component' ) {
 				continue;
 			}
-			$names = $this->token_registry->get_allowed_names_for_group( $group );
-			$san   = $this->token_registry->get_sanitization_for_group( $group );
-			$max   = isset( $san['max_length'] ) && is_numeric( $san['max_length'] ) ? (int) $san['max_length'] : self::DEFAULT_MAX_LENGTH;
+			$names      = $this->token_registry->get_allowed_names_for_group( $group );
+			$san        = $this->token_registry->get_sanitization_for_group( $group );
+			$max        = isset( $san['max_length'] ) && is_numeric( $san['max_length'] ) ? (int) $san['max_length'] : self::DEFAULT_MAX_LENGTH;
 			$value_type = isset( $san['value_type'] ) && is_string( $san['value_type'] ) ? $san['value_type'] : 'text';
 			foreach ( $names as $name ) {
 				$value = isset( $current[ $group ][ $name ] ) && is_string( $current[ $group ][ $name ] )
@@ -99,9 +99,9 @@ final class Entity_Style_Form_Builder {
 		if ( ! Entity_Style_Payload_Schema::is_allowed_entity_type( $entity_type ) || ! $this->component_registry->is_loaded() ) {
 			return array();
 		}
-		$payload   = $this->payload_repository->get_payload( $entity_type, $entity_key );
-		$current   = $payload[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] ?? array();
-		$out       = array();
+		$payload       = $this->payload_repository->get_payload( $entity_type, $entity_key );
+		$current       = $payload[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] ?? array();
+		$out           = array();
 		$component_ids = $this->component_registry->get_component_ids();
 		foreach ( $component_ids as $component_id ) {
 			$allowed = $this->component_registry->get_allowed_token_overrides( $component_id );
@@ -110,12 +110,12 @@ final class Entity_Style_Form_Builder {
 					? $current[ $component_id ][ $token_var_name ]
 					: '';
 				$out[] = array(
-					'component_id'    => $component_id,
-					'token_var_name'  => $token_var_name,
-					'name_attr'       => self::FORM_KEY . '[component_overrides][' . \esc_attr( $component_id ) . '][' . \esc_attr( $token_var_name ) . ']',
-					'label'           => $this->format_component_label( $component_id, $token_var_name ),
-					'value'           => $value,
-					'max_length'      => self::DEFAULT_MAX_LENGTH,
+					'component_id'   => $component_id,
+					'token_var_name' => $token_var_name,
+					'name_attr'      => self::FORM_KEY . '[component_overrides][' . \esc_attr( $component_id ) . '][' . \esc_attr( $token_var_name ) . ']',
+					'label'          => $this->format_component_label( $component_id, $token_var_name ),
+					'value'          => $value,
+					'max_length'     => self::DEFAULT_MAX_LENGTH,
 				);
 			}
 		}
@@ -150,7 +150,7 @@ final class Entity_Style_Form_Builder {
 	 * @return array<string, list<array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>>
 	 */
 	public function get_component_fields_by_component( string $entity_type, string $entity_key ): array {
-		$defs = $this->get_component_field_definitions( $entity_type, $entity_key );
+		$defs         = $this->get_component_field_definitions( $entity_type, $entity_key );
 		$by_component = array();
 		foreach ( $defs as $def ) {
 			$c = $def['component_id'];

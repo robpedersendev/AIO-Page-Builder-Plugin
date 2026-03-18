@@ -43,7 +43,7 @@ final class Industry_LPagery_Planning_Advisor {
 		if ( $this->rule_registry === null ) {
 			return $this->empty_result( array( 'no_lpagery_rules' ) );
 		}
-		$rules = $this->rule_registry->list_by_industry( $key );
+		$rules  = $this->rule_registry->list_by_industry( $key );
 		$active = array();
 		foreach ( $rules as $rule ) {
 			if ( isset( $rule[ Industry_LPagery_Rule_Registry::FIELD_STATUS ] ) && $rule[ Industry_LPagery_Rule_Registry::FIELD_STATUS ] === Industry_LPagery_Rule_Registry::STATUS_ACTIVE ) {
@@ -74,12 +74,12 @@ final class Industry_LPagery_Planning_Advisor {
 	 * @return Industry_LPagery_Planning_Result
 	 */
 	private function aggregate_result( array $active_rules ): Industry_LPagery_Planning_Result {
-		$posture = Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL;
-		$required = array();
-		$optional = array();
-		$hierarchy_parts = array();
+		$posture            = Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL;
+		$required           = array();
+		$optional           = array();
+		$hierarchy_parts    = array();
 		$weak_page_warnings = array();
-		$warning_flags = array();
+		$warning_flags      = array();
 
 		foreach ( $active_rules as $rule ) {
 			$p = $rule[ Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE ] ?? '';
@@ -123,8 +123,8 @@ final class Industry_LPagery_Planning_Advisor {
 			}
 		}
 
-		$required = array_values( array_unique( $required ) );
-		$optional = array_values( array_unique( $optional ) );
+		$required           = array_values( array_unique( $required ) );
+		$optional           = array_values( array_unique( $optional ) );
 		$weak_page_warnings = array_values( array_unique( $weak_page_warnings ) );
 		$hierarchy_guidance = implode( ' ', $hierarchy_parts );
 		if ( strlen( $hierarchy_guidance ) > self::HIERARCHY_GUIDANCE_MAX_LEN ) {

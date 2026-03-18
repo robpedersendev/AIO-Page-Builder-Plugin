@@ -29,9 +29,9 @@ final class Dropped_Record_Report {
 	private array $errors;
 
 	/**
-	 * @param string         $section Top-level section key (e.g. existing_page_changes).
-	 * @param int            $index   Index of the dropped record in the array.
-	 * @param string         $reason  Short reason (e.g. invalid_enum, missing_required_field).
+	 * @param string             $section Top-level section key (e.g. existing_page_changes).
+	 * @param int                $index   Index of the dropped record in the array.
+	 * @param string             $reason  Short reason (e.g. invalid_enum, missing_required_field).
 	 * @param array<int, string> $errors  List of error codes or redacted messages.
 	 */
 	public function __construct( string $section, int $index, string $reason, array $errors = array() ) {

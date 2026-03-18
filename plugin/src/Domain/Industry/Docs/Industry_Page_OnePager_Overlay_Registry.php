@@ -60,7 +60,7 @@ final class Industry_Page_OnePager_Overlay_Registry {
 			$dir . '/overlays-plumber.php',
 			$dir . '/overlays-disaster-recovery.php',
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $files as $path ) {
 			if ( is_readable( $path ) ) {
 				$loaded = require $path;
@@ -121,7 +121,7 @@ final class Industry_Page_OnePager_Overlay_Registry {
 				continue;
 			}
 			$this->by_composite[ $composite ] = $ov;
-			$this->all[]                    = $ov;
+			$this->all[]                      = $ov;
 		}
 	}
 
@@ -133,8 +133,8 @@ final class Industry_Page_OnePager_Overlay_Registry {
 	 * @return array<string, mixed>|null
 	 */
 	public function get( string $industry_key, string $page_template_key ): ?array {
-		$i = trim( $industry_key );
-		$p = trim( $page_template_key );
+		$i         = trim( $industry_key );
+		$p         = trim( $page_template_key );
 		$composite = $i . '|' . $p;
 		return $this->by_composite[ $composite ] ?? null;
 	}
@@ -155,7 +155,7 @@ final class Industry_Page_OnePager_Overlay_Registry {
 	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_industry( string $industry_key ): array {
-		$i = trim( $industry_key );
+		$i   = trim( $industry_key );
 		$out = array();
 		foreach ( $this->all as $ov ) {
 			$ik = isset( $ov[ self::FIELD_INDUSTRY_KEY ] ) && is_string( $ov[ self::FIELD_INDUSTRY_KEY ] )

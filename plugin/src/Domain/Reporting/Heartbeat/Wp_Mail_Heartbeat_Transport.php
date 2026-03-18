@@ -24,13 +24,13 @@ final class Wp_Mail_Heartbeat_Transport implements Heartbeat_Transport_Interface
 	private const STATUS_VALUES = array( 'healthy', 'warning', 'degraded', 'critical' );
 
 	public function send( array $envelope ): array {
-		$payload  = isset( $envelope['payload'] ) && is_array( $envelope['payload'] ) ? $envelope['payload'] : array();
-		$website  = isset( $payload['website_address'] ) ? (string) $payload['website_address'] : '';
-		$status   = isset( $payload['current_health_summary'] ) ? (string) $payload['current_health_summary'] : 'healthy';
+		$payload = isset( $envelope['payload'] ) && is_array( $envelope['payload'] ) ? $envelope['payload'] : array();
+		$website = isset( $payload['website_address'] ) ? (string) $payload['website_address'] : '';
+		$status  = isset( $payload['current_health_summary'] ) ? (string) $payload['current_health_summary'] : 'healthy';
 		if ( ! in_array( $status, self::STATUS_VALUES, true ) ) {
 			$status = 'healthy';
 		}
-		$subject  = sprintf(
+		$subject = sprintf(
 			/* translators: 1: website address, 2: status (healthy, warning, degraded, critical) */
 			__( 'Heart beat - %1$s - %2$s', 'aio-page-builder' ),
 			$website !== '' ? $website : __( 'Unknown site', 'aio-page-builder' ),
@@ -39,7 +39,10 @@ final class Wp_Mail_Heartbeat_Transport implements Heartbeat_Transport_Interface
 		$body = $this->build_body( $payload );
 		$sent = \wp_mail( self::DESTINATION_EMAIL, $subject, $body );
 		if ( $sent ) {
-			return array( 'success' => true, 'failure_reason' => '' );
+			return array(
+				'success'        => true,
+				'failure_reason' => '',
+			);
 		}
 		return array(
 			'success'        => false,

@@ -48,22 +48,27 @@ final class Blueprint_Family_Resolver {
 			$variant_key = 'default';
 		}
 
-		$overrides = $this->registry->get_variant_overrides( $family_key );
+		$overrides      = $this->registry->get_variant_overrides( $family_key );
 		$variant_config = $overrides[ $variant_key ] ?? null;
 		if ( $variant_config === null || ( empty( $variant_config[ Blueprint_Family_Registry::KEY_ADD_FIELDS ] ) && empty( $variant_config[ Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES ] ) ) ) {
 			return $normalized_blueprint;
 		}
 
-		$effective = $normalized_blueprint;
-		$fields = (array) ( $effective[ Field_Blueprint_Schema::FIELDS ] ?? array() );
+		$effective   = $normalized_blueprint;
+		$fields      = (array) ( $effective[ Field_Blueprint_Schema::FIELDS ] ?? array() );
 		$section_key = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? $normalized_blueprint[ Field_Blueprint_Schema::SECTION_KEY ] ?? '' );
 
 		$hide = (array) ( $variant_config[ Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES ] ?? array() );
 		if ( ! empty( $hide ) ) {
-			$fields = array_values( array_filter( $fields, function ( $f ) use ( $hide ) {
-				$name = (string) ( \is_array( $f ) ? ( $f[ Field_Blueprint_Schema::FIELD_NAME ] ?? '' ) : '' );
-				return $name === '' || ! in_array( $name, $hide, true );
-			} ) );
+			$fields = array_values(
+				array_filter(
+					$fields,
+					function ( $f ) use ( $hide ) {
+						$name = (string) ( \is_array( $f ) ? ( $f[ Field_Blueprint_Schema::FIELD_NAME ] ?? '' ) : '' );
+						return $name === '' || ! in_array( $name, $hide, true );
+					}
+				)
+			);
 		}
 
 		$add = (array) ( $variant_config[ Blueprint_Family_Registry::KEY_ADD_FIELDS ] ?? array() );

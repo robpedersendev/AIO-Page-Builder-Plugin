@@ -54,17 +54,17 @@ final class Support_Package_Result {
 	private int $package_size_bytes;
 
 	/**
-	 * @param bool         $success
-	 * @param string       $message
-	 * @param string       $package_path
-	 * @param string       $package_filename
-	 * @param list<string> $included_support_categories
-	 * @param list<string> $excluded_categories
+	 * @param bool                                              $success
+	 * @param string                                            $message
+	 * @param string                                            $package_path
+	 * @param string                                            $package_filename
+	 * @param list<string>                                      $included_support_categories
+	 * @param list<string>                                      $excluded_categories
 	 * @param array{applied: bool, keys_redacted: list<string>} $redaction_summary
-	 * @param string       $package_reference
-	 * @param string       $generation_log_reference
-	 * @param int          $checksum_count
-	 * @param int          $package_size_bytes
+	 * @param string                                            $package_reference
+	 * @param string                                            $generation_log_reference
+	 * @param int                                               $checksum_count
+	 * @param int                                               $package_size_bytes
 	 */
 	public function __construct(
 		bool $success,
@@ -79,17 +79,17 @@ final class Support_Package_Result {
 		int $checksum_count,
 		int $package_size_bytes
 	) {
-		$this->success                    = $success;
-		$this->message                    = $message;
-		$this->package_path               = $package_path;
-		$this->package_filename           = $package_filename;
+		$this->success                     = $success;
+		$this->message                     = $message;
+		$this->package_path                = $package_path;
+		$this->package_filename            = $package_filename;
 		$this->included_support_categories = $included_support_categories;
-		$this->excluded_categories        = $excluded_categories;
-		$this->redaction_summary          = $redaction_summary;
-		$this->package_reference          = $package_reference;
-		$this->generation_log_reference   = $generation_log_reference;
-		$this->checksum_count             = $checksum_count;
-		$this->package_size_bytes         = $package_size_bytes;
+		$this->excluded_categories         = $excluded_categories;
+		$this->redaction_summary           = $redaction_summary;
+		$this->package_reference           = $package_reference;
+		$this->generation_log_reference    = $generation_log_reference;
+		$this->checksum_count              = $checksum_count;
+		$this->package_size_bytes          = $package_size_bytes;
 	}
 
 	public function is_success(): bool {
@@ -146,29 +146,29 @@ final class Support_Package_Result {
 	 */
 	public function to_payload(): array {
 		return array(
-			'success'                    => $this->success,
-			'message'                    => $this->message,
-			'package_filename'           => $this->package_filename,
-			'support_package_type'       => self::SUPPORT_PACKAGE_TYPE,
+			'success'                     => $this->success,
+			'message'                     => $this->message,
+			'package_filename'            => $this->package_filename,
+			'support_package_type'        => self::SUPPORT_PACKAGE_TYPE,
 			'included_support_categories' => $this->included_support_categories,
-			'excluded_categories'        => $this->excluded_categories,
-			'redaction_summary'          => $this->redaction_summary,
-			'package_reference'          => $this->package_reference,
-			'generation_log_reference'   => $this->generation_log_reference,
-			'checksum_count'             => $this->checksum_count,
-			'package_size_bytes'         => $this->package_size_bytes,
+			'excluded_categories'         => $this->excluded_categories,
+			'redaction_summary'           => $this->redaction_summary,
+			'package_reference'           => $this->package_reference,
+			'generation_log_reference'    => $this->generation_log_reference,
+			'checksum_count'              => $this->checksum_count,
+			'package_size_bytes'          => $this->package_size_bytes,
 		);
 	}
 
 	/**
-	 * @param string       $package_path
-	 * @param string       $package_filename
-	 * @param list<string> $included_support_categories
-	 * @param list<string> $excluded_categories
+	 * @param string                                            $package_path
+	 * @param string                                            $package_filename
+	 * @param list<string>                                      $included_support_categories
+	 * @param list<string>                                      $excluded_categories
 	 * @param array{applied: bool, keys_redacted: list<string>} $redaction_summary
-	 * @param int          $checksum_count
-	 * @param int          $package_size_bytes
-	 * @param string       $generation_log_reference
+	 * @param int                                               $checksum_count
+	 * @param int                                               $package_size_bytes
+	 * @param string                                            $generation_log_reference
 	 * @return self
 	 */
 	public static function success(
@@ -210,7 +210,10 @@ final class Support_Package_Result {
 			'',
 			array(),
 			array(),
-			array( 'applied' => false, 'keys_redacted' => array() ),
+			array(
+				'applied'       => false,
+				'keys_redacted' => array(),
+			),
 			'',
 			$generation_log_reference,
 			0,

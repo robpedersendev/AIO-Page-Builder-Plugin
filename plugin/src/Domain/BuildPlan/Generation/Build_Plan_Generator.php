@@ -27,15 +27,15 @@ final class Build_Plan_Generator {
 
 	/** Step type to title. */
 	private const STEP_TITLES = array(
-		Build_Plan_Schema::STEP_TYPE_OVERVIEW             => 'Overview',
+		Build_Plan_Schema::STEP_TYPE_OVERVIEW              => 'Overview',
 		Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES => 'Existing page changes',
-		Build_Plan_Schema::STEP_TYPE_NEW_PAGES            => 'New pages',
-		Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW       => 'Hierarchy & flow',
-		Build_Plan_Schema::STEP_TYPE_NAVIGATION           => 'Navigation',
-		Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS        => 'Design tokens',
-		Build_Plan_Schema::STEP_TYPE_SEO                  => 'SEO',
-		Build_Plan_Schema::STEP_TYPE_CONFIRMATION         => 'Confirm',
-		Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK        => 'Logs & rollback',
+		Build_Plan_Schema::STEP_TYPE_NEW_PAGES             => 'New pages',
+		Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW        => 'Hierarchy & flow',
+		Build_Plan_Schema::STEP_TYPE_NAVIGATION            => 'Navigation',
+		Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS         => 'Design tokens',
+		Build_Plan_Schema::STEP_TYPE_SEO                   => 'SEO',
+		Build_Plan_Schema::STEP_TYPE_CONFIRMATION          => 'Confirm',
+		Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK         => 'Logs & rollback',
 	);
 
 	/** @var Build_Plan_Repository */
@@ -61,8 +61,8 @@ final class Build_Plan_Generator {
 	 * Generates a Build Plan from validated normalized output and context. Persists and returns result.
 	 *
 	 * @param array<string, mixed> $normalized_output Validated normalized output (run_summary, site_purpose, existing_page_changes, etc.).
-	 * @param string              $ai_run_ref        Source AI run id.
-	 * @param string              $normalized_output_ref Reference to stored normalized output (e.g. run_id:normalized_output).
+	 * @param string               $ai_run_ref        Source AI run id.
+	 * @param string               $normalized_output_ref Reference to stored normalized output (e.g. run_id:normalized_output).
 	 * @param array<string, mixed> $context           Optional: profile_context_ref, crawl_snapshot_ref, registry_snapshot_ref.
 	 * @return Plan_Generation_Result
 	 */
@@ -78,21 +78,21 @@ final class Build_Plan_Generator {
 
 		$plan_id = 'aio-plan-' . ( function_exists( 'wp_generate_uuid4' ) ? \wp_generate_uuid4() : uniqid( 'plan-', true ) );
 
-		$run_summary   = $normalized_output[ Build_Plan_Draft_Schema::KEY_RUN_SUMMARY ] ?? array();
-		$site_purpose  = $normalized_output[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ] ?? array();
+		$run_summary    = $normalized_output[ Build_Plan_Draft_Schema::KEY_RUN_SUMMARY ] ?? array();
+		$site_purpose   = $normalized_output[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ] ?? array();
 		$site_structure = $normalized_output[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ] ?? array();
 
-		$plan_title  = $this->derive_plan_title( $run_summary );
-		$plan_summary = is_array( $run_summary ) && isset( $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_SUMMARY_TEXT ] )
+		$plan_title           = $this->derive_plan_title( $run_summary );
+		$plan_summary         = is_array( $run_summary ) && isset( $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_SUMMARY_TEXT ] )
 			? (string) $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_SUMMARY_TEXT ]
 			: '';
-		$site_purpose_summary  = $this->derive_site_purpose_summary( $site_purpose );
-		$site_flow_summary     = is_array( $site_structure ) && isset( $site_structure['navigation_summary'] )
+		$site_purpose_summary = $this->derive_site_purpose_summary( $site_purpose );
+		$site_flow_summary    = is_array( $site_structure ) && isset( $site_structure['navigation_summary'] )
 			? (string) $site_structure['navigation_summary']
 			: '';
 
-		$built = $this->build_steps_in_order( $normalized_output, $plan_id, array() );
-		$steps = $built['steps'];
+		$built       = $this->build_steps_in_order( $normalized_output, $plan_id, array() );
+		$steps       = $built['steps'];
 		$all_omitted = $built['omitted'];
 
 		// Confirmation (finalization) step.
@@ -113,15 +113,18 @@ final class Build_Plan_Generator {
 			Build_Plan_Item_Schema::KEY_ITEMS     => array(),
 		);
 
-		$warnings   = isset( $normalized_output[ Build_Plan_Draft_Schema::KEY_WARNINGS ] ) && is_array( $normalized_output[ Build_Plan_Draft_Schema::KEY_WARNINGS ] )
+		$warnings    = isset( $normalized_output[ Build_Plan_Draft_Schema::KEY_WARNINGS ] ) && is_array( $normalized_output[ Build_Plan_Draft_Schema::KEY_WARNINGS ] )
 			? $normalized_output[ Build_Plan_Draft_Schema::KEY_WARNINGS ]
 			: array();
 		$assumptions = isset( $normalized_output[ Build_Plan_Draft_Schema::KEY_ASSUMPTIONS ] ) && is_array( $normalized_output[ Build_Plan_Draft_Schema::KEY_ASSUMPTIONS ] )
 			? $normalized_output[ Build_Plan_Draft_Schema::KEY_ASSUMPTIONS ]
 			: array();
-		$confidence = isset( $normalized_output[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ] ) && is_array( $normalized_output[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ] )
+		$confidence  = isset( $normalized_output[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ] ) && is_array( $normalized_output[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ] )
 			? $normalized_output[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ]
-			: array( 'overall' => 'medium', 'planning_mode' => 'mixed' );
+			: array(
+				'overall'       => 'medium',
+				'planning_mode' => 'mixed',
+			);
 
 		$definition = array(
 			Build_Plan_Schema::KEY_PLAN_ID               => $plan_id,
@@ -134,7 +137,7 @@ final class Build_Plan_Generator {
 			Build_Plan_Schema::KEY_SITE_FLOW_SUMMARY     => $site_flow_summary,
 			Build_Plan_Schema::KEY_STEPS                 => $steps,
 			Build_Plan_Schema::KEY_CREATED_AT            => gmdate( 'Y-m-d\TH:i:s\Z' ),
-			Build_Plan_Schema::KEY_APPROVAL_DENIAL_STATE  => 'pending',
+			Build_Plan_Schema::KEY_APPROVAL_DENIAL_STATE => 'pending',
 			Build_Plan_Schema::KEY_REMAINING_WORK_STATUS => 'review',
 			Build_Plan_Schema::KEY_WARNINGS              => $warnings,
 			Build_Plan_Schema::KEY_ASSUMPTIONS           => $assumptions,
@@ -175,16 +178,16 @@ final class Build_Plan_Generator {
 	/**
 	 * Builds steps in schema order: overview, existing_page_changes, new_pages, hierarchy_flow, navigation, design_tokens, seo, confirmation.
 	 *
-	 * @param array<string, mixed> $normalized_output
-	 * @param string               $plan_id
+	 * @param array<string, mixed>             $normalized_output
+	 * @param string                           $plan_id
 	 * @param array<int, array<string, mixed>> $omitted_so_far
 	 * @return array{steps: array<int, array<string, mixed>>, omitted: array<int, array<string, mixed>>}
 	 */
 	private function build_steps_in_order( array $normalized_output, string $plan_id, array $omitted_so_far ): array {
-		$run_summary   = $normalized_output[ Build_Plan_Draft_Schema::KEY_RUN_SUMMARY ] ?? array();
-		$site_purpose  = $normalized_output[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ] ?? array();
-		$site_structure = $normalized_output[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ] ?? array();
-		$plan_summary  = is_array( $run_summary ) && isset( $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_SUMMARY_TEXT ] )
+		$run_summary       = $normalized_output[ Build_Plan_Draft_Schema::KEY_RUN_SUMMARY ] ?? array();
+		$site_purpose      = $normalized_output[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ] ?? array();
+		$site_structure    = $normalized_output[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ] ?? array();
+		$plan_summary      = is_array( $run_summary ) && isset( $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_SUMMARY_TEXT ] )
 			? (string) $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_SUMMARY_TEXT ]
 			: '';
 		$site_flow_summary = is_array( $site_structure ) && isset( $site_structure['navigation_summary'] )
@@ -192,8 +195,8 @@ final class Build_Plan_Generator {
 			: '';
 
 		$all_omitted = $omitted_so_far;
-		$steps = array();
-		$order = 0;
+		$steps       = array();
+		$order       = 0;
 
 		$overview_item = array(
 			Build_Plan_Item_Schema::KEY_ITEM_ID   => $plan_id . '_overview_0',
@@ -203,18 +206,18 @@ final class Build_Plan_Generator {
 				'planning_mode'      => is_array( $run_summary ) ? (string) ( $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_PLANNING_MODE ] ?? 'mixed' ) : 'mixed',
 				'overall_confidence' => is_array( $run_summary ) ? (string) ( $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_OVERALL_CONFIDENCE ] ?? 'medium' ) : 'medium',
 			),
-			Build_Plan_Item_Schema::KEY_STATUS   => Build_Plan_Item_Statuses::PENDING,
+			Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::PENDING,
 		);
-		$steps[] = array(
-			Build_Plan_Item_Schema::KEY_STEP_ID    => $plan_id . '_step_overview',
-			Build_Plan_Item_Schema::KEY_STEP_TYPE  => Build_Plan_Schema::STEP_TYPE_OVERVIEW,
-			Build_Plan_Item_Schema::KEY_TITLE      => self::STEP_TITLES[ Build_Plan_Schema::STEP_TYPE_OVERVIEW ],
-			Build_Plan_Item_Schema::KEY_ORDER      => $order++,
-			Build_Plan_Item_Schema::KEY_ITEMS      => array( $overview_item ),
+		$steps[]       = array(
+			Build_Plan_Item_Schema::KEY_STEP_ID   => $plan_id . '_step_overview',
+			Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_OVERVIEW,
+			Build_Plan_Item_Schema::KEY_TITLE     => self::STEP_TITLES[ Build_Plan_Schema::STEP_TYPE_OVERVIEW ],
+			Build_Plan_Item_Schema::KEY_ORDER     => $order++,
+			Build_Plan_Item_Schema::KEY_ITEMS     => array( $overview_item ),
 		);
 
 		// Order per schema §3.1: existing, new, hierarchy_flow, navigation, design_tokens, seo.
-		$sections_order = array(
+		$sections_order       = array(
 			Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES,
 			Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE,
 			Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN,
@@ -223,17 +226,17 @@ final class Build_Plan_Generator {
 		);
 		$step_type_by_section = array(
 			Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES => Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES,
-			Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE   => Build_Plan_Schema::STEP_TYPE_NEW_PAGES,
-			Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN     => Build_Plan_Schema::STEP_TYPE_NAVIGATION,
+			Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE => Build_Plan_Schema::STEP_TYPE_NEW_PAGES,
+			Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN => Build_Plan_Schema::STEP_TYPE_NAVIGATION,
 			Build_Plan_Draft_Schema::KEY_DESIGN_TOKEN_RECOMMENDATIONS => Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS,
-			Build_Plan_Draft_Schema::KEY_SEO_RECOMMENDATIONS   => Build_Plan_Schema::STEP_TYPE_SEO,
+			Build_Plan_Draft_Schema::KEY_SEO_RECOMMENDATIONS => Build_Plan_Schema::STEP_TYPE_SEO,
 		);
 
 		foreach ( $sections_order as $idx => $section_key ) {
 			// Insert hierarchy step after new_pages (index 1).
 			if ( $idx === 2 ) {
 				$hierarchy_items = $this->derive_hierarchy_items( $site_structure, $plan_id );
-				$steps[] = array(
+				$steps[]         = array(
 					Build_Plan_Item_Schema::KEY_STEP_ID   => $plan_id . '_step_hierarchy',
 					Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW,
 					Build_Plan_Item_Schema::KEY_TITLE     => self::STEP_TITLES[ Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW ],
@@ -242,13 +245,13 @@ final class Build_Plan_Generator {
 				);
 			}
 
-			$records = isset( $normalized_output[ $section_key ] ) && is_array( $normalized_output[ $section_key ] )
+			$records     = isset( $normalized_output[ $section_key ] ) && is_array( $normalized_output[ $section_key ] )
 				? $normalized_output[ $section_key ]
 				: array();
-			$result = $this->item_generator->generate_for_section( $section_key, $records, $plan_id );
+			$result      = $this->item_generator->generate_for_section( $section_key, $records, $plan_id );
 			$all_omitted = array_merge( $all_omitted, $result['omitted'] );
-			$step_type = $step_type_by_section[ $section_key ];
-			$steps[] = array(
+			$step_type   = $step_type_by_section[ $section_key ];
+			$steps[]     = array(
 				Build_Plan_Item_Schema::KEY_STEP_ID   => $plan_id . '_step_' . $step_type,
 				Build_Plan_Item_Schema::KEY_STEP_TYPE => $step_type,
 				Build_Plan_Item_Schema::KEY_TITLE     => self::STEP_TITLES[ $step_type ],
@@ -257,7 +260,10 @@ final class Build_Plan_Generator {
 			);
 		}
 
-		return array( 'steps' => $steps, 'omitted' => $all_omitted );
+		return array(
+			'steps'   => $steps,
+			'omitted' => $all_omitted,
+		);
 	}
 
 	/**
@@ -327,7 +333,7 @@ final class Build_Plan_Generator {
 				Build_Plan_Item_Schema::KEY_ITEM_ID   => $plan_id . '_hierarchy_0',
 				Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_NOTE,
 				Build_Plan_Item_Schema::KEY_PAYLOAD   => array( 'recommended_top_level_pages' => $site_structure['recommended_top_level_pages'] ),
-				Build_Plan_Item_Schema::KEY_STATUS   => Build_Plan_Item_Statuses::PENDING,
+				Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::PENDING,
 			);
 		}
 		return $items;

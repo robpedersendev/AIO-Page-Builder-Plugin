@@ -77,10 +77,10 @@ final class Import_Validator {
 	 * @return Import_Validation_Result
 	 */
 	public function validate( string $zip_path ): Import_Validation_Result {
-		$failures = array();
-		$warnings = array();
-		$conflicts = array();
-		$manifest = array();
+		$failures          = array();
+		$warnings          = array();
+		$conflicts         = array();
+		$manifest          = array();
 		$checksum_verified = false;
 
 		if ( ! is_file( $zip_path ) || ! is_readable( $zip_path ) ) {
@@ -165,15 +165,15 @@ final class Import_Validator {
 	 * @return string Empty if OK; otherwise failure message.
 	 */
 	private function check_schema_version( array $manifest ): string {
-		$incoming = isset( $manifest['schema_version'] ) ? (string) $manifest['schema_version'] : '0';
-		$current  = Versions::export_schema();
-		$flags    = isset( $manifest['compatibility_flags'] ) && is_array( $manifest['compatibility_flags'] )
+		$incoming   = isset( $manifest['schema_version'] ) ? (string) $manifest['schema_version'] : '0';
+		$current    = Versions::export_schema();
+		$flags      = isset( $manifest['compatibility_flags'] ) && is_array( $manifest['compatibility_flags'] )
 			? $manifest['compatibility_flags']
 			: array();
-		$floor    = isset( $flags['migration_floor'] ) ? (string) $flags['migration_floor'] : null;
+		$floor      = isset( $flags['migration_floor'] ) ? (string) $flags['migration_floor'] : null;
 		$same_major = ! empty( $flags['same_major_required'] );
 
-		if ( $floor !== null && $floor !== '' && $this->version_compare($incoming, $floor) < 0 ) {
+		if ( $floor !== null && $floor !== '' && $this->version_compare( $incoming, $floor ) < 0 ) {
 			return 'Export schema version is below migration floor; import blocked.';
 		}
 		$incoming_major = $this->major_version( $incoming );
@@ -261,7 +261,7 @@ final class Import_Validator {
 	}
 
 	/**
-	 * @param \ZipArchive $zip
+	 * @param \ZipArchive                                                             $zip
 	 * @param array<string, string>|array<int, array{path: string, checksum: string}> $checksum_list
 	 * @return bool
 	 */
@@ -269,8 +269,8 @@ final class Import_Validator {
 		$all_ok = true;
 		foreach ( $checksum_list as $path => $value ) {
 			if ( is_int( $path ) && is_array( $value ) ) {
-				$path   = $value['path'] ?? '';
-				$value  = $value['checksum'] ?? '';
+				$path  = $value['path'] ?? '';
+				$value = $value['checksum'] ?? '';
 			}
 			if ( $path === '' || $value === '' ) {
 				continue;
@@ -294,13 +294,13 @@ final class Import_Validator {
 	/**
 	 * Pre-scan conflicts: compare incoming keys with current site (when repos available).
 	 *
-	 * @param \ZipArchive $zip
+	 * @param \ZipArchive          $zip
 	 * @param array<string, mixed> $manifest
 	 * @return list<array{category: string, key: string, message: string}>
 	 */
 	private function conflict_pre_scan( \ZipArchive $zip, array $manifest ): array {
 		$conflicts = array();
-		$included = isset( $manifest['included_categories'] ) && is_array( $manifest['included_categories'] )
+		$included  = isset( $manifest['included_categories'] ) && is_array( $manifest['included_categories'] )
 			? $manifest['included_categories']
 			: array();
 
@@ -309,7 +309,7 @@ final class Import_Validator {
 			if ( $json !== false ) {
 				$arr = json_decode( $json, true );
 				if ( is_array( $arr ) ) {
-					$current = $this->section_repo->list_all_definitions( 9999, 0 );
+					$current      = $this->section_repo->list_all_definitions( 9999, 0 );
 					$current_keys = array();
 					foreach ( $current as $def ) {
 						$k = $def['internal_key'] ?? '';
@@ -320,7 +320,11 @@ final class Import_Validator {
 					foreach ( $arr as $frag ) {
 						$key = isset( $frag['object_key'] ) ? (string) $frag['object_key'] : ( $frag['payload']['internal_key'] ?? '' );
 						if ( $key !== '' && isset( $current_keys[ $key ] ) ) {
-							$conflicts[] = array( 'category' => 'registries', 'key' => $key, 'message' => 'Section key exists.' );
+							$conflicts[] = array(
+								'category' => 'registries',
+								'key'      => $key,
+								'message'  => 'Section key exists.',
+							);
 						}
 					}
 				}
@@ -332,7 +336,7 @@ final class Import_Validator {
 			if ( $json !== false ) {
 				$arr = json_decode( $json, true );
 				if ( is_array( $arr ) ) {
-					$list = $this->plan_repo->list_recent( 9999, 0 );
+					$list             = $this->plan_repo->list_recent( 9999, 0 );
 					$current_plan_ids = array();
 					foreach ( $list as $rec ) {
 						$kid = $rec['internal_key'] ?? '';
@@ -341,10 +345,14 @@ final class Import_Validator {
 						}
 					}
 					foreach ( $arr as $item ) {
-						$def = $item['definition'] ?? $item;
+						$def     = $item['definition'] ?? $item;
 						$plan_id = $def['plan_id'] ?? '';
 						if ( $plan_id !== '' && isset( $current_plan_ids[ $plan_id ] ) ) {
-							$conflicts[] = array( 'category' => 'plans', 'key' => $plan_id, 'message' => 'Plan exists.' );
+							$conflicts[] = array(
+								'category' => 'plans',
+								'key'      => $plan_id,
+								'message'  => 'Plan exists.',
+							);
 						}
 					}
 				}
@@ -356,7 +364,7 @@ final class Import_Validator {
 			if ( $json !== false ) {
 				$arr = json_decode( $json, true );
 				if ( is_array( $arr ) ) {
-					$current = $this->token_set_reader->list_for_export( 0 );
+					$current      = $this->token_set_reader->list_for_export( 0 );
 					$current_refs = array();
 					foreach ( $current as $row ) {
 						$ref = $row['token_set_ref'] ?? '';
@@ -367,7 +375,11 @@ final class Import_Validator {
 					foreach ( $arr as $row ) {
 						$ref = $row['token_set_ref'] ?? '';
 						if ( $ref !== '' && isset( $current_refs[ $ref ] ) ) {
-							$conflicts[] = array( 'category' => 'token_sets', 'key' => $ref, 'message' => 'Token set exists.' );
+							$conflicts[] = array(
+								'category' => 'token_sets',
+								'key'      => $ref,
+								'message'  => 'Token set exists.',
+							);
 						}
 					}
 				}

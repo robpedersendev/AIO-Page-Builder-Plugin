@@ -31,28 +31,28 @@ final class Queue_Logs_Screen {
 
 	public const SLUG = 'aio-page-builder-queue-logs';
 
-	public const TAB_QUEUE           = 'queue';
-	public const TAB_EXECUTION      = 'execution';
-	public const TAB_AI_RUNS        = 'ai_runs';
-	public const TAB_REPORTING      = 'reporting';
-	public const TAB_IMPORT_EXPORT  = 'import_export';
-	public const TAB_CRITICAL       = 'critical';
+	public const TAB_QUEUE         = 'queue';
+	public const TAB_EXECUTION     = 'execution';
+	public const TAB_AI_RUNS       = 'ai_runs';
+	public const TAB_REPORTING     = 'reporting';
+	public const TAB_IMPORT_EXPORT = 'import_export';
+	public const TAB_CRITICAL      = 'critical';
 
 	private const TABS = array(
-		self::TAB_QUEUE          => 'Queue',
-		self::TAB_EXECUTION      => 'Execution Logs',
-		self::TAB_AI_RUNS        => 'AI Runs',
-		self::TAB_REPORTING      => 'Reporting Logs',
-		self::TAB_IMPORT_EXPORT  => 'Import/Export Logs',
-		self::TAB_CRITICAL       => 'Critical Errors',
+		self::TAB_QUEUE         => 'Queue',
+		self::TAB_EXECUTION     => 'Execution Logs',
+		self::TAB_AI_RUNS       => 'AI Runs',
+		self::TAB_REPORTING     => 'Reporting Logs',
+		self::TAB_IMPORT_EXPORT => 'Import/Export Logs',
+		self::TAB_CRITICAL      => 'Critical Errors',
 	);
 
 	/** @var Service_Container|null */
 	private $container;
 
-	private const NONCE_EXPORT_LOGS      = 'aio_export_logs';
-	private const NONCE_DOWNLOAD_LOG     = 'aio_download_log_export';
-	private const NONCE_QUEUE_RECOVERY   = 'aio_queue_recovery';
+	private const NONCE_EXPORT_LOGS    = 'aio_export_logs';
+	private const NONCE_DOWNLOAD_LOG   = 'aio_download_log_export';
+	private const NONCE_QUEUE_RECOVERY = 'aio_queue_recovery';
 
 	public function __construct( ?Service_Container $container = null ) {
 		$this->container = $container;
@@ -78,8 +78,8 @@ final class Queue_Logs_Screen {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			return;
 		}
-		$tab   = $this->get_current_tab();
-		$state = $this->build_state();
+		$tab    = $this->get_current_tab();
+		$state  = $this->build_state();
 		$health = ( new Reporting_Health_Summary_Builder() )->build();
 		$this->render_header( $tab );
 		$this->render_reporting_health( $health );
@@ -96,9 +96,9 @@ final class Queue_Logs_Screen {
 
 	/** @return array<string, mixed> Full state from Logs_Monitoring_State_Builder. */
 	private function build_state(): array {
-		$job_repo = null;
-		$ai_repo  = null;
-		$plan_repo = null;
+		$job_repo                = null;
+		$ai_repo                 = null;
+		$plan_repo               = null;
 		$acf_diagnostics_builder = null;
 		if ( $this->container ) {
 			if ( $this->container->has( 'job_queue_repository' ) ) {
@@ -152,12 +152,12 @@ final class Queue_Logs_Screen {
 	 * @param array<string, mixed> $queue_health From Queue_Health_Summary_Builder.
 	 */
 	private function render_queue_health( array $queue_health ): void {
-		$stale_count   = (int) ( $queue_health['stale_lock_count'] ?? 0 );
-		$long_count   = (int) ( $queue_health['long_running_count'] ?? 0 );
-		$bottleneck   = ! empty( $queue_health['bottleneck_warning'] );
-		$retry_count  = (int) ( $queue_health['retry_eligible_count'] ?? 0 );
-		$summary      = (string) ( $queue_health['summary_message'] ?? '' );
-		$stale_refs   = $queue_health['stale_lock_job_refs'] ?? array();
+		$stale_count = (int) ( $queue_health['stale_lock_count'] ?? 0 );
+		$long_count  = (int) ( $queue_health['long_running_count'] ?? 0 );
+		$bottleneck  = ! empty( $queue_health['bottleneck_warning'] );
+		$retry_count = (int) ( $queue_health['retry_eligible_count'] ?? 0 );
+		$summary     = (string) ( $queue_health['summary_message'] ?? '' );
+		$stale_refs  = $queue_health['stale_lock_job_refs'] ?? array();
 		if ( $stale_count === 0 && ! $bottleneck && $retry_count === 0 && $long_count === 0 ) {
 			if ( $summary !== '' ) {
 				echo '<div class="aio-queue-health aio-queue-health-ok"><p class="aio-queue-health-summary">' . \esc_html( $summary ) . '</p></div>';
@@ -193,7 +193,16 @@ final class Queue_Logs_Screen {
 		$status     = isset( $_GET['aio_log_export'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_log_export'] ) ) : '';
 		$file       = isset( $_GET['aio_log_file'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_log_file'] ) ) : '';
 		if ( $status === 'success' && $file !== '' ) {
-			$dl_url = \wp_nonce_url( \add_query_arg( array( 'action' => 'aio_download_log_export', 'file' => $file ), \admin_url( 'admin-post.php' ) ), self::NONCE_DOWNLOAD_LOG );
+			$dl_url = \wp_nonce_url(
+				\add_query_arg(
+					array(
+						'action' => 'aio_download_log_export',
+						'file'   => $file,
+					),
+					\admin_url( 'admin-post.php' )
+				),
+				self::NONCE_DOWNLOAD_LOG
+			);
 			echo '<div class="notice notice-success is-dismissible"><p>' . \esc_html__( 'Log export completed.', 'aio-page-builder' ) . ' <a href="' . \esc_url( $dl_url ) . '">' . \esc_html__( 'Download', 'aio-page-builder' ) . '</a></p></div>';
 		} elseif ( $status === 'error' ) {
 			$msg = isset( $_GET['aio_log_message'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_log_message'] ) ) : __( 'Export failed.', 'aio-page-builder' );
@@ -285,10 +294,10 @@ final class Queue_Logs_Screen {
 
 	/**
 	 * @param list<array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, can_cancel: bool}> $rows
-	 * @param bool $can_recovery Whether current user can perform retry/cancel (MANAGE_QUEUE_RECOVERY).
+	 * @param bool                                                                                                                                                                                                    $can_recovery Whether current user can perform retry/cancel (MANAGE_QUEUE_RECOVERY).
 	 */
 	private function render_queue_tab( array $rows, bool $can_recovery = false ): void {
-		$recovery_url = \admin_url( 'admin-post.php' );
+		$recovery_url   = \admin_url( 'admin-post.php' );
 		$recovery_nonce = \wp_create_nonce( self::NONCE_QUEUE_RECOVERY );
 		?>
 		<?php
@@ -333,21 +342,27 @@ final class Queue_Logs_Screen {
 								if ( $can_recovery ) {
 									$job_ref = (string) ( $row['job_ref'] ?? '' );
 									if ( $job_ref !== '' && ! empty( $row['retry_eligible'] ) ) {
-										$retry_action_url = \add_query_arg( array(
-											'action'          => 'aio_queue_recovery',
-											'recovery_action' => 'retry',
-											'job_ref'         => $job_ref,
-											'_wpnonce'        => $recovery_nonce,
-										), $recovery_url );
+										$retry_action_url = \add_query_arg(
+											array(
+												'action'   => 'aio_queue_recovery',
+												'recovery_action' => 'retry',
+												'job_ref'  => $job_ref,
+												'_wpnonce' => $recovery_nonce,
+											),
+											$recovery_url
+										);
 										echo ' <a href="' . \esc_url( $retry_action_url ) . '" class="button button-small">' . \esc_html__( 'Retry', 'aio-page-builder' ) . '</a>';
 									}
 									if ( $job_ref !== '' && ! empty( $row['can_cancel'] ) ) {
-										$cancel_action_url = \add_query_arg( array(
-											'action'          => 'aio_queue_recovery',
-											'recovery_action' => 'cancel',
-											'job_ref'         => $job_ref,
-											'_wpnonce'        => $recovery_nonce,
-										), $recovery_url );
+										$cancel_action_url = \add_query_arg(
+											array(
+												'action'   => 'aio_queue_recovery',
+												'recovery_action' => 'cancel',
+												'job_ref'  => $job_ref,
+												'_wpnonce' => $recovery_nonce,
+											),
+											$recovery_url
+										);
 										echo ' <a href="' . \esc_url( $cancel_action_url ) . '" class="button button-small">' . \esc_html__( 'Cancel', 'aio-page-builder' ) . '</a>';
 									}
 								}
@@ -551,14 +566,14 @@ final class Queue_Logs_Screen {
 			\wp_safe_redirect( $this->queue_logs_url( 'error', __( 'Invalid request.', 'aio-page-builder' ) ) );
 			exit;
 		}
-		$service = $this->get_queue_recovery_service();
+		$service   = $this->get_queue_recovery_service();
 		$actor_ref = 'user:' . ( \get_current_user_id() ? (string) \get_current_user_id() : '0' );
 		if ( $action === 'retry' ) {
 			$result = $service->retry_job( $job_ref, $actor_ref );
 		} else {
 			$result = $service->cancel_job( $job_ref, $actor_ref );
 		}
-		$msg = isset( $result['message'] ) && is_string( $result['message'] ) ? $result['message'] : __( 'Action completed.', 'aio-page-builder' );
+		$msg    = isset( $result['message'] ) && is_string( $result['message'] ) ? $result['message'] : __( 'Action completed.', 'aio-page-builder' );
 		$status = ! empty( $result['success'] ) ? 'ok' : 'error';
 		\wp_safe_redirect( $this->queue_logs_url( $status, $msg ) );
 		exit;
@@ -646,7 +661,10 @@ final class Queue_Logs_Screen {
 	}
 
 	private function queue_logs_url( string $recovery_status, string $recovery_message = '' ): string {
-		$args = array( 'page' => self::SLUG, 'tab' => self::TAB_QUEUE );
+		$args = array(
+			'page' => self::SLUG,
+			'tab'  => self::TAB_QUEUE,
+		);
 		if ( $recovery_status !== '' ) {
 			$args['aio_recovery'] = $recovery_status;
 		}
@@ -657,7 +675,10 @@ final class Queue_Logs_Screen {
 	}
 
 	private function logs_url( string $status, string $message = '', string $file = '' ): string {
-		$args = array( 'page' => self::SLUG, 'aio_log_export' => $status );
+		$args = array(
+			'page'           => self::SLUG,
+			'aio_log_export' => $status,
+		);
 		if ( $message !== '' ) {
 			$args['aio_log_message'] = $message;
 		}

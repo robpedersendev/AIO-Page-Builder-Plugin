@@ -77,9 +77,9 @@ final class Styles_JSON_Normalizer {
 		if ( ! is_array( $raw ) ) {
 			return $default;
 		}
-		$token_overrides = $this->normalize_global_tokens( $raw[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] ?? array() );
+		$token_overrides     = $this->normalize_global_tokens( $raw[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] ?? array() );
 		$component_overrides = $this->normalize_global_component_overrides( $raw[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] ?? array() );
-		$version = isset( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ] ) && is_string( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ] )
+		$version             = isset( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ] ) && is_string( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ] )
 			? $raw[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ]
 			: Entity_Style_Payload_Schema::PAYLOAD_VERSION;
 		return array(

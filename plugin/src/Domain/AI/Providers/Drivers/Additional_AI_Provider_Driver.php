@@ -31,10 +31,10 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 	private string $base_url;
 
 	/**
-	 * @param Provider_Error_Normalizer     $error_normalizer
-	 * @param Provider_Response_Normalizer  $response_normalizer
+	 * @param Provider_Error_Normalizer       $error_normalizer
+	 * @param Provider_Response_Normalizer    $response_normalizer
 	 * @param Provider_Secret_Store_Interface $secret_store
-	 * @param string                       $base_url Optional; default Anthropic API base.
+	 * @param string                          $base_url Optional; default Anthropic API base.
 	 */
 	public function __construct(
 		Provider_Error_Normalizer $error_normalizer,
@@ -42,7 +42,7 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		Provider_Secret_Store_Interface $secret_store,
 		string $base_url = self::API_BASE
 	) {
-		$this->base_url = rtrim( $base_url, '/' );
+		$this->base_url       = rtrim( $base_url, '/' );
 		$default_capabilities = Additional_Provider_Capability_Profile::get_capabilities();
 		parent::__construct(
 			Additional_Provider_Capability_Profile::PROVIDER_ID,
@@ -67,7 +67,12 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		$max_tok = isset( $normalized_request['max_tokens'] ) ? (int) $normalized_request['max_tokens'] : 1024;
 		$timeout = isset( $normalized_request['timeout_seconds'] ) ? (int) $normalized_request['timeout_seconds'] : 60;
 
-		$messages = array( array( 'role' => 'user', 'content' => $user ) );
+		$messages = array(
+			array(
+				'role'    => 'user',
+				'content' => $user,
+			),
+		);
 		$body     = array(
 			'model'      => $model,
 			'max_tokens' => max( 1, min( 4096, $max_tok ) ),
@@ -82,9 +87,9 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 			'method'  => 'POST',
 			'timeout' => $timeout,
 			'headers' => array(
-				'x-api-key'           => $credential,
-				'anthropic-version'   => self::ANTHROPIC_VERSION,
-				'content-type'        => 'application/json',
+				'x-api-key'         => $credential,
+				'anthropic-version' => self::ANTHROPIC_VERSION,
+				'content-type'      => 'application/json',
 			),
 			'body'    => wp_json_encode( $body ),
 		);
@@ -140,8 +145,8 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		$usage_normalized = null;
 		$usage            = $decoded['usage'] ?? null;
 		if ( is_array( $usage ) ) {
-			$input_tok  = (int) ( $usage['input_tokens'] ?? 0 );
-			$output_tok = (int) ( $usage['output_tokens'] ?? 0 );
+			$input_tok        = (int) ( $usage['input_tokens'] ?? 0 );
+			$output_tok       = (int) ( $usage['output_tokens'] ?? 0 );
 			$usage_normalized = array(
 				'prompt_tokens'     => $input_tok,
 				'completion_tokens' => $output_tok,
@@ -162,10 +167,10 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		}
 
 		return array(
-			'success'                => true,
-			'structured_payload'     => array( 'content' => $content ),
-			'usage'                  => $usage_normalized,
-			'raw_provider_metadata'  => $raw_meta,
+			'success'               => true,
+			'structured_payload'    => array( 'content' => $content ),
+			'usage'                 => $usage_normalized,
+			'raw_provider_metadata' => $raw_meta,
 		);
 	}
 }

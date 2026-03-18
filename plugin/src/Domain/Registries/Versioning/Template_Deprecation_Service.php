@@ -62,7 +62,7 @@ final class Template_Deprecation_Service {
 	 * @return array<string, mixed> Block to merge: status => 'deprecated', deprecation => [...], replacement_section_suggestions => [...].
 	 */
 	public function get_section_deprecation_block( string $reason, string $replacement_key = '' ): array {
-		$block = $this->registry_deprecation->get_section_deprecation_block( $reason, $replacement_key );
+		$block           = $this->registry_deprecation->get_section_deprecation_block( $reason, $replacement_key );
 		$block['status'] = 'deprecated';
 		return $block;
 	}
@@ -75,7 +75,7 @@ final class Template_Deprecation_Service {
 	 * @return array<string, mixed> Block to merge: status => 'deprecated', deprecation => [...], replacement_template_refs => [...].
 	 */
 	public function get_page_template_deprecation_block( string $reason, string $replacement_key = '' ): array {
-		$block = $this->registry_deprecation->get_page_template_deprecation_block( $reason, $replacement_key );
+		$block           = $this->registry_deprecation->get_page_template_deprecation_block( $reason, $replacement_key );
 		$block['status'] = 'deprecated';
 		return $block;
 	}
@@ -84,18 +84,18 @@ final class Template_Deprecation_Service {
 	 * Returns a short deprecation summary for display in directory/detail (section or page definition).
 	 *
 	 * @param array<string, mixed> $definition Section or page template definition.
-	 * @param string                $type      'section' or 'page'.
+	 * @param string               $type      'section' or 'page'.
 	 * @return array{is_deprecated: bool, reason: string, replacement_keys: list<string>, deprecated_at: string}
 	 */
 	public function get_deprecation_summary( array $definition, string $type = 'section' ): array {
 		$status = (string) ( $definition[ $type === 'page' ? Page_Template_Schema::FIELD_STATUS : Section_Schema::FIELD_STATUS ] ?? '' );
-		$dep = $definition['deprecation'] ?? array();
+		$dep    = $definition['deprecation'] ?? array();
 		if ( ! \is_array( $dep ) ) {
 			$dep = array();
 		}
-		$is_deprecated = $status === 'deprecated' || (bool) ( $dep['deprecated'] ?? $dep[ Deprecation_Metadata::IS_DEPRECATED ] ?? false );
-		$reason = (string) ( $dep['reason'] ?? $dep[ Deprecation_Metadata::DEPRECATED_REASON ] ?? '' );
-		$deprecated_at = (string) ( $dep[ Deprecation_Metadata::DEPRECATED_AT ] ?? $dep['deprecated_at'] ?? '' );
+		$is_deprecated    = $status === 'deprecated' || (bool) ( $dep['deprecated'] ?? $dep[ Deprecation_Metadata::IS_DEPRECATED ] ?? false );
+		$reason           = (string) ( $dep['reason'] ?? $dep[ Deprecation_Metadata::DEPRECATED_REASON ] ?? '' );
+		$deprecated_at    = (string) ( $dep[ Deprecation_Metadata::DEPRECATED_AT ] ?? $dep['deprecated_at'] ?? '' );
 		$replacement_keys = array();
 		if ( $type === 'page' ) {
 			$refs = $definition['replacement_template_refs'] ?? array();
@@ -116,9 +116,9 @@ final class Template_Deprecation_Service {
 		}
 		return array(
 			'is_deprecated'    => $is_deprecated,
-			'reason'            => $reason,
-			'replacement_keys'  => $replacement_keys,
-			'deprecated_at'     => $deprecated_at,
+			'reason'           => $reason,
+			'replacement_keys' => $replacement_keys,
+			'deprecated_at'    => $deprecated_at,
 		);
 	}
 
@@ -126,15 +126,15 @@ final class Template_Deprecation_Service {
 	 * Builds a decision-log entry payload for major template-family changes (spec §61.9).
 	 * Caller appends to docs/release/template-library-decision-log.md or stores elsewhere.
 	 *
-	 * @param string $decision_id     Unique decision ID (e.g. "DL-001").
-	 * @param string $summary        Short summary.
-	 * @param string $rationale      Rationale text.
-	 * @param string $owner          Owner (e.g. "Technical Lead").
-	 * @param string $status         One of: proposed, approved, superseded, rejected.
-	 * @param string $effective_version Optional effective template/registry version.
+	 * @param string       $decision_id     Unique decision ID (e.g. "DL-001").
+	 * @param string       $summary        Short summary.
+	 * @param string       $rationale      Rationale text.
+	 * @param string       $owner          Owner (e.g. "Technical Lead").
+	 * @param string       $status         One of: proposed, approved, superseded, rejected.
+	 * @param string       $effective_version Optional effective template/registry version.
 	 * @param list<string> $impacted_section_keys Optional section keys impacted.
 	 * @param list<string> $impacted_template_keys Optional page template keys impacted.
-	 * @param string $alternatives_considered Optional alternatives text.
+	 * @param string       $alternatives_considered Optional alternatives text.
 	 * @return array<string, mixed> Stable payload for decision log.
 	 */
 	public function build_decision_log_entry(
@@ -150,25 +150,25 @@ final class Template_Deprecation_Service {
 	): array {
 		$date = gmdate( 'Y-m-d' );
 		return array(
-			'decision_id'               => \sanitize_text_field( $decision_id ),
-			'date'                      => $date,
-			'owner'                     => \sanitize_text_field( $owner ),
-			'status'                    => \in_array( $status, array( 'proposed', 'approved', 'superseded', 'rejected' ), true ) ? $status : 'proposed',
-			'summary'                   => \sanitize_text_field( $summary ),
-			'rationale'                 => \sanitize_textarea_field( $rationale ),
-			'alternatives_considered'   => \sanitize_textarea_field( $alternatives_considered ),
-			'impacted_section_keys'     => array_values( array_filter( array_map( 'strval', $impacted_section_keys ) ) ),
-			'impacted_template_keys'   => array_values( array_filter( array_map( 'strval', $impacted_template_keys ) ) ),
-			'effective_version'         => \sanitize_text_field( $effective_version ),
+			'decision_id'             => \sanitize_text_field( $decision_id ),
+			'date'                    => $date,
+			'owner'                   => \sanitize_text_field( $owner ),
+			'status'                  => \in_array( $status, array( 'proposed', 'approved', 'superseded', 'rejected' ), true ) ? $status : 'proposed',
+			'summary'                 => \sanitize_text_field( $summary ),
+			'rationale'               => \sanitize_textarea_field( $rationale ),
+			'alternatives_considered' => \sanitize_textarea_field( $alternatives_considered ),
+			'impacted_section_keys'   => array_values( array_filter( array_map( 'strval', $impacted_section_keys ) ) ),
+			'impacted_template_keys'  => array_values( array_filter( array_map( 'strval', $impacted_template_keys ) ) ),
+			'effective_version'       => \sanitize_text_field( $effective_version ),
 		);
 	}
 
 	/**
 	 * Builds a changelog snippet line for a deprecation (for insertion into docs/release/changelog.md).
 	 *
-	 * @param string $template_key    Section or page template internal_key.
-	 * @param string $type            'section' or 'page'.
-	 * @param string $reason          Deprecation reason.
+	 * @param string       $template_key    Section or page template internal_key.
+	 * @param string       $type            'section' or 'page'.
+	 * @param string       $reason          Deprecation reason.
 	 * @param list<string> $replacement_keys Replacement keys if any.
 	 * @return string Single line or short block suitable for Deprecations section.
 	 */
@@ -178,12 +178,12 @@ final class Template_Deprecation_Service {
 		string $reason,
 		array $replacement_keys = array()
 	): string {
-		$label = $type === 'page' ? 'Page template' : 'Section template';
-		$key = \sanitize_text_field( $template_key );
+		$label        = $type === 'page' ? 'Page template' : 'Section template';
+		$key          = \sanitize_text_field( $template_key );
 		$reason_clean = \sanitize_text_field( $reason );
-		$line = "- **{$label}** `{$key}` deprecated. {$reason_clean}";
+		$line         = "- **{$label}** `{$key}` deprecated. {$reason_clean}";
 		if ( $replacement_keys !== array() ) {
-			$refs = \implode( '`, `', \array_map( 'sanitize_text_field', $replacement_keys ) );
+			$refs  = \implode( '`, `', \array_map( 'sanitize_text_field', $replacement_keys ) );
 			$line .= " Recommended replacement(s): `{$refs}`.";
 		} else {
 			$line .= ' No recommended replacement.';

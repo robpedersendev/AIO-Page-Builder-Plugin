@@ -8,7 +8,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$conflict_results = isset( $conflict_results ) && is_array( $conflict_results ) ? $conflict_results : array();
+$conflict_results    = isset( $conflict_results ) && is_array( $conflict_results ) ? $conflict_results : array();
 $explanation_summary = isset( $explanation_summary ) && is_string( $explanation_summary ) ? trim( $explanation_summary ) : '';
 
 $to_show = array();

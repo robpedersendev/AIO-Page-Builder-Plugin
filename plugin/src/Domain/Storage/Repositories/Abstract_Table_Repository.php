@@ -52,9 +52,9 @@ abstract class Abstract_Table_Repository implements Repository_Interface {
 
 	/** @inheritdoc */
 	public function get_by_id( int $id ): ?array {
-		$table = $this->get_table_name();
+		$table    = $this->get_table_name();
 		$prepared = $this->wpdb->prepare( "SELECT * FROM `{$table}` WHERE id = %d LIMIT 1", $id );
-		$row = $this->wpdb->get_row( $prepared );
+		$row      = $this->wpdb->get_row( $prepared );
 		if ( $row === null ) {
 			return null;
 		}
@@ -67,10 +67,10 @@ abstract class Abstract_Table_Repository implements Repository_Interface {
 		if ( $key === '' ) {
 			return null;
 		}
-		$table   = $this->get_table_name();
-		$col     = $this->get_key_column();
+		$table    = $this->get_table_name();
+		$col      = $this->get_key_column();
 		$prepared = $this->wpdb->prepare( "SELECT * FROM `{$table}` WHERE `{$col}` = %s LIMIT 1", $key );
-		$row = $this->wpdb->get_row( $prepared );
+		$row      = $this->wpdb->get_row( $prepared );
 		if ( $row === null ) {
 			return null;
 		}

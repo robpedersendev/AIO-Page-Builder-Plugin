@@ -72,9 +72,9 @@ final class Form_Provider_Picker_Cache_Service {
 	/**
 	 * Stores form list result for provider.
 	 *
-	 * @param string $provider_key
+	 * @param string                                                                                            $provider_key
 	 * @param list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}> $items
-	 * @param string $outcome One of: success, empty, error.
+	 * @param string                                                                                            $outcome One of: success, empty, error.
 	 * @return void
 	 */
 	public function set( string $provider_key, array $items, string $outcome = 'success' ): void {

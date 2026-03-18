@@ -36,8 +36,8 @@ final class Stub_Execution_Handler implements Execution_Handler_Interface {
 	 */
 	public function execute( array $envelope ): array {
 		return array(
-			'success'  => false,
-			'message'  => __( 'This action type is not available in this version.', 'aio-page-builder' ),
+			'success'   => false,
+			'message'   => __( 'This action type is not available in this version.', 'aio-page-builder' ),
 			'artifacts' => array(),
 		);
 	}

@@ -71,10 +71,10 @@ final class Apply_Menu_Change_Handler_Test extends TestCase {
 			'success'   => true,
 			'message'   => 'Menu change applied.',
 			'artifacts' => array(
-				'menu_id'            => 42,
-				'action'             => 'create',
-				'menu_name'          => 'Main Navigation',
-				'location_assigned'  => 'primary',
+				'menu_id'           => 42,
+				'action'            => 'create',
+				'menu_name'         => 'Main Navigation',
+				'location_assigned' => 'primary',
 			),
 		);
 	}
@@ -96,31 +96,34 @@ final class Apply_Menu_Change_Handler_Test extends TestCase {
 	}
 
 	public function test_apply_menu_change_handler_delegates_to_job_service(): void {
-		$stub = new Stub_Menu_Change_Job_Service();
+		$stub             = new Stub_Menu_Change_Job_Service();
 		$stub->run_result = Menu_Change_Result::success( 99, 'create', 'Footer Menu', 'footer' );
-		$handler = new Apply_Menu_Change_Handler( $stub );
-		$envelope = array(
+		$handler          = new Apply_Menu_Change_Handler( $stub );
+		$envelope         = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
-				'menu_context'        => 'header',
-				'action'              => 'create',
-				'proposed_menu_name'  => 'Footer Menu',
-				'items'               => array(),
+				'menu_context'       => 'header',
+				'action'             => 'create',
+				'proposed_menu_name' => 'Footer Menu',
+				'items'              => array(),
 			),
 		);
-		$out = $handler->execute( $envelope );
+		$out              = $handler->execute( $envelope );
 		$this->assertTrue( $out['success'] );
 		$this->assertSame( 99, $out['artifacts']['menu_id'] ?? 0 );
 		$this->assertSame( 'footer', $out['artifacts']['location_assigned'] ?? '' );
 	}
 
 	public function test_apply_menu_change_handler_returns_failure_on_invalid_target(): void {
-		$stub = new Stub_Menu_Change_Job_Service();
+		$stub             = new Stub_Menu_Change_Job_Service();
 		$stub->run_result = Menu_Change_Result::failure( 'Menu to rename could not be resolved.', array( Execution_Action_Contract::ERROR_TARGET_NOT_FOUND ) );
-		$handler = new Apply_Menu_Change_Handler( $stub );
-		$envelope = array(
-			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'menu_context' => 'header', 'action' => 'rename' ),
+		$handler          = new Apply_Menu_Change_Handler( $stub );
+		$envelope         = array(
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
+				'menu_context' => 'header',
+				'action'       => 'rename',
+			),
 		);
-		$out = $handler->execute( $envelope );
+		$out              = $handler->execute( $envelope );
 		$this->assertFalse( $out['success'] );
 		$this->assertSame( array( Execution_Action_Contract::ERROR_TARGET_NOT_FOUND ), $out['errors'] ?? array() );
 	}
@@ -138,28 +141,43 @@ final class Apply_Menu_Change_Handler_Test extends TestCase {
 
 	/** When envelope has page_class in items and template_menu_apply_service is set, handler delegates to it (Prompt 207). */
 	public function test_handler_uses_template_menu_apply_service_when_envelope_has_page_class(): void {
-		$job_stub = new Stub_Menu_Change_Job_Service();
+		$job_stub             = new Stub_Menu_Change_Job_Service();
 		$job_stub->run_result = Menu_Change_Result::success( 88, 'update_existing', 'Legacy', 'footer' );
-		$template_result = Template_Menu_Apply_Result::success(
+		$template_result      = Template_Menu_Apply_Result::success(
 			20,
-			array( 'valid' => true, 'location_slug' => 'primary' ),
-			array( 'items_ordered_by_class' => array(), 'applied_count' => 2, 'warnings' => array() ),
+			array(
+				'valid'         => true,
+				'location_slug' => 'primary',
+			),
+			array(
+				'items_ordered_by_class' => array(),
+				'applied_count'          => 2,
+				'warnings'               => array(),
+			),
 			array( array( 'status' => 'applied' ), array( 'status' => 'applied' ) ),
 			array( 'location_assigned' => 'primary' )
 		);
-		$template_stub = new Stub_Template_Menu_Apply_Service( $template_result );
-		$handler = new Apply_Menu_Change_Handler( $job_stub, $template_stub );
-		$envelope = array(
+		$template_stub        = new Stub_Template_Menu_Apply_Service( $template_result );
+		$handler              = new Apply_Menu_Change_Handler( $job_stub, $template_stub );
+		$envelope             = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
 				'menu_context' => 'header',
-				'action'      => 'update_existing',
-				'items'       => array(
-					array( 'title' => 'A', 'object_id' => 1, 'page_class' => 'top_level' ),
-					array( 'title' => 'B', 'object_id' => 2, 'page_class' => 'hub' ),
+				'action'       => 'update_existing',
+				'items'        => array(
+					array(
+						'title'      => 'A',
+						'object_id'  => 1,
+						'page_class' => 'top_level',
+					),
+					array(
+						'title'      => 'B',
+						'object_id'  => 2,
+						'page_class' => 'hub',
+					),
 				),
 			),
 		);
-		$out = $handler->execute( $envelope );
+		$out                  = $handler->execute( $envelope );
 		$this->assertTrue( $out['success'] );
 		$this->assertSame( 20, $out['artifacts']['menu_id'] ?? 0 );
 		$this->assertArrayHasKey( 'menu_apply_execution_result', $out['artifacts'] );
@@ -168,20 +186,25 @@ final class Apply_Menu_Change_Handler_Test extends TestCase {
 
 	/** When envelope has no template/hierarchy context, handler uses job_service even if template service is set. */
 	public function test_handler_uses_job_service_when_no_template_context(): void {
-		$job_stub = new Stub_Menu_Change_Job_Service();
+		$job_stub             = new Stub_Menu_Change_Job_Service();
 		$job_stub->run_result = Menu_Change_Result::success( 77, 'create', 'Plain Menu', 'sidebar' );
-		$template_result = Template_Menu_Apply_Result::failure( 'Should not be used', array() );
-		$template_stub = new Stub_Template_Menu_Apply_Service( $template_result );
-		$handler = new Apply_Menu_Change_Handler( $job_stub, $template_stub );
-		$envelope = array(
+		$template_result      = Template_Menu_Apply_Result::failure( 'Should not be used', array() );
+		$template_stub        = new Stub_Template_Menu_Apply_Service( $template_result );
+		$handler              = new Apply_Menu_Change_Handler( $job_stub, $template_stub );
+		$envelope             = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
 				'menu_context'       => 'sidebar',
-				'action'            => 'create',
+				'action'             => 'create',
 				'proposed_menu_name' => 'Plain Menu',
-				'items'             => array( array( 'title' => 'X', 'url' => '/x' ) ),
+				'items'              => array(
+					array(
+						'title' => 'X',
+						'url'   => '/x',
+					),
+				),
 			),
 		);
-		$out = $handler->execute( $envelope );
+		$out                  = $handler->execute( $envelope );
 		$this->assertTrue( $out['success'] );
 		$this->assertSame( 77, $out['artifacts']['menu_id'] ?? 0 );
 		$this->assertSame( 'sidebar', $out['artifacts']['location_assigned'] ?? '' );

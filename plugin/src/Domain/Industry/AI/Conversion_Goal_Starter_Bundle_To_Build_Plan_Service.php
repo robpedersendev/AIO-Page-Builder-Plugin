@@ -38,7 +38,7 @@ final class Conversion_Goal_Starter_Bundle_To_Build_Plan_Service {
 		Industry_Starter_Bundle_To_Build_Plan_Service $bundle_to_plan,
 		Industry_Starter_Bundle_Registry $bundle_registry
 	) {
-		$this->bundle_to_plan   = $bundle_to_plan;
+		$this->bundle_to_plan  = $bundle_to_plan;
 		$this->bundle_registry = $bundle_registry;
 	}
 
@@ -47,7 +47,7 @@ final class Conversion_Goal_Starter_Bundle_To_Build_Plan_Service {
 	 * goal overlay may refine page families, CTA posture, section emphasis, funnel shape. Fallback: non-goal conversion.
 	 *
 	 * @param string               $bundle_key Bundle key (e.g. realtor_starter).
-	 * @param array<string, mixed>  $context    Optional: conversion_goal_key, industry_profile, profile_context_ref, industry_key.
+	 * @param array<string, mixed> $context    Optional: conversion_goal_key, industry_profile, profile_context_ref, industry_key.
 	 * @return Plan_Generation_Result Success with plan_id and payload (and goal_overlay_source in rationale when applied), or failure.
 	 */
 	public function convert_to_draft( string $bundle_key, array $context = array() ): Plan_Generation_Result {
@@ -56,7 +56,7 @@ final class Conversion_Goal_Starter_Bundle_To_Build_Plan_Service {
 			return Plan_Generation_Result::failure( array( __( 'Bundle key is required.', 'aio-page-builder' ) ) );
 		}
 
-		$goal_key = $this->resolve_conversion_goal_key( $context );
+		$goal_key    = $this->resolve_conversion_goal_key( $context );
 		$gen_context = array_merge( $context, array( 'source_starter_bundle_key' => $bundle_key ) );
 		if ( $goal_key !== '' ) {
 			$gen_context['conversion_goal_key'] = $goal_key;
@@ -87,7 +87,7 @@ final class Conversion_Goal_Starter_Bundle_To_Build_Plan_Service {
 			: '';
 		if ( $goal === '' && isset( $context[ self::CONTEXT_INDUSTRY_PROFILE ] ) && is_array( $context[ self::CONTEXT_INDUSTRY_PROFILE ] ) ) {
 			$profile = $context[ self::CONTEXT_INDUSTRY_PROFILE ];
-			$goal   = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			$goal    = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 				? trim( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 				: '';
 		}

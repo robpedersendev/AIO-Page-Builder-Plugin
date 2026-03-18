@@ -29,12 +29,12 @@ final class Secondary_Goal_Caution_Rule_Registry {
 	public const SEVERITY_INFO    = 'info';
 	public const SEVERITY_CAUTION = 'caution';
 	public const SEVERITY_WARNING = 'warning';
-	public const STATUS_ACTIVE   = 'active';
+	public const STATUS_ACTIVE    = 'active';
 
-	private const SEVERITIES = array( self::SEVERITY_INFO, self::SEVERITY_CAUTION, self::SEVERITY_WARNING );
-	private const ALLOWED_GOAL_KEYS = array( 'calls', 'bookings', 'estimates', 'consultations', 'valuations', 'lead_capture' );
-	private const KEY_PATTERN = '#^[a-z0-9_-]+$#';
-	private const KEY_MAX_LENGTH = 64;
+	private const SEVERITIES                 = array( self::SEVERITY_INFO, self::SEVERITY_CAUTION, self::SEVERITY_WARNING );
+	private const ALLOWED_GOAL_KEYS          = array( 'calls', 'bookings', 'estimates', 'consultations', 'valuations', 'lead_capture' );
+	private const KEY_PATTERN                = '#^[a-z0-9_-]+$#';
+	private const KEY_MAX_LENGTH             = 64;
 	private const CAUTION_SUMMARY_MAX_LENGTH = 256;
 
 	/** @var array<string, array<string, mixed>> Map of secondary_goal_rule_key => definition. */
@@ -65,7 +65,7 @@ final class Secondary_Goal_Caution_Rule_Registry {
 	 */
 	public function load( array $rules ): void {
 		$this->by_key = array();
-		$this->all     = array();
+		$this->all    = array();
 		foreach ( $rules as $rule ) {
 			if ( ! \is_array( $rule ) ) {
 				continue;
@@ -76,7 +76,7 @@ final class Secondary_Goal_Caution_Rule_Registry {
 			if ( $rule_key === '' || \strlen( $rule_key ) > self::KEY_MAX_LENGTH || ! \preg_match( self::KEY_PATTERN, $rule_key ) ) {
 				continue;
 			}
-			$primary = isset( $rule[ self::FIELD_PRIMARY_GOAL_KEY ] ) && \is_string( $rule[ self::FIELD_PRIMARY_GOAL_KEY ] )
+			$primary   = isset( $rule[ self::FIELD_PRIMARY_GOAL_KEY ] ) && \is_string( $rule[ self::FIELD_PRIMARY_GOAL_KEY ] )
 				? \trim( $rule[ self::FIELD_PRIMARY_GOAL_KEY ] )
 				: '';
 			$secondary = isset( $rule[ self::FIELD_SECONDARY_GOAL_KEY ] ) && \is_string( $rule[ self::FIELD_SECONDARY_GOAL_KEY ] )

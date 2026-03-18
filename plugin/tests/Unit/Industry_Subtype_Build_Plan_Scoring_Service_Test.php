@@ -47,12 +47,12 @@ final class Industry_Subtype_Build_Plan_Scoring_Service_Test extends TestCase {
 
 	private function subtype_def( string $subtype_key, string $parent_industry_key ): array {
 		return array(
-			Industry_Subtype_Registry::FIELD_SUBTYPE_KEY         => $subtype_key,
+			Industry_Subtype_Registry::FIELD_SUBTYPE_KEY => $subtype_key,
 			Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY => $parent_industry_key,
-			Industry_Subtype_Registry::FIELD_LABEL              => $subtype_key,
-			Industry_Subtype_Registry::FIELD_SUMMARY            => 'Summary',
-			Industry_Subtype_Registry::FIELD_STATUS              => 'active',
-			Industry_Subtype_Registry::FIELD_VERSION_MARKER      => '1',
+			Industry_Subtype_Registry::FIELD_LABEL       => $subtype_key,
+			Industry_Subtype_Registry::FIELD_SUMMARY     => 'Summary',
+			Industry_Subtype_Registry::FIELD_STATUS      => 'active',
+			Industry_Subtype_Registry::FIELD_VERSION_MARKER => '1',
 		);
 	}
 
@@ -60,7 +60,7 @@ final class Industry_Subtype_Build_Plan_Scoring_Service_Test extends TestCase {
 		$registry = new Industry_Subtype_Registry();
 		$registry->load( array( $this->subtype_def( 'realtor_buyer_agent', 'realtor' ) ) );
 		$profile_repo = $this->createMock( Industry_Profile_Repository::class );
-		$profile = array(
+		$profile      = array(
 			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY  => 'realtor',
 			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'realtor_buyer_agent',
 		);
@@ -68,7 +68,7 @@ final class Industry_Subtype_Build_Plan_Scoring_Service_Test extends TestCase {
 		$resolver = new Industry_Subtype_Resolver( $profile_repo, $registry );
 		$extender = $this->createMock( Industry_Subtype_Page_Template_Recommendation_Extender::class );
 
-		$stub = new Industry_Subtype_Build_Plan_Scoring_Service_Test_Stub();
+		$stub    = new Industry_Subtype_Build_Plan_Scoring_Service_Test_Stub();
 		$service = new Industry_Subtype_Build_Plan_Scoring_Service( $stub, $resolver, $profile_repo, $extender );
 
 		$output = array( 'pages' => array() );
@@ -85,12 +85,12 @@ final class Industry_Subtype_Build_Plan_Scoring_Service_Test extends TestCase {
 		$registry = new Industry_Subtype_Registry();
 		$registry->load( array( $this->subtype_def( 'realtor_buyer_agent', 'realtor' ) ) );
 		$profile_repo = $this->createMock( Industry_Profile_Repository::class );
-		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor' );
+		$profile      = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor' );
 		$profile_repo->method( 'get_profile' )->willReturn( $profile );
 		$resolver = new Industry_Subtype_Resolver( $profile_repo, $registry );
 		$extender = $this->createMock( Industry_Subtype_Page_Template_Recommendation_Extender::class );
 
-		$stub = new Industry_Subtype_Build_Plan_Scoring_Service_Test_Stub();
+		$stub    = new Industry_Subtype_Build_Plan_Scoring_Service_Test_Stub();
 		$service = new Industry_Subtype_Build_Plan_Scoring_Service( $stub, $resolver, $profile_repo, $extender );
 
 		$output = array( 'pages' => array() );
@@ -108,7 +108,7 @@ final class Industry_Subtype_Build_Plan_Scoring_Service_Test extends TestCase {
 		$resolver = new Industry_Subtype_Resolver( $profile_repo, $registry );
 		$extender = $this->createMock( Industry_Subtype_Page_Template_Recommendation_Extender::class );
 
-		$stub = new Industry_Subtype_Build_Plan_Scoring_Service_Test_Stub();
+		$stub    = new Industry_Subtype_Build_Plan_Scoring_Service_Test_Stub();
 		$service = new Industry_Subtype_Build_Plan_Scoring_Service( $stub, $resolver, $profile_repo, $extender );
 
 		$context_profile = array(

@@ -45,7 +45,7 @@ final class Industry_Documentation_Summary_Export_Service_Test extends TestCase 
 
 	public function test_generate_with_no_dependencies_returns_bounded_shape(): void {
 		$service = new Industry_Documentation_Summary_Export_Service( null, null, null, null );
-		$out = $service->generate();
+		$out     = $service->generate();
 		$this->assertArrayHasKey( 'generated_at', $out );
 		$this->assertArrayHasKey( 'profile_state', $out );
 		$this->assertArrayHasKey( 'active_pack_refs', $out );
@@ -62,10 +62,10 @@ final class Industry_Documentation_Summary_Export_Service_Test extends TestCase 
 	}
 
 	public function test_generate_includes_no_sensitive_keys(): void {
-		$service = new Industry_Documentation_Summary_Export_Service( null, null, null, null );
-		$out = $service->generate();
+		$service   = new Industry_Documentation_Summary_Export_Service( null, null, null, null );
+		$out       = $service->generate();
 		$forbidden = array( 'api_key', 'password', 'secret', 'token', 'credential', 'raw_content' );
-		$keys_str = strtolower( json_encode( array_keys( $out ) ) );
+		$keys_str  = strtolower( json_encode( array_keys( $out ) ) );
 		foreach ( $forbidden as $f ) {
 			$this->assertStringNotContainsString( $f, $keys_str );
 		}
@@ -73,11 +73,11 @@ final class Industry_Documentation_Summary_Export_Service_Test extends TestCase 
 
 	public function test_generate_with_diagnostics_populates_profile_and_pack_refs(): void {
 		$settings = new Settings_Service();
-		$repo = new Industry_Profile_Repository( $settings );
+		$repo     = new Industry_Profile_Repository( $settings );
 		$repo->set_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor' ) );
 		$diagnostics = new Industry_Diagnostics_Service( $repo, null, null, null, null );
-		$export = new Industry_Documentation_Summary_Export_Service( $diagnostics, null, null, $repo );
-		$out = $export->generate();
+		$export      = new Industry_Documentation_Summary_Export_Service( $diagnostics, null, null, $repo );
+		$out         = $export->generate();
 		$this->assertSame( 'realtor', $out['profile_state']['primary_industry'] );
 		$this->assertContains( 'realtor', $out['active_pack_refs'] );
 		$this->assertNotEmpty( $out['generated_at'] );
@@ -85,13 +85,13 @@ final class Industry_Documentation_Summary_Export_Service_Test extends TestCase 
 
 	public function test_generate_with_health_check_populates_health_and_major_warnings(): void {
 		$settings = new Settings_Service();
-		$repo = new Industry_Profile_Repository( $settings );
+		$repo     = new Industry_Profile_Repository( $settings );
 		$repo->set_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'missing_pack' ) );
 		$pack_registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry( new \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Validator() );
 		$pack_registry->load( array() );
 		$health = new Industry_Health_Check_Service( $repo, $pack_registry, null, null, null, null, null, null, null, null, null );
 		$export = new Industry_Documentation_Summary_Export_Service( null, $health, null, null );
-		$out = $export->generate();
+		$out    = $export->generate();
 		$this->assertGreaterThan( 0, $out['health']['error_count'] );
 		$this->assertLessThanOrEqual( 5, count( $out['health']['sample_errors'] ) );
 		$this->assertNotEmpty( $out['health']['sample_errors'] );
@@ -99,8 +99,8 @@ final class Industry_Documentation_Summary_Export_Service_Test extends TestCase 
 
 	public function test_generate_with_override_audit_populates_override_summary(): void {
 		$override_audit = new Industry_Override_Audit_Report_Service();
-		$export = new Industry_Documentation_Summary_Export_Service( null, null, $override_audit, null );
-		$out = $export->generate();
+		$export         = new Industry_Documentation_Summary_Export_Service( null, null, $override_audit, null );
+		$out            = $export->generate();
 		$this->assertArrayHasKey( 'total_count', $out['override_summary'] );
 		$this->assertArrayHasKey( 'by_type', $out['override_summary'] );
 		$this->assertIsInt( $out['override_summary']['total_count'] );

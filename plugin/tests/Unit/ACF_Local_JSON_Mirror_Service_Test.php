@@ -36,7 +36,12 @@ final class ACF_Local_JSON_Mirror_Service_Test extends TestCase {
 			Field_Blueprint_Schema::SECTION_VERSION => '1',
 			Field_Blueprint_Schema::LABEL           => 'Hero Fields',
 			Field_Blueprint_Schema::FIELDS          => array(
-				array( 'key' => 'field_st01_hero_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ),
+				array(
+					'key'   => 'field_st01_hero_headline',
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
 			),
 		);
 	}
@@ -47,7 +52,12 @@ final class ACF_Local_JSON_Mirror_Service_Test extends TestCase {
 			Field_Blueprint_Schema::SECTION_VERSION => '1',
 			Field_Blueprint_Schema::LABEL           => 'FAQ Fields',
 			Field_Blueprint_Schema::FIELDS          => array(
-				array( 'key' => 'field_st05_faq_question', 'name' => 'question', 'label' => 'Question', 'type' => 'text' ),
+				array(
+					'key'   => 'field_st05_faq_question',
+					'name'  => 'question',
+					'label' => 'Question',
+					'type'  => 'text',
+				),
 			),
 		);
 	}
@@ -59,10 +69,10 @@ final class ACF_Local_JSON_Mirror_Service_Test extends TestCase {
 	}
 
 	public function test_get_manifest_without_writing_returns_manifest_with_version_markers(): void {
-		$blueprints = array( $this->blueprint_st01(), $this->blueprint_st05() );
+		$blueprints        = array( $this->blueprint_st01(), $this->blueprint_st05() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$group_builder = new ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$group_builder     = new ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$service           = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
 
 		$manifest = $service->get_manifest_without_writing();
 
@@ -77,10 +87,10 @@ final class ACF_Local_JSON_Mirror_Service_Test extends TestCase {
 	}
 
 	public function test_get_manifest_without_writing_includes_deterministic_group_keys(): void {
-		$blueprints = array( $this->blueprint_st01(), $this->blueprint_st05() );
+		$blueprints        = array( $this->blueprint_st01(), $this->blueprint_st05() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$group_builder = new ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$group_builder     = new ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$service           = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
 
 		$manifest = $service->get_manifest_without_writing();
 
@@ -95,10 +105,10 @@ final class ACF_Local_JSON_Mirror_Service_Test extends TestCase {
 	}
 
 	public function test_generate_mirror_to_directory_writes_files_and_returns_manifest(): void {
-		$blueprints = array( $this->blueprint_st01() );
+		$blueprints        = array( $this->blueprint_st01() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$group_builder = new ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$group_builder     = new ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$service           = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
 
 		$target_dir = sys_get_temp_dir() . '/aio-mirror-test-' . uniqid( '', true );
 		$this->assertTrue( mkdir( $target_dir, 0755, true ), 'Temp mirror dir must be created' );
@@ -132,10 +142,10 @@ final class ACF_Local_JSON_Mirror_Service_Test extends TestCase {
 	}
 
 	public function test_deterministic_mirror_same_blueprints_same_group_keys(): void {
-		$blueprints = array( $this->blueprint_st01(), $this->blueprint_st05() );
+		$blueprints        = array( $this->blueprint_st01(), $this->blueprint_st05() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$group_builder = new ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$group_builder     = new ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$service           = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
 
 		$manifest1 = $service->get_manifest_without_writing();
 		$manifest2 = $service->get_manifest_without_writing();

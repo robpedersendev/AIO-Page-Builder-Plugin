@@ -25,17 +25,29 @@ final class AI_Provider_Base_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'provider_response_normalizer', function (): Provider_Response_Normalizer {
-			return new Provider_Response_Normalizer();
-		} );
-		$container->register( 'provider_error_normalizer', function () use ( $container ): Provider_Error_Normalizer {
-			return new Provider_Error_Normalizer( $container->get( 'provider_response_normalizer' ) );
-		} );
-		$container->register( 'provider_request_context_builder', function (): Provider_Request_Context_Builder {
-			return new Provider_Request_Context_Builder();
-		} );
-		$container->register( 'provider_capability_resolver', function (): Provider_Capability_Resolver {
-			return new Provider_Capability_Resolver();
-		} );
+		$container->register(
+			'provider_response_normalizer',
+			function (): Provider_Response_Normalizer {
+				return new Provider_Response_Normalizer();
+			}
+		);
+		$container->register(
+			'provider_error_normalizer',
+			function () use ( $container ): Provider_Error_Normalizer {
+				return new Provider_Error_Normalizer( $container->get( 'provider_response_normalizer' ) );
+			}
+		);
+		$container->register(
+			'provider_request_context_builder',
+			function (): Provider_Request_Context_Builder {
+				return new Provider_Request_Context_Builder();
+			}
+		);
+		$container->register(
+			'provider_capability_resolver',
+			function (): Provider_Capability_Resolver {
+				return new Provider_Capability_Resolver();
+			}
+		);
 	}
 }

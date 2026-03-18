@@ -59,7 +59,7 @@ final class Field_Blueprint_Schema_Test extends TestCase {
 			'blueprint_id' => 'acf_st01',
 			'section_key'  => 'st01_hero',
 		);
-		$errors = Field_Blueprint_Schema::validate_blueprint_required_fields( $blueprint );
+		$errors    = Field_Blueprint_Schema::validate_blueprint_required_fields( $blueprint );
 		$this->assertNotEmpty( $errors );
 		$this->assertStringContainsString( 'section_version', implode( ' ', $errors ) );
 		$this->assertStringContainsString( 'label', implode( ' ', $errors ) );
@@ -74,7 +74,7 @@ final class Field_Blueprint_Schema_Test extends TestCase {
 			'label'           => 'Hero',
 			'fields'          => array(),
 		);
-		$errors = Field_Blueprint_Schema::validate_blueprint_required_fields( $blueprint );
+		$errors    = Field_Blueprint_Schema::validate_blueprint_required_fields( $blueprint );
 		$this->assertNotEmpty( $errors );
 		$this->assertStringContainsString( 'fields', implode( ' ', $errors ) );
 	}
@@ -86,15 +86,20 @@ final class Field_Blueprint_Schema_Test extends TestCase {
 			'section_version' => '1',
 			'label'           => 'Hero',
 			'fields'          => array(
-				array( 'key' => 'field_st01_h', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ),
+				array(
+					'key'   => 'field_st01_h',
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
 			),
 		);
-		$errors = Field_Blueprint_Schema::validate_blueprint_required_fields( $blueprint );
+		$errors    = Field_Blueprint_Schema::validate_blueprint_required_fields( $blueprint );
 		$this->assertEmpty( $errors );
 	}
 
 	public function test_validate_field_rejects_empty_key(): void {
-		$field = array(
+		$field  = array(
 			'key'   => '',
 			'name'  => 'headline',
 			'label' => 'Headline',
@@ -106,7 +111,7 @@ final class Field_Blueprint_Schema_Test extends TestCase {
 	}
 
 	public function test_validate_field_rejects_unsupported_type(): void {
-		$field = array(
+		$field  = array(
 			'key'   => 'field_st99_x',
 			'name'  => 'x',
 			'label' => 'X',
@@ -118,7 +123,7 @@ final class Field_Blueprint_Schema_Test extends TestCase {
 	}
 
 	public function test_validate_field_repeater_requires_sub_fields(): void {
-		$field = array(
+		$field  = array(
 			'key'   => 'field_st05_items',
 			'name'  => 'items',
 			'label' => 'Items',

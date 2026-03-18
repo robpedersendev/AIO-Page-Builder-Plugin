@@ -23,9 +23,9 @@ final class Industry_Style_Preset_Registry_Test extends TestCase {
 	private function valid_preset( string $key = 'legal_serious' ): array {
 		return array(
 			Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => $key,
-			Industry_Style_Preset_Registry::FIELD_LABEL            => 'Legal Serious',
-			Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => Industry_Style_Preset_Registry::SUPPORTED_SCHEMA_VERSION,
-			Industry_Style_Preset_Registry::FIELD_STATUS          => Industry_Style_Preset_Registry::STATUS_ACTIVE,
+			Industry_Style_Preset_Registry::FIELD_LABEL  => 'Legal Serious',
+			Industry_Style_Preset_Registry::FIELD_VERSION_MARKER => Industry_Style_Preset_Registry::SUPPORTED_SCHEMA_VERSION,
+			Industry_Style_Preset_Registry::FIELD_STATUS => Industry_Style_Preset_Registry::STATUS_ACTIVE,
 		);
 	}
 
@@ -50,7 +50,13 @@ final class Industry_Style_Preset_Registry_Test extends TestCase {
 		$loaded = $registry->get( 'realtor_warm' );
 		$this->assertNotNull( $loaded );
 		$this->assertSame( 'realtor', $loaded[ Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY ] );
-		$this->assertSame( array( '--aio-color-primary' => '#1a365d', '--aio-space-md' => '1rem' ), $loaded[ Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES ] );
+		$this->assertSame(
+			array(
+				'--aio-color-primary' => '#1a365d',
+				'--aio-space-md'      => '1rem',
+			),
+			$loaded[ Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES ]
+		);
 	}
 
 	public function test_invalid_token_name_rejected(): void {
@@ -87,7 +93,7 @@ final class Industry_Style_Preset_Registry_Test extends TestCase {
 
 	public function test_list_by_industry_returns_matching_presets(): void {
 		$registry = new Industry_Style_Preset_Registry();
-		$presets = array(
+		$presets  = array(
 			array_merge( $this->valid_preset( 'legal_a' ), array( Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY => 'legal' ) ),
 			array_merge( $this->valid_preset( 'legal_b' ), array( Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY => 'legal' ) ),
 			array_merge( $this->valid_preset( 'healthcare_a' ), array( Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY => 'healthcare' ) ),
@@ -101,7 +107,7 @@ final class Industry_Style_Preset_Registry_Test extends TestCase {
 
 	public function test_list_by_status_returns_matching_presets(): void {
 		$registry = new Industry_Style_Preset_Registry();
-		$presets = array(
+		$presets  = array(
 			$this->valid_preset( 'active_1' ),
 			array_merge( $this->valid_preset( 'draft_1' ), array( Industry_Style_Preset_Registry::FIELD_STATUS => Industry_Style_Preset_Registry::STATUS_DRAFT ) ),
 		);
@@ -112,7 +118,7 @@ final class Industry_Style_Preset_Registry_Test extends TestCase {
 
 	public function test_duplicate_key_first_wins(): void {
 		$registry = new Industry_Style_Preset_Registry();
-		$first  = $this->valid_preset( 'dup' );
+		$first    = $this->valid_preset( 'dup' );
 		$first[ Industry_Style_Preset_Registry::FIELD_LABEL ] = 'First';
 		$second = $this->valid_preset( 'dup' );
 		$second[ Industry_Style_Preset_Registry::FIELD_LABEL ] = 'Second';

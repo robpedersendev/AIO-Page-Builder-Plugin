@@ -73,8 +73,8 @@ final class Subtype_Starter_Bundle_Selection_View_Model {
 	/**
 	 * Builds the view model from profile and registries.
 	 *
-	 * @param array<string, mixed>                    $profile         Current industry profile.
-	 * @param Industry_Starter_Bundle_Registry|null  $bundle_registry Bundle registry.
+	 * @param array<string, mixed>                  $profile         Current industry profile.
+	 * @param Industry_Starter_Bundle_Registry|null $bundle_registry Bundle registry.
 	 * @param Industry_Subtype_Registry|null        $subtype_registry Subtype registry (for subtype label).
 	 * @return self
 	 */
@@ -83,8 +83,8 @@ final class Subtype_Starter_Bundle_Selection_View_Model {
 		?Industry_Starter_Bundle_Registry $bundle_registry,
 		?Industry_Subtype_Registry $subtype_registry
 	): self {
-		$vm = new self();
-		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$vm                       = new self();
+		$primary                  = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? \trim( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
 		$vm->primary_industry_key = $primary;
@@ -94,7 +94,7 @@ final class Subtype_Starter_Bundle_Selection_View_Model {
 			? \trim( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 			: '';
 
-		$subtype_key = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+		$subtype_key       = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			? \trim( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			: '';
 		$vm->subtype_key   = $subtype_key;
@@ -136,20 +136,20 @@ final class Subtype_Starter_Bundle_Selection_View_Model {
 
 		foreach ( $vm->parent_bundles as $bundle ) {
 			$vm->display_bundles[] = array(
-				self::DISPLAY_BUNDLE_KEY       => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '' ),
-				self::DISPLAY_LABEL           => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ?? '' ),
-				self::DISPLAY_SUMMARY         => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_SUMMARY ] ?? '' ),
+				self::DISPLAY_BUNDLE_KEY        => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '' ),
+				self::DISPLAY_LABEL             => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ?? '' ),
+				self::DISPLAY_SUMMARY           => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_SUMMARY ] ?? '' ),
 				self::DISPLAY_IS_SUBTYPE_BUNDLE => false,
-				self::DISPLAY_GROUP_LABEL     => $default_group,
+				self::DISPLAY_GROUP_LABEL       => $default_group,
 			);
 		}
 		foreach ( $vm->subtype_bundles as $bundle ) {
 			$vm->display_bundles[] = array(
-				self::DISPLAY_BUNDLE_KEY       => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '' ),
-				self::DISPLAY_LABEL           => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ?? '' ),
-				self::DISPLAY_SUMMARY         => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_SUMMARY ] ?? '' ),
+				self::DISPLAY_BUNDLE_KEY        => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '' ),
+				self::DISPLAY_LABEL             => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ?? '' ),
+				self::DISPLAY_SUMMARY           => (string) ( $bundle[ Industry_Starter_Bundle_Registry::FIELD_SUMMARY ] ?? '' ),
 				self::DISPLAY_IS_SUBTYPE_BUNDLE => true,
-				self::DISPLAY_GROUP_LABEL     => $subtype_group,
+				self::DISPLAY_GROUP_LABEL       => $subtype_group,
 			);
 		}
 

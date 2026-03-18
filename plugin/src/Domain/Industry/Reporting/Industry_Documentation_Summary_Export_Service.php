@@ -65,48 +65,51 @@ final class Industry_Documentation_Summary_Export_Service {
 	 * }
 	 */
 	public function generate(): array {
-		$profile_state = array(
-			'primary_industry'             => '',
-			'secondary_industries'         => array(),
-			'profile_readiness'            => 'none',
-			'selected_starter_bundle_key'  => null,
-			'industry_subtype_key'         => null,
+		$profile_state    = array(
+			'primary_industry'            => '',
+			'secondary_industries'        => array(),
+			'profile_readiness'           => 'none',
+			'selected_starter_bundle_key' => null,
+			'industry_subtype_key'        => null,
 		);
 		$active_pack_refs = array();
-		$override_summary = array( 'total_count' => 0, 'by_type' => array() );
-		$health = array(
-			'error_count'    => 0,
-			'warning_count'  => 0,
+		$override_summary = array(
+			'total_count' => 0,
+			'by_type'     => array(),
+		);
+		$health           = array(
+			'error_count'     => 0,
+			'warning_count'   => 0,
 			'sample_errors'   => array(),
 			'sample_warnings' => array(),
 		);
-		$major_warnings = array();
+		$major_warnings   = array();
 
 		if ( $this->diagnostics !== null ) {
-			$snapshot = $this->diagnostics->get_snapshot();
-			$profile_state['primary_industry']   = isset( $snapshot['primary_industry'] ) && is_string( $snapshot['primary_industry'] ) ? $snapshot['primary_industry'] : '';
+			$snapshot                              = $this->diagnostics->get_snapshot();
+			$profile_state['primary_industry']     = isset( $snapshot['primary_industry'] ) && is_string( $snapshot['primary_industry'] ) ? $snapshot['primary_industry'] : '';
 			$profile_state['secondary_industries'] = isset( $snapshot['secondary_industries'] ) && is_array( $snapshot['secondary_industries'] ) ? $snapshot['secondary_industries'] : array();
-			$profile_state['profile_readiness'] = isset( $snapshot['profile_readiness'] ) && is_string( $snapshot['profile_readiness'] ) ? $snapshot['profile_readiness'] : 'none';
-			$active_pack_refs = isset( $snapshot['active_pack_refs'] ) && is_array( $snapshot['active_pack_refs'] ) ? $snapshot['active_pack_refs'] : array();
+			$profile_state['profile_readiness']    = isset( $snapshot['profile_readiness'] ) && is_string( $snapshot['profile_readiness'] ) ? $snapshot['profile_readiness'] : 'none';
+			$active_pack_refs                      = isset( $snapshot['active_pack_refs'] ) && is_array( $snapshot['active_pack_refs'] ) ? $snapshot['active_pack_refs'] : array();
 			if ( isset( $snapshot['warnings'] ) && is_array( $snapshot['warnings'] ) ) {
 				$major_warnings = array_merge( $major_warnings, $snapshot['warnings'] );
 			}
 		}
 
 		if ( $this->profile_repository !== null ) {
-			$profile = $this->profile_repository->get_profile();
-			$bundle = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+			$profile                                      = $this->profile_repository->get_profile();
+			$bundle                                       = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 				? trim( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 				: '';
 			$profile_state['selected_starter_bundle_key'] = $bundle !== '' ? $bundle : null;
-			$subtype = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+			$subtype                                      = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 				? trim( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 				: '';
-			$profile_state['industry_subtype_key'] = $subtype !== '' ? $subtype : null;
+			$profile_state['industry_subtype_key']        = $subtype !== '' ? $subtype : null;
 		}
 
 		if ( $this->override_audit !== null ) {
-			$report = $this->override_audit->build_report();
+			$report                          = $this->override_audit->build_report();
 			$override_summary['total_count'] = isset( $report['total_count'] ) && is_int( $report['total_count'] ) ? $report['total_count'] : 0;
 			if ( isset( $report['by_type'] ) && is_array( $report['by_type'] ) ) {
 				foreach ( $report['by_type'] as $target_type => $data ) {
@@ -116,9 +119,9 @@ final class Industry_Documentation_Summary_Export_Service {
 		}
 
 		if ( $this->health_check !== null ) {
-			$result = $this->health_check->run();
-			$errors   = isset( $result['errors'] ) && is_array( $result['errors'] ) ? $result['errors'] : array();
-			$warnings = isset( $result['warnings'] ) && is_array( $result['warnings'] ) ? $result['warnings'] : array();
+			$result                  = $this->health_check->run();
+			$errors                  = isset( $result['errors'] ) && is_array( $result['errors'] ) ? $result['errors'] : array();
+			$warnings                = isset( $result['warnings'] ) && is_array( $result['warnings'] ) ? $result['warnings'] : array();
 			$health['error_count']   = count( $errors );
 			$health['warning_count'] = count( $warnings );
 			foreach ( array_slice( $errors, 0, self::MAX_SAMPLE_ERRORS ) as $issue ) {
@@ -146,7 +149,7 @@ final class Industry_Documentation_Summary_Export_Service {
 		return array(
 			'generated_at'     => gmdate( 'c' ),
 			'profile_state'    => $profile_state,
-			'active_pack_refs'  => array_values( $active_pack_refs ),
+			'active_pack_refs' => array_values( $active_pack_refs ),
 			'override_summary' => $override_summary,
 			'health'           => $health,
 			'major_warnings'   => array_values( array_slice( $major_warnings, 0, 20 ) ),

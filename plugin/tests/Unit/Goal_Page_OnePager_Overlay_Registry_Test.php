@@ -20,14 +20,16 @@ final class Goal_Page_OnePager_Overlay_Registry_Test extends TestCase {
 
 	public function test_load_and_get_returns_overlay(): void {
 		$registry = new Goal_Page_OnePager_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Goal_Page_OnePager_Overlay_Registry::FIELD_GOAL_KEY => 'calls',
-				Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY => 'pt_home_conversion_01',
-				Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE    => Goal_Page_OnePager_Overlay_Registry::SCOPE_GOAL_PAGE_ONEPAGER_OVERLAY,
-				Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS  => Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Goal_Page_OnePager_Overlay_Registry::FIELD_GOAL_KEY => 'calls',
+					Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY => 'pt_home_conversion_01',
+					Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE    => Goal_Page_OnePager_Overlay_Registry::SCOPE_GOAL_PAGE_ONEPAGER_OVERLAY,
+					Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS  => Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$ov = $registry->get( 'calls', 'pt_home_conversion_01' );
 		$this->assertNotNull( $ov );
 		$this->assertSame( 'calls', $ov[ Goal_Page_OnePager_Overlay_Registry::FIELD_GOAL_KEY ] );
@@ -46,14 +48,16 @@ final class Goal_Page_OnePager_Overlay_Registry_Test extends TestCase {
 
 	public function test_invalid_scope_skipped(): void {
 		$registry = new Goal_Page_OnePager_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Goal_Page_OnePager_Overlay_Registry::FIELD_GOAL_KEY => 'calls',
-				Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY => 'pt_home_conversion_01',
-				Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE    => 'wrong_scope',
-				Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS  => Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Goal_Page_OnePager_Overlay_Registry::FIELD_GOAL_KEY => 'calls',
+					Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY => 'pt_home_conversion_01',
+					Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE    => 'wrong_scope',
+					Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS  => Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$this->assertNull( $registry->get( 'calls', 'pt_home_conversion_01' ) );
 		$this->assertSame( array(), $registry->get_all() );
 	}

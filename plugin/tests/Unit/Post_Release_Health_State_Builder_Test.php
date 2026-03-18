@@ -52,9 +52,9 @@ final class Post_Release_Health_State_Builder_Test extends TestCase {
 	}
 
 	public function test_domain_health_scores_contain_expected_domains(): void {
-		$builder = new Post_Release_Health_State_Builder( null, null, null, null );
-		$state   = $builder->build( null, null );
-		$scores  = $state['domain_health_scores'];
+		$builder  = new Post_Release_Health_State_Builder( null, null, null, null );
+		$state    = $builder->build( null, null );
+		$scores   = $state['domain_health_scores'];
 		$expected = array( 'reporting', 'queue', 'build_plan_review', 'ai_run_validity', 'rollback', 'import_export', 'support_package' );
 		foreach ( $expected as $domain ) {
 			$this->assertArrayHasKey( $domain, $scores, "domain_health_scores must include: $domain" );
@@ -111,9 +111,9 @@ final class Post_Release_Health_State_Builder_Test extends TestCase {
 
 		$example_summary = array(
 			'period_start'    => '2025-02-15',
-			'period_end'     => '2025-03-15',
-			'overall_status' => 'ok',
-			'summary_message'=> 'Operational health good across domains for the selected period.',
+			'period_end'      => '2025-03-15',
+			'overall_status'  => 'ok',
+			'summary_message' => 'Operational health good across domains for the selected period.',
 		);
 
 		$this->assertSame( $example_summary['period_start'], $state['post_release_health_summary']['period_start'] );

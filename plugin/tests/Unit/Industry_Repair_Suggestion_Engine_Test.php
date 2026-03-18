@@ -37,8 +37,8 @@ final class Industry_Repair_Suggestion_Engine_Test extends TestCase {
 	}
 
 	public function test_suggestion_shape_when_returned_has_required_keys(): void {
-		$engine = new Industry_Repair_Suggestion_Engine( null, null, null, null, null );
-		$issue  = array(
+		$engine     = new Industry_Repair_Suggestion_Engine( null, null, null, null, null );
+		$issue      = array(
 			'object_type'   => 'pack',
 			'key'           => 'test',
 			'severity'      => 'error',

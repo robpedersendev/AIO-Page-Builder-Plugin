@@ -80,45 +80,48 @@ final class Page_Template_And_Composition_Expansion_Pack_Definitions {
 	 * @return array<string, mixed>
 	 */
 	public static function landing_stats_cta_faq_template(): array {
-		$ordered = array(
+		$ordered      = array(
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_STATS_HIGHLIGHTS,
+				Page_Template_Schema::SECTION_ITEM_KEY => Section_Expansion_Pack_Definitions::KEY_STATS_HIGHLIGHTS,
 				Page_Template_Schema::SECTION_ITEM_POSITION => 0,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			),
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION,
+				Page_Template_Schema::SECTION_ITEM_KEY => Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION,
 				Page_Template_Schema::SECTION_ITEM_POSITION => 1,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			),
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_FAQ,
+				Page_Template_Schema::SECTION_ITEM_KEY => Section_Expansion_Pack_Definitions::KEY_FAQ,
 				Page_Template_Schema::SECTION_ITEM_POSITION => 2,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => false,
 			),
 		);
 		$section_reqs = array(
 			Section_Expansion_Pack_Definitions::KEY_STATS_HIGHLIGHTS => array( 'required' => true ),
-			Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION  => array( 'required' => true ),
-			Section_Expansion_Pack_Definitions::KEY_FAQ             => array( 'required' => false ),
+			Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION => array( 'required' => true ),
+			Section_Expansion_Pack_Definitions::KEY_FAQ => array( 'required' => false ),
 		);
 		return array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY             => self::PAGE_TEMPLATE_LANDING_STATS_CTA_FAQ,
-			Page_Template_Schema::FIELD_NAME                      => 'Landing: stats, CTA, FAQ',
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY           => 'Landing page with key metrics, a primary CTA, and an optional FAQ section. Suited for product or service landings.',
-			Page_Template_Schema::FIELD_ARCHETYPE                 => 'landing_page',
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS          => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS      => $section_reqs,
-			Page_Template_Schema::FIELD_COMPATIBILITY             => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                 => array(
-				'page_purpose_summary'         => 'Landing with stats, CTA, and FAQ. Lead with metrics, then conversion prompt, then optional FAQ.',
-				'section_helper_order'         => 'same_as_template',
-				'page_flow_explanation'         => 'Stats establish credibility; CTA drives conversion; FAQ addresses objections.',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => self::PAGE_TEMPLATE_LANDING_STATS_CTA_FAQ,
+			Page_Template_Schema::FIELD_NAME             => 'Landing: stats, CTA, FAQ',
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => 'Landing page with key metrics, a primary CTA, and an optional FAQ section. Suited for product or service landings.',
+			Page_Template_Schema::FIELD_ARCHETYPE        => 'landing_page',
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_reqs,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => array(
+				'page_purpose_summary'  => 'Landing with stats, CTA, and FAQ. Lead with metrics, then conversion prompt, then optional FAQ.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Stats establish credibility; CTA drives conversion; FAQ addresses objections.',
 			),
-			Page_Template_Schema::FIELD_VERSION                   => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                    => 'active',
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES   => 'Requires section expansion pack (st_stats_highlights, st_cta_conversion, st_faq).',
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => 'Requires section expansion pack (st_stats_highlights, st_cta_conversion, st_faq).',
 		);
 	}
 
@@ -128,38 +131,41 @@ final class Page_Template_And_Composition_Expansion_Pack_Definitions {
 	 * @return array<string, mixed>
 	 */
 	public static function faq_page_template(): array {
-		$ordered = array(
+		$ordered      = array(
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_FAQ,
+				Page_Template_Schema::SECTION_ITEM_KEY => Section_Expansion_Pack_Definitions::KEY_FAQ,
 				Page_Template_Schema::SECTION_ITEM_POSITION => 0,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			),
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION,
+				Page_Template_Schema::SECTION_ITEM_KEY => Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION,
 				Page_Template_Schema::SECTION_ITEM_POSITION => 1,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => false,
 			),
 		);
 		$section_reqs = array(
-			Section_Expansion_Pack_Definitions::KEY_FAQ            => array( 'required' => true ),
-			Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION  => array( 'required' => false ),
+			Section_Expansion_Pack_Definitions::KEY_FAQ => array( 'required' => true ),
+			Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION => array( 'required' => false ),
 		);
 		return array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY             => self::PAGE_TEMPLATE_FAQ_PAGE,
-			Page_Template_Schema::FIELD_NAME                      => 'FAQ page',
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY           => 'FAQ-focused page with an optional CTA section at the end. For support or product FAQ pages.',
-			Page_Template_Schema::FIELD_ARCHETYPE                 => 'faq_page',
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS          => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS      => $section_reqs,
-			Page_Template_Schema::FIELD_COMPATIBILITY             => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                 => array(
-				'page_purpose_summary'         => 'FAQ page with optional CTA. Answer common questions then prompt for action.',
-				'section_helper_order'         => 'same_as_template',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => self::PAGE_TEMPLATE_FAQ_PAGE,
+			Page_Template_Schema::FIELD_NAME             => 'FAQ page',
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => 'FAQ-focused page with an optional CTA section at the end. For support or product FAQ pages.',
+			Page_Template_Schema::FIELD_ARCHETYPE        => 'faq_page',
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_reqs,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => array(
+				'page_purpose_summary' => 'FAQ page with optional CTA. Answer common questions then prompt for action.',
+				'section_helper_order' => 'same_as_template',
 			),
-			Page_Template_Schema::FIELD_VERSION                   => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                    => 'active',
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES   => 'Requires section expansion pack (st_faq, st_cta_conversion).',
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => 'Requires section expansion pack (st_faq, st_cta_conversion).',
 		);
 	}
 
@@ -171,29 +177,29 @@ final class Page_Template_And_Composition_Expansion_Pack_Definitions {
 	public static function composition_landing_stats_cta_faq(): array {
 		$ordered = array(
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => Section_Expansion_Pack_Definitions::KEY_STATS_HIGHLIGHTS,
+				Composition_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_STATS_HIGHLIGHTS,
 				Composition_Schema::SECTION_ITEM_POSITION => 0,
 				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION,
+				Composition_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION,
 				Composition_Schema::SECTION_ITEM_POSITION => 1,
 				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => Section_Expansion_Pack_Definitions::KEY_FAQ,
+				Composition_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_FAQ,
 				Composition_Schema::SECTION_ITEM_POSITION => 2,
 				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 		);
 		return array(
-			Composition_Schema::FIELD_COMPOSITION_ID        => self::COMPOSITION_LANDING_STATS_CTA_FAQ,
-			Composition_Schema::FIELD_NAME                  => 'Landing: stats, CTA, FAQ (example)',
-			Composition_Schema::FIELD_ORDERED_SECTION_LIST  => $ordered,
-			Composition_Schema::FIELD_STATUS                => 'active',
-			Composition_Schema::FIELD_VALIDATION_STATUS      => Composition_Validation_Result::VALID,
-			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF   => self::PAGE_TEMPLATE_LANDING_STATS_CTA_FAQ,
-			Composition_Schema::FIELD_VALIDATION_CODES      => array(),
+			Composition_Schema::FIELD_COMPOSITION_ID       => self::COMPOSITION_LANDING_STATS_CTA_FAQ,
+			Composition_Schema::FIELD_NAME                 => 'Landing: stats, CTA, FAQ (example)',
+			Composition_Schema::FIELD_ORDERED_SECTION_LIST => $ordered,
+			Composition_Schema::FIELD_STATUS               => 'active',
+			Composition_Schema::FIELD_VALIDATION_STATUS    => Composition_Validation_Result::VALID,
+			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF  => self::PAGE_TEMPLATE_LANDING_STATS_CTA_FAQ,
+			Composition_Schema::FIELD_VALIDATION_CODES     => array(),
 		);
 	}
 
@@ -205,24 +211,24 @@ final class Page_Template_And_Composition_Expansion_Pack_Definitions {
 	public static function composition_faq_cta(): array {
 		$ordered = array(
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => Section_Expansion_Pack_Definitions::KEY_FAQ,
+				Composition_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_FAQ,
 				Composition_Schema::SECTION_ITEM_POSITION => 0,
 				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION,
+				Composition_Schema::SECTION_ITEM_KEY      => Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION,
 				Composition_Schema::SECTION_ITEM_POSITION => 1,
 				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 		);
 		return array(
-			Composition_Schema::FIELD_COMPOSITION_ID        => self::COMPOSITION_FAQ_CTA,
-			Composition_Schema::FIELD_NAME                  => 'FAQ + CTA (example)',
-			Composition_Schema::FIELD_ORDERED_SECTION_LIST  => $ordered,
-			Composition_Schema::FIELD_STATUS                => 'active',
-			Composition_Schema::FIELD_VALIDATION_STATUS      => Composition_Validation_Result::VALID,
-			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF   => self::PAGE_TEMPLATE_FAQ_PAGE,
-			Composition_Schema::FIELD_VALIDATION_CODES      => array(),
+			Composition_Schema::FIELD_COMPOSITION_ID       => self::COMPOSITION_FAQ_CTA,
+			Composition_Schema::FIELD_NAME                 => 'FAQ + CTA (example)',
+			Composition_Schema::FIELD_ORDERED_SECTION_LIST => $ordered,
+			Composition_Schema::FIELD_STATUS               => 'active',
+			Composition_Schema::FIELD_VALIDATION_STATUS    => Composition_Validation_Result::VALID,
+			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF  => self::PAGE_TEMPLATE_FAQ_PAGE,
+			Composition_Schema::FIELD_VALIDATION_CODES     => array(),
 		);
 	}
 }

@@ -58,8 +58,8 @@ final class Styles_JSON_Sanitizer {
 	 * @return Style_Validation_Result
 	 */
 	public function sanitize_global_tokens( array $normalized ): Style_Validation_Result {
-		$errors = array();
-		$sanitized = array();
+		$errors      = array();
+		$sanitized   = array();
 		$group_names = $this->token_registry->get_token_group_names();
 		foreach ( $normalized as $group => $names ) {
 			if ( ! is_string( $group ) || ! in_array( $group, $group_names, true ) ) {
@@ -69,9 +69,9 @@ final class Styles_JSON_Sanitizer {
 			if ( $group === 'component' ) {
 				continue;
 			}
-			$allowed_names = $this->token_registry->get_allowed_names_for_group( $group );
-			$meta = $this->token_registry->get_sanitization_for_group( $group );
-			$max_len = isset( $meta['max_length'] ) && is_int( $meta['max_length'] ) ? $meta['max_length'] : self::DEFAULT_MAX_LENGTH;
+			$allowed_names       = $this->token_registry->get_allowed_names_for_group( $group );
+			$meta                = $this->token_registry->get_sanitization_for_group( $group );
+			$max_len             = isset( $meta['max_length'] ) && is_int( $meta['max_length'] ) ? $meta['max_length'] : self::DEFAULT_MAX_LENGTH;
 			$sanitized[ $group ] = array();
 			foreach ( $names as $name => $value ) {
 				if ( ! is_string( $name ) || ! is_string( $value ) ) {
@@ -99,15 +99,15 @@ final class Styles_JSON_Sanitizer {
 	 * @return Style_Validation_Result
 	 */
 	public function sanitize_global_component_overrides( array $normalized ): Style_Validation_Result {
-		$errors = array();
-		$sanitized = array();
+		$errors                = array();
+		$sanitized             = array();
 		$allowed_component_ids = $this->component_registry->get_component_ids();
 		foreach ( $normalized as $component_id => $pairs ) {
 			if ( ! is_string( $component_id ) || ! in_array( $component_id, $allowed_component_ids, true ) ) {
 				$errors[] = sprintf( 'Invalid component id: %s', $this->short_display( (string) $component_id ) );
 				continue;
 			}
-			$allowed_vars = $this->component_registry->get_allowed_token_overrides( $component_id );
+			$allowed_vars               = $this->component_registry->get_allowed_token_overrides( $component_id );
 			$sanitized[ $component_id ] = array();
 			foreach ( $pairs as $var_name => $value ) {
 				if ( ! is_string( $var_name ) || ! is_string( $value ) ) {
@@ -137,9 +137,9 @@ final class Styles_JSON_Sanitizer {
 	public function sanitize_entity_payload( array $normalized ): Style_Validation_Result {
 		$token_result = $this->sanitize_global_tokens( $normalized[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] ?? array() );
 		$comp_result  = $this->sanitize_global_component_overrides( $normalized[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] ?? array() );
-		$errors = array_merge( $token_result->get_errors(), $comp_result->get_errors() );
-		$valid = $token_result->is_valid() && $comp_result->is_valid();
-		$sanitized = array(
+		$errors       = array_merge( $token_result->get_errors(), $comp_result->get_errors() );
+		$valid        = $token_result->is_valid() && $comp_result->is_valid();
+		$sanitized    = array(
 			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => $normalized[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ] ?? Entity_Style_Payload_Schema::PAYLOAD_VERSION,
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => $token_result->get_sanitized(),
 			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => $comp_result->get_sanitized(),
@@ -160,7 +160,7 @@ final class Styles_JSON_Sanitizer {
 		}
 		$lower = strtolower( $value );
 		foreach ( self::PROHIBITED_PATTERNS as $pattern ) {
-			$needle = strpos( $pattern, ':' ) !== false || strpos( $pattern, '(' ) !== false
+			$needle   = strpos( $pattern, ':' ) !== false || strpos( $pattern, '(' ) !== false
 				? strtolower( $pattern )
 				: $pattern;
 			$haystack = ( $needle === $pattern ) ? $value : $lower;

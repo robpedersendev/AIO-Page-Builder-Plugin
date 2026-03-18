@@ -46,21 +46,24 @@ final class Registry_Fixture_Builder {
 	 */
 	public static function section(): array {
 		return array(
-			Section_Schema::FIELD_INTERNAL_KEY           => self::FIXTURE_SECTION_KEY,
-			Section_Schema::FIELD_NAME                  => 'Fixture Hero',
-			Section_Schema::FIELD_PURPOSE_SUMMARY       => 'Fixture hero section for export tests.',
-			Section_Schema::FIELD_CATEGORY               => 'hero_intro',
+			Section_Schema::FIELD_INTERNAL_KEY             => self::FIXTURE_SECTION_KEY,
+			Section_Schema::FIELD_NAME                     => 'Fixture Hero',
+			Section_Schema::FIELD_PURPOSE_SUMMARY          => 'Fixture hero section for export tests.',
+			Section_Schema::FIELD_CATEGORY                 => 'hero_intro',
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp_fixture',
-			Section_Schema::FIELD_FIELD_BLUEPRINT_REF   => 'acf_fixture',
-			Section_Schema::FIELD_HELPER_REF             => 'helper_fixture',
-			Section_Schema::FIELD_CSS_CONTRACT_REF       => 'css_fixture',
-			Section_Schema::FIELD_DEFAULT_VARIANT        => 'default',
-			Section_Schema::FIELD_VARIANTS               => array( 'default' => array( 'label' => 'Default' ) ),
-			Section_Schema::FIELD_COMPATIBILITY          => array(),
-			Section_Schema::FIELD_VERSION                => array( 'version' => '1', 'stable_key_retained' => true ),
-			Section_Schema::FIELD_STATUS                 => 'active',
-			Section_Schema::FIELD_RENDER_MODE            => 'block',
-			Section_Schema::FIELD_ASSET_DECLARATION      => array( 'none' => true ),
+			Section_Schema::FIELD_FIELD_BLUEPRINT_REF      => 'acf_fixture',
+			Section_Schema::FIELD_HELPER_REF               => 'helper_fixture',
+			Section_Schema::FIELD_CSS_CONTRACT_REF         => 'css_fixture',
+			Section_Schema::FIELD_DEFAULT_VARIANT          => 'default',
+			Section_Schema::FIELD_VARIANTS                 => array( 'default' => array( 'label' => 'Default' ) ),
+			Section_Schema::FIELD_COMPATIBILITY            => array(),
+			Section_Schema::FIELD_VERSION                  => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Section_Schema::FIELD_STATUS                   => 'active',
+			Section_Schema::FIELD_RENDER_MODE              => 'block',
+			Section_Schema::FIELD_ASSET_DECLARATION        => array( 'none' => true ),
 		);
 	}
 
@@ -72,22 +75,22 @@ final class Registry_Fixture_Builder {
 	public static function page_template(): array {
 		$ordered = array(
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY     => self::FIXTURE_SECTION_KEY,
+				Page_Template_Schema::SECTION_ITEM_KEY => self::FIXTURE_SECTION_KEY,
 				Page_Template_Schema::SECTION_ITEM_POSITION => 0,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			),
 		);
 		return array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY       => self::FIXTURE_PAGE_TEMPLATE_KEY,
-			Page_Template_Schema::FIELD_NAME               => 'Fixture Landing',
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY     => 'Fixture landing page for export tests.',
-			Page_Template_Schema::FIELD_ARCHETYPE           => 'landing',
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS   => $ordered,
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => self::FIXTURE_PAGE_TEMPLATE_KEY,
+			Page_Template_Schema::FIELD_NAME             => 'Fixture Landing',
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => 'Fixture landing page for export tests.',
+			Page_Template_Schema::FIELD_ARCHETYPE        => 'landing',
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
 			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => array( self::FIXTURE_SECTION_KEY => array( 'required' => true ) ),
-			Page_Template_Schema::FIELD_COMPATIBILITY      => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER          => array( 'page_purpose_summary' => 'Fixture purpose.' ),
-			Page_Template_Schema::FIELD_VERSION            => array( 'version' => '1' ),
-			Page_Template_Schema::FIELD_STATUS             => 'active',
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => array( 'page_purpose_summary' => 'Fixture purpose.' ),
+			Page_Template_Schema::FIELD_VERSION          => array( 'version' => '1' ),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => array(),
 			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => '',
 		);
@@ -101,18 +104,18 @@ final class Registry_Fixture_Builder {
 	public static function composition(): array {
 		$ordered = array(
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => self::FIXTURE_SECTION_KEY,
+				Composition_Schema::SECTION_ITEM_KEY      => self::FIXTURE_SECTION_KEY,
 				Composition_Schema::SECTION_ITEM_POSITION => 0,
-				Composition_Schema::SECTION_ITEM_VARIANT => 'default',
+				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 		);
 		return array(
 			Composition_Schema::FIELD_COMPOSITION_ID       => self::FIXTURE_COMPOSITION_ID,
-			Composition_Schema::FIELD_NAME                => 'Fixture Composition',
+			Composition_Schema::FIELD_NAME                 => 'Fixture Composition',
 			Composition_Schema::FIELD_ORDERED_SECTION_LIST => $ordered,
-			Composition_Schema::FIELD_STATUS              => 'active',
-			Composition_Schema::FIELD_VALIDATION_STATUS   => 'valid',
-			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF => self::FIXTURE_PAGE_TEMPLATE_KEY,
+			Composition_Schema::FIELD_STATUS               => 'active',
+			Composition_Schema::FIELD_VALIDATION_STATUS    => 'valid',
+			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF  => self::FIXTURE_PAGE_TEMPLATE_KEY,
 		);
 	}
 
@@ -140,14 +143,14 @@ final class Registry_Fixture_Builder {
 	 */
 	public static function snapshot(): array {
 		return array(
-			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID     => self::FIXTURE_SNAPSHOT_ID,
-			Version_Snapshot_Schema::FIELD_SCOPE_TYPE      => Version_Snapshot_Schema::SCOPE_REGISTRY,
+			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID    => self::FIXTURE_SNAPSHOT_ID,
+			Version_Snapshot_Schema::FIELD_SCOPE_TYPE     => Version_Snapshot_Schema::SCOPE_REGISTRY,
 			Version_Snapshot_Schema::FIELD_SCOPE_ID       => 'registry_fixture',
-			Version_Snapshot_Schema::FIELD_CREATED_AT      => '2025-01-01T00:00:00Z',
+			Version_Snapshot_Schema::FIELD_CREATED_AT     => '2025-01-01T00:00:00Z',
 			Version_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
 			Version_Snapshot_Schema::FIELD_STATUS         => Version_Snapshot_Schema::STATUS_ACTIVE,
 			Version_Snapshot_Schema::FIELD_OBJECT_REFS    => array(
-				'sections' => array( self::FIXTURE_SECTION_KEY ),
+				'sections'       => array( self::FIXTURE_SECTION_KEY ),
 				'page_templates' => array( self::FIXTURE_PAGE_TEMPLATE_KEY ),
 			),
 		);

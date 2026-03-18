@@ -78,17 +78,20 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
-		$ordered = array();
+		$ordered      = array();
 		$requirements = array();
 		foreach ( $section_keys as $pos => $key ) {
-			$ordered[] = array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => $key,
+			$ordered[]            = array(
+				Page_Template_Schema::SECTION_ITEM_KEY => $key,
 				Page_Template_Schema::SECTION_ITEM_POSITION => $pos,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			);
 			$requirements[ $key ] = array( 'required' => true );
 		}
-		return array( 'ordered' => $ordered, 'requirements' => $requirements );
+		return array(
+			'ordered'      => $ordered,
+			'requirements' => $requirements,
+		);
 	}
 
 	/**
@@ -119,20 +122,23 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 		array $extra = array()
 	): array {
 		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY             => $internal_key,
-			Page_Template_Schema::FIELD_NAME                     => $name,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY           => $purpose_summary,
-			Page_Template_Schema::FIELD_ARCHETYPE                 => $archetype,
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS          => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS      => $section_requirements,
-			Page_Template_Schema::FIELD_COMPATIBILITY             => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                 => $one_pager,
-			Page_Template_Schema::FIELD_VERSION                   => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                    => 'active',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $internal_key,
+			Page_Template_Schema::FIELD_NAME             => $name,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => $purpose_summary,
+			Page_Template_Schema::FIELD_ARCHETYPE        => $archetype,
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_requirements,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => $one_pager,
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES   => $endpoint_notes,
-			'template_category_class'                            => 'top_level',
-			'template_family'                                     => $template_family,
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => $endpoint_notes,
+			'template_category_class'                    => 'top_level',
+			'template_family'                            => $template_family,
 		);
 		if ( ! isset( $extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
 			$extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
@@ -155,7 +161,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_footer_legal_01',
 			'cta_policy_utility_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_privacy_overview_01',
 			'Privacy (overview)',
@@ -165,8 +171,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Privacy page overview. Hero and privacy highlight; legal summary and policy CTA; policy body and explainer; reassurance and contact CTA; consent and trust disclosure; footer legal; close with policy CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Privacy page overview. Hero and privacy highlight; legal summary and policy CTA; policy body and explainer; reassurance and contact CTA; consent and trust disclosure; footer legal; close with policy CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Policy-safe semantics. Semantic headings and landmarks; form/label accessibility where applicable (spec §51.9). Softer CTA direction appropriate for utility pages.',
 			),
 			'Requires section library (hero, lpu, ptf, tp, CTA batches).',
@@ -189,7 +195,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_privacy_detail_01',
 			'Privacy (detail)',
@@ -199,8 +205,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Privacy page detail-led. Compact hero and disclosure; privacy highlight and policy CTA; policy body and legal summary; FAQ and support CTA; consent and terms TOC; contact panel; contact CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Privacy page detail-led. Compact hero and disclosure; privacy highlight and policy CTA; policy body and legal summary; FAQ and support CTA; consent and terms TOC; contact panel; contact CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Structured policy content with accessible headings; CTAs for policy and support/contact. Synthetic preview only.',
 			),
 			'Requires section library (hero, lpu, ptf, CTA batches).',
@@ -223,7 +229,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_footer_legal_01',
 			'cta_policy_utility_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_terms_overview_01',
 			'Terms (overview)',
@@ -233,8 +239,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Terms page overview. Hero and terms TOC; legal summary and policy CTA; policy body and explainer; disclosure and contact CTA; reassurance and consent; footer legal; policy CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Terms page overview. Hero and terms TOC; legal summary and policy CTA; policy body and explainer; disclosure and contact CTA; reassurance and consent; footer legal; policy CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Terms structure with TOC and policy body; appropriate utility CTAs. No legal counsel; synthetic content only.',
 			),
 			'Requires section library (hero, lpu, ptf, tp, CTA batches).',
@@ -257,7 +263,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_footer_legal_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_terms_structure_01',
 			'Terms (structured)',
@@ -267,8 +273,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Terms page structured. Compact hero and disclosure; terms TOC and policy CTA; policy body and legal summary; FAQ and support CTA; trust disclosure and contact panel; footer legal; contact CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Terms page structured. Compact hero and disclosure; terms TOC and policy CTA; policy body and legal summary; FAQ and support CTA; trust disclosure and contact panel; footer legal; contact CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Structured terms with TOC; policy and support/contact CTAs. Accessibility-compliant headings and landmarks.',
 			),
 			'Requires section library (hero, lpu, ptf, CTA batches).',
@@ -291,7 +297,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'ptf_faq_01',
 			'cta_policy_utility_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_accessibility_commitment_01',
 			'Accessibility (commitment)',
@@ -301,8 +307,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Accessibility commitment page. Hero and accessibility help; policy explainer and support CTA; trust disclosure and reassurance; contact panel and contact CTA; support escalation and form intro; FAQ; policy CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Accessibility commitment page. Hero and accessibility help; policy explainer and support CTA; trust disclosure and reassurance; contact panel and contact CTA; support escalation and form intro; FAQ; policy CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Accessibility-first structure; semantic headings and landmarks (spec §51.3, §51.9). Softer CTAs for support and contact.',
 			),
 			'Requires section library (hero, lpu, ptf, tp, CTA batches).',
@@ -325,7 +331,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_trust_disclosure_01',
 			'cta_support_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_accessibility_help_01',
 			'Accessibility (help)',
@@ -335,8 +341,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Accessibility help page. Compact hero and accessibility help; support escalation and contact CTA; FAQ and contact panel; inquiry support and support CTA; reassurance and form intro; trust disclosure; support CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Accessibility help page. Compact hero and accessibility help; support escalation and contact CTA; FAQ and contact panel; inquiry support and support CTA; reassurance and form intro; trust disclosure; support CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Help-focused accessibility content; form and contact accessibility (spec §51.9).',
 			),
 			'Requires section library (hero, lpu, ptf, tp, CTA batches).',
@@ -359,7 +365,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_contact_detail_01',
 			'cta_support_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_support_help_01',
 			'Support (help)',
@@ -369,8 +375,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Support help page. Hero and support escalation; inquiry support and support CTA; FAQ and contact panel; reassurance and contact CTA; form intro and accessibility help; contact detail; support CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Support help page. Hero and support escalation; inquiry support and support CTA; FAQ and contact panel; reassurance and contact CTA; form intro and accessibility help; contact detail; support CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Support and contact utility; form accessibility (spec §51.9).',
 			),
 			'Requires section library (hero, lpu, ptf, tp, CTA batches).',
@@ -393,7 +399,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_accessibility_help_01',
 			'cta_support_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_support_escalation_01',
 			'Support (escalation)',
@@ -403,8 +409,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Support escalation page. Hero and inquiry support; support escalation and contact CTA; contact panel and FAQ; form intro and support CTA; reassurance and contact detail; accessibility help; support CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Support escalation page. Hero and inquiry support; support escalation and contact CTA; contact panel and FAQ; form intro and support CTA; reassurance and contact detail; accessibility help; support CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Escalation path and contact; accessible forms and labels.',
 			),
 			'Requires section library (hero, lpu, ptf, tp, CTA batches).',
@@ -427,7 +433,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_trust_disclosure_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_contact_utility_01',
 			'Contact (utility)',
@@ -437,8 +443,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Contact utility page. Hero and contact panel/detail; contact CTA; form intro and inquiry support; reassurance and support CTA; support escalation and accessibility help; trust disclosure; contact CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Contact utility page. Hero and contact panel/detail; contact CTA; form intro and inquiry support; reassurance and support CTA; support escalation and accessibility help; trust disclosure; contact CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Contact-first utility; form and label accessibility.',
 			),
 			'Requires section library (hero, lpu, tp, CTA batches).',
@@ -461,7 +467,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_footer_legal_01',
 			'cta_policy_utility_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_disclosure_utility_01',
 			'Disclosure (utility)',
@@ -471,8 +477,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Disclosure utility page. Hero and disclosure header; trust disclosure and policy CTA; legal summary and policy body; policy explainer and contact CTA; consent and privacy highlight; footer legal; policy CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Disclosure utility page. Hero and disclosure header; trust disclosure and policy CTA; legal summary and policy body; policy explainer and contact CTA; consent and privacy highlight; footer legal; policy CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Disclosure and policy structure; appropriate utility CTAs. Synthetic content only.',
 			),
 			'Requires section library (hero, lpu, ptf, CTA batches).',
@@ -495,7 +501,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_footer_legal_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_trust_disclosure_01',
 			'Trust & disclosure',
@@ -505,8 +511,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Trust and disclosure page. Hero and trust disclosure; disclosure header and policy CTA; legal summary and reassurance; contact panel and support CTA; privacy highlight and consent; footer legal; contact CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Trust and disclosure page. Hero and trust disclosure; disclosure header and policy CTA; legal summary and reassurance; contact panel and support CTA; privacy highlight and consent; footer legal; contact CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Trust and disclosure focus; policy and support/contact CTAs.',
 			),
 			'Requires section library (hero, lpu, tp, CTA batches).',
@@ -529,7 +535,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			'lpu_accessibility_help_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_utility_legal_01',
 			'Utility (legal links)',
@@ -539,8 +545,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Utility page with legal links. Hero and terms TOC; privacy highlight and policy CTA; legal summary and contact panel; FAQ and support CTA; footer legal and trust disclosure; accessibility help; contact CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Utility page with legal links. Hero and terms TOC; privacy highlight and policy CTA; legal summary and contact panel; FAQ and support CTA; footer legal and trust disclosure; accessibility help; contact CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Legal and utility hub-style; policy, support, contact CTAs.',
 			),
 			'Requires section library (hero, lpu, ptf, CTA batches).',

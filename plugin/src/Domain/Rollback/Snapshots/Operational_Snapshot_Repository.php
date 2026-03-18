@@ -91,7 +91,7 @@ final class Operational_Snapshot_Repository implements Operational_Snapshot_Repo
 			if ( $ref !== $target_ref ) {
 				continue;
 			}
-			$ts = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+			$ts         = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
 				? strtotime( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
 				: 0;
 			$out[ $id ] = $ts;
@@ -108,7 +108,7 @@ final class Operational_Snapshot_Repository implements Operational_Snapshot_Repo
 	private function evict_oldest( array $store ): array {
 		$with_ts = array();
 		foreach ( $store as $id => $snap ) {
-			$ts = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+			$ts             = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
 				? strtotime( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
 				: 0;
 			$with_ts[ $id ] = $ts;

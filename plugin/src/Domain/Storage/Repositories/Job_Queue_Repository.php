@@ -111,10 +111,13 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		if ( $id <= 0 ) {
 			return false;
 		}
-		return $this->update_row( $id, array(
-			'queue_status' => Job_Queue_Status::PENDING,
-			'lock_token'   => '',
-		) );
+		return $this->update_row(
+			$id,
+			array(
+				'queue_status' => Job_Queue_Status::PENDING,
+				'lock_token'   => '',
+			)
+		);
 	}
 
 	/**
@@ -128,38 +131,38 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		if ( empty( $data ) ) {
 			return true;
 		}
-		$table = $this->get_table_name();
-		$set   = array();
+		$table  = $this->get_table_name();
+		$set    = array();
 		$values = array();
 		foreach ( $data as $col => $val ) {
 			$col = \sanitize_key( $col );
 			if ( $col === '' || ! in_array( $col, array( 'queue_status', 'failure_reason', 'started_at', 'completed_at', 'retry_count', 'lock_token', 'actor_ref' ), true ) ) {
 				continue;
 			}
-			$set[] = "`{$col}` = %s";
+			$set[]    = "`{$col}` = %s";
 			$values[] = $val;
 		}
 		if ( empty( $set ) ) {
 			return true;
 		}
 		$values[] = $id;
-		$sql = "UPDATE `{$table}` SET " . implode( ', ', $set ) . " WHERE id = %d";
+		$sql      = "UPDATE `{$table}` SET " . implode( ', ', $set ) . ' WHERE id = %d';
 		$prepared = $this->wpdb->prepare( $sql, $values );
 		return $prepared !== false && $this->wpdb->query( $prepared ) !== false;
 	}
 
 	/** @inheritdoc */
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
-		$table = $this->get_table_name();
-		$limit  = $limit > 0 ? $limit : 50;
-		$offset  = $offset >= 0 ? $offset : 0;
+		$table    = $this->get_table_name();
+		$limit    = $limit > 0 ? $limit : 50;
+		$offset   = $offset >= 0 ? $offset : 0;
 		$prepared = $this->wpdb->prepare(
 			"SELECT * FROM `{$table}` WHERE queue_status = %s ORDER BY priority DESC, created_at ASC LIMIT %d OFFSET %d",
 			$status,
 			$limit,
 			$offset
 		);
-		$rows = $this->wpdb->get_results( $prepared );
+		$rows     = $this->wpdb->get_results( $prepared );
 		if ( ! is_array( $rows ) ) {
 			return array();
 		}
@@ -183,16 +186,16 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		if ( $actor_ref === '' ) {
 			return array();
 		}
-		$table  = $this->get_table_name();
-		$limit  = $limit > 0 ? $limit : 50;
-		$offset = $offset >= 0 ? $offset : 0;
+		$table    = $this->get_table_name();
+		$limit    = $limit > 0 ? $limit : 50;
+		$offset   = $offset >= 0 ? $offset : 0;
 		$prepared = $this->wpdb->prepare(
 			"SELECT * FROM `{$table}` WHERE actor_ref = %s ORDER BY created_at DESC LIMIT %d OFFSET %d",
 			$actor_ref,
 			$limit,
 			$offset
 		);
-		$rows = $this->wpdb->get_results( $prepared );
+		$rows     = $this->wpdb->get_results( $prepared );
 		if ( ! is_array( $rows ) ) {
 			return array();
 		}
@@ -205,9 +208,9 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 
 	/** @inheritdoc */
 	public function save( array $data ): int {
-		$job_ref   = isset( $data['job_ref'] ) && is_string( $data['job_ref'] ) ? $this->sanitize_key( $data['job_ref'] ) : '';
-		$job_type  = isset( $data['job_type'] ) && is_string( $data['job_type'] ) ? \sanitize_text_field( substr( $data['job_type'], 0, 64 ) ) : '';
-		$status    = isset( $data['queue_status'] ) && is_string( $data['queue_status'] ) ? \sanitize_text_field( substr( $data['queue_status'], 0, 32 ) ) : Job_Queue_Status::PENDING;
+		$job_ref  = isset( $data['job_ref'] ) && is_string( $data['job_ref'] ) ? $this->sanitize_key( $data['job_ref'] ) : '';
+		$job_type = isset( $data['job_type'] ) && is_string( $data['job_type'] ) ? \sanitize_text_field( substr( $data['job_type'], 0, 64 ) ) : '';
+		$status   = isset( $data['queue_status'] ) && is_string( $data['queue_status'] ) ? \sanitize_text_field( substr( $data['queue_status'], 0, 32 ) ) : Job_Queue_Status::PENDING;
 		if ( $job_ref === '' || $job_type === '' ) {
 			return 0;
 		}

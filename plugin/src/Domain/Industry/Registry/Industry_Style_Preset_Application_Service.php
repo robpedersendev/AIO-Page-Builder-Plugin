@@ -143,10 +143,13 @@ final class Industry_Style_Preset_Application_Service {
 	}
 
 	private function record_applied_preset( string $preset_key, string $label ): void {
-		\update_option( Option_Names::APPLIED_INDUSTRY_PRESET, array(
-			'preset_key' => $preset_key,
-			'label'      => $label,
-			'applied_at' => \gmdate( 'Y-m-d\TH:i:s\Z' ),
-		) );
+		\update_option(
+			Option_Names::APPLIED_INDUSTRY_PRESET,
+			array(
+				'preset_key' => $preset_key,
+				'label'      => $label,
+				'applied_at' => \gmdate( 'Y-m-d\TH:i:s\Z' ),
+			)
+		);
 	}
 }

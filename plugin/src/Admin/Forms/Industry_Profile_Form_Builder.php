@@ -86,7 +86,7 @@ final class Industry_Profile_Form_Builder {
 	 */
 	public function get_field_config(): array {
 		return array(
-			'primary_industry_key'   => array(
+			'primary_industry_key'    => array(
 				'name'    => Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY,
 				'type'    => 'select',
 				'label'   => __( 'Primary industry', 'aio-page-builder' ),

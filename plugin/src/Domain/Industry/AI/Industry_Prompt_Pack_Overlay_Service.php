@@ -37,7 +37,7 @@ final class Industry_Prompt_Pack_Overlay_Service {
 	 * @return array<string, mixed> Overlay with schema_version; optional active_industry_key, required_page_families, discouraged_weak_fit, cta_priorities, industry_guidance_text, etc.
 	 */
 	public function get_overlay_for_artifact( array $input_artifact ): array {
-		$base = array( 'schema_version' => self::OVERLAY_SCHEMA_VERSION );
+		$base             = array( 'schema_version' => self::OVERLAY_SCHEMA_VERSION );
 		$industry_context = isset( $input_artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ] ) && is_array( $input_artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ] )
 			? $input_artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ]
 			: null;
@@ -47,7 +47,7 @@ final class Industry_Prompt_Pack_Overlay_Service {
 		$readiness = isset( $industry_context['readiness'] ) && is_array( $industry_context['readiness'] )
 			? $industry_context['readiness']
 			: array();
-		$state = isset( $readiness['state'] ) && is_string( $readiness['state'] ) ? $readiness['state'] : '';
+		$state     = isset( $readiness['state'] ) && is_string( $readiness['state'] ) ? $readiness['state'] : '';
 		if ( $state === 'none' || $state === 'minimal' ) {
 			return $base;
 		}
@@ -72,17 +72,31 @@ final class Industry_Prompt_Pack_Overlay_Service {
 			? $pack[ Industry_Pack_Schema::FIELD_SUPPORTED_PAGE_FAMILIES ]
 			: array();
 		if ( $supported !== array() ) {
-			$base['required_page_families'] = array_values( array_filter( array_map( function ( $v ) {
-				return is_string( $v ) ? trim( $v ) : '';
-			}, $supported ) ) );
+			$base['required_page_families'] = array_values(
+				array_filter(
+					array_map(
+						function ( $v ) {
+							return is_string( $v ) ? trim( $v ) : '';
+						},
+						$supported
+					)
+				)
+			);
 		}
 		$discouraged = isset( $pack[ Industry_Pack_Schema::FIELD_DISCOURAGED_SECTION_KEYS ] ) && is_array( $pack[ Industry_Pack_Schema::FIELD_DISCOURAGED_SECTION_KEYS ] )
 			? $pack[ Industry_Pack_Schema::FIELD_DISCOURAGED_SECTION_KEYS ]
 			: array();
 		if ( $discouraged !== array() ) {
-			$base['discouraged_weak_fit'] = array_values( array_filter( array_map( function ( $v ) {
-				return is_string( $v ) ? trim( $v ) : '';
-			}, $discouraged ) ) );
+			$base['discouraged_weak_fit'] = array_values(
+				array_filter(
+					array_map(
+						function ( $v ) {
+							return is_string( $v ) ? trim( $v ) : '';
+						},
+						$discouraged
+					)
+				)
+			);
 		}
 		$cta = isset( $pack[ Industry_Pack_Schema::FIELD_DEFAULT_CTA_PATTERNS ] ) && is_array( $pack[ Industry_Pack_Schema::FIELD_DEFAULT_CTA_PATTERNS ] )
 			? $pack[ Industry_Pack_Schema::FIELD_DEFAULT_CTA_PATTERNS ]
@@ -90,9 +104,16 @@ final class Industry_Prompt_Pack_Overlay_Service {
 				? $pack[ Industry_Pack_Schema::FIELD_PREFERRED_CTA_PATTERNS ]
 				: array() );
 		if ( $cta !== array() ) {
-			$base['cta_priorities'] = array_values( array_filter( array_map( function ( $v ) {
-				return is_string( $v ) ? trim( $v ) : '';
-			}, $cta ) ) );
+			$base['cta_priorities'] = array_values(
+				array_filter(
+					array_map(
+						function ( $v ) {
+							return is_string( $v ) ? trim( $v ) : '';
+						},
+						$cta
+					)
+				)
+			);
 		}
 		$summary = isset( $pack[ Industry_Pack_Schema::FIELD_SUMMARY ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_SUMMARY ] )
 			? trim( $pack[ Industry_Pack_Schema::FIELD_SUMMARY ] )

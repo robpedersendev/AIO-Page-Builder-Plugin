@@ -28,7 +28,7 @@ final class Preview_Cache_Record_Test extends TestCase {
 			false,
 			'none'
 		);
-		$arr = $record->to_array();
+		$arr    = $record->to_array();
 		$this->assertSame( 'aio_preview_abc123', $arr['cache_key'] );
 		$this->assertSame( 'section', $arr['type'] );
 		$this->assertSame( 'hero_conv_01', $arr['template_key'] );
@@ -50,7 +50,7 @@ final class Preview_Cache_Record_Test extends TestCase {
 			'reduced_motion' => true,
 			'animation_tier' => 'none',
 		);
-		$record = Preview_Cache_Record::from_array( $payload );
+		$record  = Preview_Cache_Record::from_array( $payload );
 		$this->assertSame( 'aio_preview_xyz', $record->get_cache_key() );
 		$this->assertSame( 'page', $record->get_type() );
 		$this->assertSame( 'pt_landing', $record->get_template_key() );
@@ -62,7 +62,7 @@ final class Preview_Cache_Record_Test extends TestCase {
 	}
 
 	public function test_roundtrip_to_array_from_array(): void {
-		$record = new Preview_Cache_Record(
+		$record   = new Preview_Cache_Record(
 			'key_sec_01',
 			Preview_Cache_Record::TYPE_SECTION,
 			'st_hero',
@@ -72,7 +72,7 @@ final class Preview_Cache_Record_Test extends TestCase {
 			true,
 			'none'
 		);
-		$arr = $record->to_array();
+		$arr      = $record->to_array();
 		$restored = Preview_Cache_Record::from_array( $arr );
 		$this->assertSame( $record->get_cache_key(), $restored->get_cache_key() );
 		$this->assertSame( $record->get_html(), $restored->get_html() );
@@ -91,7 +91,7 @@ final class Preview_Cache_Record_Test extends TestCase {
 			'reduced_motion' => false,
 			'animation_tier' => 'none',
 		);
-		$record = Preview_Cache_Record::from_array( $example );
+		$record  = Preview_Cache_Record::from_array( $example );
 		$this->assertSame( $example, $record->to_array() );
 	}
 }

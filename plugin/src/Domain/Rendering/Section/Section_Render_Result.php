@@ -78,13 +78,13 @@ final class Section_Render_Result {
 	private ?Omission_Result $omission_result;
 
 	/**
-	 * @param string                   $section_key     Section internal_key.
-	 * @param string                   $variant         Resolved variant key.
-	 * @param int                      $position        Zero-based position on page.
-	 * @param array<string, mixed>     $field_values    Sanitized field name => value (may be omission-filtered).
-	 * @param array<string, mixed>     $structure       wrapper_attrs, selector_map, structural_nodes, structural_hint, asset_hints, accessibility_notes.
-	 * @param list<string>             $errors          Validation/render errors; non-empty when invalid.
-	 * @param Omission_Result|null     $omission_result Optional; set when Smart_Omission_Service was applied.
+	 * @param string               $section_key     Section internal_key.
+	 * @param string               $variant         Resolved variant key.
+	 * @param int                  $position        Zero-based position on page.
+	 * @param array<string, mixed> $field_values    Sanitized field name => value (may be omission-filtered).
+	 * @param array<string, mixed> $structure       wrapper_attrs, selector_map, structural_nodes, structural_hint, asset_hints, accessibility_notes.
+	 * @param list<string>         $errors          Validation/render errors; non-empty when invalid.
+	 * @param Omission_Result|null $omission_result Optional; set when Smart_Omission_Service was applied.
 	 */
 	public function __construct(
 		string $section_key,
@@ -129,9 +129,9 @@ final class Section_Render_Result {
 	/** @return array{class: list<string>, id: string, data_attributes: array<string, string>, style?: string} */
 	public function get_wrapper_attrs(): array {
 		return $this->structure['wrapper_attrs'] ?? array(
-			'class'            => array(),
-			'id'               => '',
-			'data_attributes'  => array(),
+			'class'           => array(),
+			'id'              => '',
+			'data_attributes' => array(),
 		);
 	}
 
@@ -202,7 +202,7 @@ final class Section_Render_Result {
 			'structural_nodes'    => $this->get_structural_nodes(),
 			'structural_hint'     => $this->get_structural_hint(),
 			'asset_hints'         => $this->get_asset_hints(),
-			'accessibility_notes'  => $this->get_accessibility_notes(),
+			'accessibility_notes' => $this->get_accessibility_notes(),
 			'errors'              => $this->errors,
 			'section_style_block' => $this->get_section_style_block(),
 		);

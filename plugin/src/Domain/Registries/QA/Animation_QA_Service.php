@@ -58,20 +58,25 @@ final class Animation_QA_Service {
 		$sections = $this->section_repository->list_all_definitions_capped( self::LIBRARY_CAP );
 		$pages    = $this->page_repository->list_all_definitions_capped( self::LIBRARY_CAP );
 
-		$violations     = array();
-		$section_by_tier = array( 'none' => 0, 'subtle' => 0, 'enhanced' => 0, 'premium' => 0 );
+		$violations                  = array();
+		$section_by_tier             = array(
+			'none'     => 0,
+			'subtle'   => 0,
+			'enhanced' => 0,
+			'premium'  => 0,
+		);
 		$reduced_motion_capped_count = 0;
-		$all_resolve_safe = true;
+		$all_resolve_safe            = true;
 
 		foreach ( $sections as $def ) {
 			$this->audit_section( $def, $violations, $section_by_tier );
-			$resolved = $this->tier_resolver->resolve( $def, null, true );
+			$resolved  = $this->tier_resolver->resolve( $def, null, true );
 			$effective = $resolved['effective_tier'] ?? 'none';
 			if ( in_array( $effective, self::REDUCED_MOTION_SAFE_TIERS, true ) ) {
 				$declared = (string) ( $def['animation_tier'] ?? 'none' );
 				$declared = in_array( $declared, self::ALLOWED_TIERS, true ) ? $declared : 'none';
 				if ( $this->tier_order( $declared ) > $this->tier_order( $effective ) ) {
-					$reduced_motion_capped_count++;
+					++$reduced_motion_capped_count;
 				}
 			} else {
 				$all_resolve_safe = false;
@@ -83,21 +88,27 @@ final class Animation_QA_Service {
 			$this->audit_page( $def, $violations );
 			$cap = (string) ( $def['animation_tier_cap'] ?? '' );
 			if ( $cap !== '' && in_array( $cap, self::ALLOWED_TIERS, true ) ) {
-				$page_with_cap++;
+				++$page_with_cap;
 			}
 		}
 
-		$section_violations = array_filter( $violations, function ( $v ) {
-			return ( $v['scope'] ?? '' ) === 'section';
-		} );
-		$page_violations = array_filter( $violations, function ( $v ) {
-			return ( $v['scope'] ?? '' ) === 'page';
-		} );
+		$section_violations = array_filter(
+			$violations,
+			function ( $v ) {
+				return ( $v['scope'] ?? '' ) === 'section';
+			}
+		);
+		$page_violations    = array_filter(
+			$violations,
+			function ( $v ) {
+				return ( $v['scope'] ?? '' ) === 'page';
+			}
+		);
 
 		$reduced_motion_check_result = array(
-			'sections_checked'       => count( $sections ),
-			'all_resolve_safe_tier'   => $all_resolve_safe,
-			'sections_capped_count'   => $reduced_motion_capped_count,
+			'sections_checked'      => count( $sections ),
+			'all_resolve_safe_tier' => $all_resolve_safe,
+			'sections_capped_count' => $reduced_motion_capped_count,
 		);
 
 		$section_summary = array(
@@ -133,9 +144,9 @@ final class Animation_QA_Service {
 	}
 
 	/**
-	 * @param array<string, mixed> $def
+	 * @param array<string, mixed>                                                            $def
 	 * @param list<array{scope: string, template_key: string, code: string, message: string}> $violations
-	 * @param array<string, int> $section_by_tier
+	 * @param array<string, int>                                                              $section_by_tier
 	 */
 	private function audit_section( array $def, array &$violations, array &$section_by_tier ): void {
 		$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
@@ -146,7 +157,7 @@ final class Animation_QA_Service {
 		$tier = (string) ( $def['animation_tier'] ?? 'none' );
 		$tier = \sanitize_key( $tier );
 		if ( ! in_array( $tier, self::ALLOWED_TIERS, true ) ) {
-			$tier = 'none';
+			$tier         = 'none';
 			$violations[] = array(
 				'scope'        => 'section',
 				'template_key' => $key,
@@ -195,7 +206,7 @@ final class Animation_QA_Service {
 	}
 
 	/**
-	 * @param array<string, mixed> $def
+	 * @param array<string, mixed>                                                            $def
 	 * @param list<array{scope: string, template_key: string, code: string, message: string}> $violations
 	 */
 	private function audit_page( array $def, array &$violations ): void {
@@ -232,7 +243,12 @@ final class Animation_QA_Service {
 	}
 
 	private function tier_order( string $tier ): int {
-		$order = array( 'none' => 0, 'subtle' => 1, 'enhanced' => 2, 'premium' => 3 );
+		$order = array(
+			'none'     => 0,
+			'subtle'   => 1,
+			'enhanced' => 2,
+			'premium'  => 3,
+		);
 		return $order[ $tier ] ?? 0;
 	}
 }

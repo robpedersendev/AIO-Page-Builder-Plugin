@@ -39,7 +39,7 @@ final class ACF_Fixture_Builder_Test extends TestCase {
 	}
 
 	public function test_build_scenario_valid_section_has_blueprint(): void {
-		$result = ACF_Fixture_Builder::build_scenario( ACF_Fixture_Builder::SCENARIO_VALID );
+		$result  = ACF_Fixture_Builder::build_scenario( ACF_Fixture_Builder::SCENARIO_VALID );
 		$section = $result['section_definitions'][0];
 		$this->assertArrayHasKey( 'field_blueprint', $section );
 		$this->assertArrayHasKey( 'internal_key', $section );

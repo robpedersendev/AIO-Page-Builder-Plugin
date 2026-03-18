@@ -49,8 +49,14 @@ final class Stub_Heartbeat_Transport implements Heartbeat_Transport_Interface {
 
 	public function send( array $envelope ): array {
 		return $this->success
-			? array( 'success' => true, 'failure_reason' => '' )
-			: array( 'success' => false, 'failure_reason' => $this->failure_reason ?: 'Delivery failed.' );
+			? array(
+				'success'        => true,
+				'failure_reason' => '',
+			)
+			: array(
+				'success'        => false,
+				'failure_reason' => $this->failure_reason ?: 'Delivery failed.',
+			);
 	}
 }
 
@@ -78,10 +84,10 @@ final class Heartbeat_Service_Test extends TestCase {
 	}
 
 	public function test_first_monthly_heartbeat_send(): void {
-		$transport = new Stub_Heartbeat_Transport();
+		$transport          = new Stub_Heartbeat_Transport();
 		$transport->success = true;
-		$service = new Heartbeat_Service( $transport, null );
-		$result  = $service->maybe_send( 'test-site.local' );
+		$service            = new Heartbeat_Service( $transport, null );
+		$result             = $service->maybe_send( 'test-site.local' );
 
 		$this->assertSame( Heartbeat_Result::HEARTBEAT_SENT, $result->get_heartbeat_status() );
 		$this->assertSame( 'sent', $result->get_delivery_status() );
@@ -114,11 +120,11 @@ final class Heartbeat_Service_Test extends TestCase {
 	}
 
 	public function test_failed_delivery_updates_retry_state(): void {
-		$transport = new Stub_Heartbeat_Transport();
-		$transport->success = false;
+		$transport                 = new Stub_Heartbeat_Transport();
+		$transport->success        = false;
 		$transport->failure_reason = 'SMTP error.';
-		$service = new Heartbeat_Service( $transport, null );
-		$result  = $service->maybe_send( 'test.local' );
+		$service                   = new Heartbeat_Service( $transport, null );
+		$result                    = $service->maybe_send( 'test.local' );
 
 		$this->assertSame( Heartbeat_Result::HEARTBEAT_FAILED, $result->get_heartbeat_status() );
 		$this->assertSame( 'failed', $result->get_delivery_status() );
@@ -179,14 +185,17 @@ final class Heartbeat_Service_Test extends TestCase {
 	public function test_example_heartbeat_result_payload(): void {
 		$result  = Heartbeat_Result::sent( '2025-03', 'report_heartbeat_abc123' );
 		$example = $result->to_array();
-		$this->assertSame( array(
-			'due_month'             => '2025-03',
-			'last_successful_month' => '2025-03',
-			'heartbeat_status'      => 'sent',
-			'delivery_status'       => 'sent',
-			'log_reference'         => 'report_heartbeat_abc123',
-			'failure_reason'        => '',
-		), $example );
+		$this->assertSame(
+			array(
+				'due_month'             => '2025-03',
+				'last_successful_month' => '2025-03',
+				'heartbeat_status'      => 'sent',
+				'delivery_status'       => 'sent',
+				'log_reference'         => 'report_heartbeat_abc123',
+				'failure_reason'        => '',
+			),
+			$example
+		);
 	}
 
 	/**

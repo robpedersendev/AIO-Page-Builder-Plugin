@@ -32,9 +32,9 @@ final class Rollback_Page_Replacement_Handler implements Rollback_Handler_Interf
 	 * @return Rollback_Result
 	 */
 	public function execute( array $pre_snapshot, array $post_snapshot, array $context = array() ): Rollback_Result {
-		$job_id = isset( $context['job_id'] ) && is_string( $context['job_id'] ) ? $context['job_id'] : '';
+		$job_id     = isset( $context['job_id'] ) && is_string( $context['job_id'] ) ? $context['job_id'] : '';
 		$target_ref = (string) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? '' );
-		$pre_block = $pre_snapshot[ Operational_Snapshot_Schema::FIELD_PRE_CHANGE ] ?? null;
+		$pre_block  = $pre_snapshot[ Operational_Snapshot_Schema::FIELD_PRE_CHANGE ] ?? null;
 		if ( ! is_array( $pre_block ) ) {
 			return Rollback_Result::failed(
 				$job_id,
@@ -90,14 +90,14 @@ final class Rollback_Page_Replacement_Handler implements Rollback_Handler_Interf
 				array( 'code' => 'target_missing' )
 			);
 		}
-		$title  = isset( $state['post_title'] ) ? (string) $state['post_title'] : $post->post_title;
-		$name   = isset( $state['post_name'] ) ? (string) $state['post_name'] : $post->post_name;
-		$status = isset( $state['post_status'] ) ? (string) $state['post_status'] : $post->post_status;
+		$title   = isset( $state['post_title'] ) ? (string) $state['post_title'] : $post->post_title;
+		$name    = isset( $state['post_name'] ) ? (string) $state['post_name'] : $post->post_name;
+		$status  = isset( $state['post_status'] ) ? (string) $state['post_status'] : $post->post_status;
 		$updated = \wp_update_post(
 			array(
-				'ID'         => $post_id,
-				'post_title' => $title,
-				'post_name'  => $name,
+				'ID'          => $post_id,
+				'post_title'  => $title,
+				'post_name'   => $name,
 				'post_status' => $status,
 			),
 			true
@@ -121,7 +121,11 @@ final class Rollback_Page_Replacement_Handler implements Rollback_Handler_Interf
 			$pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ?? '',
 			$post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ?? '',
 			'',
-			array( 'restored_title' => $title, 'restored_slug' => $name, 'restored_status' => $status )
+			array(
+				'restored_title'  => $title,
+				'restored_slug'   => $name,
+				'restored_status' => $status,
+			)
 		);
 	}
 }

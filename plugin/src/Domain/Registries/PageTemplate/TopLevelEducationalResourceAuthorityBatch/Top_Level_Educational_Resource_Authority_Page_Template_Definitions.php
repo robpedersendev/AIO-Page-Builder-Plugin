@@ -82,32 +82,35 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
-		$ordered    = array();
+		$ordered      = array();
 		$requirements = array();
 		foreach ( $section_keys as $pos => $key ) {
-			$ordered[] = array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => $key,
+			$ordered[]            = array(
+				Page_Template_Schema::SECTION_ITEM_KEY => $key,
 				Page_Template_Schema::SECTION_ITEM_POSITION => $pos,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			);
 			$requirements[ $key ] = array( 'required' => true );
 		}
-		return array( 'ordered' => $ordered, 'requirements' => $requirements );
+		return array(
+			'ordered'      => $ordered,
+			'requirements' => $requirements,
+		);
 	}
 
 	/**
 	 * Base page template shape for top-level educational/resource/authority batch.
 	 *
-	 * @param string       $internal_key
-	 * @param string       $name
-	 * @param string       $purpose_summary
-	 * @param string       $archetype
-	 * @param string       $template_family
-	 * @param array        $ordered
-	 * @param array        $section_requirements
-	 * @param array        $one_pager
-	 * @param string       $endpoint_notes
-	 * @param array        $extra
+	 * @param string $internal_key
+	 * @param string $name
+	 * @param string $purpose_summary
+	 * @param string $archetype
+	 * @param string $template_family
+	 * @param array  $ordered
+	 * @param array  $section_requirements
+	 * @param array  $one_pager
+	 * @param string $endpoint_notes
+	 * @param array  $extra
 	 * @return array<string, mixed>
 	 */
 	private static function base_template(
@@ -123,20 +126,23 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 		array $extra = array()
 	): array {
 		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY             => $internal_key,
-			Page_Template_Schema::FIELD_NAME                     => $name,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY          => $purpose_summary,
-			Page_Template_Schema::FIELD_ARCHETYPE                 => $archetype,
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS         => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS     => $section_requirements,
-			Page_Template_Schema::FIELD_COMPATIBILITY             => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                => $one_pager,
-			Page_Template_Schema::FIELD_VERSION                  => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                   => 'active',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $internal_key,
+			Page_Template_Schema::FIELD_NAME             => $name,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => $purpose_summary,
+			Page_Template_Schema::FIELD_ARCHETYPE        => $archetype,
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_requirements,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => $one_pager,
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES  => $endpoint_notes,
-			'template_category_class'                           => 'top_level',
-			'template_family'                                    => $template_family,
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => $endpoint_notes,
+			'template_category_class'                    => 'top_level',
+			'template_family'                            => $template_family,
 		);
 		if ( ! isset( $extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
 			$extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
@@ -159,7 +165,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'lpu_support_escalation_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_resource_overview_01',
 			'Resource overview',
@@ -169,14 +175,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Resource hub overview. Educate then guide to next step; CTAs spaced after explainer, after value prop, and at bottom.',
+				'page_purpose_summary'  => 'Resource hub overview. Educate then guide to next step; CTAs spaced after explainer, after value prop, and at bottom.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Educational opener; explainer and cards; first CTA; process and trust; value and inquiry CTA; FAQ and related content; support and final CTA.',
-				'cta_direction_summary'  => 'Service/inquiry/contact CTAs; soft conversion before stronger bottom CTA.',
+				'page_flow_explanation' => 'Educational opener; explainer and cards; first CTA; process and trust; value and inquiry CTA; FAQ and related content; support and final CTA.',
+				'cta_direction_summary' => 'Service/inquiry/contact CTAs; soft conversion before stronger bottom CTA.',
 			),
 			'Requires section library (hero, fb, ptf, tp, mlp, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Resource-first flow; moderate FAQ; clear progression to contact.',
 			)
 		);
@@ -197,7 +203,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'lpu_form_intro_01',
 			'cta_quote_request_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_resource_learning_01',
 			'Resource (learning flow)',
@@ -207,14 +213,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Learning-first resource. Steps and benefits before first CTA; FAQ and explainer deepen understanding; booking and quote CTAs.',
+				'page_purpose_summary'  => 'Learning-first resource. Steps and benefits before first CTA; FAQ and explainer deepen understanding; booking and quote CTAs.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Educational hero; steps and benefits; consultation CTA; FAQ and reassurance; explainer and booking CTA; expectations and cards; form and quote CTA.',
-				'cta_direction_summary'  => 'Consultation, booking, quote request; education supports conversion.',
+				'page_flow_explanation' => 'Educational hero; steps and benefits; consultation CTA; FAQ and reassurance; explainer and booking CTA; expectations and cards; form and quote CTA.',
+				'cta_direction_summary' => 'Consultation, booking, quote request; education supports conversion.',
 			),
 			'Requires section library (hero, ptf, fb, tp, mlp, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Step-by-step learning; single FAQ block; form intro before final CTA.',
 			)
 		);
@@ -235,7 +241,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'tp_credential_01',
 			'cta_trust_confirm_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_authority_explanatory_01',
 			'Authority (explanatory)',
@@ -245,14 +251,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Authority-first explanatory. Build credibility and explain; contact and consultation CTAs; close with trust CTA.',
+				'page_purpose_summary'  => 'Authority-first explanatory. Build credibility and explain; contact and consultation CTAs; close with trust CTA.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Credibility and authority; value and contact CTA; timeline and quote; differentiator and consultation CTA; explainer and disclosure; credentials and trust CTA.',
-				'cta_direction_summary'  => 'Contact, consultation, trust confirm; authority supports conversion.',
+				'page_flow_explanation' => 'Credibility and authority; value and contact CTA; timeline and quote; differentiator and consultation CTA; explainer and disclosure; credentials and trust CTA.',
+				'cta_direction_summary' => 'Contact, consultation, trust confirm; authority supports conversion.',
 			),
 			'Requires section library (hero, tp, fb, ptf, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Authority and credentials heavy; policy explainer; soft then direct CTAs.',
 			)
 		);
@@ -273,7 +279,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'tp_testimonial_01',
 			'cta_support_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_authority_editorial_01',
 			'Authority (editorial)',
@@ -283,14 +289,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Editorial authority. Story and proof before first CTA; process and disclosure; contact and support CTAs.',
+				'page_purpose_summary'  => 'Editorial authority. Story and proof before first CTA; process and disclosure; contact and support CTAs.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Editorial opener; quote and timeline; benefit detail and inquiry CTA; authority and process; disclosure and contact CTA; value and testimonial; support CTA.',
-				'cta_direction_summary'  => 'Inquiry, contact, support; editorial tone with clear CTAs.',
+				'page_flow_explanation' => 'Editorial opener; quote and timeline; benefit detail and inquiry CTA; authority and process; disclosure and contact CTA; value and testimonial; support CTA.',
+				'cta_direction_summary' => 'Inquiry, contact, support; editorial tone with clear CTAs.',
 			),
 			'Requires section library (hero, tp, fb, ptf, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Editorial flow; timeline and benefit detail; three CTAs spaced.',
 			)
 		);
@@ -311,7 +317,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'fb_differentiator_01',
 			'cta_consultation_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_comparison_decision_01',
 			'Comparison (decision support)',
@@ -321,14 +327,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Decision-support comparison. Compare options then product and compare-next CTAs; FAQ and trust; consultation CTA.',
+				'page_purpose_summary'  => 'Decision-support comparison. Compare options then product and compare-next CTAs; FAQ and trust; consultation CTA.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Compact opener; offer compare and steps; product CTA; reassurance and why choose; FAQ and compare-next CTA; cards and trust; differentiator and consultation CTA.',
-				'cta_direction_summary'  => 'Product detail, compare next, consultation; comparison supports decision.',
+				'page_flow_explanation' => 'Compact opener; offer compare and steps; product CTA; reassurance and why choose; FAQ and compare-next CTA; cards and trust; differentiator and consultation CTA.',
+				'cta_direction_summary' => 'Product detail, compare next, consultation; comparison supports decision.',
 			),
 			'Requires section library (hero, fb, ptf, tp, mlp, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Comparison-heavy; FAQ and reassurance; multiple decision CTAs.',
 			)
 		);
@@ -349,7 +355,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'lpu_support_escalation_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_comparison_buyer_guide_01',
 			'Comparison (buyer guide)',
@@ -359,14 +365,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Buyer-guide style comparison. Process and compare; FAQ by category; inquiry and quote CTAs; contact at bottom.',
+				'page_purpose_summary'  => 'Buyer-guide style comparison. Process and compare; FAQ by category; inquiry and quote CTAs; contact at bottom.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Educational hero; buying process and compare; inquiry CTA; FAQ by category and microproof; value and quote CTA; expectations and cards; support and contact CTA.',
-				'cta_direction_summary'  => 'Inquiry, quote request, contact; educational then conversion.',
+				'page_flow_explanation' => 'Educational hero; buying process and compare; inquiry CTA; FAQ by category and microproof; value and quote CTA; expectations and cards; support and contact CTA.',
+				'cta_direction_summary' => 'Inquiry, quote request, contact; educational then conversion.',
 			),
 			'Requires section library (hero, ptf, fb, tp, mlp, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'FAQ by category; buying process; buyer-guide flow.',
 			)
 		);
@@ -387,7 +393,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'mlp_related_content_01',
 			'cta_inquiry_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_faq_educational_01',
 			'FAQ (educational)',
@@ -397,14 +403,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'FAQ-dense educational. Multiple FAQ sections; explainers; support, contact, inquiry CTAs.',
+				'page_purpose_summary'  => 'FAQ-dense educational. Multiple FAQ sections; explainers; support, contact, inquiry CTAs.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Educational hero; FAQ by category and standard FAQ; support CTA; explainer and accordion FAQ; reassurance and contact CTA; policy explainer and support; related content and inquiry CTA.',
-				'cta_direction_summary'  => 'Support, contact, inquiry; FAQ reduces friction before conversion.',
+				'page_flow_explanation' => 'Educational hero; FAQ by category and standard FAQ; support CTA; explainer and accordion FAQ; reassurance and contact CTA; policy explainer and support; related content and inquiry CTA.',
+				'cta_direction_summary' => 'Support, contact, inquiry; FAQ reduces friction before conversion.',
 			),
 			'Requires section library (hero, ptf, fb, tp, lpu, mlp, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'High FAQ density; resource and policy explainers; three CTAs.',
 			)
 		);
@@ -425,7 +431,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'fb_value_prop_01',
 			'cta_support_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_faq_reassurance_01',
 			'FAQ (reassurance)',
@@ -435,14 +441,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'FAQ with reassurance emphasis. Trust and why-choose between FAQ blocks; booking, contact, support CTAs.',
+				'page_purpose_summary'  => 'FAQ with reassurance emphasis. Trust and why-choose between FAQ blocks; booking, contact, support CTAs.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Compact hero; FAQ and reassurance; booking CTA; accordion FAQ and why choose; trust band and contact CTA; expectations and form; value and support CTA.',
-				'cta_direction_summary'  => 'Booking, contact, support; reassurance supports conversion.',
+				'page_flow_explanation' => 'Compact hero; FAQ and reassurance; booking CTA; accordion FAQ and why choose; trust band and contact CTA; expectations and form; value and support CTA.',
+				'cta_direction_summary' => 'Booking, contact, support; reassurance supports conversion.',
 			),
 			'Requires section library (hero, ptf, fb, tp, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Reassurance and trust heavy; two FAQ blocks; form intro before final CTA.',
 			)
 		);
@@ -463,7 +469,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'tp_reassurance_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_buyer_guide_01',
 			'Buyer guide',
@@ -473,14 +479,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Buyer guide. Process and why-choose; consultation and quote CTAs; guarantee and reassurance; contact CTA.',
+				'page_purpose_summary'  => 'Buyer guide. Process and why-choose; consultation and quote CTAs; guarantee and reassurance; contact CTA.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Educational hero; buying process and why choose; consultation CTA; FAQ and offer highlight; guarantee and quote CTA; how-it-works and cards; reassurance and contact CTA.',
-				'cta_direction_summary'  => 'Consultation, quote request, contact; guide supports decision.',
+				'page_flow_explanation' => 'Educational hero; buying process and why choose; consultation CTA; FAQ and offer highlight; guarantee and quote CTA; how-it-works and cards; reassurance and contact CTA.',
+				'cta_direction_summary' => 'Consultation, quote request, contact; guide supports decision.',
 			),
 			'Requires section library (hero, ptf, fb, tp, mlp, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Buying process and guarantee; single FAQ; three CTAs.',
 			)
 		);
@@ -501,7 +507,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'lpu_trust_disclosure_01',
 			'cta_consultation_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_buyer_guide_compare_01',
 			'Buyer guide (comparison)',
@@ -511,14 +517,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Buyer guide with comparison. Compare and steps; product CTA; FAQ by category; inquiry and consultation CTAs.',
+				'page_purpose_summary'  => 'Buyer guide with comparison. Compare and steps; product CTA; FAQ by category; inquiry and consultation CTAs.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Compact hero; offer compare and steps; product CTA; FAQ by category and rating; differentiator and inquiry CTA; expectations and cards; disclosure and consultation CTA.',
-				'cta_direction_summary'  => 'Product detail, inquiry, consultation; comparison supports choice.',
+				'page_flow_explanation' => 'Compact hero; offer compare and steps; product CTA; FAQ by category and rating; differentiator and inquiry CTA; expectations and cards; disclosure and consultation CTA.',
+				'cta_direction_summary' => 'Product detail, inquiry, consultation; comparison supports choice.',
 			),
 			'Requires section library (hero, fb, ptf, tp, mlp, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Comparison steps and FAQ by category; rating and disclosure.',
 			)
 		);
@@ -539,7 +545,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_inquiry_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_informational_landing_01',
 			'Informational landing',
@@ -549,14 +555,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Informational landing with clear CTAs. Value and process; contact and booking CTAs; proof and panel; inquiry CTA.',
+				'page_purpose_summary'  => 'Informational landing with clear CTAs. Value and process; contact and booking CTAs; proof and panel; inquiry CTA.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Educational hero; value and how-it-works; contact CTA; trust and benefits; FAQ and booking CTA; cards and testimonial; contact panel and inquiry CTA.',
-				'cta_direction_summary'  => 'Contact, booking, inquiry; balanced education and conversion.',
+				'page_flow_explanation' => 'Educational hero; value and how-it-works; contact CTA; trust and benefits; FAQ and booking CTA; cards and testimonial; contact panel and inquiry CTA.',
+				'cta_direction_summary' => 'Contact, booking, inquiry; balanced education and conversion.',
 			),
 			'Requires section library (hero, fb, ptf, tp, mlp, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Balanced info and conversion; single FAQ; contact panel.',
 			)
 		);
@@ -578,7 +584,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			'lpu_support_escalation_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_informational_landing_soft_cta_01',
 			'Informational landing (soft CTA)',
@@ -588,14 +594,14 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Informational with softer CTA emphasis. More content before first CTA; support, inquiry, contact CTAs.',
+				'page_purpose_summary'  => 'Informational with softer CTA emphasis. More content before first CTA; support, inquiry, contact CTAs.',
 				'section_helper_order'  => 'same_as_template',
-				'page_flow_explanation'  => 'Credibility and explainer; timeline and authority; support CTA; FAQ and differentiator; related content and inquiry CTA; expectations and reassurance; support band and contact CTA.',
-				'cta_direction_summary'  => 'Support, inquiry, contact; education-first then conversion.',
+				'page_flow_explanation' => 'Credibility and explainer; timeline and authority; support CTA; FAQ and differentiator; related content and inquiry CTA; expectations and reassurance; support band and contact CTA.',
+				'cta_direction_summary' => 'Support, inquiry, contact; education-first then conversion.',
 			),
 			'Requires section library (hero, fb, ptf, tp, mlp, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
+				'preview_metadata'      => array( 'synthetic' => true ),
 				'differentiation_notes' => 'Softer CTA posture; four content blocks before first CTA; support then contact.',
 			)
 		);

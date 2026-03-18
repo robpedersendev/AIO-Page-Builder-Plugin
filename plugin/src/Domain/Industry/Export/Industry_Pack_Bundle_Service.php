@@ -94,14 +94,14 @@ final class Industry_Pack_Bundle_Service {
 	/**
 	 * Builds a portable industry pack bundle from built-in definitions or from provided sources.
 	 *
-	 * @param array<string, mixed> $options Optional. 'include_site_profile' => true to add site_profile; 'industry_profile' => array, 'applied_preset' => array when including.
+	 * @param array<string, mixed>                                 $options Optional. 'include_site_profile' => true to add site_profile; 'industry_profile' => array, 'applied_preset' => array when including.
 	 * @param array<string, array<int, array<string, mixed>>>|null $sources Optional. When provided, use these arrays per payload key (packs, starter_bundles, etc.) instead of built-in; allows testing without loading registries.
 	 * @return array<string, mixed> Bundle with manifest and payload keys.
 	 */
-	public function build_bundle( array $options = [], ?array $sources = null ): array {
+	public function build_bundle( array $options = array(), ?array $sources = null ): array {
 		$include_site_profile = ! empty( $options['include_site_profile'] );
-		$industry_profile    = $options['industry_profile'] ?? array();
-		$applied_preset      = $options['applied_preset'] ?? array();
+		$industry_profile     = $options['industry_profile'] ?? array();
+		$applied_preset       = $options['applied_preset'] ?? array();
 
 		if ( $sources !== null && is_array( $sources ) ) {
 			$packs    = $sources[ self::PAYLOAD_PACKS ] ?? array();
@@ -141,20 +141,20 @@ final class Industry_Pack_Bundle_Service {
 		}
 
 		$bundle = array(
-			self::MANIFEST_BUNDLE_VERSION       => self::BUNDLE_VERSION,
-			self::MANIFEST_SCHEMA_VERSION      => '1',
-			self::MANIFEST_CREATED_AT           => gmdate( 'c' ),
-			self::MANIFEST_INCLUDED_CATEGORIES  => $included,
-			self::MANIFEST_DEPENDENCY_REFS      => null,
-			self::PAYLOAD_PACKS                 => $packs,
-			self::PAYLOAD_STARTER_BUNDLES       => $starter,
-			self::PAYLOAD_STYLE_PRESETS         => $presets,
-			self::PAYLOAD_CTA_PATTERNS          => $cta,
-			self::PAYLOAD_SEO_GUIDANCE          => $seo,
-			self::PAYLOAD_LPAGERY_RULES         => $lpagery,
+			self::MANIFEST_BUNDLE_VERSION         => self::BUNDLE_VERSION,
+			self::MANIFEST_SCHEMA_VERSION         => '1',
+			self::MANIFEST_CREATED_AT             => gmdate( 'c' ),
+			self::MANIFEST_INCLUDED_CATEGORIES    => $included,
+			self::MANIFEST_DEPENDENCY_REFS        => null,
+			self::PAYLOAD_PACKS                   => $packs,
+			self::PAYLOAD_STARTER_BUNDLES         => $starter,
+			self::PAYLOAD_STYLE_PRESETS           => $presets,
+			self::PAYLOAD_CTA_PATTERNS            => $cta,
+			self::PAYLOAD_SEO_GUIDANCE            => $seo,
+			self::PAYLOAD_LPAGERY_RULES           => $lpagery,
 			self::PAYLOAD_SECTION_HELPER_OVERLAYS => $section,
 			self::PAYLOAD_PAGE_ONE_PAGER_OVERLAYS => $onepager,
-			self::PAYLOAD_QUESTION_PACKS        => $question,
+			self::PAYLOAD_QUESTION_PACKS          => $question,
 		);
 		if ( $include_site_profile ) {
 			$bundle[ self::PAYLOAD_SITE_PROFILE ] = array(
@@ -172,7 +172,7 @@ final class Industry_Pack_Bundle_Service {
 	 * @return list<string> List of error messages; empty if valid.
 	 */
 	public function validate_bundle( array $bundle ): array {
-		$errors = array();
+		$errors  = array();
 		$version = isset( $bundle[ self::MANIFEST_BUNDLE_VERSION ] ) && is_string( $bundle[ self::MANIFEST_BUNDLE_VERSION ] )
 			? trim( $bundle[ self::MANIFEST_BUNDLE_VERSION ] )
 			: '';

@@ -29,7 +29,7 @@ final class Content_Survivability_Checker {
 	/**
 	 * Checks post_content and optional context for survivability.
 	 *
-	 * @param string              $post_content Raw post_content (block markup or HTML).
+	 * @param string               $post_content Raw post_content (block markup or HTML).
 	 * @param array<string, mixed> $context      Optional: survivability_notes (list), source_type, source_key for reporting.
 	 * @return Content_Survivability_Result
 	 */
@@ -43,7 +43,7 @@ final class Content_Survivability_Checker {
 			$prohibited[] = 'unreplaced_token_placeholder';
 		}
 
-		$notes = isset( $context['survivability_notes'] ) && is_array( $context['survivability_notes'] )
+		$notes         = isset( $context['survivability_notes'] ) && is_array( $context['survivability_notes'] )
 			? $context['survivability_notes']
 			: array();
 		$dynamic_flags = array();
@@ -59,7 +59,7 @@ final class Content_Survivability_Checker {
 			$editability[] = 'content_meaningful_without_plugin_runtime';
 		}
 
-		$is_survivable = empty( $prohibited );
+		$is_survivable      = empty( $prohibited );
 		$deactivation_ready = $is_survivable;
 
 		return new Content_Survivability_Result(

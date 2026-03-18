@@ -60,7 +60,7 @@ final class AI_Providers_Screen {
 
 	private function render_connection_test_notice(): void {
 		$message = isset( $_GET['aio_provider_message'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['aio_provider_message'] ) ) : '';
-		$status = isset( $_GET['aio_provider_status'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['aio_provider_status'] ) ) : '';
+		$status  = isset( $_GET['aio_provider_status'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['aio_provider_status'] ) ) : '';
 		if ( $message === '' || $status === '' ) {
 			return;
 		}
@@ -74,7 +74,7 @@ final class AI_Providers_Screen {
 	 * @return bool True if request was handled (redirect sent).
 	 */
 	private function maybe_handle_test_connection(): bool {
-		$action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
+		$action      = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
 		$provider_id = isset( $_GET['provider_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['provider_id'] ) ) : '';
 		if ( $action !== 'test_connection' || $provider_id === '' ) {
 			return false;
@@ -93,8 +93,8 @@ final class AI_Providers_Screen {
 		}
 		try {
 			$test_service = $this->container->get( 'provider_connection_test_service' );
-			$result = $test_service->run_test( $driver );
-			$message = $result->is_success()
+			$result       = $test_service->run_test( $driver );
+			$message      = $result->is_success()
 				? __( 'Connection test succeeded.', 'aio-page-builder' )
 				: $result->get_user_message();
 			$this->redirect_back( $result->is_success() ? 'success' : 'error', $message );
@@ -120,7 +120,7 @@ final class AI_Providers_Screen {
 	 * @return bool True if request was handled (redirect sent).
 	 */
 	private function maybe_handle_update_credential(): bool {
-		$action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
+		$action      = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
 		$provider_id = isset( $_GET['provider_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['provider_id'] ) ) : '';
 		if ( $action !== 'update_credential' || $provider_id === '' ) {
 			return false;
@@ -137,7 +137,7 @@ final class AI_Providers_Screen {
 	private function redirect_back( string $status, string $message ): void {
 		$url = \add_query_arg(
 			array(
-				'page' => self::SLUG,
+				'page'                 => self::SLUG,
 				'aio_provider_message' => $message,
 				'aio_provider_status'  => $status,
 			),
@@ -235,11 +235,11 @@ final class AI_Providers_Screen {
 					<tbody>
 						<?php foreach ( $provider_rows as $row ) : ?>
 							<?php
-							$credential = $row['credential_status'] ?? array( 'label' => '—' );
-							$model_state = $row['model_default_state'] ?? array( 'label' => '—' );
-							$test = $row['connection_test_summary'];
-							$last_use = $row['last_successful_use'] ?? null;
-							$test_btn_url = $this->test_connection_url( $row['provider_id'] );
+							$credential      = $row['credential_status'] ?? array( 'label' => '—' );
+							$model_state     = $row['model_default_state'] ?? array( 'label' => '—' );
+							$test            = $row['connection_test_summary'];
+							$last_use        = $row['last_successful_use'] ?? null;
+							$test_btn_url    = $this->test_connection_url( $row['provider_id'] );
 							$update_cred_url = $this->update_credential_url( $row['provider_id'] );
 							?>
 							<tr>
@@ -285,10 +285,10 @@ final class AI_Providers_Screen {
 	private function test_connection_url( string $provider_id ): string {
 		return \add_query_arg(
 			array(
-				'page'   => self::SLUG,
-				'action' => 'test_connection',
+				'page'        => self::SLUG,
+				'action'      => 'test_connection',
 				'provider_id' => $provider_id,
-				'_wpnonce' => \wp_create_nonce( 'aio_test_connection_' . $provider_id ),
+				'_wpnonce'    => \wp_create_nonce( 'aio_test_connection_' . $provider_id ),
 			),
 			\admin_url( 'admin.php' )
 		);
@@ -303,10 +303,10 @@ final class AI_Providers_Screen {
 	private function update_credential_url( string $provider_id ): string {
 		return \add_query_arg(
 			array(
-				'page'   => self::SLUG,
-				'action' => 'update_credential',
+				'page'        => self::SLUG,
+				'action'      => 'update_credential',
 				'provider_id' => $provider_id,
-				'_wpnonce' => \wp_create_nonce( 'aio_update_credential_' . $provider_id ),
+				'_wpnonce'    => \wp_create_nonce( 'aio_update_credential_' . $provider_id ),
 			),
 			\admin_url( 'admin.php' )
 		);

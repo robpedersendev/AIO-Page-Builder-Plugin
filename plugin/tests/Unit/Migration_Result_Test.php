@@ -33,7 +33,7 @@ final class Migration_Result_Test extends TestCase {
 	}
 
 	public function test_to_array_has_required_keys(): void {
-		$r = new Migration_Result( Migration_Result::STATUS_WARNING, 'Warning.', array( 'note1' ), true, 'id_2' );
+		$r   = new Migration_Result( Migration_Result::STATUS_WARNING, 'Warning.', array( 'note1' ), true, 'id_2' );
 		$arr = $r->to_array();
 		$this->assertArrayHasKey( 'status', $arr );
 		$this->assertArrayHasKey( 'message', $arr );

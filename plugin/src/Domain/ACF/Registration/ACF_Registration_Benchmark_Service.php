@@ -48,12 +48,12 @@ final class ACF_Registration_Benchmark_Service {
 	 * @return array{last_registration: array<string, mixed>|null, timestamp: int, query_count: int|null, memory_peak_bytes: int}
 	 */
 	public function get_evidence_snapshot_with_profile(): array {
-		$base = $this->get_evidence_snapshot();
+		$base        = $this->get_evidence_snapshot();
 		$query_count = null;
 		if ( isset( $GLOBALS['wpdb'] ) && is_object( $GLOBALS['wpdb'] ) && isset( $GLOBALS['wpdb']->num_queries ) ) {
 			$query_count = (int) $GLOBALS['wpdb']->num_queries;
 		}
-		$memory_peak = \function_exists( 'memory_get_peak_usage' ) ? (int) memory_get_peak_usage( true ) : 0;
+		$memory_peak               = \function_exists( 'memory_get_peak_usage' ) ? (int) memory_get_peak_usage( true ) : 0;
 		$base['query_count']       = $query_count;
 		$base['memory_peak_bytes'] = $memory_peak;
 		return $base;

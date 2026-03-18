@@ -47,18 +47,18 @@ final class Content_Summary_Extractor {
 		if ( $h1 === '' ) {
 			$notes[] = Extraction_Result::NOTE_NO_H1;
 		}
-		$body_plain = $this->strip_to_body_text( $html );
-		$word_count = str_word_count( $body_plain );
-		$excerpt    = $this->bounded_excerpt( $body_plain, $notes );
-		$h2_outline = $this->extract_h2_outline( $html );
+		$body_plain      = $this->strip_to_body_text( $html );
+		$word_count      = str_word_count( $body_plain );
+		$excerpt         = $this->bounded_excerpt( $body_plain, $notes );
+		$h2_outline      = $this->extract_h2_outline( $html );
 		$heading_outline = $this->extract_heading_outline( $html );
 		if ( count( $heading_outline ) === 0 && ( $h1 !== '' || count( $h2_outline ) > 0 ) ) {
 			$notes[] = Extraction_Result::NOTE_HEADING_SKIP;
 		}
 		$internal_link_count = $this->count_internal_links( $html, $base_host );
-		$page_summary = array(
-			'title'                => $title,
-			'meta_description'     => $meta_desc,
+		$page_summary        = array(
+			'title'               => $title,
+			'meta_description'    => $meta_desc,
 			'h1'                  => $h1,
 			'h2_outline'          => $h2_outline,
 			'word_count'          => $word_count,
@@ -132,7 +132,7 @@ final class Content_Summary_Extractor {
 		$words = preg_split( '/\s+/', $body_plain, -1, PREG_SPLIT_NO_EMPTY ) ?: array();
 		if ( count( $words ) > self::MAX_EXCERPT_WORDS ) {
 			$notes[] = Extraction_Result::NOTE_EXCERPT_TRUNCATED;
-			$words = array_slice( $words, 0, self::MAX_EXCERPT_WORDS );
+			$words   = array_slice( $words, 0, self::MAX_EXCERPT_WORDS );
 		}
 		$excerpt = implode( ' ', $words );
 		if ( strlen( $excerpt ) > self::MAX_EXCERPT_CHARS ) {
@@ -152,13 +152,13 @@ final class Content_Summary_Extractor {
 				continue;
 			}
 			if ( strpos( $href, '/' ) === 0 ) {
-				$count++;
+				++$count;
 				continue;
 			}
 			if ( $base_host !== null && $base_host !== '' ) {
 				$host = parse_url( $href, PHP_URL_HOST );
 				if ( is_string( $host ) && strtolower( $host ) === strtolower( $base_host ) ) {
-					$count++;
+					++$count;
 				}
 			}
 		}

@@ -32,15 +32,15 @@ final class Industry_Page_Template_Directory_Item_View {
 	private array $template_definition;
 
 	/**
-	 * @param string                $page_template_key    Page template internal_key.
-	 * @param string                $recommendation_status One of Industry_Page_Template_Recommendation_Resolver::FIT_*.
-	 * @param int                   $score                Recommendation score.
-	 * @param list<string>          $explanation_reasons  Reason codes.
-	 * @param list<string>          $industry_source_refs Industry keys that contributed.
-	 * @param string                $hierarchy_fit        Hierarchy fit note.
-	 * @param string                $lpagery_fit         LPagery fit note.
-	 * @param list<string>          $warning_flags        Warning flags.
-	 * @param array<string, mixed>  $template_definition  Optional template definition snapshot.
+	 * @param string               $page_template_key    Page template internal_key.
+	 * @param string               $recommendation_status One of Industry_Page_Template_Recommendation_Resolver::FIT_*.
+	 * @param int                  $score                Recommendation score.
+	 * @param list<string>         $explanation_reasons  Reason codes.
+	 * @param list<string>         $industry_source_refs Industry keys that contributed.
+	 * @param string               $hierarchy_fit        Hierarchy fit note.
+	 * @param string               $lpagery_fit         LPagery fit note.
+	 * @param list<string>         $warning_flags        Warning flags.
+	 * @param array<string, mixed> $template_definition  Optional template definition snapshot.
 	 */
 	public function __construct(
 		string $page_template_key,
@@ -53,15 +53,15 @@ final class Industry_Page_Template_Directory_Item_View {
 		array $warning_flags,
 		array $template_definition = array()
 	) {
-		$this->page_template_key    = $page_template_key;
+		$this->page_template_key     = $page_template_key;
 		$this->recommendation_status = $recommendation_status;
-		$this->score                = $score;
-		$this->explanation_reasons  = $explanation_reasons;
-		$this->industry_source_refs = $industry_source_refs;
-		$this->hierarchy_fit        = $hierarchy_fit;
-		$this->lpagery_fit          = $lpagery_fit;
-		$this->warning_flags        = $warning_flags;
-		$this->template_definition = $template_definition;
+		$this->score                 = $score;
+		$this->explanation_reasons   = $explanation_reasons;
+		$this->industry_source_refs  = $industry_source_refs;
+		$this->hierarchy_fit         = $hierarchy_fit;
+		$this->lpagery_fit           = $lpagery_fit;
+		$this->warning_flags         = $warning_flags;
+		$this->template_definition   = $template_definition;
 	}
 
 	public function get_page_template_key(): string {
@@ -114,15 +114,15 @@ final class Industry_Page_Template_Directory_Item_View {
 	/** @return array<string, mixed> */
 	public function to_array(): array {
 		return array(
-			'page_template_key'    => $this->page_template_key,
+			'page_template_key'     => $this->page_template_key,
 			'recommendation_status' => $this->recommendation_status,
-			'score'                => $this->score,
-			'explanation_reasons'  => $this->explanation_reasons,
-			'industry_source_refs' => $this->industry_source_refs,
-			'hierarchy_fit'        => $this->hierarchy_fit,
-			'lpagery_fit'          => $this->lpagery_fit,
-			'warning_flags'        => $this->warning_flags,
-			'explanation_snippet'  => $this->get_explanation_snippet(),
+			'score'                 => $this->score,
+			'explanation_reasons'   => $this->explanation_reasons,
+			'industry_source_refs'  => $this->industry_source_refs,
+			'hierarchy_fit'         => $this->hierarchy_fit,
+			'lpagery_fit'           => $this->lpagery_fit,
+			'warning_flags'         => $this->warning_flags,
+			'explanation_snippet'   => $this->get_explanation_snippet(),
 		);
 	}
 }

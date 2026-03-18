@@ -37,18 +37,24 @@ final class Section_Render_Context_Builder {
 	): array {
 		$errors = $this->validate_definition( $section_definition, $variant_override );
 		if ( ! empty( $errors ) ) {
-			return array( 'context' => null, 'errors' => $errors );
+			return array(
+				'context' => null,
+				'errors'  => $errors,
+			);
 		}
 
 		$sanitized_values = $this->sanitize_field_values( $field_values );
-		$context = new Section_Render_Context(
+		$context          = new Section_Render_Context(
 			$section_definition,
 			$sanitized_values,
 			$position,
 			$variant_override
 		);
 
-		return array( 'context' => $context, 'errors' => array() );
+		return array(
+			'context' => $context,
+			'errors'  => array(),
+		);
 	}
 
 	/**

@@ -35,7 +35,7 @@ final class Industry_Build_Plan_Explanation_View_Model_Test extends TestCase {
 		$payload = array(
 			Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_SOURCE_REFS => array( 'realtor' ),
 		);
-		$vm = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
+		$vm      = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
 		$this->assertTrue( $vm['has_industry_data'] );
 		$this->assertSame( array( 'realtor' ), $vm['source_refs'] );
 	}
@@ -45,7 +45,7 @@ final class Industry_Build_Plan_Explanation_View_Model_Test extends TestCase {
 		$payload = array(
 			Industry_Build_Plan_Scoring_Service::RECORD_RECOMMENDATION_REASONS => array( 'pack_family_fit', 'template_affinity_primary' ),
 		);
-		$vm = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
+		$vm      = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
 		$this->assertTrue( $vm['has_industry_data'] );
 		$this->assertCount( 2, $vm['summary_lines'] );
 		$this->assertStringContainsString( 'Matches industry page family', $vm['summary_lines'][0] );
@@ -56,7 +56,7 @@ final class Industry_Build_Plan_Explanation_View_Model_Test extends TestCase {
 		$payload = array(
 			Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS => array( 'discouraged_for_industry', 'weak_fit' ),
 		);
-		$vm = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
+		$vm      = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
 		$this->assertTrue( $vm['has_industry_data'] );
 		$this->assertCount( 2, $vm['warning_badges'] );
 		$this->assertSame( 'discouraged_for_industry', $vm['warning_badges'][0]['code'] );
@@ -66,9 +66,13 @@ final class Industry_Build_Plan_Explanation_View_Model_Test extends TestCase {
 	/** Compliance warnings (Prompt 407) set has_industry_data and appear in compliance_cautions. */
 	public function test_from_item_payload_with_compliance_warnings(): void {
 		$warnings = array(
-			array( 'rule_key' => 'test_rule', 'severity' => 'caution', 'caution_summary' => 'Advisory note.' ),
+			array(
+				'rule_key'        => 'test_rule',
+				'severity'        => 'caution',
+				'caution_summary' => 'Advisory note.',
+			),
 		);
-		$vm = Industry_Build_Plan_Explanation_View_Model::from_item_payload( array(), $warnings );
+		$vm       = Industry_Build_Plan_Explanation_View_Model::from_item_payload( array(), $warnings );
 		$this->assertTrue( $vm['has_industry_data'] );
 		$this->assertSame( $warnings, $vm['compliance_cautions'] );
 	}
@@ -78,7 +82,7 @@ final class Industry_Build_Plan_Explanation_View_Model_Test extends TestCase {
 		$payload = array(
 			Industry_Build_Plan_Scoring_Service::RECORD_RECOMMENDATION_REASONS => array( 'valid_reason', '' ),
 		);
-		$vm = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
+		$vm      = Industry_Build_Plan_Explanation_View_Model::from_item_payload( $payload );
 		$this->assertCount( 1, $vm['summary_lines'] );
 	}
 
@@ -90,7 +94,7 @@ final class Industry_Build_Plan_Explanation_View_Model_Test extends TestCase {
 				array( 'summary' => 'LPagery weak fit' ),
 			),
 		);
-		$lines = Industry_Build_Plan_Explanation_View_Model::plan_level_warning_lines( $definition );
+		$lines      = Industry_Build_Plan_Explanation_View_Model::plan_level_warning_lines( $definition );
 		$this->assertCount( 2, $lines );
 		$this->assertSame( 'Required page family X not present', $lines[0] );
 		$this->assertSame( 'LPagery weak fit', $lines[1] );

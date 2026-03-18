@@ -66,7 +66,7 @@ final class Bulk_Action_Bar_Component {
 		}
 
 		$controls = array(
-			self::CONTROL_APPLY_TO_ALL    => array(
+			self::CONTROL_APPLY_TO_ALL      => array(
 				'label_default' => \__( 'Apply to all eligible', 'aio-page-builder' ),
 				'count_key'     => self::STATE_KEY_COUNT_ELIGIBLE,
 			),
@@ -74,11 +74,11 @@ final class Bulk_Action_Bar_Component {
 				'label_default' => \__( 'Apply to selected', 'aio-page-builder' ),
 				'count_key'     => self::STATE_KEY_COUNT_SELECTED,
 			),
-			self::CONTROL_DENY_ALL        => array(
+			self::CONTROL_DENY_ALL          => array(
 				'label_default' => \__( 'Deny all eligible', 'aio-page-builder' ),
 				'count_key'     => self::STATE_KEY_COUNT_ELIGIBLE,
 			),
-			self::CONTROL_CLEAR_SELECTION => array(
+			self::CONTROL_CLEAR_SELECTION   => array(
 				'label_default' => \__( 'Clear selection', 'aio-page-builder' ),
 				'count_key'     => null,
 			),
@@ -87,11 +87,11 @@ final class Bulk_Action_Bar_Component {
 		<div class="aio-bulk-action-bar" id="<?php echo \esc_attr( $bar_id ); ?>">
 			<?php
 			foreach ( $controls as $control_key => $config ) {
-				$state  = isset( $states[ $control_key ] ) && is_array( $states[ $control_key ] ) ? $states[ $control_key ] : array();
-				$enabled = ! empty( $state[ self::STATE_KEY_ENABLED ] );
-				$label   = (string) ( $state[ self::STATE_KEY_LABEL ] ?? $config['label_default'] );
-				$count_key = $config['count_key'];
-				$count    = $count_key !== null ? (int) ( $state[ $count_key ] ?? 0 ) : 0;
+				$state      = isset( $states[ $control_key ] ) && is_array( $states[ $control_key ] ) ? $states[ $control_key ] : array();
+				$enabled    = ! empty( $state[ self::STATE_KEY_ENABLED ] );
+				$label      = (string) ( $state[ self::STATE_KEY_LABEL ] ?? $config['label_default'] );
+				$count_key  = $config['count_key'];
+				$count      = $count_key !== null ? (int) ( $state[ $count_key ] ?? 0 ) : 0;
 				$aria_label = $label;
 				if ( $count_key !== null && $count > 0 ) {
 					$aria_label .= ' (' . $count . ')';

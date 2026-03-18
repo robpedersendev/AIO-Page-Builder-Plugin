@@ -27,8 +27,8 @@ final class Navigation_Extractor {
 	 * @return list<array{context: string, label: string, url: string, depth?: int}>
 	 */
 	public function extract( string $html ): array {
-		$out = array();
-		$seen = array();
+		$out      = array();
+		$seen     = array();
 		$patterns = array(
 			'nav'    => '#<nav[^>]*>(.*?)</nav>#is',
 			'header' => '#<header[^>]*>(.*?)</header>#is',
@@ -57,10 +57,10 @@ final class Navigation_Extractor {
 	/**
 	 * Pulls <a href="...">label</a> from a fragment and appends to $out (deduplicated by href+label).
 	 *
-	 * @param string $fragment HTML fragment.
-	 * @param string $context Context key (nav, header, footer).
+	 * @param string                                                                $fragment HTML fragment.
+	 * @param string                                                                $context Context key (nav, header, footer).
 	 * @param list<array{context: string, label: string, url: string, depth?: int}> $out Mutable output list.
-	 * @param array<string, true> $seen Mutable set of "url\tlabel" to avoid duplicates.
+	 * @param array<string, true>                                                   $seen Mutable set of "url\tlabel" to avoid duplicates.
 	 */
 	private function extract_links_from_fragment( string $fragment, string $context, array &$out, array &$seen ): void {
 		if ( preg_match_all( '#<a\s+[^>]*href\s*=\s*["\']([^"\']+)["\'][^>]*>([^<]*(?:<[^>]+>[^<]*)*?)</a>#is', $fragment, $matches, PREG_SET_ORDER ) ) {
@@ -76,10 +76,10 @@ final class Navigation_Extractor {
 					continue;
 				}
 				$seen[ $key ] = true;
-				$out[] = array(
+				$out[]        = array(
 					'context' => $context,
-					'label'  => $label,
-					'url'    => $url,
+					'label'   => $label,
+					'url'     => $url,
 				);
 			}
 		}

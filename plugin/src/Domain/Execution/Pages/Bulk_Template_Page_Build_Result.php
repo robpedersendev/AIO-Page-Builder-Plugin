@@ -20,11 +20,11 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Bulk_Template_Page_Build_Result {
 
-	public const STATUS_QUEUED   = 'queued';
+	public const STATUS_QUEUED    = 'queued';
 	public const STATUS_COMPLETED = 'completed';
-	public const STATUS_PARTIAL  = 'partial';
-	public const STATUS_REFUSED  = 'refused';
-	public const STATUS_ERROR    = 'error';
+	public const STATUS_PARTIAL   = 'partial';
+	public const STATUS_REFUSED   = 'refused';
+	public const STATUS_ERROR     = 'error';
 
 	/** @var string */
 	private $plan_id;
@@ -40,6 +40,7 @@ final class Bulk_Template_Page_Build_Result {
 
 	/**
 	 * Per plan_item_id => array(status, job_ref, post_id, template_key, slug_conflict, failure_reason, retry_eligible).
+	 *
 	 * @var array<string, array<string, mixed>>
 	 */
 	private $item_results;
@@ -69,19 +70,19 @@ final class Bulk_Template_Page_Build_Result {
 	private $bulk_plan_snapshot;
 
 	/**
-	 * @param string                                    $plan_id
-	 * @param string                                    $batch_id
-	 * @param string                                    $status
-	 * @param array<int, string>                        $job_refs
-	 * @param array<string, array<string, mixed>>      $item_results
-	 * @param list<string>                             $slug_collisions
-	 * @param int                                       $completed_count
-	 * @param int                                       $failed_count
-	 * @param int                                       $refused_count
-	 * @param bool                                      $partial_failure
-	 * @param list<string>                             $retry_eligible_item_ids
-	 * @param string                                    $message
-	 * @param array<string, mixed>                      $bulk_plan_snapshot
+	 * @param string                              $plan_id
+	 * @param string                              $batch_id
+	 * @param string                              $status
+	 * @param array<int, string>                  $job_refs
+	 * @param array<string, array<string, mixed>> $item_results
+	 * @param list<string>                        $slug_collisions
+	 * @param int                                 $completed_count
+	 * @param int                                 $failed_count
+	 * @param int                                 $refused_count
+	 * @param bool                                $partial_failure
+	 * @param list<string>                        $retry_eligible_item_ids
+	 * @param string                              $message
+	 * @param array<string, mixed>                $bulk_plan_snapshot
 	 */
 	public function __construct(
 		string $plan_id,
@@ -98,19 +99,19 @@ final class Bulk_Template_Page_Build_Result {
 		string $message = '',
 		array $bulk_plan_snapshot = array()
 	) {
-		$this->plan_id                  = $plan_id;
-		$this->batch_id                 = $batch_id;
-		$this->status                   = $status;
-		$this->job_refs                 = $job_refs;
-		$this->item_results             = $item_results;
-		$this->slug_collisions          = $slug_collisions;
-		$this->completed_count          = $completed_count;
-		$this->failed_count             = $failed_count;
-		$this->refused_count            = $refused_count;
-		$this->partial_failure          = $partial_failure;
-		$this->retry_eligible_item_ids   = $retry_eligible_item_ids;
-		$this->message                  = $message;
-		$this->bulk_plan_snapshot        = $bulk_plan_snapshot;
+		$this->plan_id                 = $plan_id;
+		$this->batch_id                = $batch_id;
+		$this->status                  = $status;
+		$this->job_refs                = $job_refs;
+		$this->item_results            = $item_results;
+		$this->slug_collisions         = $slug_collisions;
+		$this->completed_count         = $completed_count;
+		$this->failed_count            = $failed_count;
+		$this->refused_count           = $refused_count;
+		$this->partial_failure         = $partial_failure;
+		$this->retry_eligible_item_ids = $retry_eligible_item_ids;
+		$this->message                 = $message;
+		$this->bulk_plan_snapshot      = $bulk_plan_snapshot;
 	}
 
 	public function get_plan_id(): string {
@@ -177,19 +178,19 @@ final class Bulk_Template_Page_Build_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'plan_id'                   => $this->plan_id,
-			'batch_id'                  => $this->batch_id,
-			'status'                    => $this->status,
-			'job_refs'                  => $this->job_refs,
-			'item_results'               => $this->item_results,
-			'slug_collisions'           => $this->slug_collisions,
-			'completed_count'           => $this->completed_count,
-			'failed_count'              => $this->failed_count,
-			'refused_count'             => $this->refused_count,
-			'partial_failure'           => $this->partial_failure,
-			'retry_eligible_item_ids'   => $this->retry_eligible_item_ids,
-			'message'                   => $this->message,
-			'bulk_plan_snapshot'         => $this->bulk_plan_snapshot,
+			'plan_id'                 => $this->plan_id,
+			'batch_id'                => $this->batch_id,
+			'status'                  => $this->status,
+			'job_refs'                => $this->job_refs,
+			'item_results'            => $this->item_results,
+			'slug_collisions'         => $this->slug_collisions,
+			'completed_count'         => $this->completed_count,
+			'failed_count'            => $this->failed_count,
+			'refused_count'           => $this->refused_count,
+			'partial_failure'         => $this->partial_failure,
+			'retry_eligible_item_ids' => $this->retry_eligible_item_ids,
+			'message'                 => $this->message,
+			'bulk_plan_snapshot'      => $this->bulk_plan_snapshot,
 		);
 	}
 
@@ -200,38 +201,41 @@ final class Bulk_Template_Page_Build_Result {
 	 */
 	public static function example_payload(): array {
 		return array(
-			'plan_id'                   => 'plan_abc123',
-			'batch_id'                  => '20250113T143022_4567',
-			'status'                    => self::STATUS_PARTIAL,
-			'job_refs'                  => array( 'job_item_1_batch', 'job_item_2_batch' ),
-			'item_results'               => array(
+			'plan_id'                 => 'plan_abc123',
+			'batch_id'                => '20250113T143022_4567',
+			'status'                  => self::STATUS_PARTIAL,
+			'job_refs'                => array( 'job_item_1_batch', 'job_item_2_batch' ),
+			'item_results'            => array(
 				'item_1' => array(
-					'status'          => 'completed',
-					'job_ref'         => 'job_item_1_batch',
-					'post_id'         => 101,
-					'template_key'    => 'tpl_services_hub',
-					'slug_conflict'   => false,
-					'failure_reason'  => '',
-					'retry_eligible'  => false,
+					'status'         => 'completed',
+					'job_ref'        => 'job_item_1_batch',
+					'post_id'        => 101,
+					'template_key'   => 'tpl_services_hub',
+					'slug_conflict'  => false,
+					'failure_reason' => '',
+					'retry_eligible' => false,
 				),
 				'item_2' => array(
-					'status'          => 'failed',
-					'job_ref'         => 'job_item_2_batch',
-					'post_id'         => 0,
-					'template_key'    => 'tpl_child_detail',
-					'slug_conflict'   => false,
-					'failure_reason'  => 'Page template not found.',
-					'retry_eligible'  => true,
+					'status'         => 'failed',
+					'job_ref'        => 'job_item_2_batch',
+					'post_id'        => 0,
+					'template_key'   => 'tpl_child_detail',
+					'slug_conflict'  => false,
+					'failure_reason' => 'Page template not found.',
+					'retry_eligible' => true,
 				),
 			),
-			'slug_collisions'           => array(),
-			'completed_count'           => 1,
-			'failed_count'              => 1,
-			'refused_count'             => 0,
-			'partial_failure'           => true,
-			'retry_eligible_item_ids'   => array( 'item_2' ),
-			'message'                   => '1 completed. 1 failed.',
-			'bulk_plan_snapshot'         => array( 'envelope_count' => 2, 'create_page_count' => 2 ),
+			'slug_collisions'         => array(),
+			'completed_count'         => 1,
+			'failed_count'            => 1,
+			'refused_count'           => 0,
+			'partial_failure'         => true,
+			'retry_eligible_item_ids' => array( 'item_2' ),
+			'message'                 => '1 completed. 1 failed.',
+			'bulk_plan_snapshot'      => array(
+				'envelope_count'    => 2,
+				'create_page_count' => 2,
+			),
 		);
 	}
 }

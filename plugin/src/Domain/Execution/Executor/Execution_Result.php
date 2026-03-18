@@ -64,14 +64,14 @@ final class Execution_Result {
 	 * @param string               $action_type
 	 * @param string               $execution_status
 	 * @param string               $completed_at
-	 * @param array<string, mixed>  $handler_result
-	 * @param string                $snapshot_reference
-	 * @param array<int, string>    $warnings
-	 * @param string                $error_code
-	 * @param string                $error_message
-	 * @param bool                  $refusable
-	 * @param array<string, mixed>  $build_plan_updates
-	 * @param string                $log_reference
+	 * @param array<string, mixed> $handler_result
+	 * @param string               $snapshot_reference
+	 * @param array<int, string>   $warnings
+	 * @param string               $error_code
+	 * @param string               $error_message
+	 * @param bool                 $refusable
+	 * @param array<string, mixed> $build_plan_updates
+	 * @param string               $log_reference
 	 */
 	public function __construct(
 		string $action_id,
@@ -168,15 +168,15 @@ final class Execution_Result {
 	 */
 	public function to_array(): array {
 		$out = array(
-			Execution_Action_Contract::RESULT_ACTION_ID   => $this->action_id,
-			'action_type'                               => $this->action_type,
-			Execution_Action_Contract::RESULT_STATUS    => $this->execution_status,
+			Execution_Action_Contract::RESULT_ACTION_ID    => $this->action_id,
+			'action_type'                                  => $this->action_type,
+			Execution_Action_Contract::RESULT_STATUS       => $this->execution_status,
 			Execution_Action_Contract::RESULT_COMPLETED_AT => $this->completed_at,
-			'handler_result'                            => $this->handler_result,
-			'snapshot_reference'                        => $this->snapshot_reference,
-			'warnings'                                  => $this->warnings,
-			'build_plan_updates'                        => $this->build_plan_updates,
-			'log_reference'                             => $this->log_reference,
+			'handler_result'                               => $this->handler_result,
+			'snapshot_reference'                           => $this->snapshot_reference,
+			'warnings'                                     => $this->warnings,
+			'build_plan_updates'                           => $this->build_plan_updates,
+			'log_reference'                                => $this->log_reference,
 		);
 		if ( $this->error_code !== '' || $this->error_message !== '' ) {
 			$out[ Execution_Action_Contract::RESULT_ERROR ] = array(
@@ -220,11 +220,11 @@ final class Execution_Result {
 	 *
 	 * @param string               $action_id
 	 * @param string               $action_type
-	 * @param array<string, mixed>  $handler_result
-	 * @param string                $snapshot_reference
-	 * @param array<string, mixed>  $build_plan_updates
-	 * @param array<int, string>    $warnings
-	 * @param string                $log_reference
+	 * @param array<string, mixed> $handler_result
+	 * @param string               $snapshot_reference
+	 * @param array<string, mixed> $build_plan_updates
+	 * @param array<int, string>   $warnings
+	 * @param string               $log_reference
 	 * @return self
 	 */
 	public static function completed(
@@ -259,9 +259,9 @@ final class Execution_Result {
 	 * @param string               $action_type
 	 * @param string               $error_code
 	 * @param string               $message
-	 * @param array<string, mixed>  $handler_result
-	 * @param array<string, mixed>  $build_plan_updates
-	 * @param string                $log_reference
+	 * @param array<string, mixed> $handler_result
+	 * @param array<string, mixed> $build_plan_updates
+	 * @param string               $log_reference
 	 * @return self
 	 */
 	public static function failed(

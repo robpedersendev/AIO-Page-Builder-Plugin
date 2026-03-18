@@ -61,8 +61,8 @@ final class Export_Zip_Packager {
 			);
 		}
 
-		$files           = $this->list_files_in_dir( $staging_dir );
-		$manifest_local  = 'manifest.json';
+		$files          = $this->list_files_in_dir( $staging_dir );
+		$manifest_local = 'manifest.json';
 		foreach ( $files as $absolute_path ) {
 			$relative = $this->relative_path( $absolute_path, $staging_dir );
 			if ( $relative === '' ) {
@@ -104,10 +104,10 @@ final class Export_Zip_Packager {
 	 * @return string Filename like aio-export-full_operational_backup-20250715-120000-example.zip
 	 */
 	public function build_package_filename( string $mode, string $site_slug ): string {
-		$mode_safe   = preg_replace( '#[^a-z0-9_]#', '', strtolower( $mode ) ) ?: 'export';
-		$slug_safe   = preg_replace( '#[^a-zA-Z0-9_-]#', '', $site_slug ) ?: 'site';
-		$date        = gmdate( 'Ymd' );
-		$time        = gmdate( 'His' );
+		$mode_safe = preg_replace( '#[^a-z0-9_]#', '', strtolower( $mode ) ) ?: 'export';
+		$slug_safe = preg_replace( '#[^a-zA-Z0-9_-]#', '', $site_slug ) ?: 'site';
+		$date      = gmdate( 'Ymd' );
+		$time      = gmdate( 'His' );
 		return sprintf( 'aio-export-%s-%s-%s-%s.zip', $mode_safe, $date, $time, $slug_safe );
 	}
 

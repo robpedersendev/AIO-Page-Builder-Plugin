@@ -51,7 +51,7 @@ final class Reporting_Health_Summary_Builder {
 				continue;
 			}
 			++$recent_failures;
-			$type = (string) ( $entry['event_type'] ?? 'unknown' );
+			$type                    = (string) ( $entry['event_type'] ?? 'unknown' );
 			$failed_by_type[ $type ] = ( $failed_by_type[ $type ] ?? 0 ) + 1;
 		}
 
@@ -61,25 +61,25 @@ final class Reporting_Health_Summary_Builder {
 			$last_heartbeat = (string) $heartbeat_state['last_successful_month'];
 		}
 
-		$current_ym     = gmdate( 'Y-m' );
-		$degraded       = $recent_failures > 0 || ( $last_heartbeat !== '' && $last_heartbeat < $current_ym );
+		$current_ym      = gmdate( 'Y-m' );
+		$degraded        = $recent_failures > 0 || ( $last_heartbeat !== '' && $last_heartbeat < $current_ym );
 		$summary_message = $recent_failures > 0
 			? sprintf(
 				/* translators: %d: number of recent reporting failures */
 				\__( '%d recent reporting delivery failure(s).', 'aio-page-builder' ),
 				$recent_failures
 			)
-		 : ( $last_heartbeat === $current_ym
+		: ( $last_heartbeat === $current_ym
 			? \__( 'Reporting current. Heartbeat sent this month.', 'aio-page-builder' )
 			: \__( 'No heartbeat sent this month yet.', 'aio-page-builder' )
-		 );
+		);
 
 		return array(
-			'recent_failures_count'   => $recent_failures,
-			'last_heartbeat_month'   => $last_heartbeat,
-			'reporting_degraded'      => $degraded,
-			'summary_message'        => $summary_message,
-			'failed_events_by_type'  => $failed_by_type,
+			'recent_failures_count' => $recent_failures,
+			'last_heartbeat_month'  => $last_heartbeat,
+			'reporting_degraded'    => $degraded,
+			'summary_message'       => $summary_message,
+			'failed_events_by_type' => $failed_by_type,
 		);
 	}
 }

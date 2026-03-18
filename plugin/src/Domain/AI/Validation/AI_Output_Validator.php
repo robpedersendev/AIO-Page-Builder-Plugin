@@ -18,10 +18,10 @@ defined( 'ABSPATH' ) || exit;
  */
 final class AI_Output_Validator {
 
-	private const STAGE_RAW_CAPTURE = 'raw_capture';
-	private const STAGE_PARSE       = 'parse';
-	private const STAGE_TOP_LEVEL   = 'top_level';
-	private const STAGE_ITEM        = 'item';
+	private const STAGE_RAW_CAPTURE  = 'raw_capture';
+	private const STAGE_PARSE        = 'parse';
+	private const STAGE_TOP_LEVEL    = 'top_level';
+	private const STAGE_ITEM         = 'item';
 	private const STAGE_INTERNAL_REF = 'internal_ref';
 
 	/** @var Normalized_Output_Builder */
@@ -171,7 +171,7 @@ final class AI_Output_Validator {
 	}
 
 	/**
-	 * @param array<string, mixed> $parsed
+	 * @param array<string, mixed>                                                                     $parsed
 	 * @param array<int, array{section: string, index?: int, valid: bool, errors: array<int, string>}> $record_results
 	 * @return bool
 	 */
@@ -179,43 +179,71 @@ final class AI_Output_Validator {
 		$required = Build_Plan_Draft_Schema::required_top_level_keys();
 		foreach ( $required as $key ) {
 			if ( ! array_key_exists( $key, $parsed ) ) {
-				$record_results[] = array( 'section' => $key, 'valid' => false, 'errors' => array( 'missing_top_level_key' ) );
+				$record_results[] = array(
+					'section' => $key,
+					'valid'   => false,
+					'errors'  => array( 'missing_top_level_key' ),
+				);
 				return false;
 			}
 			$v = $parsed[ $key ];
 			if ( in_array( $key, Build_Plan_Draft_Schema::ARRAY_SECTIONS, true ) && ! is_array( $v ) ) {
-				$record_results[] = array( 'section' => $key, 'valid' => false, 'errors' => array( 'expected_array' ) );
+				$record_results[] = array(
+					'section' => $key,
+					'valid'   => false,
+					'errors'  => array( 'expected_array' ),
+				);
 				return false;
 			}
 		}
 		// run_summary must be object with required keys and enums.
 		$run_summary = $parsed[ Build_Plan_Draft_Schema::KEY_RUN_SUMMARY ] ?? null;
 		if ( ! is_array( $run_summary ) ) {
-			$record_results[] = array( 'section' => Build_Plan_Draft_Schema::KEY_RUN_SUMMARY, 'valid' => false, 'errors' => array( 'expected_object' ) );
+			$record_results[] = array(
+				'section' => Build_Plan_Draft_Schema::KEY_RUN_SUMMARY,
+				'valid'   => false,
+				'errors'  => array( 'expected_object' ),
+			);
 			return false;
 		}
 		$rs_required = array( Build_Plan_Draft_Schema::RUN_SUMMARY_SUMMARY_TEXT, Build_Plan_Draft_Schema::RUN_SUMMARY_PLANNING_MODE, Build_Plan_Draft_Schema::RUN_SUMMARY_OVERALL_CONFIDENCE );
 		foreach ( $rs_required as $rk ) {
 			if ( ! array_key_exists( $rk, $run_summary ) ) {
-				$record_results[] = array( 'section' => Build_Plan_Draft_Schema::KEY_RUN_SUMMARY, 'valid' => false, 'errors' => array( 'missing_' . $rk ) );
+				$record_results[] = array(
+					'section' => Build_Plan_Draft_Schema::KEY_RUN_SUMMARY,
+					'valid'   => false,
+					'errors'  => array( 'missing_' . $rk ),
+				);
 				return false;
 			}
 		}
 		$mode = $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_PLANNING_MODE ] ?? null;
 		if ( ! is_string( $mode ) || ! in_array( $mode, Build_Plan_Draft_Schema::ENUM_PLANNING_MODE, true ) ) {
-			$record_results[] = array( 'section' => Build_Plan_Draft_Schema::KEY_RUN_SUMMARY, 'valid' => false, 'errors' => array( 'invalid_enum: planning_mode' ) );
+			$record_results[] = array(
+				'section' => Build_Plan_Draft_Schema::KEY_RUN_SUMMARY,
+				'valid'   => false,
+				'errors'  => array( 'invalid_enum: planning_mode' ),
+			);
 			return false;
 		}
 		$conf = $run_summary[ Build_Plan_Draft_Schema::RUN_SUMMARY_OVERALL_CONFIDENCE ] ?? null;
 		if ( ! is_string( $conf ) || ! in_array( $conf, Build_Plan_Draft_Schema::ENUM_CONFIDENCE, true ) ) {
-			$record_results[] = array( 'section' => Build_Plan_Draft_Schema::KEY_RUN_SUMMARY, 'valid' => false, 'errors' => array( 'invalid_enum: overall_confidence' ) );
+			$record_results[] = array(
+				'section' => Build_Plan_Draft_Schema::KEY_RUN_SUMMARY,
+				'valid'   => false,
+				'errors'  => array( 'invalid_enum: overall_confidence' ),
+			);
 			return false;
 		}
 		// site_purpose, site_structure, confidence must be array/object (not primitive).
 		foreach ( array( Build_Plan_Draft_Schema::KEY_SITE_PURPOSE, Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE, Build_Plan_Draft_Schema::KEY_CONFIDENCE ) as $obj_key ) {
 			$val = $parsed[ $obj_key ] ?? null;
 			if ( $val !== null && ! is_array( $val ) ) {
-				$record_results[] = array( 'section' => $obj_key, 'valid' => false, 'errors' => array( 'expected_object' ) );
+				$record_results[] = array(
+					'section' => $obj_key,
+					'valid'   => false,
+					'errors'  => array( 'expected_object' ),
+				);
 				return false;
 			}
 		}
@@ -225,13 +253,13 @@ final class AI_Output_Validator {
 	/**
 	 * Item-level validation and internal-reference checks. Drops invalid records when partial is allowed; returns payload for normalization or null if blocking.
 	 *
-	 * @param array<string, mixed> $parsed
+	 * @param array<string, mixed>                                                                     $parsed
 	 * @param array<int, array{section: string, index?: int, valid: bool, errors: array<int, string>}> $record_results
-	 * @param array<int, Dropped_Record_Report> $dropped
+	 * @param array<int, Dropped_Record_Report>                                                        $dropped
 	 * @return array<string, mixed>|null Payload with invalid items removed, or null if blocking failure.
 	 */
 	private function validate_item_level_and_refs( array $parsed, array &$record_results, array &$dropped ): ?array {
-		$out = $parsed;
+		$out      = $parsed;
 		$sections = Build_Plan_Draft_Schema::ARRAY_SECTIONS;
 		foreach ( $sections as $section ) {
 			$list = $parsed[ $section ] ?? array();
@@ -241,15 +269,25 @@ final class AI_Output_Validator {
 			$valid_items = array();
 			foreach ( $list as $idx => $item ) {
 				if ( ! is_array( $item ) ) {
-					$record_results[] = array( 'section' => $section, 'index' => $idx, 'valid' => false, 'errors' => array( 'expected_object' ) );
-					$dropped[] = new Dropped_Record_Report( $section, $idx, 'expected_object', array( 'expected_object' ) );
+					$record_results[] = array(
+						'section' => $section,
+						'index'   => $idx,
+						'valid'   => false,
+						'errors'  => array( 'expected_object' ),
+					);
+					$dropped[]        = new Dropped_Record_Report( $section, $idx, 'expected_object', array( 'expected_object' ) );
 					continue;
 				}
 				$errors = $this->validate_item( $section, $item, $idx );
 				if ( $errors !== array() ) {
-					$record_results[] = array( 'section' => $section, 'index' => $idx, 'valid' => false, 'errors' => $errors );
-					$reason = isset( $errors[0] ) ? ( strpos( (string) $errors[0], 'invalid_enum' ) !== false ? 'invalid_enum' : 'validation_failed' ) : 'validation_failed';
-					$dropped[] = new Dropped_Record_Report( $section, $idx, $reason, $errors );
+					$record_results[] = array(
+						'section' => $section,
+						'index'   => $idx,
+						'valid'   => false,
+						'errors'  => $errors,
+					);
+					$reason           = isset( $errors[0] ) ? ( strpos( (string) $errors[0], 'invalid_enum' ) !== false ? 'invalid_enum' : 'validation_failed' ) : 'validation_failed';
+					$dropped[]        = new Dropped_Record_Report( $section, $idx, $reason, $errors );
 					continue;
 				}
 				$valid_items[] = $item;
@@ -364,15 +402,15 @@ final class AI_Output_Validator {
 	}
 
 	/**
-	 * @param string                                                                 $raw_status
-	 * @param string                                                                 $parse_status
-	 * @param bool                                                                   $top_level_valid
-	 * @param string                                                                 $schema_ref
+	 * @param string                                                                                   $raw_status
+	 * @param string                                                                                   $parse_status
+	 * @param bool                                                                                     $top_level_valid
+	 * @param string                                                                                   $schema_ref
 	 * @param array<int, array{section: string, index?: int, valid: bool, errors: array<int, string>}> $record_results
-	 * @param array<int, Dropped_Record_Report>                                      $dropped
-	 * @param array<string, mixed>|null                                              $normalized
-	 * @param string                                                                 $blocking_stage
-	 * @param bool                                                                   $is_repair_attempt
+	 * @param array<int, Dropped_Record_Report>                                                        $dropped
+	 * @param array<string, mixed>|null                                                                $normalized
+	 * @param string                                                                                   $blocking_stage
+	 * @param bool                                                                                     $is_repair_attempt
 	 * @return Validation_Report
 	 */
 	private function failed_report(

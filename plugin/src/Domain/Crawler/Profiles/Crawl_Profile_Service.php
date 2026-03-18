@@ -31,13 +31,13 @@ final class Crawl_Profile_Service {
 			'max_pages'   => 50,
 			'max_depth'   => 2,
 		),
-		Crawl_Profile_Keys::FULL_PUBLIC_BASELINE => array(
+		Crawl_Profile_Keys::FULL_PUBLIC_BASELINE  => array(
 			'label'       => 'Full public-site baseline',
 			'description' => 'Spec default: up to 500 pages, depth 4.',
 			'max_pages'   => 500,
 			'max_depth'   => 4,
 		),
-		Crawl_Profile_Keys::SUPPORT_TRIAGE_CRAWL => array(
+		Crawl_Profile_Keys::SUPPORT_TRIAGE_CRAWL  => array(
 			'label'       => 'Support triage crawl',
 			'description' => 'Moderate bounds for support and diagnostics use.',
 			'max_pages'   => 100,
@@ -107,7 +107,7 @@ final class Crawl_Profile_Service {
 	public function list_profiles_for_selection(): array {
 		$out = array();
 		foreach ( Crawl_Profile_Keys::all() as $key ) {
-			$def = self::PROFILES[ $key ] ?? null;
+			$def   = self::PROFILES[ $key ] ?? null;
 			$out[] = array(
 				'key'   => $key,
 				'label' => $def !== null ? (string) $def['label'] : $key,
@@ -150,9 +150,9 @@ final class Crawl_Profile_Service {
 			$profiles[] = $this->get_profile_payload( $key );
 		}
 		return array(
-			'profiles'            => $profiles,
-			'contract_max_pages'  => self::CONTRACT_MAX_PAGES,
-			'contract_max_depth'  => self::CONTRACT_MAX_DEPTH,
+			'profiles'           => $profiles,
+			'contract_max_pages' => self::CONTRACT_MAX_PAGES,
+			'contract_max_depth' => self::CONTRACT_MAX_DEPTH,
 		);
 	}
 }

@@ -24,13 +24,13 @@ final class Industry_Subtype_Registry {
 	public const FIELD_STATUS              = 'status';
 	public const FIELD_VERSION_MARKER      = 'version_marker';
 
-	public const STATUS_ACTIVE    = 'active';
-	public const STATUS_DRAFT     = 'draft';
+	public const STATUS_ACTIVE     = 'active';
+	public const STATUS_DRAFT      = 'draft';
 	public const STATUS_DEPRECATED = 'deprecated';
 
 	public const SUPPORTED_VERSION = '1';
-	private const KEY_PATTERN  = '#^[a-z0-9_-]+$#';
-	private const KEY_MAX_LEN  = 64;
+	private const KEY_PATTERN      = '#^[a-z0-9_-]+$#';
+	private const KEY_MAX_LEN      = 64;
 
 	/** @var array<string, array<string, mixed>> Map of subtype_key => definition. */
 	private array $by_key = array();
@@ -60,7 +60,7 @@ final class Industry_Subtype_Registry {
 			if ( ! is_array( $def ) ) {
 				continue;
 			}
-			$key = trim( (string) ( $def[ self::FIELD_SUBTYPE_KEY ] ?? '' ) );
+			$key    = trim( (string) ( $def[ self::FIELD_SUBTYPE_KEY ] ?? '' ) );
 			$parent = trim( (string) ( $def[ self::FIELD_PARENT_INDUSTRY_KEY ] ?? '' ) );
 			if ( $key === '' || $parent === '' ) {
 				continue;
@@ -77,7 +77,7 @@ final class Industry_Subtype_Registry {
 				continue;
 			}
 			if ( ! isset( $this->by_key[ $key ] ) ) {
-				$normalized = array(
+				$normalized           = array(
 					self::FIELD_SUBTYPE_KEY         => $key,
 					self::FIELD_PARENT_INDUSTRY_KEY => $parent,
 					self::FIELD_LABEL               => trim( (string) ( $def[ self::FIELD_LABEL ] ?? '' ) ),
@@ -125,9 +125,14 @@ final class Industry_Subtype_Registry {
 		$parent = trim( $parent_industry_key );
 		$list   = $this->by_parent[ $parent ] ?? array();
 		if ( $active_only ) {
-			return array_values( array_filter( $list, function ( array $def ): bool {
-				return ( $def[ self::FIELD_STATUS ] ?? '' ) === self::STATUS_ACTIVE;
-			} ) );
+			return array_values(
+				array_filter(
+					$list,
+					function ( array $def ): bool {
+						return ( $def[ self::FIELD_STATUS ] ?? '' ) === self::STATUS_ACTIVE;
+					}
+				)
+			);
 		}
 		return $list;
 	}

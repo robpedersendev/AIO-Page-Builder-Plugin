@@ -117,9 +117,9 @@ final class Documentation_Loader {
 	 * @return bool
 	 */
 	private function is_valid_section_helper( array $doc ): bool {
-		$id = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '';
-		$type = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '';
-		$body = $doc[ Documentation_Schema::FIELD_CONTENT_BODY ] ?? '';
+		$id     = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '';
+		$type   = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '';
+		$body   = $doc[ Documentation_Schema::FIELD_CONTENT_BODY ] ?? '';
 		$status = $doc[ Documentation_Schema::FIELD_STATUS ] ?? '';
 		if ( $id === '' || $type !== Documentation_Schema::TYPE_SECTION_HELPER || $body === '' || $status === '' ) {
 			return false;
@@ -170,9 +170,9 @@ final class Documentation_Loader {
 	 * @return bool
 	 */
 	private function is_valid_one_pager( array $doc ): bool {
-		$id   = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '';
-		$type = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '';
-		$body = $doc[ Documentation_Schema::FIELD_CONTENT_BODY ] ?? '';
+		$id     = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '';
+		$type   = $doc[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '';
+		$body   = $doc[ Documentation_Schema::FIELD_CONTENT_BODY ] ?? '';
 		$status = $doc[ Documentation_Schema::FIELD_STATUS ] ?? '';
 		if ( $id === '' || $type !== Documentation_Schema::TYPE_PAGE_TEMPLATE_ONE_PAGER || $body === '' || $status === '' ) {
 			return false;

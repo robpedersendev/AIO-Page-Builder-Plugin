@@ -17,27 +17,27 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Industry_SEO_Guidance_Registry {
 
-	public const FIELD_GUIDANCE_RULE_KEY   = 'guidance_rule_key';
-	public const FIELD_INDUSTRY_KEY         = 'industry_key';
-	public const FIELD_VERSION_MARKER       = 'version_marker';
-	public const FIELD_STATUS               = 'status';
-	public const FIELD_PAGE_FAMILY          = 'page_family';
-	public const FIELD_TITLE_PATTERNS       = 'title_patterns';
-	public const FIELD_H1_PATTERNS          = 'h1_patterns';
+	public const FIELD_GUIDANCE_RULE_KEY      = 'guidance_rule_key';
+	public const FIELD_INDUSTRY_KEY           = 'industry_key';
+	public const FIELD_VERSION_MARKER         = 'version_marker';
+	public const FIELD_STATUS                 = 'status';
+	public const FIELD_PAGE_FAMILY            = 'page_family';
+	public const FIELD_TITLE_PATTERNS         = 'title_patterns';
+	public const FIELD_H1_PATTERNS            = 'h1_patterns';
 	public const FIELD_INTERNAL_LINK_GUIDANCE = 'internal_link_guidance';
-	public const FIELD_LOCAL_SEO_POSTURE    = 'local_seo_posture';
-	public const FIELD_FAQ_EMPHASIS         = 'faq_emphasis';
-	public const FIELD_REVIEW_EMPHASIS      = 'review_emphasis';
-	public const FIELD_ENTITY_CAUTIONS      = 'entity_cautions';
-	public const FIELD_METADATA             = 'metadata';
+	public const FIELD_LOCAL_SEO_POSTURE      = 'local_seo_posture';
+	public const FIELD_FAQ_EMPHASIS           = 'faq_emphasis';
+	public const FIELD_REVIEW_EMPHASIS        = 'review_emphasis';
+	public const FIELD_ENTITY_CAUTIONS        = 'entity_cautions';
+	public const FIELD_METADATA               = 'metadata';
 
-	public const STATUS_ACTIVE    = 'active';
-	public const STATUS_DRAFT     = 'draft';
+	public const STATUS_ACTIVE     = 'active';
+	public const STATUS_DRAFT      = 'draft';
 	public const STATUS_DEPRECATED = 'deprecated';
 
 	public const SUPPORTED_SCHEMA_VERSION = '1';
-	private const KEY_PATTERN = '#^[a-z0-9_-]+$#';
-	private const KEY_MAX_LENGTH = 64;
+	private const KEY_PATTERN             = '#^[a-z0-9_-]+$#';
+	private const KEY_MAX_LENGTH          = 64;
 
 	/** @var array<string, array<string, mixed>> Map of guidance_rule_key => rule. */
 	private array $by_key = array();
@@ -79,7 +79,7 @@ final class Industry_SEO_Guidance_Registry {
 			$key = trim( (string) ( $rule[ self::FIELD_GUIDANCE_RULE_KEY ] ?? '' ) );
 			if ( $key !== '' && ! isset( $this->by_key[ $key ] ) ) {
 				$this->by_key[ $key ] = $this->normalize_rule( $rule );
-				$this->all[]         = $this->by_key[ $key ];
+				$this->all[]          = $this->by_key[ $key ];
 			}
 		}
 	}
@@ -151,7 +151,7 @@ final class Industry_SEO_Guidance_Registry {
 	 */
 	public function validate_rule( array $rule ): array {
 		$errors = array();
-		$key = isset( $rule[ self::FIELD_GUIDANCE_RULE_KEY ] ) && is_string( $rule[ self::FIELD_GUIDANCE_RULE_KEY ] )
+		$key    = isset( $rule[ self::FIELD_GUIDANCE_RULE_KEY ] ) && is_string( $rule[ self::FIELD_GUIDANCE_RULE_KEY ] )
 			? trim( $rule[ self::FIELD_GUIDANCE_RULE_KEY ] )
 			: '';
 		if ( $key === '' ) {
@@ -189,11 +189,11 @@ final class Industry_SEO_Guidance_Registry {
 	 * @return array<string, mixed>
 	 */
 	private function normalize_rule( array $rule ): array {
-		$out = array(
+		$out      = array(
 			self::FIELD_GUIDANCE_RULE_KEY => trim( (string) ( $rule[ self::FIELD_GUIDANCE_RULE_KEY ] ?? '' ) ),
 			self::FIELD_INDUSTRY_KEY      => trim( (string) ( $rule[ self::FIELD_INDUSTRY_KEY ] ?? '' ) ),
 			self::FIELD_VERSION_MARKER    => trim( (string) ( $rule[ self::FIELD_VERSION_MARKER ] ?? '' ) ),
-			self::FIELD_STATUS             => (string) ( $rule[ self::FIELD_STATUS ] ?? '' ),
+			self::FIELD_STATUS            => (string) ( $rule[ self::FIELD_STATUS ] ?? '' ),
 		);
 		$optional = array(
 			self::FIELD_PAGE_FAMILY,

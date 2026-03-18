@@ -42,7 +42,7 @@ final class Template_Page_Replacement_Result_Test extends TestCase {
 	}
 
 	public function test_success_result_to_array_includes_trace_record(): void {
-		$trace = array(
+		$trace  = array(
 			'original_post_id' => 50,
 			'new_post_id'      => 51,
 			'archive_status'   => 'in_place',

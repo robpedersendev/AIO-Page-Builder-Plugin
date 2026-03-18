@@ -28,7 +28,7 @@ final class Industry_Coverage_Gap_Analyzer_Test extends TestCase {
 
 	public function test_analyze_returns_structure_with_empty_gaps_when_pack_registry_null(): void {
 		$analyzer = new Industry_Coverage_Gap_Analyzer( null, null, null, null, null, null, null, null, null );
-		$result = $analyzer->analyze( true );
+		$result   = $analyzer->analyze( true );
 		$this->assertArrayHasKey( 'gaps', $result );
 		$this->assertArrayHasKey( 'by_scope', $result );
 		$this->assertIsArray( $result['gaps'] );
@@ -39,15 +39,17 @@ final class Industry_Coverage_Gap_Analyzer_Test extends TestCase {
 
 	public function test_analyze_with_active_pack_and_no_overlays_reports_gaps(): void {
 		$pack_registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
-		$pack_registry->load( array(
+		$pack_registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'gap_test_industry',
-				Industry_Pack_Schema::FIELD_NAME          => 'Gap Test',
-				Industry_Pack_Schema::FIELD_SUMMARY       => 'For coverage gap test',
-				Industry_Pack_Schema::FIELD_STATUS        => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
-			),
-		) );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'gap_test_industry',
+					Industry_Pack_Schema::FIELD_NAME    => 'Gap Test',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'For coverage gap test',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
+				),
+			)
+		);
 		$section_overlay = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry();
 		$section_overlay->load( array() );
 		$page_overlay = new \AIOPageBuilder\Domain\Industry\Docs\Industry_Page_OnePager_Overlay_Registry();
@@ -56,7 +58,7 @@ final class Industry_Coverage_Gap_Analyzer_Test extends TestCase {
 		$bundle_registry->load( array() );
 
 		$analyzer = new Industry_Coverage_Gap_Analyzer( $pack_registry, $section_overlay, $page_overlay, $bundle_registry, null, null, null, null, null );
-		$result = $analyzer->analyze( false );
+		$result   = $analyzer->analyze( false );
 
 		$this->assertGreaterThanOrEqual( 1, count( $result['gaps'] ) );
 		$this->assertArrayHasKey( 'gap_test_industry', $result['by_scope'] );
@@ -69,20 +71,22 @@ final class Industry_Coverage_Gap_Analyzer_Test extends TestCase {
 
 	public function test_analyze_gap_has_scope_priority_and_explanation(): void {
 		$pack_registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
-		$pack_registry->load( array(
+		$pack_registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'scope_test',
-				Industry_Pack_Schema::FIELD_NAME          => 'Scope Test',
-				Industry_Pack_Schema::FIELD_SUMMARY       => 'Test',
-				Industry_Pack_Schema::FIELD_STATUS        => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
-			),
-		) );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'scope_test',
+					Industry_Pack_Schema::FIELD_NAME    => 'Scope Test',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Test',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
+				),
+			)
+		);
 		$bundle_registry = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry();
 		$bundle_registry->load( array() );
 
 		$analyzer = new Industry_Coverage_Gap_Analyzer( $pack_registry, null, null, $bundle_registry, null, null, null, null, null );
-		$result = $analyzer->analyze( false );
+		$result   = $analyzer->analyze( false );
 
 		$this->assertGreaterThanOrEqual( 1, count( $result['gaps'] ) );
 		$first = $result['gaps'][0];

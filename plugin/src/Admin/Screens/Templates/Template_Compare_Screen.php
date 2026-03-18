@@ -142,26 +142,26 @@ final class Template_Compare_Screen {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
-		$type = isset( $_GET['type'] ) && $_GET['type'] === 'page' ? 'page' : 'section';
+		$type     = isset( $_GET['type'] ) && $_GET['type'] === 'page' ? 'page' : 'section';
 		$redirect = $this->maybe_handle_add_remove( $type );
 		if ( $redirect !== null ) {
 			\wp_safe_redirect( $redirect );
 			exit;
 		}
 
-		$compare_list = self::get_compare_list( $type );
+		$compare_list  = self::get_compare_list( $type );
 		$state_builder = $this->container && $this->container->has( 'template_compare_state_builder' )
 			? $this->container->get( 'template_compare_state_builder' )
 			: null;
 		if ( ! $state_builder instanceof Template_Compare_State_Builder ) {
 			$state = array(
-				'type'               => $type,
-				'compare_list_keys'   => array(),
+				'type'                  => $type,
+				'compare_list_keys'     => array(),
 				'template_compare_rows' => array(),
-				'base_url_sections'   => \admin_url( 'admin.php?page=aio-page-builder-section-templates' ),
-				'base_url_pages'      => \admin_url( 'admin.php?page=aio-page-builder-page-templates' ),
-				'compare_screen_url'  => \admin_url( 'admin.php?page=' . self::SLUG ),
-				'empty_message'      => __( 'Add templates from the Section or Page Templates directory or detail screen to compare them.', 'aio-page-builder' ),
+				'base_url_sections'     => \admin_url( 'admin.php?page=aio-page-builder-section-templates' ),
+				'base_url_pages'        => \admin_url( 'admin.php?page=aio-page-builder-page-templates' ),
+				'compare_screen_url'    => \admin_url( 'admin.php?page=' . self::SLUG ),
+				'empty_message'         => __( 'Add templates from the Section or Page Templates directory or detail screen to compare them.', 'aio-page-builder' ),
 			);
 		} else {
 			$state = $state_builder->build_state( $type, $compare_list );
@@ -176,7 +176,20 @@ final class Template_Compare_Screen {
 				? '<a href="' . \esc_url( rtrim( $docs_base, '/' ) . '/guides/template-library-operator-guide.md' ) . '" target="_blank" rel="noopener">' . \esc_html__( 'Template Library Operator Guide', 'aio-page-builder' ) . '</a>'
 				: \esc_html__( 'Template Library Operator Guide (docs/guides/template-library-operator-guide.md)', 'aio-page-builder' );
 			?>
-			<p class="aio-description" aria-label="<?php \esc_attr_e( 'Help reference', 'aio-page-builder' ); ?>"><?php echo \wp_kses( sprintf( /* translators: %s: link or path to operator guide */ __( 'For full guidance (compare list cap, add/remove from directories), see the %s.', 'aio-page-builder' ), $guide_ref ), array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ) ) ); ?></p>
+			<p class="aio-description" aria-label="<?php \esc_attr_e( 'Help reference', 'aio-page-builder' ); ?>">
+			<?php
+			echo \wp_kses(
+				sprintf( /* translators: %s: link or path to operator guide */ __( 'For full guidance (compare list cap, add/remove from directories), see the %s.', 'aio-page-builder' ), $guide_ref ),
+				array(
+					'a' => array(
+						'href'   => true,
+						'target' => true,
+						'rel'    => true,
+					),
+				)
+			);
+			?>
+													</p>
 			<?php $this->render_type_switcher( $state ); ?>
 			<?php
 			if ( count( $state['template_compare_rows'] ?? array() ) === 0 ) {
@@ -222,7 +235,13 @@ final class Template_Compare_Screen {
 			$list = array_values( array_filter( $list, fn( string $k ): bool => $k !== $remove ) );
 			\update_user_meta( $user_id, $meta_key, $list );
 		}
-		$redirect = \add_query_arg( array( 'page' => self::SLUG, 'type' => $type ), \admin_url( 'admin.php' ) );
+		$redirect = \add_query_arg(
+			array(
+				'page' => self::SLUG,
+				'type' => $type,
+			),
+			\admin_url( 'admin.php' )
+		);
 		return $redirect;
 	}
 
@@ -231,10 +250,10 @@ final class Template_Compare_Screen {
 	 * @return void
 	 */
 	private function render_type_switcher( array $state ): void {
-		$type   = (string) ( $state['type'] ?? 'section' );
-		$base   = (string) ( $state['compare_screen_url'] ?? '' );
+		$type        = (string) ( $state['type'] ?? 'section' );
+		$base        = (string) ( $state['compare_screen_url'] ?? '' );
 		$url_section = $base !== '' ? \add_query_arg( 'type', 'section', $base ) : '';
-		$url_page   = $base !== '' ? \add_query_arg( 'type', 'page', $base ) : '';
+		$url_page    = $base !== '' ? \add_query_arg( 'type', 'page', $base ) : '';
 		?>
 		<nav class="aio-compare-type-nav" aria-label="<?php \esc_attr_e( 'Compare type', 'aio-page-builder' ); ?>">
 			<a href="<?php echo $url_section !== '' ? \esc_url( $url_section ) : '#'; ?>" class="<?php echo \esc_attr( $type === 'section' ? 'active' : '' ); ?>"><?php \esc_html_e( 'Section templates', 'aio-page-builder' ); ?></a>
@@ -278,15 +297,15 @@ final class Template_Compare_Screen {
 			}
 		}
 		$labels = array(
-			'name'                 => __( 'Name', 'aio-page-builder' ),
-			'purpose_family'       => $type === 'page' ? __( 'Category / Purpose', 'aio-page-builder' ) : __( 'Purpose', 'aio-page-builder' ),
-			'cta_direction'        => __( 'CTA direction', 'aio-page-builder' ),
-			'used_sections'        => __( 'Used sections', 'aio-page-builder' ),
-			'compatibility_notes'   => __( 'Compatibility', 'aio-page-builder' ),
-			'animation_tier'       => __( 'Animation tier', 'aio-page-builder' ),
-			'helper_ref'           => __( 'Helper ref', 'aio-page-builder' ),
-			'one_pager_ref'        => __( 'One-pager', 'aio-page-builder' ),
-			'preview_excerpt'      => __( 'Preview', 'aio-page-builder' ),
+			'name'                => __( 'Name', 'aio-page-builder' ),
+			'purpose_family'      => $type === 'page' ? __( 'Category / Purpose', 'aio-page-builder' ) : __( 'Purpose', 'aio-page-builder' ),
+			'cta_direction'       => __( 'CTA direction', 'aio-page-builder' ),
+			'used_sections'       => __( 'Used sections', 'aio-page-builder' ),
+			'compatibility_notes' => __( 'Compatibility', 'aio-page-builder' ),
+			'animation_tier'      => __( 'Animation tier', 'aio-page-builder' ),
+			'helper_ref'          => __( 'Helper ref', 'aio-page-builder' ),
+			'one_pager_ref'       => __( 'One-pager', 'aio-page-builder' ),
+			'preview_excerpt'     => __( 'Preview', 'aio-page-builder' ),
 		);
 		?>
 		<div class="aio-compare-matrix-wrapper">
@@ -329,7 +348,7 @@ final class Template_Compare_Screen {
 	}
 
 	/**
-	 * @param string              $attr
+	 * @param string               $attr
 	 * @param array<string, mixed> $row
 	 * @return void
 	 */

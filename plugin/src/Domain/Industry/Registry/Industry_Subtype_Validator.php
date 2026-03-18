@@ -17,15 +17,15 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Industry_Subtype_Validator {
 
-	private const KEY_PATTERN = '#^[a-z0-9_-]+$#';
-	private const KEY_MAX_LEN = 64;
-	private const LABEL_MAX_LEN = 256;
+	private const KEY_PATTERN     = '#^[a-z0-9_-]+$#';
+	private const KEY_MAX_LEN     = 64;
+	private const LABEL_MAX_LEN   = 256;
 	private const SUMMARY_MAX_LEN = 1024;
 
 	/**
 	 * Validates a single subtype definition. Returns list of error messages; empty means valid.
 	 *
-	 * @param array<string, mixed> $def Subtype definition (subtype_key, parent_industry_key, label, summary, status, version_marker, optional refs).
+	 * @param array<string, mixed>     $def Subtype definition (subtype_key, parent_industry_key, label, summary, status, version_marker, optional refs).
 	 * @param array<string, true>|null $valid_parent_keys Optional set of allowed parent_industry_key values (e.g. from Industry_Pack_Registry). If provided, parent_industry_key must be in this set.
 	 * @return list<string> Error messages; empty if valid.
 	 */

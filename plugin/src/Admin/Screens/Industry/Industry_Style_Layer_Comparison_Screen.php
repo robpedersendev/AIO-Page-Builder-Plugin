@@ -55,10 +55,10 @@ final class Industry_Style_Layer_Comparison_Screen {
 		$presets          = array();
 		$selected_preset  = '';
 		$diff_result      = array(
-			Industry_Style_Layer_Diff_Service::RESULT_PARENT             => array( 'present' => false ),
-			Industry_Style_Layer_Diff_Service::RESULT_GOAL                => array( 'present' => false ),
-			Industry_Style_Layer_Diff_Service::RESULT_COMBINED           => array(),
-			Industry_Style_Layer_Diff_Service::RESULT_TOKEN_DIFF_ROWS    => array(),
+			Industry_Style_Layer_Diff_Service::RESULT_PARENT => array( 'present' => false ),
+			Industry_Style_Layer_Diff_Service::RESULT_GOAL => array( 'present' => false ),
+			Industry_Style_Layer_Diff_Service::RESULT_COMBINED => array(),
+			Industry_Style_Layer_Diff_Service::RESULT_TOKEN_DIFF_ROWS => array(),
 			Industry_Style_Layer_Diff_Service::RESULT_COMPONENT_DIFF_ROWS => array(),
 		);
 
@@ -71,53 +71,58 @@ final class Industry_Style_Layer_Comparison_Screen {
 				}
 			}
 			if ( $store !== null ) {
-				$profile = $store->get_profile();
+				$profile          = $store->get_profile();
 				$primary_industry = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 					? trim( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 					: '';
-				$conversion_goal = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+				$conversion_goal  = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 					? trim( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 					: '';
 			}
 
-			$preset_registry = null;
+			$preset_registry  = null;
 			$overlay_registry = null;
 			if ( $this->container->has( 'industry_style_preset_registry' ) ) {
-				$r = $this->container->get( 'industry_style_preset_registry' );
+				$r               = $this->container->get( 'industry_style_preset_registry' );
 				$preset_registry = $r instanceof Industry_Style_Preset_Registry ? $r : null;
 			}
 			if ( $this->container->has( 'goal_style_preset_overlay_registry' ) ) {
-				$r = $this->container->get( 'goal_style_preset_overlay_registry' );
+				$r                = $this->container->get( 'goal_style_preset_overlay_registry' );
 				$overlay_registry = $r instanceof \AIOPageBuilder\Domain\Industry\Registry\Goal_Style_Preset_Overlay_Registry ? $r : null;
 			}
 
 			if ( $preset_registry !== null && $primary_industry !== '' ) {
 				$presets = $preset_registry->list_by_industry( $primary_industry );
-				$presets = array_values( array_filter( $presets, function ( $p ) {
-					return ( $p[ Industry_Style_Preset_Registry::FIELD_STATUS ] ?? '' ) === Industry_Style_Preset_Registry::STATUS_ACTIVE;
-				} ) );
+				$presets = array_values(
+					array_filter(
+						$presets,
+						function ( $p ) {
+							return ( $p[ Industry_Style_Preset_Registry::FIELD_STATUS ] ?? '' ) === Industry_Style_Preset_Registry::STATUS_ACTIVE;
+						}
+					)
+				);
 			}
 
 			if ( isset( $_GET[ self::PARAM_PRESET_KEY ] ) && is_string( $_GET[ self::PARAM_PRESET_KEY ] ) ) {
 				$selected_preset = trim( sanitize_text_field( wp_unslash( $_GET[ self::PARAM_PRESET_KEY ] ) ) );
 			}
 			if ( $selected_preset === '' && ! empty( $presets ) ) {
-				$first = $presets[0];
+				$first           = $presets[0];
 				$selected_preset = (string) ( $first[ Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY ] ?? '' );
 			}
 
 			if ( $selected_preset !== '' && $preset_registry !== null ) {
-				$service = new Industry_Style_Layer_Diff_Service( $preset_registry, $overlay_registry );
+				$service     = new Industry_Style_Layer_Diff_Service( $preset_registry, $overlay_registry );
 				$diff_result = $service->compare( $selected_preset, $conversion_goal );
 			}
 		}
 
 		return array(
-			'primary_industry'   => $primary_industry,
-			'conversion_goal'    => $conversion_goal,
-			'presets'           => $presets,
-			'selected_preset'   => $selected_preset,
-			'diff_result'       => $diff_result,
+			'primary_industry' => $primary_industry,
+			'conversion_goal'  => $conversion_goal,
+			'presets'          => $presets,
+			'selected_preset'  => $selected_preset,
+			'diff_result'      => $diff_result,
 			'profile_url'      => admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
 			'style_preset_url' => admin_url( 'admin.php?page=' . Industry_Style_Preset_Screen::SLUG ),
 			'current_url'      => admin_url( 'admin.php?page=' . self::SLUG ),
@@ -133,15 +138,15 @@ final class Industry_Style_Layer_Comparison_Screen {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the style layer comparison screen.', 'aio-page-builder' ), 403 );
 		}
-		$state = $this->get_state();
+		$state            = $this->get_state();
 		$primary_industry = $state['primary_industry'];
-		$presets = $state['presets'];
-		$selected_preset = $state['selected_preset'];
-		$diff = $state['diff_result'];
-		$parent = $diff[ Industry_Style_Layer_Diff_Service::RESULT_PARENT ];
-		$goal   = $diff[ Industry_Style_Layer_Diff_Service::RESULT_GOAL ];
-		$token_rows = $diff[ Industry_Style_Layer_Diff_Service::RESULT_TOKEN_DIFF_ROWS ];
-		$component_rows = $diff[ Industry_Style_Layer_Diff_Service::RESULT_COMPONENT_DIFF_ROWS ];
+		$presets          = $state['presets'];
+		$selected_preset  = $state['selected_preset'];
+		$diff             = $state['diff_result'];
+		$parent           = $diff[ Industry_Style_Layer_Diff_Service::RESULT_PARENT ];
+		$goal             = $diff[ Industry_Style_Layer_Diff_Service::RESULT_GOAL ];
+		$token_rows       = $diff[ Industry_Style_Layer_Diff_Service::RESULT_TOKEN_DIFF_ROWS ];
+		$component_rows   = $diff[ Industry_Style_Layer_Diff_Service::RESULT_COMPONENT_DIFF_ROWS ];
 		?>
 		<div class="wrap aio-page-builder-screen aio-industry-style-layer-comparison" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>
@@ -163,8 +168,9 @@ final class Industry_Style_Layer_Comparison_Screen {
 					<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG ); ?>" />
 					<label for="aio-preset-key"><?php esc_html_e( 'Preset to compare', 'aio-page-builder' ); ?></label>
 					<select id="aio-preset-key" name="<?php echo esc_attr( self::PARAM_PRESET_KEY ); ?>">
-						<?php foreach ( $presets as $p ) :
-							$key = $p[ Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY ] ?? '';
+						<?php
+						foreach ( $presets as $p ) :
+							$key   = $p[ Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY ] ?? '';
 							$label = $p[ Industry_Style_Preset_Registry::FIELD_LABEL ] ?? $key;
 							?>
 							<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $selected_preset, $key ); ?>><?php echo esc_html( $label ); ?> (<?php echo esc_html( $key ); ?>)</option>

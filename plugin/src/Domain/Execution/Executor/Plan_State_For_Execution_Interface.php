@@ -47,10 +47,10 @@ interface Plan_State_For_Execution_Interface {
 	/**
 	 * Updates a single plan item's status and optionally execution artifact (for finalization publish).
 	 *
-	 * @param int    $post_id    Plan post ID.
-	 * @param int    $step_index Step index.
-	 * @param string $item_id    Item id.
-	 * @param string $new_status New status.
+	 * @param int                       $post_id    Plan post ID.
+	 * @param int                       $step_index Step index.
+	 * @param string                    $item_id    Item id.
+	 * @param string                    $new_status New status.
 	 * @param array<string, mixed>|null $execution_artifact Optional artifact (e.g. post_id) to store on item.
 	 * @return bool Success.
 	 */

@@ -40,18 +40,18 @@ final class Form_Provider_Picker_Discovery_Service_Test extends TestCase {
 	}
 
 	public function test_discovery_returns_providers_with_picker_support(): void {
-		$registry = new Form_Provider_Registry();
-		$ndr      = new Ndr_Form_Provider_Picker_Adapter( $registry );
+		$registry  = new Form_Provider_Registry();
+		$ndr       = new Ndr_Form_Provider_Picker_Adapter( $registry );
 		$discovery = new Form_Provider_Picker_Discovery_Service( $registry, array( 'ndr_forms' => $ndr ) );
-		$list = $discovery->get_providers_with_picker_support();
+		$list      = $discovery->get_providers_with_picker_support();
 		$this->assertContains( 'ndr_forms', $list );
 	}
 
 	public function test_discovery_picker_state_for_provider(): void {
-		$registry = new Form_Provider_Registry();
-		$ndr      = new Ndr_Form_Provider_Picker_Adapter( $registry );
+		$registry  = new Form_Provider_Registry();
+		$ndr       = new Ndr_Form_Provider_Picker_Adapter( $registry );
 		$discovery = new Form_Provider_Picker_Discovery_Service( $registry, array( 'ndr_forms' => $ndr ) );
-		$state = $discovery->get_picker_state_for_provider( 'ndr_forms' );
+		$state     = $discovery->get_picker_state_for_provider( 'ndr_forms' );
 		$this->assertSame( 'ndr_forms', $state['provider_key'] );
 		$this->assertTrue( $state['available'] );
 		$this->assertFalse( $state['supports_form_list'] );
@@ -60,8 +60,8 @@ final class Form_Provider_Picker_Discovery_Service_Test extends TestCase {
 	}
 
 	public function test_discovery_has_adapter(): void {
-		$registry = new Form_Provider_Registry();
-		$ndr      = new Ndr_Form_Provider_Picker_Adapter( $registry );
+		$registry  = new Form_Provider_Registry();
+		$ndr       = new Ndr_Form_Provider_Picker_Adapter( $registry );
 		$discovery = new Form_Provider_Picker_Discovery_Service( $registry, array( 'ndr_forms' => $ndr ) );
 		$this->assertTrue( $discovery->has_adapter( 'ndr_forms' ) );
 		$this->assertFalse( $discovery->has_adapter( 'wpforms' ) );

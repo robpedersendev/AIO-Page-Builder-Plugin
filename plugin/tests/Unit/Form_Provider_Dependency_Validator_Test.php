@@ -43,7 +43,7 @@ final class Form_Provider_Dependency_Validator_Test extends TestCase {
 	}
 
 	public function test_validate_for_template_returns_valid_true_when_no_form_embed_sections(): void {
-		$page_def = array(
+		$page_def  = array(
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
 				array( Page_Template_Schema::SECTION_ITEM_KEY => 'sec_hero' ),
 			),
@@ -52,9 +52,11 @@ final class Form_Provider_Dependency_Validator_Test extends TestCase {
 		$page_repo->method( 'get_definition_by_key' )->willReturn( $page_def );
 
 		$section_repo = $this->createMock( Section_Template_Repository::class );
-		$section_repo->method( 'get_definition_by_key' )->with( 'sec_hero' )->willReturn( array(
-			Section_Schema::FIELD_CATEGORY => 'hero',
-		) );
+		$section_repo->method( 'get_definition_by_key' )->with( 'sec_hero' )->willReturn(
+			array(
+				Section_Schema::FIELD_CATEGORY => 'hero',
+			)
+		);
 		$registry  = new Form_Provider_Registry();
 		$validator = new Form_Provider_Dependency_Validator( $registry, $page_repo, $section_repo );
 
@@ -64,7 +66,7 @@ final class Form_Provider_Dependency_Validator_Test extends TestCase {
 	}
 
 	public function test_validate_for_template_returns_valid_false_when_form_embed_provider_not_registered(): void {
-		$page_def = array(
+		$page_def  = array(
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
 				array( Page_Template_Schema::SECTION_ITEM_KEY => 'form_section_ndr' ),
 			),
@@ -72,11 +74,14 @@ final class Form_Provider_Dependency_Validator_Test extends TestCase {
 		$page_repo = $this->createMock( Page_Template_Repository::class );
 		$page_repo->method( 'get_definition_by_key' )->willReturn( $page_def );
 
-		$section_def = array(
+		$section_def  = array(
 			Section_Schema::FIELD_CATEGORY => 'form_embed',
-			'field_blueprint'             => array(
+			'field_blueprint'              => array(
 				'fields' => array(
-					array( 'name' => 'form_provider', 'default_value' => 'ndr_forms' ),
+					array(
+						'name'          => 'form_provider',
+						'default_value' => 'ndr_forms',
+					),
 				),
 			),
 		);
@@ -96,7 +101,7 @@ final class Form_Provider_Dependency_Validator_Test extends TestCase {
 	}
 
 	public function test_validate_for_template_returns_valid_true_when_form_embed_provider_registered(): void {
-		$page_def = array(
+		$page_def  = array(
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
 				array( Page_Template_Schema::SECTION_ITEM_KEY => 'form_section_ndr' ),
 			),
@@ -104,11 +109,14 @@ final class Form_Provider_Dependency_Validator_Test extends TestCase {
 		$page_repo = $this->createMock( Page_Template_Repository::class );
 		$page_repo->method( 'get_definition_by_key' )->willReturn( $page_def );
 
-		$section_def = array(
+		$section_def  = array(
 			Section_Schema::FIELD_CATEGORY => 'form_embed',
-			'field_blueprint'             => array(
+			'field_blueprint'              => array(
 				'fields' => array(
-					array( 'name' => 'form_provider', 'default_value' => 'ndr_forms' ),
+					array(
+						'name'          => 'form_provider',
+						'default_value' => 'ndr_forms',
+					),
 				),
 			),
 		);
@@ -135,7 +143,7 @@ final class Form_Provider_Dependency_Validator_Test extends TestCase {
 	}
 
 	public function test_template_uses_form_sections_returns_true_when_template_has_form_embed_section(): void {
-		$page_def = array(
+		$page_def  = array(
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
 				array( Page_Template_Schema::SECTION_ITEM_KEY => 'sec_hero' ),
 				array( Page_Template_Schema::SECTION_ITEM_KEY => 'form_section_ndr' ),
@@ -146,10 +154,12 @@ final class Form_Provider_Dependency_Validator_Test extends TestCase {
 
 		$section_repo = $this->createMock( Section_Template_Repository::class );
 		$section_repo->method( 'get_definition_by_key' )
-			->willReturnMap( array(
-				array( 'sec_hero', array( Section_Schema::FIELD_CATEGORY => 'hero' ) ),
-				array( 'form_section_ndr', array( Section_Schema::FIELD_CATEGORY => 'form_embed' ) ),
-			) );
+			->willReturnMap(
+				array(
+					array( 'sec_hero', array( Section_Schema::FIELD_CATEGORY => 'hero' ) ),
+					array( 'form_section_ndr', array( Section_Schema::FIELD_CATEGORY => 'form_embed' ) ),
+				)
+			);
 		$registry  = new Form_Provider_Registry();
 		$validator = new Form_Provider_Dependency_Validator( $registry, $page_repo, $section_repo );
 
@@ -157,7 +167,7 @@ final class Form_Provider_Dependency_Validator_Test extends TestCase {
 	}
 
 	public function test_template_uses_form_sections_returns_false_when_no_form_embed_section(): void {
-		$page_def = array(
+		$page_def  = array(
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
 				array( Page_Template_Schema::SECTION_ITEM_KEY => 'sec_hero' ),
 			),

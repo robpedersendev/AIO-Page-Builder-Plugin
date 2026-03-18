@@ -85,25 +85,25 @@ final class Form_Provider_Picker_Discovery_Service {
 	 * }
 	 */
 	public function get_picker_state_for_provider( string $provider_key ): array {
-		$provider_key = $this->sanitize_provider_key( $provider_key );
-		$adapter      = $this->adapters[ $provider_key ] ?? null;
-		$available    = $adapter !== null && $this->registry->has_provider( $provider_key ) && $adapter->is_available();
-		$display_label = $adapter !== null ? $adapter->get_display_label() : $provider_key;
+		$provider_key       = $this->sanitize_provider_key( $provider_key );
+		$adapter            = $this->adapters[ $provider_key ] ?? null;
+		$available          = $adapter !== null && $this->registry->has_provider( $provider_key ) && $adapter->is_available();
+		$display_label      = $adapter !== null ? $adapter->get_display_label() : $provider_key;
 		$supports_form_list = $adapter !== null && $adapter->supports_form_list();
-		$picker_items = array();
+		$picker_items       = array();
 		if ( $adapter !== null && $supports_form_list ) {
 			$picker_items = $this->normalize_picker_items( $provider_key, $adapter->get_form_list() );
 		}
-		$fallback_label = $adapter !== null ? $adapter->get_fallback_entry_label() : __( 'Form ID', 'aio-page-builder' );
+		$fallback_label      = $adapter !== null ? $adapter->get_fallback_entry_label() : __( 'Form ID', 'aio-page-builder' );
 		$empty_state_message = $adapter !== null && ! $supports_form_list
 			? __( 'Enter the form identifier from your form manager.', 'aio-page-builder' )
 			: ( $supports_form_list && empty( $picker_items ) ? __( 'No forms available from this provider.', 'aio-page-builder' ) : '' );
 
 		return array(
-			'provider_key'          => $provider_key,
+			'provider_key'         => $provider_key,
 			'display_label'        => $display_label,
-			'available'             => $available,
-			'supports_form_list'    => $supports_form_list,
+			'available'            => $available,
+			'supports_form_list'   => $supports_form_list,
 			'picker_items'         => $picker_items,
 			'fallback_entry_label' => $fallback_label,
 			'empty_state_message'  => $empty_state_message,
@@ -117,21 +117,21 @@ final class Form_Provider_Picker_Discovery_Service {
 	 * @return array{provider_key: string, display_label: string, available: bool, supports_form_list: bool, fallback_entry_label: string, empty_state_message: string}
 	 */
 	public function get_picker_metadata_for_provider( string $provider_key ): array {
-		$provider_key = $this->sanitize_provider_key( $provider_key );
-		$adapter      = $this->adapters[ $provider_key ] ?? null;
-		$available    = $adapter !== null && $this->registry->has_provider( $provider_key ) && $adapter->is_available();
-		$display_label = $adapter !== null ? $adapter->get_display_label() : $provider_key;
-		$supports_form_list = $adapter !== null && $adapter->supports_form_list();
-		$fallback_label = $adapter !== null ? $adapter->get_fallback_entry_label() : __( 'Form ID', 'aio-page-builder' );
+		$provider_key        = $this->sanitize_provider_key( $provider_key );
+		$adapter             = $this->adapters[ $provider_key ] ?? null;
+		$available           = $adapter !== null && $this->registry->has_provider( $provider_key ) && $adapter->is_available();
+		$display_label       = $adapter !== null ? $adapter->get_display_label() : $provider_key;
+		$supports_form_list  = $adapter !== null && $adapter->supports_form_list();
+		$fallback_label      = $adapter !== null ? $adapter->get_fallback_entry_label() : __( 'Form ID', 'aio-page-builder' );
 		$empty_state_message = $adapter !== null && ! $supports_form_list
 			? __( 'Enter the form identifier from your form manager.', 'aio-page-builder' )
 			: ( $supports_form_list ? __( 'No forms available from this provider.', 'aio-page-builder' ) : '' );
 
 		return array(
-			'provider_key'          => $provider_key,
+			'provider_key'         => $provider_key,
 			'display_label'        => $display_label,
-			'available'             => $available,
-			'supports_form_list'    => $supports_form_list,
+			'available'            => $available,
+			'supports_form_list'   => $supports_form_list,
 			'fallback_entry_label' => $fallback_label,
 			'empty_state_message'  => $empty_state_message,
 		);
@@ -161,7 +161,7 @@ final class Form_Provider_Picker_Discovery_Service {
 	/**
 	 * Normalizes raw form list items for a provider (item_id pattern, escaped label). Public for availability/cache layer.
 	 *
-	 * @param string $provider_key
+	 * @param string                                                                                        $provider_key
 	 * @param list<array{provider_key?: string, item_id: string, item_label: string, status_hint?: string}> $items
 	 * @return list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}>
 	 */
@@ -178,14 +178,14 @@ final class Form_Provider_Picker_Discovery_Service {
 	 */
 	public function is_item_stale( string $provider_key, string $form_id ): bool {
 		$provider_key = $this->sanitize_provider_key( $provider_key );
-		$adapter = $this->adapters[ $provider_key ] ?? null;
+		$adapter      = $this->adapters[ $provider_key ] ?? null;
 		return $adapter !== null ? $adapter->is_item_stale( $form_id ) : false;
 	}
 
 	/**
 	 * Sanitizes and filters picker items (item_id pattern; item_label escaped for display).
 	 *
-	 * @param string $provider_key
+	 * @param string                                                                                       $provider_key
 	 * @param list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string}> $items
 	 * @return list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string}>
 	 */
@@ -200,7 +200,7 @@ final class Form_Provider_Picker_Discovery_Service {
 				continue;
 			}
 			$item_label = isset( $item['item_label'] ) && is_string( $item['item_label'] ) ? $item['item_label'] : $item_id;
-			$out[] = array(
+			$out[]      = array(
 				'provider_key' => $provider_key,
 				'item_id'      => $item_id,
 				'item_label'   => \esc_html( $item_label ),

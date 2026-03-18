@@ -19,17 +19,17 @@ final class Dependency_Requirements {
 
 	/** Required plugins: activation blocked if missing or below minimum version. */
 	private const REQUIRED = array(
-		'acf_pro' => array(
-			'name'         => 'Advanced Custom Fields Pro',
-			'plugin_file'  => 'advanced-custom-fields-pro/acf.php',
-			'min_version'  => '6.2',
-			'purpose'      => 'Section-level field architecture, field-group generation, structured edit UI.',
+		'acf_pro'        => array(
+			'name'        => 'Advanced Custom Fields Pro',
+			'plugin_file' => 'advanced-custom-fields-pro/acf.php',
+			'min_version' => '6.2',
+			'purpose'     => 'Section-level field architecture, field-group generation, structured edit UI.',
 		),
 		'generateblocks' => array(
-			'name'         => 'GenerateBlocks',
-			'plugin_file'  => 'generateblocks/generateblocks.php',
-			'min_version'  => '2.0',
-			'purpose'      => 'Block-layer composition and container/grid output for native block build model.',
+			'name'        => 'GenerateBlocks',
+			'plugin_file' => 'generateblocks/generateblocks.php',
+			'min_version' => '2.0',
+			'purpose'     => 'Block-layer composition and container/grid output for native block build model.',
 		),
 	);
 

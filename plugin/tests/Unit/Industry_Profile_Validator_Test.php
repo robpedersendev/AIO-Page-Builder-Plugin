@@ -29,26 +29,26 @@ final class Industry_Profile_Validator_Test extends TestCase {
 
 	public function test_validate_accepts_valid_profile_with_primary(): void {
 		$validator = new Industry_Profile_Validator();
-		$profile = array(
+		$profile   = array(
 			Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '1',
 			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor',
 		);
-		$profile = Industry_Profile_Schema::normalize( $profile );
+		$profile   = Industry_Profile_Schema::normalize( $profile );
 		$this->assertTrue( $validator->validate( $profile ) );
 		$this->assertSame( array(), $validator->get_last_validation_errors() );
 	}
 
 	public function test_validate_rejects_unsupported_schema_version(): void {
 		$validator = new Industry_Profile_Validator();
-		$profile = array( Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '2' );
+		$profile   = array( Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '2' );
 		$this->assertFalse( $validator->validate( $profile ) );
 		$this->assertNotEmpty( $validator->get_last_validation_errors() );
 	}
 
 	public function test_get_readiness_none_for_unsupported_version(): void {
 		$validator = new Industry_Profile_Validator();
-		$profile = array( Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '2' );
-		$result = $validator->get_readiness( $profile );
+		$profile   = array( Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '2' );
+		$result    = $validator->get_readiness( $profile );
 		$this->assertSame( Industry_Profile_Readiness_Result::STATE_NONE, $result->get_state() );
 		$this->assertSame( Industry_Profile_Readiness_Result::SCORE_NONE, $result->get_score() );
 		$this->assertTrue( $result->has_errors() );
@@ -56,8 +56,8 @@ final class Industry_Profile_Validator_Test extends TestCase {
 
 	public function test_get_readiness_minimal_when_primary_empty(): void {
 		$validator = new Industry_Profile_Validator();
-		$profile = Industry_Profile_Schema::get_empty_profile();
-		$result = $validator->get_readiness( $profile );
+		$profile   = Industry_Profile_Schema::get_empty_profile();
+		$result    = $validator->get_readiness( $profile );
 		$this->assertSame( Industry_Profile_Readiness_Result::STATE_MINIMAL, $result->get_state() );
 		$this->assertSame( Industry_Profile_Readiness_Result::SCORE_MINIMAL, $result->get_score() );
 		$this->assertFalse( $result->is_ready() );
@@ -66,7 +66,7 @@ final class Industry_Profile_Validator_Test extends TestCase {
 	}
 
 	public function test_get_readiness_ready_when_primary_set_and_question_pack_has_answer(): void {
-		$validator = new Industry_Profile_Validator();
+		$validator   = new Industry_Profile_Validator();
 		$qp_registry = new Industry_Question_Pack_Registry();
 		$qp_registry->load( Industry_Question_Pack_Definitions::default_packs() );
 		$profile = array(
@@ -75,7 +75,7 @@ final class Industry_Profile_Validator_Test extends TestCase {
 			Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array( 'realtor' => array( 'market_focus' => 'residential' ) ),
 		);
 		$profile = Industry_Profile_Schema::normalize( $profile );
-		$result = $validator->get_readiness( $profile, null, $qp_registry );
+		$result  = $validator->get_readiness( $profile, null, $qp_registry );
 		$this->assertSame( Industry_Profile_Readiness_Result::STATE_READY, $result->get_state() );
 		$this->assertSame( Industry_Profile_Readiness_Result::SCORE_READY, $result->get_score() );
 		$this->assertTrue( $result->is_ready() );
@@ -84,7 +84,7 @@ final class Industry_Profile_Validator_Test extends TestCase {
 	}
 
 	public function test_get_readiness_partial_when_primary_set_but_no_question_pack_answers(): void {
-		$validator = new Industry_Profile_Validator();
+		$validator   = new Industry_Profile_Validator();
 		$qp_registry = new Industry_Question_Pack_Registry();
 		$qp_registry->load( Industry_Question_Pack_Definitions::default_packs() );
 		$profile = array(
@@ -92,7 +92,7 @@ final class Industry_Profile_Validator_Test extends TestCase {
 			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'plumber',
 		);
 		$profile = Industry_Profile_Schema::normalize( $profile );
-		$result = $validator->get_readiness( $profile, null, $qp_registry );
+		$result  = $validator->get_readiness( $profile, null, $qp_registry );
 		$this->assertSame( Industry_Profile_Readiness_Result::STATE_PARTIAL, $result->get_state() );
 		$this->assertSame( Industry_Profile_Readiness_Result::SCORE_PARTIAL, $result->get_score() );
 		$this->assertFalse( $result->is_ready() );
@@ -108,7 +108,7 @@ final class Industry_Profile_Validator_Test extends TestCase {
 			array(),
 			array( 'primary_set' => true )
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 		$this->assertSame( 'ready', $arr['state'] );
 		$this->assertSame( 100, $arr['score'] );
 		$this->assertArrayHasKey( 'details', $arr );
@@ -117,21 +117,25 @@ final class Industry_Profile_Validator_Test extends TestCase {
 	/** Prompt 414: subtype_registry validates industry_subtype_key; matching parent yields no subtype warning. */
 	public function test_validate_with_subtype_registry_matching_parent_no_warning(): void {
 		$subtype_registry = new Industry_Subtype_Registry();
-		$subtype_registry->load( array(
+		$subtype_registry->load(
 			array(
-				Industry_Subtype_Registry::FIELD_SUBTYPE_KEY         => 'realtor_buyer_agent',
-				Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY => 'realtor',
-				Industry_Subtype_Registry::FIELD_LABEL              => 'Buyer Agent',
-				Industry_Subtype_Registry::FIELD_SUMMARY            => 'Summary',
-				Industry_Subtype_Registry::FIELD_STATUS              => 'active',
-				Industry_Subtype_Registry::FIELD_VERSION_MARKER      => '1',
-			),
-		) );
+				array(
+					Industry_Subtype_Registry::FIELD_SUBTYPE_KEY => 'realtor_buyer_agent',
+					Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY => 'realtor',
+					Industry_Subtype_Registry::FIELD_LABEL => 'Buyer Agent',
+					Industry_Subtype_Registry::FIELD_SUMMARY => 'Summary',
+					Industry_Subtype_Registry::FIELD_STATUS => 'active',
+					Industry_Subtype_Registry::FIELD_VERSION_MARKER => '1',
+				),
+			)
+		);
 		$validator = new Industry_Profile_Validator();
-		$profile = Industry_Profile_Schema::normalize( array(
-			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY  => 'realtor',
-			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'realtor_buyer_agent',
-		) );
+		$profile   = Industry_Profile_Schema::normalize(
+			array(
+				Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY  => 'realtor',
+				Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'realtor_buyer_agent',
+			)
+		);
 		$this->assertTrue( $validator->validate( $profile, null, null, $subtype_registry ) );
 		$warnings = $validator->get_last_validation_warnings();
 		foreach ( $warnings as $w ) {
@@ -142,21 +146,25 @@ final class Industry_Profile_Validator_Test extends TestCase {
 	/** Prompt 414: subtype_registry with parent mismatch adds warning. */
 	public function test_validate_with_subtype_registry_parent_mismatch_adds_warning(): void {
 		$subtype_registry = new Industry_Subtype_Registry();
-		$subtype_registry->load( array(
+		$subtype_registry->load(
 			array(
-				Industry_Subtype_Registry::FIELD_SUBTYPE_KEY         => 'realtor_buyer_agent',
-				Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY => 'realtor',
-				Industry_Subtype_Registry::FIELD_LABEL              => 'Buyer Agent',
-				Industry_Subtype_Registry::FIELD_SUMMARY             => 'Summary',
-				Industry_Subtype_Registry::FIELD_STATUS              => 'active',
-				Industry_Subtype_Registry::FIELD_VERSION_MARKER      => '1',
-			),
-		) );
+				array(
+					Industry_Subtype_Registry::FIELD_SUBTYPE_KEY => 'realtor_buyer_agent',
+					Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY => 'realtor',
+					Industry_Subtype_Registry::FIELD_LABEL => 'Buyer Agent',
+					Industry_Subtype_Registry::FIELD_SUMMARY => 'Summary',
+					Industry_Subtype_Registry::FIELD_STATUS => 'active',
+					Industry_Subtype_Registry::FIELD_VERSION_MARKER => '1',
+				),
+			)
+		);
 		$validator = new Industry_Profile_Validator();
-		$profile = Industry_Profile_Schema::normalize( array(
-			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY  => 'plumber',
-			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'realtor_buyer_agent',
-		) );
+		$profile   = Industry_Profile_Schema::normalize(
+			array(
+				Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY  => 'plumber',
+				Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'realtor_buyer_agent',
+			)
+		);
 		$this->assertTrue( $validator->validate( $profile, null, null, $subtype_registry ) );
 		$warnings = $validator->get_last_validation_warnings();
 		$this->assertNotEmpty( $warnings );

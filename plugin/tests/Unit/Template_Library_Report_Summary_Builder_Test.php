@@ -66,15 +66,27 @@ final class Template_Library_Report_Summary_Builder_Test extends TestCase {
 	}
 
 	public function test_compliance_status_provider_accepted_values(): void {
-		$builder = new Template_Library_Report_Summary_Builder( null, null, null, false, function () {
-			return 'ok';
-		} );
+		$builder = new Template_Library_Report_Summary_Builder(
+			null,
+			null,
+			null,
+			false,
+			function () {
+				return 'ok';
+			}
+		);
 		$payload = $builder->build();
 		$this->assertSame( 'ok', $payload['compliance_summary'] );
 
-		$builder_warning = new Template_Library_Report_Summary_Builder( null, null, null, false, function () {
-			return 'warning';
-		} );
+		$builder_warning = new Template_Library_Report_Summary_Builder(
+			null,
+			null,
+			null,
+			false,
+			function () {
+				return 'warning';
+			}
+		);
 		$this->assertSame( 'warning', $builder_warning->build()['compliance_summary'] );
 	}
 }

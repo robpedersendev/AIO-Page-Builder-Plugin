@@ -46,13 +46,13 @@ final class Media_Listing_Profile_Detail_Library_Batch_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']     = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$repo       = new Section_Template_Repository();
-		$normalizer = new Section_Definition_Normalizer();
-		$this->validator = new Section_Validator( $normalizer, $repo );
-		$bp_validator = new Section_Field_Blueprint_Validator();
-		$this->blueprint_service = new Section_Field_Blueprint_Service(
+		$repo                           = new Section_Template_Repository();
+		$normalizer                     = new Section_Definition_Normalizer();
+		$this->validator                = new Section_Validator( $normalizer, $repo );
+		$bp_validator                   = new Section_Field_Blueprint_Validator();
+		$this->blueprint_service        = new Section_Field_Blueprint_Service(
 			$repo,
 			$bp_validator,
 			new Section_Field_Blueprint_Normalizer( $bp_validator )
@@ -68,9 +68,21 @@ final class Media_Listing_Profile_Detail_Library_Batch_Test extends TestCase {
 		$keys = Media_Listing_Profile_Detail_Library_Batch_Definitions::section_keys();
 		$this->assertCount( 15, $keys );
 		$expected = array(
-			'mlp_card_grid_01', 'mlp_listing_01', 'mlp_profile_summary_01', 'mlp_profile_cards_01', 'mlp_place_highlight_01',
-			'mlp_recommendation_band_01', 'mlp_gallery_01', 'mlp_media_band_01', 'mlp_detail_spec_01', 'mlp_comparison_cards_01',
-			'mlp_related_content_01', 'mlp_location_info_01', 'mlp_directory_entry_01', 'mlp_team_grid_01', 'mlp_product_cards_01',
+			'mlp_card_grid_01',
+			'mlp_listing_01',
+			'mlp_profile_summary_01',
+			'mlp_profile_cards_01',
+			'mlp_place_highlight_01',
+			'mlp_recommendation_band_01',
+			'mlp_gallery_01',
+			'mlp_media_band_01',
+			'mlp_detail_spec_01',
+			'mlp_comparison_cards_01',
+			'mlp_related_content_01',
+			'mlp_location_info_01',
+			'mlp_directory_entry_01',
+			'mlp_team_grid_01',
+			'mlp_product_cards_01',
 		);
 		foreach ( $expected as $k ) {
 			$this->assertContains( $k, $keys );
@@ -86,7 +98,7 @@ final class Media_Listing_Profile_Detail_Library_Batch_Test extends TestCase {
 		$normalizer = new Section_Definition_Normalizer();
 		foreach ( Media_Listing_Profile_Detail_Library_Batch_Definitions::all_definitions() as $def ) {
 			$normalized = $normalizer->normalize( $def );
-			$errors = $this->validator->validate_completeness( $normalized );
+			$errors     = $this->validator->validate_completeness( $normalized );
 			$this->assertEmpty( $errors, 'Definition ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '?' ) . ' should pass completeness: ' . implode( ', ', $errors ) );
 		}
 	}
@@ -143,7 +155,7 @@ final class Media_Listing_Profile_Detail_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_accessibility_guidance(): void {
 		foreach ( Media_Listing_Profile_Detail_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$guidance = (string) ( $def['accessibility_warnings_or_enhancements'] ?? '' );
 			$this->assertNotEmpty( $guidance, "Section {$key} must have accessibility_warnings_or_enhancements" );
 			$this->assertMatchesRegularExpression( '/list|grid|table|semantic|contrast|omit|aria|heading/i', $guidance, "Section {$key} should reference list, grid, table, semantic, contrast, omit, ARIA, or heading (spec §51)" );
@@ -152,7 +164,7 @@ final class Media_Listing_Profile_Detail_Library_Batch_Test extends TestCase {
 
 	public function test_preview_defaults_non_empty(): void {
 		foreach ( Media_Listing_Profile_Detail_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$defaults = $def['preview_defaults'] ?? array();
 			$this->assertIsArray( $defaults );
 			$this->assertNotEmpty( $defaults, "Section {$key} must have non-empty preview_defaults" );
@@ -160,7 +172,7 @@ final class Media_Listing_Profile_Detail_Library_Batch_Test extends TestCase {
 	}
 
 	public function test_categories_are_allowed(): void {
-		$allowed = Section_Schema::get_allowed_categories();
+		$allowed  = Section_Schema::get_allowed_categories();
 		$mlp_cats = array( 'directory_listing', 'media_gallery', 'profile_bio', 'comparison', 'related_recommended' );
 		foreach ( $mlp_cats as $c ) {
 			$this->assertArrayHasKey( $c, $allowed );
@@ -183,9 +195,9 @@ final class Media_Listing_Profile_Detail_Library_Batch_Test extends TestCase {
 
 	public function test_seeder_run_returns_success_and_fifteen_section_ids(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 500;
-		$GLOBALS['_aio_wp_query_posts']       = array();
-		$repo   = new Section_Template_Repository();
-		$result = Media_Listing_Profile_Detail_Library_Batch_Seeder::run( $repo );
+		$GLOBALS['_aio_wp_query_posts']        = array();
+		$repo                                  = new Section_Template_Repository();
+		$result                                = Media_Listing_Profile_Detail_Library_Batch_Seeder::run( $repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'section_ids', $result );

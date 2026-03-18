@@ -40,13 +40,13 @@ final class Log_Export_Result {
 	private string $export_log_reference;
 
 	/**
-	 * @param bool         $success
-	 * @param string       $message
-	 * @param list<string> $exported_log_types
+	 * @param bool                 $success
+	 * @param string               $message
+	 * @param list<string>         $exported_log_types
 	 * @param array<string, mixed> $filter_summary
-	 * @param bool         $redaction_applied
-	 * @param string       $export_file_reference
-	 * @param string       $export_log_reference
+	 * @param bool                 $redaction_applied
+	 * @param string               $export_file_reference
+	 * @param string               $export_log_reference
 	 */
 	public function __construct(
 		bool $success,
@@ -57,13 +57,13 @@ final class Log_Export_Result {
 		string $export_file_reference,
 		string $export_log_reference
 	) {
-		$this->success                = $success;
-		$this->message                = $message;
-		$this->exported_log_types     = $exported_log_types;
-		$this->filter_summary         = $filter_summary;
-		$this->redaction_applied      = $redaction_applied;
-		$this->export_file_reference  = $export_file_reference;
-		$this->export_log_reference   = $export_log_reference;
+		$this->success               = $success;
+		$this->message               = $message;
+		$this->exported_log_types    = $exported_log_types;
+		$this->filter_summary        = $filter_summary;
+		$this->redaction_applied     = $redaction_applied;
+		$this->export_file_reference = $export_file_reference;
+		$this->export_log_reference  = $export_log_reference;
 	}
 
 	public function is_success(): bool {
@@ -103,21 +103,21 @@ final class Log_Export_Result {
 	 */
 	public function to_payload(): array {
 		return array(
-			'success'                => $this->success,
-			'message'                => $this->message,
-			'exported_log_types'     => $this->exported_log_types,
-			'filter_summary'         => $this->filter_summary,
-			'redaction_applied'      => $this->redaction_applied,
+			'success'               => $this->success,
+			'message'               => $this->message,
+			'exported_log_types'    => $this->exported_log_types,
+			'filter_summary'        => $this->filter_summary,
+			'redaction_applied'     => $this->redaction_applied,
 			'export_file_reference' => $this->export_file_reference,
-			'export_log_reference'   => $this->export_log_reference,
+			'export_log_reference'  => $this->export_log_reference,
 		);
 	}
 
 	/**
-	 * @param list<string> $exported_log_types
+	 * @param list<string>         $exported_log_types
 	 * @param array<string, mixed> $filter_summary
-	 * @param string       $export_file_reference
-	 * @param string       $export_log_reference
+	 * @param string               $export_file_reference
+	 * @param string               $export_log_reference
 	 * @return self
 	 */
 	public static function success(

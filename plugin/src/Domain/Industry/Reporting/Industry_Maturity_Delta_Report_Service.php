@@ -38,32 +38,32 @@ final class Industry_Maturity_Delta_Report_Service {
 
 	/** Capability areas from maturity matrix for capability-level delta (key => default level). */
 	private const CAPABILITY_AREAS = array(
-		'packs'                    => 'stable',
-		'industry_profile'         => 'production_ready',
+		'packs'                     => 'stable',
+		'industry_profile'          => 'production_ready',
 		'subtypes'                  => 'stable',
-		'starter_bundles'          => 'stable',
-		'section_overlays'         => 'stable',
-		'page_overlays'            => 'stable',
+		'starter_bundles'           => 'stable',
+		'section_overlays'          => 'stable',
+		'page_overlays'             => 'stable',
 		'recommendation_resolvers'  => 'stable',
-		'build_plan_scoring'       => 'stable',
-		'ai_overlays'              => 'experimental',
-		'diagnostics_health'       => 'stable',
+		'build_plan_scoring'        => 'stable',
+		'ai_overlays'               => 'experimental',
+		'diagnostics_health'        => 'stable',
 		'import_export_restore'     => 'stable',
-		'cache_layers'             => 'stable',
-		'support_tooling'          => 'stable',
+		'cache_layers'              => 'stable',
+		'support_tooling'           => 'stable',
 		'release_authoring_tooling' => 'stable',
-		'whatif_simulation'        => 'stable',
-		'subtype_goal_benchmark'   => 'stable',
-		'degraded_mode'            => 'stable',
+		'whatif_simulation'         => 'stable',
+		'subtype_goal_benchmark'    => 'stable',
+		'degraded_mode'             => 'stable',
 	);
 
 	/** Maturity level order (lower index = lower maturity). */
 	private const LEVEL_ORDER = array(
-		'gap'               => 0,
-		'draft'             => 1,
-		'experimental'      => 2,
-		'stable'            => 3,
-		'production_ready'  => 4,
+		'gap'              => 0,
+		'draft'            => 1,
+		'experimental'     => 2,
+		'stable'           => 3,
+		'production_ready' => 4,
 	);
 
 	/** @var Industry_Pack_Completeness_Report_Service|null */
@@ -86,12 +86,12 @@ final class Industry_Maturity_Delta_Report_Service {
 	 * }
 	 */
 	public function generate_report( ?array $baseline_snapshot = null ): array {
-		$current = $this->build_current_snapshot();
-		$generated_at = gmdate( 'Y-m-d\TH:i:s\Z' );
+		$current          = $this->build_current_snapshot();
+		$generated_at     = gmdate( 'Y-m-d\TH:i:s\Z' );
 		$current_snapshot = array(
-			'families'          => $current['families'],
-			'capability_areas'   => $current['capability_areas'],
-			'captured_at'       => $generated_at,
+			'families'         => $current['families'],
+			'capability_areas' => $current['capability_areas'],
+			'captured_at'      => $generated_at,
 		);
 
 		if ( $baseline_snapshot === null || ! isset( $baseline_snapshot['families'] ) || ! is_array( $baseline_snapshot['families'] ) ) {
@@ -109,25 +109,25 @@ final class Industry_Maturity_Delta_Report_Service {
 			);
 		}
 
-		$baseline_families = $baseline_snapshot['families'];
+		$baseline_families   = $baseline_snapshot['families'];
 		$baseline_capability = isset( $baseline_snapshot['capability_areas'] ) && is_array( $baseline_snapshot['capability_areas'] ) ? $baseline_snapshot['capability_areas'] : array();
-		$family_deltas = array();
-		$improved = 0;
-		$stagnated = 0;
-		$regressed = 0;
+		$family_deltas       = array();
+		$improved            = 0;
+		$stagnated           = 0;
+		$regressed           = 0;
 
 		foreach ( $current['families'] as $scope => $cur ) {
-			$band_t2 = $cur['band'];
-			$total_t2 = $cur['total'];
+			$band_t2      = $cur['band'];
+			$total_t2     = $cur['total'];
 			$baseline_row = $baseline_families[ $scope ] ?? null;
-			$band_t1 = '';
-			$total_t1 = 0;
+			$band_t1      = '';
+			$total_t1     = 0;
 			if ( is_array( $baseline_row ) ) {
-				$band_t1 = isset( $baseline_row['band'] ) && is_string( $baseline_row['band'] ) ? $baseline_row['band'] : '';
+				$band_t1  = isset( $baseline_row['band'] ) && is_string( $baseline_row['band'] ) ? $baseline_row['band'] : '';
 				$total_t1 = isset( $baseline_row['total'] ) ? (int) $baseline_row['total'] : 0;
 			}
-			$trend = $this->family_trend( $band_t1, $total_t1, $band_t2, $total_t2 );
-			$scope_label = strpos( $scope, '|' ) !== false ? str_replace( '|', ' → ', $scope ) : $scope;
+			$trend           = $this->family_trend( $band_t1, $total_t1, $band_t2, $total_t2 );
+			$scope_label     = strpos( $scope, '|' ) !== false ? str_replace( '|', ' → ', $scope ) : $scope;
 			$family_deltas[] = array(
 				'scope'       => $scope,
 				'scope_label' => $scope_label,
@@ -148,9 +148,9 @@ final class Industry_Maturity_Delta_Report_Service {
 
 		$capability_deltas = array();
 		foreach ( array_keys( self::CAPABILITY_AREAS ) as $area ) {
-			$level_t2 = $current['capability_areas'][ $area ] ?? self::CAPABILITY_AREAS[ $area ];
-			$level_t1 = $baseline_capability[ $area ] ?? self::CAPABILITY_AREAS[ $area ];
-			$trend = $this->level_trend( $level_t1, $level_t2 );
+			$level_t2            = $current['capability_areas'][ $area ] ?? self::CAPABILITY_AREAS[ $area ];
+			$level_t1            = $baseline_capability[ $area ] ?? self::CAPABILITY_AREAS[ $area ];
+			$trend               = $this->level_trend( $level_t1, $level_t2 );
 			$capability_deltas[] = array(
 				'area'     => $area,
 				'level_t1' => $level_t1,
@@ -179,19 +179,19 @@ final class Industry_Maturity_Delta_Report_Service {
 	 * @return array{families: array<string, array{band: string, total: int}>, capability_areas: array<string, string>}
 	 */
 	private function build_current_snapshot(): array {
-		$families = array();
+		$families         = array();
 		$capability_areas = array();
 		foreach ( self::CAPABILITY_AREAS as $area => $level ) {
 			$capability_areas[ $area ] = $level;
 		}
 
 		if ( $this->completeness_service instanceof Industry_Pack_Completeness_Report_Service ) {
-			$report = $this->completeness_service->generate_report( true );
+			$report       = $this->completeness_service->generate_report( true );
 			$pack_results = isset( $report['pack_results'] ) && is_array( $report['pack_results'] ) ? $report['pack_results'] : array();
 			foreach ( $pack_results as $r ) {
-				$pack_key = isset( $r['pack_key'] ) && is_string( $r['pack_key'] ) ? $r['pack_key'] : '';
+				$pack_key    = isset( $r['pack_key'] ) && is_string( $r['pack_key'] ) ? $r['pack_key'] : '';
 				$subtype_key = isset( $r['subtype_key'] ) && is_string( $r['subtype_key'] ) ? $r['subtype_key'] : '';
-				$scope = $subtype_key !== '' ? $pack_key . '|' . $subtype_key : $pack_key;
+				$scope       = $subtype_key !== '' ? $pack_key . '|' . $subtype_key : $pack_key;
 				if ( $scope === '' ) {
 					continue;
 				}
@@ -202,7 +202,10 @@ final class Industry_Maturity_Delta_Report_Service {
 			}
 		}
 
-		return array( 'families' => $families, 'capability_areas' => $capability_areas );
+		return array(
+			'families'         => $families,
+			'capability_areas' => $capability_areas,
+		);
 	}
 
 	private function family_trend( string $band_t1, int $total_t1, string $band_t2, int $total_t2 ): string {

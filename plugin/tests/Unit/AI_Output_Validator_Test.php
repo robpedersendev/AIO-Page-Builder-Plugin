@@ -33,18 +33,22 @@ final class AI_Output_Validator_Test extends TestCase {
 	private function minimal_valid_payload(): array {
 		return array(
 			Build_Plan_Draft_Schema::KEY_SCHEMA_VERSION   => '1',
-			Build_Plan_Draft_Schema::KEY_RUN_SUMMARY    => array(
+			Build_Plan_Draft_Schema::KEY_RUN_SUMMARY      => array(
 				'summary_text'       => 'Draft plan.',
 				'planning_mode'      => 'mixed',
 				'overall_confidence' => 'medium',
 			),
 			Build_Plan_Draft_Schema::KEY_SITE_PURPOSE     => array(),
-			Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE   => array( 'recommended_top_level_pages' => array(), 'hierarchy_map' => array(), 'navigation_summary' => '' ),
+			Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE   => array(
+				'recommended_top_level_pages' => array(),
+				'hierarchy_map'               => array(),
+				'navigation_summary'          => '',
+			),
 			Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES => array(),
-			Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE    => array(),
-			Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN      => array(),
+			Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE => array(),
+			Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN => array(),
 			Build_Plan_Draft_Schema::KEY_DESIGN_TOKEN_RECOMMENDATIONS => array(),
-			Build_Plan_Draft_Schema::KEY_SEO_RECOMMENDATIONS   => array(),
+			Build_Plan_Draft_Schema::KEY_SEO_RECOMMENDATIONS => array(),
 			Build_Plan_Draft_Schema::KEY_WARNINGS         => array(),
 			Build_Plan_Draft_Schema::KEY_ASSUMPTIONS      => array(),
 			Build_Plan_Draft_Schema::KEY_CONFIDENCE       => array(),
@@ -101,8 +105,8 @@ final class AI_Output_Validator_Test extends TestCase {
 	}
 
 	public function test_item_level_partial_failure_produces_partial_state_and_dropped_records(): void {
-		$payload = $this->minimal_valid_payload();
-		$valid_item = array(
+		$payload      = $this->minimal_valid_payload();
+		$valid_item   = array(
 			'current_page_url'   => '/',
 			'current_page_title' => 'Home',
 			'action'             => 'keep',
@@ -163,13 +167,13 @@ final class AI_Output_Validator_Test extends TestCase {
 		$payload = $this->minimal_valid_payload();
 		$payload[ Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES ] = array(
 			array(
-				'current_page_url'   => '/about',
-				'current_page_title' => 'About',
-				'action'             => 'replace_with_new_page',
-				'reason'             => 'Replace.',
-				'risk_level'         => 'medium',
-				'confidence'         => 'high',
-				'target_page_title'  => '',
+				'current_page_url'    => '/about',
+				'current_page_title'  => 'About',
+				'action'              => 'replace_with_new_page',
+				'reason'              => 'Replace.',
+				'risk_level'          => 'medium',
+				'confidence'          => 'high',
+				'target_page_title'   => '',
 				'target_slug'         => '',
 				'target_template_key' => '',
 			),
@@ -179,9 +183,14 @@ final class AI_Output_Validator_Test extends TestCase {
 		$dropped = $report->get_dropped_records();
 		$this->assertCount( 1, $dropped );
 		$errors = $dropped[0]->get_errors();
-		$this->assertNotEmpty( array_filter( $errors, function ( $e ) {
-			return strpos( $e, 'internal_ref' ) !== false;
-		} ) );
+		$this->assertNotEmpty(
+			array_filter(
+				$errors,
+				function ( $e ) {
+					return strpos( $e, 'internal_ref' ) !== false;
+				}
+			)
+		);
 	}
 
 	public function test_blocking_failure_prevents_build_plan_handoff(): void {
@@ -235,7 +244,7 @@ final class AI_Output_Validator_Test extends TestCase {
 	}
 
 	public function test_dropped_record_report_to_array(): void {
-		$d = new Dropped_Record_Report( 'existing_page_changes', 1, 'invalid_enum', array( 'action' ) );
+		$d   = new Dropped_Record_Report( 'existing_page_changes', 1, 'invalid_enum', array( 'action' ) );
 		$arr = $d->to_array();
 		$this->assertSame( 'existing_page_changes', $arr['section'] );
 		$this->assertSame( 1, $arr['index'] );

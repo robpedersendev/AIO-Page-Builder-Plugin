@@ -18,10 +18,10 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Reporting_Delivery_Status {
 
-	public const PENDING  = 'pending';
-	public const SENT     = 'sent';
-	public const FAILED   = 'failed';
-	public const SKIPPED  = 'skipped';
+	public const PENDING = 'pending';
+	public const SENT    = 'sent';
+	public const FAILED  = 'failed';
+	public const SKIPPED = 'skipped';
 
 	/** @var list<string> */
 	private static ?array $all = null;

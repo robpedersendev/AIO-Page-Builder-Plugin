@@ -32,22 +32,22 @@ final class Section_Definition_Normalizer {
 
 	/** Default compatibility shape (section-registry-schema §4). */
 	private const DEFAULT_COMPATIBILITY = array(
-		'may_precede'             => array(),
-		'may_follow'              => array(),
-		'avoid_adjacent'          => array(),
-		'duplicate_purpose_of'    => array(),
-		'variant_conflicts'       => array(),
-		'requires_page_context'  => '',
-		'requires_token_surface'  => false,
+		'may_precede'                   => array(),
+		'may_follow'                    => array(),
+		'avoid_adjacent'                => array(),
+		'duplicate_purpose_of'          => array(),
+		'variant_conflicts'             => array(),
+		'requires_page_context'         => '',
+		'requires_token_surface'        => false,
 		'requires_content_availability' => '',
 	);
 
 	/** Default version shape (section-registry-schema §5). */
 	private const DEFAULT_VERSION = array(
-		'version'              => '1',
-		'changelog_ref'        => '',
+		'version'             => '1',
+		'changelog_ref'       => '',
 		'breaking_change'     => false,
-		'migration_notes_ref'  => '',
+		'migration_notes_ref' => '',
 		'stable_key_retained' => true,
 	);
 
@@ -63,29 +63,29 @@ final class Section_Definition_Normalizer {
 	public function normalize( array $input ): array {
 		$input = $this->filter_known_keys( $input );
 
-		$variants     = $this->normalize_variants( $input[ Section_Schema::FIELD_VARIANTS ] ?? array() );
-		$default_var  = $this->pick_default_variant( $input[ Section_Schema::FIELD_DEFAULT_VARIANT ] ?? '', $variants );
-		$compat       = $this->normalize_compatibility( $input[ Section_Schema::FIELD_COMPATIBILITY ] ?? array() );
-		$version      = $this->normalize_version( $input[ Section_Schema::FIELD_VERSION ] ?? array() );
-		$asset        = $this->normalize_asset_declaration( $input[ Section_Schema::FIELD_ASSET_DECLARATION ] ?? array() );
-		$deprecation  = $this->normalize_deprecation( $input['deprecation'] ?? array(), $input[ Section_Schema::FIELD_STATUS ] ?? '' );
+		$variants    = $this->normalize_variants( $input[ Section_Schema::FIELD_VARIANTS ] ?? array() );
+		$default_var = $this->pick_default_variant( $input[ Section_Schema::FIELD_DEFAULT_VARIANT ] ?? '', $variants );
+		$compat      = $this->normalize_compatibility( $input[ Section_Schema::FIELD_COMPATIBILITY ] ?? array() );
+		$version     = $this->normalize_version( $input[ Section_Schema::FIELD_VERSION ] ?? array() );
+		$asset       = $this->normalize_asset_declaration( $input[ Section_Schema::FIELD_ASSET_DECLARATION ] ?? array() );
+		$deprecation = $this->normalize_deprecation( $input['deprecation'] ?? array(), $input[ Section_Schema::FIELD_STATUS ] ?? '' );
 
 		$out = array(
-			Section_Schema::FIELD_INTERNAL_KEY           => $this->sanitize_key( (string) ( $input[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' ) ),
-			Section_Schema::FIELD_NAME                   => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_NAME ] ?? '' ), self::MAX_NAME ),
-			Section_Schema::FIELD_PURPOSE_SUMMARY        => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' ), self::MAX_PURPOSE ),
-			Section_Schema::FIELD_CATEGORY               => $this->sanitize_category( (string) ( $input[ Section_Schema::FIELD_CATEGORY ] ?? '' ) ),
+			Section_Schema::FIELD_INTERNAL_KEY             => $this->sanitize_key( (string) ( $input[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' ) ),
+			Section_Schema::FIELD_NAME                     => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_NAME ] ?? '' ), self::MAX_NAME ),
+			Section_Schema::FIELD_PURPOSE_SUMMARY          => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' ), self::MAX_PURPOSE ),
+			Section_Schema::FIELD_CATEGORY                 => $this->sanitize_category( (string) ( $input[ Section_Schema::FIELD_CATEGORY ] ?? '' ) ),
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF ] ?? '' ), self::MAX_REF ),
-			Section_Schema::FIELD_FIELD_BLUEPRINT_REF    => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_FIELD_BLUEPRINT_REF ] ?? '' ), self::MAX_REF ),
-			Section_Schema::FIELD_HELPER_REF             => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_HELPER_REF ] ?? '' ), self::MAX_REF ),
-			Section_Schema::FIELD_CSS_CONTRACT_REF      => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' ), self::MAX_REF ),
-			Section_Schema::FIELD_DEFAULT_VARIANT        => $default_var,
-			Section_Schema::FIELD_VARIANTS               => $variants,
-			Section_Schema::FIELD_COMPATIBILITY          => $compat,
-			Section_Schema::FIELD_VERSION                 => $version,
-			Section_Schema::FIELD_STATUS                 => $this->sanitize_status( (string) ( $input[ Section_Schema::FIELD_STATUS ] ?? 'draft' ) ),
-			Section_Schema::FIELD_RENDER_MODE            => $this->sanitize_render_mode( (string) ( $input[ Section_Schema::FIELD_RENDER_MODE ] ?? 'block' ) ),
-			Section_Schema::FIELD_ASSET_DECLARATION      => $asset,
+			Section_Schema::FIELD_FIELD_BLUEPRINT_REF      => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_FIELD_BLUEPRINT_REF ] ?? '' ), self::MAX_REF ),
+			Section_Schema::FIELD_HELPER_REF               => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_HELPER_REF ] ?? '' ), self::MAX_REF ),
+			Section_Schema::FIELD_CSS_CONTRACT_REF         => $this->sanitize_string( (string) ( $input[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' ), self::MAX_REF ),
+			Section_Schema::FIELD_DEFAULT_VARIANT          => $default_var,
+			Section_Schema::FIELD_VARIANTS                 => $variants,
+			Section_Schema::FIELD_COMPATIBILITY            => $compat,
+			Section_Schema::FIELD_VERSION                  => $version,
+			Section_Schema::FIELD_STATUS                   => $this->sanitize_status( (string) ( $input[ Section_Schema::FIELD_STATUS ] ?? 'draft' ) ),
+			Section_Schema::FIELD_RENDER_MODE              => $this->sanitize_render_mode( (string) ( $input[ Section_Schema::FIELD_RENDER_MODE ] ?? 'block' ) ),
+			Section_Schema::FIELD_ASSET_DECLARATION        => $asset,
 		);
 
 		// * Optional fields (section-registry-schema §10).
@@ -139,24 +139,30 @@ final class Section_Definition_Normalizer {
 			if ( $key === '' ) {
 				continue;
 			}
-			$desc = is_array( $desc ) ? $desc : array();
+			$desc        = is_array( $desc ) ? $desc : array();
 			$out[ $key ] = array(
-				'label'       => $this->sanitize_string( (string) ( $desc['label'] ?? $key ), 128 ),
-				'description' => $this->sanitize_string( (string) ( $desc['description'] ?? '' ), 512 ),
+				'label'         => $this->sanitize_string( (string) ( $desc['label'] ?? $key ), 128 ),
+				'description'   => $this->sanitize_string( (string) ( $desc['description'] ?? '' ), 512 ),
 				'css_modifiers' => isset( $desc['css_modifiers'] ) && is_array( $desc['css_modifiers'] )
 					? array_map( fn( $m ) => $this->sanitize_string( (string) $m, 64 ), $desc['css_modifiers'] )
 					: array(),
 			);
 		}
 		if ( empty( $out ) ) {
-			return array( 'default' => array( 'label' => 'Default', 'description' => '', 'css_modifiers' => array() ) );
+			return array(
+				'default' => array(
+					'label'         => 'Default',
+					'description'   => '',
+					'css_modifiers' => array(),
+				),
+			);
 		}
 		return $out;
 	}
 
 	/**
-	 * @param string                $default
-	 * @param array<string, mixed>  $variants
+	 * @param string               $default
+	 * @param array<string, mixed> $variants
 	 * @return string
 	 */
 	private function pick_default_variant( string $default, array $variants ): string {
@@ -190,13 +196,13 @@ final class Section_Definition_Normalizer {
 		};
 
 		return array(
-			'may_precede'             => $arr_sanitize( $raw['may_precede'] ?? array() ),
-			'may_follow'              => $arr_sanitize( $raw['may_follow'] ?? array() ),
-			'avoid_adjacent'          => $arr_sanitize( $raw['avoid_adjacent'] ?? array() ),
-			'duplicate_purpose_of'    => $arr_sanitize( $raw['duplicate_purpose_of'] ?? array() ),
-			'variant_conflicts'       => $arr_sanitize( $raw['variant_conflicts'] ?? array() ),
-			'requires_page_context'  => $this->sanitize_string( (string) ( $raw['requires_page_context'] ?? '' ), 128 ),
-			'requires_token_surface'  => (bool) ( $raw['requires_token_surface'] ?? false ),
+			'may_precede'                   => $arr_sanitize( $raw['may_precede'] ?? array() ),
+			'may_follow'                    => $arr_sanitize( $raw['may_follow'] ?? array() ),
+			'avoid_adjacent'                => $arr_sanitize( $raw['avoid_adjacent'] ?? array() ),
+			'duplicate_purpose_of'          => $arr_sanitize( $raw['duplicate_purpose_of'] ?? array() ),
+			'variant_conflicts'             => $arr_sanitize( $raw['variant_conflicts'] ?? array() ),
+			'requires_page_context'         => $this->sanitize_string( (string) ( $raw['requires_page_context'] ?? '' ), 128 ),
+			'requires_token_surface'        => (bool) ( $raw['requires_token_surface'] ?? false ),
 			'requires_content_availability' => $this->sanitize_string( (string) ( $raw['requires_content_availability'] ?? '' ), 256 ),
 		);
 	}
@@ -210,11 +216,11 @@ final class Section_Definition_Normalizer {
 			return self::DEFAULT_VERSION;
 		}
 		return array(
-			'version'              => $this->sanitize_string( (string) ( $raw['version'] ?? '1' ), 32 ),
-			'changelog_ref'        => $this->sanitize_string( (string) ( $raw['changelog_ref'] ?? '' ), 255 ),
-			'breaking_change'      => (bool) ( $raw['breaking_change'] ?? false ),
-			'migration_notes_ref'  => $this->sanitize_string( (string) ( $raw['migration_notes_ref'] ?? '' ), 255 ),
-			'stable_key_retained'   => (bool) ( $raw['stable_key_retained'] ?? true ),
+			'version'             => $this->sanitize_string( (string) ( $raw['version'] ?? '1' ), 32 ),
+			'changelog_ref'       => $this->sanitize_string( (string) ( $raw['changelog_ref'] ?? '' ), 255 ),
+			'breaking_change'     => (bool) ( $raw['breaking_change'] ?? false ),
+			'migration_notes_ref' => $this->sanitize_string( (string) ( $raw['migration_notes_ref'] ?? '' ), 255 ),
+			'stable_key_retained' => (bool) ( $raw['stable_key_retained'] ?? true ),
 		);
 	}
 
@@ -234,13 +240,13 @@ final class Section_Definition_Normalizer {
 			: array();
 
 		return array(
-			'none'           => false,
-			'frontend_css'   => (bool) ( $raw['frontend_css'] ?? false ),
-			'admin_css'      => (bool) ( $raw['admin_css'] ?? false ),
-			'frontend_js'    => (bool) ( $raw['frontend_js'] ?? false ),
-			'admin_js'       => (bool) ( $raw['admin_js'] ?? false ),
-			'icons'          => (bool) ( $raw['icons'] ?? false ),
-			'media_patterns' => (bool) ( $raw['media_patterns'] ?? false ),
+			'none'             => false,
+			'frontend_css'     => (bool) ( $raw['frontend_css'] ?? false ),
+			'admin_css'        => (bool) ( $raw['admin_css'] ?? false ),
+			'frontend_js'      => (bool) ( $raw['frontend_js'] ?? false ),
+			'admin_js'         => (bool) ( $raw['admin_js'] ?? false ),
+			'icons'            => (bool) ( $raw['icons'] ?? false ),
+			'media_patterns'   => (bool) ( $raw['media_patterns'] ?? false ),
 			'shared_resources' => array_values( array_filter( $shared ) ),
 		);
 	}
@@ -274,23 +280,23 @@ final class Section_Definition_Normalizer {
 	 */
 	private function normalize_optional_field( string $name, mixed $value ): mixed {
 		$limits = array(
-			'short_label'                         => 64,
-			'preview_description'                  => 512,
-			'preview_image_ref'                   => 255,
-			'section_purpose_family'              => 64,
-			'cta_classification'                  => 64,
-			'variation_family_key'                => 64,
-			'animation_tier'                      => 32,
-			'accessibility_contract_ref'           => 255,
-			'notes_for_ai_planning'                => 1024,
-			'hierarchy_role_hints'                 => 256,
-			'seo_relevance_notes'                  => 512,
-			'token_affinity_notes'                 => 512,
-			'lpagery_mapping_notes'                => 512,
+			'short_label'                            => 64,
+			'preview_description'                    => 512,
+			'preview_image_ref'                      => 255,
+			'section_purpose_family'                 => 64,
+			'cta_classification'                     => 64,
+			'variation_family_key'                   => 64,
+			'animation_tier'                         => 32,
+			'accessibility_contract_ref'             => 255,
+			'notes_for_ai_planning'                  => 1024,
+			'hierarchy_role_hints'                   => 256,
+			'seo_relevance_notes'                    => 512,
+			'token_affinity_notes'                   => 512,
+			'lpagery_mapping_notes'                  => 512,
 			'accessibility_warnings_or_enhancements' => 512,
-			'migration_notes'                      => 512,
-			'deprecation_notes'                    => 512,
-			'accessibility_contract_ref'           => 255,
+			'migration_notes'                        => 512,
+			'deprecation_notes'                      => 512,
+			'accessibility_contract_ref'             => 255,
 		);
 		if ( $name === 'animation_families' ) {
 			return is_array( $value )

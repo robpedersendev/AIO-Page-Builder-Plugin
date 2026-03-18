@@ -21,9 +21,9 @@ use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
  */
 final class Industry_Section_Library_Read_Model_Builder {
 
-	public const VIEW_RECOMMENDED_ONLY       = 'recommended_only';
-	public const VIEW_RECOMMENDED_PLUS_WEAK  = 'recommended_plus_weak_fit';
-	public const VIEW_FULL_LIBRARY           = 'full_library';
+	public const VIEW_RECOMMENDED_ONLY      = 'recommended_only';
+	public const VIEW_RECOMMENDED_PLUS_WEAK = 'recommended_plus_weak_fit';
+	public const VIEW_FULL_LIBRARY          = 'full_library';
 
 	/** @var Industry_Section_Recommendation_Resolver */
 	private Industry_Section_Recommendation_Resolver $resolver;
@@ -35,17 +35,17 @@ final class Industry_Section_Library_Read_Model_Builder {
 		?Industry_Section_Recommendation_Resolver $resolver = null,
 		?Industry_Weighted_Recommendation_Engine $weighted_engine = null
 	) {
-		$this->resolver = $resolver ?? new Industry_Section_Recommendation_Resolver();
+		$this->resolver        = $resolver ?? new Industry_Section_Recommendation_Resolver();
 		$this->weighted_engine = $weighted_engine;
 	}
 
 	/**
 	 * Builds the read model: sections with recommendation metadata, filtered by view mode. Invalid profile/pack → full_library behavior (all sections, neutral).
 	 *
-	 * @param array<string, mixed>       $industry_profile primary_industry_key, optional secondary_industry_keys.
-	 * @param array<string, mixed>|null  $primary_pack     Industry pack or null.
+	 * @param array<string, mixed>             $industry_profile primary_industry_key, optional secondary_industry_keys.
+	 * @param array<string, mixed>|null        $primary_pack     Industry pack or null.
 	 * @param array<int, array<string, mixed>> $sections   List of section definitions (each with internal_key).
-	 * @param string                    $view_mode        One of VIEW_RECOMMENDED_ONLY, VIEW_RECOMMENDED_PLUS_WEAK, VIEW_FULL_LIBRARY.
+	 * @param string                           $view_mode        One of VIEW_RECOMMENDED_ONLY, VIEW_RECOMMENDED_PLUS_WEAK, VIEW_FULL_LIBRARY.
 	 * @return list<Industry_Section_Library_Item_View>
 	 */
 	public function build(
@@ -92,10 +92,10 @@ final class Industry_Section_Library_Read_Model_Builder {
 	/**
 	 * Builds the read model and weighted results by section key when profile has secondary industries (Prompt 371).
 	 *
-	 * @param array<string, mixed>       $industry_profile
-	 * @param array<string, mixed>|null  $primary_pack
+	 * @param array<string, mixed>             $industry_profile
+	 * @param array<string, mixed>|null        $primary_pack
 	 * @param array<int, array<string, mixed>> $sections
-	 * @param string                    $view_mode
+	 * @param string                           $view_mode
 	 * @return array{items: list<Industry_Section_Library_Item_View>, weighted_by_key: array<string, array<string, mixed>>}
 	 */
 	public function build_with_weighted(
@@ -104,7 +104,7 @@ final class Industry_Section_Library_Read_Model_Builder {
 		array $sections,
 		string $view_mode = self::VIEW_FULL_LIBRARY
 	): array {
-		$items = $this->build( $industry_profile, $primary_pack, $sections, $view_mode );
+		$items           = $this->build( $industry_profile, $primary_pack, $sections, $view_mode );
 		$weighted_by_key = array();
 		if ( $this->weighted_engine !== null && $this->has_secondary_industries( $industry_profile ) ) {
 			$result = $this->resolver->resolve( $industry_profile, $primary_pack, $sections, array() );
@@ -115,7 +115,10 @@ final class Industry_Section_Library_Read_Model_Builder {
 				}
 			}
 		}
-		return array( 'items' => $items, 'weighted_by_key' => $weighted_by_key );
+		return array(
+			'items'           => $items,
+			'weighted_by_key' => $weighted_by_key,
+		);
 	}
 
 	private function has_secondary_industries( array $profile ): bool {

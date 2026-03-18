@@ -27,7 +27,19 @@ final class Future_Industry_Readiness_Screen_Test extends TestCase {
 	}
 
 	public function test_view_model_with_defaults_returns_bounded_structure(): void {
-		$vm = new Future_Industry_Readiness_View_Model( 0, 0, '', '', array(), array(), array( 'author_dashboard' => '#', 'pack_family_comparison' => '#', 'scaffold_promotion' => '#' ) );
+		$vm = new Future_Industry_Readiness_View_Model(
+			0,
+			0,
+			'',
+			'',
+			array(),
+			array(),
+			array(
+				'author_dashboard'       => '#',
+				'pack_family_comparison' => '#',
+				'scaffold_promotion'     => '#',
+			)
+		);
 		$this->assertSame( 0, $vm->get_expansion_blocker_count() );
 		$this->assertSame( 0, $vm->get_scaffold_incomplete_count() );
 		$this->assertIsString( $vm->get_candidate_readiness_label() );
@@ -40,7 +52,7 @@ final class Future_Industry_Readiness_Screen_Test extends TestCase {
 	}
 
 	public function test_view_model_to_array_has_required_keys(): void {
-		$vm = new Future_Industry_Readiness_View_Model( 0, 0, '', '', array(), array(), array() );
+		$vm  = new Future_Industry_Readiness_View_Model( 0, 0, '', '', array(), array(), array() );
 		$arr = $vm->to_array();
 		$this->assertArrayHasKey( Future_Industry_Readiness_View_Model::KEY_EXPANSION_BLOCKER_COUNT, $arr );
 		$this->assertArrayHasKey( Future_Industry_Readiness_View_Model::KEY_SCAFFOLD_SUMMARY, $arr );

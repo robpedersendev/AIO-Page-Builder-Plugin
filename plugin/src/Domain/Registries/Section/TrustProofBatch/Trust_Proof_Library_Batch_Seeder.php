@@ -32,7 +32,7 @@ final class Trust_Proof_Library_Batch_Seeder {
 		foreach ( Trust_Proof_Library_Batch_Definitions::all_definitions() as $definition ) {
 			$id = $section_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
-				$key = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
+				$key      = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
 				$errors[] = sprintf( __( 'Failed to save trust/proof section: %s', 'aio-page-builder' ), $key );
 				continue;
 			}
@@ -40,8 +40,8 @@ final class Trust_Proof_Library_Batch_Seeder {
 		}
 		return array(
 			'success'     => empty( $errors ),
-			'section_ids'  => $section_ids,
-			'errors'       => $errors,
+			'section_ids' => $section_ids,
+			'errors'      => $errors,
 		);
 	}
 }

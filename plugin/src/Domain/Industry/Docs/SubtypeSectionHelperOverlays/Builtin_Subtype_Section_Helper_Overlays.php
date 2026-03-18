@@ -32,7 +32,7 @@ final class Builtin_Subtype_Section_Helper_Overlays {
 			$dir . '/plumber-subtype-overlays.php',
 			$dir . '/disaster-recovery-subtype-overlays.php',
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $files as $path ) {
 			if ( ! is_readable( $path ) ) {
 				continue;

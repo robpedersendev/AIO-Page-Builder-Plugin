@@ -47,11 +47,11 @@ final class Registry_Export_Serializer {
 		Documentation_Repository $documentation_repo,
 		Version_Snapshot_Repository $snapshot_repo
 	) {
-		$this->section_repo      = $section_repo;
+		$this->section_repo       = $section_repo;
 		$this->page_template_repo = $page_template_repo;
-		$this->composition_repo  = $composition_repo;
+		$this->composition_repo   = $composition_repo;
 		$this->documentation_repo = $documentation_repo;
-		$this->snapshot_repo     = $snapshot_repo;
+		$this->snapshot_repo      = $snapshot_repo;
 	}
 
 	/**
@@ -112,13 +112,13 @@ final class Registry_Export_Serializer {
 	 * @return array{registries: array{sections: list<array>, page_templates: list<array>, compositions: list<array>}}
 	 */
 	public function build_registry_bundle( int $limit = 0 ): array {
-		$sec_limit = $limit > 0 ? $limit : 9999;
-		$pt_limit  = $limit > 0 ? $limit : 9999;
+		$sec_limit  = $limit > 0 ? $limit : 9999;
+		$pt_limit   = $limit > 0 ? $limit : 9999;
 		$comp_limit = $limit > 0 ? $limit : 9999;
 
-		$sections = $this->section_repo->list_all_definitions( $sec_limit, 0 );
+		$sections       = $this->section_repo->list_all_definitions( $sec_limit, 0 );
 		$page_templates = $this->page_template_repo->list_all_definitions( $pt_limit, 0 );
-		$compositions = $this->composition_repo->list_all_definitions( $comp_limit, 0 );
+		$compositions   = $this->composition_repo->list_all_definitions( $comp_limit, 0 );
 
 		$sections_out = array();
 		foreach ( $sections as $def ) {
@@ -150,7 +150,7 @@ final class Registry_Export_Serializer {
 	public function build_manifest_fragment(): array {
 		return array(
 			'export_schema_version' => \AIOPageBuilder\Infrastructure\Config\Versions::export_schema(),
-			'object_types' => array(
+			'object_types'          => array(
 				Registry_Export_Fragment_Builder::OBJECT_TYPE_SECTION,
 				Registry_Export_Fragment_Builder::OBJECT_TYPE_PAGE,
 				Registry_Export_Fragment_Builder::OBJECT_TYPE_COMPOSITION,

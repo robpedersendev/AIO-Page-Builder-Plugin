@@ -45,17 +45,17 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		self::$seed_id = 9000;
-		$this->page_repo   = new Page_Template_Repository();
-		$this->comp_repo   = new Composition_Repository();
-		$this->section_repo = new Section_Template_Repository();
-		$this->service    = new Field_Group_Derivation_Service(
+		self::$seed_id                  = 9000;
+		$this->page_repo                = new Page_Template_Repository();
+		$this->comp_repo                = new Composition_Repository();
+		$this->section_repo             = new Section_Template_Repository();
+		$this->service                  = new Field_Group_Derivation_Service(
 			$this->page_repo,
 			$this->comp_repo,
 			$this->section_repo
 		);
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$GLOBALS['_aio_post_meta']       = array();
+		$GLOBALS['_aio_post_meta']      = array();
 	}
 
 	protected function tearDown(): void {
@@ -64,16 +64,18 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 	}
 
 	private function seed_template( string $key, array $definition ): void {
-		$id   = self::$seed_id++;
-		$post = new \WP_Post( array(
-			'ID'          => $id,
-			'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
-			'post_title'  => 'Test',
-			'post_status' => 'publish',
-			'post_name'   => $key,
-		) );
-		$GLOBALS['_aio_wp_query_posts'][] = $post;
-		$def = array_merge( array( 'internal_key' => $key ), $definition );
+		$id                                        = self::$seed_id++;
+		$post                                      = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
+				'post_title'  => 'Test',
+				'post_status' => 'publish',
+				'post_name'   => $key,
+			)
+		);
+		$GLOBALS['_aio_wp_query_posts'][]          = $post;
+		$def                                       = array_merge( array( 'internal_key' => $key ), $definition );
 		$GLOBALS['_aio_post_meta'][ (string) $id ] = array(
 			'_aio_internal_key'             => $key,
 			'_aio_status'                   => 'active',
@@ -82,37 +84,41 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 	}
 
 	private function seed_composition( string $comp_id, array $definition ): void {
-		$id   = self::$seed_id++;
-		$post = new \WP_Post( array(
-			'ID'          => $id,
-			'post_type'   => Object_Type_Keys::COMPOSITION,
-			'post_title'  => 'Test',
-			'post_status' => 'publish',
-			'post_name'   => $comp_id,
-		) );
-		$GLOBALS['_aio_wp_query_posts'][] = $post;
-		$def = array_merge( array( 'composition_id' => $comp_id ), $definition );
+		$id                                        = self::$seed_id++;
+		$post                                      = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::COMPOSITION,
+				'post_title'  => 'Test',
+				'post_status' => 'publish',
+				'post_name'   => $comp_id,
+			)
+		);
+		$GLOBALS['_aio_wp_query_posts'][]          = $post;
+		$def                                       = array_merge( array( 'composition_id' => $comp_id ), $definition );
 		$GLOBALS['_aio_post_meta'][ (string) $id ] = array(
-			'_aio_internal_key'          => $comp_id,
-			'_aio_status'                => 'active',
+			'_aio_internal_key'           => $comp_id,
+			'_aio_status'                 => 'active',
 			'_aio_composition_definition' => wp_json_encode( $def ),
 		);
 	}
 
 	private function seed_section( string $key, array $definition ): void {
-		$id   = self::$seed_id++;
-		$post = new \WP_Post( array(
-			'ID'          => $id,
-			'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
-			'post_title'  => 'Test',
-			'post_status' => 'publish',
-			'post_name'   => $key,
-		) );
-		$GLOBALS['_aio_wp_query_posts'][] = $post;
-		$def = array_merge( array( 'internal_key' => $key ), $definition );
+		$id                                        = self::$seed_id++;
+		$post                                      = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+				'post_title'  => 'Test',
+				'post_status' => 'publish',
+				'post_name'   => $key,
+			)
+		);
+		$GLOBALS['_aio_wp_query_posts'][]          = $post;
+		$def                                       = array_merge( array( 'internal_key' => $key ), $definition );
 		$GLOBALS['_aio_post_meta'][ (string) $id ] = array(
-			'_aio_internal_key'      => $key,
-			'_aio_status'            => $definition['status'] ?? 'active',
+			'_aio_internal_key'       => $key,
+			'_aio_status'             => $definition['status'] ?? 'active',
 			'_aio_section_definition' => wp_json_encode( $def ),
 		);
 	}
@@ -123,12 +129,23 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 	}
 
 	public function test_derive_from_template_returns_group_keys_from_ordered_sections(): void {
-		$this->seed_template( 'pt_landing_contact', array(
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero', Page_Template_Schema::SECTION_ITEM_POSITION => 0, Page_Template_Schema::SECTION_ITEM_REQUIRED => true ),
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq', Page_Template_Schema::SECTION_ITEM_POSITION => 1, Page_Template_Schema::SECTION_ITEM_REQUIRED => false ),
-			),
-		) );
+		$this->seed_template(
+			'pt_landing_contact',
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+					array(
+						Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero',
+						Page_Template_Schema::SECTION_ITEM_POSITION => 0,
+						Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
+					),
+					array(
+						Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq',
+						Page_Template_Schema::SECTION_ITEM_POSITION => 1,
+						Page_Template_Schema::SECTION_ITEM_REQUIRED => false,
+					),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero', array( 'status' => 'active' ) );
 		$this->seed_section( 'st05_faq', array( 'status' => 'active' ) );
 
@@ -140,14 +157,29 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 	}
 
 	public function test_derive_from_template_excludes_deprecated_sections_for_new_page(): void {
-		$this->seed_template( 'pt_landing', array(
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero', Page_Template_Schema::SECTION_ITEM_POSITION => 0 ),
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st_old_deprecated', Page_Template_Schema::SECTION_ITEM_POSITION => 1 ),
-			),
-		) );
+		$this->seed_template(
+			'pt_landing',
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+					array(
+						Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero',
+						Page_Template_Schema::SECTION_ITEM_POSITION => 0,
+					),
+					array(
+						Page_Template_Schema::SECTION_ITEM_KEY => 'st_old_deprecated',
+						Page_Template_Schema::SECTION_ITEM_POSITION => 1,
+					),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero', array( 'status' => 'active' ) );
-		$this->seed_section( 'st_old_deprecated', array( 'status' => 'deprecated', 'deprecation' => array( 'deprecated' => true ) ) );
+		$this->seed_section(
+			'st_old_deprecated',
+			array(
+				'status'      => 'deprecated',
+				'deprecation' => array( 'deprecated' => true ),
+			)
+		);
 
 		$result = $this->service->derive_from_template( 'pt_landing', true );
 
@@ -157,14 +189,23 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 	}
 
 	public function test_derive_from_template_includes_all_sections_when_not_for_new_page(): void {
-		$this->seed_template( 'pt_legacy', array(
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st_old_deprecated' ),
-			),
-		) );
+		$this->seed_template(
+			'pt_legacy',
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st_old_deprecated' ),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero', array( 'status' => 'active' ) );
-		$this->seed_section( 'st_old_deprecated', array( 'status' => 'deprecated', 'deprecation' => array( 'deprecated' => true ) ) );
+		$this->seed_section(
+			'st_old_deprecated',
+			array(
+				'status'      => 'deprecated',
+				'deprecation' => array( 'deprecated' => true ),
+			)
+		);
 
 		$result = $this->service->derive_from_template( 'pt_legacy', false );
 
@@ -179,12 +220,22 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 	}
 
 	public function test_derive_from_composition_returns_group_keys_from_ordered_section_list(): void {
-		$this->seed_composition( 'comp-custom-landing-001', array(
-			Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(
-				array( Composition_Schema::SECTION_ITEM_KEY => 'st01_hero', Composition_Schema::SECTION_ITEM_POSITION => 0 ),
-				array( Composition_Schema::SECTION_ITEM_KEY => 'st03_cta', Composition_Schema::SECTION_ITEM_POSITION => 1, Composition_Schema::SECTION_ITEM_VARIANT => 'compact' ),
-			),
-		) );
+		$this->seed_composition(
+			'comp-custom-landing-001',
+			array(
+				Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(
+					array(
+						Composition_Schema::SECTION_ITEM_KEY => 'st01_hero',
+						Composition_Schema::SECTION_ITEM_POSITION => 0,
+					),
+					array(
+						Composition_Schema::SECTION_ITEM_KEY => 'st03_cta',
+						Composition_Schema::SECTION_ITEM_POSITION => 1,
+						Composition_Schema::SECTION_ITEM_VARIANT => 'compact',
+					),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero', array( 'status' => 'active' ) );
 		$this->seed_section( 'st03_cta', array( 'status' => 'active' ) );
 
@@ -217,9 +268,12 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 	}
 
 	public function test_derive_from_template_handles_empty_ordered_sections(): void {
-		$this->seed_template( 'pt_empty', array(
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(),
-		) );
+		$this->seed_template(
+			'pt_empty',
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(),
+			)
+		);
 		$result = $this->service->derive_from_template( 'pt_empty', true );
 		$this->assertSame( array(), $result );
 	}
@@ -231,12 +285,15 @@ final class Field_Group_Derivation_Service_Test extends TestCase {
 	}
 
 	public function test_derive_section_keys_from_template_for_registration_matches_derive_from_template_section_keys(): void {
-		$this->seed_template( 'pt_landing_contact', array(
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
-			),
-		) );
+		$this->seed_template(
+			'pt_landing_contact',
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero', array( 'status' => 'active' ) );
 		$this->seed_section( 'st05_faq', array( 'status' => 'active' ) );
 

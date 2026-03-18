@@ -38,9 +38,16 @@ final class Page_Instantiation_Payload_Builder_Test extends TestCase {
 			'<!-- wp:html --><div>Content</div><!-- /wp:html -->',
 			array( array( 'section_key' => 'st01_hero' ), array( 'section_key' => 'st02_cta' ) )
 		);
-		$builder = new Page_Instantiation_Payload_Builder();
+		$builder  = new Page_Instantiation_Payload_Builder();
 
-		$payload = $builder->build_create_payload( $assembly, 'Landing Page', array( 'page_slug_candidate' => 'landing', 'post_status_candidate' => 'draft' ) );
+		$payload = $builder->build_create_payload(
+			$assembly,
+			'Landing Page',
+			array(
+				'page_slug_candidate'   => 'landing',
+				'post_status_candidate' => 'draft',
+			)
+		);
 
 		$this->assertSame( Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE, $payload['source_type'] );
 		$this->assertSame( 'tpl_landing', $payload['source_key'] );

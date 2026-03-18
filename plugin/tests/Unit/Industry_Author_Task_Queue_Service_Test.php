@@ -38,17 +38,20 @@ final class Industry_Author_Task_Queue_Service_Test extends TestCase {
 					'pack_key'      => 'realtor',
 					'subtype_key'   => '',
 					'band'          => 'below_minimal',
-					'blocker_flags'  => array( 'missing_bundle' ),
+					'blocker_flags' => array( 'missing_bundle' ),
 				),
 			),
-			'summary' => array(),
+			'summary'      => array(),
 		);
-		$service = new Industry_Author_Task_Queue_Service();
-		$result  = $service->generate_queue( $completeness, array(), array() );
+		$service      = new Industry_Author_Task_Queue_Service();
+		$result       = $service->generate_queue( $completeness, array(), array() );
 		$this->assertNotEmpty( $result['tasks'] );
-		$blockers = array_filter( $result['tasks'], static function ( $t ) {
-			return $t['category'] === Industry_Author_Task_Queue_Service::CATEGORY_BLOCKER;
-		} );
+		$blockers = array_filter(
+			$result['tasks'],
+			static function ( $t ) {
+				return $t['category'] === Industry_Author_Task_Queue_Service::CATEGORY_BLOCKER;
+			}
+		);
 		$this->assertCount( 1, $blockers );
 		$this->assertSame( 'completeness:realtor:blocker', $blockers[0]['task_key'] );
 		$this->assertArrayHasKey( 'source_evidence_refs', $blockers[0] );
@@ -60,15 +63,15 @@ final class Industry_Author_Task_Queue_Service_Test extends TestCase {
 		$gap_report = array(
 			'ranked' => array(
 				array(
-					'scope'                 => 'realtor',
+					'scope'                  => 'realtor',
 					'missing_artifact_class' => 'starter_bundle',
-					'tier'                  => 'urgent',
-					'rationale'             => 'No starter bundle for realtor.',
+					'tier'                   => 'urgent',
+					'rationale'              => 'No starter bundle for realtor.',
 				),
 			),
 		);
-		$service = new Industry_Author_Task_Queue_Service();
-		$result  = $service->generate_queue( array(), $gap_report, array() );
+		$service    = new Industry_Author_Task_Queue_Service();
+		$result     = $service->generate_queue( array(), $gap_report, array() );
 		$this->assertNotEmpty( $result['tasks'] );
 		$blocker = null;
 		foreach ( $result['tasks'] as $t ) {
@@ -85,14 +88,14 @@ final class Industry_Author_Task_Queue_Service_Test extends TestCase {
 	public function test_generate_queue_from_override_conflicts_produces_cleanup_or_blocker(): void {
 		$conflicts = array(
 			array(
-				'override_ref'             => 'row_1',
-				'conflict_type'             => Industry_Override_Conflict_Detector::CONFLICT_TYPE_MISSING_TARGET,
-				'severity'                 => Industry_Override_Conflict_Detector::SEVERITY_WARNING,
-				'suggested_review_action'   => 'Fix or remove override for missing target.',
+				'override_ref'            => 'row_1',
+				'conflict_type'           => Industry_Override_Conflict_Detector::CONFLICT_TYPE_MISSING_TARGET,
+				'severity'                => Industry_Override_Conflict_Detector::SEVERITY_WARNING,
+				'suggested_review_action' => 'Fix or remove override for missing target.',
 			),
 		);
-		$service = new Industry_Author_Task_Queue_Service();
-		$result  = $service->generate_queue( array(), array(), $conflicts );
+		$service   = new Industry_Author_Task_Queue_Service();
+		$result    = $service->generate_queue( array(), array(), $conflicts );
 		$this->assertNotEmpty( $result['tasks'] );
 		$task = $result['tasks'][0];
 		$this->assertSame( 'conflict:row_1', $task['task_key'] );
@@ -101,12 +104,24 @@ final class Industry_Author_Task_Queue_Service_Test extends TestCase {
 	}
 
 	public function test_generate_queue_adds_validation_task_when_tasks_exist(): void {
-		$gap_report = array( 'ranked' => array( array( 'scope' => 'x', 'missing_artifact_class' => 'bundle', 'tier' => 'optional', 'rationale' => 'Add bundle.' ) ) );
-		$service = new Industry_Author_Task_Queue_Service();
-		$result  = $service->generate_queue( array(), $gap_report, array() );
-		$validation = array_filter( $result['tasks'], static function ( $t ) {
-			return $t['category'] === Industry_Author_Task_Queue_Service::CATEGORY_VALIDATION;
-		} );
+		$gap_report = array(
+			'ranked' => array(
+				array(
+					'scope'                  => 'x',
+					'missing_artifact_class' => 'bundle',
+					'tier'                   => 'optional',
+					'rationale'              => 'Add bundle.',
+				),
+			),
+		);
+		$service    = new Industry_Author_Task_Queue_Service();
+		$result     = $service->generate_queue( array(), $gap_report, array() );
+		$validation = array_filter(
+			$result['tasks'],
+			static function ( $t ) {
+				return $t['category'] === Industry_Author_Task_Queue_Service::CATEGORY_VALIDATION;
+			}
+		);
 		$this->assertCount( 1, $validation );
 		$this->assertSame( 1, $result['summary']['validation_count'] );
 	}

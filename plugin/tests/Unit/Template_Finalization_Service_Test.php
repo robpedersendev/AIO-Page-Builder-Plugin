@@ -47,8 +47,8 @@ final class Template_Finalization_Service_Test extends TestCase {
 				),
 			),
 		);
-		$service = new Template_Finalization_Service();
-		$result = $service->build( $definition, array() );
+		$service    = new Template_Finalization_Service();
+		$result     = $service->build( $definition, array() );
 		$this->assertSame( Template_Finalization_Result::RUN_STATE_COMPLETE, $result->get_run_completion_state() );
 		$summary = $result->get_finalization_summary();
 		$this->assertSame( 1, $summary['created'] );
@@ -76,8 +76,8 @@ final class Template_Finalization_Service_Test extends TestCase {
 				),
 			),
 		);
-		$service = new Template_Finalization_Service();
-		$result = $service->build( $definition, array() );
+		$service    = new Template_Finalization_Service();
+		$result     = $service->build( $definition, array() );
 		$this->assertSame( Template_Finalization_Result::RUN_STATE_WARNING, $result->get_run_completion_state() );
 		$summary = $result->get_finalization_summary();
 		$this->assertSame( 1, $summary['created'] );
@@ -98,8 +98,8 @@ final class Template_Finalization_Service_Test extends TestCase {
 				),
 			),
 		);
-		$service = new Template_Finalization_Service();
-		$result = $service->build( $definition, array() );
+		$service    = new Template_Finalization_Service();
+		$result     = $service->build( $definition, array() );
 		$this->assertSame( Template_Finalization_Result::RUN_STATE_FAILED, $result->get_run_completion_state() );
 		$this->assertSame( 1, $result->get_finalization_summary()['failed'] );
 	}
@@ -117,9 +117,14 @@ final class Template_Finalization_Service_Test extends TestCase {
 				),
 			),
 		);
-		$conflicts = array( array( 'type' => 'slug_conflict', 'slug' => 'about' ) );
-		$service = new Template_Finalization_Service();
-		$result = $service->build( $definition, $conflicts );
+		$conflicts  = array(
+			array(
+				'type' => 'slug_conflict',
+				'slug' => 'about',
+			),
+		);
+		$service    = new Template_Finalization_Service();
+		$result     = $service->build( $definition, $conflicts );
 		$this->assertSame( Template_Finalization_Result::RUN_STATE_FAILED, $result->get_run_completion_state() );
 		$this->assertSame( 1, $result->get_finalization_summary()['blocked'] );
 	}
@@ -130,10 +135,10 @@ final class Template_Finalization_Service_Test extends TestCase {
 				array(
 					Build_Plan_Item_Schema::KEY_ITEMS => array(
 						array(
-							Build_Plan_Item_Schema::KEY_ITEM_ID   => 'item-1',
+							Build_Plan_Item_Schema::KEY_ITEM_ID => 'item-1',
 							Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE,
-							Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::COMPLETED,
-							Build_Plan_Item_Schema::KEY_PAYLOAD  => array( 'template_key' => 'tpl_services' ),
+							Build_Plan_Item_Schema::KEY_STATUS => Build_Plan_Item_Statuses::COMPLETED,
+							Build_Plan_Item_Schema::KEY_PAYLOAD => array( 'template_key' => 'tpl_services' ),
 							'execution_artifact' => array(
 								'target_post_id' => 42,
 								'template_build_execution_result' => array(
@@ -147,9 +152,9 @@ final class Template_Finalization_Service_Test extends TestCase {
 				),
 			),
 		);
-		$service = new Template_Finalization_Service();
-		$result = $service->build( $definition, array() );
-		$closure = $result->get_template_execution_closure_record();
+		$service    = new Template_Finalization_Service();
+		$result     = $service->build( $definition, array() );
+		$closure    = $result->get_template_execution_closure_record();
 		$this->assertCount( 1, $closure );
 		$this->assertSame( 'item-1', $closure[0]['plan_item_id'] ?? '' );
 		$this->assertSame( 'create', $closure[0]['action_taken'] ?? '' );
@@ -165,28 +170,34 @@ final class Template_Finalization_Service_Test extends TestCase {
 				array(
 					Build_Plan_Item_Schema::KEY_ITEMS => array(
 						array(
-							Build_Plan_Item_Schema::KEY_ITEM_ID   => 'i1',
+							Build_Plan_Item_Schema::KEY_ITEM_ID => 'i1',
 							Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE,
-							Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::COMPLETED,
+							Build_Plan_Item_Schema::KEY_STATUS => Build_Plan_Item_Statuses::COMPLETED,
 							'execution_artifact' => array(
-								'template_build_execution_result' => array( 'template_key' => 'tpl_about', 'one_pager_ref' => 'doc/about' ),
+								'template_build_execution_result' => array(
+									'template_key'  => 'tpl_about',
+									'one_pager_ref' => 'doc/about',
+								),
 							),
 						),
 						array(
-							Build_Plan_Item_Schema::KEY_ITEM_ID   => 'i2',
+							Build_Plan_Item_Schema::KEY_ITEM_ID => 'i2',
 							Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE,
-							Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::COMPLETED,
+							Build_Plan_Item_Schema::KEY_STATUS => Build_Plan_Item_Statuses::COMPLETED,
 							'execution_artifact' => array(
-								'template_build_execution_result' => array( 'template_key' => 'tpl_about', 'one_pager_ref' => 'doc/about' ),
+								'template_build_execution_result' => array(
+									'template_key'  => 'tpl_about',
+									'one_pager_ref' => 'doc/about',
+								),
 							),
 						),
 					),
 				),
 			),
 		);
-		$service = new Template_Finalization_Service();
-		$result = $service->build( $definition, array() );
-		$one_pager = $result->get_one_pager_retention_summary();
+		$service    = new Template_Finalization_Service();
+		$result     = $service->build( $definition, array() );
+		$one_pager  = $result->get_one_pager_retention_summary();
 		$this->assertArrayHasKey( 'tpl_about', $one_pager );
 		$this->assertSame( 2, $one_pager['tpl_about']['count'] ?? 0 );
 		$this->assertContains( 'doc/about', $one_pager['tpl_about']['one_pager_refs'] ?? array() );

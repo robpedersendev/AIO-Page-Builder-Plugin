@@ -57,18 +57,36 @@ final class Executor_Locking_Idempotency_Contract_Test extends TestCase {
 	}
 
 	public function test_build_dedup_key_is_deterministic(): void {
-		$target = array( 'plan_item_id' => 'plan_npc_0', 'template_ref' => array( 'type' => 'internal_key', 'value' => 't1' ) );
-		$key1 = Execution_Idempotency_Helper::build_dedup_key( 'plan-1', 'plan_npc_0', Execution_Action_Types::CREATE_PAGE, $target );
-		$key2 = Execution_Idempotency_Helper::build_dedup_key( 'plan-1', 'plan_npc_0', Execution_Action_Types::CREATE_PAGE, $target );
+		$target = array(
+			'plan_item_id' => 'plan_npc_0',
+			'template_ref' => array(
+				'type'  => 'internal_key',
+				'value' => 't1',
+			),
+		);
+		$key1   = Execution_Idempotency_Helper::build_dedup_key( 'plan-1', 'plan_npc_0', Execution_Action_Types::CREATE_PAGE, $target );
+		$key2   = Execution_Idempotency_Helper::build_dedup_key( 'plan-1', 'plan_npc_0', Execution_Action_Types::CREATE_PAGE, $target );
 		$this->assertSame( $key1, $key2 );
 		$this->assertStringStartsWith( 'idem:', $key1 );
 	}
 
 	public function test_build_dedup_key_different_target_produces_different_key(): void {
-		$target1 = array( 'page_ref' => array( 'type' => 'post_id', 'value' => 42 ), 'plan_item_id' => 'plan_ep_0' );
-		$target2 = array( 'page_ref' => array( 'type' => 'post_id', 'value' => 99 ), 'plan_item_id' => 'plan_ep_1' );
-		$key1 = Execution_Idempotency_Helper::build_dedup_key( 'plan-1', 'plan_ep_0', Execution_Action_Types::REPLACE_PAGE, $target1 );
-		$key2 = Execution_Idempotency_Helper::build_dedup_key( 'plan-1', 'plan_ep_1', Execution_Action_Types::REPLACE_PAGE, $target2 );
+		$target1 = array(
+			'page_ref'     => array(
+				'type'  => 'post_id',
+				'value' => 42,
+			),
+			'plan_item_id' => 'plan_ep_0',
+		);
+		$target2 = array(
+			'page_ref'     => array(
+				'type'  => 'post_id',
+				'value' => 99,
+			),
+			'plan_item_id' => 'plan_ep_1',
+		);
+		$key1    = Execution_Idempotency_Helper::build_dedup_key( 'plan-1', 'plan_ep_0', Execution_Action_Types::REPLACE_PAGE, $target1 );
+		$key2    = Execution_Idempotency_Helper::build_dedup_key( 'plan-1', 'plan_ep_1', Execution_Action_Types::REPLACE_PAGE, $target2 );
 		$this->assertNotSame( $key1, $key2 );
 	}
 
@@ -77,9 +95,15 @@ final class Executor_Locking_Idempotency_Contract_Test extends TestCase {
 			Execution_Action_Contract::ENVELOPE_PLAN_ID => 'p1',
 			Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID => 'item_0',
 			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::CREATE_PAGE,
-			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'plan_item_id' => 'item_0', 'template_ref' => array( 'type' => 'internal_key', 'value' => 't1' ) ),
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
+				'plan_item_id' => 'item_0',
+				'template_ref' => array(
+					'type'  => 'internal_key',
+					'value' => 't1',
+				),
+			),
 		);
-		$key = Execution_Idempotency_Helper::build_dedup_key_from_envelope( $envelope );
+		$key      = Execution_Idempotency_Helper::build_dedup_key_from_envelope( $envelope );
 		$this->assertStringStartsWith( 'idem:', $key );
 		$this->assertStringContainsString( 'p1', $key );
 		$this->assertStringContainsString( 'item_0', $key );

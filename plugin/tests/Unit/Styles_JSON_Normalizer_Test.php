@@ -28,13 +28,25 @@ final class Styles_JSON_Normalizer_Test extends TestCase {
 
 	public function test_normalize_global_tokens_returns_only_string_keys_and_values(): void {
 		$raw = array(
-			'color' => array( 'primary' => '#111', 'surface' => '#fff' ),
-			1       => array( 'x' => 'y' ),
-			'typography' => array( 'heading' => 'Georgia', 2 => 'dropped' ),
+			'color'      => array(
+				'primary' => '#111',
+				'surface' => '#fff',
+			),
+			1            => array( 'x' => 'y' ),
+			'typography' => array(
+				'heading' => 'Georgia',
+				2         => 'dropped',
+			),
 		);
 		$out = $this->normalizer->normalize_global_tokens( $raw );
 		$this->assertArrayHasKey( 'color', $out );
-		$this->assertSame( array( 'primary' => '#111', 'surface' => '#fff' ), $out['color'] );
+		$this->assertSame(
+			array(
+				'primary' => '#111',
+				'surface' => '#fff',
+			),
+			$out['color']
+		);
 		$this->assertArrayHasKey( 'typography', $out );
 		$this->assertSame( array( 'heading' => 'Georgia' ), $out['typography'] );
 		$this->assertArrayNotHasKey( 1, $out );

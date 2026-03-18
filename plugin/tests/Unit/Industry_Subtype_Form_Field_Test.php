@@ -23,17 +23,17 @@ final class Industry_Subtype_Form_Field_Test extends TestCase {
 
 	private function subtype_def( string $subtype_key, string $parent_industry_key, string $label = '' ): array {
 		return array(
-			Industry_Subtype_Registry::FIELD_SUBTYPE_KEY         => $subtype_key,
+			Industry_Subtype_Registry::FIELD_SUBTYPE_KEY => $subtype_key,
 			Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY => $parent_industry_key,
-			Industry_Subtype_Registry::FIELD_LABEL              => $label !== '' ? $label : $subtype_key,
-			Industry_Subtype_Registry::FIELD_SUMMARY            => 'Summary',
-			Industry_Subtype_Registry::FIELD_STATUS             => 'active',
-			Industry_Subtype_Registry::FIELD_VERSION_MARKER      => '1',
+			Industry_Subtype_Registry::FIELD_LABEL       => $label !== '' ? $label : $subtype_key,
+			Industry_Subtype_Registry::FIELD_SUMMARY     => 'Summary',
+			Industry_Subtype_Registry::FIELD_STATUS      => 'active',
+			Industry_Subtype_Registry::FIELD_VERSION_MARKER => '1',
 		);
 	}
 
 	public function test_get_options_for_industry_returns_none_only_when_registry_null(): void {
-		$field = new Industry_Subtype_Form_Field( null );
+		$field   = new Industry_Subtype_Form_Field( null );
 		$options = $field->get_options_for_industry( 'realtor' );
 		$this->assertSame( array( '' => '— None —' ), $options );
 	}
@@ -41,18 +41,20 @@ final class Industry_Subtype_Form_Field_Test extends TestCase {
 	public function test_get_options_for_industry_returns_none_only_when_parent_empty(): void {
 		$registry = new Industry_Subtype_Registry();
 		$registry->load( array( $this->subtype_def( 'realtor_buyer_agent', 'realtor' ) ) );
-		$field = new Industry_Subtype_Form_Field( $registry );
+		$field   = new Industry_Subtype_Form_Field( $registry );
 		$options = $field->get_options_for_industry( '' );
 		$this->assertSame( array( '' => '— None —' ), $options );
 	}
 
 	public function test_get_options_for_industry_returns_subtypes_for_parent(): void {
 		$registry = new Industry_Subtype_Registry();
-		$registry->load( array(
-			$this->subtype_def( 'realtor_buyer_agent', 'realtor', 'Buyer Agent' ),
-			$this->subtype_def( 'realtor_listing', 'realtor', 'Listing Agent' ),
-		) );
-		$field = new Industry_Subtype_Form_Field( $registry );
+		$registry->load(
+			array(
+				$this->subtype_def( 'realtor_buyer_agent', 'realtor', 'Buyer Agent' ),
+				$this->subtype_def( 'realtor_listing', 'realtor', 'Listing Agent' ),
+			)
+		);
+		$field   = new Industry_Subtype_Form_Field( $registry );
 		$options = $field->get_options_for_industry( 'realtor' );
 		$this->assertArrayHasKey( '', $options );
 		$this->assertSame( '— None —', $options[''] );
@@ -82,7 +84,7 @@ final class Industry_Subtype_Form_Field_Test extends TestCase {
 	}
 
 	public function test_get_field_config_returns_expected_keys(): void {
-		$field = new Industry_Subtype_Form_Field( null );
+		$field  = new Industry_Subtype_Form_Field( null );
 		$config = $field->get_field_config();
 		$this->assertSame( Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY, $config['name'] );
 		$this->assertSame( 'select', $config['type'] );

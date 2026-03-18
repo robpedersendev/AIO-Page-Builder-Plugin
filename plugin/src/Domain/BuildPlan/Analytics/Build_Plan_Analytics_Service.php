@@ -46,7 +46,7 @@ final class Build_Plan_Analytics_Service {
 		}
 		$from_ts = $date_from !== null && $date_from !== '' ? strtotime( $date_from . ' 00:00:00' ) : false;
 		$to_ts   = $date_to !== null && $date_to !== '' ? strtotime( $date_to . ' 23:59:59' ) : false;
-		$out = array();
+		$out     = array();
 		foreach ( $all as $plan ) {
 			$post_date = (string) ( $plan['post_date'] ?? '' );
 			if ( $post_date === '' ) {
@@ -73,28 +73,28 @@ final class Build_Plan_Analytics_Service {
 	 * @return array{total_plans: int, by_status: array<string, int>, approval_count: int, rejection_count: int, approval_rate: float, denial_rate: float, date_from: string|null, date_to: string|null}
 	 */
 	public function get_plan_review_trends( ?string $date_from = null, ?string $date_to = null ): array {
-		$plans = $this->get_plans_for_period( $date_from, $date_to );
+		$plans     = $this->get_plans_for_period( $date_from, $date_to );
 		$by_status = array();
 		foreach ( Build_Plan_Statuses::ROOT_STATUSES as $s ) {
 			$by_status[ $s ] = 0;
 		}
-		$approval_count = 0;
+		$approval_count  = 0;
 		$rejection_count = 0;
 		foreach ( $plans as $plan ) {
 			$status = (string) ( $plan[ Build_Plan_Schema::KEY_STATUS ] ?? $plan['status'] ?? '' );
 			if ( $status !== '' && isset( $by_status[ $status ] ) ) {
-				$by_status[ $status ]++;
+				++$by_status[ $status ];
 			} else {
 				$by_status[ $status ] = ( $by_status[ $status ] ?? 0 ) + 1;
 			}
 			if ( $status === Build_Plan_Statuses::ROOT_APPROVED ) {
-				$approval_count++;
+				++$approval_count;
 			} elseif ( $status === Build_Plan_Statuses::ROOT_REJECTED ) {
-				$rejection_count++;
+				++$rejection_count;
 			}
 		}
-		$total = count( $plans );
-		$reviewed = $approval_count + $rejection_count;
+		$total         = count( $plans );
+		$reviewed      = $approval_count + $rejection_count;
 		$approval_rate = $reviewed > 0 ? round( $approval_count / $reviewed, 4 ) : 0.0;
 		$denial_rate   = $reviewed > 0 ? round( $rejection_count / $reviewed, 4 ) : 0.0;
 		return array(
@@ -118,10 +118,10 @@ final class Build_Plan_Analytics_Service {
 	 * @return array{blockers: list<array{category: string, count: int}>, total_rejected: int, total_failed: int, date_from: string|null, date_to: string|null}
 	 */
 	public function get_common_blockers( ?string $date_from = null, ?string $date_to = null, int $top_n = 10 ): array {
-		$plans = $this->get_plans_for_period( $date_from, $date_to );
+		$plans             = $this->get_plans_for_period( $date_from, $date_to );
 		$count_by_category = array();
-		$total_rejected = 0;
-		$total_failed = 0;
+		$total_rejected    = 0;
+		$total_failed      = 0;
 		foreach ( $plans as $plan ) {
 			$steps = isset( $plan[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan[ Build_Plan_Schema::KEY_STEPS ] )
 				? $plan[ Build_Plan_Schema::KEY_STEPS ]
@@ -137,16 +137,16 @@ final class Build_Plan_Analytics_Service {
 					if ( ! is_array( $item ) ) {
 						continue;
 					}
-					$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? 'pending' );
+					$status    = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? 'pending' );
 					$item_type = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? 'unknown' );
 					if ( $item_type === '' ) {
 						$item_type = 'unknown';
 					}
 					if ( $status === Build_Plan_Item_Statuses::REJECTED ) {
-						$total_rejected++;
+						++$total_rejected;
 						$count_by_category[ $item_type ] = ( $count_by_category[ $item_type ] ?? 0 ) + 1;
 					} elseif ( $status === Build_Plan_Item_Statuses::FAILED ) {
-						$total_failed++;
+						++$total_failed;
 						$count_by_category[ $item_type ] = ( $count_by_category[ $item_type ] ?? 0 ) + 1;
 					}
 				}
@@ -154,20 +154,23 @@ final class Build_Plan_Analytics_Service {
 		}
 		arsort( $count_by_category, SORT_NUMERIC );
 		$blockers = array();
-		$n = 0;
+		$n        = 0;
 		foreach ( $count_by_category as $category => $count ) {
 			if ( $n >= $top_n ) {
 				break;
 			}
-			$blockers[] = array( 'category' => $category, 'count' => (int) $count );
-			$n++;
+			$blockers[] = array(
+				'category' => $category,
+				'count'    => (int) $count,
+			);
+			++$n;
 		}
 		return array(
-			'blockers'        => $blockers,
-			'total_rejected'  => $total_rejected,
-			'total_failed'    => $total_failed,
-			'date_from'       => $date_from,
-			'date_to'         => $date_to,
+			'blockers'       => $blockers,
+			'total_rejected' => $total_rejected,
+			'total_failed'   => $total_failed,
+			'date_from'      => $date_from,
+			'date_to'        => $date_to,
 		);
 	}
 
@@ -179,9 +182,9 @@ final class Build_Plan_Analytics_Service {
 	 * @return array{failures_by_item_type: array<string, int>, total_failed_items: int, date_from: string|null, date_to: string|null}
 	 */
 	public function get_execution_failure_trends( ?string $date_from = null, ?string $date_to = null ): array {
-		$plans = $this->get_plans_for_period( $date_from, $date_to );
+		$plans        = $this->get_plans_for_period( $date_from, $date_to );
 		$by_item_type = array();
-		$total = 0;
+		$total        = 0;
 		foreach ( $plans as $plan ) {
 			$steps = isset( $plan[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan[ Build_Plan_Schema::KEY_STEPS ] )
 				? $plan[ Build_Plan_Schema::KEY_STEPS ]
@@ -201,7 +204,7 @@ final class Build_Plan_Analytics_Service {
 					if ( $status !== Build_Plan_Item_Statuses::FAILED ) {
 						continue;
 					}
-					$total++;
+					++$total;
 					$item_type = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? 'unknown' );
 					if ( $item_type === '' ) {
 						$item_type = 'unknown';
@@ -213,8 +216,8 @@ final class Build_Plan_Analytics_Service {
 		return array(
 			'failures_by_item_type' => $by_item_type,
 			'total_failed_items'    => $total,
-			'date_from'            => $date_from,
-			'date_to'              => $date_to,
+			'date_from'             => $date_from,
+			'date_to'               => $date_to,
 		);
 	}
 

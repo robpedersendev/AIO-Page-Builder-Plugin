@@ -31,11 +31,11 @@ final class Reporting_Payload_Schema_Test extends TestCase {
 		$envelope = array(
 			'schema_version' => '1.0',
 			'event_type'     => Reporting_Event_Types::INSTALL_NOTIFICATION,
-			'site_reference'  => 'example.com',
-			'plugin_version'  => '1.0.0',
-			'timestamp'       => '2025-03-15T00:00:00Z',
-			'dedupe_key'      => 'install_example_2025',
-			'payload'         => array(),
+			'site_reference' => 'example.com',
+			'plugin_version' => '1.0.0',
+			'timestamp'      => '2025-03-15T00:00:00Z',
+			'dedupe_key'     => 'install_example_2025',
+			'payload'        => array(),
 		);
 		$this->assertTrue( Reporting_Payload_Schema::envelope_has_required_keys( $envelope ) );
 	}
@@ -53,13 +53,13 @@ final class Reporting_Payload_Schema_Test extends TestCase {
 
 	public function test_payload_has_required_keys_install(): void {
 		$payload = array(
-			'website_address'               => 'https://example.com',
-			'plugin_version'                 => '1.0.0',
-			'wordpress_version'              => '6.4',
-			'php_version'                    => '8.2',
-			'admin_contact_email'            => 'admin@example.com',
-			'timestamp'                      => '2025-03-15T00:00:00Z',
-			'dependency_readiness_summary'   => 'all ready',
+			'website_address'              => 'https://example.com',
+			'plugin_version'               => '1.0.0',
+			'wordpress_version'            => '6.4',
+			'php_version'                  => '8.2',
+			'admin_contact_email'          => 'admin@example.com',
+			'timestamp'                    => '2025-03-15T00:00:00Z',
+			'dependency_readiness_summary' => 'all ready',
 		);
 		$this->assertTrue( Reporting_Payload_Schema::payload_has_required_keys( $payload, Reporting_Event_Types::INSTALL_NOTIFICATION ) );
 	}
@@ -74,49 +74,55 @@ final class Reporting_Payload_Schema_Test extends TestCase {
 
 	public function test_payload_has_required_keys_heartbeat(): void {
 		$payload = array(
-			'website_address'                            => 'https://example.com',
-			'plugin_version'                            => '1.0.0',
-			'wordpress_version'                         => '6.4',
-			'php_version'                               => '8.2',
-			'admin_contact_email'                       => 'admin@example.com',
-			'last_successful_ai_run_at'                  => '',
-			'last_successful_build_plan_execution_at'    => '',
-			'current_health_summary'                    => 'healthy',
-			'current_queue_warning_count'               => 0,
-			'current_unresolved_critical_error_count'   => 0,
-			'timestamp'                                 => '2025-03-15T00:00:00Z',
+			'website_address'                         => 'https://example.com',
+			'plugin_version'                          => '1.0.0',
+			'wordpress_version'                       => '6.4',
+			'php_version'                             => '8.2',
+			'admin_contact_email'                     => 'admin@example.com',
+			'last_successful_ai_run_at'               => '',
+			'last_successful_build_plan_execution_at' => '',
+			'current_health_summary'                  => 'healthy',
+			'current_queue_warning_count'             => 0,
+			'current_unresolved_critical_error_count' => 0,
+			'timestamp'                               => '2025-03-15T00:00:00Z',
 		);
 		$this->assertTrue( Reporting_Payload_Schema::payload_has_required_keys( $payload, Reporting_Event_Types::HEARTBEAT ) );
 	}
 
 	public function test_payload_has_required_keys_developer_error(): void {
 		$payload = array(
-			'severity'                 => 'critical',
-			'category'                 => 'execution',
-			'sanitized_error_summary'   => 'Build failed.',
-			'expected_behavior'        => 'Success',
-			'actual_behavior'          => 'Error',
-			'website_address'          => 'https://example.com',
-			'plugin_version'           => '1.0.0',
-			'wordpress_version'        => '6.4',
-			'php_version'              => '8.2',
-			'admin_contact_email'      => 'admin@example.com',
-			'timestamp'                => '2025-03-15T00:00:00Z',
-			'log_reference'            => array( 'log_id' => 'err-1' ),
-			'related_plan_id'          => '',
+			'severity'                => 'critical',
+			'category'                => 'execution',
+			'sanitized_error_summary' => 'Build failed.',
+			'expected_behavior'       => 'Success',
+			'actual_behavior'         => 'Error',
+			'website_address'         => 'https://example.com',
+			'plugin_version'          => '1.0.0',
+			'wordpress_version'       => '6.4',
+			'php_version'             => '8.2',
+			'admin_contact_email'     => 'admin@example.com',
+			'timestamp'               => '2025-03-15T00:00:00Z',
+			'log_reference'           => array( 'log_id' => 'err-1' ),
+			'related_plan_id'         => '',
 			'related_job_id'          => '',
-			'related_run_id'           => '',
+			'related_run_id'          => '',
 		);
 		$this->assertTrue( Reporting_Payload_Schema::payload_has_required_keys( $payload, Reporting_Event_Types::DEVELOPER_ERROR_REPORT ) );
 	}
 
 	public function test_has_no_prohibited_keys_passes_with_safe_payload(): void {
-		$data = array( 'website_address' => 'https://example.com', 'plugin_version' => '1.0' );
+		$data = array(
+			'website_address' => 'https://example.com',
+			'plugin_version'  => '1.0',
+		);
 		$this->assertTrue( Reporting_Payload_Schema::has_no_prohibited_keys( $data ) );
 	}
 
 	public function test_has_no_prohibited_keys_fails_when_password_present(): void {
-		$data = array( 'website_address' => 'https://example.com', 'password' => 'secret' );
+		$data = array(
+			'website_address' => 'https://example.com',
+			'password'        => 'secret',
+		);
 		$this->assertFalse( Reporting_Payload_Schema::has_no_prohibited_keys( $data ) );
 	}
 
@@ -135,13 +141,13 @@ final class Reporting_Payload_Schema_Test extends TestCase {
 		$payload = array(
 			'website_address' => 'https://example.com',
 			Reporting_Payload_Schema::OPTIONAL_TEMPLATE_LIBRARY_REPORT_SUMMARY_KEY => array(
-				'section_template_count'   => 10,
-				'page_template_count'     => 20,
-				'composition_count'       => 5,
-				'library_version_marker'   => '1',
-				'plugin_version_marker'    => '1.0.0',
-				'appendices_available'     => true,
-				'compliance_summary'       => 'unknown',
+				'section_template_count' => 10,
+				'page_template_count'    => 20,
+				'composition_count'      => 5,
+				'library_version_marker' => '1',
+				'plugin_version_marker'  => '1.0.0',
+				'appendices_available'   => true,
+				'compliance_summary'     => 'unknown',
 			),
 		);
 		$this->assertTrue( Reporting_Payload_Schema::has_no_prohibited_keys( $payload, true ) );

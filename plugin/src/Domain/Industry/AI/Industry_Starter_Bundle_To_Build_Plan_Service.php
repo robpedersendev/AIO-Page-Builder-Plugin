@@ -40,7 +40,7 @@ final class Industry_Starter_Bundle_To_Build_Plan_Service {
 	 * Converts the given starter bundle into a draft Build Plan. Plan is persisted and subject to normal review.
 	 *
 	 * @param string               $bundle_key Bundle key (e.g. realtor_starter).
-	 * @param array<string, mixed>  $context    Optional: profile_context_ref, industry_key for scoring.
+	 * @param array<string, mixed> $context    Optional: profile_context_ref, industry_key for scoring.
 	 * @return Plan_Generation_Result Success with plan_id and payload, or failure with errors.
 	 */
 	public function convert_to_draft( string $bundle_key, array $context = array() ): Plan_Generation_Result {
@@ -77,7 +77,7 @@ final class Industry_Starter_Bundle_To_Build_Plan_Service {
 	 * @return array<string, mixed> Normalized output (may have empty new_pages_to_create).
 	 */
 	private function build_normalized_output_from_bundle( array $bundle ): array {
-		$label  = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ) && is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] )
+		$label   = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ) && is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] )
 			? trim( $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] )
 			: '';
 		$summary = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_SUMMARY ] ) && is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_SUMMARY ] )
@@ -87,7 +87,7 @@ final class Industry_Starter_Bundle_To_Build_Plan_Service {
 		$template_refs = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ] ) && is_array( $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ] )
 			? $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ]
 			: array();
-		$section_refs = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ] ) && is_array( $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ] )
+		$section_refs  = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ] ) && is_array( $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ] )
 			? $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ]
 			: array();
 
@@ -97,13 +97,13 @@ final class Industry_Starter_Bundle_To_Build_Plan_Service {
 				continue;
 			}
 			$template_key = trim( $template_key );
-			$title = $this->humanize_template_key_to_title( $template_key, $i + 1 );
-			$slug  = sanitize_title( $title );
+			$title        = $this->humanize_template_key_to_title( $template_key, $i + 1 );
+			$slug         = sanitize_title( $title );
 			if ( $slug === '' ) {
 				$slug = 'page-' . ( $i + 1 );
 			}
 			$section_guidance = implode( ', ', array_slice( array_map( 'strval', $section_refs ), 0, 3 ) );
-			$new_pages[] = array(
+			$new_pages[]      = array(
 				'proposed_page_title' => $title,
 				'proposed_slug'       => $slug,
 				'purpose'             => __( 'From starter bundle', 'aio-page-builder' ),
@@ -115,32 +115,35 @@ final class Industry_Starter_Bundle_To_Build_Plan_Service {
 		}
 
 		$plan_summary_text = $label !== '' ? sprintf( /* translators: %s: bundle label */ __( 'Draft from starter bundle: %s', 'aio-page-builder' ), $label ) : __( 'Draft from starter bundle', 'aio-page-builder' );
-		$warnings = array();
+		$warnings          = array();
 		if ( $label !== '' ) {
 			$warnings[] = sprintf( /* translators: %s: bundle label */ __( 'Generated from starter bundle: %s', 'aio-page-builder' ), $label );
 		}
 
 		return array(
-			Build_Plan_Draft_Schema::KEY_SCHEMA_VERSION => Build_Plan_Draft_Schema::SCHEMA_REF,
-			Build_Plan_Draft_Schema::KEY_RUN_SUMMARY   => array(
+			Build_Plan_Draft_Schema::KEY_SCHEMA_VERSION   => Build_Plan_Draft_Schema::SCHEMA_REF,
+			Build_Plan_Draft_Schema::KEY_RUN_SUMMARY      => array(
 				Build_Plan_Draft_Schema::RUN_SUMMARY_SUMMARY_TEXT       => $plan_summary_text,
 				Build_Plan_Draft_Schema::RUN_SUMMARY_PLANNING_MODE     => 'mixed',
 				Build_Plan_Draft_Schema::RUN_SUMMARY_OVERALL_CONFIDENCE => 'medium',
 			),
-			Build_Plan_Draft_Schema::KEY_SITE_PURPOSE => array(
+			Build_Plan_Draft_Schema::KEY_SITE_PURPOSE     => array(
 				'summary' => $summary !== '' ? $summary : $plan_summary_text,
 			),
-			Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE => array(
+			Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE   => array(
 				'navigation_summary' => '',
 			),
 			Build_Plan_Draft_Schema::KEY_EXISTING_PAGE_CHANGES => array(),
-			Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE   => $new_pages,
-			Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN      => array(),
+			Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE => $new_pages,
+			Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN => array(),
 			Build_Plan_Draft_Schema::KEY_DESIGN_TOKEN_RECOMMENDATIONS => array(),
-			Build_Plan_Draft_Schema::KEY_SEO_RECOMMENDATIONS   => array(),
-			Build_Plan_Draft_Schema::KEY_WARNINGS              => $warnings,
-			Build_Plan_Draft_Schema::KEY_ASSUMPTIONS          => array(),
-			Build_Plan_Draft_Schema::KEY_CONFIDENCE            => array( 'overall' => 'medium', 'planning_mode' => 'mixed' ),
+			Build_Plan_Draft_Schema::KEY_SEO_RECOMMENDATIONS => array(),
+			Build_Plan_Draft_Schema::KEY_WARNINGS         => $warnings,
+			Build_Plan_Draft_Schema::KEY_ASSUMPTIONS      => array(),
+			Build_Plan_Draft_Schema::KEY_CONFIDENCE       => array(
+				'overall'       => 'medium',
+				'planning_mode' => 'mixed',
+			),
 		);
 	}
 

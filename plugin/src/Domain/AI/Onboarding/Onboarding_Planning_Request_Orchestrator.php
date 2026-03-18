@@ -39,7 +39,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 
 	private const RUN_STATUS_COMPLETED         = 'completed';
 	private const RUN_STATUS_FAILED_VALIDATION = 'failed_validation';
-	private const RUN_STATUS_FAILED           = 'failed';
+	private const RUN_STATUS_FAILED            = 'failed';
 
 	/** @var Onboarding_Draft_Service */
 	private Onboarding_Draft_Service $draft_service;
@@ -93,16 +93,16 @@ final class Onboarding_Planning_Request_Orchestrator {
 	) {
 		$this->draft_service           = $draft_service;
 		$this->prefill_service         = $prefill_service;
-		$this->prompt_pack_registry     = $prompt_pack_registry;
-		$this->input_artifact_builder   = $input_artifact_builder;
-		$this->prompt_package_builder    = $prompt_package_builder;
-		$this->request_context_builder  = $request_context_builder;
-		$this->capability_resolver      = $capability_resolver;
-		$this->validator                = $validator;
-		$this->run_service              = $run_service;
-		$this->connection_test_service  = $connection_test_service;
-		$this->failover_service         = $failover_service;
-		$this->container                = $container;
+		$this->prompt_pack_registry    = $prompt_pack_registry;
+		$this->input_artifact_builder  = $input_artifact_builder;
+		$this->prompt_package_builder  = $prompt_package_builder;
+		$this->request_context_builder = $request_context_builder;
+		$this->capability_resolver     = $capability_resolver;
+		$this->validator               = $validator;
+		$this->run_service             = $run_service;
+		$this->connection_test_service = $connection_test_service;
+		$this->failover_service        = $failover_service;
+		$this->container               = $container;
 	}
 
 	/**
@@ -111,7 +111,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 	 * @return Planning_Request_Result
 	 */
 	public function submit(): Planning_Request_Result {
-		$draft = $this->draft_service->get_draft();
+		$draft        = $this->draft_service->get_draft();
 		$current_step = $draft['current_step_key'] ?? Onboarding_Step_Keys::WELCOME;
 
 		if ( $current_step !== Onboarding_Step_Keys::SUBMISSION ) {
@@ -140,7 +140,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 			);
 		}
 
-		$prefill = $this->prefill_service->get_prefill_data( $draft );
+		$prefill     = $this->prefill_service->get_prefill_data( $draft );
 		$provider_id = $this->pick_configured_provider_id( $prefill );
 		if ( $provider_id === null || $provider_id === '' ) {
 			return new Planning_Request_Result(
@@ -164,13 +164,19 @@ final class Onboarding_Planning_Request_Orchestrator {
 				0,
 				__( 'The selected AI provider is not available.', 'aio-page-builder' ),
 				null,
-				array( 'category' => 'unsupported_feature', 'user_message' => 'Provider not available.', 'internal_code' => 'unsupported_feature', 'provider_raw' => null, 'retry_posture' => 'no_retry' ),
+				array(
+					'category'      => 'unsupported_feature',
+					'user_message'  => 'Provider not available.',
+					'internal_code' => 'unsupported_feature',
+					'provider_raw'  => null,
+					'retry_posture' => 'no_retry',
+				),
 				null
 			);
 		}
 
 		$schema_ref = Build_Plan_Draft_Schema::SCHEMA_REF;
-		$pack = $this->prompt_pack_registry->select_for_planning( $schema_ref, $provider_id );
+		$pack       = $this->prompt_pack_registry->select_for_planning( $schema_ref, $provider_id );
 		if ( $pack === null ) {
 			return new Planning_Request_Result(
 				false,
@@ -184,22 +190,24 @@ final class Onboarding_Planning_Request_Orchestrator {
 			);
 		}
 
-		$prompt_pack_ref = array(
+		$prompt_pack_ref             = array(
 			Input_Artifact_Schema::PROMPT_PACK_REF_INTERNAL_KEY => (string) ( $pack[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' ),
-			Input_Artifact_Schema::PROMPT_PACK_REF_VERSION      => (string) ( $pack[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '' ),
+			Input_Artifact_Schema::PROMPT_PACK_REF_VERSION => (string) ( $pack[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '' ),
 		);
-		$artifact_id = 'aio-artifact-' . uniqid( '', true );
-		$profile = $prefill['profile'] ?? array();
-		$goal = isset( $draft['goal_or_intent_text'] ) && is_string( $draft['goal_or_intent_text'] ) ? $draft['goal_or_intent_text'] : '';
-		$registry = array();
+		$artifact_id                 = 'aio-artifact-' . uniqid( '', true );
+		$profile                     = $prefill['profile'] ?? array();
+		$goal                        = isset( $draft['goal_or_intent_text'] ) && is_string( $draft['goal_or_intent_text'] ) ? $draft['goal_or_intent_text'] : '';
+		$registry                    = array();
 		$template_preference_profile = isset( $profile['template_preference_profile'] ) && is_array( $profile['template_preference_profile'] ) ? $profile['template_preference_profile'] : array();
 		if ( $this->container->has( 'template_recommendation_context_builder' ) ) {
 			$ctx_builder = $this->container->get( 'template_recommendation_context_builder' );
 			if ( $ctx_builder instanceof Template_Recommendation_Context_Builder ) {
-				$built = $ctx_builder->build( array(
-					'max_templates'             => Template_Recommendation_Context_Builder::DEFAULT_MAX_TEMPLATES,
-					'template_preference_profile' => $template_preference_profile,
-				) );
+				$built                                       = $ctx_builder->build(
+					array(
+						'max_templates'               => Template_Recommendation_Context_Builder::DEFAULT_MAX_TEMPLATES,
+						'template_preference_profile' => $template_preference_profile,
+					)
+				);
 				$registry['template_recommendation_context'] = $built['template_recommendation_context'];
 				if ( isset( $built['template_preference_profile'] ) && is_array( $built['template_preference_profile'] ) ) {
 					$registry['template_preference_profile'] = $built['template_preference_profile'];
@@ -216,9 +224,9 @@ final class Onboarding_Planning_Request_Orchestrator {
 		if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
 			$industry_repo = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
 			if ( $industry_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
-				$qp_registry = $this->container->has( 'industry_question_pack_registry' ) ? $this->container->get( 'industry_question_pack_registry' ) : null;
-				$pack_registry = $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
-				$readiness = $industry_repo->get_readiness( $pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null, $qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null );
+				$qp_registry      = $this->container->has( 'industry_question_pack_registry' ) ? $this->container->get( 'industry_question_pack_registry' ) : null;
+				$pack_registry    = $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ? $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) : null;
+				$readiness        = $industry_repo->get_readiness( $pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null, $qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null );
 				$industry_profile = $industry_repo->get_profile();
 				$industry_context = array(
 					'schema_version'   => '1',
@@ -232,18 +240,18 @@ final class Onboarding_Planning_Request_Orchestrator {
 					if ( $subtype_resolver instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver ) {
 						$resolved = $subtype_resolver->resolve_from_profile( $industry_profile );
 						if ( ! empty( $resolved['has_valid_subtype'] ) && $resolved['industry_subtype_key'] !== '' && is_array( $resolved['resolved_subtype'] ?? null ) ) {
-							$def = $resolved['resolved_subtype'];
+							$def                                      = $resolved['resolved_subtype'];
 							$industry_context['industry_subtype_key'] = $resolved['industry_subtype_key'];
 							$industry_context['resolved_subtype_snapshot'] = array(
 								'label'   => trim( (string) ( $def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry::FIELD_LABEL ] ?? '' ) ),
 								'summary' => trim( (string) ( $def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry::FIELD_SUMMARY ] ?? '' ) ),
 							);
-							$primary = $resolved['primary_industry_key'];
+							$primary                                       = $resolved['primary_industry_key'];
 							if ( $primary !== '' && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ) {
 								$bundle_registry = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
 								if ( $bundle_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry ) {
 									$bundles = $bundle_registry->get_for_industry( $primary, $resolved['industry_subtype_key'] );
-									$refs = array();
+									$refs    = array();
 									foreach ( $bundles as $b ) {
 										$key = $b[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '';
 										if ( $key !== '' ) {
@@ -322,10 +330,10 @@ final class Onboarding_Planning_Request_Orchestrator {
 			);
 		}
 
-		$package = $package_result->get_normalized_prompt_package();
+		$package       = $package_result->get_normalized_prompt_package();
 		$system_prompt = (string) ( $package['system_prompt'] ?? '' );
-		$user_message = (string) ( $package['user_message'] ?? '' );
-		$model = $this->capability_resolver->resolve_default_model_for_planning( $driver, $schema_ref );
+		$user_message  = (string) ( $package['user_message'] ?? '' );
+		$model         = $this->capability_resolver->resolve_default_model_for_planning( $driver, $schema_ref );
 		if ( $model === null || $model === '' ) {
 			return new Planning_Request_Result(
 				false,
@@ -334,27 +342,39 @@ final class Onboarding_Planning_Request_Orchestrator {
 				0,
 				__( 'No suitable model found for planning.', 'aio-page-builder' ),
 				null,
-				array( 'category' => 'unsupported_feature', 'user_message' => 'No model for planning.', 'internal_code' => 'unsupported_feature', 'provider_raw' => null, 'retry_posture' => 'no_retry' ),
+				array(
+					'category'      => 'unsupported_feature',
+					'user_message'  => 'No model for planning.',
+					'internal_code' => 'unsupported_feature',
+					'provider_raw'  => null,
+					'retry_posture' => 'no_retry',
+				),
 				null
 			);
 		}
 
-		$request_id = 'aio-req-' . uniqid( '', true );
-		$normalized_request = $this->request_context_builder->build( $request_id, $model, $system_prompt, $user_message, array(
-			'structured_output_schema_ref' => $schema_ref,
-			'max_tokens'                   => 4096,
-			'timeout_seconds'              => 120,
-		) );
+		$request_id         = 'aio-req-' . uniqid( '', true );
+		$normalized_request = $this->request_context_builder->build(
+			$request_id,
+			$model,
+			$system_prompt,
+			$user_message,
+			array(
+				'structured_output_schema_ref' => $schema_ref,
+				'max_tokens'                   => 4096,
+				'timeout_seconds'              => 120,
+			)
+		);
 
 		$response = $driver->request( $normalized_request );
 
-		$policy = $this->failover_service->get_policy_for_primary( $provider_id );
+		$policy          = $this->failover_service->get_policy_for_primary( $provider_id );
 		$failover_result = null;
 
 		if ( ! empty( $response['success'] ) ) {
 			$failover_result = Failover_Result::primary_success( $provider_id, $model, $policy->to_metadata_snapshot() );
 		} else {
-			$fallback_bag = $this->failover_service->try_fallback(
+			$fallback_bag    = $this->failover_service->try_fallback(
 				$policy,
 				$provider_id,
 				$model,
@@ -370,24 +390,27 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$effective_provider_id = $failover_result->get_effective_provider_id();
 		$effective_model       = $failover_result->get_effective_model_used();
 
-		$run_id = 'aio-run-' . uniqid( '', true );
+		$run_id     = 'aio-run-' . uniqid( '', true );
 		$created_at = gmdate( 'Y-m-d\TH:i:s\Z' );
-		$metadata = array(
-			'actor'            => (string) ( \get_current_user_id() ),
-			'created_at'       => $created_at,
-			'provider_id'      => $effective_provider_id,
-			'model_used'       => $effective_model,
-			'prompt_pack_ref'  => $prompt_pack_ref,
-			'retry_count'      => 0,
-			'request_id'       => $request_id,
+		$metadata   = array(
+			'actor'           => (string) ( \get_current_user_id() ),
+			'created_at'      => $created_at,
+			'provider_id'     => $effective_provider_id,
+			'model_used'      => $effective_model,
+			'prompt_pack_ref' => $prompt_pack_ref,
+			'retry_count'     => 0,
+			'request_id'      => $request_id,
 		);
-		$metadata = array_merge( $metadata, $failover_result->to_run_metadata() );
+		$metadata   = array_merge( $metadata, $failover_result->to_run_metadata() );
 
-		$raw_prompt_capture = $package['raw_prompt_capture_ready'] ?? array( 'system_prompt' => $system_prompt, 'user_message' => $user_message );
-		$artifacts = array(
-			Artifact_Category_Keys::RAW_PROMPT               => $raw_prompt_capture,
+		$raw_prompt_capture = $package['raw_prompt_capture_ready'] ?? array(
+			'system_prompt' => $system_prompt,
+			'user_message'  => $user_message,
+		);
+		$artifacts          = array(
+			Artifact_Category_Keys::RAW_PROMPT     => $raw_prompt_capture,
 			Artifact_Category_Keys::NORMALIZED_PROMPT_PACKAGE => $package,
-			Artifact_Category_Keys::INPUT_SNAPSHOT           => $input_artifact,
+			Artifact_Category_Keys::INPUT_SNAPSHOT => $input_artifact,
 		);
 
 		if ( ! empty( $response['success'] ) ) {
@@ -399,13 +422,13 @@ final class Onboarding_Planning_Request_Orchestrator {
 				$artifacts[ Artifact_Category_Keys::USAGE_METADATA ] = $response['usage'];
 			}
 
-			$validation_report = $this->validator->validate( $content, $schema_ref );
+			$validation_report                                      = $this->validator->validate( $content, $schema_ref );
 			$artifacts[ Artifact_Category_Keys::VALIDATION_REPORT ] = $validation_report->to_array();
 
 			if ( $validation_report->allows_build_plan_handoff() ) {
 				$normalized = $validation_report->get_normalized_output();
 				$artifacts[ Artifact_Category_Keys::NORMALIZED_OUTPUT ] = $normalized;
-				$metadata['completed_at'] = gmdate( 'Y-m-d\TH:i:s\Z' );
+				$metadata['completed_at']                               = gmdate( 'Y-m-d\TH:i:s\Z' );
 				$post_id = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_COMPLETED, $artifacts );
 				$this->connection_test_service->record_last_successful_use( $effective_provider_id, $created_at );
 				$this->link_run_to_draft( $draft, $run_id, $post_id );
@@ -422,7 +445,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 			}
 
 			$metadata['completed_at'] = gmdate( 'Y-m-d\TH:i:s\Z' );
-			$post_id = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_FAILED_VALIDATION, $artifacts );
+			$post_id                  = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_FAILED_VALIDATION, $artifacts );
 			$this->link_run_to_draft( $draft, $run_id, $post_id );
 			return new Planning_Request_Result(
 				false,
@@ -437,9 +460,9 @@ final class Onboarding_Planning_Request_Orchestrator {
 		}
 
 		$artifacts[ Artifact_Category_Keys::RAW_PROVIDER_RESPONSE ] = $response;
-		$normalized_error = isset( $response['normalized_error'] ) && is_array( $response['normalized_error'] ) ? $response['normalized_error'] : null;
+		$normalized_error         = isset( $response['normalized_error'] ) && is_array( $response['normalized_error'] ) ? $response['normalized_error'] : null;
 		$metadata['completed_at'] = gmdate( 'Y-m-d\TH:i:s\Z' );
-		$post_id = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_FAILED, $artifacts );
+		$post_id                  = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_FAILED, $artifacts );
 		$this->link_run_to_draft( $draft, $run_id, $post_id );
 		$user_msg = $normalized_error['user_message'] ?? __( 'The AI provider returned an error. Check the run in AI Runs.', 'aio-page-builder' );
 		return new Planning_Request_Result(

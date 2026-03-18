@@ -35,7 +35,12 @@ final class Page_Template_Gap_Closing_Super_Batch_Test extends TestCase {
 
 	/** Min CTA by class (cta-sequencing-and-placement-contract §3). */
 	private static function min_cta_for_class( string $class ): int {
-		$map = array( 'top_level' => 3, 'hub' => 4, 'nested_hub' => 4, 'child_detail' => 5 );
+		$map = array(
+			'top_level'    => 3,
+			'hub'          => 4,
+			'nested_hub'   => 4,
+			'child_detail' => 5,
+		);
 		return $map[ $class ] ?? 3;
 	}
 
@@ -83,7 +88,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Test extends TestCase {
 
 	public function test_each_definition_cta_count_and_last_section_cta(): void {
 		foreach ( Page_Template_Gap_Closing_Super_Batch_Definitions::all_definitions() as $def ) {
-			$class = (string) ( $def['template_category_class'] ?? '' );
+			$class   = (string) ( $def['template_category_class'] ?? '' );
 			$min_cta = self::min_cta_for_class( $class );
 			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			$this->assertNotEmpty( $ordered );
@@ -100,7 +105,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Test extends TestCase {
 
 	public function test_no_adjacent_cta_sections(): void {
 		foreach ( Page_Template_Gap_Closing_Super_Batch_Definitions::all_definitions() as $def ) {
-			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+			$ordered      = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			$section_keys = array();
 			foreach ( $ordered as $item ) {
 				$section_keys[] = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
@@ -115,14 +120,19 @@ final class Page_Template_Gap_Closing_Super_Batch_Test extends TestCase {
 
 	public function test_non_cta_section_count_at_least_8(): void {
 		foreach ( Page_Template_Gap_Closing_Super_Batch_Definitions::all_definitions() as $def ) {
-			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+			$ordered      = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			$section_keys = array();
 			foreach ( $ordered as $item ) {
 				$section_keys[] = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
 			}
-			$non_cta = count( array_filter( $section_keys, function ( $k ) {
-				return ! self::is_cta_section_key( $k );
-			} ) );
+			$non_cta = count(
+				array_filter(
+					$section_keys,
+					function ( $k ) {
+						return ! self::is_cta_section_key( $k );
+					}
+				)
+			);
 			$this->assertGreaterThanOrEqual( 8, $non_cta, "Template {$def[ Page_Template_Schema::FIELD_INTERNAL_KEY ]} must have at least 8 non-CTA sections" );
 		}
 	}
@@ -136,9 +146,9 @@ final class Page_Template_Gap_Closing_Super_Batch_Test extends TestCase {
 
 	public function test_seeder_run_returns_success_and_ids(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 200;
-		$GLOBALS['_aio_wp_query_posts']       = array();
-		$repo   = new Page_Template_Repository();
-		$result = Page_Template_Gap_Closing_Super_Batch_Seeder::run( $repo );
+		$GLOBALS['_aio_wp_query_posts']        = array();
+		$repo                                  = new Page_Template_Repository();
+		$result                                = Page_Template_Gap_Closing_Super_Batch_Seeder::run( $repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'page_template_ids', $result );

@@ -46,16 +46,16 @@ final class Industry_Health_Report_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function get_state(): array {
-		$errors  = array();
+		$errors   = array();
 		$warnings = array();
-		$service = null;
+		$service  = null;
 
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_health_check_service' ) ) {
 			$service = $this->container->get( 'industry_health_check_service' );
 		}
 		if ( $service instanceof Industry_Health_Check_Service ) {
-			$result = $service->run();
-			$errors  = isset( $result['errors'] ) && is_array( $result['errors'] ) ? $result['errors'] : array();
+			$result   = $service->run();
+			$errors   = isset( $result['errors'] ) && is_array( $result['errors'] ) ? $result['errors'] : array();
 			$warnings = isset( $result['warnings'] ) && is_array( $result['warnings'] ) ? $result['warnings'] : array();
 		}
 
@@ -65,21 +65,21 @@ final class Industry_Health_Report_Screen {
 		}
 		if ( $repair_engine instanceof Industry_Repair_Suggestion_Engine ) {
 			foreach ( $errors as $i => $issue ) {
-				$suggestion = $repair_engine->suggest_for_issue( $issue );
+				$suggestion                        = $repair_engine->suggest_for_issue( $issue );
 				$errors[ $i ]['repair_suggestion'] = $suggestion;
 			}
 			foreach ( $warnings as $i => $issue ) {
-				$suggestion = $repair_engine->suggest_for_issue( $issue );
+				$suggestion                          = $repair_engine->suggest_for_issue( $issue );
 				$warnings[ $i ]['repair_suggestion'] = $suggestion;
 			}
 		}
 
 		return array(
-			'errors'   => $errors,
-			'warnings' => $warnings,
-			'has_errors' => count( $errors ) > 0,
+			'errors'       => $errors,
+			'warnings'     => $warnings,
+			'has_errors'   => count( $errors ) > 0,
 			'has_warnings' => count( $warnings ) > 0,
-			'healthy'  => count( $errors ) === 0 && count( $warnings ) === 0,
+			'healthy'      => count( $errors ) === 0 && count( $warnings ) === 0,
 		);
 	}
 
@@ -127,14 +127,16 @@ final class Industry_Health_Report_Screen {
 									<td><code><?php echo \esc_html( $issue['key'] ?? '' ); ?></code></td>
 									<td><?php echo \esc_html( $issue['issue_summary'] ?? '' ); ?></td>
 									<td><?php echo \esc_html( implode( ', ', $issue['related_refs'] ?? array() ) ); ?></td>
-									<td><?php
+									<td>
+									<?php
 									$sug = $issue['repair_suggestion'] ?? null;
 									if ( \is_array( $sug ) && isset( $sug['suggested_ref'], $sug['explanation'] ) ) {
 										echo \esc_html( $sug['suggested_ref'] . ' — ' . $sug['explanation'] );
 									} else {
 										echo '—';
 									}
-									?></td>
+									?>
+									</td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
@@ -163,14 +165,16 @@ final class Industry_Health_Report_Screen {
 									<td><code><?php echo \esc_html( $issue['key'] ?? '' ); ?></code></td>
 									<td><?php echo \esc_html( $issue['issue_summary'] ?? '' ); ?></td>
 									<td><?php echo \esc_html( implode( ', ', $issue['related_refs'] ?? array() ) ); ?></td>
-									<td><?php
+									<td>
+									<?php
 									$sug = $issue['repair_suggestion'] ?? null;
 									if ( \is_array( $sug ) && isset( $sug['suggested_ref'], $sug['explanation'] ) ) {
 										echo \esc_html( $sug['suggested_ref'] . ' — ' . $sug['explanation'] );
 									} else {
 										echo '—';
 									}
-									?></td>
+									?>
+									</td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>

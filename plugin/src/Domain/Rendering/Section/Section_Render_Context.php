@@ -43,9 +43,9 @@ final class Section_Render_Context {
 		?string $variant_override = null
 	) {
 		$this->section_definition = $section_definition;
-		$this->field_values      = $field_values;
-		$this->position          = $position;
-		$this->variant_override  = $variant_override;
+		$this->field_values       = $field_values;
+		$this->position           = $position;
+		$this->variant_override   = $variant_override;
 	}
 
 	/** @return array<string, mixed> */

@@ -51,7 +51,7 @@ final class Industry_Starter_Bundle_Comparison_Screen {
 	private function get_state(): array {
 		$bundle_registry = null;
 		if ( $this->container instanceof Service_Container && $this->container->has( Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ) {
-			$r = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
+			$r               = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
 			$bundle_registry = $r instanceof Industry_Starter_Bundle_Registry ? $r : null;
 		}
 		$all_bundles = array();
@@ -59,8 +59,8 @@ final class Industry_Starter_Bundle_Comparison_Screen {
 			foreach ( $bundle_registry->list_all() as $b ) {
 				if ( ( $b[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] ?? '' ) === Industry_Starter_Bundle_Registry::STATUS_ACTIVE ) {
 					$all_bundles[] = array(
-						'bundle_key' => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '' ),
-						'label'      => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ?? '' ),
+						'bundle_key'   => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '' ),
+						'label'        => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ?? '' ),
 						'industry_key' => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY ] ?? '' ),
 						'subtype_key'  => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY ] ?? '' ),
 					);
@@ -79,7 +79,7 @@ final class Industry_Starter_Bundle_Comparison_Screen {
 			Industry_Starter_Bundle_Diff_Service::RESULT_DIFF_ROWS => array(),
 		);
 		if ( count( $selected_keys ) >= 2 && $bundle_registry !== null ) {
-			$service = new Industry_Starter_Bundle_Diff_Service( $bundle_registry );
+			$service     = new Industry_Starter_Bundle_Diff_Service( $bundle_registry );
 			$diff_result = $service->compare( array_values( $selected_keys ) );
 		}
 		return array(
@@ -101,9 +101,9 @@ final class Industry_Starter_Bundle_Comparison_Screen {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the bundle comparison screen.', 'aio-page-builder' ), 403 );
 		}
-		$state = $this->get_state();
-		$bundles = $state['bundles'];
-		$diff_rows = $state['diff_rows'];
+		$state         = $this->get_state();
+		$bundles       = $state['bundles'];
+		$diff_rows     = $state['diff_rows'];
 		$selected_keys = $state['selected_keys'];
 		?>
 		<div class="wrap aio-page-builder-screen aio-industry-bundle-comparison" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
@@ -125,8 +125,8 @@ final class Industry_Starter_Bundle_Comparison_Screen {
 					<?php
 					$links = array();
 					foreach ( $state['all_bundles'] as $b ) {
-						$key = $b['bundle_key'];
-						$label = $b['label'];
+						$key     = $b['bundle_key'];
+						$label   = $b['label'];
 						$links[] = '<code>' . esc_html( $key ) . '</code> (' . esc_html( $label ) . ')';
 					}
 					echo implode( ' &middot; ', $links ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped per item

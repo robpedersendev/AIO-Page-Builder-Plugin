@@ -26,7 +26,13 @@ final class Animation_Fallback_Service {
 	);
 
 	private const ALLOWED_FAMILIES = array(
-		'entrance', 'hover', 'scroll', 'focus', 'disclosure', 'stagger', 'micro',
+		'entrance',
+		'hover',
+		'scroll',
+		'focus',
+		'disclosure',
+		'stagger',
+		'micro',
 	);
 
 	/**

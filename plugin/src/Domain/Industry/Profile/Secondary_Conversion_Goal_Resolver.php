@@ -39,10 +39,13 @@ final class Secondary_Conversion_Goal_Resolver {
 			$profile = $this->profile_repo->get_profile();
 		}
 		if ( ! is_array( $profile ) ) {
-			return array( 'primary_goal_key' => '', 'secondary_goal_key' => '' );
+			return array(
+				'primary_goal_key'   => '',
+				'secondary_goal_key' => '',
+			);
 		}
-		$normalized = Industry_Profile_Schema::normalize( $profile );
-		$primary = isset( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+		$normalized    = Industry_Profile_Schema::normalize( $profile );
+		$primary       = isset( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 			? trim( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 			: '';
 		$secondary_raw = isset( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] )
@@ -56,7 +59,10 @@ final class Secondary_Conversion_Goal_Resolver {
 		if ( $primary !== '' && $secondary_raw !== '' && $this->is_allowed_key( $secondary_raw ) && $secondary_raw !== $primary ) {
 			$secondary = $secondary_raw;
 		}
-		return array( 'primary_goal_key' => $primary, 'secondary_goal_key' => $secondary );
+		return array(
+			'primary_goal_key'   => $primary,
+			'secondary_goal_key' => $secondary,
+		);
 	}
 
 	private function is_allowed_key( string $key ): bool {

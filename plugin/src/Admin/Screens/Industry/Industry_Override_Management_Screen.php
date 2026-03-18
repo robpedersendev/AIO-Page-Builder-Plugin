@@ -74,7 +74,7 @@ final class Industry_Override_Management_Screen {
 
 			<?php
 			$conflict_detector = new Industry_Override_Conflict_Detector( $builder, new \AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository() );
-			$conflicts = $conflict_detector->detect();
+			$conflicts         = $conflict_detector->detect();
 			if ( ! empty( $conflicts ) ) :
 				?>
 				<div class="notice notice-warning aio-override-conflicts-notice" role="region" aria-label="<?php \esc_attr_e( 'Override conflict suggestions', 'aio-page-builder' ); ?>">
@@ -177,16 +177,28 @@ final class Industry_Override_Management_Screen {
 	 */
 	private function get_result_message(): array {
 		if ( ! isset( $_GET['aio_override_remove'] ) || ! is_string( $_GET['aio_override_remove'] ) ) {
-			return array( 'type' => '', 'text' => '' );
+			return array(
+				'type' => '',
+				'text' => '',
+			);
 		}
 		$v = \sanitize_key( $_GET['aio_override_remove'] );
 		if ( $v === 'removed' ) {
-			return array( 'type' => 'success', 'text' => __( 'Override removed.', 'aio-page-builder' ) );
+			return array(
+				'type' => 'success',
+				'text' => __( 'Override removed.', 'aio-page-builder' ),
+			);
 		}
 		if ( $v === 'error' ) {
-			return array( 'type' => 'error', 'text' => __( 'Could not remove override or permission denied.', 'aio-page-builder' ) );
+			return array(
+				'type' => 'error',
+				'text' => __( 'Could not remove override or permission denied.', 'aio-page-builder' ),
+			);
 		}
-		return array( 'type' => '', 'text' => '' );
+		return array(
+			'type' => '',
+			'text' => '',
+		);
 	}
 
 	private function format_target_type( string $target_type ): string {

@@ -49,7 +49,7 @@ final class Prompt_Experiments_Screen {
 		}
 		$this->maybe_handle_save();
 		$this->maybe_handle_delete();
-		$service = $this->get_service();
+		$service     = $this->get_service();
 		$definitions = $service ? $service->list_definitions() : array();
 		$ai_runs_url = \admin_url( 'admin.php?page=' . AI_Runs_Screen::SLUG );
 		?>
@@ -65,9 +65,12 @@ final class Prompt_Experiments_Screen {
 					<h2 id="aio-experiments-heading"><?php \esc_html_e( 'Experiments', 'aio-page-builder' ); ?></h2>
 					<?php foreach ( $definitions as $def ) : ?>
 						<?php
-						$exp_id = isset( $def['id'] ) ? \sanitize_text_field( (string) $def['id'] ) : '';
-						$name   = isset( $def['name'] ) ? (string) $def['name'] : '';
-						$summary = $service ? $service->get_comparison_summary( $exp_id ) : array( 'experiment_id' => $exp_id, 'variants' => array() );
+						$exp_id  = isset( $def['id'] ) ? \sanitize_text_field( (string) $def['id'] ) : '';
+						$name    = isset( $def['name'] ) ? (string) $def['name'] : '';
+						$summary = $service ? $service->get_comparison_summary( $exp_id ) : array(
+							'experiment_id' => $exp_id,
+							'variants'      => array(),
+						);
 						?>
 						<div class="aio-experiment-card" style="margin-bottom: 1.5rem; padding: 1rem; border: 1px solid #ccc; border-radius: 4px;">
 							<h3><?php echo \esc_html( $name ); ?> <code><?php echo \esc_html( $exp_id ); ?></code></h3>
@@ -119,13 +122,18 @@ final class Prompt_Experiments_Screen {
 	}
 
 	/**
-	 * @param Prompt_Experiment_Service|null $service
+	 * @param Prompt_Experiment_Service|null   $service
 	 * @param array<int, array<string, mixed>> $definitions
 	 * @return void
 	 */
 	private function render_form( ?Prompt_Experiment_Service $service, array $definitions ): void {
 		$edit_id = isset( $_GET['edit'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['edit'] ) ) : '';
-		$current = array( 'id' => '', 'name' => '', 'description' => '', 'variants' => array() );
+		$current = array(
+			'id'          => '',
+			'name'        => '',
+			'description' => '',
+			'variants'    => array(),
+		);
 		if ( $edit_id !== '' && $service ) {
 			$found = $service->get_definition( $edit_id );
 			if ( $found !== null ) {
@@ -149,15 +157,17 @@ final class Prompt_Experiments_Screen {
 					<th scope="row"><?php \esc_html_e( 'Variants', 'aio-page-builder' ); ?></th>
 					<td>
 						<p class="description"><?php \esc_html_e( 'One variant per line: variant_id|label|internal_key|version|provider_id (e.g. v1|Baseline|aio/build-plan-draft|1.0.0|openai)', 'aio-page-builder' ); ?></p>
-						<textarea name="aio_experiment_variants" id="aio_exp_variants" rows="6" class="large-text"><?php
+						<textarea name="aio_experiment_variants" id="aio_exp_variants" rows="6" class="large-text">
+						<?php
 						$variants = $current['variants'] ?? array();
 						foreach ( $variants as $v ) {
 							$ref = $v['prompt_pack_ref'] ?? array();
-							$ik = $ref['internal_key'] ?? '';
+							$ik  = $ref['internal_key'] ?? '';
 							$ver = $ref['version'] ?? '';
 							echo \esc_textarea( ( $v['variant_id'] ?? '' ) . '|' . ( $v['label'] ?? '' ) . '|' . $ik . '|' . $ver . '|' . ( $v['provider_id'] ?? '' ) . "\n" );
 						}
-						?></textarea>
+						?>
+						</textarea>
 					</td>
 				</tr>
 			</table>
@@ -180,10 +190,10 @@ final class Prompt_Experiments_Screen {
 		if ( ! $service ) {
 			return;
 		}
-		$name = isset( $_POST['aio_experiment_name'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_name'] ) ) : '';
-		$desc = isset( $_POST['aio_experiment_description'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_description'] ) ) : '';
-		$id   = isset( $_POST['aio_experiment_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_id'] ) ) : '';
-		$raw  = isset( $_POST['aio_experiment_variants'] ) ? \sanitize_textarea_field( \wp_unslash( (string) $_POST['aio_experiment_variants'] ) ) : '';
+		$name     = isset( $_POST['aio_experiment_name'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_name'] ) ) : '';
+		$desc     = isset( $_POST['aio_experiment_description'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_description'] ) ) : '';
+		$id       = isset( $_POST['aio_experiment_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_id'] ) ) : '';
+		$raw      = isset( $_POST['aio_experiment_variants'] ) ? \sanitize_textarea_field( \wp_unslash( (string) $_POST['aio_experiment_variants'] ) ) : '';
 		$variants = array();
 		foreach ( array_filter( array_map( 'trim', explode( "\n", $raw ) ) ) as $line ) {
 			$parts = array_map( 'trim', explode( '|', $line, 5 ) );
@@ -191,14 +201,22 @@ final class Prompt_Experiments_Screen {
 				$variants[] = array(
 					'variant_id'      => $parts[0],
 					'label'           => $parts[1],
-					'prompt_pack_ref' => array( 'internal_key' => $parts[2], 'version' => $parts[3] ),
+					'prompt_pack_ref' => array(
+						'internal_key' => $parts[2],
+						'version'      => $parts[3],
+					),
 					'provider_id'     => $parts[4],
 				);
 			}
 		}
-		$def = array( 'id' => $id, 'name' => $name, 'description' => $desc, 'variants' => $variants );
+		$def    = array(
+			'id'          => $id,
+			'name'        => $name,
+			'description' => $desc,
+			'variants'    => $variants,
+		);
 		$result = $service->save_definition( $def );
-		$url = \admin_url( 'admin.php?page=' . self::SLUG . ( $result['ok'] ? '&saved=1' : '&error=' . \rawurlencode( $result['message'] ) ) );
+		$url    = \admin_url( 'admin.php?page=' . self::SLUG . ( $result['ok'] ? '&saved=1' : '&error=' . \rawurlencode( $result['message'] ) ) );
 		\wp_safe_redirect( $url );
 		exit;
 	}

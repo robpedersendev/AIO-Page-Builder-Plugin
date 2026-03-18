@@ -39,7 +39,7 @@ final class ACF_Group_Builder {
 	 */
 	public function build_group( array $blueprint ): ?array {
 		$group_key = $this->resolve_group_key( $blueprint );
-		$fields = $this->resolve_fields( $blueprint );
+		$fields    = $this->resolve_fields( $blueprint );
 
 		if ( $group_key === '' || empty( $fields ) ) {
 			return null;
@@ -50,7 +50,7 @@ final class ACF_Group_Builder {
 			'title'                 => (string) ( $blueprint[ Field_Blueprint_Schema::LABEL ] ?? 'Untitled' ),
 			'fields'                => $fields,
 			'location'              => $this->placeholder_location(),
-			'menu_order'             => 0,
+			'menu_order'            => 0,
 			'position'              => 'normal',
 			'style'                 => 'default',
 			'label_placement'       => 'top',

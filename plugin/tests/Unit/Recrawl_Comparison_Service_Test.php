@@ -72,7 +72,7 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 		return array(
 			'url'                      => $url,
 			'title_snapshot'           => $title,
-			'page_classification'     => $classification,
+			'page_classification'      => $classification,
 			'canonical_url'            => $canonical ?? $url,
 			'navigation_participation' => $nav,
 			'content_hash'             => $content_hash ?? 'hash',
@@ -80,22 +80,32 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 	}
 
 	public function test_compare_detects_added_and_removed(): void {
-		$prior = array(
+		$prior      = array(
 			(object) $this->page_record( 'https://example.com/only-prior', 'meaningful' ),
 		);
-		$new = array(
+		$new        = array(
 			(object) $this->page_record( 'https://example.com/only-new', 'meaningful' ),
 		);
-		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
+		$repo       = $this->make_repository_returning_per_run( $prior, $new );
+		$svc        = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
-		$result = $comparison->compare( 'prior-run', 'new-run' );
+		$result     = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 1, $result->added_count );
 		$this->assertSame( 1, $result->removed_count );
 		$this->assertSame( 0, $result->changed_count );
 		$this->assertSame( 0, $result->unchanged_count );
-		$added = array_filter( $result->page_changes, function ( Page_Change_Summary $p ) { return $p->change_category === Page_Change_Summary::CATEGORY_ADDED; } );
-		$removed = array_filter( $result->page_changes, function ( Page_Change_Summary $p ) { return $p->change_category === Page_Change_Summary::CATEGORY_REMOVED; } );
+		$added   = array_filter(
+			$result->page_changes,
+			function ( Page_Change_Summary $p ) {
+				return $p->change_category === Page_Change_Summary::CATEGORY_ADDED;
+			}
+		);
+		$removed = array_filter(
+			$result->page_changes,
+			function ( Page_Change_Summary $p ) {
+				return $p->change_category === Page_Change_Summary::CATEGORY_REMOVED;
+			}
+		);
 		$this->assertCount( 1, $added );
 		$this->assertCount( 1, $removed );
 		$this->assertSame( 'https://example.com/only-new', array_values( $added )[0]->url );
@@ -103,13 +113,13 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 	}
 
 	public function test_compare_detects_unchanged_when_identical(): void {
-		$row = (object) $this->page_record( 'https://example.com/same', 'meaningful', 'Same', null, 1, 'h1' );
-		$prior = array( $row );
-		$new   = array( clone $row );
-		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
+		$row        = (object) $this->page_record( 'https://example.com/same', 'meaningful', 'Same', null, 1, 'h1' );
+		$prior      = array( $row );
+		$new        = array( clone $row );
+		$repo       = $this->make_repository_returning_per_run( $prior, $new );
+		$svc        = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
-		$result = $comparison->compare( 'prior-run', 'new-run' );
+		$result     = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 0, $result->added_count );
 		$this->assertSame( 0, $result->removed_count );
 		$this->assertSame( 0, $result->changed_count );
@@ -118,12 +128,12 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 	}
 
 	public function test_compare_detects_classification_change_as_reclassified(): void {
-		$prior = array( (object) $this->page_record( 'https://example.com/page', 'low_value', 'Page' ) );
-		$new   = array( (object) $this->page_record( 'https://example.com/page', 'meaningful', 'Page' ) );
-		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
+		$prior      = array( (object) $this->page_record( 'https://example.com/page', 'low_value', 'Page' ) );
+		$new        = array( (object) $this->page_record( 'https://example.com/page', 'meaningful', 'Page' ) );
+		$repo       = $this->make_repository_returning_per_run( $prior, $new );
+		$svc        = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
-		$result = $comparison->compare( 'prior-run', 'new-run' );
+		$result     = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 1, $result->changed_count );
 		$this->assertSame( 1, $result->reclassified_count );
 		$this->assertSame( Page_Change_Summary::CATEGORY_RECLASSIFIED, $result->page_changes[0]->change_category );
@@ -131,29 +141,29 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 	}
 
 	public function test_compare_detects_title_change(): void {
-		$prior = array( (object) $this->page_record( 'https://example.com/page', 'meaningful', 'Old Title' ) );
-		$new   = array( (object) $this->page_record( 'https://example.com/page', 'meaningful', 'New Title' ) );
-		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
+		$prior      = array( (object) $this->page_record( 'https://example.com/page', 'meaningful', 'Old Title' ) );
+		$new        = array( (object) $this->page_record( 'https://example.com/page', 'meaningful', 'New Title' ) );
+		$repo       = $this->make_repository_returning_per_run( $prior, $new );
+		$svc        = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
-		$result = $comparison->compare( 'prior-run', 'new-run' );
+		$result     = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 1, $result->changed_count );
 		$this->assertContains( Page_Change_Summary::REASON_TITLE_CHANGED, $result->page_changes[0]->reason_codes );
 	}
 
 	public function test_compare_meaningful_counts(): void {
-		$prior = array(
+		$prior      = array(
 			(object) $this->page_record( 'https://example.com/a', 'meaningful' ),
 			(object) $this->page_record( 'https://example.com/b', 'low_value' ),
 		);
-		$new = array(
+		$new        = array(
 			(object) $this->page_record( 'https://example.com/a', 'meaningful' ),
 			(object) $this->page_record( 'https://example.com/b', 'meaningful' ),
 		);
-		$repo = $this->make_repository_returning_per_run( $prior, $new );
-		$svc  = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
+		$repo       = $this->make_repository_returning_per_run( $prior, $new );
+		$svc        = new Crawl_Snapshot_Service( $repo, new Crawl_Profile_Service(), new \AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher() );
 		$comparison = new Recrawl_Comparison_Service( $svc );
-		$result = $comparison->compare( 'prior-run', 'new-run' );
+		$result     = $comparison->compare( 'prior-run', 'new-run' );
 		$this->assertSame( 1, $result->meaningful_count_prior );
 		$this->assertSame( 2, $result->meaningful_count_new );
 	}

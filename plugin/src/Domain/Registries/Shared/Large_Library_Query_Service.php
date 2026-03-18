@@ -75,7 +75,7 @@ final class Large_Library_Query_Service {
 		Section_Template_Repository $section_repository,
 		Page_Template_Repository $page_template_repository
 	) {
-		$this->section_repository      = $section_repository;
+		$this->section_repository       = $section_repository;
 		$this->page_template_repository = $page_template_repository;
 	}
 
@@ -88,14 +88,14 @@ final class Large_Library_Query_Service {
 	 * @return Large_Library_Filter_Result
 	 */
 	public function query_sections( array $filters, int $page = 1, int $per_page = self::DEFAULT_PER_PAGE ): Large_Library_Filter_Result {
-		$per_page = min( max( 1, $per_page ), self::MAX_PER_PAGE );
-		$all    = $this->section_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
-		$filtered = $this->filter_sections( $all, $filters );
-		$total   = count( $filtered );
+		$per_page   = min( max( 1, $per_page ), self::MAX_PER_PAGE );
+		$all        = $this->section_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
+		$filtered   = $this->filter_sections( $all, $filters );
+		$total      = count( $filtered );
 		$pagination = Large_Library_Pagination::from_page_size( $page, $per_page, $total );
-		$slice   = array_slice( $filtered, $pagination->get_offset(), $pagination->get_per_page() );
-		$rows    = $this->section_rows_for_directory( $slice );
-		$counts  = $this->section_filter_counts( $filtered );
+		$slice      = array_slice( $filtered, $pagination->get_offset(), $pagination->get_per_page() );
+		$rows       = $this->section_rows_for_directory( $slice );
+		$counts     = $this->section_filter_counts( $filtered );
 		return new Large_Library_Filter_Result( $rows, $pagination, $counts, $total );
 	}
 
@@ -108,14 +108,14 @@ final class Large_Library_Query_Service {
 	 * @return Large_Library_Filter_Result
 	 */
 	public function query_page_templates( array $filters, int $page = 1, int $per_page = self::DEFAULT_PER_PAGE ): Large_Library_Filter_Result {
-		$per_page = min( max( 1, $per_page ), self::MAX_PER_PAGE );
-		$all     = $this->page_template_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
-		$filtered = $this->filter_page_templates( $all, $filters );
-		$total   = count( $filtered );
+		$per_page   = min( max( 1, $per_page ), self::MAX_PER_PAGE );
+		$all        = $this->page_template_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
+		$filtered   = $this->filter_page_templates( $all, $filters );
+		$total      = count( $filtered );
 		$pagination = Large_Library_Pagination::from_page_size( $page, $per_page, $total );
-		$slice   = array_slice( $filtered, $pagination->get_offset(), $pagination->get_per_page() );
-		$rows    = $this->page_template_rows_for_directory( $slice );
-		$counts  = $this->page_template_filter_counts( $filtered );
+		$slice      = array_slice( $filtered, $pagination->get_offset(), $pagination->get_per_page() );
+		$rows       = $this->page_template_rows_for_directory( $slice );
+		$counts     = $this->page_template_filter_counts( $filtered );
 		return new Large_Library_Filter_Result( $rows, $pagination, $counts, $total );
 	}
 
@@ -125,7 +125,7 @@ final class Large_Library_Query_Service {
 	 * @return array{total: int, by_status?: array<string, int>}
 	 */
 	public function get_section_count_summary(): array {
-		$all = $this->section_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
+		$all       = $this->section_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
 		$by_status = array();
 		foreach ( $all as $def ) {
 			$s = (string) ( $def[ Section_Schema::FIELD_STATUS ] ?? '' );
@@ -134,8 +134,8 @@ final class Large_Library_Query_Service {
 			}
 		}
 		return array(
-			'total'      => count( $all ),
-			'by_status'  => $by_status,
+			'total'     => count( $all ),
+			'by_status' => $by_status,
 		);
 	}
 
@@ -145,8 +145,8 @@ final class Large_Library_Query_Service {
 	 * @return array{total: int, by_status?: array<string, int>, by_archetype?: array<string, int>}
 	 */
 	public function get_page_template_count_summary(): array {
-		$all = $this->page_template_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
-		$by_status   = array();
+		$all          = $this->page_template_repository->list_all_definitions_capped( self::MAX_LIBRARY_LOAD );
+		$by_status    = array();
 		$by_archetype = array();
 		foreach ( $all as $def ) {
 			$s = (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
@@ -167,19 +167,19 @@ final class Large_Library_Query_Service {
 
 	/**
 	 * @param list<array<string, mixed>> $defs
-	 * @param array<string, mixed>      $filters
+	 * @param array<string, mixed>       $filters
 	 * @return list<array<string, mixed>>
 	 */
 	private function filter_sections( array $defs, array $filters ): array {
-		$status   = isset( $filters[ self::FILTER_STATUS ] ) ? (string) $filters[ self::FILTER_STATUS ] : '';
-		$category = isset( $filters[ self::FILTER_CATEGORY ] ) ? (string) $filters[ self::FILTER_CATEGORY ] : '';
+		$status         = isset( $filters[ self::FILTER_STATUS ] ) ? (string) $filters[ self::FILTER_STATUS ] : '';
+		$category       = isset( $filters[ self::FILTER_CATEGORY ] ) ? (string) $filters[ self::FILTER_CATEGORY ] : '';
 		$purpose_family = isset( $filters[ self::FILTER_SECTION_PURPOSE_FAMILY ] ) ? (string) $filters[ self::FILTER_SECTION_PURPOSE_FAMILY ] : '';
-		$cta      = isset( $filters[ self::FILTER_CTA_CLASSIFICATION ] ) ? (string) $filters[ self::FILTER_CTA_CLASSIFICATION ] : '';
-		$variation = isset( $filters[ self::FILTER_VARIATION_FAMILY_KEY ] ) ? (string) $filters[ self::FILTER_VARIATION_FAMILY_KEY ] : '';
-		$tags     = isset( $filters[ self::FILTER_COMPATIBILITY_TAGS ] ) && is_array( $filters[ self::FILTER_COMPATIBILITY_TAGS ] ) ? $filters[ self::FILTER_COMPATIBILITY_TAGS ] : array();
-		$preview  = isset( $filters[ self::FILTER_PREVIEW_AVAILABLE ] ) ? (bool) $filters[ self::FILTER_PREVIEW_AVAILABLE ] : null;
-		$search   = isset( $filters[ self::FILTER_SEARCH ] ) ? trim( (string) $filters[ self::FILTER_SEARCH ] ) : '';
-		$search_lower = $search !== '' ? mb_strtolower( $search, 'UTF-8' ) : '';
+		$cta            = isset( $filters[ self::FILTER_CTA_CLASSIFICATION ] ) ? (string) $filters[ self::FILTER_CTA_CLASSIFICATION ] : '';
+		$variation      = isset( $filters[ self::FILTER_VARIATION_FAMILY_KEY ] ) ? (string) $filters[ self::FILTER_VARIATION_FAMILY_KEY ] : '';
+		$tags           = isset( $filters[ self::FILTER_COMPATIBILITY_TAGS ] ) && is_array( $filters[ self::FILTER_COMPATIBILITY_TAGS ] ) ? $filters[ self::FILTER_COMPATIBILITY_TAGS ] : array();
+		$preview        = isset( $filters[ self::FILTER_PREVIEW_AVAILABLE ] ) ? (bool) $filters[ self::FILTER_PREVIEW_AVAILABLE ] : null;
+		$search         = isset( $filters[ self::FILTER_SEARCH ] ) ? trim( (string) $filters[ self::FILTER_SEARCH ] ) : '';
+		$search_lower   = $search !== '' ? mb_strtolower( $search, 'UTF-8' ) : '';
 
 		$out = array();
 		foreach ( $defs as $def ) {
@@ -205,7 +205,7 @@ final class Large_Library_Query_Service {
 				}
 			}
 			if ( ! empty( $tags ) ) {
-				$comp = $def[ Section_Schema::FIELD_COMPATIBILITY ] ?? array();
+				$comp      = $def[ Section_Schema::FIELD_COMPATIBILITY ] ?? array();
 				$comp_tags = is_array( $comp ) ? ( $comp['tags'] ?? $comp['compatibility_tags'] ?? array() ) : array();
 				if ( ! is_array( $comp_tags ) ) {
 					$comp_tags = array();
@@ -236,16 +236,16 @@ final class Large_Library_Query_Service {
 
 	/**
 	 * @param list<array<string, mixed>> $defs
-	 * @param array<string, mixed>      $filters
+	 * @param array<string, mixed>       $filters
 	 * @return list<array<string, mixed>>
 	 */
 	private function filter_page_templates( array $defs, array $filters ): array {
-		$status   = isset( $filters[ self::FILTER_STATUS ] ) ? (string) $filters[ self::FILTER_STATUS ] : '';
-		$archetype = isset( $filters[ self::FILTER_ARCHETYPE ] ) ? (string) $filters[ self::FILTER_ARCHETYPE ] : '';
-		$tpl_cat  = isset( $filters[ self::FILTER_TEMPLATE_CATEGORY_CLASS ] ) ? (string) $filters[ self::FILTER_TEMPLATE_CATEGORY_CLASS ] : '';
-		$tpl_fam  = isset( $filters[ self::FILTER_TEMPLATE_FAMILY ] ) ? (string) $filters[ self::FILTER_TEMPLATE_FAMILY ] : '';
-		$preview  = isset( $filters[ self::FILTER_PREVIEW_AVAILABLE ] ) ? (bool) $filters[ self::FILTER_PREVIEW_AVAILABLE ] : null;
-		$search   = isset( $filters[ self::FILTER_SEARCH ] ) ? trim( (string) $filters[ self::FILTER_SEARCH ] ) : '';
+		$status       = isset( $filters[ self::FILTER_STATUS ] ) ? (string) $filters[ self::FILTER_STATUS ] : '';
+		$archetype    = isset( $filters[ self::FILTER_ARCHETYPE ] ) ? (string) $filters[ self::FILTER_ARCHETYPE ] : '';
+		$tpl_cat      = isset( $filters[ self::FILTER_TEMPLATE_CATEGORY_CLASS ] ) ? (string) $filters[ self::FILTER_TEMPLATE_CATEGORY_CLASS ] : '';
+		$tpl_fam      = isset( $filters[ self::FILTER_TEMPLATE_FAMILY ] ) ? (string) $filters[ self::FILTER_TEMPLATE_FAMILY ] : '';
+		$preview      = isset( $filters[ self::FILTER_PREVIEW_AVAILABLE ] ) ? (bool) $filters[ self::FILTER_PREVIEW_AVAILABLE ] : null;
+		$search       = isset( $filters[ self::FILTER_SEARCH ] ) ? trim( (string) $filters[ self::FILTER_SEARCH ] ) : '';
 		$search_lower = $search !== '' ? mb_strtolower( $search, 'UTF-8' ) : '';
 
 		$out = array();
@@ -263,7 +263,7 @@ final class Large_Library_Query_Service {
 				continue;
 			}
 			if ( $preview === true ) {
-				$pm = $def['preview_metadata'] ?? array();
+				$pm  = $def['preview_metadata'] ?? array();
 				$ref = is_array( $pm ) ? ( $pm['preview_image_ref'] ?? $pm['preview_ref'] ?? '' ) : '';
 				if ( $ref === '' || $ref === null ) {
 					continue;
@@ -291,25 +291,25 @@ final class Large_Library_Query_Service {
 	private function section_rows_for_directory( array $defs ): array {
 		$rows = array();
 		foreach ( $defs as $def ) {
-			$variants = $def[ Section_Schema::FIELD_VARIANTS ] ?? array();
+			$variants      = $def[ Section_Schema::FIELD_VARIANTS ] ?? array();
 			$variant_count = is_array( $variants ) ? count( $variants ) : 0;
-			$version_arr = $def[ Section_Schema::FIELD_VERSION ] ?? array();
-			$version = is_array( $version_arr ) ? (string) ( $version_arr['version'] ?? '1' ) : '1';
-			$rows[] = array(
-				'internal_key'         => (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' ),
-				'name'                 => (string) ( $def[ Section_Schema::FIELD_NAME ] ?? '' ),
-				'status'               => (string) ( $def[ Section_Schema::FIELD_STATUS ] ?? '' ),
-				'category'             => (string) ( $def[ Section_Schema::FIELD_CATEGORY ] ?? '' ),
-				'purpose_summary'      => (string) ( $def[ Section_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' ),
+			$version_arr   = $def[ Section_Schema::FIELD_VERSION ] ?? array();
+			$version       = is_array( $version_arr ) ? (string) ( $version_arr['version'] ?? '1' ) : '1';
+			$rows[]        = array(
+				'internal_key'           => (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' ),
+				'name'                   => (string) ( $def[ Section_Schema::FIELD_NAME ] ?? '' ),
+				'status'                 => (string) ( $def[ Section_Schema::FIELD_STATUS ] ?? '' ),
+				'category'               => (string) ( $def[ Section_Schema::FIELD_CATEGORY ] ?? '' ),
+				'purpose_summary'        => (string) ( $def[ Section_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' ),
 				'section_purpose_family' => (string) ( $def['section_purpose_family'] ?? '' ),
-				'cta_classification'   => (string) ( $def['cta_classification'] ?? '' ),
-				'variation_family_key'  => (string) ( $def['variation_family_key'] ?? '' ),
-				'placement_tendency'    => (string) ( $def['placement_tendency'] ?? '' ),
-				'helper_ref'           => (string) ( $def[ Section_Schema::FIELD_HELPER_REF ] ?? '' ),
-				'field_blueprint_ref'  => (string) ( $def[ Section_Schema::FIELD_FIELD_BLUEPRINT_REF ] ?? '' ),
-				'preview_available'     => ( ( $def['preview_image_ref'] ?? $def['preview_description'] ?? '' ) !== '' ),
-				'version'              => $version,
-				'variant_count'        => $variant_count,
+				'cta_classification'     => (string) ( $def['cta_classification'] ?? '' ),
+				'variation_family_key'   => (string) ( $def['variation_family_key'] ?? '' ),
+				'placement_tendency'     => (string) ( $def['placement_tendency'] ?? '' ),
+				'helper_ref'             => (string) ( $def[ Section_Schema::FIELD_HELPER_REF ] ?? '' ),
+				'field_blueprint_ref'    => (string) ( $def[ Section_Schema::FIELD_FIELD_BLUEPRINT_REF ] ?? '' ),
+				'preview_available'      => ( ( $def['preview_image_ref'] ?? $def['preview_description'] ?? '' ) !== '' ),
+				'version'                => $version,
+				'variant_count'          => $variant_count,
 			);
 		}
 		return $rows;
@@ -324,23 +324,23 @@ final class Large_Library_Query_Service {
 	private function page_template_rows_for_directory( array $defs ): array {
 		$rows = array();
 		foreach ( $defs as $def ) {
-			$pm = $def['preview_metadata'] ?? array();
-			$preview_ref = is_array( $pm ) ? ( $pm['preview_image_ref'] ?? $pm['preview_ref'] ?? '' ) : '';
-			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+			$pm            = $def['preview_metadata'] ?? array();
+			$preview_ref   = is_array( $pm ) ? ( $pm['preview_image_ref'] ?? $pm['preview_ref'] ?? '' ) : '';
+			$ordered       = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			$section_count = is_array( $ordered ) ? count( $ordered ) : 0;
-			$version_arr = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
-			$version = is_array( $version_arr ) ? (string) ( $version_arr['version'] ?? '1' ) : '1';
-			$rows[] = array(
-				'internal_key'           => (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' ),
-				'name'                   => (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? '' ),
-				'status'                 => (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' ),
-				'archetype'              => (string) ( $def[ Page_Template_Schema::FIELD_ARCHETYPE ] ?? '' ),
-				'purpose_summary'        => (string) ( $def[ Page_Template_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' ),
+			$version_arr   = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
+			$version       = is_array( $version_arr ) ? (string) ( $version_arr['version'] ?? '1' ) : '1';
+			$rows[]        = array(
+				'internal_key'            => (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' ),
+				'name'                    => (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? '' ),
+				'status'                  => (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' ),
+				'archetype'               => (string) ( $def[ Page_Template_Schema::FIELD_ARCHETYPE ] ?? '' ),
+				'purpose_summary'         => (string) ( $def[ Page_Template_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' ),
 				'template_category_class' => (string) ( $def['template_category_class'] ?? '' ),
-				'template_family'        => (string) ( $def['template_family'] ?? '' ),
-				'preview_available'      => ( $preview_ref !== '' ),
-				'section_count'          => $section_count,
-				'version'                => $version,
+				'template_family'         => (string) ( $def['template_family'] ?? '' ),
+				'preview_available'       => ( $preview_ref !== '' ),
+				'section_count'           => $section_count,
+				'version'                 => $version,
 			);
 		}
 		return $rows;
@@ -351,10 +351,10 @@ final class Large_Library_Query_Service {
 	 * @return array<string, array<string, int>>
 	 */
 	private function section_filter_counts( array $filtered ): array {
-		$by_status = array();
-		$by_category = array();
-		$by_purpose_family = array();
-		$by_cta = array();
+		$by_status           = array();
+		$by_category         = array();
+		$by_purpose_family   = array();
+		$by_cta              = array();
 		$by_variation_family = array();
 		foreach ( $filtered as $def ) {
 			$s = (string) ( $def[ Section_Schema::FIELD_STATUS ] ?? '' );
@@ -379,11 +379,11 @@ final class Large_Library_Query_Service {
 			}
 		}
 		return array(
-			'status'                  => $by_status,
-			'category'                => $by_category,
-			'section_purpose_family'  => $by_purpose_family,
-			'cta_classification'      => $by_cta,
-			'variation_family_key'     => $by_variation_family,
+			'status'                 => $by_status,
+			'category'               => $by_category,
+			'section_purpose_family' => $by_purpose_family,
+			'cta_classification'     => $by_cta,
+			'variation_family_key'   => $by_variation_family,
 		);
 	}
 
@@ -392,10 +392,10 @@ final class Large_Library_Query_Service {
 	 * @return array<string, array<string, int>>
 	 */
 	private function page_template_filter_counts( array $filtered ): array {
-		$by_status = array();
+		$by_status    = array();
 		$by_archetype = array();
-		$by_tpl_cat = array();
-		$by_tpl_fam = array();
+		$by_tpl_cat   = array();
+		$by_tpl_fam   = array();
 		foreach ( $filtered as $def ) {
 			$s = (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
 			if ( $s !== '' ) {

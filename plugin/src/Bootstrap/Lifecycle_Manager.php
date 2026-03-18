@@ -41,8 +41,8 @@ require_once __DIR__ . '/../Domain/ExportRestore/Uninstall/Uninstall_Cleanup_Ser
  */
 final class Lifecycle_Result {
 
-	public const STATUS_SUCCESS         = 'success';
-	public const STATUS_WARNING         = 'warning';
+	public const STATUS_SUCCESS          = 'success';
+	public const STATUS_WARNING          = 'warning';
 	public const STATUS_BLOCKING_FAILURE = 'blocking_failure';
 
 	/** @var string One of STATUS_* */
@@ -331,7 +331,7 @@ final class Lifecycle_Manager {
 	 * @return Lifecycle_Result
 	 */
 	private function seed_form_templates(): Lifecycle_Result {
-		$base = __DIR__ . '/../Domain';
+		$base  = __DIR__ . '/../Domain';
 		$infra = __DIR__ . '/../Infrastructure';
 		require_once $base . '/Storage/Repositories/Repository_Interface.php';
 		require_once $base . '/Storage/Objects/Object_Status_Families.php';
@@ -372,7 +372,7 @@ final class Lifecycle_Manager {
 	 * @return Lifecycle_Result
 	 */
 	private function seed_section_expansion_pack(): Lifecycle_Result {
-		$base  = __DIR__ . '/../Domain';
+		$base = __DIR__ . '/../Domain';
 		require_once $base . '/Storage/Repositories/Repository_Interface.php';
 		require_once $base . '/Storage/Objects/Object_Status_Families.php';
 		require_once $base . '/Storage/Repositories/Abstract_CPT_Repository.php';
@@ -383,7 +383,7 @@ final class Lifecycle_Manager {
 		require_once $base . '/Registries/Section/ExpansionPack/Section_Expansion_Pack_Seeder.php';
 
 		$section_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
-		$result      = \AIOPageBuilder\Domain\Registries\Section\ExpansionPack\Section_Expansion_Pack_Seeder::run( $section_repo );
+		$result       = \AIOPageBuilder\Domain\Registries\Section\ExpansionPack\Section_Expansion_Pack_Seeder::run( $section_repo );
 
 		return new Lifecycle_Result(
 			Lifecycle_Result::STATUS_SUCCESS,
@@ -391,8 +391,8 @@ final class Lifecycle_Manager {
 			'seed_section_expansion_pack',
 			array(
 				'expansion_pack_seeded' => $result['success'],
-				'section_ids'          => $result['section_ids'],
-				'errors'               => $result['errors'],
+				'section_ids'           => $result['section_ids'],
+				'errors'                => $result['errors'],
 			)
 		);
 	}
@@ -403,7 +403,7 @@ final class Lifecycle_Manager {
 	 * @return Lifecycle_Result
 	 */
 	private function seed_section_gap_closing_batch(): Lifecycle_Result {
-		$base  = __DIR__ . '/../Domain';
+		$base = __DIR__ . '/../Domain';
 		require_once $base . '/Storage/Repositories/Repository_Interface.php';
 		require_once $base . '/Storage/Objects/Object_Status_Families.php';
 		require_once $base . '/Storage/Repositories/Abstract_CPT_Repository.php';
@@ -422,9 +422,9 @@ final class Lifecycle_Manager {
 			'seed_section_gap_closing_batch',
 			array(
 				'gap_closing_seeded' => $result['success'],
-				'section_ids'       => $result['section_ids'],
-				'errors'            => $result['errors'],
-				'section_keys'      => $result['section_keys'],
+				'section_ids'        => $result['section_ids'],
+				'errors'             => $result['errors'],
+				'section_keys'       => $result['section_keys'],
 			)
 		);
 	}
@@ -491,10 +491,10 @@ final class Lifecycle_Manager {
 			'',
 			'seed_page_gap_closing_batch',
 			array(
-				'gap_closing_seeded'   => $result['success'],
-				'page_template_ids'    => $result['page_template_ids'],
-				'errors'               => $result['errors'],
-				'template_keys'        => $result['template_keys'],
+				'gap_closing_seeded' => $result['success'],
+				'page_template_ids'  => $result['page_template_ids'],
+				'errors'             => $result['errors'],
+				'template_keys'      => $result['template_keys'],
 			)
 		);
 	}

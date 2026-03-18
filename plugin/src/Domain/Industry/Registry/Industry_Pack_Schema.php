@@ -209,7 +209,10 @@ final class Industry_Pack_Schema {
 		foreach ( self::get_required_fields() as $field ) {
 			$val = $pack[ $field ] ?? null;
 			if ( $val === null || ( is_string( $val ) && trim( $val ) === '' ) ) {
-				$errors[] = array( 'code' => 'missing_required', 'field' => $field );
+				$errors[] = array(
+					'code'  => 'missing_required',
+					'field' => $field,
+				);
 			}
 		}
 
@@ -218,10 +221,16 @@ final class Industry_Pack_Schema {
 			: '';
 		if ( $key !== '' ) {
 			if ( strlen( $key ) > self::INDUSTRY_KEY_MAX_LENGTH ) {
-				$errors[] = array( 'code' => 'industry_key_too_long', 'field' => self::FIELD_INDUSTRY_KEY );
+				$errors[] = array(
+					'code'  => 'industry_key_too_long',
+					'field' => self::FIELD_INDUSTRY_KEY,
+				);
 			}
 			if ( ! preg_match( self::INDUSTRY_KEY_PATTERN, $key ) ) {
-				$errors[] = array( 'code' => 'industry_key_invalid_pattern', 'field' => self::FIELD_INDUSTRY_KEY );
+				$errors[] = array(
+					'code'  => 'industry_key_invalid_pattern',
+					'field' => self::FIELD_INDUSTRY_KEY,
+				);
 			}
 		}
 
@@ -229,28 +238,40 @@ final class Industry_Pack_Schema {
 			? trim( $pack[ self::FIELD_NAME ] )
 			: '';
 		if ( $name !== '' && strlen( $name ) > self::NAME_MAX_LENGTH ) {
-			$errors[] = array( 'code' => 'name_too_long', 'field' => self::FIELD_NAME );
+			$errors[] = array(
+				'code'  => 'name_too_long',
+				'field' => self::FIELD_NAME,
+			);
 		}
 
 		$summary = isset( $pack[ self::FIELD_SUMMARY ] ) && is_string( $pack[ self::FIELD_SUMMARY ] )
 			? trim( $pack[ self::FIELD_SUMMARY ] )
 			: '';
 		if ( $summary !== '' && strlen( $summary ) > self::SUMMARY_MAX_LENGTH ) {
-			$errors[] = array( 'code' => 'summary_too_long', 'field' => self::FIELD_SUMMARY );
+			$errors[] = array(
+				'code'  => 'summary_too_long',
+				'field' => self::FIELD_SUMMARY,
+			);
 		}
 
 		$status = isset( $pack[ self::FIELD_STATUS ] ) && is_string( $pack[ self::FIELD_STATUS ] )
 			? $pack[ self::FIELD_STATUS ]
 			: '';
 		if ( $status !== '' && ! self::is_allowed_status( $status ) ) {
-			$errors[] = array( 'code' => 'invalid_status', 'field' => self::FIELD_STATUS );
+			$errors[] = array(
+				'code'  => 'invalid_status',
+				'field' => self::FIELD_STATUS,
+			);
 		}
 
 		$version = isset( $pack[ self::FIELD_VERSION_MARKER ] ) && is_string( $pack[ self::FIELD_VERSION_MARKER ] )
 			? trim( $pack[ self::FIELD_VERSION_MARKER ] )
 			: '';
 		if ( $version !== '' && ! self::is_supported_version( $version ) ) {
-			$errors[] = array( 'code' => 'unsupported_version', 'field' => self::FIELD_VERSION_MARKER );
+			$errors[] = array(
+				'code'  => 'unsupported_version',
+				'field' => self::FIELD_VERSION_MARKER,
+			);
 		}
 
 		return $errors;

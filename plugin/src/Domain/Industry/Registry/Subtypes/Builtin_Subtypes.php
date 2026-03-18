@@ -32,7 +32,7 @@ final class Builtin_Subtypes {
 			$dir . '/plumber-subtypes.php',
 			$dir . '/disaster-recovery-subtypes.php',
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $files as $path ) {
 			if ( ! is_readable( $path ) ) {
 				continue;

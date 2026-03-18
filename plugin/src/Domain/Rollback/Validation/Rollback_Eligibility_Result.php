@@ -73,25 +73,25 @@ final class Rollback_Eligibility_Result {
 		string $execution_ref,
 		string $message
 	) {
-		$this->is_eligible            = $is_eligible;
-		$this->blocking_reasons       = $blocking_reasons;
-		$this->warnings               = $warnings;
-		$this->required_permissions   = $required_permissions;
+		$this->is_eligible             = $is_eligible;
+		$this->blocking_reasons        = $blocking_reasons;
+		$this->warnings                = $warnings;
+		$this->required_permissions    = $required_permissions;
 		$this->target_resolution_state = $target_resolution_state;
-		$this->rollback_handler_key   = $rollback_handler_key;
+		$this->rollback_handler_key    = $rollback_handler_key;
 		$this->pre_snapshot_id         = $pre_snapshot_id;
-		$this->post_snapshot_id       = $post_snapshot_id;
-		$this->execution_ref          = $execution_ref;
-		$this->message                = $message;
+		$this->post_snapshot_id        = $post_snapshot_id;
+		$this->execution_ref           = $execution_ref;
+		$this->message                 = $message;
 	}
 
 	/**
 	 * Builds an eligible result (no blockers).
 	 *
-	 * @param string $rollback_handler_key
-	 * @param string $pre_snapshot_id
-	 * @param string $post_snapshot_id
-	 * @param string $execution_ref
+	 * @param string       $rollback_handler_key
+	 * @param string       $pre_snapshot_id
+	 * @param string       $post_snapshot_id
+	 * @param string       $execution_ref
 	 * @param list<string> $warnings Optional warnings (e.g. state_diverged).
 	 * @param list<string> $required_permissions
 	 * @return self
@@ -213,7 +213,7 @@ final class Rollback_Eligibility_Result {
 			'is_eligible'             => $this->is_eligible,
 			'blocking_reasons'        => $this->blocking_reasons,
 			'warnings'                => $this->warnings,
-			'required_permissions'   => $this->required_permissions,
+			'required_permissions'    => $this->required_permissions,
 			'target_resolution_state' => $this->target_resolution_state,
 			'rollback_handler_key'    => $this->rollback_handler_key,
 			'pre_snapshot_id'         => $this->pre_snapshot_id,

@@ -63,13 +63,13 @@ final class Template_Recommendation_Context_Builder {
 	 * @return array{template_recommendation_context: list<array<string, mixed>>, total_active: int, crawl_page_hints?: list<array<string, mixed>>, template_preference_profile?: array<string, mixed>}
 	 */
 	public function build( array $options = array() ): array {
-		$max = (int) ( $options['max_templates'] ?? self::DEFAULT_MAX_TEMPLATES );
-		$max = min( max( 1, $max ), 150 );
-		$filter_class = isset( $options['template_category_class'] ) ? (string) $options['template_category_class'] : '';
+		$max           = (int) ( $options['max_templates'] ?? self::DEFAULT_MAX_TEMPLATES );
+		$max           = min( max( 1, $max ), 150 );
+		$filter_class  = isset( $options['template_category_class'] ) ? (string) $options['template_category_class'] : '';
 		$filter_family = isset( $options['template_family'] ) ? (string) $options['template_family'] : '';
 
 		$definitions = $this->page_template_repository->list_definitions_by_status( 'active', $max * 2, 0 );
-		$list = array();
+		$list        = array();
 		foreach ( $definitions as $def ) {
 			if ( ! is_array( $def ) ) {
 				continue;
@@ -77,7 +77,7 @@ final class Template_Recommendation_Context_Builder {
 			if ( ! Deprecation_Metadata::is_eligible_for_new_use( $def ) ) {
 				continue;
 			}
-			$class = (string) ( $def['template_category_class'] ?? '' );
+			$class  = (string) ( $def['template_category_class'] ?? '' );
 			$family = (string) ( $def['template_family'] ?? '' );
 			if ( $filter_class !== '' && $class !== $filter_class ) {
 				continue;
@@ -90,9 +90,9 @@ final class Template_Recommendation_Context_Builder {
 				break;
 			}
 		}
-		$out = array(
+		$out          = array(
 			'template_recommendation_context' => $list,
-			'total_active'                   => count( $list ),
+			'total_active'                    => count( $list ),
 		);
 		$crawl_run_id = isset( $options['crawl_run_id'] ) ? (string) $options['crawl_run_id'] : '';
 		if ( $crawl_run_id !== '' && $this->crawl_snapshot_service !== null ) {
@@ -151,8 +151,8 @@ final class Template_Recommendation_Context_Builder {
 			return $this->empty_summary( $template_key );
 		}
 		$summary = $this->build_recommended_template_summary( $def );
-		$status = (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
-		$dep = $def['deprecation'] ?? array();
+		$status  = (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
+		$dep     = $def['deprecation'] ?? array();
 		if ( $status === 'deprecated' || ( ! empty( $dep['deprecated'] ) ) ) {
 			$summary['deprecation_status'] = 'deprecated';
 			$summary['deprecation_note']   = (string) ( $dep['reason'] ?? __( 'Template is deprecated.', 'aio-page-builder' ) );
@@ -170,56 +170,56 @@ final class Template_Recommendation_Context_Builder {
 	 * @return array<string, mixed>
 	 */
 	private function build_recommended_template_summary( array $def ): array {
-		$key    = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-		$name   = (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? $key );
-		$purpose = (string) ( $def[ Page_Template_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' );
-		$class  = (string) ( $def['template_category_class'] ?? '' );
-		$family = (string) ( $def['template_family'] ?? '' );
-		$arch   = (string) ( $def[ Page_Template_Schema::FIELD_ARCHETYPE ] ?? '' );
-		$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
-		$section_count = is_array( $ordered ) ? count( $ordered ) : 0;
-		$version_arr = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
-		$version = is_array( $version_arr ) && isset( $version_arr['version'] ) ? (string) $version_arr['version'] : '1';
-		$hierarchy_hints = $def['hierarchy_hints'] ?? array();
-		$hierarchy_hint = is_array( $hierarchy_hints ) && isset( $hierarchy_hints['hierarchy_role'] )
+		$key                 = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+		$name                = (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? $key );
+		$purpose             = (string) ( $def[ Page_Template_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' );
+		$class               = (string) ( $def['template_category_class'] ?? '' );
+		$family              = (string) ( $def['template_family'] ?? '' );
+		$arch                = (string) ( $def[ Page_Template_Schema::FIELD_ARCHETYPE ] ?? '' );
+		$ordered             = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+		$section_count       = is_array( $ordered ) ? count( $ordered ) : 0;
+		$version_arr         = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
+		$version             = is_array( $version_arr ) && isset( $version_arr['version'] ) ? (string) $version_arr['version'] : '1';
+		$hierarchy_hints     = $def['hierarchy_hints'] ?? array();
+		$hierarchy_hint      = is_array( $hierarchy_hints ) && isset( $hierarchy_hints['hierarchy_role'] )
 			? (string) $hierarchy_hints['hierarchy_role']
 			: ( $class !== '' ? $class : '' );
-		$cta_direction = (string) ( $def['cta_direction_summary'] ?? '' );
-		$one_pager = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? array();
+		$cta_direction       = (string) ( $def['cta_direction_summary'] ?? '' );
+		$one_pager           = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? array();
 		$one_pager_available = is_array( $one_pager ) && ( isset( $one_pager['link'] ) || isset( $one_pager['page_purpose_summary'] ) );
 
 		return array(
-			'template_key'               => $key,
-			'name'                      => $name,
-			'purpose_summary'            => $purpose,
-			'template_category_class'   => $class,
-			'template_family'           => $family,
-			'archetype'                 => $arch,
-			'hierarchy_hint'            => $hierarchy_hint,
-			'cta_direction_summary'    => $cta_direction,
-			'section_count'             => $section_count,
-			'version'                   => $version,
-			'deprecation_status'        => ( (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' ) ) === 'deprecated' ? 'deprecated' : 'active',
-			'one_pager_available'      => $one_pager_available,
+			'template_key'            => $key,
+			'name'                    => $name,
+			'purpose_summary'         => $purpose,
+			'template_category_class' => $class,
+			'template_family'         => $family,
+			'archetype'               => $arch,
+			'hierarchy_hint'          => $hierarchy_hint,
+			'cta_direction_summary'   => $cta_direction,
+			'section_count'           => $section_count,
+			'version'                 => $version,
+			'deprecation_status'      => ( (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' ) ) === 'deprecated' ? 'deprecated' : 'active',
+			'one_pager_available'     => $one_pager_available,
 		);
 	}
 
 	private function empty_summary( string $template_key = '' ): array {
 		return array(
-			'template_key'               => $template_key,
-			'name'                       => '',
-			'purpose_summary'            => '',
-			'template_category_class'   => '',
-			'template_family'           => '',
-			'archetype'                  => '',
-			'hierarchy_hint'             => '',
-			'cta_direction_summary'     => '',
-			'section_count'              => 0,
-			'version'                    => '1',
-			'deprecation_status'         => 'unknown',
-			'one_pager_available'        => false,
-			'deprecation_note'           => '',
-			'replacement_keys'           => array(),
+			'template_key'            => $template_key,
+			'name'                    => '',
+			'purpose_summary'         => '',
+			'template_category_class' => '',
+			'template_family'         => '',
+			'archetype'               => '',
+			'hierarchy_hint'          => '',
+			'cta_direction_summary'   => '',
+			'section_count'           => 0,
+			'version'                 => '1',
+			'deprecation_status'      => 'unknown',
+			'one_pager_available'     => false,
+			'deprecation_note'        => '',
+			'replacement_keys'        => array(),
 		);
 	}
 }

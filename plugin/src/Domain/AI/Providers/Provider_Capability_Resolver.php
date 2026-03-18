@@ -73,7 +73,7 @@ final class Provider_Capability_Resolver {
 		if ( ! $driver->supports_structured_output( $schema_ref ) ) {
 			return null;
 		}
-		$cap   = $driver->get_capabilities();
+		$cap    = $driver->get_capabilities();
 		$models = $cap['models'] ?? array();
 		if ( ! is_array( $models ) ) {
 			return null;

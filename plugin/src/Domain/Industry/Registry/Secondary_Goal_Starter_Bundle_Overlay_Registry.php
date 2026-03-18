@@ -36,9 +36,9 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry {
 	public const STATUS_DEPRECATED    = 'deprecated';
 
 	public const SUPPORTED_SCHEMA_VERSION = '1';
-	private const KEY_PATTERN  = '#^[a-z0-9_-]+$#';
-	private const KEY_MAX_LEN  = 64;
-	private const ALLOWED_REGIONS = array( 'section_emphasis', 'cta_posture', 'funnel_shape', 'page_family_emphasis' );
+	private const KEY_PATTERN             = '#^[a-z0-9_-]+$#';
+	private const KEY_MAX_LEN             = 64;
+	private const ALLOWED_REGIONS         = array( 'section_emphasis', 'cta_posture', 'funnel_shape', 'page_family_emphasis' );
 
 	/** @var array<string, array<string, mixed>> Composite "primary|secondary|bundle" => overlay. */
 	private array $by_composite = array();
@@ -80,20 +80,20 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry {
 			if ( $errors !== array() ) {
 				continue;
 			}
-			$primary   = \trim( (string) ( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] ?? '' ) );
-			$secondary = \trim( (string) ( $ov[ self::FIELD_SECONDARY_GOAL_KEY ] ?? '' ) );
-			$bundle    = isset( $ov[ self::FIELD_TARGET_BUNDLE_REF ] ) && \is_string( $ov[ self::FIELD_TARGET_BUNDLE_REF ] )
+			$primary      = \trim( (string) ( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] ?? '' ) );
+			$secondary    = \trim( (string) ( $ov[ self::FIELD_SECONDARY_GOAL_KEY ] ?? '' ) );
+			$bundle       = isset( $ov[ self::FIELD_TARGET_BUNDLE_REF ] ) && \is_string( $ov[ self::FIELD_TARGET_BUNDLE_REF ] )
 				? \trim( $ov[ self::FIELD_TARGET_BUNDLE_REF ] )
 				: '';
 			$key_specific = self::composite_key( $primary, $secondary, $bundle );
 			$key_any      = self::composite_key( $primary, $secondary, '' );
 			if ( ! isset( $this->by_composite[ $key_specific ] ) ) {
-				$normalized = $this->normalize_overlay( $ov );
+				$normalized                          = $this->normalize_overlay( $ov );
 				$this->by_composite[ $key_specific ] = $normalized;
-				$this->all[] = $normalized;
+				$this->all[]                         = $normalized;
 			}
 			if ( $bundle !== '' && ! isset( $this->by_composite[ $key_any ] ) ) {
-				$normalized = $this->normalize_overlay( $ov );
+				$normalized                     = $this->normalize_overlay( $ov );
 				$this->by_composite[ $key_any ] = $normalized;
 			}
 		}
@@ -180,7 +180,7 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry {
 			$errors[] = 'invalid_overlay_key';
 		}
 
-		$primary = isset( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] ) && \is_string( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] )
+		$primary   = isset( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] ) && \is_string( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] )
 			? \trim( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] )
 			: '';
 		$secondary = isset( $ov[ self::FIELD_SECONDARY_GOAL_KEY ] ) && \is_string( $ov[ self::FIELD_SECONDARY_GOAL_KEY ] )
@@ -240,10 +240,10 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry {
 	 * @return array<string, mixed>
 	 */
 	private function normalize_overlay( array $ov ): array {
-		$out = array(
+		$out                                     = array(
 			self::FIELD_OVERLAY_KEY             => \trim( (string) ( $ov[ self::FIELD_OVERLAY_KEY ] ?? '' ) ),
-			self::FIELD_PRIMARY_GOAL_KEY       => \trim( (string) ( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] ?? '' ) ),
-			self::FIELD_SECONDARY_GOAL_KEY     => \trim( (string) ( $ov[ self::FIELD_SECONDARY_GOAL_KEY ] ?? '' ) ),
+			self::FIELD_PRIMARY_GOAL_KEY        => \trim( (string) ( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] ?? '' ) ),
+			self::FIELD_SECONDARY_GOAL_KEY      => \trim( (string) ( $ov[ self::FIELD_SECONDARY_GOAL_KEY ] ?? '' ) ),
 			self::FIELD_TARGET_BUNDLE_REF       => isset( $ov[ self::FIELD_TARGET_BUNDLE_REF ] ) && \is_string( $ov[ self::FIELD_TARGET_BUNDLE_REF ] )
 				? \trim( $ov[ self::FIELD_TARGET_BUNDLE_REF ] )
 				: '',
@@ -254,13 +254,13 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry {
 			self::FIELD_STATUS                  => (string) ( $ov[ self::FIELD_STATUS ] ?? self::STATUS_ACTIVE ),
 			self::FIELD_VERSION_MARKER          => \trim( (string) ( $ov[ self::FIELD_VERSION_MARKER ] ?? self::SUPPORTED_SCHEMA_VERSION ) ),
 		);
-		$out[ self::FIELD_SECTION_EMPHASIS ] = isset( $ov[ self::FIELD_SECTION_EMPHASIS ] ) && \is_array( $ov[ self::FIELD_SECTION_EMPHASIS ] )
+		$out[ self::FIELD_SECTION_EMPHASIS ]     = isset( $ov[ self::FIELD_SECTION_EMPHASIS ] ) && \is_array( $ov[ self::FIELD_SECTION_EMPHASIS ] )
 			? array_values( array_filter( array_map( 'strval', $ov[ self::FIELD_SECTION_EMPHASIS ] ) ) )
 			: array();
-		$out[ self::FIELD_CTA_POSTURE ] = isset( $ov[ self::FIELD_CTA_POSTURE ] ) && \is_string( $ov[ self::FIELD_CTA_POSTURE ] )
+		$out[ self::FIELD_CTA_POSTURE ]          = isset( $ov[ self::FIELD_CTA_POSTURE ] ) && \is_string( $ov[ self::FIELD_CTA_POSTURE ] )
 			? \trim( \substr( $ov[ self::FIELD_CTA_POSTURE ], 0, 128 ) )
 			: '';
-		$out[ self::FIELD_FUNNEL_SHAPE ] = isset( $ov[ self::FIELD_FUNNEL_SHAPE ] ) && \is_string( $ov[ self::FIELD_FUNNEL_SHAPE ] )
+		$out[ self::FIELD_FUNNEL_SHAPE ]         = isset( $ov[ self::FIELD_FUNNEL_SHAPE ] ) && \is_string( $ov[ self::FIELD_FUNNEL_SHAPE ] )
 			? \trim( \substr( $ov[ self::FIELD_FUNNEL_SHAPE ], 0, 128 ) )
 			: '';
 		$out[ self::FIELD_PAGE_FAMILY_EMPHASIS ] = isset( $ov[ self::FIELD_PAGE_FAMILY_EMPHASIS ] ) && \is_array( $ov[ self::FIELD_PAGE_FAMILY_EMPHASIS ] )

@@ -41,7 +41,7 @@ final class Crawler_Sessions_Screen {
 	private function get_profile_label( string $profile_key ): string {
 		if ( $this->container && $this->container->has( 'crawl_profile_service' ) ) {
 			try {
-				$svc = $this->container->get( 'crawl_profile_service' );
+				$svc     = $this->container->get( 'crawl_profile_service' );
 				$payload = $svc->get_profile_payload( $profile_key );
 				return $payload['label'] ?? $profile_key;
 			} catch ( \Throwable $e ) {
@@ -77,7 +77,7 @@ final class Crawler_Sessions_Screen {
 		$sessions = array();
 		if ( $this->container && $this->container->has( 'crawl_snapshot_service' ) ) {
 			try {
-				$svc    = $this->container->get( 'crawl_snapshot_service' );
+				$svc      = $this->container->get( 'crawl_snapshot_service' );
 				$sessions = $svc->list_sessions( 50 );
 			} catch ( \Throwable $e ) {
 				$sessions = array();

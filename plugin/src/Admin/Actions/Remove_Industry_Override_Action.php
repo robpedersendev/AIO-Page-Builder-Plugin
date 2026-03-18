@@ -25,7 +25,7 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 final class Remove_Industry_Override_Action {
 
 	public const NONCE_NAME   = 'aio_remove_industry_override_nonce';
-	public const NONCE_ACTION  = 'aio_remove_industry_override';
+	public const NONCE_ACTION = 'aio_remove_industry_override';
 
 	/**
 	 * Handles POST: verify nonce and scope-specific capability, remove override, redirect.

@@ -20,10 +20,10 @@ final class Field_Blueprint_Schema {
 
 	/** Root blueprint fields (required). */
 	public const BLUEPRINT_ID    = 'blueprint_id';
-	public const SECTION_KEY    = 'section_key';
+	public const SECTION_KEY     = 'section_key';
 	public const SECTION_VERSION = 'section_version';
-	public const LABEL          = 'label';
-	public const FIELDS         = 'fields';
+	public const LABEL           = 'label';
+	public const FIELDS          = 'fields';
 
 	/** Per-field properties (required). */
 	public const FIELD_KEY   = 'key';
@@ -32,20 +32,20 @@ final class Field_Blueprint_Schema {
 	public const FIELD_TYPE  = 'type';
 
 	/** Supported ACF field types (spec §20.5, acf-field-blueprint-schema §5). */
-	public const TYPE_TEXT        = 'text';
-	public const TYPE_TEXTAREA    = 'textarea';
-	public const TYPE_NUMBER      = 'number';
-	public const TYPE_URL         = 'url';
-	public const TYPE_EMAIL       = 'email';
-	public const TYPE_WYSIWYG     = 'wysiwyg';
-	public const TYPE_IMAGE       = 'image';
-	public const TYPE_GALLERY     = 'gallery';
-	public const TYPE_LINK        = 'link';
-	public const TYPE_SELECT      = 'select';
-	public const TYPE_TRUE_FALSE  = 'true_false';
+	public const TYPE_TEXT         = 'text';
+	public const TYPE_TEXTAREA     = 'textarea';
+	public const TYPE_NUMBER       = 'number';
+	public const TYPE_URL          = 'url';
+	public const TYPE_EMAIL        = 'email';
+	public const TYPE_WYSIWYG      = 'wysiwyg';
+	public const TYPE_IMAGE        = 'image';
+	public const TYPE_GALLERY      = 'gallery';
+	public const TYPE_LINK         = 'link';
+	public const TYPE_SELECT       = 'select';
+	public const TYPE_TRUE_FALSE   = 'true_false';
 	public const TYPE_RELATIONSHIP = 'relationship';
-	public const TYPE_REPEATER    = 'repeater';
-	public const TYPE_GROUP       = 'group';
+	public const TYPE_REPEATER     = 'repeater';
+	public const TYPE_GROUP        = 'group';
 	public const TYPE_COLOR_PICKER = 'color_picker';
 
 	/** Field types that require sub_fields. */

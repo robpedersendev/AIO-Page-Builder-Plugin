@@ -48,22 +48,22 @@ final class Industry_Candidate_Template_Overlap_Analyzer {
 	 * }
 	 */
 	public function analyze( array $candidate ): array {
-		$label = isset( $candidate['candidate_industry_label'] ) && is_string( $candidate['candidate_industry_label'] )
+		$label         = isset( $candidate['candidate_industry_label'] ) && is_string( $candidate['candidate_industry_label'] )
 			? trim( $candidate['candidate_industry_label'] )
 			: '';
-		$page_families   = isset( $candidate['page_families'] ) && is_array( $candidate['page_families'] )
+		$page_families = isset( $candidate['page_families'] ) && is_array( $candidate['page_families'] )
 			? array_values( array_filter( array_map( 'trim', $candidate['page_families'] ) ) )
 			: array();
-		$section_keys    = isset( $candidate['section_keys'] ) && is_array( $candidate['section_keys'] )
+		$section_keys  = isset( $candidate['section_keys'] ) && is_array( $candidate['section_keys'] )
 			? array_values( array_filter( array_map( 'trim', $candidate['section_keys'] ) ) )
 			: array();
-		$cta_refs        = isset( $candidate['cta_pattern_refs'] ) && is_array( $candidate['cta_pattern_refs'] )
+		$cta_refs      = isset( $candidate['cta_pattern_refs'] ) && is_array( $candidate['cta_pattern_refs'] )
 			? array_values( array_filter( array_map( 'trim', $candidate['cta_pattern_refs'] ) ) )
 			: array();
-		$lpagery_ref     = isset( $candidate['lpagery_rule_ref'] ) && is_string( $candidate['lpagery_rule_ref'] )
+		$lpagery_ref   = isset( $candidate['lpagery_rule_ref'] ) && is_string( $candidate['lpagery_rule_ref'] )
 			? trim( $candidate['lpagery_rule_ref'] )
 			: '';
-		$proof_hint      = isset( $candidate['proof_model_hint'] ) && is_string( $candidate['proof_model_hint'] )
+		$proof_hint    = isset( $candidate['proof_model_hint'] ) && is_string( $candidate['proof_model_hint'] )
 			? trim( $candidate['proof_model_hint'] )
 			: '';
 
@@ -80,9 +80,9 @@ final class Industry_Candidate_Template_Overlap_Analyzer {
 					: array();
 				foreach ( $families as $f ) {
 					if ( is_string( $f ) && trim( $f ) !== '' ) {
-						$f = trim( $f );
+						$f                            = trim( $f );
 						$existing_page_families[ $f ] = true;
-						$family_pack_count[ $f ]     = ( $family_pack_count[ $f ] ?? 0 ) + 1;
+						$family_pack_count[ $f ]      = ( $family_pack_count[ $f ] ?? 0 ) + 1;
 					}
 				}
 				$pref = isset( $pack['preferred_section_keys'] ) && is_array( $pack['preferred_section_keys'] )
@@ -110,13 +110,13 @@ final class Industry_Candidate_Template_Overlap_Analyzer {
 			}
 		}
 
-		$page_overlap   = 0.0;
+		$page_overlap    = 0.0;
 		$section_overlap = 0.0;
 		if ( count( $page_families ) > 0 ) {
 			$match = 0;
 			foreach ( $page_families as $f ) {
 				if ( isset( $existing_page_families[ $f ] ) ) {
-					$match++;
+					++$match;
 				}
 			}
 			$page_overlap = $match / count( $page_families );
@@ -125,7 +125,7 @@ final class Industry_Candidate_Template_Overlap_Analyzer {
 			$match = 0;
 			foreach ( $section_keys as $s ) {
 				if ( isset( $existing_section_keys[ $s ] ) ) {
-					$match++;
+					++$match;
 				}
 			}
 			$section_overlap = $match / count( $section_keys );
@@ -134,18 +134,18 @@ final class Industry_Candidate_Template_Overlap_Analyzer {
 		$denom = 0;
 		$sum   = 0.0;
 		if ( count( $page_families ) > 0 ) {
-			$denom++;
+			++$denom;
 			$sum += $page_overlap;
 		}
 		if ( count( $section_keys ) > 0 ) {
-			$denom++;
+			++$denom;
 			$sum += $section_overlap;
 		}
 		$overlap_score = $denom > 0 ? $sum / $denom : 0.0;
 
 		// Strongest reusable: page families that appear in more than one pack (or all if single pack).
 		$strongest_reusable_families = array();
-		$min_packs = count( $this->pack_registry !== null ? $this->pack_registry->get_all() : array() ) > 1 ? 2 : 1;
+		$min_packs                   = count( $this->pack_registry !== null ? $this->pack_registry->get_all() : array() ) > 1 ? 2 : 1;
 		foreach ( array_keys( $family_pack_count ) as $f ) {
 			if ( ( $family_pack_count[ $f ] ?? 0 ) >= $min_packs ) {
 				$strongest_reusable_families[] = $f;
@@ -188,11 +188,11 @@ final class Industry_Candidate_Template_Overlap_Analyzer {
 		}
 
 		return array(
-			'candidate_industry_label'       => $label,
-			'overlap_score'                  => round( $overlap_score, 4 ),
-			'strongest_reusable_families'    => $strongest_reusable_families,
-			'weak_coverage_families'         => $weak_coverage_families,
-			'notes'                          => $notes,
+			'candidate_industry_label'    => $label,
+			'overlap_score'               => round( $overlap_score, 4 ),
+			'strongest_reusable_families' => $strongest_reusable_families,
+			'weak_coverage_families'      => $weak_coverage_families,
+			'notes'                       => $notes,
 		);
 	}
 }

@@ -34,7 +34,7 @@ final class Nested_Hub_Page_Template_Seeder {
 		foreach ( Nested_Hub_Page_Template_Definitions::all_definitions() as $definition ) {
 			$id = $page_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
-				$key = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
+				$key      = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
 				$errors[] = sprintf( __( 'Failed to save page template: %s', 'aio-page-builder' ), $key );
 				continue;
 			}

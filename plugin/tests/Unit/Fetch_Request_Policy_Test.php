@@ -34,7 +34,7 @@ final class Fetch_Request_Policy_Test extends TestCase {
 	}
 
 	public function test_request_headers_contain_only_user_agent(): void {
-		$policy = new Fetch_Request_Policy( 8, 250, 3, 'Crawler/1' );
+		$policy  = new Fetch_Request_Policy( 8, 250, 3, 'Crawler/1' );
 		$headers = $policy->get_request_headers();
 		$this->assertCount( 1, $headers );
 		$this->assertArrayHasKey( 'User-Agent', $headers );

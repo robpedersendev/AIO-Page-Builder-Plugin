@@ -55,8 +55,8 @@ final class Single_Action_Executor {
 		?callable $lock_release = null,
 		?callable $post_capture_snapshot = null
 	) {
-		$this->dispatcher  = $dispatcher;
-		$this->plan_state  = $plan_state;
+		$this->dispatcher            = $dispatcher;
+		$this->plan_state            = $plan_state;
 		$this->capability_checker    = $capability_checker ?? array( $this, 'default_capability_check' );
 		$this->snapshot_preflight    = $snapshot_preflight ?? array( $this, 'default_snapshot_preflight' );
 		$this->lock_acquire          = $lock_acquire ?? array( $this, 'default_lock_acquire' );
@@ -71,9 +71,9 @@ final class Single_Action_Executor {
 	 * @return Execution_Result
 	 */
 	public function execute( array $envelope ): Execution_Result {
-		$action_id   = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] : '';
-		$action_type = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] : '';
-		$plan_id     = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] : '';
+		$action_id    = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] : '';
+		$action_type  = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] : '';
+		$plan_id      = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] : '';
 		$plan_item_id = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) ? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] : '';
 
 		$shape_errors = Execution_Action_Contract::validate_envelope_shape( $envelope );
@@ -117,8 +117,8 @@ final class Single_Action_Executor {
 		if ( $snapshot_required && $snapshot_ref === '' ) {
 			$preflight_ref = ( $this->snapshot_preflight )( $envelope );
 			if ( $preflight_ref !== null && $preflight_ref !== '' ) {
-				$snapshot_ref = $preflight_ref;
-				$envelope['snapshot_ref'] = $snapshot_ref;
+				$snapshot_ref                            = $preflight_ref;
+				$envelope['snapshot_ref']                = $snapshot_ref;
 				$envelope['operational_pre_snapshot_id'] = $snapshot_ref;
 			}
 			// * Fail safely: if preflight returns null (e.g. capture failed), log and proceed without blocking execution (spec §41.2, Prompt 087).
@@ -143,19 +143,27 @@ final class Single_Action_Executor {
 					if ( $step_index !== null ) {
 						$artifacts = isset( $handler_result['artifacts'] ) && is_array( $handler_result['artifacts'] ) ? $handler_result['artifacts'] : null;
 						$this->plan_state->update_plan_item_status( $plan_post_id, $step_index, $plan_item_id, Build_Plan_Item_Statuses::COMPLETED, $artifacts );
-						$build_plan_updates = array( 'plan_id' => $plan_id, 'plan_item_id' => $plan_item_id, 'item_status' => Build_Plan_Item_Statuses::COMPLETED );
+						$build_plan_updates = array(
+							'plan_id'      => $plan_id,
+							'plan_item_id' => $plan_item_id,
+							'item_status'  => Build_Plan_Item_Statuses::COMPLETED,
+						);
 					}
 				}
 				return Execution_Result::completed( $action_id, $action_type, $handler_result, $snapshot_ref, $build_plan_updates, array(), '' );
 			}
 
-			$message = isset( $handler_result['message'] ) && is_string( $handler_result['message'] ) ? $handler_result['message'] : __( 'Handler reported failure.', 'aio-page-builder' );
+			$message            = isset( $handler_result['message'] ) && is_string( $handler_result['message'] ) ? $handler_result['message'] : __( 'Handler reported failure.', 'aio-page-builder' );
 			$build_plan_updates = array();
 			if ( $plan_item_id !== '' ) {
 				$step_index = $this->plan_state->find_step_index_for_item( $definition, $plan_item_id );
 				if ( $step_index !== null ) {
 					$this->plan_state->update_plan_item_status( $plan_post_id, $step_index, $plan_item_id, Build_Plan_Item_Statuses::FAILED );
-					$build_plan_updates = array( 'plan_id' => $plan_id, 'plan_item_id' => $plan_item_id, 'item_status' => Build_Plan_Item_Statuses::FAILED );
+					$build_plan_updates = array(
+						'plan_id'      => $plan_id,
+						'plan_item_id' => $plan_item_id,
+						'item_status'  => Build_Plan_Item_Statuses::FAILED,
+					);
 				}
 			}
 			return Execution_Result::failed( $action_id, $action_type, Execution_Action_Contract::ERROR_EXECUTION_FAILED, $message, $handler_result, $build_plan_updates, '' );
@@ -165,7 +173,11 @@ final class Single_Action_Executor {
 				$step_index = $this->plan_state->find_step_index_for_item( $definition, $plan_item_id );
 				if ( $step_index !== null ) {
 					$this->plan_state->update_plan_item_status( $plan_post_id, $step_index, $plan_item_id, Build_Plan_Item_Statuses::FAILED );
-					$build_plan_updates = array( 'plan_id' => $plan_id, 'plan_item_id' => $plan_item_id, 'item_status' => Build_Plan_Item_Statuses::FAILED );
+					$build_plan_updates = array(
+						'plan_id'      => $plan_id,
+						'plan_item_id' => $plan_item_id,
+						'item_status'  => Build_Plan_Item_Statuses::FAILED,
+					);
 				}
 			}
 			return Execution_Result::failed( $action_id, $action_type, Execution_Action_Contract::ERROR_EXECUTION_FAILED, $e->getMessage(), array(), $build_plan_updates, '' );
@@ -225,10 +237,10 @@ final class Single_Action_Executor {
 	 * @return array<int, string>
 	 */
 	private function scope_keys_for_envelope( array $envelope ): array {
-		$action_id   = $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ?? '';
-		$plan_id     = $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ?? '';
+		$action_id    = $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_ID ] ?? '';
+		$plan_id      = $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ?? '';
 		$plan_item_id = $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ?? '';
-		$keys = array();
+		$keys         = array();
 		if ( is_string( $action_id ) && $action_id !== '' ) {
 			$keys[] = 'action:' . $action_id;
 		}

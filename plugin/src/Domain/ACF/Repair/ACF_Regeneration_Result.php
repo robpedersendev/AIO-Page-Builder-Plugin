@@ -54,14 +54,14 @@ final class ACF_Regeneration_Result {
 	private array $page_assignment_repair_summary;
 
 	/**
-	 * @param int   $groups_regenerated
-	 * @param list<string> $groups_skipped
-	 * @param int   $page_assignments_repaired
-	 * @param int   $page_assignments_failed
-	 * @param list<string> $warnings
-	 * @param list<string> $errors
+	 * @param int                                                      $groups_regenerated
+	 * @param list<string>                                             $groups_skipped
+	 * @param int                                                      $page_assignments_repaired
+	 * @param int                                                      $page_assignments_failed
+	 * @param list<string>                                             $warnings
+	 * @param list<string>                                             $errors
 	 * @param array{ missing: int, version_stale: int, repaired: int } $field_group_mismatch_summary
-	 * @param array{ repaired: int, failed: int, skipped: int }         $page_assignment_repair_summary
+	 * @param array{ repaired: int, failed: int, skipped: int }        $page_assignment_repair_summary
 	 */
 	public function __construct(
 		int $groups_regenerated,
@@ -73,13 +73,13 @@ final class ACF_Regeneration_Result {
 		array $field_group_mismatch_summary,
 		array $page_assignment_repair_summary
 	) {
-		$this->groups_regenerated            = $groups_regenerated;
+		$this->groups_regenerated             = $groups_regenerated;
 		$this->groups_skipped                 = $groups_skipped;
-		$this->page_assignments_repaired     = $page_assignments_repaired;
-		$this->page_assignments_failed       = $page_assignments_failed;
-		$this->warnings                      = $warnings;
-		$this->errors                        = $errors;
-		$this->field_group_mismatch_summary  = $field_group_mismatch_summary;
+		$this->page_assignments_repaired      = $page_assignments_repaired;
+		$this->page_assignments_failed        = $page_assignments_failed;
+		$this->warnings                       = $warnings;
+		$this->errors                         = $errors;
+		$this->field_group_mismatch_summary   = $field_group_mismatch_summary;
 		$this->page_assignment_repair_summary = $page_assignment_repair_summary;
 	}
 

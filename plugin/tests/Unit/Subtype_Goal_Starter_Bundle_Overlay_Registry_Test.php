@@ -43,16 +43,18 @@ final class Subtype_Goal_Starter_Bundle_Overlay_Registry_Test extends TestCase {
 
 	public function test_invalid_overlay_skipped_at_load(): void {
 		$registry = new Subtype_Goal_Starter_Bundle_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_OVERLAY_KEY             => 'bad_goal',
-				Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_SUBTYPE_KEY             => 'realtor_buyer_agent',
-				Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_GOAL_KEY                => 'invalid_goal',
-				Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_ALLOWED_OVERLAY_REGIONS => array( 'section_emphasis' ),
-				Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_STATUS                  => Subtype_Goal_Starter_Bundle_Overlay_Registry::STATUS_ACTIVE,
-				Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_VERSION_MARKER          => Subtype_Goal_Starter_Bundle_Overlay_Registry::SUPPORTED_SCHEMA_VERSION,
-			),
-		) );
+				array(
+					Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_OVERLAY_KEY             => 'bad_goal',
+					Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_SUBTYPE_KEY             => 'realtor_buyer_agent',
+					Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_GOAL_KEY                => 'invalid_goal',
+					Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_ALLOWED_OVERLAY_REGIONS => array( 'section_emphasis' ),
+					Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_STATUS                  => Subtype_Goal_Starter_Bundle_Overlay_Registry::STATUS_ACTIVE,
+					Subtype_Goal_Starter_Bundle_Overlay_Registry::FIELD_VERSION_MARKER          => Subtype_Goal_Starter_Bundle_Overlay_Registry::SUPPORTED_SCHEMA_VERSION,
+				),
+			)
+		);
 		$this->assertEmpty( $registry->list_all() );
 	}
 

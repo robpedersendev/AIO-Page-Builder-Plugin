@@ -49,10 +49,10 @@ final class Industry_Performance_Benchmark_Service {
 	 * @return array<string, array{iterations: int, total_ms: float, mean_ms: float, skipped: bool}>
 	 */
 	public function run_benchmark( int $iterations = self::DEFAULT_ITERATIONS ): array {
-		$iterations = max( 1, min( 20, $iterations ) );
-		$out = array();
+		$iterations                              = max( 1, min( 20, $iterations ) );
+		$out                                     = array();
 		$out[ self::SCENARIO_SECTION_PREVIEW ]   = $this->run_section_preview( $iterations );
-		$out[ self::SCENARIO_PAGE_PREVIEW ]     = $this->run_page_preview( $iterations );
+		$out[ self::SCENARIO_PAGE_PREVIEW ]      = $this->run_page_preview( $iterations );
 		$out[ self::SCENARIO_BUNDLE_COMPARISON ] = $this->run_bundle_comparison( $iterations );
 		$out[ self::SCENARIO_HEALTH_CHECK ]      = $this->run_health_check( $iterations );
 		return $out;
@@ -64,16 +64,26 @@ final class Industry_Performance_Benchmark_Service {
 	 */
 	private function run_section_preview( int $n ): array {
 		if ( $this->container === null || ! $this->container->has( 'industry_section_preview_resolver' ) ) {
-			return array( 'iterations' => 0, 'total_ms' => 0.0, 'mean_ms' => 0.0, 'skipped' => true );
+			return array(
+				'iterations' => 0,
+				'total_ms'   => 0.0,
+				'mean_ms'    => 0.0,
+				'skipped'    => true,
+			);
 		}
-		$resolver = $this->container->get( 'industry_section_preview_resolver' );
+		$resolver   = $this->container->get( 'industry_section_preview_resolver' );
 		$definition = array( 'internal_key' => 'hero_cred_01' );
-		$start = microtime( true );
+		$start      = microtime( true );
 		for ( $i = 0; $i < $n; $i++ ) {
 			$resolver->resolve( 'hero_cred_01', $definition, array() );
 		}
 		$total_ms = ( microtime( true ) - $start ) * 1000;
-		return array( 'iterations' => $n, 'total_ms' => round( $total_ms, 2 ), 'mean_ms' => round( $total_ms / $n, 2 ), 'skipped' => false );
+		return array(
+			'iterations' => $n,
+			'total_ms'   => round( $total_ms, 2 ),
+			'mean_ms'    => round( $total_ms / $n, 2 ),
+			'skipped'    => false,
+		);
 	}
 
 	/**
@@ -82,16 +92,26 @@ final class Industry_Performance_Benchmark_Service {
 	 */
 	private function run_page_preview( int $n ): array {
 		if ( $this->container === null || ! $this->container->has( 'industry_page_template_preview_resolver' ) ) {
-			return array( 'iterations' => 0, 'total_ms' => 0.0, 'mean_ms' => 0.0, 'skipped' => true );
+			return array(
+				'iterations' => 0,
+				'total_ms'   => 0.0,
+				'mean_ms'    => 0.0,
+				'skipped'    => true,
+			);
 		}
-		$resolver = $this->container->get( 'industry_page_template_preview_resolver' );
+		$resolver   = $this->container->get( 'industry_page_template_preview_resolver' );
 		$definition = array( 'internal_key' => 'pt_home_trust_01' );
-		$start = microtime( true );
+		$start      = microtime( true );
 		for ( $i = 0; $i < $n; $i++ ) {
 			$resolver->resolve( 'pt_home_trust_01', $definition, array() );
 		}
 		$total_ms = ( microtime( true ) - $start ) * 1000;
-		return array( 'iterations' => $n, 'total_ms' => round( $total_ms, 2 ), 'mean_ms' => round( $total_ms / $n, 2 ), 'skipped' => false );
+		return array(
+			'iterations' => $n,
+			'total_ms'   => round( $total_ms, 2 ),
+			'mean_ms'    => round( $total_ms / $n, 2 ),
+			'skipped'    => false,
+		);
 	}
 
 	/**
@@ -100,15 +120,25 @@ final class Industry_Performance_Benchmark_Service {
 	 */
 	private function run_bundle_comparison( int $n ): array {
 		if ( $this->container === null || ! $this->container->has( 'industry_starter_bundle_diff_service' ) ) {
-			return array( 'iterations' => 0, 'total_ms' => 0.0, 'mean_ms' => 0.0, 'skipped' => true );
+			return array(
+				'iterations' => 0,
+				'total_ms'   => 0.0,
+				'mean_ms'    => 0.0,
+				'skipped'    => true,
+			);
 		}
 		$service = $this->container->get( 'industry_starter_bundle_diff_service' );
-		$start = microtime( true );
+		$start   = microtime( true );
 		for ( $i = 0; $i < $n; $i++ ) {
 			$service->compare( array( 'plumber_starter', 'plumber_residential_starter' ) );
 		}
 		$total_ms = ( microtime( true ) - $start ) * 1000;
-		return array( 'iterations' => $n, 'total_ms' => round( $total_ms, 2 ), 'mean_ms' => round( $total_ms / $n, 2 ), 'skipped' => false );
+		return array(
+			'iterations' => $n,
+			'total_ms'   => round( $total_ms, 2 ),
+			'mean_ms'    => round( $total_ms / $n, 2 ),
+			'skipped'    => false,
+		);
 	}
 
 	/**
@@ -117,14 +147,24 @@ final class Industry_Performance_Benchmark_Service {
 	 */
 	private function run_health_check( int $n ): array {
 		if ( $this->container === null || ! $this->container->has( 'industry_health_check_service' ) ) {
-			return array( 'iterations' => 0, 'total_ms' => 0.0, 'mean_ms' => 0.0, 'skipped' => true );
+			return array(
+				'iterations' => 0,
+				'total_ms'   => 0.0,
+				'mean_ms'    => 0.0,
+				'skipped'    => true,
+			);
 		}
 		$service = $this->container->get( 'industry_health_check_service' );
-		$start = microtime( true );
+		$start   = microtime( true );
 		for ( $i = 0; $i < $n; $i++ ) {
 			$service->run();
 		}
 		$total_ms = ( microtime( true ) - $start ) * 1000;
-		return array( 'iterations' => $n, 'total_ms' => round( $total_ms, 2 ), 'mean_ms' => round( $total_ms / $n, 2 ), 'skipped' => false );
+		return array(
+			'iterations' => $n,
+			'total_ms'   => round( $total_ms, 2 ),
+			'mean_ms'    => round( $total_ms / $n, 2 ),
+			'skipped'    => false,
+		);
 	}
 }

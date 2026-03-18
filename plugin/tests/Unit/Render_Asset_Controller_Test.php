@@ -25,9 +25,17 @@ final class Render_Asset_Controller_Test extends TestCase {
 
 	private function section_result( string $key, array $asset_hints = array() ): Section_Render_Result {
 		$structure = array(
-			'wrapper_attrs'       => array( 'class' => array( 'aio-s-' . $key ), 'id' => '', 'data_attributes' => array() ),
-			'selector_map'       => array( 'wrapper_class' => 'aio-s-' . $key, 'inner_class' => '', 'element_classes' => array() ),
-			'structural_nodes'   => array(),
+			'wrapper_attrs'       => array(
+				'class'           => array( 'aio-s-' . $key ),
+				'id'              => '',
+				'data_attributes' => array(),
+			),
+			'selector_map'        => array(
+				'wrapper_class'   => 'aio-s-' . $key,
+				'inner_class'     => '',
+				'element_classes' => array(),
+			),
+			'structural_nodes'    => array(),
 			'structural_hint'     => '',
 			'asset_hints'         => $asset_hints,
 			'accessibility_notes' => array(),
@@ -53,12 +61,18 @@ final class Render_Asset_Controller_Test extends TestCase {
 	}
 
 	public function test_get_requirements_from_assembly(): void {
-		$assembly = new Page_Block_Assembly_Result(
+		$assembly   = new Page_Block_Assembly_Result(
 			'page_template',
 			'tpl_landing',
 			array(
-				array( 'section_key' => 'st01_hero', 'asset_hints' => array( 'none' => true ) ),
-				array( 'section_key' => 'st02_cta', 'asset_hints' => array() ),
+				array(
+					'section_key' => 'st01_hero',
+					'asset_hints' => array( 'none' => true ),
+				),
+				array(
+					'section_key' => 'st02_cta',
+					'asset_hints' => array(),
+				),
 			),
 			'',
 			array(),
@@ -75,8 +89,8 @@ final class Render_Asset_Controller_Test extends TestCase {
 	}
 
 	public function test_summarize_requirements_example_asset_summary(): void {
-		$req1 = new Render_Asset_Requirements( 'aio-render-section-st01_hero', 'st01_hero', Render_Asset_Requirements::SCOPE_FRONTEND, array( 'none' => true ) );
-		$req2 = new Render_Asset_Requirements( 'aio-render-section-st02_cta', 'st02_cta', Render_Asset_Requirements::SCOPE_FRONTEND, array( 'frontend_css' => true ) );
+		$req1       = new Render_Asset_Requirements( 'aio-render-section-st01_hero', 'st01_hero', Render_Asset_Requirements::SCOPE_FRONTEND, array( 'none' => true ) );
+		$req2       = new Render_Asset_Requirements( 'aio-render-section-st02_cta', 'st02_cta', Render_Asset_Requirements::SCOPE_FRONTEND, array( 'frontend_css' => true ) );
 		$controller = new Render_Asset_Controller();
 
 		$summary = $controller->summarize_requirements( array( $req1, $req2 ) );
@@ -100,7 +114,7 @@ final class Render_Asset_Controller_Test extends TestCase {
 
 	public function test_apply_preview_asset_budget_list_caps_handles(): void {
 		$controller = new Render_Asset_Controller();
-		$reqs = array();
+		$reqs       = array();
 		for ( $i = 0; $i < 20; $i++ ) {
 			$reqs[] = new Render_Asset_Requirements( 'handle-' . $i, 'st_' . $i, Render_Asset_Requirements::SCOPE_FRONTEND, array() );
 		}
@@ -111,7 +125,7 @@ final class Render_Asset_Controller_Test extends TestCase {
 
 	public function test_apply_preview_asset_budget_detail_caps_handles(): void {
 		$controller = new Render_Asset_Controller();
-		$reqs = array();
+		$reqs       = array();
 		for ( $i = 0; $i < 100; $i++ ) {
 			$reqs[] = new Render_Asset_Requirements( 'handle-' . $i, 'st_' . $i, Render_Asset_Requirements::SCOPE_FRONTEND, array() );
 		}
@@ -122,12 +136,12 @@ final class Render_Asset_Controller_Test extends TestCase {
 
 	public function test_apply_preview_asset_budget_custom_max_handles(): void {
 		$controller = new Render_Asset_Controller();
-		$reqs = array(
+		$reqs       = array(
 			new Render_Asset_Requirements( 'h1', 'st1', Render_Asset_Requirements::SCOPE_FRONTEND, array() ),
 			new Render_Asset_Requirements( 'h2', 'st2', Render_Asset_Requirements::SCOPE_FRONTEND, array() ),
 			new Render_Asset_Requirements( 'h3', 'st3', Render_Asset_Requirements::SCOPE_FRONTEND, array() ),
 		);
-		$trimmed = $controller->apply_preview_asset_budget( $reqs, Render_Asset_Controller::PREVIEW_CONTEXT_DETAIL, 2 );
+		$trimmed    = $controller->apply_preview_asset_budget( $reqs, Render_Asset_Controller::PREVIEW_CONTEXT_DETAIL, 2 );
 		$this->assertCount( 2, $trimmed );
 		$this->assertSame( 'h1', $trimmed[0]->get_handle() );
 		$this->assertSame( 'h2', $trimmed[1]->get_handle() );

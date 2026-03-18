@@ -34,8 +34,8 @@ final class Styles_JSON_Sanitizer_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$plugin_root   = dirname( __DIR__, 2 );
-		$loader        = new Style_Spec_Loader( $plugin_root . '/specs/' );
+		$plugin_root              = dirname( __DIR__, 2 );
+		$loader                   = new Style_Spec_Loader( $plugin_root . '/specs/' );
 		$this->token_registry     = new Style_Token_Registry( $loader );
 		$this->component_registry = new Component_Override_Registry( $loader );
 		$this->normalizer         = new Styles_JSON_Normalizer();
@@ -43,7 +43,12 @@ final class Styles_JSON_Sanitizer_Test extends TestCase {
 	}
 
 	public function test_valid_global_tokens_pass(): void {
-		$normalized = array( 'color' => array( 'primary' => '#0a0a0a', 'surface' => '#ffffff' ) );
+		$normalized = array(
+			'color' => array(
+				'primary' => '#0a0a0a',
+				'surface' => '#ffffff',
+			),
+		);
 		$result     = $this->sanitizer->sanitize_global_tokens( $normalized );
 		$this->assertTrue( $result->is_valid() );
 		$this->assertSame( array(), $result->get_errors() );
@@ -103,7 +108,7 @@ final class Styles_JSON_Sanitizer_Test extends TestCase {
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'primary' => '#111' ) ),
 			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => array( 'card' => array( '--aio-color-surface' => '#f5f5f5' ) ),
 		);
-		$result = $this->sanitizer->sanitize_entity_payload( $normalized );
+		$result     = $this->sanitizer->sanitize_entity_payload( $normalized );
 		$this->assertTrue( $result->is_valid() );
 		$this->assertArrayHasKey( Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES, $result->get_sanitized() );
 		$this->assertArrayHasKey( Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES, $result->get_sanitized() );
@@ -124,7 +129,7 @@ final class Styles_JSON_Sanitizer_Test extends TestCase {
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'primary' => 'url(javascript:alert(1))' ) ),
 			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => array(),
 		);
-		$result = $this->sanitizer->sanitize_entity_payload( $normalized );
+		$result     = $this->sanitizer->sanitize_entity_payload( $normalized );
 		$this->assertFalse( $result->is_valid(), 'Entity payload with prohibited value must be rejected.' );
 		$this->assertNotEmpty( $result->get_errors() );
 	}

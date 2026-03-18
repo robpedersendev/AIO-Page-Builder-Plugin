@@ -25,30 +25,39 @@ final class ACF_Diagnostics_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'acf_diagnostics_service', function () use ( $container ): ACF_Diagnostics_Service {
-			return new ACF_Diagnostics_Service(
-				$container->get( 'section_field_blueprint_service' ),
-				$container->get( 'acf_group_registrar' ),
-				$container->get( 'page_field_group_assignment_service' ),
-				$container->get( 'assignment_map_service' ),
-				$container->get( 'field_cleanup_advisor' ),
-				$container->get( 'logger' )
-			);
-		} );
+		$container->register(
+			'acf_diagnostics_service',
+			function () use ( $container ): ACF_Diagnostics_Service {
+				return new ACF_Diagnostics_Service(
+					$container->get( 'section_field_blueprint_service' ),
+					$container->get( 'acf_group_registrar' ),
+					$container->get( 'page_field_group_assignment_service' ),
+					$container->get( 'assignment_map_service' ),
+					$container->get( 'field_cleanup_advisor' ),
+					$container->get( 'logger' )
+				);
+			}
+		);
 
-		$container->register( 'acf_diagnostics_state_builder', function () use ( $container ): ACF_Diagnostics_State_Builder {
-			$lpagery = $container->has( 'library_lpagery_compatibility_service' )
+		$container->register(
+			'acf_diagnostics_state_builder',
+			function () use ( $container ): ACF_Diagnostics_State_Builder {
+				$lpagery = $container->has( 'library_lpagery_compatibility_service' )
 				? $container->get( 'library_lpagery_compatibility_service' )
 				: null;
-			return new ACF_Diagnostics_State_Builder(
-				$container->get( 'acf_diagnostics_service' ),
-				$container->get( 'acf_regeneration_service' ),
-				$lpagery
-			);
-		} );
+				return new ACF_Diagnostics_State_Builder(
+					$container->get( 'acf_diagnostics_service' ),
+					$container->get( 'acf_regeneration_service' ),
+					$lpagery
+				);
+			}
+		);
 
-		$container->register( 'acf_fixture_builder', function (): ACF_Fixture_Builder {
-			return new ACF_Fixture_Builder();
-		} );
+		$container->register(
+			'acf_fixture_builder',
+			function (): ACF_Fixture_Builder {
+				return new ACF_Fixture_Builder();
+			}
+		);
 	}
 }

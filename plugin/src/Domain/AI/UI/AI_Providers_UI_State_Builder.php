@@ -50,10 +50,10 @@ final class AI_Providers_UI_State_Builder {
 		Service_Container $container
 	) {
 		$this->connection_test_service = $connection_test_service;
-		$this->secret_store           = $secret_store;
-		$this->capability_resolver    = $capability_resolver;
-		$this->settings               = $settings;
-		$this->container              = $container;
+		$this->secret_store            = $secret_store;
+		$this->capability_resolver     = $capability_resolver;
+		$this->settings                = $settings;
+		$this->container               = $container;
 	}
 
 	/**
@@ -62,17 +62,17 @@ final class AI_Providers_UI_State_Builder {
 	 * @return array{provider_rows: list<array>, disclosure_blocks: list<array>, ai_runs_url: string}
 	 */
 	public function build(): array {
-		$provider_ids = $this->get_known_provider_ids();
+		$provider_ids  = $this->get_known_provider_ids();
 		$provider_rows = array();
 		foreach ( $provider_ids as $provider_id ) {
 			$provider_rows[] = $this->build_provider_row( $provider_id );
 		}
 		$disclosure_blocks = $this->build_disclosure_blocks();
-		$ai_runs_url = \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs' ), \admin_url( 'admin.php' ) );
+		$ai_runs_url       = \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs' ), \admin_url( 'admin.php' ) );
 		return array(
-			'provider_rows'    => $provider_rows,
+			'provider_rows'     => $provider_rows,
 			'disclosure_blocks' => $disclosure_blocks,
-			'ai_runs_url'      => $ai_runs_url,
+			'ai_runs_url'       => $ai_runs_url,
 		);
 	}
 
@@ -80,7 +80,7 @@ final class AI_Providers_UI_State_Builder {
 	 * @return list<string>
 	 */
 	private function get_known_provider_ids(): array {
-		$config = $this->settings->get( Option_Names::PROVIDER_CONFIG_REF );
+		$config      = $this->settings->get( Option_Names::PROVIDER_CONFIG_REF );
 		$from_config = array();
 		if ( isset( $config['providers'] ) && is_array( $config['providers'] ) ) {
 			foreach ( $config['providers'] as $p ) {
@@ -102,18 +102,18 @@ final class AI_Providers_UI_State_Builder {
 	 * @return array{provider_id: string, label: string, credential_status: array, model_default_state: array, connection_test_summary: array|null, last_successful_use: string|null}
 	 */
 	private function build_provider_row( string $provider_id ): array {
-		$credential_status = $this->build_credential_status( $provider_id );
-		$model_default_state = $this->build_model_default_state( $provider_id );
+		$credential_status       = $this->build_credential_status( $provider_id );
+		$model_default_state     = $this->build_model_default_state( $provider_id );
 		$connection_test_summary = $this->build_connection_test_summary( $provider_id );
-		$last_successful_use = $this->connection_test_service->get_last_successful_use( $provider_id );
-		$label = $this->get_provider_label( $provider_id );
+		$last_successful_use     = $this->connection_test_service->get_last_successful_use( $provider_id );
+		$label                   = $this->get_provider_label( $provider_id );
 		return array(
 			'provider_id'             => $provider_id,
 			'label'                   => $label,
 			'credential_status'       => $credential_status,
 			'model_default_state'     => $model_default_state,
 			'connection_test_summary' => $connection_test_summary,
-			'last_successful_use'      => $last_successful_use,
+			'last_successful_use'     => $last_successful_use,
 		);
 	}
 
@@ -137,14 +137,17 @@ final class AI_Providers_UI_State_Builder {
 	private function build_model_default_state( string $provider_id ): array {
 		$driver = $this->get_driver_for_provider( $provider_id );
 		if ( $driver === null ) {
-			return array( 'model_id' => null, 'label' => __( '—', 'aio-page-builder' ) );
+			return array(
+				'model_id' => null,
+				'label'    => __( '—', 'aio-page-builder' ),
+			);
 		}
 		$schema_ref = Build_Plan_Draft_Schema::SCHEMA_REF;
-		$model_id = $this->capability_resolver->resolve_default_model_for_planning( $driver, $schema_ref );
-		$label = $model_id !== null && $model_id !== '' ? $model_id : __( 'No default', 'aio-page-builder' );
+		$model_id   = $this->capability_resolver->resolve_default_model_for_planning( $driver, $schema_ref );
+		$label      = $model_id !== null && $model_id !== '' ? $model_id : __( 'No default', 'aio-page-builder' );
 		return array(
 			'model_id' => $model_id,
-			'label'   => $label,
+			'label'    => $label,
 		);
 	}
 
@@ -181,18 +184,18 @@ final class AI_Providers_UI_State_Builder {
 
 	private function get_provider_label( string $provider_id ): string {
 		$labels = array(
-			'openai'     => 'OpenAI',
-			'anthropic'  => 'Anthropic',
+			'openai'    => 'OpenAI',
+			'anthropic' => 'Anthropic',
 		);
 		return $labels[ $provider_id ] ?? $provider_id;
 	}
 
 	private function get_credential_state_label( string $state ): string {
 		$labels = array(
-			Provider_Secret_Store_Interface::STATE_ABSENT             => __( 'Not configured', 'aio-page-builder' ),
-			Provider_Secret_Store_Interface::STATE_CONFIGURED       => __( 'Configured', 'aio-page-builder' ),
-			Provider_Secret_Store_Interface::STATE_INVALID           => __( 'Invalid', 'aio-page-builder' ),
-			Provider_Secret_Store_Interface::STATE_ROTATED           => __( 'Rotated', 'aio-page-builder' ),
+			Provider_Secret_Store_Interface::STATE_ABSENT  => __( 'Not configured', 'aio-page-builder' ),
+			Provider_Secret_Store_Interface::STATE_CONFIGURED => __( 'Configured', 'aio-page-builder' ),
+			Provider_Secret_Store_Interface::STATE_INVALID => __( 'Invalid', 'aio-page-builder' ),
+			Provider_Secret_Store_Interface::STATE_ROTATED => __( 'Rotated', 'aio-page-builder' ),
 			Provider_Secret_Store_Interface::STATE_PENDING_VALIDATION => __( 'Pending validation', 'aio-page-builder' ),
 		);
 		return $labels[ $state ] ?? $state;

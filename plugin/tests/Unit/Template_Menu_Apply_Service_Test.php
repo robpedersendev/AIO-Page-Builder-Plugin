@@ -38,16 +38,22 @@ final class Template_Menu_Apply_Service_Test extends TestCase {
 			$registered = array();
 		}
 		// Use a location slug that is unlikely to be registered (e.g. custom context that maps to unknown slug).
-		$service = new Template_Menu_Apply_Service( new Menu_Change_Job_Service() );
+		$service  = new Template_Menu_Apply_Service( new Menu_Change_Job_Service() );
 		$envelope = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
 				'menu_context' => 'header',
 				'action'       => 'update_existing',
-				'items'        => array( array( 'title' => 'A', 'object_id' => 1, 'page_class' => 'top_level' ) ),
+				'items'        => array(
+					array(
+						'title'      => 'A',
+						'object_id'  => 1,
+						'page_class' => 'top_level',
+					),
+				),
 			),
 		);
 		// If primary is not registered, we get failure with missing_location in validation result.
-		$result = $service->apply( $envelope );
+		$result     = $service->apply( $envelope );
 		$validation = $result->get_validation_result();
 		$this->assertArrayHasKey( 'location_slug', $validation );
 		$this->assertArrayHasKey( 'missing_location', $validation );
@@ -60,9 +66,17 @@ final class Template_Menu_Apply_Service_Test extends TestCase {
 
 	/** Hierarchy summary and per_item_status are present on result. */
 	public function test_result_includes_navigation_hierarchy_summary_and_per_item_status(): void {
-		$validation = array( 'valid' => false, 'location_slug' => 'primary', 'missing_location' => true );
-		$hierarchy = array( 'items_ordered_by_class' => array(), 'applied_count' => 0, 'warnings' => array() );
-		$result = Template_Menu_Apply_Result::failure(
+		$validation = array(
+			'valid'            => false,
+			'location_slug'    => 'primary',
+			'missing_location' => true,
+		);
+		$hierarchy  = array(
+			'items_ordered_by_class' => array(),
+			'applied_count'          => 0,
+			'warnings'               => array(),
+		);
+		$result     = Template_Menu_Apply_Result::failure(
 			'Menu location is not registered.',
 			array( 'menu_target_validation_failed' ),
 			$validation,

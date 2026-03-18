@@ -17,46 +17,46 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Industry_Cache_Key_Builder {
 
-	public const SCOPE_SECTION_RECOMMENDATION   = 'section_recommendation';
+	public const SCOPE_SECTION_RECOMMENDATION       = 'section_recommendation';
 	public const SCOPE_PAGE_TEMPLATE_RECOMMENDATION = 'page_template_recommendation';
-	public const SCOPE_HELPER_DOC               = 'helper_doc';
-	public const SCOPE_PAGE_ONEPAGER           = 'page_onepager';
-	public const SCOPE_STARTER_BUNDLE_LIST     = 'starter_bundle_list';
+	public const SCOPE_HELPER_DOC                   = 'helper_doc';
+	public const SCOPE_PAGE_ONEPAGER                = 'page_onepager';
+	public const SCOPE_STARTER_BUNDLE_LIST          = 'starter_bundle_list';
 
 	private const KEY_MAX_LEN = 172;
-	private const HASH_LEN     = 10;
+	private const HASH_LEN    = 10;
 
 	/**
 	 * Base key for section recommendation cache. Inputs: profile (primary, secondary, subtype), section keys hash.
 	 *
-	 * @param array<string, mixed>       $industry_profile Profile with primary_industry_key, optional secondary_industry_keys, industry_subtype_key.
+	 * @param array<string, mixed>             $industry_profile Profile with primary_industry_key, optional secondary_industry_keys, industry_subtype_key.
 	 * @param array<int, array<string, mixed>> $sections   Section definitions (used to extract keys for hash).
-	 * @param array<string, mixed>      $options          Resolver options (e.g. subtype_key).
+	 * @param array<string, mixed>             $options          Resolver options (e.g. subtype_key).
 	 * @return string Base key (no site scope).
 	 */
 	public function for_section_recommendation( array $industry_profile, array $sections, array $options = array() ): string {
-		$primary   = $this->normalize_string( (string) ( $industry_profile['primary_industry_key'] ?? '' ) );
-		$secondary = $this->normalize_string_list( $industry_profile['secondary_industry_keys'] ?? array() );
-		$subtype   = $this->normalize_string( (string) ( $industry_profile['industry_subtype_key'] ?? $options['subtype_key'] ?? '' ) );
+		$primary      = $this->normalize_string( (string) ( $industry_profile['primary_industry_key'] ?? '' ) );
+		$secondary    = $this->normalize_string_list( $industry_profile['secondary_industry_keys'] ?? array() );
+		$subtype      = $this->normalize_string( (string) ( $industry_profile['industry_subtype_key'] ?? $options['subtype_key'] ?? '' ) );
 		$section_hash = $this->hash_section_keys( $sections );
-		$parts = array( self::SCOPE_SECTION_RECOMMENDATION, $primary, $secondary, $subtype, $section_hash );
+		$parts        = array( self::SCOPE_SECTION_RECOMMENDATION, $primary, $secondary, $subtype, $section_hash );
 		return $this->join_and_truncate( $parts );
 	}
 
 	/**
 	 * Base key for page template recommendation cache.
 	 *
-	 * @param array<string, mixed>       $industry_profile Profile.
+	 * @param array<string, mixed>             $industry_profile Profile.
 	 * @param array<int, array<string, mixed>> $page_templates Page template definitions.
-	 * @param array<string, mixed>      $options         Resolver options (e.g. subtype_key).
+	 * @param array<string, mixed>             $options         Resolver options (e.g. subtype_key).
 	 * @return string Base key.
 	 */
 	public function for_page_template_recommendation( array $industry_profile, array $page_templates, array $options = array() ): string {
-		$primary   = $this->normalize_string( (string) ( $industry_profile['primary_industry_key'] ?? '' ) );
-		$secondary = $this->normalize_string_list( $industry_profile['secondary_industry_keys'] ?? array() );
-		$subtype   = $this->normalize_string( (string) ( $industry_profile['industry_subtype_key'] ?? $options['subtype_key'] ?? '' ) );
+		$primary       = $this->normalize_string( (string) ( $industry_profile['primary_industry_key'] ?? '' ) );
+		$secondary     = $this->normalize_string_list( $industry_profile['secondary_industry_keys'] ?? array() );
+		$subtype       = $this->normalize_string( (string) ( $industry_profile['industry_subtype_key'] ?? $options['subtype_key'] ?? '' ) );
 		$template_hash = $this->hash_page_template_keys( $page_templates );
-		$parts = array( self::SCOPE_PAGE_TEMPLATE_RECOMMENDATION, $primary, $secondary, $subtype, $template_hash );
+		$parts         = array( self::SCOPE_PAGE_TEMPLATE_RECOMMENDATION, $primary, $secondary, $subtype, $template_hash );
 		return $this->join_and_truncate( $parts );
 	}
 
@@ -185,9 +185,15 @@ final class Industry_Cache_Key_Builder {
 	 * @return string Joined with _, sanitized, truncated.
 	 */
 	private function join_and_truncate( array $parts ): string {
-		$joined = implode( '_', array_map( function ( $p ) {
-			return preg_replace( '/[^a-z0-9_-]/i', '_', (string) $p );
-		}, $parts ) );
+		$joined = implode(
+			'_',
+			array_map(
+				function ( $p ) {
+					return preg_replace( '/[^a-z0-9_-]/i', '_', (string) $p );
+				},
+				$parts
+			)
+		);
 		if ( strlen( $joined ) > self::KEY_MAX_LEN ) {
 			return substr( $joined, 0, self::KEY_MAX_LEN - self::HASH_LEN ) . '_' . substr( md5( $joined ), 0, self::HASH_LEN );
 		}

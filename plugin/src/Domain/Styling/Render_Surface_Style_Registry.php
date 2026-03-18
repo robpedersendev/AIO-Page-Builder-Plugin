@@ -88,7 +88,7 @@ final class Render_Surface_Style_Registry {
 	 * @return string
 	 */
 	public function get_selector_for_surface( string $surface_id ): string {
-		$s = $this->get_surface( $surface_id );
+		$s   = $this->get_surface( $surface_id );
 		$sel = $s['selector'] ?? null;
 		return is_string( $sel ) ? $sel : '';
 	}
@@ -100,7 +100,7 @@ final class Render_Surface_Style_Registry {
 	 * @return string
 	 */
 	public function get_scope_for_surface( string $surface_id ): string {
-		$s = $this->get_surface( $surface_id );
+		$s     = $this->get_surface( $surface_id );
 		$scope = $s['scope'] ?? null;
 		return is_string( $scope ) ? $scope : '';
 	}

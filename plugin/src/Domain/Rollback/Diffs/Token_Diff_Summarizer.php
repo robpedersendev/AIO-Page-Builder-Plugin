@@ -34,19 +34,19 @@ final class Token_Diff_Summarizer {
 		$pre_state  = $this->extract_pre_state( $pre_snapshot );
 		$post_state = $this->extract_post_state( $post_snapshot );
 		if ( $pre_state === null || $post_state === null ) {
-			$diff = $this->minimal_root( $pre_snapshot, $post_snapshot );
+			$diff                   = $this->minimal_root( $pre_snapshot, $post_snapshot );
 			$diff['before_summary'] = $pre_state === null ? __( 'Not available', 'aio-page-builder' ) : $this->token_one_liner( $pre_state );
 			$diff['after_summary']  = $post_state === null ? __( 'Not available', 'aio-page-builder' ) : $this->token_one_liner( $post_state );
 			return Diff_Summary_Result::failure( $diff, __( 'Missing or incompatible token-set snapshot state.', 'aio-page-builder' ), 'snapshot_missing' );
 		}
 
 		$token_set_ref = (string) ( $post_state['token_set_id'] ?? $pre_state['token_set_id'] ?? '' );
-		$target_ref   = $token_set_ref !== '' ? $token_set_ref : ( (string) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? $post_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? 'unknown' ) );
+		$target_ref    = $token_set_ref !== '' ? $token_set_ref : ( (string) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? $post_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? 'unknown' ) );
 
 		$pre_tokens  = isset( $pre_state['tokens'] ) && is_array( $pre_state['tokens'] ) ? $pre_state['tokens'] : array();
 		$post_tokens = isset( $post_state['tokens'] ) && is_array( $post_state['tokens'] ) ? $post_state['tokens'] : array();
 
-		$changes = $this->compute_token_changes( $pre_tokens, $post_tokens );
+		$changes      = $this->compute_token_changes( $pre_tokens, $post_tokens );
 		$change_count = count( $changes );
 
 		$before_summary = $this->token_one_liner( $pre_state );
@@ -61,19 +61,19 @@ final class Token_Diff_Summarizer {
 		$no_meaningful = ( $change_count === 0 );
 
 		$diff_id = $this->diff_id( $target_ref );
-		$diff = array(
-			'diff_id'        => $diff_id,
-			'diff_type'      => Diff_Type_Keys::DIFF_TYPE_TOKEN,
-			'level'          => Diff_Type_Keys::is_valid_level( $level ) ? $level : Diff_Type_Keys::LEVEL_SUMMARY,
-			'target_ref'     => $target_ref,
-			'target_type_hint'=> 'token_set',
-			'before_summary' => $before_summary,
-			'after_summary'  => $after_summary,
-			'change_count'   => $change_count,
-			'execution_ref'  => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? '' ),
-			'build_plan_ref' => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ?? '' ),
-			'plan_item_ref'  => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF ] ?? '' ),
-			'rollback'       => $this->rollback_block( $pre_snapshot, $post_snapshot ),
+		$diff    = array(
+			'diff_id'          => $diff_id,
+			'diff_type'        => Diff_Type_Keys::DIFF_TYPE_TOKEN,
+			'level'            => Diff_Type_Keys::is_valid_level( $level ) ? $level : Diff_Type_Keys::LEVEL_SUMMARY,
+			'target_ref'       => $target_ref,
+			'target_type_hint' => 'token_set',
+			'before_summary'   => $before_summary,
+			'after_summary'    => $after_summary,
+			'change_count'     => $change_count,
+			'execution_ref'    => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? '' ),
+			'build_plan_ref'   => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ?? '' ),
+			'plan_item_ref'    => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF ] ?? '' ),
+			'rollback'         => $this->rollback_block( $pre_snapshot, $post_snapshot ),
 		);
 
 		if ( $level === Diff_Type_Keys::LEVEL_DETAIL ) {
@@ -120,9 +120,9 @@ final class Token_Diff_Summarizer {
 	 * @return string
 	 */
 	private function token_one_liner( array $state ): string {
-		$ref = isset( $state['token_set_id'] ) ? trim( (string) $state['token_set_id'] ) : '';
+		$ref    = isset( $state['token_set_id'] ) ? trim( (string) $state['token_set_id'] ) : '';
 		$tokens = isset( $state['tokens'] ) && is_array( $state['tokens'] ) ? $state['tokens'] : array();
-		$count = count( $tokens );
+		$count  = count( $tokens );
 		if ( $ref === '' ) {
 			$ref = __( 'Unknown set', 'aio-page-builder' );
 		}
@@ -138,14 +138,14 @@ final class Token_Diff_Summarizer {
 	 */
 	private function compute_token_changes( array $pre_tokens, array $post_tokens ): array {
 		$all_keys = array_unique( array_merge( array_keys( $pre_tokens ), array_keys( $post_tokens ) ) );
-		$changes = array();
+		$changes  = array();
 		foreach ( $all_keys as $token_key ) {
 			$pre_val  = $this->token_value( $pre_tokens[ $token_key ] ?? null );
 			$post_val = $this->token_value( $post_tokens[ $token_key ] ?? null );
 			if ( $pre_val === $post_val ) {
 				continue;
 			}
-			$entry = array(
+			$entry      = array(
 				'token_key'    => $token_key,
 				'value_before' => $pre_val,
 				'value_after'  => $post_val,
@@ -191,18 +191,18 @@ final class Token_Diff_Summarizer {
 	private function minimal_root( array $pre_snapshot, array $post_snapshot ): array {
 		$target_ref = (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? $pre_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? 'unknown' );
 		return array(
-			'diff_id'        => $this->diff_id( $target_ref ),
-			'diff_type'      => Diff_Type_Keys::DIFF_TYPE_TOKEN,
-			'level'          => Diff_Type_Keys::LEVEL_SUMMARY,
-			'target_ref'     => $target_ref,
-			'target_type_hint'=> 'token_set',
-			'before_summary' => '',
-			'after_summary'  => '',
-			'change_count'   => 0,
-			'execution_ref'  => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? '' ),
-			'build_plan_ref' => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ?? '' ),
-			'plan_item_ref'  => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF ] ?? '' ),
-			'rollback'       => $this->rollback_block( $pre_snapshot, $post_snapshot ),
+			'diff_id'          => $this->diff_id( $target_ref ),
+			'diff_type'        => Diff_Type_Keys::DIFF_TYPE_TOKEN,
+			'level'            => Diff_Type_Keys::LEVEL_SUMMARY,
+			'target_ref'       => $target_ref,
+			'target_type_hint' => 'token_set',
+			'before_summary'   => '',
+			'after_summary'    => '',
+			'change_count'     => 0,
+			'execution_ref'    => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? '' ),
+			'build_plan_ref'   => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ?? '' ),
+			'plan_item_ref'    => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF ] ?? '' ),
+			'rollback'         => $this->rollback_block( $pre_snapshot, $post_snapshot ),
 		);
 	}
 
@@ -212,8 +212,8 @@ final class Token_Diff_Summarizer {
 	 * @return array<string, mixed>
 	 */
 	private function rollback_block( array $pre_snapshot, array $post_snapshot ): array {
-		$pre_id  = isset( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ) ? (string) $pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] : '';
-		$post_id = isset( $post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ) ? (string) $post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] : '';
+		$pre_id   = isset( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ) ? (string) $pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] : '';
+		$post_id  = isset( $post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ) ? (string) $post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] : '';
 		$eligible = (bool) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_ROLLBACK_ELIGIBLE ] ?? false );
 		$status   = (string) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_ROLLBACK_STATUS ] ?? Operational_Snapshot_Schema::ROLLBACK_STATUS_NONE );
 		return array(
@@ -226,7 +226,7 @@ final class Token_Diff_Summarizer {
 
 	private function diff_id( string $target_ref ): string {
 		$raw = ( function_exists( 'wp_generate_uuid4' ) ? \wp_generate_uuid4() : uniqid( 'diff-', true ) );
-		$id = 'diff-token-' . substr( str_replace( array( '-', ' ' ), '', $raw ), 0, 20 );
+		$id  = 'diff-token-' . substr( str_replace( array( '-', ' ' ), '', $raw ), 0, 20 );
 		return substr( $id, 0, 64 );
 	}
 }

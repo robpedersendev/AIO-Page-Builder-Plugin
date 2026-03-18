@@ -36,14 +36,14 @@ final class Template_Deprecation_Service_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$section_repo = new Section_Template_Repository();
-		$page_repo    = new Page_Template_Repository();
-		$registry_dep = new Registry_Deprecation_Service( $section_repo, $page_repo );
+		$section_repo  = new Section_Template_Repository();
+		$page_repo     = new Page_Template_Repository();
+		$registry_dep  = new Registry_Deprecation_Service( $section_repo, $page_repo );
 		$this->service = new Template_Deprecation_Service( $registry_dep );
 	}
 
 	public function test_get_deprecation_summary_section_active(): void {
-		$def = array(
+		$def     = array(
 			Section_Schema::FIELD_STATUS => 'active',
 			'deprecation'                => array(),
 		);
@@ -54,13 +54,13 @@ final class Template_Deprecation_Service_Test extends TestCase {
 	}
 
 	public function test_get_deprecation_summary_section_deprecated_with_replacement(): void {
-		$def = array(
-			Section_Schema::FIELD_STATUS => 'deprecated',
-			'deprecation'                => array(
+		$def     = array(
+			Section_Schema::FIELD_STATUS      => 'deprecated',
+			'deprecation'                     => array(
 				'deprecated'              => true,
-				'reason'                   => 'Superseded by new variant',
-				'deprecated_at'            => '2025-03-13T12:00:00Z',
-				'replacement_section_key'  => 'st01_hero_intro',
+				'reason'                  => 'Superseded by new variant',
+				'deprecated_at'           => '2025-03-13T12:00:00Z',
+				'replacement_section_key' => 'st01_hero_intro',
 			),
 			'replacement_section_suggestions' => array( 'st01_hero_intro' ),
 		);
@@ -72,9 +72,12 @@ final class Template_Deprecation_Service_Test extends TestCase {
 	}
 
 	public function test_get_deprecation_summary_page_deprecated(): void {
-		$def = array(
+		$def     = array(
 			Page_Template_Schema::FIELD_STATUS => 'deprecated',
-			'deprecation'                      => array( 'reason' => 'Use pt_home_02', 'replacement_template_key' => 'pt_home_02' ),
+			'deprecation'                      => array(
+				'reason'                   => 'Use pt_home_02',
+				'replacement_template_key' => 'pt_home_02',
+			),
 			'replacement_template_refs'        => array( 'pt_home_02' ),
 		);
 		$summary = $this->service->get_deprecation_summary( $def, 'page' );
@@ -143,12 +146,12 @@ final class Template_Deprecation_Service_Test extends TestCase {
 	 * Deprecation continuity: definition with deprecation metadata yields correct summary after upgrade (Prompt 202).
 	 */
 	public function test_deprecation_continuity_section_definition_with_deprecation_metadata(): void {
-		$def = array(
-			Section_Schema::FIELD_STATUS => 'deprecated',
-			'deprecation'                => array(
-				Deprecation_Metadata::IS_DEPRECATED   => true,
+		$def     = array(
+			Section_Schema::FIELD_STATUS      => 'deprecated',
+			'deprecation'                     => array(
+				Deprecation_Metadata::IS_DEPRECATED     => true,
 				Deprecation_Metadata::DEPRECATED_REASON => 'Replaced by st02_hero',
-				Deprecation_Metadata::DEPRECATED_AT  => '2025-03-01T00:00:00Z',
+				Deprecation_Metadata::DEPRECATED_AT     => '2025-03-01T00:00:00Z',
 			),
 			'replacement_section_suggestions' => array( 'st02_hero' ),
 		);

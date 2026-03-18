@@ -65,14 +65,14 @@ final class Create_Page_Job_Service implements Create_Page_Job_Service_Interface
 		Page_Instantiator $instantiator,
 		Page_Field_Group_Assignment_Service $assignment_service
 	) {
-		$this->page_template_repository   = $page_template_repository;
+		$this->page_template_repository    = $page_template_repository;
 		$this->section_template_repository = $section_template_repository;
-		$this->context_builder            = $context_builder;
-		$this->section_renderer           = $section_renderer;
-		$this->assembly_pipeline          = $assembly_pipeline;
-		$this->payload_builder           = $payload_builder;
-		$this->instantiator               = $instantiator;
-		$this->assignment_service         = $assignment_service;
+		$this->context_builder             = $context_builder;
+		$this->section_renderer            = $section_renderer;
+		$this->assembly_pipeline           = $assembly_pipeline;
+		$this->payload_builder             = $payload_builder;
+		$this->instantiator                = $instantiator;
+		$this->assignment_service          = $assignment_service;
 	}
 
 	/**
@@ -122,7 +122,7 @@ final class Create_Page_Job_Service implements Create_Page_Job_Service_Interface
 			'page_slug_candidate'   => $slug !== '' ? $slug : \sanitize_title( $title ),
 			'post_status_candidate' => 'draft',
 		);
-		$payload = $this->payload_builder->build_create_payload( $assembly, $title, $overrides );
+		$payload   = $this->payload_builder->build_create_payload( $assembly, $title, $overrides );
 
 		$instantiation = $this->instantiator->create_page( $payload );
 		if ( ! $instantiation->is_success() ) {
@@ -134,10 +134,16 @@ final class Create_Page_Job_Service implements Create_Page_Job_Service_Interface
 
 		$post_id = $instantiation->get_post_id();
 		if ( $parent_post_id !== null && $parent_post_id > 0 ) {
-			\wp_update_post( array( 'ID' => $post_id, 'post_parent' => $parent_post_id ), true );
+			\wp_update_post(
+				array(
+					'ID'          => $post_id,
+					'post_parent' => $parent_post_id,
+				),
+				true
+			);
 		}
 
-		$assign_result = $this->assignment_service->assign_from_template( $post_id, $template_key, true );
+		$assign_result    = $this->assignment_service->assign_from_template( $post_id, $template_key, true );
 		$assignment_count = isset( $assign_result['assigned'] ) && is_numeric( $assign_result['assigned'] ) ? (int) $assign_result['assigned'] : 0;
 
 		return Create_Page_Result::success( $post_id, $template_key, $assignment_count, '' );
@@ -197,7 +203,7 @@ final class Create_Page_Job_Service implements Create_Page_Job_Service_Interface
 		}
 
 		$section_results = array();
-		$position = 0;
+		$position        = 0;
 		foreach ( $ordered as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;

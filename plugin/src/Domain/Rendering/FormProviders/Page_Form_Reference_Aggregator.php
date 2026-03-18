@@ -58,7 +58,7 @@ final class Page_Form_Reference_Aggregator {
 				continue;
 			}
 			$seen[ $key ] = true;
-			$out[] = array(
+			$out[]        = array(
 				'form_provider' => $provider,
 				'form_id'       => $form_id,
 			);

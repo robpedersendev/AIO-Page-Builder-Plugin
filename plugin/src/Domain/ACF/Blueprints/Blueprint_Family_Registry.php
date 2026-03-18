@@ -37,8 +37,8 @@ final class Blueprint_Family_Registry {
 	/**
 	 * Registers a blueprint family. Overwrites existing entry for the same key.
 	 *
-	 * @param string $family_key variation_family_key (e.g. hero_primary, proof_cards).
-	 * @param string $base_blueprint_ref Shared field_blueprint_ref for sections in this family.
+	 * @param string                                                                    $family_key variation_family_key (e.g. hero_primary, proof_cards).
+	 * @param string                                                                    $base_blueprint_ref Shared field_blueprint_ref for sections in this family.
 	 * @param array<string, array{add_fields?: array, hide_field_names?: list<string>}> $variant_overrides Optional. variant_key => add_fields (array of field defs), hide_field_names (list of field names to omit).
 	 * @return void
 	 */
@@ -49,7 +49,7 @@ final class Blueprint_Family_Registry {
 		}
 		$this->families[ $family_key ] = array(
 			self::KEY_BASE_BLUEPRINT_REF => \sanitize_key( $base_blueprint_ref ) ?: $base_blueprint_ref,
-			self::KEY_VARIANT_OVERRIDES   => $this->sanitize_variant_overrides( $variant_overrides ),
+			self::KEY_VARIANT_OVERRIDES  => $this->sanitize_variant_overrides( $variant_overrides ),
 		);
 	}
 
@@ -121,11 +121,18 @@ final class Blueprint_Family_Registry {
 			if ( $v === '' ) {
 				continue;
 			}
-			$add = isset( $config[ self::KEY_ADD_FIELDS ] ) && \is_array( $config[ self::KEY_ADD_FIELDS ] ) ? $config[ self::KEY_ADD_FIELDS ] : array();
-			$hide = isset( $config[ self::KEY_HIDE_FIELD_NAMES ] ) && \is_array( $config[ self::KEY_HIDE_FIELD_NAMES ] ) ? $config[ self::KEY_HIDE_FIELD_NAMES ] : array();
-			$hide = array_values( array_filter( array_map( function ( $n ) {
-				return \is_string( $n ) ? $n : '';
-			}, $hide ) ) );
+			$add       = isset( $config[ self::KEY_ADD_FIELDS ] ) && \is_array( $config[ self::KEY_ADD_FIELDS ] ) ? $config[ self::KEY_ADD_FIELDS ] : array();
+			$hide      = isset( $config[ self::KEY_HIDE_FIELD_NAMES ] ) && \is_array( $config[ self::KEY_HIDE_FIELD_NAMES ] ) ? $config[ self::KEY_HIDE_FIELD_NAMES ] : array();
+			$hide      = array_values(
+				array_filter(
+					array_map(
+						function ( $n ) {
+							return \is_string( $n ) ? $n : '';
+						},
+						$hide
+					)
+				)
+			);
 			$out[ $v ] = array();
 			if ( ! empty( $add ) ) {
 				$out[ $v ][ self::KEY_ADD_FIELDS ] = $add;

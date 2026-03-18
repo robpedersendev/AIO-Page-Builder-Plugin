@@ -28,12 +28,12 @@ final class Section_Field_Blueprint_Validator {
 	private const FIELD_NAME_PATTERN = '#^[a-z0-9_]+$#';
 
 	/** Max lengths. */
-	private const MAX_BLUEPRINT_ID = 64;
-	private const MAX_SECTION_KEY = 64;
+	private const MAX_BLUEPRINT_ID    = 64;
+	private const MAX_SECTION_KEY     = 64;
 	private const MAX_SECTION_VERSION = 32;
-	private const MAX_LABEL = 255;
-	private const MAX_KEY = 64;
-	private const MAX_NAME = 64;
+	private const MAX_LABEL           = 255;
+	private const MAX_KEY             = 64;
+	private const MAX_NAME            = 64;
 
 	/**
 	 * Validates full blueprint. Returns empty array if valid; otherwise error messages.
@@ -98,8 +98,8 @@ final class Section_Field_Blueprint_Validator {
 	 * Validates alignment with section (section_key, blueprint_id vs field_blueprint_ref).
 	 *
 	 * @param array<string, mixed> $blueprint
-	 * @param string|null         $section_key
-	 * @param string|null         $field_blueprint_ref
+	 * @param string|null          $section_key
+	 * @param string|null          $field_blueprint_ref
 	 * @return list<string>
 	 */
 	public function validate_alignment( array $blueprint, ?string $section_key, ?string $field_blueprint_ref ): array {
@@ -131,7 +131,7 @@ final class Section_Field_Blueprint_Validator {
 			return array( 'fields must be a non-empty array' );
 		}
 
-		$err = array();
+		$err       = array();
 		$seen_keys = array();
 
 		foreach ( $fields as $i => $field ) {
@@ -140,9 +140,15 @@ final class Section_Field_Blueprint_Validator {
 				continue;
 			}
 			$field_err = $this->validate_field( $field, $seen_keys, 'fields' );
-			$err = array_merge( $err, array_map( function ( $e ) use ( $i ) {
-				return "fields[{$i}]: {$e}";
-			}, $field_err ) );
+			$err       = array_merge(
+				$err,
+				array_map(
+					function ( $e ) use ( $i ) {
+						return "fields[{$i}]: {$e}";
+					},
+					$field_err
+				)
+			);
 		}
 
 		return $err;
@@ -169,7 +175,7 @@ final class Section_Field_Blueprint_Validator {
 		$seen_keys[ $key ] = true;
 
 		if ( ! preg_match( self::FIELD_KEY_PATTERN, $key ) ) {
-			$err[] = "field key must match ^field_[a-z0-9_]+$";
+			$err[] = 'field key must match ^field_[a-z0-9_]+$';
 		}
 		if ( strlen( $key ) > self::MAX_KEY ) {
 			$err[] = 'field key exceeds 64 chars';
@@ -177,7 +183,7 @@ final class Section_Field_Blueprint_Validator {
 
 		$name = (string) ( $field[ Field_Blueprint_Schema::FIELD_NAME ] ?? '' );
 		if ( ! preg_match( self::FIELD_NAME_PATTERN, $name ) ) {
-			$err[] = "field name must match ^[a-z0-9_]+$";
+			$err[] = 'field name must match ^[a-z0-9_]+$';
 		}
 		if ( strlen( $name ) > self::MAX_NAME ) {
 			$err[] = 'field name exceeds 64 chars';
@@ -196,9 +202,15 @@ final class Section_Field_Blueprint_Validator {
 						continue;
 					}
 					$sub_err = $this->validate_field( $subfield, $sub_seen, "{$path}.sub_fields[{$j}]" );
-					$err = array_merge( $err, array_map( function ( $e ) use ( $j ) {
-						return "sub_fields[{$j}]: {$e}";
-					}, $sub_err ) );
+					$err     = array_merge(
+						$err,
+						array_map(
+							function ( $e ) use ( $j ) {
+								return "sub_fields[{$j}]: {$e}";
+							},
+							$sub_err
+						)
+					);
 				}
 			}
 		}
@@ -222,8 +234,8 @@ final class Section_Field_Blueprint_Validator {
 	 * Recursively rejects callable/code references in arrays.
 	 * Skips string values (e.g. field type 'link') that happen to be PHP function names.
 	 *
-	 * @param mixed       $val
-	 * @param string      $path
+	 * @param mixed        $val
+	 * @param string       $path
 	 * @param list<string> $errors
 	 */
 	private function reject_callable_references( $val, string $path, array &$errors ): void {

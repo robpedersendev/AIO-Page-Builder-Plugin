@@ -114,7 +114,10 @@ final class Industry_Coverage_Gap_Analyzer {
 		$by_scope = array();
 
 		if ( $this->pack_registry === null ) {
-			return array( 'gaps' => array(), 'by_scope' => array() );
+			return array(
+				'gaps'     => array(),
+				'by_scope' => array(),
+			);
 		}
 
 		$active_packs = $this->pack_registry->list_by_status( Industry_Pack_Schema::STATUS_ACTIVE );
@@ -136,20 +139,23 @@ final class Industry_Coverage_Gap_Analyzer {
 				if ( $subtype_key === '' || $parent_key === '' ) {
 					continue;
 				}
-				$pack = $this->pack_registry->get( $parent_key );
+				$pack  = $this->pack_registry->get( $parent_key );
 				$scope = $parent_key . '|' . $subtype_key;
 				$this->analyze_scope( $parent_key, $subtype_key, $pack, $gaps, $by_scope, $scope );
 			}
 		}
 
-		return array( 'gaps' => $gaps, 'by_scope' => $by_scope );
+		return array(
+			'gaps'     => $gaps,
+			'by_scope' => $by_scope,
+		);
 	}
 
 	/**
-	 * @param array<string, mixed>|null $pack Pack definition when scope is industry-level.
+	 * @param array<string, mixed>|null                                                                         $pack Pack definition when scope is industry-level.
 	 * @param list<array{scope: string, missing_artifact_class: string, priority: string, explanation: string}> $gaps
 	 * @param array<string, list<array{missing_artifact_class: string, priority: string, explanation: string}>> $by_scope
-	 * @param string $scope_override When set, use this as scope key (e.g. industry|subtype).
+	 * @param string                                                                                            $scope_override When set, use this as scope key (e.g. industry|subtype).
 	 */
 	private function analyze_scope( string $industry_key, string $subtype_key, ?array $pack, array &$gaps, array &$by_scope, string $scope_override = '' ): void {
 		$scope = $scope_override !== '' ? $scope_override : $industry_key;
@@ -162,16 +168,16 @@ final class Industry_Coverage_Gap_Analyzer {
 		if ( $this->section_overlay_registry !== null ) {
 			$section_count = count( $this->section_overlay_registry->get_for_industry( $industry_key ) );
 			if ( $section_count === 0 ) {
-				$entry = array(
-					'scope'                 => $scope,
+				$entry                = array(
+					'scope'                  => $scope,
 					'missing_artifact_class' => self::GAP_SECTION_HELPER_OVERLAYS,
-					'priority'              => self::PRIORITY_MEDIUM,
+					'priority'               => self::PRIORITY_MEDIUM,
 					'explanation'            => 'No section helper overlays defined for this industry.',
 				);
-				$gaps[] = $entry;
+				$gaps[]               = $entry;
 				$by_scope[ $scope ][] = array(
 					'missing_artifact_class' => $entry['missing_artifact_class'],
-					'priority'              => $entry['priority'],
+					'priority'               => $entry['priority'],
 					'explanation'            => $entry['explanation'],
 				);
 			}
@@ -181,16 +187,16 @@ final class Industry_Coverage_Gap_Analyzer {
 		if ( $this->page_overlay_registry !== null ) {
 			$page_count = count( $this->page_overlay_registry->get_for_industry( $industry_key ) );
 			if ( $page_count === 0 ) {
-				$entry = array(
-					'scope'                 => $scope,
+				$entry                = array(
+					'scope'                  => $scope,
 					'missing_artifact_class' => self::GAP_PAGE_ONEPAGER_OVERLAYS,
-					'priority'              => self::PRIORITY_MEDIUM,
+					'priority'               => self::PRIORITY_MEDIUM,
 					'explanation'            => 'No page one-pager overlays defined for this industry.',
 				);
-				$gaps[] = $entry;
+				$gaps[]               = $entry;
 				$by_scope[ $scope ][] = array(
 					'missing_artifact_class' => $entry['missing_artifact_class'],
-					'priority'              => $entry['priority'],
+					'priority'               => $entry['priority'],
 					'explanation'            => $entry['explanation'],
 				);
 			}
@@ -200,16 +206,16 @@ final class Industry_Coverage_Gap_Analyzer {
 		if ( $this->starter_bundle_registry !== null ) {
 			$bundles = $this->starter_bundle_registry->get_for_industry( $industry_key, $subtype_key );
 			if ( $bundles === array() ) {
-				$entry = array(
-					'scope'                 => $scope,
+				$entry                = array(
+					'scope'                  => $scope,
 					'missing_artifact_class' => self::GAP_STARTER_BUNDLE,
-					'priority'              => self::PRIORITY_HIGH,
+					'priority'               => self::PRIORITY_HIGH,
 					'explanation'            => $subtype_key !== '' ? 'No starter bundle for this industry and subtype.' : 'No starter bundle for this industry.',
 				);
-				$gaps[] = $entry;
+				$gaps[]               = $entry;
 				$by_scope[ $scope ][] = array(
 					'missing_artifact_class' => $entry['missing_artifact_class'],
-					'priority'              => $entry['priority'],
+					'priority'               => $entry['priority'],
 					'explanation'            => $entry['explanation'],
 				);
 			}
@@ -221,29 +227,29 @@ final class Industry_Coverage_Gap_Analyzer {
 				? trim( $pack[ Industry_Pack_Schema::FIELD_TOKEN_PRESET_REF ] )
 				: '';
 			if ( $preset_ref === '' ) {
-				$entry = array(
-					'scope'                 => $scope,
+				$entry                = array(
+					'scope'                  => $scope,
 					'missing_artifact_class' => self::GAP_STYLE_PRESET,
-					'priority'              => self::PRIORITY_LOW,
+					'priority'               => self::PRIORITY_LOW,
 					'explanation'            => 'Pack has no token_preset_ref.',
 				);
-				$gaps[] = $entry;
+				$gaps[]               = $entry;
 				$by_scope[ $scope ][] = array(
 					'missing_artifact_class' => $entry['missing_artifact_class'],
-					'priority'              => $entry['priority'],
+					'priority'               => $entry['priority'],
 					'explanation'            => $entry['explanation'],
 				);
 			} elseif ( $this->preset_registry->get( $preset_ref ) === null ) {
-				$entry = array(
-					'scope'                 => $scope,
+				$entry                = array(
+					'scope'                  => $scope,
 					'missing_artifact_class' => self::GAP_STYLE_PRESET,
-					'priority'              => self::PRIORITY_MEDIUM,
+					'priority'               => self::PRIORITY_MEDIUM,
 					'explanation'            => 'Pack token_preset_ref does not resolve.',
 				);
-				$gaps[] = $entry;
+				$gaps[]               = $entry;
 				$by_scope[ $scope ][] = array(
 					'missing_artifact_class' => $entry['missing_artifact_class'],
-					'priority'              => $entry['priority'],
+					'priority'               => $entry['priority'],
 					'explanation'            => $entry['explanation'],
 				);
 			}
@@ -253,16 +259,16 @@ final class Industry_Coverage_Gap_Analyzer {
 		if ( $this->compliance_registry !== null ) {
 			$rules = $this->compliance_registry->get_for_industry( $industry_key );
 			if ( $rules === array() ) {
-				$entry = array(
-					'scope'                 => $scope,
+				$entry                = array(
+					'scope'                  => $scope,
 					'missing_artifact_class' => self::GAP_COMPLIANCE_RULES,
-					'priority'              => self::PRIORITY_LOW,
+					'priority'               => self::PRIORITY_LOW,
 					'explanation'            => 'No compliance/caution rules for this industry.',
 				);
-				$gaps[] = $entry;
+				$gaps[]               = $entry;
 				$by_scope[ $scope ][] = array(
 					'missing_artifact_class' => $entry['missing_artifact_class'],
-					'priority'              => $entry['priority'],
+					'priority'               => $entry['priority'],
 					'explanation'            => $entry['explanation'],
 				);
 			}
@@ -274,29 +280,29 @@ final class Industry_Coverage_Gap_Analyzer {
 				? trim( $pack[ Industry_Pack_Schema::FIELD_SEO_GUIDANCE_REF ] )
 				: '';
 			if ( $seo_ref === '' ) {
-				$entry = array(
-					'scope'                 => $scope,
+				$entry                = array(
+					'scope'                  => $scope,
 					'missing_artifact_class' => self::GAP_SEO_GUIDANCE,
-					'priority'              => self::PRIORITY_LOW,
+					'priority'               => self::PRIORITY_LOW,
 					'explanation'            => 'Pack has no seo_guidance_ref.',
 				);
-				$gaps[] = $entry;
+				$gaps[]               = $entry;
 				$by_scope[ $scope ][] = array(
 					'missing_artifact_class' => $entry['missing_artifact_class'],
-					'priority'              => $entry['priority'],
+					'priority'               => $entry['priority'],
 					'explanation'            => $entry['explanation'],
 				);
 			} elseif ( $this->seo_registry->get( $seo_ref ) === null ) {
-				$entry = array(
-					'scope'                 => $scope,
+				$entry                = array(
+					'scope'                  => $scope,
 					'missing_artifact_class' => self::GAP_SEO_GUIDANCE,
-					'priority'              => self::PRIORITY_MEDIUM,
+					'priority'               => self::PRIORITY_MEDIUM,
 					'explanation'            => 'Pack seo_guidance_ref does not resolve.',
 				);
-				$gaps[] = $entry;
+				$gaps[]               = $entry;
 				$by_scope[ $scope ][] = array(
 					'missing_artifact_class' => $entry['missing_artifact_class'],
-					'priority'              => $entry['priority'],
+					'priority'               => $entry['priority'],
 					'explanation'            => $entry['explanation'],
 				);
 			}
@@ -306,16 +312,16 @@ final class Industry_Coverage_Gap_Analyzer {
 		if ( $subtype_key === '' && $this->question_pack_registry !== null ) {
 			$has_qp = $this->question_pack_registry->get( $industry_key ) !== null;
 			if ( ! $has_qp ) {
-				$entry = array(
-					'scope'                 => $scope,
+				$entry                = array(
+					'scope'                  => $scope,
 					'missing_artifact_class' => self::GAP_QUESTION_PACK,
-					'priority'              => self::PRIORITY_LOW,
+					'priority'               => self::PRIORITY_LOW,
 					'explanation'            => 'No question pack for this industry.',
 				);
-				$gaps[] = $entry;
+				$gaps[]               = $entry;
 				$by_scope[ $scope ][] = array(
 					'missing_artifact_class' => $entry['missing_artifact_class'],
-					'priority'              => $entry['priority'],
+					'priority'               => $entry['priority'],
 					'explanation'            => $entry['explanation'],
 				);
 			}

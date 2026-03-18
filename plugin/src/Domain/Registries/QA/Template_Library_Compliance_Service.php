@@ -47,10 +47,10 @@ final class Template_Library_Compliance_Service {
 
 	/** Page template_category_class minimums (template-library-coverage-matrix §3.2). */
 	private const PAGE_CLASS_MIN = array(
-		'top_level'     => 80,
-		'hub'           => 120,
-		'nested_hub'    => 100,
-		'child_detail'  => 200,
+		'top_level'    => 80,
+		'hub'          => 120,
+		'nested_hub'   => 100,
+		'child_detail' => 200,
 	);
 
 	/** Min CTA sections per page class (cta-sequencing-and-placement-contract §3). */
@@ -67,10 +67,10 @@ final class Template_Library_Compliance_Service {
 	/** CTA-classified values (contract §2.1). */
 	private const CTA_CLASSIFIED = array( 'primary_cta', 'contact_cta', 'navigation_cta' );
 
-	private const MAX_SECTION_FAMILY_SHARE = 0.25;
+	private const MAX_SECTION_FAMILY_SHARE   = 0.25;
 	private const MAX_SECTION_CATEGORY_SHARE = 0.28;
-	private const MAX_PAGE_CLASS_SHARE = 0.45;
-	private const MAX_PAGE_FAMILY_SHARE = 0.22;
+	private const MAX_PAGE_CLASS_SHARE       = 0.45;
+	private const MAX_PAGE_FAMILY_SHARE      = 0.22;
 
 	/** Allowed animation tiers (animation-support-and-fallback-contract). */
 	private const ALLOWED_ANIMATION_TIERS = array( 'none', 'subtle', 'enhanced', 'premium' );
@@ -103,12 +103,12 @@ final class Template_Library_Compliance_Service {
 			}
 		}
 
-		$count_summary            = $this->build_count_summary( $sections, $pages );
+		$count_summary             = $this->build_count_summary( $sections, $pages );
 		$category_coverage_summary = $this->build_category_coverage( $count_summary, $sections, $pages );
-		$cta_rule_violations      = $this->validate_cta_rules( $pages, $section_by_key );
-		$preview_readiness        = $this->check_preview_readiness( $sections, $pages );
-		$metadata_checks         = $this->check_metadata( $sections );
-		$export_viability         = $this->check_export( $sections, $pages );
+		$cta_rule_violations       = $this->validate_cta_rules( $pages, $section_by_key );
+		$preview_readiness         = $this->check_preview_readiness( $sections, $pages );
+		$metadata_checks           = $this->check_metadata( $sections );
+		$export_viability          = $this->check_export( $sections, $pages );
 
 		$passed = $this->compute_passed(
 			$count_summary,
@@ -145,7 +145,7 @@ final class Template_Library_Compliance_Service {
 			$by_section_family[ $fam ] = ( $by_section_family[ $fam ] ?? 0 ) + 1;
 		}
 
-		$by_page_class = array();
+		$by_page_class  = array();
 		$by_page_family = array();
 		foreach ( $pages as $def ) {
 			$cls = (string) ( $def['template_category_class'] ?? '' );
@@ -170,7 +170,7 @@ final class Template_Library_Compliance_Service {
 	}
 
 	/**
-	 * @param array $count_summary
+	 * @param array                      $count_summary
 	 * @param list<array<string, mixed>> $sections
 	 * @param list<array<string, mixed>> $pages
 	 * @return array{section_family_minimums: array<string, bool>, page_class_minimums: array<string, bool>, max_share_violations: list<string>}
@@ -178,19 +178,19 @@ final class Template_Library_Compliance_Service {
 	private function build_category_coverage( array $count_summary, array $sections, array $pages ): array {
 		$section_family_minimums = array();
 		foreach ( self::SECTION_FAMILY_MIN as $fam => $min ) {
-			$count = $count_summary['by_section_purpose_family'][ $fam ] ?? 0;
+			$count                           = $count_summary['by_section_purpose_family'][ $fam ] ?? 0;
 			$section_family_minimums[ $fam ] = $count >= $min;
 		}
 
 		$page_class_minimums = array();
 		foreach ( self::PAGE_CLASS_MIN as $cls => $min ) {
-			$count = $count_summary['by_page_category_class'][ $cls ] ?? 0;
+			$count                       = $count_summary['by_page_category_class'][ $cls ] ?? 0;
 			$page_class_minimums[ $cls ] = $count >= $min;
 		}
 
 		$max_share_violations = array();
-		$section_total = $count_summary['section_total'];
-		$page_total    = $count_summary['page_total'];
+		$section_total        = $count_summary['section_total'];
+		$page_total           = $count_summary['page_total'];
 
 		if ( $section_total > 0 ) {
 			foreach ( $count_summary['by_section_purpose_family'] as $fam => $cnt ) {
@@ -227,13 +227,13 @@ final class Template_Library_Compliance_Service {
 
 		return array(
 			'section_family_minimums' => $section_family_minimums,
-			'page_class_minimums'    => $page_class_minimums,
-			'max_share_violations'   => $max_share_violations,
+			'page_class_minimums'     => $page_class_minimums,
+			'max_share_violations'    => $max_share_violations,
 		);
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $pages
+	 * @param list<array<string, mixed>>          $pages
 	 * @param array<string, array<string, mixed>> $section_by_key
 	 * @return list<array{template_key: string, code: string, message: string}>
 	 */
@@ -241,28 +241,31 @@ final class Template_Library_Compliance_Service {
 		$violations = array();
 		foreach ( $pages as $page_def ) {
 			$template_key = (string) ( $page_def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-			$class = (string) ( $page_def['template_category_class'] ?? '' );
-			$min_cta = self::CTA_MIN_BY_CLASS[ $class ] ?? 3;
+			$class        = (string) ( $page_def['template_category_class'] ?? '' );
+			$min_cta      = self::CTA_MIN_BY_CLASS[ $class ] ?? 3;
 
 			$ordered = $page_def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			if ( ! is_array( $ordered ) || empty( $ordered ) ) {
 				continue;
 			}
 
-			usort( $ordered, function ( $a, $b ) {
-				$pa = isset( $a[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) ? (int) $a[ Page_Template_Schema::SECTION_ITEM_POSITION ] : 0;
-				$pb = isset( $b[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) ? (int) $b[ Page_Template_Schema::SECTION_ITEM_POSITION ] : 0;
-				return $pa <=> $pb;
-			} );
+			usort(
+				$ordered,
+				function ( $a, $b ) {
+					$pa = isset( $a[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) ? (int) $a[ Page_Template_Schema::SECTION_ITEM_POSITION ] : 0;
+					$pb = isset( $b[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) ? (int) $b[ Page_Template_Schema::SECTION_ITEM_POSITION ] : 0;
+					return $pa <=> $pb;
+				}
+			);
 
 			$cta_flags = array();
 			foreach ( $ordered as $item ) {
-				$sk = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
-				$sec = $section_by_key[ $sk ] ?? null;
+				$sk          = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
+				$sec         = $section_by_key[ $sk ] ?? null;
 				$cta_flags[] = $sec !== null && $this->is_cta_classified( $sec );
 			}
 
-			$cta_count = (int) array_sum( array_map( 'intval', $cta_flags ) );
+			$cta_count     = (int) array_sum( array_map( 'intval', $cta_flags ) );
 			$non_cta_count = count( $cta_flags ) - $cta_count;
 
 			if ( $cta_count < $min_cta ) {
@@ -327,7 +330,7 @@ final class Template_Library_Compliance_Service {
 				continue;
 			}
 			$preview_defaults = $def['preview_defaults'] ?? null;
-			$has_preview = ( is_array( $preview_defaults ) && ! empty( $preview_defaults ) )
+			$has_preview      = ( is_array( $preview_defaults ) && ! empty( $preview_defaults ) )
 				|| ( (string) ( $def['preview_image_ref'] ?? '' ) ) !== ''
 				|| ( (string) ( $def['preview_description'] ?? '' ) ) !== '';
 			if ( ! $has_preview ) {
@@ -337,7 +340,7 @@ final class Template_Library_Compliance_Service {
 
 		$pages_missing = array();
 		foreach ( $pages as $def ) {
-			$key = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key       = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$one_pager = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? null;
 			if ( $key !== '' && ( $one_pager === null || ! is_array( $one_pager ) ) ) {
 				$pages_missing[] = $key;
@@ -384,7 +387,7 @@ final class Template_Library_Compliance_Service {
 	private function check_export( array $sections, array $pages ): array {
 		$errors = array();
 		foreach ( $sections as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key  = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$json = wp_json_encode( $def );
 			if ( $json === false ) {
 				$errors[] = "section:{$key}: encode failed";
@@ -396,7 +399,7 @@ final class Template_Library_Compliance_Service {
 			}
 		}
 		foreach ( $pages as $def ) {
-			$key = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key  = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$json = wp_json_encode( $def );
 			if ( $json === false ) {
 				$errors[] = "page:{$key}: encode failed";
@@ -440,9 +443,12 @@ final class Template_Library_Compliance_Service {
 		if ( ! empty( $category_coverage_summary['max_share_violations'] ?? array() ) ) {
 			return false;
 		}
-		$hard_cta = array_filter( $cta_rule_violations, function ( $v ) {
-			return ( $v['code'] ?? '' ) !== 'non_cta_count_above_max';
-		} );
+		$hard_cta = array_filter(
+			$cta_rule_violations,
+			function ( $v ) {
+				return ( $v['code'] ?? '' ) !== 'non_cta_count_above_max';
+			}
+		);
 		if ( ! empty( $hard_cta ) ) {
 			return false;
 		}

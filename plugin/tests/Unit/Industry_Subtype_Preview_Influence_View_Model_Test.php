@@ -34,7 +34,7 @@ final class Industry_Subtype_Preview_Influence_View_Model_Test extends TestCase 
 	}
 
 	public function test_to_array_includes_all_keys_when_has_subtype(): void {
-		$vm = new Industry_Subtype_Preview_Influence_View_Model(
+		$vm  = new Industry_Subtype_Preview_Influence_View_Model(
 			true,
 			'realtor_buyer_agent',
 			'Buyer Agent',
@@ -56,7 +56,7 @@ final class Industry_Subtype_Preview_Influence_View_Model_Test extends TestCase 
 	}
 
 	public function test_subtype_influence_array_shape_is_bounded(): void {
-		$arr = Industry_Subtype_Preview_Influence_View_Model::none()->to_array();
+		$arr           = Industry_Subtype_Preview_Influence_View_Model::none()->to_array();
 		$expected_keys = array( 'has_subtype', 'subtype_key', 'subtype_label', 'subtype_summary', 'helper_refinement_applied', 'onepager_refinement_applied', 'caution_notes', 'bundle_context' );
 		foreach ( $expected_keys as $key ) {
 			$this->assertArrayHasKey( $key, $arr, "Subtype influence must include key: {$key}" );

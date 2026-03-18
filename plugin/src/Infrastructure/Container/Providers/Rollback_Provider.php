@@ -25,22 +25,31 @@ final class Rollback_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'rollback_eligibility_service', function () use ( $container ): Rollback_Eligibility_Service {
-			return new Rollback_Eligibility_Service(
-				$container->get( 'operational_snapshot_repository' )
-			);
-		} );
-		$container->register( 'rollback_executor', function () use ( $container ): Rollback_Executor {
-			return new Rollback_Executor(
-				$container->get( 'rollback_eligibility_service' ),
-				$container->get( 'operational_snapshot_repository' )
-			);
-		} );
-		$container->register( 'rollback_state_builder', function () use ( $container ): Rollback_State_Builder {
-			return new Rollback_State_Builder(
-				$container->get( 'rollback_eligibility_service' ),
-				$container->get( 'diff_summarizer_service' )
-			);
-		} );
+		$container->register(
+			'rollback_eligibility_service',
+			function () use ( $container ): Rollback_Eligibility_Service {
+				return new Rollback_Eligibility_Service(
+					$container->get( 'operational_snapshot_repository' )
+				);
+			}
+		);
+		$container->register(
+			'rollback_executor',
+			function () use ( $container ): Rollback_Executor {
+				return new Rollback_Executor(
+					$container->get( 'rollback_eligibility_service' ),
+					$container->get( 'operational_snapshot_repository' )
+				);
+			}
+		);
+		$container->register(
+			'rollback_state_builder',
+			function () use ( $container ): Rollback_State_Builder {
+				return new Rollback_State_Builder(
+					$container->get( 'rollback_eligibility_service' ),
+					$container->get( 'diff_summarizer_service' )
+				);
+			}
+		);
 	}
 }

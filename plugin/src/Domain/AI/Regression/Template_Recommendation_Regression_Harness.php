@@ -46,9 +46,9 @@ final class Template_Recommendation_Regression_Harness {
 	public const EXPECTED_REQUIRE_EXPLANATION = 'require_explanation';
 
 	/** Recommendation may be under proposed_template_summary. */
-	public const RECOMMENDATION_TEMPLATE_KEY = 'template_key';
-	public const RECOMMENDATION_CATEGORY_CLASS = 'template_category_class';
-	public const RECOMMENDATION_TEMPLATE_FAMILY = 'template_family';
+	public const RECOMMENDATION_TEMPLATE_KEY     = 'template_key';
+	public const RECOMMENDATION_CATEGORY_CLASS   = 'template_category_class';
+	public const RECOMMENDATION_TEMPLATE_FAMILY  = 'template_family';
 	public const RECOMMENDATION_SELECTION_REASON = 'template_selection_reason';
 
 	/** @var string Base path for fixture files. */
@@ -67,7 +67,15 @@ final class Template_Recommendation_Regression_Harness {
 	public function run( $fixture ): Template_Recommendation_Regression_Result {
 		$data = is_string( $fixture ) ? $this->load_fixture_file( $fixture ) : $fixture;
 		if ( ! is_array( $data ) ) {
-			return $this->result_invalid( array( 'case_id' => '', 'scenario' => '', 'fixture_version' => '0', 'ran_at' => gmdate( 'Y-m-d\TH:i:s\Z' ) ), 'Fixture must be array or path to JSON.' );
+			return $this->result_invalid(
+				array(
+					'case_id'         => '',
+					'scenario'        => '',
+					'fixture_version' => '0',
+					'ran_at'          => gmdate( 'Y-m-d\TH:i:s\Z' ),
+				),
+				'Fixture must be array or path to JSON.'
+			);
 		}
 		return $this->run_from_array( $data );
 	}
@@ -79,13 +87,13 @@ final class Template_Recommendation_Regression_Harness {
 	 * @return Template_Recommendation_Regression_Result
 	 */
 	public function run_from_array( array $data ): Template_Recommendation_Regression_Result {
-		$case_id    = (string) ( $data[ self::FIXTURE_CASE_ID ] ?? 'unknown' );
-		$scenario   = (string) ( $data[ self::FIXTURE_SCENARIO ] ?? '' );
-		$version    = (string) ( $data[ self::FIXTURE_VERSION ] ?? '0' );
+		$case_id        = (string) ( $data[ self::FIXTURE_CASE_ID ] ?? 'unknown' );
+		$scenario       = (string) ( $data[ self::FIXTURE_SCENARIO ] ?? '' );
+		$version        = (string) ( $data[ self::FIXTURE_VERSION ] ?? '0' );
 		$recommendation = $data[ self::FIXTURE_RECOMMENDATION ] ?? null;
-		$expected   = $data[ self::FIXTURE_EXPECTED ] ?? null;
+		$expected       = $data[ self::FIXTURE_EXPECTED ] ?? null;
 
-		$ran_at = gmdate( 'Y-m-d\TH:i:s\Z' );
+		$ran_at         = gmdate( 'Y-m-d\TH:i:s\Z' );
 		$regression_run = array(
 			'case_id'         => $case_id,
 			'scenario'        => $scenario,
@@ -100,10 +108,10 @@ final class Template_Recommendation_Regression_Harness {
 			return $this->result_invalid( $regression_run, 'Fixture recommendation must be an array.' );
 		}
 
-		$rec = $this->normalize_recommendation( $recommendation );
-		$class_fit   = $this->check_class_fit( $rec, $expected );
-		$family_fit  = $this->check_family_fit( $rec, $expected );
-		$cta_aligned = $this->check_cta_law_aligned( $rec, $expected, $data );
+		$rec             = $this->normalize_recommendation( $recommendation );
+		$class_fit       = $this->check_class_fit( $rec, $expected );
+		$family_fit      = $this->check_family_fit( $rec, $expected );
+		$cta_aligned     = $this->check_cta_law_aligned( $rec, $expected, $data );
 		$explanation_fit = $this->check_explanation_fit( $rec, $expected );
 
 		$outcome = Template_Recommendation_Regression_Result::OUTCOME_PASS;
@@ -111,29 +119,32 @@ final class Template_Recommendation_Regression_Harness {
 		$details = array();
 
 		if ( ! $class_fit ) {
-			$outcome = Template_Recommendation_Regression_Result::OUTCOME_REGRESSION;
-			$message = 'Class fit regression: template_category_class does not match expected.';
+			$outcome                   = Template_Recommendation_Regression_Result::OUTCOME_REGRESSION;
+			$message                   = 'Class fit regression: template_category_class does not match expected.';
 			$details['class_mismatch'] = array(
 				'expected' => $expected[ self::EXPECTED_CATEGORY_CLASS ] ?? null,
 				'actual'   => $rec[ self::RECOMMENDATION_CATEGORY_CLASS ] ?? null,
 			);
 		}
 		if ( ! $family_fit ) {
-			$outcome = Template_Recommendation_Regression_Result::OUTCOME_REGRESSION;
-			$message = 'Family fit regression: template_family not in allowed set.';
+			$outcome                    = Template_Recommendation_Regression_Result::OUTCOME_REGRESSION;
+			$message                    = 'Family fit regression: template_family not in allowed set.';
 			$details['family_mismatch'] = array(
 				'allowed' => $expected[ self::EXPECTED_ALLOWED_FAMILIES ] ?? array(),
 				'actual'  => $rec[ self::RECOMMENDATION_TEMPLATE_FAMILY ] ?? null,
 			);
 		}
 		if ( $cta_aligned === false ) {
-			$outcome = Template_Recommendation_Regression_Result::OUTCOME_REGRESSION;
-			$message = 'CTA-law alignment regression: expected CTA-compliant recommendation.';
-			$details['cta_law'] = array( 'expected_aligned' => true, 'actual' => false );
+			$outcome            = Template_Recommendation_Regression_Result::OUTCOME_REGRESSION;
+			$message            = 'CTA-law alignment regression: expected CTA-compliant recommendation.';
+			$details['cta_law'] = array(
+				'expected_aligned' => true,
+				'actual'           => false,
+			);
 		}
 		if ( ! $explanation_fit ) {
-			$outcome = Template_Recommendation_Regression_Result::OUTCOME_REGRESSION;
-			$message = 'Explanation fit regression: selection reason or summary missing when required.';
+			$outcome                        = Template_Recommendation_Regression_Result::OUTCOME_REGRESSION;
+			$message                        = 'Explanation fit regression: selection reason or summary missing when required.';
 			$details['explanation_missing'] = true;
 		}
 
@@ -181,10 +192,10 @@ final class Template_Recommendation_Regression_Harness {
 		$summary = $recommendation['proposed_template_summary'] ?? $recommendation;
 		$summary = is_array( $summary ) ? $summary : array();
 		return array(
-			self::RECOMMENDATION_TEMPLATE_KEY       => (string) ( $summary['template_key'] ?? $recommendation['template_key'] ?? '' ),
-			self::RECOMMENDATION_CATEGORY_CLASS      => (string) ( $summary['template_category_class'] ?? $recommendation['template_category_class'] ?? '' ),
-			self::RECOMMENDATION_TEMPLATE_FAMILY     => (string) ( $summary['template_family'] ?? $recommendation['template_family'] ?? '' ),
-			self::RECOMMENDATION_SELECTION_REASON   => (string) ( $recommendation['template_selection_reason'] ?? $summary['template_selection_reason'] ?? '' ),
+			self::RECOMMENDATION_TEMPLATE_KEY     => (string) ( $summary['template_key'] ?? $recommendation['template_key'] ?? '' ),
+			self::RECOMMENDATION_CATEGORY_CLASS   => (string) ( $summary['template_category_class'] ?? $recommendation['template_category_class'] ?? '' ),
+			self::RECOMMENDATION_TEMPLATE_FAMILY  => (string) ( $summary['template_family'] ?? $recommendation['template_family'] ?? '' ),
+			self::RECOMMENDATION_SELECTION_REASON => (string) ( $recommendation['template_selection_reason'] ?? $summary['template_selection_reason'] ?? '' ),
 		);
 	}
 
@@ -222,11 +233,11 @@ final class Template_Recommendation_Regression_Harness {
 			return null;
 		}
 		$expected_aligned = (bool) $expected[ self::EXPECTED_CTA_LAW_ALIGNED ];
-		$metadata = $data['template_metadata'] ?? null;
+		$metadata         = $data['template_metadata'] ?? null;
 		if ( is_array( $metadata ) && isset( $metadata['min_cta'], $metadata['last_section_cta'] ) ) {
-			$min = (int) $metadata['min_cta'];
+			$min      = (int) $metadata['min_cta'];
 			$last_cta = (bool) $metadata['last_section_cta'];
-			$aligned = $min >= 3 && $last_cta;
+			$aligned  = $min >= 3 && $last_cta;
 			return $aligned === $expected_aligned;
 		}
 		return null;

@@ -108,8 +108,8 @@ final class Style_Token_Registry {
 		if ( ! in_array( $name, $allowed, true ) ) {
 			return '';
 		}
-		$prefix = '--aio-';
-		$map    = array(
+		$prefix  = '--aio-';
+		$map     = array(
 			'color'      => 'color',
 			'typography' => 'font',
 			'spacing'    => 'space',

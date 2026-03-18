@@ -32,7 +32,7 @@ final class Pre_Change_Snapshot_Builder {
 		$action_type = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ]
 			: '';
-		$target = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
+		$target      = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
 			: array();
 
@@ -70,13 +70,13 @@ final class Pre_Change_Snapshot_Builder {
 			$excerpt = substr( $excerpt, 0, 497 ) . '...';
 		}
 		$state_snapshot = array(
-			'post_id'       => $post_id,
-			'post_title'    => $post->post_title,
-			'post_name'     => $post->post_name,
-			'post_status'   => $post->post_status,
-			'post_type'     => $post->post_type,
-			'content_hash'  => $content_hash,
-			'excerpt'       => $excerpt,
+			'post_id'      => $post_id,
+			'post_title'   => $post->post_title,
+			'post_name'    => $post->post_name,
+			'post_status'  => $post->post_status,
+			'post_type'    => $post->post_type,
+			'content_hash' => $content_hash,
+			'excerpt'      => $excerpt,
 		);
 		// * Replace intent: intended_template_key for template-aware diff (spec §59.11; Prompt 197).
 		$intended_key = $this->resolve_intended_template_key( $target );
@@ -85,11 +85,11 @@ final class Pre_Change_Snapshot_Builder {
 		}
 		$now = gmdate( 'c' );
 		return array(
-			'target_ref'     => (string) $post_id,
-			'object_family'  => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
-			'pre_change'     => array(
-				'captured_at'     => $now,
-				'state_snapshot'  => $state_snapshot,
+			'target_ref'    => (string) $post_id,
+			'object_family' => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
+			'pre_change'    => array(
+				'captured_at'    => $now,
+				'state_snapshot' => $state_snapshot,
 			),
 		);
 	}
@@ -132,7 +132,7 @@ final class Pre_Change_Snapshot_Builder {
 				break;
 			}
 		}
-		$items = \wp_get_nav_menu_items( $menu_id );
+		$items     = \wp_get_nav_menu_items( $menu_id );
 		$item_list = array();
 		if ( is_array( $items ) ) {
 			foreach ( $items as $item ) {
@@ -149,12 +149,12 @@ final class Pre_Change_Snapshot_Builder {
 			}
 		}
 		$state_snapshot = array(
-			'menu_id'   => (int) $menu->term_id,
-			'name'      => $menu->name,
-			'location'  => $location,
-			'items'     => $item_list,
+			'menu_id'  => (int) $menu->term_id,
+			'name'     => $menu->name,
+			'location' => $location,
+			'items'    => $item_list,
 		);
-		$now = gmdate( 'c' );
+		$now            = gmdate( 'c' );
 		return array(
 			'target_ref'    => (string) $menu_id,
 			'object_family' => Operational_Snapshot_Schema::OBJECT_FAMILY_MENU,
@@ -189,7 +189,7 @@ final class Pre_Change_Snapshot_Builder {
 			'token_set_id' => $group . ':' . $name,
 			'tokens'       => $tokens,
 		);
-		$now = gmdate( 'c' );
+		$now            = gmdate( 'c' );
 		return array(
 			'target_ref'    => $group . ':' . $name,
 			'object_family' => Operational_Snapshot_Schema::OBJECT_FAMILY_TOKEN_SET,
@@ -231,8 +231,14 @@ final class Pre_Change_Snapshot_Builder {
 			return 0;
 		}
 		$locations = \get_nav_menu_locations();
-		$slug = array( 'header' => 'primary', 'footer' => 'footer', 'mobile' => 'mobile', 'off_canvas' => 'off_canvas', 'sidebar' => 'sidebar' )[ $context ] ?? $context;
-		$term_id = isset( $locations[ $slug ] ) ? $locations[ $slug ] : null;
+		$slug      = array(
+			'header'     => 'primary',
+			'footer'     => 'footer',
+			'mobile'     => 'mobile',
+			'off_canvas' => 'off_canvas',
+			'sidebar'    => 'sidebar',
+		)[ $context ] ?? $context;
+		$term_id   = isset( $locations[ $slug ] ) ? $locations[ $slug ] : null;
 		if ( $term_id !== null && (int) $term_id > 0 ) {
 			return (int) $term_id;
 		}

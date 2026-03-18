@@ -67,7 +67,7 @@ final class Provider_Failover_Policy {
 		$this->primary_provider_id   = $primary_provider_id;
 		$this->fallback_provider_id  = $fallback_provider_id;
 		$this->eligible_categories   = array_values( array_unique( $eligible_categories ) );
-		$this->max_fallback_attempts  = $max_fallback_attempts > 0 ? min( $max_fallback_attempts, 1 ) : 0;
+		$this->max_fallback_attempts = $max_fallback_attempts > 0 ? min( $max_fallback_attempts, 1 ) : 0;
 	}
 
 	public function is_enabled(): bool {
@@ -130,11 +130,11 @@ final class Provider_Failover_Policy {
 	 */
 	public function to_metadata_snapshot(): array {
 		return array(
-			'enabled'                => $this->enabled,
+			'enabled'               => $this->enabled,
 			'primary_provider_id'   => $this->primary_provider_id,
 			'fallback_provider_id'  => $this->fallback_provider_id,
 			'eligible_categories'   => $this->eligible_categories,
-			'max_fallback_attempts'  => $this->max_fallback_attempts,
+			'max_fallback_attempts' => $this->max_fallback_attempts,
 		);
 	}
 
@@ -143,12 +143,12 @@ final class Provider_Failover_Policy {
 	 * Returns disabled policy when key missing or invalid.
 	 *
 	 * @param array<string, mixed> $config Config slice (failover_policy).
-	 * @param string              $primary_provider_id Primary provider id (from prefill/selection).
+	 * @param string               $primary_provider_id Primary provider id (from prefill/selection).
 	 * @return self
 	 */
 	public static function from_config( array $config, string $primary_provider_id ): self {
-		$enabled = isset( $config['enabled'] ) && $config['enabled'] === true;
-		$fallback = isset( $config['fallback_provider_id'] ) && is_string( $config['fallback_provider_id'] )
+		$enabled    = isset( $config['enabled'] ) && $config['enabled'] === true;
+		$fallback   = isset( $config['fallback_provider_id'] ) && is_string( $config['fallback_provider_id'] )
 			? trim( $config['fallback_provider_id'] )
 			: '';
 		$categories = array();

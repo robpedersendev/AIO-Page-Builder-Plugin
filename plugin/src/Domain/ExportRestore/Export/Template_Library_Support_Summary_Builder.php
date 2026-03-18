@@ -72,14 +72,14 @@ final class Template_Library_Support_Summary_Builder {
 		?Form_Provider_Availability_Service $form_provider_availability = null,
 		?Form_Provider_Health_Summary_Service $form_provider_health_summary_service = null
 	) {
-		$this->compliance_service   = $compliance_service;
-		$this->section_appendix     = $section_appendix;
-		$this->page_appendix        = $page_appendix;
-		$this->deprecation_service  = $deprecation_service;
-		$this->section_repository   = $section_repository;
-		$this->page_repository      = $page_repository;
-		$this->redaction            = $redaction;
-		$this->form_provider_availability = $form_provider_availability;
+		$this->compliance_service                   = $compliance_service;
+		$this->section_appendix                     = $section_appendix;
+		$this->page_appendix                        = $page_appendix;
+		$this->deprecation_service                  = $deprecation_service;
+		$this->section_repository                   = $section_repository;
+		$this->page_repository                      = $page_repository;
+		$this->redaction                            = $redaction;
+		$this->form_provider_availability           = $form_provider_availability;
 		$this->form_provider_health_summary_service = $form_provider_health_summary_service;
 	}
 
@@ -89,14 +89,14 @@ final class Template_Library_Support_Summary_Builder {
 	 * @return array<string, mixed> Stable payload: health, validation_failures, cta_violations, preview_issues, inventory, appendix_sync, version_summary.
 	 */
 	public function build(): array {
-		$health           = $this->build_health();
-		$inventory        = $this->build_inventory();
-		$appendix_sync    = $this->build_appendix_sync();
-		$version_summary  = $this->build_version_summary();
+		$health          = $this->build_health();
+		$inventory       = $this->build_inventory();
+		$appendix_sync   = $this->build_appendix_sync();
+		$version_summary = $this->build_version_summary();
 
 		$validation_failures = array();
 		$cta_violations      = array();
-		$preview_issues       = array(
+		$preview_issues      = array(
 			'sections_missing_preview' => array(),
 			'pages_missing_one_pager'  => array(),
 		);
@@ -108,7 +108,7 @@ final class Template_Library_Support_Summary_Builder {
 		}
 
 		$payload = array(
-			'health'             => $health,
+			'health'              => $health,
 			'validation_failures' => $validation_failures,
 			'cta_violations'      => $this->redact_violation_messages( $cta_violations ),
 			'preview_issues'      => $preview_issues,
@@ -155,34 +155,34 @@ final class Template_Library_Support_Summary_Builder {
 			return array();
 		}
 
-		$count_summary   = $result->get_count_summary();
-		$category        = $result->get_category_coverage_summary();
-		$cta_violations  = $result->get_cta_rule_violations();
-		$preview         = $result->get_preview_readiness();
-		$metadata        = $result->get_metadata_checks();
+		$count_summary    = $result->get_count_summary();
+		$category         = $result->get_category_coverage_summary();
+		$cta_violations   = $result->get_cta_rule_violations();
+		$preview          = $result->get_preview_readiness();
+		$metadata         = $result->get_metadata_checks();
 		$export_viability = $result->get_export_viability();
 
 		return array(
-			'passed'                     => $result->is_passed(),
-			'count_summary'              => array(
-				'section_total'   => $count_summary['section_total'] ?? 0,
-				'page_total'      => $count_summary['page_total'] ?? 0,
-				'section_target'   => $count_summary['section_target'] ?? 250,
-				'page_target'      => $count_summary['page_target'] ?? 500,
+			'passed'               => $result->is_passed(),
+			'count_summary'        => array(
+				'section_total'  => $count_summary['section_total'] ?? 0,
+				'page_total'     => $count_summary['page_total'] ?? 0,
+				'section_target' => $count_summary['section_target'] ?? 250,
+				'page_target'    => $count_summary['page_target'] ?? 500,
 			),
-			'max_share_violations'        => $category['max_share_violations'] ?? array(),
-			'cta_rule_violations'         => $cta_violations,
-			'preview_readiness'           => array(
+			'max_share_violations' => $category['max_share_violations'] ?? array(),
+			'cta_rule_violations'  => $cta_violations,
+			'preview_readiness'    => array(
 				'sections_missing_preview_count' => count( $preview['sections_missing_preview'] ?? array() ),
-				'sections_missing_preview'      => array_slice( $preview['sections_missing_preview'] ?? array(), 0, 50 ),
-				'pages_missing_one_pager_count' => count( $preview['pages_missing_one_pager'] ?? array() ),
-				'pages_missing_one_pager'       => array_slice( $preview['pages_missing_one_pager'] ?? array(), 0, 50 ),
+				'sections_missing_preview'       => array_slice( $preview['sections_missing_preview'] ?? array(), 0, 50 ),
+				'pages_missing_one_pager_count'  => count( $preview['pages_missing_one_pager'] ?? array() ),
+				'pages_missing_one_pager'        => array_slice( $preview['pages_missing_one_pager'] ?? array(), 0, 50 ),
 			),
-			'metadata_checks'             => array(
+			'metadata_checks'      => array(
 				'sections_missing_accessibility_count' => count( $metadata['sections_missing_accessibility'] ?? array() ),
 				'sections_invalid_animation_count'     => count( $metadata['sections_invalid_animation'] ?? array() ),
 			),
-			'export_viability'            => array(
+			'export_viability'     => array(
 				'viable'       => $export_viability['viable'] ?? false,
 				'errors_count' => count( $export_viability['errors'] ?? array() ),
 				'errors'       => $this->redact_export_errors( $export_viability['errors'] ?? array() ),
@@ -278,11 +278,11 @@ final class Template_Library_Support_Summary_Builder {
 		$section_total = 0;
 		$page_total    = 0;
 		if ( $this->section_appendix !== null ) {
-			$res = $this->section_appendix->build_result();
+			$res           = $this->section_appendix->build_result();
 			$section_total = $res['total'] ?? 0;
 		}
 		if ( $this->page_appendix !== null ) {
-			$res = $this->page_appendix->build_result();
+			$res        = $this->page_appendix->build_result();
 			$page_total = $res['total'] ?? 0;
 		}
 		return array(
@@ -297,14 +297,14 @@ final class Template_Library_Support_Summary_Builder {
 	 * @return array{in_sync: bool, section_match: bool, page_match: bool, note: string}
 	 */
 	private function build_appendix_sync(): array {
-		$inventory = $this->build_inventory();
-		$health    = $this->build_health();
-		$comp_section = (int) ( $health['count_summary']['section_total'] ?? 0 );
-		$comp_page    = (int) ( $health['count_summary']['page_total'] ?? 0 );
+		$inventory     = $this->build_inventory();
+		$health        = $this->build_health();
+		$comp_section  = (int) ( $health['count_summary']['section_total'] ?? 0 );
+		$comp_page     = (int) ( $health['count_summary']['page_total'] ?? 0 );
 		$section_match = $comp_section === 0 && $inventory['section_total'] === 0 || $comp_section > 0 && $inventory['section_total'] === $comp_section;
 		$page_match    = $comp_page === 0 && $inventory['page_total'] === 0 || $comp_page > 0 && $inventory['page_total'] === $comp_page;
-		$in_sync = $section_match && $page_match;
-		$note = $in_sync ? 'Appendix totals match compliance counts.' : 'Appendix and compliance counts differ; re-run appendix generation or compliance.';
+		$in_sync       = $section_match && $page_match;
+		$note          = $in_sync ? 'Appendix totals match compliance counts.' : 'Appendix and compliance counts differ; re-run appendix generation or compliance.';
 		return array(
 			'in_sync'       => $in_sync,
 			'section_match' => $section_match,

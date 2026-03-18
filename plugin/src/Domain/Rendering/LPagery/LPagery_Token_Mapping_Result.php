@@ -97,12 +97,12 @@ final class LPagery_Token_Mapping_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'supported'               => $this->supported,
-			'canonical_token_group'   => $this->canonical_token_group,
-			'canonical_token_name'    => $this->canonical_token_name,
-			'lpagery_key'             => $this->lpagery_key,
-			'warning'                 => $this->warning,
-			'reversible'              => $this->reversible,
+			'supported'             => $this->supported,
+			'canonical_token_group' => $this->canonical_token_group,
+			'canonical_token_name'  => $this->canonical_token_name,
+			'lpagery_key'           => $this->lpagery_key,
+			'warning'               => $this->warning,
+			'reversible'            => $this->reversible,
 		);
 	}
 }

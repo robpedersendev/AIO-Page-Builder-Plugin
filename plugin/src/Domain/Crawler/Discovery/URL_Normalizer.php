@@ -100,9 +100,9 @@ final class URL_Normalizer {
 		}
 		$raw_path = $parsed['path'] ?? '/';
 		$path     = $this->normalize_path( ( $raw_path === false || $raw_path === '' ) ? '/' : $raw_path );
-		$query = $this->strip_tracking_from_query( $parsed['query'] ?? '' );
-		$path  = $path === '' ? '/' : $path;
-		$q     = $query !== '' ? '?' . $query : '';
+		$query    = $this->strip_tracking_from_query( $parsed['query'] ?? '' );
+		$path     = $path === '' ? '/' : $path;
+		$q        = $query !== '' ? '?' . $query : '';
 		return $this->scheme . '://' . $this->canonical_host . $path . $q;
 	}
 
@@ -173,7 +173,11 @@ final class URL_Normalizer {
 	private function parse_url_fallback( string $url ): ?array {
 		if ( ! preg_match( '#^(https?)://([^/?#]+)(/[^?#]*)?(\?(?:[^#]*))?(\#.*)?$#i', $url, $m ) ) {
 			if ( preg_match( '#^(https?)://([^/?#]+)/?$#i', $url, $m ) ) {
-				return array( 'scheme' => strtolower( $m[1] ), 'host' => $m[2], 'path' => '/' );
+				return array(
+					'scheme' => strtolower( $m[1] ),
+					'host'   => $m[2],
+					'path'   => '/',
+				);
 			}
 			return null;
 		}
@@ -197,7 +201,7 @@ final class URL_Normalizer {
 		if ( $host === '' ) {
 			return false;
 		}
-		$port   = isset( $parsed['port'] ) ? (int) $parsed['port'] : null;
+		$port    = isset( $parsed['port'] ) ? (int) $parsed['port'] : null;
 		$compare = ( $port === 80 || $port === 443 || $port === null ) ? $host : $host . ':' . $port;
 		return $compare === $this->canonical_host;
 	}

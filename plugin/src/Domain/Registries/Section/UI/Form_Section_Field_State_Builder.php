@@ -39,8 +39,8 @@ final class Form_Section_Field_State_Builder {
 		?Form_Provider_Picker_Discovery_Service $picker_discovery = null,
 		?Form_Provider_Availability_Service $availability_service = null
 	) {
-		$this->provider_registry   = $provider_registry;
-		$this->picker_discovery    = $picker_discovery;
+		$this->provider_registry    = $provider_registry;
+		$this->picker_discovery     = $picker_discovery;
 		$this->availability_service = $availability_service;
 	}
 
@@ -64,21 +64,21 @@ final class Form_Section_Field_State_Builder {
 	 * }
 	 */
 	public function build_state( array $definition, array $field_values = array() ): array {
-		$category = (string) ( $definition[ Section_Schema::FIELD_CATEGORY ] ?? '' );
+		$category        = (string) ( $definition[ Section_Schema::FIELD_CATEGORY ] ?? '' );
 		$is_form_section = $category === 'form_embed';
 
-		$registered = $this->provider_registry->get_registered_provider_ids();
+		$registered    = $this->provider_registry->get_registered_provider_ids();
 		$form_provider = \sanitize_text_field( (string) ( $field_values[ Form_Provider_Registry::FIELD_FORM_PROVIDER ] ?? '' ) );
 		if ( $is_form_section && $form_provider === '' ) {
 			$form_provider = 'ndr_forms';
 		}
-		$form_id       = \sanitize_text_field( (string) ( $field_values[ Form_Provider_Registry::FIELD_FORM_ID ] ?? '' ) );
-		$headline      = \sanitize_text_field( (string) ( $field_values['headline'] ?? '' ) );
+		$form_id  = \sanitize_text_field( (string) ( $field_values[ Form_Provider_Registry::FIELD_FORM_ID ] ?? '' ) );
+		$headline = \sanitize_text_field( (string) ( $field_values['headline'] ?? '' ) );
 
-		$provider_valid = $form_provider !== '' && $this->provider_registry->has_provider( $form_provider );
-		$form_id_valid  = $form_id !== '' && preg_match( '/^[a-zA-Z0-9_\-]+$/', $form_id );
+		$provider_valid    = $form_provider !== '' && $this->provider_registry->has_provider( $form_provider );
+		$form_id_valid     = $form_id !== '' && preg_match( '/^[a-zA-Z0-9_\-]+$/', $form_id );
 		$shortcode_preview = null;
-		$messages = array();
+		$messages          = array();
 
 		if ( $is_form_section ) {
 			if ( $form_provider === '' ) {
@@ -97,13 +97,13 @@ final class Form_Section_Field_State_Builder {
 		}
 
 		$state = array(
-			'is_form_section'          => $is_form_section,
-			'registered_provider_ids'  => $registered,
+			'is_form_section'         => $is_form_section,
+			'registered_provider_ids' => $registered,
 			'form_provider'           => $form_provider,
 			'form_id'                 => $form_id,
 			'headline'                => $headline,
-			'provider_valid'         => $provider_valid,
-			'form_id_valid'          => $form_id_valid,
+			'provider_valid'          => $provider_valid,
+			'form_id_valid'           => $form_id_valid,
 			'shortcode_preview'       => $shortcode_preview,
 			'messages'                => $messages,
 			'labels'                  => array(
@@ -119,16 +119,16 @@ final class Form_Section_Field_State_Builder {
 					$meta = $this->picker_discovery->get_picker_metadata_for_provider( $pid );
 					$av   = $this->availability_service->get_availability_state( $pid, $form_id );
 					$base = array(
-						'provider_key'          => $meta['provider_key'],
-						'display_label'         => $meta['display_label'],
-						'available'             => $meta['available'],
-						'supports_form_list'    => $meta['supports_form_list'],
-						'picker_items'          => $meta['supports_form_list'] && isset( $av['picker_items'] ) ? $av['picker_items'] : array(),
-						'fallback_entry_label'  => $meta['fallback_entry_label'],
-						'empty_state_message'   => $meta['empty_state_message'],
-						'availability_status'   => $av['status'],
-						'from_cache'            => $av['from_cache'],
-						'stale_binding'         => $av['stale_binding'],
+						'provider_key'         => $meta['provider_key'],
+						'display_label'        => $meta['display_label'],
+						'available'            => $meta['available'],
+						'supports_form_list'   => $meta['supports_form_list'],
+						'picker_items'         => $meta['supports_form_list'] && isset( $av['picker_items'] ) ? $av['picker_items'] : array(),
+						'fallback_entry_label' => $meta['fallback_entry_label'],
+						'empty_state_message'  => $meta['empty_state_message'],
+						'availability_status'  => $av['status'],
+						'from_cache'           => $av['from_cache'],
+						'stale_binding'        => $av['stale_binding'],
 					);
 					if ( $av['message'] !== null ) {
 						$base['availability_message'] = $av['message'];

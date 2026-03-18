@@ -19,14 +19,16 @@ final class Goal_Style_Preset_Overlay_Registry_Test extends TestCase {
 
 	public function test_load_and_get_returns_overlay(): void {
 		$registry = new Goal_Style_Preset_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY => 'goal_calls_realtor',
-				Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY         => 'calls',
-				Goal_Style_Preset_Overlay_Registry::FIELD_TARGET_PRESET_REF => 'realtor_warm',
-				Goal_Style_Preset_Overlay_Registry::FIELD_STATUS          => 'active',
-			),
-		) );
+				array(
+					Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY => 'goal_calls_realtor',
+					Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY         => 'calls',
+					Goal_Style_Preset_Overlay_Registry::FIELD_TARGET_PRESET_REF => 'realtor_warm',
+					Goal_Style_Preset_Overlay_Registry::FIELD_STATUS          => 'active',
+				),
+			)
+		);
 		$ov = $registry->get( 'goal_calls_realtor' );
 		$this->assertNotNull( $ov );
 		$this->assertSame( 'calls', $ov[ Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY ] );
@@ -55,14 +57,16 @@ final class Goal_Style_Preset_Overlay_Registry_Test extends TestCase {
 
 	public function test_invalid_goal_key_skipped(): void {
 		$registry = new Goal_Style_Preset_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY => 'goal_unknown_x',
-				Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY         => 'invalid_goal_xyz',
-				Goal_Style_Preset_Overlay_Registry::FIELD_TARGET_PRESET_REF => 'realtor_warm',
-				Goal_Style_Preset_Overlay_Registry::FIELD_STATUS          => 'active',
-			),
-		) );
+				array(
+					Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_PRESET_KEY => 'goal_unknown_x',
+					Goal_Style_Preset_Overlay_Registry::FIELD_GOAL_KEY         => 'invalid_goal_xyz',
+					Goal_Style_Preset_Overlay_Registry::FIELD_TARGET_PRESET_REF => 'realtor_warm',
+					Goal_Style_Preset_Overlay_Registry::FIELD_STATUS          => 'active',
+				),
+			)
+		);
 		$this->assertNull( $registry->get( 'goal_unknown_x' ) );
 		$this->assertSame( array(), $registry->get_all() );
 	}

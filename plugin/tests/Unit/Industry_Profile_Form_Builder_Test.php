@@ -46,22 +46,24 @@ final class Industry_Profile_Form_Builder_Test extends TestCase {
 
 	public function test_primary_industry_options_include_active_packs(): void {
 		$registry = new Industry_Pack_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY  => 'legal',
-				Industry_Pack_Schema::FIELD_NAME         => 'Legal',
-				Industry_Pack_Schema::FIELD_SUMMARY      => 'Legal industry',
-				Industry_Pack_Schema::FIELD_STATUS       => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
-			),
-			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY  => 'healthcare',
-				Industry_Pack_Schema::FIELD_NAME         => 'Healthcare',
-				Industry_Pack_Schema::FIELD_SUMMARY      => 'Healthcare industry',
-				Industry_Pack_Schema::FIELD_STATUS       => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
-			),
-		) );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'legal',
+					Industry_Pack_Schema::FIELD_NAME    => 'Legal',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Legal industry',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
+				),
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'healthcare',
+					Industry_Pack_Schema::FIELD_NAME    => 'Healthcare',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Healthcare industry',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
+				),
+			)
+		);
 		$builder = new Industry_Profile_Form_Builder( $registry );
 		$options = $builder->get_primary_industry_options();
 		$this->assertArrayHasKey( '', $options );
@@ -73,7 +75,7 @@ final class Industry_Profile_Form_Builder_Test extends TestCase {
 
 	public function test_field_config_has_primary_and_secondary(): void {
 		$builder = new Industry_Profile_Form_Builder( null );
-		$config = $builder->get_field_config();
+		$config  = $builder->get_field_config();
 		$this->assertArrayHasKey( 'primary_industry_key', $config );
 		$this->assertSame( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY, $config['primary_industry_key']['name'] );
 		$this->assertSame( 'select', $config['primary_industry_key']['type'] );

@@ -53,11 +53,11 @@ final class Uninstall_Cleanup_Service {
 	 * @return array{scheduled_removed: bool, options_removed: int, tables_dropped: int, cpt_posts_removed: int, acf_transients_removed: int, built_pages_preserved: true}
 	 */
 	public function cleanup_plugin_owned_data( string $scope = self::SCOPE_FULL ): array {
-		$scheduled_removed       = false;
-		$options_removed         = 0;
-		$tables_dropped          = 0;
-		$cpt_posts_removed       = 0;
-		$acf_transients_removed  = 0;
+		$scheduled_removed      = false;
+		$options_removed        = 0;
+		$tables_dropped         = 0;
+		$cpt_posts_removed      = 0;
+		$acf_transients_removed = 0;
 
 		$this->clear_scheduled_events();
 		$scheduled_removed = true;
@@ -97,12 +97,12 @@ final class Uninstall_Cleanup_Service {
 		}
 
 		return array(
-			'scheduled_removed'       => $scheduled_removed,
-			'options_removed'         => $options_removed,
-			'tables_dropped'          => $tables_dropped,
-			'cpt_posts_removed'       => $cpt_posts_removed,
-			'acf_transients_removed'  => $acf_transients_removed,
-			'built_pages_preserved'   => true,
+			'scheduled_removed'      => $scheduled_removed,
+			'options_removed'        => $options_removed,
+			'tables_dropped'         => $tables_dropped,
+			'cpt_posts_removed'      => $cpt_posts_removed,
+			'acf_transients_removed' => $acf_transients_removed,
+			'built_pages_preserved'  => true,
 		);
 	}
 

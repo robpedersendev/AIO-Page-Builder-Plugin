@@ -26,7 +26,7 @@ final class Provider_Connection_Test_Result_Test extends TestCase {
 			'2025-07-15T12:00:00+00:00',
 			'Connection successful.'
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 		$this->assertTrue( $arr['success'] );
 		$this->assertSame( 'openai', $arr['provider_id'] );
 		$this->assertSame( 'gpt-4o', $arr['model_used'] );
@@ -36,12 +36,12 @@ final class Provider_Connection_Test_Result_Test extends TestCase {
 	}
 
 	public function test_failure_result_to_array_includes_normalized_error(): void {
-		$error = array(
+		$error  = array(
 			'category'      => 'auth_failure',
 			'user_message'  => 'AI service authentication failed.',
-			'internal_code'  => 'auth_failure',
-			'provider_raw'   => null,
-			'retry_posture'  => 'no_retry',
+			'internal_code' => 'auth_failure',
+			'provider_raw'  => null,
+			'retry_posture' => 'no_retry',
 		);
 		$result = new Provider_Connection_Test_Result(
 			false,
@@ -51,13 +51,13 @@ final class Provider_Connection_Test_Result_Test extends TestCase {
 			'2025-07-15T12:00:00+00:00',
 			'AI service authentication failed.'
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 		$this->assertFalse( $arr['success'] );
 		$this->assertSame( $error, $arr['normalized_error'] );
 	}
 
 	public function test_from_array_roundtrip(): void {
-		$data = array(
+		$data   = array(
 			'success'          => true,
 			'provider_id'      => 'openai',
 			'model_used'       => 'gpt-4o-mini',
@@ -76,14 +76,14 @@ final class Provider_Connection_Test_Result_Test extends TestCase {
 	}
 
 	public function test_from_array_failure_with_error(): void {
-		$error = array(
+		$error  = array(
 			'category'      => 'rate_limit',
 			'user_message'  => 'The AI service is temporarily busy.',
-			'internal_code'  => 'rate_limit',
-			'provider_raw'   => null,
-			'retry_posture'  => 'retry_with_backoff',
+			'internal_code' => 'rate_limit',
+			'provider_raw'  => null,
+			'retry_posture' => 'retry_with_backoff',
 		);
-		$data = array(
+		$data   = array(
 			'success'          => false,
 			'provider_id'      => 'openai',
 			'model_used'       => 'gpt-4o',

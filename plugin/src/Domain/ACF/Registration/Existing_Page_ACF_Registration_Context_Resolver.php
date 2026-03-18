@@ -39,8 +39,8 @@ class Existing_Page_ACF_Registration_Context_Resolver {
 		?Page_Section_Key_Cache_Service $section_key_cache = null,
 		?ACF_Registration_Diagnostics_Service $diagnostics = null
 	) {
-		$this->assignment_service  = $assignment_service;
-		$this->group_key_resolver  = $group_key_resolver;
+		$this->assignment_service = $assignment_service;
+		$this->group_key_resolver = $group_key_resolver;
 		$this->section_key_cache  = $section_key_cache;
 		$this->diagnostics        = $diagnostics;
 	}
@@ -100,7 +100,7 @@ class Existing_Page_ACF_Registration_Context_Resolver {
 		if ( $this->diagnostics !== null ) {
 			$this->diagnostics->set_request_cache_used( false );
 		}
-		$group_keys = $this->assignment_service->get_visible_groups_for_page( $page_id );
+		$group_keys   = $this->assignment_service->get_visible_groups_for_page( $page_id );
 		$section_keys = $this->group_key_resolver->group_keys_to_section_keys( $group_keys );
 		if ( $this->section_key_cache !== null ) {
 			$this->section_key_cache->set_for_page( $page_id, $section_keys );

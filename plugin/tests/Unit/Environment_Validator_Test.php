@@ -29,7 +29,7 @@ final class Environment_Validator_Test extends TestCase {
 
 	private function run_validator_with_wp_version( string $wp_version ): Environment_Validator {
 		$GLOBALS['wp_version'] = $wp_version;
-		$v = new Environment_Validator();
+		$v                     = new Environment_Validator();
 		$v->validate();
 		return $v;
 	}
@@ -59,7 +59,7 @@ final class Environment_Validator_Test extends TestCase {
 
 	public function test_missing_acf_fails_blocking(): void {
 		$GLOBALS['wp_version'] = '6.6';
-		$v = new Environment_Validator();
+		$v                     = new Environment_Validator();
 		$v->validate();
 		$found = false;
 		foreach ( $v->get_results() as $r ) {
@@ -73,7 +73,7 @@ final class Environment_Validator_Test extends TestCase {
 
 	public function test_missing_generateblocks_fails_blocking(): void {
 		$GLOBALS['wp_version'] = '6.6';
-		$v = new Environment_Validator();
+		$v                     = new Environment_Validator();
 		$v->validate();
 		$found = false;
 		foreach ( $v->get_results() as $r ) {
@@ -87,7 +87,7 @@ final class Environment_Validator_Test extends TestCase {
 
 	public function test_missing_lpagery_warns_only(): void {
 		$GLOBALS['wp_version'] = '6.6';
-		$v = new Environment_Validator();
+		$v                     = new Environment_Validator();
 		$v->validate();
 		$found = false;
 		foreach ( $v->get_results() as $r ) {
@@ -102,7 +102,7 @@ final class Environment_Validator_Test extends TestCase {
 
 	public function test_to_lifecycle_result_blocking_when_validation_fails(): void {
 		$GLOBALS['wp_version'] = '6.5';
-		$v = new Environment_Validator();
+		$v                     = new Environment_Validator();
 		$v->validate();
 		$lifecycle = $v->to_lifecycle_result( 'validate_environment' );
 		$this->assertTrue( $lifecycle->is_blocking() );
@@ -127,7 +127,7 @@ final class Environment_Validator_Test extends TestCase {
 
 	public function test_extension_pack_results_are_never_blocking(): void {
 		$GLOBALS['wp_version'] = '6.6';
-		$v = new Environment_Validator();
+		$v                     = new Environment_Validator();
 		$v->validate();
 		$all_extension_pack_non_blocking = true;
 		foreach ( $v->get_results() as $r ) {

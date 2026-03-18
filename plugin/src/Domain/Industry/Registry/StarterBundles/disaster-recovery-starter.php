@@ -14,11 +14,11 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry;
 
 return array(
 	array(
-		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => 'disaster_recovery_starter',
+		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY => 'disaster_recovery_starter',
 		Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => 'disaster_recovery',
-		Industry_Starter_Bundle_Registry::FIELD_LABEL       => 'Disaster Recovery Starter',
-		Industry_Starter_Bundle_Registry::FIELD_SUMMARY     => 'A practical starting set for restoration and disaster recovery: home, services, and contact with 24/7 and claim-assistance emphasis. Suited to water, fire, and mold response.',
-		Industry_Starter_Bundle_Registry::FIELD_STATUS      => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
+		Industry_Starter_Bundle_Registry::FIELD_LABEL      => 'Disaster Recovery Starter',
+		Industry_Starter_Bundle_Registry::FIELD_SUMMARY    => 'A practical starting set for restoration and disaster recovery: home, services, and contact with 24/7 and claim-assistance emphasis. Suited to water, fire, and mold response.',
+		Industry_Starter_Bundle_Registry::FIELD_STATUS     => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
 		Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => Industry_Starter_Bundle_Registry::SUPPORTED_SCHEMA_VERSION,
 
 		Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_FAMILIES => array( 'home', 'services', 'contact', 'support' ),
@@ -38,6 +38,6 @@ return array(
 		Industry_Starter_Bundle_Registry::FIELD_TOKEN_PRESET_REF => 'disaster_recovery_urgency',
 		Industry_Starter_Bundle_Registry::FIELD_CTA_GUIDANCE_REF => 'emergency_dispatch',
 		Industry_Starter_Bundle_Registry::FIELD_LPAGERY_GUIDANCE_REF => 'disaster_recovery_01',
-		Industry_Starter_Bundle_Registry::FIELD_METADATA => array( 'sort_order' => 40 ),
+		Industry_Starter_Bundle_Registry::FIELD_METADATA   => array( 'sort_order' => 40 ),
 	),
 );

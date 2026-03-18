@@ -150,13 +150,13 @@ if ( ! function_exists( 'add_query_arg' ) ) {
 		}
 		$url = (string) $url;
 		if ( is_array( $key_or_array ) ) {
-			$query = array();
+			$query  = array();
 			$parsed = parse_url( $url );
 			if ( ! empty( $parsed['query'] ) ) {
 				parse_str( $parsed['query'], $query );
 			}
 			$query = array_merge( $query, $key_or_array );
-			$base = ( isset( $parsed['scheme'] ) ? $parsed['scheme'] . '://' : '' ) . ( $parsed['host'] ?? '' ) . ( $parsed['path'] ?? '' );
+			$base  = ( isset( $parsed['scheme'] ) ? $parsed['scheme'] . '://' : '' ) . ( $parsed['host'] ?? '' ) . ( $parsed['path'] ?? '' );
 			return $base . '?' . http_build_query( $query );
 		}
 		$sep = strpos( $url, '?' ) !== false ? '&' : '?';
@@ -229,7 +229,7 @@ if ( ! class_exists( 'WP_User' ) ) {
 		public $ID;
 		public $user_email;
 		public function __construct( $id = 0, $email = '' ) {
-			$this->ID = $id;
+			$this->ID         = $id;
 			$this->user_email = $email;
 		}
 	}
@@ -345,7 +345,7 @@ if ( ! function_exists( 'wp_insert_post' ) ) {
 }
 if ( ! function_exists( 'wp_update_post' ) ) {
 	function wp_update_post( $postarr, $wp_error = false ) {
-		$id = isset( $postarr['ID'] ) ? (int) $postarr['ID'] : 0;
+		$id  = isset( $postarr['ID'] ) ? (int) $postarr['ID'] : 0;
 		$ret = isset( $GLOBALS['_aio_wp_update_post_return'] ) ? $GLOBALS['_aio_wp_update_post_return'] : $id;
 		return $wp_error && $ret === 0 ? new \WP_Error( 'update_failed', 'Stub' ) : $ret;
 	}
@@ -457,8 +457,8 @@ if ( ! class_exists( 'WP_Query' ) ) {
 					}
 				}
 				if ( $val === '' && in_array( $filter_meta_key, array( '_aio_scope_type', '_aio_scope_id' ), true ) && ! empty( $row['_aio_snapshot_definition'] ) ) {
-					$dec  = json_decode( $row['_aio_snapshot_definition'], true );
-					$val  = $filter_meta_key === '_aio_scope_type' ? ( (string) ( $dec['scope_type'] ?? '' ) ) : ( (string) ( $dec['scope_id'] ?? '' ) );
+					$dec = json_decode( $row['_aio_snapshot_definition'], true );
+					$val = $filter_meta_key === '_aio_scope_type' ? ( (string) ( $dec['scope_type'] ?? '' ) ) : ( (string) ( $dec['scope_id'] ?? '' ) );
 				}
 				if ( (string) $val === (string) $filter_meta_value ) {
 					$filtered[] = $post;
@@ -479,11 +479,19 @@ if ( ! function_exists( 'wp_upload_dir' ) ) {
 	function wp_upload_dir() {
 		if ( isset( $GLOBALS['_aio_wp_upload_dir'] ) && is_array( $GLOBALS['_aio_wp_upload_dir'] ) ) {
 			return array_merge(
-				array( 'basedir' => '', 'baseurl' => '', 'error' => false ),
+				array(
+					'basedir' => '',
+					'baseurl' => '',
+					'error'   => false,
+				),
 				$GLOBALS['_aio_wp_upload_dir']
 			);
 		}
-		return array( 'basedir' => rtrim( sys_get_temp_dir(), '/\\' ), 'baseurl' => '', 'error' => false );
+		return array(
+			'basedir' => rtrim( sys_get_temp_dir(), '/\\' ),
+			'baseurl' => '',
+			'error'   => false,
+		);
 	}
 }
 if ( ! function_exists( 'wp_mkdir_p' ) ) {

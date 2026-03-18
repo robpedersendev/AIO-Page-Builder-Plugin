@@ -74,7 +74,7 @@ final class Form_Provider_Health_Summary_Service {
 		$provider_availability = $this->availability_service !== null
 			? $this->availability_service->get_summary_for_admin()
 			: array();
-		$registered = $this->registry->get_registered_provider_ids();
+		$registered            = $this->registry->get_registered_provider_ids();
 
 		$section_count = $this->count_section_templates_with_forms();
 		$page_count    = $this->count_page_templates_using_forms();
@@ -89,20 +89,20 @@ final class Form_Provider_Health_Summary_Service {
 			}
 			if ( $error_count > 0 ) {
 				$recent_failures[] = array(
-					'domain'      => 'form_provider',
-					'count'       => $error_count,
-					'link_label'  => __( 'Form provider availability', 'aio-page-builder' ),
+					'domain'     => 'form_provider',
+					'count'      => $error_count,
+					'link_label' => __( 'Form provider availability', 'aio-page-builder' ),
 				);
 			}
 		}
 
 		return array(
-			'provider_availability'             => $provider_availability,
-			'registered_provider_ids'          => $registered,
+			'provider_availability'              => $provider_availability,
+			'registered_provider_ids'            => $registered,
 			'section_templates_with_forms_count' => $section_count,
 			'page_templates_using_forms_count'   => $page_count,
-			'recent_failures_summary'          => $recent_failures,
-			'built_at'                         => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			'recent_failures_summary'            => $recent_failures,
+			'built_at'                           => gmdate( 'Y-m-d\TH:i:s\Z' ),
 		);
 	}
 

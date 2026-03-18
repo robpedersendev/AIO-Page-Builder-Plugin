@@ -46,9 +46,9 @@ final class Post_Release_Health_State_Builder {
 		?Build_Plan_Analytics_Service $plan_analytics_service = null
 	) {
 		$this->job_queue_repository   = $job_queue_repository;
-		$this->ai_run_repository       = $ai_run_repository;
-		$this->build_plan_repository   = $build_plan_repository;
-		$this->plan_analytics_service  = $plan_analytics_service;
+		$this->ai_run_repository      = $ai_run_repository;
+		$this->build_plan_repository  = $build_plan_repository;
+		$this->plan_analytics_service = $plan_analytics_service;
 	}
 
 	/**
@@ -67,15 +67,15 @@ final class Post_Release_Health_State_Builder {
 		$date_to   = $this->normalize_date_to( $date_to );
 
 		$reporting_health = ( new Reporting_Health_Summary_Builder() )->build();
-		$queue_health    = ( new Queue_Health_Summary_Builder( $this->job_queue_repository ) )->build();
-		$triage          = ( new Support_Triage_State_Builder( $this->job_queue_repository, $this->ai_run_repository, $this->build_plan_repository ) )->build();
+		$queue_health     = ( new Queue_Health_Summary_Builder( $this->job_queue_repository ) )->build();
+		$triage           = ( new Support_Triage_State_Builder( $this->job_queue_repository, $this->ai_run_repository, $this->build_plan_repository ) )->build();
 
-		$plan_trends  = array();
-		$rollback     = array();
+		$plan_trends = array();
+		$rollback    = array();
 		if ( $this->plan_analytics_service !== null ) {
-			$analytics = $this->plan_analytics_service->get_analytics_summary( $date_from, $date_to );
+			$analytics   = $this->plan_analytics_service->get_analytics_summary( $date_from, $date_to );
 			$plan_trends = $analytics['plan_review_trends'] ?? array();
-			$rollback   = $analytics['rollback_frequency_summary'] ?? array();
+			$rollback    = $analytics['rollback_frequency_summary'] ?? array();
 		}
 
 		$ai_validity = $this->build_ai_run_validity( $date_from, $date_to );
@@ -97,17 +97,17 @@ final class Post_Release_Health_State_Builder {
 			$domain_scores
 		);
 
-		$overall_status = $this->derive_overall_status( $domain_scores, $recommended );
+		$overall_status  = $this->derive_overall_status( $domain_scores, $recommended );
 		$summary_message = $this->derive_summary_message( $overall_status, $domain_scores, $recommended );
 
 		return array(
-			'post_release_health_summary' => array(
-				'period_start'     => $date_from,
-				'period_end'       => $date_to,
-				'overall_status'   => $overall_status,
-				'summary_message'  => $summary_message,
+			'post_release_health_summary'     => array(
+				'period_start'    => $date_from,
+				'period_end'      => $date_to,
+				'overall_status'  => $overall_status,
+				'summary_message' => $summary_message,
 			),
-			'domain_health_scores'       => $domain_scores,
+			'domain_health_scores'            => $domain_scores,
 			'recommended_investigation_items' => $recommended,
 		);
 	}
@@ -133,11 +133,17 @@ final class Post_Release_Health_State_Builder {
 	 */
 	private function build_ai_run_validity( string $date_from, string $date_to ): array {
 		if ( $this->ai_run_repository === null || ! method_exists( $this->ai_run_repository, 'list_recent' ) ) {
-			return array( 'total' => 0, 'completed' => 0, 'failed' => 0, 'success_rate' => 0.0, 'in_period' => 0 );
+			return array(
+				'total'        => 0,
+				'completed'    => 0,
+				'failed'       => 0,
+				'success_rate' => 0.0,
+				'in_period'    => 0,
+			);
 		}
-		$runs   = $this->ai_run_repository->list_recent( self::AI_RUN_LIMIT, 0 );
-		$from_ts = strtotime( $date_from . ' 00:00:00' );
-		$to_ts   = strtotime( $date_to . ' 23:59:59' );
+		$runs      = $this->ai_run_repository->list_recent( self::AI_RUN_LIMIT, 0 );
+		$from_ts   = strtotime( $date_from . ' 00:00:00' );
+		$to_ts     = strtotime( $date_to . ' 23:59:59' );
 		$in_period = 0;
 		$completed = 0;
 		$failed    = 0;
@@ -145,7 +151,7 @@ final class Post_Release_Health_State_Builder {
 			if ( ! is_array( $run ) ) {
 				continue;
 			}
-			$meta = $run['run_metadata'] ?? array();
+			$meta    = $run['run_metadata'] ?? array();
 			$created = (string) ( $meta['created_at'] ?? '' );
 			if ( $created === '' ) {
 				continue;
@@ -154,15 +160,15 @@ final class Post_Release_Health_State_Builder {
 			if ( $ts < $from_ts || $ts > $to_ts ) {
 				continue;
 			}
-			$in_period++;
+			++$in_period;
 			$status = (string) ( $run['status'] ?? $meta['status'] ?? '' );
 			if ( $status === 'completed' || $status === 'success' ) {
-				$completed++;
+				++$completed;
 			} elseif ( $status === 'failed_validation' || $status === 'failed' ) {
-				$failed++;
+				++$failed;
 			}
 		}
-		$validated = $completed + $failed;
+		$validated    = $completed + $failed;
 		$success_rate = $validated > 0 ? round( $completed / $validated, 4 ) : 0.0;
 		return array(
 			'total'        => count( $runs ),
@@ -181,58 +187,70 @@ final class Post_Release_Health_State_Builder {
 		array $ai_validity,
 		array $triage
 	): array {
-		$base = \admin_url( 'admin.php' );
+		$base   = \admin_url( 'admin.php' );
 		$scores = array();
 
 		// Reporting.
-		$reporting_ok = empty( $reporting_health['reporting_degraded'] );
+		$reporting_ok        = empty( $reporting_health['reporting_degraded'] );
 		$scores['reporting'] = array(
 			'status'      => $reporting_ok ? 'ok' : 'degraded',
 			'score_label' => $reporting_ok ? __( 'OK', 'aio-page-builder' ) : __( 'Degraded', 'aio-page-builder' ),
 			'message'     => (string) ( $reporting_health['summary_message'] ?? '' ),
-			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'reporting' ), $base ),
+			'link_url'    => \add_query_arg(
+				array(
+					'page' => 'aio-page-builder-queue-logs',
+					'tab'  => 'reporting',
+				),
+				$base
+			),
 			'link_label'  => __( 'Queue & Logs → Reporting', 'aio-page-builder' ),
 		);
 
 		// Queue.
-		$stale = (int) ( $queue_health['stale_lock_count'] ?? 0 );
-		$failed = (int) ( $queue_health['total_failed'] ?? 0 );
-		$bottleneck = ! empty( $queue_health['bottleneck_warning'] );
-		$queue_status = $stale > 0 ? 'critical' : ( $failed > 0 || $bottleneck ? 'warning' : 'ok' );
+		$stale           = (int) ( $queue_health['stale_lock_count'] ?? 0 );
+		$failed          = (int) ( $queue_health['total_failed'] ?? 0 );
+		$bottleneck      = ! empty( $queue_health['bottleneck_warning'] );
+		$queue_status    = $stale > 0 ? 'critical' : ( $failed > 0 || $bottleneck ? 'warning' : 'ok' );
 		$scores['queue'] = array(
 			'status'      => $queue_status,
 			'score_label' => $queue_status === 'critical' ? __( 'Critical', 'aio-page-builder' ) : ( $queue_status === 'warning' ? __( 'Warning', 'aio-page-builder' ) : __( 'OK', 'aio-page-builder' ) ),
 			'message'     => (string) ( $queue_health['summary_message'] ?? '' ),
-			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'queue' ), $base ),
+			'link_url'    => \add_query_arg(
+				array(
+					'page' => 'aio-page-builder-queue-logs',
+					'tab'  => 'queue',
+				),
+				$base
+			),
 			'link_label'  => __( 'Queue & Logs', 'aio-page-builder' ),
 		);
 
 		// Build plan review (approval/denial trend).
-		$denial_rate = (float) ( $plan_trends['denial_rate'] ?? 0 );
-		$total_plans = (int) ( $plan_trends['total_plans'] ?? 0 );
-		$plan_status = $total_plans === 0 ? 'ok' : ( $denial_rate >= 0.5 ? 'warning' : ( $denial_rate >= 0.25 ? 'attention' : 'ok' ) );
+		$denial_rate                 = (float) ( $plan_trends['denial_rate'] ?? 0 );
+		$total_plans                 = (int) ( $plan_trends['total_plans'] ?? 0 );
+		$plan_status                 = $total_plans === 0 ? 'ok' : ( $denial_rate >= 0.5 ? 'warning' : ( $denial_rate >= 0.25 ? 'attention' : 'ok' ) );
 		$scores['build_plan_review'] = array(
 			'status'      => $plan_status,
 			'score_label' => $plan_status === 'warning' ? __( 'High denial rate', 'aio-page-builder' ) : ( $plan_status === 'attention' ? __( 'Moderate denial', 'aio-page-builder' ) : __( 'OK', 'aio-page-builder' ) ),
-			'message'     => $total_plans === 0 ? __( 'No plans in period.', 'aio-page-builder' ) : sprintf( __( 'Approval rate %.1f%%, denial %.1f%% (%d plans).', 'aio-page-builder' ), ( $plan_trends['approval_rate'] ?? 0 ) * 100, $denial_rate * 100, $total_plans ),
+			'message'     => $total_plans === 0 ? __( 'No plans in period.', 'aio-page-builder' ) : sprintf( __( 'Approval rate %1$.1f%%, denial %2$.1f%% (%3$d plans).', 'aio-page-builder' ), ( $plan_trends['approval_rate'] ?? 0 ) * 100, $denial_rate * 100, $total_plans ),
 			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-build-plan-analytics' ), $base ),
 			'link_label'  => __( 'Build Plan Analytics', 'aio-page-builder' ),
 		);
 
 		// AI run validity.
-		$rate = (float) ( $ai_validity['success_rate'] ?? 0 );
-		$in_period = (int) ( $ai_validity['in_period'] ?? 0 );
-		$ai_status = $in_period === 0 ? 'ok' : ( $rate < 0.5 ? 'warning' : ( $rate < 0.8 ? 'attention' : 'ok' ) );
+		$rate                      = (float) ( $ai_validity['success_rate'] ?? 0 );
+		$in_period                 = (int) ( $ai_validity['in_period'] ?? 0 );
+		$ai_status                 = $in_period === 0 ? 'ok' : ( $rate < 0.5 ? 'warning' : ( $rate < 0.8 ? 'attention' : 'ok' ) );
 		$scores['ai_run_validity'] = array(
 			'status'      => $ai_status,
 			'score_label' => $ai_status === 'warning' ? __( 'Low success rate', 'aio-page-builder' ) : ( $ai_status === 'attention' ? __( 'Moderate', 'aio-page-builder' ) : __( 'OK', 'aio-page-builder' ) ),
-			'message'     => $in_period === 0 ? __( 'No AI runs in period.', 'aio-page-builder' ) : sprintf( __( '%.1f%% success (%d runs in period).', 'aio-page-builder' ), $rate * 100, $in_period ),
+			'message'     => $in_period === 0 ? __( 'No AI runs in period.', 'aio-page-builder' ) : sprintf( __( '%1$.1f%% success (%2$d runs in period).', 'aio-page-builder' ), $rate * 100, $in_period ),
 			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs' ), $base ),
 			'link_label'  => __( 'AI Runs', 'aio-page-builder' ),
 		);
 
 		// Rollback (from analytics stub; link to Support Triage / history).
-		$rollback_total = (int) ( $rollback['total_rollbacks'] ?? 0 );
+		$rollback_total     = (int) ( $rollback['total_rollbacks'] ?? 0 );
 		$scores['rollback'] = array(
 			'status'      => 'ok',
 			'score_label' => __( 'OK', 'aio-page-builder' ),
@@ -242,8 +260,8 @@ final class Post_Release_Health_State_Builder {
 		);
 
 		// Import/export and support package (from triage failures).
-		$import_export_failures = $triage['import_export_failures'] ?? array();
-		$ie_ok = count( $import_export_failures ) === 0;
+		$import_export_failures  = $triage['import_export_failures'] ?? array();
+		$ie_ok                   = count( $import_export_failures ) === 0;
 		$scores['import_export'] = array(
 			'status'      => $ie_ok ? 'ok' : 'attention',
 			'score_label' => $ie_ok ? __( 'OK', 'aio-page-builder' ) : __( 'Failures present', 'aio-page-builder' ),
@@ -270,7 +288,7 @@ final class Post_Release_Health_State_Builder {
 		array $triage,
 		array $domain_scores
 	): array {
-		$base = \admin_url( 'admin.php' );
+		$base  = \admin_url( 'admin.php' );
 		$items = array();
 
 		foreach ( $triage['critical_issues'] ?? array() as $issue ) {
@@ -301,7 +319,7 @@ final class Post_Release_Health_State_Builder {
 				'domain'     => 'build_plan_review',
 				'priority'   => 'medium',
 				'title'      => __( 'High Build Plan denial rate', 'aio-page-builder' ),
-				'message'     => sprintf( __( '%.1f%% denial in period. Review common blockers and plan friction.', 'aio-page-builder' ), $denial_rate * 100 ),
+				'message'    => sprintf( __( '%.1f%% denial in period. Review common blockers and plan friction.', 'aio-page-builder' ), $denial_rate * 100 ),
 				'link_url'   => \add_query_arg( array( 'page' => 'aio-page-builder-build-plan-analytics' ), $base ),
 				'link_label' => __( 'Build Plan Analytics', 'aio-page-builder' ),
 			);

@@ -66,7 +66,13 @@ final class Stub_Plan_State_For_Executor implements \AIOPageBuilder\Domain\Execu
 	}
 
 	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null ): bool {
-		$this->last_update_call = array( 'post_id' => $post_id, 'step_index' => $step_index, 'item_id' => $item_id, 'new_status' => $new_status, 'execution_artifact' => $execution_artifact );
+		$this->last_update_call = array(
+			'post_id'            => $post_id,
+			'step_index'         => $step_index,
+			'item_id'            => $item_id,
+			'new_status'         => $new_status,
+			'execution_artifact' => $execution_artifact,
+		);
 		return $this->update_plan_item_status_return;
 	}
 
@@ -81,39 +87,46 @@ final class Single_Action_Executor_Test extends TestCase {
 	public const EXAMPLE_EXECUTION_INPUT = array(
 		'action_id'        => 'exec_create_plan_npc_0_20250311T120000Z',
 		'action_type'      => 'create_page',
-		'plan_id'         => 'aio-plan-uuid-1',
-		'plan_item_id'    => 'plan_npc_0',
+		'plan_id'          => 'aio-plan-uuid-1',
+		'plan_item_id'     => 'plan_npc_0',
 		'target_reference' => array(
-			'plan_item_id'  => 'plan_npc_0',
-			'template_ref'  => array( 'type' => 'internal_key', 'value' => 'template_landing' ),
+			'plan_item_id' => 'plan_npc_0',
+			'template_ref' => array(
+				'type'  => 'internal_key',
+				'value' => 'template_landing',
+			),
 		),
-		'approval_state'  => array(
-			'plan_status'   => 'in_progress',
-			'item_status'   => 'approved',
-			'verified_at'   => '2025-03-11T11:59:00Z',
+		'approval_state'   => array(
+			'plan_status' => 'in_progress',
+			'item_status' => 'approved',
+			'verified_at' => '2025-03-11T11:59:00Z',
 		),
-		'actor_context'   => array(
-			'actor_type'    => 'user',
-			'actor_id'      => '1',
+		'actor_context'    => array(
+			'actor_type'         => 'user',
+			'actor_id'           => '1',
 			'capability_checked' => 'aio_execute_build_plans',
-			'checked_at'    => '2025-03-11T11:59:00Z',
+			'checked_at'         => '2025-03-11T11:59:00Z',
 		),
-		'created_at'      => '2025-03-11T12:00:00Z',
+		'created_at'       => '2025-03-11T12:00:00Z',
 	);
 
 	/** Example execution result payload (unregistered action type → refused before dispatch). */
 	public static function example_result_payload(): array {
 		return array(
-			'action_id'         => 'exec_create_plan_npc_0_20250311T120000Z',
-			'action_type'       => 'create_page',
-			'status'            => 'refused',
-			'completed_at'      => gmdate( 'c' ),
-			'handler_result'    => array(),
+			'action_id'          => 'exec_create_plan_npc_0_20250311T120000Z',
+			'action_type'        => 'create_page',
+			'status'             => 'refused',
+			'completed_at'       => gmdate( 'c' ),
+			'handler_result'     => array(),
 			'snapshot_reference' => '',
-			'warnings'          => array(),
+			'warnings'           => array(),
 			'build_plan_updates' => array(),
 			'log_reference'      => '',
-			'error'             => array( 'code' => 'action_not_available', 'message' => 'This action type is not available in this version.', 'refusable' => true ),
+			'error'              => array(
+				'code'      => 'action_not_available',
+				'message'   => 'This action type is not available in this version.',
+				'refusable' => true,
+			),
 		);
 	}
 
@@ -124,140 +137,222 @@ final class Single_Action_Executor_Test extends TestCase {
 			'action_type'      => 'replace_page',
 			'plan_id'          => 'aio-plan-uuid-1',
 			'plan_item_id'     => 'plan_ep_0',
-			'target_reference' => array( 'page_ref' => array( 'type' => 'post_id', 'value' => 42 ), 'plan_item_id' => 'plan_ep_0' ),
-			'approval_state'   => array( 'plan_status' => 'pending_review', 'item_status' => 'pending', 'verified_at' => '2025-03-11T11:00:00Z' ),
-			'actor_context'    => array( 'actor_type' => 'user', 'actor_id' => '1', 'capability_checked' => 'aio_execute_build_plans', 'checked_at' => '2025-03-11T12:00:01Z' ),
+			'target_reference' => array(
+				'page_ref'     => array(
+					'type'  => 'post_id',
+					'value' => 42,
+				),
+				'plan_item_id' => 'plan_ep_0',
+			),
+			'approval_state'   => array(
+				'plan_status' => 'pending_review',
+				'item_status' => 'pending',
+				'verified_at' => '2025-03-11T11:00:00Z',
+			),
+			'actor_context'    => array(
+				'actor_type'         => 'user',
+				'actor_id'           => '1',
+				'capability_checked' => 'aio_execute_build_plans',
+				'checked_at'         => '2025-03-11T12:00:01Z',
+			),
 			'created_at'       => '2025-03-11T12:00:01Z',
 		);
 	}
 
 	/** SPR-008: unregistered action type must be refused before dispatch; user flows never reach Stub_Execution_Handler. */
 	public function test_unregistered_action_type_returns_refused(): void {
-		$repo = new Stub_Plan_State_For_Executor();
-		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo                             = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return          = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
-		$repo->find_step_index_return = 0;
-		$dispatcher = new Execution_Dispatcher();
-		$executor   = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; } );
-		$result     = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
+		$repo->find_step_index_return     = 0;
+		$dispatcher                       = new Execution_Dispatcher();
+		$executor                         = new Single_Action_Executor(
+			$dispatcher,
+			$repo,
+			function (): bool {
+				return true;
+			}
+		);
+		$result                           = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
 		$this->assertSame( Execution_Action_Contract::STATUS_REFUSED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_ACTION_NOT_AVAILABLE, $result->get_error_code() );
 		$this->assertStringContainsString( 'not available', $result->get_error_message() ?? '' );
 	}
 
 	public function test_approval_rejection_returns_refused(): void {
-		$repo = new Stub_Plan_State_For_Executor();
-		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo                             = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return          = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
-		$dispatcher = new Execution_Dispatcher();
-		$executor   = new Single_Action_Executor( $dispatcher, $repo );
-		$envelope   = self::invalid_envelope();
-		$result     = $executor->execute( $envelope );
+		$dispatcher                       = new Execution_Dispatcher();
+		$executor                         = new Single_Action_Executor( $dispatcher, $repo );
+		$envelope                         = self::invalid_envelope();
+		$result                           = $executor->execute( $envelope );
 		$this->assertSame( Execution_Action_Contract::STATUS_REFUSED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_UNAUTHORIZED, $result->get_error_code() );
 		$this->assertTrue( $result->is_refusable() );
 	}
 
 	public function test_invalid_envelope_shape_returns_refused(): void {
-		$repo = new Stub_Plan_State_For_Executor();
+		$repo       = new Stub_Plan_State_For_Executor();
 		$dispatcher = new Execution_Dispatcher();
 		$executor   = new Single_Action_Executor( $dispatcher, $repo );
-		$envelope   = array( 'action_id' => 'x', 'action_type' => 'create_page' );
+		$envelope   = array(
+			'action_id'   => 'x',
+			'action_type' => 'create_page',
+		);
 		$result     = $executor->execute( $envelope );
 		$this->assertSame( Execution_Action_Contract::STATUS_REFUSED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_INVALID_ENVELOPE, $result->get_error_code() );
 	}
 
 	public function test_plan_not_found_returns_refused(): void {
-		$repo = new Stub_Plan_State_For_Executor();
+		$repo                    = new Stub_Plan_State_For_Executor();
 		$repo->get_by_key_return = null;
-		$dispatcher = new Execution_Dispatcher();
-		$executor   = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; } );
-		$result     = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
+		$dispatcher              = new Execution_Dispatcher();
+		$executor                = new Single_Action_Executor(
+			$dispatcher,
+			$repo,
+			function (): bool {
+				return true;
+			}
+		);
+		$result                  = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
 		$this->assertSame( Execution_Action_Contract::STATUS_REFUSED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_TARGET_NOT_FOUND, $result->get_error_code() );
 	}
 
 	public function test_permission_rejection_returns_refused(): void {
-		$repo = new Stub_Plan_State_For_Executor();
-		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo                             = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return          = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
-		$dispatcher = new Execution_Dispatcher();
-		$executor   = new Single_Action_Executor( $dispatcher, $repo, function (): bool {
-			return false;
-		} );
-		$result = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
+		$dispatcher                       = new Execution_Dispatcher();
+		$executor                         = new Single_Action_Executor(
+			$dispatcher,
+			$repo,
+			function (): bool {
+				return false;
+			}
+		);
+		$result                           = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
 		$this->assertSame( Execution_Action_Contract::STATUS_REFUSED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_UNAUTHORIZED, $result->get_error_code() );
 	}
 
 	public function test_dependency_rejection_returns_refused(): void {
-		$repo = new Stub_Plan_State_For_Executor();
-		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo                             = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return          = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
-		$dispatcher = new Execution_Dispatcher();
-		$executor   = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; } );
-		$envelope   = self::EXAMPLE_EXECUTION_INPUT;
-		$envelope['dependency_manifest'] = array( 'resolved' => false, 'resolution_errors' => array( 'Parent page missing' ) );
-		$result = $executor->execute( $envelope );
+		$dispatcher                       = new Execution_Dispatcher();
+		$executor                         = new Single_Action_Executor(
+			$dispatcher,
+			$repo,
+			function (): bool {
+				return true;
+			}
+		);
+		$envelope                         = self::EXAMPLE_EXECUTION_INPUT;
+		$envelope['dependency_manifest']  = array(
+			'resolved'          => false,
+			'resolution_errors' => array( 'Parent page missing' ),
+		);
+		$result                           = $executor->execute( $envelope );
 		$this->assertSame( Execution_Action_Contract::STATUS_REFUSED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_DEPENDENCY_FAILED, $result->get_error_code() );
 	}
 
 	// * Spec §41.2, Prompt 087: when preflight returns null (e.g. capture failed), executor proceeds without blocking (fail safely); handler may then fail.
 	public function test_snapshot_required_proceeds_when_preflight_returns_null_fail_safely(): void {
-		$repo = new Stub_Plan_State_For_Executor();
-		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo                             = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return          = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
-		$dispatcher = new Execution_Dispatcher();
-		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
-			public function execute( array $envelope ): array {
-				return array( 'success' => false, 'message' => 'Handler failed.', 'artifacts' => array() );
+		$dispatcher                       = new Execution_Dispatcher();
+		$dispatcher->register_handler(
+			Execution_Action_Types::CREATE_PAGE,
+			new class() implements Execution_Handler_Interface {
+				public function execute( array $envelope ): array {
+					return array(
+						'success'   => false,
+						'message'   => 'Handler failed.',
+						'artifacts' => array(),
+					);
+				}
 			}
-		} );
-		$executor = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; }, function (): ?string {
-			return null;
-		} );
-		$envelope = self::EXAMPLE_EXECUTION_INPUT;
+		);
+		$executor                      = new Single_Action_Executor(
+			$dispatcher,
+			$repo,
+			function (): bool {
+				return true; },
+			function (): ?string {
+				return null;
+			}
+		);
+		$envelope                      = self::EXAMPLE_EXECUTION_INPUT;
 		$envelope['snapshot_required'] = true;
 		$envelope['snapshot_ref']      = '';
-		$result = $executor->execute( $envelope );
+		$result                        = $executor->execute( $envelope );
 		// Executor does not refuse; dispatch runs (handler returns failure).
 		$this->assertSame( Execution_Action_Contract::STATUS_FAILED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_EXECUTION_FAILED, $result->get_error_code() );
 	}
 
 	public function test_lock_acquire_failure_returns_refused(): void {
-		$repo = new Stub_Plan_State_For_Executor();
-		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo                             = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return          = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
-		$repo->find_step_index_return = 0;
-		$dispatcher = new Execution_Dispatcher();
-		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
-			public function execute( array $envelope ): array {
-				return array( 'success' => true, 'artifacts' => array() );
+		$repo->find_step_index_return     = 0;
+		$dispatcher                       = new Execution_Dispatcher();
+		$dispatcher->register_handler(
+			Execution_Action_Types::CREATE_PAGE,
+			new class() implements Execution_Handler_Interface {
+				public function execute( array $envelope ): array {
+					return array(
+						'success'   => true,
+						'artifacts' => array(),
+					);
+				}
 			}
-		} );
-		$executor = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; }, null, function (): bool {
-			return false;
-		} );
-		$result = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
+		);
+		$executor = new Single_Action_Executor(
+			$dispatcher,
+			$repo,
+			function (): bool {
+				return true; },
+			null,
+			function (): bool {
+				return false;
+			}
+		);
+		$result   = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
 		$this->assertSame( Execution_Action_Contract::STATUS_REFUSED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_CONFLICT, $result->get_error_code() );
 	}
 
 	public function test_handler_failure_updates_plan_item_to_failed(): void {
-		$repo = new Stub_Plan_State_For_Executor();
-		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo                             = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return          = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
-		$repo->find_step_index_return = 2;
-		$dispatcher = new Execution_Dispatcher();
-		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
-			public function execute( array $envelope ): array {
-				return array( 'success' => false, 'message' => 'Handler failed.', 'artifacts' => array() );
+		$repo->find_step_index_return     = 2;
+		$dispatcher                       = new Execution_Dispatcher();
+		$dispatcher->register_handler(
+			Execution_Action_Types::CREATE_PAGE,
+			new class() implements Execution_Handler_Interface {
+				public function execute( array $envelope ): array {
+					return array(
+						'success'   => false,
+						'message'   => 'Handler failed.',
+						'artifacts' => array(),
+					);
+				}
 			}
-		} );
-		$executor = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; } );
+		);
+		$executor = new Single_Action_Executor(
+			$dispatcher,
+			$repo,
+			function (): bool {
+				return true;
+			}
+		);
 		$result   = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
 		$this->assertSame( Execution_Action_Contract::STATUS_FAILED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_EXECUTION_FAILED, $result->get_error_code() );
@@ -267,17 +362,29 @@ final class Single_Action_Executor_Test extends TestCase {
 	}
 
 	public function test_handler_success_updates_plan_item_to_completed(): void {
-		$repo = new Stub_Plan_State_For_Executor();
-		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo                             = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return          = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
-		$repo->find_step_index_return = 2;
-		$dispatcher = new Execution_Dispatcher();
-		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
-			public function execute( array $envelope ): array {
-				return array( 'success' => true, 'artifacts' => array( 'post_id' => 42 ) );
+		$repo->find_step_index_return     = 2;
+		$dispatcher                       = new Execution_Dispatcher();
+		$dispatcher->register_handler(
+			Execution_Action_Types::CREATE_PAGE,
+			new class() implements Execution_Handler_Interface {
+				public function execute( array $envelope ): array {
+					return array(
+						'success'   => true,
+						'artifacts' => array( 'post_id' => 42 ),
+					);
+				}
 			}
-		} );
-		$executor = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; } );
+		);
+		$executor = new Single_Action_Executor(
+			$dispatcher,
+			$repo,
+			function (): bool {
+				return true;
+			}
+		);
 		$result   = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
 		$this->assertSame( Execution_Action_Contract::STATUS_COMPLETED, $result->get_execution_status() );
 		$this->assertSame( 42, ( $result->get_handler_result()['artifacts']['post_id'] ?? 0 ) );
@@ -286,21 +393,32 @@ final class Single_Action_Executor_Test extends TestCase {
 	}
 
 	public function test_lock_release_called_after_handler_throws(): void {
-		$repo = new Stub_Plan_State_For_Executor();
-		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo                             = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return          = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
-		$repo->find_step_index_return = 0;
-		$released = false;
-		$dispatcher = new Execution_Dispatcher();
-		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
-			public function execute( array $envelope ): array {
-				throw new \RuntimeException( 'Handler threw.' );
+		$repo->find_step_index_return     = 0;
+		$released                         = false;
+		$dispatcher                       = new Execution_Dispatcher();
+		$dispatcher->register_handler(
+			Execution_Action_Types::CREATE_PAGE,
+			new class() implements Execution_Handler_Interface {
+				public function execute( array $envelope ): array {
+					throw new \RuntimeException( 'Handler threw.' );
+				}
 			}
-		} );
-		$executor = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; }, null, null, function () use ( &$released ): void {
-			$released = true;
-		} );
-		$result = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
+		);
+		$executor = new Single_Action_Executor(
+			$dispatcher,
+			$repo,
+			function (): bool {
+				return true; },
+			null,
+			null,
+			function () use ( &$released ): void {
+				$released = true;
+			}
+		);
+		$result   = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
 		$this->assertTrue( $released );
 		$this->assertSame( Execution_Action_Contract::STATUS_FAILED, $result->get_execution_status() );
 	}

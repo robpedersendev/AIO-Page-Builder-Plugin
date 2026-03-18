@@ -43,10 +43,10 @@ final class Preview_Style_Context_Builder {
 		?Global_Component_Override_Emitter $component_emitter = null,
 		?Page_Style_Emitter $page_emitter = null
 	) {
-		$this->config           = $config;
-		$this->token_emitter    = $token_emitter;
+		$this->config            = $config;
+		$this->token_emitter     = $token_emitter;
 		$this->component_emitter = $component_emitter;
-		$this->page_emitter     = $page_emitter;
+		$this->page_emitter      = $page_emitter;
 	}
 
 	/**

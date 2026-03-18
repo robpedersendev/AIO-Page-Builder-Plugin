@@ -35,7 +35,7 @@ final class Page_Template_Validator {
 		Section_Registry_Service $section_registry
 	) {
 		$this->normalizer       = $normalizer;
-		$this->repository      = $repository;
+		$this->repository       = $repository;
 		$this->section_registry = $section_registry;
 	}
 
@@ -43,7 +43,7 @@ final class Page_Template_Validator {
 	 * Validates definition for create.
 	 *
 	 * @param array<string, mixed> $input
-	 * @param int                 $exclude_post_id
+	 * @param int                  $exclude_post_id
 	 * @return Page_Template_Validation_Result
 	 */
 	public function validate_for_create( array $input, int $exclude_post_id = 0 ): Page_Template_Validation_Result {
@@ -67,7 +67,7 @@ final class Page_Template_Validator {
 	 * Validates definition for update. Enforces immutable internal_key.
 	 *
 	 * @param array<string, mixed> $input
-	 * @param int                 $existing_post_id
+	 * @param int                  $existing_post_id
 	 * @return Page_Template_Validation_Result
 	 */
 	public function validate_for_update( array $input, int $existing_post_id ): Page_Template_Validation_Result {
@@ -142,7 +142,7 @@ final class Page_Template_Validator {
 			$errors[] = 'internal_key must match pattern ^[a-z0-9_]+$';
 		}
 
-		$status = (string) ( $normalized[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
+		$status  = (string) ( $normalized[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
 		$allowed = array( 'draft', 'active', 'inactive', 'deprecated' );
 		if ( $status !== '' && ! in_array( $status, $allowed, true ) ) {
 			$errors[] = 'status must be one of: ' . implode( ', ', $allowed );
@@ -214,7 +214,7 @@ final class Page_Template_Validator {
 
 	/**
 	 * @param array<string, mixed> $normalized
-	 * @param int                 $existing_post_id
+	 * @param int                  $existing_post_id
 	 * @return list<string>
 	 */
 	private function validate_key_immutability( array $normalized, int $existing_post_id ): array {

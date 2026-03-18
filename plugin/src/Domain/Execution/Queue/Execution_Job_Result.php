@@ -63,11 +63,11 @@ final class Execution_Job_Result {
 	 * @param string               $status
 	 * @param string               $action_id
 	 * @param string               $plan_item_id
-	 * @param array<string, mixed>  $result_summary
-	 * @param int                   $retry_count
-	 * @param bool                  $retry_eligible
-	 * @param string                $failure_reason
-	 * @param string                $completed_at
+	 * @param array<string, mixed> $result_summary
+	 * @param int                  $retry_count
+	 * @param bool                 $retry_eligible
+	 * @param string               $failure_reason
+	 * @param string               $completed_at
 	 */
 	public function __construct(
 		string $job_ref,
@@ -141,16 +141,16 @@ final class Execution_Job_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'job_ref'         => $this->job_ref,
-			'job_type'        => $this->job_type,
-			'status'          => $this->status,
-			'action_id'       => $this->action_id,
-			'plan_item_id'    => $this->plan_item_id,
-			'result_summary'  => $this->result_summary,
-			'retry_count'     => $this->retry_count,
-			'retry_eligible'  => $this->retry_eligible,
-			'failure_reason'  => $this->failure_reason,
-			'completed_at'    => $this->completed_at,
+			'job_ref'        => $this->job_ref,
+			'job_type'       => $this->job_type,
+			'status'         => $this->status,
+			'action_id'      => $this->action_id,
+			'plan_item_id'   => $this->plan_item_id,
+			'result_summary' => $this->result_summary,
+			'retry_count'    => $this->retry_count,
+			'retry_eligible' => $this->retry_eligible,
+			'failure_reason' => $this->failure_reason,
+			'completed_at'   => $this->completed_at,
 		);
 	}
 
@@ -161,8 +161,8 @@ final class Execution_Job_Result {
 	 * @param string               $job_type
 	 * @param string               $action_id
 	 * @param string               $plan_item_id
-	 * @param array<string, mixed>  $result_summary
-	 * @param int                   $retry_count
+	 * @param array<string, mixed> $result_summary
+	 * @param int                  $retry_count
 	 * @return self
 	 */
 	public static function completed(
@@ -190,14 +190,14 @@ final class Execution_Job_Result {
 	/**
 	 * Builds a failed job result.
 	 *
-	 * @param string $job_ref
-	 * @param string $job_type
-	 * @param string $action_id
-	 * @param string $plan_item_id
-	 * @param string $failure_reason
+	 * @param string               $job_ref
+	 * @param string               $job_type
+	 * @param string               $action_id
+	 * @param string               $plan_item_id
+	 * @param string               $failure_reason
 	 * @param array<string, mixed> $result_summary
-	 * @param int   $retry_count
-	 * @param bool  $retry_eligible
+	 * @param int                  $retry_count
+	 * @param bool                 $retry_eligible
 	 * @return self
 	 */
 	public static function failed(
@@ -227,11 +227,11 @@ final class Execution_Job_Result {
 	/**
 	 * Builds a refused job result (validation/approval blocked execution).
 	 *
-	 * @param string $job_ref
-	 * @param string $job_type
-	 * @param string $action_id
-	 * @param string $plan_item_id
-	 * @param string $failure_reason
+	 * @param string               $job_ref
+	 * @param string               $job_type
+	 * @param string               $action_id
+	 * @param string               $plan_item_id
+	 * @param string               $failure_reason
 	 * @param array<string, mixed> $result_summary
 	 * @return self
 	 */

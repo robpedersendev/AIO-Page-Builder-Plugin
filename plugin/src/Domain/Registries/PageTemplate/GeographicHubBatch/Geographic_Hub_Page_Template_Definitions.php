@@ -82,17 +82,20 @@ final class Geographic_Hub_Page_Template_Definitions {
 	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
-		$ordered = array();
+		$ordered      = array();
 		$requirements = array();
 		foreach ( $section_keys as $pos => $key ) {
-			$ordered[] = array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => $key,
+			$ordered[]            = array(
+				Page_Template_Schema::SECTION_ITEM_KEY => $key,
 				Page_Template_Schema::SECTION_ITEM_POSITION => $pos,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			);
 			$requirements[ $key ] = array( 'required' => true );
 		}
-		return array( 'ordered' => $ordered, 'requirements' => $requirements );
+		return array(
+			'ordered'      => $ordered,
+			'requirements' => $requirements,
+		);
 	}
 
 	/**
@@ -121,20 +124,23 @@ final class Geographic_Hub_Page_Template_Definitions {
 		array $extra = array()
 	): array {
 		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY             => $internal_key,
-			Page_Template_Schema::FIELD_NAME                     => $name,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY           => $purpose_summary,
-			Page_Template_Schema::FIELD_ARCHETYPE                 => 'hub_page',
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS          => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS      => $section_requirements,
-			Page_Template_Schema::FIELD_COMPATIBILITY             => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                 => $one_pager,
-			Page_Template_Schema::FIELD_VERSION                   => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                    => 'active',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $internal_key,
+			Page_Template_Schema::FIELD_NAME             => $name,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => $purpose_summary,
+			Page_Template_Schema::FIELD_ARCHETYPE        => 'hub_page',
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_requirements,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => $one_pager,
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES   => $endpoint_notes,
-			'template_category_class'                            => 'hub',
-			'template_family'                                     => $template_family,
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => $endpoint_notes,
+			'template_category_class'                    => 'hub',
+			'template_family'                            => $template_family,
 		);
 		if ( ! isset( $extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
 			$extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
@@ -159,7 +165,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'mlp_listing_01',
 			'cta_directory_nav_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_service_area_01',
 			'Service area hub',
@@ -168,18 +174,18 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Service area hub. Local value and location info; local CTA; place highlight and card grid; trust band and contact CTA; contact detail and expectations; contact panel and local CTA; listing; directory nav CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Service area hub. Local value and location info; local CTA; place highlight and card grid; trust band and contact CTA; contact detail and expectations; contact panel and local CTA; listing; directory nav CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Service area framing; local and contact and directory CTAs. Semantic headings (spec §51.6).',
-				'drill_down_intent'    => 'Local action and directory nav CTAs support drill-down to cities, regions, or sub–service areas. No real addresses; synthetic preview only.',
+				'drill_down_intent'     => 'Local action and directory nav CTAs support drill-down to cities, regions, or sub–service areas. No real addresses; synthetic preview only.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array(
-				'preview_metadata' => array( 'synthetic' => true ),
+				'preview_metadata'                         => array( 'synthetic' => true ),
 				Page_Template_Schema::FIELD_INDUSTRY_NOTES => array(
-					'cosmetology_nail' => 'Good for multi-location or area coverage.',
-					'realtor'          => 'Strong fit for service-area and coverage hierarchy.',
-					'plumber'          => 'Strong fit for service-area and 24/7 coverage.',
+					'cosmetology_nail'  => 'Good for multi-location or area coverage.',
+					'realtor'           => 'Strong fit for service-area and coverage hierarchy.',
+					'plumber'           => 'Strong fit for service-area and 24/7 coverage.',
 					'disaster_recovery' => 'Strong fit for service-area and response coverage.',
 				),
 			)
@@ -203,7 +209,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_service_area_02',
 			'Service area hub (listing-led)',
@@ -212,10 +218,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Service area hub listing-led. Location info and place highlight; local CTA; reassurance and local value; listing and directory nav CTA; contact detail and card grid; trust band and contact CTA; contact panel; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Service area hub listing-led. Location info and place highlight; local CTA; reassurance and local value; listing and directory nav CTA; contact detail and card grid; trust band and contact CTA; contact panel; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Listing density; coverage navigation. Local CTA direction notes in one-pager.',
-				'drill_down_intent'    => 'Directory nav and local CTAs support area-specific listing and nested hub drill-down.',
+				'drill_down_intent'     => 'Directory nav and local CTAs support area-specific listing and nested hub drill-down.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -239,7 +245,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'mlp_listing_01',
 			'cta_directory_nav_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_regional_01',
 			'Regional hub',
@@ -248,10 +254,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Regional hub. Local value and location info; local CTA; place highlight and card grid; reassurance and local CTA; contact detail and panel; expectations and contact CTA; listing; directory nav CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Regional hub. Local value and location info; local CTA; place highlight and card grid; reassurance and local CTA; contact detail and panel; expectations and contact CTA; listing; directory nav CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Regional emphasis; local and contact and directory CTAs for drill-down to cities or sub-regions.',
-				'drill_down_intent'    => 'Guides into nested hub or child pages (e.g. state/region to cities). Hierarchy role: broad geographic hub.',
+				'drill_down_intent'     => 'Guides into nested hub or child pages (e.g. state/region to cities). Hierarchy role: broad geographic hub.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -275,7 +281,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'tp_reassurance_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_regional_02',
 			'Regional hub (coverage-led)',
@@ -284,10 +290,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Regional hub coverage-led. Place highlight and location info; directory nav CTA; local value and listing; trust band and local CTA; contact detail and card grid; expectations and contact CTA; reassurance; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Regional hub coverage-led. Place highlight and location info; directory nav CTA; local value and listing; trust band and local CTA; contact detail and card grid; expectations and contact CTA; reassurance; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Coverage and area navigation; local CTA orientation. SEO-relevant structure (spec §15.9).',
-				'drill_down_intent'    => 'Directory nav and local CTAs support coverage map/list drill-down to cities or regions.',
+				'drill_down_intent'     => 'Directory nav and local CTAs support coverage map/list drill-down to cities or regions.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -311,7 +317,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'ptf_expectations_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_city_directory_01',
 			'City directory hub',
@@ -320,10 +326,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'City directory hub. Card grid and listing; directory nav CTA; local value and location info; reassurance and local CTA; place highlight and contact detail; contact panel and contact CTA; expectations; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'City directory hub. Card grid and listing; directory nav CTA; local value and location info; reassurance and local CTA; place highlight and contact detail; contact panel and contact CTA; expectations; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'City/region directory structure; related-location navigation. Accessibility (spec §51.3).',
-				'drill_down_intent'    => 'Guides into city or region child/detail pages. Listing and cards support area-specific directory.',
+				'drill_down_intent'     => 'Guides into city or region child/detail pages. Listing and cards support area-specific directory.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -347,7 +353,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'tp_reassurance_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_city_directory_02',
 			'City directory hub (educational)',
@@ -356,10 +362,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'City directory hub educational. Listing and local value; local CTA; card grid and place highlight; trust band and directory nav CTA; contact detail and expectations; location info and contact CTA; reassurance; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'City directory hub educational. Listing and local value; local CTA; card grid and place highlight; trust band and directory nav CTA; contact detail and expectations; location info and contact CTA; reassurance; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Educational versus conversion balance; local relevance structure.',
-				'drill_down_intent'    => 'Supports geographic category introduction and city/region drill-down.',
+				'drill_down_intent'     => 'Supports geographic category introduction and city/region drill-down.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -383,7 +389,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'mlp_listing_01',
 			'cta_directory_nav_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_location_overview_01',
 			'Location overview hub',
@@ -392,10 +398,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Location overview hub. Location info and place highlight; local CTA; local value and card grid; trust band and contact CTA; contact detail and expectations; contact panel and local CTA; listing; directory nav CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Location overview hub. Location info and place highlight; local CTA; local value and card grid; trust band and contact CTA; contact detail and expectations; contact panel and local CTA; listing; directory nav CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Location-overview; local and contact and directory CTAs. Hierarchy role: broad location landing.',
-				'drill_down_intent'    => 'Guides into nested hub or child location pages (areas, campuses, neighborhoods).',
+				'drill_down_intent'     => 'Guides into nested hub or child location pages (areas, campuses, neighborhoods).',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -419,7 +425,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'ptf_expectations_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_location_overview_02',
 			'Location overview hub (conversion-led)',
@@ -428,10 +434,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Location overview hub conversion-led. Local value and place highlight; directory nav CTA; location info and card grid; reassurance and local CTA; contact detail and listing; contact panel and contact CTA; expectations; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Location overview hub conversion-led. Local value and place highlight; directory nav CTA; location info and card grid; reassurance and local CTA; contact detail and listing; contact panel and contact CTA; expectations; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Local CTA orientation; conversion balance. Preview realism with synthetic data only.',
-				'drill_down_intent'    => 'Local action and contact CTAs support area-specific conversion and drill-down.',
+				'drill_down_intent'     => 'Local action and contact CTAs support area-specific conversion and drill-down.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -455,7 +461,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'tp_reassurance_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_coverage_listing_01',
 			'Coverage listing hub',
@@ -464,10 +470,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Coverage listing hub. Listing and card grid; directory nav CTA; local value and location info; trust band and local CTA; place highlight and contact detail; expectations and contact CTA; reassurance; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Coverage listing hub. Listing and card grid; directory nav CTA; local value and location info; trust band and local CTA; place highlight and contact detail; expectations and contact CTA; reassurance; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Coverage listings; area-specific listing structures. No real addresses; synthetic only.',
-				'drill_down_intent'    => 'Directory nav and local CTAs support coverage drill-down to regions or locations.',
+				'drill_down_intent'     => 'Directory nav and local CTAs support coverage drill-down to regions or locations.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -491,7 +497,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'ptf_expectations_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_coverage_listing_02',
 			'Coverage listing hub (proof-led)',
@@ -500,10 +506,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Coverage listing hub proof-led. Card grid and listing; local CTA; place highlight and local value; reassurance and directory nav CTA; location info and contact panel; contact detail and contact CTA; expectations; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Coverage listing hub proof-led. Card grid and listing; local CTA; place highlight and local value; reassurance and directory nav CTA; location info and contact panel; contact detail and contact CTA; expectations; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Proof density and local trust emphasis; coverage navigation.',
-				'drill_down_intent'    => 'Supports geographic category landing with proof and listing drill-down.',
+				'drill_down_intent'     => 'Supports geographic category landing with proof and listing drill-down.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -527,7 +533,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_neighborhood_01',
 			'Neighborhood hub',
@@ -536,18 +542,18 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Neighborhood hub. Place highlight and local value; local CTA; location info and card grid; trust band and directory nav CTA; contact detail and listing; reassurance and contact CTA; contact panel; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Neighborhood hub. Place highlight and local value; local CTA; location info and card grid; trust band and directory nav CTA; contact detail and listing; reassurance and contact CTA; contact panel; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Neighborhood framing; locality and area-specific structure. Semantic clarity (spec §51.6).',
-				'drill_down_intent'    => 'Guides into neighborhood or sub-area pages. No real addresses; synthetic preview only.',
+				'drill_down_intent'     => 'Guides into neighborhood or sub-area pages. No real addresses; synthetic preview only.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array(
-				'preview_metadata' => array( 'synthetic' => true ),
+				'preview_metadata'                         => array( 'synthetic' => true ),
 				Page_Template_Schema::FIELD_INDUSTRY_NOTES => array(
-					'cosmetology_nail' => 'Optional for neighborhood or area pages.',
-					'realtor'          => 'Strong fit for neighborhood and market-area hierarchy.',
-					'plumber'          => 'Good for area or coverage pages.',
+					'cosmetology_nail'  => 'Optional for neighborhood or area pages.',
+					'realtor'           => 'Strong fit for neighborhood and market-area hierarchy.',
+					'plumber'           => 'Good for area or coverage pages.',
 					'disaster_recovery' => 'Good for area or coverage pages.',
 				),
 			)
@@ -571,7 +577,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'ptf_expectations_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_campus_01',
 			'Campus hub',
@@ -580,10 +586,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Campus hub. Location info and place highlight; local CTA; local value and card grid; reassurance and contact CTA; contact detail and listing; contact panel and directory nav CTA; expectations; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Campus hub. Location info and place highlight; local CTA; local value and card grid; reassurance and contact CTA; contact detail and listing; contact panel and directory nav CTA; expectations; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Campus framing; location summary and related-location navigation. Accessibility (spec §51.3).',
-				'drill_down_intent'    => 'Guides into campus or facility sub-pages. Synthetic preview only; no private location data.',
+				'drill_down_intent'     => 'Guides into campus or facility sub-pages. Synthetic preview only; no private location data.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -607,7 +613,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'mlp_listing_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_area_trust_01',
 			'Area hub (trust-led)',
@@ -616,10 +622,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Area hub trust-led. Trust band and reassurance; local CTA; local value and location info; place highlight and contact CTA; card grid and contact detail; expectations and directory nav CTA; listing; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Area hub trust-led. Trust band and reassurance; local CTA; local value and location info; place highlight and contact CTA; card grid and contact detail; expectations and directory nav CTA; listing; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Local trust emphasis; proof pattern distinct from generic services hub. Differentiation notes in one-pager.',
-				'drill_down_intent'    => 'Regional/category hub with strong local proof; supports drill-down to areas or locations.',
+				'drill_down_intent'     => 'Regional/category hub with strong local proof; supports drill-down to areas or locations.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )
@@ -643,7 +649,7 @@ final class Geographic_Hub_Page_Template_Definitions {
 			'ptf_expectations_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'hub_geo_location_directory_01',
 			'Location directory hub',
@@ -652,10 +658,10 @@ final class Geographic_Hub_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Location directory hub. Card grid and location info; directory nav CTA; listing and local value; place highlight and local CTA; contact detail and trust band; contact panel and contact CTA; expectations; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Location directory hub. Card grid and location info; directory nav CTA; listing and local value; place highlight and local CTA; contact detail and trust band; contact panel and contact CTA; expectations; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Geographic category introduction; location-directory structure. Hierarchy role metadata for drill-down.',
-				'drill_down_intent'    => 'Guides into location-directory child pages (cities, regions, service areas). Synthetic data only.',
+				'drill_down_intent'     => 'Guides into location-directory child pages (cities, regions, service areas). Synthetic data only.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
 			array( 'preview_metadata' => array( 'synthetic' => true ) )

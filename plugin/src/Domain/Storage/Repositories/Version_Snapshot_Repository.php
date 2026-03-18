@@ -56,7 +56,7 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 
 		$data = array(
 			'internal_key' => $snapshot_id,
-			'status'      => $status,
+			'status'       => $status,
 			'post_title'   => $title,
 		);
 
@@ -153,7 +153,7 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 				),
 			)
 		);
-		$out = array();
+		$out    = array();
 		foreach ( $query->get_posts() as $post ) {
 			$meta = $this->get_meta( $post->ID );
 			if ( isset( $meta['definition'] ) && is_array( $meta['definition'] ) ) {
@@ -165,16 +165,16 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 
 	/** @inheritdoc */
 	protected function get_meta( int $post_id ): array {
-		$base = parent::get_meta( $post_id );
+		$base                          = parent::get_meta( $post_id );
 		$base[ self::META_SCOPE_TYPE ] = \get_post_meta( $post_id, self::META_SCOPE_TYPE, true ) ?: '';
 		$base[ self::META_SCOPE_ID ]   = \get_post_meta( $post_id, self::META_SCOPE_ID, true ) ?: '';
-		$raw = \get_post_meta( $post_id, self::META_DEFINITION, true );
+		$raw                           = \get_post_meta( $post_id, self::META_DEFINITION, true );
 		if ( is_string( $raw ) && $raw !== '' ) {
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
-				$base['definition'] = $decoded;
+				$base['definition']              = $decoded;
 				$base[ self::META_INTERNAL_KEY ] = $base[ self::META_INTERNAL_KEY ] ?: ( $decoded[ Version_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ?? '' );
-				$base[ self::META_STATUS ] = $base[ self::META_STATUS ] ?: ( $decoded[ Version_Snapshot_Schema::FIELD_STATUS ] ?? '' );
+				$base[ self::META_STATUS ]       = $base[ self::META_STATUS ] ?: ( $decoded[ Version_Snapshot_Schema::FIELD_STATUS ] ?? '' );
 			}
 		}
 		return $base;

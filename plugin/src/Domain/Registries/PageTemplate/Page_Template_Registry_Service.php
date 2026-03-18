@@ -45,8 +45,8 @@ final class Page_Template_Registry_Service {
 		Page_Template_Repository $repository,
 		?Registry_Deprecation_Service $deprecation_service = null
 	) {
-		$this->validator          = $validator;
-		$this->repository         = $repository;
+		$this->validator           = $validator;
+		$this->repository          = $repository;
 		$this->deprecation_service = $deprecation_service;
 	}
 
@@ -121,11 +121,11 @@ final class Page_Template_Registry_Service {
 			return Page_Template_Registry_Result::failure( array( 'Page template not found' ), 0 );
 		}
 		$existing[ Page_Template_Schema::FIELD_STATUS ] = 'deprecated';
-		$existing['deprecation'] = $this->deprecation_service !== null
+		$existing['deprecation']                        = $this->deprecation_service !== null
 			? $this->deprecation_service->get_page_template_deprecation_block( $reason, $replacement_key )
 			: Deprecation_Metadata::for_page_template( $reason, $replacement_key );
 		if ( $replacement_key !== '' ) {
-			$key = $this->sanitize_key( $replacement_key );
+			$key                                   = $this->sanitize_key( $replacement_key );
 			$existing['replacement_template_refs'] = array_merge(
 				(array) ( $existing['replacement_template_refs'] ?? array() ),
 				array( $key )
@@ -196,7 +196,7 @@ final class Page_Template_Registry_Service {
 	 */
 	public function list_eligible_for_new_selection( string $status = 'active', int $limit = 0, int $offset = 0 ): array {
 		$list = $status !== '' ? $this->repository->list_definitions_by_status( $status, $limit, $offset ) : $this->repository->list_all_definitions( $limit, $offset );
-		return array_values( array_filter( $list, [ Deprecation_Metadata::class, 'is_eligible_for_new_use' ] ) );
+		return array_values( array_filter( $list, array( Deprecation_Metadata::class, 'is_eligible_for_new_use' ) ) );
 	}
 
 	/**

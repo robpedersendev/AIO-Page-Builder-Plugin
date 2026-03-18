@@ -93,7 +93,7 @@ final class Industry_Author_Dashboard_View_Model {
 		$this->blocker_count        = $blocker_count;
 		$this->gap_count            = $gap_count;
 		$this->gap_high_count       = $gap_high_count;
-		$this->gap_medium_count    = $gap_medium_count;
+		$this->gap_medium_count     = $gap_medium_count;
 		$this->gap_low_count        = $gap_low_count;
 		$this->links                = $links;
 	}

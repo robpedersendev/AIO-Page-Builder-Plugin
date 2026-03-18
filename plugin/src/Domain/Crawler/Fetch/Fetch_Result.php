@@ -39,13 +39,13 @@ final class Fetch_Result {
 	public const FETCH_STATUS_DISALLOWED = 'disallowed';
 
 	/** Error code: contract §11. */
-	public const ERROR_TIMEOUT              = 'timeout_failure';
-	public const ERROR_TRANSPORT            = 'provider/transport_failure';
-	public const ERROR_EXCESSIVE_REDIRECTS  = 'excessive_redirects';
-	public const ERROR_MALFORMED_RESPONSE   = 'malformed_response';
-	public const ERROR_UNSUPPORTED_CONTENT  = 'unsupported_content_type';
-	public const ERROR_LOGIN_GATED          = 'login_gated';
-	public const ERROR_DISALLOWED_URL       = 'disallowed_url';
+	public const ERROR_TIMEOUT             = 'timeout_failure';
+	public const ERROR_TRANSPORT           = 'provider/transport_failure';
+	public const ERROR_EXCESSIVE_REDIRECTS = 'excessive_redirects';
+	public const ERROR_MALFORMED_RESPONSE  = 'malformed_response';
+	public const ERROR_UNSUPPORTED_CONTENT = 'unsupported_content_type';
+	public const ERROR_LOGIN_GATED         = 'login_gated';
+	public const ERROR_DISALLOWED_URL      = 'disallowed_url';
 
 	/** @var string Normalized URL that was requested. */
 	public $normalized_url;
@@ -75,15 +75,15 @@ final class Fetch_Result {
 	public $final_url;
 
 	/**
-	 * @param string       $normalized_url   URL requested.
-	 * @param int|null     $http_status      HTTP status.
-	 * @param string|null  $content_type     Content-Type header.
-	 * @param string       $fetch_status     One of FETCH_STATUS_*.
-	 * @param string|null  $error_code       Error code when not success.
-	 * @param int          $response_time_ms Time in ms.
-	 * @param string|null  $html             Body or null.
+	 * @param string                $normalized_url   URL requested.
+	 * @param int|null              $http_status      HTTP status.
+	 * @param string|null           $content_type     Content-Type header.
+	 * @param string                $fetch_status     One of FETCH_STATUS_*.
+	 * @param string|null           $error_code       Error code when not success.
+	 * @param int                   $response_time_ms Time in ms.
+	 * @param string|null           $html             Body or null.
 	 * @param array<string, string> $headers_subset Safe headers.
-	 * @param string|null  $final_url        Final URL after redirects.
+	 * @param string|null           $final_url        Final URL after redirects.
 	 */
 	public function __construct(
 		string $normalized_url,
@@ -96,7 +96,7 @@ final class Fetch_Result {
 		array $headers_subset = array(),
 		?string $final_url = null
 	) {
-		$this->normalized_url    = $normalized_url;
+		$this->normalized_url   = $normalized_url;
 		$this->http_status      = $http_status;
 		$this->content_type     = $content_type;
 		$this->fetch_status     = $fetch_status;
@@ -123,14 +123,14 @@ final class Fetch_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'normalized_url'    => $this->normalized_url,
-			'http_status'       => $this->http_status,
-			'content_type'      => $this->content_type,
-			'fetch_status'      => $this->fetch_status,
-			'error_code'        => $this->error_code,
-			'response_time_ms'  => $this->response_time_ms,
-			'final_url'         => $this->final_url,
-			'has_html'          => $this->html !== null && $this->html !== '',
+			'normalized_url'   => $this->normalized_url,
+			'http_status'      => $this->http_status,
+			'content_type'     => $this->content_type,
+			'fetch_status'     => $this->fetch_status,
+			'error_code'       => $this->error_code,
+			'response_time_ms' => $this->response_time_ms,
+			'final_url'        => $this->final_url,
+			'has_html'         => $this->html !== null && $this->html !== '',
 		);
 	}
 }

@@ -30,10 +30,10 @@ final class Industry_Profile_Validator {
 	/**
 	 * Validates profile. Populates last_errors and last_warnings; safe (no throw).
 	 *
-	 * @param array<string, mixed>                    $profile          Normalized or raw profile (will be normalized for validation).
-	 * @param Industry_Pack_Registry|null            $pack_registry    Optional; used to check primary_industry_key.
-	 * @param Industry_Question_Pack_Registry|null   $qp_registry      Optional; used to validate question_pack_answers for primary.
-	 * @param Industry_Subtype_Registry|null        $subtype_registry Optional; when set, validates industry_subtype_key matches primary.
+	 * @param array<string, mixed>                 $profile          Normalized or raw profile (will be normalized for validation).
+	 * @param Industry_Pack_Registry|null          $pack_registry    Optional; used to check primary_industry_key.
+	 * @param Industry_Question_Pack_Registry|null $qp_registry      Optional; used to validate question_pack_answers for primary.
+	 * @param Industry_Subtype_Registry|null       $subtype_registry Optional; when set, validates industry_subtype_key matches primary.
 	 * @return bool True if no validation errors (warnings allowed).
 	 */
 	public function validate(
@@ -44,7 +44,7 @@ final class Industry_Profile_Validator {
 	): bool {
 		$this->last_errors   = array();
 		$this->last_warnings = array();
-		$normalized = Industry_Profile_Schema::normalize( $profile );
+		$normalized          = Industry_Profile_Schema::normalize( $profile );
 
 		if ( ! Industry_Profile_Schema::is_supported_version( (string) ( $normalized[ Industry_Profile_Schema::FIELD_SCHEMA_VERSION ] ?? '' ) ) ) {
 			$this->last_errors[] = 'industry_profile_unsupported_schema_version';
@@ -86,7 +86,7 @@ final class Industry_Profile_Validator {
 		$conversion_goal = isset( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 			? trim( $normalized[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 			: '';
-		$secondary_goal = isset( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] )
+		$secondary_goal  = isset( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] )
 			? trim( $normalized[ Industry_Profile_Schema::FIELD_SECONDARY_CONVERSION_GOAL_KEY ] )
 			: '';
 		if ( $secondary_goal !== '' ) {
@@ -101,9 +101,9 @@ final class Industry_Profile_Validator {
 	}
 
 	/**
-	 * @param array<string, array<string, mixed>>     $qp_answers By industry_key => field_key => value.
-	 * @param string                                 $primary_industry_key
-	 * @param Industry_Question_Pack_Registry|null  $qp_registry
+	 * @param array<string, array<string, mixed>>  $qp_answers By industry_key => field_key => value.
+	 * @param string                               $primary_industry_key
+	 * @param Industry_Question_Pack_Registry|null $qp_registry
 	 */
 	private function validate_question_pack_answers( array $qp_answers, string $primary_industry_key, ?Industry_Question_Pack_Registry $qp_registry ): void {
 		foreach ( $qp_answers as $industry_key => $by_field ) {
@@ -121,11 +121,11 @@ final class Industry_Profile_Validator {
 			$pack = $qp_registry->get( $primary_industry_key );
 			if ( $pack !== null && isset( $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ] ) && is_array( $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ] ) ) {
 				$primary_answers = $qp_answers[ $primary_industry_key ] ?? array();
-				$filled = 0;
+				$filled          = 0;
 				foreach ( $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ] as $field_def ) {
 					$key = isset( $field_def['key'] ) && is_string( $field_def['key'] ) ? $field_def['key'] : '';
 					if ( $key !== '' && isset( $primary_answers[ $key ] ) && $primary_answers[ $key ] !== '' ) {
-						$filled++;
+						++$filled;
 					}
 				}
 				$total = count( $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ] );
@@ -139,9 +139,9 @@ final class Industry_Profile_Validator {
 	/**
 	 * Returns readiness result for the given profile. Uses validate() then computes state and score.
 	 *
-	 * @param array<string, mixed>                    $profile   Industry profile (normalized or raw).
-	 * @param Industry_Pack_Registry|null            $pack_registry Optional.
-	 * @param Industry_Question_Pack_Registry|null   $qp_registry  Optional.
+	 * @param array<string, mixed>                 $profile   Industry profile (normalized or raw).
+	 * @param Industry_Pack_Registry|null          $pack_registry Optional.
+	 * @param Industry_Question_Pack_Registry|null $qp_registry  Optional.
 	 * @return Industry_Profile_Readiness_Result
 	 */
 	public function get_readiness(
@@ -150,9 +150,9 @@ final class Industry_Profile_Validator {
 		?Industry_Question_Pack_Registry $qp_registry = null,
 		?Industry_Subtype_Registry $subtype_registry = null
 	): Industry_Profile_Readiness_Result {
-		$valid = $this->validate( $profile, $pack_registry, $qp_registry, $subtype_registry );
+		$valid      = $this->validate( $profile, $pack_registry, $qp_registry, $subtype_registry );
 		$normalized = Industry_Profile_Schema::normalize( $profile );
-		$primary = isset( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$primary    = isset( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
 
@@ -162,7 +162,10 @@ final class Industry_Profile_Validator {
 				Industry_Profile_Readiness_Result::SCORE_NONE,
 				$this->last_errors,
 				$this->last_warnings,
-				array( 'primary_set' => false, 'validation_passed' => false )
+				array(
+					'primary_set'       => false,
+					'validation_passed' => false,
+				)
 			);
 		}
 
@@ -172,24 +175,27 @@ final class Industry_Profile_Validator {
 				Industry_Profile_Readiness_Result::SCORE_MINIMAL,
 				array(),
 				$this->last_warnings,
-				array( 'primary_set' => false, 'question_pack_complete' => false )
+				array(
+					'primary_set'            => false,
+					'question_pack_complete' => false,
+				)
 			);
 		}
 
-		$qp_reg = $qp_registry;
-		$qp_answers = isset( $normalized[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] ) && is_array( $normalized[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] )
+		$qp_reg                 = $qp_registry;
+		$qp_answers             = isset( $normalized[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] ) && is_array( $normalized[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] )
 			? $normalized[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]
 			: array();
-		$primary_answers = $qp_answers[ $primary ] ?? array();
-		$pack = $qp_reg !== null ? $qp_reg->get( $primary ) : null;
+		$primary_answers        = $qp_answers[ $primary ] ?? array();
+		$pack                   = $qp_reg !== null ? $qp_reg->get( $primary ) : null;
 		$question_pack_complete = true;
 		if ( $pack !== null && isset( $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ] ) && is_array( $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ] ) ) {
-			$total = count( $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ] );
+			$total  = count( $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ] );
 			$filled = 0;
 			foreach ( $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ] as $field_def ) {
 				$key = isset( $field_def['key'] ) && is_string( $field_def['key'] ) ? $field_def['key'] : '';
 				if ( $key !== '' && isset( $primary_answers[ $key ] ) && $primary_answers[ $key ] !== '' ) {
-					$filled++;
+					++$filled;
 				}
 			}
 			$question_pack_complete = $total === 0 || $filled > 0;
@@ -201,7 +207,10 @@ final class Industry_Profile_Validator {
 				Industry_Profile_Readiness_Result::SCORE_READY,
 				array(),
 				$this->last_warnings,
-				array( 'primary_set' => true, 'question_pack_complete' => true )
+				array(
+					'primary_set'            => true,
+					'question_pack_complete' => true,
+				)
 			);
 		}
 
@@ -210,7 +219,10 @@ final class Industry_Profile_Validator {
 			Industry_Profile_Readiness_Result::SCORE_PARTIAL,
 			array(),
 			$this->last_warnings,
-			array( 'primary_set' => true, 'question_pack_complete' => false )
+			array(
+				'primary_set'            => true,
+				'question_pack_complete' => false,
+			)
 		);
 	}
 

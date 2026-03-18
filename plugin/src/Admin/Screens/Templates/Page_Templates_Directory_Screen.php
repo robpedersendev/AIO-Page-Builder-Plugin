@@ -55,7 +55,7 @@ final class Page_Templates_Directory_Screen {
 		}
 
 		$state_builder = $this->get_state_builder();
-		$request = array(
+		$request       = array(
 			'category_class' => isset( $_GET['category_class'] ) ? \sanitize_key( (string) $_GET['category_class'] ) : '',
 			'family'         => isset( $_GET['family'] ) ? \sanitize_key( (string) $_GET['family'] ) : '',
 			'status'         => isset( $_GET['status'] ) ? \sanitize_key( (string) $_GET['status'] ) : '',
@@ -64,8 +64,8 @@ final class Page_Templates_Directory_Screen {
 			'per_page'       => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $_GET['per_page'] ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
 			'industry_view'  => isset( $_GET['industry_view'] ) ? \sanitize_key( (string) $_GET['industry_view'] ) : Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY,
 		);
-		$state = $state_builder->build_state( $request );
-		$state = $this->enrich_state_with_industry( $state, $request );
+		$state         = $state_builder->build_state( $request );
+		$state         = $this->enrich_state_with_industry( $state, $request );
 		$state['industry_page_template_overrides_by_key'] = ( new Industry_Page_Template_Override_Service() )->list_overrides();
 
 		$view = (string) ( $state['view'] ?? 'root' );
@@ -78,7 +78,20 @@ final class Page_Templates_Directory_Screen {
 				? '<a href="' . \esc_url( rtrim( $docs_base, '/' ) . '/guides/template-library-operator-guide.md' ) . '" target="_blank" rel="noopener">' . \esc_html__( 'Template Library Operator Guide', 'aio-page-builder' ) . '</a>'
 				: \esc_html__( 'Template Library Operator Guide (docs/guides/template-library-operator-guide.md)', 'aio-page-builder' );
 			?>
-			<p class="aio-description" aria-label="<?php \esc_attr_e( 'Help reference', 'aio-page-builder' ); ?>"><?php echo \wp_kses( sprintf( /* translators: %s: link or path to operator guide */ __( 'For full guidance on browsing, compare, and compositions, see the %s.', 'aio-page-builder' ), $guide_ref ), array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ) ) ); ?></p>
+			<p class="aio-description" aria-label="<?php \esc_attr_e( 'Help reference', 'aio-page-builder' ); ?>">
+			<?php
+			echo \wp_kses(
+				sprintf( /* translators: %s: link or path to operator guide */ __( 'For full guidance on browsing, compare, and compositions, see the %s.', 'aio-page-builder' ), $guide_ref ),
+				array(
+					'a' => array(
+						'href'   => true,
+						'target' => true,
+						'rel'    => true,
+					),
+				)
+			);
+			?>
+													</p>
 			<?php $this->render_breadcrumbs( $state ); ?>
 			<?php $this->render_filters( $state ); ?>
 			<?php
@@ -104,12 +117,12 @@ final class Page_Templates_Directory_Screen {
 	private function enrich_state_with_industry( array $state, array $request ): array {
 		$view = (string) ( $state['view'] ?? 'root' );
 		if ( $view !== 'list' && $view !== 'search' ) {
-			$state['industry_view'] = Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY;
-			$state['industry_badges_by_key'] = array();
+			$state['industry_view']            = Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY;
+			$state['industry_badges_by_key']   = array();
 			$state['industry_weighted_by_key'] = array();
 			return $state;
 		}
-		$profile_repo = null;
+		$profile_repo  = null;
 		$pack_registry = null;
 		if ( $this->container && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
 			$store = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
@@ -124,7 +137,7 @@ final class Page_Templates_Directory_Screen {
 			}
 		}
 		$read_model_builder = new Industry_Page_Template_Directory_Read_Model_Builder( null, new \AIOPageBuilder\Domain\Industry\Profile\Industry_Weighted_Recommendation_Engine() );
-		$controller = new Industry_Page_Template_Filter_Controller( $read_model_builder, $profile_repo, $pack_registry );
+		$controller         = new Industry_Page_Template_Filter_Controller( $read_model_builder, $profile_repo, $pack_registry );
 		return $controller->enrich_state( $state, $request );
 	}
 
@@ -175,13 +188,13 @@ final class Page_Templates_Directory_Screen {
 	 * @return void
 	 */
 	private function render_filters( array $state ): void {
-		$base_url = (string) ( $state['base_url'] ?? \admin_url( 'admin.php?page=' . self::SLUG ) );
-		$filters  = $state['filters'] ?? array();
-		$cat      = (string) ( $filters['category_class'] ?? '' );
-		$family   = (string) ( $filters['family'] ?? '' );
-		$status   = (string) ( $filters['status'] ?? '' );
-		$search   = (string) ( $filters['search'] ?? '' );
-		$labels   = $state['category_labels'] ?? array();
+		$base_url      = (string) ( $state['base_url'] ?? \admin_url( 'admin.php?page=' . self::SLUG ) );
+		$filters       = $state['filters'] ?? array();
+		$cat           = (string) ( $filters['category_class'] ?? '' );
+		$family        = (string) ( $filters['family'] ?? '' );
+		$status        = (string) ( $filters['status'] ?? '' );
+		$search        = (string) ( $filters['search'] ?? '' );
+		$labels        = $state['category_labels'] ?? array();
 		$industry_view = (string) ( $state['industry_view'] ?? Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY );
 		?>
 		<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-directory-filters">
@@ -256,21 +269,21 @@ final class Page_Templates_Directory_Screen {
 	 * @return void
 	 */
 	private function render_list( array $state ): void {
-		$list_result = $state['list_result'] ?? array();
-		$rows        = $list_result['rows'] ?? array();
-		$pagination  = $list_result['pagination'] ?? array();
-		$base_url    = (string) ( $state['base_url'] ?? '' );
-		$filters     = $state['filters'] ?? array();
-		$cat         = (string) ( $filters['category_class'] ?? '' );
-		$family      = (string) ( $filters['family'] ?? '' );
-		$paged       = (int) ( $filters['paged'] ?? 1 );
-		$per_page    = (int) ( $filters['per_page'] ?? 25 );
-		$search      = (string) ( $filters['search'] ?? '' );
-		$can_manage  = ! empty( $state['can_manage_templates'] );
-		$category_labels = $state['category_labels'] ?? array();
-		$industry_badges_by_key = $state['industry_badges_by_key'] ?? array();
+		$list_result                             = $state['list_result'] ?? array();
+		$rows                                    = $list_result['rows'] ?? array();
+		$pagination                              = $list_result['pagination'] ?? array();
+		$base_url                                = (string) ( $state['base_url'] ?? '' );
+		$filters                                 = $state['filters'] ?? array();
+		$cat                                     = (string) ( $filters['category_class'] ?? '' );
+		$family                                  = (string) ( $filters['family'] ?? '' );
+		$paged                                   = (int) ( $filters['paged'] ?? 1 );
+		$per_page                                = (int) ( $filters['per_page'] ?? 25 );
+		$search                                  = (string) ( $filters['search'] ?? '' );
+		$can_manage                              = ! empty( $state['can_manage_templates'] );
+		$category_labels                         = $state['category_labels'] ?? array();
+		$industry_badges_by_key                  = $state['industry_badges_by_key'] ?? array();
 		$industry_page_template_overrides_by_key = $state['industry_page_template_overrides_by_key'] ?? array();
-		$industry_weighted_by_key = $state['industry_weighted_by_key'] ?? array();
+		$industry_weighted_by_key                = $state['industry_weighted_by_key'] ?? array();
 
 		$query_args = array( 'page' => self::SLUG );
 		if ( $cat !== '' ) {
@@ -309,30 +322,33 @@ final class Page_Templates_Directory_Screen {
 			<tbody>
 				<?php foreach ( $rows as $row ) : ?>
 					<?php
-					$key   = (string) ( $row['internal_key'] ?? '' );
-					$name  = (string) ( $row['name'] ?? '' );
-					$cat_slug = (string) ( $row['template_category_class'] ?? '' );
-					$cat_label = isset( $category_labels[ $cat_slug ] ) ? $category_labels[ $cat_slug ] : $cat_slug;
-					$fam_slug = (string) ( $row['template_family'] ?? '' );
-					$fam_label = $fam_slug !== '' ? \ucfirst( \str_replace( array( '_', '-' ), ' ', $fam_slug ) ) : '';
-					$status = (string) ( $row['status'] ?? '' );
-					$version = (string) ( $row['version'] ?? '1' );
+					$key           = (string) ( $row['internal_key'] ?? '' );
+					$name          = (string) ( $row['name'] ?? '' );
+					$cat_slug      = (string) ( $row['template_category_class'] ?? '' );
+					$cat_label     = isset( $category_labels[ $cat_slug ] ) ? $category_labels[ $cat_slug ] : $cat_slug;
+					$fam_slug      = (string) ( $row['template_family'] ?? '' );
+					$fam_label     = $fam_slug !== '' ? \ucfirst( \str_replace( array( '_', '-' ), ' ', $fam_slug ) ) : '';
+					$status        = (string) ( $row['status'] ?? '' );
+					$version       = (string) ( $row['version'] ?? '1' );
 					$section_count = (int) ( $row['section_count'] ?? 0 );
 					$one_pager_url = ''; // * One-pager link: populated from template definition on detail screen.
-					$detail_args = array( 'page' => Page_Template_Detail_Screen::SLUG, 'template' => $key );
+					$detail_args   = array(
+						'page'     => Page_Template_Detail_Screen::SLUG,
+						'template' => $key,
+					);
 					if ( $cat !== '' ) {
 						$detail_args['category_class'] = $cat;
 					}
 					if ( $family !== '' ) {
 						$detail_args['family'] = $family;
 					}
-					$view_url = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
-					$in_compare = \in_array( $key, Template_Compare_Screen::get_compare_list( 'page' ), true );
-					$item_view = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
-					$template_override = isset( $industry_page_template_overrides_by_key[ $key ] ) && is_array( $industry_page_template_overrides_by_key[ $key ] ) ? $industry_page_template_overrides_by_key[ $key ] : null;
-					$show_use_anyway = $item_view !== null && $template_override === null && \in_array( $item_view->get_recommendation_status(), array( Industry_Page_Template_Recommendation_Resolver::FIT_DISCOURAGED, Industry_Page_Template_Recommendation_Resolver::FIT_ALLOWED_WEAK ), true );
-					$weighted = isset( $industry_weighted_by_key[ $key ] ) && is_array( $industry_weighted_by_key[ $key ] ) ? $industry_weighted_by_key[ $key ] : null;
-					$conflict_results = ( $weighted !== null && ! empty( $weighted['conflict_results'] ) ) ? $weighted['conflict_results'] : array();
+					$view_url            = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
+					$in_compare          = \in_array( $key, Template_Compare_Screen::get_compare_list( 'page' ), true );
+					$item_view           = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
+					$template_override   = isset( $industry_page_template_overrides_by_key[ $key ] ) && is_array( $industry_page_template_overrides_by_key[ $key ] ) ? $industry_page_template_overrides_by_key[ $key ] : null;
+					$show_use_anyway     = $item_view !== null && $template_override === null && \in_array( $item_view->get_recommendation_status(), array( Industry_Page_Template_Recommendation_Resolver::FIT_DISCOURAGED, Industry_Page_Template_Recommendation_Resolver::FIT_ALLOWED_WEAK ), true );
+					$weighted            = isset( $industry_weighted_by_key[ $key ] ) && is_array( $industry_weighted_by_key[ $key ] ) ? $industry_weighted_by_key[ $key ] : null;
+					$conflict_results    = ( $weighted !== null && ! empty( $weighted['conflict_results'] ) ) ? $weighted['conflict_results'] : array();
 					$explanation_summary = ( $weighted !== null && isset( $weighted['explanation_summary'] ) ) ? (string) $weighted['explanation_summary'] : '';
 					?>
 					<tr>
@@ -390,8 +406,8 @@ final class Page_Templates_Directory_Screen {
 
 	/**
 	 * @param array{page?: int, total_pages?: int} $pagination
-	 * @param array<string, string|int> $query_args
-	 * @param string $base_url
+	 * @param array<string, string|int>            $query_args
+	 * @param string                               $base_url
 	 * @return void
 	 */
 	private function render_pagination( array $pagination, array $query_args, string $base_url ): void {

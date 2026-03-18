@@ -30,8 +30,8 @@ final class Section_Style_Emitter {
 		?Style_Token_Registry $token_registry = null,
 		?Component_Override_Registry $component_registry = null
 	) {
-		$this->payload_repository  = $payload_repository;
-		$this->token_registry      = $token_registry;
+		$this->payload_repository = $payload_repository;
+		$this->token_registry     = $token_registry;
 		$this->component_registry = $component_registry;
 	}
 
@@ -45,7 +45,7 @@ final class Section_Style_Emitter {
 		if ( $section_key === '' ) {
 			return '';
 		}
-		$payload = $this->payload_repository->get_payload( 'section_template', $section_key );
+		$payload         = $this->payload_repository->get_payload( 'section_template', $section_key );
 		$token_overrides = $payload[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] ?? array();
 		return $this->emit_token_declarations( $token_overrides );
 	}
@@ -60,7 +60,7 @@ final class Section_Style_Emitter {
 		if ( $section_key === '' || $this->component_registry === null || ! $this->component_registry->is_loaded() ) {
 			return '';
 		}
-		$payload = $this->payload_repository->get_payload( 'section_template', $section_key );
+		$payload             = $this->payload_repository->get_payload( 'section_template', $section_key );
 		$component_overrides = $payload[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] ?? array();
 		if ( ! is_array( $component_overrides ) || empty( $component_overrides ) ) {
 			return '';
@@ -74,7 +74,7 @@ final class Section_Style_Emitter {
 			if ( ! is_string( $component_id ) || ! is_array( $pairs ) ) {
 				continue;
 			}
-			$allowed = $this->component_registry->get_allowed_token_overrides( $component_id );
+			$allowed      = $this->component_registry->get_allowed_token_overrides( $component_id );
 			$element_role = $this->component_registry->get_element_role( $component_id );
 			if ( $element_role === '' || empty( $allowed ) ) {
 				continue;

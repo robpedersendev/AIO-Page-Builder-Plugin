@@ -54,7 +54,7 @@ final class ACF_Architecture_Diagnostics_Screen_Test extends TestCase {
 	 */
 	public function test_empty_state_has_required_keys_for_render(): void {
 		$screen = new ACF_Architecture_Diagnostics_Screen( null );
-		$ref = new \ReflectionClass( $screen );
+		$ref    = new \ReflectionClass( $screen );
 		$method = $ref->getMethod( 'build_state' );
 		$method->setAccessible( true );
 		$state = $method->invoke( $screen );

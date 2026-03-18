@@ -24,21 +24,24 @@ final class Section_Render_Context_Builder_Test extends TestCase {
 
 	private function valid_definition(): array {
 		return array(
-			Section_Schema::FIELD_INTERNAL_KEY   => 'st01_hero',
-			Section_Schema::FIELD_VARIANTS       => array(
+			Section_Schema::FIELD_INTERNAL_KEY             => 'st01_hero',
+			Section_Schema::FIELD_VARIANTS                 => array(
 				'default' => array( 'label' => 'Default' ),
 				'compact' => array( 'label' => 'Compact' ),
 			),
-			Section_Schema::FIELD_DEFAULT_VARIANT => 'default',
+			Section_Schema::FIELD_DEFAULT_VARIANT          => 'default',
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp_st01',
-			Section_Schema::FIELD_ASSET_DECLARATION => array( 'none' => true ),
+			Section_Schema::FIELD_ASSET_DECLARATION        => array( 'none' => true ),
 		);
 	}
 
 	public function test_build_returns_context_when_definition_valid(): void {
-		$builder = new Section_Render_Context_Builder();
-		$def = $this->valid_definition();
-		$field_values = array( 'headline' => 'Test Headline', 'subheadline' => 'Sub' );
+		$builder      = new Section_Render_Context_Builder();
+		$def          = $this->valid_definition();
+		$field_values = array(
+			'headline'    => 'Test Headline',
+			'subheadline' => 'Sub',
+		);
 
 		$out = $builder->build( $def, $field_values, 1, null );
 
@@ -52,7 +55,7 @@ final class Section_Render_Context_Builder_Test extends TestCase {
 
 	public function test_build_rejects_missing_internal_key(): void {
 		$builder = new Section_Render_Context_Builder();
-		$def = $this->valid_definition();
+		$def     = $this->valid_definition();
 		unset( $def[ Section_Schema::FIELD_INTERNAL_KEY ] );
 
 		$out = $builder->build( $def, array(), 0, null );
@@ -63,8 +66,8 @@ final class Section_Render_Context_Builder_Test extends TestCase {
 	}
 
 	public function test_build_rejects_empty_variants(): void {
-		$builder = new Section_Render_Context_Builder();
-		$def = $this->valid_definition();
+		$builder                               = new Section_Render_Context_Builder();
+		$def                                   = $this->valid_definition();
 		$def[ Section_Schema::FIELD_VARIANTS ] = array();
 
 		$out = $builder->build( $def, array(), 0, null );
@@ -75,7 +78,7 @@ final class Section_Render_Context_Builder_Test extends TestCase {
 
 	public function test_build_rejects_default_variant_not_in_variants(): void {
 		$builder = new Section_Render_Context_Builder();
-		$def = $this->valid_definition();
+		$def     = $this->valid_definition();
 		$def[ Section_Schema::FIELD_DEFAULT_VARIANT ] = 'missing_variant';
 
 		$out = $builder->build( $def, array(), 0, null );
@@ -87,7 +90,7 @@ final class Section_Render_Context_Builder_Test extends TestCase {
 
 	public function test_build_rejects_invalid_variant_override(): void {
 		$builder = new Section_Render_Context_Builder();
-		$def = $this->valid_definition();
+		$def     = $this->valid_definition();
 
 		$out = $builder->build( $def, array(), 0, 'invalid_override' );
 
@@ -98,7 +101,7 @@ final class Section_Render_Context_Builder_Test extends TestCase {
 
 	public function test_build_accepts_valid_variant_override(): void {
 		$builder = new Section_Render_Context_Builder();
-		$def = $this->valid_definition();
+		$def     = $this->valid_definition();
 
 		$out = $builder->build( $def, array(), 0, 'compact' );
 
@@ -107,8 +110,8 @@ final class Section_Render_Context_Builder_Test extends TestCase {
 	}
 
 	public function test_validate_definition_returns_errors_for_invalid_key_pattern(): void {
-		$builder = new Section_Render_Context_Builder();
-		$def = $this->valid_definition();
+		$builder                                   = new Section_Render_Context_Builder();
+		$def                                       = $this->valid_definition();
 		$def[ Section_Schema::FIELD_INTERNAL_KEY ] = 'Invalid-Key';
 
 		$errors = $builder->validate_definition( $def, null );
@@ -118,8 +121,8 @@ final class Section_Render_Context_Builder_Test extends TestCase {
 	}
 
 	public function test_sanitizes_field_values(): void {
-		$builder = new Section_Render_Context_Builder();
-		$def = $this->valid_definition();
+		$builder      = new Section_Render_Context_Builder();
+		$def          = $this->valid_definition();
 		$field_values = array( 'headline' => '  <script>alert(1)</script>  Headline  ' );
 
 		$out = $builder->build( $def, $field_values, 0, null );

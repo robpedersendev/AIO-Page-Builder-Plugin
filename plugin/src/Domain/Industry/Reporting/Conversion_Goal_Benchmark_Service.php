@@ -51,22 +51,22 @@ final class Conversion_Goal_Benchmark_Service {
 	 */
 	public function run_benchmark( array $profile_base, array $goal_keys = array() ): array {
 		$goal_keys = array_slice( array_intersect( array_values( $goal_keys ), self::LAUNCH_GOAL_KEYS ), 0, self::MAX_GOALS_PER_RUN );
-		$warnings = array();
+		$warnings  = array();
 
-		$baseline = $this->get_baseline_comparison( $profile_base );
-		$by_goal = array();
+		$baseline         = $this->get_baseline_comparison( $profile_base );
+		$by_goal          = array();
 		$readable_summary = array();
 
 		foreach ( $goal_keys as $goal_key ) {
-			$profile_with_goal = array_merge( $profile_base, array( Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY => $goal_key ) );
-			$with_goal = $this->get_baseline_comparison( $profile_with_goal );
-			$diff_summary = $this->differentiation_summary( $baseline, $with_goal, $goal_key );
+			$profile_with_goal    = array_merge( $profile_base, array( Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY => $goal_key ) );
+			$with_goal            = $this->get_baseline_comparison( $profile_with_goal );
+			$diff_summary         = $this->differentiation_summary( $baseline, $with_goal, $goal_key );
 			$by_goal[ $goal_key ] = array(
 				'section_keys'            => $with_goal['section_keys'] ?? array(),
-				'template_keys'            => $with_goal['template_keys'] ?? array(),
-				'differentiation_summary'  => $diff_summary,
+				'template_keys'           => $with_goal['template_keys'] ?? array(),
+				'differentiation_summary' => $diff_summary,
 			);
-			$readable_summary[] = sprintf( 'Goal "%s": %s', $goal_key, $diff_summary );
+			$readable_summary[]   = sprintf( 'Goal "%s": %s', $goal_key, $diff_summary );
 		}
 
 		$readable_summary = array_merge(
@@ -75,10 +75,10 @@ final class Conversion_Goal_Benchmark_Service {
 		);
 
 		return array(
-			'no_goal_baseline'   => $baseline,
-			'by_goal'            => $by_goal,
-			'readable_summary'   => $readable_summary,
-			'warnings'           => $warnings,
+			'no_goal_baseline' => $baseline,
+			'by_goal'          => $by_goal,
+			'readable_summary' => $readable_summary,
+			'warnings'         => $warnings,
 		);
 	}
 
@@ -96,35 +96,38 @@ final class Conversion_Goal_Benchmark_Service {
 			? trim( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			: '';
 
-		$section_keys = array();
+		$section_keys  = array();
 		$template_keys = array();
 		if ( $this->comparison_service !== null && $primary !== '' ) {
 			$comparison = $this->comparison_service->get_comparison( $primary, $subtype );
 			if ( is_array( $comparison ) ) {
-				$section_keys = $subtype !== ''
+				$section_keys  = $subtype !== ''
 					? ( isset( $comparison['subtype_top_section_keys'] ) && is_array( $comparison['subtype_top_section_keys'] ) ? $comparison['subtype_top_section_keys'] : array() )
 					: ( isset( $comparison['parent_top_section_keys'] ) && is_array( $comparison['parent_top_section_keys'] ) ? $comparison['parent_top_section_keys'] : array() );
 				$template_keys = $subtype !== ''
 					? ( isset( $comparison['subtype_top_template_keys'] ) && is_array( $comparison['subtype_top_template_keys'] ) ? $comparison['subtype_top_template_keys'] : array() )
 					: ( isset( $comparison['parent_top_template_keys'] ) && is_array( $comparison['parent_top_template_keys'] ) ? $comparison['parent_top_template_keys'] : array() );
-				$section_keys = array_slice( array_values( $section_keys ), 0, self::MAX_COMPARISON_ITEMS );
+				$section_keys  = array_slice( array_values( $section_keys ), 0, self::MAX_COMPARISON_ITEMS );
 				$template_keys = array_slice( array_values( $template_keys ), 0, self::MAX_COMPARISON_ITEMS );
 			}
 		}
 
-		return array( 'section_keys' => $section_keys, 'template_keys' => $template_keys );
+		return array(
+			'section_keys'  => $section_keys,
+			'template_keys' => $template_keys,
+		);
 	}
 
 	/**
 	 * Produces a short differentiation summary between baseline and goal-aware result.
 	 */
 	private function differentiation_summary( array $baseline, array $with_goal, string $goal_key ): string {
-		$base_sections = $baseline['section_keys'] ?? array();
+		$base_sections  = $baseline['section_keys'] ?? array();
 		$base_templates = $baseline['template_keys'] ?? array();
-		$goal_sections = $with_goal['section_keys'] ?? array();
+		$goal_sections  = $with_goal['section_keys'] ?? array();
 		$goal_templates = $with_goal['template_keys'] ?? array();
 
-		$section_diff = count( array_diff( $goal_sections, $base_sections ) ) + count( array_diff( $base_sections, $goal_sections ) );
+		$section_diff  = count( array_diff( $goal_sections, $base_sections ) ) + count( array_diff( $base_sections, $goal_sections ) );
 		$template_diff = count( array_diff( $goal_templates, $base_templates ) ) + count( array_diff( $base_templates, $goal_templates ) );
 
 		if ( $section_diff === 0 && $template_diff === 0 ) {

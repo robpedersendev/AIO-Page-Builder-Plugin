@@ -12,13 +12,13 @@ defined( 'ABSPATH' ) || exit;
 
 return array(
 	array(
-		'industry_key'    => 'cosmetology_nail',
-		'name'            => 'Cosmetology / Nail Technician',
-		'summary'         => 'Salon, spa, and nail businesses: booking-centered services, gallery and staff profiles, promotions. Local pages optional; service-area hubs possible.',
-		'status'          => 'active',
-		'version_marker'  => '1',
+		'industry_key'             => 'cosmetology_nail',
+		'name'                     => 'Cosmetology / Nail Technician',
+		'summary'                  => 'Salon, spa, and nail businesses: booking-centered services, gallery and staff profiles, promotions. Local pages optional; service-area hubs possible.',
+		'status'                   => 'active',
+		'version_marker'           => '1',
 
-		'supported_page_families' => array(
+		'supported_page_families'  => array(
 			'home',
 			'about',
 			'services',
@@ -33,14 +33,14 @@ return array(
 		'discouraged_section_keys' => array(),
 
 		'preferred_cta_patterns'   => array( 'book_now', 'gallery_to_booking', 'consult' ),
-		'required_cta_patterns'   => array( 'book_now' ),
+		'required_cta_patterns'    => array( 'book_now' ),
 		'discouraged_cta_patterns' => array( 'emergency_dispatch', 'claim_assistance' ),
 
-		'seo_guidance_ref' => 'cosmetology_nail',
-		'token_preset_ref'  => 'cosmetology_elegant',
-		'lpagery_rule_ref'  => 'cosmetology_nail_01',
+		'seo_guidance_ref'         => 'cosmetology_nail',
+		'token_preset_ref'         => 'cosmetology_elegant',
+		'lpagery_rule_ref'         => 'cosmetology_nail_01',
 
-		'metadata' => array(
+		'metadata'                 => array(
 			'notes_booking'   => 'Emphasis on booking CTAs and appointment flow; no integration logic in pack.',
 			'notes_gallery'   => 'Gallery and portfolio sections preferred for services and results.',
 			'notes_staff'     => 'Staff/team profiles and bios support trust and booking.',

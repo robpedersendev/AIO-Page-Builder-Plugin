@@ -39,9 +39,9 @@ final class Provider_Failover_Test extends TestCase {
 
 	public function test_policy_from_config_enabled_with_fallback(): void {
 		$config = array(
-			'enabled'                => true,
-			'fallback_provider_id'   => 'anthropic',
-			'eligible_categories'    => array( Provider_Response_Normalizer::ERROR_RATE_LIMIT, Provider_Response_Normalizer::ERROR_TIMEOUT ),
+			'enabled'              => true,
+			'fallback_provider_id' => 'anthropic',
+			'eligible_categories'  => array( Provider_Response_Normalizer::ERROR_RATE_LIMIT, Provider_Response_Normalizer::ERROR_TIMEOUT ),
 		);
 		$policy = Provider_Failover_Policy::from_config( $config, 'openai' );
 		$this->assertTrue( $policy->is_enabled() );
@@ -63,8 +63,14 @@ final class Provider_Failover_Test extends TestCase {
 	}
 
 	public function test_failover_result_primary_success_metadata_has_effective_provider(): void {
-		$snapshot = array( 'enabled' => false, 'primary_provider_id' => 'openai', 'fallback_provider_id' => '', 'eligible_categories' => array(), 'max_fallback_attempts' => 0 );
-		$result = Failover_Result::primary_success( 'openai', 'gpt-4o', $snapshot );
+		$snapshot = array(
+			'enabled'               => false,
+			'primary_provider_id'   => 'openai',
+			'fallback_provider_id'  => '',
+			'eligible_categories'   => array(),
+			'max_fallback_attempts' => 0,
+		);
+		$result   = Failover_Result::primary_success( 'openai', 'gpt-4o', $snapshot );
 		$this->assertTrue( $result->used_primary() );
 		$this->assertSame( 'openai', $result->get_effective_provider_id() );
 		$meta = $result->to_run_metadata();
@@ -76,8 +82,14 @@ final class Provider_Failover_Test extends TestCase {
 	}
 
 	public function test_failover_result_primary_failure_no_fallback_metadata(): void {
-		$snapshot = array( 'enabled' => false, 'primary_provider_id' => 'openai', 'fallback_provider_id' => '', 'eligible_categories' => array(), 'max_fallback_attempts' => 0 );
-		$result = Failover_Result::primary_failure_no_fallback( 'openai', 'gpt-4o', 'rate_limit', $snapshot );
+		$snapshot = array(
+			'enabled'               => false,
+			'primary_provider_id'   => 'openai',
+			'fallback_provider_id'  => '',
+			'eligible_categories'   => array(),
+			'max_fallback_attempts' => 0,
+		);
+		$result   = Failover_Result::primary_failure_no_fallback( 'openai', 'gpt-4o', 'rate_limit', $snapshot );
 		$this->assertFalse( $result->used_primary() );
 		$meta = $result->to_run_metadata();
 		$this->assertArrayHasKey( 'effective_provider_used', $meta );
@@ -86,12 +98,28 @@ final class Provider_Failover_Test extends TestCase {
 	}
 
 	public function test_failover_result_fallback_success_has_fallback_reference_and_effective_provider(): void {
-		$snapshot = array( 'enabled' => true, 'primary_provider_id' => 'openai', 'fallback_provider_id' => 'anthropic', 'eligible_categories' => array(), 'max_fallback_attempts' => 1 );
-		$attempts = array(
-			array( 'provider_id' => 'openai', 'model_used' => 'gpt-4o', 'category' => 'rate_limit', 'attempted_at' => '2025-01-01T00:00:00Z' ),
-			array( 'provider_id' => 'anthropic', 'model_used' => 'claude-3-5-sonnet', 'category' => 'success', 'attempted_at' => '2025-01-01T00:00:01Z' ),
+		$snapshot = array(
+			'enabled'               => true,
+			'primary_provider_id'   => 'openai',
+			'fallback_provider_id'  => 'anthropic',
+			'eligible_categories'   => array(),
+			'max_fallback_attempts' => 1,
 		);
-		$result = Failover_Result::fallback_success( 'anthropic', 'claude-3-5-sonnet', $attempts, $snapshot );
+		$attempts = array(
+			array(
+				'provider_id'  => 'openai',
+				'model_used'   => 'gpt-4o',
+				'category'     => 'rate_limit',
+				'attempted_at' => '2025-01-01T00:00:00Z',
+			),
+			array(
+				'provider_id'  => 'anthropic',
+				'model_used'   => 'claude-3-5-sonnet',
+				'category'     => 'success',
+				'attempted_at' => '2025-01-01T00:00:01Z',
+			),
+		);
+		$result   = Failover_Result::fallback_success( 'anthropic', 'claude-3-5-sonnet', $attempts, $snapshot );
 		$this->assertFalse( $result->used_primary() );
 		$this->assertSame( 'anthropic', $result->get_effective_provider_id() );
 		$meta = $result->to_run_metadata();
@@ -105,22 +133,33 @@ final class Provider_Failover_Test extends TestCase {
 		$settings = new Settings_Service();
 		$settings->set( Option_Names::PROVIDER_CONFIG_REF, array() );
 		$service = new Provider_Failover_Service( $settings, new Provider_Capability_Resolver() );
-		$policy = $service->get_policy_for_primary( 'openai' );
+		$policy  = $service->get_policy_for_primary( 'openai' );
 		$this->assertFalse( $policy->is_enabled() );
 	}
 
 	public function test_service_try_fallback_ineligible_category_returns_primary_response_and_no_fallback_result(): void {
 		$settings = new Settings_Service();
 		$settings->set( Option_Names::PROVIDER_CONFIG_REF, array() );
-		$service = new Provider_Failover_Service( $settings, new Provider_Capability_Resolver() );
-		$policy = Provider_Failover_Policy::disabled( 'openai' );
+		$service          = new Provider_Failover_Service( $settings, new Provider_Capability_Resolver() );
+		$policy           = Provider_Failover_Policy::disabled( 'openai' );
 		$primary_response = array(
 			'success'          => false,
-			'normalized_error'  => array( 'category' => Provider_Response_Normalizer::ERROR_AUTH_FAILURE, 'user_message' => 'Auth failed', 'internal_code' => 'auth_failure', 'provider_raw' => null, 'retry_posture' => 'no_retry' ),
+			'normalized_error' => array(
+				'category'      => Provider_Response_Normalizer::ERROR_AUTH_FAILURE,
+				'user_message'  => 'Auth failed',
+				'internal_code' => 'auth_failure',
+				'provider_raw'  => null,
+				'retry_posture' => 'no_retry',
+			),
 		);
-		$request = array( 'request_id' => 'req-1', 'model' => 'gpt-4o', 'system_prompt' => '', 'user_message' => '' );
-		$container = new Service_Container();
-		$bag = $service->try_fallback( $policy, 'openai', 'gpt-4o', $primary_response, $request, 'aio/build-plan-draft-v1', $container );
+		$request          = array(
+			'request_id'    => 'req-1',
+			'model'         => 'gpt-4o',
+			'system_prompt' => '',
+			'user_message'  => '',
+		);
+		$container        = new Service_Container();
+		$bag              = $service->try_fallback( $policy, 'openai', 'gpt-4o', $primary_response, $request, 'aio/build-plan-draft-v1', $container );
 		$this->assertSame( $primary_response, $bag['response'] );
 		$this->assertInstanceOf( Failover_Result::class, $bag['result'] );
 		$this->assertFalse( $bag['result']->used_primary() );
@@ -128,16 +167,27 @@ final class Provider_Failover_Test extends TestCase {
 	}
 
 	public function test_service_try_fallback_eligible_but_no_fallback_driver_returns_primary_response(): void {
-		$policy = new Provider_Failover_Policy( true, 'openai', 'nonexistent', array( Provider_Response_Normalizer::ERROR_RATE_LIMIT ), 1 );
-		$settings = new Settings_Service();
-		$service = new Provider_Failover_Service( $settings, new Provider_Capability_Resolver() );
+		$policy           = new Provider_Failover_Policy( true, 'openai', 'nonexistent', array( Provider_Response_Normalizer::ERROR_RATE_LIMIT ), 1 );
+		$settings         = new Settings_Service();
+		$service          = new Provider_Failover_Service( $settings, new Provider_Capability_Resolver() );
 		$primary_response = array(
 			'success'          => false,
-			'normalized_error'  => array( 'category' => Provider_Response_Normalizer::ERROR_RATE_LIMIT, 'user_message' => 'Rate limited', 'internal_code' => 'rate_limit', 'provider_raw' => null, 'retry_posture' => 'retry_with_backoff' ),
+			'normalized_error' => array(
+				'category'      => Provider_Response_Normalizer::ERROR_RATE_LIMIT,
+				'user_message'  => 'Rate limited',
+				'internal_code' => 'rate_limit',
+				'provider_raw'  => null,
+				'retry_posture' => 'retry_with_backoff',
+			),
 		);
-		$request = array( 'request_id' => 'req-1', 'model' => 'gpt-4o', 'system_prompt' => '', 'user_message' => '' );
-		$container = new Service_Container();
-		$bag = $service->try_fallback( $policy, 'openai', 'gpt-4o', $primary_response, $request, 'aio/build-plan-draft-v1', $container );
+		$request          = array(
+			'request_id'    => 'req-1',
+			'model'         => 'gpt-4o',
+			'system_prompt' => '',
+			'user_message'  => '',
+		);
+		$container        = new Service_Container();
+		$bag              = $service->try_fallback( $policy, 'openai', 'gpt-4o', $primary_response, $request, 'aio/build-plan-draft-v1', $container );
 		$this->assertSame( $primary_response, $bag['response'] );
 		$this->assertSame( 'openai', $bag['result']->get_effective_provider_id() );
 		$this->assertCount( 1, $bag['result']->get_attempts() );
@@ -145,18 +195,28 @@ final class Provider_Failover_Test extends TestCase {
 
 	public function test_persisted_metadata_example_failover_result_payload(): void {
 		$snapshot = array(
-			'enabled'                => true,
+			'enabled'               => true,
 			'primary_provider_id'   => 'openai',
 			'fallback_provider_id'  => 'anthropic',
 			'eligible_categories'   => array( 'rate_limit', 'timeout' ),
 			'max_fallback_attempts' => 1,
 		);
 		$attempts = array(
-			array( 'provider_id' => 'openai', 'model_used' => 'gpt-4o', 'category' => 'rate_limit', 'attempted_at' => '2025-03-12T10:00:00Z' ),
-			array( 'provider_id' => 'anthropic', 'model_used' => 'claude-3-5-sonnet-20241022', 'category' => 'success', 'attempted_at' => '2025-03-12T10:00:05Z' ),
+			array(
+				'provider_id'  => 'openai',
+				'model_used'   => 'gpt-4o',
+				'category'     => 'rate_limit',
+				'attempted_at' => '2025-03-12T10:00:00Z',
+			),
+			array(
+				'provider_id'  => 'anthropic',
+				'model_used'   => 'claude-3-5-sonnet-20241022',
+				'category'     => 'success',
+				'attempted_at' => '2025-03-12T10:00:05Z',
+			),
 		);
-		$result = Failover_Result::fallback_success( 'anthropic', 'claude-3-5-sonnet-20241022', $attempts, $snapshot );
-		$meta = $result->to_run_metadata();
+		$result   = Failover_Result::fallback_success( 'anthropic', 'claude-3-5-sonnet-20241022', $attempts, $snapshot );
+		$meta     = $result->to_run_metadata();
 		$this->assertArrayHasKey( 'failover_policy', $meta );
 		$this->assertArrayHasKey( 'failover_attempt', $meta );
 		$this->assertArrayHasKey( 'fallback_provider_reference', $meta );

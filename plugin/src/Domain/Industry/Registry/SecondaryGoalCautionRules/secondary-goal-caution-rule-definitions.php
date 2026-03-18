@@ -26,13 +26,13 @@ function _calls_lead_capture_rules(): array {
 	return array(
 		array(
 			'secondary_goal_rule_key' => 'sec_calls_lead_capture_cta_confusion',
-			'primary_goal_key'       => 'calls',
-			'secondary_goal_key'     => 'lead_capture',
-			'severity'               => 'caution',
-			'caution_summary'        => 'Call-first plus lead capture: avoid competing CTAs; keep call primary and lead magnet clearly secondary.',
-			'guidance_text'          => 'When both call and lead capture are active, ensure one primary CTA (call) and one secondary path (e.g. download guide). Do not present equal-weight options that dilute focus.',
-			'refinement_area'        => 'cta_confusion',
-			'status'                 => 'active',
+			'primary_goal_key'        => 'calls',
+			'secondary_goal_key'      => 'lead_capture',
+			'severity'                => 'caution',
+			'caution_summary'         => 'Call-first plus lead capture: avoid competing CTAs; keep call primary and lead magnet clearly secondary.',
+			'guidance_text'           => 'When both call and lead capture are active, ensure one primary CTA (call) and one secondary path (e.g. download guide). Do not present equal-weight options that dilute focus.',
+			'refinement_area'         => 'cta_confusion',
+			'status'                  => 'active',
 		),
 	);
 }
@@ -46,13 +46,13 @@ function _bookings_consultation_rules(): array {
 	return array(
 		array(
 			'secondary_goal_rule_key' => 'sec_bookings_consultation_messaging_overload',
-			'primary_goal_key'       => 'bookings',
-			'secondary_goal_key'     => 'consultations',
-			'severity'               => 'info',
-			'caution_summary'        => 'Booking plus consultation: avoid messaging overload; book primary, consultation as clear alternative.',
-			'guidance_text'          => 'Present book/schedule as the main path and consultation or discovery call as the alternative for users not ready to book. Avoid listing both with equal prominence.',
-			'refinement_area'        => 'messaging_overload',
-			'status'                 => 'active',
+			'primary_goal_key'        => 'bookings',
+			'secondary_goal_key'      => 'consultations',
+			'severity'                => 'info',
+			'caution_summary'         => 'Booking plus consultation: avoid messaging overload; book primary, consultation as clear alternative.',
+			'guidance_text'           => 'Present book/schedule as the main path and consultation or discovery call as the alternative for users not ready to book. Avoid listing both with equal prominence.',
+			'refinement_area'         => 'messaging_overload',
+			'status'                  => 'active',
 		),
 	);
 }
@@ -66,13 +66,13 @@ function _estimates_calls_rules(): array {
 	return array(
 		array(
 			'secondary_goal_rule_key' => 'sec_estimates_calls_promise_ambiguity',
-			'primary_goal_key'       => 'estimates',
-			'secondary_goal_key'     => 'calls',
-			'severity'               => 'caution',
-			'caution_summary'        => 'Estimate plus call: set clear expectations for quote vs callback; avoid overpromising response time for either path.',
-			'guidance_text'          => 'Estimate-request and call-back messaging should not promise specific turnaround unless you can deliver. Keep promise framing consistent across both paths.',
-			'refinement_area'        => 'promise_ambiguity',
-			'status'                 => 'active',
+			'primary_goal_key'        => 'estimates',
+			'secondary_goal_key'      => 'calls',
+			'severity'                => 'caution',
+			'caution_summary'         => 'Estimate plus call: set clear expectations for quote vs callback; avoid overpromising response time for either path.',
+			'guidance_text'           => 'Estimate-request and call-back messaging should not promise specific turnaround unless you can deliver. Keep promise framing consistent across both paths.',
+			'refinement_area'         => 'promise_ambiguity',
+			'status'                  => 'active',
 		),
 	);
 }
@@ -86,13 +86,13 @@ function _consultation_lead_nurture_rules(): array {
 	return array(
 		array(
 			'secondary_goal_rule_key' => 'sec_consultation_lead_nurture_cta_confusion',
-			'primary_goal_key'       => 'consultations',
-			'secondary_goal_key'     => 'lead_capture',
-			'severity'               => 'info',
-			'caution_summary'        => 'Consultation plus lead nurture: keep schedule-consultation primary; lead magnet or signup clearly secondary.',
-			'guidance_text'          => 'Consultation CTA should be the main conversion path; guide download or newsletter signup is the secondary path for users not ready to schedule.',
-			'refinement_area'        => 'cta_confusion',
-			'status'                 => 'active',
+			'primary_goal_key'        => 'consultations',
+			'secondary_goal_key'      => 'lead_capture',
+			'severity'                => 'info',
+			'caution_summary'         => 'Consultation plus lead nurture: keep schedule-consultation primary; lead magnet or signup clearly secondary.',
+			'guidance_text'           => 'Consultation CTA should be the main conversion path; guide download or newsletter signup is the secondary path for users not ready to schedule.',
+			'refinement_area'         => 'cta_confusion',
+			'status'                  => 'active',
 		),
 	);
 }

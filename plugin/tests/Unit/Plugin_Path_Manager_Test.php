@@ -21,9 +21,12 @@ final class Plugin_Path_Manager_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$base = rtrim( sys_get_temp_dir(), '/\\' ) . '/aio-pm-test-' . (string) getmypid();
-		$GLOBALS['_aio_wp_upload_dir'] = array( 'basedir' => $base, 'error' => false );
-		$this->manager = new Plugin_Path_Manager();
+		$base                          = rtrim( sys_get_temp_dir(), '/\\' ) . '/aio-pm-test-' . (string) getmypid();
+		$GLOBALS['_aio_wp_upload_dir'] = array(
+			'basedir' => $base,
+			'error'   => false,
+		);
+		$this->manager                 = new Plugin_Path_Manager();
 	}
 
 	protected function tearDown(): void {
@@ -38,7 +41,7 @@ final class Plugin_Path_Manager_Test extends TestCase {
 	}
 
 	public function test_get_uploads_base_includes_configured_basedir(): void {
-		$base = $this->manager->get_uploads_base();
+		$base     = $this->manager->get_uploads_base();
 		$expected = rtrim( $GLOBALS['_aio_wp_upload_dir']['basedir'], '/\\' ) . '/aio-page-builder/';
 		$this->assertSame( $expected, $base );
 	}

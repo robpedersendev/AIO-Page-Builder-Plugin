@@ -46,15 +46,15 @@ final class Industry_Starter_Bundle_To_Build_Plan_Service_Test extends TestCase 
 
 	private function valid_bundle( string $bundle_key = 'realtor_starter', string $industry_key = 'realtor' ): array {
 		$bundle = array(
-			Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => $bundle_key,
+			Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY => $bundle_key,
 			Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => $industry_key,
-			Industry_Starter_Bundle_Registry::FIELD_LABEL       => 'Realtor Starter',
-			Industry_Starter_Bundle_Registry::FIELD_SUMMARY     => 'Curated starting set for real estate sites.',
-			Industry_Starter_Bundle_Registry::FIELD_STATUS      => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
+			Industry_Starter_Bundle_Registry::FIELD_LABEL  => 'Realtor Starter',
+			Industry_Starter_Bundle_Registry::FIELD_SUMMARY => 'Curated starting set for real estate sites.',
+			Industry_Starter_Bundle_Registry::FIELD_STATUS => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
 			Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => Industry_Starter_Bundle_Registry::SUPPORTED_SCHEMA_VERSION,
 		);
 		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ] = array( 'pt_home', 'pt_services' );
-		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ]     = array( 'hero_01', 'cta_01' );
+		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ]       = array( 'hero_01', 'cta_01' );
 		return $bundle;
 	}
 
@@ -102,7 +102,7 @@ final class Industry_Starter_Bundle_To_Build_Plan_Service_Test extends TestCase 
 
 	public function test_convert_to_draft_with_valid_bundle_persists_plan_and_returns_success(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 42;
-		$registry = new Industry_Starter_Bundle_Registry();
+		$registry                              = new Industry_Starter_Bundle_Registry();
 		$registry->load( array( $this->valid_bundle( 'realtor_starter' ) ) );
 		$service = $this->create_service( $registry );
 

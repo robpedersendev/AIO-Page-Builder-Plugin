@@ -87,13 +87,13 @@ final class Uninstall_Export_Prompt_Service {
 		$export_result_reference = '';
 
 		if ( $choice === Uninstall_Result::CHOICE_FULL_BACKUP ) {
-			$export_result = $this->export_generator->generate( Export_Mode_Keys::PRE_UNINSTALL_BACKUP );
+			$export_result           = $this->export_generator->generate( Export_Mode_Keys::PRE_UNINSTALL_BACKUP );
 			$export_result_reference = $export_result->get_package_path() !== ''
 				? $export_result->get_package_path()
 				: ( $export_result->get_package_filename() !== '' ? $export_result->get_package_filename() : '' );
 			// * Continue with cleanup even if export failed; user chose to proceed with full backup attempt.
 		} elseif ( $choice === Uninstall_Result::CHOICE_SETTINGS_PROFILE_ONLY ) {
-			$export_result = $this->export_generator->generate( Export_Mode_Keys::UNINSTALL_SETTINGS_PROFILE_ONLY );
+			$export_result           = $this->export_generator->generate( Export_Mode_Keys::UNINSTALL_SETTINGS_PROFILE_ONLY );
 			$export_result_reference = $export_result->get_package_path() !== ''
 				? $export_result->get_package_path()
 				: ( $export_result->get_package_filename() !== '' ? $export_result->get_package_filename() : '' );

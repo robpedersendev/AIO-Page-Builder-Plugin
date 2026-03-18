@@ -55,11 +55,11 @@ final class Industry_Bundle_Upload_Validator {
 
 		if ( $tmp_name === '' || ! is_uploaded_file( $tmp_name ) ) {
 			return array(
-				'ok'          => false,
+				'ok'           => false,
 				'user_message' => __( 'No file uploaded.', 'aio-page-builder' ),
-				'log_reason'  => self::LOG_REASON_NOT_UPLOADED,
-				'tmp_path'    => '',
-				'file_size'   => 0,
+				'log_reason'   => self::LOG_REASON_NOT_UPLOADED,
+				'tmp_path'     => '',
+				'file_size'    => 0,
 			);
 		}
 		if ( $error !== \UPLOAD_ERR_OK ) {
@@ -135,50 +135,50 @@ final class Industry_Bundle_Upload_Validator {
 	public static function read_parse_validate_bundle( string $tmp_path, int $max_bytes = self::MAX_BYTES ): array {
 		if ( ! is_file( $tmp_path ) || ! is_readable( $tmp_path ) ) {
 			return array(
-				'bundle'      => null,
+				'bundle'       => null,
 				'user_message' => __( 'Could not read file.', 'aio-page-builder' ),
-				'log_reason'  => 'read_error',
+				'log_reason'   => 'read_error',
 			);
 		}
 		$size = filesize( $tmp_path );
 		if ( $size === false || $size > $max_bytes ) {
 			return array(
-				'bundle'      => null,
+				'bundle'       => null,
 				'user_message' => sprintf(
 					/* translators: %d: max size in MB */
 					__( 'File is too large. Maximum size is %d MB.', 'aio-page-builder' ),
 					(int) ( $max_bytes / ( 1024 * 1024 ) )
 				),
-				'log_reason'  => self::LOG_REASON_TOO_LARGE,
+				'log_reason'   => self::LOG_REASON_TOO_LARGE,
 			);
 		}
 		$raw = file_get_contents( $tmp_path, false, null, 0, $max_bytes );
 		if ( $raw === false ) {
 			return array(
-				'bundle'      => null,
+				'bundle'       => null,
 				'user_message' => __( 'Could not read file.', 'aio-page-builder' ),
-				'log_reason'  => 'read_error',
+				'log_reason'   => 'read_error',
 			);
 		}
 		$bundle = json_decode( $raw, true );
 		if ( ! is_array( $bundle ) ) {
 			return array(
-				'bundle'      => null,
+				'bundle'       => null,
 				'user_message' => __( 'Invalid JSON.', 'aio-page-builder' ),
-				'log_reason'  => 'invalid_json',
+				'log_reason'   => 'invalid_json',
 			);
 		}
 		$bundle_service = new Industry_Pack_Bundle_Service();
-		$errors = $bundle_service->validate_bundle( $bundle );
+		$errors         = $bundle_service->validate_bundle( $bundle );
 		if ( $errors !== array() ) {
 			return array(
-				'bundle'      => null,
+				'bundle'       => null,
 				'user_message' => __( 'Invalid bundle structure. Please use an export from this plugin.', 'aio-page-builder' ),
-				'log_reason'  => 'invalid_bundle_structure',
+				'log_reason'   => 'invalid_bundle_structure',
 			);
 		}
 		return array(
-			'bundle'      => $bundle,
+			'bundle'       => $bundle,
 			'user_message' => '',
 			'log_reason'   => '',
 		);

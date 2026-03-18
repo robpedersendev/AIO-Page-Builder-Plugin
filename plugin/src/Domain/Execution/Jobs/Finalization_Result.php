@@ -80,7 +80,7 @@ final class Finalization_Result {
 
 	/**
 	 * @param array{published: int, completed_without_publication: int, blocked: int, denied: int, failed: int} $summary
-	 * @param array<int, array<string, mixed>> $conflicts
+	 * @param array<int, array<string, mixed>>                                                                  $conflicts
 	 */
 	public static function success(
 		string $finalized_at,
@@ -92,9 +92,9 @@ final class Finalization_Result {
 		$artifacts = array_merge(
 			array(
 				'completion_summary' => $summary,
-				'conflicts'         => $conflicts,
-				'finalized_at'      => $finalized_at,
-				'actor_ref'         => $actor_ref,
+				'conflicts'          => $conflicts,
+				'finalized_at'       => $finalized_at,
+				'actor_ref'          => $actor_ref,
 			),
 			$extra
 		);

@@ -17,24 +17,24 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Industry_Substitute_Suggestion_Result {
 
-	public const KEY_ORIGINAL_KEY             = 'original_key';
+	public const KEY_ORIGINAL_KEY              = 'original_key';
 	public const KEY_SUGGESTED_REPLACEMENT_KEY = 'suggested_replacement_key';
-	public const KEY_SUBSTITUTE_REASON        = 'substitute_reason';
-	public const KEY_FIT_SCORE_DELTA          = 'fit_score_delta';
-	public const KEY_WARNING_FLAGS            = 'warning_flags';
+	public const KEY_SUBSTITUTE_REASON         = 'substitute_reason';
+	public const KEY_FIT_SCORE_DELTA           = 'fit_score_delta';
+	public const KEY_WARNING_FLAGS             = 'warning_flags';
 
-	public const REASON_SAME_FAMILY_BETTER_FIT = 'same_family_better_fit';
-	public const REASON_RECOMMENDED_ALTERNATIVE = 'recommended_alternative';
+	public const REASON_SAME_FAMILY_BETTER_FIT   = 'same_family_better_fit';
+	public const REASON_RECOMMENDED_ALTERNATIVE  = 'recommended_alternative';
 	public const REASON_SAME_CATEGORY_BETTER_FIT = 'same_category_better_fit';
 
 	/**
 	 * Builds a result array. All parameters required for a valid suggestion.
 	 *
-	 * @param string   $original_key             Section or template key that was discouraged/weak-fit.
-	 * @param string   $suggested_replacement_key Suggested alternative key.
-	 * @param string   $substitute_reason        Reason code (e.g. REASON_SAME_FAMILY_BETTER_FIT).
-	 * @param int      $fit_score_delta          Score difference (suggested minus original).
-	 * @param array    $warning_flags            Optional warning flags for context.
+	 * @param string $original_key             Section or template key that was discouraged/weak-fit.
+	 * @param string $suggested_replacement_key Suggested alternative key.
+	 * @param string $substitute_reason        Reason code (e.g. REASON_SAME_FAMILY_BETTER_FIT).
+	 * @param int    $fit_score_delta          Score difference (suggested minus original).
+	 * @param array  $warning_flags            Optional warning flags for context.
 	 * @return array<string, mixed>
 	 */
 	public static function create(

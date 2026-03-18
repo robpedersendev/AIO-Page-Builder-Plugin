@@ -42,7 +42,7 @@ final class Create_Page_Result {
 	 * @param int                  $post_id    Created page ID; 0 on failure.
 	 * @param string               $message
 	 * @param list<string>         $errors
-	 * @param array<string, mixed>  $artifacts  post_id, template_key, assignment_count, log_ref, etc.
+	 * @param array<string, mixed> $artifacts  post_id, template_key, assignment_count, log_ref, etc.
 	 * @param string               $log_ref
 	 */
 	public function __construct(
@@ -127,8 +127,8 @@ final class Create_Page_Result {
 			__( 'Page created.', 'aio-page-builder' ),
 			array(),
 			array(
-				'template_key'       => $template_key,
-				'assignment_count'   => $assignment_count,
+				'template_key'     => $template_key,
+				'assignment_count' => $assignment_count,
 			),
 			$log_ref
 		);

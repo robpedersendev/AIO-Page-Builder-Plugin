@@ -45,11 +45,11 @@ final class Industry_Subtype_Benchmark_Service {
 		?Industry_Starter_Bundle_Registry $starter_bundle_registry = null,
 		?Subtype_Compliance_Rule_Registry $subtype_compliance_registry = null
 	) {
-		$this->subtype_registry               = $subtype_registry;
+		$this->subtype_registry                 = $subtype_registry;
 		$this->subtype_section_overlay_registry = $subtype_section_overlay_registry;
-		$this->subtype_page_overlay_registry  = $subtype_page_overlay_registry;
-		$this->starter_bundle_registry        = $starter_bundle_registry;
-		$this->subtype_compliance_registry    = $subtype_compliance_registry;
+		$this->subtype_page_overlay_registry    = $subtype_page_overlay_registry;
+		$this->starter_bundle_registry          = $starter_bundle_registry;
+		$this->subtype_compliance_registry      = $subtype_compliance_registry;
 	}
 
 	/**
@@ -63,11 +63,16 @@ final class Industry_Subtype_Benchmark_Service {
 	 * }
 	 */
 	public function run_benchmark(): array {
-		$subtypes = $this->subtype_registry->get_all();
-		$active   = array_values( array_filter( $subtypes, function ( $s ) {
-			$status = $s[ Industry_Subtype_Registry::FIELD_STATUS ] ?? '';
-			return $status === Industry_Subtype_Registry::STATUS_ACTIVE;
-		} ) );
+		$subtypes    = $this->subtype_registry->get_all();
+		$active      = array_values(
+			array_filter(
+				$subtypes,
+				function ( $s ) {
+					$status = $s[ Industry_Subtype_Registry::FIELD_STATUS ] ?? '';
+					return $status === Industry_Subtype_Registry::STATUS_ACTIVE;
+				}
+			)
+		);
 		$per_subtype = array();
 		$meaningful  = 0;
 		$weak        = 0;
@@ -78,27 +83,27 @@ final class Industry_Subtype_Benchmark_Service {
 			if ( $subtype_key === '' ) {
 				continue;
 			}
-			$section_count = $this->count_section_overlays_for_subtype( $subtype_key );
-			$page_count    = $this->count_page_overlays_for_subtype( $subtype_key );
-			$has_bundle    = $this->subtype_has_bundle_ref( $sub );
-			$caution_count = $this->count_caution_rules_for_subtype( $parent, $subtype_key );
+			$section_count   = $this->count_section_overlays_for_subtype( $subtype_key );
+			$page_count      = $this->count_page_overlays_for_subtype( $subtype_key );
+			$has_bundle      = $this->subtype_has_bundle_ref( $sub );
+			$caution_count   = $this->count_caution_rules_for_subtype( $parent, $subtype_key );
 			$differentiation = $this->differentiation_note( $section_count, $page_count, $has_bundle, $caution_count );
-			$strength = ( $section_count > 0 || $page_count > 0 || $has_bundle || $caution_count > 0 ) ? 'meaningful' : 'weak';
+			$strength        = ( $section_count > 0 || $page_count > 0 || $has_bundle || $caution_count > 0 ) ? 'meaningful' : 'weak';
 			if ( $strength === 'meaningful' ) {
-				$meaningful++;
+				++$meaningful;
 			} else {
-				$weak++;
+				++$weak;
 			}
 			$per_subtype[ $subtype_key ] = array(
-				'subtype_key'             => $subtype_key,
-				'parent_industry_key'    => $parent,
-				'label'                  => $label,
-				'section_overlay_count'  => $section_count,
-				'page_overlay_count'     => $page_count,
-				'has_bundle_ref'         => $has_bundle,
-				'caution_rule_count'     => $caution_count,
-				'differentiation_note'   => $differentiation,
-				'strength'               => $strength,
+				'subtype_key'           => $subtype_key,
+				'parent_industry_key'   => $parent,
+				'label'                 => $label,
+				'section_overlay_count' => $section_count,
+				'page_overlay_count'    => $page_count,
+				'has_bundle_ref'        => $has_bundle,
+				'caution_rule_count'    => $caution_count,
+				'differentiation_note'  => $differentiation,
+				'strength'              => $strength,
 			);
 		}
 		$findings = array();
@@ -109,10 +114,10 @@ final class Industry_Subtype_Benchmark_Service {
 			$findings[] = "{$meaningful} subtype(s) show meaningful differentiation.";
 		}
 		return array(
-			'generated_at'         => gmdate( 'c' ),
-			'subtypes_evaluated'   => array_keys( $per_subtype ),
-			'per_subtype'          => $per_subtype,
-			'summary'              => array(
+			'generated_at'       => gmdate( 'c' ),
+			'subtypes_evaluated' => array_keys( $per_subtype ),
+			'per_subtype'        => $per_subtype,
+			'summary'            => array(
 				'total_subtypes'   => count( $per_subtype ),
 				'meaningful_count' => $meaningful,
 				'weak_count'       => $weak,

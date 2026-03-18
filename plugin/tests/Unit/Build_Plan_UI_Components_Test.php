@@ -38,15 +38,27 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 	/** Example step_list_rows payload: one row. */
 	public function test_step_list_row_payload_structure(): void {
 		$row = array(
-			Step_Item_List_Component::ROW_KEY_ITEM_ID          => 'ep_0',
-			Step_Item_List_Component::ROW_KEY_STATUS            => Build_Plan_Item_Statuses::PENDING,
-			Step_Item_List_Component::ROW_KEY_STATUS_BADGE     => 'pending',
-			Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS  => array( 'title' => 'Home', 'action_type' => 'Update', 'rationale' => 'Refresh content' ),
-			Step_Item_List_Component::ROW_KEY_ROW_ACTIONS      => array(
-				array( 'action_id' => 'view_detail', 'label' => 'View detail', 'enabled' => true ),
-				array( 'action_id' => 'approve', 'label' => 'Approve', 'enabled' => true ),
+			Step_Item_List_Component::ROW_KEY_ITEM_ID      => 'ep_0',
+			Step_Item_List_Component::ROW_KEY_STATUS       => Build_Plan_Item_Statuses::PENDING,
+			Step_Item_List_Component::ROW_KEY_STATUS_BADGE => 'pending',
+			Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => array(
+				'title'       => 'Home',
+				'action_type' => 'Update',
+				'rationale'   => 'Refresh content',
 			),
-			Step_Item_List_Component::ROW_KEY_IS_SELECTED       => false,
+			Step_Item_List_Component::ROW_KEY_ROW_ACTIONS  => array(
+				array(
+					'action_id' => 'view_detail',
+					'label'     => 'View detail',
+					'enabled'   => true,
+				),
+				array(
+					'action_id' => 'approve',
+					'label'     => 'Approve',
+					'enabled'   => true,
+				),
+			),
+			Step_Item_List_Component::ROW_KEY_IS_SELECTED  => false,
 		);
 		$this->assertSame( 'ep_0', $row[ Step_Item_List_Component::ROW_KEY_ITEM_ID ] );
 		$this->assertArrayHasKey( 'summary_columns', $row );
@@ -55,17 +67,26 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 
 	/** Step_Item_List_Component renders table with one row. */
 	public function test_step_item_list_component_renders_row(): void {
-		$payload = array(
+		$payload   = array(
 			Step_Item_List_Component::KEY_STEP_LIST_ROWS => array(
 				array(
 					Step_Item_List_Component::ROW_KEY_ITEM_ID         => 'ep_0',
 					Step_Item_List_Component::ROW_KEY_STATUS_BADGE     => 'pending',
-					Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => array( 'title' => 'Home', 'action_type' => 'Update' ),
-					Step_Item_List_Component::ROW_KEY_ROW_ACTIONS     => array( array( 'action_id' => 'view_detail', 'label' => 'View detail', 'enabled' => true ) ),
+					Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => array(
+						'title'       => 'Home',
+						'action_type' => 'Update',
+					),
+					Step_Item_List_Component::ROW_KEY_ROW_ACTIONS     => array(
+						array(
+							'action_id' => 'view_detail',
+							'label'     => 'View detail',
+							'enabled'   => true,
+						),
+					),
 					Step_Item_List_Component::ROW_KEY_IS_SELECTED    => false,
 				),
 			),
-			Step_Item_List_Component::KEY_COLUMN_ORDER => array( 'title', 'action_type' ),
+			Step_Item_List_Component::KEY_COLUMN_ORDER   => array( 'title', 'action_type' ),
 		);
 		$component = new Step_Item_List_Component();
 		\ob_start();
@@ -79,7 +100,7 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 
 	/** Step_Item_List_Component renders nothing when rows empty. */
 	public function test_step_item_list_component_empty_rows_outputs_nothing(): void {
-		$payload = array(
+		$payload   = array(
 			Step_Item_List_Component::KEY_STEP_LIST_ROWS => array(),
 			Step_Item_List_Component::KEY_COLUMN_ORDER   => array(),
 		);
@@ -92,9 +113,9 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 
 	/** Detail_Panel_Component renders sections and empty state. */
 	public function test_detail_panel_component_renders_sections(): void {
-		$payload = array(
-			Detail_Panel_Component::KEY_ITEM_ID   => 'ep_0',
-			Detail_Panel_Component::KEY_SECTIONS   => array(
+		$payload   = array(
+			Detail_Panel_Component::KEY_ITEM_ID     => 'ep_0',
+			Detail_Panel_Component::KEY_SECTIONS    => array(
 				array(
 					Detail_Panel_Component::SECTION_KEY_HEADING => 'Details',
 					Detail_Panel_Component::SECTION_KEY_CONTENT => '<p>Item content</p>',
@@ -114,8 +135,8 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 
 	/** Detail_Panel_Component renders empty state when item_id empty. */
 	public function test_detail_panel_component_empty_item_id(): void {
-		$payload = array(
-			Detail_Panel_Component::KEY_ITEM_ID => '',
+		$payload   = array(
+			Detail_Panel_Component::KEY_ITEM_ID  => '',
 			Detail_Panel_Component::KEY_SECTIONS => array(),
 		);
 		$component = new Detail_Panel_Component();
@@ -131,10 +152,24 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 		$detail_panel = array(
 			'item_id'     => 'ep_0',
 			'sections'    => array(
-				array( 'heading' => 'Details', 'key' => 'details', 'content' => '<dl></dl>' ),
-				array( 'heading' => 'Status', 'key' => 'status', 'content_lines' => array( 'ep_0', 'pending' ) ),
+				array(
+					'heading' => 'Details',
+					'key'     => 'details',
+					'content' => '<dl></dl>',
+				),
+				array(
+					'heading'       => 'Status',
+					'key'           => 'status',
+					'content_lines' => array( 'ep_0', 'pending' ),
+				),
 			),
-			'row_actions' => array( array( 'action_id' => 'approve', 'label' => 'Approve', 'enabled' => true ) ),
+			'row_actions' => array(
+				array(
+					'action_id' => 'approve',
+					'label'     => 'Approve',
+					'enabled'   => true,
+				),
+			),
 		);
 		$this->assertSame( 'ep_0', $detail_panel['item_id'] );
 		$this->assertCount( 2, $detail_panel['sections'] );
@@ -142,7 +177,7 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 
 	/** Bulk_Action_Bar_Component: disabled when no eligible. */
 	public function test_bulk_action_bar_disabled_when_no_eligible(): void {
-		$payload = array(
+		$payload   = array(
 			Bulk_Action_Bar_Component::KEY_BULK_ACTION_STATES => array(
 				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 					Bulk_Action_Bar_Component::STATE_KEY_ENABLED => false,
@@ -175,7 +210,7 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 
 	/** Bulk_Action_Bar_Component: enabled when eligible count > 0. */
 	public function test_bulk_action_bar_enabled_when_eligible(): void {
-		$payload = array(
+		$payload   = array(
 			Bulk_Action_Bar_Component::KEY_BULK_ACTION_STATES => array(
 				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 					Bulk_Action_Bar_Component::STATE_KEY_ENABLED => true,
@@ -211,10 +246,25 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 	/** Example bulk_action_states payload. */
 	public function test_bulk_action_states_payload_structure(): void {
 		$bulk_states = array(
-			'apply_to_all_eligible' => array( 'enabled' => true, 'label' => 'Apply to all eligible', 'count_eligible' => 2 ),
-			'apply_to_selected'     => array( 'enabled' => false, 'label' => 'Apply to selected', 'count_selected' => 0 ),
-			'deny_all_eligible'     => array( 'enabled' => true, 'label' => 'Deny all eligible', 'count_eligible' => 2 ),
-			'clear_selection'       => array( 'enabled' => false, 'label' => 'Clear selection' ),
+			'apply_to_all_eligible' => array(
+				'enabled'        => true,
+				'label'          => 'Apply to all eligible',
+				'count_eligible' => 2,
+			),
+			'apply_to_selected'     => array(
+				'enabled'        => false,
+				'label'          => 'Apply to selected',
+				'count_selected' => 0,
+			),
+			'deny_all_eligible'     => array(
+				'enabled'        => true,
+				'label'          => 'Deny all eligible',
+				'count_eligible' => 2,
+			),
+			'clear_selection'       => array(
+				'enabled' => false,
+				'label'   => 'Clear selection',
+			),
 		);
 		$this->assertTrue( $bulk_states['apply_to_all_eligible']['enabled'] );
 		$this->assertSame( 2, $bulk_states['apply_to_all_eligible']['count_eligible'] );
@@ -224,7 +274,12 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 	public function test_status_badge_component_output(): void {
 		$component = new Status_Badge_Component();
 		\ob_start();
-		$component->render( array( Status_Badge_Component::KEY_STATUS_BADGE => 'pending', Status_Badge_Component::KEY_LABEL => 'Pending' ) );
+		$component->render(
+			array(
+				Status_Badge_Component::KEY_STATUS_BADGE => 'pending',
+				Status_Badge_Component::KEY_LABEL        => 'Pending',
+			)
+		);
 		$html = \ob_get_clean();
 		$this->assertStringContainsString( 'aio-status-badge', $html );
 		$this->assertStringContainsString( 'aio-badge-pending', $html );
@@ -235,11 +290,13 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 	public function test_step_message_component_severity_display(): void {
 		$component = new Step_Message_Component();
 		\ob_start();
-		$component->render( array(
-			Step_Message_Component::KEY_SEVERITY => 'error',
-			Step_Message_Component::KEY_MESSAGE  => 'Something failed',
-			Step_Message_Component::KEY_LEVEL    => 'step',
-		) );
+		$component->render(
+			array(
+				Step_Message_Component::KEY_SEVERITY => 'error',
+				Step_Message_Component::KEY_MESSAGE  => 'Something failed',
+				Step_Message_Component::KEY_LEVEL    => 'step',
+			)
+		);
 		$html = \ob_get_clean();
 		$this->assertStringContainsString( 'aio-message-error', $html );
 		$this->assertStringContainsString( 'aio-message-level-step', $html );
@@ -249,9 +306,15 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 	/** Step_Message_Component render_list. */
 	public function test_step_message_component_render_list(): void {
 		$component = new Step_Message_Component();
-		$messages = array(
-			array( 'severity' => 'info', 'message' => 'First' ),
-			array( 'severity' => 'warning', 'message' => 'Second' ),
+		$messages  = array(
+			array(
+				'severity' => 'info',
+				'message'  => 'First',
+			),
+			array(
+				'severity' => 'warning',
+				'message'  => 'Second',
+			),
 		);
 		\ob_start();
 		$component->render_list( $messages );
@@ -264,11 +327,17 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 	/** Row_Action_Resolver: approve/deny enabled for pending when can_approve. */
 	public function test_row_action_resolver_pending_with_capability(): void {
 		$resolver = new Build_Plan_Row_Action_Resolver();
-		$item = array( 'item_id' => 'ep_0', 'status' => Build_Plan_Item_Statuses::PENDING );
-		$caps = array( 'can_approve' => true, 'can_execute' => false );
-		$actions = $resolver->resolve( $item, $caps );
-		$approve = $this->find_action( $actions, 'approve' );
-		$deny = $this->find_action( $actions, 'deny' );
+		$item     = array(
+			'item_id' => 'ep_0',
+			'status'  => Build_Plan_Item_Statuses::PENDING,
+		);
+		$caps     = array(
+			'can_approve' => true,
+			'can_execute' => false,
+		);
+		$actions  = $resolver->resolve( $item, $caps );
+		$approve  = $this->find_action( $actions, 'approve' );
+		$deny     = $this->find_action( $actions, 'deny' );
 		$this->assertNotNull( $approve );
 		$this->assertNotNull( $deny );
 		$this->assertTrue( $approve['enabled'] );
@@ -280,31 +349,34 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 	/** Row_Action_Resolver: approve/deny disabled when no can_approve. */
 	public function test_row_action_resolver_pending_without_capability(): void {
 		$resolver = new Build_Plan_Row_Action_Resolver();
-		$item = array( 'status' => Build_Plan_Item_Statuses::PENDING );
-		$actions = $resolver->resolve( $item, array() );
-		$approve = $this->find_action( $actions, 'approve' );
+		$item     = array( 'status' => Build_Plan_Item_Statuses::PENDING );
+		$actions  = $resolver->resolve( $item, array() );
+		$approve  = $this->find_action( $actions, 'approve' );
 		$this->assertFalse( $approve['enabled'] );
 	}
 
 	/** Row_Action_Resolver: execute enabled for approved when can_execute. */
 	public function test_row_action_resolver_approved_execute_enabled(): void {
 		$resolver = new Build_Plan_Row_Action_Resolver();
-		$item = array( 'status' => Build_Plan_Item_Statuses::APPROVED );
-		$caps = array( 'can_approve' => true, 'can_execute' => true );
-		$actions = $resolver->resolve( $item, $caps );
-		$execute = $this->find_action( $actions, 'execute' );
+		$item     = array( 'status' => Build_Plan_Item_Statuses::APPROVED );
+		$caps     = array(
+			'can_approve' => true,
+			'can_execute' => true,
+		);
+		$actions  = $resolver->resolve( $item, $caps );
+		$execute  = $this->find_action( $actions, 'execute' );
 		$this->assertTrue( $execute['enabled'] );
 	}
 
 	/** Step_Workspace_Payload_Builder returns step_list_rows and bulk_action_states. */
 	public function test_step_workspace_payload_builder_returns_expected_keys(): void {
-		$resolver = new Build_Plan_Row_Action_Resolver();
-		$builder = new Step_Workspace_Payload_Builder( $resolver );
+		$resolver   = new Build_Plan_Row_Action_Resolver();
+		$builder    = new Step_Workspace_Payload_Builder( $resolver );
 		$definition = array(
 			Build_Plan_Schema::KEY_STEPS => array(
 				array(
 					Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES,
-					Build_Plan_Item_Schema::KEY_ITEMS    => array(
+					Build_Plan_Item_Schema::KEY_ITEMS     => array(
 						array(
 							Build_Plan_Item_Schema::KEY_ITEM_ID   => 'ep_0',
 							Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE,
@@ -315,7 +387,16 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 				),
 			),
 		);
-		$workspace = $builder->build( $definition, 0, array( 'can_approve' => true, 'can_execute' => false ), null, array() );
+		$workspace  = $builder->build(
+			$definition,
+			0,
+			array(
+				'can_approve' => true,
+				'can_execute' => false,
+			),
+			null,
+			array()
+		);
 		$this->assertArrayHasKey( 'step_list_rows', $workspace );
 		$this->assertArrayHasKey( 'column_order', $workspace );
 		$this->assertArrayHasKey( 'bulk_action_states', $workspace );

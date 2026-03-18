@@ -20,10 +20,10 @@ final class Industry_LPagery_Rule_Registry_Test extends TestCase {
 	private function valid_rule( string $key = 'legal_entity_01' ): array {
 		return array(
 			Industry_LPagery_Rule_Registry::FIELD_LPAGERY_RULE_KEY => $key,
-			Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY      => 'legal',
-			Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER   => Industry_LPagery_Rule_Registry::SUPPORTED_SCHEMA_VERSION,
-			Industry_LPagery_Rule_Registry::FIELD_STATUS            => Industry_LPagery_Rule_Registry::STATUS_ACTIVE,
-			Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE   => Industry_LPagery_Rule_Registry::POSTURE_CENTRAL,
+			Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY => 'legal',
+			Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => Industry_LPagery_Rule_Registry::SUPPORTED_SCHEMA_VERSION,
+			Industry_LPagery_Rule_Registry::FIELD_STATUS => Industry_LPagery_Rule_Registry::STATUS_ACTIVE,
+			Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE => Industry_LPagery_Rule_Registry::POSTURE_CENTRAL,
 		);
 	}
 
@@ -38,10 +38,10 @@ final class Industry_LPagery_Rule_Registry_Test extends TestCase {
 
 	public function test_valid_rule_with_token_refs_and_hierarchy(): void {
 		$rule = $this->valid_rule( 'realtor_listing_01' );
-		$rule[ Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY ] = 'realtor';
+		$rule[ Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY ]        = 'realtor';
 		$rule[ Industry_LPagery_Rule_Registry::FIELD_REQUIRED_TOKEN_REFS ] = array( '{{location_name}}', '{{service_title}}' );
 		$rule[ Industry_LPagery_Rule_Registry::FIELD_OPTIONAL_TOKEN_REFS ] = array( '{{booking_url}}' );
-		$rule[ Industry_LPagery_Rule_Registry::FIELD_HIERARCHY_GUIDANCE ] = 'Hub then child-detail.';
+		$rule[ Industry_LPagery_Rule_Registry::FIELD_HIERARCHY_GUIDANCE ]  = 'Hub then child-detail.';
 		$registry = new Industry_LPagery_Rule_Registry();
 		$registry->load( array( $rule ) );
 		$loaded = $registry->get( 'realtor_listing_01' );
@@ -69,11 +69,13 @@ final class Industry_LPagery_Rule_Registry_Test extends TestCase {
 
 	public function test_list_by_industry_deterministic(): void {
 		$registry = new Industry_LPagery_Rule_Registry();
-		$registry->load( array(
-			$this->valid_rule( 'legal_01' ),
-			array_merge( $this->valid_rule( 'legal_02' ), array( Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE => Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL ) ),
-			array_merge( $this->valid_rule( 'realtor_01' ), array( Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY => 'realtor' ) ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_rule( 'legal_01' ),
+				array_merge( $this->valid_rule( 'legal_02' ), array( Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE => Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL ) ),
+				array_merge( $this->valid_rule( 'realtor_01' ), array( Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY => 'realtor' ) ),
+			)
+		);
 		$this->assertCount( 2, $registry->list_by_industry( 'legal' ) );
 		$this->assertCount( 1, $registry->list_by_industry( 'realtor' ) );
 		$this->assertCount( 3, $registry->get_all() );

@@ -48,7 +48,7 @@ final class Industry_Override_Audit_Report_Service_Test extends TestCase {
 
 	public function test_build_report_returns_expected_structure(): void {
 		$service = new AuditService();
-		$report = $service->build_report();
+		$report  = $service->build_report();
 		$this->assertIsArray( $report );
 		$this->assertArrayHasKey( 'generated_at', $report );
 		$this->assertArrayHasKey( 'total_count', $report );
@@ -70,7 +70,7 @@ final class Industry_Override_Audit_Report_Service_Test extends TestCase {
 		$plan->record_override( 'plan-1', 'item-1', Industry_Override_Schema::STATE_ACCEPTED, '' );
 
 		$service = new AuditService();
-		$report = $service->build_report();
+		$report  = $service->build_report();
 		$this->assertSame( 3, $report['total_count'] );
 		$this->assertSame( 1, $report['by_type'][ Industry_Override_Schema::TARGET_TYPE_SECTION ]['count'] );
 		$this->assertSame( 1, $report['by_type'][ Industry_Override_Schema::TARGET_TYPE_PAGE_TEMPLATE ]['count'] );
@@ -91,8 +91,8 @@ final class Industry_Override_Audit_Report_Service_Test extends TestCase {
 		$section->record_override( 'sec_1', Industry_Override_Schema::STATE_ACCEPTED, 'Sensitive note' );
 
 		$service = new AuditService();
-		$report = $service->build_report();
-		$json = \json_encode( $report );
+		$report  = $service->build_report();
+		$json    = \json_encode( $report );
 		$this->assertIsString( $json );
 		$this->assertStringNotContainsString( 'Sensitive note', $json );
 		$this->assertStringContainsString( 'reason_length', $json );

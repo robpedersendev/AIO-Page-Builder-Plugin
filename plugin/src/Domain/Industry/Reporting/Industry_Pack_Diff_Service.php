@@ -43,7 +43,7 @@ final class Industry_Pack_Diff_Service {
 	 *
 	 * @param array<int, array<string, mixed>> $left_packs  Baseline pack definitions (list).
 	 * @param array<int, array<string, mixed>> $right_packs New state pack definitions (list).
-	 * @param array<string, mixed>            $options     Optional left_label, right_label (strings).
+	 * @param array<string, mixed>             $options     Optional left_label, right_label (strings).
 	 * @return Industry_Pack_Diff_Result
 	 */
 	public function diff( array $left_packs, array $right_packs, array $options = array() ): Industry_Pack_Diff_Result {
@@ -68,7 +68,7 @@ final class Industry_Pack_Diff_Service {
 			}
 		}
 
-		$impact = $this->impact_level( $added, $removed, $changed );
+		$impact  = $this->impact_level( $added, $removed, $changed );
 		$summary = array(
 			'added_count'   => count( $added ),
 			'removed_count' => count( $removed ),
@@ -116,16 +116,16 @@ final class Industry_Pack_Diff_Service {
 	}
 
 	/**
-	 * @param string                 $industry_key
-	 * @param array<string, mixed>   $left
-	 * @param array<string, mixed>   $right
+	 * @param string               $industry_key
+	 * @param array<string, mixed> $left
+	 * @param array<string, mixed> $right
 	 * @return array<string, mixed>|null Change entry or null if no change.
 	 */
 	private function compare_packs( string $industry_key, array $left, array $right ): ?array {
-		$status_left  = isset( $left[ Industry_Pack_Schema::FIELD_STATUS ] ) && is_string( $left[ Industry_Pack_Schema::FIELD_STATUS ] )
+		$status_left   = isset( $left[ Industry_Pack_Schema::FIELD_STATUS ] ) && is_string( $left[ Industry_Pack_Schema::FIELD_STATUS ] )
 			? $left[ Industry_Pack_Schema::FIELD_STATUS ]
 			: '';
-		$status_right = isset( $right[ Industry_Pack_Schema::FIELD_STATUS ] ) && is_string( $right[ Industry_Pack_Schema::FIELD_STATUS ] )
+		$status_right  = isset( $right[ Industry_Pack_Schema::FIELD_STATUS ] ) && is_string( $right[ Industry_Pack_Schema::FIELD_STATUS ] )
 			? $right[ Industry_Pack_Schema::FIELD_STATUS ]
 			: '';
 		$version_left  = isset( $left[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] ) && is_string( $left[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] )
@@ -135,12 +135,18 @@ final class Industry_Pack_Diff_Service {
 			? trim( $right[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] )
 			: '';
 
-		$status_change   = ( $status_left !== $status_right ) ? array( 'from' => $status_left, 'to' => $status_right ) : null;
-		$version_change  = ( $version_left !== $version_right ) ? array( 'from' => $version_left, 'to' => $version_right ) : null;
-		$refs_added      = array();
-		$refs_removed    = array();
-		$refs_changed    = array();
-		$summary_parts   = array();
+		$status_change  = ( $status_left !== $status_right ) ? array(
+			'from' => $status_left,
+			'to'   => $status_right,
+		) : null;
+		$version_change = ( $version_left !== $version_right ) ? array(
+			'from' => $version_left,
+			'to'   => $version_right,
+		) : null;
+		$refs_added     = array();
+		$refs_removed   = array();
+		$refs_changed   = array();
+		$summary_parts  = array();
 
 		foreach ( self::REF_FIELDS as $field ) {
 			$v_left  = $left[ $field ] ?? null;
@@ -148,22 +154,25 @@ final class Industry_Pack_Diff_Service {
 			if ( is_array( $v_left ) && is_array( $v_right ) ) {
 				$left_set  = $this->normalize_array_ref( $v_left );
 				$right_set = $this->normalize_array_ref( $v_right );
-				$add = array_diff( $right_set, $left_set );
-				$rem = array_diff( $left_set, $right_set );
+				$add       = array_diff( $right_set, $left_set );
+				$rem       = array_diff( $left_set, $right_set );
 				if ( $add !== array() ) {
 					$refs_added[ $field ] = array_values( $add );
-					$summary_parts[] = $field . ' +' . count( $add );
+					$summary_parts[]      = $field . ' +' . count( $add );
 				}
 				if ( $rem !== array() ) {
 					$refs_removed[ $field ] = array_values( $rem );
-					$summary_parts[] = $field . ' -' . count( $rem );
+					$summary_parts[]        = $field . ' -' . count( $rem );
 				}
 			} else {
 				$s_left  = is_scalar( $v_left ) ? (string) $v_left : ( $v_left === null ? '' : json_encode( $v_left ) );
 				$s_right = is_scalar( $v_right ) ? (string) $v_right : ( $v_right === null ? '' : json_encode( $v_right ) );
 				if ( $s_left !== $s_right ) {
-					$refs_changed[ $field ] = array( 'from' => $s_left, 'to' => $s_right );
-					$summary_parts[] = $field;
+					$refs_changed[ $field ] = array(
+						'from' => $s_left,
+						'to'   => $s_right,
+					);
+					$summary_parts[]        = $field;
 				}
 			}
 		}
@@ -181,13 +190,13 @@ final class Industry_Pack_Diff_Service {
 		}
 
 		return array(
-			'industry_key'    => $industry_key,
-			'status_change'   => $status_change,
-			'version_change'  => $version_change,
-			'refs_added'      => $refs_added,
-			'refs_removed'    => $refs_removed,
-			'refs_changed'    => $refs_changed,
-			'summary_note'    => $summary_note,
+			'industry_key'   => $industry_key,
+			'status_change'  => $status_change,
+			'version_change' => $version_change,
+			'refs_added'     => $refs_added,
+			'refs_removed'   => $refs_removed,
+			'refs_changed'   => $refs_changed,
+			'summary_note'   => $summary_note,
 		);
 	}
 
@@ -206,9 +215,9 @@ final class Industry_Pack_Diff_Service {
 	}
 
 	/**
-	 * @param list<string>                  $added
-	 * @param list<string>                  $removed
-	 * @param list<array<string, mixed>>     $changed
+	 * @param list<string>               $added
+	 * @param list<string>               $removed
+	 * @param list<array<string, mixed>> $changed
 	 * @return string
 	 */
 	private function impact_level( array $added, array $removed, array $changed ): string {

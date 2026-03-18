@@ -36,8 +36,8 @@ final class Industry_Recommendation_Regression_Guard_Test extends TestCase {
 		$templates = array();
 		for ( $i = 0; $i < $count; $i++ ) {
 			$templates[] = array(
-				'internal_key'   => 'template_' . $i,
-				'name'           => 'Template ' . $i,
+				'internal_key'    => 'template_' . $i,
+				'name'            => 'Template ' . $i,
 				'template_family' => 'landing',
 			);
 		}
@@ -82,9 +82,9 @@ final class Industry_Recommendation_Regression_Guard_Test extends TestCase {
 			null,
 			null
 		);
-		$report = $service->run( 10, 5 );
+		$report    = $service->run( 10, 5 );
 		$this->assertCount( 4, $report['scenarios'] );
-		$at_least_one_evaluated = false;
+		$at_least_one_evaluated  = false;
 		$at_least_one_pack_found = false;
 		foreach ( $report['scenarios'] as $scenario ) {
 			$this->assertArrayHasKey( 'industry_key', $scenario );
@@ -112,12 +112,19 @@ final class Industry_Recommendation_Regression_Guard_Test extends TestCase {
 	 * Regression: unknown industry_key with null pack yields neutral (no throw). Resolver contract.
 	 */
 	public function test_unknown_industry_key_yields_neutral_no_throw(): void {
-		$resolver = new Industry_Page_Template_Recommendation_Resolver();
-		$profile  = array( 'primary_industry_key' => 'nonexistent_industry_xyz', 'secondary_industry_keys' => array() );
-		$templates = array(
-			array( 'internal_key' => 't1', 'name' => 'T1', 'template_family' => 'landing' ),
+		$resolver  = new Industry_Page_Template_Recommendation_Resolver();
+		$profile   = array(
+			'primary_industry_key'    => 'nonexistent_industry_xyz',
+			'secondary_industry_keys' => array(),
 		);
-		$result = $resolver->resolve( $profile, null, $templates, array() );
+		$templates = array(
+			array(
+				'internal_key'    => 't1',
+				'name'            => 'T1',
+				'template_family' => 'landing',
+			),
+		);
+		$result    = $resolver->resolve( $profile, null, $templates, array() );
 		$this->assertCount( 1, $result->get_items() );
 		$this->assertSame( Industry_Page_Template_Recommendation_Resolver::FIT_NEUTRAL, $result->get_items()[0]['fit_classification'] );
 		$this->assertSame( 0, $result->get_items()[0]['score'] );

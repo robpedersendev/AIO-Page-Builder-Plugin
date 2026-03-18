@@ -38,8 +38,8 @@ final class Template_Page_Replacement_Service implements Replace_Page_Job_Servic
 		Page_Template_Repository $page_template_repository,
 		?Form_Provider_Dependency_Validator $form_provider_dependency_validator = null
 	) {
-		$this->job_service             = $job_service;
-		$this->page_template_repository = $page_template_repository;
+		$this->job_service                        = $job_service;
+		$this->page_template_repository           = $page_template_repository;
 		$this->form_provider_dependency_validator = $form_provider_dependency_validator;
 	}
 
@@ -50,7 +50,7 @@ final class Template_Page_Replacement_Service implements Replace_Page_Job_Servic
 	 * @return Replace_Page_Result Result with artifacts containing template_replacement_execution_result and replacement_trace_record.
 	 */
 	public function run( array $envelope ): Replace_Page_Result {
-		$target = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
+		$target       = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
 			: array();
 		$template_key = $this->resolve_template_key_from_target( $target );
@@ -71,28 +71,28 @@ final class Template_Page_Replacement_Service implements Replace_Page_Job_Servic
 			}
 		}
 
-		$result = $this->job_service->run( $envelope );
+		$result       = $this->job_service->run( $envelope );
 		$template_key = $result->get_artifacts()['template_key'] ?? $template_key;
 		if ( $template_key === '' ) {
 			$template_key = $this->resolve_template_key_from_target( $target );
 		}
 
 		if ( $result->is_success() ) {
-			$template_def = $this->page_template_repository->get_definition_by_key( $template_key );
-			$template_family = is_array( $template_def ) && isset( $template_def['template_family'] ) && is_string( $template_def['template_family'] )
+			$template_def     = $this->page_template_repository->get_definition_by_key( $template_key );
+			$template_family  = is_array( $template_def ) && isset( $template_def['template_family'] ) && is_string( $template_def['template_family'] )
 				? $template_def['template_family']
 				: '';
 			$assignment_count = isset( $result->get_artifacts()['assignment_count'] ) && is_numeric( $result->get_artifacts()['assignment_count'] )
 				? (int) $result->get_artifacts()['assignment_count']
 				: 0;
-			$superseded = $result->get_superseded_post_id();
-			$trace = $this->build_replacement_trace_record(
+			$superseded       = $result->get_superseded_post_id();
+			$trace            = $this->build_replacement_trace_record(
 				$result->get_target_post_id(),
 				$superseded,
 				$result->get_snapshot_ref(),
 				$template_key
 			);
-			$build_result = Template_Page_Replacement_Result::success(
+			$build_result     = Template_Page_Replacement_Result::success(
 				$result->get_target_post_id(),
 				$superseded,
 				$result->get_snapshot_ref(),
@@ -111,10 +111,13 @@ final class Template_Page_Replacement_Service implements Replace_Page_Job_Servic
 			);
 		}
 
-		$artifacts = array_merge( $result->get_artifacts(), array(
-			'template_replacement_execution_result' => $build_result->to_array(),
-			'replacement_trace_record'               => $build_result->get_replacement_trace_record(),
-		) );
+		$artifacts = array_merge(
+			$result->get_artifacts(),
+			array(
+				'template_replacement_execution_result' => $build_result->to_array(),
+				'replacement_trace_record'              => $build_result->get_replacement_trace_record(),
+			)
+		);
 		return new Replace_Page_Result(
 			$result->is_success(),
 			$result->get_target_post_id(),
@@ -136,10 +139,10 @@ final class Template_Page_Replacement_Service implements Replace_Page_Job_Servic
 	 * @return array<string, mixed>
 	 */
 	private function build_replacement_trace_record( int $new_post_id, int $original_post_id, string $snapshot_pre_id, string $template_key ): array {
-		$original = $original_post_id > 0 ? $original_post_id : $new_post_id;
+		$original       = $original_post_id > 0 ? $original_post_id : $new_post_id;
 		$archive_status = $original_post_id > 0 ? 'private' : 'in_place';
 		return array(
-			'original_post_id'  => $original,
+			'original_post_id' => $original,
 			'new_post_id'      => $new_post_id,
 			'archive_status'   => $archive_status,
 			'template_key'     => $template_key,

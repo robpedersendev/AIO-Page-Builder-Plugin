@@ -57,8 +57,12 @@ final class Log_Export_Result_Test extends TestCase {
 	}
 
 	public function test_filter_summary_preserved_in_payload(): void {
-		$filters = array( 'date_from' => '2025-07-01', 'date_to' => '2025-07-15', 'plan_id' => '99' );
-		$r = Log_Export_Result::success( array( 'execution' ), $filters, 'file.json', 'ref' );
+		$filters = array(
+			'date_from' => '2025-07-01',
+			'date_to'   => '2025-07-15',
+			'plan_id'   => '99',
+		);
+		$r       = Log_Export_Result::success( array( 'execution' ), $filters, 'file.json', 'ref' );
 		$this->assertSame( $filters, $r->get_filter_summary() );
 		$this->assertSame( $filters, $r->to_payload()['filter_summary'] );
 	}

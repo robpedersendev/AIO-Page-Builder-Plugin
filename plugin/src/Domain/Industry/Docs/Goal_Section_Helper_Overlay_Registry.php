@@ -69,7 +69,7 @@ final class Goal_Section_Helper_Overlay_Registry {
 			if ( ! is_array( $ov ) ) {
 				continue;
 			}
-			$goal = isset( $ov[ self::FIELD_GOAL_KEY ] ) && is_string( $ov[ self::FIELD_GOAL_KEY ] )
+			$goal    = isset( $ov[ self::FIELD_GOAL_KEY ] ) && is_string( $ov[ self::FIELD_GOAL_KEY ] )
 				? trim( $ov[ self::FIELD_GOAL_KEY ] )
 				: '';
 			$section = isset( $ov[ self::FIELD_SECTION_KEY ] ) && is_string( $ov[ self::FIELD_SECTION_KEY ] )
@@ -101,7 +101,7 @@ final class Goal_Section_Helper_Overlay_Registry {
 				continue;
 			}
 			$this->by_composite[ $composite ] = $ov;
-			$this->all[]                     = $ov;
+			$this->all[]                      = $ov;
 		}
 	}
 
@@ -113,8 +113,8 @@ final class Goal_Section_Helper_Overlay_Registry {
 	 * @return array<string, mixed>|null
 	 */
 	public function get( string $goal_key, string $section_key ): ?array {
-		$g = trim( $goal_key );
-		$s = trim( $section_key );
+		$g         = trim( $goal_key );
+		$s         = trim( $section_key );
 		$composite = $g . '|' . $s;
 		return $this->by_composite[ $composite ] ?? null;
 	}
@@ -135,7 +135,7 @@ final class Goal_Section_Helper_Overlay_Registry {
 	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_goal( string $goal_key ): array {
-		$g = trim( $goal_key );
+		$g   = trim( $goal_key );
 		$out = array();
 		foreach ( $this->all as $ov ) {
 			$gk = isset( $ov[ self::FIELD_GOAL_KEY ] ) && is_string( $ov[ self::FIELD_GOAL_KEY ] )

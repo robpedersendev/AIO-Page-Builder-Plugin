@@ -58,13 +58,13 @@ final class Developer_Report_Result {
 		string $report_log_reference,
 		string $failure_reason
 	) {
-		$this->report_eligible       = $report_eligible;
-		$this->threshold_reason      = $threshold_reason;
-		$this->dedupe_key            = $dedupe_key;
-		$this->redaction_applied     = $redaction_applied;
-		$this->delivery_status       = $delivery_status;
-		$this->report_log_reference  = $report_log_reference;
-		$this->failure_reason        = $failure_reason;
+		$this->report_eligible      = $report_eligible;
+		$this->threshold_reason     = $threshold_reason;
+		$this->dedupe_key           = $dedupe_key;
+		$this->redaction_applied    = $redaction_applied;
+		$this->delivery_status      = $delivery_status;
+		$this->report_log_reference = $report_log_reference;
+		$this->failure_reason       = $failure_reason;
 	}
 
 	/**
@@ -142,7 +142,7 @@ final class Developer_Report_Result {
 	/** @return array<string, mixed> For logging and diagnostics. */
 	public function to_array(): array {
 		return array(
-			'report_eligible'       => $this->report_eligible,
+			'report_eligible'      => $this->report_eligible,
 			'threshold_reason'     => $this->threshold_reason,
 			'dedupe_key'           => $this->dedupe_key,
 			'redaction_applied'    => $this->redaction_applied,

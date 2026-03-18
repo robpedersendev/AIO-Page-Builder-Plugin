@@ -46,16 +46,16 @@ final class Stub_Replace_Page_Job_Service implements Replace_Page_Job_Service_In
 final class Template_Page_Replacement_Service_Test extends TestCase {
 
 	public function test_run_enriches_success_result_with_template_replacement_execution_result(): void {
-		$stub = new Stub_Replace_Page_Job_Service();
+		$stub             = new Stub_Replace_Page_Job_Service();
 		$stub->run_result = Replace_Page_Result::success( 202, 'tpl_services_hub', 3, 'op-snap-pre-123', 101 );
-		$repo = $this->createMock( Page_Template_Repository::class );
+		$repo             = $this->createMock( Page_Template_Repository::class );
 		$repo->method( 'get_definition_by_key' )->with( 'tpl_services_hub' )->willReturn( array( 'template_family' => 'services' ) );
 
-		$service = new Template_Page_Replacement_Service( $stub, $repo );
+		$service  = new Template_Page_Replacement_Service( $stub, $repo );
 		$envelope = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'template_key' => 'tpl_services_hub' ),
 		);
-		$result = $service->run( $envelope );
+		$result   = $service->run( $envelope );
 
 		$this->assertTrue( $result->is_success() );
 		$this->assertSame( 202, $result->get_target_post_id() );
@@ -78,13 +78,13 @@ final class Template_Page_Replacement_Service_Test extends TestCase {
 	}
 
 	public function test_run_rebuild_in_place_trace_has_in_place_archive_status(): void {
-		$stub = new Stub_Replace_Page_Job_Service();
+		$stub             = new Stub_Replace_Page_Job_Service();
 		$stub->run_result = Replace_Page_Result::success( 99, 'tpl_hub', 1, 'op-snap-pre-99', 0 );
-		$repo = $this->createMock( Page_Template_Repository::class );
+		$repo             = $this->createMock( Page_Template_Repository::class );
 		$repo->method( 'get_definition_by_key' )->willReturn( array() );
 
 		$service = new Template_Page_Replacement_Service( $stub, $repo );
-		$result = $service->run( array() );
+		$result  = $service->run( array() );
 
 		$trace = $result->get_artifacts()['replacement_trace_record'];
 		$this->assertSame( 'in_place', $trace['archive_status'] );
@@ -93,12 +93,12 @@ final class Template_Page_Replacement_Service_Test extends TestCase {
 	}
 
 	public function test_run_failure_includes_template_replacement_execution_result_with_errors(): void {
-		$stub = new Stub_Replace_Page_Job_Service();
+		$stub             = new Stub_Replace_Page_Job_Service();
 		$stub->run_result = Replace_Page_Result::failure( 'Pre-change snapshot required but not provided.', array( 'snapshot_required' ), 'op-snap-missing' );
-		$repo = $this->createMock( Page_Template_Repository::class );
+		$repo             = $this->createMock( Page_Template_Repository::class );
 
 		$service = new Template_Page_Replacement_Service( $stub, $repo );
-		$result = $service->run( array( Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'template_key' => 'tpl_missing' ) ) );
+		$result  = $service->run( array( Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'template_key' => 'tpl_missing' ) ) );
 
 		$this->assertFalse( $result->is_success() );
 		$this->assertSame( 'op-snap-missing', $result->get_snapshot_ref() );

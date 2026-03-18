@@ -27,12 +27,12 @@ final class Hero_Intro_Library_Batch_Seeder {
 	 * @return array{ success: bool, section_ids: list<int>, errors: list<string> }
 	 */
 	public static function run( Section_Template_Repository $section_repo ): array {
-		$errors     = array();
+		$errors      = array();
 		$section_ids = array();
 		foreach ( Hero_Intro_Library_Batch_Definitions::all_definitions() as $definition ) {
 			$id = $section_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
-				$key = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
+				$key      = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
 				$errors[] = sprintf( __( 'Failed to save hero section: %s', 'aio-page-builder' ), $key );
 				continue;
 			}

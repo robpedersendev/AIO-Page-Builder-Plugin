@@ -19,9 +19,9 @@ require_once $plugin_root . '/src/Domain/Registries/QA/Template_Library_Complian
 final class Template_Library_Compliance_Result_Test extends TestCase {
 
 	public function test_to_array_returns_stable_payload_keys(): void {
-		$count = array(
+		$count    = array(
 			'section_total'             => 120,
-			'page_total'               => 225,
+			'page_total'                => 225,
 			'section_target'            => 250,
 			'page_target'               => 500,
 			'by_section_purpose_family' => array( 'hero' => 12 ),
@@ -33,16 +33,25 @@ final class Template_Library_Compliance_Result_Test extends TestCase {
 			'page_class_minimums'     => array( 'top_level' => false ),
 			'max_share_violations'    => array(),
 		);
-		$result = new Template_Library_Compliance_Result(
+		$result   = new Template_Library_Compliance_Result(
 			$count,
 			$category,
 			array(),
-			array( 'sections_missing_preview' => array(), 'pages_missing_one_pager' => array() ),
-			array( 'sections_missing_accessibility' => array(), 'sections_invalid_animation' => array() ),
-			array( 'viable' => true, 'errors' => array() ),
+			array(
+				'sections_missing_preview' => array(),
+				'pages_missing_one_pager'  => array(),
+			),
+			array(
+				'sections_missing_accessibility' => array(),
+				'sections_invalid_animation'     => array(),
+			),
+			array(
+				'viable' => true,
+				'errors' => array(),
+			),
 			false
 		);
-		$a = $result->to_array();
+		$a        = $result->to_array();
 		$this->assertArrayHasKey( 'count_summary', $a );
 		$this->assertArrayHasKey( 'category_coverage_summary', $a );
 		$this->assertArrayHasKey( 'cta_rule_violations', $a );
@@ -59,33 +68,52 @@ final class Template_Library_Compliance_Result_Test extends TestCase {
 	 * One example compliance-result payload (machine-readable).
 	 */
 	public function test_example_compliance_result_payload(): void {
-		$count_summary = array(
+		$count_summary             = array(
 			'section_total'             => 120,
 			'page_total'                => 225,
 			'section_target'            => 250,
 			'page_target'               => 500,
-			'by_section_purpose_family' => array( 'hero' => 12, 'cta' => 26 ),
-			'by_page_category_class'    => array( 'top_level' => 77, 'hub' => 43 ),
+			'by_section_purpose_family' => array(
+				'hero' => 12,
+				'cta'  => 26,
+			),
+			'by_page_category_class'    => array(
+				'top_level' => 77,
+				'hub'       => 43,
+			),
 			'by_page_family'            => array( 'home' => 8 ),
 		);
 		$category_coverage_summary = array(
-			'section_family_minimums' => array( 'hero' => true, 'cta' => true ),
-			'page_class_minimums'     => array( 'top_level' => false, 'hub' => false ),
+			'section_family_minimums' => array(
+				'hero' => true,
+				'cta'  => true,
+			),
+			'page_class_minimums'     => array(
+				'top_level' => false,
+				'hub'       => false,
+			),
 			'max_share_violations'    => array(),
 		);
-		$cta_rule_violations = array(
-			array( 'template_key' => 'pt_example', 'code' => 'bottom_cta_missing', 'message' => 'Template pt_example: last section is not CTA-classified.' ),
+		$cta_rule_violations       = array(
+			array(
+				'template_key' => 'pt_example',
+				'code'         => 'bottom_cta_missing',
+				'message'      => 'Template pt_example: last section is not CTA-classified.',
+			),
 		);
-		$preview_readiness = array(
+		$preview_readiness         = array(
 			'sections_missing_preview' => array(),
 			'pages_missing_one_pager'  => array(),
 		);
-		$metadata_checks = array(
+		$metadata_checks           = array(
 			'sections_missing_accessibility' => array(),
 			'sections_invalid_animation'     => array(),
 		);
-		$export_viability = array( 'viable' => true, 'errors' => array() );
-		$result = new Template_Library_Compliance_Result(
+		$export_viability          = array(
+			'viable' => true,
+			'errors' => array(),
+		);
+		$result                    = new Template_Library_Compliance_Result(
 			$count_summary,
 			$category_coverage_summary,
 			$cta_rule_violations,
@@ -94,7 +122,7 @@ final class Template_Library_Compliance_Result_Test extends TestCase {
 			$export_viability,
 			false
 		);
-		$payload = $result->to_array();
+		$payload                   = $result->to_array();
 		$this->assertSame( 120, $payload['count_summary']['section_total'] );
 		$this->assertSame( 225, $payload['count_summary']['page_total'] );
 		$this->assertCount( 1, $payload['cta_rule_violations'] );
@@ -115,16 +143,29 @@ final class Template_Library_Compliance_Result_Test extends TestCase {
 			'by_page_category_class'    => array(),
 			'by_page_family'            => array(),
 		);
-		$result = new Template_Library_Compliance_Result(
+		$result        = new Template_Library_Compliance_Result(
 			$count_summary,
-			array( 'section_family_minimums' => array(), 'page_class_minimums' => array(), 'max_share_violations' => array() ),
+			array(
+				'section_family_minimums' => array(),
+				'page_class_minimums'     => array(),
+				'max_share_violations'    => array(),
+			),
 			array(),
-			array( 'sections_missing_preview' => array(), 'pages_missing_one_pager' => array() ),
-			array( 'sections_missing_accessibility' => array(), 'sections_invalid_animation' => array() ),
-			array( 'viable' => true, 'errors' => array() ),
+			array(
+				'sections_missing_preview' => array(),
+				'pages_missing_one_pager'  => array(),
+			),
+			array(
+				'sections_missing_accessibility' => array(),
+				'sections_invalid_animation'     => array(),
+			),
+			array(
+				'viable' => true,
+				'errors' => array(),
+			),
 			false
 		);
-		$lines = $result->to_summary_lines();
+		$lines         = $result->to_summary_lines();
 		$this->assertNotEmpty( $lines );
 		$first = $lines[0];
 		$this->assertStringContainsString( '120', $first );
@@ -136,22 +177,35 @@ final class Template_Library_Compliance_Result_Test extends TestCase {
 	}
 
 	public function test_passed_true_when_no_violations(): void {
-		$count = array(
-			'section_total'  => 250,
-			'page_total'     => 500,
-			'section_target' => 250,
-			'page_target'    => 500,
+		$count  = array(
+			'section_total'             => 250,
+			'page_total'                => 500,
+			'section_target'            => 250,
+			'page_target'               => 500,
 			'by_section_purpose_family' => array( 'hero' => 12 ),
 			'by_page_category_class'    => array( 'top_level' => 80 ),
 			'by_page_family'            => array(),
 		);
 		$result = new Template_Library_Compliance_Result(
 			$count,
-			array( 'section_family_minimums' => array( 'hero' => true ), 'page_class_minimums' => array( 'top_level' => true ), 'max_share_violations' => array() ),
+			array(
+				'section_family_minimums' => array( 'hero' => true ),
+				'page_class_minimums'     => array( 'top_level' => true ),
+				'max_share_violations'    => array(),
+			),
 			array(),
-			array( 'sections_missing_preview' => array(), 'pages_missing_one_pager' => array() ),
-			array( 'sections_missing_accessibility' => array(), 'sections_invalid_animation' => array() ),
-			array( 'viable' => true, 'errors' => array() ),
+			array(
+				'sections_missing_preview' => array(),
+				'pages_missing_one_pager'  => array(),
+			),
+			array(
+				'sections_missing_accessibility' => array(),
+				'sections_invalid_animation'     => array(),
+			),
+			array(
+				'viable' => true,
+				'errors' => array(),
+			),
 			true
 		);
 		$this->assertTrue( $result->is_passed() );

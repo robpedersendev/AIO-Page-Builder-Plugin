@@ -40,11 +40,11 @@ final class Industry_Shared_Fragment_Registry {
 	public const STATUS_ACTIVE = 'active';
 
 	/** Fragment types (per schema). */
-	public const TYPE_CTA_NOTES = 'cta_notes';
-	public const TYPE_SEO_SEGMENT = 'seo_segment';
+	public const TYPE_CTA_NOTES       = 'cta_notes';
+	public const TYPE_SEO_SEGMENT     = 'seo_segment';
 	public const TYPE_CAUTION_SNIPPET = 'caution_snippet';
 	public const TYPE_HELPER_GUIDANCE = 'helper_guidance';
-	public const TYPE_PAGE_GUIDANCE = 'page_guidance';
+	public const TYPE_PAGE_GUIDANCE   = 'page_guidance';
 
 	/** Allowed fragment types. */
 	private const TYPES = array(
@@ -59,7 +59,7 @@ final class Industry_Shared_Fragment_Registry {
 	private const KEY_PATTERN = '#^[a-z0-9_-]+$#';
 
 	/** Max lengths. */
-	private const KEY_MAX_LENGTH = 64;
+	private const KEY_MAX_LENGTH     = 64;
 	private const CONTENT_MAX_LENGTH = 2048;
 	private const VERSION_MAX_LENGTH = 32;
 
@@ -111,9 +111,16 @@ final class Industry_Shared_Fragment_Registry {
 			$consumers = isset( $frag[ self::FIELD_ALLOWED_CONSUMERS ] ) && is_array( $frag[ self::FIELD_ALLOWED_CONSUMERS ] )
 				? $frag[ self::FIELD_ALLOWED_CONSUMERS ]
 				: array();
-			$consumers = array_values( array_filter( array_map( function ( $c ) {
-				return is_string( $c ) ? trim( $c ) : '';
-			}, $consumers ) ) );
+			$consumers = array_values(
+				array_filter(
+					array_map(
+						function ( $c ) {
+							return is_string( $c ) ? trim( $c ) : '';
+						},
+						$consumers
+					)
+				)
+			);
 			if ( count( $consumers ) === 0 ) {
 				continue;
 			}
@@ -133,16 +140,16 @@ final class Industry_Shared_Fragment_Registry {
 				continue;
 			}
 			$this->by_key[ $key ] = array(
-				self::FIELD_FRAGMENT_KEY       => $key,
-				self::FIELD_FRAGMENT_TYPE      => $type,
-				self::FIELD_ALLOWED_CONSUMERS  => $consumers,
-				self::FIELD_CONTENT            => $content,
-				self::FIELD_STATUS             => $status,
-				self::FIELD_VERSION_MARKER     => isset( $frag[ self::FIELD_VERSION_MARKER ] ) && is_string( $frag[ self::FIELD_VERSION_MARKER ] )
+				self::FIELD_FRAGMENT_KEY      => $key,
+				self::FIELD_FRAGMENT_TYPE     => $type,
+				self::FIELD_ALLOWED_CONSUMERS => $consumers,
+				self::FIELD_CONTENT           => $content,
+				self::FIELD_STATUS            => $status,
+				self::FIELD_VERSION_MARKER    => isset( $frag[ self::FIELD_VERSION_MARKER ] ) && is_string( $frag[ self::FIELD_VERSION_MARKER ] )
 					? substr( trim( $frag[ self::FIELD_VERSION_MARKER ] ), 0, self::VERSION_MAX_LENGTH )
 					: '',
 			);
-			$this->all[] = $this->by_key[ $key ];
+			$this->all[]          = $this->by_key[ $key ];
 		}
 	}
 

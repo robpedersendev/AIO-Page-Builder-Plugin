@@ -24,12 +24,12 @@ final class Subtype_Compliance_Rule_Registry_Test extends TestCase {
 		string $parent_industry_key = 'realtor'
 	): array {
 		return array(
-			Subtype_Compliance_Rule_Registry::FIELD_SUBTYPE_RULE_KEY    => $subtype_rule_key,
-			Subtype_Compliance_Rule_Registry::FIELD_SUBTYPE_KEY        => $subtype_key,
+			Subtype_Compliance_Rule_Registry::FIELD_SUBTYPE_RULE_KEY => $subtype_rule_key,
+			Subtype_Compliance_Rule_Registry::FIELD_SUBTYPE_KEY => $subtype_key,
 			Subtype_Compliance_Rule_Registry::FIELD_PARENT_INDUSTRY_KEY => $parent_industry_key,
-			Subtype_Compliance_Rule_Registry::FIELD_SEVERITY            => Subtype_Compliance_Rule_Registry::SEVERITY_CAUTION,
-			Subtype_Compliance_Rule_Registry::FIELD_CAUTION_SUMMARY     => 'Test subtype caution summary.',
-			Subtype_Compliance_Rule_Registry::FIELD_STATUS              => 'active',
+			Subtype_Compliance_Rule_Registry::FIELD_SEVERITY => Subtype_Compliance_Rule_Registry::SEVERITY_CAUTION,
+			Subtype_Compliance_Rule_Registry::FIELD_CAUTION_SUMMARY => 'Test subtype caution summary.',
+			Subtype_Compliance_Rule_Registry::FIELD_STATUS => 'active',
 		);
 	}
 
@@ -46,7 +46,7 @@ final class Subtype_Compliance_Rule_Registry_Test extends TestCase {
 
 	public function test_load_skips_invalid_severity(): void {
 		$registry = new Subtype_Compliance_Rule_Registry();
-		$rule = $this->valid_subtype_rule();
+		$rule     = $this->valid_subtype_rule();
 		$rule[ Subtype_Compliance_Rule_Registry::FIELD_SEVERITY ] = 'invalid';
 		$registry->load( array( $rule ) );
 		$this->assertNull( $registry->get( 'test_subtype_rule_01' ) );
@@ -55,7 +55,7 @@ final class Subtype_Compliance_Rule_Registry_Test extends TestCase {
 
 	public function test_load_skips_empty_subtype_key(): void {
 		$registry = new Subtype_Compliance_Rule_Registry();
-		$rule = $this->valid_subtype_rule();
+		$rule     = $this->valid_subtype_rule();
 		$rule[ Subtype_Compliance_Rule_Registry::FIELD_SUBTYPE_KEY ] = '';
 		$registry->load( array( $rule ) );
 		$this->assertNull( $registry->get( 'test_subtype_rule_01' ) );
@@ -63,12 +63,14 @@ final class Subtype_Compliance_Rule_Registry_Test extends TestCase {
 
 	public function test_get_for_subtype_returns_only_matching_parent_and_subtype(): void {
 		$registry = new Subtype_Compliance_Rule_Registry();
-		$registry->load( array(
-			$this->valid_subtype_rule( 'r1', 'realtor_buyer_agent', 'realtor' ),
-			$this->valid_subtype_rule( 'r2', 'realtor_listing_agent', 'realtor' ),
-			$this->valid_subtype_rule( 'r3', 'realtor_buyer_agent', 'realtor' ),
-			$this->valid_subtype_rule( 'r4', 'plumber_residential', 'plumber' ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_subtype_rule( 'r1', 'realtor_buyer_agent', 'realtor' ),
+				$this->valid_subtype_rule( 'r2', 'realtor_listing_agent', 'realtor' ),
+				$this->valid_subtype_rule( 'r3', 'realtor_buyer_agent', 'realtor' ),
+				$this->valid_subtype_rule( 'r4', 'plumber_residential', 'plumber' ),
+			)
+		);
 		$buyer = $registry->get_for_subtype( 'realtor', 'realtor_buyer_agent' );
 		$this->assertCount( 2, $buyer );
 		$listing = $registry->get_for_subtype( 'realtor', 'realtor_listing_agent' );

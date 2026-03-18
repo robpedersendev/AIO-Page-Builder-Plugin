@@ -34,12 +34,12 @@ final class Conversion_Goal_Prompt_Pack_Overlay_Service {
 
 	/** Short planning hint per goal (no registry dependency). */
 	private const GOAL_PLANNING_HINTS = array(
-		'calls'          => 'Prioritize phone-call conversions: CTAs and proof points should encourage calling; include visible phone/click-to-call.',
-		'bookings'        => 'Prioritize booking conversions: CTAs and proof points should support appointment or booking flow; reduce friction to book.',
-		'estimates'       => 'Prioritize estimate-request conversions: CTAs and proof points should encourage requesting an estimate or quote.',
-		'consultations'   => 'Prioritize consultation conversions: CTAs and proof points should support booking or requesting a consultation.',
-		'valuations'      => 'Prioritize valuation conversions: CTAs and proof points should encourage requesting a valuation or appraisal.',
-		'lead_capture'    => 'Prioritize lead-capture conversions: CTAs and proof points should support form submission or contact capture; nurture before hard sell.',
+		'calls'         => 'Prioritize phone-call conversions: CTAs and proof points should encourage calling; include visible phone/click-to-call.',
+		'bookings'      => 'Prioritize booking conversions: CTAs and proof points should support appointment or booking flow; reduce friction to book.',
+		'estimates'     => 'Prioritize estimate-request conversions: CTAs and proof points should encourage requesting an estimate or quote.',
+		'consultations' => 'Prioritize consultation conversions: CTAs and proof points should support booking or requesting a consultation.',
+		'valuations'    => 'Prioritize valuation conversions: CTAs and proof points should encourage requesting a valuation or appraisal.',
+		'lead_capture'  => 'Prioritize lead-capture conversions: CTAs and proof points should support form submission or contact capture; nurture before hard sell.',
 	);
 
 	/**
@@ -49,7 +49,7 @@ final class Conversion_Goal_Prompt_Pack_Overlay_Service {
 	 * @return array<string, mixed> Overlay with schema_version; optional primary_goal_key, secondary_goal_key, conversion_goal_guidance_text.
 	 */
 	public function get_overlay_for_artifact( array $input_artifact ): array {
-		$base = array( 'schema_version' => self::OVERLAY_SCHEMA_VERSION );
+		$base             = array( 'schema_version' => self::OVERLAY_SCHEMA_VERSION );
 		$industry_context = isset( $input_artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ] ) && is_array( $input_artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ] )
 			? $input_artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ]
 			: null;
@@ -63,7 +63,7 @@ final class Conversion_Goal_Prompt_Pack_Overlay_Service {
 			return $base;
 		}
 		$base[ self::OVERLAY_PRIMARY_GOAL_KEY ] = $primary;
-		$secondary = isset( $industry_context['secondary_goal_key'] ) && is_string( $industry_context['secondary_goal_key'] )
+		$secondary                              = isset( $industry_context['secondary_goal_key'] ) && is_string( $industry_context['secondary_goal_key'] )
 			? trim( $industry_context['secondary_goal_key'] )
 			: '';
 		if ( $secondary !== '' && $this->is_launch_goal( $secondary ) && $secondary !== $primary ) {

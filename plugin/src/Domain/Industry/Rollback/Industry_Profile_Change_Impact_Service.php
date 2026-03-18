@@ -31,8 +31,8 @@ final class Industry_Profile_Change_Impact_Service {
 	 * Evaluates whether live profile diverges from the approved snapshot.
 	 * Safe when snapshot is null or malformed; returns result with snapshot_missing or has_divergence false.
 	 *
-	 * @param array<string, mixed>       $live_profile   Current industry profile (e.g. from Industry_Profile_Repository::get_profile()).
-	 * @param array<string, mixed>|null  $approved_snapshot Industry approval snapshot from plan (KEY_INDUSTRY_APPROVAL_SNAPSHOT), or null.
+	 * @param array<string, mixed>      $live_profile   Current industry profile (e.g. from Industry_Profile_Repository::get_profile()).
+	 * @param array<string, mixed>|null $approved_snapshot Industry approval snapshot from plan (KEY_INDUSTRY_APPROVAL_SNAPSHOT), or null.
 	 * @param array<int, string>        $artifact_refs  Optional plan_id or artifact refs this result applies to.
 	 * @param string|null               $live_style_preset_ref Optional current applied style preset key (from get_applied_preset()) for comparison.
 	 * @return array{has_divergence: bool, severity: string, explanation_summary: string, affected_artifact_refs: array, snapshot_missing: bool}
@@ -52,8 +52,8 @@ final class Industry_Profile_Change_Impact_Service {
 		);
 
 		if ( $approved_snapshot === null || ! is_array( $approved_snapshot ) ) {
-			$empty['snapshot_missing'] = true;
-			$empty['severity']        = self::SEVERITY_INFO;
+			$empty['snapshot_missing']    = true;
+			$empty['severity']            = self::SEVERITY_INFO;
 			$empty['explanation_summary'] = __( 'Industry context at approval was not recorded.', 'aio-page-builder' );
 			return $empty;
 		}

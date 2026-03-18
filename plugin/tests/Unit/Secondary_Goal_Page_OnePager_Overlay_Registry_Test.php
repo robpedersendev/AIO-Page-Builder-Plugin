@@ -22,15 +22,17 @@ final class Secondary_Goal_Page_OnePager_Overlay_Registry_Test extends TestCase 
 
 	public function test_load_and_get_returns_overlay(): void {
 		$registry = new Secondary_Goal_Page_OnePager_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'calls',
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'lead_capture',
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY          => 'pt_home_conversion_01',
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Page_OnePager_Overlay_Registry::SCOPE_SECONDARY_GOAL_PAGE_ONEPAGER_OVERLAY,
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'calls',
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'lead_capture',
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY          => 'pt_home_conversion_01',
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Page_OnePager_Overlay_Registry::SCOPE_SECONDARY_GOAL_PAGE_ONEPAGER_OVERLAY,
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$ov = $registry->get( 'calls', 'lead_capture', 'pt_home_conversion_01' );
 		$this->assertNotNull( $ov );
 		$this->assertSame( 'calls', $ov[ Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY ] );
@@ -46,15 +48,17 @@ final class Secondary_Goal_Page_OnePager_Overlay_Registry_Test extends TestCase 
 
 	public function test_invalid_overlay_skipped_at_load(): void {
 		$registry = new Secondary_Goal_Page_OnePager_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'bookings',
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'bookings',
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY          => 'pt_contact_request_01',
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Page_OnePager_Overlay_Registry::SCOPE_SECONDARY_GOAL_PAGE_ONEPAGER_OVERLAY,
-				Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'bookings',
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'bookings',
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY          => 'pt_contact_request_01',
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Page_OnePager_Overlay_Registry::SCOPE_SECONDARY_GOAL_PAGE_ONEPAGER_OVERLAY,
+					Secondary_Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$this->assertEmpty( $registry->get_all() );
 	}
 
@@ -72,14 +76,16 @@ final class Secondary_Goal_Page_OnePager_Overlay_Registry_Test extends TestCase 
 	/** Composition order: primary-goal overlay then secondary-goal overlay retrievable for same page. */
 	public function test_composition_order_primary_then_secondary_retrievable(): void {
 		$primary_registry = new Goal_Page_OnePager_Overlay_Registry();
-		$primary_registry->load( array(
+		$primary_registry->load(
 			array(
-				Goal_Page_OnePager_Overlay_Registry::FIELD_GOAL_KEY  => 'calls',
-				Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY  => 'pt_home_conversion_01',
-				Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE     => Goal_Page_OnePager_Overlay_Registry::SCOPE_GOAL_PAGE_ONEPAGER_OVERLAY,
-				Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS    => Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Goal_Page_OnePager_Overlay_Registry::FIELD_GOAL_KEY  => 'calls',
+					Goal_Page_OnePager_Overlay_Registry::FIELD_PAGE_KEY  => 'pt_home_conversion_01',
+					Goal_Page_OnePager_Overlay_Registry::FIELD_SCOPE     => Goal_Page_OnePager_Overlay_Registry::SCOPE_GOAL_PAGE_ONEPAGER_OVERLAY,
+					Goal_Page_OnePager_Overlay_Registry::FIELD_STATUS    => Goal_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$secondary_registry = new Secondary_Goal_Page_OnePager_Overlay_Registry();
 		$secondary_registry->load( Secondary_Goal_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions() );
 		$primary_ov = $primary_registry->get( 'calls', 'pt_home_conversion_01' );

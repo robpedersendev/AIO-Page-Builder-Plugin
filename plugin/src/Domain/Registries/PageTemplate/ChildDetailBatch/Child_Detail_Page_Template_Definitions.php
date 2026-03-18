@@ -108,17 +108,20 @@ final class Child_Detail_Page_Template_Definitions {
 	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
-		$ordered     = array();
+		$ordered      = array();
 		$requirements = array();
 		foreach ( $section_keys as $pos => $key ) {
-			$ordered[] = array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => $key,
+			$ordered[]            = array(
+				Page_Template_Schema::SECTION_ITEM_KEY => $key,
 				Page_Template_Schema::SECTION_ITEM_POSITION => $pos,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			);
 			$requirements[ $key ] = array( 'required' => true );
 		}
-		return array( 'ordered' => $ordered, 'requirements' => $requirements );
+		return array(
+			'ordered'      => $ordered,
+			'requirements' => $requirements,
+		);
 	}
 
 	/**
@@ -151,22 +154,25 @@ final class Child_Detail_Page_Template_Definitions {
 		array $extra = array()
 	): array {
 		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY               => $internal_key,
-			Page_Template_Schema::FIELD_NAME                       => $name,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY            => $purpose_summary,
-			Page_Template_Schema::FIELD_ARCHETYPE                  => $archetype,
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS           => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS       => $section_requirements,
-			Page_Template_Schema::FIELD_COMPATIBILITY               => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                  => $one_pager,
-			Page_Template_Schema::FIELD_VERSION                    => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                     => 'active',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $internal_key,
+			Page_Template_Schema::FIELD_NAME             => $name,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => $purpose_summary,
+			Page_Template_Schema::FIELD_ARCHETYPE        => $archetype,
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_requirements,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => $one_pager,
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES     => $endpoint_notes,
-			'template_category_class'                              => 'child_detail',
-			'template_family'                                      => $template_family,
-			'parent_family_compatibility'                           => $parent_family_compatibility,
-			'hierarchy_hints'                                      => array(
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => $endpoint_notes,
+			'template_category_class'                    => 'child_detail',
+			'template_family'                            => $template_family,
+			'parent_family_compatibility'                => $parent_family_compatibility,
+			'hierarchy_hints'                            => array(
 				'common_parent_page_types' => 'hub, nested_hub',
 				'hierarchy_role'           => 'leaf',
 			),
@@ -197,7 +203,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_service_conversion_01',
 			'Service detail (conversion-led)',
@@ -208,13 +214,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single service detail with conversion-led structure. Offering and trust; early and mid CTAs; proof and process; booking and contact CTA.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Detail-specific: one service entity. Conversion intensity via multiple CTAs and proof layering; mandatory bottom CTA.',
-				'cta_direction_summary'  => 'Service detail, consultation, quote, booking, contact; last section is contact CTA.',
+				'page_purpose_summary'  => 'Single service detail with conversion-led structure. Offering and trust; early and mid CTAs; proof and process; booking and contact CTA.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Detail-specific: one service entity. Conversion intensity via multiple CTAs and proof layering; mandatory bottom CTA.',
+				'cta_direction_summary' => 'Service detail, consultation, quote, booking, contact; last section is contact CTA.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Conversion-led; proof and trust early; booking and contact emphasis.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Conversion-led; proof and trust early; booking and contact emphasis.',
+			)
 		);
 	}
 
@@ -237,7 +246,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_service_educational_01',
 			'Service detail (educational)',
@@ -248,13 +257,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single service detail with educational depth. How-it-works and expectations before CTAs; trust and guarantee; quote, booking and contact CTA.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Informational depth first; conversion after education. Suited to considered purchases.',
-				'cta_direction_summary'  => 'Service detail, consultation, quote, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single service detail with educational depth. How-it-works and expectations before CTAs; trust and guarantee; quote, booking and contact CTA.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Informational depth first; conversion after education. Suited to considered purchases.',
+				'cta_direction_summary' => 'Service detail, consultation, quote, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Educational; process and expectations before conversion.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Educational; process and expectations before conversion.',
+			)
 		);
 	}
 
@@ -277,7 +289,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_service_proof_dense_01',
 			'Service detail (proof-dense)',
@@ -288,13 +300,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single service detail with proof density. Multiple trust and testimonial blocks; guarantee and logos; quote and contact CTA.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Proof-heavy; builds trust before each CTA. Suited to high-consideration services.',
-				'cta_direction_summary'  => 'Consultation, booking, quote, service detail, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single service detail with proof density. Multiple trust and testimonial blocks; guarantee and logos; quote and contact CTA.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Proof-heavy; builds trust before each CTA. Suited to high-consideration services.',
+				'cta_direction_summary' => 'Consultation, booking, quote, service detail, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Proof-dense; testimonials and guarantee prominent.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Proof-dense; testimonials and guarantee prominent.',
+			)
 		);
 	}
 
@@ -316,7 +331,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'ptf_service_flow_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_service_booking_01',
 			'Service detail (booking emphasis)',
@@ -327,19 +342,19 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single service detail with booking emphasis. Early booking CTA; consultation and service CTAs; quote and contact CTA.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Booking and contact path prominent; proof supports conversion.',
-				'cta_direction_summary'  => 'Booking, consultation, service detail, quote, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single service detail with booking emphasis. Early booking CTA; consultation and service CTAs; quote and contact CTA.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Booking and contact path prominent; proof supports conversion.',
+				'cta_direction_summary' => 'Booking, consultation, service detail, quote, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
 			array(
-				'preview_metadata'       => array( 'synthetic' => true ),
-				'differentiation_notes'  => 'Booking-first; early and repeated booking CTAs.',
+				'preview_metadata'                         => array( 'synthetic' => true ),
+				'differentiation_notes'                    => 'Booking-first; early and repeated booking CTAs.',
 				Page_Template_Schema::FIELD_INDUSTRY_NOTES => array(
-					'cosmetology_nail' => 'Strong fit for service or treatment booking flow.',
-					'realtor'          => 'Good for consultation or valuation booking.',
-					'plumber'          => 'Strong fit for schedule or callback booking.',
+					'cosmetology_nail'  => 'Strong fit for service or treatment booking flow.',
+					'realtor'           => 'Good for consultation or valuation booking.',
+					'plumber'           => 'Strong fit for schedule or callback booking.',
 					'disaster_recovery' => 'Good for assessment or non-emergency booking.',
 				),
 			)
@@ -364,7 +379,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_treatment_detail_01',
 			'Treatment detail (e.g. Gel Manicure)',
@@ -375,13 +390,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single treatment detail. Process and flow prominent; consultation and booking; contact CTA last.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Treatment-specific: one named treatment entity. Process and expectations support conversion.',
-				'cta_direction_summary'  => 'Service detail, consultation, booking, quote, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single treatment detail. Process and flow prominent; consultation and booking; contact CTA last.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Treatment-specific: one named treatment entity. Process and expectations support conversion.',
+				'cta_direction_summary' => 'Service detail, consultation, booking, quote, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Treatment-specific; process and flow emphasis.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Treatment-specific; process and flow emphasis.',
+			)
 		);
 	}
 
@@ -404,7 +422,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_service_trust_01',
 			'Service detail (trust-led)',
@@ -415,13 +433,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single service detail with trust emphasis. Trust band, guarantee, reassurance before CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Trust-first; guarantee and reassurance support conversion.',
-				'cta_direction_summary'  => 'Consultation, booking, service detail, quote, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single service detail with trust emphasis. Trust band, guarantee, reassurance before CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Trust-first; guarantee and reassurance support conversion.',
+				'cta_direction_summary' => 'Consultation, booking, service detail, quote, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Trust-led; guarantee and reassurance prominent.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Trust-led; guarantee and reassurance prominent.',
+			)
 		);
 	}
 
@@ -443,7 +464,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_service_process_01',
 			'Service detail (process-led)',
@@ -454,13 +475,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single service detail with process emphasis. Multiple process/flow sections; consultation, booking, service CTA, contact.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Process and expectations lead; conversion after clarity.',
-				'cta_direction_summary'  => 'Consultation, booking, quote, service detail, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single service detail with process emphasis. Multiple process/flow sections; consultation, booking, service CTA, contact.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Process and expectations lead; conversion after clarity.',
+				'cta_direction_summary' => 'Consultation, booking, quote, service detail, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Process-led; how-it-works and flow prominent.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Process-led; how-it-works and flow prominent.',
+			)
 		);
 	}
 
@@ -484,7 +508,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_offer_value_01',
 			'Offer detail (value-led)',
@@ -495,13 +519,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single offer detail value-led. Value prop and offer compare; purchase and quote CTAs; consultation and booking; contact CTA last.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Offer-specific entity; value and proof support conversion.',
-				'cta_direction_summary'  => 'Purchase, quote, consultation, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single offer detail value-led. Value prop and offer compare; purchase and quote CTAs; consultation and booking; contact CTA last.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Offer-specific entity; value and proof support conversion.',
+				'cta_direction_summary' => 'Purchase, quote, consultation, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Value-led; offer compare and benefit band.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Value-led; offer compare and benefit band.',
+			)
 		);
 	}
 
@@ -523,7 +550,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_offer_package_01',
 			'Offer detail (package)',
@@ -534,13 +561,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single offer/package detail. Package summary and benefit detail; purchase, quote, consultation, booking, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Package-specific; offer highlight and consent support conversion.',
-				'cta_direction_summary'  => 'Purchase, quote, consultation, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single offer/package detail. Package summary and benefit detail; purchase, quote, consultation, booking, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Package-specific; offer highlight and consent support conversion.',
+				'cta_direction_summary' => 'Purchase, quote, consultation, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Package/pricing emphasis; benefit detail and consent.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Package/pricing emphasis; benefit detail and consent.',
+			)
 		);
 	}
 
@@ -562,7 +592,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_offer_educational_01',
 			'Offer detail (educational)',
@@ -573,13 +603,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single offer detail educational. Comparison steps and differentiator; quote, purchase, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Educational; comparison and buying process before conversion.',
-				'cta_direction_summary'  => 'Compare, quote, purchase, consultation, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single offer detail educational. Comparison steps and differentiator; quote, purchase, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Educational; comparison and buying process before conversion.',
+				'cta_direction_summary' => 'Compare, quote, purchase, consultation, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Educational; comparison steps and differentiator.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Educational; comparison steps and differentiator.',
+			)
 		);
 	}
 
@@ -600,7 +633,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_offer_consultation_01',
 			'Offer detail (consultation emphasis)',
@@ -611,13 +644,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single offer detail with consultation emphasis. Early consultation CTA; quote, booking, purchase, contact.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Consultation and quote path prominent; purchase and contact follow.',
-				'cta_direction_summary'  => 'Consultation, quote, booking, purchase, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single offer detail with consultation emphasis. Early consultation CTA; quote, booking, purchase, contact.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Consultation and quote path prominent; purchase and contact follow.',
+				'cta_direction_summary' => 'Consultation, quote, booking, purchase, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Consultation-first; quote and booking CTAs.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Consultation-first; quote and booking CTAs.',
+			)
 		);
 	}
 
@@ -641,7 +677,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'ptf_expectations_01',
 			'cta_booking_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_location_local_01',
 			'Location detail (local-place, e.g. Salt Lake City)',
@@ -652,13 +688,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single location/local-place detail. Local value and place highlight; local, contact, directory, booking CTAs; synthetic preview only.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Location-specific entity (e.g. city, branch). Local trust and contact emphasis; mandatory bottom CTA.',
-				'cta_direction_summary'  => 'Local action, contact, directory nav, local action, booking; last CTA booking.',
+				'page_purpose_summary'  => 'Single location/local-place detail. Local value and place highlight; local, contact, directory, booking CTAs; synthetic preview only.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Location-specific entity (e.g. city, branch). Local trust and contact emphasis; mandatory bottom CTA.',
+				'cta_direction_summary' => 'Local action, contact, directory nav, local action, booking; last CTA booking.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Local-place; no real addresses; local value and place highlight.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Local-place; no real addresses; local value and place highlight.',
+			)
 		);
 	}
 
@@ -681,7 +720,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_booking_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_location_trust_01',
 			'Location detail (local trust emphasis)',
@@ -692,13 +731,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single location detail with local trust. Trust band, reassurance, guarantee before CTAs; contact and booking last.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Local trust emphasis; reassurance and guarantee support visit/contact.',
-				'cta_direction_summary'  => 'Local action, contact, quote, directory nav, booking; last CTA booking.',
+				'page_purpose_summary'  => 'Single location detail with local trust. Trust band, reassurance, guarantee before CTAs; contact and booking last.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Local trust emphasis; reassurance and guarantee support visit/contact.',
+				'cta_direction_summary' => 'Local action, contact, quote, directory nav, booking; last CTA booking.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Local trust; reassurance and guarantee prominent.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Local trust; reassurance and guarantee prominent.',
+			)
 		);
 	}
 
@@ -720,7 +762,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'tp_reassurance_01',
 			'cta_booking_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_location_contact_01',
 			'Location detail (contact/visit emphasis)',
@@ -731,13 +773,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single location detail with contact/visit emphasis. Contact detail and panel early; multiple contact and local CTAs; booking last.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Contact and visit path prominent; directory and booking support.',
-				'cta_direction_summary'  => 'Contact, local action, contact, directory nav, booking; last CTA booking.',
+				'page_purpose_summary'  => 'Single location detail with contact/visit emphasis. Contact detail and panel early; multiple contact and local CTAs; booking last.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Contact and visit path prominent; directory and booking support.',
+				'cta_direction_summary' => 'Contact, local action, contact, directory nav, booking; last CTA booking.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Contact/visit emphasis; contact detail and panel prominent.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Contact/visit emphasis; contact detail and panel prominent.',
+			)
 		);
 	}
 
@@ -759,7 +804,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'mlp_card_grid_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_location_visit_01',
 			'Location detail (visit/booking emphasis)',
@@ -770,13 +815,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single location detail with visit/booking emphasis. Early booking CTA; local and contact CTAs; local CTA last.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Visit and booking path prominent; local action last.',
-				'cta_direction_summary'  => 'Booking, local action, contact, directory nav, local action; last CTA local action.',
+				'page_purpose_summary'  => 'Single location detail with visit/booking emphasis. Early booking CTA; local and contact CTAs; local CTA last.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Visit and booking path prominent; local action last.',
+				'cta_direction_summary' => 'Booking, local action, contact, directory nav, local action; last CTA local action.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Visit/booking emphasis; booking CTA early.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Visit/booking emphasis; booking CTA early.',
+			)
 		);
 	}
 
@@ -798,7 +846,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_local_action_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_location_service_01',
 			'Location detail (location + service)',
@@ -809,13 +857,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single location with service link. Service offering and service CTA; consultation, booking, contact, local CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Location + service combination; service and local conversion paths.',
-				'cta_direction_summary'  => 'Service detail, consultation, booking, contact, local action; last CTA local.',
+				'page_purpose_summary'  => 'Single location with service link. Service offering and service CTA; consultation, booking, contact, local CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Location + service combination; service and local conversion paths.',
+				'cta_direction_summary' => 'Service detail, consultation, booking, contact, local action; last CTA local.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Location + service; service offering and local action.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Location + service; service offering and local action.',
+			)
 		);
 	}
 
@@ -840,7 +891,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'tp_guarantee_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_informational_01',
 			'Informational detail',
@@ -851,13 +902,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Informational detail page. Value and process; consultation, service, quote, booking, contact CTAs; guarantee before final CTA.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Informational entity detail; conversion path after education.',
-				'cta_direction_summary'  => 'Consultation, service detail, quote, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Informational detail page. Value and process; consultation, service, quote, booking, contact CTAs; guarantee before final CTA.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Informational entity detail; conversion path after education.',
+				'cta_direction_summary' => 'Consultation, service detail, quote, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Informational; value and process balanced.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Informational; value and process balanced.',
+			)
 		);
 	}
 
@@ -880,7 +934,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_informational_educational_01',
 			'Informational detail (educational)',
@@ -891,13 +945,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Informational detail educational. Process and expectations before CTAs; consultation, quote, service, contact.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Educational emphasis; conversion after learning.',
-				'cta_direction_summary'  => 'Consultation, quote, booking, service detail, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Informational detail educational. Process and expectations before CTAs; consultation, quote, service, contact.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Educational emphasis; conversion after learning.',
+				'cta_direction_summary' => 'Consultation, quote, booking, service detail, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Educational; process and expectations lead.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Educational; process and expectations lead.',
+			)
 		);
 	}
 
@@ -920,7 +977,7 @@ final class Child_Detail_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_informational_proof_01',
 			'Informational detail (proof-led)',
@@ -931,13 +988,16 @@ final class Child_Detail_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Informational detail proof-led. Trust, testimonial, guarantee, logos before CTAs; consultation, quote, service, contact.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'   => 'Proof-first; trust and guarantee support conversion.',
-				'cta_direction_summary'  => 'Consultation, quote, service detail, booking, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Informational detail proof-led. Trust, testimonial, guarantee, logos before CTAs; consultation, quote, service, contact.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Proof-first; trust and guarantee support conversion.',
+				'cta_direction_summary' => 'Consultation, quote, service detail, booking, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Proof-led; trust, testimonial, guarantee, logos.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Proof-led; trust, testimonial, guarantee, logos.',
+			)
 		);
 	}
 }

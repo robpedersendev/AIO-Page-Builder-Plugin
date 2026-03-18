@@ -35,7 +35,7 @@ final class Native_Block_Assembly_Pipeline {
 
 	/**
 	 * @param GenerateBlocks_Compatibility_Layer|null $gb_layer Optional; when set and available, eligible sections emit GenerateBlocks-compatible markup.
-	 * @param Form_Provider_Registry|null            $form_provider_registry Optional; when set, sections with form_provider + form_id emit form shortcode (form-provider-integration-contract.md).
+	 * @param Form_Provider_Registry|null             $form_provider_registry Optional; when set, sections with form_provider + form_id emit form shortcode (form-provider-integration-contract.md).
 	 */
 	public function __construct( ?GenerateBlocks_Compatibility_Layer $gb_layer = null, ?Form_Provider_Registry $form_provider_registry = null ) {
 		$this->gb_layer               = $gb_layer;
@@ -45,8 +45,8 @@ final class Native_Block_Assembly_Pipeline {
 	/**
 	 * Assembles ordered section results into page-level block content.
 	 *
-	 * @param string                    $source_type   One of Page_Block_Assembly_Result::SOURCE_TYPE_*.
-	 * @param string                    $source_key    Template internal_key or composition_id.
+	 * @param string                             $source_type   One of Page_Block_Assembly_Result::SOURCE_TYPE_*.
+	 * @param string                             $source_key    Template internal_key or composition_id.
 	 * @param array<Section_Render_Result|array> $ordered_section_results Ordered section render results (object or to_array() shape).
 	 * @return Page_Block_Assembly_Result
 	 */
@@ -126,12 +126,20 @@ final class Native_Block_Assembly_Pipeline {
 		$a11y      = isset( $item['accessibility_notes'] ) && is_array( $item['accessibility_notes'] ) ? $item['accessibility_notes'] : array();
 		$errs      = isset( $item['errors'] ) && is_array( $item['errors'] ) ? $item['errors'] : array();
 		$structure = array(
-			'wrapper_attrs'       => is_array( $wrapper ) ? $wrapper : array( 'class' => array(), 'id' => '', 'data_attributes' => array() ),
-			'selector_map'        => is_array( $selector ) ? $selector : array( 'wrapper_class' => '', 'inner_class' => '', 'element_classes' => array() ),
+			'wrapper_attrs'       => is_array( $wrapper ) ? $wrapper : array(
+				'class'           => array(),
+				'id'              => '',
+				'data_attributes' => array(),
+			),
+			'selector_map'        => is_array( $selector ) ? $selector : array(
+				'wrapper_class'   => '',
+				'inner_class'     => '',
+				'element_classes' => array(),
+			),
 			'structural_nodes'    => is_array( $nodes ) ? $nodes : array(),
 			'structural_hint'     => $hint,
 			'asset_hints'         => $assets,
-			'accessibility_notes'  => $a11y,
+			'accessibility_notes' => $a11y,
 			'section_style_block' => isset( $item['section_style_block'] ) && is_string( $item['section_style_block'] ) ? $item['section_style_block'] : '',
 		);
 		return new Section_Render_Result( $key, $variant, $position, $fields, $structure, $errs );
@@ -194,7 +202,7 @@ final class Native_Block_Assembly_Pipeline {
 			$provider = isset( $field_values[ Form_Provider_Registry::FIELD_FORM_PROVIDER ] )
 				? trim( (string) $field_values[ Form_Provider_Registry::FIELD_FORM_PROVIDER ] )
 				: '';
-			$form_id = isset( $field_values[ Form_Provider_Registry::FIELD_FORM_ID ] )
+			$form_id  = isset( $field_values[ Form_Provider_Registry::FIELD_FORM_ID ] )
 				? trim( (string) $field_values[ Form_Provider_Registry::FIELD_FORM_ID ] )
 				: '';
 			if ( $provider !== '' && $form_id !== '' ) {

@@ -31,8 +31,8 @@ final class Onboarding_Prefill_Service {
 	private $crawl_snapshot_service;
 
 	public function __construct( Profile_Store $profile_store, Settings_Service $settings, ?Crawl_Snapshot_Service $crawl_snapshot_service = null ) {
-		$this->profile_store         = $profile_store;
-		$this->settings              = $settings;
+		$this->profile_store          = $profile_store;
+		$this->settings               = $settings;
 		$this->crawl_snapshot_service = $crawl_snapshot_service;
 	}
 
@@ -43,11 +43,11 @@ final class Onboarding_Prefill_Service {
 	 * @return array<string, mixed> Keys: profile (brand_profile, business_profile), current_site_url, crawl_run_ids, latest_crawl_run_id, provider_refs.
 	 */
 	public function get_prefill_data( ?array $draft = null ): array {
-		$profile = $this->profile_store->get_full_profile();
-		$business = $profile['business_profile'] ?? array();
+		$profile          = $this->profile_store->get_full_profile();
+		$business         = $profile['business_profile'] ?? array();
 		$current_site_url = isset( $business['current_site_url'] ) && is_string( $business['current_site_url'] ) ? $business['current_site_url'] : '';
 
-		$crawl_run_ids = array();
+		$crawl_run_ids       = array();
 		$latest_crawl_run_id = null;
 		if ( $this->crawl_snapshot_service !== null ) {
 			$sessions = $this->crawl_snapshot_service->list_sessions( 20 );
@@ -68,11 +68,11 @@ final class Onboarding_Prefill_Service {
 		$provider_refs = $this->get_provider_refs();
 
 		return array(
-			'profile'              => $profile,
-			'current_site_url'     => $current_site_url,
-			'crawl_run_ids'        => $crawl_run_ids,
-			'latest_crawl_run_id'  => $latest_crawl_run_id,
-			'provider_refs'        => $provider_refs,
+			'profile'             => $profile,
+			'current_site_url'    => $current_site_url,
+			'crawl_run_ids'       => $crawl_run_ids,
+			'latest_crawl_run_id' => $latest_crawl_run_id,
+			'provider_refs'       => $provider_refs,
 		);
 	}
 
@@ -83,13 +83,13 @@ final class Onboarding_Prefill_Service {
 	 */
 	private function get_provider_refs(): array {
 		$config = $this->settings->get( Option_Names::PROVIDER_CONFIG_REF );
-		$refs = array();
+		$refs   = array();
 		if ( isset( $config['providers'] ) && is_array( $config['providers'] ) ) {
 			foreach ( $config['providers'] as $p ) {
 				if ( is_array( $p ) && isset( $p['provider_id'] ) && is_string( $p['provider_id'] ) ) {
 					$refs[] = array(
-						'provider_id'       => \sanitize_text_field( $p['provider_id'] ),
-						'credential_state'  => isset( $p['credential_state'] ) && is_string( $p['credential_state'] ) ? $p['credential_state'] : 'absent',
+						'provider_id'      => \sanitize_text_field( $p['provider_id'] ),
+						'credential_state' => isset( $p['credential_state'] ) && is_string( $p['credential_state'] ) ? $p['credential_state'] : 'absent',
 					);
 				}
 			}

@@ -89,7 +89,7 @@ final class Template_Diff_Context {
 			'template_family'     => $this->template_family,
 			'template_variation'  => $this->template_variation,
 			'cta_pattern_shift'   => $this->cta_pattern_shift,
-			'version_context'    => $this->version_context,
+			'version_context'     => $this->version_context,
 			'deprecation_context' => $this->deprecation_context,
 		);
 	}
@@ -105,7 +105,7 @@ final class Template_Diff_Context {
 			'template_family'     => 'services',
 			'template_variation'  => 'hub',
 			'cta_pattern_shift'   => false,
-			'version_context'    => 'stable_key_retained',
+			'version_context'     => 'stable_key_retained',
 			'deprecation_context' => '',
 		);
 	}

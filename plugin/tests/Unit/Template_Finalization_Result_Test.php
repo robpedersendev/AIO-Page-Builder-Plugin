@@ -22,33 +22,64 @@ final class Template_Finalization_Result_Test extends TestCase {
 	/** Example finalization summary payload (spec §59.10; Prompt 208). */
 	public static function example_finalization_summary_payload(): array {
 		return array(
-			'finalization_summary' => array(
-				'created'   => 3,
-				'replaced'  => 1,
-				'updated'   => 2,
-				'skipped'   => 0,
-				'failed'    => 0,
-				'pending'   => 0,
-				'published' => 2,
+			'finalization_summary'              => array(
+				'created'                       => 3,
+				'replaced'                      => 1,
+				'updated'                       => 2,
+				'skipped'                       => 0,
+				'failed'                        => 0,
+				'pending'                       => 0,
+				'published'                     => 2,
 				'completed_without_publication' => 4,
-				'blocked'   => 0,
-				'denied'    => 0,
+				'blocked'                       => 0,
+				'denied'                        => 0,
 			),
 			'template_execution_closure_record' => array(
-				array( 'plan_item_id' => 'item-1', 'item_type' => 'new_page', 'action_taken' => 'create', 'template_key' => 'tpl_services_hub', 'template_family' => 'services', 'post_id' => 10, 'one_pager_ref' => 'doc/one-pager-services-hub' ),
-				array( 'plan_item_id' => 'item-2', 'item_type' => 'existing_page_change', 'action_taken' => 'replace', 'template_key' => 'tpl_about', 'post_id' => 11 ),
+				array(
+					'plan_item_id'    => 'item-1',
+					'item_type'       => 'new_page',
+					'action_taken'    => 'create',
+					'template_key'    => 'tpl_services_hub',
+					'template_family' => 'services',
+					'post_id'         => 10,
+					'one_pager_ref'   => 'doc/one-pager-services-hub',
+				),
+				array(
+					'plan_item_id' => 'item-2',
+					'item_type'    => 'existing_page_change',
+					'action_taken' => 'replace',
+					'template_key' => 'tpl_about',
+					'post_id'      => 11,
+				),
 			),
-			'run_completion_state' => Template_Finalization_Result::RUN_STATE_COMPLETE,
-			'one_pager_retention_summary' => array(
-				'tpl_services_hub' => array( 'count' => 2, 'one_pager_refs' => array( 'doc/one-pager-services-hub' ) ),
+			'run_completion_state'              => Template_Finalization_Result::RUN_STATE_COMPLETE,
+			'one_pager_retention_summary'       => array(
+				'tpl_services_hub' => array(
+					'count'          => 2,
+					'one_pager_refs' => array( 'doc/one-pager-services-hub' ),
+				),
 			),
 		);
 	}
 
 	public function test_to_payload_includes_all_stable_keys(): void {
-		$summary = array( 'created' => 1, 'replaced' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0, 'pending' => 0, 'blocked' => 0, 'denied' => 0 );
-		$closure = array( array( 'plan_item_id' => 'i1', 'action_taken' => 'create' ) );
-		$result = new Template_Finalization_Result( $summary, $closure, Template_Finalization_Result::RUN_STATE_COMPLETE, array() );
+		$summary = array(
+			'created'  => 1,
+			'replaced' => 0,
+			'updated'  => 0,
+			'skipped'  => 0,
+			'failed'   => 0,
+			'pending'  => 0,
+			'blocked'  => 0,
+			'denied'   => 0,
+		);
+		$closure = array(
+			array(
+				'plan_item_id' => 'i1',
+				'action_taken' => 'create',
+			),
+		);
+		$result  = new Template_Finalization_Result( $summary, $closure, Template_Finalization_Result::RUN_STATE_COMPLETE, array() );
 		$payload = $result->to_payload();
 		$this->assertArrayHasKey( 'finalization_summary', $payload );
 		$this->assertArrayHasKey( 'template_execution_closure_record', $payload );

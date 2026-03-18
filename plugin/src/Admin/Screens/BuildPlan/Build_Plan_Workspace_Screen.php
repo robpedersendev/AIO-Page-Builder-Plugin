@@ -343,8 +343,8 @@ final class Build_Plan_Workspace_Screen {
 				\wp_safe_redirect( \add_query_arg( 'rollback_error', 'ineligible', $redirect_url ) );
 				exit;
 			}
-			$target_ref = $eligibility->get_execution_ref() !== '' ? $eligibility->get_execution_ref() : ( $eligibility->get_pre_snapshot_id() . ':' . $eligibility->get_post_snapshot_id() );
-			$payload    = array(
+			$target_ref    = $eligibility->get_execution_ref() !== '' ? $eligibility->get_execution_ref() : ( $eligibility->get_pre_snapshot_id() . ':' . $eligibility->get_post_snapshot_id() );
+			$payload       = array(
 				'pre_snapshot_id'      => $pre_snapshot_id,
 				'post_snapshot_id'     => $post_snapshot_id,
 				'rollback_handler_key' => $eligibility->get_rollback_handler_key(),
@@ -353,8 +353,11 @@ final class Build_Plan_Workspace_Screen {
 				'build_plan_ref'       => $plan_id,
 				'plan_item_ref'        => '',
 			);
-			$actor_context = array( 'actor_type' => 'user', 'actor_id' => (string) \get_current_user_id() );
-			$result = $this->container->get( 'execution_queue_service' )->request_rollback( $payload, $actor_context, array( 'run_immediately' => true ) );
+			$actor_context = array(
+				'actor_type' => 'user',
+				'actor_id'   => (string) \get_current_user_id(),
+			);
+			$result        = $this->container->get( 'execution_queue_service' )->request_rollback( $payload, $actor_context, array( 'run_immediately' => true ) );
 			if ( isset( $result['status'] ) && $result['status'] === 'completed' ) {
 				\wp_safe_redirect( \add_query_arg( 'rollback_done', '1', $redirect_url ) );
 				exit;
@@ -407,13 +410,13 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	private function render_shell( array $state, int $active_step_index ): void {
-		$plan_id   = (string) ( $state['plan_id'] ?? '' );
-		$rail      = $state['context_rail'] ?? array();
-		$steps     = $state['stepper_steps'] ?? array();
-		$definition = $state['plan_definition'] ?? array();
-		$current_step = $steps[ $active_step_index ] ?? null;
-		$base_url  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) );
-		$can_export = \current_user_can( Capabilities::EXPORT_DATA ) || \current_user_can( Capabilities::DOWNLOAD_ARTIFACTS );
+		$plan_id            = (string) ( $state['plan_id'] ?? '' );
+		$rail               = $state['context_rail'] ?? array();
+		$steps              = $state['stepper_steps'] ?? array();
+		$definition         = $state['plan_definition'] ?? array();
+		$current_step       = $steps[ $active_step_index ] ?? null;
+		$base_url           = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) );
+		$can_export         = \current_user_can( Capabilities::EXPORT_DATA ) || \current_user_can( Capabilities::DOWNLOAD_ARTIFACTS );
 		$can_view_artifacts = \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
 		?>
 		<div class="wrap aio-page-builder-screen aio-build-plan-workspace aio-build-plan-three-zone">
@@ -497,14 +500,14 @@ final class Build_Plan_Workspace_Screen {
 			<ol class="aio-stepper-list">
 				<?php foreach ( $steps as $idx => $step ) : ?>
 					<?php
-					$step_type   = (string) ( $step['step_type'] ?? '' );
-					$title       = (string) ( $step['title'] ?? $step_type );
-					$badge       = (string) ( $step['status_badge'] ?? '' );
-					$unresolved  = (int) ( $step['unresolved_count'] ?? 0 );
-					$is_blocked  = ! empty( $step['is_blocked'] );
-					$is_active   = $idx === $active_index;
-					$step_url    = $base_url . '&step=' . $idx;
-					$can_go      = $idx <= $active_index || ! $is_blocked;
+					$step_type  = (string) ( $step['step_type'] ?? '' );
+					$title      = (string) ( $step['title'] ?? $step_type );
+					$badge      = (string) ( $step['status_badge'] ?? '' );
+					$unresolved = (int) ( $step['unresolved_count'] ?? 0 );
+					$is_blocked = ! empty( $step['is_blocked'] );
+					$is_active  = $idx === $active_index;
+					$step_url   = $base_url . '&step=' . $idx;
+					$can_go     = $idx <= $active_index || ! $is_blocked;
 					?>
 					<li class="aio-stepper-item <?php echo $is_active ? 'aio-stepper-item-active' : ''; ?> <?php echo $is_blocked ? 'aio-stepper-item-blocked' : ''; ?>">
 						<?php if ( $can_go ) : ?>
@@ -538,7 +541,7 @@ final class Build_Plan_Workspace_Screen {
 			echo '<p class="aio-empty-state">' . \esc_html__( 'No step selected.', 'aio-page-builder' ) . '</p>';
 			return;
 		}
-		$step_type = (string) ( $current_step['step_type'] ?? '' );
+		$step_type  = (string) ( $current_step['step_type'] ?? '' );
 		$is_blocked = ! empty( $current_step['is_blocked'] );
 		$unresolved = (int) ( $current_step['unresolved_count'] ?? 0 );
 
@@ -577,9 +580,9 @@ final class Build_Plan_Workspace_Screen {
 	 * @param array<string, mixed> $definition Plan definition.
 	 */
 	private function render_actionable_step_workspace( array $state, array $current_step, int $active_step_index, array $definition ): void {
-		$plan_id = (string) ( $state['plan_id'] ?? $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' );
-		$unresolved = (int) ( $current_step['unresolved_count'] ?? 0 );
-		$step_type = (string) ( $current_step['step_type'] ?? '' );
+		$plan_id           = (string) ( $state['plan_id'] ?? $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' );
+		$unresolved        = (int) ( $current_step['unresolved_count'] ?? 0 );
+		$step_type         = (string) ( $current_step['step_type'] ?? '' );
 		$always_show_shell = in_array( $step_type, array( Build_Plan_Schema::STEP_TYPE_CONFIRMATION, Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK ), true );
 		if ( $unresolved === 0 && ! $always_show_shell ) {
 			echo '<div class="aio-empty-state"><p>' . \esc_html__( 'All recommendations in this step have already been resolved.', 'aio-page-builder' ) . '</p></div>';
@@ -599,13 +602,13 @@ final class Build_Plan_Workspace_Screen {
 			$selected_ids = array_values( array_filter( $selected_ids ) );
 		}
 		$capabilities = array(
-			'can_approve'         => \current_user_can( Capabilities::APPROVE_BUILD_PLANS ),
-			'can_execute'         => \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ),
-			'can_view_artifacts'  => \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ),
-			'can_rollback'        => \current_user_can( Capabilities::EXECUTE_ROLLBACKS ),
+			'can_approve'        => \current_user_can( Capabilities::APPROVE_BUILD_PLANS ),
+			'can_execute'        => \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ),
+			'can_view_artifacts' => \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ),
+			'can_rollback'       => \current_user_can( Capabilities::EXECUTE_ROLLBACKS ),
 		);
-		$builder = $this->container->get( 'build_plan_ui_state_builder' );
-		$workspace = $builder->build_step_workspace( $plan_id, $active_step_index, $capabilities, $detail_item_id, $selected_ids );
+		$builder      = $this->container->get( 'build_plan_ui_state_builder' );
+		$workspace    = $builder->build_step_workspace( $plan_id, $active_step_index, $capabilities, $detail_item_id, $selected_ids );
 
 		$step_type = (string) ( $current_step['step_type'] ?? '' );
 		if ( $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ) {
@@ -621,12 +624,12 @@ final class Build_Plan_Workspace_Screen {
 			$this->inject_rollback_entry_data( $workspace, $plan_id );
 		}
 
-		$step_messages = $workspace['step_messages'] ?? array();
-		$list_payload  = array(
+		$step_messages  = $workspace['step_messages'] ?? array();
+		$list_payload   = array(
 			Step_Item_List_Component::KEY_STEP_LIST_ROWS => $workspace['step_list_rows'] ?? array(),
 			Step_Item_List_Component::KEY_COLUMN_ORDER   => $workspace['column_order'] ?? array(),
 		);
-		$bulk_payload  = array( Bulk_Action_Bar_Component::KEY_BULK_ACTION_STATES => $workspace['bulk_action_states'] ?? array() );
+		$bulk_payload   = array( Bulk_Action_Bar_Component::KEY_BULK_ACTION_STATES => $workspace['bulk_action_states'] ?? array() );
 		$detail_payload = $workspace['detail_panel'] ?? array();
 
 		$message_component = new Step_Message_Component();
@@ -671,12 +674,12 @@ final class Build_Plan_Workspace_Screen {
 	 * Injects approve/deny action URLs with nonce into Step 1 workspace payload (row_actions and detail_panel).
 	 *
 	 * @param array<string, mixed> $workspace Workspace payload (mutated).
-	 * @param string              $plan_id   Plan ID.
+	 * @param string               $plan_id   Plan ID.
 	 */
 	private function inject_step1_action_urls( array &$workspace, string $plan_id ): void {
-		$base = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
+		$base  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
 		$nonce = \wp_create_nonce( self::NONCE_ACTION_STEP1_REVIEW );
-		$rows = &$workspace['step_list_rows'];
+		$rows  = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
 				$item_id = (string) ( $row['item_id'] ?? '' );
@@ -685,19 +688,25 @@ final class Build_Plan_Workspace_Screen {
 				}
 				$actions = isset( $row['row_actions'] ) && is_array( $row['row_actions'] ) ? $row['row_actions'] : array();
 				$workspace['step_list_rows'][ $i ]['row_actions'] = $this->add_urls_to_approve_deny( $actions, $item_id, $base, $nonce );
-				$template_key = (string) ( $row['summary_columns']['target_template'] ?? $row['existing_page_template_change_summary']['template_key'] ?? '' );
+				$template_key                                     = (string) ( $row['summary_columns']['target_template'] ?? $row['existing_page_template_change_summary']['template_key'] ?? '' );
 				if ( $template_key !== '' ) {
-					$detail_url = \add_query_arg( array( 'page' => Page_Template_Detail_Screen::SLUG, 'template' => $template_key ), \admin_url( 'admin.php' ) );
+					$detail_url  = \add_query_arg(
+						array(
+							'page'     => Page_Template_Detail_Screen::SLUG,
+							'template' => $template_key,
+						),
+						\admin_url( 'admin.php' )
+					);
 					$compare_url = Template_Compare_Screen::get_compare_add_url( 'page', $template_key );
-					$workspace['step_list_rows'][ $i ]['template_detail_url']     = $detail_url;
-					$workspace['step_list_rows'][ $i ]['template_compare_add_url'] = $compare_url;
+					$workspace['step_list_rows'][ $i ]['template_detail_url']               = $detail_url;
+					$workspace['step_list_rows'][ $i ]['template_compare_add_url']          = $compare_url;
 					$workspace['step_list_rows'][ $i ]['summary_columns']['template_links'] = '<a href="' . \esc_url( $detail_url ) . '">' . \esc_html__( 'View template', 'aio-page-builder' ) . '</a> | <a href="' . \esc_url( $compare_url ) . '">' . \esc_html__( 'Add to compare', 'aio-page-builder' ) . '</a>';
 				}
 			}
 		}
 		$detail = &$workspace['detail_panel'];
 		if ( is_array( $detail ) && isset( $detail['row_actions'] ) && is_array( $detail['row_actions'] ) ) {
-			$detail_item_id = (string) ( $detail['item_id'] ?? '' );
+			$detail_item_id        = (string) ( $detail['item_id'] ?? '' );
 			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
 		}
 	}
@@ -720,19 +729,25 @@ final class Build_Plan_Workspace_Screen {
 				}
 				$actions = isset( $row['row_actions'] ) && is_array( $row['row_actions'] ) ? $row['row_actions'] : array();
 				$workspace['step_list_rows'][ $i ]['row_actions'] = $this->add_urls_to_approve_deny( $actions, $item_id, $base, $nonce );
-				$template_key = (string) ( $row['summary_columns']['template_key'] ?? '' );
+				$template_key                                     = (string) ( $row['summary_columns']['template_key'] ?? '' );
 				if ( $template_key !== '' ) {
-					$detail_url = \add_query_arg( array( 'page' => Page_Template_Detail_Screen::SLUG, 'template' => $template_key ), \admin_url( 'admin.php' ) );
+					$detail_url  = \add_query_arg(
+						array(
+							'page'     => Page_Template_Detail_Screen::SLUG,
+							'template' => $template_key,
+						),
+						\admin_url( 'admin.php' )
+					);
 					$compare_url = Template_Compare_Screen::get_compare_add_url( 'page', $template_key );
-					$workspace['step_list_rows'][ $i ]['template_detail_url']     = $detail_url;
-					$workspace['step_list_rows'][ $i ]['template_compare_add_url'] = $compare_url;
+					$workspace['step_list_rows'][ $i ]['template_detail_url']               = $detail_url;
+					$workspace['step_list_rows'][ $i ]['template_compare_add_url']          = $compare_url;
 					$workspace['step_list_rows'][ $i ]['summary_columns']['template_links'] = '<a href="' . \esc_url( $detail_url ) . '">' . \esc_html__( 'View template', 'aio-page-builder' ) . '</a> | <a href="' . \esc_url( $compare_url ) . '">' . \esc_html__( 'Add to compare', 'aio-page-builder' ) . '</a>';
 				}
 			}
 		}
 		$detail = &$workspace['detail_panel'];
 		if ( is_array( $detail ) && isset( $detail['row_actions'] ) && is_array( $detail['row_actions'] ) ) {
-			$detail_item_id = (string) ( $detail['item_id'] ?? '' );
+			$detail_item_id        = (string) ( $detail['item_id'] ?? '' );
 			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
 		}
 	}
@@ -745,9 +760,9 @@ final class Build_Plan_Workspace_Screen {
 	 */
 	private function inject_navigation_action_urls( array &$workspace, string $plan_id ): void {
 		$nav_step_index = Navigation_Bulk_Action_Service::STEP_INDEX_NAVIGATION;
-		$base  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $nav_step_index );
-		$nonce = \wp_create_nonce( self::NONCE_ACTION_NAVIGATION_REVIEW );
-		$rows  = &$workspace['step_list_rows'];
+		$base           = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $nav_step_index );
+		$nonce          = \wp_create_nonce( self::NONCE_ACTION_NAVIGATION_REVIEW );
+		$rows           = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
 				$item_id = (string) ( $row['item_id'] ?? '' );
@@ -760,7 +775,7 @@ final class Build_Plan_Workspace_Screen {
 		}
 		$detail = &$workspace['detail_panel'];
 		if ( is_array( $detail ) && isset( $detail['row_actions'] ) && is_array( $detail['row_actions'] ) ) {
-			$detail_item_id = (string) ( $detail['item_id'] ?? '' );
+			$detail_item_id        = (string) ( $detail['item_id'] ?? '' );
 			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
 		}
 	}
@@ -772,10 +787,10 @@ final class Build_Plan_Workspace_Screen {
 	 * @param string               $plan_id  Plan ID.
 	 */
 	private function inject_rollback_entry_data( array &$workspace, string $plan_id ): void {
-		$step_7_index = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
+		$step_7_index                     = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
 		$workspace['rollback_nonce']      = \wp_create_nonce( self::NONCE_ACTION_ROLLBACK );
 		$workspace['rollback_action_url'] = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_7_index );
-		$rows = &$workspace['step_list_rows'];
+		$rows                             = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
 				$pre_id  = isset( $row['pre_snapshot_id'] ) ? (string) $row['pre_snapshot_id'] : '';
@@ -783,13 +798,13 @@ final class Build_Plan_Workspace_Screen {
 				$actions = isset( $row['row_actions'] ) && is_array( $row['row_actions'] ) ? $row['row_actions'] : array();
 				foreach ( $actions as $j => $action ) {
 					if ( ( (string) ( $action['action_id'] ?? '' ) ) === 'request_rollback' && $pre_id !== '' && $post_id !== '' ) {
-						$actions[ $j ]['form_post']   = true;
-						$actions[ $j ]['form_action'] = $workspace['rollback_action_url'];
+						$actions[ $j ]['form_post']     = true;
+						$actions[ $j ]['form_action']   = $workspace['rollback_action_url'];
 						$actions[ $j ]['hidden_fields'] = array(
-							'_wpnonce'            => $workspace['rollback_nonce'],
+							'_wpnonce'             => $workspace['rollback_nonce'],
 							'aio_rollback_request' => '1',
-							'pre_snapshot_id'     => $pre_id,
-							'post_snapshot_id'    => $post_id,
+							'pre_snapshot_id'      => $pre_id,
+							'post_snapshot_id'     => $post_id,
 						);
 						break;
 					}
@@ -801,7 +816,14 @@ final class Build_Plan_Workspace_Screen {
 		$rollback_err  = isset( $_GET['rollback_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['rollback_error'] ) ) : '';
 		$step_messages = isset( $workspace['step_messages'] ) && is_array( $workspace['step_messages'] ) ? $workspace['step_messages'] : array();
 		if ( $rollback_done ) {
-			array_unshift( $step_messages, array( 'severity' => 'success', 'message' => \__( 'Rollback completed successfully.', 'aio-page-builder' ), 'level' => 'step' ) );
+			array_unshift(
+				$step_messages,
+				array(
+					'severity' => 'success',
+					'message'  => \__( 'Rollback completed successfully.', 'aio-page-builder' ),
+					'level'    => 'step',
+				)
+			);
 		}
 		if ( $rollback_err !== '' ) {
 			$err_msg = $rollback_err === 'nonce' ? \__( 'Security check failed. Please try again.', 'aio-page-builder' )
@@ -809,7 +831,14 @@ final class Build_Plan_Workspace_Screen {
 				: ( $rollback_err === 'ineligible' ? \__( 'Rollback is not eligible for this pair.', 'aio-page-builder' )
 				: ( $rollback_err === 'unavailable' ? \__( 'Rollback service unavailable.', 'aio-page-builder' )
 				: \__( 'Rollback failed.', 'aio-page-builder' ) ) ) );
-			array_unshift( $step_messages, array( 'severity' => 'error', 'message' => $err_msg, 'level' => 'step' ) );
+			array_unshift(
+				$step_messages,
+				array(
+					'severity' => 'error',
+					'message'  => $err_msg,
+					'level'    => 'step',
+				)
+			);
 		}
 		$workspace['step_messages'] = $step_messages;
 	}
@@ -818,9 +847,9 @@ final class Build_Plan_Workspace_Screen {
 	 * Adds url to approve and deny actions when enabled.
 	 *
 	 * @param array<int, array<string, mixed>> $actions
-	 * @param string                            $item_id
-	 * @param string                            $base_url
-	 * @param string                            $nonce
+	 * @param string                           $item_id
+	 * @param string                           $base_url
+	 * @param string                           $nonce
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function add_urls_to_approve_deny( array $actions, string $item_id, string $base_url, string $nonce ): array {
@@ -844,14 +873,14 @@ final class Build_Plan_Workspace_Screen {
 	 * @param string                              $nonce_html  Escaped nonce field HTML.
 	 */
 	private function render_step1_bulk_forms( array $bulk_states, string $nonce_html ): void {
-		$make_all = $bulk_states['apply_to_all_eligible'] ?? array();
-		$deny_all = $bulk_states['deny_all_eligible'] ?? array();
-		$apply_sel = $bulk_states['apply_to_selected'] ?? array();
-		$clear_sel = $bulk_states['clear_selection'] ?? array();
+		$make_all     = $bulk_states['apply_to_all_eligible'] ?? array();
+		$deny_all     = $bulk_states['deny_all_eligible'] ?? array();
+		$apply_sel    = $bulk_states['apply_to_selected'] ?? array();
+		$clear_sel    = $bulk_states['clear_selection'] ?? array();
 		$make_enabled = ! empty( $make_all['enabled'] );
 		$deny_enabled = ! empty( $deny_all['enabled'] );
-		$make_count = (int) ( $make_all['count_eligible'] ?? 0 );
-		$deny_count = (int) ( $deny_all['count_eligible'] ?? 0 );
+		$make_count   = (int) ( $make_all['count_eligible'] ?? 0 );
+		$deny_count   = (int) ( $deny_all['count_eligible'] ?? 0 );
 		?>
 		<div class="aio-bulk-action-bar aio-step1-bulk-bar">
 			<form method="post" class="aio-bulk-form aio-bulk-make-all" style="display:inline">
@@ -888,16 +917,16 @@ final class Build_Plan_Workspace_Screen {
 	 * @param array<int, string>                  $selected_ids Currently selected item IDs from request.
 	 */
 	private function render_step2_bulk_forms( array $bulk_states, string $nonce_html, array $selected_ids ): void {
-		$build_all   = $bulk_states['apply_to_all_eligible'] ?? array();
-		$build_sel   = $bulk_states['apply_to_selected'] ?? array();
-		$clear_sel   = $bulk_states['clear_selection'] ?? array();
+		$build_all         = $bulk_states['apply_to_all_eligible'] ?? array();
+		$build_sel         = $bulk_states['apply_to_selected'] ?? array();
+		$clear_sel         = $bulk_states['clear_selection'] ?? array();
 		$build_all_enabled = ! empty( $build_all['enabled'] );
 		$build_sel_enabled = ! empty( $build_sel['enabled'] );
-		$clear_enabled    = ! empty( $clear_sel['enabled'] );
-		$build_all_count  = (int) ( $build_all['count_eligible'] ?? 0 );
-		$build_sel_count  = (int) ( $build_sel['count_selected'] ?? 0 );
-		$plan_id = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
-		$base_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
+		$clear_enabled     = ! empty( $clear_sel['enabled'] );
+		$build_all_count   = (int) ( $build_all['count_eligible'] ?? 0 );
+		$build_sel_count   = (int) ( $build_sel['count_selected'] ?? 0 );
+		$plan_id           = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
+		$base_url          = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
 		?>
 		<div class="aio-bulk-action-bar aio-step2-bulk-bar">
 			<form method="post" class="aio-bulk-form aio-bulk-build-all-step2" style="display:inline">
@@ -939,10 +968,10 @@ final class Build_Plan_Workspace_Screen {
 	 * @param string                              $nonce_html  Escaped nonce field HTML.
 	 */
 	private function render_navigation_bulk_forms( array $bulk_states, string $nonce_html ): void {
-		$apply_all = $bulk_states['apply_to_all_eligible'] ?? array();
-		$deny_all  = $bulk_states['deny_all_eligible'] ?? array();
-		$apply_sel = $bulk_states['apply_to_selected'] ?? array();
-		$clear_sel = $bulk_states['clear_selection'] ?? array();
+		$apply_all     = $bulk_states['apply_to_all_eligible'] ?? array();
+		$deny_all      = $bulk_states['deny_all_eligible'] ?? array();
+		$apply_sel     = $bulk_states['apply_to_selected'] ?? array();
+		$clear_sel     = $bulk_states['clear_selection'] ?? array();
 		$apply_enabled = ! empty( $apply_all['enabled'] );
 		$deny_enabled  = ! empty( $deny_all['enabled'] );
 		$clear_enabled = ! empty( $clear_sel['enabled'] );
@@ -989,7 +1018,7 @@ final class Build_Plan_Workspace_Screen {
 				}
 			}
 		}
-		$payload = is_array( $overview ) ? ( $overview['payload'] ?? array() ) : array();
+		$payload       = is_array( $overview ) ? ( $overview['payload'] ?? array() ) : array();
 		$planning_mode = (string) ( $payload['planning_mode'] ?? 'mixed' );
 		$confidence    = (string) ( $payload['overall_confidence'] ?? 'medium' );
 		?>
@@ -1011,7 +1040,7 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	private function render_confirmation_shell( array $definition ): void {
-		$status = (string) ( $definition[ Build_Plan_Schema::KEY_STATUS ] ?? '' );
+		$status    = (string) ( $definition[ Build_Plan_Schema::KEY_STATUS ] ?? '' );
 		$completed = $status === Build_Plan_Schema::STATUS_COMPLETED;
 		if ( $completed ) {
 			?>

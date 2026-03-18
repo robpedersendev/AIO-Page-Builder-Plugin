@@ -41,14 +41,14 @@ final class Restore_Result {
 	private array $template_library_restore_summary;
 
 	/**
-	 * @param bool   $success
-	 * @param string $message
-	 * @param list<string> $restored_categories
+	 * @param bool                        $success
+	 * @param string                      $message
+	 * @param list<string>                $restored_categories
 	 * @param list<array<string, string>> $resolved_actions
-	 * @param bool   $validation_passed
-	 * @param list<string> $blocking_failures
-	 * @param string $log_reference
-	 * @param array<string, mixed> $template_library_restore_summary Optional template-library validation summary.
+	 * @param bool                        $validation_passed
+	 * @param list<string>                $blocking_failures
+	 * @param string                      $log_reference
+	 * @param array<string, mixed>        $template_library_restore_summary Optional template-library validation summary.
 	 */
 	public function __construct(
 		bool $success,
@@ -60,14 +60,14 @@ final class Restore_Result {
 		string $log_reference,
 		array $template_library_restore_summary = array()
 	) {
-		$this->success                           = $success;
-		$this->message                           = $message;
-		$this->restored_categories               = $restored_categories;
-		$this->resolved_actions                  = $resolved_actions;
-		$this->validation_passed                 = $validation_passed;
-		$this->blocking_failures                 = $blocking_failures;
-		$this->log_reference                     = $log_reference;
-		$this->template_library_restore_summary  = $template_library_restore_summary;
+		$this->success                          = $success;
+		$this->message                          = $message;
+		$this->restored_categories              = $restored_categories;
+		$this->resolved_actions                 = $resolved_actions;
+		$this->validation_passed                = $validation_passed;
+		$this->blocking_failures                = $blocking_failures;
+		$this->log_reference                    = $log_reference;
+		$this->template_library_restore_summary = $template_library_restore_summary;
 	}
 
 	public function is_success(): bool {
@@ -113,14 +113,14 @@ final class Restore_Result {
 	 */
 	public function to_payload(): array {
 		return array(
-			'success'                           => $this->success,
-			'message'                           => $this->message,
-			'restored_categories'               => $this->restored_categories,
-			'resolved_actions'                   => $this->resolved_actions,
-			'validation_passed'                 => $this->validation_passed,
-			'blocking_failures'                 => $this->blocking_failures,
-			'log_reference'                     => $this->log_reference,
-			'template_library_restore_summary'  => $this->template_library_restore_summary,
+			'success'                          => $this->success,
+			'message'                          => $this->message,
+			'restored_categories'              => $this->restored_categories,
+			'resolved_actions'                 => $this->resolved_actions,
+			'validation_passed'                => $this->validation_passed,
+			'blocking_failures'                => $this->blocking_failures,
+			'log_reference'                    => $this->log_reference,
+			'template_library_restore_summary' => $this->template_library_restore_summary,
 		);
 	}
 

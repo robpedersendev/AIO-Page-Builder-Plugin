@@ -53,14 +53,14 @@ final class Page_Template_Detail_Screen {
 		}
 
 		$template_key = isset( $_GET['template'] ) ? \sanitize_key( (string) $_GET['template'] ) : '';
-		$request = array(
+		$request      = array(
 			'category_class' => isset( $_GET['category_class'] ) ? \sanitize_key( (string) $_GET['category_class'] ) : '',
 			'family'         => isset( $_GET['family'] ) ? \sanitize_key( (string) $_GET['family'] ) : '',
 			'reduced_motion' => isset( $_GET['reduced_motion'] ) && (string) $_GET['reduced_motion'] === '1',
 		);
 
 		$state_builder = $this->get_state_builder();
-		$state = $state_builder->build_state( $template_key, $request );
+		$state         = $state_builder->build_state( $template_key, $request );
 
 		if ( ! empty( $state['not_found'] ) ) {
 			$this->render_not_found( $state );
@@ -136,22 +136,34 @@ final class Page_Template_Detail_Screen {
 	 * @return void
 	 */
 	private function render_metadata_panel( array $state ): void {
-		$side_panel = $state['side_panel'] ?? array();
-		$name       = (string) ( $side_panel['name'] ?? $state['template_key'] ?? '' );
-		$template_key = (string) ( $state['template_key'] ?? '' );
-		$desc       = (string) ( $side_panel['description'] ?? '' );
-		$purpose_cta = (string) ( $side_panel['purpose_cta_direction'] ?? '' );
-		$category   = (string) ( $side_panel['category'] ?? '' );
+		$side_panel      = $state['side_panel'] ?? array();
+		$name            = (string) ( $side_panel['name'] ?? $state['template_key'] ?? '' );
+		$template_key    = (string) ( $state['template_key'] ?? '' );
+		$desc            = (string) ( $side_panel['description'] ?? '' );
+		$purpose_cta     = (string) ( $side_panel['purpose_cta_direction'] ?? '' );
+		$category        = (string) ( $side_panel['category'] ?? '' );
 		$differentiation = (string) ( $side_panel['differentiation_notes'] ?? '' );
-		$used_sections = $state['used_sections'] ?? array();
-		$one_pager_link = (string) ( $state['one_pager_link'] ?? '' );
-		$in_compare = $template_key !== '' && \in_array( $template_key, Template_Compare_Screen::get_compare_list( 'page' ), true );
+		$used_sections   = $state['used_sections'] ?? array();
+		$one_pager_link  = (string) ( $state['one_pager_link'] ?? '' );
+		$in_compare      = $template_key !== '' && \in_array( $template_key, Template_Compare_Screen::get_compare_list( 'page' ), true );
 		?>
 		<section class="aio-metadata-section">
 			<h2 class="aio-metadata-title"><?php echo \esc_html( $name ); ?></h2>
 			<?php if ( $template_key !== '' ) : ?>
 				<p class="aio-compare-actions">
-					<a href="<?php echo \esc_url( \add_query_arg( array( 'page' => Template_Compare_Screen::SLUG, 'type' => 'page' ), \admin_url( 'admin.php' ) ) ); ?>"><?php \esc_html_e( 'Compare workspace', 'aio-page-builder' ); ?></a>
+					<a href="
+					<?php
+					echo \esc_url(
+						\add_query_arg(
+							array(
+								'page' => Template_Compare_Screen::SLUG,
+								'type' => 'page',
+							),
+							\admin_url( 'admin.php' )
+						)
+					);
+					?>
+								"><?php \esc_html_e( 'Compare workspace', 'aio-page-builder' ); ?></a>
 					<?php if ( $in_compare ) : ?>
 						| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'page', $template_key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 					<?php else : ?>
@@ -181,7 +193,7 @@ final class Page_Template_Detail_Screen {
 				<ol class="aio-used-sections-list">
 					<?php foreach ( $used_sections as $item ) : ?>
 						<?php
-						$sk = (string) ( $item['section_key'] ?? '' );
+						$sk  = (string) ( $item['section_key'] ?? '' );
 						$pos = isset( $item['position'] ) ? (int) $item['position'] : 0;
 						?>
 						<li><code><?php echo \esc_html( $sk ); ?></code> (<?php echo (int) $pos; ?>)</li>
@@ -214,13 +226,19 @@ final class Page_Template_Detail_Screen {
 	 * @return void
 	 */
 	private function render_entity_style_panel( array $entity_style ): void {
-		$save_action   = (string) ( $entity_style['save_action'] ?? '' );
-		$nonce_action  = (string) ( $entity_style['nonce_action'] ?? '' );
-		$errors        = $entity_style['validation_errors'] ?? array();
+		$save_action    = (string) ( $entity_style['save_action'] ?? '' );
+		$nonce_action   = (string) ( $entity_style['nonce_action'] ?? '' );
+		$errors         = $entity_style['validation_errors'] ?? array();
 		$token_by_group = $entity_style['token_fields_by_group'] ?? array();
 		$comp_by_comp   = $entity_style['component_fields_by_component'] ?? array();
-		$entity_key    = (string) ( $entity_style['entity_key'] ?? '' );
-		$detail_url    = \add_query_arg( array( 'page' => self::SLUG, 'template' => $entity_key ), \admin_url( 'admin.php' ) );
+		$entity_key     = (string) ( $entity_style['entity_key'] ?? '' );
+		$detail_url     = \add_query_arg(
+			array(
+				'page'     => self::SLUG,
+				'template' => $entity_key,
+			),
+			\admin_url( 'admin.php' )
+		);
 		?>
 		<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Per-entity styling', 'aio-page-builder' ); ?></h3>
 		<?php
@@ -271,8 +289,8 @@ final class Page_Template_Detail_Screen {
 	 * @return void
 	 */
 	private function render_preview_panel( array $state ): void {
-		$html = (string) ( $state['rendered_preview_html'] ?? '' );
-		$template_key = (string) ( $state['template_key'] ?? '' );
+		$html          = (string) ( $state['rendered_preview_html'] ?? '' );
+		$template_key  = (string) ( $state['template_key'] ?? '' );
 		$style_context = $this->get_preview_style_context( 'page', $template_key );
 		?>
 		<section class="aio-preview-section" aria-label="<?php \esc_attr_e( 'Rendered preview', 'aio-page-builder' ); ?>">
@@ -314,7 +332,7 @@ final class Page_Template_Detail_Screen {
 	/**
 	 * Processes POST save for per-entity styling. Redirects on success; sets $last_result on validation failure.
 	 *
-	 * @param string                $template_key
+	 * @param string                                                      $template_key
 	 * @param \AIOPageBuilder\Domain\Styling\Style_Validation_Result|null $last_result Set when validation fails (by reference).
 	 * @return bool True if redirect was sent; false to continue rendering.
 	 */
@@ -329,7 +347,7 @@ final class Page_Template_Detail_Screen {
 		if ( ! isset( $_POST[ $nonce_key ] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ $nonce_key ] ) ), $nonce_key ) ) {
 			return false;
 		}
-		$raw = isset( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] ) && \is_array( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] )
+		$raw        = isset( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] ) && \is_array( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] )
 			? \wp_unslash( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] )
 			: array();
 		$normalizer = $this->container && $this->container->has( 'styles_json_normalizer' ) ? $this->container->get( 'styles_json_normalizer' ) : null;
@@ -342,7 +360,14 @@ final class Page_Template_Detail_Screen {
 		$result     = $sanitizer->sanitize_entity_payload( $normalized );
 		if ( $result->is_valid() ) {
 			$repo->persist_entity_payload_result( 'page_template', $template_key, $result );
-			$url = \add_query_arg( array( 'page' => self::SLUG, 'template' => $template_key, self::ENTITY_STYLE_QUERY_MSG => 'saved' ), \admin_url( 'admin.php' ) );
+			$url = \add_query_arg(
+				array(
+					'page'                       => self::SLUG,
+					'template'                   => $template_key,
+					self::ENTITY_STYLE_QUERY_MSG => 'saved',
+				),
+				\admin_url( 'admin.php' )
+			);
 			\wp_safe_redirect( $url );
 			exit;
 		}
@@ -353,7 +378,7 @@ final class Page_Template_Detail_Screen {
 	/**
 	 * Builds entity style UI state for the given page template. Returns null if styling services unavailable.
 	 *
-	 * @param string                                                                 $template_key
+	 * @param string                                                      $template_key
 	 * @param \AIOPageBuilder\Domain\Styling\Style_Validation_Result|null $last_result
 	 * @return array<string, mixed>|null
 	 */
@@ -400,13 +425,13 @@ final class Page_Template_Detail_Screen {
 	 * @return void
 	 */
 	private function render_industry_preview_block( array $industry_preview ): void {
-		$fit    = (string) ( $industry_preview['recommendation_fit'] ?? '' );
-		$hierarchy = (string) ( $industry_preview['hierarchy_fit'] ?? '' );
-		$lpagery = (string) ( $industry_preview['lpagery_posture'] ?? '' );
-		$one_pager = $industry_preview['composed_one_pager'] ?? array();
-		$warnings = $industry_preview['warning_flags'] ?? array();
+		$fit         = (string) ( $industry_preview['recommendation_fit'] ?? '' );
+		$hierarchy   = (string) ( $industry_preview['hierarchy_fit'] ?? '' );
+		$lpagery     = (string) ( $industry_preview['lpagery_posture'] ?? '' );
+		$one_pager   = $industry_preview['composed_one_pager'] ?? array();
+		$warnings    = $industry_preview['warning_flags'] ?? array();
 		$substitutes = $industry_preview['substitute_suggestions'] ?? array();
-		$primary = (string) ( $industry_preview['primary_industry_key'] ?? '' );
+		$primary     = (string) ( $industry_preview['primary_industry_key'] ?? '' );
 		?>
 		<section class="aio-industry-preview-section" aria-label="<?php \esc_attr_e( 'Industry fit and guidance', 'aio-page-builder' ); ?>">
 			<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Industry fit', 'aio-page-builder' ); ?></h3>
@@ -448,7 +473,13 @@ final class Page_Template_Detail_Screen {
 						if ( $sug_key === '' ) {
 							continue;
 						}
-						$detail_url = \add_query_arg( array( 'page' => self::SLUG, 'template' => $sug_key ), \admin_url( 'admin.php' ) );
+						$detail_url = \add_query_arg(
+							array(
+								'page'     => self::SLUG,
+								'template' => $sug_key,
+							),
+							\admin_url( 'admin.php' )
+						);
 						?>
 						<li><a href="<?php echo \esc_url( $detail_url ); ?>"><?php echo \esc_html( $sug_key ); ?></a></li>
 					<?php endforeach; ?>
@@ -457,9 +488,9 @@ final class Page_Template_Detail_Screen {
 			<?php
 			$subtype_influence = $industry_preview['subtype_influence'] ?? array();
 			if ( \is_array( $subtype_influence ) && ! empty( $subtype_influence['has_subtype'] ) ) :
-				$st_label = isset( $subtype_influence['subtype_label'] ) ? (string) $subtype_influence['subtype_label'] : '';
+				$st_label    = isset( $subtype_influence['subtype_label'] ) ? (string) $subtype_influence['subtype_label'] : '';
 				$st_onepager = ! empty( $subtype_influence['onepager_refinement_applied'] );
-				$st_notes = isset( $subtype_influence['caution_notes'] ) && \is_array( $subtype_influence['caution_notes'] ) ? $subtype_influence['caution_notes'] : array();
+				$st_notes    = isset( $subtype_influence['caution_notes'] ) && \is_array( $subtype_influence['caution_notes'] ) ? $subtype_influence['caution_notes'] : array();
 				?>
 				<div class="aio-industry-subtype-influence" aria-label="<?php \esc_attr_e( 'Subtype context', 'aio-page-builder' ); ?>">
 					<p class="aio-industry-subtype-label"><span class="aio-industry-label"><?php \esc_html_e( 'Subtype', 'aio-page-builder' ); ?>:</span> <?php echo \esc_html( $st_label ); ?></p>
@@ -497,7 +528,7 @@ final class Page_Template_Detail_Screen {
 	}
 
 	private function get_state_builder(): Page_Template_Detail_State_Builder {
-		$page_repo   = $this->container && $this->container->has( 'page_template_repository' ) ? $this->container->get( 'page_template_repository' ) : null;
+		$page_repo    = $this->container && $this->container->has( 'page_template_repository' ) ? $this->container->get( 'page_template_repository' ) : null;
 		$section_repo = $this->container && $this->container->has( 'section_template_repository' ) ? $this->container->get( 'section_template_repository' ) : null;
 		if ( ! $page_repo instanceof \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository ) {
 			$page_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
@@ -506,12 +537,12 @@ final class Page_Template_Detail_Screen {
 			$section_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
 		}
 
-		$page_provider   = new \AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Repository_Adapter( $page_repo );
+		$page_provider    = new \AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Repository_Adapter( $page_repo );
 		$section_provider = new \AIOPageBuilder\Domain\Registries\PageTemplate\UI\Section_Template_Repository_Adapter( $section_repo );
 
 		$preview_generator = new \AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator();
-		$industry_dummy   = new \AIOPageBuilder\Domain\Industry\Preview\Industry_Dummy_Data_Generator();
-		$industry_key     = null;
+		$industry_dummy    = new \AIOPageBuilder\Domain\Industry\Preview\Industry_Dummy_Data_Generator();
+		$industry_key      = null;
 		if ( $this->container && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
 			$store = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
 			if ( $store instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
@@ -523,7 +554,7 @@ final class Page_Template_Detail_Screen {
 			}
 		}
 		$side_panel_builder = new \AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder();
-		$context_builder = $this->container && $this->container->has( 'section_render_context_builder' ) ? $this->container->get( 'section_render_context_builder' ) : null;
+		$context_builder    = $this->container && $this->container->has( 'section_render_context_builder' ) ? $this->container->get( 'section_render_context_builder' ) : null;
 		if ( ! $context_builder instanceof \AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder ) {
 			$context_builder = new \AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder();
 		}
@@ -546,7 +577,7 @@ final class Page_Template_Detail_Screen {
 		if ( $preview_cache !== null && ! $preview_cache instanceof \AIOPageBuilder\Domain\Preview\Preview_Cache_Service ) {
 			$preview_cache = null;
 		}
-		$versioning_service = null;
+		$versioning_service  = null;
 		$deprecation_service = null;
 		if ( $this->container && $this->container->has( 'template_versioning_service' ) ) {
 			$v = $this->container->get( 'template_versioning_service' );

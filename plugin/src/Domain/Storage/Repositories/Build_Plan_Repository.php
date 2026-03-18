@@ -52,9 +52,9 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 				'update_post_meta_cache' => true,
 			)
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $query->get_posts() as $post ) {
-			$meta = $this->get_meta( $post->ID );
+			$meta  = $this->get_meta( $post->ID );
 			$out[] = $this->post_to_record( $post, $meta );
 		}
 		return $out;
@@ -120,10 +120,10 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	/**
 	 * Updates a single plan item's status and optionally execution artifact (spec §32.5, §37.6, plan history).
 	 *
-	 * @param int    $post_id    Plan post ID.
-	 * @param int    $step_index Step index in steps array.
-	 * @param string $item_id    Item id to update.
-	 * @param string $new_status New status (e.g. approved, completed).
+	 * @param int                       $post_id    Plan post ID.
+	 * @param int                       $step_index Step index in steps array.
+	 * @param string                    $item_id    Item id to update.
+	 * @param string                    $new_status New status (e.g. approved, completed).
 	 * @param array<string, mixed>|null $execution_artifact Optional artifact (e.g. post_id, target_post_id) for finalization publish.
 	 * @return bool True if item was found and updated; false otherwise.
 	 */
@@ -136,7 +136,7 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 		if ( ! is_array( $step ) ) {
 			return false;
 		}
-		$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
 		$updated = false;
@@ -178,10 +178,10 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 		if ( ! is_array( $step ) ) {
 			return 0;
 		}
-		$items  = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+		$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
-		$count  = 0;
+		$count = 0;
 		foreach ( $items as $i => $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -249,15 +249,15 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 
 	/** @inheritdoc */
 	protected function get_meta( int $post_id ): array {
-		$base = parent::get_meta( $post_id );
+		$base                    = parent::get_meta( $post_id );
 		$base['plan_definition'] = $this->get_plan_definition( $post_id );
 		return $base;
 	}
 
 	/** @inheritdoc */
 	protected function post_to_record( $post, array $meta ): array {
-		$base = parent::post_to_record( $post, $meta );
-		$p    = is_array( $post ) ? $post : (array) $post;
+		$base              = parent::post_to_record( $post, $meta );
+		$p                 = is_array( $post ) ? $post : (array) $post;
 		$base['post_date'] = (string) ( $p['post_date'] ?? '' );
 		if ( ! empty( $meta['plan_definition'] ) && is_array( $meta['plan_definition'] ) ) {
 			$base = array_merge( $base, $meta['plan_definition'] );
@@ -267,7 +267,7 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 
 	/** @inheritdoc */
 	public function save( array $data ): int {
-		$definition = isset( $data['plan_definition'] ) && is_array( $data['plan_definition'] ) ? $data['plan_definition'] : null;
+		$definition      = isset( $data['plan_definition'] ) && is_array( $data['plan_definition'] ) ? $data['plan_definition'] : null;
 		$data_for_parent = $data;
 		if ( $definition !== null ) {
 			$data_for_parent = array(

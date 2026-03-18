@@ -104,17 +104,17 @@ final class Support_Package_Generator {
 		?Template_Library_Support_Summary_Builder $template_library_summary_builder = null,
 		?Industry_Override_Audit_Report_Service $override_audit_report_service = null
 	) {
-		$this->path_manager                    = $path_manager;
-		$this->settings                       = $settings;
-		$this->profile_store                  = $profile_store;
-		$this->registry_serializer            = $registry_serializer;
-		$this->plan_repository                = $plan_repository;
-		$this->token_set_reader               = $token_set_reader;
-		$this->manifest_builder               = $manifest_builder;
-		$this->packager                       = $packager;
-		$this->logger                         = $logger;
+		$this->path_manager                     = $path_manager;
+		$this->settings                         = $settings;
+		$this->profile_store                    = $profile_store;
+		$this->registry_serializer              = $registry_serializer;
+		$this->plan_repository                  = $plan_repository;
+		$this->token_set_reader                 = $token_set_reader;
+		$this->manifest_builder                 = $manifest_builder;
+		$this->packager                         = $packager;
+		$this->logger                           = $logger;
 		$this->template_library_summary_builder = $template_library_summary_builder;
-		$this->override_audit_report_service  = $override_audit_report_service;
+		$this->override_audit_report_service    = $override_audit_report_service;
 	}
 
 	/**
@@ -155,7 +155,7 @@ final class Support_Package_Generator {
 			$staging_dir = rtrim( $staging_dir, '/\\' ) . '/';
 
 			if ( in_array( 'settings', $included, true ) ) {
-				$raw = $this->settings->get( Option_Names::MAIN_SETTINGS );
+				$raw      = $this->settings->get( Option_Names::MAIN_SETTINGS );
 				$redacted = $this->redact_array( $raw );
 				if ( $raw !== $redacted ) {
 					$keys_redacted[] = 'settings';
@@ -163,7 +163,7 @@ final class Support_Package_Generator {
 				$this->write_json_dir( $staging_dir . 'settings', 'settings.json', $redacted );
 			}
 			if ( in_array( 'profiles', $included, true ) ) {
-				$raw = $this->profile_store->get_full_profile();
+				$raw      = $this->profile_store->get_full_profile();
 				$redacted = $this->redact_array( is_array( $raw ) ? $raw : array() );
 				if ( is_array( $raw ) && $raw !== $redacted ) {
 					$keys_redacted[] = 'profiles';
@@ -172,7 +172,7 @@ final class Support_Package_Generator {
 			}
 			if ( in_array( 'registries', $included, true ) || in_array( 'compositions', $included, true ) ) {
 				$bundle = $this->registry_serializer->build_registry_bundle( 0 );
-				$reg = $staging_dir . 'registries';
+				$reg    = $staging_dir . 'registries';
 				if ( ! is_dir( $reg ) ) {
 					wp_mkdir_p( $reg );
 				}
@@ -182,12 +182,15 @@ final class Support_Package_Generator {
 			}
 			if ( in_array( 'plans', $included, true ) ) {
 				$plans = array();
-				$list = $this->plan_repository->list_recent( 500, 0 );
+				$list  = $this->plan_repository->list_recent( 500, 0 );
 				foreach ( $list as $record ) {
 					$id = (int) ( $record['id'] ?? 0 );
 					if ( $id > 0 ) {
-						$def = $this->plan_repository->get_plan_definition( $id );
-						$plans[] = array( 'id' => $id, 'definition' => $def );
+						$def     = $this->plan_repository->get_plan_definition( $id );
+						$plans[] = array(
+							'id'         => $id,
+							'definition' => $def,
+						);
 					}
 				}
 				$this->write_json_dir( $staging_dir . 'plans', 'plans.json', $plans );
@@ -214,29 +217,29 @@ final class Support_Package_Generator {
 			}
 
 			if ( in_array( 'reporting_history', $included, true ) ) {
-				$reporting_log = \get_option( Option_Names::REPORTING_LOG, array() );
-				$log_entries = is_array( $reporting_log ) ? array_slice( $reporting_log, -500 ) : array();
-				$redacted_log = $this->redact_reporting_log_entries( $log_entries );
+				$reporting_log   = \get_option( Option_Names::REPORTING_LOG, array() );
+				$log_entries     = is_array( $reporting_log ) ? array_slice( $reporting_log, -500 ) : array();
+				$redacted_log    = $this->redact_reporting_log_entries( $log_entries );
 				$keys_redacted[] = 'reporting_history';
 				$this->write_json_dir( $staging_dir . 'logs', 'reporting_history.json', array( 'entries' => $redacted_log ) );
 			}
 
-			$site_slug    = $this->get_site_slug();
+			$site_slug   = $this->get_site_slug();
 			$filename    = $this->packager->build_package_filename( Export_Mode_Keys::SUPPORT_BUNDLE, $site_slug );
 			$destination = $this->path_manager->get_export_package_path( $filename );
 			if ( $destination === '' ) {
 				$destination = rtrim( $exports_dir, '/\\' ) . '/' . $filename;
 			}
 
-			$source_site_url = $this->get_source_site_url();
-			$restore_notes   = 'Support bundle; redacted; not for full restore.';
+			$source_site_url   = $this->get_source_site_url();
+			$restore_notes     = 'Support bundle; redacted; not for full restore.';
 			$redaction_summary = array(
 				'applied'       => true,
 				'keys_redacted' => array_values( array_unique( $keys_redacted ) ),
 			);
-			$manifest_builder = $this->manifest_builder;
-			$manifest_factory = function ( array $checksum_list ) use ( $manifest_builder, $source_site_url, $included, $excluded, $restore_notes, $filename, $redaction_summary ) {
-				$manifest = $manifest_builder->build(
+			$manifest_builder  = $this->manifest_builder;
+			$manifest_factory  = function ( array $checksum_list ) use ( $manifest_builder, $source_site_url, $included, $excluded, $restore_notes, $filename, $redaction_summary ) {
+				$manifest                      = $manifest_builder->build(
 					Export_Mode_Keys::SUPPORT_BUNDLE,
 					$source_site_url,
 					$included,
@@ -247,7 +250,7 @@ final class Support_Package_Generator {
 					$filename
 				);
 				$manifest['redaction_summary'] = $redaction_summary;
-				$json = \wp_json_encode( $manifest );
+				$json                          = \wp_json_encode( $manifest );
 				return $json !== false ? $json : '{}';
 			};
 
@@ -258,7 +261,7 @@ final class Support_Package_Generator {
 			}
 
 			$cleanup = false;
-			$result = Support_Package_Result::success(
+			$result  = Support_Package_Result::success(
 				$destination,
 				$filename,
 				$included,
@@ -268,11 +271,15 @@ final class Support_Package_Generator {
 				$pack_result['size_bytes'],
 				$log_ref
 			);
-			$this->log( 'Support package generated.', array(
-				'size'      => $pack_result['size_bytes'],
-				'checksums' => count( $pack_result['checksum_list'] ),
-				'filename'  => $filename,
-			), $log_ref );
+			$this->log(
+				'Support package generated.',
+				array(
+					'size'      => $pack_result['size_bytes'],
+					'checksums' => count( $pack_result['checksum_list'] ),
+					'filename'  => $filename,
+				),
+				$log_ref
+			);
 			return $result;
 		} finally {
 			if ( $cleanup && $staging_dir !== '' && is_dir( $staging_dir ) ) {
@@ -287,9 +294,9 @@ final class Support_Package_Generator {
 	private function build_environment_summary(): array {
 		$wp = $GLOBALS['wp_version'] ?? '';
 		return array(
-			'php_version'     => PHP_VERSION,
-			'wp_version'      => $wp !== '' ? $wp : 'Unknown',
-			'plugin_version'  => Versions::plugin(),
+			'php_version'    => PHP_VERSION,
+			'wp_version'     => $wp !== '' ? $wp : 'Unknown',
+			'plugin_version' => Versions::plugin(),
 		);
 	}
 
@@ -300,7 +307,7 @@ final class Support_Package_Generator {
 	 * @return list<array<string, mixed>>
 	 */
 	private function redact_reporting_log_entries( array $entries ): array {
-		$out = array();
+		$out       = array();
 		$safe_keys = array( 'event_type', 'dedupe_key', 'attempted_at', 'delivery_status', 'log_reference', 'failure_reason' );
 		foreach ( $entries as $entry ) {
 			if ( ! is_array( $entry ) ) {
@@ -309,7 +316,7 @@ final class Support_Package_Generator {
 			$row = array();
 			foreach ( $safe_keys as $key ) {
 				if ( array_key_exists( $key, $entry ) ) {
-					$val = $entry[ $key ];
+					$val         = $entry[ $key ];
 					$row[ $key ] = is_string( $val ) ? $val : (string) $val;
 				}
 			}
@@ -325,7 +332,7 @@ final class Support_Package_Generator {
 	private function redact_array( array $data ): array {
 		$out = array();
 		foreach ( $data as $k => $v ) {
-			$lower = strtolower( (string) $k );
+			$lower   = strtolower( (string) $k );
 			$blocked = false;
 			foreach ( self::REDACT_KEYS as $needle ) {
 				if ( strpos( $lower, $needle ) !== false ) {
@@ -356,7 +363,7 @@ final class Support_Package_Generator {
 	}
 
 	private function get_site_slug(): string {
-		$url = \home_url( '', 'https' );
+		$url  = \home_url( '', 'https' );
 		$host = is_string( $url ) ? \parse_url( $url, PHP_URL_HOST ) : null;
 		if ( $host !== null && $host !== '' ) {
 			return preg_replace( '#[^a-zA-Z0-9_-]#', '', $host ) ?: 'site';
@@ -404,7 +411,7 @@ final class Support_Package_Generator {
 			return;
 		}
 		$context['log_ref'] = $log_ref;
-		$ref = $context !== array() ? wp_json_encode( $context ) : '';
+		$ref                = $context !== array() ? wp_json_encode( $context ) : '';
 		if ( $ref === false ) {
 			$ref = '';
 		}

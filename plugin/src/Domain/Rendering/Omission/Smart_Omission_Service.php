@@ -23,9 +23,23 @@ final class Smart_Omission_Service {
 
 	/** Node roles omission-eligible when optional and empty (contract §2.2). */
 	private const OMISSION_ELIGIBLE_ROLES = array(
-		'eyebrow', 'subheadline', 'intro', 'media', 'media-caption', 'content',
-		'badge', 'note', 'footer', 'caption', 'list', 'cards', 'cta_group',
-		'faq_items', 'faq_item', 'list_item', 'card',
+		'eyebrow',
+		'subheadline',
+		'intro',
+		'media',
+		'media-caption',
+		'content',
+		'badge',
+		'note',
+		'footer',
+		'caption',
+		'list',
+		'cards',
+		'cta_group',
+		'faq_items',
+		'faq_item',
+		'list_item',
+		'card',
 	);
 
 	/** Fallback when required headline is empty (contract §8). */
@@ -40,8 +54,8 @@ final class Smart_Omission_Service {
 	/**
 	 * Applies omission: removes optional empty keys, applies fallbacks for required-but-empty, records result.
 	 *
-	 * @param array<string, mixed> $field_values   Raw field name => value.
-	 * @param array<string, array{optional: bool, role: string}> $field_eligibility From blueprint: name => optional, role (inferred or from name).
+	 * @param array<string, mixed>                                                                                               $field_values   Raw field name => value.
+	 * @param array<string, array{optional: bool, role: string}>                                                                 $field_eligibility From blueprint: name => optional, role (inferred or from name).
 	 * @param array{section_key: string, position?: int, is_cta_classified?: bool, supplies_h1?: bool, primary_cta_key?: string} $context Section context.
 	 * @return array{field_values: array<string, mixed>, omission_result: Omission_Result}
 	 */
@@ -73,8 +87,8 @@ final class Smart_Omission_Service {
 			if ( ! $optional ) {
 				$refused[ $field_key ] = 'required';
 				if ( $empty ) {
-					$fallback = $this->fallback_for( $role, $field_key, $primary_cta_key, $is_cta, $supplies_h1 );
-					$filtered[ $field_key ] = $fallback;
+					$fallback                        = $this->fallback_for( $role, $field_key, $primary_cta_key, $is_cta, $supplies_h1 );
+					$filtered[ $field_key ]          = $fallback;
 					$fallbacks_applied[ $field_key ] = $fallback;
 				}
 				continue;
@@ -84,7 +98,7 @@ final class Smart_Omission_Service {
 			if ( in_array( $role, self::STRUCTURAL_HEADING_ROLES, true ) && ( $supplies_h1 || $position === 0 ) ) {
 				$refused[ $field_key ] = 'structural_heading';
 				if ( $empty ) {
-					$filtered[ $field_key ] = self::FALLBACK_HEADLINE;
+					$filtered[ $field_key ]          = self::FALLBACK_HEADLINE;
 					$fallbacks_applied[ $field_key ] = self::FALLBACK_HEADLINE;
 				}
 				continue;
@@ -94,7 +108,7 @@ final class Smart_Omission_Service {
 			if ( $is_cta && $primary_cta_key !== '' && $field_key === $primary_cta_key ) {
 				$refused[ $field_key ] = 'primary_cta';
 				if ( $empty ) {
-					$filtered[ $field_key ] = self::FALLBACK_CTA_LABEL;
+					$filtered[ $field_key ]          = self::FALLBACK_CTA_LABEL;
 					$fallbacks_applied[ $field_key ] = self::FALLBACK_CTA_LABEL;
 				}
 				continue;
@@ -128,7 +142,7 @@ final class Smart_Omission_Service {
 		}
 
 		return array(
-			'field_values'   => $filtered,
+			'field_values'    => $filtered,
 			'omission_result' => new Omission_Result( $omitted_keys, $refused, $fallbacks_applied ),
 		);
 	}
@@ -150,7 +164,7 @@ final class Smart_Omission_Service {
 			if ( $name === '' ) {
 				continue;
 			}
-			$required = ! empty( $f['required'] );
+			$required     = ! empty( $f['required'] );
 			$out[ $name ] = array(
 				'optional' => ! $required,
 				'role'     => $this->infer_role( $name ),

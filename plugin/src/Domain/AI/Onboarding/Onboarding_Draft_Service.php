@@ -45,7 +45,7 @@ final class Onboarding_Draft_Service {
 	 * @return bool True if saved.
 	 */
 	public function save_draft( array $payload ): bool {
-		$normalized = $this->normalize_draft( $payload );
+		$normalized               = $this->normalize_draft( $payload );
 		$normalized['updated_at'] = $this->iso8601_now();
 		$this->settings->set( Option_Names::ONBOARDING_DRAFT, $normalized );
 		return true;
@@ -71,7 +71,7 @@ final class Onboarding_Draft_Service {
 			$steps[ $key ] = Onboarding_Statuses::STEP_NOT_STARTED;
 		}
 		return array(
-			'version'                    => self::DRAFT_VERSION,
+			'version'                   => self::DRAFT_VERSION,
 			'overall_status'            => Onboarding_Statuses::NOT_STARTED,
 			'current_step_key'          => Onboarding_Step_Keys::WELCOME,
 			'step_statuses'             => $steps,
@@ -80,8 +80,8 @@ final class Onboarding_Draft_Service {
 			'provider_refs'             => array(),
 			'goal_or_intent_text'       => '',
 			'last_planning_run_id'      => null,
-			'last_planning_run_post_id'  => null,
-			'updated_at'                 => $this->iso8601_now(),
+			'last_planning_run_post_id' => null,
+			'updated_at'                => $this->iso8601_now(),
 		);
 	}
 
@@ -92,7 +92,7 @@ final class Onboarding_Draft_Service {
 	 * @return array<string, mixed>
 	 */
 	private function normalize_draft( array $raw ): array {
-		$default = $this->default_draft();
+		$default       = $this->default_draft();
 		$step_statuses = $default['step_statuses'];
 		if ( isset( $raw['step_statuses'] ) && is_array( $raw['step_statuses'] ) ) {
 			foreach ( Onboarding_Step_Keys::ordered() as $key ) {
@@ -101,10 +101,10 @@ final class Onboarding_Draft_Service {
 				}
 			}
 		}
-		$current = isset( $raw['current_step_key'] ) && is_string( $raw['current_step_key'] ) && in_array( $raw['current_step_key'], Onboarding_Step_Keys::ordered(), true )
+		$current       = isset( $raw['current_step_key'] ) && is_string( $raw['current_step_key'] ) && in_array( $raw['current_step_key'], Onboarding_Step_Keys::ordered(), true )
 			? $raw['current_step_key']
 			: $default['current_step_key'];
-		$overall = isset( $raw['overall_status'] ) && is_string( $raw['overall_status'] ) && in_array( $raw['overall_status'], Onboarding_Statuses::overall_statuses(), true )
+		$overall       = isset( $raw['overall_status'] ) && is_string( $raw['overall_status'] ) && in_array( $raw['overall_status'], Onboarding_Statuses::overall_statuses(), true )
 			? $raw['overall_status']
 			: $default['overall_status'];
 		$provider_refs = array();
@@ -112,8 +112,8 @@ final class Onboarding_Draft_Service {
 			foreach ( $raw['provider_refs'] as $ref ) {
 				if ( is_array( $ref ) && isset( $ref['provider_id'] ) && is_string( $ref['provider_id'] ) ) {
 					$provider_refs[] = array(
-						'provider_id'       => \sanitize_text_field( $ref['provider_id'] ),
-						'credential_state'  => isset( $ref['credential_state'] ) && is_string( $ref['credential_state'] ) ? $ref['credential_state'] : 'absent',
+						'provider_id'      => \sanitize_text_field( $ref['provider_id'] ),
+						'credential_state' => isset( $ref['credential_state'] ) && is_string( $ref['credential_state'] ) ? $ref['credential_state'] : 'absent',
 					);
 				}
 			}
@@ -124,17 +124,17 @@ final class Onboarding_Draft_Service {
 			$last_run_post = null;
 		}
 		return array(
-			'version'                    => isset( $raw['version'] ) && ( is_int( $raw['version'] ) || is_string( $raw['version'] ) ) ? $raw['version'] : $default['version'],
-			'overall_status'             => $overall,
-			'current_step_key'           => $current,
-			'step_statuses'              => $step_statuses,
-			'profile_snapshot_ref'       => isset( $raw['profile_snapshot_ref'] ) && ( is_string( $raw['profile_snapshot_ref'] ) || $raw['profile_snapshot_ref'] === null ) ? $raw['profile_snapshot_ref'] : $default['profile_snapshot_ref'],
-			'crawl_run_id_ref'           => isset( $raw['crawl_run_id_ref'] ) && ( is_string( $raw['crawl_run_id_ref'] ) || $raw['crawl_run_id_ref'] === null ) ? ( $raw['crawl_run_id_ref'] ? \sanitize_text_field( (string) $raw['crawl_run_id_ref'] ) : null ) : $default['crawl_run_id_ref'],
-			'provider_refs'              => $provider_refs,
-			'goal_or_intent_text'        => isset( $raw['goal_or_intent_text'] ) && is_string( $raw['goal_or_intent_text'] ) ? \sanitize_textarea_field( $raw['goal_or_intent_text'] ) : $default['goal_or_intent_text'],
-			'last_planning_run_id'       => $last_run_id,
-			'last_planning_run_post_id'  => $last_run_post,
-			'updated_at'                 => isset( $raw['updated_at'] ) && is_string( $raw['updated_at'] ) ? $raw['updated_at'] : $default['updated_at'],
+			'version'                   => isset( $raw['version'] ) && ( is_int( $raw['version'] ) || is_string( $raw['version'] ) ) ? $raw['version'] : $default['version'],
+			'overall_status'            => $overall,
+			'current_step_key'          => $current,
+			'step_statuses'             => $step_statuses,
+			'profile_snapshot_ref'      => isset( $raw['profile_snapshot_ref'] ) && ( is_string( $raw['profile_snapshot_ref'] ) || $raw['profile_snapshot_ref'] === null ) ? $raw['profile_snapshot_ref'] : $default['profile_snapshot_ref'],
+			'crawl_run_id_ref'          => isset( $raw['crawl_run_id_ref'] ) && ( is_string( $raw['crawl_run_id_ref'] ) || $raw['crawl_run_id_ref'] === null ) ? ( $raw['crawl_run_id_ref'] ? \sanitize_text_field( (string) $raw['crawl_run_id_ref'] ) : null ) : $default['crawl_run_id_ref'],
+			'provider_refs'             => $provider_refs,
+			'goal_or_intent_text'       => isset( $raw['goal_or_intent_text'] ) && is_string( $raw['goal_or_intent_text'] ) ? \sanitize_textarea_field( $raw['goal_or_intent_text'] ) : $default['goal_or_intent_text'],
+			'last_planning_run_id'      => $last_run_id,
+			'last_planning_run_post_id' => $last_run_post,
+			'updated_at'                => isset( $raw['updated_at'] ) && is_string( $raw['updated_at'] ) ? $raw['updated_at'] : $default['updated_at'],
 		);
 	}
 

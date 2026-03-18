@@ -51,7 +51,7 @@ final class Industry_Guided_Repair_Screen_Test extends TestCase {
 				'suggested_value'   => '',
 			),
 		);
-		$vm = new Industry_Guided_Repair_View_Model( $candidates, array() );
+		$vm         = new Industry_Guided_Repair_View_Model( $candidates, array() );
 		$this->assertCount( 1, $vm->get_candidates() );
 		$this->assertSame( Industry_Guided_Repair_View_Model::ACTION_NONE, $vm->get_candidates()[0]['action_type'] );
 		$this->assertTrue( $vm->get_candidates()[0]['is_advisory_only'] );
@@ -73,7 +73,7 @@ final class Industry_Guided_Repair_Screen_Test extends TestCase {
 				'suggested_value'   => '',
 			),
 		);
-		$vm = new Industry_Guided_Repair_View_Model( $candidates, array() );
+		$vm         = new Industry_Guided_Repair_View_Model( $candidates, array() );
 		$this->assertSame( Industry_Guided_Repair_View_Model::ACTION_NONE, $vm->get_candidates()[0]['action_type'] );
 	}
 }

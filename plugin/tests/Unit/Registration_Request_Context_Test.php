@@ -19,7 +19,7 @@ final class Registration_Request_Context_Test extends TestCase {
 
 	public function test_should_skip_registration_returns_true_when_front_end(): void {
 		$context = new Registration_Request_Context();
-		$skip = $context->should_skip_registration();
+		$skip    = $context->should_skip_registration();
 		$this->assertSame( ! is_admin(), $skip );
 	}
 

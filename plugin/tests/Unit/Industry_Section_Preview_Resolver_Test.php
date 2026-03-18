@@ -37,11 +37,17 @@ final class Industry_Section_Preview_Resolver_Test extends TestCase {
 		$overlay      = new Industry_Section_Helper_Overlay_Registry();
 		$composer     = new Industry_Helper_Doc_Composer( $doc_registry, $overlay );
 		$resolver     = new Industry_Section_Preview_Resolver( null, null, new Industry_Section_Recommendation_Resolver(), $composer, null );
-		$vm           = $resolver->resolve( 'hero_conv_02', array( 'internal_key' => 'hero_conv_02', 'section_purpose_family' => 'hero' ), array() );
+		$vm           = $resolver->resolve(
+			'hero_conv_02',
+			array(
+				'internal_key'           => 'hero_conv_02',
+				'section_purpose_family' => 'hero',
+			),
+			array()
+		);
 		$this->assertInstanceOf( Industry_Section_Preview_View_Model::class, $vm );
 		$this->assertFalse( $vm->has_industry() );
 		$this->assertSame( '', $vm->get_primary_industry_key() );
 		$this->assertSame( Industry_Section_Recommendation_Resolver::FIT_NEUTRAL, $vm->get_recommendation_fit() );
 	}
-
 }

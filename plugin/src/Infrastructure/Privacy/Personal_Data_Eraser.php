@@ -39,11 +39,11 @@ final class Personal_Data_Eraser {
 	 * @return array{items_removed: bool, items_retained: bool, messages: list<string>, done: bool}
 	 */
 	public static function erase( string $email_address, int $page = 1 ): array {
-		$user = \get_user_by( 'email', $email_address );
-		$page = max( 1, $page );
-		$items_removed = false;
+		$user           = \get_user_by( 'email', $email_address );
+		$page           = max( 1, $page );
+		$items_removed  = false;
 		$items_retained = false;
-		$messages = array();
+		$messages       = array();
 
 		if ( ! $user instanceof \WP_User ) {
 			return array(
@@ -62,16 +62,16 @@ final class Personal_Data_Eraser {
 			$pref_removed = self::erase_user_prefs( $user_id );
 			if ( $pref_removed ) {
 				$items_removed = true;
-				$messages[] = __( 'Template compare lists and bundle preview cache removed.', 'aio-page-builder' );
+				$messages[]    = __( 'Template compare lists and bundle preview cache removed.', 'aio-page-builder' );
 			}
 		}
 
 		$ai_run_repo = new AI_Run_Repository();
-		$runs = $ai_run_repo->list_recent_by_actor( $user_id, self::PER_PAGE, $offset );
+		$runs        = $ai_run_repo->list_recent_by_actor( $user_id, self::PER_PAGE, $offset );
 		foreach ( $runs as $run ) {
 			$post_id = isset( $run['id'] ) ? (int) $run['id'] : 0;
 			if ( $post_id > 0 ) {
-				$meta = $run['run_metadata'] ?? array();
+				$meta          = $run['run_metadata'] ?? array();
 				$meta['actor'] = self::ANONYMIZED_ACTOR;
 				$ai_run_repo->save_run_metadata( $post_id, $meta );
 				\update_post_meta( $post_id, '_aio_run_actor', self::ANONYMIZED_ACTOR );
@@ -87,7 +87,7 @@ final class Personal_Data_Eraser {
 
 		global $wpdb;
 		$job_repo = new Job_Queue_Repository( $wpdb );
-		$jobs = $job_repo->list_by_actor_ref( $actor_ref, self::PER_PAGE, $offset );
+		$jobs     = $job_repo->list_by_actor_ref( $actor_ref, self::PER_PAGE, $offset );
 		foreach ( $jobs as $job ) {
 			$id = isset( $job['id'] ) ? (int) $job['id'] : 0;
 			if ( $id > 0 ) {
@@ -103,7 +103,7 @@ final class Personal_Data_Eraser {
 		return array(
 			'items_removed'  => $items_removed,
 			'items_retained' => $items_retained,
-			'messages'      => $messages,
+			'messages'       => $messages,
 			'done'           => $done,
 		);
 	}
@@ -112,9 +112,9 @@ final class Personal_Data_Eraser {
 	 * Removes user meta (compare lists) and transient (bundle preview). Returns true if any was removed.
 	 */
 	private static function erase_user_prefs( int $user_id ): bool {
-		$removed = false;
+		$removed     = false;
 		$section_key = Template_Compare_Screen::get_compare_meta_key( 'section' );
-		$page_key = Template_Compare_Screen::get_compare_meta_key( 'page' );
+		$page_key    = Template_Compare_Screen::get_compare_meta_key( 'page' );
 		if ( \get_user_meta( $user_id, $section_key, true ) !== '' ) {
 			\delete_user_meta( $user_id, $section_key );
 			$removed = true;

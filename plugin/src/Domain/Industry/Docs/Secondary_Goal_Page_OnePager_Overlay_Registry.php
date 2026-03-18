@@ -24,9 +24,9 @@ final class Secondary_Goal_Page_OnePager_Overlay_Registry {
 	public const FIELD_STATUS             = 'status';
 
 	public const SCOPE_SECONDARY_GOAL_PAGE_ONEPAGER_OVERLAY = 'secondary_goal_page_onepager_overlay';
-	public const STATUS_ACTIVE = 'active';
+	public const STATUS_ACTIVE                              = 'active';
 
-	private const KEY_PATTERN   = '#^[a-z0-9_-]+$#';
+	private const KEY_PATTERN    = '#^[a-z0-9_-]+$#';
 	private const KEY_MAX_LENGTH = 64;
 
 	/** @var array<string, array<string, mixed>> Composite "primary|secondary|page" => overlay. */
@@ -95,7 +95,7 @@ final class Secondary_Goal_Page_OnePager_Overlay_Registry {
 				continue;
 			}
 			$this->by_composite[ $composite ] = $ov;
-			$this->all[] = $ov;
+			$this->all[]                      = $ov;
 		}
 	}
 
@@ -108,8 +108,8 @@ final class Secondary_Goal_Page_OnePager_Overlay_Registry {
 	 * @return array<string, mixed>|null
 	 */
 	public function get( string $primary_goal_key, string $secondary_goal_key, string $page_key ): ?array {
-		$p = \trim( $primary_goal_key );
-		$s = \trim( $secondary_goal_key );
+		$p  = \trim( $primary_goal_key );
+		$s  = \trim( $secondary_goal_key );
 		$pg = \trim( $page_key );
 		if ( $p === '' || $s === '' || $pg === '' || $p === $s ) {
 			return null;

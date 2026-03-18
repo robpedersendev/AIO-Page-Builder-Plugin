@@ -56,12 +56,12 @@ final class Heartbeat_Result {
 		string $log_reference,
 		string $failure_reason
 	) {
-		$this->due_month              = $due_month;
-		$this->last_successful_month  = $last_successful_month;
-		$this->heartbeat_status       = $heartbeat_status;
-		$this->delivery_status        = $delivery_status;
-		$this->log_reference           = $log_reference;
-		$this->failure_reason         = $failure_reason;
+		$this->due_month             = $due_month;
+		$this->last_successful_month = $last_successful_month;
+		$this->heartbeat_status      = $heartbeat_status;
+		$this->delivery_status       = $delivery_status;
+		$this->log_reference         = $log_reference;
+		$this->failure_reason        = $failure_reason;
 	}
 
 	public static function already_sent( string $due_month, string $last_successful_month, string $log_reference = '' ): self {
@@ -107,12 +107,12 @@ final class Heartbeat_Result {
 	/** @return array<string, mixed> */
 	public function to_array(): array {
 		return array(
-			'due_month'              => $this->due_month,
-			'last_successful_month'  => $this->last_successful_month,
-			'heartbeat_status'       => $this->heartbeat_status,
-			'delivery_status'        => $this->delivery_status,
-			'log_reference'          => $this->log_reference,
-			'failure_reason'         => $this->failure_reason,
+			'due_month'             => $this->due_month,
+			'last_successful_month' => $this->last_successful_month,
+			'heartbeat_status'      => $this->heartbeat_status,
+			'delivery_status'       => $this->delivery_status,
+			'log_reference'         => $this->log_reference,
+			'failure_reason'        => $this->failure_reason,
 		);
 	}
 }

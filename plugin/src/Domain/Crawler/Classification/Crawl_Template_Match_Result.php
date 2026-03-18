@@ -91,7 +91,7 @@ final class Crawl_Template_Match_Result {
 	 */
 	public function to_json(): string {
 		$payload = $this->to_payload();
-		$json = function_exists( 'wp_json_encode' ) ? \wp_json_encode( $payload ) : json_encode( $payload );
+		$json    = function_exists( 'wp_json_encode' ) ? \wp_json_encode( $payload ) : json_encode( $payload );
 		return is_string( $json ) ? $json : '{}';
 	}
 

@@ -49,11 +49,25 @@ final class Industry_Question_Pack_Registry_Test extends TestCase {
 
 	public function test_load_skips_invalid_entries(): void {
 		$registry = new Industry_Question_Pack_Registry();
-		$registry->load( array(
-			array( Industry_Question_Pack_Registry::FIELD_INDUSTRY_KEY => 'valid', Industry_Question_Pack_Registry::FIELD_FIELDS => array( array( 'key' => 'f1', 'label' => 'F1', 'type' => 'text' ) ) ),
-			array( Industry_Question_Pack_Registry::FIELD_INDUSTRY_KEY => '' ),
-			array( 'industry_key' => 'no_fields', 'fields' => 'not_array' ),
-		) );
+		$registry->load(
+			array(
+				array(
+					Industry_Question_Pack_Registry::FIELD_INDUSTRY_KEY => 'valid',
+					Industry_Question_Pack_Registry::FIELD_FIELDS => array(
+						array(
+							'key'   => 'f1',
+							'label' => 'F1',
+							'type'  => 'text',
+						),
+					),
+				),
+				array( Industry_Question_Pack_Registry::FIELD_INDUSTRY_KEY => '' ),
+				array(
+					'industry_key' => 'no_fields',
+					'fields'       => 'not_array',
+				),
+			)
+		);
 		$this->assertNotNull( $registry->get( 'valid' ) );
 		$this->assertNull( $registry->get( '' ) );
 		$this->assertNull( $registry->get( 'no_fields' ) );
@@ -71,16 +85,16 @@ final class Industry_Question_Pack_Registry_Test extends TestCase {
 		$registry = new Industry_Question_Pack_Registry();
 		$registry->load( Industry_Question_Pack_Definitions::default_packs() );
 		$expected = array(
-			'cosmetology_nail' => array( 'service_types', 'booking_style', 'license_notes' ),
-			'realtor'          => array( 'market_focus', 'listing_types', 'service_areas' ),
-			'plumber'          => array( 'service_scope', 'emergency_offered', 'service_areas' ),
-			'disaster_recovery'=> array( 'response_type', 'emergency_24_7', 'coverage_areas' ),
+			'cosmetology_nail'  => array( 'service_types', 'booking_style', 'license_notes' ),
+			'realtor'           => array( 'market_focus', 'listing_types', 'service_areas' ),
+			'plumber'           => array( 'service_scope', 'emergency_offered', 'service_areas' ),
+			'disaster_recovery' => array( 'response_type', 'emergency_24_7', 'coverage_areas' ),
 		);
 		foreach ( $expected as $industry_key => $field_keys ) {
 			$pack = $registry->get( $industry_key );
 			$this->assertNotNull( $pack, "Pack for {$industry_key} must load." );
 			$this->assertSame( $industry_key, $pack[ Industry_Question_Pack_Registry::FIELD_INDUSTRY_KEY ] );
-			$fields = $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ];
+			$fields      = $pack[ Industry_Question_Pack_Registry::FIELD_FIELDS ];
 			$actual_keys = array_column( $fields, 'key' );
 			$this->assertSame( $field_keys, $actual_keys, "Field keys for {$industry_key} must match storage mapping." );
 			foreach ( $fields as $field ) {

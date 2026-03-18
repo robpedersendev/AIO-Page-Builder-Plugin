@@ -31,8 +31,8 @@ final class Crawl_Snapshot_Repository_Test extends TestCase {
 	}
 
 	private function create_wpdb_stub(): object {
-		$table = 'wp_' . Table_Names::CRAWL_SNAPSHOTS;
-		$rows  = array();
+		$table     = 'wp_' . Table_Names::CRAWL_SNAPSHOTS;
+		$rows      = array();
 		$insert_id = 0;
 		return new class( $table, $rows, $insert_id ) {
 			public string $prefix = 'wp_';
@@ -42,7 +42,7 @@ final class Crawl_Snapshot_Repository_Test extends TestCase {
 
 			public function __construct( string $table, array &$rows, int &$insert_id ) {
 				$this->table     = $table;
-				$this->rows     = &$rows;
+				$this->rows      = &$rows;
 				$this->insert_id = &$insert_id;
 			}
 
@@ -66,7 +66,7 @@ final class Crawl_Snapshot_Repository_Test extends TestCase {
 				// Simulate INSERT: append a row and set insert_id.
 				if ( stripos( $query, 'INSERT' ) !== false ) {
 					$this->insert_id = count( $this->rows ) + 1;
-					$this->rows[] = array( 'id' => $this->insert_id );
+					$this->rows[]    = array( 'id' => $this->insert_id );
 					return 1;
 				}
 				return 0;
@@ -83,10 +83,10 @@ final class Crawl_Snapshot_Repository_Test extends TestCase {
 	}
 
 	private function create_wpdb_stub_with_insert_id(): object {
-		$table = 'wp_' . Table_Names::CRAWL_SNAPSHOTS;
-		$rows  = array();
+		$table     = 'wp_' . Table_Names::CRAWL_SNAPSHOTS;
+		$rows      = array();
 		$insert_id = 0;
-		$stub = new class( $table, $rows, $insert_id ) {
+		$stub      = new class( $table, $rows, $insert_id ) {
 			public string $prefix = 'wp_';
 			public int $insert_id = 0;
 			private string $table;
@@ -94,7 +94,7 @@ final class Crawl_Snapshot_Repository_Test extends TestCase {
 
 			public function __construct( string $table, array &$rows, int &$insert_id ) {
 				$this->table = $table;
-				$this->rows = &$rows;
+				$this->rows  = &$rows;
 			}
 
 			public function get_row( string $query, $output = OBJECT ) {
@@ -148,16 +148,16 @@ final class Crawl_Snapshot_Repository_Test extends TestCase {
 	}
 
 	public function test_save_with_valid_payload_returns_insert_id(): void {
-		$wpdb = $this->create_wpdb_stub_with_insert_id();
-		$repo = new Crawl_Snapshot_Repository( $wpdb );
+		$wpdb    = $this->create_wpdb_stub_with_insert_id();
+		$repo    = new Crawl_Snapshot_Repository( $wpdb );
 		$payload = Crawl_Snapshot_Payload_Builder::build_page_payload( 'run-1', 'https://example.com/' );
-		$id = $repo->save( $payload );
+		$id      = $repo->save( $payload );
 		$this->assertSame( 42, $id );
 	}
 
 	public function test_save_with_empty_payload_returns_zero(): void {
 		$repo = new Crawl_Snapshot_Repository( $this->wpdb );
-		$id = $repo->save( array() );
+		$id   = $repo->save( array() );
 		$this->assertSame( 0, $id );
 	}
 

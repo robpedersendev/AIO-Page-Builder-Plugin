@@ -37,7 +37,7 @@ final class Install_Notification_Service {
 		?Install_Notification_Transport_Interface $transport = null,
 		?Template_Library_Report_Summary_Builder $template_library_report_summary_builder = null
 	) {
-		$this->transport = $transport ?? new Wp_Mail_Install_Transport();
+		$this->transport                               = $transport ?? new Wp_Mail_Install_Transport();
 		$this->template_library_report_summary_builder = $template_library_report_summary_builder;
 	}
 
@@ -61,7 +61,7 @@ final class Install_Notification_Service {
 				return Install_Notification_Result::already_sent( (string) ( $state['log_reference'] ?? '' ) );
 			}
 
-			$timestamp = gmdate( 'Y-m-d\TH:i:s\Z' );
+			$timestamp  = gmdate( 'Y-m-d\TH:i:s\Z' );
 			$dedupe_key = Reporting_Payload_Schema::dedupe_key_install( $site_ref, $timestamp );
 			$envelope   = $this->build_envelope( $site_ref, $timestamp, $dedupe_key, $dependency_readiness_summary );
 			$log_id     = 'report_install_' . uniqid( '', true );
@@ -136,7 +136,7 @@ final class Install_Notification_Service {
 		if ( $website === '' && function_exists( 'home_url' ) ) {
 			$website = (string) home_url( '/', 'http' );
 		}
-		$wp_version = isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : '';
+		$wp_version  = isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : '';
 		$php_version = PHP_VERSION;
 		$admin_email = \get_option( 'admin_email', '' );
 		$server_ip   = '';
@@ -145,14 +145,14 @@ final class Install_Notification_Service {
 		}
 
 		$payload = array(
-			'website_address'               => $website !== '' ? $website : $site_ref,
-			'plugin_version'                => Versions::plugin(),
-			'wordpress_version'             => $wp_version,
-			'php_version'                   => $php_version,
-			'server_ip'                     => $server_ip,
-			'admin_contact_email'           => is_string( $admin_email ) ? $admin_email : '',
-			'timestamp'                     => $timestamp,
-			'dependency_readiness_summary'  => $dependency_readiness_summary,
+			'website_address'              => $website !== '' ? $website : $site_ref,
+			'plugin_version'               => Versions::plugin(),
+			'wordpress_version'            => $wp_version,
+			'php_version'                  => $php_version,
+			'server_ip'                    => $server_ip,
+			'admin_contact_email'          => is_string( $admin_email ) ? $admin_email : '',
+			'timestamp'                    => $timestamp,
+			'dependency_readiness_summary' => $dependency_readiness_summary,
 		);
 		if ( $this->template_library_report_summary_builder !== null ) {
 			$payload['template_library_report_summary'] = $this->template_library_report_summary_builder->build();
@@ -170,12 +170,16 @@ final class Install_Notification_Service {
 	}
 
 	private function record_sent_state( string $dedupe_key, string $sent_at, string $site_reference, string $log_reference ): void {
-		\update_option( Option_Names::INSTALL_NOTICE_STATE, array(
-			'dedupe_key'     => $dedupe_key,
-			'sent_at'        => $sent_at,
-			'site_reference' => $site_reference,
-			'log_reference'  => $log_reference,
-		), false );
+		\update_option(
+			Option_Names::INSTALL_NOTICE_STATE,
+			array(
+				'dedupe_key'     => $dedupe_key,
+				'sent_at'        => $sent_at,
+				'site_reference' => $site_reference,
+				'log_reference'  => $log_reference,
+			),
+			false
+		);
 	}
 
 	private function append_reporting_log( string $event_type, string $dedupe_key, string $attempted_at, string $delivery_status, string $log_reference, string $failure_reason ): void {
@@ -187,7 +191,7 @@ final class Install_Notification_Service {
 			'log_reference'   => $log_reference,
 			'failure_reason'  => $failure_reason,
 		);
-		$log = \get_option( Option_Names::REPORTING_LOG, array() );
+		$log   = \get_option( Option_Names::REPORTING_LOG, array() );
 		if ( ! is_array( $log ) ) {
 			$log = array();
 		}

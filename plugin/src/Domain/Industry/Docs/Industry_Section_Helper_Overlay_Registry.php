@@ -60,7 +60,7 @@ final class Industry_Section_Helper_Overlay_Registry {
 			$dir . '/overlays-plumber.php',
 			$dir . '/overlays-disaster-recovery.php',
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $files as $path ) {
 			if ( is_readable( $path ) ) {
 				$loaded = require $path;
@@ -92,7 +92,7 @@ final class Industry_Section_Helper_Overlay_Registry {
 			$industry = isset( $ov[ self::FIELD_INDUSTRY_KEY ] ) && is_string( $ov[ self::FIELD_INDUSTRY_KEY ] )
 				? trim( $ov[ self::FIELD_INDUSTRY_KEY ] )
 				: '';
-			$section = isset( $ov[ self::FIELD_SECTION_KEY ] ) && is_string( $ov[ self::FIELD_SECTION_KEY ] )
+			$section  = isset( $ov[ self::FIELD_SECTION_KEY ] ) && is_string( $ov[ self::FIELD_SECTION_KEY ] )
 				? trim( $ov[ self::FIELD_SECTION_KEY ] )
 				: '';
 			if ( $industry === '' || $section === '' ) {
@@ -121,7 +121,7 @@ final class Industry_Section_Helper_Overlay_Registry {
 				continue;
 			}
 			$this->by_composite[ $composite ] = $ov;
-			$this->all[]                    = $ov;
+			$this->all[]                      = $ov;
 		}
 	}
 
@@ -133,8 +133,8 @@ final class Industry_Section_Helper_Overlay_Registry {
 	 * @return array<string, mixed>|null
 	 */
 	public function get( string $industry_key, string $section_key ): ?array {
-		$i = trim( $industry_key );
-		$s = trim( $section_key );
+		$i         = trim( $industry_key );
+		$s         = trim( $section_key );
 		$composite = $i . '|' . $s;
 		return $this->by_composite[ $composite ] ?? null;
 	}
@@ -155,7 +155,7 @@ final class Industry_Section_Helper_Overlay_Registry {
 	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_industry( string $industry_key ): array {
-		$i = trim( $industry_key );
+		$i   = trim( $industry_key );
 		$out = array();
 		foreach ( $this->all as $ov ) {
 			$ik = isset( $ov[ self::FIELD_INDUSTRY_KEY ] ) && is_string( $ov[ self::FIELD_INDUSTRY_KEY ] )

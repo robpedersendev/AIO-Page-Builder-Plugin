@@ -71,10 +71,10 @@ final class Industry_Create_Page_Assistant {
 	 * @return void
 	 */
 	public function build_state( array $page_templates ): void {
-		$this->template_definitions  = $page_templates;
-		$this->fit_by_key            = null;
-		$this->recommended_keys      = null;
-		$this->last_template_result  = null;
+		$this->template_definitions = $page_templates;
+		$this->fit_by_key           = null;
+		$this->recommended_keys     = null;
+		$this->last_template_result = null;
 
 		$profile = $this->profile_repository->get_profile();
 		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
@@ -95,15 +95,15 @@ final class Industry_Create_Page_Assistant {
 		}
 		$items = $result->get_items();
 
-		$this->fit_by_key = array();
+		$this->fit_by_key       = array();
 		$this->recommended_keys = array();
 		foreach ( $items as $item ) {
 			$key = $item['page_template_key'] ?? '';
 			if ( $key === '' ) {
 				continue;
 			}
-			$fit = $item['fit_classification'] ?? Industry_Page_Template_Recommendation_Resolver::FIT_NEUTRAL;
-			$warning_flags = isset( $item['warning_flags'] ) && is_array( $item['warning_flags'] ) ? $item['warning_flags'] : array();
+			$fit             = $item['fit_classification'] ?? Industry_Page_Template_Recommendation_Resolver::FIT_NEUTRAL;
+			$warning_flags   = isset( $item['warning_flags'] ) && is_array( $item['warning_flags'] ) ? $item['warning_flags'] : array();
 			$template_family = '';
 			foreach ( $page_templates as $t ) {
 				if ( is_array( $t ) && trim( (string) ( $t[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' ) ) === $key ) {
@@ -111,7 +111,11 @@ final class Industry_Create_Page_Assistant {
 					break;
 				}
 			}
-			$this->fit_by_key[ $key ] = array( 'fit' => $fit, 'warning_flags' => $warning_flags, 'template_family' => $template_family );
+			$this->fit_by_key[ $key ] = array(
+				'fit'             => $fit,
+				'warning_flags'   => $warning_flags,
+				'template_family' => $template_family,
+			);
 			if ( $fit === Industry_Page_Template_Recommendation_Resolver::FIT_RECOMMENDED ) {
 				$this->recommended_keys[] = $key;
 			}
@@ -176,8 +180,8 @@ final class Industry_Create_Page_Assistant {
 			return array();
 		}
 		$current_family = $this->fit_by_key[ $template_key ]['template_family'] ?? '';
-		$same_family = array();
-		$other = array();
+		$same_family    = array();
+		$other          = array();
 		foreach ( $this->recommended_keys as $key ) {
 			if ( $key === $template_key ) {
 				continue;

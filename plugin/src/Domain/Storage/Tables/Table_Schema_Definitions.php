@@ -26,7 +26,7 @@ final class Table_Schema_Definitions {
 	public static function get_definitions( $wpdb ): array {
 		$prefix  = $wpdb->prefix;
 		$charset = $wpdb->get_charset_collate();
-		$defs = array();
+		$defs    = array();
 
 		$defs[] = array(
 			'name' => $prefix . Table_Names::CRAWL_SNAPSHOTS,

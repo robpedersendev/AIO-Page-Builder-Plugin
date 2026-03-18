@@ -50,10 +50,10 @@ final class Replace_Page_Handler_Test extends TestCase {
 			'success'   => true,
 			'message'   => 'Page updated or replaced.',
 			'artifacts' => array(
-				'target_post_id'      => 1001,
-				'snapshot_ref'         => 'snap_pre_epc_0_20250311T120000',
-				'template_key'         => 'tpl_landing',
-				'assignment_count'     => 2,
+				'target_post_id'   => 1001,
+				'snapshot_ref'     => 'snap_pre_epc_0_20250311T120000',
+				'template_key'     => 'tpl_landing',
+				'assignment_count' => 2,
 			),
 		);
 	}
@@ -65,11 +65,14 @@ final class Replace_Page_Handler_Test extends TestCase {
 			'message'   => 'Page updated or replaced.',
 			'artifacts' => array(
 				'target_post_id'      => 1002,
-				'snapshot_ref'         => 'snap_pre_epc_1_20250311T120001',
-				'template_key'         => 'tpl_contact',
-				'assignment_count'     => 1,
-				'superseded_post_id'   => 1001,
-				'superseded_page_ref'  => array( 'type' => 'post_id', 'value' => '1001' ),
+				'snapshot_ref'        => 'snap_pre_epc_1_20250311T120001',
+				'template_key'        => 'tpl_contact',
+				'assignment_count'    => 1,
+				'superseded_post_id'  => 1001,
+				'superseded_page_ref' => array(
+					'type'  => 'post_id',
+					'value' => '1001',
+				),
 			),
 		);
 	}
@@ -91,7 +94,13 @@ final class Replace_Page_Handler_Test extends TestCase {
 		$this->assertSame( 1001, $result->get_superseded_post_id() );
 		$artifacts = $result->get_artifacts();
 		$this->assertArrayHasKey( 'superseded_page_ref', $artifacts );
-		$this->assertSame( array( 'type' => 'post_id', 'value' => '1001' ), $artifacts['superseded_page_ref'] );
+		$this->assertSame(
+			array(
+				'type'  => 'post_id',
+				'value' => '1001',
+			),
+			$artifacts['superseded_page_ref']
+		);
 	}
 
 	public function test_replace_page_result_failure_includes_snapshot_ref(): void {
@@ -103,7 +112,7 @@ final class Replace_Page_Handler_Test extends TestCase {
 	}
 
 	public function test_replace_page_result_to_handler_result_has_snapshot_ref(): void {
-		$result = Replace_Page_Result::success( 99, 'tpl_contact', 1, 'snap_xyz', 0 );
+		$result         = Replace_Page_Result::success( 99, 'tpl_contact', 1, 'snap_xyz', 0 );
 		$handler_result = $result->to_handler_result();
 		$this->assertArrayHasKey( 'artifacts', $handler_result );
 		$this->assertSame( 'snap_xyz', $handler_result['artifacts']['snapshot_ref'] ?? '' );
@@ -111,12 +120,12 @@ final class Replace_Page_Handler_Test extends TestCase {
 	}
 
 	public function test_replace_page_handler_delegates_to_job_service(): void {
-		$stub = new Stub_Replace_Page_Job_Service();
+		$stub             = new Stub_Replace_Page_Job_Service();
 		$stub->run_result = Replace_Page_Result::success( 1001, 'tpl_landing', 2, 'snap_pre_0', 0 );
-		$handler = new Replace_Page_Handler( $stub );
-		$envelope = array(
-			Execution_Action_Contract::ENVELOPE_ACTION_ID        => 'exec_epc_0_batch1',
-			Execution_Action_Contract::ENVELOPE_ACTION_TYPE     => 'replace_page',
+		$handler          = new Replace_Page_Handler( $stub );
+		$envelope         = array(
+			Execution_Action_Contract::ENVELOPE_ACTION_ID => 'exec_epc_0_batch1',
+			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => 'replace_page',
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
 				'plan_item_id'   => 'epc_0',
 				'target_post_id' => 1001,
@@ -125,35 +134,38 @@ final class Replace_Page_Handler_Test extends TestCase {
 				'snapshot_ref'   => 'snap_pre_0',
 			),
 		);
-		$out = $handler->execute( $envelope );
+		$out              = $handler->execute( $envelope );
 		$this->assertTrue( $out['success'] );
 		$this->assertSame( 1001, $out['artifacts']['target_post_id'] ?? 0 );
 		$this->assertSame( 'snap_pre_0', $out['artifacts']['snapshot_ref'] ?? '' );
 	}
 
 	public function test_replace_page_handler_returns_failure_when_job_service_fails(): void {
-		$stub = new Stub_Replace_Page_Job_Service();
+		$stub             = new Stub_Replace_Page_Job_Service();
 		$stub->run_result = Replace_Page_Result::failure( 'Target page could not be resolved.', array( Execution_Action_Contract::ERROR_TARGET_NOT_FOUND ), 'snap_pre_0' );
-		$handler = new Replace_Page_Handler( $stub );
-		$envelope = array(
+		$handler          = new Replace_Page_Handler( $stub );
+		$envelope         = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'current_page_url' => '/missing-page/' ),
 			'snapshot_ref' => 'snap_pre_0',
 		);
-		$out = $handler->execute( $envelope );
+		$out              = $handler->execute( $envelope );
 		$this->assertFalse( $out['success'] );
 		$this->assertSame( array( Execution_Action_Contract::ERROR_TARGET_NOT_FOUND ), $out['errors'] ?? array() );
 	}
 
 	public function test_replace_page_handler_returns_failure_when_snapshot_required_but_not_provided(): void {
-		$stub = new Stub_Replace_Page_Job_Service();
+		$stub             = new Stub_Replace_Page_Job_Service();
 		$stub->run_result = Replace_Page_Result::failure( 'Pre-change snapshot required but not provided.', array( 'snapshot_required' ), '' );
-		$handler = new Replace_Page_Handler( $stub );
-		$envelope = array(
-			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'target_post_id' => 1, 'template_key' => 'tpl_landing' ),
+		$handler          = new Replace_Page_Handler( $stub );
+		$envelope         = array(
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
+				'target_post_id' => 1,
+				'template_key'   => 'tpl_landing',
+			),
 			'snapshot_required' => true,
-			'snapshot_ref'       => '',
+			'snapshot_ref'      => '',
 		);
-		$out = $handler->execute( $envelope );
+		$out              = $handler->execute( $envelope );
 		$this->assertFalse( $out['success'] );
 		$this->assertContains( 'snapshot_required', $out['errors'] ?? array() );
 	}
@@ -173,7 +185,13 @@ final class Replace_Page_Handler_Test extends TestCase {
 		$payload = self::example_replace_page_with_superseded_payload();
 		$this->assertSame( 1002, $payload['artifacts']['target_post_id'] );
 		$this->assertSame( 1001, $payload['artifacts']['superseded_post_id'] );
-		$this->assertSame( array( 'type' => 'post_id', 'value' => '1001' ), $payload['artifacts']['superseded_page_ref'] );
+		$this->assertSame(
+			array(
+				'type'  => 'post_id',
+				'value' => '1001',
+			),
+			$payload['artifacts']['superseded_page_ref']
+		);
 		$this->assertNotEmpty( $payload['artifacts']['snapshot_ref'] );
 	}
 }

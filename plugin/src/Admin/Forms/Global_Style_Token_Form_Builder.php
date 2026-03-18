@@ -54,9 +54,9 @@ final class Global_Style_Token_Form_Builder {
 			if ( $group === 'component' ) {
 				continue;
 			}
-			$names = $this->token_registry->get_allowed_names_for_group( $group );
-			$san   = $this->token_registry->get_sanitization_for_group( $group );
-			$max   = isset( $san['max_length'] ) && is_numeric( $san['max_length'] ) ? (int) $san['max_length'] : 512;
+			$names      = $this->token_registry->get_allowed_names_for_group( $group );
+			$san        = $this->token_registry->get_sanitization_for_group( $group );
+			$max        = isset( $san['max_length'] ) && is_numeric( $san['max_length'] ) ? (int) $san['max_length'] : 512;
 			$value_type = isset( $san['value_type'] ) && is_string( $san['value_type'] ) ? $san['value_type'] : 'text';
 			foreach ( $names as $name ) {
 				$value = isset( $current[ $group ][ $name ] ) && is_string( $current[ $group ][ $name ] )
@@ -82,7 +82,7 @@ final class Global_Style_Token_Form_Builder {
 	 * @return array<string, list<array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>>
 	 */
 	public function get_fields_by_group(): array {
-		$defs  = $this->get_field_definitions();
+		$defs   = $this->get_field_definitions();
 		$by_grp = array();
 		foreach ( $defs as $def ) {
 			$g = $def['group'];

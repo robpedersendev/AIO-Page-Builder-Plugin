@@ -38,33 +38,60 @@ final class Repositories_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'section_template_repository', function (): Section_Template_Repository {
-			return new Section_Template_Repository();
-		} );
-		$container->register( 'page_template_repository', function (): Page_Template_Repository {
-			return new Page_Template_Repository();
-		} );
-		$container->register( 'composition_repository', function (): Composition_Repository {
-			return new Composition_Repository();
-		} );
-		$container->register( 'prompt_pack_repository', function (): Prompt_Pack_Repository {
-			return new Prompt_Pack_Repository();
-		} );
-		$container->register( 'documentation_repository', function (): Documentation_Repository {
-			return new Documentation_Repository();
-		} );
-		$container->register( 'version_snapshot_repository', function (): Version_Snapshot_Repository {
-			return new Version_Snapshot_Repository();
-		} );
-		$container->register( 'build_plan_repository', function (): Build_Plan_Repository {
-			return new Build_Plan_Repository();
-		} );
-		$container->register( 'ai_run_repository', function (): AI_Run_Repository {
-			return new AI_Run_Repository();
-		} );
-		$container->register( 'job_queue_repository', function (): Job_Queue_Repository {
-			global $wpdb;
-			return new Job_Queue_Repository( $wpdb );
-		} );
+		$container->register(
+			'section_template_repository',
+			function (): Section_Template_Repository {
+				return new Section_Template_Repository();
+			}
+		);
+		$container->register(
+			'page_template_repository',
+			function (): Page_Template_Repository {
+				return new Page_Template_Repository();
+			}
+		);
+		$container->register(
+			'composition_repository',
+			function (): Composition_Repository {
+				return new Composition_Repository();
+			}
+		);
+		$container->register(
+			'prompt_pack_repository',
+			function (): Prompt_Pack_Repository {
+				return new Prompt_Pack_Repository();
+			}
+		);
+		$container->register(
+			'documentation_repository',
+			function (): Documentation_Repository {
+				return new Documentation_Repository();
+			}
+		);
+		$container->register(
+			'version_snapshot_repository',
+			function (): Version_Snapshot_Repository {
+				return new Version_Snapshot_Repository();
+			}
+		);
+		$container->register(
+			'build_plan_repository',
+			function (): Build_Plan_Repository {
+				return new Build_Plan_Repository();
+			}
+		);
+		$container->register(
+			'ai_run_repository',
+			function (): AI_Run_Repository {
+				return new AI_Run_Repository();
+			}
+		);
+		$container->register(
+			'job_queue_repository',
+			function (): Job_Queue_Repository {
+				global $wpdb;
+				return new Job_Queue_Repository( $wpdb );
+			}
+		);
 	}
 }

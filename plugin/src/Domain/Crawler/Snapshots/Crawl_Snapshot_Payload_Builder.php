@@ -23,18 +23,18 @@ final class Crawl_Snapshot_Payload_Builder {
 
 	// --- Session payload keys (stored in options; not in crawl_snapshots table) ---
 
-	public const SESSION_CRAWL_RUN_ID   = 'crawl_run_id';
-	public const SESSION_SITE_HOST       = 'site_host';
+	public const SESSION_CRAWL_RUN_ID      = 'crawl_run_id';
+	public const SESSION_SITE_HOST         = 'site_host';
 	public const SESSION_CRAWL_PROFILE_KEY = 'crawl_profile_key';
-	public const SESSION_STARTED_AT     = 'started_at';
-	public const SESSION_ENDED_AT        = 'ended_at';
-	public const SESSION_SETTINGS       = 'crawl_settings';
-	public const SESSION_TOTAL_DISCOVERED = 'total_discovered';
-	public const SESSION_ACCEPTED_COUNT  = 'accepted_count';
-	public const SESSION_EXCLUDED_COUNT  = 'excluded_count';
-	public const SESSION_FAILED_COUNT    = 'failed_count';
-	public const SESSION_FINAL_STATUS   = 'final_status';
-	public const SESSION_SCHEMA_VERSION = 'schema_version';
+	public const SESSION_STARTED_AT        = 'started_at';
+	public const SESSION_ENDED_AT          = 'ended_at';
+	public const SESSION_SETTINGS          = 'crawl_settings';
+	public const SESSION_TOTAL_DISCOVERED  = 'total_discovered';
+	public const SESSION_ACCEPTED_COUNT    = 'accepted_count';
+	public const SESSION_EXCLUDED_COUNT    = 'excluded_count';
+	public const SESSION_FAILED_COUNT      = 'failed_count';
+	public const SESSION_FINAL_STATUS      = 'final_status';
+	public const SESSION_SCHEMA_VERSION    = 'schema_version';
 
 	// --- Page record keys (table columns) ---
 
@@ -43,7 +43,7 @@ final class Crawl_Snapshot_Payload_Builder {
 	public const PAGE_CANONICAL_URL      = 'canonical_url';
 	public const PAGE_TITLE_SNAPSHOT     = 'title_snapshot';
 	public const PAGE_META_SNAPSHOT      = 'meta_snapshot';
-	public const PAGE_INDEXABILITY_FLAGS  = 'indexability_flags';
+	public const PAGE_INDEXABILITY_FLAGS = 'indexability_flags';
 	public const PAGE_CLASSIFICATION     = 'page_classification';
 	public const PAGE_HIERARCHY_CLUES    = 'hierarchy_clues';
 	public const PAGE_NAVIGATION         = 'navigation_participation';
@@ -57,20 +57,20 @@ final class Crawl_Snapshot_Payload_Builder {
 	/** Allowed crawl_status values (manifest ?3.1; spec ?24.16). */
 	public const STATUS_PENDING   = 'pending';
 	public const STATUS_COMPLETED = 'completed';
-	public const STATUS_ERROR    = 'error';
+	public const STATUS_ERROR     = 'error';
 
 	/** Final session status values (spec ?24.15, ?24.16). */
-	public const SESSION_STATUS_RUNNING  = 'running';
-	public const SESSION_STATUS_PARTIAL = 'partial';
+	public const SESSION_STATUS_RUNNING   = 'running';
+	public const SESSION_STATUS_PARTIAL   = 'partial';
 	public const SESSION_STATUS_COMPLETED = 'completed';
-	public const SESSION_STATUS_FAILED  = 'failed';
+	public const SESSION_STATUS_FAILED    = 'failed';
 
 	/** Max lengths for sanitization (manifest). */
-	private const URL_MAX_LENGTH       = 2048;
-	private const RUN_ID_MAX_LENGTH    = 64;
-	private const TITLE_MAX_LENGTH     = 512;
-	private const ERROR_STATE_MAX_LENGTH = 255;
-	private const INDEXABILITY_MAX_LENGTH = 255;
+	private const URL_MAX_LENGTH            = 2048;
+	private const RUN_ID_MAX_LENGTH         = 64;
+	private const TITLE_MAX_LENGTH          = 512;
+	private const ERROR_STATE_MAX_LENGTH    = 255;
+	private const INDEXABILITY_MAX_LENGTH   = 255;
 	private const CLASSIFICATION_MAX_LENGTH = 64;
 
 	/** Max length for crawl_profile_key (bounded, spec ?24). */
@@ -79,17 +79,17 @@ final class Crawl_Snapshot_Payload_Builder {
 	/**
 	 * Builds a normalized crawl session payload for storage (e.g. option).
 	 *
-	 * @param string      $crawl_run_id   Stable run identifier.
-	 * @param string      $site_host      Canonical host for the crawl.
-	 * @param string|null $started_at     ISO 8601 datetime; null if not started.
-	 * @param string|null $ended_at       ISO 8601 datetime; null if not ended.
+	 * @param string               $crawl_run_id   Stable run identifier.
+	 * @param string               $site_host      Canonical host for the crawl.
+	 * @param string|null          $started_at     ISO 8601 datetime; null if not started.
+	 * @param string|null          $ended_at       ISO 8601 datetime; null if not ended.
 	 * @param array<string, mixed> $settings Optional crawl settings (bounded, no secrets).
-	 * @param int         $total_discovered Total discovered URLs.
-	 * @param int         $accepted_count  Accepted meaningful pages.
-	 * @param int         $excluded_count  Excluded pages.
-	 * @param int         $failed_count    Failed requests.
-	 * @param string      $final_status   One of SESSION_STATUS_*.
-	 * @param string      $crawl_profile_key Approved profile key (stored with session; default full_public_baseline).
+	 * @param int                  $total_discovered Total discovered URLs.
+	 * @param int                  $accepted_count  Accepted meaningful pages.
+	 * @param int                  $excluded_count  Excluded pages.
+	 * @param int                  $failed_count    Failed requests.
+	 * @param string               $final_status   One of SESSION_STATUS_*.
+	 * @param string               $crawl_profile_key Approved profile key (stored with session; default full_public_baseline).
 	 * @return array<string, mixed> Session record; safe to store server-side.
 	 */
 	public static function build_session_payload(
@@ -105,34 +105,34 @@ final class Crawl_Snapshot_Payload_Builder {
 		string $final_status = self::SESSION_STATUS_RUNNING,
 		string $crawl_profile_key = 'full_public_baseline'
 	): array {
-		$run_id = self::sanitize_run_id( $crawl_run_id );
-		$host   = self::sanitize_host( $site_host );
-		$status = self::normalize_session_status( $final_status );
+		$run_id      = self::sanitize_run_id( $crawl_run_id );
+		$host        = self::sanitize_host( $site_host );
+		$status      = self::normalize_session_status( $final_status );
 		$profile_key = \sanitize_text_field( self::truncate( trim( $crawl_profile_key ), self::PROFILE_KEY_MAX_LENGTH ) );
 		if ( $profile_key === '' ) {
 			$profile_key = 'full_public_baseline';
 		}
 		return array(
-			self::SESSION_CRAWL_RUN_ID    => $run_id,
-			self::SESSION_SITE_HOST       => $host,
+			self::SESSION_CRAWL_RUN_ID      => $run_id,
+			self::SESSION_SITE_HOST         => $host,
 			self::SESSION_CRAWL_PROFILE_KEY => $profile_key,
-			self::SESSION_STARTED_AT      => $started_at !== null && $started_at !== '' ? $started_at : null,
-			self::SESSION_ENDED_AT       => $ended_at !== null && $ended_at !== '' ? $ended_at : null,
-			self::SESSION_SETTINGS        => self::sanitize_settings( $settings ),
-			self::SESSION_TOTAL_DISCOVERED => max( 0, $total_discovered ),
-			self::SESSION_ACCEPTED_COUNT  => max( 0, $accepted_count ),
-			self::SESSION_EXCLUDED_COUNT  => max( 0, $excluded_count ),
-			self::SESSION_FAILED_COUNT    => max( 0, $failed_count ),
-			self::SESSION_FINAL_STATUS   => $status,
-			self::SESSION_SCHEMA_VERSION => self::SCHEMA_VERSION,
+			self::SESSION_STARTED_AT        => $started_at !== null && $started_at !== '' ? $started_at : null,
+			self::SESSION_ENDED_AT          => $ended_at !== null && $ended_at !== '' ? $ended_at : null,
+			self::SESSION_SETTINGS          => self::sanitize_settings( $settings ),
+			self::SESSION_TOTAL_DISCOVERED  => max( 0, $total_discovered ),
+			self::SESSION_ACCEPTED_COUNT    => max( 0, $accepted_count ),
+			self::SESSION_EXCLUDED_COUNT    => max( 0, $excluded_count ),
+			self::SESSION_FAILED_COUNT      => max( 0, $failed_count ),
+			self::SESSION_FINAL_STATUS      => $status,
+			self::SESSION_SCHEMA_VERSION    => self::SCHEMA_VERSION,
 		);
 	}
 
 	/**
 	 * Builds a normalized page snapshot payload for table insert (manifest ?3.1).
 	 *
-	 * @param string      $crawl_run_id   Crawl run identifier.
-	 * @param string      $url            Discovered URL (normalized).
+	 * @param string               $crawl_run_id   Crawl run identifier.
+	 * @param string               $url            Discovered URL (normalized).
 	 * @param array<string, mixed> $overrides Optional overrides; only known keys applied.
 	 * @return array<string, mixed> Page record; keys match table columns.
 	 */
@@ -142,22 +142,22 @@ final class Crawl_Snapshot_Payload_Builder {
 		if ( $run_id === '' || $url === '' ) {
 			return array();
 		}
-		$base = array(
-			self::PAGE_CRAWL_RUN_ID      => $run_id,
-			self::PAGE_URL               => $url,
-			self::PAGE_CANONICAL_URL     => null,
-			self::PAGE_TITLE_SNAPSHOT    => null,
-			self::PAGE_META_SNAPSHOT     => null,
+		$base    = array(
+			self::PAGE_CRAWL_RUN_ID       => $run_id,
+			self::PAGE_URL                => $url,
+			self::PAGE_CANONICAL_URL      => null,
+			self::PAGE_TITLE_SNAPSHOT     => null,
+			self::PAGE_META_SNAPSHOT      => null,
 			self::PAGE_INDEXABILITY_FLAGS => null,
-			self::PAGE_CLASSIFICATION    => null,
-			self::PAGE_HIERARCHY_CLUES   => null,
-			self::PAGE_NAVIGATION        => 0,
-			self::PAGE_SUMMARY_DATA      => null,
-			self::PAGE_CONTENT_HASH      => null,
-			self::PAGE_CRAWL_STATUS     => self::STATUS_PENDING,
-			self::PAGE_ERROR_STATE       => null,
-			self::PAGE_CRAWLED_AT        => null,
-			self::PAGE_SCHEMA_VERSION    => self::SCHEMA_VERSION,
+			self::PAGE_CLASSIFICATION     => null,
+			self::PAGE_HIERARCHY_CLUES    => null,
+			self::PAGE_NAVIGATION         => 0,
+			self::PAGE_SUMMARY_DATA       => null,
+			self::PAGE_CONTENT_HASH       => null,
+			self::PAGE_CRAWL_STATUS       => self::STATUS_PENDING,
+			self::PAGE_ERROR_STATE        => null,
+			self::PAGE_CRAWLED_AT         => null,
+			self::PAGE_SCHEMA_VERSION     => self::SCHEMA_VERSION,
 		);
 		$allowed = array(
 			self::PAGE_CANONICAL_URL,

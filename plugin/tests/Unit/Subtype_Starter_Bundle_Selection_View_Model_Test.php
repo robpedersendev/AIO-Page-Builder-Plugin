@@ -25,7 +25,7 @@ require_once $plugin_root . '/src/Admin/ViewModels/Industry/Subtype_Starter_Bund
 final class Subtype_Starter_Bundle_Selection_View_Model_Test extends TestCase {
 
 	public function test_from_profile_empty_primary_has_no_bundles(): void {
-		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => '' );
+		$profile  = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => '' );
 		$registry = new Industry_Starter_Bundle_Registry();
 		$registry->load( Industry_Starter_Bundle_Registry::get_builtin_definitions() );
 		$vm = Subtype_Starter_Bundle_Selection_View_Model::from_profile( $profile, $registry, null );
@@ -44,7 +44,7 @@ final class Subtype_Starter_Bundle_Selection_View_Model_Test extends TestCase {
 			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'plumber_residential',
 			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => 'plumber_residential_starter',
 		);
-		$vm = Subtype_Starter_Bundle_Selection_View_Model::from_profile( $profile, $registry, $subtype_registry );
+		$vm      = Subtype_Starter_Bundle_Selection_View_Model::from_profile( $profile, $registry, $subtype_registry );
 		$this->assertTrue( $vm->has_primary );
 		$this->assertSame( 'plumber', $vm->primary_industry_key );
 		$this->assertSame( 'plumber_residential', $vm->subtype_key );
@@ -66,7 +66,7 @@ final class Subtype_Starter_Bundle_Selection_View_Model_Test extends TestCase {
 			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'plumber_residential',
 			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => 'plumber_starter',
 		);
-		$vm = Subtype_Starter_Bundle_Selection_View_Model::from_profile( $profile, $registry, $subtype_registry );
+		$vm      = Subtype_Starter_Bundle_Selection_View_Model::from_profile( $profile, $registry, $subtype_registry );
 		$this->assertFalse( $vm->can_clear_to_parent, 'Parent bundle selected so cannot clear to parent' );
 	}
 }

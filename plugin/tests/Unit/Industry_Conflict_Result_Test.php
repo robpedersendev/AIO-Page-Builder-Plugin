@@ -33,7 +33,7 @@ final class Industry_Conflict_Result_Test extends TestCase {
 	}
 
 	public function test_from_array_normalizes_and_defaults(): void {
-		$raw = array(
+		$raw    = array(
 			Industry_Conflict_Result::KEY_CONFLICT_TYPE => 'template_fit',
 			Industry_Conflict_Result::KEY_SOURCE_INDUSTRIES => array( 'legal' ),
 		);

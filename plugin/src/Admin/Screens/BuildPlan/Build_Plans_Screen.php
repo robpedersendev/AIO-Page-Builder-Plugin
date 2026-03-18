@@ -58,7 +58,7 @@ final class Build_Plans_Screen {
 		$plans = array();
 		if ( $this->container && $this->container->has( 'build_plan_repository' ) ) {
 			try {
-				$repo = $this->container->get( 'build_plan_repository' );
+				$repo  = $this->container->get( 'build_plan_repository' );
 				$plans = $repo->list_recent( 50, 0 );
 			} catch ( \Throwable $e ) {
 				$plans = array();
@@ -84,7 +84,7 @@ final class Build_Plans_Screen {
 					<tbody>
 						<?php foreach ( $plans as $plan ) : ?>
 							<?php
-							$pid = (string) ( $plan['plan_id'] ?? $plan['internal_key'] ?? $plan['post_title'] ?? '' );
+							$pid   = (string) ( $plan['plan_id'] ?? $plan['internal_key'] ?? $plan['post_title'] ?? '' );
 							$title = (string) ( $plan['plan_title'] ?? $plan['post_title'] ?? $pid );
 							?>
 							<tr>

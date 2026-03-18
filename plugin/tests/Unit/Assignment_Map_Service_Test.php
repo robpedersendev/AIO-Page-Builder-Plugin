@@ -29,11 +29,11 @@ final class Assignment_Map_Service_Test extends TestCase {
 	}
 
 	private function create_wpdb_stub(): object {
-		$prefix   = 'wp_';
-		$table    = $prefix . Table_Names::ASSIGNMENT_MAPS;
+		$prefix    = 'wp_';
+		$table     = $prefix . Table_Names::ASSIGNMENT_MAPS;
 		$insert_id = 0;
-		$rows     = array();
-		$list     = array();
+		$rows      = array();
+		$list      = array();
 		return new class( $table, $insert_id, $rows, $list ) {
 			public string $prefix = 'wp_';
 			private string $table;
@@ -42,10 +42,10 @@ final class Assignment_Map_Service_Test extends TestCase {
 			private array $list;
 
 			public function __construct( string $table, int &$insert_id, array &$rows, array &$list ) {
-				$this->table = $table;
+				$this->table     = $table;
 				$this->insert_id = &$insert_id;
-				$this->rows = &$rows;
-				$this->list = &$list;
+				$this->rows      = &$rows;
+				$this->list      = &$list;
 			}
 
 			public function prepare( string $query, ...$args ): string {
@@ -65,7 +65,7 @@ final class Assignment_Map_Service_Test extends TestCase {
 			}
 
 			public function get_row( string $query, $output = OBJECT ) {
-				$id = isset( $GLOBALS['_aio_assign_get_row_id'] ) ? (int) $GLOBALS['_aio_assign_get_row_id'] : 0;
+				$id  = isset( $GLOBALS['_aio_assign_get_row_id'] ) ? (int) $GLOBALS['_aio_assign_get_row_id'] : 0;
 				$row = isset( $GLOBALS['_aio_assign_row'] ) ? $GLOBALS['_aio_assign_row'] : null;
 				if ( $output === ARRAY_A && $row !== null ) {
 					return $row;
@@ -90,7 +90,7 @@ final class Assignment_Map_Service_Test extends TestCase {
 	/** Stub that exposes insert_id as property for Assignment_Map_Service. */
 	private function create_wpdb_stub_with_insert_id(): object {
 		$table = $this->wpdb->prefix . Table_Names::ASSIGNMENT_MAPS;
-		$stub = new class( $table ) {
+		$stub  = new class( $table ) {
 			public string $prefix = 'wp_';
 			public int $insert_id = 0;
 			private string $table;
@@ -158,18 +158,18 @@ final class Assignment_Map_Service_Test extends TestCase {
 
 	public function test_get_by_id_returns_row_when_stub_provides_it(): void {
 		$GLOBALS['_aio_assign_row'] = array(
-			'id'         => '1',
-			'map_type'   => Assignment_Types::COMPOSITION_SECTION,
-			'source_ref' => 'comp-1',
-			'target_ref' => 'section-1',
-			'scope_ref'  => null,
-			'payload'    => null,
-			'created_at' => '2025-01-01 00:00:00',
+			'id'             => '1',
+			'map_type'       => Assignment_Types::COMPOSITION_SECTION,
+			'source_ref'     => 'comp-1',
+			'target_ref'     => 'section-1',
+			'scope_ref'      => null,
+			'payload'        => null,
+			'created_at'     => '2025-01-01 00:00:00',
 			'schema_version' => '1',
 		);
-		$wpdb = $this->create_wpdb_stub_with_insert_id();
-		$svc  = new Assignment_Map_Service( $wpdb );
-		$row  = $svc->get_by_id( 1 );
+		$wpdb                       = $this->create_wpdb_stub_with_insert_id();
+		$svc                        = new Assignment_Map_Service( $wpdb );
+		$row                        = $svc->get_by_id( 1 );
 		$this->assertIsArray( $row );
 		$this->assertSame( Assignment_Types::COMPOSITION_SECTION, $row['map_type'] );
 		unset( $GLOBALS['_aio_assign_row'] );
@@ -183,10 +183,19 @@ final class Assignment_Map_Service_Test extends TestCase {
 
 	public function test_list_by_type_returns_stub_results(): void {
 		$GLOBALS['_aio_assign_results'] = array(
-			array( 'id' => '1', 'map_type' => Assignment_Types::PLAN_OBJECT, 'source_ref' => 'plan-1', 'target_ref' => 'obj-1', 'scope_ref' => null, 'payload' => null, 'created_at' => '2025-01-01 00:00:00', 'schema_version' => '1' ),
+			array(
+				'id'             => '1',
+				'map_type'       => Assignment_Types::PLAN_OBJECT,
+				'source_ref'     => 'plan-1',
+				'target_ref'     => 'obj-1',
+				'scope_ref'      => null,
+				'payload'        => null,
+				'created_at'     => '2025-01-01 00:00:00',
+				'schema_version' => '1',
+			),
 		);
-		$svc  = new Assignment_Map_Service( $this->create_wpdb_stub_with_insert_id() );
-		$list = $svc->list_by_type( Assignment_Types::PLAN_OBJECT, 10, 0 );
+		$svc                            = new Assignment_Map_Service( $this->create_wpdb_stub_with_insert_id() );
+		$list                           = $svc->list_by_type( Assignment_Types::PLAN_OBJECT, 10, 0 );
 		$this->assertCount( 1, $list );
 		$this->assertSame( 'plan-1', $list[0]['source_ref'] );
 		unset( $GLOBALS['_aio_assign_results'] );

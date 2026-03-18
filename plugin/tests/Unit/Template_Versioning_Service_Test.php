@@ -56,7 +56,7 @@ final class Template_Versioning_Service_Test extends TestCase {
 	}
 
 	public function test_get_version_summary_from_section_definition(): void {
-		$def = array(
+		$def     = array(
 			Section_Schema::FIELD_VERSION => array(
 				'version'             => '2',
 				'stable_key_retained' => false,
@@ -72,7 +72,7 @@ final class Template_Versioning_Service_Test extends TestCase {
 	}
 
 	public function test_get_version_summary_missing_version_defaults_to_one(): void {
-		$def = array();
+		$def     = array();
 		$summary = $this->service->get_version_summary( $def, 'section' );
 		$this->assertSame( '1', $summary['version'] );
 		$this->assertTrue( $summary['stable_key_retained'] );
@@ -82,12 +82,12 @@ final class Template_Versioning_Service_Test extends TestCase {
 	 * Version continuity: definition with version metadata yields correct summary after upgrade (Prompt 202).
 	 */
 	public function test_version_continuity_page_definition_with_version_block(): void {
-		$def = array(
+		$def     = array(
 			\AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema::FIELD_VERSION => array(
 				'version'             => '3',
-				'stable_key_retained'  => true,
-				'changelog_ref'        => 'release-3',
-				'breaking'             => false,
+				'stable_key_retained' => true,
+				'changelog_ref'       => 'release-3',
+				'breaking'            => false,
 			),
 		);
 		$summary = $this->service->get_version_summary( $def, 'page' );

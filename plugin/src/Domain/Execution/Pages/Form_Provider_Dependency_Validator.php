@@ -50,21 +50,33 @@ final class Form_Provider_Dependency_Validator {
 	 * @return array{valid: bool, errors: list<string>, warnings: list<string>}
 	 */
 	public function validate_for_template( string $template_key ): array {
-		$errors   = array();
-		$warnings = array();
+		$errors       = array();
+		$warnings     = array();
 		$template_key = \sanitize_key( $template_key );
 		if ( $template_key === '' ) {
-			return array( 'valid' => true, 'errors' => array(), 'warnings' => array() );
+			return array(
+				'valid'    => true,
+				'errors'   => array(),
+				'warnings' => array(),
+			);
 		}
 
 		$page_def = $this->page_repository->get_definition_by_key( $template_key );
 		if ( $page_def === null || empty( $page_def ) ) {
-			return array( 'valid' => true, 'errors' => array(), 'warnings' => array() );
+			return array(
+				'valid'    => true,
+				'errors'   => array(),
+				'warnings' => array(),
+			);
 		}
 
 		$ordered = $page_def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 		if ( ! is_array( $ordered ) ) {
-			return array( 'valid' => true, 'errors' => array(), 'warnings' => array() );
+			return array(
+				'valid'    => true,
+				'errors'   => array(),
+				'warnings' => array(),
+			);
 		}
 
 		foreach ( $ordered as $item ) {

@@ -51,9 +51,9 @@ use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
  */
 final class Template_Analytics_Service {
 
-	private const MAX_PLANS = 500;
-	private const MAX_JOBS   = 500;
-	private const MAX_COMPOSITIONS = 200;
+	private const MAX_PLANS             = 500;
+	private const MAX_JOBS              = 500;
+	private const MAX_COMPOSITIONS      = 200;
 	private const TOP_REJECTION_REASONS = 15;
 
 	/** @var Build_Plan_List_Provider_Interface */
@@ -90,14 +90,14 @@ final class Template_Analytics_Service {
 		?string $template_family = null,
 		?string $page_class = null
 	): array {
-		$plans = $this->get_plans_for_period( $date_from, $date_to );
+		$plans        = $this->get_plans_for_period( $date_from, $date_to );
 		$item_signals = $this->collect_plan_item_signals( $plans, $template_family, $page_class );
 
 		return array(
 			'template_usage_trends'           => $this->build_usage_trends( $item_signals ),
-			'recommendation_acceptance'        => $this->build_recommendation_acceptance( $item_signals ),
+			'recommendation_acceptance'       => $this->build_recommendation_acceptance( $item_signals ),
 			'rejection_reasons'               => $this->build_rejection_reasons( $item_signals ),
-			'template_family_outcome_summary'  => $this->build_family_outcome_summary( $date_from, $date_to, $template_family ),
+			'template_family_outcome_summary' => $this->build_family_outcome_summary( $date_from, $date_to, $template_family ),
 			'rollback_frequency'              => $this->build_rollback_frequency( $date_from, $date_to ),
 			'composition_usage'               => $this->build_composition_usage(),
 			'date_from'                       => $date_from,
@@ -117,7 +117,7 @@ final class Template_Analytics_Service {
 		}
 		$from_ts = $date_from !== null && $date_from !== '' ? strtotime( $date_from . ' 00:00:00' ) : false;
 		$to_ts   = $date_to !== null && $date_to !== '' ? strtotime( $date_to . ' 23:59:59' ) : false;
-		$out = array();
+		$out     = array();
 		foreach ( $all as $plan ) {
 			$post_date = (string) ( $plan['post_date'] ?? '' );
 			if ( $post_date === '' ) {
@@ -145,7 +145,7 @@ final class Template_Analytics_Service {
 	 * @return list<array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}>
 	 */
 	private function collect_plan_item_signals( array $plans, ?string $filter_family, ?string $filter_class ): array {
-		$signals = array();
+		$signals                  = array();
 		$item_types_with_template = array(
 			Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE,
 			Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE,
@@ -169,11 +169,11 @@ final class Template_Analytics_Service {
 					if ( ! in_array( $item_type, $item_types_with_template, true ) ) {
 						continue;
 					}
-					$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+					$payload         = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 						? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 						: array();
-					$template_key   = (string) ( $payload['template_key'] ?? $payload['target_template'] ?? '' );
-					$summary        = $payload['proposed_template_summary'] ?? $payload['existing_page_template_change_summary'] ?? array();
+					$template_key    = (string) ( $payload['template_key'] ?? $payload['target_template'] ?? '' );
+					$summary         = $payload['proposed_template_summary'] ?? $payload['existing_page_template_change_summary'] ?? array();
 					$template_family = (string) ( is_array( $summary ) ? ( $summary['template_family'] ?? '' ) : '' );
 					$template_class  = (string) ( is_array( $summary ) ? ( $summary['template_category_class'] ?? '' ) : '' );
 					if ( $template_class === '' && $template_key !== '' ) {
@@ -185,17 +185,17 @@ final class Template_Analytics_Service {
 					if ( $filter_class !== null && $filter_class !== '' && $template_class !== $filter_class ) {
 						continue;
 					}
-					$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? 'pending' );
+					$status           = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? 'pending' );
 					$rejection_reason = (string) ( $payload['rejection_reason'] ?? $payload['failure_reason'] ?? $item['failure_reason'] ?? '' );
 					if ( $rejection_reason === '' && ( $status === Build_Plan_Item_Statuses::REJECTED || $status === Build_Plan_Item_Statuses::FAILED ) ) {
 						$rejection_reason = 'no_reason_recorded';
 					}
 					$signals[] = array(
-						'template_key'      => $template_key,
-						'template_family'   => $template_family !== '' ? $template_family : 'unknown',
-						'template_class'    => $template_class !== '' ? $template_class : 'unknown',
-						'status'            => $status,
-						'rejection_reason'  => $rejection_reason,
+						'template_key'     => $template_key,
+						'template_family'  => $template_family !== '' ? $template_family : 'unknown',
+						'template_class'   => $template_class !== '' ? $template_class : 'unknown',
+						'status'           => $status,
+						'rejection_reason' => $rejection_reason,
 					);
 				}
 			}
@@ -211,17 +211,17 @@ final class Template_Analytics_Service {
 		$by_family = array();
 		$by_class  = array();
 		foreach ( $signals as $s ) {
-			$fam = $s['template_family'];
-			$cls = $s['template_class'];
+			$fam               = $s['template_family'];
+			$cls               = $s['template_class'];
 			$by_family[ $fam ] = ( $by_family[ $fam ] ?? 0 ) + 1;
 			$by_class[ $cls ]  = ( $by_class[ $cls ] ?? 0 ) + 1;
 		}
 		arsort( $by_family, SORT_NUMERIC );
 		arsort( $by_class, SORT_NUMERIC );
 		return array(
-			'by_family'    => $by_family,
-			'by_class'     => $by_class,
-			'total_items'  => count( $signals ),
+			'by_family'   => $by_family,
+			'by_class'    => $by_class,
+			'total_items' => count( $signals ),
 		);
 	}
 
@@ -236,29 +236,44 @@ final class Template_Analytics_Service {
 			$fam = $s['template_family'];
 			$cls = $s['template_class'];
 			if ( ! isset( $by_family[ $fam ] ) ) {
-				$by_family[ $fam ] = array( 'proposed' => 0, 'approved' => 0, 'rejected' => 0, 'failed' => 0, 'completed' => 0 );
+				$by_family[ $fam ] = array(
+					'proposed'  => 0,
+					'approved'  => 0,
+					'rejected'  => 0,
+					'failed'    => 0,
+					'completed' => 0,
+				);
 			}
 			if ( ! isset( $by_class[ $cls ] ) ) {
-				$by_class[ $cls ] = array( 'proposed' => 0, 'approved' => 0, 'rejected' => 0, 'failed' => 0, 'completed' => 0 );
+				$by_class[ $cls ] = array(
+					'proposed'  => 0,
+					'approved'  => 0,
+					'rejected'  => 0,
+					'failed'    => 0,
+					'completed' => 0,
+				);
 			}
-			$by_family[ $fam ]['proposed']++;
-			$by_class[ $cls ]['proposed']++;
+			++$by_family[ $fam ]['proposed'];
+			++$by_class[ $cls ]['proposed'];
 			$status = $s['status'];
 			if ( $status === Build_Plan_Item_Statuses::APPROVED ) {
-				$by_family[ $fam ]['approved']++;
-				$by_class[ $cls ]['approved']++;
+				++$by_family[ $fam ]['approved'];
+				++$by_class[ $cls ]['approved'];
 			} elseif ( $status === Build_Plan_Item_Statuses::REJECTED ) {
-				$by_family[ $fam ]['rejected']++;
-				$by_class[ $cls ]['rejected']++;
+				++$by_family[ $fam ]['rejected'];
+				++$by_class[ $cls ]['rejected'];
 			} elseif ( $status === Build_Plan_Item_Statuses::FAILED ) {
-				$by_family[ $fam ]['failed']++;
-				$by_class[ $cls ]['failed']++;
+				++$by_family[ $fam ]['failed'];
+				++$by_class[ $cls ]['failed'];
 			} elseif ( $status === Build_Plan_Item_Statuses::COMPLETED ) {
-				$by_family[ $fam ]['completed']++;
-				$by_class[ $cls ]['completed']++;
+				++$by_family[ $fam ]['completed'];
+				++$by_class[ $cls ]['completed'];
 			}
 		}
-		return array( 'by_family' => $by_family, 'by_class' => $by_class );
+		return array(
+			'by_family' => $by_family,
+			'by_class'  => $by_class,
+		);
 	}
 
 	/**
@@ -279,13 +294,16 @@ final class Template_Analytics_Service {
 		}
 		arsort( $counts, SORT_NUMERIC );
 		$reasons = array();
-		$n = 0;
+		$n       = 0;
 		foreach ( $counts as $reason => $count ) {
 			if ( $n >= self::TOP_REJECTION_REASONS ) {
 				break;
 			}
-			$reasons[] = array( 'reason' => $reason, 'count' => (int) $count );
-			$n++;
+			$reasons[] = array(
+				'reason' => $reason,
+				'count'  => (int) $count,
+			);
+			++$n;
 		}
 		return array(
 			'reasons' => $reasons,
@@ -302,16 +320,20 @@ final class Template_Analytics_Service {
 	 * @return array{by_family: array<string, array{completed: int, failed: int}>, total_completed: int, total_failed: int}
 	 */
 	private function build_family_outcome_summary( ?string $date_from, ?string $date_to, ?string $filter_family ): array {
-		$by_family = array();
+		$by_family       = array();
 		$total_completed = 0;
 		$total_failed    = 0;
 		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
-			return array( 'by_family' => $by_family, 'total_completed' => 0, 'total_failed' => 0 );
+			return array(
+				'by_family'       => $by_family,
+				'total_completed' => 0,
+				'total_failed'    => 0,
+			);
 		}
 		$completed = $this->job_queue_repository->list_by_status( 'completed', self::MAX_JOBS, 0 );
 		$failed    = $this->job_queue_repository->list_by_status( 'failed', self::MAX_JOBS, 0 );
-		$from_ts = $date_from !== null && $date_from !== '' ? strtotime( $date_from . ' 00:00:00' ) : false;
-		$to_ts   = $date_to !== null && $date_to !== '' ? strtotime( $date_to . ' 23:59:59' ) : false;
+		$from_ts   = $date_from !== null && $date_from !== '' ? strtotime( $date_from . ' 00:00:00' ) : false;
+		$to_ts     = $date_to !== null && $date_to !== '' ? strtotime( $date_to . ' 23:59:59' ) : false;
 		foreach ( array_merge( $completed, $failed ) as $row ) {
 			$job_type = (string) ( $row['job_type'] ?? '' );
 			if ( $job_type !== Execution_Action_Types::CREATE_PAGE && $job_type !== Execution_Action_Types::REPLACE_PAGE ) {
@@ -325,7 +347,7 @@ final class Template_Analytics_Service {
 				continue;
 			}
 			$related = (string) ( $row['related_object_refs'] ?? '' );
-			$family = '';
+			$family  = '';
 			if ( $related !== '' ) {
 				$decoded = json_decode( $related, true );
 				if ( is_array( $decoded ) ) {
@@ -343,18 +365,25 @@ final class Template_Analytics_Service {
 			}
 			$status = (string) ( $row['queue_status'] ?? '' );
 			if ( ! isset( $by_family[ $family ] ) ) {
-				$by_family[ $family ] = array( 'completed' => 0, 'failed' => 0 );
+				$by_family[ $family ] = array(
+					'completed' => 0,
+					'failed'    => 0,
+				);
 			}
 			if ( $status === 'completed' ) {
-				$by_family[ $family ]['completed']++;
-				$total_completed++;
+				++$by_family[ $family ]['completed'];
+				++$total_completed;
 			} else {
-				$by_family[ $family ]['failed']++;
-				$total_failed++;
+				++$by_family[ $family ]['failed'];
+				++$total_failed;
 			}
 		}
 		ksort( $by_family );
-		return array( 'by_family' => $by_family, 'total_completed' => $total_completed, 'total_failed' => $total_failed );
+		return array(
+			'by_family'       => $by_family,
+			'total_completed' => $total_completed,
+			'total_failed'    => $total_failed,
+		);
 	}
 
 	/**
@@ -366,14 +395,17 @@ final class Template_Analytics_Service {
 	 */
 	private function build_rollback_frequency( ?string $date_from, ?string $date_to ): array {
 		$by_month = array();
-		$total = 0;
+		$total    = 0;
 		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
-			return array( 'total_rollbacks' => 0, 'by_month' => array() );
+			return array(
+				'total_rollbacks' => 0,
+				'by_month'        => array(),
+			);
 		}
 		$completed = $this->job_queue_repository->list_by_status( 'completed', self::MAX_JOBS, 0 );
 		$failed    = $this->job_queue_repository->list_by_status( 'failed', self::MAX_JOBS, 0 );
-		$from_ts = $date_from !== null && $date_from !== '' ? strtotime( $date_from . ' 00:00:00' ) : false;
-		$to_ts   = $date_to !== null && $date_to !== '' ? strtotime( $date_to . ' 23:59:59' ) : false;
+		$from_ts   = $date_from !== null && $date_from !== '' ? strtotime( $date_from . ' 00:00:00' ) : false;
+		$to_ts     = $date_to !== null && $date_to !== '' ? strtotime( $date_to . ' 23:59:59' ) : false;
 		foreach ( array_merge( $completed, $failed ) as $row ) {
 			$job_type = (string) ( $row['job_type'] ?? '' );
 			if ( $job_type !== Execution_Action_Types::ROLLBACK_ACTION ) {
@@ -390,16 +422,22 @@ final class Template_Analytics_Service {
 			if ( $to_ts !== false && $ts > $to_ts ) {
 				continue;
 			}
-			$month = gmdate( 'Y-m', $ts );
+			$month              = gmdate( 'Y-m', $ts );
 			$by_month[ $month ] = ( $by_month[ $month ] ?? 0 ) + 1;
-			$total++;
+			++$total;
 		}
 		ksort( $by_month );
 		$list = array();
 		foreach ( $by_month as $month => $count ) {
-			$list[] = array( 'month' => $month, 'count' => (int) $count );
+			$list[] = array(
+				'month' => $month,
+				'count' => (int) $count,
+			);
 		}
-		return array( 'total_rollbacks' => $total, 'by_month' => $list );
+		return array(
+			'total_rollbacks' => $total,
+			'by_month'        => $list,
+		);
 	}
 
 	/**
@@ -409,19 +447,25 @@ final class Template_Analytics_Service {
 	 */
 	private function build_composition_usage(): array {
 		$by_status = array();
-		$total = 0;
+		$total     = 0;
 		if ( $this->composition_repository === null || ! method_exists( $this->composition_repository, 'list_all_definitions' ) ) {
-			return array( 'by_status' => array(), 'total' => 0 );
+			return array(
+				'by_status' => array(),
+				'total'     => 0,
+			);
 		}
 		$defs = $this->composition_repository->list_all_definitions( self::MAX_COMPOSITIONS, 0 );
 		foreach ( $defs as $def ) {
 			if ( ! is_array( $def ) ) {
 				continue;
 			}
-			$status = (string) ( $def['status'] ?? 'unknown' );
+			$status               = (string) ( $def['status'] ?? 'unknown' );
 			$by_status[ $status ] = ( $by_status[ $status ] ?? 0 ) + 1;
-			$total++;
+			++$total;
 		}
-		return array( 'by_status' => $by_status, 'total' => $total );
+		return array(
+			'by_status' => $by_status,
+			'total'     => $total,
+		);
 	}
 }

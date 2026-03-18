@@ -25,9 +25,9 @@ use AIOPageBuilder\Infrastructure\Config\Option_Names;
  */
 final class Support_Triage_State_Builder {
 
-	private const CRITICAL_CAP       = 10;
-	private const FAILED_AI_RUNS_CAP = 5;
-	private const STALE_PLANS_CAP    = 10;
+	private const CRITICAL_CAP            = 10;
+	private const FAILED_AI_RUNS_CAP      = 5;
+	private const STALE_PLANS_CAP         = 10;
 	private const ROLLBACK_CANDIDATES_CAP = 10;
 
 	/** Job types that typically have rollback-eligible actions (link to plan for full eligibility). */
@@ -56,10 +56,10 @@ final class Support_Triage_State_Builder {
 		?object $build_plan_repository = null,
 		?\AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service $industry_diagnostics = null
 	) {
-		$this->job_queue_repository   = $job_queue_repository;
-		$this->ai_run_repository      = $ai_run_repository;
-		$this->build_plan_repository   = $build_plan_repository;
-		$this->industry_diagnostics   = $industry_diagnostics;
+		$this->job_queue_repository  = $job_queue_repository;
+		$this->ai_run_repository     = $ai_run_repository;
+		$this->build_plan_repository = $build_plan_repository;
+		$this->industry_diagnostics  = $industry_diagnostics;
 	}
 
 	/**
@@ -76,27 +76,27 @@ final class Support_Triage_State_Builder {
 	 * }
 	 */
 	public function build(): array {
-		$reporting_health = ( new Reporting_Health_Summary_Builder() )->build();
-		$queue_health     = ( new Queue_Health_Summary_Builder( $this->job_queue_repository ) )->build();
-		$critical_errors  = $this->build_critical_errors();
-		$failed_ai_runs   = $this->build_failed_ai_runs();
-		$stale_plans      = $this->build_stale_plans();
+		$reporting_health    = ( new Reporting_Health_Summary_Builder() )->build();
+		$queue_health        = ( new Queue_Health_Summary_Builder( $this->job_queue_repository ) )->build();
+		$critical_errors     = $this->build_critical_errors();
+		$failed_ai_runs      = $this->build_failed_ai_runs();
+		$stale_plans         = $this->build_stale_plans();
 		$rollback_candidates = $this->build_rollback_candidates();
-		$import_export    = $this->build_import_export_failures();
-		$critical_issues  = $this->aggregate_critical_issues( $reporting_health, $queue_health, $critical_errors );
-		$degraded_systems = $this->aggregate_degraded_systems( $reporting_health, $queue_health );
-		$recent_failed    = $this->aggregate_recent_failed_workflows( $critical_errors, $failed_ai_runs, $queue_health );
-		$recommended_links = $this->build_recommended_links( $critical_issues, $degraded_systems, $recent_failed );
-		$industry_snapshot = $this->industry_diagnostics !== null ? $this->industry_diagnostics->get_snapshot() : null;
+		$import_export       = $this->build_import_export_failures();
+		$critical_issues     = $this->aggregate_critical_issues( $reporting_health, $queue_health, $critical_errors );
+		$degraded_systems    = $this->aggregate_degraded_systems( $reporting_health, $queue_health );
+		$recent_failed       = $this->aggregate_recent_failed_workflows( $critical_errors, $failed_ai_runs, $queue_health );
+		$recommended_links   = $this->build_recommended_links( $critical_issues, $degraded_systems, $recent_failed );
+		$industry_snapshot   = $this->industry_diagnostics !== null ? $this->industry_diagnostics->get_snapshot() : null;
 
 		$out = array(
-			'critical_issues'        => $critical_issues,
-			'degraded_systems'       => $degraded_systems,
+			'critical_issues'         => $critical_issues,
+			'degraded_systems'        => $degraded_systems,
 			'recent_failed_workflows' => $recent_failed,
-			'rollback_candidates'    => $rollback_candidates,
-			'import_export_failures' => $import_export,
-			'recommended_links'      => $recommended_links,
-			'stale_plans'            => $stale_plans,
+			'rollback_candidates'     => $rollback_candidates,
+			'import_export_failures'  => $import_export,
+			'recommended_links'       => $recommended_links,
+			'stale_plans'             => $stale_plans,
 		);
 		if ( $industry_snapshot !== null ) {
 			$out['industry_snapshot'] = $industry_snapshot;
@@ -105,15 +105,21 @@ final class Support_Triage_State_Builder {
 	}
 
 	/**
-	 * @param array<string, mixed> $reporting_health
-	 * @param array<string, mixed> $queue_health
+	 * @param array<string, mixed>        $reporting_health
+	 * @param array<string, mixed>        $queue_health
 	 * @param list<array<string, string>> $critical_errors
 	 * @return list<array{severity: string, domain: string, title: string, message: string, link_url: string, link_label: string}>
 	 */
 	private function aggregate_critical_issues( array $reporting_health, array $queue_health, array $critical_errors ): array {
-		$base = \admin_url( 'admin.php' );
-		$out  = array();
-		$logs_critical_url = \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'critical' ), $base );
+		$base              = \admin_url( 'admin.php' );
+		$out               = array();
+		$logs_critical_url = \add_query_arg(
+			array(
+				'page' => 'aio-page-builder-queue-logs',
+				'tab'  => 'critical',
+			),
+			$base
+		);
 		if ( count( $critical_errors ) > 0 ) {
 			$out[] = array(
 				'severity'   => 'critical',
@@ -130,7 +136,13 @@ final class Support_Triage_State_Builder {
 				'domain'     => 'queue',
 				'title'      => __( 'Stale queue locks', 'aio-page-builder' ),
 				'message'    => sprintf( __( '%d job(s) with stale lock detected.', 'aio-page-builder' ), (int) $queue_health['stale_lock_count'] ),
-				'link_url'   => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'queue' ), $base ),
+				'link_url'   => \add_query_arg(
+					array(
+						'page' => 'aio-page-builder-queue-logs',
+						'tab'  => 'queue',
+					),
+					$base
+				),
 				'link_label' => __( 'Queue & Logs', 'aio-page-builder' ),
 			);
 		}
@@ -140,7 +152,13 @@ final class Support_Triage_State_Builder {
 				'domain'     => 'reporting',
 				'title'      => __( 'Reporting degraded', 'aio-page-builder' ),
 				'message'    => (string) ( $reporting_health['summary_message'] ?? '' ),
-				'link_url'   => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'reporting' ), $base ),
+				'link_url'   => \add_query_arg(
+					array(
+						'page' => 'aio-page-builder-queue-logs',
+						'tab'  => 'reporting',
+					),
+					$base
+				),
 				'link_label' => __( 'Reporting logs', 'aio-page-builder' ),
 			);
 		}
@@ -160,7 +178,13 @@ final class Support_Triage_State_Builder {
 				'domain'     => 'reporting',
 				'title'      => __( 'Reporting', 'aio-page-builder' ),
 				'message'    => (string) ( $reporting_health['summary_message'] ?? '' ),
-				'link_url'   => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'reporting' ), $base ),
+				'link_url'   => \add_query_arg(
+					array(
+						'page' => 'aio-page-builder-queue-logs',
+						'tab'  => 'reporting',
+					),
+					$base
+				),
 				'link_label' => __( 'Queue & Logs → Reporting', 'aio-page-builder' ),
 			);
 		}
@@ -169,7 +193,13 @@ final class Support_Triage_State_Builder {
 				'domain'     => 'queue',
 				'title'      => __( 'Queue', 'aio-page-builder' ),
 				'message'    => (string) ( $queue_health['summary_message'] ?? '' ),
-				'link_url'   => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'queue' ), $base ),
+				'link_url'   => \add_query_arg(
+					array(
+						'page' => 'aio-page-builder-queue-logs',
+						'tab'  => 'queue',
+					),
+					$base
+				),
 				'link_label' => __( 'Queue & Logs', 'aio-page-builder' ),
 			);
 		}
@@ -179,7 +209,7 @@ final class Support_Triage_State_Builder {
 	/**
 	 * @param list<array<string, string>> $critical_errors
 	 * @param list<array<string, string>> $failed_ai_runs
-	 * @param array<string, mixed> $queue_health
+	 * @param array<string, mixed>        $queue_health
 	 * @return list<array{domain: string, identifier: string, summary: string, link_url: string, link_label: string}>
 	 */
 	private function aggregate_recent_failed_workflows( array $critical_errors, array $failed_ai_runs, array $queue_health ): array {
@@ -190,7 +220,13 @@ final class Support_Triage_State_Builder {
 				'domain'     => 'ai_runs',
 				'identifier' => (string) ( $run['run_id'] ?? '' ),
 				'summary'    => (string) ( $run['status'] ?? '' ) . ' — ' . ( (string) ( $run['created_at'] ?? '' ) ),
-				'link_url'   => \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs', 'run_id' => (string) ( $run['run_id'] ?? '' ) ), $base ),
+				'link_url'   => \add_query_arg(
+					array(
+						'page'   => 'aio-page-builder-ai-runs',
+						'run_id' => (string) ( $run['run_id'] ?? '' ),
+					),
+					$base
+				),
 				'link_label' => __( 'View AI run', 'aio-page-builder' ),
 			);
 		}
@@ -200,7 +236,13 @@ final class Support_Triage_State_Builder {
 				'domain'     => 'queue',
 				'identifier' => 'failed_jobs',
 				'summary'    => sprintf( __( '%d failed queue job(s).', 'aio-page-builder' ), $failed_count ),
-				'link_url'   => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'queue' ), $base ),
+				'link_url'   => \add_query_arg(
+					array(
+						'page' => 'aio-page-builder-queue-logs',
+						'tab'  => 'queue',
+					),
+					$base
+				),
 				'link_label' => __( 'Queue & Logs', 'aio-page-builder' ),
 			);
 		}
@@ -255,7 +297,7 @@ final class Support_Triage_State_Builder {
 			if ( $status === 'completed' || $status === 'success' || $status === '' ) {
 				continue;
 			}
-			$meta = $run['run_metadata'] ?? array();
+			$meta  = $run['run_metadata'] ?? array();
 			$out[] = array(
 				'run_id'     => (string) ( $run['internal_key'] ?? $run['post_title'] ?? '' ),
 				'status'     => $status,
@@ -277,9 +319,9 @@ final class Support_Triage_State_Builder {
 		if ( $this->build_plan_repository === null || ! method_exists( $this->build_plan_repository, 'list_recent' ) ) {
 			return array();
 		}
-		$plans = $this->build_plan_repository->list_recent( self::STALE_PLANS_CAP * 2, 0 );
+		$plans    = $this->build_plan_repository->list_recent( self::STALE_PLANS_CAP * 2, 0 );
 		$statuses = array( 'pending_review', 'in_progress', 'approved' );
-		$out = array();
+		$out      = array();
 		foreach ( $plans as $plan ) {
 			if ( ! is_array( $plan ) ) {
 				continue;
@@ -325,12 +367,24 @@ final class Support_Triage_State_Builder {
 				$plan_id = trim( substr( $related, 0, 64 ) );
 			}
 			$plan_id = $plan_id !== '' ? $plan_id : '—';
-			$out[] = array(
+			$out[]   = array(
 				'job_ref'      => (string) ( $row['job_ref'] ?? '' ),
 				'job_type'     => $job_type,
 				'plan_id'      => $plan_id,
 				'completed_at' => (string) ( $row['completed_at'] ?? '' ),
-				'link_url'     => $plan_id !== '—' ? \add_query_arg( array( 'page' => 'aio-page-builder-build-plans', 'plan_id' => $plan_id ), $base ) : \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'queue' ), $base ),
+				'link_url'     => $plan_id !== '—' ? \add_query_arg(
+					array(
+						'page'    => 'aio-page-builder-build-plans',
+						'plan_id' => $plan_id,
+					),
+					$base
+				) : \add_query_arg(
+					array(
+						'page' => 'aio-page-builder-queue-logs',
+						'tab'  => 'queue',
+					),
+					$base
+				),
 				'link_label'   => $plan_id !== '—' ? __( 'Open plan', 'aio-page-builder' ) : __( 'Queue & Logs', 'aio-page-builder' ),
 			);
 		}
@@ -358,7 +412,13 @@ final class Support_Triage_State_Builder {
 		if ( count( $critical_issues ) > 0 ) {
 			$out[] = array(
 				'label'       => __( 'Critical errors', 'aio-page-builder' ),
-				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'critical' ), $base ),
+				'url'         => \add_query_arg(
+					array(
+						'page' => 'aio-page-builder-queue-logs',
+						'tab'  => 'critical',
+					),
+					$base
+				),
 				'description' => __( 'View failed developer error report delivery.', 'aio-page-builder' ),
 			);
 		}

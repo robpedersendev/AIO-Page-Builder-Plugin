@@ -81,13 +81,13 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 	/**
 	 * Builds a legal/policy/utility section definition.
 	 *
-	 * @param string $key Internal key.
-	 * @param string $name Display name.
-	 * @param string $purpose_summary Purpose summary.
-	 * @param string $category Section category (legal_disclaimer, utility_structural, form_embed, cta_conversion).
-	 * @param string $purpose_family section_purpose_family (legal, policy, contact, utility, form_support).
-	 * @param string $variation_family_key Variation family key.
-	 * @param string $preview_desc Preview description.
+	 * @param string               $key Internal key.
+	 * @param string               $name Display name.
+	 * @param string               $purpose_summary Purpose summary.
+	 * @param string               $category Section category (legal_disclaimer, utility_structural, form_embed, cta_conversion).
+	 * @param string               $purpose_family section_purpose_family (legal, policy, contact, utility, form_support).
+	 * @param string               $variation_family_key Variation family key.
+	 * @param string               $preview_desc Preview description.
 	 * @param array<string, mixed> $blueprint_fields Field definitions for embedded blueprint.
 	 * @param array<string, mixed> $preview_defaults Synthetic ACF defaults for preview.
 	 * @param array<string, mixed> $extra Optional extra keys.
@@ -105,19 +105,23 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 		array $preview_defaults,
 		array $extra = array()
 	): array {
-		$bp_id = 'acf_blueprint_' . $key;
-		$base = array(
-			Section_Schema::FIELD_INTERNAL_KEY            => $key,
-			Section_Schema::FIELD_NAME                    => $name,
-			Section_Schema::FIELD_PURPOSE_SUMMARY         => $purpose_summary,
-			Section_Schema::FIELD_CATEGORY                => $category,
+		$bp_id                   = 'acf_blueprint_' . $key;
+		$base                    = array(
+			Section_Schema::FIELD_INTERNAL_KEY             => $key,
+			Section_Schema::FIELD_NAME                     => $name,
+			Section_Schema::FIELD_PURPOSE_SUMMARY          => $purpose_summary,
+			Section_Schema::FIELD_CATEGORY                 => $category,
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp_' . $key,
-			Section_Schema::FIELD_FIELD_BLUEPRINT_REF     => $bp_id,
-			Section_Schema::FIELD_HELPER_REF              => 'helper_' . $key,
-			Section_Schema::FIELD_CSS_CONTRACT_REF        => 'css_' . $key,
-			Section_Schema::FIELD_DEFAULT_VARIANT         => 'default',
-			Section_Schema::FIELD_VARIANTS                => array(
-				'default' => array( 'label' => 'Default', 'description' => '', 'css_modifiers' => array() ),
+			Section_Schema::FIELD_FIELD_BLUEPRINT_REF      => $bp_id,
+			Section_Schema::FIELD_HELPER_REF               => 'helper_' . $key,
+			Section_Schema::FIELD_CSS_CONTRACT_REF         => 'css_' . $key,
+			Section_Schema::FIELD_DEFAULT_VARIANT          => 'default',
+			Section_Schema::FIELD_VARIANTS                 => array(
+				'default' => array(
+					'label'         => 'Default',
+					'description'   => '',
+					'css_modifiers' => array(),
+				),
 			),
 			Section_Schema::FIELD_COMPATIBILITY            => array(
 				'may_precede'          => array(),
@@ -125,19 +129,22 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 				'avoid_adjacent'       => array(),
 				'duplicate_purpose_of' => array(),
 			),
-			Section_Schema::FIELD_VERSION                 => array( 'version' => '1', 'stable_key_retained' => true ),
-			Section_Schema::FIELD_STATUS                  => 'active',
-			Section_Schema::FIELD_RENDER_MODE             => 'block',
-			Section_Schema::FIELD_ASSET_DECLARATION       => array( 'none' => true ),
-			'section_purpose_family'                     => $purpose_family,
-			'variation_family_key'                       => $variation_family_key,
-			'preview_description'                        => $preview_desc,
-			'preview_image_ref'                          => '',
-			'animation_tier'                             => 'none',
-			'animation_families'                         => array(),
-			'preview_defaults'                           => $preview_defaults,
-			'accessibility_warnings_or_enhancements'     => 'Use semantic headings and landmarks. Forms: visible labels, label-input association, required-field indication, no placeholder-only labeling (spec ?51.9). Modals: keyboard open/close, focus trap, focus return (spec ?51.10). Omit optional blocks when empty.',
-			'seo_relevance_notes'                       => 'Legal and utility content benefits from clear headings and structure (spec ?15.9).',
+			Section_Schema::FIELD_VERSION                  => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Section_Schema::FIELD_STATUS                   => 'active',
+			Section_Schema::FIELD_RENDER_MODE              => 'block',
+			Section_Schema::FIELD_ASSET_DECLARATION        => array( 'none' => true ),
+			'section_purpose_family'                       => $purpose_family,
+			'variation_family_key'                         => $variation_family_key,
+			'preview_description'                          => $preview_desc,
+			'preview_image_ref'                            => '',
+			'animation_tier'                               => 'none',
+			'animation_families'                           => array(),
+			'preview_defaults'                             => $preview_defaults,
+			'accessibility_warnings_or_enhancements'       => 'Use semantic headings and landmarks. Forms: visible labels, label-input association, required-field indication, no placeholder-only labeling (spec ?51.9). Modals: keyboard open/close, focus trap, focus return (spec ?51.10). Omit optional blocks when empty.',
+			'seo_relevance_notes'                          => 'Legal and utility content benefits from clear headings and structure (spec ?15.9).',
 		);
 		$base['field_blueprint'] = array(
 			'blueprint_id'    => $bp_id,
@@ -155,10 +162,22 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 
 	/** Disclosure header: title + short notice. */
 	public static function lpu_disclosure_header_01(): array {
-		$key = 'lpu_disclosure_header_01';
+		$key    = 'lpu_disclosure_header_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_dh_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-			array( 'key' => 'field_lpu_dh_notice', 'name' => 'notice', 'label' => 'Notice', 'type' => 'textarea', 'required' => false ),
+			array(
+				'key'      => 'field_lpu_dh_title',
+				'name'     => 'title',
+				'label'    => 'Title',
+				'type'     => 'text',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_lpu_dh_notice',
+				'name'     => 'notice',
+				'label'    => 'Notice',
+				'type'     => 'textarea',
+				'required' => false,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -169,17 +188,32 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'disclosure_header',
 			'Disclosure header with title and optional notice.',
 			$fields,
-			array( 'title' => 'Important notice', 'notice' => 'This is sample disclosure text. Replace with your actual policy language.' ),
+			array(
+				'title'  => 'Important notice',
+				'notice' => 'This is sample disclosure text. Replace with your actual policy language.',
+			),
 			array( 'short_label' => 'Disclosure header' )
 		);
 	}
 
 	/** Policy body: heading + WYSIWYG body. */
 	public static function lpu_policy_body_01(): array {
-		$key = 'lpu_policy_body_01';
+		$key    = 'lpu_policy_body_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_pb_heading', 'name' => 'heading', 'label' => 'Heading', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_pb_body', 'name' => 'body', 'label' => 'Body', 'type' => 'wysiwyg', 'required' => true ),
+			array(
+				'key'      => 'field_lpu_pb_heading',
+				'name'     => 'heading',
+				'label'    => 'Heading',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_pb_body',
+				'name'     => 'body',
+				'label'    => 'Body',
+				'type'     => 'wysiwyg',
+				'required' => true,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -190,18 +224,39 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'policy_body',
 			'Policy body with optional heading and rich text.',
 			$fields,
-			array( 'heading' => 'Policy section', 'body' => '<p>Sample policy text. This is not legal advice. Replace with your actual policy content.</p>' ),
+			array(
+				'heading' => 'Policy section',
+				'body'    => '<p>Sample policy text. This is not legal advice. Replace with your actual policy content.</p>',
+			),
 			array( 'short_label' => 'Policy body' )
 		);
 	}
 
 	/** Legal summary: title + summary text + optional last_updated. */
 	public static function lpu_legal_summary_01(): array {
-		$key = 'lpu_legal_summary_01';
+		$key    = 'lpu_legal_summary_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_ls_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-			array( 'key' => 'field_lpu_ls_summary', 'name' => 'summary', 'label' => 'Summary', 'type' => 'textarea', 'required' => true ),
-			array( 'key' => 'field_lpu_ls_updated', 'name' => 'last_updated', 'label' => 'Last updated', 'type' => 'text', 'required' => false ),
+			array(
+				'key'      => 'field_lpu_ls_title',
+				'name'     => 'title',
+				'label'    => 'Title',
+				'type'     => 'text',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_lpu_ls_summary',
+				'name'     => 'summary',
+				'label'    => 'Summary',
+				'type'     => 'textarea',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_lpu_ls_updated',
+				'name'     => 'last_updated',
+				'label'    => 'Last updated',
+				'type'     => 'text',
+				'required' => false,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -212,18 +267,40 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'legal_summary',
 			'Legal summary with title, summary, and optional date.',
 			$fields,
-			array( 'title' => 'Summary', 'summary' => 'This is a brief summary. See full policy for complete terms.', 'last_updated' => '' ),
+			array(
+				'title'        => 'Summary',
+				'summary'      => 'This is a brief summary. See full policy for complete terms.',
+				'last_updated' => '',
+			),
 			array( 'short_label' => 'Legal summary' )
 		);
 	}
 
 	/** Consent note: heading + body + optional checkbox_label. */
 	public static function lpu_consent_note_01(): array {
-		$key = 'lpu_consent_note_01';
+		$key    = 'lpu_consent_note_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_cn_heading', 'name' => 'heading', 'label' => 'Heading', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_cn_body', 'name' => 'body', 'label' => 'Body', 'type' => 'textarea', 'required' => true ),
-			array( 'key' => 'field_lpu_cn_checkbox_label', 'name' => 'checkbox_label', 'label' => 'Checkbox label', 'type' => 'text', 'required' => false ),
+			array(
+				'key'      => 'field_lpu_cn_heading',
+				'name'     => 'heading',
+				'label'    => 'Heading',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_cn_body',
+				'name'     => 'body',
+				'label'    => 'Body',
+				'type'     => 'textarea',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_lpu_cn_checkbox_label',
+				'name'     => 'checkbox_label',
+				'label'    => 'Checkbox label',
+				'type'     => 'text',
+				'required' => false,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -234,26 +311,60 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'consent_note',
 			'Consent note with optional checkbox label.',
 			$fields,
-			array( 'heading' => 'Consent', 'body' => 'By continuing you agree to the terms above.', 'checkbox_label' => 'I have read and agree.' ),
+			array(
+				'heading'        => 'Consent',
+				'body'           => 'By continuing you agree to the terms above.',
+				'checkbox_label' => 'I have read and agree.',
+			),
 			array( 'short_label' => 'Consent note' )
 		);
 	}
 
 	/** Contact panel: heading + repeatable channels (label, value, type). */
 	public static function lpu_contact_panel_01(): array {
-		$key = 'lpu_contact_panel_01';
+		$key    = 'lpu_contact_panel_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_cp_heading', 'name' => 'heading', 'label' => 'Heading', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_lpu_cp_channels',
-				'name'        => 'channels',
-				'label'       => 'Contact channels',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_lpu_cp_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_lpu_cp_value', 'name' => 'value', 'label' => 'Value (e.g. email, phone)', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_lpu_cp_type', 'name' => 'type', 'label' => 'Type', 'type' => 'select', 'required' => false, 'choices' => array( 'email' => 'Email', 'phone' => 'Phone', 'url' => 'URL', 'other' => 'Other' ) ),
+				'key'      => 'field_lpu_cp_heading',
+				'name'     => 'heading',
+				'label'    => 'Heading',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_lpu_cp_channels',
+				'name'       => 'channels',
+				'label'      => 'Contact channels',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_lpu_cp_label',
+						'name'     => 'label',
+						'label'    => 'Label',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_lpu_cp_value',
+						'name'     => 'value',
+						'label'    => 'Value (e.g. email, phone)',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_lpu_cp_type',
+						'name'     => 'type',
+						'label'    => 'Type',
+						'type'     => 'select',
+						'required' => false,
+						'choices'  => array(
+							'email' => 'Email',
+							'phone' => 'Phone',
+							'url'   => 'URL',
+							'other' => 'Other',
+						),
+					),
 				),
 			),
 		);
@@ -266,24 +377,87 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'contact_panel',
 			'Contact panel with channels list.',
 			$fields,
-			array( 'heading' => 'Contact us', 'channels' => array( array( 'label' => 'Email', 'value' => 'support@example.com', 'type' => 'email' ) ) ),
+			array(
+				'heading'  => 'Contact us',
+				'channels' => array(
+					array(
+						'label' => 'Email',
+						'value' => 'support@example.com',
+						'type'  => 'email',
+					),
+				),
+			),
 			array( 'short_label' => 'Contact panel' )
 		);
 	}
 
 	/** Contact detail: structured block (title, address_line1, line2, city, region, postcode, country, phone, email). */
 	public static function lpu_contact_detail_01(): array {
-		$key = 'lpu_contact_detail_01';
+		$key    = 'lpu_contact_detail_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_cd_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_cd_address_line1', 'name' => 'address_line1', 'label' => 'Address line 1', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_cd_address_line2', 'name' => 'address_line2', 'label' => 'Address line 2', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_cd_city', 'name' => 'city', 'label' => 'City', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_cd_region', 'name' => 'region', 'label' => 'Region / state', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_cd_postcode', 'name' => 'postcode', 'label' => 'Postal code', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_cd_country', 'name' => 'country', 'label' => 'Country', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_cd_phone', 'name' => 'phone', 'label' => 'Phone', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_cd_email', 'name' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => false ),
+			array(
+				'key'      => 'field_lpu_cd_title',
+				'name'     => 'title',
+				'label'    => 'Title',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_cd_address_line1',
+				'name'     => 'address_line1',
+				'label'    => 'Address line 1',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_cd_address_line2',
+				'name'     => 'address_line2',
+				'label'    => 'Address line 2',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_cd_city',
+				'name'     => 'city',
+				'label'    => 'City',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_cd_region',
+				'name'     => 'region',
+				'label'    => 'Region / state',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_cd_postcode',
+				'name'     => 'postcode',
+				'label'    => 'Postal code',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_cd_country',
+				'name'     => 'country',
+				'label'    => 'Country',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_cd_phone',
+				'name'     => 'phone',
+				'label'    => 'Phone',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_cd_email',
+				'name'     => 'email',
+				'label'    => 'Email',
+				'type'     => 'email',
+				'required' => false,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -294,18 +468,44 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'contact_detail',
 			'Structured contact detail block.',
 			$fields,
-			array( 'title' => 'Head office', 'address_line1' => '123 Sample St', 'city' => 'Sample City', 'postcode' => 'AB1 2CD', 'country' => 'Country', 'phone' => '', 'email' => 'info@example.com' ),
+			array(
+				'title'         => 'Head office',
+				'address_line1' => '123 Sample St',
+				'city'          => 'Sample City',
+				'postcode'      => 'AB1 2CD',
+				'country'       => 'Country',
+				'phone'         => '',
+				'email'         => 'info@example.com',
+			),
 			array( 'short_label' => 'Contact detail' )
 		);
 	}
 
 	/** Inquiry support: heading + intro + form_embed_slot (placeholder for form shortcode/block ref). */
 	public static function lpu_inquiry_support_01(): array {
-		$key = 'lpu_inquiry_support_01';
+		$key    = 'lpu_inquiry_support_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_is_heading', 'name' => 'heading', 'label' => 'Heading', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_is_intro', 'name' => 'intro', 'label' => 'Intro', 'type' => 'textarea', 'required' => false ),
-			array( 'key' => 'field_lpu_is_form_embed_slot', 'name' => 'form_embed_slot', 'label' => 'Form embed (shortcode or block identifier)', 'type' => 'text', 'required' => false ),
+			array(
+				'key'      => 'field_lpu_is_heading',
+				'name'     => 'heading',
+				'label'    => 'Heading',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_is_intro',
+				'name'     => 'intro',
+				'label'    => 'Intro',
+				'type'     => 'textarea',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_is_form_embed_slot',
+				'name'     => 'form_embed_slot',
+				'label'    => 'Form embed (shortcode or block identifier)',
+				'type'     => 'text',
+				'required' => false,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -316,18 +516,40 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'inquiry_support',
 			'Inquiry support with optional form embed slot.',
 			$fields,
-			array( 'heading' => 'Send an inquiry', 'intro' => 'Use the form below. All fields marked required must be completed.', 'form_embed_slot' => '' ),
+			array(
+				'heading'         => 'Send an inquiry',
+				'intro'           => 'Use the form below. All fields marked required must be completed.',
+				'form_embed_slot' => '',
+			),
 			array( 'short_label' => 'Inquiry support' )
 		);
 	}
 
 	/** Support escalation: title + description + optional link. */
 	public static function lpu_support_escalation_01(): array {
-		$key = 'lpu_support_escalation_01';
+		$key    = 'lpu_support_escalation_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_se_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-			array( 'key' => 'field_lpu_se_description', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
-			array( 'key' => 'field_lpu_se_link', 'name' => 'link', 'label' => 'Link', 'type' => 'link', 'required' => false ),
+			array(
+				'key'      => 'field_lpu_se_title',
+				'name'     => 'title',
+				'label'    => 'Title',
+				'type'     => 'text',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_lpu_se_description',
+				'name'     => 'description',
+				'label'    => 'Description',
+				'type'     => 'textarea',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_se_link',
+				'name'     => 'link',
+				'label'    => 'Link',
+				'type'     => 'link',
+				'required' => false,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -338,18 +560,40 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'support_escalation',
 			'Support escalation band.',
 			$fields,
-			array( 'title' => 'Need more help?', 'description' => 'Contact support for further assistance.', 'link' => array() ),
+			array(
+				'title'       => 'Need more help?',
+				'description' => 'Contact support for further assistance.',
+				'link'        => array(),
+			),
 			array( 'short_label' => 'Support escalation' )
 		);
 	}
 
 	/** Accessibility help: heading + body + optional link. */
 	public static function lpu_accessibility_help_01(): array {
-		$key = 'lpu_accessibility_help_01';
+		$key    = 'lpu_accessibility_help_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_ah_heading', 'name' => 'heading', 'label' => 'Heading', 'type' => 'text', 'required' => true ),
-			array( 'key' => 'field_lpu_ah_body', 'name' => 'body', 'label' => 'Body', 'type' => 'textarea', 'required' => true ),
-			array( 'key' => 'field_lpu_ah_link', 'name' => 'link', 'label' => 'Link', 'type' => 'link', 'required' => false ),
+			array(
+				'key'      => 'field_lpu_ah_heading',
+				'name'     => 'heading',
+				'label'    => 'Heading',
+				'type'     => 'text',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_lpu_ah_body',
+				'name'     => 'body',
+				'label'    => 'Body',
+				'type'     => 'textarea',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_lpu_ah_link',
+				'name'     => 'link',
+				'label'    => 'Link',
+				'type'     => 'link',
+				'required' => false,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -360,19 +604,47 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'accessibility_help',
 			'Accessibility help section.',
 			$fields,
-			array( 'heading' => 'Accessibility', 'body' => 'We aim to make this site accessible. If you have difficulty, contact us.', 'link' => array() ),
+			array(
+				'heading' => 'Accessibility',
+				'body'    => 'We aim to make this site accessible. If you have difficulty, contact us.',
+				'link'    => array(),
+			),
 			array( 'short_label' => 'Accessibility help' )
 		);
 	}
 
 	/** Utility CTA: heading + text + button label + button link. */
 	public static function lpu_utility_cta_01(): array {
-		$key = 'lpu_utility_cta_01';
+		$key    = 'lpu_utility_cta_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_uc_heading', 'name' => 'heading', 'label' => 'Heading', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_uc_text', 'name' => 'text', 'label' => 'Text', 'type' => 'textarea', 'required' => false ),
-			array( 'key' => 'field_lpu_uc_button_label', 'name' => 'button_label', 'label' => 'Button label', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_uc_button_link', 'name' => 'button_link', 'label' => 'Button link', 'type' => 'link', 'required' => false ),
+			array(
+				'key'      => 'field_lpu_uc_heading',
+				'name'     => 'heading',
+				'label'    => 'Heading',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_uc_text',
+				'name'     => 'text',
+				'label'    => 'Text',
+				'type'     => 'textarea',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_uc_button_label',
+				'name'     => 'button_label',
+				'label'    => 'Button label',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_uc_button_link',
+				'name'     => 'button_link',
+				'label'    => 'Button link',
+				'type'     => 'link',
+				'required' => false,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -383,17 +655,34 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'utility_cta',
 			'Utility CTA with optional button.',
 			$fields,
-			array( 'heading' => 'Need help?', 'text' => 'Contact our team.', 'button_label' => 'Contact', 'button_link' => array() ),
+			array(
+				'heading'      => 'Need help?',
+				'text'         => 'Contact our team.',
+				'button_label' => 'Contact',
+				'button_link'  => array(),
+			),
 			array( 'short_label' => 'Utility CTA' )
 		);
 	}
 
 	/** Trust disclosure: title + body. */
 	public static function lpu_trust_disclosure_01(): array {
-		$key = 'lpu_trust_disclosure_01';
+		$key    = 'lpu_trust_disclosure_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_td_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-			array( 'key' => 'field_lpu_td_body', 'name' => 'body', 'label' => 'Body', 'type' => 'textarea', 'required' => true ),
+			array(
+				'key'      => 'field_lpu_td_title',
+				'name'     => 'title',
+				'label'    => 'Title',
+				'type'     => 'text',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_lpu_td_body',
+				'name'     => 'body',
+				'label'    => 'Body',
+				'type'     => 'textarea',
+				'required' => true,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -404,17 +693,32 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'trust_disclosure',
 			'Trust disclosure band.',
 			$fields,
-			array( 'title' => 'Disclosure', 'body' => 'Sample disclosure text. Not legal advice.' ),
+			array(
+				'title' => 'Disclosure',
+				'body'  => 'Sample disclosure text. Not legal advice.',
+			),
 			array( 'short_label' => 'Trust disclosure' )
 		);
 	}
 
 	/** Form intro: heading + body (helper text before form). */
 	public static function lpu_form_intro_01(): array {
-		$key = 'lpu_form_intro_01';
+		$key    = 'lpu_form_intro_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_fi_heading', 'name' => 'heading', 'label' => 'Heading', 'type' => 'text', 'required' => false ),
-			array( 'key' => 'field_lpu_fi_body', 'name' => 'body', 'label' => 'Body', 'type' => 'textarea', 'required' => false ),
+			array(
+				'key'      => 'field_lpu_fi_heading',
+				'name'     => 'heading',
+				'label'    => 'Heading',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'      => 'field_lpu_fi_body',
+				'name'     => 'body',
+				'label'    => 'Body',
+				'type'     => 'textarea',
+				'required' => false,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -425,17 +729,32 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'form_intro',
 			'Form intro with optional heading and body.',
 			$fields,
-			array( 'heading' => 'Submit your request', 'body' => 'Complete the form below. Required fields are marked.' ),
+			array(
+				'heading' => 'Submit your request',
+				'body'    => 'Complete the form below. Required fields are marked.',
+			),
 			array( 'short_label' => 'Form intro' )
 		);
 	}
 
 	/** Privacy highlight: title + short text. */
 	public static function lpu_privacy_highlight_01(): array {
-		$key = 'lpu_privacy_highlight_01';
+		$key    = 'lpu_privacy_highlight_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_ph_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-			array( 'key' => 'field_lpu_ph_text', 'name' => 'text', 'label' => 'Text', 'type' => 'textarea', 'required' => true ),
+			array(
+				'key'      => 'field_lpu_ph_title',
+				'name'     => 'title',
+				'label'    => 'Title',
+				'type'     => 'text',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_lpu_ph_text',
+				'name'     => 'text',
+				'label'    => 'Text',
+				'type'     => 'textarea',
+				'required' => true,
+			),
 		);
 		return self::lpu_definition(
 			$key,
@@ -446,25 +765,46 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'privacy_highlight',
 			'Privacy highlight block.',
 			$fields,
-			array( 'title' => 'Your privacy', 'text' => 'We process data as described in our privacy policy. This is sample text.' ),
+			array(
+				'title' => 'Your privacy',
+				'text'  => 'We process data as described in our privacy policy. This is sample text.',
+			),
 			array( 'short_label' => 'Privacy highlight' )
 		);
 	}
 
 	/** Terms TOC: heading + repeatable items (title, anchor_id). */
 	public static function lpu_terms_toc_01(): array {
-		$key = 'lpu_terms_toc_01';
+		$key    = 'lpu_terms_toc_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_tt_heading', 'name' => 'heading', 'label' => 'Heading', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_lpu_tt_items',
-				'name'        => 'items',
-				'label'       => 'Table of contents items',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_lpu_tt_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_lpu_tt_anchor_id', 'name' => 'anchor_id', 'label' => 'Anchor ID', 'type' => 'text', 'required' => false ),
+				'key'      => 'field_lpu_tt_heading',
+				'name'     => 'heading',
+				'label'    => 'Heading',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_lpu_tt_items',
+				'name'       => 'items',
+				'label'      => 'Table of contents items',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_lpu_tt_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_lpu_tt_anchor_id',
+						'name'     => 'anchor_id',
+						'label'    => 'Anchor ID',
+						'type'     => 'text',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -477,16 +817,34 @@ final class Legal_Policy_Utility_Library_Batch_Definitions {
 			'terms_toc',
 			'Terms TOC with repeatable items.',
 			$fields,
-			array( 'heading' => 'Contents', 'items' => array( array( 'title' => 'Section one', 'anchor_id' => 'section-1' ), array( 'title' => 'Section two', 'anchor_id' => 'section-2' ) ) ),
+			array(
+				'heading' => 'Contents',
+				'items'   => array(
+					array(
+						'title'     => 'Section one',
+						'anchor_id' => 'section-1',
+					),
+					array(
+						'title'     => 'Section two',
+						'anchor_id' => 'section-2',
+					),
+				),
+			),
 			array( 'short_label' => 'Terms TOC' )
 		);
 	}
 
 	/** Footer legal: single line or short text. */
 	public static function lpu_footer_legal_01(): array {
-		$key = 'lpu_footer_legal_01';
+		$key    = 'lpu_footer_legal_01';
 		$fields = array(
-			array( 'key' => 'field_lpu_fl_text', 'name' => 'text', 'label' => 'Text', 'type' => 'textarea', 'required' => true ),
+			array(
+				'key'      => 'field_lpu_fl_text',
+				'name'     => 'text',
+				'label'    => 'Text',
+				'type'     => 'textarea',
+				'required' => true,
+			),
 		);
 		return self::lpu_definition(
 			$key,

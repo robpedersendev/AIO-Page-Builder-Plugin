@@ -64,7 +64,7 @@ final class Industry_Compliance_Warning_Resolver {
 		if ( $industry_key === '' ) {
 			return array();
 		}
-		$out = array();
+		$out          = array();
 		$parent_rules = $this->registry->get_for_industry( $industry_key );
 		$refined_keys = array();
 		foreach ( $parent_rules as $rule ) {

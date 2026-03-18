@@ -45,10 +45,10 @@ final class Field_Cleanup_Advisor {
 		Assignment_Map_Service $assignment_map,
 		Section_Template_Repository $section_repository
 	) {
-		$this->assignment_service  = $assignment_service;
-		$this->derivation_service  = $derivation_service;
-		$this->assignment_map      = $assignment_map;
-		$this->section_repository  = $section_repository;
+		$this->assignment_service = $assignment_service;
+		$this->derivation_service = $derivation_service;
+		$this->assignment_map     = $assignment_map;
+		$this->section_repository = $section_repository;
 	}
 
 	/**
@@ -76,14 +76,14 @@ final class Field_Cleanup_Advisor {
 		$derived_set = array_flip( $derived_groups );
 		foreach ( $assigned_groups as $gk ) {
 			if ( ! isset( $derived_set[ $gk ] ) ) {
-				$section_key = $this->group_key_to_section_key( $gk );
-				$reason      = $section_key !== ''
+				$section_key                 = $this->group_key_to_section_key( $gk );
+				$reason                      = $section_key !== ''
 					? sprintf( 'Group %s (section %s) no longer in current structural source.', $gk, $section_key )
 					: sprintf( 'Group %s no longer in current structural source.', $gk );
 				$result->stale_assignments[] = array(
-					'page_ref'   => $page_ref,
-					'group_key'  => $gk,
-					'reason'     => $reason,
+					'page_ref'  => $page_ref,
+					'group_key' => $gk,
+					'reason'    => $reason,
 				);
 			}
 		}
@@ -96,9 +96,9 @@ final class Field_Cleanup_Advisor {
 			}
 			$def = $this->section_repository->get_definition_by_key( $section_key );
 			if ( $def !== null && ! Deprecation_Metadata::is_eligible_for_new_use( $def ) ) {
-				$dep = $def['deprecation'] ?? array();
-				$reason = (string) ( $dep['deprecated_reason'] ?? $dep['reason'] ?? 'Section deprecated.' );
-				$result->deprecated_groups[] = array(
+				$dep                              = $def['deprecation'] ?? array();
+				$reason                           = (string) ( $dep['deprecated_reason'] ?? $dep['reason'] ?? 'Section deprecated.' );
+				$result->deprecated_groups[]      = array(
 					'group_key'   => $gk,
 					'section_key' => $section_key,
 					'reason'      => $reason,
@@ -114,15 +114,20 @@ final class Field_Cleanup_Advisor {
 		$result->safe_to_remove = array();
 
 		// Deduplicate requires_manual_review by group_key.
-		$seen = array();
-		$result->requires_manual_review = array_values( array_filter( $result->requires_manual_review, function ( $r ) use ( &$seen ) {
-			$k = $r['group_key'];
-			if ( isset( $seen[ $k ] ) ) {
-				return false;
-			}
-			$seen[ $k ] = true;
-			return true;
-		} ) );
+		$seen                           = array();
+		$result->requires_manual_review = array_values(
+			array_filter(
+				$result->requires_manual_review,
+				function ( $r ) use ( &$seen ) {
+					$k = $r['group_key'];
+					if ( isset( $seen[ $k ] ) ) {
+						return false;
+					}
+					$seen[ $k ] = true;
+					return true;
+				}
+			)
+		);
 
 		// Compatibility notes.
 		if ( ! empty( $result->stale_assignments ) ) {
@@ -148,7 +153,7 @@ final class Field_Cleanup_Advisor {
 	 * @return array{allowed: bool, reasons: list<string>}
 	 */
 	public function recommend_destructive_cleanup( int $page_id ): array {
-		$result = $this->analyze_page( $page_id );
+		$result  = $this->analyze_page( $page_id );
 		$reasons = array();
 
 		if ( ! empty( $result->deprecated_groups ) ) {
@@ -172,7 +177,7 @@ final class Field_Cleanup_Advisor {
 	 * @return array<int, Cleanup_Result> Page ID => result.
 	 */
 	public function analyze_pages_with_assignments( int $limit = 100 ): array {
-		$rows = $this->assignment_map->list_by_type( Assignment_Types::PAGE_FIELD_GROUP, $limit, 0 );
+		$rows     = $this->assignment_map->list_by_type( Assignment_Types::PAGE_FIELD_GROUP, $limit, 0 );
 		$page_ids = array();
 		foreach ( $rows as $row ) {
 			$src = (string) ( $row['source_ref'] ?? '' );

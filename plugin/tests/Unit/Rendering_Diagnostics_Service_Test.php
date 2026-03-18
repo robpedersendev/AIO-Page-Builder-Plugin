@@ -25,9 +25,17 @@ final class Rendering_Diagnostics_Service_Test extends TestCase {
 
 	private function section_result( string $key, int $position, bool $with_errors = false ): Section_Render_Result {
 		$structure = array(
-			'wrapper_attrs'       => array( 'class' => array( 'aio-s-' . $key ), 'id' => '', 'data_attributes' => array() ),
-			'selector_map'       => array( 'wrapper_class' => 'aio-s-' . $key, 'inner_class' => '', 'element_classes' => array() ),
-			'structural_nodes'   => array(),
+			'wrapper_attrs'       => array(
+				'class'           => array( 'aio-s-' . $key ),
+				'id'              => '',
+				'data_attributes' => array(),
+			),
+			'selector_map'        => array(
+				'wrapper_class'   => 'aio-s-' . $key,
+				'inner_class'     => '',
+				'element_classes' => array(),
+			),
+			'structural_nodes'    => array(),
 			'structural_hint'     => '',
 			'asset_hints'         => array(),
 			'accessibility_notes' => array(),
@@ -79,7 +87,11 @@ final class Rendering_Diagnostics_Service_Test extends TestCase {
 	}
 
 	public function test_build_instantiation_readiness_with_payload(): void {
-		$payload = array( 'source_type' => 'composition', 'source_key' => 'comp_1', 'page_title' => 'Test' );
+		$payload = array(
+			'source_type' => 'composition',
+			'source_key'  => 'comp_1',
+			'page_title'  => 'Test',
+		);
 		$service = new Rendering_Diagnostics_Service();
 
 		$readiness = $service->build_instantiation_readiness( null, $payload );

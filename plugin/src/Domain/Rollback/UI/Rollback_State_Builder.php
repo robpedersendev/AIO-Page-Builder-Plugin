@@ -42,9 +42,9 @@ final class Rollback_State_Builder {
 	/**
 	 * Builds rollback state for the given pre- and post-change snapshot IDs.
 	 *
-	 * @param string $pre_snapshot_id  Pre-change snapshot ID.
-	 * @param string $post_snapshot_id Post-change snapshot ID.
-	 * @param string $diff_level       Diff_Type_Keys::LEVEL_SUMMARY or LEVEL_DETAIL.
+	 * @param string               $pre_snapshot_id  Pre-change snapshot ID.
+	 * @param string               $post_snapshot_id Post-change snapshot ID.
+	 * @param string               $diff_level       Diff_Type_Keys::LEVEL_SUMMARY or LEVEL_DETAIL.
 	 * @param array<string, mixed> $eligibility_options Optional: skip_permission_check, user_id.
 	 * @return array{eligibility: Rollback_Eligibility_Result, diff_result: Diff_Summary_Result, rollback_template_context: array<string, mixed>}
 	 */
@@ -54,7 +54,7 @@ final class Rollback_State_Builder {
 
 		$rollback_template_context = array();
 		if ( $diff_result->is_success() ) {
-			$diff = $diff_result->get_diff();
+			$diff             = $diff_result->get_diff();
 			$template_summary = $diff['template_diff_summary'] ?? null;
 			if ( is_array( $template_summary ) && isset( $template_summary['rollback_template_context'] ) && is_array( $template_summary['rollback_template_context'] ) ) {
 				$rollback_template_context = $template_summary['rollback_template_context'];
@@ -63,7 +63,7 @@ final class Rollback_State_Builder {
 
 		return array(
 			'eligibility'               => $eligibility,
-			'diff_result'                => $diff_result,
+			'diff_result'               => $diff_result,
 			'rollback_template_context' => $rollback_template_context,
 		);
 	}

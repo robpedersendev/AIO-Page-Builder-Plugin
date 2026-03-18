@@ -63,8 +63,8 @@ final class Step_Item_List_Component {
 	 * @return void
 	 */
 	public function render( array $payload, ?string $detail_item_id = null, string $list_id = 'aio-step-item-list' ): void {
-		$rows   = $payload[ self::KEY_STEP_LIST_ROWS ] ?? array();
-		$order  = $payload[ self::KEY_COLUMN_ORDER ] ?? array();
+		$rows  = $payload[ self::KEY_STEP_LIST_ROWS ] ?? array();
+		$order = $payload[ self::KEY_COLUMN_ORDER ] ?? array();
 		if ( ! is_array( $rows ) ) {
 			$rows = array();
 		}
@@ -76,10 +76,10 @@ final class Step_Item_List_Component {
 			return;
 		}
 
-		$first_row = reset( $rows );
-		$columns   = ! empty( $order ) ? $order : ( is_array( $first_row ) ? array_keys( (array) ( $first_row[ self::ROW_KEY_SUMMARY_COLUMNS ] ?? array() ) ) : array() );
-		$select_all_id = $list_id . '-select-all';
-		$colspan = 1 + count( $columns ) + 1 + 1; // select + columns + status + actions
+		$first_row         = reset( $rows );
+		$columns           = ! empty( $order ) ? $order : ( is_array( $first_row ) ? array_keys( (array) ( $first_row[ self::ROW_KEY_SUMMARY_COLUMNS ] ?? array() ) ) : array() );
+		$select_all_id     = $list_id . '-select-all';
+		$colspan           = 1 + count( $columns ) + 1 + 1; // select + columns + status + actions
 		$has_group_headers = isset( $first_row['group_label'] ) && (string) $first_row['group_label'] !== '';
 		if ( $has_group_headers ) {
 			$rows = $this->sort_rows_for_group_headers( $rows );
@@ -127,17 +127,20 @@ final class Step_Item_List_Component {
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function sort_rows_for_group_headers( array $rows ): array {
-		usort( $rows, function ( array $a, array $b ): int {
-			$label_a = (string) ( $a['group_label'] ?? '' );
-			$label_b = (string) ( $b['group_label'] ?? '' );
-			$cmp = strcmp( $label_a, $label_b );
-			if ( $cmp !== 0 ) {
-				return $cmp;
+		usort(
+			$rows,
+			function ( array $a, array $b ): int {
+				$label_a = (string) ( $a['group_label'] ?? '' );
+				$label_b = (string) ( $b['group_label'] ?? '' );
+				$cmp     = strcmp( $label_a, $label_b );
+				if ( $cmp !== 0 ) {
+					return $cmp;
+				}
+				$id_a = (string) ( $a[ self::ROW_KEY_ITEM_ID ] ?? '' );
+				$id_b = (string) ( $b[ self::ROW_KEY_ITEM_ID ] ?? '' );
+				return strcmp( $id_a, $id_b );
 			}
-			$id_a = (string) ( $a[ self::ROW_KEY_ITEM_ID ] ?? '' );
-			$id_b = (string) ( $b[ self::ROW_KEY_ITEM_ID ] ?? '' );
-			return strcmp( $id_a, $id_b );
-		} );
+		);
 		return array_values( $rows );
 	}
 
@@ -189,18 +192,18 @@ final class Step_Item_List_Component {
 	 * Renders a single table row.
 	 *
 	 * @param array<string, mixed> $row Row payload (item_id, status_badge, summary_columns, row_actions, is_selected).
-	 * @param array<int, string>    $columns Column keys in order.
-	 * @param string|null           $detail_item_id Currently selected item_id.
+	 * @param array<int, string>   $columns Column keys in order.
+	 * @param string|null          $detail_item_id Currently selected item_id.
 	 * @return void
 	 */
 	private function render_row( array $row, array $columns, ?string $detail_item_id ): void {
-		$item_id    = (string) ( $row[ self::ROW_KEY_ITEM_ID ] ?? '' );
-		$badge      = (string) ( $row[ self::ROW_KEY_STATUS_BADGE ] ?? '' );
-		$summary    = isset( $row[ self::ROW_KEY_SUMMARY_COLUMNS ] ) && is_array( $row[ self::ROW_KEY_SUMMARY_COLUMNS ] ) ? $row[ self::ROW_KEY_SUMMARY_COLUMNS ] : array();
-		$actions    = isset( $row[ self::ROW_KEY_ROW_ACTIONS ] ) && is_array( $row[ self::ROW_KEY_ROW_ACTIONS ] ) ? $row[ self::ROW_KEY_ROW_ACTIONS ] : array();
-		$is_selected = ! empty( $row[ self::ROW_KEY_IS_SELECTED ] );
+		$item_id          = (string) ( $row[ self::ROW_KEY_ITEM_ID ] ?? '' );
+		$badge            = (string) ( $row[ self::ROW_KEY_STATUS_BADGE ] ?? '' );
+		$summary          = isset( $row[ self::ROW_KEY_SUMMARY_COLUMNS ] ) && is_array( $row[ self::ROW_KEY_SUMMARY_COLUMNS ] ) ? $row[ self::ROW_KEY_SUMMARY_COLUMNS ] : array();
+		$actions          = isset( $row[ self::ROW_KEY_ROW_ACTIONS ] ) && is_array( $row[ self::ROW_KEY_ROW_ACTIONS ] ) ? $row[ self::ROW_KEY_ROW_ACTIONS ] : array();
+		$is_selected      = ! empty( $row[ self::ROW_KEY_IS_SELECTED ] );
 		$is_detail_active = $detail_item_id !== null && $detail_item_id === $item_id;
-		$badge_component = new Status_Badge_Component();
+		$badge_component  = new Status_Badge_Component();
 		?>
 		<tr class="aio-step-item-row <?php echo $is_detail_active ? 'aio-row-detail-active' : ''; ?>" data-item-id="<?php echo \esc_attr( $item_id ); ?>">
 			<td class="aio-col-select">
@@ -233,14 +236,14 @@ final class Step_Item_List_Component {
 		}
 		$out = array();
 		foreach ( $actions as $action ) {
-			$action_id  = (string) ( $action['action_id'] ?? '' );
-			$label      = (string) ( $action['label'] ?? $action_id );
-			$enabled    = ! empty( $action['enabled'] );
-			$url        = isset( $action['url'] ) ? (string) $action['url'] : '';
-			$form_post  = ! empty( $action['form_post'] );
+			$action_id   = (string) ( $action['action_id'] ?? '' );
+			$label       = (string) ( $action['label'] ?? $action_id );
+			$enabled     = ! empty( $action['enabled'] );
+			$url         = isset( $action['url'] ) ? (string) $action['url'] : '';
+			$form_post   = ! empty( $action['form_post'] );
 			$form_action = isset( $action['form_action'] ) ? (string) $action['form_action'] : '';
-			$hidden     = isset( $action['hidden_fields'] ) && is_array( $action['hidden_fields'] ) ? $action['hidden_fields'] : array();
-			$css_class  = 'aio-row-action aio-row-action-' . \sanitize_html_class( $action_id );
+			$hidden      = isset( $action['hidden_fields'] ) && is_array( $action['hidden_fields'] ) ? $action['hidden_fields'] : array();
+			$css_class   = 'aio-row-action aio-row-action-' . \sanitize_html_class( $action_id );
 			if ( ! $enabled ) {
 				$out[] = '<span class="' . \esc_attr( $css_class . ' aio-row-action-disabled' ) . '" aria-disabled="true">' . \esc_html( $label ) . '</span>';
 			} elseif ( $form_post && $form_action !== '' ) {

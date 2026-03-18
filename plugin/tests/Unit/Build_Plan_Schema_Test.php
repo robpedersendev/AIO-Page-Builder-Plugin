@@ -132,36 +132,39 @@ final class Build_Plan_Schema_Test extends TestCase {
 	private function valid_plan_skeleton(): array {
 		return array(
 			Build_Plan_Schema::KEY_PLAN_ID               => 'plan_550e8400-e29b-41d4-a716-446655440000',
-			Build_Plan_Schema::KEY_STATUS                 => Build_Plan_Schema::STATUS_PENDING_REVIEW,
-			Build_Plan_Schema::KEY_AI_RUN_REF             => 'aio-run-550e8400-e29b-41d4-a716-446655440001',
-			Build_Plan_Schema::KEY_NORMALIZED_OUTPUT_REF  => 'aio-run-550e8400-e29b-41d4-a716-446655440001:normalized_output',
-			Build_Plan_Schema::KEY_PLAN_TITLE             => 'Site audit plan – March 2025',
-			Build_Plan_Schema::KEY_PLAN_SUMMARY           => 'Draft plan for contact and consultation focus.',
-			Build_Plan_Schema::KEY_SITE_PURPOSE_SUMMARY   => 'Local accounting firm; contact and consultation focus.',
-			Build_Plan_Schema::KEY_SITE_FLOW_SUMMARY      => 'Home, About, Services, Contact as top-level.',
-			Build_Plan_Schema::KEY_STEPS                  => array(
+			Build_Plan_Schema::KEY_STATUS                => Build_Plan_Schema::STATUS_PENDING_REVIEW,
+			Build_Plan_Schema::KEY_AI_RUN_REF            => 'aio-run-550e8400-e29b-41d4-a716-446655440001',
+			Build_Plan_Schema::KEY_NORMALIZED_OUTPUT_REF => 'aio-run-550e8400-e29b-41d4-a716-446655440001:normalized_output',
+			Build_Plan_Schema::KEY_PLAN_TITLE            => 'Site audit plan – March 2025',
+			Build_Plan_Schema::KEY_PLAN_SUMMARY          => 'Draft plan for contact and consultation focus.',
+			Build_Plan_Schema::KEY_SITE_PURPOSE_SUMMARY  => 'Local accounting firm; contact and consultation focus.',
+			Build_Plan_Schema::KEY_SITE_FLOW_SUMMARY     => 'Home, About, Services, Contact as top-level.',
+			Build_Plan_Schema::KEY_STEPS                 => array(
 				array(
-					Build_Plan_Item_Schema::KEY_STEP_ID    => 'step_overview_0',
-					Build_Plan_Item_Schema::KEY_STEP_TYPE  => Build_Plan_Schema::STEP_TYPE_OVERVIEW,
-					Build_Plan_Item_Schema::KEY_TITLE      => 'Overview',
-					Build_Plan_Item_Schema::KEY_ORDER      => 0,
-					Build_Plan_Item_Schema::KEY_ITEMS      => array(
+					Build_Plan_Item_Schema::KEY_STEP_ID   => 'step_overview_0',
+					Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_OVERVIEW,
+					Build_Plan_Item_Schema::KEY_TITLE     => 'Overview',
+					Build_Plan_Item_Schema::KEY_ORDER     => 0,
+					Build_Plan_Item_Schema::KEY_ITEMS     => array(
 						array(
 							Build_Plan_Item_Schema::KEY_ITEM_ID   => 'item_overview_0',
 							Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_OVERVIEW_NOTE,
-							Build_Plan_Item_Schema::KEY_PAYLOAD   => array( 'summary_text' => 'Draft plan.', 'planning_mode' => 'mixed' ),
+							Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
+								'summary_text'  => 'Draft plan.',
+								'planning_mode' => 'mixed',
+							),
 						),
 					),
 				),
 				array(
-					Build_Plan_Item_Schema::KEY_STEP_ID    => 'step_confirm_1',
-					Build_Plan_Item_Schema::KEY_STEP_TYPE  => Build_Plan_Schema::STEP_TYPE_CONFIRMATION,
-					Build_Plan_Item_Schema::KEY_TITLE      => 'Confirm',
-					Build_Plan_Item_Schema::KEY_ORDER      => 1,
-					Build_Plan_Item_Schema::KEY_ITEMS      => array(),
+					Build_Plan_Item_Schema::KEY_STEP_ID   => 'step_confirm_1',
+					Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_CONFIRMATION,
+					Build_Plan_Item_Schema::KEY_TITLE     => 'Confirm',
+					Build_Plan_Item_Schema::KEY_ORDER     => 1,
+					Build_Plan_Item_Schema::KEY_ITEMS     => array(),
 				),
 			),
-			Build_Plan_Schema::KEY_CREATED_AT => '2025-03-11T12:00:00Z',
+			Build_Plan_Schema::KEY_CREATED_AT            => '2025-03-11T12:00:00Z',
 		);
 	}
 }

@@ -57,7 +57,7 @@ final class Privacy_Settings_State_Builder_Test extends TestCase {
 
 	public function test_report_destination_contains_no_raw_email(): void {
 		$state = $this->build_state();
-		$dest = $state['report_destination_summary'];
+		$dest  = $state['report_destination_summary'];
 		$this->assertArrayHasKey( 'transport_type', $dest );
 		$this->assertArrayHasKey( 'description', $dest );
 		$text = $dest['transport_type'] . ' ' . $dest['description'];
@@ -65,7 +65,7 @@ final class Privacy_Settings_State_Builder_Test extends TestCase {
 	}
 
 	public function test_uninstall_export_state_has_four_choices(): void {
-		$state = $this->build_state();
+		$state   = $this->build_state();
 		$choices = $state['uninstall_export_state']['choices'];
 		$this->assertCount( 4, $choices );
 		foreach ( $choices as $c ) {
@@ -86,7 +86,7 @@ final class Privacy_Settings_State_Builder_Test extends TestCase {
 	 */
 	private function build_state(): array {
 		$settings = new Settings_Service();
-		$builder = new Privacy_Settings_State_Builder( $settings );
+		$builder  = new Privacy_Settings_State_Builder( $settings );
 		return $builder->build();
 	}
 }

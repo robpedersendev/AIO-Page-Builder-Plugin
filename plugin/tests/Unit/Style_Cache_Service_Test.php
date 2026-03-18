@@ -48,7 +48,7 @@ final class Style_Cache_Service_Test extends TestCase {
 
 	public function test_invalidate_calls_preview_cache_invalidate_all(): void {
 		$preview = new Preview_Cache_Service( 2 );
-		$record = new \AIOPageBuilder\Domain\Preview\Preview_Cache_Record( 'aio_preview_test', 'section', 'sec_hero', 'hash', '<div>test</div>', time(), false, 'none' );
+		$record  = new \AIOPageBuilder\Domain\Preview\Preview_Cache_Record( 'aio_preview_test', 'section', 'sec_hero', 'hash', '<div>test</div>', time(), false, 'none' );
 		$preview->set( $record );
 		$this->assertSame( 1, $preview->get_cache_entry_count() );
 		$svc = new Style_Cache_Service( $preview );

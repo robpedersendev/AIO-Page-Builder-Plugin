@@ -35,11 +35,19 @@ final class Bulk_Template_Page_Build_Service_Test extends TestCase {
 	public function test_run_bulk_new_pages_returns_error_when_plan_not_found(): void {
 		$plan_state = $this->createMock( Plan_State_For_Execution_Interface::class );
 		$plan_state->method( 'get_by_key' )->with( 'missing' )->willReturn( null );
-		$bulk_executor = $this->createMock( Bulk_Executor::class );
+		$bulk_executor  = $this->createMock( Bulk_Executor::class );
 		$job_dispatcher = $this->createMock( Execution_Job_Dispatcher::class );
 
 		$service = new Bulk_Template_Page_Build_Service( $plan_state, $bulk_executor, $job_dispatcher );
-		$result = $service->run_bulk_new_pages( 'missing', null, array( 'actor_type' => 'user', 'actor_id' => '1' ), array() );
+		$result  = $service->run_bulk_new_pages(
+			'missing',
+			null,
+			array(
+				'actor_type' => 'user',
+				'actor_id'   => '1',
+			),
+			array()
+		);
 
 		$this->assertSame( Bulk_Template_Page_Build_Result::STATUS_ERROR, $result->get_status() );
 		$this->assertSame( 'Plan not found.', $result->get_message() );
@@ -51,18 +59,20 @@ final class Bulk_Template_Page_Build_Service_Test extends TestCase {
 		$plan_state->method( 'get_by_key' )->willReturn( array( 'id' => 1 ) );
 		$plan_state->method( 'get_plan_definition' )->willReturn( array( 'steps' => array() ) );
 		$bulk_executor = $this->createMock( Bulk_Executor::class );
-		$bulk_executor->method( 'build_ordered_envelopes' )->willReturn( array(
+		$bulk_executor->method( 'build_ordered_envelopes' )->willReturn(
 			array(
-				Execution_Action_Contract::ENVELOPE_ACTION_ID => 'exec_1_b',
-				Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::UPDATE_MENU,
-				Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID => 'item_1',
-				Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(),
-			),
-		) );
+				array(
+					Execution_Action_Contract::ENVELOPE_ACTION_ID => 'exec_1_b',
+					Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::UPDATE_MENU,
+					Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID => 'item_1',
+					Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(),
+				),
+			)
+		);
 		$job_dispatcher = $this->createMock( Execution_Job_Dispatcher::class );
 
 		$service = new Bulk_Template_Page_Build_Service( $plan_state, $bulk_executor, $job_dispatcher );
-		$result = $service->run_bulk_new_pages( 'plan_1', null, array(), array() );
+		$result  = $service->run_bulk_new_pages( 'plan_1', null, array(), array() );
 
 		$this->assertSame( Bulk_Template_Page_Build_Result::STATUS_ERROR, $result->get_status() );
 		$this->assertStringContainsString( 'No eligible new-page', $result->get_message() );
@@ -72,7 +82,7 @@ final class Bulk_Template_Page_Build_Service_Test extends TestCase {
 		$plan_state = $this->createMock( Plan_State_For_Execution_Interface::class );
 		$plan_state->method( 'get_by_key' )->willReturn( array( 'id' => 1 ) );
 		$plan_state->method( 'get_plan_definition' )->willReturn( array( 'steps' => array() ) );
-		$envelopes = array(
+		$envelopes     = array(
 			$this->create_page_envelope( 'item_1', 'same-slug' ),
 			$this->create_page_envelope( 'item_2', 'same-slug' ),
 		);
@@ -82,7 +92,7 @@ final class Bulk_Template_Page_Build_Service_Test extends TestCase {
 		$job_dispatcher->method( 'enqueue_batch' )->willReturn( array() );
 
 		$service = new Bulk_Template_Page_Build_Service( $plan_state, $bulk_executor, $job_dispatcher );
-		$result = $service->run_bulk_new_pages( 'plan_1', null, array(), array() );
+		$result  = $service->run_bulk_new_pages( 'plan_1', null, array(), array() );
 
 		$this->assertSame( Bulk_Template_Page_Build_Result::STATUS_QUEUED, $result->get_status() );
 		$this->assertGreaterThanOrEqual( 1, count( $result->get_slug_collisions() ) );
@@ -97,14 +107,14 @@ final class Bulk_Template_Page_Build_Service_Test extends TestCase {
 		$plan_state = $this->createMock( Plan_State_For_Execution_Interface::class );
 		$plan_state->method( 'get_by_key' )->willReturn( array( 'id' => 1 ) );
 		$plan_state->method( 'get_plan_definition' )->willReturn( array( 'steps' => array() ) );
-		$envelopes = array( $this->create_page_envelope( 'item_1', 'unique-slug-1' ) );
+		$envelopes     = array( $this->create_page_envelope( 'item_1', 'unique-slug-1' ) );
 		$bulk_executor = $this->createMock( Bulk_Executor::class );
 		$bulk_executor->method( 'build_ordered_envelopes' )->willReturn( $envelopes );
 		$job_dispatcher = $this->createMock( Execution_Job_Dispatcher::class );
 		$job_dispatcher->method( 'enqueue_batch' )->willReturn( array( 'job_ref_1' ) );
 
 		$service = new Bulk_Template_Page_Build_Service( $plan_state, $bulk_executor, $job_dispatcher );
-		$result = $service->run_bulk_new_pages( 'plan_1', array( 'item_1' ), array(), array() );
+		$result  = $service->run_bulk_new_pages( 'plan_1', array( 'item_1' ), array(), array() );
 
 		$this->assertSame( Bulk_Template_Page_Build_Result::STATUS_QUEUED, $result->get_status() );
 		$this->assertSame( array( 'job_ref_1' ), $result->get_job_refs() );
@@ -115,7 +125,7 @@ final class Bulk_Template_Page_Build_Service_Test extends TestCase {
 		$plan_state = $this->createMock( Plan_State_For_Execution_Interface::class );
 		$plan_state->method( 'get_by_key' )->willReturn( array( 'id' => 1 ) );
 		$plan_state->method( 'get_plan_definition' )->willReturn( array( 'steps' => array() ) );
-		$envelopes = array(
+		$envelopes     = array(
 			$this->create_page_envelope( 'item_1', 'slug-a' ),
 			$this->create_page_envelope( 'item_2', 'slug-b' ),
 		);
@@ -123,13 +133,26 @@ final class Bulk_Template_Page_Build_Service_Test extends TestCase {
 		$bulk_executor->method( 'build_ordered_envelopes' )->willReturn( $envelopes );
 		$job_dispatcher = $this->createMock( Execution_Job_Dispatcher::class );
 		$job_dispatcher->method( 'enqueue_batch' )->willReturn( array( 'job_1', 'job_2' ) );
-		$job_dispatcher->method( 'process_batch' )->willReturn( array(
-			Execution_Job_Result::completed( 'job_1', 'create_page', 'exec_1', 'item_1', array( 'artifacts' => array( 'post_id' => 101, 'template_key' => 'tpl_hub' ) ) ),
-			Execution_Job_Result::failed( 'job_2', 'create_page', 'exec_2', 'item_2', 'Template not found.', array(), 0, true ),
-		) );
+		$job_dispatcher->method( 'process_batch' )->willReturn(
+			array(
+				Execution_Job_Result::completed(
+					'job_1',
+					'create_page',
+					'exec_1',
+					'item_1',
+					array(
+						'artifacts' => array(
+							'post_id'      => 101,
+							'template_key' => 'tpl_hub',
+						),
+					)
+				),
+				Execution_Job_Result::failed( 'job_2', 'create_page', 'exec_2', 'item_2', 'Template not found.', array(), 0, true ),
+			)
+		);
 
 		$service = new Bulk_Template_Page_Build_Service( $plan_state, $bulk_executor, $job_dispatcher );
-		$result = $service->run_bulk_new_pages( 'plan_1', null, array(), array( 'run_immediately' => true ) );
+		$result  = $service->run_bulk_new_pages( 'plan_1', null, array(), array( 'run_immediately' => true ) );
 
 		$this->assertSame( Bulk_Template_Page_Build_Result::STATUS_PARTIAL, $result->get_status() );
 		$this->assertTrue( $result->is_partial_failure() );
@@ -144,19 +167,19 @@ final class Bulk_Template_Page_Build_Service_Test extends TestCase {
 
 	private function create_page_envelope( string $plan_item_id, string $slug ): array {
 		return array(
-			Execution_Action_Contract::ENVELOPE_ACTION_ID       => 'exec_' . $plan_item_id . '_b',
-			Execution_Action_Contract::ENVELOPE_ACTION_TYPE     => Execution_Action_Types::CREATE_PAGE,
-			Execution_Action_Contract::ENVELOPE_PLAN_ID         => 'plan_1',
-			Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID    => $plan_item_id,
+			Execution_Action_Contract::ENVELOPE_ACTION_ID  => 'exec_' . $plan_item_id . '_b',
+			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::CREATE_PAGE,
+			Execution_Action_Contract::ENVELOPE_PLAN_ID    => 'plan_1',
+			Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID => $plan_item_id,
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
 				'plan_item_id'        => $plan_item_id,
 				'template_key'        => 'tpl_hub',
-				'proposed_page_title'  => 'Page',
-				'proposed_slug'        => $slug,
+				'proposed_page_title' => 'Page',
+				'proposed_slug'       => $slug,
 			),
-			Execution_Action_Contract::ENVELOPE_APPROVAL_STATE  => array(),
-			Execution_Action_Contract::ENVELOPE_ACTOR_CONTEXT   => array(),
-			Execution_Action_Contract::ENVELOPE_CREATED_AT      => gmdate( 'c' ),
+			Execution_Action_Contract::ENVELOPE_APPROVAL_STATE => array(),
+			Execution_Action_Contract::ENVELOPE_ACTOR_CONTEXT => array(),
+			Execution_Action_Contract::ENVELOPE_CREATED_AT => gmdate( 'c' ),
 		);
 	}
 }

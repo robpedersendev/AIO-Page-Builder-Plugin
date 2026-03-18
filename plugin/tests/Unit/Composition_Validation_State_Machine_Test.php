@@ -55,7 +55,7 @@ final class Composition_Validation_State_Machine_Test extends TestCase {
 
 	public function test_scenario_matrix_missing_section(): void {
 		$expected_result = Composition_Validation_Result::VALIDATION_FAILED;
-		$blocking_codes = array( Composition_Validation_Codes::SECTION_MISSING );
+		$blocking_codes  = array( Composition_Validation_Codes::SECTION_MISSING );
 		$this->assertContains( Composition_Validation_Codes::SECTION_MISSING, Composition_Validation_Codes::get_blocking_codes() );
 		$this->assertTrue( Composition_Validation_Codes::is_blocking( Composition_Validation_Codes::SECTION_MISSING ) );
 		$this->assertFalse( Composition_Validation_Result::allows_activation( $expected_result ) );

@@ -17,9 +17,9 @@ defined( 'ABSPATH' ) || exit;
 final class Migration_Result {
 
 	public const STATUS_SUCCESS = 'success';
-	public const STATUS_WARNING  = 'warning';
-	public const STATUS_FAILURE  = 'failure';
-	public const STATUS_SKIPPED  = 'skipped';
+	public const STATUS_WARNING = 'warning';
+	public const STATUS_FAILURE = 'failure';
+	public const STATUS_SKIPPED = 'skipped';
 
 	/** @var string One of STATUS_* */
 	public readonly string $status;
@@ -62,8 +62,8 @@ final class Migration_Result {
 	public function to_array(): array {
 		return array(
 			'status'       => $this->status,
-			'message'     => $this->message,
-			'notes'       => $this->notes,
+			'message'      => $this->message,
+			'notes'        => $this->notes,
 			'safe_retry'   => $this->safe_retry,
 			'migration_id' => $this->migration_id,
 		);

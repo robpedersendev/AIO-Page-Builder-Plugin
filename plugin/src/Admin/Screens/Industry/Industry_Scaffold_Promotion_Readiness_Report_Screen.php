@@ -46,7 +46,12 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Screen {
 	private function get_report(): array {
 		if ( ! $this->container instanceof Service_Container || ! $this->container->has( 'industry_scaffold_promotion_readiness_report_service' ) ) {
 			return array(
-				'summary'      => array( 'total' => 0, 'scaffold_complete' => 0, 'authored_near_ready' => 0, 'not_near_ready' => 0 ),
+				'summary'      => array(
+					'total'               => 0,
+					'scaffold_complete'   => 0,
+					'authored_near_ready' => 0,
+					'not_near_ready'      => 0,
+				),
 				'items'        => array(),
 				'by_tier'      => array(),
 				'generated_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
@@ -55,7 +60,12 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Screen {
 		$service = $this->container->get( 'industry_scaffold_promotion_readiness_report_service' );
 		if ( ! $service instanceof Industry_Scaffold_Promotion_Readiness_Report_Service ) {
 			return array(
-				'summary'      => array( 'total' => 0, 'scaffold_complete' => 0, 'authored_near_ready' => 0, 'not_near_ready' => 0 ),
+				'summary'      => array(
+					'total'               => 0,
+					'scaffold_complete'   => 0,
+					'authored_near_ready' => 0,
+					'not_near_ready'      => 0,
+				),
 				'items'        => array(),
 				'by_tier'      => array(),
 				'generated_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
@@ -73,9 +83,9 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Screen {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Scaffold promotion readiness report.', 'aio-page-builder' ), 403 );
 		}
-		$report = $this->get_report();
-		$summary = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
-		$items = isset( $report['items'] ) && is_array( $report['items'] ) ? $report['items'] : array();
+		$report       = $this->get_report();
+		$summary      = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
+		$items        = isset( $report['items'] ) && is_array( $report['items'] ) ? $report['items'] : array();
 		$generated_at = isset( $report['generated_at'] ) && is_string( $report['generated_at'] ) ? $report['generated_at'] : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-industry-scaffold-promotion-readiness" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">

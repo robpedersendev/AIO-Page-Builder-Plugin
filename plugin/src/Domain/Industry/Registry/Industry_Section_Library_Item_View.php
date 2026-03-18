@@ -30,13 +30,13 @@ final class Industry_Section_Library_Item_View {
 	private array $section_definition;
 
 	/**
-	 * @param string                $section_key          Section template internal_key.
-	 * @param string                $recommendation_status One of Industry_Section_Recommendation_Resolver::FIT_*.
-	 * @param int                   $score                Recommendation score.
-	 * @param list<string>          $explanation_reasons  Reason codes.
-	 * @param list<string>          $industry_source_refs Industry keys that contributed.
-	 * @param list<string>          $warning_flags        Warning flags.
-	 * @param array<string, mixed>  $section_definition   Optional section definition snapshot.
+	 * @param string               $section_key          Section template internal_key.
+	 * @param string               $recommendation_status One of Industry_Section_Recommendation_Resolver::FIT_*.
+	 * @param int                  $score                Recommendation score.
+	 * @param list<string>         $explanation_reasons  Reason codes.
+	 * @param list<string>         $industry_source_refs Industry keys that contributed.
+	 * @param list<string>         $warning_flags        Warning flags.
+	 * @param array<string, mixed> $section_definition   Optional section definition snapshot.
 	 */
 	public function __construct(
 		string $section_key,
@@ -51,9 +51,9 @@ final class Industry_Section_Library_Item_View {
 		$this->recommendation_status = $recommendation_status;
 		$this->score                 = $score;
 		$this->explanation_reasons   = $explanation_reasons;
-		$this->industry_source_refs = $industry_source_refs;
+		$this->industry_source_refs  = $industry_source_refs;
 		$this->warning_flags         = $warning_flags;
-		$this->section_definition   = $section_definition;
+		$this->section_definition    = $section_definition;
 	}
 
 	public function get_section_key(): string {

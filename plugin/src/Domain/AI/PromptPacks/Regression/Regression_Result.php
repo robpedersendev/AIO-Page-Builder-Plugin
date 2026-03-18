@@ -38,11 +38,11 @@ final class Regression_Result {
 	private string $message;
 
 	/**
-	 * @param string                                                                 $outcome    One of OUTCOME_*.
-	 * @param array{run_id: string, prompt_pack_ref: array, schema_ref: string, ran_at: string} $regression_run
-	 * @param array{match: bool, added_keys: array, removed_keys: array, value_diffs: array}|null $normalized_output_diff_summary
+	 * @param string                                                                                                                        $outcome    One of OUTCOME_*.
+	 * @param array{run_id: string, prompt_pack_ref: array, schema_ref: string, ran_at: string}                                             $regression_run
+	 * @param array{match: bool, added_keys: array, removed_keys: array, value_diffs: array}|null                                           $normalized_output_diff_summary
 	 * @param array{final_validation_state_match: bool, blocking_stage_match: bool, dropped_count_match: bool, dropped_record_diffs: array} $validator_regression_summary
-	 * @param string                                                                 $message    Human-readable summary.
+	 * @param string                                                                                                                        $message    Human-readable summary.
 	 */
 	public function __construct(
 		string $outcome,
@@ -51,11 +51,11 @@ final class Regression_Result {
 		array $validator_regression_summary,
 		string $message
 	) {
-		$this->outcome                          = $outcome;
-		$this->regression_run                    = $regression_run;
-		$this->normalized_output_diff_summary    = $normalized_output_diff_summary;
-		$this->validator_regression_summary     = $validator_regression_summary;
-		$this->message                           = $message;
+		$this->outcome                        = $outcome;
+		$this->regression_run                 = $regression_run;
+		$this->normalized_output_diff_summary = $normalized_output_diff_summary;
+		$this->validator_regression_summary   = $validator_regression_summary;
+		$this->message                        = $message;
 	}
 
 	public function get_outcome(): string {
@@ -98,11 +98,11 @@ final class Regression_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'outcome'                          => $this->outcome,
-			'regression_run'                   => $this->regression_run,
-			'normalized_output_diff_summary'   => $this->normalized_output_diff_summary,
-			'validator_regression_summary'     => $this->validator_regression_summary,
-			'message'                          => $this->message,
+			'outcome'                        => $this->outcome,
+			'regression_run'                 => $this->regression_run,
+			'normalized_output_diff_summary' => $this->normalized_output_diff_summary,
+			'validator_regression_summary'   => $this->validator_regression_summary,
+			'message'                        => $this->message,
 		);
 	}
 }

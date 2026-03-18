@@ -25,8 +25,22 @@ final class Section_Template_Directory_State_Builder {
 
 	/** Purpose family order (L2; section-template-directory-ia-extension §3.3). */
 	private const PURPOSE_ORDER = array(
-		'hero', 'proof', 'offer', 'explainer', 'legal', 'utility', 'listing', 'comparison',
-		'contact', 'cta', 'faq', 'profile', 'stats', 'timeline', 'related', 'other',
+		'hero',
+		'proof',
+		'offer',
+		'explainer',
+		'legal',
+		'utility',
+		'listing',
+		'comparison',
+		'contact',
+		'cta',
+		'faq',
+		'profile',
+		'stats',
+		'timeline',
+		'related',
+		'other',
 	);
 
 	/** CTA classification order (L3 for cta/contact; §3.3). */
@@ -35,7 +49,7 @@ final class Section_Template_Directory_State_Builder {
 	/** CTA classification → label. */
 	private const CTA_LABELS = array(
 		'primary_cta'    => 'Primary CTA',
-		'contact_cta'     => 'Contact CTA',
+		'contact_cta'    => 'Contact CTA',
 		'navigation_cta' => 'Navigation CTA',
 		'none'           => 'None',
 	);
@@ -57,14 +71,14 @@ final class Section_Template_Directory_State_Builder {
 	 * @return array<string, mixed> State payload: view, breadcrumbs, tree, l3_nodes, list_result, filters, base_url, can_manage_templates, purpose_labels, cta_labels.
 	 */
 	public function build_state( array $request_params ): array {
-		$purpose_family      = isset( $request_params['purpose_family'] ) ? \sanitize_key( (string) $request_params['purpose_family'] ) : '';
-		$cta_classification  = isset( $request_params['cta_classification'] ) ? \sanitize_key( (string) $request_params['cta_classification'] ) : '';
+		$purpose_family       = isset( $request_params['purpose_family'] ) ? \sanitize_key( (string) $request_params['purpose_family'] ) : '';
+		$cta_classification   = isset( $request_params['cta_classification'] ) ? \sanitize_key( (string) $request_params['cta_classification'] ) : '';
 		$variation_family_key = isset( $request_params['variation_family_key'] ) ? \sanitize_key( (string) $request_params['variation_family_key'] ) : '';
-		$show_all            = ! empty( $request_params['all'] );
-		$status              = isset( $request_params['status'] ) ? \sanitize_key( (string) $request_params['status'] ) : '';
-		$search              = isset( $request_params['search'] ) ? \sanitize_text_field( (string) $request_params['search'] ) : '';
-		$paged               = isset( $request_params['paged'] ) ? max( 1, (int) $request_params['paged'] ) : 1;
-		$per_page            = isset( $request_params['per_page'] ) ? max( 1, min( Large_Library_Query_Service::MAX_PER_PAGE, (int) $request_params['per_page'] ) ) : Large_Library_Query_Service::DEFAULT_PER_PAGE;
+		$show_all             = ! empty( $request_params['all'] );
+		$status               = isset( $request_params['status'] ) ? \sanitize_key( (string) $request_params['status'] ) : '';
+		$search               = isset( $request_params['search'] ) ? \sanitize_text_field( (string) $request_params['search'] ) : '';
+		$paged                = isset( $request_params['paged'] ) ? max( 1, (int) $request_params['paged'] ) : 1;
+		$per_page             = isset( $request_params['per_page'] ) ? max( 1, min( Large_Library_Query_Service::MAX_PER_PAGE, (int) $request_params['per_page'] ) ) : Large_Library_Query_Service::DEFAULT_PER_PAGE;
 
 		$base_url = \admin_url( 'admin.php?page=' . self::SCREEN_SLUG );
 
@@ -79,7 +93,7 @@ final class Section_Template_Directory_State_Builder {
 			$filters[ Large_Library_Query_Service::FILTER_VARIATION_FAMILY_KEY ] = $variation_family_key;
 		}
 		if ( $show_all ) {
-			$cta_classification  = '';
+			$cta_classification   = '';
 			$variation_family_key = '';
 		}
 		if ( $status !== '' ) {
@@ -107,9 +121,13 @@ final class Section_Template_Directory_State_Builder {
 			$l3_nodes = $this->build_l3_nodes( $purpose_family, $base_url );
 		}
 
-		$list_result = array( 'rows' => array(), 'pagination' => array(), 'total_matching' => 0 );
+		$list_result = array(
+			'rows'           => array(),
+			'pagination'     => array(),
+			'total_matching' => 0,
+		);
 		if ( $view === 'list' || $view === 'search' ) {
-			$result = $this->query_service->query_sections( $filters, $paged, $per_page );
+			$result      = $this->query_service->query_sections( $filters, $paged, $per_page );
 			$list_result = array(
 				'rows'           => $result->get_rows(),
 				'pagination'     => $result->get_pagination()->to_array(),
@@ -120,25 +138,25 @@ final class Section_Template_Directory_State_Builder {
 		$can_manage = \current_user_can( 'aio_view_build_plans' );
 
 		return array(
-			'view'                  => $view,
-			'breadcrumbs'           => $breadcrumbs,
-			'tree'                  => $tree,
-			'l3_nodes'              => $l3_nodes,
-			'list_result'           => $list_result,
-			'filters'               => array(
+			'view'                 => $view,
+			'breadcrumbs'          => $breadcrumbs,
+			'tree'                 => $tree,
+			'l3_nodes'             => $l3_nodes,
+			'list_result'          => $list_result,
+			'filters'              => array(
 				'purpose_family'       => $purpose_family,
 				'cta_classification'   => $cta_classification,
 				'variation_family_key' => $variation_family_key,
-				'all'                 => $show_all,
+				'all'                  => $show_all,
 				'status'               => $status,
 				'search'               => $search,
 				'paged'                => $paged,
 				'per_page'             => $per_page,
 			),
-			'base_url'               => $base_url,
-			'can_manage_templates'   => $can_manage,
-			'purpose_labels'         => $this->get_purpose_labels(),
-			'cta_labels'             => self::CTA_LABELS,
+			'base_url'             => $base_url,
+			'can_manage_templates' => $can_manage,
+			'purpose_labels'       => $this->get_purpose_labels(),
+			'cta_labels'           => self::CTA_LABELS,
 		);
 	}
 
@@ -155,10 +173,18 @@ final class Section_Template_Directory_State_Builder {
 	 * @return list<array{label: string, url: string}>
 	 */
 	private function build_breadcrumbs( string $view, string $purpose_family, string $cta_classification, string $variation_family_key, bool $show_all, string $search, string $base_url ): array {
-		$segments = array( array( 'label' => __( 'Section Templates', 'aio-page-builder' ), 'url' => $base_url ) );
+		$segments = array(
+			array(
+				'label' => __( 'Section Templates', 'aio-page-builder' ),
+				'url'   => $base_url,
+			),
+		);
 
 		if ( $search !== '' ) {
-			$segments[] = array( 'label' => sprintf( __( 'Search: %s', 'aio-page-builder' ), \esc_html( $search ) ), 'url' => '' );
+			$segments[] = array(
+				'label' => sprintf( __( 'Search: %s', 'aio-page-builder' ), \esc_html( $search ) ),
+				'url'   => '',
+			);
 			return $segments;
 		}
 
@@ -168,7 +194,10 @@ final class Section_Template_Directory_State_Builder {
 
 		$purpose_label = $this->purpose_to_label( $purpose_family );
 		$purpose_url   = $base_url . '&purpose_family=' . \rawurlencode( $purpose_family );
-		$segments[]    = array( 'label' => $purpose_label, 'url' => $purpose_url );
+		$segments[]    = array(
+			'label' => $purpose_label,
+			'url'   => $purpose_url,
+		);
 
 		if ( $cta_classification === '' && $variation_family_key === '' && ! $show_all ) {
 			return $segments;
@@ -177,7 +206,7 @@ final class Section_Template_Directory_State_Builder {
 		$l3_label = $show_all ? __( 'All', 'aio-page-builder' ) : ( $cta_classification !== ''
 			? ( self::CTA_LABELS[ $cta_classification ] ?? $cta_classification )
 			: $this->variation_to_label( $variation_family_key ) );
-		$l3_url = $purpose_url;
+		$l3_url   = $purpose_url;
 		if ( $show_all ) {
 			$l3_url .= '&all=1';
 		} elseif ( $cta_classification !== '' ) {
@@ -185,7 +214,10 @@ final class Section_Template_Directory_State_Builder {
 		} else {
 			$l3_url .= '&variation_family_key=' . \rawurlencode( $variation_family_key );
 		}
-		$segments[] = array( 'label' => $l3_label, 'url' => $view === 'list' ? $l3_url : '' );
+		$segments[] = array(
+			'label' => $l3_label,
+			'url'   => $view === 'list' ? $l3_url : '',
+		);
 		return $segments;
 	}
 
@@ -197,14 +229,14 @@ final class Section_Template_Directory_State_Builder {
 	 */
 	private function build_tree( string $base_url ): array {
 		$empty_filters = array();
-		$result = $this->query_service->query_sections( $empty_filters, 1, 1 );
-		$counts = $result->get_filter_counts();
-		$by_purpose = $counts['section_purpose_family'] ?? array();
+		$result        = $this->query_service->query_sections( $empty_filters, 1, 1 );
+		$counts        = $result->get_filter_counts();
+		$by_purpose    = $counts['section_purpose_family'] ?? array();
 
-		$tree = array();
+		$tree   = array();
 		$labels = $this->get_purpose_labels();
 		foreach ( self::PURPOSE_ORDER as $slug ) {
-			$count = (int) ( $by_purpose[ $slug ] ?? 0 );
+			$count  = (int) ( $by_purpose[ $slug ] ?? 0 );
 			$tree[] = array(
 				'slug'  => $slug,
 				'label' => $labels[ $slug ] ?? \ucfirst( $slug ),
@@ -235,16 +267,16 @@ final class Section_Template_Directory_State_Builder {
 	 */
 	private function build_l3_nodes( string $purpose_family, string $base_url ): array {
 		$filters = array( Large_Library_Query_Service::FILTER_SECTION_PURPOSE_FAMILY => $purpose_family );
-		$result = $this->query_service->query_sections( $filters, 1, 1 );
-		$counts = $result->get_filter_counts();
-		$base = $base_url . '&purpose_family=' . \rawurlencode( $purpose_family );
+		$result  = $this->query_service->query_sections( $filters, 1, 1 );
+		$counts  = $result->get_filter_counts();
+		$base    = $base_url . '&purpose_family=' . \rawurlencode( $purpose_family );
 
 		$nodes = array();
 
 		if ( \in_array( $purpose_family, self::CTA_PURPOSE_FAMILIES, true ) ) {
 			$by_cta = $counts['cta_classification'] ?? array();
 			foreach ( self::CTA_ORDER as $slug ) {
-				$count = (int) ( $by_cta[ $slug ] ?? 0 );
+				$count   = (int) ( $by_cta[ $slug ] ?? 0 );
 				$nodes[] = array(
 					'slug'  => $slug,
 					'label' => self::CTA_LABELS[ $slug ] ?? $slug,

@@ -23,12 +23,12 @@ final class Industry_Page_Template_Preview_View_Model {
 	public const KEY_HIERARCHY_FIT          = 'hierarchy_fit';
 	public const KEY_LPAGERY_POSTURE        = 'lpagery_posture';
 	public const KEY_COMPOSED_ONE_PAGER     = 'composed_one_pager';
-	public const KEY_SUBSTITUTE_SUGGESTIONS  = 'substitute_suggestions';
-	public const KEY_WARNING_FLAGS           = 'warning_flags';
+	public const KEY_SUBSTITUTE_SUGGESTIONS = 'substitute_suggestions';
+	public const KEY_WARNING_FLAGS          = 'warning_flags';
 	public const KEY_EXPLANATION_REASONS    = 'explanation_reasons';
-	public const KEY_COMPLIANCE_WARNINGS     = 'compliance_warnings';
-	public const KEY_SUBTYPE_INFLUENCE        = 'subtype_influence';
-	public const KEY_GOAL_INFLUENCE           = 'goal_influence';
+	public const KEY_COMPLIANCE_WARNINGS    = 'compliance_warnings';
+	public const KEY_SUBTYPE_INFLUENCE      = 'subtype_influence';
+	public const KEY_GOAL_INFLUENCE         = 'goal_influence';
 
 	/** @var bool */
 	private bool $has_industry;
@@ -176,18 +176,18 @@ final class Industry_Page_Template_Preview_View_Model {
 	 */
 	public function to_array(): array {
 		return array(
-			self::KEY_HAS_INDUSTRY          => $this->has_industry,
-			self::KEY_PRIMARY_INDUSTRY_KEY  => $this->primary_industry_key,
-			self::KEY_RECOMMENDATION_FIT    => $this->recommendation_fit,
-			self::KEY_HIERARCHY_FIT         => $this->hierarchy_fit,
-			self::KEY_LPAGERY_POSTURE       => $this->lpagery_posture,
-			self::KEY_COMPOSED_ONE_PAGER    => $this->composed_one_pager,
+			self::KEY_HAS_INDUSTRY           => $this->has_industry,
+			self::KEY_PRIMARY_INDUSTRY_KEY   => $this->primary_industry_key,
+			self::KEY_RECOMMENDATION_FIT     => $this->recommendation_fit,
+			self::KEY_HIERARCHY_FIT          => $this->hierarchy_fit,
+			self::KEY_LPAGERY_POSTURE        => $this->lpagery_posture,
+			self::KEY_COMPOSED_ONE_PAGER     => $this->composed_one_pager,
 			self::KEY_SUBSTITUTE_SUGGESTIONS => $this->substitute_suggestions,
-			self::KEY_WARNING_FLAGS         => $this->warning_flags,
-			self::KEY_EXPLANATION_REASONS   => $this->explanation_reasons,
-			self::KEY_COMPLIANCE_WARNINGS   => $this->compliance_warnings,
-			self::KEY_SUBTYPE_INFLUENCE     => $this->subtype_influence,
-			self::KEY_GOAL_INFLUENCE        => $this->goal_influence,
+			self::KEY_WARNING_FLAGS          => $this->warning_flags,
+			self::KEY_EXPLANATION_REASONS    => $this->explanation_reasons,
+			self::KEY_COMPLIANCE_WARNINGS    => $this->compliance_warnings,
+			self::KEY_SUBTYPE_INFLUENCE      => $this->subtype_influence,
+			self::KEY_GOAL_INFLUENCE         => $this->goal_influence,
 		);
 	}
 }

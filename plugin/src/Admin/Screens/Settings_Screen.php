@@ -39,29 +39,29 @@ final class Settings_Screen {
 	 * @return void
 	 */
 	public function render(): void {
-		$seed_result           = isset( $_GET['aio_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_result'] ) : '';
-		$expansion_seed_result = isset( $_GET['aio_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_expansion_seed_result'] ) : '';
-		$hero_intro_batch_seed_result = isset( $_GET['aio_hero_intro_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hero_intro_batch_seed_result'] ) : '';
-		$trust_proof_batch_seed_result = isset( $_GET['aio_trust_proof_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_trust_proof_batch_seed_result'] ) : '';
-		$fb_value_batch_seed_result = isset( $_GET['aio_fb_value_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_fb_value_batch_seed_result'] ) : '';
-		$ptf_batch_seed_result = isset( $_GET['aio_ptf_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_ptf_batch_seed_result'] ) : '';
-		$mlp_batch_seed_result = isset( $_GET['aio_mlp_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_mlp_batch_seed_result'] ) : '';
-		$lpu_batch_seed_result = isset( $_GET['aio_lpu_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_lpu_batch_seed_result'] ) : '';
-		$cta_super_seed_result = isset( $_GET['aio_cta_super_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_cta_super_seed_result'] ) : '';
-		$pt_comp_expansion_seed_result = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
-		$top_level_marketing_seed_result = isset( $_GET['aio_top_level_marketing_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_marketing_seed_result'] ) : '';
-		$top_level_legal_utility_seed_result = isset( $_GET['aio_top_level_legal_utility_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_legal_utility_seed_result'] ) : '';
+		$seed_result                                  = isset( $_GET['aio_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_result'] ) : '';
+		$expansion_seed_result                        = isset( $_GET['aio_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_expansion_seed_result'] ) : '';
+		$hero_intro_batch_seed_result                 = isset( $_GET['aio_hero_intro_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hero_intro_batch_seed_result'] ) : '';
+		$trust_proof_batch_seed_result                = isset( $_GET['aio_trust_proof_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_trust_proof_batch_seed_result'] ) : '';
+		$fb_value_batch_seed_result                   = isset( $_GET['aio_fb_value_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_fb_value_batch_seed_result'] ) : '';
+		$ptf_batch_seed_result                        = isset( $_GET['aio_ptf_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_ptf_batch_seed_result'] ) : '';
+		$mlp_batch_seed_result                        = isset( $_GET['aio_mlp_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_mlp_batch_seed_result'] ) : '';
+		$lpu_batch_seed_result                        = isset( $_GET['aio_lpu_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_lpu_batch_seed_result'] ) : '';
+		$cta_super_seed_result                        = isset( $_GET['aio_cta_super_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_cta_super_seed_result'] ) : '';
+		$pt_comp_expansion_seed_result                = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
+		$top_level_marketing_seed_result              = isset( $_GET['aio_top_level_marketing_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_marketing_seed_result'] ) : '';
+		$top_level_legal_utility_seed_result          = isset( $_GET['aio_top_level_legal_utility_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_legal_utility_seed_result'] ) : '';
 		$top_level_edu_resource_authority_seed_result = isset( $_GET['aio_top_level_edu_resource_authority_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_edu_resource_authority_seed_result'] ) : '';
-		$top_level_variant_expansion_seed_result = isset( $_GET['aio_top_level_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_variant_expansion_seed_result'] ) : '';
-		$hub_page_seed_result = isset( $_GET['aio_hub_page_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_page_seed_result'] ) : '';
-		$geographic_hub_seed_result = isset( $_GET['aio_geographic_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_geographic_hub_seed_result'] ) : '';
-		$nested_hub_seed_result     = isset( $_GET['aio_nested_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_nested_hub_seed_result'] ) : '';
+		$top_level_variant_expansion_seed_result      = isset( $_GET['aio_top_level_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_variant_expansion_seed_result'] ) : '';
+		$hub_page_seed_result                         = isset( $_GET['aio_hub_page_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_page_seed_result'] ) : '';
+		$geographic_hub_seed_result                   = isset( $_GET['aio_geographic_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_geographic_hub_seed_result'] ) : '';
+		$nested_hub_seed_result                       = isset( $_GET['aio_nested_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_nested_hub_seed_result'] ) : '';
 		$hub_nested_hub_variant_expansion_seed_result = isset( $_GET['aio_hub_nested_hub_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_nested_hub_variant_expansion_seed_result'] ) : '';
-		$child_detail_seed_result   = isset( $_GET['aio_child_detail_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_seed_result'] ) : '';
-		$child_detail_product_seed_result = isset( $_GET['aio_child_detail_product_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_product_seed_result'] ) : '';
-		$child_detail_profile_entity_seed_result = isset( $_GET['aio_child_detail_profile_entity_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_profile_entity_seed_result'] ) : '';
-		$child_detail_variant_expansion_seed_result = isset( $_GET['aio_child_detail_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_variant_expansion_seed_result'] ) : '';
-		$privacy_url = \add_query_arg( array( 'page' => \AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen::SLUG ), \admin_url( 'admin.php' ) );
+		$child_detail_seed_result                     = isset( $_GET['aio_child_detail_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_seed_result'] ) : '';
+		$child_detail_product_seed_result             = isset( $_GET['aio_child_detail_product_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_product_seed_result'] ) : '';
+		$child_detail_profile_entity_seed_result      = isset( $_GET['aio_child_detail_profile_entity_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_profile_entity_seed_result'] ) : '';
+		$child_detail_variant_expansion_seed_result   = isset( $_GET['aio_child_detail_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_variant_expansion_seed_result'] ) : '';
+		$privacy_url                                  = \add_query_arg( array( 'page' => \AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen::SLUG ), \admin_url( 'admin.php' ) );
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>

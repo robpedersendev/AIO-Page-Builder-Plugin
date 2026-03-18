@@ -38,16 +38,16 @@ final class Preview_Style_Context_Builder_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->plugin_root = dirname( __DIR__, 2 );
-		$key = Entity_Style_Payload_Schema::OPTION_KEY;
+		$key               = Entity_Style_Payload_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
 		}
 	}
 
 	public function test_build_for_preview_returns_expected_keys(): void {
-		$config = new Plugin_Config();
+		$config  = new Plugin_Config();
 		$builder = new Preview_Style_Context_Builder( $config, null, null, null );
-		$out = $builder->build_for_preview( 'section', '' );
+		$out     = $builder->build_for_preview( 'section', '' );
 		$this->assertArrayHasKey( 'base_stylesheet_url', $out );
 		$this->assertArrayHasKey( 'inline_css', $out );
 		$this->assertIsString( $out['base_stylesheet_url'] );
@@ -55,40 +55,40 @@ final class Preview_Style_Context_Builder_Test extends TestCase {
 	}
 
 	public function test_build_for_preview_base_url_ends_with_base_css_path(): void {
-		$config = new Plugin_Config();
+		$config  = new Plugin_Config();
 		$builder = new Preview_Style_Context_Builder( $config, null, null, null );
-		$out = $builder->build_for_preview( 'section', '' );
+		$out     = $builder->build_for_preview( 'section', '' );
 		$this->assertStringContainsString( 'aio-page-builder-base.css', $out['base_stylesheet_url'] );
 		$this->assertSame( '', $out['inline_css'] );
 	}
 
 	public function test_build_for_section_with_page_emitter_does_not_include_page_css(): void {
-		$config  = new Plugin_Config();
-		$repo    = new Entity_Style_Payload_Repository();
-		$loader  = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
-		$token   = new Style_Token_Registry( $loader );
-		$comp    = new Component_Override_Registry( $loader );
+		$config       = new Plugin_Config();
+		$repo         = new Entity_Style_Payload_Repository();
+		$loader       = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$token        = new Style_Token_Registry( $loader );
+		$comp         = new Component_Override_Registry( $loader );
 		$page_emitter = new Page_Style_Emitter( $repo, $token, $comp );
-		$builder = new Preview_Style_Context_Builder( $config, null, null, $page_emitter );
-		$out = $builder->build_for_preview( 'section', 'sec_hero' );
+		$builder      = new Preview_Style_Context_Builder( $config, null, null, $page_emitter );
+		$out          = $builder->build_for_preview( 'section', 'sec_hero' );
 		$this->assertSame( '', $out['inline_css'] );
 	}
 
 	public function test_build_for_page_with_entity_key_and_payload_includes_page_css(): void {
-		$config = new Plugin_Config();
-		$repo   = new Entity_Style_Payload_Repository();
+		$config  = new Plugin_Config();
+		$repo    = new Entity_Style_Payload_Repository();
 		$payload = array(
 			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => '1',
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'primary' => '#abc' ) ),
 			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => array(),
 		);
 		$repo->set_payload( 'page_template', 'pt_landing', $payload );
-		$loader = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
-		$token  = new Style_Token_Registry( $loader );
-		$comp   = new Component_Override_Registry( $loader );
+		$loader       = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$token        = new Style_Token_Registry( $loader );
+		$comp         = new Component_Override_Registry( $loader );
 		$page_emitter = new Page_Style_Emitter( $repo, $token, $comp );
-		$builder = new Preview_Style_Context_Builder( $config, null, null, $page_emitter );
-		$out = $builder->build_for_preview( 'page', 'pt_landing' );
+		$builder      = new Preview_Style_Context_Builder( $config, null, null, $page_emitter );
+		$out          = $builder->build_for_preview( 'page', 'pt_landing' );
 		$this->assertStringContainsString( '.aio-page', $out['inline_css'] );
 		$this->assertStringContainsString( '--aio-color-primary', $out['inline_css'] );
 	}

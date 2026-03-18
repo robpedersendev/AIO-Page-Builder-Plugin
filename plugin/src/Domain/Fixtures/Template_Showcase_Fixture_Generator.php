@@ -35,15 +35,15 @@ final class Template_Showcase_Fixture_Generator {
 	private const FIXTURE_TIMESTAMP = '2025-03-15T10:00:00Z';
 
 	/** Section keys (representative families). */
-	private const SECTION_HERO   = 'st_showcase_hero_01';
-	private const SECTION_TRUST  = 'st_showcase_trust_01';
-	private const SECTION_CTA    = 'st_showcase_cta_01';
+	private const SECTION_HERO  = 'st_showcase_hero_01';
+	private const SECTION_TRUST = 'st_showcase_trust_01';
+	private const SECTION_CTA   = 'st_showcase_cta_01';
 
 	/** Page template keys (top-level, hub, nested_hub, child_detail). */
-	private const PAGE_LANDING   = 'pt_showcase_landing_01';
-	private const PAGE_HUB       = 'pt_showcase_hub_01';
-	private const PAGE_NESTED    = 'pt_showcase_nested_hub_01';
-	private const PAGE_CHILD     = 'pt_showcase_child_01';
+	private const PAGE_LANDING = 'pt_showcase_landing_01';
+	private const PAGE_HUB     = 'pt_showcase_hub_01';
+	private const PAGE_NESTED  = 'pt_showcase_nested_hub_01';
+	private const PAGE_CHILD   = 'pt_showcase_child_01';
 
 	/** Composition ids. */
 	private const COMP_01 = 'comp_showcase_01';
@@ -75,27 +75,27 @@ final class Template_Showcase_Fixture_Generator {
 		$page_classes     = array( 'top_level', 'hub', 'nested_hub', 'child_detail' );
 
 		$manifest = array(
-			'version'        => self::MANIFEST_VERSION,
-			'generated_at'    => self::FIXTURE_TIMESTAMP,
-			'section_families' => $section_families,
-			'page_classes'    => $page_classes,
-			'compare_sets'    => $compare_sets,
-			'counts'          => array(
-				'sections'                      => count( $sections ),
-				'page_templates'                => count( $page_templates ),
-				'compositions'                  => count( $compositions ),
+			'version'              => self::MANIFEST_VERSION,
+			'generated_at'         => self::FIXTURE_TIMESTAMP,
+			'section_families'     => $section_families,
+			'page_classes'         => $page_classes,
+			'compare_sets'         => $compare_sets,
+			'counts'               => array(
+				'sections'                        => count( $sections ),
+				'page_templates'                  => count( $page_templates ),
+				'compositions'                    => count( $compositions ),
 				'build_plan_recommendation_items' => count( $items ),
 			),
 			self::SYNTHETIC_MARKER => true,
 		);
 
 		return array(
-			'manifest'                       => $manifest,
-			'sections'                       => $sections,
-			'page_templates'                 => $page_templates,
-			'compositions'                   => $compositions,
+			'manifest'                        => $manifest,
+			'sections'                        => $sections,
+			'page_templates'                  => $page_templates,
+			'compositions'                    => $compositions,
 			'build_plan_recommendation_items' => $items,
-			'compare_sets'                   => $compare_sets,
+			'compare_sets'                    => $compare_sets,
 		);
 	}
 
@@ -115,55 +115,64 @@ final class Template_Showcase_Fixture_Generator {
 	private function build_sections(): array {
 		return array(
 			array(
-				Section_Schema::FIELD_INTERNAL_KEY           => self::SECTION_HERO,
-				Section_Schema::FIELD_NAME                  => 'Showcase Hero',
-				Section_Schema::FIELD_PURPOSE_SUMMARY       => 'Synthetic hero section for demo and QA.',
-				Section_Schema::FIELD_CATEGORY              => 'hero_intro',
+				Section_Schema::FIELD_INTERNAL_KEY        => self::SECTION_HERO,
+				Section_Schema::FIELD_NAME                => 'Showcase Hero',
+				Section_Schema::FIELD_PURPOSE_SUMMARY     => 'Synthetic hero section for demo and QA.',
+				Section_Schema::FIELD_CATEGORY            => 'hero_intro',
 				Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp_showcase_hero',
-				Section_Schema::FIELD_FIELD_BLUEPRINT_REF   => 'acf_showcase_hero',
-				Section_Schema::FIELD_HELPER_REF            => 'helper_showcase_hero',
-				Section_Schema::FIELD_CSS_CONTRACT_REF      => 'css_showcase_hero',
-				Section_Schema::FIELD_DEFAULT_VARIANT       => 'default',
-				Section_Schema::FIELD_VARIANTS              => array( 'default' => array( 'label' => 'Default' ) ),
-				Section_Schema::FIELD_COMPATIBILITY         => array(),
-				Section_Schema::FIELD_VERSION               => array( 'version' => '1', 'stable_key_retained' => true ),
-				Section_Schema::FIELD_STATUS                => 'active',
-				Section_Schema::FIELD_RENDER_MODE           => 'block',
-				Section_Schema::FIELD_ASSET_DECLARATION     => array( 'none' => true ),
+				Section_Schema::FIELD_FIELD_BLUEPRINT_REF => 'acf_showcase_hero',
+				Section_Schema::FIELD_HELPER_REF          => 'helper_showcase_hero',
+				Section_Schema::FIELD_CSS_CONTRACT_REF    => 'css_showcase_hero',
+				Section_Schema::FIELD_DEFAULT_VARIANT     => 'default',
+				Section_Schema::FIELD_VARIANTS            => array( 'default' => array( 'label' => 'Default' ) ),
+				Section_Schema::FIELD_COMPATIBILITY       => array(),
+				Section_Schema::FIELD_VERSION             => array(
+					'version'             => '1',
+					'stable_key_retained' => true,
+				),
+				Section_Schema::FIELD_STATUS              => 'active',
+				Section_Schema::FIELD_RENDER_MODE         => 'block',
+				Section_Schema::FIELD_ASSET_DECLARATION   => array( 'none' => true ),
 			),
 			array(
-				Section_Schema::FIELD_INTERNAL_KEY           => self::SECTION_TRUST,
-				Section_Schema::FIELD_NAME                  => 'Showcase Trust',
-				Section_Schema::FIELD_PURPOSE_SUMMARY       => 'Synthetic trust/proof section for demo.',
-				Section_Schema::FIELD_CATEGORY              => 'trust_proof',
+				Section_Schema::FIELD_INTERNAL_KEY        => self::SECTION_TRUST,
+				Section_Schema::FIELD_NAME                => 'Showcase Trust',
+				Section_Schema::FIELD_PURPOSE_SUMMARY     => 'Synthetic trust/proof section for demo.',
+				Section_Schema::FIELD_CATEGORY            => 'trust_proof',
 				Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp_showcase_trust',
-				Section_Schema::FIELD_FIELD_BLUEPRINT_REF   => 'acf_showcase_trust',
-				Section_Schema::FIELD_HELPER_REF            => 'helper_showcase_trust',
-				Section_Schema::FIELD_CSS_CONTRACT_REF      => 'css_showcase_trust',
-				Section_Schema::FIELD_DEFAULT_VARIANT       => 'default',
-				Section_Schema::FIELD_VARIANTS              => array( 'default' => array( 'label' => 'Default' ) ),
-				Section_Schema::FIELD_COMPATIBILITY         => array(),
-				Section_Schema::FIELD_VERSION               => array( 'version' => '1', 'stable_key_retained' => true ),
-				Section_Schema::FIELD_STATUS                => 'active',
-				Section_Schema::FIELD_RENDER_MODE           => 'block',
-				Section_Schema::FIELD_ASSET_DECLARATION     => array( 'none' => true ),
+				Section_Schema::FIELD_FIELD_BLUEPRINT_REF => 'acf_showcase_trust',
+				Section_Schema::FIELD_HELPER_REF          => 'helper_showcase_trust',
+				Section_Schema::FIELD_CSS_CONTRACT_REF    => 'css_showcase_trust',
+				Section_Schema::FIELD_DEFAULT_VARIANT     => 'default',
+				Section_Schema::FIELD_VARIANTS            => array( 'default' => array( 'label' => 'Default' ) ),
+				Section_Schema::FIELD_COMPATIBILITY       => array(),
+				Section_Schema::FIELD_VERSION             => array(
+					'version'             => '1',
+					'stable_key_retained' => true,
+				),
+				Section_Schema::FIELD_STATUS              => 'active',
+				Section_Schema::FIELD_RENDER_MODE         => 'block',
+				Section_Schema::FIELD_ASSET_DECLARATION   => array( 'none' => true ),
 			),
 			array(
-				Section_Schema::FIELD_INTERNAL_KEY           => self::SECTION_CTA,
-				Section_Schema::FIELD_NAME                  => 'Showcase CTA',
-				Section_Schema::FIELD_PURPOSE_SUMMARY       => 'Synthetic CTA section for demo and CTA-rule QA.',
-				Section_Schema::FIELD_CATEGORY              => 'cta',
+				Section_Schema::FIELD_INTERNAL_KEY        => self::SECTION_CTA,
+				Section_Schema::FIELD_NAME                => 'Showcase CTA',
+				Section_Schema::FIELD_PURPOSE_SUMMARY     => 'Synthetic CTA section for demo and CTA-rule QA.',
+				Section_Schema::FIELD_CATEGORY            => 'cta',
 				Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp_showcase_cta',
-				Section_Schema::FIELD_FIELD_BLUEPRINT_REF   => 'acf_showcase_cta',
-				Section_Schema::FIELD_HELPER_REF            => 'helper_showcase_cta',
-				Section_Schema::FIELD_CSS_CONTRACT_REF      => 'css_showcase_cta',
-				Section_Schema::FIELD_DEFAULT_VARIANT       => 'default',
-				Section_Schema::FIELD_VARIANTS              => array( 'default' => array( 'label' => 'Default' ) ),
-				Section_Schema::FIELD_COMPATIBILITY         => array(),
-				Section_Schema::FIELD_VERSION               => array( 'version' => '1', 'stable_key_retained' => true ),
-				Section_Schema::FIELD_STATUS                => 'active',
-				Section_Schema::FIELD_RENDER_MODE           => 'block',
-				Section_Schema::FIELD_ASSET_DECLARATION     => array( 'none' => true ),
+				Section_Schema::FIELD_FIELD_BLUEPRINT_REF => 'acf_showcase_cta',
+				Section_Schema::FIELD_HELPER_REF          => 'helper_showcase_cta',
+				Section_Schema::FIELD_CSS_CONTRACT_REF    => 'css_showcase_cta',
+				Section_Schema::FIELD_DEFAULT_VARIANT     => 'default',
+				Section_Schema::FIELD_VARIANTS            => array( 'default' => array( 'label' => 'Default' ) ),
+				Section_Schema::FIELD_COMPATIBILITY       => array(),
+				Section_Schema::FIELD_VERSION             => array(
+					'version'             => '1',
+					'stable_key_retained' => true,
+				),
+				Section_Schema::FIELD_STATUS              => 'active',
+				Section_Schema::FIELD_RENDER_MODE         => 'block',
+				Section_Schema::FIELD_ASSET_DECLARATION   => array( 'none' => true ),
 			),
 		);
 	}
@@ -172,92 +181,95 @@ final class Template_Showcase_Fixture_Generator {
 	 * @return list<array<string, mixed>>
 	 */
 	private function build_page_templates(): array {
-		$ordered_hero = array(
+		$ordered_hero         = array(
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY     => self::SECTION_HERO,
+				Page_Template_Schema::SECTION_ITEM_KEY => self::SECTION_HERO,
 				Page_Template_Schema::SECTION_ITEM_POSITION => 0,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			),
 		);
-		$ordered_hero_trust = array(
+		$ordered_hero_trust   = array(
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY     => self::SECTION_HERO,
+				Page_Template_Schema::SECTION_ITEM_KEY => self::SECTION_HERO,
 				Page_Template_Schema::SECTION_ITEM_POSITION => 0,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			),
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY     => self::SECTION_TRUST,
+				Page_Template_Schema::SECTION_ITEM_KEY => self::SECTION_TRUST,
 				Page_Template_Schema::SECTION_ITEM_POSITION => 1,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => false,
 			),
 		);
 		$requirements_landing = array( self::SECTION_HERO => array( 'required' => true ) );
-		$requirements_hub     = array( self::SECTION_HERO => array( 'required' => true ), self::SECTION_TRUST => array( 'required' => false ) );
+		$requirements_hub     = array(
+			self::SECTION_HERO  => array( 'required' => true ),
+			self::SECTION_TRUST => array( 'required' => false ),
+		);
 
 		return array(
 			array(
-				Page_Template_Schema::FIELD_INTERNAL_KEY       => self::PAGE_LANDING,
-				Page_Template_Schema::FIELD_NAME               => 'Showcase Landing',
-				Page_Template_Schema::FIELD_PURPOSE_SUMMARY    => 'Synthetic top-level landing for demo.',
-				Page_Template_Schema::FIELD_ARCHETYPE          => 'landing',
-				Page_Template_Schema::FIELD_ORDERED_SECTIONS   => $ordered_hero,
+				Page_Template_Schema::FIELD_INTERNAL_KEY  => self::PAGE_LANDING,
+				Page_Template_Schema::FIELD_NAME          => 'Showcase Landing',
+				Page_Template_Schema::FIELD_PURPOSE_SUMMARY => 'Synthetic top-level landing for demo.',
+				Page_Template_Schema::FIELD_ARCHETYPE     => 'landing',
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered_hero,
 				Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $requirements_landing,
-				Page_Template_Schema::FIELD_COMPATIBILITY     => array(),
-				Page_Template_Schema::FIELD_ONE_PAGER          => array( 'page_purpose_summary' => 'Showcase landing purpose.' ),
-				Page_Template_Schema::FIELD_VERSION            => array( 'version' => '1' ),
-				Page_Template_Schema::FIELD_STATUS             => 'active',
+				Page_Template_Schema::FIELD_COMPATIBILITY => array(),
+				Page_Template_Schema::FIELD_ONE_PAGER     => array( 'page_purpose_summary' => 'Showcase landing purpose.' ),
+				Page_Template_Schema::FIELD_VERSION       => array( 'version' => '1' ),
+				Page_Template_Schema::FIELD_STATUS        => 'active',
 				Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => array(),
 				Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => '',
-				'template_category_class'                     => 'top_level',
-				'template_family'                             => 'showcase_landing',
+				'template_category_class'                 => 'top_level',
+				'template_family'                         => 'showcase_landing',
 			),
 			array(
-				Page_Template_Schema::FIELD_INTERNAL_KEY       => self::PAGE_HUB,
-				Page_Template_Schema::FIELD_NAME               => 'Showcase Hub',
-				Page_Template_Schema::FIELD_PURPOSE_SUMMARY    => 'Synthetic hub page for demo.',
-				Page_Template_Schema::FIELD_ARCHETYPE          => 'hub',
-				Page_Template_Schema::FIELD_ORDERED_SECTIONS   => $ordered_hero_trust,
+				Page_Template_Schema::FIELD_INTERNAL_KEY  => self::PAGE_HUB,
+				Page_Template_Schema::FIELD_NAME          => 'Showcase Hub',
+				Page_Template_Schema::FIELD_PURPOSE_SUMMARY => 'Synthetic hub page for demo.',
+				Page_Template_Schema::FIELD_ARCHETYPE     => 'hub',
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered_hero_trust,
 				Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $requirements_hub,
-				Page_Template_Schema::FIELD_COMPATIBILITY     => array(),
-				Page_Template_Schema::FIELD_ONE_PAGER          => array( 'page_purpose_summary' => 'Showcase hub purpose.' ),
-				Page_Template_Schema::FIELD_VERSION            => array( 'version' => '1' ),
-				Page_Template_Schema::FIELD_STATUS             => 'active',
+				Page_Template_Schema::FIELD_COMPATIBILITY => array(),
+				Page_Template_Schema::FIELD_ONE_PAGER     => array( 'page_purpose_summary' => 'Showcase hub purpose.' ),
+				Page_Template_Schema::FIELD_VERSION       => array( 'version' => '1' ),
+				Page_Template_Schema::FIELD_STATUS        => 'active',
 				Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => array(),
 				Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => '',
-				'template_category_class'                     => 'hub',
-				'template_family'                             => 'showcase_hub',
+				'template_category_class'                 => 'hub',
+				'template_family'                         => 'showcase_hub',
 			),
 			array(
-				Page_Template_Schema::FIELD_INTERNAL_KEY       => self::PAGE_NESTED,
-				Page_Template_Schema::FIELD_NAME               => 'Showcase Nested Hub',
-				Page_Template_Schema::FIELD_PURPOSE_SUMMARY    => 'Synthetic nested hub for demo.',
-				Page_Template_Schema::FIELD_ARCHETYPE          => 'nested_hub',
-				Page_Template_Schema::FIELD_ORDERED_SECTIONS   => $ordered_hero_trust,
+				Page_Template_Schema::FIELD_INTERNAL_KEY  => self::PAGE_NESTED,
+				Page_Template_Schema::FIELD_NAME          => 'Showcase Nested Hub',
+				Page_Template_Schema::FIELD_PURPOSE_SUMMARY => 'Synthetic nested hub for demo.',
+				Page_Template_Schema::FIELD_ARCHETYPE     => 'nested_hub',
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered_hero_trust,
 				Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $requirements_hub,
-				Page_Template_Schema::FIELD_COMPATIBILITY     => array(),
-				Page_Template_Schema::FIELD_ONE_PAGER          => array( 'page_purpose_summary' => 'Showcase nested hub purpose.' ),
-				Page_Template_Schema::FIELD_VERSION            => array( 'version' => '1' ),
-				Page_Template_Schema::FIELD_STATUS             => 'active',
+				Page_Template_Schema::FIELD_COMPATIBILITY => array(),
+				Page_Template_Schema::FIELD_ONE_PAGER     => array( 'page_purpose_summary' => 'Showcase nested hub purpose.' ),
+				Page_Template_Schema::FIELD_VERSION       => array( 'version' => '1' ),
+				Page_Template_Schema::FIELD_STATUS        => 'active',
 				Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => array(),
 				Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => '',
-				'template_category_class'                     => 'nested_hub',
-				'template_family'                             => 'showcase_nested_hub',
+				'template_category_class'                 => 'nested_hub',
+				'template_family'                         => 'showcase_nested_hub',
 			),
 			array(
-				Page_Template_Schema::FIELD_INTERNAL_KEY       => self::PAGE_CHILD,
-				Page_Template_Schema::FIELD_NAME               => 'Showcase Child Detail',
-				Page_Template_Schema::FIELD_PURPOSE_SUMMARY    => 'Synthetic child/detail page for demo.',
-				Page_Template_Schema::FIELD_ARCHETYPE          => 'service_page',
-				Page_Template_Schema::FIELD_ORDERED_SECTIONS   => $ordered_hero_trust,
+				Page_Template_Schema::FIELD_INTERNAL_KEY  => self::PAGE_CHILD,
+				Page_Template_Schema::FIELD_NAME          => 'Showcase Child Detail',
+				Page_Template_Schema::FIELD_PURPOSE_SUMMARY => 'Synthetic child/detail page for demo.',
+				Page_Template_Schema::FIELD_ARCHETYPE     => 'service_page',
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered_hero_trust,
 				Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $requirements_hub,
-				Page_Template_Schema::FIELD_COMPATIBILITY     => array(),
-				Page_Template_Schema::FIELD_ONE_PAGER          => array( 'page_purpose_summary' => 'Showcase child detail purpose.' ),
-				Page_Template_Schema::FIELD_VERSION            => array( 'version' => '1' ),
-				Page_Template_Schema::FIELD_STATUS             => 'active',
+				Page_Template_Schema::FIELD_COMPATIBILITY => array(),
+				Page_Template_Schema::FIELD_ONE_PAGER     => array( 'page_purpose_summary' => 'Showcase child detail purpose.' ),
+				Page_Template_Schema::FIELD_VERSION       => array( 'version' => '1' ),
+				Page_Template_Schema::FIELD_STATUS        => 'active',
 				Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => array(),
 				Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => '',
-				'template_category_class'                     => 'child_detail',
-				'template_family'                             => 'showcase_child_detail',
+				'template_category_class'                 => 'child_detail',
+				'template_family'                         => 'showcase_child_detail',
 			),
 		);
 	}
@@ -268,49 +280,49 @@ final class Template_Showcase_Fixture_Generator {
 	private function build_compositions(): array {
 		$ordered1 = array(
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => self::SECTION_HERO,
+				Composition_Schema::SECTION_ITEM_KEY      => self::SECTION_HERO,
 				Composition_Schema::SECTION_ITEM_POSITION => 0,
-				Composition_Schema::SECTION_ITEM_VARIANT => 'default',
+				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => self::SECTION_CTA,
+				Composition_Schema::SECTION_ITEM_KEY      => self::SECTION_CTA,
 				Composition_Schema::SECTION_ITEM_POSITION => 1,
-				Composition_Schema::SECTION_ITEM_VARIANT => 'default',
+				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 		);
 		$ordered2 = array(
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => self::SECTION_HERO,
+				Composition_Schema::SECTION_ITEM_KEY      => self::SECTION_HERO,
 				Composition_Schema::SECTION_ITEM_POSITION => 0,
-				Composition_Schema::SECTION_ITEM_VARIANT => 'default',
+				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => self::SECTION_TRUST,
+				Composition_Schema::SECTION_ITEM_KEY      => self::SECTION_TRUST,
 				Composition_Schema::SECTION_ITEM_POSITION => 1,
-				Composition_Schema::SECTION_ITEM_VARIANT => 'default',
+				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 			array(
-				Composition_Schema::SECTION_ITEM_KEY     => self::SECTION_CTA,
+				Composition_Schema::SECTION_ITEM_KEY      => self::SECTION_CTA,
 				Composition_Schema::SECTION_ITEM_POSITION => 2,
-				Composition_Schema::SECTION_ITEM_VARIANT => 'default',
+				Composition_Schema::SECTION_ITEM_VARIANT  => 'default',
 			),
 		);
 
 		return array(
 			array(
-				Composition_Schema::FIELD_COMPOSITION_ID       => self::COMP_01,
-				Composition_Schema::FIELD_NAME                => 'Showcase Composition 1',
+				Composition_Schema::FIELD_COMPOSITION_ID => self::COMP_01,
+				Composition_Schema::FIELD_NAME           => 'Showcase Composition 1',
 				Composition_Schema::FIELD_ORDERED_SECTION_LIST => $ordered1,
-				Composition_Schema::FIELD_STATUS              => 'active',
-				Composition_Schema::FIELD_VALIDATION_STATUS   => 'valid',
+				Composition_Schema::FIELD_STATUS         => 'active',
+				Composition_Schema::FIELD_VALIDATION_STATUS => 'valid',
 				Composition_Schema::FIELD_SOURCE_TEMPLATE_REF => self::PAGE_LANDING,
 			),
 			array(
-				Composition_Schema::FIELD_COMPOSITION_ID       => self::COMP_02,
-				Composition_Schema::FIELD_NAME                => 'Showcase Composition 2',
+				Composition_Schema::FIELD_COMPOSITION_ID => self::COMP_02,
+				Composition_Schema::FIELD_NAME           => 'Showcase Composition 2',
 				Composition_Schema::FIELD_ORDERED_SECTION_LIST => $ordered2,
-				Composition_Schema::FIELD_STATUS              => 'active',
-				Composition_Schema::FIELD_VALIDATION_STATUS   => 'valid',
+				Composition_Schema::FIELD_STATUS         => 'active',
+				Composition_Schema::FIELD_VALIDATION_STATUS => 'valid',
 				Composition_Schema::FIELD_SOURCE_TEMPLATE_REF => self::PAGE_HUB,
 			),
 		);
@@ -322,21 +334,21 @@ final class Template_Showcase_Fixture_Generator {
 	 * @return list<array<string, mixed>>
 	 */
 	private function build_build_plan_recommendation_items(): array {
-		$proposed_new = array(
+		$proposed_new    = array(
 			'template_key'            => self::PAGE_LANDING,
 			'name'                    => 'Showcase Landing',
 			'template_category_class' => 'top_level',
-			'template_family'          => 'showcase_landing',
-			'cta_direction_summary'    => 'Primary CTA only.',
+			'template_family'         => 'showcase_landing',
+			'cta_direction_summary'   => 'Primary CTA only.',
 			'section_count'           => 1,
 			'deprecation_status'      => 'active',
 			'replacement_keys'        => array(),
 		);
-		$proposed_hub = array(
+		$proposed_hub    = array(
 			'template_key'            => self::PAGE_HUB,
 			'name'                    => 'Showcase Hub',
 			'template_category_class' => 'hub',
-			'template_family'          => 'showcase_hub',
+			'template_family'         => 'showcase_hub',
 			'cta_direction_summary'   => 'Neutral.',
 			'section_count'           => 2,
 			'deprecation_status'      => 'active',
@@ -346,7 +358,7 @@ final class Template_Showcase_Fixture_Generator {
 			'template_key'            => self::PAGE_NESTED,
 			'name'                    => 'Showcase Nested Hub',
 			'template_category_class' => 'nested_hub',
-			'template_family'          => 'showcase_nested_hub',
+			'template_family'         => 'showcase_nested_hub',
 			'cta_direction_summary'   => 'Neutral.',
 			'section_count'           => 2,
 			'deprecation_status'      => 'active',
@@ -359,7 +371,7 @@ final class Template_Showcase_Fixture_Generator {
 				Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
 					'target_slug'               => 'demo-home',
 					'title'                     => 'Demo Home',
-					'proposed_template_summary'  => $proposed_new,
+					'proposed_template_summary' => $proposed_new,
 				),
 				Build_Plan_Item_Schema::KEY_STATUS    => 'proposed',
 			),
@@ -369,7 +381,7 @@ final class Template_Showcase_Fixture_Generator {
 				Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
 					'target_slug'               => 'demo-services',
 					'title'                     => 'Demo Services',
-					'proposed_template_summary'  => $proposed_hub,
+					'proposed_template_summary' => $proposed_hub,
 				),
 				Build_Plan_Item_Schema::KEY_STATUS    => 'proposed',
 			),
@@ -377,9 +389,9 @@ final class Template_Showcase_Fixture_Generator {
 				Build_Plan_Item_Schema::KEY_ITEM_ID   => 'showcase_epc_1',
 				Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE,
 				Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
-					'target_page_id'                    => 1001,
+					'target_page_id'             => 1001,
 					'existing_page_template_change_summary' => $existing_change,
-					'replacement_reason_summary'       => 'Synthetic: align with nested hub template for demo.',
+					'replacement_reason_summary' => 'Synthetic: align with nested hub template for demo.',
 				),
 				Build_Plan_Item_Schema::KEY_STATUS    => 'proposed',
 			),

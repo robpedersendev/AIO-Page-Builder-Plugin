@@ -40,7 +40,7 @@ require_once $plugin_root . '/src/Domain/Fixtures/Demo_Fixture_Generator.php';
 final class Demo_Fixture_Generator_Test extends TestCase {
 
 	public function test_generate_returns_success_result(): void {
-		$gen   = new Demo_Fixture_Generator();
+		$gen    = new Demo_Fixture_Generator();
 		$result = $gen->generate();
 		$this->assertInstanceOf( Demo_Fixture_Result::class, $result );
 		$this->assertTrue( $result->is_success() );
@@ -85,7 +85,7 @@ final class Demo_Fixture_Generator_Test extends TestCase {
 	}
 
 	public function test_profile_fixture_has_schema_keys(): void {
-		$gen    = new Demo_Fixture_Generator();
+		$gen     = new Demo_Fixture_Generator();
 		$profile = $gen->get_profile_fixture();
 		$this->assertArrayHasKey( Profile_Schema::ROOT_BRAND, $profile );
 		$this->assertArrayHasKey( Profile_Schema::ROOT_BUSINESS, $profile );
@@ -94,8 +94,8 @@ final class Demo_Fixture_Generator_Test extends TestCase {
 	}
 
 	public function test_synthetic_markers_present_in_summary(): void {
-		$gen    = new Demo_Fixture_Generator();
-		$result = $gen->generate();
+		$gen     = new Demo_Fixture_Generator();
+		$result  = $gen->generate();
 		$summary = $result->get_summary();
 		$this->assertArrayHasKey( 'seed_result', $summary );
 		$this->assertTrue( $summary['seed_result'][ Demo_Fixture_Generator::SYNTHETIC_MARKER ] ?? false );
@@ -110,8 +110,8 @@ final class Demo_Fixture_Generator_Test extends TestCase {
 	}
 
 	public function test_no_secret_like_keys_in_summary(): void {
-		$gen    = new Demo_Fixture_Generator();
-		$result = $gen->generate();
+		$gen     = new Demo_Fixture_Generator();
+		$result  = $gen->generate();
 		$summary = $result->get_summary();
 		$this->assertArrayNotHasKey( 'api_key', $summary );
 		$this->assertArrayNotHasKey( 'secret', $summary );
@@ -122,11 +122,13 @@ final class Demo_Fixture_Generator_Test extends TestCase {
 	}
 
 	public function test_options_exclude_domains(): void {
-		$gen = new Demo_Fixture_Generator();
-		$result = $gen->generate( array(
-			'include_registries'  => false,
-			'include_build_plans' => false,
-		) );
+		$gen    = new Demo_Fixture_Generator();
+		$result = $gen->generate(
+			array(
+				'include_registries'  => false,
+				'include_build_plans' => false,
+			)
+		);
 		$counts = $result->get_counts();
 		$this->assertSame( 0, $counts['registries'] );
 		$this->assertSame( 0, $counts['build_plans'] );
@@ -136,8 +138,8 @@ final class Demo_Fixture_Generator_Test extends TestCase {
 	}
 
 	public function test_result_to_payload_stable_shape(): void {
-		$gen    = new Demo_Fixture_Generator();
-		$result = $gen->generate();
+		$gen     = new Demo_Fixture_Generator();
+		$result  = $gen->generate();
 		$payload = $result->to_payload();
 		$this->assertArrayHasKey( 'success', $payload );
 		$this->assertArrayHasKey( 'message', $payload );
@@ -151,8 +153,8 @@ final class Demo_Fixture_Generator_Test extends TestCase {
 	 * Example seed-result payload (spec §60.7; Prompt 130). No pseudocode.
 	 */
 	public function test_example_seed_result_payload(): void {
-		$gen    = new Demo_Fixture_Generator();
-		$result = $gen->generate();
+		$gen     = new Demo_Fixture_Generator();
+		$result  = $gen->generate();
 		$payload = $result->to_payload();
 
 		$example = array(
@@ -160,19 +162,19 @@ final class Demo_Fixture_Generator_Test extends TestCase {
 			'message'   => 'Demo fixture generation completed. All data is synthetic.',
 			'synthetic' => true,
 			'counts'    => array(
-				'registries'          => 5,
-				'profile'             => 1,
-				'crawl_summary'        => 2,
-				'ai_runs'              => 1,
-				'build_plans'          => 1,
-				'logs'                 => 2,
-				'export_example'       => 1,
-				'template_showcase'    => 0,
+				'registries'        => 5,
+				'profile'           => 1,
+				'crawl_summary'     => 2,
+				'ai_runs'           => 1,
+				'build_plans'       => 1,
+				'logs'              => 2,
+				'export_example'    => 1,
+				'template_showcase' => 0,
 			),
-			'summary' => array(
+			'summary'   => array(
 				'seed_result' => array(
-					'generator' => 'Demo_Fixture_Generator',
-					'purpose'   => 'demo_qa_review',
+					'generator'  => 'Demo_Fixture_Generator',
+					'purpose'    => 'demo_qa_review',
 					'_synthetic' => true,
 				),
 			),

@@ -52,26 +52,26 @@ final class Provider_Response_Normalizer {
 
 	/** Map category -> retry posture (contract §5.2). */
 	private const CATEGORY_RETRY = array(
-		self::ERROR_AUTH_FAILURE         => self::RETRY_NO_RETRY,
-		self::ERROR_RATE_LIMIT           => self::RETRY_WITH_BACKOFF,
-		self::ERROR_TIMEOUT              => self::RETRY_WITH_BACKOFF,
-		self::ERROR_MALFORMED_RESPONSE   => self::RETRY_ONCE,
-		self::ERROR_VALIDATION_FAILURE   => self::RETRY_NO_RETRY,
-		self::ERROR_UNSUPPORTED_FEATURE  => self::RETRY_NO_RETRY,
-		self::ERROR_PROVIDER_ERROR       => self::RETRY_WITH_BACKOFF,
-		self::ERROR_NETWORK_ERROR        => self::RETRY_WITH_BACKOFF,
+		self::ERROR_AUTH_FAILURE        => self::RETRY_NO_RETRY,
+		self::ERROR_RATE_LIMIT          => self::RETRY_WITH_BACKOFF,
+		self::ERROR_TIMEOUT             => self::RETRY_WITH_BACKOFF,
+		self::ERROR_MALFORMED_RESPONSE  => self::RETRY_ONCE,
+		self::ERROR_VALIDATION_FAILURE  => self::RETRY_NO_RETRY,
+		self::ERROR_UNSUPPORTED_FEATURE => self::RETRY_NO_RETRY,
+		self::ERROR_PROVIDER_ERROR      => self::RETRY_WITH_BACKOFF,
+		self::ERROR_NETWORK_ERROR       => self::RETRY_WITH_BACKOFF,
 	);
 
 	/** Map category -> user-facing message (short, safe per §45.3). */
 	private const CATEGORY_USER_MESSAGE = array(
-		self::ERROR_AUTH_FAILURE         => 'AI service authentication failed. Check your settings.',
-		self::ERROR_RATE_LIMIT           => 'The AI service is temporarily busy. Please try again shortly.',
-		self::ERROR_TIMEOUT              => 'The request timed out. Please try again.',
-		self::ERROR_MALFORMED_RESPONSE   => 'The AI response could not be read. Please try again.',
-		self::ERROR_VALIDATION_FAILURE   => 'The AI response did not meet the required format.',
-		self::ERROR_UNSUPPORTED_FEATURE  => 'This AI model or feature is not supported for this action.',
-		self::ERROR_PROVIDER_ERROR       => 'The AI service returned an error. Please try again later.',
-		self::ERROR_NETWORK_ERROR        => 'A network error occurred. Please check your connection and try again.',
+		self::ERROR_AUTH_FAILURE        => 'AI service authentication failed. Check your settings.',
+		self::ERROR_RATE_LIMIT          => 'The AI service is temporarily busy. Please try again shortly.',
+		self::ERROR_TIMEOUT             => 'The request timed out. Please try again.',
+		self::ERROR_MALFORMED_RESPONSE  => 'The AI response could not be read. Please try again.',
+		self::ERROR_VALIDATION_FAILURE  => 'The AI response did not meet the required format.',
+		self::ERROR_UNSUPPORTED_FEATURE => 'This AI model or feature is not supported for this action.',
+		self::ERROR_PROVIDER_ERROR      => 'The AI service returned an error. Please try again later.',
+		self::ERROR_NETWORK_ERROR       => 'A network error occurred. Please check your connection and try again.',
 	);
 
 	/**
@@ -82,7 +82,7 @@ final class Provider_Response_Normalizer {
 	 * @return array{category: string, user_message: string, internal_code: string, provider_raw: string|null, retry_posture: string}
 	 */
 	public function normalize_error( string $category, ?string $provider_raw = null ): array {
-		$retry = self::CATEGORY_RETRY[ $category ] ?? self::RETRY_NO_RETRY;
+		$retry        = self::CATEGORY_RETRY[ $category ] ?? self::RETRY_NO_RETRY;
 		$user_message = self::CATEGORY_USER_MESSAGE[ $category ] ?? 'An unexpected error occurred. Please try again.';
 		return array(
 			'category'      => $category,
@@ -111,15 +111,15 @@ final class Provider_Response_Normalizer {
 		?string $provider_raw = null
 	): array {
 		return array(
-			'request_id'          => $request_id,
-			'success'             => false,
-			'structured_payload'  => null,
-			'raw_content'         => null,
-			'provider_id'         => $provider_id,
-			'model_used'           => $model_used,
-			'usage'               => null,
+			'request_id'            => $request_id,
+			'success'               => false,
+			'structured_payload'    => null,
+			'raw_content'           => null,
+			'provider_id'           => $provider_id,
+			'model_used'            => $model_used,
+			'usage'                 => null,
 			'raw_provider_metadata' => null,
-			'normalized_error'    => $this->normalize_error( $category, $provider_raw ),
+			'normalized_error'      => $this->normalize_error( $category, $provider_raw ),
 		);
 	}
 
@@ -143,15 +143,15 @@ final class Provider_Response_Normalizer {
 		?array $raw_provider_metadata = null
 	): array {
 		return array(
-			'request_id'           => $request_id,
-			'success'              => true,
+			'request_id'            => $request_id,
+			'success'               => true,
 			'structured_payload'    => $structured_payload,
 			'raw_content'           => null,
-			'provider_id'          => $provider_id,
+			'provider_id'           => $provider_id,
 			'model_used'            => $model_used,
-			'usage'                => $usage,
+			'usage'                 => $usage,
 			'raw_provider_metadata' => $raw_provider_metadata,
-			'normalized_error'     => null,
+			'normalized_error'      => null,
 		);
 	}
 

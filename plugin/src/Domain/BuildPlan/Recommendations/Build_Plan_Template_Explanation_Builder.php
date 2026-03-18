@@ -62,7 +62,7 @@ final class Build_Plan_Template_Explanation_Builder implements Template_Explanat
 	/**
 	 * Builds build_plan_template_explanation for the given template key and optional new_page item payload.
 	 *
-	 * @param string $template_key Page template internal_key from plan item payload.
+	 * @param string               $template_key Page template internal_key from plan item payload.
 	 * @param array<string, mixed> $item_payload Optional: purpose, page_type for display context.
 	 * @return array<string, mixed> build_plan_template_explanation (template_key, template_name, purpose_summary, template_category_class, template_family, hierarchy_hint, cta_direction_summary, section_count, version, deprecation_status, replacement_keys, one_pager_available, explanation_lines).
 	 */
@@ -74,10 +74,10 @@ final class Build_Plan_Template_Explanation_Builder implements Template_Explanat
 		if ( $this->context_builder !== null ) {
 			$summary = $this->context_builder->get_recommended_template_summary( $template_key );
 		} else {
-			$def = $this->page_template_repository->get_definition_by_key( $template_key );
+			$def     = $this->page_template_repository->get_definition_by_key( $template_key );
 			$summary = $def !== null ? $this->summary_from_definition( $def ) : $this->empty_explanation( $template_key );
 		}
-		$explanation_lines = $this->build_explanation_lines( $summary, $item_payload );
+		$explanation_lines            = $this->build_explanation_lines( $summary, $item_payload );
 		$summary['explanation_lines'] = $explanation_lines;
 		return $summary;
 	}
@@ -90,15 +90,15 @@ final class Build_Plan_Template_Explanation_Builder implements Template_Explanat
 	 * @return list<string>
 	 */
 	private function build_explanation_lines( array $summary, array $item_payload ): array {
-		$lines = array();
+		$lines   = array();
 		$purpose = (string) ( $summary['purpose_summary'] ?? '' );
 		if ( $purpose !== '' ) {
 			$lines[] = \__( 'Purpose:', 'aio-page-builder' ) . ' ' . $purpose;
 		}
-		$class = (string) ( $summary['template_category_class'] ?? '' );
+		$class  = (string) ( $summary['template_category_class'] ?? '' );
 		$family = (string) ( $summary['template_family'] ?? '' );
 		if ( $class !== '' || $family !== '' ) {
-			$parts = array_filter( array( $class, $family ) );
+			$parts   = array_filter( array( $class, $family ) );
 			$lines[] = \__( 'Category / family:', 'aio-page-builder' ) . ' ' . \implode( ' · ', $parts );
 		}
 		$hint = (string) ( $summary['hierarchy_hint'] ?? '' );
@@ -115,9 +115,9 @@ final class Build_Plan_Template_Explanation_Builder implements Template_Explanat
 		}
 		$dep_status = (string) ( $summary['deprecation_status'] ?? 'active' );
 		if ( $dep_status === 'deprecated' ) {
-			$note = (string) ( $summary['deprecation_note'] ?? '' );
+			$note    = (string) ( $summary['deprecation_note'] ?? '' );
 			$lines[] = \__( 'Deprecated.', 'aio-page-builder' ) . ( $note !== '' ? ' ' . $note : '' );
-			$repl = $summary['replacement_keys'] ?? array();
+			$repl    = $summary['replacement_keys'] ?? array();
 			if ( is_array( $repl ) && $repl !== array() ) {
 				$lines[] = \__( 'Recommended replacement(s):', 'aio-page-builder' ) . ' ' . \implode( ', ', array_map( 'strval', $repl ) );
 			}
@@ -126,57 +126,57 @@ final class Build_Plan_Template_Explanation_Builder implements Template_Explanat
 	}
 
 	private function summary_from_definition( array $def ): array {
-		$key    = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-		$name   = (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? $key );
-		$purpose = (string) ( $def[ Page_Template_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' );
-		$class  = (string) ( $def['template_category_class'] ?? '' );
-		$family = (string) ( $def['template_family'] ?? '' );
-		$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
-		$section_count = is_array( $ordered ) ? count( $ordered ) : 0;
-		$version_arr = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
-		$version = is_array( $version_arr ) && isset( $version_arr['version'] ) ? (string) $version_arr['version'] : '1';
-		$status = (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
-		$dep = $def['deprecation'] ?? array();
-		$hierarchy_hints = $def['hierarchy_hints'] ?? array();
-		$hierarchy_hint = is_array( $hierarchy_hints ) && isset( $hierarchy_hints['hierarchy_role'] ) ? (string) $hierarchy_hints['hierarchy_role'] : $class;
-		$one_pager = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? array();
+		$key                 = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+		$name                = (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? $key );
+		$purpose             = (string) ( $def[ Page_Template_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' );
+		$class               = (string) ( $def['template_category_class'] ?? '' );
+		$family              = (string) ( $def['template_family'] ?? '' );
+		$ordered             = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+		$section_count       = is_array( $ordered ) ? count( $ordered ) : 0;
+		$version_arr         = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
+		$version             = is_array( $version_arr ) && isset( $version_arr['version'] ) ? (string) $version_arr['version'] : '1';
+		$status              = (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
+		$dep                 = $def['deprecation'] ?? array();
+		$hierarchy_hints     = $def['hierarchy_hints'] ?? array();
+		$hierarchy_hint      = is_array( $hierarchy_hints ) && isset( $hierarchy_hints['hierarchy_role'] ) ? (string) $hierarchy_hints['hierarchy_role'] : $class;
+		$one_pager           = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? array();
 		$one_pager_available = is_array( $one_pager ) && ( isset( $one_pager['link'] ) || isset( $one_pager['page_purpose_summary'] ) );
-		$replacement_keys = isset( $def['replacement_template_refs'] ) && is_array( $def['replacement_template_refs'] )
+		$replacement_keys    = isset( $def['replacement_template_refs'] ) && is_array( $def['replacement_template_refs'] )
 			? array_values( array_map( 'strval', $def['replacement_template_refs'] ) )
 			: array();
 
 		return array(
-			'template_key'               => $key,
-			'name'                      => $name,
-			'purpose_summary'            => $purpose,
-			'template_category_class'   => $class,
-			'template_family'           => $family,
-			'hierarchy_hint'            => $hierarchy_hint,
-			'cta_direction_summary'    => (string) ( $def['cta_direction_summary'] ?? '' ),
-			'section_count'             => $section_count,
-			'version'                   => $version,
-			'deprecation_status'        => $status === 'deprecated' ? 'deprecated' : 'active',
-			'one_pager_available'       => $one_pager_available,
-			'deprecation_note'          => (string) ( $dep['reason'] ?? '' ),
-			'replacement_keys'          => $replacement_keys,
+			'template_key'            => $key,
+			'name'                    => $name,
+			'purpose_summary'         => $purpose,
+			'template_category_class' => $class,
+			'template_family'         => $family,
+			'hierarchy_hint'          => $hierarchy_hint,
+			'cta_direction_summary'   => (string) ( $def['cta_direction_summary'] ?? '' ),
+			'section_count'           => $section_count,
+			'version'                 => $version,
+			'deprecation_status'      => $status === 'deprecated' ? 'deprecated' : 'active',
+			'one_pager_available'     => $one_pager_available,
+			'deprecation_note'        => (string) ( $dep['reason'] ?? '' ),
+			'replacement_keys'        => $replacement_keys,
 		);
 	}
 
 	private function empty_explanation( string $template_key ): array {
 		return array(
-			'template_key'               => $template_key,
-			'name'                       => '',
-			'purpose_summary'            => '',
-			'template_category_class'   => '',
-			'template_family'           => '',
-			'hierarchy_hint'             => '',
-			'cta_direction_summary'     => '',
-			'section_count'              => 0,
-			'version'                    => '1',
-			'deprecation_status'         => 'unknown',
-			'replacement_keys'           => array(),
-			'one_pager_available'        => false,
-			'explanation_lines'          => array(),
+			'template_key'            => $template_key,
+			'name'                    => '',
+			'purpose_summary'         => '',
+			'template_category_class' => '',
+			'template_family'         => '',
+			'hierarchy_hint'          => '',
+			'cta_direction_summary'   => '',
+			'section_count'           => 0,
+			'version'                 => '1',
+			'deprecation_status'      => 'unknown',
+			'replacement_keys'        => array(),
+			'one_pager_available'     => false,
+			'explanation_lines'       => array(),
 		);
 	}
 }

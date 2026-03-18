@@ -63,20 +63,20 @@ final class Industry_Content_Gap_Detector {
 
 	/** Per-industry expected content types (gap_type => severity). Empty = no industry-specific expectations. */
 	private const INDUSTRY_EXPECTATIONS = array(
-		'cosmetology_nail' => array(
+		'cosmetology_nail'  => array(
 			self::GAP_STAFF_BIOS  => self::SEVERITY_CAUTION,
 			self::GAP_GALLERY     => self::SEVERITY_CAUTION,
 			self::GAP_TRUST_PROOF => self::SEVERITY_INFO,
 		),
-		'realtor' => array(
+		'realtor'           => array(
 			self::GAP_GALLERY              => self::SEVERITY_CAUTION,
-			self::GAP_TRUST_PROOF         => self::SEVERITY_INFO,
+			self::GAP_TRUST_PROOF          => self::SEVERITY_INFO,
 			self::GAP_VALUATION_CONVERSION => self::SEVERITY_CAUTION,
 		),
-		'plumber' => array(
-			self::GAP_SERVICE_AREA      => self::SEVERITY_CAUTION,
+		'plumber'           => array(
+			self::GAP_SERVICE_AREA       => self::SEVERITY_CAUTION,
 			self::GAP_EMERGENCY_RESPONSE => self::SEVERITY_CAUTION,
-			self::GAP_TRUST_PROOF      => self::SEVERITY_INFO,
+			self::GAP_TRUST_PROOF        => self::SEVERITY_INFO,
 		),
 		'disaster_recovery' => array(
 			self::GAP_EMERGENCY_RESPONSE => self::SEVERITY_CAUTION,
@@ -161,18 +161,18 @@ final class Industry_Content_Gap_Detector {
 		if ( $expectations === array() ) {
 			return array();
 		}
-		$hints = isset( $options[ self::OPT_CONTENT_HINTS ] ) && is_array( $options[ self::OPT_CONTENT_HINTS ] )
+		$hints    = isset( $options[ self::OPT_CONTENT_HINTS ] ) && is_array( $options[ self::OPT_CONTENT_HINTS ] )
 			? $options[ self::OPT_CONTENT_HINTS ]
 			: array();
 		$hint_map = array(
 			self::GAP_STAFF_BIOS           => $hints['has_staff_bios'] ?? null,
 			self::GAP_GALLERY              => $hints['has_gallery'] ?? null,
 			self::GAP_TRUST_PROOF          => $hints['has_trust_proof'] ?? null,
-			self::GAP_SERVICE_AREA          => $hints['has_service_area_detail'] ?? null,
+			self::GAP_SERVICE_AREA         => $hints['has_service_area_detail'] ?? null,
 			self::GAP_EMERGENCY_RESPONSE   => $hints['has_emergency_details'] ?? null,
 			self::GAP_VALUATION_CONVERSION => $hints['has_valuation_assets'] ?? null,
 		);
-		$gaps = array();
+		$gaps     = array();
 		foreach ( $expectations as $gap_type => $severity ) {
 			$present = $hint_map[ $gap_type ] ?? null;
 			if ( $present === true ) {

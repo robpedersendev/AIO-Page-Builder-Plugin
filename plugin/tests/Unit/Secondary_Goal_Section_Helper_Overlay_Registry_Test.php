@@ -22,15 +22,17 @@ final class Secondary_Goal_Section_Helper_Overlay_Registry_Test extends TestCase
 
 	public function test_load_and_get_returns_overlay(): void {
 		$registry = new Secondary_Goal_Section_Helper_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'calls',
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'lead_capture',
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY        => 'hero_conv_02',
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Section_Helper_Overlay_Registry::SCOPE_SECONDARY_GOAL_SECTION_HELPER_OVERLAY,
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'calls',
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'lead_capture',
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY        => 'hero_conv_02',
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Section_Helper_Overlay_Registry::SCOPE_SECONDARY_GOAL_SECTION_HELPER_OVERLAY,
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$ov = $registry->get( 'calls', 'lead_capture', 'hero_conv_02' );
 		$this->assertNotNull( $ov );
 		$this->assertSame( 'calls', $ov[ Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY ] );
@@ -46,15 +48,17 @@ final class Secondary_Goal_Section_Helper_Overlay_Registry_Test extends TestCase
 
 	public function test_invalid_overlay_skipped_at_load(): void {
 		$registry = new Secondary_Goal_Section_Helper_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'bookings',
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'bookings',
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY       => 'cta_booking_01',
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Section_Helper_Overlay_Registry::SCOPE_SECONDARY_GOAL_SECTION_HELPER_OVERLAY,
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'bookings',
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'bookings',
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY       => 'cta_booking_01',
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Section_Helper_Overlay_Registry::SCOPE_SECONDARY_GOAL_SECTION_HELPER_OVERLAY,
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$this->assertEmpty( $registry->get_all() );
 	}
 
@@ -75,24 +79,28 @@ final class Secondary_Goal_Section_Helper_Overlay_Registry_Test extends TestCase
 	 */
 	public function test_composition_order_primary_then_secondary_retrievable(): void {
 		$primary_registry = new Goal_Section_Helper_Overlay_Registry();
-		$primary_registry->load( array(
+		$primary_registry->load(
 			array(
-				Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY   => 'calls',
-				Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'hero_conv_02',
-				Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE    => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
-				Goal_Section_Helper_Overlay_Registry::FIELD_STATUS   => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY   => 'calls',
+					Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'hero_conv_02',
+					Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE    => Goal_Section_Helper_Overlay_Registry::SCOPE_GOAL_SECTION_HELPER_OVERLAY,
+					Goal_Section_Helper_Overlay_Registry::FIELD_STATUS   => Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$secondary_registry = new Secondary_Goal_Section_Helper_Overlay_Registry();
-		$secondary_registry->load( array(
+		$secondary_registry->load(
 			array(
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'calls',
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'lead_capture',
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY        => 'hero_conv_02',
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Section_Helper_Overlay_Registry::SCOPE_SECONDARY_GOAL_SECTION_HELPER_OVERLAY,
-				Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-			),
-		) );
+				array(
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY   => 'calls',
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY => 'lead_capture',
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY        => 'hero_conv_02',
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE             => Secondary_Goal_Section_Helper_Overlay_Registry::SCOPE_SECONDARY_GOAL_SECTION_HELPER_OVERLAY,
+					Secondary_Goal_Section_Helper_Overlay_Registry::FIELD_STATUS            => Secondary_Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+				),
+			)
+		);
 		$primary_ov = $primary_registry->get( 'calls', 'hero_conv_02' );
 		$this->assertNotNull( $primary_ov );
 		$secondary_ov = $secondary_registry->get( 'calls', 'lead_capture', 'hero_conv_02' );

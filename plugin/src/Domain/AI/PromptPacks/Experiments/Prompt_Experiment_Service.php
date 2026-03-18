@@ -29,7 +29,7 @@ final class Prompt_Experiment_Service {
 	public const METADATA_VARIANT_ID    = 'experiment_variant_id';
 	public const METADATA_VARIANT_LABEL = 'experiment_variant_label';
 
-	private const OPTION_KEY = Option_Names::PROMPT_EXPERIMENTS;
+	private const OPTION_KEY      = Option_Names::PROMPT_EXPERIMENTS;
 	private const DEFINITIONS_KEY = 'definitions';
 
 	/** @var Settings_Service */
@@ -82,12 +82,15 @@ final class Prompt_Experiment_Service {
 	public function save_definition( array $definition ): array {
 		$err = $this->validate_definition( $definition );
 		if ( $err !== '' ) {
-			return array( 'ok' => false, 'message' => $err );
+			return array(
+				'ok'      => false,
+				'message' => $err,
+			);
 		}
 		$defs = $this->list_definitions();
-		$id = isset( $definition['id'] ) && is_string( $definition['id'] ) ? trim( $definition['id'] ) : '';
+		$id   = isset( $definition['id'] ) && is_string( $definition['id'] ) ? trim( $definition['id'] ) : '';
 		if ( $id === '' ) {
-			$id = 'exp-' . uniqid( '', true );
+			$id               = 'exp-' . uniqid( '', true );
 			$definition['id'] = $id;
 		}
 		if ( ! isset( $definition['created_at'] ) || $definition['created_at'] === '' ) {
@@ -106,7 +109,10 @@ final class Prompt_Experiment_Service {
 			$defs[] = $definition;
 		}
 		$this->set_experiments_option( array( self::DEFINITIONS_KEY => $defs ) );
-		return array( 'ok' => true, 'message' => __( 'Experiment saved.', 'aio-page-builder' ) );
+		return array(
+			'ok'      => true,
+			'message' => __( 'Experiment saved.', 'aio-page-builder' ),
+		);
 	}
 
 	/**
@@ -116,11 +122,16 @@ final class Prompt_Experiment_Service {
 	 * @return bool True if removed.
 	 */
 	public function delete_definition( string $experiment_id ): bool {
-		$defs = $this->list_definitions();
+		$defs   = $this->list_definitions();
 		$before = count( $defs );
-		$defs = array_values( array_filter( $defs, function ( $d ) use ( $experiment_id ) {
-			return ( $d['id'] ?? '' ) !== $experiment_id;
-		} ) );
+		$defs   = array_values(
+			array_filter(
+				$defs,
+				function ( $d ) use ( $experiment_id ) {
+					return ( $d['id'] ?? '' ) !== $experiment_id;
+				}
+			)
+		);
 		if ( count( $defs ) === $before ) {
 			return false;
 		}
@@ -185,12 +196,12 @@ final class Prompt_Experiment_Service {
 		string $status,
 		array $artifacts
 	): Experiment_Result {
-		$metadata[ self::METADATA_IS_EXPERIMENT ]   = true;
-		$metadata[ self::METADATA_EXPERIMENT_ID ]   = $experiment_id;
-		$metadata[ self::METADATA_VARIANT_ID ]     = $variant_id;
-		$metadata[ self::METADATA_VARIANT_LABEL ]   = $variant_label;
-		$post_id = $this->run_service->create_run( $run_id, $metadata, $status, $artifacts );
-		$message = $post_id > 0
+		$metadata[ self::METADATA_IS_EXPERIMENT ] = true;
+		$metadata[ self::METADATA_EXPERIMENT_ID ] = $experiment_id;
+		$metadata[ self::METADATA_VARIANT_ID ]    = $variant_id;
+		$metadata[ self::METADATA_VARIANT_LABEL ] = $variant_label;
+		$post_id                                  = $this->run_service->create_run( $run_id, $metadata, $status, $artifacts );
+		$message                                  = $post_id > 0
 			? __( 'Experiment run recorded. View in AI Runs.', 'aio-page-builder' )
 			: __( 'Failed to save experiment run.', 'aio-page-builder' );
 		return new Experiment_Result( $run_id, $post_id, $status, $experiment_id, $variant_id, $variant_label, $message );
@@ -223,21 +234,26 @@ final class Prompt_Experiment_Service {
 	 * @return array{experiment_id: string, variants: array<string, array{variant_id: string, variant_label: string, runs: array<string, int>, total: int}>} comparison_summary
 	 */
 	public function get_comparison_summary( string $experiment_id ): array {
-		$runs = $this->get_experiment_runs( $experiment_id );
+		$runs       = $this->get_experiment_runs( $experiment_id );
 		$by_variant = array();
 		foreach ( $runs as $run ) {
-			$meta = $run['run_metadata'] ?? array();
-			$vid = (string) ( $meta[ self::METADATA_VARIANT_ID ] ?? '' );
-			$label = (string) ( $meta[ self::METADATA_VARIANT_LABEL ] ?? $vid );
+			$meta   = $run['run_metadata'] ?? array();
+			$vid    = (string) ( $meta[ self::METADATA_VARIANT_ID ] ?? '' );
+			$label  = (string) ( $meta[ self::METADATA_VARIANT_LABEL ] ?? $vid );
 			$status = (string) ( $run['status'] ?? 'unknown' );
 			if ( $vid === '' ) {
 				continue;
 			}
 			if ( ! isset( $by_variant[ $vid ] ) ) {
-				$by_variant[ $vid ] = array( 'variant_id' => $vid, 'variant_label' => $label, 'runs' => array(), 'total' => 0 );
+				$by_variant[ $vid ] = array(
+					'variant_id'    => $vid,
+					'variant_label' => $label,
+					'runs'          => array(),
+					'total'         => 0,
+				);
 			}
 			$by_variant[ $vid ]['runs'][ $status ] = ( $by_variant[ $vid ]['runs'][ $status ] ?? 0 ) + 1;
-			$by_variant[ $vid ]['total']++;
+			++$by_variant[ $vid ]['total'];
 		}
 		return array(
 			'experiment_id' => $experiment_id,

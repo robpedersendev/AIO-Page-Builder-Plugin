@@ -33,9 +33,9 @@ final class Build_Plan_Stepper_And_UI_State_Test extends TestCase {
 
 	private function minimal_plan_definition_with_steps(): array {
 		return array(
-			Build_Plan_Schema::KEY_PLAN_ID   => 'aio-plan-test-1',
-			Build_Plan_Schema::KEY_STATUS    => 'pending_review',
-			Build_Plan_Schema::KEY_STEPS     => array(
+			Build_Plan_Schema::KEY_PLAN_ID => 'aio-plan-test-1',
+			Build_Plan_Schema::KEY_STATUS  => 'pending_review',
+			Build_Plan_Schema::KEY_STEPS   => array(
 				array(
 					Build_Plan_Item_Schema::KEY_STEP_ID   => 'plan_step_overview',
 					Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_OVERVIEW,
@@ -105,14 +105,14 @@ final class Build_Plan_Stepper_And_UI_State_Test extends TestCase {
 	}
 
 	public function test_ui_state_builder_returns_null_for_empty_plan_id(): void {
-		$repo   = new Build_Plan_Repository();
+		$repo    = new Build_Plan_Repository();
 		$stepper = new Build_Plan_Stepper_Builder();
 		$builder = new Build_Plan_UI_State_Builder( $repo, $stepper );
 		$this->assertNull( $builder->build( '' ) );
 	}
 
 	public function test_ui_state_builder_returns_null_when_plan_not_found(): void {
-		$repo   = new Build_Plan_Repository();
+		$repo    = new Build_Plan_Repository();
 		$stepper = new Build_Plan_Stepper_Builder();
 		$builder = new Build_Plan_UI_State_Builder( $repo, $stepper );
 		$this->assertNull( $builder->build( 'nonexistent-plan-id-' . \uniqid( 'plan-', true ) ) );
@@ -123,22 +123,37 @@ final class Build_Plan_Stepper_And_UI_State_Test extends TestCase {
 	 */
 	public function test_example_ui_state_payload_keys(): void {
 		$example = array(
-			'plan_id'          => 'aio-plan-uuid',
-			'plan_post_id'     => 1,
-			'plan_definition'  => array( 'plan_id' => 'aio-plan-uuid', 'steps' => array() ),
-			'context_rail'     => array(
+			'plan_id'         => 'aio-plan-uuid',
+			'plan_post_id'    => 1,
+			'plan_definition' => array(
+				'plan_id' => 'aio-plan-uuid',
+				'steps'   => array(),
+			),
+			'context_rail'    => array(
 				'plan_title'                => 'Plan title',
 				'plan_id'                   => 'aio-plan-uuid',
 				'ai_run_ref'                => 'run-1',
 				'normalized_output_ref'     => 'run-1:normalized_output',
 				'plan_status'               => 'pending_review',
-				'site_purpose_summary'       => 'Site purpose',
-				'site_flow_summary'          => 'Site flow',
-				'unresolved_counts_by_step' => array( 'overview' => 0, 'existing_page_changes' => 1 ),
+				'site_purpose_summary'      => 'Site purpose',
+				'site_flow_summary'         => 'Site flow',
+				'unresolved_counts_by_step' => array(
+					'overview'              => 0,
+					'existing_page_changes' => 1,
+				),
 				'warnings_summary'          => array(),
 			),
-			'stepper_steps'    => array(
-				array( 'step_id' => 'x_step_overview', 'step_type' => 'overview', 'title' => 'Overview', 'order' => 0, 'step_number' => 1, 'status_badge' => 'complete', 'unresolved_count' => 0, 'is_blocked' => false ),
+			'stepper_steps'   => array(
+				array(
+					'step_id'          => 'x_step_overview',
+					'step_type'        => 'overview',
+					'title'            => 'Overview',
+					'order'            => 0,
+					'step_number'      => 1,
+					'status_badge'     => 'complete',
+					'unresolved_count' => 0,
+					'is_blocked'       => false,
+				),
 			),
 		);
 		$this->assertArrayHasKey( 'plan_id', $example );

@@ -69,7 +69,7 @@ final class Existing_Page_Template_Change_Builder {
 	 * @return array<string, mixed> Keys: existing_page_template_change_summary, replacement_reason_summary.
 	 */
 	public function build_for_item( array $item ): array {
-		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+		$payload      = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
 		$template_key = (string) ( $payload['target_template'] ?? $payload['template_key'] ?? $payload['target_template_key'] ?? '' );
@@ -79,15 +79,15 @@ final class Existing_Page_Template_Change_Builder {
 
 		$existing_page_template_change_summary = array();
 		if ( $template_key !== '' ) {
-			$explanation = $this->template_explanation_builder->build_explanation( $template_key, $payload );
+			$explanation                           = $this->template_explanation_builder->build_explanation( $template_key, $payload );
 			$existing_page_template_change_summary = array(
-				'template_key'             => $template_key,
-				'name'                     => (string) ( $explanation['name'] ?? '' ),
-				'template_family'          => (string) ( $explanation['template_family'] ?? '' ),
+				'template_key'            => $template_key,
+				'name'                    => (string) ( $explanation['name'] ?? '' ),
+				'template_family'         => (string) ( $explanation['template_family'] ?? '' ),
 				'template_category_class' => (string) ( $explanation['template_category_class'] ?? '' ),
 				'cta_direction_summary'   => (string) ( $explanation['cta_direction_summary'] ?? '' ),
 				'section_count'           => (int) ( $explanation['section_count'] ?? 0 ),
-				'deprecation_status'       => (string) ( $explanation['deprecation_status'] ?? 'active' ),
+				'deprecation_status'      => (string) ( $explanation['deprecation_status'] ?? 'active' ),
 			);
 		}
 
@@ -95,7 +95,7 @@ final class Existing_Page_Template_Change_Builder {
 
 		return array(
 			self::KEY_EXISTING_PAGE_TEMPLATE_CHANGE_SUMMARY => $existing_page_template_change_summary,
-			self::KEY_REPLACEMENT_REASON_SUMMARY           => $replacement_reason_summary,
+			self::KEY_REPLACEMENT_REASON_SUMMARY => $replacement_reason_summary,
 		);
 	}
 
@@ -112,11 +112,11 @@ final class Existing_Page_Template_Change_Builder {
 		$action_label   = $this->action_to_label( $action );
 		$reason_short   = $reason !== '' ? $this->truncate_reason( $reason, 120 ) : '';
 		return array(
-			'action_label'    => $action_label,
-			'action'          => $action,
-			'is_replacement'  => $is_replacement,
-			'is_rebuild'      => $is_rebuild,
-			'reason_short'    => $reason_short,
+			'action_label'   => $action_label,
+			'action'         => $action,
+			'is_replacement' => $is_replacement,
+			'is_rebuild'     => $is_rebuild,
+			'reason_short'   => $reason_short,
 		);
 	}
 

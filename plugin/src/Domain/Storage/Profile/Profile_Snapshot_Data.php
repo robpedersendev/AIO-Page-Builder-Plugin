@@ -39,12 +39,12 @@ final class Profile_Snapshot_Data {
 		array $brand_profile,
 		array $business_profile
 	) {
-		$this->snapshot_id           = $snapshot_id;
-		$this->scope_type            = $scope_type;
-		$this->scope_id              = $scope_id;
-		$this->created_at            = $created_at;
+		$this->snapshot_id            = $snapshot_id;
+		$this->scope_type             = $scope_type;
+		$this->scope_id               = $scope_id;
+		$this->created_at             = $created_at;
 		$this->profile_schema_version = $profile_schema_version;
-		$this->brand_profile         = $brand_profile;
-		$this->business_profile      = $business_profile;
+		$this->brand_profile          = $brand_profile;
+		$this->business_profile       = $business_profile;
 	}
 }

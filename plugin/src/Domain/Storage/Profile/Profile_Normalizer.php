@@ -19,8 +19,18 @@ final class Profile_Normalizer {
 
 	/** Keys that must never be stored in profile (secrets/auth). */
 	private const PROHIBITED_KEYS = array(
-		'password', 'passwd', 'pwd', 'api_key', 'apikey', 'api_secret', 'secret_key',
-		'bearer_token', 'access_token', 'auth_token', 'session_id', 'csrf_token',
+		'password',
+		'passwd',
+		'pwd',
+		'api_key',
+		'apikey',
+		'api_secret',
+		'secret_key',
+		'bearer_token',
+		'access_token',
+		'auth_token',
+		'session_id',
+		'csrf_token',
 	);
 
 	/**
@@ -30,8 +40,8 @@ final class Profile_Normalizer {
 	 * @return array<string, mixed> Normalized brand_profile shape; never null branches.
 	 */
 	public function normalize_brand_profile( array $input ): array {
-		$input = $this->strip_prohibited( $input );
-		$voice = isset( $input[ Profile_Schema::BRAND_VOICE_TONE ] ) && is_array( $input[ Profile_Schema::BRAND_VOICE_TONE ] )
+		$input  = $this->strip_prohibited( $input );
+		$voice  = isset( $input[ Profile_Schema::BRAND_VOICE_TONE ] ) && is_array( $input[ Profile_Schema::BRAND_VOICE_TONE ] )
 			? $this->normalize_voice_tone( $input[ Profile_Schema::BRAND_VOICE_TONE ] )
 			: $this->default_voice_tone();
 		$assets = isset( $input[ Profile_Schema::BRAND_ASSET_REFERENCES ] ) && is_array( $input[ Profile_Schema::BRAND_ASSET_REFERENCES ] )
@@ -39,13 +49,13 @@ final class Profile_Normalizer {
 			: array();
 
 		return array(
-			'brand_positioning_summary' => $this->sanitize_string( $input['brand_positioning_summary'] ?? '' ),
-			'brand_voice_summary'       => $this->sanitize_string( $input['brand_voice_summary'] ?? '' ),
-			Profile_Schema::BRAND_VOICE_TONE => $voice,
-			'preferred_cta_style'        => $this->sanitize_string( $input['preferred_cta_style'] ?? '' ),
+			'brand_positioning_summary'            => $this->sanitize_string( $input['brand_positioning_summary'] ?? '' ),
+			'brand_voice_summary'                  => $this->sanitize_string( $input['brand_voice_summary'] ?? '' ),
+			Profile_Schema::BRAND_VOICE_TONE       => $voice,
+			'preferred_cta_style'                  => $this->sanitize_string( $input['preferred_cta_style'] ?? '' ),
 			Profile_Schema::BRAND_ASSET_REFERENCES => $assets,
-			'additional_brand_rules'     => $this->sanitize_string( $input['additional_brand_rules'] ?? '' ),
-			'content_restrictions'       => $this->sanitize_string( $input['content_restrictions'] ?? '' ),
+			'additional_brand_rules'               => $this->sanitize_string( $input['additional_brand_rules'] ?? '' ),
+			'content_restrictions'                 => $this->sanitize_string( $input['content_restrictions'] ?? '' ),
 		);
 	}
 
@@ -56,17 +66,17 @@ final class Profile_Normalizer {
 	 * @return array<string, mixed> Normalized business_profile shape.
 	 */
 	public function normalize_business_profile( array $input ): array {
-		$input = $this->strip_prohibited( $input );
-		$personas = isset( $input[ Profile_Schema::BUSINESS_PERSONAS ] ) && is_array( $input[ Profile_Schema::BUSINESS_PERSONAS ] )
+		$input       = $this->strip_prohibited( $input );
+		$personas    = isset( $input[ Profile_Schema::BUSINESS_PERSONAS ] ) && is_array( $input[ Profile_Schema::BUSINESS_PERSONAS ] )
 			? $this->normalize_personas( $input[ Profile_Schema::BUSINESS_PERSONAS ] )
 			: array();
-		$services = isset( $input[ Profile_Schema::BUSINESS_SERVICES_OFFERS ] ) && is_array( $input[ Profile_Schema::BUSINESS_SERVICES_OFFERS ] )
+		$services    = isset( $input[ Profile_Schema::BUSINESS_SERVICES_OFFERS ] ) && is_array( $input[ Profile_Schema::BUSINESS_SERVICES_OFFERS ] )
 			? $this->normalize_services_offers( $input[ Profile_Schema::BUSINESS_SERVICES_OFFERS ] )
 			: array();
 		$competitors = isset( $input[ Profile_Schema::BUSINESS_COMPETITORS ] ) && is_array( $input[ Profile_Schema::BUSINESS_COMPETITORS ] )
 			? $this->normalize_competitors( $input[ Profile_Schema::BUSINESS_COMPETITORS ] )
 			: array();
-		$geography = isset( $input[ Profile_Schema::BUSINESS_GEOGRAPHY ] ) && is_array( $input[ Profile_Schema::BUSINESS_GEOGRAPHY ] )
+		$geography   = isset( $input[ Profile_Schema::BUSINESS_GEOGRAPHY ] ) && is_array( $input[ Profile_Schema::BUSINESS_GEOGRAPHY ] )
 			? $this->normalize_geography( $input[ Profile_Schema::BUSINESS_GEOGRAPHY ] )
 			: array();
 
@@ -147,10 +157,10 @@ final class Profile_Normalizer {
 	/** @return array<string, mixed> */
 	private function default_voice_tone(): array {
 		return array(
-			'core_tone_descriptors'           => array(),
-			'prohibited_tone_descriptors'     => array(),
-			'formality_level'                 => '',
-			'emotional_positioning'           => '',
+			'core_tone_descriptors'            => array(),
+			'prohibited_tone_descriptors'      => array(),
+			'formality_level'                  => '',
+			'emotional_positioning'            => '',
 			'clarity_vs_sophistication'        => '',
 			'audience_style_notes'             => '',
 			'copy_restrictions_or_preferences' => '',
@@ -162,8 +172,8 @@ final class Profile_Normalizer {
 	 * @return array<string, mixed>
 	 */
 	private function normalize_voice_tone( array $input ): array {
-		$input = $this->strip_prohibited( $input );
-		$core  = isset( $input['core_tone_descriptors'] ) && is_array( $input['core_tone_descriptors'] )
+		$input      = $this->strip_prohibited( $input );
+		$core       = isset( $input['core_tone_descriptors'] ) && is_array( $input['core_tone_descriptors'] )
 			? array_map( fn( $v ) => $this->sanitize_string( $v ), $input['core_tone_descriptors'] )
 			: array();
 		$prohibited = isset( $input['prohibited_tone_descriptors'] ) && is_array( $input['prohibited_tone_descriptors'] )
@@ -171,12 +181,12 @@ final class Profile_Normalizer {
 			: array();
 
 		return array(
-			'core_tone_descriptors'           => array_values( $core ),
-			'prohibited_tone_descriptors'     => array_values( $prohibited ),
-			'formality_level'                 => $this->sanitize_enum( $input['formality_level'] ?? '', Profile_Schema::FORMALITY_LEVELS ),
-			'emotional_positioning'           => $this->sanitize_string( $input['emotional_positioning'] ?? '' ),
-			'clarity_vs_sophistication'       => $this->sanitize_enum( $input['clarity_vs_sophistication'] ?? '', Profile_Schema::CLARITY_VS_SOPHISTICATION ),
-			'audience_style_notes'            => $this->sanitize_string( $input['audience_style_notes'] ?? '' ),
+			'core_tone_descriptors'            => array_values( $core ),
+			'prohibited_tone_descriptors'      => array_values( $prohibited ),
+			'formality_level'                  => $this->sanitize_enum( $input['formality_level'] ?? '', Profile_Schema::FORMALITY_LEVELS ),
+			'emotional_positioning'            => $this->sanitize_string( $input['emotional_positioning'] ?? '' ),
+			'clarity_vs_sophistication'        => $this->sanitize_enum( $input['clarity_vs_sophistication'] ?? '', Profile_Schema::CLARITY_VS_SOPHISTICATION ),
+			'audience_style_notes'             => $this->sanitize_string( $input['audience_style_notes'] ?? '' ),
 			'copy_restrictions_or_preferences' => $this->sanitize_string( $input['copy_restrictions_or_preferences'] ?? '' ),
 		);
 	}
@@ -223,16 +233,16 @@ final class Profile_Normalizer {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			$item = $this->strip_prohibited( $item );
+			$item  = $this->strip_prohibited( $item );
 			$out[] = array(
-				'persona_name_or_role'                 => $this->sanitize_string( $item['persona_name_or_role'] ?? '' ),
-				'demographic_or_market_description'    => $this->sanitize_string( $item['demographic_or_market_description'] ?? '' ),
-				'goals'                                => $this->sanitize_string( $item['goals'] ?? '' ),
-				'pain_points'                         => $this->sanitize_string( $item['pain_points'] ?? '' ),
-				'buying_motivations'                   => $this->sanitize_string( $item['buying_motivations'] ?? '' ),
-				'objections'                           => $this->sanitize_string( $item['objections'] ?? '' ),
-				'service_relevance'                    => $this->sanitize_string( $item['service_relevance'] ?? '' ),
-				'conversion_expectations'              => $this->sanitize_string( $item['conversion_expectations'] ?? '' ),
+				'persona_name_or_role'                     => $this->sanitize_string( $item['persona_name_or_role'] ?? '' ),
+				'demographic_or_market_description'        => $this->sanitize_string( $item['demographic_or_market_description'] ?? '' ),
+				'goals'                                    => $this->sanitize_string( $item['goals'] ?? '' ),
+				'pain_points'                              => $this->sanitize_string( $item['pain_points'] ?? '' ),
+				'buying_motivations'                       => $this->sanitize_string( $item['buying_motivations'] ?? '' ),
+				'objections'                               => $this->sanitize_string( $item['objections'] ?? '' ),
+				'service_relevance'                        => $this->sanitize_string( $item['service_relevance'] ?? '' ),
+				'conversion_expectations'                  => $this->sanitize_string( $item['conversion_expectations'] ?? '' ),
 				'tone_sensitivity_or_messaging_preference' => $this->sanitize_string( $item['tone_sensitivity_or_messaging_preference'] ?? '' ),
 			);
 		}
@@ -249,17 +259,17 @@ final class Profile_Normalizer {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			$item = $this->strip_prohibited( $item );
+			$item  = $this->strip_prohibited( $item );
 			$out[] = array(
-				'name'                   => $this->sanitize_string( $item['name'] ?? '' ),
-				'category'               => $this->sanitize_string( $item['category'] ?? '' ),
-				'short_description'      => $this->sanitize_string( $item['short_description'] ?? '' ),
-				'strategic_importance'   => $this->sanitize_string( $item['strategic_importance'] ?? '' ),
-				'target_audience'         => $this->sanitize_string( $item['target_audience'] ?? '' ),
+				'name'                     => $this->sanitize_string( $item['name'] ?? '' ),
+				'category'                 => $this->sanitize_string( $item['category'] ?? '' ),
+				'short_description'        => $this->sanitize_string( $item['short_description'] ?? '' ),
+				'strategic_importance'     => $this->sanitize_string( $item['strategic_importance'] ?? '' ),
+				'target_audience'          => $this->sanitize_string( $item['target_audience'] ?? '' ),
 				'geographic_applicability' => $this->sanitize_string( $item['geographic_applicability'] ?? '' ),
-				'offer_relationships'    => $this->sanitize_string( $item['offer_relationships'] ?? '' ),
-				'hierarchy_hints'        => $this->sanitize_string( $item['hierarchy_hints'] ?? '' ),
-				'dedicated_pages_likely' => $this->sanitize_enum( $item['dedicated_pages_likely'] ?? '', Profile_Schema::DEDICATED_PAGES_LIKELY ),
+				'offer_relationships'      => $this->sanitize_string( $item['offer_relationships'] ?? '' ),
+				'hierarchy_hints'          => $this->sanitize_string( $item['hierarchy_hints'] ?? '' ),
+				'dedicated_pages_likely'   => $this->sanitize_enum( $item['dedicated_pages_likely'] ?? '', Profile_Schema::DEDICATED_PAGES_LIKELY ),
 			);
 		}
 		return $out;
@@ -275,20 +285,20 @@ final class Profile_Normalizer {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			$item   = $this->strip_prohibited( $item );
-			$url    = $item['competitor_url'] ?? '';
+			$item = $this->strip_prohibited( $item );
+			$url  = $item['competitor_url'] ?? '';
 			if ( is_string( $url ) && $url !== '' ) {
 				$url = $this->is_valid_url( $url ) ? \esc_url_raw( $url ) : '';
 			} else {
 				$url = '';
 			}
 			$out[] = array(
-				'competitor_name'                => $this->sanitize_string( $item['competitor_name'] ?? '' ),
-				'competitor_url'                 => $url,
-				'market_relevance'               => $this->sanitize_string( $item['market_relevance'] ?? '' ),
-				'competitive_positioning_notes'  => $this->sanitize_string( $item['competitive_positioning_notes'] ?? '' ),
-				'differentiation_observations'   => $this->sanitize_string( $item['differentiation_observations'] ?? '' ),
-				'strengths_weaknesses_notes'     => $this->sanitize_string( $item['strengths_weaknesses_notes'] ?? '' ),
+				'competitor_name'               => $this->sanitize_string( $item['competitor_name'] ?? '' ),
+				'competitor_url'                => $url,
+				'market_relevance'              => $this->sanitize_string( $item['market_relevance'] ?? '' ),
+				'competitive_positioning_notes' => $this->sanitize_string( $item['competitive_positioning_notes'] ?? '' ),
+				'differentiation_observations'  => $this->sanitize_string( $item['differentiation_observations'] ?? '' ),
+				'strengths_weaknesses_notes'    => $this->sanitize_string( $item['strengths_weaknesses_notes'] ?? '' ),
 			);
 		}
 		return $out;
@@ -304,10 +314,10 @@ final class Profile_Normalizer {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			$item = $this->strip_prohibited( $item );
+			$item  = $this->strip_prohibited( $item );
 			$out[] = array(
-				'primary_location'             => $this->sanitize_string( $item['primary_location'] ?? '' ),
-				'secondary_locations'          => $this->sanitize_string( $item['secondary_locations'] ?? '' ),
+				'primary_location'              => $this->sanitize_string( $item['primary_location'] ?? '' ),
+				'secondary_locations'           => $this->sanitize_string( $item['secondary_locations'] ?? '' ),
 				'service_area'                  => $this->sanitize_string( $item['service_area'] ?? '' ),
 				'shipping_area'                 => $this->sanitize_string( $item['shipping_area'] ?? '' ),
 				'region_type'                   => $this->sanitize_string( $item['region_type'] ?? '' ),

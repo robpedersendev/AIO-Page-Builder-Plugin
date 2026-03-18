@@ -39,12 +39,12 @@ final class Composition_Validation_Result {
 	private array $legacy_codes;
 
 	/**
-	 * @param list<array{code: string, message: string}> $blockers
-	 * @param list<array{code: string, message: string}> $warnings
-	 * @param list<array{code: string, message: string, position?: int}> $cta_rule_violations
+	 * @param list<array{code: string, message: string}>                       $blockers
+	 * @param list<array{code: string, message: string}>                       $warnings
+	 * @param list<array{code: string, message: string, position?: int}>       $cta_rule_violations
 	 * @param list<array{code: string, message: string, section_key?: string}> $compatibility_violations
-	 * @param list<array{code: string, message: string}> $preview_readiness_warnings
-	 * @param list<string> $legacy_codes
+	 * @param list<array{code: string, message: string}>                       $preview_readiness_warnings
+	 * @param list<string>                                                     $legacy_codes
 	 */
 	public function __construct(
 		bool $valid,
@@ -55,13 +55,13 @@ final class Composition_Validation_Result {
 		array $preview_readiness_warnings,
 		array $legacy_codes = array()
 	) {
-		$this->valid                     = $valid;
-		$this->blockers                  = $blockers;
-		$this->warnings                  = $warnings;
-		$this->cta_rule_violations       = $cta_rule_violations;
-		$this->compatibility_violations  = $compatibility_violations;
+		$this->valid                      = $valid;
+		$this->blockers                   = $blockers;
+		$this->warnings                   = $warnings;
+		$this->cta_rule_violations        = $cta_rule_violations;
+		$this->compatibility_violations   = $compatibility_violations;
 		$this->preview_readiness_warnings = $preview_readiness_warnings;
-		$this->legacy_codes              = $legacy_codes;
+		$this->legacy_codes               = $legacy_codes;
 	}
 
 	public function is_valid(): bool {

@@ -73,14 +73,14 @@ final class Synthetic_Preview_Context {
 		string $animation_tier,
 		string $omission_case
 	) {
-		$this->type                   = $type;
-		$this->key                    = $key;
-		$this->purpose_family         = $purpose_family;
+		$this->type                    = $type;
+		$this->key                     = $key;
+		$this->purpose_family          = $purpose_family;
 		$this->template_category_class = $template_category_class;
-		$this->variant                = $variant;
-		$this->reduced_motion         = $reduced_motion;
-		$this->animation_tier         = $animation_tier;
-		$this->omission_case          = $omission_case;
+		$this->variant                 = $variant;
+		$this->reduced_motion          = $reduced_motion;
+		$this->animation_tier          = $animation_tier;
+		$this->omission_case           = $omission_case;
 	}
 
 	/**

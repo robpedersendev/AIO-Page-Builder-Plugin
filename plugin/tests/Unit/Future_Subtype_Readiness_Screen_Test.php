@@ -27,7 +27,17 @@ final class Future_Subtype_Readiness_Screen_Test extends TestCase {
 	}
 
 	public function test_view_model_with_defaults_returns_bounded_structure(): void {
-		$vm = new Future_Subtype_Readiness_View_Model( 0, 0, array(), 0, array( 'author_dashboard' => '#', 'subtype_comparison' => '#', 'scaffold_promotion' => '#' ) );
+		$vm = new Future_Subtype_Readiness_View_Model(
+			0,
+			0,
+			array(),
+			0,
+			array(
+				'author_dashboard'   => '#',
+				'subtype_comparison' => '#',
+				'scaffold_promotion' => '#',
+			)
+		);
 		$this->assertSame( 0, $vm->get_subtype_scaffold_count() );
 		$this->assertSame( 0, $vm->get_subtype_missing_count() );
 		$this->assertSame( 0, $vm->get_blocker_count() );
@@ -38,7 +48,7 @@ final class Future_Subtype_Readiness_Screen_Test extends TestCase {
 	}
 
 	public function test_view_model_to_array_has_required_keys(): void {
-		$vm = new Future_Subtype_Readiness_View_Model( 0, 0, array(), 0, array() );
+		$vm  = new Future_Subtype_Readiness_View_Model( 0, 0, array(), 0, array() );
 		$arr = $vm->to_array();
 		$this->assertArrayHasKey( Future_Subtype_Readiness_View_Model::KEY_SUBTYPE_SCAFFOLD_COUNT, $arr );
 		$this->assertArrayHasKey( Future_Subtype_Readiness_View_Model::KEY_PROMO_SUBTYPE_SUMMARY, $arr );

@@ -101,7 +101,7 @@ final class Subtype_Section_Helper_Overlay_Registry {
 				continue;
 			}
 			$this->by_composite[ $composite ] = $ov;
-			$this->all[]                     = $ov;
+			$this->all[]                      = $ov;
 		}
 	}
 
@@ -113,8 +113,8 @@ final class Subtype_Section_Helper_Overlay_Registry {
 	 * @return array<string, mixed>|null
 	 */
 	public function get( string $subtype_key, string $section_key ): ?array {
-		$sub = trim( $subtype_key );
-		$sec = trim( $section_key );
+		$sub       = trim( $subtype_key );
+		$sec       = trim( $section_key );
 		$composite = $sub . '|' . $sec;
 		return $this->by_composite[ $composite ] ?? null;
 	}

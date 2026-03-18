@@ -16,50 +16,50 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Prompt_Pack_Schema {
 
-	public const ROOT_INTERNAL_KEY         = 'internal_key';
-	public const ROOT_NAME                 = 'name';
-	public const ROOT_VERSION              = 'version';
-	public const ROOT_PACK_TYPE            = 'pack_type';
-	public const ROOT_STATUS               = 'status';
-	public const ROOT_SEGMENTS             = 'segments';
-	public const ROOT_SCHEMA_TARGET_REF    = 'schema_target_ref';
-	public const ROOT_REPAIR_PROMPT_REF    = 'repair_prompt_ref';
-	public const ROOT_PLACEHOLDER_RULES    = 'placeholder_rules';
+	public const ROOT_INTERNAL_KEY           = 'internal_key';
+	public const ROOT_NAME                   = 'name';
+	public const ROOT_VERSION                = 'version';
+	public const ROOT_PACK_TYPE              = 'pack_type';
+	public const ROOT_STATUS                 = 'status';
+	public const ROOT_SEGMENTS               = 'segments';
+	public const ROOT_SCHEMA_TARGET_REF      = 'schema_target_ref';
+	public const ROOT_REPAIR_PROMPT_REF      = 'repair_prompt_ref';
+	public const ROOT_PLACEHOLDER_RULES      = 'placeholder_rules';
 	public const ROOT_PROVIDER_COMPATIBILITY = 'provider_compatibility';
-	public const ROOT_ARTIFACT_REFS        = 'artifact_refs';
-	public const ROOT_REDACTION            = 'redaction';
-	public const ROOT_CHANGELOG            = 'changelog';
-	public const ROOT_DEPRECATION          = 'deprecation';
+	public const ROOT_ARTIFACT_REFS          = 'artifact_refs';
+	public const ROOT_REDACTION              = 'redaction';
+	public const ROOT_CHANGELOG              = 'changelog';
+	public const ROOT_DEPRECATION            = 'deprecation';
 
 	public const SEGMENT_SYSTEM_BASE                = 'system_base';
-	public const SEGMENT_ROLE_FRAMING              = 'role_framing';
-	public const SEGMENT_PLANNING_INSTRUCTIONS     = 'planning_instructions';
-	public const SEGMENT_SCHEMA_REQUIREMENTS       = 'schema_requirements';
+	public const SEGMENT_ROLE_FRAMING               = 'role_framing';
+	public const SEGMENT_PLANNING_INSTRUCTIONS      = 'planning_instructions';
+	public const SEGMENT_SCHEMA_REQUIREMENTS        = 'schema_requirements';
 	public const SEGMENT_SITE_ANALYSIS_INSTRUCTIONS = 'site_analysis_instructions';
-	public const SEGMENT_SAFETY_INSTRUCTIONS       = 'safety_instructions';
+	public const SEGMENT_SAFETY_INSTRUCTIONS        = 'safety_instructions';
 	public const SEGMENT_NORMALIZATION_EXPECTATIONS = 'normalization_expectations';
-	public const SEGMENT_PROVIDER_NOTES            = 'provider_notes';
+	public const SEGMENT_PROVIDER_NOTES             = 'provider_notes';
 	/** Optional (Prompt 210): template taxonomy and family examples. */
-	public const SEGMENT_TEMPLATE_FAMILY_GUIDANCE  = 'template_family_guidance';
+	public const SEGMENT_TEMPLATE_FAMILY_GUIDANCE = 'template_family_guidance';
 	/** Optional (Prompt 210): CTA count, bottom-CTA, non-adjacency rules. */
-	public const SEGMENT_CTA_LAW_GUIDANCE         = 'cta_law_guidance';
+	public const SEGMENT_CTA_LAW_GUIDANCE = 'cta_law_guidance';
 	/** Optional (Prompt 210): hierarchy role expectations. */
-	public const SEGMENT_HIERARCHY_ROLE_GUIDANCE  = 'hierarchy_role_guidance';
+	public const SEGMENT_HIERARCHY_ROLE_GUIDANCE = 'hierarchy_role_guidance';
 
 	public const STATUS_ACTIVE     = 'active';
 	public const STATUS_INACTIVE   = 'inactive';
 	public const STATUS_DEPRECATED = 'deprecated';
 
 	public const PACK_TYPE_PLANNING = 'planning';
-	public const PACK_TYPE_REPAIR    = 'repair';
-	public const PACK_TYPE_SUMMARY   = 'summary';
+	public const PACK_TYPE_REPAIR   = 'repair';
+	public const PACK_TYPE_SUMMARY  = 'summary';
 	public const PACK_TYPE_OTHER    = 'other';
 
 	public const PLACEHOLDER_SOURCE_PROFILE  = 'profile';
 	public const PLACEHOLDER_SOURCE_REGISTRY = 'registry';
-	public const PLACEHOLDER_SOURCE_CRAWL     = 'crawl';
-	public const PLACEHOLDER_SOURCE_GOAL      = 'goal';
-	public const PLACEHOLDER_SOURCE_CUSTOM    = 'custom';
+	public const PLACEHOLDER_SOURCE_CRAWL    = 'crawl';
+	public const PLACEHOLDER_SOURCE_GOAL     = 'goal';
+	public const PLACEHOLDER_SOURCE_CUSTOM   = 'custom';
 	/** Prompt 210: template-family and CTA-law content from planning_guidance. */
 	public const PLACEHOLDER_SOURCE_PLANNING_GUIDANCE = 'planning_guidance';
 

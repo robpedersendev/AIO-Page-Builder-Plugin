@@ -49,9 +49,9 @@ final class Extraction_Result {
 
 	/**
 	 * @param array{title: string, meta_description: string, h1: string, h2_outline: list<string>, word_count: int, content_excerpt: string, internal_link_count: int} $page_summary
-	 * @param list<array{level: int, text: string}> $heading_outline
-	 * @param list<array{context: string, label: string, url: string, depth?: int}> $navigation_summary
-	 * @param list<string> $extraction_notes
+	 * @param list<array{level: int, text: string}>                                                                                                                    $heading_outline
+	 * @param list<array{context: string, label: string, url: string, depth?: int}>                                                                                    $navigation_summary
+	 * @param list<string>                                                                                                                                             $extraction_notes
 	 */
 	public function __construct(
 		array $page_summary,
@@ -60,7 +60,7 @@ final class Extraction_Result {
 		array $extraction_notes = array()
 	) {
 		$this->page_summary       = $page_summary;
-		$this->heading_outline   = $heading_outline;
+		$this->heading_outline    = $heading_outline;
 		$this->navigation_summary = $navigation_summary;
 		$this->extraction_notes   = $extraction_notes;
 	}

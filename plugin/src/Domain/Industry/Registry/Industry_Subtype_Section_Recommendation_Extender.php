@@ -17,10 +17,10 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Industry_Subtype_Section_Recommendation_Extender {
 
-	private const SUBTYPE_BOOST_SCORE = 5;
+	private const SUBTYPE_BOOST_SCORE             = 5;
 	private const REASON_SUBTYPE_OVERLAY_PRIORITY = 'subtype_overlay_priority';
-	private const SCORE_RECOMMENDED_MIN = 20;
-	private const SCORE_DISCOURAGED_MAX = -10;
+	private const SCORE_RECOMMENDED_MIN           = 20;
+	private const SCORE_DISCOURAGED_MAX           = -10;
 
 	/**
 	 * Applies subtype influence to the base result. When subtype is null or empty, returns result with subtype fields set to false/empty per item (no score change).
@@ -36,33 +36,36 @@ final class Industry_Subtype_Section_Recommendation_Extender {
 		?array $subtype_definition,
 		array $sections = array()
 	): Industry_Section_Recommendation_Result {
-		$items = $base_result->get_items();
+		$items         = $base_result->get_items();
 		$priority_keys = $this->subtype_section_priority_keys( $subtype_definition );
-		$new_items = array();
+		$new_items     = array();
 		foreach ( $items as $item ) {
-			$section_key = $item['section_key'] ?? '';
-			$score = (int) ( $item['score'] ?? 0 );
+			$section_key       = $item['section_key'] ?? '';
+			$score             = (int) ( $item['score'] ?? 0 );
 			$influence_applied = false;
-			$reason_summary = '';
+			$reason_summary    = '';
 			if ( $section_key !== '' && $priority_keys !== array() && in_array( $section_key, $priority_keys, true ) ) {
-				$score += self::SUBTYPE_BOOST_SCORE;
+				$score            += self::SUBTYPE_BOOST_SCORE;
 				$influence_applied = true;
-				$reason_summary = self::REASON_SUBTYPE_OVERLAY_PRIORITY;
+				$reason_summary    = self::REASON_SUBTYPE_OVERLAY_PRIORITY;
 			}
-			$new_item = array_merge( $item, array( 'score' => $score ) );
-			$new_item['fit_classification'] = $this->score_to_fit( $score );
+			$new_item                              = array_merge( $item, array( 'score' => $score ) );
+			$new_item['fit_classification']        = $this->score_to_fit( $score );
 			$new_item['subtype_influence_applied'] = $influence_applied;
-			$new_item['subtype_reason_summary'] = $reason_summary;
-			$new_items[] = $new_item;
+			$new_item['subtype_reason_summary']    = $reason_summary;
+			$new_items[]                           = $new_item;
 		}
-		usort( $new_items, function ( array $a, array $b ) {
-			$score_a = $a['score'] ?? 0;
-			$score_b = $b['score'] ?? 0;
-			if ( $score_b !== $score_a ) {
-				return $score_b <=> $score_a;
+		usort(
+			$new_items,
+			function ( array $a, array $b ) {
+				$score_a = $a['score'] ?? 0;
+				$score_b = $b['score'] ?? 0;
+				if ( $score_b !== $score_a ) {
+					return $score_b <=> $score_a;
+				}
+				return strcmp( $a['section_key'] ?? '', $b['section_key'] ?? '' );
 			}
-			return strcmp( $a['section_key'] ?? '', $b['section_key'] ?? '' );
-		} );
+		);
 		return new Industry_Section_Recommendation_Result( $new_items );
 	}
 

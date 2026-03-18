@@ -32,8 +32,8 @@ final class Test_Prompt_Pack_Repo implements Prompt_Pack_Registry_Repository_Int
 	private array $packs = array();
 
 	public function add_pack( array $definition ): void {
-		$key = (string) ( $definition[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' );
-		$ver = (string) ( $definition[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '' );
+		$key                              = (string) ( $definition[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' );
+		$ver                              = (string) ( $definition[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '' );
 		$this->packs[ $key . '|' . $ver ] = $definition;
 	}
 
@@ -68,12 +68,12 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 	private function planning_pack(): array {
 		return array(
 			Prompt_Pack_Schema::ROOT_INTERNAL_KEY      => 'aio/build-plan-draft',
-			Prompt_Pack_Schema::ROOT_NAME             => 'Build Plan Draft',
-			Prompt_Pack_Schema::ROOT_VERSION          => '1.0.0',
-			Prompt_Pack_Schema::ROOT_PACK_TYPE        => Prompt_Pack_Schema::PACK_TYPE_PLANNING,
-			Prompt_Pack_Schema::ROOT_STATUS           => Prompt_Pack_Schema::STATUS_ACTIVE,
+			Prompt_Pack_Schema::ROOT_NAME              => 'Build Plan Draft',
+			Prompt_Pack_Schema::ROOT_VERSION           => '1.0.0',
+			Prompt_Pack_Schema::ROOT_PACK_TYPE         => Prompt_Pack_Schema::PACK_TYPE_PLANNING,
+			Prompt_Pack_Schema::ROOT_STATUS            => Prompt_Pack_Schema::STATUS_ACTIVE,
 			Prompt_Pack_Schema::ROOT_SCHEMA_TARGET_REF => 'aio/build-plan-draft-v1',
-			Prompt_Pack_Schema::ROOT_SEGMENTS         => array(
+			Prompt_Pack_Schema::ROOT_SEGMENTS          => array(
 				Prompt_Pack_Schema::SEGMENT_SYSTEM_BASE => 'You are a site planning assistant. Output valid JSON.',
 				Prompt_Pack_Schema::SEGMENT_PLANNING_INSTRUCTIONS => 'Use the context: {{profile_summary}}.',
 			),
@@ -84,7 +84,7 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 		$repo = new Test_Prompt_Pack_Repo();
 		$repo->add_pack( $this->planning_pack() );
 		$registry = new Prompt_Pack_Registry_Service( $repo );
-		$pack = $registry->get_pack( 'aio/build-plan-draft' );
+		$pack     = $registry->get_pack( 'aio/build-plan-draft' );
 		$this->assertNotNull( $pack );
 		$this->assertSame( 'aio/build-plan-draft', $pack[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] );
 		$this->assertSame( '1.0.0', $pack[ Prompt_Pack_Schema::ROOT_VERSION ] );
@@ -94,7 +94,7 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 		$repo = new Test_Prompt_Pack_Repo();
 		$repo->add_pack( $this->planning_pack() );
 		$registry = new Prompt_Pack_Registry_Service( $repo );
-		$pack = $registry->select_for_planning( 'aio/build-plan-draft-v1', null );
+		$pack     = $registry->select_for_planning( 'aio/build-plan-draft-v1', null );
 		$this->assertNotNull( $pack );
 		$this->assertSame( 'aio/build-plan-draft-v1', $pack[ Prompt_Pack_Schema::ROOT_SCHEMA_TARGET_REF ] );
 	}
@@ -110,8 +110,15 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 	}
 
 	public function test_input_artifact_builder_success(): void {
-		$builder = new Input_Artifact_Builder();
-		$artifact = $builder->build( 'art-1', array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ), array( 'redaction' => array( 'redaction_applied' => false ) ) );
+		$builder  = new Input_Artifact_Builder();
+		$artifact = $builder->build(
+			'art-1',
+			array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
+			array( 'redaction' => array( 'redaction_applied' => false ) )
+		);
 		$this->assertNotNull( $artifact );
 		$this->assertSame( 'art-1', $artifact[ Input_Artifact_Schema::ROOT_ARTIFACT_ID ] );
 		$this->assertSame( '1', $artifact[ Input_Artifact_Schema::ROOT_SCHEMA_VERSION ] );
@@ -120,24 +127,27 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 	}
 
 	public function test_input_artifact_builder_failure_missing_pack_ref(): void {
-		$builder = new Input_Artifact_Builder();
+		$builder  = new Input_Artifact_Builder();
 		$artifact = $builder->build( 'art-1', array(), array() );
 		$this->assertNull( $artifact );
 		$this->assertNotEmpty( $builder->get_last_validation_errors() );
 	}
 
 	public function test_normalized_prompt_package_builder_success(): void {
-		$pack = $this->planning_pack();
+		$pack     = $this->planning_pack();
 		$artifact = array(
-			Input_Artifact_Schema::ROOT_ARTIFACT_ID => 'art-1',
-			Input_Artifact_Schema::ROOT_SCHEMA_VERSION => '1',
-			Input_Artifact_Schema::ROOT_CREATED_AT => gmdate( 'Y-m-d\TH:i:s\Z' ),
-			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
-			Input_Artifact_Schema::ROOT_REDACTION => array( 'redaction_applied' => false ),
-			Input_Artifact_Schema::ROOT_PROFILE => array( 'summary' => 'Test profile' ),
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'art-1',
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION  => '1',
+			Input_Artifact_Schema::ROOT_CREATED_AT      => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
+			Input_Artifact_Schema::ROOT_REDACTION       => array( 'redaction_applied' => false ),
+			Input_Artifact_Schema::ROOT_PROFILE         => array( 'summary' => 'Test profile' ),
 		);
-		$builder = new Normalized_Prompt_Package_Builder();
-		$result = $builder->build( $pack, $artifact );
+		$builder  = new Normalized_Prompt_Package_Builder();
+		$result   = $builder->build( $pack, $artifact );
 		$this->assertTrue( $result->is_success() );
 		$pkg = $result->get_normalized_prompt_package();
 		$this->assertNotNull( $pkg );
@@ -149,32 +159,42 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 	}
 
 	public function test_normalized_prompt_package_failure_missing_segments(): void {
-		$pack = array( Prompt_Pack_Schema::ROOT_INTERNAL_KEY => 'x', Prompt_Pack_Schema::ROOT_VERSION => '1', Prompt_Pack_Schema::ROOT_SEGMENTS => array() );
-		$artifact = array(
-			Input_Artifact_Schema::ROOT_ARTIFACT_ID => 'a',
-			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'x', 'version' => '1' ),
-			Input_Artifact_Schema::ROOT_REDACTION => array( 'redaction_applied' => false ),
+		$pack     = array(
+			Prompt_Pack_Schema::ROOT_INTERNAL_KEY => 'x',
+			Prompt_Pack_Schema::ROOT_VERSION      => '1',
+			Prompt_Pack_Schema::ROOT_SEGMENTS     => array(),
 		);
-		$builder = new Normalized_Prompt_Package_Builder();
-		$result = $builder->build( $pack, $artifact );
+		$artifact = array(
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'a',
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array(
+				'internal_key' => 'x',
+				'version'      => '1',
+			),
+			Input_Artifact_Schema::ROOT_REDACTION       => array( 'redaction_applied' => false ),
+		);
+		$builder  = new Normalized_Prompt_Package_Builder();
+		$result   = $builder->build( $pack, $artifact );
 		$this->assertFalse( $result->is_success() );
 		$this->assertNotEmpty( $result->get_validation_errors() );
 	}
 
 	/** Example normalized prompt package payload (spec §27, §29.2). */
 	public function test_example_normalized_prompt_package_payload(): void {
-		$pack = $this->planning_pack();
+		$pack     = $this->planning_pack();
 		$artifact = array(
-			Input_Artifact_Schema::ROOT_ARTIFACT_ID => 'artifact-abc-123',
-			Input_Artifact_Schema::ROOT_SCHEMA_VERSION => '1',
-			Input_Artifact_Schema::ROOT_CREATED_AT => '2025-07-01T12:00:00Z',
-			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
-			Input_Artifact_Schema::ROOT_REDACTION => array( 'redaction_applied' => true ),
-			Input_Artifact_Schema::ROOT_PROFILE => array( 'brand' => 'Acme' ),
-			Input_Artifact_Schema::ROOT_GOAL => 'Create a small business site.',
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'artifact-abc-123',
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION  => '1',
+			Input_Artifact_Schema::ROOT_CREATED_AT      => '2025-07-01T12:00:00Z',
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
+			Input_Artifact_Schema::ROOT_REDACTION       => array( 'redaction_applied' => true ),
+			Input_Artifact_Schema::ROOT_PROFILE         => array( 'brand' => 'Acme' ),
+			Input_Artifact_Schema::ROOT_GOAL            => 'Create a small business site.',
 		);
-		$builder = new Normalized_Prompt_Package_Builder();
-		$result = $builder->build( $pack, $artifact );
+		$builder  = new Normalized_Prompt_Package_Builder();
+		$result   = $builder->build( $pack, $artifact );
 		$this->assertTrue( $result->is_success() );
 		$pkg = $result->get_normalized_prompt_package();
 		$this->assertSame( 'aio/build-plan-draft-v1', $pkg['schema_target_ref'] );
@@ -185,23 +205,26 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 
 	/** Prompt 332: industry_overlay option appends industry_guidance_text to system_prompt. */
 	public function test_prompt_package_builder_appends_industry_overlay_guidance(): void {
-		$pack = $this->planning_pack();
+		$pack     = $this->planning_pack();
 		$artifact = array(
-			Input_Artifact_Schema::ROOT_ARTIFACT_ID => 'art-1',
-			Input_Artifact_Schema::ROOT_SCHEMA_VERSION => '1',
-			Input_Artifact_Schema::ROOT_CREATED_AT => gmdate( 'Y-m-d\TH:i:s\Z' ),
-			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
-			Input_Artifact_Schema::ROOT_REDACTION => array( 'redaction_applied' => false ),
-			Input_Artifact_Schema::ROOT_PROFILE => array(),
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'art-1',
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION  => '1',
+			Input_Artifact_Schema::ROOT_CREATED_AT      => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
+			Input_Artifact_Schema::ROOT_REDACTION       => array( 'redaction_applied' => false ),
+			Input_Artifact_Schema::ROOT_PROFILE         => array(),
 		);
-		$options = array(
+		$options  = array(
 			'industry_overlay' => array(
 				'schema_version'         => '1',
 				'industry_guidance_text' => 'Prefer service and local page families for this vertical.',
 			),
 		);
-		$builder = new Normalized_Prompt_Package_Builder();
-		$result = $builder->build( $pack, $artifact, $options );
+		$builder  = new Normalized_Prompt_Package_Builder();
+		$result   = $builder->build( $pack, $artifact, $options );
 		$this->assertTrue( $result->is_success() );
 		$pkg = $result->get_normalized_prompt_package();
 		$this->assertNotNull( $pkg );
@@ -211,24 +234,27 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 
 	/** Prompt 533: goal_overlay option appends conversion_goal_guidance_text to system_prompt. */
 	public function test_prompt_package_builder_appends_goal_overlay_guidance(): void {
-		$pack = $this->planning_pack();
+		$pack     = $this->planning_pack();
 		$artifact = array(
-			Input_Artifact_Schema::ROOT_ARTIFACT_ID => 'art-1',
-			Input_Artifact_Schema::ROOT_SCHEMA_VERSION => '1',
-			Input_Artifact_Schema::ROOT_CREATED_AT => gmdate( 'Y-m-d\TH:i:s\Z' ),
-			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
-			Input_Artifact_Schema::ROOT_REDACTION => array( 'redaction_applied' => false ),
-			Input_Artifact_Schema::ROOT_PROFILE => array(),
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'art-1',
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION  => '1',
+			Input_Artifact_Schema::ROOT_CREATED_AT      => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
+			Input_Artifact_Schema::ROOT_REDACTION       => array( 'redaction_applied' => false ),
+			Input_Artifact_Schema::ROOT_PROFILE         => array(),
 		);
-		$options = array(
+		$options  = array(
 			'goal_overlay' => array(
-				'schema_version' => '1',
-				'primary_goal_key' => 'calls',
+				'schema_version'                => '1',
+				'primary_goal_key'              => 'calls',
 				'conversion_goal_guidance_text' => 'Prioritize phone-call conversions; include click-to-call.',
 			),
 		);
-		$builder = new Normalized_Prompt_Package_Builder();
-		$result = $builder->build( $pack, $artifact, $options );
+		$builder  = new Normalized_Prompt_Package_Builder();
+		$result   = $builder->build( $pack, $artifact, $options );
 		$this->assertTrue( $result->is_success() );
 		$pkg = $result->get_normalized_prompt_package();
 		$this->assertNotNull( $pkg );
@@ -238,7 +264,7 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 
 	public function test_prompt_package_result_to_validation_result(): void {
 		$result = new Prompt_Package_Result( false, null, array( 'missing_segments' ), null );
-		$arr = $result->to_validation_result();
+		$arr    = $result->to_validation_result();
 		$this->assertFalse( $arr['success'] );
 		$this->assertSame( array( 'missing_segments' ), $arr['validation_errors'] );
 		$this->assertFalse( $arr['has_package'] );
@@ -246,7 +272,7 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 
 	/** Prompt 210: get_planning_guidance_content returns template-family, CTA-law, hierarchy guidance and schema_version. */
 	public function test_registry_get_planning_guidance_content_returns_structure(): void {
-		$repo = new Test_Prompt_Pack_Repo();
+		$repo     = new Test_Prompt_Pack_Repo();
 		$registry = new Prompt_Pack_Registry_Service( $repo );
 		$guidance = $registry->get_planning_guidance_content();
 		$this->assertArrayHasKey( 'template_family_guidance', $guidance );
@@ -265,33 +291,36 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 
 	/** Prompt 210: planning_guidance placeholders are substituted when artifact contains planning_guidance. */
 	public function test_normalized_prompt_package_injects_planning_guidance_placeholders(): void {
-		$pack = array(
+		$pack     = array(
 			Prompt_Pack_Schema::ROOT_INTERNAL_KEY      => 'aio/build-plan-draft',
-			Prompt_Pack_Schema::ROOT_NAME             => 'Build Plan Draft',
-			Prompt_Pack_Schema::ROOT_VERSION          => '1.0.0',
-			Prompt_Pack_Schema::ROOT_PACK_TYPE        => Prompt_Pack_Schema::PACK_TYPE_PLANNING,
-			Prompt_Pack_Schema::ROOT_STATUS           => Prompt_Pack_Schema::STATUS_ACTIVE,
+			Prompt_Pack_Schema::ROOT_NAME              => 'Build Plan Draft',
+			Prompt_Pack_Schema::ROOT_VERSION           => '1.0.0',
+			Prompt_Pack_Schema::ROOT_PACK_TYPE         => Prompt_Pack_Schema::PACK_TYPE_PLANNING,
+			Prompt_Pack_Schema::ROOT_STATUS            => Prompt_Pack_Schema::STATUS_ACTIVE,
 			Prompt_Pack_Schema::ROOT_SCHEMA_TARGET_REF => 'aio/build-plan-draft-v1',
-			Prompt_Pack_Schema::ROOT_SEGMENTS         => array(
+			Prompt_Pack_Schema::ROOT_SEGMENTS          => array(
 				Prompt_Pack_Schema::SEGMENT_SYSTEM_BASE => 'You are a planning assistant.',
 				Prompt_Pack_Schema::SEGMENT_TEMPLATE_FAMILY_GUIDANCE => 'Taxonomy: {{template_family_guidance}}',
 				Prompt_Pack_Schema::SEGMENT_CTA_LAW_GUIDANCE => 'Rules: {{cta_law_rules}}',
 			),
 		);
 		$artifact = array(
-			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'art-1',
-			Input_Artifact_Schema::ROOT_SCHEMA_VERSION  => '1',
-			Input_Artifact_Schema::ROOT_CREATED_AT      => gmdate( 'Y-m-d\TH:i:s\Z' ),
-			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ),
-			Input_Artifact_Schema::ROOT_REDACTION       => array( 'redaction_applied' => false ),
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID       => 'art-1',
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION    => '1',
+			Input_Artifact_Schema::ROOT_CREATED_AT        => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF   => array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
+			Input_Artifact_Schema::ROOT_REDACTION         => array( 'redaction_applied' => false ),
 			Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE => array(
 				'template_family_guidance' => 'Page classes: top_level, hub, nested_hub, child_detail.',
-				'cta_law_rules'           => 'Min 3 CTAs for top_level; last section must be CTA.',
+				'cta_law_rules'            => 'Min 3 CTAs for top_level; last section must be CTA.',
 				'hierarchy_role_guidance'  => 'Match hierarchy to URL depth.',
 			),
 		);
-		$builder = new Normalized_Prompt_Package_Builder();
-		$result = $builder->build( $pack, $artifact );
+		$builder  = new Normalized_Prompt_Package_Builder();
+		$result   = $builder->build( $pack, $artifact );
 		$this->assertTrue( $result->is_success() );
 		$pkg = $result->get_normalized_prompt_package();
 		$this->assertNotNull( $pkg );
@@ -307,11 +336,18 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 			'hierarchy_role_guidance'  => 'Hierarchy roles.',
 			'schema_version'           => '1',
 		);
-		$builder = new Input_Artifact_Builder();
-		$artifact = $builder->build( 'art-1', array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ), array(
-			'redaction'        => array( 'redaction_applied' => false ),
-			'planning_guidance' => $guidance,
-		) );
+		$builder  = new Input_Artifact_Builder();
+		$artifact = $builder->build(
+			'art-1',
+			array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
+			array(
+				'redaction'         => array( 'redaction_applied' => false ),
+				'planning_guidance' => $guidance,
+			)
+		);
 		$this->assertNotNull( $artifact );
 		$this->assertArrayHasKey( Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE, $artifact );
 		$this->assertSame( $guidance, $artifact[ Input_Artifact_Schema::ROOT_PLANNING_GUIDANCE ] );
@@ -321,14 +357,25 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 	public function test_input_artifact_builder_accepts_industry_context_option(): void {
 		$industry_context = array(
 			'schema_version'   => '1',
-			'readiness'        => array( 'state' => 'ready', 'score' => 100, 'validation_passed' => true ),
+			'readiness'        => array(
+				'state'             => 'ready',
+				'score'             => 100,
+				'validation_passed' => true,
+			),
 			'industry_profile' => array( 'primary_industry_key' => 'realtor' ),
 		);
-		$builder = new Input_Artifact_Builder();
-		$artifact = $builder->build( 'art-1', array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ), array(
-			'redaction'        => array( 'redaction_applied' => false ),
-			'industry_context' => $industry_context,
-		) );
+		$builder          = new Input_Artifact_Builder();
+		$artifact         = $builder->build(
+			'art-1',
+			array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
+			array(
+				'redaction'        => array( 'redaction_applied' => false ),
+				'industry_context' => $industry_context,
+			)
+		);
 		$this->assertNotNull( $artifact );
 		$this->assertArrayHasKey( Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT, $artifact );
 		$this->assertSame( $industry_context, $artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ] );
@@ -339,10 +386,17 @@ final class Prompt_Pack_Registry_And_Input_Artifact_Test extends TestCase {
 
 	/** Prompt 331: industry_context is optional; artifact valid without it. */
 	public function test_input_artifact_valid_without_industry_context(): void {
-		$builder = new Input_Artifact_Builder();
-		$artifact = $builder->build( 'art-1', array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1.0.0' ), array(
-			'redaction' => array( 'redaction_applied' => false ),
-		) );
+		$builder  = new Input_Artifact_Builder();
+		$artifact = $builder->build(
+			'art-1',
+			array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1.0.0',
+			),
+			array(
+				'redaction' => array( 'redaction_applied' => false ),
+			)
+		);
 		$this->assertNotNull( $artifact );
 		$this->assertArrayNotHasKey( Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT, $artifact );
 	}

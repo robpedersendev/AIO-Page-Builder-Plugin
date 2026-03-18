@@ -34,9 +34,9 @@ final class Profile_Snapshot_Helper_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_test_options'] = array();
-		$this->settings = new Settings_Service();
-		$this->store    = new Profile_Store( $this->settings, new Profile_Normalizer() );
-		$this->helper   = new Profile_Snapshot_Helper();
+		$this->settings               = new Settings_Service();
+		$this->store                  = new Profile_Store( $this->settings, new Profile_Normalizer() );
+		$this->helper                 = new Profile_Snapshot_Helper();
 	}
 
 	protected function tearDown(): void {

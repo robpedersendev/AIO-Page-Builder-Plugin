@@ -42,9 +42,9 @@ final class LPagery_Compatibility_Result {
 	private array $unsupported_mapping_reasons;
 
 	/**
-	 * @param bool $compatible
-	 * @param string $compatibility_state
-	 * @param array<string, mixed> $lpagery_mapping_summary
+	 * @param bool                                                                 $compatible
+	 * @param string                                                               $compatibility_state
+	 * @param array<string, mixed>                                                 $lpagery_mapping_summary
 	 * @param list<array{field_name?: string, token_key?: string, reason: string}> $unsupported_mapping_reasons
 	 */
 	public function __construct(
@@ -84,10 +84,10 @@ final class LPagery_Compatibility_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'compatible'                    => $this->compatible,
-			'lpagery_compatibility_state'   => $this->compatibility_state,
-			'lpagery_mapping_summary'       => $this->lpagery_mapping_summary,
-			'unsupported_mapping_reasons'   => $this->unsupported_mapping_reasons,
+			'compatible'                  => $this->compatible,
+			'lpagery_compatibility_state' => $this->compatibility_state,
+			'lpagery_mapping_summary'     => $this->lpagery_mapping_summary,
+			'unsupported_mapping_reasons' => $this->unsupported_mapping_reasons,
 		);
 	}
 }

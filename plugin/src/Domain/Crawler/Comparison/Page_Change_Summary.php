@@ -69,9 +69,9 @@ final class Page_Change_Summary {
 	public $new_snapshot;
 
 	/**
-	 * @param string                $url             Normalized URL.
-	 * @param string                $change_category One of CATEGORY_*.
-	 * @param list<string>          $reason_codes    Reason codes.
+	 * @param string                    $url             Normalized URL.
+	 * @param string                    $change_category One of CATEGORY_*.
+	 * @param list<string>              $reason_codes    Reason codes.
 	 * @param array<string, mixed>|null $prior_snapshot Optional prior record excerpt.
 	 * @param array<string, mixed>|null $new_snapshot   Optional new record excerpt.
 	 */
@@ -98,9 +98,9 @@ final class Page_Change_Summary {
 		return array(
 			'url'             => $this->url,
 			'change_category' => $this->change_category,
-			'reason_codes'     => $this->reason_codes,
-			'prior_snapshot'   => $this->prior_snapshot,
-			'new_snapshot'     => $this->new_snapshot,
+			'reason_codes'    => $this->reason_codes,
+			'prior_snapshot'  => $this->prior_snapshot,
+			'new_snapshot'    => $this->new_snapshot,
 		);
 	}
 }

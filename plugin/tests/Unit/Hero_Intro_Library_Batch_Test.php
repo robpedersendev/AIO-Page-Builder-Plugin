@@ -54,19 +54,19 @@ final class Hero_Intro_Library_Batch_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']     = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$repo       = new Section_Template_Repository();
-		$normalizer = new Section_Definition_Normalizer();
-		$this->validator = new Section_Validator( $normalizer, $repo );
-		$bp_validator = new Section_Field_Blueprint_Validator();
-		$this->blueprint_service = new Section_Field_Blueprint_Service(
+		$repo                           = new Section_Template_Repository();
+		$normalizer                     = new Section_Definition_Normalizer();
+		$this->validator                = new Section_Validator( $normalizer, $repo );
+		$bp_validator                   = new Section_Field_Blueprint_Validator();
+		$this->blueprint_service        = new Section_Field_Blueprint_Service(
 			$repo,
 			$bp_validator,
 			new Section_Field_Blueprint_Normalizer( $bp_validator )
 		);
-		$this->context_builder = new Section_Render_Context_Builder();
-		$this->renderer = new Section_Renderer_Base();
+		$this->context_builder          = new Section_Render_Context_Builder();
+		$this->renderer                 = new Section_Renderer_Base();
 	}
 
 	protected function tearDown(): void {
@@ -78,8 +78,18 @@ final class Hero_Intro_Library_Batch_Test extends TestCase {
 		$keys = Hero_Intro_Library_Batch_Definitions::section_keys();
 		$this->assertCount( 12, $keys );
 		$expected = array(
-			'hero_conv_01', 'hero_conv_02', 'hero_cred_01', 'hero_edu_01', 'hero_local_01', 'hero_dir_01',
-			'hero_prod_01', 'hero_legal_01', 'hero_edit_01', 'hero_compact_01', 'hero_media_01', 'hero_split_01',
+			'hero_conv_01',
+			'hero_conv_02',
+			'hero_cred_01',
+			'hero_edu_01',
+			'hero_local_01',
+			'hero_dir_01',
+			'hero_prod_01',
+			'hero_legal_01',
+			'hero_edit_01',
+			'hero_compact_01',
+			'hero_media_01',
+			'hero_split_01',
 		);
 		foreach ( $expected as $k ) {
 			$this->assertContains( $k, $keys );
@@ -95,7 +105,7 @@ final class Hero_Intro_Library_Batch_Test extends TestCase {
 		$normalizer = new Section_Definition_Normalizer();
 		foreach ( Hero_Intro_Library_Batch_Definitions::all_definitions() as $def ) {
 			$normalized = $normalizer->normalize( $def );
-			$errors = $this->validator->validate_completeness( $normalized );
+			$errors     = $this->validator->validate_completeness( $normalized );
 			$this->assertEmpty( $errors, 'Definition ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '?' ) . ' should pass completeness: ' . implode( ', ', $errors ) );
 		}
 	}
@@ -126,13 +136,13 @@ final class Hero_Intro_Library_Batch_Test extends TestCase {
 	/** Minimal field values shared by all hero sections (common + optional hero_image/split_image). */
 	private function minimal_hero_values(): array {
 		return array(
-			'headline'       => '',
-			'subheadline'    => '',
-			'eyebrow'        => '',
-			'primary_cta'    => array(),
-			'secondary_cta'  => array(),
-			'hero_image'     => array(),
-			'split_image'    => array(),
+			'headline'      => '',
+			'subheadline'   => '',
+			'eyebrow'       => '',
+			'primary_cta'   => array(),
+			'secondary_cta' => array(),
+			'hero_image'    => array(),
+			'split_image'   => array(),
 		);
 	}
 
@@ -152,7 +162,7 @@ final class Hero_Intro_Library_Batch_Test extends TestCase {
 			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$out = $this->context_builder->build( $def, $values, 0, null );
 			$this->assertEmpty( $out['errors'] );
-			$result = $this->renderer->render( $out['context'] );
+			$result       = $this->renderer->render( $out['context'] );
 			$selector_map = $result->get_selector_map();
 			$this->assertArrayHasKey( 'wrapper_class', $selector_map );
 			$this->assertSame( 'aio-s-' . $key, $selector_map['wrapper_class'] );
@@ -163,9 +173,9 @@ final class Hero_Intro_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_helper_and_css_contract_refs(): void {
 		foreach ( Hero_Intro_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key        = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$helper_ref = (string) ( $def[ Section_Schema::FIELD_HELPER_REF ] ?? '' );
-			$css_ref = (string) ( $def[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' );
+			$css_ref    = (string) ( $def[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' );
 			$this->assertNotSame( '', $helper_ref, "Section {$key} must have non-empty helper_ref" );
 			$this->assertNotSame( '', $css_ref, "Section {$key} must have non-empty css_contract_ref" );
 		}
@@ -193,7 +203,7 @@ final class Hero_Intro_Library_Batch_Test extends TestCase {
 
 	public function test_each_definition_has_semantic_accessibility_guidance(): void {
 		foreach ( Hero_Intro_Library_Batch_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key      = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$guidance = $def['accessibility_warnings_or_enhancements'] ?? '';
 			$this->assertNotEmpty( (string) $guidance, "Section {$key} must have accessibility_warnings_or_enhancements" );
 		}
@@ -210,9 +220,9 @@ final class Hero_Intro_Library_Batch_Test extends TestCase {
 
 	public function test_seeder_run_returns_success_and_twelve_section_ids(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 100;
-		$GLOBALS['_aio_wp_query_posts']       = array();
-		$repo   = new Section_Template_Repository();
-		$result = Hero_Intro_Library_Batch_Seeder::run( $repo );
+		$GLOBALS['_aio_wp_query_posts']        = array();
+		$repo                                  = new Section_Template_Repository();
+		$result                                = Hero_Intro_Library_Batch_Seeder::run( $repo );
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'success', $result );
 		$this->assertArrayHasKey( 'section_ids', $result );

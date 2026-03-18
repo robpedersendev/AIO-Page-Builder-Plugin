@@ -80,7 +80,13 @@ final class Stub_Plan_State_For_Executor_Queue implements Plan_State_For_Executi
 	}
 
 	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null ): bool {
-		$this->last_update_call = array( 'post_id' => $post_id, 'step_index' => $step_index, 'item_id' => $item_id, 'new_status' => $new_status, 'execution_artifact' => $execution_artifact );
+		$this->last_update_call = array(
+			'post_id'            => $post_id,
+			'step_index'         => $step_index,
+			'item_id'            => $item_id,
+			'new_status'         => $new_status,
+			'execution_artifact' => $execution_artifact,
+		);
 		return $this->update_plan_item_status_return;
 	}
 
@@ -107,7 +113,13 @@ final class Stub_Job_Queue_Repository implements Job_Queue_Repository_Interface 
 		if ( isset( $this->jobs[ $job_ref ] ) ) {
 			return '';
 		}
-		$this->jobs[ $job_ref ] = array_merge( $data, array( 'id' => $this->next_id++, 'retry_count' => 0 ) );
+		$this->jobs[ $job_ref ] = array_merge(
+			$data,
+			array(
+				'id'          => $this->next_id++,
+				'retry_count' => 0,
+			)
+		);
 		return $job_ref;
 	}
 
@@ -136,7 +148,7 @@ final class Stub_Job_Queue_Repository implements Job_Queue_Repository_Interface 
 /** Stub plan state for queue service tests. */
 final class Stub_Plan_State_For_Queue implements Plan_State_For_Execution_Interface {
 
-	public $get_by_key_return = null;
+	public $get_by_key_return          = null;
 	public $get_plan_definition_return = array();
 
 	public function get_by_key( string $key ): ?array {
@@ -165,16 +177,19 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 	/** Example bulk dispatch payload (request_bulk_execution input + enqueue output). */
 	public static function example_bulk_dispatch_payload(): array {
 		return array(
-			'request' => array(
+			'request'         => array(
 				'plan_id'       => 'aio-plan-uuid-1',
 				'item_ids'      => array( 'plan_npc_0', 'plan_npc_1' ),
 				'actor_context' => array(
-					'actor_type'          => 'user',
-					'actor_id'            => '1',
-					'capability_checked'  => 'aio_execute_build_plans',
-					'checked_at'          => '2025-03-11T12:00:00Z',
+					'actor_type'         => 'user',
+					'actor_id'           => '1',
+					'capability_checked' => 'aio_execute_build_plans',
+					'checked_at'         => '2025-03-11T12:00:00Z',
 				),
-				'options'       => array( 'run_immediately' => true, 'priority' => 5 ),
+				'options'       => array(
+					'run_immediately' => true,
+					'priority'        => 5,
+				),
 			),
 			'response_queued' => array(
 				'plan_id'         => 'aio-plan-uuid-1',
@@ -200,12 +215,19 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 			'action_id'      => 'exec_plan_npc_0_batch1',
 			'plan_item_id'   => 'plan_npc_0',
 			'result_summary' => array(
-				'action_id'       => 'exec_plan_npc_0_batch1',
-				'action_type'     => 'create_page',
-				'status'          => 'completed',
-				'completed_at'    => gmdate( 'c' ),
-				'handler_result'  => array( 'success' => true, 'artifacts' => array( 'post_id' => 42 ) ),
-				'build_plan_updates' => array( 'plan_id' => 'aio-plan-uuid-1', 'plan_item_id' => 'plan_npc_0', 'item_status' => 'completed' ),
+				'action_id'          => 'exec_plan_npc_0_batch1',
+				'action_type'        => 'create_page',
+				'status'             => 'completed',
+				'completed_at'       => gmdate( 'c' ),
+				'handler_result'     => array(
+					'success'   => true,
+					'artifacts' => array( 'post_id' => 42 ),
+				),
+				'build_plan_updates' => array(
+					'plan_id'      => 'aio-plan-uuid-1',
+					'plan_item_id' => 'plan_npc_0',
+					'item_status'  => 'completed',
+				),
 			),
 			'retry_count'    => 0,
 			'retry_eligible' => false,
@@ -219,38 +241,53 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 			array(
 				Build_Plan_Item_Schema::KEY_STEP_ID   => 'step_new_pages',
 				Build_Plan_Item_Schema::KEY_STEP_TYPE => 'new_pages',
-				Build_Plan_Item_Schema::KEY_TITLE    => 'New pages',
+				Build_Plan_Item_Schema::KEY_TITLE     => 'New pages',
 				Build_Plan_Item_Schema::KEY_ORDER     => 1,
-				Build_Plan_Item_Schema::KEY_ITEMS    => array(
+				Build_Plan_Item_Schema::KEY_ITEMS     => array(
 					array(
-						Build_Plan_Item_Schema::KEY_ITEM_ID   => 'plan_npc_0',
+						Build_Plan_Item_Schema::KEY_ITEM_ID => 'plan_npc_0',
 						Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE,
-						Build_Plan_Item_Schema::KEY_STATUS   => Build_Plan_Item_Statuses::APPROVED,
-						Build_Plan_Item_Schema::KEY_PAYLOAD => array( 'template_ref' => array( 'type' => 'internal_key', 'value' => 'landing' ) ),
+						Build_Plan_Item_Schema::KEY_STATUS => Build_Plan_Item_Statuses::APPROVED,
+						Build_Plan_Item_Schema::KEY_PAYLOAD => array(
+							'template_ref' => array(
+								'type'  => 'internal_key',
+								'value' => 'landing',
+							),
+						),
 						Build_Plan_Item_Schema::KEY_DEPENDS_ON_ITEM_IDS => array(),
 					),
 					array(
-						Build_Plan_Item_Schema::KEY_ITEM_ID   => 'plan_npc_1',
+						Build_Plan_Item_Schema::KEY_ITEM_ID => 'plan_npc_1',
 						Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE,
-						Build_Plan_Item_Schema::KEY_STATUS   => Build_Plan_Item_Statuses::APPROVED,
-						Build_Plan_Item_Schema::KEY_PAYLOAD => array( 'template_ref' => array( 'type' => 'internal_key', 'value' => 'landing' ) ),
+						Build_Plan_Item_Schema::KEY_STATUS => Build_Plan_Item_Statuses::APPROVED,
+						Build_Plan_Item_Schema::KEY_PAYLOAD => array(
+							'template_ref' => array(
+								'type'  => 'internal_key',
+								'value' => 'landing',
+							),
+						),
 						Build_Plan_Item_Schema::KEY_DEPENDS_ON_ITEM_IDS => array( 'plan_npc_0' ),
 					),
 				),
 			),
 		);
 		return array(
-			Build_Plan_Schema::KEY_PLAN_ID   => 'aio-plan-uuid-1',
-			Build_Plan_Schema::KEY_STATUS    => 'approved',
-			Build_Plan_Schema::KEY_STEPS     => $steps,
+			Build_Plan_Schema::KEY_PLAN_ID => 'aio-plan-uuid-1',
+			Build_Plan_Schema::KEY_STATUS  => 'approved',
+			Build_Plan_Schema::KEY_STEPS   => $steps,
 		);
 	}
 
 	public function test_bulk_executor_builds_ordered_envelopes_respecting_dependencies(): void {
-		$executor = new Bulk_Executor();
+		$executor   = new Bulk_Executor();
 		$definition = self::plan_definition_with_deps();
-		$actor = array( 'actor_type' => 'user', 'actor_id' => '1', 'capability_checked' => 'aio_execute_build_plans', 'checked_at' => gmdate( 'c' ) );
-		$envelopes = $executor->build_ordered_envelopes( 'aio-plan-uuid-1', $definition, null, $actor, 'batch1' );
+		$actor      = array(
+			'actor_type'         => 'user',
+			'actor_id'           => '1',
+			'capability_checked' => 'aio_execute_build_plans',
+			'checked_at'         => gmdate( 'c' ),
+		);
+		$envelopes  = $executor->build_ordered_envelopes( 'aio-plan-uuid-1', $definition, null, $actor, 'batch1' );
 		$this->assertCount( 2, $envelopes );
 		$first = $envelopes[0];
 		$this->assertSame( 'plan_npc_0', $first[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] );
@@ -263,10 +300,15 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 	}
 
 	public function test_bulk_executor_filters_by_item_ids_when_provided(): void {
-		$executor = new Bulk_Executor();
+		$executor   = new Bulk_Executor();
 		$definition = self::plan_definition_with_deps();
-		$actor = array( 'actor_type' => 'user', 'actor_id' => '1', 'capability_checked' => 'aio_execute_build_plans', 'checked_at' => gmdate( 'c' ) );
-		$envelopes = $executor->build_ordered_envelopes( 'aio-plan-uuid-1', $definition, array( 'plan_npc_1' ), $actor, 'batch2' );
+		$actor      = array(
+			'actor_type'         => 'user',
+			'actor_id'           => '1',
+			'capability_checked' => 'aio_execute_build_plans',
+			'checked_at'         => gmdate( 'c' ),
+		);
+		$envelopes  = $executor->build_ordered_envelopes( 'aio-plan-uuid-1', $definition, array( 'plan_npc_1' ), $actor, 'batch2' );
 		$this->assertCount( 1, $envelopes );
 		$this->assertSame( 'plan_npc_1', $envelopes[0][ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] );
 	}
@@ -274,8 +316,13 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 	public function test_bulk_executor_skips_non_approved_items(): void {
 		$definition = self::plan_definition_with_deps();
 		$definition[ Build_Plan_Schema::KEY_STEPS ][0][ Build_Plan_Item_Schema::KEY_ITEMS ][0][ Build_Plan_Item_Schema::KEY_STATUS ] = Build_Plan_Item_Statuses::PENDING;
-		$executor = new Bulk_Executor();
-		$actor = array( 'actor_type' => 'user', 'actor_id' => '1', 'capability_checked' => 'aio_execute_build_plans', 'checked_at' => gmdate( 'c' ) );
+		$executor  = new Bulk_Executor();
+		$actor     = array(
+			'actor_type'         => 'user',
+			'actor_id'           => '1',
+			'capability_checked' => 'aio_execute_build_plans',
+			'checked_at'         => gmdate( 'c' ),
+		);
 		$envelopes = $executor->build_ordered_envelopes( 'aio-plan-uuid-1', $definition, null, $actor, 'batch3' );
 		$this->assertCount( 1, $envelopes );
 		$this->assertSame( 'plan_npc_1', $envelopes[0][ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] );
@@ -296,15 +343,21 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 	}
 
 	public function test_dispatcher_enqueue_batch_persists_jobs_and_returns_job_refs(): void {
-		$stub_repo = new Stub_Job_Queue_Repository();
-		$stub_plan = new Stub_Plan_State_For_Executor_Queue();
-		$stub_plan->get_by_key_return = array( 'id' => 1 );
+		$stub_repo                             = new Stub_Job_Queue_Repository();
+		$stub_plan                             = new Stub_Plan_State_For_Executor_Queue();
+		$stub_plan->get_by_key_return          = array( 'id' => 1 );
 		$stub_plan->get_plan_definition_return = array();
-		$dispatcher = new Execution_Dispatcher();
-		$executor = new Single_Action_Executor( $dispatcher, $stub_plan, function (): bool { return true; } );
-		$job_dispatcher = new Execution_Job_Dispatcher( $stub_repo, $executor );
-		$envelope = $this->valid_envelope( 'plan_npc_0', Execution_Action_Types::CREATE_PAGE );
-		$job_refs = $job_dispatcher->enqueue_batch( array( $envelope ), 'user:1', 0 );
+		$dispatcher                            = new Execution_Dispatcher();
+		$executor                              = new Single_Action_Executor(
+			$dispatcher,
+			$stub_plan,
+			function (): bool {
+				return true;
+			}
+		);
+		$job_dispatcher                        = new Execution_Job_Dispatcher( $stub_repo, $executor );
+		$envelope                              = $this->valid_envelope( 'plan_npc_0', Execution_Action_Types::CREATE_PAGE );
+		$job_refs                              = $job_dispatcher->enqueue_batch( array( $envelope ), 'user:1', 0 );
 		$this->assertCount( 1, $job_refs );
 		$this->assertNotEmpty( $job_refs[0] );
 		$job = $stub_repo->get_by_key( $job_refs[0] );
@@ -314,21 +367,36 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 	}
 
 	public function test_dispatcher_process_job_returns_result_and_updates_job_status(): void {
-		$stub_repo = new Stub_Job_Queue_Repository();
-		$stub_plan = new Stub_Plan_State_For_Executor_Queue();
-		$stub_plan->get_by_key_return = array( 'id' => 1 );
-		$stub_plan->get_plan_definition_return = array( Build_Plan_Schema::KEY_PLAN_ID => 'aio-plan-uuid-1', Build_Plan_Schema::KEY_STEPS => array() );
-		$stub_plan->find_step_index_return = 0;
-		$dispatcher = new Execution_Dispatcher();
-		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
-			public function execute( array $envelope ): array {
-				return array( 'success' => true, 'artifacts' => array( 'post_id' => 99 ) );
+		$stub_repo                             = new Stub_Job_Queue_Repository();
+		$stub_plan                             = new Stub_Plan_State_For_Executor_Queue();
+		$stub_plan->get_by_key_return          = array( 'id' => 1 );
+		$stub_plan->get_plan_definition_return = array(
+			Build_Plan_Schema::KEY_PLAN_ID => 'aio-plan-uuid-1',
+			Build_Plan_Schema::KEY_STEPS   => array(),
+		);
+		$stub_plan->find_step_index_return     = 0;
+		$dispatcher                            = new Execution_Dispatcher();
+		$dispatcher->register_handler(
+			Execution_Action_Types::CREATE_PAGE,
+			new class() implements Execution_Handler_Interface {
+				public function execute( array $envelope ): array {
+					return array(
+						'success'   => true,
+						'artifacts' => array( 'post_id' => 99 ),
+					);
+				}
 			}
-		} );
-		$executor = new Single_Action_Executor( $dispatcher, $stub_plan, function (): bool { return true; } );
+		);
+		$executor       = new Single_Action_Executor(
+			$dispatcher,
+			$stub_plan,
+			function (): bool {
+				return true;
+			}
+		);
 		$job_dispatcher = new Execution_Job_Dispatcher( $stub_repo, $executor );
-		$envelope = $this->valid_envelope( 'plan_npc_0', Execution_Action_Types::CREATE_PAGE );
-		$job_refs = $job_dispatcher->enqueue_batch( array( $envelope ), 'user:1', 0 );
+		$envelope       = $this->valid_envelope( 'plan_npc_0', Execution_Action_Types::CREATE_PAGE );
+		$job_refs       = $job_dispatcher->enqueue_batch( array( $envelope ), 'user:1', 0 );
 		$this->assertCount( 1, $job_refs );
 		$result = $job_dispatcher->process_job( $job_refs[0] );
 		$this->assertInstanceOf( Execution_Job_Result::class, $result );
@@ -339,27 +407,42 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 	}
 
 	public function test_dispatcher_process_batch_reports_partial_failure(): void {
-		$stub_repo = new Stub_Job_Queue_Repository();
-		$stub_plan = new Stub_Plan_State_For_Executor_Queue();
-		$stub_plan->get_by_key_return = array( 'id' => 1 );
-		$stub_plan->get_plan_definition_return = array( Build_Plan_Schema::KEY_PLAN_ID => 'aio-plan-uuid-1', Build_Plan_Schema::KEY_STEPS => array() );
-		$stub_plan->find_step_index_return = 0;
-		$dispatcher = new Execution_Dispatcher();
-		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
-			public function execute( array $envelope ): array {
-				$item_id = $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ?? '';
-				return $item_id === 'plan_npc_0' ? array( 'success' => true ) : array( 'success' => false, 'message' => 'Handler failed.' );
+		$stub_repo                             = new Stub_Job_Queue_Repository();
+		$stub_plan                             = new Stub_Plan_State_For_Executor_Queue();
+		$stub_plan->get_by_key_return          = array( 'id' => 1 );
+		$stub_plan->get_plan_definition_return = array(
+			Build_Plan_Schema::KEY_PLAN_ID => 'aio-plan-uuid-1',
+			Build_Plan_Schema::KEY_STEPS   => array(),
+		);
+		$stub_plan->find_step_index_return     = 0;
+		$dispatcher                            = new Execution_Dispatcher();
+		$dispatcher->register_handler(
+			Execution_Action_Types::CREATE_PAGE,
+			new class() implements Execution_Handler_Interface {
+				public function execute( array $envelope ): array {
+					$item_id = $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ?? '';
+					return $item_id === 'plan_npc_0' ? array( 'success' => true ) : array(
+						'success' => false,
+						'message' => 'Handler failed.',
+					);
+				}
 			}
-		} );
-		$executor = new Single_Action_Executor( $dispatcher, $stub_plan, function (): bool { return true; } );
+		);
+		$executor       = new Single_Action_Executor(
+			$dispatcher,
+			$stub_plan,
+			function (): bool {
+				return true;
+			}
+		);
 		$job_dispatcher = new Execution_Job_Dispatcher( $stub_repo, $executor );
-		$e0 = $this->valid_envelope( 'plan_npc_0', Execution_Action_Types::CREATE_PAGE );
-		$e1 = $this->valid_envelope( 'plan_npc_1', Execution_Action_Types::CREATE_PAGE );
-		$job_refs = $job_dispatcher->enqueue_batch( array( $e0, $e1 ), 'user:1', 0 );
-		$results = $job_dispatcher->process_batch( $job_refs );
+		$e0             = $this->valid_envelope( 'plan_npc_0', Execution_Action_Types::CREATE_PAGE );
+		$e1             = $this->valid_envelope( 'plan_npc_1', Execution_Action_Types::CREATE_PAGE );
+		$job_refs       = $job_dispatcher->enqueue_batch( array( $e0, $e1 ), 'user:1', 0 );
+		$results        = $job_dispatcher->process_batch( $job_refs );
 		$this->assertCount( 2, $results );
 		$completed = 0;
-		$failed = 0;
+		$failed    = 0;
 		foreach ( $results as $r ) {
 			if ( $r->get_status() === Execution_Job_Result::STATUS_COMPLETED ) {
 				++$completed;
@@ -381,20 +464,31 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 	}
 
 	public function test_queue_service_returns_queued_when_not_run_immediately(): void {
-		$plan_state = new Stub_Plan_State_For_Queue();
-		$plan_state->get_by_key_return = array( 'id' => 1 );
-		$plan_state->get_plan_definition_return = self::plan_definition_with_deps();
-		$bulk = new Bulk_Executor();
-		$stub_repo = new Stub_Job_Queue_Repository();
-		$stub_plan_exec = new Stub_Plan_State_For_Executor_Queue();
-		$stub_plan_exec->get_by_key_return = array( 'id' => 1 );
+		$plan_state                                 = new Stub_Plan_State_For_Queue();
+		$plan_state->get_by_key_return              = array( 'id' => 1 );
+		$plan_state->get_plan_definition_return     = self::plan_definition_with_deps();
+		$bulk                                       = new Bulk_Executor();
+		$stub_repo                                  = new Stub_Job_Queue_Repository();
+		$stub_plan_exec                             = new Stub_Plan_State_For_Executor_Queue();
+		$stub_plan_exec->get_by_key_return          = array( 'id' => 1 );
 		$stub_plan_exec->get_plan_definition_return = array();
-		$dispatcher = new Execution_Dispatcher();
-		$executor = new Single_Action_Executor( $dispatcher, $stub_plan_exec, function (): bool { return true; } );
-		$job_dispatcher = new Execution_Job_Dispatcher( $stub_repo, $executor );
-		$service = new Execution_Queue_Service( $plan_state, $bulk, $job_dispatcher );
-		$actor = array( 'actor_type' => 'user', 'actor_id' => '1', 'capability_checked' => 'aio_execute_build_plans', 'checked_at' => gmdate( 'c' ) );
-		$out = $service->request_bulk_execution( 'aio-plan-uuid-1', null, $actor, array( 'run_immediately' => false ) );
+		$dispatcher                                 = new Execution_Dispatcher();
+		$executor                                   = new Single_Action_Executor(
+			$dispatcher,
+			$stub_plan_exec,
+			function (): bool {
+				return true;
+			}
+		);
+		$job_dispatcher                             = new Execution_Job_Dispatcher( $stub_repo, $executor );
+		$service                                    = new Execution_Queue_Service( $plan_state, $bulk, $job_dispatcher );
+		$actor                                      = array(
+			'actor_type'         => 'user',
+			'actor_id'           => '1',
+			'capability_checked' => 'aio_execute_build_plans',
+			'checked_at'         => gmdate( 'c' ),
+		);
+		$out                                        = $service->request_bulk_execution( 'aio-plan-uuid-1', null, $actor, array( 'run_immediately' => false ) );
 		$this->assertSame( 'queued', $out['status'] );
 		$this->assertNotEmpty( $out['job_refs'] );
 		$this->assertSame( 0, $out['completed_count'] );
@@ -402,27 +496,47 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 	}
 
 	public function test_queue_service_run_immediately_aggregates_item_results_and_partial_failure(): void {
-		$plan_state = new Stub_Plan_State_For_Queue();
-		$plan_state->get_by_key_return = array( 'id' => 1 );
-		$plan_state->get_plan_definition_return = self::plan_definition_with_deps();
-		$bulk = new Bulk_Executor();
-		$stub_repo = new Stub_Job_Queue_Repository();
-		$stub_plan_exec = new Stub_Plan_State_For_Executor_Queue();
-		$stub_plan_exec->get_by_key_return = array( 'id' => 1 );
-		$stub_plan_exec->get_plan_definition_return = array( Build_Plan_Schema::KEY_PLAN_ID => 'aio-plan-uuid-1', Build_Plan_Schema::KEY_STEPS => array() );
-		$stub_plan_exec->find_step_index_return = 0;
-		$dispatcher = new Execution_Dispatcher();
-		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
-			public function execute( array $envelope ): array {
-				$item_id = $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ?? '';
-				return $item_id === 'plan_npc_0' ? array( 'success' => true ) : array( 'success' => false, 'message' => 'Fail' );
+		$plan_state                                 = new Stub_Plan_State_For_Queue();
+		$plan_state->get_by_key_return              = array( 'id' => 1 );
+		$plan_state->get_plan_definition_return     = self::plan_definition_with_deps();
+		$bulk                                       = new Bulk_Executor();
+		$stub_repo                                  = new Stub_Job_Queue_Repository();
+		$stub_plan_exec                             = new Stub_Plan_State_For_Executor_Queue();
+		$stub_plan_exec->get_by_key_return          = array( 'id' => 1 );
+		$stub_plan_exec->get_plan_definition_return = array(
+			Build_Plan_Schema::KEY_PLAN_ID => 'aio-plan-uuid-1',
+			Build_Plan_Schema::KEY_STEPS   => array(),
+		);
+		$stub_plan_exec->find_step_index_return     = 0;
+		$dispatcher                                 = new Execution_Dispatcher();
+		$dispatcher->register_handler(
+			Execution_Action_Types::CREATE_PAGE,
+			new class() implements Execution_Handler_Interface {
+				public function execute( array $envelope ): array {
+					$item_id = $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ?? '';
+					return $item_id === 'plan_npc_0' ? array( 'success' => true ) : array(
+						'success' => false,
+						'message' => 'Fail',
+					);
+				}
 			}
-		} );
-		$executor = new Single_Action_Executor( $dispatcher, $stub_plan_exec, function (): bool { return true; } );
+		);
+		$executor       = new Single_Action_Executor(
+			$dispatcher,
+			$stub_plan_exec,
+			function (): bool {
+				return true;
+			}
+		);
 		$job_dispatcher = new Execution_Job_Dispatcher( $stub_repo, $executor );
-		$service = new Execution_Queue_Service( $plan_state, $bulk, $job_dispatcher );
-		$actor = array( 'actor_type' => 'user', 'actor_id' => '1', 'capability_checked' => 'aio_execute_build_plans', 'checked_at' => gmdate( 'c' ) );
-		$out = $service->request_bulk_execution( 'aio-plan-uuid-1', null, $actor, array( 'run_immediately' => true ) );
+		$service        = new Execution_Queue_Service( $plan_state, $bulk, $job_dispatcher );
+		$actor          = array(
+			'actor_type'         => 'user',
+			'actor_id'           => '1',
+			'capability_checked' => 'aio_execute_build_plans',
+			'checked_at'         => gmdate( 'c' ),
+		);
+		$out            = $service->request_bulk_execution( 'aio-plan-uuid-1', null, $actor, array( 'run_immediately' => true ) );
 		$this->assertSame( 'partial', $out['status'] );
 		$this->assertTrue( $out['partial_failure'] );
 		$this->assertSame( 1, $out['completed_count'] );
@@ -435,18 +549,23 @@ final class Bulk_Executor_And_Queue_Test extends TestCase {
 
 	private function valid_envelope( string $plan_item_id, string $action_type ): array {
 		return array(
-			Execution_Action_Contract::ENVELOPE_ACTION_ID        => 'exec_' . $plan_item_id . '_' . gmdate( 'Ymd\THis\Z' ),
-			Execution_Action_Contract::ENVELOPE_ACTION_TYPE       => $action_type,
-			Execution_Action_Contract::ENVELOPE_PLAN_ID         => 'aio-plan-uuid-1',
-			Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID      => $plan_item_id,
-			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE  => array( 'plan_item_id' => $plan_item_id ),
-			Execution_Action_Contract::ENVELOPE_APPROVAL_STATE    => array(
+			Execution_Action_Contract::ENVELOPE_ACTION_ID  => 'exec_' . $plan_item_id . '_' . gmdate( 'Ymd\THis\Z' ),
+			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => $action_type,
+			Execution_Action_Contract::ENVELOPE_PLAN_ID    => 'aio-plan-uuid-1',
+			Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID => $plan_item_id,
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'plan_item_id' => $plan_item_id ),
+			Execution_Action_Contract::ENVELOPE_APPROVAL_STATE => array(
 				Execution_Action_Contract::APPROVAL_PLAN_STATUS => 'approved',
 				Execution_Action_Contract::APPROVAL_ITEM_STATUS => 'approved',
 				Execution_Action_Contract::APPROVAL_VERIFIED_AT => gmdate( 'c' ),
 			),
-			Execution_Action_Contract::ENVELOPE_ACTOR_CONTEXT     => array( 'actor_type' => 'user', 'actor_id' => '1', 'capability_checked' => 'aio_execute_build_plans', 'checked_at' => gmdate( 'c' ) ),
-			Execution_Action_Contract::ENVELOPE_CREATED_AT       => gmdate( 'c' ),
+			Execution_Action_Contract::ENVELOPE_ACTOR_CONTEXT => array(
+				'actor_type'         => 'user',
+				'actor_id'           => '1',
+				'capability_checked' => 'aio_execute_build_plans',
+				'checked_at'         => gmdate( 'c' ),
+			),
+			Execution_Action_Contract::ENVELOPE_CREATED_AT => gmdate( 'c' ),
 		);
 	}
 }

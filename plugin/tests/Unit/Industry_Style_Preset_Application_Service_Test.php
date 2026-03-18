@@ -49,9 +49,9 @@ final class Industry_Style_Preset_Application_Service_Test extends TestCase {
 	private function valid_preset( string $key = 'legal_serious', array $token_values = array() ): array {
 		$p = array(
 			Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => $key,
-			Industry_Style_Preset_Registry::FIELD_LABEL            => 'Legal Serious',
-			Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => Industry_Style_Preset_Registry::SUPPORTED_SCHEMA_VERSION,
-			Industry_Style_Preset_Registry::FIELD_STATUS           => Industry_Style_Preset_Registry::STATUS_ACTIVE,
+			Industry_Style_Preset_Registry::FIELD_LABEL  => 'Legal Serious',
+			Industry_Style_Preset_Registry::FIELD_VERSION_MARKER => Industry_Style_Preset_Registry::SUPPORTED_SCHEMA_VERSION,
+			Industry_Style_Preset_Registry::FIELD_STATUS => Industry_Style_Preset_Registry::STATUS_ACTIVE,
 		);
 		if ( $token_values !== array() ) {
 			$p[ Industry_Style_Preset_Registry::FIELD_TOKEN_VALUES ] = $token_values;
@@ -113,10 +113,17 @@ final class Industry_Style_Preset_Application_Service_Test extends TestCase {
 		$token_reg  = new Style_Token_Registry( $loader );
 		$style_repo = new Global_Style_Settings_Repository( $token_reg, null );
 		$preset_reg = new Industry_Style_Preset_Registry();
-		$preset_reg->load( array( $this->valid_preset( 'realtor_warm', array(
-			'--aio-color-primary' => '#1a365d',
-			'--aio-space-md'      => '1rem',
-		) ) ) );
+		$preset_reg->load(
+			array(
+				$this->valid_preset(
+					'realtor_warm',
+					array(
+						'--aio-color-primary' => '#1a365d',
+						'--aio-space-md'      => '1rem',
+					)
+				),
+			)
+		);
 		$service = new Industry_Style_Preset_Application_Service( $preset_reg, $style_repo, $token_reg );
 		$this->assertTrue( $service->apply_preset( 'realtor_warm' ) );
 		$tokens = $style_repo->get_global_tokens();

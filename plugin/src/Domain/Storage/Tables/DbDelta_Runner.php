@@ -21,7 +21,7 @@ final class DbDelta_Runner {
 	 * Executes a CREATE TABLE statement via dbDelta. Idempotent for create/upgrade.
 	 *
 	 * @param \wpdb|object $wpdb Database abstraction (must have suppress_errors, last_error).
-	 * @param string      $sql  Full CREATE TABLE statement (dbDelta-compliant).
+	 * @param string       $sql  Full CREATE TABLE statement (dbDelta-compliant).
 	 * @return array{success: bool, error: string} success true when no db error; error sanitized, empty on success.
 	 */
 	public function run( $wpdb, string $sql ): array {

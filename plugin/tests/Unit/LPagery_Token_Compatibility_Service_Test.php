@@ -130,12 +130,36 @@ final class LPagery_Token_Compatibility_Service_Test extends TestCase {
 			'mapping_convention'           => 'group.name',
 			'canonical_identity_preserved' => true,
 			'sample_mappings'              => array(
-				array( 'canonical_group' => 'color', 'canonical_name' => 'primary', 'lpagery_key' => 'color.primary' ),
-				array( 'canonical_group' => 'typography', 'canonical_name' => 'heading', 'lpagery_key' => 'typography.heading' ),
-				array( 'canonical_group' => 'spacing', 'canonical_name' => 'medium', 'lpagery_key' => 'spacing.medium' ),
-				array( 'canonical_group' => 'radius', 'canonical_name' => 'default', 'lpagery_key' => 'radius.default' ),
-				array( 'canonical_group' => 'shadow', 'canonical_name' => 'card', 'lpagery_key' => 'shadow.card' ),
-				array( 'canonical_group' => 'component', 'canonical_name' => 'button', 'lpagery_key' => 'component.button' ),
+				array(
+					'canonical_group' => 'color',
+					'canonical_name'  => 'primary',
+					'lpagery_key'     => 'color.primary',
+				),
+				array(
+					'canonical_group' => 'typography',
+					'canonical_name'  => 'heading',
+					'lpagery_key'     => 'typography.heading',
+				),
+				array(
+					'canonical_group' => 'spacing',
+					'canonical_name'  => 'medium',
+					'lpagery_key'     => 'spacing.medium',
+				),
+				array(
+					'canonical_group' => 'radius',
+					'canonical_name'  => 'default',
+					'lpagery_key'     => 'radius.default',
+				),
+				array(
+					'canonical_group' => 'shadow',
+					'canonical_name'  => 'card',
+					'lpagery_key'     => 'shadow.card',
+				),
+				array(
+					'canonical_group' => 'component',
+					'canonical_name'  => 'button',
+					'lpagery_key'     => 'component.button',
+				),
 			),
 			'unsupported_warnings'         => array(),
 		);
@@ -171,14 +195,14 @@ final class LPagery_Token_Compatibility_Service_Test extends TestCase {
 	/** Prompt 179: validate_token_key supported and unsupported. */
 	public function test_validate_token_key_supported(): void {
 		$service = new LPagery_Token_Compatibility_Service();
-		$out = $service->validate_token_key( 'color.primary' );
+		$out     = $service->validate_token_key( 'color.primary' );
 		$this->assertTrue( $out['supported'] );
 		$this->assertSame( '', $out['reason'] );
 	}
 
 	public function test_validate_token_key_unsupported(): void {
 		$service = new LPagery_Token_Compatibility_Service();
-		$out = $service->validate_token_key( 'no-dot' );
+		$out     = $service->validate_token_key( 'no-dot' );
 		$this->assertFalse( $out['supported'] );
 		$this->assertNotEmpty( $out['reason'] );
 	}

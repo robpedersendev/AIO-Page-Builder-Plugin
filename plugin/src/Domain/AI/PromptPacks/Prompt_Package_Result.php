@@ -29,9 +29,9 @@ final class Prompt_Package_Result {
 	private ?array $selected_pack;
 
 	/**
-	 * @param bool                     $success                   Whether assembly succeeded.
+	 * @param bool                      $success                   Whether assembly succeeded.
 	 * @param array<string, mixed>|null $normalized_prompt_package Package when success.
-	 * @param array<int, string>       $validation_errors         Errors when not success.
+	 * @param array<int, string>        $validation_errors         Errors when not success.
 	 * @param array<string, mixed>|null $selected_pack             Selected pack when success.
 	 */
 	public function __construct(
@@ -41,9 +41,9 @@ final class Prompt_Package_Result {
 		?array $selected_pack = null
 	) {
 		$this->success                   = $success;
-		$this->normalized_prompt_package  = $normalized_prompt_package;
-		$this->validation_errors          = $validation_errors;
-		$this->selected_pack              = $selected_pack;
+		$this->normalized_prompt_package = $normalized_prompt_package;
+		$this->validation_errors         = $validation_errors;
+		$this->selected_pack             = $selected_pack;
 	}
 
 	public function is_success(): bool {

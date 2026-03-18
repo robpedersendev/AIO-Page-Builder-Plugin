@@ -56,7 +56,7 @@ final class ACF_Field_Builder {
 	 * Builds ACF field array from normalized blueprint field.
 	 *
 	 * @param array<string, mixed> $field Normalized blueprint field.
-	 * @param string|null         $parent_key Parent field/group key for subfields.
+	 * @param string|null          $parent_key Parent field/group key for subfields.
 	 * @return array<string, mixed> ACF-compatible field array.
 	 */
 	public function build_field( array $field, ?string $parent_key = null ): array {
@@ -168,7 +168,11 @@ final class ACF_Field_Builder {
 		}
 		if ( isset( $acf['wrapper'] ) && is_array( $acf['wrapper'] ) ) {
 			$acf['wrapper'] = array_merge(
-				array( 'width' => '', 'class' => '', 'id' => '' ),
+				array(
+					'width' => '',
+					'class' => '',
+					'id'    => '',
+				),
 				$acf['wrapper']
 			);
 		}

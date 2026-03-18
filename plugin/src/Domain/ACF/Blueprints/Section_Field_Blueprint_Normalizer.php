@@ -82,20 +82,26 @@ final class Section_Field_Blueprint_Normalizer {
 	 */
 	public function normalize( array $blueprint, ?string $section_key = null, ?string $field_blueprint_ref = null ): array {
 		$section_key = (string) ( $blueprint[ Field_Blueprint_Schema::SECTION_KEY ] ?? $section_key ?? '' );
-		$blueprint = $this->prefill_missing_keys( $blueprint, $section_key );
+		$blueprint   = $this->prefill_missing_keys( $blueprint, $section_key );
 
 		$errors = $this->validator->validate( $blueprint, $section_key ?: null, $field_blueprint_ref );
 		if ( ! empty( $errors ) ) {
-			return array( 'normalized' => array(), 'errors' => $errors );
+			return array(
+				'normalized' => array(),
+				'errors'     => $errors,
+			);
 		}
-		$normalized  = $this->normalize_root( $blueprint );
+		$normalized           = $this->normalize_root( $blueprint );
 		$normalized['fields'] = $this->normalize_fields(
 			(array) ( $blueprint[ Field_Blueprint_Schema::FIELDS ] ?? array() ),
 			$section_key,
 			null
 		);
 
-		return array( 'normalized' => $normalized, 'errors' => array() );
+		return array(
+			'normalized' => $normalized,
+			'errors'     => array(),
+		);
 	}
 
 	/**
@@ -110,8 +116,8 @@ final class Section_Field_Blueprint_Normalizer {
 		if ( ! is_array( $fields ) ) {
 			return $blueprint;
 		}
-		$section_key = Field_Key_Generator::sanitize( $section_key ) ?: 'x';
-		$filled = $this->prefill_fields_keys( $fields, $section_key, null );
+		$section_key                                 = Field_Key_Generator::sanitize( $section_key ) ?: 'x';
+		$filled                                      = $this->prefill_fields_keys( $fields, $section_key, null );
 		$blueprint[ Field_Blueprint_Schema::FIELDS ] = $filled;
 		return $blueprint;
 	}
@@ -128,7 +134,7 @@ final class Section_Field_Blueprint_Normalizer {
 			if ( ! is_array( $field ) ) {
 				continue;
 			}
-			$name = Field_Key_Generator::sanitize( (string) ( $field[ Field_Blueprint_Schema::FIELD_NAME ] ?? '' ) ) ?: 'field_' . ( $i + 1 );
+			$name     = Field_Key_Generator::sanitize( (string) ( $field[ Field_Blueprint_Schema::FIELD_NAME ] ?? '' ) ) ?: 'field_' . ( $i + 1 );
 			$existing = (string) ( $field[ Field_Blueprint_Schema::FIELD_KEY ] ?? '' );
 			if ( $existing === '' || ! Field_Key_Generator::is_valid_key( $existing, 'field' ) ) {
 				if ( $parent_name !== null ) {
@@ -139,7 +145,7 @@ final class Section_Field_Blueprint_Normalizer {
 			}
 			$type = (string) ( $field[ Field_Blueprint_Schema::FIELD_TYPE ] ?? 'text' );
 			if ( Field_Blueprint_Schema::type_requires_sub_fields( $type ) ) {
-				$sub = $field['sub_fields'] ?? array();
+				$sub                 = $field['sub_fields'] ?? array();
 				$field['sub_fields'] = $this->prefill_fields_keys( is_array( $sub ) ? $sub : array(), $section_key, $name );
 			}
 			$out[] = $field;
@@ -190,13 +196,13 @@ final class Section_Field_Blueprint_Normalizer {
 	 * Normalizes field array; generates deterministic keys when missing or invalid.
 	 *
 	 * @param list<array<string, mixed>> $fields
-	 * @param string                    $section_key
-	 * @param string|null               $parent_name For subfields.
+	 * @param string                     $section_key
+	 * @param string|null                $parent_name For subfields.
 	 * @return list<array<string, mixed>>
 	 */
 	private function normalize_fields( array $fields, string $section_key, ?string $parent_name ): array {
-		$out = array();
-		$used_keys = array();
+		$out         = array();
+		$used_keys   = array();
 		$section_key = Field_Key_Generator::sanitize( $section_key );
 		if ( $section_key === '' ) {
 			$section_key = 'x';
@@ -219,7 +225,7 @@ final class Section_Field_Blueprint_Normalizer {
 
 			if ( $parent_name !== null ) {
 				$proposed_key = Field_Key_Generator::subfield_key( $section_key, $parent_name, $name );
-				$key = Field_Key_Generator::ensure_unique( $proposed_key, array_keys( $used_keys ) );
+				$key          = Field_Key_Generator::ensure_unique( $proposed_key, array_keys( $used_keys ) );
 			} else {
 				$proposed_key = Field_Key_Generator::field_key( $section_key, $name );
 				$existing_key = (string) ( $field[ Field_Blueprint_Schema::FIELD_KEY ] ?? '' );
@@ -233,7 +239,7 @@ final class Section_Field_Blueprint_Normalizer {
 
 			$normalized = $this->normalize_field( $field, $key, $name, $type );
 			if ( Field_Blueprint_Schema::type_requires_sub_fields( $type ) ) {
-				$sub = $field['sub_fields'] ?? array();
+				$sub                      = $field['sub_fields'] ?? array();
 				$normalized['sub_fields'] = $this->normalize_fields( is_array( $sub ) ? $sub : array(), $section_key, $name );
 			}
 			$out[] = $normalized;
@@ -300,7 +306,7 @@ final class Section_Field_Blueprint_Normalizer {
 	 */
 	private function sanitize_validation( array $v ): array {
 		$allowed = array( 'required', 'url', 'number', 'pattern', 'maxlength', 'min_rows', 'max_rows', 'warning_if_empty', 'variant_dependent' );
-		$out = array();
+		$out     = array();
 		foreach ( $allowed as $k ) {
 			if ( array_key_exists( $k, $v ) ) {
 				if ( $k === 'required' || $k === 'url' || $k === 'warning_if_empty' ) {
@@ -325,7 +331,7 @@ final class Section_Field_Blueprint_Normalizer {
 	 */
 	private function sanitize_lpagery( array $v ): array {
 		$allowed = array( 'token_compatible', 'token_name', 'injection_notes', 'fallback_behavior', 'unsupported_reason' );
-		$out = array();
+		$out     = array();
 		foreach ( $allowed as $k ) {
 			if ( array_key_exists( $k, $v ) ) {
 				if ( $k === 'token_compatible' ) {

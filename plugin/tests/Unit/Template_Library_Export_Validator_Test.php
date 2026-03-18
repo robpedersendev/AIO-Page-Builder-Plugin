@@ -26,40 +26,40 @@ final class Template_Library_Export_Validator_Test extends TestCase {
 
 	public function test_validate_skips_when_registries_and_compositions_not_included(): void {
 		$validator = new Template_Library_Export_Validator( null, null );
-		$bundle = array(
+		$bundle    = array(
 			'registries' => array(
 				'sections'       => array(),
 				'page_templates' => array(),
 				'compositions'   => array(),
 			),
 		);
-		$summary = $validator->validate( $bundle, array( 'settings', 'profiles' ) );
+		$summary   = $validator->validate( $bundle, array( 'settings', 'profiles' ) );
 		$this->assertTrue( $summary['valid'] );
 		$this->assertSame( 0, $summary['section_count'] );
 		$this->assertArrayHasKey( 'log_reference', $summary );
 	}
 
 	public function test_validate_counts_sections_and_pages_when_registries_included(): void {
-		$validator = new Template_Library_Export_Validator( null, null );
+		$validator    = new Template_Library_Export_Validator( null, null );
 		$section_frag = array(
 			Registry_Export_Fragment_Builder::KEY_OBJECT_KEY => 'st_hero',
-			Registry_Export_Fragment_Builder::KEY_PAYLOAD   => array( Section_Schema::FIELD_INTERNAL_KEY => 'st_hero' ),
+			Registry_Export_Fragment_Builder::KEY_PAYLOAD => array( Section_Schema::FIELD_INTERNAL_KEY => 'st_hero' ),
 		);
-		$page_frag = array(
+		$page_frag    = array(
 			Registry_Export_Fragment_Builder::KEY_OBJECT_KEY => 'pt_landing',
-			Registry_Export_Fragment_Builder::KEY_PAYLOAD   => array(
+			Registry_Export_Fragment_Builder::KEY_PAYLOAD => array(
 				Page_Template_Schema::FIELD_INTERNAL_KEY => 'pt_landing',
-				Page_Template_Schema::FIELD_ONE_PAGER   => array( 'link' => 'https://example.com' ),
+				Page_Template_Schema::FIELD_ONE_PAGER    => array( 'link' => 'https://example.com' ),
 			),
 		);
-		$bundle = array(
+		$bundle       = array(
 			'registries' => array(
 				'sections'       => array( $section_frag ),
 				'page_templates' => array( $page_frag ),
 				'compositions'   => array(),
 			),
 		);
-		$summary = $validator->validate( $bundle, array( 'registries' ) );
+		$summary      = $validator->validate( $bundle, array( 'registries' ) );
 		$this->assertTrue( $summary['valid'] );
 		$this->assertSame( 1, $summary['section_count'] );
 		$this->assertSame( 1, $summary['page_template_count'] );
@@ -72,42 +72,51 @@ final class Template_Library_Export_Validator_Test extends TestCase {
 		$page_frag = array(
 			Registry_Export_Fragment_Builder::KEY_PAYLOAD => array(
 				Page_Template_Schema::FIELD_INTERNAL_KEY => 'pt_missing_op',
-				Page_Template_Schema::FIELD_ONE_PAGER   => array(),
+				Page_Template_Schema::FIELD_ONE_PAGER    => array(),
 			),
 		);
-		$bundle = array(
+		$bundle    = array(
 			'registries' => array(
 				'sections'       => array(),
 				'page_templates' => array( $page_frag ),
 				'compositions'   => array(),
 			),
 		);
-		$summary = $validator->validate( $bundle, array( 'registries' ) );
+		$summary   = $validator->validate( $bundle, array( 'registries' ) );
 		$this->assertTrue( $summary['valid'] );
 		$this->assertContains( 'pt_missing_op', $summary['one_pager_missing_keys'] );
 		$this->assertNotEmpty( $summary['warnings'] );
 	}
 
 	public function test_validate_reports_error_when_section_fragment_missing_internal_key(): void {
-		$validator = new Template_Library_Export_Validator( null, null );
+		$validator    = new Template_Library_Export_Validator( null, null );
 		$section_frag = array(
 			Registry_Export_Fragment_Builder::KEY_PAYLOAD => array( 'name' => 'No key' ),
 		);
-		$bundle = array(
+		$bundle       = array(
 			'registries' => array(
 				'sections'       => array( $section_frag ),
 				'page_templates' => array(),
 				'compositions'   => array(),
 			),
 		);
-		$summary = $validator->validate( $bundle, array( 'registries' ) );
+		$summary      = $validator->validate( $bundle, array( 'registries' ) );
 		$this->assertFalse( $summary['valid'] );
 		$this->assertNotEmpty( $summary['errors'] );
 	}
 
 	public function test_example_export_summary_payload_structure(): void {
 		$validator = new Template_Library_Export_Validator( null, null );
-		$summary = $validator->validate( array( 'registries' => array( 'sections' => array(), 'page_templates' => array(), 'compositions' => array() ) ), array( 'registries' ) );
+		$summary   = $validator->validate(
+			array(
+				'registries' => array(
+					'sections'       => array(),
+					'page_templates' => array(),
+					'compositions'   => array(),
+				),
+			),
+			array( 'registries' )
+		);
 		$this->assertArrayHasKey( 'valid', $summary );
 		$this->assertArrayHasKey( 'section_count', $summary );
 		$this->assertArrayHasKey( 'page_template_count', $summary );

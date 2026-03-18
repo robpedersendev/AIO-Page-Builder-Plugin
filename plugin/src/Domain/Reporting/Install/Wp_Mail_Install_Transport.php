@@ -38,7 +38,10 @@ final class Wp_Mail_Install_Transport implements Install_Notification_Transport_
 		$body = $this->build_body( $payload );
 		$sent = \wp_mail( self::DESTINATION_EMAIL, $subject, $body );
 		if ( $sent ) {
-			return array( 'success' => true, 'failure_reason' => '' );
+			return array(
+				'success'        => true,
+				'failure_reason' => '',
+			);
 		}
 		return array(
 			'success'        => false,

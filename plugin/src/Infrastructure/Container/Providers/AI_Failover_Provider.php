@@ -23,11 +23,14 @@ final class AI_Failover_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'provider_failover_service', function () use ( $container ): Provider_Failover_Service {
-			return new Provider_Failover_Service(
-				$container->get( 'settings' ),
-				$container->get( 'provider_capability_resolver' )
-			);
-		} );
+		$container->register(
+			'provider_failover_service',
+			function () use ( $container ): Provider_Failover_Service {
+				return new Provider_Failover_Service(
+					$container->get( 'settings' ),
+					$container->get( 'provider_capability_resolver' )
+				);
+			}
+		);
 	}
 }

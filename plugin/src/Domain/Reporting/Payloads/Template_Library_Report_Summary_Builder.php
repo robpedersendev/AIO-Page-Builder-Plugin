@@ -53,7 +53,7 @@ final class Template_Library_Report_Summary_Builder {
 	/**
 	 * @param Section_Template_Repository|null $section_repository
 	 * @param Page_Template_Repository|null    $page_repository
-	 * @param Composition_Repository|null     $composition_repository
+	 * @param Composition_Repository|null      $composition_repository
 	 * @param bool                             $appendices_available
 	 * @param callable(): string|null          $compliance_status_provider Optional. Returns ok|warning|critical|unknown.
 	 */
@@ -67,7 +67,7 @@ final class Template_Library_Report_Summary_Builder {
 		$this->section_repository         = $section_repository;
 		$this->page_repository            = $page_repository;
 		$this->composition_repository     = $composition_repository;
-		$this->appendices_available        = $appendices_available;
+		$this->appendices_available       = $appendices_available;
 		$this->compliance_status_provider = $compliance_status_provider;
 	}
 
@@ -77,7 +77,7 @@ final class Template_Library_Report_Summary_Builder {
 	 * @return array<string, mixed> Keys: section_template_count, page_template_count, composition_count, library_version_marker, plugin_version_marker, appendices_available, compliance_summary.
 	 */
 	public function build(): array {
-		$counts = $this->build_counts();
+		$counts     = $this->build_counts();
 		$compliance = 'unknown';
 		if ( $this->compliance_status_provider !== null ) {
 			$v = ( $this->compliance_status_provider )();
@@ -88,10 +88,10 @@ final class Template_Library_Report_Summary_Builder {
 
 		return array_merge(
 			array(
-				'library_version_marker'  => Versions::registry_schema(),
-				'plugin_version_marker'   => Versions::plugin(),
-				'appendices_available'     => $this->appendices_available,
-				'compliance_summary'      => $compliance,
+				'library_version_marker' => Versions::registry_schema(),
+				'plugin_version_marker'  => Versions::plugin(),
+				'appendices_available'   => $this->appendices_available,
+				'compliance_summary'     => $compliance,
 			),
 			$counts
 		);
@@ -105,19 +105,19 @@ final class Template_Library_Report_Summary_Builder {
 	private function build_counts(): array {
 		$out = array(
 			'section_template_count' => 0,
-			'page_template_count'     => 0,
+			'page_template_count'    => 0,
 			'composition_count'      => 0,
 		);
 		if ( $this->section_repository !== null ) {
-			$all = $this->section_repository->list_definitions_by_status( 'active', 10000, 0 );
+			$all                           = $this->section_repository->list_definitions_by_status( 'active', 10000, 0 );
 			$out['section_template_count'] = is_array( $all ) ? count( $all ) : 0;
 		}
 		if ( $this->page_repository !== null ) {
-			$all = $this->page_repository->list_definitions_by_status( 'active', 10000, 0 );
+			$all                        = $this->page_repository->list_definitions_by_status( 'active', 10000, 0 );
 			$out['page_template_count'] = is_array( $all ) ? count( $all ) : 0;
 		}
 		if ( $this->composition_repository !== null ) {
-			$all = $this->composition_repository->list_all_definitions( 10000, 0 );
+			$all                      = $this->composition_repository->list_all_definitions( 10000, 0 );
 			$out['composition_count'] = is_array( $all ) ? count( $all ) : 0;
 		}
 		return $out;

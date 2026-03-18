@@ -29,10 +29,10 @@ final class Entity_Style_Payload_Repository {
 		if ( ! is_array( $raw ) ) {
 			return Entity_Style_Payload_Schema::get_default_option();
 		}
-		$version = isset( $raw[ Entity_Style_Payload_Schema::KEY_VERSION ] ) && is_string( $raw[ Entity_Style_Payload_Schema::KEY_VERSION ] )
+		$version      = isset( $raw[ Entity_Style_Payload_Schema::KEY_VERSION ] ) && is_string( $raw[ Entity_Style_Payload_Schema::KEY_VERSION ] )
 			? $raw[ Entity_Style_Payload_Schema::KEY_VERSION ]
 			: Entity_Style_Payload_Schema::SCHEMA_VERSION;
-		$payloads = isset( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOADS ] ) && is_array( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOADS ] )
+		$payloads     = isset( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOADS ] ) && is_array( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOADS ] )
 			? $raw[ Entity_Style_Payload_Schema::KEY_PAYLOADS ]
 			: array();
 		$out_payloads = array();
@@ -60,9 +60,9 @@ final class Entity_Style_Payload_Repository {
 		if ( $key === '' ) {
 			return Entity_Style_Payload_Schema::get_default_payload();
 		}
-		$full    = $this->get_full();
+		$full     = $this->get_full();
 		$payloads = $full[ Entity_Style_Payload_Schema::KEY_PAYLOADS ][ $entity_type ] ?? array();
-		$raw     = isset( $payloads[ $key ] ) && is_array( $payloads[ $key ] ) ? $payloads[ $key ] : array();
+		$raw      = isset( $payloads[ $key ] ) && is_array( $payloads[ $key ] ) ? $payloads[ $key ] : array();
 		return $this->normalize_payload( $raw );
 	}
 
@@ -92,8 +92,8 @@ final class Entity_Style_Payload_Repository {
 	/**
 	 * Persists entity payload only when the validation result is valid (sanitizer-approved). Use after Styles_JSON_Normalizer + Styles_JSON_Sanitizer.
 	 *
-	 * @param string                 $entity_type
-	 * @param string                 $entity_key
+	 * @param string                  $entity_type
+	 * @param string                  $entity_key
 	 * @param Style_Validation_Result $result
 	 * @return bool True if result was valid and option was updated.
 	 */
@@ -155,8 +155,8 @@ final class Entity_Style_Payload_Repository {
 		$version = isset( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ] ) && is_string( $raw[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ] )
 			? $raw[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ]
 			: Entity_Style_Payload_Schema::PAYLOAD_VERSION;
-		$tokens = $this->normalize_token_overrides( isset( $raw[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] ) ? $raw[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] : array() );
-		$comps  = $this->normalize_component_overrides( isset( $raw[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] ) ? $raw[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] : array() );
+		$tokens  = $this->normalize_token_overrides( isset( $raw[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] ) ? $raw[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] : array() );
+		$comps   = $this->normalize_component_overrides( isset( $raw[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] ) ? $raw[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] : array() );
 		return array(
 			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => $version,
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => $tokens,

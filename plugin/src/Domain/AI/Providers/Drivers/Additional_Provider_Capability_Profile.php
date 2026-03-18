@@ -30,26 +30,26 @@ final class Additional_Provider_Capability_Profile {
 			'provider_id'                 => self::PROVIDER_ID,
 			'structured_output_supported' => true,
 			'file_attachment_supported'   => false,
-			'max_context_tokens'           => 200000,
-			'models'                       => array(
+			'max_context_tokens'          => 200000,
+			'models'                      => array(
 				array(
-					'id'                        => 'claude-sonnet-4-20250514',
+					'id'                         => 'claude-sonnet-4-20250514',
 					'supports_structured_output' => true,
-					'default_for_planning'     => true,
+					'default_for_planning'       => true,
 				),
 				array(
-					'id'                        => 'claude-3-5-sonnet-20241022',
+					'id'                         => 'claude-3-5-sonnet-20241022',
 					'supports_structured_output' => true,
-					'default_for_planning'     => false,
+					'default_for_planning'       => false,
 				),
 				array(
-					'id'                        => 'claude-3-haiku-20240307',
+					'id'                         => 'claude-3-haiku-20240307',
 					'supports_structured_output' => true,
-					'default_for_planning'     => false,
+					'default_for_planning'       => false,
 				),
 			),
-			'error_format_notes'           => 'Anthropic returns error type and message in JSON body.',
-			'retry_notes'                  => 'Rate limits and server errors support retry with backoff.',
+			'error_format_notes'          => 'Anthropic returns error type and message in JSON body.',
+			'retry_notes'                 => 'Rate limits and server errors support retry with backoff.',
 		);
 	}
 }

@@ -85,9 +85,9 @@ final class Menu_Change_Job_Service implements Menu_Change_Job_Service_Interface
 	/**
 	 * Create new menu and assign to location.
 	 *
-	 * @param string               $menu_name
-	 * @param string               $location_slug
-	 * @param array<int, mixed>    $items
+	 * @param string            $menu_name
+	 * @param string            $location_slug
+	 * @param array<int, mixed> $items
 	 * @return Menu_Change_Result
 	 */
 	private function do_create( string $menu_name, string $location_slug, array $items ): Menu_Change_Result {
@@ -107,15 +107,15 @@ final class Menu_Change_Job_Service implements Menu_Change_Job_Service_Interface
 	/**
 	 * Rename existing menu.
 	 *
-	 * @param int       $menu_id
+	 * @param int         $menu_id
 	 * @param string|null $new_name
 	 * @return Menu_Change_Result
 	 */
 	private function do_rename( int $menu_id, ?string $new_name ): Menu_Change_Result {
-		$term = get_term( $menu_id, 'nav_menu' );
+		$term         = get_term( $menu_id, 'nav_menu' );
 		$current_name = ( $term instanceof \WP_Term ) ? $term->name : '';
-		$name = $new_name !== null && $new_name !== '' ? $new_name : $current_name;
-		$updated = wp_update_nav_menu_object( $menu_id, array( 'menu-name' => $name ) );
+		$name         = $new_name !== null && $new_name !== '' ? $new_name : $current_name;
+		$updated      = wp_update_nav_menu_object( $menu_id, array( 'menu-name' => $name ) );
 		if ( is_wp_error( $updated ) ) {
 			return Menu_Change_Result::failure( $updated->get_error_message(), array( 'menu_update_failed' ) );
 		}
@@ -145,8 +145,8 @@ final class Menu_Change_Job_Service implements Menu_Change_Job_Service_Interface
 	/**
 	 * Update items on existing menu.
 	 *
-	 * @param int                $menu_id
-	 * @param array<int, mixed>  $items
+	 * @param int               $menu_id
+	 * @param array<int, mixed> $items
 	 * @return Menu_Change_Result
 	 */
 	private function do_update_items( int $menu_id, array $items ): Menu_Change_Result {
@@ -186,9 +186,9 @@ final class Menu_Change_Job_Service implements Menu_Change_Job_Service_Interface
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			$title    = isset( $item['title'] ) && is_string( $item['title'] ) ? sanitize_text_field( $item['title'] ) : '';
-			$url      = isset( $item['url'] ) && is_string( $item['url'] ) ? esc_url_raw( $item['url'] ) : '';
-			$type     = isset( $item['type'] ) && is_string( $item['type'] ) ? $item['type'] : 'custom';
+			$title     = isset( $item['title'] ) && is_string( $item['title'] ) ? sanitize_text_field( $item['title'] ) : '';
+			$url       = isset( $item['url'] ) && is_string( $item['url'] ) ? esc_url_raw( $item['url'] ) : '';
+			$type      = isset( $item['type'] ) && is_string( $item['type'] ) ? $item['type'] : 'custom';
 			$object_id = isset( $item['object_id'] ) && is_numeric( $item['object_id'] ) ? (int) $item['object_id'] : 0;
 			if ( $title === '' && $url === '' && $object_id <= 0 ) {
 				continue;
@@ -215,17 +215,17 @@ final class Menu_Change_Job_Service implements Menu_Change_Job_Service_Interface
 	 * Resolve nav menu term_id for a context (from current theme location or target ref).
 	 *
 	 * @param string               $menu_context
-	 * @param array<string, mixed>  $target
+	 * @param array<string, mixed> $target
 	 * @return int 0 if not found.
 	 */
 	private function resolve_menu_for_context( string $menu_context, array $target ): int {
 		$location_slug = self::CONTEXT_TO_LOCATION[ $menu_context ] ?? $menu_context;
-		$locations = get_theme_mod( 'nav_menu_locations' );
+		$locations     = get_theme_mod( 'nav_menu_locations' );
 		if ( is_array( $locations ) && isset( $locations[ $location_slug ] ) && (int) $locations[ $location_slug ] > 0 ) {
 			return (int) $locations[ $location_slug ];
 		}
 		if ( isset( $target['existing_menu_id'] ) && is_numeric( $target['existing_menu_id'] ) ) {
-			$id = (int) $target['existing_menu_id'];
+			$id   = (int) $target['existing_menu_id'];
 			$term = get_term( $id, 'nav_menu' );
 			if ( $term instanceof \WP_Term ) {
 				return $id;

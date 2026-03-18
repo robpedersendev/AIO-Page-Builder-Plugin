@@ -101,13 +101,19 @@ final class Existing_Page_Update_Bulk_Action_Service {
 			: array();
 		$step  = $steps[ self::STEP_INDEX_EXISTING_PAGE_CHANGES ] ?? null;
 		if ( ! is_array( $step ) ) {
-			return array( 'approve_all_eligible' => 0, 'deny_all_eligible' => 0 );
+			return array(
+				'approve_all_eligible' => 0,
+				'deny_all_eligible'    => 0,
+			);
 		}
 		$step_type = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' );
 		if ( $step_type !== Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ) {
-			return array( 'approve_all_eligible' => 0, 'deny_all_eligible' => 0 );
+			return array(
+				'approve_all_eligible' => 0,
+				'deny_all_eligible'    => 0,
+			);
 		}
-		$items  = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) ? $step[ Build_Plan_Item_Schema::KEY_ITEMS ] : array();
+		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) ? $step[ Build_Plan_Item_Schema::KEY_ITEMS ] : array();
 		$pending = 0;
 		foreach ( $items as $item ) {
 			if ( is_array( $item ) && (string) ( $item['status'] ?? '' ) === Build_Plan_Item_Statuses::PENDING ) {

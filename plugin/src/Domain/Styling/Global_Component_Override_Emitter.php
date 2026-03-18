@@ -49,7 +49,7 @@ final class Global_Component_Override_Emitter {
 			if ( ! is_string( $component_id ) || ! is_array( $pairs ) ) {
 				continue;
 			}
-			$allowed = $this->component_registry->get_allowed_token_overrides( $component_id );
+			$allowed      = $this->component_registry->get_allowed_token_overrides( $component_id );
 			$element_role = $this->component_registry->get_element_role( $component_id );
 			if ( $element_role === '' || empty( $allowed ) ) {
 				continue;

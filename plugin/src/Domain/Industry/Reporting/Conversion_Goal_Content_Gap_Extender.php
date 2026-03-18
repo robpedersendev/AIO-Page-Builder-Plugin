@@ -28,7 +28,7 @@ final class Conversion_Goal_Content_Gap_Extender {
 
 	/** Goal-specific refinement: goal_key => gap_type => [ refined_action_summary?, additive_note? ]. */
 	private const GOAL_REFINEMENTS = array(
-		'calls' => array(
+		'calls'         => array(
 			Industry_Content_Gap_Detector::GAP_TRUST_PROOF => array(
 				'additive_note' => 'For call-focused sites, visible phone number and click-to-call proof are especially relevant.',
 			),
@@ -36,13 +36,13 @@ final class Conversion_Goal_Content_Gap_Extender {
 				'additive_note' => 'Calls goal: consider lead magnets or offers that encourage phone contact.',
 			),
 		),
-		'bookings' => array(
+		'bookings'      => array(
 			Industry_Content_Gap_Detector::GAP_VALUATION_CONVERSION => array(
 				'refined_action_summary' => 'Add booking availability signals, scheduler links, or calendar integration so visitors can book directly.',
 				'additive_note'          => 'Booking-focused sites benefit from clear availability and booking CTAs.',
 			),
 		),
-		'estimates' => array(
+		'estimates'     => array(
 			Industry_Content_Gap_Detector::GAP_TRUST_PROOF => array(
 				'additive_note' => 'Estimate/quote goals: trust cues (certifications, reviews) support form submission.',
 			),
@@ -57,13 +57,13 @@ final class Conversion_Goal_Content_Gap_Extender {
 				'additive_note'          => 'Consultation goal: make the consultation CTA and value clear.',
 			),
 		),
-		'valuations' => array(
+		'valuations'    => array(
 			Industry_Content_Gap_Detector::GAP_VALUATION_CONVERSION => array(
 				'refined_action_summary' => 'Add valuation tool, CMA, or valuation lead magnet where appropriate.',
 				'additive_note'          => 'Valuation-focused sites need clear valuation entry points.',
 			),
 		),
-		'lead_capture' => array(
+		'lead_capture'  => array(
 			Industry_Content_Gap_Detector::GAP_VALUATION_CONVERSION => array(
 				'refined_action_summary' => 'Add lead capture forms, gated content, or signup paths with clear value exchange.',
 				'additive_note'          => 'Lead capture goal: emphasize form placement and offer clarity.',
@@ -114,7 +114,7 @@ final class Conversion_Goal_Content_Gap_Extender {
 	 * @return array<string, mixed> Gap item with optional goal_influence key.
 	 */
 	public function apply_to_gap_item( array $gap_item, string $goal_key ): array {
-		$gap_type = isset( $gap_item['gap_type'] ) && is_string( $gap_item['gap_type'] ) ? $gap_item['gap_type'] : '';
+		$gap_type   = isset( $gap_item['gap_type'] ) && is_string( $gap_item['gap_type'] ) ? $gap_item['gap_type'] : '';
 		$refinement = $this->get_refinement( $goal_key, $gap_type );
 		if ( $refinement === null ) {
 			return $gap_item;

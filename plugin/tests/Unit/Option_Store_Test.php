@@ -30,8 +30,8 @@ final class Option_Store_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_test_options'] = array();
-		$this->settings = new Settings_Service();
-		$this->store    = new Option_Store( $this->settings );
+		$this->settings               = new Settings_Service();
+		$this->store                  = new Option_Store( $this->settings );
 	}
 
 	protected function tearDown(): void {

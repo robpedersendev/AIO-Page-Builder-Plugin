@@ -40,7 +40,7 @@ final class Industry_Compliance_Rule_Registry_Test extends TestCase {
 
 	public function test_load_skips_invalid_severity(): void {
 		$registry = new Industry_Compliance_Rule_Registry();
-		$rule = $this->valid_rule();
+		$rule     = $this->valid_rule();
 		$rule[ Industry_Compliance_Rule_Registry::FIELD_SEVERITY ] = 'invalid';
 		$registry->load( array( $rule ) );
 		$this->assertNull( $registry->get( 'test_rule_01' ) );
@@ -49,7 +49,7 @@ final class Industry_Compliance_Rule_Registry_Test extends TestCase {
 
 	public function test_load_skips_empty_caution_summary(): void {
 		$registry = new Industry_Compliance_Rule_Registry();
-		$rule = $this->valid_rule();
+		$rule     = $this->valid_rule();
 		$rule[ Industry_Compliance_Rule_Registry::FIELD_CAUTION_SUMMARY ] = '';
 		$registry->load( array( $rule ) );
 		$this->assertNull( $registry->get( 'test_rule_01' ) );
@@ -57,11 +57,13 @@ final class Industry_Compliance_Rule_Registry_Test extends TestCase {
 
 	public function test_get_for_industry_returns_only_that_industry(): void {
 		$registry = new Industry_Compliance_Rule_Registry();
-		$registry->load( array(
-			$this->valid_rule( 'r1', 'plumber' ),
-			$this->valid_rule( 'r2', 'cosmetology_nail' ),
-			$this->valid_rule( 'r3', 'plumber' ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_rule( 'r1', 'plumber' ),
+				$this->valid_rule( 'r2', 'cosmetology_nail' ),
+				$this->valid_rule( 'r3', 'plumber' ),
+			)
+		);
 		$plumber = $registry->get_for_industry( 'plumber' );
 		$this->assertCount( 2, $plumber );
 	}
@@ -84,7 +86,7 @@ final class Industry_Compliance_Rule_Registry_Test extends TestCase {
 	 * Prompt 406: seeded rules exist for all four launch industries; registry loads and severity handling.
 	 */
 	public function test_seeded_rules_per_launch_industry(): void {
-		$defs = Industry_Compliance_Rule_Registry::get_builtin_definitions();
+		$defs     = Industry_Compliance_Rule_Registry::get_builtin_definitions();
 		$registry = new Industry_Compliance_Rule_Registry();
 		$registry->load( $defs );
 		$launch = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );

@@ -55,7 +55,7 @@ final class Hub_Page_Template_Test extends TestCase {
 			$this->assertSame( 'hub', (string) ( $def['template_category_class'] ?? '' ) );
 			$this->assertArrayHasKey( 'template_family', $def );
 			$family = (string) ( $def['template_family'] ?? '' );
-			$this->assertContains( $family, self::ALLOWED_HUB_FAMILIES, "template_family must be one of services, products, offerings, directories, locations" );
+			$this->assertContains( $family, self::ALLOWED_HUB_FAMILIES, 'template_family must be one of services, products, offerings, directories, locations' );
 		}
 	}
 
@@ -80,7 +80,7 @@ final class Hub_Page_Template_Test extends TestCase {
 			$this->assertNotEmpty( $ordered );
 			$section_keys = array();
 			foreach ( $ordered as $item ) {
-				$key = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
+				$key            = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
 				$section_keys[] = $key;
 			}
 			$cta_keys = array_filter( $section_keys, array( self::class, 'is_cta_section_key' ) );
@@ -92,7 +92,7 @@ final class Hub_Page_Template_Test extends TestCase {
 
 	public function test_no_adjacent_cta_sections(): void {
 		foreach ( Hub_Page_Template_Definitions::all_definitions() as $def ) {
-			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+			$ordered      = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			$section_keys = array();
 			foreach ( $ordered as $item ) {
 				$section_keys[] = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
@@ -107,15 +107,18 @@ final class Hub_Page_Template_Test extends TestCase {
 
 	public function test_non_cta_section_count_in_range_8_to_14(): void {
 		foreach ( Hub_Page_Template_Definitions::all_definitions() as $def ) {
-			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+			$ordered      = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			$section_keys = array();
 			foreach ( $ordered as $item ) {
 				$section_keys[] = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
 			}
-			$non_cta = array_filter( $section_keys, function ( $k ) {
-				return ! self::is_cta_section_key( $k );
-			} );
-			$count = count( $non_cta );
+			$non_cta = array_filter(
+				$section_keys,
+				function ( $k ) {
+					return ! self::is_cta_section_key( $k );
+				}
+			);
+			$count   = count( $non_cta );
 			$this->assertGreaterThanOrEqual( 8, $count, "Non-CTA section count must be >= 8, got {$count}" );
 			$this->assertLessThanOrEqual( 14, $count, "Non-CTA section count must be <= 14, got {$count}" );
 		}
@@ -155,7 +158,7 @@ final class Hub_Page_Template_Test extends TestCase {
 		foreach ( Hub_Page_Template_Definitions::all_definitions() as $def ) {
 			$one_pager = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? array();
 			$this->assertIsArray( $one_pager );
-			$has_flow = isset( $one_pager['page_flow_explanation'] ) && (string) $one_pager['page_flow_explanation'] !== '';
+			$has_flow  = isset( $one_pager['page_flow_explanation'] ) && (string) $one_pager['page_flow_explanation'] !== '';
 			$has_drill = isset( $one_pager['drill_down_intent'] ) && (string) $one_pager['drill_down_intent'] !== '';
 			$this->assertTrue( $has_flow || $has_drill, 'Hub one-pager should include page_flow_explanation or drill_down_intent' );
 		}
@@ -164,7 +167,7 @@ final class Hub_Page_Template_Test extends TestCase {
 	public function test_section_requirements_match_ordered_sections(): void {
 		foreach ( Hub_Page_Template_Definitions::all_definitions() as $def ) {
 			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
-			$reqs = $def[ Page_Template_Schema::FIELD_SECTION_REQUIREMENTS ] ?? array();
+			$reqs    = $def[ Page_Template_Schema::FIELD_SECTION_REQUIREMENTS ] ?? array();
 			foreach ( $ordered as $item ) {
 				$key = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
 				$this->assertArrayHasKey( $key, $reqs, "Section requirements must include key: {$key}" );

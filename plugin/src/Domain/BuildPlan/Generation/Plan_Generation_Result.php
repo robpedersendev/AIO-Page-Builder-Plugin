@@ -35,12 +35,12 @@ final class Plan_Generation_Result {
 	private $errors;
 
 	/**
-	 * @param bool                  $success       Whether generation succeeded.
-	 * @param string|null           $plan_id       Plan ID when success.
-	 * @param int                   $plan_post_id  Plan post ID when success (0 when failed).
-	 * @param array<string, mixed>  $plan_payload  Full plan root when success.
+	 * @param bool                                                         $success       Whether generation succeeded.
+	 * @param string|null                                                  $plan_id       Plan ID when success.
+	 * @param int                                                          $plan_post_id  Plan post ID when success (0 when failed).
+	 * @param array<string, mixed>                                         $plan_payload  Full plan root when success.
 	 * @param array{omitted: array<int, array<string, mixed>>, count: int} $omitted_report Omitted report.
-	 * @param array<int, string>    $errors        Error messages when failed.
+	 * @param array<int, string>                                           $errors        Error messages when failed.
 	 */
 	public function __construct(
 		bool $success,
@@ -92,6 +92,16 @@ final class Plan_Generation_Result {
 	 * @return self
 	 */
 	public static function failure( array $errors ): self {
-		return new self( false, null, 0, array(), array( 'omitted' => array(), 'count' => 0 ), $errors );
+		return new self(
+			false,
+			null,
+			0,
+			array(),
+			array(
+				'omitted' => array(),
+				'count'   => 0,
+			),
+			$errors
+		);
 	}
 }

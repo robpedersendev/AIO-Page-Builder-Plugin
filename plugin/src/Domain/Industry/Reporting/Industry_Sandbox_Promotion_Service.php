@@ -42,10 +42,10 @@ final class Industry_Sandbox_Promotion_Service {
 	 * @return array{prerequisites_met: bool, missing_requirements: list<string>}
 	 */
 	public function check_prerequisites( array $dry_run_result ): array {
-		$summary = isset( $dry_run_result['summary'] ) && \is_array( $dry_run_result['summary'] ) ? $dry_run_result['summary'] : array();
+		$summary       = isset( $dry_run_result['summary'] ) && \is_array( $dry_run_result['summary'] ) ? $dry_run_result['summary'] : array();
 		$lint_errors   = (int) ( $summary['lint_errors'] ?? 0 );
 		$health_errors = (int) ( $summary['health_errors'] ?? 0 );
-		$missing = array();
+		$missing       = array();
 		if ( $lint_errors > 0 ) {
 			$missing[] = \sprintf( 'Fix definition lint errors (%d).', $lint_errors );
 		}
@@ -53,7 +53,7 @@ final class Industry_Sandbox_Promotion_Service {
 			$missing[] = \sprintf( 'Fix health check errors (%d).', $health_errors );
 		}
 		return array(
-			self::RESULT_PREREQUISITES_MET => count( $missing ) === 0,
+			self::RESULT_PREREQUISITES_MET    => count( $missing ) === 0,
 			self::RESULT_MISSING_REQUIREMENTS => $missing,
 		);
 	}
@@ -64,11 +64,11 @@ final class Industry_Sandbox_Promotion_Service {
 	 *
 	 * @param array<int, array<string, mixed>> $candidate_packs   Same list passed to run_dry_run().
 	 * @param array<int, array<string, mixed>> $candidate_bundles Same list passed to run_dry_run().
-	 * @param array{summary?: array}          $dry_run_result    Output from run_dry_run().
+	 * @param array{summary?: array}           $dry_run_result    Output from run_dry_run().
 	 * @return array{pack_keys: list<string>, bundle_keys: list<string>, summary: string, prerequisites_met: bool}
 	 */
 	public function get_release_ready_summary( array $candidate_packs, array $candidate_bundles, array $dry_run_result ): array {
-		$prereq = $this->check_prerequisites( $dry_run_result );
+		$prereq    = $this->check_prerequisites( $dry_run_result );
 		$pack_keys = array();
 		foreach ( $candidate_packs as $pack ) {
 			if ( ! \is_array( $pack ) ) {
@@ -81,7 +81,7 @@ final class Industry_Sandbox_Promotion_Service {
 				$pack_keys[] = $key;
 			}
 		}
-		$pack_keys = array_values( array_unique( $pack_keys ) );
+		$pack_keys   = array_values( array_unique( $pack_keys ) );
 		$bundle_keys = array();
 		foreach ( $candidate_bundles as $bundle ) {
 			if ( ! \is_array( $bundle ) ) {
@@ -95,14 +95,14 @@ final class Industry_Sandbox_Promotion_Service {
 			}
 		}
 		$bundle_keys = array_values( array_unique( $bundle_keys ) );
-		$summary = $prereq[ self::RESULT_PREREQUISITES_MET ]
+		$summary     = $prereq[ self::RESULT_PREREQUISITES_MET ]
 			? \sprintf( 'Release-ready candidate: %d pack(s), %d bundle(s). Promotion does not auto-activate.', count( $pack_keys ), count( $bundle_keys ) )
 			: \sprintf( 'Prerequisites not met. Fix errors before promotion. Packs: %d, Bundles: %d.', count( $pack_keys ), count( $bundle_keys ) );
 		return array(
-			self::RESULT_PACK_KEYS         => $pack_keys,
-			self::RESULT_BUNDLE_KEYS      => $bundle_keys,
-			'summary'                     => $summary,
-			'prerequisites_met'           => $prereq[ self::RESULT_PREREQUISITES_MET ],
+			self::RESULT_PACK_KEYS   => $pack_keys,
+			self::RESULT_BUNDLE_KEYS => $bundle_keys,
+			'summary'                => $summary,
+			'prerequisites_met'      => $prereq[ self::RESULT_PREREQUISITES_MET ],
 		);
 	}
 }

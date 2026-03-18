@@ -40,9 +40,9 @@ final class Step_Workspace_Payload_Builder {
 	 *
 	 * @param array<string, mixed> $plan_definition Plan root.
 	 * @param int                  $step_index Step index in steps array.
-	 * @param array<string, bool>   $capabilities can_approve, can_execute, can_view_artifacts.
+	 * @param array<string, bool>  $capabilities can_approve, can_execute, can_view_artifacts.
 	 * @param string|null          $selected_item_id Item id for detail panel; null if none.
-	 * @param array<int, string>    $selected_item_ids Item ids for bulk "apply to selected".
+	 * @param array<int, string>   $selected_item_ids Item ids for bulk "apply to selected".
 	 * @return array<string, mixed> Keys: step_list_rows, column_order, bulk_action_states, detail_panel, step_messages.
 	 */
 	public function build(
@@ -55,16 +55,16 @@ final class Step_Workspace_Payload_Builder {
 		$steps_raw = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
-		$step = $steps_raw[ $step_index ] ?? null;
+		$step      = $steps_raw[ $step_index ] ?? null;
 		if ( ! is_array( $step ) ) {
 			return $this->empty_workspace();
 		}
 
-		$step_type  = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' );
-		$items      = $this->actionable_items_from_step( $step );
+		$step_type    = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' );
+		$items        = $this->actionable_items_from_step( $step );
 		$column_order = self::DEFAULT_COLUMN_ORDER;
 
-		$rows = array();
+		$rows           = array();
 		$eligible_count = 0;
 		foreach ( $items as $item ) {
 			$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
@@ -76,18 +76,18 @@ final class Step_Workspace_Payload_Builder {
 				++$eligible_count;
 			}
 			$row_actions = $this->row_action_resolver->resolve( $item, $capabilities );
-			$rows[] = array(
-				'item_id'          => $item_id,
-				'status'           => $status,
-				'status_badge'     => $this->item_status_to_badge( $status ),
-				'summary_columns'  => $this->summary_columns_for_item( $item, $step_type ),
-				'row_actions'      => $row_actions,
-				'is_selected'      => in_array( $item_id, $selected_item_ids, true ),
+			$rows[]      = array(
+				'item_id'         => $item_id,
+				'status'          => $status,
+				'status_badge'    => $this->item_status_to_badge( $status ),
+				'summary_columns' => $this->summary_columns_for_item( $item, $step_type ),
+				'row_actions'     => $row_actions,
+				'is_selected'     => in_array( $item_id, $selected_item_ids, true ),
 			);
 		}
 
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
-		$bulk_states = array(
+		$bulk_states    = array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 				'enabled'        => $eligible_count > 0 && ! empty( $capabilities['can_approve'] ),
 				'label'          => \__( 'Apply to all eligible', 'aio-page-builder' ),
@@ -146,7 +146,7 @@ final class Step_Workspace_Payload_Builder {
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function actionable_items_from_step( array $step ): array {
-		$items_raw = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+		$items_raw  = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
 		$skip_types = array(
@@ -154,7 +154,7 @@ final class Step_Workspace_Payload_Builder {
 			Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_NOTE,
 			Build_Plan_Item_Schema::ITEM_TYPE_CONFIRMATION,
 		);
-		$out = array();
+		$out        = array();
 		foreach ( $items_raw as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -194,7 +194,7 @@ final class Step_Workspace_Payload_Builder {
 			: array();
 		$columns = array();
 		foreach ( self::DEFAULT_COLUMN_ORDER as $key ) {
-			$val = $payload[ $key ] ?? $item[ $key ] ?? '';
+			$val             = $payload[ $key ] ?? $item[ $key ] ?? '';
 			$columns[ $key ] = is_string( $val ) ? $val : (string) \wp_json_encode( $val );
 		}
 		if ( trim( implode( '', $columns ) ) === '' ) {
@@ -210,20 +210,20 @@ final class Step_Workspace_Payload_Builder {
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function detail_sections_for_item( array $item ): array {
-		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+		$payload    = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
-		$sections = array();
+		$sections   = array();
 		$sections[] = array(
 			'heading' => \__( 'Details', 'aio-page-builder' ),
 			'key'     => 'details',
 			'content' => '<dl class="aio-detail-dl">' . $this->payload_to_dl( $payload ) . '</dl>',
 		);
-		$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
-		$status  = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
+		$item_id    = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
+		$status     = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
 		$sections[] = array(
-			'heading' => \__( 'Status', 'aio-page-builder' ),
-			'key'     => 'status',
+			'heading'       => \__( 'Status', 'aio-page-builder' ),
+			'key'           => 'status',
 			'content_lines' => array( $item_id, $status ),
 		);
 		return $sections;
@@ -269,12 +269,31 @@ final class Step_Workspace_Payload_Builder {
 			'step_list_rows'     => array(),
 			'column_order'       => self::DEFAULT_COLUMN_ORDER,
 			'bulk_action_states' => array(
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array( 'enabled' => false, 'label' => \__( 'Apply to all eligible', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array( 'enabled' => false, 'label' => \__( 'Apply to selected', 'aio-page-builder' ), 'count_selected' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array( 'enabled' => false, 'label' => \__( 'Deny all eligible', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array( 'enabled' => false, 'label' => \__( 'Clear selection', 'aio-page-builder' ) ),
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Apply to all eligible', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
+					'enabled'        => false,
+					'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
+					'count_selected' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Deny all eligible', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
+					'enabled' => false,
+					'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+				),
 			),
-			'detail_panel'       => array( 'item_id' => '', 'sections' => array(), 'row_actions' => array() ),
+			'detail_panel'       => array(
+				'item_id'     => '',
+				'sections'    => array(),
+				'row_actions' => array(),
+			),
 			'step_messages'      => array(),
 		);
 	}

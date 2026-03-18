@@ -24,9 +24,9 @@ final class Secondary_Goal_Section_Helper_Overlay_Registry {
 	public const FIELD_STATUS             = 'status';
 
 	public const SCOPE_SECONDARY_GOAL_SECTION_HELPER_OVERLAY = 'secondary_goal_section_helper_overlay';
-	public const STATUS_ACTIVE = 'active';
+	public const STATUS_ACTIVE                               = 'active';
 
-	private const KEY_PATTERN  = '#^[a-z0-9_-]+$#';
+	private const KEY_PATTERN    = '#^[a-z0-9_-]+$#';
 	private const KEY_MAX_LENGTH = 64;
 
 	/** @var array<string, array<string, mixed>> Composite "primary|secondary|section" => overlay. */
@@ -57,13 +57,13 @@ final class Secondary_Goal_Section_Helper_Overlay_Registry {
 			if ( ! \is_array( $ov ) ) {
 				continue;
 			}
-			$primary = isset( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] ) && \is_string( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] )
+			$primary   = isset( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] ) && \is_string( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] )
 				? \trim( $ov[ self::FIELD_PRIMARY_GOAL_KEY ] )
 				: '';
 			$secondary = isset( $ov[ self::FIELD_SECONDARY_GOAL_KEY ] ) && \is_string( $ov[ self::FIELD_SECONDARY_GOAL_KEY ] )
 				? \trim( $ov[ self::FIELD_SECONDARY_GOAL_KEY ] )
 				: '';
-			$section = isset( $ov[ self::FIELD_SECTION_KEY ] ) && \is_string( $ov[ self::FIELD_SECTION_KEY ] )
+			$section   = isset( $ov[ self::FIELD_SECTION_KEY ] ) && \is_string( $ov[ self::FIELD_SECTION_KEY ] )
 				? \trim( $ov[ self::FIELD_SECTION_KEY ] )
 				: '';
 			if ( $primary === '' || $secondary === '' || $section === '' || $primary === $secondary ) {
@@ -95,7 +95,7 @@ final class Secondary_Goal_Section_Helper_Overlay_Registry {
 				continue;
 			}
 			$this->by_composite[ $composite ] = $ov;
-			$this->all[] = $ov;
+			$this->all[]                      = $ov;
 		}
 	}
 
@@ -108,8 +108,8 @@ final class Secondary_Goal_Section_Helper_Overlay_Registry {
 	 * @return array<string, mixed>|null
 	 */
 	public function get( string $primary_goal_key, string $secondary_goal_key, string $section_key ): ?array {
-		$p = \trim( $primary_goal_key );
-		$s = \trim( $secondary_goal_key );
+		$p   = \trim( $primary_goal_key );
+		$s   = \trim( $secondary_goal_key );
 		$sec = \trim( $section_key );
 		if ( $p === '' || $s === '' || $sec === '' || $p === $s ) {
 			return null;

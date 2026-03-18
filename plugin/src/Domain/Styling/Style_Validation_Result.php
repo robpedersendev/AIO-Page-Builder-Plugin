@@ -37,8 +37,8 @@ final class Style_Validation_Result {
 	 * @param array        $sanitized Sanitized payload when valid; empty array when invalid.
 	 */
 	public function __construct( bool $valid, array $errors = array(), array $sanitized = array() ) {
-		$this->valid = $valid;
-		$this->errors = $this->bound_errors( $errors );
+		$this->valid     = $valid;
+		$this->errors    = $this->bound_errors( $errors );
 		$this->sanitized = $valid ? $sanitized : array();
 	}
 
@@ -69,7 +69,7 @@ final class Style_Validation_Result {
 	 * @return list<string>
 	 */
 	private function bound_errors( array $errors ): array {
-		$out = array();
+		$out   = array();
 		$count = 0;
 		foreach ( $errors as $msg ) {
 			if ( $count >= self::MAX_ERRORS ) {
@@ -79,7 +79,7 @@ final class Style_Validation_Result {
 				continue;
 			}
 			$trimmed = substr( $msg, 0, self::MAX_ERROR_MESSAGE_LENGTH );
-			$out[] = $trimmed;
+			$out[]   = $trimmed;
 			++$count;
 		}
 		return $out;

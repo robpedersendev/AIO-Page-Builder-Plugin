@@ -30,7 +30,7 @@ final class Global_Style_Settings_Repository_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->plugin_root = dirname( __DIR__, 2 );
-		$key = Global_Style_Settings_Schema::OPTION_KEY;
+		$key               = Global_Style_Settings_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
 		}
@@ -55,11 +55,14 @@ final class Global_Style_Settings_Repository_Test extends TestCase {
 	}
 
 	public function test_set_global_tokens_with_registry_filters_invalid_keys(): void {
-		$loader = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
 		$registry = new Style_Token_Registry( $loader );
-		$repo = new Global_Style_Settings_Repository( $registry, null );
-		$invalid = array(
-			'color'    => array( 'primary' => '#333', 'invalid_name' => '#fff' ),
+		$repo     = new Global_Style_Settings_Repository( $registry, null );
+		$invalid  = array(
+			'color'         => array(
+				'primary'      => '#333',
+				'invalid_name' => '#fff',
+			),
 			'unknown_group' => array( 'x' => 'y' ),
 		);
 		$repo->set_global_tokens( $invalid );
@@ -83,10 +86,10 @@ final class Global_Style_Settings_Repository_Test extends TestCase {
 	 * Invalid value types (non-string) are not persisted; only allowed group/name with string value are stored.
 	 */
 	public function test_invalid_value_types_not_persisted_with_registry(): void {
-		$loader = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
 		$registry = new Style_Token_Registry( $loader );
-		$repo = new Global_Style_Settings_Repository( $registry, null );
-		$input = array(
+		$repo     = new Global_Style_Settings_Repository( $registry, null );
+		$input    = array(
 			'color' => array(
 				'primary' => '#333',
 				'text'    => 12345,
@@ -114,11 +117,11 @@ final class Global_Style_Settings_Repository_Test extends TestCase {
 	 * persist_global_tokens_result persists only when result is valid (Prompt 252).
 	 */
 	public function test_persist_global_tokens_result_valid_persists(): void {
-		$loader   = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
-		$registry = new Style_Token_Registry( $loader );
-		$repo     = new Global_Style_Settings_Repository( $registry, null );
+		$loader    = new Style_Spec_Loader( $this->plugin_root . '/specs/' );
+		$registry  = new Style_Token_Registry( $loader );
+		$repo      = new Global_Style_Settings_Repository( $registry, null );
 		$sanitized = array( 'color' => array( 'primary' => '#111' ) );
-		$result   = new Style_Validation_Result( true, array(), $sanitized );
+		$result    = new Style_Validation_Result( true, array(), $sanitized );
 		$this->assertTrue( $repo->persist_global_tokens_result( $result ) );
 		$this->assertSame( $sanitized, $repo->get_global_tokens() );
 	}

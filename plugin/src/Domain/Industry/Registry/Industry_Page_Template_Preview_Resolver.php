@@ -45,11 +45,11 @@ final class Industry_Page_Template_Preview_Resolver {
 	private $substitute_engine;
 
 	/**
-	 * @param Industry_Profile_Repository|null              $profile_repository
-	 * @param Industry_Pack_Registry|null                   $pack_registry
+	 * @param Industry_Profile_Repository|null               $profile_repository
+	 * @param Industry_Pack_Registry|null                    $pack_registry
 	 * @param Industry_Page_Template_Recommendation_Resolver $recommendation_resolver
-	 * @param Industry_Page_OnePager_Composer               $one_pager_composer
-	 * @param Industry_Substitute_Suggestion_Engine|null    $substitute_engine
+	 * @param Industry_Page_OnePager_Composer                $one_pager_composer
+	 * @param Industry_Substitute_Suggestion_Engine|null     $substitute_engine
 	 */
 	public function __construct(
 		?Industry_Profile_Repository $profile_repository,
@@ -58,18 +58,18 @@ final class Industry_Page_Template_Preview_Resolver {
 		Industry_Page_OnePager_Composer $one_pager_composer,
 		?Industry_Substitute_Suggestion_Engine $substitute_engine = null
 	) {
-		$this->profile_repository     = $profile_repository;
-		$this->pack_registry          = $pack_registry;
+		$this->profile_repository      = $profile_repository;
+		$this->pack_registry           = $pack_registry;
 		$this->recommendation_resolver = $recommendation_resolver;
-		$this->one_pager_composer     = $one_pager_composer;
-		$this->substitute_engine      = $substitute_engine;
+		$this->one_pager_composer      = $one_pager_composer;
+		$this->substitute_engine       = $substitute_engine;
 	}
 
 	/**
 	 * Resolves industry-aware preview view model for the given template. Safe when no profile or invalid key.
 	 *
-	 * @param string               $template_key        Page template internal_key.
-	 * @param array<string, mixed>  $template_definition Single template definition (internal_key, template_family, etc.).
+	 * @param string                           $template_key        Page template internal_key.
+	 * @param array<string, mixed>             $template_definition Single template definition (internal_key, template_family, etc.).
 	 * @param array<int, array<string, mixed>> $all_templates Optional. When provided with substitute_engine, substitute suggestions are filled.
 	 * @return Industry_Page_Template_Preview_View_Model
 	 */
@@ -78,8 +78,8 @@ final class Industry_Page_Template_Preview_Resolver {
 		if ( $this->profile_repository === null ) {
 			return $this->empty_view_model();
 		}
-		$profile      = $this->profile_repository->get_profile();
-		$primary      = isset( $profile['primary_industry_key'] ) && \is_string( $profile['primary_industry_key'] )
+		$profile = $this->profile_repository->get_profile();
+		$primary = isset( $profile['primary_industry_key'] ) && \is_string( $profile['primary_industry_key'] )
 			? \trim( $profile['primary_industry_key'] )
 			: '';
 
@@ -96,31 +96,36 @@ final class Industry_Page_Template_Preview_Resolver {
 		$result                 = $this->recommendation_resolver->resolve( $profile, $primary_pack, $templates_for_resolver, array() );
 		$item                   = $this->get_item_by_key( $result, $template_key );
 
-		$fit              = $item['fit_classification'] ?? Industry_Page_Template_Recommendation_Resolver::FIT_NEUTRAL;
-		$hierarchy_fit    = isset( $item['hierarchy_fit'] ) && \is_string( $item['hierarchy_fit'] ) ? $item['hierarchy_fit'] : '';
-		$lpagery_fit      = isset( $item['lpagery_fit'] ) && \is_string( $item['lpagery_fit'] ) ? $item['lpagery_fit'] : '';
-		$warning_flags    = isset( $item['warning_flags'] ) && \is_array( $item['warning_flags'] ) ? array_values( array_filter( array_map( 'strval', $item['warning_flags'] ) ) ) : array();
+		$fit                 = $item['fit_classification'] ?? Industry_Page_Template_Recommendation_Resolver::FIT_NEUTRAL;
+		$hierarchy_fit       = isset( $item['hierarchy_fit'] ) && \is_string( $item['hierarchy_fit'] ) ? $item['hierarchy_fit'] : '';
+		$lpagery_fit         = isset( $item['lpagery_fit'] ) && \is_string( $item['lpagery_fit'] ) ? $item['lpagery_fit'] : '';
+		$warning_flags       = isset( $item['warning_flags'] ) && \is_array( $item['warning_flags'] ) ? array_values( array_filter( array_map( 'strval', $item['warning_flags'] ) ) ) : array();
 		$explanation_reasons = isset( $item['explanation_reasons'] ) && \is_array( $item['explanation_reasons'] ) ? array_values( array_filter( array_map( 'strval', $item['explanation_reasons'] ) ) ) : array();
 
-		$subtype_key = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+		$subtype_key     = isset( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			? \trim( $profile[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			: '';
-		$subtype_context = array( 'primary_industry_key' => $primary, 'industry_subtype_key' => $subtype_key, 'resolved_subtype' => null, 'has_valid_subtype' => false );
+		$subtype_context = array(
+			'primary_industry_key' => $primary,
+			'industry_subtype_key' => $subtype_key,
+			'resolved_subtype'     => null,
+			'has_valid_subtype'    => false,
+		);
 		if ( $this->subtype_resolver !== null ) {
 			$subtype_context = $this->subtype_resolver->resolve();
-			$subtype_key = $subtype_context['industry_subtype_key'] ?? $subtype_key;
+			$subtype_key     = $subtype_context['industry_subtype_key'] ?? $subtype_key;
 		}
-		$goal_key = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+		$goal_key           = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 			? \trim( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 			: '';
-		$composed_result = $this->one_pager_composer->compose( $template_key, $primary, $subtype_key, $goal_key );
+		$composed_result    = $this->one_pager_composer->compose( $template_key, $primary, $subtype_key, $goal_key );
 		$composed_one_pager = $composed_result->get_composed_onepager();
 		$composed_for_view  = array(
-			'hierarchy_hints'   => $composed_one_pager['hierarchy_hints'] ?? '',
-			'cta_strategy'      => $composed_one_pager['cta_strategy'] ?? '',
-			'lpagery_seo_notes' => $composed_one_pager['lpagery_seo_notes'] ?? '',
+			'hierarchy_hints'     => $composed_one_pager['hierarchy_hints'] ?? '',
+			'cta_strategy'        => $composed_one_pager['cta_strategy'] ?? '',
+			'lpagery_seo_notes'   => $composed_one_pager['lpagery_seo_notes'] ?? '',
 			'compliance_cautions' => $composed_one_pager['compliance_cautions'] ?? '',
-			'overlay_applied'   => $composed_result->is_overlay_applied(),
+			'overlay_applied'     => $composed_result->is_overlay_applied(),
 		);
 
 		$substitute_suggestions = array();
@@ -160,11 +165,11 @@ final class Industry_Page_Template_Preview_Resolver {
 	 * Builds subtype influence view model for page template (onepager refinement only).
 	 *
 	 * @param array{primary_industry_key: string, industry_subtype_key: string, resolved_subtype: array<string, mixed>|null, has_valid_subtype: bool} $subtype_context
-	 * @param string $template_key
+	 * @param string                                                                                                                                  $template_key
 	 * @return array<string, mixed>
 	 */
 	private function build_subtype_influence_page( array $subtype_context, string $template_key ): array {
-		$has_valid = ! empty( $subtype_context['has_valid_subtype'] );
+		$has_valid   = ! empty( $subtype_context['has_valid_subtype'] );
 		$subtype_key = isset( $subtype_context['industry_subtype_key'] ) && \is_string( $subtype_context['industry_subtype_key'] )
 			? \trim( $subtype_context['industry_subtype_key'] )
 			: '';
@@ -172,10 +177,10 @@ final class Industry_Page_Template_Preview_Resolver {
 			return Industry_Subtype_Preview_Influence_View_Model::none()->to_array();
 		}
 		$resolved = $subtype_context['resolved_subtype'] ?? null;
-		$label = '';
-		$summary = '';
+		$label    = '';
+		$summary  = '';
 		if ( \is_array( $resolved ) && $this->subtype_registry !== null ) {
-			$label = isset( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] ) && \is_string( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] )
+			$label   = isset( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] ) && \is_string( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] )
 				? \trim( $resolved[ Industry_Subtype_Registry::FIELD_LABEL ] )
 				: \ucfirst( \str_replace( array( '_', '-' ), ' ', $subtype_key ) );
 			$summary = isset( $resolved[ Industry_Subtype_Registry::FIELD_SUMMARY ] ) && \is_string( $resolved[ Industry_Subtype_Registry::FIELD_SUMMARY ] )
@@ -192,7 +197,7 @@ final class Industry_Page_Template_Preview_Resolver {
 		if ( $this->subtype_onepager_overlay_registry !== null ) {
 			$overlay = $this->subtype_onepager_overlay_registry->get( $subtype_key, $template_key );
 			if ( $overlay !== null && \is_array( $overlay ) ) {
-				$status = isset( $overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ] ) && \is_string( $overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ] )
+				$status              = isset( $overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ] ) && \is_string( $overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ] )
 					? $overlay[ Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS ]
 					: '';
 				$onepager_refinement = $status === Subtype_Page_OnePager_Overlay_Registry::STATUS_ACTIVE;
@@ -239,7 +244,7 @@ final class Industry_Page_Template_Preview_Resolver {
 
 	/**
 	 * @param Industry_Page_Template_Recommendation_Result $result
-	 * @param string $template_key
+	 * @param string                                       $template_key
 	 * @return array{page_template_key: string, score: int, fit_classification: string, explanation_reasons: array, industry_source_refs: array, hierarchy_fit: string, lpagery_fit: string, warning_flags: array}
 	 */
 	private function get_item_by_key( Industry_Page_Template_Recommendation_Result $result, string $template_key ): array {

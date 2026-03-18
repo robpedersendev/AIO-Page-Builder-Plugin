@@ -60,7 +60,12 @@ final class ACF_Migration_Verification_Service_Test extends TestCase {
 			Field_Blueprint_Schema::SECTION_VERSION => '1',
 			Field_Blueprint_Schema::LABEL           => 'Hero',
 			Field_Blueprint_Schema::FIELDS          => array(
-				array( 'key' => 'field_st01_hero_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ),
+				array(
+					'key'   => 'field_st01_hero_headline',
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
 			),
 		);
 	}
@@ -68,28 +73,32 @@ final class ACF_Migration_Verification_Service_Test extends TestCase {
 	private function create_blueprint_service_mock( array $blueprints ): Section_Field_Blueprint_Service_Interface {
 		$mock = $this->createMock( Section_Field_Blueprint_Service_Interface::class );
 		$mock->method( 'get_all_blueprints' )->willReturn( $blueprints );
-		$mock->method( 'get_blueprint_for_section' )->willReturnCallback( function ( string $key ) use ( $blueprints ) {
-			foreach ( $blueprints as $bp ) {
-				if ( ( $bp[ Field_Blueprint_Schema::SECTION_KEY ] ?? '' ) === $key ) {
-					return $bp;
+		$mock->method( 'get_blueprint_for_section' )->willReturnCallback(
+			function ( string $key ) use ( $blueprints ) {
+				foreach ( $blueprints as $bp ) {
+					if ( ( $bp[ Field_Blueprint_Schema::SECTION_KEY ] ?? '' ) === $key ) {
+						return $bp;
+					}
 				}
+				return null;
 			}
-			return null;
-		} );
+		);
 		return $mock;
 	}
 
 	private function create_assignment_map_mock( array $page_template_rows = array(), array $page_composition_rows = array() ): Assignment_Map_Service_Interface {
 		$mock = $this->createMock( Assignment_Map_Service_Interface::class );
-		$mock->method( 'list_by_type' )->willReturnCallback( function ( string $type ) use ( $page_template_rows, $page_composition_rows ) {
-			if ( $type === Assignment_Types::PAGE_TEMPLATE ) {
-				return $page_template_rows;
+		$mock->method( 'list_by_type' )->willReturnCallback(
+			function ( string $type ) use ( $page_template_rows, $page_composition_rows ) {
+				if ( $type === Assignment_Types::PAGE_TEMPLATE ) {
+						return $page_template_rows;
+				}
+				if ( $type === Assignment_Types::PAGE_COMPOSITION ) {
+					return $page_composition_rows;
+				}
+				return array();
 			}
-			if ( $type === Assignment_Types::PAGE_COMPOSITION ) {
-				return $page_composition_rows;
-			}
-			return array();
-		} );
+		);
 		return $mock;
 	}
 
@@ -104,17 +113,17 @@ final class ACF_Migration_Verification_Service_Test extends TestCase {
 	}
 
 	public function test_run_verification_returns_result_with_expected_shape(): void {
-		$blueprints = array( $this->blueprint_st01() );
+		$blueprints        = array( $this->blueprint_st01() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$assignment_map = $this->create_assignment_map_mock( array(), array() );
-		$page_repo = $this->create_page_template_repo_mock( array() );
-		$group_builder = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$debug_exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$assignment_map    = $this->create_assignment_map_mock( array(), array() );
+		$page_repo         = $this->create_page_template_repo_mock( array() );
+		$group_builder     = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$mirror_service    = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$debug_exporter    = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
 
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
+		$registrar            = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc       = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$section_repo         = $this->createMock( Section_Template_Repository_Interface::class );
 		$regeneration_service = new ACF_Regeneration_Service(
 			$blueprint_service,
 			$registrar,
@@ -149,16 +158,16 @@ final class ACF_Migration_Verification_Service_Test extends TestCase {
 	}
 
 	public function test_field_key_stability_summary_includes_deterministic_group_and_field_keys(): void {
-		$blueprints = array( $this->blueprint_st01() );
-		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$assignment_map = $this->create_assignment_map_mock( array(), array() );
-		$page_repo = $this->create_page_template_repo_mock( array() );
-		$group_builder = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$debug_exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
+		$blueprints           = array( $this->blueprint_st01() );
+		$blueprint_service    = $this->create_blueprint_service_mock( $blueprints );
+		$assignment_map       = $this->create_assignment_map_mock( array(), array() );
+		$page_repo            = $this->create_page_template_repo_mock( array() );
+		$group_builder        = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$mirror_service       = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$debug_exporter       = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$registrar            = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc       = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$section_repo         = $this->createMock( Section_Template_Repository_Interface::class );
 		$regeneration_service = new ACF_Regeneration_Service( $blueprint_service, $registrar, $assignment_svc, $assignment_map, $section_repo, $page_repo );
 
 		$service = new ACF_Migration_Verification_Service(
@@ -179,19 +188,24 @@ final class ACF_Migration_Verification_Service_Test extends TestCase {
 	}
 
 	public function test_assignment_continuity_flags_orphaned_when_target_not_in_registry(): void {
-		$blueprints = array( $this->blueprint_st01() );
-		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$assignment_map = $this->create_assignment_map_mock(
-			array( array( 'source_ref' => '1', 'target_ref' => 'pt_valid' ) ),
+		$blueprints           = array( $this->blueprint_st01() );
+		$blueprint_service    = $this->create_blueprint_service_mock( $blueprints );
+		$assignment_map       = $this->create_assignment_map_mock(
+			array(
+				array(
+					'source_ref' => '1',
+					'target_ref' => 'pt_valid',
+				),
+			),
 			array()
 		);
-		$page_repo = $this->create_page_template_repo_mock( array( 'pt_valid' ) );
-		$group_builder = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$debug_exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
+		$page_repo            = $this->create_page_template_repo_mock( array( 'pt_valid' ) );
+		$group_builder        = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$mirror_service       = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$debug_exporter       = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$registrar            = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc       = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$section_repo         = $this->createMock( Section_Template_Repository_Interface::class );
 		$regeneration_service = new ACF_Regeneration_Service( $blueprint_service, $registrar, $assignment_svc, $assignment_map, $section_repo, $page_repo );
 
 		$service = new ACF_Migration_Verification_Service(
@@ -212,19 +226,24 @@ final class ACF_Migration_Verification_Service_Test extends TestCase {
 	}
 
 	public function test_assignment_continuity_detects_orphaned(): void {
-		$blueprints = array( $this->blueprint_st01() );
-		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$assignment_map = $this->create_assignment_map_mock(
-			array( array( 'source_ref' => '1', 'target_ref' => 'pt_missing' ) ),
+		$blueprints           = array( $this->blueprint_st01() );
+		$blueprint_service    = $this->create_blueprint_service_mock( $blueprints );
+		$assignment_map       = $this->create_assignment_map_mock(
+			array(
+				array(
+					'source_ref' => '1',
+					'target_ref' => 'pt_missing',
+				),
+			),
 			array()
 		);
-		$page_repo = $this->create_page_template_repo_mock( array( 'pt_other' ) );
-		$group_builder = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$debug_exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
+		$page_repo            = $this->create_page_template_repo_mock( array( 'pt_other' ) );
+		$group_builder        = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$mirror_service       = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$debug_exporter       = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$registrar            = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc       = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$section_repo         = $this->createMock( Section_Template_Repository_Interface::class );
 		$regeneration_service = new ACF_Regeneration_Service( $blueprint_service, $registrar, $assignment_svc, $assignment_map, $section_repo, $page_repo );
 
 		$service = new ACF_Migration_Verification_Service(
@@ -245,16 +264,16 @@ final class ACF_Migration_Verification_Service_Test extends TestCase {
 	}
 
 	public function test_mirror_coherence_uses_registry_manifest(): void {
-		$blueprints = array( $this->blueprint_st01() );
-		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$assignment_map = $this->create_assignment_map_mock( array(), array() );
-		$page_repo = $this->create_page_template_repo_mock( array() );
-		$group_builder = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$debug_exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
+		$blueprints           = array( $this->blueprint_st01() );
+		$blueprint_service    = $this->create_blueprint_service_mock( $blueprints );
+		$assignment_map       = $this->create_assignment_map_mock( array(), array() );
+		$page_repo            = $this->create_page_template_repo_mock( array() );
+		$group_builder        = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$mirror_service       = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$debug_exporter       = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$registrar            = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc       = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$section_repo         = $this->createMock( Section_Template_Repository_Interface::class );
 		$regeneration_service = new ACF_Regeneration_Service( $blueprint_service, $registrar, $assignment_svc, $assignment_map, $section_repo, $page_repo );
 
 		$service = new ACF_Migration_Verification_Service(
@@ -276,17 +295,17 @@ final class ACF_Migration_Verification_Service_Test extends TestCase {
 	}
 
 	public function test_regeneration_safe_plan_buildable_after_simulated_partial_failure(): void {
-		$blueprints = array( $this->blueprint_st01() );
+		$blueprints        = array( $this->blueprint_st01() );
 		$blueprint_service = $this->create_blueprint_service_mock( $blueprints );
-		$assignment_map = $this->create_assignment_map_mock( array(), array() );
-		$page_repo = $this->create_page_template_repo_mock( array() );
-		$group_builder = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
-		$mirror_service = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
-		$debug_exporter = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
+		$assignment_map    = $this->create_assignment_map_mock( array(), array() );
+		$page_repo         = $this->create_page_template_repo_mock( array() );
+		$group_builder     = new \AIOPageBuilder\Domain\ACF\Registration\ACF_Group_Builder( new \AIOPageBuilder\Domain\ACF\Registration\ACF_Field_Builder() );
+		$mirror_service    = new ACF_Local_JSON_Mirror_Service( $blueprint_service, $group_builder );
+		$debug_exporter    = new ACF_Field_Group_Debug_Exporter( $blueprint_service, $mirror_service );
 
-		$registrar = $this->createMock( ACF_Group_Registrar_Interface::class );
-		$assignment_svc = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
-		$section_repo = $this->createMock( Section_Template_Repository_Interface::class );
+		$registrar            = $this->createMock( ACF_Group_Registrar_Interface::class );
+		$assignment_svc       = $this->createMock( Page_Field_Group_Assignment_Service_Interface::class );
+		$section_repo         = $this->createMock( Section_Template_Repository_Interface::class );
 		$regeneration_service = new ACF_Regeneration_Service( $blueprint_service, $registrar, $assignment_svc, $assignment_map, $section_repo, $page_repo );
 
 		$service = new ACF_Migration_Verification_Service(
@@ -310,10 +329,28 @@ final class ACF_Migration_Verification_Service_Test extends TestCase {
 			'2025-03-14T12:00:00Z',
 			'1.0.0',
 			'1',
-			array( 'stable_group_keys' => array(), 'stable_field_keys' => array(), 'unstable_or_missing' => array(), 'summary' => 'Ok' ),
-			array( 'assignments_checked' => 0, 'assignments_relevant' => 0, 'orphaned_or_invalid' => array(), 'summary' => 'Ok' ),
-			array( 'in_sync' => 0, 'version_mismatch' => 0, 'summary' => 'Ok' ),
-			array( 'plan_buildable' => true, 'repair_candidates_consistent' => true, 'summary' => 'Ok' ),
+			array(
+				'stable_group_keys'   => array(),
+				'stable_field_keys'   => array(),
+				'unstable_or_missing' => array(),
+				'summary'             => 'Ok',
+			),
+			array(
+				'assignments_checked'  => 0,
+				'assignments_relevant' => 0,
+				'orphaned_or_invalid'  => array(),
+				'summary'              => 'Ok',
+			),
+			array(
+				'in_sync'          => 0,
+				'version_mismatch' => 0,
+				'summary'          => 'Ok',
+			),
+			array(
+				'plan_buildable'               => true,
+				'repair_candidates_consistent' => true,
+				'summary'                      => 'Ok',
+			),
 			array(),
 			array(),
 			ACF_Migration_Verification_Result::STATUS_PASS,

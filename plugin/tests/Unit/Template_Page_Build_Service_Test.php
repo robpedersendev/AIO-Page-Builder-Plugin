@@ -49,31 +49,37 @@ final class Stub_Template_Build_Job_Service implements Create_Page_Job_Service_I
 final class Template_Page_Build_Service_Test extends TestCase {
 
 	public function test_run_enriches_success_result_with_template_build_execution_result(): void {
-		$stub_job = new Stub_Template_Build_Job_Service();
+		$stub_job             = new Stub_Template_Build_Job_Service();
 		$stub_job->run_result = Create_Page_Result::success( 100, 'tpl_hub', 2, '' );
 
 		$template_def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY   => 'tpl_hub',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => 'tpl_hub',
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'sec_hero', Page_Template_Schema::SECTION_ITEM_POSITION => 0 ),
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'sec_cta', Page_Template_Schema::SECTION_ITEM_POSITION => 1 ),
+				array(
+					Page_Template_Schema::SECTION_ITEM_KEY => 'sec_hero',
+					Page_Template_Schema::SECTION_ITEM_POSITION => 0,
+				),
+				array(
+					Page_Template_Schema::SECTION_ITEM_KEY => 'sec_cta',
+					Page_Template_Schema::SECTION_ITEM_POSITION => 1,
+				),
 			),
-			Page_Template_Schema::FIELD_ONE_PAGER     => array( 'doc_ref' => 'one-pager-hub' ),
-			'template_family'                         => 'services',
-			'template_category_class'                => 'hub',
+			Page_Template_Schema::FIELD_ONE_PAGER        => array( 'doc_ref' => 'one-pager-hub' ),
+			'template_family'                            => 'services',
+			'template_category_class'                    => 'hub',
 		);
-		$repo = $this->createMock( Page_Template_Repository::class );
+		$repo         = $this->createMock( Page_Template_Repository::class );
 		$repo->method( 'get_definition_by_key' )->with( 'tpl_hub' )->willReturn( $template_def );
 
-		$service = new Template_Page_Build_Service( $stub_job, $repo );
+		$service  = new Template_Page_Build_Service( $stub_job, $repo );
 		$envelope = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
-				'template_key'         => 'tpl_hub',
-				'proposed_page_title'  => 'Hub',
-				'parent_post_id'       => 5,
+				'template_key'        => 'tpl_hub',
+				'proposed_page_title' => 'Hub',
+				'parent_post_id'      => 5,
 			),
 		);
-		$result = $service->run( $envelope );
+		$result   = $service->run( $envelope );
 
 		$this->assertTrue( $result->is_success() );
 		$this->assertSame( 100, $result->get_post_id() );
@@ -93,17 +99,17 @@ final class Template_Page_Build_Service_Test extends TestCase {
 	}
 
 	public function test_run_failure_includes_template_build_execution_result_with_errors(): void {
-		$stub_job = new Stub_Template_Build_Job_Service();
+		$stub_job             = new Stub_Template_Build_Job_Service();
 		$stub_job->run_result = Create_Page_Result::failure( 'Page template not found.', array( 'template_not_found' ) );
 
 		$repo = $this->createMock( Page_Template_Repository::class );
 		$repo->method( 'get_definition_by_key' )->willReturn( null );
 
-		$service = new Template_Page_Build_Service( $stub_job, $repo );
+		$service  = new Template_Page_Build_Service( $stub_job, $repo );
 		$envelope = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'template_key' => 'tpl_missing' ),
 		);
-		$result = $service->run( $envelope );
+		$result   = $service->run( $envelope );
 
 		$this->assertFalse( $result->is_success() );
 		$artifacts = $result->get_artifacts();
@@ -115,18 +121,18 @@ final class Template_Page_Build_Service_Test extends TestCase {
 	}
 
 	public function test_run_resolves_parent_from_parent_ref(): void {
-		$stub_job = new Stub_Template_Build_Job_Service();
+		$stub_job             = new Stub_Template_Build_Job_Service();
 		$stub_job->run_result = Create_Page_Result::success( 50, 'tpl_child', 1 );
 
 		$template_def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY => 'tpl_child',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => 'tpl_child',
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(),
-			'template_family' => 'products',
+			'template_family'                            => 'products',
 		);
-		$repo = $this->createMock( Page_Template_Repository::class );
+		$repo         = $this->createMock( Page_Template_Repository::class );
 		$repo->method( 'get_definition_by_key' )->willReturn( $template_def );
 
-		$service = new Template_Page_Build_Service( $stub_job, $repo );
+		$service  = new Template_Page_Build_Service( $stub_job, $repo );
 		$envelope = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
 				'template_key'        => 'tpl_child',
@@ -134,7 +140,7 @@ final class Template_Page_Build_Service_Test extends TestCase {
 				'parent_ref'          => array( 'value' => '7' ),
 			),
 		);
-		$result = $service->run( $envelope );
+		$result   = $service->run( $envelope );
 
 		$tbr = $result->get_artifacts()['template_build_execution_result'];
 		$this->assertSame( true, $tbr['hierarchy_applied'] );
@@ -142,28 +148,33 @@ final class Template_Page_Build_Service_Test extends TestCase {
 	}
 
 	public function test_run_returns_failure_when_form_provider_validator_fails(): void {
-		$stub_job = new Stub_Template_Build_Job_Service();
+		$stub_job             = new Stub_Template_Build_Job_Service();
 		$stub_job->run_result = Create_Page_Result::success( 100, 'pt_request_form', 1 );
 
 		$template_def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY => 'pt_request_form',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => 'pt_request_form',
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(),
 		);
-		$repo = $this->createMock( Page_Template_Repository::class );
+		$repo         = $this->createMock( Page_Template_Repository::class );
 		$repo->method( 'get_definition_by_key' )->willReturn( $template_def );
 
 		$validator = $this->createMock( Form_Provider_Dependency_Validator::class );
-		$validator->method( 'validate_for_template' )->with( 'pt_request_form' )->willReturn( array(
-			'valid'    => false,
-			'errors'   => array( 'Form provider "ndr_forms" is not registered.' ),
-			'warnings' => array(),
-		) );
-
-		$service = new Template_Page_Build_Service( $stub_job, $repo, $validator );
-		$envelope = array(
-			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'template_key' => 'pt_request_form', 'proposed_page_title' => 'Contact' ),
+		$validator->method( 'validate_for_template' )->with( 'pt_request_form' )->willReturn(
+			array(
+				'valid'    => false,
+				'errors'   => array( 'Form provider "ndr_forms" is not registered.' ),
+				'warnings' => array(),
+			)
 		);
-		$result = $service->run( $envelope );
+
+		$service  = new Template_Page_Build_Service( $stub_job, $repo, $validator );
+		$envelope = array(
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
+				'template_key'        => 'pt_request_form',
+				'proposed_page_title' => 'Contact',
+			),
+		);
+		$result   = $service->run( $envelope );
 
 		$this->assertFalse( $result->is_success() );
 		$this->assertSame( 0, $result->get_post_id() );
@@ -172,17 +183,25 @@ final class Template_Page_Build_Service_Test extends TestCase {
 	}
 
 	public function test_run_no_parent_sets_hierarchy_applied_false(): void {
-		$stub_job = new Stub_Template_Build_Job_Service();
+		$stub_job             = new Stub_Template_Build_Job_Service();
 		$stub_job->run_result = Create_Page_Result::success( 60, 'tpl_top', 0 );
 
 		$repo = $this->createMock( Page_Template_Repository::class );
-		$repo->method( 'get_definition_by_key' )->willReturn( array( 'template_family' => 'top_level', Page_Template_Schema::FIELD_ORDERED_SECTIONS => array() ) );
-
-		$service = new Template_Page_Build_Service( $stub_job, $repo );
-		$envelope = array(
-			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array( 'template_key' => 'tpl_top', 'proposed_page_title' => 'Top' ),
+		$repo->method( 'get_definition_by_key' )->willReturn(
+			array(
+				'template_family' => 'top_level',
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(),
+			)
 		);
-		$result = $service->run( $envelope );
+
+		$service  = new Template_Page_Build_Service( $stub_job, $repo );
+		$envelope = array(
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
+				'template_key'        => 'tpl_top',
+				'proposed_page_title' => 'Top',
+			),
+		);
+		$result   = $service->run( $envelope );
 
 		$tbr = $result->get_artifacts()['template_build_execution_result'];
 		$this->assertSame( false, $tbr['hierarchy_applied'] );

@@ -55,11 +55,11 @@ final class Large_Library_Pagination {
 	 * @return self
 	 */
 	public static function from_page_size( int $page, int $per_page, int $total ): self {
-		$page     = max( 1, $page );
-		$per_page = max( 1, $per_page );
-		$total    = max( 0, $total );
+		$page        = max( 1, $page );
+		$per_page    = max( 1, $per_page );
+		$total       = max( 0, $total );
 		$total_pages = $per_page > 0 ? (int) ceil( $total / $per_page ) : 0;
-		$offset   = ( $page - 1 ) * $per_page;
+		$offset      = ( $page - 1 ) * $per_page;
 		return new self( $page, $per_page, $total, $total_pages, $offset );
 	}
 
@@ -72,9 +72,9 @@ final class Large_Library_Pagination {
 	 * @return self
 	 */
 	public static function from_offset_limit( int $offset, int $limit, int $total ): self {
-		$limit = max( 1, $limit );
-		$total = max( 0, $total );
-		$page  = $limit > 0 ? (int) floor( $offset / $limit ) + 1 : 1;
+		$limit       = max( 1, $limit );
+		$total       = max( 0, $total );
+		$page        = $limit > 0 ? (int) floor( $offset / $limit ) + 1 : 1;
 		$total_pages = $limit > 0 ? (int) ceil( $total / $limit ) : 0;
 		return new self( $page, $limit, $total, $total_pages, $offset );
 	}

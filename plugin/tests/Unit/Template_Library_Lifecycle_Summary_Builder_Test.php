@@ -37,7 +37,7 @@ final class Template_Library_Lifecycle_Summary_Builder_Test extends TestCase {
 	public function test_build_contains_no_secrets(): void {
 		$builder = new Template_Library_Lifecycle_Summary_Builder( null, null, null );
 		$summary = $builder->build();
-		$json = (string) \json_encode( $summary );
+		$json    = (string) \json_encode( $summary );
 		$this->assertStringNotContainsString( 'api_key', $json );
 		$this->assertStringNotContainsString( 'password', $json );
 		$this->assertStringNotContainsString( 'secret', $json );

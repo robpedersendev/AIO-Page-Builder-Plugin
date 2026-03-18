@@ -34,7 +34,7 @@ final class Import_Export_State_Builder {
 	private const EXPORT_HISTORY_LIMIT = 50;
 
 	public function __construct( Plugin_Path_Manager $path_manager, ?Template_Library_Lifecycle_Summary_Builder $lifecycle_summary_builder = null ) {
-		$this->path_manager = $path_manager;
+		$this->path_manager              = $path_manager;
 		$this->lifecycle_summary_builder = $lifecycle_summary_builder;
 	}
 
@@ -58,28 +58,28 @@ final class Import_Export_State_Builder {
 		$can_export = \current_user_can( Capabilities::EXPORT_DATA );
 		$can_import = \current_user_can( Capabilities::IMPORT_DATA );
 
-		$import_summary = null;
-		$conflict_rows = array();
-		$can_restore = false;
+		$import_summary   = null;
+		$conflict_rows    = array();
+		$can_restore      = false;
 		$resolution_modes = $this->resolution_mode_options();
-		$message = '';
+		$message          = '';
 
 		if ( $validation_payload !== null ) {
 			$import_summary = array(
-				'validation_passed'  => (bool) ( $validation_payload['validation_passed'] ?? false ),
-				'blocking_failures'  => isset( $validation_payload['blocking_failures'] ) && is_array( $validation_payload['blocking_failures'] )
+				'validation_passed' => (bool) ( $validation_payload['validation_passed'] ?? false ),
+				'blocking_failures' => isset( $validation_payload['blocking_failures'] ) && is_array( $validation_payload['blocking_failures'] )
 					? $validation_payload['blocking_failures']
 					: array(),
-				'conflicts'          => isset( $validation_payload['conflicts'] ) && is_array( $validation_payload['conflicts'] )
+				'conflicts'         => isset( $validation_payload['conflicts'] ) && is_array( $validation_payload['conflicts'] )
 					? $validation_payload['conflicts']
 					: array(),
-				'warnings'           => isset( $validation_payload['warnings'] ) && is_array( $validation_payload['warnings'] )
+				'warnings'          => isset( $validation_payload['warnings'] ) && is_array( $validation_payload['warnings'] )
 					? $validation_payload['warnings']
 					: array(),
-				'checksum_verified'  => (bool) ( $validation_payload['checksum_verified'] ?? false ),
+				'checksum_verified' => (bool) ( $validation_payload['checksum_verified'] ?? false ),
 			);
-			$conflict_rows = $import_summary['conflicts'];
-			$can_restore   = $import_summary['validation_passed'] && $can_import;
+			$conflict_rows  = $import_summary['conflicts'];
+			$can_restore    = $import_summary['validation_passed'] && $can_import;
 			if ( $import_summary['validation_passed'] && ! empty( $conflict_rows ) ) {
 				$message = __( 'Validation passed. Resolve conflicts below and confirm restore.', 'aio-page-builder' );
 			} elseif ( $import_summary['validation_passed'] ) {
@@ -103,8 +103,8 @@ final class Import_Export_State_Builder {
 			'restore_action_state'      => array(
 				'can_restore'          => $can_restore,
 				'resolution_modes'     => $resolution_modes,
-				'message'               => $message,
-				'last_restore_payload'  => $restore_result_payload,
+				'message'              => $message,
+				'last_restore_payload' => $restore_result_payload,
 			),
 			'can_export'                => $can_export,
 			'can_import'                => $can_import,
@@ -121,14 +121,14 @@ final class Import_Export_State_Builder {
 	 */
 	private function export_mode_options(): array {
 		$labels = array(
-			Export_Mode_Keys::FULL_OPERATIONAL_BACKUP     => __( 'Full operational backup', 'aio-page-builder' ),
-			Export_Mode_Keys::PRE_UNINSTALL_BACKUP        => __( 'Pre-uninstall backup', 'aio-page-builder' ),
-			Export_Mode_Keys::SUPPORT_BUNDLE              => __( 'Support bundle', 'aio-page-builder' ),
-			Export_Mode_Keys::TEMPLATE_ONLY_EXPORT        => __( 'Template only', 'aio-page-builder' ),
-			Export_Mode_Keys::PLAN_ARTIFACT_EXPORT        => __( 'Plan / artifact export', 'aio-page-builder' ),
+			Export_Mode_Keys::FULL_OPERATIONAL_BACKUP => __( 'Full operational backup', 'aio-page-builder' ),
+			Export_Mode_Keys::PRE_UNINSTALL_BACKUP    => __( 'Pre-uninstall backup', 'aio-page-builder' ),
+			Export_Mode_Keys::SUPPORT_BUNDLE          => __( 'Support bundle', 'aio-page-builder' ),
+			Export_Mode_Keys::TEMPLATE_ONLY_EXPORT    => __( 'Template only', 'aio-page-builder' ),
+			Export_Mode_Keys::PLAN_ARTIFACT_EXPORT    => __( 'Plan / artifact export', 'aio-page-builder' ),
 			Export_Mode_Keys::UNINSTALL_SETTINGS_PROFILE_ONLY => __( 'Uninstall settings/profile only', 'aio-page-builder' ),
 		);
-		$out = array();
+		$out    = array();
 		foreach ( Export_Mode_Keys::all() as $mode ) {
 			$out[] = array(
 				'value' => $mode,
@@ -164,17 +164,20 @@ final class Import_Export_State_Builder {
 			if ( $full_path === '' || ! is_file( $full_path ) ) {
 				continue;
 			}
-			$size = (int) @filesize( $full_path );
-			$mtime = @filemtime( $full_path );
+			$size   = (int) @filesize( $full_path );
+			$mtime  = @filemtime( $full_path );
 			$rows[] = array(
-				'filename'   => $file,
-				'size_bytes' => $size,
+				'filename'    => $file,
+				'size_bytes'  => $size,
 				'modified_at' => $mtime ? gmdate( 'Y-m-d H:i:s', $mtime ) : '',
 			);
 		}
-		usort( $rows, function ( array $a, array $b ): int {
-			return strcmp( $b['modified_at'], $a['modified_at'] );
-		} );
+		usort(
+			$rows,
+			function ( array $a, array $b ): int {
+				return strcmp( $b['modified_at'], $a['modified_at'] );
+			}
+		);
 		return array_slice( $rows, 0, self::EXPORT_HISTORY_LIMIT );
 	}
 
@@ -183,10 +186,22 @@ final class Import_Export_State_Builder {
 	 */
 	private function resolution_mode_options(): array {
 		return array(
-			array( 'value' => Conflict_Resolution_Service::MODE_OVERWRITE, 'label' => __( 'Overwrite current with package', 'aio-page-builder' ) ),
-			array( 'value' => Conflict_Resolution_Service::MODE_KEEP_CURRENT, 'label' => __( 'Keep current; skip conflicting', 'aio-page-builder' ) ),
-			array( 'value' => Conflict_Resolution_Service::MODE_DUPLICATE, 'label' => __( 'Import as duplicate where allowed', 'aio-page-builder' ) ),
-			array( 'value' => Conflict_Resolution_Service::MODE_CANCEL, 'label' => __( 'Cancel restore', 'aio-page-builder' ) ),
+			array(
+				'value' => Conflict_Resolution_Service::MODE_OVERWRITE,
+				'label' => __( 'Overwrite current with package', 'aio-page-builder' ),
+			),
+			array(
+				'value' => Conflict_Resolution_Service::MODE_KEEP_CURRENT,
+				'label' => __( 'Keep current; skip conflicting', 'aio-page-builder' ),
+			),
+			array(
+				'value' => Conflict_Resolution_Service::MODE_DUPLICATE,
+				'label' => __( 'Import as duplicate where allowed', 'aio-page-builder' ),
+			),
+			array(
+				'value' => Conflict_Resolution_Service::MODE_CANCEL,
+				'label' => __( 'Cancel restore', 'aio-page-builder' ),
+			),
 		);
 	}
 }

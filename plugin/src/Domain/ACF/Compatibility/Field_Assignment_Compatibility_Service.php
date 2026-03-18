@@ -39,7 +39,7 @@ final class Field_Assignment_Compatibility_Service {
 	/**
 	 * Returns group keys to retain during refinement (derived + deprecated that are currently assigned).
 	 *
-	 * @param int         $page_id       WordPress post ID (page).
+	 * @param int          $page_id       WordPress post ID (page).
 	 * @param list<string> $derived_groups Newly derived group keys from template/composition.
 	 * @return list<string> Union of derived and assigned deprecated groups to preserve.
 	 */
@@ -91,13 +91,13 @@ final class Field_Assignment_Compatibility_Service {
 	 * @return list<string>
 	 */
 	public function get_compatibility_notes_for_page( int $page_id ): array {
-		$notes   = array();
-		$source  = $this->assignment_service->get_structural_source_for_page( $page_id );
-		$groups  = $this->assignment_service->get_visible_groups_for_page( $page_id );
+		$notes            = array();
+		$source           = $this->assignment_service->get_structural_source_for_page( $page_id );
+		$groups           = $this->assignment_service->get_visible_groups_for_page( $page_id );
 		$deprecated_count = 0;
 		foreach ( $groups as $gk ) {
 			if ( $this->is_deprecated_group( $gk ) ) {
-				$deprecated_count++;
+				++$deprecated_count;
 			}
 		}
 		if ( $deprecated_count > 0 ) {

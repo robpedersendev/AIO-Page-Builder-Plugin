@@ -31,7 +31,7 @@ final class Composition_Filter_State_Test extends TestCase {
 
 	public function test_to_array_returns_all_filter_keys(): void {
 		$state = new Composition_Filter_State( 'hero', 'hero_intro', 'primary_cta', 'hero_compact', 'search', 'active', 2, 50 );
-		$a = $state->to_array();
+		$a     = $state->to_array();
 		$this->assertSame( 'hero', $a['purpose_family'] );
 		$this->assertSame( 'hero_intro', $a['category'] );
 		$this->assertSame( 'primary_cta', $a['cta_classification'] );
@@ -43,7 +43,7 @@ final class Composition_Filter_State_Test extends TestCase {
 	}
 
 	public function test_to_query_filters_maps_to_large_library_filter_keys(): void {
-		$state = new Composition_Filter_State( 'cta', '', 'contact_cta', '', '', '', 1, 25 );
+		$state   = new Composition_Filter_State( 'cta', '', 'contact_cta', '', '', '', 1, 25 );
 		$filters = $state->to_query_filters();
 		$this->assertSame( 'cta', $filters[ Large_Library_Query_Service::FILTER_SECTION_PURPOSE_FAMILY ] ?? '' );
 		$this->assertSame( 'contact_cta', $filters[ Large_Library_Query_Service::FILTER_CTA_CLASSIFICATION ] ?? '' );

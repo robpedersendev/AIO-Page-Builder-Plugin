@@ -22,7 +22,7 @@ final class Provider_Response_Normalizer_Test extends TestCase {
 	}
 
 	public function test_normalize_error_returns_stable_shape(): void {
-		$n = $this->normalizer();
+		$n   = $this->normalizer();
 		$err = $n->normalize_error( Provider_Response_Normalizer::ERROR_RATE_LIMIT, 'Rate limit exceeded' );
 		$this->assertSame( Provider_Response_Normalizer::ERROR_RATE_LIMIT, $err['category'] );
 		$this->assertSame( Provider_Response_Normalizer::RETRY_WITH_BACKOFF, $err['retry_posture'] );
@@ -53,7 +53,7 @@ final class Provider_Response_Normalizer_Test extends TestCase {
 	}
 
 	public function test_build_error_response_has_required_keys(): void {
-		$n = $this->normalizer();
+		$n   = $this->normalizer();
 		$res = $n->build_error_response( 'req_1', 'openai', 'gpt-4o', Provider_Response_Normalizer::ERROR_TIMEOUT, 'Request timed out' );
 		$this->assertFalse( $res['success'] );
 		$this->assertSame( 'req_1', $res['request_id'] );
@@ -65,10 +65,18 @@ final class Provider_Response_Normalizer_Test extends TestCase {
 	}
 
 	public function test_build_success_response_has_required_keys(): void {
-		$n = $this->normalizer();
-		$payload = array( 'version' => '1', 'sections' => array() );
-		$usage   = array( 'prompt_tokens' => 100, 'completion_tokens' => 50, 'total_tokens' => 150, 'cost_placeholder' => null );
-		$res = $n->build_success_response( 'req_2', 'openai', 'gpt-4o', $payload, $usage );
+		$n       = $this->normalizer();
+		$payload = array(
+			'version'  => '1',
+			'sections' => array(),
+		);
+		$usage   = array(
+			'prompt_tokens'     => 100,
+			'completion_tokens' => 50,
+			'total_tokens'      => 150,
+			'cost_placeholder'  => null,
+		);
+		$res     = $n->build_success_response( 'req_2', 'openai', 'gpt-4o', $payload, $usage );
 		$this->assertTrue( $res['success'] );
 		$this->assertSame( 'req_2', $res['request_id'] );
 		$this->assertSame( $payload, $res['structured_payload'] );

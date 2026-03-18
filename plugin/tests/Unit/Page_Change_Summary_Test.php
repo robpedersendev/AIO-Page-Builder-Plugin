@@ -18,7 +18,7 @@ require_once $plugin_root . '/src/Domain/Crawler/Comparison/Page_Change_Summary.
 final class Page_Change_Summary_Test extends TestCase {
 
 	public function test_to_array_returns_stable_shape(): void {
-		$p = new Page_Change_Summary(
+		$p   = new Page_Change_Summary(
 			'https://example.com/page',
 			Page_Change_Summary::CATEGORY_CHANGED,
 			array( Page_Change_Summary::REASON_TITLE_CHANGED ),

@@ -149,48 +149,48 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_create_plan_from_bundle', array( $this, 'handle_create_plan_from_bundle' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
 
-		$dashboard   = new Dashboard_Screen( $this->container );
-		$settings    = new Settings_Screen();
-		$diagnostics = new Diagnostics_Screen();
-		$acf_diagnostics = new ACF_Architecture_Diagnostics_Screen( $this->container );
-		$onboarding  = new Onboarding_Screen( $this->container );
-		$crawler_sessions  = new Crawler_Sessions_Screen( $this->container );
-		$crawler_comparison = new Crawler_Comparison_Screen( $this->container );
-		$ai_runs            = new AI_Runs_Screen( $this->container );
-		$ai_providers       = new AI_Providers_Screen( $this->container );
-		$prompt_experiments = new Prompt_Experiments_Screen( $this->container );
-		$build_plans        = new Build_Plans_Screen( $this->container );
-		$page_templates_dir   = new Page_Templates_Directory_Screen( $this->container );
-		$page_template_detail   = new Page_Template_Detail_Screen( $this->container );
-		$section_templates_dir  = new Section_Templates_Directory_Screen( $this->container );
-		$section_template_detail = new Section_Template_Detail_Screen( $this->container );
-		$template_compare_screen  = new Template_Compare_Screen( $this->container );
-		$compositions_screen     = new Compositions_Screen( $this->container );
-		$build_plan_analytics = new Build_Plan_Analytics_Screen( $this->container );
-		$template_analytics   = new Template_Analytics_Screen( $this->container );
-		$queue_logs           = new Queue_Logs_Screen( $this->container );
-		$support_triage     = new Support_Triage_Dashboard_Screen( $this->container );
-		$post_release_health = new Post_Release_Health_Screen( $this->container );
-		$privacy_reporting   = new Privacy_Reporting_Settings_Screen( $this->container );
-		$industry_profile     = new Industry_Profile_Settings_Screen( $this->container );
-		$industry_author_dashboard = new Industry_Author_Dashboard_Screen( $this->container );
-		$industry_health_report = new Industry_Health_Report_Screen( $this->container );
-		$industry_stale_content_report = new Industry_Stale_Content_Report_Screen( $this->container );
-		$industry_pack_family_comparison = new Industry_Pack_Family_Comparison_Screen( $this->container );
-		$industry_future_readiness = new Future_Industry_Readiness_Screen( $this->container );
-		$industry_future_subtype_readiness = new Future_Subtype_Readiness_Screen( $this->container );
-		$industry_maturity_delta_report = new Industry_Maturity_Delta_Report_Screen( $this->container );
-		$industry_drift_report = new Industry_Drift_Report_Screen( $this->container );
+		$dashboard                             = new Dashboard_Screen( $this->container );
+		$settings                              = new Settings_Screen();
+		$diagnostics                           = new Diagnostics_Screen();
+		$acf_diagnostics                       = new ACF_Architecture_Diagnostics_Screen( $this->container );
+		$onboarding                            = new Onboarding_Screen( $this->container );
+		$crawler_sessions                      = new Crawler_Sessions_Screen( $this->container );
+		$crawler_comparison                    = new Crawler_Comparison_Screen( $this->container );
+		$ai_runs                               = new AI_Runs_Screen( $this->container );
+		$ai_providers                          = new AI_Providers_Screen( $this->container );
+		$prompt_experiments                    = new Prompt_Experiments_Screen( $this->container );
+		$build_plans                           = new Build_Plans_Screen( $this->container );
+		$page_templates_dir                    = new Page_Templates_Directory_Screen( $this->container );
+		$page_template_detail                  = new Page_Template_Detail_Screen( $this->container );
+		$section_templates_dir                 = new Section_Templates_Directory_Screen( $this->container );
+		$section_template_detail               = new Section_Template_Detail_Screen( $this->container );
+		$template_compare_screen               = new Template_Compare_Screen( $this->container );
+		$compositions_screen                   = new Compositions_Screen( $this->container );
+		$build_plan_analytics                  = new Build_Plan_Analytics_Screen( $this->container );
+		$template_analytics                    = new Template_Analytics_Screen( $this->container );
+		$queue_logs                            = new Queue_Logs_Screen( $this->container );
+		$support_triage                        = new Support_Triage_Dashboard_Screen( $this->container );
+		$post_release_health                   = new Post_Release_Health_Screen( $this->container );
+		$privacy_reporting                     = new Privacy_Reporting_Settings_Screen( $this->container );
+		$industry_profile                      = new Industry_Profile_Settings_Screen( $this->container );
+		$industry_author_dashboard             = new Industry_Author_Dashboard_Screen( $this->container );
+		$industry_health_report                = new Industry_Health_Report_Screen( $this->container );
+		$industry_stale_content_report         = new Industry_Stale_Content_Report_Screen( $this->container );
+		$industry_pack_family_comparison       = new Industry_Pack_Family_Comparison_Screen( $this->container );
+		$industry_future_readiness             = new Future_Industry_Readiness_Screen( $this->container );
+		$industry_future_subtype_readiness     = new Future_Subtype_Readiness_Screen( $this->container );
+		$industry_maturity_delta_report        = new Industry_Maturity_Delta_Report_Screen( $this->container );
+		$industry_drift_report                 = new Industry_Drift_Report_Screen( $this->container );
 		$industry_scaffold_promotion_readiness = new Industry_Scaffold_Promotion_Readiness_Report_Screen( $this->container );
-		$industry_guided_repair = new Industry_Guided_Repair_Screen( $this->container );
-		$industry_subtype_comparison = new Industry_Subtype_Comparison_Screen( $this->container );
-		$industry_bundle_comparison   = new Industry_Starter_Bundle_Comparison_Screen( $this->container );
-		$industry_goal_comparison    = new Conversion_Goal_Comparison_Screen( $this->container );
-		$industry_bundle_import_preview = new Industry_Bundle_Import_Preview_Screen( $this->container );
-		$industry_style_preset = new Industry_Style_Preset_Screen( $this->container );
-		$global_style_tokens = new Global_Style_Token_Settings_Screen( $this->container );
-		$global_component_overrides = new Global_Component_Override_Settings_Screen( $this->container );
-		$import_export       = new Import_Export_Screen( $this->container );
+		$industry_guided_repair                = new Industry_Guided_Repair_Screen( $this->container );
+		$industry_subtype_comparison           = new Industry_Subtype_Comparison_Screen( $this->container );
+		$industry_bundle_comparison            = new Industry_Starter_Bundle_Comparison_Screen( $this->container );
+		$industry_goal_comparison              = new Conversion_Goal_Comparison_Screen( $this->container );
+		$industry_bundle_import_preview        = new Industry_Bundle_Import_Preview_Screen( $this->container );
+		$industry_style_preset                 = new Industry_Style_Preset_Screen( $this->container );
+		$global_style_tokens                   = new Global_Style_Token_Settings_Screen( $this->container );
+		$global_component_overrides            = new Global_Component_Override_Settings_Screen( $this->container );
+		$import_export                         = new Import_Export_Screen( $this->container );
 
 		add_menu_page(
 			__( 'AIO Page Builder', 'aio-page-builder' ),
@@ -643,13 +643,13 @@ final class Admin_Menu {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
 			exit;
 		}
-		$primary = isset( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$primary       = isset( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( \sanitize_text_field( \wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) ) )
 			: '';
 		$secondary_raw = isset( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
 			? $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ]
 			: ( isset( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] ) ? $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] : array() );
-		$secondary = array();
+		$secondary     = array();
 		if ( is_array( $secondary_raw ) ) {
 			foreach ( $secondary_raw as $v ) {
 				if ( is_string( $v ) ) {
@@ -664,7 +664,7 @@ final class Admin_Menu {
 		$selected_bundle_raw = isset( $_POST[ Industry_Starter_Bundle_Assistant::FIELD_NAME ] ) && \is_string( $_POST[ Industry_Starter_Bundle_Assistant::FIELD_NAME ] )
 			? \trim( \sanitize_text_field( \wp_unslash( $_POST[ Industry_Starter_Bundle_Assistant::FIELD_NAME ] ) ) )
 			: '';
-		$selected_bundle = '';
+		$selected_bundle     = '';
 		if ( $selected_bundle_raw !== '' && \strlen( $selected_bundle_raw ) <= 64 ) {
 			$bundle_registry = $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY )
 				? $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY )
@@ -677,17 +677,17 @@ final class Admin_Menu {
 			}
 		}
 
-		$subtype_raw = isset( $_POST[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $_POST[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
+		$subtype_raw      = isset( $_POST[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $_POST[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			? trim( sanitize_text_field( wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) ) )
 			: '';
-		$current = $repo->get_profile();
+		$current          = $repo->get_profile();
 		$previous_primary = isset( $current[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $current[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( $current[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
 		$subtype_registry = $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_REGISTRY )
 			? $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_SUBTYPE_REGISTRY )
 			: null;
-		$subtype = '';
+		$subtype          = '';
 		if ( $subtype_raw !== '' && $primary !== '' && strlen( $subtype_raw ) <= 64 && $subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ) {
 			$def = $subtype_registry->get( $subtype_raw );
 			if ( $def !== null && isset( $def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] ) && trim( (string) $def[ \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry::FIELD_PARENT_INDUSTRY_KEY ] ) === $primary ) {
@@ -703,7 +703,7 @@ final class Admin_Menu {
 			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => $selected_bundle,
 			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY   => $subtype,
 		);
-		$merged = array_merge( $current, $partial );
+		$merged  = array_merge( $current, $partial );
 		$merged[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = $secondary;
 		$pack_registry = null;
 		if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ) {
@@ -713,7 +713,7 @@ final class Admin_Menu {
 			}
 		}
 		$qp_registry = $this->container->has( 'industry_question_pack_registry' ) ? $this->container->get( 'industry_question_pack_registry' ) : null;
-		$validator = new Industry_Profile_Validator();
+		$validator   = new Industry_Profile_Validator();
 		if ( ! $validator->validate( $merged, $pack_registry, $qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null, $subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null ) ) {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
 			exit;
@@ -748,7 +748,7 @@ final class Admin_Menu {
 		$industry_key = isset( $_POST['aio_industry_pack_key'] ) && \is_string( $_POST['aio_industry_pack_key'] )
 			? \trim( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_pack_key'] ) ) )
 			: '';
-		$disable = isset( $_POST['aio_industry_pack_disable'] ) && (string) $_POST['aio_industry_pack_disable'] === '1';
+		$disable      = isset( $_POST['aio_industry_pack_disable'] ) && (string) $_POST['aio_industry_pack_disable'] === '1';
 		if ( $industry_key === '' ) {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
 			exit;
@@ -900,10 +900,10 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
-		$field = isset( $_POST['profile_field'] ) && \is_string( $_POST['profile_field'] )
+		$field   = isset( $_POST['profile_field'] ) && \is_string( $_POST['profile_field'] )
 			? \trim( \sanitize_text_field( \wp_unslash( $_POST['profile_field'] ) ) )
 			: '';
-		$value = isset( $_POST['profile_value'] ) && \is_string( $_POST['profile_value'] )
+		$value   = isset( $_POST['profile_value'] ) && \is_string( $_POST['profile_value'] )
 			? \trim( \sanitize_text_field( \wp_unslash( $_POST['profile_value'] ) ) )
 			: '';
 		$allowed = array( \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY );
@@ -985,7 +985,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Permission denied.', $redirect ) );
 			exit;
 		}
-		$file = isset( $_FILES['aio_industry_bundle_file'] ) && is_array( $_FILES['aio_industry_bundle_file'] ) ? $_FILES['aio_industry_bundle_file'] : array();
+		$file          = isset( $_FILES['aio_industry_bundle_file'] ) && is_array( $_FILES['aio_industry_bundle_file'] ) ? $_FILES['aio_industry_bundle_file'] : array();
 		$upload_result = Industry_Bundle_Upload_Validator::validate_upload( $file );
 		if ( ! $upload_result['ok'] ) {
 			if ( $upload_result['log_reason'] !== '' ) {
@@ -1005,27 +1005,31 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', \rawurlencode( $parse_result['user_message'] ), $redirect ) );
 			exit;
 		}
-		$bundle = $parse_result['bundle'];
-		$screen = new Industry_Bundle_Import_Preview_Screen( $this->container );
-		$local_state = $screen->get_local_state_for_conflict();
+		$bundle           = $parse_result['bundle'];
+		$screen           = new Industry_Bundle_Import_Preview_Screen( $this->container );
+		$local_state      = $screen->get_local_state_for_conflict();
 		$conflict_service = new Industry_Pack_Import_Conflict_Service();
-		$conflicts = $conflict_service->analyze( $bundle, $local_state );
-		$included = isset( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] ) && \is_array( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] )
+		$conflicts        = $conflict_service->analyze( $bundle, $local_state );
+		$included         = isset( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] ) && \is_array( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] )
 			? $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ]
 			: array();
-		$summary = array();
+		$summary          = array();
 		foreach ( $included as $cat ) {
 			if ( \is_string( $cat ) && isset( $bundle[ $cat ] ) && \is_array( $bundle[ $cat ] ) ) {
 				$summary[ $cat ] = \count( $bundle[ $cat ] );
 			}
 		}
 		$transient_key = \sprintf( 'aio_industry_bundle_preview_%d', \get_current_user_id() );
-		\set_transient( $transient_key, array(
-			'bundle'    => $bundle,
-			'conflicts' => $conflicts,
-			'included'  => $included,
-			'summary'   => $summary,
-		), 900 );
+		\set_transient(
+			$transient_key,
+			array(
+				'bundle'    => $bundle,
+				'conflicts' => $conflicts,
+				'included'  => $included,
+				'summary'   => $summary,
+			),
+			900
+		);
 		\wp_safe_redirect( $redirect );
 		exit;
 	}

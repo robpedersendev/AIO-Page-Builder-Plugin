@@ -19,7 +19,12 @@ final class Industry_Scaffold_Completeness_Report_Service_Test extends TestCase 
 
 	public function test_generate_report_with_no_registries_returns_structure(): void {
 		$service = new Industry_Scaffold_Completeness_Report_Service( null, null, null );
-		$report = $service->generate_report( array( 'include_draft_packs' => false, 'include_draft_subtypes' => false ) );
+		$report  = $service->generate_report(
+			array(
+				'include_draft_packs'    => false,
+				'include_draft_subtypes' => false,
+			)
+		);
 		$this->assertArrayHasKey( 'generated_at', $report );
 		$this->assertArrayHasKey( 'scaffold_results', $report );
 		$this->assertArrayHasKey( 'readable_summary', $report );
@@ -30,10 +35,12 @@ final class Industry_Scaffold_Completeness_Report_Service_Test extends TestCase 
 
 	public function test_generate_report_with_explicit_industry_key_evaluates_scaffold(): void {
 		$service = new Industry_Scaffold_Completeness_Report_Service( null, null, null );
-		$report = $service->generate_report( array(
-			'scaffold_industry_keys' => array( 'test_future_industry' ),
-			'include_draft_packs'    => false,
-		) );
+		$report  = $service->generate_report(
+			array(
+				'scaffold_industry_keys' => array( 'test_future_industry' ),
+				'include_draft_packs'    => false,
+			)
+		);
 		$this->assertCount( 1, $report['scaffold_results'] );
 		$result = $report['scaffold_results'][0];
 		$this->assertSame( 'industry', $result['scaffold_type'] );
@@ -46,10 +53,12 @@ final class Industry_Scaffold_Completeness_Report_Service_Test extends TestCase 
 
 	public function test_generate_report_with_subtype_key_evaluates_subtype_scaffold(): void {
 		$service = new Industry_Scaffold_Completeness_Report_Service( null, null, null );
-		$report = $service->generate_report( array(
-			'scaffold_subtype_keys'  => array( 'test_future_subtype' ),
-			'include_draft_subtypes' => false,
-		) );
+		$report  = $service->generate_report(
+			array(
+				'scaffold_subtype_keys'  => array( 'test_future_subtype' ),
+				'include_draft_subtypes' => false,
+			)
+		);
 		$this->assertCount( 1, $report['scaffold_results'] );
 		$result = $report['scaffold_results'][0];
 		$this->assertSame( 'subtype', $result['scaffold_type'] );

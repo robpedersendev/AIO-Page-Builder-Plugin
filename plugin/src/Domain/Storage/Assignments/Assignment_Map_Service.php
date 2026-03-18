@@ -33,11 +33,11 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 	/**
 	 * Inserts a new assignment row. map_type must be valid per Assignment_Types.
 	 *
-	 * @param string               $map_type   One of Assignment_Types constants.
-	 * @param string               $source_ref Source identifier (e.g. page id, plan id).
-	 * @param string               $target_ref Target identifier (e.g. template key, object ref).
-	 * @param string               $scope_ref  Optional scope (e.g. composition id); empty string stored as NULL.
-	 * @param string|null          $payload    Optional JSON or text; no secrets.
+	 * @param string      $map_type   One of Assignment_Types constants.
+	 * @param string      $source_ref Source identifier (e.g. page id, plan id).
+	 * @param string      $target_ref Target identifier (e.g. template key, object ref).
+	 * @param string      $scope_ref  Optional scope (e.g. composition id); empty string stored as NULL.
+	 * @param string|null $payload    Optional JSON or text; no secrets.
 	 * @return int Inserted row id, or 0 on failure.
 	 */
 	public function create( string $map_type, string $source_ref, string $target_ref, string $scope_ref = '', ?string $payload = null ): int {
@@ -48,9 +48,9 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		if ( $map_type === '' || $source_ref === '' || $target_ref === '' ) {
 			return 0;
 		}
-		$scope_val  = $scope_ref !== '' ? $scope_ref : null;
+		$scope_val   = $scope_ref !== '' ? $scope_ref : null;
 		$payload_val = $payload !== null && $payload !== '' ? $payload : null;
-		$result = $this->wpdb->query(
+		$result      = $this->wpdb->query(
 			$this->wpdb->prepare(
 				"INSERT INTO `{$this->table}` (`map_type`,`source_ref`,`target_ref`,`scope_ref`,`payload`,`schema_version`) VALUES (%s,%s,%s,%s,%s,%s)",
 				$map_type,
@@ -70,7 +70,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 	/**
 	 * Updates an existing row by id. Only non-null arguments are updated.
 	 *
-	 * @param int      $id         Row id.
+	 * @param int         $id         Row id.
 	 * @param string|null $map_type   New map_type if provided.
 	 * @param string|null $source_ref New source_ref if provided.
 	 * @param string|null $target_ref New target_ref if provided.
@@ -82,7 +82,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		if ( $id <= 0 ) {
 			return false;
 		}
-		$set    = array( 'schema_version' => self::SCHEMA_VERSION );
+		$set     = array( 'schema_version' => self::SCHEMA_VERSION );
 		$formats = array( '%s' );
 		if ( $map_type !== null ) {
 			$m = $this->sanitize_map_type( $map_type );
@@ -90,23 +90,23 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 				return false;
 			}
 			$set['map_type'] = $m;
-			$formats[] = '%s';
+			$formats[]       = '%s';
 		}
 		if ( $source_ref !== null ) {
 			$set['source_ref'] = $this->sanitize_ref( $source_ref );
-			$formats[] = '%s';
+			$formats[]         = '%s';
 		}
 		if ( $target_ref !== null ) {
 			$set['target_ref'] = $this->sanitize_ref( $target_ref );
-			$formats[] = '%s';
+			$formats[]         = '%s';
 		}
 		if ( $scope_ref !== null ) {
 			$set['scope_ref'] = $scope_ref === '' ? null : $this->sanitize_ref( $scope_ref );
-			$formats[] = '%s';
+			$formats[]        = '%s';
 		}
 		if ( $payload !== null ) {
 			$set['payload'] = $payload === '' ? null : $payload;
-			$formats[] = '%s';
+			$formats[]      = '%s';
 		}
 		$result = $this->wpdb->update( $this->table, $set, array( 'id' => $id ), $formats, array( '%d' ) );
 		return $result === 1;
@@ -158,7 +158,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		}
 		$limit  = $limit > 0 ? min( 500, $limit ) : 500;
 		$offset = max( 0, $offset );
-		$rows = $this->wpdb->get_results(
+		$rows   = $this->wpdb->get_results(
 			$this->wpdb->prepare(
 				"SELECT * FROM `{$this->table}` WHERE map_type = %s ORDER BY id ASC LIMIT %d OFFSET %d",
 				$map_type,
@@ -185,7 +185,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 			return array();
 		}
 		$limit = $limit > 0 ? min( 500, $limit ) : 100;
-		$rows = $this->wpdb->get_results(
+		$rows  = $this->wpdb->get_results(
 			$this->wpdb->prepare(
 				"SELECT * FROM `{$this->table}` WHERE map_type = %s AND source_ref = %s ORDER BY id ASC LIMIT %d",
 				$map_type,
@@ -213,7 +213,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 			return array();
 		}
 		$limit = $limit > 0 ? min( 500, $limit ) : 500;
-		$rows = $this->wpdb->get_col(
+		$rows  = $this->wpdb->get_col(
 			$this->wpdb->prepare(
 				"SELECT target_ref FROM `{$this->table}` WHERE map_type = %s AND source_ref = %s ORDER BY id ASC LIMIT %d",
 				$map_type,
@@ -264,7 +264,10 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		}
 		$result = $this->wpdb->delete(
 			$this->table,
-			array( 'map_type' => $map_type, 'source_ref' => $source_ref ),
+			array(
+				'map_type'   => $map_type,
+				'source_ref' => $source_ref,
+			),
 			array( '%s', '%s' )
 		);
 		return is_int( $result ) ? $result : 0;
@@ -285,7 +288,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 			return array();
 		}
 		$limit = $limit > 0 ? min( 500, $limit ) : 100;
-		$rows = $this->wpdb->get_results(
+		$rows  = $this->wpdb->get_results(
 			$this->wpdb->prepare(
 				"SELECT * FROM `{$this->table}` WHERE map_type = %s AND target_ref = %s ORDER BY id ASC LIMIT %d",
 				$map_type,

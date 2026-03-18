@@ -49,7 +49,7 @@ final class Build_Plan_Template_Explanation_Builder_Test extends TestCase {
 
 	public function test_build_explanation_has_build_plan_explanation_keys(): void {
 		$explanation = $this->builder->build_explanation( 'pt_any', array( 'purpose' => 'Test page' ) );
-		$expected = array( 'template_key', 'name', 'purpose_summary', 'template_category_class', 'template_family', 'hierarchy_hint', 'cta_direction_summary', 'section_count', 'version', 'deprecation_status', 'replacement_keys', 'one_pager_available', 'explanation_lines' );
+		$expected    = array( 'template_key', 'name', 'purpose_summary', 'template_category_class', 'template_family', 'hierarchy_hint', 'cta_direction_summary', 'section_count', 'version', 'deprecation_status', 'replacement_keys', 'one_pager_available', 'explanation_lines' );
 		foreach ( $expected as $key ) {
 			$this->assertArrayHasKey( $key, $explanation );
 		}

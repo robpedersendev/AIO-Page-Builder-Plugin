@@ -52,7 +52,7 @@ final class Prompt_Pack_Schema_Test extends TestCase {
 	}
 
 	public function test_invalid_pack_missing_segments_rejected(): void {
-		$pack = array(
+		$pack     = array(
 			Prompt_Pack_Schema::ROOT_INTERNAL_KEY => 'aio/bad',
 			Prompt_Pack_Schema::ROOT_NAME         => 'Bad',
 			Prompt_Pack_Schema::ROOT_VERSION      => '1.0.0',

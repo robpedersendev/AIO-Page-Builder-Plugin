@@ -41,14 +41,14 @@ final class Render_Preview_Helper {
 		$wrapper = $section->get_wrapper_attrs();
 		$classes = isset( $wrapper['class'] ) && is_array( $wrapper['class'] ) ? $wrapper['class'] : array();
 		return array(
-			'type'             => 'section',
-			'section_key'      => $section->get_section_key(),
-			'variant'          => $section->get_variant(),
-			'position'         => $section->get_position(),
-			'wrapper_classes'  => $classes,
-			'field_keys'       => array_keys( $section->get_field_values() ),
-			'structural_hint'  => $section->get_structural_hint(),
-			'valid'            => $section->is_valid(),
+			'type'            => 'section',
+			'section_key'     => $section->get_section_key(),
+			'variant'         => $section->get_variant(),
+			'position'        => $section->get_position(),
+			'wrapper_classes' => $classes,
+			'field_keys'      => array_keys( $section->get_field_values() ),
+			'structural_hint' => $section->get_structural_hint(),
+			'valid'           => $section->is_valid(),
 		);
 	}
 
@@ -60,7 +60,7 @@ final class Render_Preview_Helper {
 	 * @return array<string, mixed> preview_payload shape: type=page, source_type, source_key, section_count, section_previews, block_content_preview (truncated), survivability_notes.
 	 */
 	public function build_page_preview( Page_Block_Assembly_Result $assembly, bool $include_content_preview = true ): array {
-		$ordered = $assembly->get_ordered_sections();
+		$ordered          = $assembly->get_ordered_sections();
 		$section_previews = array();
 		foreach ( $ordered as $s ) {
 			$section_previews[] = array(
@@ -69,7 +69,7 @@ final class Render_Preview_Helper {
 				'position'    => $s['position'] ?? 0,
 			);
 		}
-		$content = $assembly->get_block_content();
+		$content               = $assembly->get_block_content();
 		$block_content_preview = '';
 		if ( $include_content_preview ) {
 			$block_content_preview = strlen( $content ) > self::PREVIEW_CONTENT_MAX_LENGTH
@@ -81,11 +81,11 @@ final class Render_Preview_Helper {
 			'source_type'           => $assembly->get_source_type(),
 			'source_key'            => $assembly->get_source_key(),
 			'section_count'         => count( $ordered ),
-			'section_previews'       => $section_previews,
-			'block_content_preview'  => $block_content_preview,
-			'block_content_length'   => strlen( $content ),
-			'survivability_notes'    => $assembly->get_survivability_notes(),
-			'valid'                  => $assembly->is_valid(),
+			'section_previews'      => $section_previews,
+			'block_content_preview' => $block_content_preview,
+			'block_content_length'  => strlen( $content ),
+			'survivability_notes'   => $assembly->get_survivability_notes(),
+			'valid'                 => $assembly->is_valid(),
 		);
 	}
 
@@ -97,7 +97,7 @@ final class Render_Preview_Helper {
 	 * @return array<string, mixed> preview_payload
 	 */
 	public function build_composition_preview( Page_Block_Assembly_Result $assembly, bool $include_content_preview = true ): array {
-		$payload = $this->build_page_preview( $assembly, $include_content_preview );
+		$payload         = $this->build_page_preview( $assembly, $include_content_preview );
 		$payload['type'] = 'composition';
 		return $payload;
 	}

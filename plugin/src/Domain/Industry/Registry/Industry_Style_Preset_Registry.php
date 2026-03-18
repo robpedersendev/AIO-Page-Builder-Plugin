@@ -17,25 +17,25 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Industry_Style_Preset_Registry {
 
-	public const FIELD_STYLE_PRESET_KEY   = 'style_preset_key';
-	public const FIELD_LABEL              = 'label';
-	public const FIELD_VERSION_MARKER     = 'version_marker';
-	public const FIELD_STATUS             = 'status';
-	public const FIELD_INDUSTRY_KEY       = 'industry_key';
-	public const FIELD_TOKEN_VALUES       = 'token_values';
-	public const FIELD_TOKEN_SET_REF       = 'token_set_ref';
+	public const FIELD_STYLE_PRESET_KEY        = 'style_preset_key';
+	public const FIELD_LABEL                   = 'label';
+	public const FIELD_VERSION_MARKER          = 'version_marker';
+	public const FIELD_STATUS                  = 'status';
+	public const FIELD_INDUSTRY_KEY            = 'industry_key';
+	public const FIELD_TOKEN_VALUES            = 'token_values';
+	public const FIELD_TOKEN_SET_REF           = 'token_set_ref';
 	public const FIELD_COMPONENT_OVERRIDE_REFS = 'component_override_refs';
-	public const FIELD_DESCRIPTION        = 'description';
-	public const FIELD_PREVIEW_METADATA   = 'preview_metadata';
+	public const FIELD_DESCRIPTION             = 'description';
+	public const FIELD_PREVIEW_METADATA        = 'preview_metadata';
 
-	public const STATUS_ACTIVE    = 'active';
-	public const STATUS_DRAFT    = 'draft';
+	public const STATUS_ACTIVE     = 'active';
+	public const STATUS_DRAFT      = 'draft';
 	public const STATUS_DEPRECATED = 'deprecated';
 
 	public const SUPPORTED_SCHEMA_VERSION = '1';
-	private const KEY_PATTERN = '#^[a-z0-9_-]+$#';
-	private const INDUSTRY_KEY_PATTERN = '#^[a-z0-9_-]+$#';
-	private const TOKEN_NAME_PATTERN = '#^--aio-[a-z0-9_-]+$#';
+	private const KEY_PATTERN             = '#^[a-z0-9_-]+$#';
+	private const INDUSTRY_KEY_PATTERN    = '#^[a-z0-9_-]+$#';
+	private const TOKEN_NAME_PATTERN      = '#^--aio-[a-z0-9_-]+$#';
 	/** Prohibited value substrings per styling-sanitization-rules (no script injection, no raw CSS). */
 	private const PROHIBITED_VALUE_PATTERNS = array( 'url(', 'expression(', 'javascript:', 'vbscript:', 'data:', '<', '>', '{', '}' );
 
@@ -64,7 +64,7 @@ final class Industry_Style_Preset_Registry {
 			}
 			$key = trim( (string) ( $preset[ self::FIELD_STYLE_PRESET_KEY ] ?? '' ) );
 			if ( $key !== '' && ! isset( $this->by_key[ $key ] ) ) {
-				$normalized = $this->normalize_preset( $preset );
+				$normalized           = $this->normalize_preset( $preset );
 				$this->by_key[ $key ] = $normalized;
 				$this->all[]          = $normalized;
 			}
@@ -141,7 +141,7 @@ final class Industry_Style_Preset_Registry {
 	 */
 	public function validate_preset( array $preset ): array {
 		$errors = array();
-		$key = isset( $preset[ self::FIELD_STYLE_PRESET_KEY ] ) && is_string( $preset[ self::FIELD_STYLE_PRESET_KEY ] )
+		$key    = isset( $preset[ self::FIELD_STYLE_PRESET_KEY ] ) && is_string( $preset[ self::FIELD_STYLE_PRESET_KEY ] )
 			? trim( $preset[ self::FIELD_STYLE_PRESET_KEY ] )
 			: '';
 		if ( $key === '' ) {

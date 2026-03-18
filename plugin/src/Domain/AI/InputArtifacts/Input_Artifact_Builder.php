@@ -49,14 +49,14 @@ final class Input_Artifact_Builder {
 		}
 
 		$artifact = array(
-			Input_Artifact_Schema::ROOT_ARTIFACT_ID      => $artifact_id,
-			Input_Artifact_Schema::ROOT_SCHEMA_VERSION   => self::SCHEMA_VERSION,
-			Input_Artifact_Schema::ROOT_CREATED_AT       => $this->iso8601_now(),
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => $artifact_id,
+			Input_Artifact_Schema::ROOT_SCHEMA_VERSION  => self::SCHEMA_VERSION,
+			Input_Artifact_Schema::ROOT_CREATED_AT      => $this->iso8601_now(),
 			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array(
 				Input_Artifact_Schema::PROMPT_PACK_REF_INTERNAL_KEY => $internal_key,
 				Input_Artifact_Schema::PROMPT_PACK_REF_VERSION       => $version,
 			),
-			Input_Artifact_Schema::ROOT_REDACTION => $redaction,
+			Input_Artifact_Schema::ROOT_REDACTION       => $redaction,
 		);
 
 		if ( isset( $options['profile'] ) && is_array( $options['profile'] ) ) {

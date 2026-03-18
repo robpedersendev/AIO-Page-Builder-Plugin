@@ -80,9 +80,14 @@ final class Industry_Pack_Toggle_Controller {
 			$current[] = $key;
 		}
 		if ( ! $disabled && $exists ) {
-			$current = \array_values( \array_filter( $current, function ( $k ) use ( $key ) {
-				return $k !== $key;
-			} ) );
+			$current = \array_values(
+				\array_filter(
+					$current,
+					function ( $k ) use ( $key ) {
+						return $k !== $key;
+					}
+				)
+			);
 		}
 		$this->settings->set( self::STORAGE_KEY, $current );
 	}

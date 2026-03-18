@@ -22,7 +22,7 @@ final class Execution_Lock_States {
 	// Queue status (contract §4.1; table column queue_status)
 	// -------------------------------------------------------------------------
 
-	public const STATUS_QUEUED     = 'queued';
+	public const STATUS_QUEUED    = 'queued';
 	public const STATUS_SCHEDULED = 'scheduled';
 	public const STATUS_RUNNING   = 'running';
 	public const STATUS_RETRYING  = 'retrying';
@@ -68,11 +68,11 @@ final class Execution_Lock_States {
 	// Lock scope key prefixes (contract §3.1)
 	// -------------------------------------------------------------------------
 
-	public const SCOPE_PREFIX_JOB        = 'job:';
-	public const SCOPE_PREFIX_ACTION     = 'action:';
-	public const SCOPE_PREFIX_PLAN       = 'plan:';
-	public const SCOPE_PREFIX_PLAN_ITEM  = 'plan_item:';
-	public const SCOPE_PREFIX_PAGE       = 'page:';
+	public const SCOPE_PREFIX_JOB       = 'job:';
+	public const SCOPE_PREFIX_ACTION    = 'action:';
+	public const SCOPE_PREFIX_PLAN      = 'plan:';
+	public const SCOPE_PREFIX_PLAN_ITEM = 'plan_item:';
+	public const SCOPE_PREFIX_PAGE      = 'page:';
 	public const SCOPE_PREFIX_MENU      = 'menu:';
 
 	// -------------------------------------------------------------------------

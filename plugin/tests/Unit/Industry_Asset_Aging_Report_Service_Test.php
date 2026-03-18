@@ -54,7 +54,7 @@ final class Industry_Asset_Aging_Report_Service_Test extends TestCase {
 	public function test_each_item_has_required_keys(): void {
 		$service = new Industry_Asset_Aging_Report_Service();
 		$result  = $service->generate_report();
-		$keys = array(
+		$keys    = array(
 			Industry_Asset_Aging_Report_Service::ITEM_ASSET_REF,
 			Industry_Asset_Aging_Report_Service::ITEM_ASSET_CLASS,
 			Industry_Asset_Aging_Report_Service::ITEM_DAYS_OLD,
@@ -77,9 +77,9 @@ final class Industry_Asset_Aging_Report_Service_Test extends TestCase {
 		$service = new Industry_Asset_Aging_Report_Service();
 		$result  = $service->generate_report();
 		$this->assertSame( count( $result['items'] ), $result['summary']['total'] );
-		$benign_count = count( $result['by_severity'][ Industry_Asset_Aging_Report_Service::SEVERITY_BENIGN ] ?? array() );
+		$benign_count   = count( $result['by_severity'][ Industry_Asset_Aging_Report_Service::SEVERITY_BENIGN ] ?? array() );
 		$advisory_count = count( $result['by_severity'][ Industry_Asset_Aging_Report_Service::SEVERITY_ADVISORY ] ?? array() );
-		$high_count = count( $result['high_impact_stale'] );
+		$high_count     = count( $result['high_impact_stale'] );
 		$this->assertSame( $benign_count, $result['summary']['benign'] );
 		$this->assertSame( $advisory_count, $result['summary']['advisory'] );
 		$this->assertSame( $high_count, $result['summary']['high_impact'] );

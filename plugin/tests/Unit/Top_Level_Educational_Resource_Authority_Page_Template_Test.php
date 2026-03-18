@@ -77,11 +77,11 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Test extends 
 	public function test_top_level_edu_resource_authority_cta_count_at_least_three_and_last_section_is_cta(): void {
 		foreach ( Top_Level_Educational_Resource_Authority_Page_Template_Definitions::all_definitions() as $def ) {
 			$internal_key = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
-			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+			$ordered      = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			$this->assertNotEmpty( $ordered );
 			$section_keys = array();
 			foreach ( $ordered as $item ) {
-				$key = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
+				$key            = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
 				$section_keys[] = $key;
 			}
 			$cta_keys = array_filter( $section_keys, array( self::class, 'is_cta_section_key' ) );
@@ -93,7 +93,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Test extends 
 
 	public function test_no_adjacent_cta_sections(): void {
 		foreach ( Top_Level_Educational_Resource_Authority_Page_Template_Definitions::all_definitions() as $def ) {
-			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+			$ordered      = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			$section_keys = array();
 			foreach ( $ordered as $item ) {
 				$section_keys[] = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
@@ -108,15 +108,18 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Test extends 
 
 	public function test_non_cta_section_count_in_range_8_to_14(): void {
 		foreach ( Top_Level_Educational_Resource_Authority_Page_Template_Definitions::all_definitions() as $def ) {
-			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+			$ordered      = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 			$section_keys = array();
 			foreach ( $ordered as $item ) {
 				$section_keys[] = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
 			}
-			$non_cta = array_filter( $section_keys, function ( $k ) {
-				return ! self::is_cta_section_key( $k );
-			} );
-			$count = count( $non_cta );
+			$non_cta = array_filter(
+				$section_keys,
+				function ( $k ) {
+					return ! self::is_cta_section_key( $k );
+				}
+			);
+			$count   = count( $non_cta );
 			$this->assertGreaterThanOrEqual( 8, $count, "Non-CTA section count must be >= 8, got {$count}" );
 			$this->assertLessThanOrEqual( 14, $count, "Non-CTA section count must be <= 14, got {$count}" );
 		}
@@ -157,7 +160,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Test extends 
 			$one_pager = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? array();
 			$this->assertIsArray( $one_pager );
 			$has_flow = isset( $one_pager['page_flow_explanation'] ) && (string) $one_pager['page_flow_explanation'] !== '';
-			$has_cta = isset( $one_pager['cta_direction_summary'] ) && (string) $one_pager['cta_direction_summary'] !== '';
+			$has_cta  = isset( $one_pager['cta_direction_summary'] ) && (string) $one_pager['cta_direction_summary'] !== '';
 			$this->assertTrue( $has_flow || $has_cta, 'One-pager should include page_flow_explanation or cta_direction_summary' );
 		}
 	}
@@ -165,7 +168,7 @@ final class Top_Level_Educational_Resource_Authority_Page_Template_Test extends 
 	public function test_section_requirements_match_ordered_sections(): void {
 		foreach ( Top_Level_Educational_Resource_Authority_Page_Template_Definitions::all_definitions() as $def ) {
 			$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
-			$reqs = $def[ Page_Template_Schema::FIELD_SECTION_REQUIREMENTS ] ?? array();
+			$reqs    = $def[ Page_Template_Schema::FIELD_SECTION_REQUIREMENTS ] ?? array();
 			foreach ( $ordered as $item ) {
 				$key = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? '' );
 				$this->assertArrayHasKey( $key, $reqs, "Section requirements must include key: {$key}" );

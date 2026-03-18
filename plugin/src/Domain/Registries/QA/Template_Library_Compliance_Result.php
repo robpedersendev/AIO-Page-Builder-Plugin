@@ -56,13 +56,13 @@ final class Template_Library_Compliance_Result {
 		array $export_viability,
 		bool $passed
 	) {
-		$this->count_summary            = $count_summary;
+		$this->count_summary             = $count_summary;
 		$this->category_coverage_summary = $category_coverage_summary;
-		$this->cta_rule_violations      = $cta_rule_violations;
-		$this->preview_readiness        = $preview_readiness;
-		$this->metadata_checks         = $metadata_checks;
-		$this->export_viability        = $export_viability;
-		$this->passed                  = $passed;
+		$this->cta_rule_violations       = $cta_rule_violations;
+		$this->preview_readiness         = $preview_readiness;
+		$this->metadata_checks           = $metadata_checks;
+		$this->export_viability          = $export_viability;
+		$this->passed                    = $passed;
 	}
 
 	public function get_count_summary(): array {
@@ -103,11 +103,11 @@ final class Template_Library_Compliance_Result {
 		return array(
 			'count_summary'             => $this->count_summary,
 			'category_coverage_summary' => $this->category_coverage_summary,
-			'cta_rule_violations'        => $this->cta_rule_violations,
-			'preview_readiness'          => $this->preview_readiness,
-			'metadata_checks'            => $this->metadata_checks,
-			'export_viability'           => $this->export_viability,
-			'passed'                     => $this->passed,
+			'cta_rule_violations'       => $this->cta_rule_violations,
+			'preview_readiness'         => $this->preview_readiness,
+			'metadata_checks'           => $this->metadata_checks,
+			'export_viability'          => $this->export_viability,
+			'passed'                    => $this->passed,
 		);
 	}
 
@@ -117,8 +117,8 @@ final class Template_Library_Compliance_Result {
 	 * @return list<string>
 	 */
 	public function to_summary_lines(): array {
-		$lines = array();
-		$c = $this->count_summary;
+		$lines   = array();
+		$c       = $this->count_summary;
 		$lines[] = sprintf(
 			'Sections: %d / %d. Pages: %d / %d.',
 			$c['section_total'] ?? 0,
@@ -126,11 +126,14 @@ final class Template_Library_Compliance_Result {
 			$c['page_total'] ?? 0,
 			$c['page_target'] ?? 500
 		);
-		$viol = $this->cta_rule_violations;
-		$hard = array_filter( $viol, function ( $v ) {
-			$code = $v['code'] ?? '';
-			return $code !== 'non_cta_count_above_max';
-		} );
+		$viol    = $this->cta_rule_violations;
+		$hard    = array_filter(
+			$viol,
+			function ( $v ) {
+				$code = $v['code'] ?? '';
+				return $code !== 'non_cta_count_above_max';
+			}
+		);
 		if ( ! empty( $hard ) ) {
 			$lines[] = 'CTA rule violations (hard): ' . count( $hard );
 		}

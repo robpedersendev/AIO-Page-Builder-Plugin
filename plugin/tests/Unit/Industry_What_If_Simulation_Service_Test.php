@@ -60,9 +60,11 @@ final class Industry_What_If_Simulation_Service_Test extends TestCase {
 		$settings = new Settings_Service();
 		$repo     = new Industry_Profile_Repository( $settings );
 		$service  = new Industry_What_If_Simulation_Service( $repo );
-		$result   = $service->run_simulation( array(
-			Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => '',
-		) );
+		$result   = $service->run_simulation(
+			array(
+				Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => '',
+			)
+		);
 		$this->assertTrue( $result['valid'] );
 		$this->assertSame( '', $result['simulated_profile_summary']['goal'] );
 		$this->assertSame( 'bookings', $result['live_profile_summary']['goal'] );
@@ -73,9 +75,11 @@ final class Industry_What_If_Simulation_Service_Test extends TestCase {
 		$settings = new Settings_Service();
 		$repo     = new Industry_Profile_Repository( $settings );
 		$service  = new Industry_What_If_Simulation_Service( $repo );
-		$result   = $service->run_simulation( array(
-			Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => 'lead_capture',
-		) );
+		$result   = $service->run_simulation(
+			array(
+				Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => 'lead_capture',
+			)
+		);
 		$this->assertTrue( $result['valid'] );
 		$this->assertSame( 'lead_capture', $result['simulated_profile_summary']['goal'] );
 		$this->assertSame( 'bookings', $result['live_profile_summary']['goal'] );
@@ -86,9 +90,11 @@ final class Industry_What_If_Simulation_Service_Test extends TestCase {
 		$settings = new Settings_Service();
 		$repo     = new Industry_Profile_Repository( $settings );
 		$service  = new Industry_What_If_Simulation_Service( $repo );
-		$result   = $service->run_simulation( array(
-			Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => 'invalid.goal!',
-		) );
+		$result   = $service->run_simulation(
+			array(
+				Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => 'invalid.goal!',
+			)
+		);
 		$this->assertTrue( $result['valid'] );
 		$this->assertSame( '', $result['simulated_profile_summary']['goal'] );
 	}
@@ -99,10 +105,12 @@ final class Industry_What_If_Simulation_Service_Test extends TestCase {
 		$repo     = new Industry_Profile_Repository( $settings );
 		$pack_reg = new Industry_Pack_Registry();
 		$pack_reg->load( array() );
-		$service  = new Industry_What_If_Simulation_Service( $repo, $pack_reg );
-		$result   = $service->run_simulation( array(
-			Industry_What_If_Simulation_Service::PARAM_ALTERNATE_PRIMARY => 'nonexistent_pack',
-		) );
+		$service = new Industry_What_If_Simulation_Service( $repo, $pack_reg );
+		$result  = $service->run_simulation(
+			array(
+				Industry_What_If_Simulation_Service::PARAM_ALTERNATE_PRIMARY => 'nonexistent_pack',
+			)
+		);
 		$this->assertFalse( $result['valid'] );
 		$this->assertCount( 1, $result['invalid_refs'] );
 		$this->assertSame( 'primary_industry', $result['invalid_refs'][0]['type'] );
@@ -114,11 +122,21 @@ final class Industry_What_If_Simulation_Service_Test extends TestCase {
 		$settings = new Settings_Service();
 		$repo     = new Industry_Profile_Repository( $settings );
 		$pack_reg = new Industry_Pack_Registry();
-		$pack_reg->load( array( array( 'industry_key' => 'realtor', 'name' => 'Realtor', 'status' => 'active' ) ) );
-		$service  = new Industry_What_If_Simulation_Service( $repo, $pack_reg );
-		$result   = $service->run_simulation( array(
-			Industry_What_If_Simulation_Service::PARAM_ALTERNATE_PRIMARY => 'realtor',
-		) );
+		$pack_reg->load(
+			array(
+				array(
+					'industry_key' => 'realtor',
+					'name'         => 'Realtor',
+					'status'       => 'active',
+				),
+			)
+		);
+		$service = new Industry_What_If_Simulation_Service( $repo, $pack_reg );
+		$result  = $service->run_simulation(
+			array(
+				Industry_What_If_Simulation_Service::PARAM_ALTERNATE_PRIMARY => 'realtor',
+			)
+		);
 		$this->assertTrue( $result['valid'] );
 		$this->assertSame( 'realtor', $result['simulated_profile_summary']['primary'] );
 		$this->assertSame( 'realtor', $result['live_profile_summary']['primary'] );

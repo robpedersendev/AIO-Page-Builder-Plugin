@@ -51,9 +51,9 @@ final class Build_Plan_Row_Action_Resolver {
 	 * @return array<int, array<string, mixed>> List of action descriptors: action_id, label, enabled, url (optional).
 	 */
 	public function resolve( array $item, array $capabilities = array() ): array {
-		$status = (string) ( $item['status'] ?? Build_Plan_Item_Statuses::PENDING );
-		$can_approve = ! empty( $capabilities['can_approve'] );
-		$can_execute = ! empty( $capabilities['can_execute'] );
+		$status             = (string) ( $item['status'] ?? Build_Plan_Item_Statuses::PENDING );
+		$can_approve        = ! empty( $capabilities['can_approve'] );
+		$can_execute        = ! empty( $capabilities['can_execute'] );
 		$can_view_artifacts = ! empty( $capabilities['can_view_artifacts'] );
 
 		$actions = array();
@@ -65,20 +65,20 @@ final class Build_Plan_Row_Action_Resolver {
 		);
 
 		$can_review = Build_Plan_Item_Statuses::can_transition_review( $status, Build_Plan_Item_Statuses::APPROVED );
-		$actions[] = array(
+		$actions[]  = array(
 			'action_id' => self::ACTION_APPROVE,
 			'label'     => \__( 'Approve', 'aio-page-builder' ),
 			'enabled'   => $can_approve && $can_review,
 		);
 
-		$can_deny = Build_Plan_Item_Statuses::can_transition_review( $status, Build_Plan_Item_Statuses::REJECTED );
+		$can_deny  = Build_Plan_Item_Statuses::can_transition_review( $status, Build_Plan_Item_Statuses::REJECTED );
 		$actions[] = array(
 			'action_id' => self::ACTION_DENY,
 			'label'     => \__( 'Deny', 'aio-page-builder' ),
 			'enabled'   => $can_approve && $can_deny,
 		);
 
-		$can_run = $status === Build_Plan_Item_Statuses::APPROVED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
+		$can_run   = $status === Build_Plan_Item_Statuses::APPROVED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
 		$actions[] = array(
 			'action_id' => self::ACTION_EXECUTE,
 			'label'     => \__( 'Execute', 'aio-page-builder' ),

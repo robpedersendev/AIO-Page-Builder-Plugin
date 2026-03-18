@@ -37,12 +37,12 @@ final class Provider_Connection_Test_Result {
 	private string $user_message;
 
 	/**
-	 * @param bool   $success          Whether the connection test succeeded.
-	 * @param string $provider_id      Provider identifier.
-	 * @param string $model_used       Model used for the test.
+	 * @param bool                      $success          Whether the connection test succeeded.
+	 * @param string                    $provider_id      Provider identifier.
+	 * @param string                    $model_used       Model used for the test.
 	 * @param array<string, mixed>|null $normalized_error Error object when failed; null when success.
-	 * @param string $tested_at        ISO 8601 timestamp.
-	 * @param string $user_message     User-safe display message.
+	 * @param string                    $tested_at        ISO 8601 timestamp.
+	 * @param string                    $user_message     User-safe display message.
 	 */
 	public function __construct(
 		bool $success,
@@ -113,12 +113,12 @@ final class Provider_Connection_Test_Result {
 	 * @return self
 	 */
 	public static function from_array( array $data ): self {
-		$success    = ! empty( $data['success'] );
-		$provider   = isset( $data['provider_id'] ) ? (string) $data['provider_id'] : '';
-		$model      = isset( $data['model_used'] ) ? (string) $data['model_used'] : 'unknown';
-		$error      = isset( $data['normalized_error'] ) && is_array( $data['normalized_error'] ) ? $data['normalized_error'] : null;
-		$tested_at  = isset( $data['tested_at'] ) && is_string( $data['tested_at'] ) ? $data['tested_at'] : gmdate( 'c' );
-		$user_msg   = isset( $data['user_message'] ) && is_string( $data['user_message'] ) ? $data['user_message'] : ( $success ? 'Connection successful.' : 'Connection test failed.' );
+		$success   = ! empty( $data['success'] );
+		$provider  = isset( $data['provider_id'] ) ? (string) $data['provider_id'] : '';
+		$model     = isset( $data['model_used'] ) ? (string) $data['model_used'] : 'unknown';
+		$error     = isset( $data['normalized_error'] ) && is_array( $data['normalized_error'] ) ? $data['normalized_error'] : null;
+		$tested_at = isset( $data['tested_at'] ) && is_string( $data['tested_at'] ) ? $data['tested_at'] : gmdate( 'c' );
+		$user_msg  = isset( $data['user_message'] ) && is_string( $data['user_message'] ) ? $data['user_message'] : ( $success ? 'Connection successful.' : 'Connection test failed.' );
 		return new self( $success, $provider, $model, $error, $tested_at, $user_msg );
 	}
 }

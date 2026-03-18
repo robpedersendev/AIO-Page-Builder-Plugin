@@ -46,11 +46,11 @@ require_once $plugin_root . '/src/Domain/Industry/Onboarding/Industry_Question_P
 final class Onboarding_UI_State_Builder_Test extends TestCase {
 
 	private function get_builder(): Onboarding_UI_State_Builder {
-		$settings = new Settings_Service();
-		$normalizer = new Profile_Normalizer();
+		$settings      = new Settings_Service();
+		$normalizer    = new Profile_Normalizer();
 		$profile_store = new Profile_Store( $settings, $normalizer );
-		$draft_svc = new Onboarding_Draft_Service( $settings );
-		$prefill_svc = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$draft_svc     = new Onboarding_Draft_Service( $settings );
+		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null );
 		return new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc );
 	}
 
@@ -64,7 +64,7 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 
 	public function test_build_for_screen_returns_required_keys(): void {
 		$builder = $this->get_builder();
-		$state = $builder->build_for_screen();
+		$state   = $builder->build_for_screen();
 		$this->assertArrayHasKey( 'current_step_key', $state );
 		$this->assertArrayHasKey( 'steps', $state );
 		$this->assertArrayHasKey( 'overall_status', $state );
@@ -80,18 +80,18 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 	}
 
 	public function test_at_review_without_provider_sets_blocked(): void {
-		$settings = new Settings_Service();
-		$draft_svc = new Onboarding_Draft_Service( $settings );
-		$draft = $draft_svc->get_draft();
+		$settings                  = new Settings_Service();
+		$draft_svc                 = new Onboarding_Draft_Service( $settings );
+		$draft                     = $draft_svc->get_draft();
 		$draft['current_step_key'] = Onboarding_Step_Keys::REVIEW;
-		$draft['overall_status'] = Onboarding_Statuses::IN_PROGRESS;
+		$draft['overall_status']   = Onboarding_Statuses::IN_PROGRESS;
 		$draft['step_statuses'][ Onboarding_Step_Keys::REVIEW ] = Onboarding_Statuses::STEP_IN_PROGRESS;
 		$draft_svc->save_draft( $draft );
-		$normalizer = new Profile_Normalizer();
+		$normalizer    = new Profile_Normalizer();
 		$profile_store = new Profile_Store( $settings, $normalizer );
-		$prefill_svc = new Onboarding_Prefill_Service( $profile_store, $settings, null );
-		$builder = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc );
-		$state = $builder->build_for_screen();
+		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$builder       = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc );
+		$state         = $builder->build_for_screen();
 		$this->assertTrue( $state['is_blocked'] );
 		$this->assertNotEmpty( $state['blockers'] );
 		$this->assertFalse( $state['is_provider_ready'] );
@@ -99,7 +99,7 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 
 	public function test_prefill_contains_no_secret_keys(): void {
 		$builder = $this->get_builder();
-		$state = $builder->build_for_screen();
+		$state   = $builder->build_for_screen();
 		$prefill = $state['prefill'];
 		$this->assertArrayHasKey( 'provider_refs', $prefill );
 		foreach ( $prefill['provider_refs'] as $ref ) {
@@ -112,7 +112,7 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 
 	public function test_build_for_screen_includes_industry_question_pack_state_when_no_repo(): void {
 		$builder = $this->get_builder();
-		$state = $builder->build_for_screen();
+		$state   = $builder->build_for_screen();
 		$this->assertArrayHasKey( 'industry_question_pack', $state );
 		$this->assertArrayHasKey( 'industry_question_pack_answers', $state );
 		$this->assertNull( $state['industry_question_pack'] );
@@ -121,19 +121,21 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 
 	public function test_build_for_screen_includes_industry_question_pack_when_primary_set_and_supported(): void {
 		$settings = new Settings_Service();
-		$repo = new Industry_Profile_Repository( $settings );
-		$repo->merge_profile( array(
-			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor',
-			Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array( 'realtor' => array( 'market_focus' => 'residential' ) ),
-		) );
+		$repo     = new Industry_Profile_Repository( $settings );
+		$repo->merge_profile(
+			array(
+				Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor',
+				Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array( 'realtor' => array( 'market_focus' => 'residential' ) ),
+			)
+		);
 		$qp_registry = new Industry_Question_Pack_Registry();
 		$qp_registry->load( Industry_Question_Pack_Definitions::default_packs() );
-		$normalizer = new Profile_Normalizer();
+		$normalizer    = new Profile_Normalizer();
 		$profile_store = new Profile_Store( $settings, $normalizer );
-		$draft_svc = new Onboarding_Draft_Service( $settings );
-		$prefill_svc = new Onboarding_Prefill_Service( $profile_store, $settings, null );
-		$builder = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc, $repo, $qp_registry );
-		$state = $builder->build_for_screen();
+		$draft_svc     = new Onboarding_Draft_Service( $settings );
+		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$builder       = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc, $repo, $qp_registry );
+		$state         = $builder->build_for_screen();
 		$this->assertIsArray( $state['industry_question_pack'] );
 		$this->assertSame( 'realtor', $state['industry_question_pack']['industry_key'] ?? '' );
 		$this->assertSame( array( 'market_focus' => 'residential' ), $state['industry_question_pack_answers'] );
@@ -141,16 +143,16 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 
 	public function test_build_for_screen_industry_question_pack_null_when_primary_unsupported(): void {
 		$settings = new Settings_Service();
-		$repo = new Industry_Profile_Repository( $settings );
+		$repo     = new Industry_Profile_Repository( $settings );
 		$repo->merge_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'unknown_vertical' ) );
 		$qp_registry = new Industry_Question_Pack_Registry();
 		$qp_registry->load( Industry_Question_Pack_Definitions::default_packs() );
-		$normalizer = new Profile_Normalizer();
+		$normalizer    = new Profile_Normalizer();
 		$profile_store = new Profile_Store( $settings, $normalizer );
-		$draft_svc = new Onboarding_Draft_Service( $settings );
-		$prefill_svc = new Onboarding_Prefill_Service( $profile_store, $settings, null );
-		$builder = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc, $repo, $qp_registry );
-		$state = $builder->build_for_screen();
+		$draft_svc     = new Onboarding_Draft_Service( $settings );
+		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$builder       = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc, $repo, $qp_registry );
+		$state         = $builder->build_for_screen();
 		$this->assertNull( $state['industry_question_pack'] );
 		$this->assertSame( array(), $state['industry_question_pack_answers'] );
 	}

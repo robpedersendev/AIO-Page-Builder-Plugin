@@ -37,8 +37,8 @@ final class DbDelta_Runner_Test extends TestCase {
 
 	public function test_run_returns_failure_and_sanitized_error_when_last_error_set(): void {
 		$this->wpdb_stub->last_error = '  MySQL said: something <script>bad</script>  ';
-		$runner = new DbDelta_Runner();
-		$result = $runner->run( $this->wpdb_stub, 'CREATE TABLE `wp_test` ( `id` bigint(20) NOT NULL, PRIMARY KEY  (`id`) );' );
+		$runner                      = new DbDelta_Runner();
+		$result                      = $runner->run( $this->wpdb_stub, 'CREATE TABLE `wp_test` ( `id` bigint(20) NOT NULL, PRIMARY KEY  (`id`) );' );
 		$this->assertFalse( $result['success'] );
 		$this->assertStringNotContainsString( '<script>', $result['error'] );
 		$this->assertNotEmpty( $result['error'] );

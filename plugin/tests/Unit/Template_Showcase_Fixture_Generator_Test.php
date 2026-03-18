@@ -45,14 +45,16 @@ final class Template_Showcase_Fixture_Generator_Test extends TestCase {
 		$this->assertSame( $a['manifest']['counts'], $b['manifest']['counts'] );
 		$this->assertSame( $a['manifest']['version'], $b['manifest']['version'] );
 		$this->assertSame( $a['manifest']['generated_at'], $b['manifest']['generated_at'] );
-		$this->assertSame( array_map( fn( $s ) => $s[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '', $a['sections'] ),
-			array_map( fn( $s ) => $s[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '', $b['sections'] ) );
+		$this->assertSame(
+			array_map( fn( $s ) => $s[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '', $a['sections'] ),
+			array_map( fn( $s ) => $s[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '', $b['sections'] )
+		);
 		$this->assertSame( $a['compare_sets'], $b['compare_sets'] );
 	}
 
 	public function test_family_coverage_section_families_and_page_classes(): void {
-		$gen    = new Template_Showcase_Fixture_Generator();
-		$pack   = $gen->generate();
+		$gen      = new Template_Showcase_Fixture_Generator();
+		$pack     = $gen->generate();
 		$manifest = $pack['manifest'];
 		$this->assertContains( 'hero_intro', $manifest['section_families'] );
 		$this->assertContains( 'trust_proof', $manifest['section_families'] );
@@ -119,7 +121,7 @@ final class Template_Showcase_Fixture_Generator_Test extends TestCase {
 	}
 
 	public function test_sections_have_required_schema_keys(): void {
-		$gen = new Template_Showcase_Fixture_Generator();
+		$gen  = new Template_Showcase_Fixture_Generator();
 		$pack = $gen->generate();
 		foreach ( $pack['sections'] as $section ) {
 			$this->assertArrayHasKey( Section_Schema::FIELD_INTERNAL_KEY, $section );
@@ -129,7 +131,7 @@ final class Template_Showcase_Fixture_Generator_Test extends TestCase {
 	}
 
 	public function test_compositions_have_required_schema_keys(): void {
-		$gen = new Template_Showcase_Fixture_Generator();
+		$gen  = new Template_Showcase_Fixture_Generator();
 		$pack = $gen->generate();
 		foreach ( $pack['compositions'] as $comp ) {
 			$this->assertArrayHasKey( Composition_Schema::FIELD_COMPOSITION_ID, $comp );
@@ -139,7 +141,7 @@ final class Template_Showcase_Fixture_Generator_Test extends TestCase {
 	}
 
 	public function test_page_templates_have_template_family_and_class(): void {
-		$gen = new Template_Showcase_Fixture_Generator();
+		$gen  = new Template_Showcase_Fixture_Generator();
 		$pack = $gen->generate();
 		foreach ( $pack['page_templates'] as $pt ) {
 			$this->assertArrayHasKey( Page_Template_Schema::FIELD_INTERNAL_KEY, $pt );
@@ -152,8 +154,8 @@ final class Template_Showcase_Fixture_Generator_Test extends TestCase {
 	 * Example template showcase fixture manifest payload (Prompt 201). No pseudocode.
 	 */
 	public function test_example_template_showcase_manifest_payload(): void {
-		$gen  = new Template_Showcase_Fixture_Generator();
-		$pack = $gen->generate();
+		$gen      = new Template_Showcase_Fixture_Generator();
+		$pack     = $gen->generate();
 		$manifest = $pack['manifest'];
 
 		$this->assertSame( '1.0', $manifest['version'] );

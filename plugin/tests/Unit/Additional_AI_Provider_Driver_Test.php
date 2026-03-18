@@ -42,7 +42,7 @@ require_once $plugin_root . '/src/Domain/AI/Providers/Drivers/Provider_Connectio
  * In-memory secret store for additional-driver tests.
  */
 final class Additional_Driver_Test_Secret_Store implements Provider_Secret_Store_Interface {
-	private array $creds = array();
+	private array $creds  = array();
 	private array $states = array();
 
 	public function get_credential_for_provider( string $provider_id ): ?string {
@@ -58,7 +58,7 @@ final class Additional_Driver_Test_Secret_Store implements Provider_Secret_Store
 	}
 
 	public function set_credential( string $provider_id, string $value ): bool {
-		$this->creds[ $provider_id ]   = $value;
+		$this->creds[ $provider_id ]  = $value;
 		$this->states[ $provider_id ] = self::STATE_CONFIGURED;
 		return true;
 	}
@@ -81,7 +81,7 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 	}
 
 	public function test_capability_profile_models_have_required_keys(): void {
-		$cap   = Additional_Provider_Capability_Profile::get_capabilities();
+		$cap    = Additional_Provider_Capability_Profile::get_capabilities();
 		$models = $cap['models'];
 		foreach ( $models as $m ) {
 			$this->assertArrayHasKey( 'id', $m );
@@ -107,7 +107,7 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 			new Provider_Response_Normalizer(),
 			$store
 		);
-		$cap = $driver->get_capabilities();
+		$cap    = $driver->get_capabilities();
 		$this->assertSame( 'anthropic', $cap['provider_id'] );
 		$this->assertTrue( $cap['structured_output_supported'] );
 		$this->assertGreaterThan( 0, $cap['max_context_tokens'] );
@@ -115,9 +115,16 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 
 	public function test_validator_compatible_success_response_envelope_has_required_keys(): void {
 		$normalizer = new Provider_Response_Normalizer();
-		$payload   = array( 'steps' => array(), 'schema_ref' => 'aio/build-plan-draft-v1' );
-		$usage     = array( 'prompt_tokens' => 10, 'completion_tokens' => 20, 'total_tokens' => 30 );
-		$response  = $normalizer->build_success_response(
+		$payload    = array(
+			'steps'      => array(),
+			'schema_ref' => 'aio/build-plan-draft-v1',
+		);
+		$usage      = array(
+			'prompt_tokens'     => 10,
+			'completion_tokens' => 20,
+			'total_tokens'      => 30,
+		);
+		$response   = $normalizer->build_success_response(
 			'req-1',
 			'anthropic',
 			'claude-sonnet-4-20250514',
@@ -137,17 +144,17 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 	}
 
 	public function test_driver_request_without_credential_returns_normalized_auth_error(): void {
-		$store  = new Additional_Driver_Test_Secret_Store();
-		$driver = new Additional_AI_Provider_Driver(
+		$store    = new Additional_Driver_Test_Secret_Store();
+		$driver   = new Additional_AI_Provider_Driver(
 			new Provider_Error_Normalizer(),
 			new Provider_Response_Normalizer(),
 			$store
 		);
-		$request = array(
-			'request_id'     => 'test-req-1',
-			'model'           => 'claude-sonnet-4-20250514',
-			'system_prompt'   => '',
-			'user_message'   => 'Hi',
+		$request  = array(
+			'request_id'    => 'test-req-1',
+			'model'         => 'claude-sonnet-4-20250514',
+			'system_prompt' => '',
+			'user_message'  => 'Hi',
 		);
 		$response = $driver->request( $request );
 		$this->assertFalse( $response['success'] );
@@ -188,8 +195,8 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 	}
 
 	public function test_anthropic_connection_test_without_credential_returns_normalized_auth_error(): void {
-		$store   = new Additional_Driver_Test_Secret_Store();
-		$driver  = new Additional_AI_Provider_Driver(
+		$store    = new Additional_Driver_Test_Secret_Store();
+		$driver   = new Additional_AI_Provider_Driver(
 			new Provider_Error_Normalizer(),
 			new Provider_Response_Normalizer(),
 			$store
@@ -224,7 +231,7 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 			'2025-07-15T14:30:00+00:00',
 			'Connection successful.'
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 
 		$this->assertTrue( $arr['success'] );
 		$this->assertSame( 'anthropic', $arr['provider_id'] );
@@ -246,10 +253,10 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 			'category'      => Provider_Response_Normalizer::ERROR_AUTH_FAILURE,
 			'user_message'  => 'AI service authentication failed. Check your settings.',
 			'internal_code' => Provider_Response_Normalizer::ERROR_AUTH_FAILURE,
-			'provider_raw'   => null,
-			'retry_posture'  => Provider_Response_Normalizer::RETRY_NO_RETRY,
+			'provider_raw'  => null,
+			'retry_posture' => Provider_Response_Normalizer::RETRY_NO_RETRY,
 		);
-		$result = new Provider_Connection_Test_Result(
+		$result           = new Provider_Connection_Test_Result(
 			false,
 			'anthropic',
 			'claude-sonnet-4-20250514',
@@ -257,7 +264,7 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 			'2025-07-15T14:35:00+00:00',
 			'AI service authentication failed. Check your settings.'
 		);
-		$arr = $result->to_array();
+		$arr              = $result->to_array();
 
 		$this->assertFalse( $arr['success'] );
 		$this->assertSame( 'anthropic', $arr['provider_id'] );

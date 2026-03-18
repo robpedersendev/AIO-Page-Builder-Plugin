@@ -61,23 +61,23 @@ final class Industry_Drift_Report_Service {
 		$items = array();
 
 		if ( $this->pack_registry instanceof Industry_Pack_Registry ) {
-			$packs = $this->pack_registry->list_by_status( Industry_Pack_Schema::STATUS_ACTIVE );
-			$packs = array_merge( $packs, $this->pack_registry->list_by_status( Industry_Pack_Schema::STATUS_DRAFT ) );
-			$packs = array_merge( $packs, $this->pack_registry->list_by_status( Industry_Pack_Schema::STATUS_DEPRECATED ) );
+			$packs     = $this->pack_registry->list_by_status( Industry_Pack_Schema::STATUS_ACTIVE );
+			$packs     = array_merge( $packs, $this->pack_registry->list_by_status( Industry_Pack_Schema::STATUS_DRAFT ) );
+			$packs     = array_merge( $packs, $this->pack_registry->list_by_status( Industry_Pack_Schema::STATUS_DEPRECATED ) );
 			$seen_keys = array();
 			foreach ( $packs as $pack ) {
 				$industry_key = isset( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] )
 					? trim( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] )
 					: '';
 				foreach ( self::PACK_REQUIRED_FIELDS as $field ) {
-					$val = isset( $pack[ $field ] ) ? $pack[ $field ] : null;
+					$val   = isset( $pack[ $field ] ) ? $pack[ $field ] : null;
 					$empty = $val === null || ( is_string( $val ) && trim( (string) $val ) === '' );
 					if ( $empty ) {
 						$items[] = array(
-							'drift_type'           => self::DRIFT_TYPE_SCHEMA,
-							'severity'             => self::SEVERITY_SEVERE,
-							'evidence_refs'        => array( $industry_key !== '' ? $industry_key : 'unknown', $field ),
-							'explanation'          => sprintf( 'Pack definition missing required schema field: %s', $field ),
+							'drift_type'            => self::DRIFT_TYPE_SCHEMA,
+							'severity'              => self::SEVERITY_SEVERE,
+							'evidence_refs'         => array( $industry_key !== '' ? $industry_key : 'unknown', $field ),
+							'explanation'           => sprintf( 'Pack definition missing required schema field: %s', $field ),
 							'suggested_review_path' => 'Update pack definition to include required field per industry-pack-schema; re-run health check.',
 						);
 					}
@@ -90,8 +90,8 @@ final class Industry_Drift_Report_Service {
 		}
 
 		$by_severity = $this->group_by( $items, 'severity' );
-		$by_type = $this->group_by( $items, 'drift_type' );
-		$summary = array(
+		$by_type     = $this->group_by( $items, 'drift_type' );
+		$summary     = array(
 			'total'   => count( $items ),
 			'severe'  => count( $by_severity[ self::SEVERITY_SEVERE ] ?? array() ),
 			'minor'   => count( $by_severity[ self::SEVERITY_MINOR ] ?? array() ),
@@ -99,10 +99,10 @@ final class Industry_Drift_Report_Service {
 		);
 
 		return array(
-			'summary'     => $summary,
-			'items'       => $items,
-			'by_severity' => $by_severity,
-			'by_type'     => $by_type,
+			'summary'      => $summary,
+			'items'        => $items,
+			'by_severity'  => $by_severity,
+			'by_type'      => $by_type,
 			'generated_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
 		);
 	}
@@ -111,13 +111,13 @@ final class Industry_Drift_Report_Service {
 	 * Checks convention consistency across packs (e.g. version_marker presence).
 	 *
 	 * @param array<string, array<string, mixed>> $packs Keyed by industry_key.
-	 * @param list<array<string, mixed>>         $items Append findings here.
+	 * @param list<array<string, mixed>>          $items Append findings here.
 	 */
 	private function check_convention_drift( array $packs, array &$items ): void {
 		if ( count( $packs ) < 2 ) {
 			return;
 		}
-		$with_version = 0;
+		$with_version    = 0;
 		$without_version = 0;
 		foreach ( $packs as $pack ) {
 			$v = isset( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] ) ? $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] : null;
@@ -129,10 +129,10 @@ final class Industry_Drift_Report_Service {
 		}
 		if ( $with_version > 0 && $without_version > 0 ) {
 			$items[] = array(
-				'drift_type'           => self::DRIFT_TYPE_CONVENTION,
-				'severity'             => self::SEVERITY_MINOR,
-				'evidence_refs'        => array_keys( $packs ),
-				'explanation'          => 'Mixed use of version_marker across pack definitions; convention recommends consistent use.',
+				'drift_type'            => self::DRIFT_TYPE_CONVENTION,
+				'severity'              => self::SEVERITY_MINOR,
+				'evidence_refs'         => array_keys( $packs ),
+				'explanation'           => 'Mixed use of version_marker across pack definitions; convention recommends consistent use.',
 				'suggested_review_path' => 'Add version_marker to all pack definitions or document exception in authoring guide.',
 			);
 		}
@@ -140,7 +140,7 @@ final class Industry_Drift_Report_Service {
 
 	/**
 	 * @param list<array<string, mixed>> $items
-	 * @param string $key
+	 * @param string                     $key
 	 * @return array<string, list<array<string, mixed>>>
 	 */
 	private function group_by( array $items, string $key ): array {

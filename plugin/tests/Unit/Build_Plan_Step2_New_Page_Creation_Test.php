@@ -40,10 +40,10 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 
 	/** Example Step 2 row payload (spec §33.3). */
 	public const EXAMPLE_STEP2_ROW = array(
-		'item_id'                => 'plan_npc_0',
-		'status'                 => Build_Plan_Item_Statuses::PENDING,
-		'status_badge'           => 'pending',
-		'summary_columns'        => array(
+		'item_id'               => 'plan_npc_0',
+		'status'                => Build_Plan_Item_Statuses::PENDING,
+		'status_badge'          => 'pending',
+		'summary_columns'       => array(
 			'proposed_page_title' => 'Contact Us',
 			'proposed_slug'       => 'contact-us',
 			'purpose'             => 'Lead capture and support',
@@ -52,21 +52,44 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 			'page_type'           => 'landing',
 			'confidence'          => 'medium',
 		),
-		'row_actions'            => array(),
-		'is_selected'            => false,
-		'dependency_validation'  => array( 'blocking' => false, 'messages' => array() ),
-		'post_build_status'       => '',
+		'row_actions'           => array(),
+		'is_selected'           => false,
+		'dependency_validation' => array(
+			'blocking' => false,
+			'messages' => array(),
+		),
+		'post_build_status'     => '',
 	);
 
 	/** Example Step 2 detail payload (spec §33.3–33.4). */
 	public const EXAMPLE_STEP2_DETAIL = array(
-		'item_id'    => 'plan_npc_0',
-		'sections'   => array(
-			array( 'heading' => 'Page metadata', 'key' => 'metadata', 'content_lines' => array() ),
-			array( 'heading' => 'Parent / child hierarchy', 'key' => 'parent_child', 'content_lines' => array() ),
-			array( 'heading' => 'Dependency validation', 'key' => 'dependency_validation', 'content_lines' => array() ),
-			array( 'heading' => 'Post-build status', 'key' => 'post_build_status', 'content_lines' => array() ),
-			array( 'heading' => 'Retry and recovery', 'key' => 'retry_recovery', 'content' => '<p>—</p>' ),
+		'item_id'     => 'plan_npc_0',
+		'sections'    => array(
+			array(
+				'heading'       => 'Page metadata',
+				'key'           => 'metadata',
+				'content_lines' => array(),
+			),
+			array(
+				'heading'       => 'Parent / child hierarchy',
+				'key'           => 'parent_child',
+				'content_lines' => array(),
+			),
+			array(
+				'heading'       => 'Dependency validation',
+				'key'           => 'dependency_validation',
+				'content_lines' => array(),
+			),
+			array(
+				'heading'       => 'Post-build status',
+				'key'           => 'post_build_status',
+				'content_lines' => array(),
+			),
+			array(
+				'heading' => 'Retry and recovery',
+				'key'     => 'retry_recovery',
+				'content' => '<p>—</p>',
+			),
 		),
 		'row_actions' => array(),
 	);
@@ -103,8 +126,14 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 			);
 		}
 		$steps = array(
-			array( 'step_type' => 'overview', 'items' => array() ),
-			array( 'step_type' => Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES, 'items' => array() ),
+			array(
+				'step_type' => 'overview',
+				'items'     => array(),
+			),
+			array(
+				'step_type' => Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES,
+				'items'     => array(),
+			),
 			array(
 				Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_NEW_PAGES,
 				Build_Plan_Item_Schema::KEY_ITEMS     => $items,
@@ -149,7 +178,7 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$bulk      = new New_Page_Creation_Bulk_Action_Service( new Build_Plan_Repository() );
 		$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk );
 		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
-		$ids = array_column( $workspace['step_list_rows'], 'item_id' );
+		$ids       = array_column( $workspace['step_list_rows'], 'item_id' );
 		$this->assertNotContains( 'plan_npc_low', $ids );
 	}
 
@@ -164,10 +193,10 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 
 	/** Detail builder produces sections per spec §33.3–33.10. */
 	public function test_detail_builder_sections(): void {
-		$item = array(
-			Build_Plan_Item_Schema::KEY_ITEM_ID   => 'plan_npc_0',
-			Build_Plan_Item_Schema::KEY_STATUS   => Build_Plan_Item_Statuses::PENDING,
-			Build_Plan_Item_Schema::KEY_PAYLOAD  => array(
+		$item     = array(
+			Build_Plan_Item_Schema::KEY_ITEM_ID => 'plan_npc_0',
+			Build_Plan_Item_Schema::KEY_STATUS  => Build_Plan_Item_Statuses::PENDING,
+			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
 				'proposed_page_title' => 'About',
 				'proposed_slug'       => 'about',
 				'purpose'             => 'Company info',
@@ -196,16 +225,16 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 
 	/** Dependency validation blocking reasons in detail. */
 	public function test_dependency_block_message_in_detail(): void {
-		$item = array(
-			Build_Plan_Item_Schema::KEY_ITEM_ID  => 'plan_npc_0',
-			Build_Plan_Item_Schema::KEY_STATUS   => Build_Plan_Item_Statuses::PENDING,
-			Build_Plan_Item_Schema::KEY_PAYLOAD  => array(
-				'proposed_page_title'        => 'Child',
+		$item        = array(
+			Build_Plan_Item_Schema::KEY_ITEM_ID => 'plan_npc_0',
+			Build_Plan_Item_Schema::KEY_STATUS  => Build_Plan_Item_Statuses::PENDING,
+			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
+				'proposed_page_title'         => 'Child',
 				'dependency_blocking_reasons' => array( 'Parent page must exist before creating this child.' ),
 			),
 		);
-		$builder  = new New_Page_Creation_Detail_Builder();
-		$sections = $builder->build_sections( $item );
+		$builder     = new New_Page_Creation_Detail_Builder();
+		$sections    = $builder->build_sections( $item );
 		$dep_section = null;
 		foreach ( $sections as $s ) {
 			if ( ( $s['key'] ?? '' ) === 'dependency_validation' ) {
@@ -244,7 +273,7 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$bulk      = new New_Page_Creation_Bulk_Action_Service( new Build_Plan_Repository() );
 		$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk );
 		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
-		$states = $workspace['bulk_action_states'];
+		$states    = $workspace['bulk_action_states'];
 		$this->assertFalse( $states['apply_to_all_eligible']['enabled'] );
 	}
 
@@ -279,7 +308,7 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), 'plan_npc_0', array() );
 		$this->assertSame( 'built_successfully', $workspace['step_list_rows'][0]['post_build_status'] );
 		$detail_sections = $workspace['detail_panel']['sections'] ?? array();
-		$post_section = null;
+		$post_section    = null;
 		foreach ( $detail_sections as $s ) {
 			if ( ( $s['key'] ?? '' ) === 'post_build_status' ) {
 				$post_section = $s;
@@ -309,14 +338,14 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		require_once dirname( __DIR__, 2 ) . '/src/Domain/BuildPlan/UI/New_Page_Template_Recommendation_Builder.php';
 		require_once dirname( __DIR__, 2 ) . '/src/Domain/Registries/PageTemplate/Page_Template_Schema.php';
 		require_once dirname( __DIR__, 2 ) . '/src/Domain/Storage/Repositories/Page_Template_Repository.php';
-		$explanation = new \AIOPageBuilder\Domain\BuildPlan\Recommendations\Build_Plan_Template_Explanation_Builder( new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository(), null );
+		$explanation            = new \AIOPageBuilder\Domain\BuildPlan\Recommendations\Build_Plan_Template_Explanation_Builder( new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository(), null );
 		$recommendation_builder = new \AIOPageBuilder\Domain\BuildPlan\UI\New_Page_Template_Recommendation_Builder( $explanation );
-		$resolver  = new Build_Plan_Row_Action_Resolver();
-		$detail    = new New_Page_Creation_Detail_Builder();
-		$bulk      = new New_Page_Creation_Bulk_Action_Service( new Build_Plan_Repository() );
-		$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk, $recommendation_builder );
-		$def       = $this->step2_plan_definition( 1 );
-		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
+		$resolver               = new Build_Plan_Row_Action_Resolver();
+		$detail                 = new New_Page_Creation_Detail_Builder();
+		$bulk                   = new New_Page_Creation_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui                     = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk, $recommendation_builder );
+		$def                    = $this->step2_plan_definition( 1 );
+		$workspace              = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
 		$this->assertCount( 1, $workspace['step_list_rows'] );
 		$row = $workspace['step_list_rows'][0];
 		$this->assertArrayHasKey( 'proposed_template_summary', $row );
@@ -333,12 +362,14 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		try {
 			$repo    = new Build_Plan_Repository();
 			$def     = $this->step2_plan_definition( 1 );
-			$post_id = $repo->save( array(
-				'plan_definition' => $def,
-				'internal_key'    => 'test-plan-step2',
-				'post_title'      => 'Test Plan Step2',
-				'status'          => 'publish',
-			) );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-step2',
+					'post_title'      => 'Test Plan Step2',
+					'status'          => 'publish',
+				)
+			);
 			$this->assertGreaterThan( 0, $post_id );
 			$bulk    = new New_Page_Creation_Bulk_Action_Service( $repo );
 			$updated = $bulk->approve_item( $post_id, 'plan_npc_0' );
@@ -358,16 +389,18 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		try {
 			$repo    = new Build_Plan_Repository();
 			$def     = $this->step2_plan_definition( 3 );
-			$post_id = $repo->save( array(
-				'plan_definition' => $def,
-				'internal_key'    => 'test-plan-selected',
-				'post_title'      => 'Test Plan Selected',
-				'status'          => 'publish',
-			) );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-selected',
+					'post_title'      => 'Test Plan Selected',
+					'status'          => 'publish',
+				)
+			);
 			$this->assertGreaterThan( 0, $post_id );
 			$count = $repo->update_plan_items_by_ids( $post_id, 2, array( 'plan_npc_0', 'plan_npc_2' ), Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::PENDING );
 			$this->assertSame( 2, $count );
-			$def2 = $repo->get_plan_definition( $post_id );
+			$def2  = $repo->get_plan_definition( $post_id );
 			$items = $def2[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ] ?? array();
 			$this->assertSame( Build_Plan_Item_Statuses::APPROVED, $items[0]['status'] );
 			$this->assertSame( Build_Plan_Item_Statuses::PENDING, $items[1]['status'] );

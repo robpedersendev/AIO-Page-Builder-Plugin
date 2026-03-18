@@ -61,7 +61,7 @@ final class Stub_Operational_Snapshot_Repository implements Operational_Snapshot
 	/** @inheritDoc */
 	public function list_snapshot_created_times_for_target( string $target_ref ): array {
 		$target_ref = trim( $target_ref );
-		$out = array();
+		$out        = array();
 		foreach ( $this->store as $id => $snap ) {
 			if ( ! is_array( $snap ) ) {
 				continue;
@@ -70,7 +70,7 @@ final class Stub_Operational_Snapshot_Repository implements Operational_Snapshot
 			if ( $ref !== $target_ref ) {
 				continue;
 			}
-			$ts = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+			$ts         = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
 				? strtotime( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
 				: 0;
 			$out[ $id ] = $ts;
@@ -121,17 +121,20 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 			'snapshot_id' => 'op-snap-post-exec_apply_tokens_plan_xyz_2_20250312T100500Z-20250312T100600-456',
 			'message'     => 'Post-change snapshot captured.',
 			'snapshot'    => array(
-				Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID     => 'op-snap-post-exec_apply_tokens_plan_xyz_2_20250312T100500Z-20250312T100600-456',
-				Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE   => Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE,
-				Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY  => Operational_Snapshot_Schema::OBJECT_FAMILY_TOKEN_SET,
-				Operational_Snapshot_Schema::FIELD_TARGET_REF     => 'color:primary',
-				Operational_Snapshot_Schema::FIELD_CREATED_AT     => '2025-03-12T10:06:00+00:00',
+				Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => 'op-snap-post-exec_apply_tokens_plan_xyz_2_20250312T100500Z-20250312T100600-456',
+				Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE,
+				Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_TOKEN_SET,
+				Operational_Snapshot_Schema::FIELD_TARGET_REF => 'color:primary',
+				Operational_Snapshot_Schema::FIELD_CREATED_AT => '2025-03-12T10:06:00+00:00',
 				Operational_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
-				Operational_Snapshot_Schema::FIELD_POST_CHANGE   => array(
-					'captured_at'      => '2025-03-12T10:06:00+00:00',
-					'result_snapshot'  => array( 'token_set_id' => 'color:primary', 'tokens' => array( 'primary' => array( 'value' => '#2563eb' ) ) ),
-					'outcome'          => 'success',
-					'message'          => 'Token value applied.',
+				Operational_Snapshot_Schema::FIELD_POST_CHANGE => array(
+					'captured_at'     => '2025-03-12T10:06:00+00:00',
+					'result_snapshot' => array(
+						'token_set_id' => 'color:primary',
+						'tokens'       => array( 'primary' => array( 'value' => '#2563eb' ) ),
+					),
+					'outcome'         => 'success',
+					'message'         => 'Token value applied.',
 				),
 				Operational_Snapshot_Schema::FIELD_EXECUTION_REF => 'exec_apply_tokens_plan_xyz_2_20250312T100500Z',
 				Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF => 'plan-xyz',
@@ -156,8 +159,8 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 	}
 
 	public function test_service_supports_pre_capture_for_rollback_capable_actions(): void {
-		$repo   = new Stub_Operational_Snapshot_Repository();
-		$svc    = new Operational_Snapshot_Service( $repo, new Pre_Change_Snapshot_Builder(), new Post_Change_Result_Builder() );
+		$repo = new Stub_Operational_Snapshot_Repository();
+		$svc  = new Operational_Snapshot_Service( $repo, new Pre_Change_Snapshot_Builder(), new Post_Change_Result_Builder() );
 		$this->assertTrue( $svc->supports_pre_capture( Execution_Action_Types::REPLACE_PAGE ) );
 		$this->assertTrue( $svc->supports_pre_capture( Execution_Action_Types::UPDATE_MENU ) );
 		$this->assertTrue( $svc->supports_pre_capture( Execution_Action_Types::APPLY_TOKEN_SET ) );
@@ -166,22 +169,22 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 	}
 
 	public function test_service_capture_pre_change_unsupported_action_returns_failure(): void {
-		$repo = new Stub_Operational_Snapshot_Repository();
-		$svc  = new Operational_Snapshot_Service( $repo, new Pre_Change_Snapshot_Builder(), new Post_Change_Result_Builder() );
+		$repo     = new Stub_Operational_Snapshot_Repository();
+		$svc      = new Operational_Snapshot_Service( $repo, new Pre_Change_Snapshot_Builder(), new Post_Change_Result_Builder() );
 		$envelope = array(
 			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::CREATE_PAGE,
 			Execution_Action_Contract::ENVELOPE_ACTION_ID => 'exec_create_1',
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(),
 		);
-		$result = $svc->capture_pre_change( $envelope );
+		$result   = $svc->capture_pre_change( $envelope );
 		$this->assertFalse( $result->is_success() );
 		$this->assertSame( '', $result->get_snapshot_id() );
 		$this->assertContains( 'unsupported_action', $result->get_errors() );
 	}
 
 	public function test_service_capture_pre_change_build_failure_returns_failure_safely(): void {
-		$repo = new Stub_Operational_Snapshot_Repository();
-		$svc  = new Operational_Snapshot_Service( $repo, new Pre_Change_Snapshot_Builder(), new Post_Change_Result_Builder() );
+		$repo     = new Stub_Operational_Snapshot_Repository();
+		$svc      = new Operational_Snapshot_Service( $repo, new Pre_Change_Snapshot_Builder(), new Post_Change_Result_Builder() );
 		$envelope = array(
 			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::REPLACE_PAGE,
 			Execution_Action_Contract::ENVELOPE_ACTION_ID => 'exec_replace_1',
@@ -189,7 +192,7 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 			Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID => 'item-0',
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(), // no page_ref -> build returns null
 		);
-		$result = $svc->capture_pre_change( $envelope );
+		$result   = $svc->capture_pre_change( $envelope );
 		$this->assertFalse( $result->is_success() );
 		$this->assertSame( '', $result->get_snapshot_id() );
 		$this->assertContains( 'build_failed', $result->get_errors() );
@@ -197,15 +200,18 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 	}
 
 	public function test_repository_save_and_get_by_id(): void {
-		$repo = new Stub_Operational_Snapshot_Repository();
+		$repo     = new Stub_Operational_Snapshot_Repository();
 		$snapshot = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID   => 'test-snap-1',
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => 'test-snap-1',
 			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE,
 			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
-			Operational_Snapshot_Schema::FIELD_TARGET_REF   => '42',
-			Operational_Snapshot_Schema::FIELD_CREATED_AT   => '2025-03-12T10:00:00Z',
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => '42',
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => '2025-03-12T10:00:00Z',
 			Operational_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
-			Operational_Snapshot_Schema::FIELD_PRE_CHANGE   => array( 'captured_at' => '2025-03-12T10:00:00Z', 'state_snapshot' => array() ),
+			Operational_Snapshot_Schema::FIELD_PRE_CHANGE  => array(
+				'captured_at'    => '2025-03-12T10:00:00Z',
+				'state_snapshot' => array(),
+			),
 		);
 		$this->assertTrue( $repo->save( $snapshot ) );
 		$got = $repo->get_by_id( 'test-snap-1' );
@@ -239,24 +245,32 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 
 	/** Template-aware snapshot: result_snapshot includes template_context when artifacts have template_replacement_execution_result (Prompt 197). */
 	public function test_post_change_result_builder_sets_template_context_from_template_replacement_artifacts(): void {
-		$GLOBALS['_aio_get_post_return'] = new \WP_Post( array( 'ID' => 42, 'post_type' => 'page', 'post_title' => 'Test', 'post_name' => 'test', 'post_status' => 'publish' ) );
-		$envelope = array(
+		$GLOBALS['_aio_get_post_return'] = new \WP_Post(
+			array(
+				'ID'          => 42,
+				'post_type'   => 'page',
+				'post_title'  => 'Test',
+				'post_name'   => 'test',
+				'post_status' => 'publish',
+			)
+		);
+		$envelope                        = array(
 			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::REPLACE_PAGE,
 		);
-		$handler_result = array(
+		$handler_result                  = array(
 			'success'   => true,
 			'message'   => 'Replaced.',
 			'artifacts' => array(
-				'target_post_id' => 42,
+				'target_post_id'                        => 42,
 				'template_replacement_execution_result' => array(
 					'template_key'    => 'tpl_services_hub',
-					'template_family'  => 'services',
+					'template_family' => 'services',
 					'section_count'   => 5,
 				),
 			),
 		);
-		$builder = new Post_Change_Result_Builder();
-		$out = $builder->build( $envelope, $handler_result );
+		$builder                         = new Post_Change_Result_Builder();
+		$out                             = $builder->build( $envelope, $handler_result );
 		unset( $GLOBALS['_aio_get_post_return'] );
 		$this->assertNotNull( $out );
 		$this->assertArrayHasKey( 'post_change', $out );
@@ -270,31 +284,44 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 
 	/** Menu post_change includes menu_apply_execution_result and navigation_hierarchy_summary when present (Prompt 207). */
 	public function test_post_change_menu_includes_template_menu_apply_trace(): void {
-		$envelope = array(
+		$envelope       = array(
 			Execution_Action_Contract::ENVELOPE_ACTION_TYPE => Execution_Action_Types::UPDATE_MENU,
 		);
 		$handler_result = array(
 			'success'   => true,
 			'message'   => 'Template-aware menu apply completed.',
 			'artifacts' => array(
-				'menu_id'                        => 10,
-				'menu_name'                      => 'Primary',
-				'location_assigned'              => 'primary',
+				'menu_id'                       => 10,
+				'menu_name'                     => 'Primary',
+				'location_assigned'             => 'primary',
 				'menu_apply_execution_result'   => array(
-					'success'   => true,
-					'menu_id'   => 10,
-					'per_item_status' => array( array( 'status' => 'applied', 'title' => 'Home' ) ),
+					'success'         => true,
+					'menu_id'         => 10,
+					'per_item_status' => array(
+						array(
+							'status' => 'applied',
+							'title'  => 'Home',
+						),
+					),
 				),
 				'navigation_hierarchy_summary'  => array(
-					'items_ordered_by_class' => array( array( 'title' => 'Home', 'page_class' => 'top_level' ) ),
-					'applied_count' => 1,
-					'warnings' => array(),
+					'items_ordered_by_class' => array(
+						array(
+							'title'      => 'Home',
+							'page_class' => 'top_level',
+						),
+					),
+					'applied_count'          => 1,
+					'warnings'               => array(),
 				),
-				'menu_target_validation_result'  => array( 'valid' => true, 'location_slug' => 'primary' ),
+				'menu_target_validation_result' => array(
+					'valid'         => true,
+					'location_slug' => 'primary',
+				),
 			),
 		);
-		$builder = new Post_Change_Result_Builder();
-		$out = $builder->build( $envelope, $handler_result );
+		$builder        = new Post_Change_Result_Builder();
+		$out            = $builder->build( $envelope, $handler_result );
 		$this->assertNotNull( $out );
 		$this->assertSame( Operational_Snapshot_Schema::OBJECT_FAMILY_MENU, $out['object_family'] );
 		$snap = $out['post_change']['result_snapshot'];

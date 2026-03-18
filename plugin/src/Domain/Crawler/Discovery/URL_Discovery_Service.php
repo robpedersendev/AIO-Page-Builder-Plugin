@@ -43,13 +43,13 @@ final class URL_Discovery_Service {
 	public const REJECT_IGNORED_LOGIN        = 'ignored_login';
 	public const REJECT_IGNORED_SEARCH       = 'ignored_search';
 	public const REJECT_IGNORED_FEED         = 'ignored_feed';
-	public const REJECT_IGNORED_ATTACHMENT  = 'ignored_attachment';
+	public const REJECT_IGNORED_ATTACHMENT   = 'ignored_attachment';
 	public const REJECT_IGNORED_THANKYOU     = 'ignored_thankyou';
 	public const REJECT_IGNORED_ORDER_STATUS = 'ignored_order_status';
 	public const REJECT_IGNORED_PREVIEW      = 'ignored_preview';
 	public const REJECT_IGNORED_ARCHIVE      = 'ignored_archive';
 	public const REJECT_IGNORED_PAGINATION   = 'ignored_pagination';
-	public const REJECT_IGNORED_FACETED     = 'ignored_faceted';
+	public const REJECT_IGNORED_FACETED      = 'ignored_faceted';
 
 	/** Path segments that indicate login/auth (contract §3.2, §6). */
 	private const AUTH_PATH_SEGMENTS = array(
@@ -62,28 +62,28 @@ final class URL_Discovery_Service {
 
 	/** Path segments that indicate ignored page types (contract §6). */
 	private const IGNORED_PATH_SEGMENTS = array(
-		'cart'          => self::REJECT_IGNORED_CART,
-		'basket'        => self::REJECT_IGNORED_CART,
-		'checkout'      => self::REJECT_IGNORED_CHECKOUT,
-		'pay'           => self::REJECT_IGNORED_CHECKOUT,
-		'payment'       => self::REJECT_IGNORED_CHECKOUT,
-		'account'       => self::REJECT_IGNORED_ACCOUNT,
-		'my-account'    => self::REJECT_IGNORED_ACCOUNT,
-		'dashboard'     => self::REJECT_IGNORED_ACCOUNT,
-		'login'         => self::REJECT_IGNORED_LOGIN,
-		'register'      => self::REJECT_IGNORED_LOGIN,
-		'signup'        => self::REJECT_IGNORED_LOGIN,
-		'search'        => self::REJECT_IGNORED_SEARCH,
-		'feed'          => self::REJECT_IGNORED_FEED,
-		'rss'           => self::REJECT_IGNORED_FEED,
-		'thank-you'     => self::REJECT_IGNORED_THANKYOU,
+		'cart'           => self::REJECT_IGNORED_CART,
+		'basket'         => self::REJECT_IGNORED_CART,
+		'checkout'       => self::REJECT_IGNORED_CHECKOUT,
+		'pay'            => self::REJECT_IGNORED_CHECKOUT,
+		'payment'        => self::REJECT_IGNORED_CHECKOUT,
+		'account'        => self::REJECT_IGNORED_ACCOUNT,
+		'my-account'     => self::REJECT_IGNORED_ACCOUNT,
+		'dashboard'      => self::REJECT_IGNORED_ACCOUNT,
+		'login'          => self::REJECT_IGNORED_LOGIN,
+		'register'       => self::REJECT_IGNORED_LOGIN,
+		'signup'         => self::REJECT_IGNORED_LOGIN,
+		'search'         => self::REJECT_IGNORED_SEARCH,
+		'feed'           => self::REJECT_IGNORED_FEED,
+		'rss'            => self::REJECT_IGNORED_FEED,
+		'thank-you'      => self::REJECT_IGNORED_THANKYOU,
 		'order-received' => self::REJECT_IGNORED_THANKYOU,
-		'confirmation'  => self::REJECT_IGNORED_THANKYOU,
-		'order-status'  => self::REJECT_IGNORED_ORDER_STATUS,
-		'track-order'   => self::REJECT_IGNORED_ORDER_STATUS,
-		'tag'           => self::REJECT_IGNORED_ARCHIVE,
-		'date'          => self::REJECT_IGNORED_ARCHIVE,
-		'author'        => self::REJECT_IGNORED_ARCHIVE,
+		'confirmation'   => self::REJECT_IGNORED_THANKYOU,
+		'order-status'   => self::REJECT_IGNORED_ORDER_STATUS,
+		'track-order'    => self::REJECT_IGNORED_ORDER_STATUS,
+		'tag'            => self::REJECT_IGNORED_ARCHIVE,
+		'date'           => self::REJECT_IGNORED_ARCHIVE,
+		'author'         => self::REJECT_IGNORED_ARCHIVE,
 	);
 
 	/** Query param names that indicate search (contract §6). */
@@ -139,9 +139,9 @@ final class URL_Discovery_Service {
 	 * @return list<Discovery_Result>
 	 */
 	private function process_candidates( array $candidates, string $discovery_source ): array {
-		$results    = array();
-		$seen_keys  = array();
-		$source     = in_array( $discovery_source, array( Discovery_Result::SOURCE_SEED, Discovery_Result::SOURCE_LINK, Discovery_Result::SOURCE_SITEMAP ), true )
+		$results   = array();
+		$seen_keys = array();
+		$source    = in_array( $discovery_source, array( Discovery_Result::SOURCE_SEED, Discovery_Result::SOURCE_LINK, Discovery_Result::SOURCE_SITEMAP ), true )
 			? $discovery_source
 			: Discovery_Result::SOURCE_LINK;
 
@@ -168,7 +168,7 @@ final class URL_Discovery_Service {
 				continue;
 			}
 			$seen_keys[ $dedup_key ] = true;
-			$results[] = new Discovery_Result( $normalized, $source, Discovery_Result::STATUS_ACCEPTED, null, $dedup_key );
+			$results[]               = new Discovery_Result( $normalized, $source, Discovery_Result::STATUS_ACCEPTED, null, $dedup_key );
 		}
 
 		return $results;
@@ -182,8 +182,8 @@ final class URL_Discovery_Service {
 	 * @return string|null Rejection code or null if accepted.
 	 */
 	private function classify_rejection( string $normalized_url, string $raw_url ): ?string {
-		$path = $this->path_from_url( $normalized_url );
-		$query = $this->query_from_url( $normalized_url );
+		$path      = $this->path_from_url( $normalized_url );
+		$query     = $this->query_from_url( $normalized_url );
 		$raw_query = $this->query_from_url( $raw_url );
 
 		$path_lower = strtolower( $path );
@@ -238,7 +238,7 @@ final class URL_Discovery_Service {
 	}
 
 	private function path_from_url( string $url ): string {
-		$p = parse_url( $url );
+		$p    = parse_url( $url );
 		$path = isset( $p['path'] ) ? $p['path'] : '/';
 		return '/' . trim( $path, '/' );
 	}

@@ -21,7 +21,12 @@ final class Industry_Coverage_Gap_Prioritization_Service_Test extends TestCase {
 
 	public function test_generate_report_empty_gaps_returns_structure(): void {
 		$service = new Industry_Coverage_Gap_Prioritization_Service( null );
-		$result  = $service->generate_report( array( 'gaps' => array(), 'by_scope' => array() ) );
+		$result  = $service->generate_report(
+			array(
+				'gaps'     => array(),
+				'by_scope' => array(),
+			)
+		);
 		$this->assertArrayHasKey( 'ranked', $result );
 		$this->assertArrayHasKey( 'by_tier', $result );
 		$this->assertArrayHasKey( 'release_blocker_cues', $result );
@@ -34,22 +39,27 @@ final class Industry_Coverage_Gap_Prioritization_Service_Test extends TestCase {
 	}
 
 	public function test_generate_report_ranks_and_groups_by_tier(): void {
-		$gaps = array(
+		$gaps    = array(
 			array(
-				'scope'                 => 'realtor',
+				'scope'                  => 'realtor',
 				'missing_artifact_class' => Industry_Coverage_Gap_Analyzer::GAP_STARTER_BUNDLE,
-				'priority'              => Industry_Coverage_Gap_Analyzer::PRIORITY_HIGH,
+				'priority'               => Industry_Coverage_Gap_Analyzer::PRIORITY_HIGH,
 				'explanation'            => 'No bundle for realtor.',
 			),
 			array(
-				'scope'                 => 'realtor',
+				'scope'                  => 'realtor',
 				'missing_artifact_class' => Industry_Coverage_Gap_Analyzer::GAP_QUESTION_PACK,
-				'priority'              => Industry_Coverage_Gap_Analyzer::PRIORITY_LOW,
+				'priority'               => Industry_Coverage_Gap_Analyzer::PRIORITY_LOW,
 				'explanation'            => 'No question pack.',
 			),
 		);
 		$service = new Industry_Coverage_Gap_Prioritization_Service( null );
-		$result  = $service->generate_report( array( 'gaps' => $gaps, 'by_scope' => array() ) );
+		$result  = $service->generate_report(
+			array(
+				'gaps'     => $gaps,
+				'by_scope' => array(),
+			)
+		);
 
 		$this->assertCount( 2, $result['ranked'] );
 		$this->assertSame( Industry_Coverage_Gap_Prioritization_Service::TIER_URGENT, $result['ranked'][0]['tier'] );

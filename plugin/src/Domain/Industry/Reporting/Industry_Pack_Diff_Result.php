@@ -41,14 +41,14 @@ final class Industry_Pack_Diff_Result {
 	private array $notes;
 
 	/**
-	 * @param string $compared_at ISO 8601.
-	 * @param string $left_label Label for baseline.
-	 * @param string $right_label Label for new state.
-	 * @param list<string> $added industry_key only in right.
-	 * @param list<string> $removed industry_key only in left.
-	 * @param list<array<string, mixed>> $changed Per-pack change entries.
+	 * @param string                                                                                 $compared_at ISO 8601.
+	 * @param string                                                                                 $left_label Label for baseline.
+	 * @param string                                                                                 $right_label Label for new state.
+	 * @param list<string>                                                                           $added industry_key only in right.
+	 * @param list<string>                                                                           $removed industry_key only in left.
+	 * @param list<array<string, mixed>>                                                             $changed Per-pack change entries.
 	 * @param array{added_count: int, removed_count: int, changed_count: int, impact_level?: string} $summary
-	 * @param list<string> $notes
+	 * @param list<string>                                                                           $notes
 	 */
 	public function __construct(
 		string $compared_at,
@@ -60,14 +60,14 @@ final class Industry_Pack_Diff_Result {
 		array $summary,
 		array $notes = array()
 	) {
-		$this->compared_at  = $compared_at;
-		$this->left_label   = $left_label;
-		$this->right_label  = $right_label;
-		$this->added        = $added;
-		$this->removed      = $removed;
-		$this->changed      = $changed;
-		$this->summary      = $summary;
-		$this->notes        = $notes;
+		$this->compared_at = $compared_at;
+		$this->left_label  = $left_label;
+		$this->right_label = $right_label;
+		$this->added       = $added;
+		$this->removed     = $removed;
+		$this->changed     = $changed;
+		$this->summary     = $summary;
+		$this->notes       = $notes;
 	}
 
 	public function get_compared_at(): string {
@@ -110,14 +110,14 @@ final class Industry_Pack_Diff_Result {
 	/** @return array<string, mixed> */
 	public function to_array(): array {
 		return array(
-			'compared_at'  => $this->compared_at,
-			'left_label'   => $this->left_label,
-			'right_label'  => $this->right_label,
-			'added'        => $this->added,
-			'removed'      => $this->removed,
-			'changed'      => $this->changed,
-			'summary'      => $this->summary,
-			'notes'        => $this->notes,
+			'compared_at' => $this->compared_at,
+			'left_label'  => $this->left_label,
+			'right_label' => $this->right_label,
+			'added'       => $this->added,
+			'removed'     => $this->removed,
+			'changed'     => $this->changed,
+			'summary'     => $this->summary,
+			'notes'       => $this->notes,
 		);
 	}
 }

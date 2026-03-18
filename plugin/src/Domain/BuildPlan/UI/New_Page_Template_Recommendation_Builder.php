@@ -73,7 +73,7 @@ final class New_Page_Template_Recommendation_Builder {
 	 * @return array<string, mixed> Keys: proposed_template_summary, hierarchy_context_summary, template_selection_reason, group_label, group_hierarchy_role, group_template_family, dependency_warnings, deprecation_aware, confidence_note.
 	 */
 	public function build_for_item( array $item ): array {
-		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+		$payload      = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
 		$template_key = (string) ( $payload['template_key'] ?? '' );
@@ -86,42 +86,42 @@ final class New_Page_Template_Recommendation_Builder {
 		$group_template_family     = '';
 
 		if ( $template_key !== '' ) {
-			$explanation = $this->template_explanation_builder->build_explanation( $template_key, $payload );
+			$explanation               = $this->template_explanation_builder->build_explanation( $template_key, $payload );
 			$proposed_template_summary = array(
-				'template_key'             => (string) ( $explanation['template_key'] ?? $template_key ),
-				'name'                     => (string) ( $explanation['name'] ?? '' ),
-				'template_category_class'  => (string) ( $explanation['template_category_class'] ?? '' ),
-				'template_family'          => (string) ( $explanation['template_family'] ?? '' ),
-				'cta_direction_summary'    => (string) ( $explanation['cta_direction_summary'] ?? '' ),
-				'section_count'            => (int) ( $explanation['section_count'] ?? 0 ),
-				'deprecation_status'       => (string) ( $explanation['deprecation_status'] ?? 'active' ),
-				'replacement_keys'         => isset( $explanation['replacement_keys'] ) && is_array( $explanation['replacement_keys'] ) ? $explanation['replacement_keys'] : array(),
+				'template_key'            => (string) ( $explanation['template_key'] ?? $template_key ),
+				'name'                    => (string) ( $explanation['name'] ?? '' ),
+				'template_category_class' => (string) ( $explanation['template_category_class'] ?? '' ),
+				'template_family'         => (string) ( $explanation['template_family'] ?? '' ),
+				'cta_direction_summary'   => (string) ( $explanation['cta_direction_summary'] ?? '' ),
+				'section_count'           => (int) ( $explanation['section_count'] ?? 0 ),
+				'deprecation_status'      => (string) ( $explanation['deprecation_status'] ?? 'active' ),
+				'replacement_keys'        => isset( $explanation['replacement_keys'] ) && is_array( $explanation['replacement_keys'] ) ? $explanation['replacement_keys'] : array(),
 			);
-			$deprecation_aware = ( (string) ( $explanation['deprecation_status'] ?? '' ) ) === 'deprecated';
-			$group_hierarchy_role  = (string) ( $explanation['template_category_class'] ?? $explanation['hierarchy_hint'] ?? '' );
-			$group_template_family = (string) ( $explanation['template_family'] ?? '' );
+			$deprecation_aware         = ( (string) ( $explanation['deprecation_status'] ?? '' ) ) === 'deprecated';
+			$group_hierarchy_role      = (string) ( $explanation['template_category_class'] ?? $explanation['hierarchy_hint'] ?? '' );
+			$group_template_family     = (string) ( $explanation['template_family'] ?? '' );
 			$template_selection_reason = $this->derive_selection_reason( $payload, $explanation );
 		}
 
 		$hierarchy_context_summary = $this->build_hierarchy_context_summary( $payload );
 		$dependency_warnings       = $this->collect_dependency_warnings( $payload );
 		if ( $template_key !== '' && $this->form_provider_dependency_validator !== null ) {
-			$validation = $this->form_provider_dependency_validator->validate_for_template( $template_key );
+			$validation          = $this->form_provider_dependency_validator->validate_for_template( $template_key );
 			$dependency_warnings = array_merge( $dependency_warnings, $validation['errors'], $validation['warnings'] );
 		}
-		$confidence_note           = $this->confidence_note( $payload );
-		$group_label               = $this->format_group_label( $group_hierarchy_role, $group_template_family );
+		$confidence_note = $this->confidence_note( $payload );
+		$group_label     = $this->format_group_label( $group_hierarchy_role, $group_template_family );
 
 		return array(
-			self::KEY_PROPOSED_TEMPLATE_SUMMARY  => $proposed_template_summary,
-			self::KEY_HIERARCHY_CONTEXT_SUMMARY  => $hierarchy_context_summary,
-			self::KEY_TEMPLATE_SELECTION_REASON  => $template_selection_reason,
-			self::KEY_GROUP_LABEL                 => $group_label,
-			self::KEY_GROUP_HIERARCHY_ROLE        => $group_hierarchy_role,
-			self::KEY_GROUP_TEMPLATE_FAMILY       => $group_template_family,
-			self::KEY_DEPENDENCY_WARNINGS        => $dependency_warnings,
-			self::KEY_DEPRECATION_AWARE          => $deprecation_aware,
-			self::KEY_CONFIDENCE_NOTE            => $confidence_note,
+			self::KEY_PROPOSED_TEMPLATE_SUMMARY => $proposed_template_summary,
+			self::KEY_HIERARCHY_CONTEXT_SUMMARY => $hierarchy_context_summary,
+			self::KEY_TEMPLATE_SELECTION_REASON => $template_selection_reason,
+			self::KEY_GROUP_LABEL               => $group_label,
+			self::KEY_GROUP_HIERARCHY_ROLE      => $group_hierarchy_role,
+			self::KEY_GROUP_TEMPLATE_FAMILY     => $group_template_family,
+			self::KEY_DEPENDENCY_WARNINGS       => $dependency_warnings,
+			self::KEY_DEPRECATION_AWARE         => $deprecation_aware,
+			self::KEY_CONFIDENCE_NOTE           => $confidence_note,
 		);
 	}
 
@@ -182,10 +182,10 @@ final class New_Page_Template_Recommendation_Builder {
 			$children = array();
 		}
 		return array(
-			'intended_parent'   => $parent,
-			'intended_children' => array_values( array_map( 'strval', $children ) ),
+			'intended_parent'    => $parent,
+			'intended_children'  => array_values( array_map( 'strval', $children ) ),
 			'hierarchy_position' => $position,
-			'hierarchy_role'    => $role,
+			'hierarchy_role'     => $role,
 		);
 	}
 

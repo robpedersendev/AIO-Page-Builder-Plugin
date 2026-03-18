@@ -32,7 +32,7 @@ final class Registry_Integrity_Validator {
 		Section_Registry_Service $section_registry,
 		Page_Template_Registry_Service $page_template_registry
 	) {
-		$this->section_registry      = $section_registry;
+		$this->section_registry       = $section_registry;
 		$this->page_template_registry = $page_template_registry;
 	}
 
@@ -43,14 +43,14 @@ final class Registry_Integrity_Validator {
 	 * @return Registry_Validation_Result
 	 */
 	public function validate_page_template_section_refs( array $template_definition ): Registry_Validation_Result {
-		$errors = array();
+		$errors   = array();
 		$warnings = array();
-		$codes = array();
+		$codes    = array();
 
 		$ordered = $template_definition[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 		if ( ! is_array( $ordered ) ) {
 			$errors[] = 'Ordered sections must be an array';
-			$codes[] = Registry_Validation_Result::CODE_REFERENCE_MISSING;
+			$codes[]  = Registry_Validation_Result::CODE_REFERENCE_MISSING;
 			return Registry_Validation_Result::invalid( $errors, $codes );
 		}
 
@@ -65,11 +65,11 @@ final class Registry_Integrity_Validator {
 			$section = $this->section_registry->get_by_key( $key );
 			if ( $section === null ) {
 				$errors[] = "Section reference missing: {$key}";
-				$codes[] = Registry_Validation_Result::CODE_REFERENCE_MISSING;
+				$codes[]  = Registry_Validation_Result::CODE_REFERENCE_MISSING;
 			} elseif ( ( (string) ( $section['status'] ?? '' ) ) === 'deprecated' ) {
 				$warnings[] = "Section {$key} is deprecated";
-				$codes[] = Registry_Validation_Result::CODE_REFERENCE_DEPRECATED;
-				$codes[] = Registry_Validation_Result::CODE_HAS_DEPRECATED_DEPENDENCIES;
+				$codes[]    = Registry_Validation_Result::CODE_REFERENCE_DEPRECATED;
+				$codes[]    = Registry_Validation_Result::CODE_HAS_DEPRECATED_DEPENDENCIES;
 			}
 		}
 
@@ -90,14 +90,14 @@ final class Registry_Integrity_Validator {
 	 * @return Registry_Validation_Result
 	 */
 	public function validate_composition_section_refs( array $composition_definition ): Registry_Validation_Result {
-		$errors = array();
+		$errors   = array();
 		$warnings = array();
-		$codes = array();
+		$codes    = array();
 
 		$ordered = $composition_definition[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array();
 		if ( ! is_array( $ordered ) ) {
 			$errors[] = 'Ordered section list must be an array';
-			$codes[] = Registry_Validation_Result::CODE_REFERENCE_MISSING;
+			$codes[]  = Registry_Validation_Result::CODE_REFERENCE_MISSING;
 			return Registry_Validation_Result::invalid( $errors, $codes );
 		}
 
@@ -112,11 +112,11 @@ final class Registry_Integrity_Validator {
 			$section = $this->section_registry->get_by_key( $key );
 			if ( $section === null ) {
 				$errors[] = "Section reference missing: {$key}";
-				$codes[] = Registry_Validation_Result::CODE_REFERENCE_MISSING;
+				$codes[]  = Registry_Validation_Result::CODE_REFERENCE_MISSING;
 			} elseif ( ( (string) ( $section['status'] ?? '' ) ) === 'deprecated' ) {
 				$warnings[] = "Section {$key} is deprecated";
-				$codes[] = Registry_Validation_Result::CODE_REFERENCE_DEPRECATED;
-				$codes[] = Registry_Validation_Result::CODE_HAS_DEPRECATED_DEPENDENCIES;
+				$codes[]    = Registry_Validation_Result::CODE_REFERENCE_DEPRECATED;
+				$codes[]    = Registry_Validation_Result::CODE_HAS_DEPRECATED_DEPENDENCIES;
 			}
 		}
 
@@ -174,13 +174,13 @@ final class Registry_Integrity_Validator {
 	 * @return array{missing_section_refs: list<string>, deprecated_section_refs: list<string>, missing_template_refs: list<string>, deprecated_template_refs: list<string>}
 	 */
 	public function scan_registry_integrity(): array {
-		$missing_section_refs   = array();
-		$deprecated_section_refs = array();
-		$missing_template_refs   = array();
+		$missing_section_refs     = array();
+		$deprecated_section_refs  = array();
+		$missing_template_refs    = array();
 		$deprecated_template_refs = array();
 
-		$templates = $this->page_template_registry->list_by_status( 'active', 500, 0 );
-		$templates = array_merge( $templates, $this->page_template_registry->list_by_status( 'deprecated', 500, 0 ) );
+		$templates        = $this->page_template_registry->list_by_status( 'active', 500, 0 );
+		$templates        = array_merge( $templates, $this->page_template_registry->list_by_status( 'deprecated', 500, 0 ) );
 		$all_section_keys = array();
 
 		foreach ( $templates as $tpl ) {
@@ -210,9 +210,9 @@ final class Registry_Integrity_Validator {
 		}
 
 		return array(
-			'missing_section_refs'    => array_values( array_unique( $missing_section_refs ) ),
-			'deprecated_section_refs' => array_values( array_unique( $deprecated_section_refs ) ),
-			'missing_template_refs'   => $missing_template_refs,
+			'missing_section_refs'     => array_values( array_unique( $missing_section_refs ) ),
+			'deprecated_section_refs'  => array_values( array_unique( $deprecated_section_refs ) ),
+			'missing_template_refs'    => $missing_template_refs,
 			'deprecated_template_refs' => $deprecated_template_refs,
 		);
 	}

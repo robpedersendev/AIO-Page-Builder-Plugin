@@ -51,7 +51,7 @@ final class Export_Token_Set_Reader {
 				continue;
 			}
 			if ( isset( $row['value_payload'] ) && is_string( $row['value_payload'] ) ) {
-				$decoded = json_decode( $row['value_payload'], true );
+				$decoded              = json_decode( $row['value_payload'], true );
 				$row['value_payload'] = is_array( $decoded ) ? Registry_Export_Fragment_Builder::sanitize_payload( $decoded ) : array();
 			}
 			$out[] = $row;

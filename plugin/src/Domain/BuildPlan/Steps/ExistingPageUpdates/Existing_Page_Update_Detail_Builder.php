@@ -44,13 +44,13 @@ final class Existing_Page_Update_Detail_Builder {
 	 * @return array<int, array<string, mixed>> Sections with heading, key, content or content_lines.
 	 */
 	public function build_sections( array $item, ?string $plan_id = null ): array {
-		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+		$payload  = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
 		$sections = array();
 
-		$sections[] = $this->section_page_identity( $payload );
-		$sections[] = $this->section_suggested_action( $payload );
+		$sections[]              = $this->section_page_identity( $payload );
+		$sections[]              = $this->section_suggested_action( $payload );
 		$template_change_section = $this->section_proposed_template_and_change_type( $item );
 		if ( $template_change_section !== null ) {
 			$sections[] = $template_change_section;
@@ -72,9 +72,12 @@ final class Existing_Page_Update_Detail_Builder {
 		$sections[] = $this->section_content_notes( $payload );
 		$sections[] = $this->section_warnings_assumptions_dependencies( $payload );
 
-		return array_filter( $sections, static function ( $s ) {
-			return $s !== null && is_array( $s );
-		} );
+		return array_filter(
+			$sections,
+			static function ( $s ) {
+				return $s !== null && is_array( $s );
+			}
+		);
 	}
 
 	/**
@@ -114,17 +117,17 @@ final class Existing_Page_Update_Detail_Builder {
 		if ( $item_id === '' ) {
 			return null;
 		}
-		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+		$payload          = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
-		$warnings = isset( $payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ] ) && is_array( $payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ] )
+		$warnings         = isset( $payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ] ) && is_array( $payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ] )
 			? $payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ]
 			: array();
-		$has_warnings = count( $warnings ) > 0;
+		$has_warnings     = count( $warnings ) > 0;
 		$override_service = new Industry_Build_Plan_Item_Override_Service();
-		$override = $override_service->get_override( $plan_id, $item_id );
+		$override         = $override_service->get_override( $plan_id, $item_id );
 		if ( $override !== null ) {
-			$reason = (string) ( $override[ \AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Schema::FIELD_REASON ] ?? '' );
+			$reason  = (string) ( $override[ \AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Schema::FIELD_REASON ] ?? '' );
 			$content = '<p class="aio-plan-item-overridden"><strong>' . \esc_html__( 'Overridden', 'aio-page-builder' ) . '</strong>';
 			if ( $reason !== '' ) {
 				$content .= ' <span class="aio-override-reason">' . \esc_html( $reason ) . '</span>';
@@ -132,28 +135,28 @@ final class Existing_Page_Update_Detail_Builder {
 			$content .= '</p>';
 			return array(
 				Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'Industry override', 'aio-page-builder' ),
-				Detail_Panel_Component::SECTION_KEY_KEY   => 'industry_override',
+				Detail_Panel_Component::SECTION_KEY_KEY => 'industry_override',
 				Detail_Panel_Component::SECTION_KEY_CONTENT => $content,
 			);
 		}
 		if ( ! $has_warnings ) {
 			return null;
 		}
-		$action_url = \admin_url( 'admin-post.php' );
+		$action_url   = \admin_url( 'admin-post.php' );
 		$nonce_action = \AIOPageBuilder\Admin\Actions\Save_Industry_Build_Plan_Override_Action::NONCE_ACTION;
-		$nonce_name = \AIOPageBuilder\Admin\Actions\Save_Industry_Build_Plan_Override_Action::NONCE_NAME;
-		$referer = \esc_attr( \wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) );
-		$content = '<form method="post" action="' . \esc_url( $action_url ) . '" class="aio-industry-override-form">';
-		$content .= '<input type="hidden" name="action" value="aio_save_industry_build_plan_override" />';
-		$content .= \wp_nonce_field( $nonce_action, $nonce_name, true, false );
-		$content .= '<input type="hidden" name="plan_id" value="' . \esc_attr( $plan_id ) . '" />';
-		$content .= '<input type="hidden" name="item_id" value="' . \esc_attr( $item_id ) . '" />';
-		$content .= '<input type="hidden" name="state" value="accepted" />';
-		$content .= '<input type="hidden" name="_wp_http_referer" value="' . $referer . '" />';
-		$content .= '<p><label for="aio_override_reason_' . \esc_attr( $item_id ) . '">' . \esc_html__( 'Review note (optional)', 'aio-page-builder' ) . '</label><br />';
-		$content .= '<textarea id="aio_override_reason_' . \esc_attr( $item_id ) . '" name="reason" rows="2" class="large-text" maxlength="500"></textarea></p>';
-		$content .= '<p><button type="submit" class="button">' . \esc_html__( 'Accept anyway', 'aio-page-builder' ) . '</button></p>';
-		$content .= '</form>';
+		$nonce_name   = \AIOPageBuilder\Admin\Actions\Save_Industry_Build_Plan_Override_Action::NONCE_NAME;
+		$referer      = \esc_attr( \wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) );
+		$content      = '<form method="post" action="' . \esc_url( $action_url ) . '" class="aio-industry-override-form">';
+		$content     .= '<input type="hidden" name="action" value="aio_save_industry_build_plan_override" />';
+		$content     .= \wp_nonce_field( $nonce_action, $nonce_name, true, false );
+		$content     .= '<input type="hidden" name="plan_id" value="' . \esc_attr( $plan_id ) . '" />';
+		$content     .= '<input type="hidden" name="item_id" value="' . \esc_attr( $item_id ) . '" />';
+		$content     .= '<input type="hidden" name="state" value="accepted" />';
+		$content     .= '<input type="hidden" name="_wp_http_referer" value="' . $referer . '" />';
+		$content     .= '<p><label for="aio_override_reason_' . \esc_attr( $item_id ) . '">' . \esc_html__( 'Review note (optional)', 'aio-page-builder' ) . '</label><br />';
+		$content     .= '<textarea id="aio_override_reason_' . \esc_attr( $item_id ) . '" name="reason" rows="2" class="large-text" maxlength="500"></textarea></p>';
+		$content     .= '<p><button type="submit" class="button">' . \esc_html__( 'Accept anyway', 'aio-page-builder' ) . '</button></p>';
+		$content     .= '</form>';
 		return array(
 			Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'Industry override', 'aio-page-builder' ),
 			Detail_Panel_Component::SECTION_KEY_KEY     => 'industry_override',
@@ -201,11 +204,11 @@ final class Existing_Page_Update_Detail_Builder {
 		if ( $this->template_change_builder === null ) {
 			return null;
 		}
-		$change = $this->template_change_builder->build_for_item( $item );
+		$change           = $this->template_change_builder->build_for_item( $item );
 		$template_summary = $change[ Existing_Page_Template_Change_Builder::KEY_EXISTING_PAGE_TEMPLATE_CHANGE_SUMMARY ] ?? array();
 		$reason_summary   = $change[ Existing_Page_Template_Change_Builder::KEY_REPLACEMENT_REASON_SUMMARY ] ?? array();
-		$lines = array();
-		$action_label = (string) ( $reason_summary['action_label'] ?? '' );
+		$lines            = array();
+		$action_label     = (string) ( $reason_summary['action_label'] ?? '' );
 		if ( $action_label !== '' ) {
 			$lines[] = \__( 'Change type:', 'aio-page-builder' ) . ' ' . \esc_html( $action_label );
 		}
@@ -235,8 +238,8 @@ final class Existing_Page_Update_Detail_Builder {
 			return null;
 		}
 		return array(
-			Detail_Panel_Component::SECTION_KEY_HEADING       => \__( 'Proposed template and change type', 'aio-page-builder' ),
-			Detail_Panel_Component::SECTION_KEY_KEY           => 'proposed_template_and_change_type',
+			Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'Proposed template and change type', 'aio-page-builder' ),
+			Detail_Panel_Component::SECTION_KEY_KEY     => 'proposed_template_and_change_type',
 			Detail_Panel_Component::SECTION_KEY_CONTENT_LINES => $lines,
 		);
 	}
@@ -246,7 +249,7 @@ final class Existing_Page_Update_Detail_Builder {
 		return array(
 			Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'Rationale for change', 'aio-page-builder' ),
 			Detail_Panel_Component::SECTION_KEY_KEY     => 'rationale',
-			Detail_Panel_Component::SECTION_KEY_CONTENT  => $reason !== '' ? '<p>' . \esc_html( $reason ) . '</p>' : '<p>—</p>',
+			Detail_Panel_Component::SECTION_KEY_CONTENT => $reason !== '' ? '<p>' . \esc_html( $reason ) . '</p>' : '<p>—</p>',
 		);
 	}
 
@@ -305,9 +308,9 @@ final class Existing_Page_Update_Detail_Builder {
 	}
 
 	private function section_warnings_assumptions_dependencies( array $payload ): array {
-		$warnings = $payload['warnings'] ?? array();
+		$warnings    = $payload['warnings'] ?? array();
 		$assumptions = $payload['assumptions'] ?? array();
-		$deps    = $payload['dependencies'] ?? $payload['depends_on_item_ids'] ?? array();
+		$deps        = $payload['dependencies'] ?? $payload['depends_on_item_ids'] ?? array();
 		if ( ! is_array( $warnings ) ) {
 			$warnings = array();
 		}
@@ -317,7 +320,7 @@ final class Existing_Page_Update_Detail_Builder {
 		if ( ! is_array( $deps ) ) {
 			$deps = array();
 		}
-		$risk = (string) ( $payload['risk_level'] ?? '' );
+		$risk  = (string) ( $payload['risk_level'] ?? '' );
 		$lines = array();
 		if ( $risk !== '' ) {
 			$lines[] = \__( 'Risk level:', 'aio-page-builder' ) . ' ' . \esc_html( $risk );

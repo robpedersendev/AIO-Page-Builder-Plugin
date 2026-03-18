@@ -27,13 +27,13 @@ final class Section_Gap_Closing_Super_Batch_Seeder {
 	 * @return array{ success: bool, section_ids: list<int>, errors: list<string>, section_keys: list<string> }
 	 */
 	public static function run( Section_Template_Repository $section_repo ): array {
-		$errors      = array();
-		$section_ids = array();
+		$errors       = array();
+		$section_ids  = array();
 		$section_keys = array();
 		foreach ( Section_Gap_Closing_Super_Batch_Definitions::all_definitions() as $definition ) {
-			$key = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key            = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$section_keys[] = $key;
-			$id = $section_repo->save_definition( $definition );
+			$id             = $section_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
 				$errors[] = sprintf( __( 'Failed to save gap-closing section: %s', 'aio-page-builder' ), $key );
 				continue;

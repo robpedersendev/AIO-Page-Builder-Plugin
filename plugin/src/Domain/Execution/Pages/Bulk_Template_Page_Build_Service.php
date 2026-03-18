@@ -41,18 +41,18 @@ final class Bulk_Template_Page_Build_Service {
 		Bulk_Executor $bulk_executor,
 		Execution_Job_Dispatcher $job_dispatcher
 	) {
-		$this->plan_state    = $plan_state;
-		$this->bulk_executor = $bulk_executor;
+		$this->plan_state     = $plan_state;
+		$this->bulk_executor  = $bulk_executor;
 		$this->job_dispatcher = $job_dispatcher;
 	}
 
 	/**
 	 * Runs bulk new-page build: ordered envelopes, slug validation, enqueue, optional immediate run.
 	 *
-	 * @param string               $plan_id       Plan ID (internal key).
+	 * @param string                  $plan_id       Plan ID (internal key).
 	 * @param array<int, string>|null $item_ids    Plan item IDs to include; null = all eligible (Build All).
-	 * @param array<string, mixed> $actor_context Actor context for envelopes.
-	 * @param array<string, mixed> $options       run_immediately (bool), priority (int), batch_id (string).
+	 * @param array<string, mixed>    $actor_context Actor context for envelopes.
+	 * @param array<string, mixed>    $options       run_immediately (bool), priority (int), batch_id (string).
 	 * @return Bulk_Template_Page_Build_Result
 	 */
 	public function run_bulk_new_pages(
@@ -61,7 +61,7 @@ final class Bulk_Template_Page_Build_Service {
 		array $actor_context,
 		array $options = array()
 	): Bulk_Template_Page_Build_Result {
-		$batch_id = isset( $options['batch_id'] ) && is_string( $options['batch_id'] ) ? $options['batch_id'] : $this->generate_batch_id();
+		$batch_id    = isset( $options['batch_id'] ) && is_string( $options['batch_id'] ) ? $options['batch_id'] : $this->generate_batch_id();
 		$plan_record = $this->plan_state->get_by_key( $plan_id );
 		if ( $plan_record === null ) {
 			return $this->error_result( $plan_id, $batch_id, __( 'Plan not found.', 'aio-page-builder' ) );
@@ -72,7 +72,7 @@ final class Bulk_Template_Page_Build_Service {
 			return $this->error_result( $plan_id, $batch_id, __( 'Plan definition not found.', 'aio-page-builder' ) );
 		}
 
-		$envelopes = $this->bulk_executor->build_ordered_envelopes( $plan_id, $definition, $item_ids, $actor_context, $batch_id );
+		$envelopes             = $this->bulk_executor->build_ordered_envelopes( $plan_id, $definition, $item_ids, $actor_context, $batch_id );
 		$create_page_envelopes = array();
 		foreach ( $envelopes as $env ) {
 			$action_type = isset( $env[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) ? $env[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] : '';
@@ -85,22 +85,22 @@ final class Bulk_Template_Page_Build_Service {
 			return $this->error_result( $plan_id, $batch_id, __( 'No eligible new-page actions to execute.', 'aio-page-builder' ), array( 'envelope_count' => count( $envelopes ) ) );
 		}
 
-		$slug_validation = $this->validate_slugs( $create_page_envelopes );
-		$to_enqueue = array();
+		$slug_validation         = $this->validate_slugs( $create_page_envelopes );
+		$to_enqueue              = array();
 		$slug_collision_item_ids = array();
-		$item_results_pre = array();
+		$item_results_pre        = array();
 		foreach ( $create_page_envelopes as $env ) {
 			$plan_item_id = isset( $env[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) && is_string( $env[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) ? $env[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] : '';
 			if ( $plan_item_id !== '' && isset( $slug_validation['conflict_item_ids'][ $plan_item_id ] ) ) {
-				$slug_collision_item_ids[] = $plan_item_id;
+				$slug_collision_item_ids[]         = $plan_item_id;
 				$item_results_pre[ $plan_item_id ] = array(
-					'status'          => Execution_Job_Result::STATUS_REFUSED,
-					'job_ref'         => '',
-					'post_id'         => 0,
-					'template_key'    => (string) ( $env[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]['template_key'] ?? '' ),
-					'slug_conflict'   => true,
-					'failure_reason'  => __( 'Slug conflict: duplicate or existing page.', 'aio-page-builder' ),
-					'retry_eligible'   => false,
+					'status'         => Execution_Job_Result::STATUS_REFUSED,
+					'job_ref'        => '',
+					'post_id'        => 0,
+					'template_key'   => (string) ( $env[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]['template_key'] ?? '' ),
+					'slug_conflict'  => true,
+					'failure_reason' => __( 'Slug conflict: duplicate or existing page.', 'aio-page-builder' ),
+					'retry_eligible' => false,
 				);
 				continue;
 			}
@@ -127,11 +127,11 @@ final class Bulk_Template_Page_Build_Service {
 			return $this->aggregate_to_bulk_result( $plan_id, $batch_id, $job_refs, $results, $item_results_pre, $slug_collisions );
 		}
 
-		$total = count( $create_page_envelopes );
+		$total       = count( $create_page_envelopes );
 		$refused_pre = count( $slug_collision_item_ids );
-		$queued = count( $job_refs );
-		$message = $refused_pre > 0
-			? sprintf( __( '%d queued, %d blocked by slug conflict.', 'aio-page-builder' ), $queued, $refused_pre )
+		$queued      = count( $job_refs );
+		$message     = $refused_pre > 0
+			? sprintf( __( '%1$d queued, %2$d blocked by slug conflict.', 'aio-page-builder' ), $queued, $refused_pre )
 			: sprintf( __( '%d actions queued.', 'aio-page-builder' ), $queued );
 
 		return new Bulk_Template_Page_Build_Result(
@@ -163,23 +163,23 @@ final class Bulk_Template_Page_Build_Service {
 	 * @return array{duplicate_slugs: list<string>, existing_slugs: list<string>, conflict_item_ids: array<string, true>}
 	 */
 	private function validate_slugs( array $envelopes ): array {
-		$slug_to_item_ids = array();
-		$existing_slugs = array();
+		$slug_to_item_ids  = array();
+		$existing_slugs    = array();
 		$conflict_item_ids = array();
 
 		foreach ( $envelopes as $env ) {
 			$target = isset( $env[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $env[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
 				? $env[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
 				: array();
-			$slug = isset( $target['proposed_slug'] ) && is_string( $target['proposed_slug'] ) ? trim( $target['proposed_slug'] ) : '';
+			$slug   = isset( $target['proposed_slug'] ) && is_string( $target['proposed_slug'] ) ? trim( $target['proposed_slug'] ) : '';
 			if ( $slug === '' && isset( $target['proposed_page_title'] ) && is_string( $target['proposed_page_title'] ) ) {
 				$slug = \sanitize_title( trim( $target['proposed_page_title'] ) );
 			}
 			if ( $slug === '' ) {
 				continue;
 			}
-			$plan_item_id = isset( $env[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) && is_string( $env[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) ? $env[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] : '';
-			$slug_to_item_ids[ $slug ] = $slug_to_item_ids[ $slug ] ?? array();
+			$plan_item_id                = isset( $env[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) && is_string( $env[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) ? $env[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] : '';
+			$slug_to_item_ids[ $slug ]   = $slug_to_item_ids[ $slug ] ?? array();
 			$slug_to_item_ids[ $slug ][] = $plan_item_id;
 		}
 
@@ -221,12 +221,12 @@ final class Bulk_Template_Page_Build_Service {
 	/**
 	 * Aggregates job results and pre-filled item results into Bulk_Template_Page_Build_Result.
 	 *
-	 * @param string                          $plan_id
-	 * @param string                          $batch_id
-	 * @param array<int, string>              $job_refs
-	 * @param array<int, Execution_Job_Result> $results
+	 * @param string                              $plan_id
+	 * @param string                              $batch_id
+	 * @param array<int, string>                  $job_refs
+	 * @param array<int, Execution_Job_Result>    $results
 	 * @param array<string, array<string, mixed>> $item_results_pre
-	 * @param list<string>                    $slug_collisions
+	 * @param list<string>                        $slug_collisions
 	 * @return Bulk_Template_Page_Build_Result
 	 */
 	private function aggregate_to_bulk_result(
@@ -237,28 +237,28 @@ final class Bulk_Template_Page_Build_Service {
 		array $item_results_pre,
 		array $slug_collisions
 	): Bulk_Template_Page_Build_Result {
-		$item_results = $item_results_pre;
-		$completed = 0;
-		$failed = 0;
-		$refused = 0;
+		$item_results            = $item_results_pre;
+		$completed               = 0;
+		$failed                  = 0;
+		$refused                 = 0;
 		$retry_eligible_item_ids = array();
 
 		foreach ( $results as $r ) {
 			$plan_item_id = $r->get_plan_item_id();
-			$status = $r->get_status();
-			$summary = $r->get_result_summary();
-			$artifacts = isset( $summary['artifacts'] ) && is_array( $summary['artifacts'] ) ? $summary['artifacts'] : array();
-			$post_id = isset( $artifacts['post_id'] ) && is_numeric( $artifacts['post_id'] ) ? (int) $artifacts['post_id'] : 0;
+			$status       = $r->get_status();
+			$summary      = $r->get_result_summary();
+			$artifacts    = isset( $summary['artifacts'] ) && is_array( $summary['artifacts'] ) ? $summary['artifacts'] : array();
+			$post_id      = isset( $artifacts['post_id'] ) && is_numeric( $artifacts['post_id'] ) ? (int) $artifacts['post_id'] : 0;
 			$template_key = isset( $artifacts['template_key'] ) && is_string( $artifacts['template_key'] ) ? $artifacts['template_key'] : '';
 
 			$item_results[ $plan_item_id ] = array(
-				'status'          => $status,
-				'job_ref'         => $r->get_job_ref(),
-				'post_id'         => $post_id,
-				'template_key'    => $template_key,
-				'slug_conflict'   => false,
-				'failure_reason'  => $r->get_failure_reason(),
-				'retry_eligible'  => $r->is_retry_eligible(),
+				'status'         => $status,
+				'job_ref'        => $r->get_job_ref(),
+				'post_id'        => $post_id,
+				'template_key'   => $template_key,
+				'slug_conflict'  => false,
+				'failure_reason' => $r->get_failure_reason(),
+				'retry_eligible' => $r->is_retry_eligible(),
 			);
 
 			if ( $status === Execution_Job_Result::STATUS_COMPLETED ) {
@@ -273,10 +273,10 @@ final class Bulk_Template_Page_Build_Service {
 			}
 		}
 
-		$total = $completed + $failed + $refused + count( $item_results_pre );
-		$refused += count( $item_results_pre );
+		$total           = $completed + $failed + $refused + count( $item_results_pre );
+		$refused        += count( $item_results_pre );
 		$partial_failure = $failed > 0 || $refused > 0;
-		$overall_status = $refused === $total ? Bulk_Template_Page_Build_Result::STATUS_REFUSED
+		$overall_status  = $refused === $total ? Bulk_Template_Page_Build_Result::STATUS_REFUSED
 			: ( $completed === $total ? Bulk_Template_Page_Build_Result::STATUS_COMPLETED : Bulk_Template_Page_Build_Result::STATUS_PARTIAL );
 
 		$message_parts = array();
@@ -305,7 +305,7 @@ final class Bulk_Template_Page_Build_Service {
 			$retry_eligible_item_ids,
 			$message,
 			array(
-				'envelope_count'   => count( $job_refs ) + count( $item_results_pre ),
+				'envelope_count'    => count( $job_refs ) + count( $item_results_pre ),
 				'create_page_count' => count( $item_results ),
 			)
 		);

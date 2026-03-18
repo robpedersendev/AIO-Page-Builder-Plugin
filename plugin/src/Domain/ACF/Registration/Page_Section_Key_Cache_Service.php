@@ -76,8 +76,8 @@ final class Page_Section_Key_Cache_Service {
 	/**
 	 * Sets cached section keys for a page.
 	 *
-	 * @param int           $page_id
-	 * @param list<string>  $section_keys
+	 * @param int          $page_id
+	 * @param list<string> $section_keys
 	 */
 	public function set_for_page( int $page_id, array $section_keys ): void {
 		if ( $page_id <= 0 ) {
@@ -127,8 +127,8 @@ final class Page_Section_Key_Cache_Service {
 	/**
 	 * Sets cached section keys for a template.
 	 *
-	 * @param string        $template_key
-	 * @param list<string>  $section_keys
+	 * @param string       $template_key
+	 * @param list<string> $section_keys
 	 */
 	public function set_for_template( string $template_key, array $section_keys ): void {
 		$template_key = \sanitize_key( $template_key );
@@ -178,8 +178,8 @@ final class Page_Section_Key_Cache_Service {
 	/**
 	 * Sets cached section keys for a composition.
 	 *
-	 * @param string        $composition_id
-	 * @param list<string>  $section_keys
+	 * @param string       $composition_id
+	 * @param list<string> $section_keys
 	 */
 	public function set_for_composition( string $composition_id, array $section_keys ): void {
 		$composition_id = \sanitize_key( $composition_id );

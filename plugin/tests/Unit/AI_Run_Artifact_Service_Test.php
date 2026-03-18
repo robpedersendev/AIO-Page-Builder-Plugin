@@ -20,7 +20,11 @@ require_once $plugin_root . '/src/Domain/AI/Runs/AI_Run_Artifact_Service.php';
 final class AI_Run_Artifact_Service_Test extends TestCase {
 
 	public function test_redact_sensitive_values_replaces_api_key(): void {
-		$in  = array( 'provider_id' => 'openai', 'api_key' => 'sk-secret', 'model' => 'gpt-4' );
+		$in  = array(
+			'provider_id' => 'openai',
+			'api_key'     => 'sk-secret',
+			'model'       => 'gpt-4',
+		);
 		$out = AI_Run_Artifact_Service::redact_sensitive_values( $in );
 		$this->assertSame( 'openai', $out['provider_id'] );
 		$this->assertSame( '[redacted]', $out['api_key'] );
@@ -28,14 +32,23 @@ final class AI_Run_Artifact_Service_Test extends TestCase {
 	}
 
 	public function test_redact_sensitive_values_nested(): void {
-		$in  = array( 'usage' => array( 'token' => 'secret-tok', 'count' => 10 ) );
+		$in  = array(
+			'usage' => array(
+				'token' => 'secret-tok',
+				'count' => 10,
+			),
+		);
 		$out = AI_Run_Artifact_Service::redact_sensitive_values( $in );
 		$this->assertSame( '[redacted]', $out['usage']['token'] );
 		$this->assertSame( 10, $out['usage']['count'] );
 	}
 
 	public function test_redact_sensitive_values_preserves_non_sensitive(): void {
-		$in  = array( 'actor' => '1', 'created_at' => '2025-01-01', 'retry_count' => 2 );
+		$in  = array(
+			'actor'       => '1',
+			'created_at'  => '2025-01-01',
+			'retry_count' => 2,
+		);
 		$out = AI_Run_Artifact_Service::redact_sensitive_values( $in );
 		$this->assertSame( $in, $out );
 	}

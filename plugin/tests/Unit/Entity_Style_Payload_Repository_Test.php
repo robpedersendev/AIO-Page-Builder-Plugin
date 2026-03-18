@@ -58,12 +58,12 @@ final class Entity_Style_Payload_Repository_Test extends TestCase {
 	}
 
 	public function test_set_and_get_payload_persists_and_returns_normalized(): void {
-		$repo = new Entity_Style_Payload_Repository();
+		$repo    = new Entity_Style_Payload_Repository();
 		$payload = array(
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'primary' => '#333' ) ),
 			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES  => array( 'card' => array( '--aio-color-surface' => '#fff' ) ),
 		);
-		$ok = $repo->set_payload( 'section_template', 'hero_intro', $payload );
+		$ok      = $repo->set_payload( 'section_template', 'hero_intro', $payload );
 		$this->assertTrue( $ok );
 		$read = $repo->get_payload( 'section_template', 'hero_intro' );
 		$this->assertSame( Entity_Style_Payload_Schema::PAYLOAD_VERSION, $read[ Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION ] );
@@ -77,9 +77,14 @@ final class Entity_Style_Payload_Repository_Test extends TestCase {
 	}
 
 	public function test_non_string_values_in_branches_stripped(): void {
-		$repo = new Entity_Style_Payload_Repository();
+		$repo    = new Entity_Style_Payload_Repository();
 		$payload = array(
-			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES => array( 'color' => array( 'primary' => 123, 'surface' => '#eee' ) ),
+			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES => array(
+				'color' => array(
+					'primary' => 123,
+					'surface' => '#eee',
+				),
+			),
 			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => array(),
 		);
 		$repo->set_payload( 'page_template', 'pt_landing', $payload );
@@ -106,13 +111,13 @@ final class Entity_Style_Payload_Repository_Test extends TestCase {
 	 * persist_entity_payload_result persists only when result is valid (Prompt 252).
 	 */
 	public function test_persist_entity_payload_result_valid_persists(): void {
-		$repo = new Entity_Style_Payload_Repository();
+		$repo    = new Entity_Style_Payload_Repository();
 		$payload = array(
 			Entity_Style_Payload_Schema::KEY_PAYLOAD_VERSION     => '1',
 			Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES     => array( 'color' => array( 'primary' => '#222' ) ),
 			Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES => array(),
 		);
-		$result = new Style_Validation_Result( true, array(), $payload );
+		$result  = new Style_Validation_Result( true, array(), $payload );
 		$this->assertTrue( $repo->persist_entity_payload_result( 'section_template', 'styling_test', $result ) );
 		$read = $repo->get_payload( 'section_template', 'styling_test' );
 		$this->assertSame( array( 'color' => array( 'primary' => '#222' ) ), $read[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] );

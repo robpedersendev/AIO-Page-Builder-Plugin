@@ -33,9 +33,9 @@ defined( 'ABSPATH' ) || exit;
  */
 final class ACF_Migration_Verification_Result {
 
-	public const STATUS_PASS   = 'pass';
+	public const STATUS_PASS    = 'pass';
 	public const STATUS_WARNING = 'warning';
-	public const STATUS_FAIL   = 'fail';
+	public const STATUS_FAIL    = 'fail';
 
 	/** @var string ISO 8601 UTC */
 	private string $verification_run_at;
@@ -83,14 +83,14 @@ final class ACF_Migration_Verification_Result {
 		string $overall_status,
 		string $human_summary
 	) {
-		$this->verification_run_at          = $verification_run_at;
+		$this->verification_run_at           = $verification_run_at;
 		$this->plugin_version                = $plugin_version;
 		$this->registry_schema               = $registry_schema;
 		$this->field_key_stability_summary   = $field_key_stability_summary;
 		$this->assignment_continuity_summary = $assignment_continuity_summary;
 		$this->mirror_coherence              = $mirror_coherence;
 		$this->regeneration_safe             = $regeneration_safe;
-		$this->breaking_change_risks          = $breaking_change_risks;
+		$this->breaking_change_risks         = $breaking_change_risks;
 		$this->deprecation_risks             = $deprecation_risks;
 		$this->overall_status                = $overall_status;
 		$this->human_summary                 = $human_summary;
@@ -153,17 +153,17 @@ final class ACF_Migration_Verification_Result {
 	/** @return array<string, mixed> acf_migration_verification_result payload for reports/logging */
 	public function to_array(): array {
 		return array(
-			'verification_run_at'            => $this->verification_run_at,
-			'plugin_version'                 => $this->plugin_version,
-			'registry_schema'                => $this->registry_schema,
-			'field_key_stability_summary'    => $this->field_key_stability_summary,
-			'assignment_continuity_summary'  => $this->assignment_continuity_summary,
-			'mirror_coherence'                => $this->mirror_coherence,
-			'regeneration_safe'              => $this->regeneration_safe,
-			'breaking_change_risks'          => $this->breaking_change_risks,
-			'deprecation_risks'              => $this->deprecation_risks,
-			'overall_status'                 => $this->overall_status,
-			'human_summary'                  => $this->human_summary,
+			'verification_run_at'           => $this->verification_run_at,
+			'plugin_version'                => $this->plugin_version,
+			'registry_schema'               => $this->registry_schema,
+			'field_key_stability_summary'   => $this->field_key_stability_summary,
+			'assignment_continuity_summary' => $this->assignment_continuity_summary,
+			'mirror_coherence'              => $this->mirror_coherence,
+			'regeneration_safe'             => $this->regeneration_safe,
+			'breaking_change_risks'         => $this->breaking_change_risks,
+			'deprecation_risks'             => $this->deprecation_risks,
+			'overall_status'                => $this->overall_status,
+			'human_summary'                 => $this->human_summary,
 		);
 	}
 }

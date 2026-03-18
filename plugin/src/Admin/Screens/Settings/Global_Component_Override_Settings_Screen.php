@@ -55,7 +55,7 @@ final class Global_Component_Override_Settings_Screen {
 			\wp_die( \esc_html__( 'You do not have permission to manage global component overrides.', 'aio-page-builder' ), 403 );
 		}
 
-		$repo = $this->get_repository();
+		$repo         = $this->get_repository();
 		$form_builder = $this->get_form_builder();
 
 		if ( $repo === null || $form_builder === null ) {
@@ -81,8 +81,8 @@ final class Global_Component_Override_Settings_Screen {
 			}
 		}
 
-		$message   = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
-		$by_comp   = $form_builder->get_fields_by_component();
+		$message = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
+		$by_comp = $form_builder->get_fields_by_component();
 		?>
 		<div class="wrap aio-page-builder-screen aio-global-component-overrides" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -162,8 +162,8 @@ final class Global_Component_Override_Settings_Screen {
 			|| ! $this->container->has( 'component_override_registry' ) ) {
 			return null;
 		}
-		$repo     = $this->container->get( 'global_style_settings_repository' );
-		$comp_reg = $this->container->get( 'component_override_registry' );
+		$repo      = $this->container->get( 'global_style_settings_repository' );
+		$comp_reg  = $this->container->get( 'component_override_registry' );
 		$token_reg = $this->container->has( 'style_token_registry' ) ? $this->container->get( 'style_token_registry' ) : null;
 		if ( ! $repo instanceof Global_Style_Settings_Repository ) {
 			return null;
@@ -173,7 +173,7 @@ final class Global_Component_Override_Settings_Screen {
 			return null;
 		}
 		$token_class = \AIOPageBuilder\Domain\Styling\Style_Token_Registry::class;
-		$token_reg = ( $token_reg instanceof $token_class ) ? $token_reg : null;
+		$token_reg   = ( $token_reg instanceof $token_class ) ? $token_reg : null;
 		return new Global_Component_Override_Form_Builder( $comp_reg, $repo, $token_reg );
 	}
 

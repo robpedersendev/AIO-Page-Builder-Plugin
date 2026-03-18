@@ -89,16 +89,22 @@ final class Onboarding_Screen {
 			return null;
 		}
 
-		$draft_service = $this->container->get( 'onboarding_draft_service' );
+		$draft_service   = $this->container->get( 'onboarding_draft_service' );
 		$prefill_service = $this->container->get( 'onboarding_prefill_service' );
-		$draft = $draft_service->get_draft();
+		$draft           = $draft_service->get_draft();
 
 		if ( $action === 'save_draft' ) {
 			$this->persist_template_preferences_from_post( $draft );
 			$this->persist_industry_profile_from_post();
 			$draft['overall_status'] = Onboarding_Statuses::DRAFT_SAVED;
 			$draft_service->save_draft( $draft );
-			$url = \add_query_arg( array( 'page' => self::SLUG, 'saved' => '1' ), \admin_url( 'admin.php' ) );
+			$url = \add_query_arg(
+				array(
+					'page'  => self::SLUG,
+					'saved' => '1',
+				),
+				\admin_url( 'admin.php' )
+			);
 			return $url;
 		}
 
@@ -106,13 +112,13 @@ final class Onboarding_Screen {
 			$this->persist_template_preferences_from_post( $draft );
 			$this->persist_industry_profile_from_post();
 			$ordered = Onboarding_Step_Keys::ordered();
-			$idx = array_search( $draft['current_step_key'], $ordered, true );
+			$idx     = array_search( $draft['current_step_key'], $ordered, true );
 			if ( $idx !== false && $idx < count( $ordered ) - 1 ) {
 				$next = $ordered[ $idx + 1 ];
 				$draft['step_statuses'][ $draft['current_step_key'] ] = Onboarding_Statuses::STEP_COMPLETED;
-				$draft['current_step_key'] = $next;
-				$draft['step_statuses'][ $next ] = Onboarding_Statuses::STEP_IN_PROGRESS;
-				$draft['overall_status'] = Onboarding_Statuses::IN_PROGRESS;
+				$draft['current_step_key']                            = $next;
+				$draft['step_statuses'][ $next ]                      = Onboarding_Statuses::STEP_IN_PROGRESS;
+				$draft['overall_status']                              = Onboarding_Statuses::IN_PROGRESS;
 				if ( $next === Onboarding_Step_Keys::REVIEW && ! $prefill_service->is_provider_ready() ) {
 					$draft['overall_status'] = Onboarding_Statuses::BLOCKED;
 				}
@@ -124,12 +130,12 @@ final class Onboarding_Screen {
 
 		if ( $action === 'go_back' ) {
 			$ordered = Onboarding_Step_Keys::ordered();
-			$idx = array_search( $draft['current_step_key'], $ordered, true );
+			$idx     = array_search( $draft['current_step_key'], $ordered, true );
 			if ( $idx !== false && $idx > 0 ) {
-				$prev = $ordered[ $idx - 1 ];
-				$draft['current_step_key'] = $prev;
+				$prev                            = $ordered[ $idx - 1 ];
+				$draft['current_step_key']       = $prev;
 				$draft['step_statuses'][ $prev ] = Onboarding_Statuses::STEP_IN_PROGRESS;
-				$draft['overall_status'] = Onboarding_Statuses::IN_PROGRESS;
+				$draft['overall_status']         = Onboarding_Statuses::IN_PROGRESS;
 				$draft_service->save_draft( $draft );
 			}
 			$url = \add_query_arg( array( 'page' => self::SLUG ), \admin_url( 'admin.php' ) );
@@ -138,20 +144,30 @@ final class Onboarding_Screen {
 
 		if ( $action === 'submit_planning_request' ) {
 			if ( ! \current_user_can( Capabilities::RUN_ONBOARDING ) || ! \current_user_can( Capabilities::RUN_AI_PLANS ) ) {
-				$url = \add_query_arg( array( 'page' => self::SLUG, 'planning_result' => 'blocked', 'planning_message' => rawurlencode( __( 'You do not have permission to submit a planning request.', 'aio-page-builder' ) ) ), \admin_url( 'admin.php' ) );
+				$url = \add_query_arg(
+					array(
+						'page'             => self::SLUG,
+						'planning_result'  => 'blocked',
+						'planning_message' => rawurlencode( __( 'You do not have permission to submit a planning request.', 'aio-page-builder' ) ),
+					),
+					\admin_url( 'admin.php' )
+				);
 				return $url;
 			}
 			if ( $this->container->has( 'onboarding_planning_request_orchestrator' ) ) {
-				$orchestrator = $this->container->get( 'onboarding_planning_request_orchestrator' );
-				$result = $orchestrator->submit();
-				$arr = $result->to_array();
+				$orchestrator  = $this->container->get( 'onboarding_planning_request_orchestrator' );
+				$result        = $orchestrator->submit();
+				$arr           = $result->to_array();
 				$transient_key = 'aio_onboarding_planning_result_' . \get_current_user_id();
 				\set_transient( $transient_key, $arr, 60 );
-				$url = \add_query_arg( array(
-					'page'            => self::SLUG,
-					'planning_result' => $arr['status'],
-					'run_id'          => $arr['run_id'] !== '' ? rawurlencode( $arr['run_id'] ) : '',
-				), \admin_url( 'admin.php' ) );
+				$url = \add_query_arg(
+					array(
+						'page'            => self::SLUG,
+						'planning_result' => $arr['status'],
+						'run_id'          => $arr['run_id'] !== '' ? rawurlencode( $arr['run_id'] ) : '',
+					),
+					\admin_url( 'admin.php' )
+				);
 				return $url;
 			}
 		}
@@ -170,7 +186,7 @@ final class Onboarding_Screen {
 		if ( $current !== Onboarding_Step_Keys::TEMPLATE_PREFERENCES || $this->container === null || ! $this->container->has( 'profile_store' ) ) {
 			return;
 		}
-		$raw = array(
+		$raw           = array(
 			'page_emphasis'             => isset( $_POST['aio_template_preference_page_emphasis'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_template_preference_page_emphasis'] ) ) : '',
 			'conversion_posture'        => isset( $_POST['aio_template_preference_conversion_posture'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_template_preference_conversion_posture'] ) ) : '',
 			'proof_style'               => isset( $_POST['aio_template_preference_proof_style'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_template_preference_proof_style'] ) ) : '',
@@ -212,9 +228,14 @@ final class Onboarding_Screen {
 			$partial[ Industry_Profile_Schema::FIELD_GEO_MODEL ] = \sanitize_text_field( \wp_unslash( $_POST['aio_industry_geo_model'] ) );
 		}
 		if ( isset( $_POST['aio_secondary_industry_keys'] ) && is_array( $_POST['aio_secondary_industry_keys'] ) ) {
-			$partial[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = array_filter( array_map( function ( $v ) {
-				return \is_string( $v ) ? \sanitize_text_field( \wp_unslash( $v ) ) : '';
-			}, $_POST['aio_secondary_industry_keys'] ) );
+			$partial[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = array_filter(
+				array_map(
+					function ( $v ) {
+						return \is_string( $v ) ? \sanitize_text_field( \wp_unslash( $v ) ) : '';
+					},
+					$_POST['aio_secondary_industry_keys']
+				)
+			);
 		}
 		if ( ! empty( $partial ) ) {
 			$repo->merge_profile( $partial );
@@ -241,14 +262,16 @@ final class Onboarding_Screen {
 						}
 						$post_key = 'aio_industry_qp_' . $field_key;
 						if ( isset( $_POST[ $post_key ] ) ) {
-							$val = $_POST[ $post_key ];
+							$val                    = $_POST[ $post_key ];
 							$by_field[ $field_key ] = \is_scalar( $val ) ? $val : ( \is_string( $val ) ? \sanitize_text_field( \wp_unslash( $val ) ) : '' );
 						}
 					}
 					if ( ! empty( $by_field ) ) {
-						$repo->merge_profile( array(
-							Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array( $primary => $by_field ),
-						) );
+						$repo->merge_profile(
+							array(
+								Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array( $primary => $by_field ),
+							)
+						);
 					}
 				}
 			}
@@ -273,9 +296,9 @@ final class Onboarding_Screen {
 	 */
 	private function minimal_state(): array {
 		$draft_svc = new Onboarding_Draft_Service( new \AIOPageBuilder\Infrastructure\Settings\Settings_Service() );
-		$draft = $draft_svc->default_draft();
-		$labels = Onboarding_UI_State_Builder::step_labels();
-		$steps = array();
+		$draft     = $draft_svc->default_draft();
+		$labels    = Onboarding_UI_State_Builder::step_labels();
+		$steps     = array();
 		foreach ( Onboarding_Step_Keys::ordered() as $key ) {
 			$steps[] = array(
 				'key'        => $key,
@@ -290,7 +313,13 @@ final class Onboarding_Screen {
 			'overall_status'    => $draft['overall_status'],
 			'is_blocked'        => false,
 			'blockers'          => array(),
-			'prefill'           => array( 'profile' => array(), 'current_site_url' => '', 'crawl_run_ids' => array(), 'latest_crawl_run_id' => null, 'provider_refs' => array() ),
+			'prefill'           => array(
+				'profile'             => array(),
+				'current_site_url'    => '',
+				'crawl_run_ids'       => array(),
+				'latest_crawl_run_id' => null,
+				'provider_refs'       => array(),
+			),
 			'draft'             => $draft,
 			'nonce'             => \wp_create_nonce( self::NONCE_ACTION ),
 			'nonce_action'      => self::NONCE_ACTION,
@@ -305,19 +334,19 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	private function render_shell( array $state ): void {
-		$current_step_key = $state['current_step_key'] ?? Onboarding_Step_Keys::WELCOME;
-		$steps = $state['steps'] ?? array();
-		$is_blocked = ! empty( $state['is_blocked'] );
-		$blockers = $state['blockers'] ?? array();
-		$resume_message = $state['resume_message'] ?? '';
-		$nonce = $state['nonce'] ?? '';
-		$nonce_action = $state['nonce_action'] ?? self::NONCE_ACTION;
-		$saved = isset( $_GET['saved'] ) && $_GET['saved'] === '1';
-		$planning_result_status = isset( $_GET['planning_result'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['planning_result'] ) ) : '';
+		$current_step_key        = $state['current_step_key'] ?? Onboarding_Step_Keys::WELCOME;
+		$steps                   = $state['steps'] ?? array();
+		$is_blocked              = ! empty( $state['is_blocked'] );
+		$blockers                = $state['blockers'] ?? array();
+		$resume_message          = $state['resume_message'] ?? '';
+		$nonce                   = $state['nonce'] ?? '';
+		$nonce_action            = $state['nonce_action'] ?? self::NONCE_ACTION;
+		$saved                   = isset( $_GET['saved'] ) && $_GET['saved'] === '1';
+		$planning_result_status  = isset( $_GET['planning_result'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['planning_result'] ) ) : '';
 		$planning_result_message = '';
 		if ( $planning_result_status !== '' ) {
 			$transient_key = 'aio_onboarding_planning_result_' . \get_current_user_id();
-			$stored = \get_transient( $transient_key );
+			$stored        = \get_transient( $transient_key );
 			if ( is_array( $stored ) && isset( $stored['user_message'] ) && is_string( $stored['user_message'] ) ) {
 				$planning_result_message = $stored['user_message'];
 				\delete_transient( $transient_key );
@@ -410,15 +439,15 @@ final class Onboarding_Screen {
 	/**
 	 * Renders placeholder content for the current step. Full step forms are out of scope for this prompt.
 	 *
-	 * @param string $current_step_key
+	 * @param string               $current_step_key
 	 * @param array<string, mixed> $state
 	 * @return void
 	 */
 	private function render_step_placeholder( string $current_step_key, array $state ): void {
-		$labels = Onboarding_UI_State_Builder::step_labels();
-		$label = $labels[ $current_step_key ] ?? $current_step_key;
-		$prefill = $state['prefill'] ?? array();
-		$provider_refs = $prefill['provider_refs'] ?? array();
+		$labels            = Onboarding_UI_State_Builder::step_labels();
+		$label             = $labels[ $current_step_key ] ?? $current_step_key;
+		$prefill           = $state['prefill'] ?? array();
+		$provider_refs     = $prefill['provider_refs'] ?? array();
 		$is_provider_ready = ! empty( $state['is_provider_ready'] );
 		?>
 		<div class="aio-onboarding-step-panel" data-step="<?php echo \esc_attr( $current_step_key ); ?>">
@@ -431,10 +460,16 @@ final class Onboarding_Screen {
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::SUBMISSION ) : ?>
 				<p><?php \esc_html_e( 'Request an AI-generated plan from your profile and context. The plan will appear in AI Runs; you can then create a Build Plan from it.', 'aio-page-builder' ); ?></p>
 				<?php
-				$last_run_id = $state['last_planning_run_id'] ?? null;
+				$last_run_id      = $state['last_planning_run_id'] ?? null;
 				$last_run_post_id = $state['last_planning_run_post_id'] ?? null;
 				if ( $last_run_id !== null && $last_run_post_id !== null && (int) $last_run_post_id > 0 ) :
-					$run_url = \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs', 'run_id' => $last_run_id ), \admin_url( 'admin.php' ) );
+					$run_url = \add_query_arg(
+						array(
+							'page'   => 'aio-page-builder-ai-runs',
+							'run_id' => $last_run_id,
+						),
+						\admin_url( 'admin.php' )
+					);
 					?>
 					<p><?php \esc_html_e( 'Last run:', 'aio-page-builder' ); ?> <a href="<?php echo \esc_url( $run_url ); ?>"><?php echo \esc_html( $last_run_id ); ?></a></p>
 				<?php endif; ?>
@@ -463,17 +498,17 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	private function render_template_preferences_step( array $state ): void {
-		$prefill = $state['prefill'] ?? array();
-		$profile = $prefill['profile'] ?? array();
-		$prefs = $profile[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ?? array();
-		$prefs = is_array( $prefs ) ? $prefs : array();
-		$page_emphasis = isset( $prefs['page_emphasis'] ) ? (string) $prefs['page_emphasis'] : '';
+		$prefill            = $state['prefill'] ?? array();
+		$profile            = $prefill['profile'] ?? array();
+		$prefs              = $profile[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ?? array();
+		$prefs              = is_array( $prefs ) ? $prefs : array();
+		$page_emphasis      = isset( $prefs['page_emphasis'] ) ? (string) $prefs['page_emphasis'] : '';
 		$conversion_posture = isset( $prefs['conversion_posture'] ) ? (string) $prefs['conversion_posture'] : '';
-		$proof_style = isset( $prefs['proof_style'] ) ? (string) $prefs['proof_style'] : '';
-		$content_density = isset( $prefs['content_density'] ) ? (string) $prefs['content_density'] : '';
-		$animation = isset( $prefs['animation_preference'] ) ? (string) $prefs['animation_preference'] : '';
-		$cta_intensity = isset( $prefs['cta_intensity_preference'] ) ? (string) $prefs['cta_intensity_preference'] : '';
-		$reduced_motion = ! empty( $prefs['reduced_motion_preference'] );
+		$proof_style        = isset( $prefs['proof_style'] ) ? (string) $prefs['proof_style'] : '';
+		$content_density    = isset( $prefs['content_density'] ) ? (string) $prefs['content_density'] : '';
+		$animation          = isset( $prefs['animation_preference'] ) ? (string) $prefs['animation_preference'] : '';
+		$cta_intensity      = isset( $prefs['cta_intensity_preference'] ) ? (string) $prefs['cta_intensity_preference'] : '';
+		$reduced_motion     = ! empty( $prefs['reduced_motion_preference'] );
 		?>
 		<p><?php \esc_html_e( 'These preferences help guide template and page-style recommendations. They are advisory only and do not override structural or CTA rules.', 'aio-page-builder' ); ?></p>
 		<table class="form-table" role="presentation">

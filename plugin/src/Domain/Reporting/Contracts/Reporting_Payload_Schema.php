@@ -147,7 +147,7 @@ final class Reporting_Payload_Schema {
 	 * Checks that array does not contain any prohibited keys (recursive one level for nested objects).
 	 *
 	 * @param array<string, mixed> $data Payload or envelope to check.
-	 * @param bool                $recursive If true, check one level of nested arrays for prohibited keys.
+	 * @param bool                 $recursive If true, check one level of nested arrays for prohibited keys.
 	 * @return bool True if no prohibited key is present.
 	 */
 	public static function has_no_prohibited_keys( array $data, bool $recursive = true ): bool {

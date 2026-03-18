@@ -48,7 +48,7 @@ final class Section_Inventory_Appendix_Generator {
 	 * @return string
 	 */
 	public function generate_from_definitions( array $definitions ): string {
-		$result = $this->build_result_from_definitions( $definitions );
+		$result  = $this->build_result_from_definitions( $definitions );
 		$grouped = $this->group_by_category( $result['rows'] );
 		return $this->render_markdown( $grouped, $result['total'] );
 	}
@@ -85,28 +85,28 @@ final class Section_Inventory_Appendix_Generator {
 	 * @return array<string, mixed> Appendix row: key, name, purpose, category, variants, helper_status, deprecation_status, version.
 	 */
 	private function build_row( array $def ): array {
-		$key     = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-		$name    = (string) ( $def[ Section_Schema::FIELD_NAME ] ?? $key );
-		$purpose  = (string) ( $def[ Section_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' );
-		$category = (string) ( $def[ Section_Schema::FIELD_CATEGORY ] ?? $def['section_purpose_family'] ?? '' );
-		$variants = $def[ Section_Schema::FIELD_VARIANTS ] ?? array();
-		$variant_list = \is_array( $variants ) ? array_keys( $variants ) : array();
-		$helper_ref = (string) ( $def[ Section_Schema::FIELD_HELPER_REF ] ?? '' );
-		$helper_status = $helper_ref !== '' ? 'yes' : 'no';
-		$status   = (string) ( $def[ Section_Schema::FIELD_STATUS ] ?? '' );
+		$key                = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+		$name               = (string) ( $def[ Section_Schema::FIELD_NAME ] ?? $key );
+		$purpose            = (string) ( $def[ Section_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' );
+		$category           = (string) ( $def[ Section_Schema::FIELD_CATEGORY ] ?? $def['section_purpose_family'] ?? '' );
+		$variants           = $def[ Section_Schema::FIELD_VARIANTS ] ?? array();
+		$variant_list       = \is_array( $variants ) ? array_keys( $variants ) : array();
+		$helper_ref         = (string) ( $def[ Section_Schema::FIELD_HELPER_REF ] ?? '' );
+		$helper_status      = $helper_ref !== '' ? 'yes' : 'no';
+		$status             = (string) ( $def[ Section_Schema::FIELD_STATUS ] ?? '' );
 		$deprecation_status = ( $status === 'deprecated' ) ? 'deprecated' : 'active';
-		$version_data = $def[ Section_Schema::FIELD_VERSION ] ?? array();
-		$version = \is_array( $version_data ) && isset( $version_data['version'] ) ? (string) $version_data['version'] : '1';
+		$version_data       = $def[ Section_Schema::FIELD_VERSION ] ?? array();
+		$version            = \is_array( $version_data ) && isset( $version_data['version'] ) ? (string) $version_data['version'] : '1';
 
 		return array(
-			'key'                 => $key,
-			'name'                => $name,
-			'purpose'             => $purpose,
-			'category'            => $category,
-			'variants'             => $variant_list,
-			'helper_status'        => $helper_status,
-			'deprecation_status'   => $deprecation_status,
-			'version'              => $version,
+			'key'                => $key,
+			'name'               => $name,
+			'purpose'            => $purpose,
+			'category'           => $category,
+			'variants'           => $variant_list,
+			'helper_status'      => $helper_status,
+			'deprecation_status' => $deprecation_status,
+			'version'            => $version,
 		);
 	}
 
@@ -137,11 +137,11 @@ final class Section_Inventory_Appendix_Generator {
 
 	/**
 	 * @param array<string, list<array<string, mixed>>> $grouped
-	 * @param int $total
+	 * @param int                                       $total
 	 * @return string
 	 */
 	private function render_markdown( array $grouped, int $total ): string {
-		$out = array();
+		$out   = array();
 		$out[] = '# Section Template Inventory Appendix';
 		$out[] = '';
 		$out[] = '**Spec**: §62.11 Section Template Inventory Appendix; §57.9 Documentation Standards; §60.6 Documentation Completion Requirements.';
@@ -155,20 +155,20 @@ final class Section_Inventory_Appendix_Generator {
 
 		foreach ( $grouped as $category => $rows ) {
 			$cat_label = $category === '_ungrouped' ? 'Ungrouped' : \ucfirst( \str_replace( array( '_', '-' ), ' ', $category ) );
-			$out[] = '## ' . $cat_label;
-			$out[] = '';
-			$out[] = '| Key | Name | Purpose | Variants | Helper | Deprecation | Version |';
-			$out[] = '|-----|------|---------|----------|--------|-------------|---------|';
+			$out[]     = '## ' . $cat_label;
+			$out[]     = '';
+			$out[]     = '| Key | Name | Purpose | Variants | Helper | Deprecation | Version |';
+			$out[]     = '|-----|------|---------|----------|--------|-------------|---------|';
 			foreach ( $rows as $r ) {
-				$key   = $this->escape_table_cell( (string) ( $r['key'] ?? '' ) );
-				$name  = $this->escape_table_cell( (string) ( $r['name'] ?? '' ) );
-				$purpose = $this->escape_table_cell( (string) ( $r['purpose'] ?? '' ) );
+				$key      = $this->escape_table_cell( (string) ( $r['key'] ?? '' ) );
+				$name     = $this->escape_table_cell( (string) ( $r['name'] ?? '' ) );
+				$purpose  = $this->escape_table_cell( (string) ( $r['purpose'] ?? '' ) );
 				$variants = \is_array( $r['variants'] ?? null ) ? \implode( ', ', $r['variants'] ) : '';
 				$variants = $this->escape_table_cell( $variants );
-				$helper = $this->escape_table_cell( (string) ( $r['helper_status'] ?? '' ) );
-				$dep   = $this->escape_table_cell( (string) ( $r['deprecation_status'] ?? '' ) );
-				$ver   = $this->escape_table_cell( (string) ( $r['version'] ?? '' ) );
-				$out[] = '| ' . $key . ' | ' . $name . ' | ' . $purpose . ' | ' . $variants . ' | ' . $helper . ' | ' . $dep . ' | ' . $ver . ' |';
+				$helper   = $this->escape_table_cell( (string) ( $r['helper_status'] ?? '' ) );
+				$dep      = $this->escape_table_cell( (string) ( $r['deprecation_status'] ?? '' ) );
+				$ver      = $this->escape_table_cell( (string) ( $r['version'] ?? '' ) );
+				$out[]    = '| ' . $key . ' | ' . $name . ' | ' . $purpose . ' | ' . $variants . ' | ' . $helper . ' | ' . $dep . ' | ' . $ver . ' |';
 			}
 			$out[] = '';
 		}

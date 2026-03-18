@@ -34,9 +34,9 @@ final class Execution_Idempotency_Helper {
 	 * Builds a deterministic deduplication key from plan_id, plan_item_id, action_type, and target ref.
 	 * Used to detect "same action" for duplicate suppression (contract §6.2).
 	 *
-	 * @param string $plan_id Plan ID.
-	 * @param string $plan_item_id Plan item ID (empty for plan-level actions).
-	 * @param string $action_type Action type (Execution_Action_Types).
+	 * @param string               $plan_id Plan ID.
+	 * @param string               $plan_item_id Plan item ID (empty for plan-level actions).
+	 * @param string               $action_type Action type (Execution_Action_Types).
 	 * @param array<string, mixed> $target_reference Target reference from envelope (normalized for hashing).
 	 * @return string Deduplication key (opaque but deterministic).
 	 */
@@ -46,11 +46,11 @@ final class Execution_Idempotency_Helper {
 		string $action_type,
 		array $target_reference
 	): string {
-		$plan_id       = $plan_id !== '' ? $plan_id : '_';
-		$plan_item_id  = $plan_item_id !== '' ? $plan_item_id : '_';
-		$action_type   = $action_type !== '' ? $action_type : '_';
+		$plan_id           = $plan_id !== '' ? $plan_id : '_';
+		$plan_item_id      = $plan_item_id !== '' ? $plan_item_id : '_';
+		$action_type       = $action_type !== '' ? $action_type : '_';
 		$target_normalized = self::normalize_target_for_dedup( $target_reference, $action_type );
-		$target_hash   = \hash( 'sha256', \wp_json_encode( $target_normalized ) );
+		$target_hash       = \hash( 'sha256', \wp_json_encode( $target_normalized ) );
 		return 'idem:' . $plan_id . ':' . $plan_item_id . ':' . $action_type . ':' . \substr( $target_hash, 0, 16 );
 	}
 
@@ -58,7 +58,7 @@ final class Execution_Idempotency_Helper {
 	 * Normalizes target_reference for dedup key so same logical target produces same hash.
 	 *
 	 * @param array<string, mixed> $target_reference Target reference from envelope.
-	 * @param string              $action_type Action type.
+	 * @param string               $action_type Action type.
 	 * @return array<string, mixed> Normalized structure (scalar/array only for hashing).
 	 */
 	public static function normalize_target_for_dedup( array $target_reference, string $action_type ): array {
@@ -109,16 +109,16 @@ final class Execution_Idempotency_Helper {
 	 * @return string Deduplication key.
 	 */
 	public static function build_dedup_key_from_envelope( array $envelope ): string {
-		$plan_id   = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] )
+		$plan_id      = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ID ]
 			: '';
 		$plan_item_id = isset( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID ]
 			: '';
-		$action_type = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] )
+		$action_type  = isset( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] ) && is_string( $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_ACTION_TYPE ]
 			: '';
-		$target = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
+		$target       = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
 			: array();
 		return self::build_dedup_key( $plan_id, $plan_item_id, $action_type, $target );

@@ -47,7 +47,7 @@ final class Save_Industry_Build_Plan_Override_Action {
 		$item_id = isset( $_POST['item_id'] ) && is_string( $_POST['item_id'] )
 			? trim( \sanitize_text_field( \wp_unslash( $_POST['item_id'] ) ) )
 			: '';
-		$state = isset( $_POST['state'] ) && is_string( $_POST['state'] )
+		$state   = isset( $_POST['state'] ) && is_string( $_POST['state'] )
 			? trim( \sanitize_key( \wp_unslash( $_POST['state'] ) ) )
 			: Industry_Override_Schema::STATE_ACCEPTED;
 		if ( $state !== Industry_Override_Schema::STATE_ACCEPTED && $state !== Industry_Override_Schema::STATE_REJECTED ) {
@@ -59,7 +59,7 @@ final class Save_Industry_Build_Plan_Override_Action {
 		$reason = Industry_Override_Schema::sanitize_reason( $reason );
 
 		$service = new Industry_Build_Plan_Item_Override_Service();
-		$ok = $service->record_override( $plan_id, $item_id, $state, $reason );
+		$ok      = $service->record_override( $plan_id, $item_id, $state, $reason );
 		\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_plan_override=' . ( $ok ? 'saved' : 'error' ) );
 		exit;
 	}

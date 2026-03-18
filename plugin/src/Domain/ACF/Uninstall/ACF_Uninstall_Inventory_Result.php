@@ -37,12 +37,12 @@ final class ACF_Uninstall_Inventory_Result {
 	private array $cleanup_option_keys;
 
 	/**
-	 * @param list<string>                                                                 $plugin_runtime_group_keys
-	 * @param list<array{group_key: string, field_key: string, field_name: string}>       $field_definitions
-	 * @param list<string>                                                                 $value_meta_keys
-	 * @param list<string>                                                                 $persistent_group_keys
-	 * @param list<string>                                                                 $cleanup_transient_prefixes
-	 * @param list<string>                                                                 $cleanup_option_keys
+	 * @param list<string>                                                          $plugin_runtime_group_keys
+	 * @param list<array{group_key: string, field_key: string, field_name: string}> $field_definitions
+	 * @param list<string>                                                          $value_meta_keys
+	 * @param list<string>                                                          $persistent_group_keys
+	 * @param list<string>                                                          $cleanup_transient_prefixes
+	 * @param list<string>                                                          $cleanup_option_keys
 	 */
 	public function __construct(
 		array $plugin_runtime_group_keys,
@@ -52,12 +52,12 @@ final class ACF_Uninstall_Inventory_Result {
 		array $cleanup_transient_prefixes,
 		array $cleanup_option_keys
 	) {
-		$this->plugin_runtime_group_keys   = array_values( $plugin_runtime_group_keys );
-		$this->field_definitions           = array_values( $field_definitions );
-		$this->value_meta_keys             = array_values( array_unique( $value_meta_keys ) );
-		$this->persistent_group_keys       = array_values( $persistent_group_keys );
-		$this->cleanup_transient_prefixes  = array_values( $cleanup_transient_prefixes );
-		$this->cleanup_option_keys         = array_values( $cleanup_option_keys );
+		$this->plugin_runtime_group_keys  = array_values( $plugin_runtime_group_keys );
+		$this->field_definitions          = array_values( $field_definitions );
+		$this->value_meta_keys            = array_values( array_unique( $value_meta_keys ) );
+		$this->persistent_group_keys      = array_values( $persistent_group_keys );
+		$this->cleanup_transient_prefixes = array_values( $cleanup_transient_prefixes );
+		$this->cleanup_option_keys        = array_values( $cleanup_option_keys );
 	}
 
 	/** @return list<string> */

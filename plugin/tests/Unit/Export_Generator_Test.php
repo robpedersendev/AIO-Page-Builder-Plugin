@@ -59,7 +59,7 @@ final class Export_Generator_Test extends TestCase {
 	}
 
 	public function test_manifest_builder_produces_required_keys(): void {
-		$builder = new Export_Manifest_Builder();
+		$builder  = new Export_Manifest_Builder();
 		$manifest = $builder->build(
 			Export_Mode_Keys::FULL_OPERATIONAL_BACKUP,
 			'https://example.com',
@@ -78,8 +78,8 @@ final class Export_Generator_Test extends TestCase {
 
 	public function test_zip_packager_filename_format(): void {
 		$path_manager = new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager();
-		$packager = new Export_Zip_Packager( $path_manager );
-		$name = $packager->build_package_filename( Export_Mode_Keys::TEMPLATE_ONLY_EXPORT, 'my-site' );
+		$packager     = new Export_Zip_Packager( $path_manager );
+		$name         = $packager->build_package_filename( Export_Mode_Keys::TEMPLATE_ONLY_EXPORT, 'my-site' );
 		$this->assertStringStartsWith( 'aio-export-template_only_export-', $name );
 		$this->assertStringEndsWith( '-my-site.zip', $name );
 		$this->assertMatchesRegularExpression( '#^aio-export-[a-z0-9_]+-\d{8}-\d{6}-[a-zA-Z0-9_-]+\.zip$#', $name );
@@ -95,25 +95,28 @@ final class Export_Generator_Test extends TestCase {
 		file_put_contents( $staging . '/settings/settings.json', '{"foo":"bar"}' );
 		$destination = sys_get_temp_dir() . '/aio-export-out-' . uniqid() . '.zip';
 
-		$path_manager = new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager();
-		$packager = new Export_Zip_Packager( $path_manager );
+		$path_manager     = new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager();
+		$packager         = new Export_Zip_Packager( $path_manager );
 		$manifest_factory = function ( array $checksum_list ) {
-			$m = array(
-				'export_type' => 'full_operational_backup',
-				'export_timestamp' => gmdate( 'Y-m-d\TH:i:s\Z' ),
-				'plugin_version' => '0.1.0',
-				'schema_version' => '1',
-				'source_site_url' => 'https://example.com',
-				'included_categories' => array( 'settings' ),
-				'excluded_categories' => array(),
+			$m    = array(
+				'export_type'           => 'full_operational_backup',
+				'export_timestamp'      => gmdate( 'Y-m-d\TH:i:s\Z' ),
+				'plugin_version'        => '0.1.0',
+				'schema_version'        => '1',
+				'source_site_url'       => 'https://example.com',
+				'included_categories'   => array( 'settings' ),
+				'excluded_categories'   => array(),
 				'package_checksum_list' => $checksum_list,
-				'restore_notes' => '',
-				'compatibility_flags' => array( 'schema_version' => '1', 'same_major_required' => true ),
+				'restore_notes'         => '',
+				'compatibility_flags'   => array(
+					'schema_version'      => '1',
+					'same_major_required' => true,
+				),
 			);
 			$json = json_encode( $m );
 			return $json !== false ? $json : '{}';
 		};
-		$result = $packager->pack( $staging, $destination, $manifest_factory );
+		$result           = $packager->pack( $staging, $destination, $manifest_factory );
 
 		$this->assertTrue( $result['success'] );
 		$this->assertArrayHasKey( 'settings/settings.json', $result['checksum_list'] );
@@ -134,7 +137,7 @@ final class Export_Generator_Test extends TestCase {
 	}
 
 	public function test_excluded_categories_never_in_manifest_included(): void {
-		$builder = new Export_Manifest_Builder();
+		$builder  = new Export_Manifest_Builder();
 		$manifest = $builder->build(
 			Export_Mode_Keys::SUPPORT_BUNDLE,
 			'https://example.com',

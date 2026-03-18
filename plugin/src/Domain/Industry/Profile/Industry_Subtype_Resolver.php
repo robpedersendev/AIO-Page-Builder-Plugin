@@ -47,16 +47,16 @@ final class Industry_Subtype_Resolver {
 	 * @return array{primary_industry_key: string, industry_subtype_key: string, resolved_subtype: array<string, mixed>|null, has_valid_subtype: bool}
 	 */
 	public function resolve_from_profile( array $profile ): array {
-		$normalized = Industry_Profile_Schema::normalize( $profile );
-		$primary    = isset( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$normalized  = Industry_Profile_Schema::normalize( $profile );
+		$primary     = isset( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( $normalized[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
 		$subtype_key = isset( $normalized[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] ) && is_string( $normalized[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			? trim( $normalized[ Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY ] )
 			: '';
 
-		$resolved_subtype   = null;
-		$has_valid_subtype  = false;
+		$resolved_subtype      = null;
+		$has_valid_subtype     = false;
 		$effective_subtype_key = '';
 
 		if ( $subtype_key !== '' && $this->subtype_registry !== null ) {
@@ -69,18 +69,18 @@ final class Industry_Subtype_Resolver {
 					? $def[ Industry_Subtype_Registry::FIELD_STATUS ]
 					: '';
 				if ( $parent === $primary && $status === Industry_Subtype_Registry::STATUS_ACTIVE ) {
-					$resolved_subtype   = $def;
-					$has_valid_subtype  = true;
+					$resolved_subtype      = $def;
+					$has_valid_subtype     = true;
 					$effective_subtype_key = $subtype_key;
 				}
 			}
 		}
 
 		return array(
-			'primary_industry_key'   => $primary,
-			'industry_subtype_key'  => $effective_subtype_key,
-			'resolved_subtype'      => $resolved_subtype,
-			'has_valid_subtype'     => $has_valid_subtype,
+			'primary_industry_key' => $primary,
+			'industry_subtype_key' => $effective_subtype_key,
+			'resolved_subtype'     => $resolved_subtype,
+			'has_valid_subtype'    => $has_valid_subtype,
 		);
 	}
 }

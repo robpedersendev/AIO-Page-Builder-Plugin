@@ -52,7 +52,7 @@ final class Industry_Page_Template_Filter_Controller {
 	 */
 	public function enrich_state( array $state, array $request_params ): array {
 		$industry_view = isset( $request_params['industry_view'] ) ? \sanitize_key( (string) $request_params['industry_view'] ) : '';
-		$allowed = array(
+		$allowed       = array(
 			Industry_Page_Template_Directory_Read_Model_Builder::VIEW_RECOMMENDED_ONLY,
 			Industry_Page_Template_Directory_Read_Model_Builder::VIEW_RECOMMENDED_PLUS_WEAK,
 			Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY,
@@ -64,7 +64,7 @@ final class Industry_Page_Template_Filter_Controller {
 		$state['industry_view']          = $industry_view;
 		$state['industry_badges_by_key'] = array();
 
-		$profile = array();
+		$profile      = array();
 		$primary_pack = null;
 		if ( $this->profile_repo !== null ) {
 			$profile = $this->profile_repo->get_profile();
@@ -76,8 +76,12 @@ final class Industry_Page_Template_Filter_Controller {
 			$primary_pack = $this->pack_registry->get( $primary_key );
 		}
 
-		$list_result = $state['list_result'] ?? array( 'rows' => array(), 'pagination' => array(), 'total_matching' => 0 );
-		$rows = $list_result['rows'] ?? array();
+		$list_result = $state['list_result'] ?? array(
+			'rows'           => array(),
+			'pagination'     => array(),
+			'total_matching' => 0,
+		);
+		$rows        = $list_result['rows'] ?? array();
 		if ( count( $rows ) === 0 ) {
 			return $state;
 		}
@@ -96,18 +100,18 @@ final class Industry_Page_Template_Filter_Controller {
 			}
 		}
 
-		$build_result = $this->read_model_builder->build_with_weighted( $profile, $primary_pack, $templates, $industry_view );
-		$item_views = isset( $build_result['items'] ) && is_array( $build_result['items'] ) ? $build_result['items'] : array();
+		$build_result                      = $this->read_model_builder->build_with_weighted( $profile, $primary_pack, $templates, $industry_view );
+		$item_views                        = isset( $build_result['items'] ) && is_array( $build_result['items'] ) ? $build_result['items'] : array();
 		$state['industry_weighted_by_key'] = isset( $build_result['weighted_by_key'] ) && is_array( $build_result['weighted_by_key'] ) ? $build_result['weighted_by_key'] : array();
-		$badges_by_key = array();
-		$ordered_keys = array();
+		$badges_by_key                     = array();
+		$ordered_keys                      = array();
 		foreach ( $item_views as $item ) {
 			if ( ! $item instanceof Industry_Page_Template_Directory_Item_View ) {
 				continue;
 			}
-			$k = $item->get_page_template_key();
+			$k                   = $item->get_page_template_key();
 			$badges_by_key[ $k ] = $item;
-			$ordered_keys[] = $k;
+			$ordered_keys[]      = $k;
 		}
 
 		$state['industry_badges_by_key'] = $badges_by_key;
@@ -126,10 +130,10 @@ final class Industry_Page_Template_Filter_Controller {
 					$filtered_rows[] = $rows_by_key[ $key ];
 				}
 			}
-			$state['list_result']['rows'] = $filtered_rows;
+			$state['list_result']['rows']           = $filtered_rows;
 			$state['list_result']['total_matching'] = count( $filtered_rows );
 			if ( isset( $state['list_result']['pagination'] ) && is_array( $state['list_result']['pagination'] ) ) {
-				$state['list_result']['pagination']['total'] = count( $filtered_rows );
+				$state['list_result']['pagination']['total']       = count( $filtered_rows );
 				$state['list_result']['pagination']['total_pages'] = max( 1, (int) \ceil( count( $filtered_rows ) / ( $state['list_result']['pagination']['per_page'] ?? 25 ) ) );
 			}
 		}

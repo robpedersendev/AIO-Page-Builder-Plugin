@@ -47,7 +47,7 @@ final class Table_Schema_Definitions_Test extends TestCase {
 	}
 
 	public function test_table_names_use_prefix(): void {
-		$defs = Table_Schema_Definitions::get_definitions( $this->wpdb_stub );
+		$defs  = Table_Schema_Definitions::get_definitions( $this->wpdb_stub );
 		$names = array_column( $defs, 'name' );
 		$this->assertContains( 'wp_' . Table_Names::CRAWL_SNAPSHOTS, $names );
 		$this->assertContains( 'wp_' . Table_Names::REPORTING_RECORDS, $names );

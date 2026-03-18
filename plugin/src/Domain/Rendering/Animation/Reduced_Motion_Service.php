@@ -17,10 +17,10 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Reduced_Motion_Service {
 
-	public const BEHAVIOR_HONOR = 'honor';
+	public const BEHAVIOR_HONOR          = 'honor';
 	public const BEHAVIOR_ESSENTIAL_ONLY = 'essential_only';
-	public const TIER_NONE = 'none';
-	public const TIER_SUBTLE = 'subtle';
+	public const TIER_NONE               = 'none';
+	public const TIER_SUBTLE             = 'subtle';
 
 	/**
 	 * Returns the effective tier cap when reduced-motion preference is active.
@@ -58,7 +58,12 @@ final class Reduced_Motion_Service {
 	}
 
 	private function tier_order( string $tier ): int {
-		$order = array( 'none' => 0, 'subtle' => 1, 'enhanced' => 2, 'premium' => 3 );
+		$order = array(
+			'none'     => 0,
+			'subtle'   => 1,
+			'enhanced' => 2,
+			'premium'  => 3,
+		);
 		return $order[ $tier ] ?? 0;
 	}
 

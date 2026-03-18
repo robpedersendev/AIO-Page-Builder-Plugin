@@ -79,17 +79,20 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
-		$ordered = array();
+		$ordered      = array();
 		$requirements = array();
 		foreach ( $section_keys as $pos => $key ) {
-			$ordered[] = array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => $key,
+			$ordered[]            = array(
+				Page_Template_Schema::SECTION_ITEM_KEY => $key,
 				Page_Template_Schema::SECTION_ITEM_POSITION => $pos,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			);
 			$requirements[ $key ] = array( 'required' => true );
 		}
-		return array( 'ordered' => $ordered, 'requirements' => $requirements );
+		return array(
+			'ordered'      => $ordered,
+			'requirements' => $requirements,
+		);
 	}
 
 	/**
@@ -120,20 +123,23 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 		array $extra = array()
 	): array {
 		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY             => $internal_key,
-			Page_Template_Schema::FIELD_NAME                     => $name,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY           => $purpose_summary,
-			Page_Template_Schema::FIELD_ARCHETYPE                 => $archetype,
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS          => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS      => $section_requirements,
-			Page_Template_Schema::FIELD_COMPATIBILITY             => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                 => $one_pager,
-			Page_Template_Schema::FIELD_VERSION                   => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                    => 'active',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $internal_key,
+			Page_Template_Schema::FIELD_NAME             => $name,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => $purpose_summary,
+			Page_Template_Schema::FIELD_ARCHETYPE        => $archetype,
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_requirements,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => $one_pager,
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES   => $endpoint_notes,
-			'template_category_class'                            => 'top_level',
-			'template_family'                                     => $template_family,
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => $endpoint_notes,
+			'template_category_class'                    => 'top_level',
+			'template_family'                            => $template_family,
 		);
 		if ( ! isset( $extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] ) ) {
 			$extra[ Page_Template_Schema::FIELD_INDUSTRY_AFFINITY ] = self::LAUNCH_INDUSTRIES;
@@ -156,7 +162,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'ptf_steps_01',
 			'cta_trust_confirm_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_home_conversion_01',
 			'Home (conversion-led)',
@@ -166,8 +172,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Home page conversion-led. Lead with hero and proof, then consultation CTA; mid-page benefits and logos; contact CTA and panel; features and steps; close with trust CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Home page conversion-led. Lead with hero and proof, then consultation CTA; mid-page benefits and logos; contact CTA and panel; features and steps; close with trust CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Opener establishes offer; proof and value prop build trust; first CTA captures interest; how-it-works and benefits explain; second CTA and contact panel support conversion; features and steps reinforce; final CTA confirms.',
 			),
 			'Requires section library (hero, trust, feature/benefit, process, legal/utility, CTA batches).',
@@ -190,7 +196,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'ptf_expectations_01',
 			'cta_support_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_home_trust_01',
 			'Home (trust-led)',
@@ -200,8 +206,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Home page trust-led. Lead with credibility and trust band; why choose and booking CTA; FAQ and cards; testimonial and inquiry CTA; support and differentiator; expectations; close with support CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Home page trust-led. Lead with credibility and trust band; why choose and booking CTA; FAQ and cards; testimonial and inquiry CTA; support and differentiator; expectations; close with support CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Trust-first opener; why choose and booking CTA; FAQ and cards reduce friction; testimonial and inquiry CTA; support and differentiator; expectations set scope; final CTA for help.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
@@ -223,7 +229,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'ptf_steps_01',
 			'cta_policy_utility_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_about_story_01',
 			'About (story)',
@@ -233,8 +239,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'About page story-led. Editorial hero and quote; value prop and contact CTA; timeline and authority; trust disclosure and consultation CTA; benefit detail and steps; utility CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'About page story-led. Editorial hero and quote; value prop and contact CTA; timeline and authority; trust disclosure and consultation CTA; benefit detail and steps; utility CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Story opener; value and contact CTA; timeline and authority build credibility; disclosure and consultation CTA; benefits and steps; close with utility CTA.',
 			),
 			'Requires section library (hero, trust, fb, ptf, lpu, CTA batches).',
@@ -257,7 +263,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'ptf_how_it_works_01',
 			'cta_support_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_about_team_01',
 			'About (team)',
@@ -267,8 +273,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'About page team-led. Hero and team grid; why choose and contact CTA; testimonial and FAQ; partners and inquiry CTA; contact panel and differentiator; how-it-works; support CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'About page team-led. Hero and team grid; why choose and contact CTA; testimonial and FAQ; partners and inquiry CTA; contact panel and differentiator; how-it-works; support CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Team and credibility; why choose and contact CTA; social proof and FAQ; partners and inquiry CTA; contact and differentiator; how-it-works; final CTA.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
@@ -290,7 +296,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'ptf_policy_explainer_01',
 			'cta_support_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_faq_support_01',
 			'FAQ (support)',
@@ -300,8 +306,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'FAQ page support-focused. Hero and FAQ sections; support CTA; microproof and FAQ by category; escalation and contact CTA; explainers; final support CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'FAQ page support-focused. Hero and FAQ sections; support CTA; microproof and FAQ by category; escalation and contact CTA; explainers; final support CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Educational opener; FAQ content; support CTA; microproof and categorized FAQ; escalation and contact CTA; explainers; close with support CTA.',
 			),
 			'Requires section library (hero, trust, ptf, lpu, CTA batches).',
@@ -323,7 +329,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'ptf_how_it_works_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_faq_category_01',
 			'FAQ (by category)',
@@ -333,8 +339,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'FAQ page category-led. Compact hero; FAQ by category and standard FAQ; inquiry CTA; reassurance and expectations; form intro and quote CTA; value and how-it-works; contact CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'FAQ page category-led. Compact hero; FAQ by category and standard FAQ; inquiry CTA; reassurance and expectations; form intro and quote CTA; value and how-it-works; contact CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Compact opener; categorized FAQ; inquiry CTA; reassurance and expectations; form and quote CTA; value and process; final contact CTA.',
 			),
 			'Requires section library (hero, trust, ptf, lpu, fb, CTA batches).',
@@ -356,7 +362,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'lpu_support_escalation_01',
 			'cta_support_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_contact_request_01',
 			'Contact (request)',
@@ -366,8 +372,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Contact page request-focused. Hero and contact panel/detail; contact CTA; form intro and inquiry support; reassurance and quote CTA; value prop and support band; support CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Contact page request-focused. Hero and contact panel/detail; contact CTA; form intro and inquiry support; reassurance and quote CTA; value prop and support band; support CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Hero and contact info; contact CTA; form and inquiry; reassurance and quote CTA; value and support; final CTA.',
 			),
 			'Requires section library (hero, trust, lpu, fb, CTA batches).',
@@ -389,7 +395,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'ptf_expectations_01',
 			'cta_local_action_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_contact_directions_01',
 			'Contact (directions)',
@@ -399,8 +405,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Contact page directions-led. Local hero and contact/location info; local CTA; contact panel and trust band; accessibility and contact CTA; local value and expectations; local CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Contact page directions-led. Local hero and contact/location info; local CTA; contact panel and trust band; accessibility and contact CTA; local value and expectations; local CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Location-focused opener; contact and location; local CTA; panel and trust; accessibility and contact CTA; value and expectations; final local CTA.',
 			),
 			'Requires section library (hero, trust, lpu, mlp, fb, ptf, CTA batches).',
@@ -423,7 +429,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_booking_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_services_overview_01',
 			'Services overview',
@@ -433,8 +439,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Services overview. Hero and service offering/flow; service CTA; cards and testimonial; benefits and consultation CTA; how-it-works and trust; contact panel; booking CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Services overview. Hero and service offering/flow; service CTA; cards and testimonial; benefits and consultation CTA; how-it-works and trust; contact panel; booking CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Service opener; flow and service CTA; proof and benefits; consultation CTA; process and trust; contact; final booking CTA.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
@@ -457,7 +463,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'lpu_support_escalation_01',
 			'cta_contact_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_services_value_01',
 			'Services (value-led)',
@@ -467,8 +473,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Services overview value-led. Credibility and why choose; steps and quote CTA; listing and case; differentiator and service CTA; expectations and logos; support; contact CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Services overview value-led. Credibility and why choose; steps and quote CTA; listing and case; differentiator and service CTA; expectations and logos; support; contact CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Value opener; steps and quote CTA; listing and case; differentiator and service CTA; expectations and proof; support; final contact CTA.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
@@ -491,7 +497,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_purchase_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_offerings_overview_01',
 			'Offerings overview',
@@ -501,8 +507,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Offerings overview. Product hero and packages; offer compare and purchase CTA; product cards and testimonial; benefit and product CTA; buying process and guarantee; consent; purchase CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Offerings overview. Product hero and packages; offer compare and purchase CTA; product cards and testimonial; benefit and product CTA; buying process and guarantee; consent; purchase CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Product opener; packages and purchase CTA; cards and proof; benefit and product CTA; process and guarantee; consent; final purchase CTA.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
@@ -525,7 +531,7 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			'lpu_utility_cta_01',
 			'cta_quote_request_02',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'pt_offerings_compare_01',
 			'Offerings (compare)',
@@ -535,8 +541,8 @@ final class Top_Level_Marketing_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary' => 'Offerings compare-led. Compact hero and offer compare; comparison steps and compare CTA; comparison cards and differentiator; rating and product CTA; process and highlight; utility CTA; quote CTA.',
-				'section_helper_order' => 'same_as_template',
+				'page_purpose_summary'  => 'Offerings compare-led. Compact hero and offer compare; comparison steps and compare CTA; comparison cards and differentiator; rating and product CTA; process and highlight; utility CTA; quote CTA.',
+				'section_helper_order'  => 'same_as_template',
 				'page_flow_explanation' => 'Compare opener; steps and compare CTA; cards and differentiator; rating and product CTA; process and highlight; utility; final quote CTA.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',

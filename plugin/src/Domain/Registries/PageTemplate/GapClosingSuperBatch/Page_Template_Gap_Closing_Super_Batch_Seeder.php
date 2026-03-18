@@ -27,13 +27,13 @@ final class Page_Template_Gap_Closing_Super_Batch_Seeder {
 	 * @return array{ success: bool, page_template_ids: list<int>, errors: list<string>, template_keys: list<string> }
 	 */
 	public static function run( Page_Template_Repository $page_repo ): array {
-		$errors = array();
-		$ids    = array();
+		$errors        = array();
+		$ids           = array();
 		$template_keys = array();
 		foreach ( Page_Template_Gap_Closing_Super_Batch_Definitions::all_definitions() as $definition ) {
-			$key = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key             = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$template_keys[] = $key;
-			$id = $page_repo->save_definition( $definition );
+			$id              = $page_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
 				$errors[] = sprintf( __( 'Failed to save page template: %s', 'aio-page-builder' ), $key );
 				continue;

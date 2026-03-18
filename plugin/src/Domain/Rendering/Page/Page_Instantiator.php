@@ -33,8 +33,8 @@ final class Page_Instantiator {
 	 * Builds a create-ready payload from assembly result.
 	 *
 	 * @param Page_Block_Assembly_Result $assembly   Completed assembly.
-	 * @param string                    $page_title Page title.
-	 * @param array<string, mixed>      $overrides  Optional: page_slug_candidate, post_status_candidate, source_version.
+	 * @param string                     $page_title Page title.
+	 * @param array<string, mixed>       $overrides  Optional: page_slug_candidate, post_status_candidate, source_version.
 	 * @return array<string, mixed>
 	 */
 	public function build_create_payload( Page_Block_Assembly_Result $assembly, string $page_title, array $overrides = array() ): array {
@@ -45,8 +45,8 @@ final class Page_Instantiator {
 	 * Builds an update-ready payload from assembly result and target post ID.
 	 *
 	 * @param Page_Block_Assembly_Result $assembly       Completed assembly.
-	 * @param int                       $target_post_id Existing page ID.
-	 * @param array<string, mixed>      $overrides      Optional: page_title, page_slug_candidate, post_status_candidate, source_version.
+	 * @param int                        $target_post_id Existing page ID.
+	 * @param array<string, mixed>       $overrides      Optional: page_title, page_slug_candidate, post_status_candidate, source_version.
 	 * @return array<string, mixed>
 	 */
 	public function build_update_payload( Page_Block_Assembly_Result $assembly, int $target_post_id, array $overrides = array() ): array {
@@ -65,9 +65,9 @@ final class Page_Instantiator {
 			return new Page_Instantiation_Result( false, 0, $payload, $errors );
 		}
 
-		$title  = isset( $payload['page_title'] ) && is_string( $payload['page_title'] ) ? sanitize_text_field( $payload['page_title'] ) : '';
-		$slug   = isset( $payload['page_slug_candidate'] ) && is_string( $payload['page_slug_candidate'] ) ? $payload['page_slug_candidate'] : '';
-		$status = isset( $payload['post_status_candidate'] ) && is_string( $payload['post_status_candidate'] ) && $payload['post_status_candidate'] !== ''
+		$title   = isset( $payload['page_title'] ) && is_string( $payload['page_title'] ) ? sanitize_text_field( $payload['page_title'] ) : '';
+		$slug    = isset( $payload['page_slug_candidate'] ) && is_string( $payload['page_slug_candidate'] ) ? $payload['page_slug_candidate'] : '';
+		$status  = isset( $payload['post_status_candidate'] ) && is_string( $payload['post_status_candidate'] ) && $payload['post_status_candidate'] !== ''
 			? $payload['post_status_candidate']
 			: 'draft';
 		$content = isset( $payload['post_content'] ) && is_string( $payload['post_content'] ) ? $payload['post_content'] : '';

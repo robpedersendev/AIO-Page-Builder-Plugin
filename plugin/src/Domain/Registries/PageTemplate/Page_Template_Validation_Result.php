@@ -26,8 +26,8 @@ final class Page_Template_Validation_Result {
 	public readonly ?array $normalized;
 
 	public function __construct( bool $valid, array $errors = array(), ?array $normalized = null ) {
-		$this->valid     = $valid;
-		$this->errors    = $errors;
+		$this->valid      = $valid;
+		$this->errors     = $errors;
 		$this->normalized = $normalized;
 	}
 

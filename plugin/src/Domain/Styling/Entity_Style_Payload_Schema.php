@@ -50,7 +50,7 @@ final class Entity_Style_Payload_Schema {
 	 */
 	public static function get_default_option(): array {
 		return array(
-			self::KEY_VERSION => self::SCHEMA_VERSION,
+			self::KEY_VERSION  => self::SCHEMA_VERSION,
 			self::KEY_PAYLOADS => array(
 				'section_template' => array(),
 				'page_template'    => array(),

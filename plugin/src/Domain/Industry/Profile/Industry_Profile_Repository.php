@@ -31,7 +31,7 @@ final class Industry_Profile_Repository {
 	private ?Industry_Profile_Audit_Trail_Service $audit_trail;
 
 	public function __construct( Settings_Service $settings, ?Industry_Profile_Audit_Trail_Service $audit_trail = null ) {
-		$this->settings   = $settings;
+		$this->settings    = $settings;
 		$this->audit_trail = $audit_trail;
 	}
 
@@ -84,9 +84,18 @@ final class Industry_Profile_Repository {
 				: '';
 		}
 		if ( array_key_exists( Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS, $partial ) && is_array( $partial[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) ) {
-			$current[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = array_values( array_unique( array_filter( array_map( function ( $v ) {
-				return is_string( $v ) ? trim( $v ) : '';
-			}, $partial[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) ) ) );
+			$current[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = array_values(
+				array_unique(
+					array_filter(
+						array_map(
+							function ( $v ) {
+								return is_string( $v ) ? trim( $v ) : '';
+							},
+							$partial[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ]
+						)
+					)
+				)
+			);
 		}
 		if ( array_key_exists( Industry_Profile_Schema::FIELD_SUBTYPE, $partial ) ) {
 			$current[ Industry_Profile_Schema::FIELD_SUBTYPE ] = is_string( $partial[ Industry_Profile_Schema::FIELD_SUBTYPE ] )
@@ -157,7 +166,7 @@ final class Industry_Profile_Repository {
 	 * Returns readiness/completeness for the current profile (industry-profile-validation-contract).
 	 * Uses Industry_Profile_Validator; optional registries improve validation and scoring.
 	 *
-	 * @param \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry|null           $pack_registry Optional; validates primary_industry_key.
+	 * @param \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry|null            $pack_registry Optional; validates primary_industry_key.
 	 * @param \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry|null $qp_registry  Optional; validates question-pack answers.
 	 * @return Industry_Profile_Readiness_Result
 	 */

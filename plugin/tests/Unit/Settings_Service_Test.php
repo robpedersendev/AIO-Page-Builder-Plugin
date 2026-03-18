@@ -27,7 +27,7 @@ final class Settings_Service_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_test_options'] = array();
-		$this->service = new Settings_Service();
+		$this->service                = new Settings_Service();
 	}
 
 	protected function tearDown(): void {

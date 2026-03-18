@@ -20,9 +20,9 @@ use AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry;
 final class Form_Provider_Availability_Service {
 
 	public const STATUS_AVAILABLE       = 'available';
-	public const STATUS_UNAVAILABLE    = 'unavailable';
-	public const STATUS_NO_FORMS       = 'no_forms';
-	public const STATUS_PROVIDER_ERROR = 'provider_error';
+	public const STATUS_UNAVAILABLE     = 'unavailable';
+	public const STATUS_NO_FORMS        = 'no_forms';
+	public const STATUS_PROVIDER_ERROR  = 'provider_error';
 	public const STATUS_CACHED_FALLBACK = 'cached_fallback';
 
 	/** @var Form_Provider_Registry */
@@ -39,9 +39,9 @@ final class Form_Provider_Availability_Service {
 		Form_Provider_Picker_Discovery_Service $discovery,
 		?Form_Provider_Picker_Cache_Service $cache = null
 	) {
-		$this->registry = $registry;
+		$this->registry  = $registry;
 		$this->discovery = $discovery;
-		$this->cache = $cache;
+		$this->cache     = $cache;
 	}
 
 	/**
@@ -61,14 +61,14 @@ final class Form_Provider_Availability_Service {
 	 */
 	public function get_availability_state( string $provider_key, string $current_form_id = '' ): array {
 		$provider_key = $this->sanitize_key( $provider_key );
-		$empty = array(
-			'provider_key'   => $provider_key,
-			'status'         => self::STATUS_UNAVAILABLE,
-			'message'        => null,
-			'from_cache'     => false,
-			'checked_at'     => null,
-			'picker_items'   => array(),
-			'stale_binding'  => false,
+		$empty        = array(
+			'provider_key'  => $provider_key,
+			'status'        => self::STATUS_UNAVAILABLE,
+			'message'       => null,
+			'from_cache'    => false,
+			'checked_at'    => null,
+			'picker_items'  => array(),
+			'stale_binding' => false,
 		);
 		if ( $provider_key === '' ) {
 			return $empty;
@@ -78,7 +78,7 @@ final class Form_Provider_Availability_Service {
 			return $empty;
 		}
 		if ( ! $this->discovery->has_adapter( $provider_key ) ) {
-			$empty['status'] = self::STATUS_AVAILABLE;
+			$empty['status']  = self::STATUS_AVAILABLE;
 			$empty['message'] = null;
 			return $empty;
 		}
@@ -89,13 +89,13 @@ final class Form_Provider_Availability_Service {
 		}
 		if ( ! $meta['supports_form_list'] ) {
 			return array(
-				'provider_key'   => $provider_key,
-				'status'         => self::STATUS_AVAILABLE,
-				'message'        => null,
-				'from_cache'     => false,
-				'checked_at'     => time(),
-				'picker_items'   => array(),
-				'stale_binding'  => false,
+				'provider_key'  => $provider_key,
+				'status'        => self::STATUS_AVAILABLE,
+				'message'       => null,
+				'from_cache'    => false,
+				'checked_at'    => time(),
+				'picker_items'  => array(),
+				'stale_binding' => false,
 			);
 		}
 		$adapter = $this->discovery->get_adapter( $provider_key );
@@ -106,13 +106,13 @@ final class Form_Provider_Availability_Service {
 		if ( $cached !== null ) {
 			$stale = $current_form_id !== '' && $adapter->is_item_stale( $current_form_id );
 			return array(
-				'provider_key'   => $provider_key,
-				'status'         => $cached['outcome'] === 'success' ? self::STATUS_AVAILABLE : ( $cached['outcome'] === 'empty' ? self::STATUS_NO_FORMS : self::STATUS_PROVIDER_ERROR ),
-				'message'        => null,
-				'from_cache'     => true,
-				'checked_at'     => $cached['fetched_at'],
-				'picker_items'   => $cached['items'],
-				'stale_binding'  => $stale,
+				'provider_key'  => $provider_key,
+				'status'        => $cached['outcome'] === 'success' ? self::STATUS_AVAILABLE : ( $cached['outcome'] === 'empty' ? self::STATUS_NO_FORMS : self::STATUS_PROVIDER_ERROR ),
+				'message'       => null,
+				'from_cache'    => true,
+				'checked_at'    => $cached['fetched_at'],
+				'picker_items'  => $cached['items'],
+				'stale_binding' => $stale,
 			);
 		}
 		try {
@@ -123,35 +123,35 @@ final class Form_Provider_Availability_Service {
 			}
 			$stale = $current_form_id !== '' && $adapter->is_item_stale( $current_form_id );
 			return array(
-				'provider_key'   => $provider_key,
-				'status'         => empty( $items ) ? self::STATUS_NO_FORMS : self::STATUS_AVAILABLE,
-				'message'        => empty( $items ) ? \__( 'No forms available from this provider.', 'aio-page-builder' ) : null,
-				'from_cache'     => false,
-				'checked_at'     => time(),
-				'picker_items'   => $items,
-				'stale_binding'  => $stale,
+				'provider_key'  => $provider_key,
+				'status'        => empty( $items ) ? self::STATUS_NO_FORMS : self::STATUS_AVAILABLE,
+				'message'       => empty( $items ) ? \__( 'No forms available from this provider.', 'aio-page-builder' ) : null,
+				'from_cache'    => false,
+				'checked_at'    => time(),
+				'picker_items'  => $items,
+				'stale_binding' => $stale,
 			);
 		} catch ( \Throwable $e ) {
 			$fallback = $this->cache !== null ? $this->cache->get_fallback( $provider_key ) : null;
 			if ( $fallback !== null ) {
 				return array(
-					'provider_key'   => $provider_key,
-					'status'         => self::STATUS_CACHED_FALLBACK,
-					'message'        => \__( 'Provider temporarily unavailable; showing cached form list.', 'aio-page-builder' ),
-					'from_cache'     => true,
-					'checked_at'     => $fallback['fetched_at'],
-					'picker_items'   => $fallback['items'],
-					'stale_binding'  => false,
+					'provider_key'  => $provider_key,
+					'status'        => self::STATUS_CACHED_FALLBACK,
+					'message'       => \__( 'Provider temporarily unavailable; showing cached form list.', 'aio-page-builder' ),
+					'from_cache'    => true,
+					'checked_at'    => $fallback['fetched_at'],
+					'picker_items'  => $fallback['items'],
+					'stale_binding' => false,
 				);
 			}
 			return array(
-				'provider_key'   => $provider_key,
-				'status'         => self::STATUS_PROVIDER_ERROR,
-				'message'        => \__( 'Form provider could not be reached.', 'aio-page-builder' ),
-				'from_cache'     => false,
-				'checked_at'     => null,
-				'picker_items'   => array(),
-				'stale_binding'  => false,
+				'provider_key'  => $provider_key,
+				'status'        => self::STATUS_PROVIDER_ERROR,
+				'message'       => \__( 'Form provider could not be reached.', 'aio-page-builder' ),
+				'from_cache'    => false,
+				'checked_at'    => null,
+				'picker_items'  => array(),
+				'stale_binding' => false,
 			);
 		}
 	}

@@ -35,7 +35,7 @@ final class Build_Plan_Stepper_Builder {
 	 * @return array<int, array<string, mixed>> Each step: step_id, step_type, title, order, step_number, status_badge, unresolved_count, is_blocked.
 	 */
 	public function build( array $plan_definition ): array {
-		$steps_raw = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
+		$steps_raw           = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
 		$unresolved_by_index = $this->compute_unresolved_counts( $steps_raw );
@@ -44,23 +44,23 @@ final class Build_Plan_Stepper_Builder {
 			if ( ! is_array( $step ) ) {
 				continue;
 			}
-			$step_type = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' );
-			$step_id   = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_ID ] ?? '' );
-			$title     = (string) ( $step[ Build_Plan_Item_Schema::KEY_TITLE ] ?? $step_type );
-			$order     = (int) ( $step[ Build_Plan_Item_Schema::KEY_ORDER ] ?? $idx );
+			$step_type  = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' );
+			$step_id    = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_ID ] ?? '' );
+			$title      = (string) ( $step[ Build_Plan_Item_Schema::KEY_TITLE ] ?? $step_type );
+			$order      = (int) ( $step[ Build_Plan_Item_Schema::KEY_ORDER ] ?? $idx );
 			$unresolved = $unresolved_by_index[ $idx ] ?? 0;
 			$is_blocked = $this->is_step_blocked( $idx, $unresolved_by_index );
 			$has_error  = $this->step_has_failed_item( $step );
 			$badge      = $this->derive_badge( $unresolved, $is_blocked, $has_error, $step_type );
-			$out[]     = array(
-				'step_id'           => $step_id,
-				'step_type'         => $step_type,
-				'title'             => $title,
-				'order'             => $order,
-				'step_number'       => $idx + 1,
-				'status_badge'      => $badge,
-				'unresolved_count'  => $unresolved,
-				'is_blocked'        => $is_blocked,
+			$out[]      = array(
+				'step_id'          => $step_id,
+				'step_type'        => $step_type,
+				'title'            => $title,
+				'order'            => $order,
+				'step_number'      => $idx + 1,
+				'status_badge'     => $badge,
+				'unresolved_count' => $unresolved,
+				'is_blocked'       => $is_blocked,
 			);
 		}
 		return $out;
@@ -102,7 +102,7 @@ final class Build_Plan_Stepper_Builder {
 	/**
 	 * Step is blocked if any earlier step has unresolved items.
 	 *
-	 * @param int              $current_index
+	 * @param int             $current_index
 	 * @param array<int, int> $unresolved_by_index
 	 * @return bool
 	 */

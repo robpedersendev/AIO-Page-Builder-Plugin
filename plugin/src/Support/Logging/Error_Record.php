@@ -73,15 +73,15 @@ final class Error_Record {
 		if ( ! Log_Severities::isValid( $severity ) ) {
 			throw new \InvalidArgumentException( 'Invalid log severity: ' . $severity );
 		}
-		$this->id                 = $id;
-		$this->category           = $category;
-		$this->severity           = $severity;
-		$this->timestamp          = $timestamp !== '' ? $timestamp : gmdate( 'c' );
-		$this->message            = $message;
-		$this->actor_context      = $actor_context;
-		$this->target_object      = $target_object;
-		$this->remediation_hint   = $remediation_hint;
-		$this->context_reference  = $context_reference;
+		$this->id                = $id;
+		$this->category          = $category;
+		$this->severity          = $severity;
+		$this->timestamp         = $timestamp !== '' ? $timestamp : gmdate( 'c' );
+		$this->message           = $message;
+		$this->actor_context     = $actor_context;
+		$this->target_object     = $target_object;
+		$this->remediation_hint  = $remediation_hint;
+		$this->context_reference = $context_reference;
 	}
 
 	/**

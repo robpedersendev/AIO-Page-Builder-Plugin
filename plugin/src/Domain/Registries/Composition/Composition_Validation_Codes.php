@@ -146,21 +146,21 @@ final class Composition_Validation_Codes {
 			return self::$severity_map;
 		}
 		self::$severity_map = array(
-			self::SECTION_MISSING                      => self::SEVERITY_BLOCKING,
-			self::SECTION_DEPRECATED_NO_REPLACEMENT    => self::SEVERITY_BLOCKING,
-			self::SECTION_DEPRECATED_HAS_REPLACEMENT   => self::SEVERITY_WARNING,
-			self::ORDERING_INVALID                     => self::SEVERITY_BLOCKING,
-			self::COMPATIBILITY_ADJACENCY              => self::SEVERITY_BLOCKING,
-			self::COMPATIBILITY_DUPLICATE_PURPOSE      => self::SEVERITY_WARNING,
-			self::VARIANT_CONFLICT                     => self::SEVERITY_BLOCKING,
-			self::STRUCTURAL_ANCHOR_MISSING            => self::SEVERITY_BLOCKING,
-			self::HELPER_GENERATION_FAILED             => self::SEVERITY_BLOCKING,
-			self::FIELD_GROUP_DERIVATION_FAILED        => self::SEVERITY_BLOCKING,
-			self::ONE_PAGER_GENERATION_FAILED          => self::SEVERITY_BLOCKING,
-			self::SNAPSHOT_DRIFT                       => self::SEVERITY_WARNING,
-			self::SNAPSHOT_MISSING                     => self::SEVERITY_WARNING,
-			self::SOURCE_TEMPLATE_UNAVAILABLE          => self::SEVERITY_WARNING,
-			self::EMPTY_SECTION_LIST                    => self::SEVERITY_BLOCKING,
+			self::SECTION_MISSING                    => self::SEVERITY_BLOCKING,
+			self::SECTION_DEPRECATED_NO_REPLACEMENT  => self::SEVERITY_BLOCKING,
+			self::SECTION_DEPRECATED_HAS_REPLACEMENT => self::SEVERITY_WARNING,
+			self::ORDERING_INVALID                   => self::SEVERITY_BLOCKING,
+			self::COMPATIBILITY_ADJACENCY            => self::SEVERITY_BLOCKING,
+			self::COMPATIBILITY_DUPLICATE_PURPOSE    => self::SEVERITY_WARNING,
+			self::VARIANT_CONFLICT                   => self::SEVERITY_BLOCKING,
+			self::STRUCTURAL_ANCHOR_MISSING          => self::SEVERITY_BLOCKING,
+			self::HELPER_GENERATION_FAILED           => self::SEVERITY_BLOCKING,
+			self::FIELD_GROUP_DERIVATION_FAILED      => self::SEVERITY_BLOCKING,
+			self::ONE_PAGER_GENERATION_FAILED        => self::SEVERITY_BLOCKING,
+			self::SNAPSHOT_DRIFT                     => self::SEVERITY_WARNING,
+			self::SNAPSHOT_MISSING                   => self::SEVERITY_WARNING,
+			self::SOURCE_TEMPLATE_UNAVAILABLE        => self::SEVERITY_WARNING,
+			self::EMPTY_SECTION_LIST                 => self::SEVERITY_BLOCKING,
 		);
 		return self::$severity_map;
 	}

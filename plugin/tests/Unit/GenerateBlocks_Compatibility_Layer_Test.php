@@ -41,30 +41,70 @@ final class GenerateBlocks_Compatibility_Layer_Test extends TestCase {
 			'asset_hints'         => array(),
 			'accessibility_notes' => array(),
 		);
-		return new Section_Render_Result( 'st01_hero', 'default', 0, array( 'headline' => 'Welcome', 'subheadline' => 'Intro text' ), $structure, array() );
+		return new Section_Render_Result(
+			'st01_hero',
+			'default',
+			0,
+			array(
+				'headline'    => 'Welcome',
+				'subheadline' => 'Intro text',
+			),
+			$structure,
+			array()
+		);
 	}
 
 	private function ineligible_section_result_with_repeater(): Section_Render_Result {
 		$structure = array(
-			'wrapper_attrs'       => array( 'class' => array( 'aio-s-faq' ), 'id' => 'aio-section-faq-0', 'data_attributes' => array() ),
-			'selector_map'        => array( 'wrapper_class' => 'aio-s-faq', 'inner_class' => 'aio-s-faq__inner', 'element_classes' => array() ),
+			'wrapper_attrs'       => array(
+				'class'           => array( 'aio-s-faq' ),
+				'id'              => 'aio-section-faq-0',
+				'data_attributes' => array(),
+			),
+			'selector_map'        => array(
+				'wrapper_class'   => 'aio-s-faq',
+				'inner_class'     => 'aio-s-faq__inner',
+				'element_classes' => array(),
+			),
 			'structural_nodes'    => array(),
 			'structural_hint'     => '',
 			'asset_hints'         => array(),
 			'accessibility_notes' => array(),
 		);
-		return new Section_Render_Result( 'st05_faq', 'default', 0, array( 'items' => array( array( 'q' => 'Q1', 'a' => 'A1' ) ) ), $structure, array() );
+		return new Section_Render_Result(
+			'st05_faq',
+			'default',
+			0,
+			array(
+				'items' => array(
+					array(
+						'q' => 'Q1',
+						'a' => 'A1',
+					),
+				),
+			),
+			$structure,
+			array()
+		);
 	}
 
 	public function test_when_availability_false_section_to_gb_markup_returns_null(): void {
-		$layer = new GenerateBlocks_Compatibility_Layer( function (): bool { return false; } );
+		$layer = new GenerateBlocks_Compatibility_Layer(
+			function (): bool {
+				return false;
+			}
+		);
 		$this->assertFalse( $layer->is_available() );
 		$section = $this->eligible_section_result();
 		$this->assertNull( $layer->section_to_gb_markup( $section ) );
 	}
 
 	public function test_when_availability_true_and_eligible_returns_gb_markup(): void {
-		$layer = new GenerateBlocks_Compatibility_Layer( function (): bool { return true; } );
+		$layer = new GenerateBlocks_Compatibility_Layer(
+			function (): bool {
+				return true;
+			}
+		);
 		$this->assertTrue( $layer->is_available() );
 		$section = $this->eligible_section_result();
 		$markup  = $layer->section_to_gb_markup( $section );
@@ -74,7 +114,11 @@ final class GenerateBlocks_Compatibility_Layer_Test extends TestCase {
 	}
 
 	public function test_supported_mapping_example_preserves_selector_contract(): void {
-		$layer   = new GenerateBlocks_Compatibility_Layer( function (): bool { return true; } );
+		$layer   = new GenerateBlocks_Compatibility_Layer(
+			function (): bool {
+				return true;
+			}
+		);
 		$section = $this->eligible_section_result();
 		$markup  = $layer->section_to_gb_markup( $section );
 		$this->assertNotNull( $markup );
@@ -87,23 +131,49 @@ final class GenerateBlocks_Compatibility_Layer_Test extends TestCase {
 	}
 
 	public function test_unsupported_pattern_repeater_returns_null(): void {
-		$layer   = new GenerateBlocks_Compatibility_Layer( function (): bool { return true; } );
+		$layer   = new GenerateBlocks_Compatibility_Layer(
+			function (): bool {
+				return true;
+			}
+		);
 		$section = $this->ineligible_section_result_with_repeater();
 		$this->assertNull( $layer->section_to_gb_markup( $section ), 'Section with array/repeater field must fall back to native' );
 	}
 
 	public function test_headline_and_title_as_h2_others_as_p(): void {
-		$layer = new GenerateBlocks_Compatibility_Layer( function (): bool { return true; } );
+		$layer     = new GenerateBlocks_Compatibility_Layer(
+			function (): bool {
+				return true;
+			}
+		);
 		$structure = array(
-			'wrapper_attrs'       => array( 'class' => array( 'aio-s-cta' ), 'id' => 'aio-section-cta-0', 'data_attributes' => array() ),
-			'selector_map'        => array( 'wrapper_class' => 'aio-s-cta', 'inner_class' => 'aio-s-cta__inner', 'element_classes' => array() ),
+			'wrapper_attrs'       => array(
+				'class'           => array( 'aio-s-cta' ),
+				'id'              => 'aio-section-cta-0',
+				'data_attributes' => array(),
+			),
+			'selector_map'        => array(
+				'wrapper_class'   => 'aio-s-cta',
+				'inner_class'     => 'aio-s-cta__inner',
+				'element_classes' => array(),
+			),
 			'structural_nodes'    => array(),
 			'structural_hint'     => '',
 			'asset_hints'         => array(),
 			'accessibility_notes' => array(),
 		);
-		$section = new Section_Render_Result( 'st02_cta', 'default', 0, array( 'title' => 'Sign Up', 'cta' => 'Click here' ), $structure, array() );
-		$markup  = $layer->section_to_gb_markup( $section );
+		$section   = new Section_Render_Result(
+			'st02_cta',
+			'default',
+			0,
+			array(
+				'title' => 'Sign Up',
+				'cta'   => 'Click here',
+			),
+			$structure,
+			array()
+		);
+		$markup    = $layer->section_to_gb_markup( $section );
 		$this->assertNotNull( $markup );
 		$this->assertStringContainsString( '"element":"h2"', $markup );
 		$this->assertStringContainsString( '"element":"p"', $markup );

@@ -52,8 +52,8 @@ final class Post_Release_Health_Screen {
 			\wp_die( \esc_html__( 'You do not have permission to access the post-release health review.', 'aio-page-builder' ), 403 );
 		}
 
-		$date_from = isset( $_GET['date_from'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_from'] ) ) : '';
-		$date_to   = isset( $_GET['date_to'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_to'] ) ) : '';
+		$date_from     = isset( $_GET['date_from'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_from'] ) ) : '';
+		$date_to       = isset( $_GET['date_to'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_to'] ) ) : '';
 		$export_action = isset( $_GET['export_summary'] ) && $_GET['export_summary'] === '1';
 
 		if ( $export_action ) {
@@ -61,7 +61,7 @@ final class Post_Release_Health_Screen {
 			return;
 		}
 
-		$state = $this->build_state( $date_from ?: null, $date_to ?: null );
+		$state   = $this->build_state( $date_from ?: null, $date_to ?: null );
 		$summary = $state['post_release_health_summary'] ?? array();
 		$scores  = $state['domain_health_scores'] ?? array();
 		$items   = $state['recommended_investigation_items'] ?? array();
@@ -77,7 +77,21 @@ final class Post_Release_Health_Screen {
 				<label for="date_to"><?php \esc_html_e( 'To (Y-m-d):', 'aio-page-builder' ); ?></label>
 				<input type="date" id="date_to" name="date_to" value="<?php echo \esc_attr( $summary['period_end'] ?? '' ); ?>" />
 				<button type="submit" class="button button-primary"><?php \esc_html_e( 'Apply', 'aio-page-builder' ); ?></button>
-				<a href="<?php echo \esc_url( \add_query_arg( array( 'page' => self::SLUG, 'export_summary' => '1', 'date_from' => $summary['period_start'] ?? '', 'date_to' => $summary['period_end'] ?? '' ), \admin_url( 'admin.php' ) ) ); ?>" class="button"><?php \esc_html_e( 'Export summary (JSON)', 'aio-page-builder' ); ?></a>
+				<a href="
+				<?php
+				echo \esc_url(
+					\add_query_arg(
+						array(
+							'page'           => self::SLUG,
+							'export_summary' => '1',
+							'date_from'      => $summary['period_start'] ?? '',
+							'date_to'        => $summary['period_end'] ?? '',
+						),
+						\admin_url( 'admin.php' )
+					)
+				);
+				?>
+							" class="button"><?php \esc_html_e( 'Export summary (JSON)', 'aio-page-builder' ); ?></a>
 			</form>
 
 			<section class="aio-post-release-summary" style="margin: 1.5em 0;" aria-labelledby="aio-health-summary-heading">
@@ -132,10 +146,10 @@ final class Post_Release_Health_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function build_state( ?string $date_from, ?string $date_to ): array {
-		$job_repo   = $this->container && $this->container->has( 'job_queue_repository' ) ? $this->container->get( 'job_queue_repository' ) : null;
-		$ai_repo    = $this->container && $this->container->has( 'ai_run_repository' ) ? $this->container->get( 'ai_run_repository' ) : null;
-		$plan_repo  = $this->container && $this->container->has( 'build_plan_repository' ) ? $this->container->get( 'build_plan_repository' ) : null;
-		$analytics  = $this->container && $this->container->has( 'build_plan_analytics_service' ) ? $this->container->get( 'build_plan_analytics_service' ) : null;
+		$job_repo  = $this->container && $this->container->has( 'job_queue_repository' ) ? $this->container->get( 'job_queue_repository' ) : null;
+		$ai_repo   = $this->container && $this->container->has( 'ai_run_repository' ) ? $this->container->get( 'ai_run_repository' ) : null;
+		$plan_repo = $this->container && $this->container->has( 'build_plan_repository' ) ? $this->container->get( 'build_plan_repository' ) : null;
+		$analytics = $this->container && $this->container->has( 'build_plan_analytics_service' ) ? $this->container->get( 'build_plan_analytics_service' ) : null;
 		if ( ! $analytics instanceof Build_Plan_Analytics_Service ) {
 			$analytics = null;
 		}
@@ -144,14 +158,14 @@ final class Post_Release_Health_Screen {
 	}
 
 	private function export_summary( ?string $date_from, ?string $date_to ): void {
-		$state = $this->build_state( $date_from, $date_to );
+		$state   = $this->build_state( $date_from, $date_to );
 		$payload = array(
-			'post_release_health_summary' => $state['post_release_health_summary'] ?? array(),
-			'domain_health_scores'       => $state['domain_health_scores'] ?? array(),
+			'post_release_health_summary'     => $state['post_release_health_summary'] ?? array(),
+			'domain_health_scores'            => $state['domain_health_scores'] ?? array(),
 			'recommended_investigation_items' => $state['recommended_investigation_items'] ?? array(),
-			'exported_at'                 => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			'exported_at'                     => gmdate( 'Y-m-d\TH:i:s\Z' ),
 		);
-		$json = \wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+		$json    = \wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
 		if ( $json === false ) {
 			return;
 		}

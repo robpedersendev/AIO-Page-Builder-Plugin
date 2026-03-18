@@ -32,7 +32,7 @@ final class Industry_Subtype_Starter_Bundle_To_Build_Plan_Service {
 		Industry_Starter_Bundle_Registry $bundle_registry,
 		Industry_Starter_Bundle_To_Build_Plan_Service $bundle_to_plan_service
 	) {
-		$this->bundle_registry       = $bundle_registry;
+		$this->bundle_registry        = $bundle_registry;
 		$this->bundle_to_plan_service = $bundle_to_plan_service;
 	}
 
@@ -40,7 +40,7 @@ final class Industry_Subtype_Starter_Bundle_To_Build_Plan_Service {
 	 * Converts the given starter bundle (subtype or parent) into a draft Build Plan. Uses subtype context when bundle is subtype-scoped; falls back to parent industry bundle when bundle key is invalid or inactive.
 	 *
 	 * @param string               $bundle_key Bundle key (e.g. realtor_buyer_agent_starter or realtor_starter).
-	 * @param array<string, mixed>  $context    Optional: industry_key, industry_subtype_key, profile_context_ref for fallback and rationale.
+	 * @param array<string, mixed> $context    Optional: industry_key, industry_subtype_key, profile_context_ref for fallback and rationale.
 	 * @return Plan_Generation_Result Success with plan_id and payload, or failure with errors.
 	 */
 	public function convert_to_draft( string $bundle_key, array $context = array() ): Plan_Generation_Result {
@@ -49,8 +49,8 @@ final class Industry_Subtype_Starter_Bundle_To_Build_Plan_Service {
 			return Plan_Generation_Result::failure( array( __( 'Bundle key is required.', 'aio-page-builder' ) ) );
 		}
 
-		$bundle = $this->bundle_registry->get( $bundle_key );
-		$industry_key = isset( $context['industry_key'] ) && is_string( $context['industry_key'] ) ? trim( $context['industry_key'] ) : '';
+		$bundle                  = $this->bundle_registry->get( $bundle_key );
+		$industry_key            = isset( $context['industry_key'] ) && is_string( $context['industry_key'] ) ? trim( $context['industry_key'] ) : '';
 		$subtype_key_from_bundle = '';
 
 		if ( $bundle !== null ) {
@@ -86,10 +86,13 @@ final class Industry_Subtype_Starter_Bundle_To_Build_Plan_Service {
 					? trim( $parent[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] )
 					: '';
 				if ( $parent_key !== '' ) {
-					$fallback_context = array_merge( $context, array(
-						'source_starter_bundle_key' => $parent_key,
-						'industry_key'              => $industry_key,
-					) );
+					$fallback_context = array_merge(
+						$context,
+						array(
+							'source_starter_bundle_key' => $parent_key,
+							'industry_key'              => $industry_key,
+						)
+					);
 					return $this->bundle_to_plan_service->convert_to_draft( $parent_key, $fallback_context );
 				}
 			}

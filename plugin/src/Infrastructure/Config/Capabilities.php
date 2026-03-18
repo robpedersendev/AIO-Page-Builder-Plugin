@@ -16,29 +16,29 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Capabilities {
 
-	public const MANAGE_SETTINGS               = 'aio_manage_settings';
-	public const MANAGE_SECTION_TEMPLATES      = 'aio_manage_section_templates';
-	public const MANAGE_PAGE_TEMPLATES         = 'aio_manage_page_templates';
-	public const MANAGE_COMPOSITIONS           = 'aio_manage_compositions';
-	public const MANAGE_BRAND_PROFILE          = 'aio_manage_brand_profile';
-	public const RUN_ONBOARDING                = 'aio_run_onboarding';
-	public const MANAGE_AI_PROVIDERS           = 'aio_manage_ai_providers';
-	public const RUN_AI_PLANS                  = 'aio_run_ai_plans';
-	public const VIEW_BUILD_PLANS              = 'aio_view_build_plans';
-	public const APPROVE_BUILD_PLANS           = 'aio_approve_build_plans';
-	public const EXECUTE_BUILD_PLANS           = 'aio_execute_build_plans';
-	public const EXECUTE_PAGE_REPLACEMENTS     = 'aio_execute_page_replacements';
-	public const MANAGE_NAVIGATION_CHANGES     = 'aio_manage_navigation_changes';
-	public const MANAGE_TOKEN_CHANGES          = 'aio_manage_token_changes';
-	public const FINALIZE_PLAN_ACTIONS         = 'aio_finalize_plan_actions';
-	public const VIEW_LOGS                     = 'aio_view_logs';
+	public const MANAGE_SETTINGS              = 'aio_manage_settings';
+	public const MANAGE_SECTION_TEMPLATES     = 'aio_manage_section_templates';
+	public const MANAGE_PAGE_TEMPLATES        = 'aio_manage_page_templates';
+	public const MANAGE_COMPOSITIONS          = 'aio_manage_compositions';
+	public const MANAGE_BRAND_PROFILE         = 'aio_manage_brand_profile';
+	public const RUN_ONBOARDING               = 'aio_run_onboarding';
+	public const MANAGE_AI_PROVIDERS          = 'aio_manage_ai_providers';
+	public const RUN_AI_PLANS                 = 'aio_run_ai_plans';
+	public const VIEW_BUILD_PLANS             = 'aio_view_build_plans';
+	public const APPROVE_BUILD_PLANS          = 'aio_approve_build_plans';
+	public const EXECUTE_BUILD_PLANS          = 'aio_execute_build_plans';
+	public const EXECUTE_PAGE_REPLACEMENTS    = 'aio_execute_page_replacements';
+	public const MANAGE_NAVIGATION_CHANGES    = 'aio_manage_navigation_changes';
+	public const MANAGE_TOKEN_CHANGES         = 'aio_manage_token_changes';
+	public const FINALIZE_PLAN_ACTIONS        = 'aio_finalize_plan_actions';
+	public const VIEW_LOGS                    = 'aio_view_logs';
 	public const MANAGE_QUEUE_RECOVERY        = 'aio_manage_queue_recovery';
-	public const VIEW_SENSITIVE_DIAGNOSTICS    = 'aio_view_sensitive_diagnostics';
-	public const DOWNLOAD_ARTIFACTS             = 'aio_download_artifacts';
-	public const EXPORT_DATA                   = 'aio_export_data';
-	public const IMPORT_DATA                   = 'aio_import_data';
-	public const EXECUTE_ROLLBACKS              = 'aio_execute_rollbacks';
-	public const MANAGE_REPORTING_AND_PRIVACY   = 'aio_manage_reporting_and_privacy';
+	public const VIEW_SENSITIVE_DIAGNOSTICS   = 'aio_view_sensitive_diagnostics';
+	public const DOWNLOAD_ARTIFACTS           = 'aio_download_artifacts';
+	public const EXPORT_DATA                  = 'aio_export_data';
+	public const IMPORT_DATA                  = 'aio_import_data';
+	public const EXECUTE_ROLLBACKS            = 'aio_execute_rollbacks';
+	public const MANAGE_REPORTING_AND_PRIVACY = 'aio_manage_reporting_and_privacy';
 
 	/** CPT-level: Prompt Pack, Documentation, AI Run metadata, Version Snapshot (spec §10, §44.3). */
 	public const MANAGE_PROMPT_PACKS    = 'aio_manage_prompt_packs';

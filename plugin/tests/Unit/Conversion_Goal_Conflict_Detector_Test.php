@@ -27,8 +27,8 @@ final class Conversion_Goal_Conflict_Detector_Test extends TestCase {
 	}
 
 	public function test_detect_with_goal_and_bundle_not_goal_aware_returns_weak_fit(): void {
-		$detector = new Conversion_Goal_Conflict_Detector();
-		$profile  = array(
+		$detector  = new Conversion_Goal_Conflict_Detector();
+		$profile   = array(
 			Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY => 'calls',
 			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => 'realtor_starter',
 		);

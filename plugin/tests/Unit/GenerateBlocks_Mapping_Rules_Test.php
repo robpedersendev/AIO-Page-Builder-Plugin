@@ -20,8 +20,15 @@ final class GenerateBlocks_Mapping_Rules_Test extends TestCase {
 	public function test_eligible_section_payload_returns_true(): void {
 		$payload = array(
 			'section_key'   => 'st01_hero',
-			'wrapper_attrs'  => array( 'class' => array( 'aio-s-st01_hero', 'aio-s-st01_hero--variant-default' ), 'id' => 'aio-section-st01_hero-0', 'data_attributes' => array() ),
-			'field_values'   => array( 'headline' => 'Welcome', 'subheadline' => 'Text' ),
+			'wrapper_attrs' => array(
+				'class'           => array( 'aio-s-st01_hero', 'aio-s-st01_hero--variant-default' ),
+				'id'              => 'aio-section-st01_hero-0',
+				'data_attributes' => array(),
+			),
+			'field_values'  => array(
+				'headline'    => 'Welcome',
+				'subheadline' => 'Text',
+			),
 		);
 		$this->assertTrue( GenerateBlocks_Mapping_Rules::is_eligible_for_gb( $payload ) );
 	}
@@ -29,7 +36,7 @@ final class GenerateBlocks_Mapping_Rules_Test extends TestCase {
 	public function test_ineligible_when_section_key_missing(): void {
 		$payload = array(
 			'wrapper_attrs' => array( 'class' => array( 'aio-s-hero' ) ),
-			'field_values'   => array( 'headline' => 'X' ),
+			'field_values'  => array( 'headline' => 'X' ),
 		);
 		$this->assertFalse( GenerateBlocks_Mapping_Rules::is_eligible_for_gb( $payload ) );
 	}
@@ -46,7 +53,11 @@ final class GenerateBlocks_Mapping_Rules_Test extends TestCase {
 	public function test_ineligible_when_wrapper_class_empty(): void {
 		$payload = array(
 			'section_key'   => 'st01_hero',
-			'wrapper_attrs' => array( 'class' => array(), 'id' => '', 'data_attributes' => array() ),
+			'wrapper_attrs' => array(
+				'class'           => array(),
+				'id'              => '',
+				'data_attributes' => array(),
+			),
 			'field_values'  => array( 'headline' => 'X' ),
 		);
 		$this->assertFalse( GenerateBlocks_Mapping_Rules::is_eligible_for_gb( $payload ) );
@@ -56,7 +67,10 @@ final class GenerateBlocks_Mapping_Rules_Test extends TestCase {
 		$payload = array(
 			'section_key'   => 'st01_hero',
 			'wrapper_attrs' => array( 'class' => array( 'aio-s-st01_hero' ) ),
-			'field_values'  => array( 'headline' => 'X', 'items' => array( array( 'title' => 'A' ) ) ),
+			'field_values'  => array(
+				'headline' => 'X',
+				'items'    => array( array( 'title' => 'A' ) ),
+			),
 		);
 		$this->assertFalse( GenerateBlocks_Mapping_Rules::is_eligible_for_gb( $payload ), 'Section with repeater/array field must not be eligible' );
 	}

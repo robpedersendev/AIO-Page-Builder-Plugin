@@ -40,7 +40,7 @@ final class Industry_Author_Sandbox_Service {
 		$bundle_registry = new Industry_Starter_Bundle_Registry();
 		$bundle_registry->load( $candidate_bundles );
 
-		$health_check = new Industry_Health_Check_Service(
+		$health_check    = new Industry_Health_Check_Service(
 			null,
 			$pack_registry,
 			null,
@@ -53,29 +53,32 @@ final class Industry_Author_Sandbox_Service {
 			$bundle_registry,
 			null
 		);
-		$health_result = $health_check->run();
-		$health_errors  = isset( $health_result['errors'] ) && \is_array( $health_result['errors'] ) ? $health_result['errors'] : array();
+		$health_result   = $health_check->run();
+		$health_errors   = isset( $health_result['errors'] ) && \is_array( $health_result['errors'] ) ? $health_result['errors'] : array();
 		$health_warnings = isset( $health_result['warnings'] ) && \is_array( $health_result['warnings'] ) ? $health_result['warnings'] : array();
 
-		$linter = new Industry_Definition_Linter(
+		$linter        = new Industry_Definition_Linter(
 			$pack_registry,
 			null,
 			$health_check,
 			$bundle_registry,
 			null
 		);
-		$lint_result = $linter->lint();
+		$lint_result   = $linter->lint();
 		$lint_errors   = isset( $lint_result['errors'] ) && \is_array( $lint_result['errors'] ) ? $lint_result['errors'] : array();
 		$lint_warnings = isset( $lint_result['warnings'] ) && \is_array( $lint_result['warnings'] ) ? $lint_result['warnings'] : array();
-		$summary_lint  = isset( $lint_result['summary'] ) && \is_array( $lint_result['summary'] ) ? $lint_result['summary'] : array( 'error_count' => count( $lint_errors ), 'warning_count' => count( $lint_warnings ) );
+		$summary_lint  = isset( $lint_result['summary'] ) && \is_array( $lint_result['summary'] ) ? $lint_result['summary'] : array(
+			'error_count'   => count( $lint_errors ),
+			'warning_count' => count( $lint_warnings ),
+		);
 
 		return array(
 			'lint_result'   => $lint_result,
 			'health_result' => $health_result,
 			'summary'       => array(
-				'lint_errors'    => $summary_lint['error_count'] ?? count( $lint_errors ),
-				'lint_warnings'  => $summary_lint['warning_count'] ?? count( $lint_warnings ),
-				'health_errors'  => count( $health_errors ),
+				'lint_errors'     => $summary_lint['error_count'] ?? count( $lint_errors ),
+				'lint_warnings'   => $summary_lint['warning_count'] ?? count( $lint_warnings ),
+				'health_errors'   => count( $health_errors ),
 				'health_warnings' => count( $health_warnings ),
 			),
 		);

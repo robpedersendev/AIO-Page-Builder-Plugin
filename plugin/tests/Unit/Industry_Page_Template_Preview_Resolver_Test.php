@@ -37,11 +37,17 @@ final class Industry_Page_Template_Preview_Resolver_Test extends TestCase {
 		$overlay      = new Industry_Page_OnePager_Overlay_Registry();
 		$composer     = new Industry_Page_OnePager_Composer( $doc_registry, $overlay );
 		$resolver     = new Industry_Page_Template_Preview_Resolver( null, null, new Industry_Page_Template_Recommendation_Resolver(), $composer, null );
-		$vm           = $resolver->resolve( 'pt_home_conversion_01', array( 'internal_key' => 'pt_home_conversion_01', 'template_family' => 'home' ), array() );
+		$vm           = $resolver->resolve(
+			'pt_home_conversion_01',
+			array(
+				'internal_key'    => 'pt_home_conversion_01',
+				'template_family' => 'home',
+			),
+			array()
+		);
 		$this->assertInstanceOf( Industry_Page_Template_Preview_View_Model::class, $vm );
 		$this->assertFalse( $vm->has_industry() );
 		$this->assertSame( '', $vm->get_primary_industry_key() );
 		$this->assertSame( Industry_Page_Template_Recommendation_Resolver::FIT_NEUTRAL, $vm->get_recommendation_fit() );
 	}
-
 }

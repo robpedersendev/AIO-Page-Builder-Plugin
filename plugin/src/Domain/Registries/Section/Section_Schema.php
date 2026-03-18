@@ -258,8 +258,8 @@ final class Section_Schema {
 	 * @return array<int, array{code: string, field?: string}> Empty if valid.
 	 */
 	public static function validate_industry_affinity_metadata( array $section ): array {
-		$errors = array();
-		$has_any = false;
+		$errors    = array();
+		$has_any   = false;
 		$check_key = function ( string $key ): bool {
 			if ( $key === '' || strlen( $key ) > self::INDUSTRY_KEY_MAX_LENGTH ) {
 				return false;
@@ -268,7 +268,7 @@ final class Section_Schema {
 		};
 		if ( array_key_exists( self::FIELD_INDUSTRY_AFFINITY, $section ) ) {
 			$has_any = true;
-			$val = $section[ self::FIELD_INDUSTRY_AFFINITY ];
+			$val     = $section[ self::FIELD_INDUSTRY_AFFINITY ];
 			if ( is_array( $val ) ) {
 				foreach ( $val as $k => $v ) {
 					$key_str = is_string( $k ) ? $k : (string) $v;
@@ -276,7 +276,10 @@ final class Section_Schema {
 						$key_str = $v;
 					}
 					if ( $key_str !== '' && ! $check_key( $key_str ) ) {
-						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => self::FIELD_INDUSTRY_AFFINITY );
+						$errors[] = array(
+							'code'  => 'invalid_industry_key',
+							'field' => self::FIELD_INDUSTRY_AFFINITY,
+						);
 						break;
 					}
 				}
@@ -284,12 +287,15 @@ final class Section_Schema {
 		}
 		if ( array_key_exists( self::FIELD_INDUSTRY_DISCOURAGED, $section ) ) {
 			$has_any = true;
-			$val = $section[ self::FIELD_INDUSTRY_DISCOURAGED ];
+			$val     = $section[ self::FIELD_INDUSTRY_DISCOURAGED ];
 			if ( is_array( $val ) ) {
 				foreach ( $val as $v ) {
 					$key_str = is_string( $v ) ? trim( $v ) : '';
 					if ( $key_str !== '' && ! $check_key( $key_str ) ) {
-						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => self::FIELD_INDUSTRY_DISCOURAGED );
+						$errors[] = array(
+							'code'  => 'invalid_industry_key',
+							'field' => self::FIELD_INDUSTRY_DISCOURAGED,
+						);
 						break;
 					}
 				}
@@ -297,11 +303,14 @@ final class Section_Schema {
 		}
 		if ( array_key_exists( self::FIELD_INDUSTRY_CTA_FIT, $section ) ) {
 			$has_any = true;
-			$val = $section[ self::FIELD_INDUSTRY_CTA_FIT ];
+			$val     = $section[ self::FIELD_INDUSTRY_CTA_FIT ];
 			if ( is_array( $val ) ) {
 				foreach ( array_keys( $val ) as $k ) {
 					if ( is_string( $k ) && $k !== '' && ! $check_key( $k ) ) {
-						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => self::FIELD_INDUSTRY_CTA_FIT );
+						$errors[] = array(
+							'code'  => 'invalid_industry_key',
+							'field' => self::FIELD_INDUSTRY_CTA_FIT,
+						);
 						break;
 					}
 				}
@@ -309,11 +318,14 @@ final class Section_Schema {
 		}
 		if ( array_key_exists( self::FIELD_INDUSTRY_NOTES, $section ) ) {
 			$has_any = true;
-			$val = $section[ self::FIELD_INDUSTRY_NOTES ];
+			$val     = $section[ self::FIELD_INDUSTRY_NOTES ];
 			if ( is_array( $val ) ) {
 				foreach ( array_keys( $val ) as $k ) {
 					if ( is_string( $k ) && $k !== '' && ! $check_key( $k ) ) {
-						$errors[] = array( 'code' => 'invalid_industry_key', 'field' => self::FIELD_INDUSTRY_NOTES );
+						$errors[] = array(
+							'code'  => 'invalid_industry_key',
+							'field' => self::FIELD_INDUSTRY_NOTES,
+						);
 						break;
 					}
 				}

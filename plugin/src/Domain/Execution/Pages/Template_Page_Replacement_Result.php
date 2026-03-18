@@ -78,17 +78,17 @@ final class Template_Page_Replacement_Result {
 		array $errors = array(),
 		string $message = ''
 	) {
-		$this->success                 = $success;
-		$this->target_post_id          = $target_post_id;
-		$this->superseded_post_id      = $superseded_post_id;
-		$this->snapshot_ref            = $snapshot_ref;
-		$this->template_key            = $template_key;
-		$this->template_family         = $template_family;
+		$this->success                  = $success;
+		$this->target_post_id           = $target_post_id;
+		$this->superseded_post_id       = $superseded_post_id;
+		$this->snapshot_ref             = $snapshot_ref;
+		$this->template_key             = $template_key;
+		$this->template_family          = $template_family;
 		$this->replacement_trace_record = $replacement_trace_record;
-		$this->field_assignment_count  = $field_assignment_count;
-		$this->warnings                = $warnings;
-		$this->errors                  = $errors;
-		$this->message                 = $message;
+		$this->field_assignment_count   = $field_assignment_count;
+		$this->warnings                 = $warnings;
+		$this->errors                   = $errors;
+		$this->message                  = $message;
 	}
 
 	public function is_success(): bool {
@@ -146,16 +146,16 @@ final class Template_Page_Replacement_Result {
 	public function to_array(): array {
 		return array(
 			'success'                  => $this->success,
-			'target_post_id'            => $this->target_post_id,
-			'superseded_post_id'        => $this->superseded_post_id,
-			'snapshot_ref'              => $this->snapshot_ref,
-			'template_key'              => $this->template_key,
-			'template_family'           => $this->template_family,
-			'replacement_trace_record'  => $this->replacement_trace_record,
-			'field_assignment_count'    => $this->field_assignment_count,
-			'warnings'                  => $this->warnings,
-			'errors'                    => $this->errors,
-			'message'                   => $this->message,
+			'target_post_id'           => $this->target_post_id,
+			'superseded_post_id'       => $this->superseded_post_id,
+			'snapshot_ref'             => $this->snapshot_ref,
+			'template_key'             => $this->template_key,
+			'template_family'          => $this->template_family,
+			'replacement_trace_record' => $this->replacement_trace_record,
+			'field_assignment_count'   => $this->field_assignment_count,
+			'warnings'                 => $this->warnings,
+			'errors'                   => $this->errors,
+			'message'                  => $this->message,
 		);
 	}
 
@@ -214,22 +214,22 @@ final class Template_Page_Replacement_Result {
 	public static function example_payload(): array {
 		return array(
 			'success'                  => true,
-			'target_post_id'            => 202,
-			'superseded_post_id'        => 101,
-			'snapshot_ref'              => 'op-snap-pre-exec_item_1_b-20250113T150000-123',
-			'template_key'              => 'tpl_services_hub',
-			'template_family'           => 'services',
-			'replacement_trace_record'  => array(
-				'original_post_id'   => 101,
-				'new_post_id'        => 202,
-				'archive_status'     => 'private',
-				'template_key'       => 'tpl_services_hub',
-				'snapshot_pre_id'    => 'op-snap-pre-exec_item_1_b-20250113T150000-123',
+			'target_post_id'           => 202,
+			'superseded_post_id'       => 101,
+			'snapshot_ref'             => 'op-snap-pre-exec_item_1_b-20250113T150000-123',
+			'template_key'             => 'tpl_services_hub',
+			'template_family'          => 'services',
+			'replacement_trace_record' => array(
+				'original_post_id' => 101,
+				'new_post_id'      => 202,
+				'archive_status'   => 'private',
+				'template_key'     => 'tpl_services_hub',
+				'snapshot_pre_id'  => 'op-snap-pre-exec_item_1_b-20250113T150000-123',
 			),
-			'field_assignment_count'    => 3,
-			'warnings'                  => array(),
-			'errors'                    => array(),
-			'message'                   => __( 'Page updated or replaced.', 'aio-page-builder' ),
+			'field_assignment_count'   => 3,
+			'warnings'                 => array(),
+			'errors'                   => array(),
+			'message'                  => __( 'Page updated or replaced.', 'aio-page-builder' ),
 		);
 	}
 }

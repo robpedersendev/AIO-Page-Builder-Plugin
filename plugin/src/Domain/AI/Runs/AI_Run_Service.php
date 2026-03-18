@@ -33,10 +33,10 @@ final class AI_Run_Service {
 	/**
 	 * Creates a new run record and optionally persists initial metadata and artifacts.
 	 *
-	 * @param string                $run_id     Stable run ID (e.g. UUID).
-	 * @param array<string, mixed>  $metadata   Run metadata: actor, created_at, completed_at?, provider_id, model_used, prompt_pack_ref, retry_count, build_plan_ref?, failover_policy?, failover_attempt?, fallback_provider_reference?, effective_provider_used?, is_experiment?, experiment_id?, experiment_variant_id?, experiment_variant_label?, etc.
-	 * @param string                $status     pending_generation | completed | failed_validation | failed.
-	 * @param array<string, mixed>  $artifacts  Optional map of Artifact_Category_Keys => payload (only categories present are stored).
+	 * @param string               $run_id     Stable run ID (e.g. UUID).
+	 * @param array<string, mixed> $metadata   Run metadata: actor, created_at, completed_at?, provider_id, model_used, prompt_pack_ref, retry_count, build_plan_ref?, failover_policy?, failover_attempt?, fallback_provider_reference?, effective_provider_used?, is_experiment?, experiment_id?, experiment_variant_id?, experiment_variant_label?, etc.
+	 * @param string               $status     pending_generation | completed | failed_validation | failed.
+	 * @param array<string, mixed> $artifacts  Optional map of Artifact_Category_Keys => payload (only categories present are stored).
 	 * @return int Run post ID, or 0 on failure.
 	 */
 	public function create_run( string $run_id, array $metadata, string $status, array $artifacts = array() ): int {
@@ -62,10 +62,10 @@ final class AI_Run_Service {
 	/**
 	 * Updates an existing run: status and optionally metadata and artifacts.
 	 *
-	 * @param int                   $post_id   Run post ID.
-	 * @param string                $status   New status.
-	 * @param array<string, mixed>  $metadata  Optional run metadata to merge/set.
-	 * @param array<string, mixed>  $artifacts Optional map of category => payload to store.
+	 * @param int                  $post_id   Run post ID.
+	 * @param string               $status   New status.
+	 * @param array<string, mixed> $metadata  Optional run metadata to merge/set.
+	 * @param array<string, mixed> $artifacts Optional map of category => payload to store.
 	 * @return bool Success.
 	 */
 	public function update_run( int $post_id, string $status, array $metadata = array(), array $artifacts = array() ): bool {

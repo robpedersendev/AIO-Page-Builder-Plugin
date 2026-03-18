@@ -28,7 +28,7 @@ final class Planning_Request_Result_Test extends TestCase {
 			null,
 			null
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 		$this->assertTrue( $arr['success'] );
 		$this->assertSame( Planning_Request_Result::STATUS_SUCCESS, $arr['status'] );
 		$this->assertSame( 'aio-run-123', $arr['run_id'] );
@@ -40,7 +40,10 @@ final class Planning_Request_Result_Test extends TestCase {
 	}
 
 	public function test_validation_failed_result_to_array(): void {
-		$report = array( 'final_validation_state' => 'failed', 'record_validation_results' => array() );
+		$report = array(
+			'final_validation_state'    => 'failed',
+			'record_validation_results' => array(),
+		);
 		$result = new Planning_Request_Result(
 			false,
 			Planning_Request_Result::STATUS_VALIDATION_FAILED,
@@ -51,7 +54,7 @@ final class Planning_Request_Result_Test extends TestCase {
 			null,
 			null
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 		$this->assertFalse( $arr['success'] );
 		$this->assertSame( Planning_Request_Result::STATUS_VALIDATION_FAILED, $arr['status'] );
 		$this->assertSame( $report, $arr['validation_report'] );
@@ -59,12 +62,12 @@ final class Planning_Request_Result_Test extends TestCase {
 	}
 
 	public function test_provider_failed_result_to_array(): void {
-		$error = array(
+		$error  = array(
 			'category'      => 'auth_failure',
 			'user_message'  => 'AI service authentication failed.',
-			'internal_code'  => 'auth_failure',
-			'provider_raw'   => null,
-			'retry_posture'  => 'no_retry',
+			'internal_code' => 'auth_failure',
+			'provider_raw'  => null,
+			'retry_posture' => 'no_retry',
 		);
 		$result = new Planning_Request_Result(
 			false,
@@ -76,7 +79,7 @@ final class Planning_Request_Result_Test extends TestCase {
 			$error,
 			null
 		);
-		$arr = $result->to_array();
+		$arr    = $result->to_array();
 		$this->assertFalse( $arr['success'] );
 		$this->assertSame( $error, $arr['normalized_error'] );
 	}
@@ -98,7 +101,7 @@ final class Planning_Request_Result_Test extends TestCase {
 	}
 
 	public function test_ui_safe_payload_has_no_secret_keys(): void {
-		$result = new Planning_Request_Result(
+		$result    = new Planning_Request_Result(
 			true,
 			Planning_Request_Result::STATUS_SUCCESS,
 			'run-1',
@@ -108,7 +111,7 @@ final class Planning_Request_Result_Test extends TestCase {
 			null,
 			null
 		);
-		$arr = $result->to_array();
+		$arr       = $result->to_array();
 		$forbidden = array( 'api_key', 'secret', 'token', 'password', 'credential' );
 		foreach ( $forbidden as $key ) {
 			$this->assertArrayNotHasKey( $key, $arr );

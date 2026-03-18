@@ -70,11 +70,11 @@ final class Content_Survivability_Result {
 		array $human_editability_notes = array(),
 		bool $deactivation_readiness = true
 	) {
-		$this->is_survivable                  = $is_survivable;
+		$this->is_survivable                   = $is_survivable;
 		$this->prohibited_runtime_dependencies = $prohibited_runtime_dependencies;
-		$this->dynamic_output_flags           = $dynamic_output_flags;
-		$this->human_editability_notes        = $human_editability_notes;
-		$this->deactivation_readiness         = $deactivation_readiness;
+		$this->dynamic_output_flags            = $dynamic_output_flags;
+		$this->human_editability_notes         = $human_editability_notes;
+		$this->deactivation_readiness          = $deactivation_readiness;
 	}
 
 	public function is_survivable(): bool {
@@ -107,11 +107,11 @@ final class Content_Survivability_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'is_survivable'                  => $this->is_survivable,
+			'is_survivable'                   => $this->is_survivable,
 			'prohibited_runtime_dependencies' => $this->prohibited_runtime_dependencies,
-			'dynamic_output_flags'           => $this->dynamic_output_flags,
-			'human_editability_notes'        => $this->human_editability_notes,
-			'deactivation_readiness'         => $this->deactivation_readiness,
+			'dynamic_output_flags'            => $this->dynamic_output_flags,
+			'human_editability_notes'         => $this->human_editability_notes,
+			'deactivation_readiness'          => $this->deactivation_readiness,
 		);
 	}
 }

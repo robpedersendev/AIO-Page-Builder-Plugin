@@ -37,7 +37,7 @@ final class Industry_Drift_Report_Service_Test extends TestCase {
 	public function test_each_item_has_required_keys(): void {
 		$service = new Industry_Drift_Report_Service( null );
 		$result  = $service->generate_report();
-		$keys = array( 'drift_type', 'severity', 'evidence_refs', 'explanation', 'suggested_review_path' );
+		$keys    = array( 'drift_type', 'severity', 'evidence_refs', 'explanation', 'suggested_review_path' );
 		foreach ( $result['items'] as $item ) {
 			foreach ( $keys as $key ) {
 				$this->assertArrayHasKey( $key, $item );
@@ -48,10 +48,10 @@ final class Industry_Drift_Report_Service_Test extends TestCase {
 	}
 
 	public function test_severity_grouping_consistent_with_summary(): void {
-		$service = new Industry_Drift_Report_Service( null );
-		$result  = $service->generate_report();
+		$service      = new Industry_Drift_Report_Service( null );
+		$result       = $service->generate_report();
 		$severe_count = count( $result['by_severity'][ Industry_Drift_Report_Service::SEVERITY_SEVERE ] ?? array() );
-		$minor_count = count( $result['by_severity'][ Industry_Drift_Report_Service::SEVERITY_MINOR ] ?? array() );
+		$minor_count  = count( $result['by_severity'][ Industry_Drift_Report_Service::SEVERITY_MINOR ] ?? array() );
 		$this->assertSame( $result['summary']['severe'], $severe_count );
 		$this->assertSame( $result['summary']['minor'], $minor_count );
 		$this->assertSame( count( $result['items'] ), $result['summary']['total'] );

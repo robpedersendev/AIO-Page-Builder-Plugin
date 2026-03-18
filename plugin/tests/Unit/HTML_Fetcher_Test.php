@@ -34,10 +34,12 @@ final class HTML_Fetcher_Test extends TestCase {
 	}
 
 	public function test_disallowed_url_checker_refuses_fetch(): void {
-		$fetcher = $this->make_fetcher( function ( string $url ): bool {
-			return false;
-		} );
-		$result = $fetcher->fetch( 'https://example.com/page' );
+		$fetcher = $this->make_fetcher(
+			function ( string $url ): bool {
+				return false;
+			}
+		);
+		$result  = $fetcher->fetch( 'https://example.com/page' );
 		$this->assertSame( Fetch_Result::FETCH_STATUS_DISALLOWED, $result->fetch_status );
 		$this->assertSame( Fetch_Result::ERROR_DISALLOWED_URL, $result->error_code );
 	}
@@ -46,8 +48,12 @@ final class HTML_Fetcher_Test extends TestCase {
 		$GLOBALS['_aio_wp_remote_get_return'] = function (): \WP_Error {
 			return new \WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' );
 		};
-		$fetcher = $this->make_fetcher( function (): bool { return true; } );
-		$result  = $fetcher->fetch( 'https://example.com/about' );
+		$fetcher                              = $this->make_fetcher(
+			function (): bool {
+				return true;
+			}
+		);
+		$result                               = $fetcher->fetch( 'https://example.com/about' );
 		unset( $GLOBALS['_aio_wp_remote_get_return'] );
 		$this->assertSame( Fetch_Result::FETCH_STATUS_TIMEOUT, $result->fetch_status );
 		$this->assertSame( Fetch_Result::ERROR_TIMEOUT, $result->error_code );
@@ -56,13 +62,20 @@ final class HTML_Fetcher_Test extends TestCase {
 	public function test_mock_success_returns_success_result(): void {
 		$GLOBALS['_aio_wp_remote_get_return'] = function (): array {
 			return array(
-				'response' => array( 'code' => 200, 'message' => 'OK' ),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
 				'headers'  => array( 'content-type' => 'text/html; charset=UTF-8' ),
 				'body'     => '<!DOCTYPE html><html><body>Hello</body></html>',
 			);
 		};
-		$fetcher = $this->make_fetcher( function (): bool { return true; } );
-		$result  = $fetcher->fetch( 'https://example.com/about' );
+		$fetcher                              = $this->make_fetcher(
+			function (): bool {
+				return true;
+			}
+		);
+		$result                               = $fetcher->fetch( 'https://example.com/about' );
 		unset( $GLOBALS['_aio_wp_remote_get_return'] );
 		$this->assertTrue( $result->is_success() );
 		$this->assertSame( 200, $result->http_status );
@@ -73,13 +86,20 @@ final class HTML_Fetcher_Test extends TestCase {
 	public function test_mock_non_html_returns_non_html_result(): void {
 		$GLOBALS['_aio_wp_remote_get_return'] = function (): array {
 			return array(
-				'response' => array( 'code' => 200, 'message' => 'OK' ),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
 				'headers'  => array( 'content-type' => 'application/json' ),
 				'body'     => '{"key":"value"}',
 			);
 		};
-		$fetcher = $this->make_fetcher( function (): bool { return true; } );
-		$result  = $fetcher->fetch( 'https://example.com/api' );
+		$fetcher                              = $this->make_fetcher(
+			function (): bool {
+				return true;
+			}
+		);
+		$result                               = $fetcher->fetch( 'https://example.com/api' );
 		unset( $GLOBALS['_aio_wp_remote_get_return'] );
 		$this->assertSame( Fetch_Result::FETCH_STATUS_NON_HTML, $result->fetch_status );
 		$this->assertSame( Fetch_Result::ERROR_UNSUPPORTED_CONTENT, $result->error_code );

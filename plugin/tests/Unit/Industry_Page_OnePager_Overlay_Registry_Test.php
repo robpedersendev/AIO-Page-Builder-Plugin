@@ -45,7 +45,7 @@ final class Industry_Page_OnePager_Overlay_Registry_Test extends TestCase {
 
 	public function test_load_skips_invalid_scope(): void {
 		$registry = new Industry_Page_OnePager_Overlay_Registry();
-		$ov = $this->valid_overlay();
+		$ov       = $this->valid_overlay();
 		$ov[ Industry_Page_OnePager_Overlay_Registry::FIELD_SCOPE ] = 'wrong';
 		$registry->load( array( $ov ) );
 		$this->assertNull( $registry->get( 'realtor', 'pt_home_trust_01' ) );
@@ -54,11 +54,13 @@ final class Industry_Page_OnePager_Overlay_Registry_Test extends TestCase {
 
 	public function test_get_for_industry_returns_only_that_industry(): void {
 		$registry = new Industry_Page_OnePager_Overlay_Registry();
-		$registry->load( array(
-			$this->valid_overlay( 'plumber', 'pt_landing_contact' ),
-			$this->valid_overlay( 'cosmetology', 'pt_landing_contact' ),
-			$this->valid_overlay( 'plumber', 'pt_home_trust_01' ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_overlay( 'plumber', 'pt_landing_contact' ),
+				$this->valid_overlay( 'cosmetology', 'pt_landing_contact' ),
+				$this->valid_overlay( 'plumber', 'pt_home_trust_01' ),
+			)
+		);
 		$plumber = $registry->get_for_industry( 'plumber' );
 		$this->assertCount( 2, $plumber );
 	}
@@ -90,7 +92,7 @@ final class Industry_Page_OnePager_Overlay_Registry_Test extends TestCase {
 	/** Prompt 402: second-wave page overlays load and are discoverable. */
 	public function test_builtin_overlays_include_second_wave_page_keys(): void {
 		$definitions = Industry_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions();
-		$registry = new Industry_Page_OnePager_Overlay_Registry();
+		$registry    = new Industry_Page_OnePager_Overlay_Registry();
 		$registry->load( $definitions );
 		$this->assertNotNull( $registry->get( 'cosmetology_nail', 'child_detail_service_booking_01' ), 'Second-wave cosmetology booking overlay must be present.' );
 		$this->assertNotNull( $registry->get( 'realtor', 'hub_geo_neighborhood_01' ), 'Second-wave realtor neighborhood overlay must be present.' );

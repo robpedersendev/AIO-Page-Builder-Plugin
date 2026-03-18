@@ -44,19 +44,19 @@ final class Execution_Queue_Service {
 		Execution_Job_Dispatcher $job_dispatcher,
 		?Industry_Approval_Snapshot_Builder $industry_snapshot_builder = null
 	) {
-		$this->plan_state               = $plan_state;
+		$this->plan_state                = $plan_state;
 		$this->bulk_executor             = $bulk_executor;
-		$this->job_dispatcher           = $job_dispatcher;
+		$this->job_dispatcher            = $job_dispatcher;
 		$this->industry_snapshot_builder = $industry_snapshot_builder;
 	}
 
 	/**
 	 * Request bulk execution for approved plan items. Enqueues jobs; optionally runs them immediately.
 	 *
-	 * @param string               $plan_id       Plan ID (internal key).
+	 * @param string                  $plan_id       Plan ID (internal key).
 	 * @param array<int, string>|null $item_ids   Plan item IDs to execute; null = all eligible approved items.
-	 * @param array<string, mixed> $actor_context Actor context (actor_type, actor_id, capability_checked).
-	 * @param array<string, mixed> $options       Optional: run_immediately (bool), priority (int), batch_id (string).
+	 * @param array<string, mixed>    $actor_context Actor context (actor_type, actor_id, capability_checked).
+	 * @param array<string, mixed>    $options       Optional: run_immediately (bool), priority (int), batch_id (string).
 	 * @return array<string, mixed> Bulk result: job_refs, item_results, completed_count, failed_count, refused_count, partial_failure, results_summary.
 	 */
 	public function request_bulk_execution(
@@ -81,7 +81,7 @@ final class Execution_Queue_Service {
 			$this->plan_state->save_plan_definition( $plan_post_id, $definition );
 		}
 
-		$batch_id = isset( $options['batch_id'] ) && is_string( $options['batch_id'] ) ? $options['batch_id'] : '';
+		$batch_id  = isset( $options['batch_id'] ) && is_string( $options['batch_id'] ) ? $options['batch_id'] : '';
 		$envelopes = $this->bulk_executor->build_ordered_envelopes( $plan_id, $definition, $item_ids, $actor_context, $batch_id );
 		if ( empty( $envelopes ) ) {
 			return $this->bulk_error_result( $plan_id, 'No eligible actions to execute.', array(), 0, 0, 0 );
@@ -124,9 +124,9 @@ final class Execution_Queue_Service {
 		$post_id = isset( $payload['post_snapshot_id'] ) && is_string( $payload['post_snapshot_id'] ) ? trim( $payload['post_snapshot_id'] ) : '';
 		if ( $pre_id === '' || $post_id === '' ) {
 			return array(
-				'job_ref'  => '',
-				'status'   => 'error',
-				'message'  => __( 'Missing pre or post snapshot ID.', 'aio-page-builder' ),
+				'job_ref'         => '',
+				'status'          => 'error',
+				'message'         => __( 'Missing pre or post snapshot ID.', 'aio-page-builder' ),
 				'rollback_result' => null,
 			);
 		}
@@ -135,28 +135,28 @@ final class Execution_Queue_Service {
 		$job_ref   = $this->job_dispatcher->enqueue_rollback_job( $payload, $actor_ref, $priority );
 		if ( $job_ref === '' ) {
 			return array(
-				'job_ref'  => '',
-				'status'   => 'error',
-				'message'  => __( 'Failed to enqueue rollback job.', 'aio-page-builder' ),
+				'job_ref'         => '',
+				'status'          => 'error',
+				'message'         => __( 'Failed to enqueue rollback job.', 'aio-page-builder' ),
 				'rollback_result' => null,
 			);
 		}
 		$run_immediately = ! empty( $options['run_immediately'] );
 		if ( $run_immediately ) {
 			$job_result = $this->job_dispatcher->process_job( $job_ref );
-			$status = $job_result !== null ? $job_result->get_status() : 'failed';
-			$summary = $job_result !== null ? $job_result->to_array() : array();
+			$status     = $job_result !== null ? $job_result->get_status() : 'failed';
+			$summary    = $job_result !== null ? $job_result->to_array() : array();
 			return array(
-				'job_ref'  => $job_ref,
-				'status'   => $status,
-				'message'  => $status === 'completed' ? __( 'Rollback completed.', 'aio-page-builder' ) : ( $job_result !== null ? $job_result->get_failure_reason() : __( 'Rollback job failed.', 'aio-page-builder' ) ),
+				'job_ref'         => $job_ref,
+				'status'          => $status,
+				'message'         => $status === 'completed' ? __( 'Rollback completed.', 'aio-page-builder' ) : ( $job_result !== null ? $job_result->get_failure_reason() : __( 'Rollback job failed.', 'aio-page-builder' ) ),
 				'rollback_result' => $summary,
 			);
 		}
 		return array(
-			'job_ref'  => $job_ref,
-			'status'   => 'queued',
-			'message'  => __( 'Rollback queued.', 'aio-page-builder' ),
+			'job_ref'         => $job_ref,
+			'status'          => 'queued',
+			'message'         => __( 'Rollback queued.', 'aio-page-builder' ),
 			'rollback_result' => null,
 		);
 	}
@@ -164,20 +164,20 @@ final class Execution_Queue_Service {
 	/**
 	 * Aggregates per-job results into bulk result with per-item status and partial-failure flag.
 	 *
-	 * @param string                    $plan_id
-	 * @param array<int, string>        $job_refs
+	 * @param string                           $plan_id
+	 * @param array<int, string>               $job_refs
 	 * @param array<int, Execution_Job_Result> $results
 	 * @return array<string, mixed>
 	 */
 	private function aggregate_bulk_result( string $plan_id, array $job_refs, array $results ): array {
 		$item_results = array();
-		$completed = 0;
-		$failed = 0;
-		$refused = 0;
-		$summary = array();
+		$completed    = 0;
+		$failed       = 0;
+		$refused      = 0;
+		$summary      = array();
 		foreach ( $results as $r ) {
-			$plan_item_id = $r->get_plan_item_id();
-			$status = $r->get_status();
+			$plan_item_id                  = $r->get_plan_item_id();
+			$status                        = $r->get_status();
 			$item_results[ $plan_item_id ] = array(
 				'status'         => $status,
 				'job_ref'        => $r->get_job_ref(),
@@ -185,7 +185,7 @@ final class Execution_Queue_Service {
 				'retry_eligible' => $r->is_retry_eligible(),
 				'failure_reason' => $r->get_failure_reason(),
 			);
-			$summary[] = $r->to_array();
+			$summary[]                     = $r->to_array();
 			if ( $status === Execution_Job_Result::STATUS_COMPLETED ) {
 				++$completed;
 			} elseif ( $status === Execution_Job_Result::STATUS_REFUSED ) {
@@ -194,9 +194,9 @@ final class Execution_Queue_Service {
 				++$failed;
 			}
 		}
-		$total = $completed + $failed + $refused;
+		$total           = $completed + $failed + $refused;
 		$partial_failure = $failed > 0 || $refused > 0;
-		$overall_status = $refused === $total ? 'refused' : ( $completed === $total ? 'completed' : 'partial' );
+		$overall_status  = $refused === $total ? 'refused' : ( $completed === $total ? 'completed' : 'partial' );
 
 		return array(
 			'plan_id'         => $plan_id,
@@ -204,7 +204,7 @@ final class Execution_Queue_Service {
 			'job_refs'        => $job_refs,
 			'item_results'    => $item_results,
 			'completed_count' => $completed,
-			'failed_count'     => $failed,
+			'failed_count'    => $failed,
 			'refused_count'   => $refused,
 			'partial_failure' => $partial_failure,
 			'results_summary' => $summary,

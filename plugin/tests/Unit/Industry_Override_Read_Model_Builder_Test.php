@@ -47,7 +47,7 @@ final class Industry_Override_Read_Model_Builder_Test extends TestCase {
 
 	public function test_build_returns_empty_when_no_overrides(): void {
 		$builder = new Industry_Override_Read_Model_Builder();
-		$rows = $builder->build( array() );
+		$rows    = $builder->build( array() );
 		$this->assertIsArray( $rows );
 		$this->assertCount( 0, $rows );
 	}
@@ -61,7 +61,7 @@ final class Industry_Override_Read_Model_Builder_Test extends TestCase {
 		$plan->record_override( 'plan-1', 'item-1', Industry_Override_Schema::STATE_ACCEPTED, '' );
 
 		$builder = new Industry_Override_Read_Model_Builder();
-		$rows = $builder->build( array() );
+		$rows    = $builder->build( array() );
 		$this->assertCount( 3, $rows );
 
 		$types = array_column( $rows, 'target_type' );
@@ -82,7 +82,7 @@ final class Industry_Override_Read_Model_Builder_Test extends TestCase {
 		$template->record_override( 'tpl_1', Industry_Override_Schema::STATE_ACCEPTED, '' );
 
 		$builder = new Industry_Override_Read_Model_Builder();
-		$rows = $builder->build( array( Industry_Override_Read_Model_Builder::FILTER_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_SECTION ) );
+		$rows    = $builder->build( array( Industry_Override_Read_Model_Builder::FILTER_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_SECTION ) );
 		$this->assertCount( 1, $rows );
 		$this->assertSame( Industry_Override_Schema::TARGET_TYPE_SECTION, $rows[0]['target_type'] );
 		$this->assertSame( 'sec_1', $rows[0]['target_key'] );
@@ -94,7 +94,7 @@ final class Industry_Override_Read_Model_Builder_Test extends TestCase {
 		$section->record_override( 'rejected_sec', Industry_Override_Schema::STATE_REJECTED, 'No' );
 
 		$builder = new Industry_Override_Read_Model_Builder();
-		$rows = $builder->build( array( Industry_Override_Read_Model_Builder::FILTER_STATE => Industry_Override_Schema::STATE_REJECTED ) );
+		$rows    = $builder->build( array( Industry_Override_Read_Model_Builder::FILTER_STATE => Industry_Override_Schema::STATE_REJECTED ) );
 		$this->assertCount( 1, $rows );
 		$this->assertSame( Industry_Override_Schema::STATE_REJECTED, $rows[0]['state'] );
 	}
@@ -105,7 +105,7 @@ final class Industry_Override_Read_Model_Builder_Test extends TestCase {
 		$section->record_override( 'no_reason', Industry_Override_Schema::STATE_ACCEPTED, '' );
 
 		$builder = new Industry_Override_Read_Model_Builder();
-		$rows = $builder->build( array( Industry_Override_Read_Model_Builder::FILTER_REASON_PRESENT => true ) );
+		$rows    = $builder->build( array( Industry_Override_Read_Model_Builder::FILTER_REASON_PRESENT => true ) );
 		$this->assertCount( 1, $rows );
 		$this->assertSame( 'with_reason', $rows[0]['target_key'] );
 	}

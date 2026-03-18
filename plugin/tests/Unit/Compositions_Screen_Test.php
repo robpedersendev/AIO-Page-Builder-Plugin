@@ -41,7 +41,7 @@ final class Compositions_Screen_Test extends TestCase {
 
 	public function test_get_title_returns_translated_string(): void {
 		$screen = new Compositions_Screen( null );
-		$title = $screen->get_title();
+		$title  = $screen->get_title();
 		$this->assertSame( 'Compositions', $title );
 	}
 

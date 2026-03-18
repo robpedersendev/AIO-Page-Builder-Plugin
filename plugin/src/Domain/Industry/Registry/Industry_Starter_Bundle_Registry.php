@@ -21,31 +21,31 @@ use AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service;
  */
 final class Industry_Starter_Bundle_Registry {
 
-	public const FIELD_BUNDLE_KEY                   = 'bundle_key';
-	public const FIELD_INDUSTRY_KEY                 = 'industry_key';
+	public const FIELD_BUNDLE_KEY   = 'bundle_key';
+	public const FIELD_INDUSTRY_KEY = 'industry_key';
 	/** Optional. When set, bundle is subtype-scoped (subtype-starter-bundle-contract.md). */
-	public const FIELD_SUBTYPE_KEY                 = 'subtype_key';
-	public const FIELD_LABEL                        = 'label';
-	public const FIELD_SUMMARY                      = 'summary';
-	public const FIELD_STATUS                       = 'status';
-	public const FIELD_VERSION_MARKER               = 'version_marker';
-	public const FIELD_RECOMMENDED_PAGE_FAMILIES   = 'recommended_page_families';
+	public const FIELD_SUBTYPE_KEY                    = 'subtype_key';
+	public const FIELD_LABEL                          = 'label';
+	public const FIELD_SUMMARY                        = 'summary';
+	public const FIELD_STATUS                         = 'status';
+	public const FIELD_VERSION_MARKER                 = 'version_marker';
+	public const FIELD_RECOMMENDED_PAGE_FAMILIES      = 'recommended_page_families';
 	public const FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS = 'recommended_page_template_refs';
-	public const FIELD_RECOMMENDED_SECTION_REFS     = 'recommended_section_refs';
-	public const FIELD_TOKEN_PRESET_REF             = 'token_preset_ref';
-	public const FIELD_CTA_GUIDANCE_REF             = 'cta_guidance_ref';
-	public const FIELD_LPAGERY_GUIDANCE_REF         = 'lpagery_guidance_ref';
-	public const FIELD_METADATA                     = 'metadata';
+	public const FIELD_RECOMMENDED_SECTION_REFS       = 'recommended_section_refs';
+	public const FIELD_TOKEN_PRESET_REF               = 'token_preset_ref';
+	public const FIELD_CTA_GUIDANCE_REF               = 'cta_guidance_ref';
+	public const FIELD_LPAGERY_GUIDANCE_REF           = 'lpagery_guidance_ref';
+	public const FIELD_METADATA                       = 'metadata';
 	/** Optional: when deprecated, replacement bundle key (industry-pack-deprecation-contract.md). */
-	public const FIELD_REPLACEMENT_REF              = 'replacement_ref';
+	public const FIELD_REPLACEMENT_REF = 'replacement_ref';
 
-	public const STATUS_ACTIVE    = 'active';
-	public const STATUS_DRAFT     = 'draft';
+	public const STATUS_ACTIVE     = 'active';
+	public const STATUS_DRAFT      = 'draft';
 	public const STATUS_DEPRECATED = 'deprecated';
 
 	public const SUPPORTED_SCHEMA_VERSION = '1';
-	private const KEY_PATTERN = '#^[a-z0-9_-]+$#';
-	private const KEY_MAX_LENGTH = 64;
+	private const KEY_PATTERN             = '#^[a-z0-9_-]+$#';
+	private const KEY_MAX_LENGTH          = 64;
 
 	/** @var array<string, array<string, mixed>> Map of bundle_key => bundle definition. */
 	private array $by_key = array();
@@ -63,7 +63,7 @@ final class Industry_Starter_Bundle_Registry {
 		?Industry_Read_Model_Cache_Service $cache_service = null,
 		?Industry_Cache_Key_Builder $cache_key_builder = null
 	) {
-		$this->cache_service    = $cache_service;
+		$this->cache_service     = $cache_service;
 		$this->cache_key_builder = $cache_key_builder;
 	}
 
@@ -95,7 +95,7 @@ final class Industry_Starter_Bundle_Registry {
 			}
 			$key = \trim( (string) ( $bundle[ self::FIELD_BUNDLE_KEY ] ?? '' ) );
 			if ( $key !== '' && ! isset( $this->by_key[ $key ] ) ) {
-				$normalized = $this->normalize_bundle( $bundle );
+				$normalized           = $this->normalize_bundle( $bundle );
 				$this->by_key[ $key ] = $normalized;
 				$this->all[]          = $normalized;
 			}
@@ -126,9 +126,9 @@ final class Industry_Starter_Bundle_Registry {
 		if ( $want_industry === '' ) {
 			return array();
 		}
-		$want_subtype = \trim( $subtype_key );
+		$want_subtype          = \trim( $subtype_key );
 		$industry_only_bundles = array();
-		$subtype_bundles = array();
+		$subtype_bundles       = array();
 		foreach ( $this->all as $bundle ) {
 			$ik = isset( $bundle[ self::FIELD_INDUSTRY_KEY ] ) && \is_string( $bundle[ self::FIELD_INDUSTRY_KEY ] )
 				? \trim( $bundle[ self::FIELD_INDUSTRY_KEY ] )
@@ -231,7 +231,7 @@ final class Industry_Starter_Bundle_Registry {
 		$out = array(
 			self::FIELD_BUNDLE_KEY     => \trim( (string) ( $bundle[ self::FIELD_BUNDLE_KEY ] ?? '' ) ),
 			self::FIELD_INDUSTRY_KEY   => \trim( (string) ( $bundle[ self::FIELD_INDUSTRY_KEY ] ?? '' ) ),
-			self::FIELD_SUBTYPE_KEY   => isset( $bundle[ self::FIELD_SUBTYPE_KEY ] ) && \is_string( $bundle[ self::FIELD_SUBTYPE_KEY ] )
+			self::FIELD_SUBTYPE_KEY    => isset( $bundle[ self::FIELD_SUBTYPE_KEY ] ) && \is_string( $bundle[ self::FIELD_SUBTYPE_KEY ] )
 				? \trim( $bundle[ self::FIELD_SUBTYPE_KEY ] )
 				: '',
 			self::FIELD_LABEL          => \trim( (string) ( $bundle[ self::FIELD_LABEL ] ?? '' ) ),
@@ -258,17 +258,17 @@ final class Industry_Starter_Bundle_Registry {
 			$out[ self::FIELD_RECOMMENDED_SECTION_REFS ] = array();
 		}
 
-		$out[ self::FIELD_TOKEN_PRESET_REF ] = isset( $bundle[ self::FIELD_TOKEN_PRESET_REF ] ) && \is_string( $bundle[ self::FIELD_TOKEN_PRESET_REF ] )
+		$out[ self::FIELD_TOKEN_PRESET_REF ]     = isset( $bundle[ self::FIELD_TOKEN_PRESET_REF ] ) && \is_string( $bundle[ self::FIELD_TOKEN_PRESET_REF ] )
 			? \trim( $bundle[ self::FIELD_TOKEN_PRESET_REF ] )
 			: '';
-		$out[ self::FIELD_CTA_GUIDANCE_REF ] = isset( $bundle[ self::FIELD_CTA_GUIDANCE_REF ] ) && \is_string( $bundle[ self::FIELD_CTA_GUIDANCE_REF ] )
+		$out[ self::FIELD_CTA_GUIDANCE_REF ]     = isset( $bundle[ self::FIELD_CTA_GUIDANCE_REF ] ) && \is_string( $bundle[ self::FIELD_CTA_GUIDANCE_REF ] )
 			? \trim( $bundle[ self::FIELD_CTA_GUIDANCE_REF ] )
 			: '';
 		$out[ self::FIELD_LPAGERY_GUIDANCE_REF ] = isset( $bundle[ self::FIELD_LPAGERY_GUIDANCE_REF ] ) && \is_string( $bundle[ self::FIELD_LPAGERY_GUIDANCE_REF ] )
 			? \trim( $bundle[ self::FIELD_LPAGERY_GUIDANCE_REF ] )
 			: '';
 
-		$out[ self::FIELD_METADATA ] = isset( $bundle[ self::FIELD_METADATA ] ) && \is_array( $bundle[ self::FIELD_METADATA ] )
+		$out[ self::FIELD_METADATA ]        = isset( $bundle[ self::FIELD_METADATA ] ) && \is_array( $bundle[ self::FIELD_METADATA ] )
 			? $bundle[ self::FIELD_METADATA ]
 			: array();
 		$out[ self::FIELD_REPLACEMENT_REF ] = isset( $bundle[ self::FIELD_REPLACEMENT_REF ] ) && \is_string( $bundle[ self::FIELD_REPLACEMENT_REF ] )

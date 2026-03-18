@@ -43,11 +43,11 @@ final class Composition_Duplicator {
 		}
 
 		$clone = array(
-			Composition_Schema::FIELD_NAME             => $new_name !== '' ? $new_name : ( 'Copy of ' . ( $source[ Composition_Schema::FIELD_NAME ] ?? 'Composition' ) ),
+			Composition_Schema::FIELD_NAME                 => $new_name !== '' ? $new_name : ( 'Copy of ' . ( $source[ Composition_Schema::FIELD_NAME ] ?? 'Composition' ) ),
 			Composition_Schema::FIELD_ORDERED_SECTION_LIST => $source[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array(),
-			Composition_Schema::FIELD_STATUS           => Composition_Statuses::DRAFT,
-			Composition_Schema::FIELD_VALIDATION_STATUS => Composition_Validation_Result::PENDING_VALIDATION,
-			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF => (string) ( $source[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' ),
+			Composition_Schema::FIELD_STATUS               => Composition_Statuses::DRAFT,
+			Composition_Schema::FIELD_VALIDATION_STATUS    => Composition_Validation_Result::PENDING_VALIDATION,
+			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF  => (string) ( $source[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' ),
 			Composition_Schema::FIELD_DUPLICATED_FROM_COMPOSITION_ID => $source_comp_id,
 			Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF => (string) ( $source[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] ?? '' ),
 		);

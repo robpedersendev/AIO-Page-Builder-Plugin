@@ -57,13 +57,13 @@ final class Registry_Deprecation_Test extends TestCase {
 		$this->section_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
 		$this->page_repo    = new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
 
-		$section_norm  = new \AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer();
-		$section_valid = new \AIOPageBuilder\Domain\Registries\Section\Section_Validator( $section_norm, $this->section_repo );
+		$section_norm              = new \AIOPageBuilder\Domain\Registries\Section\Section_Definition_Normalizer();
+		$section_valid             = new \AIOPageBuilder\Domain\Registries\Section\Section_Validator( $section_norm, $this->section_repo );
 		$this->deprecation_service = new Registry_Deprecation_Service( $this->section_repo, $this->page_repo );
 		$this->section_registry    = new Section_Registry_Service( $section_valid, $this->section_repo, $this->deprecation_service );
 
-		$page_norm  = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer();
-		$page_valid = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator( $page_norm, $this->page_repo, $this->section_registry );
+		$page_norm                    = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Normalizer();
+		$page_valid                   = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Validator( $page_norm, $this->page_repo, $this->section_registry );
 		$this->page_template_registry = new \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Registry_Service( $page_valid, $this->page_repo, $this->deprecation_service );
 
 		$this->integrity_validator = new Registry_Integrity_Validator( $this->section_registry, $this->page_template_registry );
@@ -81,34 +81,46 @@ final class Registry_Deprecation_Test extends TestCase {
 
 	private function valid_minimal_section( string $key = 'st01_hero', string $name = 'Hero' ): array {
 		return array(
-			Section_Schema::FIELD_INTERNAL_KEY           => $key,
-			Section_Schema::FIELD_NAME                  => $name,
-			Section_Schema::FIELD_PURPOSE_SUMMARY        => 'Purpose.',
-			Section_Schema::FIELD_CATEGORY               => 'hero_intro',
+			Section_Schema::FIELD_INTERNAL_KEY             => $key,
+			Section_Schema::FIELD_NAME                     => $name,
+			Section_Schema::FIELD_PURPOSE_SUMMARY          => 'Purpose.',
+			Section_Schema::FIELD_CATEGORY                 => 'hero_intro',
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp',
-			Section_Schema::FIELD_FIELD_BLUEPRINT_REF    => 'acf',
-			Section_Schema::FIELD_HELPER_REF             => 'helper',
-			Section_Schema::FIELD_CSS_CONTRACT_REF       => 'css',
-			Section_Schema::FIELD_DEFAULT_VARIANT        => 'default',
-			Section_Schema::FIELD_VARIANTS               => array( 'default' => array( 'label' => 'Default' ) ),
-			Section_Schema::FIELD_COMPATIBILITY          => array(),
-			Section_Schema::FIELD_VERSION                => array( 'version' => '1' ),
-			Section_Schema::FIELD_STATUS                 => 'active',
-			Section_Schema::FIELD_RENDER_MODE            => 'block',
-			Section_Schema::FIELD_ASSET_DECLARATION      => array( 'none' => true ),
+			Section_Schema::FIELD_FIELD_BLUEPRINT_REF      => 'acf',
+			Section_Schema::FIELD_HELPER_REF               => 'helper',
+			Section_Schema::FIELD_CSS_CONTRACT_REF         => 'css',
+			Section_Schema::FIELD_DEFAULT_VARIANT          => 'default',
+			Section_Schema::FIELD_VARIANTS                 => array( 'default' => array( 'label' => 'Default' ) ),
+			Section_Schema::FIELD_COMPATIBILITY            => array(),
+			Section_Schema::FIELD_VERSION                  => array( 'version' => '1' ),
+			Section_Schema::FIELD_STATUS                   => 'active',
+			Section_Schema::FIELD_RENDER_MODE              => 'block',
+			Section_Schema::FIELD_ASSET_DECLARATION        => array( 'none' => true ),
 		);
 	}
 
 	public function test_valid_deprecation_transition_with_replacement(): void {
 		$this->seed_sections();
 		$GLOBALS['_aio_wp_insert_post_return'] = 101;
-		$r1 = $this->section_registry->create( $this->valid_minimal_section( 'st_old', 'Old' ) );
+		$r1                                    = $this->section_registry->create( $this->valid_minimal_section( 'st_old', 'Old' ) );
 		$this->assertTrue( $r1->success );
 
-		$post = new \WP_Post( array( 'ID' => 101, 'post_type' => Object_Type_Keys::SECTION_TEMPLATE, 'post_title' => 'Old', 'post_status' => 'publish', 'post_name' => 'st_old' ) );
-		$GLOBALS['_aio_get_post_return'] = $post;
-		$GLOBALS['_aio_wp_query_posts'] = array_merge( $GLOBALS['_aio_wp_query_posts'] ?? array(), array( $post ) );
-		$GLOBALS['_aio_post_meta']['101'] = array( '_aio_internal_key' => 'st_old', '_aio_status' => 'active', '_aio_section_definition' => wp_json_encode( $r1->definition ) );
+		$post                                  = new \WP_Post(
+			array(
+				'ID'          => 101,
+				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+				'post_title'  => 'Old',
+				'post_status' => 'publish',
+				'post_name'   => 'st_old',
+			)
+		);
+		$GLOBALS['_aio_get_post_return']       = $post;
+		$GLOBALS['_aio_wp_query_posts']        = array_merge( $GLOBALS['_aio_wp_query_posts'] ?? array(), array( $post ) );
+		$GLOBALS['_aio_post_meta']['101']      = array(
+			'_aio_internal_key'       => 'st_old',
+			'_aio_status'             => 'active',
+			'_aio_section_definition' => wp_json_encode( $r1->definition ),
+		);
 		$GLOBALS['_aio_wp_update_post_return'] = 101;
 
 		$dep = $this->section_registry->deprecate( 101, 'Superseded by st01_hero', 'st01_hero' );
@@ -121,13 +133,25 @@ final class Registry_Deprecation_Test extends TestCase {
 	public function test_missing_reason_rejection(): void {
 		$this->seed_sections();
 		$GLOBALS['_aio_wp_insert_post_return'] = 102;
-		$r1 = $this->section_registry->create( $this->valid_minimal_section( 'st_noreason', 'NoReason' ) );
+		$r1                                    = $this->section_registry->create( $this->valid_minimal_section( 'st_noreason', 'NoReason' ) );
 		$this->assertTrue( $r1->success );
 
-		$post = new \WP_Post( array( 'ID' => 102, 'post_type' => Object_Type_Keys::SECTION_TEMPLATE, 'post_title' => 'NoReason', 'post_status' => 'publish', 'post_name' => 'st_noreason' ) );
-		$GLOBALS['_aio_get_post_return'] = $post;
-		$GLOBALS['_aio_wp_query_posts'] = array_merge( $GLOBALS['_aio_wp_query_posts'] ?? array(), array( $post ) );
-		$GLOBALS['_aio_post_meta']['102'] = array( '_aio_internal_key' => 'st_noreason', '_aio_status' => 'active', '_aio_section_definition' => wp_json_encode( $r1->definition ) );
+		$post                             = new \WP_Post(
+			array(
+				'ID'          => 102,
+				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+				'post_title'  => 'NoReason',
+				'post_status' => 'publish',
+				'post_name'   => 'st_noreason',
+			)
+		);
+		$GLOBALS['_aio_get_post_return']  = $post;
+		$GLOBALS['_aio_wp_query_posts']   = array_merge( $GLOBALS['_aio_wp_query_posts'] ?? array(), array( $post ) );
+		$GLOBALS['_aio_post_meta']['102'] = array(
+			'_aio_internal_key'       => 'st_noreason',
+			'_aio_status'             => 'active',
+			'_aio_section_definition' => wp_json_encode( $r1->definition ),
+		);
 
 		$dep = $this->section_registry->deprecate( 102, '', '' );
 		$this->assertFalse( $dep->success );
@@ -137,13 +161,25 @@ final class Registry_Deprecation_Test extends TestCase {
 	public function test_invalid_replacement_rejection(): void {
 		$this->seed_sections();
 		$GLOBALS['_aio_wp_insert_post_return'] = 103;
-		$r1 = $this->section_registry->create( $this->valid_minimal_section( 'st_invalid', 'Invalid' ) );
+		$r1                                    = $this->section_registry->create( $this->valid_minimal_section( 'st_invalid', 'Invalid' ) );
 		$this->assertTrue( $r1->success );
 
-		$post = new \WP_Post( array( 'ID' => 103, 'post_type' => Object_Type_Keys::SECTION_TEMPLATE, 'post_title' => 'Invalid', 'post_status' => 'publish', 'post_name' => 'st_invalid' ) );
-		$GLOBALS['_aio_get_post_return'] = $post;
-		$GLOBALS['_aio_wp_query_posts'] = array_merge( $GLOBALS['_aio_wp_query_posts'] ?? array(), array( $post ) );
-		$GLOBALS['_aio_post_meta']['103'] = array( '_aio_internal_key' => 'st_invalid', '_aio_status' => 'active', '_aio_section_definition' => wp_json_encode( $r1->definition ) );
+		$post                             = new \WP_Post(
+			array(
+				'ID'          => 103,
+				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+				'post_title'  => 'Invalid',
+				'post_status' => 'publish',
+				'post_name'   => 'st_invalid',
+			)
+		);
+		$GLOBALS['_aio_get_post_return']  = $post;
+		$GLOBALS['_aio_wp_query_posts']   = array_merge( $GLOBALS['_aio_wp_query_posts'] ?? array(), array( $post ) );
+		$GLOBALS['_aio_post_meta']['103'] = array(
+			'_aio_internal_key'       => 'st_invalid',
+			'_aio_status'             => 'active',
+			'_aio_section_definition' => wp_json_encode( $r1->definition ),
+		);
 
 		$dep = $this->section_registry->deprecate( 103, 'Invalid replacement', 'st_nonexistent_xyz' );
 		$this->assertFalse( $dep->success );
@@ -153,20 +189,36 @@ final class Registry_Deprecation_Test extends TestCase {
 	public function test_historical_object_readable_after_deprecation(): void {
 		$this->seed_sections();
 		$GLOBALS['_aio_wp_insert_post_return'] = 104;
-		$r1 = $this->section_registry->create( $this->valid_minimal_section( 'st_hist', 'Hist' ) );
+		$r1                                    = $this->section_registry->create( $this->valid_minimal_section( 'st_hist', 'Hist' ) );
 		$this->assertTrue( $r1->success );
 
-		$post = new \WP_Post( array( 'ID' => 104, 'post_type' => Object_Type_Keys::SECTION_TEMPLATE, 'post_title' => 'Hist', 'post_status' => 'publish', 'post_name' => 'st_hist' ) );
-		$GLOBALS['_aio_get_post_return'] = $post;
-		$GLOBALS['_aio_wp_query_posts'] = array_merge( $GLOBALS['_aio_wp_query_posts'] ?? array(), array( $post ) );
-		$GLOBALS['_aio_post_meta']['104'] = array( '_aio_internal_key' => 'st_hist', '_aio_status' => 'active', '_aio_section_definition' => wp_json_encode( $r1->definition ) );
+		$post                                  = new \WP_Post(
+			array(
+				'ID'          => 104,
+				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+				'post_title'  => 'Hist',
+				'post_status' => 'publish',
+				'post_name'   => 'st_hist',
+			)
+		);
+		$GLOBALS['_aio_get_post_return']       = $post;
+		$GLOBALS['_aio_wp_query_posts']        = array_merge( $GLOBALS['_aio_wp_query_posts'] ?? array(), array( $post ) );
+		$GLOBALS['_aio_post_meta']['104']      = array(
+			'_aio_internal_key'       => 'st_hist',
+			'_aio_status'             => 'active',
+			'_aio_section_definition' => wp_json_encode( $r1->definition ),
+		);
 		$GLOBALS['_aio_wp_update_post_return'] = 104;
 
 		$dep = $this->section_registry->deprecate( 104, 'Legacy', '' );
 		$this->assertTrue( $dep->success );
 
-		$GLOBALS['_aio_post_meta']['104'] = array( '_aio_internal_key' => 'st_hist', '_aio_status' => 'deprecated', '_aio_section_definition' => wp_json_encode( $dep->definition ) );
-		$read = $this->section_registry->get_by_key( 'st_hist' );
+		$GLOBALS['_aio_post_meta']['104'] = array(
+			'_aio_internal_key'       => 'st_hist',
+			'_aio_status'             => 'deprecated',
+			'_aio_section_definition' => wp_json_encode( $dep->definition ),
+		);
+		$read                             = $this->section_registry->get_by_key( 'st_hist' );
 		$this->assertNotNull( $read );
 		$this->assertSame( 'st_hist', $read[ Section_Schema::FIELD_INTERNAL_KEY ] );
 		$this->assertSame( 'deprecated', $read['status'] ?? '' );
@@ -193,7 +245,14 @@ final class Registry_Deprecation_Test extends TestCase {
 
 	public function test_validate_composition_section_refs_missing(): void {
 		$this->seed_sections();
-		$comp = array( 'ordered_section_list' => array( array( 'section_key' => 'st99_missing', 'position' => 0 ) ) );
+		$comp   = array(
+			'ordered_section_list' => array(
+				array(
+					'section_key' => 'st99_missing',
+					'position'    => 0,
+				),
+			),
+		);
 		$result = $this->integrity_validator->validate_composition_section_refs( $comp );
 		$this->assertFalse( $result->valid );
 		$this->assertContains( Registry_Validation_Result::CODE_REFERENCE_MISSING, $result->codes );
@@ -209,12 +268,20 @@ final class Registry_Deprecation_Test extends TestCase {
 	}
 
 	private function seed_sections(): void {
-		$GLOBALS['_aio_wp_query_posts'] = array(
-			new \WP_Post( array( 'ID' => 901, 'post_type' => Object_Type_Keys::SECTION_TEMPLATE, 'post_title' => 'Hero', 'post_status' => 'publish', 'post_name' => 'st01_hero' ) ),
+		$GLOBALS['_aio_wp_query_posts']   = array(
+			new \WP_Post(
+				array(
+					'ID'          => 901,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => 'Hero',
+					'post_status' => 'publish',
+					'post_name'   => 'st01_hero',
+				)
+			),
 		);
 		$GLOBALS['_aio_post_meta']['901'] = array(
-			'_aio_internal_key'      => 'st01_hero',
-			'_aio_status'            => 'active',
+			'_aio_internal_key'       => 'st01_hero',
+			'_aio_status'             => 'active',
 			'_aio_section_definition' => wp_json_encode( $this->valid_minimal_section( 'st01_hero', 'Hero' ) ),
 		);
 	}

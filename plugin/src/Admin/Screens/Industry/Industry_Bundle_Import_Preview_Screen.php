@@ -29,10 +29,10 @@ final class Industry_Bundle_Import_Preview_Screen {
 
 	public const SLUG = 'aio-page-builder-industry-bundle-import-preview';
 
-	private const TRANSIENT_PREVIEW   = 'aio_industry_bundle_preview_%d';
+	private const TRANSIENT_PREVIEW    = 'aio_industry_bundle_preview_%d';
 	private const NONCE_ACTION_PREVIEW = 'aio_industry_bundle_preview';
 	/** Nonce action for clear-preview (state-changing; SPR-007 deferred apply). */
-	private const NONCE_ACTION_CLEAR  = 'aio_industry_bundle_clear_preview';
+	private const NONCE_ACTION_CLEAR = 'aio_industry_bundle_clear_preview';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -56,18 +56,18 @@ final class Industry_Bundle_Import_Preview_Screen {
 	 */
 	public function get_local_state_for_conflict(): array {
 		$state = array(
-			Industry_Pack_Bundle_Service::PAYLOAD_PACKS                   => array(),
-			Industry_Pack_Bundle_Service::PAYLOAD_STARTER_BUNDLES         => array(),
-			Industry_Pack_Bundle_Service::PAYLOAD_STYLE_PRESETS           => array(),
-			Industry_Pack_Bundle_Service::PAYLOAD_CTA_PATTERNS             => array(),
-			Industry_Pack_Bundle_Service::PAYLOAD_SEO_GUIDANCE             => array(),
-			Industry_Pack_Bundle_Service::PAYLOAD_LPAGERY_RULES            => array(),
-			Industry_Pack_Bundle_Service::PAYLOAD_SECTION_HELPER_OVERLAYS  => array(),
-			Industry_Pack_Bundle_Service::PAYLOAD_PAGE_ONE_PAGER_OVERLAYS  => array(),
-			Industry_Pack_Bundle_Service::PAYLOAD_QUESTION_PACKS           => array(),
-			Industry_Pack_Bundle_Service::PAYLOAD_SITE_PROFILE              => array(),
-			'pack_versions' => array(),
-			'site_profile'  => false,
+			Industry_Pack_Bundle_Service::PAYLOAD_PACKS => array(),
+			Industry_Pack_Bundle_Service::PAYLOAD_STARTER_BUNDLES => array(),
+			Industry_Pack_Bundle_Service::PAYLOAD_STYLE_PRESETS => array(),
+			Industry_Pack_Bundle_Service::PAYLOAD_CTA_PATTERNS => array(),
+			Industry_Pack_Bundle_Service::PAYLOAD_SEO_GUIDANCE => array(),
+			Industry_Pack_Bundle_Service::PAYLOAD_LPAGERY_RULES => array(),
+			Industry_Pack_Bundle_Service::PAYLOAD_SECTION_HELPER_OVERLAYS => array(),
+			Industry_Pack_Bundle_Service::PAYLOAD_PAGE_ONE_PAGER_OVERLAYS => array(),
+			Industry_Pack_Bundle_Service::PAYLOAD_QUESTION_PACKS => array(),
+			Industry_Pack_Bundle_Service::PAYLOAD_SITE_PROFILE => array(),
+			'pack_versions'                             => array(),
+			'site_profile'                              => false,
 		);
 		if ( ! $this->container instanceof Service_Container ) {
 			return $state;
@@ -75,28 +75,28 @@ final class Industry_Bundle_Import_Preview_Screen {
 		if ( $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY ) ) {
 			$reg = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY );
 			if ( $reg instanceof Industry_Pack_Registry ) {
-				$all = $reg->get_all();
-				$keys = array();
+				$all      = $reg->get_all();
+				$keys     = array();
 				$versions = array();
 				foreach ( $all as $pack ) {
 					$key = isset( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] )
 						? trim( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] )
 						: '';
 					if ( $key !== '' ) {
-						$keys[] = $key;
+						$keys[]           = $key;
 						$versions[ $key ] = isset( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] )
 							? trim( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] )
 							: '';
 					}
 				}
 				$state[ Industry_Pack_Bundle_Service::PAYLOAD_PACKS ] = $keys;
-				$state['pack_versions'] = $versions;
+				$state['pack_versions']                               = $versions;
 			}
 		}
 		if ( $this->container->has( Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ) {
 			$reg = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
 			if ( $reg instanceof Industry_Starter_Bundle_Registry ) {
-				$all = $reg->list_all();
+				$all  = $reg->list_all();
 				$keys = array();
 				foreach ( $all as $bundle ) {
 					$key = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ) && is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] )
@@ -110,8 +110,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 			}
 		}
 		if ( $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
-			$repo = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
-			$profile = $repo && \method_exists( $repo, 'get_profile' ) ? $repo->get_profile() : array();
+			$repo                  = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			$profile               = $repo && \method_exists( $repo, 'get_profile' ) ? $repo->get_profile() : array();
 			$state['site_profile'] = ! empty( $profile['primary_industry_key'] );
 		}
 		return $state;
@@ -123,7 +123,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function get_state(): array {
-		$uid = \get_current_user_id();
+		$uid           = \get_current_user_id();
 		$transient_key = \sprintf( self::TRANSIENT_PREVIEW, $uid );
 		// * Clear preview: state-changing; requires nonce (SPR-007).
 		$clear_nonce = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ) : '';
@@ -184,12 +184,12 @@ final class Industry_Bundle_Import_Preview_Screen {
 	 * @return void
 	 */
 	private function render_preview( array $state ): void {
-		$conflicts = $state['conflicts'];
-		$included = $state['included'];
-		$summary = $state['summary'];
-		$bundle = $state['bundle'];
-		$preview_url = \admin_url( 'admin.php?page=' . self::SLUG );
-		$cancel_url  = \wp_nonce_url( \add_query_arg( 'aio_bundle_cancel', '1', $preview_url ), self::NONCE_ACTION_CLEAR );
+		$conflicts         = $state['conflicts'];
+		$included          = $state['included'];
+		$summary           = $state['summary'];
+		$bundle            = $state['bundle'];
+		$preview_url       = \admin_url( 'admin.php?page=' . self::SLUG );
+		$cancel_url        = \wp_nonce_url( \add_query_arg( 'aio_bundle_cancel', '1', $preview_url ), self::NONCE_ACTION_CLEAR );
 		$import_export_url = \admin_url( 'admin.php?page=' . \AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen::SLUG );
 		?>
 		<div class="notice notice-info inline" style="margin: 1em 0;">
@@ -262,7 +262,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 
 	private function render_upload_form(): void {
 		$action = \admin_url( 'admin-post.php?action=aio_industry_bundle_preview' );
-		$nonce = \wp_nonce_field( self::NONCE_ACTION_PREVIEW, 'aio_industry_bundle_preview_nonce', true, false );
+		$nonce  = \wp_nonce_field( self::NONCE_ACTION_PREVIEW, 'aio_industry_bundle_preview_nonce', true, false );
 		?>
 		<form method="post" action="<?php echo \esc_url( $action ); ?>" enctype="multipart/form-data" style="max-width: 32em;">
 			<?php echo $nonce; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nonce field HTML from wp_nonce_field(). ?>

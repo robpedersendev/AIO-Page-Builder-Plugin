@@ -70,17 +70,17 @@ final class Uninstall_Export_And_Cleanup_Test extends TestCase {
 	 */
 	public function test_example_uninstall_result_payload_export_and_cleanup_path(): void {
 		$example = array(
-			'success'                   => true,
-			'message'                   => 'Export completed. Plugin data has been removed. Built pages remain.',
-			'export_choice'             => Uninstall_Result::CHOICE_FULL_BACKUP,
-			'export_result_reference'   => '/var/www/html/wp-content/uploads/aio-page-builder/exports/aio-export-pre_uninstall_backup-20250715-120000-mysite.zip',
-			'cleanup_scope'             => Uninstall_Cleanup_Service::SCOPE_FULL,
+			'success'                  => true,
+			'message'                  => 'Export completed. Plugin data has been removed. Built pages remain.',
+			'export_choice'            => Uninstall_Result::CHOICE_FULL_BACKUP,
+			'export_result_reference'  => '/var/www/html/wp-content/uploads/aio-page-builder/exports/aio-export-pre_uninstall_backup-20250715-120000-mysite.zip',
+			'cleanup_scope'            => Uninstall_Cleanup_Service::SCOPE_FULL,
 			'scheduled_events_removed' => true,
-			'plugin_data_removed'       => true,
-			'built_pages_preserved'     => true,
-			'log_reference'              => 'uninstall_2025-07-15T12:00:00Z',
+			'plugin_data_removed'      => true,
+			'built_pages_preserved'    => true,
+			'log_reference'            => 'uninstall_2025-07-15T12:00:00Z',
 		);
-		$result = Uninstall_Result::completed(
+		$result  = Uninstall_Result::completed(
 			$example['export_choice'],
 			$example['export_result_reference'],
 			$example['cleanup_scope'],
@@ -122,8 +122,8 @@ final class Uninstall_Export_And_Cleanup_Test extends TestCase {
 			new \AIOPageBuilder\Domain\ExportRestore\Export\Export_Zip_Packager( new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager() ),
 			null
 		);
-		$service = new Uninstall_Export_Prompt_Service( $generator, $cleanup );
-		$choices = $service->get_choices();
+		$service   = new Uninstall_Export_Prompt_Service( $generator, $cleanup );
+		$choices   = $service->get_choices();
 		$this->assertCount( 4, $choices );
 		$values = array_column( $choices, 'value' );
 		$this->assertContains( Uninstall_Result::CHOICE_FULL_BACKUP, $values );
@@ -146,7 +146,7 @@ final class Uninstall_Export_And_Cleanup_Test extends TestCase {
 		if ( ! class_exists( \AIOPageBuilder\Domain\ExportRestore\Export\Export_Generator::class, false ) ) {
 			$this->markTestSkipped( 'Export_Generator requires full plugin bootstrap.' );
 		}
-		$cleanup = new Uninstall_Cleanup_Service( null );
+		$cleanup   = new Uninstall_Cleanup_Service( null );
 		$generator = new \AIOPageBuilder\Domain\ExportRestore\Export\Export_Generator(
 			new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager(),
 			new \AIOPageBuilder\Infrastructure\Settings\Settings_Service(),
@@ -158,8 +158,8 @@ final class Uninstall_Export_And_Cleanup_Test extends TestCase {
 			new \AIOPageBuilder\Domain\ExportRestore\Export\Export_Zip_Packager( new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager() ),
 			null
 		);
-		$service = new Uninstall_Export_Prompt_Service( $generator, $cleanup );
-		$result  = $service->run_uninstall_flow( Uninstall_Result::CHOICE_CANCEL, 'log-cancel' );
+		$service   = new Uninstall_Export_Prompt_Service( $generator, $cleanup );
+		$result    = $service->run_uninstall_flow( Uninstall_Result::CHOICE_CANCEL, 'log-cancel' );
 		$this->assertFalse( $result->is_success() );
 		$this->assertSame( Uninstall_Result::CHOICE_CANCEL, $result->get_export_choice() );
 		$this->assertTrue( $result->built_pages_preserved() );

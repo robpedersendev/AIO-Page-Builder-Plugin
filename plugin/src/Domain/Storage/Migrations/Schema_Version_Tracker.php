@@ -84,7 +84,7 @@ final class Schema_Version_Tracker {
 	 * Records a migration result for audit/failure handling. Stores last result per migration_id in version_markers.
 	 * Minimum fields: migration_id, status, message (sanitized). No secrets.
 	 *
-	 * @param string          $migration_id Migration identifier.
+	 * @param string           $migration_id Migration identifier.
 	 * @param Migration_Result $result       Result (message and notes must be sanitized).
 	 * @return void
 	 */
@@ -98,9 +98,9 @@ final class Schema_Version_Tracker {
 			$current[ $log_key ] = array();
 		}
 		$current[ $log_key ][ $migration_id ] = array(
-			'status'     => $result->status,
-			'message'    => $result->message,
-			'safe_retry' => $result->safe_retry,
+			'status'      => $result->status,
+			'message'     => $result->message,
+			'safe_retry'  => $result->safe_retry,
 			'recorded_at' => gmdate( 'c' ),
 		);
 		$this->settings->set( self::VERSION_MARKERS_KEY, $current );
@@ -113,8 +113,8 @@ final class Schema_Version_Tracker {
 	 * @return bool True if installed version is greater than code version (e.g. downgrade scenario).
 	 */
 	public function is_installed_version_future( string $version_key ): bool {
-		$installed = $this->get_installed_versions();
-		$code      = Versions::all();
+		$installed   = $this->get_installed_versions();
+		$code        = Versions::all();
 		$installed_v = isset( $installed[ $version_key ] ) ? $installed[ $version_key ] : '0';
 		$code_v      = isset( $code[ $version_key ] ) ? $code[ $version_key ] : '1';
 		return version_compare( $installed_v, $code_v, '>' );

@@ -19,10 +19,10 @@ use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
  */
 final class Industry_Substitute_Suggestion_Engine {
 
-	private const FIT_RECOMMENDED   = 'recommended';
-	private const FIT_NEUTRAL       = 'neutral';
-	private const FIT_ALLOWED_WEAK  = 'allowed_weak_fit';
-	private const FIT_DISCOURAGED   = 'discouraged';
+	private const FIT_RECOMMENDED  = 'recommended';
+	private const FIT_NEUTRAL      = 'neutral';
+	private const FIT_ALLOWED_WEAK = 'allowed_weak_fit';
+	private const FIT_DISCOURAGED  = 'discouraged';
 
 	/** Section item key in resolver result. */
 	private const SECTION_KEY_FIELD = 'section_key';
@@ -32,11 +32,11 @@ final class Industry_Substitute_Suggestion_Engine {
 	/**
 	 * Suggests substitute sections when the original is discouraged or weak-fit.
 	 *
-	 * @param string                            $original_section_key Section key that is discouraged or weak-fit.
-	 * @param string                            $section_fit          Fit classification for the original (discouraged or allowed_weak_fit to suggest).
+	 * @param string                                 $original_section_key Section key that is discouraged or weak-fit.
+	 * @param string                                 $section_fit          Fit classification for the original (discouraged or allowed_weak_fit to suggest).
 	 * @param Industry_Section_Recommendation_Result $result          Resolver result with all section scores/fit.
-	 * @param array<int, array<string, mixed>> $section_definitions  Section definitions (internal_key, section_purpose_family).
-	 * @param int                               $max                  Max suggestions to return (default 5).
+	 * @param array<int, array<string, mixed>>       $section_definitions  Section definitions (internal_key, section_purpose_family).
+	 * @param int                                    $max                  Max suggestions to return (default 5).
 	 * @return array<int, array<string, mixed>> List of Industry_Substitute_Suggestion_Result shapes.
 	 */
 	public function suggest_section_substitutes(
@@ -49,13 +49,13 @@ final class Industry_Substitute_Suggestion_Engine {
 		if ( $section_fit === self::FIT_RECOMMENDED || $section_fit === self::FIT_NEUTRAL ) {
 			return array();
 		}
-		$items = $result->get_items();
-		$by_key = $this->index_section_items_by_key( $items );
-		$original_score = isset( $by_key[ $original_section_key ] ) ? (int) ( $by_key[ $original_section_key ]['score'] ?? 0 ) : 0;
+		$items             = $result->get_items();
+		$by_key            = $this->index_section_items_by_key( $items );
+		$original_score    = isset( $by_key[ $original_section_key ] ) ? (int) ( $by_key[ $original_section_key ]['score'] ?? 0 ) : 0;
 		$original_warnings = isset( $by_key[ $original_section_key ] ) && is_array( $by_key[ $original_section_key ]['warning_flags'] ?? null )
 			? $by_key[ $original_section_key ]['warning_flags']
 			: array();
-		$original_family = $this->get_section_purpose_family( $original_section_key, $section_definitions );
+		$original_family   = $this->get_section_purpose_family( $original_section_key, $section_definitions );
 
 		$candidates = array();
 		foreach ( $items as $item ) {
@@ -67,8 +67,8 @@ final class Industry_Substitute_Suggestion_Engine {
 			if ( $fit !== self::FIT_RECOMMENDED ) {
 				continue;
 			}
-			$score = (int) ( $item['score'] ?? 0 );
-			$family = $this->get_section_purpose_family( $key, $section_definitions );
+			$score        = (int) ( $item['score'] ?? 0 );
+			$family       = $this->get_section_purpose_family( $key, $section_definitions );
 			$candidates[] = array(
 				'key'    => $key,
 				'score'  => $score,
@@ -89,11 +89,11 @@ final class Industry_Substitute_Suggestion_Engine {
 	/**
 	 * Suggests substitute page templates when the original is discouraged or weak-fit.
 	 *
-	 * @param string                                 $original_template_key Template key that is discouraged or weak-fit.
-	 * @param string                                 $template_fit          Fit classification for the original.
+	 * @param string                                       $original_template_key Template key that is discouraged or weak-fit.
+	 * @param string                                       $template_fit          Fit classification for the original.
 	 * @param Industry_Page_Template_Recommendation_Result $result          Resolver result with all template scores/fit.
-	 * @param array<int, array<string, mixed>>       $template_definitions  Template definitions (internal_key, template_family).
-	 * @param int                                    $max                   Max suggestions to return (default 5).
+	 * @param array<int, array<string, mixed>>             $template_definitions  Template definitions (internal_key, template_family).
+	 * @param int                                          $max                   Max suggestions to return (default 5).
 	 * @return array<int, array<string, mixed>> List of Industry_Substitute_Suggestion_Result shapes.
 	 */
 	public function suggest_template_substitutes(
@@ -106,13 +106,13 @@ final class Industry_Substitute_Suggestion_Engine {
 		if ( $template_fit === self::FIT_RECOMMENDED || $template_fit === self::FIT_NEUTRAL ) {
 			return array();
 		}
-		$items = $result->get_items();
-		$by_key = $this->index_template_items_by_key( $items );
-		$original_score = isset( $by_key[ $original_template_key ] ) ? (int) ( $by_key[ $original_template_key ]['score'] ?? 0 ) : 0;
+		$items             = $result->get_items();
+		$by_key            = $this->index_template_items_by_key( $items );
+		$original_score    = isset( $by_key[ $original_template_key ] ) ? (int) ( $by_key[ $original_template_key ]['score'] ?? 0 ) : 0;
 		$original_warnings = isset( $by_key[ $original_template_key ] ) && is_array( $by_key[ $original_template_key ]['warning_flags'] ?? null )
 			? $by_key[ $original_template_key ]['warning_flags']
 			: array();
-		$original_family = $this->get_template_family( $original_template_key, $template_definitions );
+		$original_family   = $this->get_template_family( $original_template_key, $template_definitions );
 
 		$candidates = array();
 		foreach ( $items as $item ) {
@@ -124,8 +124,8 @@ final class Industry_Substitute_Suggestion_Engine {
 			if ( $fit !== self::FIT_RECOMMENDED ) {
 				continue;
 			}
-			$score = (int) ( $item['score'] ?? 0 );
-			$family = $this->get_template_family( $key, $template_definitions );
+			$score        = (int) ( $item['score'] ?? 0 );
+			$family       = $this->get_template_family( $key, $template_definitions );
 			$candidates[] = array(
 				'key'    => $key,
 				'score'  => $score,
@@ -213,25 +213,28 @@ final class Industry_Substitute_Suggestion_Engine {
 		array $candidates,
 		int $max
 	): array {
-		usort( $candidates, function ( array $a, array $b ) use ( $original_family ): int {
-			$fam_a = $a['family'] !== '' && $a['family'] === $original_family ? 1 : 0;
-			$fam_b = $b['family'] !== '' && $b['family'] === $original_family ? 1 : 0;
-			if ( $fam_a !== $fam_b ) {
-				return $fam_b - $fam_a;
+		usort(
+			$candidates,
+			function ( array $a, array $b ) use ( $original_family ): int {
+				$fam_a = $a['family'] !== '' && $a['family'] === $original_family ? 1 : 0;
+				$fam_b = $b['family'] !== '' && $b['family'] === $original_family ? 1 : 0;
+				if ( $fam_a !== $fam_b ) {
+					return $fam_b - $fam_a;
+				}
+				if ( $a['score'] !== $b['score'] ) {
+					return $b['score'] - $a['score'];
+				}
+				return strcmp( $a['key'], $b['key'] );
 			}
-			if ( $a['score'] !== $b['score'] ) {
-				return $b['score'] - $a['score'];
-			}
-			return strcmp( $a['key'], $b['key'] );
-		} );
+		);
 
 		$out = array();
 		foreach ( array_slice( $candidates, 0, $max ) as $c ) {
 			$reason = ( $original_family !== '' && $c['family'] === $original_family )
 				? Industry_Substitute_Suggestion_Result::REASON_SAME_FAMILY_BETTER_FIT
 				: Industry_Substitute_Suggestion_Result::REASON_RECOMMENDED_ALTERNATIVE;
-			$delta = $c['score'] - $original_score;
-			$out[] = Industry_Substitute_Suggestion_Result::create(
+			$delta  = $c['score'] - $original_score;
+			$out[]  = Industry_Substitute_Suggestion_Result::create(
 				$original_key,
 				$c['key'],
 				$reason,
@@ -254,25 +257,28 @@ final class Industry_Substitute_Suggestion_Engine {
 		array $candidates,
 		int $max
 	): array {
-		usort( $candidates, function ( array $a, array $b ) use ( $original_family ): int {
-			$fam_a = $a['family'] !== '' && $a['family'] === $original_family ? 1 : 0;
-			$fam_b = $b['family'] !== '' && $b['family'] === $original_family ? 1 : 0;
-			if ( $fam_a !== $fam_b ) {
-				return $fam_b - $fam_a;
+		usort(
+			$candidates,
+			function ( array $a, array $b ) use ( $original_family ): int {
+				$fam_a = $a['family'] !== '' && $a['family'] === $original_family ? 1 : 0;
+				$fam_b = $b['family'] !== '' && $b['family'] === $original_family ? 1 : 0;
+				if ( $fam_a !== $fam_b ) {
+					return $fam_b - $fam_a;
+				}
+				if ( $a['score'] !== $b['score'] ) {
+					return $b['score'] - $a['score'];
+				}
+				return strcmp( $a['key'], $b['key'] );
 			}
-			if ( $a['score'] !== $b['score'] ) {
-				return $b['score'] - $a['score'];
-			}
-			return strcmp( $a['key'], $b['key'] );
-		} );
+		);
 
 		$out = array();
 		foreach ( array_slice( $candidates, 0, $max ) as $c ) {
 			$reason = ( $original_family !== '' && $c['family'] === $original_family )
 				? Industry_Substitute_Suggestion_Result::REASON_SAME_FAMILY_BETTER_FIT
 				: Industry_Substitute_Suggestion_Result::REASON_RECOMMENDED_ALTERNATIVE;
-			$delta = $c['score'] - $original_score;
-			$out[] = Industry_Substitute_Suggestion_Result::create(
+			$delta  = $c['score'] - $original_score;
+			$out[]  = Industry_Substitute_Suggestion_Result::create(
 				$original_key,
 				$c['key'],
 				$reason,

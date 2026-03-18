@@ -40,21 +40,24 @@ final class Large_Library_Query_Test extends TestCase {
 
 	private function minimal_section_definition( string $key, string $category, string $status = 'active', string $purpose_family = '' ): array {
 		$def = array(
-			Section_Schema::FIELD_INTERNAL_KEY           => $key,
-			Section_Schema::FIELD_NAME                  => 'Section ' . $key,
-			Section_Schema::FIELD_PURPOSE_SUMMARY      => 'Purpose ' . $key,
-			Section_Schema::FIELD_CATEGORY             => $category,
-			Section_Schema::FIELD_STATUS                => $status,
+			Section_Schema::FIELD_INTERNAL_KEY             => $key,
+			Section_Schema::FIELD_NAME                     => 'Section ' . $key,
+			Section_Schema::FIELD_PURPOSE_SUMMARY          => 'Purpose ' . $key,
+			Section_Schema::FIELD_CATEGORY                 => $category,
+			Section_Schema::FIELD_STATUS                   => $status,
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp',
-			Section_Schema::FIELD_FIELD_BLUEPRINT_REF  => 'acf',
-			Section_Schema::FIELD_HELPER_REF           => 'helper',
-			Section_Schema::FIELD_CSS_CONTRACT_REF     => 'css',
-			Section_Schema::FIELD_DEFAULT_VARIANT      => 'default',
-			Section_Schema::FIELD_VARIANTS             => array( 'default' => array( 'label' => 'Default' ) ),
-			Section_Schema::FIELD_COMPATIBILITY        => array(),
-			Section_Schema::FIELD_VERSION              => array( 'version' => '1', 'stable_key_retained' => true ),
-			Section_Schema::FIELD_RENDER_MODE          => 'block',
-			Section_Schema::FIELD_ASSET_DECLARATION    => array( 'none' => true ),
+			Section_Schema::FIELD_FIELD_BLUEPRINT_REF      => 'acf',
+			Section_Schema::FIELD_HELPER_REF               => 'helper',
+			Section_Schema::FIELD_CSS_CONTRACT_REF         => 'css',
+			Section_Schema::FIELD_DEFAULT_VARIANT          => 'default',
+			Section_Schema::FIELD_VARIANTS                 => array( 'default' => array( 'label' => 'Default' ) ),
+			Section_Schema::FIELD_COMPATIBILITY            => array(),
+			Section_Schema::FIELD_VERSION                  => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Section_Schema::FIELD_RENDER_MODE              => 'block',
+			Section_Schema::FIELD_ASSET_DECLARATION        => array( 'none' => true ),
 		);
 		if ( $purpose_family !== '' ) {
 			$def['section_purpose_family'] = $purpose_family;
@@ -64,16 +67,16 @@ final class Large_Library_Query_Test extends TestCase {
 
 	private function minimal_page_template_definition( string $key, string $archetype, string $status = 'active' ): array {
 		return array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY    => $key,
-			Page_Template_Schema::FIELD_NAME           => 'Page ' . $key,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY => 'Purpose ' . $key,
-			Page_Template_Schema::FIELD_ARCHETYPE      => $archetype,
-			Page_Template_Schema::FIELD_STATUS         => $status,
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $key,
+			Page_Template_Schema::FIELD_NAME             => 'Page ' . $key,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => 'Purpose ' . $key,
+			Page_Template_Schema::FIELD_ARCHETYPE        => $archetype,
+			Page_Template_Schema::FIELD_STATUS           => $status,
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(),
 			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => array(),
-			Page_Template_Schema::FIELD_COMPATIBILITY  => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER      => array( 'page_purpose_summary' => '' ),
-			Page_Template_Schema::FIELD_VERSION        => array( 'version' => '1' ),
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => array( 'page_purpose_summary' => '' ),
+			Page_Template_Schema::FIELD_VERSION          => array( 'version' => '1' ),
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => array(),
 			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => '',
 		);
@@ -82,9 +85,9 @@ final class Large_Library_Query_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_post_meta'] = array();
-		$this->section_repo       = new Section_Template_Repository();
-		$this->page_template_repo = new Page_Template_Repository();
-		$this->query_service      = new Large_Library_Query_Service( $this->section_repo, $this->page_template_repo );
+		$this->section_repo        = new Section_Template_Repository();
+		$this->page_template_repo  = new Page_Template_Repository();
+		$this->query_service       = new Large_Library_Query_Service( $this->section_repo, $this->page_template_repo );
 	}
 
 	protected function tearDown(): void {
@@ -122,12 +125,17 @@ final class Large_Library_Query_Test extends TestCase {
 	public function test_filter_result_to_array(): void {
 		$pagination = Large_Library_Pagination::from_page_size( 1, 25, 10 );
 		$result     = new Large_Library_Filter_Result(
-			array( array( 'internal_key' => 'st_hero', 'name' => 'Hero' ) ),
+			array(
+				array(
+					'internal_key' => 'st_hero',
+					'name'         => 'Hero',
+				),
+			),
 			$pagination,
 			array( 'category' => array( 'hero_intro' => 10 ) ),
 			10
 		);
-		$a = $result->to_array();
+		$a          = $result->to_array();
 		$this->assertCount( 1, $a['rows'] );
 		$this->assertSame( 'st_hero', $a['rows'][0]['internal_key'] );
 		$this->assertSame( 10, $a['total_matching'] );
@@ -144,14 +152,16 @@ final class Large_Library_Query_Test extends TestCase {
 			$this->minimal_section_definition( 'st_cta_1', 'cta_conversion' ),
 		);
 		foreach ( $defs as $i => $def ) {
-			$id = 5000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID'          => $id,
-				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
-				'post_title'  => $def['name'],
-				'post_status' => 'publish',
-				'post_name'   => $def['internal_key'],
-			) );
+			$id                   = 5000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
 				'_aio_internal_key'       => $def['internal_key'],
 				'_aio_status'             => $def['status'],
@@ -176,15 +186,17 @@ final class Large_Library_Query_Test extends TestCase {
 		$posts = array();
 		$meta  = array();
 		for ( $i = 0; $i < 30; $i++ ) {
-			$def = $this->minimal_section_definition( 'st_' . $i, 'hero_intro' );
-			$id  = 6000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID'          => $id,
-				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
-				'post_title'  => $def['name'],
-				'post_status' => 'publish',
-				'post_name'   => $def['internal_key'],
-			) );
+			$def                  = $this->minimal_section_definition( 'st_' . $i, 'hero_intro' );
+			$id                   = 6000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
 				'_aio_internal_key'       => $def['internal_key'],
 				'_aio_status'             => $def['status'],
@@ -206,7 +218,7 @@ final class Large_Library_Query_Test extends TestCase {
 	}
 
 	public function test_combined_filters_sections(): void {
-		$defs = array(
+		$defs  = array(
 			$this->minimal_section_definition( 'st_a', 'hero_intro', 'active', 'hero' ),
 			$this->minimal_section_definition( 'st_b', 'hero_intro', 'draft', 'hero' ),
 			$this->minimal_section_definition( 'st_c', 'cta_conversion', 'active', 'cta' ),
@@ -214,14 +226,16 @@ final class Large_Library_Query_Test extends TestCase {
 		$posts = array();
 		$meta  = array();
 		foreach ( $defs as $i => $def ) {
-			$id = 7000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID'          => $id,
-				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
-				'post_title'  => $def['name'],
-				'post_status' => 'publish',
-				'post_name'   => $def['internal_key'],
-			) );
+			$id                   = 7000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
 				'_aio_internal_key'       => $def['internal_key'],
 				'_aio_status'             => $def['status'],
@@ -231,36 +245,42 @@ final class Large_Library_Query_Test extends TestCase {
 		$GLOBALS['_aio_wp_query_posts'] = $posts;
 		$GLOBALS['_aio_post_meta']      = $meta;
 
-		$result = $this->query_service->query_sections( array(
-			Large_Library_Query_Service::FILTER_CATEGORY => 'hero_intro',
-			Large_Library_Query_Service::FILTER_STATUS  => 'active',
-		), 1, 25 );
+		$result = $this->query_service->query_sections(
+			array(
+				Large_Library_Query_Service::FILTER_CATEGORY => 'hero_intro',
+				Large_Library_Query_Service::FILTER_STATUS => 'active',
+			),
+			1,
+			25
+		);
 		$this->assertSame( 1, $result->get_total_matching() );
 		$this->assertSame( 'st_a', $result->get_rows()[0]['internal_key'] );
 	}
 
 	public function test_search_filter_sections(): void {
-		$defs = array(
+		$defs                       = array(
 			$this->minimal_section_definition( 'unique_hero_key', 'hero_intro' ),
 			$this->minimal_section_definition( 'other_section', 'cta_conversion' ),
 		);
-		$defs[0]['name'] = 'Unique Hero Title';
+		$defs[0]['name']            = 'Unique Hero Title';
 		$defs[0]['purpose_summary'] = 'Contains unique phrase for search.';
-		$posts = array();
-		$meta  = array();
+		$posts                      = array();
+		$meta                       = array();
 		foreach ( $defs as $i => $def ) {
-			$id = 8000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID'          => $id,
-				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
-				'post_title'  => $def['name'],
-				'post_status' => 'publish',
-				'post_name'   => $def['internal_key'],
-			) );
+			$id                   = 8000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
 				'_aio_internal_key'       => $def['internal_key'],
 				'_aio_status'             => $def['status'],
-				'_aio_section_definition'  => wp_json_encode( $def ),
+				'_aio_section_definition' => wp_json_encode( $def ),
 			);
 		}
 		$GLOBALS['_aio_wp_query_posts'] = $posts;
@@ -275,19 +295,21 @@ final class Large_Library_Query_Test extends TestCase {
 		$posts = array();
 		$meta  = array();
 		foreach ( array( 'active', 'active', 'draft' ) as $i => $status ) {
-			$def = $this->minimal_section_definition( 'st_' . $i, 'hero_intro', $status );
-			$id  = 9000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID'          => $id,
-				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
-				'post_title'  => $def['name'],
-				'post_status' => 'publish',
-				'post_name'   => $def['internal_key'],
-			) );
+			$def                  = $this->minimal_section_definition( 'st_' . $i, 'hero_intro', $status );
+			$id                   = 9000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
 				'_aio_internal_key'       => $def['internal_key'],
 				'_aio_status'             => $def['status'],
-				'_aio_section_definition'  => wp_json_encode( $def ),
+				'_aio_section_definition' => wp_json_encode( $def ),
 			);
 		}
 		$GLOBALS['_aio_wp_query_posts'] = $posts;
@@ -300,7 +322,7 @@ final class Large_Library_Query_Test extends TestCase {
 	}
 
 	public function test_count_summary_page_templates(): void {
-		$defs = array(
+		$defs  = array(
 			$this->minimal_page_template_definition( 'pt_landing', 'landing_page', 'active' ),
 			$this->minimal_page_template_definition( 'pt_service', 'service_page', 'active' ),
 			$this->minimal_page_template_definition( 'pt_faq', 'faq_page', 'draft' ),
@@ -308,18 +330,20 @@ final class Large_Library_Query_Test extends TestCase {
 		$posts = array();
 		$meta  = array();
 		foreach ( $defs as $i => $def ) {
-			$id = 10000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID'          => $id,
-				'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
-				'post_title'  => $def['name'],
-				'post_status' => 'publish',
-				'post_name'   => $def['internal_key'],
-			) );
+			$id                   = 10000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
-				'_aio_internal_key'                => $def['internal_key'],
-				'_aio_status'                      => $def['status'],
-				'_aio_page_template_definition'    => wp_json_encode( $def ),
+				'_aio_internal_key'             => $def['internal_key'],
+				'_aio_status'                   => $def['status'],
+				'_aio_page_template_definition' => wp_json_encode( $def ),
 			);
 		}
 		$GLOBALS['_aio_wp_query_posts'] = $posts;
@@ -333,21 +357,23 @@ final class Large_Library_Query_Test extends TestCase {
 	}
 
 	public function test_query_page_templates_archetype_filter(): void {
-		$defs = array(
+		$defs  = array(
 			$this->minimal_page_template_definition( 'pt_landing', 'landing_page' ),
 			$this->minimal_page_template_definition( 'pt_service', 'service_page' ),
 		);
 		$posts = array();
 		$meta  = array();
 		foreach ( $defs as $i => $def ) {
-			$id = 11000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID'          => $id,
-				'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
-				'post_title'  => $def['name'],
-				'post_status' => 'publish',
-				'post_name'   => $def['internal_key'],
-			) );
+			$id                   = 11000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
 				'_aio_internal_key'             => $def['internal_key'],
 				'_aio_status'                   => $def['status'],
@@ -369,15 +395,17 @@ final class Large_Library_Query_Test extends TestCase {
 		$posts = array();
 		$meta  = array();
 		for ( $i = 0; $i < 80; $i++ ) {
-			$def = $this->minimal_section_definition( 'st_' . $i, 'hero_intro' );
-			$id  = 13000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID'          => $id,
-				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
-				'post_title'  => $def['name'],
-				'post_status' => 'publish',
-				'post_name'   => $def['internal_key'],
-			) );
+			$def                  = $this->minimal_section_definition( 'st_' . $i, 'hero_intro' );
+			$id                   = 13000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
 				'_aio_internal_key'       => $def['internal_key'],
 				'_aio_status'             => $def['status'],
@@ -400,15 +428,17 @@ final class Large_Library_Query_Test extends TestCase {
 		$meta  = array();
 		$n     = 260;
 		for ( $i = 0; $i < $n; $i++ ) {
-			$def = $this->minimal_section_definition( 'st_large_' . $i, $i % 2 === 0 ? 'hero_intro' : 'cta_conversion' );
-			$id  = 12000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID'          => $id,
-				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
-				'post_title'  => $def['name'],
-				'post_status' => 'publish',
-				'post_name'   => $def['internal_key'],
-			) );
+			$def                  = $this->minimal_section_definition( 'st_large_' . $i, $i % 2 === 0 ? 'hero_intro' : 'cta_conversion' );
+			$id                   = 12000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
 				'_aio_internal_key'       => $def['internal_key'],
 				'_aio_status'             => $def['status'],
@@ -432,39 +462,55 @@ final class Large_Library_Query_Test extends TestCase {
 	 * Documents the exact shape returned by query_sections / query_page_templates for directory builders.
 	 */
 	public function test_example_large_library_filter_result_payload(): void {
-		$pagination = Large_Library_Pagination::from_page_size( 2, 25, 87 );
-		$rows = array(
+		$pagination    = Large_Library_Pagination::from_page_size( 2, 25, 87 );
+		$rows          = array(
 			array(
-				'internal_key'         => 'st_hero_01',
-				'name'                 => 'Hero with CTA',
-				'status'               => 'active',
-				'category'             => 'hero_intro',
-				'purpose_summary'      => 'Primary hero with headline and CTA.',
+				'internal_key'           => 'st_hero_01',
+				'name'                   => 'Hero with CTA',
+				'status'                 => 'active',
+				'category'               => 'hero_intro',
+				'purpose_summary'        => 'Primary hero with headline and CTA.',
 				'section_purpose_family' => 'hero',
-				'cta_classification'   => 'primary',
-				'variation_family_key' => 'default',
-				'preview_available'    => true,
+				'cta_classification'     => 'primary',
+				'variation_family_key'   => 'default',
+				'preview_available'      => true,
 			),
 			array(
-				'internal_key'         => 'st_cta_02',
-				'name'                 => 'Secondary CTA Block',
-				'status'               => 'active',
-				'category'             => 'cta_conversion',
-				'purpose_summary'      => 'Conversion-focused CTA section.',
+				'internal_key'           => 'st_cta_02',
+				'name'                   => 'Secondary CTA Block',
+				'status'                 => 'active',
+				'category'               => 'cta_conversion',
+				'purpose_summary'        => 'Conversion-focused CTA section.',
 				'section_purpose_family' => 'cta',
-				'cta_classification'   => 'secondary',
-				'variation_family_key' => 'minimal',
-				'preview_available'    => false,
+				'cta_classification'     => 'secondary',
+				'variation_family_key'   => 'minimal',
+				'preview_available'      => false,
 			),
 		);
 		$filter_counts = array(
-			'status'                 => array( 'active' => 80, 'draft' => 7 ),
-			'category'               => array( 'hero_intro' => 25, 'cta_conversion' => 30, 'trust_proof' => 20, 'faq' => 12 ),
-			'section_purpose_family' => array( 'hero' => 25, 'cta' => 35, 'trust' => 20 ),
-			'cta_classification'    => array( 'primary' => 20, 'secondary' => 30, '' => 37 ),
+			'status'                 => array(
+				'active' => 80,
+				'draft'  => 7,
+			),
+			'category'               => array(
+				'hero_intro'     => 25,
+				'cta_conversion' => 30,
+				'trust_proof'    => 20,
+				'faq'            => 12,
+			),
+			'section_purpose_family' => array(
+				'hero'  => 25,
+				'cta'   => 35,
+				'trust' => 20,
+			),
+			'cta_classification'     => array(
+				'primary'   => 20,
+				'secondary' => 30,
+				''          => 37,
+			),
 		);
-		$result = new Large_Library_Filter_Result( $rows, $pagination, $filter_counts, 87 );
-		$payload = $result->to_array();
+		$result        = new Large_Library_Filter_Result( $rows, $pagination, $filter_counts, 87 );
+		$payload       = $result->to_array();
 
 		$this->assertSame( 87, $payload['total_matching'] );
 		$this->assertCount( 2, $payload['rows'] );
@@ -478,31 +524,43 @@ final class Large_Library_Query_Test extends TestCase {
 
 		// Example payload shape for directory IA (one concrete instance).
 		$example = array(
-			'rows' => array(
+			'rows'           => array(
 				array(
-					'internal_key'         => 'st_hero_01',
-					'name'                 => 'Hero with CTA',
-					'status'               => 'active',
-					'category'             => 'hero_intro',
-					'purpose_summary'      => 'Primary hero with headline and CTA.',
+					'internal_key'           => 'st_hero_01',
+					'name'                   => 'Hero with CTA',
+					'status'                 => 'active',
+					'category'               => 'hero_intro',
+					'purpose_summary'        => 'Primary hero with headline and CTA.',
 					'section_purpose_family' => 'hero',
-					'cta_classification'   => 'primary',
-					'variation_family_key' => 'default',
-					'preview_available'    => true,
+					'cta_classification'     => 'primary',
+					'variation_family_key'   => 'default',
+					'preview_available'      => true,
 				),
 			),
-			'pagination' => array(
+			'pagination'     => array(
 				'page'        => 2,
 				'per_page'    => 25,
 				'total'       => 87,
 				'total_pages' => 4,
 				'offset'      => 25,
 			),
-			'filter_counts' => array(
-				'status'                 => array( 'active' => 80, 'draft' => 7 ),
-				'category'               => array( 'hero_intro' => 25, 'cta_conversion' => 30 ),
-				'section_purpose_family' => array( 'hero' => 25, 'cta' => 35 ),
-				'cta_classification'    => array( 'primary' => 20, 'secondary' => 30 ),
+			'filter_counts'  => array(
+				'status'                 => array(
+					'active' => 80,
+					'draft'  => 7,
+				),
+				'category'               => array(
+					'hero_intro'     => 25,
+					'cta_conversion' => 30,
+				),
+				'section_purpose_family' => array(
+					'hero' => 25,
+					'cta'  => 35,
+				),
+				'cta_classification'     => array(
+					'primary'   => 20,
+					'secondary' => 30,
+				),
 			),
 			'total_matching' => 87,
 		);

@@ -92,14 +92,17 @@ final class Child_Detail_Product_Page_Template_Definitions {
 		$ordered      = array();
 		$requirements = array();
 		foreach ( $section_keys as $pos => $key ) {
-			$ordered[] = array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => $key,
+			$ordered[]            = array(
+				Page_Template_Schema::SECTION_ITEM_KEY => $key,
 				Page_Template_Schema::SECTION_ITEM_POSITION => $pos,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			);
 			$requirements[ $key ] = array( 'required' => true );
 		}
-		return array( 'ordered' => $ordered, 'requirements' => $requirements );
+		return array(
+			'ordered'      => $ordered,
+			'requirements' => $requirements,
+		);
 	}
 
 	/**
@@ -132,22 +135,25 @@ final class Child_Detail_Product_Page_Template_Definitions {
 		array $extra = array()
 	): array {
 		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY               => $internal_key,
-			Page_Template_Schema::FIELD_NAME                       => $name,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY             => $purpose_summary,
-			Page_Template_Schema::FIELD_ARCHETYPE                  => $archetype,
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS           => $ordered,
-			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS       => $section_requirements,
-			Page_Template_Schema::FIELD_COMPATIBILITY              => array(),
-			Page_Template_Schema::FIELD_ONE_PAGER                  => $one_pager,
-			Page_Template_Schema::FIELD_VERSION                    => array( 'version' => '1', 'stable_key_retained' => true ),
-			Page_Template_Schema::FIELD_STATUS                     => 'active',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $internal_key,
+			Page_Template_Schema::FIELD_NAME             => $name,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => $purpose_summary,
+			Page_Template_Schema::FIELD_ARCHETYPE        => $archetype,
+			Page_Template_Schema::FIELD_ORDERED_SECTIONS => $ordered,
+			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => $section_requirements,
+			Page_Template_Schema::FIELD_COMPATIBILITY    => array(),
+			Page_Template_Schema::FIELD_ONE_PAGER        => $one_pager,
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => '',
-			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES     => $endpoint_notes,
-			'template_category_class'                              => 'child_detail',
-			'template_family'                                      => $template_family,
-			'parent_family_compatibility'                          => $parent_family_compatibility,
-			'hierarchy_hints'                                      => array(
+			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => $endpoint_notes,
+			'template_category_class'                    => 'child_detail',
+			'template_family'                            => $template_family,
+			'parent_family_compatibility'                => $parent_family_compatibility,
+			'hierarchy_hints'                            => array(
 				'common_parent_page_types' => 'hub, nested_hub',
 				'hierarchy_role'           => 'leaf',
 			),
@@ -177,7 +183,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_spec_01',
 			'Product detail (spec-heavy)',
@@ -188,13 +194,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product detail with spec/benefit density. Benefit detail and offer compare; purchase, quote, consultation, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Spec-heavy; technical and benefit detail support decision; synthetic preview only.',
-				'cta_direction_summary'  => 'Product detail, purchase, quote, consultation, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product detail with spec/benefit density. Benefit detail and offer compare; purchase, quote, consultation, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Spec-heavy; technical and benefit detail support decision; synthetic preview only.',
+				'cta_direction_summary' => 'Product detail, purchase, quote, consultation, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Spec/benefit density; no commerce logic.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Spec/benefit density; no commerce logic.',
+			)
 		);
 	}
 
@@ -217,7 +226,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_spec_02',
 			'Product detail (technical/spec-led)',
@@ -228,13 +237,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product technical/spec-led. Differentiator and benefit detail; purchase, product, quote, compare, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Technical detail and differentiator; comparison-adjacent with compare CTA.',
-				'cta_direction_summary'  => 'Purchase, product detail, quote, compare, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product technical/spec-led. Differentiator and benefit detail; purchase, product, quote, compare, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Technical detail and differentiator; comparison-adjacent with compare CTA.',
+				'cta_direction_summary' => 'Purchase, product detail, quote, compare, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Technical/spec-led; differentiator prominent.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Technical/spec-led; differentiator prominent.',
+			)
 		);
 	}
 
@@ -257,7 +269,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_comparison_01',
 			'Product detail (comparison-adjacent)',
@@ -268,13 +280,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product with comparison depth. Comparison steps and cards; compare, product, purchase, quote, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Comparison-adjacent; supports decision vs alternatives; no checkout.',
-				'cta_direction_summary'  => 'Compare, product detail, purchase, quote, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product with comparison depth. Comparison steps and cards; compare, product, purchase, quote, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Comparison-adjacent; supports decision vs alternatives; no checkout.',
+				'cta_direction_summary' => 'Compare, product detail, purchase, quote, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Comparison depth; comparison steps and cards.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Comparison depth; comparison steps and cards.',
+			)
 		);
 	}
 
@@ -297,7 +312,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_comparison_02',
 			'Product detail (comparison + highlight)',
@@ -308,13 +323,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product comparison plus offer highlight. Compare, purchase, quote, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Comparison and highlight; decision-support flow.',
-				'cta_direction_summary'  => 'Product detail, compare, purchase, quote, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product comparison plus offer highlight. Compare, purchase, quote, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Comparison and highlight; decision-support flow.',
+				'cta_direction_summary' => 'Product detail, compare, purchase, quote, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Comparison + offer highlight.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Comparison + offer highlight.',
+			)
 		);
 	}
 
@@ -337,7 +355,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_media_01',
 			'Product detail (media emphasis)',
@@ -348,13 +366,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product with media emphasis. Product cards, card grid, listing; purchase, quote, compare, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Media-rich; cards and grid support catalog-style presentation.',
-				'cta_direction_summary'  => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product with media emphasis. Product cards, card grid, listing; purchase, quote, compare, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Media-rich; cards and grid support catalog-style presentation.',
+				'cta_direction_summary' => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Media emphasis; cards and grid.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Media emphasis; cards and grid.',
+			)
 		);
 	}
 
@@ -377,7 +398,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_recommendation_01',
 			'Product detail (recommendation posture)',
@@ -388,13 +409,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product recommendation posture. Why choose and benefit band; purchase, quote, consultation, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Recommendation-oriented; buying process and highlight support guidance.',
-				'cta_direction_summary'  => 'Product detail, purchase, quote, consultation, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product recommendation posture. Why choose and benefit band; purchase, quote, consultation, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Recommendation-oriented; buying process and highlight support guidance.',
+				'cta_direction_summary' => 'Product detail, purchase, quote, consultation, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Recommendation posture; why choose and highlight.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Recommendation posture; why choose and highlight.',
+			)
 		);
 	}
 
@@ -418,7 +442,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_trust_disclosure_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_proof_01',
 			'Product detail (proof-dense)',
@@ -429,13 +453,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product proof-dense. Trust band, rating, testimonials, guarantee, logos; purchase, quote, consultation, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Proof-heavy; trust and testimonials support conversion without commerce engine.',
-				'cta_direction_summary'  => 'Product detail, purchase, quote, consultation, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product proof-dense. Trust band, rating, testimonials, guarantee, logos; purchase, quote, consultation, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Proof-heavy; trust and testimonials support conversion without commerce engine.',
+				'cta_direction_summary' => 'Product detail, purchase, quote, consultation, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Proof-dense; rating, testimonials, guarantee, logos.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Proof-dense; rating, testimonials, guarantee, logos.',
+			)
 		);
 	}
 
@@ -458,7 +485,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_cta_intense_01',
 			'Product detail (CTA intensity)',
@@ -469,13 +496,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product with CTA intensity. Multiple CTAs spaced by content; product, purchase, quote, compare, consultation, contact.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'CTA-heavy; direct guidance without transactional integration.',
-				'cta_direction_summary'  => 'Product detail, purchase, quote, compare, consultation, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product with CTA intensity. Multiple CTAs spaced by content; product, purchase, quote, compare, consultation, contact.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'CTA-heavy; direct guidance without transactional integration.',
+				'cta_direction_summary' => 'Product detail, purchase, quote, compare, consultation, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'CTA intensity; six CTAs.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'CTA intensity; six CTAs.',
+			)
 		);
 	}
 
@@ -498,7 +528,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_catalog_item_01',
 			'Catalog item detail',
@@ -509,13 +539,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single catalog item. Product cards and card grid; purchase, quote, compare, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Catalog-entity style; item-level detail with comparison support.',
-				'cta_direction_summary'  => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single catalog item. Product cards and card grid; purchase, quote, compare, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Catalog-entity style; item-level detail with comparison support.',
+				'cta_direction_summary' => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Catalog item; cards and grid.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Catalog item; cards and grid.',
+			)
 		);
 	}
 
@@ -538,7 +571,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_equipment_01',
 			'Equipment / specification-heavy product detail',
@@ -549,13 +582,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Equipment/spec-heavy product. Benefit detail and differentiator; purchase, quote, compare, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Specification-heavy; equipment and hardware style; no inventory or price engine.',
-				'cta_direction_summary'  => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Equipment/spec-heavy product. Benefit detail and differentiator; purchase, quote, compare, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Specification-heavy; equipment and hardware style; no inventory or price engine.',
+				'cta_direction_summary' => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Equipment/spec-heavy; benefit detail and differentiator.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Equipment/spec-heavy; benefit detail and differentiator.',
+			)
 		);
 	}
 
@@ -578,7 +614,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_buying_guide_01',
 			'Product detail (buying-guide style)',
@@ -589,13 +625,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product buying-guide style. Buying process and comparison steps lead; purchase, quote, compare, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Buying-guide structure; process and comparison support decision.',
-				'cta_direction_summary'  => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product buying-guide style. Buying process and comparison steps lead; purchase, quote, compare, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Buying-guide structure; process and comparison support decision.',
+				'cta_direction_summary' => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Buying-guide style; process and steps.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Buying-guide style; process and steps.',
+			)
 		);
 	}
 
@@ -618,7 +657,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_consent_note_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_value_01',
 			'Product detail (value-led)',
@@ -629,13 +668,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product value-led. Value prop, offer compare, benefit band, highlight; purchase, product, quote, consultation, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Value-first; offer and benefit support conversion.',
-				'cta_direction_summary'  => 'Purchase, product detail, quote, consultation, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product value-led. Value prop, offer compare, benefit band, highlight; purchase, product, quote, consultation, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Value-first; offer and benefit support conversion.',
+				'cta_direction_summary' => 'Purchase, product detail, quote, consultation, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Value-led; offer compare and highlight.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Value-led; offer compare and highlight.',
+			)
 		);
 	}
 
@@ -659,7 +701,7 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			'lpu_contact_panel_01',
 			'cta_contact_01',
 		);
-		$r = self::ordered_and_requirements( $keys );
+		$r    = self::ordered_and_requirements( $keys );
 		return self::base_template(
 			'child_detail_product_differentiator_01',
 			'Product detail (differentiator-led)',
@@ -670,13 +712,16 @@ final class Child_Detail_Product_Page_Template_Definitions {
 			$r['ordered'],
 			$r['requirements'],
 			array(
-				'page_purpose_summary'   => 'Single product differentiator-led. Differentiator and why choose; purchase, quote, compare, contact CTAs.',
-				'section_helper_order'   => 'same_as_template',
-				'page_flow_explanation'  => 'Differentiator-first; decision-support vs alternatives.',
-				'cta_direction_summary'  => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
+				'page_purpose_summary'  => 'Single product differentiator-led. Differentiator and why choose; purchase, quote, compare, contact CTAs.',
+				'section_helper_order'  => 'same_as_template',
+				'page_flow_explanation' => 'Differentiator-first; decision-support vs alternatives.',
+				'cta_direction_summary' => 'Product detail, purchase, quote, compare, contact; last CTA contact.',
 			),
 			'Requires section library (hero, trust, fb, ptf, mlp, lpu, CTA batches).',
-			array( 'preview_metadata' => array( 'synthetic' => true ), 'differentiation_notes' => 'Differentiator-led; vs-alternatives emphasis.' )
+			array(
+				'preview_metadata'      => array( 'synthetic' => true ),
+				'differentiation_notes' => 'Differentiator-led; vs-alternatives emphasis.',
+			)
 		);
 	}
 }

@@ -68,14 +68,14 @@ final class ACF_Regeneration_Service {
 		?ACF_Local_JSON_Mirror_Service $mirror_service = null,
 		?string $mirror_refresh_path = null
 	) {
-		$this->blueprint_service         = $blueprint_service;
-		$this->group_registrar           = $group_registrar;
-		$this->page_assignment_service   = $page_assignment_service;
-		$this->assignment_map            = $assignment_map;
-		$this->section_repository        = $section_repository;
-		$this->page_template_repository  = $page_template_repository;
-		$this->mirror_service            = $mirror_service;
-		$this->mirror_refresh_path       = $mirror_refresh_path !== '' ? $mirror_refresh_path : null;
+		$this->blueprint_service        = $blueprint_service;
+		$this->group_registrar          = $group_registrar;
+		$this->page_assignment_service  = $page_assignment_service;
+		$this->assignment_map           = $assignment_map;
+		$this->section_repository       = $section_repository;
+		$this->page_template_repository = $page_template_repository;
+		$this->mirror_service           = $mirror_service;
+		$this->mirror_refresh_path      = $mirror_refresh_path !== '' ? $mirror_refresh_path : null;
 	}
 
 	/**
@@ -88,14 +88,14 @@ final class ACF_Regeneration_Service {
 	 */
 	public function build_plan( bool $dry_run, string $scope, array $options = array() ): ACF_Regeneration_Plan {
 		$section_family_key       = isset( $options['section_family_key'] ) ? (string) $options['section_family_key'] : null;
-		$page_template_family_key  = isset( $options['page_template_family_key'] ) ? (string) $options['page_template_family_key'] : null;
-		$include_page_assignments  = ! isset( $options['include_page_assignments'] ) || ! empty( $options['include_page_assignments'] );
+		$page_template_family_key = isset( $options['page_template_family_key'] ) ? (string) $options['page_template_family_key'] : null;
+		$include_page_assignments = ! isset( $options['include_page_assignments'] ) || ! empty( $options['include_page_assignments'] );
 
 		$expected_section_keys = $this->resolve_expected_section_keys( $scope, $section_family_key, $page_template_family_key );
 		$current_groups        = $this->get_plugin_field_groups();
 		$mismatches            = $this->compute_field_group_mismatches( $expected_section_keys, $current_groups );
 		$candidates            = $include_page_assignments ? $this->gather_page_assignment_candidates() : array();
-		$refused_cleanup        = array( 'Destructive cleanup not supported; only regeneration from registry (spec §20.15).' );
+		$refused_cleanup       = array( 'Destructive cleanup not supported; only regeneration from registry (spec §20.15).' );
 
 		return new ACF_Regeneration_Plan(
 			$dry_run,
@@ -163,7 +163,7 @@ final class ACF_Regeneration_Service {
 			}
 		}
 
-		$missing_count = 0;
+		$missing_count       = 0;
 		$version_stale_count = 0;
 		foreach ( $plan->get_field_group_mismatches() as $m ) {
 			if ( ( $m['status'] ?? '' ) === ACF_Regeneration_Plan::MISMATCH_STATUS_MISSING ) {
@@ -185,14 +185,14 @@ final class ACF_Regeneration_Service {
 			array(),
 			array(),
 			array(
-				'missing'        => $missing_count,
-				'version_stale'  => $version_stale_count,
-				'repaired'       => $groups_regenerated,
+				'missing'       => $missing_count,
+				'version_stale' => $version_stale_count,
+				'repaired'      => $groups_regenerated,
 			),
 			array(
 				'repaired' => $page_repaired,
-				'failed'  => $page_failed,
-				'skipped' => $page_skipped,
+				'failed'   => $page_failed,
+				'skipped'  => $page_skipped,
 			)
 		);
 	}
@@ -208,7 +208,7 @@ final class ACF_Regeneration_Service {
 	private function resolve_expected_section_keys( string $scope, ?string $section_family_key, ?string $page_template_family_key ): array {
 		if ( $scope === ACF_Regeneration_Plan::SCOPE_SECTION_FAMILY && $section_family_key !== null && $section_family_key !== '' ) {
 			$definitions = $this->section_repository->list_all_definitions( 9999, 0 );
-			$keys = array();
+			$keys        = array();
 			foreach ( $definitions as $def ) {
 				$fam = (string) ( $def['variation_family_key'] ?? '' );
 				if ( $fam === $section_family_key ) {
@@ -222,7 +222,7 @@ final class ACF_Regeneration_Service {
 		}
 
 		if ( $scope === ACF_Regeneration_Plan::SCOPE_PAGE_TEMPLATE_FAMILY && $page_template_family_key !== null && $page_template_family_key !== '' ) {
-			$definitions = $this->page_template_repository->list_all_definitions( 9999, 0 );
+			$definitions  = $this->page_template_repository->list_all_definitions( 9999, 0 );
 			$section_keys = array();
 			foreach ( $definitions as $def ) {
 				$fam = (string) ( $def[ Page_Template_Schema::FIELD_TEMPLATE_FAMILY ] ?? '' );
@@ -245,7 +245,7 @@ final class ACF_Regeneration_Service {
 
 		// Full: all sections that have a blueprint.
 		$blueprints = $this->blueprint_service->get_all_blueprints();
-		$keys = array();
+		$keys       = array();
 		foreach ( $blueprints as $bp ) {
 			$k = (string) ( $bp[ Field_Blueprint_Schema::SECTION_KEY ] ?? '' );
 			if ( $k !== '' ) {
@@ -284,16 +284,16 @@ final class ACF_Regeneration_Service {
 	/**
 	 * Computes mismatch list: missing, version_stale, or ok.
 	 *
-	 * @param list<string> $expected_section_keys
+	 * @param list<string>         $expected_section_keys
 	 * @param array<string, array> $current_groups
 	 * @return list<array{section_key: string, group_key: string, status: string}>
 	 */
 	private function compute_field_group_mismatches( array $expected_section_keys, array $current_groups ): array {
 		$out = array();
 		foreach ( $expected_section_keys as $section_key ) {
-			$group_key = Field_Key_Generator::group_key( $section_key );
-			$current   = $current_groups[ $group_key ] ?? null;
-			$blueprint = $this->blueprint_service->get_blueprint_for_section( $section_key );
+			$group_key        = Field_Key_Generator::group_key( $section_key );
+			$current          = $current_groups[ $group_key ] ?? null;
+			$blueprint        = $this->blueprint_service->get_blueprint_for_section( $section_key );
 			$expected_version = $blueprint !== null ? (string) ( $blueprint[ Field_Blueprint_Schema::SECTION_VERSION ] ?? '1' ) : '';
 
 			if ( $current === null ) {
@@ -328,7 +328,7 @@ final class ACF_Regeneration_Service {
 	 * @return list<array{page_id: int, type: string, key: string}>
 	 */
 	private function gather_page_assignment_candidates(): array {
-		$candidates = array();
+		$candidates    = array();
 		$template_rows = $this->assignment_map->list_by_type( Assignment_Types::PAGE_TEMPLATE, 500, 0 );
 		foreach ( $template_rows as $row ) {
 			$source = (string) ( $row['source_ref'] ?? '' );
@@ -357,7 +357,7 @@ final class ACF_Regeneration_Service {
 	}
 
 	private function result_for_dry_run( ACF_Regeneration_Plan $plan ): ACF_Regeneration_Result {
-		$missing = 0;
+		$missing       = 0;
 		$version_stale = 0;
 		foreach ( $plan->get_field_group_mismatches() as $m ) {
 			if ( ( $m['status'] ?? '' ) === ACF_Regeneration_Plan::MISMATCH_STATUS_MISSING ) {
@@ -380,8 +380,8 @@ final class ACF_Regeneration_Service {
 			),
 			array(
 				'repaired' => 0,
-				'failed'  => 0,
-				'skipped' => count( $plan->get_page_assignment_repair_candidates() ),
+				'failed'   => 0,
+				'skipped'  => count( $plan->get_page_assignment_repair_candidates() ),
 			)
 		);
 	}

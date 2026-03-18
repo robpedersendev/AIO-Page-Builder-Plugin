@@ -24,12 +24,12 @@ final class Section_Scoped_Group_Registration_Result {
 	private array $skipped_keys;
 
 	/**
-	 * @param int           $registered_count Number of groups successfully registered.
-	 * @param list<string>  $skipped_keys     Section keys skipped (no blueprint or invalid).
+	 * @param int          $registered_count Number of groups successfully registered.
+	 * @param list<string> $skipped_keys     Section keys skipped (no blueprint or invalid).
 	 */
 	public function __construct( int $registered_count = 0, array $skipped_keys = array() ) {
 		$this->registered_count = $registered_count;
-		$this->skipped_keys    = array_values( $skipped_keys );
+		$this->skipped_keys     = array_values( $skipped_keys );
 	}
 
 	public function get_registered_count(): int {

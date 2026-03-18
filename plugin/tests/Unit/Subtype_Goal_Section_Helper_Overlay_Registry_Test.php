@@ -46,16 +46,18 @@ final class Subtype_Goal_Section_Helper_Overlay_Registry_Test extends TestCase {
 
 	public function test_invalid_overlay_skipped_at_load(): void {
 		$registry = new Subtype_Goal_Section_Helper_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_SUBTYPE_KEY => 'realtor_buyer_agent',
-				Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY   => 'invalid_goal',
-				Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'hero_conv_02',
-				Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE       => Subtype_Goal_Section_Helper_Overlay_Registry::SCOPE_SUBTYPE_GOAL_SECTION_HELPER_OVERLAY,
-				Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_STATUS     => Subtype_Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
-				Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_ALLOWED_OVERRIDE_REGIONS => array( 'tone_notes' ),
-			),
-		) );
+				array(
+					Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_SUBTYPE_KEY => 'realtor_buyer_agent',
+					Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_GOAL_KEY   => 'invalid_goal',
+					Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_SECTION_KEY => 'hero_conv_02',
+					Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_SCOPE       => Subtype_Goal_Section_Helper_Overlay_Registry::SCOPE_SUBTYPE_GOAL_SECTION_HELPER_OVERLAY,
+					Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_STATUS     => Subtype_Goal_Section_Helper_Overlay_Registry::STATUS_ACTIVE,
+					Subtype_Goal_Section_Helper_Overlay_Registry::FIELD_ALLOWED_OVERRIDE_REGIONS => array( 'tone_notes' ),
+				),
+			)
+		);
 		$this->assertEmpty( $registry->list_all() );
 	}
 

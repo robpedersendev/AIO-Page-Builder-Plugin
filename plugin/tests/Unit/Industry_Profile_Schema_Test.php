@@ -53,12 +53,12 @@ final class Industry_Profile_Schema_Test extends TestCase {
 
 	public function test_normalize_preserves_valid_primary_and_secondary(): void {
 		$raw = array(
-			Industry_Profile_Schema::FIELD_SCHEMA_VERSION        => '1',
-			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY   => 'legal',
+			Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '1',
+			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'legal',
 			Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => array( 'healthcare', 'real_estate' ),
-			Industry_Profile_Schema::FIELD_SUBTYPE                => 'plumber',
-			Industry_Profile_Schema::FIELD_SERVICE_MODEL          => 'b2c',
-			Industry_Profile_Schema::FIELD_GEO_MODEL              => 'local',
+			Industry_Profile_Schema::FIELD_SUBTYPE        => 'plumber',
+			Industry_Profile_Schema::FIELD_SERVICE_MODEL  => 'b2c',
+			Industry_Profile_Schema::FIELD_GEO_MODEL      => 'local',
 		);
 		$out = Industry_Profile_Schema::normalize( $raw );
 		$this->assertSame( '1', $out[ Industry_Profile_Schema::FIELD_SCHEMA_VERSION ] );
@@ -71,7 +71,7 @@ final class Industry_Profile_Schema_Test extends TestCase {
 
 	public function test_normalize_deduplicates_and_filters_secondary_keys(): void {
 		$raw = array(
-			Industry_Profile_Schema::FIELD_SCHEMA_VERSION        => '1',
+			Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '1',
 			Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => array( 'a', 'b', 'a', 1, '', '  c  ' ),
 		);
 		$out = Industry_Profile_Schema::normalize( $raw );
@@ -82,17 +82,29 @@ final class Industry_Profile_Schema_Test extends TestCase {
 		$raw = array(
 			Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '1',
 			Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS => array(
-				'realtor' => array( 'market_focus' => 'residential', 'service_areas' => 'Boston' ),
+				'realtor' => array(
+					'market_focus'  => 'residential',
+					'service_areas' => 'Boston',
+				),
 			),
 		);
 		$out = Industry_Profile_Schema::normalize( $raw );
 		$this->assertIsArray( $out[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ] );
-		$this->assertSame( array( 'market_focus' => 'residential', 'service_areas' => 'Boston' ), $out[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]['realtor'] );
+		$this->assertSame(
+			array(
+				'market_focus'  => 'residential',
+				'service_areas' => 'Boston',
+			),
+			$out[ Industry_Profile_Schema::FIELD_QUESTION_PACK_ANSWERS ]['realtor']
+		);
 	}
 
 	public function test_normalize_question_pack_answers_strips_invalid_entries(): void {
 		$raw = array(
-			'realtor' => array( 'market_focus' => 'residential', 'nested' => array( 'no' ) ),
+			'realtor' => array(
+				'market_focus' => 'residential',
+				'nested'       => array( 'no' ),
+			),
 			''        => array( 'x' => 'y' ),
 			'plumber' => array( 'service_scope' => 'both' ),
 		);

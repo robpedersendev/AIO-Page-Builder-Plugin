@@ -25,9 +25,9 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry;
 final class Industry_Repair_Suggestion_Engine {
 
 	public const SUGGESTION_TYPE_DEPRECATED_REPLACEMENT = 'deprecated_replacement';
-	public const SUGGESTION_TYPE_INACTIVE_ACTIVATE       = 'inactive_activate';
-	public const SUGGESTION_TYPE_VALID_ALTERNATIVE       = 'valid_alternative';
-	public const SUGGESTION_TYPE_FALLBACK_BUNDLE         = 'fallback_bundle';
+	public const SUGGESTION_TYPE_INACTIVE_ACTIVATE      = 'inactive_activate';
+	public const SUGGESTION_TYPE_VALID_ALTERNATIVE      = 'valid_alternative';
+	public const SUGGESTION_TYPE_FALLBACK_BUNDLE        = 'fallback_bundle';
 
 	public const CONFIDENCE_HIGH   = 'high';
 	public const CONFIDENCE_MEDIUM = 'medium';
@@ -102,7 +102,7 @@ final class Industry_Repair_Suggestion_Engine {
 				$bundle_key = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ) && \is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] )
 					? \trim( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] )
 					: '';
-				$status = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] ) && \is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] )
+				$status     = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] ) && \is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] )
 					? $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ]
 					: '';
 				if ( $bundle_key !== '' && $status === Industry_Starter_Bundle_Registry::STATUS_ACTIVE ) {
@@ -129,7 +129,7 @@ final class Industry_Repair_Suggestion_Engine {
 					$bundle_key = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ) && \is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] )
 						? \trim( $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] )
 						: '';
-					$status = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] ) && \is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] )
+					$status     = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] ) && \is_string( $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] )
 						? $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ]
 						: '';
 					if ( $bundle_key !== '' && $status === Industry_Starter_Bundle_Registry::STATUS_ACTIVE ) {

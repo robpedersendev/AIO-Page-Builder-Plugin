@@ -30,16 +30,16 @@ final class Page_Template_Inventory_Appendix_Generator_Test extends TestCase {
 
 	/** Example page template appendix row (spec §62.12). Real structure for contract reference. */
 	public const EXAMPLE_PAGE_APPENDIX_ROW = array(
-		'key'                 => 'pt_marketing_landing',
-		'name'                => 'Marketing Landing',
-		'purpose'             => 'Landing page for campaigns.',
-		'ordered_sections'    => array( 'st01_hero_intro', 'st_cta_conversion', 'st_faq' ),
-		'optional_sections'   => array( 'st_faq' ),
-		'category_class'      => 'top_level',
-		'hierarchy_hint'      => 'top_level, marketing',
-		'one_pager_status'    => 'yes',
-		'version'             => '1',
-		'deprecation_status'   => 'active',
+		'key'                => 'pt_marketing_landing',
+		'name'               => 'Marketing Landing',
+		'purpose'            => 'Landing page for campaigns.',
+		'ordered_sections'   => array( 'st01_hero_intro', 'st_cta_conversion', 'st_faq' ),
+		'optional_sections'  => array( 'st_faq' ),
+		'category_class'     => 'top_level',
+		'hierarchy_hint'     => 'top_level, marketing',
+		'one_pager_status'   => 'yes',
+		'version'            => '1',
+		'deprecation_status' => 'active',
 	);
 
 	private function get_generator(): Page_Template_Inventory_Appendix_Generator {
@@ -48,28 +48,34 @@ final class Page_Template_Inventory_Appendix_Generator_Test extends TestCase {
 	}
 
 	public function test_build_result_from_definitions_empty_returns_zero_total(): void {
-		$gen = $this->get_generator();
+		$gen    = $this->get_generator();
 		$result = $gen->build_result_from_definitions( array() );
 		$this->assertSame( 0, $result['total'] );
 		$this->assertSame( array(), $result['rows'] );
 	}
 
 	public function test_build_result_from_definitions_includes_required_fields(): void {
-		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY    => 'pt_marketing_landing',
-			Page_Template_Schema::FIELD_NAME           => 'Marketing Landing',
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY => 'Landing page for campaigns.',
-			'template_category_class'                  => 'top_level',
-			'template_family'                           => 'marketing',
+		$def    = array(
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => 'pt_marketing_landing',
+			Page_Template_Schema::FIELD_NAME             => 'Marketing Landing',
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => 'Landing page for campaigns.',
+			'template_category_class'                    => 'top_level',
+			'template_family'                            => 'marketing',
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero_intro', Page_Template_Schema::SECTION_ITEM_REQUIRED => true ),
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st_faq', Page_Template_Schema::SECTION_ITEM_REQUIRED => false ),
+				array(
+					Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero_intro',
+					Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
+				),
+				array(
+					Page_Template_Schema::SECTION_ITEM_KEY => 'st_faq',
+					Page_Template_Schema::SECTION_ITEM_REQUIRED => false,
+				),
 			),
-			Page_Template_Schema::FIELD_ONE_PAGER      => array( 'link' => 'https://example.org/one-pager' ),
-			Page_Template_Schema::FIELD_STATUS         => 'active',
-			Page_Template_Schema::FIELD_VERSION        => array( 'version' => '1' ),
+			Page_Template_Schema::FIELD_ONE_PAGER        => array( 'link' => 'https://example.org/one-pager' ),
+			Page_Template_Schema::FIELD_STATUS           => 'active',
+			Page_Template_Schema::FIELD_VERSION          => array( 'version' => '1' ),
 		);
-		$gen = $this->get_generator();
+		$gen    = $this->get_generator();
 		$result = $gen->build_result_from_definitions( array( $def ) );
 		$this->assertSame( 1, $result['total'] );
 		$row = $result['rows'][0];
@@ -85,14 +91,14 @@ final class Page_Template_Inventory_Appendix_Generator_Test extends TestCase {
 
 	public function test_generate_from_definitions_produces_markdown_with_header_and_table(): void {
 		$def = array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY   => 'pt_test',
-			Page_Template_Schema::FIELD_NAME         => 'Test',
-			'template_category_class'                 => 'hub',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => 'pt_test',
+			Page_Template_Schema::FIELD_NAME             => 'Test',
+			'template_category_class'                    => 'hub',
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(),
-			Page_Template_Schema::FIELD_VERSION       => array( 'version' => '1' ),
+			Page_Template_Schema::FIELD_VERSION          => array( 'version' => '1' ),
 		);
 		$gen = $this->get_generator();
-		$md = $gen->generate_from_definitions( array( $def ) );
+		$md  = $gen->generate_from_definitions( array( $def ) );
 		$this->assertStringContainsString( '# Page Template Inventory Appendix', $md );
 		$this->assertStringContainsString( '§62.12', $md );
 		$this->assertStringContainsString( '| Key | Name | Purpose | Ordered sections | Optional sections | Hierarchy | One-pager | Version | Deprecation |', $md );

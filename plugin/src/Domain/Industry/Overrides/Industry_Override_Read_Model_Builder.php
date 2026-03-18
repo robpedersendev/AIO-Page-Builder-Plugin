@@ -43,9 +43,9 @@ final class Industry_Override_Read_Model_Builder {
 	 * - reason_present: bool (true = only rows with non-empty reason)
 	 * - industry_context_ref: string (exact match on override record; empty = not filtered)
 	 */
-	public const FILTER_TARGET_TYPE        = 'target_type';
-	public const FILTER_STATE              = 'state';
-	public const FILTER_REASON_PRESENT     = 'reason_present';
+	public const FILTER_TARGET_TYPE          = 'target_type';
+	public const FILTER_STATE                = 'state';
+	public const FILTER_REASON_PRESENT       = 'reason_present';
 	public const FILTER_INDUSTRY_CONTEXT_REF = 'industry_context_ref';
 
 	/**
@@ -116,10 +116,10 @@ final class Industry_Override_Read_Model_Builder {
 	 * @return array<string, mixed>|null Row with row_id, target_type, target_key, plan_id, state, reason, created_at, updated_at, industry_context_ref, has_reason.
 	 */
 	private function normalize_row( string $target_type, string $target_key, ?string $plan_id, array $override ): ?array {
-		$state = isset( $override[ Industry_Override_Schema::FIELD_STATE ] ) ? (string) $override[ Industry_Override_Schema::FIELD_STATE ] : '';
-		$reason = isset( $override[ Industry_Override_Schema::FIELD_REASON ] ) ? (string) $override[ Industry_Override_Schema::FIELD_REASON ] : '';
-		$created = isset( $override[ Industry_Override_Schema::FIELD_CREATED_AT ] ) ? (int) $override[ Industry_Override_Schema::FIELD_CREATED_AT ] : 0;
-		$updated = isset( $override[ Industry_Override_Schema::FIELD_UPDATED_AT ] ) ? (int) $override[ Industry_Override_Schema::FIELD_UPDATED_AT ] : 0;
+		$state        = isset( $override[ Industry_Override_Schema::FIELD_STATE ] ) ? (string) $override[ Industry_Override_Schema::FIELD_STATE ] : '';
+		$reason       = isset( $override[ Industry_Override_Schema::FIELD_REASON ] ) ? (string) $override[ Industry_Override_Schema::FIELD_REASON ] : '';
+		$created      = isset( $override[ Industry_Override_Schema::FIELD_CREATED_AT ] ) ? (int) $override[ Industry_Override_Schema::FIELD_CREATED_AT ] : 0;
+		$updated      = isset( $override[ Industry_Override_Schema::FIELD_UPDATED_AT ] ) ? (int) $override[ Industry_Override_Schema::FIELD_UPDATED_AT ] : 0;
 		$industry_ref = isset( $override[ Industry_Override_Schema::FIELD_INDUSTRY_CONTEXT_REF ] ) ? (string) $override[ Industry_Override_Schema::FIELD_INDUSTRY_CONTEXT_REF ] : '';
 
 		$row_id = $target_type . ':' . $target_key;

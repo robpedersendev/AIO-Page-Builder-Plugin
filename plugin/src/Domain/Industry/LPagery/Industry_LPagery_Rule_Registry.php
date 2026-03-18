@@ -17,17 +17,17 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Industry_LPagery_Rule_Registry {
 
-	public const FIELD_LPAGERY_RULE_KEY   = 'lpagery_rule_key';
-	public const FIELD_INDUSTRY_KEY       = 'industry_key';
-	public const FIELD_VERSION_MARKER     = 'version_marker';
-	public const FIELD_STATUS             = 'status';
-	public const FIELD_LPAGERY_POSTURE    = 'lpagery_posture';
+	public const FIELD_LPAGERY_RULE_KEY    = 'lpagery_rule_key';
+	public const FIELD_INDUSTRY_KEY        = 'industry_key';
+	public const FIELD_VERSION_MARKER      = 'version_marker';
+	public const FIELD_STATUS              = 'status';
+	public const FIELD_LPAGERY_POSTURE     = 'lpagery_posture';
 	public const FIELD_REQUIRED_TOKEN_REFS = 'required_token_refs';
 	public const FIELD_OPTIONAL_TOKEN_REFS = 'optional_token_refs';
 	public const FIELD_HIERARCHY_GUIDANCE  = 'hierarchy_guidance';
 	public const FIELD_WEAK_PAGE_WARNINGS  = 'weak_page_warnings';
-	public const FIELD_NOTES              = 'notes';
-	public const FIELD_METADATA           = 'metadata';
+	public const FIELD_NOTES               = 'notes';
+	public const FIELD_METADATA            = 'metadata';
 
 	public const POSTURE_CENTRAL     = 'central';
 	public const POSTURE_OPTIONAL    = 'optional';
@@ -38,8 +38,8 @@ final class Industry_LPagery_Rule_Registry {
 	public const STATUS_DEPRECATED = 'deprecated';
 
 	public const SUPPORTED_SCHEMA_VERSION = '1';
-	private const KEY_PATTERN = '#^[a-z0-9_-]+$#';
-	private const KEY_MAX_LENGTH = 64;
+	private const KEY_PATTERN             = '#^[a-z0-9_-]+$#';
+	private const KEY_MAX_LENGTH          = 64;
 
 	/** @var array<string, array<string, mixed>> Map of lpagery_rule_key => rule. */
 	private array $by_key = array();
@@ -153,7 +153,7 @@ final class Industry_LPagery_Rule_Registry {
 	 */
 	public function validate_rule( array $rule ): array {
 		$errors = array();
-		$key = isset( $rule[ self::FIELD_LPAGERY_RULE_KEY ] ) && is_string( $rule[ self::FIELD_LPAGERY_RULE_KEY ] )
+		$key    = isset( $rule[ self::FIELD_LPAGERY_RULE_KEY ] ) && is_string( $rule[ self::FIELD_LPAGERY_RULE_KEY ] )
 			? trim( $rule[ self::FIELD_LPAGERY_RULE_KEY ] )
 			: '';
 		if ( $key === '' ) {
@@ -197,12 +197,12 @@ final class Industry_LPagery_Rule_Registry {
 	 * @return array<string, mixed>
 	 */
 	private function normalize_rule( array $rule ): array {
-		$out = array(
+		$out      = array(
 			self::FIELD_LPAGERY_RULE_KEY => trim( (string) ( $rule[ self::FIELD_LPAGERY_RULE_KEY ] ?? '' ) ),
-			self::FIELD_INDUSTRY_KEY    => trim( (string) ( $rule[ self::FIELD_INDUSTRY_KEY ] ?? '' ) ),
-			self::FIELD_VERSION_MARKER  => trim( (string) ( $rule[ self::FIELD_VERSION_MARKER ] ?? '' ) ),
-			self::FIELD_STATUS          => (string) ( $rule[ self::FIELD_STATUS ] ?? '' ),
-			self::FIELD_LPAGERY_POSTURE => (string) ( $rule[ self::FIELD_LPAGERY_POSTURE ] ?? '' ),
+			self::FIELD_INDUSTRY_KEY     => trim( (string) ( $rule[ self::FIELD_INDUSTRY_KEY ] ?? '' ) ),
+			self::FIELD_VERSION_MARKER   => trim( (string) ( $rule[ self::FIELD_VERSION_MARKER ] ?? '' ) ),
+			self::FIELD_STATUS           => (string) ( $rule[ self::FIELD_STATUS ] ?? '' ),
+			self::FIELD_LPAGERY_POSTURE  => (string) ( $rule[ self::FIELD_LPAGERY_POSTURE ] ?? '' ),
 		);
 		$optional = array(
 			self::FIELD_REQUIRED_TOKEN_REFS,
@@ -216,9 +216,16 @@ final class Industry_LPagery_Rule_Registry {
 			if ( array_key_exists( $field, $rule ) ) {
 				$val = $rule[ $field ];
 				if ( in_array( $field, array( self::FIELD_REQUIRED_TOKEN_REFS, self::FIELD_OPTIONAL_TOKEN_REFS ), true ) && is_array( $val ) ) {
-					$out[ $field ] = array_values( array_filter( array_map( function ( $v ) {
-						return is_string( $v ) ? trim( $v ) : '';
-					}, $val ) ) );
+					$out[ $field ] = array_values(
+						array_filter(
+							array_map(
+								function ( $v ) {
+									return is_string( $v ) ? trim( $v ) : '';
+								},
+								$val
+							)
+						)
+					);
 				} else {
 					$out[ $field ] = $val;
 				}

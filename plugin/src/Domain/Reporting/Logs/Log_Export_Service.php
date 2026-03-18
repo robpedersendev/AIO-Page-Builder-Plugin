@@ -28,12 +28,12 @@ use AIOPageBuilder\Support\Logging\Log_Severities;
 final class Log_Export_Service {
 
 	/** Approved log type keys for export. */
-	public const LOG_TYPE_QUEUE             = 'queue';
-	public const LOG_TYPE_EXECUTION         = 'execution';
-	public const LOG_TYPE_REPORTING         = 'reporting';
-	public const LOG_TYPE_CRITICAL          = 'critical';
-	public const LOG_TYPE_AI_RUNS           = 'ai_runs';
-	public const LOG_TYPE_TEMPLATE_FAMILY   = 'template_family';
+	public const LOG_TYPE_QUEUE              = 'queue';
+	public const LOG_TYPE_EXECUTION          = 'execution';
+	public const LOG_TYPE_REPORTING          = 'reporting';
+	public const LOG_TYPE_CRITICAL           = 'critical';
+	public const LOG_TYPE_AI_RUNS            = 'ai_runs';
+	public const LOG_TYPE_TEMPLATE_FAMILY    = 'template_family';
 	public const LOG_TYPE_TEMPLATE_OPERATION = 'template_operation';
 
 	/** @var list<string> */
@@ -84,12 +84,12 @@ final class Log_Export_Service {
 	/**
 	 * Exports requested log types with filters. Redacts before writing. Writes to plugin exports path.
 	 *
-	 * @param list<string>    $log_types Allowed keys from ALLOWED_LOG_TYPES.
+	 * @param list<string>         $log_types Allowed keys from ALLOWED_LOG_TYPES.
 	 * @param array<string, mixed> $filters Optional: date_from, date_to (Y-m-d), plan_id, run_id, job_ref.
 	 * @return Log_Export_Result
 	 */
 	public function export( array $log_types, array $filters = array() ): Log_Export_Result {
-		$log_ref = 'log-export-' . gmdate( 'Y-m-d\TH:i:s\Z' );
+		$log_ref   = 'log-export-' . gmdate( 'Y-m-d\TH:i:s\Z' );
 		$requested = array_values( array_intersect( $log_types, self::ALLOWED_LOG_TYPES ) );
 		if ( $requested === array() ) {
 			$this->log( 'Log export skipped: no valid log types requested.', array( 'log_ref' => $log_ref ), Log_Severities::WARNING );
@@ -107,20 +107,20 @@ final class Log_Export_Service {
 		}
 
 		$filter_summary = $this->normalize_filter_summary( $filters );
-		$payload = array(
-			'export_metadata' => array(
+		$payload        = array(
+			'export_metadata'    => array(
 				'export_timestamp'   => gmdate( 'Y-m-d\TH:i:s\Z' ),
-				'exported_log_types'  => $requested,
-				'filter_summary'      => $filter_summary,
-				'redaction_applied'   => true,
-				'label'               => 'AIO Page Builder log export',
+				'exported_log_types' => $requested,
+				'filter_summary'     => $filter_summary,
+				'redaction_applied'  => true,
+				'label'              => 'AIO Page Builder log export',
 			),
-			'queue'             => array(),
-			'execution'         => array(),
-			'reporting'         => array(),
-			'critical'          => array(),
-			'ai_runs'           => array(),
-			'template_family'   => array(),
+			'queue'              => array(),
+			'execution'          => array(),
+			'reporting'          => array(),
+			'critical'           => array(),
+			'ai_runs'            => array(),
+			'template_family'    => array(),
 			'template_operation' => array(),
 		);
 
@@ -154,7 +154,14 @@ final class Log_Export_Service {
 			return Log_Export_Result::failure( __( 'Could not write export file.', 'aio-page-builder' ), $log_ref );
 		}
 
-		$this->log( 'Log export completed.', array( 'log_ref' => $log_ref, 'filename' => $filename, 'types' => $requested ) );
+		$this->log(
+			'Log export completed.',
+			array(
+				'log_ref'  => $log_ref,
+				'filename' => $filename,
+				'types'    => $requested,
+			)
+		);
 		return Log_Export_Result::success( $requested, $filter_summary, $filename, $log_ref );
 	}
 
@@ -208,9 +215,12 @@ final class Log_Export_Service {
 				}
 			}
 		}
-		usort( $all, function ( $a, $b ) {
-			return strcmp( (string) ( $b['created_at'] ?? '' ), (string) ( $a['created_at'] ?? '' ) );
-		} );
+		usort(
+			$all,
+			function ( $a, $b ) {
+				return strcmp( (string) ( $b['created_at'] ?? '' ), (string) ( $a['created_at'] ?? '' ) );
+			}
+		);
 		return array_slice( $all, 0, self::EXPORT_CAP );
 	}
 
@@ -231,9 +241,12 @@ final class Log_Export_Service {
 				$out[] = $this->redact_queue_row( $normalized );
 			}
 		}
-		usort( $out, function ( $a, $b ) {
-			return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
-		} );
+		usort(
+			$out,
+			function ( $a, $b ) {
+				return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
+			}
+		);
 		return array_slice( $out, 0, self::EXPORT_CAP );
 	}
 
@@ -246,8 +259,8 @@ final class Log_Export_Service {
 		if ( ! is_array( $log ) ) {
 			return array();
 		}
-		$log   = array_slice( $log, -self::EXPORT_CAP );
-		$out   = array();
+		$log = array_slice( $log, -self::EXPORT_CAP );
+		$out = array();
 		foreach ( array_reverse( $log ) as $entry ) {
 			if ( ! is_array( $entry ) ) {
 				continue;
@@ -262,7 +275,7 @@ final class Log_Export_Service {
 			);
 			if ( $this->row_passes_filters( $row, $filter_summary, 'reporting' ) ) {
 				$row['failure_reason'] = $this->redaction->redact_message( $row['failure_reason'] );
-				$out[] = $row;
+				$out[]                 = $row;
 			}
 		}
 		return array_slice( $out, 0, self::EXPORT_CAP );
@@ -297,7 +310,7 @@ final class Log_Export_Service {
 			);
 			if ( $this->row_passes_filters( $row, $filter_summary, 'critical' ) ) {
 				$row['failure_reason'] = $this->redaction->redact_message( $row['failure_reason'] );
-				$out[] = $row;
+				$out[]                 = $row;
 			}
 			if ( count( $out ) >= self::EXPORT_CAP ) {
 				break;
@@ -325,15 +338,18 @@ final class Log_Export_Service {
 				continue;
 			}
 			if ( $this->row_passes_filters( $normalized, $filter_summary, 'template_operation' ) ) {
-				$redacted = $this->redact_queue_row( $normalized );
-				$redacted['template_key']   = $normalized['template_key'];
+				$redacted                    = $this->redact_queue_row( $normalized );
+				$redacted['template_key']    = $normalized['template_key'];
 				$redacted['template_family'] = $normalized['template_family'];
-				$out[] = $redacted;
+				$out[]                       = $redacted;
 			}
 		}
-		usort( $out, function ( $a, $b ) {
-			return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
-		} );
+		usort(
+			$out,
+			function ( $a, $b ) {
+				return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
+			}
+		);
 		return array_slice( $out, 0, self::EXPORT_CAP );
 	}
 
@@ -356,15 +372,18 @@ final class Log_Export_Service {
 				continue;
 			}
 			if ( $this->row_passes_filters( $normalized, $filter_summary, 'template_family' ) ) {
-				$redacted = $this->redact_queue_row( $normalized );
-				$redacted['template_key']   = $normalized['template_key'];
+				$redacted                    = $this->redact_queue_row( $normalized );
+				$redacted['template_key']    = $normalized['template_key'];
 				$redacted['template_family'] = $normalized['template_family'];
-				$out[] = $redacted;
+				$out[]                       = $redacted;
 			}
 		}
-		usort( $out, function ( $a, $b ) {
-			return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
-		} );
+		usort(
+			$out,
+			function ( $a, $b ) {
+				return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
+			}
+		);
 		return array_slice( $out, 0, self::EXPORT_CAP );
 	}
 
@@ -405,28 +424,28 @@ final class Log_Export_Service {
 		} elseif ( $related !== '' ) {
 			$plan_id = trim( substr( $related, 0, 64 ) );
 		}
-		$template_key   = '';
+		$template_key    = '';
 		$template_family = '';
 		if ( $related !== '' ) {
 			$decoded = json_decode( $related, true );
 			if ( is_array( $decoded ) ) {
 				$target = $decoded['target_reference'] ?? $decoded['target'] ?? $decoded;
 				if ( is_array( $target ) ) {
-					$template_key   = (string) ( $target['template_key'] ?? $target['template_ref'] ?? '' );
+					$template_key    = (string) ( $target['template_key'] ?? $target['template_ref'] ?? '' );
 					$template_family = (string) ( $target['template_family'] ?? '' );
 				}
 			}
 		}
 		return array(
-			'job_ref'          => (string) ( $row['job_ref'] ?? '' ),
-			'job_type'         => (string) ( $row['job_type'] ?? '' ),
-			'queue_status'     => (string) ( $row['queue_status'] ?? '' ),
-			'created_at'       => (string) ( $row['created_at'] ?? '' ),
-			'completed_at'     => (string) ( $row['completed_at'] ?? '' ),
-			'failure_reason'    => (string) ( $row['failure_reason'] ?? '' ),
-			'related_plan_id'  => $plan_id,
-			'template_key'     => $template_key,
-			'template_family'  => $template_family,
+			'job_ref'         => (string) ( $row['job_ref'] ?? '' ),
+			'job_type'        => (string) ( $row['job_type'] ?? '' ),
+			'queue_status'    => (string) ( $row['queue_status'] ?? '' ),
+			'created_at'      => (string) ( $row['created_at'] ?? '' ),
+			'completed_at'    => (string) ( $row['completed_at'] ?? '' ),
+			'failure_reason'  => (string) ( $row['failure_reason'] ?? '' ),
+			'related_plan_id' => $plan_id,
+			'template_key'    => $template_key,
+			'template_family' => $template_family,
 		);
 	}
 

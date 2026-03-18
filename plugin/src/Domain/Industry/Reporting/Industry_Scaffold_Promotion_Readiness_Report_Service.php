@@ -48,27 +48,27 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service {
 		$items = array();
 
 		if ( $this->scaffold_completeness_service instanceof Industry_Scaffold_Completeness_Report_Provider_Interface ) {
-			$report = $this->scaffold_completeness_service->generate_report( array() );
+			$report  = $this->scaffold_completeness_service->generate_report( array() );
 			$results = isset( $report['scaffold_results'] ) && is_array( $report['scaffold_results'] ) ? $report['scaffold_results'] : array();
 			foreach ( $results as $r ) {
-				$scaffold_type = isset( $r['scaffold_type'] ) && is_string( $r['scaffold_type'] ) ? $r['scaffold_type'] : '';
-				$scaffold_key = isset( $r['scaffold_key'] ) && is_string( $r['scaffold_key'] ) ? $r['scaffold_key'] : '';
-				$scaffold_ref = $scaffold_type === 'subtype' ? 'subtype:' . $scaffold_key : $scaffold_key;
-				$classes = isset( $r['artifact_classes'] ) && is_array( $r['artifact_classes'] ) ? $r['artifact_classes'] : array();
-				$blockers = array();
+				$scaffold_type    = isset( $r['scaffold_type'] ) && is_string( $r['scaffold_type'] ) ? $r['scaffold_type'] : '';
+				$scaffold_key     = isset( $r['scaffold_key'] ) && is_string( $r['scaffold_key'] ) ? $r['scaffold_key'] : '';
+				$scaffold_ref     = $scaffold_type === 'subtype' ? 'subtype:' . $scaffold_key : $scaffold_key;
+				$classes          = isset( $r['artifact_classes'] ) && is_array( $r['artifact_classes'] ) ? $r['artifact_classes'] : array();
+				$blockers         = array();
 				$missing_evidence = array();
-				$authored_count = 0;
-				$missing_count = 0;
+				$authored_count   = 0;
+				$missing_count    = 0;
 				foreach ( $classes as $artifact => $state ) {
 					if ( $state === Industry_Scaffold_Completeness_Report_Service::STATE_MISSING ) {
-						$blockers[] = $artifact;
+						$blockers[]         = $artifact;
 						$missing_evidence[] = $artifact;
 						++$missing_count;
 					} elseif ( $state === Industry_Scaffold_Completeness_Report_Service::STATE_AUTHORED ) {
 						++$authored_count;
 					}
 				}
-				$total_classes = count( $classes );
+				$total_classes   = count( $classes );
 				$readiness_score = $total_classes > 0 ? (int) round( ( $authored_count / $total_classes ) * 100 ) : 0;
 				if ( $missing_count > 0 ) {
 					$tier = self::TIER_NOT_NEAR_READY;
@@ -77,15 +77,15 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service {
 				} else {
 					$tier = self::TIER_SCAFFOLD_COMPLETE;
 				}
-				$notes = isset( $r['summary'] ) && is_string( $r['summary'] ) ? $r['summary'] : '';
+				$notes   = isset( $r['summary'] ) && is_string( $r['summary'] ) ? $r['summary'] : '';
 				$items[] = array(
-					'scaffold_ref'      => $scaffold_ref,
-					'scaffold_type'     => $scaffold_type,
-					'readiness_score'   => $readiness_score,
+					'scaffold_ref'     => $scaffold_ref,
+					'scaffold_type'    => $scaffold_type,
+					'readiness_score'  => $readiness_score,
 					'readiness_tier'   => $tier,
-					'blockers'          => $blockers,
-					'missing_evidence'  => $missing_evidence,
-					'notes'             => $notes,
+					'blockers'         => $blockers,
+					'missing_evidence' => $missing_evidence,
+					'notes'            => $notes,
 				);
 			}
 		}
@@ -98,9 +98,9 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service {
 		);
 		$summary = array(
 			'total'               => count( $items ),
-			'scaffold_complete'    => count( $by_tier[ self::TIER_SCAFFOLD_COMPLETE ] ),
-			'authored_near_ready'  => count( $by_tier[ self::TIER_AUTHORED_NEAR_READY ] ),
-			'not_near_ready'       => count( $by_tier[ self::TIER_NOT_NEAR_READY ] ),
+			'scaffold_complete'   => count( $by_tier[ self::TIER_SCAFFOLD_COMPLETE ] ),
+			'authored_near_ready' => count( $by_tier[ self::TIER_AUTHORED_NEAR_READY ] ),
+			'not_near_ready'      => count( $by_tier[ self::TIER_NOT_NEAR_READY ] ),
 		);
 
 		return array(
@@ -113,7 +113,7 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service {
 
 	/**
 	 * @param list<array<string, mixed>> $items
-	 * @param string $key
+	 * @param string                     $key
 	 * @return array<string, list<array<string, mixed>>>
 	 */
 	private function group_by( array $items, string $key ): array {

@@ -133,10 +133,10 @@ final class Prompt_Pack_Registry_Service {
 	 */
 	public function get_planning_guidance_content(): array {
 		return array(
-			'template_family_guidance'   => $this->get_template_family_guidance_text(),
-			'cta_law_rules'              => $this->get_cta_law_rules_text(),
-			'hierarchy_role_guidance'    => $this->get_hierarchy_role_guidance_text(),
-			'schema_version'             => self::PLANNING_GUIDANCE_SCHEMA_VERSION,
+			'template_family_guidance' => $this->get_template_family_guidance_text(),
+			'cta_law_rules'            => $this->get_cta_law_rules_text(),
+			'hierarchy_role_guidance'  => $this->get_hierarchy_role_guidance_text(),
+			'schema_version'           => self::PLANNING_GUIDANCE_SCHEMA_VERSION,
 		);
 	}
 

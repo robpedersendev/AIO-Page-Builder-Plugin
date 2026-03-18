@@ -22,11 +22,11 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 
 	private function valid_bundle( string $bundle_key = 'realtor_starter', string $industry_key = 'realtor' ): array {
 		return array(
-			Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => $bundle_key,
+			Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY => $bundle_key,
 			Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => $industry_key,
-			Industry_Starter_Bundle_Registry::FIELD_LABEL       => 'Realtor Starter',
-			Industry_Starter_Bundle_Registry::FIELD_SUMMARY     => 'Curated starting set for real estate sites.',
-			Industry_Starter_Bundle_Registry::FIELD_STATUS      => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
+			Industry_Starter_Bundle_Registry::FIELD_LABEL  => 'Realtor Starter',
+			Industry_Starter_Bundle_Registry::FIELD_SUMMARY => 'Curated starting set for real estate sites.',
+			Industry_Starter_Bundle_Registry::FIELD_STATUS => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
 			Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => Industry_Starter_Bundle_Registry::SUPPORTED_SCHEMA_VERSION,
 		);
 	}
@@ -43,11 +43,13 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 
 	public function test_get_for_industry_returns_matching_bundles(): void {
 		$registry = new Industry_Starter_Bundle_Registry();
-		$registry->load( array(
-			$this->valid_bundle( 'realtor_a', 'realtor' ),
-			$this->valid_bundle( 'realtor_b', 'realtor' ),
-			$this->valid_bundle( 'plumber_essentials', 'plumber' ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_bundle( 'realtor_a', 'realtor' ),
+				$this->valid_bundle( 'realtor_b', 'realtor' ),
+				$this->valid_bundle( 'plumber_essentials', 'plumber' ),
+			)
+		);
 		$realtor = $registry->get_for_industry( 'realtor' );
 		$this->assertCount( 2, $realtor );
 		$this->assertCount( 1, $registry->get_for_industry( 'plumber' ) );
@@ -56,17 +58,19 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 
 	public function test_list_all_returns_all_loaded_bundles(): void {
 		$registry = new Industry_Starter_Bundle_Registry();
-		$registry->load( array(
-			$this->valid_bundle( 'b1', 'realtor' ),
-			$this->valid_bundle( 'b2', 'plumber' ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_bundle( 'b1', 'realtor' ),
+				$this->valid_bundle( 'b2', 'plumber' ),
+			)
+		);
 		$all = $registry->list_all();
 		$this->assertCount( 2, $all );
 	}
 
 	public function test_invalid_bundle_missing_required_skipped(): void {
 		$registry = new Industry_Starter_Bundle_Registry();
-		$bad = $this->valid_bundle( 'bad' );
+		$bad      = $this->valid_bundle( 'bad' );
 		unset( $bad[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] );
 		$registry->load( array( $bad ) );
 		$this->assertNull( $registry->get( 'bad' ) );
@@ -94,7 +98,7 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 
 	public function test_duplicate_key_first_wins(): void {
 		$registry = new Industry_Starter_Bundle_Registry();
-		$first  = $this->valid_bundle( 'dup' );
+		$first    = $this->valid_bundle( 'dup' );
 		$first[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] = 'First';
 		$second = $this->valid_bundle( 'dup' );
 		$second[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] = 'Second';
@@ -107,10 +111,10 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 
 	public function test_valid_bundle_with_optional_refs_normalized(): void {
 		$bundle = $this->valid_bundle( 'full_bundle', 'plumber' );
-		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_FAMILIES ] = array( 'home', 'services' );
+		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_FAMILIES ]      = array( 'home', 'services' );
 		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ] = array( 'pt_home', 'pt_services' );
-		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ] = array( 'hero_01', 'cta_01' );
-		$bundle[ Industry_Starter_Bundle_Registry::FIELD_TOKEN_PRESET_REF ] = 'plumber_trust';
+		$bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_SECTION_REFS ]       = array( 'hero_01', 'cta_01' );
+		$bundle[ Industry_Starter_Bundle_Registry::FIELD_TOKEN_PRESET_REF ]               = 'plumber_trust';
 		$registry = new Industry_Starter_Bundle_Registry();
 		$registry->load( array( $bundle ) );
 		$loaded = $registry->get( 'full_bundle' );
@@ -133,8 +137,8 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 	}
 
 	public function test_get_for_industry_with_subtype_returns_subtype_bundles_when_present(): void {
-		$registry = new Industry_Starter_Bundle_Registry();
-		$industry_only = $this->valid_bundle( 'realtor_starter', 'realtor' );
+		$registry       = new Industry_Starter_Bundle_Registry();
+		$industry_only  = $this->valid_bundle( 'realtor_starter', 'realtor' );
 		$subtype_bundle = $this->valid_bundle( 'realtor_buyer_starter', 'realtor' );
 		$subtype_bundle[ Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY ] = 'realtor_buyer_agent';
 		$registry->load( array( $industry_only, $subtype_bundle ) );
@@ -146,10 +150,12 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 
 	public function test_get_for_industry_with_subtype_falls_back_to_industry_bundles_when_no_subtype(): void {
 		$registry = new Industry_Starter_Bundle_Registry();
-		$registry->load( array(
-			$this->valid_bundle( 'realtor_starter', 'realtor' ),
-			$this->valid_bundle( 'realtor_second', 'realtor' ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_bundle( 'realtor_starter', 'realtor' ),
+				$this->valid_bundle( 'realtor_second', 'realtor' ),
+			)
+		);
 		$for_subtype = $registry->get_for_industry( 'realtor', 'realtor_buyer_agent' );
 		$this->assertCount( 2, $for_subtype );
 		$for_empty = $registry->get_for_industry( 'realtor', '' );
@@ -172,7 +178,7 @@ final class Industry_Starter_Bundle_Registry_Test extends TestCase {
 		$registry->load( $definitions );
 
 		$expected_industry_bundles = array( 'cosmetology_nail_starter', 'realtor_starter', 'plumber_starter', 'disaster_recovery_starter' );
-		$expected_industries = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+		$expected_industries       = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
 
 		foreach ( $expected_industry_bundles as $key ) {
 			$bundle = $registry->get( $key );

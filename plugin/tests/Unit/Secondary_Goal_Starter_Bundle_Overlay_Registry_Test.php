@@ -20,18 +20,20 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry_Test extends TestCase
 
 	public function test_load_and_get_returns_overlay(): void {
 		$registry = new Secondary_Goal_Starter_Bundle_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_OVERLAY_KEY             => 'calls_lead_capture',
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY       => 'calls',
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY     => 'lead_capture',
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_TARGET_BUNDLE_REF     => '',
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_ALLOWED_OVERLAY_REGIONS => array( 'section_emphasis', 'cta_posture' ),
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_PRECEDENCE_MARKER     => Secondary_Goal_Starter_Bundle_Overlay_Registry::PRECEDENCE_SECONDARY,
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_STATUS                 => Secondary_Goal_Starter_Bundle_Overlay_Registry::STATUS_ACTIVE,
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_VERSION_MARKER        => Secondary_Goal_Starter_Bundle_Overlay_Registry::SUPPORTED_SCHEMA_VERSION,
-			),
-		) );
+				array(
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_OVERLAY_KEY             => 'calls_lead_capture',
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY       => 'calls',
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY     => 'lead_capture',
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_TARGET_BUNDLE_REF     => '',
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_ALLOWED_OVERLAY_REGIONS => array( 'section_emphasis', 'cta_posture' ),
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_PRECEDENCE_MARKER     => Secondary_Goal_Starter_Bundle_Overlay_Registry::PRECEDENCE_SECONDARY,
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_STATUS                 => Secondary_Goal_Starter_Bundle_Overlay_Registry::STATUS_ACTIVE,
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_VERSION_MARKER        => Secondary_Goal_Starter_Bundle_Overlay_Registry::SUPPORTED_SCHEMA_VERSION,
+				),
+			)
+		);
 		$ov = $registry->get( 'calls', 'lead_capture', '' );
 		$this->assertNotNull( $ov );
 		$this->assertSame( 'calls_lead_capture', $ov[ Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_OVERLAY_KEY ] );
@@ -47,23 +49,25 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry_Test extends TestCase
 
 	public function test_invalid_overlay_skipped_at_load(): void {
 		$registry = new Secondary_Goal_Starter_Bundle_Overlay_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_OVERLAY_KEY             => 'bad',
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY       => 'calls',
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY     => 'calls',
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_ALLOWED_OVERLAY_REGIONS => array( 'section_emphasis' ),
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_PRECEDENCE_MARKER     => Secondary_Goal_Starter_Bundle_Overlay_Registry::PRECEDENCE_SECONDARY,
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_STATUS                 => Secondary_Goal_Starter_Bundle_Overlay_Registry::STATUS_ACTIVE,
-				Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_VERSION_MARKER        => Secondary_Goal_Starter_Bundle_Overlay_Registry::SUPPORTED_SCHEMA_VERSION,
-			),
-		) );
+				array(
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_OVERLAY_KEY             => 'bad',
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY       => 'calls',
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY     => 'calls',
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_ALLOWED_OVERLAY_REGIONS => array( 'section_emphasis' ),
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_PRECEDENCE_MARKER     => Secondary_Goal_Starter_Bundle_Overlay_Registry::PRECEDENCE_SECONDARY,
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_STATUS                 => Secondary_Goal_Starter_Bundle_Overlay_Registry::STATUS_ACTIVE,
+					Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_VERSION_MARKER        => Secondary_Goal_Starter_Bundle_Overlay_Registry::SUPPORTED_SCHEMA_VERSION,
+				),
+			)
+		);
 		$this->assertEmpty( $registry->list_all() );
 	}
 
 	public function test_validate_overlay_returns_errors_for_primary_equals_secondary(): void {
 		$registry = new Secondary_Goal_Starter_Bundle_Overlay_Registry();
-		$ov = array(
+		$ov       = array(
 			Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_OVERLAY_KEY             => 'same_goal',
 			Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_PRIMARY_GOAL_KEY       => 'bookings',
 			Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_SECONDARY_GOAL_KEY     => 'bookings',
@@ -72,7 +76,7 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry_Test extends TestCase
 			Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_STATUS                 => Secondary_Goal_Starter_Bundle_Overlay_Registry::STATUS_ACTIVE,
 			Secondary_Goal_Starter_Bundle_Overlay_Registry::FIELD_VERSION_MARKER        => Secondary_Goal_Starter_Bundle_Overlay_Registry::SUPPORTED_SCHEMA_VERSION,
 		);
-		$errors = $registry->validate_overlay( $ov );
+		$errors   = $registry->validate_overlay( $ov );
 		$this->assertContains( 'primary_equals_secondary', $errors );
 	}
 

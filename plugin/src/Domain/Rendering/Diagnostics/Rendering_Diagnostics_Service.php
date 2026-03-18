@@ -28,14 +28,14 @@ final class Rendering_Diagnostics_Service {
 	 * @return array<string, mixed> render_summary shape: section_count, sections (list of section_key, variant, position, valid, error_count), valid_count, has_errors.
 	 */
 	public function build_render_summary( array $section_results ): array {
-		$sections = array();
+		$sections    = array();
 		$valid_count = 0;
 		foreach ( $section_results as $result ) {
 			if ( ! $result instanceof Section_Render_Result ) {
 				continue;
 			}
 			$errors = $result->get_errors();
-			$valid = empty( $errors );
+			$valid  = empty( $errors );
 			if ( $valid ) {
 				++$valid_count;
 			}
@@ -65,14 +65,14 @@ final class Rendering_Diagnostics_Service {
 		$ordered = $assembly->get_ordered_sections();
 		$errors  = $assembly->get_errors();
 		return array(
-			'source_type'               => $assembly->get_source_type(),
-			'source_key'                => $assembly->get_source_key(),
-			'section_count'             => count( $ordered ),
-			'block_content_length'      => strlen( $assembly->get_block_content() ),
-			'dynamic_dependency_count'  => count( $assembly->get_dynamic_dependencies() ),
-			'survivability_notes'       => $assembly->get_survivability_notes(),
-			'valid'                     => $assembly->is_valid(),
-			'error_count'               => count( $errors ),
+			'source_type'              => $assembly->get_source_type(),
+			'source_key'               => $assembly->get_source_key(),
+			'section_count'            => count( $ordered ),
+			'block_content_length'     => strlen( $assembly->get_block_content() ),
+			'dynamic_dependency_count' => count( $assembly->get_dynamic_dependencies() ),
+			'survivability_notes'      => $assembly->get_survivability_notes(),
+			'valid'                    => $assembly->is_valid(),
+			'error_count'              => count( $errors ),
 		);
 	}
 
@@ -89,10 +89,10 @@ final class Rendering_Diagnostics_Service {
 			'error_count' => 0,
 		);
 		if ( $result !== null ) {
-			$out['success']  = $result->is_success();
-			$out['post_id']  = $result->get_post_id();
-			$out['ready']    = $result->is_success();
-			$out['errors']   = $result->get_errors();
+			$out['success']     = $result->is_success();
+			$out['post_id']     = $result->get_post_id();
+			$out['ready']       = $result->is_success();
+			$out['errors']      = $result->get_errors();
 			$out['error_count'] = count( $result->get_errors() );
 		}
 		if ( $payload !== null ) {

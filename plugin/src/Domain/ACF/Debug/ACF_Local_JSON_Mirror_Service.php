@@ -52,7 +52,7 @@ final class ACF_Local_JSON_Mirror_Service {
 		ACF_Group_Builder $group_builder
 	) {
 		$this->blueprint_service = $blueprint_service;
-		$this->group_builder    = $group_builder;
+		$this->group_builder     = $group_builder;
 	}
 
 	/**
@@ -79,15 +79,15 @@ final class ACF_Local_JSON_Mirror_Service {
 			if ( $group === null ) {
 				continue;
 			}
-			$group_key = (string) ( $group['key'] ?? Field_Key_Generator::group_key( $section_key ) );
+			$group_key       = (string) ( $group['key'] ?? Field_Key_Generator::group_key( $section_key ) );
 			$section_version = (string) ( $blueprint[ Field_Blueprint_Schema::SECTION_VERSION ] ?? '' );
-			$filename = $group_key . '.json';
-			$path_relative = $filename;
-			$full_path = $target_dir . $filename;
-			$safe_group = $this->sanitize_group_for_export( $group );
-			$json = \wp_json_encode( $safe_group, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
+			$filename        = $group_key . '.json';
+			$path_relative   = $filename;
+			$full_path       = $target_dir . $filename;
+			$safe_group      = $this->sanitize_group_for_export( $group );
+			$json            = \wp_json_encode( $safe_group, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
 			if ( $json !== false && file_put_contents( $full_path, $json ) !== false ) {
-				$files[] = array(
+				$files[]      = array(
 					'group_key'       => $group_key,
 					'section_key'     => $section_key,
 					'section_version' => $section_version,
@@ -113,9 +113,9 @@ final class ACF_Local_JSON_Mirror_Service {
 			if ( $section_key === '' ) {
 				continue;
 			}
-			$group_key = Field_Key_Generator::group_key( $section_key );
+			$group_key    = Field_Key_Generator::group_key( $section_key );
 			$group_keys[] = $group_key;
-			$files[] = array(
+			$files[]      = array(
 				'group_key'       => $group_key,
 				'section_key'     => $section_key,
 				'section_version' => (string) ( $blueprint[ Field_Blueprint_Schema::SECTION_VERSION ] ?? '' ),
@@ -132,7 +132,7 @@ final class ACF_Local_JSON_Mirror_Service {
 	 * @return array<string, mixed>
 	 */
 	private function sanitize_group_for_export( array $group ): array {
-		$out = array();
+		$out     = array();
 		$allowed = array( 'key', 'title', 'fields', 'location', 'menu_order', 'position', 'style', 'label_placement', 'instruction_placement', 'description', 'hide_on_screen', '_aio_section_key', '_aio_section_version' );
 		foreach ( $group as $k => $v ) {
 			if ( ! in_array( $k, $allowed, true ) ) {
@@ -152,7 +152,7 @@ final class ACF_Local_JSON_Mirror_Service {
 	 * @return list<array<string, mixed>>
 	 */
 	private function sanitize_fields_for_export( array $fields ): array {
-		$out = array();
+		$out           = array();
 		$field_allowed = array( 'key', 'name', 'label', 'type', 'required', 'default_value', 'instructions', 'sub_fields', 'min', 'max', 'layout', 'return_format', 'preview_size' );
 		foreach ( $fields as $f ) {
 			if ( ! is_array( $f ) ) {
@@ -182,17 +182,17 @@ final class ACF_Local_JSON_Mirror_Service {
 	 */
 	private function build_manifest( array $files, array $group_keys, bool $failure ): array {
 		$manifest = array(
-			'schema_version'  => self::MANIFEST_SCHEMA_VERSION,
-			'mirror_version'  => self::MANIFEST_SCHEMA_VERSION,
-			'generated_at'    => gmdate( 'Y-m-d\TH:i:s\Z' ),
-			'plugin_version'  => Versions::plugin(),
-			'source'          => 'registry',
-			'group_keys'      => $group_keys,
-			'files'           => $files,
-			'label'           => __( 'ACF field groups mirror (internal/debug). Registry is source of truth.', 'aio-page-builder' ),
+			'schema_version' => self::MANIFEST_SCHEMA_VERSION,
+			'mirror_version' => self::MANIFEST_SCHEMA_VERSION,
+			'generated_at'   => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			'plugin_version' => Versions::plugin(),
+			'source'         => 'registry',
+			'group_keys'     => $group_keys,
+			'files'          => $files,
+			'label'          => __( 'ACF field groups mirror (internal/debug). Registry is source of truth.', 'aio-page-builder' ),
 		);
 		if ( $failure ) {
-			$manifest['error'] = true;
+			$manifest['error']   = true;
 			$manifest['message'] = 'Mirror generation failed.';
 		}
 		return $manifest;

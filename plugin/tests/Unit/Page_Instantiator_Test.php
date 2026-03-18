@@ -49,9 +49,9 @@ final class Page_Instantiator_Test extends TestCase {
 
 	public function test_create_page_success_stores_provenance(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 42;
-		$builder   = new Page_Instantiation_Payload_Builder();
-		$instantiator = new Page_Instantiator( $builder );
-		$payload   = $this->valid_create_payload();
+		$builder                               = new Page_Instantiation_Payload_Builder();
+		$instantiator                          = new Page_Instantiator( $builder );
+		$payload                               = $this->valid_create_payload();
 
 		$result = $instantiator->create_page( $payload );
 
@@ -60,14 +60,14 @@ final class Page_Instantiator_Test extends TestCase {
 		$this->assertSame( 42, $result->get_post_id() );
 		$this->assertEmpty( $result->get_errors() );
 		$this->assertArrayHasKey( '42', $GLOBALS['_aio_post_meta'] );
-		$this->assertSame( 'page_template', $GLOBALS['_aio_post_meta']['42'][ '_aio_build_source_type' ] );
-		$this->assertSame( 'tpl_landing', $GLOBALS['_aio_post_meta']['42'][ '_aio_build_source_key' ] );
+		$this->assertSame( 'page_template', $GLOBALS['_aio_post_meta']['42']['_aio_build_source_type'] );
+		$this->assertSame( 'tpl_landing', $GLOBALS['_aio_post_meta']['42']['_aio_build_source_key'] );
 	}
 
 	public function test_create_page_invalid_payload_returns_failure(): void {
-		$builder      = new Page_Instantiation_Payload_Builder();
-		$instantiator = new Page_Instantiator( $builder );
-		$payload     = $this->valid_create_payload();
+		$builder               = new Page_Instantiation_Payload_Builder();
+		$instantiator          = new Page_Instantiator( $builder );
+		$payload               = $this->valid_create_payload();
 		$payload['page_title'] = '';
 
 		$result = $instantiator->create_page( $payload );
@@ -80,7 +80,7 @@ final class Page_Instantiator_Test extends TestCase {
 	public function test_create_page_missing_post_content_fails_validation(): void {
 		$builder      = new Page_Instantiation_Payload_Builder();
 		$instantiator = new Page_Instantiator( $builder );
-		$payload     = $this->valid_create_payload();
+		$payload      = $this->valid_create_payload();
 		unset( $payload['post_content'] );
 
 		$result = $instantiator->create_page( $payload );
@@ -90,27 +90,33 @@ final class Page_Instantiator_Test extends TestCase {
 	}
 
 	public function test_update_page_success_stores_provenance(): void {
-		$GLOBALS['_aio_get_post_return']   = new \WP_Post( array( 'ID' => 100, 'post_type' => 'page', 'post_title' => 'Old' ) );
+		$GLOBALS['_aio_get_post_return']       = new \WP_Post(
+			array(
+				'ID'         => 100,
+				'post_type'  => 'page',
+				'post_title' => 'Old',
+			)
+		);
 		$GLOBALS['_aio_wp_update_post_return'] = 100;
-		$builder      = new Page_Instantiation_Payload_Builder();
-		$instantiator = new Page_Instantiator( $builder );
-		$payload      = $this->valid_create_payload();
-		$payload['target_post_id'] = 100;
-		$payload['post_content']   = '<!-- wp:html --><div>Updated</div><!-- /wp:html -->';
+		$builder                               = new Page_Instantiation_Payload_Builder();
+		$instantiator                          = new Page_Instantiator( $builder );
+		$payload                               = $this->valid_create_payload();
+		$payload['target_post_id']             = 100;
+		$payload['post_content']               = '<!-- wp:html --><div>Updated</div><!-- /wp:html -->';
 
 		$result = $instantiator->update_page( $payload );
 
 		$this->assertTrue( $result->is_success() );
 		$this->assertSame( 100, $result->get_post_id() );
-		$this->assertSame( 'page_template', $GLOBALS['_aio_post_meta']['100'][ '_aio_build_source_type' ] );
+		$this->assertSame( 'page_template', $GLOBALS['_aio_post_meta']['100']['_aio_build_source_type'] );
 	}
 
 	public function test_update_page_invalid_target_fails(): void {
 		$GLOBALS['_aio_get_post_return'] = null;
-		$builder      = new Page_Instantiation_Payload_Builder();
-		$instantiator = new Page_Instantiator( $builder );
-		$payload      = $this->valid_create_payload();
-		$payload['target_post_id'] = 999;
+		$builder                         = new Page_Instantiation_Payload_Builder();
+		$instantiator                    = new Page_Instantiator( $builder );
+		$payload                         = $this->valid_create_payload();
+		$payload['target_post_id']       = 999;
 
 		$result = $instantiator->update_page( $payload );
 
@@ -120,9 +126,9 @@ final class Page_Instantiator_Test extends TestCase {
 	}
 
 	public function test_update_payload_validation_requires_target_post_id(): void {
-		$builder      = new Page_Instantiation_Payload_Builder();
-		$instantiator = new Page_Instantiator( $builder );
-		$payload      = $this->valid_create_payload();
+		$builder                   = new Page_Instantiation_Payload_Builder();
+		$instantiator              = new Page_Instantiator( $builder );
+		$payload                   = $this->valid_create_payload();
 		$payload['target_post_id'] = 0;
 
 		$result = $instantiator->update_page( $payload );
@@ -131,8 +137,8 @@ final class Page_Instantiator_Test extends TestCase {
 	}
 
 	public function test_build_create_payload_via_instantiator_produces_create_ready_shape(): void {
-		$assembly = new Page_Block_Assembly_Result( 'page_template', 'tpl_x', array(), '<!-- wp:html -->x<!-- /wp:html -->', array(), array(), array() );
-		$builder  = new Page_Instantiation_Payload_Builder();
+		$assembly     = new Page_Block_Assembly_Result( 'page_template', 'tpl_x', array(), '<!-- wp:html -->x<!-- /wp:html -->', array(), array(), array() );
+		$builder      = new Page_Instantiation_Payload_Builder();
 		$instantiator = new Page_Instantiator( $builder );
 
 		$payload = $instantiator->build_create_payload( $assembly, 'My Page', array( 'post_status_candidate' => 'publish' ) );
@@ -144,9 +150,9 @@ final class Page_Instantiator_Test extends TestCase {
 
 	public function test_result_payload_used_snapshot(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 7;
-		$builder      = new Page_Instantiation_Payload_Builder();
-		$instantiator = new Page_Instantiator( $builder );
-		$payload      = $this->valid_create_payload();
+		$builder                               = new Page_Instantiation_Payload_Builder();
+		$instantiator                          = new Page_Instantiator( $builder );
+		$payload                               = $this->valid_create_payload();
 
 		$result = $instantiator->create_page( $payload );
 

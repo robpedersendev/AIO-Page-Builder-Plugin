@@ -19,7 +19,13 @@ final class Form_Provider_Picker_Cache_Service_Test extends TestCase {
 
 	public function test_set_and_get_returns_stored_entry(): void {
 		$cache = new Form_Provider_Picker_Cache_Service( 300 );
-		$items = array( array( 'provider_key' => 'ndr_forms', 'item_id' => 'f1', 'item_label' => 'Contact' ) );
+		$items = array(
+			array(
+				'provider_key' => 'ndr_forms',
+				'item_id'      => 'f1',
+				'item_label'   => 'Contact',
+			),
+		);
 		$cache->set( 'ndr_forms', $items, 'success' );
 		$entry = $cache->get( 'ndr_forms' );
 		$this->assertNotNull( $entry );
@@ -35,7 +41,13 @@ final class Form_Provider_Picker_Cache_Service_Test extends TestCase {
 
 	public function test_get_fallback_returns_expired_entry(): void {
 		$cache = new Form_Provider_Picker_Cache_Service( 1 );
-		$items = array( array( 'provider_key' => 'ndr_forms', 'item_id' => 'f1', 'item_label' => 'Contact' ) );
+		$items = array(
+			array(
+				'provider_key' => 'ndr_forms',
+				'item_id'      => 'f1',
+				'item_label'   => 'Contact',
+			),
+		);
 		$cache->set( 'ndr_forms', $items, 'success' );
 		sleep( 2 );
 		$fallback = $cache->get_fallback( 'ndr_forms' );
@@ -63,7 +75,17 @@ final class Form_Provider_Picker_Cache_Service_Test extends TestCase {
 
 	public function test_sanitizes_provider_key(): void {
 		$cache = new Form_Provider_Picker_Cache_Service( 300 );
-		$cache->set( 'NDR-Forms', array( array( 'provider_key' => 'ndr_forms', 'item_id' => 'x', 'item_label' => 'X' ) ), 'success' );
+		$cache->set(
+			'NDR-Forms',
+			array(
+				array(
+					'provider_key' => 'ndr_forms',
+					'item_id'      => 'x',
+					'item_label'   => 'X',
+				),
+			),
+			'success'
+		);
 		$entry = $cache->get( 'ndrforms' );
 		$this->assertNotNull( $entry );
 		$this->assertSame( 'success', $entry['outcome'] );
@@ -73,7 +95,17 @@ final class Form_Provider_Picker_Cache_Service_Test extends TestCase {
 		$cache = new Form_Provider_Picker_Cache_Service( 300 );
 		$cache->set( 'p1', array(), 'empty' );
 		$this->assertSame( 'empty', $cache->get( 'p1' )['outcome'] );
-		$cache->set( 'p2', array( array( 'provider_key' => 'p2', 'item_id' => 'a', 'item_label' => 'A' ) ), 'success' );
+		$cache->set(
+			'p2',
+			array(
+				array(
+					'provider_key' => 'p2',
+					'item_id'      => 'a',
+					'item_label'   => 'A',
+				),
+			),
+			'success'
+		);
 		$this->assertSame( 'success', $cache->get( 'p2' )['outcome'] );
 		$cache->set( 'p3', array(), 'invalid_outcome' );
 		$this->assertSame( 'error', $cache->get( 'p3' )['outcome'] );

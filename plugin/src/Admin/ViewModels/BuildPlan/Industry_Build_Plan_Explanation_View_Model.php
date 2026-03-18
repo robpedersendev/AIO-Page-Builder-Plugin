@@ -21,22 +21,22 @@ final class Industry_Build_Plan_Explanation_View_Model {
 
 	/** Known recommendation reason codes → human-readable labels. */
 	private const REASON_LABELS = array(
-		'pack_family_fit'         => 'Matches industry page family',
-		'template_affinity_primary'=> 'Template fits primary industry',
-		'hierarchy_fit'          => 'Fits hierarchy rules',
-		'cta_fit'                => 'CTA pattern aligned',
-		'lpagery_fit'             => 'LPagery posture aligned',
-		'section_affinity'        => 'Section fit for industry',
-		'neutral'                 => 'Neutral fit',
+		'pack_family_fit'           => 'Matches industry page family',
+		'template_affinity_primary' => 'Template fits primary industry',
+		'hierarchy_fit'             => 'Fits hierarchy rules',
+		'cta_fit'                   => 'CTA pattern aligned',
+		'lpagery_fit'               => 'LPagery posture aligned',
+		'section_affinity'          => 'Section fit for industry',
+		'neutral'                   => 'Neutral fit',
 	);
 
 	/** Known warning flag codes → human-readable labels. */
 	private const WARNING_LABELS = array(
-		'cta_mismatch'             => 'CTA pattern may not match industry preference',
-		'discouraged_for_industry'  => 'Discouraged for this industry',
-		'weak_fit'                 => 'Weak fit for industry',
-		'hierarchy_depth_missing'  => 'Hierarchy depth may be incomplete',
-		'weak_fit_local_page'      => 'Local page generation may be weak fit',
+		'cta_mismatch'                        => 'CTA pattern may not match industry preference',
+		'discouraged_for_industry'            => 'Discouraged for this industry',
+		'weak_fit'                            => 'Weak fit for industry',
+		'hierarchy_depth_missing'             => 'Hierarchy depth may be incomplete',
+		'weak_fit_local_page'                 => 'Local page generation may be weak fit',
 		'required_tokens_for_central_lpagery' => 'Central LPagery may need token setup',
 	);
 
@@ -49,7 +49,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 	/**
 	 * Builds view model from one plan item payload. Safe when payload has no industry keys.
 	 *
-	 * @param array<string, mixed> $item_payload Item payload (may contain industry_source_refs, recommendation_reasons, industry_fit_score, industry_warning_flags).
+	 * @param array<string, mixed>                                                     $item_payload Item payload (may contain industry_source_refs, recommendation_reasons, industry_fit_score, industry_warning_flags).
 	 * @param list<array{rule_key: string, severity: string, caution_summary: string}> $compliance_warnings Optional advisory compliance cautions from Industry_Compliance_Warning_Resolver (Prompt 407).
 	 * @return array{has_industry_data: bool, summary_lines: list<string>, warning_badges: list<array{code: string, label: string}>, fit_classification: string, source_refs: list<string>, compliance_cautions: list<array{rule_key: string, severity: string, caution_summary: string}>}
 	 */
@@ -64,7 +64,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 
 		$summary_lines = array();
 		foreach ( array_slice( $reasons, 0, self::MAX_SUMMARY_LINES ) as $code ) {
-			$label = self::REASON_LABELS[ $code ] ?? self::humanize_code( $code );
+			$label           = self::REASON_LABELS[ $code ] ?? self::humanize_code( $code );
 			$summary_lines[] = $label;
 		}
 		if ( $fit_score !== null && $summary_lines === array() ) {
@@ -81,7 +81,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 
 		$fit_classification = self::derive_fit_classification( $fit_score, $warning_flags );
 
-		$conflict_results = isset( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ] ) && is_array( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ] )
+		$conflict_results    = isset( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ] ) && is_array( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ] )
 			? $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_CONFLICT_RESULTS ]
 			: array();
 		$explanation_summary = isset( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_EXPLANATION_SUMMARY ] ) && is_string( $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_EXPLANATION_SUMMARY ] )
@@ -116,7 +116,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 		$warnings = isset( $plan_definition['warnings'] ) && is_array( $plan_definition['warnings'] )
 			? $plan_definition['warnings']
 			: array();
-		$out = array();
+		$out      = array();
 		foreach ( array_slice( $warnings, 0, 10 ) as $w ) {
 			if ( ! is_array( $w ) ) {
 				continue;
@@ -157,7 +157,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 			return array();
 		}
 		$allowed = array_keys( self::REASON_LABELS );
-		$out = array();
+		$out     = array();
 		foreach ( $raw as $r ) {
 			if ( is_string( $r ) && $r !== '' && ( in_array( $r, $allowed, true ) || preg_match( '#^[a-z0-9_]+$#', $r ) ) ) {
 				$out[] = $r;
@@ -176,7 +176,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 			return array();
 		}
 		$allowed = array_keys( self::WARNING_LABELS );
-		$out = array();
+		$out     = array();
 		foreach ( $raw as $f ) {
 			if ( is_string( $f ) && $f !== '' && ( in_array( $f, $allowed, true ) || preg_match( '#^[a-z0-9_]+$#', $f ) ) ) {
 				$out[] = $f;
@@ -190,7 +190,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 	}
 
 	/**
-	 * @param int|null $fit_score
+	 * @param int|null     $fit_score
 	 * @param list<string> $warning_flags
 	 */
 	private static function derive_fit_classification( ?int $fit_score, array $warning_flags ): string {

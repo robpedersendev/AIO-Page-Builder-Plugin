@@ -69,13 +69,15 @@ final class URL_Discovery_Service_Test extends TestCase {
 	public function test_duplicate_suppression(): void {
 		$normalizer = new URL_Normalizer( self::HOST );
 		$service    = new URL_Discovery_Service( $normalizer );
-		$results    = $service->discover_from_seeds( array(
-			'https://example.com/about',
-			'https://example.com/about#section',
-			'https://example.com/about?utm_source=x',
-		) );
+		$results    = $service->discover_from_seeds(
+			array(
+				'https://example.com/about',
+				'https://example.com/about#section',
+				'https://example.com/about?utm_source=x',
+			)
+		);
 		$this->assertCount( 3, $results );
-		$accepted = array_filter( $results, fn( Discovery_Result $r ) => $r->is_accepted() );
+		$accepted   = array_filter( $results, fn( Discovery_Result $r ) => $r->is_accepted() );
 		$duplicates = array_filter( $results, fn( Discovery_Result $r ) => $r->is_duplicate() );
 		$this->assertCount( 1, $accepted );
 		$this->assertCount( 2, $duplicates );

@@ -53,7 +53,7 @@ final class Error_Record_Test extends TestCase {
 	}
 
 	public function test_get_user_facing_message_returns_sanitized_message_only(): void {
-		$msg = 'Operation failed. Please check settings.';
+		$msg    = 'Operation failed. Please check settings.';
 		$record = new Error_Record( 'r1', Log_Categories::EXECUTION, Log_Severities::ERROR, $msg );
 		$this->assertSame( $msg, $record->get_user_facing_message() );
 	}
@@ -77,7 +77,7 @@ final class Error_Record_Test extends TestCase {
 
 	public function test_to_array_has_required_keys(): void {
 		$record = new Error_Record( 'id-2', Log_Categories::SECURITY, Log_Severities::CRITICAL, 'Access denied.' );
-		$arr = $record->to_array();
+		$arr    = $record->to_array();
 		$this->assertArrayHasKey( 'id', $arr );
 		$this->assertArrayHasKey( 'category', $arr );
 		$this->assertArrayHasKey( 'severity', $arr );
@@ -88,8 +88,8 @@ final class Error_Record_Test extends TestCase {
 
 	/** Redaction-safe: user-facing output does not append or inject data beyond the sanitized message. */
 	public function test_user_facing_message_contains_only_sanitized_message(): void {
-		$safe = 'Validation failed for field X.';
-		$record = new Error_Record( 'x', Log_Categories::VALIDATION, Log_Severities::ERROR, $safe, '', 'admin', 'plan-1', 'Fix field X.' );
+		$safe     = 'Validation failed for field X.';
+		$record   = new Error_Record( 'x', Log_Categories::VALIDATION, Log_Severities::ERROR, $safe, '', 'admin', 'plan-1', 'Fix field X.' );
 		$user_msg = $record->get_user_facing_message();
 		$this->assertSame( $safe, $user_msg );
 		$this->assertStringNotContainsString( 'plan-1', $user_msg );

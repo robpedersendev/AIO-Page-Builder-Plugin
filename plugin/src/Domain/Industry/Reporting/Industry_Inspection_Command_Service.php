@@ -71,15 +71,15 @@ final class Industry_Inspection_Command_Service {
 		?Industry_Starter_Bundle_Registry $starter_bundle_registry = null,
 		?callable $section_list_provider = null
 	) {
-		$this->profile_repo             = $profile_repo;
-		$this->health_service           = $health_service;
-		$this->diagnostics_service      = $diagnostics_service;
-		$this->pack_registry            = $pack_registry;
-		$this->page_resolver            = $page_resolver;
-		$this->section_resolver         = $section_resolver;
-		$this->page_repo                = $page_repo;
-		$this->starter_bundle_registry  = $starter_bundle_registry;
-		$this->section_list_provider    = $section_list_provider;
+		$this->profile_repo            = $profile_repo;
+		$this->health_service          = $health_service;
+		$this->diagnostics_service     = $diagnostics_service;
+		$this->pack_registry           = $pack_registry;
+		$this->page_resolver           = $page_resolver;
+		$this->section_resolver        = $section_resolver;
+		$this->page_repo               = $page_repo;
+		$this->starter_bundle_registry = $starter_bundle_registry;
+		$this->section_list_provider   = $section_list_provider;
 	}
 
 	/**
@@ -89,23 +89,23 @@ final class Industry_Inspection_Command_Service {
 	 */
 	public function get_profile_summary(): array {
 		$empty = array(
-			'primary_industry_key'       => '',
-			'secondary_industry_keys'    => array(),
+			'primary_industry_key'        => '',
+			'secondary_industry_keys'     => array(),
 			'selected_starter_bundle_key' => '',
-			'readiness'                  => 'none',
-			'available'                  => $this->profile_repo !== null,
+			'readiness'                   => 'none',
+			'available'                   => $this->profile_repo !== null,
 		);
 		if ( $this->profile_repo === null ) {
 			return $empty;
 		}
-		$profile = $this->profile_repo->get_profile();
-		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$profile   = $this->profile_repo->get_profile();
+		$primary   = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			: '';
 		$secondary = isset( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) && is_array( $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
 			? array_values( array_filter( array_map( 'trim', $profile[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] ) ) )
 			: array();
-		$starter = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
+		$starter   = isset( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 			? trim( $profile[ Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY ] )
 			: '';
 		$readiness = 'none';
@@ -120,9 +120,9 @@ final class Industry_Inspection_Command_Service {
 		}
 		return array(
 			'primary_industry_key'        => $primary,
-			'secondary_industry_keys'      => $secondary,
-			'selected_starter_bundle_key'  => $starter,
-			'readiness'                    => $readiness,
+			'secondary_industry_keys'     => $secondary,
+			'selected_starter_bundle_key' => $starter,
+			'readiness'                   => $readiness,
 			'available'                   => true,
 		);
 	}
@@ -143,23 +143,37 @@ final class Industry_Inspection_Command_Service {
 		if ( $this->health_service === null ) {
 			return $empty;
 		}
-		$result = $this->health_service->run();
-		$errors = $result['errors'] ?? array();
-		$warnings = $result['warnings'] ?? array();
-		$sample_errors = array_slice( array_map( function ( $e ) {
-			return array(
-				'object_type'   => $e['object_type'] ?? '',
-				'key'           => $e['key'] ?? '',
-				'issue_summary' => $e['issue_summary'] ?? '',
-			);
-		}, $errors ), 0, 5 );
-		$sample_warnings = array_slice( array_map( function ( $w ) {
-			return array(
-				'object_type'   => $w['object_type'] ?? '',
-				'key'           => $w['key'] ?? '',
-				'issue_summary' => $w['issue_summary'] ?? '',
-			);
-		}, $warnings ), 0, 5 );
+		$result          = $this->health_service->run();
+		$errors          = $result['errors'] ?? array();
+		$warnings        = $result['warnings'] ?? array();
+		$sample_errors   = array_slice(
+			array_map(
+				function ( $e ) {
+					return array(
+						'object_type'   => $e['object_type'] ?? '',
+						'key'           => $e['key'] ?? '',
+						'issue_summary' => $e['issue_summary'] ?? '',
+					);
+				},
+				$errors
+			),
+			0,
+			5
+		);
+		$sample_warnings = array_slice(
+			array_map(
+				function ( $w ) {
+					return array(
+						'object_type'   => $w['object_type'] ?? '',
+						'key'           => $w['key'] ?? '',
+						'issue_summary' => $w['issue_summary'] ?? '',
+					);
+				},
+				$warnings
+			),
+			0,
+			5
+		);
 		return array(
 			'errors_count'    => count( $errors ),
 			'warnings_count'  => count( $warnings ),
@@ -182,10 +196,10 @@ final class Industry_Inspection_Command_Service {
 				'profile_readiness'            => 'none',
 				'active_pack_refs'             => array(),
 				'applied_preset_ref'           => null,
-				'section_overlay_count'       => 0,
-				'page_overlay_count'          => 0,
-				'recommendation_mode'         => 'inactive',
-				'warnings'                    => array(),
+				'section_overlay_count'        => 0,
+				'page_overlay_count'           => 0,
+				'recommendation_mode'          => 'inactive',
+				'warnings'                     => array(),
 				'industry_subsystem_available' => false,
 			);
 		}
@@ -202,35 +216,35 @@ final class Industry_Inspection_Command_Service {
 	 * @return array{industry_key: string, top_template_keys: list<string>, top_section_keys: list<string>, template_count: int, section_count: int, pack_found: bool}
 	 */
 	public function get_recommendation_preview( string $industry_key, int $top_templates = 0, int $top_sections = 0 ): array {
-		$top_templates = $top_templates > 0 ? $top_templates : self::PREVIEW_TOP_N;
-		$profile = array(
-			'primary_industry_key'   => $industry_key,
+		$top_templates     = $top_templates > 0 ? $top_templates : self::PREVIEW_TOP_N;
+		$profile           = array(
+			'primary_industry_key'    => $industry_key,
 			'secondary_industry_keys' => array(),
 		);
-		$primary_pack = $this->pack_registry !== null ? $this->pack_registry->get( $industry_key ) : null;
+		$primary_pack      = $this->pack_registry !== null ? $this->pack_registry->get( $industry_key ) : null;
 		$top_template_keys = array();
-		$template_count = 0;
+		$template_count    = 0;
 		if ( $this->page_resolver !== null && $this->page_repo !== null ) {
-			$templates = $this->page_repo->list_all_definitions( self::PREVIEW_TEMPLATE_CAP, 0 );
-			$template_count = count( $templates );
-			$result = $this->page_resolver->resolve( $profile, $primary_pack, $templates, array() );
+			$templates         = $this->page_repo->list_all_definitions( self::PREVIEW_TEMPLATE_CAP, 0 );
+			$template_count    = count( $templates );
+			$result            = $this->page_resolver->resolve( $profile, $primary_pack, $templates, array() );
 			$top_template_keys = array_slice( array_values( $result->get_ranked_keys() ), 0, $top_templates );
 		}
 		$top_section_keys = array();
-		$section_count = 0;
+		$section_count    = 0;
 		if ( $top_sections > 0 && $this->section_resolver !== null && $this->section_list_provider !== null ) {
-			$sections = ( $this->section_list_provider )();
-			$section_count = count( $sections );
-			$result = $this->section_resolver->resolve( $profile, $primary_pack, $sections, array() );
+			$sections         = ( $this->section_list_provider )();
+			$section_count    = count( $sections );
+			$result           = $this->section_resolver->resolve( $profile, $primary_pack, $sections, array() );
 			$top_section_keys = array_slice( array_values( $result->get_ranked_keys() ), 0, $top_sections );
 		}
 		return array(
 			'industry_key'      => $industry_key,
 			'top_template_keys' => $top_template_keys,
 			'top_section_keys'  => $top_section_keys,
-			'template_count'   => $template_count,
-			'section_count'    => $section_count,
-			'pack_found'       => $primary_pack !== null,
+			'template_count'    => $template_count,
+			'section_count'     => $section_count,
+			'pack_found'        => $primary_pack !== null,
 		);
 	}
 
@@ -245,7 +259,7 @@ final class Industry_Inspection_Command_Service {
 			return array();
 		}
 		$bundles = $this->starter_bundle_registry->get_for_industry( $industry_key );
-		$keys = array();
+		$keys    = array();
 		foreach ( $bundles as $bundle ) {
 			$key = $bundle[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '';
 			if ( is_string( $key ) && $key !== '' ) {

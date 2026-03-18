@@ -17,10 +17,10 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Omitted_Recommendation_Report {
 
-	public const KEY_SECTION = 'section';
-	public const KEY_INDEX   = 'index';
-	public const KEY_REASON  = 'reason';
-	public const KEY_MESSAGE = 'message';
+	public const KEY_SECTION         = 'section';
+	public const KEY_INDEX           = 'index';
+	public const KEY_REASON          = 'reason';
+	public const KEY_MESSAGE         = 'message';
 	public const KEY_RECORD_SNAPSHOT = 'record_snapshot';
 
 	/**

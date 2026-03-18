@@ -20,12 +20,12 @@ use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Schema;
  */
 final class Page_Diff_Summarizer {
 
-	private const SUMMARY_MAX_LEN = 512;
-	private const EXCERPT_MAX_LEN = 200;
-	private const CONTENT_REPLACEMENT_NONE       = 'none';
-	private const CONTENT_REPLACEMENT_FULL       = 'full_replace';
-	private const CONTENT_REPLACEMENT_PARTIAL    = 'partial';
-	private const CONTENT_REPLACEMENT_UNKNOWN    = 'unknown';
+	private const SUMMARY_MAX_LEN             = 512;
+	private const EXCERPT_MAX_LEN             = 200;
+	private const CONTENT_REPLACEMENT_NONE    = 'none';
+	private const CONTENT_REPLACEMENT_FULL    = 'full_replace';
+	private const CONTENT_REPLACEMENT_PARTIAL = 'partial';
+	private const CONTENT_REPLACEMENT_UNKNOWN = 'unknown';
 
 	/**
 	 * Builds a content diff from pre- and post-change snapshot records.
@@ -39,7 +39,7 @@ final class Page_Diff_Summarizer {
 		$pre_state  = $this->extract_pre_state( $pre_snapshot );
 		$post_state = $this->extract_post_state( $post_snapshot );
 		if ( $pre_state === null || $post_state === null ) {
-			$diff = $this->minimal_root( $pre_snapshot, $post_snapshot, Diff_Type_Keys::DIFF_TYPE_CONTENT );
+			$diff                   = $this->minimal_root( $pre_snapshot, $post_snapshot, Diff_Type_Keys::DIFF_TYPE_CONTENT );
 			$diff['before_summary'] = $pre_state === null ? __( 'Not available', 'aio-page-builder' ) : $this->page_one_liner( $pre_state );
 			$diff['after_summary']  = $post_state === null ? __( 'Not available', 'aio-page-builder' ) : $this->page_one_liner( $post_state );
 			return Diff_Summary_Result::failure( $diff, __( 'Missing or incompatible snapshot state.', 'aio-page-builder' ), 'snapshot_missing' );
@@ -50,11 +50,11 @@ final class Page_Diff_Summarizer {
 			$target_ref = (string) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? $post_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? 'unknown' );
 		}
 
-		$change_count = 0;
-		$title_before = isset( $pre_state['post_title'] ) ? (string) $pre_state['post_title'] : '';
-		$title_after  = isset( $post_state['post_title'] ) ? (string) $post_state['post_title'] : '';
-		$slug_before  = isset( $pre_state['post_name'] ) ? (string) $pre_state['post_name'] : '';
-		$slug_after   = isset( $post_state['post_name'] ) ? (string) $post_state['post_name'] : '';
+		$change_count  = 0;
+		$title_before  = isset( $pre_state['post_title'] ) ? (string) $pre_state['post_title'] : '';
+		$title_after   = isset( $post_state['post_title'] ) ? (string) $post_state['post_title'] : '';
+		$slug_before   = isset( $pre_state['post_name'] ) ? (string) $pre_state['post_name'] : '';
+		$slug_after    = isset( $post_state['post_name'] ) ? (string) $post_state['post_name'] : '';
 		$status_before = isset( $pre_state['post_status'] ) ? (string) $pre_state['post_status'] : '';
 		$status_after  = isset( $post_state['post_status'] ) ? (string) $post_state['post_status'] : '';
 		if ( $title_before !== $title_after ) {
@@ -68,7 +68,7 @@ final class Page_Diff_Summarizer {
 		}
 		$content_hash_before = isset( $pre_state['content_hash'] ) ? (string) $pre_state['content_hash'] : '';
 		$content_hash_after  = isset( $post_state['content_hash'] ) ? (string) $post_state['content_hash'] : '';
-		$content_changed = $content_hash_before !== '' && $content_hash_after !== '' && $content_hash_before !== $content_hash_after;
+		$content_changed     = $content_hash_before !== '' && $content_hash_after !== '' && $content_hash_before !== $content_hash_after;
 		if ( $content_changed ) {
 			++$change_count;
 		}
@@ -86,31 +86,31 @@ final class Page_Diff_Summarizer {
 		$no_meaningful = ( $change_count === 0 );
 
 		$diff_id = $this->diff_id( Diff_Type_Keys::DIFF_TYPE_CONTENT, $target_ref );
-		$diff = array(
-			'diff_id'         => $diff_id,
-			'diff_type'       => Diff_Type_Keys::DIFF_TYPE_CONTENT,
-			'level'           => Diff_Type_Keys::is_valid_level( $level ) ? $level : Diff_Type_Keys::LEVEL_SUMMARY,
-			'target_ref'      => $target_ref,
-			'target_type_hint'=> 'post',
-			'before_summary'  => $before_summary,
-			'after_summary'   => $after_summary,
-			'change_count'    => $change_count,
-			'execution_ref'   => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? '' ),
-			'build_plan_ref'  => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ?? '' ),
-			'plan_item_ref'   => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF ] ?? '' ),
-			'rollback'        => $this->rollback_block( $pre_snapshot, $post_snapshot ),
+		$diff    = array(
+			'diff_id'          => $diff_id,
+			'diff_type'        => Diff_Type_Keys::DIFF_TYPE_CONTENT,
+			'level'            => Diff_Type_Keys::is_valid_level( $level ) ? $level : Diff_Type_Keys::LEVEL_SUMMARY,
+			'target_ref'       => $target_ref,
+			'target_type_hint' => 'post',
+			'before_summary'   => $before_summary,
+			'after_summary'    => $after_summary,
+			'change_count'     => $change_count,
+			'execution_ref'    => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? '' ),
+			'build_plan_ref'   => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ?? '' ),
+			'plan_item_ref'    => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF ] ?? '' ),
+			'rollback'         => $this->rollback_block( $pre_snapshot, $post_snapshot ),
 		);
 
 		if ( $level === Diff_Type_Keys::LEVEL_DETAIL ) {
 			$family = array(
-				'title_before'                 => $title_before,
-				'title_after'                  => $title_after,
-				'slug_before'                  => $slug_before,
-				'slug_after'                   => $slug_after,
-				'status_before'                => $status_before,
-				'status_after'                 => $status_after,
-				'section_structure_changed'    => false,
-				'content_replacement_indicator'=> $content_replacement,
+				'title_before'                  => $title_before,
+				'title_after'                   => $title_after,
+				'slug_before'                   => $slug_before,
+				'slug_after'                    => $slug_after,
+				'status_before'                 => $status_before,
+				'status_after'                  => $status_after,
+				'section_structure_changed'     => false,
+				'content_replacement_indicator' => $content_replacement,
 			);
 			if ( isset( $pre_state['excerpt'] ) && is_string( $pre_state['excerpt'] ) ) {
 				$family['content_excerpt_before'] = strlen( $pre_state['excerpt'] ) > self::EXCERPT_MAX_LEN
@@ -168,7 +168,7 @@ final class Page_Diff_Summarizer {
 		if ( $title === '' ) {
 			$title = __( 'Untitled', 'aio-page-builder' );
 		}
-		$slug_part = $slug !== '' ? " ({$slug})" : '';
+		$slug_part   = $slug !== '' ? " ({$slug})" : '';
 		$status_part = $status !== '' ? ", {$status}" : '';
 		return $title . $slug_part . $status_part;
 	}
@@ -191,18 +191,18 @@ final class Page_Diff_Summarizer {
 	private function minimal_root( array $pre_snapshot, array $post_snapshot, string $diff_type ): array {
 		$target_ref = (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? $pre_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? 'unknown' );
 		return array(
-			'diff_id'        => $this->diff_id( $diff_type, $target_ref ),
-			'diff_type'      => $diff_type,
-			'level'          => Diff_Type_Keys::LEVEL_SUMMARY,
-			'target_ref'     => $target_ref,
-			'target_type_hint'=> 'post',
-			'before_summary' => '',
-			'after_summary'  => '',
-			'change_count'   => 0,
-			'execution_ref'  => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? '' ),
-			'build_plan_ref' => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ?? '' ),
-			'plan_item_ref'  => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF ] ?? '' ),
-			'rollback'       => $this->rollback_block( $pre_snapshot, $post_snapshot ),
+			'diff_id'          => $this->diff_id( $diff_type, $target_ref ),
+			'diff_type'        => $diff_type,
+			'level'            => Diff_Type_Keys::LEVEL_SUMMARY,
+			'target_ref'       => $target_ref,
+			'target_type_hint' => 'post',
+			'before_summary'   => '',
+			'after_summary'    => '',
+			'change_count'     => 0,
+			'execution_ref'    => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_EXECUTION_REF ] ?? '' ),
+			'build_plan_ref'   => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ?? '' ),
+			'plan_item_ref'    => (string) ( $post_snapshot[ Operational_Snapshot_Schema::FIELD_PLAN_ITEM_REF ] ?? '' ),
+			'rollback'         => $this->rollback_block( $pre_snapshot, $post_snapshot ),
 		);
 	}
 
@@ -212,8 +212,8 @@ final class Page_Diff_Summarizer {
 	 * @return array<string, mixed>
 	 */
 	private function rollback_block( array $pre_snapshot, array $post_snapshot ): array {
-		$pre_id  = isset( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ) ? (string) $pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] : '';
-		$post_id = isset( $post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ) ? (string) $post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] : '';
+		$pre_id   = isset( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ) ? (string) $pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] : '';
+		$post_id  = isset( $post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ) ? (string) $post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] : '';
 		$eligible = (bool) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_ROLLBACK_ELIGIBLE ] ?? false );
 		$status   = (string) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_ROLLBACK_STATUS ] ?? Operational_Snapshot_Schema::ROLLBACK_STATUS_NONE );
 		return array(
@@ -226,7 +226,7 @@ final class Page_Diff_Summarizer {
 
 	private function diff_id( string $diff_type, string $target_ref ): string {
 		$raw = ( function_exists( 'wp_generate_uuid4' ) ? \wp_generate_uuid4() : uniqid( 'diff-', true ) );
-		$id = 'diff-' . $diff_type . '-' . substr( str_replace( array( '-', ' ' ), '', $raw ), 0, 24 );
+		$id  = 'diff-' . $diff_type . '-' . substr( str_replace( array( '-', ' ' ), '', $raw ), 0, 24 );
 		return substr( $id, 0, 64 );
 	}
 }

@@ -43,11 +43,11 @@ final class Failover_Result {
 	private array $policy_snapshot;
 
 	/**
-	 * @param bool   $used_primary        True if primary succeeded.
-	 * @param string $effective_provider_id Provider that produced or last attempted.
-	 * @param string $effective_model_used  Model used.
+	 * @param bool                                                                                         $used_primary        True if primary succeeded.
+	 * @param string                                                                                       $effective_provider_id Provider that produced or last attempted.
+	 * @param string                                                                                       $effective_model_used  Model used.
 	 * @param list<array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts Per-attempt log (no secrets).
-	 * @param array<string, mixed> $policy_snapshot Policy snapshot for audit.
+	 * @param array<string, mixed>                                                                         $policy_snapshot Policy snapshot for audit.
 	 */
 	public function __construct(
 		bool $used_primary,
@@ -56,10 +56,10 @@ final class Failover_Result {
 		array $attempts,
 		array $policy_snapshot
 	) {
-		$this->used_primary         = $used_primary;
+		$this->used_primary          = $used_primary;
 		$this->effective_provider_id = $effective_provider_id;
-		$this->effective_model_used = $effective_model_used;
-		$this->attempts             = $attempts;
+		$this->effective_model_used  = $effective_model_used;
+		$this->attempts              = $attempts;
 		$this->policy_snapshot       = $policy_snapshot;
 	}
 
@@ -99,8 +99,8 @@ final class Failover_Result {
 			Provider_Failover_Policy::METADATA_KEY => $this->policy_snapshot,
 			self::METADATA_KEY_ATTEMPTS            => $this->attempts,
 			self::METADATA_KEY_EFFECTIVE_PROVIDER  => array(
-				'provider_id'  => $this->effective_provider_id,
-				'model_used'   => $this->effective_model_used,
+				'provider_id' => $this->effective_provider_id,
+				'model_used'  => $this->effective_model_used,
 			),
 		);
 		if ( ! $this->used_primary && $this->effective_provider_id !== '' ) {
@@ -115,15 +115,15 @@ final class Failover_Result {
 	/**
 	 * Create result for primary success (no fallback).
 	 *
-	 * @param string $provider_id Provider that succeeded.
-	 * @param string $model_used  Model used.
+	 * @param string               $provider_id Provider that succeeded.
+	 * @param string               $model_used  Model used.
 	 * @param array<string, mixed> $policy_snapshot Policy snapshot (may be disabled).
 	 * @return self
 	 */
 	public static function primary_success( string $provider_id, string $model_used, array $policy_snapshot ): self {
 		$attempts = array(
 			array(
-				'provider_id'   => $provider_id,
+				'provider_id'  => $provider_id,
 				'model_used'   => $model_used,
 				'category'     => 'success',
 				'attempted_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
@@ -135,16 +135,16 @@ final class Failover_Result {
 	/**
 	 * Create result for primary failure with no fallback (policy disabled or ineligible).
 	 *
-	 * @param string $provider_id Provider that failed.
-	 * @param string $model_used  Model used.
-	 * @param string $category    Normalized error category (no secrets).
+	 * @param string               $provider_id Provider that failed.
+	 * @param string               $model_used  Model used.
+	 * @param string               $category    Normalized error category (no secrets).
 	 * @param array<string, mixed> $policy_snapshot Policy snapshot.
 	 * @return self
 	 */
 	public static function primary_failure_no_fallback( string $provider_id, string $model_used, string $category, array $policy_snapshot ): self {
 		$attempts = array(
 			array(
-				'provider_id'   => $provider_id,
+				'provider_id'  => $provider_id,
 				'model_used'   => $model_used,
 				'category'     => $category,
 				'attempted_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
@@ -156,10 +156,10 @@ final class Failover_Result {
 	/**
 	 * Create result for fallback success (primary failed, fallback succeeded).
 	 *
-	 * @param string $fallback_provider_id Fallback provider that succeeded.
-	 * @param string $fallback_model       Model used by fallback.
+	 * @param string                                                                                       $fallback_provider_id Fallback provider that succeeded.
+	 * @param string                                                                                       $fallback_model       Model used by fallback.
 	 * @param list<array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts Primary failure + fallback success.
-	 * @param array<string, mixed> $policy_snapshot Policy snapshot.
+	 * @param array<string, mixed>                                                                         $policy_snapshot Policy snapshot.
 	 * @return self
 	 */
 	public static function fallback_success( string $fallback_provider_id, string $fallback_model, array $attempts, array $policy_snapshot ): self {
@@ -169,10 +169,10 @@ final class Failover_Result {
 	/**
 	 * Create result for fallback failure (primary failed, fallback attempted and failed).
 	 *
-	 * @param string $last_provider_id Last provider attempted (fallback).
-	 * @param string $last_model_used   Model used.
+	 * @param string                                                                                       $last_provider_id Last provider attempted (fallback).
+	 * @param string                                                                                       $last_model_used   Model used.
 	 * @param list<array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts All attempts.
-	 * @param array<string, mixed> $policy_snapshot Policy snapshot.
+	 * @param array<string, mixed>                                                                         $policy_snapshot Policy snapshot.
 	 * @return self
 	 */
 	public static function fallback_failure( string $last_provider_id, string $last_model_used, array $attempts, array $policy_snapshot ): self {

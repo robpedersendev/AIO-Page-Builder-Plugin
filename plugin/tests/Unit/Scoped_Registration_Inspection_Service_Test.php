@@ -36,8 +36,8 @@ final class Scoped_Registration_Inspection_Service_Test extends TestCase {
 		$assignment = $this->createMock( Page_Field_Group_Assignment_Service::class );
 		$assignment->method( 'get_visible_groups_for_page' )->with( 42 )->willReturn( array( 'group_aio_st_hero', 'group_aio_st_cta' ) );
 		$derivation = $this->createMock( Field_Group_Derivation_Service::class );
-		$service = new Scoped_Registration_Inspection_Service( $assignment, $this->create_resolver(), $derivation, null );
-		$result = $service->inspect_for_page( 42 );
+		$service    = new Scoped_Registration_Inspection_Service( $assignment, $this->create_resolver(), $derivation, null );
+		$result     = $service->inspect_for_page( 42 );
 		$this->assertSame( 'existing_page', $result['mode'] );
 		$this->assertIsArray( $result['section_keys'] );
 		$this->assertIsArray( $result['group_keys'] );
@@ -54,8 +54,8 @@ final class Scoped_Registration_Inspection_Service_Test extends TestCase {
 	public function test_inspect_for_page_zero_returns_unresolved(): void {
 		$assignment = $this->createMock( Page_Field_Group_Assignment_Service::class );
 		$derivation = $this->createMock( Field_Group_Derivation_Service::class );
-		$service = new Scoped_Registration_Inspection_Service( $assignment, $this->create_resolver(), $derivation, null );
-		$result = $service->inspect_for_page( 0 );
+		$service    = new Scoped_Registration_Inspection_Service( $assignment, $this->create_resolver(), $derivation, null );
+		$result     = $service->inspect_for_page( 0 );
 		$this->assertSame( 'existing_page', $result['mode'] );
 		$this->assertSame( array(), $result['section_keys'] );
 		$this->assertSame( array(), $result['group_keys'] );
@@ -68,7 +68,7 @@ final class Scoped_Registration_Inspection_Service_Test extends TestCase {
 		$derivation = $this->createMock( Field_Group_Derivation_Service::class );
 		$derivation->method( 'derive_section_keys_from_template_for_registration' )->with( 'pt_landing' )->willReturn( new Template_Section_Key_Derivation_Result( array( 'st_hero', 'st_faq' ), true ) );
 		$service = new Scoped_Registration_Inspection_Service( $assignment, $this->create_resolver(), $derivation, null );
-		$result = $service->inspect_for_new_page_template( 'pt_landing' );
+		$result  = $service->inspect_for_new_page_template( 'pt_landing' );
 		$this->assertSame( 'new_page_template', $result['mode'] );
 		$this->assertSame( array( 'st_hero', 'st_faq' ), $result['section_keys'] );
 		$this->assertContains( 'group_aio_st_hero', $result['group_keys'] );
@@ -82,7 +82,7 @@ final class Scoped_Registration_Inspection_Service_Test extends TestCase {
 		$derivation = $this->createMock( Field_Group_Derivation_Service::class );
 		$derivation->method( 'derive_section_keys_from_composition_for_registration' )->with( 'comp_1' )->willReturn( new Template_Section_Key_Derivation_Result( array( 'st_cta' ), true ) );
 		$service = new Scoped_Registration_Inspection_Service( $assignment, $this->create_resolver(), $derivation, null );
-		$result = $service->inspect_for_new_page_composition( 'comp_1' );
+		$result  = $service->inspect_for_new_page_composition( 'comp_1' );
 		$this->assertSame( 'new_page_composition', $result['mode'] );
 		$this->assertSame( array( 'st_cta' ), $result['section_keys'] );
 		$this->assertContains( 'group_aio_st_cta', $result['group_keys'] );
@@ -92,11 +92,11 @@ final class Scoped_Registration_Inspection_Service_Test extends TestCase {
 	/** Prompt 308: cache_used true when cache returns data. */
 	public function test_inspect_for_page_reports_cache_used_when_cache_hit(): void {
 		$assignment = $this->createMock( Page_Field_Group_Assignment_Service::class );
-		$cache = new Page_Section_Key_Cache_Service( 60 );
+		$cache      = new Page_Section_Key_Cache_Service( 60 );
 		$cache->set_for_page( 10, array( 'st_hero' ) );
 		$derivation = $this->createMock( Field_Group_Derivation_Service::class );
-		$service = new Scoped_Registration_Inspection_Service( $assignment, $this->create_resolver(), $derivation, $cache );
-		$result = $service->inspect_for_page( 10 );
+		$service    = new Scoped_Registration_Inspection_Service( $assignment, $this->create_resolver(), $derivation, $cache );
+		$result     = $service->inspect_for_page( 10 );
 		$this->assertTrue( $result['cache_used'] );
 		$this->assertSame( array( 'st_hero' ), $result['section_keys'] );
 		$this->assertContains( 'group_aio_st_hero', $result['group_keys'] );

@@ -14,12 +14,12 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry;
 
 return array(
 	array(
-		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => 'cosmetology_nail_luxury_salon_starter',
+		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY => 'cosmetology_nail_luxury_salon_starter',
 		Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => 'cosmetology_nail',
 		Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY => 'cosmetology_nail_luxury_salon',
-		Industry_Starter_Bundle_Registry::FIELD_LABEL       => 'Luxury Nail Salon Starter',
-		Industry_Starter_Bundle_Registry::FIELD_SUMMARY     => 'Starting set for in-salon luxury nail experiences: home, services, about, contact with reserve-your-experience and visit emphasis. Refined tone and single primary CTA.',
-		Industry_Starter_Bundle_Registry::FIELD_STATUS      => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
+		Industry_Starter_Bundle_Registry::FIELD_LABEL      => 'Luxury Nail Salon Starter',
+		Industry_Starter_Bundle_Registry::FIELD_SUMMARY    => 'Starting set for in-salon luxury nail experiences: home, services, about, contact with reserve-your-experience and visit emphasis. Refined tone and single primary CTA.',
+		Industry_Starter_Bundle_Registry::FIELD_STATUS     => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
 		Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => Industry_Starter_Bundle_Registry::SUPPORTED_SCHEMA_VERSION,
 		Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_FAMILIES => array( 'home', 'services', 'about', 'contact', 'offerings' ),
 		Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS => array(
@@ -39,15 +39,15 @@ return array(
 		Industry_Starter_Bundle_Registry::FIELD_TOKEN_PRESET_REF => 'cosmetology_elegant',
 		Industry_Starter_Bundle_Registry::FIELD_CTA_GUIDANCE_REF => 'book_now',
 		Industry_Starter_Bundle_Registry::FIELD_LPAGERY_GUIDANCE_REF => 'cosmetology_nail_01',
-		Industry_Starter_Bundle_Registry::FIELD_METADATA => array( 'sort_order' => 11 ),
+		Industry_Starter_Bundle_Registry::FIELD_METADATA   => array( 'sort_order' => 11 ),
 	),
 	array(
-		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => 'cosmetology_nail_mobile_tech_starter',
+		Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY => 'cosmetology_nail_mobile_tech_starter',
 		Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => 'cosmetology_nail',
 		Industry_Starter_Bundle_Registry::FIELD_SUBTYPE_KEY => 'cosmetology_nail_mobile_tech',
-		Industry_Starter_Bundle_Registry::FIELD_LABEL       => 'Mobile Nail Tech Starter',
-		Industry_Starter_Bundle_Registry::FIELD_SUMMARY     => 'Starting set for mobile nail technicians: home, services, contact with service-area and book-at-your-location emphasis. Travel-to-you and convenience focus.',
-		Industry_Starter_Bundle_Registry::FIELD_STATUS      => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
+		Industry_Starter_Bundle_Registry::FIELD_LABEL      => 'Mobile Nail Tech Starter',
+		Industry_Starter_Bundle_Registry::FIELD_SUMMARY    => 'Starting set for mobile nail technicians: home, services, contact with service-area and book-at-your-location emphasis. Travel-to-you and convenience focus.',
+		Industry_Starter_Bundle_Registry::FIELD_STATUS     => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
 		Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => Industry_Starter_Bundle_Registry::SUPPORTED_SCHEMA_VERSION,
 		Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_FAMILIES => array( 'home', 'services', 'contact', 'offerings' ),
 		Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS => array(
@@ -65,6 +65,6 @@ return array(
 		Industry_Starter_Bundle_Registry::FIELD_TOKEN_PRESET_REF => 'cosmetology_elegant',
 		Industry_Starter_Bundle_Registry::FIELD_CTA_GUIDANCE_REF => 'book_now',
 		Industry_Starter_Bundle_Registry::FIELD_LPAGERY_GUIDANCE_REF => 'cosmetology_nail_01',
-		Industry_Starter_Bundle_Registry::FIELD_METADATA => array( 'sort_order' => 12 ),
+		Industry_Starter_Bundle_Registry::FIELD_METADATA   => array( 'sort_order' => 12 ),
 	),
 );

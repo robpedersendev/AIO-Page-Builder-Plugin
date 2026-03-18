@@ -46,14 +46,18 @@ require_once $plugin_root . '/src/Domain/ACF/Assignment/Page_Field_Group_Assignm
 final class Assignment_Map_Wpdb_Stub {
 	public string $prefix = 'wp_';
 	public int $insert_id = 0;
-	private int $next_id = 1;
+	private int $next_id  = 1;
 
 	public function prepare( string $query, ...$args ): string {
-		$i = 0;
-		$query = preg_replace_callback( '/%[sd]/', function () use ( $args, &$i ) {
-			$v = $args[ $i++ ] ?? null;
-			return $v === null ? 'NULL' : "'" . addslashes( (string) $v ) . "'";
-		}, $query );
+		$i     = 0;
+		$query = preg_replace_callback(
+			'/%[sd]/',
+			function () use ( $args, &$i ) {
+				$v = $args[ $i++ ] ?? null;
+				return $v === null ? 'NULL' : "'" . addslashes( (string) $v ) . "'";
+			},
+			$query
+		);
 		return $query;
 	}
 
@@ -70,9 +74,9 @@ final class Assignment_Map_Wpdb_Stub {
 			} else {
 				$map_type = $source_ref = $target_ref = '';
 			}
-			$this->next_id++;
+			++$this->next_id;
 			$this->insert_id = $this->next_id - 1;
-			$store[]        = array(
+			$store[]         = array(
 				'id'         => $this->insert_id,
 				'map_type'   => $map_type,
 				'source_ref' => $source_ref,
@@ -130,9 +134,14 @@ final class Assignment_Map_Wpdb_Stub {
 			$store = array();
 			return 0;
 		}
-		$store = array_values( array_filter( $store, function ( $r ) use ( $map_type, $source_ref ) {
-			return ! ( $r['map_type'] === $map_type && $r['source_ref'] === $source_ref );
-		} ) );
+		$store = array_values(
+			array_filter(
+				$store,
+				function ( $r ) use ( $map_type, $source_ref ) {
+					return ! ( $r['map_type'] === $map_type && $r['source_ref'] === $source_ref );
+				}
+			)
+		);
 		return $before - count( $store );
 	}
 }
@@ -146,8 +155,8 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		self::$seed_id = 9000;
-		$GLOBALS['_aio_assign_store']  = array();
+		self::$seed_id                  = 9000;
+		$GLOBALS['_aio_assign_store']   = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
 		$GLOBALS['_aio_post_meta']      = array();
 
@@ -158,7 +167,7 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 			new Composition_Repository(),
 			new Section_Template_Repository()
 		);
-		$this->service = new Page_Field_Group_Assignment_Service(
+		$this->service        = new Page_Field_Group_Assignment_Service(
 			$this->assignment_map,
 			$this->derivation
 		);
@@ -170,16 +179,18 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 	}
 
 	private function seed_template( string $key, array $definition ): void {
-		$id   = self::$seed_id++;
-		$post = new \WP_Post( array(
-			'ID'          => $id,
-			'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
-			'post_title'  => 'Test',
-			'post_status' => 'publish',
-			'post_name'   => $key,
-		) );
-		$GLOBALS['_aio_wp_query_posts'][] = $post;
-		$def = array_merge( array( 'internal_key' => $key ), $definition );
+		$id                                        = self::$seed_id++;
+		$post                                      = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
+				'post_title'  => 'Test',
+				'post_status' => 'publish',
+				'post_name'   => $key,
+			)
+		);
+		$GLOBALS['_aio_wp_query_posts'][]          = $post;
+		$def                                       = array_merge( array( 'internal_key' => $key ), $definition );
 		$GLOBALS['_aio_post_meta'][ (string) $id ] = array(
 			'_aio_internal_key'             => $key,
 			'_aio_status'                   => 'active',
@@ -188,36 +199,46 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 	}
 
 	private function seed_composition( string $comp_id, array $definition ): void {
-		$id   = self::$seed_id++;
-		$post = new \WP_Post( array(
-			'ID'          => $id,
-			'post_type'   => Object_Type_Keys::COMPOSITION,
-			'post_title'  => 'Test',
-			'post_status' => 'publish',
-			'post_name'   => $comp_id,
-		) );
-		$GLOBALS['_aio_wp_query_posts'][] = $post;
-		$def = array_merge( array( 'composition_id' => $comp_id ), $definition );
+		$id                                        = self::$seed_id++;
+		$post                                      = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::COMPOSITION,
+				'post_title'  => 'Test',
+				'post_status' => 'publish',
+				'post_name'   => $comp_id,
+			)
+		);
+		$GLOBALS['_aio_wp_query_posts'][]          = $post;
+		$def                                       = array_merge( array( 'composition_id' => $comp_id ), $definition );
 		$GLOBALS['_aio_post_meta'][ (string) $id ] = array(
-			'_aio_internal_key'          => $comp_id,
+			'_aio_internal_key'           => $comp_id,
 			'_aio_status'                 => 'active',
 			'_aio_composition_definition' => wp_json_encode( $def ),
 		);
 	}
 
 	private function seed_section( string $key, array $definition = array() ): void {
-		$id   = self::$seed_id++;
-		$post = new \WP_Post( array(
-			'ID'          => $id,
-			'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
-			'post_title'  => 'Test',
-			'post_status' => 'publish',
-			'post_name'   => $key,
-		) );
-		$GLOBALS['_aio_wp_query_posts'][] = $post;
-		$def = array_merge( array( 'internal_key' => $key, 'status' => 'active' ), $definition );
+		$id                                        = self::$seed_id++;
+		$post                                      = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+				'post_title'  => 'Test',
+				'post_status' => 'publish',
+				'post_name'   => $key,
+			)
+		);
+		$GLOBALS['_aio_wp_query_posts'][]          = $post;
+		$def                                       = array_merge(
+			array(
+				'internal_key' => $key,
+				'status'       => 'active',
+			),
+			$definition
+		);
 		$GLOBALS['_aio_post_meta'][ (string) $id ] = array(
-			'_aio_internal_key'      => $key,
+			'_aio_internal_key'       => $key,
 			'_aio_status'             => $def['status'] ?? 'active',
 			'_aio_section_definition' => wp_json_encode( $def ),
 		);
@@ -225,12 +246,15 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 
 	public function test_assign_from_template_full_replace_persists_groups_and_source(): void {
 		$page_id = 42;
-		$this->seed_template( 'pt_landing_contact', array(
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
-			),
-		) );
+		$this->seed_template(
+			'pt_landing_contact',
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero' );
 		$this->seed_section( 'st05_faq' );
 
@@ -252,12 +276,15 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 
 	public function test_assign_from_composition_full_replace_persists_groups_and_source(): void {
 		$page_id = 100;
-		$this->seed_composition( 'comp-custom-001', array(
-			Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(
-				array( Composition_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
-				array( Composition_Schema::SECTION_ITEM_KEY => 'st03_cta' ),
-			),
-		) );
+		$this->seed_composition(
+			'comp-custom-001',
+			array(
+				Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(
+					array( Composition_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
+					array( Composition_Schema::SECTION_ITEM_KEY => 'st03_cta' ),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero' );
 		$this->seed_section( 'st03_cta' );
 
@@ -276,16 +303,22 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 
 	public function test_reassign_from_template_to_composition_clears_template(): void {
 		$page_id = 50;
-		$this->seed_template( 'pt_old', array(
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
-			),
-		) );
-		$this->seed_composition( 'comp-new', array(
-			Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(
-				array( Composition_Schema::SECTION_ITEM_KEY => 'st03_cta' ),
-			),
-		) );
+		$this->seed_template(
+			'pt_old',
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
+				),
+			)
+		);
+		$this->seed_composition(
+			'comp-new',
+			array(
+				Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(
+					array( Composition_Schema::SECTION_ITEM_KEY => 'st03_cta' ),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero' );
 		$this->seed_section( 'st03_cta' );
 
@@ -302,12 +335,15 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 
 	public function test_reassign_from_stored_source_template(): void {
 		$page_id = 60;
-		$this->seed_template( 'pt_landing_contact', array(
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
-			),
-		) );
+		$this->seed_template(
+			'pt_landing_contact',
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero' );
 		$this->seed_section( 'st05_faq' );
 
@@ -320,7 +356,7 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 			if ( ! empty( $meta['_aio_page_template_definition'] ) ) {
 				$def = json_decode( $meta['_aio_page_template_definition'], true );
 				if ( is_array( $def ) && ( $def['internal_key'] ?? '' ) === 'pt_landing_contact' ) {
-					$def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ][] = array( Page_Template_Schema::SECTION_ITEM_KEY => 'st07_testimonials' );
+					$def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ][]             = array( Page_Template_Schema::SECTION_ITEM_KEY => 'st07_testimonials' );
 					$GLOBALS['_aio_post_meta'][ $id ]['_aio_page_template_definition'] = wp_json_encode( $def );
 					break;
 				}
@@ -344,12 +380,15 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 
 	public function test_sync_with_refinement_keeps_existing_and_adds_new(): void {
 		$page_id = 70;
-		$this->seed_template( 'pt_landing', array(
-			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
-				array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
-			),
-		) );
+		$this->seed_template(
+			'pt_landing',
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
+				),
+			)
+		);
 		$this->seed_section( 'st01_hero' );
 		$this->seed_section( 'st05_faq' );
 
@@ -362,7 +401,7 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 			if ( ! empty( $meta['_aio_page_template_definition'] ) ) {
 				$def = json_decode( $meta['_aio_page_template_definition'], true );
 				if ( is_array( $def ) && ( $def['internal_key'] ?? '' ) === 'pt_landing' ) {
-					$def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ][] = array( Page_Template_Schema::SECTION_ITEM_KEY => 'st07_new' );
+					$def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ][]             = array( Page_Template_Schema::SECTION_ITEM_KEY => 'st07_new' );
 					$GLOBALS['_aio_post_meta'][ $id ]['_aio_page_template_definition'] = wp_json_encode( $def );
 					break;
 				}
@@ -388,7 +427,7 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 		$this->seed_page( $page_id );
 		$assign = $this->service->assign_from_template( $page_id, 'pt_landing', true );
 		$this->assertGreaterThan( 0, $assign['assigned'] );
-		$list  = $this->service->get_visible_groups_for_page( $page_id );
+		$list   = $this->service->get_visible_groups_for_page( $page_id );
 		$result = $this->service->get_visible_groups_result_for_page( $page_id );
 		$this->assertSame( $list, $result->get_group_keys() );
 	}

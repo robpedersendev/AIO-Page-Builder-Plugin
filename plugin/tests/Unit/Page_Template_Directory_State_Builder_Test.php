@@ -48,25 +48,25 @@ final class Page_Template_Directory_State_Builder_Test extends TestCase {
 
 	private function minimal_page_def( string $key, string $category_class, string $family, int $section_count = 0, string $version = '1' ): array {
 		return array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY    => $key,
-			Page_Template_Schema::FIELD_NAME           => 'Page ' . $key,
-			Page_Template_Schema::FIELD_PURPOSE_SUMMARY => 'Purpose ' . $key,
-			Page_Template_Schema::FIELD_ARCHETYPE      => 'landing_page',
-			Page_Template_Schema::FIELD_STATUS        => 'stable',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $key,
+			Page_Template_Schema::FIELD_NAME             => 'Page ' . $key,
+			Page_Template_Schema::FIELD_PURPOSE_SUMMARY  => 'Purpose ' . $key,
+			Page_Template_Schema::FIELD_ARCHETYPE        => 'landing_page',
+			Page_Template_Schema::FIELD_STATUS           => 'stable',
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array_fill( 0, $section_count, array( 'section_key' => 'st_hero' ) ),
-			Page_Template_Schema::FIELD_VERSION       => array( 'version' => $version ),
-			'template_category_class' => $category_class,
-			'template_family'         => $family,
+			Page_Template_Schema::FIELD_VERSION          => array( 'version' => $version ),
+			'template_category_class'                    => $category_class,
+			'template_family'                            => $family,
 		);
 	}
 
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_post_meta'] = array();
-		$this->section_repo = new Section_Template_Repository();
-		$this->page_repo    = new Page_Template_Repository();
-		$this->query_service = new Large_Library_Query_Service( $this->section_repo, $this->page_repo );
-		$this->builder = new Page_Template_Directory_State_Builder( $this->query_service );
+		$this->section_repo        = new Section_Template_Repository();
+		$this->page_repo           = new Page_Template_Repository();
+		$this->query_service       = new Large_Library_Query_Service( $this->section_repo, $this->page_repo );
+		$this->builder             = new Page_Template_Directory_State_Builder( $this->query_service );
 	}
 
 	protected function tearDown(): void {
@@ -92,18 +92,20 @@ final class Page_Template_Directory_State_Builder_Test extends TestCase {
 		$posts = array();
 		$meta  = array();
 		foreach ( array( array( 'pt_home', 'top_level', 'home' ), array( 'pt_services', 'top_level', 'services' ) ) as $i => $t ) {
-			$def = $this->minimal_page_def( $t[0], $t[1], $t[2] );
-			$id  = 13000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID' => $id,
-				'post_type' => Object_Type_Keys::PAGE_TEMPLATE,
-				'post_title' => $def['name'],
-				'post_status' => 'publish',
-				'post_name' => $def['internal_key'],
-			) );
+			$def                  = $this->minimal_page_def( $t[0], $t[1], $t[2] );
+			$id                   = 13000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
-				'_aio_internal_key' => $def['internal_key'],
-				'_aio_status' => $def['status'],
+				'_aio_internal_key'             => $def['internal_key'],
+				'_aio_status'                   => $def['status'],
 				'_aio_page_template_definition' => wp_json_encode( $def ),
 			);
 		}
@@ -122,26 +124,33 @@ final class Page_Template_Directory_State_Builder_Test extends TestCase {
 	}
 
 	public function test_build_state_list_returns_list_result_with_section_count_and_version(): void {
-		$posts = array();
-		$meta  = array();
-		$def = $this->minimal_page_def( 'pt_home', 'top_level', 'home', 5, '2' );
-		$id = 14000;
-		$posts[] = new \WP_Post( array(
-			'ID' => $id,
-			'post_type' => Object_Type_Keys::PAGE_TEMPLATE,
-			'post_title' => $def['name'],
-			'post_status' => 'publish',
-			'post_name' => $def['internal_key'],
-		) );
-		$meta[ (string) $id ] = array(
-			'_aio_internal_key' => $def['internal_key'],
-			'_aio_status' => $def['status'],
+		$posts                          = array();
+		$meta                           = array();
+		$def                            = $this->minimal_page_def( 'pt_home', 'top_level', 'home', 5, '2' );
+		$id                             = 14000;
+		$posts[]                        = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
+				'post_title'  => $def['name'],
+				'post_status' => 'publish',
+				'post_name'   => $def['internal_key'],
+			)
+		);
+		$meta[ (string) $id ]           = array(
+			'_aio_internal_key'             => $def['internal_key'],
+			'_aio_status'                   => $def['status'],
 			'_aio_page_template_definition' => wp_json_encode( $def ),
 		);
 		$GLOBALS['_aio_wp_query_posts'] = $posts;
 		$GLOBALS['_aio_post_meta']      = $meta;
 
-		$state = $this->builder->build_state( array( 'category_class' => 'top_level', 'family' => 'home' ) );
+		$state = $this->builder->build_state(
+			array(
+				'category_class' => 'top_level',
+				'family'         => 'home',
+			)
+		);
 
 		$this->assertSame( 'list', $state['view'] );
 		$this->assertCount( 3, $state['breadcrumbs'] );
@@ -154,21 +163,23 @@ final class Page_Template_Directory_State_Builder_Test extends TestCase {
 	}
 
 	public function test_build_state_search_returns_view_search_and_list_result(): void {
-		$posts = array();
-		$meta  = array();
-		$def = $this->minimal_page_def( 'pt_foo_bar', 'top_level', 'home' );
-		$def['name'] = 'Foo Bar Page';
-		$id = 15000;
-		$posts[] = new \WP_Post( array(
-			'ID' => $id,
-			'post_type' => Object_Type_Keys::PAGE_TEMPLATE,
-			'post_title' => $def['name'],
-			'post_status' => 'publish',
-			'post_name' => $def['internal_key'],
-		) );
-		$meta[ (string) $id ] = array(
-			'_aio_internal_key' => $def['internal_key'],
-			'_aio_status' => $def['status'],
+		$posts                          = array();
+		$meta                           = array();
+		$def                            = $this->minimal_page_def( 'pt_foo_bar', 'top_level', 'home' );
+		$def['name']                    = 'Foo Bar Page';
+		$id                             = 15000;
+		$posts[]                        = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::PAGE_TEMPLATE,
+				'post_title'  => $def['name'],
+				'post_status' => 'publish',
+				'post_name'   => $def['internal_key'],
+			)
+		);
+		$meta[ (string) $id ]           = array(
+			'_aio_internal_key'             => $def['internal_key'],
+			'_aio_status'                   => $def['status'],
 			'_aio_page_template_definition' => wp_json_encode( $def ),
 		);
 		$GLOBALS['_aio_wp_query_posts'] = $posts;

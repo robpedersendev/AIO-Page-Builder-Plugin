@@ -16,27 +16,27 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Input_Artifact_Schema {
 
-	public const ROOT_ARTIFACT_ID       = 'artifact_id';
-	public const ROOT_SCHEMA_VERSION   = 'schema_version';
-	public const ROOT_CREATED_AT       = 'created_at';
-	public const ROOT_PROMPT_PACK_REF  = 'prompt_pack_ref';
-	public const ROOT_PROFILE          = 'profile';
-	public const ROOT_CRAWL            = 'crawl';
-	public const ROOT_REGISTRY         = 'registry';
-	public const ROOT_GOAL             = 'goal';
+	public const ROOT_ARTIFACT_ID         = 'artifact_id';
+	public const ROOT_SCHEMA_VERSION      = 'schema_version';
+	public const ROOT_CREATED_AT          = 'created_at';
+	public const ROOT_PROMPT_PACK_REF     = 'prompt_pack_ref';
+	public const ROOT_PROFILE             = 'profile';
+	public const ROOT_CRAWL               = 'crawl';
+	public const ROOT_REGISTRY            = 'registry';
+	public const ROOT_GOAL                = 'goal';
 	public const ROOT_ATTACHMENT_MANIFEST = 'attachment_manifest';
-	public const ROOT_REDACTION        = 'redaction';
+	public const ROOT_REDACTION           = 'redaction';
 	public const ROOT_INCLUSION_RATIONALE = 'inclusion_rationale';
-	public const ROOT_COMPATIBILITY    = 'compatibility';
+	public const ROOT_COMPATIBILITY       = 'compatibility';
 	/** Optional (Prompt 210): template-family and CTA-law guidance for placeholder injection. */
 	public const ROOT_PLANNING_GUIDANCE = 'planning_guidance';
 	/** Optional (Prompt 331): industry context for planner (industry-planner-input-contract). */
 	public const ROOT_INDUSTRY_CONTEXT = 'industry_context';
 
 	public const PROMPT_PACK_REF_INTERNAL_KEY = 'internal_key';
-	public const PROMPT_PACK_REF_VERSION       = 'version';
+	public const PROMPT_PACK_REF_VERSION      = 'version';
 
-	public const PROFILE_SOURCE_SNAPSHOT_REF = 'snapshot_ref';
+	public const PROFILE_SOURCE_SNAPSHOT_REF  = 'snapshot_ref';
 	public const PROFILE_SOURCE_PAYLOAD       = 'payload';
 	public const CRAWL_SOURCE_RUN_REF         = 'run_ref';
 	public const CRAWL_SOURCE_SUMMARY         = 'summary';
@@ -46,33 +46,41 @@ final class Input_Artifact_Schema {
 
 	public const REDACTION_APPLIED   = 'redaction_applied';
 	public const EXCLUDED_CATEGORIES = 'excluded_categories';
-	public const PLACEHOLDER_USED   = 'placeholder_used';
+	public const PLACEHOLDER_USED    = 'placeholder_used';
 
-	public const ATTACHMENT_FILE_ID          = 'file_id';
-	public const ATTACHMENT_FILE_TYPE        = 'file_type';
-	public const ATTACHMENT_SOURCE_CATEGORY  = 'source_category';
-	public const ATTACHMENT_PURPOSE          = 'purpose';
-	public const ATTACHMENT_REDACTION_STATUS = 'redaction_status';
+	public const ATTACHMENT_FILE_ID           = 'file_id';
+	public const ATTACHMENT_FILE_TYPE         = 'file_type';
+	public const ATTACHMENT_SOURCE_CATEGORY   = 'source_category';
+	public const ATTACHMENT_PURPOSE           = 'purpose';
+	public const ATTACHMENT_REDACTION_STATUS  = 'redaction_status';
 	public const ATTACHMENT_ATTACHMENT_STATUS = 'attachment_status';
-	public const ATTACHMENT_SIZE_BYTES       = 'size_bytes';
+	public const ATTACHMENT_SIZE_BYTES        = 'size_bytes';
 	public const ATTACHMENT_DOWNLOAD_ELIGIBLE = 'download_eligible';
 
-	public const REDACTION_STATUS_NONE      = 'none';
-	public const REDACTION_STATUS_REDACTED  = 'redacted';
-	public const REDACTION_STATUS_EXCLUDED  = 'excluded';
-	public const ATTACHMENT_STATUS_ATTACHED  = 'attached';
+	public const REDACTION_STATUS_NONE            = 'none';
+	public const REDACTION_STATUS_REDACTED        = 'redacted';
+	public const REDACTION_STATUS_EXCLUDED        = 'excluded';
+	public const ATTACHMENT_STATUS_ATTACHED       = 'attached';
 	public const ATTACHMENT_STATUS_REFERENCE_ONLY = 'reference_only';
-	public const ATTACHMENT_STATUS_FAILED    = 'failed';
-	public const SOURCE_CATEGORY_PROFILE_ASSET = 'profile_asset';
-	public const SOURCE_CATEGORY_CRAWL_EXPORT  = 'crawl_export';
-	public const SOURCE_CATEGORY_REGISTRY_EXPORT = 'registry_export';
-	public const SOURCE_CATEGORY_USER_UPLOAD   = 'user_upload';
-	public const SOURCE_CATEGORY_OTHER         = 'other';
+	public const ATTACHMENT_STATUS_FAILED         = 'failed';
+	public const SOURCE_CATEGORY_PROFILE_ASSET    = 'profile_asset';
+	public const SOURCE_CATEGORY_CRAWL_EXPORT     = 'crawl_export';
+	public const SOURCE_CATEGORY_REGISTRY_EXPORT  = 'registry_export';
+	public const SOURCE_CATEGORY_USER_UPLOAD      = 'user_upload';
+	public const SOURCE_CATEGORY_OTHER            = 'other';
 
 	/** Prohibited keys that must not appear anywhere in the artifact. */
 	private const PROHIBITED_KEYS = array(
-		'api_key', 'secret', 'token', 'password', 'authorization',
-		'apikey', 'client_secret', 'access_token', 'refresh_token', 'bearer_token',
+		'api_key',
+		'secret',
+		'token',
+		'password',
+		'authorization',
+		'apikey',
+		'client_secret',
+		'access_token',
+		'refresh_token',
+		'bearer_token',
 	);
 
 	/**

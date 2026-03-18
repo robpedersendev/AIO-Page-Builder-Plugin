@@ -38,10 +38,10 @@ final class Industry_Pack_Migration_Executor_Test extends TestCase {
 
 	private function pack_def( string $key, string $status = 'active', string $replacement_ref = '' ): array {
 		$p = array(
-			Industry_Pack_Schema::FIELD_INDUSTRY_KEY => $key,
-			Industry_Pack_Schema::FIELD_NAME => $key,
-			Industry_Pack_Schema::FIELD_SUMMARY => 'Summary',
-			Industry_Pack_Schema::FIELD_STATUS => $status,
+			Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => $key,
+			Industry_Pack_Schema::FIELD_NAME           => $key,
+			Industry_Pack_Schema::FIELD_SUMMARY        => 'Summary',
+			Industry_Pack_Schema::FIELD_STATUS         => $status,
 			Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
 		);
 		if ( $replacement_ref !== '' ) {
@@ -54,7 +54,7 @@ final class Industry_Pack_Migration_Executor_Test extends TestCase {
 		$b = array(
 			Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY => $bundle_key,
 			Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => $industry_key,
-			Industry_Starter_Bundle_Registry::FIELD_LABEL => $bundle_key,
+			Industry_Starter_Bundle_Registry::FIELD_LABEL  => $bundle_key,
 			Industry_Starter_Bundle_Registry::FIELD_SUMMARY => 'Summary',
 			Industry_Starter_Bundle_Registry::FIELD_STATUS => Industry_Starter_Bundle_Registry::STATUS_ACTIVE,
 			Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => '1',
@@ -67,12 +67,15 @@ final class Industry_Pack_Migration_Executor_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		\update_option( Option_Names::INDUSTRY_PROFILE, array(
-			Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '1',
-			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => '',
-			Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => array(),
-			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => '',
-		) );
+		\update_option(
+			Option_Names::INDUSTRY_PROFILE,
+			array(
+				Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '1',
+				Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => '',
+				Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS => array(),
+				Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => '',
+			)
+		);
 	}
 
 	protected function tearDown(): void {
@@ -81,19 +84,21 @@ final class Industry_Pack_Migration_Executor_Test extends TestCase {
 	}
 
 	public function test_run_migration_with_valid_from_to_updates_primary(): void {
-		$settings = new Settings_Service();
-		$profile_repo = new Industry_Profile_Repository( $settings );
+		$settings      = new Settings_Service();
+		$profile_repo  = new Industry_Profile_Repository( $settings );
 		$pack_registry = new Industry_Pack_Registry();
-		$pack_registry->load( array(
-			$this->pack_def( 'realtor_old' ),
-			$this->pack_def( 'realtor' ),
-		) );
+		$pack_registry->load(
+			array(
+				$this->pack_def( 'realtor_old' ),
+				$this->pack_def( 'realtor' ),
+			)
+		);
 		$bundle_registry = new Industry_Starter_Bundle_Registry();
 		$bundle_registry->load( array( $this->bundle_def( 'b1', 'realtor' ) ) );
 
 		$profile_repo->merge_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor_old' ) );
 		$executor = new Industry_Pack_Migration_Executor( $profile_repo, $pack_registry, $bundle_registry );
-		$result = $executor->run_migration( 'realtor_old', 'realtor' );
+		$result   = $executor->run_migration( 'realtor_old', 'realtor' );
 
 		$this->assertTrue( $result->is_success() );
 		$this->assertCount( 1, $result->get_migrated_refs() );
@@ -105,8 +110,8 @@ final class Industry_Pack_Migration_Executor_Test extends TestCase {
 	}
 
 	public function test_run_migration_with_invalid_to_pack_returns_failure(): void {
-		$settings = new Settings_Service();
-		$profile_repo = new Industry_Profile_Repository( $settings );
+		$settings      = new Settings_Service();
+		$profile_repo  = new Industry_Profile_Repository( $settings );
 		$pack_registry = new Industry_Pack_Registry();
 		$pack_registry->load( array( $this->pack_def( 'realtor_old' ) ) );
 		$bundle_registry = new Industry_Starter_Bundle_Registry();
@@ -114,7 +119,7 @@ final class Industry_Pack_Migration_Executor_Test extends TestCase {
 
 		$profile_repo->merge_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor_old' ) );
 		$executor = new Industry_Pack_Migration_Executor( $profile_repo, $pack_registry, $bundle_registry );
-		$result = $executor->run_migration( 'realtor_old', 'nonexistent' );
+		$result   = $executor->run_migration( 'realtor_old', 'nonexistent' );
 
 		$this->assertFalse( $result->is_success() );
 		$this->assertNotEmpty( $result->get_errors() );
@@ -123,8 +128,8 @@ final class Industry_Pack_Migration_Executor_Test extends TestCase {
 	}
 
 	public function test_run_migration_when_no_matching_refs_returns_success_with_warning(): void {
-		$settings = new Settings_Service();
-		$profile_repo = new Industry_Profile_Repository( $settings );
+		$settings      = new Settings_Service();
+		$profile_repo  = new Industry_Profile_Repository( $settings );
 		$pack_registry = new Industry_Pack_Registry();
 		$pack_registry->load( array( $this->pack_def( 'realtor_old' ), $this->pack_def( 'realtor' ) ) );
 		$bundle_registry = new Industry_Starter_Bundle_Registry();
@@ -132,7 +137,7 @@ final class Industry_Pack_Migration_Executor_Test extends TestCase {
 
 		$profile_repo->merge_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor' ) );
 		$executor = new Industry_Pack_Migration_Executor( $profile_repo, $pack_registry, $bundle_registry );
-		$result = $executor->run_migration( 'realtor_old', 'realtor' );
+		$result   = $executor->run_migration( 'realtor_old', 'realtor' );
 
 		$this->assertTrue( $result->is_success() );
 		$this->assertCount( 0, $result->get_migrated_refs() );
@@ -140,34 +145,36 @@ final class Industry_Pack_Migration_Executor_Test extends TestCase {
 	}
 
 	public function test_run_migration_to_replacement_when_no_replacement_ref_returns_failure(): void {
-		$settings = new Settings_Service();
-		$profile_repo = new Industry_Profile_Repository( $settings );
+		$settings      = new Settings_Service();
+		$profile_repo  = new Industry_Profile_Repository( $settings );
 		$pack_registry = new Industry_Pack_Registry();
 		$pack_registry->load( array( $this->pack_def( 'realtor_old' ), $this->pack_def( 'realtor' ) ) );
 		$bundle_registry = new Industry_Starter_Bundle_Registry();
 		$bundle_registry->load( array() );
 
 		$executor = new Industry_Pack_Migration_Executor( $profile_repo, $pack_registry, $bundle_registry );
-		$result = $executor->run_migration_to_replacement( 'realtor_old' );
+		$result   = $executor->run_migration_to_replacement( 'realtor_old' );
 
 		$this->assertFalse( $result->is_success() );
 		$this->assertNotEmpty( $result->get_errors() );
 	}
 
 	public function test_run_migration_to_replacement_uses_replacement_ref(): void {
-		$settings = new Settings_Service();
-		$profile_repo = new Industry_Profile_Repository( $settings );
+		$settings      = new Settings_Service();
+		$profile_repo  = new Industry_Profile_Repository( $settings );
 		$pack_registry = new Industry_Pack_Registry();
-		$pack_registry->load( array(
-			$this->pack_def( 'realtor_old', 'deprecated', 'realtor' ),
-			$this->pack_def( 'realtor' ),
-		) );
+		$pack_registry->load(
+			array(
+				$this->pack_def( 'realtor_old', 'deprecated', 'realtor' ),
+				$this->pack_def( 'realtor' ),
+			)
+		);
 		$bundle_registry = new Industry_Starter_Bundle_Registry();
 		$bundle_registry->load( array() );
 
 		$profile_repo->merge_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor_old' ) );
 		$executor = new Industry_Pack_Migration_Executor( $profile_repo, $pack_registry, $bundle_registry );
-		$result = $executor->run_migration_to_replacement( 'realtor_old' );
+		$result   = $executor->run_migration_to_replacement( 'realtor_old' );
 
 		$this->assertTrue( $result->is_success() );
 		$this->assertCount( 1, $result->get_migrated_refs() );

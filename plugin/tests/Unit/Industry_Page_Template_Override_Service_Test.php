@@ -39,7 +39,7 @@ final class Industry_Page_Template_Override_Service_Test extends TestCase {
 
 	public function test_record_override_saves_and_get_override_returns_it(): void {
 		$service = new Industry_Page_Template_Override_Service();
-		$ok = $service->record_override( 'landing_01', Industry_Override_Schema::STATE_ACCEPTED, 'Weak fit accepted.' );
+		$ok      = $service->record_override( 'landing_01', Industry_Override_Schema::STATE_ACCEPTED, 'Weak fit accepted.' );
 		$this->assertTrue( $ok );
 		$override = $service->get_override( 'landing_01' );
 		$this->assertIsArray( $override );

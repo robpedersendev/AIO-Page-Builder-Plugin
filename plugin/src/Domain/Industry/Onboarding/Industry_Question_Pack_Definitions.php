@@ -68,9 +68,21 @@ final class Industry_Question_Pack_Definitions {
 				'name'         => 'Cosmetology / Nail',
 				'intent'       => 'Gather cosmetology or nail business context for services, booking, and compliance.',
 				'fields'       => array(
-					array( 'key' => 'service_types', 'label' => 'Primary service types', 'type' => 'text' ),
-					array( 'key' => 'booking_style', 'label' => 'Booking style (walk-in, appointment, both)', 'type' => 'text' ),
-					array( 'key' => 'license_notes', 'label' => 'License or compliance notes', 'type' => 'textarea' ),
+					array(
+						'key'   => 'service_types',
+						'label' => 'Primary service types',
+						'type'  => 'text',
+					),
+					array(
+						'key'   => 'booking_style',
+						'label' => 'Booking style (walk-in, appointment, both)',
+						'type'  => 'text',
+					),
+					array(
+						'key'   => 'license_notes',
+						'label' => 'License or compliance notes',
+						'type'  => 'textarea',
+					),
 				),
 			),
 			array(
@@ -79,9 +91,21 @@ final class Industry_Question_Pack_Definitions {
 				'name'         => 'Realtor',
 				'intent'       => 'Gather real estate agent context: market focus, listing types, and geography.',
 				'fields'       => array(
-					array( 'key' => 'market_focus', 'label' => 'Market focus (residential, commercial, both)', 'type' => 'text' ),
-					array( 'key' => 'listing_types', 'label' => 'Listing types (buyer, seller, both)', 'type' => 'text' ),
-					array( 'key' => 'service_areas', 'label' => 'Service areas or geography', 'type' => 'textarea' ),
+					array(
+						'key'   => 'market_focus',
+						'label' => 'Market focus (residential, commercial, both)',
+						'type'  => 'text',
+					),
+					array(
+						'key'   => 'listing_types',
+						'label' => 'Listing types (buyer, seller, both)',
+						'type'  => 'text',
+					),
+					array(
+						'key'   => 'service_areas',
+						'label' => 'Service areas or geography',
+						'type'  => 'textarea',
+					),
 				),
 			),
 			array(
@@ -90,9 +114,21 @@ final class Industry_Question_Pack_Definitions {
 				'name'         => 'Plumber',
 				'intent'       => 'Gather plumbing business context: residential vs commercial, emergency vs scheduled.',
 				'fields'       => array(
-					array( 'key' => 'service_scope', 'label' => 'Service scope (residential, commercial, both)', 'type' => 'text' ),
-					array( 'key' => 'emergency_offered', 'label' => 'Emergency service offered', 'type' => 'boolean' ),
-					array( 'key' => 'service_areas', 'label' => 'Service areas', 'type' => 'textarea' ),
+					array(
+						'key'   => 'service_scope',
+						'label' => 'Service scope (residential, commercial, both)',
+						'type'  => 'text',
+					),
+					array(
+						'key'   => 'emergency_offered',
+						'label' => 'Emergency service offered',
+						'type'  => 'boolean',
+					),
+					array(
+						'key'   => 'service_areas',
+						'label' => 'Service areas',
+						'type'  => 'textarea',
+					),
 				),
 			),
 			array(
@@ -101,9 +137,21 @@ final class Industry_Question_Pack_Definitions {
 				'name'         => 'Disaster Recovery',
 				'intent'       => 'Gather disaster recovery / restoration context: response type and scope.',
 				'fields'       => array(
-					array( 'key' => 'response_type', 'label' => 'Response type (water, fire, mold, other)', 'type' => 'text' ),
-					array( 'key' => 'emergency_24_7', 'label' => '24/7 emergency response', 'type' => 'boolean' ),
-					array( 'key' => 'coverage_areas', 'label' => 'Coverage areas', 'type' => 'textarea' ),
+					array(
+						'key'   => 'response_type',
+						'label' => 'Response type (water, fire, mold, other)',
+						'type'  => 'text',
+					),
+					array(
+						'key'   => 'emergency_24_7',
+						'label' => '24/7 emergency response',
+						'type'  => 'boolean',
+					),
+					array(
+						'key'   => 'coverage_areas',
+						'label' => 'Coverage areas',
+						'type'  => 'textarea',
+					),
 				),
 			),
 		);

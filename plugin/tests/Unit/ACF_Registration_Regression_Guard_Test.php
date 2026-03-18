@@ -87,7 +87,7 @@ final class ACF_Registration_Regression_Guard_Test extends TestCase {
 		$registrar->expects( $this->never() )->method( 'register_all' );
 		$context = $this->createMock( Registration_Request_Context::class );
 		$context->method( 'should_skip_registration' )->willReturn( false );
-		$admin = $this->create_admin_resolver( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NON_PAGE_ADMIN, 0 ) );
+		$admin      = $this->create_admin_resolver( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NON_PAGE_ADMIN, 0 ) );
 		$controller = $this->controller( $registrar, $context, $admin );
 		$this->assertSame( 0, $controller->run_registration(), 'Non-page admin must register zero groups' );
 	}
@@ -98,8 +98,8 @@ final class ACF_Registration_Regression_Guard_Test extends TestCase {
 		$registrar->expects( $this->never() )->method( 'register_all' );
 		$context = $this->createMock( Registration_Request_Context::class );
 		$context->method( 'should_skip_registration' )->willReturn( false );
-		$existing = $this->create_existing_page_resolver_returning_null();
-		$admin = $this->create_admin_resolver( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::EXISTING_PAGE_EDIT, 1 ) );
+		$existing   = $this->create_existing_page_resolver_returning_null();
+		$admin      = $this->create_admin_resolver( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::EXISTING_PAGE_EDIT, 1 ) );
 		$controller = new ACF_Registration_Bootstrap_Controller(
 			$registrar,
 			$context,
@@ -118,8 +118,8 @@ final class ACF_Registration_Regression_Guard_Test extends TestCase {
 		$registrar->expects( $this->never() )->method( 'register_all' );
 		$context = $this->createMock( Registration_Request_Context::class );
 		$context->method( 'should_skip_registration' )->willReturn( false );
-		$new_page = $this->create_new_page_resolver_returning_null();
-		$admin = $this->create_admin_resolver( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NEW_PAGE_EDIT, 0 ) );
+		$new_page   = $this->create_new_page_resolver_returning_null();
+		$admin      = $this->create_admin_resolver( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::NEW_PAGE_EDIT, 0 ) );
 		$controller = new ACF_Registration_Bootstrap_Controller(
 			$registrar,
 			$context,
@@ -141,7 +141,7 @@ final class ACF_Registration_Regression_Guard_Test extends TestCase {
 		$context->method( 'should_skip_registration' )->willReturn( false );
 		$existing = $this->createMock( Existing_Page_ACF_Registration_Context_Resolver::class );
 		$existing->method( 'get_section_keys_for_current_request' )->willReturn( array( 'st_hero' ) );
-		$admin = $this->create_admin_resolver( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::EXISTING_PAGE_EDIT, 1 ) );
+		$admin      = $this->create_admin_resolver( new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::EXISTING_PAGE_EDIT, 1 ) );
 		$controller = new ACF_Registration_Bootstrap_Controller(
 			$registrar,
 			$context,

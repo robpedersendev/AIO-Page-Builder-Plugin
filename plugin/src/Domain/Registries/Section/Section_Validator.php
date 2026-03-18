@@ -31,7 +31,7 @@ final class Section_Validator {
 		Section_Definition_Normalizer $normalizer,
 		Section_Template_Repository $repository
 	) {
-		$this->normalizer  = $normalizer;
+		$this->normalizer = $normalizer;
 		$this->repository = $repository;
 	}
 
@@ -44,7 +44,7 @@ final class Section_Validator {
 	 */
 	public function validate_for_create( array $input, int $exclude_post_id = 0 ): Section_Validation_Result {
 		$normalized = $this->normalizer->normalize( $input );
-		$errors    = $this->validate_completeness( $normalized );
+		$errors     = $this->validate_completeness( $normalized );
 		if ( ! empty( $errors ) ) {
 			return Section_Validation_Result::failure( $errors, $normalized );
 		}
@@ -82,7 +82,7 @@ final class Section_Validator {
 	 * @return list<string> Error messages.
 	 */
 	public function validate_completeness( array $normalized ): array {
-		$errors = array();
+		$errors   = array();
 		$required = Section_Schema::get_required_fields();
 
 		foreach ( $required as $field ) {
@@ -130,7 +130,7 @@ final class Section_Validator {
 			$errors[] = 'internal_key exceeds max length';
 		}
 
-		$status = (string) ( $normalized[ Section_Schema::FIELD_STATUS ] ?? '' );
+		$status  = (string) ( $normalized[ Section_Schema::FIELD_STATUS ] ?? '' );
 		$allowed = array( 'draft', 'active', 'inactive', 'deprecated' );
 		if ( $status !== '' && ! in_array( $status, $allowed, true ) ) {
 			$errors[] = 'status must be one of: ' . implode( ', ', $allowed );

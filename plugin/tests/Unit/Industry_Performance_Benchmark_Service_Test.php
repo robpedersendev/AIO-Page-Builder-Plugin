@@ -42,30 +42,38 @@ final class Industry_Performance_Benchmark_Service_Test extends TestCase {
 
 	public function test_run_benchmark_with_container_runs_bundle_comparison_and_health_report(): void {
 		$registry = new Industry_Starter_Bundle_Registry();
-		$registry->load( array(
+		$registry->load(
 			array(
-				Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => 'bench_a',
-				Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => 'realtor',
-				Industry_Starter_Bundle_Registry::FIELD_LABEL       => 'Bench A',
-				Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => '1',
-			),
-			array(
-				Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => 'bench_b',
-				Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => 'realtor',
-				Industry_Starter_Bundle_Registry::FIELD_LABEL        => 'Bench B',
-				Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => '1',
-			),
-		) );
+				array(
+					Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => 'bench_a',
+					Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => 'realtor',
+					Industry_Starter_Bundle_Registry::FIELD_LABEL       => 'Bench A',
+					Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => '1',
+				),
+				array(
+					Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY   => 'bench_b',
+					Industry_Starter_Bundle_Registry::FIELD_INDUSTRY_KEY => 'realtor',
+					Industry_Starter_Bundle_Registry::FIELD_LABEL        => 'Bench B',
+					Industry_Starter_Bundle_Registry::FIELD_VERSION_MARKER => '1',
+				),
+			)
+		);
 		$diff_service   = new Industry_Starter_Bundle_Diff_Service( $registry );
 		$health_service = new Industry_Health_Check_Service( null, null, null, null, null, null, null, null, null, null, null );
 
 		$container = new Service_Container();
-		$container->register( 'industry_starter_bundle_diff_service', function () use ( $diff_service ) {
-			return $diff_service;
-		} );
-		$container->register( 'industry_health_check_service', function () use ( $health_service ) {
-			return $health_service;
-		} );
+		$container->register(
+			'industry_starter_bundle_diff_service',
+			function () use ( $diff_service ) {
+				return $diff_service;
+			}
+		);
+		$container->register(
+			'industry_health_check_service',
+			function () use ( $health_service ) {
+				return $health_service;
+			}
+		);
 
 		$service = new Industry_Performance_Benchmark_Service( $container );
 		$result  = $service->run_benchmark( 2 );

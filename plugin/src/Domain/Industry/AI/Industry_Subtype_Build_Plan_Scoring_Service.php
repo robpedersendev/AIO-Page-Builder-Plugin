@@ -54,7 +54,7 @@ final class Industry_Subtype_Build_Plan_Scoring_Service implements Build_Plan_Sc
 	 * @return array<string, mixed> Same structure with additive keys on page-related records.
 	 */
 	public function enrich_output( array $normalized_output, array $context = array() ): array {
-		$profile = isset( $context[ Industry_Build_Plan_Scoring_Service::CONTEXT_INDUSTRY_PROFILE ] ) && is_array( $context[ Industry_Build_Plan_Scoring_Service::CONTEXT_INDUSTRY_PROFILE ] )
+		$profile  = isset( $context[ Industry_Build_Plan_Scoring_Service::CONTEXT_INDUSTRY_PROFILE ] ) && is_array( $context[ Industry_Build_Plan_Scoring_Service::CONTEXT_INDUSTRY_PROFILE ] )
 			? $context[ Industry_Build_Plan_Scoring_Service::CONTEXT_INDUSTRY_PROFILE ]
 			: $this->profile_repo->get_profile();
 		$resolved = $this->subtype_resolver->resolve_from_profile( $profile );

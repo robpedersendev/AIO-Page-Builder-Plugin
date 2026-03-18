@@ -29,8 +29,12 @@ final class Preview_Cache_Service_Test extends TestCase {
 	}
 
 	public function test_get_cache_key_deterministic_for_section(): void {
-		$ctx = Synthetic_Preview_Context::for_section( 'st_hero', 'hero', 'default', false, 'none' );
-		$def = array( 'internal_key' => 'st_hero', 'version' => array( 1, 0 ), 'field_blueprint_ref' => 'hero_bp' );
+		$ctx  = Synthetic_Preview_Context::for_section( 'st_hero', 'hero', 'default', false, 'none' );
+		$def  = array(
+			'internal_key'        => 'st_hero',
+			'version'             => array( 1, 0 ),
+			'field_blueprint_ref' => 'hero_bp',
+		);
 		$key1 = $this->service->get_cache_key( $ctx, $def );
 		$key2 = $this->service->get_cache_key( $ctx, $def );
 		$this->assertSame( $key1, $key2 );
@@ -38,36 +42,48 @@ final class Preview_Cache_Service_Test extends TestCase {
 	}
 
 	public function test_get_cache_key_different_for_different_version_hash(): void {
-		$ctx = Synthetic_Preview_Context::for_section( 'st_hero', 'hero', 'default', false, 'none' );
-		$def1 = array( 'internal_key' => 'st_hero', 'version' => array( 1, 0 ), 'field_blueprint_ref' => '' );
-		$def2 = array( 'internal_key' => 'st_hero', 'version' => array( 2, 0 ), 'field_blueprint_ref' => '' );
+		$ctx  = Synthetic_Preview_Context::for_section( 'st_hero', 'hero', 'default', false, 'none' );
+		$def1 = array(
+			'internal_key'        => 'st_hero',
+			'version'             => array( 1, 0 ),
+			'field_blueprint_ref' => '',
+		);
+		$def2 = array(
+			'internal_key'        => 'st_hero',
+			'version'             => array( 2, 0 ),
+			'field_blueprint_ref' => '',
+		);
 		$key1 = $this->service->get_cache_key( $ctx, $def1 );
 		$key2 = $this->service->get_cache_key( $ctx, $def2 );
 		$this->assertNotSame( $key1, $key2 );
 	}
 
 	public function test_definition_version_hash_section_uses_internal_key_version_blueprint(): void {
-		$def = array( 'internal_key' => 'st_hero', 'version' => array( 1, 0 ), 'field_blueprint_ref' => 'bp1' );
-		$h1 = $this->service->definition_version_hash( $def, Synthetic_Preview_Context::TYPE_SECTION );
+		$def = array(
+			'internal_key'        => 'st_hero',
+			'version'             => array( 1, 0 ),
+			'field_blueprint_ref' => 'bp1',
+		);
+		$h1  = $this->service->definition_version_hash( $def, Synthetic_Preview_Context::TYPE_SECTION );
 		$this->assertNotEmpty( $h1 );
 		$def['version'] = array( 2, 0 );
-		$h2 = $this->service->definition_version_hash( $def, Synthetic_Preview_Context::TYPE_SECTION );
+		$h2             = $this->service->definition_version_hash( $def, Synthetic_Preview_Context::TYPE_SECTION );
 		$this->assertNotSame( $h1, $h2 );
 	}
 
 	public function test_definition_version_hash_page_uses_ordered_sections(): void {
 		$def = array(
-			'internal_key'      => 'pt_home',
+			'internal_key'     => 'pt_home',
 			'version'          => array( 1, 0 ),
 			'ordered_sections' => array(
 				array( 'section_key' => 'hero' ),
 				array( 'section_key' => 'cta' ),
 			),
 		);
-		$h1 = $this->service->definition_version_hash( $def, Synthetic_Preview_Context::TYPE_PAGE );
+		$h1  = $this->service->definition_version_hash( $def, Synthetic_Preview_Context::TYPE_PAGE );
 		$this->assertNotEmpty( $h1 );
 		$def['ordered_sections'] = array( array( 'section_key' => 'cta' ), array( 'section_key' => 'hero' ) );
-		$h2 = $this->service->definition_version_hash( $def, Synthetic_Preview_Context::TYPE_PAGE );
+		$h2                      = $this->service->definition_version_hash( $def, Synthetic_Preview_Context::TYPE_PAGE );
 		$this->assertNotSame( $h1, $h2 );
 	}
 

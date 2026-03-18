@@ -12,18 +12,18 @@ if ( ! isset( $item_view ) && ! isset( $badge_data ) ) {
 	return;
 }
 
-$status   = '';
-$snippet  = '';
+$status        = '';
+$snippet       = '';
 $hierarchy_fit = '';
 $lpagery_fit   = '';
 if ( isset( $item_view ) && $item_view instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Directory_Item_View ) {
-	$status   = $item_view->get_recommendation_status();
-	$snippet  = $item_view->get_explanation_snippet();
+	$status        = $item_view->get_recommendation_status();
+	$snippet       = $item_view->get_explanation_snippet();
 	$hierarchy_fit = $item_view->get_hierarchy_fit();
 	$lpagery_fit   = $item_view->get_lpagery_fit();
 } elseif ( isset( $badge_data ) && is_array( $badge_data ) ) {
-	$status   = (string) ( $badge_data['recommendation_status'] ?? $badge_data['fit_classification'] ?? '' );
-	$snippet  = (string) ( $badge_data['explanation_snippet'] ?? \implode( ', ', (array) ( $badge_data['explanation_reasons'] ?? array() ) ) );
+	$status        = (string) ( $badge_data['recommendation_status'] ?? $badge_data['fit_classification'] ?? '' );
+	$snippet       = (string) ( $badge_data['explanation_snippet'] ?? \implode( ', ', (array) ( $badge_data['explanation_reasons'] ?? array() ) ) );
 	$hierarchy_fit = (string) ( $badge_data['hierarchy_fit'] ?? '' );
 	$lpagery_fit   = (string) ( $badge_data['lpagery_fit'] ?? '' );
 }
@@ -63,8 +63,14 @@ $class = 'aio-industry-badge aio-industry-badge--' . \sanitize_html_class( $stat
 	<?php echo $label !== '' ? \esc_html( $label ) : '—'; ?>
 	<?php if ( $hierarchy_fit !== '' || $lpagery_fit !== '' ) : ?>
 		<span class="aio-industry-badge-meta">
-			<?php if ( $hierarchy_fit !== '' ) : ?><span class="aio-hierarchy-fit" title="<?php echo \esc_attr( $hierarchy_fit ); ?>">H</span><?php endif; ?>
-			<?php if ( $lpagery_fit !== '' ) : ?><span class="aio-lpagery-fit" title="<?php echo \esc_attr( $lpagery_fit ); ?>">L</span><?php endif; ?>
+			<?php
+			if ( $hierarchy_fit !== '' ) :
+				?>
+				<span class="aio-hierarchy-fit" title="<?php echo \esc_attr( $hierarchy_fit ); ?>">H</span><?php endif; ?>
+			<?php
+			if ( $lpagery_fit !== '' ) :
+				?>
+				<span class="aio-lpagery-fit" title="<?php echo \esc_attr( $lpagery_fit ); ?>">L</span><?php endif; ?>
 		</span>
 	<?php endif; ?>
 </span>

@@ -81,13 +81,13 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 	/**
 	 * Builds a process/timeline/FAQ section definition.
 	 *
-	 * @param string $key Internal key.
-	 * @param string $name Display name.
-	 * @param string $purpose_summary Purpose summary.
-	 * @param string $category Section category (process_steps, timeline, faq).
-	 * @param string $purpose_family section_purpose_family (process, timeline, faq).
-	 * @param string $variation_family_key Variation family key.
-	 * @param string $preview_desc Preview description.
+	 * @param string               $key Internal key.
+	 * @param string               $name Display name.
+	 * @param string               $purpose_summary Purpose summary.
+	 * @param string               $category Section category (process_steps, timeline, faq).
+	 * @param string               $purpose_family section_purpose_family (process, timeline, faq).
+	 * @param string               $variation_family_key Variation family key.
+	 * @param string               $preview_desc Preview description.
 	 * @param array<string, mixed> $blueprint_fields Field definitions for embedded blueprint.
 	 * @param array<string, mixed> $preview_defaults Synthetic ACF defaults for preview.
 	 * @param array<string, mixed> $extra Optional extra keys.
@@ -105,19 +105,23 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 		array $preview_defaults,
 		array $extra = array()
 	): array {
-		$bp_id = 'acf_blueprint_' . $key;
-		$base = array(
-			Section_Schema::FIELD_INTERNAL_KEY            => $key,
-			Section_Schema::FIELD_NAME                    => $name,
-			Section_Schema::FIELD_PURPOSE_SUMMARY         => $purpose_summary,
-			Section_Schema::FIELD_CATEGORY                => $category,
+		$bp_id                   = 'acf_blueprint_' . $key;
+		$base                    = array(
+			Section_Schema::FIELD_INTERNAL_KEY             => $key,
+			Section_Schema::FIELD_NAME                     => $name,
+			Section_Schema::FIELD_PURPOSE_SUMMARY          => $purpose_summary,
+			Section_Schema::FIELD_CATEGORY                 => $category,
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp_' . $key,
-			Section_Schema::FIELD_FIELD_BLUEPRINT_REF     => $bp_id,
-			Section_Schema::FIELD_HELPER_REF              => 'helper_' . $key,
-			Section_Schema::FIELD_CSS_CONTRACT_REF        => 'css_' . $key,
-			Section_Schema::FIELD_DEFAULT_VARIANT         => 'default',
-			Section_Schema::FIELD_VARIANTS                => array(
-				'default' => array( 'label' => 'Default', 'description' => '', 'css_modifiers' => array() ),
+			Section_Schema::FIELD_FIELD_BLUEPRINT_REF      => $bp_id,
+			Section_Schema::FIELD_HELPER_REF               => 'helper_' . $key,
+			Section_Schema::FIELD_CSS_CONTRACT_REF         => 'css_' . $key,
+			Section_Schema::FIELD_DEFAULT_VARIANT          => 'default',
+			Section_Schema::FIELD_VARIANTS                 => array(
+				'default' => array(
+					'label'         => 'Default',
+					'description'   => '',
+					'css_modifiers' => array(),
+				),
 			),
 			Section_Schema::FIELD_COMPATIBILITY            => array(
 				'may_precede'          => array(),
@@ -125,19 +129,22 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 				'avoid_adjacent'       => array(),
 				'duplicate_purpose_of' => array(),
 			),
-			Section_Schema::FIELD_VERSION                 => array( 'version' => '1', 'stable_key_retained' => true ),
-			Section_Schema::FIELD_STATUS                  => 'active',
-			Section_Schema::FIELD_RENDER_MODE             => 'block',
-			Section_Schema::FIELD_ASSET_DECLARATION       => array( 'none' => true ),
-			'section_purpose_family'                     => $purpose_family,
-			'variation_family_key'                       => $variation_family_key,
-			'preview_description'                        => $preview_desc,
-			'preview_image_ref'                          => '',
-			'animation_tier'                             => 'subtle',
-			'animation_families'                         => array( 'entrance' ),
-			'preview_defaults'                           => $preview_defaults,
-			'accessibility_warnings_or_enhancements'     => self::default_accessibility_guidance( $category ),
-			'seo_relevance_notes'                       => 'Process and FAQ content support how-to and Q&A signals; use one primary heading per section (spec §51.6). Structured data may apply for FAQ.',
+			Section_Schema::FIELD_VERSION                  => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+			),
+			Section_Schema::FIELD_STATUS                   => 'active',
+			Section_Schema::FIELD_RENDER_MODE              => 'block',
+			Section_Schema::FIELD_ASSET_DECLARATION        => array( 'none' => true ),
+			'section_purpose_family'                       => $purpose_family,
+			'variation_family_key'                         => $variation_family_key,
+			'preview_description'                          => $preview_desc,
+			'preview_image_ref'                            => '',
+			'animation_tier'                               => 'subtle',
+			'animation_families'                           => array( 'entrance' ),
+			'preview_defaults'                             => $preview_defaults,
+			'accessibility_warnings_or_enhancements'       => self::default_accessibility_guidance( $category ),
+			'seo_relevance_notes'                          => 'Process and FAQ content support how-to and Q&A signals; use one primary heading per section (spec §51.6). Structured data may apply for FAQ.',
 		);
 		$base['field_blueprint'] = array(
 			'blueprint_id'    => $bp_id,
@@ -171,18 +178,36 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 
 	/** Step list: headline + repeatable (title, description). */
 	public static function ptf_steps_01(): array {
-		$key = 'ptf_steps_01';
+		$key    = 'ptf_steps_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_st_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_st_steps',
-				'name'        => 'steps',
-				'label'       => 'Steps',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_st_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_st_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_st_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_st_steps',
+				'name'       => 'steps',
+				'label'      => 'Steps',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_st_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_st_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -195,25 +220,54 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'steps_list',
 			'Step list with headline and items.',
 			$fields,
-			array( 'headline' => 'How it works', 'steps' => array( array( 'title' => 'Step one', 'description' => 'Synthetic description.' ) ) ),
-			array( 'short_label' => 'Step list', 'suggested_use_cases' => array( 'Service page', 'Product page', 'How-to' ) )
+			array(
+				'headline' => 'How it works',
+				'steps'    => array(
+					array(
+						'title'       => 'Step one',
+						'description' => 'Synthetic description.',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Step list',
+				'suggested_use_cases' => array( 'Service page', 'Product page', 'How-to' ),
+			)
 		);
 	}
 
 	/** Horizontal step flow. */
 	public static function ptf_steps_horizontal_01(): array {
-		$key = 'ptf_steps_horizontal_01';
+		$key    = 'ptf_steps_horizontal_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_sh_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_sh_steps',
-				'name'        => 'steps',
-				'label'       => 'Steps',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_sh_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_sh_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_sh_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_sh_steps',
+				'name'       => 'steps',
+				'label'      => 'Steps',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_sh_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_sh_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -226,25 +280,58 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'steps_horizontal',
 			'Horizontal step flow.',
 			$fields,
-			array( 'headline' => 'Our process', 'steps' => array( array( 'title' => 'First', 'description' => '' ), array( 'title' => 'Second', 'description' => '' ) ) ),
-			array( 'short_label' => 'Steps horizontal', 'suggested_use_cases' => array( 'Service flow', 'Buying process', 'Workflow' ) )
+			array(
+				'headline' => 'Our process',
+				'steps'    => array(
+					array(
+						'title'       => 'First',
+						'description' => '',
+					),
+					array(
+						'title'       => 'Second',
+						'description' => '',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Steps horizontal',
+				'suggested_use_cases' => array( 'Service flow', 'Buying process', 'Workflow' ),
+			)
 		);
 	}
 
 	/** Vertical step flow. */
 	public static function ptf_steps_vertical_01(): array {
-		$key = 'ptf_steps_vertical_01';
+		$key    = 'ptf_steps_vertical_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_sv_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_sv_steps',
-				'name'        => 'steps',
-				'label'       => 'Steps',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_sv_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_sv_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_sv_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_sv_steps',
+				'name'       => 'steps',
+				'label'      => 'Steps',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_sv_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_sv_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -257,25 +344,54 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'steps_vertical',
 			'Vertical step flow.',
 			$fields,
-			array( 'headline' => 'Steps', 'steps' => array( array( 'title' => 'Step 1', 'description' => 'Synthetic.' ) ) ),
-			array( 'short_label' => 'Steps vertical', 'suggested_use_cases' => array( 'Onboarding', 'Process', 'Guide' ) )
+			array(
+				'headline' => 'Steps',
+				'steps'    => array(
+					array(
+						'title'       => 'Step 1',
+						'description' => 'Synthetic.',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Steps vertical',
+				'suggested_use_cases' => array( 'Onboarding', 'Process', 'Guide' ),
+			)
 		);
 	}
 
 	/** Buying process roadmap. */
 	public static function ptf_buying_process_01(): array {
-		$key = 'ptf_buying_process_01';
+		$key    = 'ptf_buying_process_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_bp_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_bp_steps',
-				'name'        => 'steps',
-				'label'       => 'Steps',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_bp_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_bp_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_bp_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_bp_steps',
+				'name'       => 'steps',
+				'label'      => 'Steps',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_bp_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_bp_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -288,25 +404,58 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'buying_process',
 			'Buying process steps.',
 			$fields,
-			array( 'headline' => 'How to get started', 'steps' => array( array( 'title' => 'Choose', 'description' => 'Synthetic.' ), array( 'title' => 'Order', 'description' => '' ) ) ),
-			array( 'short_label' => 'Buying process', 'suggested_use_cases' => array( 'Product page', 'Service page', 'Conversion' ) )
+			array(
+				'headline' => 'How to get started',
+				'steps'    => array(
+					array(
+						'title'       => 'Choose',
+						'description' => 'Synthetic.',
+					),
+					array(
+						'title'       => 'Order',
+						'description' => '',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Buying process',
+				'suggested_use_cases' => array( 'Product page', 'Service page', 'Conversion' ),
+			)
 		);
 	}
 
 	/** Onboarding steps. */
 	public static function ptf_onboarding_01(): array {
-		$key = 'ptf_onboarding_01';
+		$key    = 'ptf_onboarding_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_onb_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_onb_steps',
-				'name'        => 'steps',
-				'label'       => 'Steps',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_onb_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_onb_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_onb_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_onb_steps',
+				'name'       => 'steps',
+				'label'      => 'Steps',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_onb_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_onb_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -319,25 +468,54 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'onboarding',
 			'Onboarding steps.',
 			$fields,
-			array( 'headline' => 'Get started', 'steps' => array( array( 'title' => 'Sign up', 'description' => 'Synthetic.' ) ) ),
-			array( 'short_label' => 'Onboarding', 'suggested_use_cases' => array( 'Product', 'Service', 'Activation' ) )
+			array(
+				'headline' => 'Get started',
+				'steps'    => array(
+					array(
+						'title'       => 'Sign up',
+						'description' => 'Synthetic.',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Onboarding',
+				'suggested_use_cases' => array( 'Product', 'Service', 'Activation' ),
+			)
 		);
 	}
 
 	/** Service flow. */
 	public static function ptf_service_flow_01(): array {
-		$key = 'ptf_service_flow_01';
+		$key    = 'ptf_service_flow_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_sf_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_sf_steps',
-				'name'        => 'steps',
-				'label'       => 'Steps',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_sf_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_sf_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_sf_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_sf_steps',
+				'name'       => 'steps',
+				'label'      => 'Steps',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_sf_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_sf_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -350,25 +528,54 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'service_flow',
 			'Service flow steps.',
 			$fields,
-			array( 'headline' => 'Our service flow', 'steps' => array( array( 'title' => 'Consultation', 'description' => 'Synthetic.' ) ) ),
-			array( 'short_label' => 'Service flow', 'suggested_use_cases' => array( 'Service page', 'Local', 'Delivery' ) )
+			array(
+				'headline' => 'Our service flow',
+				'steps'    => array(
+					array(
+						'title'       => 'Consultation',
+						'description' => 'Synthetic.',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Service flow',
+				'suggested_use_cases' => array( 'Service page', 'Local', 'Delivery' ),
+			)
 		);
 	}
 
 	/** Treatment/service expectations. */
 	public static function ptf_expectations_01(): array {
-		$key = 'ptf_expectations_01';
+		$key    = 'ptf_expectations_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_exp_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_exp_items',
-				'name'        => 'expectations',
-				'label'       => 'Expectations',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_exp_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_exp_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_exp_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_exp_items',
+				'name'       => 'expectations',
+				'label'      => 'Expectations',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_exp_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_exp_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -381,26 +588,61 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'expectations',
 			'Expectations list.',
 			$fields,
-			array( 'headline' => 'What to expect', 'expectations' => array( array( 'title' => 'Duration', 'description' => 'Synthetic.' ) ) ),
-			array( 'short_label' => 'Expectations', 'suggested_use_cases' => array( 'Service page', 'Treatment', 'Local' ) )
+			array(
+				'headline'     => 'What to expect',
+				'expectations' => array(
+					array(
+						'title'       => 'Duration',
+						'description' => 'Synthetic.',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Expectations',
+				'suggested_use_cases' => array( 'Service page', 'Treatment', 'Local' ),
+			)
 		);
 	}
 
 	/** Timeline: headline + repeatable (date/label, title, description). */
 	public static function ptf_timeline_01(): array {
-		$key = 'ptf_timeline_01';
+		$key    = 'ptf_timeline_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_tl_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_tl_items',
-				'name'        => 'timeline_items',
-				'label'       => 'Timeline items',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_tl_date', 'name' => 'date_or_label', 'label' => 'Date or label', 'type' => 'text', 'required' => false ),
-					array( 'key' => 'field_ptf_tl_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_tl_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_tl_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_tl_items',
+				'name'       => 'timeline_items',
+				'label'      => 'Timeline items',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_tl_date',
+						'name'     => 'date_or_label',
+						'label'    => 'Date or label',
+						'type'     => 'text',
+						'required' => false,
+					),
+					array(
+						'key'      => 'field_ptf_tl_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_tl_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -413,25 +655,55 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'timeline',
 			'Timeline with items.',
 			$fields,
-			array( 'headline' => 'Timeline', 'timeline_items' => array( array( 'date_or_label' => 'Step 1', 'title' => 'Milestone', 'description' => 'Synthetic.' ) ) ),
-			array( 'short_label' => 'Timeline', 'suggested_use_cases' => array( 'Project', 'History', 'Schedule' ) )
+			array(
+				'headline'       => 'Timeline',
+				'timeline_items' => array(
+					array(
+						'date_or_label' => 'Step 1',
+						'title'         => 'Milestone',
+						'description'   => 'Synthetic.',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Timeline',
+				'suggested_use_cases' => array( 'Project', 'History', 'Schedule' ),
+			)
 		);
 	}
 
 	/** Timeline compact. */
 	public static function ptf_timeline_compact_01(): array {
-		$key = 'ptf_timeline_compact_01';
+		$key    = 'ptf_timeline_compact_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_tc_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_tc_items',
-				'name'        => 'timeline_items',
-				'label'       => 'Timeline items',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_tc_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_tc_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'text', 'required' => false ),
+				'key'      => 'field_ptf_tc_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_tc_items',
+				'name'       => 'timeline_items',
+				'label'      => 'Timeline items',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_tc_label',
+						'name'     => 'label',
+						'label'    => 'Label',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_tc_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'text',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -444,26 +716,61 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'timeline_compact',
 			'Compact timeline.',
 			$fields,
-			array( 'headline' => 'Key dates', 'timeline_items' => array( array( 'label' => 'Phase 1', 'description' => 'Synthetic.' ) ) ),
-			array( 'short_label' => 'Timeline compact', 'suggested_use_cases' => array( 'Dense layout', 'Schedule', 'Milestones' ) )
+			array(
+				'headline'       => 'Key dates',
+				'timeline_items' => array(
+					array(
+						'label'       => 'Phase 1',
+						'description' => 'Synthetic.',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Timeline compact',
+				'suggested_use_cases' => array( 'Dense layout', 'Schedule', 'Milestones' ),
+			)
 		);
 	}
 
 	/** Policy/legal explainer. */
 	public static function ptf_policy_explainer_01(): array {
-		$key = 'ptf_policy_explainer_01';
+		$key    = 'ptf_policy_explainer_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_pe_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => true ),
-			array( 'key' => 'field_ptf_pe_body', 'name' => 'body', 'label' => 'Body copy', 'type' => 'textarea', 'required' => true ),
 			array(
-				'key'         => 'field_ptf_pe_steps',
-				'name'        => 'steps',
-				'label'       => 'Optional steps',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => false,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_pe_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_pe_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_pe_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => true,
+			),
+			array(
+				'key'      => 'field_ptf_pe_body',
+				'name'     => 'body',
+				'label'    => 'Body copy',
+				'type'     => 'textarea',
+				'required' => true,
+			),
+			array(
+				'key'        => 'field_ptf_pe_steps',
+				'name'       => 'steps',
+				'label'      => 'Optional steps',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => false,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_pe_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_pe_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -476,25 +783,50 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'policy_explainer',
 			'Policy explainer with optional steps.',
 			$fields,
-			array( 'headline' => 'Policy summary', 'body' => 'Synthetic body for preview.', 'steps' => array() ),
-			array( 'short_label' => 'Policy explainer', 'suggested_use_cases' => array( 'Legal page', 'Policy', 'Compliance' ) )
+			array(
+				'headline' => 'Policy summary',
+				'body'     => 'Synthetic body for preview.',
+				'steps'    => array(),
+			),
+			array(
+				'short_label'         => 'Policy explainer',
+				'suggested_use_cases' => array( 'Legal page', 'Policy', 'Compliance' ),
+			)
 		);
 	}
 
 	/** FAQ standard: headline + repeatable question/answer. */
 	public static function ptf_faq_01(): array {
-		$key = 'ptf_faq_01';
+		$key    = 'ptf_faq_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_faq_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_faq_items',
-				'name'        => 'faq_items',
-				'label'       => 'FAQ items',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_faq_q', 'name' => 'question', 'label' => 'Question', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_faq_a', 'name' => 'answer', 'label' => 'Answer', 'type' => 'textarea', 'required' => true ),
+				'key'      => 'field_ptf_faq_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_faq_items',
+				'name'       => 'faq_items',
+				'label'      => 'FAQ items',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_faq_q',
+						'name'     => 'question',
+						'label'    => 'Question',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_faq_a',
+						'name'     => 'answer',
+						'label'    => 'Answer',
+						'type'     => 'textarea',
+						'required' => true,
+					),
 				),
 			),
 		);
@@ -507,31 +839,60 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'faq_standard',
 			'FAQ with question/answer items.',
 			$fields,
-			array( 'headline' => 'Frequently asked questions', 'faq_items' => array( array( 'question' => 'Preview question?', 'answer' => 'Synthetic answer.' ) ) ),
-			array( 'short_label' => 'FAQ', 'suggested_use_cases' => array( 'Service page', 'Product page', 'General FAQ' ) )
+			array(
+				'headline'  => 'Frequently asked questions',
+				'faq_items' => array(
+					array(
+						'question' => 'Preview question?',
+						'answer'   => 'Synthetic answer.',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'FAQ',
+				'suggested_use_cases' => array( 'Service page', 'Product page', 'General FAQ' ),
+			)
 		);
 	}
 
 	/** FAQ accordion: same structure, accessibility note for accordion pattern. */
 	public static function ptf_faq_accordion_01(): array {
-		$key = 'ptf_faq_accordion_01';
+		$key    = 'ptf_faq_accordion_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_fa_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_fa_items',
-				'name'        => 'faq_items',
-				'label'       => 'FAQ items',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_fa_q', 'name' => 'question', 'label' => 'Question', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_fa_a', 'name' => 'answer', 'label' => 'Answer', 'type' => 'textarea', 'required' => true ),
+				'key'      => 'field_ptf_fa_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_fa_items',
+				'name'       => 'faq_items',
+				'label'      => 'FAQ items',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_fa_q',
+						'name'     => 'question',
+						'label'    => 'Question',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_fa_a',
+						'name'     => 'answer',
+						'label'    => 'Answer',
+						'type'     => 'textarea',
+						'required' => true,
+					),
 				),
 			),
 		);
-		$extra = array(
-			'short_label'             => 'FAQ accordion',
-			'suggested_use_cases'      => array( 'Interactive FAQ', 'Dense page', 'Expandable' ),
+		$extra  = array(
+			'short_label'                            => 'FAQ accordion',
+			'suggested_use_cases'                    => array( 'Interactive FAQ', 'Dense page', 'Expandable' ),
 			'accessibility_warnings_or_enhancements' => 'Use one heading (h2) for the section. If accordion pattern is used: expose expanded state (aria-expanded), ensure keyboard operability, and provide static fallback so content is available without JS (spec §51.3, §51.7). FAQ items in list or dl.',
 		);
 		return self::ptf_definition(
@@ -543,33 +904,65 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'faq_accordion',
 			'FAQ with accordion-style display.',
 			$fields,
-			array( 'headline' => 'FAQ', 'faq_items' => array( array( 'question' => 'Preview question?', 'answer' => 'Synthetic answer.' ) ) ),
+			array(
+				'headline'  => 'FAQ',
+				'faq_items' => array(
+					array(
+						'question' => 'Preview question?',
+						'answer'   => 'Synthetic answer.',
+					),
+				),
+			),
 			$extra
 		);
 	}
 
 	/** FAQ by category: headline + repeatable groups (category name, items). */
 	public static function ptf_faq_by_category_01(): array {
-		$key = 'ptf_faq_by_category_01';
+		$key    = 'ptf_faq_by_category_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_fc_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_fc_groups',
-				'name'        => 'categories',
-				'label'       => 'FAQ categories',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_fc_cat_name', 'name' => 'category_name', 'label' => 'Category name', 'type' => 'text', 'required' => true ),
+				'key'      => 'field_ptf_fc_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_fc_groups',
+				'name'       => 'categories',
+				'label'      => 'FAQ categories',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
 					array(
-						'key'         => 'field_ptf_fc_items',
-						'name'        => 'items',
-						'label'       => 'Items',
-						'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-						'required'    => true,
-						'sub_fields'  => array(
-							array( 'key' => 'field_ptf_fc_q', 'name' => 'question', 'label' => 'Question', 'type' => 'text', 'required' => true ),
-							array( 'key' => 'field_ptf_fc_a', 'name' => 'answer', 'label' => 'Answer', 'type' => 'textarea', 'required' => true ),
+						'key'      => 'field_ptf_fc_cat_name',
+						'name'     => 'category_name',
+						'label'    => 'Category name',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'        => 'field_ptf_fc_items',
+						'name'       => 'items',
+						'label'      => 'Items',
+						'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+						'required'   => true,
+						'sub_fields' => array(
+							array(
+								'key'      => 'field_ptf_fc_q',
+								'name'     => 'question',
+								'label'    => 'Question',
+								'type'     => 'text',
+								'required' => true,
+							),
+							array(
+								'key'      => 'field_ptf_fc_a',
+								'name'     => 'answer',
+								'label'    => 'Answer',
+								'type'     => 'textarea',
+								'required' => true,
+							),
 						),
 					),
 				),
@@ -584,25 +977,59 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'faq_by_category',
 			'FAQ grouped by category.',
 			$fields,
-			array( 'headline' => 'FAQ', 'categories' => array( array( 'category_name' => 'General', 'items' => array( array( 'question' => 'Q?', 'answer' => 'A.' ) ) ) ) ),
-			array( 'short_label' => 'FAQ by category', 'suggested_use_cases' => array( 'Directory', 'Multi-topic', 'Hub page' ) )
+			array(
+				'headline'   => 'FAQ',
+				'categories' => array(
+					array(
+						'category_name' => 'General',
+						'items'         => array(
+							array(
+								'question' => 'Q?',
+								'answer'   => 'A.',
+							),
+						),
+					),
+				),
+			),
+			array(
+				'short_label'         => 'FAQ by category',
+				'suggested_use_cases' => array( 'Directory', 'Multi-topic', 'Hub page' ),
+			)
 		);
 	}
 
 	/** How it works explainer. */
 	public static function ptf_how_it_works_01(): array {
-		$key = 'ptf_how_it_works_01';
+		$key    = 'ptf_how_it_works_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_hiw_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_hiw_steps',
-				'name'        => 'steps',
-				'label'       => 'Steps',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_hiw_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_hiw_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ),
+				'key'      => 'field_ptf_hiw_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_hiw_steps',
+				'name'       => 'steps',
+				'label'      => 'Steps',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_hiw_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_hiw_desc',
+						'name'     => 'description',
+						'label'    => 'Description',
+						'type'     => 'textarea',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -615,26 +1042,61 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'how_it_works',
 			'How it works steps.',
 			$fields,
-			array( 'headline' => 'How it works', 'steps' => array( array( 'title' => 'Step 1', 'description' => 'Synthetic.' ) ) ),
-			array( 'short_label' => 'How it works', 'suggested_use_cases' => array( 'Product', 'Service', 'Resource' ) )
+			array(
+				'headline' => 'How it works',
+				'steps'    => array(
+					array(
+						'title'       => 'Step 1',
+						'description' => 'Synthetic.',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'How it works',
+				'suggested_use_cases' => array( 'Product', 'Service', 'Resource' ),
+			)
 		);
 	}
 
 	/** Comparison by step. */
 	public static function ptf_comparison_steps_01(): array {
-		$key = 'ptf_comparison_steps_01';
+		$key    = 'ptf_comparison_steps_01';
 		$fields = array(
-			array( 'key' => 'field_ptf_cs_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text', 'required' => false ),
 			array(
-				'key'         => 'field_ptf_cs_steps',
-				'name'        => 'steps',
-				'label'       => 'Comparison steps',
-				'type'        => Field_Blueprint_Schema::TYPE_REPEATER,
-				'required'    => true,
-				'sub_fields'  => array(
-					array( 'key' => 'field_ptf_cs_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true ),
-					array( 'key' => 'field_ptf_cs_option_a', 'name' => 'option_a', 'label' => 'Option A', 'type' => 'text', 'required' => false ),
-					array( 'key' => 'field_ptf_cs_option_b', 'name' => 'option_b', 'label' => 'Option B', 'type' => 'text', 'required' => false ),
+				'key'      => 'field_ptf_cs_headline',
+				'name'     => 'headline',
+				'label'    => 'Headline',
+				'type'     => 'text',
+				'required' => false,
+			),
+			array(
+				'key'        => 'field_ptf_cs_steps',
+				'name'       => 'steps',
+				'label'      => 'Comparison steps',
+				'type'       => Field_Blueprint_Schema::TYPE_REPEATER,
+				'required'   => true,
+				'sub_fields' => array(
+					array(
+						'key'      => 'field_ptf_cs_title',
+						'name'     => 'title',
+						'label'    => 'Title',
+						'type'     => 'text',
+						'required' => true,
+					),
+					array(
+						'key'      => 'field_ptf_cs_option_a',
+						'name'     => 'option_a',
+						'label'    => 'Option A',
+						'type'     => 'text',
+						'required' => false,
+					),
+					array(
+						'key'      => 'field_ptf_cs_option_b',
+						'name'     => 'option_b',
+						'label'    => 'Option B',
+						'type'     => 'text',
+						'required' => false,
+					),
 				),
 			),
 		);
@@ -647,8 +1109,20 @@ final class Process_Timeline_FAQ_Library_Batch_Definitions {
 			'comparison_steps',
 			'Comparison steps.',
 			$fields,
-			array( 'headline' => 'Compare', 'steps' => array( array( 'title' => 'Step', 'option_a' => 'A', 'option_b' => 'B' ) ) ),
-			array( 'short_label' => 'Comparison steps', 'suggested_use_cases' => array( 'Pricing', 'Plans', 'Options' ) )
+			array(
+				'headline' => 'Compare',
+				'steps'    => array(
+					array(
+						'title'    => 'Step',
+						'option_a' => 'A',
+						'option_b' => 'B',
+					),
+				),
+			),
+			array(
+				'short_label'         => 'Comparison steps',
+				'suggested_use_cases' => array( 'Pricing', 'Plans', 'Options' ),
+			)
 		);
 	}
 }

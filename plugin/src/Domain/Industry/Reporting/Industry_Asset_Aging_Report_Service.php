@@ -61,22 +61,22 @@ final class Industry_Asset_Aging_Report_Service {
 
 	/** Path patterns relative to plugin src: directory suffix => asset_class. Builtin aggregators excluded. */
 	private const PATH_CLASS_MAP = array(
-		'Docs/SectionHelperOverlays'           => 'overlay_section_helper',
-		'Docs/SubtypeSectionHelperOverlays'    => 'overlay_subtype_section',
-		'Docs/GoalSectionHelperOverlays'       => 'overlay_goal_section',
-		'Docs/SubtypeGoalOverlays'             => 'overlay_subtype_goal_section',
-		'Docs/SecondaryGoalSectionHelperOverlays' => 'overlay_secondary_goal_section',
-		'Docs/PageOnePagerOverlays'            => 'overlay_page_onepager',
-		'Docs/SubtypePageOnePagerOverlays'     => 'overlay_subtype_page',
-		'Docs/GoalPageOnePagerOverlays'        => 'overlay_goal_page',
-		'Docs/SubtypeGoalOverlays'             => 'overlay_subtype_goal_page',
-		'Docs/SecondaryGoalPageOnePagerOverlays' => 'overlay_secondary_goal_page',
-		'Registry/StarterBundles'               => 'bundle_starter',
-		'Registry/StarterBundles/SubtypeGoalOverlays' => 'overlay_subtype_goal_bundle',
+		'Docs/SectionHelperOverlays'                    => 'overlay_section_helper',
+		'Docs/SubtypeSectionHelperOverlays'             => 'overlay_subtype_section',
+		'Docs/GoalSectionHelperOverlays'                => 'overlay_goal_section',
+		'Docs/SubtypeGoalOverlays'                      => 'overlay_subtype_goal_section',
+		'Docs/SecondaryGoalSectionHelperOverlays'       => 'overlay_secondary_goal_section',
+		'Docs/PageOnePagerOverlays'                     => 'overlay_page_onepager',
+		'Docs/SubtypePageOnePagerOverlays'              => 'overlay_subtype_page',
+		'Docs/GoalPageOnePagerOverlays'                 => 'overlay_goal_page',
+		'Docs/SubtypeGoalOverlays'                      => 'overlay_subtype_goal_page',
+		'Docs/SecondaryGoalPageOnePagerOverlays'        => 'overlay_secondary_goal_page',
+		'Registry/StarterBundles'                       => 'bundle_starter',
+		'Registry/StarterBundles/SubtypeGoalOverlays'   => 'overlay_subtype_goal_bundle',
 		'Registry/StarterBundles/SecondaryGoalOverlays' => 'overlay_secondary_goal_bundle',
-		'Registry/CTAPatterns'                  => 'rule_cta',
-		'Registry/GoalCautionRules'            => 'rule_goal_caution',
-		'Registry/SecondaryGoalCautionRules'   => 'rule_secondary_goal_caution',
+		'Registry/CTAPatterns'                          => 'rule_cta',
+		'Registry/GoalCautionRules'                     => 'rule_goal_caution',
+		'Registry/SecondaryGoalCautionRules'            => 'rule_secondary_goal_caution',
 	);
 
 	/** Asset classes treated as high usage-criticality (user-facing overlays, bundles). */
@@ -116,8 +116,8 @@ final class Industry_Asset_Aging_Report_Service {
 	 * }
 	 */
 	public function generate_report(): array {
-		$base = $this->resolve_base_path();
-		$raw  = $this->collect_assets( $base );
+		$base  = $this->resolve_base_path();
+		$raw   = $this->collect_assets( $base );
 		$items = array();
 		foreach ( $raw as $path => $asset_class ) {
 			$full = $base . '/' . $path;
@@ -128,29 +128,29 @@ final class Industry_Asset_Aging_Report_Service {
 			if ( $mtime === false ) {
 				continue;
 			}
-			$days_old = (int) floor( ( time() - $mtime ) / 86400 );
+			$days_old  = (int) floor( ( time() - $mtime ) / 86400 );
 			$age_score = min( 100, (int) round( $days_old * 0.5 ) ); // Cap at 100
 			$high_crit = in_array( $asset_class, self::HIGH_CRITICALITY_CLASSES, true );
-			$severity = $this->band_severity( $days_old, $high_crit );
-			$priority = $this->suggest_priority( $severity, $days_old, $high_crit );
+			$severity  = $this->band_severity( $days_old, $high_crit );
+			$priority  = $this->suggest_priority( $severity, $days_old, $high_crit );
 			$rationale = $this->build_rationale( $days_old, $severity, $high_crit );
-			$items[] = array(
-				self::ITEM_ASSET_REF              => $path,
-				self::ITEM_ASSET_CLASS            => $asset_class,
-				self::ITEM_DAYS_OLD                => $days_old,
-				self::ITEM_AGE_SCORE              => $age_score,
-				self::ITEM_SEVERITY                => $severity,
-				self::ITEM_RATIONALE               => $rationale,
+			$items[]   = array(
+				self::ITEM_ASSET_REF                 => $path,
+				self::ITEM_ASSET_CLASS               => $asset_class,
+				self::ITEM_DAYS_OLD                  => $days_old,
+				self::ITEM_AGE_SCORE                 => $age_score,
+				self::ITEM_SEVERITY                  => $severity,
+				self::ITEM_RATIONALE                 => $rationale,
 				self::ITEM_SUGGESTED_REVIEW_PRIORITY => $priority,
 			);
 			if ( count( $items ) >= self::MAX_ITEMS ) {
 				break;
 			}
 		}
-		$by_class    = $this->group_by( $items, self::ITEM_ASSET_CLASS );
-		$by_severity = $this->group_by( $items, self::ITEM_SEVERITY );
+		$by_class          = $this->group_by( $items, self::ITEM_ASSET_CLASS );
+		$by_severity       = $this->group_by( $items, self::ITEM_SEVERITY );
 		$high_impact_stale = isset( $by_severity[ self::SEVERITY_HIGH_IMPACT ] ) ? $by_severity[ self::SEVERITY_HIGH_IMPACT ] : array();
-		$summary = array(
+		$summary           = array(
 			'total'       => count( $items ),
 			'benign'      => count( $by_severity[ self::SEVERITY_BENIGN ] ?? array() ),
 			'advisory'    => count( $by_severity[ self::SEVERITY_ADVISORY ] ?? array() ),
@@ -171,7 +171,7 @@ final class Industry_Asset_Aging_Report_Service {
 		if ( $this->base_path !== '' ) {
 			return $this->base_path;
 		}
-		$dir = dirname( __FILE__ );
+		$dir = __DIR__;
 		// From Reporting/ go up to Domain/Industry then use as base for relative paths.
 		return dirname( $dir );
 	}
@@ -183,7 +183,7 @@ final class Industry_Asset_Aging_Report_Service {
 	 * @return array<string, string> path => asset_class
 	 */
 	private function collect_assets( string $base ): array {
-		$out = array();
+		$out           = array();
 		$industry_base = $base;
 		if ( substr( $industry_base, -8 ) !== 'Industry' ) {
 			$industry_base = $base . '/Domain/Industry';
@@ -262,7 +262,7 @@ final class Industry_Asset_Aging_Report_Service {
 	}
 
 	private function build_rationale( int $days_old, string $severity, bool $high_criticality ): string {
-		$parts = array();
+		$parts   = array();
 		$parts[] = $days_old . ' days since last file change';
 		if ( $high_criticality ) {
 			$parts[] = 'high-usage asset';
@@ -277,7 +277,7 @@ final class Industry_Asset_Aging_Report_Service {
 
 	/**
 	 * @param list<array<string, mixed>> $items
-	 * @param string $key
+	 * @param string                     $key
 	 * @return array<string, list<array<string, mixed>>>
 	 */
 	private function group_by( array $items, string $key ): array {

@@ -25,11 +25,11 @@ use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
  */
 final class Dashboard_State_Builder {
 
-	private const LAST_CRAWL_LIMIT = 1;
-	private const LAST_AI_RUN_LIMIT = 1;
-	private const ACTIVE_PLANS_LIMIT = 5;
+	private const LAST_CRAWL_LIMIT              = 1;
+	private const LAST_AI_RUN_LIMIT             = 1;
+	private const ACTIVE_PLANS_LIMIT            = 5;
 	private const CRITICAL_ERRORS_DASHBOARD_CAP = 5;
-	private const QUEUE_WARNING_ITEMS = 5;
+	private const QUEUE_WARNING_ITEMS           = 5;
 
 	/** @var object|null Crawl_Snapshot_Service (list_sessions). */
 	private $crawl_snapshot_service;
@@ -54,10 +54,10 @@ final class Dashboard_State_Builder {
 		?object $job_queue_repository = null
 	) {
 		$this->settings               = $settings;
-		$this->crawl_snapshot_service  = $crawl_snapshot_service;
-		$this->ai_run_repository       = $ai_run_repository;
-		$this->build_plan_repository   = $build_plan_repository;
-		$this->job_queue_repository    = $job_queue_repository;
+		$this->crawl_snapshot_service = $crawl_snapshot_service;
+		$this->ai_run_repository      = $ai_run_repository;
+		$this->build_plan_repository  = $build_plan_repository;
+		$this->job_queue_repository   = $job_queue_repository;
 	}
 
 	/**
@@ -73,19 +73,19 @@ final class Dashboard_State_Builder {
 	 * }
 	 */
 	public function build(): array {
-		$readiness_cards   = $this->build_readiness_cards();
-		$last_activity     = $this->build_last_activity_cards();
-		$queue_summary     = $this->build_queue_warning_summary();
-		$critical_summary  = $this->build_critical_error_summary();
-		$quick_actions     = $this->build_quick_actions_filtered();
-		$welcome_state     = $this->build_welcome_state();
+		$readiness_cards  = $this->build_readiness_cards();
+		$last_activity    = $this->build_last_activity_cards();
+		$queue_summary    = $this->build_queue_warning_summary();
+		$critical_summary = $this->build_critical_error_summary();
+		$quick_actions    = $this->build_quick_actions_filtered();
+		$welcome_state    = $this->build_welcome_state();
 		return array(
-			'readiness_cards'       => $readiness_cards,
-			'last_activity_cards'   => $last_activity,
-			'queue_warning_summary' => $queue_summary,
+			'readiness_cards'        => $readiness_cards,
+			'last_activity_cards'    => $last_activity,
+			'queue_warning_summary'  => $queue_summary,
 			'critical_error_summary' => $critical_summary,
-			'quick_actions'         => $quick_actions,
-			'welcome_state'         => $welcome_state,
+			'quick_actions'          => $quick_actions,
+			'welcome_state'          => $welcome_state,
 		);
 	}
 
@@ -97,8 +97,8 @@ final class Dashboard_State_Builder {
 		$validator->validate();
 		$results = $validator->get_results();
 
-		$blocking = 0;
-		$warnings = 0;
+		$blocking     = 0;
+		$warnings     = 0;
 		$env_blocking = 0;
 		$dep_blocking = 0;
 		foreach ( $results as $r ) {
@@ -117,14 +117,14 @@ final class Dashboard_State_Builder {
 
 		$environment_ready = $env_blocking === 0;
 		$dependency_ready  = $dep_blocking === 0;
-		$env_message = $blocking > 0
+		$env_message       = $blocking > 0
 			? ( $validator->get_first_blocking_message() ?: __( 'One or more checks failed.', 'aio-page-builder' ) )
 			: ( $warnings > 0 ? sprintf( __( '%d warning(s).', 'aio-page-builder' ), $warnings ) : __( 'Ready.', 'aio-page-builder' ) );
-		$dep_message = $dep_blocking > 0
+		$dep_message       = $dep_blocking > 0
 			? sprintf( __( '%d required dependency issue(s).', 'aio-page-builder' ), $dep_blocking )
 			: ( $dependency_ready ? __( 'Dependencies met.', 'aio-page-builder' ) : __( 'Check diagnostics.', 'aio-page-builder' ) );
 
-		$provider_ready = $this->has_provider_configured();
+		$provider_ready   = $this->has_provider_configured();
 		$provider_message = $provider_ready
 			? __( 'At least one provider configured.', 'aio-page-builder' )
 			: __( 'No AI provider configured.', 'aio-page-builder' );
@@ -164,13 +164,13 @@ final class Dashboard_State_Builder {
 	 * @return array{last_crawl: array{run_id: string, started_at: string|null, final_status: string, total_discovered: int}|null, last_ai_run: array{run_id: string, status: string, created_at: string}|null, active_build_plans: list<array{plan_id: string, status: string, title: string}>}
 	 */
 	private function build_last_activity_cards(): array {
-		$last_crawl = $this->build_last_crawl_summary();
-		$last_ai_run = $this->build_last_ai_run_summary();
+		$last_crawl   = $this->build_last_crawl_summary();
+		$last_ai_run  = $this->build_last_ai_run_summary();
 		$active_plans = $this->build_active_plans_summary();
 		return array(
-			'last_crawl'          => $last_crawl,
-			'last_ai_run'         => $last_ai_run,
-			'active_build_plans'  => $active_plans,
+			'last_crawl'         => $last_crawl,
+			'last_ai_run'        => $last_ai_run,
+			'active_build_plans' => $active_plans,
 		);
 	}
 
@@ -182,7 +182,7 @@ final class Dashboard_State_Builder {
 			return null;
 		}
 		$sessions = $this->crawl_snapshot_service->list_sessions( self::LAST_CRAWL_LIMIT );
-		$session = $sessions[0] ?? null;
+		$session  = $sessions[0] ?? null;
 		if ( $session === null || ! is_array( $session ) ) {
 			return null;
 		}
@@ -202,7 +202,7 @@ final class Dashboard_State_Builder {
 			return null;
 		}
 		$runs = $this->ai_run_repository->list_recent( self::LAST_AI_RUN_LIMIT, 0 );
-		$run = $runs[0] ?? null;
+		$run  = $runs[0] ?? null;
 		if ( $run === null || ! is_array( $run ) ) {
 			return null;
 		}
@@ -221,9 +221,9 @@ final class Dashboard_State_Builder {
 		if ( $this->build_plan_repository === null || ! method_exists( $this->build_plan_repository, 'list_recent' ) ) {
 			return array();
 		}
-		$plans = $this->build_plan_repository->list_recent( self::ACTIVE_PLANS_LIMIT, 0 );
+		$plans           = $this->build_plan_repository->list_recent( self::ACTIVE_PLANS_LIMIT, 0 );
 		$active_statuses = array( 'pending_review', 'approved', 'in_progress' );
-		$out = array();
+		$out             = array();
 		foreach ( $plans as $plan ) {
 			if ( ! is_array( $plan ) ) {
 				continue;
@@ -248,13 +248,13 @@ final class Dashboard_State_Builder {
 		$pending_count = 0;
 		$failed_count  = 0;
 		if ( $this->job_queue_repository !== null && method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
-			$pending = $this->job_queue_repository->list_by_status( 'pending', self::QUEUE_WARNING_ITEMS, 0 );
-			$failed  = $this->job_queue_repository->list_by_status( 'failed', self::QUEUE_WARNING_ITEMS, 0 );
+			$pending       = $this->job_queue_repository->list_by_status( 'pending', self::QUEUE_WARNING_ITEMS, 0 );
+			$failed        = $this->job_queue_repository->list_by_status( 'failed', self::QUEUE_WARNING_ITEMS, 0 );
 			$pending_count = count( $pending );
 			$failed_count  = count( $failed );
 		}
 		$has_warnings = $pending_count > 0 || $failed_count > 0;
-		$message = $has_warnings
+		$message      = $has_warnings
 			? sprintf(
 				/* translators: 1: pending count, 2: failed count */
 				__( '%1$d pending, %2$d failed job(s).', 'aio-page-builder' ),
@@ -264,11 +264,11 @@ final class Dashboard_State_Builder {
 			: __( 'No queue warnings.', 'aio-page-builder' );
 		$queue_logs_url = \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs' ), \admin_url( 'admin.php' ) );
 		return array(
-			'has_warnings'    => $has_warnings,
+			'has_warnings'   => $has_warnings,
 			'pending_count'  => $pending_count,
-			'failed_count'    => $failed_count,
-			'message'         => $message,
-			'queue_logs_url'  => $queue_logs_url,
+			'failed_count'   => $failed_count,
+			'message'        => $message,
+			'queue_logs_url' => $queue_logs_url,
 		);
 	}
 
@@ -277,17 +277,23 @@ final class Dashboard_State_Builder {
 	 */
 	private function build_critical_error_summary(): array {
 		$logs_builder = new Logs_Monitoring_State_Builder( $this->job_queue_repository, $this->ai_run_repository );
-		$all = $logs_builder->build_critical_errors();
-		$items = array_slice( $all, 0, self::CRITICAL_ERRORS_DASHBOARD_CAP );
-		$out = array();
+		$all          = $logs_builder->build_critical_errors();
+		$items        = array_slice( $all, 0, self::CRITICAL_ERRORS_DASHBOARD_CAP );
+		$out          = array();
 		foreach ( $items as $entry ) {
 			$out[] = array(
-				'event_type'    => (string) ( $entry['event_type'] ?? '' ),
-				'attempted_at'  => (string) ( $entry['attempted_at'] ?? '' ),
+				'event_type'     => (string) ( $entry['event_type'] ?? '' ),
+				'attempted_at'   => (string) ( $entry['attempted_at'] ?? '' ),
 				'failure_reason' => (string) ( $entry['failure_reason'] ?? '' ),
 			);
 		}
-		$logs_url = \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs', 'tab' => 'critical' ), \admin_url( 'admin.php' ) );
+		$logs_url = \add_query_arg(
+			array(
+				'page' => 'aio-page-builder-queue-logs',
+				'tab'  => 'critical',
+			),
+			\admin_url( 'admin.php' )
+		);
 		return array(
 			'count'    => count( $all ),
 			'items'    => $out,
@@ -364,16 +370,16 @@ final class Dashboard_State_Builder {
 	 * @return array{is_first_run: bool, is_resume: bool, onboarding_url: string}
 	 */
 	private function build_welcome_state(): array {
-		$draft_service = new Onboarding_Draft_Service( $this->settings );
-		$draft = $draft_service->get_draft();
-		$overall = (string) ( $draft['overall_status'] ?? Onboarding_Statuses::NOT_STARTED );
-		$is_first_run = $overall === Onboarding_Statuses::NOT_STARTED || $overall === '';
+		$draft_service   = new Onboarding_Draft_Service( $this->settings );
+		$draft           = $draft_service->get_draft();
+		$overall         = (string) ( $draft['overall_status'] ?? Onboarding_Statuses::NOT_STARTED );
+		$is_first_run    = $overall === Onboarding_Statuses::NOT_STARTED || $overall === '';
 		$resume_statuses = array( Onboarding_Statuses::IN_PROGRESS, Onboarding_Statuses::DRAFT_SAVED, Onboarding_Statuses::BLOCKED, Onboarding_Statuses::READY_FOR_SUBMISSION );
-		$is_resume = ! $is_first_run && in_array( $overall, $resume_statuses, true );
-		$onboarding_url = \add_query_arg( array( 'page' => 'aio-page-builder-onboarding' ), \admin_url( 'admin.php' ) );
+		$is_resume       = ! $is_first_run && in_array( $overall, $resume_statuses, true );
+		$onboarding_url  = \add_query_arg( array( 'page' => 'aio-page-builder-onboarding' ), \admin_url( 'admin.php' ) );
 		return array(
-			'is_first_run'    => $is_first_run,
-			'is_resume'       => $is_resume,
+			'is_first_run'   => $is_first_run,
+			'is_resume'      => $is_resume,
 			'onboarding_url' => $onboarding_url,
 		);
 	}

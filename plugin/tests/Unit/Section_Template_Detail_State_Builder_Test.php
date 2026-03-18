@@ -81,20 +81,20 @@ final class Section_Template_Detail_State_Builder_Test extends TestCase {
 
 	private function minimal_section_definition( string $key = 'st_hero' ): array {
 		return array(
-			Section_Schema::FIELD_INTERNAL_KEY     => $key,
+			Section_Schema::FIELD_INTERNAL_KEY    => $key,
 			Section_Schema::FIELD_VARIANTS        => array( 'default' => array( 'label' => 'Default' ) ),
 			Section_Schema::FIELD_DEFAULT_VARIANT => 'default',
 			'name'                                => 'Hero Section',
-			'purpose_summary'                      => 'Primary hero with CTA.',
-			'section_purpose_family'               => 'hero',
-			'helper_ref'                           => 'hero_helper',
-			'field_blueprint_ref'                  => 'acf_hero',
+			'purpose_summary'                     => 'Primary hero with CTA.',
+			'section_purpose_family'              => 'hero',
+			'helper_ref'                          => 'hero_helper',
+			'field_blueprint_ref'                 => 'acf_hero',
 		);
 	}
 
 	public function test_build_state_with_empty_key_returns_not_found(): void {
 		$builder = $this->create_state_builder( array() );
-		$state = $builder->build_state( '', array() );
+		$state   = $builder->build_state( '', array() );
 		$this->assertTrue( $state['not_found'] );
 		$this->assertSame( '', $state['section_key'] );
 		$this->assertArrayHasKey( 'breadcrumbs', $state );
@@ -102,14 +102,14 @@ final class Section_Template_Detail_State_Builder_Test extends TestCase {
 
 	public function test_build_state_with_null_definition_returns_not_found(): void {
 		$builder = $this->create_state_builder( null );
-		$state = $builder->build_state( 'st_missing', array() );
+		$state   = $builder->build_state( 'st_missing', array() );
 		$this->assertTrue( $state['not_found'] );
 	}
 
 	public function test_build_state_with_valid_section_returns_state_with_side_panel_and_preview(): void {
-		$def = $this->minimal_section_definition( 'st01_hero' );
+		$def     = $this->minimal_section_definition( 'st01_hero' );
 		$builder = $this->create_state_builder( $def );
-		$state = $builder->build_state( 'st01_hero', array() );
+		$state   = $builder->build_state( 'st01_hero', array() );
 
 		$this->assertFalse( $state['not_found'] );
 		$this->assertSame( 'st01_hero', $state['section_key'] );
@@ -128,15 +128,23 @@ final class Section_Template_Detail_State_Builder_Test extends TestCase {
 	}
 
 	public function test_build_state_field_summary_from_embedded_blueprint(): void {
-		$def = $this->minimal_section_definition( 'st_with_fields' );
+		$def                    = $this->minimal_section_definition( 'st_with_fields' );
 		$def['field_blueprint'] = array(
 			'fields' => array(
-				array( 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ),
-				array( 'name' => 'subheadline', 'label' => 'Subheadline', 'type' => 'textarea' ),
+				array(
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
+				array(
+					'name'  => 'subheadline',
+					'label' => 'Subheadline',
+					'type'  => 'textarea',
+				),
 			),
 		);
-		$builder = $this->create_state_builder( $def );
-		$state = $builder->build_state( 'st_with_fields', array() );
+		$builder                = $this->create_state_builder( $def );
+		$state                  = $builder->build_state( 'st_with_fields', array() );
 		$this->assertFalse( $state['not_found'] );
 		$this->assertCount( 2, $state['field_summary'] );
 		$this->assertSame( 'headline', $state['field_summary'][0]['name'] );
@@ -145,10 +153,10 @@ final class Section_Template_Detail_State_Builder_Test extends TestCase {
 	}
 
 	public function test_build_state_breadcrumb_includes_purpose_family_when_provided(): void {
-		$def = $this->minimal_section_definition();
+		$def                           = $this->minimal_section_definition();
 		$def['section_purpose_family'] = 'cta';
-		$builder = $this->create_state_builder( $def );
-		$state = $builder->build_state( 'st_hero', array( 'purpose_family' => 'cta' ) );
+		$builder                       = $this->create_state_builder( $def );
+		$state                         = $builder->build_state( 'st_hero', array( 'purpose_family' => 'cta' ) );
 		$this->assertFalse( $state['not_found'] );
 		$labels = array_column( $state['breadcrumbs'], 'label' );
 		$this->assertContains( 'Section Templates', $labels );
@@ -182,13 +190,21 @@ final class Section_Template_Detail_State_Builder_Test extends TestCase {
 	 * ]
 	 */
 	public function test_example_section_template_detail_state_payload_structure(): void {
-		$def = $this->minimal_section_definition( 'st01_hero' );
-		$def['name'] = 'Hero Section';
+		$def                    = $this->minimal_section_definition( 'st01_hero' );
+		$def['name']            = 'Hero Section';
 		$def['purpose_summary'] = 'Primary hero with CTA.';
-		$def['field_blueprint'] = array( 'fields' => array( array( 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ) ) );
+		$def['field_blueprint'] = array(
+			'fields' => array(
+				array(
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
+			),
+		);
 
 		$builder = $this->create_state_builder( $def );
-		$state = $builder->build_state( 'st01_hero', array() );
+		$state   = $builder->build_state( 'st01_hero', array() );
 
 		$this->assertSame( 'st01_hero', $state['section_key'] );
 		$this->assertSame( 'Hero Section', $state['side_panel']['name'] );

@@ -92,26 +92,26 @@ final class Page_Template_Detail_State_Builder {
 		?Industry_Dummy_Data_Generator $industry_dummy_generator = null,
 		?string $industry_key = null
 	) {
-		$this->page_template_provider = $page_template_provider;
-		$this->section_provider       = $section_provider;
-		$this->preview_generator      = $preview_generator;
-		$this->side_panel_builder     = $side_panel_builder;
-		$this->context_builder        = $context_builder;
-		$this->section_renderer       = $section_renderer;
-		$this->assembly_pipeline     = $assembly_pipeline;
-		$this->lpagery_compatibility  = $lpagery_compatibility;
-		$this->preview_cache          = $preview_cache;
-		$this->versioning_service     = $versioning_service;
-		$this->deprecation_service    = $deprecation_service;
+		$this->page_template_provider    = $page_template_provider;
+		$this->section_provider          = $section_provider;
+		$this->preview_generator         = $preview_generator;
+		$this->side_panel_builder        = $side_panel_builder;
+		$this->context_builder           = $context_builder;
+		$this->section_renderer          = $section_renderer;
+		$this->assembly_pipeline         = $assembly_pipeline;
+		$this->lpagery_compatibility     = $lpagery_compatibility;
+		$this->preview_cache             = $preview_cache;
+		$this->versioning_service        = $versioning_service;
+		$this->deprecation_service       = $deprecation_service;
 		$this->form_reference_aggregator = $form_reference_aggregator;
-		$this->industry_dummy_generator = $industry_dummy_generator;
-		$this->industry_key = $industry_key !== null && $industry_key !== '' ? $industry_key : null;
+		$this->industry_dummy_generator  = $industry_dummy_generator;
+		$this->industry_key              = $industry_key !== null && $industry_key !== '' ? $industry_key : null;
 	}
 
 	/**
 	 * Builds full detail state for the given template key. Returns not_found when template does not exist.
 	 *
-	 * @param string $template_key Page template internal_key.
+	 * @param string               $template_key Page template internal_key.
 	 * @param array<string, mixed> $request_params Optional: category_class, family (for breadcrumb), reduced_motion.
 	 * @return array<string, mixed> State: template_key, definition, side_panel, used_sections, one_pager_link, preview_payload, rendered_preview_html, breadcrumbs, not_found.
 	 */
@@ -146,31 +146,35 @@ final class Page_Template_Detail_State_Builder {
 		if ( $this->industry_dummy_generator !== null && $this->industry_key !== null ) {
 			$section_field_values = $this->merge_industry_overrides_into_page_sections( $section_field_values, $ordered_for_gen );
 		}
-		$preview_payload       = $this->side_panel_builder->build_page_preview_payload( $definition, $section_field_values, $context );
+		$preview_payload = $this->side_panel_builder->build_page_preview_payload( $definition, $section_field_values, $context );
 
-		$side_panel   = $preview_payload['side_panel'] ?? $this->side_panel_builder->build_for_page( $definition, $context );
-		$used_sections = $side_panel['used_sections'] ?? array();
-		$one_pager     = $definition['one_pager'] ?? array();
+		$side_panel     = $preview_payload['side_panel'] ?? $this->side_panel_builder->build_for_page( $definition, $context );
+		$used_sections  = $side_panel['used_sections'] ?? array();
+		$one_pager      = $definition['one_pager'] ?? array();
 		$one_pager_link = \is_array( $one_pager ) && isset( $one_pager['link'] ) ? (string) $one_pager['link'] : '';
 
-		$preview_cache_hit = false;
+		$preview_cache_hit     = false;
 		$rendered_preview_html = '';
-		$cache_key = $this->preview_cache !== null ? $this->preview_cache->get_cache_key( $context, $definition ) : '';
+		$cache_key             = $this->preview_cache !== null ? $this->preview_cache->get_cache_key( $context, $definition ) : '';
 		if ( $cache_key !== '' && $this->preview_cache !== null ) {
 			$cached = $this->preview_cache->get( $cache_key );
 			if ( $cached !== null ) {
 				$rendered_preview_html = $cached->get_html();
-				$preview_cache_hit = true;
+				$preview_cache_hit     = true;
 			}
 		}
 		if ( $rendered_preview_html === '' ) {
-			$rendered_preview_html = $this->render_preview_html( $definition, $section_field_values, array(
-				'reduced_motion' => $reduced_motion,
-				'page_template'  => $definition,
-			) );
+			$rendered_preview_html = $this->render_preview_html(
+				$definition,
+				$section_field_values,
+				array(
+					'reduced_motion' => $reduced_motion,
+					'page_template'  => $definition,
+				)
+			);
 			if ( $cache_key !== '' && $this->preview_cache !== null && $rendered_preview_html !== '' ) {
 				$version_hash = $this->preview_cache->definition_version_hash( $definition, Synthetic_Preview_Context::TYPE_PAGE );
-				$record = new Preview_Cache_Record(
+				$record       = new Preview_Cache_Record(
 					$cache_key,
 					Preview_Cache_Record::TYPE_PAGE,
 					$template_key,
@@ -194,15 +198,15 @@ final class Page_Template_Detail_State_Builder {
 				if ( $sec_key === '' ) {
 					continue;
 				}
-				$section_def = $this->section_provider->get_definition_by_key( $sec_key );
-				$comp = $this->lpagery_compatibility->get_compatibility_for_section( $sec_key, \is_array( $section_def ) ? $section_def : null );
+				$section_def               = $this->section_provider->get_definition_by_key( $sec_key );
+				$comp                      = $this->lpagery_compatibility->get_compatibility_for_section( $sec_key, \is_array( $section_def ) ? $section_def : null );
 				$section_compatibilities[] = array(
-					'section_key'        => $sec_key,
-					'lpagery_state'      => $comp->get_compatibility_state(),
+					'section_key'         => $sec_key,
+					'lpagery_state'       => $comp->get_compatibility_state(),
 					'compatibility_state' => $comp->get_compatibility_state(),
 				);
 			}
-			$page_comp = $this->lpagery_compatibility->get_compatibility_for_page_template( $template_key, $definition, $section_compatibilities );
+			$page_comp                   = $this->lpagery_compatibility->get_compatibility_for_page_template( $template_key, $definition, $section_compatibilities );
 			$lpagery_compatibility_state = $page_comp->to_array();
 		} else {
 			$lpagery_compatibility_state = null;
@@ -210,14 +214,17 @@ final class Page_Template_Detail_State_Builder {
 
 		$page_form_references = array();
 		if ( $this->form_reference_aggregator !== null ) {
-			$items = array_map( function ( $e ) {
-				return array( 'field_values' => isset( $e['field_values'] ) && is_array( $e['field_values'] ) ? $e['field_values'] : array() );
-			}, $section_field_values );
+			$items                = array_map(
+				function ( $e ) {
+					return array( 'field_values' => isset( $e['field_values'] ) && is_array( $e['field_values'] ) ? $e['field_values'] : array() );
+				},
+				$section_field_values
+			);
 			$page_form_references = $this->form_reference_aggregator->aggregate( $items );
 		}
 
-		$breadcrumbs = $this->build_breadcrumbs( $definition, $category_class, $family );
-		$version_summary = $this->versioning_service !== null
+		$breadcrumbs         = $this->build_breadcrumbs( $definition, $category_class, $family );
+		$version_summary     = $this->versioning_service !== null
 			? $this->versioning_service->get_version_summary( $definition, 'page' )
 			: $this->build_version_summary_from_definition( $definition, 'page' );
 		$deprecation_summary = $this->deprecation_service !== null
@@ -225,20 +232,20 @@ final class Page_Template_Detail_State_Builder {
 			: $this->build_deprecation_summary_from_definition( $definition, 'page' );
 
 		return array(
-			'template_key'                 => $template_key,
-			'definition'                   => $definition,
-			'version_summary'              => $version_summary,
-			'deprecation_summary'          => $deprecation_summary,
-			'side_panel'                   => $side_panel,
-			'used_sections'                => $used_sections,
-			'one_pager_link'               => $one_pager_link,
-			'lpagery_compatibility_state'  => $lpagery_compatibility_state,
-			'preview_payload'              => $preview_payload,
-			'rendered_preview_html'        => $rendered_preview_html,
-			'preview_cache_hit'            => $preview_cache_hit,
-			'page_form_references'         => $page_form_references,
-			'breadcrumbs'                  => $breadcrumbs,
-			'not_found'                    => false,
+			'template_key'                => $template_key,
+			'definition'                  => $definition,
+			'version_summary'             => $version_summary,
+			'deprecation_summary'         => $deprecation_summary,
+			'side_panel'                  => $side_panel,
+			'used_sections'               => $used_sections,
+			'one_pager_link'              => $one_pager_link,
+			'lpagery_compatibility_state' => $lpagery_compatibility_state,
+			'preview_payload'             => $preview_payload,
+			'rendered_preview_html'       => $rendered_preview_html,
+			'preview_cache_hit'           => $preview_cache_hit,
+			'page_form_references'        => $page_form_references,
+			'breadcrumbs'                 => $breadcrumbs,
+			'not_found'                   => false,
 		);
 	}
 
@@ -261,15 +268,19 @@ final class Page_Template_Detail_State_Builder {
 			if ( $section_key === '' ) {
 				continue;
 			}
-			$position = isset( $item[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) && is_numeric( $item[ Page_Template_Schema::SECTION_ITEM_POSITION ] )
+			$position       = isset( $item[ Page_Template_Schema::SECTION_ITEM_POSITION ] ) && is_numeric( $item[ Page_Template_Schema::SECTION_ITEM_POSITION ] )
 				? (int) $item[ Page_Template_Schema::SECTION_ITEM_POSITION ]
 				: $pos;
-			$section_def = $this->section_provider->get_definition_by_key( $section_key );
+			$section_def    = $this->section_provider->get_definition_by_key( $section_key );
 			$purpose_family = 'other';
 			if ( \is_array( $section_def ) && isset( $section_def['section_purpose_family'] ) && \is_string( $section_def['section_purpose_family'] ) ) {
 				$purpose_family = $section_def['section_purpose_family'];
 			}
-			$out[] = array( 'section_key' => $section_key, 'position' => $position, 'purpose_family' => $purpose_family );
+			$out[] = array(
+				'section_key'    => $section_key,
+				'position'       => $position,
+				'purpose_family' => $purpose_family,
+			);
 			++$pos;
 		}
 		return $out;
@@ -279,7 +290,7 @@ final class Page_Template_Detail_State_Builder {
 	 * Merges industry dummy overrides onto each section's field_values (preview only; same order as ordered_for_gen).
 	 *
 	 * @param list<array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values
-	 * @param list<array{section_key: string, position: int, purpose_family: string}>               $ordered_for_gen
+	 * @param list<array{section_key: string, position: int, purpose_family: string}>             $ordered_for_gen
 	 * @return list<array{section_key: string, position: int, field_values: array<string, mixed>}>
 	 */
 	private function merge_industry_overrides_into_page_sections( array $section_field_values, array $ordered_for_gen ): array {
@@ -290,7 +301,7 @@ final class Page_Template_Detail_State_Builder {
 			return $section_field_values;
 		}
 		foreach ( $section_field_values as $i => $entry ) {
-			$field_values = isset( $entry['field_values'] ) && \is_array( $entry['field_values'] ) ? $entry['field_values'] : array();
+			$field_values   = isset( $entry['field_values'] ) && \is_array( $entry['field_values'] ) ? $entry['field_values'] : array();
 			$purpose_family = isset( $ordered_for_gen[ $i ]['purpose_family'] ) && \is_string( $ordered_for_gen[ $i ]['purpose_family'] )
 				? $ordered_for_gen[ $i ]['purpose_family']
 				: 'other';
@@ -302,9 +313,9 @@ final class Page_Template_Detail_State_Builder {
 				$field_values = array_merge( $field_values, $overrides );
 			}
 			$out[] = array(
-				'section_key'   => isset( $entry['section_key'] ) ? (string) $entry['section_key'] : '',
-				'position'      => isset( $entry['position'] ) ? (int) $entry['position'] : $i,
-				'field_values'  => $field_values,
+				'section_key'  => isset( $entry['section_key'] ) ? (string) $entry['section_key'] : '',
+				'position'     => isset( $entry['position'] ) ? (int) $entry['position'] : $i,
+				'field_values' => $field_values,
 			);
 		}
 		return $out;
@@ -313,15 +324,15 @@ final class Page_Template_Detail_State_Builder {
 	/**
 	 * Renders preview HTML via real pipeline: section definitions + synthetic field values → context → renderer → assemble → do_blocks.
 	 *
-	 * @param array<string, mixed> $definition
+	 * @param array<string, mixed>                                                                $definition
 	 * @param list<array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values
-	 * @param array<string, mixed> $options Optional: reduced_motion (bool), page_template (array) for animation resolution.
+	 * @param array<string, mixed>                                                                $options Optional: reduced_motion (bool), page_template (array) for animation resolution.
 	 * @return string HTML safe for admin output (escaped later if needed; block content is run through do_blocks).
 	 */
 	private function render_preview_html( array $definition, array $section_field_values, array $options = array() ): string {
-		$ordered = $definition[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+		$ordered         = $definition[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 		$section_results = array();
-		$position = 0;
+		$position        = 0;
 
 		foreach ( $section_field_values as $entry ) {
 			$section_key  = (string) ( $entry['section_key'] ?? '' );
@@ -350,7 +361,7 @@ final class Page_Template_Detail_State_Builder {
 		}
 
 		$template_key = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-		$assembly = $this->assembly_pipeline->assemble(
+		$assembly     = $this->assembly_pipeline->assemble(
 			Page_Block_Assembly_Result::SOURCE_TYPE_PAGE_TEMPLATE,
 			$template_key,
 			$section_results
@@ -368,7 +379,7 @@ final class Page_Template_Detail_State_Builder {
 	 * Builds version summary from definition when versioning service is not injected (Prompt 189).
 	 *
 	 * @param array<string, mixed> $definition
-	 * @param string $type 'section' or 'page'
+	 * @param string               $type 'section' or 'page'
 	 * @return array{version: string, stable_key_retained: bool, changelog_ref: string, breaking: bool}
 	 */
 	private function build_version_summary_from_definition( array $definition, string $type ): array {
@@ -377,10 +388,10 @@ final class Page_Template_Detail_State_Builder {
 			$version_data = array();
 		}
 		return array(
-			'version'              => isset( $version_data['version'] ) ? (string) $version_data['version'] : '1',
-			'stable_key_retained'  => (bool) ( $version_data['stable_key_retained'] ?? true ),
-			'changelog_ref'        => (string) ( $version_data['changelog_ref'] ?? '' ),
-			'breaking'             => (bool) ( $version_data['breaking'] ?? false ),
+			'version'             => isset( $version_data['version'] ) ? (string) $version_data['version'] : '1',
+			'stable_key_retained' => (bool) ( $version_data['stable_key_retained'] ?? true ),
+			'changelog_ref'       => (string) ( $version_data['changelog_ref'] ?? '' ),
+			'breaking'            => (bool) ( $version_data['breaking'] ?? false ),
 		);
 	}
 
@@ -388,16 +399,16 @@ final class Page_Template_Detail_State_Builder {
 	 * Builds deprecation summary from definition when deprecation service is not injected (Prompt 189).
 	 *
 	 * @param array<string, mixed> $definition
-	 * @param string $type 'section' or 'page'
+	 * @param string               $type 'section' or 'page'
 	 * @return array{is_deprecated: bool, reason: string, replacement_keys: list<string>, deprecated_at: string}
 	 */
 	private function build_deprecation_summary_from_definition( array $definition, string $type ): array {
 		$status = (string) ( $definition[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
-		$dep = $definition['deprecation'] ?? array();
+		$dep    = $definition['deprecation'] ?? array();
 		if ( ! \is_array( $dep ) ) {
 			$dep = array();
 		}
-		$refs = $definition['replacement_template_refs'] ?? $dep['replacement_template_key'] ?? '';
+		$refs             = $definition['replacement_template_refs'] ?? $dep['replacement_template_key'] ?? '';
 		$replacement_keys = array();
 		if ( \is_array( $refs ) ) {
 			$replacement_keys = array_values( array_filter( array_map( 'strval', $refs ) ) );
@@ -405,10 +416,10 @@ final class Page_Template_Detail_State_Builder {
 			$replacement_keys = array( (string) $refs );
 		}
 		return array(
-			'is_deprecated'   => $status === 'deprecated' || (bool) ( $dep['deprecated'] ?? false ),
-			'reason'          => (string) ( $dep['reason'] ?? '' ),
+			'is_deprecated'    => $status === 'deprecated' || (bool) ( $dep['deprecated'] ?? false ),
+			'reason'           => (string) ( $dep['reason'] ?? '' ),
 			'replacement_keys' => $replacement_keys,
-			'deprecated_at'   => (string) ( $dep['deprecated_at'] ?? '' ),
+			'deprecated_at'    => (string) ( $dep['deprecated_at'] ?? '' ),
 		);
 	}
 
@@ -416,13 +427,18 @@ final class Page_Template_Detail_State_Builder {
 	 * Breadcrumb segments for detail view: Page Templates → [Category] → [Family] → Template name.
 	 *
 	 * @param array<string, mixed> $definition
-	 * @param string $category_class
-	 * @param string $family
+	 * @param string               $category_class
+	 * @param string               $family
 	 * @return list<array{label: string, url: string}>
 	 */
 	private function build_breadcrumbs( array $definition, string $category_class, string $family ): array {
 		$base_url = \admin_url( 'admin.php?page=' . Page_Template_Directory_State_Builder::SCREEN_SLUG );
-		$segments = array( array( 'label' => __( 'Page Templates', 'aio-page-builder' ), 'url' => $base_url ) );
+		$segments = array(
+			array(
+				'label' => __( 'Page Templates', 'aio-page-builder' ),
+				'url'   => $base_url,
+			),
+		);
 
 		if ( $category_class !== '' ) {
 			$cat_labels = array(
@@ -431,43 +447,67 @@ final class Page_Template_Detail_State_Builder {
 				'nested_hub'   => __( 'Nested Hub', 'aio-page-builder' ),
 				'child_detail' => __( 'Child/Detail', 'aio-page-builder' ),
 			);
-			$cat_label = $cat_labels[ $category_class ] ?? $category_class;
-			$segments[] = array( 'label' => $cat_label, 'url' => $base_url . '&category_class=' . \rawurlencode( $category_class ) );
+			$cat_label  = $cat_labels[ $category_class ] ?? $category_class;
+			$segments[] = array(
+				'label' => $cat_label,
+				'url'   => $base_url . '&category_class=' . \rawurlencode( $category_class ),
+			);
 		}
 
 		if ( $family !== '' ) {
 			$family_label = \ucfirst( \str_replace( array( '_', '-' ), ' ', $family ) );
-			$fam_url = $base_url . '&category_class=' . \rawurlencode( $category_class ) . '&family=' . \rawurlencode( $family );
-			$segments[] = array( 'label' => $family_label, 'url' => $fam_url );
+			$fam_url      = $base_url . '&category_class=' . \rawurlencode( $category_class ) . '&family=' . \rawurlencode( $family );
+			$segments[]   = array(
+				'label' => $family_label,
+				'url'   => $fam_url,
+			);
 		}
 
-		$name = (string) ( $definition['name'] ?? $definition['internal_key'] ?? '' );
-		$segments[] = array( 'label' => $name !== '' ? $name : $definition['internal_key'], 'url' => '' );
+		$name       = (string) ( $definition['name'] ?? $definition['internal_key'] ?? '' );
+		$segments[] = array(
+			'label' => $name !== '' ? $name : $definition['internal_key'],
+			'url'   => '',
+		);
 		return $segments;
 	}
 
 	/**
-	 * @param string $template_key
+	 * @param string               $template_key
 	 * @param array<string, mixed> $request_params
 	 * @return array<string, mixed>
 	 */
 	private function not_found_state( string $template_key, array $request_params ): array {
 		$base_url = \admin_url( 'admin.php?page=' . Page_Template_Directory_State_Builder::SCREEN_SLUG );
 		return array(
-			'template_key'                 => $template_key,
-			'definition'                   => array(),
-			'version_summary'              => array( 'version' => '1', 'stable_key_retained' => true, 'changelog_ref' => '', 'breaking' => false ),
-			'deprecation_summary'          => array( 'is_deprecated' => false, 'reason' => '', 'replacement_keys' => array(), 'deprecated_at' => '' ),
-			'side_panel'                   => array(),
-			'used_sections'                => array(),
-			'one_pager_link'               => '',
-			'lpagery_compatibility_state'  => null,
-			'preview_payload'              => array(),
-			'rendered_preview_html'        => '',
-			'preview_cache_hit'            => false,
-			'page_form_references'         => array(),
-			'breadcrumbs'                  => array( array( 'label' => __( 'Page Templates', 'aio-page-builder' ), 'url' => $base_url ) ),
-			'not_found'                    => true,
+			'template_key'                => $template_key,
+			'definition'                  => array(),
+			'version_summary'             => array(
+				'version'             => '1',
+				'stable_key_retained' => true,
+				'changelog_ref'       => '',
+				'breaking'            => false,
+			),
+			'deprecation_summary'         => array(
+				'is_deprecated'    => false,
+				'reason'           => '',
+				'replacement_keys' => array(),
+				'deprecated_at'    => '',
+			),
+			'side_panel'                  => array(),
+			'used_sections'               => array(),
+			'one_pager_link'              => '',
+			'lpagery_compatibility_state' => null,
+			'preview_payload'             => array(),
+			'rendered_preview_html'       => '',
+			'preview_cache_hit'           => false,
+			'page_form_references'        => array(),
+			'breadcrumbs'                 => array(
+				array(
+					'label' => __( 'Page Templates', 'aio-page-builder' ),
+					'url'   => $base_url,
+				),
+			),
+			'not_found'                   => true,
 		);
 	}
 }

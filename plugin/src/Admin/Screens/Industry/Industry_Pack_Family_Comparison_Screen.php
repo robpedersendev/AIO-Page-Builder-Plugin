@@ -49,13 +49,13 @@ final class Industry_Pack_Family_Comparison_Screen {
 	 * @return array{rows: list<array{pack_key: string, subtype_key: string, scope_label: string, band: string, total: int, gap_count: int, blocker_count: int}>, generated_at: string, dashboard_url: string}
 	 */
 	private function get_state(): array {
-		$rows   = array();
+		$rows          = array();
 		$by_scope_gaps = array();
 
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_coverage_gap_analyzer' ) ) {
 			$analyzer = $this->container->get( 'industry_coverage_gap_analyzer' );
 			if ( $analyzer instanceof Industry_Coverage_Gap_Analyzer ) {
-				$gap_result = $analyzer->analyze( true );
+				$gap_result    = $analyzer->analyze( true );
 				$by_scope_gaps = isset( $gap_result['by_scope'] ) && is_array( $gap_result['by_scope'] ) ? $gap_result['by_scope'] : array();
 			}
 		}
@@ -63,15 +63,15 @@ final class Industry_Pack_Family_Comparison_Screen {
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_pack_completeness_report_service' ) ) {
 			$completeness = $this->container->get( 'industry_pack_completeness_report_service' );
 			if ( $completeness instanceof Industry_Pack_Completeness_Report_Service ) {
-				$report = $completeness->generate_report( true );
+				$report       = $completeness->generate_report( true );
 				$pack_results = isset( $report['pack_results'] ) && is_array( $report['pack_results'] ) ? $report['pack_results'] : array();
 				foreach ( array_slice( $pack_results, 0, self::MAX_ROWS ) as $r ) {
-					$pack_key    = isset( $r['pack_key'] ) && is_string( $r['pack_key'] ) ? $r['pack_key'] : '';
-					$subtype_key = isset( $r['subtype_key'] ) && is_string( $r['subtype_key'] ) ? $r['subtype_key'] : '';
-					$scope = $subtype_key !== '' ? $pack_key . '|' . $subtype_key : $pack_key;
-					$gap_count = count( $by_scope_gaps[ $scope ] ?? array() );
+					$pack_key      = isset( $r['pack_key'] ) && is_string( $r['pack_key'] ) ? $r['pack_key'] : '';
+					$subtype_key   = isset( $r['subtype_key'] ) && is_string( $r['subtype_key'] ) ? $r['subtype_key'] : '';
+					$scope         = $subtype_key !== '' ? $pack_key . '|' . $subtype_key : $pack_key;
+					$gap_count     = count( $by_scope_gaps[ $scope ] ?? array() );
 					$blocker_flags = isset( $r['blocker_flags'] ) && is_array( $r['blocker_flags'] ) ? $r['blocker_flags'] : array();
-					$scope_label = $pack_key;
+					$scope_label   = $pack_key;
 					if ( $subtype_key !== '' ) {
 						$scope_label .= ' → ' . $subtype_key;
 					}
@@ -105,7 +105,7 @@ final class Industry_Pack_Family_Comparison_Screen {
 			wp_die( esc_html__( 'You do not have permission to access the Pack family comparison screen.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->get_state();
-		$rows = $state['rows'];
+		$rows  = $state['rows'];
 		?>
 		<div class="wrap aio-page-builder-screen aio-industry-pack-family-comparison" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>

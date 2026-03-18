@@ -44,16 +44,16 @@ final class AI_Run_Detail_Screen {
 	 * @return void
 	 */
 	public function render( string $run_id ): void {
-		$run = null;
+		$run              = null;
 		$artifact_summary = array();
-		$can_view_raw = \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
+		$can_view_raw     = \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
 
 		if ( $this->container && $this->container->has( 'ai_run_service' ) && $this->container->has( 'ai_run_artifact_service' ) ) {
 			try {
 				$svc = $this->container->get( 'ai_run_service' );
 				$run = $svc->get_run_by_id( $run_id );
 				if ( $run !== null && isset( $run['id'] ) ) {
-					$artifact_svc = $this->container->get( 'ai_run_artifact_service' );
+					$artifact_svc     = $this->container->get( 'ai_run_artifact_service' );
 					$artifact_summary = $artifact_svc->get_artifact_summary_for_review( (int) $run['id'], $can_view_raw );
 				}
 			} catch ( \Throwable $e ) {
@@ -61,9 +61,9 @@ final class AI_Run_Detail_Screen {
 			}
 		}
 
-		$meta = $run['run_metadata'] ?? array();
+		$meta      = $run['run_metadata'] ?? array();
 		$meta_safe = AI_Run_Artifact_Service::redact_sensitive_values( $meta );
-		$list_url = \admin_url( 'admin.php?page=' . self::SLUG );
+		$list_url  = \admin_url( 'admin.php?page=' . self::SLUG );
 		?>
 		<div class="wrap aio-page-builder-screen aio-ai-run-detail" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -85,7 +85,7 @@ final class AI_Run_Detail_Screen {
 						<tr><th scope="row"><?php \esc_html_e( 'Provider', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['provider_id'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Model', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['model_used'] ?? '' ) ); ?></td></tr>
 						<?php
-						$attempts = isset( $meta_safe['failover_attempt'] ) && is_array( $meta_safe['failover_attempt'] ) ? $meta_safe['failover_attempt'] : array();
+						$attempts  = isset( $meta_safe['failover_attempt'] ) && is_array( $meta_safe['failover_attempt'] ) ? $meta_safe['failover_attempt'] : array();
 						$effective = isset( $meta_safe['effective_provider_used'] ) && is_array( $meta_safe['effective_provider_used'] )
 							? $meta_safe['effective_provider_used']
 							: null;

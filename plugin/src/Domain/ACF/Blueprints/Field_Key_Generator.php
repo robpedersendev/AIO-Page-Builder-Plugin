@@ -104,11 +104,11 @@ final class Field_Key_Generator {
 	 * @return string Unique key.
 	 */
 	public static function ensure_unique( string $key, array $existing ): string {
-		$used = array_flip( array_map( 'strval', array_values( $existing ) ) );
+		$used      = array_flip( array_map( 'strval', array_values( $existing ) ) );
 		$candidate = $key;
-		$suffix = 0;
+		$suffix    = 0;
 		while ( isset( $used[ $candidate ] ) && $suffix < 9999 ) {
-			$suffix++;
+			++$suffix;
 			$base      = strlen( $key ) + strlen( (string) $suffix ) + 1 <= self::MAX_KEY_LENGTH
 				? $key
 				: substr( $key, 0, self::MAX_KEY_LENGTH - strlen( (string) $suffix ) - 1 );

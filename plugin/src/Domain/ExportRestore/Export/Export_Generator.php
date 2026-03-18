@@ -86,18 +86,18 @@ final class Export_Generator {
 		?Template_Library_Export_Validator $template_library_export_validator = null,
 		?ACF_Local_JSON_Mirror_Service $acf_mirror_service = null
 	) {
-		$this->path_manager                       = $path_manager;
-		$this->settings                           = $settings;
-		$this->profile_store                      = $profile_store;
-		$this->registry_serializer                 = $registry_serializer;
-		$this->plan_repository                    = $plan_repository;
-		$this->token_set_reader                   = $token_set_reader;
-		$this->manifest_builder                   = $manifest_builder;
-		$this->packager                           = $packager;
-		$this->logger                             = $logger;
-		$this->support_package_generator          = $support_package_generator;
-		$this->template_library_export_validator  = $template_library_export_validator;
-		$this->acf_mirror_service                 = $acf_mirror_service;
+		$this->path_manager                      = $path_manager;
+		$this->settings                          = $settings;
+		$this->profile_store                     = $profile_store;
+		$this->registry_serializer               = $registry_serializer;
+		$this->plan_repository                   = $plan_repository;
+		$this->token_set_reader                  = $token_set_reader;
+		$this->manifest_builder                  = $manifest_builder;
+		$this->packager                          = $packager;
+		$this->logger                            = $logger;
+		$this->support_package_generator         = $support_package_generator;
+		$this->template_library_export_validator = $template_library_export_validator;
+		$this->acf_mirror_service                = $acf_mirror_service;
 	}
 
 	/**
@@ -135,11 +135,11 @@ final class Export_Generator {
 				);
 		}
 
-		$matrix = $this->get_categories_for_mode( $mode );
-		$included = $matrix['included'];
-		$excluded = $matrix['excluded'];
+		$matrix           = $this->get_categories_for_mode( $mode );
+		$included         = $matrix['included'];
+		$excluded         = $matrix['excluded'];
 		$optional_allowed = $matrix['optional_allowed'];
-		$redact = $matrix['redact'];
+		$redact           = $matrix['redact'];
 
 		foreach ( $optional_included as $cat ) {
 			if ( in_array( $cat, $optional_allowed, true ) && Export_Bundle_Schema::is_optional_category( $cat ) && ! in_array( $cat, $included, true ) ) {
@@ -178,11 +178,11 @@ final class Export_Generator {
 			}
 
 			$optional_included_list = array_intersect( $optional_included, $included );
-			$restore_notes = $mode === Export_Mode_Keys::SUPPORT_BUNDLE
+			$restore_notes          = $mode === Export_Mode_Keys::SUPPORT_BUNDLE
 				? 'Support bundle; redacted; not for full restore.'
 				: ( $mode === Export_Mode_Keys::PRE_UNINSTALL_BACKUP ? 'Pre-uninstall backup.' : 'Export ' . $mode . '.' );
 
-			$source_site_url = $this->get_source_site_url();
+			$source_site_url  = $this->get_source_site_url();
 			$manifest_builder = $this->manifest_builder;
 			$manifest_factory = function ( array $checksum_list ) use ( $manifest_builder, $mode, $source_site_url, $included, $excluded, $restore_notes, $optional_included_list, $filename ) {
 				$manifest = $manifest_builder->build(
@@ -195,7 +195,7 @@ final class Export_Generator {
 					array_values( $optional_included_list ),
 					$filename
 				);
-				$json = \wp_json_encode( $manifest );
+				$json     = \wp_json_encode( $manifest );
 				return $json !== false ? $json : '{}';
 			};
 
@@ -207,19 +207,23 @@ final class Export_Generator {
 
 			$template_library_summary = array();
 			if ( $this->template_library_export_validator !== null && ( in_array( 'registries', $included, true ) || in_array( 'compositions', $included, true ) ) ) {
-				$bundle = $this->registry_serializer->build_registry_bundle( 0 );
+				$bundle                   = $this->registry_serializer->build_registry_bundle( 0 );
 				$template_library_summary = $this->template_library_export_validator->validate( $bundle, $included );
 				if ( ! empty( $template_library_summary['errors'] ) ) {
-					$this->log( 'Template library export validation had errors.', array(
-						'mode'   => $mode,
-						'errors' => $template_library_summary['errors'],
-						'ref'    => $template_library_summary['log_reference'] ?? '',
-					), Log_Severities::WARNING );
+					$this->log(
+						'Template library export validation had errors.',
+						array(
+							'mode'   => $mode,
+							'errors' => $template_library_summary['errors'],
+							'ref'    => $template_library_summary['log_reference'] ?? '',
+						),
+						Log_Severities::WARNING
+					);
 				}
 			}
 
 			$cleanup = false;
-			$result = Export_Result::success(
+			$result  = Export_Result::success(
 				$destination,
 				$mode,
 				$included,
@@ -230,12 +234,15 @@ final class Export_Generator {
 				'export-' . $mode . '-' . gmdate( 'Y-m-d\TH:i:s\Z' ),
 				$template_library_summary
 			);
-			$this->log( 'Export completed.', array(
-				'mode'       => $mode,
-				'path'       => $destination,
-				'size'       => $pack_result['size_bytes'],
-				'checksums'  => count( $pack_result['checksum_list'] ),
-			) );
+			$this->log(
+				'Export completed.',
+				array(
+					'mode'      => $mode,
+					'path'      => $destination,
+					'size'      => $pack_result['size_bytes'],
+					'checksums' => count( $pack_result['checksum_list'] ),
+				)
+			);
 			return $result;
 		} finally {
 			if ( $cleanup && $staging_dir !== '' && is_dir( $staging_dir ) ) {
@@ -251,10 +258,10 @@ final class Export_Generator {
 	 * @return array{included: list<string>, excluded: list<string>, optional_allowed: list<string>, redact: bool}
 	 */
 	private function get_categories_for_mode( string $mode ): array {
-		$included = Export_Bundle_Schema::INCLUDED_CATEGORIES;
-		$excluded = array();
+		$included         = Export_Bundle_Schema::INCLUDED_CATEGORIES;
+		$excluded         = array();
 		$optional_allowed = array();
-		$redact = false;
+		$redact           = false;
 
 		switch ( $mode ) {
 			case Export_Mode_Keys::FULL_OPERATIONAL_BACKUP:
@@ -262,9 +269,9 @@ final class Export_Generator {
 				$optional_allowed = Export_Bundle_Schema::OPTIONAL_CATEGORIES;
 				break;
 			case Export_Mode_Keys::SUPPORT_BUNDLE:
-				$redact = true;
+				$redact           = true;
 				$optional_allowed = array( 'logs', 'reporting_history', 'acf_field_groups_mirror' );
-				$excluded = array( 'raw_ai_artifacts', 'normalized_ai_outputs', 'crawl_snapshots', 'rollback_snapshots' );
+				$excluded         = array( 'raw_ai_artifacts', 'normalized_ai_outputs', 'crawl_snapshots', 'rollback_snapshots' );
 				break;
 			case Export_Mode_Keys::TEMPLATE_ONLY_EXPORT:
 				$included = array( 'registries', 'compositions', 'styling' );
@@ -272,10 +279,10 @@ final class Export_Generator {
 				$excluded = array_merge( $excluded, Export_Bundle_Schema::OPTIONAL_CATEGORIES );
 				break;
 			case Export_Mode_Keys::PLAN_ARTIFACT_EXPORT:
-				$included = array( 'plans', 'token_sets' );
+				$included         = array( 'plans', 'token_sets' );
 				$optional_allowed = array( 'normalized_ai_outputs' );
-				$excluded = array( 'settings', 'profiles', 'registries', 'compositions', 'uninstall_restore_metadata' );
-				$excluded = array_merge( $excluded, array( 'raw_ai_artifacts', 'crawl_snapshots', 'logs', 'reporting_history', 'rollback_snapshots' ) );
+				$excluded         = array( 'settings', 'profiles', 'registries', 'compositions', 'uninstall_restore_metadata' );
+				$excluded         = array_merge( $excluded, array( 'raw_ai_artifacts', 'crawl_snapshots', 'logs', 'reporting_history', 'rollback_snapshots' ) );
 				break;
 			case Export_Mode_Keys::UNINSTALL_SETTINGS_PROFILE_ONLY:
 				$included = array( 'settings', 'profiles', 'uninstall_restore_metadata' );
@@ -312,8 +319,8 @@ final class Export_Generator {
 			$this->write_json_dir( $staging_dir . 'settings', 'settings.json', $settings );
 		}
 		if ( in_array( 'styling', $included, true ) ) {
-			$global = \get_option( Global_Style_Settings_Schema::OPTION_KEY, array() );
-			$entity  = \get_option( Entity_Style_Payload_Schema::OPTION_KEY, array() );
+			$global      = \get_option( Global_Style_Settings_Schema::OPTION_KEY, array() );
+			$entity      = \get_option( Entity_Style_Payload_Schema::OPTION_KEY, array() );
 			$styling_dir = $staging_dir . 'styling';
 			if ( ! is_dir( $styling_dir ) ) {
 				wp_mkdir_p( $styling_dir );
@@ -338,7 +345,7 @@ final class Export_Generator {
 		}
 		if ( in_array( 'registries', $included, true ) || in_array( 'compositions', $included, true ) ) {
 			$bundle = $this->registry_serializer->build_registry_bundle( 0 );
-			$reg = $staging_dir . 'registries';
+			$reg    = $staging_dir . 'registries';
 			if ( ! is_dir( $reg ) ) {
 				wp_mkdir_p( $reg );
 			}
@@ -348,12 +355,15 @@ final class Export_Generator {
 		}
 		if ( in_array( 'plans', $included, true ) ) {
 			$plans = array();
-			$list = $this->plan_repository->list_recent( 500, 0 );
+			$list  = $this->plan_repository->list_recent( 500, 0 );
 			foreach ( $list as $record ) {
 				$id = (int) ( $record['id'] ?? 0 );
 				if ( $id > 0 ) {
-					$def = $this->plan_repository->get_plan_definition( $id );
-					$plans[] = array( 'id' => $id, 'definition' => $def );
+					$def     = $this->plan_repository->get_plan_definition( $id );
+					$plans[] = array(
+						'id'         => $id,
+						'definition' => $def,
+					);
 				}
 			}
 			$this->write_json_dir( $staging_dir . 'plans', 'plans.json', $plans );
@@ -368,7 +378,7 @@ final class Export_Generator {
 		}
 		if ( in_array( 'acf_field_groups_mirror', $included, true ) && $this->acf_mirror_service !== null ) {
 			$mirror_dir = $staging_dir . 'acf_field_groups_mirror';
-			$manifest = $this->acf_mirror_service->generate_mirror_to_directory( $mirror_dir );
+			$manifest   = $this->acf_mirror_service->generate_mirror_to_directory( $mirror_dir );
 			$this->write_json_file( $mirror_dir . '/manifest.json', $manifest );
 		}
 	}
@@ -415,7 +425,7 @@ final class Export_Generator {
 	private function redact_array( array $data ): array {
 		$out = array();
 		foreach ( $data as $k => $v ) {
-			$lower = strtolower( (string) $k );
+			$lower   = strtolower( (string) $k );
 			$blocked = false;
 			foreach ( self::$redact_keys as $needle ) {
 				if ( strpos( $lower, $needle ) !== false ) {
@@ -432,7 +442,7 @@ final class Export_Generator {
 	}
 
 	private function get_site_slug(): string {
-		$url = \home_url( '', 'https' );
+		$url  = \home_url( '', 'https' );
 		$host = is_string( $url ) ? \parse_url( $url, PHP_URL_HOST ) : null;
 		if ( $host !== null && $host !== '' ) {
 			return preg_replace( '#[^a-zA-Z0-9_-]#', '', $host ) ?: 'site';

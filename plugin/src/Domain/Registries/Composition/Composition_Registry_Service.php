@@ -45,9 +45,9 @@ final class Composition_Registry_Service {
 		Assignment_Map_Service $assignment_map,
 		?Registry_Integrity_Validator $integrity_validator = null
 	) {
-		$this->validator          = $validator;
-		$this->repository         = $repository;
-		$this->assignment_map     = $assignment_map;
+		$this->validator           = $validator;
+		$this->repository          = $repository;
+		$this->assignment_map      = $assignment_map;
 		$this->integrity_validator = $integrity_validator;
 	}
 
@@ -93,7 +93,7 @@ final class Composition_Registry_Service {
 		} else {
 			$validation = $this->validator->validate( $definition );
 			$definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] = $validation['result'];
-			$definition[ Composition_Schema::FIELD_VALIDATION_CODES ] = $validation['codes'];
+			$definition[ Composition_Schema::FIELD_VALIDATION_CODES ]  = $validation['codes'];
 		}
 
 		$id = $this->repository->save_definition( $definition );
@@ -134,7 +134,7 @@ final class Composition_Registry_Service {
 		} else {
 			$validation = $this->validator->validate( $definition );
 			$definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] = $validation['result'];
-			$definition[ Composition_Schema::FIELD_VALIDATION_CODES ] = $validation['codes'];
+			$definition[ Composition_Schema::FIELD_VALIDATION_CODES ]  = $validation['codes'];
 		}
 
 		$id = $this->repository->save_definition( $definition );
@@ -276,7 +276,7 @@ final class Composition_Registry_Service {
 	 */
 	public function get_section_mappings( string $composition_id ): array {
 		$rows = $this->assignment_map->list_by_source( Assignment_Types::COMPOSITION_SECTION, $composition_id, 500 );
-		$out = array();
+		$out  = array();
 		foreach ( $rows as $row ) {
 			$target = (string) ( $row['target_ref'] ?? '' );
 			if ( $target === '' ) {
@@ -285,7 +285,7 @@ final class Composition_Registry_Service {
 			$payload = isset( $row['payload'] ) ? json_decode( (string) $row['payload'], true ) : array();
 			$pos     = isset( $payload['position'] ) ? (int) $payload['position'] : count( $out );
 			$variant = isset( $payload['variant'] ) ? (string) $payload['variant'] : 'default';
-			$out[] = array(
+			$out[]   = array(
 				'section_key' => $target,
 				'position'    => $pos,
 				'variant'     => $variant,
@@ -297,18 +297,18 @@ final class Composition_Registry_Service {
 
 	/**
 	 * @param array<string, mixed> $input
-	 * @param string              $comp_id
+	 * @param string               $comp_id
 	 * @return array<string, mixed>
 	 */
 	private function normalize_definition( array $input, string $comp_id ): array {
 		$ordered = $this->normalize_ordered_sections( $input[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array() );
 		return array(
-			Composition_Schema::FIELD_COMPOSITION_ID   => $comp_id,
-			Composition_Schema::FIELD_NAME             => \sanitize_text_field( (string) ( $input[ Composition_Schema::FIELD_NAME ] ?? 'Untitled' ) ),
+			Composition_Schema::FIELD_COMPOSITION_ID       => $comp_id,
+			Composition_Schema::FIELD_NAME                 => \sanitize_text_field( (string) ( $input[ Composition_Schema::FIELD_NAME ] ?? 'Untitled' ) ),
 			Composition_Schema::FIELD_ORDERED_SECTION_LIST => $ordered,
-			Composition_Schema::FIELD_STATUS           => $this->sanitize_status( (string) ( $input[ Composition_Schema::FIELD_STATUS ] ?? 'draft' ) ),
-			Composition_Schema::FIELD_VALIDATION_STATUS => (string) ( $input[ Composition_Schema::FIELD_VALIDATION_STATUS ] ?? Composition_Validation_Result::PENDING_VALIDATION ),
-			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF => $this->sanitize_ref( (string) ( $input[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' ) ),
+			Composition_Schema::FIELD_STATUS               => $this->sanitize_status( (string) ( $input[ Composition_Schema::FIELD_STATUS ] ?? 'draft' ) ),
+			Composition_Schema::FIELD_VALIDATION_STATUS    => (string) ( $input[ Composition_Schema::FIELD_VALIDATION_STATUS ] ?? Composition_Validation_Result::PENDING_VALIDATION ),
+			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF  => $this->sanitize_ref( (string) ( $input[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' ) ),
 			Composition_Schema::FIELD_DUPLICATED_FROM_COMPOSITION_ID => $this->sanitize_ref( (string) ( $input[ Composition_Schema::FIELD_DUPLICATED_FROM_COMPOSITION_ID ] ?? '' ) ),
 			Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF => $this->sanitize_ref( (string) ( $input[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] ?? '' ) ),
 			Composition_Schema::FIELD_HELPER_ONE_PAGER_REF => $this->sanitize_ref( (string) ( $input[ Composition_Schema::FIELD_HELPER_ONE_PAGER_REF ] ?? '' ) ),
@@ -332,9 +332,9 @@ final class Composition_Registry_Service {
 			if ( $key === '' ) {
 				continue;
 			}
-			$pos    = isset( $item[ Composition_Schema::SECTION_ITEM_POSITION ] ) ? (int) $item[ Composition_Schema::SECTION_ITEM_POSITION ] : $i;
+			$pos     = isset( $item[ Composition_Schema::SECTION_ITEM_POSITION ] ) ? (int) $item[ Composition_Schema::SECTION_ITEM_POSITION ] : $i;
 			$variant = isset( $item[ Composition_Schema::SECTION_ITEM_VARIANT ] ) ? \sanitize_text_field( (string) $item[ Composition_Schema::SECTION_ITEM_VARIANT ] ) : 'default';
-			$out[] = array(
+			$out[]   = array(
 				Composition_Schema::SECTION_ITEM_KEY      => $key,
 				Composition_Schema::SECTION_ITEM_POSITION => $pos,
 				Composition_Schema::SECTION_ITEM_VARIANT  => $variant ?: 'default',
@@ -348,18 +348,23 @@ final class Composition_Registry_Service {
 	}
 
 	/**
-	 * @param string $comp_id
+	 * @param string                           $comp_id
 	 * @param array<int, array<string, mixed>> $ordered
 	 */
 	private function save_section_mappings( string $comp_id, array $ordered ): void {
 		foreach ( $ordered as $item ) {
-			$key    = (string) ( $item[ Composition_Schema::SECTION_ITEM_KEY ] ?? '' );
-			$pos    = (int) ( $item[ Composition_Schema::SECTION_ITEM_POSITION ] ?? 0 );
+			$key     = (string) ( $item[ Composition_Schema::SECTION_ITEM_KEY ] ?? '' );
+			$pos     = (int) ( $item[ Composition_Schema::SECTION_ITEM_POSITION ] ?? 0 );
 			$variant = (string) ( $item[ Composition_Schema::SECTION_ITEM_VARIANT ] ?? 'default' );
 			if ( $key === '' ) {
 				continue;
 			}
-			$payload = wp_json_encode( array( 'position' => $pos, 'variant' => $variant ) );
+			$payload = wp_json_encode(
+				array(
+					'position' => $pos,
+					'variant'  => $variant,
+				)
+			);
 			$this->assignment_map->create(
 				Assignment_Types::COMPOSITION_SECTION,
 				$comp_id,

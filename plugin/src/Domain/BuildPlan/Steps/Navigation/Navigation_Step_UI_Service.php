@@ -50,9 +50,9 @@ final class Navigation_Step_UI_Service {
 		Navigation_Detail_Builder $detail_builder,
 		Navigation_Bulk_Action_Service $bulk_action_service
 	) {
-		$this->row_action_resolver  = $row_action_resolver;
-		$this->detail_builder       = $detail_builder;
-		$this->bulk_action_service  = $bulk_action_service;
+		$this->row_action_resolver = $row_action_resolver;
+		$this->detail_builder      = $detail_builder;
+		$this->bulk_action_service = $bulk_action_service;
 	}
 
 	/**
@@ -61,7 +61,7 @@ final class Navigation_Step_UI_Service {
 	 * @param array<string, mixed> $plan_definition Plan root.
 	 * @param int                  $step_index Must be 4 for navigation.
 	 * @param array<string, bool>  $capabilities can_approve, can_execute, can_view_artifacts.
-	 * @param string|null         $selected_item_id Item id for detail panel.
+	 * @param string|null          $selected_item_id Item id for detail panel.
 	 * @param array<int, string>   $selected_item_ids Item ids for bulk selection.
 	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages, navigation_comparison?, validation_summary?
 	 */
@@ -78,7 +78,7 @@ final class Navigation_Step_UI_Service {
 		$steps_raw = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
-		$step = $steps_raw[ $step_index ] ?? null;
+		$step      = $steps_raw[ $step_index ] ?? null;
 		if ( ! is_array( $step ) ) {
 			return $this->empty_workspace();
 		}
@@ -87,8 +87,8 @@ final class Navigation_Step_UI_Service {
 			return $this->empty_workspace();
 		}
 
-		$items = $this->eligible_items_from_step( $step );
-		$rows = array();
+		$items          = $this->eligible_items_from_step( $step );
+		$rows           = array();
 		$eligible_count = 0;
 		foreach ( $items as $item ) {
 			$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
@@ -100,18 +100,18 @@ final class Navigation_Step_UI_Service {
 				++$eligible_count;
 			}
 			$row_actions = $this->row_action_resolver->resolve( $item, $capabilities );
-			$rows[] = array(
-				Step_Item_List_Component::ROW_KEY_ITEM_ID          => $item_id,
-				Step_Item_List_Component::ROW_KEY_STATUS         => $status,
-				Step_Item_List_Component::ROW_KEY_STATUS_BADGE   => $this->status_to_badge( $status ),
+			$rows[]      = array(
+				Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
+				Step_Item_List_Component::ROW_KEY_STATUS  => $status,
+				Step_Item_List_Component::ROW_KEY_STATUS_BADGE => $this->status_to_badge( $status ),
 				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => $this->summary_columns_for_item( $item ),
-				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS     => $row_actions,
-				Step_Item_List_Component::ROW_KEY_IS_SELECTED   => in_array( $item_id, $selected_item_ids, true ),
+				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS => $row_actions,
+				Step_Item_List_Component::ROW_KEY_IS_SELECTED => in_array( $item_id, $selected_item_ids, true ),
 			);
 		}
 
-		$eligibility = $this->bulk_action_service->get_bulk_eligibility( $plan_definition );
-		$pending_count = $eligibility['approve_all_eligible'];
+		$eligibility    = $this->bulk_action_service->get_bulk_eligibility( $plan_definition );
+		$pending_count  = $eligibility['approve_all_eligible'];
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
 
 		$bulk_states = array(
@@ -155,18 +155,18 @@ final class Navigation_Step_UI_Service {
 			}
 		}
 
-		$step_messages = $this->step_messages( count( $rows ), $eligible_count );
+		$step_messages         = $this->step_messages( count( $rows ), $eligible_count );
 		$navigation_comparison = $this->build_navigation_comparison( $items );
 		$validation_summary    = $this->build_validation_summary( $items );
 
 		return array(
 			'step_list_rows'        => $rows,
-			'column_order'         => self::COLUMN_ORDER,
+			'column_order'          => self::COLUMN_ORDER,
 			'bulk_action_states'    => $bulk_states,
 			'detail_panel'          => $detail_panel,
 			'step_messages'         => $step_messages,
 			'navigation_comparison' => $navigation_comparison,
-			'validation_summary'   => $validation_summary,
+			'validation_summary'    => $validation_summary,
 		);
 	}
 
@@ -180,7 +180,7 @@ final class Navigation_Step_UI_Service {
 		$items_raw = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
-		$out = array();
+		$out       = array();
 		foreach ( $items_raw as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -198,7 +198,7 @@ final class Navigation_Step_UI_Service {
 		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
-		$cols = array();
+		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
 			$val = $payload[ $key ] ?? $item[ $key ] ?? '';
 			if ( $key === 'diff_summary' && is_array( $val ) ) {
@@ -218,7 +218,7 @@ final class Navigation_Step_UI_Service {
 	private function build_navigation_comparison( array $items ): array {
 		$comparison = array();
 		foreach ( $items as $item ) {
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+			$payload  = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
 			$context  = (string) ( $payload['menu_context'] ?? 'default' );
@@ -249,7 +249,7 @@ final class Navigation_Step_UI_Service {
 			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
-			$vals = $payload['validation_messages'] ?? $payload['validation_errors'] ?? array();
+			$vals    = $payload['validation_messages'] ?? $payload['validation_errors'] ?? array();
 			if ( ! is_array( $vals ) ) {
 				$vals = array( $vals );
 			}
@@ -265,13 +265,13 @@ final class Navigation_Step_UI_Service {
 
 	private function status_to_badge( string $status ): string {
 		$map = array(
-			Build_Plan_Item_Statuses::PENDING   => 'pending',
-			Build_Plan_Item_Statuses::APPROVED  => 'approved',
-			Build_Plan_Item_Statuses::REJECTED   => 'rejected',
-			Build_Plan_Item_Statuses::SKIPPED   => 'skipped',
+			Build_Plan_Item_Statuses::PENDING     => 'pending',
+			Build_Plan_Item_Statuses::APPROVED    => 'approved',
+			Build_Plan_Item_Statuses::REJECTED    => 'rejected',
+			Build_Plan_Item_Statuses::SKIPPED     => 'skipped',
 			Build_Plan_Item_Statuses::IN_PROGRESS => 'in_progress',
-			Build_Plan_Item_Statuses::COMPLETED => 'completed',
-			Build_Plan_Item_Statuses::FAILED    => 'failed',
+			Build_Plan_Item_Statuses::COMPLETED   => 'completed',
+			Build_Plan_Item_Statuses::FAILED      => 'failed',
 		);
 		return $map[ $status ] ?? $status;
 	}
@@ -309,15 +309,37 @@ final class Navigation_Step_UI_Service {
 			'step_list_rows'        => array(),
 			'column_order'          => self::COLUMN_ORDER,
 			'bulk_action_states'    => array(
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array( 'enabled' => false, 'label' => \__( 'Apply All Navigation Changes', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array( 'enabled' => false, 'label' => \__( 'Apply to selected', 'aio-page-builder' ), 'count_selected' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array( 'enabled' => false, 'label' => \__( 'Deny All Navigation Changes', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array( 'enabled' => false, 'label' => \__( 'Clear selection', 'aio-page-builder' ) ),
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Apply All Navigation Changes', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
+					'enabled'        => false,
+					'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
+					'count_selected' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Deny All Navigation Changes', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
+					'enabled' => false,
+					'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+				),
 			),
-			'detail_panel'          => array( 'item_id' => '', 'sections' => array(), 'row_actions' => array() ),
+			'detail_panel'          => array(
+				'item_id'     => '',
+				'sections'    => array(),
+				'row_actions' => array(),
+			),
 			'step_messages'         => array(),
 			'navigation_comparison' => array(),
-			'validation_summary'   => array( 'valid' => true, 'messages' => array() ),
+			'validation_summary'    => array(
+				'valid'    => true,
+				'messages' => array(),
+			),
 		);
 	}
 }

@@ -35,10 +35,10 @@ final class Industry_Weighted_Recommendation_Result {
 	/**
 	 * Builds a weighted result array. Safe for single-industry (conflict_results empty).
 	 *
-	 * @param int                  $final_score            Final score (from resolver).
-	 * @param array<string>        $contributing_industries Industry keys that contributed.
+	 * @param int                              $final_score            Final score (from resolver).
+	 * @param array<string>                    $contributing_industries Industry keys that contributed.
 	 * @param array<int, array<string, mixed>> $conflict_results Conflict result shapes from Industry_Conflict_Result.
-	 * @param string               $explanation_summary    Short summary for UI.
+	 * @param string                           $explanation_summary    Short summary for UI.
 	 * @return array<string, mixed>
 	 */
 	public static function create(
@@ -70,16 +70,16 @@ final class Industry_Weighted_Recommendation_Result {
 	 * @return array<string, mixed>
 	 */
 	public static function from_array( array $raw ): array {
-		$score = isset( $raw[ self::KEY_FINAL_SCORE ] ) && is_numeric( $raw[ self::KEY_FINAL_SCORE ] )
+		$score       = isset( $raw[ self::KEY_FINAL_SCORE ] ) && is_numeric( $raw[ self::KEY_FINAL_SCORE ] )
 			? (int) $raw[ self::KEY_FINAL_SCORE ]
 			: 0;
-		$industries = isset( $raw[ self::KEY_CONTRIBUTING_INDUSTRIES ] ) && is_array( $raw[ self::KEY_CONTRIBUTING_INDUSTRIES ] )
+		$industries  = isset( $raw[ self::KEY_CONTRIBUTING_INDUSTRIES ] ) && is_array( $raw[ self::KEY_CONTRIBUTING_INDUSTRIES ] )
 			? array_values( array_filter( array_map( 'strval', $raw[ self::KEY_CONTRIBUTING_INDUSTRIES ] ) ) )
 			: array();
-		$conflicts = isset( $raw[ self::KEY_CONFLICT_RESULTS ] ) && is_array( $raw[ self::KEY_CONFLICT_RESULTS ] )
+		$conflicts   = isset( $raw[ self::KEY_CONFLICT_RESULTS ] ) && is_array( $raw[ self::KEY_CONFLICT_RESULTS ] )
 			? array_map( array( Industry_Conflict_Result::class, 'from_array' ), $raw[ self::KEY_CONFLICT_RESULTS ] )
 			: array();
-		$summary = isset( $raw[ self::KEY_EXPLANATION_SUMMARY ] ) && is_string( $raw[ self::KEY_EXPLANATION_SUMMARY ] )
+		$summary     = isset( $raw[ self::KEY_EXPLANATION_SUMMARY ] ) && is_string( $raw[ self::KEY_EXPLANATION_SUMMARY ] )
 			? trim( $raw[ self::KEY_EXPLANATION_SUMMARY ] )
 			: '';
 		$has_warning = ! empty( $raw[ self::KEY_HAS_WARNING ] );

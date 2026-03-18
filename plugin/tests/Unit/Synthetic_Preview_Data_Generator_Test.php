@@ -29,7 +29,7 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->generator         = new Synthetic_Preview_Data_Generator();
+		$this->generator          = new Synthetic_Preview_Data_Generator();
 		$this->side_panel_builder = new Preview_Side_Panel_Builder();
 	}
 
@@ -59,9 +59,9 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 	}
 
 	public function test_generate_for_section_hero_is_deterministic(): void {
-		$ctx  = Synthetic_Preview_Context::for_section( 'st_hero', 'hero' );
-		$one  = $this->generator->generate_for_section( $ctx );
-		$two  = $this->generator->generate_for_section( $ctx );
+		$ctx = Synthetic_Preview_Context::for_section( 'st_hero', 'hero' );
+		$one = $this->generator->generate_for_section( $ctx );
+		$two = $this->generator->generate_for_section( $ctx );
 		$this->assertSame( $one, $two );
 		$this->assertArrayHasKey( 'headline', $one );
 		$this->assertSame( 'Welcome to Our Service', $one['headline'] );
@@ -97,12 +97,20 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 	}
 
 	public function test_generate_for_page_returns_section_field_values_per_position(): void {
-		$ctx = Synthetic_Preview_Context::for_page( 'pt_landing', 'top_level', 'home' );
+		$ctx     = Synthetic_Preview_Context::for_page( 'pt_landing', 'top_level', 'home' );
 		$ordered = array(
-			array( 'section_key' => 'st_hero', 'position' => 0, 'purpose_family' => 'hero' ),
-			array( 'section_key' => 'st_cta', 'position' => 1, 'purpose_family' => 'cta' ),
+			array(
+				'section_key'    => 'st_hero',
+				'position'       => 0,
+				'purpose_family' => 'hero',
+			),
+			array(
+				'section_key'    => 'st_cta',
+				'position'       => 1,
+				'purpose_family' => 'cta',
+			),
 		);
-		$out = $this->generator->generate_for_page( $ctx, $ordered );
+		$out     = $this->generator->generate_for_page( $ctx, $ordered );
 		$this->assertCount( 2, $out );
 		$this->assertSame( 'st_hero', $out[0]['section_key'] );
 		$this->assertSame( 0, $out[0]['position'] );
@@ -121,22 +129,22 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 
 	/** Prompt 217: synthetic preview output must not contain secret-like or unsafe content. */
 	public function test_synthetic_output_contains_no_secret_like_content(): void {
-		$families = array( 'hero', 'proof', 'cta', 'faq', 'offer', 'explainer', 'legal', 'listing', 'comparison', 'profile', 'stats', 'timeline', 'locations', 'other' );
+		$families    = array( 'hero', 'proof', 'cta', 'faq', 'offer', 'explainer', 'legal', 'listing', 'comparison', 'profile', 'stats', 'timeline', 'locations', 'other' );
 		$all_strings = array();
 		foreach ( $families as $family ) {
 			$out = $this->generator->generate_field_values_for_family( $family, 'default', '' );
 			$this->collect_strings_recursive( $out, $all_strings );
 		}
-		$combined = implode( ' ', $all_strings );
+		$combined  = implode( ' ', $all_strings );
 		$forbidden = array( 'api_key', 'password', 'bearer', 'secret', 'nonce', 'sk-', 'sk_', 'credential', 'auth_token' );
-		$lower = strtolower( $combined );
+		$lower     = strtolower( $combined );
 		foreach ( $forbidden as $sub ) {
 			$this->assertStringNotContainsString( strtolower( $sub ), $lower, "Synthetic output must not contain secret-like substring: {$sub}" );
 		}
 	}
 
 	/** @param array<string, mixed> $arr
-	 * @param list<string> $out */
+	 * @param list<string>         $out */
 	private function collect_strings_recursive( array $arr, array &$out ): void {
 		foreach ( $arr as $v ) {
 			if ( is_string( $v ) ) {
@@ -148,11 +156,11 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 	}
 
 	public function test_side_panel_for_section_includes_required_metadata(): void {
-		$def = array(
+		$def   = array(
 			'internal_key'           => 'st_hero_01',
 			'name'                   => 'Hero with CTA',
 			'purpose_summary'        => 'Primary hero section.',
-			'section_purpose_family'  => 'hero',
+			'section_purpose_family' => 'hero',
 			'cta_classification'     => '',
 			'placement_tendency'     => 'opener',
 			'variants'               => array( 'default' => array( 'label' => 'Default' ) ),
@@ -169,15 +177,21 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 	}
 
 	public function test_side_panel_for_page_includes_used_sections_and_category(): void {
-		$def = array(
-			'internal_key'             => 'pt_home',
-			'name'                     => 'Home',
-			'purpose_summary'          => 'Landing page for home.',
-			'template_category_class'   => 'top_level',
-			'template_family'          => 'home',
-			'ordered_sections'         => array(
-				array( 'section_key' => 'st_hero', 'position' => 0 ),
-				array( 'section_key' => 'st_cta', 'position' => 1 ),
+		$def   = array(
+			'internal_key'            => 'pt_home',
+			'name'                    => 'Home',
+			'purpose_summary'         => 'Landing page for home.',
+			'template_category_class' => 'top_level',
+			'template_family'         => 'home',
+			'ordered_sections'        => array(
+				array(
+					'section_key' => 'st_hero',
+					'position'    => 0,
+				),
+				array(
+					'section_key' => 'st_cta',
+					'position'    => 1,
+				),
 			),
 		);
 		$panel = $this->side_panel_builder->build_for_page( $def, null );
@@ -189,10 +203,15 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 	}
 
 	public function test_build_section_preview_payload_combines_field_values_and_side_panel(): void {
-		$def = array( 'internal_key' => 'st_hero', 'name' => 'Hero', 'purpose_summary' => 'Hero section.', 'section_purpose_family' => 'hero' );
-		$ctx  = Synthetic_Preview_Context::for_section( 'st_hero', 'hero' );
+		$def          = array(
+			'internal_key'           => 'st_hero',
+			'name'                   => 'Hero',
+			'purpose_summary'        => 'Hero section.',
+			'section_purpose_family' => 'hero',
+		);
+		$ctx          = Synthetic_Preview_Context::for_section( 'st_hero', 'hero' );
 		$field_values = $this->generator->generate_for_section( $ctx );
-		$payload = $this->side_panel_builder->build_section_preview_payload( $def, $field_values, $ctx );
+		$payload      = $this->side_panel_builder->build_section_preview_payload( $def, $field_values, $ctx );
 		$this->assertSame( 'st_hero', $payload['section_key'] );
 		$this->assertSame( $field_values, $payload['field_values'] );
 		$this->assertArrayHasKey( 'side_panel', $payload );
@@ -201,10 +220,26 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 	}
 
 	public function test_build_page_preview_payload_combines_section_field_values_and_side_panel(): void {
-		$def = array( 'internal_key' => 'pt_landing', 'name' => 'Landing', 'purpose_summary' => 'Landing page.', 'template_category_class' => 'top_level', 'template_family' => 'home', 'ordered_sections' => array() );
-		$ctx  = Synthetic_Preview_Context::for_page( 'pt_landing', 'top_level', 'home' );
-		$section_field_values = $this->generator->generate_for_page( $ctx, array( array( 'section_key' => 'st_hero', 'position' => 0, 'purpose_family' => 'hero' ) ) );
-		$payload = $this->side_panel_builder->build_page_preview_payload( $def, $section_field_values, $ctx );
+		$def                  = array(
+			'internal_key'            => 'pt_landing',
+			'name'                    => 'Landing',
+			'purpose_summary'         => 'Landing page.',
+			'template_category_class' => 'top_level',
+			'template_family'         => 'home',
+			'ordered_sections'        => array(),
+		);
+		$ctx                  = Synthetic_Preview_Context::for_page( 'pt_landing', 'top_level', 'home' );
+		$section_field_values = $this->generator->generate_for_page(
+			$ctx,
+			array(
+				array(
+					'section_key'    => 'st_hero',
+					'position'       => 0,
+					'purpose_family' => 'hero',
+				),
+			)
+		);
+		$payload              = $this->side_panel_builder->build_page_preview_payload( $def, $section_field_values, $ctx );
 		$this->assertSame( 'pt_landing', $payload['template_key'] );
 		$this->assertCount( 1, $payload['section_field_values'] );
 		$this->assertArrayHasKey( 'side_panel', $payload );
@@ -215,7 +250,7 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 	 * Use this shape for integration with section renderer preview.
 	 */
 	public function test_example_section_synthetic_preview_context_payload(): void {
-		$context = Synthetic_Preview_Context::for_section( 'st01_hero', 'hero', 'default', false, Synthetic_Preview_Context::ANIMATION_TIER_SUBTLE );
+		$context      = Synthetic_Preview_Context::for_section( 'st01_hero', 'hero', 'default', false, Synthetic_Preview_Context::ANIMATION_TIER_SUBTLE );
 		$field_values = $this->generator->generate_for_section( $context );
 		$this->assertSame( 'section', $context->get_type() );
 		$this->assertSame( 'st01_hero', $context->get_key() );
@@ -239,10 +274,18 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 	 * Use this shape for integration with page assembler preview.
 	 */
 	public function test_example_page_synthetic_preview_context_payload(): void {
-		$context = Synthetic_Preview_Context::for_page( 'pt_home_landing', 'top_level', 'home', 'default', false, Synthetic_Preview_Context::ANIMATION_TIER_NONE );
-		$ordered_sections = array(
-			array( 'section_key' => 'st_hero', 'position' => 0, 'purpose_family' => 'hero' ),
-			array( 'section_key' => 'st_cta', 'position' => 1, 'purpose_family' => 'cta' ),
+		$context              = Synthetic_Preview_Context::for_page( 'pt_home_landing', 'top_level', 'home', 'default', false, Synthetic_Preview_Context::ANIMATION_TIER_NONE );
+		$ordered_sections     = array(
+			array(
+				'section_key'    => 'st_hero',
+				'position'       => 0,
+				'purpose_family' => 'hero',
+			),
+			array(
+				'section_key'    => 'st_cta',
+				'position'       => 1,
+				'purpose_family' => 'cta',
+			),
 		);
 		$section_field_values = $this->generator->generate_for_page( $context, $ordered_sections );
 		$this->assertSame( 'page', $context->get_type() );

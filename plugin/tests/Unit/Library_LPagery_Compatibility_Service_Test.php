@@ -32,17 +32,23 @@ final class Library_LPagery_Compatibility_Service_Test extends TestCase {
 	}
 
 	public function test_supported_mapping_resolution(): void {
-		$service = $this->create_service();
+		$service    = $this->create_service();
 		$definition = array(
-			'internal_key' => 'hero_01',
+			'internal_key'    => 'hero_01',
 			'field_blueprint' => array(
 				Field_Blueprint_Schema::FIELDS => array(
-					array( Field_Blueprint_Schema::FIELD_NAME => 'headline', Field_Blueprint_Schema::FIELD_TYPE => 'text' ),
-					array( Field_Blueprint_Schema::FIELD_NAME => 'cta_url', Field_Blueprint_Schema::FIELD_TYPE => 'url' ),
+					array(
+						Field_Blueprint_Schema::FIELD_NAME => 'headline',
+						Field_Blueprint_Schema::FIELD_TYPE => 'text',
+					),
+					array(
+						Field_Blueprint_Schema::FIELD_NAME => 'cta_url',
+						Field_Blueprint_Schema::FIELD_TYPE => 'url',
+					),
 				),
 			),
 		);
-		$result = $service->get_compatibility_for_section( 'hero_01', $definition );
+		$result     = $service->get_compatibility_for_section( 'hero_01', $definition );
 		$this->assertTrue( $result->is_compatible() );
 		$this->assertSame( LPagery_Compatibility_Result::STATE_SUPPORTED, $result->get_compatibility_state() );
 		$summary = $result->get_lpagery_mapping_summary();
@@ -51,60 +57,75 @@ final class Library_LPagery_Compatibility_Service_Test extends TestCase {
 	}
 
 	public function test_unsupported_case_rejection(): void {
-		$service = $this->create_service();
+		$service    = $this->create_service();
 		$definition = array(
-			'internal_key' => 'proof_01',
+			'internal_key'    => 'proof_01',
 			'field_blueprint' => array(
 				Field_Blueprint_Schema::FIELDS => array(
-					array( Field_Blueprint_Schema::FIELD_NAME => 'headline', Field_Blueprint_Schema::FIELD_TYPE => 'text' ),
-					array( Field_Blueprint_Schema::FIELD_NAME => 'related_post', Field_Blueprint_Schema::FIELD_TYPE => 'relationship' ),
+					array(
+						Field_Blueprint_Schema::FIELD_NAME => 'headline',
+						Field_Blueprint_Schema::FIELD_TYPE => 'text',
+					),
+					array(
+						Field_Blueprint_Schema::FIELD_NAME => 'related_post',
+						Field_Blueprint_Schema::FIELD_TYPE => 'relationship',
+					),
 				),
 			),
 		);
-		$result = $service->get_compatibility_for_section( 'proof_01', $definition );
-		$reasons = $result->get_unsupported_mapping_reasons();
+		$result     = $service->get_compatibility_for_section( 'proof_01', $definition );
+		$reasons    = $result->get_unsupported_mapping_reasons();
 		$this->assertNotEmpty( $reasons );
 		$this->assertSame( 'related_post', $reasons[0]['field_name'] ?? '' );
 		$this->assertStringContainsString( 'relationship', $reasons[0]['reason'] ?? '' );
 	}
 
 	public function test_preview_safe_and_canonical_identity_preserved(): void {
-		$service = $this->create_service();
+		$service    = $this->create_service();
 		$definition = array(
-			'internal_key' => 'cta_01',
+			'internal_key'    => 'cta_01',
 			'field_blueprint' => array(
 				Field_Blueprint_Schema::FIELDS => array(
-					array( Field_Blueprint_Schema::FIELD_NAME => 'headline', Field_Blueprint_Schema::FIELD_TYPE => 'text' ),
+					array(
+						Field_Blueprint_Schema::FIELD_NAME => 'headline',
+						Field_Blueprint_Schema::FIELD_TYPE => 'text',
+					),
 				),
 			),
 		);
-		$result = $service->get_compatibility_for_section( 'cta_01', $definition );
-		$summary = $result->get_lpagery_mapping_summary();
+		$result     = $service->get_compatibility_for_section( 'cta_01', $definition );
+		$summary    = $result->get_lpagery_mapping_summary();
 		$this->assertTrue( $summary['preview_safe'] );
 		$this->assertTrue( $summary['canonical_identity_preserved'] );
 	}
 
 	public function test_validate_field_mapping_supported(): void {
 		$service = $this->create_service();
-		$out = $service->validate_field_mapping( 'headline', 'text' );
+		$out     = $service->validate_field_mapping( 'headline', 'text' );
 		$this->assertTrue( $out['supported'] );
 		$this->assertSame( '', $out['reason'] );
 	}
 
 	public function test_validate_field_mapping_unsupported_type(): void {
 		$service = $this->create_service();
-		$out = $service->validate_field_mapping( 'related', 'relationship' );
+		$out     = $service->validate_field_mapping( 'related', 'relationship' );
 		$this->assertFalse( $out['supported'] );
 		$this->assertNotEmpty( $out['reason'] );
 	}
 
 	public function test_page_template_aggregate(): void {
-		$service = $this->create_service();
+		$service                 = $this->create_service();
 		$section_compatibilities = array(
-			array( 'section_key' => 'hero_01', 'lpagery_state' => LPagery_Compatibility_Result::STATE_SUPPORTED ),
-			array( 'section_key' => 'cta_01', 'lpagery_state' => LPagery_Compatibility_Result::STATE_SUPPORTED ),
+			array(
+				'section_key'   => 'hero_01',
+				'lpagery_state' => LPagery_Compatibility_Result::STATE_SUPPORTED,
+			),
+			array(
+				'section_key'   => 'cta_01',
+				'lpagery_state' => LPagery_Compatibility_Result::STATE_SUPPORTED,
+			),
 		);
-		$result = $service->get_compatibility_for_page_template( 'tpl_home', array(), $section_compatibilities );
+		$result                  = $service->get_compatibility_for_page_template( 'tpl_home', array(), $section_compatibilities );
 		$this->assertTrue( $result->is_compatible() );
 		$this->assertSame( LPagery_Compatibility_Result::STATE_SUPPORTED, $result->get_compatibility_state() );
 		$summary = $result->get_lpagery_mapping_summary();
@@ -114,7 +135,7 @@ final class Library_LPagery_Compatibility_Service_Test extends TestCase {
 
 	public function test_page_template_unknown_when_no_sections(): void {
 		$service = $this->create_service();
-		$result = $service->get_compatibility_for_page_template( 'tpl_empty', array(), array() );
+		$result  = $service->get_compatibility_for_page_template( 'tpl_empty', array(), array() );
 		$this->assertFalse( $result->is_compatible() );
 		$this->assertSame( LPagery_Compatibility_Result::STATE_UNKNOWN, $result->get_compatibility_state() );
 	}
@@ -123,18 +144,24 @@ final class Library_LPagery_Compatibility_Service_Test extends TestCase {
 	 * Example LPagery compatibility result payload for a section (Prompt 179). Real to_array() output.
 	 */
 	public function test_example_section_lpagery_compatibility_payload(): void {
-		$service = $this->create_service();
+		$service    = $this->create_service();
 		$definition = array(
-			'internal_key' => 'hero_primary',
+			'internal_key'    => 'hero_primary',
 			'field_blueprint' => array(
 				Field_Blueprint_Schema::FIELDS => array(
-					array( Field_Blueprint_Schema::FIELD_NAME => 'headline', Field_Blueprint_Schema::FIELD_TYPE => 'text' ),
-					array( Field_Blueprint_Schema::FIELD_NAME => 'cta_url', Field_Blueprint_Schema::FIELD_TYPE => 'url' ),
+					array(
+						Field_Blueprint_Schema::FIELD_NAME => 'headline',
+						Field_Blueprint_Schema::FIELD_TYPE => 'text',
+					),
+					array(
+						Field_Blueprint_Schema::FIELD_NAME => 'cta_url',
+						Field_Blueprint_Schema::FIELD_TYPE => 'url',
+					),
 				),
 			),
 		);
-		$result = $service->get_compatibility_for_section( 'hero_primary', $definition );
-		$payload = $result->to_array();
+		$result     = $service->get_compatibility_for_section( 'hero_primary', $definition );
+		$payload    = $result->to_array();
 
 		$this->assertArrayHasKey( 'compatible', $payload );
 		$this->assertArrayHasKey( 'lpagery_compatibility_state', $payload );
@@ -151,18 +178,26 @@ final class Library_LPagery_Compatibility_Service_Test extends TestCase {
 		$example_section_payload = array(
 			'compatible'                  => true,
 			'lpagery_compatibility_state' => 'supported',
-			'lpagery_mapping_summary'      => array(
-				'supported_mappings'             => array(
-					array( 'field_name' => 'headline', 'field_type' => 'text', 'canonical_identity_preserved' => true ),
-					array( 'field_name' => 'cta_url', 'field_type' => 'url', 'canonical_identity_preserved' => true ),
+			'lpagery_mapping_summary'     => array(
+				'supported_mappings'           => array(
+					array(
+						'field_name'                   => 'headline',
+						'field_type'                   => 'text',
+						'canonical_identity_preserved' => true,
+					),
+					array(
+						'field_name'                   => 'cta_url',
+						'field_type'                   => 'url',
+						'canonical_identity_preserved' => true,
+					),
 				),
-				'unsupported_mappings'           => array(),
-				'allowed_groups'                 => array( 'color', 'typography', 'spacing', 'radius', 'shadow', 'component' ),
-				'canonical_identity_preserved'   => true,
-				'preview_safe'                   => true,
-				'mapping_convention'             => 'group.name',
+				'unsupported_mappings'         => array(),
+				'allowed_groups'               => array( 'color', 'typography', 'spacing', 'radius', 'shadow', 'component' ),
+				'canonical_identity_preserved' => true,
+				'preview_safe'                 => true,
+				'mapping_convention'           => 'group.name',
 			),
-			'unsupported_mapping_reasons'   => array(),
+			'unsupported_mapping_reasons' => array(),
 		);
 		$this->assertEquals( $example_section_payload['compatible'], $payload['compatible'] );
 		$this->assertEquals( $example_section_payload['lpagery_compatibility_state'], $payload['lpagery_compatibility_state'] );
@@ -173,13 +208,19 @@ final class Library_LPagery_Compatibility_Service_Test extends TestCase {
 	 * Example LPagery compatibility result payload for a page template (Prompt 179). Real to_array() output.
 	 */
 	public function test_example_page_template_lpagery_compatibility_payload(): void {
-		$service = $this->create_service();
+		$service                 = $this->create_service();
 		$section_compatibilities = array(
-			array( 'section_key' => 'hero_01', 'lpagery_state' => LPagery_Compatibility_Result::STATE_SUPPORTED ),
-			array( 'section_key' => 'cta_01', 'lpagery_state' => LPagery_Compatibility_Result::STATE_UNSUPPORTED ),
+			array(
+				'section_key'   => 'hero_01',
+				'lpagery_state' => LPagery_Compatibility_Result::STATE_SUPPORTED,
+			),
+			array(
+				'section_key'   => 'cta_01',
+				'lpagery_state' => LPagery_Compatibility_Result::STATE_UNSUPPORTED,
+			),
 		);
-		$result = $service->get_compatibility_for_page_template( 'tpl_landing', array( 'ordered_sections' => array( array(), array() ) ), $section_compatibilities );
-		$payload = $result->to_array();
+		$result                  = $service->get_compatibility_for_page_template( 'tpl_landing', array( 'ordered_sections' => array( array(), array() ) ), $section_compatibilities );
+		$payload                 = $result->to_array();
 
 		$this->assertArrayHasKey( 'compatible', $payload );
 		$this->assertArrayHasKey( 'lpagery_compatibility_state', $payload );

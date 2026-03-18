@@ -22,7 +22,7 @@ use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
  */
 final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Prompt_Pack_Registry_Repository_Interface {
 
-	protected const META_DEFINITION  = '_aio_prompt_pack_definition';
+	protected const META_DEFINITION   = '_aio_prompt_pack_definition';
 	protected const META_PACK_VERSION = '_aio_pack_version';
 
 	/** @inheritdoc */
@@ -38,7 +38,7 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 	 * @return array<string, mixed>|null Full pack definition or null.
 	 */
 	public function get_definition_by_key_and_version( string $internal_key, string $version ): ?array {
-		$key = $this->sanitize_key( $internal_key );
+		$key     = $this->sanitize_key( $internal_key );
 		$version = trim( $version );
 		if ( $key === '' || $version === '' ) {
 			return null;
@@ -50,8 +50,16 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
 				'meta_query'             => array(
-					array( 'key' => self::META_INTERNAL_KEY, 'value' => $key, 'compare' => '=' ),
-					array( 'key' => self::META_PACK_VERSION, 'value' => $version, 'compare' => '=' ),
+					array(
+						'key'     => self::META_INTERNAL_KEY,
+						'value'   => $key,
+						'compare' => '=',
+					),
+					array(
+						'key'     => self::META_PACK_VERSION,
+						'value'   => $version,
+						'compare' => '=',
+					),
 				),
 			)
 		);
@@ -81,7 +89,11 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
 				'meta_query'             => array(
-					array( 'key' => self::META_INTERNAL_KEY, 'value' => $key, 'compare' => '=' ),
+					array(
+						'key'     => self::META_INTERNAL_KEY,
+						'value'   => $key,
+						'compare' => '=',
+					),
 				),
 			)
 		);
@@ -92,7 +104,7 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 		foreach ( $posts as $post ) {
 			$record = $this->get_by_id( $post->ID );
 			if ( $record !== null && isset( $record['definition'] ) ) {
-				$def = $record['definition'];
+				$def    = $record['definition'];
 				$status = $def[ Prompt_Pack_Schema::ROOT_STATUS ] ?? '';
 				if ( $status === Prompt_Pack_Schema::STATUS_ACTIVE ) {
 					return $def;
@@ -112,10 +124,10 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 	 * @return list<array<string, mixed>>
 	 */
 	public function list_definitions_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
-		$status = $this->sanitize_status( $status );
-		$limit  = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
+		$status  = $this->sanitize_status( $status );
+		$limit   = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
 		$records = $this->list_by_status( $status, $limit, $offset );
-		$out = array();
+		$out     = array();
 		foreach ( $records as $r ) {
 			if ( isset( $r['definition'] ) && is_array( $r['definition'] ) ) {
 				$out[] = $r['definition'];
@@ -127,11 +139,11 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 	/** @inheritdoc */
 	protected function get_meta( int $post_id ): array {
 		$base = parent::get_meta( $post_id );
-		$raw = \get_post_meta( $post_id, self::META_DEFINITION, true );
+		$raw  = \get_post_meta( $post_id, self::META_DEFINITION, true );
 		if ( is_string( $raw ) && $raw !== '' ) {
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
-				$base['definition'] = $decoded;
+				$base['definition']              = $decoded;
 				$base[ self::META_INTERNAL_KEY ] = $base[ self::META_INTERNAL_KEY ] ?: ( $decoded[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' );
 				$base[ self::META_STATUS ]       = $base[ self::META_STATUS ] ?: ( $decoded[ Prompt_Pack_Schema::ROOT_STATUS ] ?? '' );
 				$base[ self::META_PACK_VERSION ] = $decoded[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '';
@@ -193,8 +205,8 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 	public function get_by_key( string $key ): ?array {
 		if ( strpos( $key, '|' ) !== false ) {
 			list( $internal_key, $version ) = array_map( 'trim', explode( '|', $key, 2 ) );
-			$key = $this->sanitize_key( $internal_key );
-			$version = trim( $version );
+			$key                            = $this->sanitize_key( $internal_key );
+			$version                        = trim( $version );
 			if ( $key === '' || $version === '' ) {
 				return null;
 			}
@@ -205,8 +217,16 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 					'no_found_rows'          => true,
 					'update_post_meta_cache' => true,
 					'meta_query'             => array(
-						array( 'key' => self::META_INTERNAL_KEY, 'value' => $key, 'compare' => '=' ),
-						array( 'key' => self::META_PACK_VERSION, 'value' => $version, 'compare' => '=' ),
+						array(
+							'key'     => self::META_INTERNAL_KEY,
+							'value'   => $key,
+							'compare' => '=',
+						),
+						array(
+							'key'     => self::META_PACK_VERSION,
+							'value'   => $version,
+							'compare' => '=',
+						),
 					),
 				)
 			);

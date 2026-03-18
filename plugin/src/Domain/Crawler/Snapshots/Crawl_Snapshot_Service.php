@@ -44,15 +44,15 @@ final class Crawl_Snapshot_Service {
 		Crawl_Profile_Service $profile_service,
 		Crawl_Template_Family_Matcher $template_family_matcher
 	) {
-		$this->repository             = $repository;
-		$this->profile_service        = $profile_service;
+		$this->repository              = $repository;
+		$this->profile_service         = $profile_service;
 		$this->template_family_matcher = $template_family_matcher;
 	}
 
 	/**
 	 * Creates a new crawl session: generates run id, stores session payload in options.
 	 *
-	 * @param string $site_host Canonical host for the crawl.
+	 * @param string               $site_host Canonical host for the crawl.
 	 * @param array<string, mixed> $settings Optional crawl settings (no secrets).
 	 * @return string Crawl run id, or empty string on failure.
 	 */
@@ -64,8 +64,8 @@ final class Crawl_Snapshot_Service {
 		$profile_key = $this->profile_service->resolve_profile_key(
 			(string) ( $settings['crawl_profile_key'] ?? '' )
 		);
-		$now    = $this->iso8601_now();
-		$payload = Crawl_Snapshot_Payload_Builder::build_session_payload(
+		$now         = $this->iso8601_now();
+		$payload     = Crawl_Snapshot_Payload_Builder::build_session_payload(
 			$crawl_run_id,
 			$site_host,
 			$now,
@@ -78,7 +78,7 @@ final class Crawl_Snapshot_Service {
 			Crawl_Snapshot_Payload_Builder::SESSION_STATUS_RUNNING,
 			$profile_key
 		);
-		$option_key = $this->session_option_key( $crawl_run_id );
+		$option_key  = $this->session_option_key( $crawl_run_id );
 		if ( $option_key === '' ) {
 			return '';
 		}
@@ -96,33 +96,36 @@ final class Crawl_Snapshot_Service {
 	 * @return list<array<string, mixed>>
 	 */
 	public function list_sessions( int $limit = 50 ): array {
-		$run_ids = $this->repository->list_crawl_run_ids( $limit );
+		$run_ids  = $this->repository->list_crawl_run_ids( $limit );
 		$sessions = array();
 		foreach ( $run_ids as $run_id ) {
 			$payload = $this->get_session( $run_id );
 			if ( $payload !== null ) {
 				$payload['crawl_run_id'] = $run_id;
-				$sessions[] = $payload;
+				$sessions[]              = $payload;
 			} else {
 				$sessions[] = array(
-					'crawl_run_id'       => $run_id,
-					'site_host'          => '',
-					'crawl_profile_key'  => 'full_public_baseline',
-					'started_at'         => null,
-					'ended_at'           => null,
-					'final_status'       => 'unknown',
-					'total_discovered'   => 0,
-					'accepted_count'     => 0,
-					'excluded_count'     => 0,
-					'failed_count'       => 0,
+					'crawl_run_id'      => $run_id,
+					'site_host'         => '',
+					'crawl_profile_key' => 'full_public_baseline',
+					'started_at'        => null,
+					'ended_at'          => null,
+					'final_status'      => 'unknown',
+					'total_discovered'  => 0,
+					'accepted_count'    => 0,
+					'excluded_count'    => 0,
+					'failed_count'      => 0,
 				);
 			}
 		}
-		usort( $sessions, function ( $a, $b ) {
-			$t1 = $a['started_at'] ?? '';
-			$t2 = $b['started_at'] ?? '';
-			return strcmp( (string) $t2, (string) $t1 );
-		} );
+		usort(
+			$sessions,
+			function ( $a, $b ) {
+				$t1 = $a['started_at'] ?? '';
+				$t2 = $b['started_at'] ?? '';
+				return strcmp( (string) $t2, (string) $t1 );
+			}
+		);
 		return $sessions;
 	}
 
@@ -147,7 +150,7 @@ final class Crawl_Snapshot_Service {
 	/**
 	 * Updates session metadata (e.g. ended_at, counts, final_status).
 	 *
-	 * @param string              $crawl_run_id Crawl run identifier.
+	 * @param string               $crawl_run_id Crawl run identifier.
 	 * @param array<string, mixed> $overrides    Keys from Crawl_Snapshot_Payload_Builder::SESSION_*.
 	 * @return bool True if option updated.
 	 */
@@ -176,8 +179,8 @@ final class Crawl_Snapshot_Service {
 	/**
 	 * Stores a page snapshot record (insert or update by run_id + url).
 	 *
-	 * @param string              $crawl_run_id Crawl run identifier.
-	 * @param string              $url         Normalized URL.
+	 * @param string               $crawl_run_id Crawl run identifier.
+	 * @param string               $url         Normalized URL.
 	 * @param array<string, mixed> $overrides   Optional field overrides (title_snapshot, crawl_status, etc.).
 	 * @return int Inserted or updated row id; 0 on failure.
 	 */
@@ -192,10 +195,10 @@ final class Crawl_Snapshot_Service {
 	/**
 	 * Stores classification outcome for a page (updates page_classification, indexability_flags, content_hash).
 	 *
-	 * @param string               $crawl_run_id   Crawl run identifier.
-	 * @param string               $url            Normalized URL.
+	 * @param string                $crawl_run_id   Crawl run identifier.
+	 * @param string                $url            Normalized URL.
 	 * @param Classification_Result $result         Classification result from Meaningful_Page_Classifier.
-	 * @param string|null          $title_snapshot  Optional title to store with the record.
+	 * @param string|null           $title_snapshot  Optional title to store with the record.
 	 * @return int Updated row id; 0 on failure.
 	 */
 	public function record_classification( string $crawl_run_id, string $url, Classification_Result $result, ?string $title_snapshot = null ): int {
@@ -214,8 +217,8 @@ final class Crawl_Snapshot_Service {
 	/**
 	 * Stores extraction outcome for a page (summary_data, optional title_snapshot and meta_snapshot from page_summary).
 	 *
-	 * @param string          $crawl_run_id Crawl run identifier.
-	 * @param string          $url          Normalized URL.
+	 * @param string            $crawl_run_id Crawl run identifier.
+	 * @param string            $url          Normalized URL.
 	 * @param Extraction_Result $result     Extraction result from Navigation_Extractor + Content_Summary_Extractor.
 	 * @return int Updated row id; 0 on failure.
 	 */
@@ -223,7 +226,7 @@ final class Crawl_Snapshot_Service {
 		$overrides = array(
 			Crawl_Snapshot_Payload_Builder::PAGE_SUMMARY_DATA => $result->to_summary_data_json(),
 		);
-		$title = $result->page_summary['title'] ?? '';
+		$title     = $result->page_summary['title'] ?? '';
 		if ( $title !== '' ) {
 			$overrides[ Crawl_Snapshot_Payload_Builder::PAGE_TITLE_SNAPSHOT ] = $title;
 		}
@@ -247,12 +250,12 @@ final class Crawl_Snapshot_Service {
 		if ( $page === null ) {
 			return 0;
 		}
-		$match_result = $this->template_family_matcher->match( $page );
+		$match_result  = $this->template_family_matcher->match( $page );
 		$existing_json = isset( $page['hierarchy_clues'] ) && $page['hierarchy_clues'] !== null && (string) $page['hierarchy_clues'] !== ''
 			? (string) $page['hierarchy_clues']
 			: null;
-		$merged = $this->merge_hierarchy_clues_with_hint( $existing_json, $match_result );
-		$overrides = array(
+		$merged        = $this->merge_hierarchy_clues_with_hint( $existing_json, $match_result );
+		$overrides     = array(
 			Crawl_Snapshot_Payload_Builder::PAGE_HIERARCHY_CLUES => $merged,
 		);
 		return $this->store_page_record( $crawl_run_id, $url, $overrides );
@@ -261,7 +264,7 @@ final class Crawl_Snapshot_Service {
 	/**
 	 * Merges template-family hint payload into existing hierarchy_clues JSON, or returns new JSON.
 	 *
-	 * @param string|null                $existing_json Current hierarchy_clues value.
+	 * @param string|null                 $existing_json Current hierarchy_clues value.
 	 * @param Crawl_Template_Match_Result $match_result  Matcher result to persist.
 	 * @return string JSON string for hierarchy_clues column.
 	 */
@@ -297,10 +300,10 @@ final class Crawl_Snapshot_Service {
 	/**
 	 * Lists page records for a crawl run.
 	 *
-	 * @param string   $crawl_run_id Crawl run identifier.
+	 * @param string      $crawl_run_id Crawl run identifier.
 	 * @param string|null $status     Optional filter by crawl_status.
-	 * @param int      $limit       Max rows (0 = no limit).
-	 * @param int      $offset      Offset.
+	 * @param int         $limit       Max rows (0 = no limit).
+	 * @param int         $offset      Offset.
 	 * @return list<array<string, mixed>>
 	 */
 	public function list_pages_by_run( string $crawl_run_id, ?string $status = null, int $limit = 0, int $offset = 0 ): array {

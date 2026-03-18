@@ -26,7 +26,7 @@ final class Post_Type_Registrar_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_registered_post_types'] = array();
-		$this->registrar = new Post_Type_Registrar();
+		$this->registrar                       = new Post_Type_Registrar();
 	}
 
 	protected function tearDown(): void {
@@ -64,9 +64,9 @@ final class Post_Type_Registrar_Test extends TestCase {
 
 	public function test_capability_mapping_uses_plugin_caps_not_edit_posts(): void {
 		$this->registrar->register();
-		$registered = $GLOBALS['_aio_registered_post_types'] ?? array();
+		$registered    = $GLOBALS['_aio_registered_post_types'] ?? array();
 		$expected_caps = array(
-			Object_Type_Keys::SECTION_TEMPLATE  => Capabilities::MANAGE_SECTION_TEMPLATES,
+			Object_Type_Keys::SECTION_TEMPLATE => Capabilities::MANAGE_SECTION_TEMPLATES,
 			Object_Type_Keys::PAGE_TEMPLATE    => Capabilities::MANAGE_PAGE_TEMPLATES,
 			Object_Type_Keys::COMPOSITION      => Capabilities::MANAGE_COMPOSITIONS,
 			Object_Type_Keys::BUILD_PLAN       => Capabilities::VIEW_BUILD_PLANS,

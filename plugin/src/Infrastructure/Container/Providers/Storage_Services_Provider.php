@@ -20,12 +20,18 @@ final class Storage_Services_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'assignment_map_service', function (): Assignment_Map_Service {
-			global $wpdb;
-			return new Assignment_Map_Service( $wpdb );
-		} );
-		$container->register( 'plugin_path_manager', function (): Plugin_Path_Manager {
-			return new Plugin_Path_Manager();
-		} );
+		$container->register(
+			'assignment_map_service',
+			function (): Assignment_Map_Service {
+				global $wpdb;
+				return new Assignment_Map_Service( $wpdb );
+			}
+		);
+		$container->register(
+			'plugin_path_manager',
+			function (): Plugin_Path_Manager {
+				return new Plugin_Path_Manager();
+			}
+		);
 	}
 }

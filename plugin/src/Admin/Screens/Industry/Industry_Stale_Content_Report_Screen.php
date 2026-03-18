@@ -46,7 +46,13 @@ final class Industry_Stale_Content_Report_Screen {
 	private function get_report(): array {
 		if ( ! $this->container instanceof Service_Container || ! $this->container->has( 'industry_asset_aging_report_service' ) ) {
 			return array(
-				'summary'           => array( 'total' => 0, 'benign' => 0, 'advisory' => 0, 'high_impact' => 0, 'by_class' => array() ),
+				'summary'           => array(
+					'total'       => 0,
+					'benign'      => 0,
+					'advisory'    => 0,
+					'high_impact' => 0,
+					'by_class'    => array(),
+				),
 				'items'             => array(),
 				'by_class'          => array(),
 				'by_severity'       => array(),
@@ -57,7 +63,13 @@ final class Industry_Stale_Content_Report_Screen {
 		$service = $this->container->get( 'industry_asset_aging_report_service' );
 		if ( ! $service instanceof Industry_Asset_Aging_Report_Service ) {
 			return array(
-				'summary'           => array( 'total' => 0, 'benign' => 0, 'advisory' => 0, 'high_impact' => 0, 'by_class' => array() ),
+				'summary'           => array(
+					'total'       => 0,
+					'benign'      => 0,
+					'advisory'    => 0,
+					'high_impact' => 0,
+					'by_class'    => array(),
+				),
 				'items'             => array(),
 				'by_class'          => array(),
 				'by_severity'       => array(),
@@ -77,15 +89,15 @@ final class Industry_Stale_Content_Report_Screen {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Stale Content Report.', 'aio-page-builder' ), 403 );
 		}
-		$report = $this->get_report();
-		$summary = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
-		$total = (int) ( $summary['total'] ?? 0 );
-		$benign = (int) ( $summary['benign'] ?? 0 );
-		$advisory = (int) ( $summary['advisory'] ?? 0 );
-		$high_impact = (int) ( $summary['high_impact'] ?? 0 );
-		$by_class = isset( $summary['by_class'] ) && is_array( $summary['by_class'] ) ? $summary['by_class'] : array();
+		$report            = $this->get_report();
+		$summary           = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
+		$total             = (int) ( $summary['total'] ?? 0 );
+		$benign            = (int) ( $summary['benign'] ?? 0 );
+		$advisory          = (int) ( $summary['advisory'] ?? 0 );
+		$high_impact       = (int) ( $summary['high_impact'] ?? 0 );
+		$by_class          = isset( $summary['by_class'] ) && is_array( $summary['by_class'] ) ? $summary['by_class'] : array();
 		$high_impact_stale = isset( $report['high_impact_stale'] ) && is_array( $report['high_impact_stale'] ) ? $report['high_impact_stale'] : array();
-		$generated_at = isset( $report['generated_at'] ) && is_string( $report['generated_at'] ) ? $report['generated_at'] : '';
+		$generated_at      = isset( $report['generated_at'] ) && is_string( $report['generated_at'] ) ? $report['generated_at'] : '';
 		?>
 		<div class="wrap aio-page-builder-screen aio-industry-stale-content-report" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>
@@ -130,9 +142,9 @@ final class Industry_Stale_Content_Report_Screen {
 						<tbody>
 							<?php foreach ( array_slice( $high_impact_stale, 0, 100 ) as $item ) : ?>
 								<?php
-								$ref = isset( $item['asset_ref'] ) && is_string( $item['asset_ref'] ) ? $item['asset_ref'] : '';
-								$class = isset( $item['asset_class'] ) && is_string( $item['asset_class'] ) ? $item['asset_class'] : '';
-								$days = isset( $item['days_old'] ) ? (int) $item['days_old'] : 0;
+								$ref       = isset( $item['asset_ref'] ) && is_string( $item['asset_ref'] ) ? $item['asset_ref'] : '';
+								$class     = isset( $item['asset_class'] ) && is_string( $item['asset_class'] ) ? $item['asset_class'] : '';
+								$days      = isset( $item['days_old'] ) ? (int) $item['days_old'] : 0;
 								$rationale = isset( $item['rationale'] ) && is_string( $item['rationale'] ) ? $item['rationale'] : '';
 								?>
 								<tr>

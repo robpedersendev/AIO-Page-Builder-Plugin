@@ -111,7 +111,7 @@ final class Crawler_Comparison_Screen {
 			$prior_profile = '';
 			$new_profile   = '';
 			if ( $result !== null && $prior_run_id !== '' && $new_run_id !== '' && $this->container && $this->container->has( 'crawl_snapshot_service' ) ) {
-				$svc = $this->container->get( 'crawl_snapshot_service' );
+				$svc           = $this->container->get( 'crawl_snapshot_service' );
 				$prior_session = $svc->get_session( $prior_run_id );
 				$new_session   = $svc->get_session( $new_run_id );
 				$prior_profile = $this->get_profile_label( (string) ( $prior_session['crawl_profile_key'] ?? '' ) );

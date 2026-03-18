@@ -22,9 +22,12 @@ final class AI_Regression_Harness_Provider implements Service_Provider_Interface
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'prompt_pack_regression_harness', function () use ( $container ): Prompt_Pack_Regression_Harness {
-			$validator = $container->has( 'ai_output_validator' ) ? $container->get( 'ai_output_validator' ) : new \AIOPageBuilder\Domain\AI\Validation\AI_Output_Validator();
-			return new Prompt_Pack_Regression_Harness( $validator, '' );
-		} );
+		$container->register(
+			'prompt_pack_regression_harness',
+			function () use ( $container ): Prompt_Pack_Regression_Harness {
+				$validator = $container->has( 'ai_output_validator' ) ? $container->get( 'ai_output_validator' ) : new \AIOPageBuilder\Domain\AI\Validation\AI_Output_Validator();
+				return new Prompt_Pack_Regression_Harness( $validator, '' );
+			}
+		);
 	}
 }

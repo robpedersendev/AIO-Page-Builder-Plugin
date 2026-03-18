@@ -40,7 +40,7 @@ final class Snapshot_Payload_Builder {
 	 * @return array{sections: list<array<string, mixed>>, captured_at: string}
 	 */
 	public static function build_section_registry_payload( array $section_definitions ): array {
-		$allowed = array(
+		$allowed  = array(
 			Section_Schema::FIELD_INTERNAL_KEY,
 			Section_Schema::FIELD_NAME,
 			Section_Schema::FIELD_CATEGORY,
@@ -59,8 +59,8 @@ final class Snapshot_Payload_Builder {
 			$sections[] = self::filter_to_allowed( $def, $allowed );
 		}
 		return array(
-			'sections'     => $sections,
-			'captured_at'  => self::iso8601_now(),
+			'sections'    => $sections,
+			'captured_at' => self::iso8601_now(),
 		);
 	}
 
@@ -71,7 +71,7 @@ final class Snapshot_Payload_Builder {
 	 * @return array{templates: list<array<string, mixed>>, captured_at: string}
 	 */
 	public static function build_page_template_registry_payload( array $template_definitions ): array {
-		$allowed = array(
+		$allowed   = array(
 			Page_Template_Schema::FIELD_INTERNAL_KEY,
 			Page_Template_Schema::FIELD_NAME,
 			Page_Template_Schema::FIELD_ARCHETYPE,
@@ -90,8 +90,8 @@ final class Snapshot_Payload_Builder {
 			$templates[] = self::filter_to_allowed( $def, $allowed );
 		}
 		return array(
-			'templates'    => $templates,
-			'captured_at'  => self::iso8601_now(),
+			'templates'   => $templates,
+			'captured_at' => self::iso8601_now(),
 		);
 	}
 
@@ -102,7 +102,7 @@ final class Snapshot_Payload_Builder {
 	 * @return array{composition_id: string, ordered_section_list: array, validation_status: string, source_refs: array, captured_at: string}
 	 */
 	public static function build_composition_context_payload( array $composition_definition ): array {
-		$allowed = array(
+		$allowed                 = array(
 			Composition_Schema::FIELD_COMPOSITION_ID,
 			Composition_Schema::FIELD_NAME,
 			Composition_Schema::FIELD_ORDERED_SECTION_LIST,
@@ -112,11 +112,11 @@ final class Snapshot_Payload_Builder {
 			Composition_Schema::FIELD_SOURCE_TEMPLATE_REF,
 			Composition_Schema::FIELD_DUPLICATED_FROM_COMPOSITION_ID,
 		);
-		$filtered = self::filter_to_allowed( $composition_definition, $allowed );
+		$filtered                = self::filter_to_allowed( $composition_definition, $allowed );
 		$filtered['captured_at'] = self::iso8601_now();
 		$filtered['source_refs'] = array(
-			'source_template_ref'              => (string) ( $composition_definition[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' ),
-			'duplicated_from_composition_id'  => (string) ( $composition_definition[ Composition_Schema::FIELD_DUPLICATED_FROM_COMPOSITION_ID ] ?? '' ),
+			'source_template_ref'            => (string) ( $composition_definition[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' ),
+			'duplicated_from_composition_id' => (string) ( $composition_definition[ Composition_Schema::FIELD_DUPLICATED_FROM_COMPOSITION_ID ] ?? '' ),
 		);
 		return $filtered;
 	}
@@ -153,7 +153,7 @@ final class Snapshot_Payload_Builder {
 			$lower = strtolower( (string) $key );
 			foreach ( self::PROHIBITED_FIELD_PATTERNS as $pattern ) {
 				if ( strpos( $lower, $pattern ) !== false ) {
-					$path = $prefix !== '' ? $prefix . '.' . $key : $key;
+					$path    = $prefix !== '' ? $prefix . '.' . $key : $key;
 					$found[] = $path;
 					break;
 				}
@@ -181,7 +181,7 @@ final class Snapshot_Payload_Builder {
 			if ( is_array( $v ) ) {
 				return false;
 			}
-			$i++;
+			++$i;
 		}
 		return true;
 	}

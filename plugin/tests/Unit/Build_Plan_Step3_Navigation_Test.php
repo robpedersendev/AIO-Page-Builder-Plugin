@@ -58,15 +58,43 @@ final class Build_Plan_Step3_Navigation_Test extends TestCase {
 
 	/** Example Step 3 detail payload (spec §34.4–34.7). */
 	public const EXAMPLE_NAVIGATION_DETAIL = array(
-		'item_id'  => 'plan_mcp_0',
-		'sections' => array(
-			array( 'heading' => 'Navigation context', 'key' => 'navigation_context', 'content_lines' => array() ),
-			array( 'heading' => 'Current vs proposed navigation', 'key' => 'current_vs_proposed', 'content_lines' => array() ),
-			array( 'heading' => 'Detected differences', 'key' => 'diff_summary', 'content_lines' => array() ),
-			array( 'heading' => 'Menu rename / create / location', 'key' => 'menu_action', 'content_lines' => array() ),
-			array( 'heading' => 'Menu item assignment', 'key' => 'item_assignment', 'content_lines' => array() ),
-			array( 'heading' => 'Menu location assignment', 'key' => 'location_assignment', 'content_lines' => array() ),
-			array( 'heading' => 'Navigation validation', 'key' => 'validation', 'content_lines' => array() ),
+		'item_id'     => 'plan_mcp_0',
+		'sections'    => array(
+			array(
+				'heading'       => 'Navigation context',
+				'key'           => 'navigation_context',
+				'content_lines' => array(),
+			),
+			array(
+				'heading'       => 'Current vs proposed navigation',
+				'key'           => 'current_vs_proposed',
+				'content_lines' => array(),
+			),
+			array(
+				'heading'       => 'Detected differences',
+				'key'           => 'diff_summary',
+				'content_lines' => array(),
+			),
+			array(
+				'heading'       => 'Menu rename / create / location',
+				'key'           => 'menu_action',
+				'content_lines' => array(),
+			),
+			array(
+				'heading'       => 'Menu item assignment',
+				'key'           => 'item_assignment',
+				'content_lines' => array(),
+			),
+			array(
+				'heading'       => 'Menu location assignment',
+				'key'           => 'location_assignment',
+				'content_lines' => array(),
+			),
+			array(
+				'heading'       => 'Navigation validation',
+				'key'           => 'validation',
+				'content_lines' => array(),
+			),
 		),
 		'row_actions' => array(),
 	);
@@ -88,23 +116,43 @@ final class Build_Plan_Step3_Navigation_Test extends TestCase {
 				Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE,
 				Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::PENDING,
 				Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
-					'menu_context'        => $i === 0 ? 'header' : 'footer',
+					'menu_context'       => $i === 0 ? 'header' : 'footer',
 					'action'             => $i === 0 ? 'rename' : 'update_existing',
 					'current_menu_name'  => $i === 0 ? 'Primary Menu' : 'Footer Links',
 					'proposed_menu_name' => $i === 0 ? 'Main Navigation' : 'Footer Navigation',
 					'items'              => array(
-						array( 'label' => 'Home', 'url' => '/', 'order' => 1 ),
-						array( 'label' => 'About', 'url' => '/about', 'order' => 2 ),
+						array(
+							'label' => 'Home',
+							'url'   => '/',
+							'order' => 1,
+						),
+						array(
+							'label' => 'About',
+							'url'   => '/about',
+							'order' => 2,
+						),
 					),
-					'diff_summary' => array( 'Missing pages in navigation', 'Ordering differences' ),
+					'diff_summary'       => array( 'Missing pages in navigation', 'Ordering differences' ),
 				),
 			);
 		}
 		$steps = array(
-			array( 'step_type' => 'overview', 'items' => array() ),
-			array( 'step_type' => Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES, 'items' => array() ),
-			array( 'step_type' => Build_Plan_Schema::STEP_TYPE_NEW_PAGES, 'items' => array() ),
-			array( 'step_type' => Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW, 'items' => array() ),
+			array(
+				'step_type' => 'overview',
+				'items'     => array(),
+			),
+			array(
+				'step_type' => Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES,
+				'items'     => array(),
+			),
+			array(
+				'step_type' => Build_Plan_Schema::STEP_TYPE_NEW_PAGES,
+				'items'     => array(),
+			),
+			array(
+				'step_type' => Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW,
+				'items'     => array(),
+			),
 			array(
 				Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_NAVIGATION,
 				Build_Plan_Item_Schema::KEY_ITEMS     => $items,
@@ -141,11 +189,11 @@ final class Build_Plan_Step3_Navigation_Test extends TestCase {
 
 	/** Detail builder produces sections per spec §34.1–34.10. */
 	public function test_detail_builder_sections(): void {
-		$item = array(
-			Build_Plan_Item_Schema::KEY_ITEM_ID  => 'plan_mcp_0',
-			Build_Plan_Item_Schema::KEY_STATUS   => Build_Plan_Item_Statuses::PENDING,
+		$item     = array(
+			Build_Plan_Item_Schema::KEY_ITEM_ID => 'plan_mcp_0',
+			Build_Plan_Item_Schema::KEY_STATUS  => Build_Plan_Item_Statuses::PENDING,
 			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
-				'menu_context'        => 'header',
+				'menu_context'       => 'header',
 				'action'             => 'rename',
 				'current_menu_name'  => 'Primary',
 				'proposed_menu_name' => 'Main Nav',
@@ -210,17 +258,19 @@ final class Build_Plan_Step3_Navigation_Test extends TestCase {
 		try {
 			$repo    = new Build_Plan_Repository();
 			$def     = $this->navigation_plan_definition( 1 );
-			$post_id = $repo->save( array(
-				'plan_definition' => $def,
-				'internal_key'    => 'test-plan-nav-approve',
-				'post_title'      => 'Test Nav',
-				'status'          => 'publish',
-			) );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-nav-approve',
+					'post_title'      => 'Test Nav',
+					'status'          => 'publish',
+				)
+			);
 			$this->assertGreaterThan( 0, $post_id );
 			$bulk    = new Navigation_Bulk_Action_Service( $repo );
 			$updated = $bulk->approve_item( $post_id, 'plan_mcp_0' );
 			$this->assertTrue( $updated );
-			$def2 = $repo->get_plan_definition( $post_id );
+			$def2  = $repo->get_plan_definition( $post_id );
 			$step4 = $def2[ Build_Plan_Schema::KEY_STEPS ][ Navigation_Bulk_Action_Service::STEP_INDEX_NAVIGATION ] ?? null;
 			$this->assertNotNull( $step4 );
 			$item = $step4[ Build_Plan_Item_Schema::KEY_ITEMS ][0] ?? null;
@@ -237,12 +287,14 @@ final class Build_Plan_Step3_Navigation_Test extends TestCase {
 		try {
 			$repo    = new Build_Plan_Repository();
 			$def     = $this->navigation_plan_definition( 1 );
-			$post_id = $repo->save( array(
-				'plan_definition' => $def,
-				'internal_key'    => 'test-plan-nav-deny',
-				'post_title'      => 'Test Nav Deny',
-				'status'          => 'publish',
-			) );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-nav-deny',
+					'post_title'      => 'Test Nav Deny',
+					'status'          => 'publish',
+				)
+			);
 			$this->assertGreaterThan( 0, $post_id );
 			$bulk    = new Navigation_Bulk_Action_Service( $repo );
 			$updated = $bulk->deny_item( $post_id, 'plan_mcp_0' );

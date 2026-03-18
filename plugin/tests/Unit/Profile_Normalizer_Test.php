@@ -39,23 +39,29 @@ final class Profile_Normalizer_Test extends TestCase {
 	}
 
 	public function test_normalize_brand_profile_sanitizes_formality_level_enum(): void {
-		$out = $this->normalizer->normalize_brand_profile( array(
-			'voice_tone' => array( 'formality_level' => 'neutral' ),
-		) );
+		$out = $this->normalizer->normalize_brand_profile(
+			array(
+				'voice_tone' => array( 'formality_level' => 'neutral' ),
+			)
+		);
 		$this->assertSame( 'neutral', $out[ Profile_Schema::BRAND_VOICE_TONE ]['formality_level'] );
 	}
 
 	public function test_normalize_brand_profile_rejects_invalid_formality_level(): void {
-		$out = $this->normalizer->normalize_brand_profile( array(
-			'voice_tone' => array( 'formality_level' => 'super_casual' ),
-		) );
+		$out = $this->normalizer->normalize_brand_profile(
+			array(
+				'voice_tone' => array( 'formality_level' => 'super_casual' ),
+			)
+		);
 		$this->assertSame( '', $out[ Profile_Schema::BRAND_VOICE_TONE ]['formality_level'] );
 	}
 
 	public function test_normalize_brand_profile_sanitizes_clarity_vs_sophistication(): void {
-		$out = $this->normalizer->normalize_brand_profile( array(
-			'voice_tone' => array( 'clarity_vs_sophistication' => 'sophistication' ),
-		) );
+		$out = $this->normalizer->normalize_brand_profile(
+			array(
+				'voice_tone' => array( 'clarity_vs_sophistication' => 'sophistication' ),
+			)
+		);
 		$this->assertSame( 'sophistication', $out[ Profile_Schema::BRAND_VOICE_TONE ]['clarity_vs_sophistication'] );
 	}
 
@@ -70,23 +76,36 @@ final class Profile_Normalizer_Test extends TestCase {
 	}
 
 	public function test_normalize_business_profile_sanitizes_dedicated_pages_likely(): void {
-		$out = $this->normalizer->normalize_business_profile( array(
-			'services_offers' => array(
-				array( 'name' => 'Tax', 'dedicated_pages_likely' => 'yes' ),
-				array( 'name' => 'Other', 'dedicated_pages_likely' => 'invalid' ),
-			),
-		) );
+		$out = $this->normalizer->normalize_business_profile(
+			array(
+				'services_offers' => array(
+					array(
+						'name'                   => 'Tax',
+						'dedicated_pages_likely' => 'yes',
+					),
+					array(
+						'name'                   => 'Other',
+						'dedicated_pages_likely' => 'invalid',
+					),
+				),
+			)
+		);
 		$this->assertSame( 'yes', $out[ Profile_Schema::BUSINESS_SERVICES_OFFERS ][0]['dedicated_pages_likely'] );
 		$this->assertSame( '', $out[ Profile_Schema::BUSINESS_SERVICES_OFFERS ][1]['dedicated_pages_likely'] );
 	}
 
 	public function test_normalize_business_profile_sanitizes_in_person_vs_remote(): void {
-		$out = $this->normalizer->normalize_business_profile( array(
-			'geography' => array(
-				array( 'primary_location' => 'Denver', 'in_person_vs_remote' => 'both' ),
-				array( 'in_person_vs_remote' => 'invalid_enum' ),
-			),
-		) );
+		$out = $this->normalizer->normalize_business_profile(
+			array(
+				'geography' => array(
+					array(
+						'primary_location'    => 'Denver',
+						'in_person_vs_remote' => 'both',
+					),
+					array( 'in_person_vs_remote' => 'invalid_enum' ),
+				),
+			)
+		);
 		$this->assertSame( 'both', $out[ Profile_Schema::BUSINESS_GEOGRAPHY ][0]['in_person_vs_remote'] );
 		$this->assertSame( '', $out[ Profile_Schema::BUSINESS_GEOGRAPHY ][1]['in_person_vs_remote'] );
 	}
@@ -110,23 +129,33 @@ final class Profile_Normalizer_Test extends TestCase {
 	}
 
 	public function test_prohibited_secret_like_fields_not_stored_in_brand(): void {
-		$out = $this->normalizer->normalize_brand_profile( array(
-			'brand_voice_summary' => 'Fine',
-			'api_key'            => 'secret123',
-			'password'           => 'hidden',
-		) );
+		$out = $this->normalizer->normalize_brand_profile(
+			array(
+				'brand_voice_summary' => 'Fine',
+				'api_key'             => 'secret123',
+				'password'            => 'hidden',
+			)
+		);
 		$this->assertArrayNotHasKey( 'api_key', $out );
 		$this->assertArrayNotHasKey( 'password', $out );
 		$this->assertSame( 'Fine', $out['brand_voice_summary'] );
 	}
 
 	public function test_asset_references_role_enum_sanitized(): void {
-		$out = $this->normalizer->normalize_brand_profile( array(
-			'asset_references' => array(
-				array( 'role' => 'logo', 'notes' => 'Main' ),
-				array( 'role' => 'invalid_role', 'notes' => 'X' ),
-			),
-		) );
+		$out = $this->normalizer->normalize_brand_profile(
+			array(
+				'asset_references' => array(
+					array(
+						'role'  => 'logo',
+						'notes' => 'Main',
+					),
+					array(
+						'role'  => 'invalid_role',
+						'notes' => 'X',
+					),
+				),
+			)
+		);
 		$this->assertSame( 'logo', $out[ Profile_Schema::BRAND_ASSET_REFERENCES ][0]['role'] );
 		$this->assertSame( '', $out[ Profile_Schema::BRAND_ASSET_REFERENCES ][1]['role'] );
 	}

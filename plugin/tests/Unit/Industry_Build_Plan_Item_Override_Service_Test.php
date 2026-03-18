@@ -39,7 +39,7 @@ final class Industry_Build_Plan_Item_Override_Service_Test extends TestCase {
 
 	public function test_record_override_saves_and_get_override_returns_it(): void {
 		$service = new Industry_Build_Plan_Item_Override_Service();
-		$ok = $service->record_override( 'plan-1', 'item-a', Industry_Override_Schema::STATE_ACCEPTED, 'Reviewer approved.' );
+		$ok      = $service->record_override( 'plan-1', 'item-a', Industry_Override_Schema::STATE_ACCEPTED, 'Reviewer approved.' );
 		$this->assertTrue( $ok );
 		$override = $service->get_override( 'plan-1', 'item-a' );
 		$this->assertIsArray( $override );

@@ -43,8 +43,8 @@ final class Industry_Starter_Bundle_Assistant {
 		?Industry_Subtype_Registry $subtype_registry = null
 	) {
 		$this->profile_repo     = $profile_repo;
-		$this->bundle_registry   = $bundle_registry;
-		$this->subtype_registry  = $subtype_registry;
+		$this->bundle_registry  = $bundle_registry;
+		$this->subtype_registry = $subtype_registry;
 	}
 
 	/**
@@ -56,24 +56,27 @@ final class Industry_Starter_Bundle_Assistant {
 	 */
 	public function build_state( array $profile ): array {
 		$view_model = Subtype_Starter_Bundle_Selection_View_Model::from_profile( $profile, $this->bundle_registry, $this->subtype_registry );
-		$bundles = $view_model->display_bundles !== array()
+		$bundles    = $view_model->display_bundles !== array()
 			? $view_model->display_bundles
-			: array_map( function ( array $b ): array {
-				return array(
-					Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_BUNDLE_KEY       => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '' ),
-					Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_LABEL           => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ?? '' ),
-					Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_SUMMARY         => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_SUMMARY ] ?? '' ),
-					Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_IS_SUBTYPE_BUNDLE => false,
-					Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_GROUP_LABEL     => '',
-				);
-			}, $view_model->parent_bundles );
+			: array_map(
+				function ( array $b ): array {
+					return array(
+						Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_BUNDLE_KEY       => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_BUNDLE_KEY ] ?? '' ),
+						Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_LABEL           => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ?? '' ),
+						Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_SUMMARY         => (string) ( $b[ Industry_Starter_Bundle_Registry::FIELD_SUMMARY ] ?? '' ),
+						Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_IS_SUBTYPE_BUNDLE => false,
+						Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_GROUP_LABEL     => '',
+					);
+				},
+				$view_model->parent_bundles
+			);
 		return array(
-			'has_primary'                 => $view_model->has_primary,
-			'primary_industry_key'       => $view_model->primary_industry_key,
-			'bundles'                    => $bundles,
-			'selected_key'               => $view_model->selected_key,
-			'field_name'                 => $view_model->field_name,
-			'subtype_bundle_view_model'  => $view_model,
+			'has_primary'               => $view_model->has_primary,
+			'primary_industry_key'      => $view_model->primary_industry_key,
+			'bundles'                   => $bundles,
+			'selected_key'              => $view_model->selected_key,
+			'field_name'                => $view_model->field_name,
+			'subtype_bundle_view_model' => $view_model,
 		);
 	}
 
@@ -88,10 +91,10 @@ final class Industry_Starter_Bundle_Assistant {
 		if ( ! $state['has_primary'] || empty( $state['bundles'] ) ) {
 			return;
 		}
-		$bundles    = $state['bundles'];
-		$selected   = $state['selected_key'];
-		$field_name = $state['field_name'];
-		$vm         = $state['subtype_bundle_view_model'] ?? null;
+		$bundles      = $state['bundles'];
+		$selected     = $state['selected_key'];
+		$field_name   = $state['field_name'];
+		$vm           = $state['subtype_bundle_view_model'] ?? null;
 		$use_optgroup = $vm !== null && $vm->has_subtype_bundles && $vm->parent_bundles !== array();
 		?>
 		<tr class="aio-starter-bundle-assistant">
@@ -126,7 +129,8 @@ final class Industry_Starter_Bundle_Assistant {
 							$label      = (string) ( $bundle[ Subtype_Starter_Bundle_Selection_View_Model::DISPLAY_LABEL ] ?? $bundle[ Industry_Starter_Bundle_Registry::FIELD_LABEL ] ?? $bundle_key );
 							?>
 							<option value="<?php echo \esc_attr( $bundle_key ); ?>" <?php selected( $selected, $bundle_key ); ?>><?php echo \esc_html( $label ); ?></option>
-						<?php }
+							<?php
+						}
 					}
 					?>
 				</select>

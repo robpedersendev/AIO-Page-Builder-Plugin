@@ -28,10 +28,10 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 	private string $base_url;
 
 	/**
-	 * @param Provider_Error_Normalizer     $error_normalizer
-	 * @param Provider_Response_Normalizer $response_normalizer
+	 * @param Provider_Error_Normalizer       $error_normalizer
+	 * @param Provider_Response_Normalizer    $response_normalizer
 	 * @param Provider_Secret_Store_Interface $secret_store
-	 * @param string                       $base_url Optional; default OpenAI API base.
+	 * @param string                          $base_url Optional; default OpenAI API base.
 	 */
 	public function __construct(
 		Provider_Error_Normalizer $error_normalizer,
@@ -39,16 +39,28 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		Provider_Secret_Store_Interface $secret_store,
 		string $base_url = self::API_BASE
 	) {
-		$this->base_url = rtrim( $base_url, '/' );
+		$this->base_url       = rtrim( $base_url, '/' );
 		$default_capabilities = array(
 			'provider_id'                 => 'openai',
 			'structured_output_supported' => true,
-			'file_attachment_supported'  => false,
-			'max_context_tokens'         => 128000,
-			'models'                     => array(
-				array( 'id' => 'gpt-4o', 'supports_structured_output' => true, 'default_for_planning' => true ),
-				array( 'id' => 'gpt-4o-mini', 'supports_structured_output' => true, 'default_for_planning' => false ),
-				array( 'id' => 'gpt-4-turbo', 'supports_structured_output' => true, 'default_for_planning' => false ),
+			'file_attachment_supported'   => false,
+			'max_context_tokens'          => 128000,
+			'models'                      => array(
+				array(
+					'id'                         => 'gpt-4o',
+					'supports_structured_output' => true,
+					'default_for_planning'       => true,
+				),
+				array(
+					'id'                         => 'gpt-4o-mini',
+					'supports_structured_output' => true,
+					'default_for_planning'       => false,
+				),
+				array(
+					'id'                         => 'gpt-4-turbo',
+					'supports_structured_output' => true,
+					'default_for_planning'       => false,
+				),
 			),
 		);
 		parent::__construct( 'openai', $error_normalizer, $response_normalizer, $secret_store, $default_capabilities );
@@ -70,9 +82,15 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 
 		$messages = array();
 		if ( $system !== '' ) {
-			$messages[] = array( 'role' => 'system', 'content' => $system );
+			$messages[] = array(
+				'role'    => 'system',
+				'content' => $system,
+			);
 		}
-		$messages[] = array( 'role' => 'user', 'content' => $user );
+		$messages[] = array(
+			'role'    => 'user',
+			'content' => $user,
+		);
 
 		$body = array(
 			'model'      => $model,
@@ -82,13 +100,13 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 
 		$url  = $this->base_url . '/chat/completions';
 		$args = array(
-			'method'      => 'POST',
-			'timeout'     => $timeout,
-			'headers'     => array(
+			'method'  => 'POST',
+			'timeout' => $timeout,
+			'headers' => array(
 				'Authorization' => 'Bearer ' . $credential,
 				'Content-Type'  => 'application/json',
 			),
-			'body'        => wp_json_encode( $body ),
+			'body'    => wp_json_encode( $body ),
 		);
 
 		$response = wp_remote_post( $url, $args );
@@ -161,7 +179,7 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 
 		return array(
 			'success'               => true,
-			'structured_payload'     => $structured_payload,
+			'structured_payload'    => $structured_payload,
 			'usage'                 => $usage_normalized,
 			'raw_provider_metadata' => $raw_meta,
 		);

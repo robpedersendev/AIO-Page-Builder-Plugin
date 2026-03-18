@@ -42,7 +42,7 @@ final class Documentation_Registry_Test extends TestCase {
 
 	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
-		$plugin_root     = dirname( __DIR__, 2 );
+		$plugin_root          = dirname( __DIR__, 2 );
 		self::$docs_base_path = $plugin_root . '/src/Domain/Registries/Docs';
 	}
 
@@ -238,11 +238,25 @@ final class Documentation_Registry_Test extends TestCase {
 	/** Contact/Form/Conversion batch section keys (Prompt 269). */
 	private static function contact_form_conversion_section_keys(): array {
 		return array(
-			'cta_contact_01', 'cta_contact_02', 'cta_inquiry_01', 'cta_inquiry_02',
-			'cta_booking_01', 'cta_booking_02', 'cta_quote_request_01', 'cta_quote_request_02',
-			'cta_consultation_01', 'cta_consultation_02', 'cta_purchase_01', 'cta_purchase_02',
-			'cta_trust_confirm_01', 'cta_trust_confirm_02', 'cta_support_01', 'cta_support_02',
-			'lpu_contact_panel_01', 'lpu_contact_detail_01', 'lpu_inquiry_support_01',
+			'cta_contact_01',
+			'cta_contact_02',
+			'cta_inquiry_01',
+			'cta_inquiry_02',
+			'cta_booking_01',
+			'cta_booking_02',
+			'cta_quote_request_01',
+			'cta_quote_request_02',
+			'cta_consultation_01',
+			'cta_consultation_02',
+			'cta_purchase_01',
+			'cta_purchase_02',
+			'cta_trust_confirm_01',
+			'cta_trust_confirm_02',
+			'cta_support_01',
+			'cta_support_02',
+			'lpu_contact_panel_01',
+			'lpu_contact_detail_01',
+			'lpu_inquiry_support_01',
 		);
 	}
 
@@ -267,12 +281,29 @@ final class Documentation_Registry_Test extends TestCase {
 	/** Pricing/Offer batch section keys (Prompt 270): fb_* + gc_offer_*. */
 	private static function pricing_offer_section_keys(): array {
 		return array(
-			'fb_offer_compare_01', 'fb_package_summary_01', 'fb_offer_highlight_01',
-			'gc_offer_value_01', 'gc_offer_value_02', 'gc_offer_pricing_01',
-			'gc_offer_feature_01', 'gc_offer_feature_02', 'gc_offer_local_01',
-			'gc_offer_product_01', 'gc_offer_product_02', 'gc_offer_bundle_01', 'gc_offer_compare_01',
-			'gc_offer_01', 'gc_offer_02', 'gc_offer_03', 'gc_offer_04', 'gc_offer_05',
-			'gc_offer_06', 'gc_offer_07', 'gc_offer_08', 'gc_offer_09', 'gc_offer_10',
+			'fb_offer_compare_01',
+			'fb_package_summary_01',
+			'fb_offer_highlight_01',
+			'gc_offer_value_01',
+			'gc_offer_value_02',
+			'gc_offer_pricing_01',
+			'gc_offer_feature_01',
+			'gc_offer_feature_02',
+			'gc_offer_local_01',
+			'gc_offer_product_01',
+			'gc_offer_product_02',
+			'gc_offer_bundle_01',
+			'gc_offer_compare_01',
+			'gc_offer_01',
+			'gc_offer_02',
+			'gc_offer_03',
+			'gc_offer_04',
+			'gc_offer_05',
+			'gc_offer_06',
+			'gc_offer_07',
+			'gc_offer_08',
+			'gc_offer_09',
+			'gc_offer_10',
 		);
 	}
 
@@ -373,9 +404,18 @@ final class Documentation_Registry_Test extends TestCase {
 		$loader   = new Documentation_Loader( self::$docs_base_path );
 		$registry = new Documentation_Registry( $loader );
 		$keys     = array(
-			'pt_privacy_overview_01', 'pt_privacy_detail_01', 'pt_terms_overview_01', 'pt_terms_structure_01',
-			'pt_accessibility_commitment_01', 'pt_accessibility_help_01', 'pt_support_help_01', 'pt_support_escalation_01',
-			'pt_contact_utility_01', 'pt_disclosure_utility_01', 'pt_trust_disclosure_01', 'pt_utility_legal_01',
+			'pt_privacy_overview_01',
+			'pt_privacy_detail_01',
+			'pt_terms_overview_01',
+			'pt_terms_structure_01',
+			'pt_accessibility_commitment_01',
+			'pt_accessibility_help_01',
+			'pt_support_help_01',
+			'pt_support_escalation_01',
+			'pt_contact_utility_01',
+			'pt_disclosure_utility_01',
+			'pt_trust_disclosure_01',
+			'pt_utility_legal_01',
 		);
 		foreach ( $keys as $page_template_key ) {
 			$doc = $registry->get_by_page_template_key( $page_template_key );
@@ -431,8 +471,12 @@ final class Documentation_Registry_Test extends TestCase {
 		$loader   = new Documentation_Loader( self::$docs_base_path );
 		$registry = new Documentation_Registry( $loader );
 		$keys     = array(
-			'nested_hub_services_intro_01', 'nested_hub_services_intro_02', 'nested_hub_services_listing_01',
-			'nested_hub_services_comparison_01', 'nested_hub_services_educational_01', 'nested_hub_services_specialized_01',
+			'nested_hub_services_intro_01',
+			'nested_hub_services_intro_02',
+			'nested_hub_services_listing_01',
+			'nested_hub_services_comparison_01',
+			'nested_hub_services_educational_01',
+			'nested_hub_services_specialized_01',
 		);
 		foreach ( $keys as $page_template_key ) {
 			$doc = $registry->get_by_page_template_key( $page_template_key );
@@ -452,8 +496,13 @@ final class Documentation_Registry_Test extends TestCase {
 		$loader   = new Documentation_Loader( self::$docs_base_path );
 		$registry = new Documentation_Registry( $loader );
 		$keys     = array(
-			'child_detail_service_conversion_01', 'child_detail_service_educational_01', 'child_detail_service_proof_dense_01',
-			'child_detail_service_booking_01', 'child_detail_treatment_detail_01', 'child_detail_service_trust_01', 'child_detail_service_process_01',
+			'child_detail_service_conversion_01',
+			'child_detail_service_educational_01',
+			'child_detail_service_proof_dense_01',
+			'child_detail_service_booking_01',
+			'child_detail_treatment_detail_01',
+			'child_detail_service_trust_01',
+			'child_detail_service_process_01',
 		);
 		foreach ( $keys as $page_template_key ) {
 			$doc = $registry->get_by_page_template_key( $page_template_key );
@@ -473,8 +522,11 @@ final class Documentation_Registry_Test extends TestCase {
 		$loader   = new Documentation_Loader( self::$docs_base_path );
 		$registry = new Documentation_Registry( $loader );
 		$keys     = array(
-			'child_detail_location_local_01', 'child_detail_location_trust_01', 'child_detail_location_contact_01',
-			'child_detail_location_visit_01', 'child_detail_location_service_01',
+			'child_detail_location_local_01',
+			'child_detail_location_trust_01',
+			'child_detail_location_contact_01',
+			'child_detail_location_visit_01',
+			'child_detail_location_service_01',
 		);
 		foreach ( $keys as $page_template_key ) {
 			$doc = $registry->get_by_page_template_key( $page_template_key );

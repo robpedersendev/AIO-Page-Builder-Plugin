@@ -26,8 +26,8 @@ final class Profile_Validation_Result {
 	public readonly ?array $sanitized_payload;
 
 	public function __construct( bool $valid, array $errors = array(), ?array $sanitized_payload = null ) {
-		$this->valid            = $valid;
-		$this->errors           = $errors;
+		$this->valid             = $valid;
+		$this->errors            = $errors;
 		$this->sanitized_payload = $sanitized_payload;
 	}
 

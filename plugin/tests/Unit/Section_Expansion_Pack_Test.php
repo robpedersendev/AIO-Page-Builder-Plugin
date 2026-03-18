@@ -52,19 +52,19 @@ final class Section_Expansion_Pack_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_post_meta']   = array();
+		$GLOBALS['_aio_post_meta']      = array();
 		$GLOBALS['_aio_wp_query_posts'] = array();
-		$repo     = new Section_Template_Repository();
-		$normalizer = new Section_Definition_Normalizer();
-		$this->validator = new Section_Validator( $normalizer, $repo );
-		$bp_validator = new Section_Field_Blueprint_Validator();
-		$this->blueprint_service = new Section_Field_Blueprint_Service(
+		$repo                           = new Section_Template_Repository();
+		$normalizer                     = new Section_Definition_Normalizer();
+		$this->validator                = new Section_Validator( $normalizer, $repo );
+		$bp_validator                   = new Section_Field_Blueprint_Validator();
+		$this->blueprint_service        = new Section_Field_Blueprint_Service(
 			$repo,
 			$bp_validator,
 			new Section_Field_Blueprint_Normalizer( $bp_validator )
 		);
-		$this->context_builder = new Section_Render_Context_Builder();
-		$this->renderer = new Section_Renderer_Base();
+		$this->context_builder          = new Section_Render_Context_Builder();
+		$this->renderer                 = new Section_Renderer_Base();
 	}
 
 	protected function tearDown(): void {
@@ -90,7 +90,7 @@ final class Section_Expansion_Pack_Test extends TestCase {
 		$normalizer = new Section_Definition_Normalizer();
 		foreach ( Section_Expansion_Pack_Definitions::all_definitions() as $def ) {
 			$normalized = $normalizer->normalize( $def );
-			$errors = $this->validator->validate_completeness( $normalized );
+			$errors     = $this->validator->validate_completeness( $normalized );
 			$this->assertEmpty( $errors, 'Definition ' . ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '?' ) . ' should pass completeness: ' . implode( ', ', $errors ) );
 		}
 	}
@@ -113,14 +113,39 @@ final class Section_Expansion_Pack_Test extends TestCase {
 
 	public function test_each_definition_builds_render_context_without_errors(): void {
 		$minimal_values = array(
-			Section_Expansion_Pack_Definitions::KEY_STATS_HIGHLIGHTS => array( 'headline' => 'By the numbers', 'stat_items' => array( array( 'label' => 'Clients', 'value' => '100', 'suffix' => '+' ) ) ),
-			Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION   => array( 'headline' => 'Get started', 'subheadline' => '', 'primary_cta' => array( 'url' => '#', 'title' => 'Sign up' ), 'secondary_cta' => array() ),
-			Section_Expansion_Pack_Definitions::KEY_FAQ             => array( 'headline' => 'FAQ', 'faq_items' => array( array( 'question' => 'Q?', 'answer' => 'A.' ) ) ),
+			Section_Expansion_Pack_Definitions::KEY_STATS_HIGHLIGHTS => array(
+				'headline'   => 'By the numbers',
+				'stat_items' => array(
+					array(
+						'label'  => 'Clients',
+						'value'  => '100',
+						'suffix' => '+',
+					),
+				),
+			),
+			Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION => array(
+				'headline'      => 'Get started',
+				'subheadline'   => '',
+				'primary_cta'   => array(
+					'url'   => '#',
+					'title' => 'Sign up',
+				),
+				'secondary_cta' => array(),
+			),
+			Section_Expansion_Pack_Definitions::KEY_FAQ => array(
+				'headline'  => 'FAQ',
+				'faq_items' => array(
+					array(
+						'question' => 'Q?',
+						'answer'   => 'A.',
+					),
+				),
+			),
 		);
 		foreach ( Section_Expansion_Pack_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key    = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$values = $minimal_values[ $key ] ?? array();
-			$out = $this->context_builder->build( $def, $values, 0, null );
+			$out    = $this->context_builder->build( $def, $values, 0, null );
 			$this->assertEmpty( $out['errors'], 'Render context for ' . $key . ' should build: ' . implode( ', ', $out['errors'] ) );
 			$this->assertInstanceOf( \AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context::class, $out['context'] );
 		}
@@ -128,16 +153,27 @@ final class Section_Expansion_Pack_Test extends TestCase {
 
 	public function test_each_definition_render_produces_selector_map(): void {
 		$minimal_values = array(
-			Section_Expansion_Pack_Definitions::KEY_STATS_HIGHLIGHTS => array( 'headline' => '', 'stat_items' => array() ),
-			Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION   => array( 'headline' => '', 'subheadline' => '', 'primary_cta' => array(), 'secondary_cta' => array() ),
-			Section_Expansion_Pack_Definitions::KEY_FAQ             => array( 'headline' => '', 'faq_items' => array() ),
+			Section_Expansion_Pack_Definitions::KEY_STATS_HIGHLIGHTS => array(
+				'headline'   => '',
+				'stat_items' => array(),
+			),
+			Section_Expansion_Pack_Definitions::KEY_CTA_CONVERSION => array(
+				'headline'      => '',
+				'subheadline'   => '',
+				'primary_cta'   => array(),
+				'secondary_cta' => array(),
+			),
+			Section_Expansion_Pack_Definitions::KEY_FAQ => array(
+				'headline'  => '',
+				'faq_items' => array(),
+			),
 		);
 		foreach ( Section_Expansion_Pack_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key    = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$values = $minimal_values[ $key ] ?? array();
-			$out = $this->context_builder->build( $def, $values, 0, null );
+			$out    = $this->context_builder->build( $def, $values, 0, null );
 			$this->assertEmpty( $out['errors'] );
-			$result = $this->renderer->render( $out['context'] );
+			$result       = $this->renderer->render( $out['context'] );
 			$selector_map = $result->get_selector_map();
 			$this->assertArrayHasKey( 'wrapper_class', $selector_map );
 			$this->assertSame( 'aio-s-' . $key, $selector_map['wrapper_class'], 'wrapper_class must follow css-selector-contract' );
@@ -148,9 +184,9 @@ final class Section_Expansion_Pack_Test extends TestCase {
 
 	public function test_each_definition_has_helper_and_css_contract_refs(): void {
 		foreach ( Section_Expansion_Pack_Definitions::all_definitions() as $def ) {
-			$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+			$key        = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$helper_ref = (string) ( $def[ Section_Schema::FIELD_HELPER_REF ] ?? '' );
-			$css_ref = (string) ( $def[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' );
+			$css_ref    = (string) ( $def[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' );
 			$this->assertNotSame( '', $helper_ref, "Section {$key} must have non-empty helper_ref" );
 			$this->assertNotSame( '', $css_ref, "Section {$key} must have non-empty css_contract_ref" );
 		}

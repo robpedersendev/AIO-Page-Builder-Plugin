@@ -42,7 +42,7 @@ final class Table_Names_Test extends TestCase {
 	}
 
 	public function test_full_name_uses_prefix(): void {
-		$wpdb = new \stdClass();
+		$wpdb         = new \stdClass();
 		$wpdb->prefix = 'wp_';
 		$this->assertSame( 'wp_' . Table_Names::CRAWL_SNAPSHOTS, Table_Names::full_name( $wpdb, Table_Names::CRAWL_SNAPSHOTS ) );
 		$this->assertSame( 'wp_aio_job_queue', Table_Names::full_name( $wpdb, Table_Names::JOB_QUEUE ) );

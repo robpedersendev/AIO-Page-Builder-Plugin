@@ -59,11 +59,11 @@ final class Blueprint_Family_Scale_Test extends TestCase {
 	/** Example section definition with variation_family_key and default_variant. */
 	private function example_section_definition( string $variant = 'default' ): array {
 		return array(
-			Section_Schema::FIELD_INTERNAL_KEY     => 'hero_primary_01',
+			Section_Schema::FIELD_INTERNAL_KEY    => 'hero_primary_01',
 			'field_blueprint_ref'                 => 'acf_blueprint_hero_primary',
-			'variation_family_key'                 => 'hero_primary',
-			Section_Schema::FIELD_DEFAULT_VARIANT  => $variant,
-			'section_purpose_family'               => 'hero',
+			'variation_family_key'                => 'hero_primary',
+			Section_Schema::FIELD_DEFAULT_VARIANT => $variant,
+			'section_purpose_family'              => 'hero',
 		);
 	}
 
@@ -80,11 +80,15 @@ final class Blueprint_Family_Scale_Test extends TestCase {
 
 	public function test_registry_get_base_blueprint_ref_and_variant_overrides(): void {
 		$registry = new Blueprint_Family_Registry();
-		$registry->register_family( 'proof_cards', 'acf_blueprint_proof', array(
-			'compact' => array(
-				Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES => array( 'quote', 'attribution' ),
-			),
-		) );
+		$registry->register_family(
+			'proof_cards',
+			'acf_blueprint_proof',
+			array(
+				'compact' => array(
+					Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES => array( 'quote', 'attribution' ),
+				),
+			)
+		);
 		$this->assertSame( 'acf_blueprint_proof', $registry->get_base_blueprint_ref( 'proof_cards' ) );
 		$overrides = $registry->get_variant_overrides( 'proof_cards' );
 		$this->assertArrayHasKey( 'compact', $overrides );
@@ -104,36 +108,44 @@ final class Blueprint_Family_Scale_Test extends TestCase {
 	// ---------- Blueprint_Family_Resolver ----------
 
 	public function test_resolver_returns_blueprint_unchanged_when_no_family(): void {
-		$registry = new Blueprint_Family_Registry();
-		$resolver = new Blueprint_Family_Resolver( $registry );
+		$registry   = new Blueprint_Family_Registry();
+		$resolver   = new Blueprint_Family_Resolver( $registry );
 		$definition = array( Section_Schema::FIELD_INTERNAL_KEY => 'sec_01' );
-		$blueprint = $this->example_normalized_blueprint();
-		$resolved = $resolver->resolve( $definition, $blueprint );
+		$blueprint  = $this->example_normalized_blueprint();
+		$resolved   = $resolver->resolve( $definition, $blueprint );
 		$this->assertSame( $blueprint, $resolved );
 	}
 
 	public function test_resolver_returns_blueprint_unchanged_when_family_has_no_override_for_variant(): void {
 		$registry = new Blueprint_Family_Registry();
-		$registry->register_family( 'hero_primary', 'acf_blueprint_hero_primary', array(
-			'minimal' => array( Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES => array( 'subheadline' ) ),
-		) );
-		$resolver = new Blueprint_Family_Resolver( $registry );
+		$registry->register_family(
+			'hero_primary',
+			'acf_blueprint_hero_primary',
+			array(
+				'minimal' => array( Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES => array( 'subheadline' ) ),
+			)
+		);
+		$resolver   = new Blueprint_Family_Resolver( $registry );
 		$definition = $this->example_section_definition( 'default' );
-		$blueprint = $this->example_normalized_blueprint();
-		$resolved = $resolver->resolve( $definition, $blueprint );
+		$blueprint  = $this->example_normalized_blueprint();
+		$resolved   = $resolver->resolve( $definition, $blueprint );
 		$this->assertSame( 3, count( $resolved[ Field_Blueprint_Schema::FIELDS ] ) );
 	}
 
 	public function test_resolver_applies_hide_field_names(): void {
 		$registry = new Blueprint_Family_Registry();
-		$registry->register_family( 'hero_primary', 'acf_blueprint_hero_primary', array(
-			'compact' => array( Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES => array( 'subheadline', 'cta' ) ),
-		) );
-		$resolver = new Blueprint_Family_Resolver( $registry );
+		$registry->register_family(
+			'hero_primary',
+			'acf_blueprint_hero_primary',
+			array(
+				'compact' => array( Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES => array( 'subheadline', 'cta' ) ),
+			)
+		);
+		$resolver   = new Blueprint_Family_Resolver( $registry );
 		$definition = $this->example_section_definition( 'compact' );
-		$blueprint = $this->example_normalized_blueprint();
-		$resolved = $resolver->resolve( $definition, $blueprint );
-		$names = array_column( $resolved[ Field_Blueprint_Schema::FIELDS ], 'name' );
+		$blueprint  = $this->example_normalized_blueprint();
+		$resolved   = $resolver->resolve( $definition, $blueprint );
+		$names      = array_column( $resolved[ Field_Blueprint_Schema::FIELDS ], 'name' );
 		$this->assertContains( 'headline', $names );
 		$this->assertNotContains( 'subheadline', $names );
 		$this->assertNotContains( 'cta', $names );
@@ -141,18 +153,26 @@ final class Blueprint_Family_Scale_Test extends TestCase {
 
 	public function test_resolver_applies_add_fields(): void {
 		$registry = new Blueprint_Family_Registry();
-		$registry->register_family( 'hero_primary', 'acf_blueprint_hero_primary', array(
-			'extended' => array(
-				Blueprint_Family_Registry::KEY_ADD_FIELDS => array(
-					array( 'name' => 'eyebrow', 'label' => 'Eyebrow', 'type' => 'text' ),
+		$registry->register_family(
+			'hero_primary',
+			'acf_blueprint_hero_primary',
+			array(
+				'extended' => array(
+					Blueprint_Family_Registry::KEY_ADD_FIELDS => array(
+						array(
+							'name'  => 'eyebrow',
+							'label' => 'Eyebrow',
+							'type'  => 'text',
+						),
+					),
 				),
-			),
-		) );
-		$resolver = new Blueprint_Family_Resolver( $registry );
+			)
+		);
+		$resolver   = new Blueprint_Family_Resolver( $registry );
 		$definition = $this->example_section_definition( 'extended' );
-		$blueprint = $this->example_normalized_blueprint();
-		$resolved = $resolver->resolve( $definition, $blueprint );
-		$names = array_column( $resolved[ Field_Blueprint_Schema::FIELDS ], 'name' );
+		$blueprint  = $this->example_normalized_blueprint();
+		$resolved   = $resolver->resolve( $definition, $blueprint );
+		$names      = array_column( $resolved[ Field_Blueprint_Schema::FIELDS ], 'name' );
 		$this->assertContains( 'eyebrow', $names );
 		$this->assertContains( 'headline', $names );
 		$eyebrow = null;
@@ -172,24 +192,32 @@ final class Blueprint_Family_Scale_Test extends TestCase {
 	 */
 	public function test_example_blueprint_family_resolution_payload(): void {
 		$registry = new Blueprint_Family_Registry();
-		$registry->register_family( 'hero_primary', 'acf_blueprint_hero_primary', array(
-			'default'  => array(),
-			'compact'  => array( Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES => array( 'subheadline', 'cta' ) ),
-			'extended' => array(
-				Blueprint_Family_Registry::KEY_ADD_FIELDS => array(
-					array( 'name' => 'eyebrow', 'label' => 'Eyebrow', 'type' => 'text' ),
+		$registry->register_family(
+			'hero_primary',
+			'acf_blueprint_hero_primary',
+			array(
+				'default'  => array(),
+				'compact'  => array( Blueprint_Family_Registry::KEY_HIDE_FIELD_NAMES => array( 'subheadline', 'cta' ) ),
+				'extended' => array(
+					Blueprint_Family_Registry::KEY_ADD_FIELDS => array(
+						array(
+							'name'  => 'eyebrow',
+							'label' => 'Eyebrow',
+							'type'  => 'text',
+						),
+					),
 				),
-			),
-		) );
-		$resolver = new Blueprint_Family_Resolver( $registry );
+			)
+		);
+		$resolver   = new Blueprint_Family_Resolver( $registry );
 		$definition = array(
 			Section_Schema::FIELD_INTERNAL_KEY    => 'hero_primary_01',
-			'field_blueprint_ref'                => 'acf_blueprint_hero_primary',
-			'variation_family_key'               => 'hero_primary',
+			'field_blueprint_ref'                 => 'acf_blueprint_hero_primary',
+			'variation_family_key'                => 'hero_primary',
 			Section_Schema::FIELD_DEFAULT_VARIANT => 'compact',
 		);
 		$normalized = $this->example_normalized_blueprint();
-		$effective = $resolver->resolve( $definition, $normalized );
+		$effective  = $resolver->resolve( $definition, $normalized );
 
 		$this->assertSame( 'acf_blueprint_hero_primary', $effective['blueprint_id'] );
 		$this->assertSame( 'hero_primary_01', $effective['section_key'] );

@@ -36,9 +36,9 @@ final class Validation_Result {
 
 	public function __construct( string $category, string $severity, string $code, string $message, bool $is_blocking ) {
 		$this->category    = $category;
-		$this->severity     = $severity;
-		$this->code         = $code;
-		$this->message      = $message;
+		$this->severity    = $severity;
+		$this->code        = $code;
+		$this->message     = $message;
 		$this->is_blocking = $is_blocking;
 	}
 
@@ -46,10 +46,10 @@ final class Validation_Result {
 	public function to_array(): array {
 		return array(
 			'category'    => $this->category,
-			'severity'     => $this->severity,
-			'code'         => $this->code,
-			'message'      => $this->message,
-			'is_blocking'  => $this->is_blocking,
+			'severity'    => $this->severity,
+			'code'        => $this->code,
+			'message'     => $this->message,
+			'is_blocking' => $this->is_blocking,
 		);
 	}
 }
@@ -64,11 +64,11 @@ final class Environment_Validator {
 	public const SEVERITY_INFO     = 'informational';
 
 	public const CATEGORY_PLATFORM             = 'platform';
-	public const CATEGORY_REQUIRED_DEPENDENCY = 'required_dependency';
+	public const CATEGORY_REQUIRED_DEPENDENCY  = 'required_dependency';
 	public const CATEGORY_OPTIONAL_INTEGRATION = 'optional_integration';
-	public const CATEGORY_THEME_POSTURE       = 'theme_posture';
-	public const CATEGORY_RUNTIME_READINESS   = 'runtime_readiness';
-	public const CATEGORY_EXTENSION_PACK      = 'extension_pack';
+	public const CATEGORY_THEME_POSTURE        = 'theme_posture';
+	public const CATEGORY_RUNTIME_READINESS    = 'runtime_readiness';
+	public const CATEGORY_EXTENSION_PACK       = 'extension_pack';
 
 	/** Theme slugs that are in the extension-pack additional-tested set (spec §54, Prompt 127). Informational only. */
 	private const EXTENSION_PACK_THEMES = array( 'generatepress', 'astra', 'kadence' );
@@ -156,25 +156,29 @@ final class Environment_Validator {
 		$min_wp = Dependency_Requirements::min_wordpress_version();
 		$wp_ver = $GLOBALS['wp_version'] ?? '';
 		if ( $wp_ver === '' || ! version_compare( $wp_ver, $min_wp, '>=' ) ) {
-			$this->add( new Validation_Result(
-				self::CATEGORY_PLATFORM,
-				self::SEVERITY_BLOCKING,
-				'wp_version_blocking',
-				sprintf( 'WordPress %s or newer is required. Current: %s.', $min_wp, $wp_ver ?: 'unknown' ),
-				true
-			) );
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_PLATFORM,
+					self::SEVERITY_BLOCKING,
+					'wp_version_blocking',
+					sprintf( 'WordPress %s or newer is required. Current: %s.', $min_wp, $wp_ver ?: 'unknown' ),
+					true
+				)
+			);
 		}
 
 		$min_php = Dependency_Requirements::min_php_version();
 		$php_ver = PHP_VERSION;
 		if ( ! version_compare( $php_ver, $min_php, '>=' ) ) {
-			$this->add( new Validation_Result(
-				self::CATEGORY_PLATFORM,
-				self::SEVERITY_BLOCKING,
-				'php_version_blocking',
-				sprintf( 'PHP %s or newer is required. Current: %s.', $min_php, $php_ver ),
-				true
-			) );
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_PLATFORM,
+					self::SEVERITY_BLOCKING,
+					'php_version_blocking',
+					sprintf( 'PHP %s or newer is required. Current: %s.', $min_php, $php_ver ),
+					true
+				)
+			);
 		}
 	}
 
@@ -189,24 +193,28 @@ final class Environment_Validator {
 			$name = $def['name'];
 			$min  = $def['min_version'];
 			if ( ! is_plugin_active( $file ) ) {
-				$this->add( new Validation_Result(
-					self::CATEGORY_REQUIRED_DEPENDENCY,
-					self::SEVERITY_BLOCKING,
-					$key . '_missing_blocking',
-					sprintf( '%s is required (minimum version %s). Please install and activate it.', $name, $min ),
-					true
-				) );
+				$this->add(
+					new Validation_Result(
+						self::CATEGORY_REQUIRED_DEPENDENCY,
+						self::SEVERITY_BLOCKING,
+						$key . '_missing_blocking',
+						sprintf( '%s is required (minimum version %s). Please install and activate it.', $name, $min ),
+						true
+					)
+				);
 				continue;
 			}
 			$version = $this->get_plugin_version( $file );
 			if ( $version !== null && ! version_compare( $version, $min, '>=' ) ) {
-				$this->add( new Validation_Result(
-					self::CATEGORY_REQUIRED_DEPENDENCY,
-					self::SEVERITY_BLOCKING,
-					$key . '_version_blocking',
-					sprintf( '%s version %s or newer is required. Current: %s.', $name, $min, $version ),
-					true
-				) );
+				$this->add(
+					new Validation_Result(
+						self::CATEGORY_REQUIRED_DEPENDENCY,
+						self::SEVERITY_BLOCKING,
+						$key . '_version_blocking',
+						sprintf( '%s version %s or newer is required. Current: %s.', $name, $min, $version ),
+						true
+					)
+				);
 			}
 		}
 	}
@@ -221,13 +229,15 @@ final class Environment_Validator {
 			$file = $def['plugin_file'];
 			$name = $def['name'];
 			if ( ! is_plugin_active( $file ) ) {
-				$this->add( new Validation_Result(
-					self::CATEGORY_OPTIONAL_INTEGRATION,
-					self::SEVERITY_WARNING,
-					$key . '_missing_warning',
-					sprintf( '%s is not active. Related workflows will be disabled.', $name ),
-					false
-				) );
+				$this->add(
+					new Validation_Result(
+						self::CATEGORY_OPTIONAL_INTEGRATION,
+						self::SEVERITY_WARNING,
+						$key . '_missing_warning',
+						sprintf( '%s is not active. Related workflows will be disabled.', $name ),
+						false
+					)
+				);
 			}
 		}
 	}
@@ -247,13 +257,15 @@ final class Environment_Validator {
 			$slug  = $theme->get_stylesheet();
 			if ( $slug !== '' && in_array( strtolower( $slug ), self::EXTENSION_PACK_THEMES, true ) ) {
 				$name = $theme->get( 'Name' ) ?: $slug;
-				$this->add( new Validation_Result(
-					self::CATEGORY_EXTENSION_PACK,
-					self::SEVERITY_INFO,
-					'extension_pack_theme_detected',
-					sprintf( 'Theme "%s" is in the extension-pack tested set. See compatibility matrix.', $name ),
-					false
-				) );
+				$this->add(
+					new Validation_Result(
+						self::CATEGORY_EXTENSION_PACK,
+						self::SEVERITY_INFO,
+						'extension_pack_theme_detected',
+						sprintf( 'Theme "%s" is in the extension-pack tested set. See compatibility matrix.', $name ),
+						false
+					)
+				);
 			}
 		}
 		$this->load_plugin_api();
@@ -262,13 +274,15 @@ final class Environment_Validator {
 				if ( ! is_plugin_active( $plugin_file ) || ! isset( self::EXTENSION_PACK_PLUGIN_NAMES[ $plugin_file ] ) ) {
 					continue;
 				}
-				$this->add( new Validation_Result(
-					self::CATEGORY_EXTENSION_PACK,
-					self::SEVERITY_INFO,
-					'extension_pack_plugin_detected',
-					sprintf( 'Plugin "%s" detected; extension-pack coexistence tested. See compatibility matrix.', self::EXTENSION_PACK_PLUGIN_NAMES[ $plugin_file ] ),
-					false
-				) );
+				$this->add(
+					new Validation_Result(
+						self::CATEGORY_EXTENSION_PACK,
+						self::SEVERITY_INFO,
+						'extension_pack_plugin_detected',
+						sprintf( 'Plugin "%s" detected; extension-pack coexistence tested. See compatibility matrix.', self::EXTENSION_PACK_PLUGIN_NAMES[ $plugin_file ] ),
+						false
+					)
+				);
 			}
 		}
 	}

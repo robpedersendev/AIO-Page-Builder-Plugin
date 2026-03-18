@@ -95,12 +95,12 @@ final class Build_Plan_Analytics_Screen {
 	}
 
 	private function render_review_trends( array $data ): void {
-		$total = (int) ( $data['total_plans'] ?? 0 );
-		$by_status = isset( $data['by_status'] ) && is_array( $data['by_status'] ) ? $data['by_status'] : array();
-		$approval_count = (int) ( $data['approval_count'] ?? 0 );
+		$total           = (int) ( $data['total_plans'] ?? 0 );
+		$by_status       = isset( $data['by_status'] ) && is_array( $data['by_status'] ) ? $data['by_status'] : array();
+		$approval_count  = (int) ( $data['approval_count'] ?? 0 );
 		$rejection_count = (int) ( $data['rejection_count'] ?? 0 );
-		$approval_rate = (float) ( $data['approval_rate'] ?? 0 );
-		$denial_rate = (float) ( $data['denial_rate'] ?? 0 );
+		$approval_rate   = (float) ( $data['approval_rate'] ?? 0 );
+		$denial_rate     = (float) ( $data['denial_rate'] ?? 0 );
 		?>
 		<table class="widefat striped">
 			<tbody>
@@ -121,15 +121,16 @@ final class Build_Plan_Analytics_Screen {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
-		<?php endif;
+			<?php
+		endif;
 	}
 
 	private function render_common_blockers( array $data ): void {
-		$blockers = isset( $data['blockers'] ) && is_array( $data['blockers'] ) ? $data['blockers'] : array();
+		$blockers       = isset( $data['blockers'] ) && is_array( $data['blockers'] ) ? $data['blockers'] : array();
 		$total_rejected = (int) ( $data['total_rejected'] ?? 0 );
-		$total_failed = (int) ( $data['total_failed'] ?? 0 );
+		$total_failed   = (int) ( $data['total_failed'] ?? 0 );
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Total rejected items: %d; total failed items: %d.', 'aio-page-builder' ), $total_rejected, $total_failed ) ); ?></p>
+		<p><?php echo \esc_html( sprintf( __( 'Total rejected items: %1$d; total failed items: %2$d.', 'aio-page-builder' ), $total_rejected, $total_failed ) ); ?></p>
 		<?php if ( empty( $blockers ) ) : ?>
 			<p><?php \esc_html_e( 'No blocker categories in range.', 'aio-page-builder' ); ?></p>
 		<?php else : ?>
@@ -141,12 +142,13 @@ final class Build_Plan_Analytics_Screen {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
-		<?php endif;
+			<?php
+		endif;
 	}
 
 	private function render_failure_trends( array $data ): void {
 		$by_type = isset( $data['failures_by_item_type'] ) && is_array( $data['failures_by_item_type'] ) ? $data['failures_by_item_type'] : array();
-		$total = (int) ( $data['total_failed_items'] ?? 0 );
+		$total   = (int) ( $data['total_failed_items'] ?? 0 );
 		?>
 		<p><?php echo \esc_html( sprintf( __( 'Total failed items: %d.', 'aio-page-builder' ), $total ) ); ?></p>
 		<?php if ( empty( $by_type ) ) : ?>
@@ -160,11 +162,12 @@ final class Build_Plan_Analytics_Screen {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
-		<?php endif;
+			<?php
+		endif;
 	}
 
 	private function render_rollback_summary( array $data ): void {
-		$total = (int) ( $data['total_rollbacks'] ?? 0 );
+		$total    = (int) ( $data['total_rollbacks'] ?? 0 );
 		$by_month = isset( $data['by_month'] ) && is_array( $data['by_month'] ) ? $data['by_month'] : array();
 		?>
 		<p><?php echo \esc_html( sprintf( __( 'Total rollbacks in range: %d.', 'aio-page-builder' ), $total ) ); ?></p>
@@ -179,6 +182,7 @@ final class Build_Plan_Analytics_Screen {
 		</table>
 		<?php else : ?>
 			<p><?php \esc_html_e( 'Rollback data is from plan analytics only; rollback table not queried.', 'aio-page-builder' ); ?></p>
-		<?php endif;
+			<?php
+		endif;
 	}
 }

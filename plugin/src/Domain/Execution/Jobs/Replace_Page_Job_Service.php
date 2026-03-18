@@ -73,14 +73,14 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 		Page_Instantiator $instantiator,
 		Page_Field_Group_Assignment_Service $assignment_service
 	) {
-		$this->page_template_repository   = $page_template_repository;
+		$this->page_template_repository    = $page_template_repository;
 		$this->section_template_repository = $section_template_repository;
-		$this->context_builder            = $context_builder;
-		$this->section_renderer           = $section_renderer;
-		$this->assembly_pipeline          = $assembly_pipeline;
-		$this->payload_builder            = $payload_builder;
-		$this->instantiator               = $instantiator;
-		$this->assignment_service         = $assignment_service;
+		$this->context_builder             = $context_builder;
+		$this->section_renderer            = $section_renderer;
+		$this->assembly_pipeline           = $assembly_pipeline;
+		$this->payload_builder             = $payload_builder;
+		$this->instantiator                = $instantiator;
+		$this->assignment_service          = $assignment_service;
 	}
 
 	/**
@@ -90,10 +90,10 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 	 * @return Replace_Page_Result
 	 */
 	public function run( array $envelope ): Replace_Page_Result {
-		$target   = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
+		$target            = isset( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] ) && is_array( $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ] )
 			? $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
 			: array();
-		$snapshot_ref = isset( $envelope['snapshot_ref'] ) && is_string( $envelope['snapshot_ref'] ) ? trim( $envelope['snapshot_ref'] ) : '';
+		$snapshot_ref      = isset( $envelope['snapshot_ref'] ) && is_string( $envelope['snapshot_ref'] ) ? trim( $envelope['snapshot_ref'] ) : '';
 		$snapshot_required = ! empty( $envelope['snapshot_required'] );
 
 		if ( $snapshot_required && $snapshot_ref === '' ) {
@@ -122,7 +122,7 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 			);
 		}
 
-		$action = isset( $target['action'] ) && is_string( $target['action'] ) ? $target['action'] : 'rebuild_from_template';
+		$action     = isset( $target['action'] ) && is_string( $target['action'] ) ? $target['action'] : 'rebuild_from_template';
 		$is_replace = in_array( $action, self::REPLACE_ACTIONS, true );
 
 		if ( $is_replace ) {
@@ -156,8 +156,8 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 			);
 		}
 
-		$title = isset( $target['target_page_title'] ) && is_string( $target['target_page_title'] ) ? trim( $target['target_page_title'] ) : '';
-		$slug  = isset( $target['target_slug'] ) && is_string( $target['target_slug'] ) ? trim( $target['target_slug'] ) : '';
+		$title     = isset( $target['target_page_title'] ) && is_string( $target['target_page_title'] ) ? trim( $target['target_page_title'] ) : '';
+		$slug      = isset( $target['target_slug'] ) && is_string( $target['target_slug'] ) ? trim( $target['target_slug'] ) : '';
 		$overrides = array();
 		if ( $title !== '' ) {
 			$overrides['page_title'] = $title;
@@ -176,7 +176,7 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 			);
 		}
 
-		$assign_result = $this->assignment_service->assign_from_template( $target_post_id, $template_key, true );
+		$assign_result    = $this->assignment_service->assign_from_template( $target_post_id, $template_key, true );
 		$assignment_count = isset( $assign_result['assigned'] ) && is_numeric( $assign_result['assigned'] ) ? (int) $assign_result['assigned'] : 0;
 
 		return Replace_Page_Result::success( $target_post_id, $template_key, $assignment_count, $snapshot_ref, 0 );
@@ -209,18 +209,18 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 		$title = isset( $target['target_page_title'] ) && is_string( $target['target_page_title'] ) ? trim( $target['target_page_title'] ) : '';
 		$slug  = isset( $target['target_slug'] ) && is_string( $target['target_slug'] ) ? trim( $target['target_slug'] ) : '';
 		if ( $title === '' ) {
-			$post = \get_post( $existing_post_id );
+			$post  = \get_post( $existing_post_id );
 			$title = $post instanceof \WP_Post ? $post->post_title : __( 'Replacement Page', 'aio-page-builder' );
 		}
 		if ( $slug === '' ) {
 			$slug = \sanitize_title( $title );
 		}
 
-		$overrides = array(
+		$overrides     = array(
 			'page_slug_candidate'   => $slug,
 			'post_status_candidate' => 'draft',
 		);
-		$payload = $this->payload_builder->build_create_payload( $assembly, $title, $overrides );
+		$payload       = $this->payload_builder->build_create_payload( $assembly, $title, $overrides );
 		$create_result = $this->instantiator->create_page( $payload );
 		if ( ! $create_result->is_success() ) {
 			return Replace_Page_Result::failure(
@@ -233,9 +233,15 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 		$new_post_id = $create_result->get_post_id();
 
 		// * Archive superseded page: set to private (no hard-delete; spec §32, traceability).
-		\wp_update_post( array( 'ID' => $existing_post_id, 'post_status' => 'private' ), true );
+		\wp_update_post(
+			array(
+				'ID'          => $existing_post_id,
+				'post_status' => 'private',
+			),
+			true
+		);
 
-		$assign_result = $this->assignment_service->assign_from_template( $new_post_id, $template_key, true );
+		$assign_result    = $this->assignment_service->assign_from_template( $new_post_id, $template_key, true );
 		$assignment_count = isset( $assign_result['assigned'] ) && is_numeric( $assign_result['assigned'] ) ? (int) $assign_result['assigned'] : 0;
 
 		return Replace_Page_Result::success( $new_post_id, $template_key, $assignment_count, $snapshot_ref, $existing_post_id );
@@ -324,7 +330,7 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 		}
 
 		$section_results = array();
-		$position = 0;
+		$position        = 0;
 		foreach ( $ordered as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;

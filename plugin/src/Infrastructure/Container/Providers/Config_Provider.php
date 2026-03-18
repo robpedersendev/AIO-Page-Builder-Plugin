@@ -30,37 +30,64 @@ final class Config_Provider implements Service_Provider_Interface {
 
 	/** @inheritdoc */
 	public function register( Service_Container $container ): void {
-		$container->register( 'config', function (): Plugin_Config {
-			return new Plugin_Config();
-		} );
-		$container->register( 'settings', function (): Settings_Service {
-			return new Settings_Service();
-		} );
-		$container->register( 'option_store', function () use ( $container ): Option_Store {
-			return new Option_Store( $container->get( 'settings' ) );
-		} );
-		$container->register( 'profile_normalizer', function (): Profile_Normalizer {
-			return new Profile_Normalizer();
-		} );
-		$container->register( 'profile_store', function () use ( $container ): Profile_Store {
-			return new Profile_Store( $container->get( 'settings' ), $container->get( 'profile_normalizer' ) );
-		} );
-		$container->register( 'profile_snapshot_helper', function (): Profile_Snapshot_Helper {
-			return new Profile_Snapshot_Helper();
-		} );
-		$container->register( 'schema_version_tracker', function () use ( $container ): Schema_Version_Tracker {
-			return new Schema_Version_Tracker( $container->get( 'settings' ) );
-		} );
-		$container->register( 'db_delta_runner', function (): DbDelta_Runner {
-			return new DbDelta_Runner();
-		} );
-		$container->register( 'table_installer', function () use ( $container ): Table_Installer {
-			global $wpdb;
-			return new Table_Installer(
-				$wpdb,
-				$container->get( 'db_delta_runner' ),
-				$container->get( 'schema_version_tracker' )
-			);
-		} );
+		$container->register(
+			'config',
+			function (): Plugin_Config {
+				return new Plugin_Config();
+			}
+		);
+		$container->register(
+			'settings',
+			function (): Settings_Service {
+				return new Settings_Service();
+			}
+		);
+		$container->register(
+			'option_store',
+			function () use ( $container ): Option_Store {
+				return new Option_Store( $container->get( 'settings' ) );
+			}
+		);
+		$container->register(
+			'profile_normalizer',
+			function (): Profile_Normalizer {
+				return new Profile_Normalizer();
+			}
+		);
+		$container->register(
+			'profile_store',
+			function () use ( $container ): Profile_Store {
+				return new Profile_Store( $container->get( 'settings' ), $container->get( 'profile_normalizer' ) );
+			}
+		);
+		$container->register(
+			'profile_snapshot_helper',
+			function (): Profile_Snapshot_Helper {
+				return new Profile_Snapshot_Helper();
+			}
+		);
+		$container->register(
+			'schema_version_tracker',
+			function () use ( $container ): Schema_Version_Tracker {
+				return new Schema_Version_Tracker( $container->get( 'settings' ) );
+			}
+		);
+		$container->register(
+			'db_delta_runner',
+			function (): DbDelta_Runner {
+				return new DbDelta_Runner();
+			}
+		);
+		$container->register(
+			'table_installer',
+			function () use ( $container ): Table_Installer {
+				global $wpdb;
+				return new Table_Installer(
+					$wpdb,
+					$container->get( 'db_delta_runner' ),
+					$container->get( 'schema_version_tracker' )
+				);
+			}
+		);
 	}
 }

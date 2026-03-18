@@ -55,13 +55,13 @@ final class ACF_Registration_Bootstrap_Controller {
 		Admin_Post_Edit_Context_Resolver $admin_post_edit_context_resolver,
 		?ACF_Registration_Diagnostics_Service $diagnostics = null
 	) {
-		$this->group_registrar                 = $group_registrar;
-		$this->request_context                 = $request_context;
-		$this->group_key_resolver              = $group_key_resolver;
-		$this->existing_page_resolver          = $existing_page_resolver;
-		$this->new_page_resolver               = $new_page_resolver;
+		$this->group_registrar                  = $group_registrar;
+		$this->request_context                  = $request_context;
+		$this->group_key_resolver               = $group_key_resolver;
+		$this->existing_page_resolver           = $existing_page_resolver;
+		$this->new_page_resolver                = $new_page_resolver;
 		$this->admin_post_edit_context_resolver = $admin_post_edit_context_resolver;
-		$this->diagnostics                     = $diagnostics;
+		$this->diagnostics                      = $diagnostics;
 	}
 
 	/**

@@ -99,9 +99,9 @@ final class Industry_Page_OnePager_Composer {
 				);
 			}
 		}
-		$base_doc          = $page_template_key !== '' ? $this->documentation_registry->get_by_page_template_key( $page_template_key ) : null;
-		$base_id           = '';
-		$composed          = array();
+		$base_doc = $page_template_key !== '' ? $this->documentation_registry->get_by_page_template_key( $page_template_key ) : null;
+		$base_id  = '';
+		$composed = array();
 		if ( $base_doc !== null && is_array( $base_doc ) ) {
 			$composed = $base_doc;
 			$base_id  = (string) ( $base_doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
@@ -161,14 +161,17 @@ final class Industry_Page_OnePager_Composer {
 		$result = new Composed_Page_OnePager_Result( $composed, $base_id, $overlay_applied, $overlay_industry, $page_template_key, $compliance_warnings );
 		if ( $this->cache_service !== null && $this->cache_key_builder !== null ) {
 			$base_key = $this->cache_key_builder->for_page_onepager( $page_template_key, $industry_key, $subtype_key, $conversion_goal_key );
-			$this->cache_service->set( $base_key, array(
-				'composed_onepager'     => $composed,
-				'base_documentation_id' => $base_id,
-				'overlay_applied'       => $overlay_applied,
-				'overlay_industry_key'  => $overlay_industry,
-				'page_template_key'    => $page_template_key,
-				'compliance_warnings'   => $compliance_warnings,
-			) );
+			$this->cache_service->set(
+				$base_key,
+				array(
+					'composed_onepager'     => $composed,
+					'base_documentation_id' => $base_id,
+					'overlay_applied'       => $overlay_applied,
+					'overlay_industry_key'  => $overlay_industry,
+					'page_template_key'     => $page_template_key,
+					'compliance_warnings'   => $compliance_warnings,
+				)
+			);
 		}
 		return $result;
 	}

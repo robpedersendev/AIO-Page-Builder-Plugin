@@ -38,9 +38,14 @@ final class Form_Provider_Integration_Regression_Harness_Test extends TestCase {
 	public function test_section_form_embed_valid_passes(): void {
 		$harness = new FormProviderIntegrationRegressionHarness( $this->fixtures_base() );
 		$results = $harness->run_all();
-		$valid  = array_values( array_filter( $results, static function ( $r ) {
-			return ( $r['scenario_id'] ?? '' ) === 'section-form-embed-valid';
-		} ) );
+		$valid   = array_values(
+			array_filter(
+				$results,
+				static function ( $r ) {
+					return ( $r['scenario_id'] ?? '' ) === 'section-form-embed-valid';
+				}
+			)
+		);
 		$this->assertCount( 1, $valid );
 		$this->assertTrue( $valid[0]['pass'], $valid[0]['message'] ?? '' );
 		$this->assertTrue( $valid[0]['details']['shortcode_builds'] ?? false );
@@ -50,9 +55,14 @@ final class Form_Provider_Integration_Regression_Harness_Test extends TestCase {
 	public function test_section_missing_provider_passes(): void {
 		$harness = new FormProviderIntegrationRegressionHarness( $this->fixtures_base() );
 		$results = $harness->run_all();
-		$missing = array_values( array_filter( $results, static function ( $r ) {
-			return ( $r['scenario_id'] ?? '' ) === 'section-missing-provider';
-		} ) );
+		$missing = array_values(
+			array_filter(
+				$results,
+				static function ( $r ) {
+					return ( $r['scenario_id'] ?? '' ) === 'section-missing-provider';
+				}
+			)
+		);
 		$this->assertCount( 1, $missing );
 		$this->assertTrue( $missing[0]['pass'], $missing[0]['message'] ?? '' );
 		$this->assertFalse( $missing[0]['details']['provider_registered'] ?? true );
@@ -62,9 +72,14 @@ final class Form_Provider_Integration_Regression_Harness_Test extends TestCase {
 	public function test_section_invalid_form_id_passes(): void {
 		$harness = new FormProviderIntegrationRegressionHarness( $this->fixtures_base() );
 		$results = $harness->run_all();
-		$invalid = array_values( array_filter( $results, static function ( $r ) {
-			return ( $r['scenario_id'] ?? '' ) === 'section-invalid-form-id';
-		} ) );
+		$invalid = array_values(
+			array_filter(
+				$results,
+				static function ( $r ) {
+					return ( $r['scenario_id'] ?? '' ) === 'section-invalid-form-id';
+				}
+			)
+		);
 		$this->assertCount( 1, $invalid );
 		$this->assertTrue( $invalid[0]['pass'], $invalid[0]['message'] ?? '' );
 		$this->assertFalse( $invalid[0]['details']['shortcode_builds'] ?? true );
@@ -73,9 +88,14 @@ final class Form_Provider_Integration_Regression_Harness_Test extends TestCase {
 	public function test_request_form_page_valid_passes(): void {
 		$harness = new FormProviderIntegrationRegressionHarness( $this->fixtures_base() );
 		$results = $harness->run_all();
-		$req     = array_values( array_filter( $results, static function ( $r ) {
-			return ( $r['scenario_id'] ?? '' ) === 'request-form-page-valid';
-		} ) );
+		$req     = array_values(
+			array_filter(
+				$results,
+				static function ( $r ) {
+					return ( $r['scenario_id'] ?? '' ) === 'request-form-page-valid';
+				}
+			)
+		);
 		$this->assertCount( 1, $req );
 		$this->assertTrue( $req[0]['pass'], $req[0]['message'] ?? '' );
 		$this->assertTrue( $req[0]['details']['shortcode_builds'] ?? false );

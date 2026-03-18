@@ -44,7 +44,7 @@ final class Template_Library_Upgrade_Helper {
 		if ( ! is_array( $current ) ) {
 			$current = array();
 		}
-		$installed = isset( $current[ self::REGISTRY_SCHEMA_KEY ] ) && is_string( $current[ self::REGISTRY_SCHEMA_KEY ] )
+		$installed    = isset( $current[ self::REGISTRY_SCHEMA_KEY ] ) && is_string( $current[ self::REGISTRY_SCHEMA_KEY ] )
 			? $current[ self::REGISTRY_SCHEMA_KEY ]
 			: '0';
 		$code_version = Versions::registry_schema();

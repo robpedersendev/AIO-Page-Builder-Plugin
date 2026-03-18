@@ -20,7 +20,7 @@ final class Industry_Pack_Migration_Result {
 
 	public const OBJECT_TYPE_PRIMARY_INDUSTRY   = 'primary_industry_key';
 	public const OBJECT_TYPE_SECONDARY_INDUSTRY = 'secondary_industry_keys';
-	public const OBJECT_TYPE_STARTER_BUNDLE    = 'selected_starter_bundle_key';
+	public const OBJECT_TYPE_STARTER_BUNDLE     = 'selected_starter_bundle_key';
 
 	/** @var bool */
 	private $success;
@@ -38,11 +38,11 @@ final class Industry_Pack_Migration_Result {
 	private $audit_note;
 
 	/**
-	 * @param bool                                                                 $success       Whether migration completed without fatal errors.
+	 * @param bool                                                               $success       Whether migration completed without fatal errors.
 	 * @param list<array{object_type: string, old_ref: string, new_ref: string}> $migrated_refs List of refs that were updated.
-	 * @param array<int, string>                                                  $warnings      Non-fatal warnings.
-	 * @param array<int, string>                                                  $errors        Fatal or validation errors.
-	 * @param string                                                              $audit_note    Short note for audit/support.
+	 * @param array<int, string>                                                 $warnings      Non-fatal warnings.
+	 * @param array<int, string>                                                 $errors        Fatal or validation errors.
+	 * @param string                                                             $audit_note    Short note for audit/support.
 	 */
 	public function __construct(
 		bool $success,

@@ -40,7 +40,7 @@ final class Template_Library_Restore_Validator_Test extends TestCase {
 
 	public function test_validate_empty_restored_returns_valid_summary(): void {
 		$validator = $this->make_validator();
-		$summary = $validator->validate( array(), array() );
+		$summary   = $validator->validate( array(), array() );
 		$this->assertTrue( $summary['valid'] );
 		$this->assertTrue( $summary['restore_order_ok'] );
 		$this->assertSame( 0, $summary['section_count'] );
@@ -51,15 +51,15 @@ final class Template_Library_Restore_Validator_Test extends TestCase {
 
 	public function test_validate_restore_order_ok_when_categories_in_order(): void {
 		$validator = $this->make_validator();
-		$manifest = array( 'included_categories' => array( 'settings', 'profiles', 'registries', 'compositions' ) );
-		$summary = $validator->validate( array( 'settings', 'profiles', 'registries', 'compositions' ), $manifest );
+		$manifest  = array( 'included_categories' => array( 'settings', 'profiles', 'registries', 'compositions' ) );
+		$summary   = $validator->validate( array( 'settings', 'profiles', 'registries', 'compositions' ), $manifest );
 		$this->assertTrue( $summary['restore_order_ok'] );
 	}
 
 	public function test_validate_includes_warning_when_registries_in_manifest_but_not_restored(): void {
 		$validator = $this->make_validator();
-		$manifest = array( 'included_categories' => array( 'registries' ) );
-		$summary = $validator->validate( array( 'settings' ), $manifest );
+		$manifest  = array( 'included_categories' => array( 'registries' ) );
+		$summary   = $validator->validate( array( 'settings' ), $manifest );
 		$this->assertNotEmpty( $summary['warnings'] );
 		$joined = implode( ' ', $summary['warnings'] );
 		$this->assertStringContainsString( 'Registries', $joined );
@@ -67,7 +67,7 @@ final class Template_Library_Restore_Validator_Test extends TestCase {
 
 	public function test_example_restore_summary_payload_structure(): void {
 		$validator = $this->make_validator();
-		$summary = $validator->validate( array(), array( 'included_categories' => array() ) );
+		$summary   = $validator->validate( array(), array( 'included_categories' => array() ) );
 		$this->assertArrayHasKey( 'valid', $summary );
 		$this->assertArrayHasKey( 'restore_order_ok', $summary );
 		$this->assertArrayHasKey( 'section_count', $summary );

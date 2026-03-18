@@ -38,9 +38,9 @@ final class Token_Set_Job_Service implements Token_Set_Job_Service_Interface {
 			? $envelope[ Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE ]
 			: array();
 
-		$token_group = isset( $target['token_group'] ) && is_string( $target['token_group'] ) ? trim( $target['token_group'] ) : '';
-		$token_name  = isset( $target['token_name'] ) && is_string( $target['token_name'] ) ? trim( $target['token_name'] ) : '';
-		$proposed    = $target['proposed_value'] ?? null;
+		$token_group  = isset( $target['token_group'] ) && is_string( $target['token_group'] ) ? trim( $target['token_group'] ) : '';
+		$token_name   = isset( $target['token_name'] ) && is_string( $target['token_name'] ) ? trim( $target['token_name'] ) : '';
+		$proposed     = $target['proposed_value'] ?? null;
 		$snapshot_ref = isset( $envelope['snapshot_ref'] ) && is_string( $envelope['snapshot_ref'] ) ? trim( $envelope['snapshot_ref'] ) : '';
 
 		if ( $token_group === '' || $token_name === '' ) {
@@ -69,9 +69,9 @@ final class Token_Set_Job_Service implements Token_Set_Job_Service_Interface {
 		if ( ! isset( $store[ $token_group ] ) || ! is_array( $store[ $token_group ] ) ) {
 			$store[ $token_group ] = array();
 		}
-		$previous = $store[ $token_group ][ $token_name ] ?? null;
+		$previous                             = $store[ $token_group ][ $token_name ] ?? null;
 		$store[ $token_group ][ $token_name ] = $proposed;
-		$updated = update_option( self::OPTION_APPLIED_TOKENS, $store );
+		$updated                              = update_option( self::OPTION_APPLIED_TOKENS, $store );
 		if ( ! $updated ) {
 			return Token_Set_Result::failure(
 				__( 'Failed to persist token value.', 'aio-page-builder' ),

@@ -53,14 +53,14 @@ final class Composition_Filter_State {
 		int $paged = 1,
 		int $per_page = 25
 	) {
-		$this->purpose_family      = $purpose_family;
-		$this->category           = $category;
-		$this->cta_classification = $cta_classification;
+		$this->purpose_family       = $purpose_family;
+		$this->category             = $category;
+		$this->cta_classification   = $cta_classification;
 		$this->variation_family_key = $variation_family_key;
-		$this->search             = $search;
-		$this->status             = $status;
-		$this->paged              = max( 1, $paged );
-		$this->per_page           = max( 1, min( Large_Library_Query_Service::MAX_PER_PAGE, $per_page ) );
+		$this->search               = $search;
+		$this->status               = $status;
+		$this->paged                = max( 1, $paged );
+		$this->per_page             = max( 1, min( Large_Library_Query_Service::MAX_PER_PAGE, $per_page ) );
 	}
 
 	public function get_purpose_family(): string {
@@ -121,22 +121,22 @@ final class Composition_Filter_State {
 	public function to_query_filters(): array {
 		$filters = array();
 		if ( $this->purpose_family !== '' ) {
-			$filters[\AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_SECTION_PURPOSE_FAMILY] = $this->purpose_family;
+			$filters[ \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_SECTION_PURPOSE_FAMILY ] = $this->purpose_family;
 		}
 		if ( $this->category !== '' ) {
-			$filters[\AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_CATEGORY] = $this->category;
+			$filters[ \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_CATEGORY ] = $this->category;
 		}
 		if ( $this->cta_classification !== '' ) {
-			$filters[\AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_CTA_CLASSIFICATION] = $this->cta_classification;
+			$filters[ \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_CTA_CLASSIFICATION ] = $this->cta_classification;
 		}
 		if ( $this->variation_family_key !== '' ) {
-			$filters[\AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_VARIATION_FAMILY_KEY] = $this->variation_family_key;
+			$filters[ \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_VARIATION_FAMILY_KEY ] = $this->variation_family_key;
 		}
 		if ( $this->status !== '' ) {
-			$filters[\AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_STATUS] = $this->status;
+			$filters[ \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_STATUS ] = $this->status;
 		}
 		if ( $this->search !== '' ) {
-			$filters[\AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_SEARCH] = $this->search;
+			$filters[ \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::FILTER_SEARCH ] = $this->search;
 		}
 		return $filters;
 	}

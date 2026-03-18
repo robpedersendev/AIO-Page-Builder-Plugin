@@ -43,7 +43,7 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 
 		$data = array(
 			'internal_key' => $comp_id,
-			'status'      => $status,
+			'status'       => $status,
 			'post_title'   => \sanitize_text_field( $name ),
 		);
 
@@ -100,7 +100,7 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 	 */
 	public function list_definitions_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		$records = $this->list_by_status( $status, $limit, $offset );
-		$out = array();
+		$out     = array();
 		foreach ( $records as $r ) {
 			if ( isset( $r['definition'] ) && is_array( $r['definition'] ) ) {
 				$out[] = $r['definition'];
@@ -117,8 +117,8 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 	 * @return list<array<string, mixed>>
 	 */
 	public function list_all_definitions( int $limit = 0, int $offset = 0 ): array {
-		$limit  = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
-		$query  = new \WP_Query(
+		$limit = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
+		$query = new \WP_Query(
 			array(
 				'post_type'      => $this->get_post_type(),
 				'posts_per_page' => $limit,
@@ -127,7 +127,7 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 				'post_status'    => 'any',
 			)
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $query->get_posts() as $post ) {
 			$record = $this->post_to_record( $post, $this->get_meta( $post->ID ) );
 			if ( isset( $record['definition'] ) && is_array( $record['definition'] ) ) {
@@ -144,9 +144,9 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 		if ( is_string( $raw ) && $raw !== '' ) {
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
-				$base['definition'] = $decoded;
+				$base['definition']              = $decoded;
 				$base[ self::META_INTERNAL_KEY ] = $base[ self::META_INTERNAL_KEY ] ?: ( $decoded[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
-				$base[ self::META_STATUS ] = $base[ self::META_STATUS ] ?: ( $decoded[ Composition_Schema::FIELD_STATUS ] ?? '' );
+				$base[ self::META_STATUS ]       = $base[ self::META_STATUS ] ?: ( $decoded[ Composition_Schema::FIELD_STATUS ] ?? '' );
 			}
 		}
 		return $base;

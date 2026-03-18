@@ -35,9 +35,9 @@ final class ACF_Uninstall_Inventory_Service_Test extends TestCase {
 
 	public function test_identifies_plugin_runtime_group_keys_from_section_registry(): void {
 		$section_keys = array( 'st01_hero', 'st05_faq' );
-		$repo        = $this->create_repository_mock_returning_section_keys( $section_keys );
-		$blueprint   = $this->create_blueprint_service_mock_with_two_sections();
-		$service     = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
+		$repo         = $this->create_repository_mock_returning_section_keys( $section_keys );
+		$blueprint    = $this->create_blueprint_service_mock_with_two_sections();
+		$service      = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
 
 		$result = $service->build_inventory();
 
@@ -50,9 +50,9 @@ final class ACF_Uninstall_Inventory_Service_Test extends TestCase {
 
 	public function test_does_not_include_unrelated_or_native_acf_groups(): void {
 		$section_keys = array( 'st01_hero' );
-		$repo        = $this->create_repository_mock_returning_section_keys( $section_keys );
-		$blueprint   = $this->create_blueprint_service_mock_with_one_section();
-		$service     = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
+		$repo         = $this->create_repository_mock_returning_section_keys( $section_keys );
+		$blueprint    = $this->create_blueprint_service_mock_with_one_section();
+		$service      = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
 
 		$result = $service->build_inventory();
 
@@ -65,9 +65,9 @@ final class ACF_Uninstall_Inventory_Service_Test extends TestCase {
 
 	public function test_enumerates_field_definitions_and_value_meta_keys_without_mutation(): void {
 		$section_keys = array( 'st01_hero' );
-		$repo        = $this->create_repository_mock_returning_section_keys( $section_keys );
-		$blueprint   = $this->create_blueprint_service_mock_with_one_section();
-		$service     = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
+		$repo         = $this->create_repository_mock_returning_section_keys( $section_keys );
+		$blueprint    = $this->create_blueprint_service_mock_with_one_section();
+		$service      = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
 
 		$result = $service->build_inventory();
 
@@ -85,9 +85,9 @@ final class ACF_Uninstall_Inventory_Service_Test extends TestCase {
 
 	public function test_persistent_group_keys_empty_by_default(): void {
 		$section_keys = array( 'st01_hero' );
-		$repo        = $this->create_repository_mock_returning_section_keys( $section_keys );
-		$blueprint   = $this->create_blueprint_service_mock_with_one_section();
-		$service     = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
+		$repo         = $this->create_repository_mock_returning_section_keys( $section_keys );
+		$blueprint    = $this->create_blueprint_service_mock_with_one_section();
+		$service      = new ACF_Uninstall_Inventory_Service( $repo, $blueprint );
 
 		$result = $service->build_inventory();
 
@@ -130,26 +130,35 @@ final class ACF_Uninstall_Inventory_Service_Test extends TestCase {
 			Field_Blueprint_Schema::SECTION_KEY     => 'st01_hero',
 			Field_Blueprint_Schema::SECTION_VERSION => '1',
 			Field_Blueprint_Schema::LABEL           => 'Hero Fields',
-			Field_Blueprint_Schema::FIELDS        => array(
-				array( 'key' => 'field_st01_hero_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ),
+			Field_Blueprint_Schema::FIELDS          => array(
+				array(
+					'key'   => 'field_st01_hero_headline',
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
 			),
 		);
-		$mock = $this->createMock( Section_Field_Blueprint_Service_Interface::class );
+		$mock           = $this->createMock( Section_Field_Blueprint_Service_Interface::class );
 		$mock->method( 'get_blueprint_for_section' )
-			->willReturnMap( array(
-				array( 'st01_hero', null, $blueprint_st01 ),
-				array( 'st05_faq', null, $this->blueprint_st05_faq() ),
-			) );
+			->willReturnMap(
+				array(
+					array( 'st01_hero', null, $blueprint_st01 ),
+					array( 'st05_faq', null, $this->blueprint_st05_faq() ),
+				)
+			);
 		return $mock;
 	}
 
 	private function create_blueprint_service_mock_with_two_sections(): Section_Field_Blueprint_Service_Interface {
 		$mock = $this->createMock( Section_Field_Blueprint_Service_Interface::class );
 		$mock->method( 'get_blueprint_for_section' )
-			->willReturnMap( array(
-				array( 'st01_hero', null, $this->blueprint_st01_hero() ),
-				array( 'st05_faq', null, $this->blueprint_st05_faq() ),
-			) );
+			->willReturnMap(
+				array(
+					array( 'st01_hero', null, $this->blueprint_st01_hero() ),
+					array( 'st05_faq', null, $this->blueprint_st05_faq() ),
+				)
+			);
 		return $mock;
 	}
 
@@ -158,8 +167,13 @@ final class ACF_Uninstall_Inventory_Service_Test extends TestCase {
 			Field_Blueprint_Schema::SECTION_KEY     => 'st01_hero',
 			Field_Blueprint_Schema::SECTION_VERSION => '1',
 			Field_Blueprint_Schema::LABEL           => 'Hero Fields',
-			Field_Blueprint_Schema::FIELDS         => array(
-				array( 'key' => 'field_st01_hero_headline', 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ),
+			Field_Blueprint_Schema::FIELDS          => array(
+				array(
+					'key'   => 'field_st01_hero_headline',
+					'name'  => 'headline',
+					'label' => 'Headline',
+					'type'  => 'text',
+				),
 			),
 		);
 	}
@@ -169,8 +183,13 @@ final class ACF_Uninstall_Inventory_Service_Test extends TestCase {
 			Field_Blueprint_Schema::SECTION_KEY     => 'st05_faq',
 			Field_Blueprint_Schema::SECTION_VERSION => '1',
 			Field_Blueprint_Schema::LABEL           => 'FAQ Fields',
-			Field_Blueprint_Schema::FIELDS         => array(
-				array( 'key' => 'field_st05_faq_question', 'name' => 'question', 'label' => 'Question', 'type' => 'text' ),
+			Field_Blueprint_Schema::FIELDS          => array(
+				array(
+					'key'   => 'field_st05_faq_question',
+					'name'  => 'question',
+					'label' => 'Question',
+					'type'  => 'text',
+				),
 			),
 		);
 	}

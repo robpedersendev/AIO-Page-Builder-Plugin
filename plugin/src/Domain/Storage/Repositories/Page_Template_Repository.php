@@ -43,7 +43,7 @@ final class Page_Template_Repository extends Abstract_CPT_Repository implements 
 
 		$data = array(
 			'internal_key' => $key,
-			'status'      => $status,
+			'status'       => $status,
 			'post_title'   => \sanitize_text_field( $name ),
 		);
 
@@ -103,9 +103,14 @@ final class Page_Template_Repository extends Abstract_CPT_Repository implements 
 		if ( $archetype === '' ) {
 			return $all;
 		}
-		return array_values( array_filter( $all, function ( $def ) use ( $archetype ) {
-			return ( (string) ( $def[ Page_Template_Schema::FIELD_ARCHETYPE ] ?? '' ) ) === $archetype;
-		} ) );
+		return array_values(
+			array_filter(
+				$all,
+				function ( $def ) use ( $archetype ) {
+					return ( (string) ( $def[ Page_Template_Schema::FIELD_ARCHETYPE ] ?? '' ) ) === $archetype;
+				}
+			)
+		);
 	}
 
 	/**
@@ -118,7 +123,7 @@ final class Page_Template_Repository extends Abstract_CPT_Repository implements 
 	 */
 	public function list_definitions_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		$records = $this->list_by_status( $status, $limit, $offset );
-		$out = array();
+		$out     = array();
 		foreach ( $records as $r ) {
 			if ( isset( $r['definition'] ) && is_array( $r['definition'] ) ) {
 				$out[] = $r['definition'];
@@ -161,7 +166,7 @@ final class Page_Template_Repository extends Abstract_CPT_Repository implements 
 			if ( empty( $batch ) ) {
 				break;
 			}
-			$out = array_merge( $out, $batch );
+			$out     = array_merge( $out, $batch );
 			$offset += $limit;
 			if ( count( $batch ) < $limit ) {
 				break;
@@ -188,7 +193,7 @@ final class Page_Template_Repository extends Abstract_CPT_Repository implements 
 				'post_status'    => 'any',
 			)
 		);
-		$out = array();
+		$out   = array();
 		foreach ( $query->get_posts() as $post ) {
 			$record = $this->post_to_record( $post, $this->get_meta( $post->ID ) );
 			if ( isset( $record['definition'] ) && is_array( $record['definition'] ) ) {
@@ -205,9 +210,9 @@ final class Page_Template_Repository extends Abstract_CPT_Repository implements 
 		if ( is_string( $raw ) && $raw !== '' ) {
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
-				$base['definition'] = $decoded;
+				$base['definition']              = $decoded;
 				$base[ self::META_INTERNAL_KEY ] = $base[ self::META_INTERNAL_KEY ] ?: ( $decoded[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-				$base[ self::META_STATUS ] = $base[ self::META_STATUS ] ?: ( $decoded[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
+				$base[ self::META_STATUS ]       = $base[ self::META_STATUS ] ?: ( $decoded[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
 			}
 		}
 		return $base;

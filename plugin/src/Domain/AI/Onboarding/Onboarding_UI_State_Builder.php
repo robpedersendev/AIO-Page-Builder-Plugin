@@ -38,9 +38,9 @@ final class Onboarding_UI_State_Builder {
 		?Industry_Profile_Repository $industry_profile_repository = null,
 		?Industry_Question_Pack_Registry $industry_question_pack_registry = null
 	) {
-		$this->draft_service                  = $draft_service;
-		$this->prefill_service                = $prefill_service;
-		$this->industry_profile_repository    = $industry_profile_repository;
+		$this->draft_service                   = $draft_service;
+		$this->prefill_service                 = $prefill_service;
+		$this->industry_profile_repository     = $industry_profile_repository;
 		$this->industry_question_pack_registry = $industry_question_pack_registry;
 	}
 
@@ -60,9 +60,9 @@ final class Onboarding_UI_State_Builder {
 			Onboarding_Step_Keys::EXISTING_SITE         => __( 'Existing Site', 'aio-page-builder' ),
 			Onboarding_Step_Keys::CRAWL_PREFERENCES     => __( 'Crawl Preferences', 'aio-page-builder' ),
 			Onboarding_Step_Keys::PROVIDER_SETUP        => __( 'AI Provider Setup', 'aio-page-builder' ),
-			Onboarding_Step_Keys::TEMPLATE_PREFERENCES   => __( 'Page & template preferences', 'aio-page-builder' ),
+			Onboarding_Step_Keys::TEMPLATE_PREFERENCES  => __( 'Page & template preferences', 'aio-page-builder' ),
 			Onboarding_Step_Keys::REVIEW                => __( 'Review', 'aio-page-builder' ),
-			Onboarding_Step_Keys::SUBMISSION           => __( 'Submission', 'aio-page-builder' ),
+			Onboarding_Step_Keys::SUBMISSION            => __( 'Submission', 'aio-page-builder' ),
 		);
 	}
 
@@ -72,17 +72,17 @@ final class Onboarding_UI_State_Builder {
 	 * @return array<string, mixed> Keys: current_step_key, steps, overall_status, is_blocked, blockers, prefill, draft, nonce, nonce_action, can_save_draft, resume_message, is_provider_ready.
 	 */
 	public function build_for_screen(): array {
-		$draft = $this->draft_service->get_draft();
-		$prefill = $this->prefill_service->get_prefill_data( $draft );
+		$draft            = $this->draft_service->get_draft();
+		$prefill          = $this->prefill_service->get_prefill_data( $draft );
 		$current_step_key = $draft['current_step_key'] ?? Onboarding_Step_Keys::WELCOME;
-		$overall_status = $draft['overall_status'] ?? Onboarding_Statuses::NOT_STARTED;
+		$overall_status   = $draft['overall_status'] ?? Onboarding_Statuses::NOT_STARTED;
 
 		// When resuming from draft_saved, treat as in_progress for UI.
 		$effective_status = $overall_status === Onboarding_Statuses::DRAFT_SAVED ? Onboarding_Statuses::IN_PROGRESS : $overall_status;
 
 		$step_statuses = $draft['step_statuses'] ?? array();
-		$labels = self::step_labels();
-		$steps = array();
+		$labels        = self::step_labels();
+		$steps         = array();
 		foreach ( Onboarding_Step_Keys::ordered() as $key ) {
 			$steps[] = array(
 				'key'        => $key,
@@ -93,9 +93,9 @@ final class Onboarding_UI_State_Builder {
 		}
 
 		$is_provider_ready = $this->prefill_service->is_provider_ready();
-		$is_at_review = $current_step_key === Onboarding_Step_Keys::REVIEW;
-		$is_blocked = $is_at_review && ! $is_provider_ready;
-		$blockers = array();
+		$is_at_review      = $current_step_key === Onboarding_Step_Keys::REVIEW;
+		$is_blocked        = $is_at_review && ! $is_provider_ready;
+		$blockers          = array();
 		if ( $is_at_review && ! $is_provider_ready ) {
 			$blockers[] = __( 'Configure an AI provider to continue.', 'aio-page-builder' );
 		}
@@ -107,20 +107,20 @@ final class Onboarding_UI_State_Builder {
 		$submission_warnings = $this->build_submission_warnings( $draft, $prefill );
 
 		$state = array(
-			'current_step_key'     => $current_step_key,
-			'steps'                => $steps,
-			'overall_status'       => $effective_status,
-			'is_blocked'           => $is_blocked,
-			'blockers'             => $blockers,
-			'prefill'              => $prefill,
-			'draft'                => $draft,
-			'nonce'                => \wp_create_nonce( 'aio_onboarding_save' ),
-			'nonce_action'         => 'aio_onboarding_save',
-			'can_save_draft'       => true,
-			'resume_message'       => $resume_message,
-			'is_provider_ready'    => $is_provider_ready,
-			'submission_warnings'  => $submission_warnings,
-			'last_planning_run_id' => $draft['last_planning_run_id'] ?? null,
+			'current_step_key'          => $current_step_key,
+			'steps'                     => $steps,
+			'overall_status'            => $effective_status,
+			'is_blocked'                => $is_blocked,
+			'blockers'                  => $blockers,
+			'prefill'                   => $prefill,
+			'draft'                     => $draft,
+			'nonce'                     => \wp_create_nonce( 'aio_onboarding_save' ),
+			'nonce_action'              => 'aio_onboarding_save',
+			'can_save_draft'            => true,
+			'resume_message'            => $resume_message,
+			'is_provider_ready'         => $is_provider_ready,
+			'submission_warnings'       => $submission_warnings,
+			'last_planning_run_id'      => $draft['last_planning_run_id'] ?? null,
 			'last_planning_run_post_id' => $draft['last_planning_run_post_id'] ?? null,
 		);
 
@@ -136,7 +136,7 @@ final class Onboarding_UI_State_Builder {
 	 */
 	private function append_industry_question_pack_state( array $state ): array {
 		if ( $this->industry_profile_repository === null || $this->industry_question_pack_registry === null ) {
-			$state['industry_question_pack']       = null;
+			$state['industry_question_pack']         = null;
 			$state['industry_question_pack_answers'] = array();
 			return $state;
 		}
@@ -145,20 +145,20 @@ final class Onboarding_UI_State_Builder {
 			? trim( $profile['primary_industry_key'] )
 			: '';
 		if ( $primary === '' ) {
-			$state['industry_question_pack']       = null;
+			$state['industry_question_pack']         = null;
 			$state['industry_question_pack_answers'] = array();
 			return $state;
 		}
 		$pack = $this->industry_question_pack_registry->get( $primary );
 		if ( $pack === null ) {
-			$state['industry_question_pack']       = null;
+			$state['industry_question_pack']         = null;
 			$state['industry_question_pack_answers'] = array();
 			return $state;
 		}
-		$qp_answers = isset( $profile['question_pack_answers'] ) && is_array( $profile['question_pack_answers'] )
+		$qp_answers                              = isset( $profile['question_pack_answers'] ) && is_array( $profile['question_pack_answers'] )
 			? $profile['question_pack_answers']
 			: array();
-		$state['industry_question_pack'] = $pack;
+		$state['industry_question_pack']         = $pack;
 		$state['industry_question_pack_answers'] = isset( $qp_answers[ $primary ] ) && is_array( $qp_answers[ $primary ] )
 			? $qp_answers[ $primary ]
 			: array();

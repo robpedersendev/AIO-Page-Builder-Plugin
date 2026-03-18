@@ -23,8 +23,8 @@ final class Navigation_Extractor_Test extends TestCase {
 	}
 
 	public function test_extract_returns_links_from_nav(): void {
-		$html = '<nav><ul><li><a href="/">Home</a></li><li><a href="/about">About</a></li></ul></nav>';
-		$ext = new Navigation_Extractor();
+		$html  = '<nav><ul><li><a href="/">Home</a></li><li><a href="/about">About</a></li></ul></nav>';
+		$ext   = new Navigation_Extractor();
 		$links = $ext->extract( $html );
 		$this->assertCount( 2, $links );
 		$this->assertSame( 'nav', $links[0]['context'] );
@@ -35,8 +35,8 @@ final class Navigation_Extractor_Test extends TestCase {
 	}
 
 	public function test_extract_returns_links_from_header_and_footer(): void {
-		$html = '<header><a href="/">Site</a></header><main>content</main><footer><a href="/privacy">Privacy</a></footer>';
-		$ext = new Navigation_Extractor();
+		$html  = '<header><a href="/">Site</a></header><main>content</main><footer><a href="/privacy">Privacy</a></footer>';
+		$ext   = new Navigation_Extractor();
 		$links = $ext->extract( $html );
 		$this->assertCount( 2, $links );
 		$contexts = array_column( $links, 'context' );
@@ -45,23 +45,23 @@ final class Navigation_Extractor_Test extends TestCase {
 	}
 
 	public function test_extract_deduplicates_same_href_and_label(): void {
-		$html = '<nav><a href="/">Home</a></nav><footer><a href="/">Home</a></footer>';
-		$ext = new Navigation_Extractor();
+		$html  = '<nav><a href="/">Home</a></nav><footer><a href="/">Home</a></footer>';
+		$ext   = new Navigation_Extractor();
 		$links = $ext->extract( $html );
 		$this->assertCount( 1, $links );
 	}
 
 	public function test_extract_handles_malformed_fragment(): void {
-		$html = '<nav><a href="">Empty</a><a href="/ok">OK</a></nav>';
-		$ext = new Navigation_Extractor();
+		$html  = '<nav><a href="">Empty</a><a href="/ok">OK</a></nav>';
+		$ext   = new Navigation_Extractor();
 		$links = $ext->extract( $html );
 		$this->assertCount( 1, $links );
 		$this->assertSame( '/ok', $links[0]['url'] );
 	}
 
 	public function test_extract_role_navigation(): void {
-		$html = '<div role="navigation"><a href="/menu">Menu</a></div>';
-		$ext = new Navigation_Extractor();
+		$html  = '<div role="navigation"><a href="/menu">Menu</a></div>';
+		$ext   = new Navigation_Extractor();
 		$links = $ext->extract( $html );
 		$this->assertCount( 1, $links );
 		$this->assertSame( 'nav', $links[0]['context'] );

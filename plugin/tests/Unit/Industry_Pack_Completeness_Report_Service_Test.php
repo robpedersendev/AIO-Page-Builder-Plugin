@@ -39,15 +39,17 @@ final class Industry_Pack_Completeness_Report_Service_Test extends TestCase {
 
 	public function test_generate_report_with_one_active_pack_produces_one_result(): void {
 		$pack_registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
-		$pack_registry->load( array(
+		$pack_registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY    => 'completeness_test',
-				Industry_Pack_Schema::FIELD_NAME           => 'Completeness Test',
-				Industry_Pack_Schema::FIELD_SUMMARY       => 'For report test',
-				Industry_Pack_Schema::FIELD_STATUS        => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
-			),
-		) );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'completeness_test',
+					Industry_Pack_Schema::FIELD_NAME    => 'Completeness Test',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'For report test',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
+				),
+			)
+		);
 		$bundle_registry = new Industry_Starter_Bundle_Registry();
 		$bundle_registry->load( array() );
 
@@ -71,22 +73,24 @@ final class Industry_Pack_Completeness_Report_Service_Test extends TestCase {
 
 	public function test_report_result_has_bounded_interpretable_fields(): void {
 		$pack_registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
-		$pack_registry->load( array(
+		$pack_registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY    => 'bounded_test',
-				Industry_Pack_Schema::FIELD_NAME           => 'Bounded',
-				Industry_Pack_Schema::FIELD_SUMMARY       => 'Test',
-				Industry_Pack_Schema::FIELD_STATUS        => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
-			),
-		) );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'bounded_test',
+					Industry_Pack_Schema::FIELD_NAME    => 'Bounded',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Test',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
+				),
+			)
+		);
 		$bundle_registry = new Industry_Starter_Bundle_Registry();
 		$bundle_registry->load( array() );
 
 		$service = new Industry_Pack_Completeness_Report_Service( $pack_registry, $bundle_registry );
 		$result  = $service->generate_report( false );
 
-		$row = $result['pack_results'][0];
+		$row  = $result['pack_results'][0];
 		$dims = $row['dimension_scores'];
 		$this->assertArrayHasKey( Industry_Pack_Completeness_Report_Service::DIMENSION_PACK, $dims );
 		$this->assertArrayHasKey( Industry_Pack_Completeness_Report_Service::DIMENSION_BUNDLE, $dims );

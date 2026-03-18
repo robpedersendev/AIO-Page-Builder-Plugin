@@ -38,8 +38,8 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 		ACF_Group_Builder $group_builder,
 		?Section_Template_Repository $section_repository = null
 	) {
-		$this->blueprint_service   = $blueprint_service;
-		$this->group_builder       = $group_builder;
+		$this->blueprint_service  = $blueprint_service;
+		$this->group_builder      = $group_builder;
 		$this->section_repository = $section_repository;
 	}
 
@@ -54,10 +54,10 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 			return 0;
 		}
 		$blueprints = $this->blueprint_service->get_all_blueprints();
-		$count = 0;
+		$count      = 0;
 		foreach ( $blueprints as $blueprint ) {
 			if ( $this->register_blueprint( $blueprint ) ) {
-				$count++;
+				++$count;
 			}
 		}
 		return $count;
@@ -85,9 +85,9 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 		if ( ! $this->is_acf_available() ) {
 			return new Section_Scoped_Group_Registration_Result( 0, array() );
 		}
-		$unique = array_values( array_unique( array_map( 'strval', $section_keys ) ) );
+		$unique     = array_values( array_unique( array_map( 'strval', $section_keys ) ) );
 		$registered = 0;
-		$skipped = array();
+		$skipped    = array();
 		foreach ( $unique as $key ) {
 			$key = (string) $key;
 			if ( $key === '' ) {
@@ -99,7 +99,7 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 				continue;
 			}
 			if ( $this->register_blueprint( $blueprint ) ) {
-				$registered++;
+				++$registered;
 			}
 		}
 		return new Section_Scoped_Group_Registration_Result( $registered, $skipped );
@@ -129,7 +129,7 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 		if ( $family_key === '' ) {
 			return 0;
 		}
-		$definitions = $this->section_repository->list_all_definitions( 9999, 0 );
+		$definitions  = $this->section_repository->list_all_definitions( 9999, 0 );
 		$section_keys = array();
 		foreach ( $definitions as $def ) {
 			$def_family = \sanitize_key( (string) ( $def['variation_family_key'] ?? '' ) );

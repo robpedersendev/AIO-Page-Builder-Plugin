@@ -44,11 +44,11 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 		$p = is_array( $post ) ? $post : (array) $post;
 		return array_merge(
 			array(
-				'id'           => (int) ( $p['ID'] ?? 0 ),
-				'post_type'    => $p['post_type'] ?? '',
-				'post_title'   => $p['post_title'] ?? '',
-				'post_status'  => $p['post_status'] ?? '',
-				'post_name'    => $p['post_name'] ?? '',
+				'id'          => (int) ( $p['ID'] ?? 0 ),
+				'post_type'   => $p['post_type'] ?? '',
+				'post_title'  => $p['post_title'] ?? '',
+				'post_status' => $p['post_status'] ?? '',
+				'post_name'   => $p['post_name'] ?? '',
 			),
 			array(
 				'internal_key' => $meta[ self::META_INTERNAL_KEY ] ?? '',
@@ -81,8 +81,8 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 				'update_post_meta_cache' => true,
 				'meta_query'             => array(
 					array(
-						'key'   => self::META_INTERNAL_KEY,
-						'value' => $key,
+						'key'     => self::META_INTERNAL_KEY,
+						'value'   => $key,
 						'compare' => '=',
 					),
 				),
@@ -117,9 +117,9 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 				),
 			)
 		);
-		$out = array();
+		$out    = array();
 		foreach ( $query->get_posts() as $post ) {
-			$meta = $this->get_meta( $post->ID );
+			$meta  = $this->get_meta( $post->ID );
 			$out[] = $this->post_to_record( $post, $meta );
 		}
 		return $out;
@@ -127,10 +127,10 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 
 	/** @inheritdoc */
 	public function save( array $data ): int {
-		$id = isset( $data['id'] ) ? (int) $data['id'] : 0;
-		$key = $this->sanitize_key( (string) ( $data['internal_key'] ?? $data['post_name'] ?? '' ) );
+		$id     = isset( $data['id'] ) ? (int) $data['id'] : 0;
+		$key    = $this->sanitize_key( (string) ( $data['internal_key'] ?? $data['post_name'] ?? '' ) );
 		$status = $this->sanitize_status( (string) ( $data['status'] ?? 'draft' ) );
-		$title = isset( $data['post_title'] ) ? \sanitize_text_field( (string) $data['post_title'] ) : ( $key ?: 'Untitled' );
+		$title  = isset( $data['post_title'] ) ? \sanitize_text_field( (string) $data['post_title'] ) : ( $key ?: 'Untitled' );
 
 		if ( $id > 0 ) {
 			$updated = \wp_update_post(
@@ -192,7 +192,7 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 	}
 
 	protected function sanitize_status( string $status ): string {
-		$status = \sanitize_text_field( $status );
+		$status  = \sanitize_text_field( $status );
 		$allowed = Object_Status_Families::get_statuses_for( $this->get_post_type() );
 		return in_array( $status, $allowed, true ) ? $status : '';
 	}

@@ -53,8 +53,8 @@ final class Detail_Panel_Component {
 	 * @return void
 	 */
 	public function render( array $payload, string $panel_id = 'aio-detail-panel' ): void {
-		$item_id = (string) ( $payload[ self::KEY_ITEM_ID ] ?? '' );
-		$sections = isset( $payload[ self::KEY_SECTIONS ] ) && is_array( $payload[ self::KEY_SECTIONS ] ) ? $payload[ self::KEY_SECTIONS ] : array();
+		$item_id     = (string) ( $payload[ self::KEY_ITEM_ID ] ?? '' );
+		$sections    = isset( $payload[ self::KEY_SECTIONS ] ) && is_array( $payload[ self::KEY_SECTIONS ] ) ? $payload[ self::KEY_SECTIONS ] : array();
 		$row_actions = isset( $payload[ self::KEY_ROW_ACTIONS ] ) && is_array( $payload[ self::KEY_ROW_ACTIONS ] ) ? $payload[ self::KEY_ROW_ACTIONS ] : array();
 
 		$css_class = 'aio-detail-panel aio-build-plan-detail';
@@ -91,10 +91,10 @@ final class Detail_Panel_Component {
 			if ( ! is_array( $section ) ) {
 				continue;
 			}
-			$heading = (string) ( $section[ self::SECTION_KEY_HEADING ] ?? '' );
-			$content = isset( $section[ self::SECTION_KEY_CONTENT ] ) ? (string) $section[ self::SECTION_KEY_CONTENT ] : '';
-			$lines   = isset( $section[ self::SECTION_KEY_CONTENT_LINES ] ) && is_array( $section[ self::SECTION_KEY_CONTENT_LINES ] ) ? $section[ self::SECTION_KEY_CONTENT_LINES ] : array();
-			$key     = (string) ( $section[ self::SECTION_KEY_KEY ] ?? '' );
+			$heading     = (string) ( $section[ self::SECTION_KEY_HEADING ] ?? '' );
+			$content     = isset( $section[ self::SECTION_KEY_CONTENT ] ) ? (string) $section[ self::SECTION_KEY_CONTENT ] : '';
+			$lines       = isset( $section[ self::SECTION_KEY_CONTENT_LINES ] ) && is_array( $section[ self::SECTION_KEY_CONTENT_LINES ] ) ? $section[ self::SECTION_KEY_CONTENT_LINES ] : array();
+			$key         = (string) ( $section[ self::SECTION_KEY_KEY ] ?? '' );
 			$block_class = 'aio-detail-section';
 			if ( $key !== '' ) {
 				$block_class .= ' aio-detail-section-' . \sanitize_html_class( $key );
@@ -128,9 +128,9 @@ final class Detail_Panel_Component {
 	private function render_detail_actions( array $actions, string $item_id ): void {
 		foreach ( $actions as $action ) {
 			$action_id = (string) ( $action['action_id'] ?? '' );
-			$label    = (string) ( $action['label'] ?? $action_id );
-			$enabled  = ! empty( $action['enabled'] );
-			$url      = isset( $action['url'] ) ? (string) $action['url'] : '';
+			$label     = (string) ( $action['label'] ?? $action_id );
+			$enabled   = ! empty( $action['enabled'] );
+			$url       = isset( $action['url'] ) ? (string) $action['url'] : '';
 			$css_class = 'aio-detail-action aio-detail-action-' . \sanitize_html_class( $action_id );
 			if ( ! $enabled ) {
 				echo '<span class="button button-small ' . \esc_attr( $css_class . ' aio-detail-action-disabled' ) . '" aria-disabled="true">' . \esc_html( $label ) . '</span> ';

@@ -30,14 +30,14 @@ final class Industry_Content_Gap_Detector_Test extends TestCase {
 
 	public function test_detect_unknown_industry_returns_empty(): void {
 		$detector = new Industry_Content_Gap_Detector( null );
-		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'unknown_industry_xyz' );
+		$profile  = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'unknown_industry_xyz' );
 		$this->assertSame( array(), $detector->detect( $profile, null, array() ) );
 	}
 
 	public function test_detect_realtor_returns_expected_gaps(): void {
 		$detector = new Industry_Content_Gap_Detector( null );
-		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor' );
-		$gaps = $detector->detect( $profile, null, array() );
+		$profile  = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor' );
+		$gaps     = $detector->detect( $profile, null, array() );
 		$this->assertGreaterThanOrEqual( 2, count( $gaps ) );
 		$types = array_column( $gaps, 'gap_type' );
 		$this->assertContains( Industry_Content_Gap_Detector::GAP_GALLERY, $types );
@@ -54,25 +54,25 @@ final class Industry_Content_Gap_Detector_Test extends TestCase {
 
 	public function test_detect_plumber_includes_emergency_and_service_area(): void {
 		$detector = new Industry_Content_Gap_Detector( null );
-		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'plumber' );
-		$gaps = $detector->detect( $profile, null, array() );
-		$types = array_column( $gaps, 'gap_type' );
+		$profile  = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'plumber' );
+		$gaps     = $detector->detect( $profile, null, array() );
+		$types    = array_column( $gaps, 'gap_type' );
 		$this->assertContains( Industry_Content_Gap_Detector::GAP_EMERGENCY_RESPONSE, $types );
 		$this->assertContains( Industry_Content_Gap_Detector::GAP_SERVICE_AREA, $types );
 	}
 
 	public function test_detect_content_hints_suppress_gaps(): void {
 		$detector = new Industry_Content_Gap_Detector( null );
-		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor' );
-		$options = array(
+		$profile  = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor' );
+		$options  = array(
 			Industry_Content_Gap_Detector::OPT_CONTENT_HINTS => array(
-				'has_gallery' => true,
-				'has_trust_proof' => true,
+				'has_gallery'          => true,
+				'has_trust_proof'      => true,
 				'has_valuation_assets' => true,
 			),
 		);
-		$gaps = $detector->detect( $profile, null, $options );
-		$types = array_column( $gaps, 'gap_type' );
+		$gaps     = $detector->detect( $profile, null, $options );
+		$types    = array_column( $gaps, 'gap_type' );
 		$this->assertNotContains( Industry_Content_Gap_Detector::GAP_GALLERY, $types );
 		$this->assertNotContains( Industry_Content_Gap_Detector::GAP_TRUST_PROOF, $types );
 		$this->assertNotContains( Industry_Content_Gap_Detector::GAP_VALUATION_CONVERSION, $types );
@@ -80,15 +80,15 @@ final class Industry_Content_Gap_Detector_Test extends TestCase {
 
 	public function test_detect_all_hints_present_returns_empty(): void {
 		$detector = new Industry_Content_Gap_Detector( null );
-		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'cosmetology_nail' );
-		$options = array(
+		$profile  = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'cosmetology_nail' );
+		$options  = array(
 			Industry_Content_Gap_Detector::OPT_CONTENT_HINTS => array(
-				'has_staff_bios' => true,
-				'has_gallery' => true,
+				'has_staff_bios'  => true,
+				'has_gallery'     => true,
 				'has_trust_proof' => true,
 			),
 		);
-		$gaps = $detector->detect( $profile, null, $options );
+		$gaps     = $detector->detect( $profile, null, $options );
 		$this->assertSame( array(), $gaps );
 	}
 
@@ -96,11 +96,11 @@ final class Industry_Content_Gap_Detector_Test extends TestCase {
 	public function test_detect_with_subtype_extender_adds_subtype_influence_when_refinement_exists(): void {
 		$extender = new Industry_Subtype_Content_Gap_Extender();
 		$detector = new Industry_Content_Gap_Detector( null, $extender );
-		$profile = array(
+		$profile  = array(
 			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'cosmetology_nail',
 			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'cosmetology_nail_mobile_tech',
 		);
-		$gaps = $detector->detect( $profile, null, array() );
+		$gaps     = $detector->detect( $profile, null, array() );
 		$this->assertGreaterThanOrEqual( 1, count( $gaps ) );
 		$service_area_gap = null;
 		foreach ( $gaps as $gap ) {
@@ -119,8 +119,8 @@ final class Industry_Content_Gap_Detector_Test extends TestCase {
 	public function test_detect_without_subtype_has_no_subtype_influence(): void {
 		$extender = new Industry_Subtype_Content_Gap_Extender();
 		$detector = new Industry_Content_Gap_Detector( null, $extender );
-		$profile = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'cosmetology_nail' );
-		$gaps = $detector->detect( $profile, null, array() );
+		$profile  = array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'cosmetology_nail' );
+		$gaps     = $detector->detect( $profile, null, array() );
 		foreach ( $gaps as $gap ) {
 			$this->assertArrayNotHasKey( Industry_Content_Gap_Detector::RESULT_SUBTYPE_INFLUENCE, $gap );
 		}
@@ -129,7 +129,7 @@ final class Industry_Content_Gap_Detector_Test extends TestCase {
 			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'cosmetology_nail',
 			Industry_Profile_Schema::FIELD_INDUSTRY_SUBTYPE_KEY => 'cosmetology_nail_mobile_tech',
 		);
-		$gaps2 = $detector_no_extender->detect( $profile_with_subtype, null, array() );
+		$gaps2                = $detector_no_extender->detect( $profile_with_subtype, null, array() );
 		foreach ( $gaps2 as $gap ) {
 			$this->assertArrayNotHasKey( Industry_Content_Gap_Detector::RESULT_SUBTYPE_INFLUENCE, $gap );
 		}

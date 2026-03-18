@@ -106,23 +106,26 @@ final class ACF_Architecture_Diagnostics_Screen {
 	/** @return array<string, mixed> */
 	private function empty_state(): array {
 		return array(
-			'acf_diagnostics_summary'       => array(
-				'acf_present' => false,
-				'overall_status' => ACF_Diagnostics_State_Builder::OVERALL_BLOCKED,
+			'acf_diagnostics_summary'        => array(
+				'acf_present'      => false,
+				'overall_status'   => ACF_Diagnostics_State_Builder::OVERALL_BLOCKED,
 				'repair_readiness' => 'blocked',
-				'lpagery_status' => ACF_Diagnostics_State_Builder::LPAGERY_ABSENT,
+				'lpagery_status'   => ACF_Diagnostics_State_Builder::LPAGERY_ABSENT,
 			),
 			'field_architecture_health_card' => array(),
-			'assignment_mismatch_groups'      => array(),
-			'lpagery_field_support_summary'   => array( 'status' => ACF_Diagnostics_State_Builder::LPAGERY_ABSENT, 'summary' => '' ),
-			'regeneration_plan_summary'       => array(),
+			'assignment_mismatch_groups'     => array(),
+			'lpagery_field_support_summary'  => array(
+				'status'  => ACF_Diagnostics_State_Builder::LPAGERY_ABSENT,
+				'summary' => '',
+			),
+			'regeneration_plan_summary'      => array(),
 			'filters_applied'                => array(),
 		);
 	}
 
 	/** @param array<string, mixed> $state */
 	private function render_filters( array $state ): void {
-		$base = \add_query_arg( array( 'page' => self::SLUG ), \admin_url( 'admin.php' ) );
+		$base    = \add_query_arg( array( 'page' => self::SLUG ), \admin_url( 'admin.php' ) );
 		$filters = $state['filters_applied'] ?? array();
 		?>
 		<div class="aio-acf-diagnostics-filters" style="margin: 1em 0;">
@@ -148,15 +151,15 @@ final class ACF_Architecture_Diagnostics_Screen {
 	 * @return void
 	 */
 	private function render_health_card( array $health_card, array $summary ): void {
-		$overall = (string) ( $summary['overall_status'] ?? '' );
-		$acf_present = (bool) ( $health_card['acf_present'] ?? $summary['acf_present'] ?? false );
-		$missing = (int) ( $health_card['missing_group_count'] ?? $summary['missing_count'] ?? 0 );
-		$stale = (int) ( $health_card['version_stale_count'] ?? $summary['version_stale_count'] ?? 0 );
-		$ok = (int) ( $health_card['registered_ok_count'] ?? $summary['registered_count'] ?? 0 );
-		$expected = (int) ( $health_card['expected_group_count'] ?? 0 );
+		$overall           = (string) ( $summary['overall_status'] ?? '' );
+		$acf_present       = (bool) ( $health_card['acf_present'] ?? $summary['acf_present'] ?? false );
+		$missing           = (int) ( $health_card['missing_group_count'] ?? $summary['missing_count'] ?? 0 );
+		$stale             = (int) ( $health_card['version_stale_count'] ?? $summary['version_stale_count'] ?? 0 );
+		$ok                = (int) ( $health_card['registered_ok_count'] ?? $summary['registered_count'] ?? 0 );
+		$expected          = (int) ( $health_card['expected_group_count'] ?? 0 );
 		$pages_assignments = (int) ( $health_card['pages_with_assignments'] ?? 0 );
-		$pages_source = (int) ( $health_card['pages_with_structural_source'] ?? 0 );
-		$compat_warnings = (int) ( $health_card['compatibility_warning_count'] ?? 0 );
+		$pages_source      = (int) ( $health_card['pages_with_structural_source'] ?? 0 );
+		$compat_warnings   = (int) ( $health_card['compatibility_warning_count'] ?? 0 );
 		$stale_assignments = (int) ( $health_card['stale_assignment_count'] ?? 0 );
 		?>
 		<div class="aio-acf-diagnostics-health-card card" style="max-width: 800px; padding: 1em; margin: 1em 0;">
@@ -206,7 +209,7 @@ final class ACF_Architecture_Diagnostics_Screen {
 
 	private function label_for_overall_status( string $status ): string {
 		$labels = array(
-			ACF_Diagnostics_State_Builder::OVERALL_HEALTHY  => __( 'Healthy', 'aio-page-builder' ),
+			ACF_Diagnostics_State_Builder::OVERALL_HEALTHY => __( 'Healthy', 'aio-page-builder' ),
 			ACF_Diagnostics_State_Builder::OVERALL_DRIFT   => __( 'Drift (repair available)', 'aio-page-builder' ),
 			ACF_Diagnostics_State_Builder::OVERALL_PARTIAL => __( 'Partial (some mismatches)', 'aio-page-builder' ),
 			ACF_Diagnostics_State_Builder::OVERALL_STALE   => __( 'Stale (version mismatch)', 'aio-page-builder' ),
@@ -260,7 +263,7 @@ final class ACF_Architecture_Diagnostics_Screen {
 	 * @return void
 	 */
 	private function render_lpagery_summary( array $lpagery ): void {
-		$status = (string) ( $lpagery['status'] ?? ACF_Diagnostics_State_Builder::LPAGERY_ABSENT );
+		$status  = (string) ( $lpagery['status'] ?? ACF_Diagnostics_State_Builder::LPAGERY_ABSENT );
 		$summary = (string) ( $lpagery['summary'] ?? '' );
 		?>
 		<div class="aio-acf-diagnostics-lpagery card" style="max-width: 800px; padding: 1em; margin: 1em 0;">
@@ -282,11 +285,11 @@ final class ACF_Architecture_Diagnostics_Screen {
 
 	private function label_for_lpagery_status( string $status ): string {
 		$labels = array(
-			ACF_Diagnostics_State_Builder::LPAGERY_ABSENT         => __( 'Absent', 'aio-page-builder' ),
+			ACF_Diagnostics_State_Builder::LPAGERY_ABSENT  => __( 'Absent', 'aio-page-builder' ),
 			ACF_Diagnostics_State_Builder::LPAGERY_PRESENT_UNUSED => __( 'Present (unused)', 'aio-page-builder' ),
-			ACF_Diagnostics_State_Builder::LPAGERY_SUPPORTED      => __( 'Supported', 'aio-page-builder' ),
-			ACF_Diagnostics_State_Builder::LPAGERY_PARTIAL       => __( 'Partial', 'aio-page-builder' ),
-			ACF_Diagnostics_State_Builder::LPAGERY_BLOCKED       => __( 'Blocked by unsupported fields', 'aio-page-builder' ),
+			ACF_Diagnostics_State_Builder::LPAGERY_SUPPORTED => __( 'Supported', 'aio-page-builder' ),
+			ACF_Diagnostics_State_Builder::LPAGERY_PARTIAL => __( 'Partial', 'aio-page-builder' ),
+			ACF_Diagnostics_State_Builder::LPAGERY_BLOCKED => __( 'Blocked by unsupported fields', 'aio-page-builder' ),
 		);
 		return $labels[ $status ] ?? $status;
 	}
@@ -298,10 +301,10 @@ final class ACF_Architecture_Diagnostics_Screen {
 	 * @return void
 	 */
 	private function render_regeneration_summary( array $plan ): void {
-		$missing = (int) ( $plan['missing_count'] ?? 0 );
-		$stale = (int) ( $plan['version_stale_count'] ?? 0 );
+		$missing    = (int) ( $plan['missing_count'] ?? 0 );
+		$stale      = (int) ( $plan['version_stale_count'] ?? 0 );
 		$candidates = (int) ( $plan['candidate_count'] ?? 0 );
-		$refused = $plan['refused_cleanup'] ?? array();
+		$refused    = $plan['refused_cleanup'] ?? array();
 		?>
 		<div class="aio-acf-diagnostics-regeneration card" style="max-width: 800px; padding: 1em; margin: 1em 0;">
 			<h2 class="aio-acf-diagnostics-section-title"><?php \esc_html_e( 'Regeneration readiness', 'aio-page-builder' ); ?></h2>
@@ -327,8 +330,8 @@ final class ACF_Architecture_Diagnostics_Screen {
 		if ( ! \current_user_can( $this->get_repair_capability() ) ) {
 			return;
 		}
-		$summary = $state['acf_diagnostics_summary'] ?? array();
-		$readiness = (string) ( $summary['repair_readiness'] ?? 'blocked' );
+		$summary         = $state['acf_diagnostics_summary'] ?? array();
+		$readiness       = (string) ( $summary['repair_readiness'] ?? 'blocked' );
 		$diagnostics_url = \add_query_arg( array( 'page' => self::SLUG ), \admin_url( 'admin.php' ) );
 		?>
 		<div class="aio-acf-diagnostics-repair card" style="max-width: 800px; padding: 1em; margin: 1em 0;">

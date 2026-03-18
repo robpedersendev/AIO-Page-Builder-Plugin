@@ -56,7 +56,7 @@ final class Stub_Recovery_Job_Repository implements Queue_Recovery_Repository_In
 			return false;
 		}
 		$this->jobs[ $job_ref ]['queue_status'] = Job_Queue_Status::PENDING;
-		$this->jobs[ $job_ref ]['lock_token']  = '';
+		$this->jobs[ $job_ref ]['lock_token']   = '';
 		return true;
 	}
 }
@@ -102,22 +102,22 @@ final class Queue_Recovery_And_Health_Test extends TestCase {
 		return array(
 			'success'         => true,
 			'action'          => 'retry',
-			'job_ref'          => 'job_create_plan_0_20250312100000_123',
-			'message'          => 'Job queued for retry.',
-			'previous_status'  => 'failed',
+			'job_ref'         => 'job_create_plan_0_20250312100000_123',
+			'message'         => 'Job queued for retry.',
+			'previous_status' => 'failed',
 		);
 	}
 
 	public function test_retry_eligible_job_recovery_succeeds(): void {
-		$repo = new Stub_Recovery_Job_Repository();
+		$repo                      = new Stub_Recovery_Job_Repository();
 		$repo->jobs['job_retry_1'] = array(
-			'job_ref'       => 'job_retry_1',
-			'job_type'      => 'create_page',
-			'queue_status'  => Job_Queue_Status::FAILED,
-			'retry_count'   => 2,
+			'job_ref'      => 'job_retry_1',
+			'job_type'     => 'create_page',
+			'queue_status' => Job_Queue_Status::FAILED,
+			'retry_count'  => 2,
 		);
-		$service = new Queue_Recovery_Service( $repo, null );
-		$result  = $service->retry_job( 'job_retry_1', 'user:1' );
+		$service                   = new Queue_Recovery_Service( $repo, null );
+		$result                    = $service->retry_job( 'job_retry_1', 'user:1' );
 		$this->assertTrue( $result['success'] );
 		$this->assertSame( 'retry', $result['action'] );
 		$this->assertSame( 'job_retry_1', $result['job_ref'] );
@@ -127,35 +127,35 @@ final class Queue_Recovery_And_Health_Test extends TestCase {
 	}
 
 	public function test_retry_ineligible_job_refused_not_failed(): void {
-		$repo = new Stub_Recovery_Job_Repository();
+		$repo                        = new Stub_Recovery_Job_Repository();
 		$repo->jobs['job_pending_1'] = array(
 			'job_ref'      => 'job_pending_1',
 			'job_type'     => 'create_page',
 			'queue_status' => Job_Queue_Status::PENDING,
 		);
-		$service = new Queue_Recovery_Service( $repo, null );
-		$result  = $service->retry_job( 'job_pending_1', 'user:1' );
+		$service                     = new Queue_Recovery_Service( $repo, null );
+		$result                      = $service->retry_job( 'job_pending_1', 'user:1' );
 		$this->assertFalse( $result['success'] );
 		$this->assertSame( 'Only failed jobs can be retried.', $result['message'] );
 		$this->assertSame( Job_Queue_Status::PENDING, $repo->jobs['job_pending_1']['queue_status'] );
 	}
 
 	public function test_retry_ineligible_job_type_refused(): void {
-		$repo = new Stub_Recovery_Job_Repository();
+		$repo                        = new Stub_Recovery_Job_Repository();
 		$repo->jobs['job_unknown_1'] = array(
 			'job_ref'      => 'job_unknown_1',
 			'job_type'     => 'unknown_type',
 			'queue_status' => Job_Queue_Status::FAILED,
 			'retry_count'  => 0,
 		);
-		$service = new Queue_Recovery_Service( $repo, null );
-		$result  = $service->retry_job( 'job_unknown_1', 'user:1' );
+		$service                     = new Queue_Recovery_Service( $repo, null );
+		$result                      = $service->retry_job( 'job_unknown_1', 'user:1' );
 		$this->assertFalse( $result['success'] );
 		$this->assertSame( 'Job type does not allow manual retry.', $result['message'] );
 	}
 
 	public function test_retry_job_not_found_refused(): void {
-		$repo   = new Stub_Recovery_Job_Repository();
+		$repo    = new Stub_Recovery_Job_Repository();
 		$service = new Queue_Recovery_Service( $repo, null );
 		$result  = $service->retry_job( 'nonexistent', 'user:1' );
 		$this->assertFalse( $result['success'] );
@@ -163,40 +163,40 @@ final class Queue_Recovery_And_Health_Test extends TestCase {
 	}
 
 	public function test_cancel_job_succeeds(): void {
-		$repo = new Stub_Recovery_Job_Repository();
+		$repo                       = new Stub_Recovery_Job_Repository();
 		$repo->jobs['job_cancel_1'] = array(
 			'job_ref'      => 'job_cancel_1',
 			'queue_status' => Job_Queue_Status::PENDING,
 		);
-		$service = new Queue_Recovery_Service( $repo, null );
-		$result  = $service->cancel_job( 'job_cancel_1', 'user:1' );
+		$service                    = new Queue_Recovery_Service( $repo, null );
+		$result                     = $service->cancel_job( 'job_cancel_1', 'user:1' );
 		$this->assertTrue( $result['success'] );
 		$this->assertSame( 'cancel', $result['action'] );
 		$this->assertSame( Job_Queue_Status::CANCELLED, $repo->jobs['job_cancel_1']['queue_status'] );
 	}
 
 	public function test_cancel_completed_job_refused(): void {
-		$repo = new Stub_Recovery_Job_Repository();
+		$repo                     = new Stub_Recovery_Job_Repository();
 		$repo->jobs['job_done_1'] = array(
 			'job_ref'      => 'job_done_1',
 			'queue_status' => Job_Queue_Status::COMPLETED,
 		);
-		$service = new Queue_Recovery_Service( $repo, null );
-		$result  = $service->cancel_job( 'job_done_1', 'user:1' );
+		$service                  = new Queue_Recovery_Service( $repo, null );
+		$result                   = $service->cancel_job( 'job_done_1', 'user:1' );
 		$this->assertFalse( $result['success'] );
 		$this->assertSame( 'Job cannot be cancelled in its current state.', $result['message'] );
 	}
 
 	public function test_recovery_action_logging_writes_audit_option(): void {
-		$repo = new Stub_Recovery_Job_Repository();
+		$repo                    = new Stub_Recovery_Job_Repository();
 		$repo->jobs['job_log_1'] = array(
 			'job_ref'      => 'job_log_1',
 			'job_type'     => 'replace_page',
 			'queue_status' => Job_Queue_Status::FAILED,
 			'retry_count'  => 1,
 		);
-		$option_before = \get_option( 'aio_page_builder_queue_recovery_audit', array() );
-		$service = new Queue_Recovery_Service( $repo, null );
+		$option_before           = \get_option( 'aio_page_builder_queue_recovery_audit', array() );
+		$service                 = new Queue_Recovery_Service( $repo, null );
 		$service->retry_job( 'job_log_1', 'user:42' );
 		$option_after = \get_option( 'aio_page_builder_queue_recovery_audit', array() );
 		$this->assertIsArray( $option_after );
@@ -210,23 +210,23 @@ final class Queue_Recovery_And_Health_Test extends TestCase {
 	}
 
 	public function test_health_builder_stale_lock_visibility(): void {
-		$repo = new Stub_Health_Job_Repository();
-		$old_started = date( 'Y-m-d H:i:s', time() - 7200 );
-		$repo->by_status['running'] = array(
+		$repo                         = new Stub_Health_Job_Repository();
+		$old_started                  = date( 'Y-m-d H:i:s', time() - 7200 );
+		$repo->by_status['running']   = array(
 			array(
-				'job_ref'     => 'job_stale_1',
-				'job_type'    => 'create_page',
+				'job_ref'      => 'job_stale_1',
+				'job_type'     => 'create_page',
 				'queue_status' => 'running',
-				'started_at'  => $old_started,
+				'started_at'   => $old_started,
 			),
 		);
-		$repo->by_status['pending'] = array();
-		$repo->by_status['retrying'] = array();
-		$repo->by_status['failed'] = array();
+		$repo->by_status['pending']   = array();
+		$repo->by_status['retrying']  = array();
+		$repo->by_status['failed']    = array();
 		$repo->by_status['completed'] = array();
 		$repo->by_status['cancelled'] = array();
-		$builder = new Queue_Health_Summary_Builder( $repo );
-		$health  = $builder->build();
+		$builder                      = new Queue_Health_Summary_Builder( $repo );
+		$health                       = $builder->build();
 		$this->assertSame( 1, $health['stale_lock_count'] );
 		$this->assertContains( 'job_stale_1', $health['stale_lock_job_refs'] );
 		$this->assertSame( 1, $health['total_running'] );

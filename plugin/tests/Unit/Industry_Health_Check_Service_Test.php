@@ -42,7 +42,7 @@ final class Industry_Health_Check_Service_Test extends TestCase {
 
 	public function test_run_returns_empty_errors_and_warnings_when_all_null(): void {
 		$service = new Industry_Health_Check_Service( null, null, null, null, null, null, null, null, null, null, null );
-		$result = $service->run();
+		$result  = $service->run();
 		$this->assertArrayHasKey( 'errors', $result );
 		$this->assertArrayHasKey( 'warnings', $result );
 		$this->assertIsArray( $result['errors'] );
@@ -52,15 +52,17 @@ final class Industry_Health_Check_Service_Test extends TestCase {
 	}
 
 	public function test_run_detects_profile_primary_pack_not_found(): void {
-		$settings = new Settings_Service();
+		$settings     = new Settings_Service();
 		$profile_repo = new Industry_Profile_Repository( $settings );
-		$profile_repo->set_profile( array(
-			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'nonexistent_pack',
-		) );
+		$profile_repo->set_profile(
+			array(
+				Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'nonexistent_pack',
+			)
+		);
 		$pack_registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
 		$pack_registry->load( array() );
 		$service = new Industry_Health_Check_Service( $profile_repo, $pack_registry, null, null, null, null, null, null, null, null, null );
-		$result = $service->run();
+		$result  = $service->run();
 		$this->assertCount( 1, $result['errors'] );
 		$this->assertSame( Industry_Health_Check_Service::OBJECT_TYPE_PROFILE, $result['errors'][0]['object_type'] );
 		$this->assertSame( 'primary_industry_key', $result['errors'][0]['key'] );
@@ -70,20 +72,22 @@ final class Industry_Health_Check_Service_Test extends TestCase {
 
 	public function test_run_detects_pack_token_preset_ref_missing(): void {
 		$pack_registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
-		$pack_registry->load( array(
+		$pack_registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'test_industry',
-				Industry_Pack_Schema::FIELD_NAME           => 'Test',
-				Industry_Pack_Schema::FIELD_SUMMARY        => 'Test pack',
-				Industry_Pack_Schema::FIELD_STATUS         => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
-				Industry_Pack_Schema::FIELD_TOKEN_PRESET_REF => 'nonexistent_preset',
-			),
-		) );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'test_industry',
+					Industry_Pack_Schema::FIELD_NAME    => 'Test',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Test pack',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
+					Industry_Pack_Schema::FIELD_TOKEN_PRESET_REF => 'nonexistent_preset',
+				),
+			)
+		);
 		$preset_registry = new Industry_Style_Preset_Registry();
 		$preset_registry->load( array() );
 		$service = new Industry_Health_Check_Service( null, $pack_registry, null, null, null, $preset_registry, null, null, null, null, null );
-		$result = $service->run();
+		$result  = $service->run();
 		$this->assertCount( 1, $result['errors'] );
 		$this->assertSame( Industry_Health_Check_Service::OBJECT_TYPE_PACK, $result['errors'][0]['object_type'] );
 		$this->assertSame( 'test_industry', $result['errors'][0]['key'] );
@@ -92,26 +96,30 @@ final class Industry_Health_Check_Service_Test extends TestCase {
 	}
 
 	public function test_run_detects_profile_selected_starter_bundle_not_found(): void {
-		$settings = new Settings_Service();
+		$settings     = new Settings_Service();
 		$profile_repo = new Industry_Profile_Repository( $settings );
-		$profile_repo->set_profile( array(
-			Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor',
-			Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => 'nonexistent_bundle',
-		) );
-		$pack_registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
-		$pack_registry->load( array(
+		$profile_repo->set_profile(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'realtor',
-				Industry_Pack_Schema::FIELD_NAME           => 'Realtor',
-				Industry_Pack_Schema::FIELD_SUMMARY        => 'Realtor pack',
-				Industry_Pack_Schema::FIELD_STATUS         => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
-			),
-		) );
+				Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor',
+				Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY => 'nonexistent_bundle',
+			)
+		);
+		$pack_registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
+		$pack_registry->load(
+			array(
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'realtor',
+					Industry_Pack_Schema::FIELD_NAME    => 'Realtor',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Realtor pack',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
+				),
+			)
+		);
 		$bundle_registry = new Industry_Starter_Bundle_Registry();
 		$bundle_registry->load( array() );
 		$service = new Industry_Health_Check_Service( $profile_repo, $pack_registry, null, null, null, null, null, null, null, $bundle_registry, null );
-		$result = $service->run();
+		$result  = $service->run();
 		$this->assertCount( 1, $result['errors'] );
 		$this->assertSame( Industry_Health_Check_Service::OBJECT_TYPE_PROFILE, $result['errors'][0]['object_type'] );
 		$this->assertSame( 'selected_starter_bundle_key', $result['errors'][0]['key'] );
@@ -120,28 +128,32 @@ final class Industry_Health_Check_Service_Test extends TestCase {
 
 	public function test_run_healthy_when_refs_resolve(): void {
 		$preset_registry = new Industry_Style_Preset_Registry();
-		$preset_registry->load( array(
+		$preset_registry->load(
 			array(
-				Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => 'realtor_light',
-				Industry_Style_Preset_Registry::FIELD_LABEL            => 'Realtor Light',
-				Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => '1',
-				Industry_Style_Preset_Registry::FIELD_STATUS           => Industry_Style_Preset_Registry::STATUS_ACTIVE,
-				Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY     => 'realtor',
-			),
-		) );
+				array(
+					Industry_Style_Preset_Registry::FIELD_STYLE_PRESET_KEY => 'realtor_light',
+					Industry_Style_Preset_Registry::FIELD_LABEL            => 'Realtor Light',
+					Industry_Style_Preset_Registry::FIELD_VERSION_MARKER   => '1',
+					Industry_Style_Preset_Registry::FIELD_STATUS           => Industry_Style_Preset_Registry::STATUS_ACTIVE,
+					Industry_Style_Preset_Registry::FIELD_INDUSTRY_KEY     => 'realtor',
+				),
+			)
+		);
 		$pack_registry = new Industry_Pack_Registry( new Industry_Pack_Validator() );
-		$pack_registry->load( array(
+		$pack_registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'realtor',
-				Industry_Pack_Schema::FIELD_NAME           => 'Realtor',
-				Industry_Pack_Schema::FIELD_SUMMARY        => 'Realtor pack',
-				Industry_Pack_Schema::FIELD_STATUS         => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
-				Industry_Pack_Schema::FIELD_TOKEN_PRESET_REF => 'realtor_light',
-			),
-		) );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'realtor',
+					Industry_Pack_Schema::FIELD_NAME    => 'Realtor',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Realtor pack',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => Industry_Pack_Schema::SUPPORTED_SCHEMA_VERSION,
+					Industry_Pack_Schema::FIELD_TOKEN_PRESET_REF => 'realtor_light',
+				),
+			)
+		);
 		$service = new Industry_Health_Check_Service( null, $pack_registry, null, null, null, $preset_registry, null, null, null, null, null );
-		$result = $service->run();
+		$result  = $service->run();
 		$this->assertCount( 0, $result['errors'] );
 	}
 }

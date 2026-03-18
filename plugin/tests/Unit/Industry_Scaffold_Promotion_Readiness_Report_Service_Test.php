@@ -37,10 +37,10 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service_Test extends Te
 	}
 
 	public function test_each_item_has_required_keys(): void {
-		$stub = $this->create_stub_completeness_report();
+		$stub    = $this->create_stub_completeness_report();
 		$service = new Industry_Scaffold_Promotion_Readiness_Report_Service( $stub );
-		$result = $service->generate_report();
-		$keys = array( 'scaffold_ref', 'scaffold_type', 'readiness_score', 'readiness_tier', 'blockers', 'missing_evidence', 'notes' );
+		$result  = $service->generate_report();
+		$keys    = array( 'scaffold_ref', 'scaffold_type', 'readiness_score', 'readiness_tier', 'blockers', 'missing_evidence', 'notes' );
 		foreach ( $result['items'] as $item ) {
 			foreach ( $keys as $key ) {
 				$this->assertArrayHasKey( $key, $item );
@@ -57,13 +57,13 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service_Test extends Te
 	}
 
 	public function test_tier_grouping_consistent_with_summary(): void {
-		$stub = $this->create_stub_completeness_report();
-		$service = new Industry_Scaffold_Promotion_Readiness_Report_Service( $stub );
-		$result = $service->generate_report();
-		$by_tier = $result['by_tier'];
+		$stub     = $this->create_stub_completeness_report();
+		$service  = new Industry_Scaffold_Promotion_Readiness_Report_Service( $stub );
+		$result   = $service->generate_report();
+		$by_tier  = $result['by_tier'];
 		$complete = count( $by_tier[ Industry_Scaffold_Promotion_Readiness_Report_Service::TIER_SCAFFOLD_COMPLETE ] ?? array() );
-		$near = count( $by_tier[ Industry_Scaffold_Promotion_Readiness_Report_Service::TIER_AUTHORED_NEAR_READY ] ?? array() );
-		$not = count( $by_tier[ Industry_Scaffold_Promotion_Readiness_Report_Service::TIER_NOT_NEAR_READY ] ?? array() );
+		$near     = count( $by_tier[ Industry_Scaffold_Promotion_Readiness_Report_Service::TIER_AUTHORED_NEAR_READY ] ?? array() );
+		$not      = count( $by_tier[ Industry_Scaffold_Promotion_Readiness_Report_Service::TIER_NOT_NEAR_READY ] ?? array() );
 		$this->assertSame( $result['summary']['scaffold_complete'], $complete );
 		$this->assertSame( $result['summary']['authored_near_ready'], $near );
 		$this->assertSame( $result['summary']['not_near_ready'], $not );
@@ -72,7 +72,7 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service_Test extends Te
 
 	public function test_scaffold_complete_vs_release_distinction_tiers_are_advisory(): void {
 		$service = new Industry_Scaffold_Promotion_Readiness_Report_Service( null );
-		$result = $service->generate_report();
+		$result  = $service->generate_report();
 		$this->assertArrayHasKey( Industry_Scaffold_Promotion_Readiness_Report_Service::TIER_SCAFFOLD_COMPLETE, $result['by_tier'] );
 		$this->assertArrayHasKey( Industry_Scaffold_Promotion_Readiness_Report_Service::TIER_AUTHORED_NEAR_READY, $result['by_tier'] );
 		$this->assertArrayHasKey( Industry_Scaffold_Promotion_Readiness_Report_Service::TIER_NOT_NEAR_READY, $result['by_tier'] );
@@ -90,26 +90,26 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service_Test extends Te
 				return array(
 					'scaffold_results' => array(
 						array(
-							'scaffold_type'     => 'industry',
-							'scaffold_key'      => 'test_industry',
+							'scaffold_type'    => 'industry',
+							'scaffold_key'     => 'test_industry',
 							'artifact_classes' => array(
-								'pack'          => Industry_Scaffold_Completeness_Report_Service::STATE_MISSING,
+								'pack'           => Industry_Scaffold_Completeness_Report_Service::STATE_MISSING,
 								'starter_bundle' => Industry_Scaffold_Completeness_Report_Service::STATE_SCAFFOLDED,
 							),
-							'summary' => 'Incomplete',
+							'summary'          => 'Incomplete',
 						),
 						array(
-							'scaffold_type'     => 'subtype',
-							'scaffold_key'      => 'test_subtype',
+							'scaffold_type'    => 'subtype',
+							'scaffold_key'     => 'test_subtype',
 							'artifact_classes' => array(
-								'pack'          => Industry_Scaffold_Completeness_Report_Service::STATE_AUTHORED,
+								'pack'           => Industry_Scaffold_Completeness_Report_Service::STATE_AUTHORED,
 								'starter_bundle' => Industry_Scaffold_Completeness_Report_Service::STATE_AUTHORED,
 							),
-							'summary' => 'Authored',
+							'summary'          => 'Authored',
 						),
 					),
 					'readable_summary' => '',
-					'warnings'        => array(),
+					'warnings'         => array(),
 					'generated_at'     => gmdate( 'Y-m-d\TH:i:s\Z' ),
 				);
 			}

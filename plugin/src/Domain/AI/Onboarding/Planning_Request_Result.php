@@ -18,10 +18,10 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Planning_Request_Result {
 
-	public const STATUS_SUCCESS          = 'success';
+	public const STATUS_SUCCESS           = 'success';
 	public const STATUS_VALIDATION_FAILED = 'validation_failed';
 	public const STATUS_PROVIDER_FAILED   = 'provider_failed';
-	public const STATUS_BLOCKED          = 'blocked';
+	public const STATUS_BLOCKED           = 'blocked';
 
 	/** @var bool */
 	private bool $success;
@@ -48,11 +48,11 @@ final class Planning_Request_Result {
 	private ?string $blocking_reason;
 
 	/**
-	 * @param bool   $success           Whether the run completed with valid output.
-	 * @param string $status            One of STATUS_*.
-	 * @param string $run_id            Run internal key (empty when blocked).
-	 * @param int    $run_post_id       Run post ID (0 when blocked).
-	 * @param string $user_message      User-safe message.
+	 * @param bool                      $success           Whether the run completed with valid output.
+	 * @param string                    $status            One of STATUS_*.
+	 * @param string                    $run_id            Run internal key (empty when blocked).
+	 * @param int                       $run_post_id       Run post ID (0 when blocked).
+	 * @param string                    $user_message      User-safe message.
 	 * @param array<string, mixed>|null $validation_report When validation failed.
 	 * @param array<string, mixed>|null $normalized_error  When provider failed.
 	 * @param string|null               $blocking_reason   When blocked.
@@ -124,8 +124,8 @@ final class Planning_Request_Result {
 			'run_post_id'       => $this->run_post_id,
 			'user_message'      => $this->user_message,
 			'validation_report' => $this->validation_report,
-			'normalized_error'   => $this->normalized_error,
-			'blocking_reason'    => $this->blocking_reason,
+			'normalized_error'  => $this->normalized_error,
+			'blocking_reason'   => $this->blocking_reason,
 		);
 	}
 }

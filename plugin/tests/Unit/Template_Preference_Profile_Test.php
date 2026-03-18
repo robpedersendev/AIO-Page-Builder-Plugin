@@ -25,15 +25,17 @@ final class Template_Preference_Profile_Test extends TestCase {
 	}
 
 	public function test_from_array_valid_values_persisted(): void {
-		$profile = Template_Preference_Profile::from_array( array(
-			'page_emphasis'             => Template_Preference_Profile::PAGE_EMPHASIS_CONVERSION,
-			'conversion_posture'         => Template_Preference_Profile::CONVERSION_POSTURE_STRONG,
-			'proof_style'                => Template_Preference_Profile::PROOF_STYLE_TESTIMONIALS,
-			'content_density'            => Template_Preference_Profile::CONTENT_DENSITY_SPACIOUS,
-			'animation_preference'       => Template_Preference_Profile::ANIMATION_REDUCED,
-			'cta_intensity_preference'   => Template_Preference_Profile::CTA_INTENSITY_HIGH,
-			'reduced_motion_preference'  => true,
-		) );
+		$profile = Template_Preference_Profile::from_array(
+			array(
+				'page_emphasis'             => Template_Preference_Profile::PAGE_EMPHASIS_CONVERSION,
+				'conversion_posture'        => Template_Preference_Profile::CONVERSION_POSTURE_STRONG,
+				'proof_style'               => Template_Preference_Profile::PROOF_STYLE_TESTIMONIALS,
+				'content_density'           => Template_Preference_Profile::CONTENT_DENSITY_SPACIOUS,
+				'animation_preference'      => Template_Preference_Profile::ANIMATION_REDUCED,
+				'cta_intensity_preference'  => Template_Preference_Profile::CTA_INTENSITY_HIGH,
+				'reduced_motion_preference' => true,
+			)
+		);
 		$this->assertSame( Template_Preference_Profile::PAGE_EMPHASIS_CONVERSION, $profile->get_page_emphasis() );
 		$this->assertSame( Template_Preference_Profile::CONVERSION_POSTURE_STRONG, $profile->get_conversion_posture() );
 		$this->assertSame( Template_Preference_Profile::PROOF_STYLE_TESTIMONIALS, $profile->get_proof_style() );
@@ -44,10 +46,12 @@ final class Template_Preference_Profile_Test extends TestCase {
 	}
 
 	public function test_from_array_invalid_values_coerced_to_empty(): void {
-		$profile = Template_Preference_Profile::from_array( array(
-			'page_emphasis'   => 'invalid_emphasis',
-			'conversion_posture' => 'invalid_posture',
-		) );
+		$profile = Template_Preference_Profile::from_array(
+			array(
+				'page_emphasis'      => 'invalid_emphasis',
+				'conversion_posture' => 'invalid_posture',
+			)
+		);
 		$this->assertSame( '', $profile->get_page_emphasis() );
 		$this->assertSame( '', $profile->get_conversion_posture() );
 	}
@@ -62,11 +66,13 @@ final class Template_Preference_Profile_Test extends TestCase {
 	}
 
 	public function test_to_array_stable_payload(): void {
-		$profile = Template_Preference_Profile::from_array( array(
-			'page_emphasis' => 'balanced',
-			'reduced_motion_preference' => true,
-		) );
-		$arr = $profile->to_array();
+		$profile = Template_Preference_Profile::from_array(
+			array(
+				'page_emphasis'             => 'balanced',
+				'reduced_motion_preference' => true,
+			)
+		);
+		$arr     = $profile->to_array();
 		$this->assertArrayHasKey( 'page_emphasis', $arr );
 		$this->assertArrayHasKey( 'conversion_posture', $arr );
 		$this->assertArrayHasKey( 'proof_style', $arr );

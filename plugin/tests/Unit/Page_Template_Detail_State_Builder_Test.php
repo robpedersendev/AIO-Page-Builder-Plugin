@@ -78,11 +78,11 @@ final class Page_Template_Detail_State_Builder_Test extends TestCase {
 			}
 		};
 
-		$generator    = new Synthetic_Preview_Data_Generator();
-		$side_panel   = new Preview_Side_Panel_Builder();
-		$ctx_builder  = new Section_Render_Context_Builder();
-		$renderer     = new Section_Renderer_Base();
-		$assembly     = new Native_Block_Assembly_Pipeline( null, null );
+		$generator   = new Synthetic_Preview_Data_Generator();
+		$side_panel  = new Preview_Side_Panel_Builder();
+		$ctx_builder = new Section_Render_Context_Builder();
+		$renderer    = new Section_Renderer_Base();
+		$assembly    = new Native_Block_Assembly_Pipeline( null, null );
 
 		return new Page_Template_Detail_State_Builder(
 			$page_provider,
@@ -98,8 +98,8 @@ final class Page_Template_Detail_State_Builder_Test extends TestCase {
 	/** Minimal section definition that passes Section_Render_Context_Builder::validate_definition. */
 	private function minimal_section_definition( string $key = 'st_hero' ): array {
 		return array(
-			Section_Schema::FIELD_INTERNAL_KEY => $key,
-			Section_Schema::FIELD_VARIANTS     => array( 'default' => array( 'label' => 'Default' ) ),
+			Section_Schema::FIELD_INTERNAL_KEY    => $key,
+			Section_Schema::FIELD_VARIANTS        => array( 'default' => array( 'label' => 'Default' ) ),
 			Section_Schema::FIELD_DEFAULT_VARIANT => 'default',
 		);
 	}
@@ -107,14 +107,14 @@ final class Page_Template_Detail_State_Builder_Test extends TestCase {
 	/** Minimal page definition with one ordered section. */
 	private function minimal_page_definition( string $key = 'pt_example', string $section_key = 'st_hero' ): array {
 		return array(
-			Page_Template_Schema::FIELD_INTERNAL_KEY => $key,
-			'name'                                    => 'Example Page',
-			'purpose_summary'                          => 'Example template for tests.',
-			'template_category_class'                 => 'top_level',
-			'template_family'                         => 'home',
+			Page_Template_Schema::FIELD_INTERNAL_KEY     => $key,
+			'name'                                       => 'Example Page',
+			'purpose_summary'                            => 'Example template for tests.',
+			'template_category_class'                    => 'top_level',
+			'template_family'                            => 'home',
 			Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
 				array(
-					Page_Template_Schema::SECTION_ITEM_KEY      => $section_key,
+					Page_Template_Schema::SECTION_ITEM_KEY => $section_key,
 					Page_Template_Schema::SECTION_ITEM_POSITION => 0,
 				),
 			),
@@ -123,7 +123,7 @@ final class Page_Template_Detail_State_Builder_Test extends TestCase {
 
 	public function test_build_state_with_empty_key_returns_not_found(): void {
 		$builder = $this->create_state_builder( array(), array() );
-		$state = $builder->build_state( '', array() );
+		$state   = $builder->build_state( '', array() );
 		$this->assertTrue( $state['not_found'] );
 		$this->assertSame( '', $state['template_key'] );
 		$this->assertArrayHasKey( 'breadcrumbs', $state );
@@ -131,17 +131,17 @@ final class Page_Template_Detail_State_Builder_Test extends TestCase {
 
 	public function test_build_state_with_null_page_definition_returns_not_found(): void {
 		$builder = $this->create_state_builder( null, $this->minimal_section_definition() );
-		$state = $builder->build_state( 'pt_missing', array() );
+		$state   = $builder->build_state( 'pt_missing', array() );
 		$this->assertTrue( $state['not_found'] );
 	}
 
 	public function test_build_state_with_valid_template_returns_state_with_side_panel_and_used_sections(): void {
-		$page_def = $this->minimal_page_definition( 'pt_landing', 'st_hero' );
-		$section_def = $this->minimal_section_definition( 'st_hero' );
+		$page_def                              = $this->minimal_page_definition( 'pt_landing', 'st_hero' );
+		$section_def                           = $this->minimal_section_definition( 'st_hero' );
 		$section_def['section_purpose_family'] = 'hero';
 
 		$builder = $this->create_state_builder( $page_def, $section_def );
-		$state = $builder->build_state( 'pt_landing', array() );
+		$state   = $builder->build_state( 'pt_landing', array() );
 
 		$this->assertFalse( $state['not_found'] );
 		$this->assertSame( 'pt_landing', $state['template_key'] );
@@ -159,11 +159,17 @@ final class Page_Template_Detail_State_Builder_Test extends TestCase {
 	}
 
 	public function test_build_state_breadcrumb_includes_category_and_family_when_provided(): void {
-		$page_def = $this->minimal_page_definition();
+		$page_def                            = $this->minimal_page_definition();
 		$page_def['template_category_class'] = 'hub';
-		$page_def['template_family'] = 'services';
-		$builder = $this->create_state_builder( $page_def, $this->minimal_section_definition() );
-		$state = $builder->build_state( 'pt_example', array( 'category_class' => 'hub', 'family' => 'services' ) );
+		$page_def['template_family']         = 'services';
+		$builder                             = $this->create_state_builder( $page_def, $this->minimal_section_definition() );
+		$state                               = $builder->build_state(
+			'pt_example',
+			array(
+				'category_class' => 'hub',
+				'family'         => 'services',
+			)
+		);
 		$this->assertFalse( $state['not_found'] );
 		$labels = array_column( $state['breadcrumbs'], 'label' );
 		$this->assertContains( 'Page Templates', $labels );
@@ -194,14 +200,14 @@ final class Page_Template_Detail_State_Builder_Test extends TestCase {
 	 * ]
 	 */
 	public function test_example_page_template_detail_state_payload_structure(): void {
-		$page_def = $this->minimal_page_definition( 'pt_home_landing', 'st_hero' );
-		$page_def['name'] = 'Home Landing';
-		$page_def['purpose_summary'] = 'Landing page for the home flow.';
-		$section_def = $this->minimal_section_definition( 'st_hero' );
+		$page_def                              = $this->minimal_page_definition( 'pt_home_landing', 'st_hero' );
+		$page_def['name']                      = 'Home Landing';
+		$page_def['purpose_summary']           = 'Landing page for the home flow.';
+		$section_def                           = $this->minimal_section_definition( 'st_hero' );
 		$section_def['section_purpose_family'] = 'hero';
 
 		$builder = $this->create_state_builder( $page_def, $section_def );
-		$state = $builder->build_state( 'pt_home_landing', array() );
+		$state   = $builder->build_state( 'pt_home_landing', array() );
 
 		$this->assertSame( 'pt_home_landing', $state['template_key'] );
 		$this->assertSame( 'Home Landing', $state['side_panel']['name'] );

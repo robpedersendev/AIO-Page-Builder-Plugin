@@ -27,21 +27,21 @@ final class Registry_Export_Fragment_Builder {
 
 	/** Fragment keys (stable). */
 	public const KEY_EXPORT_SCHEMA_VERSION = 'export_schema_version';
-	public const KEY_OBJECT_TYPE            = 'object_type';
-	public const KEY_OBJECT_KEY             = 'object_key';
-	public const KEY_OBJECT_STATUS          = 'object_status';
-	public const KEY_OBJECT_VERSION         = 'object_version';
-	public const KEY_PAYLOAD                = 'payload';
-	public const KEY_RELATIONSHIPS           = 'relationships';
-	public const KEY_DEPRECATION            = 'deprecation';
-	public const KEY_SOURCE_METADATA        = 'source_metadata';
+	public const KEY_OBJECT_TYPE           = 'object_type';
+	public const KEY_OBJECT_KEY            = 'object_key';
+	public const KEY_OBJECT_STATUS         = 'object_status';
+	public const KEY_OBJECT_VERSION        = 'object_version';
+	public const KEY_PAYLOAD               = 'payload';
+	public const KEY_RELATIONSHIPS         = 'relationships';
+	public const KEY_DEPRECATION           = 'deprecation';
+	public const KEY_SOURCE_METADATA       = 'source_metadata';
 
 	/** Object type identifiers. */
-	public const OBJECT_TYPE_SECTION     = 'section_template';
-	public const OBJECT_TYPE_PAGE       = 'page_template';
-	public const OBJECT_TYPE_COMPOSITION = 'composition';
+	public const OBJECT_TYPE_SECTION       = 'section_template';
+	public const OBJECT_TYPE_PAGE          = 'page_template';
+	public const OBJECT_TYPE_COMPOSITION   = 'composition';
 	public const OBJECT_TYPE_DOCUMENTATION = 'documentation';
-	public const OBJECT_TYPE_SNAPSHOT    = 'version_snapshot';
+	public const OBJECT_TYPE_SNAPSHOT      = 'version_snapshot';
 
 	/** Prohibited field names (spec §52.6): secrets, credentials, runtime data. */
 	private const PROHIBITED_KEYS = array(
@@ -72,7 +72,10 @@ final class Registry_Export_Fragment_Builder {
 		$payload = self::sanitize_payload( $definition );
 		$rels    = self::section_relationships( $definition );
 		$dep     = self::extract_deprecation( $definition );
-		$meta    = array( 'schema' => 'section_registry', 'version' => (string) ( $version['version'] ?? '1' ) );
+		$meta    = array(
+			'schema'  => 'section_registry',
+			'version' => (string) ( $version['version'] ?? '1' ),
+		);
 		return self::build( self::OBJECT_TYPE_SECTION, $key, $status, $version, $payload, $rels, $dep, $meta );
 	}
 
@@ -89,7 +92,10 @@ final class Registry_Export_Fragment_Builder {
 		$payload = self::sanitize_payload( $definition );
 		$rels    = self::page_template_relationships( $definition );
 		$dep     = self::extract_deprecation( $definition );
-		$meta    = array( 'schema' => 'page_template_registry', 'version' => (string) ( $version['version'] ?? '1' ) );
+		$meta    = array(
+			'schema'  => 'page_template_registry',
+			'version' => (string) ( $version['version'] ?? '1' ),
+		);
 		return self::build( self::OBJECT_TYPE_PAGE, $key, $status, $version, $payload, $rels, $dep, $meta );
 	}
 
@@ -106,7 +112,10 @@ final class Registry_Export_Fragment_Builder {
 		$payload = self::sanitize_payload( $definition );
 		$rels    = self::composition_relationships( $definition );
 		$dep     = array();
-		$meta    = array( 'schema' => 'composition', 'validation_status' => (string) ( $definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] ?? '' ) );
+		$meta    = array(
+			'schema'            => 'composition',
+			'validation_status' => (string) ( $definition[ Composition_Schema::FIELD_VALIDATION_STATUS ] ?? '' ),
+		);
 		return self::build( self::OBJECT_TYPE_COMPOSITION, $key, $status, $version, $payload, $rels, $dep, $meta );
 	}
 
@@ -123,7 +132,10 @@ final class Registry_Export_Fragment_Builder {
 		$payload = self::sanitize_payload( $definition );
 		$rels    = self::documentation_relationships( $definition );
 		$dep     = array();
-		$meta    = array( 'schema' => 'documentation', 'type' => (string) ( $definition[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' ) );
+		$meta    = array(
+			'schema' => 'documentation',
+			'type'   => (string) ( $definition[ Documentation_Schema::FIELD_DOCUMENTATION_TYPE ] ?? '' ),
+		);
 		return self::build( self::OBJECT_TYPE_DOCUMENTATION, $key, $status, $version, $payload, $rels, $dep, $meta );
 	}
 
@@ -140,7 +152,10 @@ final class Registry_Export_Fragment_Builder {
 		$payload = self::sanitize_payload( $definition );
 		$rels    = self::snapshot_relationships( $definition );
 		$dep     = array();
-		$meta    = array( 'schema' => 'version_snapshot', 'scope_type' => (string) ( $definition[ Version_Snapshot_Schema::FIELD_SCOPE_TYPE ] ?? '' ) );
+		$meta    = array(
+			'schema'     => 'version_snapshot',
+			'scope_type' => (string) ( $definition[ Version_Snapshot_Schema::FIELD_SCOPE_TYPE ] ?? '' ),
+		);
 		return self::build( self::OBJECT_TYPE_SNAPSHOT, $key, $status, $version, $payload, $rels, $dep, $meta );
 	}
 
@@ -148,11 +163,11 @@ final class Registry_Export_Fragment_Builder {
 	 * @param string               $object_type
 	 * @param string               $object_key
 	 * @param string               $object_status
-	 * @param array<string, mixed>  $object_version
-	 * @param array<string, mixed>  $payload
-	 * @param array<string, mixed>  $relationships
-	 * @param array<string, mixed>  $deprecation
-	 * @param array<string, mixed>  $source_metadata
+	 * @param array<string, mixed> $object_version
+	 * @param array<string, mixed> $payload
+	 * @param array<string, mixed> $relationships
+	 * @param array<string, mixed> $deprecation
+	 * @param array<string, mixed> $source_metadata
 	 * @return array<string, mixed>
 	 */
 	private static function build(
@@ -168,14 +183,14 @@ final class Registry_Export_Fragment_Builder {
 		$version_str = (string) ( $object_version['version'] ?? $object_version['schema_version'] ?? '1' );
 		return array(
 			self::KEY_EXPORT_SCHEMA_VERSION => Versions::export_schema(),
-			self::KEY_OBJECT_TYPE            => $object_type,
-			self::KEY_OBJECT_KEY             => $object_key,
-			self::KEY_OBJECT_STATUS          => $object_status,
-			self::KEY_OBJECT_VERSION         => $version_str,
-			self::KEY_PAYLOAD                => $payload,
-			self::KEY_RELATIONSHIPS           => $relationships,
-			self::KEY_DEPRECATION            => $deprecation,
-			self::KEY_SOURCE_METADATA        => $source_metadata,
+			self::KEY_OBJECT_TYPE           => $object_type,
+			self::KEY_OBJECT_KEY            => $object_key,
+			self::KEY_OBJECT_STATUS         => $object_status,
+			self::KEY_OBJECT_VERSION        => $version_str,
+			self::KEY_PAYLOAD               => $payload,
+			self::KEY_RELATIONSHIPS         => $relationships,
+			self::KEY_DEPRECATION           => $deprecation,
+			self::KEY_SOURCE_METADATA       => $source_metadata,
 		);
 	}
 
@@ -188,7 +203,7 @@ final class Registry_Export_Fragment_Builder {
 	public static function sanitize_payload( array $data ): array {
 		$out = array();
 		foreach ( $data as $k => $v ) {
-			$lower = strtolower( (string) $k );
+			$lower   = strtolower( (string) $k );
 			$blocked = false;
 			foreach ( self::PROHIBITED_KEYS as $prohibited ) {
 				if ( strpos( $lower, $prohibited ) !== false ) {
@@ -227,15 +242,15 @@ final class Registry_Export_Fragment_Builder {
 	/** @param array<string, mixed> $definition */
 	private static function section_relationships( array $definition ): array {
 		return array(
-			'section_refs'   => array(),
-			'helper_ref'     => (string) ( $definition[ Section_Schema::FIELD_HELPER_REF ] ?? '' ),
+			'section_refs'     => array(),
+			'helper_ref'       => (string) ( $definition[ Section_Schema::FIELD_HELPER_REF ] ?? '' ),
 			'css_contract_ref' => (string) ( $definition[ Section_Schema::FIELD_CSS_CONTRACT_REF ] ?? '' ),
 		);
 	}
 
 	/** @param array<string, mixed> $definition */
 	private static function page_template_relationships( array $definition ): array {
-		$ordered = $definition[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+		$ordered      = $definition[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
 		$section_keys = array();
 		foreach ( (array) $ordered as $item ) {
 			if ( is_array( $item ) ) {
@@ -250,7 +265,7 @@ final class Registry_Export_Fragment_Builder {
 
 	/** @param array<string, mixed> $definition */
 	private static function composition_relationships( array $definition ): array {
-		$ordered = $definition[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array();
+		$ordered      = $definition[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array();
 		$section_keys = array();
 		foreach ( (array) $ordered as $item ) {
 			if ( is_array( $item ) ) {
@@ -261,9 +276,9 @@ final class Registry_Export_Fragment_Builder {
 			}
 		}
 		return array(
-			'section_keys'   => array_values( array_unique( $section_keys ) ),
-			'source_template_ref' => (string) ( $definition[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' ),
-			'helper_one_pager_ref' => (string) ( $definition[ Composition_Schema::FIELD_HELPER_ONE_PAGER_REF ] ?? '' ),
+			'section_keys'          => array_values( array_unique( $section_keys ) ),
+			'source_template_ref'   => (string) ( $definition[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' ),
+			'helper_one_pager_ref'  => (string) ( $definition[ Composition_Schema::FIELD_HELPER_ONE_PAGER_REF ] ?? '' ),
 			'registry_snapshot_ref' => (string) ( $definition[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] ?? '' ),
 		);
 	}
@@ -288,7 +303,7 @@ final class Registry_Export_Fragment_Builder {
 		if ( ! is_array( $dep ) ) {
 			return array();
 		}
-		$out = array();
+		$out  = array();
 		$safe = array( 'deprecated', 'reason', 'replacement_section_key', 'replacement_template_key', 'replacement_key', 'deprecated_at', 'deprecated_reason', 'eligible_for_new_use', 'historical_reference_allowed' );
 		foreach ( $safe as $k ) {
 			if ( array_key_exists( $k, $dep ) ) {

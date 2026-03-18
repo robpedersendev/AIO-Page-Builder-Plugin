@@ -19,12 +19,15 @@ require_once $plugin_root . '/src/Domain/Industry/Overrides/Industry_Override_Sc
 final class Industry_Override_Schema_Test extends TestCase {
 
 	private function valid_override( array $overrides = array() ): array {
-		return array_merge( array(
-			Industry_Override_Schema::FIELD_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_SECTION,
-			Industry_Override_Schema::FIELD_TARGET_KEY  => 'hero_intro_01',
-			Industry_Override_Schema::FIELD_STATE       => Industry_Override_Schema::STATE_ACCEPTED,
-			Industry_Override_Schema::FIELD_REASON      => 'Client requested this section.',
-		), $overrides );
+		return array_merge(
+			array(
+				Industry_Override_Schema::FIELD_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_SECTION,
+				Industry_Override_Schema::FIELD_TARGET_KEY => 'hero_intro_01',
+				Industry_Override_Schema::FIELD_STATE      => Industry_Override_Schema::STATE_ACCEPTED,
+				Industry_Override_Schema::FIELD_REASON     => 'Client requested this section.',
+			),
+			$overrides
+		);
 	}
 
 	public function test_validate_returns_empty_for_valid_override(): void {
@@ -35,7 +38,7 @@ final class Industry_Override_Schema_Test extends TestCase {
 
 	public function test_validate_rejects_invalid_target_type(): void {
 		$override = $this->valid_override( array( Industry_Override_Schema::FIELD_TARGET_TYPE => 'invalid' ) );
-		$errors = Industry_Override_Schema::validate( $override );
+		$errors   = Industry_Override_Schema::validate( $override );
 		$this->assertContains( 'invalid_target_type', $errors );
 		$this->assertFalse( Industry_Override_Schema::is_valid( $override ) );
 	}
@@ -49,19 +52,19 @@ final class Industry_Override_Schema_Test extends TestCase {
 
 	public function test_validate_rejects_empty_target_key(): void {
 		$override = $this->valid_override( array( Industry_Override_Schema::FIELD_TARGET_KEY => '' ) );
-		$errors = Industry_Override_Schema::validate( $override );
+		$errors   = Industry_Override_Schema::validate( $override );
 		$this->assertContains( 'missing_target_key', $errors );
 	}
 
 	public function test_validate_rejects_invalid_state(): void {
 		$override = $this->valid_override( array( Industry_Override_Schema::FIELD_STATE => 'custom' ) );
-		$errors = Industry_Override_Schema::validate( $override );
+		$errors   = Industry_Override_Schema::validate( $override );
 		$this->assertContains( 'invalid_state', $errors );
 	}
 
 	public function test_validate_rejects_reason_too_long(): void {
 		$override = $this->valid_override( array( Industry_Override_Schema::FIELD_REASON => str_repeat( 'x', Industry_Override_Schema::REASON_MAX_LENGTH + 1 ) ) );
-		$errors = Industry_Override_Schema::validate( $override );
+		$errors   = Industry_Override_Schema::validate( $override );
 		$this->assertContains( 'reason_too_long', $errors );
 	}
 
@@ -89,18 +92,22 @@ final class Industry_Override_Schema_Test extends TestCase {
 	}
 
 	public function test_valid_override_page_template_target_type(): void {
-		$override = $this->valid_override( array(
-			Industry_Override_Schema::FIELD_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_PAGE_TEMPLATE,
-			Industry_Override_Schema::FIELD_TARGET_KEY  => 'hub_services_01',
-		) );
+		$override = $this->valid_override(
+			array(
+				Industry_Override_Schema::FIELD_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_PAGE_TEMPLATE,
+				Industry_Override_Schema::FIELD_TARGET_KEY => 'hub_services_01',
+			)
+		);
 		$this->assertSame( array(), Industry_Override_Schema::validate( $override ) );
 	}
 
 	public function test_valid_override_build_plan_item_target_type(): void {
-		$override = $this->valid_override( array(
-			Industry_Override_Schema::FIELD_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
-			Industry_Override_Schema::FIELD_TARGET_KEY  => 'item-uuid-123',
-		) );
+		$override = $this->valid_override(
+			array(
+				Industry_Override_Schema::FIELD_TARGET_TYPE => Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM,
+				Industry_Override_Schema::FIELD_TARGET_KEY => 'item-uuid-123',
+			)
+		);
 		$this->assertSame( array(), Industry_Override_Schema::validate( $override ) );
 	}
 }

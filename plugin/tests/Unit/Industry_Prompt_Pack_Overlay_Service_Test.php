@@ -25,71 +25,84 @@ require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Pack_Registr
 final class Industry_Prompt_Pack_Overlay_Service_Test extends TestCase {
 
 	public function test_get_overlay_returns_minimal_when_no_industry_context(): void {
-		$service = new Industry_Prompt_Pack_Overlay_Service();
+		$service  = new Industry_Prompt_Pack_Overlay_Service();
 		$artifact = array(
-			Input_Artifact_Schema::ROOT_ARTIFACT_ID => 'art-1',
-			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array( 'internal_key' => 'aio/build-plan-draft', 'version' => '1' ),
+			Input_Artifact_Schema::ROOT_ARTIFACT_ID     => 'art-1',
+			Input_Artifact_Schema::ROOT_PROMPT_PACK_REF => array(
+				'internal_key' => 'aio/build-plan-draft',
+				'version'      => '1',
+			),
 		);
-		$overlay = $service->get_overlay_for_artifact( $artifact );
+		$overlay  = $service->get_overlay_for_artifact( $artifact );
 		$this->assertSame( array( 'schema_version' => '1' ), $overlay );
 	}
 
 	public function test_get_overlay_returns_minimal_when_readiness_none(): void {
-		$service = new Industry_Prompt_Pack_Overlay_Service();
+		$service  = new Industry_Prompt_Pack_Overlay_Service();
 		$artifact = array(
 			Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT => array(
-				'readiness' => array( 'state' => 'none', 'score' => 0 ),
+				'readiness' => array(
+					'state' => 'none',
+					'score' => 0,
+				),
 			),
 		);
-		$overlay = $service->get_overlay_for_artifact( $artifact );
+		$overlay  = $service->get_overlay_for_artifact( $artifact );
 		$this->assertSame( Industry_Prompt_Pack_Overlay_Service::OVERLAY_SCHEMA_VERSION, $overlay['schema_version'] );
 		$this->assertArrayNotHasKey( 'active_industry_key', $overlay );
 	}
 
 	public function test_get_overlay_includes_guidance_when_pack_has_summary(): void {
 		$pack_registry = new Industry_Pack_Registry();
-		$pack_registry->load( array(
+		$pack_registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'realtor',
-				Industry_Pack_Schema::FIELD_NAME => 'Realtor',
-				Industry_Pack_Schema::FIELD_SUMMARY => 'Real estate and listing focus.',
-				Industry_Pack_Schema::FIELD_STATUS => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
-			),
-		) );
-		$service = new Industry_Prompt_Pack_Overlay_Service( $pack_registry );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'realtor',
+					Industry_Pack_Schema::FIELD_NAME    => 'Realtor',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Real estate and listing focus.',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
+				),
+			)
+		);
+		$service  = new Industry_Prompt_Pack_Overlay_Service( $pack_registry );
 		$artifact = array(
 			Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT => array(
-				'readiness' => array( 'state' => 'ready', 'score' => 100 ),
+				'readiness'        => array(
+					'state' => 'ready',
+					'score' => 100,
+				),
 				'industry_profile' => array( 'primary_industry_key' => 'realtor' ),
 			),
 		);
-		$overlay = $service->get_overlay_for_artifact( $artifact );
+		$overlay  = $service->get_overlay_for_artifact( $artifact );
 		$this->assertSame( 'realtor', $overlay['active_industry_key'] ?? '' );
 		$this->assertSame( 'Real estate and listing focus.', $overlay['industry_guidance_text'] ?? '' );
 	}
 
 	public function test_get_overlay_includes_required_page_families_when_pack_has_supported(): void {
 		$pack_registry = new Industry_Pack_Registry();
-		$pack_registry->load( array(
+		$pack_registry->load(
 			array(
-				Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'plumber',
-				Industry_Pack_Schema::FIELD_NAME => 'Plumber',
-				Industry_Pack_Schema::FIELD_SUMMARY => '',
-				Industry_Pack_Schema::FIELD_STATUS => Industry_Pack_Schema::STATUS_ACTIVE,
-				Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
-				Industry_Pack_Schema::FIELD_SUMMARY => 'Plumbing and local service.',
-				Industry_Pack_Schema::FIELD_SUPPORTED_PAGE_FAMILIES => array( 'service', 'local' ),
-			),
-		) );
-		$service = new Industry_Prompt_Pack_Overlay_Service( $pack_registry );
+				array(
+					Industry_Pack_Schema::FIELD_INDUSTRY_KEY => 'plumber',
+					Industry_Pack_Schema::FIELD_NAME    => 'Plumber',
+					Industry_Pack_Schema::FIELD_SUMMARY => '',
+					Industry_Pack_Schema::FIELD_STATUS  => Industry_Pack_Schema::STATUS_ACTIVE,
+					Industry_Pack_Schema::FIELD_VERSION_MARKER => '1',
+					Industry_Pack_Schema::FIELD_SUMMARY => 'Plumbing and local service.',
+					Industry_Pack_Schema::FIELD_SUPPORTED_PAGE_FAMILIES => array( 'service', 'local' ),
+				),
+			)
+		);
+		$service  = new Industry_Prompt_Pack_Overlay_Service( $pack_registry );
 		$artifact = array(
 			Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT => array(
-				'readiness' => array( 'state' => 'partial' ),
+				'readiness'        => array( 'state' => 'partial' ),
 				'industry_profile' => array( 'primary_industry_key' => 'plumber' ),
 			),
 		);
-		$overlay = $service->get_overlay_for_artifact( $artifact );
+		$overlay  = $service->get_overlay_for_artifact( $artifact );
 		$this->assertSame( array( 'service', 'local' ), $overlay['required_page_families'] ?? array() );
 	}
 
@@ -101,19 +114,22 @@ final class Industry_Prompt_Pack_Overlay_Service_Test extends TestCase {
 		$pack_registry = new Industry_Pack_Registry();
 		$pack_registry->load( Industry_Pack_Registry::get_builtin_pack_definitions() );
 		$service = new Industry_Prompt_Pack_Overlay_Service( $pack_registry );
-		$launch = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
+		$launch  = array( 'cosmetology_nail', 'realtor', 'plumber', 'disaster_recovery' );
 		foreach ( $launch as $primary ) {
 			$artifact = array(
 				Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT => array(
-					'readiness' => array( 'state' => 'ready', 'score' => 100 ),
+					'readiness'        => array(
+						'state' => 'ready',
+						'score' => 100,
+					),
 					'industry_profile' => array( 'primary_industry_key' => $primary ),
 				),
 			);
-			$overlay = $service->get_overlay_for_artifact( $artifact );
+			$overlay  = $service->get_overlay_for_artifact( $artifact );
 			$this->assertSame( '1', $overlay['schema_version'] ?? '', "{$primary}: schema_version" );
 			$this->assertSame( $primary, $overlay['active_industry_key'] ?? '', "{$primary}: active_industry_key" );
 			$has_families = ! empty( $overlay['required_page_families'] );
-			$has_cta = ! empty( $overlay['cta_priorities'] );
+			$has_cta      = ! empty( $overlay['cta_priorities'] );
 			$this->assertTrue( $has_families || $has_cta, "{$primary}: overlay must have required_page_families or cta_priorities when pack present" );
 		}
 	}

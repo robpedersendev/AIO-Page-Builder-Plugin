@@ -26,9 +26,9 @@ final class Global_Style_Token_Settings_Screen {
 
 	private const SAVE_ACTION  = 'aio_global_style_tokens_save';
 	private const RESET_ACTION = 'aio_global_style_tokens_reset';
-	private const NONCE_SAVE  = 'aio_global_style_tokens_save';
-	private const NONCE_RESET = 'aio_global_style_tokens_reset';
-	private const QUERY_MSG   = 'aio_style_msg';
+	private const NONCE_SAVE   = 'aio_global_style_tokens_save';
+	private const NONCE_RESET  = 'aio_global_style_tokens_reset';
+	private const QUERY_MSG    = 'aio_style_msg';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -55,7 +55,7 @@ final class Global_Style_Token_Settings_Screen {
 			\wp_die( \esc_html__( 'You do not have permission to manage global style settings.', 'aio-page-builder' ), 403 );
 		}
 
-		$repo = $this->get_repository();
+		$repo         = $this->get_repository();
 		$form_builder = $this->get_form_builder();
 
 		if ( $repo === null || $form_builder === null ) {
@@ -83,7 +83,7 @@ final class Global_Style_Token_Settings_Screen {
 			}
 		}
 
-		$message = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
+		$message  = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
 		$by_group = $form_builder->get_fields_by_group();
 		?>
 		<div class="wrap aio-page-builder-screen aio-global-style-tokens" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -163,7 +163,7 @@ final class Global_Style_Token_Settings_Screen {
 		if ( $this->container === null || ! $this->container->has( 'global_style_settings_repository' ) || ! $this->container->has( 'style_token_registry' ) ) {
 			return null;
 		}
-		$repo    = $this->container->get( 'global_style_settings_repository' );
+		$repo     = $this->container->get( 'global_style_settings_repository' );
 		$registry = $this->container->get( 'style_token_registry' );
 		if ( ! $repo instanceof Global_Style_Settings_Repository ) {
 			return null;

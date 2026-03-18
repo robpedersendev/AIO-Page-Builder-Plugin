@@ -24,18 +24,18 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry;
  */
 final class Industry_Scaffold_Completeness_Report_Service implements Industry_Scaffold_Completeness_Report_Provider_Interface {
 
-	public const STATE_MISSING    = 'missing';
-	public const STATE_SCAFFOLDED = 'scaffolded';
-	public const STATE_AUTHORED   = 'authored';
+	public const STATE_MISSING       = 'missing';
+	public const STATE_SCAFFOLDED    = 'scaffolded';
+	public const STATE_AUTHORED      = 'authored';
 	public const STATE_NOT_EVALUATED = 'not_evaluated';
 
-	public const ARTIFACT_PACK         = 'pack_definition';
-	public const ARTIFACT_STARTER_BUNDLE = 'starter_bundle';
+	public const ARTIFACT_PACK            = 'pack_definition';
+	public const ARTIFACT_STARTER_BUNDLE  = 'starter_bundle';
 	public const ARTIFACT_SECTION_OVERLAY = 'section_helper_overlay';
-	public const ARTIFACT_PAGE_OVERLAY   = 'page_onepager_overlay';
-	public const ARTIFACT_RULES        = 'rules';
-	public const ARTIFACT_DOCS         = 'docs';
-	public const ARTIFACT_QA           = 'qa_evidence';
+	public const ARTIFACT_PAGE_OVERLAY    = 'page_onepager_overlay';
+	public const ARTIFACT_RULES           = 'rules';
+	public const ARTIFACT_DOCS            = 'docs';
+	public const ARTIFACT_QA              = 'qa_evidence';
 
 	/** @var Industry_Pack_Registry|null */
 	private ?Industry_Pack_Registry $pack_registry;
@@ -51,8 +51,8 @@ final class Industry_Scaffold_Completeness_Report_Service implements Industry_Sc
 		?Industry_Starter_Bundle_Registry $bundle_registry = null,
 		?Industry_Subtype_Registry $subtype_registry = null
 	) {
-		$this->pack_registry   = $pack_registry;
-		$this->bundle_registry = $bundle_registry;
+		$this->pack_registry    = $pack_registry;
+		$this->bundle_registry  = $bundle_registry;
 		$this->subtype_registry = $subtype_registry;
 	}
 
@@ -68,12 +68,28 @@ final class Industry_Scaffold_Completeness_Report_Service implements Industry_Sc
 	 * }
 	 */
 	public function generate_report( array $options = array() ): array {
-		$warnings = array();
-		$industry_keys = isset( $options['scaffold_industry_keys'] ) && is_array( $options['scaffold_industry_keys'] )
-			? array_values( array_filter( array_map( function ( $k ) { return is_string( $k ) ? trim( $k ) : ''; }, $options['scaffold_industry_keys'] ) ) )
+		$warnings               = array();
+		$industry_keys          = isset( $options['scaffold_industry_keys'] ) && is_array( $options['scaffold_industry_keys'] )
+			? array_values(
+				array_filter(
+					array_map(
+						function ( $k ) {
+							return is_string( $k ) ? trim( $k ) : ''; },
+						$options['scaffold_industry_keys']
+					)
+				)
+			)
 			: array();
-		$subtype_keys = isset( $options['scaffold_subtype_keys'] ) && is_array( $options['scaffold_subtype_keys'] )
-			? array_values( array_filter( array_map( function ( $k ) { return is_string( $k ) ? trim( $k ) : ''; }, $options['scaffold_subtype_keys'] ) ) )
+		$subtype_keys           = isset( $options['scaffold_subtype_keys'] ) && is_array( $options['scaffold_subtype_keys'] )
+			? array_values(
+				array_filter(
+					array_map(
+						function ( $k ) {
+							return is_string( $k ) ? trim( $k ) : ''; },
+						$options['scaffold_subtype_keys']
+					)
+				)
+			)
 			: array();
 		$include_draft_packs    = $options['include_draft_packs'] ?? true;
 		$include_draft_subtypes = $options['include_draft_subtypes'] ?? true;
@@ -126,10 +142,10 @@ final class Industry_Scaffold_Completeness_Report_Service implements Industry_Sc
 		}
 
 		return array(
-			'generated_at'      => gmdate( 'c' ),
-			'scaffold_results'  => $scaffold_results,
-			'readable_summary'  => $readable,
-			'warnings'          => $warnings,
+			'generated_at'     => gmdate( 'c' ),
+			'scaffold_results' => $scaffold_results,
+			'readable_summary' => $readable,
+			'warnings'         => $warnings,
 		);
 	}
 
@@ -138,19 +154,19 @@ final class Industry_Scaffold_Completeness_Report_Service implements Industry_Sc
 	 */
 	private function evaluate_industry_scaffold( string $industry_key ): array {
 		$classes = array(
-			self::ARTIFACT_PACK           => self::STATE_MISSING,
-			self::ARTIFACT_STARTER_BUNDLE => self::STATE_MISSING,
+			self::ARTIFACT_PACK            => self::STATE_MISSING,
+			self::ARTIFACT_STARTER_BUNDLE  => self::STATE_MISSING,
 			self::ARTIFACT_SECTION_OVERLAY => self::STATE_NOT_EVALUATED,
-			self::ARTIFACT_PAGE_OVERLAY   => self::STATE_NOT_EVALUATED,
-			self::ARTIFACT_RULES          => self::STATE_NOT_EVALUATED,
-			self::ARTIFACT_DOCS           => self::STATE_NOT_EVALUATED,
-			self::ARTIFACT_QA             => self::STATE_NOT_EVALUATED,
+			self::ARTIFACT_PAGE_OVERLAY    => self::STATE_NOT_EVALUATED,
+			self::ARTIFACT_RULES           => self::STATE_NOT_EVALUATED,
+			self::ARTIFACT_DOCS            => self::STATE_NOT_EVALUATED,
+			self::ARTIFACT_QA              => self::STATE_NOT_EVALUATED,
 		);
 
 		if ( $this->pack_registry !== null ) {
 			$pack = $this->pack_registry->get( $industry_key );
 			if ( $pack !== null && is_array( $pack ) ) {
-				$status = trim( (string) ( $pack[ Industry_Pack_Schema::FIELD_STATUS ] ?? '' ) );
+				$status                         = trim( (string) ( $pack[ Industry_Pack_Schema::FIELD_STATUS ] ?? '' ) );
 				$classes[ self::ARTIFACT_PACK ] = $status === Industry_Pack_Schema::STATUS_ACTIVE ? self::STATE_AUTHORED : self::STATE_SCAFFOLDED;
 			}
 		}
@@ -176,10 +192,10 @@ final class Industry_Scaffold_Completeness_Report_Service implements Industry_Sc
 
 		$summary = $this->summarize_artifact_states( $classes );
 		return array(
-			'scaffold_type'     => 'industry',
-			'scaffold_key'      => $industry_key,
-			'artifact_classes'  => $classes,
-			'summary'           => $summary,
+			'scaffold_type'    => 'industry',
+			'scaffold_key'     => $industry_key,
+			'artifact_classes' => $classes,
+			'summary'          => $summary,
 		);
 	}
 
@@ -188,13 +204,13 @@ final class Industry_Scaffold_Completeness_Report_Service implements Industry_Sc
 	 */
 	private function evaluate_subtype_scaffold( string $subtype_key ): array {
 		$classes = array(
-			self::ARTIFACT_PACK           => self::STATE_NOT_EVALUATED,
-			self::ARTIFACT_STARTER_BUNDLE => self::STATE_MISSING,
+			self::ARTIFACT_PACK            => self::STATE_NOT_EVALUATED,
+			self::ARTIFACT_STARTER_BUNDLE  => self::STATE_MISSING,
 			self::ARTIFACT_SECTION_OVERLAY => self::STATE_NOT_EVALUATED,
-			self::ARTIFACT_PAGE_OVERLAY   => self::STATE_NOT_EVALUATED,
-			self::ARTIFACT_RULES          => self::STATE_NOT_EVALUATED,
-			self::ARTIFACT_DOCS           => self::STATE_NOT_EVALUATED,
-			self::ARTIFACT_QA             => self::STATE_NOT_EVALUATED,
+			self::ARTIFACT_PAGE_OVERLAY    => self::STATE_NOT_EVALUATED,
+			self::ARTIFACT_RULES           => self::STATE_NOT_EVALUATED,
+			self::ARTIFACT_DOCS            => self::STATE_NOT_EVALUATED,
+			self::ARTIFACT_QA              => self::STATE_NOT_EVALUATED,
 		);
 
 		$parent_key = '';
@@ -224,10 +240,10 @@ final class Industry_Scaffold_Completeness_Report_Service implements Industry_Sc
 
 		$summary = $this->summarize_artifact_states( $classes );
 		return array(
-			'scaffold_type'     => 'subtype',
-			'scaffold_key'      => $subtype_key,
-			'artifact_classes'  => $classes,
-			'summary'           => $summary,
+			'scaffold_type'    => 'subtype',
+			'scaffold_key'     => $subtype_key,
+			'artifact_classes' => $classes,
+			'summary'          => $summary,
 		);
 	}
 
@@ -235,19 +251,19 @@ final class Industry_Scaffold_Completeness_Report_Service implements Industry_Sc
 	 * @param array<string, string> $classes
 	 */
 	private function summarize_artifact_states( array $classes ): string {
-		$missing = 0;
+		$missing    = 0;
 		$scaffolded = 0;
-		$authored = 0;
-		$na = 0;
+		$authored   = 0;
+		$na         = 0;
 		foreach ( $classes as $state ) {
 			if ( $state === self::STATE_MISSING ) {
-				$missing++;
+				++$missing;
 			} elseif ( $state === self::STATE_SCAFFOLDED ) {
-				$scaffolded++;
+				++$scaffolded;
 			} elseif ( $state === self::STATE_AUTHORED ) {
-				$authored++;
+				++$authored;
 			} else {
-				$na++;
+				++$na;
 			}
 		}
 		$parts = array();

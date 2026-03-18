@@ -128,12 +128,15 @@ final class ACF_Diagnostics_Service {
 	 */
 	public function get_blueprint_summary(): array {
 		$blueprints = $this->blueprint_service->get_all_blueprints();
-		$valid = array();
-		$invalid = array();
+		$valid      = array();
+		$invalid    = array();
 		foreach ( $blueprints as $bp ) {
 			$section_key = (string) ( $bp['section_key'] ?? '' );
 			if ( $section_key !== '' ) {
-				$valid[] = array( 'section_key' => $section_key, 'group_key' => Field_Key_Generator::group_key( $section_key ) );
+				$valid[] = array(
+					'section_key' => $section_key,
+					'group_key'   => Field_Key_Generator::group_key( $section_key ),
+				);
 			}
 		}
 		return array(
@@ -151,7 +154,7 @@ final class ACF_Diagnostics_Service {
 	 */
 	public function get_registered_groups_summary(): array {
 		$acf_available = $this->group_registrar->is_acf_available();
-		$blueprints = $this->blueprint_service->get_all_blueprints();
+		$blueprints    = $this->blueprint_service->get_all_blueprints();
 		$expected_keys = array();
 		foreach ( $blueprints as $bp ) {
 			$section_key = (string) ( $bp['section_key'] ?? '' );
@@ -160,22 +163,24 @@ final class ACF_Diagnostics_Service {
 			}
 		}
 		if ( ! $acf_available && ! empty( $expected_keys ) && $this->logger !== null ) {
-			$this->logger->log( new Error_Record(
-				'acf-diag-' . uniqid( '', true ),
-				Log_Categories::DEPENDENCY,
-				Log_Severities::WARNING,
-				'ACF not available; field groups cannot be registered.',
-				'',
-				'',
-				'acf',
-				'Install or activate ACF to enable field group registration.',
-				''
-			) );
+			$this->logger->log(
+				new Error_Record(
+					'acf-diag-' . uniqid( '', true ),
+					Log_Categories::DEPENDENCY,
+					Log_Severities::WARNING,
+					'ACF not available; field groups cannot be registered.',
+					'',
+					'',
+					'acf',
+					'Install or activate ACF to enable field group registration.',
+					''
+				)
+			);
 		}
 		return array(
 			'acf_available'  => $acf_available,
 			'expected_count' => count( $expected_keys ),
-			'expected_keys'   => $expected_keys,
+			'expected_keys'  => $expected_keys,
 			'summary'        => $acf_available
 				? sprintf( '%d group(s) available for registration.', count( $expected_keys ) )
 				: 'ACF not available; registration skipped.',
@@ -188,9 +193,9 @@ final class ACF_Diagnostics_Service {
 	 * @return array<string, mixed>
 	 */
 	public function get_page_assignments_summary(): array {
-		$rows = $this->assignment_map->list_by_type( Assignment_Types::PAGE_FIELD_GROUP, 500, 0 );
+		$rows     = $this->assignment_map->list_by_type( Assignment_Types::PAGE_FIELD_GROUP, 500, 0 );
 		$page_ids = array();
-		$by_page = array();
+		$by_page  = array();
 		foreach ( $rows as $row ) {
 			$src = (string) ( $row['source_ref'] ?? '' );
 			$tgt = (string) ( $row['target_ref'] ?? '' );
@@ -207,16 +212,16 @@ final class ACF_Diagnostics_Service {
 			if ( ctype_digit( $page_ref ) ) {
 				$source = $this->assignment_service->get_structural_source_for_page( (int) $page_ref );
 				if ( $source !== null ) {
-					$pages_with_source++;
+					++$pages_with_source;
 				}
 			}
 		}
 		return array(
-			'total_assignment_rows' => count( $rows ),
-			'pages_with_assignments' => count( $page_ids ),
+			'total_assignment_rows'        => count( $rows ),
+			'pages_with_assignments'       => count( $page_ids ),
 			'pages_with_structural_source' => $pages_with_source,
-			'by_page' => array_map( 'array_values', $by_page ),
-			'summary' => sprintf( '%d page(s) with assignments; %d with structural source.', count( $page_ids ), $pages_with_source ),
+			'by_page'                      => array_map( 'array_values', $by_page ),
+			'summary'                      => sprintf( '%d page(s) with assignments; %d with structural source.', count( $page_ids ), $pages_with_source ),
 		);
 	}
 
@@ -227,12 +232,12 @@ final class ACF_Diagnostics_Service {
 	 */
 	public function get_compatibility_warnings(): array {
 		$warnings = array();
-		$results = $this->cleanup_advisor->analyze_pages_with_assignments( 50 );
+		$results  = $this->cleanup_advisor->analyze_pages_with_assignments( 50 );
 		foreach ( $results as $page_id => $result ) {
 			$notes = $result->compatibility_notes;
 			if ( ! empty( $notes ) ) {
 				$warnings[] = array(
-					'page_id' => $page_id,
+					'page_id'  => $page_id,
 					'messages' => $notes,
 				);
 			}
@@ -262,7 +267,7 @@ final class ACF_Diagnostics_Service {
 	 * @return array<string, mixed>
 	 */
 	public function get_stale_items(): array {
-		$stale = array();
+		$stale   = array();
 		$results = $this->cleanup_advisor->analyze_pages_with_assignments( 50 );
 		foreach ( $results as $page_id => $result ) {
 			foreach ( $result->stale_assignments as $sa ) {
@@ -275,8 +280,8 @@ final class ACF_Diagnostics_Service {
 			}
 		}
 		return array(
-			'count'  => count( $stale ),
-			'items'  => $stale,
+			'count'   => count( $stale ),
+			'items'   => $stale,
 			'summary' => count( $stale ) > 0
 				? sprintf( '%d stale assignment(s); consider refinement sync.', count( $stale ) )
 				: 'No stale assignments.',

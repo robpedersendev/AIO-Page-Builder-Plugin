@@ -94,7 +94,7 @@ final class Goal_Caution_Rule_Registry {
 	 */
 	public function load( array $rules ): void {
 		$this->by_key = array();
-		$this->all     = array();
+		$this->all    = array();
 		foreach ( $rules as $rule ) {
 			if ( ! is_array( $rule ) ) {
 				continue;
@@ -136,7 +136,7 @@ final class Goal_Caution_Rule_Registry {
 				continue;
 			}
 			$this->by_key[ $goal_rule_key ] = $rule;
-			$this->all[]                   = $rule;
+			$this->all[]                    = $rule;
 		}
 	}
 

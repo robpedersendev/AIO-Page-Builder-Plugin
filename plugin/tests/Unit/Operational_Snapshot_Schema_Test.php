@@ -71,39 +71,45 @@ final class Operational_Snapshot_Schema_Test extends TestCase {
 
 	public function test_validate_root_accepts_valid_pre_change_snapshot(): void {
 		$snapshot = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID    => 'op-snap-pre-1',
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => 'op-snap-pre-1',
 			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE,
 			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
-			Operational_Snapshot_Schema::FIELD_TARGET_REF    => '42',
-			Operational_Snapshot_Schema::FIELD_CREATED_AT   => '2025-03-12T10:00:00Z',
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => '42',
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => '2025-03-12T10:00:00Z',
 			Operational_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
-			Operational_Snapshot_Schema::FIELD_PRE_CHANGE   => array( 'captured_at' => '2025-03-12T10:00:00Z', 'state_snapshot' => array( 'post_id' => 42 ) ),
+			Operational_Snapshot_Schema::FIELD_PRE_CHANGE  => array(
+				'captured_at'    => '2025-03-12T10:00:00Z',
+				'state_snapshot' => array( 'post_id' => 42 ),
+			),
 		);
-		$errors = Operational_Snapshot_Schema::validate_root( $snapshot );
+		$errors   = Operational_Snapshot_Schema::validate_root( $snapshot );
 		$this->assertSame( array(), $errors );
 	}
 
 	public function test_validate_root_accepts_valid_post_change_snapshot(): void {
 		$snapshot = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID    => 'op-snap-post-1',
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => 'op-snap-post-1',
 			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE,
 			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_TOKEN_SET,
-			Operational_Snapshot_Schema::FIELD_TARGET_REF    => 'design-tokens-primary',
-			Operational_Snapshot_Schema::FIELD_CREATED_AT   => '2025-03-12T10:05:00Z',
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => 'design-tokens-primary',
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => '2025-03-12T10:05:00Z',
 			Operational_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
-			Operational_Snapshot_Schema::FIELD_POST_CHANGE  => array( 'captured_at' => '2025-03-12T10:05:00Z', 'outcome' => 'success' ),
+			Operational_Snapshot_Schema::FIELD_POST_CHANGE => array(
+				'captured_at' => '2025-03-12T10:05:00Z',
+				'outcome'     => 'success',
+			),
 		);
-		$errors = Operational_Snapshot_Schema::validate_root( $snapshot );
+		$errors   = Operational_Snapshot_Schema::validate_root( $snapshot );
 		$this->assertSame( array(), $errors );
 	}
 
 	public function test_validate_root_rejects_missing_required_field(): void {
 		$snapshot = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID    => 'op-snap-bad',
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => 'op-snap-bad',
 			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE,
 			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
-			Operational_Snapshot_Schema::FIELD_TARGET_REF    => '42',
-			Operational_Snapshot_Schema::FIELD_CREATED_AT   => '2025-03-12T10:00:00Z',
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => '42',
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => '2025-03-12T10:00:00Z',
 			// missing schema_version and pre_change
 		);
 		$errors = Operational_Snapshot_Schema::validate_root( $snapshot );
@@ -115,29 +121,29 @@ final class Operational_Snapshot_Schema_Test extends TestCase {
 
 	public function test_validate_root_rejects_invalid_snapshot_type(): void {
 		$snapshot = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID    => 'op-snap-bad2',
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => 'op-snap-bad2',
 			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => 'during_change',
 			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
-			Operational_Snapshot_Schema::FIELD_TARGET_REF    => '42',
-			Operational_Snapshot_Schema::FIELD_CREATED_AT   => '2025-03-12T10:00:00Z',
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => '42',
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => '2025-03-12T10:00:00Z',
 			Operational_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
 		);
-		$errors = Operational_Snapshot_Schema::validate_root( $snapshot );
+		$errors   = Operational_Snapshot_Schema::validate_root( $snapshot );
 		$this->assertNotEmpty( $errors );
 		$this->assertSame( 'invalid_snapshot_type', $errors[0]['code'] ?? '' );
 	}
 
 	public function test_validate_root_rejects_invalid_object_family(): void {
 		$snapshot = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID    => 'op-snap-bad3',
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => 'op-snap-bad3',
 			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE,
 			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => 'widget',
-			Operational_Snapshot_Schema::FIELD_TARGET_REF    => '99',
-			Operational_Snapshot_Schema::FIELD_CREATED_AT   => '2025-03-12T10:00:00Z',
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => '99',
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => '2025-03-12T10:00:00Z',
 			Operational_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
-			Operational_Snapshot_Schema::FIELD_PRE_CHANGE   => array( 'captured_at' => '2025-03-12T10:00:00Z' ),
+			Operational_Snapshot_Schema::FIELD_PRE_CHANGE  => array( 'captured_at' => '2025-03-12T10:00:00Z' ),
 		);
-		$errors = Operational_Snapshot_Schema::validate_root( $snapshot );
+		$errors   = Operational_Snapshot_Schema::validate_root( $snapshot );
 		$this->assertNotEmpty( $errors );
 		$this->assertSame( 'invalid_object_family', $errors[0]['code'] ?? '' );
 	}

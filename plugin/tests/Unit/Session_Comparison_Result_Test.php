@@ -23,8 +23,8 @@ final class Session_Comparison_Result_Test extends TestCase {
 		$changes = array(
 			new Page_Change_Summary( 'https://example.com/a', Page_Change_Summary::CATEGORY_ADDED, array( Page_Change_Summary::REASON_ADDED ), null, array() ),
 		);
-		$r = new Session_Comparison_Result( 'run-1', 'run-2', 1, 0, 0, 0, 0, 2, 3, $changes );
-		$arr = $r->to_array();
+		$r       = new Session_Comparison_Result( 'run-1', 'run-2', 1, 0, 0, 0, 0, 2, 3, $changes );
+		$arr     = $r->to_array();
 		$this->assertSame( 'run-1', $arr['prior_run_id'] );
 		$this->assertSame( 'run-2', $arr['new_run_id'] );
 		$this->assertSame( 1, $arr['added_count'] );
@@ -43,8 +43,8 @@ final class Session_Comparison_Result_Test extends TestCase {
 			new Page_Change_Summary( 'https://example.com/about', Page_Change_Summary::CATEGORY_RECLASSIFIED, array( Page_Change_Summary::REASON_CLASSIFICATION_CHANGED ), array( 'page_classification' => 'low_value' ), array( 'page_classification' => 'meaningful' ) ),
 			new Page_Change_Summary( 'https://example.com/contact', Page_Change_Summary::CATEGORY_UNCHANGED, array(), array( 'title_snapshot' => 'Contact' ), array( 'title_snapshot' => 'Contact' ) ),
 		);
-		$result = new Session_Comparison_Result( 'prior-uuid', 'new-uuid', 1, 1, 1, 1, 1, 3, 4, $page_changes );
-		$arr = $result->to_array();
+		$result       = new Session_Comparison_Result( 'prior-uuid', 'new-uuid', 1, 1, 1, 1, 1, 3, 4, $page_changes );
+		$arr          = $result->to_array();
 		$this->assertSame( 1, $arr['added_count'] );
 		$this->assertSame( 1, $arr['removed_count'] );
 		$this->assertSame( 1, $arr['changed_count'] );

@@ -25,7 +25,7 @@ use AIOPageBuilder\Infrastructure\Config\Versions;
 final class Heartbeat_Service {
 
 	private const REPORTING_LOG_MAX_ENTRIES = 50;
-	private const MAX_RETRIES = 3;
+	private const MAX_RETRIES               = 3;
 	/** Base delay in seconds for exponential backoff (1h, 2h, 4h). */
 	private const BACKOFF_BASE_SECONDS = 3600;
 
@@ -43,8 +43,8 @@ final class Heartbeat_Service {
 		?Heartbeat_Health_Provider_Interface $health_provider = null,
 		?Template_Library_Report_Summary_Builder $template_library_report_summary_builder = null
 	) {
-		$this->transport = $transport ?? new Wp_Mail_Heartbeat_Transport();
-		$this->health_provider = $health_provider ?? new Default_Heartbeat_Health_Provider();
+		$this->transport                               = $transport ?? new Wp_Mail_Heartbeat_Transport();
+		$this->health_provider                         = $health_provider ?? new Default_Heartbeat_Health_Provider();
 		$this->template_library_report_summary_builder = $template_library_report_summary_builder;
 	}
 
@@ -138,30 +138,41 @@ final class Heartbeat_Service {
 	}
 
 	private function record_success( string $year_month, string $site_ref, string $log_reference ): void {
-		\update_option( Option_Names::HEARTBEAT_STATE, array(
-			'last_successful_month' => $year_month,
-			'site_reference'        => $site_ref,
-			'log_reference'         => $log_reference,
-		), false );
+		\update_option(
+			Option_Names::HEARTBEAT_STATE,
+			array(
+				'last_successful_month' => $year_month,
+				'site_reference'        => $site_ref,
+				'log_reference'         => $log_reference,
+			),
+			false
+		);
 	}
 
 	private function record_failure( string $for_month, int $previous_attempt_count, string $attempted_at ): void {
 		$state = $this->get_heartbeat_state();
-		\update_option( Option_Names::HEARTBEAT_STATE, array_merge( $state, array(
-			'for_month'      => $for_month,
-			'attempt_count'  => $previous_attempt_count + 1,
-			'last_attempt_at' => $attempted_at,
-		) ), false );
+		\update_option(
+			Option_Names::HEARTBEAT_STATE,
+			array_merge(
+				$state,
+				array(
+					'for_month'       => $for_month,
+					'attempt_count'   => $previous_attempt_count + 1,
+					'last_attempt_at' => $attempted_at,
+				)
+			),
+			false
+		);
 	}
 
 	/** @return array<string, mixed> */
 	private function build_envelope( string $site_ref, string $year_month, string $timestamp, string $dedupe_key ): array {
-		$health   = $this->health_provider->get_health_data();
-		$website  = function_exists( 'home_url' ) ? (string) home_url( '/', 'https' ) : '';
+		$health  = $this->health_provider->get_health_data();
+		$website = function_exists( 'home_url' ) ? (string) home_url( '/', 'https' ) : '';
 		if ( $website === '' && function_exists( 'home_url' ) ) {
 			$website = (string) home_url( '/', 'http' );
 		}
-		$wp_version = isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : '';
+		$wp_version  = isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : '';
 		$admin_email = \get_option( 'admin_email', '' );
 		$server_ip   = '';
 		if ( isset( $_SERVER['SERVER_ADDR'] ) && is_string( $_SERVER['SERVER_ADDR'] ) ) {
@@ -169,18 +180,18 @@ final class Heartbeat_Service {
 		}
 
 		$payload = array(
-			'website_address'                            => $website !== '' ? $website : $site_ref,
-			'plugin_version'                            => Versions::plugin(),
-			'wordpress_version'                         => $wp_version,
-			'php_version'                               => PHP_VERSION,
-			'admin_contact_email'                       => is_string( $admin_email ) ? $admin_email : '',
-			'server_ip'                                 => $server_ip,
-			'last_successful_ai_run_at'                  => $health['last_successful_ai_run_at'] ?? '',
-			'last_successful_build_plan_execution_at'     => $health['last_successful_build_plan_execution_at'] ?? '',
-			'current_health_summary'                     => $health['current_health_summary'] ?? 'healthy',
-			'current_queue_warning_count'                => (int) ( $health['current_queue_warning_count'] ?? 0 ),
-			'current_unresolved_critical_error_count'    => (int) ( $health['current_unresolved_critical_error_count'] ?? 0 ),
-			'timestamp'                                 => $timestamp,
+			'website_address'                         => $website !== '' ? $website : $site_ref,
+			'plugin_version'                          => Versions::plugin(),
+			'wordpress_version'                       => $wp_version,
+			'php_version'                             => PHP_VERSION,
+			'admin_contact_email'                     => is_string( $admin_email ) ? $admin_email : '',
+			'server_ip'                               => $server_ip,
+			'last_successful_ai_run_at'               => $health['last_successful_ai_run_at'] ?? '',
+			'last_successful_build_plan_execution_at' => $health['last_successful_build_plan_execution_at'] ?? '',
+			'current_health_summary'                  => $health['current_health_summary'] ?? 'healthy',
+			'current_queue_warning_count'             => (int) ( $health['current_queue_warning_count'] ?? 0 ),
+			'current_unresolved_critical_error_count' => (int) ( $health['current_unresolved_critical_error_count'] ?? 0 ),
+			'timestamp'                               => $timestamp,
 		);
 		if ( $this->template_library_report_summary_builder !== null ) {
 			$payload['template_library_report_summary'] = $this->template_library_report_summary_builder->build();
@@ -206,7 +217,7 @@ final class Heartbeat_Service {
 			'log_reference'   => $log_reference,
 			'failure_reason'  => $failure_reason,
 		);
-		$log = \get_option( Option_Names::REPORTING_LOG, array() );
+		$log   = \get_option( Option_Names::REPORTING_LOG, array() );
 		if ( ! is_array( $log ) ) {
 			$log = array();
 		}

@@ -36,11 +36,11 @@ final class Composed_Helper_Doc_Result {
 	private array $compliance_warnings;
 
 	/**
-	 * @param array<string, mixed> $composed_doc       Effective helper doc (base + overlay in allowed regions).
-	 * @param string              $base_documentation_id Base doc id or empty.
-	 * @param bool                $overlay_applied    True if an active overlay was merged.
-	 * @param string              $overlay_industry_key Industry key of overlay or empty.
-	 * @param string              $section_key       Section key that was resolved.
+	 * @param array<string, mixed>                                                     $composed_doc       Effective helper doc (base + overlay in allowed regions).
+	 * @param string                                                                   $base_documentation_id Base doc id or empty.
+	 * @param bool                                                                     $overlay_applied    True if an active overlay was merged.
+	 * @param string                                                                   $overlay_industry_key Industry key of overlay or empty.
+	 * @param string                                                                   $section_key       Section key that was resolved.
 	 * @param list<array{rule_key: string, severity: string, caution_summary: string}> $compliance_warnings Advisory compliance cautions (default empty).
 	 */
 	public function __construct( array $composed_doc, string $base_documentation_id, bool $overlay_applied, string $overlay_industry_key, string $section_key, array $compliance_warnings = array() ) {
@@ -105,11 +105,11 @@ final class Composed_Helper_Doc_Result {
 	 */
 	public function to_array(): array {
 		return array(
-			'section_key'            => $this->section_key,
-			'base_documentation_id'  => $this->base_documentation_id,
-			'overlay_applied'        => $this->overlay_applied,
-			'overlay_industry_key'   => $this->overlay_industry_key,
-			'composed_doc_keys'      => array_keys( $this->composed_doc ),
+			'section_key'           => $this->section_key,
+			'base_documentation_id' => $this->base_documentation_id,
+			'overlay_applied'       => $this->overlay_applied,
+			'overlay_industry_key'  => $this->overlay_industry_key,
+			'composed_doc_keys'     => array_keys( $this->composed_doc ),
 		);
 	}
 }

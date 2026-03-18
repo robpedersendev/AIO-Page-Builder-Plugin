@@ -18,8 +18,8 @@ defined( 'ABSPATH' ) || exit;
 final class Industry_Guided_Repair_View_Model {
 
 	public const KEY_CANDIDATES   = 'candidates';
-	public const KEY_LINKS       = 'links';
-	public const KEY_MESSAGE     = 'message';
+	public const KEY_LINKS        = 'links';
+	public const KEY_MESSAGE      = 'message';
 	public const KEY_MESSAGE_TYPE = 'message_type';
 
 	/** Issue source: health error. */
@@ -51,7 +51,7 @@ final class Industry_Guided_Repair_View_Model {
 
 	/**
 	 * @param list<array{source: string, object_type: string, key: string, issue_summary: string, related_refs: list<string>, repair_suggestion: array|null, is_advisory_only: bool, action_type: string, conflict: array|null, profile_field: string, suggested_value: string}> $candidates
-	 * @param array<string, string> $links
+	 * @param array<string, string>                                                                                                                                                                                                                                              $links
 	 */
 	public function __construct(
 		array $candidates = array(),
@@ -60,7 +60,7 @@ final class Industry_Guided_Repair_View_Model {
 		string $message_type = ''
 	) {
 		$this->candidates   = $candidates;
-		$this->links         = $links;
+		$this->links        = $links;
 		$this->message      = $message;
 		$this->message_type = $message_type;
 	}
@@ -86,10 +86,10 @@ final class Industry_Guided_Repair_View_Model {
 	/** @return array<string, mixed> */
 	public function to_array(): array {
 		return array(
-			self::KEY_CANDIDATES    => $this->candidates,
-			self::KEY_LINKS         => $this->links,
-			self::KEY_MESSAGE       => $this->message,
-			self::KEY_MESSAGE_TYPE  => $this->message_type,
+			self::KEY_CANDIDATES   => $this->candidates,
+			self::KEY_LINKS        => $this->links,
+			self::KEY_MESSAGE      => $this->message,
+			self::KEY_MESSAGE_TYPE => $this->message_type,
 		);
 	}
 }

@@ -38,7 +38,7 @@ final class Industry_Inspection_Command_Service_Test extends TestCase {
 
 	public function test_get_profile_summary_with_repo_returns_bounded_shape(): void {
 		$settings = new Settings_Service();
-		$repo = new Industry_Profile_Repository( $settings );
+		$repo     = new Industry_Profile_Repository( $settings );
 		$repo->set_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'realtor' ) );
 		$service = new Industry_Inspection_Command_Service( $repo, null, null );
 		$summary = $service->get_profile_summary();
@@ -49,7 +49,7 @@ final class Industry_Inspection_Command_Service_Test extends TestCase {
 	}
 
 	public function test_get_diagnostics_snapshot_without_service_returns_empty_bounded_shape(): void {
-		$service = new Industry_Inspection_Command_Service( null, null, null );
+		$service  = new Industry_Inspection_Command_Service( null, null, null );
 		$snapshot = $service->get_diagnostics_snapshot();
 		$this->assertFalse( $snapshot['industry_subsystem_available'] );
 		$this->assertSame( 'none', $snapshot['profile_readiness'] );
@@ -81,17 +81,17 @@ final class Industry_Inspection_Command_Service_Test extends TestCase {
 
 	public function test_get_starter_bundles_for_industry_without_registry_returns_empty(): void {
 		$service = new Industry_Inspection_Command_Service( null, null, null, null, null, null, null, null );
-		$keys = $service->get_starter_bundles_for_industry( 'realtor' );
+		$keys    = $service->get_starter_bundles_for_industry( 'realtor' );
 		$this->assertSame( array(), $keys );
 	}
 
 	public function test_inspection_is_read_only_no_mutation(): void {
 		$settings = new Settings_Service();
-		$repo = new Industry_Profile_Repository( $settings );
+		$repo     = new Industry_Profile_Repository( $settings );
 		$repo->set_profile( array( Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY => 'plumber' ) );
 		$service = new Industry_Inspection_Command_Service( $repo, null, null );
-		$first = $service->get_profile_summary();
-		$second = $service->get_profile_summary();
+		$first   = $service->get_profile_summary();
+		$second  = $service->get_profile_summary();
 		$this->assertSame( $first['primary_industry_key'], $second['primary_industry_key'] );
 		$this->assertSame( 'plumber', $first['primary_industry_key'] );
 	}

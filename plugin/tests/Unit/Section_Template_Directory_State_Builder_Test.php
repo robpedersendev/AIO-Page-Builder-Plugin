@@ -46,24 +46,27 @@ final class Section_Template_Directory_State_Builder_Test extends TestCase {
 
 	private function minimal_section_def( string $key, string $purpose_family, string $cta = '', string $variation_family = '', string $helper_ref = '' ): array {
 		$def = array(
-			Section_Schema::FIELD_INTERNAL_KEY            => $key,
-			Section_Schema::FIELD_NAME                    => 'Section ' . $key,
-			Section_Schema::FIELD_PURPOSE_SUMMARY         => 'Purpose ' . $key,
-			Section_Schema::FIELD_CATEGORY                => 'hero_intro',
-			Section_Schema::FIELD_STATUS                  => 'active',
+			Section_Schema::FIELD_INTERNAL_KEY             => $key,
+			Section_Schema::FIELD_NAME                     => 'Section ' . $key,
+			Section_Schema::FIELD_PURPOSE_SUMMARY          => 'Purpose ' . $key,
+			Section_Schema::FIELD_CATEGORY                 => 'hero_intro',
+			Section_Schema::FIELD_STATUS                   => 'active',
 			Section_Schema::FIELD_STRUCTURAL_BLUEPRINT_REF => 'bp',
-			Section_Schema::FIELD_FIELD_BLUEPRINT_REF     => 'acf',
-			Section_Schema::FIELD_HELPER_REF              => $helper_ref !== '' ? $helper_ref : 'helper',
-			Section_Schema::FIELD_CSS_CONTRACT_REF        => 'css',
-			Section_Schema::FIELD_DEFAULT_VARIANT        => 'default',
-			Section_Schema::FIELD_VARIANTS                => array( 'default' => array( 'label' => 'Default' ), 'compact' => array( 'label' => 'Compact' ) ),
-			Section_Schema::FIELD_COMPATIBILITY          => array(),
-			Section_Schema::FIELD_VERSION                => array( 'version' => '1' ),
-			Section_Schema::FIELD_RENDER_MODE             => 'block',
-			Section_Schema::FIELD_ASSET_DECLARATION       => array( 'none' => true ),
-			'section_purpose_family'                     => $purpose_family,
-			'cta_classification'                        => $cta,
-			'variation_family_key'                      => $variation_family,
+			Section_Schema::FIELD_FIELD_BLUEPRINT_REF      => 'acf',
+			Section_Schema::FIELD_HELPER_REF               => $helper_ref !== '' ? $helper_ref : 'helper',
+			Section_Schema::FIELD_CSS_CONTRACT_REF         => 'css',
+			Section_Schema::FIELD_DEFAULT_VARIANT          => 'default',
+			Section_Schema::FIELD_VARIANTS                 => array(
+				'default' => array( 'label' => 'Default' ),
+				'compact' => array( 'label' => 'Compact' ),
+			),
+			Section_Schema::FIELD_COMPATIBILITY            => array(),
+			Section_Schema::FIELD_VERSION                  => array( 'version' => '1' ),
+			Section_Schema::FIELD_RENDER_MODE              => 'block',
+			Section_Schema::FIELD_ASSET_DECLARATION        => array( 'none' => true ),
+			'section_purpose_family'                       => $purpose_family,
+			'cta_classification'                           => $cta,
+			'variation_family_key'                         => $variation_family,
 		);
 		return $def;
 	}
@@ -71,10 +74,10 @@ final class Section_Template_Directory_State_Builder_Test extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$GLOBALS['_aio_post_meta'] = array();
-		$this->section_repo = new Section_Template_Repository();
-		$this->page_repo    = new Page_Template_Repository();
-		$this->query_service = new Large_Library_Query_Service( $this->section_repo, $this->page_repo );
-		$this->builder = new Section_Template_Directory_State_Builder( $this->query_service );
+		$this->section_repo        = new Section_Template_Repository();
+		$this->page_repo           = new Page_Template_Repository();
+		$this->query_service       = new Large_Library_Query_Service( $this->section_repo, $this->page_repo );
+		$this->builder             = new Section_Template_Directory_State_Builder( $this->query_service );
 	}
 
 	protected function tearDown(): void {
@@ -98,18 +101,20 @@ final class Section_Template_Directory_State_Builder_Test extends TestCase {
 		$posts = array();
 		$meta  = array();
 		foreach ( array( array( 'st_hero_1', 'hero', '', 'hero_primary' ), array( 'st_hero_2', 'hero', '', 'hero_compact' ) ) as $i => $t ) {
-			$def = $this->minimal_section_def( $t[0], $t[1], $t[2], $t[3] );
-			$id  = 16000 + $i;
-			$posts[] = new \WP_Post( array(
-				'ID' => $id,
-				'post_type' => Object_Type_Keys::SECTION_TEMPLATE,
-				'post_title' => $def['name'],
-				'post_status' => 'publish',
-				'post_name' => $def['internal_key'],
-			) );
+			$def                  = $this->minimal_section_def( $t[0], $t[1], $t[2], $t[3] );
+			$id                   = 16000 + $i;
+			$posts[]              = new \WP_Post(
+				array(
+					'ID'          => $id,
+					'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+					'post_title'  => $def['name'],
+					'post_status' => 'publish',
+					'post_name'   => $def['internal_key'],
+				)
+			);
 			$meta[ (string) $id ] = array(
-				'_aio_internal_key' => $def['internal_key'],
-				'_aio_status' => $def['status'],
+				'_aio_internal_key'       => $def['internal_key'],
+				'_aio_status'             => $def['status'],
 				'_aio_section_definition' => wp_json_encode( $def ),
 			);
 		}
@@ -125,26 +130,33 @@ final class Section_Template_Directory_State_Builder_Test extends TestCase {
 	}
 
 	public function test_build_state_list_returns_list_result_with_helper_and_version(): void {
-		$posts = array();
-		$meta  = array();
-		$def = $this->minimal_section_def( 'st_hero_01', 'hero', '', 'hero_primary', 'hero_helper' );
-		$id = 17000;
-		$posts[] = new \WP_Post( array(
-			'ID' => $id,
-			'post_type' => Object_Type_Keys::SECTION_TEMPLATE,
-			'post_title' => $def['name'],
-			'post_status' => 'publish',
-			'post_name' => $def['internal_key'],
-		) );
-		$meta[ (string) $id ] = array(
-			'_aio_internal_key' => $def['internal_key'],
-			'_aio_status' => $def['status'],
+		$posts                          = array();
+		$meta                           = array();
+		$def                            = $this->minimal_section_def( 'st_hero_01', 'hero', '', 'hero_primary', 'hero_helper' );
+		$id                             = 17000;
+		$posts[]                        = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+				'post_title'  => $def['name'],
+				'post_status' => 'publish',
+				'post_name'   => $def['internal_key'],
+			)
+		);
+		$meta[ (string) $id ]           = array(
+			'_aio_internal_key'       => $def['internal_key'],
+			'_aio_status'             => $def['status'],
 			'_aio_section_definition' => wp_json_encode( $def ),
 		);
 		$GLOBALS['_aio_wp_query_posts'] = $posts;
 		$GLOBALS['_aio_post_meta']      = $meta;
 
-		$state = $this->builder->build_state( array( 'purpose_family' => 'hero', 'variation_family_key' => 'hero_primary' ) );
+		$state = $this->builder->build_state(
+			array(
+				'purpose_family'       => 'hero',
+				'variation_family_key' => 'hero_primary',
+			)
+		);
 
 		$this->assertSame( 'list', $state['view'] );
 		$this->assertCount( 3, $state['breadcrumbs'] );
@@ -157,21 +169,23 @@ final class Section_Template_Directory_State_Builder_Test extends TestCase {
 	}
 
 	public function test_build_state_search_returns_view_search_and_list_result(): void {
-		$posts = array();
-		$meta  = array();
-		$def = $this->minimal_section_def( 'st_cta_signup', 'cta', 'primary_cta', '' );
-		$def['name'] = 'CTA Signup Section';
-		$id = 18000;
-		$posts[] = new \WP_Post( array(
-			'ID' => $id,
-			'post_type' => Object_Type_Keys::SECTION_TEMPLATE,
-			'post_title' => $def['name'],
-			'post_status' => 'publish',
-			'post_name' => $def['internal_key'],
-		) );
-		$meta[ (string) $id ] = array(
-			'_aio_internal_key' => $def['internal_key'],
-			'_aio_status' => $def['status'],
+		$posts                          = array();
+		$meta                           = array();
+		$def                            = $this->minimal_section_def( 'st_cta_signup', 'cta', 'primary_cta', '' );
+		$def['name']                    = 'CTA Signup Section';
+		$id                             = 18000;
+		$posts[]                        = new \WP_Post(
+			array(
+				'ID'          => $id,
+				'post_type'   => Object_Type_Keys::SECTION_TEMPLATE,
+				'post_title'  => $def['name'],
+				'post_status' => 'publish',
+				'post_name'   => $def['internal_key'],
+			)
+		);
+		$meta[ (string) $id ]           = array(
+			'_aio_internal_key'       => $def['internal_key'],
+			'_aio_status'             => $def['status'],
 			'_aio_section_definition' => wp_json_encode( $def ),
 		);
 		$GLOBALS['_aio_wp_query_posts'] = $posts;

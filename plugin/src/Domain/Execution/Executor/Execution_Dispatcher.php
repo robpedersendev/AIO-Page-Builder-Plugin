@@ -30,8 +30,8 @@ final class Execution_Dispatcher {
 	/**
 	 * Registers a handler for an action type.
 	 *
-	 * @param string                        $action_type One of Execution_Action_Types::*.
-	 * @param Execution_Handler_Interface  $handler
+	 * @param string                      $action_type One of Execution_Action_Types::*.
+	 * @param Execution_Handler_Interface $handler
 	 * @return void
 	 */
 	public function register_handler( string $action_type, Execution_Handler_Interface $handler ): void {
@@ -62,7 +62,7 @@ final class Execution_Dispatcher {
 	 */
 	public function dispatch( array $envelope ): array {
 		$action_type = isset( $envelope['action_type'] ) && is_string( $envelope['action_type'] ) ? $envelope['action_type'] : '';
-		$handler = $this->get_handler( $action_type );
+		$handler     = $this->get_handler( $action_type );
 		return $handler->execute( $envelope );
 	}
 

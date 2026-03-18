@@ -56,13 +56,13 @@ final class Industry_LPagery_Planning_Result {
 		string $hierarchy_guidance = '',
 		array $weak_page_warnings = array()
 	) {
-		$this->lpagery_posture        = $lpagery_posture;
-		$this->required_tokens        = array_values( $required_tokens );
-		$this->optional_tokens        = array_values( $optional_tokens );
+		$this->lpagery_posture         = $lpagery_posture;
+		$this->required_tokens         = array_values( $required_tokens );
+		$this->optional_tokens         = array_values( $optional_tokens );
 		$this->suggested_page_families = array_values( $suggested_page_families );
-		$this->warning_flags          = array_values( $warning_flags );
-		$this->hierarchy_guidance    = $hierarchy_guidance;
-		$this->weak_page_warnings    = array_values( $weak_page_warnings );
+		$this->warning_flags           = array_values( $warning_flags );
+		$this->hierarchy_guidance      = $hierarchy_guidance;
+		$this->weak_page_warnings      = array_values( $weak_page_warnings );
 	}
 
 	public function get_lpagery_posture(): string {

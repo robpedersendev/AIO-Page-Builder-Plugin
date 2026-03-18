@@ -48,7 +48,7 @@ final class Page_Template_Inventory_Appendix_Generator {
 	 * @return string
 	 */
 	public function generate_from_definitions( array $definitions ): string {
-		$result = $this->build_result_from_definitions( $definitions );
+		$result  = $this->build_result_from_definitions( $definitions );
 		$grouped = $this->group_by_category( $result['rows'] );
 		return $this->render_markdown( $grouped, $result['total'] );
 	}
@@ -85,11 +85,11 @@ final class Page_Template_Inventory_Appendix_Generator {
 	 * @return array<string, mixed> Appendix row: key, name, purpose, ordered_sections, optional_sections, hierarchy_hint, one_pager_status, version, deprecation_status.
 	 */
 	private function build_row( array $def ): array {
-		$key    = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-		$name   = (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? $key );
-		$purpose = (string) ( $def[ Page_Template_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' );
-		$ordered = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
-		$ordered_list = array();
+		$key           = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+		$name          = (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? $key );
+		$purpose       = (string) ( $def[ Page_Template_Schema::FIELD_PURPOSE_SUMMARY ] ?? '' );
+		$ordered       = $def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? array();
+		$ordered_list  = array();
 		$optional_list = array();
 		if ( \is_array( $ordered ) ) {
 			foreach ( $ordered as $item ) {
@@ -99,7 +99,7 @@ final class Page_Template_Inventory_Appendix_Generator {
 				$sk = (string) ( $item[ Page_Template_Schema::SECTION_ITEM_KEY ] ?? $item['section_key'] ?? '' );
 				if ( $sk !== '' ) {
 					$ordered_list[] = $sk;
-					$required = $item[ Page_Template_Schema::SECTION_ITEM_REQUIRED ] ?? true;
+					$required       = $item[ Page_Template_Schema::SECTION_ITEM_REQUIRED ] ?? true;
 					if ( $required === false ) {
 						$optional_list[] = $sk;
 					}
@@ -116,11 +116,11 @@ final class Page_Template_Inventory_Appendix_Generator {
 				}
 			}
 		}
-		$category_class = (string) ( $def['template_category_class'] ?? '' );
-		$family         = (string) ( $def['template_family'] ?? '' );
-		$hierarchy_role = (string) ( $def['hierarchy_role'] ?? '' );
+		$category_class  = (string) ( $def['template_category_class'] ?? '' );
+		$family          = (string) ( $def['template_family'] ?? '' );
+		$hierarchy_role  = (string) ( $def['hierarchy_role'] ?? '' );
 		$hierarchy_hints = $def['hierarchy_hints'] ?? array();
-		$hint_parts = array();
+		$hint_parts      = array();
 		if ( $category_class !== '' ) {
 			$hint_parts[] = $category_class;
 		}
@@ -138,28 +138,28 @@ final class Page_Template_Inventory_Appendix_Generator {
 		}
 		$hierarchy_hint = \implode( ', ', $hint_parts );
 
-		$one_pager = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? $def['one_pager'] ?? array();
+		$one_pager        = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? $def['one_pager'] ?? array();
 		$one_pager_status = 'no';
 		if ( \is_array( $one_pager ) && ( isset( $one_pager['link'] ) || isset( $one_pager['page_purpose_summary'] ) || ( isset( $one_pager['ref'] ) && $one_pager['ref'] !== '' ) ) ) {
 			$one_pager_status = 'yes';
 		}
 
-		$status = (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
+		$status             = (string) ( $def[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
 		$deprecation_status = ( $status === 'deprecated' ) ? 'deprecated' : 'active';
-		$version_data = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
-		$version = \is_array( $version_data ) && isset( $version_data['version'] ) ? (string) $version_data['version'] : '1';
+		$version_data       = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
+		$version            = \is_array( $version_data ) && isset( $version_data['version'] ) ? (string) $version_data['version'] : '1';
 
 		return array(
-			'key'                 => $key,
-			'name'                => $name,
-			'purpose'             => $purpose,
-			'ordered_sections'    => $ordered_list,
-			'optional_sections'   => $optional_list,
-			'category_class'      => $category_class,
-			'hierarchy_hint'      => $hierarchy_hint,
-			'one_pager_status'    => $one_pager_status,
-			'version'             => $version,
-			'deprecation_status'   => $deprecation_status,
+			'key'                => $key,
+			'name'               => $name,
+			'purpose'            => $purpose,
+			'ordered_sections'   => $ordered_list,
+			'optional_sections'  => $optional_list,
+			'category_class'     => $category_class,
+			'hierarchy_hint'     => $hierarchy_hint,
+			'one_pager_status'   => $one_pager_status,
+			'version'            => $version,
+			'deprecation_status' => $deprecation_status,
 		);
 	}
 
@@ -193,11 +193,11 @@ final class Page_Template_Inventory_Appendix_Generator {
 
 	/**
 	 * @param array<string, list<array<string, mixed>>> $grouped
-	 * @param int $total
+	 * @param int                                       $total
 	 * @return string
 	 */
 	private function render_markdown( array $grouped, int $total ): string {
-		$out = array();
+		$out   = array();
 		$out[] = '# Page Template Inventory Appendix';
 		$out[] = '';
 		$out[] = '**Spec**: §62.12 Page Template Inventory Appendix; §57.9 Documentation Standards; §60.6 Documentation Completion Requirements.';
@@ -211,23 +211,23 @@ final class Page_Template_Inventory_Appendix_Generator {
 
 		foreach ( $grouped as $category => $rows ) {
 			$cat_label = $category === '_ungrouped' ? 'Ungrouped' : \ucfirst( \str_replace( array( '_', '-' ), ' ', $category ) );
-			$out[] = '## ' . $cat_label;
-			$out[] = '';
-			$out[] = '| Key | Name | Purpose | Ordered sections | Optional sections | Hierarchy | One-pager | Version | Deprecation |';
-			$out[] = '|-----|------|---------|------------------|-------------------|-----------|-----------|---------|-------------|';
+			$out[]     = '## ' . $cat_label;
+			$out[]     = '';
+			$out[]     = '| Key | Name | Purpose | Ordered sections | Optional sections | Hierarchy | One-pager | Version | Deprecation |';
+			$out[]     = '|-----|------|---------|------------------|-------------------|-----------|-----------|---------|-------------|';
 			foreach ( $rows as $r ) {
-				$key   = $this->escape_table_cell( (string) ( $r['key'] ?? '' ) );
-				$name  = $this->escape_table_cell( (string) ( $r['name'] ?? '' ) );
-				$purpose = $this->escape_table_cell( (string) ( $r['purpose'] ?? '' ) );
-				$ordered = \is_array( $r['ordered_sections'] ?? null ) ? \implode( ', ', $r['ordered_sections'] ) : '';
-				$ordered = $this->escape_table_cell( $ordered );
+				$key      = $this->escape_table_cell( (string) ( $r['key'] ?? '' ) );
+				$name     = $this->escape_table_cell( (string) ( $r['name'] ?? '' ) );
+				$purpose  = $this->escape_table_cell( (string) ( $r['purpose'] ?? '' ) );
+				$ordered  = \is_array( $r['ordered_sections'] ?? null ) ? \implode( ', ', $r['ordered_sections'] ) : '';
+				$ordered  = $this->escape_table_cell( $ordered );
 				$optional = \is_array( $r['optional_sections'] ?? null ) ? \implode( ', ', $r['optional_sections'] ) : '—';
 				$optional = $this->escape_table_cell( $optional );
-				$hint   = $this->escape_table_cell( (string) ( $r['hierarchy_hint'] ?? '' ) );
-				$op     = $this->escape_table_cell( (string) ( $r['one_pager_status'] ?? '' ) );
-				$ver    = $this->escape_table_cell( (string) ( $r['version'] ?? '' ) );
-				$dep    = $this->escape_table_cell( (string) ( $r['deprecation_status'] ?? '' ) );
-				$out[] = '| ' . $key . ' | ' . $name . ' | ' . $purpose . ' | ' . $ordered . ' | ' . $optional . ' | ' . $hint . ' | ' . $op . ' | ' . $ver . ' | ' . $dep . ' |';
+				$hint     = $this->escape_table_cell( (string) ( $r['hierarchy_hint'] ?? '' ) );
+				$op       = $this->escape_table_cell( (string) ( $r['one_pager_status'] ?? '' ) );
+				$ver      = $this->escape_table_cell( (string) ( $r['version'] ?? '' ) );
+				$dep      = $this->escape_table_cell( (string) ( $r['deprecation_status'] ?? '' ) );
+				$out[]    = '| ' . $key . ' | ' . $name . ' | ' . $purpose . ' | ' . $ordered . ' | ' . $optional . ' | ' . $hint . ' | ' . $op . ' | ' . $ver . ' | ' . $dep . ' |';
 			}
 			$out[] = '';
 		}

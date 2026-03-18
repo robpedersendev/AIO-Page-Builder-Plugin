@@ -32,9 +32,9 @@ final class Rollback_Token_Set_Handler implements Rollback_Handler_Interface {
 	 * @return Rollback_Result
 	 */
 	public function execute( array $pre_snapshot, array $post_snapshot, array $context = array() ): Rollback_Result {
-		$job_id = isset( $context['job_id'] ) && is_string( $context['job_id'] ) ? $context['job_id'] : '';
+		$job_id     = isset( $context['job_id'] ) && is_string( $context['job_id'] ) ? $context['job_id'] : '';
 		$target_ref = (string) ( $pre_snapshot[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? '' );
-		$pre_block = $pre_snapshot[ Operational_Snapshot_Schema::FIELD_PRE_CHANGE ] ?? null;
+		$pre_block  = $pre_snapshot[ Operational_Snapshot_Schema::FIELD_PRE_CHANGE ] ?? null;
 		if ( ! is_array( $pre_block ) ) {
 			return Rollback_Result::failed(
 				$job_id,
@@ -62,7 +62,7 @@ final class Rollback_Token_Set_Handler implements Rollback_Handler_Interface {
 				array( 'code' => 'missing_state_snapshot' )
 			);
 		}
-		$tokens = isset( $state['tokens'] ) && is_array( $state['tokens'] ) ? $state['tokens'] : array();
+		$tokens       = isset( $state['tokens'] ) && is_array( $state['tokens'] ) ? $state['tokens'] : array();
 		$token_set_id = isset( $state['token_set_id'] ) ? (string) $state['token_set_id'] : $target_ref;
 		if ( strpos( $token_set_id, ':' ) === false ) {
 			return Rollback_Result::failed(
@@ -104,9 +104,9 @@ final class Rollback_Token_Set_Handler implements Rollback_Handler_Interface {
 			if ( ! is_array( $entry ) ) {
 				continue;
 			}
-			$value = isset( $entry['value'] ) ? $entry['value'] : null;
+			$value                    = isset( $entry['value'] ) ? $entry['value'] : null;
 			$store[ $group ][ $name ] = $value;
-			$restored[ $name ] = $value;
+			$restored[ $name ]        = $value;
 		}
 		$updated = \update_option( Token_Set_Job_Service::OPTION_APPLIED_TOKENS, $store );
 		if ( ! $updated ) {
@@ -128,7 +128,10 @@ final class Rollback_Token_Set_Handler implements Rollback_Handler_Interface {
 			$pre_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ?? '',
 			$post_snapshot[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ?? '',
 			'',
-			array( 'token_set_id' => $token_set_id, 'restored' => $restored )
+			array(
+				'token_set_id' => $token_set_id,
+				'restored'     => $restored,
+			)
 		);
 	}
 }

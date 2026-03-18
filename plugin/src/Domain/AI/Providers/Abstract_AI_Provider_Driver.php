@@ -35,11 +35,11 @@ abstract class Abstract_AI_Provider_Driver implements AI_Provider_Interface {
 	protected array $default_capabilities;
 
 	/**
-	 * @param string                        $provider_id           Stable provider id (e.g. openai).
-	 * @param Provider_Error_Normalizer     $error_normalizer      Maps provider errors to contract categories.
-	 * @param Provider_Response_Normalizer  $response_normalizer   Builds success/error response envelopes.
+	 * @param string                          $provider_id           Stable provider id (e.g. openai).
+	 * @param Provider_Error_Normalizer       $error_normalizer      Maps provider errors to contract categories.
+	 * @param Provider_Response_Normalizer    $response_normalizer   Builds success/error response envelopes.
 	 * @param Provider_Secret_Store_Interface $secret_store        Credential access; never logged.
-	 * @param array<string, mixed>          $default_capabilities get_capabilities() return shape.
+	 * @param array<string, mixed>            $default_capabilities get_capabilities() return shape.
 	 */
 	public function __construct(
 		string $provider_id,
@@ -48,8 +48,8 @@ abstract class Abstract_AI_Provider_Driver implements AI_Provider_Interface {
 		Provider_Secret_Store_Interface $secret_store,
 		array $default_capabilities
 	) {
-		$this->provider_id           = $provider_id;
-		$this->error_normalizer      = $error_normalizer;
+		$this->provider_id          = $provider_id;
+		$this->error_normalizer     = $error_normalizer;
 		$this->response_normalizer  = $response_normalizer;
 		$this->secret_store         = $secret_store;
 		$this->default_capabilities = $default_capabilities;
@@ -73,8 +73,8 @@ abstract class Abstract_AI_Provider_Driver implements AI_Provider_Interface {
 	 * @return array<string, mixed> Normalized response (request_id, success, structured_payload?, usage?, normalized_error?).
 	 */
 	public function request( array $request ): array {
-		$request_id  = (string) ( $request['request_id'] ?? '' );
-		$model_used  = (string) ( $request['model'] ?? 'unknown' );
+		$request_id = (string) ( $request['request_id'] ?? '' );
+		$model_used = (string) ( $request['model'] ?? 'unknown' );
 
 		if ( ! $this->secret_store->has_credential( $this->provider_id ) ) {
 			return $this->error_normalizer->build_error_response(

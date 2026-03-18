@@ -56,8 +56,8 @@ final class Industry_Author_Sandbox_Service_Test extends TestCase {
 			'status'         => 'active',
 			'version_marker' => '1',
 		);
-		$service = new Industry_Author_Sandbox_Service();
-		$result  = $service->run_dry_run( array( $valid_pack ), array() );
+		$service    = new Industry_Author_Sandbox_Service();
+		$result     = $service->run_dry_run( array( $valid_pack ), array() );
 		$this->assertIsArray( $result['lint_result']['errors'] );
 		$this->assertGreaterThanOrEqual( 0, $result['summary']['lint_errors'] );
 	}

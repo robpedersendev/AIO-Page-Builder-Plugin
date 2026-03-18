@@ -27,10 +27,10 @@ final class Industry_Definition_Linter {
 	public const SEVERITY_ERROR   = 'error';
 	public const SEVERITY_WARNING = 'warning';
 
-	public const OBJECT_TYPE_PACK          = 'pack';
+	public const OBJECT_TYPE_PACK           = 'pack';
 	public const OBJECT_TYPE_STARTER_BUNDLE = 'starter_bundle';
-	public const OBJECT_TYPE_SUBTYPE       = 'subtype';
-	public const OBJECT_TYPE_PROFILE       = 'profile';
+	public const OBJECT_TYPE_SUBTYPE        = 'subtype';
+	public const OBJECT_TYPE_PROFILE        = 'profile';
 
 	/** @var Industry_Pack_Registry|null */
 	private $pack_registry;
@@ -54,11 +54,11 @@ final class Industry_Definition_Linter {
 		?Industry_Starter_Bundle_Registry $starter_bundle_registry = null,
 		?Industry_Subtype_Registry $subtype_registry = null
 	) {
-		$this->pack_registry            = $pack_registry;
-		$this->pack_validator           = $pack_validator ?? new Industry_Pack_Validator();
-		$this->health_check             = $health_check;
-		$this->starter_bundle_registry  = $starter_bundle_registry;
-		$this->subtype_registry         = $subtype_registry;
+		$this->pack_registry           = $pack_registry;
+		$this->pack_validator          = $pack_validator ?? new Industry_Pack_Validator();
+		$this->health_check            = $health_check;
+		$this->starter_bundle_registry = $starter_bundle_registry;
+		$this->subtype_registry        = $subtype_registry;
 	}
 
 	/**
@@ -70,7 +70,7 @@ final class Industry_Definition_Linter {
 		$errors   = array();
 		$warnings = array();
 
-		$add_error = static function ( string $code, string $message, string $object_type, string $key, array $refs = array(), ?string $field = null ) use ( &$errors ): void {
+		$add_error   = static function ( string $code, string $message, string $object_type, string $key, array $refs = array(), ?string $field = null ) use ( &$errors ): void {
 			$errors[] = array(
 				'severity'     => self::SEVERITY_ERROR,
 				'code'         => $code,
@@ -93,20 +93,20 @@ final class Industry_Definition_Linter {
 
 		// 1. Pack schema and duplicate keys (on current registry state).
 		if ( $this->pack_registry !== null ) {
-			$packs = $this->pack_registry->get_all();
+			$packs     = $this->pack_registry->get_all();
 			$seen_keys = array();
 			foreach ( $packs as $index => $pack ) {
 				if ( ! is_array( $pack ) ) {
 					continue;
 				}
-				$pack_errors = $this->pack_validator->validate_pack( $pack );
+				$pack_errors  = $this->pack_validator->validate_pack( $pack );
 				$industry_key = isset( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] )
 					? trim( $pack[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ] )
 					: '';
 				foreach ( $pack_errors as $err ) {
 					$add_error(
 						$err['code'] ?? 'validation_error',
-											'Pack validation failed: ' . ( $err['code'] ?? '' ) . ( isset( $err['field'] ) ? ' (field: ' . $err['field'] . ')' : '' ),
+						'Pack validation failed: ' . ( $err['code'] ?? '' ) . ( isset( $err['field'] ) ? ' (field: ' . $err['field'] . ')' : '' ),
 						self::OBJECT_TYPE_PACK,
 						$industry_key !== '' ? $industry_key : (string) $index,
 						array(),

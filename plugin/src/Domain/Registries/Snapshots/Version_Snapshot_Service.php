@@ -44,9 +44,9 @@ final class Version_Snapshot_Service {
 		Version_Snapshot_Repository $repository,
 		Composition_Repository $composition_repository
 	) {
-		$this->section_registry      = $section_registry;
+		$this->section_registry       = $section_registry;
 		$this->page_template_registry = $page_template_registry;
-		$this->repository            = $repository;
+		$this->repository             = $repository;
 		$this->composition_repository = $composition_repository;
 	}
 
@@ -213,7 +213,7 @@ final class Version_Snapshot_Service {
 	): array {
 		$snapshot_id = $this->generate_snapshot_id();
 		$definition  = array(
-			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID     => $snapshot_id,
+			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID    => $snapshot_id,
 			Version_Snapshot_Schema::FIELD_SCOPE_TYPE     => $scope_type,
 			Version_Snapshot_Schema::FIELD_SCOPE_ID       => $scope_id,
 			Version_Snapshot_Schema::FIELD_CREATED_AT     => gmdate( 'Y-m-d\TH:i:s\Z' ),
@@ -221,12 +221,12 @@ final class Version_Snapshot_Service {
 			Version_Snapshot_Schema::FIELD_STATUS         => Version_Snapshot_Schema::STATUS_ACTIVE,
 			Version_Snapshot_Schema::FIELD_OBJECT_REFS    => $object_refs,
 			Version_Snapshot_Schema::FIELD_PROVENANCE     => array(
-				'source' => 'version_snapshot_service',
+				'source'      => 'version_snapshot_service',
 				'captured_at' => $payload['captured_at'] ?? gmdate( 'Y-m-d\TH:i:s\Z' ),
 			),
-			'payload' => $payload,
+			'payload'                                     => $payload,
 		);
-		$id = $this->repository->save_definition( $definition );
+		$id          = $this->repository->save_definition( $definition );
 		if ( $id <= 0 ) {
 			return array(
 				'success'     => false,

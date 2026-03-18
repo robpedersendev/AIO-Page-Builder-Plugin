@@ -48,8 +48,8 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 	) {
 		$this->section_repository = $section_repository;
 		$this->validator          = $validator;
-		$this->normalizer        = $normalizer;
-		$this->family_resolver   = $family_resolver;
+		$this->normalizer         = $normalizer;
+		$this->family_resolver    = $family_resolver;
 	}
 
 	/**
@@ -96,9 +96,9 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 			return null;
 		}
 
-		$section_key = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+		$section_key         = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 		$field_blueprint_ref = (string) ( $definition[ Section_Schema::FIELD_FIELD_BLUEPRINT_REF ] ?? '' );
-		$section_version = (string) ( $definition['version']['version'] ?? $blueprint_raw[ Field_Blueprint_Schema::SECTION_VERSION ] ?? '1' );
+		$section_version     = (string) ( $definition['version']['version'] ?? $blueprint_raw[ Field_Blueprint_Schema::SECTION_VERSION ] ?? '1' );
 
 		if ( $version !== null && $section_version !== $version ) {
 			return null;
@@ -188,7 +188,7 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 	 */
 	public function get_all_blueprints(): array {
 		$definitions = $this->section_repository->list_all_definitions( 9999, 0 );
-		$out = array();
+		$out         = array();
 		foreach ( $definitions as $def ) {
 			$bp = $this->get_blueprint_from_definition( $def );
 			if ( $bp !== null ) {

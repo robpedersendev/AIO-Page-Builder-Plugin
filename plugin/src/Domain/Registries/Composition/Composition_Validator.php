@@ -30,7 +30,7 @@ final class Composition_Validator {
 		Section_Registry_Service $section_registry,
 		Page_Template_Registry_Service $page_template_registry
 	) {
-		$this->section_registry      = $section_registry;
+		$this->section_registry       = $section_registry;
 		$this->page_template_registry = $page_template_registry;
 	}
 
@@ -64,8 +64,8 @@ final class Composition_Validator {
 			$codes[] = Composition_Validation_Codes::SNAPSHOT_MISSING;
 		}
 
-		$positions = array();
-		$deprecated_no_replacement = array();
+		$positions                  = array();
+		$deprecated_no_replacement  = array();
 		$deprecated_has_replacement = array();
 
 		foreach ( $ordered as $i => $item ) {
@@ -78,7 +78,7 @@ final class Composition_Validator {
 				continue;
 			}
 
-			$pos = isset( $item[ Composition_Schema::SECTION_ITEM_POSITION ] ) ? (int) $item[ Composition_Schema::SECTION_ITEM_POSITION ] : $i;
+			$pos         = isset( $item[ Composition_Schema::SECTION_ITEM_POSITION ] ) ? (int) $item[ Composition_Schema::SECTION_ITEM_POSITION ] : $i;
 			$positions[] = $pos;
 
 			$section = $this->section_registry->get_by_key( $key );
@@ -89,7 +89,7 @@ final class Composition_Validator {
 
 			$status = (string) ( $section['status'] ?? '' );
 			if ( $status === 'deprecated' ) {
-				$dep = $section['deprecation'] ?? array();
+				$dep         = $section['deprecation'] ?? array();
 				$replacement = (string) ( $dep['replacement_section_key'] ?? '' );
 				if ( $replacement === '' ) {
 					$deprecated_no_replacement[] = $key;
@@ -126,7 +126,7 @@ final class Composition_Validator {
 	 * @return list<string> Validation codes found.
 	 */
 	private function check_compatibility_adjacency( array $ordered ): array {
-		$found = array();
+		$found    = array();
 		$prev_key = null;
 		foreach ( $ordered as $item ) {
 			if ( ! is_array( $item ) ) {
@@ -159,7 +159,7 @@ final class Composition_Validator {
 	 * @return array{result: string, codes: list<string>}
 	 */
 	private function result_from_codes( array $codes ): array {
-		$codes = array_values( array_unique( $codes ) );
+		$codes        = array_values( array_unique( $codes ) );
 		$has_blocking = false;
 		$has_warning  = false;
 		foreach ( $codes as $code ) {
@@ -179,6 +179,9 @@ final class Composition_Validator {
 		} else {
 			$result = Composition_Validation_Result::VALID;
 		}
-		return array( 'result' => $result, 'codes' => $codes );
+		return array(
+			'result' => $result,
+			'codes'  => $codes,
+		);
 	}
 }

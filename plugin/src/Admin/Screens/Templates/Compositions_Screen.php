@@ -63,8 +63,8 @@ final class Compositions_Screen {
 
 	private function render_list_view(): void {
 		$compositions = $this->get_compositions_list();
-		$base_url = \admin_url( 'admin.php?page=' . self::SLUG );
-		$build_url = $base_url . '&view=build';
+		$base_url     = \admin_url( 'admin.php?page=' . self::SLUG );
+		$build_url    = $base_url . '&view=build';
 		?>
 		<div class="wrap aio-page-builder-screen aio-compositions-screen" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -77,7 +77,20 @@ final class Compositions_Screen {
 				? '<a href="' . \esc_url( rtrim( $docs_base, '/' ) . '/guides/template-library-operator-guide.md' ) . '" target="_blank" rel="noopener">' . \esc_html__( 'Template Library Operator Guide', 'aio-page-builder' ) . '</a>'
 				: \esc_html__( 'Template Library Operator Guide (docs/guides/template-library-operator-guide.md)', 'aio-page-builder' );
 			?>
-			<p class="aio-description" aria-label="<?php \esc_attr_e( 'Help reference', 'aio-page-builder' ); ?>"><?php echo \wp_kses( sprintf( /* translators: %s: link or path to operator guide */ __( 'For full guidance, see the %s.', 'aio-page-builder' ), $guide_ref ), array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ) ) ); ?></p>
+			<p class="aio-description" aria-label="<?php \esc_attr_e( 'Help reference', 'aio-page-builder' ); ?>">
+			<?php
+			echo \wp_kses(
+				sprintf( /* translators: %s: link or path to operator guide */ __( 'For full guidance, see the %s.', 'aio-page-builder' ), $guide_ref ),
+				array(
+					'a' => array(
+						'href'   => true,
+						'target' => true,
+						'rel'    => true,
+					),
+				)
+			);
+			?>
+													</p>
 			<p>
 				<a href="<?php echo \esc_url( $build_url ); ?>" class="button button-primary"><?php \esc_html_e( 'Build composition', 'aio-page-builder' ); ?></a>
 			</p>
@@ -99,14 +112,14 @@ final class Compositions_Screen {
 					<tbody>
 						<?php foreach ( $compositions as $comp ) : ?>
 							<?php
-							$comp_id = (string) ( $comp[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
-							$name = (string) ( $comp[ Composition_Schema::FIELD_NAME ] ?? $comp_id );
-							$status = (string) ( $comp[ Composition_Schema::FIELD_STATUS ] ?? '' );
-							$val_status = (string) ( $comp[ Composition_Schema::FIELD_VALIDATION_STATUS ] ?? '' );
-							$ordered = $comp[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array();
+							$comp_id       = (string) ( $comp[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
+							$name          = (string) ( $comp[ Composition_Schema::FIELD_NAME ] ?? $comp_id );
+							$status        = (string) ( $comp[ Composition_Schema::FIELD_STATUS ] ?? '' );
+							$val_status    = (string) ( $comp[ Composition_Schema::FIELD_VALIDATION_STATUS ] ?? '' );
+							$ordered       = $comp[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array();
 							$section_count = is_array( $ordered ) ? count( $ordered ) : 0;
-							$source_ref = (string) ( $comp[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' );
-							$edit_url = $base_url . '&view=build&composition_id=' . \rawurlencode( $comp_id );
+							$source_ref    = (string) ( $comp[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' );
+							$edit_url      = $base_url . '&view=build&composition_id=' . \rawurlencode( $comp_id );
 							?>
 							<tr>
 								<td><?php echo \esc_html( $name ); ?></td>
@@ -126,38 +139,38 @@ final class Compositions_Screen {
 	}
 
 	private function render_build_view(): void {
-		$request = array(
-			'view'            => 'build',
-			'composition_id'  => isset( $_GET['composition_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['composition_id'] ) ) : '',
-			'purpose_family'  => isset( $_GET['purpose_family'] ) ? \sanitize_key( (string) $_GET['purpose_family'] ) : '',
-			'category'        => isset( $_GET['category'] ) ? \sanitize_key( (string) $_GET['category'] ) : '',
-			'cta_classification' => isset( $_GET['cta_classification'] ) ? \sanitize_key( (string) $_GET['cta_classification'] ) : '',
+		$request             = array(
+			'view'                 => 'build',
+			'composition_id'       => isset( $_GET['composition_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['composition_id'] ) ) : '',
+			'purpose_family'       => isset( $_GET['purpose_family'] ) ? \sanitize_key( (string) $_GET['purpose_family'] ) : '',
+			'category'             => isset( $_GET['category'] ) ? \sanitize_key( (string) $_GET['category'] ) : '',
+			'cta_classification'   => isset( $_GET['cta_classification'] ) ? \sanitize_key( (string) $_GET['cta_classification'] ) : '',
 			'variation_family_key' => isset( $_GET['variation_family_key'] ) ? \sanitize_key( (string) $_GET['variation_family_key'] ) : '',
-			'search'          => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['search'] ) ) : '',
-			'status'          => isset( $_GET['status'] ) ? \sanitize_key( (string) $_GET['status'] ) : '',
-			'paged'           => isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1,
-			'per_page'        => isset( $_GET['per_page'] ) ? max( 1, min( 100, (int) $_GET['per_page'] ) ) : 25,
+			'search'               => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['search'] ) ) : '',
+			'status'               => isset( $_GET['status'] ) ? \sanitize_key( (string) $_GET['status'] ) : '',
+			'paged'                => isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1,
+			'per_page'             => isset( $_GET['per_page'] ) ? max( 1, min( 100, (int) $_GET['per_page'] ) ) : 25,
 		);
 		$current_composition = null;
 		if ( $request['composition_id'] !== '' ) {
-			$repo = $this->get_composition_repository();
+			$repo                = $this->get_composition_repository();
 			$current_composition = $repo->get_definition_by_key( $request['composition_id'] );
 		}
 		$state_builder = $this->get_builder_state_builder();
-		$state = $state_builder->build_state( $request, $current_composition );
+		$state         = $state_builder->build_state( $request, $current_composition );
 
-		$base_url = (string) ( $state['base_url'] ?? '' );
-		$filter_state = $state['filter_state'] ?? array();
-		$section_result = $state['section_result'] ?? array();
-		$rows = $section_result['rows'] ?? array();
-		$ordered_display = $state['ordered_sections_display'] ?? array();
-		$cta_warnings = $state['cta_warnings'] ?? array();
-		$insertion_hint = (string) ( $state['insertion_hint'] ?? '' );
+		$base_url          = (string) ( $state['base_url'] ?? '' );
+		$filter_state      = $state['filter_state'] ?? array();
+		$section_result    = $state['section_result'] ?? array();
+		$rows              = $section_result['rows'] ?? array();
+		$ordered_display   = $state['ordered_sections_display'] ?? array();
+		$cta_warnings      = $state['cta_warnings'] ?? array();
+		$insertion_hint    = (string) ( $state['insertion_hint'] ?? '' );
 		$validation_status = (string) ( $state['validation_status'] ?? '' );
-		$validation_codes = $state['validation_codes'] ?? array();
+		$validation_codes  = $state['validation_codes'] ?? array();
 		$preview_readiness = (bool) ( $state['preview_readiness'] ?? true );
-		$one_pager_ready = (bool) ( $state['one_pager_ready'] ?? false );
-		$list_url = $base_url;
+		$one_pager_ready   = (bool) ( $state['one_pager_ready'] ?? false );
+		$list_url          = $base_url;
 		?>
 		<div class="wrap aio-page-builder-screen aio-composition-builder" role="main" aria-label="<?php echo \esc_attr__( 'Composition builder', 'aio-page-builder' ); ?>">
 			<h1><?php \esc_html_e( 'Composition builder', 'aio-page-builder' ); ?></h1>
@@ -248,9 +261,9 @@ final class Compositions_Screen {
 					</tbody>
 				</table>
 				<?php
-				$pagination = $section_result['pagination'] ?? array();
+				$pagination  = $section_result['pagination'] ?? array();
 				$total_pages = (int) ( $pagination['total_pages'] ?? 1 );
-				$paged = (int) ( $filter_state['paged'] ?? 1 );
+				$paged       = (int) ( $filter_state['paged'] ?? 1 );
 				if ( $total_pages > 1 ) :
 					$prev_url = $paged > 1 ? $this->builder_page_url( $base_url, $filter_state, $paged - 1 ) : '';
 					$next_url = $paged < $total_pages ? $this->builder_page_url( $base_url, $filter_state, $paged + 1 ) : '';
@@ -274,12 +287,12 @@ final class Compositions_Screen {
 	 * @param array<string, mixed> $filter_state
 	 */
 	private function render_builder_filters( string $base_url, array $filter_state ): void {
-		$purpose = (string) ( $filter_state['purpose_family'] ?? '' );
-		$category = (string) ( $filter_state['category'] ?? '' );
-		$cta = (string) ( $filter_state['cta_classification'] ?? '' );
-		$variant = (string) ( $filter_state['variation_family_key'] ?? '' );
-		$search = (string) ( $filter_state['search'] ?? '' );
-		$status = (string) ( $filter_state['status'] ?? '' );
+		$purpose        = (string) ( $filter_state['purpose_family'] ?? '' );
+		$category       = (string) ( $filter_state['category'] ?? '' );
+		$cta            = (string) ( $filter_state['cta_classification'] ?? '' );
+		$variant        = (string) ( $filter_state['variation_family_key'] ?? '' );
+		$search         = (string) ( $filter_state['search'] ?? '' );
+		$status         = (string) ( $filter_state['status'] ?? '' );
 		$composition_id = isset( $_GET['composition_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['composition_id'] ) ) : '';
 		?>
 		<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-directory-filters">
@@ -315,7 +328,11 @@ final class Compositions_Screen {
 	 * @param array<string, mixed> $filter_state
 	 */
 	private function builder_page_url( string $base_url, array $filter_state, int $paged ): string {
-		$params = array( 'page' => self::SLUG, 'view' => 'build', 'paged' => $paged );
+		$params = array(
+			'page'  => self::SLUG,
+			'view'  => 'build',
+			'paged' => $paged,
+		);
 		if ( isset( $_GET['composition_id'] ) && (string) $_GET['composition_id'] !== '' ) {
 			$params['composition_id'] = \sanitize_text_field( \wp_unslash( (string) $_GET['composition_id'] ) );
 		}
@@ -347,7 +364,7 @@ final class Compositions_Screen {
 
 	private function get_builder_state_builder(): Composition_Builder_State_Builder {
 		$query_service = null;
-		$section_repo = null;
+		$section_repo  = null;
 		if ( $this->container ) {
 			if ( $this->container->has( 'large_library_query_service' ) ) {
 				$query_service = $this->container->get( 'large_library_query_service' );
@@ -357,14 +374,14 @@ final class Compositions_Screen {
 			}
 		}
 		if ( ! $query_service instanceof \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service ) {
-			$section_repo = $section_repo ?: new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
-			$page_repo = $this->container && $this->container->has( 'page_template_repository' )
+			$section_repo  = $section_repo ?: new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
+			$page_repo     = $this->container && $this->container->has( 'page_template_repository' )
 				? $this->container->get( 'page_template_repository' )
 				: new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
 			$query_service = new \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service( $section_repo, $page_repo );
 		}
 		$section_repo = $section_repo ?: new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
-		$builder = new Composition_Builder_State_Builder( $query_service, $section_repo );
+		$builder      = new Composition_Builder_State_Builder( $query_service, $section_repo );
 		if ( $this->container && $this->container->has( 'large_composition_validator' ) ) {
 			$builder->set_large_validator( $this->container->get( 'large_composition_validator' ) );
 		}

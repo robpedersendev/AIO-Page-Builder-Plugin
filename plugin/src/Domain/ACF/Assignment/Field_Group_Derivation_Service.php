@@ -42,8 +42,8 @@ final class Field_Group_Derivation_Service {
 		Section_Template_Repository $section_repository
 	) {
 		$this->page_template_repository = $page_template_repository;
-		$this->composition_repository  = $composition_repository;
-		$this->section_repository      = $section_repository;
+		$this->composition_repository   = $composition_repository;
+		$this->section_repository       = $section_repository;
 	}
 
 	/**

@@ -63,14 +63,14 @@ final class Industry_Read_Model_Cache_Service {
 	 * Stores value with TTL. Applies site scoping and version. Safe: no throw.
 	 *
 	 * @param string               $base_key Base key.
-	 * @param array<string, mixed>  $value    Payload to store (JSON-encodable).
+	 * @param array<string, mixed> $value    Payload to store (JSON-encodable).
 	 * @param int|null             $ttl      Seconds; null = default.
 	 * @return bool True if set_transient succeeded (or equivalent).
 	 */
 	public function set( string $base_key, array $value, ?int $ttl = null ): bool {
 		$scoped = $this->scoped_key_with_version( $base_key );
-		$ttl = $ttl !== null && $ttl > 0 ? $ttl : $this->default_ttl;
-		$json = json_encode( $value );
+		$ttl    = $ttl !== null && $ttl > 0 ? $ttl : $this->default_ttl;
+		$json   = json_encode( $value );
 		if ( $json === false ) {
 			return false;
 		}
@@ -110,7 +110,7 @@ final class Industry_Read_Model_Cache_Service {
 
 	private function scoped_key_with_version( string $base_key ): string {
 		$scoped = Industry_Site_Scope_Helper::scope_cache_key( $base_key );
-		$ver = function_exists( 'get_option' ) ? (int) get_option( self::OPTION_CACHE_VERSION, 1 ) : 1;
+		$ver    = function_exists( 'get_option' ) ? (int) get_option( self::OPTION_CACHE_VERSION, 1 ) : 1;
 		return $scoped . '_v' . $ver;
 	}
 }

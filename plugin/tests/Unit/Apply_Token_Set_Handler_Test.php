@@ -75,10 +75,10 @@ final class Apply_Token_Set_Handler_Test extends TestCase {
 	}
 
 	public function test_apply_token_set_handler_delegates_to_job_service(): void {
-		$stub = new Stub_Token_Set_Job_Service();
+		$stub             = new Stub_Token_Set_Job_Service();
 		$stub->run_result = Token_Set_Result::success( 'spacing', 'unit', '0.25rem', null, 'snap_tok' );
-		$handler = new Apply_Token_Set_Handler( $stub );
-		$envelope = array(
+		$handler          = new Apply_Token_Set_Handler( $stub );
+		$envelope         = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(
 				'token_group'    => 'spacing',
 				'token_name'     => 'unit',
@@ -86,20 +86,20 @@ final class Apply_Token_Set_Handler_Test extends TestCase {
 			),
 			'snapshot_ref' => 'snap_tok',
 		);
-		$out = $handler->execute( $envelope );
+		$out              = $handler->execute( $envelope );
 		$this->assertTrue( $out['success'] );
 		$this->assertSame( 'spacing', $out['artifacts']['token_group'] ?? '' );
 		$this->assertSame( '0.25rem', $out['artifacts']['applied_value'] ?? '' );
 	}
 
 	public function test_apply_token_set_handler_returns_failure_on_invalid_target(): void {
-		$stub = new Stub_Token_Set_Job_Service();
+		$stub             = new Stub_Token_Set_Job_Service();
 		$stub->run_result = Token_Set_Result::failure( 'Missing token group or name.', array( Execution_Action_Contract::ERROR_INVALID_ENVELOPE ) );
-		$handler = new Apply_Token_Set_Handler( $stub );
-		$envelope = array(
+		$handler          = new Apply_Token_Set_Handler( $stub );
+		$envelope         = array(
 			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(),
 		);
-		$out = $handler->execute( $envelope );
+		$out              = $handler->execute( $envelope );
 		$this->assertFalse( $out['success'] );
 		$this->assertSame( array( Execution_Action_Contract::ERROR_INVALID_ENVELOPE ), $out['errors'] ?? array() );
 	}

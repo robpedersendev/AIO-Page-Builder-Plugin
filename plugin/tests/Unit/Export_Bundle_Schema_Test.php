@@ -110,19 +110,19 @@ final class Export_Bundle_Schema_Test extends TestCase {
 	 */
 	private function minimal_valid_manifest(): array {
 		return array(
-			'export_type'            => Export_Mode_Keys::FULL_OPERATIONAL_BACKUP,
-			'export_timestamp'       => '2025-07-15T12:00:00Z',
-			'plugin_version'         => '1.0.0',
-			'schema_version'         => 1,
-			'source_site_url'         => 'https://example.com',
-			'included_categories'    => array(),
-			'excluded_categories'    => array(),
-			'package_checksum_list'  => array(),
-			'restore_notes'          => '',
-			'compatibility_flags'    => array(
-				'schema_version'           => 1,
-				'same_major_required'      => true,
-				'migration_floor'          => null,
+			'export_type'           => Export_Mode_Keys::FULL_OPERATIONAL_BACKUP,
+			'export_timestamp'      => '2025-07-15T12:00:00Z',
+			'plugin_version'        => '1.0.0',
+			'schema_version'        => 1,
+			'source_site_url'       => 'https://example.com',
+			'included_categories'   => array(),
+			'excluded_categories'   => array(),
+			'package_checksum_list' => array(),
+			'restore_notes'         => '',
+			'compatibility_flags'   => array(
+				'schema_version'              => 1,
+				'same_major_required'         => true,
+				'migration_floor'             => null,
 				'max_supported_export_schema' => 1,
 			),
 		);

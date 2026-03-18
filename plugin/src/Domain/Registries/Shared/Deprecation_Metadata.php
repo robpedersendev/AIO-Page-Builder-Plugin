@@ -43,7 +43,7 @@ final class Deprecation_Metadata {
 	 * @return array<string, mixed>
 	 */
 	public static function for_section( string $reason, string $replacement_key = '' ): array {
-		$block = array(
+		$block                                       = array(
 			'deprecated'                 => true,
 			'reason'                     => \sanitize_text_field( $reason ),
 			'replacement_section_key'    => self::sanitize( $replacement_key ),
@@ -51,11 +51,11 @@ final class Deprecation_Metadata {
 			'exclude_from_new_selection' => true,
 			'preserve_rendered_pages'    => true,
 		);
-		$block[ self::IS_DEPRECATED ]              = true;
-		$block[ self::DEPRECATED_AT ]               = gmdate( 'Y-m-d\TH:i:s\Z' );
-		$block[ self::DEPRECATED_REASON ]           = $block['reason'];
-		$block[ self::REPLACEMENT_KEY ]             = $block['replacement_section_key'];
-		$block[ self::ELIGIBLE_FOR_NEW_USE ]        = false;
+		$block[ self::IS_DEPRECATED ]                = true;
+		$block[ self::DEPRECATED_AT ]                = gmdate( 'Y-m-d\TH:i:s\Z' );
+		$block[ self::DEPRECATED_REASON ]            = $block['reason'];
+		$block[ self::REPLACEMENT_KEY ]              = $block['replacement_section_key'];
+		$block[ self::ELIGIBLE_FOR_NEW_USE ]         = false;
 		$block[ self::HISTORICAL_REFERENCE_ALLOWED ] = true;
 		return $block;
 	}
@@ -68,18 +68,18 @@ final class Deprecation_Metadata {
 	 * @return array<string, mixed>
 	 */
 	public static function for_page_template( string $reason, string $replacement_key = '' ): array {
-		$block = array(
-			'deprecated'                      => true,
-			'reason'                          => \sanitize_text_field( $reason ),
-			'replacement_template_key'        => self::sanitize( $replacement_key ),
-			'interpretability_of_old_plans'   => true,
+		$block                                       = array(
+			'deprecated'                       => true,
+			'reason'                           => \sanitize_text_field( $reason ),
+			'replacement_template_key'         => self::sanitize( $replacement_key ),
+			'interpretability_of_old_plans'    => true,
 			'exclude_from_new_build_selection' => true,
 		);
-		$block[ self::IS_DEPRECATED ]              = true;
-		$block[ self::DEPRECATED_AT ]               = gmdate( 'Y-m-d\TH:i:s\Z' );
-		$block[ self::DEPRECATED_REASON ]           = $block['reason'];
-		$block[ self::REPLACEMENT_KEY ]             = $block['replacement_template_key'];
-		$block[ self::ELIGIBLE_FOR_NEW_USE ]        = false;
+		$block[ self::IS_DEPRECATED ]                = true;
+		$block[ self::DEPRECATED_AT ]                = gmdate( 'Y-m-d\TH:i:s\Z' );
+		$block[ self::DEPRECATED_REASON ]            = $block['reason'];
+		$block[ self::REPLACEMENT_KEY ]              = $block['replacement_template_key'];
+		$block[ self::ELIGIBLE_FOR_NEW_USE ]         = false;
 		$block[ self::HISTORICAL_REFERENCE_ALLOWED ] = true;
 		return $block;
 	}

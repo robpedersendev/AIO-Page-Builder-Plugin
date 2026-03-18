@@ -24,10 +24,10 @@ final class Subtype_Page_OnePager_Overlay_Registry_Test extends TestCase {
 
 	private function valid_overlay( string $subtype_key = 'realtor_buyer_agent', string $page_key = 'pt_home_conversion_01' ): array {
 		return array(
-			Subtype_Page_OnePager_Overlay_Registry::FIELD_SUBTYPE_KEY       => $subtype_key,
+			Subtype_Page_OnePager_Overlay_Registry::FIELD_SUBTYPE_KEY => $subtype_key,
 			Subtype_Page_OnePager_Overlay_Registry::FIELD_PAGE_TEMPLATE_KEY => $page_key,
-			Subtype_Page_OnePager_Overlay_Registry::FIELD_SCOPE            => Subtype_Page_OnePager_Overlay_Registry::SCOPE_SUBTYPE_PAGE_ONEPAGER_OVERLAY,
-			Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS            => Subtype_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
+			Subtype_Page_OnePager_Overlay_Registry::FIELD_SCOPE => Subtype_Page_OnePager_Overlay_Registry::SCOPE_SUBTYPE_PAGE_ONEPAGER_OVERLAY,
+			Subtype_Page_OnePager_Overlay_Registry::FIELD_STATUS => Subtype_Page_OnePager_Overlay_Registry::STATUS_ACTIVE,
 			'cta_strategy' => 'Buyer-focused CTA.',
 		);
 	}
@@ -53,11 +53,13 @@ final class Subtype_Page_OnePager_Overlay_Registry_Test extends TestCase {
 
 	public function test_get_for_subtype_returns_only_that_subtype(): void {
 		$registry = new Subtype_Page_OnePager_Overlay_Registry();
-		$registry->load( array(
-			$this->valid_overlay( 'realtor_buyer_agent', 'pt_home_conversion_01' ),
-			$this->valid_overlay( 'realtor_buyer_agent', 'pt_contact_request_01' ),
-			$this->valid_overlay( 'realtor_listing_agent', 'pt_home_conversion_01' ),
-		) );
+		$registry->load(
+			array(
+				$this->valid_overlay( 'realtor_buyer_agent', 'pt_home_conversion_01' ),
+				$this->valid_overlay( 'realtor_buyer_agent', 'pt_contact_request_01' ),
+				$this->valid_overlay( 'realtor_listing_agent', 'pt_home_conversion_01' ),
+			)
+		);
 		$list = $registry->get_for_subtype( 'realtor_buyer_agent' );
 		$this->assertCount( 2, $list );
 	}
@@ -71,7 +73,7 @@ final class Subtype_Page_OnePager_Overlay_Registry_Test extends TestCase {
 	}
 
 	public function test_seeded_overlays_have_required_fields(): void {
-		$defs = Subtype_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions();
+		$defs     = Subtype_Page_OnePager_Overlay_Registry::get_builtin_overlay_definitions();
 		$registry = new Subtype_Page_OnePager_Overlay_Registry();
 		$registry->load( $defs );
 		$all = $registry->get_all();

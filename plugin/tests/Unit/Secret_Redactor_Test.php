@@ -22,9 +22,13 @@ final class Secret_Redactor_Test extends TestCase {
 	}
 
 	public function test_redact_array_replaces_api_key_with_placeholder(): void {
-		$r    = $this->redactor();
-		$in   = array( 'provider_id' => 'openai', 'api_key' => 'sk-secret123', 'default_model' => 'gpt-4o' );
-		$out  = $r->redact_array( $in );
+		$r   = $this->redactor();
+		$in  = array(
+			'provider_id'   => 'openai',
+			'api_key'       => 'sk-secret123',
+			'default_model' => 'gpt-4o',
+		);
+		$out = $r->redact_array( $in );
 		$this->assertSame( 'openai', $out['provider_id'] );
 		$this->assertSame( Secret_Redactor::REDACTED_PLACEHOLDER, $out['api_key'] );
 		$this->assertSame( 'gpt-4o', $out['default_model'] );
@@ -35,9 +39,9 @@ final class Secret_Redactor_Test extends TestCase {
 		$r   = $this->redactor();
 		$in  = array(
 			'config' => array(
-				'api_key'   => 'sk-nested',
-				'endpoint'  => 'https://api.example.com',
-				'password'  => 'pwd123',
+				'api_key'  => 'sk-nested',
+				'endpoint' => 'https://api.example.com',
+				'password' => 'pwd123',
 			),
 		);
 		$out = $r->redact_array( $in );
@@ -48,7 +52,10 @@ final class Secret_Redactor_Test extends TestCase {
 
 	public function test_redact_array_redacts_token_and_secret(): void {
 		$r   = $this->redactor();
-		$in  = array( 'access_token' => 'tok_xyz', 'client_secret' => 'cs_abc' );
+		$in  = array(
+			'access_token'  => 'tok_xyz',
+			'client_secret' => 'cs_abc',
+		);
 		$out = $r->redact_array( $in );
 		$this->assertSame( Secret_Redactor::REDACTED_PLACEHOLDER, $out['access_token'] );
 		$this->assertSame( Secret_Redactor::REDACTED_PLACEHOLDER, $out['client_secret'] );
@@ -56,14 +63,21 @@ final class Secret_Redactor_Test extends TestCase {
 
 	public function test_redact_array_preserves_non_secret_keys(): void {
 		$r   = $this->redactor();
-		$in  = array( 'provider_id' => 'openai', 'default_model' => 'gpt-4o', 'timeout' => 60 );
+		$in  = array(
+			'provider_id'   => 'openai',
+			'default_model' => 'gpt-4o',
+			'timeout'       => 60,
+		);
 		$out = $r->redact_array( $in );
 		$this->assertSame( $in, $out );
 	}
 
 	public function test_redacted_output_contains_no_raw_secret(): void {
 		$r   = $this->redactor();
-		$in  = array( 'api_key' => 'sk-proj-abc123xyz', 'provider_id' => 'openai' );
+		$in  = array(
+			'api_key'     => 'sk-proj-abc123xyz',
+			'provider_id' => 'openai',
+		);
 		$out = $r->redact_array( $in );
 		$str = wp_json_encode( $out );
 		$this->assertStringNotContainsString( 'sk-proj-abc123xyz', $str );
@@ -81,9 +95,9 @@ final class Secret_Redactor_Test extends TestCase {
 	}
 
 	public function test_redact_string_with_json_redacts_secrets(): void {
-		$r     = $this->redactor();
-		$json  = '{"provider_id":"openai","api_key":"sk-leak","model":"gpt-4o"}';
-		$out   = $r->redact_string( $json );
+		$r    = $this->redactor();
+		$json = '{"provider_id":"openai","api_key":"sk-leak","model":"gpt-4o"}';
+		$out  = $r->redact_string( $json );
 		$this->assertStringNotContainsString( 'sk-leak', $out );
 		$this->assertStringContainsString( Secret_Redactor::REDACTED_PLACEHOLDER, $out );
 		$decoded = json_decode( $out, true );
@@ -92,7 +106,7 @@ final class Secret_Redactor_Test extends TestCase {
 	}
 
 	public function test_redact_string_plain_text_unchanged(): void {
-		$r    = $this->redactor();
+		$r     = $this->redactor();
 		$plain = 'Some error message without JSON structure';
 		$this->assertSame( $plain, $r->redact_string( $plain ) );
 	}

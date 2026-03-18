@@ -20,10 +20,10 @@ final class Provider_Request_Context_Builder {
 	/**
 	 * Builds normalized request array from explicit fields. All inputs must be redacted; no secrets.
 	 *
-	 * @param string      $request_id   Idempotency / traceability.
-	 * @param string      $model        Model identifier (e.g. gpt-4o).
-	 * @param string      $system_prompt System prompt text (after redaction).
-	 * @param string      $user_message User/context message.
+	 * @param string               $request_id   Idempotency / traceability.
+	 * @param string               $model        Model identifier (e.g. gpt-4o).
+	 * @param string               $system_prompt System prompt text (after redaction).
+	 * @param string               $user_message User/context message.
 	 * @param array<string, mixed> $options Optional: structured_output_schema_ref, context_artifacts, max_tokens, temperature, timeout_seconds, options.
 	 * @return array<string, mixed> Normalized request (provider_request_context).
 	 */
@@ -35,10 +35,10 @@ final class Provider_Request_Context_Builder {
 		array $options = array()
 	): array {
 		$out = array(
-			'request_id'     => $request_id,
-			'model'          => $model,
-			'system_prompt'  => $system_prompt,
-			'user_message'   => $user_message,
+			'request_id'    => $request_id,
+			'model'         => $model,
+			'system_prompt' => $system_prompt,
+			'user_message'  => $user_message,
 		);
 		if ( isset( $options['structured_output_schema_ref'] ) && is_string( $options['structured_output_schema_ref'] ) ) {
 			$out['structured_output_schema_ref'] = $options['structured_output_schema_ref'];
@@ -65,11 +65,11 @@ final class Provider_Request_Context_Builder {
 	 * Builds from prompt-pack segments (assemble system and user from segment keys).
 	 * Segments array: segment_key => content string. Typically system_base + role_framing -> system; planning + artifact summary -> user.
 	 *
-	 * @param string      $request_id   Request id.
-	 * @param string      $model        Model identifier.
+	 * @param string                $request_id   Request id.
+	 * @param string                $model        Model identifier.
 	 * @param array<string, string> $system_segments Segment key => content for system prompt (concatenated in order).
 	 * @param array<string, string> $user_segments   Segment key => content for user message.
-	 * @param array<string, mixed> $options Optional: structured_output_schema_ref, context_artifacts, max_tokens, temperature, timeout_seconds, options.
+	 * @param array<string, mixed>  $options Optional: structured_output_schema_ref, context_artifacts, max_tokens, temperature, timeout_seconds, options.
 	 * @return array<string, mixed> Normalized request.
 	 */
 	public function build_from_segments(

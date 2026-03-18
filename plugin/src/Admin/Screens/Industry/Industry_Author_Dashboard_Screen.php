@@ -67,9 +67,9 @@ final class Industry_Author_Dashboard_Screen {
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_health_check_service' ) ) {
 			$health = $this->container->get( 'industry_health_check_service' );
 			if ( $health instanceof Industry_Health_Check_Service ) {
-				$result = $health->run();
-				$errs = isset( $result['errors'] ) && is_array( $result['errors'] ) ? $result['errors'] : array();
-				$warns = isset( $result['warnings'] ) && is_array( $result['warnings'] ) ? $result['warnings'] : array();
+				$result          = $health->run();
+				$errs            = isset( $result['errors'] ) && is_array( $result['errors'] ) ? $result['errors'] : array();
+				$warns           = isset( $result['warnings'] ) && is_array( $result['warnings'] ) ? $result['warnings'] : array();
 				$health_errors   = count( $errs );
 				$health_warnings = count( $warns );
 				$blocker_count  += $health_errors;
@@ -79,17 +79,17 @@ final class Industry_Author_Dashboard_Screen {
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_pack_completeness_report_service' ) ) {
 			$completeness = $this->container->get( 'industry_pack_completeness_report_service' );
 			if ( $completeness instanceof Industry_Pack_Completeness_Report_Service ) {
-				$report = $completeness->generate_report( true );
-				$summary = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
-				$release_grade  = (int) ( $summary['release_grade_count'] ?? 0 );
-				$strong         = (int) ( $summary['strong_count'] ?? 0 );
-				$minimal        = (int) ( $summary['minimal_count'] ?? 0 );
-				$below_minimal  = (int) ( $summary['below_minimal_count'] ?? 0 );
-				$pack_count     = (int) ( $summary['pack_count'] ?? 0 );
-				$subtype_count  = (int) ( $summary['subtype_count'] ?? 0 );
-				$results = isset( $report['pack_results'] ) && is_array( $report['pack_results'] ) ? $report['pack_results'] : array();
+				$report        = $completeness->generate_report( true );
+				$summary       = isset( $report['summary'] ) && is_array( $report['summary'] ) ? $report['summary'] : array();
+				$release_grade = (int) ( $summary['release_grade_count'] ?? 0 );
+				$strong        = (int) ( $summary['strong_count'] ?? 0 );
+				$minimal       = (int) ( $summary['minimal_count'] ?? 0 );
+				$below_minimal = (int) ( $summary['below_minimal_count'] ?? 0 );
+				$pack_count    = (int) ( $summary['pack_count'] ?? 0 );
+				$subtype_count = (int) ( $summary['subtype_count'] ?? 0 );
+				$results       = isset( $report['pack_results'] ) && is_array( $report['pack_results'] ) ? $report['pack_results'] : array();
 				foreach ( $results as $r ) {
-					$flags = isset( $r['blocker_flags'] ) && is_array( $r['blocker_flags'] ) ? $r['blocker_flags'] : array();
+					$flags          = isset( $r['blocker_flags'] ) && is_array( $r['blocker_flags'] ) ? $r['blocker_flags'] : array();
 					$blocker_count += count( $flags );
 				}
 			}
@@ -99,36 +99,36 @@ final class Industry_Author_Dashboard_Screen {
 			$analyzer = $this->container->get( 'industry_coverage_gap_analyzer' );
 			if ( $analyzer instanceof Industry_Coverage_Gap_Analyzer ) {
 				$gap_result = $analyzer->analyze( true );
-				$gaps = isset( $gap_result['gaps'] ) && is_array( $gap_result['gaps'] ) ? $gap_result['gaps'] : array();
-				$gap_count = count( $gaps );
+				$gaps       = isset( $gap_result['gaps'] ) && is_array( $gap_result['gaps'] ) ? $gap_result['gaps'] : array();
+				$gap_count  = count( $gaps );
 				foreach ( $gaps as $g ) {
 					$p = isset( $g['priority'] ) && is_string( $g['priority'] ) ? $g['priority'] : '';
 					if ( $p === Industry_Coverage_Gap_Analyzer::PRIORITY_HIGH ) {
-						$gap_high++;
+						++$gap_high;
 					} elseif ( $p === Industry_Coverage_Gap_Analyzer::PRIORITY_MEDIUM ) {
-						$gap_medium++;
+						++$gap_medium;
 					} else {
-						$gap_low++;
+						++$gap_low;
 					}
 				}
 			}
 		}
 
-		$base = admin_url( 'admin.php' );
+		$base  = admin_url( 'admin.php' );
 		$links = array(
-			'industry_profile'      => $base . '?page=' . Industry_Profile_Settings_Screen::SLUG,
-			'health_report'         => $base . '?page=' . Industry_Health_Report_Screen::SLUG,
-			'stale_content_report'   => $base . '?page=' . Industry_Stale_Content_Report_Screen::SLUG,
-			'pack_family_comparison'      => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
-			'future_industry_readiness'   => $base . '?page=' . Future_Industry_Readiness_Screen::SLUG,
-			'future_subtype_readiness'    => $base . '?page=' . Future_Subtype_Readiness_Screen::SLUG,
-			'maturity_delta_report'       => $base . '?page=' . Industry_Maturity_Delta_Report_Screen::SLUG,
-			'drift_report'                    => $base . '?page=' . Industry_Drift_Report_Screen::SLUG,
-			'scaffold_promotion_readiness'    => $base . '?page=' . Industry_Scaffold_Promotion_Readiness_Report_Screen::SLUG,
-			'guided_repair'                    => $base . '?page=' . Industry_Guided_Repair_Screen::SLUG,
-			'subtype_comparison'     => $base . '?page=' . Industry_Subtype_Comparison_Screen::SLUG,
-			'bundle_comparison'     => $base . '?page=' . Industry_Starter_Bundle_Comparison_Screen::SLUG,
-			'goal_comparison'       => $base . '?page=' . Conversion_Goal_Comparison_Screen::SLUG,
+			'industry_profile'             => $base . '?page=' . Industry_Profile_Settings_Screen::SLUG,
+			'health_report'                => $base . '?page=' . Industry_Health_Report_Screen::SLUG,
+			'stale_content_report'         => $base . '?page=' . Industry_Stale_Content_Report_Screen::SLUG,
+			'pack_family_comparison'       => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
+			'future_industry_readiness'    => $base . '?page=' . Future_Industry_Readiness_Screen::SLUG,
+			'future_subtype_readiness'     => $base . '?page=' . Future_Subtype_Readiness_Screen::SLUG,
+			'maturity_delta_report'        => $base . '?page=' . Industry_Maturity_Delta_Report_Screen::SLUG,
+			'drift_report'                 => $base . '?page=' . Industry_Drift_Report_Screen::SLUG,
+			'scaffold_promotion_readiness' => $base . '?page=' . Industry_Scaffold_Promotion_Readiness_Report_Screen::SLUG,
+			'guided_repair'                => $base . '?page=' . Industry_Guided_Repair_Screen::SLUG,
+			'subtype_comparison'           => $base . '?page=' . Industry_Subtype_Comparison_Screen::SLUG,
+			'bundle_comparison'            => $base . '?page=' . Industry_Starter_Bundle_Comparison_Screen::SLUG,
+			'goal_comparison'              => $base . '?page=' . Conversion_Goal_Comparison_Screen::SLUG,
 		);
 
 		return new Industry_Author_Dashboard_View_Model(
@@ -164,10 +164,10 @@ final class Industry_Author_Dashboard_Screen {
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_pack_completeness_report_service' ) ) {
 			$completeness = $this->container->get( 'industry_pack_completeness_report_service' );
 			if ( $completeness instanceof Industry_Pack_Completeness_Report_Service ) {
-				$report   = $completeness->generate_report( true );
-				$results  = isset( $report['pack_results'] ) && is_array( $report['pack_results'] ) ? $report['pack_results'] : array();
+				$report  = $completeness->generate_report( true );
+				$results = isset( $report['pack_results'] ) && is_array( $report['pack_results'] ) ? $report['pack_results'] : array();
 				foreach ( $results as $r ) {
-					$flags = isset( $r['blocker_flags'] ) && is_array( $r['blocker_flags'] ) ? $r['blocker_flags'] : array();
+					$flags                    = isset( $r['blocker_flags'] ) && is_array( $r['blocker_flags'] ) ? $r['blocker_flags'] : array();
 					$expansion_blocker_count += count( $flags );
 				}
 			}
@@ -176,7 +176,7 @@ final class Industry_Author_Dashboard_Screen {
 			$analyzer = $this->container->get( 'industry_coverage_gap_analyzer' );
 			if ( $analyzer instanceof Industry_Coverage_Gap_Analyzer ) {
 				$gap_result = $analyzer->analyze( true );
-				$gaps = isset( $gap_result['gaps'] ) && is_array( $gap_result['gaps'] ) ? $gap_result['gaps'] : array();
+				$gaps       = isset( $gap_result['gaps'] ) && is_array( $gap_result['gaps'] ) ? $gap_result['gaps'] : array();
 				foreach ( $gaps as $g ) {
 					if ( ( $g['priority'] ?? '' ) === Industry_Coverage_Gap_Analyzer::PRIORITY_HIGH ) {
 						++$expansion_blocker_count;
@@ -187,7 +187,7 @@ final class Industry_Author_Dashboard_Screen {
 		if ( $this->container instanceof Service_Container && $this->container->has( 'industry_scaffold_completeness_report_service' ) ) {
 			$scaffold = $this->container->get( 'industry_scaffold_completeness_report_service' );
 			if ( $scaffold instanceof Industry_Scaffold_Completeness_Report_Service ) {
-				$report = $scaffold->generate_report( array() );
+				$report  = $scaffold->generate_report( array() );
 				$results = isset( $report['scaffold_results'] ) && is_array( $report['scaffold_results'] ) ? $report['scaffold_results'] : array();
 				foreach ( $results as $r ) {
 					$classes = isset( $r['artifact_classes'] ) && is_array( $r['artifact_classes'] ) ? $r['artifact_classes'] : array();
@@ -201,11 +201,11 @@ final class Industry_Author_Dashboard_Screen {
 			}
 		}
 
-		$base = admin_url( 'admin.php' );
+		$base  = admin_url( 'admin.php' );
 		$links = array(
-			'pack_family_comparison'     => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
-			'future_industry_readiness'  => $base . '?page=' . Future_Industry_Readiness_Screen::SLUG,
-			'future_subtype_readiness'   => $base . '?page=' . Future_Subtype_Readiness_Screen::SLUG,
+			'pack_family_comparison'    => $base . '?page=' . Industry_Pack_Family_Comparison_Screen::SLUG,
+			'future_industry_readiness' => $base . '?page=' . Future_Industry_Readiness_Screen::SLUG,
+			'future_subtype_readiness'  => $base . '?page=' . Future_Subtype_Readiness_Screen::SLUG,
 		);
 
 		return new Future_Expansion_Readiness_Widget_View_Model(

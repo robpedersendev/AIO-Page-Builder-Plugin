@@ -62,13 +62,13 @@ final class Page_Block_Assembly_Result {
 	private array $errors;
 
 	/**
-	 * @param string                       $source_type            One of SOURCE_TYPE_*.
-	 * @param string                       $source_key             Template internal_key or composition_id.
-	 * @param list<array<string, mixed>>   $ordered_sections       Section payloads in page order.
-	 * @param string                       $block_content          Serialized block markup.
-	 * @param list<string>                 $dynamic_dependencies   Block names using render callbacks.
-	 * @param list<string>                 $survivability_notes    Durability notes.
-	 * @param list<string>                 $errors                 Assembly errors; non-empty when invalid.
+	 * @param string                     $source_type            One of SOURCE_TYPE_*.
+	 * @param string                     $source_key             Template internal_key or composition_id.
+	 * @param list<array<string, mixed>> $ordered_sections       Section payloads in page order.
+	 * @param string                     $block_content          Serialized block markup.
+	 * @param list<string>               $dynamic_dependencies   Block names using render callbacks.
+	 * @param list<string>               $survivability_notes    Durability notes.
+	 * @param list<string>               $errors                 Assembly errors; non-empty when invalid.
 	 */
 	public function __construct(
 		string $source_type,
@@ -84,7 +84,7 @@ final class Page_Block_Assembly_Result {
 		$this->ordered_sections     = $ordered_sections;
 		$this->block_content        = $block_content;
 		$this->dynamic_dependencies = $dynamic_dependencies;
-		$this->survivability_notes   = $survivability_notes;
+		$this->survivability_notes  = $survivability_notes;
 		$this->errors               = $errors;
 	}
 
@@ -136,7 +136,7 @@ final class Page_Block_Assembly_Result {
 			'ordered_sections'     => $this->ordered_sections,
 			'block_content'        => $this->block_content,
 			'dynamic_dependencies' => $this->dynamic_dependencies,
-			'survivability_notes'   => $this->survivability_notes,
+			'survivability_notes'  => $this->survivability_notes,
 			'errors'               => $this->errors,
 		);
 	}

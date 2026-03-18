@@ -46,10 +46,10 @@ final class Future_Industry_Comparison_Matrix_Service {
 	 * }
 	 */
 	public function build_matrix( array $scorecard_results ): array {
-		$candidates = array();
-		$per_candidate = array();
-		$reuse_vs_new_build = array();
-		$subtype_caution = array();
+		$candidates           = array();
+		$per_candidate        = array();
+		$reuse_vs_new_build   = array();
+		$subtype_caution      = array();
 		$dimension_comparison = array_fill_keys( self::DIMENSIONS_ORDER, array() );
 
 		foreach ( $scorecard_results as $result ) {
@@ -59,21 +59,24 @@ final class Future_Industry_Comparison_Matrix_Service {
 			$label = isset( $result['candidate_label'] ) && is_string( $result['candidate_label'] )
 				? trim( $result['candidate_label'] )
 				: 'Unknown';
-			$key = isset( $result['proposed_industry_key'] ) && is_string( $result['proposed_industry_key'] )
+			$key   = isset( $result['proposed_industry_key'] ) && is_string( $result['proposed_industry_key'] )
 				? trim( $result['proposed_industry_key'] )
 				: '';
 			if ( $label === '' ) {
 				$label = 'Unknown';
 			}
-			$candidates[] = array( 'label' => $label, 'proposed_industry_key' => $key );
+			$candidates[] = array(
+				'label'                 => $label,
+				'proposed_industry_key' => $key,
+			);
 
-			$scores = isset( $result['dimension_scores'] ) && is_array( $result['dimension_scores'] )
+			$scores         = isset( $result['dimension_scores'] ) && is_array( $result['dimension_scores'] )
 				? $result['dimension_scores']
 				: array();
-			$aggregate = isset( $result['aggregate_sum'] ) && is_int( $result['aggregate_sum'] )
+			$aggregate      = isset( $result['aggregate_sum'] ) && is_int( $result['aggregate_sum'] )
 				? $result['aggregate_sum']
 				: 0;
-			$risks = isset( $result['major_risks'] ) && is_array( $result['major_risks'] )
+			$risks          = isset( $result['major_risks'] ) && is_array( $result['major_risks'] )
 				? $result['major_risks']
 				: array();
 			$recommendation = isset( $result['recommendation'] ) && is_string( $result['recommendation'] )
@@ -81,8 +84,8 @@ final class Future_Industry_Comparison_Matrix_Service {
 				: 'review';
 
 			$per_candidate[ $label ] = array(
-				'aggregate_sum'   => $aggregate,
-				'recommendation'  => $recommendation,
+				'aggregate_sum'  => $aggregate,
+				'recommendation' => $recommendation,
 				'risk_count'     => count( $risks ),
 			);
 
@@ -91,7 +94,7 @@ final class Future_Industry_Comparison_Matrix_Service {
 			}
 
 			$reuse_vs_new_build[ $label ] = $this->reuse_vs_new_build_note( $scores );
-			$subtype_caution[ $label ] = $this->subtype_caution_entry( $scores );
+			$subtype_caution[ $label ]    = $this->subtype_caution_entry( $scores );
 		}
 
 		$suggested_order = $this->suggest_order( $per_candidate );
@@ -114,7 +117,7 @@ final class Future_Industry_Comparison_Matrix_Service {
 	private function reuse_vs_new_build_note( array $scores ): string {
 		$overlap = $scores['template_overlap'] ?? 0;
 		$content = $scores['content_model_fit'] ?? 0;
-		$avg = ( $overlap + $content ) / 2;
+		$avg     = ( $overlap + $content ) / 2;
 		if ( $avg >= 4 ) {
 			return 'High reuse';
 		}
@@ -133,7 +136,7 @@ final class Future_Industry_Comparison_Matrix_Service {
 	private function subtype_caution_entry( array $scores ): array {
 		$subtype = $scores['subtype_complexity'] ?? 3;
 		$caution = $scores['compliance_caution_burden'] ?? 3;
-		$note = 'Low burden';
+		$note    = 'Low burden';
 		if ( $subtype <= 2 || $caution <= 2 ) {
 			$note = 'Caution/subtype burden';
 		}
@@ -141,7 +144,7 @@ final class Future_Industry_Comparison_Matrix_Service {
 			$note = 'High burden';
 		}
 		return array(
-			'subtype_complexity'         => $subtype,
+			'subtype_complexity'        => $subtype,
 			'compliance_caution_burden' => $caution,
 			'burden_note'               => $note,
 		);
@@ -154,22 +157,29 @@ final class Future_Industry_Comparison_Matrix_Service {
 	 * @return list<string>
 	 */
 	private function suggest_order( array $per_candidate ): array {
-		$order_rank = array( 'go' => 0, 'review' => 1, 'no-go' => 2 );
-		$with_meta = array();
+		$order_rank = array(
+			'go'     => 0,
+			'review' => 1,
+			'no-go'  => 2,
+		);
+		$with_meta  = array();
 		foreach ( $per_candidate as $label => $meta ) {
-			$rec = $meta['recommendation'] ?? 'review';
+			$rec         = $meta['recommendation'] ?? 'review';
 			$with_meta[] = array(
-				'label'    => $label,
-				'rec_rank' => $order_rank[ $rec ] ?? 1,
+				'label'     => $label,
+				'rec_rank'  => $order_rank[ $rec ] ?? 1,
 				'aggregate' => $meta['aggregate_sum'] ?? 0,
 			);
 		}
-		usort( $with_meta, function ( $a, $b ) {
-			if ( $a['rec_rank'] !== $b['rec_rank'] ) {
-				return $a['rec_rank'] - $b['rec_rank'];
+		usort(
+			$with_meta,
+			function ( $a, $b ) {
+				if ( $a['rec_rank'] !== $b['rec_rank'] ) {
+					return $a['rec_rank'] - $b['rec_rank'];
+				}
+				return $b['aggregate'] - $a['aggregate'];
 			}
-			return $b['aggregate'] - $a['aggregate'];
-		} );
+		);
 		return array_values( array_column( $with_meta, 'label' ) );
 	}
 }

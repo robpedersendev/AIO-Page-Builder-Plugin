@@ -38,8 +38,8 @@ final class Build_Plan_Item_Schema {
 	public const ITEM_TYPE_DESIGN_TOKEN         = 'design_token';
 	public const ITEM_TYPE_SEO                  = 'seo';
 	public const ITEM_TYPE_HIERARCHY_NOTE       = 'hierarchy_note';
-	public const ITEM_TYPE_OVERVIEW_NOTE       = 'overview_note';
-	public const ITEM_TYPE_CONFIRMATION        = 'confirmation';
+	public const ITEM_TYPE_OVERVIEW_NOTE        = 'overview_note';
+	public const ITEM_TYPE_CONFIRMATION         = 'confirmation';
 
 	public const ITEM_TYPES = array(
 		self::ITEM_TYPE_EXISTING_PAGE_CHANGE,
@@ -60,11 +60,11 @@ final class Build_Plan_Item_Schema {
 	);
 
 	/** Step object required keys (build-plan-schema.md §5.1). */
-	public const KEY_STEP_ID    = 'step_id';
-	public const KEY_STEP_TYPE  = 'step_type';
-	public const KEY_TITLE      = 'title';
-	public const KEY_ORDER      = 'order';
-	public const KEY_ITEMS      = 'items';
+	public const KEY_STEP_ID   = 'step_id';
+	public const KEY_STEP_TYPE = 'step_type';
+	public const KEY_TITLE     = 'title';
+	public const KEY_ORDER     = 'order';
+	public const KEY_ITEMS     = 'items';
 
 	public const REQUIRED_STEP_KEYS = array(
 		self::KEY_STEP_ID,
