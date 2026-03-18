@@ -25,10 +25,10 @@ use AIOPageBuilder\Infrastructure\Config\Option_Names;
  */
 final class Logs_Monitoring_State_Builder {
 
-	private const QUEUE_LIMIT = 100;
-	private const EXECUTION_LIMIT = 50;
-	private const AI_RUNS_LIMIT = 20;
-	private const REPORTING_LOG_CAP = 50;
+	private const QUEUE_LIMIT         = 100;
+	private const EXECUTION_LIMIT     = 50;
+	private const AI_RUNS_LIMIT       = 20;
+	private const REPORTING_LOG_CAP   = 50;
 	private const CRITICAL_ERRORS_CAP = 50;
 
 	/** @var object|null Job queue repository (list_by_status); e.g. Job_Queue_Repository. */
@@ -49,9 +49,9 @@ final class Logs_Monitoring_State_Builder {
 		?object $build_plan_repository = null,
 		?object $acf_diagnostics_state_builder = null
 	) {
-		$this->job_queue_repository         = $job_queue_repository;
-		$this->ai_run_repository            = $ai_run_repository;
-		$this->build_plan_repository        = $build_plan_repository;
+		$this->job_queue_repository          = $job_queue_repository;
+		$this->ai_run_repository             = $ai_run_repository;
+		$this->build_plan_repository         = $build_plan_repository;
 		$this->acf_diagnostics_state_builder = $acf_diagnostics_state_builder;
 	}
 
@@ -71,7 +71,7 @@ final class Logs_Monitoring_State_Builder {
 	 */
 	public function build(): array {
 		$queue_health_builder = new Queue_Health_Summary_Builder( $this->job_queue_repository );
-		$state = array(
+		$state                = array(
 			'queue'              => $this->build_queue_tab(),
 			'queue_health'       => $queue_health_builder->build(),
 			'execution_logs'     => $this->build_execution_logs(),
@@ -95,13 +95,34 @@ final class Logs_Monitoring_State_Builder {
 	public function build_log_export_options(): array {
 		return array(
 			'exportable_log_types' => array(
-				array( 'value' => Log_Export_Service::LOG_TYPE_QUEUE, 'label' => __( 'Queue', 'aio-page-builder' ) ),
-				array( 'value' => Log_Export_Service::LOG_TYPE_EXECUTION, 'label' => __( 'Execution logs', 'aio-page-builder' ) ),
-				array( 'value' => Log_Export_Service::LOG_TYPE_REPORTING, 'label' => __( 'Reporting logs', 'aio-page-builder' ) ),
-				array( 'value' => Log_Export_Service::LOG_TYPE_CRITICAL, 'label' => __( 'Critical errors', 'aio-page-builder' ) ),
-				array( 'value' => Log_Export_Service::LOG_TYPE_AI_RUNS, 'label' => __( 'AI runs', 'aio-page-builder' ) ),
-				array( 'value' => Log_Export_Service::LOG_TYPE_TEMPLATE_FAMILY, 'label' => __( 'Template family', 'aio-page-builder' ) ),
-				array( 'value' => Log_Export_Service::LOG_TYPE_TEMPLATE_OPERATION, 'label' => __( 'Template operation', 'aio-page-builder' ) ),
+				array(
+					'value' => Log_Export_Service::LOG_TYPE_QUEUE,
+					'label' => __( 'Queue', 'aio-page-builder' ),
+				),
+				array(
+					'value' => Log_Export_Service::LOG_TYPE_EXECUTION,
+					'label' => __( 'Execution logs', 'aio-page-builder' ),
+				),
+				array(
+					'value' => Log_Export_Service::LOG_TYPE_REPORTING,
+					'label' => __( 'Reporting logs', 'aio-page-builder' ),
+				),
+				array(
+					'value' => Log_Export_Service::LOG_TYPE_CRITICAL,
+					'label' => __( 'Critical errors', 'aio-page-builder' ),
+				),
+				array(
+					'value' => Log_Export_Service::LOG_TYPE_AI_RUNS,
+					'label' => __( 'AI runs', 'aio-page-builder' ),
+				),
+				array(
+					'value' => Log_Export_Service::LOG_TYPE_TEMPLATE_FAMILY,
+					'label' => __( 'Template family', 'aio-page-builder' ),
+				),
+				array(
+					'value' => Log_Export_Service::LOG_TYPE_TEMPLATE_OPERATION,
+					'label' => __( 'Template operation', 'aio-page-builder' ),
+				),
 			),
 		);
 	}
@@ -124,9 +145,12 @@ final class Logs_Monitoring_State_Builder {
 				$all[] = $this->normalize_queue_row( $row );
 			}
 		}
-		usort( $all, function ( $a, $b ) {
-			return strcmp( (string) ( $b['created_at'] ?? '' ), (string) ( $a['created_at'] ?? '' ) );
-		} );
+		usort(
+			$all,
+			function ( $a, $b ) {
+				return strcmp( (string) ( $b['created_at'] ?? '' ), (string) ( $a['created_at'] ?? '' ) );
+			}
+		);
 		return array_slice( $all, 0, self::QUEUE_LIMIT );
 	}
 
@@ -146,9 +170,12 @@ final class Logs_Monitoring_State_Builder {
 		foreach ( $rows as $row ) {
 			$out[] = $this->normalize_queue_row( $row );
 		}
-		usort( $out, function ( $a, $b ) {
-			return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
-		} );
+		usort(
+			$out,
+			function ( $a, $b ) {
+				return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
+			}
+		);
 		return array_slice( $out, 0, self::EXECUTION_LIMIT );
 	}
 
@@ -185,8 +212,8 @@ final class Logs_Monitoring_State_Builder {
 		if ( ! is_array( $log ) ) {
 			return array();
 		}
-		$log   = array_slice( $log, -self::REPORTING_LOG_CAP );
-		$out   = array();
+		$log = array_slice( $log, -self::REPORTING_LOG_CAP );
+		$out = array();
 		foreach ( $log as $entry ) {
 			if ( ! is_array( $entry ) ) {
 				continue;
@@ -253,7 +280,6 @@ final class Logs_Monitoring_State_Builder {
 	private const RETRYABLE_JOB_TYPES = array(
 		'create_page',
 		'replace_page',
-		'update_page_metadata',
 		'update_menu',
 		'apply_token_set',
 		'finalize_plan',
@@ -278,13 +304,13 @@ final class Logs_Monitoring_State_Builder {
 				$plan_id = trim( substr( $related, 0, 64 ) );
 			}
 		}
-		$queue_status = (string) ( $row['queue_status'] ?? '' );
-		$job_type     = (string) ( $row['job_type'] ?? '' );
-		$retry_count  = isset( $row['retry_count'] ) && is_numeric( $row['retry_count'] ) ? (int) $row['retry_count'] : 0;
+		$queue_status   = (string) ( $row['queue_status'] ?? '' );
+		$job_type       = (string) ( $row['job_type'] ?? '' );
+		$retry_count    = isset( $row['retry_count'] ) && is_numeric( $row['retry_count'] ) ? (int) $row['retry_count'] : 0;
 		$retry_eligible = $queue_status === 'failed'
 			&& $retry_count < self::RETRY_ELIGIBLE_MAX_COUNT
 			&& in_array( $job_type, self::RETRYABLE_JOB_TYPES, true );
-		$can_cancel = in_array( $queue_status, array( 'pending', 'retrying', 'running', 'failed' ), true );
+		$can_cancel     = in_array( $queue_status, array( 'pending', 'retrying', 'running', 'failed' ), true );
 
 		$out = array(
 			'job_ref'         => (string) ( $row['job_ref'] ?? '' ),

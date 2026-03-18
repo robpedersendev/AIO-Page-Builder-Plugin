@@ -39,6 +39,8 @@ Execution action types are a stable enum. Each type maps to a class of mutation 
 
 **Stability**: New action types may be added only via contract revision. Executors must ignore or refuse unknown action types.
 
+**Implementation status:** In the current version, `update_page_metadata` is not implemented; the SEO/meta step is recommendation-only. The type is defined for contract stability and possible future use (see update-page-metadata-scope-decision.md).
+
 ---
 
 ## 4. Execution Action Envelope

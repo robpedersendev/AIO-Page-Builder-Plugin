@@ -48,11 +48,11 @@ final class Queue_Recovery_Service {
 	public function retry_job( string $job_ref, string $actor_ref = '' ): array {
 		$job_ref = trim( $job_ref );
 		$out     = array(
-			'success'          => false,
-			'action'           => 'retry',
-			'job_ref'          => $job_ref,
-			'message'          => '',
-			'previous_status'  => '',
+			'success'         => false,
+			'action'          => 'retry',
+			'job_ref'         => $job_ref,
+			'message'         => '',
+			'previous_status' => '',
 		);
 		if ( $job_ref === '' ) {
 			$out['message'] = __( 'Missing job reference.', 'aio-page-builder' );
@@ -65,7 +65,7 @@ final class Queue_Recovery_Service {
 			return $out;
 		}
 
-		$status = isset( $job['queue_status'] ) && is_string( $job['queue_status'] ) ? $job['queue_status'] : '';
+		$status                 = isset( $job['queue_status'] ) && is_string( $job['queue_status'] ) ? $job['queue_status'] : '';
 		$out['previous_status'] = $status;
 
 		if ( $status !== Job_Queue_Status::FAILED ) {
@@ -73,7 +73,7 @@ final class Queue_Recovery_Service {
 			return $out;
 		}
 
-		$job_type   = isset( $job['job_type'] ) && is_string( $job['job_type'] ) ? $job['job_type'] : '';
+		$job_type    = isset( $job['job_type'] ) && is_string( $job['job_type'] ) ? $job['job_type'] : '';
 		$retry_count = isset( $job['retry_count'] ) && is_numeric( $job['retry_count'] ) ? (int) $job['retry_count'] : 0;
 		if ( $retry_count >= self::MAX_RETRY_COUNT ) {
 			$out['message'] = __( 'Job has exceeded maximum retry count.', 'aio-page-builder' );
@@ -106,11 +106,11 @@ final class Queue_Recovery_Service {
 	public function cancel_job( string $job_ref, string $actor_ref = '' ): array {
 		$job_ref = trim( $job_ref );
 		$out     = array(
-			'success'          => false,
-			'action'           => 'cancel',
-			'job_ref'          => $job_ref,
-			'message'          => '',
-			'previous_status'  => '',
+			'success'         => false,
+			'action'          => 'cancel',
+			'job_ref'         => $job_ref,
+			'message'         => '',
+			'previous_status' => '',
 		);
 		if ( $job_ref === '' ) {
 			$out['message'] = __( 'Missing job reference.', 'aio-page-builder' );
@@ -123,7 +123,7 @@ final class Queue_Recovery_Service {
 			return $out;
 		}
 
-		$status = isset( $job['queue_status'] ) && is_string( $job['queue_status'] ) ? $job['queue_status'] : '';
+		$status                 = isset( $job['queue_status'] ) && is_string( $job['queue_status'] ) ? $job['queue_status'] : '';
 		$out['previous_status'] = $status;
 
 		$cancelable = array(
@@ -150,27 +150,30 @@ final class Queue_Recovery_Service {
 	}
 
 	private function is_retryable_job_type( string $job_type ): bool {
-		return in_array( $job_type, array(
-			Execution_Action_Types::CREATE_PAGE,
-			Execution_Action_Types::REPLACE_PAGE,
-			Execution_Action_Types::UPDATE_PAGE_METADATA,
-			Execution_Action_Types::UPDATE_MENU,
-			Execution_Action_Types::APPLY_TOKEN_SET,
-			Execution_Action_Types::FINALIZE_PLAN,
-			Execution_Action_Types::ROLLBACK_ACTION,
-		), true );
+		return in_array(
+			$job_type,
+			array(
+				Execution_Action_Types::CREATE_PAGE,
+				Execution_Action_Types::REPLACE_PAGE,
+				Execution_Action_Types::UPDATE_MENU,
+				Execution_Action_Types::APPLY_TOKEN_SET,
+				Execution_Action_Types::FINALIZE_PLAN,
+				Execution_Action_Types::ROLLBACK_ACTION,
+			),
+			true
+		);
 	}
 
 	private function log_recovery_action( string $action, string $job_ref, string $previous_status, string $actor_ref, bool $success ): void {
 		$entry = array(
 			'action'          => $action,
-			'job_ref'          => $job_ref,
-			'previous_status'  => $previous_status,
-			'actor_ref'        => $actor_ref,
-			'success'          => $success,
-			'recorded_at'      => current_time( 'mysql' ),
+			'job_ref'         => $job_ref,
+			'previous_status' => $previous_status,
+			'actor_ref'       => $actor_ref,
+			'success'         => $success,
+			'recorded_at'     => current_time( 'mysql' ),
 		);
-		$log = \get_option( self::AUDIT_OPTION, array() );
+		$log   = \get_option( self::AUDIT_OPTION, array() );
 		if ( ! is_array( $log ) ) {
 			$log = array();
 		}

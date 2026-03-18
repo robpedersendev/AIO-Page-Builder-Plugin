@@ -29,12 +29,18 @@ final class Import_Export_Screen {
 
 	public const SLUG = 'aio-page-builder-export-restore';
 
-	private const TRANSIENT_VALIDATION = 'aio_ie_validation_';
+	/** Maximum allowed size for Import/Export ZIP upload (50 MB). Enforced before move (import-export-zip-size-limit-decision.md). */
+	public const MAX_ZIP_UPLOAD_BYTES = 52_428_800;
+
+	/** Error code for redirect when ZIP exceeds max size. */
+	public const ERROR_CODE_FILE_TOO_LARGE = 'file_too_large';
+
+	private const TRANSIENT_VALIDATION     = 'aio_ie_validation_';
 	private const TRANSIENT_RESTORE_RESULT = 'aio_ie_restore_result_';
-	private const NONCE_CREATE_EXPORT = 'aio_ie_create_export';
-	private const NONCE_VALIDATE = 'aio_ie_validate';
-	private const NONCE_RESTORE = 'aio_ie_restore';
-	private const NONCE_DOWNLOAD = 'aio_ie_download';
+	private const NONCE_CREATE_EXPORT      = 'aio_ie_create_export';
+	private const NONCE_VALIDATE           = 'aio_ie_validate';
+	private const NONCE_RESTORE            = 'aio_ie_restore';
+	private const NONCE_DOWNLOAD           = 'aio_ie_download';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -65,40 +71,49 @@ final class Import_Export_Screen {
 			\wp_die( \esc_html__( 'You do not have permission to access Import / Export.', 'aio-page-builder' ), 403 );
 		}
 
-		$user_id = \get_current_user_id();
+		$user_id           = \get_current_user_id();
 		$validation_stored = \get_transient( self::TRANSIENT_VALIDATION . $user_id );
-		$restore_stored     = \get_transient( self::TRANSIENT_RESTORE_RESULT . $user_id );
+		$restore_stored    = \get_transient( self::TRANSIENT_RESTORE_RESULT . $user_id );
 		if ( $restore_stored !== false ) {
 			\delete_transient( self::TRANSIENT_RESTORE_RESULT . $user_id );
 		}
 		$validation_payload = null;
 		if ( is_array( $validation_stored ) && isset( $validation_stored['payload'] ) ) {
-			$validation_payload = $validation_stored['payload'];
+			$validation_payload                 = $validation_stored['payload'];
 			$validation_payload['package_path'] = '';
 		}
 		$restore_payload = is_array( $restore_stored ) && isset( $restore_stored['payload'] ) ? $restore_stored['payload'] : null;
 
 		$state_builder = $this->get_state_builder();
-		$state = $state_builder->build( $validation_payload, $restore_payload );
+		$state         = $state_builder->build( $validation_payload, $restore_payload );
 
 		$status = isset( $_GET['aio_ie_status'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_ie_status'] ) ) : '';
 		if ( $status === 'export_created' ) {
 			$file = isset( $_GET['aio_ie_file'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_ie_file'] ) ) : '';
 			echo '<div class="notice notice-success is-dismissible"><p>' . \esc_html__( 'Export created successfully.', 'aio-page-builder' );
 			if ( $file !== '' ) {
-				$dl = \wp_nonce_url( \add_query_arg( array( 'action' => 'aio_import_export_download', 'filename' => $file ), \admin_url( 'admin-post.php' ) ), self::NONCE_DOWNLOAD );
+				$dl = \wp_nonce_url(
+					\add_query_arg(
+						array(
+							'action'   => 'aio_import_export_download',
+							'filename' => $file,
+						),
+						\admin_url( 'admin-post.php' )
+					),
+					self::NONCE_DOWNLOAD
+				);
 				echo ' <a href="' . \esc_url( $dl ) . '">' . \esc_html__( 'Download', 'aio-page-builder' ) . '</a>';
 			}
 			echo '</p></div>';
 		} elseif ( $status === 'error' ) {
 			$code = isset( $_GET['aio_ie_code'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_ie_code'] ) ) : '';
-			$msg = $this->error_message_for_code( $code );
+			$msg  = $this->error_message_for_code( $code );
 			echo '<div class="notice notice-error is-dismissible"><p>' . \esc_html( $msg ) . '</p></div>';
 		}
 
 		$create_export_url = \wp_nonce_url( \admin_url( 'admin-post.php?action=aio_import_export_create_export' ), self::NONCE_CREATE_EXPORT );
-		$validate_url     = \admin_url( 'admin-post.php?action=aio_import_export_validate' );
-		$restore_url      = \wp_nonce_url( \admin_url( 'admin-post.php?action=aio_import_export_confirm_restore' ), self::NONCE_RESTORE );
+		$validate_url      = \admin_url( 'admin-post.php?action=aio_import_export_validate' );
+		$restore_url       = \wp_nonce_url( \admin_url( 'admin-post.php?action=aio_import_export_confirm_restore' ), self::NONCE_RESTORE );
 		?>
 		<div class="wrap aio-page-builder-screen aio-import-export" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -151,7 +166,16 @@ final class Import_Export_Screen {
 									<td><?php echo \esc_html( $row['modified_at'] ); ?></td>
 									<td>
 										<?php
-										$dl_url = \wp_nonce_url( \add_query_arg( array( 'action' => 'aio_import_export_download', 'filename' => $row['filename'] ), \admin_url( 'admin-post.php' ) ), self::NONCE_DOWNLOAD );
+										$dl_url = \wp_nonce_url(
+											\add_query_arg(
+												array(
+													'action'   => 'aio_import_export_download',
+													'filename' => $row['filename'],
+												),
+												\admin_url( 'admin-post.php' )
+											),
+											self::NONCE_DOWNLOAD
+										);
 										?>
 										<a href="<?php echo \esc_url( $dl_url ); ?>"><?php \esc_html_e( 'Download', 'aio-page-builder' ); ?></a>
 									</td>
@@ -174,7 +198,7 @@ final class Import_Export_Screen {
 							<th scope="row"><label for="aio-ie-package"><?php \esc_html_e( 'ZIP package', 'aio-page-builder' ); ?></label></th>
 							<td>
 								<input type="file" name="aio_ie_package_file" id="aio-ie-package" accept=".zip" required />
-								<p class="description"><?php \esc_html_e( 'Upload an export package (ZIP) to validate. No data is written until you confirm restore.', 'aio-page-builder' ); ?></p>
+								<p class="description"><?php \esc_html_e( 'Upload an export package (ZIP) to validate. Maximum size 50 MB. No data is written until you confirm restore.', 'aio-page-builder' ); ?></p>
 							</td>
 						</tr>
 					</table>
@@ -320,8 +344,8 @@ final class Import_Export_Screen {
 		}
 		/** @var Export_Generator $generator */
 		$generator = $container->get( 'export_generator' );
-		$result   = $generator->generate( $mode, array() );
-		$payload  = $result->to_payload();
+		$result    = $generator->generate( $mode, array() );
+		$payload   = $result->to_payload();
 		if ( $result->success() ) {
 			\wp_safe_redirect( $this->screen_url( 'export_created', null, $payload['package_filename'] ?? '' ) );
 		} else {
@@ -368,6 +392,13 @@ final class Import_Export_Screen {
 			\wp_safe_redirect( $this->screen_url( 'error', 'not_zip' ) );
 			exit;
 		}
+		$size = isset( $_FILES['aio_ie_package_file']['size'] ) && is_numeric( $_FILES['aio_ie_package_file']['size'] )
+			? (int) $_FILES['aio_ie_package_file']['size']
+			: 0;
+		if ( ! self::is_zip_upload_size_allowed( $size ) ) {
+			\wp_safe_redirect( $this->screen_url( 'error', self::ERROR_CODE_FILE_TOO_LARGE ) );
+			exit;
+		}
 		$temp_name = 'aio-import-validate-' . \get_current_user_id() . '.zip';
 		$dest      = rtrim( $dir, '/\\' ) . '/' . $temp_name;
 		if ( ! \move_uploaded_file( $_FILES['aio_ie_package_file']['tmp_name'], $dest ) ) {
@@ -379,7 +410,14 @@ final class Import_Export_Screen {
 		$result    = $validator->validate( $dest );
 		$payload   = $result->to_payload();
 		$manifest  = $result->get_manifest();
-		\set_transient( self::TRANSIENT_VALIDATION . \get_current_user_id(), array( 'payload' => $payload, 'manifest' => $manifest ), 3600 );
+		\set_transient(
+			self::TRANSIENT_VALIDATION . \get_current_user_id(),
+			array(
+				'payload'  => $payload,
+				'manifest' => $manifest,
+			),
+			3600
+		);
 		\wp_safe_redirect( $this->screen_url( 'validated' ) );
 		exit;
 	}
@@ -403,8 +441,8 @@ final class Import_Export_Screen {
 			\wp_safe_redirect( $this->screen_url( 'error', 'resolution_required' ) );
 			exit;
 		}
-		$user_id  = \get_current_user_id();
-		$stored   = \get_transient( self::TRANSIENT_VALIDATION . $user_id );
+		$user_id   = \get_current_user_id();
+		$stored    = \get_transient( self::TRANSIENT_VALIDATION . $user_id );
 		$container = $this->container;
 		if ( ! is_array( $stored ) || ! $container instanceof Service_Container || ! $container->has( 'restore_pipeline' ) ) {
 			\wp_safe_redirect( $this->screen_url( 'error', 'no_validation' ) );
@@ -459,7 +497,10 @@ final class Import_Export_Screen {
 	}
 
 	private function screen_url( string $status, ?string $code = null, string $filename = '' ): string {
-		$args = array( 'page' => self::SLUG, 'aio_ie_status' => $status );
+		$args = array(
+			'page'          => self::SLUG,
+			'aio_ie_status' => $status,
+		);
 		if ( $code !== null ) {
 			$args['aio_ie_code'] = $code;
 		}
@@ -477,18 +518,29 @@ final class Import_Export_Screen {
 	 */
 	private function error_message_for_code( string $code ): string {
 		$messages = array(
-			'nonce'              => __( 'Security check failed. Please try again.', 'aio-page-builder' ),
-			'capability'         => __( 'You do not have permission for this action.', 'aio-page-builder' ),
-			'invalid_mode'       => __( 'Invalid export mode.', 'aio-page-builder' ),
-			'service'            => __( 'Service unavailable. Please try again later.', 'aio-page-builder' ),
-			'no_exports_dir'     => __( 'Exports directory is not available.', 'aio-page-builder' ),
-			'no_file'            => __( 'No file was uploaded.', 'aio-page-builder' ),
-			'not_zip'            => __( 'Please upload a ZIP file.', 'aio-page-builder' ),
-			'move_failed'        => __( 'Could not save the uploaded file.', 'aio-page-builder' ),
-			'no_validation'     => __( 'No validation result found. Please validate a package first.', 'aio-page-builder' ),
+			'nonce'               => __( 'Security check failed. Please try again.', 'aio-page-builder' ),
+			'capability'          => __( 'You do not have permission for this action.', 'aio-page-builder' ),
+			'invalid_mode'        => __( 'Invalid export mode.', 'aio-page-builder' ),
+			'service'             => __( 'Service unavailable. Please try again later.', 'aio-page-builder' ),
+			'no_exports_dir'      => __( 'Exports directory is not available.', 'aio-page-builder' ),
+			'no_file'             => __( 'No file was uploaded.', 'aio-page-builder' ),
+			'not_zip'             => __( 'Please upload a ZIP file.', 'aio-page-builder' ),
+			'file_too_large'      => __( 'Import package is too large. Maximum size is 50 MB.', 'aio-page-builder' ),
+			'move_failed'         => __( 'Could not save the uploaded file.', 'aio-page-builder' ),
+			'no_validation'       => __( 'No validation result found. Please validate a package first.', 'aio-page-builder' ),
 			'resolution_required' => __( 'Please choose a conflict resolution.', 'aio-page-builder' ),
 		);
 		return $messages[ $code ] ?? __( 'An error occurred.', 'aio-page-builder' );
+	}
+
+	/**
+	 * Returns whether the given upload size is within the allowed limit (for pre-move check and tests).
+	 *
+	 * @param int $size File size in bytes.
+	 * @return bool
+	 */
+	public static function is_zip_upload_size_allowed( int $size ): bool {
+		return $size >= 0 && $size <= self::MAX_ZIP_UPLOAD_BYTES;
 	}
 
 	private function get_state_builder(): Import_Export_State_Builder {

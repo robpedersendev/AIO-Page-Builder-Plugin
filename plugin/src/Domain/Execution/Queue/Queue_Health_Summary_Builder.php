@@ -63,7 +63,7 @@ final class Queue_Health_Summary_Builder {
 			return $this->empty_summary();
 		}
 
-		$statuses = array(
+		$statuses       = array(
 			Job_Queue_Status::PENDING,
 			Job_Queue_Status::RUNNING,
 			Job_Queue_Status::RETRYING,
@@ -71,14 +71,14 @@ final class Queue_Health_Summary_Builder {
 			Job_Queue_Status::COMPLETED,
 			Job_Queue_Status::CANCELLED,
 		);
-		$counts   = array_fill_keys( $statuses, 0 );
-		$stale    = array();
-		$long     = array();
+		$counts         = array_fill_keys( $statuses, 0 );
+		$stale          = array();
+		$long           = array();
 		$retry_eligible = array();
-		$now_ts   = time();
+		$now_ts         = time();
 
 		foreach ( $statuses as $status ) {
-			$rows = $this->job_queue_repository->list_by_status( $status, 500, 0 );
+			$rows              = $this->job_queue_repository->list_by_status( $status, 500, 0 );
 			$counts[ $status ] = count( $rows );
 			foreach ( $rows as $row ) {
 				$job_ref   = isset( $row['job_ref'] ) && is_string( $row['job_ref'] ) ? trim( $row['job_ref'] ) : '';
@@ -143,31 +143,34 @@ final class Queue_Health_Summary_Builder {
 			'stale_lock_count'        => 0,
 			'stale_lock_job_refs'     => array(),
 			'long_running_count'      => 0,
-			'long_running_job_refs'    => array(),
+			'long_running_job_refs'   => array(),
 			'retry_eligible_count'    => 0,
 			'retry_eligible_job_refs' => array(),
-			'bottleneck_warning'       => false,
+			'bottleneck_warning'      => false,
 			'summary_message'         => __( 'Queue health: no data (repository unavailable).', 'aio-page-builder' ),
 		);
 	}
 
 	private function is_retryable_job_type( string $job_type ): bool {
-		return in_array( $job_type, array(
-			Execution_Action_Types::CREATE_PAGE,
-			Execution_Action_Types::REPLACE_PAGE,
-			Execution_Action_Types::UPDATE_PAGE_METADATA,
-			Execution_Action_Types::UPDATE_MENU,
-			Execution_Action_Types::APPLY_TOKEN_SET,
-			Execution_Action_Types::FINALIZE_PLAN,
-			Execution_Action_Types::ROLLBACK_ACTION,
-		), true );
+		return in_array(
+			$job_type,
+			array(
+				Execution_Action_Types::CREATE_PAGE,
+				Execution_Action_Types::REPLACE_PAGE,
+				Execution_Action_Types::UPDATE_MENU,
+				Execution_Action_Types::APPLY_TOKEN_SET,
+				Execution_Action_Types::FINALIZE_PLAN,
+				Execution_Action_Types::ROLLBACK_ACTION,
+			),
+			true
+		);
 	}
 
 	/**
 	 * @param array<string, int> $counts
 	 */
 	private function summary_message( array $counts, int $stale_count, bool $bottleneck, int $retry_eligible_count ): string {
-		$parts = array();
+		$parts   = array();
 		$pending = $counts[ Job_Queue_Status::PENDING ] ?? 0;
 		$running = $counts[ Job_Queue_Status::RUNNING ] ?? 0;
 		$failed  = $counts[ Job_Queue_Status::FAILED ] ?? 0;
@@ -182,7 +185,7 @@ final class Queue_Health_Summary_Builder {
 		}
 		if ( empty( $parts ) ) {
 			$parts[] = sprintf(
-				__( 'Queue: %d pending, %d running, %d failed.', 'aio-page-builder' ),
+				__( 'Queue: %1$d pending, %2$d running, %3$d failed.', 'aio-page-builder' ),
 				$pending,
 				$running,
 				$failed
