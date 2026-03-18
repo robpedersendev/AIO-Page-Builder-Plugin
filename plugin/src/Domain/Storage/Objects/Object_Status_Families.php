@@ -12,9 +12,10 @@ namespace AIOPageBuilder\Domain\Storage\Objects;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Maps each object type to its allowed status set. Custom status registration (e.g. register_post_status)
- * is not implemented here; this class documents the contract and provides the status sets for validation
- * and for later attachment of status registration. Lifecycle transition rules remain in object-model-schema.md §5.
+ * Maps each object type to its allowed status set. Implementation (not a shell): status sets are
+ * authoritative for validation and repository behavior. Custom status registration (e.g. register_post_status)
+ * is not implemented here; this class provides the status sets for validation and for later attachment
+ * of status registration. Lifecycle transition rules remain in object-model-schema.md §5.
  */
 final class Object_Status_Families {
 
@@ -41,7 +42,7 @@ final class Object_Status_Families {
 	 * @var array<string, list<string>>
 	 */
 	private const FAMILIES = array(
-		Object_Type_Keys::SECTION_TEMPLATE  => self::DRAFT_ACTIVE_INACTIVE_DEPRECATED,
+		Object_Type_Keys::SECTION_TEMPLATE => self::DRAFT_ACTIVE_INACTIVE_DEPRECATED,
 		Object_Type_Keys::PAGE_TEMPLATE    => self::DRAFT_ACTIVE_INACTIVE_DEPRECATED,
 		Object_Type_Keys::COMPOSITION      => self::DRAFT_ACTIVE_ARCHIVED,
 		Object_Type_Keys::BUILD_PLAN       => self::PLAN_WORKFLOW,

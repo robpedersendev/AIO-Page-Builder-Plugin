@@ -147,6 +147,7 @@ A **provider capability matrix** (e.g. in docs or config) can list providers and
 ## 9. Token / cost telemetry placeholders
 
 - The normalized response includes a `usage` object with `prompt_tokens`, `completion_tokens`, `total_tokens`, and an optional cost placeholder.
+- **cost_placeholder:** Intentionally deferred. Set to `null` in provider drivers; no cost modeling or usage-based billing in this version. Reserved for future usage/cost reporting when a spec defines it (SPR-010).
 - Cost calculation and reporting are out of scope for the provider contract; a separate telemetry or reporting layer may consume `usage` and compute cost. Logging must not include secrets (§43.13, §43.14); usage and cost data must not contain credentials or raw request/response bodies.
 
 ---
