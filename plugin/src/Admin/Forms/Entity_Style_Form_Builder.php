@@ -59,7 +59,7 @@ final class Entity_Style_Form_Builder {
 			return array();
 		}
 		$payload = $this->payload_repository->get_payload( $entity_type, $entity_key );
-		$current = $payload[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ] ?? array();
+		$current = $payload[ Entity_Style_Payload_Schema::KEY_TOKEN_OVERRIDES ];
 		$groups  = $this->token_registry->get_token_group_names();
 		$out     = array();
 		foreach ( $groups as $group ) {
@@ -68,8 +68,8 @@ final class Entity_Style_Form_Builder {
 			}
 			$names      = $this->token_registry->get_allowed_names_for_group( $group );
 			$san        = $this->token_registry->get_sanitization_for_group( $group );
-			$max        = isset( $san['max_length'] ) && is_numeric( $san['max_length'] ) ? (int) $san['max_length'] : self::DEFAULT_MAX_LENGTH;
-			$value_type = isset( $san['value_type'] ) && is_string( $san['value_type'] ) ? $san['value_type'] : 'text';
+			$max        = isset( $san['max_length'] ) ? (int) $san['max_length'] : self::DEFAULT_MAX_LENGTH;
+			$value_type = isset( $san['value_type'] ) ? $san['value_type'] : 'text';
 			foreach ( $names as $name ) {
 				$value = isset( $current[ $group ][ $name ] ) && is_string( $current[ $group ][ $name ] )
 					? $current[ $group ][ $name ]
@@ -100,7 +100,7 @@ final class Entity_Style_Form_Builder {
 			return array();
 		}
 		$payload       = $this->payload_repository->get_payload( $entity_type, $entity_key );
-		$current       = $payload[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ] ?? array();
+		$current       = $payload[ Entity_Style_Payload_Schema::KEY_COMPONENT_OVERRIDES ];
 		$out           = array();
 		$component_ids = $this->component_registry->get_component_ids();
 		foreach ( $component_ids as $component_id ) {

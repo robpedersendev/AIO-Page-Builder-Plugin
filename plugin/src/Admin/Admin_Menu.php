@@ -153,6 +153,7 @@ final class Admin_Menu {
 		$settings                              = new Settings_Screen();
 		$diagnostics                           = new Diagnostics_Screen();
 		$acf_diagnostics                       = new ACF_Architecture_Diagnostics_Screen( $this->container );
+		$form_provider_health                  = new Form_Provider_Health_Screen( $this->container );
 		$onboarding                            = new Onboarding_Screen( $this->container );
 		$crawler_sessions                      = new Crawler_Sessions_Screen( $this->container );
 		$crawler_comparison                    = new Crawler_Comparison_Screen( $this->container );
@@ -188,6 +189,7 @@ final class Admin_Menu {
 		$industry_goal_comparison              = new Conversion_Goal_Comparison_Screen( $this->container );
 		$industry_bundle_import_preview        = new Industry_Bundle_Import_Preview_Screen( $this->container );
 		$industry_style_preset                 = new Industry_Style_Preset_Screen( $this->container );
+		$industry_style_layer_comparison      = new Industry_Style_Layer_Comparison_Screen( $this->container );
 		$global_style_tokens                   = new Global_Style_Token_Settings_Screen( $this->container );
 		$global_component_overrides            = new Global_Component_Override_Settings_Screen( $this->container );
 		$import_export                         = new Import_Export_Screen( $this->container );
