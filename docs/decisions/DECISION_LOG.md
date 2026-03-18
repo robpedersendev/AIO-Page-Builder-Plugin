@@ -57,3 +57,15 @@ For each decision:
   - Implement pre-move check in Import_Export_Screen::handle_validate(); use a named constant for the limit.
   - Acceptance criteria: docs/operations/import-export-zip-size-limit-acceptance-criteria.md.
   - Industry bundle JSON remains under its own 10 MB limit.
+
+### 4. Privacy Exporter/Eraser Scope (No Expansion)
+
+- **Date:** 2025-03-18
+- **Title:** Privacy exporter/eraser scope remains actor-linked only
+- **Status:** Accepted
+- **Context:** Clarify whether scope should expand to site-level records, audit records, operational logs, or diagnostics. Current scope: AI runs, job queue, template compare user meta, bundle preview transient (all actor-linked). Ledger §6 already documented out-of-scope: onboarding draft, reporting log, industry profile/audit trail, diagnostics.
+- **Decision:** Keep current scope. Do not expand to site-level, audit, operational logs, or diagnostics. WordPress privacy API is per-user; only data attributable to the requestor belongs in export/erase. Site-level data is not “this user’s data”; full site backup is Import/Export (ZIP). Audit need is met by redacting actor while retaining records.
+- **Consequences:**
+  - Boundary documented in docs/operations/privacy-exporter-eraser-scope-boundary.md.
+  - No code change; no implementation criteria (scope unchanged).
+  - If future storage is user-keyed (e.g. per-user logs), evaluate for inclusion and update boundary doc.
