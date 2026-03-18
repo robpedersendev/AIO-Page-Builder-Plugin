@@ -32,3 +32,16 @@ For each decision:
   - Narrow exception; no broadening without a documented decision
   - Reporting module must be maintained separately from core
   - All new reporting types require a new decision log entry
+
+### 2. Industry Bundle JSON Import Apply In Scope
+
+- **Date:** 2025-03-18
+- **Title:** Industry bundle apply in scope; semantics from contracts
+- **Status:** Accepted
+- **Context:** Bundle preview existed; confirm/import did not apply bundle content. SPR-007 deferred apply because the master spec did not define apply semantics. Contracts (industry-pack-bundle-format-contract, industry-pack-import-conflict-contract) already define implementation-ready semantics.
+- **Decision:** Bundle apply is in scope. Required semantics (what is written, where, overwrite/merge/conflict, validation, safe failure) are defined by the existing industry-pack bundle-format and import-conflict contracts. A spec revision note adds this to the master spec; implementation proceeds against those contracts.
+- **Consequences:**
+  - Implement apply flow (admin-only, nonce- and capability-gated) that persists bundle content to industry registries/overlays per conflict resolution.
+  - SPR-007 satisfied by implementation once done; ledger/closeout can be updated.
+  - Acceptance criteria: docs/operations/industry-bundle-apply-acceptance-criteria.md.
+  - Full site backup/restore remains via Import / Export (ZIP).
