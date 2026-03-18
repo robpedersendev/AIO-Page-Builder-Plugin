@@ -41,6 +41,7 @@ final class Save_Industry_Page_Template_Override_Action {
 			\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_template_override=error' );
 			exit;
 		}
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce and capability verified above.
 		$template_key = isset( $_POST['template_key'] ) && is_string( $_POST['template_key'] )
 			? trim( \sanitize_text_field( \wp_unslash( $_POST['template_key'] ) ) )
 			: '';
@@ -58,10 +59,12 @@ final class Save_Industry_Page_Template_Override_Action {
 		$service = new Industry_Page_Template_Override_Service();
 		$ok      = $service->record_override( $template_key, $state, $reason );
 		\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_template_override=' . ( $ok ? 'saved' : 'error' ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		exit;
 	}
 
 	private static function redirect_url(): string {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Only called from handle() after nonce verification.
 		if ( isset( $_POST['_wp_http_referer'] ) && is_string( $_POST['_wp_http_referer'] ) ) {
 			$ref = \esc_url_raw( \wp_unslash( $_POST['_wp_http_referer'] ) );
 			if ( $ref !== '' ) {
@@ -69,5 +72,6 @@ final class Save_Industry_Page_Template_Override_Action {
 			}
 		}
 		return \admin_url( 'admin.php?page=' . Page_Templates_Directory_Screen::SLUG );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 }

@@ -41,6 +41,7 @@ final class Save_Industry_Section_Override_Action {
 			\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_section_override=error' );
 			exit;
 		}
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce and capability verified above.
 		$section_key = isset( $_POST['section_key'] ) && is_string( $_POST['section_key'] )
 			? trim( \sanitize_text_field( \wp_unslash( $_POST['section_key'] ) ) )
 			: '';
@@ -69,5 +70,6 @@ final class Save_Industry_Section_Override_Action {
 			}
 		}
 		return \admin_url( 'admin.php?page=' . Section_Templates_Directory_Screen::SLUG );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 }

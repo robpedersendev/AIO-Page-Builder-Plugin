@@ -199,10 +199,10 @@ final class Build_Plan_Workspace_Screen {
 			if ( $action === 'bulk_build_all_step2' ) {
 				$service->bulk_approve_all_eligible( $plan_post_id );
 			} else {
-				$selected = isset( $_POST['aio_step2_selected_ids'] ) && is_array( $_POST['aio_step2_selected_ids'] )
-					? array_map( 'sanitize_text_field', array_map( 'wp_unslash', $_POST['aio_step2_selected_ids'] ) )
-					: array();
-				$selected = array_values( array_filter( $selected ) );
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array values sanitized via array_map below.
+				$raw_step2   = isset( $_POST['aio_step2_selected_ids'] ) && is_array( $_POST['aio_step2_selected_ids'] ) ? \wp_unslash( $_POST['aio_step2_selected_ids'] ) : array();
+				$selected    = array_map( 'sanitize_text_field', $raw_step2 );
+				$selected    = array_values( array_filter( $selected ) );
 				$service->bulk_approve_selected( $plan_post_id, $selected );
 			}
 			\wp_safe_redirect( $redirect_url );
@@ -598,8 +598,10 @@ final class Build_Plan_Workspace_Screen {
 		}
 		$selected_ids = array();
 		if ( ! empty( $_GET['selected'] ) && is_array( $_GET['selected'] ) ) {
-			$selected_ids = array_map( 'sanitize_text_field', array_map( 'wp_unslash', $_GET['selected'] ) );
-			$selected_ids = array_values( array_filter( $selected_ids ) );
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array values sanitized via array_map below.
+			$raw_selected  = \wp_unslash( $_GET['selected'] );
+			$selected_ids  = array_map( 'sanitize_text_field', $raw_selected );
+			$selected_ids  = array_values( array_filter( $selected_ids ) );
 		}
 		$capabilities = array(
 			'can_approve'        => \current_user_can( Capabilities::APPROVE_BUILD_PLANS ),

@@ -646,9 +646,11 @@ final class Admin_Menu {
 		$primary       = isset( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( \sanitize_text_field( \wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) ) )
 			: '';
+		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array values sanitized in loop below.
 		$secondary_raw = isset( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
-			? $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ]
-			: ( isset( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] ) ? $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] : array() );
+			? \wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
+			: ( isset( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] ) ? \wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] ) : array() );
+		// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$secondary     = array();
 		if ( is_array( $secondary_raw ) ) {
 			foreach ( $secondary_raw as $v ) {
@@ -985,6 +987,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Permission denied.', $redirect ) );
 			exit;
 		}
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Validated by Industry_Bundle_Upload_Validator; not used in output or SQL.
 		$file          = isset( $_FILES['aio_industry_bundle_file'] ) && is_array( $_FILES['aio_industry_bundle_file'] ) ? $_FILES['aio_industry_bundle_file'] : array();
 		$upload_result = Industry_Bundle_Upload_Validator::validate_upload( $file );
 		if ( ! $upload_result['ok'] ) {

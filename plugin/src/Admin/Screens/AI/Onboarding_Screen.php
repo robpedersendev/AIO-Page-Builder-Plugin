@@ -78,7 +78,7 @@ final class Onboarding_Screen {
 	 * @return string|null Redirect URL or null.
 	 */
 	private function handle_post(): ?string {
-		if ( $_SERVER['REQUEST_METHOD'] !== 'POST' || ! isset( $_POST[ self::NONCE_ACTION ] ) ) {
+		if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || $_SERVER['REQUEST_METHOD'] !== 'POST' || ! isset( $_POST[ self::NONCE_ACTION ] ) ) {
 			return null;
 		}
 		if ( ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( (string) $_POST[ self::NONCE_ACTION ] ) ), self::NONCE_ACTION ) ) {
@@ -182,6 +182,7 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	private function persist_template_preferences_from_post( array $draft ): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before this method is called.
 		$current = $draft['current_step_key'] ?? '';
 		if ( $current !== Onboarding_Step_Keys::TEMPLATE_PREFERENCES || $this->container === null || ! $this->container->has( 'profile_store' ) ) {
 			return;
@@ -197,6 +198,7 @@ final class Onboarding_Screen {
 		);
 		$profile_store = $this->container->get( 'profile_store' );
 		$profile_store->set_template_preference_profile( $raw );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**
@@ -205,6 +207,7 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	private function persist_industry_profile_from_post(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before this method is called.
 		if ( $this->container === null
 			|| ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE )
 			|| ! $this->container->has( 'industry_question_pack_registry' ) ) {
@@ -228,12 +231,14 @@ final class Onboarding_Screen {
 			$partial[ Industry_Profile_Schema::FIELD_GEO_MODEL ] = \sanitize_text_field( \wp_unslash( $_POST['aio_industry_geo_model'] ) );
 		}
 		if ( isset( $_POST['aio_secondary_industry_keys'] ) && is_array( $_POST['aio_secondary_industry_keys'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array values sanitized in array_map below.
+			$raw_secondary = \wp_unslash( $_POST['aio_secondary_industry_keys'] );
 			$partial[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] = array_filter(
 				array_map(
 					function ( $v ) {
-						return \is_string( $v ) ? \sanitize_text_field( \wp_unslash( $v ) ) : '';
+						return \is_string( $v ) ? \sanitize_text_field( $v ) : '';
 					},
-					$_POST['aio_secondary_industry_keys']
+					$raw_secondary
 				)
 			);
 		}
@@ -262,8 +267,9 @@ final class Onboarding_Screen {
 						}
 						$post_key = 'aio_industry_qp_' . $field_key;
 						if ( isset( $_POST[ $post_key ] ) ) {
-							$val                    = $_POST[ $post_key ];
-							$by_field[ $field_key ] = \is_scalar( $val ) ? $val : ( \is_string( $val ) ? \sanitize_text_field( \wp_unslash( $val ) ) : '' );
+							// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized on next line.
+							$val                    = \wp_unslash( $_POST[ $post_key ] );
+							$by_field[ $field_key ] = \is_scalar( $val ) ? ( \is_string( $val ) ? \sanitize_text_field( $val ) : $val ) : '';
 						}
 					}
 					if ( ! empty( $by_field ) ) {
@@ -276,6 +282,7 @@ final class Onboarding_Screen {
 				}
 			}
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**
