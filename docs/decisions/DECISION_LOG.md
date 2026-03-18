@@ -81,3 +81,15 @@ For each decision:
   - De-scope criteria: docs/operations/token-application-descope-criteria.md.
   - No implementation criteria (feature not in scope). If brought in scope later: source-of-truth sync, enable UI, validation/preview/rollback per decision record §5.
   - Ledger SPR-009 unchanged; decision referenced for product truth.
+
+### 6. UPDATE_PAGE_METADATA Out of Scope
+
+- **Date:** 2025-03-18
+- **Title:** UPDATE_PAGE_METADATA not implemented; de-scope from queue and monitoring
+- **Status:** Accepted
+- **Context:** UPDATE_PAGE_METADATA exists in action types and Bulk_Executor maps ITEM_TYPE_SEO to it; no handler in Execution_Provider; SEO step is shell-only (“No SEO or media execution”). Jobs for it are refused.
+- **Decision:** UPDATE_PAGE_METADATA is **out of scope** for this version. Remove mapping of SEO items to it; remove from queue health, recovery, and logs action-type lists. Action type constant remains in enum/contract; no handler registered. SEO step stays recommendation-only.
+- **Consequences:**
+  - De-scope criteria: docs/operations/update-page-metadata-descope-criteria.md (exact file/line changes).
+  - No implementation (handler/job) unless a later decision brings it in scope.
+  - Spec §40.1 “update page metadata” remains as job type for future use.
