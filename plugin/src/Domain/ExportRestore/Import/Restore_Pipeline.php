@@ -116,7 +116,7 @@ final class Restore_Pipeline {
 		$this->wpdb                               = $wpdb;
 		$this->logger                             = $logger;
 		$this->template_library_restore_validator = $template_library_restore_validator;
-		$this->style_cache_service               = $style_cache_service;
+		$this->style_cache_service                = $style_cache_service;
 		$this->styles_normalizer                  = $styles_normalizer;
 		$this->styles_sanitizer                   = $styles_sanitizer;
 		$this->industry_cache_service             = $industry_cache_service;
@@ -126,7 +126,7 @@ final class Restore_Pipeline {
 	 * Runs restore only if validation passed. Applies resolution mode to conflicts. Order: settings, profile, registries, compositions, token_sets, plans, uninstall_restore_metadata.
 	 *
 	 * @param Import_Validation_Result $validation_result Must have validation_passed true.
-	 * @param string                  $resolution_mode   Conflict_Resolution_Service::MODE_*.
+	 * @param string                   $resolution_mode   Conflict_Resolution_Service::MODE_*.
 	 * @return Restore_Result
 	 */
 	public function restore( Import_Validation_Result $validation_result, string $resolution_mode ): Restore_Result {
@@ -162,18 +162,19 @@ final class Restore_Pipeline {
 			? $manifest['included_categories']
 			: array();
 
-		$restored = array();
+		$restored             = array();
 		$resolved_actions_log = array();
-		$log_ref = 'restore-' . gmdate( 'Y-m-d\TH:i:s\Z' );
+		$skipped_reasons      = array();
+		$log_ref              = 'restore-' . gmdate( 'Y-m-d\TH:i:s\Z' );
 
 		try {
 			foreach ( self::RESTORE_ORDER as $category ) {
 				if ( ! in_array( $category, $included, true ) ) {
 					continue;
 				}
-				$action_taken = $this->restore_category( $zip, $category, $manifest, $resolved_actions_map );
+				$action_taken = $this->restore_category( $zip, $category, $manifest, $resolved_actions_map, $skipped_reasons );
 				if ( $action_taken !== null ) {
-					$restored[] = $category;
+					$restored[]           = $category;
 					$resolved_actions_log = array_merge( $resolved_actions_log, $action_taken );
 				}
 			}
@@ -183,11 +184,19 @@ final class Restore_Pipeline {
 			if ( $this->template_library_restore_validator !== null ) {
 				$template_library_summary = $this->template_library_restore_validator->validate( $restored, $manifest );
 				if ( ! empty( $template_library_summary['errors'] ) ) {
-					$this->log( 'Template library restore validation had errors.', array(
-						'errors' => $template_library_summary['errors'],
-						'ref'    => $template_library_summary['log_reference'] ?? '',
-					), $log_ref, Log_Severities::WARNING );
+					$this->log(
+						'Template library restore validation had errors.',
+						array(
+							'errors' => $template_library_summary['errors'],
+							'ref'    => $template_library_summary['log_reference'] ?? '',
+						),
+						$log_ref,
+						Log_Severities::WARNING
+					);
 				}
+			}
+			if ( $skipped_reasons !== array() ) {
+				$template_library_summary['skipped_reasons'] = $skipped_reasons;
 			}
 
 			$this->log( 'Restore completed.', array( 'restored' => $restored ), $log_ref );
@@ -218,13 +227,14 @@ final class Restore_Pipeline {
 	}
 
 	/**
-	 * @param \ZipArchive              $zip
-	 * @param string                   $category
-	 * @param array<string, mixed>     $manifest
+	 * @param \ZipArchive                          $zip
+	 * @param string                               $category
+	 * @param array<string, mixed>                 $manifest
 	 * @param array<string, array<string, string>> $resolved_map
+	 * @param list<array{category: string, reason: string}> $skipped_reasons Collects category + user-facing reason when a category is skipped (e.g. styling service unavailable).
 	 * @return list<array{category: string, action: string, key?: string}>|null Actions taken, or null if skipped.
 	 */
-	private function restore_category( \ZipArchive $zip, string $category, array $manifest, array $resolved_map ): ?array {
+	private function restore_category( \ZipArchive $zip, string $category, array $manifest, array $resolved_map, array &$skipped_reasons ): ?array {
 		$actions = array();
 		switch ( $category ) {
 			case 'settings':
@@ -241,7 +251,10 @@ final class Restore_Pipeline {
 					return null;
 				}
 				$this->settings->set( Option_Names::MAIN_SETTINGS, $data );
-				$actions[] = array( 'category' => 'settings', 'action' => 'overwrite' );
+				$actions[] = array(
+					'category' => 'settings',
+					'action'   => 'overwrite',
+				);
 				return $actions;
 
 			case 'styling':
@@ -262,9 +275,21 @@ final class Restore_Pipeline {
 									Global_Style_Settings_Schema::KEY_GLOBAL_COMPONENT_OVERRIDES => $res_comps->get_sanitized(),
 								);
 								\update_option( Global_Style_Settings_Schema::OPTION_KEY, $safe, false );
-								$actions[] = array( 'category' => 'styling', 'action' => 'overwrite', 'key' => 'global_settings' );
+								$actions[] = array(
+									'category' => 'styling',
+									'action'   => 'overwrite',
+									'key'      => 'global_settings',
+								);
 							} else {
-								$this->log( 'Styling restore: global_settings validation failed; skipped.', array( 'token_errors' => $res_tokens->get_errors(), 'comp_errors' => $res_comps->get_errors() ), 'restore-styling', Log_Severities::WARNING );
+								$this->log(
+									'Styling restore: global_settings validation failed; skipped.',
+									array(
+										'token_errors' => $res_tokens->get_errors(),
+										'comp_errors'  => $res_comps->get_errors(),
+									),
+									'restore-styling',
+									Log_Severities::WARNING
+								);
 							}
 						}
 					}
@@ -274,7 +299,10 @@ final class Restore_Pipeline {
 						if ( \is_array( $data ) && $this->is_supported_entity_payload_version( $data ) ) {
 							$payloads_raw = $data[ Entity_Style_Payload_Schema::KEY_PAYLOADS ] ?? array();
 							$version      = isset( $data[ Entity_Style_Payload_Schema::KEY_VERSION ] ) && is_string( $data[ Entity_Style_Payload_Schema::KEY_VERSION ] ) ? $data[ Entity_Style_Payload_Schema::KEY_VERSION ] : Entity_Style_Payload_Schema::SCHEMA_VERSION;
-							$out_payloads = array( 'section_template' => array(), 'page_template' => array() );
+							$out_payloads = array(
+								'section_template' => array(),
+								'page_template'    => array(),
+							);
 							foreach ( Entity_Style_Payload_Schema::ENTITY_TYPES as $entity_type ) {
 								$by_key = isset( $payloads_raw[ $entity_type ] ) && is_array( $payloads_raw[ $entity_type ] ) ? $payloads_raw[ $entity_type ] : array();
 								foreach ( $by_key as $key => $raw_payload ) {
@@ -293,11 +321,19 @@ final class Restore_Pipeline {
 								Entity_Style_Payload_Schema::KEY_PAYLOADS => $out_payloads,
 							);
 							\update_option( Entity_Style_Payload_Schema::OPTION_KEY, $safe, false );
-							$actions[] = array( 'category' => 'styling', 'action' => 'overwrite', 'key' => 'entity_payloads' );
+							$actions[] = array(
+								'category' => 'styling',
+								'action'   => 'overwrite',
+								'key'      => 'entity_payloads',
+							);
 						}
 					}
 				} else {
 					$this->log( 'Styling restore skipped: normalizer or sanitizer not available.', array(), 'restore-styling', Log_Severities::WARNING );
+					$skipped_reasons[] = array(
+						'category' => 'styling',
+						'reason'   => __( 'Styling restore is not available: required service (normalizer or sanitizer) is not loaded.', 'aio-page-builder' ),
+					);
 				}
 				if ( $this->style_cache_service !== null && $actions !== array() ) {
 					$this->style_cache_service->invalidate();
@@ -318,7 +354,10 @@ final class Restore_Pipeline {
 					return null;
 				}
 				$this->profile_store->set_full_profile( $data );
-				$actions[] = array( 'category' => 'profiles', 'action' => 'overwrite' );
+				$actions[]     = array(
+					'category' => 'profiles',
+					'action'   => 'overwrite',
+				);
 				$industry_json = $zip->getFromName( 'profiles/industry.json' );
 				if ( $industry_json !== false ) {
 					$industry_data = json_decode( $industry_json, true );
@@ -336,7 +375,11 @@ final class Restore_Pipeline {
 							if ( $this->industry_cache_service !== null ) {
 								$this->industry_cache_service->invalidate_all_industry_read_models();
 							}
-							$actions[] = array( 'category' => 'profiles', 'action' => 'overwrite', 'key' => 'industry' );
+							$actions[] = array(
+								'category' => 'profiles',
+								'action'   => 'overwrite',
+								'key'      => 'industry',
+							);
 						} else {
 							$this->log( 'Industry restore skipped: unsupported or missing schema_version.', array( 'version' => $version ), 'restore-profiles', Log_Severities::WARNING );
 						}
@@ -345,15 +388,15 @@ final class Restore_Pipeline {
 				return $actions;
 
 			case 'registries':
-				$actions = array();
+				$actions       = array();
 				$sections_json = $zip->getFromName( 'registries/sections.json' );
 				if ( $sections_json !== false ) {
 					$arr = json_decode( $sections_json, true );
 					if ( is_array( $arr ) ) {
 						foreach ( $arr as $frag ) {
 							$payload = isset( $frag['payload'] ) && is_array( $frag['payload'] ) ? $frag['payload'] : array();
-							$key = $frag['object_key'] ?? ( $payload[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-							$act = $resolved_map['registries'][ $key ] ?? Conflict_Resolution_Service::ACTION_OVERWRITE;
+							$key     = $frag['object_key'] ?? ( $payload[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+							$act     = $resolved_map['registries'][ $key ] ?? Conflict_Resolution_Service::ACTION_OVERWRITE;
 							if ( $act === Conflict_Resolution_Service::ACTION_KEEP_CURRENT ) {
 								continue;
 							}
@@ -361,7 +404,11 @@ final class Restore_Pipeline {
 								$payload[ Section_Schema::FIELD_INTERNAL_KEY ] = $key . '_imported_' . uniqid();
 							}
 							$this->section_repo->save_definition( $payload );
-							$actions[] = array( 'category' => 'registries', 'action' => $act, 'key' => $key );
+							$actions[] = array(
+								'category' => 'registries',
+								'action'   => $act,
+								'key'      => $key,
+							);
 						}
 					}
 				}
@@ -371,8 +418,8 @@ final class Restore_Pipeline {
 					if ( is_array( $arr ) ) {
 						foreach ( $arr as $frag ) {
 							$payload = isset( $frag['payload'] ) && is_array( $frag['payload'] ) ? $frag['payload'] : array();
-							$key = $frag['object_key'] ?? ( $payload[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-							$act = $resolved_map['registries'][ $key ] ?? Conflict_Resolution_Service::ACTION_OVERWRITE;
+							$key     = $frag['object_key'] ?? ( $payload[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+							$act     = $resolved_map['registries'][ $key ] ?? Conflict_Resolution_Service::ACTION_OVERWRITE;
 							if ( $act === Conflict_Resolution_Service::ACTION_KEEP_CURRENT ) {
 								continue;
 							}
@@ -380,7 +427,11 @@ final class Restore_Pipeline {
 								$payload[ Page_Template_Schema::FIELD_INTERNAL_KEY ] = $key . '_imported_' . uniqid();
 							}
 							$this->page_template_repo->save_definition( $payload );
-							$actions[] = array( 'category' => 'registries', 'action' => $act, 'key' => $key );
+							$actions[] = array(
+								'category' => 'registries',
+								'action'   => $act,
+								'key'      => $key,
+							);
 						}
 					}
 				}
@@ -398,8 +449,8 @@ final class Restore_Pipeline {
 				$actions = array();
 				foreach ( $arr as $frag ) {
 					$payload = isset( $frag['payload'] ) && is_array( $frag['payload'] ) ? $frag['payload'] : array();
-					$key = $frag['object_key'] ?? ( $payload[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
-					$act = $resolved_map['registries'][ $key ] ?? $resolved_map['compositions'][ $key ] ?? Conflict_Resolution_Service::ACTION_OVERWRITE;
+					$key     = $frag['object_key'] ?? ( $payload[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
+					$act     = $resolved_map['registries'][ $key ] ?? $resolved_map['compositions'][ $key ] ?? Conflict_Resolution_Service::ACTION_OVERWRITE;
 					if ( $act === Conflict_Resolution_Service::ACTION_KEEP_CURRENT ) {
 						continue;
 					}
@@ -407,7 +458,11 @@ final class Restore_Pipeline {
 						$payload[ Composition_Schema::FIELD_COMPOSITION_ID ] = $key . '_imported_' . uniqid();
 					}
 					$this->composition_repo->save_definition( $payload );
-					$actions[] = array( 'category' => 'compositions', 'action' => $act, 'key' => $key );
+					$actions[] = array(
+						'category' => 'compositions',
+						'action'   => $act,
+						'key'      => $key,
+					);
 				}
 				return $actions !== array() ? $actions : null;
 
@@ -449,7 +504,11 @@ final class Restore_Pipeline {
 						),
 						array( '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 					);
-					$actions[] = array( 'category' => 'token_sets', 'action' => $act, 'key' => $ref );
+					$actions[] = array(
+						'category' => 'token_sets',
+						'action'   => $act,
+						'key'      => $ref,
+					);
 				}
 				return $actions !== array() ? $actions : null;
 
@@ -464,23 +523,27 @@ final class Restore_Pipeline {
 				}
 				$actions = array();
 				foreach ( $arr as $item ) {
-					$def = isset( $item['definition'] ) && is_array( $item['definition'] ) ? $item['definition'] : $item;
+					$def     = isset( $item['definition'] ) && is_array( $item['definition'] ) ? $item['definition'] : $item;
 					$plan_id = $def['plan_id'] ?? '';
-					$act = $resolved_map['plans'][ $plan_id ] ?? Conflict_Resolution_Service::ACTION_OVERWRITE;
+					$act     = $resolved_map['plans'][ $plan_id ] ?? Conflict_Resolution_Service::ACTION_OVERWRITE;
 					if ( $act === Conflict_Resolution_Service::ACTION_KEEP_CURRENT ) {
 						continue;
 					}
 					if ( $act === Conflict_Resolution_Service::ACTION_DUPLICATE && $plan_id !== '' ) {
 						$def['plan_id'] = $plan_id . '_imported_' . uniqid();
 					}
-					$existing = $plan_id !== '' ? $this->plan_repo->get_by_key( $plan_id ) : null;
+					$existing  = $plan_id !== '' ? $this->plan_repo->get_by_key( $plan_id ) : null;
 					$save_data = array( 'plan_definition' => $def );
 					if ( $existing !== null && isset( $existing['id'] ) && $act === Conflict_Resolution_Service::ACTION_OVERWRITE ) {
 						$save_data['id'] = (int) $existing['id'];
 					}
 					$post_id = $this->plan_repo->save( $save_data );
 					if ( $post_id > 0 ) {
-						$actions[] = array( 'category' => 'plans', 'action' => $act, 'key' => $plan_id );
+						$actions[] = array(
+							'category' => 'plans',
+							'action'   => $act,
+							'key'      => $plan_id,
+						);
 					}
 				}
 				return $actions !== array() ? $actions : null;
@@ -495,7 +558,12 @@ final class Restore_Pipeline {
 					return null;
 				}
 				$this->settings->set( Option_Names::UNINSTALL_PREFS, $data );
-				return array( array( 'category' => 'uninstall_restore_metadata', 'action' => 'overwrite' ) );
+				return array(
+					array(
+						'category' => 'uninstall_restore_metadata',
+						'action'   => 'overwrite',
+					),
+				);
 		}
 		return null;
 	}

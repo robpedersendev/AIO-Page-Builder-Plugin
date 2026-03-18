@@ -51,22 +51,25 @@ final class Conversion_Goal_Comparison_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function get_state(): array {
-		$profile_repo = null;
+		$profile_repo       = null;
 		$simulation_service = null;
+		$industry_loaded    = false;
 		if ( $this->container instanceof Service_Container ) {
+			$industry_loaded = $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_LOADED )
+				&& $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_LOADED ) === true;
 			if ( $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
-				$store = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+				$store        = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
 				$profile_repo = $store instanceof Industry_Profile_Repository ? $store : null;
 			}
 			if ( $this->container->has( 'industry_what_if_simulation_service' ) ) {
-				$sim = $this->container->get( 'industry_what_if_simulation_service' );
+				$sim                = $this->container->get( 'industry_what_if_simulation_service' );
 				$simulation_service = $sim instanceof Industry_What_If_Simulation_Service ? $sim : null;
 			}
 		}
 
 		$current_goal = '';
 		if ( $profile_repo !== null ) {
-			$profile = $profile_repo->get_profile();
+			$profile      = $profile_repo->get_profile();
 			$current_goal = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 				? trim( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
 				: '';
@@ -83,34 +86,40 @@ final class Conversion_Goal_Comparison_Screen {
 		$scenarios = array();
 		if ( $simulation_service === null ) {
 			return array(
-				'scenarios'   => array(),
-				'profile_url' => admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
-				'current_url' => admin_url( 'admin.php?page=' . self::SLUG ),
-				'error'       => 'missing_simulation_service',
+				'scenarios'        => array(),
+				'profile_url'      => admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
+				'current_url'      => admin_url( 'admin.php?page=' . self::SLUG ),
+				'alternate_goal_param' => self::PARAM_ALTERNATE_GOAL_KEY,
+				'error'            => 'missing_simulation_service',
+				'industry_loaded'  => $industry_loaded,
 			);
 		}
 
 		// No-goal scenario.
-		$no_goal_result = $simulation_service->run_simulation( array(
-			Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => '',
-		) );
-		$scenarios[] = array(
-			'label'       => __( 'No goal', 'aio-page-builder' ),
-			'goal_key'    => '',
-			'goal_label'  => __( 'No conversion goal', 'aio-page-builder' ),
-			'valid'       => $no_goal_result['valid'],
+		$no_goal_result = $simulation_service->run_simulation(
+			array(
+				Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => '',
+			)
+		);
+		$scenarios[]    = array(
+			'label'        => __( 'No goal', 'aio-page-builder' ),
+			'goal_key'     => '',
+			'goal_label'   => __( 'No conversion goal', 'aio-page-builder' ),
+			'valid'        => $no_goal_result['valid'],
 			'invalid_refs' => $no_goal_result['invalid_refs'],
-			'summary'     => $no_goal_result['simulated_profile_summary'],
-			'comparison'  => $no_goal_result['comparison_simulated'],
-			'warnings'    => $no_goal_result['warnings'],
+			'summary'      => $no_goal_result['simulated_profile_summary'],
+			'comparison'   => $no_goal_result['comparison_simulated'],
+			'warnings'     => $no_goal_result['warnings'],
 		);
 
 		// Current-goal scenario (only if different from no-goal).
 		if ( $current_goal !== '' ) {
-			$current_result = $simulation_service->run_simulation( array(
-				Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => $current_goal,
-			) );
-			$scenarios[] = array(
+			$current_result = $simulation_service->run_simulation(
+				array(
+					Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => $current_goal,
+				)
+			);
+			$scenarios[]    = array(
 				'label'        => __( 'Current goal', 'aio-page-builder' ),
 				'goal_key'     => $current_goal,
 				'goal_label'   => Conversion_Goal_Preview_Influence_View_Model::goal_key_to_label( $current_goal ),
@@ -124,9 +133,11 @@ final class Conversion_Goal_Comparison_Screen {
 
 		// Alternate-goal scenario (optional).
 		if ( $alternate_goal !== '' ) {
-			$alt_result = $simulation_service->run_simulation( array(
-				Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => $alternate_goal,
-			) );
+			$alt_result  = $simulation_service->run_simulation(
+				array(
+					Industry_What_If_Simulation_Service::PARAM_ALTERNATE_CONVERSION_GOAL => $alternate_goal,
+				)
+			);
 			$scenarios[] = array(
 				'label'        => __( 'Alternate goal', 'aio-page-builder' ),
 				'goal_key'     => $alternate_goal,
@@ -140,11 +151,11 @@ final class Conversion_Goal_Comparison_Screen {
 		}
 
 		return array(
-			'scenarios'    => $scenarios,
-			'profile_url'  => admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
-			'current_url'  => admin_url( 'admin.php?page=' . self::SLUG ),
+			'scenarios'            => $scenarios,
+			'profile_url'          => admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
+			'current_url'          => admin_url( 'admin.php?page=' . self::SLUG ),
 			'alternate_goal_param' => self::PARAM_ALTERNATE_GOAL_KEY,
-			'error'        => null,
+			'error'                => null,
 		);
 	}
 
@@ -157,7 +168,7 @@ final class Conversion_Goal_Comparison_Screen {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the conversion goal comparison screen.', 'aio-page-builder' ), 403 );
 		}
-		$state = $this->get_state();
+		$state     = $this->get_state();
 		$scenarios = $state['scenarios'];
 		?>
 		<div class="wrap aio-page-builder-screen aio-industry-conversion-goal-comparison" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
@@ -166,9 +177,10 @@ final class Conversion_Goal_Comparison_Screen {
 				<?php esc_html_e( 'Compare no-goal, current goal, and optional alternate-goal bundle and Build Plan posture. Read-only; no changes are applied. Set or change your conversion goal in Industry Profile.', 'aio-page-builder' ); ?>
 			</p>
 
-			<?php if ( $state['error'] === 'missing_simulation_service' ) : ?>
-				<div class="notice notice-warning inline" style="margin: 1em 0;">
-					<p><?php esc_html_e( 'Comparison service is not available. Check that the industry subsystem is loaded.', 'aio-page-builder' ); ?></p>
+			<?php if ( isset( $state['error'] ) && $state['error'] === 'missing_simulation_service' ) : ?>
+				<div class="notice notice-warning inline" style="margin: 1em 0;" role="alert">
+					<p><?php esc_html_e( 'Conversion goal comparison is not available. The industry subsystem or comparison service is not loaded.', 'aio-page-builder' ); ?></p>
+					<p><a href="<?php echo esc_url( $state['profile_url'] ?? admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ) ); ?>"><?php esc_html_e( 'Industry Profile', 'aio-page-builder' ); ?></a></p>
 				</div>
 				<?php return; ?>
 			<?php endif; ?>
@@ -216,7 +228,7 @@ final class Conversion_Goal_Comparison_Screen {
 
 						<h3 class="aio-comparison-subtitle"><?php esc_html_e( 'Profile summary', 'aio-page-builder' ); ?></h3>
 						<?php
-						$sum = $s['summary'] ?? array();
+						$sum     = $s['summary'] ?? array();
 						$primary = $sum['primary'] ?? '';
 						$subtype = $sum['subtype'] ?? '';
 						$bundle  = $sum['bundle'] ?? '';

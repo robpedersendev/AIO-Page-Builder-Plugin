@@ -296,6 +296,18 @@ final class Import_Export_Screen {
 						<?php if ( ! empty( $last['restored_categories'] ) ) : ?>
 							<p><?php \esc_html_e( 'Restored categories:', 'aio-page-builder' ); ?> <?php echo \esc_html( implode( ', ', $last['restored_categories'] ) ); ?></p>
 						<?php endif; ?>
+						<?php
+						$summary = isset( $last['template_library_restore_summary'] ) && is_array( $last['template_library_restore_summary'] ) ? $last['template_library_restore_summary'] : array();
+						$skipped = isset( $summary['skipped_reasons'] ) && is_array( $summary['skipped_reasons'] ) ? $summary['skipped_reasons'] : array();
+						if ( $skipped !== array() ) :
+							?>
+							<p><?php \esc_html_e( 'Skipped (not restored):', 'aio-page-builder' ); ?></p>
+							<ul>
+								<?php foreach ( $skipped as $item ) : ?>
+									<li><strong><?php echo \esc_html( isset( $item['category'] ) ? (string) $item['category'] : '' ); ?></strong>: <?php echo \esc_html( isset( $item['reason'] ) ? (string) $item['reason'] : '' ); ?></li>
+								<?php endforeach; ?>
+							</ul>
+						<?php endif; ?>
 						<?php if ( ! empty( $last['blocking_failures'] ) ) : ?>
 							<ul><li><?php echo \esc_html( implode( '</li><li>', $last['blocking_failures'] ) ); ?></li></ul>
 						<?php endif; ?>

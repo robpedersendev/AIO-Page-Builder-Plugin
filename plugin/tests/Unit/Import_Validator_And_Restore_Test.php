@@ -31,7 +31,7 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 
 	public function test_validate_missing_file_returns_blocking_failure(): void {
 		$validator = new Import_Validator( null, null, null, null, null );
-		$result = $validator->validate( __DIR__ . '/nonexistent.zip' );
+		$result    = $validator->validate( __DIR__ . '/nonexistent.zip' );
 		$this->assertFalse( $result->validation_passed() );
 		$this->assertNotEmpty( $result->get_blocking_failures() );
 		$this->assertStringContainsString( 'missing', strtolower( implode( ' ', $result->get_blocking_failures() ) ) );
@@ -41,7 +41,7 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 		$tmp = sys_get_temp_dir() . '/aio-invalid-' . uniqid() . '.zip';
 		file_put_contents( $tmp, 'not a zip' );
 		$validator = new Import_Validator( null, null, null, null, null );
-		$result = $validator->validate( $tmp );
+		$result    = $validator->validate( $tmp );
 		unlink( $tmp );
 		$this->assertFalse( $result->validation_passed() );
 		$this->assertNotEmpty( $result->get_blocking_failures() );
@@ -57,7 +57,7 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 		$zip->addFromString( 'settings/settings.json', '{}' );
 		$zip->close();
 		$validator = new Import_Validator( null, null, null, null, null );
-		$result = $validator->validate( $tmp );
+		$result    = $validator->validate( $tmp );
 		unlink( $tmp );
 		$this->assertFalse( $result->validation_passed() );
 		$this->assertNotEmpty( $result->get_blocking_failures() );
@@ -68,13 +68,13 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 			$this->markTestSkipped( 'ZipArchive not available.' );
 		}
 		$manifest = $this->minimal_manifest( \AIOPageBuilder\Infrastructure\Config\Versions::export_schema() );
-		$tmp = sys_get_temp_dir() . '/aio-valid-' . uniqid() . '.zip';
-		$zip = new \ZipArchive();
+		$tmp      = sys_get_temp_dir() . '/aio-valid-' . uniqid() . '.zip';
+		$zip      = new \ZipArchive();
 		$zip->open( $tmp, \ZipArchive::CREATE | \ZipArchive::OVERWRITE );
 		$zip->addFromString( 'manifest.json', wp_json_encode( $manifest ) );
 		$zip->close();
 		$validator = new Import_Validator( null, null, null, null, null );
-		$result = $validator->validate( $tmp );
+		$result    = $validator->validate( $tmp );
 		unlink( $tmp );
 		$this->assertTrue( $result->validation_passed() );
 		$this->assertEmpty( $result->get_blocking_failures() );
@@ -85,7 +85,13 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 		$r = new Import_Validation_Result(
 			true,
 			array(),
-			array( array( 'category' => 'registries', 'key' => 'st01', 'message' => 'Exists.' ) ),
+			array(
+				array(
+					'category' => 'registries',
+					'key'      => 'st01',
+					'message'  => 'Exists.',
+				),
+			),
 			array( 'Checksum warning.' ),
 			array( 'export_type' => 'full_operational_backup' ),
 			'/path/to.zip',
@@ -99,29 +105,49 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 	}
 
 	public function test_conflict_resolution_cancel_returns_cancelled(): void {
-		$svc = new Conflict_Resolution_Service();
-		$conflicts = array( array( 'category' => 'registries', 'key' => 'st01', 'message' => 'Exists.' ) );
-		$out = $svc->resolve( $conflicts, Conflict_Resolution_Service::MODE_CANCEL );
+		$svc       = new Conflict_Resolution_Service();
+		$conflicts = array(
+			array(
+				'category' => 'registries',
+				'key'      => 'st01',
+				'message'  => 'Exists.',
+			),
+		);
+		$out       = $svc->resolve( $conflicts, Conflict_Resolution_Service::MODE_CANCEL );
 		$this->assertTrue( $out['cancelled'] );
 		$this->assertEmpty( $out['resolved'] );
 	}
 
 	public function test_conflict_resolution_overwrite_returns_overwrite_actions(): void {
-		$svc = new Conflict_Resolution_Service();
+		$svc       = new Conflict_Resolution_Service();
 		$conflicts = array(
-			array( 'category' => 'registries', 'key' => 'st01', 'message' => 'Exists.' ),
-			array( 'category' => 'plans', 'key' => 'plan-1', 'message' => 'Exists.' ),
+			array(
+				'category' => 'registries',
+				'key'      => 'st01',
+				'message'  => 'Exists.',
+			),
+			array(
+				'category' => 'plans',
+				'key'      => 'plan-1',
+				'message'  => 'Exists.',
+			),
 		);
-		$out = $svc->resolve( $conflicts, Conflict_Resolution_Service::MODE_OVERWRITE );
+		$out       = $svc->resolve( $conflicts, Conflict_Resolution_Service::MODE_OVERWRITE );
 		$this->assertFalse( $out['cancelled'] );
 		$this->assertCount( 2, $out['resolved'] );
 		$this->assertSame( Conflict_Resolution_Service::ACTION_OVERWRITE, $out['resolved'][0]['action'] );
 	}
 
 	public function test_conflict_resolution_keep_current(): void {
-		$svc = new Conflict_Resolution_Service();
-		$conflicts = array( array( 'category' => 'registries', 'key' => 'st01', 'message' => 'Exists.' ) );
-		$out = $svc->resolve( $conflicts, Conflict_Resolution_Service::MODE_KEEP_CURRENT );
+		$svc       = new Conflict_Resolution_Service();
+		$conflicts = array(
+			array(
+				'category' => 'registries',
+				'key'      => 'st01',
+				'message'  => 'Exists.',
+			),
+		);
+		$out       = $svc->resolve( $conflicts, Conflict_Resolution_Service::MODE_KEEP_CURRENT );
 		$this->assertFalse( $out['cancelled'] );
 		$this->assertSame( Conflict_Resolution_Service::ACTION_KEEP_CURRENT, $out['resolved'][0]['action'] );
 	}
@@ -129,7 +155,12 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 	public function test_restore_result_success_payload(): void {
 		$r = Restore_Result::success(
 			array( 'settings', 'profiles' ),
-			array( array( 'category' => 'settings', 'action' => 'overwrite' ) ),
+			array(
+				array(
+					'category' => 'settings',
+					'action'   => 'overwrite',
+				),
+			),
 			'restore-2025-07-15T12:00:00Z'
 		);
 		$this->assertTrue( $r->is_success() );
@@ -137,6 +168,28 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 		$p = $r->to_payload();
 		$this->assertTrue( $p['success'] );
 		$this->assertSame( 'restore-2025-07-15T12:00:00Z', $p['log_reference'] );
+	}
+
+	/** Restore result exposes skipped_reasons in template_library_restore_summary for UI truthfulness. */
+	public function test_restore_result_success_includes_skipped_reasons_in_payload(): void {
+		$summary = array(
+			'skipped_reasons' => array(
+				array( 'category' => 'styling', 'reason' => 'Styling restore is not available: required service (normalizer or sanitizer) is not loaded.' ),
+			),
+		);
+		$r = Restore_Result::success(
+			array( 'settings' ),
+			array( array( 'category' => 'settings', 'action' => 'overwrite' ) ),
+			'restore-test',
+			'Restore completed.',
+			$summary
+		);
+		$p = $r->to_payload();
+		$this->assertArrayHasKey( 'template_library_restore_summary', $p );
+		$this->assertArrayHasKey( 'skipped_reasons', $p['template_library_restore_summary'] );
+		$this->assertCount( 1, $p['template_library_restore_summary']['skipped_reasons'] );
+		$this->assertSame( 'styling', $p['template_library_restore_summary']['skipped_reasons'][0]['category'] );
+		$this->assertStringContainsString( 'not available', $p['template_library_restore_summary']['skipped_reasons'][0]['reason'] );
 	}
 
 	public function test_restore_result_failure_blocked(): void {
@@ -157,13 +210,13 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 			$this->markTestSkipped( 'ZipArchive not available.' );
 		}
 		$manifest = $this->minimal_manifest( '2' );
-		$tmp = sys_get_temp_dir() . '/aio-newer-' . uniqid() . '.zip';
-		$zip = new \ZipArchive();
+		$tmp      = sys_get_temp_dir() . '/aio-newer-' . uniqid() . '.zip';
+		$zip      = new \ZipArchive();
 		$zip->open( $tmp, \ZipArchive::CREATE | \ZipArchive::OVERWRITE );
 		$zip->addFromString( 'manifest.json', wp_json_encode( $manifest ) );
 		$zip->close();
 		$validator = new Import_Validator( null, null, null, null, null );
-		$result = $validator->validate( $tmp );
+		$result    = $validator->validate( $tmp );
 		unlink( $tmp );
 		$this->assertFalse( $result->validation_passed() );
 		$failures = implode( ' ', $result->get_blocking_failures() );
@@ -174,17 +227,21 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			$this->markTestSkipped( 'ZipArchive not available.' );
 		}
-		$manifest = $this->minimal_manifest( \AIOPageBuilder\Infrastructure\Config\Versions::export_schema() );
+		$manifest                        = $this->minimal_manifest( \AIOPageBuilder\Infrastructure\Config\Versions::export_schema() );
 		$manifest['included_categories'] = array( 'settings', 'styling' );
-		$global_settings = array( 'version' => '2', 'global_tokens' => array(), 'global_component_overrides' => array() );
-		$tmp = sys_get_temp_dir() . '/aio-styling-unsup-' . uniqid() . '.zip';
-		$zip = new \ZipArchive();
+		$global_settings                 = array(
+			'version'                    => '2',
+			'global_tokens'              => array(),
+			'global_component_overrides' => array(),
+		);
+		$tmp                             = sys_get_temp_dir() . '/aio-styling-unsup-' . uniqid() . '.zip';
+		$zip                             = new \ZipArchive();
 		$zip->open( $tmp, \ZipArchive::CREATE | \ZipArchive::OVERWRITE );
 		$zip->addFromString( 'manifest.json', wp_json_encode( $manifest ) );
 		$zip->addFromString( 'styling/global_settings.json', wp_json_encode( $global_settings ) );
 		$zip->close();
 		$validator = new Import_Validator( null, null, null, null, null );
-		$result = $validator->validate( $tmp );
+		$result    = $validator->validate( $tmp );
 		unlink( $tmp );
 		$this->assertFalse( $result->validation_passed() );
 		$failures = implode( ' ', $result->get_blocking_failures() );
@@ -196,14 +253,14 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 			$this->markTestSkipped( 'ZipArchive not available.' );
 		}
 		$manifest = $this->minimal_manifest( '1' );
-		$tmp = sys_get_temp_dir() . '/aio-prohibited-' . uniqid() . '.zip';
-		$zip = new \ZipArchive();
+		$tmp      = sys_get_temp_dir() . '/aio-prohibited-' . uniqid() . '.zip';
+		$zip      = new \ZipArchive();
 		$zip->open( $tmp, \ZipArchive::CREATE | \ZipArchive::OVERWRITE );
 		$zip->addFromString( 'manifest.json', wp_json_encode( $manifest ) );
 		$zip->addFromString( '../evil.txt', 'no' );
 		$zip->close();
 		$validator = new Import_Validator( null, null, null, null, null );
-		$result = $validator->validate( $tmp );
+		$result    = $validator->validate( $tmp );
 		unlink( $tmp );
 		$this->assertFalse( $result->validation_passed() );
 		$this->assertStringContainsString( 'Prohibited', implode( ' ', $result->get_blocking_failures() ) );
@@ -215,19 +272,19 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 	 */
 	private function minimal_manifest( string $schema_version = '1' ): array {
 		return array(
-			'export_type'            => 'full_operational_backup',
-			'export_timestamp'       => gmdate( 'Y-m-d\TH:i:s\Z' ),
-			'plugin_version'         => \AIOPageBuilder\Infrastructure\Config\Versions::plugin(),
-			'schema_version'         => $schema_version,
-			'source_site_url'        => 'https://example.com',
-			'included_categories'    => array( 'settings' ),
-			'excluded_categories'    => array(),
-			'package_checksum_list'  => array(),
-			'restore_notes'          => '',
-			'compatibility_flags'    => array(
-				'schema_version'          => $schema_version,
-				'same_major_required'     => true,
-				'migration_floor'         => $schema_version,
+			'export_type'           => 'full_operational_backup',
+			'export_timestamp'      => gmdate( 'Y-m-d\TH:i:s\Z' ),
+			'plugin_version'        => \AIOPageBuilder\Infrastructure\Config\Versions::plugin(),
+			'schema_version'        => $schema_version,
+			'source_site_url'       => 'https://example.com',
+			'included_categories'   => array( 'settings' ),
+			'excluded_categories'   => array(),
+			'package_checksum_list' => array(),
+			'restore_notes'         => '',
+			'compatibility_flags'   => array(
+				'schema_version'              => $schema_version,
+				'same_major_required'         => true,
+				'migration_floor'             => $schema_version,
 				'max_supported_export_schema' => $schema_version,
 			),
 		);
