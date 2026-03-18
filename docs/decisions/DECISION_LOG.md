@@ -45,3 +45,15 @@ For each decision:
   - SPR-007 satisfied by implementation once done; ledger/closeout can be updated.
   - Acceptance criteria: docs/operations/industry-bundle-apply-acceptance-criteria.md.
   - Full site backup/restore remains via Import / Export (ZIP).
+
+### 3. Import/Export ZIP Pre-Move Size Limit
+
+- **Date:** 2025-03-18
+- **Title:** Explicit plugin cap for Import/Export ZIP upload size
+- **Status:** Accepted
+- **Context:** Import/Export validate runs after move; no pre-move size check. Spec §43.11 requires file-upload workflows to validate file size; closeout listed pre-move ZIP size limit as optional hardening.
+- **Decision:** Enforce an explicit plugin maximum (50 MB) before move_uploaded_file() in the validate flow. Reject oversized uploads with a dedicated error message stating the limit. Satisfies §43.11 and aligns with tightly controlled ZIP import (§43.12).
+- **Consequences:**
+  - Implement pre-move check in Import_Export_Screen::handle_validate(); use a named constant for the limit.
+  - Acceptance criteria: docs/operations/import-export-zip-size-limit-acceptance-criteria.md.
+  - Industry bundle JSON remains under its own 10 MB limit.
