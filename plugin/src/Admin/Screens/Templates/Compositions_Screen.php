@@ -284,7 +284,8 @@ final class Compositions_Screen {
 	}
 
 	/**
-	 * @param array<string, mixed> $filter_state
+	 * @param string               $base_url     Base URL for form action.
+	 * @param array<string, mixed> $filter_state Current filter key/value state.
 	 */
 	private function render_builder_filters( string $base_url, array $filter_state ): void {
 		$purpose        = (string) ( $filter_state['purpose_family'] ?? '' );
@@ -325,7 +326,9 @@ final class Compositions_Screen {
 	}
 
 	/**
-	 * @param array<string, mixed> $filter_state
+	 * @param string               $base_url     Base URL for list links.
+	 * @param array<string, mixed> $filter_state Current filter state (preserved in query).
+	 * @param int                  $paged        Page number.
 	 */
 	private function builder_page_url( string $base_url, array $filter_state, int $paged ): string {
 		$params = array(

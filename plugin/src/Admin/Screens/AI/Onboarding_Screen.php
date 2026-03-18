@@ -337,7 +337,7 @@ final class Onboarding_Screen {
 	}
 
 	/**
-	 * @param array<string, mixed> $state
+	 * @param array<string, mixed> $state Onboarding state (steps, blockers, nonce, etc.).
 	 * @return void
 	 */
 	private function render_shell( array $state ): void {
@@ -446,8 +446,8 @@ final class Onboarding_Screen {
 	/**
 	 * Renders placeholder content for the current step. Full step forms are out of scope for this prompt.
 	 *
-	 * @param string               $current_step_key
-	 * @param array<string, mixed> $state
+	 * @param string               $current_step_key Current step identifier.
+	 * @param array<string, mixed> $state            Onboarding state (prefill, provider refs, etc.).
 	 * @return void
 	 */
 	private function render_step_placeholder( string $current_step_key, array $state ): void {

@@ -88,7 +88,7 @@ final class Form_Provider_Health_Screen {
 	}
 
 	/**
-	 * @param list<array{provider_key: string, status: string, message: string|null}> $rows
+	 * @param list<array{provider_key: string, status: string, message: string|null}> $rows Provider availability rows.
 	 * @return void
 	 */
 	private function render_provider_availability( array $rows ): void {
@@ -122,7 +122,7 @@ final class Form_Provider_Health_Screen {
 	}
 
 	/**
-	 * @param list<string> $ids
+	 * @param array<int, string> $ids Provider IDs to display.
 	 * @return void
 	 */
 	private function render_registered_providers( array $ids ): void {
@@ -135,7 +135,7 @@ final class Form_Provider_Health_Screen {
 	}
 
 	/**
-	 * @param array<string, mixed> $summary
+	 * @param array<string, mixed> $summary Summary counts (section_templates_with_forms_count, etc.).
 	 * @return void
 	 */
 	private function render_usage_counts( array $summary ): void {
@@ -161,7 +161,7 @@ final class Form_Provider_Health_Screen {
 	}
 
 	/**
-	 * @param list<array{domain: string, count: int, link_label: string}> $failures
+	 * @param list<array{domain: string, count: int, link_label: string}> $failures Failure items to display.
 	 * @return void
 	 */
 	private function render_recent_failures( array $failures ): void {
@@ -181,7 +181,7 @@ final class Form_Provider_Health_Screen {
 	}
 
 	/**
-	 * @param array<string, mixed> $summary
+	 * @param array<string, mixed> $summary Summary data for link context.
 	 * @return void
 	 */
 	private function render_links( array $summary ): void {

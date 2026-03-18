@@ -848,10 +848,10 @@ final class Build_Plan_Workspace_Screen {
 	/**
 	 * Adds url to approve and deny actions when enabled.
 	 *
-	 * @param array<int, array<string, mixed>> $actions
-	 * @param string                           $item_id
-	 * @param string                           $base_url
-	 * @param string                           $nonce
+	 * @param array<int, array<string, mixed>> $actions  Row actions to augment.
+	 * @param string                           $item_id  Item identifier for query params.
+	 * @param string                           $base_url Base URL for action links.
+	 * @param string                           $nonce    Nonce value for links.
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function add_urls_to_approve_deny( array $actions, string $item_id, string $base_url, string $nonce ): array {
