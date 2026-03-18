@@ -11,14 +11,26 @@ namespace AIOPageBuilder\Admin\Screens\Crawler;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
  * Renders page records for a single crawl run. No raw HTML bodies; structured summary only.
+ * Shown within Crawler_Sessions_Screen; same capability as sessions list (spec §44.3).
  */
 final class Crawler_Session_Detail_Screen {
 
-	private const CAPABILITY = 'manage_options';
+	/** Aligned with Crawler_Sessions_Screen for consistency. */
+	private const CAPABILITY = Capabilities::VIEW_SENSITIVE_DIAGNOSTICS;
+
+	/**
+	 * Capability required to view this screen (used when rendered via Crawler_Sessions_Screen).
+	 *
+	 * @return string
+	 */
+	public function get_capability(): string {
+		return self::CAPABILITY;
+	}
 
 	/** @var Service_Container|null */
 	private $container;

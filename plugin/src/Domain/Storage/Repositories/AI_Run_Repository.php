@@ -55,7 +55,13 @@ final class AI_Run_Repository extends Abstract_CPT_Repository {
 	 */
 	public function save_run_metadata( int $post_id, array $data ): bool {
 		$json = wp_json_encode( $data );
-		return $json !== false && \update_post_meta( $post_id, self::META_RUN_METADATA, $json ) !== false;
+		if ( $json === false || \update_post_meta( $post_id, self::META_RUN_METADATA, $json ) === false ) {
+			return false;
+		}
+		// * Indexed for privacy exporter/eraser (actor-linked queries).
+		$actor = isset( $data['actor'] ) ? (string) $data['actor'] : '';
+		\update_post_meta( $post_id, '_aio_run_actor', $actor );
+		return true;
 	}
 
 	/**
@@ -90,6 +96,42 @@ final class AI_Run_Repository extends Abstract_CPT_Repository {
 		$key  = self::META_ARTIFACT_PREFIX . $category;
 		$json = wp_json_encode( $payload );
 		return $json !== false && \update_post_meta( $post_id, $key, $json ) !== false;
+	}
+
+	/**
+	 * Lists runs for a given actor (user ID). For privacy exporter/eraser.
+	 *
+	 * @param int $user_id WordPress user ID (stored in run metadata as actor).
+	 * @param int $limit   Max items (default 50).
+	 * @param int $offset Offset for pagination.
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_recent_by_actor( int $user_id, int $limit = 50, int $offset = 0 ): array {
+		$limit  = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
+		$offset = $offset >= 0 ? $offset : 0;
+		$query  = new \WP_Query(
+			array(
+				'post_type'      => $this->get_post_type(),
+				'posts_per_page' => $limit,
+				'offset'         => $offset,
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+				'no_found_rows'  => true,
+				'meta_query'     => array(
+					array(
+						'key'   => '_aio_run_actor',
+						'value' => (string) $user_id,
+						'compare' => '=',
+					),
+				),
+			)
+		);
+		$out = array();
+		foreach ( $query->get_posts() as $post ) {
+			$meta = $this->get_meta( $post->ID );
+			$out[] = $this->post_to_record( $post, $meta );
+		}
+		return $out;
 	}
 
 	/**

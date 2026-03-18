@@ -457,12 +457,12 @@ final class Page_Template_Detail_Screen {
 			<?php
 			$subtype_influence = $industry_preview['subtype_influence'] ?? array();
 			if ( \is_array( $subtype_influence ) && ! empty( $subtype_influence['has_subtype'] ) ) :
-				$st_label = isset( $subtype_influence['subtype_label'] ) ? \esc_html( (string) $subtype_influence['subtype_label'] ) : '';
+				$st_label = isset( $subtype_influence['subtype_label'] ) ? (string) $subtype_influence['subtype_label'] : '';
 				$st_onepager = ! empty( $subtype_influence['onepager_refinement_applied'] );
 				$st_notes = isset( $subtype_influence['caution_notes'] ) && \is_array( $subtype_influence['caution_notes'] ) ? $subtype_influence['caution_notes'] : array();
 				?>
 				<div class="aio-industry-subtype-influence" aria-label="<?php \esc_attr_e( 'Subtype context', 'aio-page-builder' ); ?>">
-					<p class="aio-industry-subtype-label"><span class="aio-industry-label"><?php \esc_html_e( 'Subtype', 'aio-page-builder' ); ?>:</span> <?php echo $st_label; ?></p>
+					<p class="aio-industry-subtype-label"><span class="aio-industry-label"><?php \esc_html_e( 'Subtype', 'aio-page-builder' ); ?>:</span> <?php echo \esc_html( $st_label ); ?></p>
 					<?php if ( $st_onepager ) : ?>
 						<p class="aio-industry-subtype-refinement"><?php \esc_html_e( 'Subtype one-pager overlay applied for this template.', 'aio-page-builder' ); ?></p>
 					<?php endif; ?>
@@ -478,11 +478,11 @@ final class Page_Template_Detail_Screen {
 			<?php
 			$goal_influence = $industry_preview['goal_influence'] ?? array();
 			if ( \is_array( $goal_influence ) && ! empty( $goal_influence['has_goal'] ) ) :
-				$goal_label = isset( $goal_influence['goal_label'] ) ? \esc_html( (string) $goal_influence['goal_label'] ) : '';
+				$goal_label = isset( $goal_influence['goal_label'] ) ? (string) $goal_influence['goal_label'] : '';
 				$goal_notes = isset( $goal_influence['goal_caution_notes'] ) && \is_array( $goal_influence['goal_caution_notes'] ) ? $goal_influence['goal_caution_notes'] : array();
 				?>
 				<div class="aio-industry-goal-influence" aria-label="<?php \esc_attr_e( 'Conversion goal context', 'aio-page-builder' ); ?>">
-					<p class="aio-industry-goal-label"><span class="aio-industry-label"><?php \esc_html_e( 'Conversion goal', 'aio-page-builder' ); ?>:</span> <?php echo $goal_label; ?></p>
+					<p class="aio-industry-goal-label"><span class="aio-industry-label"><?php \esc_html_e( 'Conversion goal', 'aio-page-builder' ); ?>:</span> <?php echo \esc_html( $goal_label ); ?></p>
 					<?php if ( count( $goal_notes ) > 0 ) : ?>
 						<ul class="aio-industry-goal-notes">
 							<?php foreach ( $goal_notes as $note ) : ?>

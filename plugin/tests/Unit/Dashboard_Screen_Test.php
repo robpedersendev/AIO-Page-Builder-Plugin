@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Infrastructure/Config/Capabilities.php';
 require_once $plugin_root . '/src/Admin/Screens/Dashboard/Dashboard_Screen.php';
 
 final class Dashboard_Screen_Test extends TestCase {
@@ -27,9 +28,9 @@ final class Dashboard_Screen_Test extends TestCase {
 		$this->assertSame( 'aio-page-builder', Dashboard_Screen::SLUG );
 	}
 
-	public function test_dashboard_capability_is_manage_options(): void {
+	public function test_dashboard_capability_is_plugin_view_logs(): void {
 		$screen = new Dashboard_Screen();
-		$this->assertSame( 'manage_options', $screen->get_capability() );
+		$this->assertSame( \AIOPageBuilder\Infrastructure\Config\Capabilities::VIEW_LOGS, $screen->get_capability() );
 	}
 
 	public function test_dashboard_has_non_empty_title(): void {

@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Admin\Widgets\Industry_Status_Summary_Widget;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Admin\Dashboard\Dashboard_State_Builder;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
@@ -23,7 +24,8 @@ final class Dashboard_Screen {
 
 	public const SLUG = 'aio-page-builder';
 
-	private const CAPABILITY = 'manage_options';
+	/** Gated by plugin capability; aligned with Industry Author Dashboard (spec §44.3). */
+	private const CAPABILITY = Capabilities::VIEW_LOGS;
 
 	/** @var Service_Container|null */
 	private $container;
@@ -55,6 +57,7 @@ final class Dashboard_Screen {
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 		<?php
 		$this->render_welcome_or_resume( $state['welcome_state'] );
+		$this->render_reporting_disclosure_summary();
 		$this->render_quick_actions( $state['quick_actions'] );
 		$this->render_industry_summary_widget();
 		$this->render_readiness_cards( $state['readiness_cards'] );
@@ -84,6 +87,23 @@ final class Dashboard_Screen {
 		$plans   = $this->container && $this->container->has( 'build_plan_repository' ) ? $this->container->get( 'build_plan_repository' ) : null;
 		$queue   = $this->container && $this->container->has( 'job_queue_repository' ) ? $this->container->get( 'job_queue_repository' ) : null;
 		return new Dashboard_State_Builder( $settings, $crawl, $ai, $plans, $queue );
+	}
+
+	/**
+	 * Renders a short reporting disclosure summary and link to Privacy, Reporting & Settings (spec §46.11).
+	 *
+	 * @return void
+	 */
+	private function render_reporting_disclosure_summary(): void {
+		$privacy_url = \add_query_arg( array( 'page' => \AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen::SLUG ), \admin_url( 'admin.php' ) );
+		?>
+		<div class="aio-dashboard-reporting-summary notice notice-info inline" style="margin: 1em 0;">
+			<p>
+				<?php \esc_html_e( 'This plugin sends operational reports (installation, heartbeat, error summaries) to an approved destination. No secrets or personal data are included.', 'aio-page-builder' ); ?>
+				<a href="<?php echo \esc_url( $privacy_url ); ?>"><?php \esc_html_e( 'Privacy, Reporting & Settings', 'aio-page-builder' ); ?></a>
+			</p>
+		</div>
+		<?php
 	}
 
 	/**

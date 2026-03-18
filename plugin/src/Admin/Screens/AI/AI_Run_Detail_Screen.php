@@ -121,16 +121,16 @@ final class AI_Run_Detail_Screen {
 							if ( ! is_array( $a ) ) {
 								continue;
 							}
-							$p = isset( $a['provider_id'] ) ? \esc_html( (string) $a['provider_id'] ) : '';
-							$m = isset( $a['model_used'] ) ? \esc_html( (string) $a['model_used'] ) : '';
-							$c = isset( $a['category'] ) ? \esc_html( (string) $a['category'] ) : '';
-							$t = isset( $a['attempted_at'] ) ? \esc_html( (string) $a['attempted_at'] ) : '';
+							$p = isset( $a['provider_id'] ) ? (string) $a['provider_id'] : '';
+							$m = isset( $a['model_used'] ) ? (string) $a['model_used'] : '';
+							$c = isset( $a['category'] ) ? (string) $a['category'] : '';
+							$t = isset( $a['attempted_at'] ) ? (string) $a['attempted_at'] : '';
 							?>
 						<tr>
-							<td><code><?php echo $p; ?></code></td>
-							<td><?php echo $m; ?></td>
-							<td><?php echo $c; ?></td>
-							<td><?php echo $t; ?></td>
+							<td><code><?php echo \esc_html( $p ); ?></code></td>
+							<td><?php echo \esc_html( $m ); ?></td>
+							<td><?php echo \esc_html( $c ); ?></td>
+							<td><?php echo \esc_html( $t ); ?></td>
 						</tr>
 						<?php endforeach; ?>
 					</tbody>

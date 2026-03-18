@@ -857,7 +857,7 @@ final class Build_Plan_Workspace_Screen {
 			<form method="post" class="aio-bulk-form aio-bulk-make-all" style="display:inline">
 				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<input type="hidden" name="aio_build_plan_action" value="bulk_approve_step1" />
-				<button type="submit" class="button button-secondary" <?php echo $make_enabled ? '' : ' disabled="disabled"'; ?>>
+				<button type="submit" class="button button-secondary" <?php echo $make_enabled ? '' : ' disabled="disabled"'; /* Safe: fixed attribute value */ ?>>
 					<?php \esc_html_e( 'Make All Updates', 'aio-page-builder' ); ?>
 					<?php if ( $make_count > 0 ) : ?>
 						<span class="aio-bulk-count">(<?php echo (int) $make_count; ?>)</span>
@@ -1023,7 +1023,7 @@ final class Build_Plan_Workspace_Screen {
 		} else {
 			?>
 			<div class="aio-step-confirmation">
-				<p><?php \esc_html_e( 'Review approved and denied items; confirm or start execution. (Placeholder — actions in a later prompt.)', 'aio-page-builder' ); ?></p>
+				<p><?php \esc_html_e( 'Review approved and denied items. Execution is started from the plan run/queue flow, not from this step.', 'aio-page-builder' ); ?></p>
 			</div>
 			<?php
 		}

@@ -66,11 +66,11 @@ final class Prompt_Experiments_Screen {
 					<?php foreach ( $definitions as $def ) : ?>
 						<?php
 						$exp_id = isset( $def['id'] ) ? \sanitize_text_field( (string) $def['id'] ) : '';
-						$name   = isset( $def['name'] ) ? \esc_html( (string) $def['name'] ) : '';
+						$name   = isset( $def['name'] ) ? (string) $def['name'] : '';
 						$summary = $service ? $service->get_comparison_summary( $exp_id ) : array( 'experiment_id' => $exp_id, 'variants' => array() );
 						?>
 						<div class="aio-experiment-card" style="margin-bottom: 1.5rem; padding: 1rem; border: 1px solid #ccc; border-radius: 4px;">
-							<h3><?php echo $name; ?> <code><?php echo \esc_html( $exp_id ); ?></code></h3>
+							<h3><?php echo \esc_html( $name ); ?> <code><?php echo \esc_html( $exp_id ); ?></code></h3>
 							<?php if ( ! empty( $summary['variants'] ) ) : ?>
 								<table class="widefat striped" style="max-width: 600px;">
 									<thead>
@@ -135,7 +135,7 @@ final class Prompt_Experiments_Screen {
 		$nonce = \wp_nonce_field( 'aio_save_experiment', 'aio_experiment_nonce', true, false );
 		?>
 		<form method="post" action="">
-			<?php echo $nonce; ?>
+			<?php echo $nonce; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nonce field HTML from wp_nonce_field(). ?>
 			<table class="form-table">
 				<tr>
 					<th scope="row"><label for="aio_exp_name"><?php \esc_html_e( 'Name', 'aio-page-builder' ); ?></label></th>

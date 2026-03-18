@@ -95,6 +95,7 @@ final class Execution_Action_Contract {
 	public const ERROR_EXECUTION_FAILED     = 'execution_failed';
 	public const ERROR_CONFLICT              = 'conflict';
 	public const ERROR_ROLLBACK_NOT_ELIGIBLE = 'rollback_not_eligible';
+	public const ERROR_ACTION_NOT_AVAILABLE  = 'action_not_available';
 
 	/**
 	 * Validates that the envelope has all required top-level keys and a valid action type.

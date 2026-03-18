@@ -37,7 +37,7 @@ if ( $status === 'recommended' ) {
 	$label = __( 'Neutral', 'aio-page-builder' );
 }
 
-$class = 'aio-industry-badge aio-industry-badge--' . \esc_attr( \sanitize_html_class( $status ) );
-$title = $snippet !== '' ? \esc_attr( $snippet ) : \esc_attr( $label );
+$class = 'aio-industry-badge aio-industry-badge--' . \sanitize_html_class( $status );
+$title = $snippet !== '' ? $snippet : $label;
 ?>
-<span class="<?php echo $class; ?>" title="<?php echo $title; ?>" aria-label="<?php echo \esc_attr( $label ); ?>"><?php echo \esc_html( $label ); ?></span>
+<span class="<?php echo \esc_attr( $class ); ?>" title="<?php echo \esc_attr( $title ); ?>" aria-label="<?php echo \esc_attr( $label ); ?>"><?php echo \esc_html( $label ); ?></span>

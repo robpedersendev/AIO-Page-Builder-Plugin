@@ -11,7 +11,7 @@
 - **Toggle industry pack:** `Admin_Menu::handle_toggle_industry_pack()`; `Industry_Pack_Toggle_Controller`; nonce/capability in Admin_Menu.
 - **Industry style preset apply:** `Admin_Menu::handle_apply_industry_style_preset()`.
 - **Guided repair actions:** `Industry_Guided_Repair_Screen` (migrate, apply_ref, activate nonces).
-- **Bundle import confirm:** `Industry_Bundle_Import_Preview_Screen` (nonce on confirm).
+- **Bundle preview:** `Industry_Bundle_Import_Preview_Screen` (preview only; apply not implemented; nonce on preview upload).
 - **Override remove:** `Remove_Industry_Override_Action` (nonce; capability per target type in Override Management).
 - **Screen capability:** All Industry screens checked use `get_capability()` and `current_user_can()` before render.
 

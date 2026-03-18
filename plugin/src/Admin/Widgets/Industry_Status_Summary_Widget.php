@@ -22,12 +22,22 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Schema;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
  * Renders a compact industry summary card. Safe when no industry configured; no secrets or raw internals.
  */
 final class Industry_Status_Summary_Widget {
+
+	/**
+	 * Capability required to view this widget (aligned with dashboard/settings surface).
+	 *
+	 * @return string
+	 */
+	public static function get_required_capability(): string {
+		return Capabilities::VIEW_LOGS;
+	}
 
 	/**
 	 * Builds view model for the widget. Safe when dependencies are null.
@@ -184,7 +194,7 @@ final class Industry_Status_Summary_Widget {
 	 * @return void
 	 */
 	public static function render( Service_Container $container ): void {
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( self::get_required_capability() ) ) {
 			return;
 		}
 		$vm = self::build_view_model( $container );

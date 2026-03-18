@@ -72,7 +72,7 @@ These are likely failure points or high-impact seams. Audit prompts should verif
 | Industry_Drift_Report_Screen | Read-only; severity grouping. |
 | Industry_Maturity_Delta_Report_Screen | No baseline fallback; readable. |
 | Industry_Guided_Repair_Screen | Action types bounded; no auto-apply without confirmation. |
-| Industry_Bundle_Import_Preview_Screen | Conflict detection; no import without user confirm. |
+| Industry_Bundle_Import_Preview_Screen | Conflict detection; preview only (apply not implemented); users directed to Import / Export for full restore. |
 
 ---
 

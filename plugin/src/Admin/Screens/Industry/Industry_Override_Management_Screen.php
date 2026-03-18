@@ -129,7 +129,7 @@ final class Industry_Override_Management_Screen {
 								<td><?php echo \esc_html( $this->format_target_type( $row['target_type'] ?? '' ) ); ?></td>
 								<td>
 									<?php echo \esc_html( $row['target_key'] ?? '' ); ?>
-									<?php echo $this->render_artifact_link( $row ); ?>
+									<?php echo $this->render_artifact_link( $row ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Link built with esc_url/esc_html in render_artifact_link. ?>
 								</td>
 								<td><?php echo $row['plan_id'] !== null && $row['plan_id'] !== '' ? \esc_html( $row['plan_id'] ) : '—'; ?></td>
 								<td><?php echo \esc_html( $row['state'] ?? '' ); ?></td>
@@ -254,7 +254,7 @@ final class Industry_Override_Management_Screen {
 		?>
 		<form method="post" action="<?php echo \esc_url( $action_url ); ?>" style="display:inline;">
 			<input type="hidden" name="action" value="aio_remove_industry_override" />
-			<?php echo $nonce; ?>
+			<?php echo $nonce; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nonce field HTML from wp_nonce_field(). ?>
 			<input type="hidden" name="target_type" value="<?php echo \esc_attr( $target_type ); ?>" />
 			<input type="hidden" name="target_key" value="<?php echo \esc_attr( (string) $target_key ); ?>" />
 			<?php if ( $plan_id !== null && $plan_id !== '' ) : ?>

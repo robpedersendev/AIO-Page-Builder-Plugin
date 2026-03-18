@@ -223,6 +223,70 @@ if ( ! function_exists( 'dbDelta' ) ) {
 if ( ! defined( 'OBJECT' ) ) {
 	define( 'OBJECT', 'OBJECT' );
 }
+// * Stubs for privacy exporter/eraser tests (Tools → Export/Erase Personal Data). Control via $GLOBALS['_aio_get_user_by_return'].
+if ( ! class_exists( 'WP_User' ) ) {
+	class WP_User {
+		public $ID;
+		public $user_email;
+		public function __construct( $id = 0, $email = '' ) {
+			$this->ID = $id;
+			$this->user_email = $email;
+		}
+	}
+}
+if ( ! function_exists( 'get_user_by' ) ) {
+	function get_user_by( $field, $value ) {
+		return isset( $GLOBALS['_aio_get_user_by_return'] ) ? $GLOBALS['_aio_get_user_by_return'] : null;
+	}
+}
+if ( ! function_exists( 'get_user_meta' ) ) {
+	function get_user_meta( $user_id, $key = '', $single = false ) {
+		$store = $GLOBALS['_aio_user_meta'] ?? array();
+		$id    = (string) $user_id;
+		if ( $key === '' ) {
+			return isset( $store[ $id ] ) ? $store[ $id ] : array();
+		}
+		$val = isset( $store[ $id ][ $key ] ) ? $store[ $id ][ $key ] : '';
+		return $single ? $val : array( $val );
+	}
+}
+if ( ! function_exists( 'update_user_meta' ) ) {
+	function update_user_meta( $user_id, $meta_key, $meta_value ) {
+		$id = (string) $user_id;
+		if ( ! isset( $GLOBALS['_aio_user_meta'][ $id ] ) ) {
+			$GLOBALS['_aio_user_meta'][ $id ] = array();
+		}
+		$GLOBALS['_aio_user_meta'][ $id ][ $meta_key ] = $meta_value;
+		return true;
+	}
+}
+if ( ! function_exists( 'delete_user_meta' ) ) {
+	function delete_user_meta( $user_id, $meta_key ) {
+		$id = (string) $user_id;
+		if ( isset( $GLOBALS['_aio_user_meta'][ $id ][ $meta_key ] ) ) {
+			unset( $GLOBALS['_aio_user_meta'][ $id ][ $meta_key ] );
+		}
+		return true;
+	}
+}
+if ( ! function_exists( 'get_transient' ) ) {
+	function get_transient( $key ) {
+		return isset( $GLOBALS['_aio_transients'][ $key ] ) ? $GLOBALS['_aio_transients'][ $key ] : false;
+	}
+}
+if ( ! function_exists( 'delete_transient' ) ) {
+	function delete_transient( $key ) {
+		if ( isset( $GLOBALS['_aio_transients'][ $key ] ) ) {
+			unset( $GLOBALS['_aio_transients'][ $key ] );
+		}
+		return true;
+	}
+}
+if ( ! function_exists( 'add_filter' ) ) {
+	function add_filter( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
+		// No-op for unit tests; privacy filters registered in WP context.
+	}
+}
 if ( ! class_exists( 'WP_Post' ) ) {
 	class WP_Post {
 		public $ID;

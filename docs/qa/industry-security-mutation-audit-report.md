@@ -12,7 +12,7 @@
 - **Style preset apply:** Admin_Menu (aio_apply_industry_style_preset): wp_verify_nonce(..., 'aio_apply_industry_style_preset').
 - **Override save/remove:** Save_Industry_Section_Override_Action, Save_Industry_Page_Template_Override_Action, Save_Industry_Build_Plan_Override_Action: wp_verify_nonce(..., self::NONCE_ACTION); current_user_can(Capabilities::MANAGE_SECTION_TEMPLATES | MANAGE_PAGE_TEMPLATES | APPROVE_BUILD_PLANS) as appropriate. Remove_Industry_Override_Action: nonce + capability check per target_type (section/page_template/build_plan_item).
 - **Guided repair:** Admin_Menu: aio_guided_repair_migrate_nonce, aio_guided_repair_apply_ref_nonce, aio_guided_repair_activate_nonce — each wp_verify_nonce with screen NONCE_ACTION_*; handlers perform repair actions after check.
-- **Bundle preview/import:** aio_industry_bundle_preview_nonce (POST); aio_industry_bundle_confirm_import (_wpnonce GET). Import confirmation and execution gated.
+- **Bundle preview:** aio_industry_bundle_preview_nonce (POST). Preview only; apply not implemented; no confirm-import action.
 - **Export/restore:** Import_Export_Screen: NONCE_CREATE_EXPORT, NONCE_VALIDATE, NONCE_RESTORE, NONCE_DOWNLOAD — wp_verify_nonce on each. Restore validates payload and schema version; no silent overwrite. Admin-only screen.
 - **Build Plan approval/deny:** Build_Plan_Workspace_Screen: NONCE_ACTION_STEP1_REVIEW, STEP2_REVIEW, NAVIGATION_REVIEW, ROLLBACK — wp_verify_nonce before approve_item/deny_item/rollback. Capability implied by menu/screen access.
 - **Create plan from starter bundle:** Create_Plan_From_Starter_Bundle_Action: nonce check (NONCE_ACTION).
@@ -25,7 +25,7 @@
 
 | Area | Result | Notes |
 |------|--------|--------|
-| **Nonce on state-changing actions** | Verified | Profile save, pack toggle, style preset, override save/remove, guided repair (migrate/apply_ref/activate), bundle preview/confirm import, export/restore/download, Build Plan approve/deny/rollback, create plan from bundle — all use wp_verify_nonce with named action. |
+| **Nonce on state-changing actions** | Verified | Profile save, pack toggle, style preset, override save/remove, guided repair (migrate/apply_ref/activate), bundle preview, export/restore/download, Build Plan approve/deny/rollback, create plan from bundle — all use wp_verify_nonce with named action. |
 | **Capability on state-changing actions** | Verified | Override actions check MANAGE_SECTION_TEMPLATES, MANAGE_PAGE_TEMPLATES, APPROVE_BUILD_PLANS. Screens check get_capability() (VIEW_LOGS or equivalent). Menu registration restricts industry pages to capable users. |
 | **No hidden mutation in preview/comparison/simulation** | Verified | Preview resolvers and What-If simulation return computed data; no write to profile, overrides, or build plan. Guided repair and bundle import are explicit actions with nonce. |
 | **Export/restore security** | Verified | Export/restore/download behind nonce; restore validates schema version and payload; admin-only. No public export/restore endpoints. |

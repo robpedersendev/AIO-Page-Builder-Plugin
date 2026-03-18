@@ -11,6 +11,8 @@ namespace AIOPageBuilder\Admin\Screens;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
+
 /**
  * Placeholder Dashboard screen. Renders title and not-yet-implemented notice.
  */
@@ -18,8 +20,8 @@ final class Dashboard_Screen {
 
 	public const SLUG = 'aio-page-builder';
 
-	/** Placeholder until capability mapping is finalized. */
-	private const CAPABILITY = 'manage_options';
+	/** Gated by plugin capability; aligned with Industry Author Dashboard (spec §44.3). */
+	private const CAPABILITY = Capabilities::VIEW_LOGS;
 
 	public function get_title(): string {
 		return __( 'Dashboard', 'aio-page-builder' );

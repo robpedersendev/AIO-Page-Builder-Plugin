@@ -1,9 +1,11 @@
 <?php
 /**
- * Stub execution handler for action types not yet implemented (Prompt 079).
+ * Stub execution handler for action types without a registered handler (Prompt 079).
  *
- * Returns a structured "not implemented" result so the executor can complete the flow
- * without concrete mutation logic.
+ * Used by Execution_Dispatcher::get_handler() when no handler is registered for an action type.
+ * Single_Action_Executor gates unregistered types via has_handler() and returns refused before
+ * dispatch, so this stub is only reached if dispatch is invoked without that check (e.g. tests or recovery).
+ * Returns a structured unavailable result so callers get a consistent, user-safe message.
  *
  * @package AIOPageBuilder
  */
@@ -15,7 +17,7 @@ namespace AIOPageBuilder\Domain\Execution\Executor;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * No-op handler that reports success=false and message "Not implemented".
+ * Handler fallback that reports success=false with a clear unavailability message.
  */
 final class Stub_Execution_Handler implements Execution_Handler_Interface {
 
@@ -27,7 +29,7 @@ final class Stub_Execution_Handler implements Execution_Handler_Interface {
 	}
 
 	/**
-	 * Returns not-implemented result shape.
+	 * Returns action-not-available result shape.
 	 *
 	 * @param array<string, mixed> $envelope
 	 * @return array<string, mixed>
@@ -35,7 +37,7 @@ final class Stub_Execution_Handler implements Execution_Handler_Interface {
 	public function execute( array $envelope ): array {
 		return array(
 			'success'  => false,
-			'message'  => $this->action_type !== '' ? sprintf( __( 'Action type "%s" is not yet implemented.', 'aio-page-builder' ), $this->action_type ) : __( 'Action not yet implemented.', 'aio-page-builder' ),
+			'message'  => __( 'This action type is not available in this version.', 'aio-page-builder' ),
 			'artifacts' => array(),
 		);
 	}

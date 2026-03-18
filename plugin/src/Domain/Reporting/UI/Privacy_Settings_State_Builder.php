@@ -177,13 +177,14 @@ final class Privacy_Settings_State_Builder {
 	}
 
 	/**
-	 * Suggested privacy-policy helper text (spec §47.11).
+	 * Suggested privacy-policy helper text (spec §47.11, SPR-004).
+	 * Aligns with WordPress Tools → Export Personal Data / Erase Personal Data for actor-linked data.
 	 *
 	 * @return string
 	 */
 	private function build_privacy_helper_text(): string {
 		return __(
-			'The AIO Page Builder plugin stores configuration, profile data, crawl summaries, Build Plan records, and operational logs. It may send operational reports (installation, heartbeat, error summaries) to an approved destination. AI planning requests and related data may be sent to configured AI providers. Stored data and reporting are admin-facing; retention follows the product’s policy. Administrators can export settings and use the uninstall flow to remove plugin data; built page content may be preserved.',
+			'The AIO Page Builder plugin stores configuration, profile data, crawl summaries, Build Plan records, and operational logs. It may send operational reports (installation, heartbeat, error summaries) to an approved destination. AI planning requests and related data may be sent to configured AI providers. Stored data and reporting are admin-facing; retention follows the product’s policy. The plugin registers with WordPress Tools → Export Personal Data and Erase Personal Data for actor-linked data: AI run metadata, job queue records, template compare lists, and bundle preview cache. Export produces a copy; erase redacts the actor link while keeping records for audit. Administrators can also export settings and use the uninstall flow to remove plugin data; built page content may be preserved.',
 			'aio-page-builder'
 		);
 	}

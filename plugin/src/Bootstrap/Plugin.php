@@ -159,7 +159,10 @@ require_once $bootstrap_dir . '/../Admin/Forms/Global_Component_Override_Form_Bu
 require_once $bootstrap_dir . '/../Admin/Screens/Settings/Global_Style_Token_Settings_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Settings/Global_Component_Override_Settings_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Screens/Settings/Privacy_Reporting_Settings_Screen.php';
+require_once $bootstrap_dir . '/../Admin/Screens/Templates/Template_Compare_Screen.php';
 require_once $bootstrap_dir . '/../Admin/Admin_Menu.php';
+require_once $bootstrap_dir . '/../Infrastructure/Privacy/Personal_Data_Exporter.php';
+require_once $bootstrap_dir . '/../Infrastructure/Privacy/Personal_Data_Eraser.php';
 
 /**
  * Plugin bootstrap. Activation, deactivation, and run() are the only public entrypoints.
@@ -223,9 +226,43 @@ final class Plugin {
 		$registrar = new Module_Registrar( $container );
 		$registrar->register_bootstrap();
 		$this->container = $registrar->container();
+		add_filter( 'wp_privacy_personal_data_exporters', array( self::class, 'register_personal_data_exporter' ), 10, 1 );
+		add_filter( 'wp_privacy_personal_data_erasers', array( self::class, 'register_personal_data_eraser' ), 10, 1 );
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'register_admin_menu' ), 10 );
 		}
+	}
+
+	/**
+	 * Registers the plugin personal data exporter (Tools → Export Personal Data). SPR-004.
+	 *
+	 * @param array<int, array{exporter_friendly_name: string, callback: callable}> $exporters
+	 * @return array<int, array{exporter_friendly_name: string, callback: callable}>
+	 */
+	public static function register_personal_data_exporter( array $exporters ): array {
+		$exporters['aio-page-builder'] = array(
+			'exporter_friendly_name' => __( 'AIO Page Builder', 'aio-page-builder' ),
+			'callback'               => function ( string $email_address, int $page = 1 ): array {
+				return \AIOPageBuilder\Infrastructure\Privacy\Personal_Data_Exporter::export( $email_address, $page );
+			},
+		);
+		return $exporters;
+	}
+
+	/**
+	 * Registers the plugin personal data eraser (Tools → Erase Personal Data). SPR-004.
+	 *
+	 * @param array<int, array{eraser_friendly_name: string, callback: callable}> $erasers
+	 * @return array<int, array{eraser_friendly_name: string, callback: callable}>
+	 */
+	public static function register_personal_data_eraser( array $erasers ): array {
+		$erasers['aio-page-builder'] = array(
+			'eraser_friendly_name' => __( 'AIO Page Builder', 'aio-page-builder' ),
+			'callback'             => function ( string $email_address, int $page = 1 ): array {
+				return \AIOPageBuilder\Infrastructure\Privacy\Personal_Data_Eraser::erase( $email_address, $page );
+			},
+		);
+		return $erasers;
 	}
 
 	/**

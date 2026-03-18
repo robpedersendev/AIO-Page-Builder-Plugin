@@ -1,0 +1,111 @@
+# Security, Privacy, and Completeness Remediation Ledger
+
+**Source:** [security-privacy-completeness-audit.md](../qa/security-privacy-completeness-audit.md).  
+**Purpose:** Deterministic remediation plan for security, privacy, role-scope, and completeness findings. Use for follow-on fix prompts; do not implement outside authorized remediation prompts.  
+**Spec authority:** [aio-page-builder-master-spec.md](../specs/aio-page-builder-master-spec.md).  
+**Finding ID format:** `SPR-NNN` (Security-Privacy-Remediation).
+
+---
+
+## 1. Priority tiers
+
+| Tier | Scope | Execution order |
+|------|--------|------------------|
+| **P0** | Security/compliance | First |
+| **P1** | Permissions, privacy, data handling | Second |
+| **P2** | Completeness, placeholders, legacy cleanup | Third |
+
+---
+
+## 2. P0 — Security / compliance
+
+| ID | Severity | Affected files / classes | Required remediation | Spec / contracts | Fix type | Acceptance criteria |
+|----|----------|---------------------------|------------------------|-------------------|----------|---------------------|
+| **SPR-001** | Medium | `plugin/src/Admin/Admin_Menu.php` — `handle_industry_bundle_preview()` | Add a maximum file size limit (e.g. 5–10 MB) before reading upload; optionally validate MIME or extension for JSON. Do not weaken nonce/capability checks. | Security-and-Privacy.mdc; master spec (sanitization, safe request handling). | Code | Size limit enforced; oversized upload rejected with clear message; optional MIME/extension check documented or implemented. **Implemented 2025-03-16.** |
+| **SPR-002** | Low | `plugin/src/Admin/Screens/AI/Prompt_Experiments_Screen.php` | Output escaping: experiment name already fixed to `esc_html( $name )` at echo. No further code change; ledger entry for traceability. | Master spec (output escaping). | — | Already addressed; verify no regressions. |
+
+---
+
+## 3. P1 — Permissions / privacy / data handling
+
+| ID | Severity | Affected files / classes | Required remediation | Spec / contracts | Fix type | Acceptance criteria |
+|----|----------|---------------------------|------------------------|-------------------|----------|---------------------|
+| **SPR-003** | Medium | Crawler_Comparison_Screen, Crawler_Sessions_Screen, Crawler_Session_Detail_Screen, Onboarding_Screen, Settings_Screen, Diagnostics_Screen, Dashboard_Screen (root), Dashboard_Screen (Dashboard provider), Industry_Status_Summary_Widget | Replace `manage_options` with the appropriate plugin capability (e.g. VIEW_LOGS, MANAGE_SETTINGS, RUN_ONBOARDING per screen) **or** document in code/spec why admin-only (`manage_options`) is required. Align Industry_Status_Summary_Widget with the same capability used for the dashboard/settings surface. | Master spec (capability-based access, permissions); Capability_Registrar; Infrastructure\Config\Capabilities. | Code or decision log | All listed screens/widget either use a plugin capability from Capabilities or have an explicit decision-log/spec note justifying `manage_options`. **Implemented 2025-03-16.** |
+| **SPR-004** | Low | Plugin-wide | If the plugin stores **personal data** as defined by applicable law or WordPress privacy API: register `wp_privacy_*` exporter and eraser. If spec explicitly states no personal data is stored, add a short doc note or decision-log entry confirming that and close. | Master spec (privacy-aware data handling; exporter/eraser where appropriate); Private-Distribution-Reporting.mdc. | Decision log then code or docs | Decision recorded: either (a) exporter/eraser registered and tested, or (b) “no personal data stored” documented with rationale. **May require spec clarification.** |
+
+---
+
+## 4. P2 — Completeness / placeholders / legacy cleanup
+
+| ID | Severity | Affected files / classes | Required remediation | Spec / contracts | Fix type | Acceptance criteria |
+|----|----------|---------------------------|------------------------|-------------------|----------|---------------------|
+| **SPR-005** | Low | `plugin/src/Admin/Screens/Settings_Screen.php` | Leave as placeholder **or** implement per spec. Do not invent features beyond spec. If keeping placeholder, ensure capability and any links are correct. | Master spec (settings, reporting disclosure). | Code or docs | Implemented: real intro (version, reporting disclosure link to Privacy, Reporting & Settings), seed actions retained; no placeholder copy. |
+| **SPR-006** | Low | `plugin/src/Admin/Screens/Dashboard_Screen.php` (root) | Same as SPR-005: leave as placeholder or implement per spec. Do not invent features. | Master spec (dashboard, first-run guidance). | Code or docs | Implemented: first-run/welcome, dependency summary (readiness cards), reporting disclosure summary + link, quick actions (onboarding, diagnostics, crawl, AI runs, build plans, queue & logs, providers, import/export); Diagnostics screen real (environment/dependency table). |
+| **SPR-007** | Low | `Industry_Bundle_Import_Preview_Screen`, `Admin_Menu` | Current behavior: clears preview transient only; “apply” not implemented. Either implement apply per export/restore/industry spec **or** document as deferred and ensure UI message is accurate. | Export/restore docs; industry bundle contract. | Code or docs | Deferred apply; UI honest (preview only, link to Import/Export). **Implemented 2025-03-16.** |
+| **SPR-008** | Informational | `plugin/src/Domain/Execution/Executor/Stub_Execution_Handler.php` | Document that stub is intentional for unregistered action types; gate at executor so user flows never hit stub. | Execution/build plan spec. | Code + docs | **Implemented 2025-03-16.** Single_Action_Executor checks `has_handler()` before dispatch and returns refused with ERROR_ACTION_NOT_AVAILABLE; stub message aligned to "This action type is not available in this version."; no production UI suggests executable workflows that only return stub. |
+| **SPR-009** | Informational | `plugin/src/Domain/BuildPlan/Steps/Tokens/Tokens_Step_UI_Service.php` | Shell-only UI per spec; make copy explicit that token application is not available. | Master spec (design tokens step). | Code or docs | **Implemented 2025-03-16.** Revert/history section text set to "Token application is not available in this version. Recommendations are for review only." |
+| **SPR-010** | Informational | `plugin/src/Domain/Storage/Profile/Profile_Snapshot_Data.php`, `Additional_AI_Provider_Driver` cost_placeholder | Placeholder/schema-only artifacts. No remediation unless spec defines persistence or cost handling. | Profile snapshot schema; AI provider contract. | Docs or none | **Implemented 2025-03-16.** Profile_Snapshot_Data docblock clarified: schema/type only; no persistence or UI execution. |
+| **SPR-011** | Low | PrivatePluginBase namespace (Bootstrap, Activation, Deactivation, Options, Security/Capabilities, Rest/NamespaceController, Admin/Menu, Admin/Settings/Page, Settings/Registrar, Reporting/Service, Diagnostics/Logger) | Isolate legacy code so it is not mistaken for active runtime. Main entry is `AIOPageBuilder\Bootstrap\Plugin` (aio-page-builder.php). | Master spec (single entry point, bootstrap). | Code + docs | **Implemented 2025-03-16.** Legacy code quarantined in `plugin/legacy/` with LEGACY headers and `legacy/README.md`. Active plugin does not load any file from legacy/. BootstrapTest loads from legacy/ only. Remove originals from `src/` if still present (Bootstrap.php, Activation.php, Deactivation.php, Options.php, Security/Capabilities.php, Rest/NamespaceController.php, Admin/Menu.php, Admin/Settings/Page.php, Settings/Registrar.php, Reporting/Service.php, Diagnostics/Logger.php). |
+
+---
+
+## 5. Recommended execution order
+
+1. **SPR-001** — Bundle upload size (and optional MIME) limit.  
+2. **SPR-002** — Verify Prompt_Experiments_Screen escaping (no code change if already done).  
+3. **SPR-003** — Capability alignment (manage_options → plugin caps or documented exception).  
+4. **SPR-004** — Privacy decision: register exporter/eraser or document “no personal data.”  
+5. **SPR-011** — PrivatePluginBase legacy cleanup or isolation.  
+6. **SPR-005, SPR-006** — Settings/Dashboard placeholder: implement or document deferred.  
+7. **SPR-007** — Bundle confirm import: deferred; UI gated (preview only, link to Import/Export).  
+8. **SPR-008, SPR-009, SPR-010** — Informational; docs only if needed.
+
+---
+
+## 6. Spec / decision-log notes
+
+- **SPR-004:** May require spec or decision-log clarification on whether the plugin stores “personal data” and thus register exporter/eraser. Implemented: actor-linked data (AI runs, job queue, compare lists, bundle preview) via Tools → Export/Erase Personal Data; site-level options, reporting log, industry audit trail, diagnostics not keyed by user—out of scope.  
+- **SPR-005, SPR-006, SPR-007:** Remediation must not add features beyond the master spec; defer or document if spec does not define the behavior.  
+- **SPR-003:** If keeping `manage_options` by design, add a decision-log entry or spec note so future work does not treat it as an oversight.
+
+---
+
+## 7. Changelog
+
+- **2025-03-16 — Regression and audit close:** Re-checked nonce coverage (all state-changing admin_post and forms verified), capability checks (screens and handlers use plugin caps), upload/import validation (bundle hardened; Import/Export nonce/cap/.zip), output escaping (remediated hotspots), privacy exporter/eraser (registered and tested), stub/placeholder reachability (executor gate; UI copy), legacy/REST (quarantined; not loaded). Added Stub_Execution_Handler_Test for stub result shape and message. Added §8 Remediation status (Fixed / Intentionally deferred per ID) and [security-privacy-audit-close-report.md](../qa/security-privacy-audit-close-report.md) with evidence and remaining gaps (optional Import/Export size limit; SPR-007 deferred per spec).
+- **2025-03-16 — SPR-011 (PrivatePluginBase legacy containment):** Quarantined all PrivatePluginBase code into `plugin/legacy/`. Created `plugin/legacy/README.md` documenting single entry (aio-page-builder.php → AIOPageBuilder\Bootstrap\Plugin), activation/deactivation via Lifecycle_Manager, and that no legacy file is loaded in production. Each legacy file has a leading LEGACY comment and reference to legacy/README.md. BootstrapTest updated to load legacy classes explicitly from `plugin/legacy/` and to use namespace AIOPageBuilder\Tests; test documents that it exercises quarantined code only. Remove original files from `src/` (Bootstrap.php, Activation.php, Deactivation.php, Options.php, Security/Capabilities.php, Rest/NamespaceController.php, Admin/Menu.php, Admin/Settings/Page.php, Settings/Registrar.php, Reporting/Service.php, Diagnostics/Logger.php) if still present.
+- **2025-03-16 — Stub/placeholder safety (SPR-008, SPR-009, SPR-010, workspace copy):** Single_Action_Executor gates unregistered action types via `has_handler()` and returns refused with ERROR_ACTION_NOT_AVAILABLE and message "This action type is not available in this version." so user-triggered execution never reaches Stub_Execution_Handler. Execution_Action_Contract gained ERROR_ACTION_NOT_AVAILABLE. Stub_Execution_Handler docblock and message updated for consistency. Tokens_Step_UI_Service: Revert/history copy set to "Token application is not available in this version. Recommendations are for review only." Build_Plan_Workspace_Screen: confirmation step copy set to "Review approved and denied items. Execution is started from the plan run/queue flow, not from this step." Profile_Snapshot_Data docblock clarified (schema/type only; no persistence or UI execution). Single_Action_Executor_Test: added test_unregistered_action_type_returns_refused; example_result_payload and test_execution_result_to_array_has_required_shape updated for refused shape; test_snapshot_required_proceeds_when_preflight_returns_null_fail_safely now registers a failing handler so flow still tests fail-safely path.
+- **2025-03-16 — SPR-005, SPR-006 (Dashboard and Settings minimal viable):** Dashboard: added reporting disclosure summary block with link to Privacy, Reporting & Settings; added Diagnostics quick action (VIEW_SENSITIVE_DIAGNOSTICS). Settings: removed placeholder notice; added intro with plugin version and reporting disclosure link to Privacy, Reporting & Settings; seed sections unchanged. Diagnostics_Screen: replaced placeholder with real Environment_Validator results table (category, severity, code, message, blocking). Dashboard_Screen_Test updated to assert VIEW_LOGS capability.
+- **2025-03-16 — SPR-007 (bundle confirm import):** Deferred apply per spec; no misleading confirm step. Removed `handle_industry_bundle_confirm_import` and admin_post action. Industry_Bundle_Import_Preview_Screen: description and preview notice state that applying bundle content is not yet supported and direct users to Import / Export for full backup restore. Replaced "Confirm import" button with "Clear preview" and "Import / Export (full restore)" link. Removed confirm_message from state.
+- **2025-03-16 — SPR-004 (privacy exporter/eraser):** Registered `wp_privacy_personal_data_exporters` and `wp_privacy_personal_data_erasers` in `Plugin::run()`. Added `Infrastructure/Privacy/Personal_Data_Exporter.php` (exports AI runs, job queue rows, template compare user meta, bundle preview transient note) and `Personal_Data_Eraser.php` (deletes user meta and transient; redacts actor on AI runs and job queue while keeping records for audit). Privacy helper text in `Privacy_Settings_State_Builder` updated to describe Export/Erase registration and redaction behavior. Template_Compare_Screen required in bootstrap so exporter/eraser can resolve compare meta keys when run outside admin_menu.
+- **2025-03-16 — SPR-003 (capability normalization):** Replaced `manage_options` with plugin capabilities on all in-scope screens and the industry status widget. Crawler screens and Diagnostics use `VIEW_SENSITIVE_DIAGNOSTICS`; Onboarding uses `RUN_ONBOARDING`; Settings uses `MANAGE_SETTINGS`; both Dashboard screens use `VIEW_LOGS`; Industry_Status_Summary_Widget uses `VIEW_LOGS` and exposes `get_required_capability()` for tests. Dashboard_State_Builder quick_actions now reference `RUN_ONBOARDING` and `VIEW_SENSITIVE_DIAGNOSTICS`. Crawler_Admin_Screen_Test and Industry_Status_Summary_Widget_Test updated to assert plugin capability values.
+- **2025-03-16 — SPR-001 (bundle upload hardening):** Added `Industry_Bundle_Upload_Validator` (size limit 10 MB, extension `.json`, MIME via `finfo` allowlist `application/json` / `text/json` / `text/plain`). `handle_industry_bundle_preview()` validates upload before reading; then `read_parse_validate_bundle()` reads with size cap, decodes JSON, and validates bundle structure. Malformed/oversized/wrong-type files rejected with safe user messages; failures logged via `error_log` with reason codes only. Unit tests: oversized file, invalid JSON, valid JSON but invalid bundle structure, success path; validate_upload rejects empty/not-uploaded.
+- **2025-03-16 — Output escaping / hardening (audit §2.4):** Replaced ambiguous pre-escaped output with explicit escape at echo where practical. Prompt_Experiments_Screen, Industry_Bundle_Import_Preview_Screen, Industry_Override_Management_Screen: added phpcs:ignore + short comment for nonce and for `render_artifact_link()` HTML. AI_Run_Detail_Screen: attempt table now assigns raw values and uses `echo esc_html( $p )` etc. Industry badge views (industry-template-badges.php, industry-section-badges.php): class/title escaped at output with `esc_attr`. Page_Template_Detail_Screen and Section_Template_Detail_Screen: subtype/goal labels use `esc_html` at echo. Template_Compare_Screen: tab class uses `esc_attr`. Build_Plan_Workspace_Screen: one inline comment for fixed disabled-attribute output. No double-escape of intentional HTML (nonce, JSON).
+
+---
+
+## 8. Remediation status (post regression 2025-03-16)
+
+| ID | Status | Notes |
+|----|--------|--------|
+| **SPR-001** | Fixed | Bundle upload: size 10 MB, extension `.json`, MIME allowlist; nonce + capability in `handle_industry_bundle_preview()`. |
+| **SPR-002** | Fixed | Experiment name escaped at echo; no regressions. |
+| **SPR-003** | Fixed | All in-scope screens/widget use plugin capabilities; no `manage_options` in remediated set. |
+| **SPR-004** | Fixed | Exporter/eraser registered; actor-linked data in scope; decision recorded in §6. |
+| **SPR-005** | Fixed | Settings: real intro, reporting disclosure link; no placeholder copy. |
+| **SPR-006** | Fixed | Dashboard: welcome, readiness cards, disclosure summary, quick actions; Diagnostics real. |
+| **SPR-007** | Intentionally deferred | Apply not implemented; UI states preview only and links to Import/Export. |
+| **SPR-008** | Fixed | Executor gates unregistered types; stub message consistent; tests added. |
+| **SPR-009** | Fixed | Tokens step copy explicit; bulk actions disabled. |
+| **SPR-010** | Fixed | Profile_Snapshot_Data docblock; schema-only, no persistence/UI. |
+| **SPR-011** | Fixed | Legacy quarantined in `plugin/legacy/`; not loaded; single entry documented. |
+
+---
+
+## 9. References
+
+- [security-privacy-completeness-audit.md](../qa/security-privacy-completeness-audit.md)
+- [security-privacy-audit-close-report.md](../qa/security-privacy-audit-close-report.md) — Final regression and remaining gaps
+- [industry-audit-remediation-ledger.md](industry-audit-remediation-ledger.md) (separate; industry audit findings)
+- [aio-page-builder-master-spec.md](../specs/aio-page-builder-master-spec.md)
+- [.cursor/rules/Security-and-Privacy.mdc](../.cursor/rules/Security-and-Privacy.mdc)

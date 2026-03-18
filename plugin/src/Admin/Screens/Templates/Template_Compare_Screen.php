@@ -237,8 +237,8 @@ final class Template_Compare_Screen {
 		$url_page   = $base !== '' ? \add_query_arg( 'type', 'page', $base ) : '';
 		?>
 		<nav class="aio-compare-type-nav" aria-label="<?php \esc_attr_e( 'Compare type', 'aio-page-builder' ); ?>">
-			<a href="<?php echo $url_section !== '' ? \esc_url( $url_section ) : '#'; ?>" class="<?php echo $type === 'section' ? 'active' : ''; ?>"><?php \esc_html_e( 'Section templates', 'aio-page-builder' ); ?></a>
-			| <a href="<?php echo $url_page !== '' ? \esc_url( $url_page ) : '#'; ?>" class="<?php echo $type === 'page' ? 'active' : ''; ?>"><?php \esc_html_e( 'Page templates', 'aio-page-builder' ); ?></a>
+			<a href="<?php echo $url_section !== '' ? \esc_url( $url_section ) : '#'; ?>" class="<?php echo \esc_attr( $type === 'section' ? 'active' : '' ); ?>"><?php \esc_html_e( 'Section templates', 'aio-page-builder' ); ?></a>
+			| <a href="<?php echo $url_page !== '' ? \esc_url( $url_page ) : '#'; ?>" class="<?php echo \esc_attr( $type === 'page' ? 'active' : '' ); ?>"><?php \esc_html_e( 'Page templates', 'aio-page-builder' ); ?></a>
 		</nav>
 		<?php
 	}

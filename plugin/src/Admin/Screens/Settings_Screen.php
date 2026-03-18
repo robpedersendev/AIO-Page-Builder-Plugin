@@ -11,15 +11,18 @@ namespace AIOPageBuilder\Admin\Screens;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Bootstrap\Constants;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
+
 /**
- * Placeholder Settings screen. Renders title and not-yet-implemented notice.
+ * Settings screen: template library seed actions and link to privacy/reporting disclosure (spec §49.12).
  */
 final class Settings_Screen {
 
 	public const SLUG = 'aio-page-builder-settings';
 
-	/** Placeholder until capability mapping is finalized. */
-	private const CAPABILITY = 'manage_options';
+	/** Gated by plugin capability for settings (spec §44.3). */
+	private const CAPABILITY = Capabilities::MANAGE_SETTINGS;
 
 	public function get_title(): string {
 		return __( 'Settings', 'aio-page-builder' );
@@ -57,10 +60,21 @@ final class Settings_Screen {
 		$child_detail_product_seed_result = isset( $_GET['aio_child_detail_product_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_product_seed_result'] ) : '';
 		$child_detail_profile_entity_seed_result = isset( $_GET['aio_child_detail_profile_entity_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_profile_entity_seed_result'] ) : '';
 		$child_detail_variant_expansion_seed_result = isset( $_GET['aio_child_detail_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_variant_expansion_seed_result'] ) : '';
+		$privacy_url = \add_query_arg( array( 'page' => \AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen::SLUG ), \admin_url( 'admin.php' ) );
 		?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
-			<p class="aio-page-builder-notice"><?php \esc_html_e( 'Not yet implemented. This screen will show plugin settings and reporting disclosure.', 'aio-page-builder' ); ?></p>
+			<p class="description">
+				<?php
+				printf(
+					/* translators: 1: plugin version, 2: opening link tag, 3: closing link tag */
+					\esc_html__( 'Plugin version %1$s. This plugin sends operational reports to an approved destination. For full disclosure, retention, and privacy: %2$sPrivacy, Reporting & Settings%3$s.', 'aio-page-builder' ),
+					\esc_html( Constants::plugin_version() ),
+					'<a href="' . \esc_url( $privacy_url ) . '">',
+					'</a>'
+				);
+				?>
+			</p>
 
 			<?php if ( $seed_result === 'success' ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Form section and request page template seeded successfully.', 'aio-page-builder' ); ?></p></div>

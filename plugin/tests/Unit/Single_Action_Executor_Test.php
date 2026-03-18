@@ -101,19 +101,19 @@ final class Single_Action_Executor_Test extends TestCase {
 		'created_at'      => '2025-03-11T12:00:00Z',
 	);
 
-	/** Example execution result payload (handler stub returns not implemented → failed). */
+	/** Example execution result payload (unregistered action type → refused before dispatch). */
 	public static function example_result_payload(): array {
 		return array(
-			'action_id'       => 'exec_create_plan_npc_0_20250311T120000Z',
-			'action_type'     => 'create_page',
-			'status'          => 'failed',
-			'completed_at'    => gmdate( 'c' ),
-			'handler_result'  => array( 'success' => false, 'message' => 'Action type "create_page" is not yet implemented.', 'artifacts' => array() ),
+			'action_id'         => 'exec_create_plan_npc_0_20250311T120000Z',
+			'action_type'       => 'create_page',
+			'status'            => 'refused',
+			'completed_at'      => gmdate( 'c' ),
+			'handler_result'    => array(),
 			'snapshot_reference' => '',
-			'warnings'        => array(),
-			'build_plan_updates' => array( 'plan_id' => 'aio-plan-uuid-1', 'plan_item_id' => 'plan_npc_0', 'item_status' => 'failed' ),
-			'log_reference'   => '',
-			'error'           => array( 'code' => 'execution_failed', 'message' => 'Action type "create_page" is not yet implemented.', 'refusable' => false ),
+			'warnings'          => array(),
+			'build_plan_updates' => array(),
+			'log_reference'      => '',
+			'error'             => array( 'code' => 'action_not_available', 'message' => 'This action type is not available in this version.', 'refusable' => true ),
 		);
 	}
 
@@ -196,14 +196,19 @@ final class Single_Action_Executor_Test extends TestCase {
 		$repo->get_by_key_return = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
 		$dispatcher = new Execution_Dispatcher();
-		$executor   = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; }, function (): ?string {
+		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
+			public function execute( array $envelope ): array {
+				return array( 'success' => false, 'message' => 'Handler failed.', 'artifacts' => array() );
+			}
+		} );
+		$executor = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; }, function (): ?string {
 			return null;
 		} );
 		$envelope = self::EXAMPLE_EXECUTION_INPUT;
 		$envelope['snapshot_required'] = true;
 		$envelope['snapshot_ref']      = '';
 		$result = $executor->execute( $envelope );
-		// Executor does not refuse; dispatch runs (stub returns failure when no handler registered).
+		// Executor does not refuse; dispatch runs (handler returns failure).
 		$this->assertSame( Execution_Action_Contract::STATUS_FAILED, $result->get_execution_status() );
 		$this->assertSame( Execution_Action_Contract::ERROR_EXECUTION_FAILED, $result->get_error_code() );
 	}

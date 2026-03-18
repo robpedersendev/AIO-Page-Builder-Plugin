@@ -108,6 +108,10 @@ final class Single_Action_Executor {
 			return Execution_Result::refused( $action_id, $action_type, Execution_Action_Contract::ERROR_DEPENDENCY_FAILED, __( 'Dependencies not satisfied.', 'aio-page-builder' ) );
 		}
 
+		if ( ! $this->dispatcher->has_handler( $action_type ) ) {
+			return Execution_Result::refused( $action_id, $action_type, Execution_Action_Contract::ERROR_ACTION_NOT_AVAILABLE, __( 'This action type is not available in this version.', 'aio-page-builder' ) );
+		}
+
 		$snapshot_required = ! empty( $envelope['snapshot_required'] );
 		$snapshot_ref      = isset( $envelope['snapshot_ref'] ) && is_string( $envelope['snapshot_ref'] ) ? trim( $envelope['snapshot_ref'] ) : '';
 		if ( $snapshot_required && $snapshot_ref === '' ) {

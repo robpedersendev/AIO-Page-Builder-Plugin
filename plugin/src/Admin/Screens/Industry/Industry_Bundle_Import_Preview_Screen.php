@@ -1,8 +1,8 @@
 <?php
 /**
- * Pre-import preview and operator confirmation for industry pack bundle imports (Prompt 419).
- * Shows bundle contents, conflicts, missing dependencies, and intended actions before import.
- * Admin-only; requires explicit confirmation; no auto-import on upload.
+ * Preview-only screen for industry pack bundle (JSON) contents and conflict analysis (Prompt 419, SPR-007).
+ * Apply/import of bundle content is not implemented; this screen is for inspection only.
+ * For full backup restore (ZIP), use Import / Export.
  *
  * @package AIOPageBuilder
  */
@@ -23,7 +23,7 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
- * Renders industry bundle import preview and confirmation step.
+ * Renders industry bundle preview (contents and conflicts). Apply not implemented; use Import / Export for restore.
  */
 final class Industry_Bundle_Import_Preview_Screen {
 
@@ -31,7 +31,6 @@ final class Industry_Bundle_Import_Preview_Screen {
 
 	private const TRANSIENT_PREVIEW = 'aio_industry_bundle_preview_%d';
 	private const NONCE_ACTION_PREVIEW = 'aio_industry_bundle_preview';
-	private const NONCE_ACTION_CONFIRM = 'aio_industry_bundle_confirm_import';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -143,7 +142,6 @@ final class Industry_Bundle_Import_Preview_Screen {
 		return array(
 			'preview' => false,
 			'error'   => isset( $_GET['aio_bundle_preview_error'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_bundle_preview_error'] ) ) : '',
-			'confirm_message' => isset( $_GET['aio_bundle_confirm'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_bundle_confirm'] ) ) : '',
 		);
 	}
 
@@ -161,12 +159,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 		<div class="wrap aio-page-builder-screen aio-industry-bundle-import-preview" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="description">
-				<?php \esc_html_e( 'Upload an industry pack bundle (JSON) to preview contents, conflicts, and intended actions. Import requires explicit confirmation.', 'aio-page-builder' ); ?>
+				<?php \esc_html_e( 'Upload an industry pack bundle (JSON) to preview contents and conflicts. This screen is preview only; applying bundle content is not yet supported. To restore plugin data (including industry profile), use Import / Export and upload a full backup ZIP.', 'aio-page-builder' ); ?>
 			</p>
-
-			<?php if ( ! empty( $state['confirm_message'] ) ) : ?>
-				<div class="notice notice-info inline"><p><?php echo \esc_html( $state['confirm_message'] ); ?></p></div>
-			<?php endif; ?>
 
 			<?php if ( ! empty( $state['error'] ) ) : ?>
 				<div class="notice notice-error inline"><p><?php echo \esc_html( $state['error'] ); ?></p></div>
@@ -191,9 +185,16 @@ final class Industry_Bundle_Import_Preview_Screen {
 		$summary = $state['summary'];
 		$bundle = $state['bundle'];
 		$preview_url = \admin_url( 'admin.php?page=' . self::SLUG );
-		$confirm_url = \wp_nonce_url( \admin_url( 'admin-post.php?action=aio_industry_bundle_confirm_import' ), self::NONCE_ACTION_CONFIRM );
 		$cancel_url = \add_query_arg( 'aio_bundle_cancel', '1', $preview_url );
+		$import_export_url = \admin_url( 'admin.php?page=' . \AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen::SLUG );
 		?>
+		<div class="notice notice-info inline" style="margin: 1em 0;">
+			<p>
+				<?php \esc_html_e( 'This is a preview only. Applying industry bundle content is not yet supported. To restore plugin data, use', 'aio-page-builder' ); ?>
+				<a href="<?php echo \esc_url( $import_export_url ); ?>"><?php \esc_html_e( 'Import / Export', 'aio-page-builder' ); ?></a>
+				<?php \esc_html_e( 'and upload a full backup ZIP.', 'aio-page-builder' ); ?>
+			</p>
+		</div>
 		<section class="aio-bundle-preview-summary" style="margin: 1.5em 0;">
 			<h2><?php \esc_html_e( 'Bundle summary', 'aio-page-builder' ); ?></h2>
 			<p>
@@ -248,8 +249,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 
 		<section class="aio-bundle-preview-actions" style="margin: 1.5em 0;">
 			<p>
-				<a href="<?php echo \esc_url( $confirm_url ); ?>" class="button button-primary"><?php \esc_html_e( 'Confirm import', 'aio-page-builder' ); ?></a>
-				<a href="<?php echo \esc_url( $cancel_url ); ?>" class="button"><?php \esc_html_e( 'Cancel', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo \esc_url( $cancel_url ); ?>" class="button"><?php \esc_html_e( 'Clear preview', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo \esc_url( $import_export_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Import / Export (full restore)', 'aio-page-builder' ); ?></a>
 			</p>
 		</section>
 		<?php
@@ -260,7 +261,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 		$nonce = \wp_nonce_field( self::NONCE_ACTION_PREVIEW, 'aio_industry_bundle_preview_nonce', true, false );
 		?>
 		<form method="post" action="<?php echo \esc_url( $action ); ?>" enctype="multipart/form-data" style="max-width: 32em;">
-			<?php echo $nonce; ?>
+			<?php echo $nonce; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nonce field HTML from wp_nonce_field(). ?>
 			<p>
 				<label for="aio_industry_bundle_file"><?php \esc_html_e( 'Industry bundle (JSON file)', 'aio-page-builder' ); ?></label>
 				<input type="file" name="aio_industry_bundle_file" id="aio_industry_bundle_file" accept=".json,application/json" />

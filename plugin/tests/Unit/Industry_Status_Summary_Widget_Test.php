@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Schema;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Infrastructure/Config/Capabilities.php';
 require_once $plugin_root . '/src/Infrastructure/Config/Option_Names.php';
 require_once $plugin_root . '/src/Infrastructure/Settings/Settings_Service.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Service_Container.php';
@@ -47,6 +49,10 @@ require_once $plugin_root . '/src/Bootstrap/Industry_Packs_Module.php';
 require_once $plugin_root . '/src/Admin/Widgets/Industry_Status_Summary_Widget.php';
 
 final class Industry_Status_Summary_Widget_Test extends TestCase {
+
+	public function test_widget_requires_view_logs_capability(): void {
+		$this->assertSame( Capabilities::VIEW_LOGS, Industry_Status_Summary_Widget::get_required_capability(), 'Widget aligned with Industry Author Dashboard capability.' );
+	}
 
 	public function test_build_view_model_without_industry_profile_store_returns_no_industry(): void {
 		$container = new Service_Container();

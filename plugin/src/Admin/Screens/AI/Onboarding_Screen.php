@@ -32,7 +32,8 @@ final class Onboarding_Screen {
 
 	public const SLUG = 'aio-page-builder-onboarding';
 
-	private const CAPABILITY = 'manage_options';
+	/** Gated by plugin capability for onboarding (spec §44.3). */
+	private const CAPABILITY = Capabilities::RUN_ONBOARDING;
 
 	private const NONCE_ACTION = 'aio_onboarding_save';
 

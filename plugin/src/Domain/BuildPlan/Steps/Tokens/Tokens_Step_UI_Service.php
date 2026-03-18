@@ -165,7 +165,7 @@ final class Tokens_Step_UI_Service {
 					\__( 'Proposed value:', 'aio-page-builder' ) . ' ' . \esc_html( $proposed_str ),
 				) ),
 				array( 'heading' => \__( 'Rationale', 'aio-page-builder' ), 'key' => 'rationale', 'content_lines' => array( \esc_html( (string) ( $payload['rationale'] ?? '—' ) ) ) ),
-				array( 'heading' => \__( 'Revert / history', 'aio-page-builder' ), 'key' => 'revert_history', 'content_lines' => array( \__( 'Placeholder — no execution in this step.', 'aio-page-builder' ) ) ),
+				array( 'heading' => \__( 'Revert / history', 'aio-page-builder' ), 'key' => 'revert_history', 'content_lines' => array( \__( 'Token application is not available in this version. Recommendations are for review only.', 'aio-page-builder' ) ) ),
 			);
 			$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $item, $capabilities );
 			break;

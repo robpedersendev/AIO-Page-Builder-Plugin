@@ -320,12 +320,17 @@ final class Dashboard_State_Builder {
 			array(
 				'label'      => __( 'Start / Resume Onboarding', 'aio-page-builder' ),
 				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-onboarding' ), $base ),
-				'capability' => 'manage_options',
+				'capability' => Capabilities::RUN_ONBOARDING,
+			),
+			array(
+				'label'      => __( 'Diagnostics', 'aio-page-builder' ),
+				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-diagnostics' ), $base ),
+				'capability' => Capabilities::VIEW_SENSITIVE_DIAGNOSTICS,
 			),
 			array(
 				'label'      => __( 'Crawl Sessions', 'aio-page-builder' ),
 				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-crawler-sessions' ), $base ),
-				'capability' => 'manage_options',
+				'capability' => Capabilities::VIEW_SENSITIVE_DIAGNOSTICS,
 			),
 			array(
 				'label'      => __( 'AI Runs', 'aio-page-builder' ),

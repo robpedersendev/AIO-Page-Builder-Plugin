@@ -57,9 +57,9 @@ $title = \implode( ' · ', $parts );
 if ( $title === '' ) {
 	$title = $label;
 }
-$class = 'aio-industry-badge aio-industry-badge--' . \esc_attr( \sanitize_html_class( $status !== '' ? $status : 'neutral' ) );
+$class = 'aio-industry-badge aio-industry-badge--' . \sanitize_html_class( $status !== '' ? $status : 'neutral' );
 ?>
-<span class="<?php echo $class; ?>" title="<?php echo \esc_attr( $title ); ?>" aria-label="<?php echo \esc_attr( $label !== '' ? $label : __( 'Industry fit', 'aio-page-builder' ) ); ?>">
+<span class="<?php echo \esc_attr( $class ); ?>" title="<?php echo \esc_attr( $title ); ?>" aria-label="<?php echo \esc_attr( $label !== '' ? $label : __( 'Industry fit', 'aio-page-builder' ) ); ?>">
 	<?php echo $label !== '' ? \esc_html( $label ) : '—'; ?>
 	<?php if ( $hierarchy_fit !== '' || $lpagery_fit !== '' ) : ?>
 		<span class="aio-industry-badge-meta">

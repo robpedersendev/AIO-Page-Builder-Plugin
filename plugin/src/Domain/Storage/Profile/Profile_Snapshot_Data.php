@@ -1,6 +1,8 @@
 <?php
 /**
- * Placeholder for profile snapshot payload shape (spec §22.11). No persistence; see profile-snapshot-schema.md.
+ * Profile snapshot payload shape (spec §22.11). No persistence; see profile-snapshot-schema.md.
+ *
+ * Schema/type only; no persistence or UI execution is implemented. Used for type-hint and documentation.
  *
  * @package AIOPageBuilder
  */
@@ -13,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Immutable snapshot payload: snapshot_id, scope_type, scope_id, created_at, profile_schema_version, brand_profile, business_profile.
- * All fields and nested shape are defined in docs/schemas/profile-snapshot-schema.md. This class exists for type-hint and documentation only.
+ * All fields and nested shape are defined in docs/schemas/profile-snapshot-schema.md. This class exists for type-hint and documentation only; no persistence or UI execution.
  */
 final class Profile_Snapshot_Data {
 

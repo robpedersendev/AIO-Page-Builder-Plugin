@@ -84,6 +84,18 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 	}
 
 	/**
+	 * Updates actor_ref for a row (e.g. for privacy eraser anonymization). Preserves the row for audit.
+	 *
+	 * @param int    $id        Row id.
+	 * @param string $actor_ref New value (e.g. user:0 for anonymized).
+	 * @return bool
+	 */
+	public function update_actor_ref( int $id, string $actor_ref ): bool {
+		$actor_ref = $this->sanitize_key( $actor_ref );
+		return $this->update_row( $id, array( 'actor_ref' => $actor_ref ) );
+	}
+
+	/**
 	 * Resets a failed job for manual retry: sets queue_status to pending and clears lock (spec §42.4, §42.5).
 	 * Caller must enforce retry eligibility and capability. Does not increment retry_count.
 	 *
@@ -121,7 +133,7 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		$values = array();
 		foreach ( $data as $col => $val ) {
 			$col = \sanitize_key( $col );
-			if ( $col === '' || ! in_array( $col, array( 'queue_status', 'failure_reason', 'started_at', 'completed_at', 'retry_count', 'lock_token' ), true ) ) {
+			if ( $col === '' || ! in_array( $col, array( 'queue_status', 'failure_reason', 'started_at', 'completed_at', 'retry_count', 'lock_token', 'actor_ref' ), true ) ) {
 				continue;
 			}
 			$set[] = "`{$col}` = %s";
@@ -144,6 +156,39 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		$prepared = $this->wpdb->prepare(
 			"SELECT * FROM `{$table}` WHERE queue_status = %s ORDER BY priority DESC, created_at ASC LIMIT %d OFFSET %d",
 			$status,
+			$limit,
+			$offset
+		);
+		$rows = $this->wpdb->get_results( $prepared );
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $rows as $row ) {
+			$out[] = $this->row_to_record( $row );
+		}
+		return $out;
+	}
+
+	/**
+	 * Lists jobs by actor reference (e.g. user:123). Used by privacy exporter/eraser.
+	 *
+	 * @param string $actor_ref Sanitized actor ref (e.g. user:5).
+	 * @param int    $limit     Max rows (default 50).
+	 * @param int    $offset    Offset for pagination.
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_by_actor_ref( string $actor_ref, int $limit = 50, int $offset = 0 ): array {
+		$actor_ref = $this->sanitize_key( $actor_ref );
+		if ( $actor_ref === '' ) {
+			return array();
+		}
+		$table  = $this->get_table_name();
+		$limit  = $limit > 0 ? $limit : 50;
+		$offset = $offset >= 0 ? $offset : 0;
+		$prepared = $this->wpdb->prepare(
+			"SELECT * FROM `{$table}` WHERE actor_ref = %s ORDER BY created_at DESC LIMIT %d OFFSET %d",
+			$actor_ref,
 			$limit,
 			$offset
 		);

@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Admin\Screens\Crawler;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
@@ -20,7 +21,8 @@ final class Crawler_Comparison_Screen {
 
 	public const SLUG = 'aio-page-builder-crawler-comparison';
 
-	private const CAPABILITY = 'manage_options';
+	/** Gated by plugin capability for crawler/diagnostics (spec §44.3). */
+	private const CAPABILITY = Capabilities::VIEW_SENSITIVE_DIAGNOSTICS;
 
 	/** @var Service_Container|null */
 	private $container;
