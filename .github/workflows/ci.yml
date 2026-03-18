@@ -26,7 +26,7 @@ jobs:
 
       - name: Get Composer cache directory
         id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        run: cd plugin && echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -36,16 +36,16 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        run: cd plugin && composer install --prefer-dist --no-progress
 
       - name: Run PHPCS
-        run: composer run phpcs
+        run: cd plugin && composer run phpcs
         continue-on-error: ${{ matrix.php != '8.1' }}
 
       - name: Run PHPStan
-        run: composer run phpstan
+        run: cd plugin && composer run phpstan
         continue-on-error: ${{ matrix.php != '8.1' }}
 
       - name: Run PHPUnit
-        run: composer run phpunit
+        run: cd plugin && composer run phpunit
         continue-on-error: ${{ matrix.php != '8.1' }}
