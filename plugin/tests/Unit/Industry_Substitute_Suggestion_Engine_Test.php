@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Domain/Registries/Section/Section_Schema.php';
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Substitute_Suggestion_Result.php';
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Substitute_Suggestion_Engine.php';
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Section_Recommendation_Result.php';
@@ -67,6 +68,35 @@ final class Industry_Substitute_Suggestion_Engine_Test extends TestCase {
 		);
 		$suggestions = $this->engine->suggest_section_substitutes( 's1', 'recommended', $result, array(), 5 );
 		$this->assertSame( array(), $suggestions );
+	}
+
+	/**
+	 * Regression: no recommended candidates → empty array; no throw. Guard §3.4.
+	 */
+	public function test_section_substitutes_empty_array_when_no_recommended_candidates(): void {
+		$result      = new Industry_Section_Recommendation_Result(
+			array(
+				array(
+					'section_key'          => 's_discouraged',
+					'score'                => -20,
+					'fit_classification'   => 'discouraged',
+					'explanation_reasons'  => array(),
+					'industry_source_refs' => array(),
+					'warning_flags'        => array(),
+				),
+				array(
+					'section_key'          => 's_neutral',
+					'score'                => 0,
+					'fit_classification'   => 'neutral',
+					'explanation_reasons'  => array(),
+					'industry_source_refs' => array(),
+					'warning_flags'        => array(),
+				),
+			)
+		);
+		$suggestions = $this->engine->suggest_section_substitutes( 's_discouraged', 'discouraged', $result, array(), 5 );
+		$this->assertSame( array(), $suggestions );
+		$this->assertIsArray( $suggestions );
 	}
 
 	public function test_section_substitutes_returns_better_fit_same_family_first(): void {
