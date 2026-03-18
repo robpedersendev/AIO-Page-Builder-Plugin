@@ -4,6 +4,8 @@
 
 **Source:** Focused inventory pass over Tokens_Step_UI_Service, Profile_Snapshot_Data, cost_placeholder, History_Rollback_Step_UI_Service, Object_Status_Families, and related areas.
 
+**Backlog close:** [backlog-close-report.md](backlog-close-report.md) — final categorization and remaining actions.
+
 ---
 
 ## 1. Classified as intentionally deferred (no implementation without spec)

@@ -4,6 +4,8 @@
 
 **Reference:** Request to implement only approved backlog items (industry bundle apply, ZIP pre-move cap, privacy scope, token application, UPDATE_PAGE_METADATA de-scope, Build Plan Step 2 Deny, workspace detail/table). Privacy scope, token application, Build Plan Step 2 Deny, and workspace improvements had no in-scope approval or were out of scope; industry bundle apply was approved but requires storage/registry design not yet specified—not implemented in this pass.
 
+**Final audit:** [backlog-close-report.md](backlog-close-report.md) — categorization, evidence, and remaining action list.
+
 ---
 
 ## 1. UPDATE_PAGE_METADATA de-scope
