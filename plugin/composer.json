@@ -15,11 +15,14 @@
     },
     "scripts": {
         "phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml.dist",
-        "phpcbf": "php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml.dist"
+        "phpcbf": "php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml.dist",
+        "phpstan": "vendor/bin/phpstan analyse -c phpstan.neon.dist",
+        "phpunit": "vendor/bin/phpunit -c phpunit.xml.dist"
     },
     "require-dev": {
         "wp-coding-standards/wpcs": "^3.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "php-stubs/wordpress-stubs": "^6.0",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^10.0"
     }
