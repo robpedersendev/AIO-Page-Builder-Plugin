@@ -1,8 +1,45 @@
 # Security, Privacy & Completeness — Audit Close Report
 
 **Date:** 2025-03-16  
-**Source:** Post-remediation regression and re-audit.  
+**Source:** Post-remediation regression and final closeout pass (SPR-001 through SPR-011).  
 **Ledger:** [security-privacy-remediation-ledger.md](../operations/security-privacy-remediation-ledger.md).
+
+---
+
+## 0. Final closeout summary
+
+### Resolved (fixed or documented exception)
+
+| ID | Status | Evidence (file / behavior) |
+|----|--------|-----------------------------|
+| **SPR-001** | Fixed | `plugin/src/Domain/Industry/Export/Industry_Bundle_Upload_Validator.php`: MAX_BYTES 10 MB; validate_upload() extension `.json`, MIME finfo allowlist. `Admin_Menu.php` L989–1005: validate_upload then read_parse_validate_bundle(MAX_BYTES); nonce + MANAGE_SETTINGS. |
+| **SPR-002** | Fixed | `plugin/src/Admin/Screens/AI/Prompt_Experiments_Screen.php` L73: experiment name output uses `esc_html( $name )` at echo. |
+| **SPR-003** | Fixed | `plugin/src`: grep `manage_options` → no matches. SPR003_Capability_Alignment_Test: Settings, Diagnostics, Onboarding, Dashboard, Crawler x3, Industry_Status_Summary_Widget use Capabilities constants; test_no_plugin_capability_equals_manage_options. |
+| **SPR-004** | Fixed | `plugin/src/Bootstrap/Plugin.php` L229–230: wp_privacy_personal_data_exporters/erasers. Personal_Data_Exporter / Personal_Data_Eraser in Infrastructure/Privacy. Personal_Data_Privacy_Test: contract + group IDs (SPR-004 audit scope). Ledger §6: in/out of scope documented. |
+| **SPR-005** | Fixed | `plugin/src/Admin/Screens/Settings_Screen.php` L19, L64–73: real intro, version, link to Privacy, Reporting & Settings; docblock SPR-005. |
+| **SPR-006** | Fixed | `plugin/src/Admin/Admin_Menu.php` L152, L210: Dashboard_Screen from Dashboard\Dashboard_Screen (single dashboard per §49.5). No root placeholder in active menu. |
+| **SPR-008** | Fixed | `plugin/src/Domain/Execution/Executor/Single_Action_Executor.php` L111–112: has_handler() → refused ERROR_ACTION_NOT_AVAILABLE. Stub_Execution_Handler docblock SPR-008. Single_Action_Executor_Test::test_unregistered_action_type_returns_refused. |
+| **SPR-009** | Fixed | `plugin/src/Domain/BuildPlan/Steps/Tokens/Tokens_Step_UI_Service.php` L6–7, L169: shell-only; "Token application is not available…"; bulk actions disabled; docblock SPR-009. |
+| **SPR-010** | Fixed | `plugin/src/Domain/Storage/Profile/Profile_Snapshot_Data.php`: docblock SPR-010, schema/type only. Additional_AI_Provider_Driver + Concrete_AI_Provider_Driver: cost_placeholder inline comment (SPR-010). |
+| **SPR-011** | Fixed | `plugin/aio-page-builder.php` L19–25: loads only src/Bootstrap/Constants.php, Plugin.php. plugin/legacy/: PrivatePluginBase (Bootstrap, Activation, etc.); not loaded. No PrivatePluginBase in src/. |
+
+### Deferred (intentional; no code gap)
+
+| ID | Status | Evidence |
+|----|--------|----------|
+| **SPR-007** | Intentionally deferred | No handle_industry_bundle_confirm_import in codebase. `Industry_Bundle_Import_Preview_Screen.php`: docblock and UI copy "preview only"; "Applying… not yet supported"; link to Import / Export; Clear preview nonce NONCE_ACTION_CLEAR. Industry_Bundle_Import_Preview_Screen_Test: capability, slug, title. |
+
+### Items requiring spec or product decision
+
+| Item | Notes |
+|------|------|
+| Industry bundle apply | Spec does not define apply semantics; UI honest. No action unless spec defines. |
+| Import/Export ZIP size | No pre-move size limit; .zip + is_uploaded_file + validation after move. Optional: add size cap before move. |
+| Personal data scope | Ledger §6 documents in-scope (actor-linked) vs out-of-scope (site-level/audit). No change unless spec expands. |
+
+### Remaining risk level
+
+- **Low.** All P0/P1/P2 remediation items are either fixed with evidence and tests, or intentionally deferred with honest UI and documentation. No open coding gaps. Optional hardening (Import/Export size limit) and scope decisions are documented.
 
 ---
 

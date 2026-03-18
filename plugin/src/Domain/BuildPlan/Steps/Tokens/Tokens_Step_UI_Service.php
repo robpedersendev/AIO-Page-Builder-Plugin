@@ -1,9 +1,10 @@
 <?php
 /**
- * Step 4 (design tokens) workspace shell (spec §35, Prompt 076).
+ * Step 4 (design tokens) workspace shell (spec §35, Prompt 076, SPR-009).
  *
- * Renders token recommendation rows, token-set summaries, diff placeholders,
- * accept/deny/defer shells, and revert/history placeholders. No token application.
+ * Shell-only UI: token recommendation rows, summaries, and revert/history copy. Token application
+ * is not implemented; UI states "Token application is not available in this version. Recommendations
+ * are for review only." Bulk apply/deny controls are disabled. Do not treat as a gap—intentional per spec.
  *
  * @package AIOPageBuilder
  */

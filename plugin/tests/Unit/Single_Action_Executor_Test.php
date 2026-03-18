@@ -131,6 +131,20 @@ final class Single_Action_Executor_Test extends TestCase {
 		);
 	}
 
+	/** SPR-008: unregistered action type must be refused before dispatch; user flows never reach Stub_Execution_Handler. */
+	public function test_unregistered_action_type_returns_refused(): void {
+		$repo = new Stub_Plan_State_For_Executor();
+		$repo->get_by_key_return = array( 'id' => 1 );
+		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
+		$repo->find_step_index_return = 0;
+		$dispatcher = new Execution_Dispatcher();
+		$executor   = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; } );
+		$result     = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
+		$this->assertSame( Execution_Action_Contract::STATUS_REFUSED, $result->get_execution_status() );
+		$this->assertSame( Execution_Action_Contract::ERROR_ACTION_NOT_AVAILABLE, $result->get_error_code() );
+		$this->assertStringContainsString( 'not available', $result->get_error_message() ?? '' );
+	}
+
 	public function test_approval_rejection_returns_refused(): void {
 		$repo = new Stub_Plan_State_For_Executor();
 		$repo->get_by_key_return = array( 'id' => 1 );
@@ -217,10 +231,14 @@ final class Single_Action_Executor_Test extends TestCase {
 		$repo = new Stub_Plan_State_For_Executor();
 		$repo->get_by_key_return = array( 'id' => 1 );
 		$repo->get_plan_definition_return = array( Build_Plan_Schema::KEY_STEPS => array() );
+		$repo->find_step_index_return = 0;
 		$dispatcher = new Execution_Dispatcher();
-		$executor   = new Single_Action_Executor( $dispatcher, $repo, function (): bool {
-			return true;
-		}, null, function (): bool {
+		$dispatcher->register_handler( Execution_Action_Types::CREATE_PAGE, new class() implements Execution_Handler_Interface {
+			public function execute( array $envelope ): array {
+				return array( 'success' => true, 'artifacts' => array() );
+			}
+		} );
+		$executor = new Single_Action_Executor( $dispatcher, $repo, function (): bool { return true; }, null, function (): bool {
 			return false;
 		} );
 		$result = $executor->execute( self::EXAMPLE_EXECUTION_INPUT );
@@ -287,6 +305,7 @@ final class Single_Action_Executor_Test extends TestCase {
 		$this->assertSame( Execution_Action_Contract::STATUS_FAILED, $result->get_execution_status() );
 	}
 
+	/** example_result_payload() documents refused shape (SPR-008); required keys apply to any result. */
 	public function test_execution_result_to_array_has_required_shape(): void {
 		$payload = self::example_result_payload();
 		$this->assertArrayHasKey( 'action_id', $payload );
@@ -294,6 +313,6 @@ final class Single_Action_Executor_Test extends TestCase {
 		$this->assertArrayHasKey( 'handler_result', $payload );
 		$this->assertArrayHasKey( 'build_plan_updates', $payload );
 		$this->assertArrayHasKey( 'error', $payload );
-		$this->assertSame( 'failed', $payload['status'] );
+		$this->assertSame( 'refused', $payload['status'] );
 	}
 }

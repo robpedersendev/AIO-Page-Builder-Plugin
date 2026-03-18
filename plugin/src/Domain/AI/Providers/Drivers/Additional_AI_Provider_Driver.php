@@ -146,7 +146,7 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 				'prompt_tokens'     => $input_tok,
 				'completion_tokens' => $output_tok,
 				'total_tokens'      => $input_tok + $output_tok,
-				'cost_placeholder'  => null,
+				'cost_placeholder'  => null, // SPR-010: cost modeling not implemented; reserved for future usage/cost reporting.
 			);
 		}
 

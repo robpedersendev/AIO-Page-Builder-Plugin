@@ -1,10 +1,10 @@
 <?php
 /**
- * Stub execution handler for action types without a registered handler (Prompt 079).
+ * Stub execution handler for action types without a registered handler (Prompt 079, SPR-008).
  *
- * Used by Execution_Dispatcher::get_handler() when no handler is registered for an action type.
- * Single_Action_Executor gates unregistered types via has_handler() and returns refused before
- * dispatch, so this stub is only reached if dispatch is invoked without that check (e.g. tests or recovery).
+ * Intentional fallback: used when no handler is registered for an action type. Single_Action_Executor
+ * gates unregistered types via has_handler() and returns refused before dispatch, so production user
+ * flows do not reach this stub. Only reachable if dispatch is invoked without that check (e.g. tests).
  * Returns a structured unavailable result so callers get a consistent, user-safe message.
  *
  * @package AIOPageBuilder

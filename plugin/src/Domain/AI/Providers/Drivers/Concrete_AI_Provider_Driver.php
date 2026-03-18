@@ -147,7 +147,7 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 				'prompt_tokens'     => (int) ( $usage['prompt_tokens'] ?? 0 ),
 				'completion_tokens' => (int) ( $usage['completion_tokens'] ?? 0 ),
 				'total_tokens'      => (int) ( $usage['total_tokens'] ?? 0 ),
-				'cost_placeholder'  => null,
+				'cost_placeholder'  => null, // SPR-010: cost modeling not implemented; reserved for future usage/cost reporting.
 			);
 		}
 

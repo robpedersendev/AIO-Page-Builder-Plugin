@@ -23,14 +23,16 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
- * Renders industry bundle preview (contents and conflicts). Apply not implemented; use Import / Export for restore.
+ * Renders industry bundle preview (contents and conflicts). Apply not implemented (SPR-007 deferred); use Import / Export for full restore.
  */
 final class Industry_Bundle_Import_Preview_Screen {
 
 	public const SLUG = 'aio-page-builder-industry-bundle-import-preview';
 
-	private const TRANSIENT_PREVIEW = 'aio_industry_bundle_preview_%d';
+	private const TRANSIENT_PREVIEW   = 'aio_industry_bundle_preview_%d';
 	private const NONCE_ACTION_PREVIEW = 'aio_industry_bundle_preview';
+	/** Nonce action for clear-preview (state-changing; SPR-007 deferred apply). */
+	private const NONCE_ACTION_CLEAR  = 'aio_industry_bundle_clear_preview';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -123,9 +125,11 @@ final class Industry_Bundle_Import_Preview_Screen {
 	private function get_state(): array {
 		$uid = \get_current_user_id();
 		$transient_key = \sprintf( self::TRANSIENT_PREVIEW, $uid );
-		if ( isset( $_GET['aio_bundle_cancel'] ) && \get_transient( $transient_key ) ) {
+		// * Clear preview: state-changing; requires nonce (SPR-007).
+		$clear_nonce = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( isset( $_GET['aio_bundle_cancel'] ) && $clear_nonce !== '' && \wp_verify_nonce( $clear_nonce, self::NONCE_ACTION_CLEAR ) && \get_transient( $transient_key ) ) {
 			\delete_transient( $transient_key );
-			\wp_safe_redirect( \remove_query_arg( 'aio_bundle_cancel', \wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) );
+			\wp_safe_redirect( \remove_query_arg( array( 'aio_bundle_cancel', '_wpnonce' ), \wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) );
 			exit;
 		}
 		$preview = \get_transient( $transient_key );
@@ -185,7 +189,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 		$summary = $state['summary'];
 		$bundle = $state['bundle'];
 		$preview_url = \admin_url( 'admin.php?page=' . self::SLUG );
-		$cancel_url = \add_query_arg( 'aio_bundle_cancel', '1', $preview_url );
+		$cancel_url  = \wp_nonce_url( \add_query_arg( 'aio_bundle_cancel', '1', $preview_url ), self::NONCE_ACTION_CLEAR );
 		$import_export_url = \admin_url( 'admin.php?page=' . \AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen::SLUG );
 		?>
 		<div class="notice notice-info inline" style="margin: 1em 0;">

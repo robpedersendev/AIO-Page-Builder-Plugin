@@ -10,6 +10,8 @@ This directory contains the old **PrivatePluginBase** bootstrap and related code
 
 No file in this `legacy/` directory is required or autoloaded by the active plugin. Do not reference or require these files from production code.
 
+**For audits:** Security and compliance reviews should not treat `plugin/legacy/` as part of the active runtime surface. Only `aio-page-builder.php` and code under `plugin/src/` are in use.
+
 ## Contents of this directory
 
 | Path | Purpose (legacy only) |

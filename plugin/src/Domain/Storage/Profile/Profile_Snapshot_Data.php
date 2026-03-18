@@ -1,8 +1,9 @@
 <?php
 /**
- * Profile snapshot payload shape (spec §22.11). No persistence; see profile-snapshot-schema.md.
+ * Profile snapshot payload shape (spec §22.11, SPR-010). No persistence; see profile-snapshot-schema.md.
  *
  * Schema/type only; no persistence or UI execution is implemented. Used for type-hint and documentation.
+ * Future audits: do not treat as an accidental gap—intentional placeholder until spec defines persistence.
  *
  * @package AIOPageBuilder
  */

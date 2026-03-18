@@ -15,6 +15,9 @@
  * Update URI: https://example.com/aio-page-builder
  *
  * @package AIOPageBuilder
+ *
+ * Single entry point: this file loads only src/Bootstrap/Constants.php and src/Bootstrap/Plugin.
+ * Legacy PrivatePluginBase code is quarantined in plugin/legacy/ and is not loaded (see legacy/README.md).
  */
 
 defined( 'ABSPATH' ) || exit;

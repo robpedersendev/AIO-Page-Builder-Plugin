@@ -63,4 +63,11 @@ final class Personal_Data_Privacy_Test extends TestCase {
 		$this->assertArrayHasKey( 'done', $result );
 		$this->assertIsBool( $result['done'] );
 	}
+
+	/** Asserts exporter group IDs match SPR-004 audit (AI runs, job queue, user prefs). */
+	public function test_exporter_group_ids_match_audit_scope(): void {
+		$this->assertSame( 'aio-ai-runs', Personal_Data_Exporter::GROUP_AI_RUNS );
+		$this->assertSame( 'aio-job-queue', Personal_Data_Exporter::GROUP_JOB_QUEUE );
+		$this->assertSame( 'aio-user-prefs', Personal_Data_Exporter::GROUP_USER_PREFS );
+	}
 }

@@ -16,6 +16,7 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 
 /**
  * Settings screen: template library seed actions and link to privacy/reporting disclosure (spec §49.12).
+ * Implemented (SPR-005): real intro with version and link to Privacy, Reporting & Settings; seed actions retained.
  */
 final class Settings_Screen {
 

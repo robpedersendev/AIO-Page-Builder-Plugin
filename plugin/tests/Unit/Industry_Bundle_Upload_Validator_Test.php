@@ -2,6 +2,9 @@
 /**
  * Unit tests for Industry_Bundle_Upload_Validator (SPR-001): size, MIME/extension, JSON and bundle structure.
  *
+ * validate_upload() enforces size, extension, and MIME before any read; extension/MIME branches require
+ * is_uploaded_file() to pass (not true in CLI). read_parse_validate_bundle() enforces max read size, JSON decode, and bundle structure.
+ *
  * @package AIOPageBuilder
  */
 
@@ -122,5 +125,31 @@ final class Industry_Bundle_Upload_Validator_Test extends TestCase {
 
 	public function test_max_bytes_constant(): void {
 		$this->assertSame( 10 * 1024 * 1024, Industry_Bundle_Upload_Validator::MAX_BYTES );
+	}
+
+	/** Rejection messages must be admin-safe (no paths or internal details). */
+	public function test_rejection_user_messages_are_admin_safe(): void {
+		$result = Industry_Bundle_Upload_Validator::validate_upload( array() );
+		$this->assertFalse( $result['ok'] );
+		$this->assertStringNotContainsString( '/', $result['user_message'] );
+		$this->assertStringNotContainsString( 'tmp', $result['user_message'] );
+		$path_result = Industry_Bundle_Upload_Validator::read_parse_validate_bundle( '/nonexistent/path.json' );
+		$this->assertNull( $path_result['bundle'] );
+		$this->assertStringNotContainsString( '/nonexistent', $path_result['user_message'] );
+	}
+
+	/** Oversized file rejection message includes max size (MB). */
+	public function test_oversized_rejection_message_includes_max_mb(): void {
+		$tmp = tempnam( sys_get_temp_dir(), 'aio-bundle-' );
+		$this->assertNotFalse( $tmp );
+		try {
+			file_put_contents( $tmp, str_repeat( 'x', Industry_Bundle_Upload_Validator::MAX_BYTES + 1 ) );
+			$result = Industry_Bundle_Upload_Validator::read_parse_validate_bundle( $tmp );
+			$this->assertNull( $result['bundle'] );
+			$this->assertSame( Industry_Bundle_Upload_Validator::LOG_REASON_TOO_LARGE, $result['log_reason'] );
+			$this->assertStringContainsString( '10', $result['user_message'] );
+		} finally {
+			@unlink( $tmp );
+		}
 	}
 }
