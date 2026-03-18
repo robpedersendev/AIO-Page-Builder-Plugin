@@ -66,7 +66,7 @@ final class SEO_Media_Step_UI_Service {
 		$steps_raw = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
-		$step = $steps_raw[ $step_index ] ?? null;
+		$step      = $steps_raw[ $step_index ] ?? null;
 		if ( ! is_array( $step ) ) {
 			return $this->empty_workspace();
 		}
@@ -75,8 +75,8 @@ final class SEO_Media_Step_UI_Service {
 			return $this->empty_workspace();
 		}
 
-		$items = $this->eligible_items_from_step( $step );
-		$rows = array();
+		$items          = $this->eligible_items_from_step( $step );
+		$rows           = array();
 		$eligible_count = 0;
 		foreach ( $items as $item ) {
 			$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
@@ -87,30 +87,33 @@ final class SEO_Media_Step_UI_Service {
 			if ( $status === Build_Plan_Item_Statuses::PENDING ) {
 				++$eligible_count;
 			}
-			$row_actions = $this->row_action_resolver->resolve( $item, $capabilities );
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+			$row_actions       = $this->row_action_resolver->resolve( $item, $capabilities );
+			$payload           = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
 			$storage_indicator = (string) ( $payload['storage_path_indicator'] ?? 'plugin_advisory' );
-			$rows[] = array(
-				Step_Item_List_Component::ROW_KEY_ITEM_ID          => $item_id,
-				Step_Item_List_Component::ROW_KEY_STATUS           => $status,
-				Step_Item_List_Component::ROW_KEY_STATUS_BADGE   => $this->status_to_badge( $status ),
+			$rows[]            = array(
+				Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
+				Step_Item_List_Component::ROW_KEY_STATUS  => $status,
+				Step_Item_List_Component::ROW_KEY_STATUS_BADGE => $this->status_to_badge( $status ),
 				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => $this->summary_columns_for_item( $item ),
-				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS     => $row_actions,
-				Step_Item_List_Component::ROW_KEY_IS_SELECTED     => in_array( $item_id, $selected_item_ids, true ),
+				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS => $row_actions,
+				Step_Item_List_Component::ROW_KEY_IS_SELECTED => in_array( $item_id, $selected_item_ids, true ),
 			);
 		}
 
-		$bulk_states = $this->placeholder_bulk_states( $eligible_count, $selected_item_ids, $rows );
-		$detail_panel = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
-		$step_messages = $this->step_messages( count( $rows ), $eligible_count );
-		$seo_storage_path_placeholder = array( 'integration' => 'plugin_advisory', 'description' => \__( 'Recommendation-only; no write execution in this step.', 'aio-page-builder' ) );
+		$bulk_states                  = $this->placeholder_bulk_states( $eligible_count, $selected_item_ids, $rows );
+		$detail_panel                 = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
+		$step_messages                = $this->step_messages( count( $rows ), $eligible_count );
+		$seo_storage_path_placeholder = array(
+			'integration' => 'plugin_advisory',
+			'description' => \__( 'Recommendation-only; no write execution in this step.', 'aio-page-builder' ),
+		);
 
 		return array(
-			'step_list_rows'           => $rows,
-			'column_order'             => self::COLUMN_ORDER,
-			'bulk_action_states'       => $bulk_states,
-			'detail_panel'             => $detail_panel,
-			'step_messages'            => $step_messages,
+			'step_list_rows'               => $rows,
+			'column_order'                 => self::COLUMN_ORDER,
+			'bulk_action_states'           => $bulk_states,
+			'detail_panel'                 => $detail_panel,
+			'step_messages'                => $step_messages,
 			'seo_storage_path_placeholder' => $seo_storage_path_placeholder,
 		);
 	}
@@ -119,7 +122,7 @@ final class SEO_Media_Step_UI_Service {
 		$items_raw = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
-		$out = array();
+		$out       = array();
 		foreach ( $items_raw as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -136,7 +139,7 @@ final class SEO_Media_Step_UI_Service {
 		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
-		$cols = array();
+		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
 			$val = $payload[ $key ] ?? '';
 			if ( $key === 'storage_path_indicator' && $val === '' ) {
@@ -148,7 +151,11 @@ final class SEO_Media_Step_UI_Service {
 	}
 
 	private function build_detail_panel( array $items, ?string $selected_item_id, array $capabilities ): array {
-		$detail_panel = array( 'item_id' => $selected_item_id ?? '', 'sections' => array(), 'row_actions' => array() );
+		$detail_panel = array(
+			'item_id'     => $selected_item_id ?? '',
+			'sections'    => array(),
+			'row_actions' => array(),
+		);
 		if ( $selected_item_id === null || $selected_item_id === '' ) {
 			return $detail_panel;
 		}
@@ -156,11 +163,23 @@ final class SEO_Media_Step_UI_Service {
 			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ) !== $selected_item_id ) {
 				continue;
 			}
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
-			$detail_panel['sections'] = array(
-				array( 'heading' => \__( 'Target', 'aio-page-builder' ), 'key' => 'target', 'content_lines' => array( \esc_html( (string) ( $payload['target_page_title_or_url'] ?? '—' ) ) ) ),
-				array( 'heading' => \__( 'Title / meta / schema / media', 'aio-page-builder' ), 'key' => 'recommendations', 'content_lines' => array( \__( 'Placeholder — recommendation shell only.', 'aio-page-builder' ) ) ),
-				array( 'heading' => \__( 'Storage path', 'aio-page-builder' ), 'key' => 'storage_path', 'content_lines' => array( \esc_html( (string) ( $payload['storage_path_indicator'] ?? 'plugin_advisory' ) ) ) ),
+			$payload                     = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+			$detail_panel['sections']    = array(
+				array(
+					'heading'       => \__( 'Target', 'aio-page-builder' ),
+					'key'           => 'target',
+					'content_lines' => array( \esc_html( (string) ( $payload['target_page_title_or_url'] ?? '—' ) ) ),
+				),
+				array(
+					'heading'       => \__( 'Title / meta / schema / media', 'aio-page-builder' ),
+					'key'           => 'recommendations',
+					'content_lines' => array( \__( 'SEO and meta updates are not available in this version. Recommendations are for review only.', 'aio-page-builder' ) ),
+				),
+				array(
+					'heading'       => \__( 'Storage path', 'aio-page-builder' ),
+					'key'           => 'storage_path',
+					'content_lines' => array( \esc_html( (string) ( $payload['storage_path_indicator'] ?? 'plugin_advisory' ) ) ),
+				),
 			);
 			$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $item, $capabilities );
 			break;
@@ -171,49 +190,104 @@ final class SEO_Media_Step_UI_Service {
 	private function placeholder_bulk_states( int $eligible_count, array $selected_item_ids, array $rows ): array {
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
 		return array(
-			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL     => array( 'enabled' => false, 'label' => \__( 'Apply all SEO', 'aio-page-builder' ), 'count_eligible' => $eligible_count ),
-			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array( 'enabled' => false, 'label' => \__( 'Apply to selected', 'aio-page-builder' ), 'count_selected' => $selected_count ),
-			Bulk_Action_Bar_Component::CONTROL_DENY_ALL        => array( 'enabled' => false, 'label' => \__( 'Deny all', 'aio-page-builder' ), 'count_eligible' => $eligible_count ),
-			Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array( 'enabled' => $selected_count > 0, 'label' => \__( 'Clear selection', 'aio-page-builder' ) ),
+			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
+				'enabled'        => false,
+				'label'          => \__( 'Apply all SEO', 'aio-page-builder' ),
+				'count_eligible' => $eligible_count,
+			),
+			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
+				'enabled'        => false,
+				'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
+				'count_selected' => $selected_count,
+			),
+			Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
+				'enabled'        => false,
+				'label'          => \__( 'Deny all', 'aio-page-builder' ),
+				'count_eligible' => $eligible_count,
+			),
+			Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
+				'enabled' => $selected_count > 0,
+				'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+			),
 		);
 	}
 
 	private function status_to_badge( string $status ): string {
 		$map = array(
-			Build_Plan_Item_Statuses::PENDING   => 'pending',
-			Build_Plan_Item_Statuses::APPROVED  => 'approved',
-			Build_Plan_Item_Statuses::REJECTED   => 'rejected',
-			Build_Plan_Item_Statuses::SKIPPED   => 'skipped',
+			Build_Plan_Item_Statuses::PENDING     => 'pending',
+			Build_Plan_Item_Statuses::APPROVED    => 'approved',
+			Build_Plan_Item_Statuses::REJECTED    => 'rejected',
+			Build_Plan_Item_Statuses::SKIPPED     => 'skipped',
 			Build_Plan_Item_Statuses::IN_PROGRESS => 'in_progress',
-			Build_Plan_Item_Statuses::COMPLETED => 'completed',
-			Build_Plan_Item_Statuses::FAILED    => 'failed',
+			Build_Plan_Item_Statuses::COMPLETED   => 'completed',
+			Build_Plan_Item_Statuses::FAILED      => 'failed',
 		);
 		return $map[ $status ] ?? $status;
 	}
 
 	private function step_messages( int $total, int $eligible ): array {
 		if ( $total === 0 ) {
-			return array( array( 'severity' => 'info', 'message' => \__( 'No SEO/meta/media recommendations for this plan.', 'aio-page-builder' ), 'level' => 'step' ) );
+			return array(
+				array(
+					'severity' => 'info',
+					'message'  => \__( 'No SEO/meta/media recommendations for this plan.', 'aio-page-builder' ),
+					'level'    => 'step',
+				),
+			);
 		}
 		if ( $eligible === 0 ) {
-			return array( array( 'severity' => 'success', 'message' => \__( 'All SEO recommendations have been reviewed.', 'aio-page-builder' ), 'level' => 'step' ) );
+			return array(
+				array(
+					'severity' => 'success',
+					'message'  => \__( 'All SEO recommendations have been reviewed.', 'aio-page-builder' ),
+					'level'    => 'step',
+				),
+			);
 		}
-		return array( array( 'severity' => 'info', 'message' => sprintf( \_n( '%d SEO item pending review.', '%d SEO items pending review.', $eligible, 'aio-page-builder' ), $eligible ), 'level' => 'step' ) );
+		return array(
+			array(
+				'severity' => 'info',
+				'message'  => sprintf( \_n( '%d SEO item pending review.', '%d SEO items pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+				'level'    => 'step',
+			),
+		);
 	}
 
 	private function empty_workspace(): array {
 		return array(
-			'step_list_rows'           => array(),
-			'column_order'             => self::COLUMN_ORDER,
-			'bulk_action_states'       => array(
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array( 'enabled' => false, 'label' => \__( 'Apply all SEO', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array( 'enabled' => false, 'label' => \__( 'Apply to selected', 'aio-page-builder' ), 'count_selected' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array( 'enabled' => false, 'label' => \__( 'Deny all', 'aio-page-builder' ), 'count_eligible' => 0 ),
-				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array( 'enabled' => false, 'label' => \__( 'Clear selection', 'aio-page-builder' ) ),
+			'step_list_rows'               => array(),
+			'column_order'                 => self::COLUMN_ORDER,
+			'bulk_action_states'           => array(
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Apply all SEO', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
+					'enabled'        => false,
+					'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
+					'count_selected' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
+					'enabled'        => false,
+					'label'          => \__( 'Deny all', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
+					'enabled' => false,
+					'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+				),
 			),
-			'detail_panel'             => array( 'item_id' => '', 'sections' => array(), 'row_actions' => array() ),
-			'step_messages'            => array(),
-			'seo_storage_path_placeholder' => array( 'integration' => 'plugin_advisory', 'description' => '' ),
+			'detail_panel'                 => array(
+				'item_id'     => '',
+				'sections'    => array(),
+				'row_actions' => array(),
+			),
+			'step_messages'                => array(),
+			'seo_storage_path_placeholder' => array(
+				'integration' => 'plugin_advisory',
+				'description' => '',
+			),
 		);
 	}
 }

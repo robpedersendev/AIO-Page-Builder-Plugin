@@ -42,3 +42,18 @@ No new tests: de-scope is removal of mapping and type listing; existing queue/he
 - **Privacy scope expansion** — Out of scope per [privacy-exporter-eraser-scope-decision.md](privacy-exporter-eraser-scope-decision.md).
 - **Token application end-to-end** — Out of scope per [token-application-scope-decision.md](token-application-scope-decision.md).
 - **Build Plan Step 2 Deny / workspace detail–table improvements** — No decision records found; not implemented.
+
+---
+
+## 4. Exposed-but-unavailable cleanup (ambiguity removal)
+
+**Objective:** Remove ambiguity where code, queues, health surfaces, or UI implied executable behavior that is unavailable, deferred, or intentionally unsupported.
+
+| Change | File | Description |
+|--------|------|-------------|
+| Code | `plugin/src/Domain/BuildPlan/Steps/Finalization/Finalization_Step_UI_Service.php` | Replaced placeholder copy with truthful messaging: "Finalization queue and publish actions are not available in this version"; "Conflict reporting is not available in this version"; "Preview not available in this version". Updated file docblock. |
+| Code | `plugin/src/Domain/BuildPlan/Steps/SEO/SEO_Media_Step_UI_Service.php` | Detail panel "Title / meta / schema / media": replaced "Placeholder — recommendation shell only." with "SEO and meta updates are not available in this version. Recommendations are for review only." |
+| Docs | `docs/contracts/execution-action-contract.md` | Implementation status: added note for `apply_token_set` — infrastructure exists; token application is not a user-facing feature; design-tokens step is recommendation-only (token-application-scope-decision.md). |
+| Tests | `plugin/tests/Unit/Build_Plan_Steps_4_7_Shell_Test.php` | Updated EXAMPLE_STEP_6_PAYLOAD to match new finalization copy; added `test_step6_finalization_detail_panel_states_not_available`; added `test_step5_seo_detail_panel_states_not_available_when_item_selected`. |
+
+**Unchanged (already aligned):** Tokens step already had disabled bulk actions and "Token application is not available in this version. Recommendations are for review only." UPDATE_PAGE_METADATA already de-scoped from mapping and health/recovery/logs. APPLY_TOKEN_SET remains in retryable/rollback lists per token-application-descope-criteria (handler retained; not presented as user-facing feature).
