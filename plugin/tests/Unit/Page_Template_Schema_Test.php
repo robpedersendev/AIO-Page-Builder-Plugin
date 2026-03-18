@@ -116,7 +116,7 @@ final class Page_Template_Schema_Test extends TestCase {
 			'position'    => 2,
 			'required'    => false,
 		);
-		// section_requirements still only has st01_hero
+		// section_requirements still only has st01_hero.
 		$req = $valid[ Page_Template_Schema::FIELD_SECTION_REQUIREMENTS ];
 		$this->assertArrayNotHasKey( 'st05_cta', $req );
 	}

@@ -28,6 +28,7 @@ require_once $plugin_root . '/src/Bootstrap/Environment_Validator.php';
 final class Environment_Validator_Test extends TestCase {
 
 	private function run_validator_with_wp_version( string $wp_version ): Environment_Validator {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional override to test version checks.
 		$GLOBALS['wp_version'] = $wp_version;
 		$v                     = new Environment_Validator();
 		$v->validate();
@@ -58,6 +59,7 @@ final class Environment_Validator_Test extends TestCase {
 	}
 
 	public function test_missing_acf_fails_blocking(): void {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional override to test version checks.
 		$GLOBALS['wp_version'] = '6.6';
 		$v                     = new Environment_Validator();
 		$v->validate();
@@ -72,6 +74,7 @@ final class Environment_Validator_Test extends TestCase {
 	}
 
 	public function test_missing_generateblocks_fails_blocking(): void {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional override to test version checks.
 		$GLOBALS['wp_version'] = '6.6';
 		$v                     = new Environment_Validator();
 		$v->validate();
@@ -86,6 +89,7 @@ final class Environment_Validator_Test extends TestCase {
 	}
 
 	public function test_missing_lpagery_warns_only(): void {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional override to test version checks.
 		$GLOBALS['wp_version'] = '6.6';
 		$v                     = new Environment_Validator();
 		$v->validate();
@@ -101,6 +105,7 @@ final class Environment_Validator_Test extends TestCase {
 	}
 
 	public function test_to_lifecycle_result_blocking_when_validation_fails(): void {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional override to test version checks.
 		$GLOBALS['wp_version'] = '6.5';
 		$v                     = new Environment_Validator();
 		$v->validate();
@@ -126,6 +131,7 @@ final class Environment_Validator_Test extends TestCase {
 	}
 
 	public function test_extension_pack_results_are_never_blocking(): void {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional override to test version checks.
 		$GLOBALS['wp_version'] = '6.6';
 		$v                     = new Environment_Validator();
 		$v->validate();

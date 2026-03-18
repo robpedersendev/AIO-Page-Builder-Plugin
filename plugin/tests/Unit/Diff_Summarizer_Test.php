@@ -431,7 +431,7 @@ final class Diff_Summarizer_Test extends TestCase {
 	public function test_token_diff_failure_when_pre_state_missing(): void {
 		$summarizer = new Token_Diff_Summarizer();
 		$pre        = self::token_pre_snapshot();
-		$pre[ Operational_Snapshot_Schema::FIELD_PRE_CHANGE ] = array( 'captured_at' => 'now' ); // no state_snapshot
+		$pre[ Operational_Snapshot_Schema::FIELD_PRE_CHANGE ] = array( 'captured_at' => 'now' ); // no state_snapshot.
 		$post   = self::token_post_snapshot();
 		$result = $summarizer->summarize( $pre, $post, Diff_Type_Keys::LEVEL_SUMMARY );
 		$this->assertFalse( $result->is_success() );

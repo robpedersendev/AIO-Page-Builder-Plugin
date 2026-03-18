@@ -52,7 +52,7 @@ final class Industry_Recommendation_Regression_Guard_Test extends TestCase {
 				$this->templates = $templates;
 			}
 			public function list_all_definitions( int $limit = 0, int $offset = 0 ): array {
-				return array_slice( $this->templates, $offset, $limit ?: count( $this->templates ) );
+				return array_slice( $this->templates, $offset, $limit ? $limit : count( $this->templates ) );
 			}
 		};
 	}

@@ -79,7 +79,7 @@ final class Template_Diff_Summary_Builder_Test extends TestCase {
 		$this->assertSame( 'tpl_services_hub', $summary['template_key_after'] );
 		$this->assertSame( 'services', $summary['template_family_after'] );
 		$this->assertSame( 5, $summary['section_count_after'] );
-		$this->assertTrue( $summary['template_structural_change'] ); // empty before -> template after
+		$this->assertTrue( $summary['template_structural_change'] ); // empty before -> template after.
 		$this->assertArrayHasKey( 'rollback_template_context', $summary );
 		$this->assertSame( 'tpl_services_hub', $summary['rollback_template_context']['template_key'] );
 		$this->assertSame( 'services', $summary['rollback_template_context']['template_family'] );

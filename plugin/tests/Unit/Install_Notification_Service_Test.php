@@ -53,7 +53,7 @@ final class Stub_Install_Transport implements Install_Notification_Transport_Int
 			)
 			: array(
 				'success'        => false,
-				'failure_reason' => $this->failure_reason ?: 'Delivery failed.',
+				'failure_reason' => $this->failure_reason !== '' && $this->failure_reason !== null ? $this->failure_reason : 'Delivery failed.',
 			);
 	}
 }

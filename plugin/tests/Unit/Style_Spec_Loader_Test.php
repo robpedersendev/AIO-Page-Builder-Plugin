@@ -17,7 +17,11 @@ require_once $plugin_root . '/src/Domain/Styling/Style_Spec_Loader.php';
 
 final class Style_Spec_Loader_Test extends TestCase {
 
-	/** Plugin root (plugin/ directory). */
+	/**
+	 * Plugin root (plugin/ directory).
+	 *
+	 * @var string
+	 */
 	private string $plugin_root;
 
 	protected function setUp(): void {

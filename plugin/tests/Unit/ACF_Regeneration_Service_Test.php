@@ -378,7 +378,8 @@ final class ACF_Regeneration_Service_Test extends TestCase {
 			$this->assertFileExists( $mirror_refresh_path . '/group_aio_st01_hero.json', 'Mirror must be written after repair' );
 		} finally {
 			if ( is_dir( $mirror_refresh_path ) ) {
-				foreach ( glob( $mirror_refresh_path . '/*' ) ?: array() as $f ) {
+				$files = glob( $mirror_refresh_path . '/*' );
+				foreach ( $files !== false ? $files : array() as $f ) {
 					@unlink( $f );
 				}
 				@rmdir( $mirror_refresh_path );

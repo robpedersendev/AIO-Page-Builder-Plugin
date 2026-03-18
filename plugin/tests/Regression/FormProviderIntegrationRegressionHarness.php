@@ -79,7 +79,7 @@ final class FormProviderIntegrationRegressionHarness {
 	/**
 	 * Runs a single scenario from fixture array.
 	 *
-	 * @param array<string, mixed> $fixture
+	 * @param array<string, mixed> $fixture Scenario fixture (scenario_id, expected, section/page_template).
 	 * @return array{scenario_id: string, pass: bool, message: string, details: array}
 	 */
 	public function run_one( array $fixture ): array {
@@ -153,7 +153,7 @@ final class FormProviderIntegrationRegressionHarness {
 	/**
 	 * Returns a summary suitable for report artifact (machine-readable).
 	 *
-	 * @param list<array{scenario_id: string, pass: bool, message: string, details: array}> $results
+	 * @param list<array{scenario_id: string, pass: bool, message: string, details: array}> $results Per-scenario run results.
 	 * @return array{ran_at: string, total: int, passed: int, failed: int, results: array}
 	 */
 	public static function summary( array $results ): array {
@@ -175,7 +175,7 @@ final class FormProviderIntegrationRegressionHarness {
 	}
 
 	/**
-	 * @param string $path
+	 * @param string $path Path to JSON fixture file.
 	 * @return array<string, mixed>|null
 	 */
 	private function load_json( string $path ): ?array {

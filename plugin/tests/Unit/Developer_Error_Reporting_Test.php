@@ -64,7 +64,7 @@ final class Stub_Developer_Error_Transport implements Developer_Error_Transport_
 			)
 			: array(
 				'success'        => false,
-				'failure_reason' => $this->failure_reason ?: 'Delivery failed.',
+				'failure_reason' => $this->failure_reason !== '' && $this->failure_reason !== null ? $this->failure_reason : 'Delivery failed.',
 			);
 	}
 }

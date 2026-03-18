@@ -108,11 +108,13 @@ if ( ! function_exists( 'esc_html' ) ) {
 }
 if ( ! function_exists( 'esc_attr_e' ) ) {
 	function esc_attr_e( $text, $domain = 'default' ) {
+		// phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralDomain -- Test stub; params are variables by design.
 		echo esc_attr( __( $text, $domain ) );
 	}
 }
 if ( ! function_exists( 'esc_html_e' ) ) {
 	function esc_html_e( $text, $domain = 'default' ) {
+		// phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralDomain -- Test stub; params are variables by design.
 		echo esc_html( __( $text, $domain ) );
 	}
 }
@@ -215,6 +217,7 @@ if ( ! function_exists( '_n' ) ) {
 	}
 }
 if ( ! function_exists( 'dbDelta' ) ) {
+	// phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid -- Stub must match WordPress function name dbDelta.
 	function dbDelta( $sql ) {
 		// No-op for unit tests; real table creation runs in WP context.
 	}

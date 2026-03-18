@@ -22,8 +22,9 @@ require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Schem
 require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Repository.php';
 require_once $plugin_root . '/src/Domain/Industry/Reporting/Industry_Inspection_Command_Service.php';
 
-// * Tests that call set_profile() require WordPress option stubs (run with phpunit.xml.dist bootstrap).
-
+/**
+ * Tests that call set_profile() require WordPress option stubs (run with phpunit.xml.dist bootstrap).
+ */
 final class Industry_Inspection_Command_Service_Test extends TestCase {
 
 	public function test_get_profile_summary_without_repo_returns_available_false(): void {

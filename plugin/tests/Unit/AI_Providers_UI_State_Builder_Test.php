@@ -72,7 +72,7 @@ final class AI_Providers_UI_State_Builder_Test extends TestCase {
 	 * Documents and asserts the stable AI Providers screen state payload shape (spec §49.9).
 	 * Example payload (no pseudocode):
 	 *
-	 * provider_rows: [ { provider_id: "openai", label: "OpenAI", credential_status: { state: "absent", label: "Not configured" },
+	 * Provider_rows: [ { provider_id: "openai", label: "OpenAI", credential_status: { state: "absent", label: "Not configured" },
 	 *   model_default_state: { model_id: null, label: "—" }, connection_test_summary: null, last_successful_use: null } ]
 	 * disclosure_blocks: [ { heading: "External transfer", content: "When you use AI providers..." }, { heading: "Cost", content: "AI requests consume tokens..." } ]
 	 * ai_runs_url: "http://example.org/wp-admin/admin.php?page=aio-page-builder-ai-runs"
@@ -93,7 +93,7 @@ final class AI_Providers_UI_State_Builder_Test extends TestCase {
 	/**
 	 * Asserts that no key in the state is a known secret-bearing key name (exact match).
 	 *
-	 * @param array<string, mixed> $arr
+	 * @param array<string, mixed> $arr State array to check for forbidden key names.
 	 */
 	private function assertNoSecretKeysInArray( array $arr ): void {
 		$forbidden = array( 'api_key', 'secret', 'token', 'password', 'apikey' );

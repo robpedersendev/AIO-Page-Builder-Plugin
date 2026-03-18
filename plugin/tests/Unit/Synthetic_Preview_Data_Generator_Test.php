@@ -143,8 +143,10 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 		}
 	}
 
-	/** @param array<string, mixed> $arr
-	 * @param list<string>         $out */
+	/**
+	 * @param array<string, mixed> $arr Array to scan for string values.
+	 * @param array<int, string>   $out Output list of strings (by reference).
+	 */
 	private function collect_strings_recursive( array $arr, array &$out ): void {
 		foreach ( $arr as $v ) {
 			if ( is_string( $v ) ) {
@@ -258,7 +260,7 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 		$this->assertArrayHasKey( 'subheadline', $field_values );
 		$this->assertArrayHasKey( 'cta_text', $field_values );
 		$this->assertArrayHasKey( 'cta_url', $field_values );
-		// Example payload shape (documentation):
+		// Example payload shape (documentation).
 		$example = array(
 			'section_key'  => $context->get_key(),
 			'variant'      => $context->get_variant(),
@@ -291,7 +293,7 @@ final class Synthetic_Preview_Data_Generator_Test extends TestCase {
 		$this->assertSame( 'page', $context->get_type() );
 		$this->assertSame( 'pt_home_landing', $context->get_key() );
 		$this->assertCount( 2, $section_field_values );
-		// Example payload shape (documentation):
+		// Example payload shape (documentation).
 		$example = array(
 			'template_key'         => $context->get_key(),
 			'section_field_values' => $section_field_values,

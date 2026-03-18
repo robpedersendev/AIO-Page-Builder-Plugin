@@ -6,6 +6,8 @@
  * - Meaningful: H1 + ≥150 words, or in_navigation, or likely_role, or link_count ≥ 3.
  * - Thin (low_value): no H1 or <150 words and none of the above.
  * - Duplicate: candidate matches known page by canonical or content_hash.
+ *
+ * @package AIOPageBuilder
  */
 
 namespace AIOPageBuilder\Tests\Unit;

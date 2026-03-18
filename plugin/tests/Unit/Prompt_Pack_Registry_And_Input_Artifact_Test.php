@@ -59,7 +59,7 @@ final class Test_Prompt_Pack_Repo implements Prompt_Pack_Registry_Repository_Int
 				$out[] = $def;
 			}
 		}
-		return array_slice( $out, $offset, $limit ?: 50 );
+		return array_slice( $out, $offset, $limit ? $limit : 50 );
 	}
 }
 

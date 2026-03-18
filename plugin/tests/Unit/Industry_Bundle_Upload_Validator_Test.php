@@ -2,7 +2,7 @@
 /**
  * Unit tests for Industry_Bundle_Upload_Validator (SPR-001): size, MIME/extension, JSON and bundle structure.
  *
- * validate_upload() enforces size, extension, and MIME before any read; extension/MIME branches require
+ * Validate_upload() enforces size, extension, and MIME before any read; extension/MIME branches require
  * is_uploaded_file() to pass (not true in CLI). read_parse_validate_bundle() enforces max read size, JSON decode, and bundle structure.
  *
  * @package AIOPageBuilder

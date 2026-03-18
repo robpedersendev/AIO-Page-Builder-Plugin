@@ -55,7 +55,7 @@ final class Stub_Heartbeat_Transport implements Heartbeat_Transport_Interface {
 			)
 			: array(
 				'success'        => false,
-				'failure_reason' => $this->failure_reason ?: 'Delivery failed.',
+				'failure_reason' => $this->failure_reason !== '' && $this->failure_reason !== null ? $this->failure_reason : 'Delivery failed.',
 			);
 	}
 }

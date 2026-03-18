@@ -72,7 +72,9 @@ final class Assignment_Map_Wpdb_Stub {
 				$source_ref = $m[2];
 				$target_ref = $m[3];
 			} else {
-				$map_type = $source_ref = $target_ref = '';
+				$map_type   = '';
+				$source_ref = '';
+				$target_ref = '';
 			}
 			++$this->next_id;
 			$this->insert_id = $this->next_id - 1;

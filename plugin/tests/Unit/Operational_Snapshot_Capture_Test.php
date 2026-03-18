@@ -190,7 +190,7 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 			Execution_Action_Contract::ENVELOPE_ACTION_ID => 'exec_replace_1',
 			Execution_Action_Contract::ENVELOPE_PLAN_ID   => 'plan-1',
 			Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID => 'item-0',
-			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(), // no page_ref -> build returns null
+			Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(), // no page_ref -> build returns null.
 		);
 		$result   = $svc->capture_pre_change( $envelope );
 		$this->assertFalse( $result->is_success() );

@@ -64,7 +64,9 @@ final class Compatibility_Service_Wpdb_Stub {
 		if ( ! is_array( $store ) ) {
 			$store = array(); }
 		if ( strpos( $sql, 'INSERT INTO' ) !== false ) {
-			$map_type = $source_ref = $target_ref = '';
+			$map_type   = '';
+			$source_ref = '';
+			$target_ref = '';
 			if ( preg_match( '/VALUES\s*\(\s*\'([^\']*)\'\s*,\s*\'([^\']*)\'\s*,\s*\'([^\']*)\'/s', $sql, $m ) ) {
 				$map_type   = $m[1];
 				$source_ref = $m[2];
@@ -87,7 +89,8 @@ final class Compatibility_Service_Wpdb_Stub {
 		$store = $GLOBALS['_aio_assign_store'] ?? array();
 		if ( ! is_array( $store ) ) {
 			return array(); }
-		$map_type = $source_ref = null;
+		$map_type   = null;
+		$source_ref = null;
 		if ( preg_match( '/map_type\s*=\s*[\'"]([^\'"]*)[\'"]/', $query, $m ) ) {
 			$map_type = $m[1]; }
 		if ( preg_match( '/source_ref\s*=\s*[\'"]([^\'"]*)[\'"]/', $query, $m ) ) {

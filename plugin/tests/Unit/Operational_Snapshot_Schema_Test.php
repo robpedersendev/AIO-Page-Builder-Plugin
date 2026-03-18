@@ -110,7 +110,7 @@ final class Operational_Snapshot_Schema_Test extends TestCase {
 			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
 			Operational_Snapshot_Schema::FIELD_TARGET_REF  => '42',
 			Operational_Snapshot_Schema::FIELD_CREATED_AT  => '2025-03-12T10:00:00Z',
-			// missing schema_version and pre_change
+			// missing schema_version and pre_change.
 		);
 		$errors = Operational_Snapshot_Schema::validate_root( $snapshot );
 		$this->assertNotEmpty( $errors );

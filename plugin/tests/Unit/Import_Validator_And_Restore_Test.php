@@ -174,12 +174,20 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 	public function test_restore_result_success_includes_skipped_reasons_in_payload(): void {
 		$summary = array(
 			'skipped_reasons' => array(
-				array( 'category' => 'styling', 'reason' => 'Styling restore is not available: required service (normalizer or sanitizer) is not loaded.' ),
+				array(
+					'category' => 'styling',
+					'reason'   => 'Styling restore is not available: required service (normalizer or sanitizer) is not loaded.',
+				),
 			),
 		);
 		$r = Restore_Result::success(
 			array( 'settings' ),
-			array( array( 'category' => 'settings', 'action' => 'overwrite' ) ),
+			array(
+				array(
+					'category' => 'settings',
+					'action'   => 'overwrite',
+				),
+			),
 			'restore-test',
 			'Restore completed.',
 			$summary
@@ -267,7 +275,7 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 	}
 
 	/**
-	 * @param string $schema_version
+	 * @param string $schema_version Manifest schema version for compatibility_flags.
 	 * @return array<string, mixed>
 	 */
 	private function minimal_manifest( string $schema_version = '1' ): array {
