@@ -69,3 +69,15 @@ For each decision:
   - Boundary documented in docs/operations/privacy-exporter-eraser-scope-boundary.md.
   - No code change; no implementation criteria (scope unchanged).
   - If future storage is user-keyed (e.g. per-user logs), evaluate for inclusion and update boundary doc.
+
+### 5. Token Application (Build Plan Step) Out of Scope
+
+- **Date:** 2025-03-18
+- **Title:** Token application remains recommendation-only; not a user-facing feature
+- **Status:** Accepted
+- **Context:** APPLY_TOKEN_SET and handler/job exist; Tokens step UI is shell-only (SPR-009) with disabled bulk apply and “not available” copy. Clarify whether token application is in scope as an executable feature.
+- **Decision:** Token application is **out of scope** for the current product. Step is recommendation-only. Bulk apply/deny stay disabled; copy must state token application is not available. Handler, job, and rollback are retained as infrastructure but must not be presented as a supported user feature. Runtime styling uses aio_global_style_settings; aio_applied_design_tokens is build plan/rollback only—no sync in place.
+- **Consequences:**
+  - De-scope criteria: docs/operations/token-application-descope-criteria.md.
+  - No implementation criteria (feature not in scope). If brought in scope later: source-of-truth sync, enable UI, validation/preview/rollback per decision record §5.
+  - Ledger SPR-009 unchanged; decision referenced for product truth.
