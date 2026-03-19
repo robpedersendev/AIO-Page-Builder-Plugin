@@ -34,13 +34,13 @@ final class Rollback_Eligibility_Result {
 	/** @var bool */
 	private bool $is_eligible;
 
-	/** @var list<string> Blocking reason codes (Rollback_Blocking_Reasons). */
+	/** @var array<int, string> Blocking reason codes (Rollback_Blocking_Reasons). */
 	private array $blocking_reasons;
 
-	/** @var list<string> Warning codes or messages (non-blocking). */
+	/** @var array<int, string> Warning codes or messages (non-blocking). */
 	private array $warnings;
 
-	/** @var list<string> Capability names required to execute rollback. */
+	/** @var array<int, string> Capability names required to execute rollback. */
 	private array $required_permissions;
 
 	/** @var string One of TARGET_* constants. */
@@ -92,8 +92,8 @@ final class Rollback_Eligibility_Result {
 	 * @param string       $pre_snapshot_id
 	 * @param string       $post_snapshot_id
 	 * @param string       $execution_ref
-	 * @param list<string> $warnings Optional warnings (e.g. state_diverged).
-	 * @param list<string> $required_permissions
+	 * @param array<int, string> $warnings Optional warnings (e.g. state_diverged).
+	 * @param array<int, string> $required_permissions
 	 * @return self
 	 */
 	public static function eligible(
@@ -121,14 +121,14 @@ final class Rollback_Eligibility_Result {
 	/**
 	 * Builds an ineligible result with blocking reasons.
 	 *
-	 * @param list<string> $blocking_reasons
+	 * @param array<int, string> $blocking_reasons
 	 * @param string       $rollback_handler_key Empty if unknown.
 	 * @param string       $pre_snapshot_id
 	 * @param string       $post_snapshot_id
 	 * @param string       $execution_ref
 	 * @param string       $target_resolution_state
-	 * @param list<string> $warnings
-	 * @param list<string> $required_permissions
+	 * @param array<int, string> $warnings
+	 * @param array<int, string> $required_permissions
 	 * @param string       $message
 	 * @return self
 	 */
@@ -164,17 +164,17 @@ final class Rollback_Eligibility_Result {
 		return $this->is_eligible;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_blocking_reasons(): array {
 		return $this->blocking_reasons;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_warnings(): array {
 		return $this->warnings;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_required_permissions(): array {
 		return $this->required_permissions;
 	}

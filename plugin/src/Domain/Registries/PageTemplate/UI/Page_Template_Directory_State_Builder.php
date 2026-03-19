@@ -135,7 +135,7 @@ final class Page_Template_Directory_State_Builder {
 	 * @param string $family
 	 * @param string $search
 	 * @param string $base_url
-	 * @return list<array{label: string, url: string}>
+	 * @return array<int, array{label: string, url: string}>
 	 */
 	private function build_breadcrumbs( string $view, string $category_class, string $family, string $search, string $base_url ): array {
 		$segments = array(
@@ -181,7 +181,7 @@ final class Page_Template_Directory_State_Builder {
 	 * Builds tree: list of categories with count and url.
 	 *
 	 * @param string $base_url
-	 * @return list<array{slug: string, label: string, count: int, url: string}>
+	 * @return array<int, array{slug: string, label: string, count: int, url: string}>
 	 */
 	private function build_tree( string $base_url ): array {
 		$empty_filters = array();
@@ -207,7 +207,7 @@ final class Page_Template_Directory_State_Builder {
 	 *
 	 * @param string $category_class
 	 * @param string $base_url
-	 * @return list<array{slug: string, label: string, count: int, url: string}>
+	 * @return array<int, array{slug: string, label: string, count: int, url: string}>
 	 */
 	private function build_families_for_category( string $category_class, string $base_url ): array {
 		$filters = array( Large_Library_Query_Service::FILTER_TEMPLATE_CATEGORY_CLASS => $category_class );

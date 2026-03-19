@@ -30,7 +30,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 	/**
 	 * Returns all top-level legal/utility page template definitions (order preserved for seeding).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function all_definitions(): array {
 		return array(
@@ -52,7 +52,7 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 	/**
 	 * Returns page template internal keys in this batch.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function template_keys(): array {
 		return array(
@@ -74,8 +74,8 @@ final class Top_Level_Legal_Utility_Page_Template_Definitions {
 	/**
 	 * Builds ordered_sections and section_requirements from a list of section keys.
 	 *
-	 * @param list<string> $section_keys Section internal keys in order (no adjacent CTA; last must be CTA).
-	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
+	 * @param array<int, string> $section_keys Section internal keys in order (no adjacent CTA; last must be CTA).
+	 * @return array{ ordered: array<int, array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
 		$ordered      = array();

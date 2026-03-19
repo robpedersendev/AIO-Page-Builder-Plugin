@@ -169,7 +169,7 @@ final class Industry_Pack_Bundle_Service {
 	 * Validates bundle structure and manifest. Does not validate per-object schemas (done at import).
 	 *
 	 * @param array<string, mixed> $bundle Bundle array (manifest + payload).
-	 * @return list<string> List of error messages; empty if valid.
+	 * @return array<int, string> List of error messages; empty if valid.
 	 */
 	public function validate_bundle( array $bundle ): array {
 		$errors  = array();

@@ -40,7 +40,7 @@ final class Industry_Guided_Repair_View_Model {
 	/** Action: resolve in Override Management (link only). */
 	public const ACTION_LINK_OVERRIDE_MANAGEMENT = 'link_override_management';
 
-	/** @var list<array{source: string, object_type: string, key: string, issue_summary: string, related_refs: list<string>, repair_suggestion: array|null, is_advisory_only: bool, action_type: string, conflict: array|null, profile_field: string, suggested_value: string}> */
+	/** @var array<int, array{source: string, object_type: string, key: string, issue_summary: string, related_refs: array<int, string>, repair_suggestion: array|null, is_advisory_only: bool, action_type: string, conflict: array|null, profile_field: string, suggested_value: string}> */
 	private array $candidates;
 
 	/** @var array<string, string> */
@@ -50,7 +50,7 @@ final class Industry_Guided_Repair_View_Model {
 	private string $message_type;
 
 	/**
-	 * @param list<array{source: string, object_type: string, key: string, issue_summary: string, related_refs: list<string>, repair_suggestion: array|null, is_advisory_only: bool, action_type: string, conflict: array|null, profile_field: string, suggested_value: string}> $candidates
+	 * @param array<int, array{source: string, object_type: string, key: string, issue_summary: string, related_refs: array<int, string>, repair_suggestion: array|null, is_advisory_only: bool, action_type: string, conflict: array|null, profile_field: string, suggested_value: string}> $candidates
 	 * @param array<string, string>                                                                                                                                                                                                                                              $links
 	 */
 	public function __construct(
@@ -65,7 +65,7 @@ final class Industry_Guided_Repair_View_Model {
 		$this->message_type = $message_type;
 	}
 
-	/** @return list<array{source: string, object_type: string, key: string, issue_summary: string, related_refs: list<string>, repair_suggestion: array|null, is_advisory_only: bool, action_type: string, conflict: array|null, profile_field: string, suggested_value: string}> */
+	/** @return array<int, array{source: string, object_type: string, key: string, issue_summary: string, related_refs: array<int, string>, repair_suggestion: array|null, is_advisory_only: bool, action_type: string, conflict: array|null, profile_field: string, suggested_value: string}> */
 	public function get_candidates(): array {
 		return $this->candidates;
 	}

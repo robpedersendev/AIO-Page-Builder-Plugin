@@ -115,15 +115,15 @@ final class Industry_Pack_Completeness_Report_Service {
 	 *
 	 * @param bool $include_subtypes When true, score each subtype scope as well.
 	 * @return array{
-	 *   pack_results: list<array{
+	 *   pack_results: array<int, array{
 	 *     pack_key: string,
 	 *     subtype_key: string,
 	 *     dimension_scores: array<string, int>,
 	 *     total: int,
 	 *     band: string,
-	 *     missing_assets: list<string>,
-	 *     blocker_flags: list<string>,
-	 *     notes: list<string>
+	 *     missing_assets: array<int, string>,
+	 *     blocker_flags: array<int, string>,
+	 *     notes: array<int, string>
 	 *   }>,
 	 *   summary: array{pack_count: int, subtype_count: int, release_grade_count: int, strong_count: int, minimal_count: int, below_minimal_count: int}
 	 * }
@@ -172,7 +172,7 @@ final class Industry_Pack_Completeness_Report_Service {
 	/**
 	 * @param array<string, mixed>|null $pack
 	 * @param array<string, bool>       $health_errors_by_key Pack/subtype keys that have health errors.
-	 * @return array{pack_key: string, subtype_key: string, dimension_scores: array<string, int>, total: int, band: string, missing_assets: list<string>, blocker_flags: list<string>, notes: list<string>}
+	 * @return array{pack_key: string, subtype_key: string, dimension_scores: array<string, int>, total: int, band: string, missing_assets: array<int, string>, blocker_flags: array<int, string>, notes: array<int, string>}
 	 */
 	private function score_scope( string $industry_key, string $subtype_key, ?array $pack, array $health_errors_by_key ): array {
 		$scope_key      = $subtype_key !== '' ? $industry_key . '|' . $subtype_key : $industry_key;
@@ -319,7 +319,7 @@ final class Industry_Pack_Completeness_Report_Service {
 
 	/**
 	 * @param array<string, int> $dimensions
-	 * @param list<string>       $blocker_flags
+	 * @param array<int, string>       $blocker_flags
 	 */
 	private function compute_band( array $dimensions, int $total, array $blocker_flags ): string {
 		$pack_score   = $dimensions[ self::DIMENSION_PACK ] ?? 0;
@@ -395,7 +395,7 @@ final class Industry_Pack_Completeness_Report_Service {
 	}
 
 	/**
-	 * @param list<array{pack_key: string, subtype_key: string, band: string}> $pack_results
+	 * @param array<int, array{pack_key: string, subtype_key: string, band: string}> $pack_results
 	 * @return array{pack_count: int, subtype_count: int, release_grade_count: int, strong_count: int, minimal_count: int, below_minimal_count: int}
 	 */
 	private function make_summary( array $pack_results ): array {

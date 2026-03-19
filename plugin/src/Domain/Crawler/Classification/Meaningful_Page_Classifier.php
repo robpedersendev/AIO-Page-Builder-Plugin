@@ -54,7 +54,7 @@ final class Meaningful_Page_Classifier {
 	 * @param string                                                                                                                              $normalized_url   Page URL.
 	 * @param string                                                                                                                              $html             Response body (HTML).
 	 * @param array{canonical_url?: string|null, final_url?: string|null, in_navigation?: bool, link_count?: int}                                 $context Optional context.
-	 * @param list<array{normalized_url: string, canonical_url?: string|null, title?: string|null, h1?: string|null, content_hash?: string|null}> $known_pages Already-accepted pages for duplicate check.
+	 * @param array<int, array{normalized_url: string, canonical_url?: string|null, title?: string|null, h1?: string|null, content_hash?: string|null}> $known_pages Already-accepted pages for duplicate check.
 	 * @return Classification_Result
 	 */
 	public function classify(

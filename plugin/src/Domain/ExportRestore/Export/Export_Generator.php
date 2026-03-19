@@ -105,7 +105,7 @@ final class Export_Generator {
 	 * Writes ZIP under plugin exports path; logs attempt and result.
 	 *
 	 * @param string       $mode             Export mode key (Export_Mode_Keys).
-	 * @param list<string> $optional_included Optional category keys to include when mode allows (e.g. logs, reporting_history).
+	 * @param array<int, string> $optional_included Optional category keys to include when mode allows (e.g. logs, reporting_history).
 	 * @return Export_Result
 	 */
 	public function generate( string $mode, array $optional_included = array() ): Export_Result {
@@ -255,7 +255,7 @@ final class Export_Generator {
 	 * Returns category matrix for mode (export-bundle-structure-contract.md §2.1).
 	 *
 	 * @param string $mode Export mode key.
-	 * @return array{included: list<string>, excluded: list<string>, optional_allowed: list<string>, redact: bool}
+	 * @return array{included: array<int, string>, excluded: array<int, string>, optional_allowed: array<int, string>, redact: bool}
 	 */
 	private function get_categories_for_mode( string $mode ): array {
 		$included         = Export_Bundle_Schema::INCLUDED_CATEGORIES;
@@ -305,7 +305,7 @@ final class Export_Generator {
 	 *
 	 * @param string       $staging_dir Staging root path.
 	 * @param string       $mode        Export mode.
-	 * @param list<string> $included    Categories to include.
+	 * @param array<int, string> $included    Categories to include.
 	 * @param bool         $redact      Whether to redact settings and profile.
 	 */
 	private function write_staging_files( string $staging_dir, string $mode, array $included, bool $redact ): void {

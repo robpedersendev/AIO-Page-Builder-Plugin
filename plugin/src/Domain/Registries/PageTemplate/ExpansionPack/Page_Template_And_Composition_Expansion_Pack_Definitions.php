@@ -53,7 +53,7 @@ final class Page_Template_And_Composition_Expansion_Pack_Definitions {
 	/**
 	 * Returns all expansion-pack page template definitions.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function page_template_definitions(): array {
 		return array(
@@ -65,7 +65,7 @@ final class Page_Template_And_Composition_Expansion_Pack_Definitions {
 	/**
 	 * Returns all expansion-pack composition definitions.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function composition_definitions(): array {
 		return array(

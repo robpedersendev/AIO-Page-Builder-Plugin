@@ -25,7 +25,7 @@ final class Template_Menu_Apply_Result {
 	/** @var string */
 	private $message;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private $errors;
 
 	/** @var int WordPress nav menu term_id; 0 on failure. */
@@ -37,7 +37,7 @@ final class Template_Menu_Apply_Result {
 	/** @var array<string, mixed> navigation_hierarchy_summary. */
 	private $hierarchy_summary;
 
-	/** @var list<array<string, mixed>> per_item_status. */
+	/** @var array<int, array<string, mixed>> per_item_status. */
 	private $per_item_status;
 
 	/** @var array<string, mixed> artifacts for handler/snapshot. */
@@ -71,7 +71,7 @@ final class Template_Menu_Apply_Result {
 		return $this->message;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_errors(): array {
 		return $this->errors;
 	}
@@ -90,7 +90,7 @@ final class Template_Menu_Apply_Result {
 		return $this->hierarchy_summary;
 	}
 
-	/** @return list<array<string, mixed>> */
+	/** @return array<int, array<string, mixed>> */
 	public function get_per_item_status(): array {
 		return $this->per_item_status;
 	}
@@ -149,7 +149,7 @@ final class Template_Menu_Apply_Result {
 	 * @param int                        $menu_id
 	 * @param array<string, mixed>       $validation_result
 	 * @param array<string, mixed>       $hierarchy_summary
-	 * @param list<array<string, mixed>> $per_item_status
+	 * @param array<int, array<string, mixed>> $per_item_status
 	 * @param array<string, mixed>       $artifacts
 	 * @return self
 	 */
@@ -176,10 +176,10 @@ final class Template_Menu_Apply_Result {
 	 * Failure factory. Missing location must be visible (no silent skip).
 	 *
 	 * @param string                     $message
-	 * @param list<string>               $errors
+	 * @param array<int, string>               $errors
 	 * @param array<string, mixed>       $validation_result
 	 * @param array<string, mixed>       $hierarchy_summary
-	 * @param list<array<string, mixed>> $per_item_status
+	 * @param array<int, array<string, mixed>> $per_item_status
 	 * @return self
 	 */
 	public static function failure(

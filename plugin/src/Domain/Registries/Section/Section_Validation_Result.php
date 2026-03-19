@@ -20,7 +20,7 @@ final class Section_Validation_Result {
 	/** @var bool */
 	public readonly bool $valid;
 
-	/** @var list<string> Error codes or messages; no secrets. */
+	/** @var array<int, string> Error codes or messages; no secrets. */
 	public readonly array $errors;
 
 	/** @var array<string, mixed>|null Normalized definition when available. */

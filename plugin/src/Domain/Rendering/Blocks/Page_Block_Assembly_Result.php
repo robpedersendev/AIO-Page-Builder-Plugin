@@ -46,29 +46,29 @@ final class Page_Block_Assembly_Result {
 	/** @var string */
 	private string $source_key;
 
-	/** @var list<array<string, mixed>> */
+	/** @var array<int, array<string, mixed>> */
 	private array $ordered_sections;
 
 	/** @var string */
 	private string $block_content;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $dynamic_dependencies;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $survivability_notes;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $errors;
 
 	/**
 	 * @param string                     $source_type            One of SOURCE_TYPE_*.
 	 * @param string                     $source_key             Template internal_key or composition_id.
-	 * @param list<array<string, mixed>> $ordered_sections       Section payloads in page order.
+	 * @param array<int, array<string, mixed>> $ordered_sections       Section payloads in page order.
 	 * @param string                     $block_content          Serialized block markup.
-	 * @param list<string>               $dynamic_dependencies   Block names using render callbacks.
-	 * @param list<string>               $survivability_notes    Durability notes.
-	 * @param list<string>               $errors                 Assembly errors; non-empty when invalid.
+	 * @param array<int, string>               $dynamic_dependencies   Block names using render callbacks.
+	 * @param array<int, string>               $survivability_notes    Durability notes.
+	 * @param array<int, string>               $errors                 Assembly errors; non-empty when invalid.
 	 */
 	public function __construct(
 		string $source_type,
@@ -96,7 +96,7 @@ final class Page_Block_Assembly_Result {
 		return $this->source_key;
 	}
 
-	/** @return list<array<string, mixed>> */
+	/** @return array<int, array<string, mixed>> */
 	public function get_ordered_sections(): array {
 		return $this->ordered_sections;
 	}
@@ -105,17 +105,17 @@ final class Page_Block_Assembly_Result {
 		return $this->block_content;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_dynamic_dependencies(): array {
 		return $this->dynamic_dependencies;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_survivability_notes(): array {
 		return $this->survivability_notes;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_errors(): array {
 		return $this->errors;
 	}

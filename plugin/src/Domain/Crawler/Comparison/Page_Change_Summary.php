@@ -59,7 +59,7 @@ final class Page_Change_Summary {
 	/** @var string One of CATEGORY_*. */
 	public $change_category;
 
-	/** @var list<string> Explicit reason codes. */
+	/** @var array<int, string> Explicit reason codes. */
 	public $reason_codes;
 
 	/** @var array<string, mixed>|null Key fields from prior run record; null if added. */
@@ -71,7 +71,7 @@ final class Page_Change_Summary {
 	/**
 	 * @param string                    $url             Normalized URL.
 	 * @param string                    $change_category One of CATEGORY_*.
-	 * @param list<string>              $reason_codes    Reason codes.
+	 * @param array<int, string>              $reason_codes    Reason codes.
 	 * @param array<string, mixed>|null $prior_snapshot Optional prior record excerpt.
 	 * @param array<string, mixed>|null $new_snapshot   Optional new record excerpt.
 	 */
@@ -92,7 +92,7 @@ final class Page_Change_Summary {
 	/**
 	 * Returns a machine-readable array for logging or API.
 	 *
-	 * @return array{url: string, change_category: string, reason_codes: list<string>, prior_snapshot: array|null, new_snapshot: array|null}
+	 * @return array{url: string, change_category: string, reason_codes: array<int, string>, prior_snapshot: array|null, new_snapshot: array|null}
 	 */
 	public function to_array(): array {
 		return array(

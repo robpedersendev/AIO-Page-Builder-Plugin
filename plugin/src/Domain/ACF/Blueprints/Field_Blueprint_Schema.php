@@ -68,19 +68,19 @@ final class Field_Blueprint_Schema {
 		self::TYPE_IMAGE, // Unsupported for attachment ref; URL-only may be partial.
 	);
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private static ?array $supported_types = null;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private static ?array $required_blueprint_fields = null;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private static ?array $required_field_properties = null;
 
 	/**
 	 * Returns all supported field types.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_supported_types(): array {
 		if ( self::$supported_types !== null ) {
@@ -109,7 +109,7 @@ final class Field_Blueprint_Schema {
 	/**
 	 * Returns required root blueprint field names.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_required_blueprint_fields(): array {
 		if ( self::$required_blueprint_fields !== null ) {
@@ -128,7 +128,7 @@ final class Field_Blueprint_Schema {
 	/**
 	 * Returns required per-field property names.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_required_field_properties(): array {
 		if ( self::$required_field_properties !== null ) {
@@ -187,7 +187,7 @@ final class Field_Blueprint_Schema {
 	 * Validates that a blueprint has all required root fields.
 	 *
 	 * @param array<string, mixed> $blueprint
-	 * @return list<string> Empty if valid; otherwise error messages.
+	 * @return array<int, string> Empty if valid; otherwise error messages.
 	 */
 	public static function validate_blueprint_required_fields( array $blueprint ): array {
 		$errors = array();
@@ -212,7 +212,7 @@ final class Field_Blueprint_Schema {
 	 * Validates that a field definition has all required properties.
 	 *
 	 * @param array<string, mixed> $field
-	 * @return list<string> Empty if valid; otherwise error messages.
+	 * @return array<int, string> Empty if valid; otherwise error messages.
 	 */
 	public static function validate_field_required_properties( array $field ): array {
 		$errors = array();

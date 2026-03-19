@@ -18,31 +18,31 @@ defined( 'ABSPATH' ) || exit;
  */
 final class ACF_Uninstall_Inventory_Result {
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $plugin_runtime_group_keys;
 
-	/** @var list<array{group_key: string, field_key: string, field_name: string}> */
+	/** @var array<int, array{group_key: string, field_key: string, field_name: string}> */
 	private array $field_definitions;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $value_meta_keys;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $persistent_group_keys;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $cleanup_transient_prefixes;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $cleanup_option_keys;
 
 	/**
-	 * @param list<string>                                                          $plugin_runtime_group_keys
-	 * @param list<array{group_key: string, field_key: string, field_name: string}> $field_definitions
-	 * @param list<string>                                                          $value_meta_keys
-	 * @param list<string>                                                          $persistent_group_keys
-	 * @param list<string>                                                          $cleanup_transient_prefixes
-	 * @param list<string>                                                          $cleanup_option_keys
+	 * @param array<int, string>                                                          $plugin_runtime_group_keys
+	 * @param array<int, array{group_key: string, field_key: string, field_name: string}> $field_definitions
+	 * @param array<int, string>                                                          $value_meta_keys
+	 * @param array<int, string>                                                          $persistent_group_keys
+	 * @param array<int, string>                                                          $cleanup_transient_prefixes
+	 * @param array<int, string>                                                          $cleanup_option_keys
 	 */
 	public function __construct(
 		array $plugin_runtime_group_keys,
@@ -60,32 +60,32 @@ final class ACF_Uninstall_Inventory_Result {
 		$this->cleanup_option_keys        = array_values( $cleanup_option_keys );
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_plugin_runtime_group_keys(): array {
 		return $this->plugin_runtime_group_keys;
 	}
 
-	/** @return list<array{group_key: string, field_key: string, field_name: string}> */
+	/** @return array<int, array{group_key: string, field_key: string, field_name: string}> */
 	public function get_field_definitions(): array {
 		return $this->field_definitions;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_value_meta_keys(): array {
 		return $this->value_meta_keys;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_persistent_group_keys(): array {
 		return $this->persistent_group_keys;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_cleanup_transient_prefixes(): array {
 		return $this->cleanup_transient_prefixes;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_cleanup_option_keys(): array {
 		return $this->cleanup_option_keys;
 	}

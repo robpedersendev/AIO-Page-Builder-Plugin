@@ -140,7 +140,7 @@ final class Demo_Fixture_Generator {
 	/**
 	 * Returns registry fixture bundle (sections, page_templates, compositions, documentation, snapshots).
 	 *
-	 * @return array{sections: list<array>, page_templates: list<array>, compositions: list<array>, documentation: list<array>, snapshots: list<array>}
+	 * @return array{sections: array<int, array>, page_templates: array<int, array>, compositions: array<int, array>, documentation: array<int, array>, snapshots: array<int, array>}
 	 */
 	public function get_registry_fixtures(): array {
 		return Registry_Fixture_Builder::full_bundle();
@@ -194,7 +194,7 @@ final class Demo_Fixture_Generator {
 	/**
 	 * Returns synthetic crawl session summary (page records shape for demo).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_crawl_summary_fixture(): array {
 		$run_id = self::DEMO_CRAWL_RUN_ID;
@@ -253,7 +253,7 @@ final class Demo_Fixture_Generator {
 	/**
 	 * Returns one or more Build Plan definitions conforming to Build_Plan_Schema.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_build_plan_fixture(): array {
 		$plan_id = self::DEMO_PLAN_ID;
@@ -309,7 +309,7 @@ final class Demo_Fixture_Generator {
 	/**
 	 * Returns synthetic log entries (structure only; no real secrets).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_log_example(): array {
 		return array(

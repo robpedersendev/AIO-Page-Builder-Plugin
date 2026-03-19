@@ -53,12 +53,12 @@ final class Template_Showcase_Fixture_Generator {
 	 * Generates the full template showcase fixture pack.
 	 *
 	 * @return array{
-	 *   manifest: array{version: string, generated_at: string, section_families: list<string>, page_classes: list<string>, compare_sets: array{section_keys: list<string>, page_keys: list<string>}, counts: array{sections: int, page_templates: int, compositions: int, build_plan_recommendation_items: int}, _synthetic: bool},
-	 *   sections: list<array>,
-	 *   page_templates: list<array>,
-	 *   compositions: list<array>,
-	 *   build_plan_recommendation_items: list<array>,
-	 *   compare_sets: array{section_keys: list<string>, page_keys: list<string>}
+	 *   manifest: array{version: string, generated_at: string, section_families: array<int, string>, page_classes: array<int, string>, compare_sets: array{section_keys: array<int, string>, page_keys: array<int, string>}, counts: array{sections: int, page_templates: int, compositions: int, build_plan_recommendation_items: int}, _synthetic: bool},
+	 *   sections: array<int, array>,
+	 *   page_templates: array<int, array>,
+	 *   compositions: array<int, array>,
+	 *   build_plan_recommendation_items: array<int, array>,
+	 *   compare_sets: array{section_keys: array<int, string>, page_keys: array<int, string>}
 	 * }
 	 */
 	public function generate(): array {
@@ -110,7 +110,7 @@ final class Template_Showcase_Fixture_Generator {
 	}
 
 	/**
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function build_sections(): array {
 		return array(
@@ -178,7 +178,7 @@ final class Template_Showcase_Fixture_Generator {
 	}
 
 	/**
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function build_page_templates(): array {
 		$ordered_hero         = array(
@@ -275,7 +275,7 @@ final class Template_Showcase_Fixture_Generator {
 	}
 
 	/**
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function build_compositions(): array {
 		$ordered1 = array(
@@ -331,7 +331,7 @@ final class Template_Showcase_Fixture_Generator {
 	/**
 	 * Sample Build Plan items with proposed_template_summary / existing_page_template_change_summary for demo.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function build_build_plan_recommendation_items(): array {
 		$proposed_new    = array(

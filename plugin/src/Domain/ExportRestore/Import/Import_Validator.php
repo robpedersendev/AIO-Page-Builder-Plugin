@@ -228,7 +228,7 @@ final class Import_Validator {
 
 	/**
 	 * @param \ZipArchive $zip
-	 * @return list<string> Prohibited path names.
+	 * @return array<int, string> Prohibited path names.
 	 */
 	private function check_prohibited_paths( \ZipArchive $zip ): array {
 		$prohibited = array();
@@ -296,7 +296,7 @@ final class Import_Validator {
 	 *
 	 * @param \ZipArchive          $zip
 	 * @param array<string, mixed> $manifest
-	 * @return list<array{category: string, key: string, message: string}>
+	 * @return array<int, array{category: string, key: string, message: string}>
 	 */
 	private function conflict_pre_scan( \ZipArchive $zip, array $manifest ): array {
 		$conflicts = array();

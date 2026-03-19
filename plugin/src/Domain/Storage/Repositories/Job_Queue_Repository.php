@@ -179,7 +179,7 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 	 * @param string $actor_ref Sanitized actor ref (e.g. user:5).
 	 * @param int    $limit     Max rows (default 50).
 	 * @param int    $offset    Offset for pagination.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_actor_ref( string $actor_ref, int $limit = 50, int $offset = 0 ): array {
 		$actor_ref = $this->sanitize_key( $actor_ref );

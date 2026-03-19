@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Large_Library_Filter_Result {
 
-	/** @var list<array<string, mixed>> Row summaries (internal_key, name, status, taxonomy fields, etc.). */
+	/** @var array<int, array<string, mixed>> Row summaries (internal_key, name, status, taxonomy fields, etc.). */
 	private array $rows;
 
 	/** @var Large_Library_Pagination */
@@ -31,7 +31,7 @@ final class Large_Library_Filter_Result {
 	private int $total_matching;
 
 	/**
-	 * @param list<array<string, mixed>>        $rows          Row summaries for directory/IA.
+	 * @param array<int, array<string, mixed>>        $rows          Row summaries for directory/IA.
 	 * @param Large_Library_Pagination          $pagination    Pagination metadata.
 	 * @param array<string, array<string, int>> $filter_counts Optional counts by filter dimension.
 	 */
@@ -69,7 +69,7 @@ final class Large_Library_Filter_Result {
 	/**
 	 * Exports to array for JSON/IA payloads (spec directory IA extension).
 	 *
-	 * @return array{rows: list<array<string, mixed>>, pagination: array{page: int, per_page: int, total: int, total_pages: int, offset: int}, filter_counts: array<string, array<string, int>>, total_matching: int}
+	 * @return array{rows: array<int, array<string, mixed>>, pagination: array{page: int, per_page: int, total: int, total_pages: int, offset: int}, filter_counts: array<string, array<string, int>>, total_matching: int}
 	 */
 	public function to_array(): array {
 		return array(

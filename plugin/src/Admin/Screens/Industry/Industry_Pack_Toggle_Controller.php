@@ -32,7 +32,7 @@ final class Industry_Pack_Toggle_Controller {
 	/**
 	 * Returns the list of disabled industry pack keys (industry_key). Stored as a list of strings; empty array when none.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_disabled_pack_keys(): array {
 		$raw = $this->settings->get( self::STORAGE_KEY );

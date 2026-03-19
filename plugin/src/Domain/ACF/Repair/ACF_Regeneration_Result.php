@@ -32,7 +32,7 @@ final class ACF_Regeneration_Result {
 	/** @var int Number of field groups successfully registered. */
 	private int $groups_regenerated;
 
-	/** @var list<string> Group keys that were skipped (e.g. no blueprint, ACF unavailable). */
+	/** @var array<int, string> Group keys that were skipped (e.g. no blueprint, ACF unavailable). */
 	private array $groups_skipped;
 
 	/** @var int Number of page assignments successfully repaired. */
@@ -41,10 +41,10 @@ final class ACF_Regeneration_Result {
 	/** @var int Number of page assignment repair attempts that failed. */
 	private int $page_assignments_failed;
 
-	/** @var list<string> Non-fatal warnings. */
+	/** @var array<int, string> Non-fatal warnings. */
 	private array $warnings;
 
-	/** @var list<string> Fatal or recorded errors. */
+	/** @var array<int, string> Fatal or recorded errors. */
 	private array $errors;
 
 	/** @var array{ missing: int, version_stale: int, repaired: int } */
@@ -55,11 +55,11 @@ final class ACF_Regeneration_Result {
 
 	/**
 	 * @param int                                                      $groups_regenerated
-	 * @param list<string>                                             $groups_skipped
+	 * @param array<int, string>                                             $groups_skipped
 	 * @param int                                                      $page_assignments_repaired
 	 * @param int                                                      $page_assignments_failed
-	 * @param list<string>                                             $warnings
-	 * @param list<string>                                             $errors
+	 * @param array<int, string>                                             $warnings
+	 * @param array<int, string>                                             $errors
 	 * @param array{ missing: int, version_stale: int, repaired: int } $field_group_mismatch_summary
 	 * @param array{ repaired: int, failed: int, skipped: int }        $page_assignment_repair_summary
 	 */
@@ -87,7 +87,7 @@ final class ACF_Regeneration_Result {
 		return $this->groups_regenerated;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_groups_skipped(): array {
 		return $this->groups_skipped;
 	}
@@ -100,12 +100,12 @@ final class ACF_Regeneration_Result {
 		return $this->page_assignments_failed;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_warnings(): array {
 		return $this->warnings;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_errors(): array {
 		return $this->errors;
 	}

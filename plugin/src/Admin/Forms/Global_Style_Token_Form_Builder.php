@@ -41,7 +41,7 @@ final class Global_Style_Token_Form_Builder {
 	 * Returns field definitions for all approved global token groups (excludes component).
 	 * Each field has: group, name, name_attr, label, value, value_type, max_length.
 	 *
-	 * @return list<array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>
+	 * @return array<int, array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>
 	 */
 	public function get_field_definitions(): array {
 		if ( ! $this->token_registry->is_loaded() ) {
@@ -79,7 +79,7 @@ final class Global_Style_Token_Form_Builder {
 	/**
 	 * Groups field definitions by token group for sectioned rendering.
 	 *
-	 * @return array<string, list<array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>>
+	 * @return array<string, array<int, array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>>
 	 */
 	public function get_fields_by_group(): array {
 		$defs   = $this->get_field_definitions();

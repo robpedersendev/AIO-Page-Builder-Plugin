@@ -70,7 +70,7 @@ class New_Page_ACF_Registration_Context_Resolver {
 	/**
 	 * Resolves section keys for new-page edit when a template or composition is chosen. Returns null when not new-page context.
 	 *
-	 * @return list<string>|null Section keys to register; empty list when new-page but no template chosen; null when not new-page.
+	 * @return array<int, string>|null Section keys to register; empty list when new-page but no template chosen; null when not new-page.
 	 */
 	public function get_section_keys_for_current_request(): ?array {
 		if ( ! $this->is_new_page_edit_context() ) {

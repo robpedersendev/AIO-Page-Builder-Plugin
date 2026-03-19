@@ -71,9 +71,9 @@ final class Template_Library_Restore_Validator {
 	/**
 	 * Validates restored state for template-library coherence and appendix regenerability.
 	 *
-	 * @param list<string>         $restored_categories Categories that were restored (from Restore_Result).
+	 * @param array<int, string>         $restored_categories Categories that were restored (from Restore_Result).
 	 * @param array<string, mixed> $manifest           Decoded manifest (included_categories, etc.).
-	 * @return array{valid: bool, restore_order_ok: bool, section_count: int, page_template_count: int, composition_count: int, appendix_regenerable: bool, errors: list<string>, warnings: list<string>, log_reference: string} template_library_restore_summary
+	 * @return array{valid: bool, restore_order_ok: bool, section_count: int, page_template_count: int, composition_count: int, appendix_regenerable: bool, errors: array<int, string>, warnings: array<int, string>, log_reference: string} template_library_restore_summary
 	 */
 	public function validate( array $restored_categories, array $manifest ): array {
 		$log_ref              = 'tlib-restore-' . gmdate( 'Y-m-d\TH:i:s\Z' );

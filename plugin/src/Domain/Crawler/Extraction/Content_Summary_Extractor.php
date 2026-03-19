@@ -31,7 +31,7 @@ final class Content_Summary_Extractor {
 	 *
 	 * @param string      $html       Raw HTML.
 	 * @param string|null $base_host  Optional host for internal-link count (e.g. example.com).
-	 * @return array{page_summary: array, heading_outline: array, extraction_notes: list<string>}
+	 * @return array{page_summary: array, heading_outline: array, extraction_notes: array<int, string>}
 	 */
 	public function extract( string $html, ?string $base_host = null ): array {
 		$notes = array();
@@ -95,7 +95,7 @@ final class Content_Summary_Extractor {
 		return trim( wp_strip_all_tags( $m[1] ) );
 	}
 
-	/** @return list<string> First N H2 texts. */
+	/** @return array<int, string> First N H2 texts. */
 	private function extract_h2_outline( string $html ): array {
 		$out = array();
 		if ( preg_match_all( '#<h2[^>]*>([^<]+)</h2>#is', $html, $matches ) ) {
@@ -106,7 +106,7 @@ final class Content_Summary_Extractor {
 		return $out;
 	}
 
-	/** @return list<array{level: int, text: string}> */
+	/** @return array<int, array{level: int, text: string}> */
 	private function extract_heading_outline( string $html ): array {
 		$out = array();
 		if ( preg_match_all( '#<h([1-6])[^>]*>([^<]+)</h\1>#is', $html, $matches, PREG_SET_ORDER ) ) {

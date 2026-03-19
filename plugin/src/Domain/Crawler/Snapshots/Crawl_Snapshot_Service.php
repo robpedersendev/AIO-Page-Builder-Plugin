@@ -93,7 +93,7 @@ final class Crawl_Snapshot_Service {
 	 * Lists crawl sessions (runs that have at least one page record). Merges option-stored session payloads where present.
 	 *
 	 * @param int $limit Max sessions to return (default 50).
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_sessions( int $limit = 50 ): array {
 		$run_ids  = $this->repository->list_crawl_run_ids( $limit );
@@ -304,7 +304,7 @@ final class Crawl_Snapshot_Service {
 	 * @param string|null $status     Optional filter by crawl_status.
 	 * @param int         $limit       Max rows (0 = no limit).
 	 * @param int         $offset      Offset.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_pages_by_run( string $crawl_run_id, ?string $status = null, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_by_run_id( $crawl_run_id, $status, $limit, $offset );
@@ -316,7 +316,7 @@ final class Crawl_Snapshot_Service {
 	 * @param string $status crawl_status value (pending, completed, error).
 	 * @param int    $limit  Max rows (0 = no limit).
 	 * @param int    $offset Offset.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_pages_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_by_status( $status, $limit, $offset );

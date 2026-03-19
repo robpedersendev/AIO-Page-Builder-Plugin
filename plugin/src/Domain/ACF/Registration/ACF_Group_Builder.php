@@ -80,7 +80,7 @@ final class ACF_Group_Builder {
 	 * Resolves and builds ACF fields from blueprint.
 	 *
 	 * @param array<string, mixed> $blueprint
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function resolve_fields( array $blueprint ): array {
 		$fields_raw = $blueprint[ Field_Blueprint_Schema::FIELDS ] ?? array();
@@ -98,7 +98,7 @@ final class ACF_Group_Builder {
 	 * Placeholder location rules. Groups registered but not displayed until page assignment.
 	 * Uses non-matching post_type so no screens show the group by default.
 	 *
-	 * @return list<list<array<string, string>>>
+	 * @return array<int, array<int, array<string, string>>>
 	 */
 	private function placeholder_location(): array {
 		return array(
@@ -116,7 +116,7 @@ final class ACF_Group_Builder {
 	 * Builds location rules for a specific post type (for later page-assignment use).
 	 *
 	 * @param string $post_type
-	 * @return list<list<array<string, string>>>
+	 * @return array<int, array<int, array<string, string>>>
 	 */
 	public static function location_for_post_type( string $post_type ): array {
 		$post_type = \sanitize_text_field( $post_type );

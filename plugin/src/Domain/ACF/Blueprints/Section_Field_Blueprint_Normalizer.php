@@ -78,7 +78,7 @@ final class Section_Field_Blueprint_Normalizer {
 	 * @param array<string, mixed> $blueprint Raw blueprint.
 	 * @param string|null          $section_key Expected section key (for alignment).
 	 * @param string|null          $field_blueprint_ref Expected blueprint_id from section.
-	 * @return array{normalized: array<string, mixed>, errors: list<string>}
+	 * @return array{normalized: array<string, mixed>, errors: array<int, string>}
 	 */
 	public function normalize( array $blueprint, ?string $section_key = null, ?string $field_blueprint_ref = null ): array {
 		$section_key = (string) ( $blueprint[ Field_Blueprint_Schema::SECTION_KEY ] ?? $section_key ?? '' );
@@ -123,10 +123,10 @@ final class Section_Field_Blueprint_Normalizer {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $fields
+	 * @param array<int, array<string, mixed>> $fields
 	 * @param string                     $section_key
 	 * @param string|null                $parent_name
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function prefill_fields_keys( array $fields, string $section_key, ?string $parent_name ): array {
 		$out = array();
@@ -195,10 +195,10 @@ final class Section_Field_Blueprint_Normalizer {
 	/**
 	 * Normalizes field array; generates deterministic keys when missing or invalid.
 	 *
-	 * @param list<array<string, mixed>> $fields
+	 * @param array<int, array<string, mixed>> $fields
 	 * @param string                     $section_key
 	 * @param string|null                $parent_name For subfields.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function normalize_fields( array $fields, string $section_key, ?string $parent_name ): array {
 		$out         = array();

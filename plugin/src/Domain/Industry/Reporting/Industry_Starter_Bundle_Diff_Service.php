@@ -38,8 +38,8 @@ final class Industry_Starter_Bundle_Diff_Service {
 	/**
 	 * Compares two or more starter bundles by key. Returns bundle summaries and diff rows for UI.
 	 *
-	 * @param list<string> $bundle_keys Two or more bundle keys (max MAX_BUNDLES). Invalid or missing keys are skipped.
-	 * @return array{bundles: list<array<string, mixed>>, diff_rows: list<array{field: string, label: string, values: list<string|list<string>>, changed: bool}>}
+	 * @param array<int, string> $bundle_keys Two or more bundle keys (max MAX_BUNDLES). Invalid or missing keys are skipped.
+	 * @return array{bundles: array<int, array<string, mixed>>, diff_rows: array<int, array{field: string, label: string, values: array<int, string|array<int, string>>, changed: bool}>}
 	 */
 	public function compare( array $bundle_keys ): array {
 		$bundles = array();
@@ -113,8 +113,8 @@ final class Industry_Starter_Bundle_Diff_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $bundles
-	 * @return list<array{field: string, label: string, values: list<string|list<string>>, changed: bool}>
+	 * @param array<int, array<string, mixed>> $bundles
+	 * @return array<int, array{field: string, label: string, values: array<int, string|array<int, string>>, changed: bool}>
 	 */
 	private function build_diff_rows( array $bundles ): array {
 		$rows = array();

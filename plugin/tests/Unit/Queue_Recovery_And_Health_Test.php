@@ -66,7 +66,7 @@ final class Stub_Recovery_Job_Repository implements Queue_Recovery_Repository_In
  */
 final class Stub_Health_Job_Repository {
 
-	/** @var array<string, list<array<string, mixed>>> */
+	/** @var array<string, array<int, array<string, mixed>>> */
 	public $by_status = array();
 
 	public function list_by_status( string $status, int $limit = 50, int $offset = 0 ): array {

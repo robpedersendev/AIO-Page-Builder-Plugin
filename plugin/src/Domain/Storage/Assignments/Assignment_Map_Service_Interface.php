@@ -23,7 +23,7 @@ interface Assignment_Map_Service_Interface {
 	 * @param string $map_type One of Assignment_Types constants.
 	 * @param int    $limit    Max rows; 0 means default.
 	 * @param int    $offset   Offset for pagination.
-	 * @return list<array<string, mixed>> Rows with source_ref, target_ref, etc.
+	 * @return array<int, array<string, mixed>> Rows with source_ref, target_ref, etc.
 	 */
 	public function list_by_type( string $map_type, int $limit = 0, int $offset = 0 ): array;
 }

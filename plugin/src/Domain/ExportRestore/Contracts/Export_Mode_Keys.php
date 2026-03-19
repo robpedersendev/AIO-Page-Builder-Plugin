@@ -36,13 +36,13 @@ final class Export_Mode_Keys {
 	/** Uninstall settings/profile only; only settings, profiles, uninstall_restore_metadata (spec §52.11). */
 	public const UNINSTALL_SETTINGS_PROFILE_ONLY = 'uninstall_settings_profile_only';
 
-	/** @var list<string>|null */
+	/** @var array<int, string>|null */
 	private static ?array $all = null;
 
 	/**
 	 * Returns all export mode values.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {

@@ -31,7 +31,7 @@ final class Nested_Hub_Page_Template_Definitions {
 	/**
 	 * Allowed parent hub template_family values for parent_family_compatibility (spec §13.8).
 	 *
-	 * @var list<string>
+	 * @var array<int, string>
 	 */
 	public const ALLOWED_PARENT_FAMILIES = array(
 		'services',
@@ -44,7 +44,7 @@ final class Nested_Hub_Page_Template_Definitions {
 	/**
 	 * Returns all nested hub page template definitions (order preserved for seeding).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function all_definitions(): array {
 		return array(
@@ -72,7 +72,7 @@ final class Nested_Hub_Page_Template_Definitions {
 	/**
 	 * Returns page template internal keys in this batch.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function template_keys(): array {
 		return array(
@@ -100,8 +100,8 @@ final class Nested_Hub_Page_Template_Definitions {
 	/**
 	 * Builds ordered_sections and section_requirements from a list of section keys.
 	 *
-	 * @param list<string> $section_keys Section internal keys in order (no adjacent CTA; last must be CTA).
-	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
+	 * @param array<int, string> $section_keys Section internal keys in order (no adjacent CTA; last must be CTA).
+	 * @return array{ ordered: array<int, array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
 		$ordered      = array();
@@ -127,7 +127,7 @@ final class Nested_Hub_Page_Template_Definitions {
 	 * @param string       $name
 	 * @param string       $purpose_summary
 	 * @param string       $template_family
-	 * @param list<string> $parent_family_compatibility
+	 * @param array<int, string> $parent_family_compatibility
 	 * @param array        $ordered
 	 * @param array        $section_requirements
 	 * @param array        $one_pager

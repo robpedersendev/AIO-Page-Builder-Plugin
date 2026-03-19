@@ -47,7 +47,7 @@ final class Section_Expansion_Pack_Definitions {
 	/**
 	 * Returns all expansion-pack section definitions (order preserved for seeding).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function all_definitions(): array {
 		return array(
@@ -60,7 +60,7 @@ final class Section_Expansion_Pack_Definitions {
 	/**
 	 * Returns section keys in this pack (for listing and tests).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function section_keys(): array {
 		return array(

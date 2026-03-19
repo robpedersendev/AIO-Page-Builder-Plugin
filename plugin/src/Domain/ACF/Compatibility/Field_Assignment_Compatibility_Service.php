@@ -40,8 +40,8 @@ final class Field_Assignment_Compatibility_Service {
 	 * Returns group keys to retain during refinement (derived + deprecated that are currently assigned).
 	 *
 	 * @param int          $page_id       WordPress post ID (page).
-	 * @param list<string> $derived_groups Newly derived group keys from template/composition.
-	 * @return list<string> Union of derived and assigned deprecated groups to preserve.
+	 * @param array<int, string> $derived_groups Newly derived group keys from template/composition.
+	 * @return array<int, string> Union of derived and assigned deprecated groups to preserve.
 	 */
 	public function get_groups_to_retain_during_refinement( int $page_id, array $derived_groups ): array {
 		$existing = $this->assignment_service->get_visible_groups_for_page( $page_id );
@@ -88,7 +88,7 @@ final class Field_Assignment_Compatibility_Service {
 	 * Returns compatibility notes for a page's refinement (for diagnostics/audit).
 	 *
 	 * @param int $page_id
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_compatibility_notes_for_page( int $page_id ): array {
 		$notes            = array();

@@ -44,7 +44,7 @@ final class Page_Template_Inventory_Appendix_Generator {
 	/**
 	 * Generates markdown from a given list of definitions (deterministic; for tests).
 	 *
-	 * @param list<array<string, mixed>> $definitions
+	 * @param array<int, array<string, mixed>> $definitions
 	 * @return string
 	 */
 	public function generate_from_definitions( array $definitions ): string {
@@ -56,7 +56,7 @@ final class Page_Template_Inventory_Appendix_Generator {
 	/**
 	 * Returns a stable result payload for tests and callers (list of row data, not raw markdown).
 	 *
-	 * @return array{rows: list<array<string, mixed>>, total: int}
+	 * @return array{rows: array<int, array<string, mixed>>, total: int}
 	 */
 	public function build_result(): array {
 		$defs = $this->page_repository->list_all_definitions_capped( self::CAP );
@@ -66,8 +66,8 @@ final class Page_Template_Inventory_Appendix_Generator {
 	/**
 	 * Builds result payload from a given list of definitions (deterministic; for tests and regeneration from alternate sources).
 	 *
-	 * @param list<array<string, mixed>> $definitions
-	 * @return array{rows: list<array<string, mixed>>, total: int}
+	 * @param array<int, array<string, mixed>> $definitions
+	 * @return array{rows: array<int, array<string, mixed>>, total: int}
 	 */
 	public function build_result_from_definitions( array $definitions ): array {
 		$rows = array();
@@ -164,8 +164,8 @@ final class Page_Template_Inventory_Appendix_Generator {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $rows
-	 * @return array<string, list<array<string, mixed>>> category => rows
+	 * @param array<int, array<string, mixed>> $rows
+	 * @return array<string, array<int, array<string, mixed>>> category => rows
 	 */
 	private function group_by_category( array $rows ): array {
 		$grouped = array();
@@ -192,7 +192,7 @@ final class Page_Template_Inventory_Appendix_Generator {
 	}
 
 	/**
-	 * @param array<string, list<array<string, mixed>>> $grouped
+	 * @param array<string, array<int, array<string, mixed>>> $grouped
 	 * @param int                                       $total
 	 * @return string
 	 */

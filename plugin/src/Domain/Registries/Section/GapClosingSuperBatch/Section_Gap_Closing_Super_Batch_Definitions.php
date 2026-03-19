@@ -34,7 +34,7 @@ final class Section_Gap_Closing_Super_Batch_Definitions {
 	 * Spec rows: key, name, purpose_summary, category, section_purpose_family, variation_family_key.
 	 * Distribution aligns with coverage matrix minimums and remaining gaps (offer, explainer, faq, profile, stats, listing, comparison, contact, legal, utility, timeline, related, plus spread for proof, cta, hero).
 	 *
-	 * @var list<array{key: string, name: string, purpose_summary: string, category: string, section_purpose_family: string, variation_family_key: string}>
+	 * @var array<int, array{key: string, name: string, purpose_summary: string, category: string, section_purpose_family: string, variation_family_key: string}>
 	 */
 	private static function specs(): array {
 		return array(
@@ -1131,7 +1131,7 @@ final class Section_Gap_Closing_Super_Batch_Definitions {
 	/**
 	 * Returns all gap-closing batch section definitions (order preserved for seeding).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function all_definitions(): array {
 		$out = array();
@@ -1152,7 +1152,7 @@ final class Section_Gap_Closing_Super_Batch_Definitions {
 	/**
 	 * Returns section keys in this batch (for listing and tests).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function section_keys(): array {
 		$keys = array();

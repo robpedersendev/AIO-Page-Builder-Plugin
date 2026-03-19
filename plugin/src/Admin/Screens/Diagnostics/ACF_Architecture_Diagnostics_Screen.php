@@ -221,7 +221,7 @@ final class ACF_Architecture_Diagnostics_Screen {
 	/**
 	 * Renders assignment mismatch groups table.
 	 *
-	 * @param list<array<string, mixed>> $groups
+	 * @param array<int, array<string, mixed>> $groups
 	 * @return void
 	 */
 	private function render_assignment_mismatches( array $groups ): void {

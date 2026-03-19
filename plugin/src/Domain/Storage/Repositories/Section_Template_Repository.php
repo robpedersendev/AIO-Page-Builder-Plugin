@@ -94,7 +94,7 @@ final class Section_Template_Repository extends Abstract_CPT_Repository implemen
 	 * @param string $category Category slug (Section_Schema allowed).
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_category( string $category, int $limit = 0, int $offset = 0 ): array {
 		$all = $this->list_all_definitions( $limit, $offset );
@@ -117,7 +117,7 @@ final class Section_Template_Repository extends Abstract_CPT_Repository implemen
 	 * @param string $status
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_definitions_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		$records = $this->list_by_status( $status, $limit, $offset );
@@ -136,7 +136,7 @@ final class Section_Template_Repository extends Abstract_CPT_Repository implemen
 	 *
 	 * @param int $limit
 	 * @param int $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_all_definitions( int $limit = 0, int $offset = 0 ): array {
 		$limit = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
@@ -181,7 +181,7 @@ final class Section_Template_Repository extends Abstract_CPT_Repository implemen
 	 * Lists all section definitions up to a cap (for in-memory filtering; spec §55.8).
 	 *
 	 * @param int $max Maximum definitions to load (bounded for large libraries).
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_all_definitions_capped( int $max = 1000 ): array {
 		$chunk_size = min( 200, max( 1, $max ) );
@@ -205,7 +205,7 @@ final class Section_Template_Repository extends Abstract_CPT_Repository implemen
 	/**
 	 * Returns all unique internal keys in the registry (for uniqueness checks).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_all_internal_keys(): array {
 		$defs = $this->list_all_definitions( 9999, 0 );

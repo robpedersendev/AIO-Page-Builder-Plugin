@@ -70,7 +70,7 @@ final class Industry_LPagery_Planning_Advisor {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $active_rules Valid active rules for the industry.
+	 * @param array<int, array<string, mixed>> $active_rules Valid active rules for the industry.
 	 * @return Industry_LPagery_Planning_Result
 	 */
 	private function aggregate_result( array $active_rules ): Industry_LPagery_Planning_Result {
@@ -155,7 +155,7 @@ final class Industry_LPagery_Planning_Advisor {
 	}
 
 	/**
-	 * @param list<string> $warning_flags
+	 * @param array<int, string> $warning_flags
 	 * @return Industry_LPagery_Planning_Result
 	 */
 	private function empty_result( array $warning_flags = array() ): Industry_LPagery_Planning_Result {

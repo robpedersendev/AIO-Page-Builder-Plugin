@@ -44,13 +44,13 @@ final class Content_Survivability_Result {
 	/** @var bool */
 	private bool $is_survivable;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $prohibited_runtime_dependencies;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $dynamic_output_flags;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $human_editability_notes;
 
 	/** @var bool */
@@ -58,9 +58,9 @@ final class Content_Survivability_Result {
 
 	/**
 	 * @param bool         $is_survivable                   True when no prohibited lock-in detected.
-	 * @param list<string> $prohibited_runtime_dependencies  Detected prohibited patterns.
-	 * @param list<string> $dynamic_output_flags            Justified optional dynamic paths.
-	 * @param list<string> $human_editability_notes         Editability/usability notes.
+	 * @param array<int, string> $prohibited_runtime_dependencies  Detected prohibited patterns.
+	 * @param array<int, string> $dynamic_output_flags            Justified optional dynamic paths.
+	 * @param array<int, string> $human_editability_notes         Editability/usability notes.
 	 * @param bool         $deactivation_readiness          True when content remains meaningful without plugin.
 	 */
 	public function __construct(
@@ -81,17 +81,17 @@ final class Content_Survivability_Result {
 		return $this->is_survivable;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_prohibited_runtime_dependencies(): array {
 		return $this->prohibited_runtime_dependencies;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_dynamic_output_flags(): array {
 		return $this->dynamic_output_flags;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_human_editability_notes(): array {
 		return $this->human_editability_notes;
 	}

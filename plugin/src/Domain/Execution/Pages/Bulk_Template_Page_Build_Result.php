@@ -45,7 +45,7 @@ final class Bulk_Template_Page_Build_Result {
 	 */
 	private $item_results;
 
-	/** @var list<string> Plan item IDs or slugs that had slug conflict (pre-validation or execution). */
+	/** @var array<int, string> Plan item IDs or slugs that had slug conflict (pre-validation or execution). */
 	private $slug_collisions;
 
 	/** @var int */
@@ -60,7 +60,7 @@ final class Bulk_Template_Page_Build_Result {
 	/** @var bool */
 	private $partial_failure;
 
-	/** @var list<string> Plan item IDs that failed and are retry-eligible (spec §33.10). */
+	/** @var array<int, string> Plan item IDs that failed and are retry-eligible (spec §33.10). */
 	private $retry_eligible_item_ids;
 
 	/** @var string */
@@ -75,12 +75,12 @@ final class Bulk_Template_Page_Build_Result {
 	 * @param string                              $status
 	 * @param array<int, string>                  $job_refs
 	 * @param array<string, array<string, mixed>> $item_results
-	 * @param list<string>                        $slug_collisions
+	 * @param array<int, string>                        $slug_collisions
 	 * @param int                                 $completed_count
 	 * @param int                                 $failed_count
 	 * @param int                                 $refused_count
 	 * @param bool                                $partial_failure
-	 * @param list<string>                        $retry_eligible_item_ids
+	 * @param array<int, string>                        $retry_eligible_item_ids
 	 * @param string                              $message
 	 * @param array<string, mixed>                $bulk_plan_snapshot
 	 */
@@ -136,7 +136,7 @@ final class Bulk_Template_Page_Build_Result {
 		return $this->item_results;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_slug_collisions(): array {
 		return $this->slug_collisions;
 	}
@@ -157,7 +157,7 @@ final class Bulk_Template_Page_Build_Result {
 		return $this->partial_failure;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_retry_eligible_item_ids(): array {
 		return $this->retry_eligible_item_ids;
 	}

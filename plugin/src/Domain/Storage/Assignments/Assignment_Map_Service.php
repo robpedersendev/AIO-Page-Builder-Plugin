@@ -149,7 +149,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 	 * @param string $map_type One of Assignment_Types constants.
 	 * @param int    $limit    Max rows (0 = no limit cap; service caps at 500).
 	 * @param int    $offset   Offset.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_type( string $map_type, int $limit = 0, int $offset = 0 ): array {
 		$map_type = $this->sanitize_map_type( $map_type );
@@ -176,7 +176,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 	 * @param string $map_type   One of Assignment_Types constants.
 	 * @param string $source_ref Source identifier.
 	 * @param int    $limit     Max rows (0 = 100).
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_source( string $map_type, string $source_ref, int $limit = 0 ): array {
 		$map_type   = $this->sanitize_map_type( $map_type );
@@ -204,7 +204,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 	 * @param string $map_type   One of Assignment_Types constants.
 	 * @param string $source_ref Source identifier (e.g. page id).
 	 * @param int    $limit     Max rows (0 = 500).
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function list_target_refs_by_source( string $map_type, string $source_ref, int $limit = 0 ): array {
 		$map_type   = $this->sanitize_map_type( $map_type );
@@ -279,7 +279,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 	 * @param string $map_type   One of Assignment_Types constants.
 	 * @param string $target_ref Target identifier.
 	 * @param int    $limit     Max rows (0 = 100).
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_target( string $map_type, string $target_ref, int $limit = 0 ): array {
 		$map_type   = $this->sanitize_map_type( $map_type );

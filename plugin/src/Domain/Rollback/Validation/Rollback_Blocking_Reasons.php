@@ -51,13 +51,13 @@ final class Rollback_Blocking_Reasons {
 	/** Post snapshot is not a post_change type (invalid pairing). */
 	public const POST_SNAPSHOT_TYPE_INVALID = 'post_snapshot_type_invalid';
 
-	/** @var list<string> All blocking reason codes. */
+	/** @var array<int, string> All blocking reason codes. */
 	private static ?array $all = null;
 
 	/**
 	 * Returns all blocking reason codes.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_all(): array {
 		if ( self::$all !== null ) {

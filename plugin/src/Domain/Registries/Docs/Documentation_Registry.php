@@ -72,7 +72,7 @@ final class Documentation_Registry {
 	/**
 	 * Returns all loaded section helper docs (for export or listing).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all_section_helpers(): array {
 		return $this->loader->load_section_helpers();

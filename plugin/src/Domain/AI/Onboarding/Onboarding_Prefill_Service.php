@@ -79,7 +79,7 @@ final class Onboarding_Prefill_Service {
 	/**
 	 * Provider config: provider_id and credential_state only. No secrets.
 	 *
-	 * @return list<array{provider_id: string, credential_state: string}>
+	 * @return array<int, array{provider_id: string, credential_state: string}>
 	 */
 	private function get_provider_refs(): array {
 		$config = $this->settings->get( Option_Names::PROVIDER_CONFIG_REF );

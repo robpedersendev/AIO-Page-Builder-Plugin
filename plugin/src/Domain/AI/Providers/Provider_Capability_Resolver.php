@@ -23,7 +23,7 @@ final class Provider_Capability_Resolver {
 	/**
 	 * Returns the list of known provider IDs with registered drivers.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_known_provider_ids(): array {
 		return array_values( self::KNOWN_PROVIDER_IDS );

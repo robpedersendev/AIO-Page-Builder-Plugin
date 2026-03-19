@@ -170,7 +170,7 @@ final class Section_Template_Directory_State_Builder {
 	 * @param bool   $show_all
 	 * @param string $search
 	 * @param string $base_url
-	 * @return list<array{label: string, url: string}>
+	 * @return array<int, array{label: string, url: string}>
 	 */
 	private function build_breadcrumbs( string $view, string $purpose_family, string $cta_classification, string $variation_family_key, bool $show_all, string $search, string $base_url ): array {
 		$segments = array(
@@ -225,7 +225,7 @@ final class Section_Template_Directory_State_Builder {
 	 * Builds tree: list of purpose families (L2) with count and url.
 	 *
 	 * @param string $base_url
-	 * @return list<array{slug: string, label: string, count: int, url: string}>
+	 * @return array<int, array{slug: string, label: string, count: int, url: string}>
 	 */
 	private function build_tree( string $base_url ): array {
 		$empty_filters = array();
@@ -263,7 +263,7 @@ final class Section_Template_Directory_State_Builder {
 	 *
 	 * @param string $purpose_family
 	 * @param string $base_url
-	 * @return list<array{slug: string, label: string, count: int, url: string, type: string}>
+	 * @return array<int, array{slug: string, label: string, count: int, url: string, type: string}>
 	 */
 	private function build_l3_nodes( string $purpose_family, string $base_url ): array {
 		$filters = array( Large_Library_Query_Service::FILTER_SECTION_PURPOSE_FAMILY => $purpose_family );

@@ -59,7 +59,7 @@ final class AI_Providers_UI_State_Builder {
 	/**
 	 * Builds full UI state for the AI Providers screen.
 	 *
-	 * @return array{provider_rows: list<array>, disclosure_blocks: list<array>, ai_runs_url: string}
+	 * @return array{provider_rows: array<int, array>, disclosure_blocks: array<int, array>, ai_runs_url: string}
 	 */
 	public function build(): array {
 		$provider_ids  = $this->get_known_provider_ids();
@@ -77,7 +77,7 @@ final class AI_Providers_UI_State_Builder {
 	}
 
 	/**
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function get_known_provider_ids(): array {
 		$config      = $this->settings->get( Option_Names::PROVIDER_CONFIG_REF );
@@ -204,7 +204,7 @@ final class AI_Providers_UI_State_Builder {
 	/**
 	 * Disclosure blocks for external transfer and cost (spec §49.9). Must remain visible.
 	 *
-	 * @return list<array{heading: string, content: string}>
+	 * @return array<int, array{heading: string, content: string}>
 	 */
 	private function build_disclosure_blocks(): array {
 		return array(

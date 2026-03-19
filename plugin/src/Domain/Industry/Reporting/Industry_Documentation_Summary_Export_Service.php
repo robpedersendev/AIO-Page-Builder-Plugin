@@ -57,11 +57,11 @@ final class Industry_Documentation_Summary_Export_Service {
 	 *
 	 * @return array{
 	 *   generated_at: string,
-	 *   profile_state: array{primary_industry: string, secondary_industries: list<string>, profile_readiness: string, selected_starter_bundle_key: string|null, industry_subtype_key: string|null},
-	 *   active_pack_refs: list<string>,
+	 *   profile_state: array{primary_industry: string, secondary_industries: array<int, string>, profile_readiness: string, selected_starter_bundle_key: string|null, industry_subtype_key: string|null},
+	 *   active_pack_refs: array<int, string>,
 	 *   override_summary: array{total_count: int, by_type: array<string, int>},
-	 *   health: array{error_count: int, warning_count: int, sample_errors: list<array{object_type: string, key: string, issue_summary: string}>, sample_warnings: list<array{object_type: string, key: string, issue_summary: string}>},
-	 *   major_warnings: list<string>
+	 *   health: array{error_count: int, warning_count: int, sample_errors: array<int, array{object_type: string, key: string, issue_summary: string}>, sample_warnings: array<int, array{object_type: string, key: string, issue_summary: string}>},
+	 *   major_warnings: array<int, string>
 	 * }
 	 */
 	public function generate(): array {

@@ -52,7 +52,7 @@ final class Industry_Override_Read_Model_Builder {
 	 * Builds a unified list of override rows. Each row has: row_id, target_type, target_key, plan_id (null for section/page_template), state, reason, created_at, updated_at, industry_context_ref, has_reason.
 	 *
 	 * @param array<string, mixed> $filters Optional filters (FILTER_* keys).
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function build( array $filters = array() ): array {
 		$rows = array();

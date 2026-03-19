@@ -38,14 +38,14 @@ final class LPagery_Compatibility_Result {
 	/** @var array<string, mixed> lpagery_mapping_summary: supported_mappings, unsupported_mappings, allowed_groups, canonical_identity_preserved, preview_safe. */
 	private array $lpagery_mapping_summary;
 
-	/** @var list<array{field_name?: string, token_key?: string, reason: string}> */
+	/** @var array<int, array{field_name?: string, token_key?: string, reason: string}> */
 	private array $unsupported_mapping_reasons;
 
 	/**
 	 * @param bool                                                                 $compatible
 	 * @param string                                                               $compatibility_state
 	 * @param array<string, mixed>                                                 $lpagery_mapping_summary
-	 * @param list<array{field_name?: string, token_key?: string, reason: string}> $unsupported_mapping_reasons
+	 * @param array<int, array{field_name?: string, token_key?: string, reason: string}> $unsupported_mapping_reasons
 	 */
 	public function __construct(
 		bool $compatible,
@@ -72,7 +72,7 @@ final class LPagery_Compatibility_Result {
 		return $this->lpagery_mapping_summary;
 	}
 
-	/** @return list<array{field_name?: string, token_key?: string, reason: string}> */
+	/** @return array<int, array{field_name?: string, token_key?: string, reason: string}> */
 	public function get_unsupported_mapping_reasons(): array {
 		return $this->unsupported_mapping_reasons;
 	}

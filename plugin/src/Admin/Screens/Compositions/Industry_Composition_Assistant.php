@@ -36,7 +36,7 @@ final class Industry_Composition_Assistant {
 	/** @var array<string, array{fit: string, warning_flags: array, purpose_family: string}>|null Cached by-key fit data (purpose_family from section_purpose_family). */
 	private $fit_by_key;
 
-	/** @var list<string>|null Cached recommended section keys (ranked). */
+	/** @var array<int, string>|null Cached recommended section keys (ranked). */
 	private $recommended_keys;
 
 	/** @var Industry_Substitute_Suggestion_Engine|null Optional engine for richer substitute suggestions. */
@@ -132,7 +132,7 @@ final class Industry_Composition_Assistant {
 	/**
 	 * Recommended section keys in rank order (best first). Empty when no guidance.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_recommended_section_keys(): array {
 		return $this->recommended_keys !== null ? $this->recommended_keys : array();
@@ -156,7 +156,7 @@ final class Industry_Composition_Assistant {
 	 * Warning flags for a section key.
 	 *
 	 * @param string $section_key Section internal key.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_warning_flags_for_section( string $section_key ): array {
 		if ( $this->fit_by_key === null ) {
@@ -171,7 +171,7 @@ final class Industry_Composition_Assistant {
 	 *
 	 * @param string $section_key Section internal key.
 	 * @param int    $max         Max substitutes to return (default 5).
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_substitute_section_keys( string $section_key, int $max = 5 ): array {
 		if ( $this->recommended_keys === null || $this->fit_by_key === null ) {

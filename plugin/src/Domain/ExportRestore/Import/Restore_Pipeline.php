@@ -209,7 +209,7 @@ final class Restore_Pipeline {
 	}
 
 	/**
-	 * @param list<array{category: string, key: string, action: string}> $resolved
+	 * @param array<int, array{category: string, key: string, action: string}> $resolved
 	 * @return array<string, array<string, string>> Map category -> ( key -> action ).
 	 */
 	private function build_resolved_map( array $resolved ): array {
@@ -231,8 +231,8 @@ final class Restore_Pipeline {
 	 * @param string                                        $category
 	 * @param array<string, mixed>                          $manifest
 	 * @param array<string, array<string, string>>          $resolved_map
-	 * @param list<array{category: string, reason: string}> $skipped_reasons Collects category + user-facing reason when a category is skipped (e.g. styling service unavailable).
-	 * @return list<array{category: string, action: string, key?: string}>|null Actions taken, or null if skipped.
+	 * @param array<int, array{category: string, reason: string}> $skipped_reasons Collects category + user-facing reason when a category is skipped (e.g. styling service unavailable).
+	 * @return array<int, array{category: string, action: string, key?: string}>|null Actions taken, or null if skipped.
 	 */
 	private function restore_category( \ZipArchive $zip, string $category, array $manifest, array $resolved_map, array &$skipped_reasons ): ?array {
 		$actions = array();

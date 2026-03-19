@@ -178,9 +178,9 @@ final class Composition_Builder_State_Builder {
 	}
 
 	/**
-	 * @param list<array<string, mixed>>          $ordered
+	 * @param array<int, array<string, mixed>>          $ordered
 	 * @param array<string, array<string, mixed>> $section_by_key
-	 * @return list<array{code: string, message: string}>
+	 * @return array<int, array{code: string, message: string}>
 	 */
 	private function compute_cta_warnings( array $ordered, array $section_by_key ): array {
 		$warnings  = array();
@@ -212,7 +212,7 @@ final class Composition_Builder_State_Builder {
 	}
 
 	/**
-	 * @param list<array<string, mixed>>          $ordered
+	 * @param array<int, array<string, mixed>>          $ordered
 	 * @param array<string, array<string, mixed>> $section_by_key
 	 */
 	private function compute_insertion_hint( array $ordered, array $section_by_key ): string {

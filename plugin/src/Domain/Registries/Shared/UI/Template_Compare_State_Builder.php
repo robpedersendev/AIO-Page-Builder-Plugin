@@ -50,7 +50,7 @@ final class Template_Compare_State_Builder {
 	 * Builds full compare state for the given type and list of keys.
 	 *
 	 * @param string       $type             'section' or 'page'.
-	 * @param list<string> $compare_list_keys Ordered list of template keys to compare.
+	 * @param array<int, string> $compare_list_keys Ordered list of template keys to compare.
 	 * @return array<string, mixed> State: type, compare_list_keys, section_compare_matrix|page_compare_matrix, template_compare_rows (alias), base_url_sections, base_url_pages, compare_screen_url, empty_message.
 	 */
 	public function build_state( string $type, array $compare_list_keys ): array {

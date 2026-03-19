@@ -45,7 +45,7 @@ final class Industry_Subtype_Preview_Influence_View_Model {
 	/** @var bool True when a subtype page-one-pager overlay was applied for this template. */
 	private bool $onepager_refinement_applied;
 
-	/** @var list<string> Optional advisory caution or fit notes for the subtype. */
+	/** @var array<int, string> Optional advisory caution or fit notes for the subtype. */
 	private array $caution_notes;
 
 	/** @var string Optional bundle context (e.g. selected subtype bundle label). */
@@ -58,7 +58,7 @@ final class Industry_Subtype_Preview_Influence_View_Model {
 	 * @param string       $subtype_summary
 	 * @param bool         $helper_refinement_applied
 	 * @param bool         $onepager_refinement_applied
-	 * @param list<string> $caution_notes
+	 * @param array<int, string> $caution_notes
 	 * @param string       $bundle_context
 	 */
 	public function __construct(
@@ -106,7 +106,7 @@ final class Industry_Subtype_Preview_Influence_View_Model {
 	}
 
 	/**
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_caution_notes(): array {
 		return $this->caution_notes;

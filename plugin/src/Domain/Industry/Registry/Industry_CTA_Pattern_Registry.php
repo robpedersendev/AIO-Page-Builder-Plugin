@@ -44,7 +44,7 @@ final class Industry_CTA_Pattern_Registry {
 	/** @var array<string, array<string, mixed>> Map of pattern_key => definition. */
 	private array $by_key = array();
 
-	/** @var list<array<string, mixed>> All valid patterns in load order. */
+	/** @var array<int, array<string, mixed>> All valid patterns in load order. */
 	private array $all = array();
 
 	/**
@@ -116,7 +116,7 @@ final class Industry_CTA_Pattern_Registry {
 	/**
 	 * Returns all loaded patterns.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -132,8 +132,8 @@ final class Industry_CTA_Pattern_Registry {
 	/**
 	 * Resolves a list of pattern keys to definitions; unknown keys are skipped. Deterministic order.
 	 *
-	 * @param list<string> $pattern_keys List of pattern keys (e.g. from industry pack preferred_cta_patterns).
-	 * @return list<array<string, mixed>>
+	 * @param array<int, string> $pattern_keys List of pattern keys (e.g. from industry pack preferred_cta_patterns).
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function resolve_keys( array $pattern_keys ): array {
 		$out = array();

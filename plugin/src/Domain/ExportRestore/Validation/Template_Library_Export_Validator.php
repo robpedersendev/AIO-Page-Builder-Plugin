@@ -56,9 +56,9 @@ final class Template_Library_Export_Validator {
 	/**
 	 * Validates the registry bundle for template-library export coherence.
 	 *
-	 * @param array{registries: array{sections?: list<array>, page_templates?: list<array>, compositions?: list<array>}} $bundle Bundle from Registry_Export_Serializer::build_registry_bundle().
-	 * @param list<string>                                                                                               $included_categories Categories included in this export.
-	 * @return array{valid: bool, section_count: int, page_template_count: int, composition_count: int, one_pager_included_count: int, one_pager_missing_keys: list<string>, appendix_regenerable: bool, appendix_section_row_count: int, appendix_page_row_count: int, errors: list<string>, warnings: list<string>, log_reference: string} template_library_export_summary
+	 * @param array{registries: array{sections?: array<int, array>, page_templates?: array<int, array>, compositions?: array<int, array>}} $bundle Bundle from Registry_Export_Serializer::build_registry_bundle().
+	 * @param array<int, string>                                                                                               $included_categories Categories included in this export.
+	 * @return array{valid: bool, section_count: int, page_template_count: int, composition_count: int, one_pager_included_count: int, one_pager_missing_keys: array<int, string>, appendix_regenerable: bool, appendix_section_row_count: int, appendix_page_row_count: int, errors: array<int, string>, warnings: array<int, string>, log_reference: string} template_library_export_summary
 	 */
 	public function validate( array $bundle, array $included_categories ): array {
 		$log_ref                    = 'tlib-export-' . gmdate( 'Y-m-d\TH:i:s\Z' );
@@ -170,8 +170,8 @@ final class Template_Library_Export_Validator {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $fragments
-	 * @return list<array<string, mixed>>
+	 * @param array<int, array<string, mixed>> $fragments
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function extract_payloads( array $fragments ): array {
 		$out = array();
@@ -184,9 +184,9 @@ final class Template_Library_Export_Validator {
 	}
 
 	/**
-	 * @param list<string> $one_pager_missing_keys
-	 * @param list<string> $errors
-	 * @param list<string> $warnings
+	 * @param array<int, string> $one_pager_missing_keys
+	 * @param array<int, string> $errors
+	 * @param array<int, string> $warnings
 	 * @return array<string, mixed>
 	 */
 	private function summary(

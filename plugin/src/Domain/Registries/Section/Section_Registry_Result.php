@@ -19,7 +19,7 @@ final class Section_Registry_Result {
 	/** @var bool */
 	public readonly bool $success;
 
-	/** @var list<string> Error messages on failure. */
+	/** @var array<int, string> Error messages on failure. */
 	public readonly array $errors;
 
 	/** @var int Post ID; 0 on failure. */

@@ -59,13 +59,13 @@ final class Logs_Monitoring_State_Builder {
 	 * Builds full monitoring state for all tabs. Permission checks are caller's responsibility.
 	 *
 	 * @return array{
-	 *   queue: list<array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}>,
-	 *   execution_logs: list<array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}>,
-	 *   ai_runs: list<array{run_id: string, status: string, created_at: string}>,
-	 *   reporting_logs: list<array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}>,
-	 *   import_export_logs: list<array{id: string, type: string, created_at: string, status: string}>,
-	 *   critical_errors: list<array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}>,
-	 *   log_export: array{exportable_log_types: list<array{value: string, label: string}>},
+	 *   queue: array<int, array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}>,
+	 *   execution_logs: array<int, array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}>,
+	 *   ai_runs: array<int, array{run_id: string, status: string, created_at: string}>,
+	 *   reporting_logs: array<int, array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}>,
+	 *   import_export_logs: array<int, array{id: string, type: string, created_at: string, status: string}>,
+	 *   critical_errors: array<int, array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}>,
+	 *   log_export: array{exportable_log_types: array<int, array{value: string, label: string}>},
 	 *   queue_health: array{total_pending: int, stale_lock_count: int, ...}
 	 * }
 	 */
@@ -90,7 +90,7 @@ final class Logs_Monitoring_State_Builder {
 	/**
 	 * Options for log export (spec §48.10). Used by Queue & Logs screen for export form.
 	 *
-	 * @return array{exportable_log_types: list<array{value: string, label: string}>}
+	 * @return array{exportable_log_types: array<int, array{value: string, label: string}>}
 	 */
 	public function build_log_export_options(): array {
 		return array(
@@ -130,7 +130,7 @@ final class Logs_Monitoring_State_Builder {
 	/**
 	 * Queue tab payload: recent jobs by status (pending, running, failed, completed). Row-to-plan via related_object_refs.
 	 *
-	 * @return list<array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}>
+	 * @return array<int, array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}>
 	 */
 	public function build_queue_tab(): array {
 		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
@@ -157,7 +157,7 @@ final class Logs_Monitoring_State_Builder {
 	/**
 	 * Execution logs: completed/failed jobs with timestamps (redacted; no raw payloads).
 	 *
-	 * @return list<array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}>
+	 * @return array<int, array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}>
 	 */
 	public function build_execution_logs(): array {
 		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
@@ -182,7 +182,7 @@ final class Logs_Monitoring_State_Builder {
 	/**
 	 * AI Runs tab: recent runs for linking (run_id, status, created_at). No raw prompts.
 	 *
-	 * @return list<array{run_id: string, status: string, created_at: string}>
+	 * @return array<int, array{run_id: string, status: string, created_at: string}>
 	 */
 	public function build_ai_runs_tab(): array {
 		if ( $this->ai_run_repository === null || ! method_exists( $this->ai_run_repository, 'list_recent' ) ) {
@@ -205,7 +205,7 @@ final class Logs_Monitoring_State_Builder {
 	/**
 	 * Reporting logs: REPORTING_LOG option entries (event_type, attempted_at, delivery_status, log_reference, failure_reason).
 	 *
-	 * @return list<array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}>
+	 * @return array<int, array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}>
 	 */
 	public function build_reporting_logs(): array {
 		$log = \get_option( Option_Names::REPORTING_LOG, array() );
@@ -233,7 +233,7 @@ final class Logs_Monitoring_State_Builder {
 	/**
 	 * Import/Export logs: placeholder (no storage yet). Stable shape for future.
 	 *
-	 * @return list<array{id: string, type: string, created_at: string, status: string}>
+	 * @return array<int, array{id: string, type: string, created_at: string, status: string}>
 	 */
 	public function build_import_export_logs(): array {
 		return array();
@@ -242,7 +242,7 @@ final class Logs_Monitoring_State_Builder {
 	/**
 	 * Critical errors: reporting log entries that are developer_error_report and failed.
 	 *
-	 * @return list<array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}>
+	 * @return array<int, array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}>
 	 */
 	public function build_critical_errors(): array {
 		$log = \get_option( Option_Names::REPORTING_LOG, array() );

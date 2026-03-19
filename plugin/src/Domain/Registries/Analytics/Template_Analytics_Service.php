@@ -108,7 +108,7 @@ final class Template_Analytics_Service {
 	/**
 	 * @param string|null $date_from
 	 * @param string|null $date_to
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function get_plans_for_period( ?string $date_from = null, ?string $date_to = null ): array {
 		$all = $this->plan_list_provider->list_recent( self::MAX_PLANS, 0 );
@@ -139,10 +139,10 @@ final class Template_Analytics_Service {
 	/**
 	 * Collects template-related signals from plan items (new_page, existing_page_change).
 	 *
-	 * @param list<array<string, mixed>> $plans
+	 * @param array<int, array<string, mixed>> $plans
 	 * @param string|null                $filter_family
 	 * @param string|null                $filter_class
-	 * @return list<array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}>
+	 * @return array<int, array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}>
 	 */
 	private function collect_plan_item_signals( array $plans, ?string $filter_family, ?string $filter_class ): array {
 		$signals                  = array();
@@ -204,7 +204,7 @@ final class Template_Analytics_Service {
 	}
 
 	/**
-	 * @param list<array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}> $signals
+	 * @param array<int, array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}> $signals
 	 * @return array{by_family: array<string, int>, by_class: array<string, int>, total_items: int}
 	 */
 	private function build_usage_trends( array $signals ): array {
@@ -226,7 +226,7 @@ final class Template_Analytics_Service {
 	}
 
 	/**
-	 * @param list<array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}> $signals
+	 * @param array<int, array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}> $signals
 	 * @return array{by_family: array<string, array{proposed: int, approved: int, rejected: int, failed: int, completed: int}>, by_class: array<string, array{proposed: int, approved: int, rejected: int, failed: int, completed: int}>}
 	 */
 	private function build_recommendation_acceptance( array $signals ): array {
@@ -277,8 +277,8 @@ final class Template_Analytics_Service {
 	}
 
 	/**
-	 * @param list<array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}> $signals
-	 * @return array{reasons: list<array{reason: string, count: int}>, total: int}
+	 * @param array<int, array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}> $signals
+	 * @return array{reasons: array<int, array{reason: string, count: int}>, total: int}
 	 */
 	private function build_rejection_reasons( array $signals ): array {
 		$counts = array();
@@ -391,7 +391,7 @@ final class Template_Analytics_Service {
 	 *
 	 * @param string|null $date_from
 	 * @param string|null $date_to
-	 * @return array{total_rollbacks: int, by_month: list<array{month: string, count: int}>}
+	 * @return array{total_rollbacks: int, by_month: array<int, array{month: string, count: int}>}
 	 */
 	private function build_rollback_frequency( ?string $date_from, ?string $date_to ): array {
 		$by_month = array();

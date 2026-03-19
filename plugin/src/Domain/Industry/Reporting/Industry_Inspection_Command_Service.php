@@ -57,7 +57,7 @@ final class Industry_Inspection_Command_Service {
 	/** @var Industry_Starter_Bundle_Registry|null */
 	private $starter_bundle_registry;
 
-	/** @var callable(): list<array<string, mixed>>|null Section list provider for preview. */
+	/** @var callable(): array<int, array<string, mixed>>|null Section list provider for preview. */
 	private $section_list_provider;
 
 	public function __construct(
@@ -85,7 +85,7 @@ final class Industry_Inspection_Command_Service {
 	/**
 	 * Returns a bounded profile summary for inspection. No secrets.
 	 *
-	 * @return array{primary_industry_key: string, secondary_industry_keys: list<string>, selected_starter_bundle_key: string, readiness: string, available: bool}
+	 * @return array{primary_industry_key: string, secondary_industry_keys: array<int, string>, selected_starter_bundle_key: string, readiness: string, available: bool}
 	 */
 	public function get_profile_summary(): array {
 		$empty = array(
@@ -130,7 +130,7 @@ final class Industry_Inspection_Command_Service {
 	/**
 	 * Returns a bounded health check summary (errors/warnings counts and sample issues). No mutation.
 	 *
-	 * @return array{errors_count: int, warnings_count: int, sample_errors: list<array{object_type: string, key: string, issue_summary: string}>, sample_warnings: list<array{object_type: string, key: string, issue_summary: string}>, available: bool}
+	 * @return array{errors_count: int, warnings_count: int, sample_errors: array<int, array{object_type: string, key: string, issue_summary: string}>, sample_warnings: array<int, array{object_type: string, key: string, issue_summary: string}>, available: bool}
 	 */
 	public function get_health_summary(): array {
 		$empty = array(
@@ -213,7 +213,7 @@ final class Industry_Inspection_Command_Service {
 	 * @param string $industry_key Industry key to preview (e.g. realtor).
 	 * @param int    $top_templates Max number of top page template keys to return (0 = use default).
 	 * @param int    $top_sections  Max number of top section keys to return (0 = skip sections).
-	 * @return array{industry_key: string, top_template_keys: list<string>, top_section_keys: list<string>, template_count: int, section_count: int, pack_found: bool}
+	 * @return array{industry_key: string, top_template_keys: array<int, string>, top_section_keys: array<int, string>, template_count: int, section_count: int, pack_found: bool}
 	 */
 	public function get_recommendation_preview( string $industry_key, int $top_templates = 0, int $top_sections = 0 ): array {
 		$top_templates     = $top_templates > 0 ? $top_templates : self::PREVIEW_TOP_N;
@@ -252,7 +252,7 @@ final class Industry_Inspection_Command_Service {
 	 * Returns starter bundle keys available for an industry. Read-only.
 	 *
 	 * @param string $industry_key Industry key.
-	 * @return list<string> Bundle keys.
+	 * @return array<int, string> Bundle keys.
 	 */
 	public function get_starter_bundles_for_industry( string $industry_key ): array {
 		if ( $this->starter_bundle_registry === null ) {

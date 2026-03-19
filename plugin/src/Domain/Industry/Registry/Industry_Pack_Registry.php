@@ -20,7 +20,7 @@ final class Industry_Pack_Registry {
 	/** @var array<string, array<string, mixed>> Map of industry_key => pack definition. */
 	private array $by_key = array();
 
-	/** @var list<array<string, mixed>> All valid packs in load order. */
+	/** @var array<int, array<string, mixed>> All valid packs in load order. */
 	private array $all = array();
 
 	/** @var Industry_Pack_Validator */
@@ -92,7 +92,7 @@ final class Industry_Pack_Registry {
 	/**
 	 * Returns all loaded packs.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -102,7 +102,7 @@ final class Industry_Pack_Registry {
 	 * Returns packs with the given status (e.g. active). Empty array if none.
 	 *
 	 * @param string $status One of Industry_Pack_Schema::STATUS_*.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_status( string $status ): array {
 		$out = array();

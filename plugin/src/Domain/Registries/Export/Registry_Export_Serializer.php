@@ -109,7 +109,7 @@ final class Registry_Export_Serializer {
 	 * Excludes documentation and snapshots (optional categories).
 	 *
 	 * @param int $limit Max definitions per type (0 = default).
-	 * @return array{registries: array{sections: list<array>, page_templates: list<array>, compositions: list<array>}}
+	 * @return array{registries: array{sections: array<int, array>, page_templates: array<int, array>, compositions: array<int, array>}}
 	 */
 	public function build_registry_bundle( int $limit = 0 ): array {
 		$sec_limit  = $limit > 0 ? $limit : 9999;

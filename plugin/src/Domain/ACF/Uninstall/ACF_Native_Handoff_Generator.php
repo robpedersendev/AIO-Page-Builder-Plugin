@@ -48,7 +48,7 @@ final class ACF_Native_Handoff_Generator {
 	 * Uses page location so groups remain visible on page edit screens after uninstall.
 	 * Skips groups that already exist in ACF storage and are not marked as our handoff.
 	 *
-	 * @return array{imported: int, skipped_existing: int, skipped_no_blueprint: int, errors: list<string>}
+	 * @return array{imported: int, skipped_existing: int, skipped_no_blueprint: int, errors: array<int, string>}
 	 */
 	public function generate_handoff(): array {
 		$result = array(

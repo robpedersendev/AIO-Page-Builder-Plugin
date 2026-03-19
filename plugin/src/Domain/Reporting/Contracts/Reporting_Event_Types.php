@@ -28,13 +28,13 @@ final class Reporting_Event_Types {
 	/** Developer error report (severity/trigger-based). */
 	public const DEVELOPER_ERROR_REPORT = 'developer_error_report';
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private static ?array $all = null;
 
 	/**
 	 * Returns all event type values.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {

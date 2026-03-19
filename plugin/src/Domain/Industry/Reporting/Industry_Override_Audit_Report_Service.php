@@ -33,7 +33,7 @@ final class Industry_Override_Audit_Report_Service {
 	 * @return array{
 	 *   generated_at: string,
 	 *   total_count: int,
-	 *   by_type: array<string, array{count: int, items: list<array{target_key: string, plan_id: string|null, state: string, reason_length: int}>}>,
+	 *   by_type: array<string, array{count: int, items: array<int, array{target_key: string, plan_id: string|null, state: string, reason_length: int}>}>,
 	 *   by_industry_context: array<string, int>
 	 * }
 	 */

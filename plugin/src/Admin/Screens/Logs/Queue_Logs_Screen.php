@@ -299,7 +299,7 @@ final class Queue_Logs_Screen {
 	}
 
 	/**
-	 * @param list<array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, can_cancel: bool}> $rows
+	 * @param array<int, array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, can_cancel: bool}> $rows
 	 * @param bool                                                                                                                                                                                                    $can_recovery Whether current user can perform retry/cancel (MANAGE_QUEUE_RECOVERY).
 	 */
 	private function render_queue_tab( array $rows, bool $can_recovery = false ): void {
@@ -382,7 +382,7 @@ final class Queue_Logs_Screen {
 		<?php
 	}
 
-	/** @param list<array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}> $rows */
+	/** @param array<int, array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string}> $rows */
 	private function render_execution_tab( array $rows ): void {
 		?>
 		<table class="wp-list-table widefat fixed striped">
@@ -427,7 +427,7 @@ final class Queue_Logs_Screen {
 		<?php
 	}
 
-	/** @param list<array{run_id: string, status: string, created_at: string}> $rows */
+	/** @param array<int, array{run_id: string, status: string, created_at: string}> $rows */
 	private function render_ai_runs_tab( array $rows ): void {
 		?>
 		<table class="wp-list-table widefat fixed striped">
@@ -458,7 +458,7 @@ final class Queue_Logs_Screen {
 		<?php
 	}
 
-	/** @param list<array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}> $rows */
+	/** @param array<int, array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}> $rows */
 	private function render_reporting_tab( array $rows ): void {
 		?>
 		<table class="wp-list-table widefat fixed striped">
@@ -490,7 +490,7 @@ final class Queue_Logs_Screen {
 		<?php
 	}
 
-	/** @param list<array{id: string, type: string, created_at: string, status: string}> $rows */
+	/** @param array<int, array{id: string, type: string, created_at: string, status: string}> $rows */
 	private function render_import_export_tab( array $rows ): void {
 		?>
 		<table class="wp-list-table widefat fixed striped">
@@ -520,7 +520,7 @@ final class Queue_Logs_Screen {
 		<?php
 	}
 
-	/** @param list<array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}> $rows */
+	/** @param array<int, array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}> $rows */
 	private function render_critical_tab( array $rows ): void {
 		?>
 		<table class="wp-list-table widefat fixed striped">

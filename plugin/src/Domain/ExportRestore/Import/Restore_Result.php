@@ -22,16 +22,16 @@ final class Restore_Result {
 	/** @var string */
 	private string $message;
 
-	/** @var list<string> Categories that were restored. */
+	/** @var array<int, string> Categories that were restored. */
 	private array $restored_categories;
 
-	/** @var list<array{category: string, action: string, key?: string}> Summary of resolved actions (overwrite, keep, duplicate). */
+	/** @var array<int, array{category: string, action: string, key?: string}> Summary of resolved actions (overwrite, keep, duplicate). */
 	private array $resolved_actions;
 
 	/** @var bool Whether validation had passed before restore ran. */
 	private bool $validation_passed;
 
-	/** @var list<string> Blocking failures if restore was not run or failed. */
+	/** @var array<int, string> Blocking failures if restore was not run or failed. */
 	private array $blocking_failures;
 
 	/** @var string Log reference for this restore. */
@@ -43,10 +43,10 @@ final class Restore_Result {
 	/**
 	 * @param bool                        $success
 	 * @param string                      $message
-	 * @param list<string>                $restored_categories
-	 * @param list<array<string, string>> $resolved_actions
+	 * @param array<int, string>                $restored_categories
+	 * @param array<int, array<string, string>> $resolved_actions
 	 * @param bool                        $validation_passed
-	 * @param list<string>                $blocking_failures
+	 * @param array<int, string>                $blocking_failures
 	 * @param string                      $log_reference
 	 * @param array<string, mixed>        $template_library_restore_summary Optional template-library validation summary.
 	 */
@@ -78,12 +78,12 @@ final class Restore_Result {
 		return $this->message;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_restored_categories(): array {
 		return $this->restored_categories;
 	}
 
-	/** @return list<array{category: string, action: string, key?: string}> */
+	/** @return array<int, array{category: string, action: string, key?: string}> */
 	public function get_resolved_actions(): array {
 		return $this->resolved_actions;
 	}
@@ -92,7 +92,7 @@ final class Restore_Result {
 		return $this->validation_passed;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_blocking_failures(): array {
 		return $this->blocking_failures;
 	}
@@ -109,7 +109,7 @@ final class Restore_Result {
 	/**
 	 * Payload for UI/API (no secrets).
 	 *
-	 * @return array{success: bool, message: string, restored_categories: list<string>, resolved_actions: list<array>, validation_passed: bool, blocking_failures: list<string>, log_reference: string}
+	 * @return array{success: bool, message: string, restored_categories: array<int, string>, resolved_actions: array<int, array>, validation_passed: bool, blocking_failures: array<int, string>, log_reference: string}
 	 */
 	public function to_payload(): array {
 		return array(

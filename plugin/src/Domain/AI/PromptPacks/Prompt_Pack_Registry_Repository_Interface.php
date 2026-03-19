@@ -39,7 +39,7 @@ interface Prompt_Pack_Registry_Repository_Interface {
 	 * @param string $status
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_definitions_by_status( string $status, int $limit = 0, int $offset = 0 ): array;
 }

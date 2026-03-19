@@ -66,10 +66,10 @@ final class Page_Template_Schema {
 	/** One-pager block: page-purpose summary (required within one_pager). */
 	public const ONE_PAGER_PURPOSE_SUMMARY = 'page_purpose_summary';
 
-	/** @var list<string> Required field names for completeness check (spec §13.2). */
+	/** @var array<int, string> Required field names for completeness check (spec §13.2). */
 	private static ?array $required_fields = null;
 
-	/** @var list<string> Optional field names (spec §13.3). */
+	/** @var array<int, string> Optional field names (spec §13.3). */
 	private static ?array $optional_fields = null;
 
 	/** @var array<string, string> Allowed archetype slug => description. */
@@ -78,7 +78,7 @@ final class Page_Template_Schema {
 	/**
 	 * Returns required field names. A page template missing any of these is incomplete.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_required_fields(): array {
 		if ( self::$required_fields !== null ) {
@@ -104,7 +104,7 @@ final class Page_Template_Schema {
 	/**
 	 * Returns optional field names (spec §13.3).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_optional_fields(): array {
 		if ( self::$optional_fields !== null ) {
@@ -182,7 +182,7 @@ final class Page_Template_Schema {
 	/**
 	 * Returns required keys for an ordered section reference item.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_ordered_section_item_keys(): array {
 		return array(

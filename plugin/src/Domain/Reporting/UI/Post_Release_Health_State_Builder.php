@@ -59,7 +59,7 @@ final class Post_Release_Health_State_Builder {
 	 * @return array{
 	 *   post_release_health_summary: array{period_start: string, period_end: string, overall_status: string, summary_message: string},
 	 *   domain_health_scores: array<string, array{status: string, score_label: string, message: string, link_url: string, link_label: string}>,
-	 *   recommended_investigation_items: list<array{domain: string, priority: string, title: string, message: string, link_url: string, link_label: string}>
+	 *   recommended_investigation_items: array<int, array{domain: string, priority: string, title: string, message: string, link_url: string, link_label: string}>
 	 * }
 	 */
 	public function build( ?string $date_from = null, ?string $date_to = null ): array {

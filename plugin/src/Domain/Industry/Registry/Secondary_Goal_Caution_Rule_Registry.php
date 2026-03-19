@@ -40,7 +40,7 @@ final class Secondary_Goal_Caution_Rule_Registry {
 	/** @var array<string, array<string, mixed>> Map of secondary_goal_rule_key => definition. */
 	private array $by_key = array();
 
-	/** @var list<array<string, mixed>> All valid rules in load order. */
+	/** @var array<int, array<string, mixed>> All valid rules in load order. */
 	private array $all = array();
 
 	/**
@@ -134,7 +134,7 @@ final class Secondary_Goal_Caution_Rule_Registry {
 	/**
 	 * Returns all loaded rules.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -145,7 +145,7 @@ final class Secondary_Goal_Caution_Rule_Registry {
 	 *
 	 * @param string $primary_goal_key   Primary conversion goal key.
 	 * @param string $secondary_goal_key Secondary conversion goal key.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_for_primary_secondary( string $primary_goal_key, string $secondary_goal_key ): array {
 		$p = \trim( $primary_goal_key );

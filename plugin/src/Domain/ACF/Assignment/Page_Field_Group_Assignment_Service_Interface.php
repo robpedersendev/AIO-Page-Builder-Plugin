@@ -21,7 +21,7 @@ interface Page_Field_Group_Assignment_Service_Interface {
 	 * Rebuilds field-group assignments for a page from its stored template or composition.
 	 *
 	 * @param int $page_id Post ID of the page.
-	 * @return array{assigned: list<string>, removed: list<string>, errors: list<string>} Result summary.
+	 * @return array{assigned: array<int, string>, removed: array<int, string>, errors: array<int, string>} Result summary.
 	 */
 	public function reassign_from_stored_source( int $page_id ): array;
 }

@@ -25,7 +25,7 @@ final class Child_Detail_Variant_Expansion_Page_Template_Seeder {
 	 * Seeds all child/detail variant expansion definitions.
 	 *
 	 * @param Page_Template_Repository $page_repo
-	 * @return array{ success: bool, page_template_ids: list<int>, errors: list<string> }
+	 * @return array{ success: bool, page_template_ids: array<int, int>, errors: array<int, string> }
 	 */
 	public static function run( Page_Template_Repository $page_repo ): array {
 		$errors = array();

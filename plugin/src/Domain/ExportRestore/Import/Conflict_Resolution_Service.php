@@ -46,9 +46,9 @@ final class Conflict_Resolution_Service {
 	/**
 	 * Resolves conflicts with the given mode. Returns list of actions per conflict; if mode is cancel, returns cancelled flag.
 	 *
-	 * @param list<array{category: string, key: string, message: string}> $conflicts From validation.
+	 * @param array<int, array{category: string, key: string, message: string}> $conflicts From validation.
 	 * @param string                                                      $mode One of MODE_OVERWRITE, MODE_KEEP_CURRENT, MODE_DUPLICATE, MODE_CANCEL.
-	 * @return array{resolved: list<array{category: string, key: string, action: string}>, cancelled: bool}
+	 * @return array{resolved: array<int, array{category: string, key: string, action: string}>, cancelled: bool}
 	 */
 	public function resolve( array $conflicts, string $mode ): array {
 		if ( $mode === self::MODE_CANCEL ) {

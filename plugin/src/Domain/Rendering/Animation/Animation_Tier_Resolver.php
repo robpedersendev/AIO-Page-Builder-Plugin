@@ -26,7 +26,7 @@ final class Animation_Tier_Resolver {
 	 * @param array<string, mixed>      $section_definition Section template definition (animation_tier, animation_families, reduced_motion_behavior).
 	 * @param array<string, mixed>|null $page_template      Optional page template (animation_tier_cap, animation_families_allowed).
 	 * @param bool                      $reduced_motion     User prefers reduced motion.
-	 * @return array{effective_tier: string, effective_families: list<string>, reduced_motion_applied: bool, resolution_reason: string}
+	 * @return array{effective_tier: string, effective_families: array<int, string>, reduced_motion_applied: bool, resolution_reason: string}
 	 */
 	public function resolve(
 		array $section_definition,

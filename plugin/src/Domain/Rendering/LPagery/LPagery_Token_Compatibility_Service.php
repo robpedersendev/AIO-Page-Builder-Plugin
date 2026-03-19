@@ -119,11 +119,11 @@ final class LPagery_Token_Compatibility_Service {
 	 * Returns a stable compatibility summary payload. No storage changes; metadata only.
 	 *
 	 * @return array{
-	 *   allowed_groups: list<string>,
+	 *   allowed_groups: array<int, string>,
 	 *   mapping_convention: string,
 	 *   canonical_identity_preserved: bool,
-	 *   sample_mappings: list<array{canonical_group: string, canonical_name: string, lpagery_key: string}>,
-	 *   unsupported_warnings: list<string>
+	 *   sample_mappings: array<int, array{canonical_group: string, canonical_name: string, lpagery_key: string}>,
+	 *   unsupported_warnings: array<int, string>
 	 * }
 	 */
 	public function get_compatibility_summary(): array {
@@ -156,7 +156,7 @@ final class LPagery_Token_Compatibility_Service {
 	/**
 	 * Returns the list of canonical token groups supported for LPagery mapping (read-only).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_allowed_groups(): array {
 		return array_values( self::ALLOWED_GROUPS );

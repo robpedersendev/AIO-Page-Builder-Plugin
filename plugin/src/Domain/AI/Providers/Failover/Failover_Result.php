@@ -36,7 +36,7 @@ final class Failover_Result {
 	/** @var string Model used by effective provider. */
 	private string $effective_model_used;
 
-	/** @var list<array{provider_id: string, model_used: string, category: string, attempted_at: string}> */
+	/** @var array<int, array{provider_id: string, model_used: string, category: string, attempted_at: string}> */
 	private array $attempts;
 
 	/** @var array<string, mixed> Policy snapshot used (to_metadata_snapshot()). */
@@ -46,7 +46,7 @@ final class Failover_Result {
 	 * @param bool                                                                                         $used_primary        True if primary succeeded.
 	 * @param string                                                                                       $effective_provider_id Provider that produced or last attempted.
 	 * @param string                                                                                       $effective_model_used  Model used.
-	 * @param list<array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts Per-attempt log (no secrets).
+	 * @param array<int, array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts Per-attempt log (no secrets).
 	 * @param array<string, mixed>                                                                         $policy_snapshot Policy snapshot for audit.
 	 */
 	public function __construct(
@@ -76,7 +76,7 @@ final class Failover_Result {
 	}
 
 	/**
-	 * @return list<array{provider_id: string, model_used: string, category: string, attempted_at: string}>
+	 * @return array<int, array{provider_id: string, model_used: string, category: string, attempted_at: string}>
 	 */
 	public function get_attempts(): array {
 		return $this->attempts;
@@ -158,7 +158,7 @@ final class Failover_Result {
 	 *
 	 * @param string                                                                                       $fallback_provider_id Fallback provider that succeeded.
 	 * @param string                                                                                       $fallback_model       Model used by fallback.
-	 * @param list<array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts Primary failure + fallback success.
+	 * @param array<int, array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts Primary failure + fallback success.
 	 * @param array<string, mixed>                                                                         $policy_snapshot Policy snapshot.
 	 * @return self
 	 */
@@ -171,7 +171,7 @@ final class Failover_Result {
 	 *
 	 * @param string                                                                                       $last_provider_id Last provider attempted (fallback).
 	 * @param string                                                                                       $last_model_used   Model used.
-	 * @param list<array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts All attempts.
+	 * @param array<int, array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts All attempts.
 	 * @param array<string, mixed>                                                                         $policy_snapshot Policy snapshot.
 	 * @return self
 	 */

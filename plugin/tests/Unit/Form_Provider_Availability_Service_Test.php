@@ -31,7 +31,7 @@ final class Form_Provider_Availability_Test_Adapter implements Form_Provider_Pic
 	public string $provider_key     = 'test_provider';
 	public bool $available          = true;
 	public bool $supports_form_list = true;
-	/** @var list<array{provider_key: string, item_id: string, item_label: string}> */
+	/** @var array<int, array{provider_key: string, item_id: string, item_label: string}> */
 	public array $form_list             = array();
 	public bool $throw_on_get_form_list = false;
 	public bool $stale_for_any          = false;

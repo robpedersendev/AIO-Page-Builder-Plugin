@@ -99,7 +99,7 @@ final class Composition_Validation_Codes {
 	/**
 	 * Returns all validation codes that are blocking.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_blocking_codes(): array {
 		$blocking = array();
@@ -114,7 +114,7 @@ final class Composition_Validation_Codes {
 	/**
 	 * Returns all validation codes that are warnings.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_warning_codes(): array {
 		$warnings = array();

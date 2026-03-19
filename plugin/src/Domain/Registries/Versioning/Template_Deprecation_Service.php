@@ -85,7 +85,7 @@ final class Template_Deprecation_Service {
 	 *
 	 * @param array<string, mixed> $definition Section or page template definition.
 	 * @param string               $type      'section' or 'page'.
-	 * @return array{is_deprecated: bool, reason: string, replacement_keys: list<string>, deprecated_at: string}
+	 * @return array{is_deprecated: bool, reason: string, replacement_keys: array<int, string>, deprecated_at: string}
 	 */
 	public function get_deprecation_summary( array $definition, string $type = 'section' ): array {
 		$status = (string) ( $definition[ $type === 'page' ? Page_Template_Schema::FIELD_STATUS : Section_Schema::FIELD_STATUS ] ?? '' );
@@ -132,8 +132,8 @@ final class Template_Deprecation_Service {
 	 * @param string       $owner          Owner (e.g. "Technical Lead").
 	 * @param string       $status         One of: proposed, approved, superseded, rejected.
 	 * @param string       $effective_version Optional effective template/registry version.
-	 * @param list<string> $impacted_section_keys Optional section keys impacted.
-	 * @param list<string> $impacted_template_keys Optional page template keys impacted.
+	 * @param array<int, string> $impacted_section_keys Optional section keys impacted.
+	 * @param array<int, string> $impacted_template_keys Optional page template keys impacted.
 	 * @param string       $alternatives_considered Optional alternatives text.
 	 * @return array<string, mixed> Stable payload for decision log.
 	 */
@@ -169,7 +169,7 @@ final class Template_Deprecation_Service {
 	 * @param string       $template_key    Section or page template internal_key.
 	 * @param string       $type            'section' or 'page'.
 	 * @param string       $reason          Deprecation reason.
-	 * @param list<string> $replacement_keys Replacement keys if any.
+	 * @param array<int, string> $replacement_keys Replacement keys if any.
 	 * @return string Single line or short block suitable for Deprecations section.
 	 */
 	public function build_changelog_snippet_for_deprecation(

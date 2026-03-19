@@ -253,7 +253,7 @@ final class Page_Template_Detail_State_Builder {
 	 * Builds ordered list for synthetic generator: section_key, position, purpose_family (from section definition).
 	 *
 	 * @param array<int, array<string, mixed>> $ordered_sections
-	 * @return list<array{section_key: string, position: int, purpose_family: string}>
+	 * @return array<int, array{section_key: string, position: int, purpose_family: string}>
 	 */
 	private function build_ordered_sections_for_generator( array $ordered_sections ): array {
 		$out = array();
@@ -289,9 +289,9 @@ final class Page_Template_Detail_State_Builder {
 	/**
 	 * Merges industry dummy overrides onto each section's field_values (preview only; same order as ordered_for_gen).
 	 *
-	 * @param list<array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values
-	 * @param list<array{section_key: string, position: int, purpose_family: string}>             $ordered_for_gen
-	 * @return list<array{section_key: string, position: int, field_values: array<string, mixed>}>
+	 * @param array<int, array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values
+	 * @param array<int, array{section_key: string, position: int, purpose_family: string}>             $ordered_for_gen
+	 * @return array<int, array{section_key: string, position: int, field_values: array<string, mixed>}>
 	 */
 	private function merge_industry_overrides_into_page_sections( array $section_field_values, array $ordered_for_gen ): array {
 		$out = array();
@@ -325,7 +325,7 @@ final class Page_Template_Detail_State_Builder {
 	 * Renders preview HTML via real pipeline: section definitions + synthetic field values → context → renderer → assemble → do_blocks.
 	 *
 	 * @param array<string, mixed>                                                                $definition
-	 * @param list<array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values
+	 * @param array<int, array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values
 	 * @param array<string, mixed>                                                                $options Optional: reduced_motion (bool), page_template (array) for animation resolution.
 	 * @return string HTML safe for admin output (escaped later if needed; block content is run through do_blocks).
 	 */
@@ -400,7 +400,7 @@ final class Page_Template_Detail_State_Builder {
 	 *
 	 * @param array<string, mixed> $definition
 	 * @param string               $type 'section' or 'page'
-	 * @return array{is_deprecated: bool, reason: string, replacement_keys: list<string>, deprecated_at: string}
+	 * @return array{is_deprecated: bool, reason: string, replacement_keys: array<int, string>, deprecated_at: string}
 	 */
 	private function build_deprecation_summary_from_definition( array $definition, string $type ): array {
 		$status = (string) ( $definition[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
@@ -429,7 +429,7 @@ final class Page_Template_Detail_State_Builder {
 	 * @param array<string, mixed> $definition
 	 * @param string               $category_class
 	 * @param string               $family
-	 * @return list<array{label: string, url: string}>
+	 * @return array<int, array{label: string, url: string}>
 	 */
 	private function build_breadcrumbs( array $definition, string $category_class, string $family ): array {
 		$base_url = \admin_url( 'admin.php?page=' . Page_Template_Directory_State_Builder::SCREEN_SLUG );

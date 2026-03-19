@@ -23,7 +23,7 @@ final class Render_Surface_Style_Registry {
 	/** @var string Spec version when loaded. */
 	private string $spec_version = '';
 
-	/** @var list<array> Ordered list of surface definitions. */
+	/** @var array<int, array> Ordered list of surface definitions. */
 	private array $surfaces = array();
 
 	public function __construct( Style_Spec_Loader $loader ) {
@@ -60,7 +60,7 @@ final class Render_Surface_Style_Registry {
 	/**
 	 * Returns all render surface definitions (id, selector, scope, allowed_output).
 	 *
-	 * @return list<array{id?: string, selector?: string, scope?: string, allowed_output?: array}>
+	 * @return array<int, array{id?: string, selector?: string, scope?: string, allowed_output?: array}>
 	 */
 	public function get_surfaces(): array {
 		return $this->surfaces;

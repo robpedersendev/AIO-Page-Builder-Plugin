@@ -67,8 +67,8 @@ final class Dashboard_State_Builder {
 	 *   readiness_cards: array{environment: array, dependency: array, provider: array},
 	 *   last_activity_cards: array{last_crawl: array|null, last_ai_run: array|null, active_build_plans: array},
 	 *   queue_warning_summary: array{has_warnings: bool, pending_count: int, failed_count: int, message: string, queue_logs_url: string},
-	 *   critical_error_summary: array{count: int, items: list<array>, logs_url: string},
-	 *   quick_actions: list<array{label: string, url: string, capability: string}>,
+	 *   critical_error_summary: array{count: int, items: array<int, array>, logs_url: string},
+	 *   quick_actions: array<int, array{label: string, url: string, capability: string}>,
 	 *   welcome_state: array{is_first_run: bool, is_resume: bool, onboarding_url: string}
 	 * }
 	 */
@@ -161,7 +161,7 @@ final class Dashboard_State_Builder {
 	}
 
 	/**
-	 * @return array{last_crawl: array{run_id: string, started_at: string|null, final_status: string, total_discovered: int}|null, last_ai_run: array{run_id: string, status: string, created_at: string}|null, active_build_plans: list<array{plan_id: string, status: string, title: string}>}
+	 * @return array{last_crawl: array{run_id: string, started_at: string|null, final_status: string, total_discovered: int}|null, last_ai_run: array{run_id: string, status: string, created_at: string}|null, active_build_plans: array<int, array{plan_id: string, status: string, title: string}>}
 	 */
 	private function build_last_activity_cards(): array {
 		$last_crawl   = $this->build_last_crawl_summary();
@@ -215,7 +215,7 @@ final class Dashboard_State_Builder {
 	}
 
 	/**
-	 * @return list<array{plan_id: string, status: string, title: string}>
+	 * @return array<int, array{plan_id: string, status: string, title: string}>
 	 */
 	private function build_active_plans_summary(): array {
 		if ( $this->build_plan_repository === null || ! method_exists( $this->build_plan_repository, 'list_recent' ) ) {
@@ -273,7 +273,7 @@ final class Dashboard_State_Builder {
 	}
 
 	/**
-	 * @return array{count: int, items: list<array{event_type: string, attempted_at: string, failure_reason: string}>, logs_url: string}
+	 * @return array{count: int, items: array<int, array{event_type: string, attempted_at: string, failure_reason: string}>, logs_url: string}
 	 */
 	private function build_critical_error_summary(): array {
 		$logs_builder = new Logs_Monitoring_State_Builder( $this->job_queue_repository, $this->ai_run_repository );
@@ -304,7 +304,7 @@ final class Dashboard_State_Builder {
 	/**
 	 * Quick actions with capability check. Only includes actions the current user can perform.
 	 *
-	 * @return list<array{label: string, url: string, capability: string}>
+	 * @return array<int, array{label: string, url: string, capability: string}>
 	 */
 	private function build_quick_actions_filtered(): array {
 		$all = $this->get_quick_actions_definitions();
@@ -318,7 +318,7 @@ final class Dashboard_State_Builder {
 	}
 
 	/**
-	 * @return list<array{label: string, url: string, capability: string}>
+	 * @return array<int, array{label: string, url: string, capability: string}>
 	 */
 	private function get_quick_actions_definitions(): array {
 		$base = \admin_url( 'admin.php' );

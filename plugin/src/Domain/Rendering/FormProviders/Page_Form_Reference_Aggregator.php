@@ -35,7 +35,7 @@ final class Page_Form_Reference_Aggregator {
 	 * Only includes pairs where provider is registered and form_id is non-empty; excludes invalid refs.
 	 *
 	 * @param array<Section_Render_Result|array> $ordered_section_results Section render results (object or to_array() shape).
-	 * @return list<array{form_provider: string, form_id: string}>
+	 * @return array<int, array{form_provider: string, form_id: string}>
 	 */
 	public function aggregate( array $ordered_section_results ): array {
 		$seen = array();

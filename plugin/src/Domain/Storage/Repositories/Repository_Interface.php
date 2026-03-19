@@ -39,7 +39,7 @@ interface Repository_Interface {
 	 * @param string $status Status slug (e.g. active, draft, pending_review).
 	 * @param int    $limit  Max items to return (0 = use default).
 	 * @param int    $offset Offset for pagination.
-	 * @return list<array<string, mixed>> List of decoded objects/rows.
+	 * @return array<int, array<string, mixed>> List of decoded objects/rows.
 	 */
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array;
 

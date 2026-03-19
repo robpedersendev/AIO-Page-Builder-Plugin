@@ -66,13 +66,13 @@ final class Support_Triage_State_Builder {
 	 * Builds full support triage payload. Permission checks are caller's responsibility.
 	 *
 	 * @return array{
-	 *   critical_issues: list<array{severity: string, domain: string, title: string, message: string, link_url: string, link_label: string}>,
-	 *   degraded_systems: list<array{domain: string, title: string, message: string, link_url: string, link_label: string}>,
-	 *   recent_failed_workflows: list<array{domain: string, identifier: string, summary: string, link_url: string, link_label: string}>,
-	 *   rollback_candidates: list<array{job_ref: string, job_type: string, plan_id: string, completed_at: string, link_url: string, link_label: string}>,
-	 *   import_export_failures: list<array{message: string, link_url: string, link_label: string}>,
-	 *   recommended_links: list<array{label: string, url: string, description: string}>,
-	 *   stale_plans: list<array{plan_id: string, status: string, title: string}>
+	 *   critical_issues: array<int, array{severity: string, domain: string, title: string, message: string, link_url: string, link_label: string}>,
+	 *   degraded_systems: array<int, array{domain: string, title: string, message: string, link_url: string, link_label: string}>,
+	 *   recent_failed_workflows: array<int, array{domain: string, identifier: string, summary: string, link_url: string, link_label: string}>,
+	 *   rollback_candidates: array<int, array{job_ref: string, job_type: string, plan_id: string, completed_at: string, link_url: string, link_label: string}>,
+	 *   import_export_failures: array<int, array{message: string, link_url: string, link_label: string}>,
+	 *   recommended_links: array<int, array{label: string, url: string, description: string}>,
+	 *   stale_plans: array<int, array{plan_id: string, status: string, title: string}>
 	 * }
 	 */
 	public function build(): array {
@@ -107,8 +107,8 @@ final class Support_Triage_State_Builder {
 	/**
 	 * @param array<string, mixed>        $reporting_health
 	 * @param array<string, mixed>        $queue_health
-	 * @param list<array<string, string>> $critical_errors
-	 * @return list<array{severity: string, domain: string, title: string, message: string, link_url: string, link_label: string}>
+	 * @param array<int, array<string, string>> $critical_errors
+	 * @return array<int, array{severity: string, domain: string, title: string, message: string, link_url: string, link_label: string}>
 	 */
 	private function aggregate_critical_issues( array $reporting_health, array $queue_health, array $critical_errors ): array {
 		$base              = \admin_url( 'admin.php' );
@@ -168,7 +168,7 @@ final class Support_Triage_State_Builder {
 	/**
 	 * @param array<string, mixed> $reporting_health
 	 * @param array<string, mixed> $queue_health
-	 * @return list<array{domain: string, title: string, message: string, link_url: string, link_label: string}>
+	 * @return array<int, array{domain: string, title: string, message: string, link_url: string, link_label: string}>
 	 */
 	private function aggregate_degraded_systems( array $reporting_health, array $queue_health ): array {
 		$base = \admin_url( 'admin.php' );
@@ -207,10 +207,10 @@ final class Support_Triage_State_Builder {
 	}
 
 	/**
-	 * @param list<array<string, string>> $critical_errors
-	 * @param list<array<string, string>> $failed_ai_runs
+	 * @param array<int, array<string, string>> $critical_errors
+	 * @param array<int, array<string, string>> $failed_ai_runs
 	 * @param array<string, mixed>        $queue_health
-	 * @return list<array{domain: string, identifier: string, summary: string, link_url: string, link_label: string}>
+	 * @return array<int, array{domain: string, identifier: string, summary: string, link_url: string, link_label: string}>
 	 */
 	private function aggregate_recent_failed_workflows( array $critical_errors, array $failed_ai_runs, array $queue_health ): array {
 		$base = \admin_url( 'admin.php' );
@@ -250,7 +250,7 @@ final class Support_Triage_State_Builder {
 	}
 
 	/**
-	 * @return list<array{event_type: string, attempted_at: string, failure_reason: string}>
+	 * @return array<int, array{event_type: string, attempted_at: string, failure_reason: string}>
 	 */
 	private function build_critical_errors(): array {
 		$log = \get_option( Option_Names::REPORTING_LOG, array() );
@@ -281,7 +281,7 @@ final class Support_Triage_State_Builder {
 	}
 
 	/**
-	 * @return list<array{run_id: string, status: string, created_at: string}>
+	 * @return array<int, array{run_id: string, status: string, created_at: string}>
 	 */
 	private function build_failed_ai_runs(): array {
 		if ( $this->ai_run_repository === null || ! method_exists( $this->ai_run_repository, 'list_recent' ) ) {
@@ -313,7 +313,7 @@ final class Support_Triage_State_Builder {
 	/**
 	 * Plans in pending_review or in_progress (needing attention). No secrets.
 	 *
-	 * @return list<array{plan_id: string, status: string, title: string}>
+	 * @return array<int, array{plan_id: string, status: string, title: string}>
 	 */
 	private function build_stale_plans(): array {
 		if ( $this->build_plan_repository === null || ! method_exists( $this->build_plan_repository, 'list_recent' ) ) {
@@ -345,7 +345,7 @@ final class Support_Triage_State_Builder {
 	/**
 	 * Recent completed jobs that are typically rollback-capable; link to plan for eligibility.
 	 *
-	 * @return list<array{job_ref: string, job_type: string, plan_id: string, completed_at: string, link_url: string, link_label: string}>
+	 * @return array<int, array{job_ref: string, job_type: string, plan_id: string, completed_at: string, link_url: string, link_label: string}>
 	 */
 	private function build_rollback_candidates(): array {
 		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
@@ -394,17 +394,17 @@ final class Support_Triage_State_Builder {
 	/**
 	 * Import/export failures: no persistent failure log in state; empty list. Use recommended_links to reach Import/Export screen.
 	 *
-	 * @return list<array{message: string, link_url: string, link_label: string}>
+	 * @return array<int, array{message: string, link_url: string, link_label: string}>
 	 */
 	private function build_import_export_failures(): array {
 		return array();
 	}
 
 	/**
-	 * @param list<array<string, string>> $critical_issues
-	 * @param list<array<string, string>> $degraded_systems
-	 * @param list<array<string, string>> $recent_failed
-	 * @return list<array{label: string, url: string, description: string}>
+	 * @param array<int, array<string, string>> $critical_issues
+	 * @param array<int, array<string, string>> $degraded_systems
+	 * @param array<int, array<string, string>> $recent_failed
+	 * @return array<int, array{label: string, url: string, description: string}>
 	 */
 	private function build_recommended_links( array $critical_issues, array $degraded_systems, array $recent_failed ): array {
 		$base = \admin_url( 'admin.php' );

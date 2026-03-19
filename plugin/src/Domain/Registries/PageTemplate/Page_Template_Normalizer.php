@@ -112,7 +112,7 @@ final class Page_Template_Normalizer {
 	 * Normalizes ordered_sections: ensures position ascending, valid item shape.
 	 *
 	 * @param array<int, mixed> $raw
-	 * @return list<array{section_key: string, position: int, required: bool}>
+	 * @return array<int, array{section_key: string, position: int, required: bool}>
 	 */
 	private function normalize_ordered_sections( array $raw ): array {
 		if ( ! is_array( $raw ) ) {
@@ -147,7 +147,7 @@ final class Page_Template_Normalizer {
 	 * Builds section_requirements from ordered sections; merges with input requirements.
 	 *
 	 * @param array<string, mixed>                                            $raw
-	 * @param list<array{section_key: string, position: int, required: bool}> $ordered
+	 * @param array<int, array{section_key: string, position: int, required: bool}> $ordered
 	 * @return array<string, array{required: bool}>
 	 */
 	private function normalize_section_requirements( array $raw, array $ordered ): array {

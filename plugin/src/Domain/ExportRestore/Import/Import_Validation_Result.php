@@ -19,13 +19,13 @@ final class Import_Validation_Result {
 	/** @var bool */
 	private bool $validation_passed;
 
-	/** @var list<string> Blocking failure messages (permission, ZIP, manifest, schema, checksum, prohibited file). */
+	/** @var array<int, string> Blocking failure messages (permission, ZIP, manifest, schema, checksum, prohibited file). */
 	private array $blocking_failures;
 
-	/** @var list<array{category: string, key: string, message: string}> Conflict entries for pre-scan. */
+	/** @var array<int, array{category: string, key: string, message: string}> Conflict entries for pre-scan. */
 	private array $conflicts;
 
-	/** @var list<string> Non-blocking warnings. */
+	/** @var array<int, string> Non-blocking warnings. */
 	private array $warnings;
 
 	/** @var array<string, mixed> Decoded manifest (empty if not read). */
@@ -39,9 +39,9 @@ final class Import_Validation_Result {
 
 	/**
 	 * @param bool                        $validation_passed
-	 * @param list<string>                $blocking_failures
-	 * @param list<array<string, string>> $conflicts
-	 * @param list<string>                $warnings
+	 * @param array<int, string>                $blocking_failures
+	 * @param array<int, array<string, string>> $conflicts
+	 * @param array<int, string>                $warnings
 	 * @param array<string, mixed>        $manifest
 	 * @param string                      $package_path
 	 * @param bool                        $checksum_verified
@@ -68,17 +68,17 @@ final class Import_Validation_Result {
 		return $this->validation_passed;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_blocking_failures(): array {
 		return $this->blocking_failures;
 	}
 
-	/** @return list<array{category: string, key: string, message: string}> */
+	/** @return array<int, array{category: string, key: string, message: string}> */
 	public function get_conflicts(): array {
 		return $this->conflicts;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_warnings(): array {
 		return $this->warnings;
 	}
@@ -99,7 +99,7 @@ final class Import_Validation_Result {
 	/**
 	 * Rebuilds instance from stored payload and manifest (e.g. transient for restore flow). Server-side only.
 	 *
-	 * @param array{payload: array{validation_passed: bool, blocking_failures: list<string>, conflicts: list<array>, warnings: list<string>, package_path: string, checksum_verified: bool}, manifest: array<string, mixed>} $stored
+	 * @param array{payload: array{validation_passed: bool, blocking_failures: array<int, string>, conflicts: array<int, array>, warnings: array<int, string>, package_path: string, checksum_verified: bool}, manifest: array<string, mixed>} $stored
 	 * @return self
 	 */
 	public static function from_stored( array $stored ): self {
@@ -119,7 +119,7 @@ final class Import_Validation_Result {
 	/**
 	 * Payload for UI/API (no secrets). Omit package_path when sending to client.
 	 *
-	 * @return array{validation_passed: bool, blocking_failures: list<string>, conflicts: list<array>, warnings: list<string>, package_path: string, checksum_verified: bool}
+	 * @return array{validation_passed: bool, blocking_failures: array<int, string>, conflicts: array<int, array>, warnings: array<int, string>, package_path: string, checksum_verified: bool}
 	 */
 	public function to_payload(): array {
 		return array(

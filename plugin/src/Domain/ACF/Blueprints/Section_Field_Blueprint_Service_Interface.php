@@ -29,7 +29,7 @@ interface Section_Field_Blueprint_Service_Interface {
 	/**
 	 * Returns all normalized blueprints from sections that have embedded field_blueprint.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all_blueprints(): array;
 }

@@ -24,7 +24,7 @@ final class Navigation_Extractor {
 	 * Extracts navigation links from HTML. Looks for <nav>, <header>, <footer> and role="navigation".
 	 *
 	 * @param string $html Raw HTML.
-	 * @return list<array{context: string, label: string, url: string, depth?: int}>
+	 * @return array<int, array{context: string, label: string, url: string, depth?: int}>
 	 */
 	public function extract( string $html ): array {
 		$out      = array();
@@ -59,7 +59,7 @@ final class Navigation_Extractor {
 	 *
 	 * @param string                                                                $fragment HTML fragment.
 	 * @param string                                                                $context Context key (nav, header, footer).
-	 * @param list<array{context: string, label: string, url: string, depth?: int}> $out Mutable output list.
+	 * @param array<int, array{context: string, label: string, url: string, depth?: int}> $out Mutable output list.
 	 * @param array<string, true>                                                   $seen Mutable set of "url\tlabel" to avoid duplicates.
 	 */
 	private function extract_links_from_fragment( string $fragment, string $context, array &$out, array &$seen ): void {

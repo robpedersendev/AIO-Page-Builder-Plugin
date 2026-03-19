@@ -51,7 +51,7 @@ final class Field_Group_Derivation_Service {
 	 *
 	 * @param string $template_key Page template internal_key.
 	 * @param bool   $for_new_page If true, exclude deprecated sections. If false, include all.
-	 * @return list<string> Group keys (group_aio_*).
+	 * @return array<int, string> Group keys (group_aio_*).
 	 */
 	public function derive_from_template( string $template_key, bool $for_new_page = true ): array {
 		$definition = $this->page_template_repository->get_definition_by_key( $template_key );
@@ -67,7 +67,7 @@ final class Field_Group_Derivation_Service {
 	 *
 	 * @param string $composition_id Composition id.
 	 * @param bool   $for_new_page   If true, exclude deprecated sections.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function derive_from_composition( string $composition_id, bool $for_new_page = true ): array {
 		$definition = $this->composition_repository->get_definition_by_key( $composition_id );
@@ -115,9 +115,9 @@ final class Field_Group_Derivation_Service {
 	/**
 	 * Merges derived groups with existing groups for refinement (preserves deprecated on existing pages).
 	 *
-	 * @param list<string> $derived  Newly derived group keys.
-	 * @param list<string> $existing Existing page assignment group keys.
-	 * @return list<string> Union: derived + existing (deprecated sections kept).
+	 * @param array<int, string> $derived  Newly derived group keys.
+	 * @param array<int, string> $existing Existing page assignment group keys.
+	 * @return array<int, string> Union: derived + existing (deprecated sections kept).
 	 */
 	public function merge_for_refinement( array $derived, array $existing ): array {
 		$union = array_flip( $derived );
@@ -130,8 +130,8 @@ final class Field_Group_Derivation_Service {
 	/**
 	 * Extracts section keys from page template ordered_sections.
 	 *
-	 * @param list<array<string, mixed>> $ordered
-	 * @return list<string>
+	 * @param array<int, array<string, mixed>> $ordered
+	 * @return array<int, string>
 	 */
 	private function extract_section_keys( array $ordered ): array {
 		$keys = array();
@@ -150,8 +150,8 @@ final class Field_Group_Derivation_Service {
 	/**
 	 * Extracts section keys from composition ordered_section_list.
 	 *
-	 * @param list<array<string, mixed>> $ordered
-	 * @return list<string>
+	 * @param array<int, array<string, mixed>> $ordered
+	 * @return array<int, string>
 	 */
 	private function extract_section_keys_from_composition( array $ordered ): array {
 		$keys = array();
@@ -170,8 +170,8 @@ final class Field_Group_Derivation_Service {
 	/**
 	 * Filters section keys to those eligible for new-page use (excludes deprecated).
 	 *
-	 * @param list<string> $section_keys
-	 * @return list<string>
+	 * @param array<int, string> $section_keys
+	 * @return array<int, string>
 	 */
 	private function filter_section_keys_eligible_for_new_page( array $section_keys ): array {
 		$out = array();
@@ -188,9 +188,9 @@ final class Field_Group_Derivation_Service {
 	/**
 	 * Maps section keys to group keys, optionally excluding deprecated.
 	 *
-	 * @param list<string> $section_keys
+	 * @param array<int, string> $section_keys
 	 * @param bool         $exclude_deprecated
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function section_keys_to_groups( array $section_keys, bool $exclude_deprecated ): array {
 		$groups = array();

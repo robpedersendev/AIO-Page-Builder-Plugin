@@ -45,7 +45,7 @@ final class FormProviderIntegrationRegressionHarness {
 	/**
 	 * Runs all fixture-based scenarios and returns result list.
 	 *
-	 * @return list<array{scenario_id: string, pass: bool, message: string, details: array}>
+	 * @return array<int, array{scenario_id: string, pass: bool, message: string, details: array}>
 	 */
 	public function run_all(): array {
 		$results = array();
@@ -153,7 +153,7 @@ final class FormProviderIntegrationRegressionHarness {
 	/**
 	 * Returns a summary suitable for report artifact (machine-readable).
 	 *
-	 * @param list<array{scenario_id: string, pass: bool, message: string, details: array}> $results Per-scenario run results.
+	 * @param array<int, array{scenario_id: string, pass: bool, message: string, details: array}> $results Per-scenario run results.
 	 * @return array{ran_at: string, total: int, passed: int, failed: int, results: array}
 	 */
 	public static function summary( array $results ): array {

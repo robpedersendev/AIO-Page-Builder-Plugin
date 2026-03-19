@@ -24,7 +24,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Seeder {
 	 * Seeds all profile/entity/resource child/detail page template definitions.
 	 *
 	 * @param Page_Template_Repository $page_repo
-	 * @return array{ success: bool, page_template_ids: list<int>, errors: list<string> }
+	 * @return array{ success: bool, page_template_ids: array<int, int>, errors: array<int, string> }
 	 */
 	public static function run( Page_Template_Repository $page_repo ): array {
 		$errors = array();

@@ -62,11 +62,11 @@ final class Form_Provider_Health_Summary_Service {
 	 * Builds the full health summary for dashboard or support export (bounded, no secrets).
 	 *
 	 * @return array{
-	 *   provider_availability: list<array{provider_key: string, status: string, message: string|null}>,
-	 *   registered_provider_ids: list<string>,
+	 *   provider_availability: array<int, array{provider_key: string, status: string, message: string|null}>,
+	 *   registered_provider_ids: array<int, string>,
 	 *   section_templates_with_forms_count: int,
 	 *   page_templates_using_forms_count: int,
-	 *   recent_failures_summary: list<array{domain: string, count: int, link_label: string}>,
+	 *   recent_failures_summary: array<int, array{domain: string, count: int, link_label: string}>,
 	 *   built_at: string
 	 * }
 	 */

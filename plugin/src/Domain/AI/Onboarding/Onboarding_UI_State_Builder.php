@@ -170,7 +170,7 @@ final class Onboarding_UI_State_Builder {
 	 *
 	 * @param array<string, mixed> $draft
 	 * @param array<string, mixed> $prefill
-	 * @return list<array{category: string, message: string, severity?: string}>
+	 * @return array<int, array{category: string, message: string, severity?: string}>
 	 */
 	private function build_submission_warnings( array $draft, array $prefill ): array {
 		$warnings = array();

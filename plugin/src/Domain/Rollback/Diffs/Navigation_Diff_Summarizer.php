@@ -181,8 +181,8 @@ final class Navigation_Diff_Summarizer {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $items
-	 * @return list<int>
+	 * @param array<int, array<string, mixed>> $items
+	 * @return array<int, int>
 	 */
 	private function menu_item_ids( array $items ): array {
 		$ids = array();
@@ -211,9 +211,9 @@ final class Navigation_Diff_Summarizer {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $pre_items
-	 * @param list<array<string, mixed>> $post_items
-	 * @return list<array<string, string>>
+	 * @param array<int, array<string, mixed>> $pre_items
+	 * @param array<int, array<string, mixed>> $post_items
+	 * @return array<int, array<string, string>>
 	 */
 	private function label_changes( array $pre_items, array $post_items ): array {
 		$out       = array();
@@ -240,8 +240,8 @@ final class Navigation_Diff_Summarizer {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $pre_items
-	 * @param list<array<string, mixed>> $post_items
+	 * @param array<int, array<string, mixed>> $pre_items
+	 * @param array<int, array<string, mixed>> $post_items
 	 * @return bool
 	 */
 	private function order_changed( array $pre_items, array $post_items ): bool {

@@ -31,7 +31,7 @@ final class Industry_Pack_Validator {
 	 * Packs with validation errors are reported; duplicate industry_key (first wins) reported as duplicate_key.
 	 *
 	 * @param array<int, array<string, mixed>> $packs List of pack definitions.
-	 * @return array{valid: list<array<string, mixed>>, invalid: array<int, array{index: int, errors: array<int, array{code: string, field?: string}>}>, duplicate_keys: list<string>}
+	 * @return array{valid: array<int, array<string, mixed>>, invalid: array<int, array{index: int, errors: array<int, array{code: string, field?: string}>}>, duplicate_keys: array<int, string>}
 	 */
 	public function validate_bulk( array $packs ): array {
 		$valid          = array();

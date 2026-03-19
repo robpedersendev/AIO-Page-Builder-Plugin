@@ -125,7 +125,7 @@ final class Dashboard_Screen {
 	}
 
 	/**
-	 * @param list<array{label: string, url: string}> $actions
+	 * @param array<int, array{label: string, url: string}> $actions
 	 * @return void
 	 */
 	/**
@@ -140,7 +140,7 @@ final class Dashboard_Screen {
 	}
 
 	/**
-	 * @param list<array{label: string, url: string}> $actions
+	 * @param array<int, array{label: string, url: string}> $actions
 	 * @return void
 	 */
 	private function render_quick_actions( array $actions ): void {
@@ -282,7 +282,7 @@ final class Dashboard_Screen {
 	}
 
 	/**
-	 * @param array{count: int, items: list<array>, logs_url: string} $summary
+	 * @param array{count: int, items: array<int, array>, logs_url: string} $summary
 	 * @return void
 	 */
 	private function render_critical_errors( array $summary ): void {

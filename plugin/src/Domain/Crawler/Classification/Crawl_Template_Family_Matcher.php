@@ -158,7 +158,7 @@ final class Crawl_Template_Family_Matcher {
 	 *
 	 * @param string $slug_hint
 	 * @param string $suggested_class
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function infer_template_families( string $slug_hint, string $suggested_class ): array {
 		$families = array();
@@ -178,7 +178,7 @@ final class Crawl_Template_Family_Matcher {
 	/**
 	 * Infers likely section-purpose-family patterns from heading outline (advisory).
 	 *
-	 * @param list<array{level: int, text: string}> $heading_outline
+	 * @param array<int, array{level: int, text: string}> $heading_outline
 	 * @param int                                   $word_count
 	 * @return array<string, mixed> section_family_match_summary
 	 */

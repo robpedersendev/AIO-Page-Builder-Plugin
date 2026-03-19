@@ -87,7 +87,7 @@ final class Build_Plan_Template_Explanation_Builder implements Template_Explanat
 	 *
 	 * @param array<string, mixed> $summary
 	 * @param array<string, mixed> $item_payload
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function build_explanation_lines( array $summary, array $item_payload ): array {
 		$lines   = array();

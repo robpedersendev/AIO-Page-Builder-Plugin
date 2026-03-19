@@ -36,7 +36,7 @@ final class Log_Export_Service {
 	public const LOG_TYPE_TEMPLATE_FAMILY    = 'template_family';
 	public const LOG_TYPE_TEMPLATE_OPERATION = 'template_operation';
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	public const ALLOWED_LOG_TYPES = array(
 		self::LOG_TYPE_QUEUE,
 		self::LOG_TYPE_EXECUTION,
@@ -84,7 +84,7 @@ final class Log_Export_Service {
 	/**
 	 * Exports requested log types with filters. Redacts before writing. Writes to plugin exports path.
 	 *
-	 * @param list<string>         $log_types Allowed keys from ALLOWED_LOG_TYPES.
+	 * @param array<int, string>         $log_types Allowed keys from ALLOWED_LOG_TYPES.
 	 * @param array<string, mixed> $filters Optional: date_from, date_to (Y-m-d), plan_id, run_id, job_ref.
 	 * @return Log_Export_Result
 	 */
@@ -197,7 +197,7 @@ final class Log_Export_Service {
 
 	/**
 	 * @param array<string, mixed> $filter_summary
-	 * @return list<array<string, string>>
+	 * @return array<int, array<string, string>>
 	 */
 	private function collect_queue_rows( array $filter_summary ): array {
 		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
@@ -226,7 +226,7 @@ final class Log_Export_Service {
 
 	/**
 	 * @param array<string, mixed> $filter_summary
-	 * @return list<array<string, string>>
+	 * @return array<int, array<string, string>>
 	 */
 	private function collect_execution_rows( array $filter_summary ): array {
 		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
@@ -252,7 +252,7 @@ final class Log_Export_Service {
 
 	/**
 	 * @param array<string, mixed> $filter_summary
-	 * @return list<array<string, string>>
+	 * @return array<int, array<string, string>>
 	 */
 	private function collect_reporting_rows( array $filter_summary ): array {
 		$log = \get_option( Option_Names::REPORTING_LOG, array() );
@@ -283,7 +283,7 @@ final class Log_Export_Service {
 
 	/**
 	 * @param array<string, mixed> $filter_summary
-	 * @return list<array<string, string>>
+	 * @return array<int, array<string, string>>
 	 */
 	private function collect_critical_rows( array $filter_summary ): array {
 		$log = \get_option( Option_Names::REPORTING_LOG, array() );
@@ -323,7 +323,7 @@ final class Log_Export_Service {
 	 * Template-operation rows: execution-style rows for create_page/replace_page only (spec §48.10, Prompt 198).
 	 *
 	 * @param array<string, mixed> $filter_summary
-	 * @return list<array<string, string>>
+	 * @return array<int, array<string, string>>
 	 */
 	private function collect_template_operation_rows( array $filter_summary ): array {
 		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
@@ -357,7 +357,7 @@ final class Log_Export_Service {
 	 * Template-family rows: same as template_operation but optionally filtered by template_family (spec §48.10, Prompt 198).
 	 *
 	 * @param array<string, mixed> $filter_summary
-	 * @return list<array<string, string>>
+	 * @return array<int, array<string, string>>
 	 */
 	private function collect_template_family_rows( array $filter_summary ): array {
 		if ( $this->job_queue_repository === null || ! method_exists( $this->job_queue_repository, 'list_by_status' ) ) {
@@ -389,7 +389,7 @@ final class Log_Export_Service {
 
 	/**
 	 * @param array<string, mixed> $filter_summary
-	 * @return list<array<string, string>>
+	 * @return array<int, array<string, string>>
 	 */
 	private function collect_ai_runs_rows( array $filter_summary ): array {
 		if ( $this->ai_run_repository === null || ! method_exists( $this->ai_run_repository, 'list_recent' ) ) {

@@ -74,10 +74,10 @@ final class Template_Page_Build_Result {
 	/** @var int */
 	private $field_assignment_count;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private $warnings;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private $errors;
 
 	/** @var string */
@@ -98,8 +98,8 @@ final class Template_Page_Build_Result {
 	 * @param array<string, mixed> $one_pager_metadata
 	 * @param int                  $section_count
 	 * @param int                  $field_assignment_count
-	 * @param list<string>         $warnings
-	 * @param list<string>         $errors
+	 * @param array<int, string>         $warnings
+	 * @param array<int, string>         $errors
 	 * @param string               $log_ref
 	 * @param string               $message
 	 */
@@ -182,12 +182,12 @@ final class Template_Page_Build_Result {
 		return $this->field_assignment_count;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_warnings(): array {
 		return $this->warnings;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_errors(): array {
 		return $this->errors;
 	}
@@ -238,7 +238,7 @@ final class Template_Page_Build_Result {
 	 * @param array<string, mixed> $one_pager_metadata
 	 * @param int                  $section_count
 	 * @param int                  $field_assignment_count
-	 * @param list<string>         $warnings
+	 * @param array<int, string>         $warnings
 	 * @param string               $log_ref
 	 * @return self
 	 */
@@ -279,7 +279,7 @@ final class Template_Page_Build_Result {
 	 * Builds a failure result with message and errors.
 	 *
 	 * @param string       $message
-	 * @param list<string> $errors
+	 * @param array<int, string> $errors
 	 * @param string       $template_key
 	 * @param string       $log_ref
 	 * @return self

@@ -79,8 +79,8 @@ final class Industry_Maturity_Delta_Report_Service {
 	 * @param array<string, mixed>|null $baseline_snapshot Optional. Keys: families (scope => [band, total]), capability_areas (area => level), captured_at.
 	 * @return array{
 	 *   summary: array{improved: int, stagnated: int, regressed: int, no_baseline: bool},
-	 *   family_deltas: list<array{scope: string, scope_label: string, band_t1: string, band_t2: string, total_t1: int, total_t2: int, trend: string}>,
-	 *   capability_deltas: list<array{area: string, level_t1: string, level_t2: string, trend: string}>,
+	 *   family_deltas: array<int, array{scope: string, scope_label: string, band_t1: string, band_t2: string, total_t1: int, total_t2: int, trend: string}>,
+	 *   capability_deltas: array<int, array{area: string, level_t1: string, level_t2: string, trend: string}>,
 	 *   current_snapshot: array{families: array<string, array{band: string, total: int}>, capability_areas: array<string, string>, captured_at: string},
 	 *   generated_at: string
 	 * }

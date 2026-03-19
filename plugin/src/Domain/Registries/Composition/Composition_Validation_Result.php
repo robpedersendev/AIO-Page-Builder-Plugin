@@ -32,13 +32,13 @@ final class Composition_Validation_Result {
 	/** References deprecated section(s); policy-defined eligibility. */
 	public const DEPRECATED_CONTEXT = 'deprecated_context';
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private static ?array $results = null;
 
 	/**
 	 * Returns all allowed validation result values.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$results !== null ) {

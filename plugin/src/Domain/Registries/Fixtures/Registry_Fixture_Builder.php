@@ -159,7 +159,7 @@ final class Registry_Fixture_Builder {
 	/**
 	 * Returns all fixture definitions as a bundle (for export/import round-trip tests).
 	 *
-	 * @return array{sections: list<array>, page_templates: list<array>, compositions: list<array>, documentation: list<array>, snapshots: list<array>}
+	 * @return array{sections: array<int, array>, page_templates: array<int, array>, compositions: array<int, array>, documentation: array<int, array>, snapshots: array<int, array>}
 	 */
 	public static function full_bundle(): array {
 		return array(

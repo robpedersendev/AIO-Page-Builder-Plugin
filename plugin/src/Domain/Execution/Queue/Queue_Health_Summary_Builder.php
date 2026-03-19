@@ -49,11 +49,11 @@ final class Queue_Health_Summary_Builder {
 	 *   total_completed: int,
 	 *   total_cancelled: int,
 	 *   stale_lock_count: int,
-	 *   stale_lock_job_refs: list<string>,
+	 *   stale_lock_job_refs: array<int, string>,
 	 *   long_running_count: int,
-	 *   long_running_job_refs: list<string>,
+	 *   long_running_job_refs: array<int, string>,
 	 *   retry_eligible_count: int,
-	 *   retry_eligible_job_refs: list<string>,
+	 *   retry_eligible_job_refs: array<int, string>,
 	 *   bottleneck_warning: bool,
 	 *   summary_message: string
 	 * }
@@ -130,7 +130,7 @@ final class Queue_Health_Summary_Builder {
 	}
 
 	/**
-	 * @return array{total_pending: int, total_running: int, total_retrying: int, total_failed: int, total_completed: int, total_cancelled: int, stale_lock_count: int, stale_lock_job_refs: list<string>, long_running_count: int, long_running_job_refs: list<string>, retry_eligible_count: int, retry_eligible_job_refs: list<string>, bottleneck_warning: bool, summary_message: string}
+	 * @return array{total_pending: int, total_running: int, total_retrying: int, total_failed: int, total_completed: int, total_cancelled: int, stale_lock_count: int, stale_lock_job_refs: array<int, string>, long_running_count: int, long_running_job_refs: array<int, string>, retry_eligible_count: int, retry_eligible_job_refs: array<int, string>, bottleneck_warning: bool, summary_message: string}
 	 */
 	private function empty_summary(): array {
 		return array(

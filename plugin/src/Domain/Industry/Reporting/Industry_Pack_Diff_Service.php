@@ -90,7 +90,7 @@ final class Industry_Pack_Diff_Service {
 
 	/**
 	 * @param array<int, array<string, mixed>> $packs
-	 * @param list<string>                     $notes
+	 * @param array<int, string>                     $notes
 	 * @param string                           $side
 	 * @return array<string, array<string, mixed>>
 	 */
@@ -202,7 +202,7 @@ final class Industry_Pack_Diff_Service {
 
 	/**
 	 * @param array $arr
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function normalize_array_ref( array $arr ): array {
 		$out = array();
@@ -215,9 +215,9 @@ final class Industry_Pack_Diff_Service {
 	}
 
 	/**
-	 * @param list<string>               $added
-	 * @param list<string>               $removed
-	 * @param list<array<string, mixed>> $changed
+	 * @param array<int, string>               $added
+	 * @param array<int, string>               $removed
+	 * @param array<int, array<string, mixed>> $changed
 	 * @return string
 	 */
 	private function impact_level( array $added, array $removed, array $changed ): string {

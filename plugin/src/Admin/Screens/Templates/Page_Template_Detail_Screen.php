@@ -105,7 +105,7 @@ final class Page_Template_Detail_Screen {
 	}
 
 	/**
-	 * @param list<array{label: string, url: string}> $breadcrumbs
+	 * @param array<int, array{label: string, url: string}> $breadcrumbs
 	 * @return void
 	 */
 	private function render_breadcrumbs( array $breadcrumbs ): void {

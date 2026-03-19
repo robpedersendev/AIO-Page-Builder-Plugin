@@ -68,7 +68,7 @@ final class Snapshot_Type_Keys {
 	/**
 	 * Returns all registry-oriented snapshot types.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_registry_oriented_types(): array {
 		return array(

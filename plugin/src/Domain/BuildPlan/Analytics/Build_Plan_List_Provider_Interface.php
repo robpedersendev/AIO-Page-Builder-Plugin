@@ -21,7 +21,7 @@ interface Build_Plan_List_Provider_Interface {
 	 *
 	 * @param int $limit  Max items.
 	 * @param int $offset Offset for pagination.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_recent( int $limit = 50, int $offset = 0 ): array;
 }

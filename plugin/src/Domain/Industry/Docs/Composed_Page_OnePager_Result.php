@@ -32,7 +32,7 @@ final class Composed_Page_OnePager_Result {
 	/** @var string Page template key that was resolved. */
 	private string $page_template_key;
 
-	/** @var list<array{rule_key: string, severity: string, caution_summary: string}> Advisory compliance cautions for display (Prompt 407). */
+	/** @var array<int, array{rule_key: string, severity: string, caution_summary: string}> Advisory compliance cautions for display (Prompt 407). */
 	private array $compliance_warnings;
 
 	/**
@@ -41,7 +41,7 @@ final class Composed_Page_OnePager_Result {
 	 * @param bool                                                                     $overlay_applied    True if an active overlay was merged.
 	 * @param string                                                                   $overlay_industry_key Industry key of overlay or empty.
 	 * @param string                                                                   $page_template_key  Page template key that was resolved.
-	 * @param list<array{rule_key: string, severity: string, caution_summary: string}> $compliance_warnings Advisory compliance cautions (default empty).
+	 * @param array<int, array{rule_key: string, severity: string, caution_summary: string}> $compliance_warnings Advisory compliance cautions (default empty).
 	 */
 	public function __construct( array $composed_onepager, string $base_documentation_id, bool $overlay_applied, string $overlay_industry_key, string $page_template_key, array $compliance_warnings = array() ) {
 		$this->composed_onepager     = $composed_onepager;
@@ -80,7 +80,7 @@ final class Composed_Page_OnePager_Result {
 	/**
 	 * Returns advisory compliance/caution rules for display (Prompt 407). Empty when none.
 	 *
-	 * @return list<array{rule_key: string, severity: string, caution_summary: string}>
+	 * @return array<int, array{rule_key: string, severity: string, caution_summary: string}>
 	 */
 	public function get_compliance_warnings(): array {
 		return $this->compliance_warnings;

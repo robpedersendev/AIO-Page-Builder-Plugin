@@ -112,8 +112,8 @@ final class URL_Discovery_Service {
 	 * Processes seed URLs and returns discovery results (accepted, rejected, duplicate).
 	 * Seeds are normalized and filtered; duplicates by dedup_key are marked duplicate.
 	 *
-	 * @param list<string> $seed_urls Raw seed URLs (e.g. homepage, sitemap URLs).
-	 * @return list<Discovery_Result>
+	 * @param array<int, string> $seed_urls Raw seed URLs (e.g. homepage, sitemap URLs).
+	 * @return array<int, Discovery_Result>
 	 */
 	public function discover_from_seeds( array $seed_urls ): array {
 		return $this->process_candidates( $seed_urls, Discovery_Result::SOURCE_SEED );
@@ -123,9 +123,9 @@ final class URL_Discovery_Service {
 	 * Processes candidate URLs extracted from a page (e.g. from HTML or link set).
 	 * Caller is responsible for extracting hrefs; this method only normalizes and filters.
 	 *
-	 * @param list<string> $link_urls Raw URLs (e.g. from fetcher-provided link set).
+	 * @param array<int, string> $link_urls Raw URLs (e.g. from fetcher-provided link set).
 	 * @param string       $discovery_source One of Discovery_Result::SOURCE_*.
-	 * @return list<Discovery_Result>
+	 * @return array<int, Discovery_Result>
 	 */
 	public function discover_from_links( array $link_urls, string $discovery_source = Discovery_Result::SOURCE_LINK ): array {
 		return $this->process_candidates( $link_urls, $discovery_source );
@@ -134,9 +134,9 @@ final class URL_Discovery_Service {
 	/**
 	 * Processes a list of raw candidate URLs: normalize, filter, deduplicate.
 	 *
-	 * @param list<string> $candidates Raw candidate URLs.
+	 * @param array<int, string> $candidates Raw candidate URLs.
 	 * @param string       $discovery_source SOURCE_SEED, SOURCE_LINK, or SOURCE_SITEMAP.
-	 * @return list<Discovery_Result>
+	 * @return array<int, Discovery_Result>
 	 */
 	private function process_candidates( array $candidates, string $discovery_source ): array {
 		$results   = array();

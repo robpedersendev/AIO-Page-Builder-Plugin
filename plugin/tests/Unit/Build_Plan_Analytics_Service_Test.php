@@ -29,7 +29,7 @@ require_once $plugin_root . '/src/Domain/BuildPlan/Analytics/Build_Plan_Analytic
  */
 class Build_Plan_Analytics_Stub_Repository implements \AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_List_Provider_Interface {
 
-	/** @var list<array<string, mixed>> */
+	/** @var array<int, array<string, mixed>> */
 	private $plans;
 
 	public function __construct( array $plans ) {

@@ -105,7 +105,7 @@ final class Industry_Profile_Audit_Trail_Service {
 	 * Returns timeline of events (newest first). Bounded by limit.
 	 *
 	 * @param int $limit Max events to return (default 50).
-	 * @return list<array{event_type: string, timestamp: string, old_summary: string, new_summary: string, related_refs: array, actor?: string}>
+	 * @return array<int, array{event_type: string, timestamp: string, old_summary: string, new_summary: string, related_refs: array, actor?: string}>
 	 */
 	public function get_timeline( int $limit = 50 ): array {
 		$events = $this->get_raw_events();
@@ -147,7 +147,7 @@ final class Industry_Profile_Audit_Trail_Service {
 	}
 
 	/**
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function get_raw_events(): array {
 		$raw = \get_option( self::OPTION_KEY, array() );

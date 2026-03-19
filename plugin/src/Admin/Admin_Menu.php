@@ -975,6 +975,7 @@ final class Admin_Menu {
 
 	/**
 	 * Handles industry bundle preview: validate upload, analyze conflicts, store preview in transient, redirect.
+	 * No state write; preview only. Direct apply of JSON bundles is not supported (v1); use Import / Export (ZIP) for restore.
 	 *
 	 * @return void
 	 */

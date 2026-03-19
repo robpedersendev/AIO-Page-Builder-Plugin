@@ -79,7 +79,7 @@ final class Section_Validator {
 	 * Validates completeness per section-registry-schema §12 incompleteness rules.
 	 *
 	 * @param array<string, mixed> $normalized Normalized definition from Section_Definition_Normalizer.
-	 * @return list<string> Error messages.
+	 * @return array<int, string> Error messages.
 	 */
 	public function validate_completeness( array $normalized ): array {
 		$errors   = array();
@@ -186,7 +186,7 @@ final class Section_Validator {
 	/**
 	 * @param string $key
 	 * @param int    $exclude_post_id
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function validate_key_uniqueness( string $key, int $exclude_post_id ): array {
 		if ( $key === '' ) {
@@ -206,7 +206,7 @@ final class Section_Validator {
 	/**
 	 * @param array<string, mixed> $normalized
 	 * @param int                  $existing_post_id
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function validate_key_immutability( array $normalized, int $existing_post_id ): array {
 		$existing = $this->repository->get_by_id( $existing_post_id );

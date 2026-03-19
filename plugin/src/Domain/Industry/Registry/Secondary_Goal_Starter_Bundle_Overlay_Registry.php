@@ -43,7 +43,7 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry {
 	/** @var array<string, array<string, mixed>> Composite "primary|secondary|bundle" => overlay. */
 	private array $by_composite = array();
 
-	/** @var list<array<string, mixed>> All valid overlays in load order. */
+	/** @var array<int, array<string, mixed>> All valid overlays in load order. */
 	private array $all = array();
 
 	/**
@@ -130,7 +130,7 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry {
 	 *
 	 * @param string $primary_goal_key   Primary conversion goal key.
 	 * @param string $secondary_goal_key Secondary conversion goal key.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_for_primary_secondary( string $primary_goal_key, string $secondary_goal_key ): array {
 		$p = \trim( $primary_goal_key );
@@ -156,7 +156,7 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry {
 	/**
 	 * Returns all loaded overlays.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_all(): array {
 		return $this->all;
@@ -166,7 +166,7 @@ final class Secondary_Goal_Starter_Bundle_Overlay_Registry {
 	 * Validates an overlay definition. Returns list of error codes; empty when valid.
 	 *
 	 * @param array<string, mixed> $ov Raw overlay.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate_overlay( array $ov ): array {
 		$errors = array();

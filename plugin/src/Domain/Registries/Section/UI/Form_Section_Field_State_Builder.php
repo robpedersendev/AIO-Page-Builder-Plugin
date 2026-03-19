@@ -51,14 +51,14 @@ final class Form_Section_Field_State_Builder {
 	 * @param array<string, mixed> $field_values Optional saved/current values: form_provider, form_id, headline.
 	 * @return array{
 	 *   is_form_section: bool,
-	 *   registered_provider_ids: list<string>,
+	 *   registered_provider_ids: array<int, string>,
 	 *   form_provider: string,
 	 *   form_id: string,
 	 *   headline: string,
 	 *   provider_valid: bool,
 	 *   form_id_valid: bool,
 	 *   shortcode_preview: string|null,
-	 *   messages: list<string>,
+	 *   messages: array<int, string>,
 	 *   labels: array{form_provider: string, form_id: string, headline: string},
 	 *   picker_states: array<string, array>|null (when picker_discovery set)
 	 * }

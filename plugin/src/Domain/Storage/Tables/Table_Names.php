@@ -40,13 +40,13 @@ final class Table_Names {
 	/** §11.8 Reporting records. */
 	public const REPORTING_RECORDS = 'aio_reporting_records';
 
-	/** @var list<string>|null */
+	/** @var array<int, string>|null */
 	private static ?array $all = null;
 
 	/**
 	 * Returns all table suffixes in stable order.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {

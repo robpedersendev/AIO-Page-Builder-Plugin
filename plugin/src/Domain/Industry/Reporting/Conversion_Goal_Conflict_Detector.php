@@ -42,7 +42,7 @@ final class Conversion_Goal_Conflict_Detector {
 	 *
 	 * @param array<string, mixed> $profile    Normalized industry profile (primary_industry_key, industry_subtype_key, selected_starter_bundle_key, conversion_goal_key).
 	 * @param array<string, mixed> $options    Optional: overrides_snapshot (array), caution_flags (list), bundle_goal_aware (bool for current bundle).
-	 * @return list<array{conflict_type: string, severity: string, related_refs: array, explanation: string, suggested_review_action: string}>
+	 * @return array<int, array{conflict_type: string, severity: string, related_refs: array, explanation: string, suggested_review_action: string}>
 	 */
 	public function detect( array $profile, array $options = array() ): array {
 		$goal = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )

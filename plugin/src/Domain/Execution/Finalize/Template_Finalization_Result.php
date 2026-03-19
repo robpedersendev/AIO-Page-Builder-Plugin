@@ -34,7 +34,7 @@ final class Template_Finalization_Result {
 	/** @var array<string, mixed> finalization_summary (counts, etc.). */
 	private $finalization_summary;
 
-	/** @var list<array<string, mixed>> template_execution_closure_record (trace links). */
+	/** @var array<int, array<string, mixed>> template_execution_closure_record (trace links). */
 	private $template_execution_closure_record;
 
 	/** @var string run_completion_state (complete|warning|partial|failed). */
@@ -60,7 +60,7 @@ final class Template_Finalization_Result {
 		return $this->finalization_summary;
 	}
 
-	/** @return list<array<string, mixed>> */
+	/** @return array<int, array<string, mixed>> */
 	public function get_template_execution_closure_record(): array {
 		return $this->template_execution_closure_record;
 	}

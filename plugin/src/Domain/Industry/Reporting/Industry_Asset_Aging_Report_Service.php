@@ -108,10 +108,10 @@ final class Industry_Asset_Aging_Report_Service {
 	 *
 	 * @return array{
 	 *   summary: array{total: int, benign: int, advisory: int, high_impact: int, by_class: array<string, int>},
-	 *   items: list<array{asset_ref: string, asset_class: string, days_old: int, age_score: int, severity: string, rationale: string, suggested_review_priority: int}>,
-	 *   by_class: array<string, list<array>>,
-	 *   by_severity: array<string, list<array>>,
-	 *   high_impact_stale: list<array>,
+	 *   items: array<int, array{asset_ref: string, asset_class: string, days_old: int, age_score: int, severity: string, rationale: string, suggested_review_priority: int}>,
+	 *   by_class: array<string, array<int, array>>,
+	 *   by_severity: array<string, array<int, array>>,
+	 *   high_impact_stale: array<int, array>,
 	 *   generated_at: string
 	 * }
 	 */
@@ -276,9 +276,9 @@ final class Industry_Asset_Aging_Report_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $items
+	 * @param array<int, array<string, mixed>> $items
 	 * @param string                     $key
-	 * @return array<string, list<array<string, mixed>>>
+	 * @return array<string, array<int, array<string, mixed>>>
 	 */
 	private function group_by( array $items, string $key ): array {
 		$out = array();

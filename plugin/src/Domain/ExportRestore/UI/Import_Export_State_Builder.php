@@ -44,11 +44,11 @@ final class Import_Export_State_Builder {
 	 * @param array<string, mixed>|null $validation_payload   Import_Validation_Result::to_payload() or null.
 	 * @param array<string, mixed>|null $restore_result_payload Restore_Result::to_payload() or null.
 	 * @return array{
-	 *   export_mode_options: list<array{value: string, label: string}>,
-	 *   export_history_rows: list<array{filename: string, size_bytes: int, modified_at: string}>,
-	 *   import_validation_summary: array{validation_passed: bool, blocking_failures: list<string>, conflicts: list<array>, warnings: list<string>, checksum_verified: bool}|null,
-	 *   restore_conflict_rows: list<array{category: string, key: string, message: string}>,
-	 *   restore_action_state: array{can_restore: bool, resolution_modes: list<array{value: string, label: string}>, message: string, last_restore_payload: array|null},
+	 *   export_mode_options: array<int, array{value: string, label: string}>,
+	 *   export_history_rows: array<int, array{filename: string, size_bytes: int, modified_at: string}>,
+	 *   import_validation_summary: array{validation_passed: bool, blocking_failures: array<int, string>, conflicts: array<int, array>, warnings: array<int, string>, checksum_verified: bool}|null,
+	 *   restore_conflict_rows: array<int, array{category: string, key: string, message: string}>,
+	 *   restore_action_state: array{can_restore: bool, resolution_modes: array<int, array{value: string, label: string}>, message: string, last_restore_payload: array|null},
 	 *   can_export: bool,
 	 *   can_import: bool,
 	 *   privacy_screen_url: string
@@ -117,7 +117,7 @@ final class Import_Export_State_Builder {
 	}
 
 	/**
-	 * @return list<array{value: string, label: string}>
+	 * @return array<int, array{value: string, label: string}>
 	 */
 	private function export_mode_options(): array {
 		$labels = array(
@@ -141,7 +141,7 @@ final class Import_Export_State_Builder {
 	/**
 	 * Lists recent export packages (filename, size, mtime). No server paths exposed.
 	 *
-	 * @return list<array{filename: string, size_bytes: int, modified_at: string}>
+	 * @return array<int, array{filename: string, size_bytes: int, modified_at: string}>
 	 */
 	private function export_history_rows(): array {
 		$dir = $this->path_manager->get_exports_dir();
@@ -182,7 +182,7 @@ final class Import_Export_State_Builder {
 	}
 
 	/**
-	 * @return list<array{value: string, label: string}>
+	 * @return array<int, array{value: string, label: string}>
 	 */
 	private function resolution_mode_options(): array {
 		return array(

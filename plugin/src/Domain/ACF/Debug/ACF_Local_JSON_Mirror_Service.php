@@ -148,8 +148,8 @@ final class ACF_Local_JSON_Mirror_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $fields
-	 * @return list<array<string, mixed>>
+	 * @param array<int, array<string, mixed>> $fields
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function sanitize_fields_for_export( array $fields ): array {
 		$out           = array();
@@ -175,8 +175,8 @@ final class ACF_Local_JSON_Mirror_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $files
-	 * @param list<string>               $group_keys
+	 * @param array<int, array<string, mixed>> $files
+	 * @param array<int, string>               $group_keys
 	 * @param bool                       $failure
 	 * @return array<string, mixed>
 	 */

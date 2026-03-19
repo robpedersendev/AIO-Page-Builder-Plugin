@@ -27,7 +27,7 @@ final class Menu_Change_Result {
 	/** @var string */
 	private $message;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private $errors;
 
 	/** @var array<string, mixed> */
@@ -59,7 +59,7 @@ final class Menu_Change_Result {
 		return $this->message;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_errors(): array {
 		return $this->errors;
 	}

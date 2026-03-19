@@ -52,7 +52,7 @@ final class Scoped_Registration_Inspection_Service {
 	 * Inspects resolution for an existing page. Uses same logic as Existing_Page_ACF_Registration_Context_Resolver.
 	 *
 	 * @param int $page_id Page post ID.
-	 * @return array{mode: string, section_keys: list<string>, group_keys: list<string>, cache_used: bool, resolved: bool}
+	 * @return array{mode: string, section_keys: array<int, string>, group_keys: array<int, string>, cache_used: bool, resolved: bool}
 	 */
 	public function inspect_for_page( int $page_id ): array {
 		if ( $page_id <= 0 ) {
@@ -95,7 +95,7 @@ final class Scoped_Registration_Inspection_Service {
 	 * Inspects resolution for a new-page template context. Uses same derivation as New_Page_ACF_Registration_Context_Resolver.
 	 *
 	 * @param string $template_key Page template internal_key.
-	 * @return array{mode: string, section_keys: list<string>, group_keys: list<string>, cache_used: bool, resolved: bool}
+	 * @return array{mode: string, section_keys: array<int, string>, group_keys: array<int, string>, cache_used: bool, resolved: bool}
 	 */
 	public function inspect_for_new_page_template( string $template_key ): array {
 		$template_key = \sanitize_key( $template_key );
@@ -139,7 +139,7 @@ final class Scoped_Registration_Inspection_Service {
 	 * Inspects resolution for a new-page composition context.
 	 *
 	 * @param string $composition_id Composition internal key.
-	 * @return array{mode: string, section_keys: list<string>, group_keys: list<string>, cache_used: bool, resolved: bool}
+	 * @return array{mode: string, section_keys: array<int, string>, group_keys: array<int, string>, cache_used: bool, resolved: bool}
 	 */
 	public function inspect_for_new_page_composition( string $composition_id ): array {
 		$composition_id = \sanitize_key( $composition_id );
@@ -182,8 +182,8 @@ final class Scoped_Registration_Inspection_Service {
 	/**
 	 * Maps section keys to plugin group keys (group_aio_*).
 	 *
-	 * @param list<string> $section_keys
-	 * @return list<string>
+	 * @param array<int, string> $section_keys
+	 * @return array<int, string>
 	 */
 	private function section_keys_to_group_keys( array $section_keys ): array {
 		$out = array();

@@ -44,13 +44,13 @@ final class Registry_Validation_Result {
 	/** @var bool */
 	public readonly bool $valid;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	public readonly array $errors;
 
-	/** @var list<string> Non-blocking. */
+	/** @var array<int, string> Non-blocking. */
 	public readonly array $warnings;
 
-	/** @var list<string> Machine-readable codes. */
+	/** @var array<int, string> Machine-readable codes. */
 	public readonly array $codes;
 
 	public function __construct(

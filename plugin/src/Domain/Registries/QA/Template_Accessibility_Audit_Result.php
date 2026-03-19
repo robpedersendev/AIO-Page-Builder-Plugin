@@ -32,7 +32,7 @@ final class Template_Accessibility_Audit_Result {
 	/** @var bool True when no machine-checkable violations. */
 	private bool $passed;
 
-	/** @var list<array{scope: string, template_key: string, rule_code: string, message: string}> */
+	/** @var array<int, array{scope: string, template_key: string, rule_code: string, message: string}> */
 	private array $semantic_rule_violations;
 
 	/** @var array{audited: int, violations: int, by_rule_code: array<string, int>} */
@@ -41,15 +41,15 @@ final class Template_Accessibility_Audit_Result {
 	/** @var array{audited: int, violations: int, by_rule_code: array<string, int>} */
 	private array $page_audit_summary;
 
-	/** @var list<string> Items that still require manual or preview-based review. */
+	/** @var array<int, string> Items that still require manual or preview-based review. */
 	private array $human_review_required;
 
 	/**
 	 * @param bool                                                                                 $passed
-	 * @param list<array{scope: string, template_key: string, rule_code: string, message: string}> $semantic_rule_violations
+	 * @param array<int, array{scope: string, template_key: string, rule_code: string, message: string}> $semantic_rule_violations
 	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>}               $section_audit_summary
 	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>}               $page_audit_summary
-	 * @param list<string>                                                                         $human_review_required
+	 * @param array<int, string>                                                                         $human_review_required
 	 */
 	public function __construct(
 		bool $passed,
@@ -69,7 +69,7 @@ final class Template_Accessibility_Audit_Result {
 		return $this->passed;
 	}
 
-	/** @return list<array{scope: string, template_key: string, rule_code: string, message: string}> */
+	/** @return array<int, array{scope: string, template_key: string, rule_code: string, message: string}> */
 	public function get_semantic_rule_violations(): array {
 		return $this->semantic_rule_violations;
 	}
@@ -84,7 +84,7 @@ final class Template_Accessibility_Audit_Result {
 		return $this->page_audit_summary;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_human_review_required(): array {
 		return $this->human_review_required;
 	}
@@ -107,7 +107,7 @@ final class Template_Accessibility_Audit_Result {
 	/**
 	 * Human-readable summary lines (for report excerpt).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function to_summary_lines(): array {
 		$lines   = array();

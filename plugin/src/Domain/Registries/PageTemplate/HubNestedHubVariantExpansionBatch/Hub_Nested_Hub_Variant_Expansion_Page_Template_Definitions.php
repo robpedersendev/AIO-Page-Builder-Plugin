@@ -27,7 +27,7 @@ final class Hub_Nested_Hub_Variant_Expansion_Page_Template_Definitions {
 	/**
 	 * Returns all hub and nested hub variant definitions (order preserved for seeding).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function all_definitions(): array {
 		return array(
@@ -70,7 +70,7 @@ final class Hub_Nested_Hub_Variant_Expansion_Page_Template_Definitions {
 	/**
 	 * Returns page template internal keys in this batch.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function template_keys(): array {
 		return array(

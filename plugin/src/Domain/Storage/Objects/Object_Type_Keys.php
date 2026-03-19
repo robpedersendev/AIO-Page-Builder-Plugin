@@ -43,13 +43,13 @@ final class Object_Type_Keys {
 	/** Version Snapshot (§10.8). */
 	public const VERSION_SNAPSHOT = self::PREFIX . 'version_snapshot';
 
-	/** @var list<string>|null */
+	/** @var array<int, string>|null */
 	private static ?array $all = null;
 
 	/**
 	 * Returns all plugin CPT keys in stable order.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {

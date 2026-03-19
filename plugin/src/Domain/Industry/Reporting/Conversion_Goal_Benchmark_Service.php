@@ -41,12 +41,12 @@ final class Conversion_Goal_Benchmark_Service {
 	 * Does not mutate live state. Returns bounded summary.
 	 *
 	 * @param array<string, mixed> $profile_base Normalized industry profile (primary_industry_key, industry_subtype_key, selected_starter_bundle_key). conversion_goal_key should be empty for no-goal baseline.
-	 * @param list<string>         $goal_keys    Goal keys to test (e.g. LAUNCH_GOAL_KEYS). Capped at MAX_GOALS_PER_RUN.
+	 * @param array<int, string>         $goal_keys    Goal keys to test (e.g. LAUNCH_GOAL_KEYS). Capped at MAX_GOALS_PER_RUN.
 	 * @return array{
-	 *   no_goal_baseline: array{section_keys?: list<string>, template_keys?: list<string>},
-	 *   by_goal: array<string, array{section_keys?: list<string>, template_keys?: list<string>, differentiation_summary: string}>,
-	 *   readable_summary: list<string>,
-	 *   warnings: list<string>
+	 *   no_goal_baseline: array{section_keys?: array<int, string>, template_keys?: array<int, string>},
+	 *   by_goal: array<string, array{section_keys?: array<int, string>, template_keys?: array<int, string>, differentiation_summary: string}>,
+	 *   readable_summary: array<int, string>,
+	 *   warnings: array<int, string>
 	 * }
 	 */
 	public function run_benchmark( array $profile_base, array $goal_keys = array() ): array {
@@ -86,7 +86,7 @@ final class Conversion_Goal_Benchmark_Service {
 	 * Returns baseline comparison data (section_keys, template_keys) for the given profile. Uses comparison service when available.
 	 *
 	 * @param array<string, mixed> $profile
-	 * @return array{section_keys: list<string>, template_keys: list<string>}
+	 * @return array{section_keys: array<int, string>, template_keys: array<int, string>}
 	 */
 	private function get_baseline_comparison( array $profile ): array {
 		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )

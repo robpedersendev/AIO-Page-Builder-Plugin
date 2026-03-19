@@ -70,7 +70,7 @@ final class Animation_Fallback_Service {
 	 * Filters family slugs against contract (allowed families only).
 	 *
 	 * @param string[] $families Declared animation_families.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function filter_allowed_families( array $families ): array {
 		$out = array();

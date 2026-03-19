@@ -35,7 +35,7 @@ interface ACF_Group_Registrar_Interface {
 	/**
 	 * Registers only the given section keys (page-scoped registration).
 	 *
-	 * @param list<string> $section_keys
+	 * @param array<int, string> $section_keys
 	 * @return int Number of groups registered.
 	 */
 	public function register_sections( array $section_keys ): int;

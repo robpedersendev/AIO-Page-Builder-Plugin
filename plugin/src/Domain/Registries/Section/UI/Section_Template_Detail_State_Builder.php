@@ -226,7 +226,7 @@ final class Section_Template_Detail_State_Builder {
 	 *
 	 * @param string               $section_key
 	 * @param array<string, mixed> $definition
-	 * @return list<array{name: string, label: string, type: string}>
+	 * @return array<int, array{name: string, label: string, type: string}>
 	 */
 	private function build_field_summary( string $section_key, array $definition ): array {
 		$blueprint = null;
@@ -327,7 +327,7 @@ final class Section_Template_Detail_State_Builder {
 	 *
 	 * @param array<string, mixed> $definition
 	 * @param string               $type 'section' or 'page'
-	 * @return array{is_deprecated: bool, reason: string, replacement_keys: list<string>, deprecated_at: string}
+	 * @return array{is_deprecated: bool, reason: string, replacement_keys: array<int, string>, deprecated_at: string}
 	 */
 	private function build_deprecation_summary_from_definition( array $definition, string $type ): array {
 		$status_field = $type === 'page' ? \AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema::FIELD_STATUS : Section_Schema::FIELD_STATUS;
@@ -365,7 +365,7 @@ final class Section_Template_Detail_State_Builder {
 	 *
 	 * @param array<string, mixed> $definition
 	 * @param string               $purpose_family
-	 * @return list<array{label: string, url: string}>
+	 * @return array<int, array{label: string, url: string}>
 	 */
 	private function build_breadcrumbs( array $definition, string $purpose_family ): array {
 		$base_url = \admin_url( 'admin.php?page=' . Section_Template_Directory_State_Builder::SCREEN_SLUG );

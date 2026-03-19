@@ -117,7 +117,7 @@ final class Export_Zip_Packager {
 	 * Lists all files in a directory recursively (no directories).
 	 *
 	 * @param string $dir Absolute path.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function list_files_in_dir( string $dir ): array {
 		$out = array();

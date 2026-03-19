@@ -24,7 +24,7 @@ final class Trust_Proof_Library_Batch_Seeder {
 	 * Seeds all trust/proof batch section definitions.
 	 *
 	 * @param Section_Template_Repository $section_repo
-	 * @return array{ success: bool, section_ids: list<int>, errors: list<string> }
+	 * @return array{ success: bool, section_ids: array<int, int>, errors: array<int, string> }
 	 */
 	public static function run( Section_Template_Repository $section_repo ): array {
 		$errors      = array();

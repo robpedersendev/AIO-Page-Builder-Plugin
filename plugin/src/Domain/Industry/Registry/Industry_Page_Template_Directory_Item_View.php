@@ -20,13 +20,13 @@ final class Industry_Page_Template_Directory_Item_View {
 	private string $page_template_key;
 	private string $recommendation_status;
 	private int $score;
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $explanation_reasons;
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $industry_source_refs;
 	private string $hierarchy_fit;
 	private string $lpagery_fit;
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $warning_flags;
 	/** @var array<string, mixed> Page template definition snapshot (optional). */
 	private array $template_definition;
@@ -35,11 +35,11 @@ final class Industry_Page_Template_Directory_Item_View {
 	 * @param string               $page_template_key    Page template internal_key.
 	 * @param string               $recommendation_status One of Industry_Page_Template_Recommendation_Resolver::FIT_*.
 	 * @param int                  $score                Recommendation score.
-	 * @param list<string>         $explanation_reasons  Reason codes.
-	 * @param list<string>         $industry_source_refs Industry keys that contributed.
+	 * @param array<int, string>         $explanation_reasons  Reason codes.
+	 * @param array<int, string>         $industry_source_refs Industry keys that contributed.
 	 * @param string               $hierarchy_fit        Hierarchy fit note.
 	 * @param string               $lpagery_fit         LPagery fit note.
-	 * @param list<string>         $warning_flags        Warning flags.
+	 * @param array<int, string>         $warning_flags        Warning flags.
 	 * @param array<string, mixed> $template_definition  Optional template definition snapshot.
 	 */
 	public function __construct(
@@ -76,12 +76,12 @@ final class Industry_Page_Template_Directory_Item_View {
 		return $this->score;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_explanation_reasons(): array {
 		return $this->explanation_reasons;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_industry_source_refs(): array {
 		return $this->industry_source_refs;
 	}
@@ -94,7 +94,7 @@ final class Industry_Page_Template_Directory_Item_View {
 		return $this->lpagery_fit;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_warning_flags(): array {
 		return $this->warning_flags;
 	}

@@ -24,7 +24,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Seeder {
 	 * Seeds all gap-closing batch page template definitions.
 	 *
 	 * @param Page_Template_Repository $page_repo
-	 * @return array{ success: bool, page_template_ids: list<int>, errors: list<string>, template_keys: list<string> }
+	 * @return array{ success: bool, page_template_ids: array<int, int>, errors: array<int, string>, template_keys: array<int, string> }
 	 */
 	public static function run( Page_Template_Repository $page_repo ): array {
 		$errors        = array();

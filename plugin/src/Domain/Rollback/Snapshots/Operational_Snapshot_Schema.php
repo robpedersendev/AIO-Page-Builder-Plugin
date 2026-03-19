@@ -94,25 +94,25 @@ final class Operational_Snapshot_Schema {
 	public const FIELD_PRE_CHANGE        = 'pre_change';
 	public const FIELD_POST_CHANGE       = 'post_change';
 
-	/** @var list<string> Required root field names. */
+	/** @var array<int, string> Required root field names. */
 	private static ?array $required_root_fields = null;
 
-	/** @var list<string> Allowed snapshot types. */
+	/** @var array<int, string> Allowed snapshot types. */
 	private static ?array $snapshot_types = null;
 
-	/** @var list<string> Allowed object families. */
+	/** @var array<int, string> Allowed object families. */
 	private static ?array $object_families = null;
 
-	/** @var list<string> Allowed retention classes. */
+	/** @var array<int, string> Allowed retention classes. */
 	private static ?array $retention_classes = null;
 
-	/** @var list<string> Allowed rollback status values. */
+	/** @var array<int, string> Allowed rollback status values. */
 	private static ?array $rollback_statuses = null;
 
 	/**
 	 * Returns required root field names (operational-snapshot-schema.md §4.1).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_required_root_fields(): array {
 		if ( self::$required_root_fields !== null ) {
@@ -132,7 +132,7 @@ final class Operational_Snapshot_Schema {
 	/**
 	 * Returns allowed snapshot_type values.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_snapshot_types(): array {
 		if ( self::$snapshot_types !== null ) {
@@ -158,7 +158,7 @@ final class Operational_Snapshot_Schema {
 	/**
 	 * Returns allowed object_family values (spec §41.1).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_object_families(): array {
 		if ( self::$object_families !== null ) {
@@ -188,7 +188,7 @@ final class Operational_Snapshot_Schema {
 	/**
 	 * Returns allowed retention_class values (spec §41.8).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_retention_classes(): array {
 		if ( self::$retention_classes !== null ) {
@@ -207,7 +207,7 @@ final class Operational_Snapshot_Schema {
 	/**
 	 * Returns allowed rollback_status values (spec §11.5).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_rollback_statuses(): array {
 		if ( self::$rollback_statuses !== null ) {

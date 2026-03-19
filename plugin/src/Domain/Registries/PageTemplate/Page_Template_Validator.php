@@ -91,7 +91,7 @@ final class Page_Template_Validator {
 	 * Validates completeness per page-template-registry-schema §12.
 	 *
 	 * @param array<string, mixed> $normalized
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate_completeness( array $normalized ): array {
 		$errors   = array();
@@ -171,7 +171,7 @@ final class Page_Template_Validator {
 	 * Validates that every section_key in ordered_sections exists in section registry.
 	 *
 	 * @param array<string, mixed> $normalized
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate_section_references( array $normalized ): array {
 		$errors  = array();
@@ -195,7 +195,7 @@ final class Page_Template_Validator {
 	/**
 	 * @param string $key
 	 * @param int    $exclude_post_id
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function validate_key_uniqueness( string $key, int $exclude_post_id ): array {
 		if ( $key === '' ) {
@@ -215,7 +215,7 @@ final class Page_Template_Validator {
 	/**
 	 * @param array<string, mixed> $normalized
 	 * @param int                  $existing_post_id
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function validate_key_immutability( array $normalized, int $existing_post_id ): array {
 		$existing = $this->repository->get_by_id( $existing_post_id );

@@ -104,7 +104,7 @@ final class Form_Provider_Registry {
 	/**
 	 * Returns list of registered provider identifiers (for admin/ACF choices).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_registered_provider_ids(): array {
 		return array_keys( $this->providers );
@@ -164,7 +164,7 @@ final class Form_Provider_Registry {
 	 *
 	 * @param string $provider_id
 	 * @param string $form_id
-	 * @return array{ valid: bool, errors: list<string> }
+	 * @return array{ valid: bool, errors: array<int, string> }
 	 */
 	public function validate_provider_and_form( string $provider_id, string $form_id ): array {
 		$errors = array();

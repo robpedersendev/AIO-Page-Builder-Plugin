@@ -35,14 +35,14 @@ final class Future_Industry_Comparison_Matrix_Service {
 	/**
 	 * Builds a comparison matrix from multiple scorecard results.
 	 *
-	 * @param array<int, array{candidate_label: string, proposed_industry_key?: string, dimension_scores: array<string, int>, aggregate_sum: int, major_risks: list<string>, recommendation: string}> $scorecard_results One result per candidate (from Future_Industry_Scorecard_Executor::execute).
+	 * @param array<int, array{candidate_label: string, proposed_industry_key?: string, dimension_scores: array<string, int>, aggregate_sum: int, major_risks: array<int, string>, recommendation: string}> $scorecard_results One result per candidate (from Future_Industry_Scorecard_Executor::execute).
 	 * @return array{
-	 *   candidates: list<array{label: string, proposed_industry_key: string}>,
+	 *   candidates: array<int, array{label: string, proposed_industry_key: string}>,
 	 *   dimension_comparison: array<string, array<string, int>>,
 	 *   per_candidate_summary: array<string, array{aggregate_sum: int, recommendation: string, risk_count: int}>,
 	 *   reuse_vs_new_build: array<string, string>,
 	 *   subtype_caution_highlight: array<string, array{subtype_complexity: int, compliance_caution_burden: int, burden_note: string}>,
-	 *   suggested_order: list<string>
+	 *   suggested_order: array<int, string>
 	 * }
 	 */
 	public function build_matrix( array $scorecard_results ): array {
@@ -154,7 +154,7 @@ final class Future_Industry_Comparison_Matrix_Service {
 	 * Suggests candidate order: go first, then review, then no-go; within same recommendation by aggregate descending.
 	 *
 	 * @param array<string, array{aggregate_sum: int, recommendation: string}> $per_candidate
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function suggest_order( array $per_candidate ): array {
 		$order_rank = array(

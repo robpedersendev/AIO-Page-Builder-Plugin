@@ -24,7 +24,7 @@ final class Log_Export_Result {
 	/** @var string */
 	private string $message;
 
-	/** @var list<string> Log types included in the export (e.g. queue, execution, reporting, critical, ai_runs). */
+	/** @var array<int, string> Log types included in the export (e.g. queue, execution, reporting, critical, ai_runs). */
 	private array $exported_log_types;
 
 	/** @var array<string, mixed> Filter parameters applied (e.g. date_from, date_to, plan_id). */
@@ -42,7 +42,7 @@ final class Log_Export_Result {
 	/**
 	 * @param bool                 $success
 	 * @param string               $message
-	 * @param list<string>         $exported_log_types
+	 * @param array<int, string>         $exported_log_types
 	 * @param array<string, mixed> $filter_summary
 	 * @param bool                 $redaction_applied
 	 * @param string               $export_file_reference
@@ -74,7 +74,7 @@ final class Log_Export_Result {
 		return $this->message;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_exported_log_types(): array {
 		return $this->exported_log_types;
 	}
@@ -99,7 +99,7 @@ final class Log_Export_Result {
 	/**
 	 * Payload for UI/API (no secrets).
 	 *
-	 * @return array{success: bool, message: string, exported_log_types: list<string>, filter_summary: array, redaction_applied: bool, export_file_reference: string, export_log_reference: string}
+	 * @return array{success: bool, message: string, exported_log_types: array<int, string>, filter_summary: array, redaction_applied: bool, export_file_reference: string, export_log_reference: string}
 	 */
 	public function to_payload(): array {
 		return array(
@@ -114,7 +114,7 @@ final class Log_Export_Result {
 	}
 
 	/**
-	 * @param list<string>         $exported_log_types
+	 * @param array<int, string>         $exported_log_types
 	 * @param array<string, mixed> $filter_summary
 	 * @param string               $export_file_reference
 	 * @param string               $export_log_reference

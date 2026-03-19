@@ -99,7 +99,7 @@ final class Option_Names {
 	/**
 	 * Returns all known option keys in stable order.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {

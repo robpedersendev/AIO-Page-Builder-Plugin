@@ -224,7 +224,7 @@ final class Composition_Registry_Service {
 	 * @param string $status
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_definitions_by_status( $status, $limit, $offset );
@@ -234,7 +234,7 @@ final class Composition_Registry_Service {
 	 * Returns read-time warnings for deprecated section dependencies in a composition.
 	 *
 	 * @param string $composition_id
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_deprecation_warnings( string $composition_id ): array {
 		$definition = $this->repository->get_definition_by_key( $composition_id );
@@ -272,7 +272,7 @@ final class Composition_Registry_Service {
 	 * Returns ordered section mappings from assignment map for a composition.
 	 *
 	 * @param string $composition_id
-	 * @return list<array{section_key: string, position: int, variant: string}>
+	 * @return array<int, array{section_key: string, position: int, variant: string}>
 	 */
 	public function get_section_mappings( string $composition_id ): array {
 		$rows = $this->assignment_map->list_by_source( Assignment_Types::COMPOSITION_SECTION, $composition_id, 500 );
@@ -317,7 +317,7 @@ final class Composition_Registry_Service {
 
 	/**
 	 * @param array<int, mixed> $raw
-	 * @return list<array{section_key: string, position: int, variant: string}>
+	 * @return array<int, array{section_key: string, position: int, variant: string}>
 	 */
 	private function normalize_ordered_sections( array $raw ): array {
 		if ( ! is_array( $raw ) ) {

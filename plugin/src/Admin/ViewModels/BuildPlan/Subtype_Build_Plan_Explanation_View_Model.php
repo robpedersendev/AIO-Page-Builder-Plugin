@@ -44,7 +44,7 @@ final class Subtype_Build_Plan_Explanation_View_Model {
 	 *   source_starter_bundle_key: string|null,
 	 *   source_industry_subtype_key: string|null,
 	 *   subtype_bundle_rationale_line: string,
-	 *   subtype_caution_notes: list<string>
+	 *   subtype_caution_notes: array<int, string>
 	 * }
 	 */
 	public static function from_plan_definition( array $plan_definition ): array {

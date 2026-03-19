@@ -57,7 +57,7 @@ final class Industry_Style_Layer_Diff_Service {
 	 *
 	 * @param string $preset_key Industry style_preset_key.
 	 * @param string $goal_key   Conversion goal key (empty to skip goal layer).
-	 * @return array{parent: array<string, mixed>, subtype: array<string, mixed>|null, goal: array<string, mixed>|null, combined: array<string, mixed>, token_diff_rows: list<array<string, mixed>>, component_diff_rows: list<array<string, mixed>>}
+	 * @return array{parent: array<string, mixed>, subtype: array<string, mixed>|null, goal: array<string, mixed>|null, combined: array<string, mixed>, token_diff_rows: array<int, array<string, mixed>>, component_diff_rows: array<int, array<string, mixed>>}
 	 */
 	public function compare( string $preset_key, string $goal_key = '' ): array {
 		$parent   = array(
@@ -148,7 +148,7 @@ final class Industry_Style_Layer_Diff_Service {
 
 	/**
 	 * @param mixed $refs
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function normalize_component_refs( $refs ): array {
 		if ( ! is_array( $refs ) ) {
@@ -167,7 +167,7 @@ final class Industry_Style_Layer_Diff_Service {
 	 * @param array<string, mixed> $parent
 	 * @param array<string, mixed> $goal
 	 * @param array<string, mixed> $combined
-	 * @return list<array{token_key: string, parent: string, goal: string, combined: string, changed: bool}>
+	 * @return array<int, array{token_key: string, parent: string, goal: string, combined: string, changed: bool}>
 	 */
 	private function build_token_diff_rows( array $parent, array $goal, array $combined ): array {
 		$all_keys = array_keys( $combined['token_values'] );
@@ -203,7 +203,7 @@ final class Industry_Style_Layer_Diff_Service {
 	 * @param array<string, mixed> $parent
 	 * @param array<string, mixed> $goal
 	 * @param array<string, mixed> $combined
-	 * @return list<array{ref: string, parent: bool, goal: bool, combined: bool, changed: bool}>
+	 * @return array<int, array{ref: string, parent: bool, goal: bool, combined: bool, changed: bool}>
 	 */
 	private function build_component_diff_rows( array $parent, array $goal, array $combined ): array {
 		$all_refs = $combined['component_override_refs'];

@@ -109,7 +109,7 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 	 * @param string $scope_type Version_Snapshot_Schema::SCOPE_* constant.
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_definitions_by_scope_type( string $scope_type, int $limit = 0, int $offset = 0 ): array {
 		return $this->list_definitions_by_meta( self::META_SCOPE_TYPE, $scope_type, $limit, $offset );
@@ -121,7 +121,7 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 	 * @param string $scope_id
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_definitions_by_scope_id( string $scope_id, int $limit = 0, int $offset = 0 ): array {
 		return $this->list_definitions_by_meta( self::META_SCOPE_ID, $scope_id, $limit, $offset );
@@ -132,7 +132,7 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 	 * @param string $meta_value
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function list_definitions_by_meta( string $meta_key, string $meta_value, int $limit, int $offset ): array {
 		$limit  = $limit > 0 ? min( self::DEFAULT_LIST_LIMIT, $limit ) : self::DEFAULT_LIST_LIMIT;

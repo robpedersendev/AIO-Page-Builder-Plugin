@@ -28,7 +28,7 @@ final class Page_Template_And_Composition_Expansion_Pack_Seeder {
 	 *
 	 * @param Page_Template_Repository $page_repo
 	 * @param Composition_Repository   $composition_repo
-	 * @return array{ success: bool, page_template_ids: list<int>, composition_ids: list<int>, errors: list<string> }
+	 * @return array{ success: bool, page_template_ids: array<int, int>, composition_ids: array<int, int>, errors: array<int, string> }
 	 */
 	public static function run(
 		Page_Template_Repository $page_repo,

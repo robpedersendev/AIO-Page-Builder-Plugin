@@ -64,8 +64,8 @@ final class Schema_Version_Tracker {
 	/**
 	 * Returns migrations that apply given current installed versions (applies_to returns true).
 	 *
-	 * @param list<Migration_Contract> $migrations Available migrations in run order.
-	 * @return list<Migration_Contract> Migrations that are applicable and pending.
+	 * @param array<int, Migration_Contract> $migrations Available migrations in run order.
+	 * @return array<int, Migration_Contract> Migrations that are applicable and pending.
 	 */
 	public function get_pending_migrations( array $migrations ): array {
 		$installed = $this->get_installed_versions();

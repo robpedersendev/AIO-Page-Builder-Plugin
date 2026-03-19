@@ -58,10 +58,10 @@ final class ACF_Migration_Verification_Result {
 	/** @var array<string, mixed> regeneration_safe */
 	private array $regeneration_safe;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $breaking_change_risks;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $deprecation_risks;
 
 	/** @var string One of STATUS_* */
@@ -128,12 +128,12 @@ final class ACF_Migration_Verification_Result {
 		return $this->regeneration_safe;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_breaking_change_risks(): array {
 		return $this->breaking_change_risks;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_deprecation_risks(): array {
 		return $this->deprecation_risks;
 	}

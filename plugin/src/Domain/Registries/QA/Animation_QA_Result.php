@@ -36,7 +36,7 @@ final class Animation_QA_Result {
 	/** @var bool True when no machine-checkable fallback/metadata violations. */
 	private bool $passed;
 
-	/** @var list<array{scope: string, template_key: string, code: string, message: string}> */
+	/** @var array<int, array{scope: string, template_key: string, code: string, message: string}> */
 	private array $fallback_violation_summary;
 
 	/** @var array{sections_checked: int, all_resolve_safe_tier: bool, sections_capped_count: int} */
@@ -48,16 +48,16 @@ final class Animation_QA_Result {
 	/** @var array{audited: int, with_tier_cap: int, violations: int} */
 	private array $page_summary;
 
-	/** @var list<string> Manual QA checklist items (animation-support-and-fallback-contract §9). */
+	/** @var array<int, string> Manual QA checklist items (animation-support-and-fallback-contract §9). */
 	private array $manual_qa_checklist;
 
 	/**
 	 * @param bool                                                                                  $passed
-	 * @param list<array{scope: string, template_key: string, code: string, message: string}>       $fallback_violation_summary
+	 * @param array<int, array{scope: string, template_key: string, code: string, message: string}>       $fallback_violation_summary
 	 * @param array{sections_checked: int, all_resolve_safe_tier: bool, sections_capped_count: int} $reduced_motion_check_result
 	 * @param array{audited: int, by_tier: array<string, int>, violations: int}                     $section_summary
 	 * @param array{audited: int, with_tier_cap: int, violations: int}                              $page_summary
-	 * @param list<string>                                                                          $manual_qa_checklist
+	 * @param array<int, string>                                                                          $manual_qa_checklist
 	 */
 	public function __construct(
 		bool $passed,
@@ -79,7 +79,7 @@ final class Animation_QA_Result {
 		return $this->passed;
 	}
 
-	/** @return list<array{scope: string, template_key: string, code: string, message: string}> */
+	/** @return array<int, array{scope: string, template_key: string, code: string, message: string}> */
 	public function get_fallback_violation_summary(): array {
 		return $this->fallback_violation_summary;
 	}
@@ -99,7 +99,7 @@ final class Animation_QA_Result {
 		return $this->page_summary;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_manual_qa_checklist(): array {
 		return $this->manual_qa_checklist;
 	}
@@ -123,7 +123,7 @@ final class Animation_QA_Result {
 	/**
 	 * Human-readable summary lines (for report excerpt).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function to_summary_lines(): array {
 		$lines   = array();

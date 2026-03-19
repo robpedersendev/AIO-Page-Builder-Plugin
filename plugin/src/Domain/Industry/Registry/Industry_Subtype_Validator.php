@@ -27,7 +27,7 @@ final class Industry_Subtype_Validator {
 	 *
 	 * @param array<string, mixed>     $def Subtype definition (subtype_key, parent_industry_key, label, summary, status, version_marker, optional refs).
 	 * @param array<string, true>|null $valid_parent_keys Optional set of allowed parent_industry_key values (e.g. from Industry_Pack_Registry). If provided, parent_industry_key must be in this set.
-	 * @return list<string> Error messages; empty if valid.
+	 * @return array<int, string> Error messages; empty if valid.
 	 */
 	public function validate( array $def, ?array $valid_parent_keys = null ): array {
 		$errors = array();

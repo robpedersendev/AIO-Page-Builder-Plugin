@@ -43,7 +43,7 @@ final class Provider_Failover_Policy {
 	/** @var string */
 	private string $fallback_provider_id;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $eligible_categories;
 
 	/** @var int */
@@ -53,7 +53,7 @@ final class Provider_Failover_Policy {
 	 * @param bool         $enabled               Whether failover is allowed.
 	 * @param string       $primary_provider_id   Primary provider id.
 	 * @param string       $fallback_provider_id  Fallback provider id (must differ from primary).
-	 * @param list<string> $eligible_categories   Error categories that allow fallback (ERROR_* constants).
+	 * @param array<int, string> $eligible_categories   Error categories that allow fallback (ERROR_* constants).
 	 * @param int          $max_fallback_attempts Upper bound (typically 1).
 	 */
 	public function __construct(
@@ -83,7 +83,7 @@ final class Provider_Failover_Policy {
 	}
 
 	/**
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_eligible_categories(): array {
 		return $this->eligible_categories;
@@ -126,7 +126,7 @@ final class Provider_Failover_Policy {
 	/**
 	 * Snapshot for run metadata (no secrets). Stable payload per spec.
 	 *
-	 * @return array{enabled: bool, primary_provider_id: string, fallback_provider_id: string, eligible_categories: list<string>, max_fallback_attempts: int}
+	 * @return array{enabled: bool, primary_provider_id: string, fallback_provider_id: string, eligible_categories: array<int, string>, max_fallback_attempts: int}
 	 */
 	public function to_metadata_snapshot(): array {
 		return array(

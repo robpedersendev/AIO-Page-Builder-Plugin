@@ -63,7 +63,7 @@ final class Industry_Compliance_Rule_Registry {
 	/** @var array<string, array<string, mixed>> Map of rule_key => definition. */
 	private array $by_key = array();
 
-	/** @var list<array<string, mixed>> All valid rules in load order. */
+	/** @var array<int, array<string, mixed>> All valid rules in load order. */
 	private array $all = array();
 
 	/**
@@ -145,7 +145,7 @@ final class Industry_Compliance_Rule_Registry {
 	/**
 	 * Returns all loaded rules.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -155,7 +155,7 @@ final class Industry_Compliance_Rule_Registry {
 	 * Returns rules for the given industry (active only when status is used by consumers).
 	 *
 	 * @param string $industry_key Industry pack key.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_for_industry( string $industry_key ): array {
 		$i   = trim( $industry_key );

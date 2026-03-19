@@ -24,7 +24,7 @@ final class Section_Gap_Closing_Super_Batch_Seeder {
 	 * Seeds all gap-closing batch section definitions.
 	 *
 	 * @param Section_Template_Repository $section_repo
-	 * @return array{ success: bool, section_ids: list<int>, errors: list<string>, section_keys: list<string> }
+	 * @return array{ success: bool, section_ids: array<int, int>, errors: array<int, string>, section_keys: array<int, string> }
 	 */
 	public static function run( Section_Template_Repository $section_repo ): array {
 		$errors       = array();

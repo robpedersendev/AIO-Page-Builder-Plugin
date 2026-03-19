@@ -60,7 +60,7 @@ final class Template_Recommendation_Context_Builder {
 	 * When options include template_preference_profile (Prompt 212), attaches it for advisory recommendation guidance.
 	 *
 	 * @param array<string, mixed> $options Optional: max_templates (int), template_category_class (string), template_family (string), crawl_run_id (string), template_preference_profile (array).
-	 * @return array{template_recommendation_context: list<array<string, mixed>>, total_active: int, crawl_page_hints?: list<array<string, mixed>>, template_preference_profile?: array<string, mixed>}
+	 * @return array{template_recommendation_context: array<int, array<string, mixed>>, total_active: int, crawl_page_hints?: array<int, array<string, mixed>>, template_preference_profile?: array<string, mixed>}
 	 */
 	public function build( array $options = array() ): array {
 		$max           = (int) ( $options['max_templates'] ?? self::DEFAULT_MAX_TEMPLATES );
@@ -108,7 +108,7 @@ final class Template_Recommendation_Context_Builder {
 	 * Loads crawl snapshot pages for a run and extracts template-family hints from hierarchy_clues (Prompt 209).
 	 *
 	 * @param string $crawl_run_id
-	 * @return list<array<string, mixed>> Each item: url, crawl_template_family_hint, section_family_match_summary, page_rebuild_signal_summary.
+	 * @return array<int, array<string, mixed>> Each item: url, crawl_template_family_hint, section_family_match_summary, page_rebuild_signal_summary.
 	 */
 	private function load_crawl_page_hints( string $crawl_run_id ): array {
 		$pages = $this->crawl_snapshot_service->list_pages_by_run( $crawl_run_id, 'completed', 500, 0 );

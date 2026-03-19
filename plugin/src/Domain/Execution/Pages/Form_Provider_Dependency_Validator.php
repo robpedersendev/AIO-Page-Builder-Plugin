@@ -47,7 +47,7 @@ final class Form_Provider_Dependency_Validator {
 	 * Validates that any form_embed sections in the template have their (default or required) provider registered.
 	 *
 	 * @param string $template_key Page template internal_key.
-	 * @return array{valid: bool, errors: list<string>, warnings: list<string>}
+	 * @return array{valid: bool, errors: array<int, string>, warnings: array<int, string>}
 	 */
 	public function validate_for_template( string $template_key ): array {
 		$errors       = array();

@@ -203,7 +203,7 @@ final class ACF_Regeneration_Service {
 	 * @param string      $scope
 	 * @param string|null $section_family_key
 	 * @param string|null $page_template_family_key
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function resolve_expected_section_keys( string $scope, ?string $section_family_key, ?string $page_template_family_key ): array {
 		if ( $scope === ACF_Regeneration_Plan::SCOPE_SECTION_FAMILY && $section_family_key !== null && $section_family_key !== '' ) {
@@ -284,9 +284,9 @@ final class ACF_Regeneration_Service {
 	/**
 	 * Computes mismatch list: missing, version_stale, or ok.
 	 *
-	 * @param list<string>         $expected_section_keys
+	 * @param array<int, string>         $expected_section_keys
 	 * @param array<string, array> $current_groups
-	 * @return list<array{section_key: string, group_key: string, status: string}>
+	 * @return array<int, array{section_key: string, group_key: string, status: string}>
 	 */
 	private function compute_field_group_mismatches( array $expected_section_keys, array $current_groups ): array {
 		$out = array();
@@ -325,7 +325,7 @@ final class ACF_Regeneration_Service {
 	/**
 	 * Gathers page assignment repair candidates from assignment map (pages with template or composition source).
 	 *
-	 * @return list<array{page_id: int, type: string, key: string}>
+	 * @return array<int, array{page_id: int, type: string, key: string}>
 	 */
 	private function gather_page_assignment_candidates(): array {
 		$candidates    = array();

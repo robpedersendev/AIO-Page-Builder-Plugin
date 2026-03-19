@@ -31,7 +31,7 @@ final class Blueprint_Family_Registry {
 	/** Key for field names to hide in a variant override. */
 	public const KEY_HIDE_FIELD_NAMES = 'hide_field_names';
 
-	/** @var array<string, array{base_blueprint_ref: string, variant_overrides: array<string, array{add_fields?: array, hide_field_names?: list<string>}>}> */
+	/** @var array<string, array{base_blueprint_ref: string, variant_overrides: array<string, array{add_fields?: array, hide_field_names?: array<int, string>}>}> */
 	private array $families = array();
 
 	/**
@@ -39,7 +39,7 @@ final class Blueprint_Family_Registry {
 	 *
 	 * @param string                                                                    $family_key variation_family_key (e.g. hero_primary, proof_cards).
 	 * @param string                                                                    $base_blueprint_ref Shared field_blueprint_ref for sections in this family.
-	 * @param array<string, array{add_fields?: array, hide_field_names?: list<string>}> $variant_overrides Optional. variant_key => add_fields (array of field defs), hide_field_names (list of field names to omit).
+	 * @param array<string, array{add_fields?: array, hide_field_names?: array<int, string>}> $variant_overrides Optional. variant_key => add_fields (array of field defs), hide_field_names (list of field names to omit).
 	 * @return void
 	 */
 	public function register_family( string $family_key, string $base_blueprint_ref, array $variant_overrides = array() ): void {
@@ -79,7 +79,7 @@ final class Blueprint_Family_Registry {
 	 * Returns variant overrides for the family (variant_key => add_fields / hide_field_names).
 	 *
 	 * @param string $family_key
-	 * @return array<string, array{add_fields?: array, hide_field_names?: list<string>}>
+	 * @return array<string, array{add_fields?: array, hide_field_names?: array<int, string>}>
 	 */
 	public function get_variant_overrides( string $family_key ): array {
 		$fam = $this->get_family( $family_key );
@@ -99,7 +99,7 @@ final class Blueprint_Family_Registry {
 	/**
 	 * Returns all registered family keys (deterministic order).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_registered_family_keys(): array {
 		$keys = array_keys( $this->families );
@@ -109,7 +109,7 @@ final class Blueprint_Family_Registry {
 
 	/**
 	 * @param array<string, mixed> $variant_overrides
-	 * @return array<string, array{add_fields?: array, hide_field_names?: list<string>}>
+	 * @return array<string, array{add_fields?: array, hide_field_names?: array<int, string>}>
 	 */
 	private function sanitize_variant_overrides( array $variant_overrides ): array {
 		$out = array();

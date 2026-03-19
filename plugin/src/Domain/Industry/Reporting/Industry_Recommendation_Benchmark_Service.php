@@ -49,7 +49,7 @@ final class Industry_Recommendation_Benchmark_Service {
 	/** @var Industry_Starter_Bundle_Registry|null */
 	private $starter_bundle_registry;
 
-	/** @var callable(): list<array<string, mixed>>|null Optional section list provider for benchmark. */
+	/** @var callable(): array<int, array<string, mixed>>|null Optional section list provider for benchmark. */
 	private $section_list_provider;
 
 	public function __construct(
@@ -73,7 +73,7 @@ final class Industry_Recommendation_Benchmark_Service {
 	 *
 	 * @param int $template_cap Max page templates to load per scenario (0 = use default).
 	 * @param int $top_n        Top-N recommendation keys to capture per scenario (0 = use default).
-	 * @return array{scenarios: list<array<string, mixed>>, run_at: string, launch_industries: list<string>}
+	 * @return array{scenarios: array<int, array<string, mixed>>, run_at: string, launch_industries: array<int, string>}
 	 */
 	public function run( int $template_cap = 0, int $top_n = 0 ): array {
 		$template_cap = $template_cap > 0 ? $template_cap : self::DEFAULT_CAP;

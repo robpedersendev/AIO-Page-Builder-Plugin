@@ -54,7 +54,7 @@ final class Version_Snapshot_Service {
 	 * Captures section registry state and persists a snapshot.
 	 *
 	 * @param string $scope_id Optional scope identifier (e.g. 'section_registry').
-	 * @return array{success: bool, snapshot_id: string, post_id: int, errors: list<string>}
+	 * @return array{success: bool, snapshot_id: string, post_id: int, errors: array<int, string>}
 	 */
 	public function capture_section_registry( string $scope_id = 'section_registry' ): array {
 		$sections = $this->section_registry->list_by_status( 'active', 500, 0 );
@@ -79,7 +79,7 @@ final class Version_Snapshot_Service {
 	 * Captures page template registry state and persists a snapshot.
 	 *
 	 * @param string $scope_id Optional scope identifier (e.g. 'page_template_registry').
-	 * @return array{success: bool, snapshot_id: string, post_id: int, errors: list<string>}
+	 * @return array{success: bool, snapshot_id: string, post_id: int, errors: array<int, string>}
 	 */
 	public function capture_page_template_registry( string $scope_id = 'page_template_registry' ): array {
 		$templates = $this->page_template_registry->list_by_status( 'active', 500, 0 );
@@ -104,7 +104,7 @@ final class Version_Snapshot_Service {
 	 * Captures composition validation context and persists a snapshot.
 	 *
 	 * @param array<string, mixed> $composition_definition Normalized composition definition.
-	 * @return array{success: bool, snapshot_id: string, post_id: int, errors: list<string>}
+	 * @return array{success: bool, snapshot_id: string, post_id: int, errors: array<int, string>}
 	 */
 	public function capture_composition_context( array $composition_definition ): array {
 		$comp_id = (string) ( $composition_definition[ \AIOPageBuilder\Domain\Registries\Composition\Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
@@ -159,7 +159,7 @@ final class Version_Snapshot_Service {
 	 * @param string $scope_type Version_Snapshot_Schema::SCOPE_* constant.
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_scope_type( string $scope_type, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_definitions_by_scope_type( $scope_type, $limit, $offset );
@@ -171,7 +171,7 @@ final class Version_Snapshot_Service {
 	 * @param string $scope_id
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_scope_id( string $scope_id, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_definitions_by_scope_id( $scope_id, $limit, $offset );
@@ -203,7 +203,7 @@ final class Version_Snapshot_Service {
 	 * @param string               $scope_id
 	 * @param array<string, mixed> $payload
 	 * @param array<string, mixed> $object_refs
-	 * @return array{success: bool, snapshot_id: string, post_id: int, errors: list<string>}
+	 * @return array{success: bool, snapshot_id: string, post_id: int, errors: array<int, string>}
 	 */
 	private function persist_snapshot(
 		string $scope_type,

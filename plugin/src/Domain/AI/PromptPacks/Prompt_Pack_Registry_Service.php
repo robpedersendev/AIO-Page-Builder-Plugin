@@ -53,7 +53,7 @@ final class Prompt_Pack_Registry_Service {
 	 *
 	 * @param string|null $pack_type Optional: planning, repair, summary, other.
 	 * @param int         $limit     Max items.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_active_packs( ?string $pack_type = null, int $limit = 50 ): array {
 		$defs = $this->repository->list_definitions_by_status( Prompt_Pack_Schema::STATUS_ACTIVE, $limit, 0 );

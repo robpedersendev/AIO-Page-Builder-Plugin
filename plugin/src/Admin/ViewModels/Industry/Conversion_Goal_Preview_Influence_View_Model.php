@@ -41,7 +41,7 @@ final class Conversion_Goal_Preview_Influence_View_Model {
 	/** @var bool True when a goal page-one-pager overlay was applied for this template. */
 	private bool $onepager_refinement_applied;
 
-	/** @var list<string> Optional advisory goal-related caution or fit notes. */
+	/** @var array<int, string> Optional advisory goal-related caution or fit notes. */
 	private array $goal_caution_notes;
 
 	/** @var string Optional preset/bundle context (e.g. goal-aware preset overlay applied). */
@@ -53,7 +53,7 @@ final class Conversion_Goal_Preview_Influence_View_Model {
 	 * @param string       $goal_label
 	 * @param bool         $helper_refinement_applied
 	 * @param bool         $onepager_refinement_applied
-	 * @param list<string> $goal_caution_notes
+	 * @param array<int, string> $goal_caution_notes
 	 * @param string       $goal_preset_context
 	 */
 	public function __construct(
@@ -95,7 +95,7 @@ final class Conversion_Goal_Preview_Influence_View_Model {
 	}
 
 	/**
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_goal_caution_notes(): array {
 		return $this->goal_caution_notes;

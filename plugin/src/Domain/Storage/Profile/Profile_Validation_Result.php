@@ -19,7 +19,7 @@ final class Profile_Validation_Result {
 	/** @var bool */
 	public readonly bool $valid;
 
-	/** @var list<string> Error or warning messages; sanitized, no secrets. */
+	/** @var array<int, string> Error or warning messages; sanitized, no secrets. */
 	public readonly array $errors;
 
 	/** @var array<string, mixed>|null Normalized/sanitized payload when available. */

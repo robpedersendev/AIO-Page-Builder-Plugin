@@ -41,7 +41,7 @@ require_once $plugin_root . '/src/Domain/Crawler/Snapshots/Crawl_Snapshot_Reposi
 
 final class Repository_Interface_Conformance_Test extends TestCase {
 
-	/** @var list<Repository_Interface> */
+	/** @var array<int, Repository_Interface> */
 	private array $repositories;
 
 	protected function setUp(): void {

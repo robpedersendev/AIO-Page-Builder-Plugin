@@ -42,7 +42,7 @@ final class Industry_Style_Preset_Registry {
 	/** @var array<string, array<string, mixed>> Map of style_preset_key => preset definition. */
 	private array $by_key = array();
 
-	/** @var list<array<string, mixed>> All valid presets in load order. */
+	/** @var array<int, array<string, mixed>> All valid presets in load order. */
 	private array $all = array();
 
 	/**
@@ -85,7 +85,7 @@ final class Industry_Style_Preset_Registry {
 	/**
 	 * Returns all loaded presets.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -95,7 +95,7 @@ final class Industry_Style_Preset_Registry {
 	 * Returns presets associated with the given industry_key. Empty array if none.
 	 *
 	 * @param string $industry_key Industry key (Industry_Pack_Schema::FIELD_INDUSTRY_KEY).
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_industry( string $industry_key ): array {
 		$want = trim( $industry_key );
@@ -118,7 +118,7 @@ final class Industry_Style_Preset_Registry {
 	 * Returns presets with the given status (e.g. active). Empty array if none.
 	 *
 	 * @param string $status One of STATUS_ACTIVE, STATUS_DRAFT, STATUS_DEPRECATED.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_status( string $status ): array {
 		$out = array();
@@ -137,7 +137,7 @@ final class Industry_Style_Preset_Registry {
 	 * Validates a single preset. Returns list of error codes; empty array when valid.
 	 *
 	 * @param array<string, mixed> $preset Raw preset definition.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate_preset( array $preset ): array {
 		$errors = array();

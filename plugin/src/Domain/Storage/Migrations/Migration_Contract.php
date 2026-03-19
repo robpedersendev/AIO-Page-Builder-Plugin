@@ -27,7 +27,7 @@ final class Migration_Result {
 	/** @var string Human-readable message; must be sanitized. */
 	public readonly string $message;
 
-	/** @var list<string> Additional notes; must be sanitized. */
+	/** @var array<int, string> Additional notes; must be sanitized. */
 	public readonly array $notes;
 
 	/** @var bool Whether the migration is safe to retry (idempotent or recoverable). */

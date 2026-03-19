@@ -152,7 +152,7 @@ final class Template_Accessibility_Audit_Service {
 
 	/**
 	 * @param array<string, mixed>                                                                 $def
-	 * @param list<array{scope: string, template_key: string, rule_code: string, message: string}> $violations
+	 * @param array<int, array{scope: string, template_key: string, rule_code: string, message: string}> $violations
 	 */
 	private function audit_section( array $def, array &$violations ): void {
 		$key = (string) ( $def[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
@@ -199,7 +199,7 @@ final class Template_Accessibility_Audit_Service {
 	/**
 	 * @param array<string, mixed>                                                                 $page_def
 	 * @param array<string, array<string, mixed>>                                                  $section_by_key
-	 * @param list<array{scope: string, template_key: string, rule_code: string, message: string}> $violations
+	 * @param array<int, array{scope: string, template_key: string, rule_code: string, message: string}> $violations
 	 */
 	private function audit_page_cta_rules( array $page_def, array $section_by_key, array &$violations ): void {
 		$template_key = (string) ( $page_def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );

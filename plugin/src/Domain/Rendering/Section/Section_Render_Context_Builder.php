@@ -27,7 +27,7 @@ final class Section_Render_Context_Builder {
 	 * @param array<string, mixed> $field_values       Field name => value.
 	 * @param int                  $position           Zero-based position on page.
 	 * @param string|null          $variant_override   Optional variant key override.
-	 * @return array{ context: Section_Render_Context|null, errors: list<string> }
+	 * @return array{ context: Section_Render_Context|null, errors: array<int, string> }
 	 */
 	public function build(
 		array $section_definition,
@@ -62,7 +62,7 @@ final class Section_Render_Context_Builder {
 	 *
 	 * @param array<string, mixed> $section_definition Section definition.
 	 * @param string|null          $variant_override   Optional variant override to validate.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate_definition( array $section_definition, ?string $variant_override = null ): array {
 		$errors = array();

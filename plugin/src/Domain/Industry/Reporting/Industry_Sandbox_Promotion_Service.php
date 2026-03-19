@@ -39,7 +39,7 @@ final class Industry_Sandbox_Promotion_Service {
 	 * Checks whether dry-run output meets promotion prerequisites. No mutation.
 	 *
 	 * @param array{summary?: array{lint_errors?: int, health_errors?: int}} $dry_run_result Output from Industry_Author_Sandbox_Service::run_dry_run().
-	 * @return array{prerequisites_met: bool, missing_requirements: list<string>}
+	 * @return array{prerequisites_met: bool, missing_requirements: array<int, string>}
 	 */
 	public function check_prerequisites( array $dry_run_result ): array {
 		$summary       = isset( $dry_run_result['summary'] ) && \is_array( $dry_run_result['summary'] ) ? $dry_run_result['summary'] : array();
@@ -65,7 +65,7 @@ final class Industry_Sandbox_Promotion_Service {
 	 * @param array<int, array<string, mixed>> $candidate_packs   Same list passed to run_dry_run().
 	 * @param array<int, array<string, mixed>> $candidate_bundles Same list passed to run_dry_run().
 	 * @param array{summary?: array}           $dry_run_result    Output from run_dry_run().
-	 * @return array{pack_keys: list<string>, bundle_keys: list<string>, summary: string, prerequisites_met: bool}
+	 * @return array{pack_keys: array<int, string>, bundle_keys: array<int, string>, summary: string, prerequisites_met: bool}
 	 */
 	public function get_release_ready_summary( array $candidate_packs, array $candidate_bundles, array $dry_run_result ): array {
 		$prereq    = $this->check_prerequisites( $dry_run_result );

@@ -34,7 +34,7 @@ final class Uninstall_Export_Prompt_Service {
 	/**
 	 * Returns the four required uninstall export choices for UI (spec §52.11).
 	 *
-	 * @return list<array{value: string, label: string, description: string}>
+	 * @return array<int, array{value: string, label: string, description: string}>
 	 */
 	public function get_choices(): array {
 		return array(

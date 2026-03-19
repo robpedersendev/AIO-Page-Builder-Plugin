@@ -68,10 +68,10 @@ final class Section_Render_Result {
 	/** @var array<string, mixed> */
 	private array $field_values;
 
-	/** @var array{wrapper_attrs: array{class: list<string>, id: string, data_attributes: array<string, string>}, selector_map: array{wrapper_class: string, inner_class: string, element_classes: array<string, string>}, structural_nodes: list<array{role: string, class: string}>, structural_hint: string, asset_hints: array, accessibility_notes: list<string>} */
+	/** @var array{wrapper_attrs: array{class: array<int, string>, id: string, data_attributes: array<string, string>}, selector_map: array{wrapper_class: string, inner_class: string, element_classes: array<string, string>}, structural_nodes: array<int, array{role: string, class: string}>, structural_hint: string, asset_hints: array, accessibility_notes: array<int, string>} */
 	private array $structure;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $errors;
 
 	/** @var Omission_Result|null */
@@ -83,7 +83,7 @@ final class Section_Render_Result {
 	 * @param int                  $position        Zero-based position on page.
 	 * @param array<string, mixed> $field_values    Sanitized field name => value (may be omission-filtered).
 	 * @param array<string, mixed> $structure       wrapper_attrs, selector_map, structural_nodes, structural_hint, asset_hints, accessibility_notes.
-	 * @param list<string>         $errors          Validation/render errors; non-empty when invalid.
+	 * @param array<int, string>         $errors          Validation/render errors; non-empty when invalid.
 	 * @param Omission_Result|null $omission_result Optional; set when Smart_Omission_Service was applied.
 	 */
 	public function __construct(
@@ -126,7 +126,7 @@ final class Section_Render_Result {
 		return $this->field_values;
 	}
 
-	/** @return array{class: list<string>, id: string, data_attributes: array<string, string>, style?: string} */
+	/** @return array{class: array<int, string>, id: string, data_attributes: array<string, string>, style?: string} */
 	public function get_wrapper_attrs(): array {
 		return $this->structure['wrapper_attrs'] ?? array(
 			'class'           => array(),
@@ -149,7 +149,7 @@ final class Section_Render_Result {
 		);
 	}
 
-	/** @return list<array{role: string, class: string}> */
+	/** @return array<int, array{role: string, class: string}> */
 	public function get_structural_nodes(): array {
 		return $this->structure['structural_nodes'] ?? array();
 	}
@@ -163,7 +163,7 @@ final class Section_Render_Result {
 		return $this->structure['asset_hints'] ?? array();
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_accessibility_notes(): array {
 		return $this->structure['accessibility_notes'] ?? array();
 	}
@@ -171,13 +171,13 @@ final class Section_Render_Result {
 	/**
 	 * Animation resolution (effective_tier, effective_families, reduced_motion_applied) when Animation_Tier_Resolver was used.
 	 *
-	 * @return array{effective_tier: string, effective_families: list<string>, reduced_motion_applied: bool, resolution_reason: string}|null
+	 * @return array{effective_tier: string, effective_families: array<int, string>, reduced_motion_applied: bool, resolution_reason: string}|null
 	 */
 	public function get_animation_resolution(): ?array {
 		return isset( $this->structure['animation_resolution'] ) && is_array( $this->structure['animation_resolution'] ) ? $this->structure['animation_resolution'] : null;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_errors(): array {
 		return $this->errors;
 	}

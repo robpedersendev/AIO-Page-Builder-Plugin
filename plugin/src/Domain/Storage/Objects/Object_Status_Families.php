@@ -39,7 +39,7 @@ final class Object_Status_Families {
 	 * Custom statuses are not registered in this prompt; register_post_status (or equivalent) will be
 	 * attached in a later prompt using these families.
 	 *
-	 * @var array<string, list<string>>
+	 * @var array<string, array<int, string>>
 	 */
 	private const FAMILIES = array(
 		Object_Type_Keys::SECTION_TEMPLATE => self::DRAFT_ACTIVE_INACTIVE_DEPRECATED,
@@ -56,7 +56,7 @@ final class Object_Status_Families {
 	 * Returns allowed status slugs for an object type.
 	 *
 	 * @param string $post_type One of Object_Type_Keys constants.
-	 * @return list<string> Empty if unknown.
+	 * @return array<int, string> Empty if unknown.
 	 */
 	public static function get_statuses_for( string $post_type ): array {
 		return self::FAMILIES[ $post_type ] ?? array();

@@ -36,16 +36,16 @@ final class Diff_Type_Keys {
 	/** Output level: detail (detail view, audit, full family_payload). */
 	public const LEVEL_DETAIL = 'detail';
 
-	/** @var list<string> Allowed diff_type values. */
+	/** @var array<int, string> Allowed diff_type values. */
 	private static ?array $diff_types = null;
 
-	/** @var list<string> Allowed level values. */
+	/** @var array<int, string> Allowed level values. */
 	private static ?array $levels = null;
 
 	/**
 	 * Returns allowed diff_type values (diff-service-contract.md §2).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_diff_types(): array {
 		if ( self::$diff_types !== null ) {
@@ -73,7 +73,7 @@ final class Diff_Type_Keys {
 	/**
 	 * Returns allowed level values (summary, detail).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_levels(): array {
 		if ( self::$levels !== null ) {

@@ -20,31 +20,31 @@ final class Composition_Validation_Result {
 	/** @var bool */
 	private bool $valid;
 
-	/** @var list<array{code: string, message: string}> */
+	/** @var array<int, array{code: string, message: string}> */
 	private array $blockers;
 
-	/** @var list<array{code: string, message: string}> */
+	/** @var array<int, array{code: string, message: string}> */
 	private array $warnings;
 
-	/** @var list<array{code: string, message: string, position?: int}> */
+	/** @var array<int, array{code: string, message: string, position?: int}> */
 	private array $cta_rule_violations;
 
-	/** @var list<array{code: string, message: string, section_key?: string}> */
+	/** @var array<int, array{code: string, message: string, section_key?: string}> */
 	private array $compatibility_violations;
 
-	/** @var list<array{code: string, message: string}> */
+	/** @var array<int, array{code: string, message: string}> */
 	private array $preview_readiness_warnings;
 
-	/** @var list<string> Legacy validation codes from Composition_Validator (for backward compatibility). */
+	/** @var array<int, string> Legacy validation codes from Composition_Validator (for backward compatibility). */
 	private array $legacy_codes;
 
 	/**
-	 * @param list<array{code: string, message: string}>                       $blockers
-	 * @param list<array{code: string, message: string}>                       $warnings
-	 * @param list<array{code: string, message: string, position?: int}>       $cta_rule_violations
-	 * @param list<array{code: string, message: string, section_key?: string}> $compatibility_violations
-	 * @param list<array{code: string, message: string}>                       $preview_readiness_warnings
-	 * @param list<string>                                                     $legacy_codes
+	 * @param array<int, array{code: string, message: string}>                       $blockers
+	 * @param array<int, array{code: string, message: string}>                       $warnings
+	 * @param array<int, array{code: string, message: string, position?: int}>       $cta_rule_violations
+	 * @param array<int, array{code: string, message: string, section_key?: string}> $compatibility_violations
+	 * @param array<int, array{code: string, message: string}>                       $preview_readiness_warnings
+	 * @param array<int, string>                                                     $legacy_codes
 	 */
 	public function __construct(
 		bool $valid,
@@ -68,32 +68,32 @@ final class Composition_Validation_Result {
 		return $this->valid;
 	}
 
-	/** @return list<array{code: string, message: string}> */
+	/** @return array<int, array{code: string, message: string}> */
 	public function get_blockers(): array {
 		return $this->blockers;
 	}
 
-	/** @return list<array{code: string, message: string}> */
+	/** @return array<int, array{code: string, message: string}> */
 	public function get_warnings(): array {
 		return $this->warnings;
 	}
 
-	/** @return list<array{code: string, message: string, position?: int}> */
+	/** @return array<int, array{code: string, message: string, position?: int}> */
 	public function get_cta_rule_violations(): array {
 		return $this->cta_rule_violations;
 	}
 
-	/** @return list<array{code: string, message: string, section_key?: string}> */
+	/** @return array<int, array{code: string, message: string, section_key?: string}> */
 	public function get_compatibility_violations(): array {
 		return $this->compatibility_violations;
 	}
 
-	/** @return list<array{code: string, message: string}> */
+	/** @return array<int, array{code: string, message: string}> */
 	public function get_preview_readiness_warnings(): array {
 		return $this->preview_readiness_warnings;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_legacy_codes(): array {
 		return $this->legacy_codes;
 	}

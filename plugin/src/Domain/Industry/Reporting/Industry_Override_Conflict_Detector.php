@@ -53,14 +53,14 @@ final class Industry_Override_Conflict_Detector {
 	/**
 	 * Runs conflict detection on all overrides. Returns bounded list of conflict results.
 	 *
-	 * @return list<array{
+	 * @return array<int, array{
 	 *   override_ref: string,
 	 *   conflict_type: string,
 	 *   severity: string,
 	 *   target_type: string,
 	 *   target_key: string,
 	 *   plan_id: string|null,
-	 *   related_refs: list<string>,
+	 *   related_refs: array<int, string>,
 	 *   suggested_review_action: string
 	 * }>
 	 */

@@ -19,7 +19,7 @@ final class Page_Template_Validation_Result {
 	/** @var bool */
 	public readonly bool $valid;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	public readonly array $errors;
 
 	/** @var array<string, mixed>|null */

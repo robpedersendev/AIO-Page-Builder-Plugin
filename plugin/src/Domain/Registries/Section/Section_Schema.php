@@ -63,22 +63,22 @@ final class Section_Schema {
 	/** Required: asset dependency declaration object. */
 	public const FIELD_ASSET_DECLARATION = 'asset_declaration';
 
-	/** @var list<string> Required field names for completeness check (spec §12.2). */
+	/** @var array<int, string> Required field names for completeness check (spec §12.2). */
 	private static ?array $required_fields = null;
 
-	/** @var list<string> Optional field names (spec §12.3). */
+	/** @var array<int, string> Optional field names (spec §12.3). */
 	private static ?array $optional_fields = null;
 
 	/** @var array<string, string> Allowed category slug => description. */
 	private static ?array $allowed_categories = null;
 
-	/** @var list<string> Allowed render mode values. */
+	/** @var array<int, string> Allowed render mode values. */
 	private static ?array $allowed_render_modes = null;
 
 	/**
 	 * Returns required field names. A section missing any of these is incomplete.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_required_fields(): array {
 		if ( self::$required_fields !== null ) {
@@ -107,7 +107,7 @@ final class Section_Schema {
 	/**
 	 * Returns optional field names (spec §12.3).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_optional_fields(): array {
 		if ( self::$optional_fields !== null ) {
@@ -191,7 +191,7 @@ final class Section_Schema {
 	/**
 	 * Returns allowed render mode values (section-registry-schema §2.2).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_allowed_render_modes(): array {
 		if ( self::$allowed_render_modes !== null ) {

@@ -26,7 +26,7 @@ final class Form_Template_Seeder {
 	 *
 	 * @param Section_Template_Repository $section_repo
 	 * @param Page_Template_Repository    $page_repo
-	 * @return array{ success: bool, section_id: int, page_id: int, errors: list<string> }
+	 * @return array{ success: bool, section_id: int, page_id: int, errors: array<int, string> }
 	 */
 	public static function run(
 		Section_Template_Repository $section_repo,

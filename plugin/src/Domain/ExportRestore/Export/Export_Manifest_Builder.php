@@ -26,11 +26,11 @@ final class Export_Manifest_Builder {
 	 *
 	 * @param string                $export_type        Export mode key.
 	 * @param string                $source_site_url     Site URL (no credentials).
-	 * @param list<string>          $included_categories Categories present in bundle.
-	 * @param list<string>          $excluded_categories Categories explicitly excluded (audit).
+	 * @param array<int, string>          $included_categories Categories present in bundle.
+	 * @param array<int, string>          $excluded_categories Categories explicitly excluded (audit).
 	 * @param array<string, string> $package_checksum_list Path => "algo:hexdigest".
 	 * @param string                $restore_notes       Human-readable notes.
-	 * @param list<string>          $optional_included   Optional categories included (if any).
+	 * @param array<int, string>          $optional_included   Optional categories included (if any).
 	 * @param string                $package_filename   Optional filename (no path).
 	 * @return array<string, mixed> Manifest ready for JSON encoding.
 	 */

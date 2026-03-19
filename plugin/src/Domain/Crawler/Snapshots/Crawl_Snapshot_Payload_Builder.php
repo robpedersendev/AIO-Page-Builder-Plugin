@@ -203,7 +203,7 @@ final class Crawl_Snapshot_Payload_Builder {
 	/**
 	 * Returns allowed page crawl_status values.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_allowed_page_statuses(): array {
 		return array( self::STATUS_PENDING, self::STATUS_COMPLETED, self::STATUS_ERROR );
@@ -212,7 +212,7 @@ final class Crawl_Snapshot_Payload_Builder {
 	/**
 	 * Returns allowed session final_status values.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_allowed_session_statuses(): array {
 		return array( self::SESSION_STATUS_RUNNING, self::SESSION_STATUS_PARTIAL, self::SESSION_STATUS_COMPLETED, self::SESSION_STATUS_FAILED );

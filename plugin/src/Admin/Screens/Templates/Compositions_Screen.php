@@ -348,7 +348,7 @@ final class Compositions_Screen {
 	}
 
 	/**
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function get_compositions_list(): array {
 		$repo = $this->get_composition_repository();

@@ -51,7 +51,7 @@ final class Goal_Style_Preset_Overlay_Registry {
 	/** @var array<string, array<string, mixed>> Map of goal_preset_key => overlay. */
 	private array $by_key = array();
 
-	/** @var list<array<string, mixed>> All valid overlays in load order. */
+	/** @var array<int, array<string, mixed>> All valid overlays in load order. */
 	private array $all = array();
 
 	/**
@@ -127,7 +127,7 @@ final class Goal_Style_Preset_Overlay_Registry {
 	/**
 	 * Returns all loaded overlays.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -137,7 +137,7 @@ final class Goal_Style_Preset_Overlay_Registry {
 	 * Returns overlays for the given conversion goal.
 	 *
 	 * @param string $goal_key Conversion goal key.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_for_goal( string $goal_key ): array {
 		$g   = trim( $goal_key );
@@ -157,7 +157,7 @@ final class Goal_Style_Preset_Overlay_Registry {
 	 * Returns overlays that refine the given target_preset_ref.
 	 *
 	 * @param string $target_preset_ref style_preset_key (e.g. realtor_warm, plumber_trust).
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_overlays_for_preset( string $target_preset_ref ): array {
 		$t   = trim( $target_preset_ref );

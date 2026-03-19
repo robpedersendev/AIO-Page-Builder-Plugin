@@ -68,7 +68,7 @@ final class GenerateBlocks_Mapping_Rules {
 	/**
 	 * Returns list of unsupported pattern descriptions for documentation and fallback messaging.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function unsupported_patterns(): array {
 		return array(
@@ -82,7 +82,7 @@ final class GenerateBlocks_Mapping_Rules {
 	/**
 	 * Allowed block names this layer may emit. Used for validation and documentation.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function allowed_block_names(): array {
 		return array(

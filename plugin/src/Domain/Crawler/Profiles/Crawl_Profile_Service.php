@@ -102,7 +102,7 @@ final class Crawl_Profile_Service {
 	/**
 	 * Returns list of profiles for admin selection. Keys and labels only.
 	 *
-	 * @return list<array{key: string, label: string}>
+	 * @return array<int, array{key: string, label: string}>
 	 */
 	public function list_profiles_for_selection(): array {
 		$out = array();
@@ -142,7 +142,7 @@ final class Crawl_Profile_Service {
 	/**
 	 * Returns stable crawl_profile_summary payload: list of profiles with bounds and labeling (diagnostics / admin).
 	 *
-	 * @return array{profiles: list<array{key: string, label: string, description: string, max_pages: int, max_depth: int}>, contract_max_pages: int, contract_max_depth: int}
+	 * @return array{profiles: array<int, array{key: string, label: string, description: string, max_pages: int, max_depth: int}>, contract_max_pages: int, contract_max_depth: int}
 	 */
 	public function get_profile_summary(): array {
 		$profiles = array();

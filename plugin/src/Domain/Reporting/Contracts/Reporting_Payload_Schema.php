@@ -96,7 +96,7 @@ final class Reporting_Payload_Schema {
 	 * Returns required payload (body) keys for the given event type.
 	 *
 	 * @param string $event_type One of Reporting_Event_Types.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_required_payload_keys( string $event_type ): array {
 		switch ( $event_type ) {

@@ -55,11 +55,11 @@ final class Composition_Schema {
 	/** Ordered section item: variant key (optional). */
 	public const SECTION_ITEM_VARIANT = 'variant';
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private static ?array $required_fields = null;
 
 	/**
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_required_fields(): array {
 		if ( self::$required_fields !== null ) {

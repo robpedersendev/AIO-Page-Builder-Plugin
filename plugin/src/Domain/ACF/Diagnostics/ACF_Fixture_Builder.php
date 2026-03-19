@@ -38,7 +38,7 @@ final class ACF_Fixture_Builder {
 	 * Returns fixture definitions for the given scenario. Caller applies to repositories/globals.
 	 *
 	 * @param string $scenario One of SCENARIO_* constants.
-	 * @return array{section_definitions?: list<array>, template_definitions?: list<array>, composition_definitions?: list<array>, assignment_rows?: list<array>, description: string}
+	 * @return array{section_definitions?: array<int, array>, template_definitions?: array<int, array>, composition_definitions?: array<int, array>, assignment_rows?: array<int, array>, description: string}
 	 */
 	public static function build_scenario( string $scenario ): array {
 		switch ( $scenario ) {
@@ -63,7 +63,7 @@ final class ACF_Fixture_Builder {
 	/**
 	 * Returns all scenario keys for iteration.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all_scenarios(): array {
 		return array(

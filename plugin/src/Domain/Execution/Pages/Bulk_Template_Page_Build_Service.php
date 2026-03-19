@@ -160,7 +160,7 @@ final class Bulk_Template_Page_Build_Service {
 	 * Validates proposed slugs: within-batch duplicates and existing pages (spec §33.8).
 	 *
 	 * @param array<int, array<string, mixed>> $envelopes Create_page envelopes.
-	 * @return array{duplicate_slugs: list<string>, existing_slugs: list<string>, conflict_item_ids: array<string, true>}
+	 * @return array{duplicate_slugs: array<int, string>, existing_slugs: array<int, string>, conflict_item_ids: array<string, true>}
 	 */
 	private function validate_slugs( array $envelopes ): array {
 		$slug_to_item_ids  = array();
@@ -226,7 +226,7 @@ final class Bulk_Template_Page_Build_Service {
 	 * @param array<int, string>                  $job_refs
 	 * @param array<int, Execution_Job_Result>    $results
 	 * @param array<string, array<string, mixed>> $item_results_pre
-	 * @param list<string>                        $slug_collisions
+	 * @param array<int, string>                        $slug_collisions
 	 * @return Bulk_Template_Page_Build_Result
 	 */
 	private function aggregate_to_bulk_result(

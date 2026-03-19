@@ -44,7 +44,7 @@ final class Session_Comparison_Result {
 	/** @var int Count of meaningful pages in new run. */
 	public $meaningful_count_new;
 
-	/** @var list<Page_Change_Summary> */
+	/** @var array<int, Page_Change_Summary> */
 	public $page_changes;
 
 	/**
@@ -57,7 +57,7 @@ final class Session_Comparison_Result {
 	 * @param int                       $reclassified_count   Pages with classification change.
 	 * @param int                       $meaningful_count_prior Meaningful pages in prior.
 	 * @param int                       $meaningful_count_new  Meaningful pages in new.
-	 * @param list<Page_Change_Summary> $page_changes      Per-page change summaries.
+	 * @param array<int, Page_Change_Summary> $page_changes      Per-page change summaries.
 	 */
 	public function __construct(
 		string $prior_run_id,

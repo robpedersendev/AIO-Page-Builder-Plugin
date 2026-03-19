@@ -82,7 +82,7 @@ final class Table_Installer {
 	/**
 	 * Returns which manifest tables are missing. Used for recovery detection.
 	 *
-	 * @return list<string> List of Table_Names suffixes that are missing.
+	 * @return array<int, string> List of Table_Names suffixes that are missing.
 	 */
 	public function get_missing_tables(): array {
 		$missing = array();

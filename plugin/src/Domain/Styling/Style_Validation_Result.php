@@ -25,7 +25,7 @@ final class Style_Validation_Result {
 	/** @var bool */
 	private bool $valid;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $errors;
 
 	/** @var array<string, mixed> Sanitized payload (shape depends on context: global_tokens, global_component_overrides, or entity payload). */
@@ -49,7 +49,7 @@ final class Style_Validation_Result {
 	/**
 	 * Returns error messages (bounded length and count).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_errors(): array {
 		return $this->errors;
@@ -66,7 +66,7 @@ final class Style_Validation_Result {
 
 	/**
 	 * @param array<int, string> $errors Raw error messages to bound.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function bound_errors( array $errors ): array {
 		$out   = array();

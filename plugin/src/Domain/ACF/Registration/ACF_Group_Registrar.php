@@ -67,7 +67,7 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 	 * Registers groups for the given section keys only (deterministic; single-section blueprint lookup per key).
 	 * De-duplicates keys; skips invalid or missing section keys safely.
 	 *
-	 * @param list<string> $section_keys
+	 * @param array<int, string> $section_keys
 	 * @return int Number of groups registered.
 	 */
 	public function register_sections( array $section_keys ): int {
@@ -78,7 +78,7 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 	 * Registers groups for the given section keys and returns a result summary (registered count, skipped keys).
 	 * De-duplicates keys; uses get_blueprint_for_section() per key (no full blueprint list load).
 	 *
-	 * @param list<string> $section_keys
+	 * @param array<int, string> $section_keys
 	 * @return Section_Scoped_Group_Registration_Result
 	 */
 	public function register_sections_with_result( array $section_keys ): Section_Scoped_Group_Registration_Result {
@@ -108,7 +108,7 @@ final class ACF_Group_Registrar implements ACF_Group_Registrar_Interface {
 	/**
 	 * Registers groups only for sections that appear on the given page (deterministic; §6.2–6.3).
 	 *
-	 * @param list<string> $section_keys Section keys from page template composition.
+	 * @param array<int, string> $section_keys Section keys from page template composition.
 	 * @return int Number of groups registered.
 	 */
 	public function register_sections_for_page( array $section_keys ): int {

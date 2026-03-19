@@ -56,7 +56,7 @@ final class ACF_Field_Group_Debug_Exporter {
 	/**
 	 * Builds list of field_group_debug_export_record for all registry-defined groups.
 	 *
-	 * @return list<array<string, mixed>> field_group_debug_export_record entries.
+	 * @return array<int, array<string, mixed>> field_group_debug_export_record entries.
 	 */
 	public function build_debug_export(): array {
 		$blueprints = $this->blueprint_service->get_all_blueprints();

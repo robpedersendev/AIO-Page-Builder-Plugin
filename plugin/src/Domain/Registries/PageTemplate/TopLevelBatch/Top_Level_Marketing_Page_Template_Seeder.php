@@ -25,7 +25,7 @@ final class Top_Level_Marketing_Page_Template_Seeder {
 	 * Seeds all top-level marketing page template definitions.
 	 *
 	 * @param Page_Template_Repository $page_repo
-	 * @return array{ success: bool, page_template_ids: list<int>, errors: list<string> }
+	 * @return array{ success: bool, page_template_ids: array<int, int>, errors: array<int, string> }
 	 */
 	public static function run( Page_Template_Repository $page_repo ): array {
 		$errors = array();

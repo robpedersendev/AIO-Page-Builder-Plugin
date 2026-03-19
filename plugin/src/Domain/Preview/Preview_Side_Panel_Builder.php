@@ -134,7 +134,7 @@ final class Preview_Side_Panel_Builder {
 	 * Merges synthetic preview context into a payload suitable for page preview (multiple sections).
 	 *
 	 * @param array<string, mixed>                                                                $page_definition
-	 * @param list<array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values From Synthetic_Preview_Data_Generator::generate_for_page().
+	 * @param array<int, array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values From Synthetic_Preview_Data_Generator::generate_for_page().
 	 * @param Synthetic_Preview_Context|null                                                      $context
 	 * @return array<string, mixed> template_key, section_field_values, side_panel, options.
 	 */

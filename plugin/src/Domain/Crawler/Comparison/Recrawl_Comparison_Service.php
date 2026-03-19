@@ -131,7 +131,7 @@ final class Recrawl_Comparison_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $pages
+	 * @param array<int, array<string, mixed>> $pages
 	 * @return array<string, array<string, mixed>> Keyed by url.
 	 */
 	private function index_by_url( array $pages ): array {
@@ -150,7 +150,7 @@ final class Recrawl_Comparison_Service {
 	 *
 	 * @param array<string, mixed> $prior
 	 * @param array<string, mixed> $new
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function diff_reasons( array $prior, array $new ): array {
 		$reasons     = array();

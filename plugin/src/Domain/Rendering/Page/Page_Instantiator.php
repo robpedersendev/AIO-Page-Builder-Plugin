@@ -135,7 +135,7 @@ final class Page_Instantiator {
 
 	/**
 	 * @param array<string, mixed> $payload
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function validate_create_payload( array $payload ): array {
 		$errors = array();
@@ -159,7 +159,7 @@ final class Page_Instantiator {
 
 	/**
 	 * @param array<string, mixed> $payload
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function validate_update_payload( array $payload ): array {
 		$errors = array();

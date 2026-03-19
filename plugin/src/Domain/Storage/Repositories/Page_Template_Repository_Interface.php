@@ -22,7 +22,7 @@ interface Page_Template_Repository_Interface {
 	 *
 	 * @param int $limit  Max items; 0 = default.
 	 * @param int $offset Offset for pagination.
-	 * @return list<array<string, mixed>> List of definitions with ordered_sections etc.
+	 * @return array<int, array<string, mixed>> List of definitions with ordered_sections etc.
 	 */
 	public function list_all_definitions( int $limit = 0, int $offset = 0 ): array;
 }

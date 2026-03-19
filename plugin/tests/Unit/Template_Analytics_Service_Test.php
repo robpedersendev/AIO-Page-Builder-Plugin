@@ -30,7 +30,7 @@ require_once $plugin_root . '/src/Domain/Registries/Analytics/Template_Analytics
  */
 final class Stub_Plan_List_Provider implements Build_Plan_List_Provider_Interface {
 
-	/** @var list<array<string, mixed>> */
+	/** @var array<int, array<string, mixed>> */
 	public $plans = array();
 
 	public function list_recent( int $limit = 50, int $offset = 0 ): array {

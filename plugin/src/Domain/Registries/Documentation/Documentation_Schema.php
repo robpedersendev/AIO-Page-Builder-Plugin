@@ -75,25 +75,25 @@ final class Documentation_Schema {
 	/** Editing posture: generated then human-refined. */
 	public const EDITING_MIXED = 'mixed';
 
-	/** @var list<string> Required field names. */
+	/** @var array<int, string> Required field names. */
 	private static ?array $required_fields = null;
 
-	/** @var list<string> Optional field names. */
+	/** @var array<int, string> Optional field names. */
 	private static ?array $optional_fields = null;
 
-	/** @var list<string> Allowed documentation types. */
+	/** @var array<int, string> Allowed documentation types. */
 	private static ?array $documentation_types = null;
 
-	/** @var list<string> Allowed status values. */
+	/** @var array<int, string> Allowed status values. */
 	private static ?array $statuses = null;
 
-	/** @var list<string> Allowed generated_or_human_edited values. */
+	/** @var array<int, string> Allowed generated_or_human_edited values. */
 	private static ?array $editing_postures = null;
 
 	/**
 	 * Returns required field names.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_required_fields(): array {
 		if ( self::$required_fields !== null ) {
@@ -111,7 +111,7 @@ final class Documentation_Schema {
 	/**
 	 * Returns optional field names.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_optional_fields(): array {
 		if ( self::$optional_fields !== null ) {
@@ -131,7 +131,7 @@ final class Documentation_Schema {
 	/**
 	 * Returns allowed documentation_type values (spec §10.7, §15, §16, §14.6).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_documentation_types(): array {
 		if ( self::$documentation_types !== null ) {
@@ -177,7 +177,7 @@ final class Documentation_Schema {
 	/**
 	 * Returns allowed status values (object-model §3.7).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_statuses(): array {
 		if ( self::$statuses !== null ) {
@@ -200,7 +200,7 @@ final class Documentation_Schema {
 	/**
 	 * Returns allowed generated_or_human_edited values.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_editing_postures(): array {
 		if ( self::$editing_postures !== null ) {

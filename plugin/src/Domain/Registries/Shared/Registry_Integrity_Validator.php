@@ -135,7 +135,7 @@ final class Registry_Integrity_Validator {
 	 *
 	 * @param array<string, mixed> $definition Section, page template, or composition definition.
 	 * @param string               $object_type 'section'|'page_template'|'composition'
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_deprecation_warnings( array $definition, string $object_type = 'composition' ): array {
 		if ( $object_type === 'page_template' ) {
@@ -152,8 +152,8 @@ final class Registry_Integrity_Validator {
 	/**
 	 * Filters definitions to those eligible for new selection (excludes deprecated).
 	 *
-	 * @param list<array<string, mixed>> $definitions
-	 * @return list<array<string, mixed>>
+	 * @param array<int, array<string, mixed>> $definitions
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function filter_eligible_for_new_selection( array $definitions ): array {
 		$out = array();
@@ -171,7 +171,7 @@ final class Registry_Integrity_Validator {
 	/**
 	 * Runs registry-wide integrity scan. Returns summary for diagnostics/export validation.
 	 *
-	 * @return array{missing_section_refs: list<string>, deprecated_section_refs: list<string>, missing_template_refs: list<string>, deprecated_template_refs: list<string>}
+	 * @return array{missing_section_refs: array<int, string>, deprecated_section_refs: array<int, string>, missing_template_refs: array<int, string>, deprecated_template_refs: array<int, string>}
 	 */
 	public function scan_registry_integrity(): array {
 		$missing_section_refs     = array();

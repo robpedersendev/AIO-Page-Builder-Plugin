@@ -52,7 +52,7 @@ final class Entity_Style_Form_Builder {
 	 *
 	 * @param string $entity_type One of Entity_Style_Payload_Schema::ENTITY_TYPES.
 	 * @param string $entity_key  Entity key (e.g. section_key, template_key).
-	 * @return list<array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>
+	 * @return array<int, array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>
 	 */
 	public function get_token_field_definitions( string $entity_type, string $entity_key ): array {
 		if ( ! Entity_Style_Payload_Schema::is_allowed_entity_type( $entity_type ) || ! $this->token_registry->is_loaded() ) {
@@ -93,7 +93,7 @@ final class Entity_Style_Form_Builder {
 	 *
 	 * @param string $entity_type
 	 * @param string $entity_key
-	 * @return list<array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>
+	 * @return array<int, array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>
 	 */
 	public function get_component_field_definitions( string $entity_type, string $entity_key ): array {
 		if ( ! Entity_Style_Payload_Schema::is_allowed_entity_type( $entity_type ) || ! $this->component_registry->is_loaded() ) {
@@ -127,7 +127,7 @@ final class Entity_Style_Form_Builder {
 	 *
 	 * @param string $entity_type
 	 * @param string $entity_key
-	 * @return array<string, list<array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>>
+	 * @return array<string, array<int, array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>>
 	 */
 	public function get_token_fields_by_group( string $entity_type, string $entity_key ): array {
 		$defs   = $this->get_token_field_definitions( $entity_type, $entity_key );
@@ -147,7 +147,7 @@ final class Entity_Style_Form_Builder {
 	 *
 	 * @param string $entity_type
 	 * @param string $entity_key
-	 * @return array<string, list<array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>>
+	 * @return array<string, array<int, array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>>
 	 */
 	public function get_component_fields_by_component( string $entity_type, string $entity_key ): array {
 		$defs         = $this->get_component_field_definitions( $entity_type, $entity_key );

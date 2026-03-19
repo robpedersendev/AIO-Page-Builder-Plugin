@@ -89,8 +89,8 @@ final class Page_Template_Gap_Closing_Super_Batch_Definitions {
 	/**
 	 * Builds ordered_sections and section_requirements from a list of section keys.
 	 *
-	 * @param list<string> $section_keys Section internal keys in order (no adjacent CTA; last must be CTA).
-	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
+	 * @param array<int, string> $section_keys Section internal keys in order (no adjacent CTA; last must be CTA).
+	 * @return array{ ordered: array<int, array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
 		$ordered      = array();
@@ -114,7 +114,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Definitions {
 	 *
 	 * @param string $template_category_class top_level, hub, nested_hub, child_detail.
 	 * @param int    $seed Optional seed for variation (used to pick different CTA/non-CTA from pools).
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private static function build_section_sequence( string $template_category_class, int $seed = 0 ): array {
 		$min_cta       = self::MIN_CTA_BY_CLASS[ $template_category_class ] ?? 3;
@@ -145,7 +145,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Definitions {
 	 *
 	 * @param int $total Total section count.
 	 * @param int $min_cta Number of CTA positions needed.
-	 * @return list<int>
+	 * @return array<int, int>
 	 */
 	private static function place_ctas( int $total, int $min_cta ): array {
 		if ( $total < $min_cta || $min_cta <= 0 ) {
@@ -166,7 +166,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Definitions {
 	/**
 	 * Returns spec rows for gap-closing templates: key, name, purpose, class, family, archetype.
 	 *
-	 * @return list<array{key: string, name: string, purpose: string, class: string, family: string, archetype: string}>
+	 * @return array<int, array{key: string, name: string, purpose: string, class: string, family: string, archetype: string}>
 	 */
 	private static function specs(): array {
 		$specs              = array();
@@ -250,7 +250,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Definitions {
 	/**
 	 * Returns all gap-closing page template definitions (order preserved for seeding).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function all_definitions(): array {
 		$specs = self::specs();
@@ -264,7 +264,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Definitions {
 	/**
 	 * Returns page template internal keys in this batch.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function template_keys(): array {
 		$keys = array();

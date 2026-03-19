@@ -19,7 +19,7 @@ final class Composition_Registry_Result {
 	/** @var bool */
 	public readonly bool $success;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	public readonly array $errors;
 
 	/** @var int */

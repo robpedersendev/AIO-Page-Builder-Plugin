@@ -41,7 +41,7 @@ final class Form_Provider_Picker_Cache_Service {
 	 * Returns cached form list for provider if present and not expired.
 	 *
 	 * @param string $provider_key
-	 * @return array{items: list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}>, outcome: string, fetched_at: int}|null
+	 * @return array{items: array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}>, outcome: string, fetched_at: int}|null
 	 */
 	public function get( string $provider_key ): ?array {
 		$key = $this->sanitize_key( $provider_key );
@@ -62,7 +62,7 @@ final class Form_Provider_Picker_Cache_Service {
 	 * Returns cached entry even if expired (for fallback when live fetch fails).
 	 *
 	 * @param string $provider_key
-	 * @return array{items: list<array>, outcome: string, fetched_at: int}|null
+	 * @return array{items: array<int, array>, outcome: string, fetched_at: int}|null
 	 */
 	public function get_fallback( string $provider_key ): ?array {
 		$key = $this->sanitize_key( $provider_key );
@@ -73,7 +73,7 @@ final class Form_Provider_Picker_Cache_Service {
 	 * Stores form list result for provider.
 	 *
 	 * @param string                                                                                            $provider_key
-	 * @param list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}> $items
+	 * @param array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}> $items
 	 * @param string                                                                                            $outcome One of: success, empty, error.
 	 * @return void
 	 */

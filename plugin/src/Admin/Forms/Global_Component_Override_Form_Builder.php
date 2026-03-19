@@ -50,7 +50,7 @@ final class Global_Component_Override_Form_Builder {
 	 * Returns field definitions for all approved component overrides.
 	 * Each field has: component_id, token_var_name, name_attr, label, value, max_length.
 	 *
-	 * @return list<array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>
+	 * @return array<int, array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>
 	 */
 	public function get_field_definitions(): array {
 		if ( ! $this->component_registry->is_loaded() ) {
@@ -80,7 +80,7 @@ final class Global_Component_Override_Form_Builder {
 	/**
 	 * Groups field definitions by component_id for sectioned rendering.
 	 *
-	 * @return array<string, list<array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>>
+	 * @return array<string, array<int, array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>>
 	 */
 	public function get_fields_by_component(): array {
 		$defs         = $this->get_field_definitions();

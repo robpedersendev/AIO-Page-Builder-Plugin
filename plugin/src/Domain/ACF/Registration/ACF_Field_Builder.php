@@ -80,9 +80,9 @@ final class ACF_Field_Builder {
 	/**
 	 * Builds array of ACF fields from normalized blueprint fields.
 	 *
-	 * @param list<array<string, mixed>> $fields
+	 * @param array<int, array<string, mixed>> $fields
 	 * @param string|null                $parent_key
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function build_fields( array $fields, ?string $parent_key = null ): array {
 		$out = array();

@@ -41,7 +41,7 @@ final class Section_Field_Blueprint_Validator {
 	 * @param array<string, mixed> $blueprint Raw blueprint definition.
 	 * @param string|null          $section_key Expected section key (for alignment check).
 	 * @param string|null          $field_blueprint_ref Expected blueprint_id from section (for alignment check).
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate( array $blueprint, ?string $section_key = null, ?string $field_blueprint_ref = null ): array {
 		$errors = array();
@@ -58,7 +58,7 @@ final class Section_Field_Blueprint_Validator {
 	 * Validates root structure and required properties.
 	 *
 	 * @param array<string, mixed> $blueprint
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate_root( array $blueprint ): array {
 		$errors = Field_Blueprint_Schema::validate_blueprint_required_fields( $blueprint );
@@ -100,7 +100,7 @@ final class Section_Field_Blueprint_Validator {
 	 * @param array<string, mixed> $blueprint
 	 * @param string|null          $section_key
 	 * @param string|null          $field_blueprint_ref
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate_alignment( array $blueprint, ?string $section_key, ?string $field_blueprint_ref ): array {
 		$err = array();
@@ -123,7 +123,7 @@ final class Section_Field_Blueprint_Validator {
 	 * Validates all fields and nested sub_fields.
 	 *
 	 * @param array<string, mixed> $blueprint
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate_fields( array $blueprint ): array {
 		$fields = $blueprint[ Field_Blueprint_Schema::FIELDS ] ?? array();
@@ -160,7 +160,7 @@ final class Section_Field_Blueprint_Validator {
 	 * @param array<string, mixed> $field
 	 * @param array<string, true>  $seen_keys Keys already used in this scope.
 	 * @param string               $path Path for error messages.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function validate_field( array $field, array &$seen_keys, string $path ): array {
 		$err = Field_Blueprint_Schema::validate_field_required_properties( $field );
@@ -222,7 +222,7 @@ final class Section_Field_Blueprint_Validator {
 	 * Validates that blueprint contains no executable/code references (security).
 	 *
 	 * @param array<string, mixed> $blueprint
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function validate_security( array $blueprint ): array {
 		$err = array();
@@ -236,7 +236,7 @@ final class Section_Field_Blueprint_Validator {
 	 *
 	 * @param mixed        $val
 	 * @param string       $path
-	 * @param list<string> $errors
+	 * @param array<int, string> $errors
 	 */
 	private function reject_callable_references( $val, string $path, array &$errors ): void {
 		if ( is_array( $val ) ) {

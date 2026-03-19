@@ -50,8 +50,8 @@ final class Industry_Subtype_Goal_Benchmark_Service {
 	 *   profile_base: array{primary_industry_key: string, subtype_key: string, goal_key: string},
 	 *   scenarios: array{parent_only?: array, subtype_only?: array, goal_only?: array, combined?: array},
 	 *   recommendation_differentiation: array{parent_vs_subtype: string, parent_vs_goal: string, parent_vs_combined: string, combined_strength: string},
-	 *   readable_summary: list<string>,
-	 *   warnings: list<string>
+	 *   readable_summary: array<int, string>,
+	 *   warnings: array<int, string>
 	 * }
 	 */
 	public function run_benchmark( array $profile_base, string $subtype_key = '', string $goal_key = '' ): array {
@@ -129,8 +129,8 @@ final class Industry_Subtype_Goal_Benchmark_Service {
 
 	/**
 	 * @param array<string, mixed> $profile
-	 * @param list<string>         $goal_keys
-	 * @return array{section_keys: list<string>, template_keys: list<string>, bundle_count?: int}
+	 * @param array<int, string>         $goal_keys
+	 * @return array{section_keys: array<int, string>, template_keys: array<int, string>, bundle_count?: int}
 	 */
 	private function get_scenario_result( array $profile, array $goal_keys ): array {
 		if ( $this->goal_benchmark === null ) {
@@ -159,7 +159,7 @@ final class Industry_Subtype_Goal_Benchmark_Service {
 	}
 
 	/**
-	 * @param array<string, array{section_keys?: list<string>, template_keys?: list<string>}> $scenarios
+	 * @param array<string, array{section_keys?: array<int, string>, template_keys?: array<int, string>}> $scenarios
 	 * @return array{parent_vs_subtype: string, parent_vs_goal: string, parent_vs_combined: string, combined_strength: string}
 	 */
 	private function build_differentiation( array $scenarios, string $subtype_key, string $goal_key ): array {
@@ -218,7 +218,7 @@ final class Industry_Subtype_Goal_Benchmark_Service {
 	/**
 	 * @param array<string, array>  $scenarios
 	 * @param array<string, string> $diff
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function build_readable_summary( array $scenarios, array $diff, string $primary, string $subtype_key, string $goal_key ): array {
 		$lines   = array();

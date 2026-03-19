@@ -65,7 +65,7 @@ final class Industry_Repair_Suggestion_Engine {
 	/**
 	 * Suggests a repair for a single health/conflict issue. Returns one suggestion or null when no good suggestion.
 	 *
-	 * @param array{object_type: string, key: string, severity: string, issue_summary: string, related_refs: list<string>} $issue
+	 * @param array{object_type: string, key: string, severity: string, issue_summary: string, related_refs: array<int, string>} $issue
 	 * @return array{broken_ref: string, suggested_ref: string, suggestion_type: string, confidence_summary: string, explanation: string}|null
 	 */
 	public function suggest_for_issue( array $issue ): ?array {

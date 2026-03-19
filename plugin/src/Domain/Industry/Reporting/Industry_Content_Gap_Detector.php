@@ -139,7 +139,7 @@ final class Industry_Content_Gap_Detector {
 	 * @param array<string, mixed> $profile Normalized Industry Profile (primary_industry_key, selected_starter_bundle_key, etc.).
 	 * @param string|null          $bundle_key Override bundle key; when null, profile selected_starter_bundle_key is used.
 	 * @param array<string, mixed> $options Optional. content_hints (map of hint => bool), available_page_template_keys, available_section_keys.
-	 * @return list<array{gap_type: string, severity: string, related_page_families: list<string>, related_section_families: list<string>, recommended_action_summary: string, subtype_influence?: array}>
+	 * @return array<int, array{gap_type: string, severity: string, related_page_families: array<int, string>, related_section_families: array<int, string>, recommended_action_summary: string, subtype_influence?: array}>
 	 */
 	public function detect( array $profile, ?string $bundle_key = null, array $options = array() ): array {
 		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )

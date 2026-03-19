@@ -44,7 +44,7 @@ final class Industry_Section_Helper_Overlay_Registry {
 	/** @var array<string, array<string, mixed>> Composite key "industry_key|section_key" => overlay. */
 	private array $by_composite = array();
 
-	/** @var list<array<string, mixed>> All valid overlays in load order. */
+	/** @var array<int, array<string, mixed>> All valid overlays in load order. */
 	private array $all = array();
 
 	/**
@@ -142,7 +142,7 @@ final class Industry_Section_Helper_Overlay_Registry {
 	/**
 	 * Returns all loaded overlays.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -152,7 +152,7 @@ final class Industry_Section_Helper_Overlay_Registry {
 	 * Returns overlays for the given industry (all section keys for that industry).
 	 *
 	 * @param string $industry_key Industry pack key.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_for_industry( string $industry_key ): array {
 		$i   = trim( $industry_key );

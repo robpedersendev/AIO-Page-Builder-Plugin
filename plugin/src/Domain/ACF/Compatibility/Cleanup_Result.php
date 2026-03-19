@@ -18,19 +18,19 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Cleanup_Result {
 
-	/** @var list<array{page_ref: string, group_key: string, reason: string}> Assignments no longer in current source. */
+	/** @var array<int, array{page_ref: string, group_key: string, reason: string}> Assignments no longer in current source. */
 	public array $stale_assignments = array();
 
-	/** @var list<array{group_key: string, section_key: string, reason: string}> Groups whose section is deprecated. */
+	/** @var array<int, array{group_key: string, section_key: string, reason: string}> Groups whose section is deprecated. */
 	public array $deprecated_groups = array();
 
-	/** @var list<string> Group keys that can be safely removed (conservative; often empty). */
+	/** @var array<int, string> Group keys that can be safely removed (conservative; often empty). */
 	public array $safe_to_remove = array();
 
-	/** @var list<array{group_key: string, reason: string}> Groups requiring manual review before removal. */
+	/** @var array<int, array{group_key: string, reason: string}> Groups requiring manual review before removal. */
 	public array $requires_manual_review = array();
 
-	/** @var list<string> Human-readable compatibility notes. */
+	/** @var array<int, string> Human-readable compatibility notes. */
 	public array $compatibility_notes = array();
 
 	/**

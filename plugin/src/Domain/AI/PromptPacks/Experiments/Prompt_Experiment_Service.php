@@ -50,7 +50,7 @@ final class Prompt_Experiment_Service {
 	/**
 	 * Lists all experiment definitions (prompt_experiment_definition shape).
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_definitions(): array {
 		$data = $this->get_experiments_option();
@@ -212,7 +212,7 @@ final class Prompt_Experiment_Service {
 	 *
 	 * @param string $experiment_id Experiment id.
 	 * @param int    $limit         Max runs to scan (recent first).
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_experiment_runs( string $experiment_id, int $limit = 200 ): array {
 		$all = $this->run_repository->list_recent( $limit, 0 );

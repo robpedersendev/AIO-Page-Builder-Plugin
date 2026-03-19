@@ -52,7 +52,7 @@ final class Global_Token_Variable_Emitter {
 	/**
 	 * Returns list of "name: value;" declaration strings for approved tokens only.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_approved_declarations(): array {
 		if ( $this->token_registry === null || ! $this->token_registry->is_loaded() ) {

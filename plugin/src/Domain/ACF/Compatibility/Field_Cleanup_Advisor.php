@@ -150,7 +150,7 @@ final class Field_Cleanup_Advisor {
 	 * Returns whether destructive cleanup is allowed. Always false; returns refusal reasons.
 	 *
 	 * @param int $page_id
-	 * @return array{allowed: bool, reasons: list<string>}
+	 * @return array{allowed: bool, reasons: array<int, string>}
 	 */
 	public function recommend_destructive_cleanup( int $page_id ): array {
 		$result  = $this->analyze_page( $page_id );

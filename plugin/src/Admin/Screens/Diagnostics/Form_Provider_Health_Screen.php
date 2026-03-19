@@ -88,7 +88,7 @@ final class Form_Provider_Health_Screen {
 	}
 
 	/**
-	 * @param list<array{provider_key: string, status: string, message: string|null}> $rows Provider availability rows.
+	 * @param array<int, array{provider_key: string, status: string, message: string|null}> $rows Provider availability rows.
 	 * @return void
 	 */
 	private function render_provider_availability( array $rows ): void {
@@ -161,7 +161,7 @@ final class Form_Provider_Health_Screen {
 	}
 
 	/**
-	 * @param list<array{domain: string, count: int, link_label: string}> $failures Failure items to display.
+	 * @param array<int, array{domain: string, count: int, link_label: string}> $failures Failure items to display.
 	 * @return void
 	 */
 	private function render_recent_failures( array $failures ): void {

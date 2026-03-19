@@ -36,8 +36,8 @@ final class Snapshot_Payload_Builder {
 	/**
 	 * Builds section-registry snapshot payload: list of section summaries (keys, status, compatibility).
 	 *
-	 * @param list<array<string, mixed>> $section_definitions From Section_Registry_Service::list_by_status.
-	 * @return array{sections: list<array<string, mixed>>, captured_at: string}
+	 * @param array<int, array<string, mixed>> $section_definitions From Section_Registry_Service::list_by_status.
+	 * @return array{sections: array<int, array<string, mixed>>, captured_at: string}
 	 */
 	public static function build_section_registry_payload( array $section_definitions ): array {
 		$allowed  = array(
@@ -67,8 +67,8 @@ final class Snapshot_Payload_Builder {
 	/**
 	 * Builds page-template-registry snapshot payload: list of template summaries.
 	 *
-	 * @param list<array<string, mixed>> $template_definitions From Page_Template_Registry_Service::list_by_status etc.
-	 * @return array{templates: list<array<string, mixed>>, captured_at: string}
+	 * @param array<int, array<string, mixed>> $template_definitions From Page_Template_Registry_Service::list_by_status etc.
+	 * @return array{templates: array<int, array<string, mixed>>, captured_at: string}
 	 */
 	public static function build_page_template_registry_payload( array $template_definitions ): array {
 		$allowed   = array(
@@ -135,7 +135,7 @@ final class Snapshot_Payload_Builder {
 	 * Returns list of keys that match prohibited patterns (for tests/validation).
 	 *
 	 * @param array<string, mixed> $payload
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function collect_prohibited_keys( array $payload ): array {
 		$found = array();
@@ -145,7 +145,7 @@ final class Snapshot_Payload_Builder {
 
 	/**
 	 * @param array<string, mixed> $data
-	 * @param list<string>         $found
+	 * @param array<int, string>         $found
 	 * @param string               $prefix
 	 */
 	private static function collect_prohibited_recursive( array $data, array &$found, string $prefix ): void {
@@ -188,7 +188,7 @@ final class Snapshot_Payload_Builder {
 
 	/**
 	 * @param array<string, mixed> $data
-	 * @param list<string>         $allowed_keys
+	 * @param array<int, string>         $allowed_keys
 	 * @return array<string, mixed>
 	 */
 	private static function filter_to_allowed( array $data, array $allowed_keys ): array {

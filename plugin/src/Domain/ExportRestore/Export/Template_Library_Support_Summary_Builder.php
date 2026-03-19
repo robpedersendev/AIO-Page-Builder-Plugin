@@ -128,7 +128,7 @@ final class Template_Library_Support_Summary_Builder {
 	/**
 	 * Bounded provider availability summary for diagnostics/support (Prompt 237). No secrets.
 	 *
-	 * @return list<array{provider_key: string, status: string, message: string|null}>
+	 * @return array<int, array{provider_key: string, status: string, message: string|null}>
 	 */
 	private function build_form_provider_availability(): array {
 		return $this->form_provider_availability->get_summary_for_admin();
@@ -192,7 +192,7 @@ final class Template_Library_Support_Summary_Builder {
 
 	/**
 	 * @param array<string, mixed> $health
-	 * @return list<array{template_key: string, code: string, message: string}>
+	 * @return array<int, array{template_key: string, code: string, message: string}>
 	 */
 	private function extract_validation_failures( array $health ): array {
 		$out = array();
@@ -221,7 +221,7 @@ final class Template_Library_Support_Summary_Builder {
 
 	/**
 	 * @param array<string, mixed> $health
-	 * @return array{sections_missing_preview: list<string>, pages_missing_one_pager: list<string>}
+	 * @return array{sections_missing_preview: array<int, string>, pages_missing_one_pager: array<int, string>}
 	 */
 	private function extract_preview_issues( array $health ): array {
 		$preview = $health['preview_readiness'] ?? array();
@@ -232,8 +232,8 @@ final class Template_Library_Support_Summary_Builder {
 	}
 
 	/**
-	 * @param list<array{template_key: string, code: string, message: string}> $violations
-	 * @return list<array{template_key: string, code: string, message: string}>
+	 * @param array<int, array{template_key: string, code: string, message: string}> $violations
+	 * @return array<int, array{template_key: string, code: string, message: string}>
 	 */
 	private function redact_violation_messages( array $violations ): array {
 		$out = array();
@@ -258,8 +258,8 @@ final class Template_Library_Support_Summary_Builder {
 	}
 
 	/**
-	 * @param list<string> $errors
-	 * @return list<string>
+	 * @param array<int, string> $errors
+	 * @return array<int, string>
 	 */
 	private function redact_export_errors( array $errors ): array {
 		$out = array();

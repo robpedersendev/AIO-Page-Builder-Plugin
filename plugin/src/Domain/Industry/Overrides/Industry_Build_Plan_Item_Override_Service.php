@@ -105,7 +105,7 @@ final class Industry_Build_Plan_Item_Override_Service {
 	 * Returns all Build Plan item overrides across all plans (for listing/audit).
 	 * Each entry has plan_id, item_id, and override record.
 	 *
-	 * @return list<array{plan_id: string, item_id: string, override: array<string, mixed>}>
+	 * @return array<int, array{plan_id: string, item_id: string, override: array<string, mixed>}>
 	 */
 	public function list_all_overrides(): array {
 		$all = $this->get_all();

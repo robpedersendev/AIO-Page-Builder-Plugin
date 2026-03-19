@@ -38,7 +38,7 @@ final class Composition_Validator {
 	 * Runs full validation and returns structured result with codes.
 	 *
 	 * @param array<string, mixed> $composition Normalized composition definition.
-	 * @return array{result: string, codes: list<string>} result = validation result constant, codes = validation codes emitted.
+	 * @return array{result: string, codes: array<int, string>} result = validation result constant, codes = validation codes emitted.
 	 */
 	public function validate( array $composition ): array {
 		$codes = array();
@@ -122,8 +122,8 @@ final class Composition_Validator {
 	/**
 	 * Checks adjacent sections for avoid_adjacent / duplicate_purpose violations.
 	 *
-	 * @param list<array<string, mixed>> $ordered
-	 * @return list<string> Validation codes found.
+	 * @param array<int, array<string, mixed>> $ordered
+	 * @return array<int, string> Validation codes found.
 	 */
 	private function check_compatibility_adjacency( array $ordered ): array {
 		$found    = array();
@@ -155,8 +155,8 @@ final class Composition_Validator {
 	}
 
 	/**
-	 * @param list<string> $codes
-	 * @return array{result: string, codes: list<string>}
+	 * @param array<int, string> $codes
+	 * @return array{result: string, codes: array<int, string>}
 	 */
 	private function result_from_codes( array $codes ): array {
 		$codes        = array_values( array_unique( $codes ) );

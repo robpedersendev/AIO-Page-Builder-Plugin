@@ -52,10 +52,10 @@ final class Documentation_Loader {
 	/** @var string Base path (Docs directory). */
 	private string $base_path;
 
-	/** @var list<array<string, mixed>>|null Loaded section helper doc objects. */
+	/** @var array<int, array<string, mixed>>|null Loaded section helper doc objects. */
 	private ?array $loaded = null;
 
-	/** @var list<array<string, mixed>>|null Loaded one-pager doc objects. */
+	/** @var array<int, array<string, mixed>>|null Loaded one-pager doc objects. */
 	private ?array $loaded_one_pagers = null;
 
 	public function __construct( string $base_path = '' ) {
@@ -66,7 +66,7 @@ final class Documentation_Loader {
 	 * Loads all section helper docs from batch directories.
 	 * Safe: skips non-array return values and missing files.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function load_section_helpers(): array {
 		if ( $this->loaded !== null ) {
@@ -136,7 +136,7 @@ final class Documentation_Loader {
 	 * Loads all page_template_one_pager docs from one-pager batch directories.
 	 * Safe: skips non-array return values and invalid one-pagers.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function load_page_template_one_pagers(): array {
 		if ( $this->loaded_one_pagers !== null ) {

@@ -58,7 +58,7 @@ final class Form_Provider_Picker_Discovery_Service {
 	/**
 	 * Provider keys that have an adapter and are registered and available.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_providers_with_picker_support(): array {
 		$out = array();
@@ -79,7 +79,7 @@ final class Form_Provider_Picker_Discovery_Service {
 	 *   display_label: string,
 	 *   available: bool,
 	 *   supports_form_list: bool,
-	 *   picker_items: list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string}>,
+	 *   picker_items: array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string}>,
 	 *   fallback_entry_label: string,
 	 *   empty_state_message: string
 	 * }
@@ -162,8 +162,8 @@ final class Form_Provider_Picker_Discovery_Service {
 	 * Normalizes raw form list items for a provider (item_id pattern, escaped label). Public for availability/cache layer.
 	 *
 	 * @param string                                                                                        $provider_key
-	 * @param list<array{provider_key?: string, item_id: string, item_label: string, status_hint?: string}> $items
-	 * @return list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}>
+	 * @param array<int, array{provider_key?: string, item_id: string, item_label: string, status_hint?: string}> $items
+	 * @return array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}>
 	 */
 	public function normalize_picker_items_for_provider( string $provider_key, array $items ): array {
 		return $this->normalize_picker_items( $this->sanitize_provider_key( $provider_key ), $items );
@@ -186,8 +186,8 @@ final class Form_Provider_Picker_Discovery_Service {
 	 * Sanitizes and filters picker items (item_id pattern; item_label escaped for display).
 	 *
 	 * @param string                                                                                       $provider_key
-	 * @param list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string}> $items
-	 * @return list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string}>
+	 * @param array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string}> $items
+	 * @return array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string}>
 	 */
 	private function normalize_picker_items( string $provider_key, array $items ): array {
 		$out = array();

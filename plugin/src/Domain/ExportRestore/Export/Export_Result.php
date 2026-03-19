@@ -30,10 +30,10 @@ final class Export_Result {
 	/** @var string Export mode key. */
 	private string $export_mode;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $included_categories;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $excluded_categories;
 
 	/** @var int Number of files in package_checksum_list. */
@@ -56,8 +56,8 @@ final class Export_Result {
 	 * @param string               $message              Human-readable outcome message.
 	 * @param string               $package_path         Absolute path to ZIP (empty if failed).
 	 * @param string               $export_mode          Export mode key.
-	 * @param list<string>         $included_categories  Categories included in bundle.
-	 * @param list<string>         $excluded_categories  Categories excluded (for audit).
+	 * @param array<int, string>         $included_categories  Categories included in bundle.
+	 * @param array<int, string>         $excluded_categories  Categories excluded (for audit).
 	 * @param int                  $checksum_count       Number of checksummed files.
 	 * @param int                  $package_size_bytes   Size of package file.
 	 * @param string               $log_reference        Optional log reference.
@@ -110,12 +110,12 @@ final class Export_Result {
 		return $this->export_mode;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_included_categories(): array {
 		return $this->included_categories;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_excluded_categories(): array {
 		return $this->excluded_categories;
 	}
@@ -148,7 +148,7 @@ final class Export_Result {
 	/**
 	 * Returns a payload suitable for UI or API (no secrets).
 	 *
-	 * @return array{success: bool, message: string, package_path: string, export_mode: string, included_categories: list<string>, excluded_categories: list<string>, checksum_count: int, package_size_bytes: int, log_reference: string, package_filename: string}
+	 * @return array{success: bool, message: string, package_path: string, export_mode: string, included_categories: array<int, string>, excluded_categories: array<int, string>, checksum_count: int, package_size_bytes: int, log_reference: string, package_filename: string}
 	 */
 	public function to_payload(): array {
 		return array(
@@ -171,8 +171,8 @@ final class Export_Result {
 	 *
 	 * @param string               $package_path   Absolute path to ZIP.
 	 * @param string               $export_mode    Export mode key.
-	 * @param list<string>         $included       Included categories.
-	 * @param list<string>         $excluded       Excluded categories.
+	 * @param array<int, string>         $included       Included categories.
+	 * @param array<int, string>         $excluded       Excluded categories.
 	 * @param int                  $checksum_count Number of checksummed files.
 	 * @param int                  $package_size   Size in bytes.
 	 * @param string               $filename       Package filename.
@@ -211,8 +211,8 @@ final class Export_Result {
 	 *
 	 * @param string       $message   Error or reason message.
 	 * @param string       $mode      Export mode attempted.
-	 * @param list<string> $included  Categories that would have been included.
-	 * @param list<string> $excluded  Excluded categories.
+	 * @param array<int, string> $included  Categories that would have been included.
+	 * @param array<int, string> $excluded  Excluded categories.
 	 * @param string       $log_ref   Optional log reference.
 	 * @return self
 	 */

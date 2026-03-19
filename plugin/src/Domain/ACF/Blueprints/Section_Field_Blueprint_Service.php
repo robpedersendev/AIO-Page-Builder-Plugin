@@ -170,7 +170,7 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 	 * @param array<string, mixed> $blueprint Raw blueprint.
 	 * @param string|null          $section_key Section internal_key for alignment.
 	 * @param string|null          $field_blueprint_ref Section field_blueprint_ref for alignment.
-	 * @return array{normalized: array<string, mixed>|null, errors: list<string>}
+	 * @return array{normalized: array<string, mixed>|null, errors: array<int, string>}
 	 */
 	public function validate_and_normalize( array $blueprint, ?string $section_key = null, ?string $field_blueprint_ref = null ): array {
 		$result = $this->normalizer->normalize( $blueprint, $section_key, $field_blueprint_ref );
@@ -184,7 +184,7 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 	 * Returns all normalized blueprints from sections that have embedded field_blueprint.
 	 * Must not be used from the acf/init registration bootstrap path; use get_blueprint_for_section() per key for conditional registration. Reserved for explicit tooling (e.g. run_full_registration, debug export, diagnostics). See docs/qa/acf-blueprint-bulk-load-elimination-report.md.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all_blueprints(): array {
 		$definitions = $this->section_repository->list_all_definitions( 9999, 0 );
@@ -213,7 +213,7 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 	 * Additive compatibility annotation; does not change blueprint validation or registration.
 	 *
 	 * @param array<string, mixed> $blueprint Normalized blueprint (must contain Field_Blueprint_Schema::FIELDS).
-	 * @return list<string> Field keys/names whose type is in LPAGERY_SUPPORTED_TYPES.
+	 * @return array<int, string> Field keys/names whose type is in LPAGERY_SUPPORTED_TYPES.
 	 */
 	public function get_lpagery_compatible_field_keys( array $blueprint ): array {
 		$fields = $blueprint[ Field_Blueprint_Schema::FIELDS ] ?? null;

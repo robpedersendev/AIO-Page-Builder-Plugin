@@ -24,7 +24,7 @@ final class Section_Expansion_Pack_Seeder {
 	 * Seeds all expansion-pack section definitions.
 	 *
 	 * @param Section_Template_Repository $section_repo
-	 * @return array{ success: bool, section_ids: list<int>, errors: list<string> }
+	 * @return array{ success: bool, section_ids: array<int, int>, errors: array<int, string> }
 	 */
 	public static function run( Section_Template_Repository $section_repo ): array {
 		$errors      = array();

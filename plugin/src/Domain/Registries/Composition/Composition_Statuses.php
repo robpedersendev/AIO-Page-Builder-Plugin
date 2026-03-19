@@ -26,13 +26,13 @@ final class Composition_Statuses {
 	/** Retained but not selectable for new page creation. */
 	public const ARCHIVED = 'archived';
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private static ?array $lifecycle_statuses = null;
 
 	/**
 	 * Returns all allowed lifecycle status values.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_lifecycle_statuses(): array {
 		if ( self::$lifecycle_statuses !== null ) {

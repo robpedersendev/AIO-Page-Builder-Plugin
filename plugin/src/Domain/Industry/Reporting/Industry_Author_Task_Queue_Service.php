@@ -39,7 +39,7 @@ final class Industry_Author_Task_Queue_Service {
 	 * @param array|null $completeness_report    Output of Industry_Pack_Completeness_Report_Service::generate_report().
 	 * @param array|null $gap_prioritization_report Output of Industry_Coverage_Gap_Prioritization_Service::generate_report() or run().
 	 * @param array|null $override_conflicts    Output of Industry_Override_Conflict_Detector::detect().
-	 * @return array{tasks: list<array{task_key: string, category: string, severity: string, source_evidence_refs: list<string>, suggested_action: string}>, summary: array{blocker: int, cleanup: int, expansion: int, documentation: int, validation: int}}
+	 * @return array{tasks: array<int, array{task_key: string, category: string, severity: string, source_evidence_refs: array<int, string>, suggested_action: string}>, summary: array{blocker: int, cleanup: int, expansion: int, documentation: int, validation: int}}
 	 */
 	public function generate_queue(
 		?array $completeness_report = null,
@@ -81,7 +81,7 @@ final class Industry_Author_Task_Queue_Service {
 
 	/**
 	 * @param array $completeness_report
-	 * @return list<array{task_key: string, category: string, severity: string, source_evidence_refs: list<string>, suggested_action: string}>
+	 * @return array<int, array{task_key: string, category: string, severity: string, source_evidence_refs: array<int, string>, suggested_action: string}>
 	 */
 	private function tasks_from_completeness( array $completeness_report ): array {
 		$out     = array();
@@ -118,7 +118,7 @@ final class Industry_Author_Task_Queue_Service {
 
 	/**
 	 * @param array $gap_report
-	 * @return list<array{task_key: string, category: string, severity: string, source_evidence_refs: list<string>, suggested_action: string}>
+	 * @return array<int, array{task_key: string, category: string, severity: string, source_evidence_refs: array<int, string>, suggested_action: string}>
 	 */
 	private function tasks_from_gap_prioritization( array $gap_report ): array {
 		$out    = array();
@@ -150,7 +150,7 @@ final class Industry_Author_Task_Queue_Service {
 
 	/**
 	 * @param array $conflicts
-	 * @return list<array{task_key: string, category: string, severity: string, source_evidence_refs: list<string>, suggested_action: string}>
+	 * @return array<int, array{task_key: string, category: string, severity: string, source_evidence_refs: array<int, string>, suggested_action: string}>
 	 */
 	private function tasks_from_override_conflicts( array $conflicts ): array {
 		$out = array();
@@ -179,7 +179,7 @@ final class Industry_Author_Task_Queue_Service {
 
 	/**
 	 * @param array $tasks
-	 * @return list<array{task_key: string, category: string, severity: string, source_evidence_refs: list<string>, suggested_action: string}>
+	 * @return array<int, array{task_key: string, category: string, severity: string, source_evidence_refs: array<int, string>, suggested_action: string}>
 	 */
 	private function sort_and_bound( array $tasks ): array {
 		$order     = array(

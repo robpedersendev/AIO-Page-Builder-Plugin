@@ -121,7 +121,7 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 	 * @param string $status Status (active, inactive, deprecated).
 	 * @param int    $limit  Max items.
 	 * @param int    $offset Offset.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_definitions_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		$status  = $this->sanitize_status( $status );

@@ -43,10 +43,10 @@ final class Template_Page_Replacement_Result {
 	/** @var int */
 	private $field_assignment_count;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private $warnings;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private $errors;
 
 	/** @var string */
@@ -61,8 +61,8 @@ final class Template_Page_Replacement_Result {
 	 * @param string               $template_family
 	 * @param array<string, mixed> $replacement_trace_record
 	 * @param int                  $field_assignment_count
-	 * @param list<string>         $warnings
-	 * @param list<string>         $errors
+	 * @param array<int, string>         $warnings
+	 * @param array<int, string>         $errors
 	 * @param string               $message
 	 */
 	public function __construct(
@@ -124,12 +124,12 @@ final class Template_Page_Replacement_Result {
 		return $this->field_assignment_count;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_warnings(): array {
 		return $this->warnings;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_errors(): array {
 		return $this->errors;
 	}

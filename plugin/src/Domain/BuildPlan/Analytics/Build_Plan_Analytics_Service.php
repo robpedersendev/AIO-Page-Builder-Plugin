@@ -37,7 +37,7 @@ final class Build_Plan_Analytics_Service {
 	 *
 	 * @param string|null $date_from Y-m-d or empty.
 	 * @param string|null $date_to   Y-m-d or empty.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_plans_for_period( ?string $date_from = null, ?string $date_to = null ): array {
 		$all = $this->plan_list_provider->list_recent( self::MAX_PLANS, 0 );
@@ -115,7 +115,7 @@ final class Build_Plan_Analytics_Service {
 	 * @param string|null $date_from Y-m-d.
 	 * @param string|null $date_to   Y-m-d.
 	 * @param int         $top_n     Max categories to return (default 10).
-	 * @return array{blockers: list<array{category: string, count: int}>, total_rejected: int, total_failed: int, date_from: string|null, date_to: string|null}
+	 * @return array{blockers: array<int, array{category: string, count: int}>, total_rejected: int, total_failed: int, date_from: string|null, date_to: string|null}
 	 */
 	public function get_common_blockers( ?string $date_from = null, ?string $date_to = null, int $top_n = 10 ): array {
 		$plans             = $this->get_plans_for_period( $date_from, $date_to );
@@ -226,7 +226,7 @@ final class Build_Plan_Analytics_Service {
 	 *
 	 * @param string|null $date_from Y-m-d.
 	 * @param string|null $date_to   Y-m-d.
-	 * @return array{total_rollbacks: int, by_month: list<array{month: string, count: int}>, date_from: string|null, date_to: string|null, source: string}
+	 * @return array{total_rollbacks: int, by_month: array<int, array{month: string, count: int}>, date_from: string|null, date_to: string|null, source: string}
 	 */
 	public function get_rollback_frequency_summary( ?string $date_from = null, ?string $date_to = null ): array {
 		return array(

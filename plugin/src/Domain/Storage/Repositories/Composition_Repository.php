@@ -97,7 +97,7 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 	 * @param string $status
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_definitions_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		$records = $this->list_by_status( $status, $limit, $offset );
@@ -115,7 +115,7 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 	 *
 	 * @param int $limit
 	 * @param int $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_all_definitions( int $limit = 0, int $offset = 0 ): array {
 		$limit = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;

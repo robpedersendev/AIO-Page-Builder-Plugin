@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Template_Section_Key_Derivation_Result {
 
-	/** @var list<string> Section internal_key values. */
+	/** @var array<int, string> Section internal_key values. */
 	private array $section_keys;
 
 	/** @var bool True when the template/composition was found and resolved. */
@@ -31,7 +31,7 @@ final class Template_Section_Key_Derivation_Result {
 	/**
 	 * Returns the list of section keys to register.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_section_keys(): array {
 		return $this->section_keys;

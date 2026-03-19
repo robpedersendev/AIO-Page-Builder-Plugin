@@ -39,8 +39,8 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service {
 	 *
 	 * @return array{
 	 *   summary: array{total: int, scaffold_complete: int, authored_near_ready: int, not_near_ready: int},
-	 *   items: list<array{scaffold_ref: string, scaffold_type: string, readiness_score: int, readiness_tier: string, blockers: list<string>, missing_evidence: list<string>, notes: string}>,
-	 *   by_tier: array<string, list<array>>,
+	 *   items: array<int, array{scaffold_ref: string, scaffold_type: string, readiness_score: int, readiness_tier: string, blockers: array<int, string>, missing_evidence: array<int, string>, notes: string}>,
+	 *   by_tier: array<string, array<int, array>>,
 	 *   generated_at: string
 	 * }
 	 */
@@ -112,9 +112,9 @@ final class Industry_Scaffold_Promotion_Readiness_Report_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $items
+	 * @param array<int, array<string, mixed>> $items
 	 * @param string                     $key
-	 * @return array<string, list<array<string, mixed>>>
+	 * @return array<string, array<int, array<string, mixed>>>
 	 */
 	private function group_by( array $items, string $key ): array {
 		$out = array();

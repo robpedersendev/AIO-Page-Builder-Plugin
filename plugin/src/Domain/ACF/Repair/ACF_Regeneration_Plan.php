@@ -63,18 +63,18 @@ final class ACF_Regeneration_Plan {
 	/**
 	 * List of field group mismatch entries: section_key, group_key, status (ok|missing|version_stale).
 	 *
-	 * @var list<array{section_key: string, group_key: string, status: string}>
+	 * @var array<int, array{section_key: string, group_key: string, status: string}>
 	 */
 	private array $field_group_mismatches;
 
 	/**
 	 * Page assignment repair candidates: page_id, type (page_template|page_composition), key (template_key or composition_id).
 	 *
-	 * @var list<array{page_id: int, type: string, key: string}>
+	 * @var array<int, array{page_id: int, type: string, key: string}>
 	 */
 	private array $page_assignment_repair_candidates;
 
-	/** @var list<string> Reasons why unsafe cleanup was refused. */
+	/** @var array<int, string> Reasons why unsafe cleanup was refused. */
 	private array $refused_cleanup;
 
 	/**
@@ -83,9 +83,9 @@ final class ACF_Regeneration_Plan {
 	 * @param string|null                                                         $section_family_key
 	 * @param string|null                                                         $page_template_family_key
 	 * @param bool                                                                $include_page_assignments
-	 * @param list<array{section_key: string, group_key: string, status: string}> $field_group_mismatches
-	 * @param list<array{page_id: int, type: string, key: string}>                $page_assignment_repair_candidates
-	 * @param list<string>                                                        $refused_cleanup
+	 * @param array<int, array{section_key: string, group_key: string, status: string}> $field_group_mismatches
+	 * @param array<int, array{page_id: int, type: string, key: string}>                $page_assignment_repair_candidates
+	 * @param array<int, string>                                                        $refused_cleanup
 	 */
 	public function __construct(
 		bool $dry_run,
@@ -127,17 +127,17 @@ final class ACF_Regeneration_Plan {
 		return $this->include_page_assignments;
 	}
 
-	/** @return list<array{section_key: string, group_key: string, status: string}> */
+	/** @return array<int, array{section_key: string, group_key: string, status: string}> */
 	public function get_field_group_mismatches(): array {
 		return $this->field_group_mismatches;
 	}
 
-	/** @return list<array{page_id: int, type: string, key: string}> */
+	/** @return array<int, array{page_id: int, type: string, key: string}> */
 	public function get_page_assignment_repair_candidates(): array {
 		return $this->page_assignment_repair_candidates;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_refused_cleanup(): array {
 		return $this->refused_cleanup;
 	}
@@ -145,7 +145,7 @@ final class ACF_Regeneration_Plan {
 	/**
 	 * Returns counts suitable for acf_regeneration_plan payload.
 	 *
-	 * @return array{ dry_run: bool, scope: string, section_family_key: string|null, page_template_family_key: string|null, include_page_assignments: bool, field_group_mismatches: list<array>, page_assignment_repair_candidates: list<array>, refused_cleanup: list<string>, missing_count: int, version_stale_count: int, ok_count: int, candidate_count: int }
+	 * @return array{ dry_run: bool, scope: string, section_family_key: string|null, page_template_family_key: string|null, include_page_assignments: bool, field_group_mismatches: array<int, array>, page_assignment_repair_candidates: array<int, array>, refused_cleanup: array<int, string>, missing_count: int, version_stale_count: int, ok_count: int, candidate_count: int }
 	 */
 	public function to_array(): array {
 		$missing       = 0;

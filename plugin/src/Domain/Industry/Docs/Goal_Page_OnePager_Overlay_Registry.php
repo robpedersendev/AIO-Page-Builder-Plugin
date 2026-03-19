@@ -44,7 +44,7 @@ final class Goal_Page_OnePager_Overlay_Registry {
 	/** @var array<string, array<string, mixed>> Composite key "goal_key|page_key" => overlay. */
 	private array $by_composite = array();
 
-	/** @var list<array<string, mixed>> All valid overlays in load order. */
+	/** @var array<int, array<string, mixed>> All valid overlays in load order. */
 	private array $all = array();
 
 	/**
@@ -122,7 +122,7 @@ final class Goal_Page_OnePager_Overlay_Registry {
 	/**
 	 * Returns all loaded overlays.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -132,7 +132,7 @@ final class Goal_Page_OnePager_Overlay_Registry {
 	 * Returns overlays for the given goal.
 	 *
 	 * @param string $goal_key Conversion goal key.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_for_goal( string $goal_key ): array {
 		$g   = trim( $goal_key );

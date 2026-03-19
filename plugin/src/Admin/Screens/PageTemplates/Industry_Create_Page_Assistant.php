@@ -39,7 +39,7 @@ final class Industry_Create_Page_Assistant {
 	/** @var array<string, array{fit: string, warning_flags: array, template_family: string}>|null Cached by-key fit data. */
 	private $fit_by_key;
 
-	/** @var list<string>|null Cached recommended keys (ranked). */
+	/** @var array<int, string>|null Cached recommended keys (ranked). */
 	private $recommended_keys;
 
 	/** @var Industry_Substitute_Suggestion_Engine|null Optional engine for richer substitute suggestions. */
@@ -134,7 +134,7 @@ final class Industry_Create_Page_Assistant {
 	/**
 	 * Recommended template keys in rank order (best first). Empty when no guidance.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_recommended_template_keys(): array {
 		return $this->recommended_keys !== null ? $this->recommended_keys : array();
@@ -158,7 +158,7 @@ final class Industry_Create_Page_Assistant {
 	 * Warning flags for a template key (e.g. hierarchy_mismatch, discouraged_for_industry).
 	 *
 	 * @param string $template_key Page template internal key.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_warning_flags_for_template( string $template_key ): array {
 		if ( $this->fit_by_key === null ) {
@@ -173,7 +173,7 @@ final class Industry_Create_Page_Assistant {
 	 *
 	 * @param string $template_key Page template internal key.
 	 * @param int    $max          Max substitutes to return (default 5).
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_substitute_template_keys( string $template_key, int $max = 5 ): array {
 		if ( $this->recommended_keys === null || $this->fit_by_key === null ) {

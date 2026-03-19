@@ -228,7 +228,7 @@ final class Industry_Page_Template_Recommendation_Resolver {
 
 	/**
 	 * @param mixed $val industry_affinity / industry_required / industry_discouraged (array of keys or map).
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function normalize_industry_key_list( $val ): array {
 		if ( ! is_array( $val ) ) {

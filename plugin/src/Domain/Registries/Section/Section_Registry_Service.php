@@ -174,7 +174,7 @@ final class Section_Registry_Service {
 	 * @param string $status
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_definitions_by_status( $status, $limit, $offset );
@@ -186,7 +186,7 @@ final class Section_Registry_Service {
 	 * @param string $category
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_category( string $category, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_by_category( $category, $limit, $offset );
@@ -198,7 +198,7 @@ final class Section_Registry_Service {
 	 * @param string $status Optional filter by status (e.g. 'active'); empty = all non-deprecated.
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_eligible_for_new_selection( string $status = 'active', int $limit = 0, int $offset = 0 ): array {
 		$list = $status !== '' ? $this->repository->list_definitions_by_status( $status, $limit, $offset ) : $this->repository->list_all_definitions( $limit, $offset );
@@ -259,7 +259,7 @@ final class Section_Registry_Service {
 	 * Call from activation, first-time setup, or admin seed action. Requires the page template repository.
 	 *
 	 * @param Page_Template_Repository $page_repo Page template repository (for pt_request_form).
-	 * @return array{ success: bool, section_id: int, page_id: int, errors: list<string> }
+	 * @return array{ success: bool, section_id: int, page_id: int, errors: array<int, string> }
 	 */
 	public function ensure_bundled_form_templates( Page_Template_Repository $page_repo ): array {
 		return Form_Template_Seeder::run( $this->repository, $page_repo );
