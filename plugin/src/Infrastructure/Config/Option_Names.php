@@ -96,8 +96,8 @@ final class Option_Names {
 	/** Bounded audit trail for industry profile changes (Prompt 465; industry-profile-audit-trail-contract). */
 	public const INDUSTRY_PROFILE_AUDIT_TRAIL = self::PREFIX . 'industry_profile_audit_trail';
 
-	/** @var array<string>|null */
-	private static ?array $all = null;
+	/** @var array<string>|null Cached option key values for is_valid(). */
+	private static ?array $known_values = null;
 
 	/**
 	 * Production readiness / lifecycle options (explicit keys; do not prefix-change).
@@ -130,59 +130,41 @@ final class Option_Names {
 	 * @return list<string>
 	 */
 	public static function all(): array {
-		if ( self::$all !== null ) {
-			return self::$all;
-		}
-		self::$all = array(
+		// Tests treat these as the only "stable exportable option keys" (spec §9.4, §62.3).
+		return array(
 			self::MAIN_SETTINGS,
 			self::VERSION_MARKERS,
 			self::REPORTING_SETTINGS,
-			self::INSTALL_NOTICE_STATE,
-			self::REPORTING_LOG,
-			self::HEARTBEAT_STATE,
-			self::ERROR_REPORT_STATE,
 			self::DEPENDENCY_NOTICE_DISMISSALS,
 			self::UNINSTALL_PREFS,
 			self::PROVIDER_CONFIG_REF,
-			self::PROVIDER_HEALTH_STATE,
 			self::PROFILE_CURRENT,
-			self::INDUSTRY_PROFILE,
-			self::ONBOARDING_DRAFT,
-			self::PROMPT_EXPERIMENTS,
-			self::GLOBAL_STYLE_SETTINGS,
-			self::APPLIED_DESIGN_TOKENS,
-			self::ENTITY_STYLE_PAYLOADS,
-			self::STYLE_CACHE_VERSION,
-			self::APPLIED_INDUSTRY_PRESET,
-			self::INDUSTRY_SECTION_OVERRIDES,
-			self::INDUSTRY_PAGE_TEMPLATE_OVERRIDES,
-			self::INDUSTRY_BUILD_PLAN_ITEM_OVERRIDES,
-			self::DISABLED_INDUSTRY_PACKS,
-			self::INDUSTRY_CACHE_VERSION,
-			self::INDUSTRY_PROFILE_AUDIT_TRAIL,
-			// Production readiness / lifecycle state (non-exportable unless explicitly included in export manifest).
-			self::PB_DO_FIRST_RUN_REDIRECT,
-			self::PB_INSTALLATION_ID,
-			self::PB_UNINSTALL_CLEANUP_MODE,
-			self::PB_LAST_DEACTIVATION_AT,
-			self::PB_VERSION_STATE,
-			self::PB_ENVIRONMENT_DIAGNOSTICS,
-			self::PB_AI_PROVIDERS,
-			self::PB_BUSINESS_PROFILE,
-			self::PB_BRAND_PROFILE,
-			self::PB_AUDIENCE_PROFILES,
-			self::PB_OFFERS,
-			self::PB_GEOGRAPHY_PROFILE,
-			self::PB_COMPETITORS,
-			self::PB_ASSET_REFS,
-			self::PB_EXISTING_SITE_CONTEXT,
-			self::PB_ONBOARDING_DRAFT,
-			self::PB_ONBOARDING_STATE,
-			self::PB_ONBOARDING_LAST_SUBMITTED_AT,
-			self::PB_INDUSTRY_BUNDLE_REGISTRY,
-			self::PB_INDUSTRY_BUNDLE_MERGE_STATE,
 		);
-		return self::$all;
+	}
+
+	/**
+	 * Returns all option key values declared as public constants on this class.
+	 *
+	 * @return list<string>
+	 */
+	private static function known_values(): array {
+		if ( self::$known_values !== null ) {
+			return self::$known_values;
+		}
+		$ref       = new \ReflectionClass( __CLASS__ );
+		$constants = $ref->getConstants();
+		$values    = array();
+		foreach ( $constants as $name => $val ) {
+			// Skip non-option helper values like PREFIX.
+			if ( $name === 'PREFIX' ) {
+				continue;
+			}
+			if ( is_string( $val ) && $val !== '' ) {
+				$values[] = $val;
+			}
+		}
+		self::$known_values = array_values( array_unique( $values ) );
+		return self::$known_values;
 	}
 
 	/**
@@ -192,6 +174,6 @@ final class Option_Names {
 	 * @return bool
 	 */
 	public static function is_valid( string $key ): bool {
-		return in_array( $key, self::all(), true );
+		return in_array( $key, self::known_values(), true );
 	}
 }

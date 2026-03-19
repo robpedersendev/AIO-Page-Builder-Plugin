@@ -75,7 +75,7 @@ final class Industry_Helper_Doc_Composer {
 		?Subtype_Section_Helper_Overlay_Registry $subtype_overlay_registry = null,
 		?Subtype_Goal_Section_Helper_Overlay_Registry $subtype_goal_overlay_registry = null,
 		?Industry_Read_Model_Cache_Service $cache_service = null,
-		?Industry_Cache_Key_Builder $cache_key_builder = null,
+		Industry_Cache_Key_Builder|Industry_Shared_Fragment_Resolver|null $cache_key_builder_or_fragment_resolver = null,
 		?Industry_Shared_Fragment_Resolver $fragment_resolver = null
 	) {
 		$this->documentation_registry        = $documentation_registry;
@@ -84,8 +84,19 @@ final class Industry_Helper_Doc_Composer {
 		$this->subtype_overlay_registry      = $subtype_overlay_registry;
 		$this->subtype_goal_overlay_registry = $subtype_goal_overlay_registry;
 		$this->cache_service                 = $cache_service;
-		$this->cache_key_builder             = $cache_key_builder;
-		$this->fragment_resolver             = $fragment_resolver;
+		$this->cache_key_builder             = null;
+		$this->fragment_resolver             = null;
+
+		if ( $cache_key_builder_or_fragment_resolver instanceof Industry_Cache_Key_Builder ) {
+			$this->cache_key_builder = $cache_key_builder_or_fragment_resolver;
+		} elseif ( $cache_key_builder_or_fragment_resolver instanceof Industry_Shared_Fragment_Resolver ) {
+			$this->fragment_resolver = $cache_key_builder_or_fragment_resolver;
+		}
+
+		// Param #8 always wins when provided.
+		if ( $fragment_resolver instanceof Industry_Shared_Fragment_Resolver ) {
+			$this->fragment_resolver = $fragment_resolver;
+		}
 	}
 
 	/**

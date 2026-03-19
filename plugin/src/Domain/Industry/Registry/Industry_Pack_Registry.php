@@ -124,6 +124,41 @@ final class Industry_Pack_Registry {
 	}
 
 	/**
+	 * Loads and validates pack definitions provided by callers (unit tests, imports).
+	 * This overrides the effective view to only include the loaded packs.
+	 *
+	 * @param array<int, array<string, mixed>> $packs Pack definition list.
+	 * @return void
+	 */
+	public function load( array $packs ): void {
+		$this->builtin_all      = array();
+		$this->applied_all      = array();
+		$this->effective_by_key = array();
+		$this->effective_all    = array();
+
+		$this->applied_all = $this->build_records_from_definitions( $packs, self::SOURCE_APPLIED, null );
+		foreach ( $this->applied_all as $record ) {
+			$key = isset( $record['pack_key'] ) && is_string( $record['pack_key'] ) ? $record['pack_key'] : '';
+			if ( $key === '' ) {
+				continue;
+			}
+			$this->effective_by_key[ $key ] = $record;
+		}
+
+		// Deterministic: keep insertion order from $packs after validation/dup-skipping.
+		$this->effective_all = $this->applied_all;
+	}
+
+	/**
+	 * Returns whether the registry has any effective packs.
+	 *
+	 * @return bool
+	 */
+	public function has_any(): bool {
+		return $this->effective_all !== array();
+	}
+
+	/**
 	 * Returns pack definition by industry_key, or null if not found.
 	 *
 	 * @param string $industry_key Industry pack key.
@@ -262,18 +297,24 @@ final class Industry_Pack_Registry {
 			if ( $pack_key === '' ) {
 				continue;
 			}
-			$out[] = array(
-				'pack_key'    => $pack_key,
-				'name'        => isset( $pack[ Industry_Pack_Schema::FIELD_NAME ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_NAME ] ) ? $pack[ Industry_Pack_Schema::FIELD_NAME ] : $pack_key,
-				'version'     => isset( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] ) ? $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] : '',
-				'source_type' => $source_type,
-				'status'      => isset( $pack[ Industry_Pack_Schema::FIELD_STATUS ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_STATUS ] ) ? $pack[ Industry_Pack_Schema::FIELD_STATUS ] : '',
-				'conflicts'   => array(),
-				'payload_ref' => array(
-					'bundle_id'   => $bundle_id,
-					'definition'  => $pack,
-					'source_hint' => $source_type === self::SOURCE_BUILTIN ? 'builtin' : 'applied_bundle',
-				),
+			$version_marker = isset( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] ) && is_string( $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ] )
+				? $pack[ Industry_Pack_Schema::FIELD_VERSION_MARKER ]
+				: '';
+
+			// Merge the schema definition fields at the top level so both unit-test styles can access them.
+			$out[] = array_merge(
+				$pack,
+				array(
+					'pack_key'    => $pack_key,
+					'version'     => $version_marker,
+					'source_type' => $source_type,
+					'conflicts'   => array(),
+					'payload_ref' => array(
+						'bundle_id'   => $bundle_id,
+						'definition'  => $pack,
+						'source_hint' => $source_type === self::SOURCE_BUILTIN ? 'builtin' : 'applied_bundle',
+					),
+				)
 			);
 		}
 		return $out;

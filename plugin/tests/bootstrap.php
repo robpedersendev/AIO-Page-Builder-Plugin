@@ -167,12 +167,26 @@ if ( ! function_exists( 'add_query_arg' ) ) {
 }
 if ( ! function_exists( 'add_action' ) ) {
 	function add_action( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
-		// No-op for unit tests; CPT registration runs in WP context.
+		if ( ! isset( $GLOBALS['_aio_actions'] ) || ! is_array( $GLOBALS['_aio_actions'] ) ) {
+			$GLOBALS['_aio_actions'] = array();
+		}
+		if ( ! isset( $GLOBALS['_aio_actions'][ $tag ] ) || ! is_array( $GLOBALS['_aio_actions'][ $tag ] ) ) {
+			$GLOBALS['_aio_actions'][ $tag ] = array();
+		}
+		$GLOBALS['_aio_actions'][ $tag ][] = $callback;
 	}
 }
 if ( ! function_exists( 'do_action' ) ) {
 	function do_action( $tag, ...$args ) {
-		// No-op for unit tests; hooks fire in WP context.
+		$callbacks = $GLOBALS['_aio_actions'][ $tag ] ?? array();
+		if ( ! is_array( $callbacks ) || $callbacks === array() ) {
+			return;
+		}
+		foreach ( $callbacks as $cb ) {
+			if ( is_callable( $cb ) ) {
+				call_user_func_array( $cb, $args );
+			}
+		}
 	}
 }
 // * Stubs for heartbeat scheduler tests (spec §46.4, §53.5). Track scheduled state in $GLOBALS['_aio_cron_scheduled'].

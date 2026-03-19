@@ -19,6 +19,11 @@
         "phpstan": "vendor/bin/phpstan analyse -c phpstan.neon.dist",
         "phpunit": "vendor/bin/phpunit -c phpunit.xml.dist"
     },
+    "autoload": {
+        "psr-4": {
+            "AIOPageBuilder\\": "src/"
+        }
+    },
     "require-dev": {
         "wp-coding-standards/wpcs": "^3.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",

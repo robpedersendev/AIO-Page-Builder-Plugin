@@ -48,9 +48,10 @@ final class Settings_Service {
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; key is validated option name.
 			throw new \InvalidArgumentException( 'Unknown option key: ' . $key );
 		}
-		$value = \get_option( $key, self::DEFAULTS[ $key ] );
+		$default = self::DEFAULTS[ $key ] ?? array();
+		$value   = \get_option( $key, $default );
 		if ( ! is_array( $value ) ) {
-			return self::DEFAULTS[ $key ];
+			return $default;
 		}
 		return $value;
 	}
@@ -83,7 +84,7 @@ final class Settings_Service {
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; key is validated option name.
 			throw new \InvalidArgumentException( 'Unknown option key: ' . $key );
 		}
-		return self::DEFAULTS[ $key ];
+		return self::DEFAULTS[ $key ] ?? array();
 	}
 
 	/**

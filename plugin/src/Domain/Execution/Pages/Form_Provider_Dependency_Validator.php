@@ -22,7 +22,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
  * Returns validation result: valid, errors (blocking), warnings (advisory).
  * Does not mutate state; safe to call before build or replacement.
  */
-final class Form_Provider_Dependency_Validator {
+class Form_Provider_Dependency_Validator {
 
 	/** @var Form_Provider_Registry */
 	private Form_Provider_Registry $provider_registry;
