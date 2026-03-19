@@ -150,7 +150,6 @@ final class Section_Template_Detail_State_Builder {
 
 		$field_summary       = $this->build_field_summary( $section_key, $definition );
 		$helper_ref          = (string) ( $definition[ Section_Schema::FIELD_HELPER_REF ] ?? $side_panel['helper_ref'] ?? '' );
-		$helper_doc_route    = $this->build_helper_doc_route( $helper_ref );
 		$compatibility       = $definition['compatibility'] ?? array();
 		$compatibility_notes = \is_array( $compatibility ) ? $compatibility : array();
 
@@ -209,7 +208,6 @@ final class Section_Template_Detail_State_Builder {
 			'side_panel'                  => $side_panel,
 			'field_summary'               => $field_summary,
 			'helper_ref'                  => $helper_ref,
-			'helper_doc_route'            => $helper_doc_route,
 			'compatibility_notes'         => $compatibility_notes,
 			'lpagery_compatibility_state' => $lpagery_compatibility_state,
 			'preview_payload'             => $preview_payload,
@@ -259,34 +257,6 @@ final class Section_Template_Detail_State_Builder {
 			}
 		}
 		return $out;
-	}
-
-	/**
-	 * Builds helper documentation URL from helper_ref. Placeholder until helper-doc URL builder exists.
-	 *
-	 * @param string $helper_ref
-	 * @return string
-	 */
-	private function build_helper_doc_route( string $helper_ref ): array {
-		$helper_ref = \sanitize_text_field( $helper_ref );
-		if ( $helper_ref === '' ) {
-			return array();
-		}
-		if ( str_starts_with( $helper_ref, 'doc-helper-' ) ) {
-			return array(
-				'name' => 'documentation_detail',
-				'args' => array( 'doc_id' => $helper_ref ),
-			);
-		}
-		$key = str_starts_with( $helper_ref, 'helper_' )
-			? \sanitize_key( substr( $helper_ref, strlen( 'helper_' ) ) )
-			: \sanitize_key( $helper_ref );
-		return $key !== ''
-			? array(
-				'name' => 'documentation_detail',
-				'args' => array( 'section' => $key ),
-			)
-			: array();
 	}
 
 	/**
@@ -424,7 +394,6 @@ final class Section_Template_Detail_State_Builder {
 			'side_panel'                  => array(),
 			'field_summary'               => array(),
 			'helper_ref'                  => '',
-			'helper_doc_url'              => '',
 			'compatibility_notes'         => array(),
 			'lpagery_compatibility_state' => null,
 			'preview_payload'             => array(),

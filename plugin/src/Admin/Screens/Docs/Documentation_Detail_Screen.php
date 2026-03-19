@@ -63,7 +63,19 @@ final class Documentation_Detail_Screen {
 			<h1 class="wp-heading-inline"><?php echo \esc_html( $title ); ?></h1>
 			<hr class="wp-header-end" />
 			<p>
-				<a class="button button-secondary" href="<?php echo \esc_url( \admin_url( 'admin.php?page=aio-page-builder-section-templates' ) ); ?>">
+				<?php
+				$back_url = \admin_url( 'admin.php?page=aio-page-builder-section-templates' );
+				if ( $this->container !== null && $this->container->has( 'admin_router' ) ) {
+					$router = $this->container->get( 'admin_router' );
+					if ( $router instanceof \AIOPageBuilder\Infrastructure\AdminRouting\Admin_Router ) {
+						$back_url = $router->url( 'section_templates_directory', array() );
+						if ( $back_url === '' ) {
+							$back_url = \admin_url( 'admin.php?page=aio-page-builder-section-templates' );
+						}
+					}
+				}
+				?>
+				<a class="button button-secondary" href="<?php echo \esc_url( $back_url ); ?>">
 					<?php \esc_html_e( 'Back to Section Templates', 'aio-page-builder' ); ?>
 				</a>
 			</p>

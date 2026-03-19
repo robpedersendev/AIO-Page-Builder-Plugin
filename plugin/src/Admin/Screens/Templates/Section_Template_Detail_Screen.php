@@ -16,8 +16,10 @@ use AIOPageBuilder\Admin\Forms\Entity_Style_Form_Builder;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Domain\Registries\Section\UI\Section_Template_Detail_State_Builder;
 use AIOPageBuilder\Domain\Styling\Entity_Style_UI_State_Builder;
+use AIOPageBuilder\Domain\Preview\UI\Template_Preview_Presenter;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Admin\Services\Helper_Doc_Url_Resolver;
 
 /**
  * Renders a single section template detail: name, description, purpose family, CTA classification,
@@ -156,13 +158,22 @@ final class Section_Template_Detail_Screen {
 		$placement     = (string) ( $side_panel['placement_tendency'] ?? '' );
 		$field_ref     = (string) ( $side_panel['field_blueprint_ref'] ?? '' );
 		$helper_ref    = (string) ( $state['helper_ref'] ?? '' );
-		$helper_url    = '';
-		$route         = $state['helper_doc_route'] ?? array();
-		if ( is_array( $route ) && isset( $route['name'] ) && is_string( $route['name'] ) ) {
-			$args = isset( $route['args'] ) && is_array( $route['args'] ) ? $route['args'] : array();
-			$helper_url = $this->container && $this->container->has( 'admin_router' )
-				? (string) $this->container->get( 'admin_router' )->url( $route['name'], $args )
-				: '';
+		$version_summary     = \is_array( $state['version_summary'] ?? null ) ? (array) $state['version_summary'] : array();
+		$deprecation_summary = \is_array( $state['deprecation_summary'] ?? null ) ? (array) $state['deprecation_summary'] : array();
+		$version             = (string) ( $version_summary['version'] ?? '' );
+		$is_deprecated       = ! empty( $deprecation_summary['is_deprecated'] );
+
+		$helper_state = array(
+			'available' => false,
+			'url'       => '',
+			'message'   => Helper_Doc_Url_Resolver::UNAVAILABLE_MESSAGE,
+			'doc_id'    => '',
+		);
+		if ( $section_key !== '' && $this->container && $this->container->has( 'helper_doc_url_resolver' ) ) {
+			$resolver = $this->container->get( 'helper_doc_url_resolver' );
+			if ( $resolver instanceof Helper_Doc_Url_Resolver ) {
+				$helper_state = $resolver->resolve( $section_key, $version !== '' ? $version : null, $helper_ref !== '' ? $helper_ref : null );
+			}
 		}
 		$compat        = $state['compatibility_notes'] ?? array();
 		$field_summary = $state['field_summary'] ?? array();
@@ -208,17 +219,23 @@ final class Section_Template_Detail_Screen {
 					<dt><?php \esc_html_e( 'Placement tendency', 'aio-page-builder' ); ?></dt>
 					<dd><?php echo \esc_html( \ucfirst( \str_replace( array( '_', '-' ), ' ', $placement ) ) ); ?></dd>
 				<?php endif; ?>
+				<?php if ( $version !== '' ) : ?>
+					<dt><?php \esc_html_e( 'Version', 'aio-page-builder' ); ?></dt>
+					<dd><?php echo \esc_html( $version ); ?></dd>
+				<?php endif; ?>
+				<dt><?php \esc_html_e( 'Deprecation', 'aio-page-builder' ); ?></dt>
+				<dd><?php echo $is_deprecated ? \esc_html__( 'Deprecated', 'aio-page-builder' ) : \esc_html__( 'Active', 'aio-page-builder' ); ?></dd>
 				<?php if ( $field_ref !== '' ) : ?>
 					<dt><?php \esc_html_e( 'Field blueprint', 'aio-page-builder' ); ?></dt>
 					<dd><code><?php echo \esc_html( $field_ref ); ?></code></dd>
 				<?php endif; ?>
 			</dl>
-			<?php if ( $helper_ref !== '' ) : ?>
+			<?php if ( $helper_ref !== '' || ! empty( $helper_state['available'] ) ) : ?>
 				<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Helper documentation', 'aio-page-builder' ); ?></h3>
-				<?php if ( $helper_url !== '' ) : ?>
-					<p><a href="<?php echo \esc_url( $helper_url ); ?>" target="_blank" rel="noopener noreferrer"><?php echo \esc_html( $helper_ref ); ?></a></p>
+				<?php if ( ! empty( $helper_state['available'] ) && (string) ( $helper_state['url'] ?? '' ) !== '' ) : ?>
+					<p><a href="<?php echo \esc_url( (string) $helper_state['url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'Open helper doc', 'aio-page-builder' ); ?></a></p>
 				<?php else : ?>
-					<p><span class="aio-helper-ref" title="<?php echo \esc_attr( $helper_ref ); ?>"><?php echo \esc_html( $helper_ref ); ?></span></p>
+					<p class="aio-helper-doc-unavailable"><?php echo \esc_html( (string) ( $helper_state['message'] ?? Helper_Doc_Url_Resolver::UNAVAILABLE_MESSAGE ) ); ?></p>
 				<?php endif; ?>
 			<?php endif; ?>
 			<?php
@@ -370,10 +387,13 @@ final class Section_Template_Detail_Screen {
 		$html          = (string) ( $state['rendered_preview_html'] ?? '' );
 		$section_key   = (string) ( $state['section_key'] ?? '' );
 		$style_context = $this->get_preview_style_context( 'section', $section_key );
+		$presenter     = new Template_Preview_Presenter();
+		$title         = $presenter->get_preview_title( $html !== '' );
+		$label         = $presenter->get_preview_aria_label( $html !== '' );
 		?>
-		<section class="aio-preview-section" aria-label="<?php \esc_attr_e( 'Rendered preview', 'aio-page-builder' ); ?>">
-			<h2 class="aio-preview-title"><?php \esc_html_e( 'Preview', 'aio-page-builder' ); ?></h2>
-			<p class="aio-preview-notice"><?php \esc_html_e( 'This preview uses synthetic data and the same section renderer as live pages. Omission and animation behavior apply.', 'aio-page-builder' ); ?></p>
+		<section class="aio-preview-section" aria-label="<?php echo \esc_attr( $label ); ?>">
+			<h2 class="aio-preview-title"><?php echo \esc_html( $title ); ?></h2>
+			<p class="aio-preview-notice"><?php \esc_html_e( 'This preview uses synthetic data. If no rendered preview is available, the view is a structural preview only.', 'aio-page-builder' ); ?></p>
 			<?php if ( $style_context !== null ) : ?>
 				<?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Inline preview context; base URL from trusted builder. ?>
 				<link rel="stylesheet" href="<?php echo \esc_url( $style_context['base_stylesheet_url'] ); ?>" />

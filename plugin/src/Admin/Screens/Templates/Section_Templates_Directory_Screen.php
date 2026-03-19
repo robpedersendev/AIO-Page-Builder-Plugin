@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\Registries\Section\UI\Section_Template_Directory_State
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
+use AIOPageBuilder\Admin\Services\Helper_Doc_Url_Resolver;
 
 /**
  * Renders the Section Templates directory: root (purpose tree), purpose (L3 CTA/variant nodes), or list (section rows).
@@ -336,15 +337,12 @@ final class Section_Templates_Directory_Screen {
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
 				<tr>
+					<th scope="col"><?php \esc_html_e( 'Key', 'aio-page-builder' ); ?></th>
 					<th scope="col"><?php \esc_html_e( 'Name', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Internal key', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Purpose family', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'CTA / Variant', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th>
+					<th scope="col"><?php \esc_html_e( 'Category', 'aio-page-builder' ); ?></th>
 					<th scope="col"><?php \esc_html_e( 'Version', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Placement', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Variants', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Helper / Field', 'aio-page-builder' ); ?></th>
+					<th scope="col"><?php \esc_html_e( 'Helper Doc', 'aio-page-builder' ); ?></th>
+					<th scope="col"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th>
 					<th scope="col"><?php \esc_html_e( 'Actions', 'aio-page-builder' ); ?></th>
 				</tr>
 			</thead>
@@ -371,8 +369,24 @@ final class Section_Templates_Directory_Screen {
 					if ( $pf_slug !== '' ) {
 						$detail_args['purpose_family'] = $pf_slug;
 					}
-					$view_url            = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
-					$helper_url          = ''; // * Helper-doc link: populated on detail screen when helper_doc_url resolver exists.
+					$view_url = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
+					if ( $this->container && $this->container->has( 'admin_router' ) ) {
+						$view_url = (string) $this->container->get( 'admin_router' )->url( 'section_template_detail', $detail_args );
+					}
+					$preview_url = $view_url;
+
+					$helper_state = array(
+						'available' => false,
+						'url'       => '',
+						'message'   => Helper_Doc_Url_Resolver::UNAVAILABLE_MESSAGE,
+						'doc_id'    => '',
+					);
+					if ( $this->container && $this->container->has( 'helper_doc_url_resolver' ) ) {
+						$resolver = $this->container->get( 'helper_doc_url_resolver' );
+						if ( $resolver instanceof Helper_Doc_Url_Resolver ) {
+							$helper_state = $resolver->resolve( $key, $version, $helper_ref !== '' ? $helper_ref : null );
+						}
+					}
 					$in_compare          = \in_array( $key, Template_Compare_Screen::get_compare_list( 'section' ), true );
 					$item_view           = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
 					$section_override    = isset( $industry_section_overrides_by_key[ $key ] ) && is_array( $industry_section_overrides_by_key[ $key ] ) ? $industry_section_overrides_by_key[ $key ] : null;
@@ -382,41 +396,31 @@ final class Section_Templates_Directory_Screen {
 					$explanation_summary = ( $weighted !== null && isset( $weighted['explanation_summary'] ) ) ? (string) $weighted['explanation_summary'] : '';
 					?>
 					<tr>
-						<td><?php echo \esc_html( $name ); ?></td>
 						<td><code><?php echo \esc_html( $key ); ?></code></td>
+						<td><?php echo \esc_html( $name ); ?></td>
 						<td>
-							<?php if ( $item_view !== null ) : ?>
-								<?php require \dirname( __DIR__, 2 ) . '/Views/sections/industry-section-badges.php'; ?>
-								<?php if ( ! empty( $conflict_results ) || $explanation_summary !== '' ) : ?>
-									<?php require \dirname( __DIR__, 2 ) . '/Views/industry/industry-conflict-badges.php'; ?>
-								<?php endif; ?>
-							<?php else : ?>
-								—
+							<?php echo \esc_html( $pf_label !== '' ? $pf_label : '—' ); ?>
+							<?php if ( $cta_var !== '—' ) : ?>
+								<div class="description"><?php echo \esc_html( $cta_var ); ?></div>
 							<?php endif; ?>
 						</td>
-						<td><?php echo \esc_html( $pf_label ); ?></td>
-						<td><?php echo \esc_html( $cta_var ); ?></td>
-						<td><?php echo \esc_html( $status ); ?></td>
 						<td><?php echo \esc_html( $version ); ?></td>
-						<td><?php echo \esc_html( $placement !== '' ? \str_replace( array( '_', '-' ), ' ', $placement ) : '—' ); ?></td>
-						<td><?php echo (int) $variant_count; ?></td>
 						<td>
-							<?php if ( $helper_ref !== '' ) : ?>
-								<span class="aio-helper-ref" title="<?php echo \esc_attr( $helper_ref ); ?>"><?php \esc_html_e( 'Helper', 'aio-page-builder' ); ?></span>
-								<?php
-								if ( $field_ref !== '' ) :
-									?>
-									| <?php endif; ?>
-							<?php endif; ?>
-							<?php if ( $field_ref !== '' ) : ?>
-								<span class="aio-field-ref" title="<?php echo \esc_attr( $field_ref ); ?>"><?php \esc_html_e( 'Field summary', 'aio-page-builder' ); ?></span>
-							<?php endif; ?>
-							<?php if ( $helper_ref === '' && $field_ref === '' ) : ?>
-								—
+							<?php if ( ! empty( $helper_state['available'] ) && (string) ( $helper_state['url'] ?? '' ) !== '' ) : ?>
+								<a href="<?php echo \esc_url( (string) $helper_state['url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'Open helper doc', 'aio-page-builder' ); ?></a>
+							<?php else : ?>
+								<span class="aio-helper-doc-unavailable"><?php \esc_html_e( 'Not available', 'aio-page-builder' ); ?></span>
 							<?php endif; ?>
 						</td>
+						<td><?php echo \esc_html( $status ); ?></td>
 						<td>
-							<a href="<?php echo \esc_url( $view_url ); ?>"><?php \esc_html_e( 'View', 'aio-page-builder' ); ?></a>
+							<a href="<?php echo \esc_url( $view_url ); ?>"><?php \esc_html_e( 'View detail', 'aio-page-builder' ); ?></a>
+							<?php if ( ! empty( $helper_state['available'] ) && (string) ( $helper_state['url'] ?? '' ) !== '' ) : ?>
+								| <a href="<?php echo \esc_url( (string) $helper_state['url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'Open helper doc', 'aio-page-builder' ); ?></a>
+							<?php else : ?>
+								| <span class="aio-helper-doc-unavailable" title="<?php echo \esc_attr( Helper_Doc_Url_Resolver::UNAVAILABLE_MESSAGE ); ?>"><?php \esc_html_e( 'Open helper doc', 'aio-page-builder' ); ?></span>
+							<?php endif; ?>
+							| <a href="<?php echo \esc_url( $preview_url ); ?>"><?php \esc_html_e( 'Structural preview', 'aio-page-builder' ); ?></a>
 							<?php if ( $in_compare ) : ?>
 								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'section', $key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 							<?php else : ?>

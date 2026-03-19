@@ -17,7 +17,7 @@ use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
  * Provides lookup of documentation objects loaded from file-based section helper and one-pager batches.
  * Keyed by documentation_id; by source_reference.section_template_key (section helpers); by source_reference.page_template_key (one-pagers).
  */
-final class Documentation_Registry {
+final class Documentation_Registry implements Documentation_Registry_Lookup_Interface {
 
 	/** @var Documentation_Loader */
 	private Documentation_Loader $loader;

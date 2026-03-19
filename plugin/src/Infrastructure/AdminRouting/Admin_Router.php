@@ -130,6 +130,8 @@ final class Admin_Router {
 
 	private function register_defaults(): void {
 		$this->register_route( 'dashboard', 'aio-page-builder-dashboard', Capabilities::MANAGE_SETTINGS );
+		$this->register_route( 'section_templates_directory', 'aio-page-builder-section-templates', Capabilities::MANAGE_SECTION_TEMPLATES, array( 'purpose_family' => 'key', 'cta_classification' => 'key', 'variation_family_key' => 'key', 'all' => 'bool', 'status' => 'key', 'search' => 'text', 'paged' => 'int', 'per_page' => 'int', 'industry_view' => 'key' ) );
+		$this->register_route( 'page_templates_directory', 'aio-page-builder-page-templates', Capabilities::MANAGE_PAGE_TEMPLATES, array( 'category_class' => 'key', 'family' => 'key', 'status' => 'key', 'search' => 'text', 'paged' => 'int', 'per_page' => 'int', 'industry_view' => 'key' ) );
 		$this->register_route( 'section_template_detail', 'aio-page-builder-section-template-detail', Capabilities::MANAGE_SECTION_TEMPLATES, array( 'section' => 'key', 'purpose_family' => 'key', 'reduced_motion' => 'bool' ) );
 		$this->register_route( 'page_template_detail', 'aio-page-builder-page-template-detail', Capabilities::MANAGE_PAGE_TEMPLATES, array( 'template' => 'key', 'purpose_family' => 'key', 'reduced_motion' => 'bool' ) );
 		$this->register_route( 'template_compare', 'aio-page-builder-template-compare', Capabilities::MANAGE_PAGE_TEMPLATES, array( 'type' => 'key' ) );

@@ -16,6 +16,7 @@ use AIOPageBuilder\Admin\Forms\Entity_Style_Form_Builder;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Detail_State_Builder;
 use AIOPageBuilder\Domain\Styling\Entity_Style_UI_State_Builder;
+use AIOPageBuilder\Domain\Preview\UI\Template_Preview_Presenter;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -145,6 +146,10 @@ final class Page_Template_Detail_Screen {
 		$differentiation = (string) ( $side_panel['differentiation_notes'] ?? '' );
 		$used_sections   = $state['used_sections'] ?? array();
 		$one_pager_link  = (string) ( $state['one_pager_link'] ?? '' );
+		$version_summary     = \is_array( $state['version_summary'] ?? null ) ? (array) $state['version_summary'] : array();
+		$deprecation_summary = \is_array( $state['deprecation_summary'] ?? null ) ? (array) $state['deprecation_summary'] : array();
+		$version             = (string) ( $version_summary['version'] ?? '' );
+		$is_deprecated       = ! empty( $deprecation_summary['is_deprecated'] );
 		$in_compare      = $template_key !== '' && \in_array( $template_key, Template_Compare_Screen::get_compare_list( 'page' ), true );
 		?>
 		<section class="aio-metadata-section">
@@ -187,6 +192,12 @@ final class Page_Template_Detail_Screen {
 					<dt><?php \esc_html_e( 'Differentiation', 'aio-page-builder' ); ?></dt>
 					<dd><?php echo \esc_html( $differentiation ); ?></dd>
 				<?php endif; ?>
+				<?php if ( $version !== '' ) : ?>
+					<dt><?php \esc_html_e( 'Version', 'aio-page-builder' ); ?></dt>
+					<dd><?php echo \esc_html( $version ); ?></dd>
+				<?php endif; ?>
+				<dt><?php \esc_html_e( 'Deprecation', 'aio-page-builder' ); ?></dt>
+				<dd><?php echo $is_deprecated ? \esc_html__( 'Deprecated', 'aio-page-builder' ) : \esc_html__( 'Active', 'aio-page-builder' ); ?></dd>
 			</dl>
 			<?php if ( count( $used_sections ) > 0 ) : ?>
 				<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Used sections', 'aio-page-builder' ); ?></h3>
@@ -200,10 +211,13 @@ final class Page_Template_Detail_Screen {
 					<?php endforeach; ?>
 				</ol>
 			<?php endif; ?>
+			<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'One-pager', 'aio-page-builder' ); ?></h3>
 			<?php if ( $one_pager_link !== '' ) : ?>
 				<p class="aio-one-pager-link">
-					<a href="<?php echo \esc_url( $one_pager_link ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'One-pager (opens in new tab)', 'aio-page-builder' ); ?></a>
+					<a href="<?php echo \esc_url( $one_pager_link ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'Open one-pager', 'aio-page-builder' ); ?></a>
 				</p>
+			<?php else : ?>
+				<p class="aio-one-pager-unavailable"><?php \esc_html_e( 'Not available', 'aio-page-builder' ); ?></p>
 			<?php endif; ?>
 			<?php
 			$industry_preview = $state['industry_preview'] ?? null;
@@ -292,10 +306,13 @@ final class Page_Template_Detail_Screen {
 		$html          = (string) ( $state['rendered_preview_html'] ?? '' );
 		$template_key  = (string) ( $state['template_key'] ?? '' );
 		$style_context = $this->get_preview_style_context( 'page', $template_key );
+		$presenter     = new Template_Preview_Presenter();
+		$title         = $presenter->get_preview_title( $html !== '' );
+		$label         = $presenter->get_preview_aria_label( $html !== '' );
 		?>
-		<section class="aio-preview-section" aria-label="<?php \esc_attr_e( 'Rendered preview', 'aio-page-builder' ); ?>">
-			<h2 class="aio-preview-title"><?php \esc_html_e( 'Preview', 'aio-page-builder' ); ?></h2>
-			<p class="aio-preview-notice"><?php \esc_html_e( 'This preview uses synthetic data and the same rendering pipeline as live pages. Omission and animation behavior apply.', 'aio-page-builder' ); ?></p>
+		<section class="aio-preview-section" aria-label="<?php echo \esc_attr( $label ); ?>">
+			<h2 class="aio-preview-title"><?php echo \esc_html( $title ); ?></h2>
+			<p class="aio-preview-notice"><?php \esc_html_e( 'This preview uses synthetic data. If no rendered preview is available, the view is a structural preview only.', 'aio-page-builder' ); ?></p>
 			<?php if ( $style_context !== null ) : ?>
 				<?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Inline preview context; base URL is from trusted builder. ?>
 				<link rel="stylesheet" href="<?php echo \esc_url( $style_context['base_stylesheet_url'] ); ?>" />

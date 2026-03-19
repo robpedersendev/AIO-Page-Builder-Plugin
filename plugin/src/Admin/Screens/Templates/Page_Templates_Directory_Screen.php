@@ -319,13 +319,13 @@ final class Page_Templates_Directory_Screen {
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
 				<tr>
+					<th scope="col"><?php \esc_html_e( 'Key', 'aio-page-builder' ); ?></th>
 					<th scope="col"><?php \esc_html_e( 'Name', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Internal key', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Category', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Family', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th>
+					<th scope="col"><?php \esc_html_e( 'Purpose', 'aio-page-builder' ); ?></th>
+					<th scope="col"><?php \esc_html_e( 'Section Order', 'aio-page-builder' ); ?></th>
 					<th scope="col"><?php \esc_html_e( 'Version', 'aio-page-builder' ); ?></th>
-					<th scope="col"><?php \esc_html_e( 'Sections', 'aio-page-builder' ); ?></th>
+					<th scope="col"><?php \esc_html_e( 'One-pager', 'aio-page-builder' ); ?></th>
+					<th scope="col"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th>
 					<th scope="col"><?php \esc_html_e( 'Actions', 'aio-page-builder' ); ?></th>
 				</tr>
 			</thead>
@@ -337,11 +337,11 @@ final class Page_Templates_Directory_Screen {
 					$cat_slug      = (string) ( $row['template_category_class'] ?? '' );
 					$cat_label     = isset( $category_labels[ $cat_slug ] ) ? $category_labels[ $cat_slug ] : $cat_slug;
 					$fam_slug      = (string) ( $row['template_family'] ?? '' );
-					$fam_label     = $fam_slug !== '' ? \ucfirst( \str_replace( array( '_', '-' ), ' ', $fam_slug ) ) : '';
 					$status        = (string) ( $row['status'] ?? '' );
 					$version       = (string) ( $row['version'] ?? '1' );
 					$section_count = (int) ( $row['section_count'] ?? 0 );
-					$one_pager_url = ''; // * One-pager link: populated from template definition on detail screen.
+					$purpose       = (string) ( $row['purpose_summary'] ?? '' );
+					$one_pager_url = ''; // * One-pager availability is shown on detail screen.
 					$detail_args   = array(
 						'page'     => Page_Template_Detail_Screen::SLUG,
 						'template' => $key,
@@ -352,7 +352,11 @@ final class Page_Templates_Directory_Screen {
 					if ( $family !== '' ) {
 						$detail_args['family'] = $family;
 					}
-					$view_url            = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
+					$view_url = \add_query_arg( $detail_args, \admin_url( 'admin.php' ) );
+					if ( $this->container && $this->container->has( 'admin_router' ) ) {
+						$view_url = (string) $this->container->get( 'admin_router' )->url( 'page_template_detail', $detail_args );
+					}
+					$preview_url = $view_url;
 					$in_compare          = \in_array( $key, Template_Compare_Screen::get_compare_list( 'page' ), true );
 					$item_view           = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
 					$template_override   = isset( $industry_page_template_overrides_by_key[ $key ] ) && is_array( $industry_page_template_overrides_by_key[ $key ] ) ? $industry_page_template_overrides_by_key[ $key ] : null;
@@ -362,29 +366,27 @@ final class Page_Templates_Directory_Screen {
 					$explanation_summary = ( $weighted !== null && isset( $weighted['explanation_summary'] ) ) ? (string) $weighted['explanation_summary'] : '';
 					?>
 					<tr>
-						<td><?php echo \esc_html( $name ); ?></td>
 						<td><code><?php echo \esc_html( $key ); ?></code></td>
-						<td>
-							<?php if ( $item_view !== null ) : ?>
-								<?php require \dirname( __DIR__, 2 ) . '/Views/page-templates/industry-template-badges.php'; ?>
-								<?php if ( ! empty( $conflict_results ) || $explanation_summary !== '' ) : ?>
-									<?php require \dirname( __DIR__, 2 ) . '/Views/industry/industry-conflict-badges.php'; ?>
-								<?php endif; ?>
-							<?php else : ?>
-								—
-							<?php endif; ?>
-						</td>
-						<td><?php echo \esc_html( $cat_label ); ?></td>
-						<td><?php echo \esc_html( $fam_label ); ?></td>
-						<td><?php echo \esc_html( $status ); ?></td>
+						<td><?php echo \esc_html( $name ); ?></td>
+						<td><?php echo \esc_html( $purpose !== '' ? $purpose : '—' ); ?></td>
+						<td><?php echo \esc_html( $section_count > 0 ? sprintf( /* translators: %d: number of sections */ __( '%d sections', 'aio-page-builder' ), $section_count ) : '—' ); ?></td>
 						<td><?php echo \esc_html( $version ); ?></td>
-						<td><?php echo (int) $section_count; ?></td>
 						<td>
 							<?php if ( $one_pager_url !== '' ) : ?>
 								<a href="<?php echo \esc_url( $one_pager_url ); ?>"><?php \esc_html_e( 'One-pager', 'aio-page-builder' ); ?></a>
-								|
+							<?php else : ?>
+								<span class="aio-one-pager-unavailable"><?php \esc_html_e( 'Not available', 'aio-page-builder' ); ?></span>
 							<?php endif; ?>
-							<a href="<?php echo \esc_url( $view_url ); ?>"><?php \esc_html_e( 'View', 'aio-page-builder' ); ?></a>
+						</td>
+						<td><?php echo \esc_html( $status ); ?></td>
+						<td>
+							<a href="<?php echo \esc_url( $view_url ); ?>"><?php \esc_html_e( 'View detail', 'aio-page-builder' ); ?></a>
+							<?php if ( $one_pager_url !== '' ) : ?>
+								| <a href="<?php echo \esc_url( $one_pager_url ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'Open one-pager', 'aio-page-builder' ); ?></a>
+							<?php else : ?>
+								| <span class="aio-one-pager-unavailable" title="<?php echo \esc_attr__( 'One-pager not available.', 'aio-page-builder' ); ?>"><?php \esc_html_e( 'Open one-pager', 'aio-page-builder' ); ?></span>
+							<?php endif; ?>
+							| <a href="<?php echo \esc_url( $preview_url ); ?>"><?php \esc_html_e( 'Structural preview', 'aio-page-builder' ); ?></a>
 							<?php if ( $in_compare ) : ?>
 								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'page', $key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 							<?php else : ?>
