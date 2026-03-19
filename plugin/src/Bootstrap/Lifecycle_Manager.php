@@ -229,7 +229,7 @@ final class Lifecycle_Manager {
 
 	private function check_dependencies(): Lifecycle_Result {
 		// Required/optional dependency checks are run in validate_environment via Environment_Validator.
-		// This phase remains for future dependency logic that runs after environment (e.g. version handshakes).
+		// This phase exists for lifecycle-contract compatibility; dependency checks run in validate_environment.
 		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'check_dependencies' );
 	}
 

@@ -2,7 +2,7 @@
 /**
  * Version map for plugin, schemas, tables, registries, and exports.
  * Single source of truth for contract versions; migrations and schemas depend on these keys.
- * Initial values are placeholders and will be advanced by later prompts.
+ * Stable contract versions used for compatibility checks and migration control.
  *
  * @package AIOPageBuilder
  */
@@ -49,8 +49,7 @@ final class Versions {
 	private static array $map = array();
 
 	/**
-	 * Returns the full version map. Keys are stable; values are placeholders until
-	 * migrations and registries are implemented.
+	 * Returns the full version map. Keys are stable; values are current contract versions.
 	 *
 	 * @return array<string, string> Associative array of version key => version string.
 	 */

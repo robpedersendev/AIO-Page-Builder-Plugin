@@ -284,9 +284,13 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 		$container->register(
 			'tokens_step_ui_service',
 			function () use ( $container ): Tokens_Step_UI_Service {
+				$operational_repo = $container->has( 'operational_snapshot_repository' ) ? $container->get( 'operational_snapshot_repository' ) : null;
+				$token_diff       = $container->has( 'token_diff_summarizer' ) ? $container->get( 'token_diff_summarizer' ) : null;
 				return new Tokens_Step_UI_Service(
 					$container->get( 'build_plan_row_action_resolver' ),
-					$container->get( 'global_style_settings_repository' )
+					$container->get( 'global_style_settings_repository' ),
+					$operational_repo,
+					$token_diff
 				);
 			}
 		);

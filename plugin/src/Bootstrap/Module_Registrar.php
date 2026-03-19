@@ -48,7 +48,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Styling_Provider;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 
 /**
- * Loads and runs only bootstrap-level providers. Domain providers are registered in later prompts.
+ * Loads and runs only bootstrap-level providers. Domain providers are registered during the full module registration phase.
  * Registration order is explicit and stable.
  */
 final class Module_Registrar {

@@ -1,8 +1,7 @@
 <?php
 /**
- * Preview-only screen for industry pack bundle (JSON) contents and conflict analysis (Prompt 419, SPR-007).
- * Apply/import of bundle content is not implemented; this screen is for inspection only.
- * For full backup restore (ZIP), use Import / Export.
+ * Preview screen for industry pack bundle (JSON) contents and conflict analysis (Prompt 419, SPR-007).
+ * The screen renders conflicts and, when permitted, offers an apply action to import the selected bundle content.
  *
  * @package AIOPageBuilder
  */
@@ -22,7 +21,7 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
- * Renders industry bundle preview (contents and conflicts). Apply not implemented (SPR-007 deferred); use Import / Export for full restore.
+ * Renders industry bundle preview (contents and conflicts) and provides an apply form when permitted.
  */
 final class Industry_Bundle_Import_Preview_Screen {
 

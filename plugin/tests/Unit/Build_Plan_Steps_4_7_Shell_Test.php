@@ -37,6 +37,8 @@ require_once $plugin_root . '/src/Domain/BuildPlan/Steps/SEO/SEO_Media_Step_UI_S
 require_once $plugin_root . '/src/Domain/BuildPlan/Steps/Finalization/Finalization_Step_UI_Service.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Steps/History/History_Rollback_Step_UI_Service.php';
 require_once $plugin_root . '/src/Domain/Styling/Global_Style_Settings_Repository.php';
+require_once $plugin_root . '/src/Domain/Styling/Global_Style_Settings_Schema.php';
+require_once $plugin_root . '/src/Infrastructure/Config/Option_Names.php';
 
 final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 
@@ -327,6 +329,53 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$this->assertTrue( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL ]['enabled'] );
 		$this->assertFalse( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED ]['enabled'] );
 		$this->assertTrue( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_DENY_ALL ]['enabled'] );
+		$this->assertArrayHasKey( Tokens_Step_UI_Service::BULK_CONTROL_EXECUTE_ALL_REMAINING, $workspace['bulk_action_states'] );
+		$this->assertArrayHasKey( Tokens_Step_UI_Service::BULK_CONTROL_EXECUTE_SELECTED, $workspace['bulk_action_states'] );
+		$this->assertFalse( $workspace['bulk_action_states'][ Tokens_Step_UI_Service::BULK_CONTROL_EXECUTE_ALL_REMAINING ]['enabled'] );
+		$this->assertFalse( $workspace['bulk_action_states'][ Tokens_Step_UI_Service::BULK_CONTROL_EXECUTE_SELECTED ]['enabled'] );
+	}
+
+	public function test_step4_tokens_execute_buttons_enabled_for_approved_when_can_execute(): void {
+		$resolver = new Build_Plan_Row_Action_Resolver();
+		$service  = new Tokens_Step_UI_Service( $resolver, new Global_Style_Settings_Repository() );
+		$items    = array(
+			array(
+				Build_Plan_Item_Schema::KEY_ITEM_ID   => 'plan_dt_0',
+				Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN,
+				Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::APPROVED,
+				Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
+					'token_group'    => 'colors',
+					'token_name'     => 'primary',
+					'proposed_value' => '#2563eb',
+					'rationale'      => 'Align with brand',
+					'confidence'     => 'high',
+				),
+			),
+		);
+
+		$def = $this->plan_definition_with_step_at( Tokens_Step_UI_Service::STEP_INDEX_DESIGN_TOKENS, Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS, $items );
+
+		$workspace_all = $service->build_workspace(
+			$def,
+			Tokens_Step_UI_Service::STEP_INDEX_DESIGN_TOKENS,
+			array( 'can_approve' => false, 'can_execute' => true ),
+			null,
+			array()
+		);
+
+		$this->assertTrue( $workspace_all['bulk_action_states'][ Tokens_Step_UI_Service::BULK_CONTROL_EXECUTE_ALL_REMAINING ]['enabled'] );
+		$this->assertSame( 1, (int) ( $workspace_all['bulk_action_states'][ Tokens_Step_UI_Service::BULK_CONTROL_EXECUTE_ALL_REMAINING ]['count_eligible'] ?? 0 ) );
+
+		$workspace_sel = $service->build_workspace(
+			$def,
+			Tokens_Step_UI_Service::STEP_INDEX_DESIGN_TOKENS,
+			array( 'can_execute' => true ),
+			null,
+			array( 'plan_dt_0' )
+		);
+
+		$this->assertTrue( $workspace_sel['bulk_action_states'][ Tokens_Step_UI_Service::BULK_CONTROL_EXECUTE_SELECTED ]['enabled'] );
+		$this->assertSame( 1, (int) ( $workspace_sel['bulk_action_states'][ Tokens_Step_UI_Service::BULK_CONTROL_EXECUTE_SELECTED ]['count_selected'] ?? 0 ) );
 	}
 
 	public function test_step5_seo_workspace_has_storage_path_placeholder(): void {

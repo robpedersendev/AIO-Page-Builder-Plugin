@@ -21,11 +21,20 @@ use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Repository;
+use AIOPageBuilder\Domain\Rollback\Diffs\Diff_Type_Keys;
+use AIOPageBuilder\Domain\Rollback\Diffs\Token_Diff_Summarizer;
+use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Repository_Interface;
 
 final class Tokens_Step_UI_Service {
 
 	/** Step index for design tokens in canonical step order. */
 	public const STEP_INDEX_DESIGN_TOKENS = 5;
+
+	/** Bulk execute-all control key for token execution. */
+	public const BULK_CONTROL_EXECUTE_ALL_REMAINING = 'execute_to_all_remaining';
+
+	/** Bulk execute-selected control key for token execution. */
+	public const BULK_CONTROL_EXECUTE_SELECTED = 'execute_to_selected';
 
 	/** Column order per spec §35. */
 	public const COLUMN_ORDER = array(
@@ -42,12 +51,28 @@ final class Tokens_Step_UI_Service {
 	/** @var Global_Style_Settings_Repository */
 	private $global_style_settings_repository;
 
+	/** @var Operational_Snapshot_Repository_Interface|null */
+	private ?Operational_Snapshot_Repository_Interface $operational_snapshot_repository;
+
+	/** @var Token_Diff_Summarizer|null */
+	private ?Token_Diff_Summarizer $token_diff_summarizer;
+
+	/** @var string|null Internal build-plan key for lookup of rollback/diff state. */
+	private ?string $current_plan_id = null;
+
 	/** @var array<string, array<string, string>>|null */
 	private ?array $current_tokens_cache = null;
 
-	public function __construct( Build_Plan_Row_Action_Resolver $row_action_resolver, Global_Style_Settings_Repository $global_style_settings_repository ) {
+	public function __construct(
+		Build_Plan_Row_Action_Resolver $row_action_resolver,
+		Global_Style_Settings_Repository $global_style_settings_repository,
+		?Operational_Snapshot_Repository_Interface $operational_snapshot_repository = null,
+		?Token_Diff_Summarizer $token_diff_summarizer = null
+	) {
 		$this->row_action_resolver = $row_action_resolver;
 		$this->global_style_settings_repository = $global_style_settings_repository;
+		$this->operational_snapshot_repository = $operational_snapshot_repository;
+		$this->token_diff_summarizer = $token_diff_summarizer;
 	}
 
 	/**
@@ -70,6 +95,9 @@ final class Tokens_Step_UI_Service {
 		if ( $step_index !== self::STEP_INDEX_DESIGN_TOKENS ) {
 			return $this->empty_workspace();
 		}
+		$this->current_plan_id = isset( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] ) && is_string( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] )
+			? $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ]
+			: null;
 		$steps_raw = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
@@ -84,15 +112,32 @@ final class Tokens_Step_UI_Service {
 
 		$items          = $this->eligible_items_from_step( $step );
 		$rows           = array();
-		$eligible_count = 0;
+		$pending_count = 0;
+		$approved_count = 0;
+		$selected_pending_count = 0;
+		$selected_approved_count = 0;
+		$selected_any_count = 0;
 		foreach ( $items as $item ) {
 			$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
 			if ( $item_id === '' ) {
 				continue;
 			}
 			$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING );
+			$is_selected = in_array( $item_id, $selected_item_ids, true );
 			if ( $status === Build_Plan_Item_Statuses::PENDING ) {
-				++$eligible_count;
+				++$pending_count;
+				if ( $is_selected ) {
+					++$selected_pending_count;
+					++$selected_any_count;
+				}
+			} elseif ( $status === Build_Plan_Item_Statuses::APPROVED ) {
+				++$approved_count;
+				if ( $is_selected ) {
+					++$selected_approved_count;
+					++$selected_any_count;
+				}
+			} elseif ( $is_selected ) {
+				++$selected_any_count;
 			}
 			$row_actions = $this->row_action_resolver->resolve( $item, $capabilities );
 			$rows[]      = array(
@@ -101,13 +146,13 @@ final class Tokens_Step_UI_Service {
 				Step_Item_List_Component::ROW_KEY_STATUS_BADGE => $this->status_to_badge( $status ),
 				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => $this->summary_columns_for_item( $item ),
 				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS => $row_actions,
-				Step_Item_List_Component::ROW_KEY_IS_SELECTED => in_array( $item_id, $selected_item_ids, true ),
+				Step_Item_List_Component::ROW_KEY_IS_SELECTED => $is_selected,
 			);
 		}
 
-		$bulk_states       = $this->bulk_states( $eligible_count, $capabilities, $selected_item_ids, $rows );
+		$bulk_states       = $this->bulk_states( $pending_count, $approved_count, $selected_pending_count, $selected_approved_count, $selected_any_count, $capabilities );
 		$detail_panel      = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
-		$step_messages     = $this->step_messages( count( $rows ), $eligible_count );
+		$step_messages     = $this->step_messages( count( $rows ), $pending_count );
 		$token_set_summary = $this->build_token_set_summary( $items );
 
 		return array(
@@ -174,13 +219,48 @@ final class Tokens_Step_UI_Service {
 			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ) !== $selected_item_id ) {
 				continue;
 			}
+			$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING );
 			$payload                     = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
 			$proposed_val                = $payload['proposed_value'] ?? null;
 			$proposed_str                = is_scalar( $proposed_val ) ? (string) $proposed_val : \wp_json_encode( $proposed_val );
 			$group                        = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? $payload['token_group'] : '';
 			$name                         = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? $payload['token_name'] : '';
+			$token_set_ref               = ( $group !== '' && $name !== '' ) ? $group . ':' . $name : '';
 			$current_str                  = $this->current_value_for_token( $group, $name );
 			$has_current                  = $current_str !== '';
+			$rollback_info               = $this->rollback_info_for_token_set_ref( $token_set_ref );
+			$rollback_eligible           = ! empty( $rollback_info['rollback_eligible'] );
+			$pre_snapshot_id             = (string) ( $rollback_info['pre_snapshot_id'] ?? '' );
+			$post_snapshot_id            = (string) ( $rollback_info['post_snapshot_id'] ?? '' );
+			$diff_payload                = isset( $rollback_info['diff_payload'] ) && is_array( $rollback_info['diff_payload'] ) ? $rollback_info['diff_payload'] : array();
+			$diff_id                      = (string) ( $diff_payload['diff_id'] ?? '' );
+			$can_execute                  = ! empty( $capabilities['can_execute'] );
+			$execute_enabled             = $can_execute && $status === Build_Plan_Item_Statuses::APPROVED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
+			$retry_enabled               = $can_execute && $status === Build_Plan_Item_Statuses::FAILED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::FAILED, Build_Plan_Item_Statuses::IN_PROGRESS );
+			$execution_state_lines       = array();
+			if ( $status === Build_Plan_Item_Statuses::PENDING ) {
+				$execution_state_lines[] = \__( 'Pending review; execution is disabled until approved.', 'aio-page-builder' );
+			} elseif ( $status === Build_Plan_Item_Statuses::APPROVED ) {
+				$execution_state_lines[] = $execute_enabled ? \__( 'Approved and ready for execution.', 'aio-page-builder' ) : \__( 'Approved but execution is disabled by permissions.', 'aio-page-builder' );
+			} elseif ( $status === Build_Plan_Item_Statuses::IN_PROGRESS ) {
+				$execution_state_lines[] = \__( 'Execution is in progress.', 'aio-page-builder' );
+			} elseif ( $status === Build_Plan_Item_Statuses::COMPLETED ) {
+				$execution_state_lines[] = \__( 'Execution completed.', 'aio-page-builder' );
+			} elseif ( $status === Build_Plan_Item_Statuses::FAILED ) {
+				$execution_state_lines[] = $retry_enabled ? \__( 'Execution failed; retry is available.', 'aio-page-builder' ) : \__( 'Execution failed; retry is disabled by state or permissions.', 'aio-page-builder' );
+			} else {
+				$execution_state_lines[] = \__( 'Execution is disabled in this state.', 'aio-page-builder' );
+			}
+			$execution_state_lines[] = \__( 'Rollback eligible:', 'aio-page-builder' ) . ' ' . ( $rollback_eligible ? 'yes' : 'no' );
+			if ( $rollback_eligible && $pre_snapshot_id !== '' ) {
+				$execution_state_lines[] = \__( 'Pre snapshot:', 'aio-page-builder' ) . ' ' . substr( $pre_snapshot_id, 0, 64 );
+			}
+			if ( $rollback_eligible && $post_snapshot_id !== '' ) {
+				$execution_state_lines[] = \__( 'Post snapshot:', 'aio-page-builder' ) . ' ' . substr( $post_snapshot_id, 0, 64 );
+			}
+			if ( $rollback_eligible && $diff_id !== '' ) {
+				$execution_state_lines[] = \__( 'Diff reference:', 'aio-page-builder' ) . ' ' . substr( $diff_id, 0, 64 );
+			}
 			$detail_panel['sections']    = array(
 				array(
 					'heading'       => \__( 'Token', 'aio-page-builder' ),
@@ -188,6 +268,7 @@ final class Tokens_Step_UI_Service {
 					'content_lines' => array(
 						\__( 'Group:', 'aio-page-builder' ) . ' ' . (string) ( $payload['token_group'] ?? '' ),
 						\__( 'Name:', 'aio-page-builder' ) . ' ' . (string) ( $payload['token_name'] ?? '' ),
+						\__( 'Token set:', 'aio-page-builder' ) . ' ' . (string) $token_set_ref,
 						\__( 'Proposed value:', 'aio-page-builder' ) . ' ' . $proposed_str,
 					),
 				),
@@ -205,10 +286,10 @@ final class Tokens_Step_UI_Service {
 					'content_lines' => array( (string) ( $payload['rationale'] ?? '—' ) ),
 				),
 				array(
-					'heading'       => \__( 'Revert / history', 'aio-page-builder' ),
-					'key'           => 'revert_history',
+					'heading'       => \__( 'Execution and rollback', 'aio-page-builder' ),
+					'key'           => 'execution_rollback',
 					'content_lines' => array(
-						\__( 'After execution, token changes are traceable and reversible via the plan rollback workflow.', 'aio-page-builder' ),
+						...$execution_state_lines,
 					),
 				),
 			);
@@ -216,6 +297,63 @@ final class Tokens_Step_UI_Service {
 			break;
 		}
 		return $detail_panel;
+	}
+
+	/**
+	 * Returns truthful rollback availability and diff reference for a token set.
+	 *
+	 * @param string $token_set_ref token_group:token_name
+	 * @return array<string, mixed> Empty when rollback/diff dependencies are unavailable.
+	 */
+	private function rollback_info_for_token_set_ref( string $token_set_ref ): array {
+		if ( $token_set_ref === '' || $this->operational_snapshot_repository === null || $this->current_plan_id === null ) {
+			return array(
+				'rollback_eligible' => false,
+			);
+		}
+		$entries = $this->operational_snapshot_repository->list_rollback_entries_for_plan( $this->current_plan_id );
+		if ( ! is_array( $entries ) || empty( $entries ) ) {
+			return array(
+				'rollback_eligible' => false,
+			);
+		}
+		$match = null;
+		foreach ( $entries as $entry ) {
+			if ( ! is_array( $entry ) ) {
+				continue;
+			}
+			$target_ref = isset( $entry['target_ref'] ) ? (string) $entry['target_ref'] : '';
+			if ( $target_ref === $token_set_ref ) {
+				$match = $entry;
+				break;
+			}
+		}
+		if ( $match === null ) {
+			return array(
+				'rollback_eligible' => false,
+			);
+		}
+		$pre_snapshot_id  = isset( $match['pre_snapshot_id'] ) ? (string) $match['pre_snapshot_id'] : '';
+		$post_snapshot_id = isset( $match['post_snapshot_id'] ) ? (string) $match['post_snapshot_id'] : '';
+
+		$diff_payload = array();
+		if ( $this->token_diff_summarizer !== null && $pre_snapshot_id !== '' && $post_snapshot_id !== '' ) {
+			$pre_snapshot = $this->operational_snapshot_repository->get_by_id( $pre_snapshot_id );
+			$post_snapshot = $this->operational_snapshot_repository->get_by_id( $post_snapshot_id );
+			if ( is_array( $pre_snapshot ) && is_array( $post_snapshot ) ) {
+				$diff_result = $this->token_diff_summarizer->summarize( $pre_snapshot, $post_snapshot, Diff_Type_Keys::LEVEL_SUMMARY );
+				if ( $diff_result->is_success() ) {
+					$diff_payload = $diff_result->to_array();
+				}
+			}
+		}
+
+		return array(
+			'rollback_eligible' => true,
+			'pre_snapshot_id'   => $pre_snapshot_id,
+			'post_snapshot_id'  => $post_snapshot_id,
+			'diff_payload'      => $diff_payload,
+		);
 	}
 
 	private function build_token_set_summary( array $items ): array {
@@ -233,32 +371,53 @@ final class Tokens_Step_UI_Service {
 		);
 	}
 
-	private function bulk_states( int $eligible_count, array $capabilities, array $selected_item_ids, array $rows ): array {
-		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
+	private function bulk_states(
+		int $pending_count,
+		int $approved_count,
+		int $selected_pending_count,
+		int $selected_approved_count,
+		int $selected_any_count,
+		array $capabilities
+	): array {
 		$can_approve    = ! empty( $capabilities['can_approve'] );
-		$apply_all_ok   = $can_approve && $eligible_count > 0;
-		$apply_sel_ok   = $can_approve && $selected_count > 0;
-		$deny_all_ok    = $can_approve && $eligible_count > 0;
+		$can_execute    = ! empty( $capabilities['can_execute'] );
+
+		$apply_all_ok   = $can_approve && $pending_count > 0;
+		$apply_sel_ok   = $can_approve && $selected_pending_count > 0;
+		$deny_all_ok    = $can_approve && $pending_count > 0;
+
+		$exec_all_ok    = $can_execute && $approved_count > 0;
+		$exec_sel_ok    = $can_execute && $selected_approved_count > 0;
 
 		return array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 				'enabled'        => $apply_all_ok,
 				'label'          => \__( 'Apply all tokens', 'aio-page-builder' ),
-				'count_eligible' => $eligible_count,
+				'count_eligible' => $pending_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
 				'enabled'        => $apply_sel_ok,
 				'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
-				'count_selected' => $selected_count,
+				'count_selected' => $selected_pending_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
 				'enabled'        => $deny_all_ok,
 				'label'          => \__( 'Deny all', 'aio-page-builder' ),
-				'count_eligible' => $eligible_count,
+				'count_eligible' => $pending_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
-				'enabled' => $selected_count > 0,
+				'enabled' => $selected_any_count > 0,
 				'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+			),
+			self::BULK_CONTROL_EXECUTE_ALL_REMAINING => array(
+				'enabled'        => $exec_all_ok,
+				'label'          => \__( 'Execute all remaining', 'aio-page-builder' ),
+				'count_eligible' => $approved_count,
+			),
+			self::BULK_CONTROL_EXECUTE_SELECTED => array(
+				'enabled'        => $exec_sel_ok,
+				'label'          => \__( 'Execute selected', 'aio-page-builder' ),
+				'count_selected' => $selected_approved_count,
 			),
 		);
 	}
@@ -348,6 +507,16 @@ final class Tokens_Step_UI_Service {
 				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
 					'enabled' => false,
 					'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+				),
+				self::BULK_CONTROL_EXECUTE_ALL_REMAINING => array(
+					'enabled'        => false,
+					'label'          => \__( 'Execute all remaining', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				self::BULK_CONTROL_EXECUTE_SELECTED => array(
+					'enabled'        => false,
+					'label'          => \__( 'Execute selected', 'aio-page-builder' ),
+					'count_selected' => 0,
 				),
 			),
 			'detail_panel'           => array(

@@ -3,7 +3,7 @@
  * Root bootstrap plugin class.
  *
  * Single controlled entry point for activation, deactivation, and runtime.
- * Wires lifecycle hooks and delegates to domain only via services added in later prompts.
+ * Wires lifecycle hooks and delegates to domain services via registered providers.
  *
  * @package AIOPageBuilder
  */

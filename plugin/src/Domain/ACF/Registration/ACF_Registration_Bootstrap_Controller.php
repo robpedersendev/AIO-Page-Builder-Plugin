@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Single central ACF registration bootstrap. Generic acf/init must call this
  * instead of calling register_all() directly. Extension point for context-aware
- * registration (front-end skip, admin page-scoped) in later prompts.
+ * registration (front-end skip, admin page-scoped).
  */
 final class ACF_Registration_Bootstrap_Controller {
 
