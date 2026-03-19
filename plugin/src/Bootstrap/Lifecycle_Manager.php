@@ -219,7 +219,8 @@ final class Lifecycle_Manager {
 		}
 	}
 
-	// ----- Activation phase placeholders (spec §53.1, §53.2) -----
+	// Activation lifecycle phase.
+	// Dependency checks are performed inside validate_environment() for this v1.
 
 	private function validate_environment(): Lifecycle_Result {
 		$validator = new Environment_Validator();
@@ -513,7 +514,8 @@ final class Lifecycle_Manager {
 		);
 	}
 
-	// ----- Deactivation phase placeholders -----
+	// Deactivation lifecycle phase.
+	// In v1, deactivation focuses on heartbeat unscheduling and runtime teardown scope.
 
 	private function unschedule(): void {
 		\AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler::unschedule();
@@ -521,10 +523,12 @@ final class Lifecycle_Manager {
 	}
 
 	private function teardown_runtime(): void {
-		// Placeholder: flush caches, stop workers. No deletion of options or content.
+		// No-op currently: v1 deactivation does not flush caches or stop workers here.
+		// Runtime cleanup is intentionally scoped to other deactivation handlers.
 	}
 
-	// ----- Uninstall phase placeholders (spec §52.11, §9.12) -----
+	// Uninstall lifecycle phase.
+	// In v1, uninstall may export reminders and run conditional cleanup when confirmed.
 
 	private function export_reminder_integration(): void {
 		// * Export choices are presented on the admin Uninstall screen (Uninstall_Export_Prompt_Service).

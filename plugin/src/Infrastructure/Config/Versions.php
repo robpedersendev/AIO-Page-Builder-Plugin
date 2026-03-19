@@ -15,8 +15,8 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Exposes version identifiers for upgrade detection, migration control, and schema compatibility.
- * Machine-readable and immutable at runtime. Future prompts may append domain-specific keys
- * but must not rename the root keys defined here (spec §58.4, §58.5).
+ * Machine-readable and immutable at runtime. The version map may be extended with new
+ * domain-specific keys without renaming the root keys defined here (spec §58.4, §58.5).
  */
 final class Versions {
 
