@@ -32,8 +32,9 @@ final class History_Rollback_Step_UI_Service {
 		'event_at',
 		'action_type',
 		'scope',
-		'before_after',
-		'rollback_eligible',
+		'actor',
+		'result',
+		'rollback',
 	);
 
 	/**
@@ -146,24 +147,7 @@ final class History_Rollback_Step_UI_Service {
 				);
 			}
 		}
-		if ( empty( $rows ) ) {
-			$rows = array(
-				array(
-					Step_Item_List_Component::ROW_KEY_ITEM_ID => 'placeholder_0',
-					Step_Item_List_Component::ROW_KEY_STATUS  => '',
-					Step_Item_List_Component::ROW_KEY_STATUS_BADGE => '',
-					Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => array(
-						'event_at'          => '—',
-						'action_type'       => \__( 'No history recorded yet (placeholder).', 'aio-page-builder' ),
-						'scope'             => '—',
-						'before_after'      => '—',
-						'rollback_eligible' => '—',
-					),
-					Step_Item_List_Component::ROW_KEY_ROW_ACTIONS => array(),
-					Step_Item_List_Component::ROW_KEY_IS_SELECTED => false,
-				),
-			);
-		}
+		// Empty state is handled at screen level; do not inject placeholder rows.
 
 		$bulk_states                      = array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
@@ -192,12 +176,12 @@ final class History_Rollback_Step_UI_Service {
 				array(
 					'heading'       => \__( 'Before / after snapshot', 'aio-page-builder' ),
 					'key'           => 'snapshot',
-					'content_lines' => array( \__( 'Placeholder — no snapshot capture in this step.', 'aio-page-builder' ) ),
+					'content_lines' => array( \__( 'Select a history row to view snapshot references and rollback details.', 'aio-page-builder' ) ),
 				),
 				array(
 					'heading'       => \__( 'Audit trail', 'aio-page-builder' ),
 					'key'           => 'audit',
-					'content_lines' => array( \__( 'Immutable audit trail (placeholder).', 'aio-page-builder' ) ),
+					'content_lines' => array( \__( 'Audit trail entries are derived from execution snapshots and job results.', 'aio-page-builder' ) ),
 				),
 			),
 			'row_actions' => array(),

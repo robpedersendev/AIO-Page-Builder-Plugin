@@ -258,7 +258,7 @@ final class Build_Plan_Step1_Existing_Page_Updates_Test extends TestCase {
 		$workspace = $ui->build_workspace( $def, 1, array( 'can_approve' => true ), null, array() );
 		$this->assertSame( Existing_Page_Updates_UI_Service::COLUMN_ORDER, $workspace['column_order'] );
 		$this->assertSame( 'current_page_title', $workspace['column_order'][0] );
-		$this->assertContains( 'template_links', $workspace['column_order'] );
+		$this->assertContains( 'risk_level', $workspace['column_order'] );
 	}
 
 	/** With template change builder, rows have existing_page_template_change_summary and replacement_reason_summary (Prompt 193). */

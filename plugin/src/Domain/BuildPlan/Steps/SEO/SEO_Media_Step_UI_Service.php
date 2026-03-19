@@ -32,8 +32,10 @@ final class SEO_Media_Step_UI_Service {
 	/** Column order per spec §36. */
 	public const COLUMN_ORDER = array(
 		'target_page_title_or_url',
+		'action_type',
+		'current',
+		'proposed',
 		'confidence',
-		'storage_path_indicator',
 	);
 
 	/** @var Build_Plan_Row_Action_Resolver */
@@ -88,8 +90,7 @@ final class SEO_Media_Step_UI_Service {
 				++$eligible_count;
 			}
 			$row_actions       = $this->row_action_resolver->resolve( $item, $capabilities );
-			$payload           = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
-			$storage_indicator = (string) ( $payload['storage_path_indicator'] ?? 'plugin_advisory' );
+			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
 			$rows[]            = array(
 				Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
 				Step_Item_List_Component::ROW_KEY_STATUS  => $status,
@@ -113,18 +114,12 @@ final class SEO_Media_Step_UI_Service {
 				)
 			);
 		}
-		$seo_storage_path_placeholder = array(
-			'integration' => 'plugin_advisory',
-			'description' => \__( 'Recommendation-only; no write execution in this step.', 'aio-page-builder' ),
-		);
-
 		return array(
 			'step_list_rows'               => $rows,
 			'column_order'                 => self::COLUMN_ORDER,
 			'bulk_action_states'           => $bulk_states,
 			'detail_panel'                 => $detail_panel,
 			'step_messages'                => $step_messages,
-			'seo_storage_path_placeholder' => $seo_storage_path_placeholder,
 		);
 	}
 
@@ -152,9 +147,6 @@ final class SEO_Media_Step_UI_Service {
 		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
 			$val = $payload[ $key ] ?? '';
-			if ( $key === 'storage_path_indicator' && $val === '' ) {
-				$val = 'plugin_advisory';
-			}
 			$cols[ $key ] = is_string( $val ) ? $val : (string) \wp_json_encode( $val );
 		}
 		return $cols;
@@ -184,11 +176,6 @@ final class SEO_Media_Step_UI_Service {
 					'heading'       => \__( 'Title / meta / schema / media', 'aio-page-builder' ),
 					'key'           => 'recommendations',
 					'content_lines' => array( \__( 'SEO and meta updates are not available in this version. Recommendations are for review only.', 'aio-page-builder' ) ),
-				),
-				array(
-					'heading'       => \__( 'Storage path', 'aio-page-builder' ),
-					'key'           => 'storage_path',
-					'content_lines' => array( \esc_html( (string) ( $payload['storage_path_indicator'] ?? 'plugin_advisory' ) ) ),
 				),
 			);
 			$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $item, $capabilities );

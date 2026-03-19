@@ -36,10 +36,8 @@ final class New_Page_Creation_UI_Service {
 		'proposed_slug',
 		'purpose',
 		'template_key',
-		'template_links',
 		'hierarchy_position',
 		'page_type',
-		'confidence',
 	);
 
 	/** Minimum confidence for item to appear (spec §33.2: exclude low). */

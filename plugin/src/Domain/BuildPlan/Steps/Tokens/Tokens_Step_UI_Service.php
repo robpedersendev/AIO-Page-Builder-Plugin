@@ -34,8 +34,8 @@ final class Tokens_Step_UI_Service {
 	public const COLUMN_ORDER = array(
 		'token_group',
 		'token_name',
+		'current_value',
 		'proposed_value',
-		'rationale',
 		'confidence',
 	);
 

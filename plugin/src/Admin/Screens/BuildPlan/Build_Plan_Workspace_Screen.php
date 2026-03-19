@@ -44,17 +44,22 @@ final class Build_Plan_Workspace_Screen {
 		return Capabilities::VIEW_BUILD_PLANS;
 	}
 
-	/** Nonce action for Step 1 approve/deny and bulk actions. */
-	public const NONCE_ACTION_STEP1_REVIEW = 'aio_build_plan_step1_review';
-
-	/** Nonce action for Step 2 build-intent and bulk actions. */
-	public const NONCE_ACTION_STEP2_REVIEW = 'aio_build_plan_step2_review';
-
-	/** Nonce action for Step 3 (navigation) approve/deny and bulk actions. */
-	public const NONCE_ACTION_NAVIGATION_REVIEW = 'aio_build_plan_navigation_review';
+	/** Bulk nonce action (required contract). */
+	public const NONCE_ACTION_BULK = 'aio_pb_build_plan_bulk_action';
 
 	/** Nonce action for Step 7 (logs/rollback) rollback request. */
 	public const NONCE_ACTION_ROLLBACK = 'aio_build_plan_rollback_request';
+
+	/**
+	 * Returns row action nonce key for an item id (required contract).
+	 *
+	 * @param string $item_id
+	 * @return string
+	 */
+	private function row_nonce_action( string $item_id ): string {
+		$item_id = \sanitize_text_field( $item_id );
+		return $item_id !== '' ? 'aio_pb_build_plan_row_action_' . $item_id : '';
+	}
 
 	/**
 	 * Renders workspace for the given plan_id. Exits with not-found message if plan missing.
@@ -108,7 +113,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
 			$action = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
 			$nonce  = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
-			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_STEP1_REVIEW ) ) {
+			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_BULK ) ) {
 				return false;
 			}
 			if ( $action !== 'bulk_approve_step1' && $action !== 'bulk_approve_selected_step1' && $action !== 'bulk_deny_step1' ) {
@@ -148,7 +153,8 @@ final class Build_Plan_Workspace_Screen {
 		$get_action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
 		$item_id    = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
 		$nonce      = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
-		if ( ( $get_action === 'approve_item' || $get_action === 'deny_item' ) && $item_id !== '' && \wp_verify_nonce( $nonce, self::NONCE_ACTION_STEP1_REVIEW ) ) {
+		$row_nonce_action = $this->row_nonce_action( $item_id );
+		if ( ( $get_action === 'approve_item' || $get_action === 'deny_item' ) && $item_id !== '' && $row_nonce_action !== '' && \wp_verify_nonce( $nonce, $row_nonce_action ) ) {
 			$state = $this->get_state( $plan_id );
 			if ( $state === null ) {
 				return false;
@@ -188,7 +194,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
 			$action = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
 			$nonce  = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
-			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_STEP2_REVIEW ) ) {
+			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_BULK ) ) {
 				return false;
 			}
 			if ( $action !== 'bulk_build_all_step2' && $action !== 'bulk_build_selected_step2' && $action !== 'bulk_deny_all_step2' ) {
@@ -244,7 +250,8 @@ final class Build_Plan_Workspace_Screen {
 		$get_action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
 		$item_id    = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
 		$nonce      = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
-		if ( $get_step === '2' && ( $get_action === 'approve_item' || $get_action === 'deny_item' ) && $item_id !== '' && \wp_verify_nonce( $nonce, self::NONCE_ACTION_STEP2_REVIEW ) ) {
+		$row_nonce_action = $this->row_nonce_action( $item_id );
+		if ( $get_step === '2' && ( $get_action === 'approve_item' || $get_action === 'deny_item' ) && $item_id !== '' && $row_nonce_action !== '' && \wp_verify_nonce( $nonce, $row_nonce_action ) ) {
 			$state = $this->get_state( $plan_id );
 			if ( $state === null ) {
 				return false;
@@ -679,9 +686,8 @@ final class Build_Plan_Workspace_Screen {
 		$bulk_component    = new Bulk_Action_Bar_Component();
 		$list_component    = new Step_Item_List_Component();
 		$detail_component  = new Detail_Panel_Component();
-		$step1_bulk_nonce  = $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ? \wp_nonce_field( self::NONCE_ACTION_STEP1_REVIEW, '_wpnonce', false, false ) : '';
-		$step2_bulk_nonce  = $step_type === Build_Plan_Schema::STEP_TYPE_NEW_PAGES ? \wp_nonce_field( self::NONCE_ACTION_STEP2_REVIEW, '_wpnonce', false, false ) : '';
-		$nav_bulk_nonce    = $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION ? \wp_nonce_field( self::NONCE_ACTION_NAVIGATION_REVIEW, '_wpnonce', false, false ) : '';
+		$bulk_nonce_html   = \wp_nonce_field( self::NONCE_ACTION_BULK, '_wpnonce', false, false );
+		$nav_bulk_nonce    = $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION ? $bulk_nonce_html : '';
 		$step_title        = (string) ( $current_step['title'] ?? $current_step['step_type'] ?? __( 'Step', 'aio-page-builder' ) );
 		?>
 		<div class="aio-step-workspace-actionable" role="region" aria-labelledby="aio-step-workspace-heading">
@@ -705,9 +711,9 @@ final class Build_Plan_Workspace_Screen {
 						<form method="post" class="aio-step-bulk-and-list-form">
 							<?php
 							if ( $step_type === Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES ) {
-								$this->render_step1_bulk_forms( $workspace['bulk_action_states'] ?? array(), $step1_bulk_nonce );
+								$this->render_step1_bulk_forms( $workspace['bulk_action_states'] ?? array(), $bulk_nonce_html );
 							} else {
-								$this->render_step2_bulk_forms( $workspace['bulk_action_states'] ?? array(), $step2_bulk_nonce, array() );
+								$this->render_step2_bulk_forms( $workspace['bulk_action_states'] ?? array(), $bulk_nonce_html, array() );
 							}
 							$list_component->render( $list_payload, $detail_item_id );
 							?>
@@ -733,7 +739,6 @@ final class Build_Plan_Workspace_Screen {
 	private function inject_step1_action_urls( array &$workspace, string $plan_id ): void {
 		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
 		$base   = $router ? (string) $router->url( 'build_plan_workspace', array( 'plan_id' => $plan_id, 'step' => 1 ) ) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
-		$nonce = \wp_create_nonce( self::NONCE_ACTION_STEP1_REVIEW );
 		$rows  = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
@@ -741,6 +746,7 @@ final class Build_Plan_Workspace_Screen {
 				if ( $item_id === '' ) {
 					continue;
 				}
+				$nonce   = \wp_create_nonce( $this->row_nonce_action( $item_id ) );
 				$actions = isset( $row['row_actions'] ) && is_array( $row['row_actions'] ) ? $row['row_actions'] : array();
 				$workspace['step_list_rows'][ $i ]['row_actions'] = $this->add_urls_to_approve_deny( $actions, $item_id, $base, $nonce );
 				$template_key                                     = (string) ( $row['summary_columns']['target_template'] ?? $row['existing_page_template_change_summary']['template_key'] ?? '' );
@@ -762,6 +768,7 @@ final class Build_Plan_Workspace_Screen {
 		$detail = &$workspace['detail_panel'];
 		if ( is_array( $detail ) && isset( $detail['row_actions'] ) && is_array( $detail['row_actions'] ) ) {
 			$detail_item_id        = (string) ( $detail['item_id'] ?? '' );
+			$nonce                 = $detail_item_id !== '' ? \wp_create_nonce( $this->row_nonce_action( $detail_item_id ) ) : '';
 			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
 		}
 
@@ -816,7 +823,6 @@ final class Build_Plan_Workspace_Screen {
 	private function inject_step2_action_urls( array &$workspace, string $plan_id ): void {
 		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
 		$base   = $router ? (string) $router->url( 'build_plan_workspace', array( 'plan_id' => $plan_id, 'step' => 2 ) ) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
-		$nonce = \wp_create_nonce( self::NONCE_ACTION_STEP2_REVIEW );
 		$rows  = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
@@ -824,6 +830,7 @@ final class Build_Plan_Workspace_Screen {
 				if ( $item_id === '' ) {
 					continue;
 				}
+				$nonce   = \wp_create_nonce( $this->row_nonce_action( $item_id ) );
 				$actions = isset( $row['row_actions'] ) && is_array( $row['row_actions'] ) ? $row['row_actions'] : array();
 				$workspace['step_list_rows'][ $i ]['row_actions'] = $this->add_urls_to_approve_deny( $actions, $item_id, $base, $nonce );
 				$template_key                                     = (string) ( $row['summary_columns']['template_key'] ?? '' );
@@ -845,6 +852,7 @@ final class Build_Plan_Workspace_Screen {
 		$detail = &$workspace['detail_panel'];
 		if ( is_array( $detail ) && isset( $detail['row_actions'] ) && is_array( $detail['row_actions'] ) ) {
 			$detail_item_id        = (string) ( $detail['item_id'] ?? '' );
+			$nonce                 = $detail_item_id !== '' ? \wp_create_nonce( $this->row_nonce_action( $detail_item_id ) ) : '';
 			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
 		}
 

@@ -361,7 +361,7 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
 		$this->assertSame( New_Page_Creation_UI_Service::COLUMN_ORDER, $workspace['column_order'] );
 		$this->assertSame( 'proposed_page_title', $workspace['column_order'][0] );
-		$this->assertContains( 'template_links', $workspace['column_order'] );
+		$this->assertContains( 'template_key', $workspace['column_order'] );
 	}
 
 	/** With recommendation builder, rows have proposed_template_summary, group_label, template_links column (Prompt 192). */

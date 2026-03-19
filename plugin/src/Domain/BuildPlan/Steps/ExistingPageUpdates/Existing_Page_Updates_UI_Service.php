@@ -34,8 +34,6 @@ final class Existing_Page_Updates_UI_Service {
 		'current_page_url',
 		'action',
 		'target_template',
-		'template_links',
-		'reason',
 		'risk_level',
 	);
 

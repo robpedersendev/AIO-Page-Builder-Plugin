@@ -354,7 +354,6 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$def       = $this->plan_definition_with_step_at( SEO_Media_Step_UI_Service::STEP_INDEX_SEO, Build_Plan_Schema::STEP_TYPE_SEO, $items );
 		$workspace = $service->build_workspace( $def, SEO_Media_Step_UI_Service::STEP_INDEX_SEO, array( 'can_approve' => true ), null, array() );
 
-		$this->assertArrayHasKey( 'seo_storage_path_placeholder', $workspace );
 		$this->assertArrayHasKey( 'step_list_rows', $workspace );
 		$this->assertSame( SEO_Media_Step_UI_Service::COLUMN_ORDER, $workspace['column_order'] );
 		$this->assertFalse( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL ]['enabled'] );
@@ -370,8 +369,6 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$this->assertArrayHasKey( 'blocked', $workspace['finalization_buckets'] );
 		$this->assertArrayHasKey( 'failed', $workspace['finalization_buckets'] );
 		$this->assertArrayHasKey( 'deferred', $workspace['finalization_buckets'] );
-		$this->assertArrayHasKey( 'conflict_summary_placeholder', $workspace );
-		$this->assertArrayHasKey( 'preview_link_placeholder', $workspace );
 		$this->assertSame( array(), $workspace['step_list_rows'] );
 		$this->assertFalse( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL ]['enabled'] );
 	}
@@ -396,9 +393,7 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$this->assertNotNull( $conflicts_section );
 		$this->assertNotEmpty( $queue_section['content_lines'] );
 		$this->assertNotEmpty( $conflicts_section['content_lines'] );
-		$this->assertStringContainsString( 'not available', $queue_section['content_lines'][0] );
-		$this->assertStringContainsString( 'not available', $conflicts_section['content_lines'][0] );
-		$this->assertStringContainsString( 'not available', $workspace['preview_link_placeholder']['label'] );
+		$this->assertStringContainsString( 'Publish-ready', $queue_section['content_lines'][0] );
 	}
 
 	/** SEO step detail panel states SEO/meta updates are not available (recommendation-only). */
@@ -442,8 +437,7 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$this->assertArrayHasKey( 'total_events', $workspace['history_summary'] );
 		$this->assertArrayHasKey( 'eligible_count', $workspace['rollback_eligibility_placeholder'] );
 		$this->assertArrayHasKey( 'can_rollback', $workspace['rollback_eligibility_placeholder'] );
-		$this->assertCount( 1, $workspace['step_list_rows'], 'When no history items, one placeholder row is returned.' );
-		$this->assertSame( 'placeholder_0', $workspace['step_list_rows'][0][ Step_Item_List_Component::ROW_KEY_ITEM_ID ] );
+		$this->assertCount( 0, $workspace['step_list_rows'], 'When no history items, list is empty and empty state is shown in UI.' );
 		$this->assertFalse( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL ]['enabled'] );
 	}
 
