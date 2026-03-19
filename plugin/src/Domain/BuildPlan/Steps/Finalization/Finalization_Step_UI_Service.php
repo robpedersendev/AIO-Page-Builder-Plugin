@@ -2,8 +2,8 @@
 /**
  * Step 6 (review, publish, finalization) workspace shell (spec §37, Prompt 076).
  *
- * Renders finalization queue buckets and copy that state publish/preview/conflict reporting
- * are not available in this version. No publish execution.
+ * Renders finalization queue buckets and conflict summary. Finalization execution is performed
+ * by the execution engine (finalize_plan) when invoked from the workspace.
  *
  * @package AIOPageBuilder
  */
@@ -34,7 +34,7 @@ final class Finalization_Step_UI_Service {
 	 * @param array<string, bool>  $capabilities can_approve, can_execute, can_view_artifacts.
 	 * @param string|null          $selected_item_id Unused; detail may show queue summary.
 	 * @param array<int, string>   $selected_item_ids Unused.
-	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages, finalization_buckets?, conflict_summary_placeholder?, preview_link_placeholder?
+	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages, finalization_buckets, conflict_summary, preview_link
 	 */
 	public function build_workspace(
 		array $plan_definition,
@@ -149,7 +149,7 @@ final class Finalization_Step_UI_Service {
 		$step_messages                = array(
 			array(
 				'severity' => 'info',
-				'message'  => \__( 'Review approved items and confirm when ready. Execution is not performed in this step.', 'aio-page-builder' ),
+				'message'  => \__( 'Review conflicts and finalize when ready. Finalization re-checks readiness and will not proceed when blocked.', 'aio-page-builder' ),
 				'level'    => 'step',
 			),
 		);

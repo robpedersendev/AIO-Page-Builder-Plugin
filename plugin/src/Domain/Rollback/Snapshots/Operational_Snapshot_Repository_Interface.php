@@ -49,4 +49,13 @@ interface Operational_Snapshot_Repository_Interface {
 	 * @return array<int, array{post_snapshot_id: string, pre_snapshot_id: string, action_type: string, target_ref: string, created_at: string}>
 	 */
 	public function list_rollback_entries_for_plan( string $plan_id ): array;
+
+	/**
+	 * Lists post-change snapshots in optional date range for analytics.
+	 *
+	 * @param string|null $date_from Y-m-d.
+	 * @param string|null $date_to   Y-m-d.
+	 * @return list<array<string, mixed>> Snapshot roots (post_change only).
+	 */
+	public function list_post_change_snapshots_for_period( ?string $date_from = null, ?string $date_to = null ): array;
 }

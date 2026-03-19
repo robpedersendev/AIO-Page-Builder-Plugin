@@ -160,6 +160,51 @@ final class Operational_Snapshot_Repository implements Operational_Snapshot_Repo
 	}
 
 	/**
+	 * Lists post-change snapshots in optional date range for analytics.
+	 *
+	 * @param string|null $date_from Y-m-d.
+	 * @param string|null $date_to   Y-m-d.
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_post_change_snapshots_for_period( ?string $date_from = null, ?string $date_to = null ): array {
+		$store = \get_option( self::OPTION_KEY, array() );
+		if ( ! is_array( $store ) ) {
+			$store = array();
+		}
+		$from_ts = $date_from !== null && $date_from !== '' ? strtotime( $date_from . ' 00:00:00' ) : false;
+		$to_ts   = $date_to !== null && $date_to !== '' ? strtotime( $date_to . ' 23:59:59' ) : false;
+
+		$out = array();
+		foreach ( $store as $snap ) {
+			if ( ! is_array( $snap ) ) {
+				continue;
+			}
+			$type = isset( $snap[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] )
+				? $snap[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ]
+				: '';
+			if ( $type !== Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE ) {
+				continue;
+			}
+			$created_at = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+				? $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ]
+				: '';
+			$ts         = $created_at !== '' ? strtotime( $created_at ) : false;
+			if ( $ts === false ) {
+				$out[] = $snap;
+				continue;
+			}
+			if ( $from_ts !== false && $ts < $from_ts ) {
+				continue;
+			}
+			if ( $to_ts !== false && $ts > $to_ts ) {
+				continue;
+			}
+			$out[] = $snap;
+		}
+		return $out;
+	}
+
+	/**
 	 * Keeps at most MAX_SNAPSHOTS entries; evicts oldest by created_at.
 	 *
 	 * @param array<string, array<string, mixed>> $store

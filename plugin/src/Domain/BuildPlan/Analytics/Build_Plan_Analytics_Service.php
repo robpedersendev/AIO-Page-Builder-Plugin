@@ -230,59 +230,83 @@ final class Build_Plan_Analytics_Service {
 	}
 
 	/**
-	 * Rollback frequency summary. Stub: uses plan history only; rollback table not queried (spec §59.12).
+	 * Rollback metrics summary derived from operational snapshots:
+	 * - completed_rollbacks: count of rollback_action post-change snapshots in scope
+	 * - rollback_eligible_completed_executions: count of rollback-eligible post-change snapshots excluding rollback_action
+	 * - rollback_rate: completed_rollbacks / rollback_eligible_completed_executions (0 when denominator is 0)
 	 *
 	 * @param string|null $date_from Y-m-d.
 	 * @param string|null $date_to   Y-m-d.
-	 * @return array{total_rollbacks: int, by_month: array<int, array{month: string, count: int}>, date_from: string|null, date_to: string|null, source: string}
+	 * @return array{completed_rollbacks: int, rollback_eligible_completed_executions: int, rollback_rate: float|null, by_month: array<int, array{month: string, completed_rollbacks: int, rollback_eligible_completed_executions: int}>, date_from: string|null, date_to: string|null, source: string}
 	 */
 	public function get_rollback_frequency_summary( ?string $date_from = null, ?string $date_to = null ): array {
 		if ( $this->snapshot_repository === null ) {
 			return array(
-				'total_rollbacks' => 0,
-				'by_month'        => array(),
-				'date_from'       => $date_from,
-				'date_to'         => $date_to,
-				'source'          => 'plan_analytics_only',
+				'completed_rollbacks'                    => 0,
+				'rollback_eligible_completed_executions' => 0,
+				'rollback_rate'                          => 0.0,
+				'by_month'                               => array(),
+				'date_from'                              => $date_from,
+				'date_to'                                => $date_to,
+				'source'                                 => 'unavailable',
 			);
 		}
-		$plans = $this->get_plans_for_period( $date_from, $date_to );
-		$by_m = array();
-		$total = 0;
-		foreach ( $plans as $plan ) {
-			$plan_id = (string) ( $plan[ Build_Plan_Schema::KEY_PLAN_ID ] ?? $plan['plan_id'] ?? $plan['internal_key'] ?? '' );
-			if ( $plan_id === '' ) {
+
+		$post_change = $this->snapshot_repository->list_post_change_snapshots_for_period( $date_from, $date_to );
+		$by_month    = array();
+
+		$completed_rollbacks = 0;
+		$eligible_execs      = 0;
+
+		foreach ( $post_change as $snap ) {
+			if ( ! is_array( $snap ) ) {
 				continue;
 			}
-			$entries = $this->snapshot_repository->list_rollback_entries_for_plan( $plan_id );
-			foreach ( $entries as $e ) {
-				$created_at = (string) ( $e['created_at'] ?? '' );
-				if ( $created_at === '' ) {
-					continue;
-				}
-				$ts = strtotime( $created_at );
-				if ( $ts === false ) {
-					continue;
-				}
-				$month = gmdate( 'Y-m', $ts );
-				$by_m[ $month ] = ( $by_m[ $month ] ?? 0 ) + 1;
-				++$total;
+			$created_at = isset( $snap['created_at'] ) && is_string( $snap['created_at'] ) ? $snap['created_at'] : '';
+			$ts         = $created_at !== '' ? strtotime( $created_at ) : false;
+			$month      = $ts !== false ? gmdate( 'Y-m', $ts ) : 'unknown';
+			if ( ! isset( $by_month[ $month ] ) ) {
+				$by_month[ $month ] = array(
+					'completed_rollbacks'                    => 0,
+					'rollback_eligible_completed_executions' => 0,
+				);
+			}
+
+			$action_type = isset( $snap['action_type'] ) && is_string( $snap['action_type'] ) ? $snap['action_type'] : '';
+			$eligible    = ! empty( $snap['rollback_eligible'] );
+
+			if ( $action_type === \AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types::ROLLBACK_ACTION ) {
+				++$completed_rollbacks;
+				++$by_month[ $month ]['completed_rollbacks'];
+				continue;
+			}
+
+			if ( $eligible ) {
+				++$eligible_execs;
+				++$by_month[ $month ]['rollback_eligible_completed_executions'];
 			}
 		}
-		ksort( $by_m, SORT_STRING );
-		$by_month = array();
-		foreach ( $by_m as $month => $count ) {
-			$by_month[] = array(
-				'month' => (string) $month,
-				'count' => (int) $count,
+
+		ksort( $by_month, SORT_STRING );
+		$by_month_list = array();
+		foreach ( $by_month as $m => $row ) {
+			$by_month_list[] = array(
+				'month'                                => (string) $m,
+				'completed_rollbacks'                  => (int) $row['completed_rollbacks'],
+				'rollback_eligible_completed_executions' => (int) $row['rollback_eligible_completed_executions'],
 			);
 		}
+
+		$rate = $eligible_execs > 0 ? round( $completed_rollbacks / $eligible_execs, 4 ) : 0.0;
+
 		return array(
-			'total_rollbacks' => $total,
-			'by_month'        => $by_month,
-			'date_from'       => $date_from,
-			'date_to'         => $date_to,
-			'source'          => 'operational_snapshots',
+			'completed_rollbacks'                    => $completed_rollbacks,
+			'rollback_eligible_completed_executions' => $eligible_execs,
+			'rollback_rate'                          => $eligible_execs > 0 ? $rate : 0.0,
+			'by_month'                               => $by_month_list,
+			'date_from'                              => $date_from,
+			'date_to'                                => $date_to,
+			'source'                                 => 'operational_snapshots',
 		);
 	}
 

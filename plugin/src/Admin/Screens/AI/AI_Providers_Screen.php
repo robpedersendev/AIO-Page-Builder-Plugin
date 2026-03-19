@@ -19,7 +19,7 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
- * Renders provider management UI. No raw keys; credential status only. Mutating actions are nonce-protected placeholders.
+ * Renders provider management UI. No raw keys; credential status only. Mutating actions are capability- and nonce-protected.
  */
 final class AI_Providers_Screen {
 

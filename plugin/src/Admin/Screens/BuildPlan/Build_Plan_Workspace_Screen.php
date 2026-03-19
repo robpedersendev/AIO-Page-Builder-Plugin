@@ -50,6 +50,9 @@ final class Build_Plan_Workspace_Screen {
 	/** Nonce action for Step 7 (logs/rollback) rollback request. */
 	public const NONCE_ACTION_ROLLBACK = 'aio_build_plan_rollback_request';
 
+	/** Bulk nonce action for Step 6 finalization (required contract). */
+	public const NONCE_ACTION_FINALIZE_BULK = 'aio_pb_finalize_plan_bulk';
+
 	/**
 	 * Returns row action nonce key for an item id (required contract).
 	 *
@@ -85,6 +88,10 @@ final class Build_Plan_Workspace_Screen {
 		if ( $handled ) {
 			return;
 		}
+		$handled = $this->maybe_handle_finalize_plan( $plan_id );
+		if ( $handled ) {
+			return;
+		}
 		$state = $this->get_state( $plan_id );
 		if ( $state === null ) {
 			$this->render_not_found( $plan_id );
@@ -92,6 +99,74 @@ final class Build_Plan_Workspace_Screen {
 		}
 		$current_step_index = $this->get_active_step_index( $state );
 		$this->render_shell( $state, $current_step_index );
+	}
+
+	/**
+	 * Handles Step 6 finalization action. Requires FINALIZE_PLAN_ACTIONS capability and nonce.
+	 *
+	 * @param string $plan_id Plan ID.
+	 * @return bool True if handled (redirect sent).
+	 */
+	private function maybe_handle_finalize_plan( string $plan_id ): bool {
+		if ( ! \current_user_can( Capabilities::FINALIZE_PLAN_ACTIONS ) ) {
+			return false;
+		}
+		if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || $_SERVER['REQUEST_METHOD'] !== 'POST' || ! isset( $_POST['aio_build_plan_action'] ) ) {
+			return false;
+		}
+		$action = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
+		if ( $action !== 'bulk_finalize_plan' ) {
+			return false;
+		}
+		$nonce = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
+		if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_FINALIZE_BULK ) ) {
+			return false;
+		}
+		$plan_id = \sanitize_text_field( $plan_id );
+		if ( $plan_id === '' || ! $this->container || ! $this->container->has( 'single_action_executor' ) || ! $this->container->has( 'build_plan_repository' ) ) {
+			return false;
+		}
+		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=6' );
+
+		$repo = $this->container->get( 'build_plan_repository' );
+		if ( ! $repo || ! \method_exists( $repo, 'get_by_key' ) || ! \method_exists( $repo, 'get_plan_definition' ) ) {
+			return false;
+		}
+		$plan_record = $repo->get_by_key( $plan_id );
+		$plan_post_id = is_array( $plan_record ) ? (int) ( $plan_record['id'] ?? 0 ) : 0;
+		$definition   = $plan_post_id > 0 ? $repo->get_plan_definition( $plan_post_id ) : array();
+		$plan_status  = is_array( $definition ) && isset( $definition[ Build_Plan_Schema::KEY_STATUS ] ) && is_string( $definition[ Build_Plan_Schema::KEY_STATUS ] ) ? $definition[ Build_Plan_Schema::KEY_STATUS ] : '';
+
+		$now = gmdate( 'c' );
+		$envelope = array(
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_ACTION_ID      => 'finalize_' . $plan_id . '_' . (string) time(),
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_ACTION_TYPE    => \AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types::FINALIZE_PLAN,
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_PLAN_ID        => $plan_id,
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_PLAN_ITEM_ID   => '',
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_TARGET_REFERENCE => array(),
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_APPROVAL_STATE => array(
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::APPROVAL_PLAN_STATUS => $plan_status,
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::APPROVAL_VERIFIED_AT => $now,
+			),
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_ACTOR_CONTEXT  => array(
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE         => 'user',
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID           => (string) \get_current_user_id(),
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED => Capabilities::FINALIZE_PLAN_ACTIONS,
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT         => $now,
+			),
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_CREATED_AT     => $now,
+		);
+
+		$executor = $this->container->get( 'single_action_executor' );
+		$result   = $executor->execute( $envelope );
+
+		// Minimal audit log (no secrets).
+		if ( \is_object( $result ) && \method_exists( $result, 'get_status' ) ) {
+			\error_log( '[AIO Page Builder] Finalize plan result: ' . (string) $result->get_status() . ' plan_id=' . $plan_id );
+		}
+
+		\wp_safe_redirect( \add_query_arg( array( 'finalize_result' => 'done' ), $redirect_url ) );
+		exit;
 	}
 
 	/**
@@ -646,6 +721,7 @@ final class Build_Plan_Workspace_Screen {
 			'can_execute'        => \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ),
 			'can_view_artifacts' => \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ),
 			'can_rollback'       => \current_user_can( Capabilities::EXECUTE_ROLLBACKS ),
+			'can_finalize'       => \current_user_can( Capabilities::FINALIZE_PLAN_ACTIONS ),
 		);
 		$builder      = $this->container->get( 'build_plan_ui_state_builder' );
 		$workspace    = $builder->build_step_workspace( $plan_id, $active_step_index, $capabilities, $detail_item_id, $selected_ids );
@@ -693,6 +769,15 @@ final class Build_Plan_Workspace_Screen {
 		<div class="aio-step-workspace-actionable" role="region" aria-labelledby="aio-step-workspace-heading">
 			<h2 id="aio-step-workspace-heading" class="screen-reader-text"><?php echo \esc_html( $step_title ); ?></h2>
 			<?php $message_component->render_list( $step_messages ); ?>
+			<?php if ( $step_type === Build_Plan_Schema::STEP_TYPE_CONFIRMATION ) : ?>
+				<form method="post" style="margin: 12px 0;">
+					<?php echo \wp_nonce_field( self::NONCE_ACTION_FINALIZE_BULK, '_wpnonce', true, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<input type="hidden" name="aio_build_plan_action" value="bulk_finalize_plan" />
+					<button type="submit" class="button button-primary" <?php echo \current_user_can( Capabilities::FINALIZE_PLAN_ACTIONS ) ? '' : 'disabled'; ?>>
+						<?php \esc_html_e( 'Finalize plan', 'aio-page-builder' ); ?>
+					</button>
+				</form>
+			<?php endif; ?>
 			<?php
 			if ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION && ! empty( $workspace['validation_summary']['messages'] ) ) {
 				echo '<div class="aio-navigation-validation-notice notice notice-warning"><p>' . \esc_html__( 'Validation messages:', 'aio-page-builder' ) . ' ' . \esc_html( implode( ' ', array_slice( $workspace['validation_summary']['messages'], 0, 3 ) ) ) . '</p></div>';
