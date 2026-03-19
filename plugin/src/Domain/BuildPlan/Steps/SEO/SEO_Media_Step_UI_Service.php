@@ -103,6 +103,16 @@ final class SEO_Media_Step_UI_Service {
 		$bulk_states                  = $this->placeholder_bulk_states( $eligible_count, $selected_item_ids, $rows );
 		$detail_panel                 = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
 		$step_messages                = $this->step_messages( count( $rows ), $eligible_count );
+		if ( count( $rows ) > 0 ) {
+			array_unshift(
+				$step_messages,
+				array(
+					'severity' => 'info',
+					'message'  => \__( 'Metadata and SEO recommendations are for review only. They are not applied automatically in this version.', 'aio-page-builder' ),
+					'level'    => 'step',
+				)
+			);
+		}
 		$seo_storage_path_placeholder = array(
 			'integration' => 'plugin_advisory',
 			'description' => \__( 'Recommendation-only; no write execution in this step.', 'aio-page-builder' ),

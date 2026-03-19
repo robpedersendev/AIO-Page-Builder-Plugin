@@ -16,11 +16,13 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Action types that the execution engine may perform. Governed by execution-action-contract.md.
+ * ALL lists only types valid for execution in v1; UPDATE_PAGE_METADATA is recommendation-only (Prompt 641).
  */
 final class Execution_Action_Types {
 
 	public const CREATE_PAGE           = 'create_page';
 	public const REPLACE_PAGE          = 'replace_page';
+	/** Not executable in v1; metadata is recommendation-only. Excluded from ALL (Prompt 641). */
 	public const UPDATE_PAGE_METADATA  = 'update_page_metadata';
 	public const ASSIGN_PAGE_HIERARCHY = 'assign_page_hierarchy';
 	public const CREATE_MENU           = 'create_menu';
@@ -29,11 +31,10 @@ final class Execution_Action_Types {
 	public const FINALIZE_PLAN         = 'finalize_plan';
 	public const ROLLBACK_ACTION       = 'rollback_action';
 
-	/** @var array<int, string> All allowed action types. */
+	/** @var array<int, string> Action types valid for execution in v1. Excludes UPDATE_PAGE_METADATA (recommendation-only). */
 	public const ALL = array(
 		self::CREATE_PAGE,
 		self::REPLACE_PAGE,
-		self::UPDATE_PAGE_METADATA,
 		self::ASSIGN_PAGE_HIERARCHY,
 		self::CREATE_MENU,
 		self::UPDATE_MENU,

@@ -33,7 +33,7 @@ final class Bulk_Executor {
 		Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE     => Execution_Action_Types::CREATE_PAGE,
 		Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE  => Execution_Action_Types::UPDATE_MENU,
 		Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN => Execution_Action_Types::APPLY_TOKEN_SET,
-		// ITEM_TYPE_SEO not mapped: UPDATE_PAGE_METADATA out of scope (update-page-metadata-scope-decision.md).
+		// ITEM_TYPE_SEO not mapped: UPDATE_PAGE_METADATA is recommendation-only in v1 (Prompt 641).
 	);
 
 	/**
