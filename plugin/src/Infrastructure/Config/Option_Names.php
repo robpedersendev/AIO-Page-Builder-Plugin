@@ -109,6 +109,7 @@ final class Option_Names {
 	public const PB_LAST_DEACTIVATION_AT       = 'aio_pb_last_deactivation_at';
 	public const PB_VERSION_STATE              = 'aio_pb_version_state';
 	public const PB_ENVIRONMENT_DIAGNOSTICS    = 'aio_pb_environment_diagnostics';
+	public const PB_AI_PROVIDERS               = 'aio_pb_ai_providers';
 
 	/**
 	 * Returns all known option keys in stable order.
@@ -153,6 +154,7 @@ final class Option_Names {
 			self::PB_LAST_DEACTIVATION_AT,
 			self::PB_VERSION_STATE,
 			self::PB_ENVIRONMENT_DIAGNOSTICS,
+			self::PB_AI_PROVIDERS,
 		);
 		return self::$all;
 	}

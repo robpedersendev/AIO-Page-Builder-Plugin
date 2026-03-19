@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\Providers\AI_Provider_Interface;
 use AIOPageBuilder\Domain\AI\UI\AI_Providers_UI_State_Builder;
+use AIOPageBuilder\Domain\AI\UI\AI_Provider_State_Store;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -74,15 +75,13 @@ final class AI_Providers_Screen {
 	 * @return bool True if request was handled (redirect sent).
 	 */
 	private function maybe_handle_test_connection(): bool {
-		$action      = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
-		$provider_id = isset( $_GET['provider_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['provider_id'] ) ) : '';
-		if ( $action !== 'test_connection' || $provider_id === '' ) {
+		$action      = isset( $_POST['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['action'] ) ) : '';
+		$provider_id = isset( $_POST['provider_id'] ) ? \sanitize_key( (string) $_POST['provider_id'] ) : '';
+		if ( $action !== 'aio_pb_test_ai_provider_connection' || $provider_id === '' ) {
 			return false;
 		}
-		$nonce = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
-		if ( ! \wp_verify_nonce( $nonce, 'aio_test_connection_' . $provider_id ) ) {
-			return false;
-		}
+		$nonce_action = 'aio_pb_test_ai_provider_connection_' . $provider_id;
+		\check_admin_referer( $nonce_action );
 		if ( ! $this->container ) {
 			return false;
 		}
@@ -94,11 +93,13 @@ final class AI_Providers_Screen {
 		try {
 			$test_service = $this->container->get( 'provider_connection_test_service' );
 			$result       = $test_service->run_test( $driver );
+			$this->persist_provider_state_after_test( $provider_id, $result->is_success() );
 			$message      = $result->is_success()
 				? __( 'Connection test succeeded.', 'aio-page-builder' )
 				: $result->get_user_message();
 			$this->redirect_back( $result->is_success() ? 'success' : 'error', $message );
 		} catch ( \Throwable $e ) {
+			$this->persist_provider_state_after_test( $provider_id, false );
 			$this->redirect_back( 'error', __( 'Connection test failed.', 'aio-page-builder' ) );
 		}
 		return true;
@@ -120,18 +121,27 @@ final class AI_Providers_Screen {
 	 * @return bool True if request was handled (redirect sent).
 	 */
 	private function maybe_handle_update_credential(): bool {
-		$action      = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
-		$provider_id = isset( $_GET['provider_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['provider_id'] ) ) : '';
-		if ( $action !== 'update_credential' || $provider_id === '' ) {
+		$action      = isset( $_POST['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['action'] ) ) : '';
+		$provider_id = isset( $_POST['provider_id'] ) ? \sanitize_key( (string) $_POST['provider_id'] ) : '';
+		if ( $action !== 'aio_pb_update_ai_provider_credential' || $provider_id === '' ) {
 			return false;
 		}
-		$nonce = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
-		if ( ! \wp_verify_nonce( $nonce, 'aio_update_credential_' . $provider_id ) ) {
+		$nonce_action = 'aio_pb_update_ai_provider_credential_' . $provider_id;
+		\check_admin_referer( $nonce_action );
+		if ( ! $this->container ) {
 			return false;
 		}
-		$url = \add_query_arg( array( 'page' => 'aio-page-builder-onboarding' ), \admin_url( 'admin.php' ) );
-		\wp_safe_redirect( $url );
-		exit;
+		$credential = isset( $_POST['provider_credential'] ) ? (string) \wp_unslash( $_POST['provider_credential'] ) : '';
+		$credential = trim( $credential );
+		if ( $credential === '' ) {
+			$this->redirect_back( 'error', __( 'Credential is required.', 'aio-page-builder' ) );
+			return true;
+		}
+		$secret_store = $this->container->get( 'provider_secret_store' );
+		$secret_store->set_credential( $provider_id, $credential );
+		$this->persist_provider_state_after_credential_update( $provider_id );
+		$this->redirect_back( 'success', __( 'Credential updated.', 'aio-page-builder' ) );
+		return true;
 	}
 
 	private function redirect_back( string $status, string $message ): void {
@@ -259,8 +269,19 @@ final class AI_Providers_Screen {
 								</td>
 								<td><?php echo $last_use !== null ? \esc_html( $this->format_timestamp( $last_use ) ) : '—'; ?></td>
 								<td>
-									<a href="<?php echo \esc_url( $test_btn_url ); ?>" class="button button-small"><?php \esc_html_e( 'Test connection', 'aio-page-builder' ); ?></a>
-									<a href="<?php echo \esc_url( $update_cred_url ); ?>" class="button button-small"><?php \esc_html_e( 'Update credential', 'aio-page-builder' ); ?></a>
+									<form method="post" action="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG ) ); ?>" style="display:inline-block;margin-right:6px;">
+										<input type="hidden" name="action" value="aio_pb_test_ai_provider_connection" />
+										<input type="hidden" name="provider_id" value="<?php echo \esc_attr( $row['provider_id'] ); ?>" />
+										<?php \wp_nonce_field( 'aio_pb_test_ai_provider_connection_' . $row['provider_id'] ); ?>
+										<button type="submit" class="button button-small"><?php \esc_html_e( 'Test connection', 'aio-page-builder' ); ?></button>
+									</form>
+									<form method="post" action="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG ) ); ?>" style="display:inline-block;">
+										<input type="hidden" name="action" value="aio_pb_update_ai_provider_credential" />
+										<input type="hidden" name="provider_id" value="<?php echo \esc_attr( $row['provider_id'] ); ?>" />
+										<?php \wp_nonce_field( 'aio_pb_update_ai_provider_credential_' . $row['provider_id'] ); ?>
+										<input type="password" name="provider_credential" value="" autocomplete="off" placeholder="<?php \esc_attr_e( 'New key', 'aio-page-builder' ); ?>" style="max-width:160px;" />
+										<button type="submit" class="button button-small"><?php \esc_html_e( 'Update credential', 'aio-page-builder' ); ?></button>
+									</form>
 								</td>
 							</tr>
 						<?php endforeach; ?>
@@ -282,33 +303,44 @@ final class AI_Providers_Screen {
 	 * @param string $provider_id
 	 * @return string
 	 */
-	private function test_connection_url( string $provider_id ): string {
-		return \add_query_arg(
-			array(
-				'page'        => self::SLUG,
-				'action'      => 'test_connection',
-				'provider_id' => $provider_id,
-				'_wpnonce'    => \wp_create_nonce( 'aio_test_connection_' . $provider_id ),
-			),
-			\admin_url( 'admin.php' )
+	private function persist_provider_state_after_test( string $provider_id, bool $success ): void {
+		if ( ! $this->container ) {
+			return;
+		}
+		$settings = $this->container->get( 'settings' );
+		$store    = new AI_Provider_State_Store( $settings );
+		$driver   = $this->get_driver_for_provider_id( $provider_id );
+		$model    = '';
+		if ( $driver !== null && $this->container->has( 'provider_capability_resolver' ) ) {
+			$resolver = $this->container->get( 'provider_capability_resolver' );
+			$model    = (string) ( $resolver->resolve_default_model_for_connection_test( $driver ) ?? '' );
+		}
+		$updates = array(
+			'credential_ref_or_secure_value' => 'secret_store',
+			'masked_status'                  => 'configured',
+			'default_model'                  => $model,
+			'last_test_status'               => $success ? 'success' : 'failure',
+			'last_tested_at'                 => gmdate( 'c' ),
 		);
+		if ( $success ) {
+			$updates['last_successful_use_at'] = gmdate( 'c' );
+		}
+		$store->merge( $provider_id, $updates );
 	}
 
-	/**
-	 * Placeholder URL for update credential; handler must verify nonce and capability (spec §49.9).
-	 *
-	 * @param string $provider_id
-	 * @return string
-	 */
-	private function update_credential_url( string $provider_id ): string {
-		return \add_query_arg(
+	private function persist_provider_state_after_credential_update( string $provider_id ): void {
+		if ( ! $this->container ) {
+			return;
+		}
+		$settings = $this->container->get( 'settings' );
+		$store    = new AI_Provider_State_Store( $settings );
+		$store->merge(
+			$provider_id,
 			array(
-				'page'        => self::SLUG,
-				'action'      => 'update_credential',
-				'provider_id' => $provider_id,
-				'_wpnonce'    => \wp_create_nonce( 'aio_update_credential_' . $provider_id ),
-			),
-			\admin_url( 'admin.php' )
+				'credential_ref_or_secure_value' => 'secret_store',
+				'masked_status'                  => 'pending_validation',
+				'default_model'                  => '',
+			)
 		);
 	}
 }

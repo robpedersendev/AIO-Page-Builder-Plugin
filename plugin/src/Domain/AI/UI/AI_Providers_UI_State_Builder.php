@@ -42,6 +42,9 @@ final class AI_Providers_UI_State_Builder {
 	/** @var Service_Container */
 	private Service_Container $container;
 
+	/** @var AI_Provider_State_Store */
+	private AI_Provider_State_Store $provider_state_store;
+
 	public function __construct(
 		Provider_Connection_Test_Service $connection_test_service,
 		Provider_Secret_Store_Interface $secret_store,
@@ -54,6 +57,7 @@ final class AI_Providers_UI_State_Builder {
 		$this->capability_resolver     = $capability_resolver;
 		$this->settings                = $settings;
 		$this->container               = $container;
+		$this->provider_state_store    = new AI_Provider_State_Store( $settings );
 	}
 
 	/**
@@ -105,7 +109,7 @@ final class AI_Providers_UI_State_Builder {
 		$credential_status       = $this->build_credential_status( $provider_id );
 		$model_default_state     = $this->build_model_default_state( $provider_id );
 		$connection_test_summary = $this->build_connection_test_summary( $provider_id );
-		$last_successful_use     = $this->connection_test_service->get_last_successful_use( $provider_id );
+		$last_successful_use     = $this->get_last_successful_use_from_state( $provider_id );
 		$label                   = $this->get_provider_label( $provider_id );
 		return array(
 			'provider_id'             => $provider_id,
@@ -156,16 +160,23 @@ final class AI_Providers_UI_State_Builder {
 	 * @return array{success: bool, tested_at: string, user_message: string, model_used: string}|null
 	 */
 	private function build_connection_test_summary( string $provider_id ): ?array {
-		$result = $this->connection_test_service->get_last_result( $provider_id );
-		if ( $result === null ) {
+		$state = $this->provider_state_store->get( $provider_id );
+		if ( empty( $state['last_test_status'] ) || empty( $state['last_tested_at'] ) ) {
 			return null;
 		}
+		$success = (string) $state['last_test_status'] === 'success';
 		return array(
-			'success'      => $result->is_success(),
-			'tested_at'    => $result->get_tested_at(),
-			'user_message' => $result->get_user_message(),
-			'model_used'   => $result->get_model_used(),
+			'success'      => $success,
+			'tested_at'    => (string) $state['last_tested_at'],
+			'user_message' => $success ? __( 'Connection successful.', 'aio-page-builder' ) : __( 'Connection test failed.', 'aio-page-builder' ),
+			'model_used'   => isset( $state['default_model'] ) ? (string) $state['default_model'] : '',
 		);
+	}
+
+	private function get_last_successful_use_from_state( string $provider_id ): ?string {
+		$state = $this->provider_state_store->get( $provider_id );
+		$val   = isset( $state['last_successful_use_at'] ) ? (string) $state['last_successful_use_at'] : '';
+		return $val !== '' ? $val : null;
 	}
 
 	/**

@@ -22,6 +22,7 @@ use AIOPageBuilder\Domain\Crawler\Discovery\URL_Normalizer;
 use AIOPageBuilder\Domain\Crawler\Fetch\Fetch_Request_Policy;
 use AIOPageBuilder\Domain\Crawler\Fetch\HTML_Fetcher;
 use AIOPageBuilder\Domain\Crawler\Profiles\Crawl_Profile_Service;
+use AIOPageBuilder\Domain\Crawler\Queue\Crawl_Enqueue_Service;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Repository;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -60,6 +61,12 @@ final class Crawler_Provider implements Service_Provider_Interface {
 				$profile    = $container->get( 'crawl_profile_service' );
 				$matcher    = $container->get( 'crawl_template_family_matcher' );
 				return new Crawl_Snapshot_Service( $repository, $profile, $matcher );
+			}
+		);
+		$container->register(
+			'crawl_enqueue_service',
+			function () use ( $container ): Crawl_Enqueue_Service {
+				return new Crawl_Enqueue_Service( $container->get( 'crawl_snapshot_service' ) );
 			}
 		);
 		$container->register(

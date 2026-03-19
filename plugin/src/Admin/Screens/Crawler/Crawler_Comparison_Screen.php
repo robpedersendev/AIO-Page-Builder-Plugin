@@ -157,8 +157,6 @@ final class Crawler_Comparison_Screen {
 					</table>
 				<?php endif; ?>
 			<?php endif; ?>
-			<?php /* Future: nonce for any mutating action. */ ?>
-			<p class="aio-crawler-action-placeholder" data-nonce-placeholder="reserved" aria-hidden="true"></p>
 		</div>
 		<?php
 	}
