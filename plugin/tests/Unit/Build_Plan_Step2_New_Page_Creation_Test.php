@@ -25,16 +25,27 @@ require_once $plugin_root . '/src/Domain/BuildPlan/Schema/Build_Plan_Item_Schema
 require_once $plugin_root . '/src/Domain/BuildPlan/Statuses/Build_Plan_Item_Statuses.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/UI/Build_Plan_Row_Action_Resolver.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/UI/Components/Detail_Panel_Component.php';
+require_once $plugin_root . '/src/Domain/BuildPlan/UI/Build_Plan_Stepper_Builder.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Steps/NewPageCreation/New_Page_Creation_Detail_Builder.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Steps/NewPageCreation/New_Page_Creation_Bulk_Action_Service.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/UI/Components/Step_Item_List_Component.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/UI/Components/Bulk_Action_Bar_Component.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Steps/NewPageCreation/New_Page_Creation_UI_Service.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Build_Plan_Repository_Interface.php';
+require_once $plugin_root . '/src/Domain/BuildPlan/Recommendations/Template_Explanation_Builder_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Type_Keys.php';
 require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Status_Families.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repository.php';
+require_once $plugin_root . '/src/Domain/Execution/Executor/Plan_State_For_Execution_Interface.php';
+require_once $plugin_root . '/src/Domain/BuildPlan/Analytics/Build_Plan_List_Provider_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Build_Plan_Repository.php';
+require_once $plugin_root . '/src/Domain/Industry/AI/Build_Plan_Scoring_Interface.php';
+require_once $plugin_root . '/src/Domain/Industry/AI/Industry_Build_Plan_Scoring_Service.php';
+require_once $plugin_root . '/src/Admin/ViewModels/BuildPlan/Industry_Build_Plan_Explanation_View_Model.php';
+require_once $plugin_root . '/src/Domain/Industry/Overrides/Industry_Build_Plan_Item_Override_Service.php';
+require_once $plugin_root . '/src/Infrastructure/Config/Option_Names.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Page_Template_Repository_Interface.php';
 
 final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 
@@ -279,6 +290,19 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$this->assertFalse( $states['deny_all_eligible']['enabled'] );
 	}
 
+	/** Deny All Eligible becomes enabled when pending eligible rows exist. */
+	public function test_deny_all_enabled_when_eligible(): void {
+		$resolver  = new Build_Plan_Row_Action_Resolver();
+		$detail    = new New_Page_Creation_Detail_Builder();
+		$bulk      = new New_Page_Creation_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk );
+		$def       = $this->step2_plan_definition( 2 );
+		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
+		$states    = $workspace['bulk_action_states'];
+		$this->assertTrue( $states['deny_all_eligible']['enabled'] );
+		$this->assertSame( 2, (int) $states['deny_all_eligible']['count_eligible'] );
+	}
+
 	/** Unauthorized: can_approve false disables bulk and row approve/deny. */
 	public function test_unauthorized_bulk_disabled(): void {
 		$resolver  = new Build_Plan_Row_Action_Resolver();
@@ -414,6 +438,9 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 			$this->assertNotNull( $item );
 			$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $item['status'] );
 			$this->assertTrue( Build_Plan_Item_Statuses::is_terminal( $item['status'] ) );
+			$stepper = new \AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder();
+			$steps   = $stepper->build( $def2 );
+			$this->assertSame( 0, (int) ( $steps[2]['unresolved_count'] ?? -1 ) );
 		} finally {
 			unset( $GLOBALS['_aio_wp_insert_post_return'] );
 		}
@@ -447,6 +474,77 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		}
 	}
 
+	/** Bulk deny all eligible marks items rejected so execute is disabled in UI. */
+	public function test_bulk_deny_all_eligible_not_executable_in_ui(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 793;
+		try {
+			$repo = new Build_Plan_Repository();
+			$def  = $this->step2_plan_definition( 1 );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-bulk-deny-not-exec',
+					'post_title'      => 'Test Plan Bulk Deny Not Exec',
+					'status'          => 'publish',
+				)
+			);
+			$this->assertGreaterThan( 0, $post_id );
+
+			$bulk = new New_Page_Creation_Bulk_Action_Service( $repo );
+			$count = $bulk->bulk_deny_all_eligible( $post_id );
+			$this->assertSame( 1, $count );
+
+			$def2 = $repo->get_plan_definition( $post_id );
+			$resolver = new Build_Plan_Row_Action_Resolver();
+			$detail   = new New_Page_Creation_Detail_Builder();
+			$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk );
+			$workspace = $ui->build_workspace( $def2, 2, array( 'can_approve' => true, 'can_execute' => true ), null, array() );
+
+			$this->assertCount( 1, $workspace['step_list_rows'] );
+			$row_actions = $workspace['step_list_rows'][0]['row_actions'];
+			$execute_action = null;
+			foreach ( $row_actions as $a ) {
+				if ( ( $a['action_id'] ?? '' ) === 'execute' ) {
+					$execute_action = $a;
+					break;
+				}
+			}
+			$this->assertNotNull( $execute_action );
+			$this->assertFalse( $execute_action['enabled'] );
+		} finally {
+			unset( $GLOBALS['_aio_wp_insert_post_return'] );
+		}
+	}
+
+	/** Bulk deny all eligible should skip low-confidence pending items. */
+	public function test_bulk_deny_all_eligible_skips_low_confidence(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 791;
+		try {
+			$repo = new Build_Plan_Repository();
+			$def  = $this->step2_plan_definition( 2 );
+			// plan_npc_0 becomes ineligible for bulk actions.
+			$def[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ][0]['payload']['confidence'] = 'low';
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-bulk-deny-low-confidence',
+					'post_title'      => 'Test Plan Bulk Deny Low Confidence',
+					'status'          => 'publish',
+				)
+			);
+			$this->assertGreaterThan( 0, $post_id );
+			$bulk  = new New_Page_Creation_Bulk_Action_Service( $repo );
+			$count = $bulk->bulk_deny_all_eligible( $post_id );
+			$this->assertSame( 1, $count );
+			$def2  = $repo->get_plan_definition( $post_id );
+			$items = $def2[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ] ?? array();
+			$this->assertSame( Build_Plan_Item_Statuses::PENDING, $items[0]['status'] );
+			$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $items[1]['status'] );
+		} finally {
+			unset( $GLOBALS['_aio_wp_insert_post_return'] );
+		}
+	}
+
 	/** Denied item shows rejected badge and is excluded from unresolved (terminal status). */
 	public function test_denied_item_shows_rejected_and_is_terminal(): void {
 		$def = $this->step2_plan_definition( 1 );
@@ -455,12 +553,53 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$detail    = new New_Page_Creation_Detail_Builder();
 		$bulk      = new New_Page_Creation_Bulk_Action_Service( new Build_Plan_Repository() );
 		$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk );
-		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
+		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true, 'can_execute' => true ), null, array() );
 		$this->assertCount( 1, $workspace['step_list_rows'] );
 		$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $workspace['step_list_rows'][0]['status'] );
 		$this->assertSame( 'rejected', $workspace['step_list_rows'][0]['status_badge'] );
 		$this->assertSame( 0, $workspace['bulk_action_states']['apply_to_all_eligible']['count_eligible'] );
 		$this->assertSame( 0, $workspace['bulk_action_states']['deny_all_eligible']['count_eligible'] );
+		$row_actions = $workspace['step_list_rows'][0]['row_actions'];
+		$execute_action = null;
+		$deny_action = null;
+		foreach ( $row_actions as $a ) {
+			if ( ( $a['action_id'] ?? '' ) === 'execute' ) {
+				$execute_action = $a;
+			}
+			if ( ( $a['action_id'] ?? '' ) === 'deny' ) {
+				$deny_action = $a;
+			}
+		}
+		$this->assertNotNull( $execute_action );
+		$this->assertFalse( $execute_action['enabled'] );
+		$this->assertNotNull( $deny_action );
+		$this->assertFalse( $deny_action['enabled'] );
+	}
+
+	/** After bulk deny, stepper unresolved count for Step 2 becomes zero. */
+	public function test_bulk_deny_reduces_step2_unresolved_count(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 792;
+		try {
+			$repo = new Build_Plan_Repository();
+			$def  = $this->step2_plan_definition( 2 );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-bulk-deny-unresolved-count',
+					'post_title'      => 'Test Plan Bulk Deny Unresolved Count',
+					'status'          => 'publish',
+				)
+			);
+			$this->assertGreaterThan( 0, $post_id );
+			$bulk = new New_Page_Creation_Bulk_Action_Service( $repo );
+			$bulk->bulk_deny_all_eligible( $post_id );
+			$def2 = $repo->get_plan_definition( $post_id );
+			$stepper = new \AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder();
+			$steps = $stepper->build( $def2 );
+			$this->assertSame( 0, (int) ( $steps[2]['unresolved_count'] ?? -1 ) );
+		} finally {
+			unset( $GLOBALS['_aio_wp_insert_post_return'] );
+		}
 	}
 
 	/** update_plan_items_by_ids updates only selected pending items. */

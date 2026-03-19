@@ -92,7 +92,7 @@ final class HTML_Fetcher {
 		$message      = $wp_error->get_error_message();
 		$error_code   = Fetch_Result::ERROR_TRANSPORT;
 		$fetch_status = Fetch_Result::FETCH_STATUS_FAILURE;
-		if ( strpos( strtolower( $message ), 'timeout' ) !== false || $code === 'http_request_failed' && strpos( strtolower( $message ), 'timed' ) !== false ) {
+		if ( strpos( strtolower( $message ), 'timeout' ) !== false || ( $code === 'http_request_failed' && strpos( strtolower( $message ), 'timed' ) !== false ) ) {
 			$error_code   = Fetch_Result::ERROR_TIMEOUT;
 			$fetch_status = Fetch_Result::FETCH_STATUS_TIMEOUT;
 		} elseif ( strpos( strtolower( $message ), 'refused' ) !== false || strpos( strtolower( $message ), 'could not resolve' ) !== false ) {

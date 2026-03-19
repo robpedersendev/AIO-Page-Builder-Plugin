@@ -71,7 +71,7 @@ final class Page_Change_Summary {
 	/**
 	 * @param string                    $url             Normalized URL.
 	 * @param string                    $change_category One of CATEGORY_*.
-	 * @param array<int, string>              $reason_codes    Reason codes.
+	 * @param array<int, string>        $reason_codes    Reason codes.
 	 * @param array<string, mixed>|null $prior_snapshot Optional prior record excerpt.
 	 * @param array<string, mixed>|null $new_snapshot   Optional new record excerpt.
 	 */

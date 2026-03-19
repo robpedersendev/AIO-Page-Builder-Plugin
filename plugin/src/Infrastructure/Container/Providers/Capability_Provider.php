@@ -29,7 +29,7 @@ final class Capability_Provider implements Service_Provider_Interface {
 				return new class() {
 					/** @return array<int, string> */
 					public function get_all(): array {
-						return Capabilities::getAll();
+						return Capabilities::get_all();
 					}
 
 					public function role_has_cap( string $role_key, string $cap ): bool {

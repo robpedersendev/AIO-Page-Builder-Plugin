@@ -55,11 +55,11 @@ final class ACF_Regeneration_Result {
 
 	/**
 	 * @param int                                                      $groups_regenerated
-	 * @param array<int, string>                                             $groups_skipped
+	 * @param array<int, string>                                       $groups_skipped
 	 * @param int                                                      $page_assignments_repaired
 	 * @param int                                                      $page_assignments_failed
-	 * @param array<int, string>                                             $warnings
-	 * @param array<int, string>                                             $errors
+	 * @param array<int, string>                                       $warnings
+	 * @param array<int, string>                                       $errors
 	 * @param array{ missing: int, version_stale: int, repaired: int } $field_group_mismatch_summary
 	 * @param array{ repaired: int, failed: int, skipped: int }        $page_assignment_repair_summary
 	 */

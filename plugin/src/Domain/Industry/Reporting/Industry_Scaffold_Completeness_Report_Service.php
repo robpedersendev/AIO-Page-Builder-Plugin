@@ -62,9 +62,9 @@ final class Industry_Scaffold_Completeness_Report_Service implements Industry_Sc
 	 * @param array<string, mixed> $options Optional: scaffold_industry_keys (list), scaffold_subtype_keys (list of subtype_key), include_draft_packs (bool, default true to discover draft packs), include_draft_subtypes (bool, default true).
 	 * @return array{
 	 *   generated_at: string,
-	 *   scaffold_results: array<int, array{scaffold_type: string, scaffold_key: string, artifact_classes: array<string, string>, summary: string}>,
-	 *   readable_summary: array<int, string>,
-	 *   warnings: array<int, string>
+	 *   scaffold_results: list<array{scaffold_type: string, scaffold_key: string, artifact_classes: array<string, string>, summary: string}>,
+	 *   readable_summary: list<string>,
+	 *   warnings: list<string>
 	 * }
 	 */
 	public function generate_report( array $options = array() ): array {

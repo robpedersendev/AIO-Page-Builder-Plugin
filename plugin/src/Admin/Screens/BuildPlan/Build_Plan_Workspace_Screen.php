@@ -53,7 +53,7 @@ final class Build_Plan_Workspace_Screen {
 	/** Nonce action for Step 3 (navigation) approve/deny and bulk actions. */
 	public const NONCE_ACTION_NAVIGATION_REVIEW = 'aio_build_plan_navigation_review';
 
-	/** Nonce action for Step 8 (logs/rollback) rollback request. */
+	/** Nonce action for Step 7 (logs/rollback) rollback request. */
 	public const NONCE_ACTION_ROLLBACK = 'aio_build_plan_rollback_request';
 
 	/**
@@ -181,7 +181,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_STEP2_REVIEW ) ) {
 				return false;
 			}
-			if ( $action !== 'bulk_build_all_step2' && $action !== 'bulk_build_selected_step2' && $action !== 'bulk_deny_step2' ) {
+			if ( $action !== 'bulk_build_all_step2' && $action !== 'bulk_build_selected_step2' && $action !== 'bulk_deny_all_step2' ) {
 				return false;
 			}
 			if ( ! $this->container || ! $this->container->has( 'new_page_creation_bulk_action_service' ) ) {
@@ -198,16 +198,28 @@ final class Build_Plan_Workspace_Screen {
 			$service = $this->container->get( 'new_page_creation_bulk_action_service' );
 			if ( $action === 'bulk_build_all_step2' ) {
 				$service->bulk_approve_all_eligible( $plan_post_id );
-			} elseif ( $action === 'bulk_deny_step2' ) {
-				$count = $service->bulk_deny_all_eligible( $plan_post_id );
-				if ( $count > 0 && \function_exists( 'error_log' ) ) {
-					\error_log( sprintf( 'AIO Build Plan: bulk_deny step=2 plan_post_id=%d count=%d actor=%s', $plan_post_id, $count, (string) \get_current_user_id() ) );
+			} elseif ( $action === 'bulk_deny_all_step2' ) {
+				$confirm = isset( $_POST['aio_step2_deny_all_confirm'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_step2_deny_all_confirm'] ) ) : '';
+				if ( $confirm !== '1' ) {
+					\wp_safe_redirect( \add_query_arg( array( 'step2_bulk_deny_error' => 'confirm_required' ), $redirect_url ) );
+					exit;
 				}
+				$count = (int) $service->bulk_deny_all_eligible( $plan_post_id );
+				\wp_safe_redirect(
+					\add_query_arg(
+						array(
+							'step2_bulk_deny_done'   => '1',
+							'step2_bulk_deny_count' => (string) $count,
+						),
+						$redirect_url
+					)
+				);
+				exit;
 			} else {
 				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array values sanitized via array_map below.
-				$raw_step2   = isset( $_POST['aio_step2_selected_ids'] ) && is_array( $_POST['aio_step2_selected_ids'] ) ? \wp_unslash( $_POST['aio_step2_selected_ids'] ) : array();
-				$selected    = array_map( 'sanitize_text_field', $raw_step2 );
-				$selected    = array_values( array_filter( $selected ) );
+				$raw_step2 = isset( $_POST['aio_step2_selected_ids'] ) && is_array( $_POST['aio_step2_selected_ids'] ) ? \wp_unslash( $_POST['aio_step2_selected_ids'] ) : array();
+				$selected  = array_map( 'sanitize_text_field', $raw_step2 );
+				$selected  = array_values( array_filter( $selected ) );
 				$service->bulk_approve_selected( $plan_post_id, $selected );
 			}
 			\wp_safe_redirect( $redirect_url );
@@ -228,15 +240,17 @@ final class Build_Plan_Workspace_Screen {
 				return false;
 			}
 			$service = $this->container->get( 'new_page_creation_bulk_action_service' );
+			$updated = false;
 			if ( $get_action === 'approve_item' ) {
-				$service->approve_item( $plan_post_id, $item_id );
-			} else {
-				$updated = $service->deny_item( $plan_post_id, $item_id );
-				if ( $updated && \function_exists( 'error_log' ) ) {
-					\error_log( sprintf( 'AIO Build Plan: deny step=2 plan_post_id=%d item_id=%s actor=%s', $plan_post_id, $item_id, (string) \get_current_user_id() ) );
-				}
+				$updated = (bool) $service->approve_item( $plan_post_id, $item_id );
 			}
-			\wp_safe_redirect( $redirect_url );
+			if ( $get_action === 'deny_item' ) {
+				$updated = (bool) $service->deny_item( $plan_post_id, $item_id );
+			}
+			$target = ( $get_action === 'deny_item' && $updated )
+				? \add_query_arg( array( 'step2_row_deny_done' => '1' ), $redirect_url )
+				: $redirect_url;
+			\wp_safe_redirect( $target );
 			exit;
 		}
 		return false;
@@ -315,7 +329,7 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	/**
-	 * Handles Step 8 (logs/rollback) rollback request: validates permission and eligibility, enqueues rollback job, redirects (spec §38.5, §41.10).
+	 * Handles Step 7 rollback request: validates permission and eligibility, enqueues rollback job, redirects (spec §38.5, §41.10).
 	 *
 	 * @param string $plan_id Plan ID.
 	 * @return bool True if request was handled and redirect sent; false to continue render.
@@ -328,8 +342,8 @@ final class Build_Plan_Workspace_Screen {
 		if ( $plan_id === '' ) {
 			return false;
 		}
-		$step_rollback_index = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
-		$redirect_url       = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_rollback_index );
+		$step_7_index = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
+		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_7_index );
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_rollback_request'] ) ) {
 			$nonce = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
@@ -363,9 +377,8 @@ final class Build_Plan_Workspace_Screen {
 				'plan_item_ref'        => '',
 			);
 			$actor_context = array(
-				'actor_type'          => 'user',
-				'actor_id'            => (string) \get_current_user_id(),
-				'capability_checked'  => Capabilities::EXECUTE_ROLLBACKS,
+				'actor_type' => 'user',
+				'actor_id'   => (string) \get_current_user_id(),
 			);
 			$result        = $this->container->get( 'execution_queue_service' )->request_rollback( $payload, $actor_context, array( 'run_immediately' => true ) );
 			if ( isset( $result['status'] ) && $result['status'] === 'completed' ) {
@@ -494,7 +507,7 @@ final class Build_Plan_Workspace_Screen {
 			<div class="aio-context-rail-actions">
 				<p><a href="<?php echo \esc_url( $list_url ); ?>" class="button"><?php \esc_html_e( 'Save and exit', 'aio-page-builder' ); ?></a></p>
 				<?php if ( $can_export ) : ?>
-					<p><span class="aio-context-rail-unavailable" aria-hidden="true"><?php \esc_html_e( 'Export plan', 'aio-page-builder' ); ?></span> <span class="description"><?php \esc_html_e( 'Not available in this version.', 'aio-page-builder' ); ?></span></p>
+					<p><span class="button button-secondary" role="button" aria-disabled="true"><?php \esc_html_e( 'Export plan', 'aio-page-builder' ); ?></span> <span class="description"><?php \esc_html_e( '(Coming soon)', 'aio-page-builder' ); ?></span></p>
 				<?php endif; ?>
 				<?php if ( $can_view_artifacts && (string) ( $rail['ai_run_ref'] ?? '' ) !== '' ) : ?>
 					<p><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=aio-page-builder-ai-runs&run_id=' . \rawurlencode( (string) $rail['ai_run_ref'] ) ) ); ?>" class="button button-secondary"><?php \esc_html_e( 'View source artifacts', 'aio-page-builder' ); ?></a></p>
@@ -609,9 +622,9 @@ final class Build_Plan_Workspace_Screen {
 		$selected_ids = array();
 		if ( ! empty( $_GET['selected'] ) && is_array( $_GET['selected'] ) ) {
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array values sanitized via array_map below.
-			$raw_selected  = \wp_unslash( $_GET['selected'] );
-			$selected_ids  = array_map( 'sanitize_text_field', $raw_selected );
-			$selected_ids  = array_values( array_filter( $selected_ids ) );
+			$raw_selected = \wp_unslash( $_GET['selected'] );
+			$selected_ids = array_map( 'sanitize_text_field', $raw_selected );
+			$selected_ids = array_values( array_filter( $selected_ids ) );
 		}
 		$capabilities = array(
 			'can_approve'        => \current_user_can( Capabilities::APPROVE_BUILD_PLANS ),
@@ -762,6 +775,54 @@ final class Build_Plan_Workspace_Screen {
 			$detail_item_id        = (string) ( $detail['item_id'] ?? '' );
 			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
 		}
+
+		$step_messages = isset( $workspace['step_messages'] ) && is_array( $workspace['step_messages'] ) ? $workspace['step_messages'] : array();
+		$bulk_done      = isset( $_GET['step2_bulk_deny_done'] ) && $_GET['step2_bulk_deny_done'] === '1';
+		$bulk_count     = isset( $_GET['step2_bulk_deny_count'] ) && is_numeric( $_GET['step2_bulk_deny_count'] )
+			? (int) $_GET['step2_bulk_deny_count']
+			: 0;
+		$row_deny_done  = isset( $_GET['step2_row_deny_done'] ) && $_GET['step2_row_deny_done'] === '1';
+		$bulk_error     = isset( $_GET['step2_bulk_deny_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step2_bulk_deny_error'] ) ) : '';
+
+		if ( $bulk_done ) {
+			$msg = sprintf(
+				_n( 'Denied %d eligible new page recommendation.', 'Denied %d eligible new page recommendations.', $bulk_count, 'aio-page-builder' ),
+				$bulk_count
+			);
+			array_unshift(
+				$step_messages,
+				array(
+					'severity' => 'success',
+					'message'  => $msg,
+					'level'    => 'step',
+				)
+			);
+		}
+		if ( $row_deny_done ) {
+			array_unshift(
+				$step_messages,
+				array(
+					'severity' => 'info',
+					'message'  => \__( 'Denied the selected new page recommendation.', 'aio-page-builder' ),
+					'level'    => 'step',
+				)
+			);
+		}
+		if ( $bulk_error !== '' ) {
+			$err_msg = $bulk_error === 'confirm_required'
+				? \__( 'Please confirm bulk denial to continue.', 'aio-page-builder' )
+				: \__( 'Bulk denial failed.', 'aio-page-builder' );
+			array_unshift(
+				$step_messages,
+				array(
+					'severity' => 'error',
+					'message'  => $err_msg,
+					'level'    => 'step',
+				)
+			);
+		}
+
+		$workspace['step_messages'] = $step_messages;
 	}
 
 	/**
@@ -793,15 +854,15 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	/**
-	 * Injects rollback nonce, action URL, and per-row form data for Step 8 (logs/rollback) (spec §41.10). Surfaces rollback_done/rollback_error.
+	 * Injects rollback nonce, action URL, and per-row form data for Step 7 (spec §41.10). Surfaces rollback_done/rollback_error.
 	 *
 	 * @param array<string, mixed> $workspace Workspace payload (mutated).
 	 * @param string               $plan_id  Plan ID.
 	 */
 	private function inject_rollback_entry_data( array &$workspace, string $plan_id ): void {
-		$step_rollback_index               = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
-		$workspace['rollback_nonce']       = \wp_create_nonce( self::NONCE_ACTION_ROLLBACK );
-		$workspace['rollback_action_url']  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_rollback_index );
+		$step_7_index                     = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
+		$workspace['rollback_nonce']      = \wp_create_nonce( self::NONCE_ACTION_ROLLBACK );
+		$workspace['rollback_action_url'] = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_7_index );
 		$rows                             = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
@@ -905,6 +966,7 @@ final class Build_Plan_Workspace_Screen {
 					<?php endif; ?>
 				</button>
 			</form>
+			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Apply to selected', 'aio-page-builder' ); ?></button>
 			<form method="post" class="aio-bulk-form aio-bulk-deny-all" style="display:inline">
 				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<input type="hidden" name="aio_build_plan_action" value="bulk_deny_step1" />
@@ -915,6 +977,7 @@ final class Build_Plan_Workspace_Screen {
 					<?php endif; ?>
 				</button>
 			</form>
+			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Clear selection', 'aio-page-builder' ); ?></button>
 		</div>
 		<?php
 	}
@@ -933,11 +996,11 @@ final class Build_Plan_Workspace_Screen {
 		$clear_sel         = $bulk_states['clear_selection'] ?? array();
 		$build_all_enabled = ! empty( $build_all['enabled'] );
 		$build_sel_enabled = ! empty( $build_sel['enabled'] );
-		$deny_all_enabled   = ! empty( $deny_all['enabled'] );
-		$deny_all_count     = (int) ( $deny_all['count_eligible'] ?? 0 );
+		$deny_enabled      = ! empty( $deny_all['enabled'] );
 		$clear_enabled     = ! empty( $clear_sel['enabled'] );
 		$build_all_count   = (int) ( $build_all['count_eligible'] ?? 0 );
 		$build_sel_count   = (int) ( $build_sel['count_selected'] ?? 0 );
+		$deny_count        = (int) ( $deny_all['count_eligible'] ?? 0 );
 		$plan_id           = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
 		$base_url          = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
 		?>
@@ -967,11 +1030,20 @@ final class Build_Plan_Workspace_Screen {
 			</form>
 			<form method="post" class="aio-bulk-form aio-bulk-deny-all-step2" style="display:inline">
 				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<input type="hidden" name="aio_build_plan_action" value="bulk_deny_step2" />
-				<button type="submit" class="button button-secondary" <?php echo $deny_all_enabled ? '' : ' disabled="disabled"'; ?>>
-					<?php \esc_html_e( 'Deny All New Pages', 'aio-page-builder' ); ?>
-					<?php if ( $deny_all_count > 0 ) : ?>
-						<span class="aio-bulk-count">(<?php echo (int) $deny_all_count; ?>)</span>
+				<input type="hidden" name="aio_build_plan_action" value="bulk_deny_all_step2" />
+				<label style="margin: 0 0.75em;">
+					<input
+						type="checkbox"
+						name="aio_step2_deny_all_confirm"
+						value="1"
+						<?php echo $deny_enabled ? 'required="required"' : 'disabled="disabled"'; ?>
+					/>
+					<?php \esc_html_e( 'Confirm denial', 'aio-page-builder' ); ?>
+				</label>
+				<button type="submit" class="button button-secondary" <?php echo $deny_enabled ? '' : ' disabled="disabled"'; ?>>
+					<?php \esc_html_e( 'Deny All Eligible', 'aio-page-builder' ); ?>
+					<?php if ( $deny_count > 0 ) : ?>
+						<span class="aio-bulk-count">(<?php echo (int) $deny_count; ?>)</span>
 					<?php endif; ?>
 				</button>
 			</form>
@@ -993,8 +1065,11 @@ final class Build_Plan_Workspace_Screen {
 	private function render_navigation_bulk_forms( array $bulk_states, string $nonce_html ): void {
 		$apply_all     = $bulk_states['apply_to_all_eligible'] ?? array();
 		$deny_all      = $bulk_states['deny_all_eligible'] ?? array();
+		$apply_sel     = $bulk_states['apply_to_selected'] ?? array();
+		$clear_sel     = $bulk_states['clear_selection'] ?? array();
 		$apply_enabled = ! empty( $apply_all['enabled'] );
 		$deny_enabled  = ! empty( $deny_all['enabled'] );
+		$clear_enabled = ! empty( $clear_sel['enabled'] );
 		$apply_count   = (int) ( $apply_all['count_eligible'] ?? 0 );
 		$deny_count    = (int) ( $deny_all['count_eligible'] ?? 0 );
 		?>
@@ -1009,6 +1084,7 @@ final class Build_Plan_Workspace_Screen {
 					<?php endif; ?>
 				</button>
 			</form>
+			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Apply to selected', 'aio-page-builder' ); ?></button>
 			<form method="post" class="aio-bulk-form aio-bulk-deny-navigation" style="display:inline">
 				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<input type="hidden" name="aio_build_plan_action" value="bulk_deny_navigation" />
@@ -1019,6 +1095,7 @@ final class Build_Plan_Workspace_Screen {
 					<?php endif; ?>
 				</button>
 			</form>
+			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Clear selection', 'aio-page-builder' ); ?></button>
 		</div>
 		<?php
 	}
@@ -1041,7 +1118,7 @@ final class Build_Plan_Workspace_Screen {
 		$confidence    = (string) ( $payload['overall_confidence'] ?? 'medium' );
 		?>
 		<div class="aio-step-overview">
-			<p class="aio-plan-summary"><?php echo \esc_html( $summary ?: __( 'No summary.', 'aio-page-builder' ) ); ?></p>
+			<p class="aio-plan-summary"><?php echo \esc_html( ( $summary !== '' && $summary !== null ) ? $summary : __( 'No summary.', 'aio-page-builder' ) ); ?></p>
 			<p><strong><?php \esc_html_e( 'Planning mode:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $planning_mode ); ?> | <strong><?php \esc_html_e( 'Confidence:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $confidence ); ?></p>
 			<p class="aio-overview-actions"><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' ) ) . '&step=1' ) ); ?>" class="button button-primary"><?php \esc_html_e( 'Start review', 'aio-page-builder' ); ?></a></p>
 		</div>
@@ -1052,7 +1129,7 @@ final class Build_Plan_Workspace_Screen {
 		$site_flow = (string) ( $definition[ Build_Plan_Schema::KEY_SITE_FLOW_SUMMARY ] ?? '' );
 		?>
 		<div class="aio-step-hierarchy">
-			<p><?php echo \esc_html( $site_flow ?: __( 'No hierarchy or flow summary for this plan.', 'aio-page-builder' ) ); ?></p>
+			<p><?php echo \esc_html( ( $site_flow !== '' && $site_flow !== null ) ? $site_flow : __( 'No hierarchy or flow summary for this plan.', 'aio-page-builder' ) ); ?></p>
 		</div>
 		<?php
 	}

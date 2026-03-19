@@ -35,11 +35,11 @@ final class Industry_Page_Template_Directory_Item_View {
 	 * @param string               $page_template_key    Page template internal_key.
 	 * @param string               $recommendation_status One of Industry_Page_Template_Recommendation_Resolver::FIT_*.
 	 * @param int                  $score                Recommendation score.
-	 * @param array<int, string>         $explanation_reasons  Reason codes.
-	 * @param array<int, string>         $industry_source_refs Industry keys that contributed.
+	 * @param array<int, string>   $explanation_reasons  Reason codes.
+	 * @param array<int, string>   $industry_source_refs Industry keys that contributed.
 	 * @param string               $hierarchy_fit        Hierarchy fit note.
 	 * @param string               $lpagery_fit         LPagery fit note.
-	 * @param array<int, string>         $warning_flags        Warning flags.
+	 * @param array<int, string>   $warning_flags        Warning flags.
 	 * @param array<string, mixed> $template_definition  Optional template definition snapshot.
 	 */
 	public function __construct(

@@ -104,7 +104,7 @@ final class AI_Run_Repository extends Abstract_CPT_Repository {
 	 * @param int $user_id WordPress user ID (stored in run metadata as actor).
 	 * @param int $limit   Max items (default 50).
 	 * @param int $offset Offset for pagination.
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function list_recent_by_actor( int $user_id, int $limit = 50, int $offset = 0 ): array {
 		$limit  = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
@@ -139,7 +139,7 @@ final class AI_Run_Repository extends Abstract_CPT_Repository {
 	 *
 	 * @param int $limit  Max items (default 50).
 	 * @param int $offset Offset for pagination.
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function list_recent( int $limit = 50, int $offset = 0 ): array {
 		$limit = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;

@@ -57,9 +57,9 @@ final class Industry_Subtype_Benchmark_Service {
 	 *
 	 * @return array{
 	 *   generated_at: string,
-	 *   subtypes_evaluated: array<int, string>,
+	 *   subtypes_evaluated: list<string>,
 	 *   per_subtype: array<string, array{subtype_key: string, parent_industry_key: string, label: string, section_overlay_count: int, page_overlay_count: int, has_bundle_ref: bool, caution_rule_count: int, differentiation_note: string, strength: string}>,
-	 *   summary: array{total_subtypes: int, meaningful_count: int, weak_count: int, findings: array<int, string>}
+	 *   summary: array{total_subtypes: int, meaningful_count: int, weak_count: int, findings: list<string>}
 	 * }
 	 */
 	public function run_benchmark(): array {

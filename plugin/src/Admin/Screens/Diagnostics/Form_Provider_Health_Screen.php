@@ -88,7 +88,7 @@ final class Form_Provider_Health_Screen {
 	}
 
 	/**
-	 * @param array<int, array{provider_key: string, status: string, message: string|null}> $rows Provider availability rows.
+	 * @param list<array{provider_key: string, status: string, message: string|null}> $rows Provider availability rows.
 	 * @return void
 	 */
 	private function render_provider_availability( array $rows ): void {
@@ -129,7 +129,8 @@ final class Form_Provider_Health_Screen {
 		?>
 		<div class="aio-form-provider-health-card card" style="max-width: 800px; padding: 1em; margin: 1em 0;">
 			<h2 class="aio-form-provider-health-section-title"><?php \esc_html_e( 'Registered providers', 'aio-page-builder' ); ?></h2>
-			<p><?php echo \esc_html( implode( ', ', $ids ) ?: __( 'None', 'aio-page-builder' ) ); ?></p>
+			<?php $joined = implode( ', ', $ids ); ?>
+			<p><?php echo \esc_html( $joined !== '' ? $joined : __( 'None', 'aio-page-builder' ) ); ?></p>
 		</div>
 		<?php
 	}
@@ -161,7 +162,7 @@ final class Form_Provider_Health_Screen {
 	}
 
 	/**
-	 * @param array<int, array{domain: string, count: int, link_label: string}> $failures Failure items to display.
+	 * @param list<array{domain: string, count: int, link_label: string}> $failures Failure items to display.
 	 * @return void
 	 */
 	private function render_recent_failures( array $failures ): void {

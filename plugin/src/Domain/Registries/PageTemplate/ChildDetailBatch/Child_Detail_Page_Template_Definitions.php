@@ -30,7 +30,7 @@ final class Child_Detail_Page_Template_Definitions {
 	/**
 	 * Allowed template families for child_detail (page-template-category-taxonomy-contract).
 	 *
-	 * @var array<int, string>
+	 * @var list<string>
 	 */
 	public const ALLOWED_FAMILIES = array(
 		'services',
@@ -42,7 +42,7 @@ final class Child_Detail_Page_Template_Definitions {
 	/**
 	 * Returns all child/detail page template definitions (order preserved for seeding).
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public static function all_definitions(): array {
 		return array(
@@ -75,7 +75,7 @@ final class Child_Detail_Page_Template_Definitions {
 	/**
 	 * Returns page template internal keys in this batch.
 	 *
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public static function template_keys(): array {
 		return array(
@@ -104,8 +104,8 @@ final class Child_Detail_Page_Template_Definitions {
 	/**
 	 * Builds ordered_sections and section_requirements from a list of section keys.
 	 *
-	 * @param array<int, string> $section_keys Section internal keys in order (no adjacent CTA; last must be CTA).
-	 * @return array{ ordered: array<int, array<string, mixed>>, requirements: array<string, array{required: bool}> }
+	 * @param list<string> $section_keys Section internal keys in order (no adjacent CTA; last must be CTA).
+	 * @return array{ ordered: list<array<string, mixed>>, requirements: array<string, array{required: bool}> }
 	 */
 	private static function ordered_and_requirements( array $section_keys ): array {
 		$ordered      = array();
@@ -132,7 +132,7 @@ final class Child_Detail_Page_Template_Definitions {
 	 * @param string       $purpose_summary
 	 * @param string       $archetype
 	 * @param string       $template_family
-	 * @param array<int, string> $parent_family_compatibility
+	 * @param list<string> $parent_family_compatibility
 	 * @param array        $ordered
 	 * @param array        $section_requirements
 	 * @param array        $one_pager

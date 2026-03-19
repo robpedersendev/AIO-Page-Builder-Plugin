@@ -84,7 +84,7 @@ final class Log_Export_Service {
 	/**
 	 * Exports requested log types with filters. Redacts before writing. Writes to plugin exports path.
 	 *
-	 * @param array<int, string>         $log_types Allowed keys from ALLOWED_LOG_TYPES.
+	 * @param array<int, string>   $log_types Allowed keys from ALLOWED_LOG_TYPES.
 	 * @param array<string, mixed> $filters Optional: date_from, date_to (Y-m-d), plan_id, run_id, job_ref.
 	 * @return Log_Export_Result
 	 */

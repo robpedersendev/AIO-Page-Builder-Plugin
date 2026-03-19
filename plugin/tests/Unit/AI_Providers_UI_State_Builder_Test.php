@@ -109,7 +109,7 @@ final class AI_Providers_UI_State_Builder_Test extends TestCase {
 	/**
 	 * Builds state using real connection test and settings (final classes); only secret store is mocked.
 	 *
-	 * @return array{provider_rows: array<int, array>, disclosure_blocks: array<int, array>, ai_runs_url: string}
+	 * @return array{provider_rows: list<array>, disclosure_blocks: list<array>, ai_runs_url: string}
 	 */
 	private function build_state_with_mocks(): array {
 		$settings = new Settings_Service();

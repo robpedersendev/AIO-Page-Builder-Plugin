@@ -57,7 +57,7 @@ final class Status_Badge_Component {
 		}
 		$css_class = 'aio-status-badge aio-badge-' . \sanitize_html_class( $badge_key );
 		?>
-		<span class="<?php echo \esc_attr( $css_class ); ?>" role="status"><?php echo \esc_html( $label ?: $badge_key ); ?></span>
+		<span class="<?php echo \esc_attr( $css_class ); ?>" role="status"><?php echo \esc_html( $label !== '' && $label !== null ? $label : $badge_key ); ?></span>
 		<?php
 	}
 }

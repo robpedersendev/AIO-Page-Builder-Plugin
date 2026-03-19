@@ -140,8 +140,8 @@ final class Template_Analytics_Service {
 	 * Collects template-related signals from plan items (new_page, existing_page_change).
 	 *
 	 * @param array<int, array<string, mixed>> $plans
-	 * @param string|null                $filter_family
-	 * @param string|null                $filter_class
+	 * @param string|null                      $filter_family
+	 * @param string|null                      $filter_class
 	 * @return array<int, array{template_key: string, template_family: string, template_class: string, status: string, rejection_reason: string}>
 	 */
 	private function collect_plan_item_signals( array $plans, ?string $filter_family, ?string $filter_class ): array {

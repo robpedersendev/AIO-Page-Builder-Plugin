@@ -91,7 +91,7 @@ final class Classification_Result {
 
 	/**
 	 * @param string                  $classification   One of CLASSIFICATION_*.
-	 * @param array<int, string>            $reason_codes     Reason codes.
+	 * @param array<int, string>      $reason_codes     Reason codes.
 	 * @param string|null             $duplicate_of     Duplicate target URL when classification is duplicate.
 	 * @param array<string, bool|int> $meaningful_flags Optional flags (has_h1, word_count, in_nav, etc.).
 	 * @param string                  $retention_decision One of RETENTION_*.

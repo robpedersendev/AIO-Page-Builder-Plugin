@@ -146,7 +146,7 @@ final class Page_Template_Normalizer {
 	/**
 	 * Builds section_requirements from ordered sections; merges with input requirements.
 	 *
-	 * @param array<string, mixed>                                            $raw
+	 * @param array<string, mixed>                                                  $raw
 	 * @param array<int, array{section_key: string, position: int, required: bool}> $ordered
 	 * @return array<string, array{required: bool}>
 	 */

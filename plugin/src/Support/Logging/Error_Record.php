@@ -68,11 +68,11 @@ final class Error_Record {
 		string $remediation_hint = '',
 		string $context_reference = ''
 	) {
-		if ( ! Log_Categories::isValid( $category ) ) {
+		if ( ! Log_Categories::is_valid( $category ) ) {
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; category is validated.
 			throw new \InvalidArgumentException( 'Invalid log category: ' . $category );
 		}
-		if ( ! Log_Severities::isValid( $severity ) ) {
+		if ( ! Log_Severities::is_valid( $severity ) ) {
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; severity is validated.
 			throw new \InvalidArgumentException( 'Invalid log severity: ' . $severity );
 		}

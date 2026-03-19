@@ -38,13 +38,13 @@ final class Import_Validation_Result {
 	private bool $checksum_verified;
 
 	/**
-	 * @param bool                        $validation_passed
+	 * @param bool                              $validation_passed
 	 * @param array<int, string>                $blocking_failures
 	 * @param array<int, array<string, string>> $conflicts
 	 * @param array<int, string>                $warnings
-	 * @param array<string, mixed>        $manifest
-	 * @param string                      $package_path
-	 * @param bool                        $checksum_verified
+	 * @param array<string, mixed>              $manifest
+	 * @param string                            $package_path
+	 * @param bool                              $checksum_verified
 	 */
 	public function __construct(
 		bool $validation_passed,

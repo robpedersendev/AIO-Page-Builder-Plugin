@@ -91,8 +91,8 @@ final class Entity_Style_Form_Builder {
 	/**
 	 * Returns component override field definitions for the entity.
 	 *
-	 * @param string $entity_type
-	 * @param string $entity_key
+	 * @param string $entity_type Entity type (e.g. section, page).
+	 * @param string $entity_key  Entity identifier (internal key).
 	 * @return array<int, array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>
 	 */
 	public function get_component_field_definitions( string $entity_type, string $entity_key ): array {
@@ -125,8 +125,8 @@ final class Entity_Style_Form_Builder {
 	/**
 	 * Token fields grouped by token group for sectioned rendering.
 	 *
-	 * @param string $entity_type
-	 * @param string $entity_key
+	 * @param string $entity_type Entity type (e.g. section, page).
+	 * @param string $entity_key  Entity identifier (internal key).
 	 * @return array<string, array<int, array{group: string, name: string, name_attr: string, label: string, value: string, value_type: string, max_length: int}>>
 	 */
 	public function get_token_fields_by_group( string $entity_type, string $entity_key ): array {
@@ -145,8 +145,8 @@ final class Entity_Style_Form_Builder {
 	/**
 	 * Component override fields grouped by component_id.
 	 *
-	 * @param string $entity_type
-	 * @param string $entity_key
+	 * @param string $entity_type Entity type (e.g. section, page).
+	 * @param string $entity_key  Entity identifier (internal key).
 	 * @return array<string, array<int, array{component_id: string, token_var_name: string, name_attr: string, label: string, value: string, max_length: int}>>
 	 */
 	public function get_component_fields_by_component( string $entity_type, string $entity_key ): array {

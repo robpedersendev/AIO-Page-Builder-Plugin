@@ -57,11 +57,11 @@ final class Content_Survivability_Result {
 	private bool $deactivation_readiness;
 
 	/**
-	 * @param bool         $is_survivable                   True when no prohibited lock-in detected.
+	 * @param bool               $is_survivable                   True when no prohibited lock-in detected.
 	 * @param array<int, string> $prohibited_runtime_dependencies  Detected prohibited patterns.
 	 * @param array<int, string> $dynamic_output_flags            Justified optional dynamic paths.
 	 * @param array<int, string> $human_editability_notes         Editability/usability notes.
-	 * @param bool         $deactivation_readiness          True when content remains meaningful without plugin.
+	 * @param bool               $deactivation_readiness          True when content remains meaningful without plugin.
 	 */
 	public function __construct(
 		bool $is_survivable,

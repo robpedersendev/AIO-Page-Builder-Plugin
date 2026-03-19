@@ -31,7 +31,7 @@ final class Capability_Registrar {
 	public static function register(): void {
 		$admin = \get_role( self::ROLE_ADMINISTRATOR );
 		if ( $admin instanceof \WP_Role ) {
-			foreach ( Capabilities::getAll() as $cap ) {
+			foreach ( Capabilities::get_all() as $cap ) {
 				$admin->add_cap( $cap );
 			}
 		}
@@ -54,7 +54,7 @@ final class Capability_Registrar {
 		if ( ! $roles instanceof \WP_Roles ) {
 			return;
 		}
-		$caps = Capabilities::getAll();
+		$caps = Capabilities::get_all();
 		foreach ( $roles->roles as $role_key => $role_data ) {
 			$role = \get_role( $role_key );
 			if ( $role instanceof \WP_Role ) {

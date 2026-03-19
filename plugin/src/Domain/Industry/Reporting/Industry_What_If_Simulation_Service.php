@@ -64,12 +64,12 @@ final class Industry_What_If_Simulation_Service {
 	 * @param array<string, mixed> $params Optional PARAM_ALTERNATE_* keys; omitted or null = keep live value; empty string = clear that slot for simulation.
 	 * @return array{
 	 *   valid: bool,
-	 *   invalid_refs: array<int, array{type: string, key: string}>,
+	 *   invalid_refs: list<array{type: string, key: string}>,
 	 *   simulated_profile_summary: array{primary: string, subtype: string, bundle: string},
 	 *   live_profile_summary: array{primary: string, subtype: string, bundle: string},
 	 *   comparison_simulated: array<string, mixed>|null,
 	 *   comparison_live: array<string, mixed>|null,
-	 *   warnings: array<int, string>
+	 *   warnings: list<string>
 	 * }
 	 */
 	public function run_simulation( array $params = array() ): array {
@@ -151,7 +151,7 @@ final class Industry_What_If_Simulation_Service {
 	 *
 	 * @param array<string, mixed> $simulated
 	 * @param array<string, mixed> $params
-	 * @return array<int, array{type: string, key: string}>
+	 * @return list<array{type: string, key: string}>
 	 */
 	private function validate_simulated_refs( array $simulated, array $params ): array {
 		$invalid = array();

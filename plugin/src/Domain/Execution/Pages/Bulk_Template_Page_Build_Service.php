@@ -226,7 +226,7 @@ final class Bulk_Template_Page_Build_Service {
 	 * @param array<int, string>                  $job_refs
 	 * @param array<int, Execution_Job_Result>    $results
 	 * @param array<string, array<string, mixed>> $item_results_pre
-	 * @param array<int, string>                        $slug_collisions
+	 * @param array<int, string>                  $slug_collisions
 	 * @return Bulk_Template_Page_Build_Result
 	 */
 	private function aggregate_to_bulk_result(

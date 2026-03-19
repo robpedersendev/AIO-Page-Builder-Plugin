@@ -337,7 +337,7 @@ final class Composition_Registry_Service {
 			$out[]   = array(
 				Composition_Schema::SECTION_ITEM_KEY      => $key,
 				Composition_Schema::SECTION_ITEM_POSITION => $pos,
-				Composition_Schema::SECTION_ITEM_VARIANT  => $variant ?: 'default',
+				Composition_Schema::SECTION_ITEM_VARIANT  => ( $variant !== '' && $variant !== null ) ? $variant : 'default',
 			);
 		}
 		usort( $out, fn( $a, $b ) => $a[ Composition_Schema::SECTION_ITEM_POSITION ] <=> $b[ Composition_Schema::SECTION_ITEM_POSITION ] );

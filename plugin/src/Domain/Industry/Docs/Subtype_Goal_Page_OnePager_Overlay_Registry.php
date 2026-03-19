@@ -56,7 +56,7 @@ final class Subtype_Goal_Page_OnePager_Overlay_Registry {
 	/** @var array<string, array<string, mixed>> Composite "subtype|goal|page" => overlay. */
 	private array $by_composite = array();
 
-	/** @var array<int, array<string, mixed>> All valid overlays in load order. */
+	/** @var list<array<string, mixed>> All valid overlays in load order. */
 	private array $all = array();
 
 	/**
@@ -161,7 +161,7 @@ final class Subtype_Goal_Page_OnePager_Overlay_Registry {
 	 *
 	 * @param string $subtype_key Subtype key.
 	 * @param string $goal_key    Conversion goal key.
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_subtype_goal( string $subtype_key, string $goal_key ): array {
 		$sub = trim( $subtype_key );
@@ -187,7 +187,7 @@ final class Subtype_Goal_Page_OnePager_Overlay_Registry {
 	/**
 	 * Returns all loaded overlays.
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function list_all(): array {
 		return $this->all;

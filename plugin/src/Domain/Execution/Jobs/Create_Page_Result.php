@@ -41,7 +41,7 @@ final class Create_Page_Result {
 	 * @param bool                 $success
 	 * @param int                  $post_id    Created page ID; 0 on failure.
 	 * @param string               $message
-	 * @param array<int, string>         $errors
+	 * @param array<int, string>   $errors
 	 * @param array<string, mixed> $artifacts  post_id, template_key, assignment_count, log_ref, etc.
 	 * @param string               $log_ref
 	 */

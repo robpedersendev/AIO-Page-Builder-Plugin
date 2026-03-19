@@ -93,7 +93,7 @@ final class Install_Notification_Service {
 			return '';
 		}
 		$url = home_url( '/', 'https' );
-		$url = $url ?: home_url( '/', 'http' );
+		$url = ( $url !== '' && $url !== false ) ? $url : home_url( '/', 'http' );
 		if ( $url === '' || $url === false ) {
 			return '';
 		}
@@ -102,7 +102,8 @@ final class Install_Notification_Service {
 		if ( $host !== '' ) {
 			return $host;
 		}
-		return preg_replace( '/[^a-zA-Z0-9._-]/', '_', (string) $url ) ?: '';
+		$sanitized = preg_replace( '/[^a-zA-Z0-9._-]/', '_', (string) $url );
+		return $sanitized !== '' ? $sanitized : '';
 	}
 
 	/** @return array{dedupe_key?: string, site_reference?: string, sent_at?: string, log_reference?: string} */

@@ -53,11 +53,11 @@ final class Animation_QA_Result {
 
 	/**
 	 * @param bool                                                                                  $passed
-	 * @param array<int, array{scope: string, template_key: string, code: string, message: string}>       $fallback_violation_summary
+	 * @param array<int, array{scope: string, template_key: string, code: string, message: string}> $fallback_violation_summary
 	 * @param array{sections_checked: int, all_resolve_safe_tier: bool, sections_capped_count: int} $reduced_motion_check_result
 	 * @param array{audited: int, by_tier: array<string, int>, violations: int}                     $section_summary
 	 * @param array{audited: int, with_tier_cap: int, violations: int}                              $page_summary
-	 * @param array<int, string>                                                                          $manual_qa_checklist
+	 * @param array<int, string>                                                                    $manual_qa_checklist
 	 */
 	public function __construct(
 		bool $passed,

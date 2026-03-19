@@ -104,7 +104,7 @@ final class Export_Generator {
 	 * Generates export package for the given mode and optional categories.
 	 * Writes ZIP under plugin exports path; logs attempt and result.
 	 *
-	 * @param string       $mode             Export mode key (Export_Mode_Keys).
+	 * @param string             $mode             Export mode key (Export_Mode_Keys).
 	 * @param array<int, string> $optional_included Optional category keys to include when mode allows (e.g. logs, reporting_history).
 	 * @return Export_Result
 	 */
@@ -303,10 +303,10 @@ final class Export_Generator {
 	/**
 	 * Writes category data to staging directory (ZIP layout: settings/, profiles/, registries/, plans/, tokens/).
 	 *
-	 * @param string       $staging_dir Staging root path.
-	 * @param string       $mode        Export mode.
+	 * @param string             $staging_dir Staging root path.
+	 * @param string             $mode        Export mode.
 	 * @param array<int, string> $included    Categories to include.
-	 * @param bool         $redact      Whether to redact settings and profile.
+	 * @param bool               $redact      Whether to redact settings and profile.
 	 */
 	private function write_staging_files( string $staging_dir, string $mode, array $included, bool $redact ): void {
 		$staging_dir = rtrim( $staging_dir, '/\\' ) . '/';
@@ -445,7 +445,8 @@ final class Export_Generator {
 		$url  = \home_url( '', 'https' );
 		$host = is_string( $url ) ? \parse_url( $url, PHP_URL_HOST ) : null;
 		if ( $host !== null && $host !== '' ) {
-			return preg_replace( '#[^a-zA-Z0-9_-]#', '', $host ) ?: 'site';
+			$slug = preg_replace( '#[^a-zA-Z0-9_-]#', '', $host );
+			return $slug !== '' ? $slug : 'site';
 		}
 		return 'site';
 	}

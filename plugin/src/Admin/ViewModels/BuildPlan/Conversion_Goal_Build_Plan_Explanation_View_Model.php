@@ -54,7 +54,7 @@ final class Conversion_Goal_Build_Plan_Explanation_View_Model {
 	 *   conversion_goal_key: string|null,
 	 *   goal_overlay_applied: bool,
 	 *   goal_rationale_line: string,
-	 *   goal_influence_notes: array<int, string>
+	 *   goal_influence_notes: list<string>
 	 * }
 	 */
 	public static function from_plan_definition( array $plan_definition ): array {

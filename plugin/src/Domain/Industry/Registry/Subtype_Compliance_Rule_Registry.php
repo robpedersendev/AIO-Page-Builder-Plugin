@@ -72,7 +72,7 @@ final class Subtype_Compliance_Rule_Registry {
 	/** @var array<string, array<string, mixed>> Map of subtype_rule_key => definition. */
 	private array $by_key = array();
 
-	/** @var array<int, array<string, mixed>> All valid rules in load order. */
+	/** @var list<array<string, mixed>> All valid rules in load order. */
 	private array $all = array();
 
 	/**
@@ -160,7 +160,7 @@ final class Subtype_Compliance_Rule_Registry {
 	/**
 	 * Returns all loaded subtype rules.
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -171,7 +171,7 @@ final class Subtype_Compliance_Rule_Registry {
 	 *
 	 * @param string $parent_industry_key Parent industry pack key.
 	 * @param string $subtype_key         Subtype key.
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_subtype( string $parent_industry_key, string $subtype_key ): array {
 		$parent = trim( $parent_industry_key );

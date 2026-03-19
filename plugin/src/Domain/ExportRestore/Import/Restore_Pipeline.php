@@ -127,9 +127,10 @@ final class Restore_Pipeline {
 	 *
 	 * @param Import_Validation_Result $validation_result Must have validation_passed true.
 	 * @param string                   $resolution_mode   Conflict_Resolution_Service::MODE_*.
+	 * @param array<int, string>|null  $allowed_categories Optional allowlist of categories to restore (scope selection). When provided, categories not in allowlist are skipped.
 	 * @return Restore_Result
 	 */
-	public function restore( Import_Validation_Result $validation_result, string $resolution_mode ): Restore_Result {
+	public function restore( Import_Validation_Result $validation_result, string $resolution_mode, ?array $allowed_categories = null ): Restore_Result {
 		if ( ! $validation_result->validation_passed() ) {
 			return Restore_Result::failure(
 				'Restore blocked: validation did not pass.',
@@ -161,6 +162,7 @@ final class Restore_Pipeline {
 		$included = isset( $manifest['included_categories'] ) && is_array( $manifest['included_categories'] )
 			? $manifest['included_categories']
 			: array();
+		$allowed  = $allowed_categories !== null ? array_values( array_unique( array_filter( $allowed_categories, 'is_string' ) ) ) : null;
 
 		$restored             = array();
 		$resolved_actions_log = array();
@@ -170,6 +172,9 @@ final class Restore_Pipeline {
 		try {
 			foreach ( self::RESTORE_ORDER as $category ) {
 				if ( ! in_array( $category, $included, true ) ) {
+					continue;
+				}
+				if ( $allowed !== null && ! in_array( $category, $allowed, true ) ) {
 					continue;
 				}
 				$action_taken = $this->restore_category( $zip, $category, $manifest, $resolved_actions_map, $skipped_reasons );
@@ -209,7 +214,7 @@ final class Restore_Pipeline {
 	}
 
 	/**
-	 * @param array<int, array{category: string, key: string, action: string}> $resolved
+	 * @param list<array{category: string, key: string, action: string}> $resolved
 	 * @return array<string, array<string, string>> Map category -> ( key -> action ).
 	 */
 	private function build_resolved_map( array $resolved ): array {
@@ -231,8 +236,8 @@ final class Restore_Pipeline {
 	 * @param string                                        $category
 	 * @param array<string, mixed>                          $manifest
 	 * @param array<string, array<string, string>>          $resolved_map
-	 * @param array<int, array{category: string, reason: string}> $skipped_reasons Collects category + user-facing reason when a category is skipped (e.g. styling service unavailable).
-	 * @return array<int, array{category: string, action: string, key?: string}>|null Actions taken, or null if skipped.
+	 * @param list<array{category: string, reason: string}> $skipped_reasons Collects category + user-facing reason when a category is skipped (e.g. styling service unavailable).
+	 * @return list<array{category: string, action: string, key?: string}>|null Actions taken, or null if skipped.
 	 */
 	private function restore_category( \ZipArchive $zip, string $category, array $manifest, array $resolved_map, array &$skipped_reasons ): ?array {
 		$actions = array();

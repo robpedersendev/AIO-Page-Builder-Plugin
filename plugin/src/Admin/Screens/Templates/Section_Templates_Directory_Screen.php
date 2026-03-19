@@ -55,6 +55,8 @@ final class Section_Templates_Directory_Screen {
 		}
 
 		$state_builder                              = $this->get_state_builder();
+		$raw_paged                                  = isset( $_GET['paged'] ) ? \wp_unslash( $_GET['paged'] ) : null;
+		$raw_per_page                               = isset( $_GET['per_page'] ) ? \wp_unslash( $_GET['per_page'] ) : null;
 		$request                                    = array(
 			'purpose_family'       => isset( $_GET['purpose_family'] ) ? \sanitize_key( \wp_unslash( $_GET['purpose_family'] ) ) : '',
 			'cta_classification'   => isset( $_GET['cta_classification'] ) ? \sanitize_key( \wp_unslash( $_GET['cta_classification'] ) ) : '',
@@ -62,8 +64,8 @@ final class Section_Templates_Directory_Screen {
 			'all'                  => isset( $_GET['all'] ) && \sanitize_key( \wp_unslash( $_GET['all'] ) ) === '1',
 			'status'               => isset( $_GET['status'] ) ? \sanitize_key( \wp_unslash( $_GET['status'] ) ) : '',
 			'search'               => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( $_GET['search'] ) ) : '',
-			'paged'                => isset( $_GET['paged'] ) ? max( 1, (int) \wp_unslash( $_GET['paged'] ) ) : 1,
-			'per_page'             => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) \wp_unslash( $_GET['per_page'] ) ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
+			'paged'                => $raw_paged !== null ? max( 1, (int) $raw_paged ) : 1,
+			'per_page'             => $raw_per_page !== null ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $raw_per_page ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
 			'industry_view'        => isset( $_GET['industry_view'] ) ? \sanitize_key( \wp_unslash( $_GET['industry_view'] ) ) : Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY,
 		);
 		$state                                      = $state_builder->build_state( $request );
@@ -420,7 +422,7 @@ final class Section_Templates_Directory_Screen {
 									<?php \wp_nonce_field( \AIOPageBuilder\Admin\Actions\Save_Industry_Section_Override_Action::NONCE_ACTION, \AIOPageBuilder\Admin\Actions\Save_Industry_Section_Override_Action::NONCE_NAME ); ?>
 									<input type="hidden" name="section_key" value="<?php echo \esc_attr( $key ); ?>" />
 									<input type="hidden" name="state" value="accepted" />
-									<input type="hidden" name="_wp_http_referer" value="<?php echo \esc_attr( \wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ); ?>" />
+									<input type="hidden" name="_wp_http_referer" value="<?php echo \esc_attr( \sanitize_text_field( \wp_unslash( isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '' ) ) ); ?>" />
 									<button type="submit" class="button-link"><?php \esc_html_e( 'Use anyway', 'aio-page-builder' ); ?></button>
 								</form>
 							<?php endif; ?>
@@ -450,6 +452,7 @@ final class Section_Templates_Directory_Screen {
 			$prev_args = array_merge( $query_args, array( 'paged' => $page - 1 ) );
 			echo '<li><a href="' . \esc_url( \add_query_arg( $prev_args, $base_url ) ) . '">' . \esc_html__( 'Previous', 'aio-page-builder' ) . '</a></li>';
 		}
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $page and $total_pages are integers for %d.
 		echo '<li><span class="aio-pagination-info">' . sprintf( /* translators: 1: current page, 2: total pages */ \esc_html__( 'Page %1$d of %2$d', 'aio-page-builder' ), $page, $total_pages ) . '</span></li>';
 		if ( $page < $total_pages ) {
 			$next_args = array_merge( $query_args, array( 'paged' => $page + 1 ) );

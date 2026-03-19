@@ -43,13 +43,13 @@ final class Industry_Section_Preview_View_Model {
 	/** @var array<int, array<string, mixed>> Substitute suggestion result shapes. */
 	private array $substitute_suggestions;
 
-	/** @var array<int, string> */
+	/** @var list<string> */
 	private array $warning_flags;
 
-	/** @var array<int, string> */
+	/** @var list<string> */
 	private array $explanation_reasons;
 
-	/** @var array<int, array{rule_key: string, severity: string, caution_summary: string}> Advisory compliance cautions (Prompt 407). */
+	/** @var list<array{rule_key: string, severity: string, caution_summary: string}> Advisory compliance cautions (Prompt 407). */
 	private array $compliance_warnings;
 
 	/** @var array<string, mixed> Subtype influence (Industry_Subtype_Preview_Influence_View_Model::to_array()); empty when no subtype. */
@@ -109,14 +109,14 @@ final class Industry_Section_Preview_View_Model {
 	}
 
 	/**
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public function get_warning_flags(): array {
 		return $this->warning_flags;
 	}
 
 	/**
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public function get_explanation_reasons(): array {
 		return $this->explanation_reasons;
@@ -125,7 +125,7 @@ final class Industry_Section_Preview_View_Model {
 	/**
 	 * Returns advisory compliance/caution rules for display (Prompt 407).
 	 *
-	 * @return array<int, array{rule_key: string, severity: string, caution_summary: string}>
+	 * @return list<array{rule_key: string, severity: string, caution_summary: string}>
 	 */
 	public function get_compliance_warnings(): array {
 		return $this->compliance_warnings;

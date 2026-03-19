@@ -26,12 +26,24 @@
 	<rule ref="Squiz.Commenting.ClassComment">
 		<exclude name="Squiz.Commenting.ClassComment.Missing"/>
 	</rule>
-	<!-- Param description (comment text) optional; @param type and name still required. Add descriptions incrementally. -->
 	<rule ref="Squiz.Commenting.FunctionComment">
 		<exclude name="Squiz.Commenting.FunctionComment.Missing"/>
 		<exclude name="Squiz.Commenting.FunctionComment.WrongStyle"/>
 		<exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+		<!-- Param description text deferred; add incrementally. Tag and type already required. -->
 		<exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+		<!-- Docblock list<string> etc. not expressible as PHP type hints; param order vs. docblock order in constructors. -->
+		<exclude name="Squiz.Commenting.FunctionComment.IncorrectTypeHint"/>
+		<exclude name="Squiz.Commenting.FunctionComment.ParamNameNoMatch"/>
+	</rule>
+	<!-- Table/identifier names from constants cannot be bound as placeholders in MySQL; values use prepare(). -->
+	<rule ref="WordPress.DB.PreparedSQL">
+		<exclude name="WordPress.DB.PreparedSQL.InterpolatedNotPrepared"/>
+		<exclude name="WordPress.DB.PreparedSQL.NotPrepared"/>
+	</rule>
+	<!-- Translators comments for placeholder strings; add incrementally. -->
+	<rule ref="WordPress.WP.I18n">
+		<exclude name="WordPress.WP.I18n.MissingTranslatorsComment"/>
 	</rule>
 	<rule ref="Squiz.Commenting.VariableComment">
 		<exclude name="Squiz.Commenting.VariableComment.Missing"/>

@@ -206,7 +206,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 	/**
 	 * Persists page_field_group rows for each group key.
 	 *
-	 * @param string       $page_ref
+	 * @param string             $page_ref
 	 * @param array<int, string> $group_keys
 	 * @return int Number of groups persisted.
 	 */

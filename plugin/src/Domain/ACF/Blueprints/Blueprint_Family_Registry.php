@@ -37,8 +37,8 @@ final class Blueprint_Family_Registry {
 	/**
 	 * Registers a blueprint family. Overwrites existing entry for the same key.
 	 *
-	 * @param string                                                                    $family_key variation_family_key (e.g. hero_primary, proof_cards).
-	 * @param string                                                                    $base_blueprint_ref Shared field_blueprint_ref for sections in this family.
+	 * @param string                                                                          $family_key variation_family_key (e.g. hero_primary, proof_cards).
+	 * @param string                                                                          $base_blueprint_ref Shared field_blueprint_ref for sections in this family.
 	 * @param array<string, array{add_fields?: array, hide_field_names?: array<int, string>}> $variant_overrides Optional. variant_key => add_fields (array of field defs), hide_field_names (list of field names to omit).
 	 * @return void
 	 */

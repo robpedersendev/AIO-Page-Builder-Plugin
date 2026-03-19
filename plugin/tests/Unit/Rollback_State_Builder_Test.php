@@ -133,28 +133,28 @@ final class Rollback_State_Builder_Test extends TestCase {
 
 	/** v1 (Prompt 642): list_rollback_entries_for_plan returns post snapshots with pre_snapshot_id for the given plan. */
 	public function test_list_rollback_entries_for_plan_returns_linked_entries(): void {
-		$repo   = new Operational_Snapshot_Repository();
+		$repo    = new Operational_Snapshot_Repository();
 		$plan_id = 'plan-list-rollback-test-' . (string) time();
 		$pre_id  = 'pre-list-test-1';
 		$post_id = 'post-list-test-1';
 		$pre     = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID   => $pre_id,
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => $pre_id,
 			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_PRE_CHANGE,
 			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
-			Operational_Snapshot_Schema::FIELD_TARGET_REF   => '42',
-			Operational_Snapshot_Schema::FIELD_CREATED_AT    => '2025-03-12T10:00:00+00:00',
-			Operational_Snapshot_Schema::FIELD_ACTION_TYPE   => 'replace_page',
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => '42',
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => '2025-03-12T10:00:00+00:00',
+			Operational_Snapshot_Schema::FIELD_ACTION_TYPE => 'replace_page',
 		);
 		$post    = array(
-			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID   => $post_id,
+			Operational_Snapshot_Schema::FIELD_SNAPSHOT_ID => $post_id,
 			Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE => Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE,
 			Operational_Snapshot_Schema::FIELD_OBJECT_FAMILY => Operational_Snapshot_Schema::OBJECT_FAMILY_PAGE,
-			Operational_Snapshot_Schema::FIELD_TARGET_REF   => '42',
-			Operational_Snapshot_Schema::FIELD_CREATED_AT   => '2025-03-12T10:01:00+00:00',
-			Operational_Snapshot_Schema::FIELD_ACTION_TYPE  => 'replace_page',
+			Operational_Snapshot_Schema::FIELD_TARGET_REF  => '42',
+			Operational_Snapshot_Schema::FIELD_CREATED_AT  => '2025-03-12T10:01:00+00:00',
+			Operational_Snapshot_Schema::FIELD_ACTION_TYPE => 'replace_page',
 			Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF => $plan_id,
-			Operational_Snapshot_Schema::FIELD_POST_CHANGE  => array( 'result_snapshot' => array() ),
-			'pre_snapshot_id' => $pre_id,
+			Operational_Snapshot_Schema::FIELD_POST_CHANGE => array( 'result_snapshot' => array() ),
+			'pre_snapshot_id'                              => $pre_id,
 		);
 		$repo->save( $pre );
 		$repo->save( $post );

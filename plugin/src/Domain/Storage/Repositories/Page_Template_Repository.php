@@ -39,7 +39,7 @@ final class Page_Template_Repository extends Abstract_CPT_Repository implements 
 	public function save_definition( array $definition ): int {
 		$key    = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 		$status = (string) ( $definition[ Page_Template_Schema::FIELD_STATUS ] ?? 'draft' );
-		$name   = (string) ( $definition[ Page_Template_Schema::FIELD_NAME ] ?? $key ?: 'Untitled' );
+		$name   = (string) ( $definition[ Page_Template_Schema::FIELD_NAME ] ?? ( $key !== '' ? $key : 'Untitled' ) );
 
 		$data = array(
 			'internal_key' => $key,
@@ -211,8 +211,8 @@ final class Page_Template_Repository extends Abstract_CPT_Repository implements 
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
 				$base['definition']              = $decoded;
-				$base[ self::META_INTERNAL_KEY ] = $base[ self::META_INTERNAL_KEY ] ?: ( $decoded[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-				$base[ self::META_STATUS ]       = $base[ self::META_STATUS ] ?: ( $decoded[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
+				$base[ self::META_INTERNAL_KEY ] = ( $base[ self::META_INTERNAL_KEY ] !== '' && $base[ self::META_INTERNAL_KEY ] !== false ) ? $base[ self::META_INTERNAL_KEY ] : ( $decoded[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+				$base[ self::META_STATUS ]       = ( $base[ self::META_STATUS ] !== '' && $base[ self::META_STATUS ] !== false ) ? $base[ self::META_STATUS ] : ( $decoded[ Page_Template_Schema::FIELD_STATUS ] ?? '' );
 			}
 		}
 		return $base;

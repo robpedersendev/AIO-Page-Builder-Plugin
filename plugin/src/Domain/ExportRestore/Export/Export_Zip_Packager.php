@@ -108,8 +108,8 @@ final class Export_Zip_Packager {
 		$slug_clean = preg_replace( '#[^a-zA-Z0-9_-]#', '', $site_slug );
 		$mode_safe  = $mode_clean !== '' && $mode_clean !== null ? $mode_clean : 'export';
 		$slug_safe  = $slug_clean !== '' && $slug_clean !== null ? $slug_clean : 'site';
-		$date      = gmdate( 'Ymd' );
-		$time      = gmdate( 'His' );
+		$date       = gmdate( 'Ymd' );
+		$time       = gmdate( 'His' );
 		return sprintf( 'aio-export-%s-%s-%s-%s.zip', $mode_safe, $date, $time, $slug_safe );
 	}
 

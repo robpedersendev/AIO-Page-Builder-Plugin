@@ -177,7 +177,7 @@ final class ACF_Local_JSON_Mirror_Service {
 	/**
 	 * @param array<int, array<string, mixed>> $files
 	 * @param array<int, string>               $group_keys
-	 * @param bool                       $failure
+	 * @param bool                             $failure
 	 * @return array<string, mixed>
 	 */
 	private function build_manifest( array $files, array $group_keys, bool $failure ): array {

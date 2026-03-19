@@ -27,6 +27,9 @@ require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interfa
 require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Type_Keys.php';
 require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Status_Families.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Build_Plan_Repository_Interface.php';
+require_once $plugin_root . '/src/Domain/Execution/Executor/Plan_State_For_Execution_Interface.php';
+require_once $plugin_root . '/src/Domain/BuildPlan/Analytics/Build_Plan_List_Provider_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Build_Plan_Repository.php';
 
 final class Build_Plan_Stepper_And_UI_State_Test extends TestCase {

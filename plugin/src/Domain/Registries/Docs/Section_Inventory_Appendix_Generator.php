@@ -137,7 +137,7 @@ final class Section_Inventory_Appendix_Generator {
 
 	/**
 	 * @param array<string, array<int, array<string, mixed>>> $grouped
-	 * @param int                                       $total
+	 * @param int                                             $total
 	 * @return string
 	 */
 	private function render_markdown( array $grouped, int $total ): string {

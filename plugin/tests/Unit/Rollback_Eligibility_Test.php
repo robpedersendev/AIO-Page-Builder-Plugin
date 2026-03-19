@@ -257,8 +257,8 @@ final class Rollback_Eligibility_Test extends TestCase {
 
 	/** v1 (Prompt 642): UPDATE_MENU has no rollback handler; eligibility returns NO_HANDLER_FOR_ACTION_TYPE. */
 	public function test_ineligible_when_action_type_not_rollback_capable_in_v1(): void {
-		$repo                   = new Stub_Rollback_Repo();
-		$repo->store['pre-menu'] = self::pre_snapshot( 'pre-menu', '10', Operational_Snapshot_Schema::OBJECT_FAMILY_MENU, Execution_Action_Types::UPDATE_MENU );
+		$repo                     = new Stub_Rollback_Repo();
+		$repo->store['pre-menu']  = self::pre_snapshot( 'pre-menu', '10', Operational_Snapshot_Schema::OBJECT_FAMILY_MENU, Execution_Action_Types::UPDATE_MENU );
 		$repo->store['post-menu'] = self::post_snapshot( 'post-menu', '10' );
 
 		$service = new Rollback_Eligibility_Service( $repo );

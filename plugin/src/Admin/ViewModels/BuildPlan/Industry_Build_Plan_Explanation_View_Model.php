@@ -50,8 +50,8 @@ final class Industry_Build_Plan_Explanation_View_Model {
 	 * Builds view model from one plan item payload. Safe when payload has no industry keys.
 	 *
 	 * @param array<string, mixed>                                                     $item_payload Item payload (may contain industry_source_refs, recommendation_reasons, industry_fit_score, industry_warning_flags).
-	 * @param array<int, array{rule_key: string, severity: string, caution_summary: string}> $compliance_warnings Optional advisory compliance cautions from Industry_Compliance_Warning_Resolver (Prompt 407).
-	 * @return array{has_industry_data: bool, summary_lines: array<int, string>, warning_badges: array<int, array{code: string, label: string}>, fit_classification: string, source_refs: array<int, string>, compliance_cautions: array<int, array{rule_key: string, severity: string, caution_summary: string}>}
+	 * @param list<array{rule_key: string, severity: string, caution_summary: string}> $compliance_warnings Optional advisory compliance cautions from Industry_Compliance_Warning_Resolver (Prompt 407).
+	 * @return array{has_industry_data: bool, summary_lines: list<string>, warning_badges: list<array{code: string, label: string}>, fit_classification: string, source_refs: list<string>, compliance_cautions: list<array{rule_key: string, severity: string, caution_summary: string}>}
 	 */
 	public static function from_item_payload( array $item_payload, array $compliance_warnings = array() ): array {
 		$source_refs   = self::sanitize_source_refs( $item_payload );
@@ -110,7 +110,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 	 * Builds plan-level industry warning lines from plan definition (warnings array).
 	 *
 	 * @param array<string, mixed> $plan_definition Plan root (may contain warnings).
-	 * @return array<int, string> Escaped lines for display; empty when none.
+	 * @return list<string> Escaped lines for display; empty when none.
 	 */
 	public static function plan_level_warning_lines( array $plan_definition ): array {
 		$warnings = isset( $plan_definition['warnings'] ) && is_array( $plan_definition['warnings'] )
@@ -131,7 +131,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 
 	/**
 	 * @param array<string, mixed> $item_payload
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	private static function sanitize_source_refs( array $item_payload ): array {
 		$raw = $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_SOURCE_REFS ] ?? null;
@@ -149,7 +149,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 
 	/**
 	 * @param array<string, mixed> $item_payload
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	private static function sanitize_reasons( array $item_payload ): array {
 		$raw = $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_RECOMMENDATION_REASONS ] ?? null;
@@ -168,7 +168,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 
 	/**
 	 * @param array<string, mixed> $item_payload
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	private static function sanitize_warning_flags( array $item_payload ): array {
 		$raw = $item_payload[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_WARNING_FLAGS ] ?? null;
@@ -191,7 +191,7 @@ final class Industry_Build_Plan_Explanation_View_Model {
 
 	/**
 	 * @param int|null     $fit_score
-	 * @param array<int, string> $warning_flags
+	 * @param list<string> $warning_flags
 	 */
 	private static function derive_fit_classification( ?int $fit_score, array $warning_flags ): string {
 		if ( in_array( 'discouraged_for_industry', $warning_flags, true ) ) {

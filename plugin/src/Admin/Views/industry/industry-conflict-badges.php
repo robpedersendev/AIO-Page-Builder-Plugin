@@ -36,6 +36,6 @@ foreach ( $to_show as $c ) {
 if ( $explanation_summary !== '' ) {
 	$title_parts[] = $explanation_summary;
 }
-$title = implode( ' ', $title_parts );
+$badge_title = implode( ' ', $title_parts );
 ?>
-<span class="aio-industry-conflict-badge aio-industry-conflict-badge--warning" title="<?php echo \esc_attr( $title ); ?>" aria-label="<?php \esc_attr_e( 'Multi-industry conflict; primary applied.', 'aio-page-builder' ); ?>"><?php \esc_html_e( 'Conflict', 'aio-page-builder' ); ?></span>
+<span class="aio-industry-conflict-badge aio-industry-conflict-badge--warning" title="<?php echo \esc_attr( $badge_title ); ?>" aria-label="<?php \esc_attr_e( 'Multi-industry conflict; primary applied.', 'aio-page-builder' ); ?>"><?php \esc_html_e( 'Conflict', 'aio-page-builder' ); ?></span>

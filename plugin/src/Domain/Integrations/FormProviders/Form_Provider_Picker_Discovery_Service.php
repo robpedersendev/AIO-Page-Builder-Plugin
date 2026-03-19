@@ -161,7 +161,7 @@ final class Form_Provider_Picker_Discovery_Service {
 	/**
 	 * Normalizes raw form list items for a provider (item_id pattern, escaped label). Public for availability/cache layer.
 	 *
-	 * @param string                                                                                        $provider_key
+	 * @param string                                                                                              $provider_key
 	 * @param array<int, array{provider_key?: string, item_id: string, item_label: string, status_hint?: string}> $items
 	 * @return array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}>
 	 */
@@ -185,7 +185,7 @@ final class Form_Provider_Picker_Discovery_Service {
 	/**
 	 * Sanitizes and filters picker items (item_id pattern; item_label escaped for display).
 	 *
-	 * @param string                                                                                       $provider_key
+	 * @param string                                                                                             $provider_key
 	 * @param array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string}> $items
 	 * @return array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string}>
 	 */

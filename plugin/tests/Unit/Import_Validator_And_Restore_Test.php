@@ -180,7 +180,7 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 				),
 			),
 		);
-		$r = Restore_Result::success(
+		$r       = Restore_Result::success(
 			array( 'settings' ),
 			array(
 				array(
@@ -192,7 +192,7 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 			'Restore completed.',
 			$summary
 		);
-		$p = $r->to_payload();
+		$p       = $r->to_payload();
 		$this->assertArrayHasKey( 'template_library_restore_summary', $p );
 		$this->assertArrayHasKey( 'skipped_reasons', $p['template_library_restore_summary'] );
 		$this->assertCount( 1, $p['template_library_restore_summary']['skipped_reasons'] );

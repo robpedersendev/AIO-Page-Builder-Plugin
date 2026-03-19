@@ -69,7 +69,7 @@ final class Goal_Caution_Rule_Registry {
 	/** @var array<string, array<string, mixed>> Map of goal_rule_key => definition. */
 	private array $by_key = array();
 
-	/** @var array<int, array<string, mixed>> All valid rules in load order. */
+	/** @var list<array<string, mixed>> All valid rules in load order. */
 	private array $all = array();
 
 	/**
@@ -154,7 +154,7 @@ final class Goal_Caution_Rule_Registry {
 	/**
 	 * Returns all loaded rules.
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -164,7 +164,7 @@ final class Goal_Caution_Rule_Registry {
 	 * Returns rules for the given conversion goal.
 	 *
 	 * @param string $goal_key Conversion goal key.
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_goal( string $goal_key ): array {
 		$g   = trim( $goal_key );

@@ -167,7 +167,7 @@ final class Large_Library_Query_Service {
 
 	/**
 	 * @param array<int, array<string, mixed>> $defs
-	 * @param array<string, mixed>       $filters
+	 * @param array<string, mixed>             $filters
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function filter_sections( array $defs, array $filters ): array {
@@ -236,7 +236,7 @@ final class Large_Library_Query_Service {
 
 	/**
 	 * @param array<int, array<string, mixed>> $defs
-	 * @param array<string, mixed>       $filters
+	 * @param array<string, mixed>             $filters
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function filter_page_templates( array $defs, array $filters ): array {

@@ -12,32 +12,32 @@ if ( ! isset( $item_view ) && ! isset( $badge_data ) ) {
 	return;
 }
 
-$status  = '';
-$snippet = '';
+$badge_status = '';
+$snippet      = '';
 if ( isset( $item_view ) && $item_view instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Library_Item_View ) {
-	$status  = $item_view->get_recommendation_status();
-	$snippet = $item_view->get_explanation_snippet();
+	$badge_status = $item_view->get_recommendation_status();
+	$snippet      = $item_view->get_explanation_snippet();
 } elseif ( isset( $badge_data ) && is_array( $badge_data ) ) {
-	$status  = (string) ( $badge_data['recommendation_status'] ?? $badge_data['fit_classification'] ?? '' );
-	$snippet = (string) ( $badge_data['explanation_snippet'] ?? \implode( ', ', (array) ( $badge_data['explanation_reasons'] ?? array() ) ) );
+	$badge_status = (string) ( $badge_data['recommendation_status'] ?? $badge_data['fit_classification'] ?? '' );
+	$snippet      = (string) ( $badge_data['explanation_snippet'] ?? \implode( ', ', (array) ( $badge_data['explanation_reasons'] ?? array() ) ) );
 }
 
-if ( $status === '' ) {
+if ( $badge_status === '' ) {
 	return;
 }
 
-$label = $status;
-if ( $status === 'recommended' ) {
+$label = $badge_status;
+if ( $badge_status === 'recommended' ) {
 	$label = __( 'Recommended', 'aio-page-builder' );
-} elseif ( $status === 'allowed_weak_fit' ) {
+} elseif ( $badge_status === 'allowed_weak_fit' ) {
 	$label = __( 'Weak fit', 'aio-page-builder' );
-} elseif ( $status === 'discouraged' ) {
+} elseif ( $badge_status === 'discouraged' ) {
 	$label = __( 'Discouraged', 'aio-page-builder' );
-} elseif ( $status === 'neutral' ) {
+} elseif ( $badge_status === 'neutral' ) {
 	$label = __( 'Neutral', 'aio-page-builder' );
 }
 
-$class = 'aio-industry-badge aio-industry-badge--' . \sanitize_html_class( $status );
-$title = $snippet !== '' ? $snippet : $label;
+$class       = 'aio-industry-badge aio-industry-badge--' . \sanitize_html_class( $badge_status );
+$badge_title = $snippet !== '' ? $snippet : $label;
 ?>
-<span class="<?php echo \esc_attr( $class ); ?>" title="<?php echo \esc_attr( $title ); ?>" aria-label="<?php echo \esc_attr( $label ); ?>"><?php echo \esc_html( $label ); ?></span>
+<span class="<?php echo \esc_attr( $class ); ?>" title="<?php echo \esc_attr( $badge_title ); ?>" aria-label="<?php echo \esc_attr( $label ); ?>"><?php echo \esc_html( $label ); ?></span>

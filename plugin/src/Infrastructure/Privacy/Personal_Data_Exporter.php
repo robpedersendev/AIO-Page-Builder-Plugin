@@ -85,7 +85,7 @@ final class Personal_Data_Exporter {
 
 	/**
 	 * @param int $user_id
-	 * @return array<int, array{group_id: string, group_label: string, item_id: string, data: array<int, array{name: string, value: string}>}>
+	 * @return list<array{group_id: string, group_label: string, item_id: string, data: array<int, array{name: string, value: string}>}>
 	 */
 	private static function export_user_prefs( int $user_id ): array {
 		$items        = array();

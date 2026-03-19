@@ -108,7 +108,7 @@ final class Industry_Pack_Import_Conflict_Service {
 	 *
 	 * @param array<string, mixed>                $bundle Valid bundle (manifest + payload).
 	 * @param array<string, array<string, mixed>> $local_state Map of category => array of existing keys (e.g. packs => array( 'realtor', 'plumber' ), starter_bundles => array( 'realtor_essentials' )). Optional: version by key, e.g. packs_versions => array( 'realtor' => '1' ).
-	 * @return array<int, array<string, mixed>> Conflict items with object_key, category, conflict_type, proposed_resolution, warning_severity, message; final_outcome = null.
+	 * @return list<array<string, mixed>> Conflict items with object_key, category, conflict_type, proposed_resolution, warning_severity, message; final_outcome = null.
 	 */
 	public function analyze( array $bundle, array $local_state = array() ): array {
 		$conflicts = array();
@@ -173,9 +173,9 @@ final class Industry_Pack_Import_Conflict_Service {
 	/**
 	 * Applies resolution to conflict list and sets final_outcome per item. Operator can pass mode (e.g. replace_all) or leave default proposed_resolution.
 	 *
-	 * @param array<int, array<string, mixed>> $conflicts From analyze().
+	 * @param list<array<string, mixed>> $conflicts From analyze().
 	 * @param array<string, string>      $operator_choices Optional. Map of "category|object_key" => RESOLUTION_* or mode key "default_duplicate" => replace|skip.
-	 * @return array<int, array<string, mixed>> Same items with final_outcome set (applied, skipped, merged, failed).
+	 * @return list<array<string, mixed>> Same items with final_outcome set (applied, skipped, merged, failed).
 	 */
 	public function resolve( array $conflicts, array $operator_choices = array() ): array {
 		$default_duplicate = $operator_choices['default_duplicate'] ?? null;
@@ -196,7 +196,7 @@ final class Industry_Pack_Import_Conflict_Service {
 	/**
 	 * Returns whether any conflict has severity error and final_outcome failed or unresolved (no resolution applied).
 	 *
-	 * @param array<int, array<string, mixed>> $resolved Resolved conflict list.
+	 * @param list<array<string, mixed>> $resolved Resolved conflict list.
 	 * @return bool
 	 */
 	public function has_unresolved_errors( array $resolved ): bool {

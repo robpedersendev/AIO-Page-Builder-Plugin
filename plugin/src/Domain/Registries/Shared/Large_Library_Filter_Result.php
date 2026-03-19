@@ -31,7 +31,7 @@ final class Large_Library_Filter_Result {
 	private int $total_matching;
 
 	/**
-	 * @param array<int, array<string, mixed>>        $rows          Row summaries for directory/IA.
+	 * @param array<int, array<string, mixed>>  $rows          Row summaries for directory/IA.
 	 * @param Large_Library_Pagination          $pagination    Pagination metadata.
 	 * @param array<string, array<string, int>> $filter_counts Optional counts by filter dimension.
 	 */

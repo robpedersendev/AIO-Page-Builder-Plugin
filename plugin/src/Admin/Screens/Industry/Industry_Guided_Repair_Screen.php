@@ -121,7 +121,7 @@ final class Industry_Guided_Repair_Screen {
 	 * @param array<string, mixed> $issue
 	 * @param string               $source
 	 * @param object|null          $repair_engine
-	 * @return array{source: string, object_type: string, key: string, issue_summary: string, related_refs: array<int, string>, repair_suggestion: array|null, is_advisory_only: bool, action_type: string, conflict: array|null, profile_field: string, suggested_value: string}
+	 * @return array{source: string, object_type: string, key: string, issue_summary: string, related_refs: list<string>, repair_suggestion: array|null, is_advisory_only: bool, action_type: string, conflict: array|null, profile_field: string, suggested_value: string}
 	 */
 	private function build_candidate( array $issue, string $source, $repair_engine ): array {
 		$object_type = isset( $issue['object_type'] ) && is_string( $issue['object_type'] ) ? $issue['object_type'] : '';

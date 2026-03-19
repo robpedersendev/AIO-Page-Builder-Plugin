@@ -57,7 +57,7 @@ final class Industry_Compliance_Warning_Resolver {
 	 * @param string $industry_key Industry pack key.
 	 * @param string $subtype_key  Optional subtype key. When empty or subtype registry not set, returns parent rules only.
 	 * @param string $goal_key     Optional conversion goal key. When non-empty and goal registry set, appends goal caution rules.
-	 * @return array<int, array{rule_key: string, severity: string, caution_summary: string}>
+	 * @return list<array{rule_key: string, severity: string, caution_summary: string}>
 	 */
 	public function get_for_display( string $industry_key, string $subtype_key = '', string $goal_key = '' ): array {
 		$industry_key = trim( $industry_key );

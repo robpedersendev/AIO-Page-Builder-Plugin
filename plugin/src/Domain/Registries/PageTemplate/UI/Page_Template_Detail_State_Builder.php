@@ -324,9 +324,9 @@ final class Page_Template_Detail_State_Builder {
 	/**
 	 * Renders preview HTML via real pipeline: section definitions + synthetic field values → context → renderer → assemble → do_blocks.
 	 *
-	 * @param array<string, mixed>                                                                $definition
+	 * @param array<string, mixed>                                                                      $definition
 	 * @param array<int, array{section_key: string, position: int, field_values: array<string, mixed>}> $section_field_values
-	 * @param array<string, mixed>                                                                $options Optional: reduced_motion (bool), page_template (array) for animation resolution.
+	 * @param array<string, mixed>                                                                      $options Optional: reduced_motion (bool), page_template (array) for animation resolution.
 	 * @return string HTML safe for admin output (escaped later if needed; block content is run through do_blocks).
 	 */
 	private function render_preview_html( array $definition, array $section_field_values, array $options = array() ): string {

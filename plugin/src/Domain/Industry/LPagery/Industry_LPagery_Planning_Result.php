@@ -39,12 +39,12 @@ final class Industry_LPagery_Planning_Result {
 	private array $weak_page_warnings;
 
 	/**
-	 * @param string       $lpagery_posture       central | optional | discouraged.
+	 * @param string             $lpagery_posture       central | optional | discouraged.
 	 * @param array<int, string> $required_tokens       Token refs required when LPagery is used.
 	 * @param array<int, string> $optional_tokens       Optional token refs.
 	 * @param array<int, string> $suggested_page_families Advisory page family or hierarchy hints.
 	 * @param array<int, string> $warning_flags         Warning codes for planning/UI.
-	 * @param string       $hierarchy_guidance     Concatenated hierarchy guidance from rules.
+	 * @param string             $hierarchy_guidance     Concatenated hierarchy guidance from rules.
 	 * @param array<int, string> $weak_page_warnings    Page types or patterns that are weak fit.
 	 */
 	public function __construct(

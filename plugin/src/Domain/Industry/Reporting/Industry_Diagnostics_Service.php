@@ -75,14 +75,14 @@ final class Industry_Diagnostics_Service {
 	 *
 	 * @return array{
 	 *   primary_industry: string,
-	 *   secondary_industries: array<int, string>,
+	 *   secondary_industries: list<string>,
 	 *   profile_readiness: string,
-	 *   active_pack_refs: array<int, string>,
+	 *   active_pack_refs: list<string>,
 	 *   applied_preset_ref: string|null,
 	 *   section_overlay_count: int,
 	 *   page_overlay_count: int,
 	 *   recommendation_mode: string,
-	 *   warnings: array<int, string>,
+	 *   warnings: list<string>,
 	 *   industry_subsystem_available: bool
 	 * }
 	 */

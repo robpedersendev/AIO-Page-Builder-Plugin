@@ -81,7 +81,7 @@ final class ACF_Field_Builder {
 	 * Builds array of ACF fields from normalized blueprint fields.
 	 *
 	 * @param array<int, array<string, mixed>> $fields
-	 * @param string|null                $parent_key
+	 * @param string|null                      $parent_key
 	 * @return array<int, array<string, mixed>>
 	 */
 	public function build_fields( array $fields, ?string $parent_key = null ): array {

@@ -120,7 +120,7 @@ final class Support_Package_Generator {
 	/**
 	 * Generates a support-safe package. Writes ZIP to plugin exports path; logs result.
 	 *
-	 * @param array<int, string> $optional_included Optional categories to add (e.g. logs, reporting_history).
+	 * @param list<string> $optional_included Optional categories to add (e.g. logs, reporting_history).
 	 * @return Support_Package_Result
 	 */
 	public function generate( array $optional_included = array() ): Support_Package_Result {
@@ -303,8 +303,8 @@ final class Support_Package_Generator {
 	/**
 	 * Redacts reporting log entries for support export (§48.10, §45.9). No secrets in output.
 	 *
-	 * @param array<int, array<string, mixed>> $entries
-	 * @return array<int, array<string, mixed>>
+	 * @param list<array<string, mixed>> $entries
+	 * @return list<array<string, mixed>>
 	 */
 	private function redact_reporting_log_entries( array $entries ): array {
 		$out       = array();
@@ -366,7 +366,8 @@ final class Support_Package_Generator {
 		$url  = \home_url( '', 'https' );
 		$host = is_string( $url ) ? \parse_url( $url, PHP_URL_HOST ) : null;
 		if ( $host !== null && $host !== '' ) {
-			return preg_replace( '#[^a-zA-Z0-9_-]#', '', $host ) ?: 'site';
+			$slug = preg_replace( '#[^a-zA-Z0-9_-]#', '', $host );
+			return $slug !== '' ? $slug : 'site';
 		}
 		return 'site';
 	}

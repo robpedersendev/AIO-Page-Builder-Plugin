@@ -123,16 +123,16 @@ final class Nested_Hub_Page_Template_Definitions {
 	/**
 	 * Base page template shape for nested hub batch (template_category_class = nested_hub, archetype = sub_hub_page).
 	 *
-	 * @param string       $internal_key
-	 * @param string       $name
-	 * @param string       $purpose_summary
-	 * @param string       $template_family
+	 * @param string             $internal_key
+	 * @param string             $name
+	 * @param string             $purpose_summary
+	 * @param string             $template_family
 	 * @param array<int, string> $parent_family_compatibility
-	 * @param array        $ordered
-	 * @param array        $section_requirements
-	 * @param array        $one_pager
-	 * @param string       $endpoint_notes
-	 * @param array        $extra
+	 * @param array              $ordered
+	 * @param array              $section_requirements
+	 * @param array              $one_pager
+	 * @param string             $endpoint_notes
+	 * @param array              $extra
 	 * @return array<string, mixed>
 	 */
 	private static function base_template(

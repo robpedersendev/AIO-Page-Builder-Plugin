@@ -25,30 +25,30 @@ final class Industry_Pack_Diff_Result {
 	/** @var string */
 	private string $right_label;
 
-	/** @var array<int, string> */
+	/** @var list<string> */
 	private array $added;
 
-	/** @var array<int, string> */
+	/** @var list<string> */
 	private array $removed;
 
-	/** @var array<int, array<string, mixed>> */
+	/** @var list<array<string, mixed>> */
 	private array $changed;
 
 	/** @var array{added_count: int, removed_count: int, changed_count: int, impact_level?: string} */
 	private array $summary;
 
-	/** @var array<int, string> */
+	/** @var list<string> */
 	private array $notes;
 
 	/**
 	 * @param string                                                                                 $compared_at ISO 8601.
 	 * @param string                                                                                 $left_label Label for baseline.
 	 * @param string                                                                                 $right_label Label for new state.
-	 * @param array<int, string>                                                                           $added industry_key only in right.
-	 * @param array<int, string>                                                                           $removed industry_key only in left.
-	 * @param array<int, array<string, mixed>>                                                             $changed Per-pack change entries.
+	 * @param list<string>                                                                           $added industry_key only in right.
+	 * @param list<string>                                                                           $removed industry_key only in left.
+	 * @param list<array<string, mixed>>                                                             $changed Per-pack change entries.
 	 * @param array{added_count: int, removed_count: int, changed_count: int, impact_level?: string} $summary
-	 * @param array<int, string>                                                                           $notes
+	 * @param list<string>                                                                           $notes
 	 */
 	public function __construct(
 		string $compared_at,
@@ -82,17 +82,17 @@ final class Industry_Pack_Diff_Result {
 		return $this->right_label;
 	}
 
-	/** @return array<int, string> */
+	/** @return list<string> */
 	public function get_added(): array {
 		return $this->added;
 	}
 
-	/** @return array<int, string> */
+	/** @return list<string> */
 	public function get_removed(): array {
 		return $this->removed;
 	}
 
-	/** @return array<int, array<string, mixed>> */
+	/** @return list<array<string, mixed>> */
 	public function get_changed(): array {
 		return $this->changed;
 	}
@@ -102,7 +102,7 @@ final class Industry_Pack_Diff_Result {
 		return $this->summary;
 	}
 
-	/** @return array<int, string> */
+	/** @return list<string> */
 	public function get_notes(): array {
 		return $this->notes;
 	}

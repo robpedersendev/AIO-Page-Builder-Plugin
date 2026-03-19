@@ -34,11 +34,11 @@ final class Industry_Coverage_Gap_Prioritization_Service {
 	/**
 	 * Generates prioritized report from gap analyzer output. Ranks by tier, groups by artifact class and scope.
 	 *
-	 * @param array{gaps: array<int, array{scope: string, missing_artifact_class: string, priority: string, explanation: string}>, by_scope: array<string, array<int, array{missing_artifact_class: string, priority: string, explanation: string}>>} $gap_result Result from Industry_Coverage_Gap_Analyzer::analyze().
+	 * @param array{gaps: list<array{scope: string, missing_artifact_class: string, priority: string, explanation: string}>, by_scope: array<string, list<array{missing_artifact_class: string, priority: string, explanation: string}>>} $gap_result Result from Industry_Coverage_Gap_Analyzer::analyze().
 	 * @return array{
-	 *   ranked: array<int, array{scope: string, missing_artifact_class: string, priority: string, tier: string, priority_score: int, rationale: string, related_scopes: array<int, string>}>,
-	 *   by_tier: array<string, array<int, array{scope: string, missing_artifact_class: string, rationale: string}>>,
-	 *   release_blocker_cues: array<int, string>,
+	 *   ranked: list<array{scope: string, missing_artifact_class: string, priority: string, tier: string, priority_score: int, rationale: string, related_scopes: list<string>}>,
+	 *   by_tier: array<string, list<array{scope: string, missing_artifact_class: string, rationale: string}>>,
+	 *   release_blocker_cues: list<string>,
 	 *   summary: array{urgent: int, important: int, optional: int}
 	 * }
 	 */
@@ -121,7 +121,7 @@ final class Industry_Coverage_Gap_Prioritization_Service {
 	 * Runs gap analyzer (if set) and returns prioritized report.
 	 *
 	 * @param bool $include_subtypes
-	 * @return array{ranked: list, by_tier: array, release_blocker_cues: array<int, string>, summary: array}
+	 * @return array{ranked: list, by_tier: array, release_blocker_cues: list<string>, summary: array}
 	 */
 	public function run( bool $include_subtypes = true ): array {
 		$gap_result = array(

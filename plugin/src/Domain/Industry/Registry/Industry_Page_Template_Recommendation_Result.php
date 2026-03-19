@@ -39,7 +39,7 @@ final class Industry_Page_Template_Recommendation_Result {
 	/**
 	 * Returns page template keys in recommendation order (best first).
 	 *
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public function get_ranked_keys(): array {
 		$out = array();

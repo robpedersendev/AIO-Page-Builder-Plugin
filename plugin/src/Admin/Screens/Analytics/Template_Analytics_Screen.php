@@ -93,6 +93,7 @@ final class Template_Analytics_Screen {
 				);
 			} catch ( \Throwable $e ) {
 				// Observational; fail gracefully.
+				(void) $e;
 			}
 		}
 

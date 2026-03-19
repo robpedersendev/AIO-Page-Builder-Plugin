@@ -234,8 +234,8 @@ final class Section_Field_Blueprint_Validator {
 	 * Recursively rejects callable/code references in arrays.
 	 * Skips string values (e.g. field type 'link') that happen to be PHP function names.
 	 *
-	 * @param mixed        $val
-	 * @param string       $path
+	 * @param mixed              $val
+	 * @param string             $path
 	 * @param array<int, string> $errors
 	 */
 	private function reject_callable_references( $val, string $path, array &$errors ): void {

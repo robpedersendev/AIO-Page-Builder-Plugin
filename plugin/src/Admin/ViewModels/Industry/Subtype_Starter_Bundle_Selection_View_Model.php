@@ -55,13 +55,13 @@ final class Subtype_Starter_Bundle_Selection_View_Model {
 	/** @var bool */
 	public bool $has_primary = false;
 
-	/** @var array<int, array<string, mixed>> Parent (industry-only) bundles. */
+	/** @var list<array<string, mixed>> Parent (industry-only) bundles. */
 	public array $parent_bundles = array();
 
-	/** @var array<int, array<string, mixed>> Subtype-scoped bundles when subtype is set. */
+	/** @var list<array<string, mixed>> Subtype-scoped bundles when subtype is set. */
 	public array $subtype_bundles = array();
 
-	/** @var array<int, array<string, mixed>> Unified display list (bundle_key, label, summary, is_subtype_bundle, group_label). */
+	/** @var list<array<string, mixed>> Unified display list (bundle_key, label, summary, is_subtype_bundle, group_label). */
 	public array $display_bundles = array();
 
 	/** @var bool True when selected bundle is subtype-scoped and parent_bundles exist (user can clear to parent). */

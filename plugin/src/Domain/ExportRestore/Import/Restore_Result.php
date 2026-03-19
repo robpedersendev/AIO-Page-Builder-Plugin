@@ -41,14 +41,14 @@ final class Restore_Result {
 	private array $template_library_restore_summary;
 
 	/**
-	 * @param bool                        $success
-	 * @param string                      $message
+	 * @param bool                              $success
+	 * @param string                            $message
 	 * @param array<int, string>                $restored_categories
 	 * @param array<int, array<string, string>> $resolved_actions
-	 * @param bool                        $validation_passed
+	 * @param bool                              $validation_passed
 	 * @param array<int, string>                $blocking_failures
-	 * @param string                      $log_reference
-	 * @param array<string, mixed>        $template_library_restore_summary Optional template-library validation summary.
+	 * @param string                            $log_reference
+	 * @param array<string, mixed>              $template_library_restore_summary Optional template-library validation summary.
 	 */
 	public function __construct(
 		bool $success,

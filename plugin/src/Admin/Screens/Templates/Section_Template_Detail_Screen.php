@@ -116,7 +116,7 @@ final class Section_Template_Detail_Screen {
 	}
 
 	/**
-	 * @param array<int, array{label: string, url: string}> $breadcrumbs
+	 * @param list<array{label: string, url: string}> $breadcrumbs
 	 * @return void
 	 */
 	private function render_breadcrumbs( array $breadcrumbs ): void {
@@ -368,9 +368,10 @@ final class Section_Template_Detail_Screen {
 			<h2 class="aio-preview-title"><?php \esc_html_e( 'Preview', 'aio-page-builder' ); ?></h2>
 			<p class="aio-preview-notice"><?php \esc_html_e( 'This preview uses synthetic data and the same section renderer as live pages. Omission and animation behavior apply.', 'aio-page-builder' ); ?></p>
 			<?php if ( $style_context !== null ) : ?>
+				<?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Inline preview context; base URL from trusted builder. ?>
 				<link rel="stylesheet" href="<?php echo \esc_url( $style_context['base_stylesheet_url'] ); ?>" />
 				<?php if ( $style_context['inline_css'] !== '' ) : ?>
-					<style type="text/css" id="aio-preview-style-context"><?php echo /* Safe: from sanitized emitters only */ $style_context['inline_css']; ?></style>
+					<style type="text/css" id="aio-preview-style-context"><?php echo $style_context['inline_css']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- From trusted Preview_Style_Context_Builder. ?></style>
 				<?php endif; ?>
 			<?php endif; ?>
 			<div class="aio-preview-content">

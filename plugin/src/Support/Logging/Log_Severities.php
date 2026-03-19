@@ -43,7 +43,7 @@ final class Log_Severities {
 	 * @param string $severity Severity value.
 	 * @return bool
 	 */
-	public static function isValid( string $severity ): bool {
+	public static function is_valid( string $severity ): bool {
 		return in_array( $severity, self::all(), true );
 	}
 }

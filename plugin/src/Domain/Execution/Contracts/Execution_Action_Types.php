@@ -20,8 +20,8 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Execution_Action_Types {
 
-	public const CREATE_PAGE           = 'create_page';
-	public const REPLACE_PAGE          = 'replace_page';
+	public const CREATE_PAGE  = 'create_page';
+	public const REPLACE_PAGE = 'replace_page';
 	/** Not executable in v1; metadata is recommendation-only. Excluded from ALL (Prompt 641). */
 	public const UPDATE_PAGE_METADATA  = 'update_page_metadata';
 	public const ASSIGN_PAGE_HIERARCHY = 'assign_page_hierarchy';

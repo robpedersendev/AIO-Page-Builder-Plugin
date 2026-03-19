@@ -66,9 +66,12 @@ final class Global_Style_Token_Settings_Screen {
 		// * Process save: POST with nonce and SAVE_ACTION.
 		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::SAVE_ACTION ) {
 			if ( isset( $_POST[ self::NONCE_SAVE ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_SAVE ] ) ), self::NONCE_SAVE ) ) {
-				$tokens = $this->collect_tokens_from_post();
-				$ok     = $repo->set_global_tokens( $tokens );
-				$msg    = $ok ? 'success' : 'error';
+				$raw_tokens = isset( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] ) && is_array( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] )
+					? \wp_unslash( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] )
+					: array();
+				$tokens     = $this->collect_tokens_from_raw( $raw_tokens );
+				$ok         = $repo->set_global_tokens( $tokens );
+				$msg        = $ok ? 'success' : 'error';
 				\wp_safe_redirect( \add_query_arg( self::QUERY_MSG, $msg, $this->get_settings_url() ) );
 				exit;
 			}
@@ -176,16 +179,12 @@ final class Global_Style_Token_Settings_Screen {
 	}
 
 	/**
-	 * Collects token array from POST. Only scalar string values; structure filtered by repository on write.
+	 * Builds token array from unslashed raw POST data. Only scalar string values; structure filtered by repository on write.
 	 *
+	 * @param array<string, mixed> $raw Unslashed POST tokens key (e.g. from wp_unslash( $_POST[ FORM_TOKENS_KEY ] )).
 	 * @return array<string, array<string, string>>
 	 */
-	private function collect_tokens_from_post(): array {
-		$key = Global_Style_Token_Form_Builder::FORM_TOKENS_KEY;
-		if ( ! isset( $_POST[ $key ] ) || ! is_array( $_POST[ $key ] ) ) {
-			return array();
-		}
-		$raw = \wp_unslash( $_POST[ $key ] );
+	private function collect_tokens_from_raw( array $raw ): array {
 		$out = array();
 		foreach ( $raw as $group => $names ) {
 			if ( ! is_string( $group ) || ! is_array( $names ) ) {

@@ -1,9 +1,10 @@
 <?php
 /**
- * Step 4 (design tokens) workspace (spec §35, Prompt 076, 640).
+ * Step 4 (design tokens) workspace shell (spec §35, Prompt 076, SPR-009).
  *
- * Token recommendation rows, summaries, bulk apply/deny. Apply writes to plugin-owned token storage
- * and updates plugin-controlled generated CSS only; theme mods are not changed.
+ * Shell-only UI: token recommendation rows, summaries, and revert/history copy. Token application
+ * is not implemented; UI states "Token application is not available in this version. Recommendations
+ * are for review only." Bulk apply/deny controls are disabled. Do not treat as a gap—intentional per spec.
  *
  * @package AIOPageBuilder
  */
@@ -22,7 +23,7 @@ use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
 
 /**
- * UI for design_tokens step. Token apply updates plugin-owned storage and generated CSS (v1 scope).
+ * Shell-only UI for design_tokens step. No token application.
  */
 final class Tokens_Step_UI_Service {
 
@@ -53,7 +54,7 @@ final class Tokens_Step_UI_Service {
 	 * @param array<string, bool>  $capabilities can_approve, can_execute, can_view_artifacts.
 	 * @param string|null          $selected_item_id Item id for detail panel.
 	 * @param array<int, string>   $selected_item_ids Item ids for bulk selection.
-	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages, token_diff_placeholder?, token_set_summary?
+	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages, token_diff_placeholder? (structural only; no diff/apply in this version), token_set_summary?
 	 */
 	public function build_workspace(
 		array $plan_definition,
@@ -100,20 +101,11 @@ final class Tokens_Step_UI_Service {
 			);
 		}
 
-		$bulk_states            = $this->build_bulk_states( $eligible_count, $capabilities, $selected_item_ids, $rows );
-		$detail_panel           = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
-		$step_messages          = $this->step_messages( count( $rows ), $eligible_count );
-		if ( count( $rows ) > 0 ) {
-			array_unshift(
-				$step_messages,
-				array(
-					'severity' => 'info',
-					'message'  => \__( 'Applying tokens updates plugin design token storage and generated CSS. Theme settings are not changed.', 'aio-page-builder' ),
-					'level'    => 'step',
-				)
-			);
-		}
-		$token_set_summary      = $this->build_token_set_summary( $items );
+		$bulk_states       = $this->placeholder_bulk_states( $eligible_count, $capabilities, $selected_item_ids, $rows );
+		$detail_panel      = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
+		$step_messages     = $this->step_messages( count( $rows ), $eligible_count );
+		$token_set_summary = $this->build_token_set_summary( $items );
+		// Structural placeholder for UI shape only; no current/proposed diff or apply in this version (token application out of scope).
 		$token_diff_placeholder = array(
 			'current_value'  => '',
 			'proposed_value' => '',
@@ -218,23 +210,21 @@ final class Tokens_Step_UI_Service {
 		);
 	}
 
-	private function build_bulk_states( int $eligible_count, array $capabilities, array $selected_item_ids, array $rows ): array {
-		$can_execute   = ! empty( $capabilities['can_execute'] );
-		$can_approve   = ! empty( $capabilities['can_approve'] );
+	private function placeholder_bulk_states( int $eligible_count, array $capabilities, array $selected_item_ids, array $rows ): array {
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
 		return array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
-				'enabled'        => $eligible_count > 0 && $can_execute,
+				'enabled'        => false,
 				'label'          => \__( 'Apply all tokens', 'aio-page-builder' ),
 				'count_eligible' => $eligible_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
-				'enabled'        => $selected_count > 0 && $can_execute,
+				'enabled'        => false,
 				'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
 				'count_selected' => $selected_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
-				'enabled'        => $eligible_count > 0 && $can_approve,
+				'enabled'        => false,
 				'label'          => \__( 'Deny all', 'aio-page-builder' ),
 				'count_eligible' => $eligible_count,
 			),

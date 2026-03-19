@@ -144,8 +144,8 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
 				$base['definition']              = $decoded;
-				$base[ self::META_INTERNAL_KEY ] = $base[ self::META_INTERNAL_KEY ] ?: ( $decoded[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' );
-				$base[ self::META_STATUS ]       = $base[ self::META_STATUS ] ?: ( $decoded[ Prompt_Pack_Schema::ROOT_STATUS ] ?? '' );
+				$base[ self::META_INTERNAL_KEY ] = ( $base[ self::META_INTERNAL_KEY ] !== '' && $base[ self::META_INTERNAL_KEY ] !== false ) ? $base[ self::META_INTERNAL_KEY ] : ( $decoded[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' );
+				$base[ self::META_STATUS ]       = ( $base[ self::META_STATUS ] !== '' && $base[ self::META_STATUS ] !== false ) ? $base[ self::META_STATUS ] : ( $decoded[ Prompt_Pack_Schema::ROOT_STATUS ] ?? '' );
 				$base[ self::META_PACK_VERSION ] = $decoded[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '';
 			}
 		}
@@ -171,7 +171,7 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 		$internal_key = (string) ( $definition[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' );
 		$version      = (string) ( $definition[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '' );
 		$status       = (string) ( $definition[ Prompt_Pack_Schema::ROOT_STATUS ] ?? 'inactive' );
-		$name         = (string) ( $definition[ Prompt_Pack_Schema::ROOT_NAME ] ?? $internal_key ?: 'Untitled' );
+		$name         = (string) ( $definition[ Prompt_Pack_Schema::ROOT_NAME ] ?? ( $internal_key !== '' ? $internal_key : 'Untitled' ) );
 
 		$data = array(
 			'internal_key' => $internal_key,

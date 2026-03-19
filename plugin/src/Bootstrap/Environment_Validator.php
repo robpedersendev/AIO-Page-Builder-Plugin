@@ -161,7 +161,7 @@ final class Environment_Validator {
 					self::CATEGORY_PLATFORM,
 					self::SEVERITY_BLOCKING,
 					'wp_version_blocking',
-					sprintf( 'WordPress %s or newer is required. Current: %s.', $min_wp, $wp_ver ?: 'unknown' ),
+					sprintf( 'WordPress %s or newer is required. Current: %s.', $min_wp, ( $wp_ver !== '' && $wp_ver !== null ? $wp_ver : 'unknown' ) ),
 					true
 				)
 			);
@@ -256,7 +256,7 @@ final class Environment_Validator {
 			$theme = wp_get_theme();
 			$slug  = $theme->get_stylesheet();
 			if ( $slug !== '' && in_array( strtolower( $slug ), self::EXTENSION_PACK_THEMES, true ) ) {
-				$name = $theme->get( 'Name' ) ?: $slug;
+				$name = ( $theme->get( 'Name' ) !== '' && $theme->get( 'Name' ) !== null ) ? $theme->get( 'Name' ) : $slug;
 				$this->add(
 					new Validation_Result(
 						self::CATEGORY_EXTENSION_PACK,

@@ -41,21 +41,6 @@ final class Industry_Page_Template_Recommendation_Resolver {
 
 	private const TEMPLATE_FAMILY_FIELD = 'template_family';
 
-	/** @var Industry_Read_Model_Cache_Service|null Optional cache; null when not configured. */
-	private $cache_service = null;
-
-	/** @var Industry_Cache_Key_Builder|null Optional key builder; null when not configured. */
-	private $cache_key_builder = null;
-
-	/**
-	 * @param Industry_Read_Model_Cache_Service|null $cache_service     Optional cache; null to disable.
-	 * @param Industry_Cache_Key_Builder|null        $cache_key_builder Optional key builder; null to disable.
-	 */
-	public function __construct( ?Industry_Read_Model_Cache_Service $cache_service = null, ?Industry_Cache_Key_Builder $cache_key_builder = null ) {
-		$this->cache_service     = $cache_service;
-		$this->cache_key_builder = $cache_key_builder;
-	}
-
 	/**
 	 * Resolves ranked page-template recommendations. Safe: missing profile yields neutral ranking.
 	 *
@@ -228,7 +213,7 @@ final class Industry_Page_Template_Recommendation_Resolver {
 
 	/**
 	 * @param mixed $val industry_affinity / industry_required / industry_discouraged (array of keys or map).
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	private function normalize_industry_key_list( $val ): array {
 		if ( ! is_array( $val ) ) {

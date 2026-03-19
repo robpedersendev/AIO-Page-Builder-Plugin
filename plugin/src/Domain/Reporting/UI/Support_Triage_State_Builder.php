@@ -105,8 +105,8 @@ final class Support_Triage_State_Builder {
 	}
 
 	/**
-	 * @param array<string, mixed>        $reporting_health
-	 * @param array<string, mixed>        $queue_health
+	 * @param array<string, mixed>              $reporting_health
+	 * @param array<string, mixed>              $queue_health
 	 * @param array<int, array<string, string>> $critical_errors
 	 * @return array<int, array{severity: string, domain: string, title: string, message: string, link_url: string, link_label: string}>
 	 */
@@ -209,7 +209,7 @@ final class Support_Triage_State_Builder {
 	/**
 	 * @param array<int, array<string, string>> $critical_errors
 	 * @param array<int, array<string, string>> $failed_ai_runs
-	 * @param array<string, mixed>        $queue_health
+	 * @param array<string, mixed>              $queue_health
 	 * @return array<int, array{domain: string, identifier: string, summary: string, link_url: string, link_label: string}>
 	 */
 	private function aggregate_recent_failed_workflows( array $critical_errors, array $failed_ai_runs, array $queue_health ): array {
@@ -440,7 +440,7 @@ final class Support_Triage_State_Builder {
 		$out[] = array(
 			'label'       => __( 'Import / Export', 'aio-page-builder' ),
 			'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-export-restore' ), $base ),
-			'description' => __( 'Validate package, restore, export history.', 'aio-page-builder' ),
+			'description' => __( 'Preview import, review conflicts, confirm restore, export history.', 'aio-page-builder' ),
 		);
 		return $out;
 	}

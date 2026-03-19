@@ -107,19 +107,19 @@ final class Industry_Pack_Schema {
 	/** Max length for summary. */
 	public const SUMMARY_MAX_LENGTH = 1024;
 
-	/** @var array<int, string>|null */
+	/** @var list<string>|null */
 	private static ?array $required_fields = null;
 
-	/** @var array<int, string>|null */
+	/** @var list<string>|null */
 	private static ?array $optional_fields = null;
 
-	/** @var array<int, string>|null */
+	/** @var list<string>|null */
 	private static ?array $allowed_statuses = null;
 
 	/**
 	 * Required field names for industry pack object.
 	 *
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public static function get_required_fields(): array {
 		if ( self::$required_fields !== null ) {
@@ -138,7 +138,7 @@ final class Industry_Pack_Schema {
 	/**
 	 * Optional field names for industry pack object.
 	 *
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public static function get_optional_fields(): array {
 		if ( self::$optional_fields !== null ) {
@@ -169,7 +169,7 @@ final class Industry_Pack_Schema {
 	/**
 	 * Allowed status values.
 	 *
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public static function get_allowed_statuses(): array {
 		if ( self::$allowed_statuses !== null ) {

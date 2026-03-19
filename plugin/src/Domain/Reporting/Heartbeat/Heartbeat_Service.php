@@ -119,7 +119,7 @@ final class Heartbeat_Service {
 			return '';
 		}
 		$url = home_url( '/', 'https' );
-		$url = $url ?: home_url( '/', 'http' );
+		$url = ( $url !== '' && $url !== false ) ? $url : home_url( '/', 'http' );
 		if ( $url === '' || $url === false ) {
 			return '';
 		}
@@ -128,7 +128,8 @@ final class Heartbeat_Service {
 		if ( $host !== '' ) {
 			return $host;
 		}
-		return preg_replace( '/[^a-zA-Z0-9._-]/', '_', (string) $url ) ?: '';
+		$sanitized = preg_replace( '/[^a-zA-Z0-9._-]/', '_', (string) $url );
+		return $sanitized !== '' ? $sanitized : '';
 	}
 
 	/** @return array{last_successful_month?: string, for_month?: string, attempt_count?: int, last_attempt_at?: string, site_reference?: string, log_reference?: string} */

@@ -12,34 +12,34 @@ if ( ! isset( $item_view ) && ! isset( $badge_data ) ) {
 	return;
 }
 
-$status        = '';
+$badge_status  = '';
 $snippet       = '';
 $hierarchy_fit = '';
 $lpagery_fit   = '';
 if ( isset( $item_view ) && $item_view instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Directory_Item_View ) {
-	$status        = $item_view->get_recommendation_status();
+	$badge_status  = $item_view->get_recommendation_status();
 	$snippet       = $item_view->get_explanation_snippet();
 	$hierarchy_fit = $item_view->get_hierarchy_fit();
 	$lpagery_fit   = $item_view->get_lpagery_fit();
 } elseif ( isset( $badge_data ) && is_array( $badge_data ) ) {
-	$status        = (string) ( $badge_data['recommendation_status'] ?? $badge_data['fit_classification'] ?? '' );
+	$badge_status  = (string) ( $badge_data['recommendation_status'] ?? $badge_data['fit_classification'] ?? '' );
 	$snippet       = (string) ( $badge_data['explanation_snippet'] ?? \implode( ', ', (array) ( $badge_data['explanation_reasons'] ?? array() ) ) );
 	$hierarchy_fit = (string) ( $badge_data['hierarchy_fit'] ?? '' );
 	$lpagery_fit   = (string) ( $badge_data['lpagery_fit'] ?? '' );
 }
 
-if ( $status === '' && $hierarchy_fit === '' && $lpagery_fit === '' ) {
+if ( $badge_status === '' && $hierarchy_fit === '' && $lpagery_fit === '' ) {
 	return;
 }
 
-$label = $status;
-if ( $status === 'recommended' ) {
+$label = $badge_status;
+if ( $badge_status === 'recommended' ) {
 	$label = __( 'Recommended', 'aio-page-builder' );
-} elseif ( $status === 'allowed_weak_fit' ) {
+} elseif ( $badge_status === 'allowed_weak_fit' ) {
 	$label = __( 'Weak fit', 'aio-page-builder' );
-} elseif ( $status === 'discouraged' ) {
+} elseif ( $badge_status === 'discouraged' ) {
 	$label = __( 'Discouraged', 'aio-page-builder' );
-} elseif ( $status === 'neutral' ) {
+} elseif ( $badge_status === 'neutral' ) {
 	$label = __( 'Neutral', 'aio-page-builder' );
 }
 
@@ -53,13 +53,13 @@ if ( $hierarchy_fit !== '' ) {
 if ( $lpagery_fit !== '' ) {
 	$parts[] = sprintf( /* translators: %s: LPagery fit note */ __( 'LPagery: %s', 'aio-page-builder' ), $lpagery_fit );
 }
-$title = \implode( ' · ', $parts );
-if ( $title === '' ) {
-	$title = $label;
+$badge_title = \implode( ' · ', $parts );
+if ( $badge_title === '' ) {
+	$badge_title = $label;
 }
-$class = 'aio-industry-badge aio-industry-badge--' . \sanitize_html_class( $status !== '' ? $status : 'neutral' );
+$class = 'aio-industry-badge aio-industry-badge--' . \sanitize_html_class( $badge_status !== '' ? $badge_status : 'neutral' );
 ?>
-<span class="<?php echo \esc_attr( $class ); ?>" title="<?php echo \esc_attr( $title ); ?>" aria-label="<?php echo \esc_attr( $label !== '' ? $label : __( 'Industry fit', 'aio-page-builder' ) ); ?>">
+<span class="<?php echo \esc_attr( $class ); ?>" title="<?php echo \esc_attr( $badge_title ); ?>" aria-label="<?php echo \esc_attr( $label !== '' ? $label : __( 'Industry fit', 'aio-page-builder' ) ); ?>">
 	<?php echo $label !== '' ? \esc_html( $label ) : '—'; ?>
 	<?php if ( $hierarchy_fit !== '' || $lpagery_fit !== '' ) : ?>
 		<span class="aio-industry-badge-meta">

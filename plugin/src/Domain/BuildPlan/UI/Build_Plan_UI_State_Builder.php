@@ -21,7 +21,6 @@ use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Media_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service;
-use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 
 /**
@@ -64,9 +63,6 @@ final class Build_Plan_UI_State_Builder {
 	/** @var History_Rollback_Step_UI_Service|null */
 	private $history_rollback_step_ui_service;
 
-	/** @var Operational_Snapshot_Repository_Interface|null */
-	private $snapshot_repository;
-
 	public function __construct(
 		Build_Plan_Repository $repository,
 		Build_Plan_Stepper_Builder $stepper_builder,
@@ -77,8 +73,7 @@ final class Build_Plan_UI_State_Builder {
 		?Tokens_Step_UI_Service $tokens_step_ui_service = null,
 		?SEO_Media_Step_UI_Service $seo_media_step_ui_service = null,
 		?Finalization_Step_UI_Service $finalization_step_ui_service = null,
-		?History_Rollback_Step_UI_Service $history_rollback_step_ui_service = null,
-		?Operational_Snapshot_Repository_Interface $snapshot_repository = null
+		?History_Rollback_Step_UI_Service $history_rollback_step_ui_service = null
 	) {
 		$this->repository                       = $repository;
 		$this->stepper_builder                  = $stepper_builder;
@@ -90,7 +85,6 @@ final class Build_Plan_UI_State_Builder {
 		$this->seo_media_step_ui_service        = $seo_media_step_ui_service;
 		$this->finalization_step_ui_service     = $finalization_step_ui_service;
 		$this->history_rollback_step_ui_service = $history_rollback_step_ui_service;
-		$this->snapshot_repository              = $snapshot_repository;
 	}
 
 	/**
@@ -185,10 +179,7 @@ final class Build_Plan_UI_State_Builder {
 			return $this->finalization_step_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
 		}
 		if ( $step_type === Build_Plan_Schema::STEP_TYPE_LOGS_ROLLBACK && $this->history_rollback_step_ui_service !== null ) {
-			$history_entries = $this->snapshot_repository !== null
-				? $this->snapshot_repository->list_rollback_entries_for_plan( $plan_id )
-				: array();
-			return $this->history_rollback_step_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids, $history_entries );
+			return $this->history_rollback_step_ui_service->build_workspace( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );
 		}
 		if ( $this->step_workspace_builder !== null ) {
 			return $this->step_workspace_builder->build( $definition, $step_index, $capabilities, $selected_item_id, $selected_item_ids );

@@ -360,7 +360,7 @@ final class ACF_Diagnostics_State_Builder {
 	 * Filters assignment_mismatch_groups by severity when filter_severity is set.
 	 *
 	 * @param array<int, array<string, mixed>> $groups
-	 * @param string|null                $filter_severity
+	 * @param string|null                      $filter_severity
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function apply_severity_filter( array $groups, ?string $filter_severity ): array {

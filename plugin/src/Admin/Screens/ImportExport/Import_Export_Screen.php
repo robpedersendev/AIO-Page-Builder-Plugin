@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\ImportExport;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Mode_Keys;
+use AIOPageBuilder\Domain\ExportRestore\Contracts\Restore_Scope_Keys;
 use AIOPageBuilder\Domain\ExportRestore\Import\Import_Validation_Result;
 use AIOPageBuilder\Domain\ExportRestore\Import\Import_Validator;
 use AIOPageBuilder\Domain\ExportRestore\Import\Restore_Pipeline;
@@ -47,6 +48,7 @@ final class Import_Export_Screen {
 	private const NONCE_VALIDATE           = 'aio_ie_validate';
 	private const NONCE_RESTORE            = 'aio_ie_restore';
 	private const NONCE_DOWNLOAD           = 'aio_ie_download';
+	private const FIELD_CONFIRM_ACK        = 'aio_ie_confirm_ack';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -83,15 +85,19 @@ final class Import_Export_Screen {
 		if ( $restore_stored !== false ) {
 			\delete_transient( self::TRANSIENT_RESTORE_RESULT . $user_id );
 		}
-		$validation_payload = null;
+		$validation_payload  = null;
+		$validation_manifest = null;
 		if ( is_array( $validation_stored ) && isset( $validation_stored['payload'] ) ) {
 			$validation_payload                 = $validation_stored['payload'];
 			$validation_payload['package_path'] = '';
+			$validation_manifest                = isset( $validation_stored['manifest'] ) && is_array( $validation_stored['manifest'] )
+				? $validation_stored['manifest']
+				: null;
 		}
 		$restore_payload = is_array( $restore_stored ) && isset( $restore_stored['payload'] ) ? $restore_stored['payload'] : null;
 
 		$state_builder = $this->get_state_builder();
-		$state         = $state_builder->build( $validation_payload, $restore_payload );
+		$state         = $state_builder->build( $validation_payload, $restore_payload, $validation_manifest );
 
 		$status = isset( $_GET['aio_ie_status'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_ie_status'] ) ) : '';
 		if ( $status === 'export_created' ) {
@@ -195,7 +201,7 @@ final class Import_Export_Screen {
 
 			<?php if ( $state['can_import'] ) : ?>
 			<section class="aio-restore" aria-labelledby="aio-restore-heading">
-				<h2 id="aio-restore-heading"><?php \esc_html_e( 'Restore from package', 'aio-page-builder' ); ?></h2>
+				<h2 id="aio-restore-heading"><?php \esc_html_e( 'Import / Restore', 'aio-page-builder' ); ?></h2>
 				<form method="post" action="<?php echo \esc_url( $validate_url ); ?>" enctype="multipart/form-data">
 					<input type="hidden" name="action" value="aio_import_export_validate" />
 					<?php \wp_nonce_field( self::NONCE_VALIDATE ); ?>
@@ -204,18 +210,18 @@ final class Import_Export_Screen {
 							<th scope="row"><label for="aio-ie-package"><?php \esc_html_e( 'ZIP package', 'aio-page-builder' ); ?></label></th>
 							<td>
 								<input type="file" name="aio_ie_package_file" id="aio-ie-package" accept=".zip" required />
-								<p class="description"><?php \esc_html_e( 'Upload an export package (ZIP) to validate. Maximum size 50 MB. No data is written until you confirm restore.', 'aio-page-builder' ); ?></p>
+								<p class="description"><?php \esc_html_e( 'Upload an AIO Page Builder export package (ZIP) to preview and validate. Maximum size 50 MB. No plugin data is written until you explicitly confirm restore.', 'aio-page-builder' ); ?></p>
 							</td>
 						</tr>
 					</table>
 					<p class="submit">
-						<button type="submit" class="button button-primary"><?php \esc_html_e( 'Validate package', 'aio-page-builder' ); ?></button>
+						<button type="submit" class="button button-primary"><?php \esc_html_e( 'Preview import', 'aio-page-builder' ); ?></button>
 					</p>
 				</form>
 
 				<?php if ( $state['import_validation_summary'] !== null ) : ?>
 					<div class="aio-validation-result" aria-live="polite">
-						<h3><?php \esc_html_e( 'Validation result', 'aio-page-builder' ); ?></h3>
+						<h3><?php \esc_html_e( 'Preview import', 'aio-page-builder' ); ?></h3>
 						<?php
 						$sum = $state['import_validation_summary'];
 						if ( $sum['validation_passed'] ) {
@@ -244,9 +250,45 @@ final class Import_Export_Screen {
 						?>
 					</div>
 
+					<?php if ( $state['import_package_preview'] !== null ) : ?>
+						<?php $p = $state['import_package_preview']; ?>
+						<div class="aio-import-package-preview" style="margin: 1em 0;">
+							<h3><?php \esc_html_e( 'Package contents', 'aio-page-builder' ); ?></h3>
+							<table class="widefat striped" style="max-width: 60em;">
+								<tbody>
+									<tr>
+										<th scope="row"><?php \esc_html_e( 'Export type', 'aio-page-builder' ); ?></th>
+										<td><code><?php echo \esc_html( (string) ( $p['export_type'] ?? '' ) ); ?></code></td>
+									</tr>
+									<tr>
+										<th scope="row"><?php \esc_html_e( 'Export timestamp', 'aio-page-builder' ); ?></th>
+										<td><?php echo \esc_html( (string) ( $p['export_timestamp'] ?? '' ) ); ?></td>
+									</tr>
+									<tr>
+										<th scope="row"><?php \esc_html_e( 'Plugin version', 'aio-page-builder' ); ?></th>
+										<td><?php echo \esc_html( (string) ( $p['plugin_version'] ?? '' ) ); ?></td>
+									</tr>
+									<tr>
+										<th scope="row"><?php \esc_html_e( 'Schema version', 'aio-page-builder' ); ?></th>
+										<td><?php echo \esc_html( (string) ( $p['schema_version'] ?? '' ) ); ?></td>
+									</tr>
+									<tr>
+										<th scope="row"><?php \esc_html_e( 'Source site', 'aio-page-builder' ); ?></th>
+										<td><?php echo \esc_html( (string) ( $p['source_site_url'] ?? '' ) ); ?></td>
+									</tr>
+									<tr>
+										<th scope="row"><?php \esc_html_e( 'Included categories', 'aio-page-builder' ); ?></th>
+										<td><?php echo \esc_html( implode( ', ', (array) ( $p['included_categories'] ?? array() ) ) ); ?></td>
+									</tr>
+								</tbody>
+							</table>
+							<p class="description"><?php \esc_html_e( 'This restores only AIO Page Builder plugin-owned data. It does not clone a full WordPress site and does not rewrite built page content unless separately approved.', 'aio-page-builder' ); ?></p>
+						</div>
+					<?php endif; ?>
+
 					<?php if ( ! empty( $state['restore_conflict_rows'] ) ) : ?>
 						<div class="aio-conflicts">
-							<h3><?php \esc_html_e( 'Conflicts (choose resolution below)', 'aio-page-builder' ); ?></h3>
+							<h3><?php \esc_html_e( 'Conflicts (review before restore)', 'aio-page-builder' ); ?></h3>
 							<table class="widefat striped">
 								<thead>
 									<tr>
@@ -275,6 +317,27 @@ final class Import_Export_Screen {
 							<p><?php echo \esc_html( $state['restore_action_state']['message'] ); ?></p>
 							<table class="form-table">
 								<tr>
+									<th scope="row"><?php \esc_html_e( 'Restore scope', 'aio-page-builder' ); ?></th>
+									<td>
+										<fieldset>
+											<?php foreach ( $state['restore_scope_options'] as $opt ) : ?>
+												<?php
+												$value    = isset( $opt['value'] ) ? (string) $opt['value'] : '';
+												$label    = isset( $opt['label'] ) ? (string) $opt['label'] : '';
+												$eligible = isset( $opt['eligible_categories'] ) && is_array( $opt['eligible_categories'] ) ? implode( ', ', $opt['eligible_categories'] ) : '';
+												?>
+												<label style="display:block; margin: 0.25em 0;">
+													<input type="radio" name="restore_scope" value="<?php echo \esc_attr( $value ); ?>" <?php checked( $value, Restore_Scope_Keys::FULL_AIO_BACKUP ); ?> required />
+													<?php echo \esc_html( $label ); ?>
+													<?php if ( $eligible !== '' ) : ?>
+														<span class="description"><?php echo \esc_html( ' (' . $eligible . ')' ); ?></span>
+													<?php endif; ?>
+												</label>
+											<?php endforeach; ?>
+										</fieldset>
+									</td>
+								</tr>
+								<tr>
 									<th scope="row"><label for="aio-resolution-mode"><?php \esc_html_e( 'Conflict resolution', 'aio-page-builder' ); ?></label></th>
 									<td>
 										<select name="resolution_mode" id="aio-resolution-mode" required>
@@ -284,9 +347,18 @@ final class Import_Export_Screen {
 										</select>
 									</td>
 								</tr>
+								<tr>
+									<th scope="row"><?php \esc_html_e( 'Confirm restore', 'aio-page-builder' ); ?></th>
+									<td>
+										<label>
+											<input type="checkbox" name="<?php echo \esc_attr( self::FIELD_CONFIRM_ACK ); ?>" value="1" required />
+											<?php \esc_html_e( 'I understand this will write AIO Page Builder plugin data to this site. I have reviewed the package preview and conflict handling.', 'aio-page-builder' ); ?>
+										</label>
+									</td>
+								</tr>
 							</table>
 							<p class="submit">
-								<button type="submit" class="button button-primary"><?php \esc_html_e( 'Run restore', 'aio-page-builder' ); ?></button>
+								<button type="submit" class="button button-primary"><?php \esc_html_e( 'Confirm restore', 'aio-page-builder' ); ?></button>
 							</p>
 						</form>
 					<?php endif; ?>
@@ -467,6 +539,16 @@ final class Import_Export_Screen {
 			\wp_safe_redirect( $this->screen_url( 'error', 'capability' ) );
 			exit;
 		}
+		$ack = isset( $_POST[ self::FIELD_CONFIRM_ACK ] ) ? \sanitize_text_field( \wp_unslash( $_POST[ self::FIELD_CONFIRM_ACK ] ) ) : '';
+		if ( $ack !== '1' ) {
+			\wp_safe_redirect( $this->screen_url( 'error', 'confirm_required' ) );
+			exit;
+		}
+		$scope = isset( $_POST['restore_scope'] ) ? \sanitize_text_field( \wp_unslash( $_POST['restore_scope'] ) ) : '';
+		if ( $scope === '' || ! Restore_Scope_Keys::is_valid( $scope ) ) {
+			\wp_safe_redirect( $this->screen_url( 'error', 'invalid_scope' ) );
+			exit;
+		}
 		$resolution = isset( $_POST['resolution_mode'] ) ? \sanitize_text_field( \wp_unslash( $_POST['resolution_mode'] ) ) : '';
 		if ( $resolution === '' ) {
 			\wp_safe_redirect( $this->screen_url( 'error', 'resolution_required' ) );
@@ -482,7 +564,11 @@ final class Import_Export_Screen {
 		$validation_result = Import_Validation_Result::from_stored( $stored );
 		/** @var Restore_Pipeline $pipeline */
 		$pipeline = $container->get( 'restore_pipeline' );
-		$result   = $pipeline->restore( $validation_result, $resolution );
+		$allowed  = null;
+		if ( $scope === Restore_Scope_Keys::SETTINGS_PROFILE_ONLY ) {
+			$allowed = array( 'settings', 'styling', 'profiles', 'uninstall_restore_metadata' );
+		}
+		$result = $pipeline->restore( $validation_result, $resolution, $allowed );
 		\delete_transient( self::TRANSIENT_VALIDATION . $user_id );
 		$zip_path = $validation_result->get_package_path();
 		if ( $zip_path !== '' && is_file( $zip_path ) ) {
@@ -561,6 +647,8 @@ final class Import_Export_Screen {
 			'move_failed'         => __( 'Could not save the uploaded file.', 'aio-page-builder' ),
 			'no_validation'       => __( 'No validation result found. Please validate a package first.', 'aio-page-builder' ),
 			'resolution_required' => __( 'Please choose a conflict resolution.', 'aio-page-builder' ),
+			'confirm_required'    => __( 'Please confirm restore before continuing.', 'aio-page-builder' ),
+			'invalid_scope'       => __( 'Please choose a restore scope.', 'aio-page-builder' ),
 		);
 		return $messages[ $code ] ?? __( 'An error occurred.', 'aio-page-builder' );
 	}

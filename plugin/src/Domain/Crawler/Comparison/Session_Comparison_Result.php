@@ -48,15 +48,15 @@ final class Session_Comparison_Result {
 	public $page_changes;
 
 	/**
-	 * @param string                    $prior_run_id         Prior crawl run id.
-	 * @param string                    $new_run_id           New crawl run id.
-	 * @param int                       $added_count          Pages only in new.
-	 * @param int                       $removed_count         Pages only in prior.
-	 * @param int                       $changed_count         Pages in both with changes.
-	 * @param int                       $unchanged_count       Pages in both unchanged.
-	 * @param int                       $reclassified_count   Pages with classification change.
-	 * @param int                       $meaningful_count_prior Meaningful pages in prior.
-	 * @param int                       $meaningful_count_new  Meaningful pages in new.
+	 * @param string                          $prior_run_id         Prior crawl run id.
+	 * @param string                          $new_run_id           New crawl run id.
+	 * @param int                             $added_count          Pages only in new.
+	 * @param int                             $removed_count         Pages only in prior.
+	 * @param int                             $changed_count         Pages in both with changes.
+	 * @param int                             $unchanged_count       Pages in both unchanged.
+	 * @param int                             $reclassified_count   Pages with classification change.
+	 * @param int                             $meaningful_count_prior Meaningful pages in prior.
+	 * @param int                             $meaningful_count_new  Meaningful pages in new.
 	 * @param array<int, Page_Change_Summary> $page_changes      Per-page change summaries.
 	 */
 	public function __construct(

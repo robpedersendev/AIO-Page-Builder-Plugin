@@ -50,11 +50,11 @@ final class Provider_Failover_Policy {
 	private int $max_fallback_attempts;
 
 	/**
-	 * @param bool         $enabled               Whether failover is allowed.
-	 * @param string       $primary_provider_id   Primary provider id.
-	 * @param string       $fallback_provider_id  Fallback provider id (must differ from primary).
+	 * @param bool               $enabled               Whether failover is allowed.
+	 * @param string             $primary_provider_id   Primary provider id.
+	 * @param string             $fallback_provider_id  Fallback provider id (must differ from primary).
 	 * @param array<int, string> $eligible_categories   Error categories that allow fallback (ERROR_* constants).
-	 * @param int          $max_fallback_attempts Upper bound (typically 1).
+	 * @param int                $max_fallback_attempts Upper bound (typically 1).
 	 */
 	public function __construct(
 		bool $enabled,

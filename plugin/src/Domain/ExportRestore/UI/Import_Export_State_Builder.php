@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\ExportRestore\UI;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Mode_Keys;
+use AIOPageBuilder\Domain\ExportRestore\Contracts\Restore_Scope_Keys;
 use AIOPageBuilder\Domain\ExportRestore\Import\Conflict_Resolution_Service;
 use AIOPageBuilder\Domain\Lifecycle\Template_Library_Lifecycle_Summary_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -43,22 +44,26 @@ final class Import_Export_State_Builder {
 	 *
 	 * @param array<string, mixed>|null $validation_payload   Import_Validation_Result::to_payload() or null.
 	 * @param array<string, mixed>|null $restore_result_payload Restore_Result::to_payload() or null.
+	 * @param array<string, mixed>|null $manifest Import manifest (decoded) or null.
 	 * @return array{
 	 *   export_mode_options: array<int, array{value: string, label: string}>,
 	 *   export_history_rows: array<int, array{filename: string, size_bytes: int, modified_at: string}>,
 	 *   import_validation_summary: array{validation_passed: bool, blocking_failures: array<int, string>, conflicts: array<int, array>, warnings: array<int, string>, checksum_verified: bool}|null,
+	 *   import_package_preview: array{export_type: string, export_timestamp: string, plugin_version: string, schema_version: string, source_site_url: string, included_categories: array<int, string>, excluded_categories: array<int, string>}|null,
 	 *   restore_conflict_rows: array<int, array{category: string, key: string, message: string}>,
 	 *   restore_action_state: array{can_restore: bool, resolution_modes: array<int, array{value: string, label: string}>, message: string, last_restore_payload: array|null},
+	 *   restore_scope_options: array<int, array{value: string, label: string, eligible_categories: array<int, string>}>,
 	 *   can_export: bool,
 	 *   can_import: bool,
 	 *   privacy_screen_url: string
 	 * }
 	 */
-	public function build( ?array $validation_payload = null, ?array $restore_result_payload = null ): array {
+	public function build( ?array $validation_payload = null, ?array $restore_result_payload = null, ?array $manifest = null ): array {
 		$can_export = \current_user_can( Capabilities::EXPORT_DATA );
 		$can_import = \current_user_can( Capabilities::IMPORT_DATA );
 
 		$import_summary   = null;
+		$import_preview   = null;
 		$conflict_rows    = array();
 		$can_restore      = false;
 		$resolution_modes = $this->resolution_mode_options();
@@ -89,6 +94,10 @@ final class Import_Export_State_Builder {
 			}
 		}
 
+		if ( $manifest !== null ) {
+			$import_preview = $this->build_import_preview_from_manifest( $manifest );
+		}
+
 		if ( $restore_result_payload !== null ) {
 			$message = isset( $restore_result_payload['message'] ) ? (string) $restore_result_payload['message'] : $message;
 		}
@@ -99,6 +108,7 @@ final class Import_Export_State_Builder {
 			'export_mode_options'       => $this->export_mode_options(),
 			'export_history_rows'       => $this->export_history_rows(),
 			'import_validation_summary' => $import_summary,
+			'import_package_preview'    => $import_preview,
 			'restore_conflict_rows'     => $conflict_rows,
 			'restore_action_state'      => array(
 				'can_restore'          => $can_restore,
@@ -106,6 +116,7 @@ final class Import_Export_State_Builder {
 				'message'              => $message,
 				'last_restore_payload' => $restore_result_payload,
 			),
+			'restore_scope_options'     => $this->restore_scope_options( $import_preview ),
 			'can_export'                => $can_export,
 			'can_import'                => $can_import,
 			'privacy_screen_url'        => $privacy_screen_url,
@@ -114,6 +125,55 @@ final class Import_Export_State_Builder {
 			$state['template_library_lifecycle_summary'] = $this->lifecycle_summary_builder->build();
 		}
 		return $state;
+	}
+
+	/**
+	 * @param array<string, mixed> $manifest
+	 * @return array{export_type: string, export_timestamp: string, plugin_version: string, schema_version: string, source_site_url: string, included_categories: array<int, string>, excluded_categories: array<int, string>}
+	 */
+	private function build_import_preview_from_manifest( array $manifest ): array {
+		$included = isset( $manifest['included_categories'] ) && is_array( $manifest['included_categories'] )
+			? array_values( array_filter( $manifest['included_categories'], 'is_string' ) )
+			: array();
+		$excluded = isset( $manifest['excluded_categories'] ) && is_array( $manifest['excluded_categories'] )
+			? array_values( array_filter( $manifest['excluded_categories'], 'is_string' ) )
+			: array();
+		return array(
+			'export_type'         => isset( $manifest['export_type'] ) ? (string) $manifest['export_type'] : '',
+			'export_timestamp'    => isset( $manifest['export_timestamp'] ) ? (string) $manifest['export_timestamp'] : '',
+			'plugin_version'      => isset( $manifest['plugin_version'] ) ? (string) $manifest['plugin_version'] : '',
+			'schema_version'      => isset( $manifest['schema_version'] ) ? (string) $manifest['schema_version'] : '',
+			'source_site_url'     => isset( $manifest['source_site_url'] ) ? (string) $manifest['source_site_url'] : '',
+			'included_categories' => $included,
+			'excluded_categories' => $excluded,
+		);
+	}
+
+	/**
+	 * @param array{included_categories: array<int, string>}|null $import_preview
+	 * @return array<int, array{value: string, label: string, eligible_categories: array<int, string>}>
+	 */
+	private function restore_scope_options( ?array $import_preview ): array {
+		$included = $import_preview !== null ? ( $import_preview['included_categories'] ?? array() ) : array();
+		$included = is_array( $included ) ? array_values( array_filter( $included, 'is_string' ) ) : array();
+
+		$settings_profile_allow    = array( 'settings', 'styling', 'profiles', 'uninstall_restore_metadata' );
+		$settings_profile_eligible = array_values( array_intersect( $settings_profile_allow, $included ) );
+
+		$full_eligible = $included;
+
+		return array(
+			array(
+				'value'               => Restore_Scope_Keys::SETTINGS_PROFILE_ONLY,
+				'label'               => __( 'Import settings/profile only', 'aio-page-builder' ),
+				'eligible_categories' => $settings_profile_eligible,
+			),
+			array(
+				'value'               => Restore_Scope_Keys::FULL_AIO_BACKUP,
+				'label'               => __( 'Import full AIO backup', 'aio-page-builder' ),
+				'eligible_categories' => $full_eligible,
+			),
+		);
 	}
 
 	/**
@@ -188,11 +248,11 @@ final class Import_Export_State_Builder {
 		return array(
 			array(
 				'value' => Conflict_Resolution_Service::MODE_OVERWRITE,
-				'label' => __( 'Overwrite current with package', 'aio-page-builder' ),
+				'label' => __( 'Overwrite incoming object over current', 'aio-page-builder' ),
 			),
 			array(
 				'value' => Conflict_Resolution_Service::MODE_KEEP_CURRENT,
-				'label' => __( 'Keep current; skip conflicting', 'aio-page-builder' ),
+				'label' => __( 'Keep current and skip import object', 'aio-page-builder' ),
 			),
 			array(
 				'value' => Conflict_Resolution_Service::MODE_DUPLICATE,

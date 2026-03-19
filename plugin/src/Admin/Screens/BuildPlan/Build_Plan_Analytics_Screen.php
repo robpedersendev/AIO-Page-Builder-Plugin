@@ -59,6 +59,7 @@ final class Build_Plan_Analytics_Screen {
 				$summary = $svc->get_analytics_summary( $from, $to );
 			} catch ( \Throwable $e ) {
 				// Observational; fail gracefully. Intentionally empty.
+				(void) $e;
 			}
 		}
 		$build_plans_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );

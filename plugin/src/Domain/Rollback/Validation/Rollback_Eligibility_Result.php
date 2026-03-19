@@ -88,10 +88,10 @@ final class Rollback_Eligibility_Result {
 	/**
 	 * Builds an eligible result (no blockers).
 	 *
-	 * @param string       $rollback_handler_key
-	 * @param string       $pre_snapshot_id
-	 * @param string       $post_snapshot_id
-	 * @param string       $execution_ref
+	 * @param string             $rollback_handler_key
+	 * @param string             $pre_snapshot_id
+	 * @param string             $post_snapshot_id
+	 * @param string             $execution_ref
 	 * @param array<int, string> $warnings Optional warnings (e.g. state_diverged).
 	 * @param array<int, string> $required_permissions
 	 * @return self
@@ -122,14 +122,14 @@ final class Rollback_Eligibility_Result {
 	 * Builds an ineligible result with blocking reasons.
 	 *
 	 * @param array<int, string> $blocking_reasons
-	 * @param string       $rollback_handler_key Empty if unknown.
-	 * @param string       $pre_snapshot_id
-	 * @param string       $post_snapshot_id
-	 * @param string       $execution_ref
-	 * @param string       $target_resolution_state
+	 * @param string             $rollback_handler_key Empty if unknown.
+	 * @param string             $pre_snapshot_id
+	 * @param string             $post_snapshot_id
+	 * @param string             $execution_ref
+	 * @param string             $target_resolution_state
 	 * @param array<int, string> $warnings
 	 * @param array<int, string> $required_permissions
-	 * @param string       $message
+	 * @param string             $message
 	 * @return self
 	 */
 	public static function ineligible(

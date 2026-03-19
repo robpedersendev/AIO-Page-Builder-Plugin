@@ -79,7 +79,7 @@ final class Step_Item_List_Component {
 		$first_row         = reset( $rows );
 		$columns           = ! empty( $order ) ? $order : ( is_array( $first_row ) ? array_keys( (array) ( $first_row[ self::ROW_KEY_SUMMARY_COLUMNS ] ?? array() ) ) : array() );
 		$select_all_id     = $list_id . '-select-all';
-		$colspan           = 1 + count( $columns ) + 1 + 1; // select + columns + status + actions
+		$colspan           = 1 + count( $columns ) + 1 + 1; // Select + columns + status + actions.
 		$has_group_headers = isset( $first_row['group_label'] ) && (string) $first_row['group_label'] !== '';
 		if ( $has_group_headers ) {
 			$rows = $this->sort_rows_for_group_headers( $rows );
@@ -258,6 +258,7 @@ final class Step_Item_List_Component {
 				$out[] = '<button type="button" class="button button-small ' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button>';
 			}
 		}
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $out entries built with esc_url/esc_attr/esc_html above.
 		echo implode( ' ', $out );
 	}
 }

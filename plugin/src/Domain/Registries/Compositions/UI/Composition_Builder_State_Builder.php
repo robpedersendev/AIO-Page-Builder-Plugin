@@ -178,7 +178,7 @@ final class Composition_Builder_State_Builder {
 	}
 
 	/**
-	 * @param array<int, array<string, mixed>>          $ordered
+	 * @param array<int, array<string, mixed>>    $ordered
 	 * @param array<string, array<string, mixed>> $section_by_key
 	 * @return array<int, array{code: string, message: string}>
 	 */
@@ -212,7 +212,7 @@ final class Composition_Builder_State_Builder {
 	}
 
 	/**
-	 * @param array<int, array<string, mixed>>          $ordered
+	 * @param array<int, array<string, mixed>>    $ordered
 	 * @param array<string, array<string, mixed>> $section_by_key
 	 */
 	private function compute_insertion_hint( array $ordered, array $section_by_key ): string {

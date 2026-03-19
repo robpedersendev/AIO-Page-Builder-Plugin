@@ -46,7 +46,7 @@ final class Capabilities {
 	public const VIEW_AI_RUNS           = 'aio_view_ai_runs';
 	public const VIEW_VERSION_SNAPSHOTS = 'aio_view_version_snapshots';
 
-	/** @var array<string>|null Full list cached for getAll(). */
+	/** @var array<string>|null Full list cached for get_all(). */
 	private static ?array $all = null;
 
 	/**
@@ -54,7 +54,7 @@ final class Capabilities {
 	 *
 	 * @return array<string>
 	 */
-	public static function getAll(): array {
+	public static function get_all(): array {
 		if ( self::$all !== null ) {
 			return self::$all;
 		}
@@ -110,6 +110,6 @@ final class Capabilities {
 	 * @return bool
 	 */
 	public static function is_plugin_capability( string $cap ): bool {
-		return in_array( $cap, self::getAll(), true );
+		return in_array( $cap, self::get_all(), true );
 	}
 }

@@ -39,7 +39,7 @@ final class Field_Assignment_Compatibility_Service {
 	/**
 	 * Returns group keys to retain during refinement (derived + deprecated that are currently assigned).
 	 *
-	 * @param int          $page_id       WordPress post ID (page).
+	 * @param int                $page_id       WordPress post ID (page).
 	 * @param array<int, string> $derived_groups Newly derived group keys from template/composition.
 	 * @return array<int, string> Union of derived and assigned deprecated groups to preserve.
 	 */

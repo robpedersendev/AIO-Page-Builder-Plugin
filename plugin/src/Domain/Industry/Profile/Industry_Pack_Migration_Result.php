@@ -25,7 +25,7 @@ final class Industry_Pack_Migration_Result {
 	/** @var bool */
 	private $success;
 
-	/** @var array<int, array{object_type: string, old_ref: string, new_ref: string}> */
+	/** @var list<array{object_type: string, old_ref: string, new_ref: string}> */
 	private $migrated_refs;
 
 	/** @var array<int, string> */
@@ -39,7 +39,7 @@ final class Industry_Pack_Migration_Result {
 
 	/**
 	 * @param bool                                                               $success       Whether migration completed without fatal errors.
-	 * @param array<int, array{object_type: string, old_ref: string, new_ref: string}> $migrated_refs List of refs that were updated.
+	 * @param list<array{object_type: string, old_ref: string, new_ref: string}> $migrated_refs List of refs that were updated.
 	 * @param array<int, string>                                                 $warnings      Non-fatal warnings.
 	 * @param array<int, string>                                                 $errors        Fatal or validation errors.
 	 * @param string                                                             $audit_note    Short note for audit/support.
@@ -62,7 +62,7 @@ final class Industry_Pack_Migration_Result {
 		return $this->success;
 	}
 
-	/** @return array<int, array{object_type: string, old_ref: string, new_ref: string}> */
+	/** @return list<array{object_type: string, old_ref: string, new_ref: string}> */
 	public function get_migrated_refs(): array {
 		return $this->migrated_refs;
 	}

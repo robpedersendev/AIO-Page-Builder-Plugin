@@ -43,11 +43,11 @@ final class Failover_Result {
 	private array $policy_snapshot;
 
 	/**
-	 * @param bool                                                                                         $used_primary        True if primary succeeded.
-	 * @param string                                                                                       $effective_provider_id Provider that produced or last attempted.
-	 * @param string                                                                                       $effective_model_used  Model used.
+	 * @param bool                                                                                               $used_primary        True if primary succeeded.
+	 * @param string                                                                                             $effective_provider_id Provider that produced or last attempted.
+	 * @param string                                                                                             $effective_model_used  Model used.
 	 * @param array<int, array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts Per-attempt log (no secrets).
-	 * @param array<string, mixed>                                                                         $policy_snapshot Policy snapshot for audit.
+	 * @param array<string, mixed>                                                                               $policy_snapshot Policy snapshot for audit.
 	 */
 	public function __construct(
 		bool $used_primary,
@@ -156,10 +156,10 @@ final class Failover_Result {
 	/**
 	 * Create result for fallback success (primary failed, fallback succeeded).
 	 *
-	 * @param string                                                                                       $fallback_provider_id Fallback provider that succeeded.
-	 * @param string                                                                                       $fallback_model       Model used by fallback.
+	 * @param string                                                                                             $fallback_provider_id Fallback provider that succeeded.
+	 * @param string                                                                                             $fallback_model       Model used by fallback.
 	 * @param array<int, array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts Primary failure + fallback success.
-	 * @param array<string, mixed>                                                                         $policy_snapshot Policy snapshot.
+	 * @param array<string, mixed>                                                                               $policy_snapshot Policy snapshot.
 	 * @return self
 	 */
 	public static function fallback_success( string $fallback_provider_id, string $fallback_model, array $attempts, array $policy_snapshot ): self {
@@ -169,10 +169,10 @@ final class Failover_Result {
 	/**
 	 * Create result for fallback failure (primary failed, fallback attempted and failed).
 	 *
-	 * @param string                                                                                       $last_provider_id Last provider attempted (fallback).
-	 * @param string                                                                                       $last_model_used   Model used.
+	 * @param string                                                                                             $last_provider_id Last provider attempted (fallback).
+	 * @param string                                                                                             $last_model_used   Model used.
 	 * @param array<int, array{provider_id: string, model_used: string, category: string, attempted_at: string}> $attempts All attempts.
-	 * @param array<string, mixed>                                                                         $policy_snapshot Policy snapshot.
+	 * @param array<string, mixed>                                                                               $policy_snapshot Policy snapshot.
 	 * @return self
 	 */
 	public static function fallback_failure( string $last_provider_id, string $last_model_used, array $attempts, array $policy_snapshot ): self {

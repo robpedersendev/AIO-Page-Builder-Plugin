@@ -66,9 +66,6 @@ final class Option_Names {
 	/** Global styling settings (tokens, component overrides); plugin-owned, removed on uninstall (spec ?17.10, styling contract ?8). */
 	public const GLOBAL_STYLE_SETTINGS = 'aio_global_style_settings';
 
-	/** Applied design tokens from Build Plan execution (plugin-owned; spec §35, §40.2; Prompt 640). */
-	public const APPLIED_DESIGN_TOKENS = 'aio_applied_design_tokens';
-
 	/** Per-entity style payloads (section/page template overrides); plugin-owned, removed on uninstall. */
 	public const ENTITY_STYLE_PAYLOADS = 'aio_entity_style_payloads';
 
@@ -102,7 +99,7 @@ final class Option_Names {
 	/**
 	 * Returns all known option keys in stable order.
 	 *
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {
@@ -125,7 +122,6 @@ final class Option_Names {
 			self::ONBOARDING_DRAFT,
 			self::PROMPT_EXPERIMENTS,
 			self::GLOBAL_STYLE_SETTINGS,
-			self::APPLIED_DESIGN_TOKENS,
 			self::ENTITY_STYLE_PAYLOADS,
 			self::STYLE_CACHE_VERSION,
 			self::APPLIED_INDUSTRY_PRESET,

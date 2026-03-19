@@ -33,18 +33,18 @@ final class Industry_Candidate_Template_Overlap_Analyzer {
 	 *
 	 * @param array{
 	 *   candidate_industry_label: string,
-	 *   page_families?: array<int, string>,
-	 *   section_keys?: array<int, string>,
-	 *   cta_pattern_refs?: array<int, string>,
+	 *   page_families?: list<string>,
+	 *   section_keys?: list<string>,
+	 *   cta_pattern_refs?: list<string>,
 	 *   lpagery_rule_ref?: string,
 	 *   proof_model_hint?: string
 	 * } $candidate
 	 * @return array{
 	 *   candidate_industry_label: string,
 	 *   overlap_score: float,
-	 *   strongest_reusable_families: array<int, string>,
-	 *   weak_coverage_families: array<int, string>,
-	 *   notes: array<int, string>
+	 *   strongest_reusable_families: list<string>,
+	 *   weak_coverage_families: list<string>,
+	 *   notes: list<string>
 	 * }
 	 */
 	public function analyze( array $candidate ): array {

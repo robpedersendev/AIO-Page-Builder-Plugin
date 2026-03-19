@@ -73,7 +73,7 @@ final class Industry_Subtype_Section_Recommendation_Extender {
 	 * Returns list of section keys to prioritize from subtype helper_overlay_refs (treated as section_key refs).
 	 *
 	 * @param array<string, mixed>|null $subtype_definition
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	private function subtype_section_priority_keys( ?array $subtype_definition ): array {
 		if ( $subtype_definition === null || ! isset( $subtype_definition['helper_overlay_refs'] ) || ! is_array( $subtype_definition['helper_overlay_refs'] ) ) {

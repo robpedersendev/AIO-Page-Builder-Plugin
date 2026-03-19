@@ -126,7 +126,7 @@ final class Industry_Recommendation_Regression_Guard_Test extends TestCase {
 			if ( empty( $scenario['pack_found'] ) ) {
 				continue;
 			}
-			$fd = $scenario['page_recommendations']['fit_distribution'] ?? array();
+			$fd  = $scenario['page_recommendations']['fit_distribution'] ?? array();
 			$sum = ( $fd['recommended'] ?? 0 ) + ( $fd['neutral'] ?? 0 ) + ( $fd['discouraged'] ?? 0 ) + ( $fd['allowed_weak_fit'] ?? 0 );
 			if ( $sum > 0 ) {
 				$at_least_one_non_zero_fit = true;

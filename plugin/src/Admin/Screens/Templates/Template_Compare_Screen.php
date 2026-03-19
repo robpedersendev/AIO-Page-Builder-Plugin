@@ -70,7 +70,7 @@ final class Template_Compare_Screen {
 	 * Returns the current user's compare list for the given type (for directory/detail link display).
 	 *
 	 * @param string $type 'section' or 'page'.
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public static function get_compare_list( string $type ): array {
 		$meta_key = self::get_compare_meta_key( $type );
@@ -291,9 +291,11 @@ final class Template_Compare_Screen {
 		}
 		$style_context = $this->get_preview_style_context( $type, '' );
 		if ( $style_context !== null ) {
+			// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Inline preview context; base URL from trusted builder.
 			echo '<link rel="stylesheet" href="' . \esc_url( $style_context['base_stylesheet_url'] ) . '" />';
 			if ( $style_context['inline_css'] !== '' ) {
-				echo '<style type="text/css" id="aio-compare-preview-style">' . /* Safe: from sanitized emitters only */ $style_context['inline_css'] . '</style>';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- From trusted Preview_Style_Context_Builder.
+				echo '<style type="text/css" id="aio-compare-preview-style">' . $style_context['inline_css'] . '</style>';
 			}
 		}
 		$labels = array(
@@ -355,15 +357,18 @@ final class Template_Compare_Screen {
 	private function render_cell( string $attr, array $row ): void {
 		$val = $row[ $attr ] ?? null;
 		if ( $attr === 'used_sections' && \is_array( $val ) ) {
-			echo \esc_html( \implode( ', ', $val ) ?: '—' );
+			$joined = \implode( ', ', $val );
+			echo \esc_html( $joined !== '' ? $joined : '—' );
 			return;
 		}
 		if ( $attr === 'compatibility_notes' && \is_array( $val ) ) {
-			echo \esc_html( \wp_json_encode( $val ) ?: '—' );
+			$encoded = \wp_json_encode( $val );
+			echo \esc_html( $encoded !== false && $encoded !== '' ? $encoded : '—' );
 			return;
 		}
 		if ( \is_scalar( $val ) ) {
-			echo \esc_html( (string) $val ?: '—' );
+			$str = (string) $val;
+			echo \esc_html( $str !== '' ? $str : '—' );
 			return;
 		}
 		echo '—';

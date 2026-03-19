@@ -189,7 +189,7 @@ final class Admin_Menu {
 		$industry_goal_comparison              = new Conversion_Goal_Comparison_Screen( $this->container );
 		$industry_bundle_import_preview        = new Industry_Bundle_Import_Preview_Screen( $this->container );
 		$industry_style_preset                 = new Industry_Style_Preset_Screen( $this->container );
-		$industry_style_layer_comparison      = new Industry_Style_Layer_Comparison_Screen( $this->container );
+		$industry_style_layer_comparison       = new Industry_Style_Layer_Comparison_Screen( $this->container );
 		$global_style_tokens                   = new Global_Style_Token_Settings_Screen( $this->container );
 		$global_component_overrides            = new Global_Component_Override_Settings_Screen( $this->container );
 		$import_export                         = new Import_Export_Screen( $this->container );
@@ -645,7 +645,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
 			exit;
 		}
-		$primary       = isset( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
+		$primary = isset( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
 			? trim( \sanitize_text_field( \wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) ) )
 			: '';
 		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array values sanitized in loop below.
@@ -653,7 +653,7 @@ final class Admin_Menu {
 			? \wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS ] )
 			: ( isset( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] ) ? \wp_unslash( $_POST[ Industry_Profile_Schema::FIELD_SECONDARY_INDUSTRY_KEYS . '[]' ] ) : array() );
 		// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$secondary     = array();
+		$secondary = array();
 		if ( is_array( $secondary_raw ) ) {
 			foreach ( $secondary_raw as $v ) {
 				if ( is_string( $v ) ) {
@@ -975,7 +975,6 @@ final class Admin_Menu {
 
 	/**
 	 * Handles industry bundle preview: validate upload, analyze conflicts, store preview in transient, redirect.
-	 * No state write; preview only. Direct apply of JSON bundles is not supported (v1); use Import / Export (ZIP) for restore.
 	 *
 	 * @return void
 	 */

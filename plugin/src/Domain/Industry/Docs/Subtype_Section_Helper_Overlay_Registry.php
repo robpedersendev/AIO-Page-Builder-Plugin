@@ -44,7 +44,7 @@ final class Subtype_Section_Helper_Overlay_Registry {
 	/** @var array<string, array<string, mixed>> Composite key "subtype_key|section_key" => overlay. */
 	private array $by_composite = array();
 
-	/** @var array<int, array<string, mixed>> All valid overlays in load order. */
+	/** @var list<array<string, mixed>> All valid overlays in load order. */
 	private array $all = array();
 
 	/**
@@ -122,7 +122,7 @@ final class Subtype_Section_Helper_Overlay_Registry {
 	/**
 	 * Returns all loaded overlays.
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -132,7 +132,7 @@ final class Subtype_Section_Helper_Overlay_Registry {
 	 * Returns overlays for the given subtype (all section keys for that subtype).
 	 *
 	 * @param string $subtype_key Subtype key.
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_subtype( string $subtype_key ): array {
 		$sub = trim( $subtype_key );

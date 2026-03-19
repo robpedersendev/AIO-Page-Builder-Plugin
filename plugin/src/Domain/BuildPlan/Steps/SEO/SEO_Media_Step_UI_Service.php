@@ -100,9 +100,9 @@ final class SEO_Media_Step_UI_Service {
 			);
 		}
 
-		$bulk_states                  = $this->placeholder_bulk_states( $eligible_count, $selected_item_ids, $rows );
-		$detail_panel                 = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
-		$step_messages                = $this->step_messages( count( $rows ), $eligible_count );
+		$bulk_states   = $this->placeholder_bulk_states( $eligible_count, $selected_item_ids, $rows );
+		$detail_panel  = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
+		$step_messages = $this->step_messages( count( $rows ), $eligible_count );
 		if ( count( $rows ) > 0 ) {
 			array_unshift(
 				$step_messages,

@@ -284,7 +284,7 @@ final class ACF_Regeneration_Service {
 	/**
 	 * Computes mismatch list: missing, version_stale, or ok.
 	 *
-	 * @param array<int, string>         $expected_section_keys
+	 * @param array<int, string>   $expected_section_keys
 	 * @param array<string, array> $current_groups
 	 * @return array<int, array{section_key: string, group_key: string, status: string}>
 	 */

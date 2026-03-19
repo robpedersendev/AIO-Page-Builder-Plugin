@@ -37,10 +37,10 @@ final class Section_Template_Repository extends Abstract_CPT_Repository implemen
 	 * @return int Post ID on success; 0 on failure.
 	 */
 	public function save_definition( array $definition ): int {
-		$key    = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
-		$status = (string) ( $definition[ Section_Schema::FIELD_STATUS ] ?? 'draft' );
+		$key      = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
+		$status   = (string) ( $definition[ Section_Schema::FIELD_STATUS ] ?? 'draft' );
 		$name_raw = $definition[ Section_Schema::FIELD_NAME ] ?? $key;
-		$name   = (string) ( $name_raw !== '' && $name_raw !== null ? $name_raw : 'Untitled' );
+		$name     = (string) ( $name_raw !== '' && $name_raw !== null ? $name_raw : 'Untitled' );
 
 		$data = array(
 			'internal_key' => $key,
@@ -227,8 +227,8 @@ final class Section_Template_Repository extends Abstract_CPT_Repository implemen
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
 				$base['definition']              = $decoded;
-				$ik = $base[ self::META_INTERNAL_KEY ];
-				$st = $base[ self::META_STATUS ];
+				$ik                              = $base[ self::META_INTERNAL_KEY ];
+				$st                              = $base[ self::META_STATUS ];
 				$base[ self::META_INTERNAL_KEY ] = ( $ik !== '' && $ik !== null && $ik !== false ) ? $ik : ( $decoded[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 				$base[ self::META_STATUS ]       = ( $st !== '' && $st !== null && $st !== false ) ? $st : ( $decoded[ Section_Schema::FIELD_STATUS ] ?? '' );
 			}

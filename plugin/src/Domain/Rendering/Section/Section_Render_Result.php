@@ -83,7 +83,7 @@ final class Section_Render_Result {
 	 * @param int                  $position        Zero-based position on page.
 	 * @param array<string, mixed> $field_values    Sanitized field name => value (may be omission-filtered).
 	 * @param array<string, mixed> $structure       wrapper_attrs, selector_map, structural_nodes, structural_hint, asset_hints, accessibility_notes.
-	 * @param array<int, string>         $errors          Validation/render errors; non-empty when invalid.
+	 * @param array<int, string>   $errors          Validation/render errors; non-empty when invalid.
 	 * @param Omission_Result|null $omission_result Optional; set when Smart_Omission_Service was applied.
 	 */
 	public function __construct(

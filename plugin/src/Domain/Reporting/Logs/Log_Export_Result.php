@@ -42,7 +42,7 @@ final class Log_Export_Result {
 	/**
 	 * @param bool                 $success
 	 * @param string               $message
-	 * @param array<int, string>         $exported_log_types
+	 * @param array<int, string>   $exported_log_types
 	 * @param array<string, mixed> $filter_summary
 	 * @param bool                 $redaction_applied
 	 * @param string               $export_file_reference
@@ -114,7 +114,7 @@ final class Log_Export_Result {
 	}
 
 	/**
-	 * @param array<int, string>         $exported_log_types
+	 * @param array<int, string>   $exported_log_types
 	 * @param array<string, mixed> $filter_summary
 	 * @param string               $export_file_reference
 	 * @param string               $export_log_reference

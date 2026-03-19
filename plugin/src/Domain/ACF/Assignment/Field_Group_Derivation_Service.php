@@ -189,7 +189,7 @@ final class Field_Group_Derivation_Service {
 	 * Maps section keys to group keys, optionally excluding deprecated.
 	 *
 	 * @param array<int, string> $section_keys
-	 * @param bool         $exclude_deprecated
+	 * @param bool               $exclude_deprecated
 	 * @return array<int, string>
 	 */
 	private function section_keys_to_groups( array $section_keys, bool $exclude_deprecated ): array {

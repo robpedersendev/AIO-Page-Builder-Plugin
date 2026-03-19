@@ -42,7 +42,7 @@ final class Subtype_Goal_Starter_Bundle_Overlay_Registry {
 	/** @var array<string, array<string, mixed>> Composite "subtype|goal|bundle" => overlay. */
 	private array $by_composite = array();
 
-	/** @var array<int, array<string, mixed>> All valid overlays in load order. */
+	/** @var list<array<string, mixed>> All valid overlays in load order. */
 	private array $all = array();
 
 	private static function composite_key( string $subtype, string $goal, string $bundle ): string {
@@ -126,7 +126,7 @@ final class Subtype_Goal_Starter_Bundle_Overlay_Registry {
 	 *
 	 * @param string $subtype_key Industry subtype key.
 	 * @param string $goal_key    Conversion goal key.
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_subtype_goal( string $subtype_key, string $goal_key ): array {
 		$s = \trim( $subtype_key );
@@ -150,7 +150,7 @@ final class Subtype_Goal_Starter_Bundle_Overlay_Registry {
 	/**
 	 * Returns all loaded overlays.
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function list_all(): array {
 		return $this->all;
@@ -160,7 +160,7 @@ final class Subtype_Goal_Starter_Bundle_Overlay_Registry {
 	 * Validates an overlay definition. Returns list of error codes; empty when valid.
 	 *
 	 * @param array<string, mixed> $ov Raw overlay.
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public function validate_overlay( array $ov ): array {
 		$errors = array();

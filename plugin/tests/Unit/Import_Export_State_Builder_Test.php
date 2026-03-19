@@ -42,6 +42,7 @@ require_once $plugin_root . '/src/Bootstrap/Constants.php';
 \AIOPageBuilder\Bootstrap\Constants::init();
 require_once $plugin_root . '/src/Infrastructure/Config/Capabilities.php';
 require_once $plugin_root . '/src/Domain/ExportRestore/Contracts/Export_Mode_Keys.php';
+require_once $plugin_root . '/src/Domain/ExportRestore/Contracts/Restore_Scope_Keys.php';
 require_once $plugin_root . '/src/Domain/ExportRestore/Import/Conflict_Resolution_Service.php';
 require_once $plugin_root . '/src/Infrastructure/Files/Plugin_Path_Manager.php';
 require_once $plugin_root . '/src/Domain/ExportRestore/UI/Import_Export_State_Builder.php';
@@ -61,8 +62,10 @@ final class Import_Export_State_Builder_Test extends TestCase {
 		$this->assertArrayHasKey( 'export_mode_options', $state );
 		$this->assertArrayHasKey( 'export_history_rows', $state );
 		$this->assertArrayHasKey( 'import_validation_summary', $state );
+		$this->assertArrayHasKey( 'import_package_preview', $state );
 		$this->assertArrayHasKey( 'restore_conflict_rows', $state );
 		$this->assertArrayHasKey( 'restore_action_state', $state );
+		$this->assertArrayHasKey( 'restore_scope_options', $state );
 		$this->assertArrayHasKey( 'can_export', $state );
 		$this->assertArrayHasKey( 'can_import', $state );
 		$this->assertArrayHasKey( 'privacy_screen_url', $state );
@@ -146,5 +149,29 @@ final class Import_Export_State_Builder_Test extends TestCase {
 		$builder = new Import_Export_State_Builder( $this->path_manager() );
 		$state   = $builder->build( null, null );
 		$this->assertStringContainsString( 'aio-page-builder-privacy-reporting', $state['privacy_screen_url'] );
+	}
+
+	public function test_with_manifest_builds_import_package_preview_and_scope_options(): void {
+		if ( ! function_exists( 'current_user_can' ) ) {
+			$this->markTestSkipped( 'WordPress not loaded.' );
+		}
+		$manifest = array(
+			'export_type'         => 'full_operational_backup',
+			'export_timestamp'    => '2026-03-01T12:00:00Z',
+			'plugin_version'      => '1.2.3',
+			'schema_version'      => '1',
+			'source_site_url'     => 'https://example.com',
+			'included_categories' => array( 'settings', 'styling', 'profiles', 'registries' ),
+			'excluded_categories' => array( 'secrets' ),
+		);
+		$builder  = new Import_Export_State_Builder( $this->path_manager() );
+		$state    = $builder->build( null, null, $manifest );
+		$this->assertIsArray( $state['import_package_preview'] );
+		$this->assertSame( 'full_operational_backup', $state['import_package_preview']['export_type'] );
+		$this->assertIsArray( $state['restore_scope_options'] );
+		$this->assertNotEmpty( $state['restore_scope_options'] );
+		$values = array_column( $state['restore_scope_options'], 'value' );
+		$this->assertContains( \AIOPageBuilder\Domain\ExportRestore\Contracts\Restore_Scope_Keys::SETTINGS_PROFILE_ONLY, $values );
+		$this->assertContains( \AIOPageBuilder\Domain\ExportRestore\Contracts\Restore_Scope_Keys::FULL_AIO_BACKUP, $values );
 	}
 }

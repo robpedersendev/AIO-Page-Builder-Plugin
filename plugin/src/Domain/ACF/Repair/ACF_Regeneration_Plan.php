@@ -78,11 +78,11 @@ final class ACF_Regeneration_Plan {
 	private array $refused_cleanup;
 
 	/**
-	 * @param bool                                                                $dry_run
-	 * @param string                                                              $scope
-	 * @param string|null                                                         $section_family_key
-	 * @param string|null                                                         $page_template_family_key
-	 * @param bool                                                                $include_page_assignments
+	 * @param bool                                                                      $dry_run
+	 * @param string                                                                    $scope
+	 * @param string|null                                                               $section_family_key
+	 * @param string|null                                                               $page_template_family_key
+	 * @param bool                                                                      $include_page_assignments
 	 * @param array<int, array{section_key: string, group_key: string, status: string}> $field_group_mismatches
 	 * @param array<int, array{page_id: int, type: string, key: string}>                $page_assignment_repair_candidates
 	 * @param array<int, string>                                                        $refused_cleanup

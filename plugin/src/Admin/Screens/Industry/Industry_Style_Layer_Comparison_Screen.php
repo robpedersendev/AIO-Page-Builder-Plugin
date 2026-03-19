@@ -185,7 +185,7 @@ final class Industry_Style_Layer_Comparison_Screen {
 						printf(
 							/* translators: 1: preset label/key, 2: conversion goal or "none" */
 							esc_html__( 'Preset: %1$s. Conversion goal: %2$s.', 'aio-page-builder' ),
-							esc_html( $parent['label'] ?: $selected_preset ),
+							esc_html( ( $parent['label'] !== '' && $parent['label'] !== null ) ? $parent['label'] : $selected_preset ),
 							$state['conversion_goal'] !== '' ? esc_html( $state['conversion_goal'] ) : esc_html__( 'none', 'aio-page-builder' )
 						);
 						?>

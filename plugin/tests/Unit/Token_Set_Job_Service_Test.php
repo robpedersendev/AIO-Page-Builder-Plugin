@@ -44,7 +44,7 @@ final class Token_Set_Job_Service_Test extends TestCase {
 				'proposed_value' => '#2563eb',
 			),
 		);
-		$result = $service->run( $envelope );
+		$result   = $service->run( $envelope );
 		$this->assertTrue( $result->is_success() );
 		$stored = \get_option( Option_Names::APPLIED_DESIGN_TOKENS, array() );
 		$this->assertIsArray( $stored );
@@ -61,7 +61,7 @@ final class Token_Set_Job_Service_Test extends TestCase {
 				'proposed_value' => '#333',
 			),
 		);
-		$result = $service->run( $envelope );
+		$result   = $service->run( $envelope );
 		$this->assertFalse( $result->is_success() );
 		$this->assertSame( array(), \get_option( Option_Names::APPLIED_DESIGN_TOKENS, array() ) );
 	}
@@ -75,7 +75,7 @@ final class Token_Set_Job_Service_Test extends TestCase {
 				'proposed_value' => 'y',
 			),
 		);
-		$result = $service->run( $envelope );
+		$result   = $service->run( $envelope );
 		$this->assertFalse( $result->is_success() );
 		$this->assertNotEmpty( $result->get_errors() );
 	}
@@ -89,7 +89,7 @@ final class Token_Set_Job_Service_Test extends TestCase {
 				'proposed_value' => 0.25,
 			),
 		);
-		$result = $service->run( $envelope );
+		$result   = $service->run( $envelope );
 		$this->assertTrue( $result->is_success() );
 		$stored = \get_option( Option_Names::APPLIED_DESIGN_TOKENS, array() );
 		$this->assertSame( '0.25', $stored['spacing']['unit'] );

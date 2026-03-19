@@ -179,7 +179,7 @@ final class Crawl_Template_Family_Matcher {
 	 * Infers likely section-purpose-family patterns from heading outline (advisory).
 	 *
 	 * @param array<int, array{level: int, text: string}> $heading_outline
-	 * @param int                                   $word_count
+	 * @param int                                         $word_count
 	 * @return array<string, mixed> section_family_match_summary
 	 */
 	private function infer_section_family_summary( array $heading_outline, int $word_count ): array {

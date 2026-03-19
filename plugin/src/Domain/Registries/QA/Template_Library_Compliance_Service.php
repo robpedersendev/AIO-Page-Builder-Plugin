@@ -170,7 +170,7 @@ final class Template_Library_Compliance_Service {
 	}
 
 	/**
-	 * @param array                      $count_summary
+	 * @param array                            $count_summary
 	 * @param array<int, array<string, mixed>> $sections
 	 * @param array<int, array<string, mixed>> $pages
 	 * @return array{section_family_minimums: array<string, bool>, page_class_minimums: array<string, bool>, max_share_violations: array<int, string>}
@@ -233,7 +233,7 @@ final class Template_Library_Compliance_Service {
 	}
 
 	/**
-	 * @param array<int, array<string, mixed>>          $pages
+	 * @param array<int, array<string, mixed>>    $pages
 	 * @param array<string, array<string, mixed>> $section_by_key
 	 * @return array<int, array{template_key: string, code: string, message: string}>
 	 */

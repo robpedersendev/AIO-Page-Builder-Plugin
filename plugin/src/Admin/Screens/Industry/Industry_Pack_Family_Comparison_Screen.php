@@ -46,7 +46,7 @@ final class Industry_Pack_Family_Comparison_Screen {
 	/**
 	 * Builds comparison rows from completeness report and gap analyzer. One row per pack or subtype scope.
 	 *
-	 * @return array{rows: array<int, array{pack_key: string, subtype_key: string, scope_label: string, band: string, total: int, gap_count: int, blocker_count: int}>, generated_at: string, dashboard_url: string}
+	 * @return array{rows: list<array{pack_key: string, subtype_key: string, scope_label: string, band: string, total: int, gap_count: int, blocker_count: int}>, generated_at: string, dashboard_url: string}
 	 */
 	private function get_state(): array {
 		$rows          = array();

@@ -165,8 +165,8 @@ final class Render_Asset_Controller {
 	 * Applies asset budget for preview contexts (list/detail). Trims requirements to max handles (spec §55.5, §55.8).
 	 *
 	 * @param array<int, Render_Asset_Requirements> $requirements    Full list from get_requirements_from_sections or get_requirements_from_assembly.
-	 * @param string                          $preview_context PREVIEW_CONTEXT_LIST | PREVIEW_CONTEXT_DETAIL.
-	 * @param int                             $max_handles     Optional. 0 = use default for context.
+	 * @param string                                $preview_context PREVIEW_CONTEXT_LIST | PREVIEW_CONTEXT_DETAIL.
+	 * @param int                                   $max_handles     Optional. 0 = use default for context.
 	 * @return array<int, Render_Asset_Requirements>
 	 */
 	public function apply_preview_asset_budget( array $requirements, string $preview_context, int $max_handles = 0 ): array {

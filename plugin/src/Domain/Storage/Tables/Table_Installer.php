@@ -73,7 +73,7 @@ final class Table_Installer {
 	 * @return bool
 	 */
 	public function table_exists( string $suffix ): bool {
-		$full   = Table_Names::full_name( $this->wpdb, $suffix );
+		$full = Table_Names::full_name( $this->wpdb, $suffix );
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared via wpdb->prepare; table name from Table_Names.
 		$result = $this->wpdb->get_var( $this->wpdb->prepare( 'SHOW TABLES LIKE %s', $full ) );
 		return $result === $full;
@@ -82,7 +82,7 @@ final class Table_Installer {
 	/**
 	 * Returns which manifest tables are missing. Used for recovery detection.
 	 *
-	 * @return array<int, string> List of Table_Names suffixes that are missing.
+	 * @return list<string> List of Table_Names suffixes that are missing.
 	 */
 	public function get_missing_tables(): array {
 		$missing = array();

@@ -197,7 +197,7 @@ final class Plugin {
 				deactivate_plugins( Constants::plugin_basename() );
 			}
 			\wp_die(
-				\esc_html( $result->message ?: 'Plugin activation failed.' ),
+				\esc_html( ( $result->message !== '' && $result->message !== null ) ? $result->message : 'Plugin activation failed.' ),
 				'Activation Failed',
 				array(
 					'response'  => 500,

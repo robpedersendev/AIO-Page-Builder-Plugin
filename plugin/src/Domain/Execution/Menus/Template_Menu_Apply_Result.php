@@ -146,11 +146,11 @@ final class Template_Menu_Apply_Result {
 	/**
 	 * Success factory.
 	 *
-	 * @param int                        $menu_id
-	 * @param array<string, mixed>       $validation_result
-	 * @param array<string, mixed>       $hierarchy_summary
+	 * @param int                              $menu_id
+	 * @param array<string, mixed>             $validation_result
+	 * @param array<string, mixed>             $hierarchy_summary
 	 * @param array<int, array<string, mixed>> $per_item_status
-	 * @param array<string, mixed>       $artifacts
+	 * @param array<string, mixed>             $artifacts
 	 * @return self
 	 */
 	public static function success(
@@ -175,10 +175,10 @@ final class Template_Menu_Apply_Result {
 	/**
 	 * Failure factory. Missing location must be visible (no silent skip).
 	 *
-	 * @param string                     $message
+	 * @param string                           $message
 	 * @param array<int, string>               $errors
-	 * @param array<string, mixed>       $validation_result
-	 * @param array<string, mixed>       $hierarchy_summary
+	 * @param array<string, mixed>             $validation_result
+	 * @param array<string, mixed>             $hierarchy_summary
 	 * @param array<int, array<string, mixed>> $per_item_status
 	 * @return self
 	 */

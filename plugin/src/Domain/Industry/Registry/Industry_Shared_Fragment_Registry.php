@@ -66,7 +66,7 @@ final class Industry_Shared_Fragment_Registry {
 	/** @var array<string, array<string, mixed>> */
 	private array $by_key = array();
 
-	/** @var array<int, array<string, mixed>> */
+	/** @var list<array<string, mixed>> */
 	private array $all = array();
 
 	/**
@@ -167,7 +167,7 @@ final class Industry_Shared_Fragment_Registry {
 	/**
 	 * Returns all loaded fragments.
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -177,7 +177,7 @@ final class Industry_Shared_Fragment_Registry {
 	 * Returns fragments of the given type.
 	 *
 	 * @param string $fragment_type One of TYPE_* constants.
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_by_type( string $fragment_type ): array {
 		$type = trim( $fragment_type );

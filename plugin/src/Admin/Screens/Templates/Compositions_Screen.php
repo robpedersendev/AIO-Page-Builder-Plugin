@@ -348,7 +348,7 @@ final class Compositions_Screen {
 	}
 
 	/**
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	private function get_compositions_list(): array {
 		$repo = $this->get_composition_repository();
@@ -377,13 +377,13 @@ final class Compositions_Screen {
 			}
 		}
 		if ( ! $query_service instanceof \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service ) {
-			$section_repo  = $section_repo ?: new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
+			$section_repo  = $section_repo !== null ? $section_repo : new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
 			$page_repo     = $this->container && $this->container->has( 'page_template_repository' )
 				? $this->container->get( 'page_template_repository' )
 				: new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
 			$query_service = new \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service( $section_repo, $page_repo );
 		}
-		$section_repo = $section_repo ?: new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
+		$section_repo = $section_repo !== null ? $section_repo : new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
 		$builder      = new Composition_Builder_State_Builder( $query_service, $section_repo );
 		if ( $this->container && $this->container->has( 'large_composition_validator' ) ) {
 			$builder->set_large_validator( $this->container->get( 'large_composition_validator' ) );

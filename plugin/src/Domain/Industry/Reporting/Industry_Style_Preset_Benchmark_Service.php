@@ -31,10 +31,10 @@ final class Industry_Style_Preset_Benchmark_Service {
 	 *
 	 * @return array{
 	 *   generated_at: string,
-	 *   presets_evaluated: array<int, string>,
+	 *   presets_evaluated: list<string>,
 	 *   per_preset: array<string, array{label: string, industry_key: string, token_count: int, component_ref_count: int, primary_color: string|null, distinctiveness_note: string, compatibility: string, accessibility_notes: string}>,
-	 *   pairwise_distinctiveness: array<int, array{preset_a: string, preset_b: string, note: string}>,
-	 *   summary: array{total_presets: int, all_compatible: bool, findings: array<int, string>}
+	 *   pairwise_distinctiveness: list<array{preset_a: string, preset_b: string, note: string}>,
+	 *   summary: array{total_presets: int, all_compatible: bool, findings: list<string>}
 	 * }
 	 */
 	public function run_benchmark(): array {
@@ -160,8 +160,8 @@ final class Industry_Style_Preset_Benchmark_Service {
 	}
 
 	/**
-	 * @param array<int, array<string, mixed>> $active
-	 * @return array<int, array{preset_a: string, preset_b: string, note: string}>
+	 * @param list<array<string, mixed>> $active
+	 * @return list<array{preset_a: string, preset_b: string, note: string}>
 	 */
 	private function pairwise_distinctiveness( array $active ): array {
 		$out = array();

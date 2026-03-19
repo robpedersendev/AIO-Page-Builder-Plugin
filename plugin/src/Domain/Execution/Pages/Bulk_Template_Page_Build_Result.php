@@ -75,12 +75,12 @@ final class Bulk_Template_Page_Build_Result {
 	 * @param string                              $status
 	 * @param array<int, string>                  $job_refs
 	 * @param array<string, array<string, mixed>> $item_results
-	 * @param array<int, string>                        $slug_collisions
+	 * @param array<int, string>                  $slug_collisions
 	 * @param int                                 $completed_count
 	 * @param int                                 $failed_count
 	 * @param int                                 $refused_count
 	 * @param bool                                $partial_failure
-	 * @param array<int, string>                        $retry_eligible_item_ids
+	 * @param array<int, string>                  $retry_eligible_item_ids
 	 * @param string                              $message
 	 * @param array<string, mixed>                $bulk_plan_snapshot
 	 */

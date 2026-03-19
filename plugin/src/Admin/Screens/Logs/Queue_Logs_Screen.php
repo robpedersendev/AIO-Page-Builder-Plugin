@@ -39,13 +39,38 @@ final class Queue_Logs_Screen {
 	public const TAB_CRITICAL      = 'critical';
 
 	private const TABS = array(
-		self::TAB_QUEUE         => 'Queue',
-		self::TAB_EXECUTION     => 'Execution Logs',
-		self::TAB_AI_RUNS       => 'AI Runs',
-		self::TAB_REPORTING     => 'Reporting Logs',
-		self::TAB_IMPORT_EXPORT => 'Import/Export Logs',
-		self::TAB_CRITICAL      => 'Critical Errors',
+		self::TAB_QUEUE         => null,
+		self::TAB_EXECUTION     => null,
+		self::TAB_AI_RUNS       => null,
+		self::TAB_REPORTING     => null,
+		self::TAB_IMPORT_EXPORT => null,
+		self::TAB_CRITICAL      => null,
 	);
+
+	/**
+	 * Returns translated tab label for nav. Uses literal per key for PHPCS I18n.NonSingularStringLiteralText.
+	 *
+	 * @param string $tab_key One of self::TAB_*.
+	 * @return string
+	 */
+	private function get_tab_label( string $tab_key ): string {
+		switch ( $tab_key ) {
+			case self::TAB_QUEUE:
+				return \__( 'Queue', 'aio-page-builder' );
+			case self::TAB_EXECUTION:
+				return \__( 'Execution Logs', 'aio-page-builder' );
+			case self::TAB_AI_RUNS:
+				return \__( 'AI Runs', 'aio-page-builder' );
+			case self::TAB_REPORTING:
+				return \__( 'Reporting Logs', 'aio-page-builder' );
+			case self::TAB_IMPORT_EXPORT:
+				return \__( 'Import/Export Logs', 'aio-page-builder' );
+			case self::TAB_CRITICAL:
+				return \__( 'Critical Errors', 'aio-page-builder' );
+			default:
+				return $tab_key;
+		}
+	}
 
 	/** @var Service_Container|null */
 	private $container;
@@ -249,9 +274,9 @@ final class Queue_Logs_Screen {
 		$base = \admin_url( 'admin.php?page=' . self::SLUG );
 		?>
 		<nav class="nav-tab-wrapper aio-queue-logs-tabs" aria-label="<?php \esc_attr_e( 'Queue & Logs tabs', 'aio-page-builder' ); ?>">
-			<?php foreach ( self::TABS as $key => $label ) : ?>
+			<?php foreach ( array_keys( self::TABS ) as $key ) : ?>
 				<a href="<?php echo \esc_url( $base . '&tab=' . \rawurlencode( $key ) ); ?>"
-					class="nav-tab <?php echo $key === $current ? 'nav-tab-active' : ''; ?>"><?php echo \esc_html( \__( $label, 'aio-page-builder' ) ); ?></a>
+					class="nav-tab <?php echo $key === $current ? 'nav-tab-active' : ''; ?>"><?php echo \esc_html( $this->get_tab_label( $key ) ); ?></a>
 			<?php endforeach; ?>
 		</nav>
 		<?php
@@ -300,7 +325,7 @@ final class Queue_Logs_Screen {
 
 	/**
 	 * @param array<int, array{job_ref: string, job_type: string, queue_status: string, created_at: string, completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, can_cancel: bool}> $rows
-	 * @param bool                                                                                                                                                                                                    $can_recovery Whether current user can perform retry/cancel (MANAGE_QUEUE_RECOVERY).
+	 * @param bool                                                                                                                                                                                                          $can_recovery Whether current user can perform retry/cancel (MANAGE_QUEUE_RECOVERY).
 	 */
 	private function render_queue_tab( array $rows, bool $can_recovery = false ): void {
 		$recovery_url   = \admin_url( 'admin-post.php' );
@@ -599,13 +624,12 @@ final class Queue_Logs_Screen {
 			\wp_safe_redirect( $this->logs_url( 'error', __( 'You do not have permission to export logs.', 'aio-page-builder' ) ) );
 			exit;
 		}
-		$log_types = array();
-		if ( ! empty( $_POST['log_types'] ) && is_array( $_POST['log_types'] ) ) {
-			foreach ( $_POST['log_types'] as $t ) {
-				$v = \sanitize_text_field( \wp_unslash( $t ) );
-				if ( in_array( $v, Log_Export_Service::ALLOWED_LOG_TYPES, true ) ) {
-					$log_types[] = $v;
-				}
+		$log_types   = array();
+		$raw_log_ary = isset( $_POST['log_types'] ) && is_array( $_POST['log_types'] ) ? \wp_unslash( $_POST['log_types'] ) : array();
+		foreach ( $raw_log_ary as $t ) {
+			$v = \sanitize_text_field( (string) $t );
+			if ( in_array( $v, Log_Export_Service::ALLOWED_LOG_TYPES, true ) ) {
+				$log_types[] = $v;
 			}
 		}
 		$filters = array();

@@ -46,7 +46,7 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 		$scope_type  = (string) ( $definition[ Version_Snapshot_Schema::FIELD_SCOPE_TYPE ] ?? '' );
 		$scope_id    = (string) ( $definition[ Version_Snapshot_Schema::FIELD_SCOPE_ID ] ?? '' );
 		$status      = (string) ( $definition[ Version_Snapshot_Schema::FIELD_STATUS ] ?? Version_Snapshot_Schema::STATUS_ACTIVE );
-		$title       = \sanitize_text_field( (string) ( $definition['post_title'] ?? $snapshot_id ?: 'Snapshot' ) );
+		$title       = \sanitize_text_field( (string) ( $definition['post_title'] ?? ( $snapshot_id !== '' ? $snapshot_id : 'Snapshot' ) ) );
 
 		$snapshot_id = $this->sanitize_key( $snapshot_id );
 		if ( $snapshot_id === '' ) {
@@ -166,15 +166,17 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 	/** @inheritdoc */
 	protected function get_meta( int $post_id ): array {
 		$base                          = parent::get_meta( $post_id );
-		$base[ self::META_SCOPE_TYPE ] = \get_post_meta( $post_id, self::META_SCOPE_TYPE, true ) ?: '';
-		$base[ self::META_SCOPE_ID ]   = \get_post_meta( $post_id, self::META_SCOPE_ID, true ) ?: '';
+		$scope_type_val = \get_post_meta( $post_id, self::META_SCOPE_TYPE, true );
+		$scope_id_val   = \get_post_meta( $post_id, self::META_SCOPE_ID, true );
+		$base[ self::META_SCOPE_TYPE ] = ( $scope_type_val !== '' && $scope_type_val !== false ) ? (string) $scope_type_val : '';
+		$base[ self::META_SCOPE_ID ]   = ( $scope_id_val !== '' && $scope_id_val !== false ) ? (string) $scope_id_val : '';
 		$raw                           = \get_post_meta( $post_id, self::META_DEFINITION, true );
 		if ( is_string( $raw ) && $raw !== '' ) {
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
 				$base['definition']              = $decoded;
-				$base[ self::META_INTERNAL_KEY ] = $base[ self::META_INTERNAL_KEY ] ?: ( $decoded[ Version_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ?? '' );
-				$base[ self::META_STATUS ]       = $base[ self::META_STATUS ] ?: ( $decoded[ Version_Snapshot_Schema::FIELD_STATUS ] ?? '' );
+				$base[ self::META_INTERNAL_KEY ] = ( $base[ self::META_INTERNAL_KEY ] !== '' && $base[ self::META_INTERNAL_KEY ] !== false ) ? $base[ self::META_INTERNAL_KEY ] : ( $decoded[ Version_Snapshot_Schema::FIELD_SNAPSHOT_ID ] ?? '' );
+				$base[ self::META_STATUS ]       = ( $base[ self::META_STATUS ] !== '' && $base[ self::META_STATUS ] !== false ) ? $base[ self::META_STATUS ] : ( $decoded[ Version_Snapshot_Schema::FIELD_STATUS ] ?? '' );
 			}
 		}
 		return $base;

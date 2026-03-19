@@ -125,7 +125,7 @@ final class Dashboard_Screen {
 	}
 
 	/**
-	 * @param array<int, array{label: string, url: string}> $actions
+	 * @param list<array{label: string, url: string}> $actions
 	 * @return void
 	 */
 	/**
@@ -140,7 +140,7 @@ final class Dashboard_Screen {
 	}
 
 	/**
-	 * @param array<int, array{label: string, url: string}> $actions
+	 * @param list<array{label: string, url: string}> $actions
 	 * @return void
 	 */
 	private function render_quick_actions( array $actions ): void {
@@ -253,7 +253,7 @@ final class Dashboard_Screen {
 									)
 								);
 								?>
-												"><?php echo \esc_html( $plan['title'] ?: $plan['plan_id'] ); ?></a> (<?php echo \esc_html( $plan['status'] ); ?>)</li>
+												"><?php echo \esc_html( ( $plan['title'] !== '' && $plan['title'] !== null ) ? $plan['title'] : $plan['plan_id'] ); ?></a> (<?php echo \esc_html( $plan['status'] ); ?>)</li>
 							<?php endforeach; ?>
 						</ul>
 						<p><a href="<?php echo \esc_url( \add_query_arg( array( 'page' => 'aio-page-builder-build-plans' ), \admin_url( 'admin.php' ) ) ); ?>"><?php \esc_html_e( 'View all', 'aio-page-builder' ); ?></a></p>
@@ -282,7 +282,7 @@ final class Dashboard_Screen {
 	}
 
 	/**
-	 * @param array{count: int, items: array<int, array>, logs_url: string} $summary
+	 * @param array{count: int, items: list<array>, logs_url: string} $summary
 	 * @return void
 	 */
 	private function render_critical_errors( array $summary ): void {

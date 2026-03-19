@@ -36,7 +36,7 @@ final class Personal_Data_Eraser {
 	 *
 	 * @param string $email_address User email.
 	 * @param int    $page         Page number (1-based).
-	 * @return array{items_removed: bool, items_retained: bool, messages: array<int, string>, done: bool}
+	 * @return array{items_removed: bool, items_retained: bool, messages: list<string>, done: bool}
 	 */
 	public static function erase( string $email_address, int $page = 1 ): array {
 		$user           = \get_user_by( 'email', $email_address );

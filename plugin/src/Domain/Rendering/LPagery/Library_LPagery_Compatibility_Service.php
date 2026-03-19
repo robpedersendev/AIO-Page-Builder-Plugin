@@ -114,8 +114,8 @@ final class Library_LPagery_Compatibility_Service {
 	/**
 	 * Returns LPagery compatibility for a page template. Aggregates from used sections or template-level metadata.
 	 *
-	 * @param string                                                   $template_key Page template internal_key.
-	 * @param array<string, mixed>                                     $definition   Optional template definition (ordered_sections, etc.).
+	 * @param string                                                         $template_key Page template internal_key.
+	 * @param array<string, mixed>                                           $definition   Optional template definition (ordered_sections, etc.).
 	 * @param array<int, array{section_key: string, lpagery_state?: string}> $section_compatibilities Optional precomputed section compatibilities for used sections.
 	 * @return LPagery_Compatibility_Result
 	 */

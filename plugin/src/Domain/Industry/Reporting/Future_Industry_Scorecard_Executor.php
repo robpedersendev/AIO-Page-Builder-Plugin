@@ -57,7 +57,7 @@ final class Future_Industry_Scorecard_Executor {
 	 *   evaluated_at: string,
 	 *   dimension_scores: array<string, int>,
 	 *   aggregate_sum: int,
-	 *   major_risks: array<int, string>,
+	 *   major_risks: list<string>,
 	 *   recommendation: string,
 	 *   summary_text: string
 	 * }
@@ -229,7 +229,7 @@ final class Future_Industry_Scorecard_Executor {
 	 *
 	 * @param array<string, int>   $scores
 	 * @param array<string, mixed> $dossier
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	private function collect_major_risks( array $scores, array $dossier ): array {
 		$risks = array();
@@ -254,7 +254,7 @@ final class Future_Industry_Scorecard_Executor {
 	 * Derives go / review / no-go from scores, aggregate, and risks.
 	 *
 	 * @param array<string, int> $scores
-	 * @param array<int, string>       $risks
+	 * @param list<string>       $risks
 	 */
 	private function derive_recommendation( array $scores, int $aggregate, array $risks ): string {
 		foreach ( $risks as $r ) {
@@ -283,7 +283,7 @@ final class Future_Industry_Scorecard_Executor {
 	/**
 	 * Builds a short summary string.
 	 *
-	 * @param array<int, string> $risks
+	 * @param list<string> $risks
 	 */
 	private function build_summary_text( string $label, int $aggregate, string $recommendation, array $risks ): string {
 		$out = sprintf( '%s: aggregate %d/50, recommendation %s.', $label, $aggregate, $recommendation );

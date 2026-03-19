@@ -42,9 +42,9 @@ final class LPagery_Compatibility_Result {
 	private array $unsupported_mapping_reasons;
 
 	/**
-	 * @param bool                                                                 $compatible
-	 * @param string                                                               $compatibility_state
-	 * @param array<string, mixed>                                                 $lpagery_mapping_summary
+	 * @param bool                                                                       $compatible
+	 * @param string                                                                     $compatibility_state
+	 * @param array<string, mixed>                                                       $lpagery_mapping_summary
 	 * @param array<int, array{field_name?: string, token_key?: string, reason: string}> $unsupported_mapping_reasons
 	 */
 	public function __construct(

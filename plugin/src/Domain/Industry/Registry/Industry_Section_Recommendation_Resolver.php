@@ -37,21 +37,6 @@ final class Industry_Section_Recommendation_Resolver {
 	private const POINTS_SECTION_DISCOURAGED_SECONDARY = -15;
 	private const POINTS_CTA_FIT                       = 5;
 
-	/** @var Industry_Read_Model_Cache_Service|null Optional cache; null when not configured. */
-	private $cache_service = null;
-
-	/** @var Industry_Cache_Key_Builder|null Optional key builder; null when not configured. */
-	private $cache_key_builder = null;
-
-	/**
-	 * @param Industry_Read_Model_Cache_Service|null $cache_service     Optional cache; null to disable.
-	 * @param Industry_Cache_Key_Builder|null        $cache_key_builder Optional key builder; null to disable.
-	 */
-	public function __construct( ?Industry_Read_Model_Cache_Service $cache_service = null, ?Industry_Cache_Key_Builder $cache_key_builder = null ) {
-		$this->cache_service     = $cache_service;
-		$this->cache_key_builder = $cache_key_builder;
-	}
-
 	/**
 	 * Resolves ranked section recommendations. Safe: missing profile or pack yields neutral ranking.
 	 *
@@ -213,7 +198,7 @@ final class Industry_Section_Recommendation_Resolver {
 
 	/**
 	 * @param mixed $val industry_affinity or industry_discouraged value (array of keys or map).
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	private function normalize_industry_key_list( $val ): array {
 		if ( ! is_array( $val ) ) {

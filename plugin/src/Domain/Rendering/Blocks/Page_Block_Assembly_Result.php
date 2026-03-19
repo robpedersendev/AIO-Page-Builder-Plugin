@@ -62,10 +62,10 @@ final class Page_Block_Assembly_Result {
 	private array $errors;
 
 	/**
-	 * @param string                     $source_type            One of SOURCE_TYPE_*.
-	 * @param string                     $source_key             Template internal_key or composition_id.
+	 * @param string                           $source_type            One of SOURCE_TYPE_*.
+	 * @param string                           $source_key             Template internal_key or composition_id.
 	 * @param array<int, array<string, mixed>> $ordered_sections       Section payloads in page order.
-	 * @param string                     $block_content          Serialized block markup.
+	 * @param string                           $block_content          Serialized block markup.
 	 * @param array<int, string>               $dynamic_dependencies   Block names using render callbacks.
 	 * @param array<int, string>               $survivability_notes    Durability notes.
 	 * @param array<int, string>               $errors                 Assembly errors; non-empty when invalid.

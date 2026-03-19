@@ -101,7 +101,7 @@ final class Industry_Health_Check_Service {
 	/**
 	 * Runs validation and returns issues. Grouped by severity; each issue has object_type, key, severity, issue_summary, related_refs.
 	 *
-	 * @return array{errors: array<int, array{object_type: string, key: string, severity: string, issue_summary: string, related_refs: array<int, string>}>, warnings: array<int, array{object_type: string, key: string, severity: string, issue_summary: string, related_refs: array<int, string>}>}
+	 * @return array{errors: list<array{object_type: string, key: string, severity: string, issue_summary: string, related_refs: list<string>}>, warnings: list<array{object_type: string, key: string, severity: string, issue_summary: string, related_refs: list<string>}>}
 	 */
 	public function run(): array {
 		static $request_cache = array();
@@ -283,7 +283,7 @@ final class Industry_Health_Check_Service {
 
 	/**
 	 * @param array<string, mixed> $pack
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	private function collect_pack_cta_refs( array $pack ): array {
 		$out    = array();

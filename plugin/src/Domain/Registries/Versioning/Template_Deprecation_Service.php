@@ -126,15 +126,15 @@ final class Template_Deprecation_Service {
 	 * Builds a decision-log entry payload for major template-family changes (spec §61.9).
 	 * Caller appends to docs/release/template-library-decision-log.md or stores elsewhere.
 	 *
-	 * @param string       $decision_id     Unique decision ID (e.g. "DL-001").
-	 * @param string       $summary        Short summary.
-	 * @param string       $rationale      Rationale text.
-	 * @param string       $owner          Owner (e.g. "Technical Lead").
-	 * @param string       $status         One of: proposed, approved, superseded, rejected.
-	 * @param string       $effective_version Optional effective template/registry version.
+	 * @param string             $decision_id     Unique decision ID (e.g. "DL-001").
+	 * @param string             $summary        Short summary.
+	 * @param string             $rationale      Rationale text.
+	 * @param string             $owner          Owner (e.g. "Technical Lead").
+	 * @param string             $status         One of: proposed, approved, superseded, rejected.
+	 * @param string             $effective_version Optional effective template/registry version.
 	 * @param array<int, string> $impacted_section_keys Optional section keys impacted.
 	 * @param array<int, string> $impacted_template_keys Optional page template keys impacted.
-	 * @param string       $alternatives_considered Optional alternatives text.
+	 * @param string             $alternatives_considered Optional alternatives text.
 	 * @return array<string, mixed> Stable payload for decision log.
 	 */
 	public function build_decision_log_entry(
@@ -166,9 +166,9 @@ final class Template_Deprecation_Service {
 	/**
 	 * Builds a changelog snippet line for a deprecation (for insertion into docs/release/changelog.md).
 	 *
-	 * @param string       $template_key    Section or page template internal_key.
-	 * @param string       $type            'section' or 'page'.
-	 * @param string       $reason          Deprecation reason.
+	 * @param string             $template_key    Section or page template internal_key.
+	 * @param string             $type            'section' or 'page'.
+	 * @param string             $reason          Deprecation reason.
 	 * @param array<int, string> $replacement_keys Replacement keys if any.
 	 * @return string Single line or short block suitable for Deprecations section.
 	 */

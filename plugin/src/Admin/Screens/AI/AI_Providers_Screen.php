@@ -209,7 +209,7 @@ final class AI_Providers_Screen {
 
 	/**
 	 * @param array<int, array> $provider_rows
-	 * @param string      $ai_runs_url
+	 * @param string            $ai_runs_url
 	 * @return void
 	 */
 	private function render_provider_list( array $provider_rows, string $ai_runs_url ): void {

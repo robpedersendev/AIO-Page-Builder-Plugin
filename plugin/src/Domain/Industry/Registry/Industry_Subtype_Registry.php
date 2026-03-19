@@ -35,7 +35,7 @@ final class Industry_Subtype_Registry {
 	/** @var array<string, array<string, mixed>> Map of subtype_key => definition. */
 	private array $by_key = array();
 
-	/** @var array<string, array<int, array<string, mixed>>> Map of parent_industry_key => list of subtypes. */
+	/** @var array<string, list<array<string, mixed>>> Map of parent_industry_key => list of subtypes. */
 	private array $by_parent = array();
 
 	/**
@@ -108,7 +108,7 @@ final class Industry_Subtype_Registry {
 	/**
 	 * Returns all loaded subtype definitions (for linting and coverage analysis).
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return array_values( $this->by_key );
@@ -119,7 +119,7 @@ final class Industry_Subtype_Registry {
 	 *
 	 * @param string $parent_industry_key Parent industry pack key.
 	 * @param bool   $active_only If true, only return status = active.
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_parent( string $parent_industry_key, bool $active_only = true ): array {
 		$parent = trim( $parent_industry_key );

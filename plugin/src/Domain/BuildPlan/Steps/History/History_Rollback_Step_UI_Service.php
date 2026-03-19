@@ -39,11 +39,11 @@ final class History_Rollback_Step_UI_Service {
 	/**
 	 * Builds step workspace payload for Step 8 (logs / history / rollback).
 	 *
-	 * @param array<string, mixed> $plan_definition Plan root.
-	 * @param int                  $step_index Must be 8.
-	 * @param array<string, bool>  $capabilities can_approve, can_execute, can_view_artifacts, can_rollback (optional).
-	 * @param string|null          $selected_item_id Item id for detail panel.
-	 * @param array<int, string>   $selected_item_ids Unused.
+	 * @param array<string, mixed>                                                                                                              $plan_definition Plan root.
+	 * @param int                                                                                                                               $step_index Must be 8.
+	 * @param array<string, bool>                                                                                                               $capabilities can_approve, can_execute, can_view_artifacts, can_rollback (optional).
+	 * @param string|null                                                                                                                       $selected_item_id Item id for detail panel.
+	 * @param array<int, string>                                                                                                                $selected_item_ids Unused.
 	 * @param array<int, array{post_snapshot_id: string, pre_snapshot_id: string, action_type: string, target_ref: string, created_at: string}> $history_entries Optional rollback-capable entries from snapshot repo (when provided, overrides step items).
 	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages, history_summary?, rollback_eligibility_placeholder?
 	 */
@@ -75,12 +75,12 @@ final class History_Rollback_Step_UI_Service {
 
 		if ( ! empty( $history_entries ) ) {
 			foreach ( $history_entries as $i => $entry ) {
-				$pre_snapshot_id   = $entry['pre_snapshot_id'] ?? '';
+				$pre_snapshot_id  = $entry['pre_snapshot_id'] ?? '';
 				$post_snapshot_id = $entry['post_snapshot_id'] ?? '';
 				$action_type      = $entry['action_type'] ?? '';
 				$target_ref       = $entry['target_ref'] ?? '';
 				$created_at       = $entry['created_at'] ?? '';
-				$event_at_display  = $created_at !== '' ? \wp_date( 'Y-m-d H:i:s', strtotime( $created_at ) ) : '—';
+				$event_at_display = $created_at !== '' ? \wp_date( 'Y-m-d H:i:s', strtotime( $created_at ) ) : '—';
 				$item_id          = 'hist_' . $i . '_' . $post_snapshot_id;
 				$row_actions      = array();
 				if ( $can_rollback && $pre_snapshot_id !== '' && $post_snapshot_id !== '' ) {
@@ -92,10 +92,10 @@ final class History_Rollback_Step_UI_Service {
 				}
 				$rows[] = array(
 					Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
-					Step_Item_List_Component::ROW_KEY_STATUS  => 'completed',
+					Step_Item_List_Component::ROW_KEY_STATUS => 'completed',
 					Step_Item_List_Component::ROW_KEY_STATUS_BADGE => 'completed',
-					'pre_snapshot_id'                         => $pre_snapshot_id,
-					'post_snapshot_id'                        => $post_snapshot_id,
+					'pre_snapshot_id'  => $pre_snapshot_id,
+					'post_snapshot_id' => $post_snapshot_id,
 					Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => array(
 						'event_at'          => $event_at_display,
 						'action_type'       => $action_type !== '' ? $action_type : '—',
@@ -130,10 +130,10 @@ final class History_Rollback_Step_UI_Service {
 				}
 				$rows[] = array(
 					Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
-					Step_Item_List_Component::ROW_KEY_STATUS  => (string) ( $item['status'] ?? '' ),
+					Step_Item_List_Component::ROW_KEY_STATUS => (string) ( $item['status'] ?? '' ),
 					Step_Item_List_Component::ROW_KEY_STATUS_BADGE => 'completed',
-					'pre_snapshot_id'                         => $pre_snapshot_id,
-					'post_snapshot_id'                        => $post_snapshot_id,
+					'pre_snapshot_id'  => $pre_snapshot_id,
+					'post_snapshot_id' => $post_snapshot_id,
 					Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => array(
 						'event_at'          => (string) ( $payload['event_at'] ?? '—' ),
 						'action_type'       => (string) ( $payload['action_type'] ?? '—' ),

@@ -145,7 +145,7 @@ final class Snapshot_Payload_Builder {
 
 	/**
 	 * @param array<string, mixed> $data
-	 * @param array<int, string>         $found
+	 * @param array<int, string>   $found
 	 * @param string               $prefix
 	 */
 	private static function collect_prohibited_recursive( array $data, array &$found, string $prefix ): void {
@@ -188,7 +188,7 @@ final class Snapshot_Payload_Builder {
 
 	/**
 	 * @param array<string, mixed> $data
-	 * @param array<int, string>         $allowed_keys
+	 * @param array<int, string>   $allowed_keys
 	 * @return array<string, mixed>
 	 */
 	private static function filter_to_allowed( array $data, array $allowed_keys ): array {

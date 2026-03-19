@@ -25,6 +25,9 @@ use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
  */
 final class New_Page_Creation_Bulk_Action_Service {
 
+	/** Minimum confidence for item to be eligible for bulk actions (matches UI filter). */
+	private const MIN_CONFIDENCE_EXCLUDE = 'low';
+
 	/** @var Build_Plan_Repository */
 	private $repository;
 
@@ -65,12 +68,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 	 * @return int Number of items updated.
 	 */
 	public function bulk_approve_all_eligible( int $plan_post_id ): int {
-		return $this->repository->update_plan_step_items_by_status(
-			$plan_post_id,
-			self::STEP_INDEX_NEW_PAGES,
-			Build_Plan_Item_Statuses::PENDING,
-			Build_Plan_Item_Statuses::APPROVED
-		);
+		return $this->bulk_set_all_eligible_status( $plan_post_id, Build_Plan_Item_Statuses::APPROVED );
 	}
 
 	/**
@@ -81,13 +79,11 @@ final class New_Page_Creation_Bulk_Action_Service {
 	 * @return int Number of items updated.
 	 */
 	public function bulk_approve_selected( int $plan_post_id, array $item_ids ): int {
-		return $this->repository->update_plan_items_by_ids(
-			$plan_post_id,
-			self::STEP_INDEX_NEW_PAGES,
-			$item_ids,
-			Build_Plan_Item_Statuses::APPROVED,
-			Build_Plan_Item_Statuses::PENDING
-		);
+		if ( empty( $item_ids ) ) {
+			return 0;
+		}
+		$item_id_set = array_flip( array_map( 'strval', $item_ids ) );
+		return $this->bulk_set_selected_eligible_status( $plan_post_id, $item_id_set, Build_Plan_Item_Statuses::APPROVED );
 	}
 
 	/**
@@ -98,12 +94,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 	 * @return int Number of items updated.
 	 */
 	public function bulk_deny_all_eligible( int $plan_post_id ): int {
-		return $this->repository->update_plan_step_items_by_status(
-			$plan_post_id,
-			self::STEP_INDEX_NEW_PAGES,
-			Build_Plan_Item_Statuses::PENDING,
-			Build_Plan_Item_Statuses::REJECTED
-		);
+		return $this->bulk_set_all_eligible_status( $plan_post_id, Build_Plan_Item_Statuses::REJECTED );
 	}
 
 	/**
@@ -141,6 +132,13 @@ final class New_Page_Creation_Bulk_Action_Service {
 			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ) {
 				continue;
 			}
+			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
+				: array();
+			$confidence = (string) ( $payload['confidence'] ?? 'medium' );
+			if ( $confidence === self::MIN_CONFIDENCE_EXCLUDE ) {
+				continue;
+			}
 			if ( (string) ( $item['status'] ?? '' ) === Build_Plan_Item_Statuses::PENDING ) {
 				++$pending;
 			}
@@ -168,10 +166,124 @@ final class New_Page_Creation_Bulk_Action_Service {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			if ( (string) ( $item['item_id'] ?? '' ) === $item_id && (string) ( $item['status'] ?? '' ) === Build_Plan_Item_Statuses::PENDING ) {
-				return $this->repository->update_plan_item_status( $plan_post_id, self::STEP_INDEX_NEW_PAGES, $item_id, $new_status );
+			$item_id_value = (string) ( $item['item_id'] ?? '' );
+			if ( $item_id_value !== $item_id ) {
+				continue;
 			}
+			if ( (string) ( $item['status'] ?? '' ) !== Build_Plan_Item_Statuses::PENDING ) {
+				continue;
+			}
+			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ) {
+				continue;
+			}
+			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
+				: array();
+			$confidence = (string) ( $payload['confidence'] ?? 'medium' );
+			if ( $confidence === self::MIN_CONFIDENCE_EXCLUDE ) {
+				return false;
+			}
+			return $this->repository->update_plan_item_status( $plan_post_id, self::STEP_INDEX_NEW_PAGES, $item_id, $new_status );
 		}
 		return false;
+	}
+
+	/**
+	 * Bulk-set status for all eligible (pending + non-low confidence) items in Step 2.
+	 *
+	 * @param int    $plan_post_id Plan post ID.
+	 * @param string $new_status   New status (approved or rejected).
+	 * @return int Number of items updated.
+	 */
+	private function bulk_set_all_eligible_status( int $plan_post_id, string $new_status ): int {
+		$definition = $this->repository->get_plan_definition( $plan_post_id );
+		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+		$step       = $steps[ self::STEP_INDEX_NEW_PAGES ] ?? null;
+		if ( ! is_array( $step ) ) {
+			return 0;
+		}
+		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+			: array();
+		$count   = 0;
+		foreach ( $items as $i => $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ) {
+				continue;
+			}
+			if ( (string) ( $item['status'] ?? '' ) !== Build_Plan_Item_Statuses::PENDING ) {
+				continue;
+			}
+			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
+				: array();
+			$confidence = (string) ( $payload['confidence'] ?? 'medium' );
+			if ( $confidence === self::MIN_CONFIDENCE_EXCLUDE ) {
+				continue;
+			}
+			$items[ $i ]['status'] = $new_status;
+			++$count;
+		}
+		if ( $count > 0 ) {
+			$definition[ Build_Plan_Schema::KEY_STEPS ][ self::STEP_INDEX_NEW_PAGES ][ Build_Plan_Item_Schema::KEY_ITEMS ] = $items;
+			$this->repository->save_plan_definition( $plan_post_id, $definition );
+		}
+		return $count;
+	}
+
+	/**
+	 * Bulk-set status for a selected set of eligible pending items.
+	 *
+	 * @param int               $plan_post_id Plan post ID.
+	 * @param array<string,bool> $item_id_set Item IDs to consider.
+	 * @param string            $new_status  New status to set.
+	 * @return int Number of items updated.
+	 */
+	private function bulk_set_selected_eligible_status( int $plan_post_id, array $item_id_set, string $new_status ): int {
+		$definition = $this->repository->get_plan_definition( $plan_post_id );
+		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+		$step       = $steps[ self::STEP_INDEX_NEW_PAGES ] ?? null;
+		if ( ! is_array( $step ) ) {
+			return 0;
+		}
+		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+			: array();
+		$count   = 0;
+		foreach ( $items as $i => $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			$id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
+			if ( $id === '' || ! isset( $item_id_set[ $id ] ) ) {
+				continue;
+			}
+			if ( (string) ( $item['status'] ?? '' ) !== Build_Plan_Item_Statuses::PENDING ) {
+				continue;
+			}
+			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ) {
+				continue;
+			}
+			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
+				: array();
+			$confidence = (string) ( $payload['confidence'] ?? 'medium' );
+			if ( $confidence === self::MIN_CONFIDENCE_EXCLUDE ) {
+				continue;
+			}
+			$items[ $i ]['status'] = $new_status;
+			++$count;
+		}
+		if ( $count > 0 ) {
+			$definition[ Build_Plan_Schema::KEY_STEPS ][ self::STEP_INDEX_NEW_PAGES ][ Build_Plan_Item_Schema::KEY_ITEMS ] = $items;
+			$this->repository->save_plan_definition( $plan_post_id, $definition );
+		}
+		return $count;
 	}
 }

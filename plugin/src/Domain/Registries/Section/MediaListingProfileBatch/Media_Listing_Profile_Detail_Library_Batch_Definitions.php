@@ -31,7 +31,7 @@ final class Media_Listing_Profile_Detail_Library_Batch_Definitions {
 	/**
 	 * Returns all media/listing/profile/detail batch section definitions (order preserved for seeding).
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public static function all_definitions(): array {
 		return array(
@@ -56,7 +56,7 @@ final class Media_Listing_Profile_Detail_Library_Batch_Definitions {
 	/**
 	 * Returns section keys in this batch (for listing and tests).
 	 *
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public static function section_keys(): array {
 		return array(

@@ -151,7 +151,7 @@ final class Template_Accessibility_Audit_Service {
 	}
 
 	/**
-	 * @param array<string, mixed>                                                                 $def
+	 * @param array<string, mixed>                                                                       $def
 	 * @param array<int, array{scope: string, template_key: string, rule_code: string, message: string}> $violations
 	 */
 	private function audit_section( array $def, array &$violations ): void {
@@ -197,8 +197,8 @@ final class Template_Accessibility_Audit_Service {
 	}
 
 	/**
-	 * @param array<string, mixed>                                                                 $page_def
-	 * @param array<string, array<string, mixed>>                                                  $section_by_key
+	 * @param array<string, mixed>                                                                       $page_def
+	 * @param array<string, array<string, mixed>>                                                        $section_by_key
 	 * @param array<int, array{scope: string, template_key: string, rule_code: string, message: string}> $violations
 	 */
 	private function audit_page_cta_rules( array $page_def, array $section_by_key, array &$violations ): void {

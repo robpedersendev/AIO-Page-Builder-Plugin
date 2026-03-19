@@ -51,9 +51,9 @@ final class Industry_Drift_Report_Service {
 	 *
 	 * @return array{
 	 *   summary: array{total: int, severe: int, minor: int, by_type: array<string, int>},
-	 *   items: array<int, array{drift_type: string, severity: string, evidence_refs: array<int, string>, explanation: string, suggested_review_path: string}>,
-	 *   by_severity: array<string, array<int, array>>,
-	 *   by_type: array<string, array<int, array>>,
+	 *   items: list<array{drift_type: string, severity: string, evidence_refs: list<string>, explanation: string, suggested_review_path: string}>,
+	 *   by_severity: array<string, list<array>>,
+	 *   by_type: array<string, list<array>>,
 	 *   generated_at: string
 	 * }
 	 */
@@ -111,7 +111,7 @@ final class Industry_Drift_Report_Service {
 	 * Checks convention consistency across packs (e.g. version_marker presence).
 	 *
 	 * @param array<string, array<string, mixed>> $packs Keyed by industry_key.
-	 * @param array<int, array<string, mixed>>          $items Append findings here.
+	 * @param list<array<string, mixed>>          $items Append findings here.
 	 */
 	private function check_convention_drift( array $packs, array &$items ): void {
 		if ( count( $packs ) < 2 ) {
@@ -139,9 +139,9 @@ final class Industry_Drift_Report_Service {
 	}
 
 	/**
-	 * @param array<int, array<string, mixed>> $items
+	 * @param list<array<string, mixed>> $items
 	 * @param string                     $key
-	 * @return array<string, array<int, array<string, mixed>>>
+	 * @return array<string, list<array<string, mixed>>>
 	 */
 	private function group_by( array $items, string $key ): array {
 		$out = array();

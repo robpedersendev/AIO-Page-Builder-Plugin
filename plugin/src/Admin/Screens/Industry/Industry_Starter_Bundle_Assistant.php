@@ -52,7 +52,7 @@ final class Industry_Starter_Bundle_Assistant {
 	 * When subtype_registry is set, state includes subtype_bundle_view_model for subtype-aware UI (parent vs subtype, clear to parent).
 	 *
 	 * @param array<string, mixed> $profile Current industry profile (primary_industry_key, selected_starter_bundle_key, industry_subtype_key).
-	 * @return array{has_primary: bool, primary_industry_key: string, bundles: array<int, array<string, mixed>>, selected_key: string, field_name: string, subtype_bundle_view_model?: Subtype_Starter_Bundle_Selection_View_Model}
+	 * @return array{has_primary: bool, primary_industry_key: string, bundles: list<array<string, mixed>>, selected_key: string, field_name: string, subtype_bundle_view_model?: Subtype_Starter_Bundle_Selection_View_Model}
 	 */
 	public function build_state( array $profile ): array {
 		$view_model = Subtype_Starter_Bundle_Selection_View_Model::from_profile( $profile, $this->bundle_registry, $this->subtype_registry );
@@ -84,7 +84,7 @@ final class Industry_Starter_Bundle_Assistant {
 	 * Renders the starter bundle selection block. Call from Industry Profile (or onboarding) inside the same form that saves profile.
 	 * When state includes subtype_bundle_view_model with both parent and subtype bundles, renders optgroups and optional "clear to parent" note.
 	 *
-	 * @param array{has_primary: bool, primary_industry_key: string, bundles: array<int, array<string, mixed>>, selected_key: string, field_name: string, subtype_bundle_view_model?: Subtype_Starter_Bundle_Selection_View_Model} $state From build_state().
+	 * @param array{has_primary: bool, primary_industry_key: string, bundles: list<array<string, mixed>>, selected_key: string, field_name: string, subtype_bundle_view_model?: Subtype_Starter_Bundle_Selection_View_Model} $state From build_state().
 	 * @return void
 	 */
 	public function render( array $state ): void {

@@ -1,8 +1,8 @@
 <?php
 /**
- * Preview-only screen for industry pack bundle (JSON) contents and conflict analysis (Prompt 419, SPR-007, Prompt 639).
- * In v1, direct apply of JSON bundles is out of scope. This screen supports preview and conflict inspection only.
- * State restoration is only supported via Import / Export using a full backup ZIP (spec §52).
+ * Preview-only screen for industry pack bundle (JSON) contents and conflict analysis (Prompt 419, SPR-007).
+ * Apply/import of bundle content is not implemented; this screen is for inspection only.
+ * For full backup restore (ZIP), use Import / Export.
  *
  * @package AIOPageBuilder
  */
@@ -23,7 +23,7 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
- * Renders industry bundle preview (contents and conflicts). V1: preview-only; direct apply not supported. Use Import / Export (ZIP) for restore.
+ * Renders industry bundle preview (contents and conflicts). Apply not implemented (SPR-007 deferred); use Import / Export for full restore.
  */
 final class Industry_Bundle_Import_Preview_Screen {
 
@@ -31,7 +31,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 
 	private const TRANSIENT_PREVIEW    = 'aio_industry_bundle_preview_%d';
 	private const NONCE_ACTION_PREVIEW = 'aio_industry_bundle_preview';
-	/** Nonce action for clear-preview only (clears transient; no bundle apply or state write). */
+	/** Nonce action for clear-preview (state-changing; SPR-007 deferred apply). */
 	private const NONCE_ACTION_CLEAR = 'aio_industry_bundle_clear_preview';
 
 	/** @var Service_Container|null */
@@ -125,7 +125,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 	private function get_state(): array {
 		$uid           = \get_current_user_id();
 		$transient_key = \sprintf( self::TRANSIENT_PREVIEW, $uid );
-		// Clear preview only (transient delete); no bundle apply.
+		// * Clear preview: state-changing; requires nonce (SPR-007).
 		$clear_nonce = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ) : '';
 		if ( isset( $_GET['aio_bundle_cancel'] ) && $clear_nonce !== '' && \wp_verify_nonce( $clear_nonce, self::NONCE_ACTION_CLEAR ) && \get_transient( $transient_key ) ) {
 			\delete_transient( $transient_key );
@@ -163,7 +163,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 		<div class="wrap aio-page-builder-screen aio-industry-bundle-import-preview" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="description">
-				<?php \esc_html_e( 'Upload an industry pack bundle (JSON) to preview contents and conflicts. Direct apply of JSON bundles is not supported in this version—this screen is preview only. To restore plugin data (including industry profile), use Import / Export and upload a full backup ZIP.', 'aio-page-builder' ); ?>
+				<?php \esc_html_e( 'Upload an industry pack bundle (JSON) to preview contents and conflicts. This screen is preview only; applying bundle content is not yet supported. To restore plugin data (including industry profile), use Import / Export and upload a full backup ZIP.', 'aio-page-builder' ); ?>
 			</p>
 
 			<?php if ( ! empty( $state['error'] ) ) : ?>
@@ -194,7 +194,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 		?>
 		<div class="notice notice-info inline" style="margin: 1em 0;">
 			<p>
-				<?php \esc_html_e( 'This is a preview only. Direct apply of JSON bundles is not supported in this version. To restore plugin state, use', 'aio-page-builder' ); ?>
+				<?php \esc_html_e( 'This is a preview only. Applying industry bundle content is not yet supported. To restore plugin data, use', 'aio-page-builder' ); ?>
 				<a href="<?php echo \esc_url( $import_export_url ); ?>"><?php \esc_html_e( 'Import / Export', 'aio-page-builder' ); ?></a>
 				<?php \esc_html_e( 'and upload a full backup ZIP.', 'aio-page-builder' ); ?>
 			</p>
@@ -254,9 +254,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 		<section class="aio-bundle-preview-actions" style="margin: 1.5em 0;">
 			<p>
 				<a href="<?php echo \esc_url( $cancel_url ); ?>" class="button"><?php \esc_html_e( 'Clear preview', 'aio-page-builder' ); ?></a>
-				<a href="<?php echo \esc_url( $import_export_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Import / Export (ZIP restore)', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo \esc_url( $import_export_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Import / Export (full restore)', 'aio-page-builder' ); ?></a>
 			</p>
-			<p class="description"><?php \esc_html_e( 'Only ZIP-based restore via Import / Export can write plugin state. This preview does not apply or import the bundle.', 'aio-page-builder' ); ?></p>
 		</section>
 		<?php
 	}

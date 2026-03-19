@@ -34,7 +34,7 @@ final class Trust_Proof_Library_Batch_Definitions {
 	/**
 	 * Returns all trust/proof batch section definitions (order preserved for seeding).
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public static function all_definitions(): array {
 		return array(
@@ -62,7 +62,7 @@ final class Trust_Proof_Library_Batch_Definitions {
 	/**
 	 * Returns section keys in this batch (for listing and tests).
 	 *
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public static function section_keys(): array {
 		return array(

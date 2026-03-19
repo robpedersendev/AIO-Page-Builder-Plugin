@@ -105,7 +105,7 @@ final class Page_Template_Detail_Screen {
 	}
 
 	/**
-	 * @param array<int, array{label: string, url: string}> $breadcrumbs
+	 * @param list<array{label: string, url: string}> $breadcrumbs
 	 * @return void
 	 */
 	private function render_breadcrumbs( array $breadcrumbs ): void {
@@ -297,9 +297,10 @@ final class Page_Template_Detail_Screen {
 			<h2 class="aio-preview-title"><?php \esc_html_e( 'Preview', 'aio-page-builder' ); ?></h2>
 			<p class="aio-preview-notice"><?php \esc_html_e( 'This preview uses synthetic data and the same rendering pipeline as live pages. Omission and animation behavior apply.', 'aio-page-builder' ); ?></p>
 			<?php if ( $style_context !== null ) : ?>
+				<?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Inline preview context; base URL is from trusted builder. ?>
 				<link rel="stylesheet" href="<?php echo \esc_url( $style_context['base_stylesheet_url'] ); ?>" />
 				<?php if ( $style_context['inline_css'] !== '' ) : ?>
-					<style type="text/css" id="aio-preview-style-context"><?php echo /* Safe: from sanitized emitters only */ $style_context['inline_css']; ?></style>
+					<style type="text/css" id="aio-preview-style-context"><?php echo $style_context['inline_css']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- From trusted Preview_Style_Context_Builder. ?></style>
 				<?php endif; ?>
 			<?php endif; ?>
 			<div class="aio-preview-content">
@@ -347,8 +348,9 @@ final class Page_Template_Detail_Screen {
 		if ( ! isset( $_POST[ $nonce_key ] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ $nonce_key ] ) ), $nonce_key ) ) {
 			return false;
 		}
-		$raw        = isset( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] ) && \is_array( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] )
-			? \wp_unslash( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] )
+		$form_key   = Entity_Style_Form_Builder::FORM_KEY;
+		$raw        = isset( $_POST[ $form_key ] ) && \is_array( $_POST[ $form_key ] )
+			? \wp_unslash( $_POST[ $form_key ] )
 			: array();
 		$normalizer = $this->container && $this->container->has( 'styles_json_normalizer' ) ? $this->container->get( 'styles_json_normalizer' ) : null;
 		$sanitizer  = $this->container && $this->container->has( 'styles_json_sanitizer' ) ? $this->container->get( 'styles_json_sanitizer' ) : null;

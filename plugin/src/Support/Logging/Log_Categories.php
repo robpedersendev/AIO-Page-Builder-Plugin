@@ -58,7 +58,7 @@ final class Log_Categories {
 	 * @param string $category Category value.
 	 * @return bool
 	 */
-	public static function isValid( string $category ): bool {
+	public static function is_valid( string $category ): bool {
 		return in_array( $category, self::all(), true );
 	}
 }

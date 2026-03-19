@@ -50,7 +50,7 @@ final class Industry_Starter_Bundle_Registry {
 	/** @var array<string, array<string, mixed>> Map of bundle_key => bundle definition. */
 	private array $by_key = array();
 
-	/** @var array<int, array<string, mixed>> All valid bundles in load order. */
+	/** @var list<array<string, mixed>> All valid bundles in load order. */
 	private array $all = array();
 
 	/** @var Industry_Read_Model_Cache_Service|null */
@@ -119,7 +119,7 @@ final class Industry_Starter_Bundle_Registry {
 	 *
 	 * @param string $industry_key Industry pack key.
 	 * @param string $subtype_key  Optional subtype key. Empty = industry bundles only (subtype-starter-bundle-contract.md).
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_for_industry( string $industry_key, string $subtype_key = '' ): array {
 		$want_industry = \trim( $industry_key );
@@ -157,7 +157,7 @@ final class Industry_Starter_Bundle_Registry {
 	/**
 	 * Returns all loaded bundles.
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return list<array<string, mixed>>
 	 */
 	public function list_all(): array {
 		return $this->all;
@@ -167,7 +167,7 @@ final class Industry_Starter_Bundle_Registry {
 	 * Validates a bundle definition. Returns list of error codes; empty array when valid.
 	 *
 	 * @param array<string, mixed> $bundle Raw bundle definition.
-	 * @return array<int, string>
+	 * @return list<string>
 	 */
 	public function validate_bundle( array $bundle ): array {
 		$errors = array();

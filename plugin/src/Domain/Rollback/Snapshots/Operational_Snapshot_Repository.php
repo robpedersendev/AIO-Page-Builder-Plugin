@@ -136,11 +136,11 @@ final class Operational_Snapshot_Repository implements Operational_Snapshot_Repo
 			$action_type = isset( $snap[ Operational_Snapshot_Schema::FIELD_ACTION_TYPE ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_ACTION_TYPE ] )
 				? $snap[ Operational_Snapshot_Schema::FIELD_ACTION_TYPE ]
 				: '';
-			$target_ref = isset( $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) ? trim( (string) $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) : '';
-			$created_at = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+			$target_ref  = isset( $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) ? trim( (string) $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) : '';
+			$created_at  = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
 				? $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ]
 				: '';
-			$entries[] = array(
+			$entries[]   = array(
 				'post_snapshot_id' => $id,
 				'pre_snapshot_id'  => $pre_id,
 				'action_type'      => $action_type,
@@ -148,11 +148,14 @@ final class Operational_Snapshot_Repository implements Operational_Snapshot_Repo
 				'created_at'       => $created_at,
 			);
 		}
-		usort( $entries, function ( array $a, array $b ): int {
-			$ta = strtotime( $a['created_at'] );
-			$tb = strtotime( $b['created_at'] );
-			return $tb <=> $ta;
-		} );
+		usort(
+			$entries,
+			function ( array $a, array $b ): int {
+				$ta = strtotime( $a['created_at'] );
+				$tb = strtotime( $b['created_at'] );
+				return $tb <=> $ta;
+			}
+		);
 		return array_values( $entries );
 	}
 

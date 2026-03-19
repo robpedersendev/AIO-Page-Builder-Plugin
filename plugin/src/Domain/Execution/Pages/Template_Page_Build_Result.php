@@ -98,8 +98,8 @@ final class Template_Page_Build_Result {
 	 * @param array<string, mixed> $one_pager_metadata
 	 * @param int                  $section_count
 	 * @param int                  $field_assignment_count
-	 * @param array<int, string>         $warnings
-	 * @param array<int, string>         $errors
+	 * @param array<int, string>   $warnings
+	 * @param array<int, string>   $errors
 	 * @param string               $log_ref
 	 * @param string               $message
 	 */
@@ -238,7 +238,7 @@ final class Template_Page_Build_Result {
 	 * @param array<string, mixed> $one_pager_metadata
 	 * @param int                  $section_count
 	 * @param int                  $field_assignment_count
-	 * @param array<int, string>         $warnings
+	 * @param array<int, string>   $warnings
 	 * @param string               $log_ref
 	 * @return self
 	 */
@@ -278,10 +278,10 @@ final class Template_Page_Build_Result {
 	/**
 	 * Builds a failure result with message and errors.
 	 *
-	 * @param string       $message
+	 * @param string             $message
 	 * @param array<int, string> $errors
-	 * @param string       $template_key
-	 * @param string       $log_ref
+	 * @param string             $template_key
+	 * @param string             $log_ref
 	 * @return self
 	 */
 	public static function failure( string $message, array $errors = array(), string $template_key = '', string $log_ref = '' ): self {

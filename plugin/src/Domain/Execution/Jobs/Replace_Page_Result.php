@@ -46,7 +46,7 @@ final class Replace_Page_Result {
 	 * @param int                  $superseded_post_id Archived page ID when replace; 0 for rebuild.
 	 * @param string               $snapshot_ref     Pre-change snapshot ref for logging/rollback.
 	 * @param string               $message
-	 * @param array<int, string>         $errors
+	 * @param array<int, string>   $errors
 	 * @param array<string, mixed> $artifacts        template_key, assignment_count, superseded_page_ref, etc.
 	 */
 	public function __construct(

@@ -166,8 +166,11 @@ final class Industry_Override_Management_Screen {
 		if ( isset( $_GET['reason_present'] ) && $_GET['reason_present'] === '1' ) {
 			$filters[ Industry_Override_Read_Model_Builder::FILTER_REASON_PRESENT ] = true;
 		}
-		if ( isset( $_GET['industry_context_ref'] ) && is_string( $_GET['industry_context_ref'] ) && trim( $_GET['industry_context_ref'] ) !== '' ) {
-			$filters[ Industry_Override_Read_Model_Builder::FILTER_INDUSTRY_CONTEXT_REF ] = trim( \sanitize_text_field( \wp_unslash( $_GET['industry_context_ref'] ) ) );
+		if ( isset( $_GET['industry_context_ref'] ) && is_string( $_GET['industry_context_ref'] ) ) {
+			$ref = trim( \sanitize_text_field( \wp_unslash( $_GET['industry_context_ref'] ) ) );
+			if ( $ref !== '' ) {
+				$filters[ Industry_Override_Read_Model_Builder::FILTER_INDUSTRY_CONTEXT_REF ] = $ref;
+			}
 		}
 		return $filters;
 	}

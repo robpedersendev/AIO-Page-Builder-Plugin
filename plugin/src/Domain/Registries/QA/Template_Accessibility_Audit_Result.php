@@ -45,10 +45,10 @@ final class Template_Accessibility_Audit_Result {
 	private array $human_review_required;
 
 	/**
-	 * @param bool                                                                                 $passed
+	 * @param bool                                                                                       $passed
 	 * @param array<int, array{scope: string, template_key: string, rule_code: string, message: string}> $semantic_rule_violations
-	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>}               $section_audit_summary
-	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>}               $page_audit_summary
+	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>}                     $section_audit_summary
+	 * @param array{audited: int, violations: int, by_rule_code: array<string, int>}                     $page_audit_summary
 	 * @param array<int, string>                                                                         $human_review_required
 	 */
 	public function __construct(

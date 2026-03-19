@@ -124,7 +124,7 @@ final class URL_Discovery_Service {
 	 * Caller is responsible for extracting hrefs; this method only normalizes and filters.
 	 *
 	 * @param array<int, string> $link_urls Raw URLs (e.g. from fetcher-provided link set).
-	 * @param string       $discovery_source One of Discovery_Result::SOURCE_*.
+	 * @param string             $discovery_source One of Discovery_Result::SOURCE_*.
 	 * @return array<int, Discovery_Result>
 	 */
 	public function discover_from_links( array $link_urls, string $discovery_source = Discovery_Result::SOURCE_LINK ): array {
@@ -135,7 +135,7 @@ final class URL_Discovery_Service {
 	 * Processes a list of raw candidate URLs: normalize, filter, deduplicate.
 	 *
 	 * @param array<int, string> $candidates Raw candidate URLs.
-	 * @param string       $discovery_source SOURCE_SEED, SOURCE_LINK, or SOURCE_SITEMAP.
+	 * @param string             $discovery_source SOURCE_SEED, SOURCE_LINK, or SOURCE_SITEMAP.
 	 * @return array<int, Discovery_Result>
 	 */
 	private function process_candidates( array $candidates, string $discovery_source ): array {
@@ -205,7 +205,7 @@ final class URL_Discovery_Service {
 				return self::REJECT_IGNORED_LOGIN;
 			}
 		}
-		$path_normalized = rtrim( $path_lower, '/' ) ?: '/';
+		$path_normalized = rtrim( $path_lower, '/' ) !== '' ? rtrim( $path_lower, '/' ) : '/';
 		foreach ( self::IGNORED_PATH_SEGMENTS as $seg => $code ) {
 			$first = (string) ( array_values( $segments )[0] ?? '' );
 			if ( strtolower( $first ) === $seg || strpos( $path_lower, '/' . $seg . '/' ) === 0 || $path_normalized === '/' . $seg ) {

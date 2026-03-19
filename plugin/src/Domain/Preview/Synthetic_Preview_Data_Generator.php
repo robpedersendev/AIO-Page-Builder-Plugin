@@ -48,7 +48,7 @@ final class Synthetic_Preview_Data_Generator {
 	/**
 	 * Generates per-section field values for a page template preview.
 	 *
-	 * @param Synthetic_Preview_Context                                                $context         Page context (template_key, category, family).
+	 * @param Synthetic_Preview_Context                                                      $context         Page context (template_key, category, family).
 	 * @param array<int, array{section_key: string, position: int, purpose_family?: string}> $ordered_sections Each with section_key, position; purpose_family optional (default 'other').
 	 * @return array<int, array{section_key: string, position: int, field_values: array<string, mixed>}>
 	 */

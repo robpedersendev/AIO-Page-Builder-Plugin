@@ -54,17 +54,17 @@ final class Support_Package_Result {
 	private int $package_size_bytes;
 
 	/**
-	 * @param bool                                              $success
-	 * @param string                                            $message
-	 * @param string                                            $package_path
-	 * @param string                                            $package_filename
+	 * @param bool                                                    $success
+	 * @param string                                                  $message
+	 * @param string                                                  $package_path
+	 * @param string                                                  $package_filename
 	 * @param array<int, string>                                      $included_support_categories
 	 * @param array<int, string>                                      $excluded_categories
 	 * @param array{applied: bool, keys_redacted: array<int, string>} $redaction_summary
-	 * @param string                                            $package_reference
-	 * @param string                                            $generation_log_reference
-	 * @param int                                               $checksum_count
-	 * @param int                                               $package_size_bytes
+	 * @param string                                                  $package_reference
+	 * @param string                                                  $generation_log_reference
+	 * @param int                                                     $checksum_count
+	 * @param int                                                     $package_size_bytes
 	 */
 	public function __construct(
 		bool $success,
@@ -161,14 +161,14 @@ final class Support_Package_Result {
 	}
 
 	/**
-	 * @param string                                            $package_path
-	 * @param string                                            $package_filename
+	 * @param string                                                  $package_path
+	 * @param string                                                  $package_filename
 	 * @param array<int, string>                                      $included_support_categories
 	 * @param array<int, string>                                      $excluded_categories
 	 * @param array{applied: bool, keys_redacted: array<int, string>} $redaction_summary
-	 * @param int                                               $checksum_count
-	 * @param int                                               $package_size_bytes
-	 * @param string                                            $generation_log_reference
+	 * @param int                                                     $checksum_count
+	 * @param int                                                     $package_size_bytes
+	 * @param string                                                  $generation_log_reference
 	 * @return self
 	 */
 	public static function success(

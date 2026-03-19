@@ -61,8 +61,8 @@ final class Template_Page_Replacement_Result {
 	 * @param string               $template_family
 	 * @param array<string, mixed> $replacement_trace_record
 	 * @param int                  $field_assignment_count
-	 * @param array<int, string>         $warnings
-	 * @param array<int, string>         $errors
+	 * @param array<int, string>   $warnings
+	 * @param array<int, string>   $errors
 	 * @param string               $message
 	 */
 	public function __construct(

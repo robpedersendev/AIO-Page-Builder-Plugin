@@ -50,7 +50,7 @@ final class Industry_Subtype_Comparison_Service {
 	/** @var Page_Template_Repository_Interface|null */
 	private $page_repo;
 
-	/** @var callable(): array<int, array<string, mixed>>|null */
+	/** @var callable(): list<array<string, mixed>>|null */
 	private $section_list_provider;
 
 	public function __construct(
@@ -82,12 +82,12 @@ final class Industry_Subtype_Comparison_Service {
 	 *   primary_industry_key: string,
 	 *   subtype_key: string,
 	 *   subtype_label: string,
-	 *   parent_bundles: array<int, array{bundle_key: string, label: string}>,
-	 *   subtype_bundles: array<int, array{bundle_key: string, label: string}>,
-	 *   parent_top_template_keys: array<int, string>,
-	 *   parent_top_section_keys: array<int, string>,
-	 *   subtype_top_template_keys: array<int, string>,
-	 *   subtype_top_section_keys: array<int, string>,
+	 *   parent_bundles: list<array{bundle_key: string, label: string}>,
+	 *   subtype_bundles: list<array{bundle_key: string, label: string}>,
+	 *   parent_top_template_keys: list<string>,
+	 *   parent_top_section_keys: list<string>,
+	 *   subtype_top_template_keys: list<string>,
+	 *   subtype_top_section_keys: list<string>,
 	 *   pack_found: bool,
 	 *   has_subtype: bool
 	 * }
@@ -172,7 +172,7 @@ final class Industry_Subtype_Comparison_Service {
 	}
 
 	/**
-	 * @return array<int, array{bundle_key: string, label: string}>
+	 * @return list<array{bundle_key: string, label: string}>
 	 */
 	private function bundle_list( string $industry_key, string $subtype_key ): array {
 		if ( $this->starter_bundle_registry === null ) {

@@ -107,7 +107,7 @@ final class Industry_Coverage_Gap_Analyzer {
 	 * Runs coverage-gap analysis for active industries and optional subtypes. Returns grouped gaps.
 	 *
 	 * @param bool $include_subtypes When true, analyze each subtype scope as well.
-	 * @return array{gaps: array<int, array{scope: string, missing_artifact_class: string, priority: string, explanation: string}>, by_scope: array<string, array<int, array{missing_artifact_class: string, priority: string, explanation: string}>>}
+	 * @return array{gaps: list<array{scope: string, missing_artifact_class: string, priority: string, explanation: string}>, by_scope: array<string, list<array{missing_artifact_class: string, priority: string, explanation: string}>>}
 	 */
 	public function analyze( bool $include_subtypes = true ): array {
 		$gaps     = array();
@@ -153,8 +153,8 @@ final class Industry_Coverage_Gap_Analyzer {
 
 	/**
 	 * @param array<string, mixed>|null                                                                         $pack Pack definition when scope is industry-level.
-	 * @param array<int, array{scope: string, missing_artifact_class: string, priority: string, explanation: string}> $gaps
-	 * @param array<string, array<int, array{missing_artifact_class: string, priority: string, explanation: string}>> $by_scope
+	 * @param list<array{scope: string, missing_artifact_class: string, priority: string, explanation: string}> $gaps
+	 * @param array<string, list<array{missing_artifact_class: string, priority: string, explanation: string}>> $by_scope
 	 * @param string                                                                                            $scope_override When set, use this as scope key (e.g. industry|subtype).
 	 */
 	private function analyze_scope( string $industry_key, string $subtype_key, ?array $pack, array &$gaps, array &$by_scope, string $scope_override = '' ): void {
