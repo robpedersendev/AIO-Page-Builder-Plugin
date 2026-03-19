@@ -35,6 +35,12 @@ final class Import_Export_Screen {
 	/** Error code for redirect when ZIP exceeds max size. */
 	public const ERROR_CODE_FILE_TOO_LARGE = 'file_too_large';
 
+	/** Error code for redirect when uploaded file MIME type is not an allowed ZIP type (spec §43.11). */
+	public const ERROR_CODE_INVALID_MIME = 'invalid_mime';
+
+	/** Allowed MIME types for ZIP package upload (server-side finfo check). */
+	private const ALLOWED_ZIP_MIME_TYPES = array( 'application/zip', 'application/x-zip-compressed' );
+
 	private const TRANSIENT_VALIDATION     = 'aio_ie_validation_';
 	private const TRANSIENT_RESTORE_RESULT = 'aio_ie_restore_result_';
 	private const NONCE_CREATE_EXPORT      = 'aio_ie_create_export';
@@ -395,6 +401,7 @@ final class Import_Export_Screen {
 			\wp_safe_redirect( $this->screen_url( 'error', 'no_exports_dir' ) );
 			exit;
 		}
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- tmp_name checked with is_uploaded_file(); assignment and usage for MIME check/move only.
 		if ( empty( $_FILES['aio_ie_package_file']['tmp_name'] ) || ! is_uploaded_file( $_FILES['aio_ie_package_file']['tmp_name'] ) ) {
 			\wp_safe_redirect( $this->screen_url( 'error', 'no_file' ) );
 			exit;
@@ -411,9 +418,21 @@ final class Import_Export_Screen {
 			\wp_safe_redirect( $this->screen_url( 'error', self::ERROR_CODE_FILE_TOO_LARGE ) );
 			exit;
 		}
+		$tmp_path = $_FILES['aio_ie_package_file']['tmp_name']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- tmp_name validated by is_uploaded_file(), used only for finfo_file and move_uploaded_file.
+		$finfo    = \finfo_open( \FILEINFO_MIME_TYPE );
+		if ( $finfo === false ) {
+			\wp_safe_redirect( $this->screen_url( 'error', self::ERROR_CODE_INVALID_MIME ) );
+			exit;
+		}
+		$detected_mime = \finfo_file( $finfo, $tmp_path );
+		\finfo_close( $finfo );
+		if ( $detected_mime === false || ! in_array( $detected_mime, self::ALLOWED_ZIP_MIME_TYPES, true ) ) {
+			\wp_safe_redirect( $this->screen_url( 'error', self::ERROR_CODE_INVALID_MIME ) );
+			exit;
+		}
 		$temp_name = 'aio-import-validate-' . \get_current_user_id() . '.zip';
 		$dest      = rtrim( $dir, '/\\' ) . '/' . $temp_name;
-		if ( ! \move_uploaded_file( $_FILES['aio_ie_package_file']['tmp_name'], $dest ) ) {
+		if ( ! \move_uploaded_file( $tmp_path, $dest ) ) {
 			\wp_safe_redirect( $this->screen_url( 'error', 'move_failed' ) );
 			exit;
 		}
@@ -538,6 +557,7 @@ final class Import_Export_Screen {
 			'no_file'             => __( 'No file was uploaded.', 'aio-page-builder' ),
 			'not_zip'             => __( 'Please upload a ZIP file.', 'aio-page-builder' ),
 			'file_too_large'      => __( 'Import package is too large. Maximum size is 50 MB.', 'aio-page-builder' ),
+			'invalid_mime'        => __( 'Invalid file type. Please upload a ZIP package.', 'aio-page-builder' ),
 			'move_failed'         => __( 'Could not save the uploaded file.', 'aio-page-builder' ),
 			'no_validation'       => __( 'No validation result found. Please validate a package first.', 'aio-page-builder' ),
 			'resolution_required' => __( 'Please choose a conflict resolution.', 'aio-page-builder' ),
