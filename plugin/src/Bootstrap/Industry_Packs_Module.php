@@ -125,9 +125,13 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 			self::CONTAINER_KEY_INDUSTRY_PACK_REGISTRY,
 			function () use ( $container ): \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry {
 				$validator = $container->has( 'industry_pack_validator' ) ? $container->get( 'industry_pack_validator' ) : new \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Validator();
-				$registry  = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry( $validator );
-				$registry->load( \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry::get_builtin_pack_definitions() );
-				return $registry;
+				$settings  = $container->has( 'settings' ) ? $container->get( 'settings' ) : null;
+				$toggle    = $container->has( self::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ? $container->get( self::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) : null;
+				return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry(
+					$validator,
+					$settings instanceof \AIOPageBuilder\Infrastructure\Settings\Settings_Service ? $settings : null,
+					$toggle instanceof \AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller ? $toggle : null
+				);
 			}
 		);
 		$container->register(

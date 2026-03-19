@@ -82,10 +82,11 @@ use AIOPageBuilder\Domain\Registries\Section\MediaListingProfileBatch\Media_List
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Industry\Export\Industry_Bundle_Upload_Validator;
 use AIOPageBuilder\Domain\Industry\Export\Industry_Pack_Bundle_Service;
-use AIOPageBuilder\Domain\Industry\Export\Industry_Pack_Import_Conflict_Service;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Validator;
+use AIOPageBuilder\Domain\Industry\Import\Industry_Bundle_Apply_Service;
+use AIOPageBuilder\Domain\Industry\Import\Industry_Bundle_Conflict_Scanner;
 use AIOPageBuilder\Domain\Registries\Section\ProcessTimelineFaqBatch\Process_Timeline_FAQ_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\TrustProofBatch\Trust_Proof_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
@@ -149,6 +150,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_guided_repair_activate', array( $this, 'handle_guided_repair_activate' ), 10 );
 		\add_action( 'admin_post_aio_create_plan_from_bundle', array( $this, 'handle_create_plan_from_bundle' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
+		\add_action( 'admin_post_aio_industry_bundle_apply', array( $this, 'handle_industry_bundle_apply' ), 10 );
 
 		$dashboard                             = new Dashboard_Screen( $this->container );
 		$settings                              = new Settings_Screen();
@@ -993,11 +995,11 @@ final class Admin_Menu {
 	public function handle_industry_bundle_preview(): void {
 		$redirect = \admin_url( 'admin.php?page=' . Industry_Bundle_Import_Preview_Screen::SLUG );
 		if ( ! isset( $_POST['aio_industry_bundle_preview_nonce'] ) ||
-			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_bundle_preview_nonce'] ) ), 'aio_industry_bundle_preview' ) ) {
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_bundle_preview_nonce'] ) ), 'aio_pb_preview_industry_bundle' ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Invalid request.', $redirect ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! \current_user_can( Capabilities::IMPORT_DATA ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Permission denied.', $redirect ) );
 			exit;
 		}
@@ -1024,9 +1026,13 @@ final class Admin_Menu {
 		}
 		$bundle           = $parse_result['bundle'];
 		$screen           = new Industry_Bundle_Import_Preview_Screen( $this->container );
-		$local_state      = $screen->get_local_state_for_conflict();
-		$conflict_service = new Industry_Pack_Import_Conflict_Service();
-		$conflicts        = $conflict_service->analyze( $bundle, $local_state );
+		$settings         = $this->container instanceof Service_Container && $this->container->has( 'settings' ) ? $this->container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+		$apply_service    = new Industry_Bundle_Apply_Service(
+			$settings instanceof \AIOPageBuilder\Infrastructure\Settings\Settings_Service ? $settings : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service(),
+			new Industry_Bundle_Conflict_Scanner()
+		);
+		$local_hashes = $apply_service->get_effective_local_hashes();
+		$conflicts    = ( new Industry_Bundle_Conflict_Scanner() )->scan( $bundle, $local_hashes );
 		$included         = isset( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] ) && \is_array( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] )
 			? $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ]
 			: array();
@@ -1048,6 +1054,67 @@ final class Admin_Menu {
 			900
 		);
 		\wp_safe_redirect( $redirect );
+		exit;
+	}
+
+	/**
+	 * Handles industry bundle apply: requires preview transient, scope selection, and explicit conflict decisions.
+	 *
+	 * @return void
+	 */
+	public function handle_industry_bundle_apply(): void {
+		$redirect = \admin_url( 'admin.php?page=' . Industry_Bundle_Import_Preview_Screen::SLUG );
+		if ( ! isset( $_POST['aio_industry_bundle_apply_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_bundle_apply_nonce'] ) ), 'aio_pb_apply_industry_bundle' ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Invalid request.', $redirect ) );
+			exit;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Permission denied.', $redirect ) );
+			exit;
+		}
+
+		$transient_key = \sprintf( 'aio_industry_bundle_preview_%d', \get_current_user_id() );
+		$preview       = \get_transient( $transient_key );
+		$bundle        = is_array( $preview ) && isset( $preview['bundle'] ) && is_array( $preview['bundle'] ) ? $preview['bundle'] : null;
+		if ( $bundle === null ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'No preview bundle to apply.', $redirect ) );
+			exit;
+		}
+
+		$scope = isset( $_POST['aio_industry_bundle_scope'] ) && is_string( $_POST['aio_industry_bundle_scope'] )
+			? sanitize_key( wp_unslash( $_POST['aio_industry_bundle_scope'] ) )
+			: Industry_Bundle_Apply_Service::SCOPE_FULL_SITE_PACKAGE;
+		$slug  = isset( $_POST['aio_industry_bundle_slug'] ) && is_string( $_POST['aio_industry_bundle_slug'] )
+			? sanitize_key( wp_unslash( $_POST['aio_industry_bundle_slug'] ) )
+			: '';
+
+		$decisions_raw = isset( $_POST['conflict_decisions'] ) && is_array( $_POST['conflict_decisions'] ) ? $_POST['conflict_decisions'] : array();
+		$decisions     = array();
+		foreach ( $decisions_raw as $k => $v ) {
+			if ( ! is_string( $k ) || ! is_string( $v ) ) {
+				continue;
+			}
+			$key = sanitize_text_field( wp_unslash( $k ) );
+			$val = sanitize_key( wp_unslash( $v ) );
+			if ( $val === 'replace' || $val === 'skip' ) {
+				$decisions[ $key ] = $val;
+			}
+		}
+
+		$settings = $this->container instanceof Service_Container && $this->container->has( 'settings' ) ? $this->container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+		$apply    = new Industry_Bundle_Apply_Service(
+			$settings instanceof \AIOPageBuilder\Infrastructure\Settings\Settings_Service ? $settings : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service(),
+			new Industry_Bundle_Conflict_Scanner()
+		);
+		$result = $apply->apply( $bundle, $slug, $scope, $decisions, (int) \get_current_user_id() );
+		if ( ! $result['ok'] ) {
+			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', rawurlencode( $result['error'] ), $redirect ) );
+			exit;
+		}
+
+		\delete_transient( $transient_key );
+		\wp_safe_redirect( \add_query_arg( 'aio_bundle_apply_result', 'applied', $redirect ) );
 		exit;
 	}
 

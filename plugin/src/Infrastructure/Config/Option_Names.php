@@ -121,6 +121,8 @@ final class Option_Names {
 	public const PB_ONBOARDING_DRAFT           = 'aio_pb_onboarding_draft';
 	public const PB_ONBOARDING_STATE           = 'aio_pb_onboarding_state';
 	public const PB_ONBOARDING_LAST_SUBMITTED_AT = 'aio_pb_onboarding_last_submitted_at';
+	public const PB_INDUSTRY_BUNDLE_REGISTRY   = 'aio_pb_industry_bundle_registry';
+	public const PB_INDUSTRY_BUNDLE_MERGE_STATE = 'aio_pb_industry_bundle_merge_state';
 
 	/**
 	 * Returns all known option keys in stable order.
@@ -177,6 +179,8 @@ final class Option_Names {
 			self::PB_ONBOARDING_DRAFT,
 			self::PB_ONBOARDING_STATE,
 			self::PB_ONBOARDING_LAST_SUBMITTED_AT,
+			self::PB_INDUSTRY_BUNDLE_REGISTRY,
+			self::PB_INDUSTRY_BUNDLE_MERGE_STATE,
 		);
 		return self::$all;
 	}

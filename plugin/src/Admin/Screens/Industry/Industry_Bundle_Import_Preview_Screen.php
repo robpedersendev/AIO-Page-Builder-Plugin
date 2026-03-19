@@ -15,7 +15,6 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Industry\Export\Industry_Pack_Bundle_Service;
-use AIOPageBuilder\Domain\Industry\Export\Industry_Pack_Import_Conflict_Service;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Schema;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry;
@@ -30,7 +29,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 	public const SLUG = 'aio-page-builder-industry-bundle-import-preview';
 
 	private const TRANSIENT_PREVIEW    = 'aio_industry_bundle_preview_%d';
-	private const NONCE_ACTION_PREVIEW = 'aio_industry_bundle_preview';
+	private const NONCE_ACTION_PREVIEW = 'aio_pb_preview_industry_bundle';
+	private const NONCE_ACTION_APPLY   = 'aio_pb_apply_industry_bundle';
 	/** Nonce action for clear-preview (state-changing; SPR-007 deferred apply). */
 	private const NONCE_ACTION_CLEAR = 'aio_industry_bundle_clear_preview';
 
@@ -46,7 +46,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 	}
 
 	public function get_capability(): string {
-		return Capabilities::MANAGE_SETTINGS;
+		return Capabilities::IMPORT_DATA;
 	}
 
 	/**
@@ -164,7 +164,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 		<div class="wrap aio-page-builder-screen aio-industry-bundle-import-preview" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="description">
-				<?php \esc_html_e( 'Upload an industry pack bundle (JSON) to preview contents and conflicts. This screen is preview only; applying bundle content is not yet supported. To restore plugin data (including industry profile), use Import / Export and upload a full backup ZIP.', 'aio-page-builder' ); ?>
+				<?php \esc_html_e( 'Upload an industry pack bundle (JSON) to preview contents, review conflicts, choose scope, and apply.', 'aio-page-builder' ); ?>
 			</p>
 
 			<?php if ( ! empty( $state['error'] ) ) : ?>
@@ -191,15 +191,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 		$bundle            = $state['bundle'];
 		$preview_url       = \admin_url( 'admin.php?page=' . self::SLUG );
 		$cancel_url        = \wp_nonce_url( \add_query_arg( 'aio_bundle_cancel', '1', $preview_url ), self::NONCE_ACTION_CLEAR );
-		$import_export_url = \admin_url( 'admin.php?page=' . \AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen::SLUG );
+		$can_apply         = \current_user_can( Capabilities::MANAGE_SETTINGS );
 		?>
-		<div class="notice notice-info inline" style="margin: 1em 0;">
-			<p>
-				<?php \esc_html_e( 'This is a preview only. Applying industry bundle content is not yet supported. To restore plugin data, use', 'aio-page-builder' ); ?>
-				<a href="<?php echo \esc_url( $import_export_url ); ?>"><?php \esc_html_e( 'Import / Export', 'aio-page-builder' ); ?></a>
-				<?php \esc_html_e( 'and upload a full backup ZIP.', 'aio-page-builder' ); ?>
-			</p>
-		</div>
 		<section class="aio-bundle-preview-summary" style="margin: 1.5em 0;">
 			<h2><?php \esc_html_e( 'Bundle summary', 'aio-page-builder' ); ?></h2>
 			<p>
@@ -231,18 +224,14 @@ final class Industry_Bundle_Import_Preview_Screen {
 							<th scope="col"><?php \esc_html_e( 'Category', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Object key', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Conflict type', 'aio-page-builder' ); ?></th>
-							<th scope="col"><?php \esc_html_e( 'Proposed resolution', 'aio-page-builder' ); ?></th>
-							<th scope="col"><?php \esc_html_e( 'Message', 'aio-page-builder' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
 						<?php foreach ( $conflicts as $c ) : ?>
 							<tr>
-								<td><?php echo \esc_html( $c[ Industry_Pack_Import_Conflict_Service::RESULT_CATEGORY ] ?? '' ); ?></td>
-								<td><code><?php echo \esc_html( $c[ Industry_Pack_Import_Conflict_Service::RESULT_OBJECT_KEY ] ?? '' ); ?></code></td>
-								<td><?php echo \esc_html( $c[ Industry_Pack_Import_Conflict_Service::RESULT_CONFLICT_TYPE ] ?? '' ); ?></td>
-								<td><?php echo \esc_html( $c[ Industry_Pack_Import_Conflict_Service::RESULT_PROPOSED_RESOLUTION ] ?? '' ); ?></td>
-								<td><?php echo \esc_html( $c[ Industry_Pack_Import_Conflict_Service::RESULT_MESSAGE ] ?? '' ); ?></td>
+								<td><?php echo \esc_html( (string) ( $c['category'] ?? '' ) ); ?></td>
+								<td><code><?php echo \esc_html( (string) ( $c['object_key'] ?? '' ) ); ?></code></td>
+								<td><?php echo \esc_html( (string) ( $c['conflict_type'] ?? '' ) ); ?></td>
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
@@ -252,10 +241,59 @@ final class Industry_Bundle_Import_Preview_Screen {
 			<p><?php \esc_html_e( 'No conflicts detected with current site state.', 'aio-page-builder' ); ?></p>
 		<?php endif; ?>
 
+		<section class="aio-bundle-preview-apply" style="margin: 1.5em 0;">
+			<h2><?php \esc_html_e( 'Apply bundle', 'aio-page-builder' ); ?></h2>
+			<?php if ( ! $can_apply ) : ?>
+				<div class="notice notice-warning inline"><p><?php \esc_html_e( 'You can preview bundles, but applying requires manage settings permission.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php?action=aio_industry_bundle_apply' ) ); ?>">
+				<?php echo \wp_nonce_field( self::NONCE_ACTION_APPLY, 'aio_industry_bundle_apply_nonce', true, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<p>
+					<label for="aio_industry_bundle_scope"><strong><?php \esc_html_e( 'Scope', 'aio-page-builder' ); ?></strong></label><br />
+					<select name="aio_industry_bundle_scope" id="aio_industry_bundle_scope">
+						<option value="settings_only"><?php \esc_html_e( 'Import settings only', 'aio-page-builder' ); ?></option>
+						<option value="full_site_package"><?php \esc_html_e( 'Import full site package', 'aio-page-builder' ); ?></option>
+					</select>
+				</p>
+				<?php if ( $conflicts !== array() ) : ?>
+					<p><strong><?php \esc_html_e( 'Conflict decisions', 'aio-page-builder' ); ?></strong></p>
+					<?php foreach ( $conflicts as $c ) : ?>
+						<?php
+						$cat = isset( $c['category'] ) ? (string) $c['category'] : '';
+						$key = isset( $c['object_key'] ) ? (string) $c['object_key'] : '';
+						$name = 'conflict_decisions[' . \esc_attr( $cat . '|' . $key ) . ']';
+						?>
+						<div style="margin: .75em 0; padding: .75em; border: 1px solid #ccd0d4; background: #fff;">
+							<p style="margin: 0 0 .5em;">
+								<code><?php echo \esc_html( $cat . ' / ' . $key ); ?></code><br />
+								<?php \esc_html_e( 'Incoming content differs from local content. Choose replace or skip.', 'aio-page-builder' ); ?>
+							</p>
+							<label style="margin-right: 1em;">
+								<input type="radio" name="<?php echo $name; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" value="replace" />
+								<?php \esc_html_e( 'Replace', 'aio-page-builder' ); ?>
+							</label>
+							<label>
+								<input type="radio" name="<?php echo $name; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" value="skip" />
+								<?php \esc_html_e( 'Skip', 'aio-page-builder' ); ?>
+							</label>
+						</div>
+					<?php endforeach; ?>
+				<?php endif; ?>
+				<p>
+					<label for="aio_industry_bundle_slug"><?php \esc_html_e( 'Bundle label (optional)', 'aio-page-builder' ); ?></label><br />
+					<input type="text" name="aio_industry_bundle_slug" id="aio_industry_bundle_slug" class="regular-text" value="" />
+				</p>
+				<p>
+					<button type="submit" class="button button-primary" <?php echo $can_apply ? '' : 'disabled'; ?>>
+						<?php \esc_html_e( 'Confirm apply', 'aio-page-builder' ); ?>
+					</button>
+				</p>
+			</form>
+		</section>
+
 		<section class="aio-bundle-preview-actions" style="margin: 1.5em 0;">
 			<p>
 				<a href="<?php echo \esc_url( $cancel_url ); ?>" class="button"><?php \esc_html_e( 'Clear preview', 'aio-page-builder' ); ?></a>
-				<a href="<?php echo \esc_url( $import_export_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Import / Export (full restore)', 'aio-page-builder' ); ?></a>
 			</p>
 		</section>
 		<?php
