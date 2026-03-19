@@ -23,6 +23,33 @@ require_once $plugin_root . '/src/Domain/BuildPlan/Statuses/Build_Plan_Statuses.
 require_once $plugin_root . '/src/Domain/BuildPlan/Statuses/Build_Plan_Item_Statuses.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Analytics/Build_Plan_List_Provider_Interface.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Analytics/Build_Plan_Analytics_Service.php';
+require_once $plugin_root . '/src/Domain/Rollback/Snapshots/Operational_Snapshot_Repository_Interface.php';
+
+class Build_Plan_Analytics_Stub_Snapshot_Repository implements \AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Repository_Interface {
+
+	/** @var array<string, array<int, array{post_snapshot_id: string, pre_snapshot_id: string, action_type: string, target_ref: string, created_at: string}>> */
+	private $by_plan_id;
+
+	public function __construct( array $by_plan_id ) {
+		$this->by_plan_id = $by_plan_id;
+	}
+
+	public function save( array $snapshot ): bool {
+		return false;
+	}
+
+	public function get_by_id( string $snapshot_id ): ?array {
+		return null;
+	}
+
+	public function list_snapshot_created_times_for_target( string $target_ref ): array {
+		return array();
+	}
+
+	public function list_rollback_entries_for_plan( string $plan_id ): array {
+		return $this->by_plan_id[ $plan_id ] ?? array();
+	}
+}
 
 /**
  * Stub list provider that returns a fixed list of plans for analytics tests.
@@ -141,6 +168,38 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 		$this->assertArrayHasKey( 'source', $summary );
 		$this->assertSame( 0, $summary['total_rollbacks'] );
 		$this->assertSame( 'plan_analytics_only', $summary['source'] );
+	}
+
+	public function test_rollback_frequency_summary_uses_operational_snapshots_when_available(): void {
+		$plan   = $this->make_plan( '2025-03-15 10:00:00', Build_Plan_Statuses::ROOT_COMPLETED, array() );
+		$repo   = new Build_Plan_Analytics_Stub_Repository( array( $plan ) );
+		$snaps  = new Build_Plan_Analytics_Stub_Snapshot_Repository(
+			array(
+				$plan[ Build_Plan_Schema::KEY_PLAN_ID ] => array(
+					array(
+						'post_snapshot_id' => 'post_1',
+						'pre_snapshot_id'  => 'pre_1',
+						'action_type'      => 'replace_page',
+						'target_ref'       => 'post:123',
+						'created_at'       => '2025-03-16 12:00:00',
+					),
+					array(
+						'post_snapshot_id' => 'post_2',
+						'pre_snapshot_id'  => 'pre_2',
+						'action_type'      => 'token_change',
+						'target_ref'       => 'tokens:global',
+						'created_at'       => '2025-03-20 12:00:00',
+					),
+				),
+			)
+		);
+		$svc    = new Build_Plan_Analytics_Service( $repo, $snaps );
+		$out    = $svc->get_rollback_frequency_summary( '2025-03-01', '2025-03-31' );
+		$this->assertSame( 'operational_snapshots', $out['source'] );
+		$this->assertSame( 2, $out['total_rollbacks'] );
+		$this->assertNotEmpty( $out['by_month'] );
+		$this->assertSame( '2025-03', $out['by_month'][0]['month'] );
+		$this->assertSame( 2, $out['by_month'][0]['count'] );
 	}
 
 	public function test_analytics_summary_returns_redacted_payloads_no_raw_secrets(): void {

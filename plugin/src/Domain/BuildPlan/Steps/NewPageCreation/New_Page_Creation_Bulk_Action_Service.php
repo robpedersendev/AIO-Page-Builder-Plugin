@@ -132,7 +132,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ) {
 				continue;
 			}
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+			$payload    = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
 			$confidence = (string) ( $payload['confidence'] ?? 'medium' );
@@ -176,7 +176,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ) {
 				continue;
 			}
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+			$payload    = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
 			$confidence = (string) ( $payload['confidence'] ?? 'medium' );
@@ -204,10 +204,10 @@ final class New_Page_Creation_Bulk_Action_Service {
 		if ( ! is_array( $step ) ) {
 			return 0;
 		}
-		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+		$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
-		$count   = 0;
+		$count = 0;
 		foreach ( $items as $i => $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -218,7 +218,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 			if ( (string) ( $item['status'] ?? '' ) !== Build_Plan_Item_Statuses::PENDING ) {
 				continue;
 			}
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+			$payload    = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
 			$confidence = (string) ( $payload['confidence'] ?? 'medium' );
@@ -238,9 +238,9 @@ final class New_Page_Creation_Bulk_Action_Service {
 	/**
 	 * Bulk-set status for a selected set of eligible pending items.
 	 *
-	 * @param int               $plan_post_id Plan post ID.
+	 * @param int                $plan_post_id Plan post ID.
 	 * @param array<string,bool> $item_id_set Item IDs to consider.
-	 * @param string            $new_status  New status to set.
+	 * @param string             $new_status  New status to set.
 	 * @return int Number of items updated.
 	 */
 	private function bulk_set_selected_eligible_status( int $plan_post_id, array $item_id_set, string $new_status ): int {
@@ -252,10 +252,10 @@ final class New_Page_Creation_Bulk_Action_Service {
 		if ( ! is_array( $step ) ) {
 			return 0;
 		}
-		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+		$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
-		$count   = 0;
+		$count = 0;
 		foreach ( $items as $i => $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -270,7 +270,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE ) {
 				continue;
 			}
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+			$payload    = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 				: array();
 			$confidence = (string) ( $payload['confidence'] ?? 'medium' );

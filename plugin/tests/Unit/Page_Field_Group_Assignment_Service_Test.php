@@ -247,6 +247,32 @@ final class Page_Field_Group_Assignment_Service_Test extends TestCase {
 		);
 	}
 
+	private function seed_page_template( string $key ): void {
+		$this->seed_template(
+			$key,
+			array(
+				Page_Template_Schema::FIELD_ORDERED_SECTIONS => array(
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st01_hero' ),
+					array( Page_Template_Schema::SECTION_ITEM_KEY => 'st05_faq' ),
+				),
+			)
+		);
+		$this->seed_section( 'st01_hero' );
+		$this->seed_section( 'st05_faq' );
+	}
+
+	private function seed_page( int $page_id ): void {
+		$GLOBALS['_aio_get_post_return'] = new \WP_Post(
+			array(
+				'ID'          => $page_id,
+				'post_type'   => 'page',
+				'post_title'  => 'Test Page',
+				'post_status' => 'publish',
+				'post_name'   => 'test-page',
+			)
+		);
+	}
+
 	public function test_assign_from_template_full_replace_persists_groups_and_source(): void {
 		$page_id = 42;
 		$this->seed_template(

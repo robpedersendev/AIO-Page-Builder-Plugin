@@ -20,7 +20,7 @@ use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
  * Repository for site-level industry profile. Mutations are admin/authorized-only by callers.
  * Optional audit trail service records profile changes (Prompt 465).
  */
-final class Industry_Profile_Repository {
+class Industry_Profile_Repository {
 
 	private const OPTION_KEY = Option_Names::INDUSTRY_PROFILE;
 

@@ -66,12 +66,14 @@ final class Global_Style_Token_Settings_Screen {
 		// * Process save: POST with nonce and SAVE_ACTION.
 		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::SAVE_ACTION ) {
 			if ( isset( $_POST[ self::NONCE_SAVE ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_SAVE ] ) ), self::NONCE_SAVE ) ) {
-				$raw_tokens = isset( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] ) && is_array( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] )
-					? \wp_unslash( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] )
-					: array();
-				$tokens     = $this->collect_tokens_from_raw( $raw_tokens );
-				$ok         = $repo->set_global_tokens( $tokens );
-				$msg        = $ok ? 'success' : 'error';
+				$raw_tokens = array();
+				if ( isset( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] ) && is_array( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] ) ) {
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then passed to collect_tokens_from_raw which sanitizes.
+					$raw_tokens = \wp_unslash( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] );
+				}
+				$tokens = $this->collect_tokens_from_raw( $raw_tokens );
+				$ok     = $repo->set_global_tokens( $tokens );
+				$msg    = $ok ? 'success' : 'error';
 				\wp_safe_redirect( \add_query_arg( self::QUERY_MSG, $msg, $this->get_settings_url() ) );
 				exit;
 			}

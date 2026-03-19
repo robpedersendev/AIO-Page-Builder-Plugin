@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Statuses;
+use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Repository_Interface;
 
 /**
  * Aggregates plan and item-level data into stable analytics payloads. Redacted; no raw secrets.
@@ -28,8 +29,15 @@ final class Build_Plan_Analytics_Service {
 	/** @var Build_Plan_List_Provider_Interface */
 	private $plan_list_provider;
 
-	public function __construct( Build_Plan_List_Provider_Interface $plan_list_provider ) {
+	/** @var Operational_Snapshot_Repository_Interface|null */
+	private $snapshot_repository;
+
+	public function __construct(
+		Build_Plan_List_Provider_Interface $plan_list_provider,
+		?Operational_Snapshot_Repository_Interface $snapshot_repository = null
+	) {
 		$this->plan_list_provider = $plan_list_provider;
+		$this->snapshot_repository = $snapshot_repository;
 	}
 
 	/**
@@ -229,12 +237,52 @@ final class Build_Plan_Analytics_Service {
 	 * @return array{total_rollbacks: int, by_month: array<int, array{month: string, count: int}>, date_from: string|null, date_to: string|null, source: string}
 	 */
 	public function get_rollback_frequency_summary( ?string $date_from = null, ?string $date_to = null ): array {
+		if ( $this->snapshot_repository === null ) {
+			return array(
+				'total_rollbacks' => 0,
+				'by_month'        => array(),
+				'date_from'       => $date_from,
+				'date_to'         => $date_to,
+				'source'          => 'plan_analytics_only',
+			);
+		}
+		$plans = $this->get_plans_for_period( $date_from, $date_to );
+		$by_m = array();
+		$total = 0;
+		foreach ( $plans as $plan ) {
+			$plan_id = (string) ( $plan[ Build_Plan_Schema::KEY_PLAN_ID ] ?? $plan['plan_id'] ?? $plan['internal_key'] ?? '' );
+			if ( $plan_id === '' ) {
+				continue;
+			}
+			$entries = $this->snapshot_repository->list_rollback_entries_for_plan( $plan_id );
+			foreach ( $entries as $e ) {
+				$created_at = (string) ( $e['created_at'] ?? '' );
+				if ( $created_at === '' ) {
+					continue;
+				}
+				$ts = strtotime( $created_at );
+				if ( $ts === false ) {
+					continue;
+				}
+				$month = gmdate( 'Y-m', $ts );
+				$by_m[ $month ] = ( $by_m[ $month ] ?? 0 ) + 1;
+				++$total;
+			}
+		}
+		ksort( $by_m, SORT_STRING );
+		$by_month = array();
+		foreach ( $by_m as $month => $count ) {
+			$by_month[] = array(
+				'month' => (string) $month,
+				'count' => (int) $count,
+			);
+		}
 		return array(
-			'total_rollbacks' => 0,
-			'by_month'        => array(),
+			'total_rollbacks' => $total,
+			'by_month'        => $by_month,
 			'date_from'       => $date_from,
 			'date_to'         => $date_to,
-			'source'          => 'plan_analytics_only',
+			'source'          => 'operational_snapshots',
 		);
 	}
 

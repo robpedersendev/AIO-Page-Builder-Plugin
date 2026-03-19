@@ -90,6 +90,27 @@ final class Existing_Page_Update_Bulk_Action_Service {
 	}
 
 	/**
+	 * Bulk approves selected pending items in Step 1.
+	 *
+	 * @param int                $plan_post_id Plan post ID.
+	 * @param array<int, string> $item_ids Selected item IDs.
+	 * @return int Number of items updated.
+	 */
+	public function bulk_approve_selected( int $plan_post_id, array $item_ids ): int {
+		$item_ids = array_values( array_filter( array_map( 'strval', $item_ids ) ) );
+		if ( empty( $item_ids ) ) {
+			return 0;
+		}
+		$updated = 0;
+		foreach ( $item_ids as $item_id ) {
+			if ( $this->set_item_status_if_pending( $plan_post_id, $item_id, Build_Plan_Item_Statuses::APPROVED ) ) {
+				++$updated;
+			}
+		}
+		return $updated;
+	}
+
+	/**
 	 * Returns eligibility for bulk actions: count of pending items in Step 1.
 	 *
 	 * @param array<string, mixed> $plan_definition Plan root.

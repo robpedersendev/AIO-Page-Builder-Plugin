@@ -168,7 +168,7 @@ final class New_Page_Creation_UI_Service {
 				'count_eligible' => $pending_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
-				'enabled'        => $selected_count > 0 && ! empty( $capabilities['can_approve'] ),
+				'enabled'        => $pending_count > 0 && ! empty( $capabilities['can_approve'] ),
 				'label'          => \__( 'Build Selected Pages', 'aio-page-builder' ),
 				'count_selected' => $selected_count,
 			),
@@ -178,7 +178,7 @@ final class New_Page_Creation_UI_Service {
 				'count_eligible' => $pending_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
-				'enabled' => $selected_count > 0,
+				'enabled' => $pending_count > 0,
 				'label'   => \__( 'Clear selection', 'aio-page-builder' ),
 			),
 		);

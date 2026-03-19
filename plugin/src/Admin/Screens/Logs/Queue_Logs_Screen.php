@@ -625,7 +625,11 @@ final class Queue_Logs_Screen {
 			exit;
 		}
 		$log_types   = array();
-		$raw_log_ary = isset( $_POST['log_types'] ) && is_array( $_POST['log_types'] ) ? \wp_unslash( $_POST['log_types'] ) : array();
+		$raw_log_ary = array();
+		if ( isset( $_POST['log_types'] ) && is_array( $_POST['log_types'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then each element sanitized in loop.
+			$raw_log_ary = \wp_unslash( $_POST['log_types'] );
+		}
 		foreach ( $raw_log_ary as $t ) {
 			$v = \sanitize_text_field( (string) $t );
 			if ( in_array( $v, Log_Export_Service::ALLOWED_LOG_TYPES, true ) ) {

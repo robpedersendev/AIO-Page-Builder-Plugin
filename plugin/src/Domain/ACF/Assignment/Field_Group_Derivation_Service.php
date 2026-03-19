@@ -25,7 +25,7 @@ use AIOPageBuilder\Domain\Templates\Template_Section_Key_Derivation_Result;
  * Derives visible field group keys from structural source (template or composition).
  * For new assignments: excludes deprecated sections. For refinement: keeps existing deprecated.
  */
-final class Field_Group_Derivation_Service {
+class Field_Group_Derivation_Service {
 
 	/** @var Page_Template_Repository */
 	private Page_Template_Repository $page_template_repository;

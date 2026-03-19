@@ -55,7 +55,11 @@ class Existing_Page_ACF_Registration_Context_Resolver {
 		if ( ! is_admin() || $pagenow !== 'post.php' ) {
 			return false;
 		}
-		$post_id = isset( $_GET['post'] ) ? (int) \wp_unslash( $_GET['post'] ) : 0;
+		$post_id = 0;
+		if ( isset( $_GET['post'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Cast to int after unslash; used as post ID.
+			$post_id = (int) \wp_unslash( $_GET['post'] );
+		}
 		if ( $post_id <= 0 ) {
 			return false;
 		}
@@ -72,7 +76,12 @@ class Existing_Page_ACF_Registration_Context_Resolver {
 		if ( ! $this->is_existing_page_edit_context() ) {
 			return 0;
 		}
-		return isset( $_GET['post'] ) ? (int) \wp_unslash( $_GET['post'] ) : 0;
+		$post_id = 0;
+		if ( isset( $_GET['post'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Cast to int after unslash; used as post ID.
+			$post_id = (int) \wp_unslash( $_GET['post'] );
+		}
+		return $post_id;
 	}
 
 	/**

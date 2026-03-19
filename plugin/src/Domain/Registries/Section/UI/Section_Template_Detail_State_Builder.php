@@ -21,6 +21,7 @@ use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Context;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
+use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Versioning_Service;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
@@ -268,10 +269,39 @@ final class Section_Template_Detail_State_Builder {
 	 * @return string
 	 */
 	private function build_helper_doc_url( string $helper_ref ): string {
+		$helper_ref = \sanitize_text_field( $helper_ref );
 		if ( $helper_ref === '' ) {
 			return '';
 		}
-		// * Helper-doc URL: placeholder; replace with real helper-doc resolver when available (spec §15).
+		$registry = new Documentation_Registry();
+		$doc_id   = '';
+		$key      = '';
+		if ( str_starts_with( $helper_ref, 'doc-helper-' ) ) {
+			$doc_id = $helper_ref;
+		} elseif ( str_starts_with( $helper_ref, 'helper_' ) ) {
+			$key = \sanitize_key( substr( $helper_ref, strlen( 'helper_' ) ) );
+		} else {
+			$key = \sanitize_key( $helper_ref );
+		}
+
+		if ( $doc_id !== '' ) {
+			$doc = $registry->get_by_id( $doc_id );
+			if ( $doc === null ) {
+				return '';
+			}
+			return \admin_url(
+				'admin.php?page=' . \AIOPageBuilder\Admin\Screens\Docs\Documentation_Detail_Screen::SLUG . '&doc_id=' . \rawurlencode( $doc_id )
+			);
+		}
+		if ( $key !== '' ) {
+			$doc = $registry->get_by_section_key( $key );
+			if ( $doc === null ) {
+				return '';
+			}
+			return \admin_url(
+				'admin.php?page=' . \AIOPageBuilder\Admin\Screens\Docs\Documentation_Detail_Screen::SLUG . '&section=' . \rawurlencode( $key )
+			);
+		}
 		return '';
 	}
 

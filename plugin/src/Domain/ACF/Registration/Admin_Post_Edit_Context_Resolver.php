@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  * Resolves current admin request into a typed context. Conditions documented in acf-page-visibility-contract.
  * Unsupported contexts fail safe toward no full registration.
  */
-final class Admin_Post_Edit_Context_Resolver {
+class Admin_Post_Edit_Context_Resolver {
 
 	/**
 	 * Resolves the current request into an admin post-edit context.
@@ -49,7 +49,11 @@ final class Admin_Post_Edit_Context_Resolver {
 			if ( $this->is_secondary_edit_request() ) {
 				return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::UNSUPPORTED_ADMIN, 0 );
 			}
-			$post_id = isset( $_GET['post'] ) ? (int) \wp_unslash( $_GET['post'] ) : 0;
+			$post_id = 0;
+			if ( isset( $_GET['post'] ) ) {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Cast to int after unslash; used as post ID.
+				$post_id = (int) \wp_unslash( $_GET['post'] );
+			}
 			if ( $post_id <= 0 ) {
 				return new Admin_Post_Edit_Context_Result( Admin_Post_Edit_Context_Result::UNSUPPORTED_ADMIN, 0 );
 			}
@@ -88,7 +92,11 @@ final class Admin_Post_Edit_Context_Resolver {
 				return true;
 			}
 		}
-		$post_id = isset( $_GET['post'] ) ? (int) \wp_unslash( $_GET['post'] ) : 0;
+		$post_id = 0;
+		if ( isset( $_GET['post'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Cast to int after unslash; used as post ID.
+			$post_id = (int) \wp_unslash( $_GET['post'] );
+		}
 		if ( $post_id > 0 && get_post_type( $post_id ) === 'revision' ) {
 			return true;
 		}

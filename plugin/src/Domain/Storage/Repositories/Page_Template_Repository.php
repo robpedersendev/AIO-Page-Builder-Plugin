@@ -20,7 +20,7 @@ use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
  * Internal key: stable slug (e.g. pt_landing_contact). Status: draft | active | inactive | deprecated.
  * Full definition stored in _aio_page_template_definition meta (JSON).
  */
-final class Page_Template_Repository extends Abstract_CPT_Repository implements Page_Template_Repository_Interface {
+class Page_Template_Repository extends Abstract_CPT_Repository implements Page_Template_Repository_Interface {
 
 	/** Meta key for full page template definition (JSON-encoded). */
 	protected const META_DEFINITION = '_aio_page_template_definition';

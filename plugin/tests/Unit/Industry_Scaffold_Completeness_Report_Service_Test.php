@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Domain/Industry/Reporting/Industry_Scaffold_Completeness_Report_Provider_Interface.php';
 require_once $plugin_root . '/src/Domain/Industry/Reporting/Industry_Scaffold_Completeness_Report_Service.php';
 
 final class Industry_Scaffold_Completeness_Report_Service_Test extends TestCase {

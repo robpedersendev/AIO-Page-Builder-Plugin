@@ -185,7 +185,8 @@ final class New_Page_Creation_Detail_Builder {
 		$action_url   = \admin_url( 'admin-post.php' );
 		$nonce_action = \AIOPageBuilder\Admin\Actions\Save_Industry_Build_Plan_Override_Action::NONCE_ACTION;
 		$nonce_name   = \AIOPageBuilder\Admin\Actions\Save_Industry_Build_Plan_Override_Action::NONCE_NAME;
-		$referer      = \esc_attr( \wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) );
+		$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( (string) $_SERVER['REQUEST_URI'] ) ) : '';
+		$referer      = \esc_attr( $request_uri );
 		$content      = '<form method="post" action="' . \esc_url( $action_url ) . '" class="aio-industry-override-form">';
 		$content     .= '<input type="hidden" name="action" value="aio_save_industry_build_plan_override" />';
 		$content     .= \wp_nonce_field( $nonce_action, $nonce_name, true, false );

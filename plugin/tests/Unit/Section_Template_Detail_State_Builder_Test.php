@@ -48,6 +48,10 @@ require_once $plugin_root . '/src/Domain/Rendering/Section/Section_Render_Result
 require_once $plugin_root . '/src/Domain/FormProvider/Form_Provider_Registry.php';
 require_once $plugin_root . '/src/Domain/Rendering/Blocks/Page_Block_Assembly_Result.php';
 require_once $plugin_root . '/src/Domain/Rendering/Blocks/Native_Block_Assembly_Pipeline.php';
+require_once $plugin_root . '/src/Domain/Registries/Docs/Documentation_Loader.php';
+require_once $plugin_root . '/src/Domain/Registries/Docs/Documentation_Registry.php';
+require_once $plugin_root . '/src/Domain/Registries/Documentation/Documentation_Schema.php';
+require_once $plugin_root . '/src/Admin/Screens/Docs/Documentation_Detail_Screen.php';
 
 final class Section_Template_Detail_State_Builder_Test extends TestCase {
 
@@ -125,6 +129,18 @@ final class Section_Template_Detail_State_Builder_Test extends TestCase {
 		$this->assertArrayHasKey( 'rendered_preview_html', $state );
 		$this->assertIsString( $state['rendered_preview_html'] );
 		$this->assertArrayHasKey( 'preview_payload', $state );
+	}
+
+	public function test_build_state_resolves_helper_doc_url_when_doc_exists(): void {
+		$def               = $this->minimal_section_definition( 'cta_contact_01' );
+		$def['helper_ref'] = 'doc-helper-cta_contact_01';
+		$builder           = $this->create_state_builder( $def );
+		$state             = $builder->build_state( 'cta_contact_01', array() );
+		$this->assertFalse( $state['not_found'] );
+		$this->assertSame( 'doc-helper-cta_contact_01', $state['helper_ref'] );
+		$this->assertIsString( $state['helper_doc_url'] );
+		$this->assertNotSame( '', $state['helper_doc_url'] );
+		$this->assertStringContainsString( 'aio-page-builder-documentation-detail', $state['helper_doc_url'] );
 	}
 
 	public function test_build_state_field_summary_from_embedded_blueprint(): void {

@@ -17,7 +17,7 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 /**
  * Extends base page-template recommendation result with optional subtype weighting and explanation.
  */
-final class Industry_Subtype_Page_Template_Recommendation_Extender {
+class Industry_Subtype_Page_Template_Recommendation_Extender {
 
 	private const SUBTYPE_BOOST_SCORE         = 5;
 	private const REASON_PAGE_FAMILY_EMPHASIS = 'subtype_page_family_emphasis';

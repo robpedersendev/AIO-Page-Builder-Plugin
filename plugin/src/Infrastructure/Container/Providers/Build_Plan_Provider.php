@@ -325,7 +325,11 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 		$container->register(
 			'build_plan_analytics_service',
 			function () use ( $container ): Build_Plan_Analytics_Service {
-				return new Build_Plan_Analytics_Service( $container->get( 'build_plan_repository' ) );
+				$snapshots = $container->has( 'operational_snapshot_repository' ) ? $container->get( 'operational_snapshot_repository' ) : null;
+				return new Build_Plan_Analytics_Service(
+					$container->get( 'build_plan_repository' ),
+					$snapshots
+				);
 			}
 		);
 		$analytics_dir = __DIR__ . '/../../../Domain/Registries/Analytics';

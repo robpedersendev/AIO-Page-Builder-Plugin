@@ -55,9 +55,17 @@ final class Page_Templates_Directory_Screen {
 		}
 
 		$state_builder = $this->get_state_builder();
-		$raw_paged     = isset( $_GET['paged'] ) ? \wp_unslash( $_GET['paged'] ) : null;
-		$raw_per_page  = isset( $_GET['per_page'] ) ? \wp_unslash( $_GET['per_page'] ) : null;
-		$request       = array(
+		$raw_paged     = null;
+		if ( isset( $_GET['paged'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then cast to int for paged.
+			$raw_paged = \wp_unslash( $_GET['paged'] );
+		}
+		$raw_per_page = null;
+		if ( isset( $_GET['per_page'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then cast to int for per_page.
+			$raw_per_page = \wp_unslash( $_GET['per_page'] );
+		}
+		$request = array(
 			'category_class' => isset( $_GET['category_class'] ) ? \sanitize_key( \wp_unslash( $_GET['category_class'] ) ) : '',
 			'family'         => isset( $_GET['family'] ) ? \sanitize_key( \wp_unslash( $_GET['family'] ) ) : '',
 			'status'         => isset( $_GET['status'] ) ? \sanitize_key( \wp_unslash( $_GET['status'] ) ) : '',
@@ -66,8 +74,8 @@ final class Page_Templates_Directory_Screen {
 			'per_page'       => $raw_per_page !== null ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $raw_per_page ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
 			'industry_view'  => isset( $_GET['industry_view'] ) ? \sanitize_key( \wp_unslash( $_GET['industry_view'] ) ) : Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY,
 		);
-		$state         = $state_builder->build_state( $request );
-		$state         = $this->enrich_state_with_industry( $state, $request );
+		$state   = $state_builder->build_state( $request );
+		$state   = $this->enrich_state_with_industry( $state, $request );
 		$state['industry_page_template_overrides_by_key'] = ( new Industry_Page_Template_Override_Service() )->list_overrides();
 
 		$view = (string) ( $state['view'] ?? 'root' );

@@ -31,7 +31,8 @@ final class Conversion_Goal_Starter_Bundle_To_Build_Plan_Service_Test extends Te
 		$registry = new Industry_Starter_Bundle_Registry();
 		$registry->load( array() );
 		$base = null;
-		if ( class_exists( \AIOPageBuilder\Infrastructure\Container\Service_Container::class, false ) ) {
+		if ( class_exists( \AIOPageBuilder\Infrastructure\Container\Service_Container::class, false )
+			&& method_exists( \AIOPageBuilder\Infrastructure\Container\Service_Container::class, 'get_instance' ) ) {
 			$container = \AIOPageBuilder\Infrastructure\Container\Service_Container::get_instance();
 			if ( $container !== null && $container->has( 'industry_starter_bundle_to_build_plan_service' ) ) {
 				$base = $container->get( 'industry_starter_bundle_to_build_plan_service' );

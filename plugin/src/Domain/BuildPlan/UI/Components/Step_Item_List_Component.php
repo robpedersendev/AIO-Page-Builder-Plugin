@@ -54,6 +54,9 @@ final class Step_Item_List_Component {
 	/** @var string Row payload key for is_selected. */
 	public const ROW_KEY_IS_SELECTED = 'is_selected';
 
+	/** @var string Optional payload key for checkbox field name (array field). */
+	public const KEY_SELECTION_FIELD_NAME = 'selection_field_name';
+
 	/**
 	 * Renders the item list table.
 	 *
@@ -65,6 +68,9 @@ final class Step_Item_List_Component {
 	public function render( array $payload, ?string $detail_item_id = null, string $list_id = 'aio-step-item-list' ): void {
 		$rows  = $payload[ self::KEY_STEP_LIST_ROWS ] ?? array();
 		$order = $payload[ self::KEY_COLUMN_ORDER ] ?? array();
+		$name  = isset( $payload[ self::KEY_SELECTION_FIELD_NAME ] ) && is_string( $payload[ self::KEY_SELECTION_FIELD_NAME ] )
+			? trim( $payload[ self::KEY_SELECTION_FIELD_NAME ] )
+			: 'selected[]';
 		if ( ! is_array( $rows ) ) {
 			$rows = array();
 		}
@@ -111,7 +117,7 @@ final class Step_Item_List_Component {
 							<tr class="aio-group-header" role="row"><td colspan="<?php echo (int) $colspan; ?>" scope="rowgroup"><?php echo \esc_html( $group_label ); ?></td></tr>
 							<?php
 						}
-						$this->render_row( $row, $columns, $detail_item_id );
+						$this->render_row( $row, $columns, $detail_item_id, $name );
 					endforeach;
 					?>
 				</tbody>
@@ -194,9 +200,10 @@ final class Step_Item_List_Component {
 	 * @param array<string, mixed> $row Row payload (item_id, status_badge, summary_columns, row_actions, is_selected).
 	 * @param array<int, string>   $columns Column keys in order.
 	 * @param string|null          $detail_item_id Currently selected item_id.
+	 * @param string               $selection_field_name Field name for checkbox input (array field, e.g. selected[]).
 	 * @return void
 	 */
-	private function render_row( array $row, array $columns, ?string $detail_item_id ): void {
+	private function render_row( array $row, array $columns, ?string $detail_item_id, string $selection_field_name ): void {
 		$item_id          = (string) ( $row[ self::ROW_KEY_ITEM_ID ] ?? '' );
 		$badge            = (string) ( $row[ self::ROW_KEY_STATUS_BADGE ] ?? '' );
 		$summary          = isset( $row[ self::ROW_KEY_SUMMARY_COLUMNS ] ) && is_array( $row[ self::ROW_KEY_SUMMARY_COLUMNS ] ) ? $row[ self::ROW_KEY_SUMMARY_COLUMNS ] : array();
@@ -207,7 +214,7 @@ final class Step_Item_List_Component {
 		?>
 		<tr class="aio-step-item-row <?php echo $is_detail_active ? 'aio-row-detail-active' : ''; ?>" data-item-id="<?php echo \esc_attr( $item_id ); ?>">
 			<td class="aio-col-select">
-				<input type="checkbox" class="aio-row-select" value="<?php echo \esc_attr( $item_id ); ?>" <?php echo $is_selected ? ' checked="checked"' : ''; ?> aria-label="<?php echo \esc_attr( sprintf( __( 'Select item %s', 'aio-page-builder' ), $item_id ) ); ?>" />
+				<input type="checkbox" class="aio-row-select" name="<?php echo \esc_attr( $selection_field_name ); ?>" value="<?php echo \esc_attr( $item_id ); ?>" <?php echo $is_selected ? ' checked="checked"' : ''; ?> aria-label="<?php echo \esc_attr( sprintf( __( 'Select item %s', 'aio-page-builder' ), $item_id ) ); ?>" />
 			</td>
 			<?php foreach ( $columns as $col_key ) : ?>
 				<td class="aio-col-<?php echo \esc_attr( \sanitize_html_class( $col_key ) ); ?>"><?php echo isset( $summary[ $col_key ] ) ? \wp_kses_post( (string) $summary[ $col_key ] ) : '—'; ?></td>

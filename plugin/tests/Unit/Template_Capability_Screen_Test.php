@@ -71,7 +71,7 @@ final class Template_Capability_Screen_Test extends TestCase {
 	 * Capability matrix completeness: template workflow caps are defined and in getAll().
 	 */
 	public function test_template_workflow_capabilities_exist_in_plugin_set(): void {
-		$all = Capabilities::getAll();
+		$all = Capabilities::get_all();
 		$this->assertContains( Capabilities::MANAGE_SECTION_TEMPLATES, $all );
 		$this->assertContains( Capabilities::MANAGE_PAGE_TEMPLATES, $all );
 		$this->assertContains( Capabilities::MANAGE_COMPOSITIONS, $all );

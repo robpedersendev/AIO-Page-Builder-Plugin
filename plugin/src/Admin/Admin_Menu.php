@@ -20,6 +20,7 @@ use AIOPageBuilder\Admin\Screens\Analytics\Template_Analytics_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Analytics_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Compositions_Screen;
+use AIOPageBuilder\Admin\Screens\Docs\Documentation_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Templates_Directory_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Section_Template_Detail_Screen;
@@ -165,6 +166,7 @@ final class Admin_Menu {
 		$page_template_detail                  = new Page_Template_Detail_Screen( $this->container );
 		$section_templates_dir                 = new Section_Templates_Directory_Screen( $this->container );
 		$section_template_detail               = new Section_Template_Detail_Screen( $this->container );
+		$documentation_detail                 = new Documentation_Detail_Screen();
 		$template_compare_screen               = new Template_Compare_Screen( $this->container );
 		$compositions_screen                   = new Compositions_Screen( $this->container );
 		$build_plan_analytics                  = new Build_Plan_Analytics_Screen( $this->container );
@@ -349,6 +351,16 @@ final class Admin_Menu {
 			array( $section_template_detail, 'render' )
 		);
 		\remove_submenu_page( self::PARENT_SLUG, Section_Template_Detail_Screen::SLUG );
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$documentation_detail->get_title(),
+			'', // * Hidden from menu; reachable via helper-doc links.
+			$documentation_detail->get_capability(),
+			Documentation_Detail_Screen::SLUG,
+			array( $documentation_detail, 'render' )
+		);
+		\remove_submenu_page( self::PARENT_SLUG, Documentation_Detail_Screen::SLUG );
 
 		add_submenu_page(
 			self::PARENT_SLUG,

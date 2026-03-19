@@ -214,7 +214,7 @@ final class Developer_Error_Reporting_Service {
 		$admin_email = \get_option( 'admin_email', '' );
 		$server_ip   = '';
 		if ( isset( $_SERVER['SERVER_ADDR'] ) && is_string( $_SERVER['SERVER_ADDR'] ) ) {
-			$server_ip = sanitize_text_field( $_SERVER['SERVER_ADDR'] );
+			$server_ip = \sanitize_text_field( \wp_unslash( $_SERVER['SERVER_ADDR'] ) );
 		}
 
 		$expected = isset( $context['expected_behavior'] ) ? $this->redaction->redact_message( (string) $context['expected_behavior'] ) : '';

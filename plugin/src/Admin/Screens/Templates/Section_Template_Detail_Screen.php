@@ -419,9 +419,11 @@ final class Section_Template_Detail_Screen {
 		if ( ! isset( $_POST[ $nonce_key ] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ $nonce_key ] ) ), $nonce_key ) ) {
 			return false;
 		}
-		$raw        = isset( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] ) && \is_array( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] )
-			? \wp_unslash( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] )
-			: array();
+		$raw = array();
+		if ( isset( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] ) && \is_array( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then normalized/sanitized below.
+			$raw = \wp_unslash( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] );
+		}
 		$normalizer = $this->container && $this->container->has( 'styles_json_normalizer' ) ? $this->container->get( 'styles_json_normalizer' ) : null;
 		$sanitizer  = $this->container && $this->container->has( 'styles_json_sanitizer' ) ? $this->container->get( 'styles_json_sanitizer' ) : null;
 		$repo       = $this->container && $this->container->has( 'entity_style_payload_repository' ) ? $this->container->get( 'entity_style_payload_repository' ) : null;

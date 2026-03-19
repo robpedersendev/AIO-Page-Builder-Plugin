@@ -16,12 +16,12 @@ $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Infrastructure/Config/Capabilities.php';
 
 /**
- * Capability source-of-truth: constants, getAll(), get_editor_defaults(), is_plugin_capability().
+ * Capability source-of-truth: constants, get_all(), get_editor_defaults(), is_plugin_capability().
  */
 final class Capabilities_Test extends TestCase {
 
 	public function test_get_all_returns_full_list_in_stable_order(): void {
-		$all = Capabilities::getAll();
+		$all = Capabilities::get_all();
 		$this->assertIsArray( $all );
 		$this->assertCount( 26, $all );
 		$this->assertSame( Capabilities::MANAGE_SETTINGS, $all[0] );
@@ -47,7 +47,7 @@ final class Capabilities_Test extends TestCase {
 	}
 
 	public function test_is_plugin_capability_returns_true_for_all_registered(): void {
-		foreach ( Capabilities::getAll() as $cap ) {
+		foreach ( Capabilities::get_all() as $cap ) {
 			$this->assertTrue( Capabilities::is_plugin_capability( $cap ), "Expected {$cap} to be a plugin capability" );
 		}
 	}

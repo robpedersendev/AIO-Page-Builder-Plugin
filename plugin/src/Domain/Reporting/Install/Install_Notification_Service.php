@@ -142,7 +142,7 @@ final class Install_Notification_Service {
 		$admin_email = \get_option( 'admin_email', '' );
 		$server_ip   = '';
 		if ( isset( $_SERVER['SERVER_ADDR'] ) && is_string( $_SERVER['SERVER_ADDR'] ) ) {
-			$server_ip = sanitize_text_field( $_SERVER['SERVER_ADDR'] );
+			$server_ip = \sanitize_text_field( \wp_unslash( $_SERVER['SERVER_ADDR'] ) );
 		}
 
 		$payload = array(

@@ -167,7 +167,7 @@ final class Stub_Plan_State_For_Queue implements Plan_State_For_Execution_Interf
 		return 0;
 	}
 
-	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status ): bool {
+	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null ): bool {
 		return true;
 	}
 }

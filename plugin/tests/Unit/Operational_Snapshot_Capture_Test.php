@@ -77,6 +77,11 @@ final class Stub_Operational_Snapshot_Repository implements Operational_Snapshot
 		}
 		return $out;
 	}
+
+	/** @inheritDoc */
+	public function list_rollback_entries_for_plan( string $plan_id ): array {
+		return array();
+	}
 }
 
 final class Operational_Snapshot_Capture_Test extends TestCase {

@@ -478,8 +478,8 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 	public function test_bulk_deny_all_eligible_not_executable_in_ui(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 793;
 		try {
-			$repo = new Build_Plan_Repository();
-			$def  = $this->step2_plan_definition( 1 );
+			$repo    = new Build_Plan_Repository();
+			$def     = $this->step2_plan_definition( 1 );
 			$post_id = $repo->save(
 				array(
 					'plan_definition' => $def,
@@ -490,18 +490,27 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 			);
 			$this->assertGreaterThan( 0, $post_id );
 
-			$bulk = new New_Page_Creation_Bulk_Action_Service( $repo );
+			$bulk  = new New_Page_Creation_Bulk_Action_Service( $repo );
 			$count = $bulk->bulk_deny_all_eligible( $post_id );
 			$this->assertSame( 1, $count );
 
-			$def2 = $repo->get_plan_definition( $post_id );
-			$resolver = new Build_Plan_Row_Action_Resolver();
-			$detail   = new New_Page_Creation_Detail_Builder();
+			$def2      = $repo->get_plan_definition( $post_id );
+			$resolver  = new Build_Plan_Row_Action_Resolver();
+			$detail    = new New_Page_Creation_Detail_Builder();
 			$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk );
-			$workspace = $ui->build_workspace( $def2, 2, array( 'can_approve' => true, 'can_execute' => true ), null, array() );
+			$workspace = $ui->build_workspace(
+				$def2,
+				2,
+				array(
+					'can_approve' => true,
+					'can_execute' => true,
+				),
+				null,
+				array()
+			);
 
 			$this->assertCount( 1, $workspace['step_list_rows'] );
-			$row_actions = $workspace['step_list_rows'][0]['row_actions'];
+			$row_actions    = $workspace['step_list_rows'][0]['row_actions'];
 			$execute_action = null;
 			foreach ( $row_actions as $a ) {
 				if ( ( $a['action_id'] ?? '' ) === 'execute' ) {
@@ -553,15 +562,24 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$detail    = new New_Page_Creation_Detail_Builder();
 		$bulk      = new New_Page_Creation_Bulk_Action_Service( new Build_Plan_Repository() );
 		$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk );
-		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true, 'can_execute' => true ), null, array() );
+		$workspace = $ui->build_workspace(
+			$def,
+			2,
+			array(
+				'can_approve' => true,
+				'can_execute' => true,
+			),
+			null,
+			array()
+		);
 		$this->assertCount( 1, $workspace['step_list_rows'] );
 		$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $workspace['step_list_rows'][0]['status'] );
 		$this->assertSame( 'rejected', $workspace['step_list_rows'][0]['status_badge'] );
 		$this->assertSame( 0, $workspace['bulk_action_states']['apply_to_all_eligible']['count_eligible'] );
 		$this->assertSame( 0, $workspace['bulk_action_states']['deny_all_eligible']['count_eligible'] );
-		$row_actions = $workspace['step_list_rows'][0]['row_actions'];
+		$row_actions    = $workspace['step_list_rows'][0]['row_actions'];
 		$execute_action = null;
-		$deny_action = null;
+		$deny_action    = null;
 		foreach ( $row_actions as $a ) {
 			if ( ( $a['action_id'] ?? '' ) === 'execute' ) {
 				$execute_action = $a;
@@ -580,8 +598,8 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 	public function test_bulk_deny_reduces_step2_unresolved_count(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 792;
 		try {
-			$repo = new Build_Plan_Repository();
-			$def  = $this->step2_plan_definition( 2 );
+			$repo    = new Build_Plan_Repository();
+			$def     = $this->step2_plan_definition( 2 );
 			$post_id = $repo->save(
 				array(
 					'plan_definition' => $def,
@@ -593,9 +611,9 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 			$this->assertGreaterThan( 0, $post_id );
 			$bulk = new New_Page_Creation_Bulk_Action_Service( $repo );
 			$bulk->bulk_deny_all_eligible( $post_id );
-			$def2 = $repo->get_plan_definition( $post_id );
+			$def2    = $repo->get_plan_definition( $post_id );
 			$stepper = new \AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder();
-			$steps = $stepper->build( $def2 );
+			$steps   = $stepper->build( $def2 );
 			$this->assertSame( 0, (int) ( $steps[2]['unresolved_count'] ?? -1 ) );
 		} finally {
 			unset( $GLOBALS['_aio_wp_insert_post_return'] );

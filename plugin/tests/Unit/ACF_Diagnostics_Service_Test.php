@@ -40,17 +40,22 @@ require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Type_Keys.php';
 require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Status_Families.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repository.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Section_Template_Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Section_Template_Repository.php';
+require_once $plugin_root . '/src/Domain/ACF/Blueprints/Section_Field_Blueprint_Service_Interface.php';
 require_once $plugin_root . '/src/Domain/ACF/Blueprints/Section_Field_Blueprint_Service.php';
 require_once $plugin_root . '/src/Domain/ACF/Registration/ACF_Field_Builder.php';
 require_once $plugin_root . '/src/Domain/ACF/Registration/ACF_Group_Builder.php';
+require_once $plugin_root . '/src/Domain/ACF/Registration/ACF_Group_Registrar_Interface.php';
 require_once $plugin_root . '/src/Domain/ACF/Registration/ACF_Group_Registrar.php';
 require_once $plugin_root . '/src/Domain/Registries/PageTemplate/Page_Template_Schema.php';
 require_once $plugin_root . '/src/Domain/Registries/Composition/Composition_Schema.php';
+require_once $plugin_root . '/src/Domain/Storage/Repositories/Page_Template_Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Page_Template_Repository.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Composition_Repository.php';
 require_once $plugin_root . '/src/Domain/Registries/Shared/Deprecation_Metadata.php';
 require_once $plugin_root . '/src/Domain/ACF/Assignment/Field_Group_Derivation_Service.php';
+require_once $plugin_root . '/src/Domain/ACF/Assignment/Page_Field_Group_Assignment_Service_Interface.php';
 require_once $plugin_root . '/src/Domain/ACF/Assignment/Page_Field_Group_Assignment_Service.php';
 require_once $plugin_root . '/src/Domain/ACF/Compatibility/Cleanup_Result.php';
 require_once $plugin_root . '/src/Domain/ACF/Compatibility/Field_Cleanup_Advisor.php';
@@ -121,6 +126,26 @@ final class Diagnostics_Wpdb_Stub {
 		if ( preg_match( '/LIMIT\s+(\d+)/', $query, $m ) ) {
 			$out = array_slice( $out, 0, (int) $m[1] ); }
 		return $out;
+	}
+
+	/**
+	 * Stub for wpdb::get_col — returns first column of matching rows (e.g. target_ref).
+	 *
+	 * @param string $query Prepared SQL query.
+	 * @return array<int, string>|null Column values or null on failure.
+	 */
+	public function get_col( string $query ): ?array {
+		$rows = $this->get_results( $query, \ARRAY_A );
+		if ( ! is_array( $rows ) ) {
+			return null;
+		}
+		$col = array();
+		foreach ( $rows as $row ) {
+			if ( isset( $row['target_ref'] ) && is_string( $row['target_ref'] ) ) {
+				$col[] = $row['target_ref'];
+			}
+		}
+		return $col;
 	}
 
 	public function delete( string $table, array $where, $where_format = null ): int|false {

@@ -21,7 +21,7 @@ use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Types;
  * Operationalizes acf-page-visibility-contract. Stores normalized assignments.
  * Callers must perform capability checks before mutating.
  */
-final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assignment_Service_Interface {
+class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assignment_Service_Interface {
 
 	/** @var Assignment_Map_Service */
 	private Assignment_Map_Service $assignment_map;
@@ -60,7 +60,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 		}
 
 		$assigned = $this->persist_field_groups( $page_ref, $derived );
-		do_action( 'aio_acf_assignment_changed', $page_id );
+		\do_action( 'aio_acf_assignment_changed', $page_id );
 		return array(
 			'assigned' => $assigned,
 			'errors'   => array(),
@@ -90,7 +90,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 		}
 
 		$assigned = $this->persist_field_groups( $page_ref, $derived );
-		do_action( 'aio_acf_assignment_changed', $page_id );
+		\do_action( 'aio_acf_assignment_changed', $page_id );
 		return array(
 			'assigned' => $assigned,
 			'errors'   => array(),

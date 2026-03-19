@@ -107,6 +107,21 @@ final class Compatibility_Service_Wpdb_Stub {
 		return $out;
 	}
 
+	/** Stub for wpdb::get_col — returns first column (e.g. target_ref) of matching rows. */
+	public function get_col( string $query ): ?array {
+		$rows = $this->get_results( $query, \ARRAY_A );
+		if ( ! is_array( $rows ) ) {
+			return null;
+		}
+		$col = array();
+		foreach ( $rows as $row ) {
+			if ( isset( $row['target_ref'] ) && is_string( $row['target_ref'] ) ) {
+				$col[] = $row['target_ref'];
+			}
+		}
+		return $col;
+	}
+
 	public function delete( string $table, array $where, $where_format = null ): int|false {
 		$store      = &$GLOBALS['_aio_assign_store'];
 		$map_type   = $where['map_type'] ?? '';

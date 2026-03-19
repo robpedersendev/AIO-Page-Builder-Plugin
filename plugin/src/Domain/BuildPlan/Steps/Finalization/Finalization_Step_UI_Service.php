@@ -19,7 +19,7 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
 
 /**
- * Shell-only UI for confirmation (finalization) step. No publish/swap execution.
+ * Finalization step UI: surfaces publish readiness, conflicts, and completion summary (spec §37).
  */
 final class Finalization_Step_UI_Service {
 
@@ -58,19 +58,44 @@ final class Finalization_Step_UI_Service {
 			return $this->empty_workspace();
 		}
 
-		$finalization_buckets         = array(
-			'publish_ready' => 0,
-			'blocked'       => 0,
-			'failed'        => 0,
-			'deferred'      => 0,
+		$counts         = $this->count_items_by_outcome( $plan_definition );
+		$conflicts      = $this->detect_conflicts( $plan_definition );
+		$conflict_count = count( $conflicts );
+
+		$completion_summary = null;
+		if ( isset( $plan_definition['completion_summary'] ) && is_array( $plan_definition['completion_summary'] ) ) {
+			$completion_summary = $plan_definition['completion_summary'];
+		}
+
+		$finalization_buckets = array(
+			'publish_ready' => (int) ( $completion_summary['published'] ?? 0 ),
+			'blocked'       => (int) ( $completion_summary['blocked'] ?? $conflict_count ),
+			'failed'        => (int) ( $completion_summary['failed'] ?? $counts['failed'] ),
+			'deferred'      => (int) ( $counts['pending'] + $counts['approved'] ),
 		);
-		$conflict_summary_placeholder = array(
-			'count'    => 0,
-			'messages' => array(),
+		$conflict_summary = array(
+			'count'    => $conflict_count,
+			'messages' => array_values(
+				array_slice(
+					array_map(
+						static function ( array $c ): string {
+							$msg = isset( $c['message'] ) ? (string) $c['message'] : '';
+							if ( $msg !== '' ) {
+								return $msg;
+							}
+							$type = isset( $c['type'] ) ? (string) $c['type'] : 'conflict';
+							return $type;
+						},
+						$conflicts
+					),
+					0,
+					5
+				)
+			),
 		);
-		$preview_link_placeholder     = array(
+		$preview_link = array(
 			'url'   => '',
-			'label' => \__( 'Preview not available in this version', 'aio-page-builder' ),
+			'label' => \__( 'View logs & rollback history', 'aio-page-builder' ),
 		);
 		$step_list_rows               = array();
 		$column_order                 = array( 'bucket', 'count', 'status' );
@@ -102,16 +127,21 @@ final class Finalization_Step_UI_Service {
 					'heading'       => \__( 'Finalization queue', 'aio-page-builder' ),
 					'key'           => 'queue',
 					'content_lines' => array(
-						\__( 'Finalization queue and publish actions are not available in this version.', 'aio-page-builder' ),
-						\__( 'Blocked: 0', 'aio-page-builder' ),
-						\__( 'Failed: 0', 'aio-page-builder' ),
-						\__( 'Deferred: 0', 'aio-page-builder' ),
+						sprintf( \__( 'Publish-ready: %d', 'aio-page-builder' ), (int) $finalization_buckets['publish_ready'] ),
+						sprintf( \__( 'Blocked: %d', 'aio-page-builder' ), (int) $finalization_buckets['blocked'] ),
+						sprintf( \__( 'Failed: %d', 'aio-page-builder' ), (int) $finalization_buckets['failed'] ),
+						sprintf( \__( 'Deferred: %d', 'aio-page-builder' ), (int) $finalization_buckets['deferred'] ),
 					),
 				),
 				array(
 					'heading'       => \__( 'Conflicts', 'aio-page-builder' ),
 					'key'           => 'conflicts',
-					'content_lines' => array( \__( 'Conflict reporting is not available in this version.', 'aio-page-builder' ) ),
+					'content_lines' => $conflict_count > 0
+						? array_merge(
+							array( sprintf( \__( 'Conflicts detected: %d', 'aio-page-builder' ), (int) $conflict_count ) ),
+							array_slice( $conflict_summary['messages'], 0, 3 )
+						)
+						: array( \__( 'No conflicts detected in the current plan state.', 'aio-page-builder' ) ),
 				),
 			),
 			'row_actions' => array(),
@@ -139,8 +169,8 @@ final class Finalization_Step_UI_Service {
 			'detail_panel'                 => $detail_panel,
 			'step_messages'                => $step_messages,
 			'finalization_buckets'         => $finalization_buckets,
-			'conflict_summary_placeholder' => $conflict_summary_placeholder,
-			'preview_link_placeholder'     => $preview_link_placeholder,
+			'conflict_summary'             => $conflict_summary,
+			'preview_link'                 => $preview_link,
 			'run_completion_state'         => $run_completion_state,
 			'finalization_summary'         => $finalization_summary,
 		);
@@ -183,16 +213,110 @@ final class Finalization_Step_UI_Service {
 				'failed'        => 0,
 				'deferred'      => 0,
 			),
-			'conflict_summary_placeholder' => array(
+			'conflict_summary'             => array(
 				'count'    => 0,
 				'messages' => array(),
 			),
-			'preview_link_placeholder'     => array(
+			'preview_link'                 => array(
 				'url'   => '',
-				'label' => \__( 'Preview not available in this version', 'aio-page-builder' ),
+				'label' => \__( 'View logs & rollback history', 'aio-page-builder' ),
 			),
 			'run_completion_state'         => '',
 			'finalization_summary'         => null,
 		);
+	}
+
+	/**
+	 * @param array<string, mixed> $definition
+	 * @return array{pending: int, approved: int, completed: int, rejected: int, failed: int}
+	 */
+	private function count_items_by_outcome( array $definition ): array {
+		$out   = array(
+			'pending'   => 0,
+			'approved'  => 0,
+			'completed' => 0,
+			'rejected'  => 0,
+			'failed'    => 0,
+		);
+		$steps = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+		foreach ( $steps as $step ) {
+			if ( ! is_array( $step ) ) {
+				continue;
+			}
+			$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+				? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+				: array();
+			foreach ( $items as $item ) {
+				if ( ! is_array( $item ) ) {
+					continue;
+				}
+				$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
+				if ( $status === 'completed' ) {
+					++$out['completed'];
+				} elseif ( $status === 'rejected' ) {
+					++$out['rejected'];
+				} elseif ( $status === 'failed' ) {
+					++$out['failed'];
+				} elseif ( $status === 'approved' || $status === 'in_progress' ) {
+					++$out['approved'];
+				} else {
+					++$out['pending'];
+				}
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Detects conflicts that block finalization (slug collisions across completed items).
+	 *
+	 * @param array<string, mixed> $definition
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function detect_conflicts( array $definition ): array {
+		$conflicts = array();
+		$slugs     = array();
+		$steps     = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+		foreach ( $steps as $step ) {
+			if ( ! is_array( $step ) ) {
+				continue;
+			}
+			$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+				? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+				: array();
+			foreach ( $items as $item ) {
+				if ( ! is_array( $item ) ) {
+					continue;
+				}
+				$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? '' );
+				if ( $status !== 'completed' ) {
+					continue;
+				}
+				$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+				$slug    = isset( $payload['page_slug_candidate'] ) && is_string( $payload['page_slug_candidate'] ) ? trim( $payload['page_slug_candidate'] ) : '';
+				if ( $slug === '' && isset( $payload['proposed_slug'] ) && is_string( $payload['proposed_slug'] ) ) {
+					$slug = trim( $payload['proposed_slug'] );
+				}
+				if ( $slug === '' && isset( $payload['target_slug'] ) && is_string( $payload['target_slug'] ) ) {
+					$slug = trim( $payload['target_slug'] );
+				}
+				if ( $slug === '' ) {
+					continue;
+				}
+				if ( isset( $slugs[ $slug ] ) ) {
+					$conflicts[] = array(
+						'type'    => 'slug_conflict',
+						'slug'    => $slug,
+						'message' => __( 'Duplicate slug in plan.', 'aio-page-builder' ),
+					);
+				}
+				$slugs[ $slug ] = true;
+			}
+		}
+		return $conflicts;
 	}
 }

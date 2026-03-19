@@ -30,14 +30,14 @@ final class Log_Severities_Test extends TestCase {
 	}
 
 	public function test_is_valid_accepts_all_constants(): void {
-		$this->assertTrue( Log_Severities::isValid( Log_Severities::INFO ) );
-		$this->assertTrue( Log_Severities::isValid( Log_Severities::WARNING ) );
-		$this->assertTrue( Log_Severities::isValid( Log_Severities::ERROR ) );
-		$this->assertTrue( Log_Severities::isValid( Log_Severities::CRITICAL ) );
+		$this->assertTrue( Log_Severities::is_valid( Log_Severities::INFO ) );
+		$this->assertTrue( Log_Severities::is_valid( Log_Severities::WARNING ) );
+		$this->assertTrue( Log_Severities::is_valid( Log_Severities::ERROR ) );
+		$this->assertTrue( Log_Severities::is_valid( Log_Severities::CRITICAL ) );
 	}
 
 	public function test_is_valid_rejects_unknown(): void {
-		$this->assertFalse( Log_Severities::isValid( 'debug' ) );
-		$this->assertFalse( Log_Severities::isValid( '' ) );
+		$this->assertFalse( Log_Severities::is_valid( 'debug' ) );
+		$this->assertFalse( Log_Severities::is_valid( '' ) );
 	}
 }

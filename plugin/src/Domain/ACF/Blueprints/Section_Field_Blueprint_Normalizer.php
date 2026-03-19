@@ -116,7 +116,7 @@ final class Section_Field_Blueprint_Normalizer {
 		if ( ! is_array( $fields ) ) {
 			return $blueprint;
 		}
-		$sanitized = Field_Key_Generator::sanitize( $section_key );
+		$sanitized                                   = Field_Key_Generator::sanitize( $section_key );
 		$section_key                                 = $sanitized !== '' ? $sanitized : 'x';
 		$filled                                      = $this->prefill_fields_keys( $fields, $section_key, null );
 		$blueprint[ Field_Blueprint_Schema::FIELDS ] = $filled;
@@ -137,7 +137,7 @@ final class Section_Field_Blueprint_Normalizer {
 			}
 			$sanitized_name = Field_Key_Generator::sanitize( (string) ( $field[ Field_Blueprint_Schema::FIELD_NAME ] ?? '' ) );
 			$name           = $sanitized_name !== '' ? $sanitized_name : 'field_' . ( $i + 1 );
-			$existing = (string) ( $field[ Field_Blueprint_Schema::FIELD_KEY ] ?? '' );
+			$existing       = (string) ( $field[ Field_Blueprint_Schema::FIELD_KEY ] ?? '' );
 			if ( $existing === '' || ! Field_Key_Generator::is_valid_key( $existing, 'field' ) ) {
 				if ( $parent_name !== null ) {
 					$field[ Field_Blueprint_Schema::FIELD_KEY ] = Field_Key_Generator::subfield_key( $section_key, $parent_name, $name );

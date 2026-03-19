@@ -170,6 +170,11 @@ if ( ! function_exists( 'add_action' ) ) {
 		// No-op for unit tests; CPT registration runs in WP context.
 	}
 }
+if ( ! function_exists( 'do_action' ) ) {
+	function do_action( $tag, ...$args ) {
+		// No-op for unit tests; hooks fire in WP context.
+	}
+}
 // * Stubs for heartbeat scheduler tests (spec §46.4, §53.5). Track scheduled state in $GLOBALS['_aio_cron_scheduled'].
 if ( ! function_exists( 'wp_next_scheduled' ) ) {
 	function wp_next_scheduled( $hook, $args = array() ) {
@@ -275,6 +280,39 @@ if ( ! function_exists( 'delete_user_meta' ) ) {
 if ( ! function_exists( 'get_transient' ) ) {
 	function get_transient( $key ) {
 		return isset( $GLOBALS['_aio_transients'][ $key ] ) ? $GLOBALS['_aio_transients'][ $key ] : false;
+	}
+}
+if ( ! function_exists( 'set_transient' ) ) {
+	function set_transient( $key, $value, $expiration = 0 ) {
+		if ( ! isset( $GLOBALS['_aio_transients'] ) || ! is_array( $GLOBALS['_aio_transients'] ) ) {
+			$GLOBALS['_aio_transients'] = array();
+		}
+		$GLOBALS['_aio_transients'][ $key ] = $value;
+		return true;
+	}
+}
+if ( ! function_exists( 'get_posts' ) ) {
+	function get_posts( $args = array() ) {
+		$posts = isset( $GLOBALS['_aio_wp_query_posts'] ) ? $GLOBALS['_aio_wp_query_posts'] : array();
+		$post_type = isset( $args['post_type'] ) ? $args['post_type'] : '';
+		if ( $post_type !== '' ) {
+			$by_type = array();
+			foreach ( $posts as $post ) {
+				$pt = is_object( $post ) ? ( $post->post_type ?? '' ) : ( $post['post_type'] ?? '' );
+				if ( $pt === $post_type ) {
+					$by_type[] = $post;
+				}
+			}
+			$posts = $by_type;
+		}
+		if ( ! empty( $args['fields'] ) && $args['fields'] === 'ids' ) {
+			$out = array();
+			foreach ( $posts as $post ) {
+				$out[] = is_object( $post ) ? ( $post->ID ?? 0 ) : ( $post['ID'] ?? 0 );
+			}
+			return $out;
+		}
+		return $posts;
 	}
 }
 if ( ! function_exists( 'delete_transient' ) ) {

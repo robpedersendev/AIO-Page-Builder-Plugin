@@ -25,7 +25,7 @@ use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
 /**
  * Turns approved plan items into an ordered list of execution envelopes.
  */
-final class Bulk_Executor {
+class Bulk_Executor {
 
 	/** Map plan item_type to execution action_type (spec §40.1). Non-mapped types are skipped. */
 	private const ITEM_TYPE_TO_ACTION_TYPE = array(

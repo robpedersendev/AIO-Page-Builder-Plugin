@@ -82,7 +82,7 @@ final class Uninstall_Cleanup_Service {
 		}
 
 		foreach ( Object_Type_Keys::all() as $post_type ) {
-			$posts = get_posts(
+			$posts = \get_posts(
 				array(
 					'post_type'      => $post_type,
 					'posts_per_page' => -1,

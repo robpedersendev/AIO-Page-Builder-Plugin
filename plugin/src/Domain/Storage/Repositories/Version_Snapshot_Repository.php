@@ -166,8 +166,8 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 	/** @inheritdoc */
 	protected function get_meta( int $post_id ): array {
 		$base                          = parent::get_meta( $post_id );
-		$scope_type_val = \get_post_meta( $post_id, self::META_SCOPE_TYPE, true );
-		$scope_id_val   = \get_post_meta( $post_id, self::META_SCOPE_ID, true );
+		$scope_type_val                = \get_post_meta( $post_id, self::META_SCOPE_TYPE, true );
+		$scope_id_val                  = \get_post_meta( $post_id, self::META_SCOPE_ID, true );
 		$base[ self::META_SCOPE_TYPE ] = ( $scope_type_val !== '' && $scope_type_val !== false ) ? (string) $scope_type_val : '';
 		$base[ self::META_SCOPE_ID ]   = ( $scope_id_val !== '' && $scope_id_val !== false ) ? (string) $scope_id_val : '';
 		$raw                           = \get_post_meta( $post_id, self::META_DEFINITION, true );

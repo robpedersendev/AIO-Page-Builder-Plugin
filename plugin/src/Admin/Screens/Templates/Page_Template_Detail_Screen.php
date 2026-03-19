@@ -348,10 +348,12 @@ final class Page_Template_Detail_Screen {
 		if ( ! isset( $_POST[ $nonce_key ] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ $nonce_key ] ) ), $nonce_key ) ) {
 			return false;
 		}
-		$form_key   = Entity_Style_Form_Builder::FORM_KEY;
-		$raw        = isset( $_POST[ $form_key ] ) && \is_array( $_POST[ $form_key ] )
-			? \wp_unslash( $_POST[ $form_key ] )
-			: array();
+		$form_key = Entity_Style_Form_Builder::FORM_KEY;
+		$raw      = array();
+		if ( isset( $_POST[ $form_key ] ) && \is_array( $_POST[ $form_key ] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then normalized/sanitized below.
+			$raw = \wp_unslash( $_POST[ $form_key ] );
+		}
 		$normalizer = $this->container && $this->container->has( 'styles_json_normalizer' ) ? $this->container->get( 'styles_json_normalizer' ) : null;
 		$sanitizer  = $this->container && $this->container->has( 'styles_json_sanitizer' ) ? $this->container->get( 'styles_json_sanitizer' ) : null;
 		$repo       = $this->container && $this->container->has( 'entity_style_payload_repository' ) ? $this->container->get( 'entity_style_payload_repository' ) : null;

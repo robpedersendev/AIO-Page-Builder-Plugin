@@ -129,7 +129,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 		$clear_nonce = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ) : '';
 		if ( isset( $_GET['aio_bundle_cancel'] ) && $clear_nonce !== '' && \wp_verify_nonce( $clear_nonce, self::NONCE_ACTION_CLEAR ) && \get_transient( $transient_key ) ) {
 			\delete_transient( $transient_key );
-			\wp_safe_redirect( \remove_query_arg( array( 'aio_bundle_cancel', '_wpnonce' ), \wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) );
+			$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( (string) $_SERVER['REQUEST_URI'] ) ) : '';
+			\wp_safe_redirect( \remove_query_arg( array( 'aio_bundle_cancel', '_wpnonce' ), $request_uri ) );
 			exit;
 		}
 		$preview = \get_transient( $transient_key );

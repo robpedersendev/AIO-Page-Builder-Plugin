@@ -30,12 +30,12 @@ final class Log_Categories_Test extends TestCase {
 
 	public function test_is_valid_accepts_all_constants(): void {
 		foreach ( Log_Categories::all() as $cat ) {
-			$this->assertTrue( Log_Categories::isValid( $cat ), "Category {$cat} should be valid" );
+			$this->assertTrue( Log_Categories::is_valid( $cat ), "Category {$cat} should be valid" );
 		}
 	}
 
 	public function test_is_valid_rejects_unknown(): void {
-		$this->assertFalse( Log_Categories::isValid( 'misc' ) );
-		$this->assertFalse( Log_Categories::isValid( '' ) );
+		$this->assertFalse( Log_Categories::is_valid( 'misc' ) );
+		$this->assertFalse( Log_Categories::is_valid( '' ) );
 	}
 }

@@ -27,7 +27,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Status;
 /**
  * Queue job creation and dispatch through the single-action executor or rollback executor.
  */
-final class Execution_Job_Dispatcher {
+class Execution_Job_Dispatcher {
 
 	/** @var Job_Queue_Repository_Interface */
 	private $job_queue_repository;

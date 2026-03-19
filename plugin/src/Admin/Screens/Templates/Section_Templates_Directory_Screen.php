@@ -54,9 +54,17 @@ final class Section_Templates_Directory_Screen {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
-		$state_builder                              = $this->get_state_builder();
-		$raw_paged                                  = isset( $_GET['paged'] ) ? \wp_unslash( $_GET['paged'] ) : null;
-		$raw_per_page                               = isset( $_GET['per_page'] ) ? \wp_unslash( $_GET['per_page'] ) : null;
+		$state_builder = $this->get_state_builder();
+		$raw_paged     = null;
+		if ( isset( $_GET['paged'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then cast to int for paged.
+			$raw_paged = \wp_unslash( $_GET['paged'] );
+		}
+		$raw_per_page = null;
+		if ( isset( $_GET['per_page'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then cast to int for per_page.
+			$raw_per_page = \wp_unslash( $_GET['per_page'] );
+		}
 		$request                                    = array(
 			'purpose_family'       => isset( $_GET['purpose_family'] ) ? \sanitize_key( \wp_unslash( $_GET['purpose_family'] ) ) : '',
 			'cta_classification'   => isset( $_GET['cta_classification'] ) ? \sanitize_key( \wp_unslash( $_GET['cta_classification'] ) ) : '',
