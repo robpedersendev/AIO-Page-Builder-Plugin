@@ -47,12 +47,16 @@ final class Export_Manifest_Builder {
 		$timestamp      = gmdate( 'Y-m-d\TH:i:s\Z' );
 		$plugin_version = Versions::plugin();
 		$schema_version = Versions::export_schema();
+		$version_state  = \get_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_VERSION_STATE, array() );
+		$version_state  = is_array( $version_state ) ? $version_state : array();
 
 		$manifest = array(
 			'export_type'           => $export_type,
 			'export_timestamp'      => $timestamp,
 			'plugin_version'        => $plugin_version,
 			'schema_version'        => $schema_version,
+			'version_map'           => Versions::all(),
+			'version_state'         => $version_state,
 			'source_site_url'       => $source_site_url,
 			'included_categories'   => $included_categories,
 			'excluded_categories'   => $excluded_categories,

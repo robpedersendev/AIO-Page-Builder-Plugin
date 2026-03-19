@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\Reporting\UI;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Bootstrap\Constants;
+use AIOPageBuilder\Bootstrap\Environment_Validator;
 use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Result;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -55,6 +56,7 @@ final class Privacy_Settings_State_Builder {
 			'retention_state'               => $this->build_retention_state(),
 			'uninstall_export_state'        => $this->build_uninstall_export_state(),
 			'environment_summary'           => $this->build_environment_summary(),
+			'environment_diagnostics'       => $this->build_environment_diagnostics(),
 			'version_summary'               => $this->build_version_summary(),
 			'report_destination_summary'    => $this->build_report_destination_summary(),
 			'privacy_helper_text'           => $this->build_privacy_helper_text(),
@@ -153,6 +155,20 @@ final class Privacy_Settings_State_Builder {
 			'php_version' => $php,
 			'wp_version'  => $wp !== '' ? $wp : __( 'Unknown', 'aio-page-builder' ),
 		);
+	}
+
+	/**
+	 * Returns persisted diagnostics snapshot, generating one if missing.
+	 *
+	 * @return array{generated_at: string, checks: array<int, array<string, mixed>>}
+	 */
+	private function build_environment_diagnostics(): array {
+		$raw = \get_option( Option_Names::PB_ENVIRONMENT_DIAGNOSTICS, array() );
+		if ( is_array( $raw ) && isset( $raw['generated_at'] ) && isset( $raw['checks'] ) ) {
+			return $raw;
+		}
+		$validator = new Environment_Validator();
+		return $validator->build_snapshot( true );
 	}
 
 	/**

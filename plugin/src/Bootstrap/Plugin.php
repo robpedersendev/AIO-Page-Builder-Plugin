@@ -163,6 +163,7 @@ require_once $bootstrap_dir . '/../Admin/Screens/Templates/Template_Compare_Scre
 require_once $bootstrap_dir . '/../Admin/Admin_Menu.php';
 require_once $bootstrap_dir . '/../Infrastructure/Privacy/Personal_Data_Exporter.php';
 require_once $bootstrap_dir . '/../Infrastructure/Privacy/Personal_Data_Eraser.php';
+require_once $bootstrap_dir . '/../Infrastructure/Config/Capabilities.php';
 
 /**
  * Plugin bootstrap. Activation, deactivation, and run() are the only public entrypoints.
@@ -229,11 +230,33 @@ final class Plugin {
 		$registrar = new Module_Registrar( $container );
 		$registrar->register_bootstrap();
 		$this->container = $registrar->container();
+		if ( is_admin() ) {
+			add_action( 'admin_init', array( $this, 'maybe_do_first_run_redirect' ), 5 );
+		}
 		add_filter( 'wp_privacy_personal_data_exporters', array( self::class, 'register_personal_data_exporter' ), 10, 1 );
 		add_filter( 'wp_privacy_personal_data_erasers', array( self::class, 'register_personal_data_eraser' ), 10, 1 );
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'register_admin_menu' ), 10 );
 		}
+	}
+
+	/**
+	 * One-time first run redirect after activation.
+	 *
+	 * @return void
+	 */
+	public function maybe_do_first_run_redirect(): void {
+		if ( ! \current_user_can( \AIOPageBuilder\Infrastructure\Config\Capabilities::MANAGE_SETTINGS ) ) {
+			return;
+		}
+		$flag = \get_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT, '' );
+		$flag = is_string( $flag ) ? $flag : '';
+		if ( $flag !== '1' ) {
+			return;
+		}
+		\delete_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT );
+		\wp_safe_redirect( \admin_url( 'admin.php?page=aio-page-builder-dashboard' ) );
+		exit;
 	}
 
 	/**

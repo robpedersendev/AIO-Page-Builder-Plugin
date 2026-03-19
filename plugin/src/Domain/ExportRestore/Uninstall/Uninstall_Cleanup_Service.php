@@ -141,4 +141,26 @@ final class Uninstall_Cleanup_Service {
 		}
 		return $count;
 	}
+
+	/**
+	 * Runs cleanup only when uninstall cleanup mode has been explicitly confirmed.
+	 * Default behavior is to preserve plugin-owned data on uninstall when no confirmation exists.
+	 *
+	 * @return array{cleanup_ran: bool, mode: string, cleanup_result?: array<string, mixed>}
+	 */
+	public function cleanup_if_confirmed(): array {
+		$mode = \get_option( Option_Names::PB_UNINSTALL_CLEANUP_MODE, '' );
+		$mode = is_string( $mode ) ? trim( $mode ) : '';
+		if ( $mode !== 'confirmed_cleanup' ) {
+			return array(
+				'cleanup_ran' => false,
+				'mode'        => $mode !== '' ? $mode : 'preserve_default',
+			);
+		}
+		return array(
+			'cleanup_ran'     => true,
+			'mode'            => $mode,
+			'cleanup_result'  => $this->cleanup_plugin_owned_data( self::SCOPE_FULL ),
+		);
+	}
 }

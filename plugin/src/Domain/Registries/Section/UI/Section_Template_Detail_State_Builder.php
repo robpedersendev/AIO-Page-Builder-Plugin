@@ -21,7 +21,6 @@ use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Context;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
-use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Versioning_Service;
 use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
@@ -151,7 +150,7 @@ final class Section_Template_Detail_State_Builder {
 
 		$field_summary       = $this->build_field_summary( $section_key, $definition );
 		$helper_ref          = (string) ( $definition[ Section_Schema::FIELD_HELPER_REF ] ?? $side_panel['helper_ref'] ?? '' );
-		$helper_doc_url      = $this->build_helper_doc_url( $helper_ref );
+		$helper_doc_route    = $this->build_helper_doc_route( $helper_ref );
 		$compatibility       = $definition['compatibility'] ?? array();
 		$compatibility_notes = \is_array( $compatibility ) ? $compatibility : array();
 
@@ -210,7 +209,7 @@ final class Section_Template_Detail_State_Builder {
 			'side_panel'                  => $side_panel,
 			'field_summary'               => $field_summary,
 			'helper_ref'                  => $helper_ref,
-			'helper_doc_url'              => $helper_doc_url,
+			'helper_doc_route'            => $helper_doc_route,
 			'compatibility_notes'         => $compatibility_notes,
 			'lpagery_compatibility_state' => $lpagery_compatibility_state,
 			'preview_payload'             => $preview_payload,
@@ -268,41 +267,26 @@ final class Section_Template_Detail_State_Builder {
 	 * @param string $helper_ref
 	 * @return string
 	 */
-	private function build_helper_doc_url( string $helper_ref ): string {
+	private function build_helper_doc_route( string $helper_ref ): array {
 		$helper_ref = \sanitize_text_field( $helper_ref );
 		if ( $helper_ref === '' ) {
-			return '';
+			return array();
 		}
-		$registry = new Documentation_Registry();
-		$doc_id   = '';
-		$key      = '';
 		if ( str_starts_with( $helper_ref, 'doc-helper-' ) ) {
-			$doc_id = $helper_ref;
-		} elseif ( str_starts_with( $helper_ref, 'helper_' ) ) {
-			$key = \sanitize_key( substr( $helper_ref, strlen( 'helper_' ) ) );
-		} else {
-			$key = \sanitize_key( $helper_ref );
-		}
-
-		if ( $doc_id !== '' ) {
-			$doc = $registry->get_by_id( $doc_id );
-			if ( $doc === null ) {
-				return '';
-			}
-			return \admin_url(
-				'admin.php?page=' . \AIOPageBuilder\Admin\Screens\Docs\Documentation_Detail_Screen::SLUG . '&doc_id=' . \rawurlencode( $doc_id )
+			return array(
+				'name' => 'documentation_detail',
+				'args' => array( 'doc_id' => $helper_ref ),
 			);
 		}
-		if ( $key !== '' ) {
-			$doc = $registry->get_by_section_key( $key );
-			if ( $doc === null ) {
-				return '';
-			}
-			return \admin_url(
-				'admin.php?page=' . \AIOPageBuilder\Admin\Screens\Docs\Documentation_Detail_Screen::SLUG . '&section=' . \rawurlencode( $key )
-			);
-		}
-		return '';
+		$key = str_starts_with( $helper_ref, 'helper_' )
+			? \sanitize_key( substr( $helper_ref, strlen( 'helper_' ) ) )
+			: \sanitize_key( $helper_ref );
+		return $key !== ''
+			? array(
+				'name' => 'documentation_detail',
+				'args' => array( 'section' => $key ),
+			)
+			: array();
 	}
 
 	/**

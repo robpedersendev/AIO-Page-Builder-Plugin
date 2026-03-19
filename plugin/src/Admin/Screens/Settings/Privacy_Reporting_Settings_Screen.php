@@ -118,6 +118,29 @@ final class Privacy_Reporting_Settings_Screen {
 				<h2 id="aio-env-heading"><?php \esc_html_e( 'Environment & version', 'aio-page-builder' ); ?></h2>
 				<p><?php \esc_html_e( 'Plugin version:', 'aio-page-builder' ); ?> <strong><?php echo \esc_html( $state['version_summary']['plugin_version'] ); ?></strong></p>
 				<p><?php \esc_html_e( 'PHP:', 'aio-page-builder' ); ?> <?php echo \esc_html( $state['environment_summary']['php_version'] ); ?> — <?php \esc_html_e( 'WordPress:', 'aio-page-builder' ); ?> <?php echo \esc_html( $state['environment_summary']['wp_version'] ); ?></p>
+				<?php
+				$diag = $state['environment_diagnostics'] ?? null;
+				if ( is_array( $diag ) && ! empty( $diag['checks'] ) && is_array( $diag['checks'] ) ) :
+					?>
+					<p class="description">
+						<?php
+						printf(
+							/* translators: %s: ISO timestamp */
+							\esc_html__( 'Diagnostics snapshot generated at %s.', 'aio-page-builder' ),
+							\esc_html( (string) ( $diag['generated_at'] ?? '' ) )
+						);
+						?>
+					</p>
+					<ul>
+						<?php foreach ( array_slice( $diag['checks'], 0, 8 ) as $check ) : ?>
+							<?php
+							$sev = isset( $check['severity'] ) ? (string) $check['severity'] : '';
+							$msg = isset( $check['message'] ) ? (string) $check['message'] : '';
+							?>
+							<li><strong><?php echo \esc_html( strtoupper( $sev ) ); ?></strong> — <?php echo \esc_html( $msg ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
 			</section>
 
 			<section class="aio-report-destination" aria-labelledby="aio-destination-heading">

@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Bootstrap;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Infrastructure\Config\Dependency_Requirements;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Single validation outcome: category, severity, code, message, blocking flag.
@@ -59,9 +60,9 @@ final class Validation_Result {
  */
 final class Environment_Validator {
 
-	public const SEVERITY_BLOCKING = 'blocking_failure';
+	public const SEVERITY_BLOCKING = 'blocking';
 	public const SEVERITY_WARNING  = 'warning';
-	public const SEVERITY_INFO     = 'informational';
+	public const SEVERITY_INFO     = 'info';
 
 	public const CATEGORY_PLATFORM             = 'platform';
 	public const CATEGORY_REQUIRED_DEPENDENCY  = 'required_dependency';
@@ -96,6 +97,27 @@ final class Environment_Validator {
 		$this->run_theme_posture_checks();
 		$this->run_extension_pack_detection();
 		$this->run_runtime_readiness_checks();
+	}
+
+	/**
+	 * Builds and (optionally) persists environment diagnostics snapshot.
+	 *
+	 * @param bool $persist Whether to persist to option.
+	 * @return array{generated_at: string, checks: list<array{category: string, severity: string, code: string, message: string, is_blocking: bool}>}
+	 */
+	public function build_snapshot( bool $persist = true ): array {
+		$this->validate();
+		$snapshot = array(
+			'generated_at' => gmdate( 'c' ),
+			'checks'       => array_map(
+				static fn( Validation_Result $r ) => $r->to_array(),
+				$this->results
+			),
+		);
+		if ( $persist ) {
+			\update_option( Option_Names::PB_ENVIRONMENT_DIAGNOSTICS, $snapshot, false );
+		}
+		return $snapshot;
 	}
 
 	/** @return Validation_Result[] */
@@ -243,8 +265,38 @@ final class Environment_Validator {
 	}
 
 	private function run_theme_posture_checks(): void {
-		// Placeholder: theme compatibility / GeneratePress posture. Later prompt.
-		// No add() unless we have a concrete check; avoids noise.
+		if ( ! function_exists( 'wp_get_theme' ) ) {
+			return;
+		}
+		$theme = \wp_get_theme();
+		$slug  = strtolower( (string) $theme->get_stylesheet() );
+		if ( $slug === 'generatepress' ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_THEME_POSTURE,
+					self::SEVERITY_INFO,
+					'theme_generatepress_supported',
+					__( 'Theme: GeneratePress (supported target).', 'aio-page-builder' ),
+					false
+				)
+			);
+			return;
+		}
+		$name  = (string) $theme->get( 'Name' );
+		$label = $name !== '' ? $name : $slug;
+		$this->add(
+			new Validation_Result(
+				self::CATEGORY_THEME_POSTURE,
+				self::SEVERITY_WARNING,
+				'theme_not_generatepress_warning',
+				sprintf(
+					/* translators: %s: theme name */
+					__( 'Theme: %s. GeneratePress is the supported target; other block-capable themes are generally supported but may require additional review.', 'aio-page-builder' ),
+					$label !== '' ? $label : __( 'Unknown', 'aio-page-builder' )
+				),
+				false
+			)
+		);
 	}
 
 	/**
@@ -288,11 +340,159 @@ final class Environment_Validator {
 	}
 
 	private function run_runtime_readiness_checks(): void {
-		// Placeholder: uploads directory readiness.
-		// Placeholder: mail/report transport.
-		// Placeholder: scheduler readiness.
-		// Placeholder: provider readiness.
-		// No add() for now.
+		$this->check_uploads_readiness();
+		$this->check_scheduler_readiness();
+		$this->check_reporting_transport_readiness();
+		$this->check_provider_readiness();
+	}
+
+	private function check_uploads_readiness(): void {
+		if ( ! function_exists( 'wp_upload_dir' ) ) {
+			return;
+		}
+		$dir  = \wp_upload_dir( null, false );
+		$err  = isset( $dir['error'] ) ? (string) $dir['error'] : '';
+		$path = isset( $dir['basedir'] ) ? (string) $dir['basedir'] : '';
+		if ( $err !== '' ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_BLOCKING,
+					'uploads_unavailable_blocking',
+					__( 'Uploads directory is not available. Export, import, and support packages require a working uploads directory.', 'aio-page-builder' ),
+					true
+				)
+			);
+			return;
+		}
+		if ( $path === '' || ! is_dir( $path ) || ! is_writable( $path ) ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_BLOCKING,
+					'uploads_not_writable_blocking',
+					__( 'Uploads directory is not writable. Export/import/preview caches require filesystem write access.', 'aio-page-builder' ),
+					true
+				)
+			);
+		} else {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_INFO,
+					'uploads_ready',
+					__( 'Uploads directory is available and writable.', 'aio-page-builder' ),
+					false
+				)
+			);
+		}
+	}
+
+	private function check_reporting_transport_readiness(): void {
+		if ( ! function_exists( 'wp_mail' ) ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_WARNING,
+					'wp_mail_unavailable_warning',
+					__( 'wp_mail() is not available. Reporting transports may fail.', 'aio-page-builder' ),
+					false
+				)
+			);
+			return;
+		}
+		$log = \get_option( Option_Names::REPORTING_LOG, array() );
+		$last = is_array( $log ) && ! empty( $log ) ? end( $log ) : null;
+		$last_status = is_array( $last ) ? (string) ( $last['status'] ?? '' ) : '';
+		if ( $last_status === 'failed' ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_WARNING,
+					'reporting_last_failure_warning',
+					__( 'Reporting last delivery attempt failed. See reporting log for details.', 'aio-page-builder' ),
+					false
+				)
+			);
+		} else {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_INFO,
+					'reporting_transport_callable',
+					__( 'Reporting transport is available (wp_mail).', 'aio-page-builder' ),
+					false
+				)
+			);
+		}
+	}
+
+	private function check_scheduler_readiness(): void {
+		$disabled = defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON;
+		if ( $disabled ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_WARNING,
+					'wp_cron_disabled_warning',
+					__( 'WP-Cron is disabled (DISABLE_WP_CRON). Scheduled reporting and automated maintenance may not run unless a real cron triggers wp-cron.php.', 'aio-page-builder' ),
+					false
+				)
+			);
+		}
+		$hook = \AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler::CRON_HOOK;
+		$registered = function_exists( 'has_action' ) ? ( has_action( $hook ) !== false ) : true;
+		if ( ! $registered ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_WARNING,
+					'heartbeat_hook_not_registered_warning',
+					__( 'Heartbeat cron hook is not registered. Reporting provider may not be loaded.', 'aio-page-builder' ),
+					false
+				)
+			);
+		}
+		$scheduled = function_exists( 'wp_next_scheduled' ) ? \wp_next_scheduled( $hook ) : false;
+		if ( ! $scheduled ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_WARNING,
+					'heartbeat_not_scheduled_warning',
+					__( 'Heartbeat schedule is not currently set. Activate the plugin (or re-save schedules) to register cron events.', 'aio-page-builder' ),
+					false
+				)
+			);
+		}
+	}
+
+	private function check_provider_readiness(): void {
+		$provider_ref = \get_option( Option_Names::PROVIDER_CONFIG_REF, array() );
+		$has_any      = is_array( $provider_ref ) && ! empty( $provider_ref );
+		if ( ! $has_any ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_WARNING,
+					'ai_provider_not_configured_warning',
+					__( 'No AI provider configuration was found. AI planning workflows will not run until a provider is configured.', 'aio-page-builder' ),
+					false
+				)
+			);
+		}
+		$health = \get_option( Option_Names::PROVIDER_HEALTH_STATE, array() );
+		if ( is_array( $health ) && isset( $health['last_connection_test_status'] ) && (string) $health['last_connection_test_status'] === 'failed' ) {
+			$this->add(
+				new Validation_Result(
+					self::CATEGORY_RUNTIME_READINESS,
+					self::SEVERITY_WARNING,
+					'ai_provider_last_test_failed_warning',
+					__( 'Last AI provider connection test failed. Update credentials and re-test.', 'aio-page-builder' ),
+					false
+				)
+			);
+		}
 	}
 
 	private function load_plugin_api(): void {

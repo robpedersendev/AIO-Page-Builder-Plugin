@@ -20,6 +20,21 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Versions {
 
+	/** Plugin release version (synced with Constants::plugin_version()). */
+	public const PLUGIN_VERSION = 'plugin';
+
+	/** Global schema contract version (spec-controlled). */
+	public const GLOBAL_SCHEMA_VERSION = '1';
+
+	/** Custom table schema version for dbDelta-managed tables. */
+	public const TABLE_SCHEMA_VERSION = '1';
+
+	/** Registry schema version for section/page/composition/doc registries. */
+	public const REGISTRY_SCHEMA_VERSION = '1';
+
+	/** Export bundle/manifest schema version. */
+	public const EXPORT_SCHEMA_VERSION = '1';
+
 	/**
 	 * Stable version map keys. Do not rename; append only for new domains.
 	 *
@@ -45,10 +60,10 @@ final class Versions {
 		}
 		self::$map = array(
 			'plugin'          => \AIOPageBuilder\Bootstrap\Constants::plugin_version(),
-			'global_schema'   => '1',  // Initial placeholder; advance when global schema contract is set.
-			'table_schema'    => '1',  // Initial placeholder; advance when custom tables are introduced.
-			'registry_schema' => '1',  // Initial placeholder; advance when registry format is locked.
-			'export_schema'   => '1',  // Initial placeholder; advance when export manifest is defined.
+			'global_schema'   => self::GLOBAL_SCHEMA_VERSION,
+			'table_schema'    => self::TABLE_SCHEMA_VERSION,
+			'registry_schema' => self::REGISTRY_SCHEMA_VERSION,
+			'export_schema'   => self::EXPORT_SCHEMA_VERSION,
 		);
 		return self::$map;
 	}

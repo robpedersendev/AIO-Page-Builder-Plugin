@@ -131,16 +131,15 @@ final class Section_Template_Detail_State_Builder_Test extends TestCase {
 		$this->assertArrayHasKey( 'preview_payload', $state );
 	}
 
-	public function test_build_state_resolves_helper_doc_url_when_doc_exists(): void {
+	public function test_build_state_resolves_helper_doc_route_when_doc_ref_exists(): void {
 		$def               = $this->minimal_section_definition( 'cta_contact_01' );
 		$def['helper_ref'] = 'doc-helper-cta_contact_01';
 		$builder           = $this->create_state_builder( $def );
 		$state             = $builder->build_state( 'cta_contact_01', array() );
 		$this->assertFalse( $state['not_found'] );
 		$this->assertSame( 'doc-helper-cta_contact_01', $state['helper_ref'] );
-		$this->assertIsString( $state['helper_doc_url'] );
-		$this->assertNotSame( '', $state['helper_doc_url'] );
-		$this->assertStringContainsString( 'aio-page-builder-documentation-detail', $state['helper_doc_url'] );
+		$this->assertIsArray( $state['helper_doc_route'] );
+		$this->assertSame( 'documentation_detail', $state['helper_doc_route']['name'] ?? '' );
 	}
 
 	public function test_build_state_field_summary_from_embedded_blueprint(): void {

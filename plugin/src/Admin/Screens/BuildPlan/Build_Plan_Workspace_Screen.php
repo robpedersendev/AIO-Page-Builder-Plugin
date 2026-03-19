@@ -731,7 +731,8 @@ final class Build_Plan_Workspace_Screen {
 	 * @param string               $plan_id   Plan ID.
 	 */
 	private function inject_step1_action_urls( array &$workspace, string $plan_id ): void {
-		$base  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
+		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$base   = $router ? (string) $router->url( 'build_plan_workspace', array( 'plan_id' => $plan_id, 'step' => 1 ) ) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
 		$nonce = \wp_create_nonce( self::NONCE_ACTION_STEP1_REVIEW );
 		$rows  = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
@@ -744,7 +745,7 @@ final class Build_Plan_Workspace_Screen {
 				$workspace['step_list_rows'][ $i ]['row_actions'] = $this->add_urls_to_approve_deny( $actions, $item_id, $base, $nonce );
 				$template_key                                     = (string) ( $row['summary_columns']['target_template'] ?? $row['existing_page_template_change_summary']['template_key'] ?? '' );
 				if ( $template_key !== '' ) {
-					$detail_url  = \add_query_arg(
+					$detail_url  = $router ? (string) $router->url( 'page_template_detail', array( 'template' => $template_key ) ) : \add_query_arg(
 						array(
 							'page'     => Page_Template_Detail_Screen::SLUG,
 							'template' => $template_key,
@@ -792,9 +793,18 @@ final class Build_Plan_Workspace_Screen {
 		if ( ! isset( $workspace['preview_link'] ) || ! is_array( $workspace['preview_link'] ) ) {
 			return;
 		}
-		$workspace['preview_link']['url'] = \admin_url(
-			'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK
-		);
+		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$workspace['preview_link']['url'] = $router
+			? (string) $router->url(
+				'build_plan_workspace',
+				array(
+					'plan_id' => $plan_id,
+					'step'    => \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK,
+				)
+			)
+			: \admin_url(
+				'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK
+			);
 	}
 
 	/**
@@ -804,7 +814,8 @@ final class Build_Plan_Workspace_Screen {
 	 * @param string               $plan_id  Plan ID.
 	 */
 	private function inject_step2_action_urls( array &$workspace, string $plan_id ): void {
-		$base  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
+		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$base   = $router ? (string) $router->url( 'build_plan_workspace', array( 'plan_id' => $plan_id, 'step' => 2 ) ) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
 		$nonce = \wp_create_nonce( self::NONCE_ACTION_STEP2_REVIEW );
 		$rows  = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
@@ -817,7 +828,7 @@ final class Build_Plan_Workspace_Screen {
 				$workspace['step_list_rows'][ $i ]['row_actions'] = $this->add_urls_to_approve_deny( $actions, $item_id, $base, $nonce );
 				$template_key                                     = (string) ( $row['summary_columns']['template_key'] ?? '' );
 				if ( $template_key !== '' ) {
-					$detail_url  = \add_query_arg(
+					$detail_url  = $router ? (string) $router->url( 'page_template_detail', array( 'template' => $template_key ) ) : \add_query_arg(
 						array(
 							'page'     => Page_Template_Detail_Screen::SLUG,
 							'template' => $template_key,

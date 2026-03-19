@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Holds provider configs and builds shortcode embed strings from (provider_id, form_id).
  */
-final class Form_Provider_Registry {
+class Form_Provider_Registry {
 
 	/** ACF field name for provider identifier in form sections. */
 	public const FIELD_FORM_PROVIDER = 'form_provider';

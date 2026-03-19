@@ -66,6 +66,9 @@ final class Option_Names {
 	/** Global styling settings (tokens, component overrides); plugin-owned, removed on uninstall (spec ?17.10, styling contract ?8). */
 	public const GLOBAL_STYLE_SETTINGS = 'aio_global_style_settings';
 
+	/** Applied design tokens (execution-applied; merged on read by Global_Style_Settings_Repository). */
+	public const APPLIED_DESIGN_TOKENS = self::PREFIX . 'applied_design_tokens';
+
 	/** Per-entity style payloads (section/page template overrides); plugin-owned, removed on uninstall. */
 	public const ENTITY_STYLE_PAYLOADS = 'aio_entity_style_payloads';
 
@@ -97,6 +100,17 @@ final class Option_Names {
 	private static ?array $all = null;
 
 	/**
+	 * Production readiness / lifecycle options (explicit keys; do not prefix-change).
+	 * These are referenced by external operational docs and lifecycle hooks.
+	 */
+	public const PB_DO_FIRST_RUN_REDIRECT      = 'aio_pb_do_first_run_redirect';
+	public const PB_INSTALLATION_ID            = 'aio_pb_installation_id';
+	public const PB_UNINSTALL_CLEANUP_MODE     = 'aio_pb_uninstall_cleanup_mode';
+	public const PB_LAST_DEACTIVATION_AT       = 'aio_pb_last_deactivation_at';
+	public const PB_VERSION_STATE              = 'aio_pb_version_state';
+	public const PB_ENVIRONMENT_DIAGNOSTICS    = 'aio_pb_environment_diagnostics';
+
+	/**
 	 * Returns all known option keys in stable order.
 	 *
 	 * @return list<string>
@@ -122,6 +136,7 @@ final class Option_Names {
 			self::ONBOARDING_DRAFT,
 			self::PROMPT_EXPERIMENTS,
 			self::GLOBAL_STYLE_SETTINGS,
+			self::APPLIED_DESIGN_TOKENS,
 			self::ENTITY_STYLE_PAYLOADS,
 			self::STYLE_CACHE_VERSION,
 			self::APPLIED_INDUSTRY_PRESET,
@@ -131,6 +146,13 @@ final class Option_Names {
 			self::DISABLED_INDUSTRY_PACKS,
 			self::INDUSTRY_CACHE_VERSION,
 			self::INDUSTRY_PROFILE_AUDIT_TRAIL,
+			// Production readiness / lifecycle state (non-exportable unless explicitly included in export manifest).
+			self::PB_DO_FIRST_RUN_REDIRECT,
+			self::PB_INSTALLATION_ID,
+			self::PB_UNINSTALL_CLEANUP_MODE,
+			self::PB_LAST_DEACTIVATION_AT,
+			self::PB_VERSION_STATE,
+			self::PB_ENVIRONMENT_DIAGNOSTICS,
 		);
 		return self::$all;
 	}

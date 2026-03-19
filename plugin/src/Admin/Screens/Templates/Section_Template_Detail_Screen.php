@@ -156,7 +156,14 @@ final class Section_Template_Detail_Screen {
 		$placement     = (string) ( $side_panel['placement_tendency'] ?? '' );
 		$field_ref     = (string) ( $side_panel['field_blueprint_ref'] ?? '' );
 		$helper_ref    = (string) ( $state['helper_ref'] ?? '' );
-		$helper_url    = (string) ( $state['helper_doc_url'] ?? '' );
+		$helper_url    = '';
+		$route         = $state['helper_doc_route'] ?? array();
+		if ( is_array( $route ) && isset( $route['name'] ) && is_string( $route['name'] ) ) {
+			$args = isset( $route['args'] ) && is_array( $route['args'] ) ? $route['args'] : array();
+			$helper_url = $this->container && $this->container->has( 'admin_router' )
+				? (string) $this->container->get( 'admin_router' )->url( $route['name'], $args )
+				: '';
+		}
 		$compat        = $state['compatibility_notes'] ?? array();
 		$field_summary = $state['field_summary'] ?? array();
 		$in_compare    = $section_key !== '' && \in_array( $section_key, Template_Compare_Screen::get_compare_list( 'section' ), true );

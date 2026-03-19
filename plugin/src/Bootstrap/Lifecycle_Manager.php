@@ -16,6 +16,7 @@ require_once __DIR__ . '/../Infrastructure/Config/Dependency_Requirements.php';
 require_once __DIR__ . '/../Infrastructure/Config/Capabilities.php';
 require_once __DIR__ . '/../Infrastructure/Config/Option_Names.php';
 require_once __DIR__ . '/../Infrastructure/Config/Versions.php';
+require_once __DIR__ . '/../Infrastructure/Config/Version_State_Service.php';
 require_once __DIR__ . '/../Infrastructure/Settings/Settings_Service.php';
 require_once __DIR__ . '/../Domain/Storage/Migrations/Migration_Contract.php';
 require_once __DIR__ . '/../Domain/Storage/Migrations/Schema_Version_Tracker.php';
@@ -233,7 +234,21 @@ final class Lifecycle_Manager {
 	}
 
 	private function init_options(): Lifecycle_Result {
-		// Placeholder: no option writes in this prompt. Later prompt owns option initialization.
+		$settings = new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+
+		$installation_id = $settings->get( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_INSTALLATION_ID );
+		if ( ! is_string( $installation_id ) || trim( $installation_id ) === '' ) {
+			$settings->set( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_INSTALLATION_ID, \wp_generate_uuid4() );
+		}
+
+		// First-run redirect is a real, single-use flag consumed by Bootstrap\Plugin (admin_init).
+		if ( $settings->get( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT ) === null ) {
+			$settings->set( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT, '1' );
+		}
+
+		$version_state = new \AIOPageBuilder\Infrastructure\Config\Version_State_Service();
+		$version_state->persist_current_state();
+
 		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'init_options' );
 	}
 
@@ -320,7 +335,6 @@ final class Lifecycle_Manager {
 	}
 
 	private function first_run_redirect_readiness(): Lifecycle_Result {
-		// Placeholder: no redirect. Later prompt owns first-time setup / redirect to Dashboard or Onboarding.
 		return new Lifecycle_Result( Lifecycle_Result::STATUS_SUCCESS, '', 'first_run_redirect_readiness' );
 	}
 
@@ -503,6 +517,7 @@ final class Lifecycle_Manager {
 
 	private function unschedule(): void {
 		\AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler::unschedule();
+		\update_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_LAST_DEACTIVATION_AT, gmdate( 'c' ), false );
 	}
 
 	private function teardown_runtime(): void {
@@ -519,6 +534,6 @@ final class Lifecycle_Manager {
 
 	private function cleanup_plugin_data(): void {
 		$cleanup = new \AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Cleanup_Service();
-		$cleanup->cleanup_plugin_owned_data( \AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Cleanup_Service::SCOPE_FULL );
+		$cleanup->cleanup_if_confirmed();
 	}
 }

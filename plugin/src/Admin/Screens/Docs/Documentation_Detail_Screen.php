@@ -16,8 +16,16 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 final class Documentation_Detail_Screen {
+
+	/** @var Service_Container|null */
+	private ?Service_Container $container;
+
+	public function __construct( ?Service_Container $container = null ) {
+		$this->container = $container;
+	}
 
 	public const SLUG = 'aio-page-builder-documentation-detail';
 
@@ -54,6 +62,11 @@ final class Documentation_Detail_Screen {
 		<div class="wrap aio-page-builder-screen aio-documentation-detail" role="main" aria-label="<?php echo \esc_attr( $title ); ?>">
 			<h1 class="wp-heading-inline"><?php echo \esc_html( $title ); ?></h1>
 			<hr class="wp-header-end" />
+			<p>
+				<a class="button button-secondary" href="<?php echo \esc_url( \admin_url( 'admin.php?page=aio-page-builder-section-templates' ) ); ?>">
+					<?php \esc_html_e( 'Back to Section Templates', 'aio-page-builder' ); ?>
+				</a>
+			</p>
 
 			<?php if ( ! \is_array( $doc ) ) : ?>
 				<div class="notice notice-error"><p><?php \esc_html_e( 'Documentation not found.', 'aio-page-builder' ); ?></p></div>

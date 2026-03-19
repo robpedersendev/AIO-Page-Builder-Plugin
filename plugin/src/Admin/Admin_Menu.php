@@ -166,7 +166,7 @@ final class Admin_Menu {
 		$page_template_detail                  = new Page_Template_Detail_Screen( $this->container );
 		$section_templates_dir                 = new Section_Templates_Directory_Screen( $this->container );
 		$section_template_detail               = new Section_Template_Detail_Screen( $this->container );
-		$documentation_detail                 = new Documentation_Detail_Screen();
+		$documentation_detail                 = new Documentation_Detail_Screen( $this->container );
 		$template_compare_screen               = new Template_Compare_Screen( $this->container );
 		$compositions_screen                   = new Compositions_Screen( $this->container );
 		$build_plan_analytics                  = new Build_Plan_Analytics_Screen( $this->container );
