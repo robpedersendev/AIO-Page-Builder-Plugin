@@ -57,11 +57,11 @@ final class Post_Release_Health_Screen {
 		$export_action = isset( $_GET['export_summary'] ) && $_GET['export_summary'] === '1';
 
 		if ( $export_action ) {
-			$this->export_summary( $date_from ?: null, $date_to ?: null );
+			$this->export_summary( $date_from !== '' ? $date_from : null, $date_to !== '' ? $date_to : null );
 			return;
 		}
 
-		$state   = $this->build_state( $date_from ?: null, $date_to ?: null );
+		$state   = $this->build_state( $date_from !== '' ? $date_from : null, $date_to !== '' ? $date_to : null );
 		$summary = $state['post_release_health_summary'] ?? array();
 		$scores  = $state['domain_health_scores'] ?? array();
 		$items   = $state['recommended_investigation_items'] ?? array();

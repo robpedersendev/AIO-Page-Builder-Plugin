@@ -155,7 +155,7 @@ final class Section_Validator {
 		if ( (string) $status === 'deprecated' ) {
 			$dep = $normalized['deprecation'] ?? array();
 			if ( is_array( $dep ) && ! empty( $dep['reason'] ) ) {
-				// * Reason recommended but not strictly required by schema for traceability.
+				// * Reason recommended but not strictly required by schema for traceability. No validation error.
 			}
 		}
 

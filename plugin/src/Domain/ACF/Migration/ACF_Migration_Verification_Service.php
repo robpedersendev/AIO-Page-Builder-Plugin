@@ -284,7 +284,7 @@ final class ACF_Migration_Verification_Service {
 	/**
 	 * Builds mirror coherence (registry vs optional simulated mirror manifest).
 	 *
-	 * @param array<string, mixed> $options simulated_mirror_manifest => array (optional)
+	 * @param array<string, mixed> $options simulated_mirror_manifest => array (optional).
 	 * @return array<string, mixed>
 	 */
 	public function build_mirror_coherence( array $options = array() ): array {

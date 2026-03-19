@@ -60,7 +60,7 @@ class New_Page_ACF_Registration_Context_Resolver {
 		if ( ! is_admin() || $pagenow !== 'post-new.php' ) {
 			return false;
 		}
-		$post_type = isset( $_GET['post_type'] ) ? \sanitize_key( (string) $_GET['post_type'] ) : '';
+		$post_type = isset( $_GET['post_type'] ) ? \sanitize_key( \wp_unslash( $_GET['post_type'] ) ) : '';
 		if ( $post_type === '' ) {
 			$post_type = get_post_type_object( 'page' ) ? 'page' : '';
 		}

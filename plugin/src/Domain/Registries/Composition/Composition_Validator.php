@@ -134,7 +134,7 @@ final class Composition_Validator {
 			}
 			$key = (string) ( $item[ Composition_Schema::SECTION_ITEM_KEY ] ?? '' );
 			if ( $key === '' || $prev_key === null ) {
-				$prev_key = $key ?: $prev_key;
+				$prev_key = ( $key !== '' && $key !== null ) ? $key : $prev_key;
 				continue;
 			}
 			$prev_section = $this->section_registry->get_by_key( $prev_key );

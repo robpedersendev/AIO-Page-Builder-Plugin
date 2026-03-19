@@ -37,7 +37,9 @@ final class Option_Store {
 		return is_array( $raw ) ? $raw : array();
 	}
 
-	/** @param array<string, mixed> $value Caller must sanitize; no secrets. */
+	/**
+	 * @param array<string, mixed> $value Caller-sanitized value; must not contain secrets.
+	 */
 	public function set_main_settings( array $value ): void {
 		$this->settings->set( self::KEY_MAIN, $value );
 	}
@@ -48,7 +50,9 @@ final class Option_Store {
 		return is_array( $raw ) ? $raw : array();
 	}
 
-	/** @param array<string, mixed> $value Caller must sanitize; no secrets. */
+	/**
+	 * @param array<string, mixed> $value Caller-sanitized value; must not contain secrets.
+	 */
 	public function set_reporting_settings( array $value ): void {
 		$this->settings->set( self::KEY_REPORTING, $value );
 	}

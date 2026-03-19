@@ -52,7 +52,7 @@ final class Table_Installer {
 			if ( ! $result['success'] ) {
 				return array(
 					'success'      => false,
-					'message'      => $result['error'] ?: 'Table creation or upgrade failed.',
+					'message'      => ( $result['error'] !== '' && $result['error'] !== null ) ? $result['error'] : 'Table creation or upgrade failed.',
 					'failed_table' => $name,
 				);
 			}
@@ -74,6 +74,7 @@ final class Table_Installer {
 	 */
 	public function table_exists( string $suffix ): bool {
 		$full   = Table_Names::full_name( $this->wpdb, $suffix );
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared via wpdb->prepare; table name from Table_Names.
 		$result = $this->wpdb->get_var( $this->wpdb->prepare( 'SHOW TABLES LIKE %s', $full ) );
 		return $result === $full;
 	}

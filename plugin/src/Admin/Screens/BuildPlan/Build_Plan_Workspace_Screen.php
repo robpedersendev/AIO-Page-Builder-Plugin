@@ -181,7 +181,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_STEP2_REVIEW ) ) {
 				return false;
 			}
-			if ( $action !== 'bulk_build_all_step2' && $action !== 'bulk_build_selected_step2' ) {
+			if ( $action !== 'bulk_build_all_step2' && $action !== 'bulk_build_selected_step2' && $action !== 'bulk_deny_step2' ) {
 				return false;
 			}
 			if ( ! $this->container || ! $this->container->has( 'new_page_creation_bulk_action_service' ) ) {
@@ -198,6 +198,11 @@ final class Build_Plan_Workspace_Screen {
 			$service = $this->container->get( 'new_page_creation_bulk_action_service' );
 			if ( $action === 'bulk_build_all_step2' ) {
 				$service->bulk_approve_all_eligible( $plan_post_id );
+			} elseif ( $action === 'bulk_deny_step2' ) {
+				$count = $service->bulk_deny_all_eligible( $plan_post_id );
+				if ( $count > 0 && \function_exists( 'error_log' ) ) {
+					\error_log( sprintf( 'AIO Build Plan: bulk_deny step=2 plan_post_id=%d count=%d actor=%s', $plan_post_id, $count, (string) \get_current_user_id() ) );
+				}
 			} else {
 				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array values sanitized via array_map below.
 				$raw_step2   = isset( $_POST['aio_step2_selected_ids'] ) && is_array( $_POST['aio_step2_selected_ids'] ) ? \wp_unslash( $_POST['aio_step2_selected_ids'] ) : array();
@@ -225,8 +230,12 @@ final class Build_Plan_Workspace_Screen {
 			$service = $this->container->get( 'new_page_creation_bulk_action_service' );
 			if ( $get_action === 'approve_item' ) {
 				$service->approve_item( $plan_post_id, $item_id );
+			} else {
+				$updated = $service->deny_item( $plan_post_id, $item_id );
+				if ( $updated && \function_exists( 'error_log' ) ) {
+					\error_log( sprintf( 'AIO Build Plan: deny step=2 plan_post_id=%d item_id=%s actor=%s', $plan_post_id, $item_id, (string) \get_current_user_id() ) );
+				}
 			}
-			// Deny (reject) for Step 2: not implemented in bulk service; no-op to avoid broken link.
 			\wp_safe_redirect( $redirect_url );
 			exit;
 		}
@@ -921,9 +930,12 @@ final class Build_Plan_Workspace_Screen {
 	private function render_step2_bulk_forms( array $bulk_states, string $nonce_html, array $selected_ids ): void {
 		$build_all         = $bulk_states['apply_to_all_eligible'] ?? array();
 		$build_sel         = $bulk_states['apply_to_selected'] ?? array();
+		$deny_all          = $bulk_states['deny_all_eligible'] ?? array();
 		$clear_sel         = $bulk_states['clear_selection'] ?? array();
 		$build_all_enabled = ! empty( $build_all['enabled'] );
 		$build_sel_enabled = ! empty( $build_sel['enabled'] );
+		$deny_all_enabled   = ! empty( $deny_all['enabled'] );
+		$deny_all_count     = (int) ( $deny_all['count_eligible'] ?? 0 );
 		$clear_enabled     = ! empty( $clear_sel['enabled'] );
 		$build_all_count   = (int) ( $build_all['count_eligible'] ?? 0 );
 		$build_sel_count   = (int) ( $build_sel['count_selected'] ?? 0 );
@@ -951,6 +963,16 @@ final class Build_Plan_Workspace_Screen {
 					<?php \esc_html_e( 'Build Selected Pages', 'aio-page-builder' ); ?>
 					<?php if ( $build_sel_count > 0 ) : ?>
 						<span class="aio-bulk-count">(<?php echo (int) $build_sel_count; ?>)</span>
+					<?php endif; ?>
+				</button>
+			</form>
+			<form method="post" class="aio-bulk-form aio-bulk-deny-all-step2" style="display:inline">
+				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<input type="hidden" name="aio_build_plan_action" value="bulk_deny_step2" />
+				<button type="submit" class="button button-secondary" <?php echo $deny_all_enabled ? '' : ' disabled="disabled"'; ?>>
+					<?php \esc_html_e( 'Deny All New Pages', 'aio-page-builder' ); ?>
+					<?php if ( $deny_all_count > 0 ) : ?>
+						<span class="aio-bulk-count">(<?php echo (int) $deny_all_count; ?>)</span>
 					<?php endif; ?>
 				</button>
 			</form>

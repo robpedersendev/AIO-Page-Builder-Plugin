@@ -146,7 +146,7 @@ final class HTML_Fetcher {
 				$response_time_ms,
 				null,
 				$headers_subset,
-				$final_url ?: $normalized_url
+				( $final_url !== '' && $final_url !== null ) ? $final_url : $normalized_url
 			);
 		}
 		if ( $code < 200 || $code >= 300 ) {

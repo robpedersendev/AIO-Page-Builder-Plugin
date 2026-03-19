@@ -19,19 +19,19 @@ use AIOPageBuilder\Infrastructure\Config\Dependency_Requirements;
  */
 final class Validation_Result {
 
-	/** Category: platform (WP/PHP), required_dependency, optional_integration, theme_posture, runtime_readiness */
+	/** @var string Category: platform (WP/PHP), required_dependency, optional_integration, theme_posture, runtime_readiness */
 	public string $category;
 
-	/** Severity: blocking_failure, warning, informational */
+	/** @var string Severity: blocking_failure, warning, informational */
 	public string $severity;
 
-	/** Stable code for this rule (see environment-validation-contract.md) */
+	/** @var string Stable code for this rule (see environment-validation-contract.md) */
 	public string $code;
 
-	/** Admin-safe message; no sensitive server details */
+	/** @var string Admin-safe message; no sensitive server details */
 	public string $message;
 
-	/** Whether this result blocks activation or the affected workflow */
+	/** @var bool Whether this result blocks activation or the affected workflow */
 	public bool $is_blocking;
 
 	public function __construct( string $category, string $severity, string $code, string $message, bool $is_blocking ) {

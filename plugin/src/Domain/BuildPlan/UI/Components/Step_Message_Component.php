@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Renders one message. Payload: severity, message (or summary), optional level, related_object, retry_eligible, log_reference.
  *
- * step_messages payload shape (for list): array of message arrays, each:
+ * Step_messages payload shape (for list): array of message arrays, each:
  *   - severity: info | warning | error | success
  *   - message or summary: string (plain-language)
  *   - level (optional): plan | step | row

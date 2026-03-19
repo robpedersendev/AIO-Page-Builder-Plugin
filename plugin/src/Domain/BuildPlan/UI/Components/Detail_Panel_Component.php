@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Renders detail panel for one selected item. Payload: item_id, sections, row_actions (optional).
  *
- * detail_panel_sections: array of section arrays, each:
+ * Detail_panel_sections: array of section arrays, each:
  *   - heading: string
  *   - content: string (HTML, pre-escaped by caller) or content_lines: array of strings
  *   - key (optional): string for CSS/data

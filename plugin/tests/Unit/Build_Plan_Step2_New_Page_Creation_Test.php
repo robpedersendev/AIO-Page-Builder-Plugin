@@ -254,7 +254,7 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$this->assertCount( 2, $payload['messages'] );
 	}
 
-	/** Bulk eligibility: build_all_eligible and build_selected_eligible. */
+	/** Bulk eligibility: build_all_eligible, build_selected_eligible, deny_all_eligible. */
 	public function test_bulk_eligibility_payload(): void {
 		$repo = new Build_Plan_Repository();
 		$bulk = new New_Page_Creation_Bulk_Action_Service( $repo );
@@ -262,9 +262,10 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$el   = $bulk->get_bulk_eligibility( $def );
 		$this->assertSame( 2, $el['build_all_eligible'] );
 		$this->assertSame( 2, $el['build_selected_eligible'] );
+		$this->assertSame( 2, $el['deny_all_eligible'] );
 	}
 
-	/** Build-all and build-selected disabled when no pending. */
+	/** Build-all, build-selected, and deny-all disabled when no pending. */
 	public function test_bulk_disabled_when_no_eligible(): void {
 		$def = $this->step2_plan_definition( 1 );
 		$def[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ][0]['status'] = Build_Plan_Item_Statuses::APPROVED;
@@ -275,9 +276,10 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
 		$states    = $workspace['bulk_action_states'];
 		$this->assertFalse( $states['apply_to_all_eligible']['enabled'] );
+		$this->assertFalse( $states['deny_all_eligible']['enabled'] );
 	}
 
-	/** Unauthorized: can_approve false disables bulk and row approve. */
+	/** Unauthorized: can_approve false disables bulk and row approve/deny. */
 	public function test_unauthorized_bulk_disabled(): void {
 		$resolver  = new Build_Plan_Row_Action_Resolver();
 		$detail    = new New_Page_Creation_Detail_Builder();
@@ -286,15 +288,21 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$def       = $this->step2_plan_definition( 1 );
 		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => false ), null, array() );
 		$this->assertFalse( $workspace['bulk_action_states']['apply_to_all_eligible']['enabled'] );
+		$this->assertFalse( $workspace['bulk_action_states']['deny_all_eligible']['enabled'] );
 		$approve_action = null;
+		$deny_action    = null;
 		foreach ( $workspace['step_list_rows'][0]['row_actions'] as $a ) {
 			if ( ( $a['action_id'] ?? '' ) === 'approve' ) {
 				$approve_action = $a;
-				break;
+			}
+			if ( ( $a['action_id'] ?? '' ) === 'deny' ) {
+				$deny_action = $a;
 			}
 		}
 		$this->assertNotNull( $approve_action );
 		$this->assertFalse( $approve_action['enabled'] );
+		$this->assertNotNull( $deny_action );
+		$this->assertFalse( $deny_action['enabled'] );
 	}
 
 	/** Post-build placeholder in row and detail. */
@@ -381,6 +389,78 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		} finally {
 			unset( $GLOBALS['_aio_wp_insert_post_return'] );
 		}
+	}
+
+	/** Deny item (reject) updates status via repository; denied item is terminal and not executed. */
+	public function test_deny_item_step2(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 889;
+		try {
+			$repo    = new Build_Plan_Repository();
+			$def     = $this->step2_plan_definition( 1 );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-step2-deny',
+					'post_title'      => 'Test Plan Step2 Deny',
+					'status'          => 'publish',
+				)
+			);
+			$this->assertGreaterThan( 0, $post_id );
+			$bulk    = new New_Page_Creation_Bulk_Action_Service( $repo );
+			$updated = $bulk->deny_item( $post_id, 'plan_npc_0' );
+			$this->assertTrue( $updated );
+			$def2 = $repo->get_plan_definition( $post_id );
+			$item = $def2[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ][0] ?? null;
+			$this->assertNotNull( $item );
+			$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $item['status'] );
+			$this->assertTrue( Build_Plan_Item_Statuses::is_terminal( $item['status'] ) );
+		} finally {
+			unset( $GLOBALS['_aio_wp_insert_post_return'] );
+		}
+	}
+
+	/** Bulk deny all eligible updates all pending to rejected. */
+	public function test_bulk_deny_all_eligible_step2(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 790;
+		try {
+			$repo    = new Build_Plan_Repository();
+			$def     = $this->step2_plan_definition( 3 );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-bulk-deny',
+					'post_title'      => 'Test Plan Bulk Deny',
+					'status'          => 'publish',
+				)
+			);
+			$this->assertGreaterThan( 0, $post_id );
+			$bulk  = new New_Page_Creation_Bulk_Action_Service( $repo );
+			$count = $bulk->bulk_deny_all_eligible( $post_id );
+			$this->assertSame( 3, $count );
+			$def2  = $repo->get_plan_definition( $post_id );
+			$items = $def2[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ] ?? array();
+			foreach ( $items as $item ) {
+				$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $item['status'] );
+			}
+		} finally {
+			unset( $GLOBALS['_aio_wp_insert_post_return'] );
+		}
+	}
+
+	/** Denied item shows rejected badge and is excluded from unresolved (terminal status). */
+	public function test_denied_item_shows_rejected_and_is_terminal(): void {
+		$def = $this->step2_plan_definition( 1 );
+		$def[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ][0]['status'] = Build_Plan_Item_Statuses::REJECTED;
+		$resolver  = new Build_Plan_Row_Action_Resolver();
+		$detail    = new New_Page_Creation_Detail_Builder();
+		$bulk      = new New_Page_Creation_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui        = new New_Page_Creation_UI_Service( $resolver, $detail, $bulk );
+		$workspace = $ui->build_workspace( $def, 2, array( 'can_approve' => true ), null, array() );
+		$this->assertCount( 1, $workspace['step_list_rows'] );
+		$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $workspace['step_list_rows'][0]['status'] );
+		$this->assertSame( 'rejected', $workspace['step_list_rows'][0]['status_badge'] );
+		$this->assertSame( 0, $workspace['bulk_action_states']['apply_to_all_eligible']['count_eligible'] );
+		$this->assertSame( 0, $workspace['bulk_action_states']['deny_all_eligible']['count_eligible'] );
 	}
 
 	/** update_plan_items_by_ids updates only selected pending items. */

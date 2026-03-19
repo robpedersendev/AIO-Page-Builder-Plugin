@@ -327,7 +327,11 @@ final class Build_Plan_Item_Generator {
 	}
 
 	/**
-	 * @param array<string, mixed> $payload
+	 * @param string               $item_id         Item identifier.
+	 * @param string               $item_type      Item type key.
+	 * @param array<string, mixed> $payload        Item payload.
+	 * @param string               $source_section Source section key.
+	 * @param int                  $source_index   Source index.
 	 * @param array<string, mixed> $record_snapshot For source traceability (redacted by caller if needed).
 	 * @return array<string, mixed>
 	 */

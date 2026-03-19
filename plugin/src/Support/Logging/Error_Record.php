@@ -55,6 +55,7 @@ final class Error_Record {
 	 * @param string $target_object Optional.
 	 * @param string $remediation_hint Optional.
 	 * @param string $context_reference Optional job/plan/run reference.
+	 * @throws \InvalidArgumentException When category or severity is invalid.
 	 */
 	public function __construct(
 		string $id,
@@ -68,9 +69,11 @@ final class Error_Record {
 		string $context_reference = ''
 	) {
 		if ( ! Log_Categories::isValid( $category ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; category is validated.
 			throw new \InvalidArgumentException( 'Invalid log category: ' . $category );
 		}
 		if ( ! Log_Severities::isValid( $severity ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; severity is validated.
 			throw new \InvalidArgumentException( 'Invalid log severity: ' . $severity );
 		}
 		$this->id                = $id;

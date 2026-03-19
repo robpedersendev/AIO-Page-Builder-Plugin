@@ -66,7 +66,7 @@ final class Menu_Change_Job_Service implements Menu_Change_Job_Service_Interface
 			if ( $existing_id <= 0 ) {
 				return Menu_Change_Result::failure( __( 'Menu to rename could not be resolved.', 'aio-page-builder' ), array( Execution_Action_Contract::ERROR_TARGET_NOT_FOUND ) );
 			}
-			return $this->do_rename( $existing_id, $menu_name ?: null );
+			return $this->do_rename( $existing_id, ( $menu_name !== '' && $menu_name !== null ) ? $menu_name : null );
 		}
 		if ( $action === 'replace' ) {
 			return $this->do_replace( $menu_name, $location_slug, $items, $menu_context );
@@ -196,7 +196,7 @@ final class Menu_Change_Job_Service implements Menu_Change_Job_Service_Interface
 			$item_data = array(
 				'menu-item-position' => $position,
 				'menu-item-type'     => $type,
-				'menu-item-title'    => $title !== '' ? $title : ( $url ?: (string) $object_id ),
+				'menu-item-title'    => $title !== '' ? $title : ( ( $url !== '' && $url !== null ) ? $url : (string) $object_id ),
 				'menu-item-status'   => 'publish',
 			);
 			if ( $url !== '' ) {

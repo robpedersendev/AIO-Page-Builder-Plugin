@@ -104,7 +104,7 @@ final class Section_Field_Blueprint_Service implements Section_Field_Blueprint_S
 			return null;
 		}
 
-		$result = $this->normalizer->normalize( $blueprint_raw, $section_key, $field_blueprint_ref ?: null );
+		$result = $this->normalizer->normalize( $blueprint_raw, $section_key, ( $field_blueprint_ref !== '' && $field_blueprint_ref !== null ) ? $field_blueprint_ref : null );
 		if ( ! empty( $result['errors'] ) ) {
 			return null;
 		}

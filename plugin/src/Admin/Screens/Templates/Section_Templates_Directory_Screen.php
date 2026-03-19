@@ -56,15 +56,15 @@ final class Section_Templates_Directory_Screen {
 
 		$state_builder                              = $this->get_state_builder();
 		$request                                    = array(
-			'purpose_family'       => isset( $_GET['purpose_family'] ) ? \sanitize_key( (string) $_GET['purpose_family'] ) : '',
-			'cta_classification'   => isset( $_GET['cta_classification'] ) ? \sanitize_key( (string) $_GET['cta_classification'] ) : '',
-			'variation_family_key' => isset( $_GET['variation_family_key'] ) ? \sanitize_key( (string) $_GET['variation_family_key'] ) : '',
-			'all'                  => isset( $_GET['all'] ) && (string) $_GET['all'] === '1',
-			'status'               => isset( $_GET['status'] ) ? \sanitize_key( (string) $_GET['status'] ) : '',
-			'search'               => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['search'] ) ) : '',
-			'paged'                => isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1,
-			'per_page'             => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $_GET['per_page'] ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
-			'industry_view'        => isset( $_GET['industry_view'] ) ? \sanitize_key( (string) $_GET['industry_view'] ) : Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY,
+			'purpose_family'       => isset( $_GET['purpose_family'] ) ? \sanitize_key( \wp_unslash( $_GET['purpose_family'] ) ) : '',
+			'cta_classification'   => isset( $_GET['cta_classification'] ) ? \sanitize_key( \wp_unslash( $_GET['cta_classification'] ) ) : '',
+			'variation_family_key' => isset( $_GET['variation_family_key'] ) ? \sanitize_key( \wp_unslash( $_GET['variation_family_key'] ) ) : '',
+			'all'                  => isset( $_GET['all'] ) && \sanitize_key( \wp_unslash( $_GET['all'] ) ) === '1',
+			'status'               => isset( $_GET['status'] ) ? \sanitize_key( \wp_unslash( $_GET['status'] ) ) : '',
+			'search'               => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( $_GET['search'] ) ) : '',
+			'paged'                => isset( $_GET['paged'] ) ? max( 1, (int) \wp_unslash( $_GET['paged'] ) ) : 1,
+			'per_page'             => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) \wp_unslash( $_GET['per_page'] ) ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
+			'industry_view'        => isset( $_GET['industry_view'] ) ? \sanitize_key( \wp_unslash( $_GET['industry_view'] ) ) : Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY,
 		);
 		$state                                      = $state_builder->build_state( $request );
 		$state                                      = $this->enrich_state_with_industry( $state, $request );

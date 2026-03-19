@@ -39,7 +39,8 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 	public function save_definition( array $definition ): int {
 		$comp_id = (string) ( $definition[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
 		$status  = (string) ( $definition[ Composition_Schema::FIELD_STATUS ] ?? 'draft' );
-		$name    = (string) ( $definition[ Composition_Schema::FIELD_NAME ] ?? $comp_id ?: 'Untitled' );
+		$name_raw = $definition[ Composition_Schema::FIELD_NAME ] ?? $comp_id;
+		$name    = (string) ( $name_raw !== '' && $name_raw !== null ? $name_raw : 'Untitled' );
 
 		$data = array(
 			'internal_key' => $comp_id,
@@ -145,8 +146,10 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 			$decoded = json_decode( $raw, true );
 			if ( is_array( $decoded ) ) {
 				$base['definition']              = $decoded;
-				$base[ self::META_INTERNAL_KEY ] = $base[ self::META_INTERNAL_KEY ] ?: ( $decoded[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
-				$base[ self::META_STATUS ]       = $base[ self::META_STATUS ] ?: ( $decoded[ Composition_Schema::FIELD_STATUS ] ?? '' );
+				$ik = $base[ self::META_INTERNAL_KEY ];
+				$st = $base[ self::META_STATUS ];
+				$base[ self::META_INTERNAL_KEY ] = ( $ik !== '' && $ik !== null && $ik !== false ) ? $ik : ( $decoded[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
+				$base[ self::META_STATUS ]       = ( $st !== '' && $st !== null && $st !== false ) ? $st : ( $decoded[ Composition_Schema::FIELD_STATUS ] ?? '' );
 			}
 		}
 		return $base;

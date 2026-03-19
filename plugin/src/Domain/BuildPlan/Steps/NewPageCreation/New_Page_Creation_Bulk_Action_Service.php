@@ -2,8 +2,9 @@
 /**
  * Step 2 bulk and single build-intent state handling (spec §33.5–33.7).
  *
- * Applies individual or bulk approve (build-intent) to new-page items; persists via repository.
+ * Applies individual or bulk approve (build-intent) or deny (reject) to new-page items; persists via repository.
  * Does not execute page creation. Build-all and build-selected set status to APPROVED for later execution.
+ * Denied items are set to REJECTED and are excluded from execution and from the unresolved queue.
  *
  * @package AIOPageBuilder
  */
@@ -20,7 +21,7 @@ use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 
 /**
- * Single and bulk build-intent (approve) for Step 2 (new_pages). Caller must verify capability and nonce.
+ * Single and bulk build-intent (approve) and deny for Step 2 (new_pages). Caller must verify capability and nonce.
  */
 final class New_Page_Creation_Bulk_Action_Service {
 
@@ -43,6 +44,18 @@ final class New_Page_Creation_Bulk_Action_Service {
 	 */
 	public function approve_item( int $plan_post_id, string $item_id ): bool {
 		return $this->set_item_status_if_pending( $plan_post_id, $item_id, Build_Plan_Item_Statuses::APPROVED );
+	}
+
+	/**
+	 * Denies a single new-page item (sets to rejected). No-op if item not found or not pending.
+	 * Denied items are excluded from execution and from the unresolved queue.
+	 *
+	 * @param int    $plan_post_id Plan post ID.
+	 * @param string $item_id      Item id.
+	 * @return bool True if updated.
+	 */
+	public function deny_item( int $plan_post_id, string $item_id ): bool {
+		return $this->set_item_status_if_pending( $plan_post_id, $item_id, Build_Plan_Item_Statuses::REJECTED );
 	}
 
 	/**
@@ -78,10 +91,26 @@ final class New_Page_Creation_Bulk_Action_Service {
 	}
 
 	/**
+	 * Bulk deny all pending new-page items in Step 2 (Deny All). Preserves state in plan record.
+	 * Denied items are excluded from execution and from the unresolved queue.
+	 *
+	 * @param int $plan_post_id Plan post ID.
+	 * @return int Number of items updated.
+	 */
+	public function bulk_deny_all_eligible( int $plan_post_id ): int {
+		return $this->repository->update_plan_step_items_by_status(
+			$plan_post_id,
+			self::STEP_INDEX_NEW_PAGES,
+			Build_Plan_Item_Statuses::PENDING,
+			Build_Plan_Item_Statuses::REJECTED
+		);
+	}
+
+	/**
 	 * Returns eligibility for bulk actions: count of pending new-page items in Step 2.
 	 *
 	 * @param array<string, mixed> $plan_definition Plan root.
-	 * @return array{build_all_eligible: int, build_selected_eligible: int}
+	 * @return array{build_all_eligible: int, build_selected_eligible: int, deny_all_eligible: int}
 	 */
 	public function get_bulk_eligibility( array $plan_definition ): array {
 		$steps = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
@@ -92,6 +121,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 			return array(
 				'build_all_eligible'      => 0,
 				'build_selected_eligible' => 0,
+				'deny_all_eligible'       => 0,
 			);
 		}
 		$step_type = (string) ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' );
@@ -99,6 +129,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 			return array(
 				'build_all_eligible'      => 0,
 				'build_selected_eligible' => 0,
+				'deny_all_eligible'       => 0,
 			);
 		}
 		$items   = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) ? $step[ Build_Plan_Item_Schema::KEY_ITEMS ] : array();
@@ -117,6 +148,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 		return array(
 			'build_all_eligible'      => $pending,
 			'build_selected_eligible' => $pending,
+			'deny_all_eligible'       => $pending,
 		);
 	}
 

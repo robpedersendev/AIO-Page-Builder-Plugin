@@ -88,7 +88,8 @@ final class Industry_LPagery_Planning_Advisor {
 			} elseif ( $p === Industry_LPagery_Rule_Registry::POSTURE_DISCOURAGED && $posture !== Industry_LPagery_Rule_Registry::POSTURE_CENTRAL ) {
 				$posture = Industry_LPagery_Rule_Registry::POSTURE_DISCOURAGED;
 			} elseif ( $p === Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL && $posture === Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL ) {
-				// Already optional.
+				// Already optional; no change.
+				(void) $p;
 			}
 
 			$req = $rule[ Industry_LPagery_Rule_Registry::FIELD_REQUIRED_TOKEN_REFS ] ?? array();

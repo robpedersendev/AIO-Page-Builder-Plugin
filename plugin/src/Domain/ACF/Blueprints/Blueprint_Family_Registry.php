@@ -48,7 +48,7 @@ final class Blueprint_Family_Registry {
 			return;
 		}
 		$this->families[ $family_key ] = array(
-			self::KEY_BASE_BLUEPRINT_REF => \sanitize_key( $base_blueprint_ref ) ?: $base_blueprint_ref,
+			self::KEY_BASE_BLUEPRINT_REF => ( ( $bk = \sanitize_key( $base_blueprint_ref ) ) !== '' && $bk !== null ) ? $bk : $base_blueprint_ref,
 			self::KEY_VARIANT_OVERRIDES  => $this->sanitize_variant_overrides( $variant_overrides ),
 		);
 	}

@@ -135,7 +135,7 @@ final class Industry_Style_Preset_Screen {
 				<p><?php \esc_html_e( 'No style presets are available for your current industry.', 'aio-page-builder' ); ?></p>
 			<?php else : ?>
 				<?php if ( $state['applied_preset'] !== null ) : ?>
-					<p><strong><?php \esc_html_e( 'Currently applied:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $state['applied_preset']['label'] ?: $state['applied_preset']['preset_key'] ); ?></p>
+					<p><strong><?php \esc_html_e( 'Currently applied:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( ( $state['applied_preset']['label'] !== '' && $state['applied_preset']['label'] !== null ) ? $state['applied_preset']['label'] : $state['applied_preset']['preset_key'] ); ?></p>
 				<?php endif; ?>
 
 				<table class="wp-list-table widefat fixed striped">

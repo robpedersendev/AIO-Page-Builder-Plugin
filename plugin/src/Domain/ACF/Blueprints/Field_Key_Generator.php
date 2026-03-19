@@ -120,8 +120,8 @@ final class Field_Key_Generator {
 	/**
 	 * Validates that a key conforms to the contract pattern.
 	 *
-	 * @param string $key
-	 * @param string $kind 'group' or 'field'
+	 * @param string $key  Key to validate.
+	 * @param string $kind 'group' or 'field'.
 	 * @return bool
 	 */
 	public static function is_valid_key( string $key, string $kind = 'field' ): bool {

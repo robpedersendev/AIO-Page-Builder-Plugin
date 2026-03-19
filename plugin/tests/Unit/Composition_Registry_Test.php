@@ -50,6 +50,7 @@ require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Type_Keys.php';
 require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Status_Families.php';
 require_once $plugin_root . '/src/Domain/Storage/Tables/Table_Names.php';
 require_once $plugin_root . '/src/Domain/Storage/Assignments/Assignment_Types.php';
+require_once $plugin_root . '/src/Domain/Storage/Assignments/Assignment_Map_Service_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Assignments/Assignment_Map_Service.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Abstract_CPT_Repository.php';

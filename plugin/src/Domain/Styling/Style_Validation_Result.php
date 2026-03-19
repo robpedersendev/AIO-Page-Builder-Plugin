@@ -32,9 +32,9 @@ final class Style_Validation_Result {
 	private array $sanitized;
 
 	/**
-	 * @param bool         $valid    Whether validation passed.
-	 * @param list<string> $errors   Bounded list of error messages (safe for admin).
-	 * @param array        $sanitized Sanitized payload when valid; empty array when invalid.
+	 * @param bool               $valid     Whether validation passed.
+	 * @param array<int, string> $errors    Bounded list of error messages (safe for admin).
+	 * @param array              $sanitized Sanitized payload when valid; empty array when invalid.
 	 */
 	public function __construct( bool $valid, array $errors = array(), array $sanitized = array() ) {
 		$this->valid     = $valid;
@@ -65,7 +65,7 @@ final class Style_Validation_Result {
 	}
 
 	/**
-	 * @param list<string> $errors
+	 * @param array<int, string> $errors Raw error messages to bound.
 	 * @return list<string>
 	 */
 	private function bound_errors( array $errors ): array {

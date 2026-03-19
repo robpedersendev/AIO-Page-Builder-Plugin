@@ -255,7 +255,7 @@ final class Lifecycle_Manager {
 		if ( ! $result['success'] ) {
 			return new Lifecycle_Result(
 				Lifecycle_Result::STATUS_BLOCKING_FAILURE,
-				\esc_html( $result['message'] ?: __( 'Custom table installation or upgrade failed.', 'aio-page-builder' ) ),
+				\esc_html( ( $result['message'] !== '' && $result['message'] !== null ) ? $result['message'] : __( 'Custom table installation or upgrade failed.', 'aio-page-builder' ) ),
 				'check_tables_schema',
 				array( 'failed_table' => $result['failed_table'] )
 			);

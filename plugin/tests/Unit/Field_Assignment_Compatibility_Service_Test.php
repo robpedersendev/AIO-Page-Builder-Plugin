@@ -24,6 +24,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/Storage/Tables/Table_Names.php';
 require_once $plugin_root . '/src/Domain/Storage/Assignments/Assignment_Types.php';
+require_once $plugin_root . '/src/Domain/Storage/Assignments/Assignment_Map_Service_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Assignments/Assignment_Map_Service.php';
 require_once $plugin_root . '/src/Domain/ACF/Blueprints/Field_Key_Generator.php';
 require_once $plugin_root . '/src/Domain/Registries/Shared/Deprecation_Metadata.php';

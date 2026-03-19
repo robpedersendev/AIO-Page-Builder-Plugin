@@ -85,8 +85,8 @@ final class Support_Triage_Dashboard_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function apply_filters( array $state ): array {
-		$domain   = isset( $_GET['domain'] ) ? \sanitize_key( (string) $_GET['domain'] ) : '';
-		$severity = isset( $_GET['severity'] ) ? \sanitize_key( (string) $_GET['severity'] ) : '';
+		$domain   = isset( $_GET['domain'] ) ? \sanitize_key( \wp_unslash( $_GET['domain'] ) ) : '';
+		$severity = isset( $_GET['severity'] ) ? \sanitize_key( \wp_unslash( $_GET['severity'] ) ) : '';
 		if ( $domain !== '' ) {
 			$state['critical_issues']         = array_values(
 				array_filter(

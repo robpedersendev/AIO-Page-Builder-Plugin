@@ -129,7 +129,8 @@ final class Content_Summary_Extractor {
 	}
 
 	private function bounded_excerpt( string $body_plain, array &$notes ): string {
-		$words = preg_split( '/\s+/', $body_plain, -1, PREG_SPLIT_NO_EMPTY ) ?: array();
+		$words_raw = preg_split( '/\s+/', $body_plain, -1, PREG_SPLIT_NO_EMPTY );
+		$words    = $words_raw !== false ? $words_raw : array();
 		if ( count( $words ) > self::MAX_EXCERPT_WORDS ) {
 			$notes[] = Extraction_Result::NOTE_EXCERPT_TRUNCATED;
 			$words   = array_slice( $words, 0, self::MAX_EXCERPT_WORDS );

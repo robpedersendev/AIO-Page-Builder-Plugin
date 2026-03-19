@@ -43,6 +43,7 @@ final class Settings_Service {
 	 */
 	public function get( string $key ): array {
 		if ( ! Option_Names::is_valid( $key ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; key is validated option name.
 			throw new \InvalidArgumentException( 'Unknown option key: ' . $key );
 		}
 		$value = \get_option( $key, self::DEFAULTS[ $key ] );
@@ -62,6 +63,7 @@ final class Settings_Service {
 	 */
 	public function set( string $key, array $value ): void {
 		if ( ! Option_Names::is_valid( $key ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; key is validated option name.
 			throw new \InvalidArgumentException( 'Unknown option key: ' . $key );
 		}
 		\update_option( $key, $value );
@@ -76,6 +78,7 @@ final class Settings_Service {
 	 */
 	public function get_default( string $key ): array {
 		if ( ! Option_Names::is_valid( $key ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; key is validated option name.
 			throw new \InvalidArgumentException( 'Unknown option key: ' . $key );
 		}
 		return self::DEFAULTS[ $key ];

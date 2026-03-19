@@ -35,7 +35,7 @@ final class Service_Container {
 	 * Registers a factory for a service ID. Factory is invoked at most once per ID.
 	 *
 	 * @param string   $id      Stable service ID (see service-registration-contract.md).
-	 * @param callable $factory Callable that returns the service. Signature: (): mixed
+	 * @param callable $factory Callable that returns the service. Signature: (): mixed.
 	 * @return void
 	 */
 	public function register( string $id, callable $factory ): void {
@@ -54,6 +54,7 @@ final class Service_Container {
 			return $this->instances[ $id ];
 		}
 		if ( ! array_key_exists( $id, $this->factories ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message; ID is internal, not HTML.
 			throw new \RuntimeException( 'Unknown service ID: ' . $id );
 		}
 		$this->instances[ $id ] = ( $this->factories[ $id ] )();

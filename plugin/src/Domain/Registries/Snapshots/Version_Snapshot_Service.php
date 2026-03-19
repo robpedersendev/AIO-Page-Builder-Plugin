@@ -69,7 +69,7 @@ final class Version_Snapshot_Service {
 		}
 		return $this->persist_snapshot(
 			Version_Snapshot_Schema::SCOPE_REGISTRY,
-			$scope_id ?: 'section_registry',
+			$scope_id !== '' && $scope_id !== null ? $scope_id : 'section_registry',
 			$payload,
 			array( 'sections_count' => count( $sections ) )
 		);
@@ -94,7 +94,7 @@ final class Version_Snapshot_Service {
 		}
 		return $this->persist_snapshot(
 			Version_Snapshot_Schema::SCOPE_REGISTRY,
-			$scope_id ?: 'page_template_registry',
+			$scope_id !== '' && $scope_id !== null ? $scope_id : 'page_template_registry',
 			$payload,
 			array( 'templates_count' => count( $templates ) )
 		);

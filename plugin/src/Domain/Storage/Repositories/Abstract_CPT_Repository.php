@@ -130,7 +130,7 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 		$id     = isset( $data['id'] ) ? (int) $data['id'] : 0;
 		$key    = $this->sanitize_key( (string) ( $data['internal_key'] ?? $data['post_name'] ?? '' ) );
 		$status = $this->sanitize_status( (string) ( $data['status'] ?? 'draft' ) );
-		$title  = isset( $data['post_title'] ) ? \sanitize_text_field( (string) $data['post_title'] ) : ( $key ?: 'Untitled' );
+		$title  = isset( $data['post_title'] ) ? \sanitize_text_field( (string) $data['post_title'] ) : ( $key !== '' && $key !== null ? $key : 'Untitled' );
 
 		if ( $id > 0 ) {
 			$updated = \wp_update_post(
@@ -181,8 +181,8 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 	 */
 	protected function get_meta( int $post_id ): array {
 		return array(
-			self::META_INTERNAL_KEY => \get_post_meta( $post_id, self::META_INTERNAL_KEY, true ) ?: '',
-			self::META_STATUS       => \get_post_meta( $post_id, self::META_STATUS, true ) ?: '',
+			self::META_INTERNAL_KEY => ( ( $meta_ik = \get_post_meta( $post_id, self::META_INTERNAL_KEY, true ) ) !== false && $meta_ik !== '' ) ? $meta_ik : '',
+			self::META_STATUS       => ( ( $meta_st = \get_post_meta( $post_id, self::META_STATUS, true ) ) !== false && $meta_st !== '' ) ? $meta_st : '',
 		);
 	}
 

@@ -330,7 +330,7 @@ final class Template_Menu_Apply_Service implements Template_Menu_Apply_Service_I
 			$item_data = array(
 				'menu-item-position'  => $position,
 				'menu-item-type'      => $type === 'page' ? 'post_type' : $type,
-				'menu-item-title'     => $title !== '' ? $title : ( $url ?: (string) $object_id ),
+				'menu-item-title'     => $title !== '' ? $title : ( ( $url !== '' && $url !== null ) ? $url : (string) $object_id ),
 				'menu-item-status'    => 'publish',
 				'menu-item-parent-id' => $parent_menu_item_id,
 			);

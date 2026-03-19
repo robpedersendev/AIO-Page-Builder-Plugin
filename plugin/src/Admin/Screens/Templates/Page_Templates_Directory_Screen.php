@@ -56,13 +56,13 @@ final class Page_Templates_Directory_Screen {
 
 		$state_builder = $this->get_state_builder();
 		$request       = array(
-			'category_class' => isset( $_GET['category_class'] ) ? \sanitize_key( (string) $_GET['category_class'] ) : '',
-			'family'         => isset( $_GET['family'] ) ? \sanitize_key( (string) $_GET['family'] ) : '',
-			'status'         => isset( $_GET['status'] ) ? \sanitize_key( (string) $_GET['status'] ) : '',
-			'search'         => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['search'] ) ) : '',
-			'paged'          => isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1,
-			'per_page'       => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $_GET['per_page'] ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
-			'industry_view'  => isset( $_GET['industry_view'] ) ? \sanitize_key( (string) $_GET['industry_view'] ) : Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY,
+			'category_class' => isset( $_GET['category_class'] ) ? \sanitize_key( \wp_unslash( $_GET['category_class'] ) ) : '',
+			'family'         => isset( $_GET['family'] ) ? \sanitize_key( \wp_unslash( $_GET['family'] ) ) : '',
+			'status'         => isset( $_GET['status'] ) ? \sanitize_key( \wp_unslash( $_GET['status'] ) ) : '',
+			'search'         => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( $_GET['search'] ) ) : '',
+			'paged'          => isset( $_GET['paged'] ) ? max( 1, (int) \wp_unslash( $_GET['paged'] ) ) : 1,
+			'per_page'       => isset( $_GET['per_page'] ) ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) \wp_unslash( $_GET['per_page'] ) ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
+			'industry_view'  => isset( $_GET['industry_view'] ) ? \sanitize_key( \wp_unslash( $_GET['industry_view'] ) ) : Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY,
 		);
 		$state         = $state_builder->build_state( $request );
 		$state         = $this->enrich_state_with_industry( $state, $request );

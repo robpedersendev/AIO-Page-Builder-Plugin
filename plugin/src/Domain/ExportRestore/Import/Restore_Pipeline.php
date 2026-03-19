@@ -227,10 +227,10 @@ final class Restore_Pipeline {
 	}
 
 	/**
-	 * @param \ZipArchive                          $zip
-	 * @param string                               $category
-	 * @param array<string, mixed>                 $manifest
-	 * @param array<string, array<string, string>> $resolved_map
+	 * @param \ZipArchive                                   $zip
+	 * @param string                                        $category
+	 * @param array<string, mixed>                          $manifest
+	 * @param array<string, array<string, string>>          $resolved_map
 	 * @param list<array{category: string, reason: string}> $skipped_reasons Collects category + user-facing reason when a category is skipped (e.g. styling service unavailable).
 	 * @return list<array{category: string, action: string, key?: string}>|null Actions taken, or null if skipped.
 	 */

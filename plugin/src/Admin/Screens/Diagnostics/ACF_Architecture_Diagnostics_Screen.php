@@ -90,7 +90,7 @@ final class ACF_Architecture_Diagnostics_Screen {
 		}
 		$section_family = isset( $_GET['section_family'] ) ? \sanitize_text_field( \wp_unslash( $_GET['section_family'] ) ) : null;
 		$pt_family      = isset( $_GET['page_template_family'] ) ? \sanitize_text_field( \wp_unslash( $_GET['page_template_family'] ) ) : null;
-		$severity       = isset( $_GET['severity'] ) ? \sanitize_key( (string) $_GET['severity'] ) : null;
+		$severity       = isset( $_GET['severity'] ) ? \sanitize_key( \wp_unslash( $_GET['severity'] ) ) : null;
 		if ( $section_family === '' ) {
 			$section_family = null;
 		}

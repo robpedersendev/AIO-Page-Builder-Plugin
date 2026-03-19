@@ -159,6 +159,7 @@ final class New_Page_Creation_UI_Service {
 
 		$eligibility    = $this->bulk_action_service->get_bulk_eligibility( $plan_definition );
 		$pending_count  = $eligibility['build_all_eligible'];
+		$deny_eligible  = $eligibility['deny_all_eligible'] ?? 0;
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
 
 		$bulk_states = array(
@@ -173,9 +174,9 @@ final class New_Page_Creation_UI_Service {
 				'count_selected' => $selected_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
-				'enabled'        => false,
-				'label'          => \__( 'Deny All', 'aio-page-builder' ),
-				'count_eligible' => 0,
+				'enabled'        => $deny_eligible > 0 && ! empty( $capabilities['can_approve'] ),
+				'label'          => \__( 'Deny All New Pages', 'aio-page-builder' ),
+				'count_eligible' => $deny_eligible,
 			),
 			Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
 				'enabled' => $selected_count > 0,

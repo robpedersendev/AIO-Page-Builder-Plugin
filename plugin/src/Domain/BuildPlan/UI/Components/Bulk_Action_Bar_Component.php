@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Renders bulk action bar. Payload: bulk_action_states with per-control enabled/label/count.
  *
- * bulk_action_states shape:
+ * Bulk_action_states shape:
  *   - apply_to_all_eligible: { enabled: bool, label: string, count_eligible: int }
  *   - apply_to_selected: { enabled: bool, label: string, count_selected: int }
  *   - deny_all_eligible: { enabled: bool, label: string, count_eligible: int }

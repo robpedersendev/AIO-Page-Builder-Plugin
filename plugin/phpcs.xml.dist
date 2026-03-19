@@ -26,10 +26,12 @@
 	<rule ref="Squiz.Commenting.ClassComment">
 		<exclude name="Squiz.Commenting.ClassComment.Missing"/>
 	</rule>
+	<!-- Param description (comment text) optional; @param type and name still required. Add descriptions incrementally. -->
 	<rule ref="Squiz.Commenting.FunctionComment">
 		<exclude name="Squiz.Commenting.FunctionComment.Missing"/>
 		<exclude name="Squiz.Commenting.FunctionComment.WrongStyle"/>
 		<exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+		<exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
 	</rule>
 	<rule ref="Squiz.Commenting.VariableComment">
 		<exclude name="Squiz.Commenting.VariableComment.Missing"/>

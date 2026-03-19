@@ -90,7 +90,7 @@ final class Queue_Logs_Screen {
 	}
 
 	private function get_current_tab(): string {
-		$t = isset( $_GET['tab'] ) ? sanitize_key( (string) $_GET['tab'] ) : '';
+		$t = isset( $_GET['tab'] ) ? \sanitize_key( \wp_unslash( $_GET['tab'] ) ) : '';
 		return array_key_exists( $t, self::TABS ) ? $t : self::TAB_QUEUE;
 	}
 
@@ -257,7 +257,13 @@ final class Queue_Logs_Screen {
 		<?php
 	}
 
-	/** @param array<string, mixed> $state */
+	/**
+	 * Renders content for the current log tab.
+	 *
+	 * @param string               $tab   Current tab key.
+	 * @param array<string, mixed> $state Full state from Logs_Monitoring_State_Builder.
+	 * @param array<string, mixed> $health Health/readiness state (unused in this version).
+	 */
 	private function render_tab_content( string $tab, array $state, array $health ): void {
 		switch ( $tab ) {
 			case self::TAB_QUEUE:
@@ -303,7 +309,7 @@ final class Queue_Logs_Screen {
 		<?php
 		if ( isset( $_GET['aio_recovery'] ) && isset( $_GET['aio_recovery_msg'] ) ) {
 			$msg = \sanitize_text_field( \wp_unslash( $_GET['aio_recovery_msg'] ) );
-			$ok  = \sanitize_key( (string) $_GET['aio_recovery'] ) === 'ok';
+			$ok  = \sanitize_key( \wp_unslash( $_GET['aio_recovery'] ) ) === 'ok';
 			echo '<div class="notice notice-' . ( $ok ? 'success' : 'error' ) . ' is-dismissible"><p>' . \esc_html( $msg ) . '</p></div>';
 		}
 		?>
@@ -561,7 +567,7 @@ final class Queue_Logs_Screen {
 			exit;
 		}
 		$job_ref = isset( $_GET['job_ref'] ) ? \sanitize_text_field( \wp_unslash( $_GET['job_ref'] ) ) : '';
-		$action  = isset( $_GET['recovery_action'] ) ? \sanitize_key( (string) $_GET['recovery_action'] ) : '';
+		$action  = isset( $_GET['recovery_action'] ) ? \sanitize_key( \wp_unslash( $_GET['recovery_action'] ) ) : '';
 		if ( $job_ref === '' || ( $action !== 'retry' && $action !== 'cancel' ) ) {
 			\wp_safe_redirect( $this->queue_logs_url( 'error', __( 'Invalid request.', 'aio-page-builder' ) ) );
 			exit;
