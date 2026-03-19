@@ -37,7 +37,7 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	 *
 	 * @param int $limit  Max items (default 50).
 	 * @param int $offset Offset for pagination.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_recent( int $limit = 50, int $offset = 0 ): array {
 		$limit = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;

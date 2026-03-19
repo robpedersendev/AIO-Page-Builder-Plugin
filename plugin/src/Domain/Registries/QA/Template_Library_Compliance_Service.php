@@ -131,8 +131,8 @@ final class Template_Library_Compliance_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $sections
-	 * @param list<array<string, mixed>> $pages
+	 * @param array<int, array<string, mixed>> $sections
+	 * @param array<int, array<string, mixed>> $pages
 	 * @return array{section_total: int, page_total: int, section_target: int, page_target: int, by_section_purpose_family: array<string, int>, by_page_category_class: array<string, int>, by_page_family: array<string, int>}
 	 */
 	private function build_count_summary( array $sections, array $pages ): array {
@@ -171,9 +171,9 @@ final class Template_Library_Compliance_Service {
 
 	/**
 	 * @param array                      $count_summary
-	 * @param list<array<string, mixed>> $sections
-	 * @param list<array<string, mixed>> $pages
-	 * @return array{section_family_minimums: array<string, bool>, page_class_minimums: array<string, bool>, max_share_violations: list<string>}
+	 * @param array<int, array<string, mixed>> $sections
+	 * @param array<int, array<string, mixed>> $pages
+	 * @return array{section_family_minimums: array<string, bool>, page_class_minimums: array<string, bool>, max_share_violations: array<int, string>}
 	 */
 	private function build_category_coverage( array $count_summary, array $sections, array $pages ): array {
 		$section_family_minimums = array();
@@ -233,9 +233,9 @@ final class Template_Library_Compliance_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>>          $pages
+	 * @param array<int, array<string, mixed>>          $pages
 	 * @param array<string, array<string, mixed>> $section_by_key
-	 * @return list<array{template_key: string, code: string, message: string}>
+	 * @return array<int, array{template_key: string, code: string, message: string}>
 	 */
 	private function validate_cta_rules( array $pages, array $section_by_key ): array {
 		$violations = array();
@@ -318,9 +318,9 @@ final class Template_Library_Compliance_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $sections
-	 * @param list<array<string, mixed>> $pages
-	 * @return array{sections_missing_preview: list<string>, pages_missing_one_pager: list<string>}
+	 * @param array<int, array<string, mixed>> $sections
+	 * @param array<int, array<string, mixed>> $pages
+	 * @return array{sections_missing_preview: array<int, string>, pages_missing_one_pager: array<int, string>}
 	 */
 	private function check_preview_readiness( array $sections, array $pages ): array {
 		$sections_missing = array();
@@ -353,8 +353,8 @@ final class Template_Library_Compliance_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $sections
-	 * @return array{sections_missing_accessibility: list<string>, sections_invalid_animation: list<string>}
+	 * @param array<int, array<string, mixed>> $sections
+	 * @return array{sections_missing_accessibility: array<int, string>, sections_invalid_animation: array<int, string>}
 	 */
 	private function check_metadata( array $sections ): array {
 		$missing_a11y = array();
@@ -380,9 +380,9 @@ final class Template_Library_Compliance_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $sections
-	 * @param list<array<string, mixed>> $pages
-	 * @return array{viable: bool, errors: list<string>}
+	 * @param array<int, array<string, mixed>> $sections
+	 * @param array<int, array<string, mixed>> $pages
+	 * @return array{viable: bool, errors: array<int, string>}
 	 */
 	private function check_export( array $sections, array $pages ): array {
 		$errors = array();

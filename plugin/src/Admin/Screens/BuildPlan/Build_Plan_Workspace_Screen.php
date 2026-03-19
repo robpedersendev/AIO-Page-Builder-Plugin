@@ -493,7 +493,7 @@ final class Build_Plan_Workspace_Screen {
 			<div class="aio-context-rail-actions">
 				<p><a href="<?php echo \esc_url( $list_url ); ?>" class="button"><?php \esc_html_e( 'Save and exit', 'aio-page-builder' ); ?></a></p>
 				<?php if ( $can_export ) : ?>
-					<p><span class="button button-secondary" role="button" aria-disabled="true"><?php \esc_html_e( 'Export plan', 'aio-page-builder' ); ?></span> <span class="description"><?php \esc_html_e( '(Coming soon)', 'aio-page-builder' ); ?></span></p>
+					<p><span class="aio-context-rail-unavailable" aria-hidden="true"><?php \esc_html_e( 'Export plan', 'aio-page-builder' ); ?></span> <span class="description"><?php \esc_html_e( 'Not available in this version.', 'aio-page-builder' ); ?></span></p>
 				<?php endif; ?>
 				<?php if ( $can_view_artifacts && (string) ( $rail['ai_run_ref'] ?? '' ) !== '' ) : ?>
 					<p><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=aio-page-builder-ai-runs&run_id=' . \rawurlencode( (string) $rail['ai_run_ref'] ) ) ); ?>" class="button button-secondary"><?php \esc_html_e( 'View source artifacts', 'aio-page-builder' ); ?></a></p>
@@ -904,7 +904,6 @@ final class Build_Plan_Workspace_Screen {
 					<?php endif; ?>
 				</button>
 			</form>
-			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Apply to selected', 'aio-page-builder' ); ?></button>
 			<form method="post" class="aio-bulk-form aio-bulk-deny-all" style="display:inline">
 				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<input type="hidden" name="aio_build_plan_action" value="bulk_deny_step1" />
@@ -915,7 +914,6 @@ final class Build_Plan_Workspace_Screen {
 					<?php endif; ?>
 				</button>
 			</form>
-			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Clear selection', 'aio-page-builder' ); ?></button>
 		</div>
 		<?php
 	}
@@ -994,11 +992,8 @@ final class Build_Plan_Workspace_Screen {
 	private function render_navigation_bulk_forms( array $bulk_states, string $nonce_html ): void {
 		$apply_all     = $bulk_states['apply_to_all_eligible'] ?? array();
 		$deny_all      = $bulk_states['deny_all_eligible'] ?? array();
-		$apply_sel     = $bulk_states['apply_to_selected'] ?? array();
-		$clear_sel     = $bulk_states['clear_selection'] ?? array();
 		$apply_enabled = ! empty( $apply_all['enabled'] );
 		$deny_enabled  = ! empty( $deny_all['enabled'] );
-		$clear_enabled = ! empty( $clear_sel['enabled'] );
 		$apply_count   = (int) ( $apply_all['count_eligible'] ?? 0 );
 		$deny_count    = (int) ( $deny_all['count_eligible'] ?? 0 );
 		?>
@@ -1013,7 +1008,6 @@ final class Build_Plan_Workspace_Screen {
 					<?php endif; ?>
 				</button>
 			</form>
-			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Apply to selected', 'aio-page-builder' ); ?></button>
 			<form method="post" class="aio-bulk-form aio-bulk-deny-navigation" style="display:inline">
 				<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<input type="hidden" name="aio_build_plan_action" value="bulk_deny_navigation" />
@@ -1024,7 +1018,6 @@ final class Build_Plan_Workspace_Screen {
 					<?php endif; ?>
 				</button>
 			</form>
-			<button type="button" class="button button-secondary" disabled="disabled"><?php \esc_html_e( 'Clear selection', 'aio-page-builder' ); ?></button>
 		</div>
 		<?php
 	}

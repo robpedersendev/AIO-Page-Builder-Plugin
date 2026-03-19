@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Visible_Group_Key_Query_Result {
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $group_keys;
 
 	public function __construct( array $group_keys ) {
@@ -27,7 +27,7 @@ final class Visible_Group_Key_Query_Result {
 	/**
 	 * Returns the list of visible group keys (e.g. group_aio_st01_hero).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_group_keys(): array {
 		return $this->group_keys;

@@ -22,14 +22,14 @@ interface Section_Template_Repository_Interface {
 	 *
 	 * @param int $limit  Max items; 0 = default.
 	 * @param int $offset Offset for pagination.
-	 * @return list<array<string, mixed>> List of definitions keyed by internal_key etc.
+	 * @return array<int, array<string, mixed>> List of definitions keyed by internal_key etc.
 	 */
 	public function list_all_definitions( int $limit = 0, int $offset = 0 ): array;
 
 	/**
 	 * Returns all unique internal keys in the registry (for uniqueness checks and inventory).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_all_internal_keys(): array;
 }

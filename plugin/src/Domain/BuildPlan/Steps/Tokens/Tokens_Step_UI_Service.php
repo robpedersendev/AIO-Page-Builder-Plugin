@@ -104,6 +104,17 @@ final class Tokens_Step_UI_Service {
 		$bulk_states            = $this->placeholder_bulk_states( $eligible_count, $capabilities, $selected_item_ids, $rows );
 		$detail_panel           = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
 		$step_messages          = $this->step_messages( count( $rows ), $eligible_count );
+		// Surface read-only status at step level so users see it even when no item is selected.
+		if ( count( $rows ) > 0 ) {
+			array_unshift(
+				$step_messages,
+				array(
+					'severity' => 'info',
+					'message'  => \__( 'Token application is not available in this version. Recommendations are for review only.', 'aio-page-builder' ),
+					'level'    => 'step',
+				)
+			);
+		}
 		$token_set_summary      = $this->build_token_set_summary( $items );
 		// Structural placeholder for UI shape only; no current/proposed diff or apply in this version (token application out of scope).
 		$token_diff_placeholder = array(

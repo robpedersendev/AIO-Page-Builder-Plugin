@@ -193,7 +193,7 @@ final class New_Page_Template_Recommendation_Builder {
 	 * Collects dependency blocking messages from payload.
 	 *
 	 * @param array<string, mixed> $payload
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function collect_dependency_warnings( array $payload ): array {
 		$reasons = $payload['dependency_blocking_reasons'] ?? $payload['blocking_reasons'] ?? array();

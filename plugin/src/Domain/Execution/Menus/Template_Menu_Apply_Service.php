@@ -297,7 +297,7 @@ final class Template_Menu_Apply_Service implements Template_Menu_Apply_Service_I
 	 *
 	 * @param int                              $menu_id
 	 * @param array<int, array<string, mixed>> $ordered_items
-	 * @param list<array<string, mixed>>       $per_item_status Output.
+	 * @param array<int, array<string, mixed>>       $per_item_status Output.
 	 * @return int Applied count.
 	 */
 	private function apply_items_with_hierarchy( int $menu_id, array $ordered_items, array &$per_item_status ): int {

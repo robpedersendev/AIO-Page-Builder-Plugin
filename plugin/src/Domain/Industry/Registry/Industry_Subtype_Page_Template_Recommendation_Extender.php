@@ -85,7 +85,7 @@ final class Industry_Subtype_Page_Template_Recommendation_Extender {
 
 	/**
 	 * @param array<string, mixed>|null $subtype_definition
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function subtype_page_family_emphasis( ?array $subtype_definition ): array {
 		if ( $subtype_definition === null || ! isset( $subtype_definition['page_family_emphasis'] ) || ! is_array( $subtype_definition['page_family_emphasis'] ) ) {
@@ -102,7 +102,7 @@ final class Industry_Subtype_Page_Template_Recommendation_Extender {
 
 	/**
 	 * @param array<string, mixed>|null $subtype_definition
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	private function subtype_one_pager_overlay_refs( ?array $subtype_definition ): array {
 		if ( $subtype_definition === null || ! isset( $subtype_definition['one_pager_overlay_refs'] ) || ! is_array( $subtype_definition['one_pager_overlay_refs'] ) ) {

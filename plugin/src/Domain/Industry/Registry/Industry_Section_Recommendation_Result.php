@@ -39,7 +39,7 @@ final class Industry_Section_Recommendation_Result {
 	/**
 	 * Returns section keys in recommendation order (best first).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_ranked_keys(): array {
 		$out = array();

@@ -64,7 +64,7 @@ final class Industry_Definition_Linter {
 	/**
 	 * Runs lint across packs, refs, subtypes, and bundle graph. Returns human-readable results.
 	 *
-	 * @return array{errors: list<array{severity: string, code: string, message: string, object_type: string, key: string, field?: string, related_refs: list<string>}>, warnings: list<array{severity: string, code: string, message: string, object_type: string, key: string, field?: string, related_refs: list<string>}>, summary: array{error_count: int, warning_count: int}}
+	 * @return array{errors: array<int, array{severity: string, code: string, message: string, object_type: string, key: string, field?: string, related_refs: array<int, string>}>, warnings: array<int, array{severity: string, code: string, message: string, object_type: string, key: string, field?: string, related_refs: array<int, string>}>, summary: array{error_count: int, warning_count: int}}
 	 */
 	public function lint(): array {
 		$errors   = array();
@@ -193,7 +193,7 @@ final class Industry_Definition_Linter {
 	/**
 	 * Returns a flat list of all issues (errors then warnings) for simple iteration or display.
 	 *
-	 * @return list<array{severity: string, code: string, message: string, object_type: string, key: string, field?: string, related_refs: list<string>}>
+	 * @return array<int, array{severity: string, code: string, message: string, object_type: string, key: string, field?: string, related_refs: array<int, string>}>
 	 */
 	public function get_all_issues(): array {
 		$result = $this->lint();

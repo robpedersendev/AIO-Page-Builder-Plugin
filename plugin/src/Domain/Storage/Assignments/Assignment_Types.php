@@ -35,13 +35,13 @@ final class Assignment_Types {
 	/** Page → composition (page post ID to composition_id). Used when page is composition-driven. */
 	public const PAGE_COMPOSITION = 'page_composition';
 
-	/** @var list<string>|null */
+	/** @var array<int, string>|null */
 	private static ?array $all = null;
 
 	/**
 	 * Returns all allowed map_type values in stable order.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {

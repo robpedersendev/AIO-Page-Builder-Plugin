@@ -166,9 +166,9 @@ final class Large_Library_Query_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $defs
+	 * @param array<int, array<string, mixed>> $defs
 	 * @param array<string, mixed>       $filters
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function filter_sections( array $defs, array $filters ): array {
 		$status         = isset( $filters[ self::FILTER_STATUS ] ) ? (string) $filters[ self::FILTER_STATUS ] : '';
@@ -235,9 +235,9 @@ final class Large_Library_Query_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $defs
+	 * @param array<int, array<string, mixed>> $defs
 	 * @param array<string, mixed>       $filters
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function filter_page_templates( array $defs, array $filters ): array {
 		$status       = isset( $filters[ self::FILTER_STATUS ] ) ? (string) $filters[ self::FILTER_STATUS ] : '';
@@ -285,8 +285,8 @@ final class Large_Library_Query_Service {
 	/**
 	 * Builds row summaries for directory IA (section).
 	 *
-	 * @param list<array<string, mixed>> $defs
-	 * @return list<array<string, mixed>>
+	 * @param array<int, array<string, mixed>> $defs
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function section_rows_for_directory( array $defs ): array {
 		$rows = array();
@@ -318,8 +318,8 @@ final class Large_Library_Query_Service {
 	/**
 	 * Builds row summaries for directory IA (page template).
 	 *
-	 * @param list<array<string, mixed>> $defs
-	 * @return list<array<string, mixed>>
+	 * @param array<int, array<string, mixed>> $defs
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function page_template_rows_for_directory( array $defs ): array {
 		$rows = array();
@@ -347,7 +347,7 @@ final class Large_Library_Query_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $filtered
+	 * @param array<int, array<string, mixed>> $filtered
 	 * @return array<string, array<string, int>>
 	 */
 	private function section_filter_counts( array $filtered ): array {
@@ -388,7 +388,7 @@ final class Large_Library_Query_Service {
 	}
 
 	/**
-	 * @param list<array<string, mixed>> $filtered
+	 * @param array<int, array<string, mixed>> $filtered
 	 * @return array<string, array<string, int>>
 	 */
 	private function page_template_filter_counts( array $filtered ): array {

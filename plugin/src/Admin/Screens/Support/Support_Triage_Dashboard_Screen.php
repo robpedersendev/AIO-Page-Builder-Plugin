@@ -141,7 +141,7 @@ final class Support_Triage_Dashboard_Screen {
 		<?php
 	}
 
-	/** @param list<array<string, string>> $items */
+	/** @param array<int, array<string, string>> $items */
 	private function render_critical_issues( array $items ): void {
 		?>
 		<section class="aio-support-triage-section aio-critical-issues" style="margin: 1.5em 0;" aria-labelledby="aio-triage-critical-heading">
@@ -163,7 +163,7 @@ final class Support_Triage_Dashboard_Screen {
 		<?php
 	}
 
-	/** @param list<array<string, string>> $items */
+	/** @param array<int, array<string, string>> $items */
 	private function render_degraded_systems( array $items ): void {
 		?>
 		<section class="aio-support-triage-section aio-degraded-systems" style="margin: 1.5em 0;" aria-labelledby="aio-triage-degraded-heading">
@@ -184,7 +184,7 @@ final class Support_Triage_Dashboard_Screen {
 		<?php
 	}
 
-	/** @param list<array<string, string>> $items */
+	/** @param array<int, array<string, string>> $items */
 	private function render_recent_failed_workflows( array $items ): void {
 		?>
 		<section class="aio-support-triage-section aio-recent-failed" style="margin: 1.5em 0;" aria-labelledby="aio-triage-failed-heading">
@@ -262,7 +262,7 @@ final class Support_Triage_Dashboard_Screen {
 		<?php
 	}
 
-	/** @param list<array<string, string>> $items */
+	/** @param array<int, array<string, string>> $items */
 	private function render_import_export_failures( array $items ): void {
 		?>
 		<section class="aio-support-triage-section aio-import-export" style="margin: 1.5em 0;" aria-labelledby="aio-triage-ie-heading">
@@ -280,7 +280,7 @@ final class Support_Triage_Dashboard_Screen {
 		<?php
 	}
 
-	/** @param list<array<string, string>> $items */
+	/** @param array<int, array<string, string>> $items */
 	private function render_recommended_links( array $items ): void {
 		?>
 		<section class="aio-support-triage-section aio-recommended-links" style="margin: 1.5em 0;" aria-labelledby="aio-triage-links-heading">

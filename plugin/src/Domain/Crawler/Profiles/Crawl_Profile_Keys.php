@@ -32,7 +32,7 @@ final class Crawl_Profile_Keys {
 	/**
 	 * All approved profile keys. Unsupported keys must be rejected.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		return array(

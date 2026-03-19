@@ -23,13 +23,13 @@ final class Reporting_Delivery_Status {
 	public const FAILED  = 'failed';
 	public const SKIPPED = 'skipped';
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private static ?array $all = null;
 
 	/**
 	 * Returns all delivery status values.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {

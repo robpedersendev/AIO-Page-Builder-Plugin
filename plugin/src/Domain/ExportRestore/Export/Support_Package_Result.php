@@ -32,13 +32,13 @@ final class Support_Package_Result {
 	/** @var string Package filename only. */
 	private string $package_filename;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private array $included_support_categories;
 
-	/** @var list<string> Excluded categories (audit). */
+	/** @var array<int, string> Excluded categories (audit). */
 	private array $excluded_categories;
 
-	/** @var array{applied: bool, keys_redacted: list<string>} */
+	/** @var array{applied: bool, keys_redacted: array<int, string>} */
 	private array $redaction_summary;
 
 	/** @var string Safe identifier for admin/UI (e.g. filename). */
@@ -58,9 +58,9 @@ final class Support_Package_Result {
 	 * @param string                                            $message
 	 * @param string                                            $package_path
 	 * @param string                                            $package_filename
-	 * @param list<string>                                      $included_support_categories
-	 * @param list<string>                                      $excluded_categories
-	 * @param array{applied: bool, keys_redacted: list<string>} $redaction_summary
+	 * @param array<int, string>                                      $included_support_categories
+	 * @param array<int, string>                                      $excluded_categories
+	 * @param array{applied: bool, keys_redacted: array<int, string>} $redaction_summary
 	 * @param string                                            $package_reference
 	 * @param string                                            $generation_log_reference
 	 * @param int                                               $checksum_count
@@ -108,17 +108,17 @@ final class Support_Package_Result {
 		return $this->package_filename;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_included_support_categories(): array {
 		return $this->included_support_categories;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_excluded_categories(): array {
 		return $this->excluded_categories;
 	}
 
-	/** @return array{applied: bool, keys_redacted: list<string>} */
+	/** @return array{applied: bool, keys_redacted: array<int, string>} */
 	public function get_redaction_summary(): array {
 		return $this->redaction_summary;
 	}
@@ -142,7 +142,7 @@ final class Support_Package_Result {
 	/**
 	 * Payload for UI/API (no secrets). Omit or empty package_path when sending to client.
 	 *
-	 * @return array{success: bool, message: string, package_filename: string, support_package_type: string, included_support_categories: list<string>, excluded_categories: list<string>, redaction_summary: array, package_reference: string, generation_log_reference: string, checksum_count: int, package_size_bytes: int}
+	 * @return array{success: bool, message: string, package_filename: string, support_package_type: string, included_support_categories: array<int, string>, excluded_categories: array<int, string>, redaction_summary: array, package_reference: string, generation_log_reference: string, checksum_count: int, package_size_bytes: int}
 	 */
 	public function to_payload(): array {
 		return array(
@@ -163,9 +163,9 @@ final class Support_Package_Result {
 	/**
 	 * @param string                                            $package_path
 	 * @param string                                            $package_filename
-	 * @param list<string>                                      $included_support_categories
-	 * @param list<string>                                      $excluded_categories
-	 * @param array{applied: bool, keys_redacted: list<string>} $redaction_summary
+	 * @param array<int, string>                                      $included_support_categories
+	 * @param array<int, string>                                      $excluded_categories
+	 * @param array{applied: bool, keys_redacted: array<int, string>} $redaction_summary
 	 * @param int                                               $checksum_count
 	 * @param int                                               $package_size_bytes
 	 * @param string                                            $generation_log_reference

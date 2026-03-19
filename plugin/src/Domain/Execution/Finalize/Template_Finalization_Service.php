@@ -125,7 +125,7 @@ final class Template_Finalization_Service {
 	 * Builds template execution closure record: trace links (template_key, template_family, post_id, one_pager ref).
 	 *
 	 * @param array<string, mixed> $definition
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function build_template_execution_closure_record( array $definition ): array {
 		$record = array();

@@ -27,7 +27,7 @@ final class Log_Severities {
 	/**
 	 * Returns all severity values in stable order.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {

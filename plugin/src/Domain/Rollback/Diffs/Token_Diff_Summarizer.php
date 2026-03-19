@@ -134,7 +134,7 @@ final class Token_Diff_Summarizer {
 	 *
 	 * @param array<string, mixed> $pre_tokens  Map of token key => array with at least 'value'.
 	 * @param array<string, mixed> $post_tokens  Same shape.
-	 * @return list<array<string, string>>
+	 * @return array<int, array<string, string>>
 	 */
 	private function compute_token_changes( array $pre_tokens, array $post_tokens ): array {
 		$all_keys = array_unique( array_merge( array_keys( $pre_tokens ), array_keys( $post_tokens ) ) );

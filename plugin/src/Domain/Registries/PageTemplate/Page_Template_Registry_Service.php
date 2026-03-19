@@ -168,7 +168,7 @@ final class Page_Template_Registry_Service {
 	 * @param string $status
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_definitions_by_status( $status, $limit, $offset );
@@ -180,7 +180,7 @@ final class Page_Template_Registry_Service {
 	 * @param string $archetype
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_archetype( string $archetype, int $limit = 0, int $offset = 0 ): array {
 		return $this->repository->list_by_archetype( $archetype, $limit, $offset );
@@ -192,7 +192,7 @@ final class Page_Template_Registry_Service {
 	 * @param string $status Optional filter (e.g. 'active'); empty = all non-deprecated.
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_eligible_for_new_selection( string $status = 'active', int $limit = 0, int $offset = 0 ): array {
 		$list = $status !== '' ? $this->repository->list_definitions_by_status( $status, $limit, $offset ) : $this->repository->list_all_definitions( $limit, $offset );
@@ -225,7 +225,7 @@ final class Page_Template_Registry_Service {
 	 * Call from activation, first-time setup, or admin seed action. Requires the section template repository.
 	 *
 	 * @param Section_Template_Repository $section_repo Section template repository (for form_section_ndr).
-	 * @return array{ success: bool, section_id: int, page_id: int, errors: list<string> }
+	 * @return array{ success: bool, section_id: int, page_id: int, errors: array<int, string> }
 	 */
 	public function ensure_bundled_form_templates( Section_Template_Repository $section_repo ): array {
 		return Form_Template_Seeder::run( $section_repo, $this->repository );

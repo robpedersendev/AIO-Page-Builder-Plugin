@@ -35,23 +35,23 @@ final class Extraction_Result {
 	/** Extraction note: content excerpt truncated to bound. */
 	public const NOTE_EXCERPT_TRUNCATED = 'excerpt_truncated';
 
-	/** @var array{title: string, meta_description: string, h1: string, h2_outline: list<string>, word_count: int, content_excerpt: string, internal_link_count: int} */
+	/** @var array{title: string, meta_description: string, h1: string, h2_outline: array<int, string>, word_count: int, content_excerpt: string, internal_link_count: int} */
 	public $page_summary;
 
-	/** @var list<array{level: int, text: string}> Heading outline (h1–h6 in document order). */
+	/** @var array<int, array{level: int, text: string}> Heading outline (h1–h6 in document order). */
 	public $heading_outline;
 
-	/** @var list<array{context: string, label: string, url: string, depth?: int}> */
+	/** @var array<int, array{context: string, label: string, url: string, depth?: int}> */
 	public $navigation_summary;
 
-	/** @var list<string> Diagnostic codes/messages. */
+	/** @var array<int, string> Diagnostic codes/messages. */
 	public $extraction_notes;
 
 	/**
-	 * @param array{title: string, meta_description: string, h1: string, h2_outline: list<string>, word_count: int, content_excerpt: string, internal_link_count: int} $page_summary
-	 * @param list<array{level: int, text: string}>                                                                                                                    $heading_outline
-	 * @param list<array{context: string, label: string, url: string, depth?: int}>                                                                                    $navigation_summary
-	 * @param list<string>                                                                                                                                             $extraction_notes
+	 * @param array{title: string, meta_description: string, h1: string, h2_outline: array<int, string>, word_count: int, content_excerpt: string, internal_link_count: int} $page_summary
+	 * @param array<int, array{level: int, text: string}>                                                                                                                    $heading_outline
+	 * @param array<int, array{context: string, label: string, url: string, depth?: int}>                                                                                    $navigation_summary
+	 * @param array<int, string>                                                                                                                                             $extraction_notes
 	 */
 	public function __construct(
 		array $page_summary,
@@ -68,7 +68,7 @@ final class Extraction_Result {
 	/**
 	 * Returns a machine-readable array for logging or API.
 	 *
-	 * @return array{page_summary: array, heading_outline: array, navigation_summary: array, extraction_notes: list<string>}
+	 * @return array{page_summary: array, heading_outline: array, navigation_summary: array, extraction_notes: array<int, string>}
 	 */
 	public function to_array(): array {
 		return array(

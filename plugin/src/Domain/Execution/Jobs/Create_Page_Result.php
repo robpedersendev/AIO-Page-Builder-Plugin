@@ -28,7 +28,7 @@ final class Create_Page_Result {
 	/** @var string */
 	private $message;
 
-	/** @var list<string> */
+	/** @var array<int, string> */
 	private $errors;
 
 	/** @var array<string, mixed> */
@@ -41,7 +41,7 @@ final class Create_Page_Result {
 	 * @param bool                 $success
 	 * @param int                  $post_id    Created page ID; 0 on failure.
 	 * @param string               $message
-	 * @param list<string>         $errors
+	 * @param array<int, string>         $errors
 	 * @param array<string, mixed> $artifacts  post_id, template_key, assignment_count, log_ref, etc.
 	 * @param string               $log_ref
 	 */
@@ -73,7 +73,7 @@ final class Create_Page_Result {
 		return $this->message;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_errors(): array {
 		return $this->errors;
 	}

@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Omission_Result {
 
-	/** @var list<string> Field keys that were omitted (optional and empty). */
+	/** @var array<int, string> Field keys that were omitted (optional and empty). */
 	private array $omitted_keys;
 
 	/** @var array<string, string> Field key => refusal reason (required, structural heading, primary CTA, etc.). */
@@ -27,7 +27,7 @@ final class Omission_Result {
 	private array $fallbacks_applied;
 
 	/**
-	 * @param list<string>          $omitted_keys     Keys omitted (optional + empty).
+	 * @param array<int, string>          $omitted_keys     Keys omitted (optional + empty).
 	 * @param array<string, string> $refused          Key => reason when omission was refused.
 	 * @param array<string, string> $fallbacks_applied Key => fallback value applied.
 	 */
@@ -41,7 +41,7 @@ final class Omission_Result {
 		$this->fallbacks_applied = $fallbacks_applied;
 	}
 
-	/** @return list<string> */
+	/** @return array<int, string> */
 	public function get_omitted_keys(): array {
 		return $this->omitted_keys;
 	}
@@ -72,7 +72,7 @@ final class Omission_Result {
 	/**
 	 * Payload for tests and debugging (not user-facing).
 	 *
-	 * @return array{omitted_keys: list<string>, refused: array<string, string>, fallbacks_applied: array<string, string>}
+	 * @return array{omitted_keys: array<int, string>, refused: array<string, string>, fallbacks_applied: array<string, string>}
 	 */
 	public function to_array(): array {
 		return array(

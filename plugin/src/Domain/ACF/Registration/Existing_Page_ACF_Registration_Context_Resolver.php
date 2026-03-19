@@ -78,7 +78,7 @@ class Existing_Page_ACF_Registration_Context_Resolver {
 	/**
 	 * Resolves section keys for the current existing-page edit. Returns null when not in that context.
 	 *
-	 * @return list<string>|null Section keys to register, or null if not existing-page edit context.
+	 * @return array<int, string>|null Section keys to register, or null if not existing-page edit context.
 	 */
 	public function get_section_keys_for_current_request(): ?array {
 		if ( ! $this->is_existing_page_edit_context() ) {

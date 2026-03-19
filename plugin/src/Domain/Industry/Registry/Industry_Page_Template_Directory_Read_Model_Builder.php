@@ -46,7 +46,7 @@ final class Industry_Page_Template_Directory_Read_Model_Builder {
 	 * @param array<string, mixed>|null        $primary_pack     Industry pack or null.
 	 * @param array<int, array<string, mixed>> $page_templates List of page template definitions (each with internal_key).
 	 * @param string                           $view_mode        One of VIEW_RECOMMENDED_ONLY, VIEW_RECOMMENDED_PLUS_WEAK, VIEW_FULL_LIBRARY.
-	 * @return list<Industry_Page_Template_Directory_Item_View>
+	 * @return array<int, Industry_Page_Template_Directory_Item_View>
 	 */
 	public function build(
 		array $industry_profile,
@@ -98,7 +98,7 @@ final class Industry_Page_Template_Directory_Read_Model_Builder {
 	 * @param array<string, mixed>|null        $primary_pack
 	 * @param array<int, array<string, mixed>> $page_templates
 	 * @param string                           $view_mode
-	 * @return array{items: list<Industry_Page_Template_Directory_Item_View>, weighted_by_key: array<string, array<string, mixed>>}
+	 * @return array{items: array<int, Industry_Page_Template_Directory_Item_View>, weighted_by_key: array<string, array<string, mixed>>}
 	 */
 	public function build_with_weighted(
 		array $industry_profile,

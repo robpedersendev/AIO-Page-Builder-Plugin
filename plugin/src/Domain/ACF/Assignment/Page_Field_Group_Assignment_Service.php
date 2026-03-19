@@ -43,7 +43,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 	 * @param int    $page_id     WordPress post ID (page).
 	 * @param string $template_key Page template internal_key.
 	 * @param bool   $full_replace If true, replace all. If false, refine (add new, keep existing).
-	 * @return array{assigned: int, errors: list<string>}
+	 * @return array{assigned: int, errors: array<int, string>}
 	 */
 	public function assign_from_template( int $page_id, string $template_key, bool $full_replace = true ): array {
 		$page_ref = (string) $page_id;
@@ -73,7 +73,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 	 * @param int    $page_id        WordPress post ID (page).
 	 * @param string $composition_id Composition id.
 	 * @param bool   $full_replace   If true, replace all. If false, refine.
-	 * @return array{assigned: int, errors: list<string>}
+	 * @return array{assigned: int, errors: array<int, string>}
 	 */
 	public function assign_from_composition( int $page_id, string $composition_id, bool $full_replace = true ): array {
 		$page_ref = (string) $page_id;
@@ -102,7 +102,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 	 * Uses optimized read path (target_ref only) per Prompt 295.
 	 *
 	 * @param int $page_id
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_visible_groups_for_page( int $page_id ): array {
 		return $this->get_visible_groups_result_for_page( $page_id )->get_group_keys();
@@ -127,7 +127,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 	 * Re-assigns when page's structural source changes. Derives from current source.
 	 *
 	 * @param int $page_id
-	 * @return array{assigned: int, errors: list<string>}
+	 * @return array{assigned: int, errors: array<int, string>}
 	 */
 	public function reassign_from_stored_source( int $page_id ): array {
 		$page_ref = (string) $page_id;
@@ -150,7 +150,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 	 * Use when template/composition was updated and pages should gain new sections without losing old ones.
 	 *
 	 * @param int $page_id
-	 * @return array{assigned: int, errors: list<string>}
+	 * @return array{assigned: int, errors: array<int, string>}
 	 */
 	public function sync_with_refinement( int $page_id ): array {
 		$page_ref    = (string) $page_id;
@@ -207,7 +207,7 @@ final class Page_Field_Group_Assignment_Service implements Page_Field_Group_Assi
 	 * Persists page_field_group rows for each group key.
 	 *
 	 * @param string       $page_ref
-	 * @param list<string> $group_keys
+	 * @param array<int, string> $group_keys
 	 * @return int Number of groups persisted.
 	 */
 	private function persist_field_groups( string $page_ref, array $group_keys ): int {

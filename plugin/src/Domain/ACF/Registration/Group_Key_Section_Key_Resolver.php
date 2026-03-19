@@ -44,8 +44,8 @@ final class Group_Key_Section_Key_Resolver {
 	/**
 	 * Resolves multiple group keys to section keys. Invalid/foreign keys are omitted; duplicates removed.
 	 *
-	 * @param list<string> $group_keys
-	 * @return list<string> Section keys corresponding to valid plugin group keys, de-duplicated.
+	 * @param array<int, string> $group_keys
+	 * @return array<int, string> Section keys corresponding to valid plugin group keys, de-duplicated.
 	 */
 	public function group_keys_to_section_keys( array $group_keys ): array {
 		$section_keys = array();

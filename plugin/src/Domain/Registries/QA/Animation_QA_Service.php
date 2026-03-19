@@ -145,7 +145,7 @@ final class Animation_QA_Service {
 
 	/**
 	 * @param array<string, mixed>                                                            $def
-	 * @param list<array{scope: string, template_key: string, code: string, message: string}> $violations
+	 * @param array<int, array{scope: string, template_key: string, code: string, message: string}> $violations
 	 * @param array<string, int>                                                              $section_by_tier
 	 */
 	private function audit_section( array $def, array &$violations, array &$section_by_tier ): void {
@@ -207,7 +207,7 @@ final class Animation_QA_Service {
 
 	/**
 	 * @param array<string, mixed>                                                            $def
-	 * @param list<array{scope: string, template_key: string, code: string, message: string}> $violations
+	 * @param array<int, array{scope: string, template_key: string, code: string, message: string}> $violations
 	 */
 	private function audit_page( array $def, array &$violations ): void {
 		$key = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );

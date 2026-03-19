@@ -20,19 +20,19 @@ final class Template_Library_Compliance_Result {
 	/** @var array{section_total: int, page_total: int, section_target: int, page_target: int, by_section_purpose_family: array<string, int>, by_page_category_class: array<string, int>, by_page_family: array<string, int>} */
 	private array $count_summary;
 
-	/** @var array{section_family_minimums: array<string, bool>, page_class_minimums: array<string, bool>, max_share_violations: list<string>} */
+	/** @var array{section_family_minimums: array<string, bool>, page_class_minimums: array<string, bool>, max_share_violations: array<int, string>} */
 	private array $category_coverage_summary;
 
-	/** @var list<array{template_key: string, code: string, message: string}> */
+	/** @var array<int, array{template_key: string, code: string, message: string}> */
 	private array $cta_rule_violations;
 
-	/** @var array{sections_missing_preview: list<string>, pages_missing_one_pager: list<string>} */
+	/** @var array{sections_missing_preview: array<int, string>, pages_missing_one_pager: array<int, string>} */
 	private array $preview_readiness;
 
-	/** @var array{sections_missing_accessibility: list<string>, sections_invalid_animation: list<string>} */
+	/** @var array{sections_missing_accessibility: array<int, string>, sections_invalid_animation: array<int, string>} */
 	private array $metadata_checks;
 
-	/** @var array{viable: bool, errors: list<string>} */
+	/** @var array{viable: bool, errors: array<int, string>} */
 	private array $export_viability;
 
 	/** @var bool True when no hard-fail violations. */
@@ -73,7 +73,7 @@ final class Template_Library_Compliance_Result {
 		return $this->category_coverage_summary;
 	}
 
-	/** @return list<array{template_key: string, code: string, message: string}> */
+	/** @return array<int, array{template_key: string, code: string, message: string}> */
 	public function get_cta_rule_violations(): array {
 		return $this->cta_rule_violations;
 	}
@@ -114,7 +114,7 @@ final class Template_Library_Compliance_Result {
 	/**
 	 * Human-readable summary lines (for report excerpt).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function to_summary_lines(): array {
 		$lines   = array();

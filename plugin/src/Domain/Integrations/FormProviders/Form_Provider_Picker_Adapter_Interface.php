@@ -50,7 +50,7 @@ interface Form_Provider_Picker_Adapter_Interface {
 	 * List of forms for picker (normalized). Only called when supports_form_list() is true.
 	 * Returned item_id and item_label are provider-supplied; consumers must validate/sanitize.
 	 *
-	 * @return list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string}>
+	 * @return array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string}>
 	 */
 	public function get_form_list(): array;
 

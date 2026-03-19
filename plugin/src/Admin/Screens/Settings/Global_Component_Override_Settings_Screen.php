@@ -59,7 +59,14 @@ final class Global_Component_Override_Settings_Screen {
 		$form_builder = $this->get_form_builder();
 
 		if ( $repo === null || $form_builder === null ) {
-			echo '<div class="wrap"><p>' . \esc_html__( 'Global component override settings are unavailable.', 'aio-page-builder' ) . '</p></div>';
+			$diagnostics_url = \admin_url( 'admin.php?page=aio-page-builder-diagnostics' );
+			echo '<div class="wrap aio-page-builder-screen"><h1>' . \esc_html( $this->get_title() ) . '</h1>';
+			echo '<div class="notice notice-warning inline"><p>' . \esc_html__( 'Global component override settings are unavailable. The style repository or form builder could not be loaded.', 'aio-page-builder' ) . '</p>';
+			echo '<p>' . \sprintf(
+				/* translators: 1: link to diagnostics, 2: link text */
+				\esc_html__( 'You can try reloading this page or check the %1$s screen for dependency status.', 'aio-page-builder' ),
+				'<a href="' . \esc_url( $diagnostics_url ) . '">' . \esc_html__( 'Diagnostics', 'aio-page-builder' ) . '</a>'
+			) . '</p></div></div>';
 			return;
 		}
 

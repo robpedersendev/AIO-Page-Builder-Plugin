@@ -32,7 +32,7 @@ final class Log_Categories {
 	/**
 	 * Returns all category values in stable order.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		if ( self::$all !== null ) {

@@ -30,7 +30,7 @@ final class Export_Token_Set_Reader {
 	 * Returns all token set rows for export (export-safe columns; value_payload sanitized).
 	 *
 	 * @param int $limit Max rows (0 = no limit).
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_for_export( int $limit = 0 ): array {
 		$table = $this->wpdb->prefix . Table_Names::TOKEN_SETS;

@@ -148,7 +148,7 @@ final class AI_Providers_Screen {
 	}
 
 	/**
-	 * @return array{provider_rows: list<array>, disclosure_blocks: list<array>, ai_runs_url: string}
+	 * @return array{provider_rows: array<int, array>, disclosure_blocks: array<int, array>, ai_runs_url: string}
 	 */
 	private function get_state(): array {
 		$builder = $this->get_state_builder();
@@ -191,7 +191,7 @@ final class AI_Providers_Screen {
 	}
 
 	/**
-	 * @param list<array{heading: string, content: string}> $blocks
+	 * @param array<int, array{heading: string, content: string}> $blocks
 	 * @return void
 	 */
 	private function render_disclosure( array $blocks ): void {
@@ -208,7 +208,7 @@ final class AI_Providers_Screen {
 	}
 
 	/**
-	 * @param list<array> $provider_rows
+	 * @param array<int, array> $provider_rows
 	 * @param string      $ai_runs_url
 	 * @return void
 	 */

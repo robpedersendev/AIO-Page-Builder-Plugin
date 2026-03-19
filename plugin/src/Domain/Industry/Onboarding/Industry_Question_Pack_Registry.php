@@ -83,7 +83,7 @@ final class Industry_Question_Pack_Registry {
 	/**
 	 * Returns list of industry keys that have a question pack.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_supported_industry_keys(): array {
 		return array_values( array_keys( $this->by_industry ) );

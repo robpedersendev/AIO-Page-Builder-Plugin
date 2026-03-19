@@ -70,7 +70,7 @@ final class Template_Compare_Screen {
 	 * Returns the current user's compare list for the given type (for directory/detail link display).
 	 *
 	 * @param string $type 'section' or 'page'.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public static function get_compare_list( string $type ): array {
 		$meta_key = self::get_compare_meta_key( $type );

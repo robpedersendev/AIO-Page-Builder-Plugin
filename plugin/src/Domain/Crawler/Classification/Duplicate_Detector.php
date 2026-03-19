@@ -28,7 +28,7 @@ final class Duplicate_Detector {
 	 * Checks whether the candidate duplicates any known page. Returns duplicate URL and reason or null.
 	 *
 	 * @param array{normalized_url: string, canonical_url?: string|null, title?: string|null, h1?: string|null, content_hash?: string|null, final_url?: string|null} $candidate Candidate page data.
-	 * @param list<array{normalized_url: string, canonical_url?: string|null, title?: string|null, h1?: string|null, content_hash?: string|null}>                    $known_pages Already-accepted pages (same run).
+	 * @param array<int, array{normalized_url: string, canonical_url?: string|null, title?: string|null, h1?: string|null, content_hash?: string|null}>                    $known_pages Already-accepted pages (same run).
 	 * @return array{duplicate_of: string, reason: string}|null Null if no duplicate found.
 	 */
 	public function find_duplicate( array $candidate, array $known_pages ): ?array {

@@ -65,7 +65,7 @@ final class Style_Token_Registry {
 	/**
 	 * Returns all token group names (e.g. color, typography, spacing).
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_token_group_names(): array {
 		if ( ! $this->is_loaded() ) {
@@ -82,7 +82,7 @@ final class Style_Token_Registry {
 	 * Returns allowed token names for a group (short names, e.g. primary, heading).
 	 *
 	 * @param string $group Token group (e.g. color, typography).
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_allowed_names_for_group( string $group ): array {
 		if ( ! $this->is_loaded() ) {

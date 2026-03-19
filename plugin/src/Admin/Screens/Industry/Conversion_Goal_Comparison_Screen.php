@@ -180,7 +180,8 @@ final class Conversion_Goal_Comparison_Screen {
 			<?php if ( isset( $state['error'] ) && $state['error'] === 'missing_simulation_service' ) : ?>
 				<div class="notice notice-warning inline" style="margin: 1em 0;" role="alert">
 					<p><?php esc_html_e( 'Conversion goal comparison is not available. The industry subsystem or comparison service is not loaded.', 'aio-page-builder' ); ?></p>
-					<p><a href="<?php echo esc_url( $state['profile_url'] ?? admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ) ); ?>"><?php esc_html_e( 'Industry Profile', 'aio-page-builder' ); ?></a></p>
+					<p><?php esc_html_e( 'To use this feature, ensure the industry packs module is active. You can set or change your industry in Industry Profile.', 'aio-page-builder' ); ?></p>
+					<p><a href="<?php echo esc_url( $state['profile_url'] ?? admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ) ); ?>"><?php esc_html_e( 'Go to Industry Profile', 'aio-page-builder' ); ?></a></p>
 				</div>
 				<?php return; ?>
 			<?php endif; ?>

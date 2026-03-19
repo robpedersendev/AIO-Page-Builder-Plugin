@@ -74,7 +74,7 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 	 * @param string|null $status       Optional filter by crawl_status.
 	 * @param int         $limit         Max rows (0 = no limit).
 	 * @param int         $offset        Offset.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_run_id( string $crawl_run_id, ?string $status = null, int $limit = 0, int $offset = 0 ): array {
 		$run_id = $this->sanitize_run_id( $crawl_run_id );
@@ -115,7 +115,7 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 	 * Lists distinct crawl run ids from the snapshot table (most recent first).
 	 *
 	 * @param int $limit Max number of run ids (0 = no limit).
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function list_crawl_run_ids( int $limit = 50 ): array {
 		$table = $this->get_table_name();
@@ -266,7 +266,7 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 	 * Casts values for wpdb::prepare (all %s for simplicity; wpdb accepts int as %s).
 	 *
 	 * @param array<int, mixed> $values
-	 * @return list<string|int>
+	 * @return array<int, string|int>
 	 */
 	private function cast_values_for_prepare( array $values ): array {
 		$out = array();

@@ -39,9 +39,9 @@ final class Privacy_Settings_State_Builder {
 	 * Builds full screen state. All values safe for display; no secrets.
 	 *
 	 * @return array{
-	 *   reporting_disclosure: list<array{heading: string, content: string}>,
+	 *   reporting_disclosure: array<int, array{heading: string, content: string}>,
 	 *   retention_state: array{reporting_log_summary: string, retention_note: string},
-	 *   uninstall_export_state: array{choices: list<array>, prefs_summary: string, built_pages_message: string},
+	 *   uninstall_export_state: array{choices: array<int, array>, prefs_summary: string, built_pages_message: string},
 	 *   environment_summary: array{php_version: string, wp_version: string},
 	 *   version_summary: array{plugin_version: string},
 	 *   report_destination_summary: array{transport_type: string, description: string},
@@ -65,7 +65,7 @@ final class Privacy_Settings_State_Builder {
 	/**
 	 * Mandatory reporting disclosure (spec §46.1, §46.11). Must remain clearly visible.
 	 *
-	 * @return list<array{heading: string, content: string}>
+	 * @return array<int, array{heading: string, content: string}>
 	 */
 	private function build_reporting_disclosure(): array {
 		return array(
@@ -99,7 +99,7 @@ final class Privacy_Settings_State_Builder {
 	}
 
 	/**
-	 * @return array{choices: list<array>, prefs_summary: string, built_pages_message: string, acf_preservation_message: string, template_library_lifecycle_summary?: array<string, mixed>}
+	 * @return array{choices: array<int, array>, prefs_summary: string, built_pages_message: string, acf_preservation_message: string, template_library_lifecycle_summary?: array<string, mixed>}
 	 */
 	private function build_uninstall_export_state(): array {
 		$choices                  = array(

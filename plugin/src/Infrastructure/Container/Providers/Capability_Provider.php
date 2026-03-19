@@ -27,7 +27,7 @@ final class Capability_Provider implements Service_Provider_Interface {
 			'capabilities',
 			function (): object {
 				return new class() {
-					/** @return list<string> */
+					/** @return array<int, string> */
 					public function get_all(): array {
 						return Capabilities::getAll();
 					}

@@ -44,7 +44,7 @@ final class Industry_LPagery_Rule_Registry {
 	/** @var array<string, array<string, mixed>> Map of lpagery_rule_key => rule. */
 	private array $by_key = array();
 
-	/** @var list<array<string, mixed>> All valid rules in load order. */
+	/** @var array<int, array<string, mixed>> All valid rules in load order. */
 	private array $all = array();
 
 	/**
@@ -100,7 +100,7 @@ final class Industry_LPagery_Rule_Registry {
 	/**
 	 * Returns all loaded rules.
 	 *
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_all(): array {
 		return $this->all;
@@ -110,7 +110,7 @@ final class Industry_LPagery_Rule_Registry {
 	 * Returns rules for the given industry_key. Empty array if none.
 	 *
 	 * @param string $industry_key Industry pack key.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_industry( string $industry_key ): array {
 		$want = trim( $industry_key );
@@ -130,7 +130,7 @@ final class Industry_LPagery_Rule_Registry {
 	 * Returns rules with the given status. Empty array if none.
 	 *
 	 * @param string $status One of STATUS_ACTIVE, STATUS_DRAFT, STATUS_DEPRECATED.
-	 * @return list<array<string, mixed>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_by_status( string $status ): array {
 		$out = array();
@@ -149,7 +149,7 @@ final class Industry_LPagery_Rule_Registry {
 	 * Validates a single rule. Returns list of error codes; empty when valid.
 	 *
 	 * @param array<string, mixed> $rule Raw rule.
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function validate_rule( array $rule ): array {
 		$errors = array();

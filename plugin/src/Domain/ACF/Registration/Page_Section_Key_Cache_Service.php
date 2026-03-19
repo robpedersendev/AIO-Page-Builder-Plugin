@@ -53,7 +53,7 @@ final class Page_Section_Key_Cache_Service {
 	 * Gets cached section keys for a page. Returns null on miss or invalid.
 	 *
 	 * @param int $page_id
-	 * @return list<string>|null
+	 * @return array<int, string>|null
 	 */
 	public function get_for_page( int $page_id ): ?array {
 		if ( $page_id <= 0 ) {
@@ -77,7 +77,7 @@ final class Page_Section_Key_Cache_Service {
 	 * Sets cached section keys for a page.
 	 *
 	 * @param int          $page_id
-	 * @param list<string> $section_keys
+	 * @param array<int, string> $section_keys
 	 */
 	public function set_for_page( int $page_id, array $section_keys ): void {
 		if ( $page_id <= 0 ) {
@@ -103,7 +103,7 @@ final class Page_Section_Key_Cache_Service {
 	 * Gets cached section keys for a template. Returns null on miss.
 	 *
 	 * @param string $template_key
-	 * @return list<string>|null
+	 * @return array<int, string>|null
 	 */
 	public function get_for_template( string $template_key ): ?array {
 		$template_key = \sanitize_key( $template_key );
@@ -128,7 +128,7 @@ final class Page_Section_Key_Cache_Service {
 	 * Sets cached section keys for a template.
 	 *
 	 * @param string       $template_key
-	 * @param list<string> $section_keys
+	 * @param array<int, string> $section_keys
 	 */
 	public function set_for_template( string $template_key, array $section_keys ): void {
 		$template_key = \sanitize_key( $template_key );
@@ -155,7 +155,7 @@ final class Page_Section_Key_Cache_Service {
 	 * Gets cached section keys for a composition. Returns null on miss.
 	 *
 	 * @param string $composition_id
-	 * @return list<string>|null
+	 * @return array<int, string>|null
 	 */
 	public function get_for_composition( string $composition_id ): ?array {
 		$composition_id = \sanitize_key( $composition_id );
@@ -179,7 +179,7 @@ final class Page_Section_Key_Cache_Service {
 	 * Sets cached section keys for a composition.
 	 *
 	 * @param string       $composition_id
-	 * @param list<string> $section_keys
+	 * @param array<int, string> $section_keys
 	 */
 	public function set_for_composition( string $composition_id, array $section_keys ): void {
 		$composition_id = \sanitize_key( $composition_id );

@@ -60,7 +60,7 @@ final class Component_Override_Registry {
 	/**
 	 * Returns all component ids.
 	 *
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_component_ids(): array {
 		return array_keys( $this->by_id );
@@ -70,7 +70,7 @@ final class Component_Override_Registry {
 	 * Returns component data by id.
 	 *
 	 * @param string $component_id Component id (e.g. card, cta, badge).
-	 * @return array{id?: string, element_role?: string, selector_pattern?: string, allowed_token_overrides?: list<string>} Empty array if not found.
+	 * @return array{id?: string, element_role?: string, selector_pattern?: string, allowed_token_overrides?: array<int, string>} Empty array if not found.
 	 */
 	public function get_component( string $component_id ): array {
 		if ( isset( $this->by_id[ $component_id ] ) && is_array( $this->by_id[ $component_id ] ) ) {
@@ -107,7 +107,7 @@ final class Component_Override_Registry {
 	 * Returns list of allowed token variable names for overrides (e.g. --aio-color-primary).
 	 *
 	 * @param string $component_id
-	 * @return list<string>
+	 * @return array<int, string>
 	 */
 	public function get_allowed_token_overrides( string $component_id ): array {
 		$c    = $this->get_component( $component_id );

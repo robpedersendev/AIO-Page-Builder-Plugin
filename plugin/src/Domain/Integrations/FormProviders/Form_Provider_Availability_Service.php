@@ -55,7 +55,7 @@ final class Form_Provider_Availability_Service {
 	 *   message: string|null,
 	 *   from_cache: bool,
 	 *   checked_at: int|null,
-	 *   picker_items: list<array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}>,
+	 *   picker_items: array<int, array{provider_key: string, item_id: string, item_label: string, status_hint?: string|null}>,
 	 *   stale_binding: bool
 	 * }
 	 */
@@ -159,7 +159,7 @@ final class Form_Provider_Availability_Service {
 	/**
 	 * Summary of all registered providers' availability (for diagnostics/support).
 	 *
-	 * @return list<array{provider_key: string, status: string, message: string|null}>
+	 * @return array<int, array{provider_key: string, status: string, message: string|null}>
 	 */
 	public function get_summary_for_admin(): array {
 		$ids = $this->registry->get_registered_provider_ids();
