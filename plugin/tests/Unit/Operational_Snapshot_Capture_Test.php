@@ -77,6 +77,11 @@ final class Stub_Operational_Snapshot_Repository implements Operational_Snapshot
 		}
 		return $out;
 	}
+
+	/** @inheritDoc */
+	public function list_rollback_entries_for_plan( string $plan_id ): array {
+		return array();
+	}
 }
 
 final class Operational_Snapshot_Capture_Test extends TestCase {
@@ -158,11 +163,12 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 		$this->assertContains( 'build_failed', $result->get_errors() );
 	}
 
+	/** v1 (Prompt 642): only page replacement and token changes are rollback-capable; menu is out of scope. */
 	public function test_service_supports_pre_capture_for_rollback_capable_actions(): void {
 		$repo = new Stub_Operational_Snapshot_Repository();
 		$svc  = new Operational_Snapshot_Service( $repo, new Pre_Change_Snapshot_Builder(), new Post_Change_Result_Builder() );
 		$this->assertTrue( $svc->supports_pre_capture( Execution_Action_Types::REPLACE_PAGE ) );
-		$this->assertTrue( $svc->supports_pre_capture( Execution_Action_Types::UPDATE_MENU ) );
+		$this->assertFalse( $svc->supports_pre_capture( Execution_Action_Types::UPDATE_MENU ), 'v1: menu not rollback-capable' );
 		$this->assertTrue( $svc->supports_pre_capture( Execution_Action_Types::APPLY_TOKEN_SET ) );
 		$this->assertFalse( $svc->supports_pre_capture( Execution_Action_Types::CREATE_PAGE ) );
 		$this->assertFalse( $svc->supports_pre_capture( Execution_Action_Types::FINALIZE_PLAN ) );

@@ -53,7 +53,7 @@ final class Build_Plan_Workspace_Screen {
 	/** Nonce action for Step 3 (navigation) approve/deny and bulk actions. */
 	public const NONCE_ACTION_NAVIGATION_REVIEW = 'aio_build_plan_navigation_review';
 
-	/** Nonce action for Step 7 (logs/rollback) rollback request. */
+	/** Nonce action for Step 8 (logs/rollback) rollback request. */
 	public const NONCE_ACTION_ROLLBACK = 'aio_build_plan_rollback_request';
 
 	/**
@@ -315,7 +315,7 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	/**
-	 * Handles Step 7 rollback request: validates permission and eligibility, enqueues rollback job, redirects (spec §38.5, §41.10).
+	 * Handles Step 8 (logs/rollback) rollback request: validates permission and eligibility, enqueues rollback job, redirects (spec §38.5, §41.10).
 	 *
 	 * @param string $plan_id Plan ID.
 	 * @return bool True if request was handled and redirect sent; false to continue render.
@@ -328,8 +328,8 @@ final class Build_Plan_Workspace_Screen {
 		if ( $plan_id === '' ) {
 			return false;
 		}
-		$step_7_index = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
-		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_7_index );
+		$step_rollback_index = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
+		$redirect_url       = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_rollback_index );
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_rollback_request'] ) ) {
 			$nonce = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
@@ -363,8 +363,9 @@ final class Build_Plan_Workspace_Screen {
 				'plan_item_ref'        => '',
 			);
 			$actor_context = array(
-				'actor_type' => 'user',
-				'actor_id'   => (string) \get_current_user_id(),
+				'actor_type'          => 'user',
+				'actor_id'            => (string) \get_current_user_id(),
+				'capability_checked'  => Capabilities::EXECUTE_ROLLBACKS,
 			);
 			$result        = $this->container->get( 'execution_queue_service' )->request_rollback( $payload, $actor_context, array( 'run_immediately' => true ) );
 			if ( isset( $result['status'] ) && $result['status'] === 'completed' ) {
@@ -792,15 +793,15 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	/**
-	 * Injects rollback nonce, action URL, and per-row form data for Step 7 (spec §41.10). Surfaces rollback_done/rollback_error.
+	 * Injects rollback nonce, action URL, and per-row form data for Step 8 (logs/rollback) (spec §41.10). Surfaces rollback_done/rollback_error.
 	 *
 	 * @param array<string, mixed> $workspace Workspace payload (mutated).
 	 * @param string               $plan_id  Plan ID.
 	 */
 	private function inject_rollback_entry_data( array &$workspace, string $plan_id ): void {
-		$step_7_index                     = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
-		$workspace['rollback_nonce']      = \wp_create_nonce( self::NONCE_ACTION_ROLLBACK );
-		$workspace['rollback_action_url'] = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_7_index );
+		$step_rollback_index               = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
+		$workspace['rollback_nonce']       = \wp_create_nonce( self::NONCE_ACTION_ROLLBACK );
+		$workspace['rollback_action_url']  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_rollback_index );
 		$rows                             = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {

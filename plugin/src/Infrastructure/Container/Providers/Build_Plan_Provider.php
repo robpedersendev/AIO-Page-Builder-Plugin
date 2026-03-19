@@ -318,7 +318,8 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 					$container->get( 'tokens_step_ui_service' ),
 					$container->get( 'seo_media_step_ui_service' ),
 					$container->get( 'finalization_step_ui_service' ),
-					$container->get( 'history_rollback_step_ui_service' )
+					$container->get( 'history_rollback_step_ui_service' ),
+					$container->has( 'operational_snapshot_repository' ) ? $container->get( 'operational_snapshot_repository' ) : null
 				);
 			}
 		);

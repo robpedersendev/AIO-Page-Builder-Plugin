@@ -40,4 +40,13 @@ interface Operational_Snapshot_Repository_Interface {
 	 * @return array<string, int> Map of snapshot_id to created_at timestamp.
 	 */
 	public function list_snapshot_created_times_for_target( string $target_ref ): array;
+
+	/**
+	 * Returns rollback-capable history entries for a build plan (v1: page replacement + token only).
+	 * Each entry has post_snapshot_id, pre_snapshot_id, action_type, target_ref, created_at.
+	 *
+	 * @param string $plan_id Build plan internal key.
+	 * @return array<int, array{post_snapshot_id: string, pre_snapshot_id: string, action_type: string, target_ref: string, created_at: string}>
+	 */
+	public function list_rollback_entries_for_plan( string $plan_id ): array;
 }

@@ -57,6 +57,36 @@ final class Stub_Rollback_Repo implements Operational_Snapshot_Repository_Interf
 	public function list_snapshot_created_times_for_target( string $target_ref ): array {
 		return $this->list_for_target;
 	}
+
+	/** @inheritDoc */
+	public function list_rollback_entries_for_plan( string $plan_id ): array {
+		$out = array();
+		foreach ( $this->store as $id => $snap ) {
+			if ( ! is_array( $snap ) ) {
+				continue;
+			}
+			$type = $snap[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] ?? '';
+			if ( $type !== Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE ) {
+				continue;
+			}
+			$plan_ref = trim( (string) ( $snap[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ?? '' ) );
+			if ( $plan_ref !== $plan_id ) {
+				continue;
+			}
+			$pre_id = isset( $snap['pre_snapshot_id'] ) && is_string( $snap['pre_snapshot_id'] ) ? trim( $snap['pre_snapshot_id'] ) : '';
+			if ( $pre_id === '' ) {
+				continue;
+			}
+			$out[] = array(
+				'post_snapshot_id' => $id,
+				'pre_snapshot_id'  => $pre_id,
+				'action_type'      => (string) ( $snap[ Operational_Snapshot_Schema::FIELD_ACTION_TYPE ] ?? '' ),
+				'target_ref'       => (string) ( $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ?? '' ),
+				'created_at'       => (string) ( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ?? '' ),
+			);
+		}
+		return $out;
+	}
 }
 
 final class Rollback_Eligibility_Test extends TestCase {
@@ -223,6 +253,19 @@ final class Rollback_Eligibility_Test extends TestCase {
 
 		$this->assertTrue( $result->is_eligible() );
 		$this->assertEmpty( $result->get_blocking_reasons() );
+	}
+
+	/** v1 (Prompt 642): UPDATE_MENU has no rollback handler; eligibility returns NO_HANDLER_FOR_ACTION_TYPE. */
+	public function test_ineligible_when_action_type_not_rollback_capable_in_v1(): void {
+		$repo                   = new Stub_Rollback_Repo();
+		$repo->store['pre-menu'] = self::pre_snapshot( 'pre-menu', '10', Operational_Snapshot_Schema::OBJECT_FAMILY_MENU, Execution_Action_Types::UPDATE_MENU );
+		$repo->store['post-menu'] = self::post_snapshot( 'post-menu', '10' );
+
+		$service = new Rollback_Eligibility_Service( $repo );
+		$result  = $service->evaluate( 'pre-menu', 'post-menu', array( 'skip_permission_check' => true ) );
+
+		$this->assertFalse( $result->is_eligible() );
+		$this->assertContains( Rollback_Blocking_Reasons::NO_HANDLER_FOR_ACTION_TYPE, $result->get_blocking_reasons() );
 	}
 
 	public function test_ineligible_when_snapshot_used(): void {

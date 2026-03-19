@@ -100,6 +100,63 @@ final class Operational_Snapshot_Repository implements Operational_Snapshot_Repo
 	}
 
 	/**
+	 * Returns rollback-capable history entries for a build plan (v1: page replacement + token only).
+	 *
+	 * @param string $plan_id Build plan internal key.
+	 * @return array<int, array{post_snapshot_id: string, pre_snapshot_id: string, action_type: string, target_ref: string, created_at: string}>
+	 */
+	public function list_rollback_entries_for_plan( string $plan_id ): array {
+		$plan_id = trim( $plan_id );
+		if ( $plan_id === '' ) {
+			return array();
+		}
+		$store = \get_option( self::OPTION_KEY, array() );
+		if ( ! is_array( $store ) ) {
+			$store = array();
+		}
+		$entries = array();
+		foreach ( $store as $id => $snap ) {
+			if ( ! is_array( $snap ) ) {
+				continue;
+			}
+			$type = isset( $snap[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ] )
+				? $snap[ Operational_Snapshot_Schema::FIELD_SNAPSHOT_TYPE ]
+				: '';
+			if ( $type !== Operational_Snapshot_Schema::SNAPSHOT_TYPE_POST_CHANGE ) {
+				continue;
+			}
+			$plan_ref = isset( $snap[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ) ? trim( (string) $snap[ Operational_Snapshot_Schema::FIELD_BUILD_PLAN_REF ] ) : '';
+			if ( $plan_ref !== $plan_id ) {
+				continue;
+			}
+			$pre_id = isset( $snap['pre_snapshot_id'] ) && is_string( $snap['pre_snapshot_id'] ) ? trim( $snap['pre_snapshot_id'] ) : '';
+			if ( $pre_id === '' ) {
+				continue;
+			}
+			$action_type = isset( $snap[ Operational_Snapshot_Schema::FIELD_ACTION_TYPE ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_ACTION_TYPE ] )
+				? $snap[ Operational_Snapshot_Schema::FIELD_ACTION_TYPE ]
+				: '';
+			$target_ref = isset( $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) ? trim( (string) $snap[ Operational_Snapshot_Schema::FIELD_TARGET_REF ] ) : '';
+			$created_at = isset( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] ) && is_string( $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ] )
+				? $snap[ Operational_Snapshot_Schema::FIELD_CREATED_AT ]
+				: '';
+			$entries[] = array(
+				'post_snapshot_id' => $id,
+				'pre_snapshot_id'  => $pre_id,
+				'action_type'      => $action_type,
+				'target_ref'       => $target_ref,
+				'created_at'       => $created_at,
+			);
+		}
+		usort( $entries, function ( array $a, array $b ): int {
+			$ta = strtotime( $a['created_at'] );
+			$tb = strtotime( $b['created_at'] );
+			return $tb <=> $ta;
+		} );
+		return array_values( $entries );
+	}
+
+	/**
 	 * Keeps at most MAX_SNAPSHOTS entries; evicts oldest by created_at.
 	 *
 	 * @param array<string, array<string, mixed>> $store

@@ -25,10 +25,9 @@ use AIOPageBuilder\Infrastructure\Config\Option_Names;
  */
 final class Rollback_Eligibility_Service {
 
-	/** Action types that have a rollback handler (spec §38.4). */
+	/** Action types that have a rollback handler in v1 (spec §38.4; Prompt 642: page replacement + token only). */
 	private const ROLLBACK_ACTION_TYPES = array(
 		Execution_Action_Types::REPLACE_PAGE,
-		Execution_Action_Types::UPDATE_MENU,
 		Execution_Action_Types::APPLY_TOKEN_SET,
 	);
 

@@ -25,10 +25,9 @@ use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
  */
 final class Operational_Snapshot_Service {
 
-	/** Action types that support operational snapshot capture (rollback-capable). */
+	/** Action types that support operational snapshot capture in v1 (Prompt 642: page replacement + token only). */
 	private const CAPTURE_ACTION_TYPES = array(
 		Execution_Action_Types::REPLACE_PAGE,
-		Execution_Action_Types::UPDATE_MENU,
 		Execution_Action_Types::APPLY_TOKEN_SET,
 	);
 
