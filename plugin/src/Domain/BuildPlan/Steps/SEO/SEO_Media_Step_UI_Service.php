@@ -3,7 +3,9 @@
  * Step 5 (SEO, meta, media) workspace UI (spec §36, Prompt 076).
  *
  * Renders SEO/meta/media recommendation rows with review controls.
- * In this version, plugin execution does not automatically write SEO/meta/media.
+ * This step is recommendation-only in v1: it records accepted SEO/meta/media
+ * guidance as advisory plan data and does not include a direct write execution
+ * path for SEO/meta/media changes.
  *
  * @package AIOPageBuilder
  */
@@ -106,7 +108,7 @@ final class SEO_Media_Step_UI_Service {
 				$step_messages,
 				array(
 					'severity' => 'info',
-					'message'  => \__( 'SEO/meta recommendations are advisory in this version. Approved items are recorded for manual application.', 'aio-page-builder' ),
+					'message'  => \__( 'SEO/meta/media recommendations are advisory only in this version. Approving items records them in plan artifacts; no direct write execution path exists for this step.', 'aio-page-builder' ),
 					'level'    => 'step',
 				)
 			);
@@ -143,8 +145,26 @@ final class SEO_Media_Step_UI_Service {
 			: array();
 		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
-			$val = $payload[ $key ] ?? '';
-			$cols[ $key ] = is_string( $val ) ? $val : (string) \wp_json_encode( $val );
+			if ( $key === 'target_page_title_or_url' ) {
+				$val        = isset( $payload['target_page_title_or_url'] ) ? (string) ( $payload['target_page_title_or_url'] ) : '';
+				$cols[ $key ] = $val !== '' ? $val : '—';
+				continue;
+			}
+			if ( $key === 'action_type' ) {
+				$cols[ $key ] = \__( 'Advisory recommendation (no direct write)', 'aio-page-builder' );
+				continue;
+			}
+			if ( $key === 'current' || $key === 'proposed' ) {
+				$cols[ $key ] = '—';
+				continue;
+			}
+			if ( $key === 'confidence' ) {
+				$val = isset( $payload['confidence'] ) ? (string) ( $payload['confidence'] ) : '';
+				$cols[ $key ] = $val !== '' ? $val : '—';
+				continue;
+			}
+			$val = $payload[ $key ] ?? null;
+			$cols[ $key ] = is_string( $val ) && $val !== '' ? $val : '—';
 		}
 		return $cols;
 	}
@@ -163,20 +183,46 @@ final class SEO_Media_Step_UI_Service {
 				continue;
 			}
 			$payload                     = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+				$target                      = (string) ( $payload['target_page_title_or_url'] ?? '—' );
+				$confidence                  = (string) ( $payload['confidence'] ?? '' );
+				$confidence_display          = $confidence !== '' ? $confidence : '—';
+				$advisory_storage_line       = \__( 'Stored in Build Plan artifacts as advisory SEO guidance.', 'aio-page-builder' );
+				$no_direct_write_advisory    = \__( 'This step does not include first-party adapter writes for SEO/meta/media in v1.', 'aio-page-builder' );
+				$no_direct_write_capability  = \__( 'Approved items are review records only; apply the guidance through supported SEO plugins or manual integration.', 'aio-page-builder' );
 			$detail_panel['sections']    = array(
 				array(
 					'heading'       => \__( 'Target', 'aio-page-builder' ),
 					'key'           => 'target',
-					'content_lines' => array( \esc_html( (string) ( $payload['target_page_title_or_url'] ?? '—' ) ) ),
+						'content_lines' => array( \esc_html( $target ) ),
 				),
 				array(
-					'heading'       => \__( 'Title / meta / schema / media', 'aio-page-builder' ),
+						'heading'       => \__( 'SEO guidance (advisory)', 'aio-page-builder' ),
 					'key'           => 'recommendations',
 					'content_lines' => array(
-						\__( 'Approved items are stored as advisory SEO recommendations in the Build Plan artifacts.', 'aio-page-builder' ),
+							$advisory_storage_line,
+							\__( 'Recommendation purpose: title/meta/schema guidance and media direction are guidance-only in this version.', 'aio-page-builder' ),
+							\__( 'Execution posture: no direct write execution exists for this step in v1.', 'aio-page-builder' ),
+							\__( 'Dependency notes: interoperability-first; no generic SEO plugin mutation is performed by this step.', 'aio-page-builder' ),
 					),
 				),
+					array(
+						'heading'       => \__( 'Confidence', 'aio-page-builder' ),
+						'key'           => 'confidence',
+						'content_lines' => array( \esc_html( \sprintf( '%s: %s', \__( 'Confidence', 'aio-page-builder' ), $confidence_display ) ) ),
+					),
+					array(
+						'heading'       => \__( 'Advisory status', 'aio-page-builder' ),
+						'key'           => 'advisory_status',
+						'content_lines' => array(
+							$no_direct_write_advisory,
+							$no_direct_write_capability,
+						),
+					),
 			);
+				if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING ) === Build_Plan_Item_Statuses::APPROVED ) {
+					$detail_panel['sections'][0]['content_lines'] = array( \esc_html( $target ) );
+					$detail_panel['sections'][1]['content_lines'][]   = \__( 'Status: APPROVED (recorded for advisory review / manual integration).', 'aio-page-builder' );
+				}
 			$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $item, $capabilities );
 			break;
 		}
@@ -192,12 +238,12 @@ final class SEO_Media_Step_UI_Service {
 		return array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 				'enabled'        => $apply_all_ok,
-				'label'          => \__( 'Apply all SEO', 'aio-page-builder' ),
+				'label'          => \__( 'Approve all SEO recommendations', 'aio-page-builder' ),
 				'count_eligible' => $eligible_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
 				'enabled'        => $apply_sel_ok,
-				'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
+				'label'          => \__( 'Approve selected SEO recommendations', 'aio-page-builder' ),
 				'count_selected' => $selected_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
@@ -260,12 +306,12 @@ final class SEO_Media_Step_UI_Service {
 			'bulk_action_states'           => array(
 				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 					'enabled'        => false,
-					'label'          => \__( 'Apply all SEO', 'aio-page-builder' ),
+					'label'          => \__( 'Approve all SEO recommendations', 'aio-page-builder' ),
 					'count_eligible' => 0,
 				),
 				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
 					'enabled'        => false,
-					'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
+					'label'          => \__( 'Approve selected SEO recommendations', 'aio-page-builder' ),
 					'count_selected' => 0,
 				),
 				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(

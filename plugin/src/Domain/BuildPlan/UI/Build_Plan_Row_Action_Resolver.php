@@ -81,23 +81,23 @@ final class Build_Plan_Row_Action_Resolver {
 		);
 
 		$supports_execution = $item_type === Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN;
-		$can_run              = $supports_execution
-			&& $status === Build_Plan_Item_Statuses::APPROVED
-			&& Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
-		$actions[] = array(
-			'action_id' => self::ACTION_EXECUTE,
-			'label'     => \__( 'Execute', 'aio-page-builder' ),
-			'enabled'   => $can_execute && $can_run,
-		);
+		if ( $supports_execution ) {
+			$can_run = $status === Build_Plan_Item_Statuses::APPROVED
+				&& Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
+			$actions[] = array(
+				'action_id' => self::ACTION_EXECUTE,
+				'label'     => \__( 'Execute', 'aio-page-builder' ),
+				'enabled'   => $can_execute && $can_run,
+			);
 
-		$can_retry = $supports_execution
-			&& $status === Build_Plan_Item_Statuses::FAILED
-			&& Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::FAILED, Build_Plan_Item_Statuses::IN_PROGRESS );
-		$actions[] = array(
-			'action_id' => self::ACTION_RETRY,
-			'label'     => \__( 'Retry', 'aio-page-builder' ),
-			'enabled'   => $can_execute && $can_retry,
-		);
+			$can_retry = $status === Build_Plan_Item_Statuses::FAILED
+				&& Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::FAILED, Build_Plan_Item_Statuses::IN_PROGRESS );
+			$actions[] = array(
+				'action_id' => self::ACTION_RETRY,
+				'label'     => \__( 'Retry', 'aio-page-builder' ),
+				'enabled'   => $can_execute && $can_retry,
+			);
+		}
 
 		$actions[] = array(
 			'action_id' => self::ACTION_VIEW_DIFF,
