@@ -110,6 +110,17 @@ final class Option_Names {
 	public const PB_VERSION_STATE              = 'aio_pb_version_state';
 	public const PB_ENVIRONMENT_DIAGNOSTICS    = 'aio_pb_environment_diagnostics';
 	public const PB_AI_PROVIDERS               = 'aio_pb_ai_providers';
+	public const PB_BUSINESS_PROFILE           = 'aio_pb_business_profile';
+	public const PB_BRAND_PROFILE              = 'aio_pb_brand_profile';
+	public const PB_AUDIENCE_PROFILES          = 'aio_pb_audience_profiles';
+	public const PB_OFFERS                     = 'aio_pb_offers';
+	public const PB_GEOGRAPHY_PROFILE          = 'aio_pb_geography_profile';
+	public const PB_COMPETITORS                = 'aio_pb_competitors';
+	public const PB_ASSET_REFS                 = 'aio_pb_asset_refs';
+	public const PB_EXISTING_SITE_CONTEXT      = 'aio_pb_existing_site_context';
+	public const PB_ONBOARDING_DRAFT           = 'aio_pb_onboarding_draft';
+	public const PB_ONBOARDING_STATE           = 'aio_pb_onboarding_state';
+	public const PB_ONBOARDING_LAST_SUBMITTED_AT = 'aio_pb_onboarding_last_submitted_at';
 
 	/**
 	 * Returns all known option keys in stable order.
@@ -155,6 +166,17 @@ final class Option_Names {
 			self::PB_VERSION_STATE,
 			self::PB_ENVIRONMENT_DIAGNOSTICS,
 			self::PB_AI_PROVIDERS,
+			self::PB_BUSINESS_PROFILE,
+			self::PB_BRAND_PROFILE,
+			self::PB_AUDIENCE_PROFILES,
+			self::PB_OFFERS,
+			self::PB_GEOGRAPHY_PROFILE,
+			self::PB_COMPETITORS,
+			self::PB_ASSET_REFS,
+			self::PB_EXISTING_SITE_CONTEXT,
+			self::PB_ONBOARDING_DRAFT,
+			self::PB_ONBOARDING_STATE,
+			self::PB_ONBOARDING_LAST_SUBMITTED_AT,
 		);
 		return self::$all;
 	}
