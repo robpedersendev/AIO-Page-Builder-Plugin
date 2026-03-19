@@ -14,6 +14,7 @@ namespace AIOPageBuilder\Domain\BuildPlan\UI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 
 /**
@@ -52,6 +53,7 @@ final class Build_Plan_Row_Action_Resolver {
 	 */
 	public function resolve( array $item, array $capabilities = array() ): array {
 		$status             = (string) ( $item['status'] ?? Build_Plan_Item_Statuses::PENDING );
+		$item_type          = (string) ( $item['item_type'] ?? '' );
 		$can_approve        = ! empty( $capabilities['can_approve'] );
 		$can_execute        = ! empty( $capabilities['can_execute'] );
 		$can_view_artifacts = ! empty( $capabilities['can_view_artifacts'] );
@@ -78,14 +80,19 @@ final class Build_Plan_Row_Action_Resolver {
 			'enabled'   => $can_approve && $can_deny,
 		);
 
-		$can_run   = $status === Build_Plan_Item_Statuses::APPROVED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
+		$supports_execution = $item_type === Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN;
+		$can_run              = $supports_execution
+			&& $status === Build_Plan_Item_Statuses::APPROVED
+			&& Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
 		$actions[] = array(
 			'action_id' => self::ACTION_EXECUTE,
 			'label'     => \__( 'Execute', 'aio-page-builder' ),
 			'enabled'   => $can_execute && $can_run,
 		);
 
-		$can_retry = $status === Build_Plan_Item_Statuses::FAILED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::FAILED, Build_Plan_Item_Statuses::IN_PROGRESS );
+		$can_retry = $supports_execution
+			&& $status === Build_Plan_Item_Statuses::FAILED
+			&& Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::FAILED, Build_Plan_Item_Statuses::IN_PROGRESS );
 		$actions[] = array(
 			'action_id' => self::ACTION_RETRY,
 			'label'     => \__( 'Retry', 'aio-page-builder' ),

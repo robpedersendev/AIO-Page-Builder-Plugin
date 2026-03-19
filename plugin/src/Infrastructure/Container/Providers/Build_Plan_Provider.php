@@ -284,13 +284,32 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 		$container->register(
 			'tokens_step_ui_service',
 			function () use ( $container ): Tokens_Step_UI_Service {
-				return new Tokens_Step_UI_Service( $container->get( 'build_plan_row_action_resolver' ) );
+				return new Tokens_Step_UI_Service(
+					$container->get( 'build_plan_row_action_resolver' ),
+					$container->get( 'global_style_settings_repository' )
+				);
+			}
+		);
+		$container->register(
+			'design_token_bulk_action_service',
+			function () use ( $container ): \AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Design_Token_Bulk_Action_Service {
+				return new \AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Design_Token_Bulk_Action_Service(
+					$container->get( 'build_plan_repository' )
+				);
 			}
 		);
 		$container->register(
 			'seo_media_step_ui_service',
 			function () use ( $container ): SEO_Media_Step_UI_Service {
 				return new SEO_Media_Step_UI_Service( $container->get( 'build_plan_row_action_resolver' ) );
+			}
+		);
+		$container->register(
+			'seo_bulk_action_service',
+			function () use ( $container ): \AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Bulk_Action_Service {
+				return new \AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Bulk_Action_Service(
+					$container->get( 'build_plan_repository' )
+				);
 			}
 		);
 		$container->register(

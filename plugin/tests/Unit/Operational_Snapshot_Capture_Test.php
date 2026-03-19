@@ -82,6 +82,11 @@ final class Stub_Operational_Snapshot_Repository implements Operational_Snapshot
 	public function list_rollback_entries_for_plan( string $plan_id ): array {
 		return array();
 	}
+
+	/** @inheritDoc */
+	public function list_post_change_snapshots_for_period( ?string $date_from = null, ?string $date_to = null ): array {
+		return array();
+	}
 }
 
 final class Operational_Snapshot_Capture_Test extends TestCase {

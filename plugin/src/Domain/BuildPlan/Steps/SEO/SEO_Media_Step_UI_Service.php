@@ -1,9 +1,9 @@
 <?php
 /**
- * Step 5 (SEO, meta, media) workspace shell (spec §36, Prompt 076).
+ * Step 5 (SEO, meta, media) workspace UI (spec §36, Prompt 076).
  *
- * Renders SEO/meta/media recommendation rows, title/meta/schema/media placeholders,
- * and storage-path indicators. No SEO writes or media sourcing.
+ * Renders SEO/meta/media recommendation rows with review controls.
+ * In this version, plugin execution does not automatically write SEO/meta/media.
  *
  * @package AIOPageBuilder
  */
@@ -21,9 +21,6 @@ use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
 
-/**
- * Shell-only UI for seo step. No SEO or media execution.
- */
 final class SEO_Media_Step_UI_Service {
 
 	/** Step index for SEO in canonical step order. */
@@ -53,7 +50,7 @@ final class SEO_Media_Step_UI_Service {
 	 * @param array<string, bool>  $capabilities can_approve, can_execute, can_view_artifacts.
 	 * @param string|null          $selected_item_id Item id for detail panel.
 	 * @param array<int, string>   $selected_item_ids Item ids for bulk selection.
-	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages, seo_storage_path_placeholder?
+	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages
 	 */
 	public function build_workspace(
 		array $plan_definition,
@@ -101,7 +98,7 @@ final class SEO_Media_Step_UI_Service {
 			);
 		}
 
-		$bulk_states   = $this->placeholder_bulk_states( $eligible_count, $selected_item_ids, $rows );
+		$bulk_states   = $this->bulk_states( $eligible_count, $capabilities, $selected_item_ids, $rows );
 		$detail_panel  = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
 		$step_messages = $this->step_messages( count( $rows ), $eligible_count );
 		if ( count( $rows ) > 0 ) {
@@ -109,7 +106,7 @@ final class SEO_Media_Step_UI_Service {
 				$step_messages,
 				array(
 					'severity' => 'info',
-					'message'  => \__( 'Metadata and SEO recommendations are for review only. They are not applied automatically in this version.', 'aio-page-builder' ),
+					'message'  => \__( 'SEO/meta recommendations are advisory in this version. Approved items are recorded for manual application.', 'aio-page-builder' ),
 					'level'    => 'step',
 				)
 			);
@@ -175,7 +172,9 @@ final class SEO_Media_Step_UI_Service {
 				array(
 					'heading'       => \__( 'Title / meta / schema / media', 'aio-page-builder' ),
 					'key'           => 'recommendations',
-					'content_lines' => array( \__( 'SEO and meta updates are not available in this version. Recommendations are for review only.', 'aio-page-builder' ) ),
+					'content_lines' => array(
+						\__( 'Approved items are stored as advisory SEO recommendations in the Build Plan artifacts.', 'aio-page-builder' ),
+					),
 				),
 			);
 			$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $item, $capabilities );
@@ -184,21 +183,25 @@ final class SEO_Media_Step_UI_Service {
 		return $detail_panel;
 	}
 
-	private function placeholder_bulk_states( int $eligible_count, array $selected_item_ids, array $rows ): array {
+	private function bulk_states( int $eligible_count, array $capabilities, array $selected_item_ids, array $rows ): array {
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
+		$can_approve    = ! empty( $capabilities['can_approve'] );
+		$apply_all_ok   = $can_approve && $eligible_count > 0;
+		$apply_sel_ok   = $can_approve && $selected_count > 0;
+		$deny_all_ok    = $can_approve && $eligible_count > 0;
 		return array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
-				'enabled'        => false,
+				'enabled'        => $apply_all_ok,
 				'label'          => \__( 'Apply all SEO', 'aio-page-builder' ),
 				'count_eligible' => $eligible_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
-				'enabled'        => false,
+				'enabled'        => $apply_sel_ok,
 				'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
 				'count_selected' => $selected_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
-				'enabled'        => false,
+				'enabled'        => $deny_all_ok,
 				'label'          => \__( 'Deny all', 'aio-page-builder' ),
 				'count_eligible' => $eligible_count,
 			),
@@ -281,10 +284,6 @@ final class SEO_Media_Step_UI_Service {
 				'row_actions' => array(),
 			),
 			'step_messages'                => array(),
-			'seo_storage_path_placeholder' => array(
-				'integration' => 'plugin_advisory',
-				'description' => '',
-			),
 		);
 	}
 }

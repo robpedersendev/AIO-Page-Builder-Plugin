@@ -49,6 +49,10 @@ class Build_Plan_Analytics_Stub_Snapshot_Repository implements \AIOPageBuilder\D
 	public function list_rollback_entries_for_plan( string $plan_id ): array {
 		return $this->by_plan_id[ $plan_id ] ?? array();
 	}
+
+	public function list_post_change_snapshots_for_period( ?string $date_from = null, ?string $date_to = null ): array {
+		return array();
+	}
 }
 
 /**

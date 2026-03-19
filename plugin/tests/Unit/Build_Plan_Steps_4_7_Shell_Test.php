@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
+use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Repository;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -35,6 +36,7 @@ require_once $plugin_root . '/src/Domain/BuildPlan/Steps/Tokens/Tokens_Step_UI_S
 require_once $plugin_root . '/src/Domain/BuildPlan/Steps/SEO/SEO_Media_Step_UI_Service.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Steps/Finalization/Finalization_Step_UI_Service.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Steps/History/History_Rollback_Step_UI_Service.php';
+require_once $plugin_root . '/src/Domain/Styling/Global_Style_Settings_Repository.php';
 
 final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 
@@ -94,11 +96,6 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 			'groups' => array( 'colors' => 1 ),
 			'total'  => 1,
 		),
-		'token_diff_placeholder' => array(
-			'current_value'  => '',
-			'proposed_value' => '',
-			'applied'        => false,
-		),
 	);
 
 	/** Example Step 5 (SEO/media) UI workspace payload (spec §36). */
@@ -145,10 +142,6 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 			'row_actions' => array(),
 		),
 		'step_messages'                => array(),
-		'seo_storage_path_placeholder' => array(
-			'integration'  => 'plugin_advisory',
-			'write_target' => '',
-		),
 	);
 
 	/** Example Step 6 (finalization) UI workspace payload (spec §37). */
@@ -304,7 +297,7 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 
 	public function test_step4_tokens_workspace_has_shared_and_step_specific_keys(): void {
 		$resolver  = new Build_Plan_Row_Action_Resolver();
-		$service   = new Tokens_Step_UI_Service( $resolver );
+		$service   = new Tokens_Step_UI_Service( $resolver, new Global_Style_Settings_Repository() );
 		$items     = array(
 			array(
 				Build_Plan_Item_Schema::KEY_ITEM_ID   => 'plan_dt_0',
@@ -328,12 +321,12 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$this->assertArrayHasKey( 'detail_panel', $workspace );
 		$this->assertArrayHasKey( 'step_messages', $workspace );
 		$this->assertArrayHasKey( 'token_set_summary', $workspace );
-		$this->assertArrayHasKey( 'token_diff_placeholder', $workspace );
 		$this->assertSame( Tokens_Step_UI_Service::COLUMN_ORDER, $workspace['column_order'] );
 		$this->assertCount( 1, $workspace['step_list_rows'] );
 		$this->assertSame( array( 'colors' => 1 ), $workspace['token_set_summary']['groups'] );
-		$this->assertFalse( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL ]['enabled'] );
-		$this->assertFalse( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_DENY_ALL ]['enabled'] );
+		$this->assertTrue( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL ]['enabled'] );
+		$this->assertFalse( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED ]['enabled'] );
+		$this->assertTrue( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_DENY_ALL ]['enabled'] );
 	}
 
 	public function test_step5_seo_workspace_has_storage_path_placeholder(): void {
@@ -356,7 +349,8 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 
 		$this->assertArrayHasKey( 'step_list_rows', $workspace );
 		$this->assertSame( SEO_Media_Step_UI_Service::COLUMN_ORDER, $workspace['column_order'] );
-		$this->assertFalse( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL ]['enabled'] );
+		$this->assertTrue( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL ]['enabled'] );
+		$this->assertFalse( $workspace['bulk_action_states'][ Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED ]['enabled'] );
 	}
 
 	public function test_step6_finalization_workspace_has_buckets_and_empty_list(): void {
@@ -423,8 +417,7 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		}
 		$this->assertNotNull( $recommendations_section );
 		$this->assertNotEmpty( $recommendations_section['content_lines'] );
-		$this->assertStringContainsString( 'not available', $recommendations_section['content_lines'][0] );
-		$this->assertStringContainsString( 'review only', $recommendations_section['content_lines'][0] );
+		$this->assertStringContainsString( 'advisory', $recommendations_section['content_lines'][0] );
 	}
 
 	public function test_step7_history_workspace_has_placeholder_row_when_empty_and_rollback_placeholder(): void {
@@ -443,11 +436,10 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 
 	public function test_step4_returns_empty_workspace_for_wrong_step_index(): void {
 		$resolver  = new Build_Plan_Row_Action_Resolver();
-		$service   = new Tokens_Step_UI_Service( $resolver );
+		$service   = new Tokens_Step_UI_Service( $resolver, new Global_Style_Settings_Repository() );
 		$def       = $this->plan_definition_with_step_at( 5, Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS, array() );
 		$workspace = $service->build_workspace( $def, 6, array( 'can_approve' => true ), null, array() );
 		$this->assertSame( array(), $workspace['step_list_rows'] );
-		$this->assertArrayHasKey( 'token_diff_placeholder', $workspace );
 	}
 
 	public function test_step7_rollback_eligibility_reflects_capability(): void {
@@ -464,17 +456,13 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$ex = self::EXAMPLE_STEP_4_PAYLOAD;
 		$this->assertArrayHasKey( 'step_list_rows', $ex );
 		$this->assertArrayHasKey( 'token_set_summary', $ex );
-		$this->assertArrayHasKey( 'token_diff_placeholder', $ex );
 		$this->assertArrayHasKey( 'groups', $ex['token_set_summary'] );
-		$this->assertArrayHasKey( 'current_value', $ex['token_diff_placeholder'] );
 	}
 
 	/** Example payload structure: Step 5. */
 	public function test_example_step5_payload_structure(): void {
 		$ex = self::EXAMPLE_STEP_5_PAYLOAD;
-		$this->assertArrayHasKey( 'seo_storage_path_placeholder', $ex );
 		$this->assertArrayHasKey( 'target_page_title_or_url', $ex['step_list_rows'][0]['summary_columns'] );
-		$this->assertArrayHasKey( 'storage_path_indicator', $ex['step_list_rows'][0]['summary_columns'] );
 	}
 
 	/** Example payload structure: Step 6. */

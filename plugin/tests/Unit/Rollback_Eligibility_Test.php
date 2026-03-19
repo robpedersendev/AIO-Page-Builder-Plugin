@@ -87,6 +87,11 @@ final class Stub_Rollback_Repo implements Operational_Snapshot_Repository_Interf
 		}
 		return $out;
 	}
+
+	/** @inheritDoc */
+	public function list_post_change_snapshots_for_period( ?string $date_from = null, ?string $date_to = null ): array {
+		return array();
+	}
 }
 
 final class Rollback_Eligibility_Test extends TestCase {

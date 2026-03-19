@@ -1,10 +1,9 @@
 <?php
 /**
- * Step 4 (design tokens) workspace shell (spec §35, Prompt 076, SPR-009).
+ * Step 4 (design tokens) workspace UI (spec §35, Prompt 076).
  *
- * Shell-only UI: token recommendation rows, summaries, and revert/history copy. Token application
- * is not implemented; UI states "Token application is not available in this version. Recommendations
- * are for review only." Bulk apply/deny controls are disabled. Do not treat as a gap—intentional per spec.
+ * Renders token recommendation rows with current/proposed values and review controls.
+ * Token application happens via the execution queue for approved items.
  *
  * @package AIOPageBuilder
  */
@@ -21,10 +20,8 @@ use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
+use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Repository;
 
-/**
- * Shell-only UI for design_tokens step. No token application.
- */
 final class Tokens_Step_UI_Service {
 
 	/** Step index for design tokens in canonical step order. */
@@ -42,8 +39,15 @@ final class Tokens_Step_UI_Service {
 	/** @var Build_Plan_Row_Action_Resolver */
 	private $row_action_resolver;
 
-	public function __construct( Build_Plan_Row_Action_Resolver $row_action_resolver ) {
+	/** @var Global_Style_Settings_Repository */
+	private $global_style_settings_repository;
+
+	/** @var array<string, array<string, string>>|null */
+	private ?array $current_tokens_cache = null;
+
+	public function __construct( Build_Plan_Row_Action_Resolver $row_action_resolver, Global_Style_Settings_Repository $global_style_settings_repository ) {
 		$this->row_action_resolver = $row_action_resolver;
+		$this->global_style_settings_repository = $global_style_settings_repository;
 	}
 
 	/**
@@ -54,7 +58,7 @@ final class Tokens_Step_UI_Service {
 	 * @param array<string, bool>  $capabilities can_approve, can_execute, can_view_artifacts.
 	 * @param string|null          $selected_item_id Item id for detail panel.
 	 * @param array<int, string>   $selected_item_ids Item ids for bulk selection.
-	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages, token_diff_placeholder? (structural only; no diff/apply in this version), token_set_summary?
+	 * @return array<string, mixed> step_list_rows, column_order, bulk_action_states, detail_panel, step_messages, token_set_summary?
 	 */
 	public function build_workspace(
 		array $plan_definition,
@@ -101,16 +105,10 @@ final class Tokens_Step_UI_Service {
 			);
 		}
 
-		$bulk_states       = $this->placeholder_bulk_states( $eligible_count, $capabilities, $selected_item_ids, $rows );
+		$bulk_states       = $this->bulk_states( $eligible_count, $capabilities, $selected_item_ids, $rows );
 		$detail_panel      = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
 		$step_messages     = $this->step_messages( count( $rows ), $eligible_count );
 		$token_set_summary = $this->build_token_set_summary( $items );
-		// Structural placeholder for UI shape only; no current/proposed diff or apply in this version (token application out of scope).
-		$token_diff_placeholder = array(
-			'current_value'  => '',
-			'proposed_value' => '',
-			'applied'        => false,
-		);
 
 		return array(
 			'step_list_rows'         => $rows,
@@ -119,7 +117,6 @@ final class Tokens_Step_UI_Service {
 			'detail_panel'           => $detail_panel,
 			'step_messages'          => $step_messages,
 			'token_set_summary'      => $token_set_summary,
-			'token_diff_placeholder' => $token_diff_placeholder,
 		);
 	}
 
@@ -144,8 +141,20 @@ final class Tokens_Step_UI_Service {
 		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
-		$cols    = array();
+		$group = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? $payload['token_group'] : '';
+		$name  = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? $payload['token_name'] : '';
+		$curr  = $this->current_value_for_token( $group, $name );
+		$cols  = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
+			if ( $key === 'current_value' ) {
+				$cols[ $key ] = $curr !== '' ? $curr : '—';
+				continue;
+			}
+			if ( $key === 'proposed_value' ) {
+				$val          = $payload['proposed_value'] ?? '';
+				$cols[ $key ] = is_string( $val ) ? $val : (string) \wp_json_encode( $val );
+				continue;
+			}
 			$val          = $payload[ $key ] ?? '';
 			$cols[ $key ] = is_string( $val ) ? $val : (string) \wp_json_encode( $val );
 		}
@@ -168,25 +177,39 @@ final class Tokens_Step_UI_Service {
 			$payload                     = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
 			$proposed_val                = $payload['proposed_value'] ?? null;
 			$proposed_str                = is_scalar( $proposed_val ) ? (string) $proposed_val : \wp_json_encode( $proposed_val );
+			$group                        = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? $payload['token_group'] : '';
+			$name                         = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? $payload['token_name'] : '';
+			$current_str                  = $this->current_value_for_token( $group, $name );
+			$has_current                  = $current_str !== '';
 			$detail_panel['sections']    = array(
 				array(
 					'heading'       => \__( 'Token', 'aio-page-builder' ),
 					'key'           => 'token',
 					'content_lines' => array(
-						\__( 'Group:', 'aio-page-builder' ) . ' ' . \esc_html( (string) ( $payload['token_group'] ?? '' ) ),
-						\__( 'Name:', 'aio-page-builder' ) . ' ' . \esc_html( (string) ( $payload['token_name'] ?? '' ) ),
-						\__( 'Proposed value:', 'aio-page-builder' ) . ' ' . \esc_html( $proposed_str ),
+						\__( 'Group:', 'aio-page-builder' ) . ' ' . (string) ( $payload['token_group'] ?? '' ),
+						\__( 'Name:', 'aio-page-builder' ) . ' ' . (string) ( $payload['token_name'] ?? '' ),
+						\__( 'Proposed value:', 'aio-page-builder' ) . ' ' . $proposed_str,
+					),
+				),
+				array(
+					'heading'       => \__( 'Current / proposed values', 'aio-page-builder' ),
+					'key'           => 'values',
+					'content_lines' => array(
+						\__( 'Current value:', 'aio-page-builder' ) . ' ' . ( $has_current ? (string) $current_str : '—' ),
+						\__( 'Proposed value:', 'aio-page-builder' ) . ' ' . $proposed_str,
 					),
 				),
 				array(
 					'heading'       => \__( 'Rationale', 'aio-page-builder' ),
 					'key'           => 'rationale',
-					'content_lines' => array( \esc_html( (string) ( $payload['rationale'] ?? '—' ) ) ),
+					'content_lines' => array( (string) ( $payload['rationale'] ?? '—' ) ),
 				),
 				array(
 					'heading'       => \__( 'Revert / history', 'aio-page-builder' ),
 					'key'           => 'revert_history',
-					'content_lines' => array( \__( 'Token application is not available in this version. Recommendations are for review only.', 'aio-page-builder' ) ),
+					'content_lines' => array(
+						\__( 'After execution, token changes are traceable and reversible via the plan rollback workflow.', 'aio-page-builder' ),
+					),
 				),
 			);
 			$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $item, $capabilities );
@@ -210,21 +233,26 @@ final class Tokens_Step_UI_Service {
 		);
 	}
 
-	private function placeholder_bulk_states( int $eligible_count, array $capabilities, array $selected_item_ids, array $rows ): array {
+	private function bulk_states( int $eligible_count, array $capabilities, array $selected_item_ids, array $rows ): array {
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
+		$can_approve    = ! empty( $capabilities['can_approve'] );
+		$apply_all_ok   = $can_approve && $eligible_count > 0;
+		$apply_sel_ok   = $can_approve && $selected_count > 0;
+		$deny_all_ok    = $can_approve && $eligible_count > 0;
+
 		return array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
-				'enabled'        => false,
+				'enabled'        => $apply_all_ok,
 				'label'          => \__( 'Apply all tokens', 'aio-page-builder' ),
 				'count_eligible' => $eligible_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
-				'enabled'        => false,
+				'enabled'        => $apply_sel_ok,
 				'label'          => \__( 'Apply to selected', 'aio-page-builder' ),
 				'count_selected' => $selected_count,
 			),
 			Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
-				'enabled'        => false,
+				'enabled'        => $deny_all_ok,
 				'label'          => \__( 'Deny all', 'aio-page-builder' ),
 				'count_eligible' => $eligible_count,
 			),
@@ -233,6 +261,27 @@ final class Tokens_Step_UI_Service {
 				'label'   => \__( 'Clear selection', 'aio-page-builder' ),
 			),
 		);
+	}
+
+	/**
+	 * Returns current applied token value for a single group/name pair.
+	 *
+	 * @param string $group Token group key.
+	 * @param string $name Token name key.
+	 * @return string Current value or empty string when unknown.
+	 */
+	private function current_value_for_token( string $group, string $name ): string {
+		if ( $group === '' || $name === '' ) {
+			return '';
+		}
+		if ( $this->current_tokens_cache === null ) {
+			$this->current_tokens_cache = $this->global_style_settings_repository->get_global_tokens();
+		}
+		if ( ! isset( $this->current_tokens_cache[ $group ] ) || ! is_array( $this->current_tokens_cache[ $group ] ) ) {
+			return '';
+		}
+		$value = $this->current_tokens_cache[ $group ][ $name ] ?? '';
+		return is_string( $value ) ? $value : '';
 	}
 
 	private function status_to_badge( string $status ): string {
@@ -310,11 +359,6 @@ final class Tokens_Step_UI_Service {
 			'token_set_summary'      => array(
 				'groups' => array(),
 				'total'  => 0,
-			),
-			'token_diff_placeholder' => array(
-				'current_value'  => '',
-				'proposed_value' => '',
-				'applied'        => false,
 			),
 		);
 	}
