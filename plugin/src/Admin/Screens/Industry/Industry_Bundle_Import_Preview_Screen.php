@@ -30,7 +30,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 	private const TRANSIENT_PREVIEW    = 'aio_industry_bundle_preview_%d';
 	private const NONCE_ACTION_PREVIEW = 'aio_pb_preview_industry_bundle';
 	private const NONCE_ACTION_APPLY   = 'aio_pb_apply_industry_bundle';
-	/** Nonce action for clear-preview (state-changing; SPR-007 deferred apply). */
+	/** Nonce action for clear-preview (state-changing; clears preview before apply). */
 	private const NONCE_ACTION_CLEAR = 'aio_industry_bundle_clear_preview';
 
 	/** @var Service_Container|null */
