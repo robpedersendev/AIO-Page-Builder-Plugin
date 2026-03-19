@@ -13,10 +13,10 @@ namespace AIOPageBuilder\Domain\Rollback\Execution\Handlers;
 
 defined( 'ABSPATH' ) || exit;
 
-use AIOPageBuilder\Domain\Execution\Jobs\Token_Set_Job_Service;
 use AIOPageBuilder\Domain\Rollback\Execution\Rollback_Handler_Interface;
 use AIOPageBuilder\Domain\Rollback\Execution\Rollback_Result;
 use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Schema;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Restores design token set from pre-change snapshot.
@@ -24,7 +24,7 @@ use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Schema;
 final class Rollback_Token_Set_Handler implements Rollback_Handler_Interface {
 
 	/**
-	 * Restores token values from pre state_snapshot into OPTION_APPLIED_TOKENS (group => [ name => value ]).
+	 * Restores token values from pre state_snapshot into applied design tokens option (group => [ name => value ]).
 	 *
 	 * @param array<string, mixed> $pre_snapshot
 	 * @param array<string, mixed> $post_snapshot
@@ -92,7 +92,7 @@ final class Rollback_Token_Set_Handler implements Rollback_Handler_Interface {
 				array( 'code' => 'missing_group' )
 			);
 		}
-		$store = \get_option( Token_Set_Job_Service::OPTION_APPLIED_TOKENS, array() );
+		$store = \get_option( Option_Names::APPLIED_DESIGN_TOKENS, array() );
 		if ( ! is_array( $store ) ) {
 			$store = array();
 		}
@@ -108,7 +108,7 @@ final class Rollback_Token_Set_Handler implements Rollback_Handler_Interface {
 			$store[ $group ][ $name ] = $value;
 			$restored[ $name ]        = $value;
 		}
-		$updated = \update_option( Token_Set_Job_Service::OPTION_APPLIED_TOKENS, $store );
+		$updated = \update_option( Option_Names::APPLIED_DESIGN_TOKENS, $store );
 		if ( ! $updated ) {
 			return Rollback_Result::failed(
 				$job_id,

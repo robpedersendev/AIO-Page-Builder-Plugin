@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract;
 use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
-use AIOPageBuilder\Domain\Execution\Jobs\Token_Set_Job_Service;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Builds pre_change block and target_ref/object_family from envelope for rollback-capable action types.
@@ -175,7 +175,7 @@ final class Pre_Change_Snapshot_Builder {
 		if ( $group === '' || $name === '' ) {
 			return null;
 		}
-		$store = \get_option( Token_Set_Job_Service::OPTION_APPLIED_TOKENS, array() );
+		$store = \get_option( Option_Names::APPLIED_DESIGN_TOKENS, array() );
 		if ( ! is_array( $store ) ) {
 			$store = array();
 		}

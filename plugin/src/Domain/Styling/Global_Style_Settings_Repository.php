@@ -1,7 +1,7 @@
 <?php
 /**
  * Read/write repository for global styling settings (Prompt 246).
- * Structured, versioned; invalid keys/values fail closed. Separate from aio_applied_design_tokens.
+ * Structured, versioned; invalid keys/values fail closed. Read path merges in applied design tokens (Option_Names::APPLIED_DESIGN_TOKENS) so plugin-controlled CSS reflects execution-applied tokens.
  *
  * @package AIOPageBuilder
  */
@@ -11,6 +11,8 @@ declare( strict_types=1 );
 namespace AIOPageBuilder\Domain\Styling;
 
 defined( 'ABSPATH' ) || exit;
+
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Persists and retrieves global style settings. Filters all writes through token and component registries.
@@ -80,24 +82,59 @@ final class Global_Style_Settings_Repository {
 		$full   = $this->get_full();
 		$tokens = $full[ Global_Style_Settings_Schema::KEY_GLOBAL_TOKENS ] ?? array();
 		if ( ! is_array( $tokens ) ) {
-			return array();
-		}
-		if ( $this->token_registry === null || ! $this->token_registry->is_loaded() ) {
-			return $tokens;
+			$tokens = array();
 		}
 		$out = array();
-		foreach ( $tokens as $group => $names ) {
-			if ( ! is_string( $group ) || ! is_array( $names ) ) {
-				continue;
+		if ( $this->token_registry !== null && $this->token_registry->is_loaded() ) {
+			foreach ( $tokens as $group => $names ) {
+				if ( ! is_string( $group ) || ! is_array( $names ) ) {
+					continue;
+				}
+				$allowed_names = $this->token_registry->get_allowed_names_for_group( $group );
+				if ( empty( $allowed_names ) ) {
+					continue;
+				}
+				$out[ $group ] = array();
+				foreach ( $names as $name => $value ) {
+					if ( is_string( $name ) && in_array( $name, $allowed_names, true ) && is_string( $value ) ) {
+						$out[ $group ][ $name ] = $value;
+					}
+				}
 			}
-			$allowed_names = $this->token_registry->get_allowed_names_for_group( $group );
-			if ( empty( $allowed_names ) ) {
-				continue;
+		} else {
+			foreach ( $tokens as $group => $names ) {
+				if ( ! is_string( $group ) || ! is_array( $names ) ) {
+					continue;
+				}
+				$out[ $group ] = array();
+				foreach ( $names as $name => $value ) {
+					if ( is_string( $name ) && is_string( $value ) ) {
+						$out[ $group ][ $name ] = $value;
+					}
+				}
 			}
-			$out[ $group ] = array();
-			foreach ( $names as $name => $value ) {
-				if ( is_string( $name ) && in_array( $name, $allowed_names, true ) && is_string( $value ) ) {
-					$out[ $group ][ $name ] = $value;
+		}
+		// * Merge applied design tokens from execution (plugin-owned); applied values override repo.
+		$applied = \get_option( Option_Names::APPLIED_DESIGN_TOKENS, array() );
+		if ( is_array( $applied ) ) {
+			foreach ( $applied as $group => $names ) {
+				if ( ! is_string( $group ) || ! is_array( $names ) ) {
+					continue;
+				}
+				if ( ! isset( $out[ $group ] ) ) {
+					$out[ $group ] = array();
+				}
+				foreach ( $names as $name => $value ) {
+					if ( is_string( $name ) && is_string( $value ) ) {
+						if ( $this->token_registry !== null && $this->token_registry->is_loaded() ) {
+							$allowed = $this->token_registry->get_allowed_names_for_group( $group );
+							if ( in_array( $name, $allowed ?? array(), true ) ) {
+								$out[ $group ][ $name ] = $value;
+							}
+						} else {
+							$out[ $group ][ $name ] = $value;
+						}
+					}
 				}
 			}
 		}

@@ -12,11 +12,13 @@ use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
 use AIOPageBuilder\Domain\Styling\Style_Spec_Loader;
 use AIOPageBuilder\Domain\Styling\Style_Token_Registry;
 use AIOPageBuilder\Domain\Styling\Style_Validation_Result;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 2 );
+require_once $plugin_root . '/src/Infrastructure/Config/Option_Names.php';
 require_once $plugin_root . '/src/Domain/Styling/Global_Style_Settings_Schema.php';
 require_once $plugin_root . '/src/Domain/Styling/Global_Style_Settings_Repository.php';
 require_once $plugin_root . '/src/Domain/Styling/Style_Spec_Loader.php';
@@ -33,6 +35,10 @@ final class Global_Style_Settings_Repository_Test extends TestCase {
 		$key               = Global_Style_Settings_Schema::OPTION_KEY;
 		if ( isset( $GLOBALS['_aio_test_options'][ $key ] ) ) {
 			unset( $GLOBALS['_aio_test_options'][ $key ] );
+		}
+		$applied_key = Option_Names::APPLIED_DESIGN_TOKENS;
+		if ( isset( $GLOBALS['_aio_test_options'][ $applied_key ] ) ) {
+			unset( $GLOBALS['_aio_test_options'][ $applied_key ] );
 		}
 	}
 
@@ -136,5 +142,21 @@ final class Global_Style_Settings_Repository_Test extends TestCase {
 		$result   = new Style_Validation_Result( false, array( 'Invalid token group' ), array() );
 		$this->assertFalse( $repo->persist_global_tokens_result( $result ) );
 		$this->assertSame( array(), $repo->get_global_tokens() );
+	}
+
+	/**
+	 * get_global_tokens merges applied design tokens from execution (Prompt 640); applied overrides repo.
+	 */
+	public function test_get_global_tokens_merges_applied_design_tokens(): void {
+		\update_option( Option_Names::APPLIED_DESIGN_TOKENS, array( 'color' => array( 'primary' => '#applied' ) ) );
+		try {
+			$repo = new Global_Style_Settings_Repository( null, null );
+			$out  = $repo->get_global_tokens();
+			$this->assertArrayHasKey( 'color', $out );
+			$this->assertArrayHasKey( 'primary', $out['color'] );
+			$this->assertSame( '#applied', $out['color']['primary'] );
+		} finally {
+			\delete_option( Option_Names::APPLIED_DESIGN_TOKENS );
+		}
 	}
 }

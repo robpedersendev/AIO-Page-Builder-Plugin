@@ -15,14 +15,12 @@ namespace AIOPageBuilder\Domain\Execution\Jobs;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Applies one design-token recommendation (token_group, token_name, proposed_value).
  */
 final class Token_Set_Job_Service implements Token_Set_Job_Service_Interface {
-
-	/** Option key for applied token values: [ group => [ name => value ] ]. */
-	public const OPTION_APPLIED_TOKENS = 'aio_applied_design_tokens';
 
 	/** Allowed token groups (spec §35, Build_Plan_Draft_Schema::DTR_ENUM_GROUP). */
 	private const ALLOWED_GROUPS = array( 'color', 'typography', 'spacing', 'radius', 'shadow', 'component' );
@@ -61,8 +59,9 @@ final class Token_Set_Job_Service implements Token_Set_Job_Service_Interface {
 				array( 'invalid_target' )
 			);
 		}
+		$proposed = is_scalar( $proposed ) ? (string) $proposed : '';
 
-		$store = get_option( self::OPTION_APPLIED_TOKENS, array() );
+		$store = get_option( Option_Names::APPLIED_DESIGN_TOKENS, array() );
 		if ( ! is_array( $store ) ) {
 			$store = array();
 		}
@@ -71,7 +70,7 @@ final class Token_Set_Job_Service implements Token_Set_Job_Service_Interface {
 		}
 		$previous                             = $store[ $token_group ][ $token_name ] ?? null;
 		$store[ $token_group ][ $token_name ] = $proposed;
-		$updated                              = update_option( self::OPTION_APPLIED_TOKENS, $store );
+		$updated                              = update_option( Option_Names::APPLIED_DESIGN_TOKENS, $store );
 		if ( ! $updated ) {
 			return Token_Set_Result::failure(
 				__( 'Failed to persist token value.', 'aio-page-builder' ),

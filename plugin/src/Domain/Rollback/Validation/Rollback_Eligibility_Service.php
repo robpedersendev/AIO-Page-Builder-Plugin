@@ -16,8 +16,8 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
 use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Repository_Interface;
 use AIOPageBuilder\Domain\Rollback\Snapshots\Operational_Snapshot_Schema;
-use AIOPageBuilder\Domain\Execution\Jobs\Token_Set_Job_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Determines rollback eligibility from snapshot presence, handler support, target resolution,
@@ -271,7 +271,7 @@ final class Rollback_Eligibility_Service {
 				$term = \get_term( $term_id, 'nav_menu' );
 				return ( $term instanceof \WP_Term ) ? Rollback_Eligibility_Result::TARGET_RESOLVED : Rollback_Eligibility_Result::TARGET_MISSING;
 			case Operational_Snapshot_Schema::OBJECT_FAMILY_TOKEN_SET:
-				$store = \get_option( Token_Set_Job_Service::OPTION_APPLIED_TOKENS, array() );
+				$store = \get_option( Option_Names::APPLIED_DESIGN_TOKENS, array() );
 				if ( ! is_array( $store ) ) {
 					return Rollback_Eligibility_Result::TARGET_MISSING;
 				}
