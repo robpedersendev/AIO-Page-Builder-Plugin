@@ -1,8 +1,11 @@
 <?php
 /**
- * Unit tests for Execution_Action_Types (spec §39, §40.1; Prompt 641).
+ * Unit tests for Execution_Action_Types (spec §39, §40.1).
  *
- * Ensures UPDATE_PAGE_METADATA is not valid for execution in v1 (recommendation-only).
+ * Ensures de-scoped action types are absent from ALL and rejected by is_valid():
+ * - UPDATE_PAGE_METADATA: recommendation-only.
+ * - ASSIGN_PAGE_HIERARCHY: hierarchy embedded in CREATE_PAGE.
+ * - CREATE_MENU: subsumed by UPDATE_MENU.
  *
  * @package AIOPageBuilder
  */
@@ -47,5 +50,37 @@ final class Execution_Action_Types_Test extends TestCase {
 	public function test_is_valid_rejects_unknown_type(): void {
 		$this->assertFalse( Execution_Action_Types::is_valid( 'unknown_action' ) );
 		$this->assertFalse( Execution_Action_Types::is_valid( '' ) );
+	}
+
+	/** ASSIGN_PAGE_HIERARCHY is de-scoped: hierarchy is applied inline during CREATE_PAGE. */
+	public function test_assign_page_hierarchy_is_not_valid_for_execution(): void {
+		$this->assertFalse(
+			Execution_Action_Types::is_valid( Execution_Action_Types::ASSIGN_PAGE_HIERARCHY ),
+			'ASSIGN_PAGE_HIERARCHY must not be valid for execution in v1 (embedded in CREATE_PAGE).'
+		);
+	}
+
+	public function test_all_does_not_contain_assign_page_hierarchy(): void {
+		$this->assertNotContains(
+			Execution_Action_Types::ASSIGN_PAGE_HIERARCHY,
+			Execution_Action_Types::ALL,
+			'ALL must not include ASSIGN_PAGE_HIERARCHY in v1.'
+		);
+	}
+
+	/** CREATE_MENU is de-scoped: menu creation is handled by UPDATE_MENU. */
+	public function test_create_menu_is_not_valid_for_execution(): void {
+		$this->assertFalse(
+			Execution_Action_Types::is_valid( Execution_Action_Types::CREATE_MENU ),
+			'CREATE_MENU must not be valid for execution in v1 (subsumed by UPDATE_MENU).'
+		);
+	}
+
+	public function test_all_does_not_contain_create_menu(): void {
+		$this->assertNotContains(
+			Execution_Action_Types::CREATE_MENU,
+			Execution_Action_Types::ALL,
+			'ALL must not include CREATE_MENU in v1.'
+		);
 	}
 }
