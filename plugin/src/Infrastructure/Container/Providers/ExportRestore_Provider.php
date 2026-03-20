@@ -86,6 +86,7 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				if ( $container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE ) ) {
 					$industry_cache = $container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_READ_MODEL_CACHE_SERVICE );
 				}
+				$snapshot_repo = $container->has( 'profile_snapshot_repository' ) ? $container->get( 'profile_snapshot_repository' ) : null;
 				return new \AIOPageBuilder\Domain\ExportRestore\Import\Restore_Pipeline(
 					$container->get( 'settings' ),
 					$container->get( 'profile_store' ),
@@ -99,7 +100,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 					$style_cache instanceof \AIOPageBuilder\Domain\Styling\Style_Cache_Service ? $style_cache : null,
 					$styles_norm,
 					$styles_san,
-					$industry_cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $industry_cache : null
+					$industry_cache instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service ? $industry_cache : null,
+					$snapshot_repo instanceof \AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface ? $snapshot_repo : null
 				);
 			}
 		);
@@ -166,6 +168,7 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 			function () use ( $container ): Export_Generator {
 				$template_library_validator = $container->has( 'template_library_export_validator' ) ? $container->get( 'template_library_export_validator' ) : null;
 				$acf_mirror_service         = $container->has( 'acf_local_json_mirror_service' ) ? $container->get( 'acf_local_json_mirror_service' ) : null;
+				$snapshot_repo              = $container->has( 'profile_snapshot_repository' ) ? $container->get( 'profile_snapshot_repository' ) : null;
 				return new Export_Generator(
 					$container->get( 'plugin_path_manager' ),
 					$container->get( 'settings' ),
@@ -178,7 +181,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 					$container->has( 'logger' ) ? $container->get( 'logger' ) : null,
 					$container->get( 'support_package_generator' ),
 					$template_library_validator,
-					$acf_mirror_service
+					$acf_mirror_service,
+					$snapshot_repo instanceof \AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface ? $snapshot_repo : null
 				);
 			}
 		);

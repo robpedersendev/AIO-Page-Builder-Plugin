@@ -18,7 +18,6 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 
 defined( 'ABSPATH' ) || exit;
 
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Capture_Service;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Diff_Service;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
@@ -56,7 +55,7 @@ final class Profile_Snapshot_History_Panel {
 	}
 
 	public function get_capability(): string {
-		return Capabilities::MANAGE_PLUGIN_SETTINGS;
+		return Capabilities::MANAGE_SETTINGS;
 	}
 
 	/**
@@ -79,7 +78,7 @@ final class Profile_Snapshot_History_Panel {
 	 * @return void
 	 */
 	public function handle_restore(): void {
-		if ( ! \current_user_can( Capabilities::MANAGE_PLUGIN_SETTINGS ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to restore profile snapshots.', 'aio-page-builder' ), 403 );
 		}
 
@@ -163,7 +162,7 @@ final class Profile_Snapshot_History_Panel {
 	 * @return void
 	 */
 	public function render(): void {
-		if ( ! \current_user_can( Capabilities::MANAGE_PLUGIN_SETTINGS ) ) {
+		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ) );
 		}
 

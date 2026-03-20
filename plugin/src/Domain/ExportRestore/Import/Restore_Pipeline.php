@@ -14,11 +14,15 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Schema;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
+use AIOPageBuilder\Infrastructure\Config\Versions;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
+use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Bundle_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Industry_Export_Restore_Schema;
 use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Restore_Validator;
 use AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service;
@@ -92,6 +96,9 @@ final class Restore_Pipeline {
 	/** @var Industry_Read_Model_Cache_Service|null Invalidate industry read-model caches after industry profile restore (Prompt 435). */
 	private ?Industry_Read_Model_Cache_Service $industry_cache_service;
 
+	/** @var Profile_Snapshot_Repository_Interface|null Restores profile snapshot history from the profiles category (v2). */
+	private ?Profile_Snapshot_Repository_Interface $snapshot_repository;
+
 	public function __construct(
 		Settings_Service $settings,
 		Profile_Store $profile_store,
@@ -105,7 +112,8 @@ final class Restore_Pipeline {
 		?Style_Cache_Service $style_cache_service = null,
 		?Styles_JSON_Normalizer $styles_normalizer = null,
 		?Styles_JSON_Sanitizer $styles_sanitizer = null,
-		?Industry_Read_Model_Cache_Service $industry_cache_service = null
+		?Industry_Read_Model_Cache_Service $industry_cache_service = null,
+		?Profile_Snapshot_Repository_Interface $snapshot_repository = null
 	) {
 		$this->settings                           = $settings;
 		$this->profile_store                      = $profile_store;
@@ -120,6 +128,7 @@ final class Restore_Pipeline {
 		$this->styles_normalizer                  = $styles_normalizer;
 		$this->styles_sanitizer                   = $styles_sanitizer;
 		$this->industry_cache_service             = $industry_cache_service;
+		$this->snapshot_repository                = $snapshot_repository;
 	}
 
 	/**
@@ -387,6 +396,55 @@ final class Restore_Pipeline {
 							);
 						} else {
 							$this->log( 'Industry restore skipped: unsupported or missing schema_version.', array( 'version' => $version ), 'restore-profiles', Log_Severities::WARNING );
+						}
+					}
+				}
+				// * Restore profile snapshot history when repository is wired and the bundle includes it.
+				if ( $this->snapshot_repository !== null ) {
+					$snap_json = $zip->getFromName( 'profiles/' . Export_Bundle_Schema::PROFILES_SNAPSHOT_HISTORY_KEY . '.json' );
+					if ( $snap_json !== false ) {
+						$snap_records = json_decode( $snap_json, true );
+						if ( is_array( $snap_records ) ) {
+							$restored_count = 0;
+							foreach ( $snap_records as $rec ) {
+								if ( ! is_array( $rec ) ) {
+									continue;
+								}
+								$snap_schema_version = (string) ( $rec['profile_schema_version'] ?? '' );
+								// * Skip snapshots with incompatible schema versions to avoid corrupt history.
+								if ( $snap_schema_version !== Versions::PROFILE_SCHEMA_VERSION ) {
+									$this->log(
+										'Profile snapshot skipped: incompatible profile_schema_version.',
+										array( 'profile_schema_version' => $snap_schema_version ),
+										'restore-profiles',
+										Log_Severities::WARNING
+									);
+									continue;
+								}
+								$snap_id = (string) ( $rec['snapshot_id'] ?? '' );
+								if ( $snap_id === '' ) {
+									continue;
+								}
+								$snap = new Profile_Snapshot_Data(
+									$snap_id,
+									(string) ( $rec['scope_type'] ?? 'other' ),
+									(string) ( $rec['scope_id'] ?? '' ),
+									(string) ( $rec['created_at'] ?? '' ),
+									$snap_schema_version,
+									is_array( $rec['brand_profile'] ?? null ) ? $rec['brand_profile'] : array(),
+									is_array( $rec['business_profile'] ?? null ) ? $rec['business_profile'] : array(),
+									(string) ( $rec['source'] ?? 'manual' )
+								);
+								$this->snapshot_repository->save( $snap );
+								++$restored_count;
+							}
+							if ( $restored_count > 0 ) {
+								$actions[] = array(
+									'category' => 'profiles',
+									'action'   => 'snapshot_history_restored',
+									'count'    => $restored_count,
+								);
+							}
 						}
 					}
 				}

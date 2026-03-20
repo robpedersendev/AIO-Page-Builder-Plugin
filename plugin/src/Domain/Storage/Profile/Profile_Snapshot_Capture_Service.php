@@ -51,44 +51,44 @@ final class Profile_Snapshot_Capture_Service {
 	/**
 	 * Captures a snapshot after brand profile is merged.
 	 *
-	 * @param Profile_Store $store
+	 * @param Profile_Store_Interface $store
 	 * @return void
 	 */
-	public function on_brand_profile_merged( Profile_Store $store ): void {
+	public function on_brand_profile_merged( Profile_Store_Interface $store ): void {
 		$this->capture( $store, 'brand_profile_merge', 'other', '' );
 	}
 
 	/**
 	 * Captures a snapshot after business profile is merged.
 	 *
-	 * @param Profile_Store $store
+	 * @param Profile_Store_Interface $store
 	 * @return void
 	 */
-	public function on_business_profile_merged( Profile_Store $store ): void {
+	public function on_business_profile_merged( Profile_Store_Interface $store ): void {
 		$this->capture( $store, 'business_profile_merge', 'other', '' );
 	}
 
 	/**
 	 * Captures a snapshot after a successful onboarding AI run.
 	 *
-	 * @param Profile_Store $store   Current profile store.
-	 * @param string        $run_ref Optional AI run reference for scope_id.
+	 * @param Profile_Store_Interface $store   Current profile store.
+	 * @param string                  $run_ref Optional AI run reference for scope_id.
 	 * @return void
 	 */
-	public function on_onboarding_run_completed( Profile_Store $store, string $run_ref = '' ): void {
+	public function on_onboarding_run_completed( Profile_Store_Interface $store, string $run_ref = '' ): void {
 		$this->capture( $store, 'onboarding_completion', 'onboarding_session', $run_ref );
 	}
 
 	/**
 	 * Builds and persists a snapshot. Logs any error, never throws.
 	 *
-	 * @param Profile_Store $store
-	 * @param string        $source
-	 * @param string        $scope_type
-	 * @param string        $scope_id
+	 * @param Profile_Store_Interface $store
+	 * @param string                  $source
+	 * @param string                  $scope_type
+	 * @param string                  $scope_id
 	 * @return void
 	 */
-	private function capture( Profile_Store $store, string $source, string $scope_type, string $scope_id ): void {
+	private function capture( Profile_Store_Interface $store, string $source, string $scope_type, string $scope_id ): void {
 		try {
 			$snapshot = $this->factory->build( $store, $source, $scope_type, $scope_id );
 			$saved    = $this->repository->save( $snapshot );

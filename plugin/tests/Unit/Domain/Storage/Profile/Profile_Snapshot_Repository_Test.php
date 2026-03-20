@@ -170,7 +170,7 @@ final class Profile_Snapshot_Repository_Test extends TestCase {
 		$snap = $this->snapshot( 'snap_del' );
 		$this->repo->save( $snap );
 		$result = $this->repo->delete( 'snap_del' );
-		$this->assertSame( 1, $result );
+		$this->assertTrue( $result );
 	}
 
 	public function test_brand_and_business_profiles_survive_round_trip(): void {

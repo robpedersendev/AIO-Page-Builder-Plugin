@@ -21,6 +21,8 @@ use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Export_Valid
 use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
 use AIOPageBuilder\Domain\Registries\Export\Registry_Export_Serializer;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
@@ -72,6 +74,9 @@ final class Export_Generator {
 	/** @var ACF_Local_JSON_Mirror_Service|null Optional ACF field groups mirror for debug/support export (Prompt 224). */
 	private ?ACF_Local_JSON_Mirror_Service $acf_mirror_service;
 
+	/** @var Profile_Snapshot_Repository_Interface|null Optional snapshot repository for including profile history in exports (v2). */
+	private ?Profile_Snapshot_Repository_Interface $snapshot_repository;
+
 	public function __construct(
 		Plugin_Path_Manager $path_manager,
 		Settings_Service $settings,
@@ -84,7 +89,8 @@ final class Export_Generator {
 		?Logger_Interface $logger = null,
 		?Support_Package_Generator $support_package_generator = null,
 		?Template_Library_Export_Validator $template_library_export_validator = null,
-		?ACF_Local_JSON_Mirror_Service $acf_mirror_service = null
+		?ACF_Local_JSON_Mirror_Service $acf_mirror_service = null,
+		?Profile_Snapshot_Repository_Interface $snapshot_repository = null
 	) {
 		$this->path_manager                      = $path_manager;
 		$this->settings                          = $settings;
@@ -98,6 +104,7 @@ final class Export_Generator {
 		$this->support_package_generator         = $support_package_generator;
 		$this->template_library_export_validator = $template_library_export_validator;
 		$this->acf_mirror_service                = $acf_mirror_service;
+		$this->snapshot_repository               = $snapshot_repository;
 	}
 
 	/**
@@ -342,6 +349,17 @@ final class Export_Generator {
 				Industry_Export_Restore_Schema::KEY_APPLIED_PRESET  => $applied_preset,
 			);
 			$this->write_json_dir( $staging_dir . 'profiles', 'industry.json', $industry_payload );
+			// * Write profile snapshot history alongside profile.json (Export_Bundle_Schema::PROFILES_SNAPSHOT_HISTORY_KEY).
+			// * Skipped when no snapshot repository is wired (support bundle, template-only, etc.) or when redacting.
+			if ( $this->snapshot_repository !== null && ! $redact ) {
+				$all_snaps    = $this->snapshot_repository->get_all();
+				$snap_payload = \array_map( array( $this, 'serialize_snapshot' ), $all_snaps );
+				$this->write_json_dir(
+					$staging_dir . 'profiles',
+					Export_Bundle_Schema::PROFILES_SNAPSHOT_HISTORY_KEY . '.json',
+					$snap_payload
+				);
+			}
 		}
 		if ( in_array( 'registries', $included, true ) || in_array( 'compositions', $included, true ) ) {
 			$bundle = $this->registry_serializer->build_registry_bundle( 0 );
@@ -381,6 +399,26 @@ final class Export_Generator {
 			$manifest   = $this->acf_mirror_service->generate_mirror_to_directory( $mirror_dir );
 			$this->write_json_file( $mirror_dir . '/manifest.json', $manifest );
 		}
+	}
+
+	/**
+	 * Serializes a Profile_Snapshot_Data to a plain array for JSON export.
+	 * Only brand_profile and business_profile are included; no template_preference_profile in snapshots.
+	 *
+	 * @param Profile_Snapshot_Data $snapshot
+	 * @return array<string, mixed>
+	 */
+	private function serialize_snapshot( Profile_Snapshot_Data $snapshot ): array {
+		return array(
+			'snapshot_id'            => $snapshot->snapshot_id,
+			'scope_type'             => $snapshot->scope_type,
+			'scope_id'               => $snapshot->scope_id,
+			'created_at'             => $snapshot->created_at,
+			'profile_schema_version' => $snapshot->profile_schema_version,
+			'brand_profile'          => $snapshot->brand_profile,
+			'business_profile'       => $snapshot->business_profile,
+			'source'                 => $snapshot->source,
+		);
 	}
 
 	private function write_json_dir( string $dir, string $filename, array $data ): void {
