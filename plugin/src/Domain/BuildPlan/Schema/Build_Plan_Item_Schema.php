@@ -38,6 +38,8 @@ final class Build_Plan_Item_Schema {
 	public const ITEM_TYPE_DESIGN_TOKEN         = 'design_token';
 	public const ITEM_TYPE_SEO                  = 'seo';
 	public const ITEM_TYPE_HIERARCHY_NOTE       = 'hierarchy_note';
+	/** Executable hierarchy assignment (v2). payload: page_id, parent_page_id. Emits ASSIGN_PAGE_HIERARCHY envelope. */
+	public const ITEM_TYPE_HIERARCHY_ASSIGNMENT = 'hierarchy_assignment';
 	public const ITEM_TYPE_OVERVIEW_NOTE        = 'overview_note';
 	public const ITEM_TYPE_CONFIRMATION         = 'confirmation';
 
@@ -48,6 +50,7 @@ final class Build_Plan_Item_Schema {
 		self::ITEM_TYPE_DESIGN_TOKEN,
 		self::ITEM_TYPE_SEO,
 		self::ITEM_TYPE_HIERARCHY_NOTE,
+		self::ITEM_TYPE_HIERARCHY_ASSIGNMENT,
 		self::ITEM_TYPE_OVERVIEW_NOTE,
 		self::ITEM_TYPE_CONFIRMATION,
 	);

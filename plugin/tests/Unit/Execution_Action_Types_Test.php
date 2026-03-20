@@ -52,19 +52,19 @@ final class Execution_Action_Types_Test extends TestCase {
 		$this->assertFalse( Execution_Action_Types::is_valid( '' ) );
 	}
 
-	/** ASSIGN_PAGE_HIERARCHY is de-scoped: hierarchy is applied inline during CREATE_PAGE. */
-	public function test_assign_page_hierarchy_is_not_valid_for_execution(): void {
-		$this->assertFalse(
+	/** ASSIGN_PAGE_HIERARCHY is executable in v2 via Assign_Page_Hierarchy_Handler. */
+	public function test_assign_page_hierarchy_is_valid_for_execution(): void {
+		$this->assertTrue(
 			Execution_Action_Types::is_valid( Execution_Action_Types::ASSIGN_PAGE_HIERARCHY ),
-			'ASSIGN_PAGE_HIERARCHY must not be valid for execution in v1 (embedded in CREATE_PAGE).'
+			'ASSIGN_PAGE_HIERARCHY must be valid for execution in v2 (Assign_Page_Hierarchy_Handler registered).'
 		);
 	}
 
-	public function test_all_does_not_contain_assign_page_hierarchy(): void {
-		$this->assertNotContains(
+	public function test_all_contains_assign_page_hierarchy(): void {
+		$this->assertContains(
 			Execution_Action_Types::ASSIGN_PAGE_HIERARCHY,
 			Execution_Action_Types::ALL,
-			'ALL must not include ASSIGN_PAGE_HIERARCHY in v1.'
+			'ALL must include ASSIGN_PAGE_HIERARCHY in v2.'
 		);
 	}
 

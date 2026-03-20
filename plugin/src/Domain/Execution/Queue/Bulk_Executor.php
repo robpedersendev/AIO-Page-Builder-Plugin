@@ -29,11 +29,13 @@ class Bulk_Executor {
 
 	/** Map plan item_type to execution action_type (spec §40.1). Non-mapped types are skipped. */
 	private const ITEM_TYPE_TO_ACTION_TYPE = array(
-		Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE => Execution_Action_Types::REPLACE_PAGE,
-		Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE     => Execution_Action_Types::CREATE_PAGE,
-		Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE  => Execution_Action_Types::UPDATE_MENU,
-		Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN => Execution_Action_Types::APPLY_TOKEN_SET,
-		// ITEM_TYPE_SEO not mapped: UPDATE_PAGE_METADATA is recommendation-only in v1 (Prompt 641).
+		Build_Plan_Item_Schema::ITEM_TYPE_EXISTING_PAGE_CHANGE  => Execution_Action_Types::REPLACE_PAGE,
+		Build_Plan_Item_Schema::ITEM_TYPE_NEW_PAGE              => Execution_Action_Types::CREATE_PAGE,
+		Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE           => Execution_Action_Types::UPDATE_MENU,
+		Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN          => Execution_Action_Types::APPLY_TOKEN_SET,
+		Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_ASSIGNMENT  => Execution_Action_Types::ASSIGN_PAGE_HIERARCHY,
+		// ITEM_TYPE_SEO not mapped: UPDATE_PAGE_METADATA is recommendation-only (v2 planned).
+		// ITEM_TYPE_HIERARCHY_NOTE not mapped: advisory-only; use ITEM_TYPE_HIERARCHY_ASSIGNMENT for executable items.
 	);
 
 	/**

@@ -51,6 +51,9 @@ final class Build_Plan_Workspace_Screen {
 	/** Bulk nonce action for design-token execution (required contract). */
 	public const NONCE_ACTION_EXECUTE_TOKEN_BULK = 'aio_pb_execute_token_bulk';
 
+	/** Bulk nonce action for hierarchy assignment execution (v2-scope-backlog.md §1). */
+	public const NONCE_ACTION_EXECUTE_HIERARCHY_BULK = 'aio_pb_execute_hierarchy_bulk';
+
 	/** Nonce action for Step 7 (logs/rollback) rollback request. */
 	public const NONCE_ACTION_ROLLBACK = 'aio_build_plan_rollback_request';
 
@@ -82,6 +85,19 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	/**
+	 * Returns row nonce action key for hierarchy-assignment execution.
+	 *
+	 * Required contract: `aio_pb_execute_hierarchy_item_{item_id}`.
+	 *
+	 * @param string $item_id Plan item id.
+	 * @return string
+	 */
+	private function execute_hierarchy_row_nonce_action( string $item_id ): string {
+		$item_id = \sanitize_text_field( $item_id );
+		return $item_id !== '' ? 'aio_pb_execute_hierarchy_item_' . $item_id : '';
+	}
+
+	/**
 	 * Renders workspace for the given plan_id. Exits with not-found message if plan missing.
 	 * Handles Step 2 then Step 1 actions before rendering.
 	 *
@@ -106,6 +122,10 @@ final class Build_Plan_Workspace_Screen {
 			return;
 		}
 		$handled = $this->maybe_handle_navigation_action( $plan_id );
+		if ( $handled ) {
+			return;
+		}
+		$handled = $this->maybe_handle_hierarchy_action( $plan_id );
 		if ( $handled ) {
 			return;
 		}
@@ -839,6 +859,305 @@ final class Build_Plan_Workspace_Screen {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Handles Step 3 (hierarchy) row execute/retry and bulk execute.
+	 *
+	 * Row execute/retry: GET request with action=execute_hierarchy_item|retry_hierarchy_item,
+	 * item_id, and nonce aio_pb_execute_hierarchy_item_{item_id}. Searches all steps for item.
+	 * Bulk execute: POST with aio_build_plan_action=bulk_execute_all_hierarchy|bulk_execute_selected_hierarchy
+	 * and nonce NONCE_ACTION_EXECUTE_HIERARCHY_BULK.
+	 *
+	 * @param string $plan_id Plan ID.
+	 * @return bool True if request was handled and redirect sent; false to continue render.
+	 */
+	private function maybe_handle_hierarchy_action( string $plan_id ): bool {
+		$hierarchy_step_index = \AIOPageBuilder\Domain\BuildPlan\Steps\Hierarchy\Hierarchy_Step_UI_Service::STEP_INDEX_HIERARCHY;
+		$plan_id              = \sanitize_text_field( $plan_id );
+		if ( $plan_id === '' ) {
+			return false;
+		}
+
+		$redirect_url = \admin_url(
+			'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $hierarchy_step_index
+		);
+
+		// Bulk execute (POST).
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
+			$action        = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
+			$execute_nonce = isset( $_POST['_wpnonce_execute'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce_execute'] ) ) : '';
+
+			$bulk_execute_actions = array( 'bulk_execute_all_hierarchy', 'bulk_execute_selected_hierarchy' );
+			if ( ! in_array( $action, $bulk_execute_actions, true ) ) {
+				return false;
+			}
+			if ( ! \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ) ) {
+				return false;
+			}
+			if ( ! \wp_verify_nonce( $execute_nonce, self::NONCE_ACTION_EXECUTE_HIERARCHY_BULK ) ) {
+				return false;
+			}
+			if ( ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+				return false;
+			}
+
+			$state = $this->get_state( $plan_id );
+			if ( $state === null ) {
+				return false;
+			}
+			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
+			if ( $plan_post_id <= 0 ) {
+				return false;
+			}
+			$definition = isset( $state['plan_definition'] ) && is_array( $state['plan_definition'] ) ? $state['plan_definition'] : array();
+			$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+				? $definition[ Build_Plan_Schema::KEY_STEPS ]
+				: array();
+
+			$selected_ids = array();
+			if ( $action === 'bulk_execute_selected_hierarchy' ) {
+				$raw = isset( $_POST['aio_hierarchy_selected_ids'] ) && is_array( $_POST['aio_hierarchy_selected_ids'] )
+					? \wp_unslash( $_POST['aio_hierarchy_selected_ids'] )
+					: array();
+				$selected_ids = \array_values( \array_filter( \array_map( 'sanitize_text_field', $raw ) ) );
+			}
+			$id_filter = $action === 'bulk_execute_selected_hierarchy' ? array_flip( \array_map( 'strval', $selected_ids ) ) : null;
+
+			$item_ids_to_exec = array();
+			foreach ( $steps as $step ) {
+				if ( ! is_array( $step ) ) {
+					continue;
+				}
+				$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+					? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+					: array();
+				foreach ( $items as $it ) {
+					if ( ! is_array( $it ) ) {
+						continue;
+					}
+					$it_id   = (string) ( $it[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
+					$it_type = (string) ( $it[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' );
+					$it_status = (string) ( $it['status'] ?? '' );
+					if ( $it_id === '' || $it_type !== Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_ASSIGNMENT ) {
+						continue;
+					}
+					if ( $it_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
+						continue;
+					}
+					if ( $id_filter !== null && ! isset( $id_filter[ $it_id ] ) ) {
+						continue;
+					}
+					$item_ids_to_exec[] = $it_id;
+				}
+			}
+			$item_ids_to_exec = \array_values( \array_unique( \array_filter( $item_ids_to_exec ) ) );
+
+			if ( empty( $item_ids_to_exec ) ) {
+				\wp_safe_redirect( \add_query_arg( array( 'hierarchy_bulk_execute_error' => 'none_selected' ), $redirect_url ) );
+				exit;
+			}
+
+			$actor_context = array(
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE           => 'user',
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID             => (string) \get_current_user_id(),
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED   => Capabilities::EXECUTE_BUILD_PLANS,
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT           => \gmdate( 'c' ),
+				'execution_origin'                                                                               => $action,
+			);
+
+			\error_log(
+				'[AIO Page Builder] ' . \wp_json_encode(
+					array(
+						'event'            => 'hierarchy_execution_request',
+						'actor_id'         => (string) \get_current_user_id(),
+						'plan_id'          => $plan_id,
+						'item_ids'         => $item_ids_to_exec,
+						'execution_origin' => $action,
+					)
+				)
+			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
+			$results = $this->container->get( 'execution_queue_service' )->request_bulk_execution(
+				$plan_id,
+				$item_ids_to_exec,
+				$actor_context,
+				array( 'run_immediately' => true )
+			);
+
+			\error_log(
+				'[AIO Page Builder] ' . \wp_json_encode(
+					array(
+						'event'            => 'hierarchy_execution_result',
+						'actor_id'         => (string) \get_current_user_id(),
+						'plan_id'          => $plan_id,
+						'execution_origin' => $action,
+						'overall_status'   => $results['status'] ?? 'error',
+						'completed_count'  => $results['completed_count'] ?? 0,
+						'failed_count'     => $results['failed_count'] ?? 0,
+						'item_results'     => $results['item_results'] ?? array(),
+					)
+				)
+			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
+			\wp_safe_redirect( $redirect_url );
+			exit;
+		}
+
+		// Row execute/retry (GET).
+		$get_action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
+		$item_id    = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
+		$nonce      = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
+
+		$is_execute_action = in_array( $get_action, array( 'execute_hierarchy_item', 'retry_hierarchy_item' ), true );
+		if ( ! $is_execute_action ) {
+			return false;
+		}
+		if ( $item_id === '' ) {
+			return false;
+		}
+		$row_nonce = $this->execute_hierarchy_row_nonce_action( $item_id );
+		if ( $row_nonce === '' || ! \wp_verify_nonce( $nonce, $row_nonce ) ) {
+			return false;
+		}
+		if ( ! \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+			return false;
+		}
+
+		$state = $this->get_state( $plan_id );
+		if ( $state === null ) {
+			return false;
+		}
+		$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
+		if ( $plan_post_id <= 0 ) {
+			return false;
+		}
+		$definition = isset( $state['plan_definition'] ) && is_array( $state['plan_definition'] ) ? $state['plan_definition'] : array();
+		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? $definition[ Build_Plan_Schema::KEY_STEPS ]
+			: array();
+
+		// Search all steps for the item (hierarchy_assignment items may appear in any step).
+		$item_found  = false;
+		$item_type   = '';
+		$item_status = '';
+		$payload     = array();
+		$found_step_index = -1;
+		foreach ( $steps as $s_idx => $step ) {
+			if ( ! is_array( $step ) ) {
+				continue;
+			}
+			$s_items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+				? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
+				: array();
+			foreach ( $s_items as $it ) {
+				if ( ! is_array( $it ) ) {
+					continue;
+				}
+				$found_id = (string) ( $it[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
+				if ( $found_id !== $item_id ) {
+					continue;
+				}
+				$item_found       = true;
+				$item_type        = (string) ( $it[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' );
+				$item_status      = (string) ( $it['status'] ?? '' );
+				$payload          = is_array( $it[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ?? null ) ? $it[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+				$found_step_index = (int) $s_idx;
+				break 2;
+			}
+		}
+
+		if ( ! $item_found || $item_type !== Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_ASSIGNMENT ) {
+			return false;
+		}
+
+		// Validate payload contains resolvable page reference.
+		$page_id        = isset( $payload['page_id'] ) ? (int) $payload['page_id'] : 0;
+		$parent_page_id = isset( $payload['parent_page_id'] ) ? (int) $payload['parent_page_id'] : -1;
+		if ( $page_id <= 0 || $parent_page_id < 0 ) {
+			return false;
+		}
+
+		if ( $get_action === 'retry_hierarchy_item' ) {
+			if ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::FAILED ) {
+				return false;
+			}
+			if ( $found_step_index >= 0 ) {
+				$repo    = $this->container->has( 'build_plan_repository' ) ? $this->container->get( 'build_plan_repository' ) : null;
+				$updated = false;
+				if ( $repo !== null && method_exists( $repo, 'update_plan_item_status' ) ) {
+					$updated = $repo->update_plan_item_status(
+						$plan_post_id,
+						$found_step_index,
+						$item_id,
+						\AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS
+					);
+				}
+				\error_log(
+					'[AIO Page Builder] ' . \wp_json_encode(
+						array(
+							'event'      => 'hierarchy_retry_status_update',
+							'plan_id'    => $plan_id,
+							'item_id'    => $item_id,
+							'page_id'    => $page_id,
+							'updated'    => $updated,
+							'new_status' => \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS,
+						)
+					)
+				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			}
+		} else {
+			if ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
+				return false;
+			}
+		}
+
+		$actor_context = array(
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE           => 'user',
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID             => (string) \get_current_user_id(),
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED   => Capabilities::EXECUTE_BUILD_PLANS,
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT           => \gmdate( 'c' ),
+			'execution_origin'                                                                               => $get_action,
+		);
+
+		\error_log(
+			'[AIO Page Builder] ' . \wp_json_encode(
+				array(
+					'event'            => 'hierarchy_execution_request',
+					'actor_id'         => (string) \get_current_user_id(),
+					'plan_id'          => $plan_id,
+					'item_id'          => $item_id,
+					'page_id'          => $page_id,
+					'parent_page_id'   => $parent_page_id,
+					'execution_origin' => $get_action,
+				)
+			)
+		); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
+		$results = $this->container->get( 'execution_queue_service' )->request_bulk_execution(
+			$plan_id,
+			array( $item_id ),
+			$actor_context,
+			array( 'run_immediately' => true )
+		);
+
+		\error_log(
+			'[AIO Page Builder] ' . \wp_json_encode(
+				array(
+					'event'            => 'hierarchy_execution_result',
+					'actor_id'         => (string) \get_current_user_id(),
+					'plan_id'          => $plan_id,
+					'item_id'          => $item_id,
+					'page_id'          => $page_id,
+					'execution_origin' => $get_action,
+					'overall_status'   => $results['status'] ?? 'error',
+					'item_results'     => $results['item_results'] ?? array(),
+				)
+			)
+		); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+
+		\wp_safe_redirect( $redirect_url );
+		exit;
 	}
 
 	/**

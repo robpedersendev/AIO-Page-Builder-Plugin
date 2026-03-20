@@ -80,7 +80,16 @@ final class Build_Plan_Row_Action_Resolver {
 			'enabled'   => $can_approve && $can_deny,
 		);
 
-		$supports_execution = $item_type === Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN;
+		// * Execute/retry are available for token and hierarchy_assignment items.
+		// * ITEM_TYPE_HIERARCHY_NOTE remains advisory-only and never exposes execute.
+		$supports_execution = in_array(
+			$item_type,
+			array(
+				Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN,
+				Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_ASSIGNMENT,
+			),
+			true
+		);
 		if ( $supports_execution ) {
 			$can_run = $status === Build_Plan_Item_Statuses::APPROVED
 				&& Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );

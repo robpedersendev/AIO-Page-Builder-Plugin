@@ -16,10 +16,10 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Action types that the execution engine may perform. Governed by execution-action-contract.md.
- * ALL lists types valid for execution in v1. Three types are deferred to v2:
- * - UPDATE_PAGE_METADATA: recommendation-only in v1; v2 will add a dedicated metadata-write handler.
- * - ASSIGN_PAGE_HIERARCHY: inline in CREATE_PAGE for v1; v2 will add standalone post-parent reassignment.
- * - CREATE_MENU: subsumed by UPDATE_MENU in v1; v2 will add explicit menu-creation envelopes and handler.
+ * ALL lists types valid for execution. Two types remain deferred to v2:
+ * - UPDATE_PAGE_METADATA: recommendation-only; v2 will add a dedicated metadata-write handler.
+ * - CREATE_MENU: subsumed by UPDATE_MENU; v2 will add explicit menu-creation envelopes and handler.
+ * ASSIGN_PAGE_HIERARCHY is now executable via Assign_Page_Hierarchy_Handler (v2).
  */
 final class Execution_Action_Types {
 
@@ -49,14 +49,15 @@ final class Execution_Action_Types {
 	public const ROLLBACK_ACTION       = 'rollback_action';
 
 	/**
-	 * Action types valid for execution in v1.
-	 * UPDATE_PAGE_METADATA, ASSIGN_PAGE_HIERARCHY, and CREATE_MENU are deferred to v2 — see their docblocks.
+	 * Action types valid for execution. UPDATE_PAGE_METADATA and CREATE_MENU are deferred to v2.
+	 * ASSIGN_PAGE_HIERARCHY is executable as of v2 via Assign_Page_Hierarchy_Handler.
 	 *
 	 * @var array<int, string>
 	 */
 	public const ALL = array(
 		self::CREATE_PAGE,
 		self::REPLACE_PAGE,
+		self::ASSIGN_PAGE_HIERARCHY,
 		self::UPDATE_MENU,
 		self::APPLY_TOKEN_SET,
 		self::FINALIZE_PLAN,
