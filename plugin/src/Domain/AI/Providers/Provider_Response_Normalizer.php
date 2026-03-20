@@ -130,7 +130,7 @@ final class Provider_Response_Normalizer {
 	 * @param string       $provider_id     Provider identifier.
 	 * @param string       $model_used       Model used.
 	 * @param array|object $structured_payload Validated structured payload.
-	 * @param array|null   $usage            Optional usage (prompt_tokens, completion_tokens, total_tokens, cost_placeholder).
+	 * @param array|null   $usage            Optional usage (prompt_tokens, completion_tokens, total_tokens). Cost calculation is de-scoped for v1.
 	 * @param array|null   $raw_provider_metadata Optional provider metadata (debug only).
 	 * @return array<string, mixed>
 	 */

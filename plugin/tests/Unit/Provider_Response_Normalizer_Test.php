@@ -74,7 +74,6 @@ final class Provider_Response_Normalizer_Test extends TestCase {
 			'prompt_tokens'     => 100,
 			'completion_tokens' => 50,
 			'total_tokens'      => 150,
-			'cost_placeholder'  => null,
 		);
 		$res     = $n->build_success_response( 'req_2', 'openai', 'gpt-4o', $payload, $usage );
 		$this->assertTrue( $res['success'] );

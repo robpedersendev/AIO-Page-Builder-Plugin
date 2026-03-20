@@ -194,7 +194,6 @@ final class Provider_Driver_Base_Test extends TestCase {
 					'prompt_tokens'     => 100,
 					'completion_tokens' => 50,
 					'total_tokens'      => 150,
-					'cost_placeholder'  => null,
 				),
 			)
 		);

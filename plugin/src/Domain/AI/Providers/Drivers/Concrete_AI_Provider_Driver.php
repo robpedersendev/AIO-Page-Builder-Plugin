@@ -161,11 +161,13 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		$structured_payload = array( 'content' => $content );
 		$usage_normalized   = null;
 		if ( is_array( $usage ) ) {
+			// * Token counts are authoritative provider-reported values.
+			// * Cost calculation is de-scoped for v1: provider APIs do not return cost directly,
+			//   and a derived per-model pricing table would require ongoing maintenance with stale-data risk.
 			$usage_normalized = array(
 				'prompt_tokens'     => (int) ( $usage['prompt_tokens'] ?? 0 ),
 				'completion_tokens' => (int) ( $usage['completion_tokens'] ?? 0 ),
 				'total_tokens'      => (int) ( $usage['total_tokens'] ?? 0 ),
-				'cost_placeholder'  => null, // SPR-010: cost modeling not implemented; reserved for future usage/cost reporting.
 			);
 		}
 

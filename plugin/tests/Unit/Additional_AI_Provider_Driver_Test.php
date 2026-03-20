@@ -143,6 +143,26 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 		$this->assertNull( $response['normalized_error'] );
 	}
 
+	/** cost_placeholder is de-scoped for v1; must not be emitted in the usage struct. */
+	public function test_usage_struct_does_not_contain_cost_placeholder(): void {
+		$normalizer = new Provider_Response_Normalizer();
+		$usage      = array(
+			'prompt_tokens'     => 5,
+			'completion_tokens' => 10,
+			'total_tokens'      => 15,
+		);
+		$response   = $normalizer->build_success_response( 'req-cost', 'anthropic', 'claude-3', array(), $usage );
+		$this->assertIsArray( $response['usage'] );
+		$this->assertArrayNotHasKey(
+			'cost_placeholder',
+			$response['usage'],
+			'cost_placeholder must not appear in the usage struct (de-scoped for v1).'
+		);
+		$this->assertArrayHasKey( 'prompt_tokens', $response['usage'] );
+		$this->assertArrayHasKey( 'completion_tokens', $response['usage'] );
+		$this->assertArrayHasKey( 'total_tokens', $response['usage'] );
+	}
+
 	public function test_driver_request_without_credential_returns_normalized_auth_error(): void {
 		$store    = new Additional_Driver_Test_Secret_Store();
 		$driver   = new Additional_AI_Provider_Driver(

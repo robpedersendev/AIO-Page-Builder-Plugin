@@ -145,13 +145,15 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		$usage_normalized = null;
 		$usage            = $decoded['usage'] ?? null;
 		if ( is_array( $usage ) ) {
-			$input_tok        = (int) ( $usage['input_tokens'] ?? 0 );
-			$output_tok       = (int) ( $usage['output_tokens'] ?? 0 );
+			$input_tok  = (int) ( $usage['input_tokens'] ?? 0 );
+			$output_tok = (int) ( $usage['output_tokens'] ?? 0 );
+			// * Token counts are authoritative provider-reported values (input_tokens + output_tokens).
+			// * Cost calculation is de-scoped for v1: provider APIs do not return cost directly,
+			//   and a derived per-model pricing table would require ongoing maintenance with stale-data risk.
 			$usage_normalized = array(
 				'prompt_tokens'     => $input_tok,
 				'completion_tokens' => $output_tok,
 				'total_tokens'      => $input_tok + $output_tok,
-				'cost_placeholder'  => null, // SPR-010: cost modeling not implemented; reserved for future usage/cost reporting.
 			);
 		}
 
