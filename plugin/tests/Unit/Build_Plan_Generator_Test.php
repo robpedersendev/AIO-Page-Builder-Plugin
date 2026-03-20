@@ -292,6 +292,123 @@ final class Build_Plan_Generator_Test extends TestCase {
 		unset( $GLOBALS['_aio_wp_insert_post_return'] );
 	}
 
+	// -----------------------------------------------------------------------
+	// Navigation step: ITEM_TYPE_MENU_NEW vs ITEM_TYPE_MENU_CHANGE.
+	// -----------------------------------------------------------------------
+
+	public function test_menu_create_action_emits_item_type_menu_new(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 1;
+		$output                                = $this->valid_normalized_output();
+		$output[ Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN ] = array(
+			array(
+				'menu_context'       => 'primary',
+				'action'             => 'create',
+				'proposed_menu_name' => 'Main Navigation',
+				'items'              => array( array( 'title' => 'Home', 'url' => '/' ) ),
+			),
+		);
+		$gen    = new Build_Plan_Generator( new Build_Plan_Repository(), new Build_Plan_Item_Generator() );
+		$result = $gen->generate( $output, 'run-1', 'run-1:out', array() );
+		$this->assertTrue( $result->is_success() );
+
+		$nav_step = $this->find_step( $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ], Build_Plan_Schema::STEP_TYPE_NAVIGATION );
+		$this->assertNotNull( $nav_step );
+		$items = $nav_step[ Build_Plan_Item_Schema::KEY_ITEMS ];
+		$this->assertCount( 1, $items );
+		$this->assertSame( Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW, $items[0][ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] );
+
+		$payload = $items[0][ Build_Plan_Item_Schema::KEY_PAYLOAD ];
+		$this->assertSame( 'Main Navigation', $payload['menu_name'], 'menu_name must be set from proposed_menu_name for Create_Menu_Handler.' );
+		$this->assertSame( 'primary', $payload['theme_location'], 'theme_location must be set from menu_context.' );
+		$this->assertIsArray( $payload['items'] );
+		unset( $GLOBALS['_aio_wp_insert_post_return'] );
+	}
+
+	public function test_menu_rename_action_still_emits_item_type_menu_change(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 1;
+		$output                                = $this->valid_normalized_output();
+		$output[ Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN ] = array(
+			array(
+				'menu_context'       => 'header',
+				'action'             => 'rename',
+				'proposed_menu_name' => 'New Header Nav',
+				'items'              => array(),
+			),
+		);
+		$gen    = new Build_Plan_Generator( new Build_Plan_Repository(), new Build_Plan_Item_Generator() );
+		$result = $gen->generate( $output, 'run-1', 'run-1:out', array() );
+		$this->assertTrue( $result->is_success() );
+
+		$nav_step = $this->find_step( $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ], Build_Plan_Schema::STEP_TYPE_NAVIGATION );
+		$this->assertNotNull( $nav_step );
+		$items = $nav_step[ Build_Plan_Item_Schema::KEY_ITEMS ];
+		$this->assertCount( 1, $items );
+		$this->assertSame( Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE, $items[0][ Build_Plan_Item_Schema::KEY_ITEM_TYPE ], 'rename action must remain ITEM_TYPE_MENU_CHANGE.' );
+		unset( $GLOBALS['_aio_wp_insert_post_return'] );
+	}
+
+	public function test_menu_update_existing_action_still_emits_item_type_menu_change(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 1;
+		$output                                = $this->valid_normalized_output();
+		$output[ Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN ] = array(
+			array(
+				'menu_context'       => 'footer',
+				'action'             => 'update_existing',
+				'proposed_menu_name' => 'Footer Nav',
+				'items'              => array(),
+			),
+		);
+		$gen    = new Build_Plan_Generator( new Build_Plan_Repository(), new Build_Plan_Item_Generator() );
+		$result = $gen->generate( $output, 'run-1', 'run-1:out', array() );
+		$this->assertTrue( $result->is_success() );
+
+		$nav_step = $this->find_step( $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ], Build_Plan_Schema::STEP_TYPE_NAVIGATION );
+		$items    = $nav_step[ Build_Plan_Item_Schema::KEY_ITEMS ];
+		$this->assertSame( Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE, $items[0][ Build_Plan_Item_Schema::KEY_ITEM_TYPE ], 'update_existing action must remain ITEM_TYPE_MENU_CHANGE.' );
+		unset( $GLOBALS['_aio_wp_insert_post_return'] );
+	}
+
+	public function test_mixed_menu_actions_produce_distinct_item_types(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 1;
+		$output                                = $this->valid_normalized_output();
+		$output[ Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN ] = array(
+			array(
+				'menu_context'       => 'primary',
+				'action'             => 'create',
+				'proposed_menu_name' => 'New Nav',
+				'items'              => array(),
+			),
+			array(
+				'menu_context'       => 'footer',
+				'action'             => 'update_existing',
+				'proposed_menu_name' => 'Existing Footer',
+				'items'              => array(),
+			),
+		);
+		$gen    = new Build_Plan_Generator( new Build_Plan_Repository(), new Build_Plan_Item_Generator() );
+		$result = $gen->generate( $output, 'run-1', 'run-1:out', array() );
+		$this->assertTrue( $result->is_success() );
+
+		$nav_step = $this->find_step( $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ], Build_Plan_Schema::STEP_TYPE_NAVIGATION );
+		$items    = $nav_step[ Build_Plan_Item_Schema::KEY_ITEMS ];
+		$this->assertCount( 2, $items );
+
+		$types = array_column( $items, Build_Plan_Item_Schema::KEY_ITEM_TYPE );
+		$this->assertContains( Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW, $types, 'create record must produce ITEM_TYPE_MENU_NEW.' );
+		$this->assertContains( Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE, $types, 'update_existing record must produce ITEM_TYPE_MENU_CHANGE.' );
+		unset( $GLOBALS['_aio_wp_insert_post_return'] );
+	}
+
+	/** Helper: find a step by step_type from the plan steps array. */
+	private function find_step( array $steps, string $step_type ): ?array {
+		foreach ( $steps as $step ) {
+			if ( ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' ) === $step_type ) {
+				return $step;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Example omitted-recommendation report payload (spec §30.3). Structure of Omitted_Recommendation_Report::report().
 	 */

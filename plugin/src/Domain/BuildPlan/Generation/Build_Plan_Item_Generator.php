@@ -208,20 +208,47 @@ final class Build_Plan_Item_Generator {
 				);
 				continue;
 			}
-			$item_id = $prefix . '_mcp_' . $i;
-			$items[] = $this->build_item(
-				$item_id,
-				Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE,
-				array(
-					'menu_context'       => (string) ( $rec[ Build_Plan_Draft_Schema::MCP_MENU_CONTEXT ] ?? '' ),
-					'action'             => (string) ( $rec[ Build_Plan_Draft_Schema::MCP_ACTION ] ?? '' ),
-					'proposed_menu_name' => (string) ( $rec['proposed_menu_name'] ?? '' ),
-					'items'              => is_array( $rec['items'] ?? null ) ? $rec['items'] : array(),
-				),
-				Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN,
-				$i,
-				$rec
-			);
+			$item_id     = $prefix . '_mcp_' . $i;
+			$action      = (string) ( $rec[ Build_Plan_Draft_Schema::MCP_ACTION ] ?? '' );
+			$menu_context = (string) ( $rec[ Build_Plan_Draft_Schema::MCP_MENU_CONTEXT ] ?? '' );
+			$proposed_name = (string) ( $rec['proposed_menu_name'] ?? '' );
+			$rec_items   = is_array( $rec['items'] ?? null ) ? $rec['items'] : array();
+
+			if ( $action === 'create' ) {
+				// * Net-new menu: emit ITEM_TYPE_MENU_NEW so Create_Menu_Handler can execute it.
+				// * Payload keys must satisfy: menu_name (required by handler and workspace screen),
+				// * theme_location (optional; menu_context slug doubles as the initial location hint),
+				// * items (optional seed), plus display fields action/menu_context for Navigation_Detail_Builder.
+				$items[] = $this->build_item(
+					$item_id,
+					Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW,
+					array(
+						'menu_name'      => $proposed_name,
+						'theme_location' => $menu_context,
+						'items'          => $rec_items,
+						'action'         => $action,
+						'menu_context'   => $menu_context,
+					),
+					Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN,
+					$i,
+					$rec
+				);
+			} else {
+				// * Rename/replace/update_existing: keep as menu_change → UPDATE_MENU.
+				$items[] = $this->build_item(
+					$item_id,
+					Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE,
+					array(
+						'menu_context'       => $menu_context,
+						'action'             => $action,
+						'proposed_menu_name' => $proposed_name,
+						'items'              => $rec_items,
+					),
+					Build_Plan_Draft_Schema::KEY_MENU_CHANGE_PLAN,
+					$i,
+					$rec
+				);
+			}
 		}
 		return array(
 			'items'   => $items,

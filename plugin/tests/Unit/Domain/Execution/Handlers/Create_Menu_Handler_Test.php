@@ -194,7 +194,7 @@ final class Create_Menu_Handler_Test extends TestCase {
 		$this->assertTrue( $result['success'] );
 		$this->assertFalse( $result['artifacts']['location_assigned'] );
 		$this->assertSame( 'not_registered', $result['artifacts']['location_skipped_reason'] );
-		$this->assertEmpty( $GLOBALS['_cmh_test_theme_mod_locations'] );
+		$this->assertEmpty( $GLOBALS['_aio_test_theme_mods'] );
 	}
 
 	public function test_items_applied_count_matches_successful_items(): void {
