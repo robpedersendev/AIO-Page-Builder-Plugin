@@ -94,6 +94,8 @@ final class Onboarding_Screen {
 		$draft           = $draft_service->get_draft();
 
 		if ( $action === 'save_draft' ) {
+			$this->persist_brand_profile_from_post( $draft );
+			$this->persist_business_profile_from_post( $draft );
 			$this->persist_template_preferences_from_post( $draft );
 			$this->persist_industry_profile_from_post();
 			$draft['overall_status'] = Onboarding_Statuses::DRAFT_SAVED;
@@ -109,6 +111,8 @@ final class Onboarding_Screen {
 		}
 
 		if ( $action === 'advance_step' ) {
+			$this->persist_brand_profile_from_post( $draft );
+			$this->persist_business_profile_from_post( $draft );
 			$this->persist_template_preferences_from_post( $draft );
 			$this->persist_industry_profile_from_post();
 			$ordered = Onboarding_Step_Keys::ordered();
@@ -482,19 +486,24 @@ final class Onboarding_Screen {
 					?>
 					<p><?php \esc_html_e( 'Last run:', 'aio-page-builder' ); ?> <a href="<?php echo \esc_url( $run_url ); ?>"><?php echo \esc_html( $last_run_id ); ?></a></p>
 				<?php endif; ?>
+			<?php elseif ( $current_step_key === Onboarding_Step_Keys::BUSINESS_PROFILE ) : ?>
+				<?php $this->render_business_profile_step( $state ); ?>
+			<?php elseif ( $current_step_key === Onboarding_Step_Keys::BRAND_PROFILE ) : ?>
+				<?php $this->render_brand_profile_step( $state ); ?>
+			<?php elseif ( $current_step_key === Onboarding_Step_Keys::AUDIENCE_OFFERS ) : ?>
+				<?php $this->render_audience_offers_step( $state ); ?>
+			<?php elseif ( $current_step_key === Onboarding_Step_Keys::GEOGRAPHY_COMPETITORS ) : ?>
+				<?php $this->render_geography_competitors_step( $state ); ?>
+			<?php elseif ( $current_step_key === Onboarding_Step_Keys::ASSET_INTAKE ) : ?>
+				<?php $this->render_asset_intake_step( $state ); ?>
+			<?php elseif ( $current_step_key === Onboarding_Step_Keys::EXISTING_SITE ) : ?>
+				<?php $this->render_existing_site_step( $state ); ?>
+			<?php elseif ( $current_step_key === Onboarding_Step_Keys::CRAWL_PREFERENCES ) : ?>
+				<?php $this->render_crawl_preferences_step( $state ); ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::TEMPLATE_PREFERENCES ) : ?>
 				<?php $this->render_template_preferences_step( $state ); ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::REVIEW ) : ?>
-				<p><?php \esc_html_e( 'Review your inputs before proceeding. Profile and provider readiness are checked here.', 'aio-page-builder' ); ?></p>
-				<?php if ( count( $provider_refs ) > 0 ) : ?>
-					<ul aria-label="<?php \esc_attr_e( 'Provider status', 'aio-page-builder' ); ?>">
-						<?php foreach ( $provider_refs as $ref ) : ?>
-							<li><?php echo \esc_html( ( $ref['provider_id'] ?? '' ) . ': ' . ( $ref['credential_state'] ?? 'absent' ) ); ?></li>
-						<?php endforeach; ?>
-					</ul>
-				<?php endif; ?>
-			<?php else : ?>
-				<p><?php echo \esc_html( sprintf( __( 'Step “%s” — use Next to advance through the onboarding flow, or Save draft to save your progress.', 'aio-page-builder' ), $label ) ); ?></p>
+				<?php $this->render_review_step( $state ); ?>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -603,4 +612,478 @@ final class Onboarding_Screen {
 		</table>
 		<?php
 	}
+	/**
+	 * Persists brand profile fields from POST. Step-agnostic: only writes keys present in POST.
+	 * Nonce is verified in handle_post() before this method is called.
+	 *
+	 * @param array<string, mixed> $draft Current draft (unused; kept for signature consistency).
+	 * @return void
+	 */
+	private function persist_brand_profile_from_post( array $draft ): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before this method is called.
+		if ( $this->container === null || ! $this->container->has( 'profile_store' ) ) {
+			return;
+		}
+		$partial      = array();
+		$text_fields  = array(
+			'aio_bp_brand_positioning'        => 'brand_positioning_summary',
+			'aio_bp_brand_voice'              => 'brand_voice_summary',
+			'aio_bp_brand_cta_style'          => 'preferred_cta_style',
+			'aio_bp_brand_additional_rules'   => 'additional_brand_rules',
+			'aio_bp_brand_content_restrict'   => 'content_restrictions',
+		);
+		foreach ( $text_fields as $post_key => $field ) {
+			if ( isset( $_POST[ $post_key ] ) && is_string( $_POST[ $post_key ] ) ) {
+				$partial[ $field ] = \sanitize_textarea_field( \wp_unslash( $_POST[ $post_key ] ) );
+			}
+		}
+		$voice_partial = array();
+		if ( isset( $_POST['aio_bp_brand_formality'] ) && is_string( $_POST['aio_bp_brand_formality'] ) ) {
+			$voice_partial['formality_level'] = \sanitize_text_field( \wp_unslash( $_POST['aio_bp_brand_formality'] ) );
+		}
+		if ( isset( $_POST['aio_bp_brand_clarity'] ) && is_string( $_POST['aio_bp_brand_clarity'] ) ) {
+			$voice_partial['clarity_vs_sophistication'] = \sanitize_text_field( \wp_unslash( $_POST['aio_bp_brand_clarity'] ) );
+		}
+		if ( isset( $_POST['aio_bp_brand_emotional_pos'] ) && is_string( $_POST['aio_bp_brand_emotional_pos'] ) ) {
+			$voice_partial['emotional_positioning'] = \sanitize_textarea_field( \wp_unslash( $_POST['aio_bp_brand_emotional_pos'] ) );
+		}
+		if ( ! empty( $voice_partial ) ) {
+			$partial[ Profile_Schema::BRAND_VOICE_TONE ] = $voice_partial;
+		}
+		if ( ! empty( $partial ) ) {
+			$profile_store = $this->container->get( 'profile_store' );
+			if ( $profile_store instanceof \AIOPageBuilder\Domain\Storage\Profile\Profile_Store ) {
+				$profile_store->merge_brand_profile( $partial );
+			}
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+	}
+
+	/**
+	 * Persists business profile fields from POST. Step-agnostic: only writes keys present in POST.
+	 * Nonce is verified in handle_post() before this method is called.
+	 *
+	 * @param array<string, mixed> $draft Current draft (unused; kept for signature consistency).
+	 * @return void
+	 */
+	private function persist_business_profile_from_post( array $draft ): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before this method is called.
+		if ( $this->container === null || ! $this->container->has( 'profile_store' ) ) {
+			return;
+		}
+		$partial     = array();
+		$text_fields = array(
+			'aio_bp_biz_name'            => 'business_name',
+			'aio_bp_biz_type'            => 'business_type',
+			'aio_bp_biz_contact_goals'   => 'preferred_contact_or_conversion_goals',
+			'aio_bp_biz_value_prop'      => 'value_proposition_notes',
+			'aio_bp_biz_differentiators' => 'major_differentiators',
+			'aio_bp_biz_target_audience' => 'target_audience_summary',
+			'aio_bp_biz_primary_offers'  => 'primary_offers_summary',
+			'aio_bp_biz_priorities'      => 'strategic_priorities',
+			'aio_bp_biz_compliance'      => 'compliance_or_legal_notes',
+			'aio_bp_biz_geo_market'      => 'core_geographic_market',
+			'aio_bp_biz_marketing_lang'  => 'existing_marketing_language',
+			'aio_bp_biz_seasonality'     => 'seasonality',
+			'aio_bp_biz_visual_ref'      => 'visual_inspiration_references',
+			'aio_bp_biz_sales_process'   => 'internal_sales_process_notes',
+		);
+		foreach ( $text_fields as $post_key => $field ) {
+			if ( isset( $_POST[ $post_key ] ) && is_string( $_POST[ $post_key ] ) ) {
+				$partial[ $field ] = \sanitize_textarea_field( \wp_unslash( $_POST[ $post_key ] ) );
+			}
+		}
+		if ( isset( $_POST['aio_bp_biz_url'] ) && is_string( $_POST['aio_bp_biz_url'] ) ) {
+			$partial['current_site_url'] = \esc_url_raw( \wp_unslash( $_POST['aio_bp_biz_url'] ) );
+		}
+		if ( ! empty( $partial ) ) {
+			$profile_store = $this->container->get( 'profile_store' );
+			if ( $profile_store instanceof \AIOPageBuilder\Domain\Storage\Profile\Profile_Store ) {
+				$profile_store->merge_business_profile( $partial );
+			}
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+	}
+
+	/**
+	 * Renders business profile form fields; prefilled from stored business profile.
+	 *
+	 * @param array<string, mixed> $state Onboarding UI state.
+	 * @return void
+	 */
+	private function render_business_profile_step( array $state ): void {
+		$prefill  = $state['prefill'] ?? array();
+		$profile  = $prefill['profile'] ?? array();
+		$biz      = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
+		$name     = isset( $biz['business_name'] ) ? (string) $biz['business_name'] : '';
+		$type     = isset( $biz['business_type'] ) ? (string) $biz['business_type'] : '';
+		$goals    = isset( $biz['preferred_contact_or_conversion_goals'] ) ? (string) $biz['preferred_contact_or_conversion_goals'] : '';
+		$value    = isset( $biz['value_proposition_notes'] ) ? (string) $biz['value_proposition_notes'] : '';
+		$diff     = isset( $biz['major_differentiators'] ) ? (string) $biz['major_differentiators'] : '';
+		?>
+		<p><?php \esc_html_e( 'Provide core business information. This data is used as context for AI page planning.', 'aio-page-builder' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_name"><?php \esc_html_e( 'Business name', 'aio-page-builder' ); ?></label></th>
+				<td><input type="text" name="aio_bp_biz_name" id="aio_bp_biz_name" class="regular-text" value="<?php echo \esc_attr( $name ); ?>" /></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_type"><?php \esc_html_e( 'Business type', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<input type="text" name="aio_bp_biz_type" id="aio_bp_biz_type" class="regular-text" value="<?php echo \esc_attr( $type ); ?>" />
+					<p class="description"><?php \esc_html_e( 'e.g. local service, e-commerce, professional services, SaaS', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_contact_goals"><?php \esc_html_e( 'Contact / conversion goals', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<textarea name="aio_bp_biz_contact_goals" id="aio_bp_biz_contact_goals" class="large-text" rows="3"><?php echo \esc_textarea( $goals ); ?></textarea>
+					<p class="description"><?php \esc_html_e( 'Primary actions you want visitors to take (e.g. book a call, request a quote, buy online).', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_value_prop"><?php \esc_html_e( 'Value proposition', 'aio-page-builder' ); ?></label></th>
+				<td><textarea name="aio_bp_biz_value_prop" id="aio_bp_biz_value_prop" class="large-text" rows="3"><?php echo \esc_textarea( $value ); ?></textarea></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_differentiators"><?php \esc_html_e( 'Main differentiators', 'aio-page-builder' ); ?></label></th>
+				<td><textarea name="aio_bp_biz_differentiators" id="aio_bp_biz_differentiators" class="large-text" rows="3"><?php echo \esc_textarea( $diff ); ?></textarea></td>
+			</tr>
+		</table>
+		<?php
+	}
+
+	/**
+	 * Renders brand profile form fields; prefilled from stored brand profile.
+	 *
+	 * @param array<string, mixed> $state Onboarding UI state.
+	 * @return void
+	 */
+	private function render_brand_profile_step( array $state ): void {
+		$prefill      = $state['prefill'] ?? array();
+		$profile      = $prefill['profile'] ?? array();
+		$brand        = isset( $profile[ Profile_Schema::ROOT_BRAND ] ) && is_array( $profile[ Profile_Schema::ROOT_BRAND ] )
+			? $profile[ Profile_Schema::ROOT_BRAND ] : array();
+		$positioning  = isset( $brand['brand_positioning_summary'] ) ? (string) $brand['brand_positioning_summary'] : '';
+		$voice_sum    = isset( $brand['brand_voice_summary'] ) ? (string) $brand['brand_voice_summary'] : '';
+		$cta_style    = isset( $brand['preferred_cta_style'] ) ? (string) $brand['preferred_cta_style'] : '';
+		$extra_rules  = isset( $brand['additional_brand_rules'] ) ? (string) $brand['additional_brand_rules'] : '';
+		$restrictions = isset( $brand['content_restrictions'] ) ? (string) $brand['content_restrictions'] : '';
+		$voice_tone   = isset( $brand[ Profile_Schema::BRAND_VOICE_TONE ] ) && is_array( $brand[ Profile_Schema::BRAND_VOICE_TONE ] )
+			? $brand[ Profile_Schema::BRAND_VOICE_TONE ] : array();
+		$formality    = isset( $voice_tone['formality_level'] ) ? (string) $voice_tone['formality_level'] : '';
+		$clarity      = isset( $voice_tone['clarity_vs_sophistication'] ) ? (string) $voice_tone['clarity_vs_sophistication'] : '';
+		$emotional    = isset( $voice_tone['emotional_positioning'] ) ? (string) $voice_tone['emotional_positioning'] : '';
+		?>
+		<p><?php \esc_html_e( 'Describe your brand voice, positioning, and content preferences. These guide AI-generated copy style.', 'aio-page-builder' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="aio_bp_brand_positioning"><?php \esc_html_e( 'Brand positioning summary', 'aio-page-builder' ); ?></label></th>
+				<td><textarea name="aio_bp_brand_positioning" id="aio_bp_brand_positioning" class="large-text" rows="3"><?php echo \esc_textarea( $positioning ); ?></textarea></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_brand_voice"><?php \esc_html_e( 'Brand voice summary', 'aio-page-builder' ); ?></label></th>
+				<td><textarea name="aio_bp_brand_voice" id="aio_bp_brand_voice" class="large-text" rows="3"><?php echo \esc_textarea( $voice_sum ); ?></textarea></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_brand_formality"><?php \esc_html_e( 'Formality level', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<select name="aio_bp_brand_formality" id="aio_bp_brand_formality">
+						<option value="" <?php \selected( $formality, '' ); ?>><?php \esc_html_e( 'Not specified', 'aio-page-builder' ); ?></option>
+						<?php foreach ( Profile_Schema::FORMALITY_LEVELS as $level ) : ?>
+							<option value="<?php echo \esc_attr( $level ); ?>" <?php \selected( $formality, $level ); ?>><?php echo \esc_html( ucfirst( str_replace( '_', ' ', $level ) ) ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_brand_clarity"><?php \esc_html_e( 'Clarity vs sophistication', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<select name="aio_bp_brand_clarity" id="aio_bp_brand_clarity">
+						<option value="" <?php \selected( $clarity, '' ); ?>><?php \esc_html_e( 'Not specified', 'aio-page-builder' ); ?></option>
+						<?php foreach ( Profile_Schema::CLARITY_VS_SOPHISTICATION as $opt ) : ?>
+							<option value="<?php echo \esc_attr( $opt ); ?>" <?php \selected( $clarity, $opt ); ?>><?php echo \esc_html( ucfirst( str_replace( '_', ' ', $opt ) ) ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_brand_emotional_pos"><?php \esc_html_e( 'Emotional positioning', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<input type="text" name="aio_bp_brand_emotional_pos" id="aio_bp_brand_emotional_pos" class="regular-text" value="<?php echo \esc_attr( $emotional ); ?>" />
+					<p class="description"><?php \esc_html_e( 'e.g. trustworthy, empowering, friendly, authoritative', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_brand_cta_style"><?php \esc_html_e( 'Preferred CTA style', 'aio-page-builder' ); ?></label></th>
+				<td><input type="text" name="aio_bp_brand_cta_style" id="aio_bp_brand_cta_style" class="regular-text" value="<?php echo \esc_attr( $cta_style ); ?>" /></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_brand_additional_rules"><?php \esc_html_e( 'Additional brand rules', 'aio-page-builder' ); ?></label></th>
+				<td><textarea name="aio_bp_brand_additional_rules" id="aio_bp_brand_additional_rules" class="large-text" rows="3"><?php echo \esc_textarea( $extra_rules ); ?></textarea></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_brand_content_restrict"><?php \esc_html_e( 'Content restrictions', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<textarea name="aio_bp_brand_content_restrict" id="aio_bp_brand_content_restrict" class="large-text" rows="2"><?php echo \esc_textarea( $restrictions ); ?></textarea>
+					<p class="description"><?php \esc_html_e( 'Topics, language, or claims to avoid in AI-generated content.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+
+	/**
+	 * Renders audience and offers form fields; prefilled from stored business profile.
+	 *
+	 * @param array<string, mixed> $state Onboarding UI state.
+	 * @return void
+	 */
+	private function render_audience_offers_step( array $state ): void {
+		$prefill    = $state['prefill'] ?? array();
+		$profile    = $prefill['profile'] ?? array();
+		$biz        = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
+		$audience   = isset( $biz['target_audience_summary'] ) ? (string) $biz['target_audience_summary'] : '';
+		$offers     = isset( $biz['primary_offers_summary'] ) ? (string) $biz['primary_offers_summary'] : '';
+		$priorities = isset( $biz['strategic_priorities'] ) ? (string) $biz['strategic_priorities'] : '';
+		$compliance = isset( $biz['compliance_or_legal_notes'] ) ? (string) $biz['compliance_or_legal_notes'] : '';
+		?>
+		<p><?php \esc_html_e( 'Describe your target audience and primary offers. This context shapes page structure and copy priorities.', 'aio-page-builder' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_target_audience"><?php \esc_html_e( 'Target audience summary', 'aio-page-builder' ); ?></label></th>
+				<td><textarea name="aio_bp_biz_target_audience" id="aio_bp_biz_target_audience" class="large-text" rows="3"><?php echo \esc_textarea( $audience ); ?></textarea></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_primary_offers"><?php \esc_html_e( 'Primary offers summary', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<textarea name="aio_bp_biz_primary_offers" id="aio_bp_biz_primary_offers" class="large-text" rows="3"><?php echo \esc_textarea( $offers ); ?></textarea>
+					<p class="description"><?php \esc_html_e( 'Main products or services offered.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_priorities"><?php \esc_html_e( 'Strategic priorities', 'aio-page-builder' ); ?></label></th>
+				<td><textarea name="aio_bp_biz_priorities" id="aio_bp_biz_priorities" class="large-text" rows="3"><?php echo \esc_textarea( $priorities ); ?></textarea></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_compliance"><?php \esc_html_e( 'Compliance / legal notes', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<textarea name="aio_bp_biz_compliance" id="aio_bp_biz_compliance" class="large-text" rows="2"><?php echo \esc_textarea( $compliance ); ?></textarea>
+					<p class="description"><?php \esc_html_e( 'Regulatory requirements or disclaimers that affect content.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+
+	/**
+	 * Renders geography and competitive context form fields; prefilled from stored business profile.
+	 *
+	 * @param array<string, mixed> $state Onboarding UI state.
+	 * @return void
+	 */
+	private function render_geography_competitors_step( array $state ): void {
+		$prefill    = $state['prefill'] ?? array();
+		$profile    = $prefill['profile'] ?? array();
+		$biz        = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
+		$geo        = isset( $biz['core_geographic_market'] ) ? (string) $biz['core_geographic_market'] : '';
+		$mktg_lang  = isset( $biz['existing_marketing_language'] ) ? (string) $biz['existing_marketing_language'] : '';
+		$seasonality = isset( $biz['seasonality'] ) ? (string) $biz['seasonality'] : '';
+		?>
+		<p><?php \esc_html_e( 'Describe your primary market geography and competitive context. This helps AI planning prioritise relevant content angles.', 'aio-page-builder' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_geo_market"><?php \esc_html_e( 'Core geographic market', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<input type="text" name="aio_bp_biz_geo_market" id="aio_bp_biz_geo_market" class="regular-text" value="<?php echo \esc_attr( $geo ); ?>" />
+					<p class="description"><?php \esc_html_e( 'e.g. UK, Greater London, North America, global', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_marketing_lang"><?php \esc_html_e( 'Existing marketing language', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<textarea name="aio_bp_biz_marketing_lang" id="aio_bp_biz_marketing_lang" class="large-text" rows="3"><?php echo \esc_textarea( $mktg_lang ); ?></textarea>
+					<p class="description"><?php \esc_html_e( 'Key phrases, taglines, or copy already used in your marketing.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_seasonality"><?php \esc_html_e( 'Seasonality notes', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<textarea name="aio_bp_biz_seasonality" id="aio_bp_biz_seasonality" class="large-text" rows="2"><?php echo \esc_textarea( $seasonality ); ?></textarea>
+					<p class="description"><?php \esc_html_e( 'Seasonal demand patterns that affect content or offer emphasis.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+
+	/**
+	 * Renders asset intake form fields; prefilled from stored business profile.
+	 *
+	 * @param array<string, mixed> $state Onboarding UI state.
+	 * @return void
+	 */
+	private function render_asset_intake_step( array $state ): void {
+		$prefill      = $state['prefill'] ?? array();
+		$profile      = $prefill['profile'] ?? array();
+		$biz          = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
+		$visual_ref   = isset( $biz['visual_inspiration_references'] ) ? (string) $biz['visual_inspiration_references'] : '';
+		$sales_proc   = isset( $biz['internal_sales_process_notes'] ) ? (string) $biz['internal_sales_process_notes'] : '';
+		?>
+		<p><?php \esc_html_e( 'Provide references to visual assets and any notes about your sales or content process. These guide template and copy decisions.', 'aio-page-builder' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_visual_ref"><?php \esc_html_e( 'Visual inspiration references', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<textarea name="aio_bp_biz_visual_ref" id="aio_bp_biz_visual_ref" class="large-text" rows="3"><?php echo \esc_textarea( $visual_ref ); ?></textarea>
+					<p class="description"><?php \esc_html_e( 'URLs or notes describing visual style, competitor sites, or design references.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_sales_process"><?php \esc_html_e( 'Sales process notes', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<textarea name="aio_bp_biz_sales_process" id="aio_bp_biz_sales_process" class="large-text" rows="3"><?php echo \esc_textarea( $sales_proc ); ?></textarea>
+					<p class="description"><?php \esc_html_e( 'Notes about how prospects engage and convert, to help sequence page content.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+
+	/**
+	 * Renders existing site context step; prefilled from stored business profile.
+	 *
+	 * @param array<string, mixed> $state Onboarding UI state.
+	 * @return void
+	 */
+	private function render_existing_site_step( array $state ): void {
+		$prefill     = $state['prefill'] ?? array();
+		$stored_url  = $prefill['current_site_url'] ?? '';
+		$profile     = $prefill['profile'] ?? array();
+		$biz         = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
+		$site_url    = isset( $biz['current_site_url'] ) && $biz['current_site_url'] !== ''
+			? (string) $biz['current_site_url'] : ( is_string( $stored_url ) ? $stored_url : '' );
+		$crawler_url = \add_query_arg( array( 'page' => 'aio-page-builder-crawler' ), \admin_url( 'admin.php' ) );
+		?>
+		<p><?php \esc_html_e( 'If you have an existing site, enter its URL here. This is used as context for AI planning and enables crawl-based content analysis.', 'aio-page-builder' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="aio_bp_biz_url"><?php \esc_html_e( 'Current site URL', 'aio-page-builder' ); ?></label></th>
+				<td>
+					<input type="url" name="aio_bp_biz_url" id="aio_bp_biz_url" class="regular-text" value="<?php echo \esc_attr( $site_url ); ?>" placeholder="https://" />
+					<p class="description"><?php \esc_html_e( 'Leave blank if no existing site.', 'aio-page-builder' ); ?></p>
+				</td>
+			</tr>
+		</table>
+		<p>
+			<?php
+			printf(
+				/* translators: %s: URL to Crawler Sessions screen */
+				\esc_html__( 'To run a deep content analysis of your existing site, use the %s screen.', 'aio-page-builder' ),
+				'<a href="' . \esc_url( $crawler_url ) . '">' . \esc_html__( 'Crawler Sessions', 'aio-page-builder' ) . '</a>'
+			);
+			?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Renders crawl preferences step; shows latest crawl context and links to Crawler Sessions screen.
+	 *
+	 * @param array<string, mixed> $state Onboarding UI state.
+	 * @return void
+	 */
+	private function render_crawl_preferences_step( array $state ): void {
+		$prefill          = $state['prefill'] ?? array();
+		$latest_run_id    = $prefill['latest_crawl_run_id'] ?? null;
+		$crawl_run_ids    = $prefill['crawl_run_ids'] ?? array();
+		$crawler_url      = \add_query_arg( array( 'page' => 'aio-page-builder-crawler' ), \admin_url( 'admin.php' ) );
+		?>
+		<p><?php \esc_html_e( 'Crawl your existing site to give the AI planner richer context about your current content structure and gaps.', 'aio-page-builder' ); ?></p>
+		<?php if ( $latest_run_id !== null && $latest_run_id !== '' ) : ?>
+			<p>
+				<?php
+				echo \esc_html(
+					sprintf(
+						/* translators: %s: crawl run ID */
+						__( 'Latest crawl run: %s', 'aio-page-builder' ),
+						(string) $latest_run_id
+					)
+				);
+				?>
+			</p>
+			<?php if ( is_array( $crawl_run_ids ) && count( $crawl_run_ids ) > 1 ) : ?>
+				<p class="description"><?php echo \esc_html( sprintf( __( '%d crawl runs available.', 'aio-page-builder' ), count( $crawl_run_ids ) ) ); ?></p>
+			<?php endif; ?>
+		<?php else : ?>
+			<p><?php \esc_html_e( 'No crawl runs recorded yet.', 'aio-page-builder' ); ?></p>
+		<?php endif; ?>
+		<p>
+			<a href="<?php echo \esc_url( $crawler_url ); ?>" class="button"><?php \esc_html_e( 'Go to Crawler Sessions', 'aio-page-builder' ); ?></a>
+		</p>
+		<p class="description"><?php \esc_html_e( 'Crawler settings and run options are managed on the Crawler Sessions screen. Return here after running a crawl to continue.', 'aio-page-builder' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Renders review step: profile summary and provider readiness.
+	 *
+	 * @param array<string, mixed> $state Onboarding UI state.
+	 * @return void
+	 */
+	private function render_review_step( array $state ): void {
+		$prefill           = $state['prefill'] ?? array();
+		$profile           = $prefill['profile'] ?? array();
+		$biz               = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
+		$brand             = isset( $profile[ Profile_Schema::ROOT_BRAND ] ) && is_array( $profile[ Profile_Schema::ROOT_BRAND ] )
+			? $profile[ Profile_Schema::ROOT_BRAND ] : array();
+		$provider_refs     = $prefill['provider_refs'] ?? array();
+		$is_provider_ready = ! empty( $state['is_provider_ready'] );
+		$biz_name          = isset( $biz['business_name'] ) && $biz['business_name'] !== '' ? (string) $biz['business_name'] : '';
+		$biz_type          = isset( $biz['business_type'] ) && $biz['business_type'] !== '' ? (string) $biz['business_type'] : '';
+		$audience          = isset( $biz['target_audience_summary'] ) && $biz['target_audience_summary'] !== '' ? (string) $biz['target_audience_summary'] : '';
+		$positioning       = isset( $brand['brand_positioning_summary'] ) && $brand['brand_positioning_summary'] !== '' ? (string) $brand['brand_positioning_summary'] : '';
+		?>
+		<p><?php \esc_html_e( 'Review your stored profile and provider readiness before requesting an AI plan.', 'aio-page-builder' ); ?></p>
+		<h4><?php \esc_html_e( 'Profile summary', 'aio-page-builder' ); ?></h4>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><?php \esc_html_e( 'Business name', 'aio-page-builder' ); ?></th>
+				<td><?php echo $biz_name !== '' ? \esc_html( $biz_name ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php \esc_html_e( 'Business type', 'aio-page-builder' ); ?></th>
+				<td><?php echo $biz_type !== '' ? \esc_html( $biz_type ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php \esc_html_e( 'Target audience', 'aio-page-builder' ); ?></th>
+				<td><?php echo $audience !== '' ? \esc_html( $audience ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php \esc_html_e( 'Brand positioning', 'aio-page-builder' ); ?></th>
+				<td><?php echo $positioning !== '' ? \esc_html( $positioning ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
+			</tr>
+		</table>
+		<h4><?php \esc_html_e( 'Provider readiness', 'aio-page-builder' ); ?></h4>
+		<?php if ( $is_provider_ready ) : ?>
+			<p class="aio-onboarding-ready"><?php \esc_html_e( 'At least one AI provider is configured and ready.', 'aio-page-builder' ); ?></p>
+		<?php else : ?>
+			<p class="aio-onboarding-not-ready"><?php \esc_html_e( 'No AI provider is configured. Go to the AI Providers screen to add credentials before requesting a plan.', 'aio-page-builder' ); ?></p>
+		<?php endif; ?>
+		<?php if ( count( $provider_refs ) > 0 ) : ?>
+			<ul aria-label="<?php \esc_attr_e( 'Provider status', 'aio-page-builder' ); ?>">
+				<?php foreach ( $provider_refs as $ref ) : ?>
+					<li><?php echo \esc_html( ( $ref['provider_id'] ?? '' ) . ': ' . ( $ref['credential_state'] ?? 'absent' ) ); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
+		<?php
+	}
+
 }
