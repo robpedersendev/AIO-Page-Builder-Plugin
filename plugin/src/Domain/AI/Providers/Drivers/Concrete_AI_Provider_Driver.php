@@ -162,12 +162,13 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		$usage_normalized   = null;
 		if ( is_array( $usage ) ) {
 			// * Token counts are authoritative provider-reported values.
-			// * Cost calculation is de-scoped for v1: provider APIs do not return cost directly,
-			//   and a derived per-model pricing table would require ongoing maintenance with stale-data risk.
+			// TODO: v2 — populate cost_usd using a per-model pricing registry once pricing data is stable.
+			//   OpenAI does not return cost in the API response; a pricing table keyed by model slug is required.
 			$usage_normalized = array(
 				'prompt_tokens'     => (int) ( $usage['prompt_tokens'] ?? 0 ),
 				'completion_tokens' => (int) ( $usage['completion_tokens'] ?? 0 ),
 				'total_tokens'      => (int) ( $usage['total_tokens'] ?? 0 ),
+				'cost_usd'          => null,
 			);
 		}
 

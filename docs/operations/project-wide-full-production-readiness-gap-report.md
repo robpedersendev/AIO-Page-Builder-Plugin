@@ -49,7 +49,7 @@ For this audit, **production-ready** means:
 **Verdict: Not production-ready** under the strict definition due to A-1 (user-visible "(Coming soon)" copy). **One fix away** from production-candidate state.
 
 - **Fully implemented and truly production-ready:** All core execution handlers, Build Plan workspace (Steps 1–7) truthful and governed, Tokens step executable, SEO advisory-only, rollback v1, capabilities, import/export + wizard, industry bundle apply, template registries + detail/compare/composition screens, crawler, AI provider handlers, admin router, analytics, diagnostics, queue/logs, onboarding (full step forms), versioning/lifecycle wording, PHP syntax clean, 2,847 tests pass, all release gate documents complete.
-- **Formally de-scoped (decisions made, documented):** `assign_page_hierarchy` handler, `create_menu` handler, profile snapshot persistence, AI cost/usage reporting.
+- **Deferred to v2 (decisions made, documented):** `assign_page_hierarchy` handler, `create_menu` handler, profile snapshot persistence, AI cost/usage reporting. See `docs/release/v2-scope-backlog.md` for implementation plans.
 - **Blocking production:** A-1 user-visible "(Coming soon)" on Export plan button.
 
 ---
@@ -81,9 +81,9 @@ For this audit, **production-ready** means:
 | **Onboarding — placeholder copy** | Implemented (P2B) | "future update" copy replaced; provider step routes to AI Providers screen; no deferred-work language. |
 | **New_Page_Creation_Detail_Builder — label** | Implemented (P2B) | "Post-build placeholder:" → "Post-build result:" |
 | **Stale comment drift (8 locations)** | Implemented (P3B) | Industry_Packs_Module, Crawler_Comparison_Screen, Build_Plan_Workspace_Screen, Admin_Router_Provider, Page_Templates_Directory_Screen, Section_Templates_Directory_Screen, Onboarding_Screen — all corrected. |
-| **assign_page_hierarchy / create_menu** | De-scoped (P4A) | Removed from Execution_Action_Types::ALL; no handler; no misleading UI affordance. Documented with rationale. |
-| **Profile snapshot persistence** | De-scoped (P5B) | Formal decision made; Schema/type only. No production surface implies persistence. |
-| **AI cost/usage reporting** | De-scoped (P6B) | cost_placeholder removed from both drivers; usage struct has only authoritative token counts. |
+| **assign_page_hierarchy / create_menu** | Deferred to v2 (P4A) | Removed from Execution_Action_Types::ALL; no handler; no misleading UI affordance. Documented with rationale. |
+| **Profile snapshot persistence** | Deferred to v2 (P5B) | Formal decision made; Schema/type only. No production surface implies persistence. |
+| **AI cost/usage reporting** | Deferred to v2 (P6B) | cost_placeholder removed from both drivers; usage struct has only authoritative token counts. |
 | **Release gate documentation** | Complete (RC1) | RELEASE_CHECKLIST.md, release-candidate-closure.md, known-risk-register.md, compatibility-matrix.md, migration-coverage-matrix.md, security-redaction-review.md, changelog.md, README.md, support-triage-guide.md updated. |
 | **PHP syntax** | Pass | 0 syntax errors across all 1,622 source + test files. |
 | **PHPUnit (2026-03-19)** | 2,847/2,872 pass | 25 pre-existing failures documented/waived (TF-1). Stale-count tests fixed (4). |
@@ -105,17 +105,17 @@ None. All previously partial items are either fully implemented or formally de-s
 
 ---
 
-## 8. What Is Not Yet Implemented (Formally De-scoped)
+## 8. What Is Not Yet Implemented (Deferred to v2)
 
-These items are formally de-scoped for v1 via approved decisions. They are not production blockers; they are documented constraints.
+These items are deferred to v2. They are NOT permanently de-scoped. Implementation plans are in `docs/release/v2-scope-backlog.md`.
 
-| Item | Decision | Documentation |
-|------|----------|---------------|
-| **assign_page_hierarchy execution handler** | De-scoped (P4A). Hierarchy assignment is embedded in CREATE_PAGE. ITEM_TYPE_HIERARCHY_NOTE items are advisory-only. | Execution_Action_Types.php docblock; known-risk-register.md |
-| **create_menu execution handler** | De-scoped (P4A). Menu creation subsumed by UPDATE_MENU handler. | Execution_Action_Types.php docblock; known-risk-register.md |
-| **Profile snapshot persistence** | De-scoped (P5B). Schema/type only for v1. Core traceability met via Operational_Snapshot_Repository. | Profile_Snapshot_Data.php; known-risk-register.md |
-| **AI cost/usage reporting** | De-scoped (P6B). Token counts are the authoritative v1 metric. cost_placeholder removed. | Both AI driver files; known-risk-register.md |
-| **Build Plan — plan export** | Not yet implemented; "(Coming soon)" copy must be removed. See §6 (A-1). | Pending resolution |
+| Item | v1 posture | v2 target | References |
+|------|-----------|-----------|------------|
+| **assign_page_hierarchy execution handler** | Hierarchy set inline in CREATE_PAGE for v1. ITEM_TYPE_HIERARCHY_NOTE items are advisory. | Standalone handler, post-parent reassignment, governed execution path, Build Plan step integration. | `Execution_Action_Types.php`; `v2-scope-backlog.md §1` |
+| **create_menu execution handler** | New-menu creation subsumed by UPDATE_MENU handler for v1. | Dedicated create_menu handler, separate plan item type, governed execution path. | `Execution_Action_Types.php`; `v2-scope-backlog.md §2` |
+| **Profile snapshot persistence** | Schema/type only for v1. No repository, no history UI, no export inclusion. | `Profile_Snapshot_Repository`, capture on save/onboarding, history UI, export/restore. | `Profile_Snapshot_Data.php`; `v2-scope-backlog.md §3` |
+| **AI cost/usage reporting (`cost_usd`)** | `cost_usd` field present but null. Token counts are the authoritative v1 metric. | `Provider_Pricing_Registry` keyed by model, cost_usd computed and stored, spend-cap alerts. | Both AI driver files; `v2-scope-backlog.md §4` |
+| **Build Plan — plan export** | Not yet implemented; "(Coming soon)" copy must be removed. See §6 (A-1). | Pending resolution + v2 implementation. | Pending |
 
 ---
 
@@ -168,8 +168,8 @@ These are not exploitable gaps; the render-gate architecture is consistent and p
 | # | Item | Previous status | Current status (2026-03-19) |
 |---|------|-----------------|---------------------------|
 | 1 | **Token application (Tokens step)** | Intentionally deferred (advisory-only). | **RESOLVED (P1).** Tokens step executable; bulk + row govern with nonce + capability + audit log. |
-| 2 | **Profile snapshot persistence** | Schema-only; deferred. | **DE-SCOPED (P5B).** Formal decision made; documented. |
-| 3 | **AI cost/usage reporting** | cost_placeholder null; reserved. | **DE-SCOPED (P6B).** cost_placeholder removed from both drivers. |
+| 2 | **Profile snapshot persistence** | Schema-only; deferred. | **DEFERRED TO v2 (P5B).** v1: type/schema only; full persistence planned for v2. |
+| 3 | **AI cost/usage reporting** | cost_placeholder null; reserved. | **DEFERRED TO v2 (P6B).** cost_usd field present (null); pricing registry planned for v2. |
 | 4 | **SEO step advisory posture** | Shell-only. | **RESOLVED (P2).** Advisory-only; no execute affordances; copy truthful. |
 | 5 | **Industry bundle apply** | Decision made. | **RESOLVED (P1).** Industry_Bundle_Apply_Service fully implemented. |
 | 6 | **Build Plan Step 2 deny** | Blocked. | **RESOLVED (P1).** Row-level + bulk deny fully implemented. |
@@ -182,7 +182,7 @@ These are not exploitable gaps; the render-gate architecture is consistent and p
 | 13 | **Section helper-doc URL** | Placeholder. | **RESOLVED (P1).** Helper_Doc_Url_Resolver: real URL from Documentation_Registry. |
 | 14 | **Finalization — conflict summary / preview link** | Placeholder fields. | **RESOLVED (P1).** Real data from plan state. |
 | 15 | **Page/Section template detail screens** | "Out of scope." | **RESOLVED (P1).** Both screens fully implemented. |
-| 16 | **assign_page_hierarchy / create_menu** | Decision required. | **DE-SCOPED (P4A).** Removed from ALL; documented with rationale. |
+| 16 | **assign_page_hierarchy / create_menu** | Decision required. | **DEFERRED TO v2 (P4A).** Excluded from v1 ALL; standalone handlers planned for v2. |
 | 17 | **Onboarding — user-visible placeholder copy** | Lines 466, 495 live to users. | **RESOLVED (P2B).** Truthful copy; provider step routes to AI Providers screen. |
 | 18 | **Onboarding — full step forms** | Shell + placeholder copy. | **RESOLVED (P2A).** All 7 profile steps; real forms; persist; prefill; review step. |
 | 19 | **New_Page_Creation_Detail_Builder — "Post-build placeholder:"** | User-visible label. | **RESOLVED (P2B).** → "Post-build result:". |

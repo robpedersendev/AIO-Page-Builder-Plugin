@@ -143,21 +143,20 @@ final class Additional_AI_Provider_Driver_Test extends TestCase {
 		$this->assertNull( $response['normalized_error'] );
 	}
 
-	/** cost_placeholder is de-scoped for v1; must not be emitted in the usage struct. */
-	public function test_usage_struct_does_not_contain_cost_placeholder(): void {
+	/** cost_usd is present in the usage struct but null until the v2 pricing registry is implemented. */
+	public function test_usage_struct_contains_cost_usd_as_null(): void {
 		$normalizer = new Provider_Response_Normalizer();
 		$usage      = array(
 			'prompt_tokens'     => 5,
 			'completion_tokens' => 10,
 			'total_tokens'      => 15,
+			'cost_usd'          => null,
 		);
 		$response   = $normalizer->build_success_response( 'req-cost', 'anthropic', 'claude-3', array(), $usage );
 		$this->assertIsArray( $response['usage'] );
-		$this->assertArrayNotHasKey(
-			'cost_placeholder',
-			$response['usage'],
-			'cost_placeholder must not appear in the usage struct (de-scoped for v1).'
-		);
+		$this->assertArrayHasKey( 'cost_usd', $response['usage'], 'cost_usd must be present in usage struct (v2 planned).' );
+		$this->assertNull( $response['usage']['cost_usd'], 'cost_usd must be null until v2 pricing registry is implemented.' );
+		$this->assertArrayNotHasKey( 'cost_placeholder', $response['usage'], 'cost_placeholder legacy key must not appear.' );
 		$this->assertArrayHasKey( 'prompt_tokens', $response['usage'] );
 		$this->assertArrayHasKey( 'completion_tokens', $response['usage'] );
 		$this->assertArrayHasKey( 'total_tokens', $response['usage'] );

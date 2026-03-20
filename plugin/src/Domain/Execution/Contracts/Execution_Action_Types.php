@@ -16,10 +16,10 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Action types that the execution engine may perform. Governed by execution-action-contract.md.
- * ALL lists only types valid for execution in v1. Three types are excluded from ALL:
- * - UPDATE_PAGE_METADATA: recommendation-only (no mutation handler).
- * - ASSIGN_PAGE_HIERARCHY: hierarchy is applied inline during CREATE_PAGE via Template_Page_Build_Service; no standalone action needed.
- * - CREATE_MENU: menu creation is handled by UPDATE_MENU via Apply_Menu_Change_Handler / Menu_Change_Job_Service::do_create().
+ * ALL lists types valid for execution in v1. Three types are deferred to v2:
+ * - UPDATE_PAGE_METADATA: recommendation-only in v1; v2 will add a dedicated metadata-write handler.
+ * - ASSIGN_PAGE_HIERARCHY: inline in CREATE_PAGE for v1; v2 will add standalone post-parent reassignment.
+ * - CREATE_MENU: subsumed by UPDATE_MENU in v1; v2 will add explicit menu-creation envelopes and handler.
  */
 final class Execution_Action_Types {
 
@@ -28,17 +28,19 @@ final class Execution_Action_Types {
 	/** Not executable in v1; metadata is recommendation-only. Excluded from ALL. */
 	public const UPDATE_PAGE_METADATA = 'update_page_metadata';
 	/**
-	 * Not executable as a standalone action in v1. Hierarchy assignment is embedded in CREATE_PAGE:
-	 * Template_Page_Build_Service resolves post_parent from the plan item payload and sets it during page creation.
-	 * The Build Plan hierarchy step generates advisory ITEM_TYPE_HIERARCHY_NOTE items, not executable envelopes.
-	 * Excluded from ALL.
+	 * Deferred to v2. Standalone post-parent reassignment handler not yet implemented.
+	 * In v1, hierarchy is set inline during CREATE_PAGE via Template_Page_Build_Service.
+	 * v2 target: dedicated handler that reassigns post_parent for existing pages,
+	 * supporting batch hierarchy corrections and Build Plan hierarchy step execution.
+	 * Excluded from ALL until handler is implemented.
 	 */
 	public const ASSIGN_PAGE_HIERARCHY = 'assign_page_hierarchy';
 	/**
-	 * Not executable as a standalone action in v1. Menu creation is handled by UPDATE_MENU:
-	 * Apply_Menu_Change_Handler delegates to Menu_Change_Job_Service::do_create() for new menus and
-	 * ::do_replace() for replacements. No separate plan item type or UI surface emits create_menu envelopes.
-	 * Excluded from ALL.
+	 * Deferred to v2. Explicit menu-creation envelope and handler not yet implemented.
+	 * In v1, new-menu creation is handled by UPDATE_MENU via Apply_Menu_Change_Handler::do_create().
+	 * v2 target: dedicated create_menu handler with its own plan item type, Build Plan step UI affordance,
+	 * and governed execution path separate from update/replace flows.
+	 * Excluded from ALL until handler is implemented.
 	 */
 	public const CREATE_MENU           = 'create_menu';
 	public const UPDATE_MENU           = 'update_menu';
@@ -48,8 +50,7 @@ final class Execution_Action_Types {
 
 	/**
 	 * Action types valid for execution in v1.
-	 * Excludes UPDATE_PAGE_METADATA (recommendation-only), ASSIGN_PAGE_HIERARCHY (inline in CREATE_PAGE),
-	 * and CREATE_MENU (subsumed by UPDATE_MENU).
+	 * UPDATE_PAGE_METADATA, ASSIGN_PAGE_HIERARCHY, and CREATE_MENU are deferred to v2 — see their docblocks.
 	 *
 	 * @var array<int, string>
 	 */
