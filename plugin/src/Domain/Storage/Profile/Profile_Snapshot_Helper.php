@@ -25,7 +25,7 @@ final class Profile_Snapshot_Helper {
 	 * @param Profile_Store $store Current profile store.
 	 * @return array{brand_profile: array<string, mixed>, business_profile: array<string, mixed>}
 	 */
-	public function get_current_for_snapshot( Profile_Store $store ): array {
+	public function get_current_for_snapshot( Profile_Store_Interface $store ): array {
 		$full = $store->get_full_profile();
 		return array(
 			Profile_Schema::ROOT_BRAND    => $full[ Profile_Schema::ROOT_BRAND ],

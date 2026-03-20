@@ -19,7 +19,7 @@ use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
  * Normalized current profile payload shape: { brand_profile: array, business_profile: array }.
  * All writes must be capability- and nonce-gated by callers; this service does not enforce permissions.
  */
-final class Profile_Store {
+final class Profile_Store implements Profile_Store_Interface {
 
 	private const OPTION_KEY = Option_Names::PROFILE_CURRENT;
 

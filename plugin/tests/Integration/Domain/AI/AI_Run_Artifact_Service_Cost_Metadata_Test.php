@@ -10,8 +10,8 @@ declare( strict_types=1 );
 namespace AIOPageBuilder\Tests\Integration\Domain\AI;
 
 use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
+use AIOPageBuilder\Domain\AI\Runs\AI_Artifact_Repository_Interface;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
-use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository;
 use PHPUnit\Framework\TestCase;
 
 if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\__' ) ) {
@@ -21,37 +21,31 @@ if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\__' ) ) {
 }
 
 /**
+ * In-memory artifact store satisfying AI_Artifact_Repository_Interface without WordPress infrastructure.
+ */
+final class In_Memory_Artifact_Repo implements AI_Artifact_Repository_Interface {
+	/** @var array<int, array<string, mixed>> */
+	private array $data = array();
+
+	public function get_artifact_payload( int $post_id, string $category ): mixed {
+		return $this->data[ $post_id ][ $category ] ?? null;
+	}
+
+	public function save_artifact_payload( int $post_id, string $category, mixed $payload ): bool {
+		$this->data[ $post_id ][ $category ] = $payload;
+		return true;
+	}
+}
+
+/**
  * @covers \AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service
  */
 final class AI_Run_Artifact_Service_Cost_Metadata_Test extends TestCase {
 
-	/** @var array<int, array<string, mixed>> */
-	private array $artifact_store = array();
-
 	private AI_Run_Artifact_Service $service;
 
 	protected function setUp(): void {
-		$this->artifact_store = array();
-
-		// Use PHPUnit mock so we can satisfy the concrete AI_Run_Repository type-hint
-		// without loading WordPress infrastructure.
-		$repo = $this->getMockBuilder( AI_Run_Repository::class )
-			->disableOriginalConstructor()
-			->onlyMethods( array( 'save_artifact_payload', 'get_artifact_payload' ) )
-			->getMock();
-
-		$store = &$this->artifact_store;
-		$repo->method( 'save_artifact_payload' )
-			->willReturnCallback( function ( int $post_id, string $category, $payload ) use ( &$store ): bool {
-				$store[ $post_id ][ $category ] = $payload;
-				return true;
-			} );
-		$repo->method( 'get_artifact_payload' )
-			->willReturnCallback( function ( int $post_id, string $category ) use ( &$store ) {
-				return $store[ $post_id ][ $category ] ?? null;
-			} );
-
-		$this->service = new AI_Run_Artifact_Service( $repo );
+		$this->service = new AI_Run_Artifact_Service( new In_Memory_Artifact_Repo() );
 	}
 
 	public function test_cost_usd_is_stored_and_retrieved_via_usage_metadata(): void {

@@ -30,10 +30,17 @@ if ( ! function_exists( 'AIOPageBuilder\Domain\Storage\Profile\wp_json_encode' )
 
 namespace AIOPageBuilder\Tests\Unit\Domain\Storage\Profile;
 
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Diff_Service;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
+use PHPUnit\Framework\TestCase;
+
+require_once dirname( __DIR__, 5 ) . '/src/Domain/Storage/Profile/Profile_Store_Interface.php';
+
 /**
  * Fake Profile_Store that returns controlled profile data for diff tests.
  */
-final class Fake_Profile_Store_For_Diff {
+final class Fake_Profile_Store_For_Diff implements Profile_Store_Interface {
 	private array $brand;
 	private array $business;
 
@@ -48,6 +55,13 @@ final class Fake_Profile_Store_For_Diff {
 
 	public function get_business_profile(): array {
 		return $this->business;
+	}
+
+	public function get_full_profile(): array {
+		return array(
+			'brand_profile'    => $this->brand,
+			'business_profile' => $this->business,
+		);
 	}
 }
 

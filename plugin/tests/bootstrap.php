@@ -357,7 +357,21 @@ if ( ! class_exists( 'WP_Post' ) ) {
 	}
 }
 if ( ! function_exists( 'get_post' ) ) {
+	/**
+	 * Per-ID post stub: checks _aio_get_post_by_id[$id] first, then _aio_get_post_return.
+	 *
+	 * @param int|null $id
+	 * @param string   $output
+	 * @param string   $filter
+	 * @return \WP_Post|\stdClass|null
+	 */
 	function get_post( $id = null, $output = OBJECT, $filter = 'raw' ) {
+		if ( $id !== null && isset( $GLOBALS['_aio_get_post_by_id'] ) && is_array( $GLOBALS['_aio_get_post_by_id'] ) ) {
+			$key = (int) $id;
+			if ( array_key_exists( $key, $GLOBALS['_aio_get_post_by_id'] ) ) {
+				return $GLOBALS['_aio_get_post_by_id'][ $key ];
+			}
+		}
 		return isset( $GLOBALS['_aio_get_post_return'] ) ? $GLOBALS['_aio_get_post_return'] : null;
 	}
 }
@@ -399,7 +413,18 @@ if ( ! function_exists( 'wp_insert_post' ) ) {
 	}
 }
 if ( ! function_exists( 'wp_update_post' ) ) {
+	/**
+	 * _aio_wp_update_post_raw_return bypasses the WP_Error conversion and returns verbatim.
+	 * Use it when you need to test the branch that handles an integer 0 even when $wp_error=true.
+	 *
+	 * @param array $postarr
+	 * @param bool  $wp_error
+	 * @return int|\WP_Error
+	 */
 	function wp_update_post( $postarr, $wp_error = false ) {
+		if ( isset( $GLOBALS['_aio_wp_update_post_raw_return'] ) ) {
+			return $GLOBALS['_aio_wp_update_post_raw_return'];
+		}
 		$id  = isset( $postarr['ID'] ) ? (int) $postarr['ID'] : 0;
 		$ret = isset( $GLOBALS['_aio_wp_update_post_return'] ) ? $GLOBALS['_aio_wp_update_post_return'] : $id;
 		return $wp_error && $ret === 0 ? new \WP_Error( 'update_failed', 'Stub' ) : $ret;
@@ -601,7 +626,15 @@ if ( ! function_exists( 'wp_remote_get' ) ) {
 }
 if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
 	function wp_remote_retrieve_response_code( $response ) {
-		return is_array( $response ) && isset( $response['response']['code'] ) ? (int) $response['response']['code'] : 0;
+		if ( is_array( $response ) ) {
+			if ( isset( $response['response']['code'] ) ) {
+				return (int) $response['response']['code'];
+			}
+			if ( isset( $response['code'] ) ) {
+				return (int) $response['code'];
+			}
+		}
+		return 0;
 	}
 }
 if ( ! function_exists( 'wp_remote_retrieve_headers' ) ) {
@@ -624,5 +657,49 @@ if ( ! function_exists( 'wp_remote_retrieve_header' ) ) {
 			}
 		}
 		return '';
+	}
+}
+if ( ! function_exists( 'wp_remote_post' ) ) {
+	function wp_remote_post( $url, $args = array() ) {
+		return isset( $GLOBALS['__driver_cost_test_mock_response'] )
+			? $GLOBALS['__driver_cost_test_mock_response']
+			: array( 'code' => 200, 'body' => '', 'headers' => array() );
+	}
+}
+if ( ! function_exists( 'wp_create_nav_menu' ) ) {
+	function wp_create_nav_menu( $menu_name ) {
+		if ( isset( $GLOBALS['_aio_wp_create_nav_menu_return'] ) ) {
+			return $GLOBALS['_aio_wp_create_nav_menu_return'];
+		}
+		return isset( $GLOBALS['_aio_test_nav_menu_id'] ) ? (int) $GLOBALS['_aio_test_nav_menu_id'] : 1;
+	}
+}
+if ( ! function_exists( 'get_registered_nav_menus' ) ) {
+	function get_registered_nav_menus(): array {
+		return isset( $GLOBALS['_aio_test_registered_nav_menus'] ) ? (array) $GLOBALS['_aio_test_registered_nav_menus'] : array();
+	}
+}
+if ( ! function_exists( 'get_theme_mod' ) ) {
+	function get_theme_mod( $name, $default = false ) {
+		$mods = isset( $GLOBALS['_aio_test_theme_mods'] ) ? (array) $GLOBALS['_aio_test_theme_mods'] : array();
+		return array_key_exists( $name, $mods ) ? $mods[ $name ] : $default;
+	}
+}
+if ( ! function_exists( 'set_theme_mod' ) ) {
+	function set_theme_mod( $name, $value ): void {
+		if ( ! isset( $GLOBALS['_aio_test_theme_mods'] ) ) {
+			$GLOBALS['_aio_test_theme_mods'] = array();
+		}
+		$GLOBALS['_aio_test_theme_mods'][ $name ] = $value;
+	}
+}
+if ( ! function_exists( 'wp_update_nav_menu_item' ) ) {
+	function wp_update_nav_menu_item( $menu_id, $menu_item_db_id, $args = array(), $fire_after_hooks = true ) {
+		return isset( $GLOBALS['_aio_test_nav_menu_item_id'] ) ? (int) $GLOBALS['_aio_test_nav_menu_item_id'] : 1;
+	}
+}
+if ( ! function_exists( 'wp_delete_nav_menu' ) ) {
+	function wp_delete_nav_menu( $menu ) {
+		return true;
 	}
 }

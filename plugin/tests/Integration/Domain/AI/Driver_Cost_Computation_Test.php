@@ -24,22 +24,32 @@ if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\wp_remote_po
 	function wp_remote_post( string $url, array $args = array() ): array {
 		return $GLOBALS['__driver_cost_test_mock_response'] ?? array();
 	}
+}
+if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\wp_remote_retrieve_response_code' ) ) {
 	/** @return int|string */
 	function wp_remote_retrieve_response_code( $response ) {
 		return $response['code'] ?? 0;
 	}
+}
+if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\wp_remote_retrieve_body' ) ) {
 	/** @return string */
 	function wp_remote_retrieve_body( $response ): string {
 		return $response['body'] ?? '';
 	}
+}
+if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\is_wp_error' ) ) {
 	/** @return bool */
 	function is_wp_error( $thing ): bool {
 		return false;
 	}
+}
+if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\wp_json_encode' ) ) {
 	/** @return string */
 	function wp_json_encode( $data ): string {
 		return json_encode( $data );
 	}
+}
+if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\__' ) ) {
 	/** @return string */
 	function __( string $text, string $domain = 'default' ): string {
 		return $text;
@@ -48,14 +58,21 @@ if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\wp_remote_po
 
 // Minimal secret store stub.
 class Stub_Secret_Store_Cost implements \AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface {
-	public function get_credential( string $provider_id ): ?string {
+	public function get_credential_for_provider( string $provider_id ): ?string {
 		return 'test-key';
 	}
-	public function set_credential( string $provider_id, string $credential ): void {}
+	public function get_credential_state( string $provider_id ): string {
+		return \AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface::STATE_CONFIGURED;
+	}
+	public function set_credential( string $provider_id, string $value ): bool {
+		return true;
+	}
 	public function has_credential( string $provider_id ): bool {
 		return true;
 	}
-	public function delete_credential( string $provider_id ): void {}
+	public function delete_credential( string $provider_id ): bool {
+		return true;
+	}
 }
 
 /**

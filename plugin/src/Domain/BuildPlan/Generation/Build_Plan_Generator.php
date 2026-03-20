@@ -319,6 +319,15 @@ final class Build_Plan_Generator {
 	}
 
 	/**
+	 * Derives hierarchy step items from site_structure.
+	 *
+	 * Two sources are processed in order:
+	 * 1. hierarchy_assignments: concrete {page_id, parent_page_id, ?note} entries from the AI
+	 *    or from post-creation injection. Resolvable entries → ITEM_TYPE_HIERARCHY_ASSIGNMENT
+	 *    (executable). Entries missing a valid page_id → ITEM_TYPE_HIERARCHY_NOTE (advisory).
+	 * 2. recommended_top_level_pages: AI textual recommendations without page IDs →
+	 *    single ITEM_TYPE_HIERARCHY_NOTE (advisory).
+	 *
 	 * @param array<string, mixed>|mixed $site_structure
 	 * @param string                     $plan_id
 	 * @return array<int, array<string, mixed>>
@@ -328,6 +337,42 @@ final class Build_Plan_Generator {
 			return array();
 		}
 		$items = array();
+
+		// * Emit ITEM_TYPE_HIERARCHY_ASSIGNMENT for each resolvable concrete assignment.
+		if ( ! empty( $site_structure['hierarchy_assignments'] ) && is_array( $site_structure['hierarchy_assignments'] ) ) {
+			foreach ( $site_structure['hierarchy_assignments'] as $idx => $assignment ) {
+				if ( ! is_array( $assignment ) ) {
+					continue;
+				}
+				$a_page_id        = isset( $assignment['page_id'] ) ? (int) $assignment['page_id'] : 0;
+				$a_parent_page_id = isset( $assignment['parent_page_id'] ) ? (int) $assignment['parent_page_id'] : -1;
+				$a_note           = isset( $assignment['note'] ) ? (string) $assignment['note'] : '';
+				if ( $a_page_id > 0 && $a_parent_page_id >= 0 ) {
+					$items[] = array(
+						Build_Plan_Item_Schema::KEY_ITEM_ID   => $plan_id . '_hierarchy_assign_' . $idx,
+						Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_ASSIGNMENT,
+						Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
+							'page_id'        => $a_page_id,
+							'parent_page_id' => $a_parent_page_id,
+							'note'           => $a_note,
+						),
+						Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::PENDING,
+					);
+				} else {
+					// Unresolvable (page_id missing or invalid): demote to advisory note.
+					$items[] = array(
+						Build_Plan_Item_Schema::KEY_ITEM_ID   => $plan_id . '_hierarchy_note_unresolved_' . $idx,
+						Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_NOTE,
+						Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
+							'note' => $a_note !== '' ? $a_note : 'Hierarchy assignment could not be resolved: page_id missing.',
+						),
+						Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::PENDING,
+					);
+				}
+			}
+		}
+
+		// * Emit a single advisory ITEM_TYPE_HIERARCHY_NOTE for AI top-level page recommendations.
 		if ( ! empty( $site_structure['recommended_top_level_pages'] ) && is_array( $site_structure['recommended_top_level_pages'] ) ) {
 			$items[] = array(
 				Build_Plan_Item_Schema::KEY_ITEM_ID   => $plan_id . '_hierarchy_0',

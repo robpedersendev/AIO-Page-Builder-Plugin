@@ -60,10 +60,25 @@ if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\__' ) ) {
 
 namespace AIOPageBuilder\Tests\Integration\Domain\Execution;
 
+use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
+use AIOPageBuilder\Domain\Execution\Executor\Execution_Dispatcher;
+use AIOPageBuilder\Domain\Execution\Handlers\Create_Menu_Handler;
+use PHPUnit\Framework\TestCase;
+
 /**
  * Verifies CREATE_MENU is fully wired into the execution engine.
  */
 final class Single_Action_Executor_Create_Menu_Test extends TestCase {
+
+	protected function setUp(): void {
+		parent::setUp();
+		$GLOBALS['_aio_wp_create_nav_menu_return'] = 99;
+	}
+
+	protected function tearDown(): void {
+		parent::tearDown();
+		unset( $GLOBALS['_aio_wp_create_nav_menu_return'] );
+	}
 
 	public function test_create_menu_is_in_all(): void {
 		$this->assertContains(

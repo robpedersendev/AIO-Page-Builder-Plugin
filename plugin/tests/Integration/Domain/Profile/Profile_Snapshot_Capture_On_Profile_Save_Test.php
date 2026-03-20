@@ -18,6 +18,8 @@ $plugin_root = dirname( __DIR__, 4 );
 require_once $plugin_root . '/tests/bootstrap_i18n_stub.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Data.php';
+require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Store_Interface.php';
+require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Helper.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Factory.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Capture_Service.php';
@@ -32,14 +34,11 @@ namespace AIOPageBuilder\Tests\Integration\Domain\Profile;
 $GLOBALS['_test_wp_actions'] = array();
 
 function do_action( string $hook, ...$args ): void {
-	$callbacks = $GLOBALS['_test_wp_actions'][ $hook ] ?? array();
-	foreach ( $callbacks as $cb ) {
-		$cb( ...$args );
-	}
+	\do_action( $hook, ...$args );
 }
 
-function add_action( string $hook, callable $callback, int $priority = 10, int $accepted_args = 1 ): bool {
-	$GLOBALS['_test_wp_actions'][ $hook ][] = $callback;
+function add_action( string $hook, callable $callback, int $priority = 10, int $accepted_args = 1 ) {
+	\add_action( $hook, $callback, $priority, $accepted_args );
 	return true;
 }
 
@@ -99,6 +98,8 @@ if ( ! function_exists( 'AIOPageBuilder\Domain\Storage\Profile\do_action' ) ) {
 
 namespace AIOPageBuilder\Tests\Integration\Domain\Profile;
 
+use PHPUnit\Framework\TestCase;
+
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Normalizer.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Store.php';
 
@@ -106,7 +107,7 @@ require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Store.php';
 // In-memory snapshot repository for test assertions.
 // ---------------------------------------------------------------------------
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Capture_Service;
@@ -114,7 +115,7 @@ use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 
-final class In_Memory_Snapshot_Repo {
+final class In_Memory_Snapshot_Repo implements Profile_Snapshot_Repository_Interface {
 	/** @var array<int, Profile_Snapshot_Data> */
 	public array $saved = array();
 
@@ -131,6 +132,21 @@ final class In_Memory_Snapshot_Repo {
 		}
 		return null;
 	}
+
+	public function delete( string $snapshot_id ): bool {
+		foreach ( $this->saved as $k => $s ) {
+			if ( $s->snapshot_id === $snapshot_id ) {
+				unset( $this->saved[ $k ] );
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function get_all( int $limit = 0 ): array {
+		$all = array_values( $this->saved );
+		return $limit > 0 ? array_slice( $all, 0, $limit ) : $all;
+	}
 }
 
 /**
@@ -141,8 +157,8 @@ final class Profile_Snapshot_Capture_On_Profile_Save_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_test_wp_actions'] = array();
-		$GLOBALS['_test_options']    = array();
+		$GLOBALS['_aio_actions']  = array();
+		$GLOBALS['_test_options'] = array();
 	}
 
 	private function make_store(): Profile_Store {
@@ -199,10 +215,10 @@ final class Profile_Snapshot_Capture_On_Profile_Save_Test extends TestCase {
 		$capture = $this->make_capture_service( $repo );
 		$capture->register_hooks();
 		$store = $this->make_store();
-		$store->merge_brand_profile( array( 'name' => 'Post-merge Brand' ) );
+		$store->merge_brand_profile( array( 'brand_positioning_summary' => 'Post-merge Brand' ) );
 		$snap = $repo->saved[0] ?? null;
 		$this->assertNotNull( $snap );
 		// * The snapshot must reflect post-merge state, not the old state.
-		$this->assertSame( 'Post-merge Brand', $snap->brand_profile['name'] ?? null );
+		$this->assertSame( 'Post-merge Brand', $snap->brand_profile['brand_positioning_summary'] ?? null );
 	}
 }

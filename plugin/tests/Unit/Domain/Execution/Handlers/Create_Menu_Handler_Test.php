@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
-$plugin_root = dirname( __DIR__, 6 );
+$plugin_root = dirname( __DIR__, 5 );
 require_once $plugin_root . '/src/Domain/Execution/Executor/Execution_Handler_Interface.php';
 require_once $plugin_root . '/src/Domain/Execution/Handlers/Create_Menu_Handler.php';
 
@@ -31,44 +31,55 @@ $GLOBALS['_cmh_test_theme_mod_locations'] = array();
 /** @var bool */
 $GLOBALS['_cmh_test_item_result'] = 1;
 
-function wp_create_nav_menu( string $menu_name ) {
-	return $GLOBALS['_cmh_test_create_result'];
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\wp_create_nav_menu' ) ) {
+	function wp_create_nav_menu( string $menu_name ) {
+		return $GLOBALS['_cmh_test_create_result'];
+	}
 }
-
-function get_registered_nav_menus(): array {
-	return $GLOBALS['_cmh_test_registered_locations'];
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\get_registered_nav_menus' ) ) {
+	function get_registered_nav_menus(): array {
+		return $GLOBALS['_cmh_test_registered_locations'];
+	}
 }
-
-function get_theme_mod( string $name ): array {
-	return $GLOBALS['_cmh_test_theme_mod_locations'];
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\get_theme_mod' ) ) {
+	function get_theme_mod( string $name ): array {
+		return $GLOBALS['_cmh_test_theme_mod_locations'];
+	}
 }
-
-function set_theme_mod( string $name, array $value ): void {
-	$GLOBALS['_cmh_test_theme_mod_locations'] = $value;
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\set_theme_mod' ) ) {
+	function set_theme_mod( string $name, array $value ): void {
+		$GLOBALS['_cmh_test_theme_mod_locations'] = $value;
+	}
 }
-
-function wp_update_nav_menu_item( int $menu_id, int $item_db_id, array $item_data ): int {
-	return $GLOBALS['_cmh_test_item_result'];
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\wp_update_nav_menu_item' ) ) {
+	function wp_update_nav_menu_item( int $menu_id, int $item_db_id, array $item_data ): int {
+		return $GLOBALS['_cmh_test_item_result'];
+	}
 }
-
-function is_wp_error( $thing ): bool {
-	return $thing instanceof \WP_Error;
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\is_wp_error' ) ) {
+	function is_wp_error( $thing ): bool {
+		return $thing instanceof \WP_Error;
+	}
 }
-
-function sanitize_text_field( string $str ): string {
-	return $str;
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\sanitize_text_field' ) ) {
+	function sanitize_text_field( string $str ): string {
+		return $str;
+	}
 }
-
-function esc_url_raw( string $url ): string {
-	return $url;
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\esc_url_raw' ) ) {
+	function esc_url_raw( string $url ): string {
+		return $url;
+	}
 }
-
-function __( string $text, string $domain = 'default' ): string {
-	return $text;
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\__' ) ) {
+	function __( string $text, string $domain = 'default' ): string {
+		return $text;
+	}
 }
-
-function sprintf( string $format, ...$args ): string {
-	return \vsprintf( $format, $args );
+if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\sprintf' ) ) {
+	function sprintf( string $format, ...$args ): string {
+		return \vsprintf( $format, $args );
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -99,10 +110,20 @@ final class Create_Menu_Handler_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_cmh_test_create_result']       = 42;
-		$GLOBALS['_cmh_test_registered_locations'] = array( 'primary' => 'Primary Menu', 'footer' => 'Footer Menu' );
-		$GLOBALS['_cmh_test_theme_mod_locations']  = array();
-		$GLOBALS['_cmh_test_item_result']          = 1;
+		$GLOBALS['_aio_wp_create_nav_menu_return']  = 42;
+		$GLOBALS['_aio_test_registered_nav_menus']  = array( 'primary' => 'Primary Menu', 'footer' => 'Footer Menu' );
+		$GLOBALS['_aio_test_theme_mods']            = array();
+		$GLOBALS['_aio_test_nav_menu_item_id']      = 1;
+	}
+
+	protected function tearDown(): void {
+		parent::tearDown();
+		unset(
+			$GLOBALS['_aio_wp_create_nav_menu_return'],
+			$GLOBALS['_aio_test_registered_nav_menus'],
+			$GLOBALS['_aio_test_theme_mods'],
+			$GLOBALS['_aio_test_nav_menu_item_id']
+		);
 	}
 
 	private function handler(): Create_Menu_Handler {
@@ -125,14 +146,14 @@ final class Create_Menu_Handler_Test extends TestCase {
 	}
 
 	public function test_wp_create_nav_menu_error_returns_failure(): void {
-		$GLOBALS['_cmh_test_create_result'] = new \WP_Error( 'nav_menu_exists', 'That menu name already exists.' );
+		$GLOBALS['_aio_wp_create_nav_menu_return'] = new \WP_Error( 'nav_menu_exists', 'That menu name already exists.' );
 		$result = $this->handler()->execute( $this->envelope( array( 'menu_name' => 'My Menu' ) ) );
 		$this->assertFalse( $result['success'] );
 		$this->assertStringContainsString( 'That menu name already exists.', $result['message'] );
 	}
 
 	public function test_wp_create_nav_menu_returning_zero_returns_failure(): void {
-		$GLOBALS['_cmh_test_create_result'] = 0;
+		$GLOBALS['_aio_wp_create_nav_menu_return'] = 0;
 		$result = $this->handler()->execute( $this->envelope( array( 'menu_name' => 'My Menu' ) ) );
 		$this->assertFalse( $result['success'] );
 	}
@@ -158,7 +179,7 @@ final class Create_Menu_Handler_Test extends TestCase {
 		$this->assertTrue( $result['success'] );
 		$this->assertTrue( $result['artifacts']['location_assigned'] );
 		$this->assertSame( 'primary', $result['artifacts']['theme_location'] );
-		$this->assertSame( array( 'primary' => 42 ), $GLOBALS['_cmh_test_theme_mod_locations'] );
+		$this->assertSame( array( 'primary' => 42 ), $GLOBALS['_aio_test_theme_mods']['nav_menu_locations'] ?? array() );
 	}
 
 	public function test_theme_location_not_registered_skips_silently_and_records_reason(): void {

@@ -20,7 +20,7 @@ use AIOPageBuilder\Infrastructure\Config\Versions;
 /**
  * CRUD repository for Profile_Snapshot_Data objects backed by the custom profile_snapshots table.
  */
-final class Profile_Snapshot_Repository {
+final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_Interface {
 
 	/** @var \wpdb|object */
 	private $wpdb;

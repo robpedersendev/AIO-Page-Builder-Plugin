@@ -46,6 +46,11 @@ if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\__' ) ) {
 
 namespace AIOPageBuilder\Tests\Integration\Domain\Execution;
 
+use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
+use AIOPageBuilder\Domain\Execution\Executor\Execution_Dispatcher;
+use AIOPageBuilder\Domain\Execution\Handlers\Assign_Page_Hierarchy_Handler;
+use PHPUnit\Framework\TestCase;
+
 /**
  * Verifies ASSIGN_PAGE_HIERARCHY is fully wired into the execution engine.
  */

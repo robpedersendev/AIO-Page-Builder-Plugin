@@ -52,12 +52,14 @@ final class Provider_Spend_Cap_Enforcement_Test extends TestCase {
 
 	protected function setUp(): void {
 		$GLOBALS['__spend_test_options'] = array();
+		$GLOBALS['_aio_test_options']    = array();
 		$this->cap_settings   = new Provider_Spend_Cap_Settings();
 		$this->spend_service  = new Provider_Monthly_Spend_Service( $this->cap_settings );
 	}
 
 	protected function tearDown(): void {
 		unset( $GLOBALS['__spend_test_options'] );
+		unset( $GLOBALS['_aio_test_options'] );
 	}
 
 	public function test_record_and_retrieve_month_total(): void {

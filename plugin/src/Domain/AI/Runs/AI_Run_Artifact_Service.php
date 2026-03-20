@@ -11,7 +11,7 @@ namespace AIOPageBuilder\Domain\AI\Runs;
 
 defined( 'ABSPATH' ) || exit;
 
-use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository; // * Kept for downstream compatibility; service now depends on AI_Artifact_Repository_Interface.
 
 /**
  * Stores and retrieves artifacts by run and category. Builds review-safe payloads with redaction.
@@ -22,10 +22,10 @@ final class AI_Run_Artifact_Service {
 	/** Placeholder shown when content is redacted. */
 	private const REDACTED_PLACEHOLDER = '[redacted]';
 
-	/** @var AI_Run_Repository */
+	/** @var AI_Artifact_Repository_Interface */
 	private $run_repository;
 
-	public function __construct( AI_Run_Repository $run_repository ) {
+	public function __construct( AI_Artifact_Repository_Interface $run_repository ) {
 		$this->run_repository = $run_repository;
 	}
 

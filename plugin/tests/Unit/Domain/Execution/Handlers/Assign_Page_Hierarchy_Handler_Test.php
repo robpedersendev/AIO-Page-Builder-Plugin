@@ -2,93 +2,51 @@
 /**
  * Unit tests for Assign_Page_Hierarchy_Handler (v2-scope-backlog.md §1).
  *
- * WP functions (get_post, wp_update_post, is_wp_error) are overridden in this namespace
- * to avoid requiring a full WordPress bootstrap for handler unit tests.
+ * WP stubs are provided by the PHPUnit bootstrap (tests/bootstrap.php).
+ * Per-ID post lookup uses $GLOBALS['_aio_get_post_by_id'][id] (enhanced bootstrap stub).
+ * wp_update_post return is controlled via $GLOBALS['_aio_wp_update_post_return'].
  *
  * @package AIOPageBuilder
  */
 
-namespace AIOPageBuilder\Domain\Execution\Handlers;
+declare( strict_types=1 );
 
+namespace AIOPageBuilder\Tests\Unit\Domain\Execution\Handlers;
+
+use AIOPageBuilder\Domain\Execution\Handlers\Assign_Page_Hierarchy_Handler;
 use PHPUnit\Framework\TestCase;
 
-defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
-
-$plugin_root = dirname( __DIR__, 6 );
-require_once $plugin_root . '/src/Domain/Execution/Executor/Execution_Handler_Interface.php';
-require_once $plugin_root . '/src/Domain/Execution/Handlers/Assign_Page_Hierarchy_Handler.php';
-
-// ---------------------------------------------------------------------------
-// WP function stubs — scoped to handler namespace so real WP is not required.
-// ---------------------------------------------------------------------------
-
-/** @var array<int,\stdClass|null> Global stub registry used by the test namespace stubs. */
-$GLOBALS['_aph_test_posts'] = array();
-/** @var bool|\WP_Error */
-$GLOBALS['_aph_test_update_result'] = 0;
-
-function get_post( int $post_id ): ?\stdClass {
-	return $GLOBALS['_aph_test_posts'][ $post_id ] ?? null;
-}
-
-function wp_update_post( array $args, bool $wp_error = false ) {
-	return $GLOBALS['_aph_test_update_result'];
-}
-
-function is_wp_error( $thing ): bool {
-	return $thing instanceof \WP_Error;
-}
-
-function __( string $text, string $domain = 'default' ): string {
-	return $text;
-}
-
-function sprintf( string $format, ...$args ): string {
-	return \vsprintf( $format, $args );
-}
-
-// ---------------------------------------------------------------------------
-// Minimal WP_Error stub.
-// ---------------------------------------------------------------------------
-if ( ! class_exists( 'WP_Error' ) ) {
-	class WP_Error {
-		private string $message;
-		public function __construct( string $code = '', string $message = '' ) {
-			$this->message = $message;
-		}
-		public function get_error_message(): string {
-			return $this->message;
-		}
-	}
-}
-
-// ---------------------------------------------------------------------------
-// Minimal WP_Post stub.
-// ---------------------------------------------------------------------------
-if ( ! class_exists( 'WP_Post' ) ) {
-	class WP_Post extends \stdClass {}
-}
-
-// ---------------------------------------------------------------------------
-
 /**
- * Tests for Assign_Page_Hierarchy_Handler.
+ * @covers \AIOPageBuilder\Domain\Execution\Handlers\Assign_Page_Hierarchy_Handler
  */
 final class Assign_Page_Hierarchy_Handler_Test extends TestCase {
 
 	private Assign_Page_Hierarchy_Handler $handler;
 
 	protected function setUp(): void {
-		$this->handler                        = new Assign_Page_Hierarchy_Handler();
-		$GLOBALS['_aph_test_posts']           = array();
-		$GLOBALS['_aph_test_update_result']   = 0;
+		$this->handler                         = new Assign_Page_Hierarchy_Handler();
+		$GLOBALS['_aio_get_post_by_id']        = array();
+		$GLOBALS['_aio_get_post_return']       = null;
+		$GLOBALS['_aio_wp_update_post_return'] = null;
+	}
+
+	protected function tearDown(): void {
+		unset( $GLOBALS['_aio_get_post_by_id'] );
+		unset( $GLOBALS['_aio_get_post_return'] );
+		unset( $GLOBALS['_aio_wp_update_post_return'] );
 	}
 
 	private function envelope( array $target_reference ): array {
 		return array( 'target_reference' => $target_reference );
 	}
 
-	// --- Rejection tests ---
+	private function make_page( int $post_parent = 0 ): \WP_Post {
+		$p              = new \WP_Post();
+		$p->post_parent = $post_parent;
+		return $p;
+	}
+
+	// --- Rejection tests: invalid input ---
 
 	public function test_rejects_missing_page_id(): void {
 		$result = $this->handler->execute( $this->envelope( array( 'parent_page_id' => 0 ) ) );
@@ -103,7 +61,7 @@ final class Assign_Page_Hierarchy_Handler_Test extends TestCase {
 	}
 
 	public function test_rejects_missing_parent_page_id(): void {
-		$GLOBALS['_aph_test_posts'][5] = new \WP_Post();
+		$GLOBALS['_aio_get_post_by_id'][5] = $this->make_page();
 		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 5 ) ) );
 		$this->assertFalse( $result['success'] );
 		$this->assertContains( 'parent_page_id_required', $result['errors'] );
@@ -115,30 +73,61 @@ final class Assign_Page_Hierarchy_Handler_Test extends TestCase {
 		$this->assertContains( 'parent_page_id_required', $result['errors'] );
 	}
 
+	// --- Rejection tests: unresolvable references ---
+
 	public function test_rejects_nonexistent_page(): void {
-		$GLOBALS['_aph_test_posts'] = array();
+		// post 99 not registered → get_post returns null → page_not_found.
 		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 99, 'parent_page_id' => 0 ) ) );
 		$this->assertFalse( $result['success'] );
 		$this->assertContains( 'page_not_found', $result['errors'] );
 	}
 
 	public function test_rejects_nonexistent_parent(): void {
-		$page              = new \WP_Post();
-		$page->post_parent = 0;
-		$GLOBALS['_aph_test_posts'][5]  = $page;
-		$GLOBALS['_aph_test_posts'][99] = null;
+		$GLOBALS['_aio_get_post_by_id'][5] = $this->make_page( 0 );
+		// post 99 not in registry → get_post(99) returns null → parent_not_found.
 		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 5, 'parent_page_id' => 99 ) ) );
 		$this->assertFalse( $result['success'] );
 		$this->assertContains( 'parent_not_found', $result['errors'] );
 	}
 
+	// --- Rejection tests: circular / self-parent ---
+
+	public function test_rejects_self_parent_assignment(): void {
+		$GLOBALS['_aio_get_post_by_id'][5] = $this->make_page( 0 );
+		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 5, 'parent_page_id' => 5 ) ) );
+		$this->assertFalse( $result['success'] );
+		$this->assertContains( 'self_parent_circular', $result['errors'] );
+	}
+
+	public function test_rejects_circular_chain_direct(): void {
+		// page 5 has parent=10. Walking ancestors of proposed parent=5:
+		// get_post(5)->post_parent = 10 → 10 ≡ page_id=10 → circular.
+		$GLOBALS['_aio_get_post_by_id'][5]  = $this->make_page( 10 ); // page 5 parent=10
+		$GLOBALS['_aio_get_post_by_id'][10] = $this->make_page( 5 );  // page 10 parent=5
+		// Attempt: assign page 10 a parent of 5.
+		// self-parent check: 10 ≠ 5 → OK.
+		// parent exists check: get_post(5) = page → OK.
+		// circular check: walk ancestors of 5; page5->parent=10 ≡ page_id(10) → circular!
+		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 10, 'parent_page_id' => 5 ) ) );
+		$this->assertFalse( $result['success'] );
+		$this->assertContains( 'circular_hierarchy', $result['errors'] );
+	}
+
+	public function test_rejects_circular_chain_indirect(): void {
+		// Chain: 10→20→5; assigning page 5 a parent of 10 would create 5→10→20→5 cycle.
+		$GLOBALS['_aio_get_post_by_id'][5]  = $this->make_page( 0 );
+		$GLOBALS['_aio_get_post_by_id'][10] = $this->make_page( 20 );
+		$GLOBALS['_aio_get_post_by_id'][20] = $this->make_page( 5 );  // 20's parent is 5
+		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 5, 'parent_page_id' => 10 ) ) );
+		$this->assertFalse( $result['success'] );
+		$this->assertContains( 'circular_hierarchy', $result['errors'] );
+	}
+
 	// --- No-op test ---
 
 	public function test_returns_no_op_when_parent_already_matches(): void {
-		$page              = new \WP_Post();
-		$page->post_parent = 10;
-		$GLOBALS['_aph_test_posts'][5]  = $page;
-		$GLOBALS['_aph_test_posts'][10] = new \WP_Post();
+		$GLOBALS['_aio_get_post_by_id'][5]  = $this->make_page( 10 ); // already child of 10
+		$GLOBALS['_aio_get_post_by_id'][10] = $this->make_page( 0 );
 		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 5, 'parent_page_id' => 10 ) ) );
 		$this->assertTrue( $result['success'] );
 		$this->assertTrue( $result['artifacts']['no_op'] ?? false );
@@ -150,14 +139,10 @@ final class Assign_Page_Hierarchy_Handler_Test extends TestCase {
 	// --- Success tests ---
 
 	public function test_calls_wp_update_post_and_returns_success(): void {
-		$page              = new \WP_Post();
-		$page->post_parent = 0;
-		$GLOBALS['_aph_test_posts'][5]  = $page;
-		$GLOBALS['_aph_test_posts'][10] = new \WP_Post();
-		$GLOBALS['_aph_test_update_result'] = 5;
-
+		$GLOBALS['_aio_get_post_by_id'][5]  = $this->make_page( 0 );
+		$GLOBALS['_aio_get_post_by_id'][10] = $this->make_page( 0 );
+		// Bootstrap wp_update_post returns postarr['ID'] when _aio_wp_update_post_return is null.
 		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 5, 'parent_page_id' => 10 ) ) );
-
 		$this->assertTrue( $result['success'] );
 		$this->assertSame( 5, $result['artifacts']['page_id'] );
 		$this->assertSame( 0, $result['artifacts']['old_parent'] );
@@ -165,24 +150,15 @@ final class Assign_Page_Hierarchy_Handler_Test extends TestCase {
 	}
 
 	public function test_artifacts_contain_old_and_new_parent(): void {
-		$page              = new \WP_Post();
-		$page->post_parent = 7;
-		$GLOBALS['_aph_test_posts'][3]  = $page;
-		$GLOBALS['_aph_test_posts'][12] = new \WP_Post();
-		$GLOBALS['_aph_test_update_result'] = 3;
-
+		$GLOBALS['_aio_get_post_by_id'][3]  = $this->make_page( 7 ); // old parent = 7
+		$GLOBALS['_aio_get_post_by_id'][12] = $this->make_page( 0 );
 		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 3, 'parent_page_id' => 12 ) ) );
-
 		$this->assertSame( 7, $result['artifacts']['old_parent'], 'old_parent must reflect the original post_parent.' );
 		$this->assertSame( 12, $result['artifacts']['new_parent'], 'new_parent must reflect the requested parent_page_id.' );
 	}
 
 	public function test_top_level_assignment_succeeds_with_parent_zero(): void {
-		$page              = new \WP_Post();
-		$page->post_parent = 7;
-		$GLOBALS['_aph_test_posts'][3] = $page;
-		$GLOBALS['_aph_test_update_result'] = 3;
-
+		$GLOBALS['_aio_get_post_by_id'][3] = $this->make_page( 7 ); // currently child of 7
 		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 3, 'parent_page_id' => 0 ) ) );
 		$this->assertTrue( $result['success'] );
 		$this->assertSame( 0, $result['artifacts']['new_parent'] );
@@ -191,30 +167,19 @@ final class Assign_Page_Hierarchy_Handler_Test extends TestCase {
 	// --- Failure tests ---
 
 	public function test_returns_failure_on_wp_error(): void {
-		$page              = new \WP_Post();
-		$page->post_parent = 0;
-		$GLOBALS['_aph_test_posts'][5] = $page;
-		$GLOBALS['_aph_test_update_result'] = new \WP_Error( 'db_error', 'Database write failed.' );
-
+		$GLOBALS['_aio_get_post_by_id'][5]     = $this->make_page( 3 ); // old parent = 3 → new=0, different from old
+		$GLOBALS['_aio_wp_update_post_return'] = new \WP_Error( 'db_error', 'Database write failed.' );
 		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 5, 'parent_page_id' => 0 ) ) );
-
-		// Parent 0 = top-level; old_parent = 0 → triggers no-op since 0 === 0. Adjust: use different parent.
-		$page->post_parent = 3;
-		$GLOBALS['_aph_test_posts'][5] = $page;
-		$GLOBALS['_aph_test_update_result'] = new \WP_Error( 'db_error', 'Database write failed.' );
-		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 5, 'parent_page_id' => 0 ) ) );
-
 		$this->assertFalse( $result['success'] );
 		$this->assertContains( 'wp_update_post_error', $result['errors'] );
 	}
 
 	public function test_returns_failure_on_zero_result(): void {
-		$page              = new \WP_Post();
-		$page->post_parent = 3;
-		$GLOBALS['_aph_test_posts'][5]      = $page;
-		$GLOBALS['_aph_test_update_result'] = 0;
-
+		$GLOBALS['_aio_get_post_by_id'][5]          = $this->make_page( 3 );
+		// * Use raw-return override to bypass bootstrap's 0→WP_Error conversion when wp_error=true.
+		$GLOBALS['_aio_wp_update_post_raw_return']   = 0;
 		$result = $this->handler->execute( $this->envelope( array( 'page_id' => 5, 'parent_page_id' => 0 ) ) );
+		unset( $GLOBALS['_aio_wp_update_post_raw_return'] );
 		$this->assertFalse( $result['success'] );
 		$this->assertContains( 'wp_update_post_zero', $result['errors'] );
 	}

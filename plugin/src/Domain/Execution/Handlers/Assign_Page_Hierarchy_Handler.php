@@ -75,6 +75,37 @@ final class Assign_Page_Hierarchy_Handler implements Execution_Handler_Interface
 
 		$old_parent = (int) $page->post_parent;
 
+		// * Reject self-parent: a page cannot be its own parent.
+		if ( $page_id === $parent_page_id ) {
+			return array(
+				'success' => false,
+				'message' => \__( 'Hierarchy assignment failed: a page cannot be its own parent.', 'aio-page-builder' ),
+				'errors'  => array( 'self_parent_circular' ),
+			);
+		}
+
+		// * Reject circular chain: walk ancestors of the proposed parent; fail if page_id is encountered.
+		if ( $parent_page_id > 0 ) {
+			$ancestor_id = $parent_page_id;
+			$depth       = 0;
+			while ( $ancestor_id > 0 && $depth < 50 ) {
+				$ancestor_post = \get_post( $ancestor_id );
+				if ( ! $ancestor_post instanceof \WP_Post ) {
+					break;
+				}
+				$ancestor_parent = (int) $ancestor_post->post_parent;
+				if ( $ancestor_parent === $page_id ) {
+					return array(
+						'success' => false,
+						'message' => \__( 'Hierarchy assignment failed: assigning this parent would create a circular hierarchy.', 'aio-page-builder' ),
+						'errors'  => array( 'circular_hierarchy' ),
+					);
+				}
+				$ancestor_id = $ancestor_parent;
+				++$depth;
+			}
+		}
+
 		// * No-op: parent already matches; return success without writing to avoid unnecessary revision.
 		if ( $old_parent === $parent_page_id ) {
 			return array(

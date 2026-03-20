@@ -28,6 +28,8 @@ $plugin_root = dirname( __DIR__, 4 );
 require_once $plugin_root . '/tests/bootstrap_i18n_stub.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Data.php';
+require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Store_Interface.php';
+require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Repository_Interface.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Helper.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Factory.php';
 require_once $plugin_root . '/src/Infrastructure/Config/Versions.php';
@@ -41,6 +43,13 @@ use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
 // ---------------------------------------------------------------------------
 namespace AIOPageBuilder\Tests\Integration\Admin\Profile;
 
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
+use PHPUnit\Framework\TestCase;
+
 function wp_json_encode( $data ): string {
 	$r = \json_encode( $data );
 	return is_string( $r ) ? $r : '';
@@ -51,7 +60,7 @@ function gmdate( string $f, ?int $t = null ): string { return \gmdate( $f, $t );
 // ---------------------------------------------------------------------------
 // In-memory Profile_Store that records writes for assertion.
 // ---------------------------------------------------------------------------
-final class Spy_Profile_Store {
+final class Spy_Profile_Store implements Profile_Store_Interface {
 	/** @var array<int, array<string, mixed>> */
 	public array $set_calls = array();
 	/** @var array<string, mixed> */
@@ -84,7 +93,7 @@ final class Spy_Profile_Store {
 // ---------------------------------------------------------------------------
 // In-memory snapshot repository.
 // ---------------------------------------------------------------------------
-final class Spy_Snapshot_Repo {
+final class Spy_Snapshot_Repo implements Profile_Snapshot_Repository_Interface {
 	/** @var array<string, Profile_Snapshot_Data> */
 	public array $store = array();
 	/** @var array<int, Profile_Snapshot_Data> */
@@ -98,6 +107,19 @@ final class Spy_Snapshot_Repo {
 		$this->store[ $snap->snapshot_id ] = $snap;
 		$this->saves[]                     = $snap;
 		return true;
+	}
+
+	public function delete( string $snapshot_id ): bool {
+		if ( isset( $this->store[ $snapshot_id ] ) ) {
+			unset( $this->store[ $snapshot_id ] );
+			return true;
+		}
+		return false;
+	}
+
+	public function get_all( int $limit = 0 ): array {
+		$all = array_values( $this->store );
+		return $limit > 0 ? array_slice( $all, 0, $limit ) : $all;
 	}
 }
 

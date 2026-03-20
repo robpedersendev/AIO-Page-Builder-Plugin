@@ -94,7 +94,7 @@ final class Build_Plan_Row_Action_Resolver_Create_Menu_Test extends TestCase {
 	}
 
 	public function test_menu_new_denied_has_execute_disabled(): void {
-		$item    = $this->make_item( Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW, Build_Plan_Item_Statuses::DENIED );
+		$item    = $this->make_item( Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW, Build_Plan_Item_Statuses::REJECTED );
 		$actions = $this->resolver->resolve( $item, $this->caps() );
 		$execute = $this->find_action( $actions, Build_Plan_Row_Action_Resolver::ACTION_EXECUTE );
 		if ( $execute !== null ) {

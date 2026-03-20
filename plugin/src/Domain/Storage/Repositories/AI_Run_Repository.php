@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Domain\Storage\Repositories;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Runs\AI_Artifact_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 
 /**
@@ -18,7 +19,7 @@ use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
  * Internal key: run_id (e.g. UUID). Status: pending_generation | completed | failed_validation | failed.
  * Run metadata and artifact payloads stored in post meta; raw vs normalized kept separate.
  */
-final class AI_Run_Repository extends Abstract_CPT_Repository {
+final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Artifact_Repository_Interface {
 
 	/** Meta key for run metadata (actor, timestamps, provider, model, prompt_pack_ref, retry_count, build_plan_ref). */
 	public const META_RUN_METADATA = '_aio_run_metadata';

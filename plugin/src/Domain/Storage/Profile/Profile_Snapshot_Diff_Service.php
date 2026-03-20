@@ -28,7 +28,7 @@ final class Profile_Snapshot_Diff_Service {
 	 * @param bool                  $include_unchanged Include rows where values are equal.
 	 * @return array<int, array{field: string, section: string, snapshot_value: string, current_value: string, changed: bool}>
 	 */
-	public function diff( Profile_Snapshot_Data $snapshot, Profile_Store $current_store, bool $include_unchanged = false ): array {
+	public function diff( Profile_Snapshot_Data $snapshot, Profile_Store_Interface $current_store, bool $include_unchanged = false ): array {
 		$current_brand    = $current_store->get_brand_profile();
 		$current_business = $current_store->get_business_profile();
 
@@ -63,7 +63,7 @@ final class Profile_Snapshot_Diff_Service {
 	 * @param Profile_Store         $current_store
 	 * @return array{total: int, changed: int, changed_fields: array<int, string>}
 	 */
-	public function summary( Profile_Snapshot_Data $snapshot, Profile_Store $current_store ): array {
+	public function summary( Profile_Snapshot_Data $snapshot, Profile_Store_Interface $current_store ): array {
 		$all     = $this->diff( $snapshot, $current_store, true );
 		$changed = array_filter( $all, fn( $r ) => $r['changed'] );
 		return array(

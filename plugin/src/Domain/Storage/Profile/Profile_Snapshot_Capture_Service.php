@@ -27,11 +27,11 @@ final class Profile_Snapshot_Capture_Service {
 	private Profile_Snapshot_Factory $factory;
 
 	/** @var Profile_Snapshot_Repository */
-	private Profile_Snapshot_Repository $repository;
+	private Profile_Snapshot_Repository_Interface $repository;
 
 	public function __construct(
 		Profile_Snapshot_Factory $factory,
-		Profile_Snapshot_Repository $repository
+		Profile_Snapshot_Repository_Interface $repository
 	) {
 		$this->factory    = $factory;
 		$this->repository = $repository;

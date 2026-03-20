@@ -35,16 +35,33 @@ if ( ! function_exists( 'AIOPageBuilder\Domain\Storage\Profile\gmdate' ) ) {
 
 namespace AIOPageBuilder\Tests\Unit\Domain\Storage\Profile;
 
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
+use PHPUnit\Framework\TestCase;
+
+require_once dirname( __DIR__, 5 ) . '/src/Domain/Storage/Profile/Profile_Store_Interface.php';
+
 /**
  * Fake Profile_Store that returns controlled profile data.
  */
-final class Fake_Profile_Store_For_Factory {
+final class Fake_Profile_Store_For_Factory implements Profile_Store_Interface {
 	public function get_full_profile(): array {
 		return array(
 			Profile_Schema::ROOT_BRAND    => array( 'name' => 'Test Brand', 'tagline' => 'Great tag' ),
 			Profile_Schema::ROOT_BUSINESS => array( 'industry' => 'Tech', 'founded' => '2010' ),
 			Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE => array(),
 		);
+	}
+
+	public function get_brand_profile(): array {
+		return array( 'name' => 'Test Brand', 'tagline' => 'Great tag' );
+	}
+
+	public function get_business_profile(): array {
+		return array( 'industry' => 'Tech', 'founded' => '2010' );
 	}
 }
 

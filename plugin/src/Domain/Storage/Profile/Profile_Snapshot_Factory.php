@@ -39,7 +39,7 @@ final class Profile_Snapshot_Factory {
 	 * @return Profile_Snapshot_Data     Unsaved snapshot value object.
 	 */
 	public function build(
-		Profile_Store $store,
+		Profile_Store_Interface $store,
 		string $source = 'manual',
 		string $scope_type = 'other',
 		string $scope_id = ''
