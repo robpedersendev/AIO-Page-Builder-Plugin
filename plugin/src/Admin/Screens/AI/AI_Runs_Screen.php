@@ -43,6 +43,9 @@ final class AI_Runs_Screen {
 	 * @return void
 	 */
 	public function render(): void {
+		if ( ! \current_user_can( Capabilities::VIEW_AI_RUNS ) ) {
+			\wp_die( \esc_html__( 'You do not have permission to view AI runs.', 'aio-page-builder' ) );
+		}
 		$run_id = isset( $_GET['run_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['run_id'] ) ) : '';
 		if ( $run_id !== '' ) {
 			$detail = new AI_Run_Detail_Screen( $this->container );

@@ -12,7 +12,7 @@ namespace AIOPageBuilder\Infrastructure\Config;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Canonical option name constants. Future prompts may add fields within approved structures; roots require migration.
+ * Canonical option name constants. New option roots require migration; additions within approved structures must remain backward-compatible.
  */
 final class Option_Names {
 

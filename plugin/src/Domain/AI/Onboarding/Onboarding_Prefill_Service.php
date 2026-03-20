@@ -40,7 +40,7 @@ final class Onboarding_Prefill_Service {
 	 * Returns prefill data for the onboarding screen. No secret values.
 	 *
 	 * @param array<string, mixed>|null $draft Current draft (optional); used to restore crawl_run_id_ref / goal if present.
-	 * @return array<string, mixed> Keys: profile (brand_profile, business_profile), current_site_url, crawl_run_ids, latest_crawl_run_id, provider_refs.
+	 * @return array<string, mixed> Keys: profile (brand_profile, business_profile), current_site_url, crawl_run_ids, latest_crawl_run_id, latest_crawl_session_timestamp, provider_refs.
 	 */
 	public function get_prefill_data( ?array $draft = null ): array {
 		$profile          = $this->profile_store->get_full_profile();
@@ -65,14 +65,25 @@ final class Onboarding_Prefill_Service {
 			$latest_crawl_run_id = $draft['crawl_run_id_ref'];
 		}
 
+		$latest_crawl_session_timestamp = null;
+		if ( $this->crawl_snapshot_service !== null && is_string( $latest_crawl_run_id ) && $latest_crawl_run_id !== '' ) {
+			$sess = $this->crawl_snapshot_service->get_session( $latest_crawl_run_id );
+			if ( is_array( $sess ) ) {
+				$ended                          = isset( $sess['ended_at'] ) && is_string( $sess['ended_at'] ) ? \trim( $sess['ended_at'] ) : '';
+				$started                        = isset( $sess['started_at'] ) && is_string( $sess['started_at'] ) ? \trim( $sess['started_at'] ) : '';
+				$latest_crawl_session_timestamp = $ended !== '' ? $ended : ( $started !== '' ? $started : null );
+			}
+		}
+
 		$provider_refs = $this->get_provider_refs();
 
 		return array(
-			'profile'             => $profile,
-			'current_site_url'    => $current_site_url,
-			'crawl_run_ids'       => $crawl_run_ids,
-			'latest_crawl_run_id' => $latest_crawl_run_id,
-			'provider_refs'       => $provider_refs,
+			'profile'                        => $profile,
+			'current_site_url'               => $current_site_url,
+			'crawl_run_ids'                  => $crawl_run_ids,
+			'latest_crawl_run_id'            => $latest_crawl_run_id,
+			'latest_crawl_session_timestamp' => $latest_crawl_session_timestamp,
+			'provider_refs'                  => $provider_refs,
 		);
 	}
 

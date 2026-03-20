@@ -25,6 +25,7 @@ use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Message_Component;
 use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
+use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -62,6 +63,11 @@ final class Build_Plan_Workspace_Screen {
 
 	/** Bulk nonce action for Step 6 finalization (required contract). */
 	public const NONCE_ACTION_FINALIZE_BULK = 'aio_pb_finalize_plan_bulk';
+
+	/**
+	 * Nonce action prefix for JSON plan export; append sanitized `plan_id` (see workspace export handler).
+	 */
+	public const NONCE_ACTION_EXPORT_BUILD_PLAN_PREFIX = 'aio_pb_export_build_plan_';
 
 	/**
 	 * Returns row action nonce key for an item id (required contract).
@@ -121,6 +127,10 @@ final class Build_Plan_Workspace_Screen {
 	 * @return void
 	 */
 	public function render( string $plan_id ): void {
+		$handled = $this->maybe_handle_export_plan( $plan_id );
+		if ( $handled ) {
+			return;
+		}
 		$handled = $this->maybe_handle_step2_action( $plan_id );
 		if ( $handled ) {
 			return;
@@ -525,14 +535,6 @@ final class Build_Plan_Workspace_Screen {
 				return false;
 			}
 
-
-			$state = $this->get_state( $plan_id );
-			if ( $state === null ) {
-				return false;
-			}
-			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
-			$definition   = isset( $state['plan_definition'] ) && is_array( $state['plan_definition'] ) ? $state['plan_definition'] : array();
-
 			$is_bulk_execute = in_array( $action, array( 'bulk_execute_all_remaining_step4', 'bulk_execute_selected_step4' ), true );
 
 			if ( $is_bulk_execute ) {
@@ -545,6 +547,11 @@ final class Build_Plan_Workspace_Screen {
 				if ( ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
 					return false;
 				}
+				$state = $this->get_state( $plan_id );
+				if ( $state === null ) {
+					return false;
+				}
+				$definition = isset( $state['plan_definition'] ) && is_array( $state['plan_definition'] ) ? $state['plan_definition'] : array();
 
 				$steps = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 					? $definition[ Build_Plan_Schema::KEY_STEPS ]
@@ -560,6 +567,7 @@ final class Build_Plan_Workspace_Screen {
 
 				$selected_ids = array();
 				if ( $action === 'bulk_execute_selected_step4' ) {
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array sanitized via array_map(sanitize_text_field) below.
 					$raw_selected = isset( $_POST['aio_step4_selected_ids'] ) && is_array( $_POST['aio_step4_selected_ids'] ) ? \wp_unslash( $_POST['aio_step4_selected_ids'] ) : array();
 					$selected_ids = \array_values( \array_filter( \array_map( 'sanitize_text_field', $raw_selected ) ) );
 				}
@@ -638,16 +646,16 @@ final class Build_Plan_Workspace_Screen {
 				\error_log(
 					'[AIO Page Builder] ' . \wp_json_encode(
 						array(
-							'event'                => 'token_execution_result',
-						'actor_id'            => (string) \get_current_user_id(),
-							'plan_id'              => $plan_id,
-							'execution_origin'    => $action,
-							'overall_status'      => $results['status'] ?? 'error',
-							'completed_count'     => $results['completed_count'] ?? 0,
-							'failed_count'        => $results['failed_count'] ?? 0,
-							'refused_count'       => $results['refused_count'] ?? 0,
-							'partial_failure'     => $results['partial_failure'] ?? false,
-							'item_results'        => $results['item_results'] ?? array(),
+							'event'             => 'token_execution_result',
+							'actor_id'          => (string) \get_current_user_id(),
+							'plan_id'           => $plan_id,
+							'execution_origin'  => $action,
+							'overall_status'    => $results['status'] ?? 'error',
+							'completed_count'   => $results['completed_count'] ?? 0,
+							'failed_count'      => $results['failed_count'] ?? 0,
+							'refused_count'     => $results['refused_count'] ?? 0,
+							'partial_failure'   => $results['partial_failure'] ?? false,
+							'item_results'      => $results['item_results'] ?? array(),
 						)
 					)
 				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -656,16 +664,21 @@ final class Build_Plan_Workspace_Screen {
 				exit;
 			}
 
-			if ( $plan_post_id <= 0 ) {
-				return false;
-			}
-			if ( ! $this->container || ! $this->container->has( 'design_token_bulk_action_service' ) ) {
-				return false;
-			}
 			if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
 				return false;
 			}
 			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_BULK ) ) {
+				return false;
+			}
+			$state = $this->get_state( $plan_id );
+			if ( $state === null ) {
+				return false;
+			}
+			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
+			if ( $plan_post_id <= 0 ) {
+				return false;
+			}
+			if ( ! $this->container || ! $this->container->has( 'design_token_bulk_action_service' ) ) {
 				return false;
 			}
 
@@ -675,6 +688,7 @@ final class Build_Plan_Workspace_Screen {
 			} elseif ( $action === 'bulk_deny_all_step4' ) {
 				$service->bulk_deny_all_eligible( $plan_post_id );
 			} else {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array sanitized via array_map(sanitize_text_field) below.
 				$raw_selected = isset( $_POST['aio_step4_selected_ids'] ) && is_array( $_POST['aio_step4_selected_ids'] ) ? \wp_unslash( $_POST['aio_step4_selected_ids'] ) : array();
 				$selected      = array_map( 'sanitize_text_field', $raw_selected );
 				$selected      = array_values( array_filter( $selected ) );
@@ -707,13 +721,22 @@ final class Build_Plan_Workspace_Screen {
 			true
 		);
 
+		if ( ! $is_review_action && ! $is_execute_action ) {
+			return false;
+		}
+		if ( $get_step !== (string) $tokens_step_index || $item_id === '' ) {
+			return false;
+		}
 		$nonce_action = $is_execute_action ? $execute_row_nonce_action : $row_nonce_action;
-		if ( $get_step !== (string) $tokens_step_index || $item_id === '' || $nonce_action === '' || ! \wp_verify_nonce( $nonce, $nonce_action ) ) {
+		if ( $nonce_action === '' ) {
 			return false;
 		}
 
 		if ( $is_review_action ) {
 			if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'design_token_bulk_action_service' ) ) {
+				return false;
+			}
+			if ( ! \wp_verify_nonce( $nonce, $nonce_action ) ) {
 				return false;
 			}
 			$state = $this->get_state( $plan_id );
@@ -736,6 +759,9 @@ final class Build_Plan_Workspace_Screen {
 
 		if ( $is_execute_action ) {
 			if ( ! \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+				return false;
+			}
+			if ( ! \wp_verify_nonce( $nonce, $nonce_action ) ) {
 				return false;
 			}
 			$state = $this->get_state( $plan_id );
@@ -814,20 +840,18 @@ final class Build_Plan_Workspace_Screen {
 				\error_log(
 					'[AIO Page Builder] ' . \wp_json_encode(
 						array(
-							'event'      => 'token_retry_status_update',
-							'plan_id'    => $plan_id,
-							'item_id'    => $item_id,
-							'updated'    => $updated,
-							'token_group'=> $token_group,
-							'token_name' => $token_name,
-							'new_status' => \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS,
+							'event'       => 'token_retry_status_update',
+							'plan_id'     => $plan_id,
+							'item_id'     => $item_id,
+							'updated'     => $updated,
+							'token_group' => $token_group,
+							'token_name'  => $token_name,
+							'new_status'  => \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS,
 						)
 					)
 				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			} else {
-				if ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
-					return false;
-				}
+			} elseif ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
+				return false;
 			}
 
 			\error_log(
@@ -1654,6 +1678,79 @@ final class Build_Plan_Workspace_Screen {
 		return $builder->build( $plan_id );
 	}
 
+	/**
+	 * Authenticated JSON download of the plan (GET + per-plan nonce). Uses EXPORT_DATA or DOWNLOAD_ARTIFACTS (same as workspace export control).
+	 *
+	 * @param string $plan_id Plan ID from routing.
+	 * @return bool True when download was sent (script terminated).
+	 */
+	private function maybe_handle_export_plan( string $plan_id ): bool {
+		if ( ! isset( $_GET['aio_export_build_plan'] ) || (string) $_GET['aio_export_build_plan'] !== '1' ) {
+			return false;
+		}
+		$plan_id = \sanitize_text_field( $plan_id );
+		if ( $plan_id === '' ) {
+			return false;
+		}
+		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) && ! \current_user_can( Capabilities::DOWNLOAD_ARTIFACTS ) ) {
+			\wp_die( \esc_html__( 'You do not have permission to export build plans.', 'aio-page-builder' ), '', array( 'response' => 403 ) );
+		}
+		$nonce        = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
+		$nonce_action = self::NONCE_ACTION_EXPORT_BUILD_PLAN_PREFIX . $plan_id;
+		if ( $nonce === '' || ! \wp_verify_nonce( $nonce, $nonce_action ) ) {
+			\wp_die( \esc_html__( 'Invalid export link. Please reload the workspace and try again.', 'aio-page-builder' ), '', array( 'response' => 403 ) );
+		}
+		$state = $this->get_state( $plan_id );
+		if ( $state === null ) {
+			\wp_die( \esc_html__( 'Plan not found.', 'aio-page-builder' ), '', array( 'response' => 404 ) );
+		}
+		$payload = $this->build_export_payload_for_download( $state );
+		$audit   = array(
+			'event'        => 'build_plan_exported',
+			'plan_id'      => (string) ( $payload['plan_id'] ?? '' ),
+			'plan_post_id' => (int) ( $payload['plan_post_id'] ?? 0 ),
+			'actor_id'     => (string) \get_current_user_id(),
+			'timestamp'    => gmdate( 'c' ),
+		);
+		\error_log( '[AIO Page Builder] ' . \wp_json_encode( $audit ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		$safe_filename = \preg_replace( '/[^a-zA-Z0-9._-]+/', '-', (string) ( $payload['plan_id'] ?? 'plan' ) );
+		if ( $safe_filename === '' ) {
+			$safe_filename = 'plan';
+		}
+		$filename = 'build-plan-' . $safe_filename . '.json';
+		\header( 'Content-Type: application/json; charset=utf-8' );
+		\header( 'Content-Disposition: attachment; filename="' . \esc_attr( $filename ) . '"' );
+		\nocache_headers();
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON body; nested secrets redacted via AI_Run_Artifact_Service.
+		echo \wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		exit;
+	}
+
+	/**
+	 * Builds the export JSON structure (redacted plan definition and context rail summary).
+	 *
+	 * @param array<string, mixed> $state Workspace state from Build_Plan_UI_State_Builder::build().
+	 * @return array<string, mixed>
+	 */
+	private function build_export_payload_for_download( array $state ): array {
+		$plan_id      = (string) ( $state['plan_id'] ?? '' );
+		$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
+		$definition   = isset( $state['plan_definition'] ) && is_array( $state['plan_definition'] ) ? $state['plan_definition'] : array();
+		$definition   = AI_Run_Artifact_Service::redact_sensitive_values( $definition );
+		$rail         = isset( $state['context_rail'] ) && is_array( $state['context_rail'] ) ? $state['context_rail'] : array();
+		$rail_safe    = AI_Run_Artifact_Service::redact_sensitive_values( $rail );
+		$steps        = isset( $state['stepper_steps'] ) && is_array( $state['stepper_steps'] ) ? $state['stepper_steps'] : array();
+		return array(
+			'export_version'   => 1,
+			'exported_at_utc'  => gmdate( 'c' ),
+			'plan_id'          => $plan_id,
+			'plan_post_id'     => $plan_post_id,
+			'plan_definition'  => $definition,
+			'context_rail'     => $rail_safe,
+			'stepper_snapshot' => $steps,
+		);
+	}
+
 	private function get_active_step_index( array $state ): int {
 		$steps = $state['stepper_steps'] ?? array();
 		if ( empty( $steps ) ) {
@@ -1695,10 +1792,20 @@ final class Build_Plan_Workspace_Screen {
 		$base_url           = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) );
 		$can_export         = \current_user_can( Capabilities::EXPORT_DATA ) || \current_user_can( Capabilities::DOWNLOAD_ARTIFACTS );
 		$can_view_artifacts = \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
+		$export_url         = '';
+		if ( $can_export && $plan_id !== '' ) {
+			$export_url = \add_query_arg(
+				array(
+					'aio_export_build_plan' => '1',
+					'_wpnonce'              => \wp_create_nonce( self::NONCE_ACTION_EXPORT_BUILD_PLAN_PREFIX . $plan_id ),
+				),
+				$base_url
+			);
+		}
 		?>
 		<div class="wrap aio-page-builder-screen aio-build-plan-workspace aio-build-plan-three-zone">
 			<aside class="aio-build-plan-context-rail" role="complementary" aria-label="<?php \esc_attr_e( 'Plan context and actions', 'aio-page-builder' ); ?>">
-				<?php $this->render_context_rail( $rail, $plan_id, $base_url, $can_export, $can_view_artifacts ); ?>
+				<?php $this->render_context_rail( $rail, $plan_id, $base_url, $export_url, $can_view_artifacts ); ?>
 			</aside>
 			<main class="aio-build-plan-main" id="aio-build-plan-main" aria-label="<?php \esc_attr_e( 'Build Plan steps and content', 'aio-page-builder' ); ?>">
 				<div class="aio-build-plan-stepper">
@@ -1712,7 +1819,7 @@ final class Build_Plan_Workspace_Screen {
 		<?php
 	}
 
-	private function render_context_rail( array $rail, string $plan_id, string $base_url, bool $can_export, bool $can_view_artifacts ): void {
+	private function render_context_rail( array $rail, string $plan_id, string $base_url, string $export_url, bool $can_view_artifacts ): void {
 		$list_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
 		?>
 		<div class="aio-context-rail-inner">
@@ -1760,8 +1867,8 @@ final class Build_Plan_Workspace_Screen {
 			<?php endif; ?>
 			<div class="aio-context-rail-actions">
 				<p><a href="<?php echo \esc_url( $list_url ); ?>" class="button"><?php \esc_html_e( 'Save and exit', 'aio-page-builder' ); ?></a></p>
-				<?php if ( $can_export ) : ?>
-					<p><span class="button button-secondary" role="button" aria-disabled="true"><?php \esc_html_e( 'Export plan', 'aio-page-builder' ); ?></span> <span class="description"><?php \esc_html_e( '(Coming soon)', 'aio-page-builder' ); ?></span></p>
+				<?php if ( $export_url !== '' ) : ?>
+					<p><a href="<?php echo \esc_url( $export_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Export plan', 'aio-page-builder' ); ?></a></p>
 				<?php endif; ?>
 				<?php if ( $can_view_artifacts && (string) ( $rail['ai_run_ref'] ?? '' ) !== '' ) : ?>
 					<p><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=aio-page-builder-ai-runs&run_id=' . \rawurlencode( (string) $rail['ai_run_ref'] ) ) ); ?>" class="button button-secondary"><?php \esc_html_e( 'View source artifacts', 'aio-page-builder' ); ?></a></p>

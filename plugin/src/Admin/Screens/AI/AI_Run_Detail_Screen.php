@@ -45,6 +45,9 @@ final class AI_Run_Detail_Screen {
 	 * @return void
 	 */
 	public function render( string $run_id ): void {
+		if ( ! \current_user_can( Capabilities::VIEW_AI_RUNS ) ) {
+			\wp_die( \esc_html__( 'You do not have permission to view AI run details.', 'aio-page-builder' ) );
+		}
 		$run              = null;
 		$artifact_summary = array();
 		$usage_data       = null;

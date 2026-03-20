@@ -598,6 +598,34 @@ if ( ! function_exists( 'wp_create_nonce' ) ) {
 		return 'test-nonce-' . $action;
 	}
 }
+if ( ! function_exists( 'wp_verify_nonce' ) ) {
+	/**
+	 * Test shim: accepts only nonces produced by wp_create_nonce() for the same action.
+	 *
+	 * @param string|false $nonce  Nonce value.
+	 * @param string|int   $action Nonce action.
+	 * @return int|false
+	 */
+	function wp_verify_nonce( $nonce, $action = -1 ) {
+		return is_string( $nonce ) && $nonce !== '' && $nonce === wp_create_nonce( (string) $action ) ? 1 : false;
+	}
+}
+if ( ! function_exists( 'nocache_headers' ) ) {
+	function nocache_headers() {
+		// No-op in unit test bootstrap.
+	}
+}
+if ( ! function_exists( 'wp_die' ) ) {
+	/**
+	 * @param string|\WP_Error $message Optional. Error message.
+	 * @param string           $title   Optional. Error title.
+	 * @param string|array     $args    Optional. Arguments to control behavior.
+	 * @return never
+	 */
+	function wp_die( $message = '', $title = '', $args = array() ) {
+		throw new \RuntimeException( is_string( $message ) ? $message : 'wp_die' );
+	}
+}
 if ( ! function_exists( 'wp_nonce_field' ) ) {
 	function wp_nonce_field( $action = -1, $name = '_wpnonce', $referer = true ) {
 		echo '<input type="hidden" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( wp_create_nonce( $action ) ) . '" />';

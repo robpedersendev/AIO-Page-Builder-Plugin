@@ -16,9 +16,8 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Action types that the execution engine may perform. Governed by execution-action-contract.md.
- * ALL lists types valid for execution. One type remains deferred to v2:
- * - UPDATE_PAGE_METADATA: recommendation-only; v2 will add a dedicated metadata-write handler.
- * ASSIGN_PAGE_HIERARCHY (v2) and CREATE_MENU (v2) are now executable.
+ * ALL lists types valid for execution except UPDATE_PAGE_METADATA (recommendation-only; no dedicated write handler yet).
+ * ASSIGN_PAGE_HIERARCHY and CREATE_MENU are executable via Assign_Page_Hierarchy_Handler and Create_Menu_Handler.
  */
 final class Execution_Action_Types {
 
@@ -27,11 +26,9 @@ final class Execution_Action_Types {
 	/** Not executable in v1; metadata is recommendation-only. Excluded from ALL. */
 	public const UPDATE_PAGE_METADATA = 'update_page_metadata';
 	/**
-	 * Deferred to v2. Standalone post-parent reassignment handler not yet implemented.
-	 * In v1, hierarchy is set inline during CREATE_PAGE via Template_Page_Build_Service.
-	 * v2 target: dedicated handler that reassigns post_parent for existing pages,
-	 * supporting batch hierarchy corrections and Build Plan hierarchy step execution.
-	 * Excluded from ALL until handler is implemented.
+	 * Reassigns an existing page’s parent (`post_parent`) to a target page ID (or 0 for top-level).
+	 * Handled by Assign_Page_Hierarchy_Handler after executor validation; used for hierarchy plan items
+	 * and batch hierarchy execution from the Build Plan workspace.
 	 */
 	public const ASSIGN_PAGE_HIERARCHY = 'assign_page_hierarchy';
 	/**
@@ -46,8 +43,7 @@ final class Execution_Action_Types {
 	public const ROLLBACK_ACTION       = 'rollback_action';
 
 	/**
-	 * Action types valid for execution. UPDATE_PAGE_METADATA remains deferred to v2.
-	 * ASSIGN_PAGE_HIERARCHY and CREATE_MENU are executable as of v2.
+	 * Action types valid for execution. UPDATE_PAGE_METADATA is excluded (recommendation-only).
 	 *
 	 * @var array<int, string>
 	 */

@@ -85,6 +85,9 @@ final class AI_Providers_Screen {
 		if ( $action !== 'aio_pb_test_ai_provider_connection' || $provider_id === '' ) {
 			return false;
 		}
+		if ( ! \current_user_can( Capabilities::MANAGE_AI_PROVIDERS ) ) {
+			return false;
+		}
 		$nonce_action = 'aio_pb_test_ai_provider_connection_' . $provider_id;
 		\check_admin_referer( $nonce_action );
 		if ( ! $this->container ) {
@@ -129,6 +132,9 @@ final class AI_Providers_Screen {
 		$action      = isset( $_POST['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['action'] ) ) : '';
 		$provider_id = isset( $_POST['provider_id'] ) ? \sanitize_key( (string) $_POST['provider_id'] ) : '';
 		if ( $action !== 'aio_pb_update_ai_provider_credential' || $provider_id === '' ) {
+			return false;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_AI_PROVIDERS ) ) {
 			return false;
 		}
 		$nonce_action = 'aio_pb_update_ai_provider_credential_' . $provider_id;
@@ -444,10 +450,12 @@ final class AI_Providers_Screen {
 	}
 
 	/**
-	 * Placeholder URL for test connection; handler must verify nonce and capability (spec §49.9).
+	 * Persists per-provider UI state after a connection test: credential source, masked status, resolved default model,
+	 * last_test_status, last_tested_at, and last_successful_use_at when the test succeeds.
 	 *
-	 * @param string $provider_id
-	 * @return string
+	 * @param string $provider_id Provider slug.
+	 * @param bool   $success     Whether the connection test succeeded.
+	 * @return void
 	 */
 	private function persist_provider_state_after_test( string $provider_id, bool $success ): void {
 		if ( ! $this->container ) {

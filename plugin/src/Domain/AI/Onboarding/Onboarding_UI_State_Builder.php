@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
+use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 
 /**
  * Assembles everything the onboarding screen needs to render: step list, current step, blocked state, prefill, nonce.
@@ -32,16 +35,26 @@ final class Onboarding_UI_State_Builder {
 	/** @var Industry_Question_Pack_Registry|null */
 	private ?Industry_Question_Pack_Registry $industry_question_pack_registry;
 
+	/** @var Profile_Snapshot_Repository_Interface|null */
+	private ?Profile_Snapshot_Repository_Interface $profile_snapshot_repository;
+
+	/** @var Settings_Service|null */
+	private ?Settings_Service $settings_service;
+
 	public function __construct(
 		Onboarding_Draft_Service $draft_service,
 		Onboarding_Prefill_Service $prefill_service,
 		?Industry_Profile_Repository $industry_profile_repository = null,
-		?Industry_Question_Pack_Registry $industry_question_pack_registry = null
+		?Industry_Question_Pack_Registry $industry_question_pack_registry = null,
+		?Profile_Snapshot_Repository_Interface $profile_snapshot_repository = null,
+		?Settings_Service $settings_service = null
 	) {
 		$this->draft_service                   = $draft_service;
 		$this->prefill_service                 = $prefill_service;
 		$this->industry_profile_repository     = $industry_profile_repository;
 		$this->industry_question_pack_registry = $industry_question_pack_registry;
+		$this->profile_snapshot_repository     = $profile_snapshot_repository;
+		$this->settings_service                = $settings_service;
 	}
 
 	/**
@@ -168,13 +181,99 @@ final class Onboarding_UI_State_Builder {
 	/**
 	 * Builds change-detection and stale-crawl warnings for submission step. Surface only; does not block.
 	 *
+	 * Profile-vs-run comparison uses persisted profile snapshots from merge events when the snapshot repository
+	 * is available; otherwise that signal is skipped (no invented warning). Stale crawl uses the latest crawl
+	 * session timestamp from prefill when present.
+	 *
 	 * @param array<string, mixed> $draft
 	 * @param array<string, mixed> $prefill
-	 * @return array<int, array{category: string, message: string, severity?: string}>
+	 * @return array<int, array{code: string, message: string}>
 	 */
 	private function build_submission_warnings( array $draft, array $prefill ): array {
-		$warnings = array();
-		// * Placeholder for change-detection (e.g. profile updated since last crawl) and stale-crawl age.
+		$warnings       = array();
+		$threshold_days = 30;
+		$settings       = $this->settings_service;
+		if ( $settings !== null ) {
+			$main = $settings->get( Option_Names::MAIN_SETTINGS );
+			$raw  = isset( $main['onboarding_stale_crawl_warning_days'] ) ? (int) $main['onboarding_stale_crawl_warning_days'] : 0;
+			if ( $raw > 0 ) {
+				$threshold_days = $raw;
+			}
+		}
+
+		$last_run_post_id = isset( $draft['last_planning_run_post_id'] ) ? (int) $draft['last_planning_run_post_id'] : 0;
+		if ( $this->profile_snapshot_repository !== null && $last_run_post_id > 0 ) {
+			$run_post = \get_post( $last_run_post_id );
+			if ( $run_post instanceof \WP_Post ) {
+				$run_ts = false;
+				$gm     = isset( $run_post->post_modified_gmt ) ? (string) $run_post->post_modified_gmt : '';
+				if ( $gm !== '' ) {
+					$run_ts = \strtotime( $gm );
+				}
+				if ( $run_ts === false && isset( $run_post->post_modified ) ) {
+					$run_ts = \strtotime( (string) $run_post->post_modified );
+				}
+				if ( $run_ts !== false ) {
+					$merge_ts = $this->latest_profile_merge_snapshot_timestamp();
+					if ( $merge_ts !== null && $merge_ts > $run_ts ) {
+						$warnings[] = array(
+							'code'    => 'profile_updated_since_last_run',
+							'message' => \__( 'Your business or brand profile was saved after the last successful planning run. Submit again if you want the latest profile reflected in planning.', 'aio-page-builder' ),
+						);
+					}
+				}
+			}
+		}
+
+		$crawl_ts_str = isset( $prefill['latest_crawl_session_timestamp'] ) && is_string( $prefill['latest_crawl_session_timestamp'] )
+			? \trim( $prefill['latest_crawl_session_timestamp'] )
+			: '';
+		if ( $crawl_ts_str !== '' ) {
+			$crawl_ts = \strtotime( $crawl_ts_str );
+			if ( $crawl_ts !== false ) {
+				$age_seconds = \time() - $crawl_ts;
+				$threshold   = $threshold_days * 86400;
+				if ( $age_seconds > $threshold ) {
+					$warnings[] = array(
+						'code'    => 'stale_crawl_context',
+						/* translators: %d: maximum age in whole days before crawl is considered stale. */
+						'message' => \sprintf( \__( 'The most recent crawl data is older than %d days. Consider running a new crawl if your site content has changed.', 'aio-page-builder' ), $threshold_days ),
+					);
+				}
+			}
+		}
+
 		return $warnings;
+	}
+
+	/**
+	 * Returns the newest Unix timestamp among brand/business merge snapshots, or null when none exist.
+	 *
+	 * @return int|null
+	 */
+	private function latest_profile_merge_snapshot_timestamp(): ?int {
+		if ( $this->profile_snapshot_repository === null ) {
+			return null;
+		}
+		$snapshots = $this->profile_snapshot_repository->get_all( 200 );
+		$max       = null;
+		foreach ( $snapshots as $snap ) {
+			$src = isset( $snap->source ) ? (string) $snap->source : '';
+			if ( ! \in_array( $src, array( 'brand_profile_merge', 'business_profile_merge' ), true ) ) {
+				continue;
+			}
+			$created = isset( $snap->created_at ) ? (string) $snap->created_at : '';
+			if ( $created === '' ) {
+				continue;
+			}
+			$ts = \strtotime( $created );
+			if ( $ts === false ) {
+				continue;
+			}
+			if ( $max === null || $ts > $max ) {
+				$max = $ts;
+			}
+		}
+		return $max;
 	}
 }

@@ -42,17 +42,22 @@ final class Onboarding_Provider implements Service_Provider_Interface {
 		$container->register(
 			'onboarding_ui_state_builder',
 			function () use ( $container ): Onboarding_UI_State_Builder {
-				$industry_repo = $container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE )
-				? $container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE )
-				: null;
-				$qp_registry   = $container->has( 'industry_question_pack_registry' )
-				? $container->get( 'industry_question_pack_registry' )
-				: null;
+				$industry_repo     = $container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE )
+					? $container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE )
+					: null;
+				$qp_registry       = $container->has( 'industry_question_pack_registry' )
+					? $container->get( 'industry_question_pack_registry' )
+					: null;
+				$profile_snapshots = $container->has( 'profile_snapshot_repository' )
+					? $container->get( 'profile_snapshot_repository' )
+					: null;
 				return new Onboarding_UI_State_Builder(
 					$container->get( 'onboarding_draft_service' ),
 					$container->get( 'onboarding_prefill_service' ),
 					$industry_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $industry_repo : null,
-					$qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null
+					$qp_registry instanceof \AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry ? $qp_registry : null,
+					$profile_snapshots instanceof \AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface ? $profile_snapshots : null,
+					$container->get( 'settings' )
 				);
 			}
 		);

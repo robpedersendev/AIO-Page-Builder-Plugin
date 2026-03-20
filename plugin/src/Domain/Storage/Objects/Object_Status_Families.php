@@ -36,8 +36,7 @@ final class Object_Status_Families {
 
 	/**
 	 * Object type (Object_Type_Keys constant) → list of allowed status slugs.
-	 * Custom statuses are not registered in this prompt; register_post_status (or equivalent) will be
-	 * attached in a later prompt using these families.
+	 * Custom status registration is managed by the bootstrap layer; these families are the authoritative status set for validation.
 	 *
 	 * @var array<string, array<int, string>>
 	 */
