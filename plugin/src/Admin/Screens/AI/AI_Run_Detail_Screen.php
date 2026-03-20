@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
+use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -46,6 +47,7 @@ final class AI_Run_Detail_Screen {
 	public function render( string $run_id ): void {
 		$run              = null;
 		$artifact_summary = array();
+		$usage_data       = null;
 		$can_view_raw     = \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
 
 		if ( $this->container && $this->container->has( 'ai_run_service' ) && $this->container->has( 'ai_run_artifact_service' ) ) {
@@ -55,6 +57,10 @@ final class AI_Run_Detail_Screen {
 				if ( $run !== null && isset( $run['id'] ) ) {
 					$artifact_svc     = $this->container->get( 'ai_run_artifact_service' );
 					$artifact_summary = $artifact_svc->get_artifact_summary_for_review( (int) $run['id'], $can_view_raw );
+					$raw_usage        = $artifact_svc->get( (int) $run['id'], Artifact_Category_Keys::USAGE_METADATA );
+					if ( is_array( $raw_usage ) ) {
+						$usage_data = $raw_usage;
+					}
 				}
 			} catch ( \Throwable $e ) {
 				$run = null;
@@ -97,6 +103,35 @@ final class AI_Run_Detail_Screen {
 						<tr><th scope="row"><?php \esc_html_e( 'Prompt pack', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['prompt_pack_ref'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Retry count', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['retry_count'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Build plan ref', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['build_plan_ref'] ?? '' ) ); ?></td></tr>
+						<?php
+						// * Token usage and cost row — sourced from usage_metadata artifact (not run_metadata).
+						$prompt_tok     = isset( $usage_data['prompt_tokens'] ) ? (int) $usage_data['prompt_tokens'] : null;
+						$completion_tok = isset( $usage_data['completion_tokens'] ) ? (int) $usage_data['completion_tokens'] : null;
+						$total_tok      = isset( $usage_data['total_tokens'] ) ? (int) $usage_data['total_tokens'] : null;
+						$cost_usd       = isset( $usage_data['cost_usd'] ) ? $usage_data['cost_usd'] : null;
+						if ( $usage_data !== null ) :
+							$token_str = $total_tok !== null
+								? sprintf(
+									/* translators: 1: prompt token count, 2: completion token count, 3: total token count */
+									\__( '%1$d prompt + %2$d completion = %3$d total', 'aio-page-builder' ),
+									$prompt_tok ?? 0,
+									$completion_tok ?? 0,
+									$total_tok
+								)
+								: \__( 'Not available', 'aio-page-builder' );
+							$cost_str = $cost_usd !== null
+								? '$' . number_format( (float) $cost_usd, 6 )
+								: \__( 'Not available (model not in pricing registry)', 'aio-page-builder' );
+							?>
+						<tr>
+							<th scope="row"><?php \esc_html_e( 'Token usage', 'aio-page-builder' ); ?></th>
+							<td><?php echo \esc_html( $token_str ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php \esc_html_e( 'Estimated cost', 'aio-page-builder' ); ?></th>
+							<td><?php echo \esc_html( $cost_str ); ?></td>
+						</tr>
+						<?php endif; ?>
 						<?php if ( ! empty( $meta_safe['is_experiment'] ) ) : ?>
 						<tr><th scope="row"><?php \esc_html_e( 'Experiment', 'aio-page-builder' ); ?></th><td><span class="aio-run-badge"><?php \esc_html_e( 'Experiment run', 'aio-page-builder' ); ?></span> <?php echo \esc_html( (string) ( $meta_safe['experiment_id'] ?? '' ) ); ?> — <?php echo \esc_html( (string) ( $meta_safe['experiment_variant_label'] ?? $meta_safe['experiment_variant_id'] ?? '' ) ); ?></td></tr>
 						<?php endif; ?>

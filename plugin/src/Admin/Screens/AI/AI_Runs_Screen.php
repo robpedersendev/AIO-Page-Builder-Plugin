@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Pricing\Provider_Pricing_Registry;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -52,7 +53,8 @@ final class AI_Runs_Screen {
 	}
 
 	private function render_list(): void {
-		$runs = array();
+		$runs         = array();
+		$spend_summaries = array();
 		if ( $this->container && $this->container->has( 'ai_run_repository' ) ) {
 			try {
 				$repo = $this->container->get( 'ai_run_repository' );
@@ -61,10 +63,75 @@ final class AI_Runs_Screen {
 				$runs = array();
 			}
 		}
+		if ( $this->container && $this->container->has( 'provider_monthly_spend_service' ) && $this->container->has( 'provider_pricing_registry' ) ) {
+			try {
+				$spend_svc = $this->container->get( 'provider_monthly_spend_service' );
+				$registry  = $this->container->get( 'provider_pricing_registry' );
+				foreach ( $registry->get_provider_ids() as $provider_id ) {
+					$spend_summaries[ $provider_id ] = $spend_svc->get_spend_summary( $provider_id );
+				}
+			} catch ( \Throwable $e ) {
+				$spend_summaries = array();
+			}
+		}
 		?>
 		<div class="wrap aio-page-builder-screen aio-ai-runs" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<p class="aio-ai-runs-description"><?php \esc_html_e( 'Review AI runs and their artifact summaries. Raw prompts and provider responses are restricted.', 'aio-page-builder' ); ?></p>
+			<?php if ( ! empty( $spend_summaries ) ) : ?>
+			<section class="aio-spend-summary" aria-labelledby="aio-spend-summary-heading">
+				<h2 id="aio-spend-summary-heading" style="font-size:1em;margin-bottom:0.5em;"><?php \esc_html_e( 'Month-to-date spend by provider', 'aio-page-builder' ); ?></h2>
+				<table class="widefat striped" style="max-width:640px;margin-bottom:1.5em;">
+					<thead>
+						<tr>
+							<th scope="col"><?php \esc_html_e( 'Provider', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Spent (USD)', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Cap (USD)', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+					<?php foreach ( $spend_summaries as $provider_id => $summary ) : ?>
+						<?php
+						$month_total = isset( $summary['month_total'] ) ? (float) $summary['month_total'] : 0.0;
+						$cap         = isset( $summary['cap'] ) ? (float) $summary['cap'] : 0.0;
+						$has_cap     = ! empty( $summary['has_cap'] );
+						$exceeded    = ! empty( $summary['exceeded'] );
+						$approaching = ! empty( $summary['approaching'] );
+						$pct         = isset( $summary['percent_used'] ) ? (float) $summary['percent_used'] : 0.0;
+						if ( $exceeded ) {
+							$status_label = \__( 'Cap exceeded', 'aio-page-builder' );
+							$status_color = '#dc3232';
+						} elseif ( $approaching ) {
+							$status_label = sprintf(
+								/* translators: %d: integer percent of cap used */
+								\__( 'Approaching cap (%d%%)', 'aio-page-builder' ),
+								(int) round( $pct * 100 )
+							);
+							$status_color = '#ffba00';
+						} elseif ( $has_cap ) {
+							$status_label = sprintf(
+								/* translators: %d: integer percent of cap used */
+								\__( '%d%% of cap used', 'aio-page-builder' ),
+								(int) round( $pct * 100 )
+							);
+							$status_color = '';
+						} else {
+							$status_label = \__( 'No cap set', 'aio-page-builder' );
+							$status_color = '';
+						}
+						?>
+						<tr>
+							<td><?php echo \esc_html( $provider_id ); ?></td>
+							<td>$<?php echo \esc_html( number_format( $month_total, 4 ) ); ?></td>
+							<td><?php echo $has_cap ? \esc_html( '$' . number_format( $cap, 2 ) ) : \esc_html( \__( '—', 'aio-page-builder' ) ); ?></td>
+							<td style="<?php echo $status_color ? 'color:' . \esc_attr( $status_color ) . ';font-weight:600;' : ''; ?>"><?php echo \esc_html( $status_label ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+					</tbody>
+				</table>
+			</section>
+			<?php endif; ?>
 			<?php if ( count( $runs ) === 0 ) : ?>
 				<p class="aio-admin-notice"><?php \esc_html_e( 'No AI runs yet.', 'aio-page-builder' ); ?></p>
 			<?php else : ?>

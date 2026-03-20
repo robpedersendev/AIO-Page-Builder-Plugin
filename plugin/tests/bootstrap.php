@@ -86,6 +86,11 @@ if ( ! function_exists( 'sanitize_text_field' ) ) {
 		return trim( (string) $str );
 	}
 }
+if ( ! function_exists( 'wp_unslash' ) ) {
+	function wp_unslash( $value ) {
+		return is_string( $value ) ? stripslashes( $value ) : $value;
+	}
+}
 if ( ! function_exists( 'sanitize_textarea_field' ) ) {
 	function sanitize_textarea_field( $str ) {
 		return trim( (string) $str );
