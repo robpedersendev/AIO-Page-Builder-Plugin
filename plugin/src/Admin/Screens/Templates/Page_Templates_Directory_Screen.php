@@ -23,7 +23,7 @@ use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 
 /**
  * Renders the Page Templates directory: root (category tree), category (family list), or list (template rows).
- * No detail preview in this screen; one-pager and composition are capability-gated links/placeholders.
+ * No detail preview in this screen; one-pager and composition views are capability-gated links to their own screens.
  */
 final class Page_Templates_Directory_Screen {
 

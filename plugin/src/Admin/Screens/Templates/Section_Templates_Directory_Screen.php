@@ -24,7 +24,7 @@ use AIOPageBuilder\Admin\Services\Helper_Doc_Url_Resolver;
 
 /**
  * Renders the Section Templates directory: root (purpose tree), purpose (L3 CTA/variant nodes), or list (section rows).
- * No section detail preview in this screen; View and helper links are capability-gated; detail screen is out of scope.
+ * No section detail preview in this screen; View and helper links are capability-gated links to their respective screens.
  */
 final class Section_Templates_Directory_Screen {
 

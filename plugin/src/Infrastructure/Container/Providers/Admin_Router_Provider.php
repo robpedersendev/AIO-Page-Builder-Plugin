@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers admin router placeholder.
+ * Registers the admin router service: named admin-page routes and URL generation.
  *
  * @package AIOPageBuilder
  */

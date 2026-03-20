@@ -15,7 +15,7 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
- * Renders comparison form (select prior/new run) and Session_Comparison_Result summary. No mutating actions; nonce reserved for future.
+ * Renders comparison form (select prior/new run) and Session_Comparison_Result summary. Read-only screen; no mutating actions.
  */
 final class Crawler_Comparison_Screen {
 

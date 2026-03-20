@@ -1,7 +1,7 @@
 <?php
 /**
  * Bootstrap entrypoint for the Industry Pack subsystem (industry-pack-extension-contract).
- * Registers the industry subsystem with the container so future prompts have a stable home.
+ * Registers the industry subsystem with the container for pack discovery, registry, and onboarding integration.
  * Industry packs extend existing registries, onboarding, docs, AI, and LPagery—they do not replace them.
  *
  * @package AIOPageBuilder
@@ -26,7 +26,7 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 	/** Container key: whether the industry subsystem is loaded (for dependency checks). */
 	public const CONTAINER_KEY_INDUSTRY_LOADED = 'industry_packs_loaded';
 
-	/** Container key: industry pack registry (list/get/validate). Placeholder until implemented. */
+	/** Container key: industry pack registry (list/get/validate). */
 	public const CONTAINER_KEY_INDUSTRY_PACK_REGISTRY = 'industry_pack_registry';
 
 	/** Container key: industry profile store (primary/secondary industry). */

@@ -30,7 +30,7 @@ use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
  * Renders Build Plan detail with three-zone layout. Consumes UI state from Build_Plan_UI_State_Builder.
- * Row/detail and step-specific tables are placeholders in this prompt.
+ * Displays step list, row/detail panels, and bulk action controls for all implemented step types.
  */
 final class Build_Plan_Workspace_Screen {
 
