@@ -9,15 +9,24 @@
 ## [Unreleased]
 
 ### Added
-- (Add items as work completes.)
 - **Template library:** For expansion counts, screens, compatibility, and limitations, see [template-library-release-notes-addendum.md](template-library-release-notes-addendum.md).
 - **Form provider integration:** Provider-backed form sections (category form_embed) and request-form page template (`pt_request_form`). Form_Provider_Registry (provider_id + form_id); shortcode assembly; Build Plan/execution dependency validation (block when provider missing); finalization form_dependency; security validation and hardening; E2E acceptance structure. Operator guide: [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md). Release gate and extension backlog: [form-provider-integration-review-packet.md](form-provider-integration-review-packet.md), [form-provider-extension-backlog.md](form-provider-extension-backlog.md).
 
-### Changed
-- (None.)
+### Changed (Production Hardening Passes — 2026-03-19)
+- **P1 — Tokens step (Build Plan):** Tokens step UI aligned with real execution pipeline (`Token_Set_Job_Service`, `Apply_Token_Set_Handler`). Removed "execution not implemented" copy. Placeholder diff fields removed. Row/bulk action paths governed with capability, nonce, validation, and structured audit logging.
+- **P2 — SEO step (Build Plan):** SEO step explicitly advisory-only; execution affordances removed where no handler exists. Step summary, row state, and detail payloads state advisory posture consistently.
+- **P3 — Industry Bundle import/apply screen:** Stale "preview-only / apply not implemented" language removed. Screen contract and copy reflect the real upload→preview→conflict-review→apply flow.
+- **P4 — Versions, Bootstrap, Lifecycle wording:** Placeholder-driven and "later prompt / future" framing removed from `Versions.php`, `Plugin.php`, `Module_Registrar.php`, `Lifecycle_Manager.php`. Comments describe stable production behavior.
+- **P2A — Onboarding forms:** Full guided step forms implemented in `Onboarding_Screen` for all 7 profile steps. Real save/load/prefill using `Profile_Store`. Provider setup routes through existing `AI_Providers_Screen`. Review step shows stored data and readiness. All actions capability- and nonce-gated.
+- **P2B — Placeholder copy removal:** User-visible placeholder/deferred-work copy removed from `Onboarding_Screen` and `New_Page_Creation_Detail_Builder`. No "future update," "coming soon," or "out of scope" copy in released surfaces.
+- **P3B — Stale comment/docblock cleanup:** Stale implementation-history wording removed from `Industry_Packs_Module`, `Crawler_Comparison_Screen`, `Build_Plan_Workspace_Screen`, `Admin_Router_Provider`, `Page_Templates_Directory_Screen`, `Section_Templates_Directory_Screen`, `Onboarding_Screen`.
+- **P4A — Execution action types de-scope:** `assign_page_hierarchy` and `create_menu` explicitly de-scoped from executable action set (mirrors `UPDATE_PAGE_METADATA` posture). Removed from `Execution_Action_Types::ALL`; documented with rationale. No misleading executable affordances.
+- **P5B — Profile snapshot persistence de-scope:** `Profile_Snapshot_Data` remains schema-only for v1; no persistence implemented. Formally documented.
+- **P6B — AI cost/usage de-scope:** `cost_placeholder => null` removed from `Concrete_AI_Provider_Driver` and `Additional_AI_Provider_Driver` usage structs. Token counts (prompt, completion, total) are the authoritative v1 operational metric. Docblocks updated.
 
 ### Fixed
-- (None.)
+- Stale-count test drift corrected: `Assignment_Types_Test` (5→6 types), `Export_Bundle_Schema_Test` (5→6 modes), `Onboarding_State_Machine_Contract_Test` (11→12 steps), `Composition_Filter_State_Test` (100→`MAX_PER_PAGE`=50).
+- `support-triage-guide.md` §6 Diagnostics screen copy updated from placeholder to production-accurate de-scoped wording.
 
 ### Migration / compatibility
 - (Carry forward from last release unless updated.)

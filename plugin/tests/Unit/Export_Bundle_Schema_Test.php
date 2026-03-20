@@ -73,12 +73,15 @@ final class Export_Bundle_Schema_Test extends TestCase {
 		$this->assertFalse( Export_Bundle_Schema::is_allowed_category( 'unknown_cat' ) );
 	}
 
-	public function test_export_mode_keys_all_returns_five_modes(): void {
+	public function test_export_mode_keys_all_returns_six_modes(): void {
 		$all = Export_Mode_Keys::all();
-		$this->assertCount( 5, $all );
+		$this->assertCount( 6, $all );
 		$this->assertContains( Export_Mode_Keys::FULL_OPERATIONAL_BACKUP, $all );
+		$this->assertContains( Export_Mode_Keys::PRE_UNINSTALL_BACKUP, $all );
 		$this->assertContains( Export_Mode_Keys::SUPPORT_BUNDLE, $all );
 		$this->assertContains( Export_Mode_Keys::TEMPLATE_ONLY_EXPORT, $all );
+		$this->assertContains( Export_Mode_Keys::PLAN_ARTIFACT_EXPORT, $all );
+		$this->assertContains( Export_Mode_Keys::UNINSTALL_SETTINGS_PROFILE_ONLY, $all );
 	}
 
 	public function test_export_mode_keys_is_valid(): void {

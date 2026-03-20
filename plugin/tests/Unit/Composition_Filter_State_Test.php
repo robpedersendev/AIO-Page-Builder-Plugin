@@ -52,6 +52,6 @@ final class Composition_Filter_State_Test extends TestCase {
 	public function test_paged_and_per_page_bounded(): void {
 		$state = new Composition_Filter_State( '', '', '', '', '', '', 0, 200 );
 		$this->assertSame( 1, $state->get_paged() );
-		$this->assertSame( 100, $state->get_per_page() );
+		$this->assertSame( Large_Library_Query_Service::MAX_PER_PAGE, $state->get_per_page() );
 	}
 }

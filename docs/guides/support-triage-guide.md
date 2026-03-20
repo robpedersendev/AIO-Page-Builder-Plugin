@@ -74,10 +74,9 @@ Do not ask for or store raw API keys, passwords, or unredacted logs.
 ## 6. Diagnostics screen
 
 - **Screen:** **AIO Page Builder → Diagnostics** (`aio-page-builder-diagnostics`).  
-- **Current state:** Placeholder (“Not yet implemented”). Future: environment validation and diagnostics. Structured logging is available for internal use.
+- **Current state:** The Diagnostics screen is registered in the admin menu but does not yet surface environment or validation summaries in the UI. Structured logging is available internally and exportable via Support Bundle. This screen is de-scoped for v1; detailed diagnostics are available through Queue and Logs and the Support Bundle export.
 
-When Diagnostics is implemented, use it for environment and validation summaries as documented in the product at that time.
-
+Until the Diagnostics screen is expanded, use Queue and Logs (Critical Errors tab) for internal error summaries, and Import / Export (Support Bundle) for operator diagnostics.
 ---
 
 ## 7. Cross-references

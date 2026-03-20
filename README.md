@@ -1,36 +1,72 @@
-# Private Plugin Base
+# AIO Page Builder
 
-A private-distribution WordPress plugin base built to WordPress-style engineering standards.
+Privately distributed WordPress plugin. Provides AI-assisted page planning, Build Plan review, template library, and execution for WordPress sites.
+
+---
 
 ## Requirements
 
-- WordPress 6.6 or later
-- PHP 8.1 or later
+| Dependency | Minimum | Notes |
+|------------|---------|-------|
+| WordPress | 6.6 | Activation blocked below minimum |
+| PHP | 8.1 | Activation blocked below minimum |
+| Advanced Custom Fields Pro | 6.2 | Required; activation blocked if missing or below minimum |
+| GenerateBlocks | 2.0 | Required; activation blocked if missing or below minimum |
+| GeneratePress (theme) | — | Preferred; other standards-compliant block-capable themes supported |
+| LPagery | — | Optional; token workflows degrade gracefully when absent |
+
+---
 
 ## Installation
 
-1. Upload the plugin directory to `wp-content/plugins/`, or clone into that path.
-2. Activate the plugin via **Plugins** in the WordPress admin.
+1. Upload the plugin ZIP to **WordPress Admin → Plugins → Add New → Upload Plugin**.
+2. Activate. The plugin validates environment requirements at activation; a clear admin notice is shown if requirements are not met.
+3. Complete onboarding via **AIO Page Builder → Onboarding & Profile**.
+4. Configure an AI provider via **AIO Page Builder → AI Providers**.
 
-## Development
+---
 
-- **Start local environment:** `npm run wp-env:start`
-- **Stop environment:** `npm run wp-env:stop`
-- **Lint PHP:** `npm run lint:php`
-- **Auto-fix PHP:** `npm run fix:php`
-- **Run tests:** `npm run test:php` or `composer run phpunit`
-- **Static analysis:** `npm run analyse:php` or `composer run phpstan`
+## Distribution
+
+This plugin is privately distributed. It is not published to the WordPress Plugin Directory. Update delivery is managed via the private distribution channel. Do not redistribute without authorization.
+
+---
+
+## Operational Reporting
+
+This plugin sends mandatory operational reports (install notification, periodic heartbeat, developer error reports) to the plugin operator's server. Reporting is disclosed on **AIO Page Builder → Privacy, Reporting & Settings**. Reporting failure does not break core plugin functionality. No user personal data is included in reports. See the admin operator guide for full disclosure details.
+
+---
 
 ## Documentation
 
-- [Engineering Standard](docs/standards/ENGINEERING_STANDARD.md)
-- [Security Standard](docs/standards/SECURITY_STANDARD.md)
-- [Reporting Exception](docs/standards/REPORTING_EXCEPTION.md)
-- [Portability and Uninstall](docs/standards/PORTABILITY_AND_UNINSTALL.md)
-- [Decision Log](docs/decisions/DECISION_LOG.md)
-- [Definition of Done](docs/qa/DEFINITION_OF_DONE.md)
-- [Release Checklist](docs/qa/RELEASE_CHECKLIST.md)
+| Guide | Purpose |
+|-------|---------|
+| [Admin & Operator Guide](docs/guides/admin-operator-guide.md) | Full admin screen and workflow reference |
+| [End-User Workflow Guide](docs/guides/end-user-workflow-guide.md) | Onboarding, Build Plan review, and execution |
+| [Template Library Operator Guide](docs/guides/template-library-operator-guide.md) | Section/page template directories, compare, compositions |
+| [Template Library Editor Guide](docs/guides/template-library-editor-guide.md) | Choosing templates; one-pagers; compositions |
+| [Template Library Support Guide](docs/guides/template-library-support-guide.md) | Template diagnostics, compliance, support bundles |
+| [Support Triage Guide](docs/guides/support-triage-guide.md) | Logs, support bundle, redaction, issue triage |
+
+---
+
+## Known Limitations (RC1)
+
+- Diagnostics screen is registered but does not yet surface environment/validation summaries in the UI (de-scoped for v1).
+- Multisite: site-level operation supported; network-wide centralized management not validated.
+- PHP 8.4+ not in validated set; add to compatibility matrix when routinely tested.
+- Rollback and diff UX may be enhanced in future releases.
+- 25 pre-existing PHPUnit test failures (none are user-facing functional regressions); see [known-risk-register.md](docs/release/known-risk-register.md) §3 (TF-1).
+
+---
+
+## Changelog
+
+See [docs/release/changelog.md](docs/release/changelog.md).
+
+---
 
 ## License
 
-GPLv2 or later. See [LICENSE](LICENSE) if present.
+Privately distributed. All rights reserved. Not for public redistribution.

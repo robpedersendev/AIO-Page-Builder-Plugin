@@ -17,11 +17,12 @@ require_once $plugin_root . '/src/Domain/Storage/Assignments/Assignment_Types.ph
 
 final class Assignment_Types_Test extends TestCase {
 
-	public function test_all_returns_five_types(): void {
+	public function test_all_returns_six_types(): void {
 		$all = Assignment_Types::all();
-		$this->assertCount( 5, $all );
+		$this->assertCount( 6, $all );
 		$this->assertContains( Assignment_Types::PAGE_FIELD_GROUP, $all );
 		$this->assertContains( Assignment_Types::PAGE_TEMPLATE, $all );
+		$this->assertContains( Assignment_Types::PAGE_COMPOSITION, $all );
 		$this->assertContains( Assignment_Types::PLAN_OBJECT, $all );
 		$this->assertContains( Assignment_Types::TEMPLATE_DEPENDENCY, $all );
 		$this->assertContains( Assignment_Types::COMPOSITION_SECTION, $all );

@@ -21,11 +21,12 @@ final class Onboarding_State_Machine_Contract_Test extends TestCase {
 
 	public function test_ordered_steps_match_contract(): void {
 		$ordered = Onboarding_Step_Keys::ordered();
-		$this->assertCount( 11, $ordered, 'Contract defines 11 steps' );
+		$this->assertCount( 12, $ordered, 'Contract defines 12 steps' );
 		$this->assertSame( Onboarding_Step_Keys::WELCOME, $ordered[0] );
-		$this->assertSame( Onboarding_Step_Keys::SUBMISSION, $ordered[10] );
-		$this->assertSame( Onboarding_Step_Keys::REVIEW, $ordered[9] );
 		$this->assertSame( Onboarding_Step_Keys::PROVIDER_SETUP, $ordered[8] );
+		$this->assertSame( Onboarding_Step_Keys::TEMPLATE_PREFERENCES, $ordered[9] );
+		$this->assertSame( Onboarding_Step_Keys::REVIEW, $ordered[10] );
+		$this->assertSame( Onboarding_Step_Keys::SUBMISSION, $ordered[11] );
 	}
 
 	public function test_overall_statuses_include_required(): void {
