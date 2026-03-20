@@ -32,6 +32,12 @@ final class Export_Bundle_Schema {
 		'compatibility_flags',
 	);
 
+	/**
+	 * Sub-key under the profiles category that carries serialized profile snapshots (v2).
+	 * Export assemblers include this key when exporting the profiles category.
+	 */
+	public const PROFILES_SNAPSHOT_HISTORY_KEY = 'profile_snapshot_history';
+
 	/** Included data category keys (spec §52.4). Styling (Prompt 257): global settings and per-entity payloads. */
 	public const INCLUDED_CATEGORIES = array(
 		'settings',

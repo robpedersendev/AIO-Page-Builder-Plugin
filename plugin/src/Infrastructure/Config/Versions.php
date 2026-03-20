@@ -35,6 +35,9 @@ final class Versions {
 	/** Export bundle/manifest schema version. */
 	public const EXPORT_SCHEMA_VERSION = '1';
 
+	/** Profile snapshot schema version (v2-scope-backlog.md §3). */
+	public const PROFILE_SCHEMA_VERSION = '1';
+
 	/**
 	 * Stable version map keys. Do not rename; append only for new domains.
 	 *

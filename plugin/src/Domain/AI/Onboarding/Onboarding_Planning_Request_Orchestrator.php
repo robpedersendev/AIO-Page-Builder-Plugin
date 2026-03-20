@@ -432,6 +432,8 @@ final class Onboarding_Planning_Request_Orchestrator {
 				$post_id = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_COMPLETED, $artifacts );
 				$this->connection_test_service->record_last_successful_use( $effective_provider_id, $created_at );
 				$this->link_run_to_draft( $draft, $run_id, $post_id );
+				// * Fires after a successful AI run so snapshot capture and other listeners can react.
+				\do_action( 'aio_pb_onboarding_run_completed', $run_id );
 				return new Planning_Request_Result(
 					true,
 					Planning_Request_Result::STATUS_SUCCESS,

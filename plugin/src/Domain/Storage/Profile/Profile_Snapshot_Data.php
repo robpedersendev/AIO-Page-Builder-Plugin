@@ -1,10 +1,9 @@
 <?php
 /**
- * Profile snapshot payload shape (spec §22.11, SPR-010). No persistence in v1; see profile-snapshot-schema.md.
+ * Profile snapshot immutable value object (spec §22.11, v2-scope-backlog.md §3).
  *
- * Schema/type definition for v2 implementation. Used for type-hint and documentation in v1.
- * TODO: v2 — implement full persistence: storage table, Profile_Snapshot_Repository, capture on onboarding
- *   completion and profile save, history UI, export/restore inclusion.
+ * Fields: snapshot_id, scope_type, scope_id, created_at, profile_schema_version,
+ * brand_profile, business_profile, source. Persisted via Profile_Snapshot_Repository.
  *
  * @package AIOPageBuilder
  */
@@ -16,8 +15,7 @@ namespace AIOPageBuilder\Domain\Storage\Profile;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Immutable snapshot payload: snapshot_id, scope_type, scope_id, created_at, profile_schema_version, brand_profile, business_profile.
- * All fields and nested shape are defined in docs/schemas/profile-snapshot-schema.md. This class exists for type-hint and documentation only; no persistence or UI execution.
+ * Immutable snapshot payload. All fields are set at construction time and are read-only after.
  */
 final class Profile_Snapshot_Data {
 
@@ -30,6 +28,11 @@ final class Profile_Snapshot_Data {
 	public array $brand_profile;
 	/** @var array<string, mixed> Shape per profile-schema.md §4–9 */
 	public array $business_profile;
+	/**
+	 * Human-readable capture source: brand_profile_merge, business_profile_merge,
+	 * onboarding_completion, restore_event, manual, or other.
+	 */
+	public string $source;
 
 	public function __construct(
 		string $snapshot_id,
@@ -38,7 +41,8 @@ final class Profile_Snapshot_Data {
 		string $created_at,
 		string $profile_schema_version,
 		array $brand_profile,
-		array $business_profile
+		array $business_profile,
+		string $source = 'manual'
 	) {
 		$this->snapshot_id            = $snapshot_id;
 		$this->scope_type             = $scope_type;
@@ -47,5 +51,6 @@ final class Profile_Snapshot_Data {
 		$this->profile_schema_version = $profile_schema_version;
 		$this->brand_profile          = $brand_profile;
 		$this->business_profile       = $business_profile;
+		$this->source                 = $source;
 	}
 }

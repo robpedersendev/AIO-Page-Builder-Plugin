@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Admin\Screens\AI\AI_Providers_Screen;
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
+use AIOPageBuilder\Admin\Screens\AI\Profile_Snapshot_History_Panel;
 use AIOPageBuilder\Admin\Screens\AI\Prompt_Experiments_Screen;
 use AIOPageBuilder\Admin\Screens\Analytics\Template_Analytics_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Analytics_Screen;
@@ -158,6 +159,8 @@ final class Admin_Menu {
 		$acf_diagnostics                       = new ACF_Architecture_Diagnostics_Screen( $this->container );
 		$form_provider_health                  = new Form_Provider_Health_Screen( $this->container );
 		$onboarding                            = new Onboarding_Screen( $this->container );
+		$profile_snapshots                     = new Profile_Snapshot_History_Panel( $this->container );
+		$profile_snapshots->register_hooks();
 		$crawler_sessions                      = new Crawler_Sessions_Screen( $this->container );
 		$crawler_comparison                    = new Crawler_Comparison_Screen( $this->container );
 		$ai_runs                               = new AI_Runs_Screen( $this->container );
@@ -260,6 +263,15 @@ final class Admin_Menu {
 			$onboarding->get_capability(),
 			Onboarding_Screen::SLUG,
 			array( $onboarding, 'render' )
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			$profile_snapshots->get_title(),
+			__( 'Profile History', 'aio-page-builder' ),
+			$profile_snapshots->get_capability(),
+			Profile_Snapshot_History_Panel::SLUG,
+			array( $profile_snapshots, 'render' )
 		);
 
 		add_submenu_page(

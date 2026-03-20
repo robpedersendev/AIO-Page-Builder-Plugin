@@ -44,6 +44,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Reporting_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Build_Plan_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Repositories_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Storage_Services_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\Profile_Snapshot_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Styling_Provider;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 
@@ -113,6 +114,7 @@ final class Module_Registrar {
 			new AI_Experiments_Provider(),
 			new AI_Runs_Provider(),
 			new Storage_Services_Provider(),
+			new Profile_Snapshot_Provider(),
 			new ExportRestore_Provider(),
 			new Onboarding_Provider(),
 			new Styling_Provider(),

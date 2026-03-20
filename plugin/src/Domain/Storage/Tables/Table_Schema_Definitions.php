@@ -229,6 +229,27 @@ final class Table_Schema_Definitions {
 ) $charset;",
 		);
 
+		$defs[] = array(
+			'name' => $prefix . Table_Names::PROFILE_SNAPSHOTS,
+			'sql'  => "CREATE TABLE `{$prefix}" . Table_Names::PROFILE_SNAPSHOTS . "` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `snapshot_id` varchar(64) NOT NULL,
+  `scope_type` varchar(32) NOT NULL DEFAULT 'other',
+  `scope_id` varchar(128) NOT NULL DEFAULT '',
+  `source` varchar(64) NOT NULL DEFAULT 'manual',
+  `profile_schema_version` varchar(16) NOT NULL DEFAULT '1',
+  `brand_profile` longtext NOT NULL,
+  `business_profile` longtext NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `schema_version` varchar(16) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `snapshot_id` (`snapshot_id`),
+  KEY `scope_type` (`scope_type`),
+  KEY `source` (`source`),
+  KEY `created_at` (`created_at`)
+) $charset;",
+		);
+
 		return $defs;
 	}
 }

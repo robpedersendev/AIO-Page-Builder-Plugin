@@ -40,6 +40,9 @@ final class Table_Names {
 	/** §11.8 Reporting records. */
 	public const REPORTING_RECORDS = 'aio_reporting_records';
 
+	/** §11.9 Profile snapshots (v2-scope-backlog.md §3). */
+	public const PROFILE_SNAPSHOTS = 'aio_profile_snapshots';
+
 	/** @var array<int, string>|null */
 	private static ?array $all = null;
 
@@ -61,6 +64,7 @@ final class Table_Names {
 			self::TOKEN_SETS,
 			self::ASSIGNMENT_MAPS,
 			self::REPORTING_RECORDS,
+			self::PROFILE_SNAPSHOTS,
 		);
 		return self::$all;
 	}

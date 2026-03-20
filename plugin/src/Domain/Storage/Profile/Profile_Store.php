@@ -196,6 +196,7 @@ final class Profile_Store {
 
 	/**
 	 * Merges partial brand into current brand; only keys present in $partial update; then normalizes for storage.
+	 * Fires aio_pb_brand_profile_merged with $this after the write so snapshot services can react.
 	 *
 	 * @param array<string, mixed> $partial Keys to update (nested keys replace at that level).
 	 * @return void
@@ -204,10 +205,12 @@ final class Profile_Store {
 		$current = $this->get_brand_profile();
 		$merged  = $this->array_merge_deep( $current, $partial );
 		$this->set_brand_profile( $merged );
+		\do_action( 'aio_pb_brand_profile_merged', $this );
 	}
 
 	/**
 	 * Merges partial business into current business; only keys present in $partial update; then normalizes for storage.
+	 * Fires aio_pb_business_profile_merged with $this after the write so snapshot services can react.
 	 *
 	 * @param array<string, mixed> $partial Keys to update.
 	 * @return void
@@ -216,6 +219,7 @@ final class Profile_Store {
 		$current = $this->get_business_profile();
 		$merged  = $this->array_merge_deep( $current, $partial );
 		$this->set_business_profile( $merged );
+		\do_action( 'aio_pb_business_profile_merged', $this );
 	}
 
 	/**
