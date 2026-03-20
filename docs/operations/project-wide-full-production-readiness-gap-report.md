@@ -1,29 +1,29 @@
 # Project-Wide Full Production Readiness Gap Report
 
-**Document type:** Audit report (Prompt 643)  
+**Document type:** Audit report (updated Mar 2026, from Prompt 643 baseline)  
 **Strict standard:** Production-ready = no deferred work acceptable, no misleading/unavailable behavior, no partially implemented required features, all decisions resolved, all required systems hardened and supportable.  
-**Source:** Direct codebase and docs inspection; master spec; approved decisions; Prompts 620–645 outputs.
+**Source:** Direct codebase and docs inspection; master spec; approved decisions; full rescan covering all src/ files.
 
 ---
 
 ## 1. Title
 
-**AIO Page Builder — Full Production Readiness Gap Report (Strict Definition)**
+**AIO Page Builder — Full Production Readiness Gap Report (Strict Definition, Mar 2026 Rescan)**
 
 ---
 
 ## 2. Executive Summary
 
-Under the strict definition that **nothing important may remain deferred, no incomplete feature may remain exposed, and no partially implemented feature may be treated as acceptable**, the plugin is **not yet production-ready**. This report identifies every remaining gap.
+Significant progress since the Prompt 643 baseline. The following major blockers are now resolved: industry bundle apply handler + persistence, admin router (real implementation), helper-doc URL resolver, Build Plan Analytics rollback frequency, crawler start/retry actions, AI Providers test/update credential handlers, Versions.php placeholder wording, Bootstrap/Lifecycle wording, Build Plan Steps 4 (Tokens) and 5 (SEO), Industry Bundle preview screen stale copy, finalization step placeholder fields, and page/section template detail screens.
 
-**Summary of gaps:**
+The plugin is **still not production-ready** under the strict definition. The remaining blockers are a smaller, tighter set.
 
-- **Decision blockers:** 1 (Industry bundle apply persistence/design).
-- **Implementation blockers:** Multiple (onboarding full step forms, admin router real implementation, environment/lifecycle placeholders, AI provider mutating actions, industry bundle apply handler, Build Plan workspace row/detail completeness, crawler actions, finalization/helper-doc placeholders, and others).
-- **Exposed-but-unavailable / misleading:** Several screens or actions present UI that implies capability not yet implemented (onboarding steps, AI test connection/update credential, crawler start/retry, industry bundle apply, section helper-doc links, template directory detail/preview).
-- **Hardening / QA / release:** Release checklist largely unchecked; Plugin Check, compatibility matrix, migration matrix, release-candidate closure, doc-to-UI consistency, and security redaction review remain as release blockers.
+**Summary of remaining gaps:**
 
-The report below classifies each major area and lists exact next actions. No deferred item is treated as acceptable for production.
+- **User-visible placeholder copy (high priority):** Onboarding step UI displays "will be added in a future update" copy to users; `New_Page_Creation_Detail_Builder` shows "Post-build placeholder:" as a label in the admin.
+- **Stale production wording (comment/docblock drift):** Six comment or docblock locations still contain "future prompts", "nonce reserved for future", "placeholders in this prompt", or "out of scope" framing.
+- **Unimplemented functionality:** Onboarding full step forms (decision/implementation required); `assign_page_hierarchy` and `create_menu` handlers (decision required); profile snapshot persistence (deferred by decision, intentional); AI cost modeling (deferred by decision, intentional).
+- **Hardening/QA/release:** Release checklist, Plugin Check, compatibility/migration matrices, security review, doc-to-UI consistency remain as release blockers.
 
 ---
 
@@ -31,7 +31,7 @@ The report below classifies each major area and lists exact next actions. No def
 
 For this audit, **production-ready** means:
 
-1. **No deferred work is acceptable** — Every item previously labeled “deferred” must either be implemented before production or removed from required scope via an explicit approved decision.
+1. **No deferred work is acceptable** — Every item previously labeled "deferred" must either be implemented before production or removed from required scope via an explicit approved decision.
 2. **No misleading, exposed, or unavailable behavior is acceptable** — Surfaces must not imply support for behavior that is not implemented or is placeholder-only.
 3. **No partially implemented required feature is acceptable** — Required features (per master spec and approved decisions) must be complete end-to-end.
 4. **No unresolved product/spec decision that affects implementation is acceptable** — Decisions that block implementation must be closed before production.
@@ -41,10 +41,10 @@ For this audit, **production-ready** means:
 
 ## 4. Current Production Readiness Status
 
-**Verdict: Not production-ready** under the strict definition above.
+**Verdict: Not production-ready** under the strict definition above, but significantly closer than the Prompt 643 baseline.
 
-- **Fully implemented and truly production-ready:** Core execution engine (create_page, replace_page, update_menu, apply_token_set, finalize_plan), rollback/history v1 (page replacement + token changes), capability model, import/export with ZIP size cap, Import/Restore wizard flow (preview → conflicts → scope → explicit confirm), Build Plan list/analytics/workspace structure (with noted placeholder areas) including Step 2 deny, template registries and compositions, diagnostics (real state), queue/logs, ACF/industry/restore stabilization, and many unit tests.
-- **Blocking production:** Unresolved decisions (1), partially implemented or placeholder areas (onboarding, admin router, environment/lifecycle, AI providers, industry bundle apply, Build Plan workspace row/detail, crawler, finalization/helper-doc, version/analytics stubs), exposed-but-unavailable or misleading UI, and incomplete hardening/QA/release gates.
+- **Fully implemented and truly production-ready:** Core execution engine (create_page, replace_page, update_menu, apply_token_set, finalize_plan), rollback/history v1, capability model, import/export with ZIP size cap, Import/Restore wizard, Build Plan structure (Steps 1–7) with Tokens step execution, SEO step advisory-only, Step 2 deny, template registries, section/page template detail screens, composition screens, diagnostics, queue/logs, ACF/industry/restore stabilization, crawler start/retry, AI provider test/update handlers, admin router, helper-doc URL resolver, industry bundle apply, analytics rollback frequency, and broad unit tests.
+- **Blocking production:** User-visible placeholder copy in onboarding; stale comment drift in six files; onboarding full step forms unimplemented; `assign_page_hierarchy`/`create_menu` handler absence; and incomplete hardening/QA/release gates.
 
 ---
 
@@ -52,20 +52,31 @@ For this audit, **production-ready** means:
 
 | Area | Status | Evidence / Notes |
 |------|--------|------------------|
-| **Execution engine — core actions** | Implemented | Create_Page_Handler, Replace_Page_Handler, Apply_Menu_Change_Handler, Apply_Token_Set_Handler, Finalize_Plan_Handler registered; Bulk_Executor maps plan items to these; Single_Action_Executor refuses unregistered types (no silent stub execution in production path). |
-| **Rollback / history v1** | Implemented | Rollback_Executor with Rollback_Page_Replacement_Handler and Rollback_Token_Set_Handler; Rollback_Eligibility_Service; operational snapshots for REPLACE_PAGE and APPLY_TOKEN_SET; list_rollback_entries_for_plan; History step shows rollback-capable rows and “Request rollback” (Prompt 642). |
-| **Capability model** | Implemented | Capabilities.php defines all capabilities; screens and Admin_Menu use only defined capabilities; EXECUTE_ROLLBACKS enforced at rollback request; capability_checked in actor_context for rollback. |
-| **Import/export ZIP size cap** | Implemented | Import_Export_Screen: MAX_ZIP_UPLOAD_BYTES, size check before move_uploaded_file, ERROR_CODE_FILE_TOO_LARGE; unit test. |
-| **Import / Restore wizard** | Implemented | Import/Restore flow now requires preview + conflict review + restore scope selection + explicit confirmation before writing plugin-owned state (spec §52). |
-| **Token application truthfulness** | Implemented | Tokens step: bulk apply/deny disabled; copy states “recommendations are for review only.” No UI implies apply is available. |
-| **UPDATE_PAGE_METADATA de-scope** | Implemented | Removed from executable mapping and health/recovery/logs; SEO step recommendation-only; type constant retained for contract stability. |
-| **Build Plan list, analytics, workspace structure** | Implemented | Build_Plans_Screen, Build_Plan_Analytics_Screen, Build_Plan_Workspace_Screen with step routing, capabilities, rollback request handling; step UI services for existing page, new page, navigation, tokens, SEO, finalization, history. |
-| **Build Plan Step 2 deny** | Implemented | Step 2 supports per-row deny and “Deny All Eligible” with confirmation; denied items are marked rejected, removed from unresolved counts, remain visible in plan history, and are excluded from execution selection. |
-| **Template registries and compositions** | Implemented | Section/Page template registries, directory screens, composition builder state; contracts and taxonomy followed. |
-| **Diagnostics (real state)** | Implemented | Diagnostics_Screen docblock states “No placeholder; real state only.” |
-| **Queue and logs** | Implemented | Queue_Logs_Screen, job services, retry/recovery, health summary; rollback job flow. |
-| **ACF / industry / restore stabilization** | Implemented | Per backlog-close-report and stabilization-pass-summary. |
-| **Unit tests (broad)** | Implemented | Execution, Rollback, BuildPlan, Import/Export, Industry, and other domains have unit tests; rollback and snapshot tests updated for v1. |
+| **Execution engine — core actions** | Implemented | Create_Page_Handler, Replace_Page_Handler, Apply_Menu_Change_Handler, Apply_Token_Set_Handler, Finalize_Plan_Handler; Bulk_Executor maps plan items; Single_Action_Executor refuses unregistered types. |
+| **Build Plan Step 4 — Tokens (executable)** | Implemented | Tokens_Step_UI_Service updated; bulk + row execute/retry with nonce + capability + audit log; execution reaches Apply_Token_Set_Handler. |
+| **Build Plan Step 5 — SEO (advisory-only)** | Implemented | SEO_Media_Step_UI_Service: advisory-only, no execute/retry affordances, truthful copy. Row_Action_Resolver excludes execute/retry for SEO items. |
+| **Rollback / history v1** | Implemented | Rollback_Executor; Rollback_Eligibility_Service; operational snapshots for REPLACE_PAGE and APPLY_TOKEN_SET; History step shows rollback-capable rows; "Request rollback" capability-gated. |
+| **Capability model** | Implemented | Capabilities.php; all screens enforce capabilities at render and action time. |
+| **Import/export + ZIP size cap** | Implemented | Import_Export_Screen: MAX_ZIP_UPLOAD_BYTES, size check, ERROR_CODE_FILE_TOO_LARGE. |
+| **Import / Restore wizard** | Implemented | Full flow: upload → preview → conflict review → restore scope → explicit confirm. |
+| **Industry bundle apply** | Implemented | Industry_Bundle_Apply_Service: validates bundle, resolves conflicts with explicit decisions, persists payload + conflicts as options, updates registry and merge state. |
+| **Build Plan list, analytics, workspace structure** | Implemented | Build_Plans_Screen, Build_Plan_Analytics_Screen (including real rollback frequency from snapshot data), Build_Plan_Workspace_Screen with step routing and per-step UI services for all steps. |
+| **Build Plan Step 2 deny** | Implemented | Per-row deny and "Deny All Eligible" with confirmation; denied items marked rejected. |
+| **Admin router** | Implemented | Admin_Router_Provider registers real Admin_Router (not stdClass); Helper_Doc_Url_Resolver registered and resolves URLs from Documentation_Registry. |
+| **Helper-doc URL resolver** | Implemented | Helper_Doc_Url_Resolver: resolves by section_key from Documentation_Registry; returns truthful UNAVAILABLE_MESSAGE when doc absent. |
+| **Template registries + detail screens** | Implemented | Section/Page template directories, Section_Template_Detail_Screen, Page_Template_Detail_Screen (metadata, field summary, one-pager, rendered preview); Compositions screen. |
+| **Crawler start/retry** | Implemented | Crawler_Sessions_Screen: aio_pb_start_crawl and aio_pb_retry_crawl with check_admin_referer; Crawl_Enqueue_Service wired. |
+| **AI Providers test/update** | Implemented | AI_Providers_Screen: maybe_handle_test_connection and maybe_handle_update_credential; nonce + capability protected; redirects with result notice. |
+| **Analytics — rollback frequency** | Implemented | Build_Plan_Analytics_Service.get_rollback_frequency_summary: queries snapshot data; computes completed_rollbacks, eligible_executions, rollback_rate. |
+| **Diagnostics** | Implemented | Diagnostics_Screen: "No placeholder; real state only." |
+| **Queue and logs** | Implemented | Queue_Logs_Screen, job services, retry/recovery, health summary, rollback job flow. |
+| **Versions.php** | Implemented | No placeholder wording; stable contract versions; keys documented. |
+| **Bootstrap / Lifecycle wording** | Implemented | Plugin.php, Module_Registrar.php, Lifecycle_Manager.php: no "later prompts / future logic" wording; stable production descriptions. |
+| **UPDATE_PAGE_METADATA de-scope** | Implemented | Removed from executable mapping; type constant retained for contract stability. |
+| **Industry bundle preview screen** | Implemented | No stale "preview-only / apply not implemented" copy; screen matches real flow. |
+| **Finalization step** | Implemented | No conflict_summary_placeholder or preview_link_placeholder; real data: finalization buckets, conflict count/messages, completion summary from plan state. |
+| **Environment_Validator** | Implemented | Real checks: platform, required_dependency, optional_integration, theme_posture, runtime_readiness, extension_pack. |
+| **Unit tests (broad)** | Implemented | Execution, Rollback, BuildPlan, Import/Export, Industry, and domain tests; rollback and snapshot tests updated. |
 
 ---
 
@@ -73,11 +84,9 @@ For this audit, **production-ready** means:
 
 | Item | Current status | Why not production-ready | Next action |
 |------|----------------|---------------------------|-------------|
-| **Build Plan workspace row/detail tables** | Structure present; content described as “placeholders in this prompt” (Build_Plan_Workspace_Screen). | Row/detail and step-specific tables may not meet full spec or supportability for production. | Confirm spec §31 / build-plan-admin-ia-contract for row/detail completeness; implement or explicitly de-scope and document. |
-| **Finalization step** | conflict_summary_placeholder, preview_link_placeholder, deferred count. | Placeholders may mislead or leave workflows incomplete. | Define real conflict summary and preview link behavior or remove from required scope and update copy. |
-| **Section template detail — helper-doc URL** | Section_Template_Detail_State_Builder: “Helper-doc URL: placeholder; replace with real helper-doc resolver when available.” | Helper links may be broken or misleading. | Implement helper-doc URL resolver per spec §15 or remove/gate links and document. |
-| **Build_Plan_Analytics_Service — rollback frequency** | “Stub: uses plan history only; rollback table not queried (spec §59.12).” | Analytics may underreport or misreport rollback usage. | Implement rollback frequency from snapshot/rollback data or document as “plan-level only” and accept. |
-| **Versions.php** | “Initial values are placeholders”; global_schema, table_schema, registry_schema, export_schema “placeholder until …”. | Version/schema tracking may be inconsistent for support and upgrades. | Advance version map when schemas are locked; document or implement. |
+| **Onboarding screen — user-visible placeholder copy** | Screen renders step shell and draft save/load. Step forms show "will be added in a future update." | Users see steps and click Next, but see deferred-work copy (`line 466, 495`). Misleading in production. | Either implement real step forms or rework copy to say "form fields not yet available" without implying "future update" phrasing; remove `render_step_placeholder` method comment "out of scope for this prompt" (line 447). |
+| **New_Page_Creation_Detail_Builder — "Post-build placeholder:" label** | Detail panel shows "Post-build placeholder: [status]" as a user-visible admin label (line 295). | User-visible placeholder label in a production admin panel is unacceptable. | Rename to a truthful label: "Post-build status:" or "Build result:". |
+| **Industry_Packs_Module.php — stale constant comment** | CONTAINER_KEY_INDUSTRY_PACK_REGISTRY constant has comment "Placeholder until implemented." (line 30). The registry IS registered with a real Industry_Pack_Registry. | Comment misrepresents the implementation state. | Update constant docblock to describe the registered Industry_Pack_Registry. |
 
 ---
 
@@ -85,15 +94,7 @@ For this audit, **production-ready** means:
 
 | Item | Location | What exists | What is missing | Why it blocks production |
 |------|----------|-------------|-----------------|---------------------------|
-| **Onboarding** | Onboarding_Screen.php | Step shell, step routing. | Full step forms; “Renders placeholder content for the current step. Full step forms are out of scope for this prompt.” | Spec §23 requires guided onboarding; users see steps but cannot complete real intake. |
-| **Admin router** | Admin_Router_Provider.php | Registers `admin_router` as `new \stdClass()`. | Real routing implementation. | Docblock: “Placeholder for admin menu/screen routing. Later prompts will replace with real implementation.” Any consumer expecting a real router is exposed to a non-contract. |
-| **Environment validation** | Environment_Validator.php | Exists. | Theme compatibility/GeneratePress, uploads directory, mail/report transport, scheduler readiness, provider readiness noted as placeholders. | Spec §6.13 requires validation at activation, diagnostics, and before high-impact execution; incomplete validation risks unsupported environments. |
-| **Lifecycle (activation/deactivation/uninstall)** | Lifecycle_Manager.php | Phases present. | Activation “no option writes, Later prompt”; no first-time setup redirect; deactivation “flush caches/stop workers, no deletion”; uninstall placeholders. | Production activation/uninstall behavior must be defined and implemented for supportability and data retention. |
-| **AI Providers — mutating actions** | AI_Providers_Screen.php | UI for provider management; credential status. | “Mutating actions are nonce-protected placeholders”; “Placeholder URL for test connection”; “Placeholder URL for update credential.” | Users see Test connection / Update credential; handlers must verify nonce and capability (spec §49.9). |
-| **Industry bundle apply** | Industry_Bundle_Import_Preview_Screen; apply handler | Preview, conflict inspection. | No persistence/store for applied bundle; no registry merge; apply handler not implemented. | Decision: apply is in scope (industry-bundle-apply-decision Outcome A). Contracts define semantics; storage/merge design and implementation missing. |
-| **Crawler actions** | Crawler_Sessions_Screen.php, Crawler_Comparison_Screen.php | Screens exist. | “Future: crawl start/retry button; nonce placeholder”; `aio-crawler-action-placeholder`. | If crawl start/retry is required by spec, implement or remove from UI and document. |
-| **Industry_Packs_Module — pack registry** | Industry_Packs_Module.php | Module and get_builtin_* registration. | Docblock: “CONTAINER_KEY_INDUSTRY_PACK_REGISTRY … Placeholder until implemented.” | If production relies on a non-built-in pack registry, implement or document limitation. |
-| **Page/Section template directory — detail and preview** | Page_Templates_Directory_Screen, Section_Templates_Directory_Screen | Directory list/filter. | “No detail preview in this screen; one-pager and composition are capability-gated links/placeholders”; “detail screen is out of scope.” | Users may expect detail/preview; either implement or make copy and IA explicitly “list only” / “links coming later.” |
+| **Onboarding full step forms** | Onboarding_Screen.php | Step shell, draft save/load, prefill, provider readiness. | Full step forms for each step (brand, industry profile, AI setup, business context, submission). "form fields will be added in a future update." | Spec §23 requires guided onboarding; users see steps but cannot complete real intake. User-visible deferred-work copy is unacceptable. |
 
 ---
 
@@ -101,40 +102,38 @@ For this audit, **production-ready** means:
 
 | Item | Where it matters | Why it blocks production |
 |------|------------------|---------------------------|
-| **Industry bundle apply — persistence and handler** | Apply flow after conflict resolution. | Decision: in scope. Contracts define what to write and how; no design for where to persist applied bundle or how registries merge applied + built-in; no apply handler. |
-| **Build Plan workspace improvements (row/detail completeness)** | Build Plan workspace row tables and detail panels. | Step shells and core actions exist, but row/detail completeness may not meet spec §31 / build-plan-admin-ia-contract. If required for production, must be completed or explicitly de-scoped. |
-| **assign_page_hierarchy execution handler** | Execution_Action_Types; dispatcher. | Type exists; no handler registered. Single_Action_Executor refuses unregistered types, so no silent wrong behavior; if spec requires hierarchy assignment as an executable action, handler must be implemented or action de-scoped by decision. |
-| **create_menu execution handler** | Execution_Action_Types; dispatcher. | Type exists; no handler registered (update_menu is registered). If create_menu is required for production, implement or de-scope. |
-| **Profile snapshot persistence** | Profile_Snapshot_Data; profile-snapshot-schema. | Schema/type only; no persistence or UI. Shell-placeholder-backlog: “If product later requires storing/restoring profile snapshots, spec must define persistence store, scope, and lifecycle.” |
-| **Cost/usage reporting (AI)** | AI provider drivers (cost_placeholder => null). | SPR-010: cost modeling not implemented; reserved for future. If production requires usage/cost reporting, spec and implementation needed; otherwise ensure no UI implies it. |
+| **assign_page_hierarchy execution handler** | Execution_Action_Types (constant exists); dispatcher. | Type defined; no handler registered. Single_Action_Executor refuses unregistered types — no silent wrong behavior — but plan items of this type cannot execute. If spec requires hierarchy assignment, handler must be implemented or type explicitly de-scoped. |
+| **create_menu execution handler** | Execution_Action_Types (constant exists); dispatcher. | Type defined; no handler registered (update_menu is registered). Same posture as assign_page_hierarchy. |
+| **Profile snapshot persistence** | Profile_Snapshot_Data; profile-snapshot-schema.md. | Schema/type only; explicitly documented as intentional: "intentional placeholder until spec defines persistence." No persistence or UI. | No production surface exposes or implies profile snapshot capability. Acceptable as-is if no spec requirement is exposed. Requires formal out-of-scope decision or implementation if spec §22.11 requires it. |
+| **AI cost/usage reporting** | Concrete_AI_Provider_Driver, Additional_AI_Provider_Driver (cost_placeholder => null). | SPR-010: cost modeling not implemented; reserved for future. | No UI implies cost reporting. Acceptable as-is if admin copy makes no cost claims. Requires formal out-of-scope decision or implementation. |
 
 ---
 
-## 9. What Still Needs My Decision
+## 9. What Still Needs A Decision
 
 | # | Item | Why decision needed | Options |
 |---|------|----------------------|--------|
-| 1 | **Industry bundle apply — persistence and registry merge** | Apply is in scope (decision Outcome A); implementation is blocked on where to persist applied bundle and how registries merge applied + built-in. | (A) Define persistence store and registry merge contract; then implement apply handler. (B) Revisit decision and keep preview-only with explicit “apply not available” copy until design is done. |
-| 2 | **Build Plan workspace row/detail completeness** | Build Plan shell exists; production readiness depends on whether full row/detail behavior is required by spec §31 / IA contract. | (A) Implement full row/detail behaviors and per-step completeness. (B) Explicitly de-scope to “v1 shell + core actions only” and update copy/docs accordingly. |
-| 3 | **Onboarding full step forms** | Spec §23 requires guided onboarding; current UI is step shell with placeholder content. | (A) Implement full step forms and persistence per spec. (B) De-scope to “onboarding shell only” in spec/revision and update UI copy so users are not misled. |
-| 4 | **Crawler start/retry and actions** | Screens show placeholder for crawl start/retry. | (A) Implement crawl start/retry with nonce and capability. (B) Remove or hide action from UI and document as future. |
-| 5 | **Admin router** | Currently stdClass placeholder. | (A) Implement real admin router for menu/screen routing. (B) Document that routing is handled elsewhere and remove or repurpose placeholder. |
-| 6 | **assign_page_hierarchy / create_menu** | Action types exist; no handlers. | (A) Implement handlers if required by spec. (B) Explicitly exclude from executable action set (like UPDATE_PAGE_METADATA) and document. |
+| 1 | **Onboarding — full forms vs shell-only** | Spec §23 requires guided onboarding; current UI is step shell + placeholder copy. User-visible "future update" copy is a release blocker. | (A) Implement full step forms per spec §23. (B) Formally de-scope to "intake shell only" in spec/revision; update UI copy to state capability clearly without "future update" language. |
+| 2 | **assign_page_hierarchy / create_menu** | Action types exist; no handlers. | (A) Implement handlers if spec requires. (B) Explicitly exclude from executable set (like UPDATE_PAGE_METADATA) and document the exclusion. |
+| 3 | **Profile snapshot persistence** | Schema-only; intentionally deferred. | (A) Implement per spec §22.11. (B) Formal decision that profile snapshot storage is out of scope for v1; update Profile_Snapshot_Data comment to reflect the decision. |
+| 4 | **AI cost/usage reporting** | cost_placeholder null; reserved. | (A) Implement cost modeling. (B) Formal decision that cost reporting is out of scope; update driver comments to reflect the decision. |
 
 ---
 
-## 10. What Is Exposed but Unavailable or Misleading
+## 10. Stale Wording — Comment / Docblock Drift
 
-| Item | Location | What is exposed | Why it blocks production |
-|------|----------|-----------------|---------------------------|
-| **Onboarding step content** | Onboarding_Screen.php | Step shell with `render_step_placeholder`; users see steps. | “Full step forms are out of scope” — users may believe they can complete onboarding; experience is incomplete. |
-| **AI Providers — Test connection / Update credential** | AI_Providers_Screen.php | Placeholder URLs for test connection and update credential. | Mutating actions are placeholders; users may expect them to work. |
-| **Industry bundle apply** | Industry_Bundle_Import_Preview_Screen | Preview and conflict UI. | “In v1, direct apply of JSON bundles is out of scope” — if apply is now in scope (per decision), UI must either support apply or clearly state “Apply not yet available” until implemented. |
-| **Crawler start/retry** | Crawler_Sessions_Screen, Crawler_Comparison_Screen | Placeholder for crawl start/retry. | “Future: crawl start/retry button; nonce placeholder” — if not implemented, remove or clearly label as coming later. |
-| **Page template directory — detail/preview** | Page_Templates_Directory_Screen | One-pager and composition as “capability-gated links/placeholders.” | May imply full detail/preview is available. |
-| **Section template directory — detail** | Section_Templates_Directory_Screen | “Detail screen is out of scope.” | View and helper links capability-gated; detail may be expected. |
-| **Finalization — conflict summary / preview link** | Finalization_Step_UI_Service.php | conflict_summary_placeholder, preview_link_placeholder. | Structural placeholders may be shown to users; clarify or implement. |
-| **Section helper-doc URL** | Section_Template_Detail_State_Builder | Helper-doc URL built from helper_ref; “placeholder until … resolver when available.” | Links may be wrong or misleading. |
+These items do not produce user-visible problems but misrepresent implementation state in the codebase. Each must be corrected before production for maintainability and audit compliance.
+
+| File | Line(s) | Current text | Required correction |
+|------|---------|--------------|---------------------|
+| `Bootstrap/Industry_Packs_Module.php` | 4 | "so future prompts have a stable home" | Stable module description without "future prompts". |
+| `Bootstrap/Industry_Packs_Module.php` | 30 | "Placeholder until implemented." (CONTAINER_KEY_INDUSTRY_PACK_REGISTRY constant) | Describe the registered Industry_Pack_Registry (already implemented). |
+| `Admin/Screens/Crawler/Crawler_Comparison_Screen.php` | 18 | "nonce reserved for future" | "Read-only screen; no mutating actions." |
+| `Admin/Screens/BuildPlan/Build_Plan_Workspace_Screen.php` | 33 | "Row/detail and step-specific tables are placeholders in this prompt." | Remove or replace with accurate description (all step UI services are real). |
+| `Infrastructure/Container/Providers/Admin_Router_Provider.php` | class docblock | "Registers admin router placeholder." | Reflects real Admin_Router implementation. |
+| `Admin/Screens/Templates/Page_Templates_Directory_Screen.php` | 26 | "one-pager and composition are capability-gated links/placeholders" | Remove "placeholders"; Page_Template_Detail_Screen exists and is fully implemented. |
+| `Admin/Screens/Templates/Section_Templates_Directory_Screen.php` | 27 | "detail screen is out of scope" | Remove; Section_Template_Detail_Screen exists and is fully implemented. |
+| `Admin/Screens/AI/Onboarding_Screen.php` | 447 | "Full step forms are out of scope for this prompt." (method docblock) | Remove this docblock phrase or replace with a truthful description of the method's role. |
 
 ---
 
@@ -142,33 +141,34 @@ For this audit, **production-ready** means:
 
 | Item | Current state | Required action |
 |------|---------------|-----------------|
-| **Admin router placeholder** | `admin_router` => `new \stdClass()`. | Replace with real implementation or remove registration and document that routing is handled elsewhere. |
-| **Environment_Validator placeholders** | Theme, uploads, mail/report transport, scheduler, provider readiness. | Implement real checks per spec §6.13 or document supported subset and remove misleading checks. |
-| **Lifecycle_Manager placeholders** | Activation, first-time redirect, deactivation, uninstall. | Implement defined behavior or document and minimize placeholder scope. |
-| **Onboarding step placeholder** | render_step_placeholder; no full forms. | Either implement full step forms or rework UI/copy so “onboarding” is clearly limited (e.g. “Coming soon” or minimal intake only). |
-| **AI Providers test/update placeholder URLs** | Placeholder URLs; handlers must verify nonce and capability. | Implement handlers or remove/hide actions and document. |
-| **Crawler action placeholder** | aio-crawler-action-placeholder. | Implement crawl start/retry or remove from UI and document. |
-| **Industry bundle apply (if not implemented)** | UI may imply apply available. | If apply remains unimplemented, ensure all copy states “Preview only” / “Apply not yet available” and no primary CTA promises apply. |
-| **Finalization / Section helper-doc placeholders** | conflict_summary_placeholder, preview_link_placeholder; helper-doc URL placeholder. | Implement or replace with explicit “N/A” / disabled state and copy. |
+| **Onboarding user-visible "future update" copy** | Lines 466, 495 of Onboarding_Screen.php: "Provider setup UI will be added in a future update" and "form fields will be added in a future update." | Replace with either (a) real forms or (b) truthful copy that does not imply "future update" (e.g., "This step is not yet available." or redirect to existing AI Providers screen). |
+| **"Post-build placeholder:" label** | New_Page_Creation_Detail_Builder.php line 295: user-visible in admin detail panel. | Rename to "Post-build status:" or equivalent truthful label. |
+| **Stale docblocks/comments (§10 above)** | Eight locations. | Correct each comment to reflect actual implemented state. |
 
 ---
 
-## 12. All Previously Deferred Items That Must Now Be Resolved
+## 12. All Previously Deferred Items — Resolution Status
 
-Per prompt constraint: **no deferred work is acceptable** for production-ready status. Each item must be either implemented or explicitly removed from required scope by an approved decision.
-
-| # | Item | Previous status | Resolution required |
-|---|------|-----------------|---------------------|
-| 1 | **Token application (user-facing)** | Intentionally deferred (token-application-scope-decision). | Already truthful in UI (recommendation-only). No change required unless product brings token apply in scope. |
-| 2 | **Profile snapshot persistence** | Schema-only; no persistence (SPR-010). | Either implement persistence per spec or formal decision that profile snapshot storage is out of scope. |
-| 3 | **Cost/usage reporting (AI)** | cost_placeholder null; reserved for future (SPR-010). | Either implement or formal decision that cost reporting is out of scope; ensure no UI implies it. |
-| 4 | **History/Rollback step execution** | Was “shell only” in shell-placeholder-backlog. | **Resolved:** Prompt 642 implemented rollback from History step (list_rollback_entries_for_plan, Request rollback). No longer deferred. |
-| 5 | **Industry bundle apply** | Blocked on spec/product decision; then in scope (Outcome A). | **Decision made.** Persistence/merge design and implementation still required (see §7, §8). |
-| 6 | **Build Plan Step 2 Deny / workspace** | Blocked on spec/product decision. | **Resolved:** Step 2 deny is implemented (row-level + bulk deny). Remaining question is workspace row/detail completeness scope. |
-| 7 | **Privacy scope expansion** | Intentionally deferred (privacy-exporter-eraser-scope-decision). | Out of scope; no resolution needed unless product changes. |
-| 8 | **Onboarding full step forms** | Placeholder content; “out of scope for this prompt.” | **Resolution required:** Implement or de-scope with clear copy. |
-| 9 | **Admin router** | Placeholder (stdClass). | **Resolution required:** Real implementation or remove and document. |
-| 10 | **Environment / Lifecycle placeholders** | Various placeholders. | **Resolution required:** Implement or document and minimize. |
+| # | Item | Previous status | Current status |
+|---|------|-----------------|----------------|
+| 1 | **Token application (user-facing)** | Intentionally deferred (advisory-only). | **CHANGED:** Tokens step is now EXECUTABLE (Step 4). Bulk + row execute/retry governed with nonce + capability + audit log. Real handler (Apply_Token_Set_Handler). |
+| 2 | **Profile snapshot persistence** | Schema-only; no persistence (SPR-010). | **Unchanged.** Intentionally deferred; no production surface claims otherwise. Formal out-of-scope decision still required. |
+| 3 | **Cost/usage reporting (AI)** | cost_placeholder null; reserved for future (SPR-010). | **Unchanged.** No UI implies it. Formal out-of-scope decision still required. |
+| 4 | **History/Rollback step** | Was "shell only" in earlier baseline. | **Resolved.** History step with rollback entries and "Request rollback" fully implemented. |
+| 5 | **Industry bundle apply** | Blocked on design; then decision made (Outcome A). | **RESOLVED.** Industry_Bundle_Apply_Service: validate, conflict scan, decisions, persist, registry update. |
+| 6 | **Build Plan Step 2 Deny** | Blocked on spec/product decision. | **Resolved.** Step 2 deny is fully implemented (row-level + bulk deny). |
+| 7 | **Privacy scope expansion** | Intentionally deferred. | **Unchanged.** Out of scope; no resolution needed unless product changes. |
+| 8 | **Onboarding full step forms** | Placeholder; "out of scope for this prompt." | **Unchanged.** Step shell exists; forms still missing; user-visible deferred copy still present. **Resolution required.** |
+| 9 | **Admin router** | Placeholder (stdClass). | **RESOLVED.** Real Admin_Router class; Helper_Doc_Url_Resolver registered and functional. |
+| 10 | **Environment / Lifecycle** | Various placeholders. | **RESOLVED.** Environment_Validator has real checks; Lifecycle_Manager phases implemented; no stale wording. |
+| 11 | **Crawler start/retry** | Placeholder action; nonce placeholder. | **RESOLVED.** Crawler_Sessions_Screen: real start/retry with check_admin_referer. |
+| 12 | **AI Providers test/update** | Placeholder URLs; handlers missing. | **RESOLVED.** Real handlers with nonce + capability protection. |
+| 13 | **Build Plan workspace row/detail completeness** | Step shells; some placeholder row/detail. | **SUBSTANTIALLY RESOLVED.** All step UI services real. Tokens step execution live. SEO advisory posture truthful. Finalization buckets and conflicts from real data. Stale docblock comment remains (§10). |
+| 14 | **Build_Plan_Analytics rollback frequency** | Stub; plan history only. | **RESOLVED.** Queries real operational snapshot data. |
+| 15 | **Section helper-doc URL** | Placeholder until resolver available. | **RESOLVED.** Helper_Doc_Url_Resolver: real URL from Documentation_Registry. |
+| 16 | **Finalization — conflict summary / preview link** | conflict_summary_placeholder, preview_link_placeholder. | **RESOLVED.** Real data from plan state: finalization buckets, conflict messages, completion summary. |
+| 17 | **Page/Section template detail screens** | Directory screen said "out of scope" / "links/placeholders". | **RESOLVED.** Both Section_Template_Detail_Screen and Page_Template_Detail_Screen fully implemented. |
+| 18 | **assign_page_hierarchy / create_menu** | Types exist; no handlers. | **Unchanged.** Decision still required: implement handlers or explicitly de-scope. |
 
 ---
 
@@ -176,11 +176,11 @@ Per prompt constraint: **no deferred work is acceptable** for production-ready s
 
 The following **block production readiness** under the strict definition:
 
-1. **Unresolved decisions:** Industry bundle apply persistence/merge design; Build Plan workspace row/detail completeness scope (if required by spec §31 / IA contract).
-2. **Incomplete required features:** Onboarding (full step forms or explicit de-scope); industry bundle apply handler and storage; Build Plan workspace row/detail completeness (if required by spec).
-3. **Exposed-but-unavailable behavior:** AI Providers test/update credential; crawler start/retry; onboarding steps; industry bundle apply (until implemented); template directory detail/preview expectations; finalization/helper-doc placeholders.
-4. **Infrastructure placeholders:** Admin router; Environment_Validator; Lifecycle_Manager activation/deactivation/uninstall.
-5. **Hardening/QA/release:** Release checklist not completed; Plugin Check; compatibility/migration matrices; release-candidate closure; doc-to-UI consistency; security redaction review.
+1. **User-visible placeholder / deferred-work copy:** Onboarding screen (lines 466, 495) shows "will be added in a future update"; New_Page_Creation_Detail_Builder shows "Post-build placeholder:" label.
+2. **Incomplete required feature:** Onboarding full step forms — users see step navigation with no real forms; decision and implementation required.
+3. **Unresolved handler decisions:** assign_page_hierarchy and create_menu action types exist with no handlers; decision required before production.
+4. **Stale comment drift:** Eight docblock/comment locations misrepresent implementation state (§10).
+5. **Hardening/QA/release:** Release checklist; Plugin Check; compatibility/migration matrices; release-candidate closure; doc-to-UI consistency; security redaction review.
 
 ---
 
@@ -188,12 +188,10 @@ The following **block production readiness** under the strict definition:
 
 | Priority | Decision | Owner | Next action |
 |----------|----------|--------|-------------|
-| 1 | **Industry bundle apply — where to persist and how registries merge** | Product/spec | Define persistence store (or registry merge contract). Then implementation can proceed per existing contracts. |
-| 2 | **Build Plan workspace row/detail completeness** | Product/spec | Decide whether full per-step row/detail behavior is required for production; implement or explicitly de-scope and update copy/docs. |
-| 3 | **Onboarding — full implementation vs shell-only** | Product/spec | Confirm spec §23 requirement; either implement full step forms or revise spec and UI copy. |
-| 4 | **Crawler start/retry — in scope or future** | Product/spec | Implement or remove from UI and document. |
-| 5 | **Admin router — real implementation vs current routing** | Technical | Implement real router or document that routing is handled elsewhere and remove placeholder. |
-| 6 | **assign_page_hierarchy / create_menu — executable or excluded** | Product/spec | Implement handlers or explicitly exclude from executable set (like UPDATE_PAGE_METADATA). |
+| 1 | **Onboarding — full forms vs shell-only** | Product/spec | Close decision; either implement full step forms or revise spec and update UI copy to remove deferred-work language. |
+| 2 | **assign_page_hierarchy / create_menu** | Product/spec | Implement handlers or explicitly exclude from executable set (document exclusion like UPDATE_PAGE_METADATA). |
+| 3 | **Profile snapshot persistence** | Product/spec | Formal out-of-scope decision or implementation per spec §22.11. |
+| 4 | **AI cost/usage reporting** | Product/spec | Formal out-of-scope decision or implementation. |
 
 ---
 
@@ -201,18 +199,11 @@ The following **block production readiness** under the strict definition:
 
 | Priority | Item | Affected files/subsystems | Next action |
 |----------|------|---------------------------|-------------|
-| 1 | **Industry bundle apply handler and persistence** | Industry registries, apply handler, storage/merge design. | After decision §14.1: design persistence/merge; implement apply handler, validation, conflict resolution → write only final_outcome = applied. |
-| 2 | **Onboarding full step forms (if in scope)** | Onboarding_Screen, onboarding state, profile/brand intake. | Implement step forms and persistence per spec §23 or follow de-scope decision. |
-| 3 | **Admin router** | Admin_Router_Provider, any consumer of admin_router. | Replace stdClass with real router or remove and document. |
-| 4 | **Environment_Validator** | Environment_Validator.php. | Implement theme, uploads, transport, scheduler, provider checks per §6.13 or document subset. |
-| 5 | **Lifecycle_Manager** | Lifecycle_Manager.php. | Implement activation options/setup, deactivation cleanup, uninstall behavior per spec and PORTABILITY_AND_UNINSTALL. |
-| 6 | **AI Providers — test connection / update credential** | AI_Providers_Screen, handlers. | Implement nonce- and capability-protected handlers (spec §49.9) or remove/hide actions. |
-| 7 | **Crawler start/retry (if in scope)** | Crawler_Sessions_Screen, Crawler_Comparison_Screen. | Implement actions with nonce and capability or remove from UI. |
-| 8 | **Build Plan workspace row/detail** | Build_Plan_Workspace_Screen, step UI services. | Complete per spec §31 / build-plan-admin-ia-contract or document limitations. (Step 2 deny itself is complete.) |
-| 9 | **Finalization — conflict summary and preview link** | Finalization_Step_UI_Service. | Implement or replace with explicit N/A and copy. |
-| 10 | **Section helper-doc URL** | Section_Template_Detail_State_Builder. | Implement helper-doc resolver per spec §15 or remove/gate links. |
-| 11 | **Build_Plan_Analytics rollback frequency** | Build_Plan_Analytics_Service. | Query rollback/snapshot data per §59.12 or document “plan-level only.” |
-| 12 | **Versions.php schema versions** | Versions.php. | Advance when schemas locked or document. |
+| 1 | **Onboarding full step forms (if in scope)** | Onboarding_Screen.php, onboarding state, profile/brand intake. | Implement step forms per spec §23 or de-scope and update copy per decision. |
+| 2 | **"Post-build placeholder:" user label** | New_Page_Creation_Detail_Builder.php line 295. | Rename to "Post-build status:" or similar truthful label. |
+| 3 | **assign_page_hierarchy handler (if in scope)** | Execution_Action_Types, dispatcher. | Implement or explicitly de-scope per decision §14.2. |
+| 4 | **create_menu handler (if in scope)** | Execution_Action_Types, dispatcher. | Implement or explicitly de-scope per decision §14.2. |
+| 5 | **Stale comment/docblock corrections** | Eight files listed in §10. | Correct comments to reflect actual implementation state. |
 
 ---
 
@@ -226,38 +217,40 @@ The following **block production readiness** under the strict definition:
 | 4 | **Migration/upgrade matrix** | docs/qa/migration-coverage-matrix.md | Execute and update; release-note migration/compatibility notes. |
 | 5 | **Release-candidate closure** | docs/qa/release-candidate-closure.md | Complete performance posture, QA evidence, gate status, release-note inputs. |
 | 6 | **Known-risk register** | docs/release/known-risk-register.md | Update with known risks and mitigations. |
-| 7 | **Doc-to-UI consistency** | admin-operator-guide, template-library guides, support-triage-guide, end-user-workflow-guide | Consistency pass; align docs with current UI and scope (per release-candidate-closure §7). |
-| 8 | **Security redaction review** | docs/qa/security-redaction-review.md (or equivalent) | Capability, nonce, import/export safety, redaction. |
+| 7 | **Doc-to-UI consistency** | admin-operator-guide, template guides, support-triage-guide, end-user-workflow-guide | Consistency pass; align docs with current UI/scope. |
+| 8 | **Security redaction review** | docs/qa/security-redaction-review.md | Capability, nonce, import/export safety, redaction. |
 | 9 | **Changelog and README** | Release checklist | Update for release. |
-| 10 | **Reporting disclosure** | Release checklist | If reporting is implemented: disclosure in admin docs, settings, and help content. |
+| 10 | **Reporting disclosure** | Release checklist | Disclosure in admin docs, settings, and help content (reporting implemented). |
 
 ---
 
 ## 17. Recommended Final Order of Work
 
-1. **Close decision blockers (§14):** Industry bundle apply persistence/merge; Build Plan Step 2 Deny; Onboarding scope; Crawler actions; Admin router; assign_page_hierarchy/create_menu.
-2. **Implement implementation blockers (§15)** in dependency order: industry bundle apply (after decision); onboarding (if in scope); admin router; environment/lifecycle; AI provider handlers; crawler (if in scope); Build Plan workspace completeness; finalization/helper-doc; analytics/versions as needed.
-3. **Remove or rework exposed-but-unavailable behavior (§10, §11):** Ensure every UI element either works or is clearly labeled as unavailable/coming later.
-4. **Resolve deferred items (§12):** Implement or formal out-of-scope decisions for profile snapshot, cost reporting, and any remaining deferred list items.
-5. **Complete hardening/QA/release queue (§16):** Lint, tests, Plugin Check, compatibility/migration matrices, release-candidate closure, known-risk register, doc-to-UI consistency, security review, changelog/README.
+1. **Fix user-visible placeholder copy immediately (§11):** Remove "future update" copy from Onboarding_Screen (lines 466, 495) and rename "Post-build placeholder:" label in New_Page_Creation_Detail_Builder.
+2. **Close decision blockers (§14):** Onboarding scope; assign_page_hierarchy/create_menu; profile snapshot; AI cost.
+3. **Implement onboarding step forms (§15.1) if in scope** — the single largest remaining feature gap.
+4. **Correct stale comments/docblocks (§10):** Eight files; pure wording/correctness fixes.
+5. **Implement execution handlers (§15.3, §15.4)** for assign_page_hierarchy/create_menu if required by spec.
+6. **Complete hardening/QA/release queue (§16):** Lint, tests, Plugin Check, compatibility/migration matrices, release-candidate closure, known-risk register, doc-to-UI consistency, security review, changelog/README.
 
 ---
 
 ## 18. Final Production-Readiness Verdict
 
-**Not production-ready** under the strict definition used in this audit.
+**Not production-ready** under the strict definition, but substantially more complete than the Prompt 643 baseline.
 
-The plugin has substantial implemented surface (execution engine, rollback v1, capabilities, import/export + Import/Restore wizard, Build Plan structure including Step 2 deny, registries, diagnostics, queue/logs, tests) but **does not yet meet** “no deferred work acceptable, no misleading/unavailable behavior, no partially implemented required features, all decisions resolved, all required systems hardened and supportable.” Until the remaining decision queue is closed, the implementation queue is completed for required scope, exposed-but-unavailable behavior is removed or reworked, and the validation/QA/release queue is completed, the project cannot honestly be called 100% production-ready.
+The plugin now has a fully implemented execution engine (all five core handlers), rollback v1, capabilities, import/export + Import/Restore wizard, industry bundle apply, Build Plan workspace with all steps truthful and governed, section/page template detail screens, crawler, AI provider handlers, admin router, analytics, diagnostics, and broad unit tests. The main remaining release blockers are: user-visible placeholder copy in onboarding, the onboarding step forms decision, the assign_page_hierarchy/create_menu handler decision, stale comment drift in eight files, and the validation/QA/release gate queue.
 
 ---
 
 ## 19. Final Recommendation
 
-1. **Immediate:** Close the two highest-priority decision blockers (Industry bundle apply persistence/merge; Build Plan Step 2 Deny or de-scope).
-2. **Short term:** Implement industry bundle apply (once design is done), then address onboarding scope and admin router; in parallel, rework or remove every exposed-but-unavailable surface (AI providers, crawler, onboarding copy, industry apply copy, template directory, finalization/helper-doc).
-3. **Before release:** Complete environment/lifecycle and remaining implementation blockers; run full release checklist (lint, tests, Plugin Check, compatibility/migration matrices, release-candidate closure, doc-to-UI consistency, security review); update changelog and README.
-4. **Ongoing:** Treat “deferred” as a resolution target (implement or de-scope by decision) for any remaining items before declaring production-ready.
+1. **Immediate (before any release candidate):** Remove user-visible "future update" copy from Onboarding_Screen lines 466 and 495; rename "Post-build placeholder:" to a truthful label.
+2. **Short term:** Close the onboarding decision (forms or shell-only); correct the eight stale comment locations; make assign_page_hierarchy/create_menu handler decision.
+3. **If onboarding is in scope:** Implement full step forms per spec §23.
+4. **Before release:** Complete full release checklist (lint, tests, Plugin Check, compatibility/migration matrices, release-candidate closure, doc-to-UI consistency, security review); update changelog and README.
+5. **Formal decisions for deferred items:** Close profile snapshot and AI cost decisions (out-of-scope or implement) to prevent perpetual carry-forward.
 
 ---
 
-*End of report. No code changes were made; this document is audit-only.*
+*End of report. No code changes were made; this document is audit-only. Rescan performed March 2026.*

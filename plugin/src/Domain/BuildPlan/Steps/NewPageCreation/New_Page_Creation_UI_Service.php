@@ -4,7 +4,7 @@
  *
  * Filters to eligible new_page items, builds row summaries and detail via
  * New_Page_Creation_Detail_Builder, bulk eligibility (Build All / Build Selected), dependency
- * and post-build placeholder display. Does not execute page creation.
+ * and post-build result display. Does not execute page creation.
  *
  * @package AIOPageBuilder
  */

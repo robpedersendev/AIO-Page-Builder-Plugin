@@ -3,7 +3,7 @@
  * Builds detail panel sections for Step 2 new-page items (spec §33.3–33.10).
  *
  * Renders proposed metadata, parent/child hierarchy, dependency validation,
- * post-build status placeholder, and retry/recovery messaging.
+ * post-build result status, and retry/recovery messaging.
  *
  * @package AIOPageBuilder
  */
@@ -292,7 +292,7 @@ final class New_Page_Creation_Detail_Builder {
 		$post_status = (string) ( $payload['post_build_status'] ?? '' );
 		$lines       = array( \__( 'Current Build Plan state:', 'aio-page-builder' ) . ' ' . $status );
 		if ( $post_status !== '' ) {
-			$lines[] = \__( 'Post-build placeholder:', 'aio-page-builder' ) . ' ' . $post_status;
+			$lines[] = \__( 'Post-build result:', 'aio-page-builder' ) . ' ' . $post_status;
 		}
 		return array(
 			Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'Post-build status', 'aio-page-builder' ),

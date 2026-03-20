@@ -329,8 +329,8 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		$this->assertFalse( $deny_action['enabled'] );
 	}
 
-	/** Post-build placeholder in row and detail. */
-	public function test_post_build_placeholder_in_payload(): void {
+	/** Post-build result status surfaced in row and detail. */
+	public function test_post_build_status_in_payload(): void {
 		$def = $this->step2_plan_definition( 1 );
 		$def[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ][0]['payload']['post_build_status'] = 'built_successfully';
 		$resolver  = new Build_Plan_Row_Action_Resolver();
@@ -348,7 +348,11 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 			}
 		}
 		$this->assertNotNull( $post_section );
-		$this->assertStringContainsString( 'built_successfully', implode( ' ', $post_section['content_lines'] ?? array() ) );
+		$content = implode( ' ', $post_section['content_lines'] ?? array() );
+		$this->assertStringContainsString( 'built_successfully', $content );
+		// * Label must be truthful — never "placeholder".
+		$this->assertStringContainsString( 'Post-build result:', $content );
+		$this->assertStringNotContainsString( 'placeholder', strtolower( $content ) );
 	}
 
 	/** Column order is Step 2 specific and includes template_links (Prompt 192). */

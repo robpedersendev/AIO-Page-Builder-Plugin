@@ -416,7 +416,7 @@ final class Onboarding_Screen {
 
 			<section class="aio-onboarding-content" aria-labelledby="aio-onboarding-step-heading">
 				<h2 id="aio-onboarding-step-heading" class="screen-reader-text"><?php \esc_html_e( 'Current step', 'aio-page-builder' ); ?></h2>
-				<?php $this->render_step_placeholder( $current_step_key, $state ); ?>
+				<?php $this->render_step_content( $current_step_key, $state ); ?>
 			</section>
 
 			<form method="post" action="" class="aio-onboarding-actions">
@@ -444,13 +444,15 @@ final class Onboarding_Screen {
 	}
 
 	/**
-	 * Renders placeholder content for the current step. Full step forms are out of scope for this prompt.
+	 * Renders step content for the current onboarding step.
+	 * Business profile and site-context steps display navigation guidance; template preferences,
+	 * provider setup, review, and submission steps render their respective controls.
 	 *
 	 * @param string               $current_step_key Current step identifier.
 	 * @param array<string, mixed> $state            Onboarding state (prefill, provider refs, etc.).
 	 * @return void
 	 */
-	private function render_step_placeholder( string $current_step_key, array $state ): void {
+	private function render_step_content( string $current_step_key, array $state ): void {
 		$labels            = Onboarding_UI_State_Builder::step_labels();
 		$label             = $labels[ $current_step_key ] ?? $current_step_key;
 		$prefill           = $state['prefill'] ?? array();
@@ -463,7 +465,7 @@ final class Onboarding_Screen {
 				<p><?php \esc_html_e( 'Welcome to AIO Page Builder. This flow collects your business and brand context, existing site information, and AI provider setup so you can request an AI-generated plan. You can save your progress and return later.', 'aio-page-builder' ); ?></p>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::PROVIDER_SETUP ) : ?>
 				<p><?php \esc_html_e( 'Configure at least one AI provider (API key) to use AI planning. Credentials are stored securely and never shown here.', 'aio-page-builder' ); ?></p>
-				<p><?php \esc_html_e( 'Provider setup UI will be added in a future update. Current readiness:', 'aio-page-builder' ); ?> <?php echo $is_provider_ready ? \esc_html__( 'At least one provider configured.', 'aio-page-builder' ) : \esc_html__( 'No provider configured.', 'aio-page-builder' ); ?></p>
+				<p><?php \esc_html_e( 'To add or update provider credentials, use the AI Providers screen. Current readiness:', 'aio-page-builder' ); ?> <?php echo $is_provider_ready ? \esc_html__( 'At least one provider configured.', 'aio-page-builder' ) : \esc_html__( 'No provider configured.', 'aio-page-builder' ); ?></p>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::SUBMISSION ) : ?>
 				<p><?php \esc_html_e( 'Request an AI-generated plan from your profile and context. The plan will appear in AI Runs; you can then create a Build Plan from it.', 'aio-page-builder' ); ?></p>
 				<?php
@@ -492,7 +494,7 @@ final class Onboarding_Screen {
 					</ul>
 				<?php endif; ?>
 			<?php else : ?>
-				<p><?php echo \esc_html( sprintf( __( 'Step “%s” — form fields will be added in a future update. Use Next to advance or Save draft to leave.', 'aio-page-builder' ), $label ) ); ?></p>
+				<p><?php echo \esc_html( sprintf( __( 'Step “%s” — use Next to advance through the onboarding flow, or Save draft to save your progress.', 'aio-page-builder' ), $label ) ); ?></p>
 			<?php endif; ?>
 		</div>
 		<?php
