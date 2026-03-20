@@ -116,7 +116,10 @@ final class Navigation_Bulk_Action_Service {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE ) {
+			$nav_item_type = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' );
+			// * Include both menu_change and menu_new items in bulk approve/deny eligibility (v2).
+			if ( $nav_item_type !== Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE
+				&& $nav_item_type !== Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW ) {
 				continue;
 			}
 			if ( (string) ( $item['status'] ?? '' ) === Build_Plan_Item_Statuses::PENDING ) {

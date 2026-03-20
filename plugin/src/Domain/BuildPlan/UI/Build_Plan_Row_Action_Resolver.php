@@ -80,13 +80,14 @@ final class Build_Plan_Row_Action_Resolver {
 			'enabled'   => $can_approve && $can_deny,
 		);
 
-		// * Execute/retry are available for token and hierarchy_assignment items.
-		// * ITEM_TYPE_HIERARCHY_NOTE remains advisory-only and never exposes execute.
+		// * Execute/retry are available for token, hierarchy_assignment, and menu_new items.
+		// * ITEM_TYPE_HIERARCHY_NOTE is advisory-only. ITEM_TYPE_MENU_CHANGE uses UPDATE_MENU (approve/deny only in v1).
 		$supports_execution = in_array(
 			$item_type,
 			array(
 				Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN,
 				Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_ASSIGNMENT,
+				Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW,
 			),
 			true
 		);

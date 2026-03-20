@@ -17,6 +17,7 @@ use AIOPageBuilder\Domain\Execution\Executor\Single_Action_Executor;
 use AIOPageBuilder\Domain\Execution\Handlers\Apply_Menu_Change_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Apply_Token_Set_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Assign_Page_Hierarchy_Handler;
+use AIOPageBuilder\Domain\Execution\Handlers\Create_Menu_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Create_Page_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Finalize_Plan_Handler;
 use AIOPageBuilder\Domain\Execution\Handlers\Replace_Page_Handler;
@@ -248,6 +249,10 @@ final class Execution_Provider implements Service_Provider_Interface {
 				$dispatcher->register_handler(
 					Execution_Action_Types::ASSIGN_PAGE_HIERARCHY,
 					new Assign_Page_Hierarchy_Handler()
+				);
+				$dispatcher->register_handler(
+					Execution_Action_Types::CREATE_MENU,
+					new Create_Menu_Handler()
 				);
 				$dispatcher->register_handler(
 					Execution_Action_Types::FINALIZE_PLAN,

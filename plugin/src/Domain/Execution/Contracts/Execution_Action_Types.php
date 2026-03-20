@@ -16,10 +16,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Action types that the execution engine may perform. Governed by execution-action-contract.md.
- * ALL lists types valid for execution. Two types remain deferred to v2:
+ * ALL lists types valid for execution. One type remains deferred to v2:
  * - UPDATE_PAGE_METADATA: recommendation-only; v2 will add a dedicated metadata-write handler.
- * - CREATE_MENU: subsumed by UPDATE_MENU; v2 will add explicit menu-creation envelopes and handler.
- * ASSIGN_PAGE_HIERARCHY is now executable via Assign_Page_Hierarchy_Handler (v2).
+ * ASSIGN_PAGE_HIERARCHY (v2) and CREATE_MENU (v2) are now executable.
  */
 final class Execution_Action_Types {
 
@@ -36,11 +35,9 @@ final class Execution_Action_Types {
 	 */
 	public const ASSIGN_PAGE_HIERARCHY = 'assign_page_hierarchy';
 	/**
-	 * Deferred to v2. Explicit menu-creation envelope and handler not yet implemented.
-	 * In v1, new-menu creation is handled by UPDATE_MENU via Apply_Menu_Change_Handler::do_create().
-	 * v2 target: dedicated create_menu handler with its own plan item type, Build Plan step UI affordance,
-	 * and governed execution path separate from update/replace flows.
-	 * Excluded from ALL until handler is implemented.
+	 * Executable in v2 via Create_Menu_Handler. Net-new menu creation with optional location assignment
+	 * and item seeding. Distinct from UPDATE_MENU (rename/replace/update_existing) flows.
+	 * Triggered by ITEM_TYPE_MENU_NEW plan items.
 	 */
 	public const CREATE_MENU           = 'create_menu';
 	public const UPDATE_MENU           = 'update_menu';
@@ -49,8 +46,8 @@ final class Execution_Action_Types {
 	public const ROLLBACK_ACTION       = 'rollback_action';
 
 	/**
-	 * Action types valid for execution. UPDATE_PAGE_METADATA and CREATE_MENU are deferred to v2.
-	 * ASSIGN_PAGE_HIERARCHY is executable as of v2 via Assign_Page_Hierarchy_Handler.
+	 * Action types valid for execution. UPDATE_PAGE_METADATA remains deferred to v2.
+	 * ASSIGN_PAGE_HIERARCHY and CREATE_MENU are executable as of v2.
 	 *
 	 * @var array<int, string>
 	 */
@@ -58,6 +55,7 @@ final class Execution_Action_Types {
 		self::CREATE_PAGE,
 		self::REPLACE_PAGE,
 		self::ASSIGN_PAGE_HIERARCHY,
+		self::CREATE_MENU,
 		self::UPDATE_MENU,
 		self::APPLY_TOKEN_SET,
 		self::FINALIZE_PLAN,

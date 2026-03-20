@@ -92,9 +92,9 @@ final class Single_Action_Executor_Assign_Page_Hierarchy_Test extends TestCase {
 		);
 	}
 
-	public function test_all_does_not_contain_create_menu(): void {
-		// * CREATE_MENU is still deferred to v2 Phase 2 — must not be in ALL yet.
-		$this->assertNotContains(
+	public function test_all_contains_create_menu(): void {
+		// * CREATE_MENU is now executable in v2 via Create_Menu_Handler.
+		$this->assertContains(
 			Execution_Action_Types::CREATE_MENU,
 			Execution_Action_Types::ALL
 		);

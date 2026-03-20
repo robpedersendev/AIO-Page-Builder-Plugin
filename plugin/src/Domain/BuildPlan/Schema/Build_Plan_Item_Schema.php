@@ -35,6 +35,8 @@ final class Build_Plan_Item_Schema {
 	public const ITEM_TYPE_EXISTING_PAGE_CHANGE = 'existing_page_change';
 	public const ITEM_TYPE_NEW_PAGE             = 'new_page';
 	public const ITEM_TYPE_MENU_CHANGE          = 'menu_change';
+	/** Net-new menu creation (v2). payload: menu_name, ?theme_location, ?items. Emits CREATE_MENU envelope. */
+	public const ITEM_TYPE_MENU_NEW             = 'menu_new';
 	public const ITEM_TYPE_DESIGN_TOKEN         = 'design_token';
 	public const ITEM_TYPE_SEO                  = 'seo';
 	public const ITEM_TYPE_HIERARCHY_NOTE       = 'hierarchy_note';
@@ -47,6 +49,7 @@ final class Build_Plan_Item_Schema {
 		self::ITEM_TYPE_EXISTING_PAGE_CHANGE,
 		self::ITEM_TYPE_NEW_PAGE,
 		self::ITEM_TYPE_MENU_CHANGE,
+		self::ITEM_TYPE_MENU_NEW,
 		self::ITEM_TYPE_DESIGN_TOKEN,
 		self::ITEM_TYPE_SEO,
 		self::ITEM_TYPE_HIERARCHY_NOTE,

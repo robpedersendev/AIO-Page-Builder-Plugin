@@ -4,8 +4,6 @@
  *
  * Ensures de-scoped action types are absent from ALL and rejected by is_valid():
  * - UPDATE_PAGE_METADATA: recommendation-only.
- * - ASSIGN_PAGE_HIERARCHY: hierarchy embedded in CREATE_PAGE.
- * - CREATE_MENU: subsumed by UPDATE_MENU.
  *
  * @package AIOPageBuilder
  */
@@ -68,19 +66,19 @@ final class Execution_Action_Types_Test extends TestCase {
 		);
 	}
 
-	/** CREATE_MENU is de-scoped: menu creation is handled by UPDATE_MENU. */
-	public function test_create_menu_is_not_valid_for_execution(): void {
-		$this->assertFalse(
+	/** CREATE_MENU is now executable in v2 via Create_Menu_Handler. */
+	public function test_create_menu_is_valid_for_execution(): void {
+		$this->assertTrue(
 			Execution_Action_Types::is_valid( Execution_Action_Types::CREATE_MENU ),
-			'CREATE_MENU must not be valid for execution in v1 (subsumed by UPDATE_MENU).'
+			'CREATE_MENU must be valid for execution in v2 (distinct from UPDATE_MENU).'
 		);
 	}
 
-	public function test_all_does_not_contain_create_menu(): void {
-		$this->assertNotContains(
+	public function test_all_contains_create_menu(): void {
+		$this->assertContains(
 			Execution_Action_Types::CREATE_MENU,
 			Execution_Action_Types::ALL,
-			'ALL must not include CREATE_MENU in v1.'
+			'ALL must include CREATE_MENU in v2.'
 		);
 	}
 }

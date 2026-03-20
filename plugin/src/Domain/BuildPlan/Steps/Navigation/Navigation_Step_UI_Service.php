@@ -186,7 +186,9 @@ final class Navigation_Step_UI_Service {
 				continue;
 			}
 			$item_type = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' );
-			if ( $item_type !== Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE ) {
+			// * Include both menu_change (update/rename/replace) and menu_new (net-new creation, v2).
+			if ( $item_type !== Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE
+				&& $item_type !== Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW ) {
 				continue;
 			}
 			$out[] = $item;

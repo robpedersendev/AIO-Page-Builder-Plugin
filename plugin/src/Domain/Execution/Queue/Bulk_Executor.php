@@ -34,6 +34,7 @@ class Bulk_Executor {
 		Build_Plan_Item_Schema::ITEM_TYPE_MENU_CHANGE           => Execution_Action_Types::UPDATE_MENU,
 		Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN          => Execution_Action_Types::APPLY_TOKEN_SET,
 		Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_ASSIGNMENT  => Execution_Action_Types::ASSIGN_PAGE_HIERARCHY,
+		Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW              => Execution_Action_Types::CREATE_MENU,
 		// ITEM_TYPE_SEO not mapped: UPDATE_PAGE_METADATA is recommendation-only (v2 planned).
 		// ITEM_TYPE_HIERARCHY_NOTE not mapped: advisory-only; use ITEM_TYPE_HIERARCHY_ASSIGNMENT for executable items.
 	);
