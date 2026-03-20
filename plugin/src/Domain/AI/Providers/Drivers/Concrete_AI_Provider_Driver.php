@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\AI\Providers\Drivers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Pricing\Provider_Cost_Calculator;
 use AIOPageBuilder\Domain\AI\Providers\Abstract_AI_Provider_Driver;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Error_Normalizer;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Response_Normalizer;
@@ -22,23 +23,31 @@ use AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface;
  */
 final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 
-	private const API_BASE = 'https://api.openai.com/v1';
+	/** Public alias used by the container provider to avoid repeating the URL string. */
+	public const API_BASE_DEFAULT = 'https://api.openai.com/v1';
+	private const API_BASE        = self::API_BASE_DEFAULT;
 
 	/** @var string Override base URL for testing (e.g. mock server). */
 	private string $base_url;
+
+	/** @var Provider_Cost_Calculator|null */
+	private ?Provider_Cost_Calculator $cost_calculator;
 
 	/**
 	 * @param Provider_Error_Normalizer       $error_normalizer
 	 * @param Provider_Response_Normalizer    $response_normalizer
 	 * @param Provider_Secret_Store_Interface $secret_store
-	 * @param string                          $base_url Optional; default OpenAI API base.
+	 * @param string                          $base_url        Optional; default OpenAI API base.
+	 * @param Provider_Cost_Calculator|null   $cost_calculator Optional; when null, cost_usd remains null.
 	 */
 	public function __construct(
 		Provider_Error_Normalizer $error_normalizer,
 		Provider_Response_Normalizer $response_normalizer,
 		Provider_Secret_Store_Interface $secret_store,
-		string $base_url = self::API_BASE
+		string $base_url = self::API_BASE,
+		?Provider_Cost_Calculator $cost_calculator = null
 	) {
+		$this->cost_calculator = $cost_calculator;
 		$this->base_url       = rtrim( $base_url, '/' );
 		$default_capabilities = array(
 			'provider_id'                 => 'openai',
@@ -162,13 +171,17 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		$usage_normalized   = null;
 		if ( is_array( $usage ) ) {
 			// * Token counts are authoritative provider-reported values.
-			// TODO: v2 — populate cost_usd using a per-model pricing registry once pricing data is stable.
-			//   OpenAI does not return cost in the API response; a pricing table keyed by model slug is required.
+			// * OpenAI does not return cost in the API response; cost is computed from the pricing registry.
+			$prompt_tok     = (int) ( $usage['prompt_tokens'] ?? 0 );
+			$completion_tok = (int) ( $usage['completion_tokens'] ?? 0 );
+			$cost_usd       = $this->cost_calculator !== null
+				? $this->cost_calculator->calculate( 'openai', $model, $prompt_tok, $completion_tok )
+				: null;
 			$usage_normalized = array(
-				'prompt_tokens'     => (int) ( $usage['prompt_tokens'] ?? 0 ),
-				'completion_tokens' => (int) ( $usage['completion_tokens'] ?? 0 ),
+				'prompt_tokens'     => $prompt_tok,
+				'completion_tokens' => $completion_tok,
 				'total_tokens'      => (int) ( $usage['total_tokens'] ?? 0 ),
-				'cost_usd'          => null,
+				'cost_usd'          => $cost_usd,
 			);
 		}
 

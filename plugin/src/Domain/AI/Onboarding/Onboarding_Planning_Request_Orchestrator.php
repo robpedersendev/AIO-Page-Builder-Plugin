@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Domain\AI\Onboarding;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Budget\Provider_Monthly_Spend_Service;
+use AIOPageBuilder\Domain\AI\Budget\Provider_Spend_Cap_Settings;
 use AIOPageBuilder\Domain\AI\InputArtifacts\Input_Artifact_Builder;
 use AIOPageBuilder\Domain\AI\InputArtifacts\Input_Artifact_Schema;
 use AIOPageBuilder\Domain\AI\PromptPacks\Normalized_Prompt_Package_Builder;
@@ -153,6 +155,12 @@ final class Onboarding_Planning_Request_Orchestrator {
 				null,
 				'no_configured_provider'
 			);
+		}
+
+		// * Spend cap preflight: block run if cap exceeded and override is not enabled.
+		$spend_blocked = $this->check_spend_cap_preflight( $provider_id );
+		if ( $spend_blocked !== null ) {
+			return $spend_blocked;
 		}
 
 		$driver = $this->get_driver_for_provider( $provider_id );
@@ -432,6 +440,8 @@ final class Onboarding_Planning_Request_Orchestrator {
 				$post_id = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_COMPLETED, $artifacts );
 				$this->connection_test_service->record_last_successful_use( $effective_provider_id, $created_at );
 				$this->link_run_to_draft( $draft, $run_id, $post_id );
+				// * Record cost_usd against the monthly spend accumulator when pricing data is available.
+				$this->maybe_record_run_cost( $effective_provider_id, $response['usage'] ?? null );
 				// * Fires after a successful AI run so snapshot capture and other listeners can react.
 				\do_action( 'aio_pb_onboarding_run_completed', $run_id );
 				return new Planning_Request_Result(
@@ -477,6 +487,84 @@ final class Onboarding_Planning_Request_Orchestrator {
 			$normalized_error,
 			null
 		);
+	}
+
+	/**
+	 * Checks the monthly spend cap for the given provider. Returns a blocked result when
+	 * the cap is exceeded and override is not enabled; returns null to indicate pass.
+	 *
+	 * @param string $provider_id
+	 * @return Planning_Request_Result|null
+	 */
+	private function check_spend_cap_preflight( string $provider_id ): ?Planning_Request_Result {
+		if ( ! $this->container->has( 'provider_monthly_spend_service' ) ) {
+			return null;
+		}
+		if ( ! $this->container->has( 'provider_spend_cap_settings' ) ) {
+			return null;
+		}
+		/** @var Provider_Monthly_Spend_Service $spend_service */
+		$spend_service = $this->container->get( 'provider_monthly_spend_service' );
+		/** @var Provider_Spend_Cap_Settings $cap_settings */
+		$cap_settings = $this->container->get( 'provider_spend_cap_settings' );
+
+		if ( ! $cap_settings->has_cap( $provider_id ) ) {
+			return null;
+		}
+		$summary = $spend_service->get_spend_summary( $provider_id );
+		if ( $summary['exceeded'] && ! $summary['override_enabled'] ) {
+			\error_log( sprintf(
+				'[AIO Page Builder] Spend cap preflight blocked run for provider %s (spent $%.4f of $%.2f cap).',
+				$provider_id,
+				$summary['month_total'],
+				$summary['cap']
+			) );
+			return new Planning_Request_Result(
+				false,
+				Planning_Request_Result::STATUS_BLOCKED,
+				'',
+				0,
+				/* translators: %1$s provider name, %2$s dollar amount spent, %3$s cap amount */
+				sprintf(
+					__( 'Monthly spend cap for %1$s exceeded ($%2$s of $%3$s). Enable the override in AI Providers settings to allow additional runs.', 'aio-page-builder' ),
+					\esc_html( $provider_id ),
+					number_format( $summary['month_total'], 4 ),
+					number_format( $summary['cap'], 2 )
+				),
+				null,
+				null,
+				'spend_cap_exceeded'
+			);
+		}
+		return null;
+	}
+
+	/**
+	 * Records the cost_usd from a completed run usage struct against the monthly accumulator.
+	 * No-op when usage is absent or cost_usd is null.
+	 *
+	 * @param string     $provider_id
+	 * @param array|null $usage
+	 * @return void
+	 */
+	private function maybe_record_run_cost( string $provider_id, ?array $usage ): void {
+		if ( ! is_array( $usage ) ) {
+			return;
+		}
+		$cost = $usage['cost_usd'] ?? null;
+		if ( ! is_float( $cost ) && ! is_int( $cost ) ) {
+			return;
+		}
+		$cost_float = (float) $cost;
+		if ( $cost_float <= 0.0 ) {
+			return;
+		}
+		if ( ! $this->container->has( 'provider_monthly_spend_service' ) ) {
+			return;
+		}
+		/** @var Provider_Monthly_Spend_Service $spend_service */
+		$spend_service = $this->container->get( 'provider_monthly_spend_service' );
+		$spend_service->record_run_cost( $provider_id, $cost_float );
 	}
 
 	/**

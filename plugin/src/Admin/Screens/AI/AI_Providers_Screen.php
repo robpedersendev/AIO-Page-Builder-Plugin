@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Budget\Provider_Spend_Cap_Settings;
+use AIOPageBuilder\Domain\AI\Budget\Provider_Monthly_Spend_Service;
 use AIOPageBuilder\Domain\AI\Providers\AI_Provider_Interface;
 use AIOPageBuilder\Domain\AI\UI\AI_Providers_UI_State_Builder;
 use AIOPageBuilder\Domain\AI\UI\AI_Provider_State_Store;
@@ -49,7 +51,9 @@ final class AI_Providers_Screen {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage AI providers.', 'aio-page-builder' ), 403 );
 		}
-		$handled = $this->maybe_handle_test_connection() || $this->maybe_handle_update_credential();
+		$handled = $this->maybe_handle_test_connection()
+			|| $this->maybe_handle_update_credential()
+			|| $this->maybe_handle_save_spend_cap();
 		if ( $handled ) {
 			return;
 		}
@@ -57,6 +61,7 @@ final class AI_Providers_Screen {
 		$state = $this->get_state();
 		$this->render_disclosure( $state['disclosure_blocks'] );
 		$this->render_provider_list( $state['provider_rows'], $state['ai_runs_url'] );
+		$this->render_spend_cap_section( $state['provider_rows'] );
 	}
 
 	private function render_connection_test_notice(): void {
@@ -288,6 +293,147 @@ final class AI_Providers_Screen {
 					</tbody>
 				</table>
 			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Handles action=aio_pb_save_spend_cap: saves monthly spend cap settings per provider.
+	 *
+	 * @return bool True if handled and redirected.
+	 */
+	private function maybe_handle_save_spend_cap(): bool {
+		$action      = isset( $_POST['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['action'] ) ) : '';
+		$provider_id = isset( $_POST['provider_id'] ) ? \sanitize_key( (string) $_POST['provider_id'] ) : '';
+		if ( $action !== 'aio_pb_save_spend_cap' || $provider_id === '' ) {
+			return false;
+		}
+		if ( ! \current_user_can( Capabilities::MANAGE_AI_PROVIDERS ) ) {
+			$this->redirect_back( 'error', __( 'You do not have permission to change spend cap settings.', 'aio-page-builder' ) );
+			return true;
+		}
+		\check_admin_referer( 'aio_pb_save_spend_cap_' . $provider_id );
+		if ( ! $this->container ) {
+			return false;
+		}
+		$cap_raw   = isset( $_POST['monthly_cap_usd'] ) ? (string) \wp_unslash( $_POST['monthly_cap_usd'] ) : '0';
+		$cap_usd   = max( 0.0, (float) $cap_raw );
+		$override  = ! empty( $_POST['override_cap_exceeded'] );
+		/** @var Provider_Spend_Cap_Settings $cap_settings */
+		$cap_settings = $this->container->get( 'provider_spend_cap_settings' );
+		$cap_settings->save_settings( $provider_id, $cap_usd, $override );
+		$this->redirect_back( 'success', __( 'Spend cap settings saved.', 'aio-page-builder' ) );
+		return true;
+	}
+
+	/**
+	 * Renders per-provider spend summary notices and cap settings forms.
+	 *
+	 * @param array<int, array> $provider_rows
+	 * @return void
+	 */
+	private function render_spend_cap_section( array $provider_rows ): void {
+		if ( ! $this->container
+			|| ! $this->container->has( 'provider_monthly_spend_service' )
+			|| ! $this->container->has( 'provider_spend_cap_settings' ) ) {
+			return;
+		}
+		/** @var Provider_Monthly_Spend_Service $spend_service */
+		$spend_service = $this->container->get( 'provider_monthly_spend_service' );
+		/** @var Provider_Spend_Cap_Settings $cap_settings */
+		$cap_settings = $this->container->get( 'provider_spend_cap_settings' );
+		?>
+		<div class="wrap aio-ai-spend-cap-section">
+			<h2><?php \esc_html_e( 'Monthly Spend Caps', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Set a per-provider monthly spend cap to prevent unexpected costs. When exceeded, new AI runs are blocked unless the override is enabled. Cost tracking uses approximate rates; verify totals in your provider dashboard.', 'aio-page-builder' ); ?></p>
+			<?php foreach ( $provider_rows as $row ) :
+				$pid     = $row['provider_id'] ?? '';
+				if ( $pid === '' ) {
+					continue;
+				}
+				$summary = $spend_service->get_spend_summary( $pid );
+				$label   = \esc_html( $row['label'] ?? $pid );
+				?>
+				<div class="aio-spend-cap-provider" style="margin-bottom:2em;padding:1em;border:1px solid #ccd0d4;background:#fff;">
+					<h3 style="margin-top:0;"><?php echo $label; ?></h3>
+					<?php if ( $summary['month_total'] > 0.0 || $summary['has_cap'] ) : ?>
+						<?php if ( $summary['exceeded'] ) : ?>
+							<div class="notice notice-error inline" style="margin:0 0 1em;"><p>
+								<?php
+								printf(
+									\esc_html__( 'Monthly spend cap exceeded: $%1$s spent of $%2$s cap.', 'aio-page-builder' ),
+									\esc_html( number_format( $summary['month_total'], 4 ) ),
+									\esc_html( number_format( $summary['cap'], 2 ) )
+								);
+								if ( $summary['override_enabled'] ) {
+									echo ' ';
+									\esc_html_e( 'Override enabled — runs are still allowed.', 'aio-page-builder' );
+								}
+								?>
+							</p></div>
+						<?php elseif ( $summary['approaching'] ) : ?>
+							<div class="notice notice-warning inline" style="margin:0 0 1em;"><p>
+								<?php
+								printf(
+									\esc_html__( 'Approaching monthly spend cap: $%1$s spent of $%2$s cap (%3$s%%).', 'aio-page-builder' ),
+									\esc_html( number_format( $summary['month_total'], 4 ) ),
+									\esc_html( number_format( $summary['cap'], 2 ) ),
+									\esc_html( number_format( $summary['percent_used'] * 100, 1 ) )
+								);
+								?>
+							</p></div>
+						<?php else : ?>
+							<p><strong><?php \esc_html_e( 'Month-to-date spend:', 'aio-page-builder' ); ?></strong>
+							<?php echo \esc_html( '$' . number_format( $summary['month_total'], 4 ) ); ?>
+							<?php if ( $summary['has_cap'] ) : ?>
+								<?php echo \esc_html( sprintf( ' / $%s cap', number_format( $summary['cap'], 2 ) ) ); ?>
+							<?php endif; ?>
+							</p>
+						<?php endif; ?>
+					<?php else : ?>
+						<p><em><?php \esc_html_e( 'No spend recorded this month.', 'aio-page-builder' ); ?></em></p>
+					<?php endif; ?>
+
+					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG ) ); ?>">
+						<input type="hidden" name="action" value="aio_pb_save_spend_cap" />
+						<input type="hidden" name="provider_id" value="<?php echo \esc_attr( $pid ); ?>" />
+						<?php \wp_nonce_field( 'aio_pb_save_spend_cap_' . $pid ); ?>
+						<table class="form-table" style="margin:0;">
+							<tr>
+								<th scope="row"><label for="monthly_cap_<?php echo \esc_attr( $pid ); ?>"><?php \esc_html_e( 'Monthly cap (USD)', 'aio-page-builder' ); ?></label></th>
+								<td>
+									<input
+										type="number"
+										id="monthly_cap_<?php echo \esc_attr( $pid ); ?>"
+										name="monthly_cap_usd"
+										value="<?php echo \esc_attr( (string) $cap_settings->get_cap( $pid ) ); ?>"
+										min="0"
+										max="<?php echo \esc_attr( (string) Provider_Spend_Cap_Settings::MAX_CAP_USD ); ?>"
+										step="0.01"
+										style="width:120px;"
+									/>
+									<p class="description"><?php \esc_html_e( 'Enter 0 to disable the cap.', 'aio-page-builder' ); ?></p>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php \esc_html_e( 'Allow override when cap exceeded', 'aio-page-builder' ); ?></th>
+								<td>
+									<label>
+										<input
+											type="checkbox"
+											name="override_cap_exceeded"
+											value="1"
+											<?php \checked( $cap_settings->is_override_enabled( $pid ) ); ?>
+										/>
+										<?php \esc_html_e( 'Continue allowing runs after cap is reached', 'aio-page-builder' ); ?>
+									</label>
+								</td>
+							</tr>
+						</table>
+						<p><button type="submit" class="button button-primary"><?php \esc_html_e( 'Save cap settings', 'aio-page-builder' ); ?></button></p>
+					</form>
+				</div>
+			<?php endforeach; ?>
 		</div>
 		<?php
 	}
