@@ -31,6 +31,8 @@ Start at **Dashboard** for readiness and quick links. Use **Onboarding & Profile
 
 Complete the guided steps to capture brand and business profile data. This data is used by the planner and AI; incomplete profile can affect plan quality. You can save a draft and return later. After completion, the profile is available for crawl interpretation and Build Plan generation. When the Industry Pack subsystem is enabled, **industry profile** (primary and optional secondary industry) can be set from the same area or from **Industry** submenu; it influences template recommendations, Build Plan scoring, and documentation overlays.
 
+**Deep dive (steps, drafts, prefill, blocking, submission):** [onboarding-and-profile.md](../kb/operator/onboarding-and-profile.md).
+
 ---
 
 ## 3. Provider setup and connection testing

@@ -25,12 +25,14 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 ### Getting Started
 
 - [concepts-and-glossary.md](concepts-and-glossary.md) — Terms, default permissions, UI map, guide picker, FAQ.
-- [admin-operator-guide.md §1–§2](../guides/admin-operator-guide.md) — Menu overview, settings, onboarding.
+- [onboarding-and-profile.md](operator/onboarding-and-profile.md) — Full onboarding/profile workflow (drafts, prefill, submission).
+- [admin-operator-guide.md §1–§2](../guides/admin-operator-guide.md) — Menu overview, settings, onboarding summary.
 - [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md) — Editor onboarding and Build Plan review.
 - [settings-registry-maintenance.md](operator/settings-registry-maintenance.md) — Registry seed actions on Settings (stub).
 
 ### AI & Providers
 
+- [onboarding-and-profile.md](operator/onboarding-and-profile.md) — Onboarding through **Request AI plan** and profile storage.
 - [admin-operator-guide.md §3, §5](../guides/admin-operator-guide.md) — Providers and AI Runs.
 - [advanced-ai-labs.md](operator/advanced-ai-labs.md) — Profile History, Prompt Experiments (stub).
 

@@ -46,7 +46,7 @@
 
 | Workflow / route | Primary | Secondary |
 |------------------|---------|-----------|
-| Onboarding & Profile (`aio-page-builder-onboarding`) | [admin-operator-guide.md §2](../guides/admin-operator-guide.md); [end-user-workflow-guide.md §1](../guides/end-user-workflow-guide.md) | `Onboarding_UI_State_Builder` |
+| Onboarding & Profile (`aio-page-builder-onboarding`) | [onboarding-and-profile.md](operator/onboarding-and-profile.md) | [admin-operator-guide.md §2](../guides/admin-operator-guide.md); [end-user-workflow-guide.md §1](../guides/end-user-workflow-guide.md); `Onboarding_UI_State_Builder` |
 | Profile History (`aio-page-builder-profile-snapshots`) | [advanced-ai-labs.md](operator/advanced-ai-labs.md) | Panel + history UX (content TBD) |
 | AI Runs list + run detail (`aio-page-builder-ai-runs`) | [admin-operator-guide.md §5](../guides/admin-operator-guide.md) | [support-triage-guide.md §1](../guides/support-triage-guide.md) (AI Runs tab) |
 | AI Providers (`aio-page-builder-ai-providers`) | [admin-operator-guide.md §3](../guides/admin-operator-guide.md) | `AI_Providers_UI_State_Builder` |

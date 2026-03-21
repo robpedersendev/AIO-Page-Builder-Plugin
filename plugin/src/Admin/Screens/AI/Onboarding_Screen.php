@@ -22,6 +22,7 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
 use AIOPageBuilder\Domain\AI\Onboarding\Planning_Request_Result;
 use AIOPageBuilder\Domain\Profile\Template_Preference_Profile;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
+use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -968,7 +969,7 @@ final class Onboarding_Screen {
 			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
 		$site_url    = isset( $biz['current_site_url'] ) && $biz['current_site_url'] !== ''
 			? (string) $biz['current_site_url'] : ( is_string( $stored_url ) ? $stored_url : '' );
-		$crawler_url = \add_query_arg( array( 'page' => 'aio-page-builder-crawler' ), \admin_url( 'admin.php' ) );
+		$crawler_url = \add_query_arg( array( 'page' => Crawler_Sessions_Screen::SLUG ), \admin_url( 'admin.php' ) );
 		?>
 		<p><?php \esc_html_e( 'If you have an existing site, enter its URL here. This is used as context for AI planning and enables crawl-based content analysis.', 'aio-page-builder' ); ?></p>
 		<table class="form-table" role="presentation">
@@ -1002,7 +1003,7 @@ final class Onboarding_Screen {
 		$prefill       = $state['prefill'] ?? array();
 		$latest_run_id = $prefill['latest_crawl_run_id'] ?? null;
 		$crawl_run_ids = $prefill['crawl_run_ids'] ?? array();
-		$crawler_url   = \add_query_arg( array( 'page' => 'aio-page-builder-crawler' ), \admin_url( 'admin.php' ) );
+		$crawler_url   = \add_query_arg( array( 'page' => Crawler_Sessions_Screen::SLUG ), \admin_url( 'admin.php' ) );
 		?>
 		<p><?php \esc_html_e( 'Crawl your existing site to give the AI planner richer context about your current content structure and gaps.', 'aio-page-builder' ); ?></p>
 		<?php if ( $latest_run_id !== null && $latest_run_id !== '' ) : ?>

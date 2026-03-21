@@ -10,6 +10,8 @@
 
 This page will describe **Profile History** (snapshot timeline / panel behavior) and **Prompt Experiments** (who should use it, relationship to production prompts and AI Runs). Detailed field-level and prompt-pack documentation belongs in specs/contracts; this KB stays UI- and workflow-oriented.
 
+**Onboarding and current profile:** [onboarding-and-profile.md](onboarding-and-profile.md) (drafts, prefill, **Request AI plan**). Profile restore here replaces **current** profile data in `Profile_Store`; it does not replace onboarding draft step state by itself.
+
 ---
 
 ## Target outline for full article

@@ -13,7 +13,7 @@
 
 - **Where:** **AIO Page Builder → Onboarding & Profile**.
 
-Complete the steps to provide brand and business profile data. This information is used so the AI can produce relevant Build Plans and recommendations. You can **Save draft** and return later. Finish onboarding before relying on AI-generated plans.
+Complete the steps to provide brand and business profile data. This information is used so the AI can produce relevant Build Plans and recommendations. You can **Save draft** and return later. Finish onboarding before relying on AI-generated plans. Operator-level detail (all steps, drafts, **Request AI plan**): [onboarding-and-profile.md](../kb/operator/onboarding-and-profile.md).
 
 ---
 
