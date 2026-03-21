@@ -77,9 +77,10 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ### Analytics / Diagnostics / Logs
 
-- [operational-analytics.md](analytics/operational-analytics.md) — Build Plan Analytics, Template Analytics, Post-Release Health (stub).
-- [diagnostics-screens.md](operator/diagnostics-screens.md) — Diagnostics, ACF Architecture, Form Provider Health (stub).
-- [admin-operator-guide.md §9](../guides/admin-operator-guide.md); [support-triage-guide.md §1–§2](../guides/support-triage-guide.md) — Queue & Logs, export.
+- [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md) — **Operator guide:** analytics screens, Diagnostics, Queue & Logs (tabs, limits, placeholders), reporting health, log export, Privacy/Reporting disclosure, troubleshooting; avoids overclaiming (e.g. Import/Export Logs tab, import/export failure aggregation).
+- [operational-analytics.md](analytics/operational-analytics.md) — FILE_MAP anchor for analytics routes (links to guide above).
+- [diagnostics-screens.md](operator/diagnostics-screens.md) — FILE_MAP anchor for diagnostics routes (links to guide above).
+- [admin-operator-guide.md §9](../guides/admin-operator-guide.md); [support-triage-guide.md §1–§2](../guides/support-triage-guide.md) — Short summary; triage runbook.
 
 ### Support / Troubleshooting / FAQ
 
@@ -99,6 +100,7 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ### Privacy, reporting, uninstall
 
+- [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md) — Reporting disclosure blocks, retention copy, privacy helper, report destination summary (aligned with `Privacy_Settings_State_Builder`).
 - [admin-operator-guide.md §10](../guides/admin-operator-guide.md); [REPORTING_EXCEPTION.md](../standards/REPORTING_EXCEPTION.md); [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md).
 
 ### Private distribution & release documentation

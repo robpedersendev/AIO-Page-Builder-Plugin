@@ -133,8 +133,8 @@ Custom roles, membership plugins, or manual cap edits override these defaults. I
 | **Build Plans** | Plan list; opening a plan loads the **workspace** (stepper + lists). |
 | **Page Templates** / **Section Templates** / **Template Compare** / **Compositions** | Template library and compare; compositions builder. |
 | **Build Plan Analytics** / **Template Analytics** | Read-only trends. |
-| **Queue & Logs** | Queue, execution, AI, reporting, import/export, critical errors; reporting health banner. |
-| **Support Triage** / **Post-Release Health** | Aggregated operational views. |
+| **Queue & Logs** | Queue, execution, AI, reporting, import/export tab (placeholder until activity store exists), critical errors; reporting health banner — [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md). |
+| **Support Triage** / **Post-Release Health** | Aggregated operational views — same guide. |
 | **Privacy, Reporting & Settings** | Disclosure, retention, uninstall/export choices. |
 | **Industry** submenu | Industry profile, overrides, reports, bundle import, guided repair, style tools (caps vary). |
 | **Global Style Tokens** / **Global Component Overrides** | Site-wide styling defaults. |

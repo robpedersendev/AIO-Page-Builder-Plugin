@@ -36,9 +36,9 @@
 
 | Workflow / route | Primary | Secondary |
 |------------------|---------|-----------|
-| Diagnostics (`aio-page-builder-diagnostics`) | [diagnostics-screens.md](operator/diagnostics-screens.md) | [support-triage-guide.md §6](../guides/support-triage-guide.md) |
-| ACF Field Architecture (`aio-page-builder-acf-diagnostics`) | [diagnostics-screens.md](operator/diagnostics-screens.md) | `ACF_Diagnostics_State_Builder` |
-| Form Provider Health (`aio-page-builder-form-provider-health`) | [diagnostics-screens.md](operator/diagnostics-screens.md); [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md) | [admin-screen-inventory.md §2.6](../contracts/admin-screen-inventory.md) |
+| Diagnostics (`aio-page-builder-diagnostics`) | [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md); [diagnostics-screens.md](operator/diagnostics-screens.md) | [support-triage-guide.md §6](../guides/support-triage-guide.md); `Environment_Validator` |
+| ACF Field Architecture (`aio-page-builder-acf-diagnostics`) | [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md); [diagnostics-screens.md](operator/diagnostics-screens.md) | `ACF_Diagnostics_State_Builder` |
+| Form Provider Health (`aio-page-builder-form-provider-health`) | [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md); [diagnostics-screens.md](operator/diagnostics-screens.md); [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md) | [admin-screen-inventory.md §2.6](../contracts/admin-screen-inventory.md) |
 
 ---
 
@@ -94,9 +94,9 @@
 
 | Workflow / route | Primary | Secondary |
 |------------------|---------|-----------|
-| Build Plan Analytics (`aio-page-builder-build-plan-analytics`) | [operational-analytics.md](analytics/operational-analytics.md) | `Build_Plan_Analytics_Service` / screen |
-| Template Analytics (`aio-page-builder-template-analytics`) | [operational-analytics.md](analytics/operational-analytics.md) | Template analytics screen |
-| Post-Release Health (`aio-page-builder-post-release-health`) | [operational-analytics.md](analytics/operational-analytics.md) | [admin-screen-inventory.md §4](../contracts/admin-screen-inventory.md) |
+| Build Plan Analytics (`aio-page-builder-build-plan-analytics`) | [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md); [operational-analytics.md](analytics/operational-analytics.md) | `Build_Plan_Analytics_Service`; `Build_Plan_Analytics_Screen` |
+| Template Analytics (`aio-page-builder-template-analytics`) | [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md); [operational-analytics.md](analytics/operational-analytics.md) | `Template_Analytics_Screen` |
+| Post-Release Health (`aio-page-builder-post-release-health`) | [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md); [operational-analytics.md](analytics/operational-analytics.md) | `Post_Release_Health_State_Builder`; [admin-screen-inventory.md §4](../contracts/admin-screen-inventory.md) |
 
 ---
 
@@ -113,7 +113,7 @@
 
 | Workflow / route | Primary | Secondary |
 |------------------|---------|-----------|
-| Privacy, Reporting & Settings (`aio-page-builder-privacy-reporting`) | [admin-operator-guide.md §10](../guides/admin-operator-guide.md) | [REPORTING_EXCEPTION.md](../standards/REPORTING_EXCEPTION.md); `Privacy_Settings_State_Builder` |
+| Privacy, Reporting & Settings (`aio-page-builder-privacy-reporting`) | [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md) (disclosure, retention, helper); [admin-operator-guide.md §10](../guides/admin-operator-guide.md) | [REPORTING_EXCEPTION.md](../standards/REPORTING_EXCEPTION.md); `Privacy_Settings_State_Builder`; `Privacy_Reporting_Settings_Screen` |
 | Portability and uninstall | [PORTABILITY_AND_UNINSTALL.md](../standards/PORTABILITY_AND_UNINSTALL.md) | [admin-operator-guide.md §10](../guides/admin-operator-guide.md) |
 
 ---
