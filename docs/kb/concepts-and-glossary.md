@@ -138,7 +138,7 @@ Custom roles, membership plugins, or manual cap edits override these defaults. I
 | **Privacy, Reporting & Settings** | Disclosure, retention, uninstall/export choices. |
 | **Industry** submenu | Industry profile, overrides, reports, bundle import, guided repair, style tools (caps vary). |
 | **Global Style Tokens** / **Global Component Overrides** | Site-wide styling defaults. |
-| **Import / Export** | Backups, support bundles, validate/restore. |
+| **Import / Export** | Backups, support bundles, validate/restore — [import-export-and-restore.md](operator/import-export-and-restore.md). |
 
 Hidden routes: **Page Template Detail**, **Section Template Detail**, **Documentation Detail**—opened from links inside the template library, not from the sidebar.
 

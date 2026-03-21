@@ -71,6 +71,7 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ### Import / Export / Restore
 
+- [import-export-and-restore.md](operator/import-export-and-restore.md) — **Operator workflow:** export modes, preview/validate, restore scope, conflicts, ZIP rules, uninstall/deactivation vs built pages, step-by-step, edge cases, FAQ.
 - [admin-operator-guide.md §11](../guides/admin-operator-guide.md); [support-triage-guide.md §3](../guides/support-triage-guide.md) (support bundle).
 - [export-bundle-structure-contract.md](../contracts/export-bundle-structure-contract.md) — Bundle shape (implementer reference).
 

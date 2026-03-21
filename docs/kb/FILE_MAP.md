@@ -122,7 +122,7 @@
 
 | Workflow / route | Primary | Secondary |
 |------------------|---------|-----------|
-| Import / Export (`aio-page-builder-export-restore`) | [admin-operator-guide.md §11](../guides/admin-operator-guide.md); [support-triage-guide.md §3](../guides/support-triage-guide.md) (support bundle) | [export-bundle-structure-contract.md](../contracts/export-bundle-structure-contract.md); `Import_Export_State_Builder` |
+| Import / Export (`aio-page-builder-export-restore`) | [import-export-and-restore.md](operator/import-export-and-restore.md); [admin-operator-guide.md §11](../guides/admin-operator-guide.md); [support-triage-guide.md §3](../guides/support-triage-guide.md) (support bundle) | [export-bundle-structure-contract.md](../contracts/export-bundle-structure-contract.md); `Import_Export_State_Builder`; `Import_Export_Screen` |
 
 ---
 
