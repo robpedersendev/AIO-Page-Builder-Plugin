@@ -3,7 +3,7 @@
 **Audience:** Content editors and implementers who choose templates, use one-pagers, and need helper documentation.  
 **Spec:** §0.10.7, §1.9.4, §10.7 (Documentation object), §57.9, §60.6.  
 **Purpose:** Practical guidance for choosing section and page templates, understanding one-pagers and compositions, and using helper docs. Product-accurate; no aspirational behavior.  
-**Knowledge base:** [KB index](../kb/index.md); [FILE_MAP.md](../kb/FILE_MAP.md) §7 (helper / documentation detail route).
+**Knowledge base:** [Template system overview](../kb/templates/template-system-overview.md); [KB index](../kb/index.md); [FILE_MAP.md](../kb/FILE_MAP.md) §7 (helper / documentation detail route).
 
 ---
 

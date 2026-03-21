@@ -45,6 +45,8 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ### Templates
 
+- [template-system-overview.md](templates/template-system-overview.md) — Umbrella: sections vs page templates vs compositions vs helper docs and previews (**start here**).
+- [section-templates-deep-dive.md](templates/section-templates-deep-dive.md), [page-templates-deep-dive.md](templates/page-templates-deep-dive.md), [compositions-deep-dive.md](templates/compositions-deep-dive.md) — Focused KB stubs (expand later).
 - [template-library-operator-guide.md](../guides/template-library-operator-guide.md) — Directories, detail, compare, compositions.
 - [template-library-editor-guide.md](../guides/template-library-editor-guide.md) — Choosing templates, one-pagers, helper docs.
 - [template-library-support-guide.md](../guides/template-library-support-guide.md) — Support-focused template diagnostics.
@@ -99,6 +101,7 @@ Labels and table columns on many screens are driven by dedicated builders. Use t
 
 | Area | Representative builders |
 |------|-------------------------|
+| Template system (umbrella doc) | [template-system-overview.md](templates/template-system-overview.md) |
 | Dashboard | `Dashboard_State_Builder` |
 | Onboarding | `Onboarding_UI_State_Builder` |
 | AI providers | `AI_Providers_UI_State_Builder` |

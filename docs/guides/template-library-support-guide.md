@@ -2,7 +2,8 @@
 
 **Audience:** Support reviewers and operators performing template-library diagnostics and issue triage.  
 **Spec:** §0.10.7, §1.9.4, §54.8, §55.8, §57.9, §59.14, §60.6.  
-**Purpose:** Template-library diagnostics, appendices, compliance reports, support bundles, and bounded limitations. Product-accurate; no exposure of secrets or unsafe shortcuts.
+**Purpose:** Template-library diagnostics, appendices, compliance reports, support bundles, and bounded limitations. Product-accurate; no exposure of secrets or unsafe shortcuts.  
+**Knowledge base:** [Template system overview](../kb/templates/template-system-overview.md); [KB index](../kb/index.md); [FILE_MAP.md](../kb/FILE_MAP.md) §7.
 
 ---
 

@@ -76,15 +76,16 @@
 
 | Workflow / route | Primary | Secondary |
 |------------------|---------|-----------|
-| Page Templates directory (`aio-page-builder-page-templates`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | `Page_Template_Directory_State_Builder` |
-| Page Template Detail (`aio-page-builder-page-template-detail`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | `Page_Template_Detail_State_Builder`; `Entity_Style_UI_State_Builder` (per-entity styling panel) |
-| Section Templates directory (`aio-page-builder-section-templates`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | `Section_Template_Directory_State_Builder` |
-| Section Template Detail (`aio-page-builder-section-template-detail`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md); [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md) (form binding panel) | `Section_Template_Detail_State_Builder`; `Form_Section_Field_State_Builder` |
-| Template Compare (`aio-page-builder-template-compare`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | `Template_Compare_State_Builder` |
-| Compositions list + builder (`aio-page-builder-compositions`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | `Composition_Builder_State_Builder` |
-| Documentation / helper detail (`aio-page-builder-documentation-detail`) | [template-library-editor-guide.md §6](../guides/template-library-editor-guide.md) | [admin-screen-inventory.md](../contracts/admin-screen-inventory.md) |
-| Choosing templates, one-pagers, helper docs (editor lens) | [template-library-editor-guide.md](../guides/template-library-editor-guide.md) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) |
-| Support — inventory appendices, compliance | [template-library-support-guide.md](../guides/template-library-support-guide.md) | [support-triage-guide.md](../guides/support-triage-guide.md) |
+| Template system overview (sections vs pages vs compositions vs docs/previews) | [template-system-overview.md](templates/template-system-overview.md) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md); [template-library-editor-guide.md](../guides/template-library-editor-guide.md); deep-dive stubs under `kb/templates/` |
+| Page Templates directory (`aio-page-builder-page-templates`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | [template-system-overview.md](templates/template-system-overview.md); `Page_Template_Directory_State_Builder` |
+| Page Template Detail (`aio-page-builder-page-template-detail`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | [template-system-overview.md](templates/template-system-overview.md); `Page_Template_Detail_State_Builder`; `Entity_Style_UI_State_Builder` (per-entity styling panel) |
+| Section Templates directory (`aio-page-builder-section-templates`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | [template-system-overview.md](templates/template-system-overview.md); `Section_Template_Directory_State_Builder` |
+| Section Template Detail (`aio-page-builder-section-template-detail`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md); [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md) (form binding panel) | [template-system-overview.md](templates/template-system-overview.md); `Section_Template_Detail_State_Builder`; `Form_Section_Field_State_Builder` |
+| Template Compare (`aio-page-builder-template-compare`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | [template-system-overview.md](templates/template-system-overview.md); `Template_Compare_State_Builder` |
+| Compositions list + builder (`aio-page-builder-compositions`) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) | [template-system-overview.md](templates/template-system-overview.md); `Composition_Builder_State_Builder` |
+| Documentation / helper detail (`aio-page-builder-documentation-detail`) | [template-library-editor-guide.md §6](../guides/template-library-editor-guide.md) | [template-system-overview.md](templates/template-system-overview.md); [admin-screen-inventory.md](../contracts/admin-screen-inventory.md) |
+| Choosing templates, one-pagers, helper docs (editor lens) | [template-library-editor-guide.md](../guides/template-library-editor-guide.md) | [template-system-overview.md](templates/template-system-overview.md); [template-library-operator-guide.md](../guides/template-library-operator-guide.md) |
+| Support — inventory appendices, compliance | [template-library-support-guide.md](../guides/template-library-support-guide.md) | [template-system-overview.md](templates/template-system-overview.md); [support-triage-guide.md](../guides/support-triage-guide.md) |
 
 ---
 
