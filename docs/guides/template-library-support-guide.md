@@ -15,7 +15,7 @@ This guide covers **support and diagnostics** specific to the expanded template 
 - What is included in support bundles for template/registry data.
 - Known limitations and safe troubleshooting steps.
 
-It **complements** the general [support-triage-guide.md](support-triage-guide.md) (logs, reporting, redaction, export modes). It does not replace security or redaction rules.
+It **complements** the general [support-triage-guide.md](support-triage-guide.md) (logs, reporting, redaction, export modes). It does not replace security or redaction rules. **Knowledge base:** [KB index](../kb/index.md); [FILE_MAP.md](../kb/FILE_MAP.md) §7.
 
 ---
 

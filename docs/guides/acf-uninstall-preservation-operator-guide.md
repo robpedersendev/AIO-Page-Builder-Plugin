@@ -2,7 +2,8 @@
 
 **Audience:** Site administrators and operators planning or performing plugin uninstall.  
 **Spec:** acf-uninstall-retention-contract, acf-native-handoff-contract, PORTABILITY_AND_UNINSTALL.  
-**Purpose:** Explain what is retained by default, what requires a handoff to preserve editable field groups, and how to avoid losing editor continuity.
+**Purpose:** Explain what is retained by default, what requires a handoff to preserve editable field groups, and how to avoid losing editor continuity.  
+**Knowledge base:** [FILE_MAP.md](../kb/FILE_MAP.md) §16.
 
 ---
 

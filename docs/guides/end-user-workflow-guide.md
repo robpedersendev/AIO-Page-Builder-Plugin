@@ -2,7 +2,8 @@
 
 **Audience:** Content editors and users who complete onboarding, review Build Plans, and trigger execution.  
 **Spec:** §1.5.4, §0.10.7.  
-**Purpose:** Concise guidance for onboarding/profile and Build Plan review.
+**Purpose:** Concise guidance for onboarding/profile and Build Plan review.  
+**Knowledge base:** [KB index](../kb/index.md) (end-user lane); [FILE_MAP.md](../kb/FILE_MAP.md).
 
 ---
 
@@ -39,4 +40,4 @@ Only approved items are executed. Do not approve steps you have not reviewed. Th
 
 ## 4. Where to get more detail
 
-Operators and admins: see [admin-operator-guide.md](admin-operator-guide.md). Support and diagnostics: see [support-triage-guide.md](support-triage-guide.md).
+Operators and admins: see [admin-operator-guide.md](admin-operator-guide.md). Support and diagnostics: see [support-triage-guide.md](support-triage-guide.md). Full workflow index: [FILE_MAP.md](../kb/FILE_MAP.md).

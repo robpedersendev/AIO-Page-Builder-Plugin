@@ -2,16 +2,25 @@
 
 **Audience:** Site administrators and operators.  
 **Spec:** §0.10.7, §49, §60.6, §59.15.  
-**Purpose:** Operational guidance for admin screens, provider setup, crawler, AI runs, Build Plans, execution/rollback, reporting disclosure, import/export, and uninstall.
+**Purpose:** Operational guidance for admin screens, provider setup, crawler, AI runs, Build Plans, execution/rollback, reporting disclosure, import/export, and uninstall.  
+**Knowledge base:** [KB index](../kb/index.md) — audience lanes, taxonomy, and [FILE_MAP.md](../kb/FILE_MAP.md) (every menu route → canonical article).
 
 ---
 
 ## 1. Quick start and menu
 
 - **Menu:** WordPress admin → **AIO Page Builder** (top-level).
-- **Submenus:** Dashboard, Settings, Diagnostics, Onboarding & Profile, Crawl Sessions, Crawl Comparison, AI Runs, AI Providers, Build Plans, **Page Templates**, **Section Templates**, **Template Compare**, **Compositions**, Build Plan Analytics, Template Analytics, Queue & Logs, Support Triage, Privacy, Reporting & Settings, Import / Export.
+- **Submenus (registered order):** Dashboard; Settings; Diagnostics; ACF Field Architecture; Form Provider Health; Onboarding & Profile; Profile History; Crawl Sessions; Crawl Comparison; AI Runs; AI Providers; Prompt Experiments; Build Plans; **Page Templates**; **Section Templates**; Template Compare; Compositions; Build Plan Analytics; Template Analytics; Queue & Logs; Support Triage; Post-Release Health; Privacy, Reporting & Settings; Industry Profile; Industry Overrides; Industry Author Dashboard; Industry Health Report; Stale content report; Pack family comparison; Future industry readiness; Future subtype readiness; Maturity delta report; Drift report; Scaffold promotion readiness; Guided Repair; Subtype comparison; Bundle comparison; Conversion goal comparison; Industry Bundle Import; Industry Style Preset; Style layer comparison; Global Style Tokens; Global Component Overrides; Import / Export.
 
-Start at **Dashboard** for readiness and quick links. Use **Onboarding & Profile** to complete brand/business profile before running AI planning. Use **AI Providers** to configure and test the AI connection. For the expanded template library (directories, compare, compositions, previews), see [template-library-operator-guide.md](template-library-operator-guide.md).
+**Hidden routes (no menu label):** Page Template Detail, Section Template Detail, and Documentation Detail open from **View** / helper links inside the template library. See [template-library-operator-guide.md](template-library-operator-guide.md).
+
+Start at **Dashboard** for readiness and quick links. Use **Onboarding & Profile** to complete brand/business profile before running AI planning. Use **AI Providers** to configure and test the AI connection. For the expanded template library (directories, compare, compositions, previews), see [template-library-operator-guide.md](template-library-operator-guide.md). For **Industry** menus (profile, reports, bundle import, guided repair, etc.), the KB hub is [industry-admin-workflows.md](../kb/industry/industry-admin-workflows.md) (stub until expanded). For **Settings** seed actions (registry batches), see §1.1 and [settings-registry-maintenance.md](../kb/operator/settings-registry-maintenance.md).
+
+### 1.1 Settings (`aio-page-builder-settings`)
+
+- **Capability:** `aio_manage_settings` (typical administrators).
+- **Purpose:** Plugin version, link to **Privacy, Reporting & Settings**, and **registry maintenance**: idempotent **seed** actions that install or refresh curated section templates, page templates, and related batches (plus **Seed form section and request page template** for form provider flows — see [form-provider-operator-guide.md](form-provider-operator-guide.md)). Each action shows success or error admin notices after redirect. Re-running a seed generally overwrites definitions for the same internal keys; use only when you intend to refresh registry content.
+- **Detail:** [settings-registry-maintenance.md](../kb/operator/settings-registry-maintenance.md) (outline for per-action documentation).
 
 ---
 
@@ -141,6 +150,7 @@ Support bundle and other modes are defined in the export-bundle-structure contra
 
 | Need | Screen or doc |
 |------|----------------|
+| Knowledge base index and workflow map | [index.md](../kb/index.md); [FILE_MAP.md](../kb/FILE_MAP.md) |
 | Template library operation | [template-library-operator-guide.md](template-library-operator-guide.md) |
 | Template choice and one-pagers (editors) | [template-library-editor-guide.md](template-library-editor-guide.md) |
 | Template library support and diagnostics | [template-library-support-guide.md](template-library-support-guide.md) |

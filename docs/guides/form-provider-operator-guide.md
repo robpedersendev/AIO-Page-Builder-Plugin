@@ -2,7 +2,8 @@
 
 **Audience:** Administrators and operators using provider-backed form sections and the request-form page template.  
 **Spec:** §0.10.7, §0.10.10, §49, §50, §57.9, §60.6.  
-**Purpose:** Current behavior, failure states, and operator-facing guidance. Product-accurate; no aspirational behavior.
+**Purpose:** Current behavior, failure states, and operator-facing guidance. Product-accurate; no aspirational behavior.  
+**Knowledge base:** [KB index](../kb/index.md); [FILE_MAP.md](../kb/FILE_MAP.md) §3 (Form Provider Health) and §2 (Settings seed).
 
 ---
 

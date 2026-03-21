@@ -2,7 +2,8 @@
 
 **Audience:** Administrators and operators managing the expanded template library.  
 **Spec:** §0.10.7, §1.9.4, §49, §50, §55.8, §57.9, §60.6.  
-**Purpose:** How to browse, compare, preview, compose, and operate the section/page template directories, detail screens, compare workspace, and compositions. Product-accurate; no aspirational behavior.
+**Purpose:** How to browse, compare, preview, compose, and operate the section/page template directories, detail screens, compare workspace, and compositions. Product-accurate; no aspirational behavior.  
+**Knowledge base:** [KB index](../kb/index.md); template workflows in [FILE_MAP.md](../kb/FILE_MAP.md) §7.
 
 ---
 

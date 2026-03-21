@@ -2,7 +2,7 @@
 
 **Document type:** Contract for admin menu and screen routing (spec §49, §49.11).  
 **Governs:** Submenu slugs, screen classes, capability mapping, and Queue & Logs tabs.  
-**Guidance:** For operator and support workflows, see [admin-operator-guide.md](../guides/admin-operator-guide.md) and [support-triage-guide.md](../guides/support-triage-guide.md).
+**Guidance:** For operator and support workflows, see [admin-operator-guide.md](../guides/admin-operator-guide.md) and [support-triage-guide.md](../guides/support-triage-guide.md). User-facing KB index and full menu-to-article map: [index.md](../kb/index.md), [FILE_MAP.md](../kb/FILE_MAP.md). **Note:** The table in §2 is not exhaustive for every registered submenu; [FILE_MAP.md](../kb/FILE_MAP.md) reflects the full `Admin_Menu::register()` surface.
 
 ---
 

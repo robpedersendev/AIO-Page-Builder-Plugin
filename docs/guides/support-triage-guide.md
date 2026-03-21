@@ -2,7 +2,8 @@
 
 **Audience:** Support staff and operators performing diagnostics and issue triage.  
 **Spec:** §59.15, §60.6, §46 (reporting), security and redaction standards.  
-**Purpose:** Logs, support package usage, and issue triage; redaction and safe handling.
+**Purpose:** Logs, support package usage, and issue triage; redaction and safe handling.  
+**Knowledge base:** [KB index](../kb/index.md) (support lane); [FILE_MAP.md](../kb/FILE_MAP.md).
 
 ---
 
