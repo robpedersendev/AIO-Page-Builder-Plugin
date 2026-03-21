@@ -66,9 +66,9 @@ final class GenerateBlocks_Mapping_Rules {
 	}
 
 	/**
-	 * Returns list of unsupported pattern descriptions for documentation and fallback messaging.
+	 * Returns keyed unsupported pattern descriptions for documentation and fallback messaging.
 	 *
-	 * @return array<int, string>
+	 * @return array<string, string>
 	 */
 	public static function unsupported_patterns(): array {
 		return array(

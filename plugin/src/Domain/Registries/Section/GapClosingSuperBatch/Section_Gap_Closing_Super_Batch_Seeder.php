@@ -35,6 +35,7 @@ final class Section_Gap_Closing_Super_Batch_Seeder {
 			$section_keys[] = $key;
 			$id             = $section_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
+				/* translators: %s: internal registry key. */
 				$errors[] = sprintf( __( 'Failed to save gap-closing section: %s', 'aio-page-builder' ), $key );
 				continue;
 			}

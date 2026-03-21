@@ -13,7 +13,6 @@ namespace AIOPageBuilder\Domain\Registries\PageTemplate\NestedHubBatch;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
-use AIOPageBuilder\Domain\Registries\PageTemplate\Nested_Hub_Page_Template_Definitions;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 
 /**
@@ -35,6 +34,7 @@ final class Nested_Hub_Page_Template_Seeder {
 			$id = $page_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
 				$key      = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
+				/* translators: %s: internal registry key. */
 				$errors[] = sprintf( __( 'Failed to save page template: %s', 'aio-page-builder' ), $key );
 				continue;
 			}

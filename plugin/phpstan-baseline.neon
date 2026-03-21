@@ -1,0 +1,1135 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$array \(list\<\(int\|string\)\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/ACF/Assignment/Field_Group_Derivation_Service.php
+
+		-
+			message: '#^Return type \(array\{assigned\: int, errors\: array\<int, string\>\}\) of method AIOPageBuilder\\Domain\\ACF\\Assignment\\Page_Field_Group_Assignment_Service\:\:reassign_from_stored_source\(\) should be compatible with return type \(array\{assigned\: array\<int, string\>, removed\: array\<int, string\>, errors\: array\<int, string\>\}\) of method AIOPageBuilder\\Domain\\ACF\\Assignment\\Page_Field_Group_Assignment_Service_Interface\:\:reassign_from_stored_source\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/Domain/ACF/Assignment/Page_Field_Group_Assignment_Service.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between ''fields'' and ''fields'' will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Domain/ACF/Blueprints/Section_Field_Blueprint_Normalizer.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\ACF\\Blueprints\\Section_Field_Blueprint_Service\:\:\$validator is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/ACF/Blueprints/Section_Field_Blueprint_Service.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/ACF/Blueprints/Section_Field_Blueprint_Service.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<\(int\|string\)\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/ACF/Compatibility/Field_Assignment_Compatibility_Service.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\ACF\\Debug\\ACF_Field_Group_Debug_Exporter\:\:\$mirror_service is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/ACF/Debug/ACF_Field_Group_Debug_Exporter.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between ''allow_null''\|''button_label''\|''choices''\|''conditional_logic''\|''default_value''\|''filters''\|''instructions''\|''key''\|''label''\|''layout''\|''library''\|''max''\|''maxlength''\|''media_upload''\|''min''\|''multiple''\|''name''\|''placeholder''\|''post_type''\|''preview_size''\|''required''\|''return_format''\|''rows''\|''step''\|''toolbar''\|''type''\|''ui''\|''wrapper'' and ''sub_fields'' will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: src/Domain/ACF/Registration/ACF_Field_Builder.php
+
+		-
+			message: '#^Function acf_add_local_field_group not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Domain/ACF/Registration/ACF_Group_Registrar.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\ACF\\Registration\\New_Page_ACF_Registration_Context_Resolver\:\:\$group_key_resolver is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/ACF/Registration/New_Page_ACF_Registration_Context_Resolver.php
+
+		-
+			message: '#^Access to undefined constant AIOPageBuilder\\Domain\\Registries\\PageTemplate\\Page_Template_Schema\:\:FIELD_TEMPLATE_FAMILY\.$#'
+			identifier: classConstant.notFound
+			count: 1
+			path: src/Domain/ACF/Repair/ACF_Regeneration_Service.php
+
+		-
+			message: '#^Comparison operation "\>" between array\<int, string\> and 0 results in an error\.$#'
+			identifier: greater.invalid
+			count: 1
+			path: src/Domain/ACF/Repair/ACF_Regeneration_Service.php
+
+		-
+			message: '#^Variable \$field_key on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/Domain/ACF/Uninstall/ACF_Uninstall_Inventory_Service.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between mixed and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 3
+			path: src/Domain/AI/Onboarding/Onboarding_Draft_Service.php
+
+		-
+			message: '#^Property WP_Post\:\:\$post_modified \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Domain/AI/Onboarding/Onboarding_UI_State_Builder.php
+
+		-
+			message: '#^Property WP_Post\:\:\$post_modified_gmt \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Domain/AI/Onboarding/Onboarding_UI_State_Builder.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/AI/Planning/Template_Recommendation_Context_Builder.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/AI/PromptPacks/Experiments/Prompt_Experiment_Service.php
+
+		-
+			message: '#^Parameter \#1 \$regression_run of method AIOPageBuilder\\Domain\\AI\\PromptPacks\\Regression\\Prompt_Pack_Regression_Harness\:\:result_fixture_invalid\(\) expects array, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Domain/AI/PromptPacks/Regression/Prompt_Pack_Regression_Harness.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/AI/Providers/Abstract_AI_Provider_Driver.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: src/Domain/AI/Providers/Drivers/Provider_Connection_Test_Service.php
+
+		-
+			message: '#^Parameter \#1 \$array \(array\{''openai'', ''anthropic''\}\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/AI/Providers/Provider_Capability_Resolver.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between ''_key''\|''_password''\|''_secret''\|''_token'' and '''' will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/AI/Secrets/Secret_Redactor.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/AI/UI/AI_Provider_State_Store.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\AI\\UI\\AI_Providers_UI_State_Builder\:\:\$connection_test_service is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/AI/UI/AI_Providers_UI_State_Builder.php
+
+		-
+			message: '#^Constant AIOPageBuilder\\Domain\\AI\\Validation\\AI_Output_Validator\:\:STAGE_INTERNAL_REF is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Domain/AI/Validation/AI_Output_Validator.php
+
+		-
+			message: '#^Method AIOPageBuilder\\Domain\\AI\\Validation\\AI_Output_Validator\:\:validate_item_level_and_refs\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Domain/AI/Validation/AI_Output_Validator.php
+
+		-
+			message: '#^Parameter &\$record_results by\-ref type of method AIOPageBuilder\\Domain\\AI\\Validation\\AI_Output_Validator\:\:validate_item_level_and_refs\(\) expects array\<int, array\{section\: string, index\?\: int, valid\: bool, errors\: array\<int, string\>\}\>, non\-empty\-array\<int, array\{section\: string, index\?\: \(int\|string\), valid\: bool, errors\: array\<int, string\>\}\> given\.$#'
+			identifier: parameterByRef.type
+			count: 2
+			path: src/Domain/AI/Validation/AI_Output_Validator.php
+
+		-
+			message: '#^Result of \|\| is always true\.$#'
+			identifier: booleanOr.alwaysTrue
+			count: 1
+			path: src/Domain/AI/Validation/AI_Output_Validator.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between ''partial'' and ''partial'' will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Domain/AI/Validation/AI_Output_Validator.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/BuildPlan/Steps/ExistingPageUpdates/Existing_Page_Update_Detail_Builder.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between array and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/BuildPlan/Steps/ExistingPageUpdates/Existing_Page_Update_Detail_Builder.php
+
+		-
+			message: '#^Method AIOPageBuilder\\Domain\\BuildPlan\\Steps\\ExistingPageUpdates\\Existing_Page_Update_Detail_Builder\:\:build_sections\(\) invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Domain/BuildPlan/Steps/ExistingPageUpdates/Existing_Page_Updates_UI_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/BuildPlan/Steps/Navigation/Navigation_Detail_Builder.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between array and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/BuildPlan/Steps/Navigation/Navigation_Detail_Builder.php
+
+		-
+			message: '#^Parameter \#2 \$item_id_set of method AIOPageBuilder\\Domain\\BuildPlan\\Steps\\NewPageCreation\\New_Page_Creation_Bulk_Action_Service\:\:bulk_set_selected_eligible_status\(\) expects array\<string, bool\>, array\<string, \(int\|string\)\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Domain/BuildPlan/Steps/NewPageCreation/New_Page_Creation_Bulk_Action_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/BuildPlan/Steps/NewPageCreation/New_Page_Creation_Detail_Builder.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between array and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/BuildPlan/Steps/NewPageCreation/New_Page_Creation_Detail_Builder.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/BuildPlan/Steps/NewPageCreation/New_Page_Creation_UI_Service.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between ''confidence'' and ''confidence'' will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Domain/BuildPlan/Steps/SEO/SEO_Media_Step_UI_Service.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Domain/BuildPlan/Steps/SEO/SEO_Media_Step_UI_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/BuildPlan/Steps/Tokens/Tokens_Step_UI_Service.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/BuildPlan/UI/Components/Status_Badge_Component.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''action_type'' \(''action_type'', ''action_type''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: src/Domain/BuildPlan/UI/Components/Step_Item_List_Component.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/BuildPlan/UI/Components/Step_Item_List_Component.php
+
+		-
+			message: '#^Result of && is always false\.$#'
+			identifier: booleanAnd.alwaysFalse
+			count: 1
+			path: src/Domain/BuildPlan/UI/Components/Step_Item_List_Component.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between '''' and '''' will always evaluate to false\.$#'
+			identifier: notIdentical.alwaysFalse
+			count: 1
+			path: src/Domain/BuildPlan/UI/Components/Step_Item_List_Component.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between \*NEVER\* and '''' will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/BuildPlan/UI/Components/Step_Item_List_Component.php
+
+		-
+			message: '#^Constant AIOPageBuilder\\Domain\\Crawler\\Classification\\Crawl_Template_Family_Matcher\:\:PATH_DEPTH_CHILD_MIN is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Domain/Crawler/Classification/Crawl_Template_Family_Matcher.php
+
+		-
+			message: '#^Constant AIOPageBuilder\\Domain\\Crawler\\Classification\\Duplicate_Detector\:\:KNOWN_KEYS is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Domain/Crawler/Classification/Duplicate_Detector.php
+
+		-
+			message: '#^PHPDoc tag @var for constant AIOPageBuilder\\Domain\\Crawler\\Classification\\Duplicate_Detector\:\:KNOWN_KEYS with type array\{normalized_url\: string, canonical_url\?\: string\|null, title\?\: string\|null, h1\?\: string\|null, content_hash\?\: string\|null\} is incompatible with value array\{''normalized_url'', ''canonical_url'', ''title'', ''h1'', ''content_hash''\}\.$#'
+			identifier: classConstant.phpDocType
+			count: 1
+			path: src/Domain/Crawler/Classification/Duplicate_Detector.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\<int\|string, array\<mixed\>\|string\> will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Crawler/Discovery/URL_Normalizer.php
+
+		-
+			message: '#^Regex pattern is invalid\: Unknown modifier ''\]'' in pattern\: \#\^\(https\?\)\://\(\[\^/\?\#\]\+\)\(/\[\^\?\#\]\*\)\?\(\\\?\(\?\:\[\^\#\]\*\)\)\?\(\\\#\.\*\)\?\$\#i$#'
+			identifier: regexp.pattern
+			count: 1
+			path: src/Domain/Crawler/Discovery/URL_Normalizer.php
+
+		-
+			message: '#^Regex pattern is invalid\: Unknown modifier ''\]'' in pattern\: \#\^\(https\?\)\://\(\[\^/\?\#\]\+\)/\?\$\#i$#'
+			identifier: regexp.pattern
+			count: 1
+			path: src/Domain/Crawler/Discovery/URL_Normalizer.php
+
+		-
+			message: '#^Regex pattern is invalid\: Unknown modifier ''\]'' in pattern\: \#\^https\?\://\(\[\^/\?\#\]\+\)\#i$#'
+			identifier: regexp.pattern
+			count: 2
+			path: src/Domain/Crawler/Discovery/URL_Normalizer.php
+
+		-
+			message: '#^Offset 1 on array\{non\-falsy\-string, string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Crawler/Extraction/Content_Summary_Extractor.php
+
+		-
+			message: '#^Offset 1 on array\{string, non\-empty\-string, string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Crawler/Extraction/Navigation_Extractor.php
+
+		-
+			message: '#^Offset 1 on array\{string, string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Crawler/Extraction/Navigation_Extractor.php
+
+		-
+			message: '#^Offset 2 on array\{string, non\-empty\-string, string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Crawler/Extraction/Navigation_Extractor.php
+
+		-
+			message: '#^PHPDoc tag @var for property AIOPageBuilder\\Domain\\Crawler\\Fetch\\HTML_Fetcher\:\:\$allowed_url_checker contains unresolvable type\.$#'
+			identifier: property.unresolvableType
+			count: 1
+			path: src/Domain/Crawler/Fetch/HTML_Fetcher.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string\|null and '''' will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/Crawler/Fetch/HTML_Fetcher.php
+
+		-
+			message: '#^Offset ''description'' on array\{label\: ''Quick context…'', description\: ''Fewer pages and…'', max_pages\: 50, max_depth\: 2\}\|array\{label\: ''Support triage crawl'', description\: ''Moderate bounds for…'', max_pages\: 100, max_depth\: 3\}\|array\{label\: string, description\: ''''\|''Spec default\: up to…'', max_pages\: 500, max_depth\: 4\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Crawler/Profiles/Crawl_Profile_Service.php
+
+		-
+			message: '#^Offset ''label'' on array\{label\: ''Quick context…'', description\: ''Fewer pages and…'', max_pages\: 50, max_depth\: 2\}\|array\{label\: ''Support triage crawl'', description\: ''Moderate bounds for…'', max_pages\: 100, max_depth\: 3\}\|array\{label\: string, description\: ''''\|''Spec default\: up to…'', max_pages\: 500, max_depth\: 4\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Crawler/Profiles/Crawl_Profile_Service.php
+
+		-
+			message: '#^Offset ''max_depth'' on array\{label\: ''Full public\-site…'', description\: ''Spec default\: up to…'', max_pages\: 500, max_depth\: 4\}\|array\{label\: ''Quick context…'', description\: ''Fewer pages and…'', max_pages\: 50, max_depth\: 2\}\|array\{label\: ''Support triage crawl'', description\: ''Moderate bounds for…'', max_pages\: 100, max_depth\: 3\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Crawler/Profiles/Crawl_Profile_Service.php
+
+		-
+			message: '#^Offset ''max_pages'' on array\{label\: ''Full public\-site…'', description\: ''Spec default\: up to…'', max_pages\: 500, max_depth\: 4\}\|array\{label\: ''Quick context…'', description\: ''Fewer pages and…'', max_pages\: 50, max_depth\: 2\}\|array\{label\: ''Support triage crawl'', description\: ''Moderate bounds for…'', max_pages\: 100, max_depth\: 3\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Crawler/Profiles/Crawl_Profile_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Crawler/Queue/Crawl_Enqueue_Service.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between mixed and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/Crawler/Snapshots/Crawl_Snapshot_Service.php
+
+		-
+			message: '#^Callable callable\(\)\: bool invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Domain/Execution/Executor/Single_Action_Executor.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Execution\\Executor\\Stub_Execution_Handler\:\:\$action_type is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Execution/Executor/Stub_Execution_Handler.php
+
+		-
+			message: '#^Property WP_Term\:\:\$name \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Domain/Execution/Jobs/Menu_Change_Job_Service.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/Execution/Jobs/Menu_Change_Job_Service.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between ''update_existing'' and ''update_existing'' will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Domain/Execution/Jobs/Menu_Change_Job_Service.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Domain/Execution/Jobs/Menu_Change_Job_Service.php
+
+		-
+			message: '#^Constant AIOPageBuilder\\Domain\\Execution\\Jobs\\Replace_Page_Job_Service\:\:REBUILD_ACTIONS is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Domain/Execution/Jobs/Replace_Page_Job_Service.php
+
+		-
+			message: '#^Property WP_Term\:\:\$name \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Domain/Execution/Menus/Template_Menu_Apply_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Execution/Queue/Execution_Job_Dispatcher.php
+
+		-
+			message: '#^Call to method info\(\) on an unknown class Psr\\Log\\LoggerInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Domain/Execution/Queue/Queue_Recovery_Service.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Execution\\Queue\\Queue_Recovery_Service\:\:\$logger has unknown class Psr\\Log\\LoggerInterface as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Domain/Execution/Queue/Queue_Recovery_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/ExportRestore/Export/Export_Generator.php
+
+		-
+			message: '#^Parameter \#1 \$array \(array\{''plans'', ''token_sets''\}\|array\{''registries'', ''compositions'', ''styling''\}\|array\{''settings'', ''profiles'', ''uninstall_restore…''\}\|array\{''settings'', ''styling'', ''profiles'', ''registries'', ''compositions'', ''plans'', ''token_sets'', ''uninstall_restore…''\}\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/ExportRestore/Export/Export_Generator.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string and '''' will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/ExportRestore/Export/Export_Generator.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\ExportRestore\\Export\\Export_Zip_Packager\:\:\$path_manager is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/ExportRestore/Export/Export_Zip_Packager.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-falsy\-string and false will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/ExportRestore/Export/Export_Zip_Packager.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: src/Domain/ExportRestore/Export/Support_Package_Generator.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\<mixed, mixed\> will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/ExportRestore/Export/Support_Package_Generator.php
+
+		-
+			message: '#^Parameter \#1 \$array \(array\{''settings'', ''profiles'', ''registries'', ''compositions'', ''plans'', ''token_sets'', ''uninstall_restore…''\}\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/ExportRestore/Export/Support_Package_Generator.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-array and array\{\} will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/ExportRestore/Export/Support_Package_Generator.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string and '''' will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/ExportRestore/Export/Support_Package_Generator.php
+
+		-
+			message: '#^Call to function method_exists\(\) with AIOPageBuilder\\Domain\\Storage\\Repositories\\Page_Template_Repository and ''list_all…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/ExportRestore/Export/Template_Library_Support_Summary_Builder.php
+
+		-
+			message: '#^Call to function method_exists\(\) with AIOPageBuilder\\Domain\\Storage\\Repositories\\Section_Template_Repository and ''list_all…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/ExportRestore/Export/Template_Library_Support_Summary_Builder.php
+
+		-
+			message: '#^Instanceof between AIOPageBuilder\\Domain\\Registries\\QA\\Template_Library_Compliance_Result and AIOPageBuilder\\Domain\\Registries\\QA\\Template_Library_Compliance_Result will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Domain/ExportRestore/Export/Template_Library_Support_Summary_Builder.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\ExportRestore\\Export\\Template_Library_Support_Summary_Builder\:\:\$deprecation_service is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/ExportRestore/Export/Template_Library_Support_Summary_Builder.php
+
+		-
+			message: '#^Parameter \#5 \$manifest of class AIOPageBuilder\\Domain\\ExportRestore\\Import\\Import_Validation_Result constructor expects array\<string, mixed\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Domain/ExportRestore/Import/Import_Validator.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\ExportRestore\\Import\\Import_Validator\:\:\$composition_repo is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/ExportRestore/Import/Import_Validator.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\ExportRestore\\Import\\Import_Validator\:\:\$page_template_repo is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/ExportRestore/Import/Import_Validator.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between array\{\} and array\{\} will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Domain/ExportRestore/Import/Import_Validator.php
+
+		-
+			message: '#^Parameter \#1 \$data of method AIOPageBuilder\\Domain\\Fixtures\\Demo_Fixture_Generator\:\:tag_synthetic\(\) expects array\<string, mixed\>, array\<int, array\<string, mixed\>\> given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Domain/Fixtures/Demo_Fixture_Generator.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/Industry/AI/Industry_Approval_Snapshot_Builder.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between mixed and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/Industry/AI/Industry_Build_Plan_Scoring_Service.php
+
+		-
+			message: '#^Variable \$clean on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/Domain/Industry/AI/Industry_Starter_Bundle_To_Build_Plan_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 4
+			path: src/Domain/Industry/Docs/Industry_Helper_Doc_Composer.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 4
+			path: src/Domain/Industry/Docs/Industry_Page_OnePager_Composer.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Industry/Export/Industry_Pack_Bundle_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: src/Domain/Industry/Import/Industry_Bundle_Apply_Service.php
+
+		-
+			message: '#^Constant AIOPageBuilder\\Domain\\Industry\\Import\\Industry_Bundle_Apply_Service\:\:STATUS_FAILED is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Domain/Industry/Import/Industry_Bundle_Apply_Service.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<\(int\|string\)\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/Industry/Onboarding/Industry_Question_Pack_Registry.php
+
+		-
+			message: '#^Method AIOPageBuilder\\Domain\\Industry\\Overrides\\Industry_Override_Read_Model_Builder\:\:normalize_row\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Domain/Industry/Overrides/Industry_Override_Read_Model_Builder.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$industry_key$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Domain/Industry/Registry/Industry_Pack_Registry.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Industry/Registry/Industry_Page_Template_Preview_Resolver.php
+
+		-
+			message: '#^Offset ''page_template_key'' on array\{page_template_key\: non\-empty\-string, score\: int\<\-95, 260\>, fit_classification\: ''allowed_weak_fit''\|''discouraged''\|''neutral''\|''recommended'', explanation_reasons\: list\<''hierarchy_fit''\|''industry…''\|''industry_required…''\|''lpagery_fit''\|''pack_family_fit''\|''template_affinity…''\>, industry_source_refs\: list\<non\-empty\-string\>, hierarchy_fit\: string, lpagery_fit\: string, warning_flags\: array\{\}\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Registry/Industry_Page_Template_Recommendation_Resolver.php
+
+		-
+			message: '#^Offset ''score'' on array\{page_template_key\: non\-empty\-string, score\: int\<\-95, 260\>, fit_classification\: ''allowed_weak_fit''\|''discouraged''\|''neutral''\|''recommended'', explanation_reasons\: list\<''hierarchy_fit''\|''industry…''\|''industry_required…''\|''lpagery_fit''\|''pack_family_fit''\|''template_affinity…''\>, industry_source_refs\: list\<non\-empty\-string\>, hierarchy_fit\: string, lpagery_fit\: string, warning_flags\: array\{\}\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Registry/Industry_Page_Template_Recommendation_Resolver.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Industry/Registry/Industry_Section_Preview_Resolver.php
+
+		-
+			message: '#^Offset ''score'' on array\{section_key\: non\-empty\-string, score\: int\<\-140, 145\>, fit_classification\: ''allowed_weak_fit''\|''discouraged''\|''neutral''\|''recommended'', explanation_reasons\: list\<''cta_fit''\|''in_pack_discouraged''\|''in_pack_preferred''\|''section_affinity…''\|''section_discouraged…''\>, industry_source_refs\: list\<non\-empty\-string\>, warning_flags\: array\{\}\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Registry/Industry_Section_Recommendation_Resolver.php
+
+		-
+			message: '#^Offset ''section_key'' on array\{section_key\: non\-empty\-string, score\: int\<\-140, 145\>, fit_classification\: ''allowed_weak_fit''\|''discouraged''\|''neutral''\|''recommended'', explanation_reasons\: list\<''cta_fit''\|''in_pack_discouraged''\|''in_pack_preferred''\|''section_affinity…''\|''section_discouraged…''\>, industry_source_refs\: list\<non\-empty\-string\>, warning_flags\: array\{\}\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Registry/Industry_Section_Recommendation_Resolver.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string and '''' will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 4
+			path: src/Domain/Industry/Registry/Industry_Section_Recommendation_Resolver.php
+
+		-
+			message: '#^Constant AIOPageBuilder\\Domain\\Industry\\Registry\\Industry_Substitute_Suggestion_Engine\:\:FIT_ALLOWED_WEAK is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Domain/Industry/Registry/Industry_Substitute_Suggestion_Engine.php
+
+		-
+			message: '#^Constant AIOPageBuilder\\Domain\\Industry\\Registry\\Industry_Substitute_Suggestion_Engine\:\:FIT_DISCOURAGED is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Domain/Industry/Registry/Industry_Substitute_Suggestion_Engine.php
+
+		-
+			message: '#^Offset ''page_template_key'' on array\{page_template_key\: string, score\: int, fit_classification\: string, explanation_reasons\: array, industry_source_refs\: array, hierarchy_fit\: string, lpagery_fit\: string, warning_flags\: array, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Registry/Industry_Subtype_Page_Template_Recommendation_Extender.php
+
+		-
+			message: '#^Offset ''score'' on array\{page_template_key\: string, score\: int, fit_classification\: string, explanation_reasons\: array, industry_source_refs\: array, hierarchy_fit\: string, lpagery_fit\: string, warning_flags\: array, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Registry/Industry_Subtype_Page_Template_Recommendation_Extender.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between '''' and '''' will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Domain/Industry/Registry/Industry_Subtype_Page_Template_Recommendation_Extender.php
+
+		-
+			message: '#^Offset ''score'' on array\{section_key\: string, score\: int, fit_classification\: string, explanation_reasons\: array, industry_source_refs\: array, warning_flags\: array, subtype_influence_applied\: bool, subtype_reason_summary\: ''''\|''subtype_overlay…''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Registry/Industry_Subtype_Section_Recommendation_Extender.php
+
+		-
+			message: '#^Offset ''section_key'' on array\{section_key\: string, score\: int, fit_classification\: string, explanation_reasons\: array, industry_source_refs\: array, warning_flags\: array, subtype_influence_applied\: bool, subtype_reason_summary\: ''''\|''subtype_overlay…''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Registry/Industry_Subtype_Section_Recommendation_Extender.php
+
+		-
+			message: '#^Parameter \#1 \$array \(array\{\}\|array\{''version_marker must…''\}\|array\{0\: ''status must be one…'', 1\?\: ''version_marker must…''\}\|list\{0\: ''label must not…'', 1\?\: ''status must be one…''\|''summary must not…''\|''version_marker must…'', 2\?\: ''status must be one…''\|''version_marker must…'', 3\?\: ''version_marker must…''\}\|list\{0\: ''parent_industry_key…'', 1\?\: ''label must not…''\|''status must be one…''\|''summary must not…''\|''version_marker must…'', 2\?\: ''status must be one…''\|''summary must not…''\|''version_marker must…'', 3\?\: ''status must be one…''\|''version_marker must…'', 4\?\: ''version_marker must…''\}\|list\{0\: ''subtype_key is…''\|''subtype_key must…'', 1\?\: ''label must not…''\|''parent_industry_key…''\|''status must be one…''\|''summary must not…''\|''version_marker must…'', 2\?\: ''label must not…''\|''status must be one…''\|''summary must not…''\|''version_marker must…'', 3\?\: ''status must be one…''\|''summary must not…''\|''version_marker must…'', 4\?\: ''status must be one…''\|''version_marker must…'', 5\?\: ''version_marker must…''\}\|list\{0\: ''subtype_key must…'', 1\?\: ''label must not…''\|''parent_industry_key…''\|''status must be one…''\|''subtype_key must…''\|''summary must not…''\|''version_marker must…'', 2\?\: ''label must not…''\|''parent_industry_key…''\|''status must be one…''\|''summary must not…''\|''version_marker must…'', 3\?\: ''label must not…''\|''status must be one…''\|''summary must not…''\|''version_marker must…'', 4\?\: ''status must be one…''\|''summary must not…''\|''version_marker must…'', 5\?\: ''status must be one…''\|''version_marker must…'', 6\?\: ''version_marker must…''\}\|list\{0\: ''summary must not…'', 1\?\: ''status must be one…''\|''version_marker must…'', 2\?\: ''version_marker must…''\}\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/Industry/Registry/Industry_Subtype_Validator.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Industry/Reporting/Conversion_Goal_Benchmark_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\{additive_note\: ''Calls goal\:…''\}\|array\{additive_note\: ''Estimate/quote…''\}\|array\{additive_note\: ''For call\-focused…''\}\|array\{refined_action_summary\: ''Add booking…'', additive_note\: ''Booking\-focused…''\}\|array\{refined_action_summary\: ''Add consultation…'', additive_note\: ''Consultation goal\:…''\}\|array\{refined_action_summary\: ''Add estimate…'', additive_note\: ''Estimate\-focused…''\}\|array\{refined_action_summary\: ''Add lead capture…'', additive_note\: ''Lead capture goal\:…''\}\|array\{refined_action_summary\: ''Add valuation tool,…'', additive_note\: ''Valuation\-focused…''\} will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Industry/Reporting/Conversion_Goal_Content_Gap_Extender.php
+
+		-
+			message: '#^Offset ''additive_note'' on array\{additive_note\: ''Calls goal\:…''\}\|array\{additive_note\: ''Estimate/quote…''\}\|array\{additive_note\: ''For call\-focused…''\}\|array\{refined_action_summary\: ''Add booking…'', additive_note\: ''Booking\-focused…''\}\|array\{refined_action_summary\: ''Add consultation…'', additive_note\: ''Consultation goal\:…''\}\|array\{refined_action_summary\: ''Add estimate…'', additive_note\: ''Estimate\-focused…''\}\|array\{refined_action_summary\: ''Add lead capture…'', additive_note\: ''Lead capture goal\:…''\}\|array\{refined_action_summary\: ''Add valuation tool,…'', additive_note\: ''Valuation\-focused…''\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/Domain/Industry/Reporting/Conversion_Goal_Content_Gap_Extender.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Docs/SubtypeGoalOverlays'' \(''Docs/SubtypeGoalOverlays'', ''Docs/SubtypeGoalOverlays''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Asset_Aging_Report_Service.php
+
+		-
+			message: '#^Constant AIOPageBuilder\\Domain\\Industry\\Reporting\\Industry_Author_Task_Queue_Service\:\:MAX_PER_CATEGORY is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Author_Task_Queue_Service.php
+
+		-
+			message: '#^Offset \(int\|string\) on array\<string, int\<1, max\>\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Candidate_Template_Overlap_Analyzer.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Industry\\Reporting\\Industry_Content_Gap_Detector\:\:\$bundle_registry is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Content_Gap_Detector.php
+
+		-
+			message: '#^Offset ''priority_score'' on array\{scope\: string, missing_artifact_class\: string, priority\: string, tier\: string, priority_score\: int, rationale\: string, related_scopes\: array\{string\}\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Reporting/Industry_Coverage_Gap_Prioritization_Service.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Industry\\Reporting\\Industry_Health_Check_Service\:\:\$question_pack_registry is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Health_Check_Service.php
+
+		-
+			message: '#^Offset ''issue_summary'' on array\{object_type\: string, key\: string, severity\: string, issue_summary\: string, related_refs\: list\<string\>\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Reporting/Industry_Inspection_Command_Service.php
+
+		-
+			message: '#^Offset ''key'' on array\{object_type\: string, key\: string, severity\: string, issue_summary\: string, related_refs\: list\<string\>\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Reporting/Industry_Inspection_Command_Service.php
+
+		-
+			message: '#^Offset ''object_type'' on array\{object_type\: string, key\: string, severity\: string, issue_summary\: string, related_refs\: list\<string\>\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Reporting/Industry_Inspection_Command_Service.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string and '''' will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Inspection_Command_Service.php
+
+		-
+			message: '#^Comparison operation "\>\=" between int\<1, max\> and 1 is always true\.$#'
+			identifier: greaterOrEqual.alwaysTrue
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Pack_Completeness_Report_Service.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Industry\\Reporting\\Industry_Pack_Completeness_Report_Service\:\:\$compliance_registry is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Pack_Completeness_Report_Service.php
+
+		-
+			message: '#^Offset ''neutral'' on array\{recommended\: int\<0, max\>, neutral\: int\<0, max\>, discouraged\: int\<0, max\>, allowed_weak_fit\: int\<0, max\>\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Reporting/Industry_Recommendation_Benchmark_Service.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Industry\\Reporting\\Industry_Repair_Suggestion_Engine\:\:\$subtype_registry is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Repair_Suggestion_Engine.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: src/Domain/Industry/Reporting/Industry_Scaffold_Completeness_Report_Service.php
+
+		-
+			message: '#^Offset ''compatibility'' on array\{label\: string, industry_key\: string, token_count\: int\<0, max\>, component_ref_count\: int\<0, max\>, primary_color\: string\|null, distinctiveness_note\: string, compatibility\: string, accessibility_notes\: ''Review contrast for…''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Industry/Reporting/Industry_Style_Preset_Benchmark_Service.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$preset$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Style_Preset_Benchmark_Service.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Industry\\Reporting\\Industry_Subtype_Benchmark_Service\:\:\$starter_bundle_registry is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Subtype_Benchmark_Service.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Industry\\Reporting\\Industry_Subtype_Comparison_Service\:\:\$profile_repo is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Subtype_Comparison_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\{additive_note\: ''Buyer\-focused\: CMA,…''\}\|array\{additive_note\: ''Commercial clients…''\}\|array\{additive_note\: ''Listing\-focused\:…''\}\|array\{refined_action_summary\: ''Define service area…'', additive_note\: ''Mobile services…''\} will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Subtype_Content_Gap_Extender.php
+
+		-
+			message: '#^Offset ''additive_note'' on array\{additive_note\: ''Buyer\-focused\: CMA,…''\}\|array\{additive_note\: ''Commercial clients…''\}\|array\{additive_note\: ''Listing\-focused\:…''\}\|array\{refined_action_summary\: ''Define service area…'', additive_note\: ''Mobile services…''\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Subtype_Content_Gap_Extender.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Industry\\Reporting\\Industry_Subtype_Goal_Benchmark_Service\:\:\$subtype_benchmark is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Industry/Reporting/Industry_Subtype_Goal_Benchmark_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Industry/Rollback/Industry_Profile_Change_Impact_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 3
+			path: src/Domain/Lifecycle/Template_Library_Lifecycle_Summary_Builder.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: src/Domain/Onboarding/Onboarding_State_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Registries/Composition/Composition_Registry_Service.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Domain/Registries/Composition/Composition_Validator.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Registries\\Export\\Registry_Export_Serializer\:\:\$documentation_repo is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Registries/Export/Registry_Export_Serializer.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Registries\\Export\\Registry_Export_Serializer\:\:\$snapshot_repo is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Registries/Export/Registry_Export_Serializer.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 5
+			path: src/Domain/Registries/PageTemplate/Page_Template_Normalizer.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<array\{section_key\: non\-empty\-string, position\: \(int\|string\), required\: bool\}\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/Registries/PageTemplate/Page_Template_Normalizer.php
+
+		-
+			message: '#^Offset ''field_values'' on array\{section_key\: string, position\: int, field_values\: array\<string, mixed\>\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/Domain/Registries/PageTemplate/UI/Page_Template_Detail_State_Builder.php
+
+		-
+			message: '#^Offset ''child_detail''\|''hub''\|''nested_hub''\|''top_level'' on array\{top_level\: ''Top Level Page…'', hub\: ''Hub Page Templates'', nested_hub\: ''Nested Hub Page…'', child_detail\: ''Child/Detail Page…''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Registries/PageTemplate/UI/Page_Template_Directory_State_Builder.php
+
+		-
+			message: '#^Offset ''scope'' on array\{scope\: string, template_key\: string, code\: string, message\: string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Registries/QA/Animation_QA_Service.php
+
+		-
+			message: '#^Offset ''scope'' on array\{scope\: string, template_key\: string, rule_code\: string, message\: string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Domain/Registries/QA/Template_Accessibility_Audit_Service.php
+
+		-
+			message: '#^Offset ''code'' on array\{template_key\: string, code\: string, message\: string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Registries/QA/Template_Library_Compliance_Result.php
+
+		-
+			message: '#^Parameter \#6 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\FeatureBenefitBatch\\Feature_Benefit_Value_Library_Batch_Definitions\:\:fb_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|list\<array\<string, bool\|string\>\>\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 15
+			path: src/Domain/Registries/Section/FeatureBenefitBatch/Feature_Benefit_Value_Library_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#6 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\FeatureBenefitBatch\\Feature_Benefit_Value_Library_Batch_Definitions\:\:fb_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Domain/Registries/Section/FeatureBenefitBatch/Feature_Benefit_Value_Library_Batch_Definitions.php
+
+		-
+			message: '#^PHPDoc tag @var above a method has no effect\.$#'
+			identifier: varTag.misplaced
+			count: 1
+			path: src/Domain/Registries/Section/GapClosingSuperBatch/Section_Gap_Closing_Super_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#8 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\LegalPolicyUtilityBatch\\Legal_Policy_Utility_Library_Batch_Definitions\:\:lpu_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|list\<array\<string, array\<string, string\>\|bool\|string\>\>\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Domain/Registries/Section/LegalPolicyUtilityBatch/Legal_Policy_Utility_Library_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#8 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\LegalPolicyUtilityBatch\\Legal_Policy_Utility_Library_Batch_Definitions\:\:lpu_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|list\<array\<string, bool\|string\>\>\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Domain/Registries/Section/LegalPolicyUtilityBatch/Legal_Policy_Utility_Library_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#8 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\LegalPolicyUtilityBatch\\Legal_Policy_Utility_Library_Batch_Definitions\:\:lpu_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 12
+			path: src/Domain/Registries/Section/LegalPolicyUtilityBatch/Legal_Policy_Utility_Library_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#8 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\LegalPolicyUtilityBatch\\Legal_Policy_Utility_Library_Batch_Definitions\:\:lpu_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, string\|true\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Domain/Registries/Section/LegalPolicyUtilityBatch/Legal_Policy_Utility_Library_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#8 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\MediaListingProfileBatch\\Media_Listing_Profile_Detail_Library_Batch_Definitions\:\:mlp_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|list\<array\<string, bool\|string\>\>\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 12
+			path: src/Domain/Registries/Section/MediaListingProfileBatch/Media_Listing_Profile_Detail_Library_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#8 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\MediaListingProfileBatch\\Media_Listing_Profile_Detail_Library_Batch_Definitions\:\:mlp_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Domain/Registries/Section/MediaListingProfileBatch/Media_Listing_Profile_Detail_Library_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#8 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\ProcessTimelineFaqBatch\\Process_Timeline_FAQ_Library_Batch_Definitions\:\:ptf_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|list\<array\<string, bool\|list\<array\<string, bool\|string\>\>\|string\>\>\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Domain/Registries/Section/ProcessTimelineFaqBatch/Process_Timeline_FAQ_Library_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#8 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\ProcessTimelineFaqBatch\\Process_Timeline_FAQ_Library_Batch_Definitions\:\:ptf_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|list\<array\<string, bool\|string\>\>\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 14
+			path: src/Domain/Registries/Section/ProcessTimelineFaqBatch/Process_Timeline_FAQ_Library_Batch_Definitions.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''accessibility_contract_ref'' \(''accessibility_contract_ref'', ''accessibility_contract_ref''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: src/Domain/Registries/Section/Section_Definition_Normalizer.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 5
+			path: src/Domain/Registries/Section/Section_Definition_Normalizer.php
+
+		-
+			message: '#^Parameter \#6 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\TrustProofBatch\\Trust_Proof_Library_Batch_Definitions\:\:proof_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|list\<array\<string, bool\|string\>\>\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 12
+			path: src/Domain/Registries/Section/TrustProofBatch/Trust_Proof_Library_Batch_Definitions.php
+
+		-
+			message: '#^Parameter \#6 \$blueprint_fields of static method AIOPageBuilder\\Domain\\Registries\\Section\\TrustProofBatch\\Trust_Proof_Library_Batch_Definitions\:\:proof_definition\(\) expects array\<string, mixed\>, array\<int, array\<string, bool\|string\>\> given\.$#'
+			identifier: argument.type
+			count: 6
+			path: src/Domain/Registries/Section/TrustProofBatch/Trust_Proof_Library_Batch_Definitions.php
+
+		-
+			message: '#^Offset ''contact_cta''\|''navigation_cta''\|''none''\|''primary_cta'' on array\{primary_cta\: ''Primary CTA'', contact_cta\: ''Contact CTA'', navigation_cta\: ''Navigation CTA'', none\: ''None''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Domain/Registries/Section/UI/Section_Template_Directory_State_Builder.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between mixed and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: src/Domain/Registries/Shared/Large_Library_Query_Service.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-string and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 2
+			path: src/Domain/Registries/Snapshots/Version_Snapshot_Service.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Rendering/Assets/Render_Asset_Controller.php
+
+		-
+			message: '#^Parameter \#1 \$array \(array\{''color'', ''typography'', ''spacing'', ''radius'', ''shadow'', ''component''\}\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 2
+			path: src/Domain/Rendering/LPagery/LPagery_Token_Compatibility_Service.php
+
+		-
+			message: '#^PHPDoc tag @param for parameter \$version with type string\|null is not subtype of native type string\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: src/Domain/Rendering/Page/Page_Instantiation_Payload_Builder.php
+
+		-
+			message: '#^Call to function is_bool\(\) with bool will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Domain/Rendering/Section/Section_Render_Context_Builder.php
+
+		-
+			message: '#^Method AIOPageBuilder\\Domain\\Rendering\\Section\\Section_Render_Result\:\:get_animation_resolution\(\) never returns array\{effective_tier\: string, effective_families\: array\<int, string\>, reduced_motion_applied\: bool, resolution_reason\: string\} so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Domain/Rendering/Section/Section_Render_Result.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<array\{post_snapshot_id\: \(int\|string\), pre_snapshot_id\: non\-empty\-string, action_type\: string, target_ref\: string, created_at\: string\}\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Domain/Rollback/Snapshots/Operational_Snapshot_Repository.php
+
+		-
+			message: '#^Property WP_Post\:\:\$post_content \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Domain/Styling/Frontend_Style_Enqueue_Service.php
+
+		-
+			message: '#^Variable \$allowed on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/Domain/Styling/Global_Style_Settings_Repository.php
+
+		-
+			message: '#^Property AIOPageBuilder\\Domain\\Styling\\Styles_JSON_Sanitizer\:\:\$normalizer is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Domain/Styling/Styles_JSON_Sanitizer.php

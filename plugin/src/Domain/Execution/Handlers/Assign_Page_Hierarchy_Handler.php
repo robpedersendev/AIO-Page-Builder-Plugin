@@ -26,7 +26,7 @@ final class Assign_Page_Hierarchy_Handler implements Execution_Handler_Interface
 	/**
 	 * Executes the hierarchy assignment. Envelope has been validated by Single_Action_Executor.
 	 *
-	 * target_reference must contain:
+	 * The target_reference must contain:
 	 *   - page_id (int > 0): the page whose post_parent will be updated.
 	 *   - parent_page_id (int >= 0): new parent (0 = top-level).
 	 *

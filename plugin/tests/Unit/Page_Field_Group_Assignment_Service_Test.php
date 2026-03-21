@@ -50,16 +50,7 @@ final class Assignment_Map_Wpdb_Stub {
 	private int $next_id  = 1;
 
 	public function prepare( string $query, ...$args ): string {
-		$i     = 0;
-		$query = preg_replace_callback(
-			'/%[sd]/',
-			function () use ( $args, &$i ) {
-				$v = $args[ $i++ ] ?? null;
-				return $v === null ? 'NULL' : "'" . addslashes( (string) $v ) . "'";
-			},
-			$query
-		);
-		return $query;
+		return aio_page_builder_test_wpdb_prepare( $query, ...$args );
 	}
 
 	public function query( string $sql ): int|false {

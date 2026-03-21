@@ -91,8 +91,9 @@ final class Template_Analytics_Screen {
 					$template_family !== '' ? $template_family : null,
 					$page_class !== '' ? $page_class : null
 				);
-			} catch ( \Throwable ) {
-				// Observational; fail gracefully.
+			} catch ( \Throwable $e ) {
+				// * Observational screen: keep default summary on service failure.
+				unset( $e );
 			}
 		}
 

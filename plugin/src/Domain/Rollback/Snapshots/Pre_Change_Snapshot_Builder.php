@@ -139,12 +139,17 @@ final class Pre_Change_Snapshot_Builder {
 				if ( ! $item instanceof \WP_Post ) {
 					continue;
 				}
+				$prepared = \wp_setup_nav_menu_item( $item );
+				if ( ! $prepared instanceof \WP_Post ) {
+					continue;
+				}
+				$parent      = (int) \get_post_meta( $prepared->ID, '_menu_item_menu_item_parent', true );
 				$item_list[] = array(
-					'id'     => $item->ID,
-					'title'  => $item->title,
-					'url'    => $item->url,
-					'parent' => (int) $item->menu_item_parent,
-					'order'  => (int) $item->menu_order,
+					'id'     => $prepared->ID,
+					'title'  => (string) $prepared->post_title,
+					'url'    => $this->nav_menu_item_url( $prepared ),
+					'parent' => $parent,
+					'order'  => (int) $prepared->menu_order,
 				);
 			}
 		}
@@ -246,5 +251,21 @@ final class Pre_Change_Snapshot_Builder {
 			return (int) $target['existing_menu_id'];
 		}
 		return 0;
+	}
+
+	/**
+	 * Resolves a nav menu item URL from post meta (avoids dynamic WP_Post properties missing from stubs).
+	 */
+	private function nav_menu_item_url( \WP_Post $item ): string {
+		$type = (string) \get_post_meta( $item->ID, '_menu_item_type', true );
+		if ( $type === 'custom' ) {
+			return (string) \get_post_meta( $item->ID, '_menu_item_url', true );
+		}
+		$object_id = (int) \get_post_meta( $item->ID, '_menu_item_object_id', true );
+		if ( $object_id <= 0 ) {
+			return '';
+		}
+		$url = \get_permalink( $object_id );
+		return \is_string( $url ) ? $url : '';
 	}
 }

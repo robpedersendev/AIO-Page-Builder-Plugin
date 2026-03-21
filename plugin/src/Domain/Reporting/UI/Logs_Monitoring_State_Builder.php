@@ -73,14 +73,14 @@ final class Logs_Monitoring_State_Builder {
 	public function build(): array {
 		$queue_health_builder = new Queue_Health_Summary_Builder( $this->job_queue_repository );
 		$state                = array(
-			'queue'                              => $this->build_queue_tab(),
-			'queue_health'                       => $queue_health_builder->build(),
-			'execution_logs'                     => $this->build_execution_logs(),
-			'ai_runs'                            => $this->build_ai_runs_tab(),
-			'reporting_logs'                     => $this->build_reporting_logs(),
-			'import_export_logs'                 => $this->build_import_export_logs(),
+			'queue'                                => $this->build_queue_tab(),
+			'queue_health'                         => $queue_health_builder->build(),
+			'execution_logs'                       => $this->build_execution_logs(),
+			'ai_runs'                              => $this->build_ai_runs_tab(),
+			'reporting_logs'                       => $this->build_reporting_logs(),
+			'import_export_logs'                   => $this->build_import_export_logs(),
 			'import_export_activity_log_available' => false,
-			'critical_errors'                    => $this->build_critical_errors(),
+			'critical_errors'                      => $this->build_critical_errors(),
 			'log_export'                           => $this->build_log_export_options(),
 		);
 		if ( $this->acf_diagnostics_state_builder !== null && method_exists( $this->acf_diagnostics_state_builder, 'build_for_bundle' ) ) {

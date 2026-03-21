@@ -93,11 +93,12 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 		$this->assert_table_identifier( $table );
 		if ( $limit > 0 ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$sql  = $this->wpdb->prepare( 'SELECT * FROM `' . $table . '` ORDER BY created_at DESC, id DESC LIMIT %d', $limit );
-			$rows = $this->wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$sql  = $this->wpdb->prepare( 'SELECT * FROM %i ORDER BY created_at DESC, id DESC LIMIT %d', $table, $limit );
+			$rows = $this->wpdb->get_results( $sql, ARRAY_A );
 		} else {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$rows = $this->wpdb->get_results( 'SELECT * FROM `' . $table . '` ORDER BY created_at DESC, id DESC', ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$sql  = $this->wpdb->prepare( 'SELECT * FROM %i ORDER BY created_at DESC, id DESC', $table );
+			$rows = $this->wpdb->get_results( $sql, ARRAY_A );
 		}
 		if ( ! is_array( $rows ) ) {
 			return array();
@@ -114,10 +115,10 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 	public function get_by_id( string $snapshot_id ): ?Profile_Snapshot_Data {
 		$table = $this->table();
 		$this->assert_table_identifier( $table );
-		$sql = 'SELECT * FROM `' . $table . '` WHERE snapshot_id = %s LIMIT 1';
+		$sql = 'SELECT * FROM %i WHERE snapshot_id = %s LIMIT 1';
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $this->wpdb->get_row(
-			$this->wpdb->prepare( $sql, $snapshot_id ),
+			$this->wpdb->prepare( $sql, $table, $snapshot_id ),
 			ARRAY_A
 		);
 		if ( ! is_array( $row ) ) {
@@ -144,7 +145,7 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 	public function count(): int {
 		$table = $this->table();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$n = $this->wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared
+		$n = $this->wpdb->get_var( $this->wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) );
 		return (int) $n;
 	}
 

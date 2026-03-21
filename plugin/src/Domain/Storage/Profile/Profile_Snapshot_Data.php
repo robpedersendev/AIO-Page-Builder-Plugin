@@ -29,8 +29,8 @@ final class Profile_Snapshot_Data {
 	/** @var array<string, mixed> Shape per profile-schema.md §4–9 */
 	public array $business_profile;
 	/**
-	 * Human-readable capture source: brand_profile_merge, business_profile_merge,
-	 * onboarding_completion, restore_event, manual, or other.
+	 * @var string Human-readable capture source: brand_profile_merge, business_profile_merge,
+	 *             onboarding_completion, restore_event, manual, or other.
 	 */
 	public string $source;
 

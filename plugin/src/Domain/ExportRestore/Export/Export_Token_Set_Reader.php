@@ -38,9 +38,17 @@ final class Export_Token_Set_Reader {
 		if ( $this->wpdb->get_var( $this->wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
 			return array();
 		}
-		$sql = 'SELECT id, token_set_ref, source_type, state, plan_ref, scope_ref, value_payload, schema_version, created_at, applied_at, acceptance_status FROM `' . $table . '` ORDER BY created_at ASC';
 		if ( $limit > 0 ) {
-			$sql = $this->wpdb->prepare( $sql . ' LIMIT %d', $limit );
+			$sql = $this->wpdb->prepare(
+				'SELECT id, token_set_ref, source_type, state, plan_ref, scope_ref, value_payload, schema_version, created_at, applied_at, acceptance_status FROM %i ORDER BY created_at ASC LIMIT %d',
+				$table,
+				$limit
+			);
+		} else {
+			$sql = $this->wpdb->prepare(
+				'SELECT id, token_set_ref, source_type, state, plan_ref, scope_ref, value_payload, schema_version, created_at, applied_at, acceptance_status FROM %i ORDER BY created_at ASC',
+				$table
+			);
 		}
 		$rows = $this->wpdb->get_results( $sql, ARRAY_A );
 		if ( ! is_array( $rows ) ) {

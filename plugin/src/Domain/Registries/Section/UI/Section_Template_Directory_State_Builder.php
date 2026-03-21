@@ -182,6 +182,7 @@ final class Section_Template_Directory_State_Builder {
 
 		if ( $search !== '' ) {
 			$segments[] = array(
+				/* translators: %s: search query (escaped for display). */
 				'label' => sprintf( __( 'Search: %s', 'aio-page-builder' ), \esc_html( $search ) ),
 				'url'   => '',
 			);

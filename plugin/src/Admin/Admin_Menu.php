@@ -1101,8 +1101,12 @@ final class Admin_Menu {
 			? sanitize_key( wp_unslash( $_POST['aio_industry_bundle_slug'] ) )
 			: '';
 
-		$decisions_raw = isset( $_POST['conflict_decisions'] ) && is_array( $_POST['conflict_decisions'] ) ? $_POST['conflict_decisions'] : array();
-		$decisions     = array();
+		$decisions_raw = array();
+		if ( isset( $_POST['conflict_decisions'] ) && is_array( $_POST['conflict_decisions'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Keys/values sanitized in the foreach below.
+			$decisions_raw = wp_unslash( $_POST['conflict_decisions'] );
+		}
+		$decisions = array();
 		foreach ( $decisions_raw as $k => $v ) {
 			if ( ! is_string( $k ) || ! is_string( $v ) ) {
 				continue;

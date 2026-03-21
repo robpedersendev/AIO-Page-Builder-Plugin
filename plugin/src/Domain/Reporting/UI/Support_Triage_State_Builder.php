@@ -125,7 +125,11 @@ final class Support_Triage_State_Builder {
 				'severity'   => 'critical',
 				'domain'     => 'reporting',
 				'title'      => __( 'Critical error delivery failures', 'aio-page-builder' ),
-				'message'    => sprintf( __( '%d developer error report(s) failed to deliver.', 'aio-page-builder' ), count( $critical_errors ) ),
+				'message'    => sprintf(
+					/* translators: %d: number of failed error reports. */
+					__( '%d developer error report(s) failed to deliver.', 'aio-page-builder' ),
+					count( $critical_errors )
+				),
 				'link_url'   => $logs_critical_url,
 				'link_label' => __( 'View critical errors', 'aio-page-builder' ),
 			);
@@ -135,7 +139,11 @@ final class Support_Triage_State_Builder {
 				'severity'   => 'critical',
 				'domain'     => 'queue',
 				'title'      => __( 'Stale queue locks', 'aio-page-builder' ),
-				'message'    => sprintf( __( '%d job(s) with stale lock detected.', 'aio-page-builder' ), (int) $queue_health['stale_lock_count'] ),
+				'message'    => sprintf(
+					/* translators: %d: number of jobs with stale locks. */
+					__( '%d job(s) with stale lock detected.', 'aio-page-builder' ),
+					(int) $queue_health['stale_lock_count']
+				),
 				'link_url'   => \add_query_arg(
 					array(
 						'page' => 'aio-page-builder-queue-logs',
@@ -235,7 +243,11 @@ final class Support_Triage_State_Builder {
 			$out[] = array(
 				'domain'     => 'queue',
 				'identifier' => 'failed_jobs',
-				'summary'    => sprintf( __( '%d failed queue job(s).', 'aio-page-builder' ), $failed_count ),
+				'summary'    => sprintf(
+					/* translators: %d: number of failed queue jobs. */
+					__( '%d failed queue job(s).', 'aio-page-builder' ),
+					$failed_count
+				),
 				'link_url'   => \add_query_arg(
 					array(
 						'page' => 'aio-page-builder-queue-logs',

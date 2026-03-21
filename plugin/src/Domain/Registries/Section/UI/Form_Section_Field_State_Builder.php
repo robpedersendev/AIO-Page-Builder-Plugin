@@ -60,7 +60,7 @@ final class Form_Section_Field_State_Builder {
 	 *   shortcode_preview: string|null,
 	 *   messages: array<int, string>,
 	 *   labels: array{form_provider: string, form_id: string, headline: string},
-	 *   picker_states: array<string, array>|null (when picker_discovery set)
+	 *   picker_states: array<string, array>|null
 	 * }
 	 */
 	public function build_state( array $definition, array $field_values = array() ): array {

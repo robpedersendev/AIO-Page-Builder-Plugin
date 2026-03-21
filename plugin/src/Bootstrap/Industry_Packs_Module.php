@@ -667,12 +667,17 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 					$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
 				);
 				$substitute_engine           = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine();
+				$subtype_resolver            = $container->has( self::CONTAINER_KEY_SUBTYPE_RESOLVER ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_RESOLVER ) : null;
+				$subtype_registry            = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
 				return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Preview_Resolver(
 					$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
 					$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
 					$section_resolver,
 					$helper_composer,
-					$substitute_engine
+					$substitute_engine,
+					$subtype_resolver instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver ? $subtype_resolver : null,
+					$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null,
+					$subtype_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry ? $subtype_overlay : null
 				);
 			}
 		);
@@ -702,12 +707,17 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 					$key_builder instanceof \AIOPageBuilder\Domain\Industry\Cache\Industry_Cache_Key_Builder ? $key_builder : null
 				);
 				$substitute_engine         = new \AIOPageBuilder\Domain\Industry\Registry\Industry_Substitute_Suggestion_Engine();
+				$subtype_resolver          = $container->has( self::CONTAINER_KEY_SUBTYPE_RESOLVER ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_RESOLVER ) : null;
+				$subtype_registry          = $container->has( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) ? $container->get( self::CONTAINER_KEY_SUBTYPE_REGISTRY ) : null;
 				return new \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Preview_Resolver(
 					$profile_repo instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ? $profile_repo : null,
 					$pack_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry ? $pack_registry : null,
 					$page_resolver,
 					$one_pager_composer,
-					$substitute_engine
+					$substitute_engine,
+					$subtype_resolver instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver ? $subtype_resolver : null,
+					$subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null,
+					$subtype_page_overlay instanceof \AIOPageBuilder\Domain\Industry\Docs\Subtype_Page_OnePager_Overlay_Registry ? $subtype_page_overlay : null
 				);
 			}
 		);

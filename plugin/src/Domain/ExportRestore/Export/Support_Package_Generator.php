@@ -390,21 +390,19 @@ final class Support_Package_Generator {
 	}
 
 	private function remove_staging_dir( string $dir ): void {
-		if ( ! is_dir( $dir ) ) {
+		if ( $dir === '' || ! is_dir( $dir ) ) {
 			return;
 		}
-		$files = new \RecursiveIteratorIterator(
-			new \RecursiveDirectoryIterator( $dir, \RecursiveDirectoryIterator::SKIP_DOTS ),
-			\RecursiveIteratorIterator::CHILD_FIRST
-		);
-		foreach ( $files as $item ) {
-			if ( $item->isDir() ) {
-				rmdir( $item->getRealPath() );
-			} else {
-				unlink( $item->getRealPath() );
+		global $wp_filesystem;
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			if ( ! \WP_Filesystem() ) {
+				return;
 			}
 		}
-		rmdir( $dir );
+		if ( $wp_filesystem instanceof \WP_Filesystem_Base ) {
+			$wp_filesystem->delete( $dir, true );
+		}
 	}
 
 	private function log( string $message, array $context, string $log_ref, string $severity = Log_Severities::INFO ): void {

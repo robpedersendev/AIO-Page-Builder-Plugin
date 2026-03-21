@@ -366,6 +366,8 @@ final class Environment_Validator {
 			);
 			return;
 		}
+		// * Direct is_writable: bootstrap validation before WP_Filesystem is guaranteed available.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable -- uploads path check at bootstrap.
 		if ( $path === '' || ! is_dir( $path ) || ! is_writable( $path ) ) {
 			$this->add(
 				new Validation_Result(

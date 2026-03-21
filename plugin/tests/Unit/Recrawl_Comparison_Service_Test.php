@@ -57,7 +57,8 @@ final class Recrawl_Comparison_Service_Test extends TestCase {
 			}
 
 			public function prepare( string $q, ...$a ) {
-				$this->last_run_id = (string) ( $a[0] ?? '' );
+				// Table name is first arg (%i); crawl run id follows.
+				$this->last_run_id = (string) ( $a[1] ?? $a[0] ?? '' );
 				return $q;
 			}
 

@@ -15,10 +15,10 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Admin\ViewModels\Industry\Conversion_Goal_Preview_Influence_View_Model;
 use AIOPageBuilder\Admin\ViewModels\Industry\Industry_Subtype_Preview_Influence_View_Model;
 use AIOPageBuilder\Admin\ViewModels\Sections\Industry_Section_Preview_View_Model;
-use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Docs\Industry_Helper_Doc_Composer;
 use AIOPageBuilder\Domain\Industry\Docs\Subtype_Section_Helper_Overlay_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
+use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Subtype_Resolver;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry;
 
@@ -42,18 +42,33 @@ final class Industry_Section_Preview_Resolver {
 	/** @var Industry_Substitute_Suggestion_Engine|null */
 	private $substitute_engine;
 
+	/** @var Industry_Subtype_Resolver|null */
+	private ?Industry_Subtype_Resolver $subtype_resolver = null;
+
+	/** @var Industry_Subtype_Registry|null */
+	private ?Industry_Subtype_Registry $subtype_registry = null;
+
+	/** @var Subtype_Section_Helper_Overlay_Registry|null */
+	private ?Subtype_Section_Helper_Overlay_Registry $subtype_helper_overlay_registry = null;
+
 	public function __construct(
 		?Industry_Profile_Repository $profile_repository,
 		?Industry_Pack_Registry $pack_registry,
 		Industry_Section_Recommendation_Resolver $recommendation_resolver,
 		Industry_Helper_Doc_Composer $helper_composer,
-		?Industry_Substitute_Suggestion_Engine $substitute_engine = null
+		?Industry_Substitute_Suggestion_Engine $substitute_engine = null,
+		?Industry_Subtype_Resolver $subtype_resolver = null,
+		?Industry_Subtype_Registry $subtype_registry = null,
+		?Subtype_Section_Helper_Overlay_Registry $subtype_helper_overlay_registry = null
 	) {
-		$this->profile_repository      = $profile_repository;
-		$this->pack_registry           = $pack_registry;
-		$this->recommendation_resolver = $recommendation_resolver;
-		$this->helper_composer         = $helper_composer;
-		$this->substitute_engine       = $substitute_engine;
+		$this->profile_repository              = $profile_repository;
+		$this->pack_registry                   = $pack_registry;
+		$this->recommendation_resolver         = $recommendation_resolver;
+		$this->helper_composer                 = $helper_composer;
+		$this->substitute_engine               = $substitute_engine;
+		$this->subtype_resolver                = $subtype_resolver;
+		$this->subtype_registry                = $subtype_registry;
+		$this->subtype_helper_overlay_registry = $subtype_helper_overlay_registry;
 	}
 
 	/**
@@ -135,7 +150,7 @@ final class Industry_Section_Preview_Resolver {
 			true
 		);
 
-		$goal_influence = $this->build_goal_influence_section( $profile, $section_key );
+		$goal_influence = $this->build_goal_influence_section( $profile );
 
 		return new Industry_Section_Preview_View_Model(
 			true,
@@ -202,6 +217,31 @@ final class Industry_Section_Preview_Resolver {
 			$helper_refinement,
 			false,
 			$caution_notes,
+			''
+		);
+		return $vm->to_array();
+	}
+
+	/**
+	 * Builds conversion-goal influence for section template preview. Fallback when no goal.
+	 *
+	 * @param array<string, mixed> $profile Normalized industry profile.
+	 * @return array<string, mixed>
+	 */
+	private function build_goal_influence_section( array $profile ): array {
+		$goal_key = isset( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] ) && \is_string( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			? \trim( $profile[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] )
+			: '';
+		if ( $goal_key === '' ) {
+			return Conversion_Goal_Preview_Influence_View_Model::none()->to_array();
+		}
+		$vm = new Conversion_Goal_Preview_Influence_View_Model(
+			true,
+			$goal_key,
+			Conversion_Goal_Preview_Influence_View_Model::goal_key_to_label( $goal_key ),
+			false,
+			false,
+			array(),
 			''
 		);
 		return $vm->to_array();

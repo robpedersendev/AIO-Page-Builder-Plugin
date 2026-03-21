@@ -35,6 +35,7 @@ final class Page_Template_Gap_Closing_Super_Batch_Seeder {
 			$template_keys[] = $key;
 			$id              = $page_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
+				/* translators: %s: internal registry key. */
 				$errors[] = sprintf( __( 'Failed to save page template: %s', 'aio-page-builder' ), $key );
 				continue;
 			}

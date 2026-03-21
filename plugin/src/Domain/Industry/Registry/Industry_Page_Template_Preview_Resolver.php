@@ -44,25 +44,43 @@ final class Industry_Page_Template_Preview_Resolver {
 	/** @var Industry_Substitute_Suggestion_Engine|null */
 	private $substitute_engine;
 
+	/** @var Industry_Subtype_Resolver|null */
+	private ?Industry_Subtype_Resolver $subtype_resolver = null;
+
+	/** @var Industry_Subtype_Registry|null */
+	private ?Industry_Subtype_Registry $subtype_registry = null;
+
+	/** @var Subtype_Page_OnePager_Overlay_Registry|null */
+	private ?Subtype_Page_OnePager_Overlay_Registry $subtype_onepager_overlay_registry = null;
+
 	/**
 	 * @param Industry_Profile_Repository|null               $profile_repository
 	 * @param Industry_Pack_Registry|null                    $pack_registry
 	 * @param Industry_Page_Template_Recommendation_Resolver $recommendation_resolver
 	 * @param Industry_Page_OnePager_Composer                $one_pager_composer
 	 * @param Industry_Substitute_Suggestion_Engine|null     $substitute_engine
+	 * @param Industry_Subtype_Resolver|null                 $subtype_resolver
+	 * @param Industry_Subtype_Registry|null                 $subtype_registry
+	 * @param Subtype_Page_OnePager_Overlay_Registry|null    $subtype_onepager_overlay_registry
 	 */
 	public function __construct(
 		?Industry_Profile_Repository $profile_repository,
 		?Industry_Pack_Registry $pack_registry,
 		Industry_Page_Template_Recommendation_Resolver $recommendation_resolver,
 		Industry_Page_OnePager_Composer $one_pager_composer,
-		?Industry_Substitute_Suggestion_Engine $substitute_engine = null
+		?Industry_Substitute_Suggestion_Engine $substitute_engine = null,
+		?Industry_Subtype_Resolver $subtype_resolver = null,
+		?Industry_Subtype_Registry $subtype_registry = null,
+		?Subtype_Page_OnePager_Overlay_Registry $subtype_onepager_overlay_registry = null
 	) {
-		$this->profile_repository      = $profile_repository;
-		$this->pack_registry           = $pack_registry;
-		$this->recommendation_resolver = $recommendation_resolver;
-		$this->one_pager_composer      = $one_pager_composer;
-		$this->substitute_engine       = $substitute_engine;
+		$this->profile_repository                = $profile_repository;
+		$this->pack_registry                     = $pack_registry;
+		$this->recommendation_resolver           = $recommendation_resolver;
+		$this->one_pager_composer                = $one_pager_composer;
+		$this->substitute_engine                 = $substitute_engine;
+		$this->subtype_resolver                  = $subtype_resolver;
+		$this->subtype_registry                  = $subtype_registry;
+		$this->subtype_onepager_overlay_registry = $subtype_onepager_overlay_registry;
 	}
 
 	/**

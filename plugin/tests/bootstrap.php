@@ -8,6 +8,53 @@
 // Composer autoload.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
+if ( ! function_exists( 'aio_page_builder_test_wpdb_prepare' ) ) {
+	/**
+	 * Minimal wpdb::prepare() simulation for unit-test stubs (supports %s, %d, %f, %i per WP 6.2+).
+	 *
+	 * @param string   $query SQL with placeholders.
+	 * @param mixed ...$args Arguments in placeholder order.
+	 * @return string
+	 */
+	function aio_page_builder_test_wpdb_prepare( string $query, ...$args ): string {
+		$i   = 0;
+		$len = strlen( $query );
+		$out = '';
+		for ( $p = 0; $p < $len; ++$p ) {
+			if ( '%' === $query[ $p ] && $p + 1 < $len ) {
+				$t = $query[ $p + 1 ];
+				if ( 's' === $t ) {
+					$v = $args[ $i++ ] ?? '';
+					$out .= "'" . addslashes( (string) $v ) . "'";
+					++$p;
+					continue;
+				}
+				if ( 'd' === $t ) {
+					$v = $args[ $i++ ] ?? 0;
+					$out .= (string) (int) $v;
+					++$p;
+					continue;
+				}
+				if ( 'f' === $t ) {
+					$v = $args[ $i++ ] ?? 0.0;
+					$out .= is_numeric( $v ) ? (string) (float) $v : '0';
+					++$p;
+					continue;
+				}
+				if ( 'i' === $t ) {
+					$v    = (string) ( $args[ $i++ ] ?? '' );
+					$safe = preg_replace( '/[^A-Za-z0-9_]/', '', $v );
+					$out .= '`' . $safe . '`';
+					++$p;
+					continue;
+				}
+			}
+			$out .= $query[ $p ];
+		}
+		return $out;
+	}
+}
+
 // * Stub path for Environment_Validator test-only plugin API include (see Environment_Validator.php).
 if ( ! defined( 'AIOPAGEBUILDER_TEST_PLUGIN_INCLUDES' ) ) {
 	define( 'AIOPAGEBUILDER_TEST_PLUGIN_INCLUDES', __DIR__ . '/fixtures/wp-plugin-api-stub.php' );

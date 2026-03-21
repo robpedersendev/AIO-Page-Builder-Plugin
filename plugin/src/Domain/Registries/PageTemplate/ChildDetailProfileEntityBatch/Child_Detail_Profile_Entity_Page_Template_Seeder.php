@@ -34,6 +34,7 @@ final class Child_Detail_Profile_Entity_Page_Template_Seeder {
 			$id = $page_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
 				$key      = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
+				/* translators: %s: internal registry key. */
 				$errors[] = sprintf( __( 'Failed to save page template: %s', 'aio-page-builder' ), $key );
 				continue;
 			}

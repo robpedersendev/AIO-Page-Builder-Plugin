@@ -33,6 +33,7 @@ final class Legal_Policy_Utility_Library_Batch_Seeder {
 			$id = $section_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
 				$key      = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
+				/* translators: %s: internal registry key. */
 				$errors[] = sprintf( __( 'Failed to save legal/policy/utility section: %s', 'aio-page-builder' ), $key );
 				continue;
 			}

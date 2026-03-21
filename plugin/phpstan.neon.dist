@@ -1,3 +1,6 @@
+includes:
+    - phpstan-baseline.neon
+
 parameters:
     level: 5
     # Admin/Infrastructure consume Domain PHPDoc shapes; treating them as uncertain avoids false positives on redundant ??/isset.

@@ -27,9 +27,9 @@ final class Create_Menu_Handler implements Execution_Handler_Interface {
 	/**
 	 * Executes the menu creation. Envelope has been validated by Single_Action_Executor.
 	 *
-	 * target_reference must contain:
+	 * The target_reference must contain:
 	 *   - menu_name (string, non-empty): name passed to wp_create_nav_menu().
-	 * target_reference may contain:
+	 * The target_reference may contain:
 	 *   - theme_location (string): registered theme location slug; skipped if not registered.
 	 *   - items (array): seed items; each may have title, url, type, object_id.
 	 *

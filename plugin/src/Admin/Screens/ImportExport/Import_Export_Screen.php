@@ -490,7 +490,7 @@ final class Import_Export_Screen {
 			\wp_safe_redirect( $this->screen_url( 'error', self::ERROR_CODE_FILE_TOO_LARGE ) );
 			exit;
 		}
-		$tmp_path = $_FILES['aio_ie_package_file']['tmp_name']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- tmp_name validated by is_uploaded_file(), used only for finfo_file and move_uploaded_file.
+		$tmp_path = $_FILES['aio_ie_package_file']['tmp_name']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- tmp_name validated by is_uploaded_file(); used for MIME check and copy into exports dir.
 		$finfo    = \finfo_open( \FILEINFO_MIME_TYPE );
 		if ( $finfo === false ) {
 			\wp_safe_redirect( $this->screen_url( 'error', self::ERROR_CODE_INVALID_MIME ) );
@@ -504,7 +504,7 @@ final class Import_Export_Screen {
 		}
 		$temp_name = 'aio-import-validate-' . \get_current_user_id() . '.zip';
 		$dest      = rtrim( $dir, '/\\' ) . '/' . $temp_name;
-		if ( ! \move_uploaded_file( $tmp_path, $dest ) ) {
+		if ( ! @\copy( (string) $tmp_path, $dest ) ) {
 			\wp_safe_redirect( $this->screen_url( 'error', 'move_failed' ) );
 			exit;
 		}
@@ -609,7 +609,12 @@ final class Import_Export_Screen {
 		\header( 'Content-Type: application/zip' );
 		\header( 'Content-Disposition: attachment; filename="' . \esc_attr( $filename ) . '"' );
 		\header( 'Content-Length: ' . (string) filesize( $path ) );
-		readfile( $path );
+		$in = \fopen( $path, 'rb' );
+		if ( false === $in ) {
+			\wp_die( \esc_html__( 'Could not read file.', 'aio-page-builder' ), 500 );
+		}
+		\fpassthru( $in );
+		\fclose( $in );
 		exit;
 	}
 

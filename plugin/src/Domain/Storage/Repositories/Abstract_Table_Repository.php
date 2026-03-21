@@ -44,6 +44,7 @@ abstract class Abstract_Table_Repository implements Repository_Interface {
 	 * Confirms a SQL identifier segment (table or column) is safe for concatenation into queries.
 	 *
 	 * @param string $ident Table or column name from internal constants only.
+	 * @throws \InvalidArgumentException When the identifier contains invalid characters.
 	 */
 	protected function assert_sql_identifier( string $ident ): void {
 		if ( ! preg_match( '/^[A-Za-z0-9_]+$/', $ident ) ) {
@@ -65,8 +66,8 @@ abstract class Abstract_Table_Repository implements Repository_Interface {
 	public function get_by_id( int $id ): ?array {
 		$table = $this->get_table_name();
 		$this->assert_sql_identifier( $table );
-		$sql      = 'SELECT * FROM `' . $table . '` WHERE id = %d LIMIT 1';
-		$prepared = $this->wpdb->prepare( $sql, $id );
+		$sql      = 'SELECT * FROM %i WHERE id = %d LIMIT 1';
+		$prepared = $this->wpdb->prepare( $sql, $table, $id );
 		$row      = $this->wpdb->get_row( $prepared );
 		if ( $row === null ) {
 			return null;
@@ -84,8 +85,8 @@ abstract class Abstract_Table_Repository implements Repository_Interface {
 		$col   = $this->get_key_column();
 		$this->assert_sql_identifier( $table );
 		$this->assert_sql_identifier( $col );
-		$sql      = 'SELECT * FROM `' . $table . '` WHERE `' . $col . '` = %s LIMIT 1';
-		$prepared = $this->wpdb->prepare( $sql, $key );
+		$sql      = 'SELECT * FROM %i WHERE %i = %s LIMIT 1';
+		$prepared = $this->wpdb->prepare( $sql, $table, $col, $key );
 		$row      = $this->wpdb->get_row( $prepared );
 		if ( $row === null ) {
 			return null;

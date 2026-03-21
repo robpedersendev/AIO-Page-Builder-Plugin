@@ -232,7 +232,13 @@ final class Post_Release_Health_State_Builder {
 		$scores['build_plan_review'] = array(
 			'status'      => $plan_status,
 			'score_label' => $plan_status === 'warning' ? __( 'High denial rate', 'aio-page-builder' ) : ( $plan_status === 'attention' ? __( 'Moderate denial', 'aio-page-builder' ) : __( 'OK', 'aio-page-builder' ) ),
-			'message'     => $total_plans === 0 ? __( 'No plans in period.', 'aio-page-builder' ) : sprintf( __( 'Approval rate %1$.1f%%, denial %2$.1f%% (%3$d plans).', 'aio-page-builder' ), ( $plan_trends['approval_rate'] ?? 0 ) * 100, $denial_rate * 100, $total_plans ),
+			'message'     => $total_plans === 0 ? __( 'No plans in period.', 'aio-page-builder' ) : sprintf(
+				/* translators: 1: approval rate percent, 2: denial rate percent, 3: plan count. */
+				__( 'Approval rate %1$.1f%%, denial %2$.1f%% (%3$d plans).', 'aio-page-builder' ),
+				( $plan_trends['approval_rate'] ?? 0 ) * 100,
+				$denial_rate * 100,
+				$total_plans
+			),
 			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-build-plan-analytics' ), $base ),
 			'link_label'  => __( 'Build Plan Analytics', 'aio-page-builder' ),
 		);
@@ -244,7 +250,12 @@ final class Post_Release_Health_State_Builder {
 		$scores['ai_run_validity'] = array(
 			'status'      => $ai_status,
 			'score_label' => $ai_status === 'warning' ? __( 'Low success rate', 'aio-page-builder' ) : ( $ai_status === 'attention' ? __( 'Moderate', 'aio-page-builder' ) : __( 'OK', 'aio-page-builder' ) ),
-			'message'     => $in_period === 0 ? __( 'No AI runs in period.', 'aio-page-builder' ) : sprintf( __( '%1$.1f%% success (%2$d runs in period).', 'aio-page-builder' ), $rate * 100, $in_period ),
+			'message'     => $in_period === 0 ? __( 'No AI runs in period.', 'aio-page-builder' ) : sprintf(
+				/* translators: 1: success rate percent, 2: number of runs. */
+				__( '%1$.1f%% success (%2$d runs in period).', 'aio-page-builder' ),
+				$rate * 100,
+				$in_period
+			),
 			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs' ), $base ),
 			'link_label'  => __( 'AI Runs', 'aio-page-builder' ),
 		);
@@ -254,7 +265,11 @@ final class Post_Release_Health_State_Builder {
 		$scores['rollback'] = array(
 			'status'      => 'ok',
 			'score_label' => __( 'OK', 'aio-page-builder' ),
-			'message'     => $rollback_total === 0 ? __( 'No rollbacks in period.', 'aio-page-builder' ) : sprintf( __( '%d rollback(s) in period.', 'aio-page-builder' ), $rollback_total ),
+			'message'     => $rollback_total === 0 ? __( 'No rollbacks in period.', 'aio-page-builder' ) : sprintf(
+				/* translators: %d: number of rollbacks. */
+				__( '%d rollback(s) in period.', 'aio-page-builder' ),
+				$rollback_total
+			),
 			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-support-triage' ), $base ),
 			'link_label'  => __( 'Support Triage', 'aio-page-builder' ),
 		);
@@ -321,7 +336,11 @@ final class Post_Release_Health_State_Builder {
 				'domain'     => 'build_plan_review',
 				'priority'   => 'medium',
 				'title'      => __( 'High Build Plan denial rate', 'aio-page-builder' ),
-				'message'    => sprintf( __( '%.1f%% denial in period. Review common blockers and plan friction.', 'aio-page-builder' ), $denial_rate * 100 ),
+				'message'    => sprintf(
+					/* translators: %s: denial rate percentage (one decimal). */
+					__( '%.1f%% denial in period. Review common blockers and plan friction.', 'aio-page-builder' ),
+					$denial_rate * 100
+				),
 				'link_url'   => \add_query_arg( array( 'page' => 'aio-page-builder-build-plan-analytics' ), $base ),
 				'link_label' => __( 'Build Plan Analytics', 'aio-page-builder' ),
 			);

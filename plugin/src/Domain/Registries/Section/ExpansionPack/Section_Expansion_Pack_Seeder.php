@@ -33,6 +33,7 @@ final class Section_Expansion_Pack_Seeder {
 			$id = $section_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
 				$key      = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
+				/* translators: %s: internal registry key. */
 				$errors[] = sprintf( __( 'Failed to save section: %s', 'aio-page-builder' ), $key );
 				continue;
 			}

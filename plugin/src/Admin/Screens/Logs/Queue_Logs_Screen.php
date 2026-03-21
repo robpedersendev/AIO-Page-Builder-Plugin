@@ -519,7 +519,7 @@ final class Queue_Logs_Screen {
 
 	/**
 	 * @param array<int, array{id: string, type: string, created_at: string, status: string}> $rows
-	 * @param bool                                                                               $activity_log_available Dedicated import/export activity store is enabled.
+	 * @param bool                                                                            $activity_log_available Dedicated import/export activity store is enabled.
 	 */
 	private function render_import_export_tab( array $rows, bool $activity_log_available ): void {
 		if ( ! $activity_log_available ) {
@@ -701,7 +701,12 @@ final class Queue_Logs_Screen {
 		\header( 'Content-Type: application/json' );
 		\header( 'Content-Disposition: attachment; filename="' . \esc_attr( $file ) . '"' );
 		\header( 'Content-Length: ' . (string) filesize( $path ) );
-		readfile( $path );
+		$in = \fopen( $path, 'rb' );
+		if ( false === $in ) {
+			\wp_die( \esc_html__( 'Could not read file.', 'aio-page-builder' ), 500 );
+		}
+		\fpassthru( $in );
+		\fclose( $in );
 		exit;
 	}
 

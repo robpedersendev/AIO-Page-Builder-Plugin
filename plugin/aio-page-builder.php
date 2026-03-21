@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: AIO Page Builder
- * Plugin URI: https://example.com/aio-page-builder
+ * Plugin URI: https://steadyhandmarketing.com/aio-page-builder
  * Description: Private-distribution WordPress plugin for structured page building with AI-assisted planning.
  * Version: 0.1.0
  * Requires at least: 6.6
@@ -12,7 +12,6 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: aio-page-builder
  * Domain Path: /languages
- * Update URI: https://example.com/aio-page-builder
  *
  * @package AIOPageBuilder
  *

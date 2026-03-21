@@ -90,15 +90,7 @@ if ( ! class_exists( 'AIOPageBuilder\Tests\Unit\Domain\Storage\Profile\Fake_Wpdb
 		}
 
 		public function prepare( string $query, ...$args ): string {
-			// Minimal implementation: replace %s with quoted first arg, %d with int.
-			foreach ( $args as $arg ) {
-				if ( is_int( $arg ) ) {
-					$query = preg_replace( '/%d/', (string) $arg, $query, 1 );
-				} else {
-					$query = preg_replace( '/%s/', "'{$arg}'", $query, 1 );
-				}
-			}
-			return $query;
+			return aio_page_builder_test_wpdb_prepare( $query, ...$args );
 		}
 	}
 }

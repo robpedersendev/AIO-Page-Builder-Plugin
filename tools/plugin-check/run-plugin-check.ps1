@@ -76,8 +76,8 @@ docker compose run --rm -T -u root wpcli wp plugin check aio-page-builder `
     --path=/var/www/html `
     --require=/var/www/html/wp-content/plugins/plugin-check/cli.php `
     --format=json `
-    --exclude-directories=tests,legacy `
-    --exclude-files=phpstan-bootstrap.php,phpstan-wordpress-overrides.stub.php `
+    --exclude-directories=tests,legacy,phpstan-fixtures,docs `
+    --exclude-files=phpstan-bootstrap.php,phpstan-wordpress-overrides.stub.php,phpcs.xml.dist,phpstan.neon.dist,phpunit.xml.dist,.wp-env.json,.phpunit.result.cache `
     --allow-root `
     2>$null | Set-Content -Path $OutJson -Encoding utf8
 $checkExit = $LASTEXITCODE

@@ -61,8 +61,8 @@ final class Reporting_Health_Summary_Builder {
 			$last_heartbeat = (string) $heartbeat_state['last_successful_month'];
 		}
 
-		$current_ym      = gmdate( 'Y-m' );
-		$degraded        = $recent_failures > 0 || ( $last_heartbeat !== '' && $last_heartbeat < $current_ym );
+		$current_ym = gmdate( 'Y-m' );
+		$degraded   = $recent_failures > 0 || ( $last_heartbeat !== '' && $last_heartbeat < $current_ym );
 		if ( $recent_failures > 0 ) {
 			$summary_message = sprintf(
 				/* translators: %d: number of failed outbound reporting deliveries in the last 30 days */
