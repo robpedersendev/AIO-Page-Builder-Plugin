@@ -3,7 +3,7 @@
 **Audience:** Support, operators, and power users.  
 **Primary runbook (symptoms, logs, escalation):** [support-triage-guide.md](../guides/support-triage-guide.md).  
 **Vocabulary and caps:** [concepts-and-glossary.md](concepts-and-glossary.md).  
-**Workflow index:** [index.md](index.md).
+**Workflow index:** [index.md](index.md); compact paths: [index § Start here (three paths)](index.md#start-here-three-paths).
 
 Answers here are **short**; follow links for procedures and edge cases.
 

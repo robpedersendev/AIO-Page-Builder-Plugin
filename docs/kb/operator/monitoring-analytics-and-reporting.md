@@ -129,9 +129,7 @@ From **`Queue_Health_Summary_Builder`** (when the job queue repository is availa
 
 Sections (in render order):
 
-1. **Reporting disclosure** — two blocks from **`Privacy_Settings_State_Builder`** (exact strings are in the plugin source; summaries here must stay aligned):
-   - **Private distribution reporting:** product may send operational reports (install notification, periodic heartbeat, error reports) to an approved destination; described as **mandatory for this distribution model** and **not disableable** in UI; states that **secrets/credentials are not included** in reports.
-   - **What may be sent:** **Included** — site identifier, plugin version, WP/PHP versions, dependency state, sanitized error summaries on failures. **Excluded** — API keys, passwords, personal data, raw logs; delivery status recorded locally for diagnostics.
+1. **Reporting disclosure** — two blocks from **`Privacy_Settings_State_Builder`**. **UI headings** (WordPress i18n strings) are **Private distribution reporting** and **What may be sent**; paragraph text states that operational reports (install, heartbeat, error reports) may go to an approved destination, are **mandatory** for this distribution model, **cannot be disabled** in-product, and **omit secrets/credentials**; the second block lists **included** vs **excluded** categories (identifier, versions, dependency state, sanitized error summaries vs keys, passwords, personal data, raw logs) and notes local delivery-status logging.
 2. **Retention** — reporting log **entry count** sentence; note that entries are retained for diagnostics, governed by product policy, and **local logs do not contain secrets**.
 3. **Uninstall / export behavior** — preference summary, built-pages message, ACF preservation pointer, uninstall choice list, optional template lifecycle block (same lifecycle copy as elsewhere).
 4. **Environment & version** — plugin, PHP, WordPress; up to **eight** lines from a **persisted diagnostics snapshot** (`generated_at` + check messages) when present.

@@ -104,9 +104,11 @@ Custom roles, membership plugins, or manual cap edits override these defaults. I
 | **Page Templates** / detail | `aio_manage_page_templates` | |
 | **Template Compare** | `aio_manage_page_templates` | |
 | **Compositions** | `aio_manage_compositions` | |
-| Analytics (**Build Plan Analytics**, **Template Analytics**) | `aio_view_build_plans` | |
+| **Build Plan Analytics** | `aio_view_build_plans` | |
+| **Template Analytics** | `aio_view_logs` | |
+| **Post-Release Health** | `aio_view_logs` | |
 | **Queue & Logs**, **Support Triage**, **Post-Release Health**, many **Industry** reports | `aio_view_logs` | |
-| **Industry Profile** and **Industry Overrides** | `aio_manage_settings` | Other Industry screens may use `aio_view_logs`; see [industry-admin-workflows.md](industry/industry-admin-workflows.md). |
+| **Industry Profile**, **Industry Overrides**, **Guided Repair**, **Industry Style Preset** | `aio_manage_settings` | Report and comparison screens typically use `aio_view_logs`. **Industry Bundle Import** uses `aio_import_data`. Full map: [industry-admin-workflows.md](industry/industry-admin-workflows.md). |
 | **Global Style Tokens** / **Global Component Overrides** | `aio_manage_settings` | |
 | **Privacy, Reporting & Settings** | `aio_manage_reporting_and_privacy` | |
 | Open **Import / Export** | `aio_export_data` **or** `aio_import_data` | Screen allows either. |
@@ -152,7 +154,7 @@ Hidden routes: **Page Template Detail**, **Section Template Detail**, **Document
 | Site admin / operator | [admin-operator-guide.md](../guides/admin-operator-guide.md) |
 | Template library (browse/compare/compose) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md) |
 | Choosing templates / helper docs | [template-library-editor-guide.md](../guides/template-library-editor-guide.md) |
-| Support / logs / bundles | [support-triage-guide.md](../guides/support-triage-guide.md) |
+| Support / logs / bundles | [support-triage-guide.md](../guides/support-triage-guide.md); [master-faq.md](master-faq.md) |
 | Template support appendices | [template-library-support-guide.md](../guides/template-library-support-guide.md) |
 | Form provider | [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md) |
 | Uninstall / ACF preservation | [acf-uninstall-preservation-operator-guide.md](../guides/acf-uninstall-preservation-operator-guide.md) |

@@ -3,7 +3,7 @@
 **Audience:** Support staff and operators performing diagnostics and issue triage.  
 **Spec:** §59.15, §60.6, §46 (reporting), security and redaction standards.  
 **Companion:** [Master FAQ](../kb/master-faq.md) (short answers and repeated confusion).  
-**Knowledge base:** [KB index](../kb/index.md); [FILE_MAP.md](../kb/FILE_MAP.md).
+**Knowledge base:** [KB index — Start here (three paths)](../kb/index.md#start-here-three-paths); [FILE_MAP.md](../kb/FILE_MAP.md).
 
 Use this guide **by symptom first**, then use logs and exports. Do not ask for API keys, passwords, or unredacted secrets.
 

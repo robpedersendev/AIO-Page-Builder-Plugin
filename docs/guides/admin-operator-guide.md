@@ -14,7 +14,7 @@
 
 **Hidden routes (no menu label):** Page Template Detail, Section Template Detail, and Documentation Detail open from **View** / helper links inside the template library. See [template-library-operator-guide.md](template-library-operator-guide.md).
 
-Start at **Dashboard** for readiness and quick links. Use **Onboarding & Profile** to complete brand/business profile before running AI planning. Use **AI Providers** to configure and test the AI connection. For the expanded template library (directories, compare, compositions, previews), see [template-library-operator-guide.md](template-library-operator-guide.md). For **Industry** menus (profile, reports, bundle import, guided repair, etc.), the KB hub is [industry-admin-workflows.md](../kb/industry/industry-admin-workflows.md) (stub until expanded). For **Settings** seed actions (registry batches), see §1.1 and [settings-registry-maintenance.md](../kb/operator/settings-registry-maintenance.md).
+Start at **Dashboard** for readiness and quick links. Use **Onboarding & Profile** to complete brand/business profile before running AI planning. Use **AI Providers** to configure and test the AI connection. For the expanded template library (directories, compare, compositions, previews), see [template-library-operator-guide.md](template-library-operator-guide.md). For **Industry** menus (profile, reports, bundle import, guided repair, etc.), the KB hub is [industry-admin-workflows.md](../kb/industry/industry-admin-workflows.md). For **Settings** seed actions (registry batches), see §1.1 and [settings-registry-maintenance.md](../kb/operator/settings-registry-maintenance.md).
 
 ### 1.1 Settings (`aio-page-builder-settings`)
 

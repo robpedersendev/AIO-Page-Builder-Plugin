@@ -3,7 +3,7 @@
 **Audience:** Content editors and users who complete onboarding, review Build Plans, and trigger execution.  
 **Spec:** §1.5.4, §0.10.7.  
 **Purpose:** Concise guidance for onboarding/profile and Build Plan review.  
-**Knowledge base:** [KB index](../kb/index.md) (end-user lane); [FILE_MAP.md](../kb/FILE_MAP.md); [concepts-and-glossary.md](../kb/concepts-and-glossary.md) (terms and default permissions).
+**Knowledge base:** [KB index](../kb/index.md#start-here-three-paths) (start-here paths); [FILE_MAP.md](../kb/FILE_MAP.md); [concepts-and-glossary.md](../kb/concepts-and-glossary.md) (terms and default permissions); [master-faq.md](../kb/master-faq.md) (short answers).
 
 **Default WordPress roles:** The **Editor** role receives only `aio_view_build_plans`, `aio_approve_build_plans`, and `aio_view_logs` unless an administrator adds more. If you cannot open **Onboarding & Profile** or **Execute** actions, ask for the appropriate capability (see concepts guide).
 

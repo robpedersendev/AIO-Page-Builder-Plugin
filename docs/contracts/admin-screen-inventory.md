@@ -103,7 +103,7 @@ When admin screens list or browse **section templates**, **directory and browse 
 
 ### 2.5 Compositions screen (spec §14, §49.6; Prompt 177)
 
-The **Compositions** screen lists governed custom compositions and provides a **composition builder** view for large-library assembly. Views: **list** (compositions table; Build composition link) and **build** (filtered section library, current ordered sections, CTA count/proximity warnings, insertion hint, preview and one-pager readiness). State is built by `Composition_Builder_State_Builder`; filter state by `Composition_Filter_State`. Screen slug: `aio-page-builder-compositions`. Capability: `aio_view_build_plans`. No freeform drag-and-drop; section ordering and CTA rules remain governed. Mutation (create/update composition) is server-validated and out of scope for this screen’s initial implementation; builder shows state and guidance only.
+The **Compositions** screen lists governed custom compositions and provides a **composition builder** view for large-library assembly. Views: **list** (compositions table; Build composition link) and **build** (filtered section library, current ordered sections, CTA count/proximity warnings, insertion hint, preview and one-pager readiness). State is built by `Composition_Builder_State_Builder`; filter state by `Composition_Filter_State`. Screen slug: `aio-page-builder-compositions`. Capability: `aio_manage_compositions`. No freeform drag-and-drop; section ordering and CTA rules remain governed. Mutation (create/update composition) is server-validated and out of scope for this screen’s initial implementation; builder shows state and guidance only.
 
 **Example composition-builder state payload** (build view, one composition with two sections):
 

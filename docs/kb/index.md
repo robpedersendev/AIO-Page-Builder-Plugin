@@ -10,13 +10,25 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ---
 
+## Start here (three paths)
+
+Use this block to route people before they dive into the taxonomy.
+
+1. **First-time user (editor / reviewer)** — [concepts-and-glossary.md](concepts-and-glossary.md) (permissions you are likely to have) → [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md) → [build-plan-overview.md](operator/build-plan-overview.md) when plans appear. If something is missing from the menu, default **Editor** caps are limited; see the glossary permissions table.
+
+2. **Operator / site admin** — [concepts-and-glossary.md](concepts-and-glossary.md) → [admin-operator-guide.md](../guides/admin-operator-guide.md) → [FILE_MAP.md](FILE_MAP.md) for **AIO Page Builder →** menu label → primary article. Deep workflows: [onboarding-and-profile.md](operator/onboarding-and-profile.md), [ai-providers-credentials-budget.md](operator/ai-providers-credentials-budget.md), [crawler-sessions-and-comparison.md](operator/crawler-sessions-and-comparison.md), [import-export-and-restore.md](operator/import-export-and-restore.md), [industry-admin-workflows.md](industry/industry-admin-workflows.md).
+
+3. **Support / troubleshooter** — [support-triage-guide.md](../guides/support-triage-guide.md) (symptom router) + [master-faq.md](master-faq.md) → [monitoring-analytics-and-reporting.md](operator/monitoring-analytics-and-reporting.md) (Queue & Logs, reporting disclosure alignment) → [FILE_MAP.md](FILE_MAP.md) §9–§11. Escalation context: [known-risk-register.md](../release/known-risk-register.md).
+
+---
+
 ## Audiences
 
 | Audience | Start here | Typical next steps |
 |----------|------------|--------------------|
-| **End users** (editors running onboarding / plan review) | [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md) | [admin-operator-guide.md](../guides/admin-operator-guide.md) for capability context; [FILE_MAP.md](FILE_MAP.md) |
-| **Operators / site admins** | [admin-operator-guide.md](../guides/admin-operator-guide.md) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md); [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md); KB stubs under `operator/`, `industry/`, `analytics/` |
-| **Support & diagnostics** | [support-triage-guide.md](../guides/support-triage-guide.md); [master-faq.md](master-faq.md) | [template-library-support-guide.md](../guides/template-library-support-guide.md); [FILE_MAP.md](FILE_MAP.md) §9–§11 |
+| **End users** (editors running onboarding / plan review) | [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md); [index § Start here (three paths)](#start-here-three-paths) | [admin-operator-guide.md](../guides/admin-operator-guide.md) for capability context; [FILE_MAP.md](FILE_MAP.md) |
+| **Operators / site admins** | [admin-operator-guide.md](../guides/admin-operator-guide.md); [index § Start here (three paths)](#start-here-three-paths) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md); [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md); [industry-admin-workflows.md](industry/industry-admin-workflows.md); operator articles under `docs/kb/operator/` |
+| **Support & diagnostics** | [support-triage-guide.md](../guides/support-triage-guide.md); [master-faq.md](master-faq.md); [index § Start here (three paths)](#start-here-three-paths) | [template-library-support-guide.md](../guides/template-library-support-guide.md); [FILE_MAP.md](FILE_MAP.md) §9–§11 |
 
 ---
 
@@ -28,7 +40,7 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 - [onboarding-and-profile.md](operator/onboarding-and-profile.md) — Full onboarding/profile workflow (drafts, prefill, submission).
 - [admin-operator-guide.md §1–§2](../guides/admin-operator-guide.md) — Menu overview, settings, onboarding summary.
 - [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md) — Editor onboarding and Build Plan review.
-- [settings-registry-maintenance.md](operator/settings-registry-maintenance.md) — Registry seed actions on Settings (stub).
+- [settings-registry-maintenance.md](operator/settings-registry-maintenance.md) — Settings seeds: prerequisites, high-level workflow, edge cases (per-button detail still in admin operator guide).
 
 ### AI & Providers
 
@@ -94,12 +106,12 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 ### Industry Pack subsystem
 
 - [industry-bundle-import-and-apply.md](industry/industry-bundle-import-and-apply.md) — JSON bundle preview, hash conflicts, replace/skip, scopes, safe apply, vs Import/Export ZIP.
-- [industry-admin-workflows.md](industry/industry-admin-workflows.md) — All Industry submenu screens (stub); links bundle apply guide.
+- [industry-admin-workflows.md](industry/industry-admin-workflows.md) — Industry submenu map (labels, slugs, caps), intents, edge cases; links bundle apply guide.
 - [industry-operator-curriculum.md](../operations/industry-operator-curriculum.md) — Training path (internal).
 
 ### Styling (global)
 
-- [global-styling.md](operator/global-styling.md) — Global Style Tokens and Global Component Overrides (stub); cross-links template detail styling.
+- [global-styling.md](operator/global-styling.md) — Global Style Tokens and Global Component Overrides: prerequisites, workflow sketch, edge cases; cross-links template detail styling.
 
 ### Privacy, reporting, uninstall
 
