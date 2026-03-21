@@ -36,7 +36,8 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 - [ai-providers-credentials-budget.md](operator/ai-providers-credentials-budget.md) — AI Providers: credentials, connection tests, spend caps, month-to-date behavior.
 - [ai-runs-and-run-details.md](operator/ai-runs-and-run-details.md) — AI Runs list, spend summary, run detail, token/cost fields.
 - [admin-operator-guide.md §3, §5](../guides/admin-operator-guide.md) — Short operator summary for Providers and AI Runs.
-- [advanced-ai-labs.md](operator/advanced-ai-labs.md) — Profile History, Prompt Experiments (stub).
+- [profile-snapshots-and-history.md](operator/profile-snapshots-and-history.md) — Profile History: snapshots, diff, restore, export/import, audit, vs rollback.
+- [advanced-ai-labs.md](operator/advanced-ai-labs.md) — Prompt Experiments (stub); links profile snapshot guide.
 
 ### Crawl & Discovery
 

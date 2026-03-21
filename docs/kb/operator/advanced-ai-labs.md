@@ -6,17 +6,16 @@
 
 ---
 
-## Scope (architecture only)
+## Profile History (profile snapshots)
 
-This page will describe **Profile History** (snapshot timeline / panel behavior) and **Prompt Experiments** (who should use it, relationship to production prompts and AI Runs). Detailed field-level and prompt-pack documentation belongs in specs/contracts; this KB stays UI- and workflow-oriented.
+**Canonical guide:** [profile-snapshots-and-history.md](profile-snapshots-and-history.md) — capture hooks, list/diff, restore (brand/business overwrite, template preference behavior), export/import of `profile_snapshot_history`, audit via `error_log`, edge cases vs Build Plan rollback.
 
-**Onboarding and current profile:** [onboarding-and-profile.md](onboarding-and-profile.md) (drafts, prefill, **Request AI plan**). Profile restore here replaces **current** profile data in `Profile_Store`; it does not replace onboarding draft step state by itself.
+**Onboarding and current profile:** [onboarding-and-profile.md](onboarding-and-profile.md) (drafts, prefill, **Request AI plan**). Profile restore does not reset onboarding draft step state by itself.
 
 ---
 
-## Target outline for full article
+## Prompt Experiments (stub)
 
-- Prerequisites (capabilities; relationship to Onboarding & Profile and AI Providers).
-- How Profile History complements onboarding saves and audits.
-- Prompt Experiments: intended operator workflow, safeguards, and when to stop and use AI Runs + logs instead.
-- Cross-links: [admin-operator-guide.md §2–§5](../../guides/admin-operator-guide.md), [support-triage-guide.md](../../guides/support-triage-guide.md).
+This subsection will describe **Prompt Experiments** (who should use it, relationship to production prompts and AI Runs). Detailed prompt-pack documentation belongs in specs/contracts.
+
+**Cross-links:** [admin-operator-guide.md §2–§5](../../guides/admin-operator-guide.md), [support-triage-guide.md](../../guides/support-triage-guide.md).

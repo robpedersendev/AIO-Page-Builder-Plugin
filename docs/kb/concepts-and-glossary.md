@@ -127,7 +127,7 @@ Custom roles, membership plugins, or manual cap edits override these defaults. I
 | **Diagnostics** | Environment/dependency summary. |
 | **ACF Field Architecture** / **Form Provider Health** | Structured health and drift-style views for ACF and form-backed templates. |
 | **Onboarding & Profile** | Brand/business profile and onboarding flow. |
-| **Profile History** | Profile **snapshot** history and restore (title on screen: **Profile Snapshot History**). |
+| **Profile History** | Profile **snapshot** history and restore (title on screen: **Profile Snapshot History**) — [profile-snapshots-and-history.md](operator/profile-snapshots-and-history.md). |
 | **Crawl Sessions** / **Crawl Comparison** | Crawl results and comparisons. |
 | **AI Runs** / **AI Providers** / **Prompt Experiments** | Run history, provider config, experiments. |
 | **Build Plans** | Plan list; opening a plan loads the **workspace** (stepper + lists). |

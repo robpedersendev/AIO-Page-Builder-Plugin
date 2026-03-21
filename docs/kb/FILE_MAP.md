@@ -47,7 +47,7 @@
 | Workflow / route | Primary | Secondary |
 |------------------|---------|-----------|
 | Onboarding & Profile (`aio-page-builder-onboarding`) | [onboarding-and-profile.md](operator/onboarding-and-profile.md) | [admin-operator-guide.md §2](../guides/admin-operator-guide.md); [end-user-workflow-guide.md §1](../guides/end-user-workflow-guide.md); `Onboarding_UI_State_Builder` |
-| Profile History (`aio-page-builder-profile-snapshots`) | [advanced-ai-labs.md](operator/advanced-ai-labs.md) | Panel + history UX (content TBD) |
+| Profile History (`aio-page-builder-profile-snapshots`) | [profile-snapshots-and-history.md](operator/profile-snapshots-and-history.md) | [advanced-ai-labs.md](operator/advanced-ai-labs.md) (Prompt Experiments); `Profile_Snapshot_History_Panel` |
 | AI Runs list + run detail (`aio-page-builder-ai-runs`) | [ai-runs-and-run-details.md](operator/ai-runs-and-run-details.md) | [admin-operator-guide.md §5](../guides/admin-operator-guide.md); [support-triage-guide.md §1](../guides/support-triage-guide.md) (AI Runs tab); `AI_Runs_Screen` / `AI_Run_Detail_Screen` |
 | AI Providers (`aio-page-builder-ai-providers`) | [ai-providers-credentials-budget.md](operator/ai-providers-credentials-budget.md) | [admin-operator-guide.md §3](../guides/admin-operator-guide.md); `AI_Providers_UI_State_Builder` |
 | Prompt Experiments (`aio-page-builder-prompt-experiments`) | [advanced-ai-labs.md](operator/advanced-ai-labs.md) | Spec / internal QA (content TBD) |

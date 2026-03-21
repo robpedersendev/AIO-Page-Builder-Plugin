@@ -23,7 +23,7 @@ Exports are **ZIP packages** with a root `manifest.json` plus folders such as `s
 
 **Secrets:** API keys, passwords, and similar categories are **never** placed in export bundles (see contract excluded categories).
 
-**Profile snapshots:** When the deployment exports profile history, it travels under the profiles category (see contract `profile_snapshot_history`). Day-to-day profile editing is covered in [onboarding-and-profile.md](onboarding-and-profile.md); **Profile History** in [advanced-ai-labs.md](advanced-ai-labs.md).
+**Profile snapshots:** When the deployment exports profile history, it travels under the profiles category (see contract `profile_snapshot_history`). See [profile-snapshots-and-history.md](profile-snapshots-and-history.md) for capture, restore, and import behavior; [onboarding-and-profile.md](onboarding-and-profile.md) for day-to-day profile editing.
 
 After **Create export**, the file appears under **Export history** as `aio-export-*.zip` with a nonce-protected **Download** link.
 
