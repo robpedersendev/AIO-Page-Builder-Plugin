@@ -52,7 +52,7 @@ final class Table_Installer {
 			if ( ! $result['success'] ) {
 				return array(
 					'success'      => false,
-					'message'      => ( $result['error'] !== '' && $result['error'] !== null ) ? $result['error'] : 'Table creation or upgrade failed.',
+					'message'      => $result['error'] !== '' ? $result['error'] : 'Table creation or upgrade failed.',
 					'failed_table' => $name,
 				);
 			}

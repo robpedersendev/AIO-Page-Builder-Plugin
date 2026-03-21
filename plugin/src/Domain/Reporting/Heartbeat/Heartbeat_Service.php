@@ -96,7 +96,7 @@ final class Heartbeat_Service {
 				return Heartbeat_Result::sent( $current_ym, $log_id );
 			}
 
-			$failure_reason = isset( $outcome['failure_reason'] ) ? (string) $outcome['failure_reason'] : \__( 'Email delivery failed.', 'aio-page-builder' );
+			$failure_reason = (string) $outcome['failure_reason'];
 			$this->record_failure( $current_ym, $attempt_count, $timestamp );
 			$this->append_reporting_log( $dedupe_key, $timestamp, 'failed', $log_id, $failure_reason );
 			$last_ok = isset( $state['last_successful_month'] ) ? (string) $state['last_successful_month'] : '';
@@ -118,18 +118,20 @@ final class Heartbeat_Service {
 		if ( ! function_exists( 'home_url' ) ) {
 			return '';
 		}
-		$url = home_url( '/', 'https' );
-		$url = ( $url !== '' && $url !== false ) ? $url : home_url( '/', 'http' );
-		if ( $url === '' || $url === false ) {
+		$url = (string) home_url( '/', 'https' );
+		if ( $url === '' ) {
+			$url = (string) home_url( '/', 'http' );
+		}
+		if ( $url === '' ) {
 			return '';
 		}
-		$parsed = parse_url( (string) $url );
+		$parsed = parse_url( $url );
 		$host   = isset( $parsed['host'] ) ? trim( (string) $parsed['host'] ) : '';
 		if ( $host !== '' ) {
 			return $host;
 		}
-		$sanitized = preg_replace( '/[^a-zA-Z0-9._-]/', '_', (string) $url );
-		return $sanitized !== '' ? $sanitized : '';
+		$sanitized = preg_replace( '/[^a-zA-Z0-9._-]/', '_', $url );
+		return is_string( $sanitized ) ? $sanitized : '';
 	}
 
 	/** @return array{last_successful_month?: string, for_month?: string, attempt_count?: int, last_attempt_at?: string, site_reference?: string, log_reference?: string} */
@@ -187,11 +189,11 @@ final class Heartbeat_Service {
 			'php_version'                             => PHP_VERSION,
 			'admin_contact_email'                     => is_string( $admin_email ) ? $admin_email : '',
 			'server_ip'                               => $server_ip,
-			'last_successful_ai_run_at'               => $health['last_successful_ai_run_at'] ?? '',
-			'last_successful_build_plan_execution_at' => $health['last_successful_build_plan_execution_at'] ?? '',
-			'current_health_summary'                  => $health['current_health_summary'] ?? 'healthy',
-			'current_queue_warning_count'             => (int) ( $health['current_queue_warning_count'] ?? 0 ),
-			'current_unresolved_critical_error_count' => (int) ( $health['current_unresolved_critical_error_count'] ?? 0 ),
+			'last_successful_ai_run_at'               => $health['last_successful_ai_run_at'],
+			'last_successful_build_plan_execution_at' => $health['last_successful_build_plan_execution_at'],
+			'current_health_summary'                  => $health['current_health_summary'],
+			'current_queue_warning_count'             => $health['current_queue_warning_count'],
+			'current_unresolved_critical_error_count' => $health['current_unresolved_critical_error_count'],
 			'timestamp'                               => $timestamp,
 		);
 		if ( $this->template_library_report_summary_builder !== null ) {

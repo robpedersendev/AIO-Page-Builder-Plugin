@@ -74,8 +74,8 @@ final class Post_Release_Health_State_Builder {
 		$rollback    = array();
 		if ( $this->plan_analytics_service !== null ) {
 			$analytics   = $this->plan_analytics_service->get_analytics_summary( $date_from, $date_to );
-			$plan_trends = $analytics['plan_review_trends'] ?? array();
-			$rollback    = $analytics['rollback_frequency_summary'] ?? array();
+			$plan_trends = $analytics['plan_review_trends'];
+			$rollback    = $analytics['rollback_frequency_summary'];
 		}
 
 		$ai_validity = $this->build_ai_run_validity( $date_from, $date_to );

@@ -31,7 +31,7 @@ final class Profile_Snapshot_Factory {
 	/**
 	 * Builds a new snapshot from the current profile store state.
 	 *
-	 * @param Profile_Store $store       Current profile store (read-only access).
+	 * @param Profile_Store_Interface $store Current profile store (read-only access).
 	 * @param string        $source      Capture context: brand_profile_merge, business_profile_merge,
 	 *                                   onboarding_completion, restore_event, manual.
 	 * @param string        $scope_type  Snapshot scope type per Profile_Schema::SNAPSHOT_SCOPE_TYPES.
@@ -52,12 +52,8 @@ final class Profile_Snapshot_Factory {
 			$scope_id,
 			\gmdate( 'Y-m-d H:i:s' ),
 			Versions::PROFILE_SCHEMA_VERSION,
-			is_array( $payload[ Profile_Schema::ROOT_BRAND ] ?? null )
-				? $payload[ Profile_Schema::ROOT_BRAND ]
-				: array(),
-			is_array( $payload[ Profile_Schema::ROOT_BUSINESS ] ?? null )
-				? $payload[ Profile_Schema::ROOT_BUSINESS ]
-				: array(),
+			$payload[ Profile_Schema::ROOT_BRAND ],
+			$payload[ Profile_Schema::ROOT_BUSINESS ],
 			$source
 		);
 	}

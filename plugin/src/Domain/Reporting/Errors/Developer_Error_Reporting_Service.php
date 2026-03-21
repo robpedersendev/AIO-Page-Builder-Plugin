@@ -90,7 +90,8 @@ final class Developer_Error_Reporting_Service {
 				return Developer_Report_Result::skipped_dedupe( $dedupe_key );
 			}
 
-			$attempt_count = isset( $state['retry_for_dedupe_key'] ) && (string) ( $state['retry_for_dedupe_key'] ?? '' ) === $dedupe_key
+			$retry_for_key = isset( $state['retry_for_dedupe_key'] ) ? (string) $state['retry_for_dedupe_key'] : '';
+			$attempt_count = $retry_for_key === $dedupe_key
 				? (int) ( $state['retry_attempt_count'] ?? 0 )
 				: 0;
 			$last_attempt  = isset( $state['retry_last_attempt_at'] ) ? (string) $state['retry_last_attempt_at'] : '';
@@ -118,7 +119,7 @@ final class Developer_Error_Reporting_Service {
 				return Developer_Report_Result::eligible_sent( $dedupe_key, $log_id );
 			}
 
-			$failure_reason = isset( $outcome['failure_reason'] ) ? (string) $outcome['failure_reason'] : \__( 'Email delivery failed.', 'aio-page-builder' );
+			$failure_reason = (string) $outcome['failure_reason'];
 			$this->record_retry_failure( $state, $dedupe_key, $attempt_count, $timestamp );
 			$this->append_reporting_log( $dedupe_key, $timestamp, 'failed', $log_id, $failure_reason );
 			return Developer_Report_Result::eligible_failed( $dedupe_key, $log_id, $failure_reason );
@@ -137,13 +138,13 @@ final class Developer_Error_Reporting_Service {
 	}
 
 	private function was_dedupe_key_already_sent( array $state, string $dedupe_key ): bool {
-		$sent = isset( $state['sent_dedupe_keys'] ) && is_array( $state['sent_dedupe_keys'] ) ? $state['sent_dedupe_keys'] : array();
+		$sent = is_array( $state['sent_dedupe_keys'] ?? null ) ? $state['sent_dedupe_keys'] : array();
 		return in_array( $dedupe_key, $sent, true );
 	}
 
 	private function record_sent( string $dedupe_key ): void {
 		$state  = $this->get_error_report_state();
-		$sent   = isset( $state['sent_dedupe_keys'] ) && is_array( $state['sent_dedupe_keys'] ) ? $state['sent_dedupe_keys'] : array();
+		$sent   = is_array( $state['sent_dedupe_keys'] ?? null ) ? $state['sent_dedupe_keys'] : array();
 		$sent[] = $dedupe_key;
 		$sent   = array_slice( array_unique( $sent ), -self::SENT_DEDUPE_KEYS_MAX );
 		\update_option( Option_Names::ERROR_REPORT_STATE, array_merge( $state, array( 'sent_dedupe_keys' => $sent ) ), false );
@@ -180,18 +181,20 @@ final class Developer_Error_Reporting_Service {
 		if ( ! function_exists( 'home_url' ) ) {
 			return '';
 		}
-		$url = home_url( '/', 'https' );
-		$url = ( $url !== '' && $url !== null && $url !== false ) ? $url : home_url( '/', 'http' );
-		if ( $url === '' || $url === false ) {
+		$url = (string) home_url( '/', 'https' );
+		if ( $url === '' ) {
+			$url = (string) home_url( '/', 'http' );
+		}
+		if ( $url === '' ) {
 			return '';
 		}
-		$parsed = parse_url( (string) $url );
+		$parsed = parse_url( $url );
 		$host   = isset( $parsed['host'] ) ? trim( (string) $parsed['host'] ) : '';
 		if ( $host !== '' ) {
 			return $host;
 		}
-		$sanitized = preg_replace( '/[^a-zA-Z0-9._-]/', '_', (string) $url );
-		return $sanitized !== '' && $sanitized !== null ? $sanitized : '';
+		$sanitized = preg_replace( '/[^a-zA-Z0-9._-]/', '_', $url );
+		return is_string( $sanitized ) ? $sanitized : '';
 	}
 
 	/**

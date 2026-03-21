@@ -74,7 +74,7 @@ final class Install_Notification_Service {
 				return Install_Notification_Result::sent( $log_id );
 			}
 
-			$failure_reason = isset( $outcome['failure_reason'] ) ? (string) $outcome['failure_reason'] : __( 'Email delivery failed.', 'aio-page-builder' );
+			$failure_reason = (string) $outcome['failure_reason'];
 			$this->append_reporting_log( Reporting_Event_Types::INSTALL_NOTIFICATION, $dedupe_key, $timestamp, 'failed', $log_id, $failure_reason );
 			return Install_Notification_Result::failed( $failure_reason, $log_id );
 		} catch ( \Throwable $e ) {
@@ -92,18 +92,20 @@ final class Install_Notification_Service {
 		if ( ! function_exists( 'home_url' ) ) {
 			return '';
 		}
-		$url = home_url( '/', 'https' );
-		$url = ( $url !== '' && $url !== false ) ? $url : home_url( '/', 'http' );
-		if ( $url === '' || $url === false ) {
+		$url = (string) home_url( '/', 'https' );
+		if ( $url === '' ) {
+			$url = (string) home_url( '/', 'http' );
+		}
+		if ( $url === '' ) {
 			return '';
 		}
-		$parsed = parse_url( (string) $url );
+		$parsed = parse_url( $url );
 		$host   = isset( $parsed['host'] ) ? trim( (string) $parsed['host'] ) : '';
 		if ( $host !== '' ) {
 			return $host;
 		}
-		$sanitized = preg_replace( '/[^a-zA-Z0-9._-]/', '_', (string) $url );
-		return $sanitized !== '' ? $sanitized : '';
+		$sanitized = preg_replace( '/[^a-zA-Z0-9._-]/', '_', $url );
+		return is_string( $sanitized ) ? $sanitized : '';
 	}
 
 	/** @return array{dedupe_key?: string, site_reference?: string, sent_at?: string, log_reference?: string} */

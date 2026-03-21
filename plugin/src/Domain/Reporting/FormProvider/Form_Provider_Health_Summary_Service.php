@@ -83,7 +83,7 @@ final class Form_Provider_Health_Summary_Service {
 		if ( $provider_availability !== array() ) {
 			$error_count = 0;
 			foreach ( $provider_availability as $row ) {
-				if ( isset( $row['status'] ) && in_array( (string) $row['status'], array( 'provider_error', 'unavailable' ), true ) ) {
+				if ( in_array( (string) $row['status'], array( 'provider_error', 'unavailable' ), true ) ) {
 					++$error_count;
 				}
 			}
@@ -118,9 +118,6 @@ final class Form_Provider_Health_Summary_Service {
 		$list = $this->section_repository->list_all_definitions_capped( self::SECTION_CAP );
 		$n    = 0;
 		foreach ( $list as $def ) {
-			if ( ! is_array( $def ) ) {
-				continue;
-			}
 			$category = (string) ( $def[ Section_Schema::FIELD_CATEGORY ] ?? '' );
 			if ( $category === 'form_embed' ) {
 				++$n;
@@ -141,9 +138,6 @@ final class Form_Provider_Health_Summary_Service {
 		$list = $this->page_repository->list_all_definitions_capped( self::PAGE_CAP );
 		$n    = 0;
 		foreach ( $list as $def ) {
-			if ( ! is_array( $def ) ) {
-				continue;
-			}
 			$key = (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			if ( $key !== '' && $this->dependency_validator->template_uses_form_sections( $key ) ) {
 				++$n;

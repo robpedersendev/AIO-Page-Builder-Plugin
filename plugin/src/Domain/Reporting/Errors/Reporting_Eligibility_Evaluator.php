@@ -103,8 +103,12 @@ final class Reporting_Eligibility_Evaluator {
 			}
 		}
 
-		// * Spec §46.7: same error repeats 3 times within 24 hours (even without explicit trigger_type).
-		if ( $repetition_count_24h >= self::REPEATED_ERROR_THRESHOLD ) {
+		// * Spec §46.6: same error repeats 3+ times within 24 hours (even without explicit trigger_type).
+		// * Spec §46.7: info and warning use stricter local-only rules; warning repetition threshold is handled below.
+		if ( $repetition_count_24h >= self::REPEATED_ERROR_THRESHOLD
+			&& $severity !== Log_Severities::INFO
+			&& $severity !== Log_Severities::WARNING
+		) {
 			return array(
 				'eligible' => true,
 				'reason'   => '',

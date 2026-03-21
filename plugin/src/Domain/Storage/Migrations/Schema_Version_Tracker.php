@@ -54,9 +54,6 @@ final class Schema_Version_Tracker {
 	 */
 	public function set_installed_version( string $key, string $version ): void {
 		$current = $this->settings->get( self::VERSION_MARKERS_KEY );
-		if ( ! is_array( $current ) ) {
-			$current = array();
-		}
 		$current[ $key ] = $version;
 		$this->settings->set( self::VERSION_MARKERS_KEY, $current );
 	}
@@ -90,9 +87,6 @@ final class Schema_Version_Tracker {
 	 */
 	public function record_migration_result( string $migration_id, Migration_Result $result ): void {
 		$current = $this->settings->get( self::VERSION_MARKERS_KEY );
-		if ( ! is_array( $current ) ) {
-			$current = array();
-		}
 		$log_key = '_migration_log';
 		if ( ! isset( $current[ $log_key ] ) || ! is_array( $current[ $log_key ] ) ) {
 			$current[ $log_key ] = array();

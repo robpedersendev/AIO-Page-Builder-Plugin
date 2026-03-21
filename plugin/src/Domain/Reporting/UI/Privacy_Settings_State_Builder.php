@@ -127,7 +127,7 @@ final class Privacy_Settings_State_Builder {
 			),
 		);
 		$prefs                    = $this->settings->get( Option_Names::UNINSTALL_PREFS );
-		$prefs_summary            = empty( $prefs ) || ! is_array( $prefs )
+		$prefs_summary            = empty( $prefs )
 			? __( 'No uninstall preference saved. On uninstall you will be offered export choices.', 'aio-page-builder' )
 			: __( 'Uninstall/export preferences are stored. Use the Uninstall flow to export or remove plugin data.', 'aio-page-builder' );
 		$built_pages_message      = __( 'Built pages (content created with the builder) will remain on your site. Only plugin-owned data (settings, templates, plans, logs) will be removed when you continue.', 'aio-page-builder' );

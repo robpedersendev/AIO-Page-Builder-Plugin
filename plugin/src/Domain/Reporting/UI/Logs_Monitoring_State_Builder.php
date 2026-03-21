@@ -148,7 +148,7 @@ final class Logs_Monitoring_State_Builder {
 		usort(
 			$all,
 			function ( $a, $b ) {
-				return strcmp( (string) ( $b['created_at'] ?? '' ), (string) ( $a['created_at'] ?? '' ) );
+				return strcmp( $b['created_at'], $a['created_at'] );
 			}
 		);
 		return array_slice( $all, 0, self::QUEUE_LIMIT );
@@ -173,7 +173,9 @@ final class Logs_Monitoring_State_Builder {
 		usort(
 			$out,
 			function ( $a, $b ) {
-				return strcmp( (string) ( $b['completed_at'] ?? $b['created_at'] ?? '' ), (string) ( $a['completed_at'] ?? $a['created_at'] ?? '' ) );
+				$b_ts = $b['completed_at'] !== '' ? $b['completed_at'] : $b['created_at'];
+				$a_ts = $a['completed_at'] !== '' ? $a['completed_at'] : $a['created_at'];
+				return strcmp( $b_ts, $a_ts );
 			}
 		);
 		return array_slice( $out, 0, self::EXECUTION_LIMIT );

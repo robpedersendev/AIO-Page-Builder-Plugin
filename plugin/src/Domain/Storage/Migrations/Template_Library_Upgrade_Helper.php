@@ -41,9 +41,6 @@ final class Template_Library_Upgrade_Helper {
 	 */
 	public function run(): array {
 		$current = $this->settings->get( self::VERSION_MARKERS_KEY );
-		if ( ! is_array( $current ) ) {
-			$current = array();
-		}
 		$installed    = isset( $current[ self::REGISTRY_SCHEMA_KEY ] ) && is_string( $current[ self::REGISTRY_SCHEMA_KEY ] )
 			? $current[ self::REGISTRY_SCHEMA_KEY ]
 			: '0';

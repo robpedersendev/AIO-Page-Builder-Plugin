@@ -40,7 +40,7 @@ final class Composition_Repository extends Abstract_CPT_Repository {
 		$comp_id  = (string) ( $definition[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
 		$status   = (string) ( $definition[ Composition_Schema::FIELD_STATUS ] ?? 'draft' );
 		$name_raw = $definition[ Composition_Schema::FIELD_NAME ] ?? $comp_id;
-		$name     = (string) ( $name_raw !== '' && $name_raw !== null ? $name_raw : 'Untitled' );
+		$name     = (string) ( $name_raw !== '' ? $name_raw : 'Untitled' );
 
 		$data = array(
 			'internal_key' => $comp_id,

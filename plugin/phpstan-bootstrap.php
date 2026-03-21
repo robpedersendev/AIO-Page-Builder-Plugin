@@ -1,7 +1,6 @@
 <?php
 /**
- * PHPStan bootstrap: loads WordPress function/class stubs from php-stubs/wordpress-stubs.
- * Path is resolved from this file so analysis works regardless of process CWD.
+ * PHPStan bootstrap: defines constants expected by plugin code. WordPress symbols come from stubFiles (phpstan.neon.dist).
  *
  * @package AIOPageBuilder
  */
@@ -22,4 +21,14 @@ if ( ! is_file( $wordpress_stubs ) ) {
 	exit( 1 );
 }
 
-require $wordpress_stubs;
+if ( ! defined( 'ABSPATH' ) ) {
+	// Trailing slash; DbDelta_Runner resolves ABSPATH . 'wp-admin/includes/upgrade.php' for static analysis.
+	define( 'ABSPATH', __DIR__ . '/phpstan-fixtures/wp/' );
+}
+
+if ( ! defined( 'ARRAY_A' ) ) {
+	define( 'ARRAY_A', 'ARRAY_A' );
+}
+
+// Load stub definitions so PHPStan can resolve global WordPress symbols (wp_unslash, etc.).
+require_once $wordpress_stubs;

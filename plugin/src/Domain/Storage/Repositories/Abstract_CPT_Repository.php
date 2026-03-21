@@ -130,7 +130,7 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 		$id     = isset( $data['id'] ) ? (int) $data['id'] : 0;
 		$key    = $this->sanitize_key( (string) ( $data['internal_key'] ?? $data['post_name'] ?? '' ) );
 		$status = $this->sanitize_status( (string) ( $data['status'] ?? 'draft' ) );
-		$title  = isset( $data['post_title'] ) ? \sanitize_text_field( (string) $data['post_title'] ) : ( $key !== '' && $key !== null ? $key : 'Untitled' );
+		$title  = isset( $data['post_title'] ) ? \sanitize_text_field( (string) $data['post_title'] ) : ( $key !== '' ? $key : 'Untitled' );
 
 		if ( $id > 0 ) {
 			$updated = \wp_update_post(
@@ -154,7 +154,7 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 				),
 				true
 			);
-			if ( is_wp_error( $inserted ) || $inserted === 0 ) {
+			if ( is_wp_error( $inserted ) ) {
 				return 0;
 			}
 			$id = (int) $inserted;

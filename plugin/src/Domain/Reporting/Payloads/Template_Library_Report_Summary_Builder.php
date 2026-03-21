@@ -81,7 +81,7 @@ final class Template_Library_Report_Summary_Builder {
 		$compliance = 'unknown';
 		if ( $this->compliance_status_provider !== null ) {
 			$v = ( $this->compliance_status_provider )();
-			if ( is_string( $v ) && in_array( $v, array( 'ok', 'warning', 'critical', 'unknown' ), true ) ) {
+			if ( $v === 'ok' || $v === 'warning' || $v === 'critical' || $v === 'unknown' ) {
 				$compliance = $v;
 			}
 		}
@@ -110,15 +110,15 @@ final class Template_Library_Report_Summary_Builder {
 		);
 		if ( $this->section_repository !== null ) {
 			$all                           = $this->section_repository->list_definitions_by_status( 'active', 10000, 0 );
-			$out['section_template_count'] = is_array( $all ) ? count( $all ) : 0;
+			$out['section_template_count'] = count( $all );
 		}
 		if ( $this->page_repository !== null ) {
 			$all                        = $this->page_repository->list_definitions_by_status( 'active', 10000, 0 );
-			$out['page_template_count'] = is_array( $all ) ? count( $all ) : 0;
+			$out['page_template_count'] = count( $all );
 		}
 		if ( $this->composition_repository !== null ) {
 			$all                      = $this->composition_repository->list_all_definitions( 10000, 0 );
-			$out['composition_count'] = is_array( $all ) ? count( $all ) : 0;
+			$out['composition_count'] = count( $all );
 		}
 		return $out;
 	}

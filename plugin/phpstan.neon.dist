@@ -1,10 +1,13 @@
 parameters:
     level: 5
+    # Analyze plugin source only. Tests define global WordPress stubs (e.g. update_option with 2 params) that
+    # conflict with php-stubs/wordpress-stubs (3 params including autoload); PHPStan merges those and breaks Domain analysis.
     paths:
         - src
-        - tests
     excludePaths:
         - vendor/*
         - node_modules/*
     bootstrapFiles:
         - phpstan-bootstrap.php
+    stubFiles:
+        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php

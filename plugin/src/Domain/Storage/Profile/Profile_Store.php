@@ -228,8 +228,7 @@ final class Profile_Store implements Profile_Store_Interface {
 	 * @return array<string, mixed>
 	 */
 	private function get_full_profile_raw(): array {
-		$raw = $this->settings->get( self::OPTION_KEY );
-		return is_array( $raw ) ? $raw : array();
+		return $this->settings->get( self::OPTION_KEY );
 	}
 
 	/**

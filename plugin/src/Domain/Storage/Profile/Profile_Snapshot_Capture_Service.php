@@ -26,7 +26,7 @@ final class Profile_Snapshot_Capture_Service {
 	/** @var Profile_Snapshot_Factory */
 	private Profile_Snapshot_Factory $factory;
 
-	/** @var Profile_Snapshot_Repository */
+	/** @var Profile_Snapshot_Repository_Interface */
 	private Profile_Snapshot_Repository_Interface $repository;
 
 	public function __construct(

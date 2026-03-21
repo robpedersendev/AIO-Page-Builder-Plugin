@@ -24,7 +24,7 @@ final class Profile_Snapshot_Diff_Service {
 	 * Compares a snapshot against the current profile store. Returns diff rows.
 	 *
 	 * @param Profile_Snapshot_Data $snapshot         Snapshot to compare.
-	 * @param Profile_Store         $current_store    Live profile store.
+	 * @param Profile_Store_Interface $current_store    Live profile store.
 	 * @param bool                  $include_unchanged Include rows where values are equal.
 	 * @return array<int, array{field: string, section: string, snapshot_value: string, current_value: string, changed: bool}>
 	 */
@@ -60,7 +60,7 @@ final class Profile_Snapshot_Diff_Service {
 	 * Returns a summary: total fields checked, changed count, changed field keys.
 	 *
 	 * @param Profile_Snapshot_Data $snapshot
-	 * @param Profile_Store         $current_store
+	 * @param Profile_Store_Interface $current_store
 	 * @return array{total: int, changed: int, changed_fields: array<int, string>}
 	 */
 	public function summary( Profile_Snapshot_Data $snapshot, Profile_Store_Interface $current_store ): array {
@@ -69,7 +69,7 @@ final class Profile_Snapshot_Diff_Service {
 		return array(
 			'total'          => count( $all ),
 			'changed'        => count( $changed ),
-			'changed_fields' => array_values( array_column( $changed, 'field' ) ),
+			'changed_fields' => array_column( $changed, 'field' ),
 		);
 	}
 

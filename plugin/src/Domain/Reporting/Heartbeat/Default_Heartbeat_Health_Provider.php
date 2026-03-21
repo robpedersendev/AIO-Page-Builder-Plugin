@@ -23,7 +23,7 @@ final class Default_Heartbeat_Health_Provider implements Heartbeat_Health_Provid
 		return array(
 			'last_successful_ai_run_at'               => '',
 			'last_successful_build_plan_execution_at' => '',
-			'current_health_summary'                  => 'healthy',
+			'current_health_summary'                  => self::HEALTH_VALUES[0],
 			'current_queue_warning_count'             => 0,
 			'current_unresolved_critical_error_count' => 0,
 		);

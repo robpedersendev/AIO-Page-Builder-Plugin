@@ -22,7 +22,7 @@ final class Profile_Snapshot_Helper {
 	 * Returns current profile as a copy suitable for snapshot payload. Keys: brand_profile, business_profile.
 	 * Immutable-by-convention: do not modify the returned array.
 	 *
-	 * @param Profile_Store $store Current profile store.
+	 * @param Profile_Store_Interface $store Current profile store.
 	 * @return array{brand_profile: array<string, mixed>, business_profile: array<string, mixed>}
 	 */
 	public function get_current_for_snapshot( Profile_Store_Interface $store ): array {

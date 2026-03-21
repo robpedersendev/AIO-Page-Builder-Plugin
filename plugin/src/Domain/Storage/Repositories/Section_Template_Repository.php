@@ -40,7 +40,7 @@ class Section_Template_Repository extends Abstract_CPT_Repository implements Sec
 		$key      = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 		$status   = (string) ( $definition[ Section_Schema::FIELD_STATUS ] ?? 'draft' );
 		$name_raw = $definition[ Section_Schema::FIELD_NAME ] ?? $key;
-		$name     = (string) ( $name_raw !== '' && $name_raw !== null ? $name_raw : 'Untitled' );
+		$name     = (string) ( $name_raw !== '' ? $name_raw : 'Untitled' );
 
 		$data = array(
 			'internal_key' => $key,

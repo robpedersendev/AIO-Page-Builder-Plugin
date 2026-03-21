@@ -198,9 +198,6 @@ final class Profile_Normalizer {
 	private function normalize_asset_references( array $list ): array {
 		$out = array();
 		foreach ( $list as $item ) {
-			if ( ! is_array( $item ) ) {
-				continue;
-			}
 			$item = $this->strip_prohibited( $item );
 			$role = $this->sanitize_enum( $item['role'] ?? '', Profile_Schema::ASSET_ROLES );
 			$att  = $item['attachment_id'] ?? null;
@@ -230,9 +227,6 @@ final class Profile_Normalizer {
 	private function normalize_personas( array $list ): array {
 		$out = array();
 		foreach ( $list as $item ) {
-			if ( ! is_array( $item ) ) {
-				continue;
-			}
 			$item  = $this->strip_prohibited( $item );
 			$out[] = array(
 				'persona_name_or_role'                     => $this->sanitize_string( $item['persona_name_or_role'] ?? '' ),
@@ -256,9 +250,6 @@ final class Profile_Normalizer {
 	private function normalize_services_offers( array $list ): array {
 		$out = array();
 		foreach ( $list as $item ) {
-			if ( ! is_array( $item ) ) {
-				continue;
-			}
 			$item  = $this->strip_prohibited( $item );
 			$out[] = array(
 				'name'                     => $this->sanitize_string( $item['name'] ?? '' ),
@@ -282,9 +273,6 @@ final class Profile_Normalizer {
 	private function normalize_competitors( array $list ): array {
 		$out = array();
 		foreach ( $list as $item ) {
-			if ( ! is_array( $item ) ) {
-				continue;
-			}
 			$item = $this->strip_prohibited( $item );
 			$url  = $item['competitor_url'] ?? '';
 			if ( is_string( $url ) && $url !== '' ) {
@@ -311,9 +299,6 @@ final class Profile_Normalizer {
 	private function normalize_geography( array $list ): array {
 		$out = array();
 		foreach ( $list as $item ) {
-			if ( ! is_array( $item ) ) {
-				continue;
-			}
 			$item  = $this->strip_prohibited( $item );
 			$out[] = array(
 				'primary_location'              => $this->sanitize_string( $item['primary_location'] ?? '' ),
@@ -362,7 +347,7 @@ final class Profile_Normalizer {
 	private function strip_prohibited( array $arr ): array {
 		$out = array();
 		foreach ( $arr as $k => $v ) {
-			$key_lower = is_string( $k ) ? strtolower( $k ) : '';
+			$key_lower = strtolower( (string) $k );
 			$skip      = false;
 			foreach ( self::PROHIBITED_KEYS as $prohibited ) {
 				if ( strpos( $key_lower, $prohibited ) !== false ) {
