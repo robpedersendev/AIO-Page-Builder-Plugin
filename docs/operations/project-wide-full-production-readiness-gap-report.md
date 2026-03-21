@@ -272,6 +272,58 @@ New advisory items are limited to **R-*** (§5) where still open; **R-6** is **c
 
 
 
-*End of report. Supersedes prior 2026-03-21 draft; **gates re-measured on 2026-03-21 at `ca94de0`***.
+## 11. CI parity gate (2026-03-20)
+
+
+
+**Workflow reference:** `.github/workflows/ci.yml` — `plugin/` working directory; matrix PHP **8.1** / **8.2** / **8.3**; **8.1** is the only lane where PHPCS, PHPStan, and PHPUnit use `continue-on-error: false` (hard fail).
+
+
+
+**Local host (Windows):** PHP **8.5.1** — not a matrix substitute; used for quick regression only.
+
+
+
+**PHP 8.1 parity:** `docker run` with image `php:8.1-cli` (PHP **8.1.34**), bind-mount `plugin/` to `/app`, `composer install --prefer-dist --no-progress` inside container (**exit 0**). Tools use mounted `vendor/`.
+
+
+
+| Step | Command (as run for this record) | Environment | Exit | Notes |
+
+|------|----------------------------------|-------------|------|--------|
+
+| Install | `composer install --prefer-dist --no-progress` | Host `plugin/` | **0** | Nothing to install (lock current). |
+
+| Install | Same | Docker `php:8.1-cli` /app | **0** | After apt `zip` + Composer installer. |
+
+| PHPUnit | `vendor/bin/phpunit -c phpunit.xml.dist` | Host | **0** | 3056 tests, 55458 assertions, 5 skipped, 8 deprecations, “OK, but there were issues!” |
+
+| PHPUnit | Same | Docker 8.1 | **0** | 3056 tests, 55439 assertions, 11 skipped, 1 deprecation — counts differ from 8.5; still green. |
+
+| PHPCS | `composer run phpcs` (= `phpcs.xml.dist`, full paths) | Host | **2** | **9** errors, **11** warnings, **12** files (summary). |
+
+| PHPCS | `php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml.dist --report=summary` | Docker 8.1 | **2** | Same totals as host (parity). |
+
+| PHPStan | `composer run phpstan` | Host | **1** | **Complete run:** `[ERROR] Found 322 errors` (after `composer.json` script raised to **1G**; previously **512M** OOM’d mid-analysis). |
+
+| PHPStan | `php -d memory_limit=1G vendor/bin/phpstan analyse -c phpstan.neon.dist --memory-limit=1G` | Docker 8.1 | **1** | **322** errors — same order of magnitude as host. |
+
+| Plugin Check | `composer run plugin-check:summarize` | Host | **0** | Summarizer only; **253** ERROR, **690** WARNING, **194** files on archived `tools/plugin-check/output/plugin-check-report.json`. Full run: `tools/plugin-check/PROCEDURE.txt` + CI `plugin-check` job (**continue-on-error: true**). |
+
+
+
+**Fix applied in this gate (PHP 8.1 parse):** Removed PHP **8.3+** `(void)` casts in `Section_Validator.php` and `Industry_LPagery_Planning_Advisor.php` and resolved resulting **empty if/elseif** PHPCS violations — without this, PHPUnit on **8.1** fatally parse-errors before tests run (**CI hard-fail**).
+
+
+
+**Architect waiver ledger (non-green items):** See project response / release closure; treat **PHPCS exit 2**, **PHPStan 322**, **Plugin Check 253 ERROR** as waiver or fix-now per severity until CI 8.1 is objectively green.
+
+
+
+---
+
+
+
+*End of report. Supersedes prior 2026-03-21 draft; **gates re-measured on 2026-03-21 at `ca94de0`***; **§11 added 2026-03-20 (CI parity)**.
 
 

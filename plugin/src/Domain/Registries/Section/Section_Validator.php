@@ -152,13 +152,7 @@ final class Section_Validator {
 			$errors[] = 'default_variant must be a key in variants';
 		}
 
-		if ( (string) $status === 'deprecated' ) {
-			$dep = $normalized['deprecation'] ?? array();
-			if ( is_array( $dep ) && ! empty( $dep['reason'] ) ) {
-				// * Reason recommended but not strictly required by schema for traceability. No validation error.
-				(void) $dep;
-			}
-		}
+		// * When status is deprecated, deprecation.reason is recommended for traceability; schema does not require it — no validation error is emitted.
 
 		return $errors;
 	}

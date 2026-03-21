@@ -20,7 +20,7 @@
     "scripts": {
         "phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml.dist",
         "phpcbf": "php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml.dist",
-        "phpstan": "php -d memory_limit=512M vendor/bin/phpstan analyse -c phpstan.neon.dist",
+        "phpstan": "php -d memory_limit=1G vendor/bin/phpstan analyse -c phpstan.neon.dist --memory-limit=1G",
         "phpunit": "vendor/bin/phpunit -c phpunit.xml.dist",
         "plugin-check": [
             "Composer\\Config::disableProcessTimeout",
