@@ -572,7 +572,7 @@ final class Import_Export_Screen {
 		\delete_transient( self::TRANSIENT_VALIDATION . $user_id );
 		$zip_path = $validation_result->get_package_path();
 		if ( $zip_path !== '' && is_file( $zip_path ) ) {
-			@unlink( $zip_path );
+			\wp_delete_file( $zip_path );
 		}
 		\set_transient( self::TRANSIENT_RESTORE_RESULT . $user_id, array( 'payload' => $result->to_payload() ), 60 );
 		\wp_safe_redirect( $this->screen_url( 'restored' ) );
@@ -609,12 +609,8 @@ final class Import_Export_Screen {
 		\header( 'Content-Type: application/zip' );
 		\header( 'Content-Disposition: attachment; filename="' . \esc_attr( $filename ) . '"' );
 		\header( 'Content-Length: ' . (string) filesize( $path ) );
-		$in = \fopen( $path, 'rb' );
-		if ( false === $in ) {
-			\wp_die( \esc_html__( 'Could not read file.', 'aio-page-builder' ), 500 );
-		}
-		\fpassthru( $in );
-		\fclose( $in );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Binary ZIP to client; path validated above.
+		\readfile( $path );
 		exit;
 	}
 

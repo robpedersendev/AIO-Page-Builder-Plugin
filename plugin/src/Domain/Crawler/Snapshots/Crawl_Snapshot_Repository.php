@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Storage\Repositories\Abstract_Table_Repository;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Repository for crawl snapshot table. Identity per record is (crawl_run_id, url).
@@ -47,9 +48,8 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		}
 		$table = $this->get_table_name();
 		$this->assert_sql_identifier( $table );
-		$sql      = 'SELECT * FROM %i WHERE `crawl_run_id` = %s AND `url` = %s LIMIT 1';
-		$prepared = $this->wpdb->prepare( $sql, $table, $run_id, $url );
-		$row      = $this->wpdb->get_row( $prepared );
+		$sql = 'SELECT * FROM %i WHERE `crawl_run_id` = %s AND `url` = %s LIMIT 1';
+		$row = Wpdb_Prepared_Results::get_row( $this->wpdb, $sql, array( $table, $run_id, $url ) );
 		if ( $row === null ) {
 			return null;
 		}
@@ -96,8 +96,8 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 			$sql   .= ' OFFSET %d';
 			$args[] = $offset;
 		}
-		$prepared = $this->wpdb->prepare( $sql, $table, ...$args );
-		$rows     = $this->wpdb->get_results( $prepared );
+		$prepare_args = array_merge( array( $table ), $args );
+		$rows         = Wpdb_Prepared_Results::get_results( $this->wpdb, $sql, $prepare_args );
 		if ( ! is_array( $rows ) ) {
 			return array();
 		}
@@ -120,18 +120,18 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		$table = $this->get_table_name();
 		$this->assert_sql_identifier( $table );
 		if ( $limit > 0 ) {
-			$prepared = $this->wpdb->prepare(
+			$col = Wpdb_Prepared_Results::get_col(
+				$this->wpdb,
 				'SELECT crawl_run_id FROM %i GROUP BY crawl_run_id ORDER BY MAX(id) DESC LIMIT %d',
-				$table,
-				$limit
+				array( $table, $limit )
 			);
 		} else {
-			$prepared = $this->wpdb->prepare(
+			$col = Wpdb_Prepared_Results::get_col(
+				$this->wpdb,
 				'SELECT crawl_run_id FROM %i GROUP BY crawl_run_id ORDER BY MAX(id) DESC',
-				$table
+				array( $table )
 			);
 		}
-		$col = $this->wpdb->get_col( $prepared );
 		if ( ! is_array( $col ) ) {
 			return array();
 		}
@@ -152,8 +152,8 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 			$sql   .= ' OFFSET %d';
 			$args[] = $offset;
 		}
-		$prepared = $this->wpdb->prepare( $sql, $table, ...$args );
-		$rows     = $this->wpdb->get_results( $prepared );
+		$prepare_args = array_merge( array( $table ), $args );
+		$rows         = Wpdb_Prepared_Results::get_results( $this->wpdb, $sql, $prepare_args );
 		if ( ! is_array( $rows ) ) {
 			return array();
 		}
@@ -229,7 +229,7 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		$prepared_values = $this->cast_values_for_prepare( $values );
 		$this->assert_sql_identifier( $table );
 		$sql    = 'INSERT INTO %i (' . $col_list . ') VALUES (' . $placeholders . ')';
-		$result = $this->wpdb->query( $this->wpdb->prepare( $sql, $table, ...$prepared_values ) );
+		$result = Wpdb_Prepared_Results::query( $this->wpdb, $sql, array_merge( array( $table ), $prepared_values ) );
 		if ( $result !== 1 ) {
 			return 0;
 		}

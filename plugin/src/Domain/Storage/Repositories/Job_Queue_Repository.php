@@ -15,6 +15,7 @@ use AIOPageBuilder\Domain\Execution\Queue\Job_Queue_Repository_Interface;
 use AIOPageBuilder\Domain\Execution\Queue\Queue_Recovery_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Status;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Repository → storage: Table_Names::JOB_QUEUE (custom table).
@@ -132,8 +133,6 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 			return true;
 		}
 		$table  = $this->get_table_name();
-		$set    = array();
-		$values = array();
 		$parts  = array();
 		$values = array( $table );
 		foreach ( $data as $col => $val ) {
@@ -151,9 +150,9 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		}
 		$values[] = $id;
 		$this->assert_sql_identifier( $table );
-		$sql      = 'UPDATE %i SET ' . implode( ', ', $parts ) . ' WHERE id = %d';
-		$prepared = $this->wpdb->prepare( $sql, ...$values );
-		return $prepared !== false && $this->wpdb->query( $prepared ) !== false;
+		$sql    = 'UPDATE %i SET ' . implode( ', ', $parts ) . ' WHERE id = %d';
+		$result = Wpdb_Prepared_Results::query( $this->wpdb, $sql, $values );
+		return $result !== false;
 	}
 
 	/** @inheritdoc */
@@ -192,9 +191,8 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		$limit  = $limit > 0 ? $limit : 50;
 		$offset = $offset >= 0 ? $offset : 0;
 		$this->assert_sql_identifier( $table );
-		$sql      = 'SELECT * FROM %i WHERE actor_ref = %s ORDER BY created_at DESC LIMIT %d OFFSET %d';
-		$prepared = $this->wpdb->prepare( $sql, $table, $actor_ref, $limit, $offset );
-		$rows     = $this->wpdb->get_results( $prepared );
+		$sql  = 'SELECT * FROM %i WHERE actor_ref = %s ORDER BY created_at DESC LIMIT %d OFFSET %d';
+		$rows = Wpdb_Prepared_Results::get_results( $this->wpdb, $sql, array( $table, $actor_ref, $limit, $offset ) );
 		if ( ! is_array( $rows ) ) {
 			return array();
 		}
@@ -224,20 +222,23 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		$now         = current_time( 'mysql' );
 
 		$this->assert_sql_identifier( $table );
-		$sql      = 'INSERT INTO %i ( job_ref, job_type, queue_status, priority, payload_ref, actor_ref, created_at, retry_count, related_object_refs ) VALUES ( %s, %s, %s, %d, %s, %s, %s, 0, %s )';
-		$prepared = $this->wpdb->prepare(
+		$sql = 'INSERT INTO %i ( job_ref, job_type, queue_status, priority, payload_ref, actor_ref, created_at, retry_count, related_object_refs ) VALUES ( %s, %s, %s, %d, %s, %s, %s, 0, %s )';
+		$result = Wpdb_Prepared_Results::query(
+			$this->wpdb,
 			$sql,
-			$table,
-			$job_ref,
-			$job_type,
-			$status,
-			$priority,
-			$payload_ref,
-			$actor_ref,
-			$now,
-			$related
+			array(
+				$table,
+				$job_ref,
+				$job_type,
+				$status,
+				$priority,
+				$payload_ref,
+				$actor_ref,
+				$now,
+				$related,
+			)
 		);
-		if ( $prepared === false || $this->wpdb->query( $prepared ) === false ) {
+		if ( $result === false ) {
 			return 0;
 		}
 		$id = (int) $this->wpdb->insert_id;

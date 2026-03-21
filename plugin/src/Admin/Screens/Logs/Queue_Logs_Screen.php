@@ -701,12 +701,8 @@ final class Queue_Logs_Screen {
 		\header( 'Content-Type: application/json' );
 		\header( 'Content-Disposition: attachment; filename="' . \esc_attr( $file ) . '"' );
 		\header( 'Content-Length: ' . (string) filesize( $path ) );
-		$in = \fopen( $path, 'rb' );
-		if ( false === $in ) {
-			\wp_die( \esc_html__( 'Could not read file.', 'aio-page-builder' ), 500 );
-		}
-		\fpassthru( $in );
-		\fclose( $in );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Binary JSON export; path validated above.
+		\readfile( $path );
 		exit;
 	}
 

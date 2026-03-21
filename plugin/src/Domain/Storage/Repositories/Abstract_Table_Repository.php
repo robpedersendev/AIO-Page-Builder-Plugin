@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\Storage\Repositories;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Operational table access. Subclasses define table suffix and key column.
@@ -85,9 +86,8 @@ abstract class Abstract_Table_Repository implements Repository_Interface {
 		$col   = $this->get_key_column();
 		$this->assert_sql_identifier( $table );
 		$this->assert_sql_identifier( $col );
-		$sql      = 'SELECT * FROM %i WHERE %i = %s LIMIT 1';
-		$prepared = $this->wpdb->prepare( $sql, $table, $col, $key );
-		$row      = $this->wpdb->get_row( $prepared );
+		$sql = 'SELECT * FROM %i WHERE %i = %s LIMIT 1';
+		$row = Wpdb_Prepared_Results::get_row( $this->wpdb, $sql, array( $table, $col, $key ) );
 		if ( $row === null ) {
 			return null;
 		}

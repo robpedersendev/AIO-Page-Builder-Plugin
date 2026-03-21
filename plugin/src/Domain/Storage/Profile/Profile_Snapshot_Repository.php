@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
 use AIOPageBuilder\Infrastructure\Config\Versions;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * CRUD repository for Profile_Snapshot_Data objects backed by the custom profile_snapshots table.
@@ -93,12 +94,20 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 		$this->assert_table_identifier( $table );
 		if ( $limit > 0 ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$sql  = $this->wpdb->prepare( 'SELECT * FROM %i ORDER BY created_at DESC, id DESC LIMIT %d', $table, $limit );
-			$rows = $this->wpdb->get_results( $sql, ARRAY_A );
+			$rows = Wpdb_Prepared_Results::get_results(
+				$this->wpdb,
+				'SELECT * FROM %i ORDER BY created_at DESC, id DESC LIMIT %d',
+				array( $table, $limit ),
+				ARRAY_A
+			);
 		} else {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$sql  = $this->wpdb->prepare( 'SELECT * FROM %i ORDER BY created_at DESC, id DESC', $table );
-			$rows = $this->wpdb->get_results( $sql, ARRAY_A );
+			$rows = Wpdb_Prepared_Results::get_results(
+				$this->wpdb,
+				'SELECT * FROM %i ORDER BY created_at DESC, id DESC',
+				array( $table ),
+				ARRAY_A
+			);
 		}
 		if ( ! is_array( $rows ) ) {
 			return array();
@@ -145,7 +154,7 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 	public function count(): int {
 		$table = $this->table();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$n = $this->wpdb->get_var( $this->wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) );
+		$n = Wpdb_Prepared_Results::get_var( $this->wpdb, 'SELECT COUNT(*) FROM %i', array( $table ) );
 		return (int) $n;
 	}
 

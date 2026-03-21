@@ -15,6 +15,7 @@ use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Removes scheduled events and plugin-owned options, tables, CPTs, and ACF section-key cache transients.
@@ -76,7 +77,7 @@ final class Uninstall_Cleanup_Service {
 					continue;
 				}
 				$table = $prefix . $suffix;
-				$this->wpdb->query( $this->wpdb->prepare( 'DROP TABLE IF EXISTS %i', $table ) );
+				Wpdb_Prepared_Results::query( $this->wpdb, 'DROP TABLE IF EXISTS %i', array( $table ) );
 				if ( $this->wpdb->last_error === '' ) {
 					++$tables_dropped;
 				}
@@ -133,8 +134,7 @@ final class Uninstall_Cleanup_Service {
 				}
 			}
 			$like_timeout = $this->wpdb->esc_like( '_transient_timeout_' . $prefix ) . '%';
-			$sql_timeout  = 'SELECT option_id FROM %i WHERE option_name LIKE %s';
-			$ids_timeout  = $this->wpdb->get_col( $this->wpdb->prepare( $sql_timeout, $table, $like_timeout ) );
+			$ids_timeout = Wpdb_Prepared_Results::get_col( $this->wpdb, 'SELECT option_id FROM %i WHERE option_name LIKE %s', array( $table, $like_timeout ) );
 			if ( is_array( $ids_timeout ) ) {
 				foreach ( $ids_timeout as $id ) {
 					$this->wpdb->delete( $table, array( 'option_id' => $id ) );

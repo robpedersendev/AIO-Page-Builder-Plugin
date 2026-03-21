@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Storage\Migrations\Schema_Version_Tracker;
 use AIOPageBuilder\Infrastructure\Config\Versions;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Deterministic installer: builds definitions from manifest, runs dbDelta for each table,
@@ -74,8 +75,7 @@ final class Table_Installer {
 	 */
 	public function table_exists( string $suffix ): bool {
 		$full = Table_Names::full_name( $this->wpdb, $suffix );
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared via wpdb->prepare; table name from Table_Names.
-		$result = $this->wpdb->get_var( $this->wpdb->prepare( 'SHOW TABLES LIKE %s', $full ) );
+		$result = Wpdb_Prepared_Results::get_var( $this->wpdb, 'SHOW TABLES LIKE %s', array( $full ) );
 		return $result === $full;
 	}
 

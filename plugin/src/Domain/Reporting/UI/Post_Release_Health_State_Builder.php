@@ -282,7 +282,11 @@ final class Post_Release_Health_State_Builder {
 			'score_label' => $ie_ok ? __( 'OK', 'aio-page-builder' ) : __( 'Failures present', 'aio-page-builder' ),
 			'message'     => $ie_ok
 				? __( 'Import/export outcomes are not aggregated here; use Import / Export for operations and Queue & Logs for reporting history.', 'aio-page-builder' )
-				: sprintf( __( '%d import/export issue(s) noted.', 'aio-page-builder' ), count( $import_export_failures ) ),
+				: sprintf(
+					/* translators: %d: number of import/export issues. */
+					__( '%d import/export issue(s) noted.', 'aio-page-builder' ),
+					count( $import_export_failures )
+				),
 			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-export-restore' ), $base ),
 			'link_label'  => __( 'Import / Export', 'aio-page-builder' ),
 		);

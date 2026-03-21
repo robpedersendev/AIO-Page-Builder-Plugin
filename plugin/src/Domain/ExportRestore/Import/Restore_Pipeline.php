@@ -28,6 +28,7 @@ use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Restore_Vali
 use AIOPageBuilder\Domain\Industry\Cache\Industry_Read_Model_Cache_Service;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
 use AIOPageBuilder\Domain\Styling\Style_Cache_Service;
@@ -539,7 +540,7 @@ final class Restore_Pipeline {
 					return null;
 				}
 				$table = $this->wpdb->prefix . Table_Names::TOKEN_SETS;
-				if ( $this->wpdb->get_var( $this->wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
+				if ( Wpdb_Prepared_Results::get_var( $this->wpdb, 'SHOW TABLES LIKE %s', array( $table ) ) !== $table ) {
 					return null;
 				}
 				$actions = array();

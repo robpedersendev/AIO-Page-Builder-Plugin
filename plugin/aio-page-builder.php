@@ -7,7 +7,7 @@
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Author: Steady Hand Marketing
- * Author URI: https://example.com
+ * Author URI: https://steadyhandmarketing.com
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: aio-page-builder

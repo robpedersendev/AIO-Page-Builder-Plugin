@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Export\Registry_Export_Fragment_Builder;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Lists token set records for export. value_payload is sanitized (spec §52.6).
@@ -35,22 +36,24 @@ final class Export_Token_Set_Reader {
 	public function list_for_export( int $limit = 0 ): array {
 		$table = $this->wpdb->prefix . Table_Names::TOKEN_SETS;
 		$this->assert_table_identifier( $table );
-		if ( $this->wpdb->get_var( $this->wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
+		if ( Wpdb_Prepared_Results::get_var( $this->wpdb, 'SHOW TABLES LIKE %s', array( $table ) ) !== $table ) {
 			return array();
 		}
 		if ( $limit > 0 ) {
-			$sql = $this->wpdb->prepare(
+			$rows = Wpdb_Prepared_Results::get_results(
+				$this->wpdb,
 				'SELECT id, token_set_ref, source_type, state, plan_ref, scope_ref, value_payload, schema_version, created_at, applied_at, acceptance_status FROM %i ORDER BY created_at ASC LIMIT %d',
-				$table,
-				$limit
+				array( $table, $limit ),
+				ARRAY_A
 			);
 		} else {
-			$sql = $this->wpdb->prepare(
+			$rows = Wpdb_Prepared_Results::get_results(
+				$this->wpdb,
 				'SELECT id, token_set_ref, source_type, state, plan_ref, scope_ref, value_payload, schema_version, created_at, applied_at, acceptance_status FROM %i ORDER BY created_at ASC',
-				$table
+				array( $table ),
+				ARRAY_A
 			);
 		}
-		$rows = $this->wpdb->get_results( $sql, ARRAY_A );
 		if ( ! is_array( $rows ) ) {
 			return array();
 		}
