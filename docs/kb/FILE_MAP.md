@@ -13,6 +13,8 @@
 | Topic | Primary |
 |-------|---------|
 | Product terms, default role caps, UI map, which guide to open, terminology FAQ | [concepts-and-glossary.md](concepts-and-glossary.md) |
+| Cross-cutting FAQ (short answers, deep links) | [master-faq.md](master-faq.md) |
+| Symptom-first support triage, logs, exports, escalation | [support-triage-guide.md](../guides/support-triage-guide.md) |
 
 ---
 
@@ -105,7 +107,7 @@
 | Workflow / route | Primary | Secondary |
 |------------------|---------|-----------|
 | Queue & Logs — all tabs (`aio-page-builder-queue-logs`) | [admin-operator-guide.md §9](../guides/admin-operator-guide.md); [support-triage-guide.md §1–§2](../guides/support-triage-guide.md) | `Logs_Monitoring_State_Builder`; `Reporting_Health_Summary_Builder` |
-| Support Triage (`aio-page-builder-support-triage`) | [support-triage-guide.md](../guides/support-triage-guide.md) | `Support_Triage_State_Builder` |
+| Support Triage (`aio-page-builder-support-triage`) | [support-triage-guide.md](../guides/support-triage-guide.md) | [master-faq.md](master-faq.md); `Support_Triage_State_Builder` |
 
 ---
 

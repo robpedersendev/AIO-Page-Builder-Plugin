@@ -47,7 +47,7 @@ Use this order unless a shorter article only needs a subset:
 
 ## 5. Troubleshooting and FAQ
 
-- **Troubleshooting:** Symptom-first. Link to **Queue & Logs**, **Support Triage**, or **Import / Export** as appropriate; keep redaction and export rules consistent with [support-triage-guide.md](../guides/support-triage-guide.md).
+- **Troubleshooting:** Symptom-first. Link to **Queue & Logs**, **Support Triage**, or **Import / Export** as appropriate; keep redaction and export rules consistent with [support-triage-guide.md](../guides/support-triage-guide.md). For repeated cross-cutting questions, point to [master-faq.md](master-faq.md).
 - **FAQ:** Use only for genuinely frequent questions; avoid duplicating the main workflow. Each FAQ entry: one question, a short answer, optional “see also” link.
 - Do not use FAQ to smuggle implementation detail that belongs in contracts or QA checklists.
 

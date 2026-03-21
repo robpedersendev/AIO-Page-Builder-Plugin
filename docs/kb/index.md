@@ -16,7 +16,7 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 |----------|------------|--------------------|
 | **End users** (editors running onboarding / plan review) | [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md) | [admin-operator-guide.md](../guides/admin-operator-guide.md) for capability context; [FILE_MAP.md](FILE_MAP.md) |
 | **Operators / site admins** | [admin-operator-guide.md](../guides/admin-operator-guide.md) | [template-library-operator-guide.md](../guides/template-library-operator-guide.md); [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md); KB stubs under `operator/`, `industry/`, `analytics/` |
-| **Support & diagnostics** | [support-triage-guide.md](../guides/support-triage-guide.md) | [template-library-support-guide.md](../guides/template-library-support-guide.md); [FILE_MAP.md](FILE_MAP.md) §9–§11 |
+| **Support & diagnostics** | [support-triage-guide.md](../guides/support-triage-guide.md); [master-faq.md](master-faq.md) | [template-library-support-guide.md](../guides/template-library-support-guide.md); [FILE_MAP.md](FILE_MAP.md) §9–§11 |
 
 ---
 
@@ -85,7 +85,8 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ### Support / Troubleshooting / FAQ
 
-- [support-triage-guide.md](../guides/support-triage-guide.md) — Primary support runbook.
+- [support-triage-guide.md](../guides/support-triage-guide.md) — **Primary runbook:** symptom router, logs, exports, redaction, escalation, weird edge cases.
+- [master-faq.md](master-faq.md) — Short cross-cutting FAQ with KB deep links.
 - [build-plan-rollback-and-recovery.md](operator/build-plan-rollback-and-recovery.md) — Build Plan queue retry, rollback eligibility, partial failures (with triage links).
 - [industry-support-training-packet.md](../operations/industry-support-training-packet.md) — Industry-specific escalation (internal).
 - [known-risk-register.md](../release/known-risk-register.md) — Known product risks at release.
