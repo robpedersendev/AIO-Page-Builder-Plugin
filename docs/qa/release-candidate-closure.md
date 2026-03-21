@@ -23,15 +23,16 @@
 
 ## 2. QA Evidence Summary
 
-**RC1 execution date: 2026-03-19. Runtime: PHP 8.5.1.**
+**Evidence refresh: 2026-03-21. Git: `ca94de0`. Runtime: PHP 8.5.1** (commands from `plugin/` unless noted).
 
-| Scope | Artifact / location | Pass/fail/waiver |
+| Scope | Artifact / location | Pass/fail / open |
 |-------|--------------------|-------------------|
-| **Unit tests** (§56.2) | Full PHPUnit suite: 2,872 tests, 54,926 assertions. | **2,847 pass. 25 pre-existing failures** — see TF-1 in [known-risk-register.md](../release/known-risk-register.md) §3. 12 skipped (integration-only). Stale-count tests fixed: `Assignment_Types` (5→6), `Export_Mode_Keys` (5→6), `Onboarding_Step_Keys` (11→12), `Composition_Filter_State` (100→50 MAX_PER_PAGE). |
-| **PHP syntax** | `php -l` on all 1,622 source and test files. | **Pass — 0 syntax errors.** |
-| **PHPCS (WPCS strict)** | 1,622 files scanned. | **0 security/functional errors.** 2,146 total reported (dominant: `MissingParamComment`, documentation-only; 47 fixable CRLF EOL). Formally waived: PHPCS-W1. See §4. |
-| **Plugin Check critical** | Review of PHPCS output for security/injection/execution-path findings. | **0 critical findings.** No nonce bypass, no injection, no unsafe output. |
-| **Integration** (§56.3) | Cross-subsystem (onboarding→profile store, validation→Build Plan, execution→snapshot/log, export/restore round-trip). | Covered by PHPUnit integration suite above; 12 integration-scenario tests skipped pending full env. |
+| **Unit tests** (§56.2) | `vendor/bin/phpunit -c phpunit.xml.dist` | **Pass (exit 0).** **3,056** tests, **55,458** assertions; **5** skipped; **8** deprecations; PHPUnit reported **OK, but there were issues!** Prior TF-1 (25 failures) is **superseded** at this HEAD — see [known-risk-register.md](../release/known-risk-register.md) §3. |
+| **PHP syntax** | Recursive `php -l` on **1,711** files under `src/` and `tests/`. | **Pass — 0 parse errors.** |
+| **PHPCS (`phpcs.xml.dist`)** | `php vendor/bin/phpcs --standard=phpcs.xml.dist src --report=summary` | **Open — exit 2.** **9** errors, **11** warnings, **12** files; **11** violations PHPCBF-reported fixable in that summary. `tests/` tree: `phpcs ... tests --report=summary` — **exit 0** (476 files, ~55s). |
+| **Plugin Check** | `composer run plugin-check:summarize` → `tools/plugin-check/output/plugin-check-report.json` | **Open debt — summarize exit 0.** Report totals: **253** ERROR, **690** WARNING, **194** files with ≥1 finding (2026-03-21). Not a “zero findings” gate. |
+| **PHPStan** | `composer run phpstan` | **Open — exit 1.** Worker hit **512M** memory limit; PHPStan reported **incomplete** result. Re-run with higher memory for a full baseline. |
+| **Integration** (§56.3) | Cross-subsystem (onboarding→profile store, validation→Build Plan, execution→snapshot/log, export/restore round-trip). | Covered by PHPUnit suite above; remaining skips are environment/scenario-specific (see PHPUnit output). |
 | **End-to-end** (§56.4) | Install→onboarding, AI run→Build Plan, approval→page creation, export/import round-trip, uninstall export. | Manual E2E pending on full WordPress environment. Reserved for operator sign-off. |
 | **Template ecosystem E2E** (§56.4) | Directory browsing, detail previews, compare, compositions, Build Plan recommendation, new-page/replacement/menu apply, diff/rollback, export/restore, reporting enrichments, capability restrictions. | [template-ecosystem-end-to-end-acceptance-report.md](template-ecosystem-end-to-end-acceptance-report.md); scenario manifest: [tests/e2e/template-ecosystem/SCENARIO_MANIFEST.md](../../tests/e2e/template-ecosystem/SCENARIO_MANIFEST.md). Pending manual execution. |
 | **Migration/compatibility** | [migration-coverage-matrix.md](migration-coverage-matrix.md), [compatibility-matrix.md](compatibility-matrix.md). | Unit coverage verified. Manual activation scenarios (§4 Scenarios 1–8) pending full env run. |
@@ -44,39 +45,42 @@
 | **Form provider regression** (§56.8) | Fixture-driven regression harness. | [form-provider-regression-report.md](form-provider-regression-report.md). Pending execution. |
 | **Doc-to-UI consistency** | All six guidance docs reviewed 2026-03-19. | **Pass.** One stale Diagnostics screen copy fixed in [support-triage-guide.md](../guides/support-triage-guide.md) §6. No other placeholder copy found. |
 
-**Final run result (2026-03-19):** PHP syntax: pass; Unit: 2,847/2,872 pass (25 pre-existing failures, formally waived/documented); PHPCS: 0 security findings; Plugin Check critical: 0; Security/redaction: audited; Doc-to-UI: pass; Performance: bounded. E2E and manual scenarios pending full WordPress environment; do not block code-level gate.
+**Final run result (2026-03-21):** PHP syntax: pass (1,711 files). PHPUnit: **exit 0** with skips + deprecations (see table). PHPCS `src/`: **not clean** (exit 2). Plugin Check JSON on disk: **253** ERR / **690** WARN — **open triage**. PHPStan: **exit 1**, incomplete (memory). Security/redaction audit (2026-03-19) and doc-to-UI pass remain valid. E2E and manual migration-matrix scenarios still pending full WordPress environment.
 
 ---
 
 ## 3. Release-Gate Checklist Status (§59.14, hardening matrix §4.3)
 
-**Evidence date: 2026-03-19.**
+**Evidence date: 2026-03-21** (security/a11y doc dates unchanged where noted).
 
 | # | Gate | Criterion | Status |
 |---|------|-----------|--------|
 | 1 | Security | REST/AJAX nonce+capability; no secrets in logs/exports; permission callbacks. | **PASS.** [security-redaction-review.md](security-redaction-review.md) audited; 0 open high-severity; `cost_placeholder` removed. |
 | 2 | Accessibility | Admin UI a11y checklist; no critical a11y open. | **PASS (checklist).** [accessibility-remediation-checklist.md](accessibility-remediation-checklist.md) remediation applied; manual QA recommended. |
-| 3 | Performance | No blocking regressions; long-running work queued/chunked/scheduled; Plugin Check. | **PASS.** Bounded list sizes; queue offloading in place; Plugin Check 0 critical findings. |
-| 4 | Migration | Migrations updated; version consistent; upgrade path tested or N/A. | **PASS (unit coverage).** Table schema 1; `Table_Installer` idempotent; `is_installed_version_future()` verified. Manual activation scenarios pending. |
-| 5 | Compatibility | WP/PHP matrix current; Plugin Check critical/warning addressed. | **PASS (unit coverage).** `Environment_Validator` enforces WP 6.6+, PHP 8.1+, ACF Pro 6.2+, GenerateBlocks 2.0+. Full live matrix run pending. |
+| 3 | Performance | No blocking regressions; long-running work queued/chunked/scheduled; Plugin Check. | **PARTIAL.** Bounded list sizes and queue offloading documented in §1. **Plugin Check report not clear:** summarize shows **253** ERROR / **690** WARNING — track as open until triaged or waived with owner sign-off. |
+| 4 | Migration | Migrations updated; version consistent; upgrade path tested or N/A. | **PASS (automated coverage).** Table schema 1; `Table_Installer` idempotent; `is_installed_version_future()` verified in suite. Manual §4 scenarios in migration matrix still **Observed: TBD**. |
+| 5 | Compatibility | WP/PHP matrix current; Plugin Check critical/warning addressed. | **PARTIAL.** `Environment_Validator` + full PHPUnit **exit 0** at PHP **8.5.1**; spec baseline WP 6.6+ / PHP 8.1–8.3. Live matrix cells and Plugin Check findings remain **open** until executed/triaged. |
 | 6 | Redaction | Logs, exports, reports, diagnostics free of secrets; rules applied. | **PASS.** `Secret_Redactor`, `Reporting_Redaction_Service`, export exclusions verified. No secrets in exports. |
 | 7 | Documentation | §60.6 artifacts; release notes cover §58.6; user/admin/support guidance. | **PASS.** Changelog updated; README created; 6 guidance docs updated and consistency-checked. Stale Diagnostics copy fixed. |
 | 8 | Rollback / reporting / portability | Per product promises. | **PASS.** Rollback queued; reporting disclosed on Privacy/Reporting screen; export/restore/uninstall documented. |
 
-**Sign-off:** Per §60.8, M12 requires Product Owner, Technical Lead, QA, and Security (where applicable). See [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) §6. No code change blocks sign-off; open items are TF-1 (test failures, waived) and manual E2E scenarios.
+**Sign-off:** Per §60.8, M12 requires Product Owner, Technical Lead, QA, and Security (where applicable). See [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) §6. **Open for honest gate closure:** PHPCS (`src/`), Plugin Check triage, PHPStan complete run, PHPUnit skips/deprecations, manual E2E and migration-matrix **Observed** cells.
 
 ---
 
 ## 4. High-Severity Issue and Waiver Summary
 
-- **Critical:** None open; no waiver allowed for critical.
+- **Critical:** None open in product/security registers from the 2026-03-19 security-redaction audit; no waiver allowed for critical product defects.
 - **High:** None open in hardening issue registers (accessibility, compatibility, migration, security-redaction). No waiver required for high.
-- **Medium — waived:**
-  - **TF-1:** 25 pre-existing PHPUnit test failures. None are security, data-loss, or critical functional issues. Classified by root cause: (a) ACF global-state leak in test suite (3 tests); (b) Build Plan analytics key drift (3 tests); (c) Build Plan UI component test contract drift pre-existing from prior passes (4 tests); (d) Industry subsystem schema/validation drift (10 tests); (e) Crawl/Onboarding/Snapshot/Queue/Template assertion drift (5 tests). No production user-facing behavior is broken by these failures; all involve internal service contracts or test isolation. Formally waived: these failures are pre-existing and documented in [known-risk-register.md](../release/known-risk-register.md) §3 (TF-1). Resolution planned for v1.1 targeted regression pass.
-  - **PHPCS-W1:** 2,146 WPCS strict errors — dominant type `Squiz.Commenting.FunctionComment.MissingParamComment` (documentation strictness, not functional). 47 fixable CRLF EOL. 0 security or functional findings. Formally waived: no security, data-loss, or functional impact; aggressive linter standard per workspace rules. `MethodNameInvalid` in 2 files noted.
-- **Waivers recorded above.** Each waiver references waiver_id (TF-1, PHPCS-W1) for hardening-matrix tracking.
+- **Superseded / retracted waivers:**
+  - **TF-1:** Previously documented **25** PHPUnit failures (2026-03-19). **Superseded 2026-03-21:** full suite **exit 0** at git `ca94de0` (see §2). Do not use TF-1 as active waiver for test failures at current HEAD.
+- **Open quality debt (not waived here):**
+  - **PHPCS (`src/`):** **9** errors, **11** warnings, exit **2** on scoped `src/` run — fix, PHPCBF, or formal waiver with owner per hardening matrix.
+  - **Plugin Check:** **253** ERROR / **690** WARNING in archived JSON summarize output — triage or document waivers; do not claim clean.
+  - **PHPStan:** Last run **exit 1** (512M worker OOM) — incomplete; raise memory and re-run for baseline.
+- **Waivers:** Only active waivers should be listed in [known-risk-register.md](../release/known-risk-register.md) with owner sign-off. Stale PHPCS-W1 narrative (thousands of doc-comment errors) does **not** match current `phpcs.xml.dist` scoped results; do not cite it without a fresh full-tree report.
 
-**Exit criteria (§60.4):** Milestone exits only when acceptance tests pass, no critical/high unresolved in scope, documentation updated, sign-off recorded. This closure doc supports that evidence. The two medium waivers above do not block exit.
+**Exit criteria (§60.4):** Milestone exits only when acceptance tests pass, no critical/high unresolved in scope, documentation updated, sign-off recorded. PHPUnit **passes** at this HEAD; **tooling gates** above remain **open** until green or formally waived.
 
 ---
 

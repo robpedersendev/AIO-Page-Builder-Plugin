@@ -211,7 +211,7 @@ final class Queue_Recovery_And_Health_Test extends TestCase {
 
 	public function test_health_builder_stale_lock_visibility(): void {
 		$repo                         = new Stub_Health_Job_Repository();
-		$old_started                  = gmdate( 'Y-m-d H:i:s', time() - 7200 );
+		$old_started                  = gmdate( 'c', time() - 7200 );
 		$repo->by_status['running']   = array(
 			array(
 				'job_ref'      => 'job_stale_1',

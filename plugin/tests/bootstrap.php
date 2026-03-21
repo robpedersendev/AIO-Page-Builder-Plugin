@@ -81,6 +81,15 @@ if ( ! function_exists( 'wp_strip_all_tags' ) ) {
 		return preg_replace( '@<[^>]*?>@s', '', (string) $string );
 	}
 }
+if ( ! function_exists( 'wp_parse_url' ) ) {
+	/**
+	 * @param int $component PHP_URL_* or -1 for full array (same contract as parse_url).
+	 * @return mixed
+	 */
+	function wp_parse_url( $url, $component = -1 ) {
+		return parse_url( (string) $url, $component );
+	}
+}
 if ( ! function_exists( 'sanitize_key' ) ) {
 	function sanitize_key( $key ) {
 		return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) );

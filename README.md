@@ -57,7 +57,7 @@ This plugin sends mandatory operational reports (install notification, periodic 
 - Multisite: site-level operation supported; network-wide centralized management not validated.
 - PHP 8.4+ not in validated set; add to compatibility matrix when routinely tested.
 - Rollback and diff UX may be enhanced in future releases.
-- 25 pre-existing PHPUnit test failures (none are user-facing functional regressions); see [known-risk-register.md](docs/release/known-risk-register.md) §3 (TF-1).
+- **Quality gates:** Full PHPUnit passes locally at this repo state (**exit 0**; see [release-candidate-closure.md](docs/qa/release-candidate-closure.md) §2 for skips/deprecations). PHPCS (`src/`), Plugin Check, and PHPStan are **not** all green — see [known-risk-register.md](docs/release/known-risk-register.md) §3 (TOOL-1–TOOL-3) and the release checklist.
 
 ---
 

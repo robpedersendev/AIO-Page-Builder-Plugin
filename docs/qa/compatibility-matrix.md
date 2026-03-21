@@ -136,9 +136,10 @@ Extension-pack targets require run and recorded compatibility tests before being
 
 ## 12. QA Evidence Summary
 
+- **Measured run (2026-03-21, git `ca94de0`, `plugin/`):** `vendor/bin/phpunit -c phpunit.xml.dist` — **exit 0**; **3,056** tests; **55,458** assertions; **5** skipped; **8** deprecations; PHPUnit message **OK, but there were issues!** Local runtime **PHP 8.5.1** (CI matrix remains **8.1–8.3**).
 - **Unit:** `Environment_Validator_Test` covers WP version blocking (6.5 fail, 6.6 pass), required dependency blocking (ACF, GenerateBlocks missing), optional LPagery warning.
 - **Integration / E2E:** At least one fully supported stack (WP 6.6+, PHP 8.1+, ACF Pro 6.2+, GenerateBlocks 2.0+) should pass: install → onboarding → Build Plan → execution path (or current scope). Record in matrix and in release checklist.
-- **Manual:** Plugin Check run; critical/warning findings addressed (hardening gate 5). Compatibility matrix updated with test date and results before release.
+- **Manual:** Plugin Check report on disk summarized **253** ERROR / **690** WARNING (**194** files with findings) via `composer run plugin-check:summarize` (2026-03-21). Compatibility matrix §2 live cells still require dated Pass/Fail when executed on real stacks; do not treat summarize output alone as “gate passed.”
 - **Extension pack:** For each added extension-pack target, run and record tests in extension-pack-evidence.md; add compatibility shims only when a verified issue requires them (Prompt 127, spec §59.14).
 - **Expanded template library:** Compatibility pass for the enlarged registry (250+ section, 500+ page templates, compositions) is documented in [template-library-compatibility-report.md](template-library-compatibility-report.md). Run the checklist there (directory, previews, built pages, ACF at scale, GenerateBlocks/native output, optional LPagery, theme coexistence) and record results; do not claim a template family compatible without testing representative previews and builds (Prompt 203, spec §55.8, §56.3, §56.4, §59.14).
 

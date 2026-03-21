@@ -91,6 +91,7 @@ Narrow fixes in this pass: none required. Table_Installer is idempotent and reco
 
 ## 8. QA Evidence Summary
 
+- **Measured run (2026-03-21, git `ca94de0`, `plugin/`):** Full PHPUnit **exit 0** (**3,056** tests, **55,458** assertions, **5** skipped, **8** deprecations). Migration-adjacent automated coverage includes `Schema_Version_Tracker_Test`, `Migration_Result_Test`, and lifecycle/table paths as exercised by the suite (see §4 scenario list for what still needs manual **Observed** entries).
 - **Unit:** Schema_Version_Tracker_Test (get_installed_versions, set, pending migrations, future version, record_migration_result). Migration_Result_Test. Table_Installer covered indirectly via lifecycle/table tests.
 - **Integration:** Activation flow runs check_tables_schema; failure blocks activation; success sets table_schema. Import_Validator schema check unit/integration as applicable.
 - **Manual / E2E:** Execute scenario matrix (§4); fill Observed column; run export → import round-trip; verify no secrets in package and restore behavior. Record in this doc and in release checklist.

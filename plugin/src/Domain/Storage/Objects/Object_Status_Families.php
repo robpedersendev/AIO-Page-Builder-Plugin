@@ -1,6 +1,6 @@
 <?php
 /**
- * Object type → status families and later custom-status attachment point (spec §10.10, §10.11).
+ * Object type → allowed status families for validation and repository behavior (spec §10.10, §10.11).
  *
  * @package AIOPageBuilder
  */
@@ -14,8 +14,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Maps each object type to its allowed status set. Implementation (not a shell): status sets are
  * authoritative for validation and repository behavior. Custom status registration (e.g. register_post_status)
- * is not implemented here; this class provides the status sets for validation and for later attachment
- * of status registration. Lifecycle transition rules remain in object-model-schema.md §5.
+ * is handled in bootstrap, not in this class. Lifecycle transition rules remain in object-model-schema.md §5.
  */
 final class Object_Status_Families {
 

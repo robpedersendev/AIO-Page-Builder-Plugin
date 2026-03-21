@@ -12,6 +12,10 @@
 - **Template library:** For expansion counts, screens, compatibility, and limitations, see [template-library-release-notes-addendum.md](template-library-release-notes-addendum.md).
 - **Form provider integration:** Provider-backed form sections (category form_embed) and request-form page template (`pt_request_form`). Form_Provider_Registry (provider_id + form_id); shortcode assembly; Build Plan/execution dependency validation (block when provider missing); finalization form_dependency; security validation and hardening; E2E acceptance structure. Operator guide: [form-provider-operator-guide.md](../guides/form-provider-operator-guide.md). Release gate and extension backlog: [form-provider-integration-review-packet.md](form-provider-integration-review-packet.md), [form-provider-extension-backlog.md](form-provider-extension-backlog.md).
 
+### Changed (Release evidence & R-6 — 2026-03-21)
+- **Docs:** [RELEASE_CHECKLIST.md](../qa/RELEASE_CHECKLIST.md), [release-candidate-closure.md](../qa/release-candidate-closure.md), [compatibility-matrix.md](../qa/compatibility-matrix.md), [migration-coverage-matrix.md](../qa/migration-coverage-matrix.md), [known-risk-register.md](known-risk-register.md), root [README.md](../../README.md), and [project-wide-full-production-readiness-gap-report.md](../operations/project-wide-full-production-readiness-gap-report.md) updated with measured commands, exit codes, and counts (PHPUnit; PHPCS `src/` + `tests/`; Plugin Check summarize; PHPStan). TF-1 superseded; TOOL-1–TOOL-3 added for open tooling debt.
+- **R-6:** `Object_Status_Families` class docblock aligned — bootstrap owns custom status registration; this class remains the authoritative allowed-status sets for validation/repositories.
+
 ### Changed (Production Hardening Passes — 2026-03-19)
 - **P1 — Tokens step (Build Plan):** Tokens step UI aligned with real execution pipeline (`Token_Set_Job_Service`, `Apply_Token_Set_Handler`). Removed "execution not implemented" copy. Placeholder diff fields removed. Row/bulk action paths governed with capability, nonce, validation, and structured audit logging.
 - **P2 — SEO step (Build Plan):** SEO step explicitly advisory-only; execution affordances removed where no handler exists. Step summary, row state, and detail payloads state advisory posture consistently.
@@ -27,6 +31,7 @@
 ### Fixed
 - Stale-count test drift corrected: `Assignment_Types_Test` (5→6 types), `Export_Bundle_Schema_Test` (5→6 modes), `Onboarding_State_Machine_Contract_Test` (11→12 steps), `Composition_Filter_State_Test` (100→`MAX_PER_PAGE`=50).
 - `support-triage-guide.md` §6 Diagnostics screen copy updated from placeholder to production-accurate de-scoped wording.
+- Test bootstrap: `wp_parse_url()` stub for PHPUnit parity with WordPress. Queue health test: stable `started_at` via `gmdate( 'c', … )` for stale-lock visibility.
 
 ### Migration / compatibility
 - (Carry forward from last release unless updated.)

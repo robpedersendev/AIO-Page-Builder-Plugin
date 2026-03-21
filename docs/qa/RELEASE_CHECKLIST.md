@@ -4,26 +4,27 @@ Use this checklist before each release. It is designed to be explicit, reviewabl
 
 **Hardening and release gate:** For full acceptance criteria, severity classification, waiver rules, and sign-off requirements, see [hardening-release-gate-matrix.md](../contracts/hardening-release-gate-matrix.md) (spec §59.14, §59.15, §60.2–60.8).
 
-**RC1 execution date: 2026-03-19.**
+**Latest evidence refresh: 2026-03-21** (git `ca94de0`; commands from `plugin/` unless noted).
 
 ---
 
 ## Code and Tests
 
-- [x] **PHP syntax lint:** `php -l` across all 1,622 source and test files — **0 syntax errors** (2026-03-19).
-- [x] **PHPUnit:** 2,872 tests, 54,926 assertions, **2,847 pass, 25 pre-existing failures** (2026-03-19). See [release-candidate-closure.md](release-candidate-closure.md) §2 and known-risk-register.md §3 (TF-1) for failure triage and waiver.
-- [x] **PHPCS (WPCS strict):** 2,146 reported errors, 0 warnings, 47 auto-fixable (CRLF EOL only). **Critical security/functional findings: 0.** Dominant finding type: `Squiz.Commenting.FunctionComment.MissingParamComment` (documentation strictness, not functional). Formally waived per §5.2 (no security or functional impact). See [release-candidate-closure.md](release-candidate-closure.md) §4 (PHPCS-W1). `MethodNameInvalid` in 2 files: `Log_Severities::isValid()`, documented.
-- [x] **Plugin Check critical findings:** 0. No security, injection, or execution-path findings.
-- [x] **Compatibility matrix executed and updated:** [compatibility-matrix.md](compatibility-matrix.md) — WP 6.6–6.7+, PHP 8.1–8.3 (runtime is PHP 8.5.1 at test time); required plugins enforced at activation; `Environment_Validator` verified. See §12.
-- [x] **Migration/upgrade matrix executed and updated:** [migration-coverage-matrix.md](migration-coverage-matrix.md) — table schema 1, export schema 1, same-major import, `Table_Installer` idempotent, `is_installed_version_future()` blocks downgrade.
+- [x] **PHP syntax lint:** Recursive `php -l` on **1,711** files under `plugin/src` and `plugin/tests` — **0** parse errors (2026-03-21).
+- [x] **PHPUnit:** `vendor/bin/phpunit -c phpunit.xml.dist` — **exit 0**. **3,056** tests, **55,458** assertions; PHPUnit reported **5** skipped, **8** deprecations; summary line **OK, but there were issues!** Runtime **PHP 8.5.1**. See [release-candidate-closure.md](release-candidate-closure.md) §2.
+- [ ] **PHPCS (WPCS, `phpcs.xml.dist`):** `php vendor/bin/phpcs --standard=phpcs.xml.dist src --report=summary` — **exit 2**. **9** errors, **11** warnings in **12** files; PHPCBF reported **11** auto-fixable in that summary (2026-03-21). `php vendor/bin/phpcs --standard=phpcs.xml.dist tests --report=summary` — **exit 0** (**476** test files; ~55s). Not a repo-wide green gate until `src/` is clean or formally waived with owner sign-off.
+- [ ] **Plugin Check:** `composer run plugin-check:summarize` on `tools/plugin-check/output/plugin-check-report.json` — **exit 0** (summarizer only). Report totals: **253** ERROR, **690** WARNING, **194** files with at least one finding (2026-03-21). Treat as **open quality debt** per project policy; do not claim “zero critical” without a fresh run and triage.
+- [ ] **PHPStan:** `composer run phpstan` — **exit 1** (2026-03-21). Parallel worker hit configured **512M** memory limit; PHPStan reported incomplete analysis (“Result is incomplete because of severe errors”). Increase `--memory-limit` / adjust `composer.json` script and re-run for a complete baseline.
+- [x] **Compatibility matrix:** [compatibility-matrix.md](compatibility-matrix.md) — spec baseline unchanged; **automated** evidence: `Environment_Validator_Test` and full PHPUnit above. **Live** WP×PHP matrix cells still require recorded manual/E2E runs when cutting a release.
+- [x] **Migration/upgrade matrix:** [migration-coverage-matrix.md](migration-coverage-matrix.md) — table schema **1**, export schema **1**, same-major import, `Table_Installer` idempotent, `is_installed_version_future()` blocks downgrade; **automated** coverage via PHPUnit (see matrix §8). Manual scenario column in §4 remains **execute and record** for operator sign-off.
 
 ---
 
 ## Documentation
 
-- [x] **Changelog updated:** [changelog.md](../release/changelog.md) — [Unreleased] section updated with production hardening passes P1–P6B (2026-03-19).
-- [x] **README created:** Root `README.md` created with installation, requirements, known changes, and distribution notes.
-- [x] **Release notes compatibility snippet:** Tested WP 6.6+; PHP 8.1–8.3; ACF Pro 6.2+; GenerateBlocks 2.0+; preferred GeneratePress. See [compatibility-matrix.md](compatibility-matrix.md) §10.
+- [x] **Changelog updated:** [changelog.md](../release/changelog.md) — [Unreleased] includes evidence/tooling notes as of 2026-03-21.
+- [x] **README created:** Root `README.md` with installation, requirements, known changes, and distribution notes.
+- [x] **Release notes compatibility snippet:** Tested WP 6.6+; PHP 8.1–8.3 (CI target); local PHPUnit at PHP **8.5.1**; ACF Pro 6.2+; GenerateBlocks 2.0+; preferred GeneratePress. See [compatibility-matrix.md](compatibility-matrix.md) §10.
 - [x] **Release notes migration notes:** Table schema 1; export schema 1; same-major import; no breaking schema change. See [migration-coverage-matrix.md](migration-coverage-matrix.md) §7.
 - [x] **Reporting disclosure:** Disclosed on Privacy, Reporting & Settings screen (admin UI) and in [admin-operator-guide.md](../guides/admin-operator-guide.md) §12. Reporting failure does not break core. Payloads documented in reporting contracts.
 - [x] **User/admin/support guidance:** All six guidance docs exist; doc-to-UI consistency pass completed 2026-03-19. One placeholder copy item resolved in [support-triage-guide.md](../guides/support-triage-guide.md) §6 (Diagnostics screen). See [release-candidate-closure.md](release-candidate-closure.md) §7.
@@ -48,9 +49,9 @@ Use this checklist before each release. It is designed to be explicit, reviewabl
 
 ## Release Candidate and Sign-Off
 
-- [x] **Release-candidate closure completed:** [release-candidate-closure.md](release-candidate-closure.md) updated with actual QA evidence, gate status, and risk disposition (2026-03-19).
-- [x] **Known-risk register updated:** [known-risk-register.md](../release/known-risk-register.md) — TF-1 entry added for 25 pre-existing test failures with classification and waiver rationale.
-- [ ] **Sign-off:** Pending Product Owner, Technical Lead, and QA approval per hardening matrix §6. No code change blocks sign-off; outstanding test failures are formally documented.
+- [x] **Release-candidate closure updated:** [release-candidate-closure.md](release-candidate-closure.md) — QA evidence and gate status aligned with **2026-03-21** measured runs (PHPUnit pass with skips/deprecations; PHPCS/Plugin Check/PHPStan not green).
+- [x] **Known-risk register updated:** [known-risk-register.md](../release/known-risk-register.md) — TF-1 superseded; tooling debt entries for PHPCS, Plugin Check, PHPStan incompleteness.
+- [ ] **Sign-off:** Pending Product Owner, Technical Lead, and QA per hardening matrix §6. **Open:** PHPCS (`src/`), Plugin Check report triage, PHPStan complete run; PHPUnit skips/deprecations tracked in closure doc.
 
 ---
 
@@ -62,4 +63,4 @@ Use this checklist before each release. It is designed to be explicit, reviewabl
 
 ---
 
-*Evidence artifacts: PHPUnit run 2026-03-19 (2,872 tests / 2,847 pass / 25 pre-existing failures); PHP syntax lint clean; PHPCS 0 security findings; guides doc-to-UI pass complete.*
+*Evidence artifacts (2026-03-21): PHPUnit exit 0 (3,056 tests; 5 skipped; 8 deprecations); PHP syntax 0 errors / 1,711 files; PHPCS `src/` exit 2 (9 errors, 11 warnings); PHPCS `tests/` exit 0; Plugin Check summarize on archived JSON (253 ERR / 690 WARN); PHPStan exit 1 (memory-limited incomplete run).*
