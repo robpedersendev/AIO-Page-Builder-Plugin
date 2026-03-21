@@ -2,4 +2,4 @@
 
 **Parent guide:** [build-plan-overview.md](build-plan-overview.md) (default step 8, index `7`).
 
-Reserved for finalization bulk actions, `aio_finalize_plan_actions`, and pre-execution checklist copy.
+**Canonical detail:** [build-plan-finalization-logs-rollback.md](build-plan-finalization-logs-rollback.md) (finalization buckets, conflicts, Finalize plan, export context rail).

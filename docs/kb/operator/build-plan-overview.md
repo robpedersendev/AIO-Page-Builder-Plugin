@@ -177,6 +177,8 @@ This overview is the **home** for Build Plan documentation. Each step article li
 
 **Hierarchy, navigation, design tokens, SEO (indices `3`–`6`, UI steps 4–7):** [build-plan-hierarchy-navigation-tokens-seo.md](build-plan-hierarchy-navigation-tokens-seo.md) — executable vs advisory rows, token execution, SEO posture, edge cases.
 
+**Confirm & Logs / rollback (indices `7`–`8`, UI steps 8–9):** [build-plan-finalization-logs-rollback.md](build-plan-finalization-logs-rollback.md) — finalization buckets, conflicts, rollback eligibility, export, edge cases.
+
 ---
 
 ## 11. Cross-links
