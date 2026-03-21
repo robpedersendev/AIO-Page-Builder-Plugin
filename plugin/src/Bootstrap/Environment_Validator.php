@@ -402,8 +402,8 @@ final class Environment_Validator {
 			);
 			return;
 		}
-		$log = \get_option( Option_Names::REPORTING_LOG, array() );
-		$last = is_array( $log ) && ! empty( $log ) ? end( $log ) : null;
+		$log         = \get_option( Option_Names::REPORTING_LOG, array() );
+		$last        = is_array( $log ) && ! empty( $log ) ? end( $log ) : null;
 		$last_status = is_array( $last ) ? (string) ( $last['status'] ?? '' ) : '';
 		if ( $last_status === 'failed' ) {
 			$this->add(
@@ -441,7 +441,7 @@ final class Environment_Validator {
 				)
 			);
 		}
-		$hook = \AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler::CRON_HOOK;
+		$hook       = \AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Scheduler::CRON_HOOK;
 		$registered = function_exists( 'has_action' ) ? ( has_action( $hook ) !== false ) : true;
 		if ( ! $registered ) {
 			$this->add(

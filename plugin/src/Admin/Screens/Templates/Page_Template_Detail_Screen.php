@@ -56,7 +56,7 @@ final class Page_Template_Detail_Screen {
 		$template_key = isset( $_GET['template'] ) ? \sanitize_key( (string) $_GET['template'] ) : '';
 		$last_result  = null;
 		$this->process_entity_style_save( $template_key, $last_result );
-		$request      = array(
+		$request = array(
 			'category_class' => isset( $_GET['category_class'] ) ? \sanitize_key( (string) $_GET['category_class'] ) : '',
 			'family'         => isset( $_GET['family'] ) ? \sanitize_key( (string) $_GET['family'] ) : '',
 			'reduced_motion' => isset( $_GET['reduced_motion'] ) && (string) $_GET['reduced_motion'] === '1',
@@ -144,20 +144,20 @@ final class Page_Template_Detail_Screen {
 	 * @return void
 	 */
 	private function render_metadata_panel( array $state ): void {
-		$side_panel      = $state['side_panel'] ?? array();
-		$name            = (string) ( $side_panel['name'] ?? $state['template_key'] ?? '' );
-		$template_key    = (string) ( $state['template_key'] ?? '' );
-		$desc            = (string) ( $side_panel['description'] ?? '' );
-		$purpose_cta     = (string) ( $side_panel['purpose_cta_direction'] ?? '' );
-		$category        = (string) ( $side_panel['category'] ?? '' );
-		$differentiation = (string) ( $side_panel['differentiation_notes'] ?? '' );
-		$used_sections   = $state['used_sections'] ?? array();
-		$one_pager_link  = (string) ( $state['one_pager_link'] ?? '' );
+		$side_panel          = $state['side_panel'] ?? array();
+		$name                = (string) ( $side_panel['name'] ?? $state['template_key'] ?? '' );
+		$template_key        = (string) ( $state['template_key'] ?? '' );
+		$desc                = (string) ( $side_panel['description'] ?? '' );
+		$purpose_cta         = (string) ( $side_panel['purpose_cta_direction'] ?? '' );
+		$category            = (string) ( $side_panel['category'] ?? '' );
+		$differentiation     = (string) ( $side_panel['differentiation_notes'] ?? '' );
+		$used_sections       = $state['used_sections'] ?? array();
+		$one_pager_link      = (string) ( $state['one_pager_link'] ?? '' );
 		$version_summary     = \is_array( $state['version_summary'] ?? null ) ? (array) $state['version_summary'] : array();
 		$deprecation_summary = \is_array( $state['deprecation_summary'] ?? null ) ? (array) $state['deprecation_summary'] : array();
 		$version             = (string) ( $version_summary['version'] ?? '' );
 		$is_deprecated       = ! empty( $deprecation_summary['is_deprecated'] );
-		$in_compare      = $template_key !== '' && \in_array( $template_key, Template_Compare_Screen::get_compare_list( 'page' ), true );
+		$in_compare          = $template_key !== '' && \in_array( $template_key, Template_Compare_Screen::get_compare_list( 'page' ), true );
 		?>
 		<section class="aio-metadata-section">
 			<h2 class="aio-metadata-title"><?php echo \esc_html( $name ); ?></h2>

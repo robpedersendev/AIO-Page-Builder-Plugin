@@ -48,8 +48,8 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		?Provider_Cost_Calculator $cost_calculator = null
 	) {
 		$this->cost_calculator = $cost_calculator;
-		$this->base_url       = rtrim( $base_url, '/' );
-		$default_capabilities = array(
+		$this->base_url        = rtrim( $base_url, '/' );
+		$default_capabilities  = array(
 			'provider_id'                 => 'openai',
 			'structured_output_supported' => true,
 			'file_attachment_supported'   => false,
@@ -172,9 +172,9 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		if ( is_array( $usage ) ) {
 			// * Token counts are authoritative provider-reported values.
 			// * OpenAI does not return cost in the API response; cost is computed from the pricing registry.
-			$prompt_tok     = (int) ( $usage['prompt_tokens'] ?? 0 );
-			$completion_tok = (int) ( $usage['completion_tokens'] ?? 0 );
-			$cost_usd       = $this->cost_calculator !== null
+			$prompt_tok       = (int) ( $usage['prompt_tokens'] ?? 0 );
+			$completion_tok   = (int) ( $usage['completion_tokens'] ?? 0 );
+			$cost_usd         = $this->cost_calculator !== null
 				? $this->cost_calculator->calculate( 'openai', $model, $prompt_tok, $completion_tok )
 				: null;
 			$usage_normalized = array(

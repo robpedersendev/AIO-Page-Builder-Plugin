@@ -70,4 +70,3 @@ final class IndustryBundleImportPreviewScreenTest extends TestCase {
 		$this->assertStringNotContainsString( 'deferred', $lower );
 	}
 }
-

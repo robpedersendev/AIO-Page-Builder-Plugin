@@ -31,7 +31,7 @@ final class MigrationManagerTest extends TestCase {
 
 	public function test_version_state_service_persists_state(): void {
 		$GLOBALS['__aio_opts'] = array();
-		$svc                  = new Version_State_Service();
+		$svc                   = new Version_State_Service();
 		$svc->persist_current_state();
 		$stored = \get_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_VERSION_STATE, array() );
 		$this->assertIsArray( $stored );
@@ -39,4 +39,3 @@ final class MigrationManagerTest extends TestCase {
 		$this->assertArrayHasKey( 'last_migrated_at', $stored );
 	}
 }
-

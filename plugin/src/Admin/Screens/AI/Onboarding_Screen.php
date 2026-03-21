@@ -624,13 +624,13 @@ final class Onboarding_Screen {
 		if ( $this->container === null || ! $this->container->has( 'profile_store' ) ) {
 			return;
 		}
-		$partial      = array();
-		$text_fields  = array(
-			'aio_bp_brand_positioning'        => 'brand_positioning_summary',
-			'aio_bp_brand_voice'              => 'brand_voice_summary',
-			'aio_bp_brand_cta_style'          => 'preferred_cta_style',
-			'aio_bp_brand_additional_rules'   => 'additional_brand_rules',
-			'aio_bp_brand_content_restrict'   => 'content_restrictions',
+		$partial     = array();
+		$text_fields = array(
+			'aio_bp_brand_positioning'      => 'brand_positioning_summary',
+			'aio_bp_brand_voice'            => 'brand_voice_summary',
+			'aio_bp_brand_cta_style'        => 'preferred_cta_style',
+			'aio_bp_brand_additional_rules' => 'additional_brand_rules',
+			'aio_bp_brand_content_restrict' => 'content_restrictions',
 		);
 		foreach ( $text_fields as $post_key => $field ) {
 			if ( isset( $_POST[ $post_key ] ) && is_string( $_POST[ $post_key ] ) ) {
@@ -712,15 +712,15 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	private function render_business_profile_step( array $state ): void {
-		$prefill  = $state['prefill'] ?? array();
-		$profile  = $prefill['profile'] ?? array();
-		$biz      = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+		$prefill = $state['prefill'] ?? array();
+		$profile = $prefill['profile'] ?? array();
+		$biz     = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
 			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
-		$name     = isset( $biz['business_name'] ) ? (string) $biz['business_name'] : '';
-		$type     = isset( $biz['business_type'] ) ? (string) $biz['business_type'] : '';
-		$goals    = isset( $biz['preferred_contact_or_conversion_goals'] ) ? (string) $biz['preferred_contact_or_conversion_goals'] : '';
-		$value    = isset( $biz['value_proposition_notes'] ) ? (string) $biz['value_proposition_notes'] : '';
-		$diff     = isset( $biz['major_differentiators'] ) ? (string) $biz['major_differentiators'] : '';
+		$name    = isset( $biz['business_name'] ) ? (string) $biz['business_name'] : '';
+		$type    = isset( $biz['business_type'] ) ? (string) $biz['business_type'] : '';
+		$goals   = isset( $biz['preferred_contact_or_conversion_goals'] ) ? (string) $biz['preferred_contact_or_conversion_goals'] : '';
+		$value   = isset( $biz['value_proposition_notes'] ) ? (string) $biz['value_proposition_notes'] : '';
+		$diff    = isset( $biz['major_differentiators'] ) ? (string) $biz['major_differentiators'] : '';
 		?>
 		<p><?php \esc_html_e( 'Provide core business information. This data is used as context for AI page planning.', 'aio-page-builder' ); ?></p>
 		<table class="form-table" role="presentation">
@@ -885,12 +885,12 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	private function render_geography_competitors_step( array $state ): void {
-		$prefill    = $state['prefill'] ?? array();
-		$profile    = $prefill['profile'] ?? array();
-		$biz        = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+		$prefill     = $state['prefill'] ?? array();
+		$profile     = $prefill['profile'] ?? array();
+		$biz         = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
 			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
-		$geo        = isset( $biz['core_geographic_market'] ) ? (string) $biz['core_geographic_market'] : '';
-		$mktg_lang  = isset( $biz['existing_marketing_language'] ) ? (string) $biz['existing_marketing_language'] : '';
+		$geo         = isset( $biz['core_geographic_market'] ) ? (string) $biz['core_geographic_market'] : '';
+		$mktg_lang   = isset( $biz['existing_marketing_language'] ) ? (string) $biz['existing_marketing_language'] : '';
 		$seasonality = isset( $biz['seasonality'] ) ? (string) $biz['seasonality'] : '';
 		?>
 		<p><?php \esc_html_e( 'Describe your primary market geography and competitive context. This helps AI planning prioritise relevant content angles.', 'aio-page-builder' ); ?></p>
@@ -927,12 +927,12 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	private function render_asset_intake_step( array $state ): void {
-		$prefill      = $state['prefill'] ?? array();
-		$profile      = $prefill['profile'] ?? array();
-		$biz          = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+		$prefill    = $state['prefill'] ?? array();
+		$profile    = $prefill['profile'] ?? array();
+		$biz        = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
 			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
-		$visual_ref   = isset( $biz['visual_inspiration_references'] ) ? (string) $biz['visual_inspiration_references'] : '';
-		$sales_proc   = isset( $biz['internal_sales_process_notes'] ) ? (string) $biz['internal_sales_process_notes'] : '';
+		$visual_ref = isset( $biz['visual_inspiration_references'] ) ? (string) $biz['visual_inspiration_references'] : '';
+		$sales_proc = isset( $biz['internal_sales_process_notes'] ) ? (string) $biz['internal_sales_process_notes'] : '';
 		?>
 		<p><?php \esc_html_e( 'Provide references to visual assets and any notes about your sales or content process. These guide template and copy decisions.', 'aio-page-builder' ); ?></p>
 		<table class="form-table" role="presentation">
@@ -999,10 +999,10 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	private function render_crawl_preferences_step( array $state ): void {
-		$prefill          = $state['prefill'] ?? array();
-		$latest_run_id    = $prefill['latest_crawl_run_id'] ?? null;
-		$crawl_run_ids    = $prefill['crawl_run_ids'] ?? array();
-		$crawler_url      = \add_query_arg( array( 'page' => 'aio-page-builder-crawler' ), \admin_url( 'admin.php' ) );
+		$prefill       = $state['prefill'] ?? array();
+		$latest_run_id = $prefill['latest_crawl_run_id'] ?? null;
+		$crawl_run_ids = $prefill['crawl_run_ids'] ?? array();
+		$crawler_url   = \add_query_arg( array( 'page' => 'aio-page-builder-crawler' ), \admin_url( 'admin.php' ) );
 		?>
 		<p><?php \esc_html_e( 'Crawl your existing site to give the AI planner richer context about your current content structure and gaps.', 'aio-page-builder' ); ?></p>
 		<?php if ( $latest_run_id !== null && $latest_run_id !== '' ) : ?>
@@ -1085,5 +1085,4 @@ final class Onboarding_Screen {
 		<?php endif; ?>
 		<?php
 	}
-
 }

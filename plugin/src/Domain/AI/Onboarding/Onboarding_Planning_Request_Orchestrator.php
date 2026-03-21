@@ -513,12 +513,14 @@ final class Onboarding_Planning_Request_Orchestrator {
 		}
 		$summary = $spend_service->get_spend_summary( $provider_id );
 		if ( $summary['exceeded'] && ! $summary['override_enabled'] ) {
-			\error_log( sprintf(
-				'[AIO Page Builder] Spend cap preflight blocked run for provider %s (spent $%.4f of $%.2f cap).',
-				$provider_id,
-				$summary['month_total'],
-				$summary['cap']
-			) );
+			\error_log(
+				sprintf(
+					'[AIO Page Builder] Spend cap preflight blocked run for provider %s (spent $%.4f of $%.2f cap).',
+					$provider_id,
+					$summary['month_total'],
+					$summary['cap']
+				)
+			);
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_BLOCKED,

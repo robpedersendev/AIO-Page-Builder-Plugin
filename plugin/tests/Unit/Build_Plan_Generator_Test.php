@@ -212,17 +212,24 @@ final class Build_Plan_Generator_Test extends TestCase {
 
 	public function test_hierarchy_assignments_emit_executable_items(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 1;
-		$output         = $this->valid_normalized_output();
+		$output                                = $this->valid_normalized_output();
 		$output[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ] = array(
 			'hierarchy_assignments' => array(
-				array( 'page_id' => 5, 'parent_page_id' => 10, 'note' => 'Services under Home.' ),
-				array( 'page_id' => 7, 'parent_page_id' => 0 ),
+				array(
+					'page_id'        => 5,
+					'parent_page_id' => 10,
+					'note'           => 'Services under Home.',
+				),
+				array(
+					'page_id'        => 7,
+					'parent_page_id' => 0,
+				),
 			),
 		);
 		$gen    = new Build_Plan_Generator( new Build_Plan_Repository(), new Build_Plan_Item_Generator() );
 		$result = $gen->generate( $output, 'run-1', 'run-1:out', array() );
 		$this->assertTrue( $result->is_success() );
-		$steps = $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ];
+		$steps          = $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ];
 		$hierarchy_step = null;
 		foreach ( $steps as $step ) {
 			if ( ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' ) === Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW ) {
@@ -245,16 +252,20 @@ final class Build_Plan_Generator_Test extends TestCase {
 
 	public function test_unresolvable_assignment_emitted_as_hierarchy_note(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 1;
-		$output         = $this->valid_normalized_output();
+		$output                                = $this->valid_normalized_output();
 		$output[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ] = array(
 			'hierarchy_assignments' => array(
-				array( 'page_id' => 0, 'parent_page_id' => 10, 'note' => 'Missing page ID.' ),
+				array(
+					'page_id'        => 0,
+					'parent_page_id' => 10,
+					'note'           => 'Missing page ID.',
+				),
 			),
 		);
 		$gen    = new Build_Plan_Generator( new Build_Plan_Repository(), new Build_Plan_Item_Generator() );
 		$result = $gen->generate( $output, 'run-1', 'run-1:out', array() );
 		$this->assertTrue( $result->is_success() );
-		$steps = $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ];
+		$steps          = $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ];
 		$hierarchy_step = null;
 		foreach ( $steps as $step ) {
 			if ( ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' ) === Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW ) {
@@ -271,12 +282,12 @@ final class Build_Plan_Generator_Test extends TestCase {
 
 	public function test_recommended_top_level_pages_still_emit_hierarchy_note(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 1;
-		$output         = $this->valid_normalized_output();
+		$output                                = $this->valid_normalized_output();
 		// site_structure already has recommended_top_level_pages in valid_normalized_output().
 		$gen    = new Build_Plan_Generator( new Build_Plan_Repository(), new Build_Plan_Item_Generator() );
 		$result = $gen->generate( $output, 'run-1', 'run-1:out', array() );
 		$this->assertTrue( $result->is_success() );
-		$steps = $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ];
+		$steps          = $result->get_plan_payload()[ Build_Plan_Schema::KEY_STEPS ];
 		$hierarchy_step = null;
 		foreach ( $steps as $step ) {
 			if ( ( $step[ Build_Plan_Item_Schema::KEY_STEP_TYPE ] ?? '' ) === Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW ) {
@@ -304,7 +315,12 @@ final class Build_Plan_Generator_Test extends TestCase {
 				'menu_context'       => 'primary',
 				'action'             => 'create',
 				'proposed_menu_name' => 'Main Navigation',
-				'items'              => array( array( 'title' => 'Home', 'url' => '/' ) ),
+				'items'              => array(
+					array(
+						'title' => 'Home',
+						'url'   => '/',
+					),
+				),
 			),
 		);
 		$gen    = new Build_Plan_Generator( new Build_Plan_Repository(), new Build_Plan_Item_Generator() );

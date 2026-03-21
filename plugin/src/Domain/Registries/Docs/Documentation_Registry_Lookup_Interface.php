@@ -25,4 +25,3 @@ interface Documentation_Registry_Lookup_Interface {
 	 */
 	public function get_by_section_key( string $section_template_key ): ?array;
 }
-

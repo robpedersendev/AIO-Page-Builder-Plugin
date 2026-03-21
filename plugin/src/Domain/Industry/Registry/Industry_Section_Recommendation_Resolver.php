@@ -35,7 +35,7 @@ final class Industry_Section_Recommendation_Resolver {
 
 	/**
 	 * @param Industry_Read_Model_Cache_Service|null $cache_service Optional cache service for result caching.
-	 * @param Industry_Cache_Key_Builder|null         $cache_key_builder Optional key builder for cache keys.
+	 * @param Industry_Cache_Key_Builder|null        $cache_key_builder Optional key builder for cache keys.
 	 */
 	public function __construct( ?Industry_Read_Model_Cache_Service $cache_service = null, ?Industry_Cache_Key_Builder $cache_key_builder = null ) {
 		$this->cache_service     = $cache_service;

@@ -158,9 +158,9 @@ final class Uninstall_Cleanup_Service {
 			);
 		}
 		return array(
-			'cleanup_ran'     => true,
-			'mode'            => $mode,
-			'cleanup_result'  => $this->cleanup_plugin_owned_data( self::SCOPE_FULL ),
+			'cleanup_ran'    => true,
+			'mode'           => $mode,
+			'cleanup_result' => $this->cleanup_plugin_owned_data( self::SCOPE_FULL ),
 		);
 	}
 }

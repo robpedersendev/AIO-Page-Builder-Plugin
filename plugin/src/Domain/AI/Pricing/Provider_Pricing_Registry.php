@@ -44,29 +44,62 @@ final class Provider_Pricing_Registry {
 	private const RATES = array(
 		'openai'    => array(
 			// gpt-4o: $2.50 / $10.00 per 1M tokens.
-			'gpt-4o'              => array( 'input' => 0.0000025, 'output' => 0.00001 ),
+			'gpt-4o'              => array(
+				'input'  => 0.0000025,
+				'output' => 0.00001,
+			),
 			// gpt-4o-mini: $0.15 / $0.60 per 1M tokens.
-			'gpt-4o-mini'         => array( 'input' => 0.00000015, 'output' => 0.0000006 ),
+			'gpt-4o-mini'         => array(
+				'input'  => 0.00000015,
+				'output' => 0.0000006,
+			),
 			// gpt-4-turbo: $10.00 / $30.00 per 1M tokens.
-			'gpt-4-turbo'         => array( 'input' => 0.00001, 'output' => 0.00003 ),
+			'gpt-4-turbo'         => array(
+				'input'  => 0.00001,
+				'output' => 0.00003,
+			),
 			// gpt-4-turbo-preview: same as gpt-4-turbo.
-			'gpt-4-turbo-preview' => array( 'input' => 0.00001, 'output' => 0.00003 ),
+			'gpt-4-turbo-preview' => array(
+				'input'  => 0.00001,
+				'output' => 0.00003,
+			),
 			// gpt-3.5-turbo: $0.50 / $1.50 per 1M tokens.
-			'gpt-3.5-turbo'       => array( 'input' => 0.0000005, 'output' => 0.0000015 ),
+			'gpt-3.5-turbo'       => array(
+				'input'  => 0.0000005,
+				'output' => 0.0000015,
+			),
 		),
 		'anthropic' => array(
 			// claude-sonnet-4-20250514: $3.00 / $15.00 per 1M tokens.
-			'claude-sonnet-4-20250514'   => array( 'input' => 0.000003, 'output' => 0.000015 ),
+			'claude-sonnet-4-20250514'   => array(
+				'input'  => 0.000003,
+				'output' => 0.000015,
+			),
 			// claude-3-5-sonnet-20241022: $3.00 / $15.00 per 1M tokens.
-			'claude-3-5-sonnet-20241022' => array( 'input' => 0.000003, 'output' => 0.000015 ),
+			'claude-3-5-sonnet-20241022' => array(
+				'input'  => 0.000003,
+				'output' => 0.000015,
+			),
 			// claude-3-5-sonnet-20240620: $3.00 / $15.00 per 1M tokens.
-			'claude-3-5-sonnet-20240620' => array( 'input' => 0.000003, 'output' => 0.000015 ),
+			'claude-3-5-sonnet-20240620' => array(
+				'input'  => 0.000003,
+				'output' => 0.000015,
+			),
 			// claude-3-5-haiku-20241022: $0.80 / $4.00 per 1M tokens.
-			'claude-3-5-haiku-20241022'  => array( 'input' => 0.0000008, 'output' => 0.000004 ),
+			'claude-3-5-haiku-20241022'  => array(
+				'input'  => 0.0000008,
+				'output' => 0.000004,
+			),
 			// claude-3-opus-20240229: $15.00 / $75.00 per 1M tokens.
-			'claude-3-opus-20240229'     => array( 'input' => 0.000015, 'output' => 0.000075 ),
+			'claude-3-opus-20240229'     => array(
+				'input'  => 0.000015,
+				'output' => 0.000075,
+			),
 			// claude-3-haiku-20240307: $0.25 / $1.25 per 1M tokens.
-			'claude-3-haiku-20240307'    => array( 'input' => 0.00000025, 'output' => 0.00000125 ),
+			'claude-3-haiku-20240307'    => array(
+				'input'  => 0.00000025,
+				'output' => 0.00000125,
+			),
 		),
 	);
 

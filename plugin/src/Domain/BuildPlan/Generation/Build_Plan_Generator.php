@@ -349,24 +349,24 @@ final class Build_Plan_Generator {
 				$a_note           = isset( $assignment['note'] ) ? (string) $assignment['note'] : '';
 				if ( $a_page_id > 0 && $a_parent_page_id >= 0 ) {
 					$items[] = array(
-						Build_Plan_Item_Schema::KEY_ITEM_ID   => $plan_id . '_hierarchy_assign_' . $idx,
+						Build_Plan_Item_Schema::KEY_ITEM_ID => $plan_id . '_hierarchy_assign_' . $idx,
 						Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_ASSIGNMENT,
-						Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
+						Build_Plan_Item_Schema::KEY_PAYLOAD => array(
 							'page_id'        => $a_page_id,
 							'parent_page_id' => $a_parent_page_id,
 							'note'           => $a_note,
 						),
-						Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::PENDING,
+						Build_Plan_Item_Schema::KEY_STATUS => Build_Plan_Item_Statuses::PENDING,
 					);
 				} else {
 					// Unresolvable (page_id missing or invalid): demote to advisory note.
 					$items[] = array(
-						Build_Plan_Item_Schema::KEY_ITEM_ID   => $plan_id . '_hierarchy_note_unresolved_' . $idx,
+						Build_Plan_Item_Schema::KEY_ITEM_ID => $plan_id . '_hierarchy_note_unresolved_' . $idx,
 						Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_NOTE,
-						Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
+						Build_Plan_Item_Schema::KEY_PAYLOAD => array(
 							'note' => $a_note !== '' ? $a_note : 'Hierarchy assignment could not be resolved: page_id missing.',
 						),
-						Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::PENDING,
+						Build_Plan_Item_Schema::KEY_STATUS => Build_Plan_Item_Statuses::PENDING,
 					);
 				}
 			}

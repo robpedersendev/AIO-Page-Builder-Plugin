@@ -194,9 +194,9 @@ final class Crawler_Sessions_Screen {
 	private function redirect_with_notice( string $status, string $message ): void {
 		$url = \add_query_arg(
 			array(
-				'page'                => self::SLUG,
-				'aio_crawl_status'    => $status,
-				'aio_crawl_message'   => $message,
+				'page'              => self::SLUG,
+				'aio_crawl_status'  => $status,
+				'aio_crawl_message' => $message,
 			),
 			\admin_url( 'admin.php' )
 		);

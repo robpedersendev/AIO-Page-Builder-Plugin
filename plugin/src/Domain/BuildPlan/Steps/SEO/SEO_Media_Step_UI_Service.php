@@ -88,9 +88,9 @@ final class SEO_Media_Step_UI_Service {
 			if ( $status === Build_Plan_Item_Statuses::PENDING ) {
 				++$eligible_count;
 			}
-			$row_actions       = $this->row_action_resolver->resolve( $item, $capabilities );
-			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
-			$rows[]            = array(
+			$row_actions = $this->row_action_resolver->resolve( $item, $capabilities );
+			$payload     = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+			$rows[]      = array(
 				Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
 				Step_Item_List_Component::ROW_KEY_STATUS  => $status,
 				Step_Item_List_Component::ROW_KEY_STATUS_BADGE => $this->status_to_badge( $status ),
@@ -114,11 +114,11 @@ final class SEO_Media_Step_UI_Service {
 			);
 		}
 		return array(
-			'step_list_rows'               => $rows,
-			'column_order'                 => self::COLUMN_ORDER,
-			'bulk_action_states'           => $bulk_states,
-			'detail_panel'                 => $detail_panel,
-			'step_messages'                => $step_messages,
+			'step_list_rows'     => $rows,
+			'column_order'       => self::COLUMN_ORDER,
+			'bulk_action_states' => $bulk_states,
+			'detail_panel'       => $detail_panel,
+			'step_messages'      => $step_messages,
 		);
 	}
 
@@ -146,7 +146,7 @@ final class SEO_Media_Step_UI_Service {
 		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
 			if ( $key === 'target_page_title_or_url' ) {
-				$val        = isset( $payload['target_page_title_or_url'] ) ? (string) ( $payload['target_page_title_or_url'] ) : '';
+				$val          = isset( $payload['target_page_title_or_url'] ) ? (string) ( $payload['target_page_title_or_url'] ) : '';
 				$cols[ $key ] = $val !== '' ? $val : '—';
 				continue;
 			}
@@ -159,11 +159,11 @@ final class SEO_Media_Step_UI_Service {
 				continue;
 			}
 			if ( $key === 'confidence' ) {
-				$val = isset( $payload['confidence'] ) ? (string) ( $payload['confidence'] ) : '';
+				$val          = isset( $payload['confidence'] ) ? (string) ( $payload['confidence'] ) : '';
 				$cols[ $key ] = $val !== '' ? $val : '—';
 				continue;
 			}
-			$val = $payload[ $key ] ?? null;
+			$val          = $payload[ $key ] ?? null;
 			$cols[ $key ] = is_string( $val ) && $val !== '' ? $val : '—';
 		}
 		return $cols;
@@ -182,47 +182,47 @@ final class SEO_Media_Step_UI_Service {
 			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ) !== $selected_item_id ) {
 				continue;
 			}
-			$payload                     = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
-				$target                      = (string) ( $payload['target_page_title_or_url'] ?? '—' );
-				$confidence                  = (string) ( $payload['confidence'] ?? '' );
-				$confidence_display          = $confidence !== '' ? $confidence : '—';
-				$advisory_storage_line       = \__( 'Stored in Build Plan artifacts as advisory SEO guidance.', 'aio-page-builder' );
-				$no_direct_write_advisory    = \__( 'This step does not include first-party adapter writes for SEO/meta/media in v1.', 'aio-page-builder' );
-				$no_direct_write_capability  = \__( 'Approved items are review records only; apply the guidance through supported SEO plugins or manual integration.', 'aio-page-builder' );
-			$detail_panel['sections']    = array(
+			$payload                        = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+				$target                     = (string) ( $payload['target_page_title_or_url'] ?? '—' );
+				$confidence                 = (string) ( $payload['confidence'] ?? '' );
+				$confidence_display         = $confidence !== '' ? $confidence : '—';
+				$advisory_storage_line      = \__( 'Stored in Build Plan artifacts as advisory SEO guidance.', 'aio-page-builder' );
+				$no_direct_write_advisory   = \__( 'This step does not include first-party adapter writes for SEO/meta/media in v1.', 'aio-page-builder' );
+				$no_direct_write_capability = \__( 'Approved items are review records only; apply the guidance through supported SEO plugins or manual integration.', 'aio-page-builder' );
+			$detail_panel['sections']       = array(
 				array(
 					'heading'       => \__( 'Target', 'aio-page-builder' ),
 					'key'           => 'target',
-						'content_lines' => array( \esc_html( $target ) ),
+					'content_lines' => array( \esc_html( $target ) ),
 				),
 				array(
-						'heading'       => \__( 'SEO guidance (advisory)', 'aio-page-builder' ),
+					'heading'       => \__( 'SEO guidance (advisory)', 'aio-page-builder' ),
 					'key'           => 'recommendations',
 					'content_lines' => array(
-							$advisory_storage_line,
-							\__( 'Recommendation purpose: title/meta/schema guidance and media direction are guidance-only in this version.', 'aio-page-builder' ),
-							\__( 'Execution posture: no direct write execution exists for this step in v1.', 'aio-page-builder' ),
-							\__( 'Dependency notes: interoperability-first; no generic SEO plugin mutation is performed by this step.', 'aio-page-builder' ),
+						$advisory_storage_line,
+						\__( 'Recommendation purpose: title/meta/schema guidance and media direction are guidance-only in this version.', 'aio-page-builder' ),
+						\__( 'Execution posture: no direct write execution exists for this step in v1.', 'aio-page-builder' ),
+						\__( 'Dependency notes: interoperability-first; no generic SEO plugin mutation is performed by this step.', 'aio-page-builder' ),
 					),
 				),
-					array(
-						'heading'       => \__( 'Confidence', 'aio-page-builder' ),
-						'key'           => 'confidence',
-						'content_lines' => array( \esc_html( \sprintf( '%s: %s', \__( 'Confidence', 'aio-page-builder' ), $confidence_display ) ) ),
+				array(
+					'heading'       => \__( 'Confidence', 'aio-page-builder' ),
+					'key'           => 'confidence',
+					'content_lines' => array( \esc_html( \sprintf( '%s: %s', \__( 'Confidence', 'aio-page-builder' ), $confidence_display ) ) ),
+				),
+				array(
+					'heading'       => \__( 'Advisory status', 'aio-page-builder' ),
+					'key'           => 'advisory_status',
+					'content_lines' => array(
+						$no_direct_write_advisory,
+						$no_direct_write_capability,
 					),
-					array(
-						'heading'       => \__( 'Advisory status', 'aio-page-builder' ),
-						'key'           => 'advisory_status',
-						'content_lines' => array(
-							$no_direct_write_advisory,
-							$no_direct_write_capability,
-						),
-					),
+				),
 			);
-				if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING ) === Build_Plan_Item_Statuses::APPROVED ) {
-					$detail_panel['sections'][0]['content_lines'] = array( \esc_html( $target ) );
-					$detail_panel['sections'][1]['content_lines'][]   = \__( 'Status: APPROVED (recorded for advisory review / manual integration).', 'aio-page-builder' );
-				}
+			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING ) === Build_Plan_Item_Statuses::APPROVED ) {
+				$detail_panel['sections'][0]['content_lines']   = array( \esc_html( $target ) );
+				$detail_panel['sections'][1]['content_lines'][] = \__( 'Status: APPROVED (recorded for advisory review / manual integration).', 'aio-page-builder' );
+			}
 			$detail_panel['row_actions'] = $this->row_action_resolver->resolve( $item, $capabilities );
 			break;
 		}
@@ -301,9 +301,9 @@ final class SEO_Media_Step_UI_Service {
 
 	private function empty_workspace(): array {
 		return array(
-			'step_list_rows'               => array(),
-			'column_order'                 => self::COLUMN_ORDER,
-			'bulk_action_states'           => array(
+			'step_list_rows'     => array(),
+			'column_order'       => self::COLUMN_ORDER,
+			'bulk_action_states' => array(
 				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 					'enabled'        => false,
 					'label'          => \__( 'Approve all SEO recommendations', 'aio-page-builder' ),
@@ -324,12 +324,12 @@ final class SEO_Media_Step_UI_Service {
 					'label'   => \__( 'Clear selection', 'aio-page-builder' ),
 				),
 			),
-			'detail_panel'                 => array(
+			'detail_panel'       => array(
 				'item_id'     => '',
 				'sections'    => array(),
 				'row_actions' => array(),
 			),
-			'step_messages'                => array(),
+			'step_messages'      => array(),
 		);
 	}
 }

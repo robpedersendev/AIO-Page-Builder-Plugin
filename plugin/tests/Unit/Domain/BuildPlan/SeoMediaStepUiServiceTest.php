@@ -87,7 +87,11 @@ final class SeoMediaStepUiServiceTest extends TestCase {
 		$workspace = $service->build_workspace(
 			$def,
 			SEO_Media_Step_UI_Service::STEP_INDEX_SEO,
-			array( 'can_approve' => true, 'can_execute' => true, 'can_view_artifacts' => false ),
+			array(
+				'can_approve'        => true,
+				'can_execute'        => true,
+				'can_view_artifacts' => false,
+			),
 			null,
 			array()
 		);
@@ -167,7 +171,10 @@ final class SeoMediaStepUiServiceTest extends TestCase {
 		$workspace = $service->build_workspace(
 			$def,
 			SEO_Media_Step_UI_Service::STEP_INDEX_SEO,
-			array( 'can_approve' => true, 'can_execute' => true ),
+			array(
+				'can_approve' => true,
+				'can_execute' => true,
+			),
 			'plan_seo_0',
 			array()
 		);
@@ -194,4 +201,3 @@ final class SeoMediaStepUiServiceTest extends TestCase {
 		}
 	}
 }
-

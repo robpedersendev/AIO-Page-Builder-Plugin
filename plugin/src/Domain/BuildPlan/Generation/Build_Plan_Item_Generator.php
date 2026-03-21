@@ -208,11 +208,11 @@ final class Build_Plan_Item_Generator {
 				);
 				continue;
 			}
-			$item_id     = $prefix . '_mcp_' . $i;
-			$action      = (string) ( $rec[ Build_Plan_Draft_Schema::MCP_ACTION ] ?? '' );
-			$menu_context = (string) ( $rec[ Build_Plan_Draft_Schema::MCP_MENU_CONTEXT ] ?? '' );
+			$item_id       = $prefix . '_mcp_' . $i;
+			$action        = (string) ( $rec[ Build_Plan_Draft_Schema::MCP_ACTION ] ?? '' );
+			$menu_context  = (string) ( $rec[ Build_Plan_Draft_Schema::MCP_MENU_CONTEXT ] ?? '' );
 			$proposed_name = (string) ( $rec['proposed_menu_name'] ?? '' );
-			$rec_items   = is_array( $rec['items'] ?? null ) ? $rec['items'] : array();
+			$rec_items     = is_array( $rec['items'] ?? null ) ? $rec['items'] : array();
 
 			if ( $action === 'create' ) {
 				// * Net-new menu: emit ITEM_TYPE_MENU_NEW so Create_Menu_Handler can execute it.

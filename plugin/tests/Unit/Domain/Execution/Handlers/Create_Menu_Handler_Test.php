@@ -110,10 +110,13 @@ final class Create_Menu_Handler_Test extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$GLOBALS['_aio_wp_create_nav_menu_return']  = 42;
-		$GLOBALS['_aio_test_registered_nav_menus']  = array( 'primary' => 'Primary Menu', 'footer' => 'Footer Menu' );
-		$GLOBALS['_aio_test_theme_mods']            = array();
-		$GLOBALS['_aio_test_nav_menu_item_id']      = 1;
+		$GLOBALS['_aio_wp_create_nav_menu_return'] = 42;
+		$GLOBALS['_aio_test_registered_nav_menus'] = array(
+			'primary' => 'Primary Menu',
+			'footer'  => 'Footer Menu',
+		);
+		$GLOBALS['_aio_test_theme_mods']           = array();
+		$GLOBALS['_aio_test_nav_menu_item_id']     = 1;
 	}
 
 	protected function tearDown(): void {
@@ -147,14 +150,14 @@ final class Create_Menu_Handler_Test extends TestCase {
 
 	public function test_wp_create_nav_menu_error_returns_failure(): void {
 		$GLOBALS['_aio_wp_create_nav_menu_return'] = new \WP_Error( 'nav_menu_exists', 'That menu name already exists.' );
-		$result = $this->handler()->execute( $this->envelope( array( 'menu_name' => 'My Menu' ) ) );
+		$result                                    = $this->handler()->execute( $this->envelope( array( 'menu_name' => 'My Menu' ) ) );
 		$this->assertFalse( $result['success'] );
 		$this->assertStringContainsString( 'That menu name already exists.', $result['message'] );
 	}
 
 	public function test_wp_create_nav_menu_returning_zero_returns_failure(): void {
 		$GLOBALS['_aio_wp_create_nav_menu_return'] = 0;
-		$result = $this->handler()->execute( $this->envelope( array( 'menu_name' => 'My Menu' ) ) );
+		$result                                    = $this->handler()->execute( $this->envelope( array( 'menu_name' => 'My Menu' ) ) );
 		$this->assertFalse( $result['success'] );
 	}
 
@@ -203,8 +206,16 @@ final class Create_Menu_Handler_Test extends TestCase {
 				array(
 					'menu_name' => 'Footer Nav',
 					'items'     => array(
-						array( 'title' => 'Home', 'url' => 'https://example.com/', 'type' => 'custom' ),
-						array( 'title' => 'About', 'url' => 'https://example.com/about/', 'type' => 'custom' ),
+						array(
+							'title' => 'Home',
+							'url'   => 'https://example.com/',
+							'type'  => 'custom',
+						),
+						array(
+							'title' => 'About',
+							'url'   => 'https://example.com/about/',
+							'type'  => 'custom',
+						),
 					),
 				)
 			)
@@ -220,7 +231,10 @@ final class Create_Menu_Handler_Test extends TestCase {
 					'menu_name' => 'Sparse Nav',
 					'items'     => array(
 						array(),
-						array( 'title' => 'Home', 'url' => 'https://example.com/' ),
+						array(
+							'title' => 'Home',
+							'url'   => 'https://example.com/',
+						),
 					),
 				)
 			)

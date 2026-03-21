@@ -117,8 +117,8 @@ final class Profile_Snapshot_History_Panel {
 
 		// * Capture a pre-restore snapshot before overwriting the current profile.
 		/** @var Profile_Snapshot_Factory $factory */
-		$factory       = $this->container->get( 'profile_snapshot_factory' );
-		$pre_restore   = $factory->build( $store, 'pre_restore_backup', 'other', $snapshot_id );
+		$factory     = $this->container->get( 'profile_snapshot_factory' );
+		$pre_restore = $factory->build( $store, 'pre_restore_backup', 'other', $snapshot_id );
 		$repo->save( $pre_restore );
 
 		// Full overwrite restore — sets brand + business profile from snapshot.
@@ -165,7 +165,7 @@ final class Profile_Snapshot_History_Panel {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ) );
 		}
 
-		$snapshots    = $this->get_snapshots();
+		$snapshots     = $this->get_snapshots();
 		$current_store = $this->get_profile_store();
 		$diff_service  = $this->get_diff_service();
 
@@ -253,8 +253,8 @@ final class Profile_Snapshot_History_Panel {
 			return;
 		}
 		$error_map = array(
-			'missing_id'         => __( 'Restore failed: snapshot ID is missing.', 'aio-page-builder' ),
-			'not_found'          => __( 'Restore failed: snapshot not found.', 'aio-page-builder' ),
+			'missing_id'          => __( 'Restore failed: snapshot ID is missing.', 'aio-page-builder' ),
+			'not_found'           => __( 'Restore failed: snapshot not found.', 'aio-page-builder' ),
 			'service_unavailable' => __( 'Restore failed: profile snapshot services are not available.', 'aio-page-builder' ),
 		);
 		$error_key = isset( $_GET['restore_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['restore_error'] ) ) : '';
@@ -266,8 +266,8 @@ final class Profile_Snapshot_History_Panel {
 	/**
 	 * Produces a plain-text diff summary comparing a snapshot to the current profile.
 	 *
-	 * @param Profile_Snapshot_Data  $snapshot
-	 * @param Profile_Store|null     $store
+	 * @param Profile_Snapshot_Data              $snapshot
+	 * @param Profile_Store|null                 $store
 	 * @param Profile_Snapshot_Diff_Service|null $diff_service
 	 * @return string
 	 */

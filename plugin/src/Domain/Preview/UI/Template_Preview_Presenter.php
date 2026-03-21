@@ -33,4 +33,3 @@ final class Template_Preview_Presenter {
 			: __( 'Structural preview', 'aio-page-builder' );
 	}
 }
-

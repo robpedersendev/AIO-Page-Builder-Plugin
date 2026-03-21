@@ -93,8 +93,18 @@ final class AI_Run_Artifact_Service_Cost_Metadata_Test extends TestCase {
 	}
 
 	public function test_zero_cost_usd_is_distinct_from_null(): void {
-		$usage_zero = array( 'prompt_tokens' => 0, 'completion_tokens' => 0, 'total_tokens' => 0, 'cost_usd' => 0.0 );
-		$usage_null = array( 'prompt_tokens' => 0, 'completion_tokens' => 0, 'total_tokens' => 0, 'cost_usd' => null );
+		$usage_zero = array(
+			'prompt_tokens'     => 0,
+			'completion_tokens' => 0,
+			'total_tokens'      => 0,
+			'cost_usd'          => 0.0,
+		);
+		$usage_null = array(
+			'prompt_tokens'     => 0,
+			'completion_tokens' => 0,
+			'total_tokens'      => 0,
+			'cost_usd'          => null,
+		);
 
 		$this->service->store( 4, Artifact_Category_Keys::USAGE_METADATA, $usage_zero );
 		$this->service->store( 5, Artifact_Category_Keys::USAGE_METADATA, $usage_null );

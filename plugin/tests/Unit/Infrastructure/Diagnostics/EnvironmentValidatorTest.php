@@ -39,4 +39,3 @@ final class EnvironmentValidatorTest extends TestCase {
 		$this->assertArrayHasKey( 'generated_at', $persisted );
 	}
 }
-

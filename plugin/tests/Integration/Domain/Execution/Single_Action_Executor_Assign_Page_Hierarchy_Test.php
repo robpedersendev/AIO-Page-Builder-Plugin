@@ -32,16 +32,20 @@ require_once $plugin_root . '/src/Domain/Execution/Handlers/Assign_Page_Hierarch
 namespace AIOPageBuilder\Domain\Execution\Handlers;
 
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\get_post' ) ) {
-	function get_post( int $id ) { return null; }
+	function get_post( int $id ) {
+		return null; }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\wp_update_post' ) ) {
-	function wp_update_post( array $args, bool $return_error = false ) { return 0; }
+	function wp_update_post( array $args, bool $return_error = false ) {
+		return 0; }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\is_wp_error' ) ) {
-	function is_wp_error( $thing ): bool { return false; }
+	function is_wp_error( $thing ): bool {
+		return false; }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\__' ) ) {
-	function __( string $text, string $domain = 'default' ): string { return $text; }
+	function __( string $text, string $domain = 'default' ): string {
+		return $text; }
 }
 
 namespace AIOPageBuilder\Tests\Integration\Domain\Execution;

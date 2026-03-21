@@ -75,8 +75,10 @@ namespace AIOPageBuilder\Domain\Profile;
 
 if ( ! class_exists( 'AIOPageBuilder\Domain\Profile\Template_Preference_Profile' ) ) {
 	class Template_Preference_Profile {
-		public function to_array(): array { return array(); }
-		public static function from_array( array $a ): self { return new self(); }
+		public function to_array(): array {
+			return array(); }
+		public static function from_array( array $a ): self {
+			return new self(); }
 	}
 }
 
@@ -172,9 +174,12 @@ final class Profile_Snapshot_Capture_On_Profile_Save_Test extends TestCase {
 
 	public function test_merge_brand_profile_fires_action(): void {
 		$fired = false;
-		add_action( 'aio_pb_brand_profile_merged', function () use ( &$fired ): void {
-			$fired = true;
-		} );
+		add_action(
+			'aio_pb_brand_profile_merged',
+			function () use ( &$fired ): void {
+				$fired = true;
+			}
+		);
 		$store = $this->make_store();
 		$store->merge_brand_profile( array( 'name' => 'Acme' ) );
 		$this->assertTrue( $fired, 'aio_pb_brand_profile_merged action must be fired.' );
@@ -182,9 +187,12 @@ final class Profile_Snapshot_Capture_On_Profile_Save_Test extends TestCase {
 
 	public function test_merge_business_profile_fires_action(): void {
 		$fired = false;
-		add_action( 'aio_pb_business_profile_merged', function () use ( &$fired ): void {
-			$fired = true;
-		} );
+		add_action(
+			'aio_pb_business_profile_merged',
+			function () use ( &$fired ): void {
+				$fired = true;
+			}
+		);
 		$store = $this->make_store();
 		$store->merge_business_profile( array( 'industry' => 'Tech' ) );
 		$this->assertTrue( $fired, 'aio_pb_business_profile_merged action must be fired.' );

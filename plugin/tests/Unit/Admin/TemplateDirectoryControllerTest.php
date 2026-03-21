@@ -27,4 +27,3 @@ final class TemplateDirectoryControllerTest extends TestCase {
 		$this->assertSame( 'aio-page-builder-page-templates', Page_Templates_Directory_Screen::SLUG );
 	}
 }
-

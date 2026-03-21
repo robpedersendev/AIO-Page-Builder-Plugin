@@ -66,10 +66,9 @@ final class AI_Provider_State_Store {
 		if ( $key === '' ) {
 			return;
 		}
-		$all = $this->all();
-		$cur = isset( $all[ $key ] ) && is_array( $all[ $key ] ) ? $all[ $key ] : array();
+		$all         = $this->all();
+		$cur         = isset( $all[ $key ] ) && is_array( $all[ $key ] ) ? $all[ $key ] : array();
 		$all[ $key ] = array_merge( $cur, $updates );
 		$this->settings->set( Option_Names::PB_AI_PROVIDERS, $all );
 	}
 }
-

@@ -20,20 +20,19 @@ namespace AIOPageBuilder\Tests\Unit\Infrastructure\Lifecycle {
 
 	final class UninstallServiceTest extends TestCase {
 
-	public function test_cleanup_if_confirmed_defaults_to_preserve(): void {
-		\delete_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_UNINSTALL_CLEANUP_MODE );
-		$svc                  = new Uninstall_Cleanup_Service( null );
-		$out                  = $svc->cleanup_if_confirmed();
-		$this->assertFalse( $out['cleanup_ran'] );
-	}
+		public function test_cleanup_if_confirmed_defaults_to_preserve(): void {
+			\delete_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_UNINSTALL_CLEANUP_MODE );
+			$svc = new Uninstall_Cleanup_Service( null );
+			$out = $svc->cleanup_if_confirmed();
+			$this->assertFalse( $out['cleanup_ran'] );
+		}
 
-	public function test_cleanup_if_confirmed_runs_when_confirmed_mode_set(): void {
-		\update_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_UNINSTALL_CLEANUP_MODE, 'confirmed_cleanup', false );
-		$svc = new Uninstall_Cleanup_Service( null );
-		$out = $svc->cleanup_if_confirmed();
-		$this->assertTrue( $out['cleanup_ran'] );
-		$this->assertSame( 'confirmed_cleanup', $out['mode'] );
-	}
+		public function test_cleanup_if_confirmed_runs_when_confirmed_mode_set(): void {
+			\update_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_UNINSTALL_CLEANUP_MODE, 'confirmed_cleanup', false );
+			$svc = new Uninstall_Cleanup_Service( null );
+			$out = $svc->cleanup_if_confirmed();
+			$this->assertTrue( $out['cleanup_ran'] );
+			$this->assertSame( 'confirmed_cleanup', $out['mode'] );
+		}
 	}
 }
-

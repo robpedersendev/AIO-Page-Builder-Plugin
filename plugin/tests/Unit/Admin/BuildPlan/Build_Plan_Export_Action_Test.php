@@ -27,7 +27,7 @@ final class Build_Plan_Export_Action_Test extends TestCase {
 			'context_rail'    => array( 'token_secret' => 'y' ),
 			'stepper_steps'   => array( array( 'step_type' => 'overview' ) ),
 		);
-		$m       = new ReflectionMethod( Build_Plan_Workspace_Screen::class, 'build_export_payload_for_download' );
+		$m      = new ReflectionMethod( Build_Plan_Workspace_Screen::class, 'build_export_payload_for_download' );
 		$m->setAccessible( true );
 		$payload = $m->invoke( $screen, $state );
 		$this->assertSame( 1, $payload['export_version'] );

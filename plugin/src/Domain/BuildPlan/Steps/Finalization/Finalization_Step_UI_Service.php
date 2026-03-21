@@ -73,7 +73,7 @@ final class Finalization_Step_UI_Service {
 			'failed'        => (int) ( $completion_summary['failed'] ?? $counts['failed'] ),
 			'deferred'      => (int) ( $counts['pending'] + $counts['approved'] ),
 		);
-		$conflict_summary = array(
+		$conflict_summary     = array(
 			'count'    => $conflict_count,
 			'messages' => array_values(
 				array_slice(
@@ -93,13 +93,13 @@ final class Finalization_Step_UI_Service {
 				)
 			),
 		);
-		$preview_link = array(
+		$preview_link         = array(
 			'url'   => '',
 			'label' => \__( 'View logs & rollback history', 'aio-page-builder' ),
 		);
-		$step_list_rows               = array();
-		$column_order                 = array( 'bucket', 'count', 'status' );
-		$bulk_states                  = array(
+		$step_list_rows       = array();
+		$column_order         = array( 'bucket', 'count', 'status' );
+		$bulk_states          = array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 				'enabled'        => false,
 				'label'          => \__( 'Publish all', 'aio-page-builder' ),
@@ -120,7 +120,7 @@ final class Finalization_Step_UI_Service {
 				'label'   => \__( 'Clear selection', 'aio-page-builder' ),
 			),
 		);
-		$detail_panel                 = array(
+		$detail_panel         = array(
 			'item_id'     => '',
 			'sections'    => array(
 				array(
@@ -146,7 +146,7 @@ final class Finalization_Step_UI_Service {
 			),
 			'row_actions' => array(),
 		);
-		$step_messages                = array(
+		$step_messages        = array(
 			array(
 				'severity' => 'info',
 				'message'  => \__( 'Review conflicts and finalize when ready. Finalization re-checks readiness and will not proceed when blocked.', 'aio-page-builder' ),
@@ -163,24 +163,24 @@ final class Finalization_Step_UI_Service {
 		}
 
 		return array(
-			'step_list_rows'               => $step_list_rows,
-			'column_order'                 => $column_order,
-			'bulk_action_states'           => $bulk_states,
-			'detail_panel'                 => $detail_panel,
-			'step_messages'                => $step_messages,
-			'finalization_buckets'         => $finalization_buckets,
-			'conflict_summary'             => $conflict_summary,
-			'preview_link'                 => $preview_link,
-			'run_completion_state'         => $run_completion_state,
-			'finalization_summary'         => $finalization_summary,
+			'step_list_rows'       => $step_list_rows,
+			'column_order'         => $column_order,
+			'bulk_action_states'   => $bulk_states,
+			'detail_panel'         => $detail_panel,
+			'step_messages'        => $step_messages,
+			'finalization_buckets' => $finalization_buckets,
+			'conflict_summary'     => $conflict_summary,
+			'preview_link'         => $preview_link,
+			'run_completion_state' => $run_completion_state,
+			'finalization_summary' => $finalization_summary,
 		);
 	}
 
 	private function empty_workspace(): array {
 		return array(
-			'step_list_rows'               => array(),
-			'column_order'                 => array(),
-			'bulk_action_states'           => array(
+			'step_list_rows'       => array(),
+			'column_order'         => array(),
+			'bulk_action_states'   => array(
 				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 					'enabled'        => false,
 					'label'          => \__( 'Publish all', 'aio-page-builder' ),
@@ -201,28 +201,28 @@ final class Finalization_Step_UI_Service {
 					'label'   => \__( 'Clear selection', 'aio-page-builder' ),
 				),
 			),
-			'detail_panel'                 => array(
+			'detail_panel'         => array(
 				'item_id'     => '',
 				'sections'    => array(),
 				'row_actions' => array(),
 			),
-			'step_messages'                => array(),
-			'finalization_buckets'         => array(
+			'step_messages'        => array(),
+			'finalization_buckets' => array(
 				'publish_ready' => 0,
 				'blocked'       => 0,
 				'failed'        => 0,
 				'deferred'      => 0,
 			),
-			'conflict_summary'             => array(
+			'conflict_summary'     => array(
 				'count'    => 0,
 				'messages' => array(),
 			),
-			'preview_link'                 => array(
+			'preview_link'         => array(
 				'url'   => '',
 				'label' => \__( 'View logs & rollback history', 'aio-page-builder' ),
 			),
-			'run_completion_state'         => '',
-			'finalization_summary'         => null,
+			'run_completion_state' => '',
+			'finalization_summary' => null,
 		);
 	}
 

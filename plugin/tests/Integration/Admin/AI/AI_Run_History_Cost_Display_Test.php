@@ -118,7 +118,7 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 		$GLOBALS['__spend_test_options'] = array();
 		// * Allow AI run screens; deny raw diagnostics (matches production gating under test).
 		$GLOBALS['_aio_current_user_can_caps'] = array(
-			Capabilities::VIEW_AI_RUNS                => true,
+			Capabilities::VIEW_AI_RUNS               => true,
 			Capabilities::VIEW_SENSITIVE_DIAGNOSTICS => false,
 		);
 		unset( $GLOBALS['_aio_current_user_can_return'] );
@@ -166,14 +166,14 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 			'internal_key' => $run_id,
 			'status'       => 'completed',
 			'run_metadata' => array(
-				'provider_id'    => 'openai',
-				'model_used'     => 'gpt-4o',
-				'created_at'     => '2025-07-01 00:00:00',
-				'completed_at'   => '2025-07-01 00:01:00',
-				'actor'          => 'admin',
+				'provider_id'     => 'openai',
+				'model_used'      => 'gpt-4o',
+				'created_at'      => '2025-07-01 00:00:00',
+				'completed_at'    => '2025-07-01 00:01:00',
+				'actor'           => 'admin',
 				'prompt_pack_ref' => 'pack-v1',
-				'retry_count'    => 0,
-				'build_plan_ref' => '',
+				'retry_count'     => 0,
+				'build_plan_ref'  => '',
 			),
 		);
 	}
@@ -189,8 +189,8 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 			'total_tokens'      => 1500,
 			'cost_usd'          => 0.007500,
 		);
-		$container = $this->build_detail_container( $this->make_run( 'run-abc' ), $usage_data );
-		$html      = $this->capture_detail( $container, 'run-abc' );
+		$container  = $this->build_detail_container( $this->make_run( 'run-abc' ), $usage_data );
+		$html       = $this->capture_detail( $container, 'run-abc' );
 
 		$this->assertStringContainsString( 'Estimated cost', $html );
 		$this->assertStringContainsString( '$0.007500', $html );
@@ -203,8 +203,8 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 			'total_tokens'      => 1000,
 			'cost_usd'          => 0.003,
 		);
-		$container = $this->build_detail_container( $this->make_run( 'run-abc' ), $usage_data );
-		$html      = $this->capture_detail( $container, 'run-abc' );
+		$container  = $this->build_detail_container( $this->make_run( 'run-abc' ), $usage_data );
+		$html       = $this->capture_detail( $container, 'run-abc' );
 
 		$this->assertStringContainsString( 'Token usage', $html );
 		// Prompt + completion + total token counts must all appear.
@@ -220,8 +220,8 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 			'total_tokens'      => 800,
 			'cost_usd'          => null,
 		);
-		$container = $this->build_detail_container( $this->make_run( 'run-xyz' ), $usage_data );
-		$html      = $this->capture_detail( $container, 'run-xyz' );
+		$container  = $this->build_detail_container( $this->make_run( 'run-xyz' ), $usage_data );
+		$html       = $this->capture_detail( $container, 'run-xyz' );
 
 		$this->assertStringContainsString( 'Not available', $html );
 		// * "$0.000000" must NOT appear — zero and null have different semantics.
@@ -271,7 +271,7 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 
 	private function make_spend_service_no_cap(): Provider_Monthly_Spend_Service {
 		$GLOBALS['__spend_test_options'] = array();
-		$cap_settings = new Provider_Spend_Cap_Settings();
+		$cap_settings                    = new Provider_Spend_Cap_Settings();
 		return new Provider_Monthly_Spend_Service( $cap_settings );
 	}
 
@@ -310,8 +310,8 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 
 	public function test_list_spend_shows_approaching_when_over_threshold(): void {
 		$GLOBALS['__spend_test_options'] = array();
-		$cap_settings = new Provider_Spend_Cap_Settings();
-		$spend_svc    = new Provider_Monthly_Spend_Service( $cap_settings );
+		$cap_settings                    = new Provider_Spend_Cap_Settings();
+		$spend_svc                       = new Provider_Monthly_Spend_Service( $cap_settings );
 		$cap_settings->save_settings( 'openai', 10.0, false );
 		$spend_svc->record_run_cost( 'openai', 9.0 );
 
@@ -325,8 +325,8 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 
 	public function test_list_spend_shows_cap_exceeded_when_exceeded(): void {
 		$GLOBALS['__spend_test_options'] = array();
-		$cap_settings = new Provider_Spend_Cap_Settings();
-		$spend_svc    = new Provider_Monthly_Spend_Service( $cap_settings );
+		$cap_settings                    = new Provider_Spend_Cap_Settings();
+		$spend_svc                       = new Provider_Monthly_Spend_Service( $cap_settings );
 		$cap_settings->save_settings( 'openai', 5.0, false );
 		$spend_svc->record_run_cost( 'openai', 6.0 );
 
@@ -340,8 +340,8 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 
 	public function test_list_spend_shows_dollar_spent_value(): void {
 		$GLOBALS['__spend_test_options'] = array();
-		$cap_settings = new Provider_Spend_Cap_Settings();
-		$spend_svc    = new Provider_Monthly_Spend_Service( $cap_settings );
+		$cap_settings                    = new Provider_Spend_Cap_Settings();
+		$spend_svc                       = new Provider_Monthly_Spend_Service( $cap_settings );
 		$spend_svc->record_run_cost( 'openai', 2.5 );
 
 		$registry  = new Provider_Pricing_Registry();

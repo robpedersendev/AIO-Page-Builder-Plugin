@@ -149,15 +149,15 @@ final class Section_Template_Detail_Screen {
 	 * @return void
 	 */
 	private function render_metadata_panel( array $state ): void {
-		$side_panel    = $state['side_panel'] ?? array();
-		$name          = (string) ( $side_panel['name'] ?? $state['section_key'] ?? '' );
-		$section_key   = (string) ( $state['section_key'] ?? '' );
-		$desc          = (string) ( $side_panel['description'] ?? '' );
-		$purpose       = (string) ( $side_panel['purpose_family'] ?? '' );
-		$cta           = (string) ( $side_panel['cta_classification'] ?? '' );
-		$placement     = (string) ( $side_panel['placement_tendency'] ?? '' );
-		$field_ref     = (string) ( $side_panel['field_blueprint_ref'] ?? '' );
-		$helper_ref    = (string) ( $state['helper_ref'] ?? '' );
+		$side_panel          = $state['side_panel'] ?? array();
+		$name                = (string) ( $side_panel['name'] ?? $state['section_key'] ?? '' );
+		$section_key         = (string) ( $state['section_key'] ?? '' );
+		$desc                = (string) ( $side_panel['description'] ?? '' );
+		$purpose             = (string) ( $side_panel['purpose_family'] ?? '' );
+		$cta                 = (string) ( $side_panel['cta_classification'] ?? '' );
+		$placement           = (string) ( $side_panel['placement_tendency'] ?? '' );
+		$field_ref           = (string) ( $side_panel['field_blueprint_ref'] ?? '' );
+		$helper_ref          = (string) ( $state['helper_ref'] ?? '' );
 		$version_summary     = \is_array( $state['version_summary'] ?? null ) ? (array) $state['version_summary'] : array();
 		$deprecation_summary = \is_array( $state['deprecation_summary'] ?? null ) ? (array) $state['deprecation_summary'] : array();
 		$version             = (string) ( $version_summary['version'] ?? '' );

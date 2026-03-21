@@ -157,10 +157,10 @@ final class Page_Templates_Directory_Screen {
 			$query_service = $this->container->get( 'large_library_query_service' );
 		}
 		if ( ! $query_service instanceof \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service ) {
-			$section_repo = $this->container && $this->container->has( 'section_template_repository' )
+			$section_repo  = $this->container && $this->container->has( 'section_template_repository' )
 				? $this->container->get( 'section_template_repository' )
 				: new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
-			$page_repo    = $this->container && $this->container->has( 'page_template_repository' )
+			$page_repo     = $this->container && $this->container->has( 'page_template_repository' )
 				? $this->container->get( 'page_template_repository' )
 				: new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
 			$query_service = new \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service( $section_repo, $page_repo );
@@ -358,7 +358,7 @@ final class Page_Templates_Directory_Screen {
 					if ( $this->container && $this->container->has( 'admin_router' ) ) {
 						$view_url = (string) $this->container->get( 'admin_router' )->url( 'page_template_detail', $detail_args );
 					}
-					$preview_url = $view_url;
+					$preview_url         = $view_url;
 					$in_compare          = \in_array( $key, Template_Compare_Screen::get_compare_list( 'page' ), true );
 					$item_view           = isset( $industry_badges_by_key[ $key ] ) ? $industry_badges_by_key[ $key ] : null;
 					$template_override   = isset( $industry_page_template_overrides_by_key[ $key ] ) && is_array( $industry_page_template_overrides_by_key[ $key ] ) ? $industry_page_template_overrides_by_key[ $key ] : null;

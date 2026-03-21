@@ -87,10 +87,10 @@ final class Industry_Pack_Registry {
 	 * Rebuilds the effective registry view from merge layers. Safe: no throw.
 	 */
 	public function refresh(): void {
-		$this->builtin_all        = $this->build_records_from_definitions( self::get_builtin_pack_definitions(), self::SOURCE_BUILTIN, null );
-		$this->applied_all        = $this->build_applied_records();
-		$this->effective_by_key   = array();
-		$this->effective_all      = array();
+		$this->builtin_all      = $this->build_records_from_definitions( self::get_builtin_pack_definitions(), self::SOURCE_BUILTIN, null );
+		$this->applied_all      = $this->build_applied_records();
+		$this->effective_by_key = array();
+		$this->effective_all    = array();
 
 		// Deterministic merge: builtins first, then applied overlays (later bundles override earlier when same key exists).
 		foreach ( $this->builtin_all as $record ) {
@@ -225,8 +225,14 @@ final class Industry_Pack_Registry {
 	public function merge_order(): array {
 		$applied = $this->get_applied_bundle_ids();
 		return array(
-			array( 'layer' => 'builtin', 'refs' => array() ),
-			array( 'layer' => 'applied', 'refs' => $applied ),
+			array(
+				'layer' => 'builtin',
+				'refs'  => array(),
+			),
+			array(
+				'layer' => 'applied',
+				'refs'  => $applied,
+			),
 		);
 	}
 

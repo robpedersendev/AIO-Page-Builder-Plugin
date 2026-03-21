@@ -93,7 +93,7 @@ final class Build_Plan_Row_Action_Resolver {
 			true
 		);
 		if ( $supports_execution ) {
-			$can_run = $status === Build_Plan_Item_Statuses::APPROVED
+			$can_run   = $status === Build_Plan_Item_Statuses::APPROVED
 				&& Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
 			$actions[] = array(
 				'action_id' => self::ACTION_EXECUTE,

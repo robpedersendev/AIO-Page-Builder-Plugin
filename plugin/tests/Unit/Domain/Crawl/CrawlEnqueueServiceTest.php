@@ -19,4 +19,3 @@ final class CrawlEnqueueServiceTest extends TestCase {
 		$this->assertTrue( class_exists( Crawl_Enqueue_Service::class ) );
 	}
 }
-

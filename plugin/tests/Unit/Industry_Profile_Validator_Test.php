@@ -39,8 +39,8 @@ final class Industry_Profile_Validator_Test extends TestCase {
 	}
 
 	public function test_unsupported_schema_version_normalizes_to_empty_profile(): void {
-		$validator = new Industry_Profile_Validator();
-		$profile   = array( Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '2' );
+		$validator  = new Industry_Profile_Validator();
+		$profile    = array( Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '2' );
 		$normalized = Industry_Profile_Schema::normalize( $profile );
 		$this->assertSame( Industry_Profile_Schema::get_empty_profile(), $normalized );
 		$this->assertTrue( $validator->validate( $profile ) );

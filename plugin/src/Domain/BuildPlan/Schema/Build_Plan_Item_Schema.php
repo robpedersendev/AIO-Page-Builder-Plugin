@@ -36,10 +36,10 @@ final class Build_Plan_Item_Schema {
 	public const ITEM_TYPE_NEW_PAGE             = 'new_page';
 	public const ITEM_TYPE_MENU_CHANGE          = 'menu_change';
 	/** Net-new menu creation (v2). payload: menu_name, ?theme_location, ?items. Emits CREATE_MENU envelope. */
-	public const ITEM_TYPE_MENU_NEW             = 'menu_new';
-	public const ITEM_TYPE_DESIGN_TOKEN         = 'design_token';
-	public const ITEM_TYPE_SEO                  = 'seo';
-	public const ITEM_TYPE_HIERARCHY_NOTE       = 'hierarchy_note';
+	public const ITEM_TYPE_MENU_NEW       = 'menu_new';
+	public const ITEM_TYPE_DESIGN_TOKEN   = 'design_token';
+	public const ITEM_TYPE_SEO            = 'seo';
+	public const ITEM_TYPE_HIERARCHY_NOTE = 'hierarchy_note';
 	/** Executable hierarchy assignment (v2). payload: page_id, parent_page_id. Emits ASSIGN_PAGE_HIERARCHY envelope. */
 	public const ITEM_TYPE_HIERARCHY_ASSIGNMENT = 'hierarchy_assignment';
 	public const ITEM_TYPE_OVERVIEW_NOTE        = 'overview_note';

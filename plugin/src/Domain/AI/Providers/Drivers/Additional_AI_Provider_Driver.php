@@ -51,8 +51,8 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		?Provider_Cost_Calculator $cost_calculator = null
 	) {
 		$this->cost_calculator = $cost_calculator;
-		$this->base_url       = rtrim( $base_url, '/' );
-		$default_capabilities = Additional_Provider_Capability_Profile::get_capabilities();
+		$this->base_url        = rtrim( $base_url, '/' );
+		$default_capabilities  = Additional_Provider_Capability_Profile::get_capabilities();
 		parent::__construct(
 			Additional_Provider_Capability_Profile::PROVIDER_ID,
 			$error_normalizer,

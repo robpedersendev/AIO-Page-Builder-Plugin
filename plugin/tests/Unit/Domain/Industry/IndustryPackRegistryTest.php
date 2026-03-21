@@ -62,7 +62,7 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Industry {
 			$builtin = Industry_Pack_Registry::get_builtin_pack_definitions();
 			$this->assertNotEmpty( $builtin, 'Expected builtin industry packs to exist.' );
 
-			$first = $builtin[0];
+			$first    = $builtin[0];
 			$pack_key = (string) $first[ Industry_Pack_Schema::FIELD_INDUSTRY_KEY ];
 
 			$bundle_id = 'bundle-1';
@@ -72,7 +72,7 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Industry {
 				array( 'apply_order' => array( $bundle_id ) )
 			);
 
-			$overlay = $first;
+			$overlay                                     = $first;
 			$overlay[ Industry_Pack_Schema::FIELD_NAME ] = 'Overlay Name';
 			update_option(
 				'aio_pb_industry_bundle_payload_' . sanitize_key( $bundle_id ),
@@ -98,4 +98,3 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Industry {
 		}
 	}
 }
-

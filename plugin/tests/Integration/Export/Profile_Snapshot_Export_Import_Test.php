@@ -104,7 +104,10 @@ final class Profile_Snapshot_Export_Import_Test extends TestCase {
 			'2025-06-01 10:00:00',
 			Versions::PROFILE_SCHEMA_VERSION,
 			array( 'brand_positioning_summary' => 'Test Brand' ),
-			array( 'industry' => 'SaaS', 'business_name' => 'Acme' ),
+			array(
+				'industry'      => 'SaaS',
+				'business_name' => 'Acme',
+			),
 			$source
 		);
 	}
@@ -194,8 +197,8 @@ final class Profile_Snapshot_Export_Import_Test extends TestCase {
 				'voice_tone'                => array( 'formality_level' => 'formal' ),
 			),
 			array(
-				'industry'  => 'Healthcare',
-				'personas'  => array( array( 'role' => 'Physician' ) ),
+				'industry' => 'Healthcare',
+				'personas' => array( array( 'role' => 'Physician' ) ),
 			),
 			'manual'
 		);

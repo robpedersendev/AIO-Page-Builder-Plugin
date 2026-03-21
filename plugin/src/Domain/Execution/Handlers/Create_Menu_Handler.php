@@ -130,7 +130,7 @@ final class Create_Menu_Handler implements Execution_Handler_Interface {
 	/**
 	 * Seeds the new menu with initial items. Skips items with no identifiable content.
 	 *
-	 * @param int                            $menu_id Nav menu term ID.
+	 * @param int                             $menu_id Nav menu term ID.
 	 * @param array<int, array<string,mixed>> $items   Seed item descriptors.
 	 * @return int Number of items successfully added.
 	 */

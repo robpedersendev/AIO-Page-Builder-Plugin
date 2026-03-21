@@ -77,7 +77,7 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Industry {
 			$settings = new Settings_Service();
 			$apply    = new Industry_Bundle_Apply_Service( $settings, new Industry_Bundle_Conflict_Scanner() );
 
-			$item_local = array(
+			$item_local    = array(
 				Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'plumber',
 				Industry_Pack_Schema::FIELD_NAME           => 'Plumber',
 				Industry_Pack_Schema::FIELD_SUMMARY        => 'A',
@@ -114,7 +114,7 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Industry {
 			$apply    = new Industry_Bundle_Apply_Service( $settings, new Industry_Bundle_Conflict_Scanner() );
 			$settings->set( Option_Names::PB_INDUSTRY_BUNDLE_MERGE_STATE, array() );
 
-			$item = array(
+			$item   = array(
 				Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'custompack',
 				Industry_Pack_Schema::FIELD_NAME           => 'Custom Pack',
 				Industry_Pack_Schema::FIELD_SUMMARY        => 'A',
@@ -143,4 +143,3 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Industry {
 		}
 	}
 }
-

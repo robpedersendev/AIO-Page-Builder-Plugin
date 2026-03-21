@@ -23,12 +23,12 @@ final class Version_State_Service {
 	 */
 	public function build_current_state(): array {
 		return array(
-			'plugin_version'        => Versions::plugin(),
-			'global_schema_version' => Versions::global_schema(),
-			'table_schema_version'  => Versions::table_schema(),
+			'plugin_version'          => Versions::plugin(),
+			'global_schema_version'   => Versions::global_schema(),
+			'table_schema_version'    => Versions::table_schema(),
 			'registry_schema_version' => Versions::registry_schema(),
-			'export_schema_version' => Versions::export_schema(),
-			'last_migrated_at'      => gmdate( 'c' ),
+			'export_schema_version'   => Versions::export_schema(),
+			'last_migrated_at'        => gmdate( 'c' ),
 		);
 	}
 
@@ -52,4 +52,3 @@ final class Version_State_Service {
 		return \update_option( Option_Names::PB_VERSION_STATE, $state, false );
 	}
 }
-

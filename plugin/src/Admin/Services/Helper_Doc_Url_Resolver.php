@@ -98,4 +98,3 @@ final class Helper_Doc_Url_Resolver {
 		);
 	}
 }
-

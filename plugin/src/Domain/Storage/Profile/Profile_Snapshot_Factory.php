@@ -32,10 +32,10 @@ final class Profile_Snapshot_Factory {
 	 * Builds a new snapshot from the current profile store state.
 	 *
 	 * @param Profile_Store_Interface $store Current profile store (read-only access).
-	 * @param string        $source      Capture context: brand_profile_merge, business_profile_merge,
-	 *                                   onboarding_completion, restore_event, manual.
-	 * @param string        $scope_type  Snapshot scope type per Profile_Schema::SNAPSHOT_SCOPE_TYPES.
-	 * @param string        $scope_id    Optional scope reference (e.g. AI run ID or plan ID).
+	 * @param string                  $source      Capture context: brand_profile_merge, business_profile_merge,
+	 *                                             onboarding_completion, restore_event, manual.
+	 * @param string                  $scope_type  Snapshot scope type per Profile_Schema::SNAPSHOT_SCOPE_TYPES.
+	 * @param string                  $scope_id    Optional scope reference (e.g. AI run ID or plan ID).
 	 * @return Profile_Snapshot_Data     Unsaved snapshot value object.
 	 */
 	public function build(

@@ -19,12 +19,11 @@ namespace AIOPageBuilder\Tests\Unit\Infrastructure\Lifecycle {
 
 	final class LifecycleManagerTest extends TestCase {
 
-	public function test_deactivate_sets_last_deactivation_at(): void {
-		$mgr                  = new Lifecycle_Manager();
-		$mgr->deactivate();
-		$value = \get_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_LAST_DEACTIVATION_AT, '' );
-		$this->assertNotSame( '', (string) $value );
-	}
+		public function test_deactivate_sets_last_deactivation_at(): void {
+			$mgr = new Lifecycle_Manager();
+			$mgr->deactivate();
+			$value = \get_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_LAST_DEACTIVATION_AT, '' );
+			$this->assertNotSame( '', (string) $value );
+		}
 	}
 }
-

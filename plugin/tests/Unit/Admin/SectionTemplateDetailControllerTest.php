@@ -24,4 +24,3 @@ final class SectionTemplateDetailControllerTest extends TestCase {
 		$this->assertSame( 'aio-page-builder-section-template-detail', Section_Template_Detail_Screen::SLUG );
 	}
 }
-

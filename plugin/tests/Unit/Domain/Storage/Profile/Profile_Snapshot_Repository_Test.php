@@ -56,9 +56,9 @@ if ( ! class_exists( 'AIOPageBuilder\Tests\Unit\Domain\Storage\Profile\Fake_Wpdb
 			if ( ! isset( $this->tables[ $table ] ) ) {
 				return 0;
 			}
-			$key      = array_key_first( $where );
-			$val      = $where[ $key ];
-			$before   = count( $this->tables[ $table ] );
+			$key                    = array_key_first( $where );
+			$val                    = $where[ $key ];
+			$before                 = count( $this->tables[ $table ] );
 			$this->tables[ $table ] = array_values(
 				array_filter(
 					$this->tables[ $table ],
@@ -138,7 +138,7 @@ final class Profile_Snapshot_Repository_Test extends TestCase {
 	}
 
 	public function test_save_inserts_row(): void {
-		$snap = $this->snapshot();
+		$snap   = $this->snapshot();
 		$result = $this->repo->save( $snap );
 		$this->assertTrue( $result );
 		$this->assertCount( 1, $this->wpdb->tables['wp_aio_profile_snapshots'] ?? array() );
@@ -174,8 +174,14 @@ final class Profile_Snapshot_Repository_Test extends TestCase {
 	}
 
 	public function test_brand_and_business_profiles_survive_round_trip(): void {
-		$brand    = array( 'name' => 'Acme Co.', 'tagline' => 'Building Tomorrow' );
-		$business = array( 'industry' => 'SaaS', 'personas' => array( array( 'role' => 'Buyer' ) ) );
+		$brand    = array(
+			'name'    => 'Acme Co.',
+			'tagline' => 'Building Tomorrow',
+		);
+		$business = array(
+			'industry' => 'SaaS',
+			'personas' => array( array( 'role' => 'Buyer' ) ),
+		);
 		$snap     = new Profile_Snapshot_Data( 'snap_rt', 'other', '', '2025-06-01 00:00:00', '1', $brand, $business, 'brand_profile_merge' );
 		$this->repo->save( $snap );
 		$loaded = $this->repo->get_by_id( 'snap_rt' );

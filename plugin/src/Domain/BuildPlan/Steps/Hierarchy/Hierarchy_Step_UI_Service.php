@@ -53,17 +53,17 @@ final class Hierarchy_Step_UI_Service {
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
 
-		$step  = $steps[ self::STEP_INDEX_HIERARCHY ] ?? null;
+		$step = $steps[ self::STEP_INDEX_HIERARCHY ] ?? null;
 		if ( ! is_array( $step ) ) {
 			return null;
 		}
 
-		$items       = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+		$items          = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
-		$step_rows   = array();
-		$exec_count  = 0;
-		$done_count  = 0;
+		$step_rows      = array();
+		$exec_count     = 0;
+		$done_count     = 0;
 		$advisory_count = 0;
 
 		foreach ( $items as $item ) {
@@ -89,23 +89,23 @@ final class Hierarchy_Step_UI_Service {
 			}
 
 			$step_rows[] = array(
-				'item_id'      => (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ),
-				'item_type'    => $item_type,
-				'status'       => $status,
-				'page_id'      => isset( $payload['page_id'] ) ? (int) $payload['page_id'] : null,
+				'item_id'        => (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ),
+				'item_type'      => $item_type,
+				'status'         => $status,
+				'page_id'        => isset( $payload['page_id'] ) ? (int) $payload['page_id'] : null,
 				'parent_page_id' => isset( $payload['parent_page_id'] ) ? (int) $payload['parent_page_id'] : null,
-				'note'         => isset( $payload['note'] ) ? (string) $payload['note'] : '',
-				'row_actions'  => $row_actions,
+				'note'           => isset( $payload['note'] ) ? (string) $payload['note'] : '',
+				'row_actions'    => $row_actions,
 			);
 		}
 
 		return array(
-			'step_index'      => self::STEP_INDEX_HIERARCHY,
-			'step_rows'       => $step_rows,
+			'step_index'       => self::STEP_INDEX_HIERARCHY,
+			'step_rows'        => $step_rows,
 			'executable_count' => $exec_count,
-			'completed_count' => $done_count,
-			'advisory_count'  => $advisory_count,
-			'column_order'    => array( 'page_id', 'parent_page_id', 'status', 'note' ),
+			'completed_count'  => $done_count,
+			'advisory_count'   => $advisory_count,
+			'column_order'     => array( 'page_id', 'parent_page_id', 'status', 'note' ),
 		);
 	}
 }

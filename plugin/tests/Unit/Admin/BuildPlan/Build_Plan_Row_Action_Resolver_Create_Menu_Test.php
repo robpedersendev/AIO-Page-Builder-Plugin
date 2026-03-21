@@ -41,7 +41,7 @@ final class Build_Plan_Row_Action_Resolver_Create_Menu_Test extends TestCase {
 		return array(
 			Build_Plan_Item_Schema::KEY_ITEM_ID   => 'test-item-' . $item_type . '-' . $status,
 			Build_Plan_Item_Schema::KEY_ITEM_TYPE => $item_type,
-			'status'                               => $status,
+			'status'                              => $status,
 			Build_Plan_Item_Schema::KEY_PAYLOAD   => array(),
 		);
 	}

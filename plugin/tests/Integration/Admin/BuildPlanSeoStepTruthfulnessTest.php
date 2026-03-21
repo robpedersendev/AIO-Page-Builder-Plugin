@@ -83,7 +83,10 @@ final class BuildPlanSeoStepTruthfulnessTest extends TestCase {
 		$workspace = $service->build_workspace(
 			$def,
 			SEO_Media_Step_UI_Service::STEP_INDEX_SEO,
-			array( 'can_approve' => true, 'can_execute' => true ),
+			array(
+				'can_approve' => true,
+				'can_execute' => true,
+			),
 			null,
 			array()
 		);
@@ -109,4 +112,3 @@ final class BuildPlanSeoStepTruthfulnessTest extends TestCase {
 		}
 	}
 }
-

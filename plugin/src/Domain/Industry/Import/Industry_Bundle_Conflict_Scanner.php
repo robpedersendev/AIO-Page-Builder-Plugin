@@ -20,7 +20,7 @@ final class Industry_Bundle_Conflict_Scanner {
 	public const CONFLICT_SAME_KEY_DIFFERENT_CONTENT = 'same_key_different_content';
 
 	/**
-	 * @param array<string, mixed> $bundle Valid bundle (manifest + payload).
+	 * @param array<string, mixed>                 $bundle Valid bundle (manifest + payload).
 	 * @param array<string, array<string, string>> $local_hashes Map: category => (object_key => sha256 hash).
 	 * @return list<array{category: string, object_key: string, conflict_type: string, incoming_hash: string, local_hash: string}>
 	 */
@@ -98,7 +98,7 @@ final class Industry_Bundle_Conflict_Scanner {
 				}
 				return $out;
 			}
-			$out = array();
+			$out  = array();
 			$keys = array_keys( $value );
 			sort( $keys );
 			foreach ( $keys as $k ) {
@@ -144,4 +144,3 @@ final class Industry_Bundle_Conflict_Scanner {
 		}
 	}
 }
-

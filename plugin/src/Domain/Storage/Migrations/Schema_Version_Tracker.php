@@ -53,7 +53,7 @@ final class Schema_Version_Tracker {
 	 * @return void
 	 */
 	public function set_installed_version( string $key, string $version ): void {
-		$current = $this->settings->get( self::VERSION_MARKERS_KEY );
+		$current         = $this->settings->get( self::VERSION_MARKERS_KEY );
 		$current[ $key ] = $version;
 		$this->settings->set( self::VERSION_MARKERS_KEY, $current );
 	}

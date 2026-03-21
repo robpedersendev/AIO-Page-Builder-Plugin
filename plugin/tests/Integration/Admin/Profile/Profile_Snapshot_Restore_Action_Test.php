@@ -54,8 +54,10 @@ function wp_json_encode( $data ): string {
 	$r = \json_encode( $data );
 	return is_string( $r ) ? $r : '';
 }
-function error_log( string $m ): bool { return true; }
-function gmdate( string $f, ?int $t = null ): string { return \gmdate( $f, $t ); }
+function error_log( string $m ): bool {
+	return true; }
+function gmdate( string $f, ?int $t = null ): string {
+	return \gmdate( $f, $t ); }
 
 // ---------------------------------------------------------------------------
 // In-memory Profile_Store that records writes for assertion.
@@ -152,7 +154,10 @@ final class Restore_Logic {
 	public function restore( string $snapshot_id ): array {
 		$snapshot = $this->repo->get_by_id( $snapshot_id );
 		if ( $snapshot === null ) {
-			return array( 'success' => false, 'error' => 'not_found' );
+			return array(
+				'success' => false,
+				'error'   => 'not_found',
+			);
 		}
 		// Capture pre-restore backup.
 		$pre = $this->factory->build( $this->store, 'pre_restore_backup', 'other', $snapshot_id ); // @phpstan-ignore-line
@@ -172,7 +177,10 @@ final class Restore_Logic {
 			'source_snapshot' => $snapshot_id,
 			'pre_backup_id'   => $pre->snapshot_id,
 		);
-		return array( 'success' => true, 'error' => '' );
+		return array(
+			'success' => true,
+			'error'   => '',
+		);
 	}
 }
 
@@ -207,13 +215,13 @@ final class Profile_Snapshot_Restore_Action_Test extends TestCase {
 
 	public function test_restore_fails_for_nonexistent_snapshot(): void {
 		[ , , $logic ] = $this->make_logic();
-		$result = $logic->restore( 'nonexistent' );
+		$result        = $logic->restore( 'nonexistent' );
 		$this->assertFalse( $result['success'] );
 		$this->assertSame( 'not_found', $result['error'] );
 	}
 
 	public function test_restore_writes_snapshot_fields_to_profile_store(): void {
-		$snap = $this->snapshot();
+		$snap                = $this->snapshot();
 		[ $store, , $logic ] = $this->make_logic( $snap );
 		$logic->restore( $snap->snapshot_id );
 		$this->assertNotEmpty( $store->set_calls );
@@ -223,7 +231,7 @@ final class Profile_Snapshot_Restore_Action_Test extends TestCase {
 	}
 
 	public function test_restore_saves_pre_backup_snapshot(): void {
-		$snap = $this->snapshot();
+		$snap               = $this->snapshot();
 		[ , $repo, $logic ] = $this->make_logic( $snap );
 		$logic->restore( $snap->snapshot_id );
 		$sources = array_column( $repo->saves, 'source' );
@@ -231,7 +239,7 @@ final class Profile_Snapshot_Restore_Action_Test extends TestCase {
 	}
 
 	public function test_restore_saves_post_restore_snapshot(): void {
-		$snap = $this->snapshot();
+		$snap               = $this->snapshot();
 		[ , $repo, $logic ] = $this->make_logic( $snap );
 		$logic->restore( $snap->snapshot_id );
 		$sources = array_column( $repo->saves, 'source' );
@@ -239,7 +247,7 @@ final class Profile_Snapshot_Restore_Action_Test extends TestCase {
 	}
 
 	public function test_restore_emits_audit_log_entry(): void {
-		$snap = $this->snapshot();
+		$snap          = $this->snapshot();
 		[ , , $logic ] = $this->make_logic( $snap );
 		$logic->restore( $snap->snapshot_id );
 		$this->assertNotEmpty( $logic->audit_log );
@@ -247,9 +255,9 @@ final class Profile_Snapshot_Restore_Action_Test extends TestCase {
 	}
 
 	public function test_restore_success_returns_true(): void {
-		$snap = $this->snapshot();
+		$snap          = $this->snapshot();
 		[ , , $logic ] = $this->make_logic( $snap );
-		$result = $logic->restore( $snap->snapshot_id );
+		$result        = $logic->restore( $snap->snapshot_id );
 		$this->assertTrue( $result['success'] );
 	}
 }

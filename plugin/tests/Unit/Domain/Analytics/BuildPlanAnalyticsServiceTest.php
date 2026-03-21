@@ -55,7 +55,7 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Analytics {
 		}
 
 		public function test_rollback_rate_is_zero_when_denominator_is_zero(): void {
-			$svc = new Build_Plan_Analytics_Service( new StubPlanListProvider(), new Operational_Snapshot_Repository() );
+			$svc     = new Build_Plan_Analytics_Service( new StubPlanListProvider(), new Operational_Snapshot_Repository() );
 			$summary = $svc->get_rollback_frequency_summary( '2026-01-01', '2026-01-31' );
 			$this->assertSame( 0, $summary['completed_rollbacks'] );
 			$this->assertSame( 0, $summary['rollback_eligible_completed_executions'] );
@@ -99,4 +99,3 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Analytics {
 		}
 	}
 }
-

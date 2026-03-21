@@ -60,12 +60,11 @@ final class Onboarding_State_Service {
 	 */
 	public function default_state(): array {
 		return array(
-			'current_step'     => 'welcome',
-			'completed_steps'  => array(),
-			'draft_status'     => 'not_started',
-			'last_changed_at'  => gmdate( 'c' ),
-			'last_changed_by'  => '',
+			'current_step'    => 'welcome',
+			'completed_steps' => array(),
+			'draft_status'    => 'not_started',
+			'last_changed_at' => gmdate( 'c' ),
+			'last_changed_by' => '',
 		);
 	}
 }
-

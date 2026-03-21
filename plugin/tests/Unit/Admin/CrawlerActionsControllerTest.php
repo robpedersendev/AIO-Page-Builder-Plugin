@@ -19,4 +19,3 @@ final class CrawlerActionsControllerTest extends TestCase {
 		$this->assertSame( 'aio-page-builder-crawler-sessions', Crawler_Sessions_Screen::SLUG );
 	}
 }
-

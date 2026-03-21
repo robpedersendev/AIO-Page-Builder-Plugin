@@ -110,21 +110,29 @@ final class Driver_Cost_Computation_Test extends TestCase {
 	public function test_openai_driver_computes_cost_usd_for_known_model(): void {
 		$GLOBALS['__driver_cost_test_mock_response'] = array(
 			'code' => 200,
-			'body' => json_encode( array(
-				'choices' => array( array( 'message' => array( 'content' => 'hello' ) ) ),
-				'usage'   => array( 'prompt_tokens' => 1000, 'completion_tokens' => 500, 'total_tokens' => 1500 ),
-				'model'   => 'gpt-4o',
-				'id'      => 'chatcmpl-test',
-			) ),
+			'body' => json_encode(
+				array(
+					'choices' => array( array( 'message' => array( 'content' => 'hello' ) ) ),
+					'usage'   => array(
+						'prompt_tokens'     => 1000,
+						'completion_tokens' => 500,
+						'total_tokens'      => 1500,
+					),
+					'model'   => 'gpt-4o',
+					'id'      => 'chatcmpl-test',
+				)
+			),
 		);
 
-		$driver   = $this->build_openai_driver();
-		$result   = $driver->request( array(
-			'request_id'    => 'req-1',
-			'model'         => 'gpt-4o',
-			'user_message'  => 'test',
-			'system_prompt' => '',
-		) );
+		$driver = $this->build_openai_driver();
+		$result = $driver->request(
+			array(
+				'request_id'    => 'req-1',
+				'model'         => 'gpt-4o',
+				'user_message'  => 'test',
+				'system_prompt' => '',
+			)
+		);
 
 		$this->assertTrue( $result['success'] );
 		$this->assertNotNull( $result['usage']['cost_usd'] );
@@ -137,11 +145,17 @@ final class Driver_Cost_Computation_Test extends TestCase {
 	public function test_openai_driver_leaves_cost_usd_null_when_no_calculator(): void {
 		$GLOBALS['__driver_cost_test_mock_response'] = array(
 			'code' => 200,
-			'body' => json_encode( array(
-				'choices' => array( array( 'message' => array( 'content' => 'hello' ) ) ),
-				'usage'   => array( 'prompt_tokens' => 1000, 'completion_tokens' => 500, 'total_tokens' => 1500 ),
-				'model'   => 'gpt-4o',
-			) ),
+			'body' => json_encode(
+				array(
+					'choices' => array( array( 'message' => array( 'content' => 'hello' ) ) ),
+					'usage'   => array(
+						'prompt_tokens'     => 1000,
+						'completion_tokens' => 500,
+						'total_tokens'      => 1500,
+					),
+					'model'   => 'gpt-4o',
+				)
+			),
 		);
 
 		$driver = new Concrete_AI_Provider_Driver(
@@ -151,12 +165,14 @@ final class Driver_Cost_Computation_Test extends TestCase {
 			'http://mock.local'
 			// No calculator — cost_usd should remain null.
 		);
-		$result = $driver->request( array(
-			'request_id'    => 'req-2',
-			'model'         => 'gpt-4o',
-			'user_message'  => 'test',
-			'system_prompt' => '',
-		) );
+		$result = $driver->request(
+			array(
+				'request_id'    => 'req-2',
+				'model'         => 'gpt-4o',
+				'user_message'  => 'test',
+				'system_prompt' => '',
+			)
+		);
 
 		$this->assertTrue( $result['success'] );
 		$this->assertNull( $result['usage']['cost_usd'] );
@@ -165,20 +181,28 @@ final class Driver_Cost_Computation_Test extends TestCase {
 	public function test_openai_driver_leaves_cost_usd_null_for_unknown_model(): void {
 		$GLOBALS['__driver_cost_test_mock_response'] = array(
 			'code' => 200,
-			'body' => json_encode( array(
-				'choices' => array( array( 'message' => array( 'content' => 'hello' ) ) ),
-				'usage'   => array( 'prompt_tokens' => 100, 'completion_tokens' => 50, 'total_tokens' => 150 ),
-				'model'   => 'gpt-unknown-future',
-			) ),
+			'body' => json_encode(
+				array(
+					'choices' => array( array( 'message' => array( 'content' => 'hello' ) ) ),
+					'usage'   => array(
+						'prompt_tokens'     => 100,
+						'completion_tokens' => 50,
+						'total_tokens'      => 150,
+					),
+					'model'   => 'gpt-unknown-future',
+				)
+			),
 		);
 
 		$driver = $this->build_openai_driver();
-		$result = $driver->request( array(
-			'request_id'    => 'req-3',
-			'model'         => 'gpt-unknown-future',
-			'user_message'  => 'test',
-			'system_prompt' => '',
-		) );
+		$result = $driver->request(
+			array(
+				'request_id'    => 'req-3',
+				'model'         => 'gpt-unknown-future',
+				'user_message'  => 'test',
+				'system_prompt' => '',
+			)
+		);
 
 		$this->assertTrue( $result['success'] );
 		$this->assertNull( $result['usage']['cost_usd'] );
@@ -187,22 +211,34 @@ final class Driver_Cost_Computation_Test extends TestCase {
 	public function test_anthropic_driver_computes_cost_usd_for_known_model(): void {
 		$GLOBALS['__driver_cost_test_mock_response'] = array(
 			'code' => 200,
-			'body' => json_encode( array(
-				'content'     => array( array( 'text' => 'hello', 'type' => 'text' ) ),
-				'usage'       => array( 'input_tokens' => 2000, 'output_tokens' => 1000 ),
-				'model'       => 'claude-sonnet-4-20250514',
-				'id'          => 'msg-test',
-				'stop_reason' => 'end_turn',
-			) ),
+			'body' => json_encode(
+				array(
+					'content'     => array(
+						array(
+							'text' => 'hello',
+							'type' => 'text',
+						),
+					),
+					'usage'       => array(
+						'input_tokens'  => 2000,
+						'output_tokens' => 1000,
+					),
+					'model'       => 'claude-sonnet-4-20250514',
+					'id'          => 'msg-test',
+					'stop_reason' => 'end_turn',
+				)
+			),
 		);
 
 		$driver = $this->build_anthropic_driver();
-		$result = $driver->request( array(
-			'request_id'    => 'req-4',
-			'model'         => 'claude-sonnet-4-20250514',
-			'user_message'  => 'test',
-			'system_prompt' => '',
-		) );
+		$result = $driver->request(
+			array(
+				'request_id'    => 'req-4',
+				'model'         => 'claude-sonnet-4-20250514',
+				'user_message'  => 'test',
+				'system_prompt' => '',
+			)
+		);
 
 		$this->assertTrue( $result['success'] );
 		$this->assertNotNull( $result['usage']['cost_usd'] );
@@ -213,11 +249,21 @@ final class Driver_Cost_Computation_Test extends TestCase {
 	public function test_anthropic_driver_leaves_cost_usd_null_when_no_calculator(): void {
 		$GLOBALS['__driver_cost_test_mock_response'] = array(
 			'code' => 200,
-			'body' => json_encode( array(
-				'content'     => array( array( 'text' => 'hello', 'type' => 'text' ) ),
-				'usage'       => array( 'input_tokens' => 500, 'output_tokens' => 200 ),
-				'model'       => 'claude-sonnet-4-20250514',
-			) ),
+			'body' => json_encode(
+				array(
+					'content' => array(
+						array(
+							'text' => 'hello',
+							'type' => 'text',
+						),
+					),
+					'usage'   => array(
+						'input_tokens'  => 500,
+						'output_tokens' => 200,
+					),
+					'model'   => 'claude-sonnet-4-20250514',
+				)
+			),
 		);
 
 		$driver = new Additional_AI_Provider_Driver(
@@ -226,12 +272,14 @@ final class Driver_Cost_Computation_Test extends TestCase {
 			new Stub_Secret_Store_Cost(),
 			'http://mock.local'
 		);
-		$result = $driver->request( array(
-			'request_id'    => 'req-5',
-			'model'         => 'claude-sonnet-4-20250514',
-			'user_message'  => 'test',
-			'system_prompt' => '',
-		) );
+		$result = $driver->request(
+			array(
+				'request_id'    => 'req-5',
+				'model'         => 'claude-sonnet-4-20250514',
+				'user_message'  => 'test',
+				'system_prompt' => '',
+			)
+		);
 
 		$this->assertTrue( $result['success'] );
 		$this->assertNull( $result['usage']['cost_usd'] );
@@ -240,20 +288,28 @@ final class Driver_Cost_Computation_Test extends TestCase {
 	public function test_token_counts_unaffected_by_calculator(): void {
 		$GLOBALS['__driver_cost_test_mock_response'] = array(
 			'code' => 200,
-			'body' => json_encode( array(
-				'choices' => array( array( 'message' => array( 'content' => 'hello' ) ) ),
-				'usage'   => array( 'prompt_tokens' => 777, 'completion_tokens' => 333, 'total_tokens' => 1110 ),
-				'model'   => 'gpt-4o',
-			) ),
+			'body' => json_encode(
+				array(
+					'choices' => array( array( 'message' => array( 'content' => 'hello' ) ) ),
+					'usage'   => array(
+						'prompt_tokens'     => 777,
+						'completion_tokens' => 333,
+						'total_tokens'      => 1110,
+					),
+					'model'   => 'gpt-4o',
+				)
+			),
 		);
 
 		$driver = $this->build_openai_driver();
-		$result = $driver->request( array(
-			'request_id'    => 'req-6',
-			'model'         => 'gpt-4o',
-			'user_message'  => 'test',
-			'system_prompt' => '',
-		) );
+		$result = $driver->request(
+			array(
+				'request_id'    => 'req-6',
+				'model'         => 'gpt-4o',
+				'user_message'  => 'test',
+				'system_prompt' => '',
+			)
+		);
 
 		$this->assertSame( 777, $result['usage']['prompt_tokens'] );
 		$this->assertSame( 333, $result['usage']['completion_tokens'] );

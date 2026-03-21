@@ -219,8 +219,8 @@ final class Import_Validator_And_Restore_Test extends TestCase {
 		}
 		$manifest = $this->minimal_manifest( '2' );
 		$manifest['compatibility_flags']['same_major_required'] = false;
-		$tmp      = sys_get_temp_dir() . '/aio-newer-' . uniqid() . '.zip';
-		$zip      = new \ZipArchive();
+		$tmp = sys_get_temp_dir() . '/aio-newer-' . uniqid() . '.zip';
+		$zip = new \ZipArchive();
 		$zip->open( $tmp, \ZipArchive::CREATE | \ZipArchive::OVERWRITE );
 		$zip->addFromString( 'manifest.json', wp_json_encode( $manifest ) );
 		$zip->close();

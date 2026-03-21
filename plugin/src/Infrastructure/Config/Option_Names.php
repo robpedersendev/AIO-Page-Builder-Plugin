@@ -103,26 +103,26 @@ final class Option_Names {
 	 * Production readiness / lifecycle options (explicit keys; do not prefix-change).
 	 * These are referenced by external operational docs and lifecycle hooks.
 	 */
-	public const PB_DO_FIRST_RUN_REDIRECT      = 'aio_pb_do_first_run_redirect';
-	public const PB_INSTALLATION_ID            = 'aio_pb_installation_id';
-	public const PB_UNINSTALL_CLEANUP_MODE     = 'aio_pb_uninstall_cleanup_mode';
-	public const PB_LAST_DEACTIVATION_AT       = 'aio_pb_last_deactivation_at';
-	public const PB_VERSION_STATE              = 'aio_pb_version_state';
-	public const PB_ENVIRONMENT_DIAGNOSTICS    = 'aio_pb_environment_diagnostics';
-	public const PB_AI_PROVIDERS               = 'aio_pb_ai_providers';
-	public const PB_BUSINESS_PROFILE           = 'aio_pb_business_profile';
-	public const PB_BRAND_PROFILE              = 'aio_pb_brand_profile';
-	public const PB_AUDIENCE_PROFILES          = 'aio_pb_audience_profiles';
-	public const PB_OFFERS                     = 'aio_pb_offers';
-	public const PB_GEOGRAPHY_PROFILE          = 'aio_pb_geography_profile';
-	public const PB_COMPETITORS                = 'aio_pb_competitors';
-	public const PB_ASSET_REFS                 = 'aio_pb_asset_refs';
-	public const PB_EXISTING_SITE_CONTEXT      = 'aio_pb_existing_site_context';
-	public const PB_ONBOARDING_DRAFT           = 'aio_pb_onboarding_draft';
-	public const PB_ONBOARDING_STATE           = 'aio_pb_onboarding_state';
+	public const PB_DO_FIRST_RUN_REDIRECT        = 'aio_pb_do_first_run_redirect';
+	public const PB_INSTALLATION_ID              = 'aio_pb_installation_id';
+	public const PB_UNINSTALL_CLEANUP_MODE       = 'aio_pb_uninstall_cleanup_mode';
+	public const PB_LAST_DEACTIVATION_AT         = 'aio_pb_last_deactivation_at';
+	public const PB_VERSION_STATE                = 'aio_pb_version_state';
+	public const PB_ENVIRONMENT_DIAGNOSTICS      = 'aio_pb_environment_diagnostics';
+	public const PB_AI_PROVIDERS                 = 'aio_pb_ai_providers';
+	public const PB_BUSINESS_PROFILE             = 'aio_pb_business_profile';
+	public const PB_BRAND_PROFILE                = 'aio_pb_brand_profile';
+	public const PB_AUDIENCE_PROFILES            = 'aio_pb_audience_profiles';
+	public const PB_OFFERS                       = 'aio_pb_offers';
+	public const PB_GEOGRAPHY_PROFILE            = 'aio_pb_geography_profile';
+	public const PB_COMPETITORS                  = 'aio_pb_competitors';
+	public const PB_ASSET_REFS                   = 'aio_pb_asset_refs';
+	public const PB_EXISTING_SITE_CONTEXT        = 'aio_pb_existing_site_context';
+	public const PB_ONBOARDING_DRAFT             = 'aio_pb_onboarding_draft';
+	public const PB_ONBOARDING_STATE             = 'aio_pb_onboarding_state';
 	public const PB_ONBOARDING_LAST_SUBMITTED_AT = 'aio_pb_onboarding_last_submitted_at';
-	public const PB_INDUSTRY_BUNDLE_REGISTRY   = 'aio_pb_industry_bundle_registry';
-	public const PB_INDUSTRY_BUNDLE_MERGE_STATE = 'aio_pb_industry_bundle_merge_state';
+	public const PB_INDUSTRY_BUNDLE_REGISTRY     = 'aio_pb_industry_bundle_registry';
+	public const PB_INDUSTRY_BUNDLE_MERGE_STATE  = 'aio_pb_industry_bundle_merge_state';
 
 	/**
 	 * Returns all known option keys in stable order.

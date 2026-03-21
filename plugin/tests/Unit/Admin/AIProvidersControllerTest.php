@@ -21,4 +21,3 @@ final class AIProvidersControllerTest extends TestCase {
 		$this->assertSame( 'aio_manage_ai_providers', $screen->get_capability() );
 	}
 }
-

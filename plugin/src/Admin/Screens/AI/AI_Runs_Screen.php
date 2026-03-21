@@ -56,7 +56,7 @@ final class AI_Runs_Screen {
 	}
 
 	private function render_list(): void {
-		$runs         = array();
+		$runs            = array();
 		$spend_summaries = array();
 		if ( $this->container && $this->container->has( 'ai_run_repository' ) ) {
 			try {

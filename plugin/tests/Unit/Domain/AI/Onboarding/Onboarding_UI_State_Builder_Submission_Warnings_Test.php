@@ -70,7 +70,7 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				),
 			)
 		);
-		$builder = $this->base_builder( $repo, $settings );
+		$builder                        = $this->base_builder( $repo, $settings );
 		$GLOBALS['_aio_get_post_by_id'] = array(
 			10 => new WP_Post(
 				array(
@@ -79,9 +79,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				)
 			),
 		);
-		$draft   = array( 'last_planning_run_post_id' => 10 );
-		$prefill = array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) );
-		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
+		$draft                          = array( 'last_planning_run_post_id' => 10 );
+		$prefill                        = array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) );
+		$w                              = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertSame( array(), $w );
 	}
 
@@ -102,7 +102,7 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				),
 			)
 		);
-		$builder = $this->base_builder( $repo, $settings );
+		$builder                        = $this->base_builder( $repo, $settings );
 		$GLOBALS['_aio_get_post_by_id'] = array(
 			10 => new WP_Post(
 				array(
@@ -111,9 +111,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				)
 			),
 		);
-		$draft   = array( 'last_planning_run_post_id' => 10 );
-		$prefill = array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) );
-		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
+		$draft                          = array( 'last_planning_run_post_id' => 10 );
+		$prefill                        = array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) );
+		$w                              = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertCount( 1, $w );
 		$this->assertSame( 'profile_updated_since_last_run', $w[0]['code'] );
 	}
@@ -147,7 +147,7 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				),
 			)
 		);
-		$builder = $this->base_builder( $repo, $settings );
+		$builder                        = $this->base_builder( $repo, $settings );
 		$GLOBALS['_aio_get_post_by_id'] = array(
 			10 => new WP_Post(
 				array(
@@ -156,9 +156,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				)
 			),
 		);
-		$draft   = array( 'last_planning_run_post_id' => 10 );
-		$prefill = array( 'latest_crawl_session_timestamp' => '1990-01-01T00:00:00Z' );
-		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
+		$draft                          = array( 'last_planning_run_post_id' => 10 );
+		$prefill                        = array( 'latest_crawl_session_timestamp' => '1990-01-01T00:00:00Z' );
+		$w                              = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertCount( 2, $w );
 		$codes = array( $w[0]['code'], $w[1]['code'] );
 		$this->assertContains( 'profile_updated_since_last_run', $codes );
@@ -182,7 +182,7 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 			Option_Names::MAIN_SETTINGS,
 			array( 'onboarding_stale_crawl_warning_days' => 3650 )
 		);
-		$repo     = $this->createMock( Profile_Snapshot_Repository_Interface::class );
+		$repo = $this->createMock( Profile_Snapshot_Repository_Interface::class );
 		$repo->method( 'get_all' )->willReturn( array() );
 		$builder = $this->base_builder( $repo, $settings );
 		$draft   = array();

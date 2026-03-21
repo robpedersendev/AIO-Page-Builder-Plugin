@@ -109,8 +109,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 			}
 		}
 		if ( $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
-			$repo                  = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
-			$profile               = $repo && \method_exists( $repo, 'get_profile' ) ? $repo->get_profile() : array();
+			$repo                               = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+			$profile                            = $repo && \method_exists( $repo, 'get_profile' ) ? $repo->get_profile() : array();
 			$state['has_site_industry_profile'] = ! empty( $profile['primary_industry_key'] );
 		}
 		return $state;
@@ -184,13 +184,13 @@ final class Industry_Bundle_Import_Preview_Screen {
 	 * @return void
 	 */
 	private function render_preview( array $state ): void {
-		$conflicts         = $state['conflicts'];
-		$included          = $state['included'];
-		$summary           = $state['summary'];
-		$bundle            = $state['bundle'];
-		$preview_url       = \admin_url( 'admin.php?page=' . self::SLUG );
-		$cancel_url        = \wp_nonce_url( \add_query_arg( 'aio_bundle_cancel', '1', $preview_url ), self::NONCE_ACTION_CLEAR );
-		$can_apply         = \current_user_can( Capabilities::MANAGE_SETTINGS );
+		$conflicts   = $state['conflicts'];
+		$included    = $state['included'];
+		$summary     = $state['summary'];
+		$bundle      = $state['bundle'];
+		$preview_url = \admin_url( 'admin.php?page=' . self::SLUG );
+		$cancel_url  = \wp_nonce_url( \add_query_arg( 'aio_bundle_cancel', '1', $preview_url ), self::NONCE_ACTION_CLEAR );
+		$can_apply   = \current_user_can( Capabilities::MANAGE_SETTINGS );
 		?>
 		<section class="aio-bundle-preview-summary" style="margin: 1.5em 0;">
 			<h2><?php \esc_html_e( 'Bundle summary', 'aio-page-builder' ); ?></h2>
@@ -258,8 +258,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 					<p><strong><?php \esc_html_e( 'Conflict decisions', 'aio-page-builder' ); ?></strong></p>
 					<?php foreach ( $conflicts as $c ) : ?>
 						<?php
-						$cat = isset( $c['category'] ) ? (string) $c['category'] : '';
-						$key = isset( $c['object_key'] ) ? (string) $c['object_key'] : '';
+						$cat  = isset( $c['category'] ) ? (string) $c['category'] : '';
+						$key  = isset( $c['object_key'] ) ? (string) $c['object_key'] : '';
 						$name = 'conflict_decisions[' . \esc_attr( $cat . '|' . $key ) . ']';
 						?>
 						<div style="margin: .75em 0; padding: .75em; border: 1px solid #ccd0d4; background: #fff;">

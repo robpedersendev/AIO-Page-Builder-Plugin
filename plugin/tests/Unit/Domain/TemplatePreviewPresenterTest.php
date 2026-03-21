@@ -31,4 +31,3 @@ final class TemplatePreviewPresenterTest extends TestCase {
 		$this->assertSame( 'Rendered preview', $p->get_preview_aria_label( true ) );
 	}
 }
-

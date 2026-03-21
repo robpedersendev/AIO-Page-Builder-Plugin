@@ -102,7 +102,7 @@ final class AI_Providers_Screen {
 			$test_service = $this->container->get( 'provider_connection_test_service' );
 			$result       = $test_service->run_test( $driver );
 			$this->persist_provider_state_after_test( $provider_id, $result->is_success() );
-			$message      = $result->is_success()
+			$message = $result->is_success()
 				? __( 'Connection test succeeded.', 'aio-page-builder' )
 				: $result->get_user_message();
 			$this->redirect_back( $result->is_success() ? 'success' : 'error', $message );
@@ -320,9 +320,9 @@ final class AI_Providers_Screen {
 		if ( ! $this->container ) {
 			return false;
 		}
-		$cap_raw   = isset( $_POST['monthly_cap_usd'] ) ? (string) \wp_unslash( $_POST['monthly_cap_usd'] ) : '0';
-		$cap_usd   = max( 0.0, (float) $cap_raw );
-		$override  = ! empty( $_POST['override_cap_exceeded'] );
+		$cap_raw  = isset( $_POST['monthly_cap_usd'] ) ? (string) \wp_unslash( $_POST['monthly_cap_usd'] ) : '0';
+		$cap_usd  = max( 0.0, (float) $cap_raw );
+		$override = ! empty( $_POST['override_cap_exceeded'] );
 		/** @var Provider_Spend_Cap_Settings $cap_settings */
 		$cap_settings = $this->container->get( 'provider_spend_cap_settings' );
 		$cap_settings->save_settings( $provider_id, $cap_usd, $override );
@@ -350,8 +350,9 @@ final class AI_Providers_Screen {
 		<div class="wrap aio-ai-spend-cap-section">
 			<h2><?php \esc_html_e( 'Monthly Spend Caps', 'aio-page-builder' ); ?></h2>
 			<p><?php \esc_html_e( 'Set a per-provider monthly spend cap to prevent unexpected costs. When exceeded, new AI runs are blocked unless the override is enabled. Cost tracking uses approximate rates; verify totals in your provider dashboard.', 'aio-page-builder' ); ?></p>
-			<?php foreach ( $provider_rows as $row ) :
-				$pid     = $row['provider_id'] ?? '';
+			<?php
+			foreach ( $provider_rows as $row ) :
+				$pid = $row['provider_id'] ?? '';
 				if ( $pid === '' ) {
 					continue;
 				}

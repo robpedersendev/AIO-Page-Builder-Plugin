@@ -31,31 +31,39 @@ require_once $plugin_root . '/src/Domain/Execution/Handlers/Create_Menu_Handler.
 namespace AIOPageBuilder\Domain\Execution\Handlers;
 
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\wp_create_nav_menu' ) ) {
-	function wp_create_nav_menu( string $name ) { return 99; }
+	function wp_create_nav_menu( string $name ) {
+		return 99; }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\get_registered_nav_menus' ) ) {
-	function get_registered_nav_menus(): array { return array(); }
+	function get_registered_nav_menus(): array {
+		return array(); }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\get_theme_mod' ) ) {
-	function get_theme_mod( string $name ): array { return array(); }
+	function get_theme_mod( string $name ): array {
+		return array(); }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\set_theme_mod' ) ) {
 	function set_theme_mod( string $name, array $value ): void {}
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\wp_update_nav_menu_item' ) ) {
-	function wp_update_nav_menu_item( int $id, int $item_id, array $data ): int { return 1; }
+	function wp_update_nav_menu_item( int $id, int $item_id, array $data ): int {
+		return 1; }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\is_wp_error' ) ) {
-	function is_wp_error( $thing ): bool { return false; }
+	function is_wp_error( $thing ): bool {
+		return false; }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\sanitize_text_field' ) ) {
-	function sanitize_text_field( string $s ): string { return $s; }
+	function sanitize_text_field( string $s ): string {
+		return $s; }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\esc_url_raw' ) ) {
-	function esc_url_raw( string $url ): string { return $url; }
+	function esc_url_raw( string $url ): string {
+		return $url; }
 }
 if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\__' ) ) {
-	function __( string $text, string $domain = 'default' ): string { return $text; }
+	function __( string $text, string $domain = 'default' ): string {
+		return $text; }
 }
 
 namespace AIOPageBuilder\Tests\Integration\Domain\Execution;

@@ -36,11 +36,11 @@ final class Execution_Action_Types {
 	 * and item seeding. Distinct from UPDATE_MENU (rename/replace/update_existing) flows.
 	 * Triggered by ITEM_TYPE_MENU_NEW plan items.
 	 */
-	public const CREATE_MENU           = 'create_menu';
-	public const UPDATE_MENU           = 'update_menu';
-	public const APPLY_TOKEN_SET       = 'apply_token_set';
-	public const FINALIZE_PLAN         = 'finalize_plan';
-	public const ROLLBACK_ACTION       = 'rollback_action';
+	public const CREATE_MENU     = 'create_menu';
+	public const UPDATE_MENU     = 'update_menu';
+	public const APPLY_TOKEN_SET = 'apply_token_set';
+	public const FINALIZE_PLAN   = 'finalize_plan';
+	public const ROLLBACK_ACTION = 'rollback_action';
 
 	/**
 	 * Action types valid for execution. UPDATE_PAGE_METADATA is excluded (recommendation-only).

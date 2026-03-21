@@ -39,7 +39,7 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Industry {
 		public function test_scan_reports_conflict_when_same_key_has_different_hash(): void {
 			$scanner = new Industry_Bundle_Conflict_Scanner();
 
-			$local_item = array(
+			$local_item    = array(
 				Industry_Pack_Schema::FIELD_INDUSTRY_KEY   => 'plumber',
 				Industry_Pack_Schema::FIELD_NAME           => 'Plumber',
 				Industry_Pack_Schema::FIELD_SUMMARY        => 'A',
@@ -67,4 +67,3 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Industry {
 		}
 	}
 }
-

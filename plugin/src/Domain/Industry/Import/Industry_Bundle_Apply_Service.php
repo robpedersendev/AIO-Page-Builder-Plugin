@@ -32,11 +32,11 @@ final class Industry_Bundle_Apply_Service {
 	}
 
 	/**
-	 * @param array<string, mixed> $bundle Valid bundle.
-	 * @param string              $bundle_slug Slug-like label for registry record.
-	 * @param string              $scope One of SCOPE_*.
+	 * @param array<string, mixed>  $bundle Valid bundle.
+	 * @param string                $bundle_slug Slug-like label for registry record.
+	 * @param string                $scope One of SCOPE_*.
 	 * @param array<string, string> $decisions Map of "category|object_key" => "replace"|"skip".
-	 * @param int                 $user_id Current user ID.
+	 * @param int                   $user_id Current user ID.
 	 * @return array{ok: bool, bundle_id: string, error: string}
 	 */
 	public function apply( array $bundle, string $bundle_slug, string $scope, array $decisions, int $user_id ): array {
@@ -47,12 +47,20 @@ final class Industry_Bundle_Apply_Service {
 		$bundle_service = new Industry_Pack_Bundle_Service();
 		$errors         = $bundle_service->validate_bundle( $bundle );
 		if ( $errors !== array() ) {
-			return array( 'ok' => false, 'bundle_id' => '', 'error' => 'Invalid bundle.' );
+			return array(
+				'ok'        => false,
+				'bundle_id' => '',
+				'error'     => 'Invalid bundle.',
+			);
 		}
 
 		$allowed_categories = $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] ?? array();
 		if ( ! is_array( $allowed_categories ) ) {
-			return array( 'ok' => false, 'bundle_id' => '', 'error' => 'Invalid included_categories.' );
+			return array(
+				'ok'        => false,
+				'bundle_id' => '',
+				'error'     => 'Invalid included_categories.',
+			);
 		}
 
 		$bundle_id = function_exists( 'wp_generate_uuid4' ) ? wp_generate_uuid4() : (string) ( uniqid( 'aio_pb_bundle_', true ) );
@@ -63,7 +71,11 @@ final class Industry_Bundle_Apply_Service {
 		$effective_local_hashes = $this->get_effective_local_hashes();
 		$conflicts              = $this->scanner->scan( $bundle, $effective_local_hashes );
 		if ( $conflicts !== array() && ! $this->has_explicit_decisions_for_conflicts( $conflicts, $decisions ) ) {
-			return array( 'ok' => false, 'bundle_id' => '', 'error' => 'Conflicts require explicit decisions.' );
+			return array(
+				'ok'        => false,
+				'bundle_id' => '',
+				'error'     => 'Conflicts require explicit decisions.',
+			);
 		}
 
 		$payload_to_store = $this->build_payload_for_scope( $bundle, $scope, $decisions, $effective_local_hashes );
@@ -75,7 +87,7 @@ final class Industry_Bundle_Apply_Service {
 		$registry = $this->settings->get( Option_Names::PB_INDUSTRY_BUNDLE_REGISTRY );
 		$registry = is_array( $registry ) ? $registry : array();
 
-		$record = array(
+		$record     = array(
 			'bundle_id'      => $bundle_id,
 			'bundle_slug'    => $bundle_slug !== '' ? $bundle_slug : 'uploaded-bundle',
 			'bundle_version' => (string) ( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_BUNDLE_VERSION ] ?? '' ),
@@ -88,16 +100,20 @@ final class Industry_Bundle_Apply_Service {
 		$registry[] = $record;
 		$this->settings->set( Option_Names::PB_INDUSTRY_BUNDLE_REGISTRY, $registry );
 
-		$merge_state = $this->settings->get( Option_Names::PB_INDUSTRY_BUNDLE_MERGE_STATE );
-		$merge_state = is_array( $merge_state ) ? $merge_state : array();
-		$merge_state['apply_order'] = isset( $merge_state['apply_order'] ) && is_array( $merge_state['apply_order'] ) ? $merge_state['apply_order'] : array();
+		$merge_state                  = $this->settings->get( Option_Names::PB_INDUSTRY_BUNDLE_MERGE_STATE );
+		$merge_state                  = is_array( $merge_state ) ? $merge_state : array();
+		$merge_state['apply_order']   = isset( $merge_state['apply_order'] ) && is_array( $merge_state['apply_order'] ) ? $merge_state['apply_order'] : array();
 		$merge_state['apply_order'][] = $bundle_id;
-		$merge_state['apply_order'] = array_values( array_unique( array_map( 'strval', $merge_state['apply_order'] ) ) );
-		$merge_state['updated_at']  = gmdate( 'c' );
-		$merge_state['updated_by']  = $user_id;
+		$merge_state['apply_order']   = array_values( array_unique( array_map( 'strval', $merge_state['apply_order'] ) ) );
+		$merge_state['updated_at']    = gmdate( 'c' );
+		$merge_state['updated_by']    = $user_id;
 		$this->settings->set( Option_Names::PB_INDUSTRY_BUNDLE_MERGE_STATE, $merge_state );
 
-		return array( 'ok' => true, 'bundle_id' => $bundle_id, 'error' => '' );
+		return array(
+			'ok'        => true,
+			'bundle_id' => $bundle_id,
+			'error'     => '',
+		);
 	}
 
 	/**
@@ -129,7 +145,7 @@ final class Industry_Bundle_Apply_Service {
 	}
 
 	/**
-	 * @param array<string, mixed> $bundle
+	 * @param array<string, mixed>                 $bundle
 	 * @param array<string, array<string, string>> $hashes
 	 * @return array<string, array<string, string>>
 	 */
@@ -188,7 +204,7 @@ final class Industry_Bundle_Apply_Service {
 
 	/**
 	 * @param list<array{category: string, object_key: string}> $conflicts
-	 * @param array<string, string> $decisions
+	 * @param array<string, string>                             $decisions
 	 */
 	private function has_explicit_decisions_for_conflicts( array $conflicts, array $decisions ): bool {
 		foreach ( $conflicts as $c ) {
@@ -205,14 +221,14 @@ final class Industry_Bundle_Apply_Service {
 	}
 
 	/**
-	 * @param array<string, mixed> $bundle
-	 * @param string $scope
-	 * @param array<string, string> $decisions
+	 * @param array<string, mixed>                 $bundle
+	 * @param string                               $scope
+	 * @param array<string, string>                $decisions
 	 * @param array<string, array<string, string>> $effective_local_hashes
 	 * @return array<string, mixed>
 	 */
 	private function build_payload_for_scope( array $bundle, string $scope, array $decisions, array $effective_local_hashes ): array {
-		$out = $bundle;
+		$out      = $bundle;
 		$included = isset( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] ) && is_array( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] )
 			? $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ]
 			: array();
@@ -280,4 +296,3 @@ final class Industry_Bundle_Apply_Service {
 		return 'aio_pb_industry_bundle_conflicts_' . sanitize_key( $bundle_id );
 	}
 }
-

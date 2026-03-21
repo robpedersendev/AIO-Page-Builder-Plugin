@@ -44,7 +44,7 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 
 	/** Example Step 4 (design tokens) UI workspace payload (spec §35). */
 	public const EXAMPLE_STEP_4_PAYLOAD = array(
-		'step_list_rows'         => array(
+		'step_list_rows'     => array(
 			array(
 				'item_id'         => 'plan_dt_0',
 				'status'          => 'pending',
@@ -60,8 +60,8 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 				'is_selected'     => false,
 			),
 		),
-		'column_order'           => array( 'token_group', 'token_name', 'proposed_value', 'rationale', 'confidence' ),
-		'bulk_action_states'     => array(
+		'column_order'       => array( 'token_group', 'token_name', 'proposed_value', 'rationale', 'confidence' ),
+		'bulk_action_states' => array(
 			'apply_to_all_eligible' => array(
 				'enabled'        => false,
 				'label'          => 'Apply all tokens',
@@ -82,19 +82,19 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 				'label'   => 'Clear selection',
 			),
 		),
-		'detail_panel'           => array(
+		'detail_panel'       => array(
 			'item_id'     => '',
 			'sections'    => array(),
 			'row_actions' => array(),
 		),
-		'step_messages'          => array(
+		'step_messages'      => array(
 			array(
 				'severity' => 'info',
 				'message'  => '1 token pending review.',
 				'level'    => 'step',
 			),
 		),
-		'token_set_summary'      => array(
+		'token_set_summary'  => array(
 			'groups' => array( 'colors' => 1 ),
 			'total'  => 1,
 		),
@@ -102,7 +102,7 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 
 	/** Example Step 5 (SEO/media) UI workspace payload (spec §36). */
 	public const EXAMPLE_STEP_5_PAYLOAD = array(
-		'step_list_rows'               => array(
+		'step_list_rows'     => array(
 			array(
 				'item_id'         => 'plan_seo_0',
 				'status'          => 'pending',
@@ -116,8 +116,8 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 				'is_selected'     => false,
 			),
 		),
-		'column_order'                 => array( 'target_page_title_or_url', 'confidence', 'storage_path_indicator' ),
-		'bulk_action_states'           => array(
+		'column_order'       => array( 'target_page_title_or_url', 'confidence', 'storage_path_indicator' ),
+		'bulk_action_states' => array(
 			'apply_to_all_eligible' => array(
 				'enabled'        => false,
 				'label'          => 'Apply all',
@@ -138,12 +138,12 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 				'label'   => 'Clear selection',
 			),
 		),
-		'detail_panel'                 => array(
+		'detail_panel'       => array(
 			'item_id'     => '',
 			'sections'    => array(),
 			'row_actions' => array(),
 		),
-		'step_messages'                => array(),
+		'step_messages'      => array(),
 	);
 
 	/** Example Step 6 (finalization) UI workspace payload (spec §37). */
@@ -358,7 +358,10 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$workspace_all = $service->build_workspace(
 			$def,
 			Tokens_Step_UI_Service::STEP_INDEX_DESIGN_TOKENS,
-			array( 'can_approve' => false, 'can_execute' => true ),
+			array(
+				'can_approve' => false,
+				'can_execute' => true,
+			),
 			null,
 			array()
 		);

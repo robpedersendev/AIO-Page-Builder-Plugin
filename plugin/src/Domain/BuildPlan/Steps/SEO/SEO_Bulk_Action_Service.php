@@ -94,7 +94,7 @@ final class SEO_Bulk_Action_Service {
 	/**
 	 * Bulk approves selected pending SEO items in Step 5.
 	 *
-	 * @param int                 $plan_post_id Plan post ID.
+	 * @param int                $plan_post_id Plan post ID.
 	 * @param array<int, string> $item_ids     Selected item ids.
 	 * @return int Number of items updated.
 	 */
@@ -194,10 +194,10 @@ final class SEO_Bulk_Action_Service {
 			return 0;
 		}
 
-		$items  = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
+		$items = isset( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ) && is_array( $step[ Build_Plan_Item_Schema::KEY_ITEMS ] )
 			? $step[ Build_Plan_Item_Schema::KEY_ITEMS ]
 			: array();
-		$count  = 0;
+		$count = 0;
 		foreach ( $items as $i => $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -234,7 +234,7 @@ final class SEO_Bulk_Action_Service {
 	/**
 	 * Bulk sets status for selected eligible pending items only.
 	 *
-	 * @param int                 $plan_post_id Plan post ID.
+	 * @param int                $plan_post_id Plan post ID.
 	 * @param array<int, string> $item_ids     Selected item ids.
 	 * @param string             $new_status
 	 * @return int
@@ -300,22 +300,21 @@ final class SEO_Bulk_Action_Service {
 	/**
 	 * Minimal structured audit; safe for logs (no secrets).
 	 *
-	 * @param int                   $plan_post_id
-	 * @param string                $event_key
+	 * @param int                  $plan_post_id
+	 * @param string               $event_key
 	 * @param array<string, mixed> $details
-	 * @param bool                  $success
+	 * @param bool                 $success
 	 * @return void
 	 */
 	private function audit( int $plan_post_id, string $event_key, array $details, bool $success ): void {
 		$entry = array(
-			'event'      => $event_key,
-			'plan_post'  => $plan_post_id,
-			'success'    => $success,
-			'details'    => $details,
-			'actor'      => 'admin',
-			'timestamp'  => gmdate( 'c' ),
+			'event'     => $event_key,
+			'plan_post' => $plan_post_id,
+			'success'   => $success,
+			'details'   => $details,
+			'actor'     => 'admin',
+			'timestamp' => gmdate( 'c' ),
 		);
 		\error_log( '[AIO Page Builder] ' . \wp_json_encode( $entry ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 	}
 }
-

@@ -19,4 +19,3 @@ final class ProviderConnectionTestServiceTest extends TestCase {
 		$this->assertTrue( class_exists( Provider_Connection_Test_Service::class ) );
 	}
 }
-

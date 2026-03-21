@@ -82,7 +82,10 @@ final class Profile_Snapshot_Diff_Service_Test extends TestCase {
 	}
 
 	public function test_no_diff_when_profiles_are_identical(): void {
-		$brand    = array( 'name' => 'Acme', 'tagline' => 'Great' );
+		$brand    = array(
+			'name'    => 'Acme',
+			'tagline' => 'Great',
+		);
 		$business = array( 'industry' => 'Tech' );
 		$snap     = $this->snapshot( $brand, $business );
 		$store    = new Fake_Profile_Store_For_Diff( $brand, $business ); // @phpstan-ignore-line
@@ -102,9 +105,18 @@ final class Profile_Snapshot_Diff_Service_Test extends TestCase {
 	}
 
 	public function test_unchanged_field_omitted_by_default(): void {
-		$brand = array( 'name' => 'Same', 'tagline' => 'changed' );
+		$brand = array(
+			'name'    => 'Same',
+			'tagline' => 'changed',
+		);
 		$snap  = $this->snapshot( $brand, array() );
-		$store = new Fake_Profile_Store_For_Diff( array( 'name' => 'Same', 'tagline' => 'different' ), array() ); // @phpstan-ignore-line
+		$store = new Fake_Profile_Store_For_Diff(
+			array(
+				'name'    => 'Same',
+				'tagline' => 'different',
+			),
+			array()
+		); // @phpstan-ignore-line
 		$rows  = $this->diff_svc->diff( $snap, $store ); // @phpstan-ignore-line
 		$this->assertCount( 1, $rows );
 		$this->assertSame( 'tagline', $rows[0]['field'] );
@@ -136,17 +148,29 @@ final class Profile_Snapshot_Diff_Service_Test extends TestCase {
 	}
 
 	public function test_section_labels_are_correct(): void {
-		$snap  = $this->snapshot( array( 'name' => 'A' ), array( 'industry' => 'X' ) );
-		$store = new Fake_Profile_Store_For_Diff( array( 'name' => 'B' ), array( 'industry' => 'Y' ) ); // @phpstan-ignore-line
-		$rows  = $this->diff_svc->diff( $snap, $store ); // @phpstan-ignore-line
+		$snap     = $this->snapshot( array( 'name' => 'A' ), array( 'industry' => 'X' ) );
+		$store    = new Fake_Profile_Store_For_Diff( array( 'name' => 'B' ), array( 'industry' => 'Y' ) ); // @phpstan-ignore-line
+		$rows     = $this->diff_svc->diff( $snap, $store ); // @phpstan-ignore-line
 		$sections = array_column( $rows, 'section' );
 		$this->assertContains( 'brand_profile', $sections );
 		$this->assertContains( 'business_profile', $sections );
 	}
 
 	public function test_summary_returns_counts(): void {
-		$snap  = $this->snapshot( array( 'a' => '1', 'b' => '2' ), array() );
-		$store = new Fake_Profile_Store_For_Diff( array( 'a' => '1', 'b' => '9' ), array() ); // @phpstan-ignore-line
+		$snap  = $this->snapshot(
+			array(
+				'a' => '1',
+				'b' => '2',
+			),
+			array()
+		);
+		$store = new Fake_Profile_Store_For_Diff(
+			array(
+				'a' => '1',
+				'b' => '9',
+			),
+			array()
+		); // @phpstan-ignore-line
 		$sum   = $this->diff_svc->summary( $snap, $store ); // @phpstan-ignore-line
 		$this->assertSame( 2, $sum['total'] );
 		$this->assertSame( 1, $sum['changed'] );

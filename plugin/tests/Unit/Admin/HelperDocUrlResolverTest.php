@@ -24,7 +24,7 @@ require_once $plugin_root . '/src/Admin/Services/Helper_Doc_Url_Resolver.php';
 final class HelperDocUrlResolverTest extends TestCase {
 
 	public function test_resolve_returns_unavailable_when_registry_missing(): void {
-		$registry  = new class() implements Documentation_Registry_Lookup_Interface {
+		$registry = new class() implements Documentation_Registry_Lookup_Interface {
 			public function get_by_section_key( string $section_key ): ?array { // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
 				return null;
 			}
@@ -32,9 +32,9 @@ final class HelperDocUrlResolverTest extends TestCase {
 				return null;
 			}
 		};
-		$router    = new Admin_Router();
-		$resolver  = new Helper_Doc_Url_Resolver( $registry, $router );
-		$resolved  = $resolver->resolve( 'hero_intro', '1', null );
+		$router   = new Admin_Router();
+		$resolver = new Helper_Doc_Url_Resolver( $registry, $router );
+		$resolved = $resolver->resolve( 'hero_intro', '1', null );
 
 		$this->assertFalse( $resolved['available'] );
 		$this->assertSame( '', $resolved['url'] );
@@ -60,4 +60,3 @@ final class HelperDocUrlResolverTest extends TestCase {
 		$this->assertStringContainsString( 'aio-page-builder-documentation-detail', $resolved['url'] );
 	}
 }
-

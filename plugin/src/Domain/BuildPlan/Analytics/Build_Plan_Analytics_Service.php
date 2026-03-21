@@ -36,7 +36,7 @@ final class Build_Plan_Analytics_Service {
 		Build_Plan_List_Provider_Interface $plan_list_provider,
 		?Operational_Snapshot_Repository_Interface $snapshot_repository = null
 	) {
-		$this->plan_list_provider = $plan_list_provider;
+		$this->plan_list_provider  = $plan_list_provider;
 		$this->snapshot_repository = $snapshot_repository;
 	}
 
@@ -267,7 +267,7 @@ final class Build_Plan_Analytics_Service {
 			$month      = $ts !== false ? gmdate( 'Y-m', $ts ) : 'unknown';
 			if ( ! isset( $by_month[ $month ] ) ) {
 				$by_month[ $month ] = array(
-					'completed_rollbacks'                    => 0,
+					'completed_rollbacks' => 0,
 					'rollback_eligible_completed_executions' => 0,
 				);
 			}
@@ -291,8 +291,8 @@ final class Build_Plan_Analytics_Service {
 		$by_month_list = array();
 		foreach ( $by_month as $m => $row ) {
 			$by_month_list[] = array(
-				'month'                                => (string) $m,
-				'completed_rollbacks'                  => (int) $row['completed_rollbacks'],
+				'month'                                  => (string) $m,
+				'completed_rollbacks'                    => (int) $row['completed_rollbacks'],
 				'rollback_eligible_completed_executions' => (int) $row['rollback_eligible_completed_executions'],
 			);
 		}

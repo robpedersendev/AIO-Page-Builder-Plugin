@@ -323,7 +323,7 @@ if ( ! function_exists( 'set_transient' ) ) {
 }
 if ( ! function_exists( 'get_posts' ) ) {
 	function get_posts( $args = array() ) {
-		$posts = isset( $GLOBALS['_aio_wp_query_posts'] ) ? $GLOBALS['_aio_wp_query_posts'] : array();
+		$posts     = isset( $GLOBALS['_aio_wp_query_posts'] ) ? $GLOBALS['_aio_wp_query_posts'] : array();
 		$post_type = isset( $args['post_type'] ) ? $args['post_type'] : '';
 		if ( $post_type !== '' ) {
 			$by_type = array();
@@ -713,7 +713,11 @@ if ( ! function_exists( 'wp_remote_post' ) ) {
 	function wp_remote_post( $url, $args = array() ) {
 		return isset( $GLOBALS['__driver_cost_test_mock_response'] )
 			? $GLOBALS['__driver_cost_test_mock_response']
-			: array( 'code' => 200, 'body' => '', 'headers' => array() );
+			: array(
+				'code'    => 200,
+				'body'    => '',
+				'headers' => array(),
+			);
 	}
 }
 if ( ! function_exists( 'wp_create_nav_menu' ) ) {

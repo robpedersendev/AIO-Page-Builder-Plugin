@@ -50,18 +50,30 @@ require_once dirname( __DIR__, 5 ) . '/src/Domain/Storage/Profile/Profile_Store_
 final class Fake_Profile_Store_For_Factory implements Profile_Store_Interface {
 	public function get_full_profile(): array {
 		return array(
-			Profile_Schema::ROOT_BRAND    => array( 'name' => 'Test Brand', 'tagline' => 'Great tag' ),
-			Profile_Schema::ROOT_BUSINESS => array( 'industry' => 'Tech', 'founded' => '2010' ),
+			Profile_Schema::ROOT_BRAND    => array(
+				'name'    => 'Test Brand',
+				'tagline' => 'Great tag',
+			),
+			Profile_Schema::ROOT_BUSINESS => array(
+				'industry' => 'Tech',
+				'founded'  => '2010',
+			),
 			Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE => array(),
 		);
 	}
 
 	public function get_brand_profile(): array {
-		return array( 'name' => 'Test Brand', 'tagline' => 'Great tag' );
+		return array(
+			'name'    => 'Test Brand',
+			'tagline' => 'Great tag',
+		);
 	}
 
 	public function get_business_profile(): array {
-		return array( 'industry' => 'Tech', 'founded' => '2010' );
+		return array(
+			'industry' => 'Tech',
+			'founded'  => '2010',
+		);
 	}
 }
 
@@ -130,7 +142,7 @@ final class Profile_Snapshot_Factory_Test extends TestCase {
 	}
 
 	public function test_snapshot_does_not_include_prohibited_keys(): void {
-		$snap = $this->factory()->build( $this->fake_store() ); // @phpstan-ignore-line
+		$snap       = $this->factory()->build( $this->fake_store() ); // @phpstan-ignore-line
 		$prohibited = array( 'password', 'api_key', 'bearer_token', 'secret' );
 		foreach ( $prohibited as $key ) {
 			$this->assertArrayNotHasKey( $key, $snap->brand_profile );

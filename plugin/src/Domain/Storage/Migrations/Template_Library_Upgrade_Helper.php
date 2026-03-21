@@ -40,7 +40,7 @@ final class Template_Library_Upgrade_Helper {
 	 * @return array{validated: bool, registry_schema_recorded: bool, message: string}
 	 */
 	public function run(): array {
-		$current = $this->settings->get( self::VERSION_MARKERS_KEY );
+		$current      = $this->settings->get( self::VERSION_MARKERS_KEY );
 		$installed    = isset( $current[ self::REGISTRY_SCHEMA_KEY ] ) && is_string( $current[ self::REGISTRY_SCHEMA_KEY ] )
 			? $current[ self::REGISTRY_SCHEMA_KEY ]
 			: '0';

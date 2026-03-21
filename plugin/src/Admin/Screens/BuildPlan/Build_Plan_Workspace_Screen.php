@@ -210,12 +210,12 @@ final class Build_Plan_Workspace_Screen {
 		if ( ! $repo || ! \method_exists( $repo, 'get_by_key' ) || ! \method_exists( $repo, 'get_plan_definition' ) ) {
 			return false;
 		}
-		$plan_record = $repo->get_by_key( $plan_id );
+		$plan_record  = $repo->get_by_key( $plan_id );
 		$plan_post_id = is_array( $plan_record ) ? (int) ( $plan_record['id'] ?? 0 ) : 0;
 		$definition   = $plan_post_id > 0 ? $repo->get_plan_definition( $plan_post_id ) : array();
 		$plan_status  = is_array( $definition ) && isset( $definition[ Build_Plan_Schema::KEY_STATUS ] ) && is_string( $definition[ Build_Plan_Schema::KEY_STATUS ] ) ? $definition[ Build_Plan_Schema::KEY_STATUS ] : '';
 
-		$now = gmdate( 'c' );
+		$now      = gmdate( 'c' );
 		$envelope = array(
 			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_ACTION_ID      => 'finalize_' . $plan_id . '_' . (string) time(),
 			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ENVELOPE_ACTION_TYPE    => \AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types::FINALIZE_PLAN,
@@ -303,10 +303,10 @@ final class Build_Plan_Workspace_Screen {
 			exit;
 		}
 
-		$get_action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
-		$item_id    = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
-		$get_step   = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
-		$nonce      = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
+		$get_action       = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
+		$item_id          = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
+		$get_step         = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
+		$nonce            = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
 		$row_nonce_action = $this->row_nonce_action( $item_id );
 		if ( $get_step === '1' && ( $get_action === 'approve_item' || $get_action === 'deny_item' ) && $item_id !== '' && $row_nonce_action !== '' && \wp_verify_nonce( $nonce, $row_nonce_action ) ) {
 			$state = $this->get_state( $plan_id );
@@ -400,10 +400,10 @@ final class Build_Plan_Workspace_Screen {
 			exit;
 		}
 
-		$get_step   = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
-		$get_action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
-		$item_id    = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
-		$nonce      = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
+		$get_step         = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
+		$get_action       = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
+		$item_id          = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
+		$nonce            = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
 		$row_nonce_action = $this->row_nonce_action( $item_id );
 		if ( $get_step === '2' && ( $get_action === 'approve_item' || $get_action === 'deny_item' ) && $item_id !== '' && $row_nonce_action !== '' && \wp_verify_nonce( $nonce, $row_nonce_action ) ) {
 			$state = $this->get_state( $plan_id );
@@ -524,9 +524,9 @@ final class Build_Plan_Workspace_Screen {
 		);
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
-			$action       = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
-			$nonce        = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
-			$execute_nonce = isset( $_POST['_wpnonce_execute'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce_execute'] ) ) : '';
+			$action          = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
+			$nonce           = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
+			$execute_nonce   = isset( $_POST['_wpnonce_execute'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce_execute'] ) ) : '';
 			$allowed_actions = array(
 				'bulk_approve_all_step4',
 				'bulk_approve_selected_step4',
@@ -596,9 +596,9 @@ final class Build_Plan_Workspace_Screen {
 					if ( $status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
 						continue;
 					}
-					$payload = isset( $it[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $it[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $it[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
-					$token_group   = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? \trim( $payload['token_group'] ) : '';
-					$token_name    = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? \trim( $payload['token_name'] ) : '';
+					$payload        = isset( $it[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $it[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $it[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+					$token_group    = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? \trim( $payload['token_group'] ) : '';
+					$token_name     = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? \trim( $payload['token_name'] ) : '';
 					$proposed_value = $payload['proposed_value'] ?? null;
 					$proposed_ok    = $proposed_value !== null && \is_scalar( $proposed_value );
 					if ( $token_group === '' || ! in_array( $token_group, $token_group_allow, true ) || $token_name === '' || ! $proposed_ok ) {
@@ -619,21 +619,21 @@ final class Build_Plan_Workspace_Screen {
 				}
 
 				$actor_context = array(
-					\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE           => 'user',
-					\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID             => (string) \get_current_user_id(),
+					\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE => 'user',
+					\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID => (string) \get_current_user_id(),
 					\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED => Capabilities::EXECUTE_BUILD_PLANS,
-					\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT           => gmdate( 'c' ),
-					'execution_origin'                                                                                => $action,
+					\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT => gmdate( 'c' ),
+					'execution_origin' => $action,
 				);
 
 				\error_log(
 					'[AIO Page Builder] ' . \wp_json_encode(
 						array(
-							'event'         => 'token_execution_request',
-							'actor_id'      => (string) \get_current_user_id(),
-							'plan_id'       => $plan_id,
-							'item_ids'     => $item_ids_to_exec,
-							'token_targets' => $token_targets,
+							'event'            => 'token_execution_request',
+							'actor_id'         => (string) \get_current_user_id(),
+							'plan_id'          => $plan_id,
+							'item_ids'         => $item_ids_to_exec,
+							'token_targets'    => $token_targets,
 							'execution_origin' => $action,
 						)
 					)
@@ -649,16 +649,16 @@ final class Build_Plan_Workspace_Screen {
 				\error_log(
 					'[AIO Page Builder] ' . \wp_json_encode(
 						array(
-							'event'             => 'token_execution_result',
-							'actor_id'          => (string) \get_current_user_id(),
-							'plan_id'           => $plan_id,
-							'execution_origin'  => $action,
-							'overall_status'    => $results['status'] ?? 'error',
-							'completed_count'   => $results['completed_count'] ?? 0,
-							'failed_count'      => $results['failed_count'] ?? 0,
-							'refused_count'     => $results['refused_count'] ?? 0,
-							'partial_failure'   => $results['partial_failure'] ?? false,
-							'item_results'      => $results['item_results'] ?? array(),
+							'event'            => 'token_execution_result',
+							'actor_id'         => (string) \get_current_user_id(),
+							'plan_id'          => $plan_id,
+							'execution_origin' => $action,
+							'overall_status'   => $results['status'] ?? 'error',
+							'completed_count'  => $results['completed_count'] ?? 0,
+							'failed_count'     => $results['failed_count'] ?? 0,
+							'refused_count'    => $results['refused_count'] ?? 0,
+							'partial_failure'  => $results['partial_failure'] ?? false,
+							'item_results'     => $results['item_results'] ?? array(),
 						)
 					)
 				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -693,8 +693,8 @@ final class Build_Plan_Workspace_Screen {
 			} else {
 				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array sanitized via array_map(sanitize_text_field) below.
 				$raw_selected = isset( $_POST['aio_step4_selected_ids'] ) && is_array( $_POST['aio_step4_selected_ids'] ) ? \wp_unslash( $_POST['aio_step4_selected_ids'] ) : array();
-				$selected      = array_map( 'sanitize_text_field', $raw_selected );
-				$selected      = array_values( array_filter( $selected ) );
+				$selected     = array_map( 'sanitize_text_field', $raw_selected );
+				$selected     = array_values( array_filter( $selected ) );
 				if ( empty( $selected ) ) {
 					\wp_safe_redirect( \add_query_arg( array( 'step4_bulk_apply_error' => 'none_selected' ), $redirect_url ) );
 					exit;
@@ -706,14 +706,14 @@ final class Build_Plan_Workspace_Screen {
 			exit;
 		}
 
-		$get_action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
-		$item_id    = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
-		$get_step   = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
-		$nonce      = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
-		$row_nonce_action = $this->row_nonce_action( $item_id );
+		$get_action               = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
+		$item_id                  = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
+		$get_step                 = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
+		$nonce                    = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
+		$row_nonce_action         = $this->row_nonce_action( $item_id );
 		$execute_row_nonce_action = $this->execute_token_row_nonce_action( $item_id );
 
-		$is_review_action = in_array(
+		$is_review_action  = in_array(
 			$get_action,
 			array( 'approve_token_item', 'deny_token_item' ),
 			true
@@ -815,7 +815,7 @@ final class Build_Plan_Workspace_Screen {
 
 			$allowed_groups = Build_Plan_Draft_Schema::DTR_ENUM_GROUP;
 			$proposed_value = $payload['proposed_value'] ?? null;
-			$payload_ok = $token_group !== ''
+			$payload_ok     = $token_group !== ''
 				&& in_array( $token_group, $allowed_groups, true )
 				&& $token_name !== ''
 				&& $proposed_value !== null
@@ -860,25 +860,25 @@ final class Build_Plan_Workspace_Screen {
 			\error_log(
 				'[AIO Page Builder] ' . \wp_json_encode(
 					array(
-						'event'          => 'token_execution_request',
-						'actor_id'       => (string) \get_current_user_id(),
-						'plan_id'        => $plan_id,
-						'item_id'        => $item_id,
-						'token_group'    => $token_group,
-						'token_name'     => $token_name,
+						'event'            => 'token_execution_request',
+						'actor_id'         => (string) \get_current_user_id(),
+						'plan_id'          => $plan_id,
+						'item_id'          => $item_id,
+						'token_group'      => $token_group,
+						'token_name'       => $token_name,
 						'execution_origin' => $get_action,
 					)
 				)
 			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 			$actor_context = array(
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE           => 'user',
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID             => (string) \get_current_user_id(),
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE => 'user',
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID => (string) \get_current_user_id(),
 				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED => Capabilities::EXECUTE_BUILD_PLANS,
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT           => gmdate( 'c' ),
-				'execution_origin'                                                                           => $get_action,
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT => gmdate( 'c' ),
+				'execution_origin' => $get_action,
 			);
-			$results = $this->container->get( 'execution_queue_service' )->request_bulk_execution(
+			$results       = $this->container->get( 'execution_queue_service' )->request_bulk_execution(
 				$plan_id,
 				array( $item_id ),
 				$actor_context,
@@ -888,10 +888,10 @@ final class Build_Plan_Workspace_Screen {
 			\error_log(
 				'[AIO Page Builder] ' . \wp_json_encode(
 					array(
-						'event'             => 'token_execution_result',
+						'event'            => 'token_execution_result',
 						'actor_id'         => (string) \get_current_user_id(),
-						'plan_id'           => $plan_id,
-						'item_id'           => $item_id,
+						'plan_id'          => $plan_id,
+						'item_id'          => $item_id,
 						'token_group'      => $token_group,
 						'token_name'       => $token_name,
 						'execution_origin' => $get_action,
@@ -964,7 +964,7 @@ final class Build_Plan_Workspace_Screen {
 
 			$selected_ids = array();
 			if ( $action === 'bulk_execute_selected_hierarchy' ) {
-				$raw = isset( $_POST['aio_hierarchy_selected_ids'] ) && is_array( $_POST['aio_hierarchy_selected_ids'] )
+				$raw          = isset( $_POST['aio_hierarchy_selected_ids'] ) && is_array( $_POST['aio_hierarchy_selected_ids'] )
 					? \wp_unslash( $_POST['aio_hierarchy_selected_ids'] )
 					: array();
 				$selected_ids = \array_values( \array_filter( \array_map( 'sanitize_text_field', $raw ) ) );
@@ -983,8 +983,8 @@ final class Build_Plan_Workspace_Screen {
 					if ( ! is_array( $it ) ) {
 						continue;
 					}
-					$it_id   = (string) ( $it[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
-					$it_type = (string) ( $it[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' );
+					$it_id     = (string) ( $it[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
+					$it_type   = (string) ( $it[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' );
 					$it_status = (string) ( $it['status'] ?? '' );
 					if ( $it_id === '' || $it_type !== Build_Plan_Item_Schema::ITEM_TYPE_HIERARCHY_ASSIGNMENT ) {
 						continue;
@@ -1006,11 +1006,11 @@ final class Build_Plan_Workspace_Screen {
 			}
 
 			$actor_context = array(
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE           => 'user',
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID             => (string) \get_current_user_id(),
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED   => Capabilities::EXECUTE_BUILD_PLANS,
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT           => \gmdate( 'c' ),
-				'execution_origin'                                                                               => $action,
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE => 'user',
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID => (string) \get_current_user_id(),
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED => Capabilities::EXECUTE_BUILD_PLANS,
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT => \gmdate( 'c' ),
+				'execution_origin' => $action,
 			);
 
 			\error_log(
@@ -1085,10 +1085,10 @@ final class Build_Plan_Workspace_Screen {
 			: array();
 
 		// Search all steps for the item (hierarchy_assignment items may appear in any step).
-		$item_found  = false;
-		$item_type   = '';
-		$item_status = '';
-		$payload     = array();
+		$item_found       = false;
+		$item_type        = '';
+		$item_status      = '';
+		$payload          = array();
 		$found_step_index = -1;
 		foreach ( $steps as $s_idx => $step ) {
 			if ( ! is_array( $step ) ) {
@@ -1153,18 +1153,16 @@ final class Build_Plan_Workspace_Screen {
 					)
 				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
-		} else {
-			if ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
+		} elseif ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
 				return false;
-			}
 		}
 
 		$actor_context = array(
-			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE           => 'user',
-			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID             => (string) \get_current_user_id(),
-			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED   => Capabilities::EXECUTE_BUILD_PLANS,
-			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT           => \gmdate( 'c' ),
-			'execution_origin'                                                                               => $get_action,
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE => 'user',
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID => (string) \get_current_user_id(),
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED => Capabilities::EXECUTE_BUILD_PLANS,
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT => \gmdate( 'c' ),
+			'execution_origin' => $get_action,
 		);
 
 		\error_log(
@@ -1263,7 +1261,7 @@ final class Build_Plan_Workspace_Screen {
 
 			$selected_ids = array();
 			if ( $action === 'bulk_execute_selected_create_menu' ) {
-				$raw = isset( $_POST['aio_create_menu_selected_ids'] ) && is_array( $_POST['aio_create_menu_selected_ids'] )
+				$raw          = isset( $_POST['aio_create_menu_selected_ids'] ) && is_array( $_POST['aio_create_menu_selected_ids'] )
 					? \wp_unslash( $_POST['aio_create_menu_selected_ids'] )
 					: array();
 				$selected_ids = \array_values( \array_filter( \array_map( 'sanitize_text_field', $raw ) ) );
@@ -1305,11 +1303,11 @@ final class Build_Plan_Workspace_Screen {
 			}
 
 			$actor_context = array(
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE           => 'user',
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID             => (string) \get_current_user_id(),
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED   => Capabilities::EXECUTE_BUILD_PLANS,
-				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT           => \gmdate( 'c' ),
-				'execution_origin'                                                                               => $action,
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE => 'user',
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID => (string) \get_current_user_id(),
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED => Capabilities::EXECUTE_BUILD_PLANS,
+				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT => \gmdate( 'c' ),
+				'execution_origin' => $action,
 			);
 
 			\error_log(
@@ -1450,18 +1448,16 @@ final class Build_Plan_Workspace_Screen {
 					)
 				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
-		} else {
-			if ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
+		} elseif ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
 				return false;
-			}
 		}
 
 		$actor_context = array(
-			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE           => 'user',
-			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID             => (string) \get_current_user_id(),
-			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED   => Capabilities::EXECUTE_BUILD_PLANS,
-			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT           => \gmdate( 'c' ),
-			'execution_origin'                                                                               => $get_action,
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE => 'user',
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_ID => (string) \get_current_user_id(),
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED => Capabilities::EXECUTE_BUILD_PLANS,
+			\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_CHECKED_AT => \gmdate( 'c' ),
+			'execution_origin' => $get_action,
 		);
 
 		\error_log(
@@ -1552,8 +1548,8 @@ final class Build_Plan_Workspace_Screen {
 				$service->bulk_deny_all_eligible( $plan_post_id );
 			} else {
 				$raw_selected = isset( $_POST['aio_step5_selected_ids'] ) && is_array( $_POST['aio_step5_selected_ids'] ) ? \wp_unslash( $_POST['aio_step5_selected_ids'] ) : array();
-				$selected      = array_map( 'sanitize_text_field', $raw_selected );
-				$selected      = array_values( array_filter( $selected ) );
+				$selected     = array_map( 'sanitize_text_field', $raw_selected );
+				$selected     = array_values( array_filter( $selected ) );
 				if ( empty( $selected ) ) {
 					\wp_safe_redirect( \add_query_arg( array( 'step5_bulk_apply_error' => 'none_selected' ), $redirect_url ) );
 					exit;
@@ -1565,10 +1561,10 @@ final class Build_Plan_Workspace_Screen {
 			exit;
 		}
 
-		$get_action = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
-		$item_id    = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
-		$get_step   = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
-		$nonce      = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
+		$get_action       = isset( $_GET['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['action'] ) ) : '';
+		$item_id          = isset( $_GET['item_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['item_id'] ) ) : '';
+		$get_step         = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
+		$nonce            = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
 		$row_nonce_action = $this->row_nonce_action( $item_id );
 
 		$is_review_action = in_array(
@@ -2117,8 +2113,14 @@ final class Build_Plan_Workspace_Screen {
 	 */
 	private function inject_step1_action_urls( array &$workspace, string $plan_id ): void {
 		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
-		$base   = $router ? (string) $router->url( 'build_plan_workspace', array( 'plan_id' => $plan_id, 'step' => 1 ) ) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
-		$rows  = &$workspace['step_list_rows'];
+		$base   = $router ? (string) $router->url(
+			'build_plan_workspace',
+			array(
+				'plan_id' => $plan_id,
+				'step'    => 1,
+			)
+		) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
+		$rows   = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
 				$item_id = (string) ( $row['item_id'] ?? '' );
@@ -2179,7 +2181,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( ! isset( $workspace['preview_link'] ) || ! is_array( $workspace['preview_link'] ) ) {
 			return;
 		}
-		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$router                           = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
 		$workspace['preview_link']['url'] = $router
 			? (string) $router->url(
 				'build_plan_workspace',
@@ -2201,8 +2203,14 @@ final class Build_Plan_Workspace_Screen {
 	 */
 	private function inject_step2_action_urls( array &$workspace, string $plan_id ): void {
 		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
-		$base   = $router ? (string) $router->url( 'build_plan_workspace', array( 'plan_id' => $plan_id, 'step' => 2 ) ) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
-		$rows  = &$workspace['step_list_rows'];
+		$base   = $router ? (string) $router->url(
+			'build_plan_workspace',
+			array(
+				'plan_id' => $plan_id,
+				'step'    => 2,
+			)
+		) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
+		$rows   = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
 				$item_id = (string) ( $row['item_id'] ?? '' );
@@ -2306,16 +2314,22 @@ final class Build_Plan_Workspace_Screen {
 	 */
 	private function inject_step4_action_urls( array &$workspace, string $plan_id ): void {
 		$tokens_step_index = \AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service::STEP_INDEX_DESIGN_TOKENS;
-		$router             = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
-		$base               = $router
-			? (string) $router->url( 'build_plan_workspace', array( 'plan_id' => $plan_id, 'step' => $tokens_step_index ) )
+		$router            = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$base              = $router
+			? (string) $router->url(
+				'build_plan_workspace',
+				array(
+					'plan_id' => $plan_id,
+					'step'    => $tokens_step_index,
+				)
+			)
 			: \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $tokens_step_index );
 
 		$action_map = array(
-			Build_Plan_Row_Action_Resolver::ACTION_APPROVE  => 'approve_token_item',
-			Build_Plan_Row_Action_Resolver::ACTION_DENY     => 'deny_token_item',
-			Build_Plan_Row_Action_Resolver::ACTION_EXECUTE  => 'execute_token_item',
-			Build_Plan_Row_Action_Resolver::ACTION_RETRY    => 'retry_token_item',
+			Build_Plan_Row_Action_Resolver::ACTION_APPROVE => 'approve_token_item',
+			Build_Plan_Row_Action_Resolver::ACTION_DENY    => 'deny_token_item',
+			Build_Plan_Row_Action_Resolver::ACTION_EXECUTE => 'execute_token_item',
+			Build_Plan_Row_Action_Resolver::ACTION_RETRY   => 'retry_token_item',
 		);
 
 		$rows = &$workspace['step_list_rows'];
@@ -2345,8 +2359,8 @@ final class Build_Plan_Workspace_Screen {
 							),
 							true
 						) ? $this->execute_token_row_nonce_action( $item_id ) : $this->row_nonce_action( $item_id );
-						$nonce = $nonce_action !== '' ? \wp_create_nonce( $nonce_action ) : '';
-						$a['url'] = $base . '&action=' . \rawurlencode( $action_map[ $action_id ] ) . '&item_id=' . \rawurlencode( $item_id ) . '&_wpnonce=' . $nonce;
+						$nonce        = $nonce_action !== '' ? \wp_create_nonce( $nonce_action ) : '';
+						$a['url']     = $base . '&action=' . \rawurlencode( $action_map[ $action_id ] ) . '&item_id=' . \rawurlencode( $item_id ) . '&_wpnonce=' . $nonce;
 					}
 					$actions[ $j ] = $a;
 				}
@@ -2376,8 +2390,8 @@ final class Build_Plan_Workspace_Screen {
 							),
 							true
 						) ? $this->execute_token_row_nonce_action( $detail_item_id ) : $this->row_nonce_action( $detail_item_id );
-						$nonce = $nonce_action !== '' ? \wp_create_nonce( $nonce_action ) : '';
-						$a['url'] = $base . '&action=' . \rawurlencode( $action_map[ $action_id ] ) . '&item_id=' . \rawurlencode( $detail_item_id ) . '&_wpnonce=' . $nonce;
+						$nonce        = $nonce_action !== '' ? \wp_create_nonce( $nonce_action ) : '';
+						$a['url']     = $base . '&action=' . \rawurlencode( $action_map[ $action_id ] ) . '&item_id=' . \rawurlencode( $detail_item_id ) . '&_wpnonce=' . $nonce;
 					}
 					$actions[ $j ] = $a;
 				}
@@ -2396,7 +2410,13 @@ final class Build_Plan_Workspace_Screen {
 		$seo_step_index = \AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Media_Step_UI_Service::STEP_INDEX_SEO;
 		$router         = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
 		$base           = $router
-			? (string) $router->url( 'build_plan_workspace', array( 'plan_id' => $plan_id, 'step' => $seo_step_index ) )
+			? (string) $router->url(
+				'build_plan_workspace',
+				array(
+					'plan_id' => $plan_id,
+					'step'    => $seo_step_index,
+				)
+			)
 			: \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $seo_step_index );
 
 		$action_map = array(
@@ -2577,14 +2597,14 @@ final class Build_Plan_Workspace_Screen {
 	 * @param string                              $nonce_html  Escaped nonce field HTML.
 	 */
 	private function render_step1_bulk_forms( array $bulk_states, string $nonce_html ): void {
-		$make_all     = $bulk_states['apply_to_all_eligible'] ?? array();
-		$deny_all     = $bulk_states['deny_all_eligible'] ?? array();
-		$apply_sel    = $bulk_states['apply_to_selected'] ?? array();
-		$clear_sel    = $bulk_states['clear_selection'] ?? array();
-		$make_enabled = ! empty( $make_all['enabled'] );
-		$deny_enabled = ! empty( $deny_all['enabled'] );
-		$make_count   = (int) ( $make_all['count_eligible'] ?? 0 );
-		$deny_count   = (int) ( $deny_all['count_eligible'] ?? 0 );
+		$make_all          = $bulk_states['apply_to_all_eligible'] ?? array();
+		$deny_all          = $bulk_states['deny_all_eligible'] ?? array();
+		$apply_sel         = $bulk_states['apply_to_selected'] ?? array();
+		$clear_sel         = $bulk_states['clear_selection'] ?? array();
+		$make_enabled      = ! empty( $make_all['enabled'] );
+		$deny_enabled      = ! empty( $deny_all['enabled'] );
+		$make_count        = (int) ( $make_all['count_eligible'] ?? 0 );
+		$deny_count        = (int) ( $deny_all['count_eligible'] ?? 0 );
 		$apply_sel_enabled = ! empty( $apply_sel['enabled'] );
 		$clear_enabled     = ! empty( $clear_sel['enabled'] );
 		$apply_sel_count   = (int) ( $apply_sel['count_selected'] ?? 0 );
@@ -2699,17 +2719,17 @@ final class Build_Plan_Workspace_Screen {
 		$deny_enabled      = ! empty( $deny_all['enabled'] );
 		$clear_enabled     = ! empty( $clear_sel['enabled'] );
 
-		$apply_all_count = (int) ( $apply_all['count_eligible'] ?? 0 );
-		$apply_sel_count = (int) ( $apply_sel['count_selected'] ?? 0 );
-		$deny_count      = (int) ( $deny_all['count_eligible'] ?? 0 );
+		$apply_all_count  = (int) ( $apply_all['count_eligible'] ?? 0 );
+		$apply_sel_count  = (int) ( $apply_sel['count_selected'] ?? 0 );
+		$deny_count       = (int) ( $deny_all['count_eligible'] ?? 0 );
 		$exec_all_enabled = ! empty( $exec_all['enabled'] );
 		$exec_sel_enabled = ! empty( $exec_sel['enabled'] );
 		$exec_all_count   = (int) ( $exec_all['count_eligible'] ?? 0 );
 		$exec_sel_count   = (int) ( $exec_sel['count_selected'] ?? 0 );
 
-		$plan_id    = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
-		$step_index = \AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service::STEP_INDEX_DESIGN_TOKENS;
-		$base_url   = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_index );
+		$plan_id            = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
+		$step_index         = \AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service::STEP_INDEX_DESIGN_TOKENS;
+		$base_url           = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_index );
 		$execute_nonce_html = \wp_nonce_field( self::NONCE_ACTION_EXECUTE_TOKEN_BULK, '_wpnonce_execute', false, false );
 
 		?>

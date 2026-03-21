@@ -69,10 +69,10 @@ final class Tokens_Step_UI_Service {
 		?Operational_Snapshot_Repository_Interface $operational_snapshot_repository = null,
 		?Token_Diff_Summarizer $token_diff_summarizer = null
 	) {
-		$this->row_action_resolver = $row_action_resolver;
+		$this->row_action_resolver              = $row_action_resolver;
 		$this->global_style_settings_repository = $global_style_settings_repository;
-		$this->operational_snapshot_repository = $operational_snapshot_repository;
-		$this->token_diff_summarizer = $token_diff_summarizer;
+		$this->operational_snapshot_repository  = $operational_snapshot_repository;
+		$this->token_diff_summarizer            = $token_diff_summarizer;
 	}
 
 	/**
@@ -98,10 +98,10 @@ final class Tokens_Step_UI_Service {
 		$this->current_plan_id = isset( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] ) && is_string( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ]
 			: null;
-		$steps_raw = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
+		$steps_raw             = isset( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $plan_definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_STEPS ]
 			: array();
-		$step      = $steps_raw[ $step_index ] ?? null;
+		$step                  = $steps_raw[ $step_index ] ?? null;
 		if ( ! is_array( $step ) ) {
 			return $this->empty_workspace();
 		}
@@ -110,19 +110,19 @@ final class Tokens_Step_UI_Service {
 			return $this->empty_workspace();
 		}
 
-		$items          = $this->eligible_items_from_step( $step );
-		$rows           = array();
-		$pending_count = 0;
-		$approved_count = 0;
-		$selected_pending_count = 0;
+		$items                   = $this->eligible_items_from_step( $step );
+		$rows                    = array();
+		$pending_count           = 0;
+		$approved_count          = 0;
+		$selected_pending_count  = 0;
 		$selected_approved_count = 0;
-		$selected_any_count = 0;
+		$selected_any_count      = 0;
 		foreach ( $items as $item ) {
 			$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
 			if ( $item_id === '' ) {
 				continue;
 			}
-			$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING );
+			$status      = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING );
 			$is_selected = in_array( $item_id, $selected_item_ids, true );
 			if ( $status === Build_Plan_Item_Statuses::PENDING ) {
 				++$pending_count;
@@ -156,12 +156,12 @@ final class Tokens_Step_UI_Service {
 		$token_set_summary = $this->build_token_set_summary( $items );
 
 		return array(
-			'step_list_rows'         => $rows,
-			'column_order'           => self::COLUMN_ORDER,
-			'bulk_action_states'     => $bulk_states,
-			'detail_panel'           => $detail_panel,
-			'step_messages'          => $step_messages,
-			'token_set_summary'      => $token_set_summary,
+			'step_list_rows'     => $rows,
+			'column_order'       => self::COLUMN_ORDER,
+			'bulk_action_states' => $bulk_states,
+			'detail_panel'       => $detail_panel,
+			'step_messages'      => $step_messages,
+			'token_set_summary'  => $token_set_summary,
 		);
 	}
 
@@ -186,10 +186,10 @@ final class Tokens_Step_UI_Service {
 		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
 			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
 			: array();
-		$group = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? $payload['token_group'] : '';
-		$name  = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? $payload['token_name'] : '';
-		$curr  = $this->current_value_for_token( $group, $name );
-		$cols  = array();
+		$group   = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? $payload['token_group'] : '';
+		$name    = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? $payload['token_name'] : '';
+		$curr    = $this->current_value_for_token( $group, $name );
+		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
 			if ( $key === 'current_value' ) {
 				$cols[ $key ] = $curr !== '' ? $curr : '—';
@@ -219,25 +219,25 @@ final class Tokens_Step_UI_Service {
 			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ) !== $selected_item_id ) {
 				continue;
 			}
-			$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING );
-			$payload                     = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
-			$proposed_val                = $payload['proposed_value'] ?? null;
-			$proposed_str                = is_scalar( $proposed_val ) ? (string) $proposed_val : \wp_json_encode( $proposed_val );
-			$group                        = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? $payload['token_group'] : '';
-			$name                         = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? $payload['token_name'] : '';
-			$token_set_ref               = ( $group !== '' && $name !== '' ) ? $group . ':' . $name : '';
-			$current_str                  = $this->current_value_for_token( $group, $name );
-			$has_current                  = $current_str !== '';
-			$rollback_info               = $this->rollback_info_for_token_set_ref( $token_set_ref );
-			$rollback_eligible           = ! empty( $rollback_info['rollback_eligible'] );
-			$pre_snapshot_id             = (string) ( $rollback_info['pre_snapshot_id'] ?? '' );
-			$post_snapshot_id            = (string) ( $rollback_info['post_snapshot_id'] ?? '' );
-			$diff_payload                = isset( $rollback_info['diff_payload'] ) && is_array( $rollback_info['diff_payload'] ) ? $rollback_info['diff_payload'] : array();
-			$diff_id                      = (string) ( $diff_payload['diff_id'] ?? '' );
-			$can_execute                  = ! empty( $capabilities['can_execute'] );
-			$execute_enabled             = $can_execute && $status === Build_Plan_Item_Statuses::APPROVED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
-			$retry_enabled               = $can_execute && $status === Build_Plan_Item_Statuses::FAILED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::FAILED, Build_Plan_Item_Statuses::IN_PROGRESS );
-			$execution_state_lines       = array();
+			$status                = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING );
+			$payload               = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) ? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] : array();
+			$proposed_val          = $payload['proposed_value'] ?? null;
+			$proposed_str          = is_scalar( $proposed_val ) ? (string) $proposed_val : \wp_json_encode( $proposed_val );
+			$group                 = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? $payload['token_group'] : '';
+			$name                  = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? $payload['token_name'] : '';
+			$token_set_ref         = ( $group !== '' && $name !== '' ) ? $group . ':' . $name : '';
+			$current_str           = $this->current_value_for_token( $group, $name );
+			$has_current           = $current_str !== '';
+			$rollback_info         = $this->rollback_info_for_token_set_ref( $token_set_ref );
+			$rollback_eligible     = ! empty( $rollback_info['rollback_eligible'] );
+			$pre_snapshot_id       = (string) ( $rollback_info['pre_snapshot_id'] ?? '' );
+			$post_snapshot_id      = (string) ( $rollback_info['post_snapshot_id'] ?? '' );
+			$diff_payload          = isset( $rollback_info['diff_payload'] ) && is_array( $rollback_info['diff_payload'] ) ? $rollback_info['diff_payload'] : array();
+			$diff_id               = (string) ( $diff_payload['diff_id'] ?? '' );
+			$can_execute           = ! empty( $capabilities['can_execute'] );
+			$execute_enabled       = $can_execute && $status === Build_Plan_Item_Statuses::APPROVED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::APPROVED, Build_Plan_Item_Statuses::IN_PROGRESS );
+			$retry_enabled         = $can_execute && $status === Build_Plan_Item_Statuses::FAILED && Build_Plan_Item_Statuses::can_transition_execution( Build_Plan_Item_Statuses::FAILED, Build_Plan_Item_Statuses::IN_PROGRESS );
+			$execution_state_lines = array();
 			if ( $status === Build_Plan_Item_Statuses::PENDING ) {
 				$execution_state_lines[] = \__( 'Pending review; execution is disabled until approved.', 'aio-page-builder' );
 			} elseif ( $status === Build_Plan_Item_Statuses::APPROVED ) {
@@ -338,7 +338,7 @@ final class Tokens_Step_UI_Service {
 
 		$diff_payload = array();
 		if ( $this->token_diff_summarizer !== null && $pre_snapshot_id !== '' && $post_snapshot_id !== '' ) {
-			$pre_snapshot = $this->operational_snapshot_repository->get_by_id( $pre_snapshot_id );
+			$pre_snapshot  = $this->operational_snapshot_repository->get_by_id( $pre_snapshot_id );
 			$post_snapshot = $this->operational_snapshot_repository->get_by_id( $post_snapshot_id );
 			if ( is_array( $pre_snapshot ) && is_array( $post_snapshot ) ) {
 				$diff_result = $this->token_diff_summarizer->summarize( $pre_snapshot, $post_snapshot, Diff_Type_Keys::LEVEL_SUMMARY );
@@ -379,15 +379,15 @@ final class Tokens_Step_UI_Service {
 		int $selected_any_count,
 		array $capabilities
 	): array {
-		$can_approve    = ! empty( $capabilities['can_approve'] );
-		$can_execute    = ! empty( $capabilities['can_execute'] );
+		$can_approve = ! empty( $capabilities['can_approve'] );
+		$can_execute = ! empty( $capabilities['can_execute'] );
 
-		$apply_all_ok   = $can_approve && $pending_count > 0;
-		$apply_sel_ok   = $can_approve && $selected_pending_count > 0;
-		$deny_all_ok    = $can_approve && $pending_count > 0;
+		$apply_all_ok = $can_approve && $pending_count > 0;
+		$apply_sel_ok = $can_approve && $selected_pending_count > 0;
+		$deny_all_ok  = $can_approve && $pending_count > 0;
 
-		$exec_all_ok    = $can_execute && $approved_count > 0;
-		$exec_sel_ok    = $can_execute && $selected_approved_count > 0;
+		$exec_all_ok = $can_execute && $approved_count > 0;
+		$exec_sel_ok = $can_execute && $selected_approved_count > 0;
 
 		return array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
@@ -409,12 +409,12 @@ final class Tokens_Step_UI_Service {
 				'enabled' => $selected_any_count > 0,
 				'label'   => \__( 'Clear selection', 'aio-page-builder' ),
 			),
-			self::BULK_CONTROL_EXECUTE_ALL_REMAINING => array(
+			self::BULK_CONTROL_EXECUTE_ALL_REMAINING    => array(
 				'enabled'        => $exec_all_ok,
 				'label'          => \__( 'Execute all remaining', 'aio-page-builder' ),
 				'count_eligible' => $approved_count,
 			),
-			self::BULK_CONTROL_EXECUTE_SELECTED => array(
+			self::BULK_CONTROL_EXECUTE_SELECTED         => array(
 				'enabled'        => $exec_sel_ok,
 				'label'          => \__( 'Execute selected', 'aio-page-builder' ),
 				'count_selected' => $selected_approved_count,
@@ -486,9 +486,9 @@ final class Tokens_Step_UI_Service {
 
 	private function empty_workspace(): array {
 		return array(
-			'step_list_rows'         => array(),
-			'column_order'           => self::COLUMN_ORDER,
-			'bulk_action_states'     => array(
+			'step_list_rows'     => array(),
+			'column_order'       => self::COLUMN_ORDER,
+			'bulk_action_states' => array(
 				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 					'enabled'        => false,
 					'label'          => \__( 'Apply all tokens', 'aio-page-builder' ),
@@ -513,19 +513,19 @@ final class Tokens_Step_UI_Service {
 					'label'          => \__( 'Execute all remaining', 'aio-page-builder' ),
 					'count_eligible' => 0,
 				),
-				self::BULK_CONTROL_EXECUTE_SELECTED => array(
+				self::BULK_CONTROL_EXECUTE_SELECTED      => array(
 					'enabled'        => false,
 					'label'          => \__( 'Execute selected', 'aio-page-builder' ),
 					'count_selected' => 0,
 				),
 			),
-			'detail_panel'           => array(
+			'detail_panel'       => array(
 				'item_id'     => '',
 				'sections'    => array(),
 				'row_actions' => array(),
 			),
-			'step_messages'          => array(),
-			'token_set_summary'      => array(
+			'step_messages'      => array(),
+			'token_set_summary'  => array(
 				'groups' => array(),
 				'total'  => 0,
 			),

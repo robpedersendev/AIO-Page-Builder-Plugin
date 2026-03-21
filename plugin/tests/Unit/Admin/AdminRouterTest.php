@@ -46,4 +46,3 @@ final class AdminRouterTest extends TestCase {
 		$this->assertStringContainsString( 'doc_id=doc-helper-cta_contact_01', $url );
 	}
 }
-

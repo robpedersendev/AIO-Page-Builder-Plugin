@@ -153,13 +153,13 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_apply', array( $this, 'handle_industry_bundle_apply' ), 10 );
 
-		$dashboard                             = new Dashboard_Screen( $this->container );
-		$settings                              = new Settings_Screen();
-		$diagnostics                           = new Diagnostics_Screen();
-		$acf_diagnostics                       = new ACF_Architecture_Diagnostics_Screen( $this->container );
-		$form_provider_health                  = new Form_Provider_Health_Screen( $this->container );
-		$onboarding                            = new Onboarding_Screen( $this->container );
-		$profile_snapshots                     = new Profile_Snapshot_History_Panel( $this->container );
+		$dashboard            = new Dashboard_Screen( $this->container );
+		$settings             = new Settings_Screen();
+		$diagnostics          = new Diagnostics_Screen();
+		$acf_diagnostics      = new ACF_Architecture_Diagnostics_Screen( $this->container );
+		$form_provider_health = new Form_Provider_Health_Screen( $this->container );
+		$onboarding           = new Onboarding_Screen( $this->container );
+		$profile_snapshots    = new Profile_Snapshot_History_Panel( $this->container );
 		$profile_snapshots->register_hooks();
 		$crawler_sessions                      = new Crawler_Sessions_Screen( $this->container );
 		$crawler_comparison                    = new Crawler_Comparison_Screen( $this->container );
@@ -171,7 +171,7 @@ final class Admin_Menu {
 		$page_template_detail                  = new Page_Template_Detail_Screen( $this->container );
 		$section_templates_dir                 = new Section_Templates_Directory_Screen( $this->container );
 		$section_template_detail               = new Section_Template_Detail_Screen( $this->container );
-		$documentation_detail                 = new Documentation_Detail_Screen( $this->container );
+		$documentation_detail                  = new Documentation_Detail_Screen( $this->container );
 		$template_compare_screen               = new Template_Compare_Screen( $this->container );
 		$compositions_screen                   = new Compositions_Screen( $this->container );
 		$build_plan_analytics                  = new Build_Plan_Analytics_Screen( $this->container );
@@ -1036,19 +1036,19 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', \rawurlencode( $parse_result['user_message'] ), $redirect ) );
 			exit;
 		}
-		$bundle           = $parse_result['bundle'];
-		$screen           = new Industry_Bundle_Import_Preview_Screen( $this->container );
-		$settings         = $this->container instanceof Service_Container && $this->container->has( 'settings' ) ? $this->container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
-		$apply_service    = new Industry_Bundle_Apply_Service(
+		$bundle        = $parse_result['bundle'];
+		$screen        = new Industry_Bundle_Import_Preview_Screen( $this->container );
+		$settings      = $this->container instanceof Service_Container && $this->container->has( 'settings' ) ? $this->container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+		$apply_service = new Industry_Bundle_Apply_Service(
 			$settings instanceof \AIOPageBuilder\Infrastructure\Settings\Settings_Service ? $settings : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service(),
 			new Industry_Bundle_Conflict_Scanner()
 		);
-		$local_hashes = $apply_service->get_effective_local_hashes();
-		$conflicts    = ( new Industry_Bundle_Conflict_Scanner() )->scan( $bundle, $local_hashes );
-		$included         = isset( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] ) && \is_array( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] )
+		$local_hashes  = $apply_service->get_effective_local_hashes();
+		$conflicts     = ( new Industry_Bundle_Conflict_Scanner() )->scan( $bundle, $local_hashes );
+		$included      = isset( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] ) && \is_array( $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ] )
 			? $bundle[ Industry_Pack_Bundle_Service::MANIFEST_INCLUDED_CATEGORIES ]
 			: array();
-		$summary          = array();
+		$summary       = array();
 		foreach ( $included as $cat ) {
 			if ( \is_string( $cat ) && isset( $bundle[ $cat ] ) && \is_array( $bundle[ $cat ] ) ) {
 				$summary[ $cat ] = \count( $bundle[ $cat ] );
@@ -1119,7 +1119,7 @@ final class Admin_Menu {
 			$settings instanceof \AIOPageBuilder\Infrastructure\Settings\Settings_Service ? $settings : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service(),
 			new Industry_Bundle_Conflict_Scanner()
 		);
-		$result = $apply->apply( $bundle, $slug, $scope, $decisions, (int) \get_current_user_id() );
+		$result   = $apply->apply( $bundle, $slug, $scope, $decisions, (int) \get_current_user_id() );
 		if ( ! $result['ok'] ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', rawurlencode( $result['error'] ), $redirect ) );
 			exit;

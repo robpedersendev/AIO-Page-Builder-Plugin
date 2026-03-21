@@ -64,7 +64,7 @@ final class Provider_Cost_Calculator_Test extends TestCase {
 		$cost = $this->calculator->calculate( 'openai', 'gpt-4o', 1, 1 );
 		$this->assertNotNull( $cost );
 		// Result must not have more decimal places than PRECISION allows.
-		$formatted = number_format( $cost, Provider_Cost_Calculator::PRECISION + 1, '.', '' );
+		$formatted  = number_format( $cost, Provider_Cost_Calculator::PRECISION + 1, '.', '' );
 		$last_digit = substr( $formatted, -1 );
 		$this->assertSame( '0', $last_digit, 'Cost should not have more digits than PRECISION' );
 	}

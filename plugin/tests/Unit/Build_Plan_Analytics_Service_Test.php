@@ -190,9 +190,9 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 	}
 
 	public function test_rollback_frequency_summary_uses_operational_snapshots_when_available(): void {
-		$plan   = $this->make_plan( '2025-03-15 10:00:00', Build_Plan_Statuses::ROOT_COMPLETED, array() );
-		$repo   = new Build_Plan_Analytics_Stub_Repository( array( $plan ) );
-		$snaps  = new Build_Plan_Analytics_Stub_Snapshot_Repository(
+		$plan  = $this->make_plan( '2025-03-15 10:00:00', Build_Plan_Statuses::ROOT_COMPLETED, array() );
+		$repo  = new Build_Plan_Analytics_Stub_Repository( array( $plan ) );
+		$snaps = new Build_Plan_Analytics_Stub_Snapshot_Repository(
 			array(
 				$plan[ Build_Plan_Schema::KEY_PLAN_ID ] => array(
 					array(
@@ -212,8 +212,8 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 				),
 			)
 		);
-		$svc    = new Build_Plan_Analytics_Service( $repo, $snaps );
-		$out    = $svc->get_rollback_frequency_summary( '2025-03-01', '2025-03-31' );
+		$svc   = new Build_Plan_Analytics_Service( $repo, $snaps );
+		$out   = $svc->get_rollback_frequency_summary( '2025-03-01', '2025-03-31' );
 		$this->assertSame( 'operational_snapshots', $out['source'] );
 		$this->assertSame( 2, $out['completed_rollbacks'] );
 		$this->assertNotEmpty( $out['by_month'] );

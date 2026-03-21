@@ -26,4 +26,3 @@ final class VersionsTest extends TestCase {
 		$this->assertSame( Versions::EXPORT_SCHEMA_VERSION, $all['export_schema'] );
 	}
 }
-

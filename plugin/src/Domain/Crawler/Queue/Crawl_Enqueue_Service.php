@@ -19,7 +19,7 @@ use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
  */
 final class Crawl_Enqueue_Service {
 
-	private const LOCK_PREFIX = 'aio_page_builder_crawl_lock_';
+	private const LOCK_PREFIX      = 'aio_page_builder_crawl_lock_';
 	private const LOCK_TTL_SECONDS = 1800;
 
 	private Crawl_Snapshot_Service $snapshot_service;
@@ -32,27 +32,43 @@ final class Crawl_Enqueue_Service {
 	 * Enqueues a new crawl run for the current site.
 	 *
 	 * @param array<string, mixed> $settings
-	 * @param string              $created_by
+	 * @param string               $created_by
 	 * @return array{success: bool, crawl_id: string, message: string}
 	 */
 	public function enqueue_start( array $settings, string $created_by ): array {
 		$site_url  = function_exists( 'site_url' ) ? (string) \site_url() : '';
 		$site_host = $this->host_from_site_url( $site_url );
 		if ( $site_host === '' ) {
-			return array( 'success' => false, 'crawl_id' => '', 'message' => __( 'Site host could not be determined.', 'aio-page-builder' ) );
+			return array(
+				'success'  => false,
+				'crawl_id' => '',
+				'message'  => __( 'Site host could not be determined.', 'aio-page-builder' ),
+			);
 		}
 		if ( ! $this->acquire_lock( $site_host ) ) {
-			return array( 'success' => false, 'crawl_id' => '', 'message' => __( 'A crawl is already active or recently queued for this site.', 'aio-page-builder' ) );
+			return array(
+				'success'  => false,
+				'crawl_id' => '',
+				'message'  => __( 'A crawl is already active or recently queued for this site.', 'aio-page-builder' ),
+			);
 		}
 
 		$crawl_id = $this->snapshot_service->create_session( $site_host, $settings );
 		if ( $crawl_id === '' ) {
 			$this->release_lock( $site_host );
-			return array( 'success' => false, 'crawl_id' => '', 'message' => __( 'Failed to queue crawl.', 'aio-page-builder' ) );
+			return array(
+				'success'  => false,
+				'crawl_id' => '',
+				'message'  => __( 'Failed to queue crawl.', 'aio-page-builder' ),
+			);
 		}
 
 		$this->augment_session_payload( $crawl_id, $site_url, '', $settings, $created_by );
-		return array( 'success' => true, 'crawl_id' => $crawl_id, 'message' => __( 'Crawl queued.', 'aio-page-builder' ) );
+		return array(
+			'success'  => true,
+			'crawl_id' => $crawl_id,
+			'message'  => __( 'Crawl queued.', 'aio-page-builder' ),
+		);
 	}
 
 	/**
@@ -66,15 +82,27 @@ final class Crawl_Enqueue_Service {
 		$prior_id = \sanitize_text_field( $prior_crawl_id );
 		$prior    = $this->snapshot_service->get_session( $prior_id );
 		if ( $prior === null ) {
-			return array( 'success' => false, 'crawl_id' => '', 'message' => __( 'Prior crawl session not found.', 'aio-page-builder' ) );
+			return array(
+				'success'  => false,
+				'crawl_id' => '',
+				'message'  => __( 'Prior crawl session not found.', 'aio-page-builder' ),
+			);
 		}
 		$site_host = (string) ( $prior[ Crawl_Snapshot_Payload_Builder::SESSION_SITE_HOST ] ?? '' );
 		$site_host = \sanitize_text_field( $site_host );
 		if ( $site_host === '' ) {
-			return array( 'success' => false, 'crawl_id' => '', 'message' => __( 'Prior crawl session host is missing.', 'aio-page-builder' ) );
+			return array(
+				'success'  => false,
+				'crawl_id' => '',
+				'message'  => __( 'Prior crawl session host is missing.', 'aio-page-builder' ),
+			);
 		}
 		if ( ! $this->acquire_lock( $site_host ) ) {
-			return array( 'success' => false, 'crawl_id' => '', 'message' => __( 'A crawl is already active or recently queued for this site.', 'aio-page-builder' ) );
+			return array(
+				'success'  => false,
+				'crawl_id' => '',
+				'message'  => __( 'A crawl is already active or recently queued for this site.', 'aio-page-builder' ),
+			);
 		}
 		$settings = isset( $prior[ Crawl_Snapshot_Payload_Builder::SESSION_SETTINGS ] ) && is_array( $prior[ Crawl_Snapshot_Payload_Builder::SESSION_SETTINGS ] )
 			? $prior[ Crawl_Snapshot_Payload_Builder::SESSION_SETTINGS ]
@@ -82,11 +110,19 @@ final class Crawl_Enqueue_Service {
 		$crawl_id = $this->snapshot_service->create_session( $site_host, $settings );
 		if ( $crawl_id === '' ) {
 			$this->release_lock( $site_host );
-			return array( 'success' => false, 'crawl_id' => '', 'message' => __( 'Failed to queue retry crawl.', 'aio-page-builder' ) );
+			return array(
+				'success'  => false,
+				'crawl_id' => '',
+				'message'  => __( 'Failed to queue retry crawl.', 'aio-page-builder' ),
+			);
 		}
 		$site_url = (string) ( $prior['site_url'] ?? '' );
 		$this->augment_session_payload( $crawl_id, $site_url, $prior_id, $settings, $created_by );
-		return array( 'success' => true, 'crawl_id' => $crawl_id, 'message' => __( 'Retry queued from prior snapshot settings.', 'aio-page-builder' ) );
+		return array(
+			'success'  => true,
+			'crawl_id' => $crawl_id,
+			'message'  => __( 'Retry queued from prior snapshot settings.', 'aio-page-builder' ),
+		);
 	}
 
 	private function host_from_site_url( string $site_url ): string {
@@ -100,14 +136,14 @@ final class Crawl_Enqueue_Service {
 		if ( $existing === null ) {
 			return;
 		}
-		$existing['site_url']    = $site_url !== '' ? \esc_url_raw( $site_url ) : '';
-		$existing['status']      = 'queued';
-		$existing['retry_of']    = $retry_of !== '' ? \sanitize_text_field( $retry_of ) : '';
-		$existing['settings']    = is_array( $settings ) ? $settings : array();
-		$existing['created_by']  = \sanitize_text_field( $created_by );
-		$existing['created_at']  = gmdate( 'c' );
-		$existing['crawl_id']    = $crawl_id;
-		$option_key = 'aio_page_builder_crawl_session_' . substr( preg_replace( '/[^a-zA-Z0-9_-]/', '', $crawl_id ), 0, 64 );
+		$existing['site_url']   = $site_url !== '' ? \esc_url_raw( $site_url ) : '';
+		$existing['status']     = 'queued';
+		$existing['retry_of']   = $retry_of !== '' ? \sanitize_text_field( $retry_of ) : '';
+		$existing['settings']   = is_array( $settings ) ? $settings : array();
+		$existing['created_by'] = \sanitize_text_field( $created_by );
+		$existing['created_at'] = gmdate( 'c' );
+		$existing['crawl_id']   = $crawl_id;
+		$option_key             = 'aio_page_builder_crawl_session_' . substr( preg_replace( '/[^a-zA-Z0-9_-]/', '', $crawl_id ), 0, 64 );
 		\update_option( $option_key, $existing, false );
 	}
 
@@ -133,4 +169,3 @@ final class Crawl_Enqueue_Service {
 		\delete_option( $key );
 	}
 }
-

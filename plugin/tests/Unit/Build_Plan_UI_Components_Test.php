@@ -358,15 +358,15 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 
 	/** Row_Action_Resolver: execute enabled for approved when can_execute. */
 	public function test_row_action_resolver_approved_execute_enabled(): void {
-		$resolver = new Build_Plan_Row_Action_Resolver();
-		$item     = array( 'status' => Build_Plan_Item_Statuses::APPROVED );
+		$resolver          = new Build_Plan_Row_Action_Resolver();
+		$item              = array( 'status' => Build_Plan_Item_Statuses::APPROVED );
 		$item['item_type'] = Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN;
-		$caps     = array(
+		$caps              = array(
 			'can_approve' => true,
 			'can_execute' => true,
 		);
-		$actions  = $resolver->resolve( $item, $caps );
-		$execute  = $this->find_action( $actions, 'execute' );
+		$actions           = $resolver->resolve( $item, $caps );
+		$execute           = $this->find_action( $actions, 'execute' );
 		$this->assertTrue( $execute['enabled'] );
 	}
 
