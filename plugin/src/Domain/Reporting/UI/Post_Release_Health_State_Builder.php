@@ -259,13 +259,15 @@ final class Post_Release_Health_State_Builder {
 			'link_label'  => __( 'Support Triage', 'aio-page-builder' ),
 		);
 
-		// Import/export and support package (from triage failures).
+		// Import/export: triage may surface failures when a feed exists; otherwise do not imply a monitored failure log.
 		$import_export_failures  = $triage['import_export_failures'] ?? array();
 		$ie_ok                   = count( $import_export_failures ) === 0;
 		$scores['import_export'] = array(
 			'status'      => $ie_ok ? 'ok' : 'attention',
 			'score_label' => $ie_ok ? __( 'OK', 'aio-page-builder' ) : __( 'Failures present', 'aio-page-builder' ),
-			'message'     => $ie_ok ? __( 'No import/export failures.', 'aio-page-builder' ) : sprintf( __( '%d import/export issue(s) noted.', 'aio-page-builder' ), count( $import_export_failures ) ),
+			'message'     => $ie_ok
+				? __( 'Import/export outcomes are not aggregated here; use Import / Export for operations and Queue & Logs for reporting history.', 'aio-page-builder' )
+				: sprintf( __( '%d import/export issue(s) noted.', 'aio-page-builder' ), count( $import_export_failures ) ),
 			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-export-restore' ), $base ),
 			'link_label'  => __( 'Import / Export', 'aio-page-builder' ),
 		);

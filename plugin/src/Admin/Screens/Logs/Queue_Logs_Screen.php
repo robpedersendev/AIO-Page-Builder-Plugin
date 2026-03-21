@@ -4,6 +4,7 @@
  *
  * Tabs: Queue, Execution Logs, AI Runs, Reporting Logs, Import/Export Logs, Critical Errors.
  * Capability-gated; redacted; row-to-object navigation. Reporting failures visible.
+ * Import/Export Logs tab is reserved until a dedicated activity store exists; copy must not imply that log is populated.
  *
  * @package AIOPageBuilder
  */
@@ -147,7 +148,7 @@ final class Queue_Logs_Screen {
 		?>
 		<div class="wrap aio-page-builder-screen aio-queue-logs" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
-			<p class="aio-queue-logs-description"><?php \esc_html_e( 'Monitor queue state, execution logs, reporting delivery, and critical errors. Row links open related plans or runs.', 'aio-page-builder' ); ?></p>
+			<p class="aio-queue-logs-description"><?php \esc_html_e( 'Monitor queue state, execution logs, outbound reporting delivery (install, heartbeat, diagnostics), and failed developer-diagnostics deliveries. Row links open related plans or runs. Import/Export Logs lists import/export activity only when that store exists; use Reporting Logs and Export logs for operational history today.', 'aio-page-builder' ); ?></p>
 		<?php
 	}
 
@@ -162,10 +163,7 @@ final class Queue_Logs_Screen {
 			<h2 class="aio-reporting-health-title"><?php \esc_html_e( 'Reporting health', 'aio-page-builder' ); ?></h2>
 			<p class="aio-reporting-health-summary"><?php echo \esc_html( $health['summary_message'] ?? '' ); ?></p>
 			<?php if ( ! empty( $health['last_heartbeat_month'] ) ) : ?>
-				<p class="aio-reporting-health-heartbeat"><?php echo \esc_html( \__( 'Last heartbeat:', 'aio-page-builder' ) . ' ' . (string) $health['last_heartbeat_month'] ); ?></p>
-			<?php endif; ?>
-			<?php if ( (int) ( $health['recent_failures_count'] ?? 0 ) > 0 ) : ?>
-				<p class="aio-reporting-health-failures"><?php echo \esc_html( (string) ( $health['recent_failures_count'] ?? 0 ) . ' ' . \__( 'recent delivery failure(s).', 'aio-page-builder' ) ); ?></p>
+				<p class="aio-reporting-health-heartbeat"><?php echo \esc_html( \__( 'Last successful heartbeat month:', 'aio-page-builder' ) . ' ' . (string) $health['last_heartbeat_month'] ); ?></p>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -307,7 +305,10 @@ final class Queue_Logs_Screen {
 				$this->render_reporting_tab( $state['reporting_logs'] ?? array() );
 				break;
 			case self::TAB_IMPORT_EXPORT:
-				$this->render_import_export_tab( $state['import_export_logs'] ?? array() );
+				$this->render_import_export_tab(
+					$state['import_export_logs'] ?? array(),
+					(bool) ( $state['import_export_activity_log_available'] ?? false )
+				);
 				break;
 			case self::TAB_CRITICAL:
 				$this->render_critical_tab( $state['critical_errors'] ?? array() );
@@ -486,6 +487,7 @@ final class Queue_Logs_Screen {
 	/** @param array<int, array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}> $rows */
 	private function render_reporting_tab( array $rows ): void {
 		?>
+		<p class="description"><?php \esc_html_e( 'Each row is one outbound operational reporting attempt recorded locally (redacted references). Delivery failures here do not stop normal plugin operation.', 'aio-page-builder' ); ?></p>
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
 				<tr>
@@ -515,8 +517,17 @@ final class Queue_Logs_Screen {
 		<?php
 	}
 
-	/** @param array<int, array{id: string, type: string, created_at: string, status: string}> $rows */
-	private function render_import_export_tab( array $rows ): void {
+	/**
+	 * @param array<int, array{id: string, type: string, created_at: string, status: string}> $rows
+	 * @param bool                                                                               $activity_log_available Dedicated import/export activity store is enabled.
+	 */
+	private function render_import_export_tab( array $rows, bool $activity_log_available ): void {
+		if ( ! $activity_log_available ) {
+			?>
+			<p class="description"><?php \esc_html_e( 'A dedicated import/export activity log is not stored in this version. Use Reporting Logs for outbound operational reporting attempts (install, heartbeat, diagnostics), the Export logs section on this screen for redacted JSON exports, and Import / Export for package operations and conflicts.', 'aio-page-builder' ); ?></p>
+			<?php
+			return;
+		}
 		?>
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
@@ -529,7 +540,7 @@ final class Queue_Logs_Screen {
 			</thead>
 			<tbody>
 				<?php if ( empty( $rows ) ) : ?>
-					<tr><td colspan="4"><?php \esc_html_e( 'No import/export log entries yet.', 'aio-page-builder' ); ?></td></tr>
+					<tr><td colspan="4"><?php \esc_html_e( 'No import/export log entries.', 'aio-page-builder' ); ?></td></tr>
 				<?php else : ?>
 					<?php foreach ( $rows as $row ) : ?>
 						<tr>
@@ -560,7 +571,7 @@ final class Queue_Logs_Screen {
 			</thead>
 			<tbody>
 				<?php if ( empty( $rows ) ) : ?>
-					<tr><td colspan="5"><?php \esc_html_e( 'No critical error report failures.', 'aio-page-builder' ); ?></td></tr>
+					<tr><td colspan="5"><?php \esc_html_e( 'No failed developer diagnostics deliveries.', 'aio-page-builder' ); ?></td></tr>
 				<?php else : ?>
 					<?php foreach ( $rows as $row ) : ?>
 						<tr>

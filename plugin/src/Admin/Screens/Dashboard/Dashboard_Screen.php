@@ -291,7 +291,7 @@ final class Dashboard_Screen {
 		}
 		?>
 		<div class="aio-dashboard-critical-errors notice notice-error inline" style="margin: 1em 0;">
-			<p><strong><?php echo \esc_html( sprintf( __( '%d critical error(s) reported.', 'aio-page-builder' ), $summary['count'] ) ); ?></strong> <a href="<?php echo \esc_url( $summary['logs_url'] ); ?>"><?php \esc_html_e( 'View in Queue & Logs', 'aio-page-builder' ); ?></a></p>
+			<p><strong><?php echo \esc_html( sprintf( __( '%d developer diagnostics delivery failure(s).', 'aio-page-builder' ), $summary['count'] ) ); ?></strong> <a href="<?php echo \esc_url( $summary['logs_url'] ); ?>"><?php \esc_html_e( 'View in Queue & Logs', 'aio-page-builder' ); ?></a></p>
 			<?php if ( count( $summary['items'] ) > 0 ) : ?>
 				<ul style="margin: 0.5em 0 0 1.2em;">
 					<?php foreach ( $summary['items'] as $item ) : ?>

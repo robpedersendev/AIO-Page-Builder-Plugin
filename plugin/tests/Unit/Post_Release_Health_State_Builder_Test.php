@@ -128,4 +128,12 @@ final class Post_Release_Health_State_Builder_Test extends TestCase {
 		$this->assertArrayHasKey( 'import_export', $state['domain_health_scores'] );
 		$this->assertArrayHasKey( 'support_package', $state['domain_health_scores'] );
 	}
+
+	public function test_import_export_domain_message_does_not_claim_monitored_failure_feed_when_empty(): void {
+		$builder = new Post_Release_Health_State_Builder( null, null, null, null );
+		$state   = $builder->build( null, null );
+		$msg     = (string) ( $state['domain_health_scores']['import_export']['message'] ?? '' );
+		$this->assertStringContainsString( 'not aggregated', $msg );
+		$this->assertStringNotContainsString( 'No import/export failures', $msg );
+	}
 }

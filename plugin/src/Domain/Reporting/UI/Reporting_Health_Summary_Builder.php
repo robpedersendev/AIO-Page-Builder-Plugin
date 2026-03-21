@@ -63,16 +63,17 @@ final class Reporting_Health_Summary_Builder {
 
 		$current_ym      = gmdate( 'Y-m' );
 		$degraded        = $recent_failures > 0 || ( $last_heartbeat !== '' && $last_heartbeat < $current_ym );
-		$summary_message = $recent_failures > 0
-			? sprintf(
-				/* translators: %d: number of recent reporting failures */
-				\__( '%d recent reporting delivery failure(s).', 'aio-page-builder' ),
+		if ( $recent_failures > 0 ) {
+			$summary_message = sprintf(
+				/* translators: %d: number of failed outbound reporting deliveries in the last 30 days */
+				\__( '%d reporting delivery failure(s) in the last 30 days.', 'aio-page-builder' ),
 				$recent_failures
-			)
-		: ( $last_heartbeat === $current_ym
-			? \__( 'Reporting current. Heartbeat sent this month.', 'aio-page-builder' )
-			: \__( 'No heartbeat sent this month yet.', 'aio-page-builder' )
-		);
+			);
+		} elseif ( $last_heartbeat === $current_ym ) {
+			$summary_message = \__( 'No reporting delivery failures in the last 30 days. Heartbeat recorded for this calendar month.', 'aio-page-builder' );
+		} else {
+			$summary_message = \__( 'No reporting delivery failures in the last 30 days. No successful heartbeat recorded for this calendar month yet.', 'aio-page-builder' );
+		}
 
 		return array(
 			'recent_failures_count' => $recent_failures,

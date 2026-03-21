@@ -392,7 +392,7 @@ final class Support_Triage_State_Builder {
 	}
 
 	/**
-	 * Import/export failures: no persistent failure log in state; empty list. Use recommended_links to reach Import/Export screen.
+	 * Import/export failures for triage. Empty until a dedicated failure feed is wired; Post Release health must not treat empty as proof of zero failures.
 	 *
 	 * @return array<int, array{message: string, link_url: string, link_label: string}>
 	 */

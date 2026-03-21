@@ -64,6 +64,7 @@ final class Logs_Monitoring_State_Builder {
 	 *   ai_runs: array<int, array{run_id: string, status: string, created_at: string}>,
 	 *   reporting_logs: array<int, array{event_type: string, dedupe_key: string, attempted_at: string, delivery_status: string, log_reference: string, failure_reason: string}>,
 	 *   import_export_logs: array<int, array{id: string, type: string, created_at: string, status: string}>,
+	 *   import_export_activity_log_available: bool,
 	 *   critical_errors: array<int, array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}>,
 	 *   log_export: array{exportable_log_types: array<int, array{value: string, label: string}>},
 	 *   queue_health: array{total_pending: int, stale_lock_count: int, ...}
@@ -72,14 +73,15 @@ final class Logs_Monitoring_State_Builder {
 	public function build(): array {
 		$queue_health_builder = new Queue_Health_Summary_Builder( $this->job_queue_repository );
 		$state                = array(
-			'queue'              => $this->build_queue_tab(),
-			'queue_health'       => $queue_health_builder->build(),
-			'execution_logs'     => $this->build_execution_logs(),
-			'ai_runs'            => $this->build_ai_runs_tab(),
-			'reporting_logs'     => $this->build_reporting_logs(),
-			'import_export_logs' => $this->build_import_export_logs(),
-			'critical_errors'    => $this->build_critical_errors(),
-			'log_export'         => $this->build_log_export_options(),
+			'queue'                              => $this->build_queue_tab(),
+			'queue_health'                       => $queue_health_builder->build(),
+			'execution_logs'                     => $this->build_execution_logs(),
+			'ai_runs'                            => $this->build_ai_runs_tab(),
+			'reporting_logs'                     => $this->build_reporting_logs(),
+			'import_export_logs'                 => $this->build_import_export_logs(),
+			'import_export_activity_log_available' => false,
+			'critical_errors'                    => $this->build_critical_errors(),
+			'log_export'                           => $this->build_log_export_options(),
 		);
 		if ( $this->acf_diagnostics_state_builder !== null && method_exists( $this->acf_diagnostics_state_builder, 'build_for_bundle' ) ) {
 			$state['acf_diagnostics_summary'] = $this->acf_diagnostics_state_builder->build_for_bundle();
@@ -242,7 +244,7 @@ final class Logs_Monitoring_State_Builder {
 	}
 
 	/**
-	 * Critical errors: reporting log entries that are developer_error_report and failed.
+	 * Critical errors tab payload: reporting log entries where developer error diagnostics outbound delivery failed (not all site PHP errors).
 	 *
 	 * @return array<int, array{event_type: string, attempted_at: string, delivery_status: string, failure_reason: string, log_reference: string}>
 	 */

@@ -11,7 +11,7 @@
  * - [ ] Execution Logs tab: same columns; row-to-plan link.
  * - [ ] AI Runs tab: run_id, status, created_at; "View details" links to AI Runs screen; "Open AI Runs" button.
  * - [ ] Reporting Logs tab: event_type, attempted_at, delivery_status, log_reference, failure_reason; status badges.
- * - [ ] Import/Export Logs tab: placeholder "No import/export log entries yet" or table when data exists.
+ * - [ ] Import/Export Logs tab: disclosure when no dedicated activity store; table when import_export_activity_log_available.
  * - [ ] Critical Errors tab: failed developer_error_report entries; status badges.
  * - [ ] Reporting health card: summary_message, last_heartbeat_month, recent_failures_count when degraded.
  * - [ ] Without aio_view_logs: menu item not visible or screen shows no content.
@@ -61,6 +61,8 @@ final class Queue_Logs_Screen_Test extends TestCase {
 		$this->assertArrayHasKey( 'ai_runs', $state );
 		$this->assertArrayHasKey( 'reporting_logs', $state );
 		$this->assertArrayHasKey( 'import_export_logs', $state );
+		$this->assertArrayHasKey( 'import_export_activity_log_available', $state );
+		$this->assertFalse( $state['import_export_activity_log_available'] );
 		$this->assertArrayHasKey( 'critical_errors', $state );
 		$this->assertIsArray( $state['queue'] );
 		$this->assertIsArray( $state['reporting_logs'] );
