@@ -8,6 +8,11 @@
 // Composer autoload.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
+// * Stub path for Environment_Validator test-only plugin API include (see Environment_Validator.php).
+if ( ! defined( 'AIOPAGEBUILDER_TEST_PLUGIN_INCLUDES' ) ) {
+	define( 'AIOPAGEBUILDER_TEST_PLUGIN_INCLUDES', __DIR__ . '/fixtures/wp-plugin-api-stub.php' );
+}
+
 // Define ABSPATH if not in WordPress context.
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/wordpress/' );

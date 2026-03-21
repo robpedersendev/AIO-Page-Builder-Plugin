@@ -13,7 +13,6 @@ use AIOPageBuilder\Bootstrap\Validation_Result;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
-define( 'AIOPAGEBUILDER_TEST_PLUGIN_INCLUDES', dirname( __DIR__ ) . '/fixtures/wp-plugin-api-stub.php' );
 
 $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Bootstrap/Constants.php';
