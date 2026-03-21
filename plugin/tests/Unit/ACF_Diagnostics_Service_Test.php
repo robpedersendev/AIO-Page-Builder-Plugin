@@ -304,7 +304,7 @@ final class ACF_Diagnostics_Service_Test extends TestCase {
 		$this->assertArrayHasKey( 'group_key', $summary['valid'][0] );
 	}
 
-	public function test_registered_groups_summary_when_acf_unavailable(): void {
+	public function test_registered_groups_summary_when_acf_stubbed_like_wp(): void {
 		$this->seed_section(
 			'st_diag_one',
 			array(
@@ -326,7 +326,7 @@ final class ACF_Diagnostics_Service_Test extends TestCase {
 
 		$summary = $this->diagnostics->get_registered_groups_summary();
 
-		$this->assertFalse( $summary['acf_available'] );
+		$this->assertTrue( $summary['acf_available'] );
 		$this->assertSame( 1, $summary['expected_count'] );
 	}
 

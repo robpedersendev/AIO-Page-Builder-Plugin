@@ -218,6 +218,13 @@ final class Industry_Starter_Bundle_Registry {
 			$errors[] = 'unsupported_version';
 		}
 
+		$subtype_key = isset( $bundle[ self::FIELD_SUBTYPE_KEY ] ) && \is_string( $bundle[ self::FIELD_SUBTYPE_KEY ] )
+			? \trim( $bundle[ self::FIELD_SUBTYPE_KEY ] )
+			: '';
+		if ( $subtype_key !== '' && ( \strlen( $subtype_key ) > self::KEY_MAX_LENGTH || ! \preg_match( self::KEY_PATTERN, $subtype_key ) ) ) {
+			$errors[] = 'invalid_subtype_key';
+		}
+
 		return $errors;
 	}
 

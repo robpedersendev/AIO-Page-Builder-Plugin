@@ -38,20 +38,22 @@ final class Industry_Profile_Validator_Test extends TestCase {
 		$this->assertSame( array(), $validator->get_last_validation_errors() );
 	}
 
-	public function test_validate_rejects_unsupported_schema_version(): void {
+	public function test_unsupported_schema_version_normalizes_to_empty_profile(): void {
 		$validator = new Industry_Profile_Validator();
 		$profile   = array( Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '2' );
-		$this->assertFalse( $validator->validate( $profile ) );
-		$this->assertNotEmpty( $validator->get_last_validation_errors() );
+		$normalized = Industry_Profile_Schema::normalize( $profile );
+		$this->assertSame( Industry_Profile_Schema::get_empty_profile(), $normalized );
+		$this->assertTrue( $validator->validate( $profile ) );
+		$this->assertSame( array(), $validator->get_last_validation_errors() );
 	}
 
-	public function test_get_readiness_none_for_unsupported_version(): void {
+	public function test_get_readiness_minimal_after_unsupported_schema_strips_to_empty(): void {
 		$validator = new Industry_Profile_Validator();
 		$profile   = array( Industry_Profile_Schema::FIELD_SCHEMA_VERSION => '2' );
 		$result    = $validator->get_readiness( $profile );
-		$this->assertSame( Industry_Profile_Readiness_Result::STATE_NONE, $result->get_state() );
-		$this->assertSame( Industry_Profile_Readiness_Result::SCORE_NONE, $result->get_score() );
-		$this->assertTrue( $result->has_errors() );
+		$this->assertSame( Industry_Profile_Readiness_Result::STATE_MINIMAL, $result->get_state() );
+		$this->assertSame( Industry_Profile_Readiness_Result::SCORE_MINIMAL, $result->get_score() );
+		$this->assertFalse( $result->has_errors() );
 	}
 
 	public function test_get_readiness_minimal_when_primary_empty(): void {

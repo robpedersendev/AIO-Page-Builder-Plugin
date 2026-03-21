@@ -172,7 +172,7 @@ final class Operational_Snapshot_Capture_Test extends TestCase {
 		$repo = new Stub_Operational_Snapshot_Repository();
 		$svc  = new Operational_Snapshot_Service( $repo, new Pre_Change_Snapshot_Builder(), new Post_Change_Result_Builder() );
 		$this->assertTrue( $svc->supports_pre_capture( Execution_Action_Types::REPLACE_PAGE ) );
-		$this->assertTrue( $svc->supports_pre_capture( Execution_Action_Types::UPDATE_MENU ) );
+		$this->assertFalse( $svc->supports_pre_capture( Execution_Action_Types::UPDATE_MENU ) );
 		$this->assertTrue( $svc->supports_pre_capture( Execution_Action_Types::APPLY_TOKEN_SET ) );
 		$this->assertFalse( $svc->supports_pre_capture( Execution_Action_Types::CREATE_PAGE ) );
 		$this->assertFalse( $svc->supports_pre_capture( Execution_Action_Types::FINALIZE_PLAN ) );

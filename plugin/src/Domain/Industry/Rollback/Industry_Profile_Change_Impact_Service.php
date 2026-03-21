@@ -68,9 +68,10 @@ final class Industry_Profile_Change_Impact_Service {
 		$snap_secondary = isset( $approved_snapshot[ self::KEY_SECONDARY ] ) && is_array( $approved_snapshot[ self::KEY_SECONDARY ] )
 			? array_values( array_filter( array_map( 'trim', array_map( 'strval', $approved_snapshot[ self::KEY_SECONDARY ] ) ) ) )
 			: array();
-		$snap_style     = isset( $approved_snapshot[ self::KEY_STYLE ] ) && is_string( $approved_snapshot[ self::KEY_STYLE ] )
-			? trim( $approved_snapshot[ self::KEY_STYLE ] )
-			: ( $approved_snapshot[ self::KEY_STYLE ] === null ? '' : '' );
+		$snap_style = '';
+		if ( isset( $approved_snapshot[ self::KEY_STYLE ] ) && is_string( $approved_snapshot[ self::KEY_STYLE ] ) ) {
+			$snap_style = trim( $approved_snapshot[ self::KEY_STYLE ] );
+		}
 
 		$primary_changed   = $live_primary !== $snap_primary;
 		$secondary_changed = $this->secondary_sets_differ( $live_secondary, $snap_secondary );

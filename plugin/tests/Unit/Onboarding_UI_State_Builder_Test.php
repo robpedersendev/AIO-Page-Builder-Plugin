@@ -63,6 +63,9 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 	}
 
 	public function test_build_for_screen_returns_required_keys(): void {
+		$settings  = new Settings_Service();
+		$draft_svc = new Onboarding_Draft_Service( $settings );
+		$draft_svc->clear_draft();
 		$builder = $this->get_builder();
 		$state   = $builder->build_for_screen();
 		$this->assertArrayHasKey( 'current_step_key', $state );

@@ -12,6 +12,7 @@ use AIOPageBuilder\Domain\Industry\Docs\Industry_Section_Helper_Overlay_Registry
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Diagnostics_Service;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 use PHPUnit\Framework\TestCase;
 
@@ -44,6 +45,10 @@ final class Industry_Diagnostics_Service_Test extends TestCase {
 	}
 
 	public function test_snapshot_with_empty_profile_has_no_secrets(): void {
+		if ( ! isset( $GLOBALS['_aio_test_options'] ) ) {
+			$GLOBALS['_aio_test_options'] = array();
+		}
+		$GLOBALS['_aio_test_options'][ Option_Names::INDUSTRY_PROFILE ] = array();
 		$settings = new Settings_Service();
 		$repo     = new Industry_Profile_Repository( $settings );
 		$service  = new Industry_Diagnostics_Service( $repo, null, null, null, null );

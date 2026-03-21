@@ -38,10 +38,10 @@ final class Industry_Maturity_Delta_Report_Service_Test extends TestCase {
 		$this->assertArrayHasKey( 'captured_at', $result['current_snapshot'] );
 	}
 
-	public function test_generate_report_with_empty_baseline_families_returns_no_baseline(): void {
+	public function test_generate_report_with_empty_baseline_families_compares_against_empty_scope(): void {
 		$service = new Industry_Maturity_Delta_Report_Service( null );
 		$result  = $service->generate_report( array( 'families' => array() ) );
-		$this->assertTrue( $result['summary']['no_baseline'] );
+		$this->assertFalse( $result['summary']['no_baseline'] );
 	}
 
 	public function test_generate_report_with_baseline_returns_trends(): void {

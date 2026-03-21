@@ -141,6 +141,8 @@ final class Industry_What_If_Simulation_Service {
 			$goal = is_string( $v ) ? trim( $v ) : '';
 			if ( $goal === '' || ( strlen( $goal ) <= 64 && preg_match( '#^[a-z0-9_-]+$#', $goal ) ) ) {
 				$out[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] = $goal;
+			} else {
+				$out[ Industry_Profile_Schema::FIELD_CONVERSION_GOAL_KEY ] = '';
 			}
 		}
 		return $out;

@@ -125,9 +125,11 @@ final class Industry_What_If_Simulation_Service_Test extends TestCase {
 		$pack_reg->load(
 			array(
 				array(
-					'industry_key' => 'realtor',
-					'name'         => 'Realtor',
-					'status'       => 'active',
+					'industry_key'     => 'realtor',
+					'name'             => 'Realtor',
+					'summary'          => 'Test pack.',
+					'status'           => 'active',
+					'version_marker'   => '1',
 				),
 			)
 		);

@@ -37,7 +37,8 @@ final class Industry_Drift_Report_Service_Test extends TestCase {
 	public function test_each_item_has_required_keys(): void {
 		$service = new Industry_Drift_Report_Service( null );
 		$result  = $service->generate_report();
-		$keys    = array( 'drift_type', 'severity', 'evidence_refs', 'explanation', 'suggested_review_path' );
+		$this->assertIsArray( $result['items'] );
+		$keys = array( 'drift_type', 'severity', 'evidence_refs', 'explanation', 'suggested_review_path' );
 		foreach ( $result['items'] as $item ) {
 			foreach ( $keys as $key ) {
 				$this->assertArrayHasKey( $key, $item );

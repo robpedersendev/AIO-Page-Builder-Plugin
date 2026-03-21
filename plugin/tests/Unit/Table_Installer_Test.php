@@ -105,7 +105,7 @@ final class Table_Installer_Test extends TestCase {
 		$runner          = new DbDelta_Runner();
 		$installer       = new Table_Installer( $this->wpdb_stub, $runner, $this->tracker );
 		$missing         = $installer->get_missing_tables();
-		$this->assertCount( 8, $missing );
+		$this->assertCount( 9, $missing );
 		$this->assertContains( Table_Names::CRAWL_SNAPSHOTS, $missing );
 	}
 

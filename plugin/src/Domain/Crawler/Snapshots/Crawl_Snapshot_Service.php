@@ -258,7 +258,12 @@ final class Crawl_Snapshot_Service {
 		$overrides     = array(
 			Crawl_Snapshot_Payload_Builder::PAGE_HIERARCHY_CLUES => $merged,
 		);
-		return $this->store_page_record( $crawl_run_id, $url, $overrides );
+		$payload       = Crawl_Snapshot_Payload_Builder::build_page_payload( $crawl_run_id, $url, $overrides );
+		if ( empty( $payload ) ) {
+			return 0;
+		}
+		$payload['id'] = (int) ( $page['id'] ?? 0 );
+		return $this->repository->save( $payload );
 	}
 
 	/**

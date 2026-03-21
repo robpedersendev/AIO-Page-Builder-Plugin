@@ -17,9 +17,9 @@ require_once $plugin_root . '/src/Domain/Storage/Tables/Table_Names.php';
 
 final class Table_Names_Test extends TestCase {
 
-	public function test_all_returns_eight_manifest_tables(): void {
+	public function test_all_returns_nine_manifest_tables(): void {
 		$all = Table_Names::all();
-		$this->assertCount( 8, $all );
+		$this->assertCount( 9, $all );
 		$this->assertContains( Table_Names::CRAWL_SNAPSHOTS, $all );
 		$this->assertContains( Table_Names::AI_ARTIFACTS, $all );
 		$this->assertContains( Table_Names::JOB_QUEUE, $all );
@@ -28,6 +28,7 @@ final class Table_Names_Test extends TestCase {
 		$this->assertContains( Table_Names::TOKEN_SETS, $all );
 		$this->assertContains( Table_Names::ASSIGNMENT_MAPS, $all );
 		$this->assertContains( Table_Names::REPORTING_RECORDS, $all );
+		$this->assertContains( Table_Names::PROFILE_SNAPSHOTS, $all );
 	}
 
 	public function test_suffixes_match_manifest(): void {
@@ -39,6 +40,7 @@ final class Table_Names_Test extends TestCase {
 		$this->assertSame( 'aio_token_sets', Table_Names::TOKEN_SETS );
 		$this->assertSame( 'aio_assignment_maps', Table_Names::ASSIGNMENT_MAPS );
 		$this->assertSame( 'aio_reporting_records', Table_Names::REPORTING_RECORDS );
+		$this->assertSame( 'aio_profile_snapshots', Table_Names::PROFILE_SNAPSHOTS );
 	}
 
 	public function test_full_name_uses_prefix(): void {

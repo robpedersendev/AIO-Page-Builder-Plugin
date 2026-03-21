@@ -139,6 +139,7 @@ final class Hero_Intro_Library_Batch_Definitions {
 			'animation_families'                           => array( 'entrance', 'hover' ),
 			'preview_defaults'                             => $preview_defaults,
 			'accessibility_warnings_or_enhancements'       => 'Use one primary heading (h1 or h2 per page context). CTA links must have visible, descriptive text. Ensure sufficient contrast for hero text.',
+			Section_Schema::FIELD_INDUSTRY_AFFINITY          => self::LAUNCH_INDUSTRIES,
 		);
 		$base['field_blueprint'] = array(
 			'blueprint_id'    => $bp_id,

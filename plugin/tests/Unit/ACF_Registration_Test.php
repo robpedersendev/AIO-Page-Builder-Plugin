@@ -236,12 +236,13 @@ final class ACF_Registration_Test extends TestCase {
 		$this->assertNull( $registrar->assemble_group( array( 'section_key' => 'x' ) ) );
 	}
 
-	public function test_registrar_is_acf_available_false_without_acf(): void {
+	public function test_registrar_is_acf_available_true_when_bootstrap_stubs_acf(): void {
 		$registrar = $this->create_registrar();
-		$this->assertFalse( $registrar->is_acf_available() );
+		// * PHPUnit bootstrap defines acf_add_local_field_group; same as real WP+ACF presence for this check.
+		$this->assertTrue( $registrar->is_acf_available() );
 	}
 
-	public function test_registrar_register_all_returns_zero_without_acf(): void {
+	public function test_registrar_register_all_returns_zero_when_no_blueprints_in_repo(): void {
 		$registrar = $this->create_registrar();
 		$count     = $registrar->register_all();
 		$this->assertSame( 0, $count );

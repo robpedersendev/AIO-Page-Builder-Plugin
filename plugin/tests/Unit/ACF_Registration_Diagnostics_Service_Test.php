@@ -56,7 +56,7 @@ final class ACF_Registration_Diagnostics_Service_Test extends TestCase {
 			false
 		);
 		$last    = $this->diagnostics->get_last_registration();
-		$allowed = array( 'mode', 'section_key_count', 'cache_used', 'full_registration_invoked' );
+		$allowed = array( 'mode', 'section_key_count', 'cache_used', 'full_registration_invoked', 'site_id' );
 		$this->assertSame( $allowed, array_keys( $last ) );
 	}
 

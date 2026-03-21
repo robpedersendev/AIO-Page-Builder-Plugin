@@ -133,6 +133,16 @@ final class Import_Validator {
 			return new Import_Validation_Result( false, $failures, $conflicts, $warnings, $manifest, $zip_path, false );
 		}
 
+		$included = $manifest['included_categories'] ?? array();
+		if ( is_array( $included ) && in_array( 'styling', $included, true ) ) {
+			$styling_err = $this->check_styling_schema_versions( $zip );
+			if ( $styling_err !== '' ) {
+				$zip->close();
+				$failures[] = $styling_err;
+				return new Import_Validation_Result( false, $failures, $conflicts, $warnings, $manifest, $zip_path, false );
+			}
+		}
+
 		$checksum_list = $manifest['package_checksum_list'] ?? array();
 		if ( is_array( $checksum_list ) && $checksum_list !== array() ) {
 			$checksum_verified = $this->verify_checksums( $zip, $checksum_list );

@@ -41,6 +41,20 @@ final class Industry_Page_Template_Recommendation_Resolver {
 
 	private const TEMPLATE_FAMILY_FIELD = 'template_family';
 
+	/** @var Industry_Read_Model_Cache_Service|null */
+	private $cache_service;
+
+	/** @var Industry_Cache_Key_Builder|null */
+	private $cache_key_builder;
+
+	public function __construct(
+		?Industry_Read_Model_Cache_Service $cache_service = null,
+		?Industry_Cache_Key_Builder $cache_key_builder = null
+	) {
+		$this->cache_service     = $cache_service;
+		$this->cache_key_builder = $cache_key_builder;
+	}
+
 	/**
 	 * Resolves ranked page-template recommendations. Safe: missing profile yields neutral ranking.
 	 *

@@ -328,8 +328,9 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 	public function test_row_action_resolver_pending_with_capability(): void {
 		$resolver = new Build_Plan_Row_Action_Resolver();
 		$item     = array(
-			'item_id' => 'ep_0',
-			'status'  => Build_Plan_Item_Statuses::PENDING,
+			'item_id'   => 'ep_0',
+			'status'    => Build_Plan_Item_Statuses::PENDING,
+			'item_type' => Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN,
 		);
 		$caps     = array(
 			'can_approve' => true,
@@ -369,8 +370,8 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 		$this->assertTrue( $execute['enabled'] );
 	}
 
-	/** Row_Action_Resolver: execute disabled for non-executable item types (SEO). */
-	public function test_row_action_resolver_seo_execute_disabled(): void {
+	/** Row_Action_Resolver: SEO items do not expose execute/retry (advisory-only step). */
+	public function test_row_action_resolver_seo_has_no_execute_or_retry(): void {
 		$resolver = new Build_Plan_Row_Action_Resolver();
 		$item     = array(
 			'status'    => Build_Plan_Item_Statuses::APPROVED,
@@ -381,9 +382,8 @@ final class Build_Plan_UI_Components_Test extends TestCase {
 			'can_execute' => true,
 		);
 		$actions  = $resolver->resolve( $item, $caps );
-		$execute  = $this->find_action( $actions, 'execute' );
-		$this->assertNotNull( $execute );
-		$this->assertFalse( $execute['enabled'] );
+		$this->assertNull( $this->find_action( $actions, 'execute' ) );
+		$this->assertNull( $this->find_action( $actions, 'retry' ) );
 	}
 
 	/** Step_Workspace_Payload_Builder returns step_list_rows and bulk_action_states. */

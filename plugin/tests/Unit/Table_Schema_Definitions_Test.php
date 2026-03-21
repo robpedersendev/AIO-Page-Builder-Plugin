@@ -31,9 +31,9 @@ final class Table_Schema_Definitions_Test extends TestCase {
 		};
 	}
 
-	public function test_get_definitions_returns_eight_tables(): void {
+	public function test_get_definitions_returns_nine_tables(): void {
 		$defs = Table_Schema_Definitions::get_definitions( $this->wpdb_stub );
-		$this->assertCount( 8, $defs );
+		$this->assertCount( 9, $defs );
 	}
 
 	public function test_each_definition_has_name_and_sql(): void {

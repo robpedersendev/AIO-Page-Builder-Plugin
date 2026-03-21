@@ -51,7 +51,20 @@ class Build_Plan_Analytics_Stub_Snapshot_Repository implements \AIOPageBuilder\D
 	}
 
 	public function list_post_change_snapshots_for_period( ?string $date_from = null, ?string $date_to = null ): array {
-		return array();
+		$out = array();
+		foreach ( $this->by_plan_id as $snapshots ) {
+			foreach ( $snapshots as $snap ) {
+				$created = isset( $snap['created_at'] ) && is_string( $snap['created_at'] ) ? $snap['created_at'] : '';
+				if ( $date_from !== null && $date_to !== null && $created !== '' ) {
+					$day = substr( $created, 0, 10 );
+					if ( $day < $date_from || $day > $date_to ) {
+						continue;
+					}
+				}
+				$out[] = $snap;
+			}
+		}
+		return $out;
 	}
 }
 
@@ -167,11 +180,13 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 		$repo    = new Build_Plan_Analytics_Stub_Repository( array() );
 		$svc     = new Build_Plan_Analytics_Service( $repo );
 		$summary = $svc->get_rollback_frequency_summary( null, null );
-		$this->assertArrayHasKey( 'total_rollbacks', $summary );
+		$this->assertArrayHasKey( 'completed_rollbacks', $summary );
+		$this->assertArrayHasKey( 'rollback_eligible_completed_executions', $summary );
+		$this->assertArrayHasKey( 'rollback_rate', $summary );
 		$this->assertArrayHasKey( 'by_month', $summary );
 		$this->assertArrayHasKey( 'source', $summary );
-		$this->assertSame( 0, $summary['total_rollbacks'] );
-		$this->assertSame( 'plan_analytics_only', $summary['source'] );
+		$this->assertSame( 0, $summary['completed_rollbacks'] );
+		$this->assertSame( 'unavailable', $summary['source'] );
 	}
 
 	public function test_rollback_frequency_summary_uses_operational_snapshots_when_available(): void {
@@ -183,14 +198,14 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 					array(
 						'post_snapshot_id' => 'post_1',
 						'pre_snapshot_id'  => 'pre_1',
-						'action_type'      => 'replace_page',
+						'action_type'      => 'rollback_action',
 						'target_ref'       => 'post:123',
 						'created_at'       => '2025-03-16 12:00:00',
 					),
 					array(
 						'post_snapshot_id' => 'post_2',
 						'pre_snapshot_id'  => 'pre_2',
-						'action_type'      => 'token_change',
+						'action_type'      => 'rollback_action',
 						'target_ref'       => 'tokens:global',
 						'created_at'       => '2025-03-20 12:00:00',
 					),
@@ -200,10 +215,10 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 		$svc    = new Build_Plan_Analytics_Service( $repo, $snaps );
 		$out    = $svc->get_rollback_frequency_summary( '2025-03-01', '2025-03-31' );
 		$this->assertSame( 'operational_snapshots', $out['source'] );
-		$this->assertSame( 2, $out['total_rollbacks'] );
+		$this->assertSame( 2, $out['completed_rollbacks'] );
 		$this->assertNotEmpty( $out['by_month'] );
 		$this->assertSame( '2025-03', $out['by_month'][0]['month'] );
-		$this->assertSame( 2, $out['by_month'][0]['count'] );
+		$this->assertSame( 2, $out['by_month'][0]['completed_rollbacks'] );
 	}
 
 	public function test_analytics_summary_returns_redacted_payloads_no_raw_secrets(): void {
@@ -274,11 +289,11 @@ final class Build_Plan_Analytics_Service_Test extends TestCase {
 				'date_to'               => '2025-03-31',
 			),
 			'rollback_frequency_summary' => array(
-				'total_rollbacks' => 0,
-				'by_month'        => array(),
-				'date_from'       => '2025-03-01',
-				'date_to'         => '2025-03-31',
-				'source'          => 'plan_analytics_only',
+				'completed_rollbacks' => 0,
+				'by_month'            => array(),
+				'date_from'           => '2025-03-01',
+				'date_to'             => '2025-03-31',
+				'source'              => 'unavailable',
 			),
 		);
 		$this->assertSame( $example['plan_review_trends']['total_plans'], $summary['plan_review_trends']['total_plans'] );

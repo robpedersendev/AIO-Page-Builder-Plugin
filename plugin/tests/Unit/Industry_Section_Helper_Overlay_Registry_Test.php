@@ -93,7 +93,7 @@ final class Industry_Section_Helper_Overlay_Registry_Test extends TestCase {
 		$registry = new Industry_Section_Helper_Overlay_Registry();
 		$registry->load( $definitions );
 		$cosmetology = $registry->get_for_industry( 'cosmetology_nail' );
-		$this->assertCount( 5, $cosmetology );
+		$this->assertCount( 9, $cosmetology );
 		$ov = $registry->get( 'cosmetology_nail', 'hero_conv_02' );
 		$this->assertNotNull( $ov );
 		$this->assertSame( 'section_helper_overlay', $ov[ Industry_Section_Helper_Overlay_Registry::FIELD_SCOPE ] );
