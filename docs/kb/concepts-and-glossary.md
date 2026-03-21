@@ -35,7 +35,7 @@ A **governed custom ordering of section templates** (custom page assembly) manag
 
 ### Build Plan
 
-A **reviewable package of proposed work** generated from AI/planning (often linked to an **AI Run**). Listed under **Build Plans**; opening a plan shows the **workspace** with a **stepper** (multiple **steps**). Plan records use statuses such as `pending_review`, `approved`, `in_progress`, and `completed` in the data model—labels in the list table match the UI.
+A **reviewable package of proposed work** generated from AI/planning (often linked to an **AI Run**). Listed under **Build Plans**; opening a plan shows the **workspace** with a **stepper** (multiple **steps**). Plan records use statuses such as `pending_review`, `approved`, `in_progress`, and `completed` in the data model—labels in the list table match the UI. **Operator overview:** [build-plan-overview.md](operator/build-plan-overview.md).
 
 ### Plan item
 
@@ -55,7 +55,7 @@ A **single row** inside a Build Plan **step** (e.g. one existing-page update, on
 
 ### Rollback
 
-A **request to undo** executed changes using stored **version snapshots**, when eligible. Requested from the **logs / rollback** step in the Build Plan workspace. Requires `aio_execute_rollbacks`; the rollback itself is **queued** and may fail or be ineligible (missing snapshots, validation, etc.).
+A **request to undo** executed changes using stored **version snapshots**, when eligible. Requested from the **Logs & rollback** step (typically the **last** step in the default plan stack). Requires `aio_execute_rollbacks`; the rollback itself is **queued** and may fail or be ineligible (missing snapshots, validation, etc.).
 
 ### Snapshot
 
@@ -196,5 +196,5 @@ The list and detail views require **`aio_view_ai_runs`**. See [ai-runs-and-run-d
 
 ## 6. Terminology alignment notes
 
-- Build Plan **step types** in code include: overview, existing page changes, new pages, hierarchy flow, navigation, design tokens, SEO, confirmation, logs/rollback. The stepper **numbering** in guides may not list every type for every plan; trust the **labels on screen**.
+- Build Plan **step types** in code include: overview, existing page changes, new pages, hierarchy flow, navigation, design tokens, SEO, confirmation, logs/rollback. Default **nine** steps and safe navigation: [build-plan-overview.md](operator/build-plan-overview.md). Trust the **labels on screen** if a plan omits or reorders steps.
 - **Documentation** detail requires `aio_manage_section_templates`; editors without that cap may need another role or link path to view helper content.

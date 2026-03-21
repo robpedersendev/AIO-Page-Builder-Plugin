@@ -192,7 +192,7 @@ Open **AI Runs** for the recorded run (id may be in the notice). Failures includ
 | Capabilities and roles | [concepts-and-glossary.md](../concepts-and-glossary.md) |
 | AI Providers (credentials, test connection, spend cap) | [ai-providers-credentials-budget.md](ai-providers-credentials-budget.md); [admin-operator-guide.md](../../guides/admin-operator-guide.md) §3 |
 | Crawl Sessions / Comparison | [crawler-sessions-and-comparison.md](crawler-sessions-and-comparison.md); [admin-operator-guide.md](../../guides/admin-operator-guide.md) §4 |
-| Build Plans (after planning) | [admin-operator-guide.md](../../guides/admin-operator-guide.md) §6–§7; [end-user-workflow-guide.md](../../guides/end-user-workflow-guide.md) |
+| Build Plans (after planning) | [build-plan-overview.md](build-plan-overview.md); [admin-operator-guide.md](../../guides/admin-operator-guide.md) §6–§7; [end-user-workflow-guide.md](../../guides/end-user-workflow-guide.md) |
 | Profile snapshot history / restore | [advanced-ai-labs.md](advanced-ai-labs.md) (stub); screen **Profile History** / `aio-page-builder-profile-snapshots`; [FILE_MAP.md](../FILE_MAP.md) §4 |
 | Industry profile | [industry-admin-workflows.md](../industry/industry-admin-workflows.md) |
 | Import / export affecting profile | [admin-operator-guide.md](../../guides/admin-operator-guide.md) §11; [FILE_MAP.md](../FILE_MAP.md) §11 |

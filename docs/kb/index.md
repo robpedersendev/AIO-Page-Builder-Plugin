@@ -55,7 +55,8 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ### Build Plans
 
-- [admin-operator-guide.md §6–§7](../guides/admin-operator-guide.md); [end-user-workflow-guide.md §2](../guides/end-user-workflow-guide.md).
+- [build-plan-overview.md](operator/build-plan-overview.md) — **Start here:** list, workspace, steps 1–9 (default labels), review vs execution, safety, item status, FAQ. Step stubs: nine `build-plan-step-*.md` files (linked from the overview).
+- [admin-operator-guide.md §6–§7](../guides/admin-operator-guide.md); [end-user-workflow-guide.md §2–§3](../guides/end-user-workflow-guide.md).
 
 ### Execution & Rollback
 
@@ -109,7 +110,7 @@ Labels and table columns on many screens are driven by dedicated builders. Use t
 | AI providers | `AI_Providers_UI_State_Builder` |
 | Page / section directories & detail | `Page_Template_Directory_State_Builder`, `Section_Template_Directory_State_Builder`, `Page_Template_Detail_State_Builder`, `Section_Template_Detail_State_Builder` |
 | Compare / compositions | `Template_Compare_State_Builder`, `Composition_Builder_State_Builder` |
-| Build Plan workspace | `Build_Plan_UI_State_Builder` |
+| Build Plan workspace | [build-plan-overview.md](operator/build-plan-overview.md); `Build_Plan_UI_State_Builder` |
 | Rollback | `Rollback_State_Builder` |
 | Import / Export | `Import_Export_State_Builder` |
 | Logs / triage / post-release / privacy settings | `Logs_Monitoring_State_Builder`, `Reporting_Health_Summary_Builder`, `Support_Triage_State_Builder`, `Post_Release_Health_State_Builder`, `Privacy_Settings_State_Builder` |

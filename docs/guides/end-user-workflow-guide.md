@@ -21,22 +21,20 @@ Complete the steps to provide brand and business profile data. This information 
 
 - **Where:** **AIO Page Builder → Build Plans**. Open a plan to see the workspace.
 
-**What you see:** A stepper with steps such as existing page updates, new page creation (build intent), navigation changes, then execution and logs/rollback.
+**Full guide:** [build-plan-overview.md](../kb/operator/build-plan-overview.md) — step list, safety before execute, how to read statuses, and advisory vs executable items.
 
-**What you do:**  
-- **Step 1 — Existing page updates:** Review each item; **Approve** or **Deny**, or use **Bulk approve** / **Bulk deny** for the step.  
-- **Step 2 — Build intent:** Approve items you want built, or use **Build All** / **Build selected**.  
-- **Step 3 — Navigation:** Approve or deny menu/navigation items; **Apply All** / **Deny All** available.  
-- **Later steps:** Review the approved set, then confirm or start execution as shown in the UI.
+**What you see:** A **context rail** (plan ID, source run, status, summaries) and a **stepper** with numbered steps. The default order starts with **Overview**, then **Existing page changes**, **New pages**, **Hierarchy & flow**, **Navigation**, **Design tokens**, **SEO**, **Confirm**, and **Logs & rollback**—trust the **labels on screen** if your plan differs.
 
-Only approved items are executed. Do not approve steps you have not reviewed. The system does not execute without your review and approval.
+**What you do:** Move through the stepper; on each step, review items and use **Approve** / **Deny** (or **Apply** / **Deny** on navigation), bulk actions where offered, and **Execute** only when your role allows and the item type supports it. Later steps include confirmation and execution history. **SEO** and some notes may be **advisory only** (no execute).
+
+Only approved items are executed. Do not approve items you have not reviewed. The system does not execute without your review and approval (and execution capability where required).
 
 ---
 
 ## 3. After execution
 
 - **Queue & Logs:** **AIO Page Builder → Queue & Logs** shows queue status and execution logs. Rows can link back to the Build Plan or AI Run.  
-- **Rollback:** If something went wrong and the plan supports rollback, use the rollback action in the Build Plan workspace (Step 7). Rollback is queued and may not apply in all cases; check the result and verify important content.
+- **Rollback:** If something went wrong and the plan supports rollback, use the rollback action on the **Logs & rollback** step (last step in the default stack). Rollback is queued and may not apply in all cases; check the result and verify important content.
 
 ---
 

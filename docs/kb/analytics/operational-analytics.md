@@ -18,4 +18,4 @@ Single KB home for **read-only analytics** views: Build Plan Analytics, Template
 - Build Plan Analytics: approval/denial trends, blockers, execution/rollback summaries (as shown in UI).
 - Template Analytics: aggregate template usage signals (as shown in UI).
 - Post-Release Health: period selection, export JSON (if enabled for role), relationship to reporting health.
-- Cross-links: [admin-operator-guide.md §6–§9](../../guides/admin-operator-guide.md), [admin-screen-inventory.md](../../contracts/admin-screen-inventory.md) §§4–5.
+- Cross-links: [build-plan-overview.md](../operator/build-plan-overview.md), [admin-operator-guide.md §6–§9](../../guides/admin-operator-guide.md), [admin-screen-inventory.md](../../contracts/admin-screen-inventory.md) §§4–5.
