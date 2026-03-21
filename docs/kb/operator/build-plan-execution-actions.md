@@ -155,7 +155,7 @@ Until execution succeeds, the live site is unchanged for that item (except side 
 
 1. **Review before execute** — Approving only marks intent. **Execute** (or batch queue) applies **live** mutations. Use **Export plan** ([build-plan-overview.md](build-plan-overview.md)) before large batches.
 2. **Partial execution reality** — Jobs run **asynchronously**; some items may **`completed`** while others **`failed`** or remain **`approved`**. The queue can be **paused** or **backlogged**; always read **Queue → Execution** logs.
-3. **Retry vs rollback** — **Retry** re-runs the **forward** handler for a failed **plan item** job. **Rollback** attempts to **revert** a **successful** change using **snapshots** for supported types only. A failed create is not “rolled back” by the same button as a successful replace.
+3. **Retry vs rollback** — **Retry** re-runs the **forward** handler for a failed **plan item** job. **Rollback** attempts to **revert** a **successful** change using **snapshots** for supported types only. A failed create is not “rolled back” by the same button as a successful replace. Operator playbook: [build-plan-rollback-and-recovery.md](build-plan-rollback-and-recovery.md).
 4. **Locks** — The executor acquires **scope locks**; concurrent execution of the same target may be **refused** (`Could not acquire lock`).
 5. **Handler missing** — If a type were not registered, the executor returns **action not available** (should not happen for types in `Execution_Provider` today).
 

@@ -142,7 +142,7 @@ Use **Export plan** (if allowed) and review offline; focus one **step** at a tim
 An **earlier** step still has items that are not in a **terminal** status. Clear those decisions first.
 
 **Where is rollback?**  
-**Logs & rollback** step (typically **step 9** in the default stack). Rollback is **queued** and can be **ineligible** or **error**—read the messages and verify the site afterward.
+**Logs & rollback** step (typically **step 9** in the default stack). Rollback is **queued** and can be **ineligible** or **error**—read the messages and verify the site afterward. **Retry vs rollback and queue recovery:** [build-plan-rollback-and-recovery.md](build-plan-rollback-and-recovery.md).
 
 **Does Save and exit save my review?**  
 It returns you to the **list**; review mutations are saved when you submit the relevant **Approve/Deny/Execute** forms with valid nonces, not merely by leaving the screen.

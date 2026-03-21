@@ -60,11 +60,13 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 - [build-plan-hierarchy-navigation-tokens-seo.md](operator/build-plan-hierarchy-navigation-tokens-seo.md) — **Hierarchy, navigation, design tokens, SEO** (`step=3`–`6`): executable vs advisory, tokens, SEO v1 posture, troubleshooting.
 - [build-plan-finalization-logs-rollback.md](operator/build-plan-finalization-logs-rollback.md) — **Confirm** & **Logs & rollback** (`step=7`–`8`): finalization, conflicts, rollback, JSON export.
 - [build-plan-execution-actions.md](operator/build-plan-execution-actions.md) — **Execution action types** (`create_page`, `replace_page`, menus, tokens, hierarchy, finalize, rollback): prerequisites, snapshot/rollback, edge cases.
+- [build-plan-rollback-and-recovery.md](operator/build-plan-rollback-and-recovery.md) — **Rollback vs retry**, queue recovery, partial failures, escalation, what not to do.
 - [admin-operator-guide.md §6–§7](../guides/admin-operator-guide.md); [end-user-workflow-guide.md §2–§3](../guides/end-user-workflow-guide.md).
 
 ### Execution & Rollback
 
 - [build-plan-execution-actions.md](operator/build-plan-execution-actions.md) — Per-action behavior, risks, retry vs rollback.
+- [build-plan-rollback-and-recovery.md](operator/build-plan-rollback-and-recovery.md) — Safe recovery playbook, Queue tab retry, eligibility limits.
 - [admin-operator-guide.md §7–§8](../guides/admin-operator-guide.md); [end-user-workflow-guide.md §3](../guides/end-user-workflow-guide.md).
 
 ### Import / Export / Restore
@@ -81,6 +83,7 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 ### Support / Troubleshooting / FAQ
 
 - [support-triage-guide.md](../guides/support-triage-guide.md) — Primary support runbook.
+- [build-plan-rollback-and-recovery.md](operator/build-plan-rollback-and-recovery.md) — Build Plan queue retry, rollback eligibility, partial failures (with triage links).
 - [industry-support-training-packet.md](../operations/industry-support-training-packet.md) — Industry-specific escalation (internal).
 - [known-risk-register.md](../release/known-risk-register.md) — Known product risks at release.
 

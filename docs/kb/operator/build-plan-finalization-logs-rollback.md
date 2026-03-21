@@ -2,7 +2,7 @@
 
 **Audience:** Operators closing out a Build Plan, auditing execution, or considering rollback.  
 **Parent:** [build-plan-overview.md](build-plan-overview.md)  
-**Related:** [build-plan-hierarchy-navigation-tokens-seo.md](build-plan-hierarchy-navigation-tokens-seo.md); [build-plan-overview.md §6–§8](build-plan-overview.md); [admin-operator-guide.md §7–§8](../../guides/admin-operator-guide.md); [executor-locking-idempotency-contract.md](../../contracts/executor-locking-idempotency-contract.md).
+**Related:** [build-plan-hierarchy-navigation-tokens-seo.md](build-plan-hierarchy-navigation-tokens-seo.md); [build-plan-rollback-and-recovery.md](build-plan-rollback-and-recovery.md); [build-plan-overview.md §6–§8](build-plan-overview.md); [admin-operator-guide.md §7–§8](../../guides/admin-operator-guide.md); [executor-locking-idempotency-contract.md](../../contracts/executor-locking-idempotency-contract.md).
 
 In the **default generated plan**, these are the **last two** stepper steps after SEO:
 
