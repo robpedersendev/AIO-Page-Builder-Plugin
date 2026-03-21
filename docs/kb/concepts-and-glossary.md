@@ -186,6 +186,12 @@ An **AI Run** is a generation/validation event. A **Build Plan** is the structur
 **Why can’t I see Onboarding or Execute?**  
 Default **Editor** users have **view + approve + logs** only. An administrator must grant caps such as `aio_run_onboarding` or `aio_execute_build_plans` if those roles should perform those actions.
 
+**Why can’t I open AI Providers or change API keys?**  
+That screen requires **`aio_manage_ai_providers`**. See [ai-providers-credentials-budget.md](operator/ai-providers-credentials-budget.md).
+
+**Why can’t I see AI Runs?**  
+The list and detail views require **`aio_view_ai_runs`**. See [ai-runs-and-run-details.md](operator/ai-runs-and-run-details.md).
+
 ---
 
 ## 6. Terminology alignment notes

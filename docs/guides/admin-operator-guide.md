@@ -42,6 +42,8 @@ Complete the guided steps to capture brand and business profile data. This data 
 
 Configure one or more AI providers (credentials, model defaults). The UI does not display raw API keys; it shows credential status only. Use the **Test connection** action per provider to verify connectivity. Connection test results appear as a notice (success or error message) after redirect. Do not use debug credentials or share keys; documentation must not include real secrets.
 
+**Deep dive (credentials, connection tests, spend caps, enforcement scope):** [ai-providers-credentials-budget.md](../kb/operator/ai-providers-credentials-budget.md).
+
 ---
 
 ## 4. Crawl interpretation
@@ -58,7 +60,9 @@ Crawler runs are scoped to this site only. Sessions list shows Run ID, site host
 - **Screen:** **AIO Page Builder → AI Runs** (`aio-page-builder-ai-runs`).
 - **Capability:** `aio_view_ai_runs`.
 
-Lists recent AI runs (Run ID, status, provider, model, prompt pack, created). Open a run to see metadata and artifact summaries. Raw prompts and provider responses are restricted; only summarized or normalized data is shown unless sensitive diagnostics are enabled. From a run you can navigate to a linked Build Plan when one was created from that run.
+Lists recent AI runs (Run ID, status, provider, model, prompt pack, created). Open a run to see metadata and artifact summaries. Raw prompts and provider responses are restricted; only summarized or normalized data is shown unless sensitive diagnostics are enabled. Run metadata may include a **build plan ref** when linked; open **Build Plans** separately to review the plan workspace.
+
+**Deep dive (list, month-to-date table, detail fields, token/cost behavior):** [ai-runs-and-run-details.md](../kb/operator/ai-runs-and-run-details.md).
 
 ---
 
