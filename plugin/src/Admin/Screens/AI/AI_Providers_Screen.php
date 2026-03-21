@@ -142,7 +142,7 @@ final class AI_Providers_Screen {
 		if ( ! $this->container ) {
 			return false;
 		}
-		$credential = isset( $_POST['provider_credential'] ) ? (string) \wp_unslash( $_POST['provider_credential'] ) : '';
+		$credential = isset( $_POST['provider_credential'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['provider_credential'] ) ) : '';
 		$credential = trim( $credential );
 		if ( $credential === '' ) {
 			$this->redirect_back( 'error', __( 'Credential is required.', 'aio-page-builder' ) );
@@ -320,7 +320,7 @@ final class AI_Providers_Screen {
 		if ( ! $this->container ) {
 			return false;
 		}
-		$cap_raw  = isset( $_POST['monthly_cap_usd'] ) ? (string) \wp_unslash( $_POST['monthly_cap_usd'] ) : '0';
+		$cap_raw  = isset( $_POST['monthly_cap_usd'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['monthly_cap_usd'] ) ) : '0';
 		$cap_usd  = max( 0.0, (float) $cap_raw );
 		$override = ! empty( $_POST['override_cap_exceeded'] );
 		/** @var Provider_Spend_Cap_Settings $cap_settings */
@@ -357,15 +357,15 @@ final class AI_Providers_Screen {
 					continue;
 				}
 				$summary = $spend_service->get_spend_summary( $pid );
-				$label   = \esc_html( $row['label'] ?? $pid );
 				?>
 				<div class="aio-spend-cap-provider" style="margin-bottom:2em;padding:1em;border:1px solid #ccd0d4;background:#fff;">
-					<h3 style="margin-top:0;"><?php echo $label; ?></h3>
+					<h3 style="margin-top:0;"><?php echo \esc_html( (string) ( $row['label'] ?? $pid ) ); ?></h3>
 					<?php if ( $summary['month_total'] > 0.0 || $summary['has_cap'] ) : ?>
 						<?php if ( $summary['exceeded'] ) : ?>
 							<div class="notice notice-error inline" style="margin:0 0 1em;"><p>
 								<?php
 								printf(
+									/* translators: 1: Month-to-date spend (USD, formatted). 2: Monthly cap (USD, formatted). */
 									\esc_html__( 'Monthly spend cap exceeded: $%1$s spent of $%2$s cap.', 'aio-page-builder' ),
 									\esc_html( number_format( $summary['month_total'], 4 ) ),
 									\esc_html( number_format( $summary['cap'], 2 ) )
@@ -380,6 +380,7 @@ final class AI_Providers_Screen {
 							<div class="notice notice-warning inline" style="margin:0 0 1em;"><p>
 								<?php
 								printf(
+									/* translators: 1: Month-to-date spend (USD). 2: Monthly cap (USD). 3: Percent of cap used. */
 									\esc_html__( 'Approaching monthly spend cap: $%1$s spent of $%2$s cap (%3$s%%).', 'aio-page-builder' ),
 									\esc_html( number_format( $summary['month_total'], 4 ) ),
 									\esc_html( number_format( $summary['cap'], 2 ) ),

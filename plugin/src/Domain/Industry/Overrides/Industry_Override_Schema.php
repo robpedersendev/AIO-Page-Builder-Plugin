@@ -121,7 +121,7 @@ final class Industry_Override_Schema {
 	 * @return string Sanitized reason.
 	 */
 	public static function sanitize_reason( string $reason ): string {
-		$reason = \function_exists( 'wp_strip_all_tags' ) ? \wp_strip_all_tags( $reason ) : \strip_tags( $reason );
+		$reason = \wp_strip_all_tags( $reason );
 		$reason = trim( $reason );
 		if ( strlen( $reason ) > self::REASON_MAX_LENGTH ) {
 			$reason = substr( $reason, 0, self::REASON_MAX_LENGTH );

@@ -34,12 +34,13 @@ final class Export_Token_Set_Reader {
 	 */
 	public function list_for_export( int $limit = 0 ): array {
 		$table = $this->wpdb->prefix . Table_Names::TOKEN_SETS;
+		$this->assert_table_identifier( $table );
 		if ( $this->wpdb->get_var( $this->wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
 			return array();
 		}
-		$sql = "SELECT id, token_set_ref, source_type, state, plan_ref, scope_ref, value_payload, schema_version, created_at, applied_at, acceptance_status FROM `{$table}` ORDER BY created_at ASC";
+		$sql = 'SELECT id, token_set_ref, source_type, state, plan_ref, scope_ref, value_payload, schema_version, created_at, applied_at, acceptance_status FROM `' . $table . '` ORDER BY created_at ASC';
 		if ( $limit > 0 ) {
-			$sql .= $this->wpdb->prepare( ' LIMIT %d', $limit );
+			$sql = $this->wpdb->prepare( $sql . ' LIMIT %d', $limit );
 		}
 		$rows = $this->wpdb->get_results( $sql, ARRAY_A );
 		if ( ! is_array( $rows ) ) {
@@ -57,5 +58,14 @@ final class Export_Token_Set_Reader {
 			$out[] = $row;
 		}
 		return $out;
+	}
+
+	/**
+	 * @throws \InvalidArgumentException When the table name is not a simple SQL identifier.
+	 */
+	private function assert_table_identifier( string $table ): void {
+		if ( ! preg_match( '/^[A-Za-z0-9_]+$/', $table ) ) {
+			throw new \InvalidArgumentException( 'Invalid token_sets table identifier.' );
+		}
 	}
 }

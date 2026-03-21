@@ -48,7 +48,7 @@ final class DbDelta_Runner {
 	 * @return string
 	 */
 	private function sanitize_error( string $raw ): string {
-		$s = strip_tags( $raw );
+		$s = \wp_strip_all_tags( $raw );
 		$s = preg_replace( '/\s+/', ' ', $s );
 		return substr( $s, 0, 512 );
 	}

@@ -246,7 +246,7 @@ final class Crawl_Template_Family_Matcher {
 	}
 
 	private function path_depth( string $url ): int {
-		$parsed = parse_url( $url );
+		$parsed = \wp_parse_url( $url );
 		$path   = (string) ( is_array( $parsed ) && isset( $parsed['path'] ) ? $parsed['path'] : '/' );
 		$path   = trim( $path, '/' );
 		if ( $path === '' ) {
@@ -263,7 +263,7 @@ final class Crawl_Template_Family_Matcher {
 	 * @return string
 	 */
 	private function slug_hint_from_url_and_title( string $url, string $title ): string {
-		$parsed   = parse_url( $url );
+		$parsed   = \wp_parse_url( $url );
 		$path     = (string) ( is_array( $parsed ) && isset( $parsed['path'] ) ? $parsed['path'] : '/' );
 		$path     = strtolower( trim( $path, '/' ) );
 		$segments = array_filter( explode( '/', $path ) );

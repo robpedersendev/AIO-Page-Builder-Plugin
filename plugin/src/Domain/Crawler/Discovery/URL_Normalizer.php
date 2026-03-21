@@ -141,7 +141,7 @@ final class URL_Normalizer {
 		if ( $scheme !== 'http/' && $scheme !== 'https' ) {
 			$url = 'https://' . ltrim( $url, '/' );
 		}
-		$parsed = parse_url( $url );
+		$parsed = \wp_parse_url( $url );
 		if ( ! is_array( $parsed ) ) {
 			$parsed = $this->parse_url_fallback( $url );
 			if ( $parsed === null ) {

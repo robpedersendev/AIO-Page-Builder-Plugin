@@ -238,13 +238,13 @@ final class URL_Discovery_Service {
 	}
 
 	private function path_from_url( string $url ): string {
-		$p    = parse_url( $url );
+		$p    = \wp_parse_url( $url );
 		$path = isset( $p['path'] ) ? $p['path'] : '/';
 		return '/' . trim( $path, '/' );
 	}
 
 	private function query_from_url( string $url ): string {
-		$p = parse_url( $url );
+		$p = \wp_parse_url( $url );
 		return isset( $p['query'] ) ? $p['query'] : '';
 	}
 

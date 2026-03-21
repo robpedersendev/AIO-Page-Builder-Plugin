@@ -73,7 +73,7 @@ final class Crawler_Provider implements Service_Provider_Interface {
 			'url_normalizer',
 			function (): URL_Normalizer {
 				$home = \home_url( '/', 'https' );
-				$host = parse_url( $home, PHP_URL_HOST );
+				$host = \wp_parse_url( $home, PHP_URL_HOST );
 				return new URL_Normalizer( is_string( $host ) ? $host : '', 'https' );
 			}
 		);

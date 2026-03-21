@@ -364,7 +364,7 @@ final class Support_Package_Generator {
 
 	private function get_site_slug(): string {
 		$url  = \home_url( '', 'https' );
-		$host = is_string( $url ) ? \parse_url( $url, PHP_URL_HOST ) : null;
+		$host = is_string( $url ) ? \wp_parse_url( $url, PHP_URL_HOST ) : null;
 		if ( $host !== null && $host !== '' ) {
 			$slug = preg_replace( '#[^a-zA-Z0-9_-]#', '', $host );
 			return $slug !== '' ? $slug : 'site';

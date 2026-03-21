@@ -99,7 +99,7 @@ final class Install_Notification_Service {
 		if ( $url === '' ) {
 			return '';
 		}
-		$parsed = parse_url( $url );
+		$parsed = \wp_parse_url( $url );
 		$host   = isset( $parsed['host'] ) ? trim( (string) $parsed['host'] ) : '';
 		if ( $host !== '' ) {
 			return $host;

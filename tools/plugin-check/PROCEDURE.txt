@@ -38,6 +38,14 @@ Notes
 - PLUGIN_SOURCE defaults to ../../plugin relative to docker-compose.yml; override with env PLUGIN_SOURCE for unusual layouts.
 - First run downloads images and plugin-check zip (~10+ minutes possible).
 
+Gate scope (excludes)
+---------------------
+Runners pass:
+  --exclude-directories=tests,legacy
+  --exclude-files=phpstan-bootstrap.php,phpstan-wordpress-overrides.stub.php
+
+Rationale: PHPUnit harness, quarantined legacy tree, and PHPStan bootstrap files are not part of the shipped runtime plugin surface. Findings there are triage noise for release quality. Anything under src/ remains in scope unless the Architect documents a separate waiver (e.g. generated registry docs batches).
+
 CI (GitHub Actions)
 -------------------
 See .github/workflows/ci.yml job plugin-check. Uses the same compose stack; continues on error until the baseline is cleared (see workflow comment).

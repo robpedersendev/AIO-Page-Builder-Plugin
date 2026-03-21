@@ -90,13 +90,14 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 	 */
 	public function get_all( int $limit = 0 ): array {
 		$table = $this->table();
+		$this->assert_table_identifier( $table );
 		if ( $limit > 0 ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$sql  = $this->wpdb->prepare( "SELECT * FROM `{$table}` ORDER BY created_at DESC, id DESC LIMIT %d", $limit );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$sql  = $this->wpdb->prepare( 'SELECT * FROM `' . $table . '` ORDER BY created_at DESC, id DESC LIMIT %d', $limit );
 			$rows = $this->wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		} else {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-			$rows = $this->wpdb->get_results( "SELECT * FROM `{$table}` ORDER BY created_at DESC, id DESC", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared
+			$rows = $this->wpdb->get_results( 'SELECT * FROM `' . $table . '` ORDER BY created_at DESC, id DESC', ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		}
 		if ( ! is_array( $rows ) ) {
 			return array();
@@ -112,9 +113,11 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 	 */
 	public function get_by_id( string $snapshot_id ): ?Profile_Snapshot_Data {
 		$table = $this->table();
+		$this->assert_table_identifier( $table );
+		$sql = 'SELECT * FROM `' . $table . '` WHERE snapshot_id = %s LIMIT 1';
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $this->wpdb->get_row(
-			$this->wpdb->prepare( "SELECT * FROM `{$table}` WHERE snapshot_id = %s LIMIT 1", $snapshot_id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$this->wpdb->prepare( $sql, $snapshot_id ),
 			ARRAY_A
 		);
 		if ( ! is_array( $row ) ) {
@@ -179,5 +182,14 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 	/** Returns the fully qualified table name. */
 	private function table(): string {
 		return $this->wpdb->prefix . Table_Names::PROFILE_SNAPSHOTS;
+	}
+
+	/**
+	 * @throws \InvalidArgumentException When the table name is not a simple SQL identifier.
+	 */
+	private function assert_table_identifier( string $table ): void {
+		if ( ! preg_match( '/^[A-Za-z0-9_]+$/', $table ) ) {
+			throw new \InvalidArgumentException( 'Invalid profile snapshots table identifier.' );
+		}
 	}
 }

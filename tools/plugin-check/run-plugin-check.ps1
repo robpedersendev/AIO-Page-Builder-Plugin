@@ -9,7 +9,7 @@ $env:PLUGIN_SOURCE = $PluginPath
 Set-Location $ScriptDir
 Write-Host "PLUGIN_SOURCE=$PluginPath"
 
-docker compose up -d db wordpress
+docker compose up -d db wordpress 2>$null | Out-Null
 
 Write-Host "Waiting for WordPress files and database..."
 $ready = $false
@@ -35,10 +35,10 @@ if ($LASTEXITCODE -ne 0) {
         --admin_email="admin@example.test" `
         --path=/var/www/html `
         --skip-email `
-        --allow-root
+        --allow-root 2>$null | Out-Null
 }
 
-docker compose run --rm -T -u root wpcli wp plugin install plugin-check --activate --path=/var/www/html --allow-root
+docker compose run --rm -T -u root wpcli wp plugin install plugin-check --activate --path=/var/www/html --allow-root 2>$null | Out-Null
 
 $OutDir = Join-Path $ScriptDir "output"
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
@@ -48,6 +48,8 @@ docker compose run --rm -T -u root wpcli wp plugin check aio-page-builder `
     --path=/var/www/html `
     --require=/var/www/html/wp-content/plugins/plugin-check/cli.php `
     --format=json `
+    --exclude-directories=tests,legacy `
+    --exclude-files=phpstan-bootstrap.php,phpstan-wordpress-overrides.stub.php `
     --allow-root `
     2>$null | Set-Content -Path $OutJson -Encoding utf8
 

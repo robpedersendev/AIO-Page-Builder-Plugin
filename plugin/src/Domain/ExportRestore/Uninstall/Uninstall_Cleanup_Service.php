@@ -71,8 +71,12 @@ final class Uninstall_Cleanup_Service {
 		if ( $this->wpdb instanceof \wpdb ) {
 			$prefix = $this->wpdb->prefix;
 			foreach ( Table_Names::all() as $suffix ) {
+				$suffix = (string) $suffix;
+				if ( ! preg_match( '/^[a-z0-9_]+$/', $suffix ) ) {
+					continue;
+				}
 				$table = $prefix . $suffix;
-				$this->wpdb->query( "DROP TABLE IF EXISTS `{$table}`" );
+				$this->wpdb->query( 'DROP TABLE IF EXISTS `' . $table . '`' );
 				if ( $this->wpdb->last_error === '' ) {
 					++$tables_dropped;
 				}
@@ -129,7 +133,8 @@ final class Uninstall_Cleanup_Service {
 				}
 			}
 			$like_timeout = $this->wpdb->esc_like( '_transient_timeout_' . $prefix ) . '%';
-			$ids_timeout  = $this->wpdb->get_col( $this->wpdb->prepare( "SELECT option_id FROM `{$table}` WHERE option_name LIKE %s", $like_timeout ) );
+			$sql_timeout  = 'SELECT option_id FROM `' . $table . '` WHERE option_name LIKE %s';
+			$ids_timeout  = $this->wpdb->get_col( $this->wpdb->prepare( $sql_timeout, $like_timeout ) );
 			if ( is_array( $ids_timeout ) ) {
 				foreach ( $ids_timeout as $id ) {
 					$this->wpdb->delete( $table, array( 'option_id' => $id ) );

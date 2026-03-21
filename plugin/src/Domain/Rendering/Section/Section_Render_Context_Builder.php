@@ -123,7 +123,7 @@ final class Section_Render_Context_Builder {
 	private function sanitize_single_value( $value ) {
 		if ( is_scalar( $value ) ) {
 			if ( is_string( $value ) ) {
-				$value = \strip_tags( $value );
+				$value = \wp_strip_all_tags( $value );
 				return \sanitize_text_field( $value );
 			}
 			if ( is_int( $value ) || is_float( $value ) ) {

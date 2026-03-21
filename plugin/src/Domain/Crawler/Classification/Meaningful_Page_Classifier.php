@@ -173,7 +173,7 @@ final class Meaningful_Page_Classifier {
 	}
 
 	private function likely_role( string $url, string $title ): bool {
-		$path        = (string) parse_url( $url, PHP_URL_PATH );
+		$path        = (string) \wp_parse_url( $url, PHP_URL_PATH );
 		$path        = strtolower( trim( $path, '/' ) );
 		$segments    = array_filter( explode( '/', $path ) );
 		$title_lower = strtolower( $title );

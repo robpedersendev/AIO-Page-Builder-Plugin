@@ -31,6 +31,15 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 	}
 
 	/**
+	 * @throws \InvalidArgumentException When the resolved table name is not a simple identifier.
+	 */
+	private function assert_table_identifier(): void {
+		if ( ! preg_match( '/^[A-Za-z0-9_]+$/', $this->table ) ) {
+			throw new \InvalidArgumentException( 'Invalid assignment map table identifier.' );
+		}
+	}
+
+	/**
 	 * Inserts a new assignment row. map_type must be valid per Assignment_Types.
 	 *
 	 * @param string      $map_type   One of Assignment_Types constants.
@@ -50,9 +59,11 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		}
 		$scope_val   = $scope_ref !== '' ? $scope_ref : null;
 		$payload_val = $payload !== null && $payload !== '' ? $payload : null;
-		$result      = $this->wpdb->query(
+		$this->assert_table_identifier();
+		$sql    = 'INSERT INTO `' . $this->table . '` (`map_type`,`source_ref`,`target_ref`,`scope_ref`,`payload`,`schema_version`) VALUES (%s,%s,%s,%s,%s,%s)';
+		$result = $this->wpdb->query(
 			$this->wpdb->prepare(
-				"INSERT INTO `{$this->table}` (`map_type`,`source_ref`,`target_ref`,`scope_ref`,`payload`,`schema_version`) VALUES (%s,%s,%s,%s,%s,%s)",
+				$sql,
 				$map_type,
 				$source_ref,
 				$target_ref,
@@ -136,10 +147,9 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		if ( $id <= 0 ) {
 			return null;
 		}
-		$row = $this->wpdb->get_row(
-			$this->wpdb->prepare( "SELECT * FROM `{$this->table}` WHERE id = %d LIMIT 1", $id ),
-			\ARRAY_A
-		);
+		$this->assert_table_identifier();
+		$sql = 'SELECT * FROM `' . $this->table . '` WHERE id = %d LIMIT 1';
+		$row = $this->wpdb->get_row( $this->wpdb->prepare( $sql, $id ), \ARRAY_A );
 		return is_array( $row ) ? $row : null;
 	}
 
@@ -158,15 +168,9 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		}
 		$limit  = $limit > 0 ? min( 500, $limit ) : 500;
 		$offset = max( 0, $offset );
-		$rows   = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT * FROM `{$this->table}` WHERE map_type = %s ORDER BY id ASC LIMIT %d OFFSET %d",
-				$map_type,
-				$limit,
-				$offset
-			),
-			\ARRAY_A
-		);
+		$this->assert_table_identifier();
+		$sql  = 'SELECT * FROM `' . $this->table . '` WHERE map_type = %s ORDER BY id ASC LIMIT %d OFFSET %d';
+		$rows = $this->wpdb->get_results( $this->wpdb->prepare( $sql, $map_type, $limit, $offset ), \ARRAY_A );
 		return is_array( $rows ) ? $rows : array();
 	}
 
@@ -185,15 +189,9 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 			return array();
 		}
 		$limit = $limit > 0 ? min( 500, $limit ) : 100;
-		$rows  = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT * FROM `{$this->table}` WHERE map_type = %s AND source_ref = %s ORDER BY id ASC LIMIT %d",
-				$map_type,
-				$source_ref,
-				$limit
-			),
-			\ARRAY_A
-		);
+		$this->assert_table_identifier();
+		$sql  = 'SELECT * FROM `' . $this->table . '` WHERE map_type = %s AND source_ref = %s ORDER BY id ASC LIMIT %d';
+		$rows = $this->wpdb->get_results( $this->wpdb->prepare( $sql, $map_type, $source_ref, $limit ), \ARRAY_A );
 		return is_array( $rows ) ? $rows : array();
 	}
 
@@ -213,14 +211,9 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 			return array();
 		}
 		$limit = $limit > 0 ? min( 500, $limit ) : 500;
-		$rows  = $this->wpdb->get_col(
-			$this->wpdb->prepare(
-				"SELECT target_ref FROM `{$this->table}` WHERE map_type = %s AND source_ref = %s ORDER BY id ASC LIMIT %d",
-				$map_type,
-				$source_ref,
-				$limit
-			)
-		);
+		$this->assert_table_identifier();
+		$sql  = 'SELECT target_ref FROM `' . $this->table . '` WHERE map_type = %s AND source_ref = %s ORDER BY id ASC LIMIT %d';
+		$rows = $this->wpdb->get_col( $this->wpdb->prepare( $sql, $map_type, $source_ref, $limit ) );
 		if ( ! is_array( $rows ) ) {
 			return array();
 		}
@@ -288,15 +281,9 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 			return array();
 		}
 		$limit = $limit > 0 ? min( 500, $limit ) : 100;
-		$rows  = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT * FROM `{$this->table}` WHERE map_type = %s AND target_ref = %s ORDER BY id ASC LIMIT %d",
-				$map_type,
-				$target_ref,
-				$limit
-			),
-			\ARRAY_A
-		);
+		$this->assert_table_identifier();
+		$sql  = 'SELECT * FROM `' . $this->table . '` WHERE map_type = %s AND target_ref = %s ORDER BY id ASC LIMIT %d';
+		$rows = $this->wpdb->get_results( $this->wpdb->prepare( $sql, $map_type, $target_ref, $limit ), \ARRAY_A );
 		return is_array( $rows ) ? $rows : array();
 	}
 

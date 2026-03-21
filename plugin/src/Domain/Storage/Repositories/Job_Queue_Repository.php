@@ -139,29 +139,28 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 			if ( $col === '' || ! in_array( $col, array( 'queue_status', 'failure_reason', 'started_at', 'completed_at', 'retry_count', 'lock_token', 'actor_ref' ), true ) ) {
 				continue;
 			}
-			$set[]    = "`{$col}` = %s";
+			$this->assert_sql_identifier( $col );
+			$set[]    = '`' . $col . '` = %s';
 			$values[] = $val;
 		}
 		if ( empty( $set ) ) {
 			return true;
 		}
 		$values[] = $id;
-		$sql      = "UPDATE `{$table}` SET " . implode( ', ', $set ) . ' WHERE id = %d';
-		$prepared = $this->wpdb->prepare( $sql, $values );
+		$this->assert_sql_identifier( $table );
+		$sql      = 'UPDATE `' . $table . '` SET ' . implode( ', ', $set ) . ' WHERE id = %d';
+		$prepared = $this->wpdb->prepare( $sql, ...$values );
 		return $prepared !== false && $this->wpdb->query( $prepared ) !== false;
 	}
 
 	/** @inheritdoc */
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
-		$table    = $this->get_table_name();
-		$limit    = $limit > 0 ? $limit : 50;
-		$offset   = $offset >= 0 ? $offset : 0;
-		$prepared = $this->wpdb->prepare(
-			"SELECT * FROM `{$table}` WHERE queue_status = %s ORDER BY priority DESC, created_at ASC LIMIT %d OFFSET %d",
-			$status,
-			$limit,
-			$offset
-		);
+		$table  = $this->get_table_name();
+		$limit  = $limit > 0 ? $limit : 50;
+		$offset = $offset >= 0 ? $offset : 0;
+		$this->assert_sql_identifier( $table );
+		$sql      = 'SELECT * FROM `' . $table . '` WHERE queue_status = %s ORDER BY priority DESC, created_at ASC LIMIT %d OFFSET %d';
+		$prepared = $this->wpdb->prepare( $sql, $status, $limit, $offset );
 		$rows     = $this->wpdb->get_results( $prepared );
 		if ( ! is_array( $rows ) ) {
 			return array();
@@ -186,15 +185,12 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		if ( $actor_ref === '' ) {
 			return array();
 		}
-		$table    = $this->get_table_name();
-		$limit    = $limit > 0 ? $limit : 50;
-		$offset   = $offset >= 0 ? $offset : 0;
-		$prepared = $this->wpdb->prepare(
-			"SELECT * FROM `{$table}` WHERE actor_ref = %s ORDER BY created_at DESC LIMIT %d OFFSET %d",
-			$actor_ref,
-			$limit,
-			$offset
-		);
+		$table  = $this->get_table_name();
+		$limit  = $limit > 0 ? $limit : 50;
+		$offset = $offset >= 0 ? $offset : 0;
+		$this->assert_sql_identifier( $table );
+		$sql      = 'SELECT * FROM `' . $table . '` WHERE actor_ref = %s ORDER BY created_at DESC LIMIT %d OFFSET %d';
+		$prepared = $this->wpdb->prepare( $sql, $actor_ref, $limit, $offset );
 		$rows     = $this->wpdb->get_results( $prepared );
 		if ( ! is_array( $rows ) ) {
 			return array();
@@ -224,8 +220,10 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		$related     = isset( $data['related_object_refs'] ) && is_string( $data['related_object_refs'] ) ? $data['related_object_refs'] : '';
 		$now         = current_time( 'mysql' );
 
+		$this->assert_sql_identifier( $table );
+		$sql      = 'INSERT INTO `' . $table . '` ( job_ref, job_type, queue_status, priority, payload_ref, actor_ref, created_at, retry_count, related_object_refs ) VALUES ( %s, %s, %s, %d, %s, %s, %s, 0, %s )';
 		$prepared = $this->wpdb->prepare(
-			"INSERT INTO `{$table}` ( job_ref, job_type, queue_status, priority, payload_ref, actor_ref, created_at, retry_count, related_object_refs ) VALUES ( %s, %s, %s, %d, %s, %s, %s, 0, %s )",
+			$sql,
 			$job_ref,
 			$job_type,
 			$status,

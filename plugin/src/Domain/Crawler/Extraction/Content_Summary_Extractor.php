@@ -157,7 +157,7 @@ final class Content_Summary_Extractor {
 				continue;
 			}
 			if ( $base_host !== null && $base_host !== '' ) {
-				$host = parse_url( $href, PHP_URL_HOST );
+				$host = \wp_parse_url( $href, PHP_URL_HOST );
 				if ( is_string( $host ) && strtolower( $host ) === strtolower( $base_host ) ) {
 					++$count;
 				}

@@ -45,12 +45,10 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		if ( $run_id === '' || $url === '' ) {
 			return null;
 		}
-		$table    = $this->get_table_name();
-		$prepared = $this->wpdb->prepare(
-			"SELECT * FROM `{$table}` WHERE `crawl_run_id` = %s AND `url` = %s LIMIT 1",
-			$run_id,
-			$url
-		);
+		$table = $this->get_table_name();
+		$this->assert_sql_identifier( $table );
+		$sql      = 'SELECT * FROM `' . $table . '` WHERE `crawl_run_id` = %s AND `url` = %s LIMIT 1';
+		$prepared = $this->wpdb->prepare( $sql, $run_id, $url );
 		$row      = $this->wpdb->get_row( $prepared );
 		if ( $row === null ) {
 			return null;
@@ -82,8 +80,9 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 			return array();
 		}
 		$table = $this->get_table_name();
-		$sql   = "SELECT * FROM `{$table}` WHERE `crawl_run_id` = %s";
-		$args  = array( $run_id );
+		$this->assert_sql_identifier( $table );
+		$sql  = 'SELECT * FROM `' . $table . '` WHERE `crawl_run_id` = %s';
+		$args = array( $run_id );
 		if ( $status !== null && $status !== '' ) {
 			$sql   .= ' AND `crawl_status` = %s';
 			$args[] = $status;
@@ -119,10 +118,10 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 	 */
 	public function list_crawl_run_ids( int $limit = 50 ): array {
 		$table = $this->get_table_name();
-		$sql   = "SELECT crawl_run_id FROM `{$table}` GROUP BY crawl_run_id ORDER BY MAX(id) DESC";
+		$this->assert_sql_identifier( $table );
+		$sql = 'SELECT crawl_run_id FROM `' . $table . '` GROUP BY crawl_run_id ORDER BY MAX(id) DESC';
 		if ( $limit > 0 ) {
-			$sql     .= ' LIMIT %d';
-			$prepared = $this->wpdb->prepare( $sql, $limit );
+			$prepared = $this->wpdb->prepare( $sql . ' LIMIT %d', $limit );
 		} else {
 			$prepared = $sql;
 		}
@@ -136,8 +135,9 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 	/** @inheritdoc */
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		$table = $this->get_table_name();
-		$sql   = "SELECT * FROM `{$table}` WHERE `crawl_status` = %s ORDER BY `crawled_at` DESC, `id` ASC";
-		$args  = array( $status );
+		$this->assert_sql_identifier( $table );
+		$sql  = 'SELECT * FROM `' . $table . '` WHERE `crawl_status` = %s ORDER BY `crawled_at` DESC, `id` ASC';
+		$args = array( $status );
 		if ( $limit > 0 ) {
 			$sql   .= ' LIMIT %d';
 			$args[] = $limit;
@@ -221,12 +221,9 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		$col_list        = '`crawl_run_id`,`url`,`canonical_url`,`title_snapshot`,`meta_snapshot`,`indexability_flags`,`page_classification`,`hierarchy_clues`,`navigation_participation`,`summary_data`,`content_hash`,`crawl_status`,`error_state`,`crawled_at`,`schema_version`';
 		$placeholders    = implode( ', ', array_fill( 0, count( $values ), '%s' ) );
 		$prepared_values = $this->cast_values_for_prepare( $values );
-		$result          = $this->wpdb->query(
-			$this->wpdb->prepare(
-				"INSERT INTO `{$table}` ({$col_list}) VALUES ({$placeholders})",
-				...$prepared_values
-			)
-		);
+		$this->assert_sql_identifier( $table );
+		$sql    = 'INSERT INTO `' . $table . '` (' . $col_list . ') VALUES (' . $placeholders . ')';
+		$result = $this->wpdb->query( $this->wpdb->prepare( $sql, ...$prepared_values ) );
 		if ( $result !== 1 ) {
 			return 0;
 		}
@@ -241,8 +238,9 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 	 * @return bool True if one row updated.
 	 */
 	private function update_row( int $id, array $payload ): bool {
-		$table  = $this->get_table_name();
-		$set    = array(
+		$table = $this->get_table_name();
+		$this->assert_sql_identifier( $table );
+		$set   = array(
 			'canonical_url'            => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_CANONICAL_URL ],
 			'title_snapshot'           => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_TITLE_SNAPSHOT ],
 			'meta_snapshot'            => $payload[ Crawl_Snapshot_Payload_Builder::PAGE_META_SNAPSHOT ],
