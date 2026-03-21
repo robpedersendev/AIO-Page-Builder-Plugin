@@ -5,6 +5,7 @@
  *
  * @package AIOPageBuilder
  */
+
 declare( strict_types=1 );
 
 namespace AIOPageBuilder\Domain\Industry\Import;
