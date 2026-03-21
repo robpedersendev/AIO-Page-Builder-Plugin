@@ -964,9 +964,11 @@ final class Build_Plan_Workspace_Screen {
 
 			$selected_ids = array();
 			if ( $action === 'bulk_execute_selected_hierarchy' ) {
-				$raw          = isset( $_POST['aio_hierarchy_selected_ids'] ) && is_array( $_POST['aio_hierarchy_selected_ids'] )
-					? \wp_unslash( $_POST['aio_hierarchy_selected_ids'] )
-					: array();
+				$raw = array();
+				if ( isset( $_POST['aio_hierarchy_selected_ids'] ) && is_array( $_POST['aio_hierarchy_selected_ids'] ) ) {
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified above; each ID sanitized via array_map( sanitize_text_field ) below.
+					$raw = \wp_unslash( $_POST['aio_hierarchy_selected_ids'] );
+				}
 				$selected_ids = \array_values( \array_filter( \array_map( 'sanitize_text_field', $raw ) ) );
 			}
 			$id_filter = $action === 'bulk_execute_selected_hierarchy' ? array_flip( \array_map( 'strval', $selected_ids ) ) : null;
@@ -1261,9 +1263,11 @@ final class Build_Plan_Workspace_Screen {
 
 			$selected_ids = array();
 			if ( $action === 'bulk_execute_selected_create_menu' ) {
-				$raw          = isset( $_POST['aio_create_menu_selected_ids'] ) && is_array( $_POST['aio_create_menu_selected_ids'] )
-					? \wp_unslash( $_POST['aio_create_menu_selected_ids'] )
-					: array();
+				$raw = array();
+				if ( isset( $_POST['aio_create_menu_selected_ids'] ) && is_array( $_POST['aio_create_menu_selected_ids'] ) ) {
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified above; each ID sanitized via array_map( sanitize_text_field ) below.
+					$raw = \wp_unslash( $_POST['aio_create_menu_selected_ids'] );
+				}
 				$selected_ids = \array_values( \array_filter( \array_map( 'sanitize_text_field', $raw ) ) );
 			}
 			$id_filter = $action === 'bulk_execute_selected_create_menu' ? array_flip( \array_map( 'strval', $selected_ids ) ) : null;
@@ -1547,6 +1551,7 @@ final class Build_Plan_Workspace_Screen {
 			} elseif ( $action === 'bulk_deny_all_step5' ) {
 				$service->bulk_deny_all_eligible( $plan_post_id );
 			} else {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce and capability verified above; each ID sanitized via array_map( sanitize_text_field ) below.
 				$raw_selected = isset( $_POST['aio_step5_selected_ids'] ) && is_array( $_POST['aio_step5_selected_ids'] ) ? \wp_unslash( $_POST['aio_step5_selected_ids'] ) : array();
 				$selected     = array_map( 'sanitize_text_field', $raw_selected );
 				$selected     = array_values( array_filter( $selected ) );
@@ -2057,22 +2062,15 @@ final class Build_Plan_Workspace_Screen {
 			if ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION && ! empty( $workspace['validation_summary']['messages'] ) ) {
 				echo '<div class="aio-navigation-validation-notice notice notice-warning"><p>' . \esc_html__( 'Validation messages:', 'aio-page-builder' ) . ' ' . \esc_html( implode( ' ', array_slice( $workspace['validation_summary']['messages'], 0, 3 ) ) ) . '</p></div>';
 			}
-			if (
-				in_array(
-					$step_type,
-					array(
-						Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES,
-						Build_Plan_Schema::STEP_TYPE_NEW_PAGES,
-						Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS,
-						Build_Plan_Schema::STEP_TYPE_SEO,
-					),
-					true
-				)
-			) {
-				// Bulk actions for Steps 1/2/4/5 are rendered within the list form to submit selection.
-			} elseif ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION ) {
+			$step_types_with_inline_list_bulk = array(
+				Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES,
+				Build_Plan_Schema::STEP_TYPE_NEW_PAGES,
+				Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS,
+				Build_Plan_Schema::STEP_TYPE_SEO,
+			);
+			if ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION ) {
 				$this->render_navigation_bulk_forms( $workspace['bulk_action_states'] ?? array(), $nav_bulk_nonce );
-			} else {
+			} elseif ( ! in_array( $step_type, $step_types_with_inline_list_bulk, true ) ) {
 				$bulk_component->render( $bulk_payload );
 			}
 			?>
