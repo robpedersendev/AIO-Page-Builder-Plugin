@@ -123,6 +123,12 @@ if ( ! function_exists( 'esc_html_e' ) ) {
 		echo esc_html( __( $text, $domain ) );
 	}
 }
+if ( ! function_exists( 'esc_html__' ) ) {
+	function esc_html__( $text, $domain = 'default' ) {
+		// phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText, WordPress.WP.I18n.NonSingularStringLiteralDomain -- Test stub; params are variables by design.
+		return esc_html( __( $text, $domain ) );
+	}
+}
 if ( ! function_exists( 'sanitize_html_class' ) ) {
 	function sanitize_html_class( $class ) {
 		return preg_replace( '/[^a-z0-9_-]/', '', strtolower( (string) $class ) );
@@ -387,6 +393,12 @@ if ( ! function_exists( 'get_term' ) ) {
 }
 if ( ! function_exists( 'current_user_can' ) ) {
 	function current_user_can( $capability, ...$args ) {
+		$cap = (string) $capability;
+		if ( ! empty( $GLOBALS['_aio_current_user_can_caps'] ) && is_array( $GLOBALS['_aio_current_user_can_caps'] ) ) {
+			if ( array_key_exists( $cap, $GLOBALS['_aio_current_user_can_caps'] ) ) {
+				return (bool) $GLOBALS['_aio_current_user_can_caps'][ $cap ];
+			}
+		}
 		return isset( $GLOBALS['_aio_current_user_can_return'] ) ? (bool) $GLOBALS['_aio_current_user_can_return'] : false;
 	}
 }

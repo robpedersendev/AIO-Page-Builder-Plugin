@@ -24,6 +24,7 @@ use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Domain\AI\Budget\Provider_Monthly_Spend_Service;
 use AIOPageBuilder\Domain\AI\Budget\Provider_Spend_Cap_Settings;
 use AIOPageBuilder\Domain\AI\Pricing\Provider_Pricing_Registry;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use PHPUnit\Framework\TestCase;
 
@@ -115,8 +116,12 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 	protected function setUp(): void {
 		$GLOBALS['_aio_test_options']    = array();
 		$GLOBALS['__spend_test_options'] = array();
-		// * Ensure current_user_can returns false (no VIEW_SENSITIVE_DIAGNOSTICS).
-		$GLOBALS['_aio_current_user_can_return'] = false;
+		// * Allow AI run screens; deny raw diagnostics (matches production gating under test).
+		$GLOBALS['_aio_current_user_can_caps'] = array(
+			Capabilities::VIEW_AI_RUNS                => true,
+			Capabilities::VIEW_SENSITIVE_DIAGNOSTICS => false,
+		);
+		unset( $GLOBALS['_aio_current_user_can_return'] );
 		// * Ensure $_GET has no run_id so AI_Runs_Screen renders the list.
 		unset( $_GET['run_id'] );
 	}
@@ -125,7 +130,7 @@ final class AI_Run_History_Cost_Display_Test extends TestCase {
 		unset(
 			$GLOBALS['_aio_test_options'],
 			$GLOBALS['__spend_test_options'],
-			$GLOBALS['_aio_current_user_can_return'],
+			$GLOBALS['_aio_current_user_can_caps'],
 			$_GET['run_id']
 		);
 	}
