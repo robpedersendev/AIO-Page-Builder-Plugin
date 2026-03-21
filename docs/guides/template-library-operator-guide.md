@@ -42,10 +42,11 @@ Under **AIO Page Builder**:
 
 ## 3. Page Templates directory
 
+- **User-facing KB:** [page-templates-deep-dive.md](../kb/templates/page-templates-deep-dive.md).
 - **Screen:** **AIO Page Builder → Page Templates** (`aio-page-builder-page-templates`).
-- **Hierarchy:** Root (category tree) → Category (family list) → List (template rows with key, name, category, status, version, compare links).
-- **Filters:** Category, family, status, search, pagination (same pattern as section directory).
-- **Actions per row:** **View** (detail), **Add to compare** / **Remove from compare**.
+- **Hierarchy:** Root (category tree) → Category (family list) → List or **search** view when search is set (template rows: key, name, purpose, section count, version, status).
+- **Filters:** **Industry fit**, search, status (Any / Stable / Draft), pagination (`paged`, `per_page` capped).
+- **Actions per row:** **View detail**, **Structural preview** (same as detail), **Open one-pager** (directory row is not wired to per-template URLs—use detail), **Add to compare** / **Remove from compare**, optional **Use anyway** / **Overridden** for industry fit.
 - **No execution:** Observational. Page creation is via Build Plan execution.
 
 ---
@@ -85,12 +86,12 @@ Under **AIO Page Builder**:
 
 ## 6. Compositions
 
+- **User-facing KB:** [compositions-deep-dive.md](../kb/templates/compositions-deep-dive.md).
 - **Screen:** **AIO Page Builder → Compositions** (`aio-page-builder-compositions`).
-- **List view:** Table of compositions (Name, ID, Status, Validation, Sections count, Source template, **Edit**). **Build composition** button to create or open builder.
-- **Build view:** `view=build` or `view=build&composition_id=<id>`. Governed builder: section selection is **category- and CTA-aware**; no freeform drag-drop of arbitrary content. Section library below for adding sections; order and validation follow composition schema and CTA rules.
+- **List view:** Table of compositions (Name, ID, Status, Validation, Sections count, Source template, **Edit**). **Build composition** button. List capped at **100** rows for performance.
+- **Build view:** `view=build` or `view=build&composition_id=<id>`. Shows **Current sections**, **CTA guidance**, **validation codes**, **preview / one-pager readiness** badges, and a **filtered section library** table. No freeform HTML—registry sections only. On-screen copy: **save via Compositions API or Settings** (or integrated flows).
 - **CTA rules:** Compositions respect CTA sequencing and placement rules (e.g. bottom-of-page CTA, non-adjacent CTAs). Validation status reflects rule compliance.
 - **One-pager readiness:** Compositions can be used as one-pager-style page templates; they are assembled from registered section templates only.
-- **Save:** Compositions are saved via Compositions API or Settings; the UI indicates save handling.
 
 ---
 

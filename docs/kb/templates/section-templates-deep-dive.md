@@ -181,6 +181,6 @@ No — the Documentation route is gated the same as section management.
 ## 14. Cross-links
 
 - Umbrella: [template-system-overview.md](template-system-overview.md)  
-- Page templates: [page-templates-deep-dive.md](page-templates-deep-dive.md) (stub or expanded)  
+- Page templates: [page-templates-deep-dive.md](page-templates-deep-dive.md)  
 - Compositions: [compositions-deep-dive.md](compositions-deep-dive.md)  
 - Compare / large library: [template-library-operator-guide.md §4, §9](../../guides/template-library-operator-guide.md)

@@ -39,6 +39,7 @@ You **choose** templates when building compositions or when the Build Plan sugge
 
 ## 4. Choosing page templates
 
+- **User-facing KB:** [page-templates-deep-dive.md](../kb/templates/page-templates-deep-dive.md).
 - **By category and family:** Page Templates directory is organized by category and family. Use it to find one-pagers, hubs, child-detail pages, etc.
 - **By composition source:** Some page templates are tied to a **composition** (ordered section list). In that case, the page template is effectively a one-pager built from specific sections. Detail screen shows composition/section summary.
 - **Preview:** Use **View** on a page template to see the full-page preview (synthetic data). Helps compare options before committing to a plan.
@@ -48,8 +49,9 @@ You **choose** templates when building compositions or when the Build Plan sugge
 
 ## 5. One-pagers and compositions
 
+- **User-facing KB:** [compositions-deep-dive.md](../kb/templates/compositions-deep-dive.md); page-level patterns also [page-templates-deep-dive.md](../kb/templates/page-templates-deep-dive.md).
 - **One-pager:** A single-page layout built from an **ordered list of section templates**. In this product, one-pagers are implemented as **compositions** (or page templates that reference a composition). You do not "create a one-pager" as a separate object; you create or select a **composition** that defines the section order.
-- **Compositions screen:** **AIO Page Builder → Compositions**. List shows existing compositions; **Build composition** opens the builder. In the builder you add sections from the section library; the system enforces **CTA rules** (e.g. bottom-of-page CTA, non-adjacent CTAs). Validation status shows whether the composition complies.
+- **Compositions screen:** **AIO Page Builder → Compositions**. List shows existing compositions; **Build composition** opens the builder. The builder shows **current sections**, **CTA guidance**, **validation**, and a **filtered section library**; persisted changes follow **Compositions API or Settings** (per on-screen guidance). **CTA rules** (e.g. bottom-of-page CTA, non-adjacent CTAs) are enforced.
 - **Using a composition:** Once a composition is saved, it can be used as the structure for a page (e.g. via Build Plan or template assignment). The same composition can back a page template so that "choose this page template" means "use this section order."
 - **No freeform layout:** Compositions are built only from **registered section templates**. You cannot paste arbitrary HTML or add unregistered blocks. This keeps output predictable and CTA-law compliant.
 

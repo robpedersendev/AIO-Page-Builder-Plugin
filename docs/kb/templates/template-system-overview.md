@@ -69,8 +69,8 @@ No. Directories, detail, compare, and compositions builder are **observational o
 |-------|----------|
 | **This overview** (you are here) | `template-system-overview.md` |
 | **Section templates** (directory, detail, helpers, previews, edge cases) | [section-templates-deep-dive.md](section-templates-deep-dive.md) |
-| **Page templates** (deep dive stub) | [page-templates-deep-dive.md](page-templates-deep-dive.md) |
-| **Compositions** (deep dive stub) | [compositions-deep-dive.md](compositions-deep-dive.md) |
+| **Page templates** (directory, detail, one-pager quirk, vs compositions) | [page-templates-deep-dive.md](page-templates-deep-dive.md) |
+| **Compositions** (list, builder, validation, save/API, overlap with page templates) | [compositions-deep-dive.md](compositions-deep-dive.md) |
 | **Operator workflows** (directories, compare, builder, previews) | [template-library-operator-guide.md](../../guides/template-library-operator-guide.md) |
 | **Editor / chooser lens** (helper docs, one-pagers, CTA rules) | [template-library-editor-guide.md](../../guides/template-library-editor-guide.md) |
 | **Support & diagnostics** | [template-library-support-guide.md](../../guides/template-library-support-guide.md) |
