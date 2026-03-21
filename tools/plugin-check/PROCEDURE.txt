@@ -36,7 +36,12 @@ Notes
 -----
 - wpcli runs as root with --allow-root so plugin-check can write to wp-content (wordpress image volume permissions).
 - PLUGIN_SOURCE defaults to ../../plugin relative to docker-compose.yml; override with env PLUGIN_SOURCE for unusual layouts.
+- Git Bash on Windows: run-plugin-check.sh sets PLUGIN_SOURCE via cygpath to a Windows path (e.g. C:\...\plugin) so Docker bind mounts work; Unix-style /c/... paths with spaces often break wp core version.
 - First run downloads images and plugin-check zip (~10+ minutes possible).
+
+Troubleshooting
+---------------
+- "WordPress failed to become ready": re-run ./run-plugin-check.sh (wait can be up to ~3 minutes). If it persists: cd tools/plugin-check && docker compose logs wordpress db (tail). Stale volume: docker compose down -v (removes DB/html volume; next run reinstalls WP).
 
 Gate scope (excludes)
 ---------------------

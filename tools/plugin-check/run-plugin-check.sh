@@ -5,7 +5,17 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-export PLUGIN_SOURCE="${PLUGIN_SOURCE:-${REPO_ROOT}/plugin}"
+
+# * Docker Desktop on Windows: bind mounts from Git Bash need a Windows path (cygpath). Paths with
+# * spaces in Unix form (/c/Users/.../Wordpress Plugins/...) often fail to mount or leave WP broken.
+if [[ -z "${PLUGIN_SOURCE:-}" ]]; then
+	if command -v cygpath >/dev/null 2>&1; then
+		PLUGIN_SOURCE="$(cygpath -aw "${REPO_ROOT}/plugin")"
+	else
+		PLUGIN_SOURCE="${REPO_ROOT}/plugin"
+	fi
+	export PLUGIN_SOURCE
+fi
 
 cd "${SCRIPT_DIR}"
 
@@ -14,7 +24,7 @@ echo "PLUGIN_SOURCE=${PLUGIN_SOURCE}"
 docker compose up -d db wordpress
 
 echo "Waiting for WordPress files and database..."
-for _ in $(seq 1 45); do
+for _ in $(seq 1 90); do
 	if docker compose run --rm -T -u root wpcli wp core version --path=/var/www/html --allow-root >/dev/null 2>&1; then
 		break
 	fi
@@ -23,6 +33,10 @@ done
 
 if ! docker compose run --rm -T -u root wpcli wp core version --path=/var/www/html --allow-root >/dev/null 2>&1; then
 	echo "WordPress failed to become ready (wp core version)." >&2
+	echo "--- wp core version (stderr) ---" >&2
+	docker compose run --rm -T -u root wpcli wp core version --path=/var/www/html --allow-root 2>&1 || true
+	echo "--- wordpress container logs (tail) ---" >&2
+	docker compose logs wordpress --tail 80 2>&1 || true
 	exit 1
 fi
 
