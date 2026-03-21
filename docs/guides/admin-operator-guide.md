@@ -49,9 +49,11 @@ Configure one or more AI providers (credentials, model defaults). The UI does no
 ## 4. Crawl interpretation
 
 - **Screens:** **Crawl Sessions** (`aio-page-builder-crawler-sessions`), **Crawl Comparison** (`aio-page-builder-crawler-comparison`).
-- **Capability:** `aio_view_sensitive_diagnostics` for both (see [concepts-and-glossary.md](../kb/concepts-and-glossary.md) for defaults).
+- **Capability:** `aio_view_sensitive_diagnostics` to view both; **`aio_run_onboarding`** to **Start crawl** / **Retry crawl** (see [concepts-and-glossary.md](../kb/concepts-and-glossary.md) for defaults).
 
 Crawler runs are scoped to this site only. Sessions list shows Run ID, site host, status, discovered/accepted/excluded counts. Open a session to see pages for that run. Crawl rules: public-only, normalized URL identity, meaningful-page focus; no arbitrary host input. Use crawl results to understand site structure before or after AI runs; the planner uses this data when generating Build Plans.
+
+**Deep dive (profiles, enqueue/retry, comparison semantics, list vs table, onboarding freshness):** [crawler-sessions-and-comparison.md](../kb/operator/crawler-sessions-and-comparison.md).
 
 ---
 

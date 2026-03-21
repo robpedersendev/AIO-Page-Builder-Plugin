@@ -181,7 +181,7 @@ You cannot advance past **Review** until at least one provider is **configured**
 Open **AI Runs** for the recorded run (id may be in the notice). Failures include validation, provider errors, missing prompt pack, spend cap, or input artifact build issues—messages are user-safe, not raw provider dumps.
 
 **Where did my crawl go?**  
-**Crawl Preferences** lists the latest id when the crawl service is available. Full detail is on **Crawl Sessions** / **Crawl Comparison** ([admin-operator-guide.md](../../guides/admin-operator-guide.md) §4).
+**Crawl Preferences** lists the latest id when the crawl service is available. Full detail is on **Crawl Sessions** / **Crawl Comparison** — [crawler-sessions-and-comparison.md](crawler-sessions-and-comparison.md); [admin-operator-guide.md](../../guides/admin-operator-guide.md) §4. On **Submission**, advisory notices can include **stale crawl** and **profile updated since last run** (non-blocking).
 
 ---
 
@@ -191,7 +191,7 @@ Open **AI Runs** for the recorded run (id may be in the notice). Failures includ
 |--------|-----|
 | Capabilities and roles | [concepts-and-glossary.md](../concepts-and-glossary.md) |
 | AI Providers (credentials, test connection, spend cap) | [ai-providers-credentials-budget.md](ai-providers-credentials-budget.md); [admin-operator-guide.md](../../guides/admin-operator-guide.md) §3 |
-| Crawl Sessions / Comparison | [admin-operator-guide.md](../../guides/admin-operator-guide.md) §4 |
+| Crawl Sessions / Comparison | [crawler-sessions-and-comparison.md](crawler-sessions-and-comparison.md); [admin-operator-guide.md](../../guides/admin-operator-guide.md) §4 |
 | Build Plans (after planning) | [admin-operator-guide.md](../../guides/admin-operator-guide.md) §6–§7; [end-user-workflow-guide.md](../../guides/end-user-workflow-guide.md) |
 | Profile snapshot history / restore | [advanced-ai-labs.md](advanced-ai-labs.md) (stub); screen **Profile History** / `aio-page-builder-profile-snapshots`; [FILE_MAP.md](../FILE_MAP.md) §4 |
 | Industry profile | [industry-admin-workflows.md](../industry/industry-admin-workflows.md) |

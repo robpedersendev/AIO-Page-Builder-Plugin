@@ -474,6 +474,15 @@ final class Onboarding_Screen {
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::SUBMISSION ) : ?>
 				<p><?php \esc_html_e( 'Request an AI-generated plan from your profile and context. The plan will appear in AI Runs; you can then create a Build Plan from it.', 'aio-page-builder' ); ?></p>
 				<?php
+				$submission_warnings = isset( $state['submission_warnings'] ) && is_array( $state['submission_warnings'] ) ? $state['submission_warnings'] : array();
+				foreach ( $submission_warnings as $warning ) :
+					if ( ! is_array( $warning ) || ! isset( $warning['message'] ) || (string) $warning['message'] === '' ) {
+						continue;
+					}
+					?>
+				<div class="notice notice-warning" role="status"><p><?php echo \esc_html( (string) $warning['message'] ); ?></p></div>
+					<?php
+				endforeach;
 				$last_run_id      = $state['last_planning_run_id'] ?? null;
 				$last_run_post_id = $state['last_planning_run_post_id'] ?? null;
 				if ( $last_run_id !== null && $last_run_post_id !== null && (int) $last_run_post_id > 0 ) :

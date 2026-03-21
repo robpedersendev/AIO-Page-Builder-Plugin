@@ -19,7 +19,7 @@ The **Onboarding & Profile** screen flow: guided steps to complete or update the
 
 ### Crawl session
 
-A **Crawl Sessions** entry represents a **site crawl run**: discovered pages, status, and counts for that run. Open a session from **Crawl Sessions** to see pages for that run. **Crawl Comparison** compares crawl outputs. Both screens use `aio_view_sensitive_diagnostics`. Crawls are scoped to this site; they are used to understand structure for planning.
+A **Crawl Sessions** entry represents a **site crawl run**: discovered pages, status, and counts for that run. Open a session from **Crawl Sessions** to see pages for that run. **Crawl Comparison** compares crawl outputs. Both screens use `aio_view_sensitive_diagnostics`; **Start crawl** / **Retry crawl** require `aio_run_onboarding`. Crawls are scoped to this site; they are used to understand structure for planning. **Deep dive:** [crawler-sessions-and-comparison.md](operator/crawler-sessions-and-comparison.md).
 
 ### Section template
 

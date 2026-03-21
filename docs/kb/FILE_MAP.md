@@ -58,8 +58,8 @@
 
 | Workflow / route | Primary | Secondary |
 |------------------|---------|-----------|
-| Crawl Sessions list + session detail (`aio-page-builder-crawler-sessions`) | [admin-operator-guide.md §4](../guides/admin-operator-guide.md) | Crawler capability in screen class |
-| Crawl Comparison (`aio-page-builder-crawler-comparison`) | [admin-operator-guide.md §4](../guides/admin-operator-guide.md) | — |
+| Crawl Sessions list + session detail (`aio-page-builder-crawler-sessions`) | [crawler-sessions-and-comparison.md](operator/crawler-sessions-and-comparison.md) | [admin-operator-guide.md §4](../guides/admin-operator-guide.md); `Crawler_Sessions_Screen` / `Crawler_Session_Detail_Screen` |
+| Crawl Comparison (`aio-page-builder-crawler-comparison`) | [crawler-sessions-and-comparison.md](operator/crawler-sessions-and-comparison.md) | [admin-operator-guide.md §4](../guides/admin-operator-guide.md); `Crawler_Comparison_Screen` |
 
 ---
 

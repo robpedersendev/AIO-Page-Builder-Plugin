@@ -40,7 +40,8 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ### Crawl & Discovery
 
-- [admin-operator-guide.md §4](../guides/admin-operator-guide.md) — Crawl Sessions and Crawl Comparison.
+- [crawler-sessions-and-comparison.md](operator/crawler-sessions-and-comparison.md) — Sessions, start/retry, comparison, freshness vs onboarding.
+- [admin-operator-guide.md §4](../guides/admin-operator-guide.md) — Short operator summary for Crawl Sessions and Crawl Comparison.
 
 ### Templates
 
