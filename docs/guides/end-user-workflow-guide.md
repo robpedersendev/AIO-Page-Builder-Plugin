@@ -21,7 +21,7 @@ Complete the steps to provide brand and business profile data. This information 
 
 - **Where:** **AIO Page Builder → Build Plans**. Open a plan to see the workspace.
 
-**Full guide:** [build-plan-overview.md](../kb/operator/build-plan-overview.md) — step list, safety before execute, how to read statuses, and advisory vs executable items.
+**Full guides:** [build-plan-overview.md](../kb/operator/build-plan-overview.md) — step list, safety before execute, statuses, advisory items. **Existing pages + new pages (approve/deny/bulk):** [build-plan-review-existing-and-new-pages.md](../kb/operator/build-plan-review-existing-and-new-pages.md).
 
 **What you see:** A **context rail** (plan ID, source run, status, summaries) and a **stepper** with numbered steps. The default order starts with **Overview**, then **Existing page changes**, **New pages**, **Hierarchy & flow**, **Navigation**, **Design tokens**, **SEO**, **Confirm**, and **Logs & rollback**—trust the **labels on screen** if your plan differs.
 

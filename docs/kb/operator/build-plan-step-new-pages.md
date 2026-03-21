@@ -1,5 +1,5 @@
 # Build Plan step — New pages
 
-**Parent guide:** [build-plan-overview.md](build-plan-overview.md) (default step 3, index `2`).
+**Parent:** [build-plan-overview.md](build-plan-overview.md).
 
-Reserved for new-page items, template rationale links, approve/execute flow, and dependency warnings.
+**Review guide (approve/deny/bulk, step index 2):** [build-plan-review-existing-and-new-pages.md](build-plan-review-existing-and-new-pages.md).

@@ -173,6 +173,8 @@ This overview is the **home** for Build Plan documentation. Each step article li
 | 8 | Confirm | [build-plan-step-confirmation.md](build-plan-step-confirmation.md) |
 | 9 | Logs & rollback | [build-plan-step-logs-rollback.md](build-plan-step-logs-rollback.md) |
 
+**Existing + new pages (review depth):** [build-plan-review-existing-and-new-pages.md](build-plan-review-existing-and-new-pages.md) — approve/deny/bulk for URL **`step=1`** and **`step=2`**.
+
 ---
 
 ## 11. Cross-links

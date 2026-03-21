@@ -1,5 +1,5 @@
 # Build Plan step — Existing page changes
 
-**Parent guide:** [build-plan-overview.md](build-plan-overview.md) (default step 2, index `1`).
+**Parent:** [build-plan-overview.md](build-plan-overview.md).
 
-Reserved for approve/deny/bulk patterns, row detail, and execution expectations for existing-page items.
+**Review guide (approve/deny/bulk, step index 1):** [build-plan-review-existing-and-new-pages.md](build-plan-review-existing-and-new-pages.md).

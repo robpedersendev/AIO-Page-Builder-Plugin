@@ -70,7 +70,7 @@ Lists recent AI runs (Run ID, status, provider, model, prompt pack, created). Op
 
 ## 6. Build Plan step review
 
-- **User-facing KB:** [build-plan-overview.md](../kb/operator/build-plan-overview.md) (list, workspace, default nine steps, review vs execution, safety, item status).
+- **User-facing KB:** [build-plan-overview.md](../kb/operator/build-plan-overview.md) (list, workspace, default nine steps, review vs execution, safety, item status). **Existing + new page review:** [build-plan-review-existing-and-new-pages.md](../kb/operator/build-plan-review-existing-and-new-pages.md).
 - **Screen:** **AIO Page Builder → Build Plans** (`aio-page-builder-build-plans`).
 - **Capability:** `aio_view_build_plans` to view; `aio_approve_build_plans` to approve/deny steps; `aio_execute_build_plans` to run execution; `aio_execute_rollbacks` to request rollback.
 
