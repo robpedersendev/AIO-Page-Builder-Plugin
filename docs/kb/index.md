@@ -91,7 +91,8 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ### Industry Pack subsystem
 
-- [industry-admin-workflows.md](industry/industry-admin-workflows.md) — All Industry submenu screens (stub).
+- [industry-bundle-import-and-apply.md](industry/industry-bundle-import-and-apply.md) — JSON bundle preview, hash conflicts, replace/skip, scopes, safe apply, vs Import/Export ZIP.
+- [industry-admin-workflows.md](industry/industry-admin-workflows.md) — All Industry submenu screens (stub); links bundle apply guide.
 - [industry-operator-curriculum.md](../operations/industry-operator-curriculum.md) — Training path (internal).
 
 ### Styling (global)

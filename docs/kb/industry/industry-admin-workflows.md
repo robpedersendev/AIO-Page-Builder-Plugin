@@ -4,11 +4,13 @@
 **Canonical map:** [FILE_MAP.md](../FILE_MAP.md) §12–§14.  
 **Related:** [admin-screen-inventory.md §2.1](../../contracts/admin-screen-inventory.md); [industry-support-training-packet.md](../../operations/industry-support-training-packet.md) (support); [industry-operator-curriculum.md](../../operations/industry-operator-curriculum.md) (training).
 
+**Industry JSON bundle preview / apply:** [industry-bundle-import-and-apply.md](industry-bundle-import-and-apply.md) — upload, conflicts (`same_key_different_content`), replace/skip, scopes, merge state.
+
 ---
 
 ## Scope (architecture only)
 
-One KB article covers **all Industry-labeled submenus** registered in `Admin_Menu::register()`: profile, overrides, author dashboard, health and drift reports, comparisons, guided repair, bundle import preview, style preset and layer comparison, and embedded assistants on template screens. Prevents parallel “one doc per screen” duplication; subsections will map menu label → purpose → primary actions.
+One KB article covers **all Industry-labeled submenus** registered in `Admin_Menu::register()`: profile, overrides, author dashboard, health and drift reports, comparisons, guided repair, bundle import preview, style preset and layer comparison, and embedded assistants on template screens. **Bundle import preview/apply** procedures are canonical in [industry-bundle-import-and-apply.md](industry-bundle-import-and-apply.md). Remaining subsections will map menu label → purpose → primary actions.
 
 ---
 

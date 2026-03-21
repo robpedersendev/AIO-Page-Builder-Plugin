@@ -133,7 +133,8 @@
 | Industry Profile (`aio-page-builder-industry-profile`) — includes starter bundle assistant UI | [industry-admin-workflows.md](industry/industry-admin-workflows.md) | [admin-screen-inventory.md §2.1](../contracts/admin-screen-inventory.md); [industry-support-training-packet.md](../operations/industry-support-training-packet.md) |
 | Industry Overrides (`aio-page-builder-industry-overrides`) | [industry-admin-workflows.md](industry/industry-admin-workflows.md) | — |
 | Industry Author Dashboard (`aio-page-builder-industry-author-dashboard`) | [industry-admin-workflows.md](industry/industry-admin-workflows.md) | [industry-operator-curriculum.md](../operations/industry-operator-curriculum.md) |
-| Industry Health / Stale / Pack family / Future readiness / Subtype readiness / Maturity delta / Drift / Scaffold promotion / Guided Repair / Comparisons / Bundle Import / Style Preset / Style layer comparison (all `aio-page-builder-industry-*` slugs) | [industry-admin-workflows.md](industry/industry-admin-workflows.md) | Relevant contracts under `docs/contracts/industry-*.md` |
+| Industry Bundle Import Preview (`aio-page-builder-industry-bundle-import-preview`) | [industry-bundle-import-and-apply.md](industry/industry-bundle-import-and-apply.md) | [industry-pack-bundle-format-contract.md](../contracts/industry-pack-bundle-format-contract.md); `Industry_Bundle_Apply_Service`; `Industry_Bundle_Import_Preview_Screen` |
+| Industry Health / Stale / Pack family / Future readiness / Subtype readiness / Maturity delta / Drift / Scaffold promotion / Guided Repair / Comparisons / Style Preset / Style layer comparison (other `aio-page-builder-industry-*` slugs) | [industry-admin-workflows.md](industry/industry-admin-workflows.md) | Relevant contracts under `docs/contracts/industry-*.md` |
 
 ---
 
