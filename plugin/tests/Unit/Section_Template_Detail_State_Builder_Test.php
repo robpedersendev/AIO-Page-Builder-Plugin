@@ -131,15 +131,16 @@ final class Section_Template_Detail_State_Builder_Test extends TestCase {
 		$this->assertArrayHasKey( 'preview_payload', $state );
 	}
 
-	public function test_build_state_resolves_helper_doc_route_when_doc_ref_exists(): void {
+	public function test_build_state_includes_helper_ref_without_resolver_payload(): void {
 		$def               = $this->minimal_section_definition( 'cta_contact_01' );
 		$def['helper_ref'] = 'doc-helper-cta_contact_01';
 		$builder           = $this->create_state_builder( $def );
 		$state             = $builder->build_state( 'cta_contact_01', array() );
 		$this->assertFalse( $state['not_found'] );
 		$this->assertSame( 'doc-helper-cta_contact_01', $state['helper_ref'] );
-		$this->assertIsArray( $state['helper_doc_route'] );
-		$this->assertSame( 'documentation_detail', $state['helper_doc_route']['name'] ?? '' );
+		// * Helper-doc URL/route is produced by Helper_Doc_Url_Resolver at screen render, not in builder state.
+		$this->assertArrayNotHasKey( 'helper_doc_route', $state );
+		$this->assertArrayNotHasKey( 'helper_doc_url', $state );
 	}
 
 	public function test_build_state_field_summary_from_embedded_blueprint(): void {
@@ -196,7 +197,6 @@ final class Section_Template_Detail_State_Builder_Test extends TestCase {
 	 *   ],
 	 *   'field_summary'          => [ [ 'name' => 'headline', 'label' => 'Headline', 'type' => 'text' ], ... ],
 	 *   'helper_ref'             => 'hero_helper',
-	 *   'helper_doc_url'         => '',
 	 *   'compatibility_notes'    => [],
 	 *   'preview_payload'        => [ 'section_key' => '...', 'field_values' => [ ... ], 'side_panel' => [ ... ], 'options' => [ ... ] ],
 	 *   'rendered_preview_html'  => '<div class="aio-s-st01_hero">...</div>',

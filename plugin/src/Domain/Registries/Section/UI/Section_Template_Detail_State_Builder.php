@@ -31,7 +31,8 @@ use AIOPageBuilder\Domain\Rendering\Section\Section_Renderer_Base;
 
 /**
  * Builds stable detail-state payload: section definition, side-panel metadata, field_summary,
- * helper_ref, helper_doc_url, compatibility_notes, preview payload, and rendered_preview_html.
+ * helper_ref, compatibility_notes, preview payload, and rendered_preview_html.
+ * Helper-doc admin URLs are resolved at render time via Helper_Doc_Url_Resolver (Section_Template_Detail_Screen), not in this array.
  */
 final class Section_Template_Detail_State_Builder {
 
@@ -114,7 +115,7 @@ final class Section_Template_Detail_State_Builder {
 	 *
 	 * @param string               $section_key Section template internal_key.
 	 * @param array<string, mixed> $request_params Optional: purpose_family (for breadcrumb), reduced_motion.
-	 * @return array<string, mixed> State: section_key, definition, side_panel, field_summary, helper_ref, helper_doc_url, compatibility_notes, preview_payload, rendered_preview_html, breadcrumbs, not_found.
+	 * @return array<string, mixed> State: section_key, definition, side_panel, field_summary, helper_ref, compatibility_notes, preview_payload, rendered_preview_html, breadcrumbs, not_found.
 	 */
 	public function build_state( string $section_key, array $request_params = array() ): array {
 		$section_key = \sanitize_key( $section_key );
