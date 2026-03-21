@@ -7,10 +7,11 @@
 
 namespace AIOPageBuilder\Tests\Unit\Domain\Storage\Profile;
 
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -21,26 +22,7 @@ require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Data.p
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Helper.php';
 require_once $plugin_root . '/src/Infrastructure/Config/Versions.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Factory.php';
-
-// ---------------------------------------------------------------------------
-// Minimal stubs: gmdate, random_bytes, bin2hex
-// ---------------------------------------------------------------------------
-namespace AIOPageBuilder\Domain\Storage\Profile;
-
-if ( ! function_exists( 'AIOPageBuilder\Domain\Storage\Profile\gmdate' ) ) {
-	function gmdate( string $format, ?int $timestamp = null ): string {
-		return \gmdate( $format, $timestamp );
-	}
-}
-
-namespace AIOPageBuilder\Tests\Unit\Domain\Storage\Profile;
-
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
-use PHPUnit\Framework\TestCase;
+require_once $plugin_root . '/tests/fixtures/profile-snapshot-gmdate-stub.php';
 
 require_once dirname( __DIR__, 5 ) . '/src/Domain/Storage/Profile/Profile_Store_Interface.php';
 

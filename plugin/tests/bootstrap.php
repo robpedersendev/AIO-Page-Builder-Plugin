@@ -638,8 +638,10 @@ if ( ! function_exists( 'wp_die' ) ) {
 	 * @param string           $title   Optional. Error title.
 	 * @param string|array     $args    Optional. Arguments to control behavior.
 	 * @return never
+	 * @throws \RuntimeException Always; test bootstrap replaces wp_die with an exception.
 	 */
 	function wp_die( $message = '', $title = '', $args = array() ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Test harness: exception message is for assertions, not HTML output.
 		throw new \RuntimeException( is_string( $message ) ? $message : 'wp_die' );
 	}
 }

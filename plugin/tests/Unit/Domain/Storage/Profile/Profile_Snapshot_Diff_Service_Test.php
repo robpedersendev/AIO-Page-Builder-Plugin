@@ -9,6 +9,7 @@ namespace AIOPageBuilder\Tests\Unit\Domain\Storage\Profile;
 
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Diff_Service;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -17,25 +18,9 @@ $plugin_root = dirname( __DIR__, 5 );
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Data.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Diff_Service.php';
+require_once $plugin_root . '/tests/fixtures/profile-snapshot-wp-json-encode-stub.php';
 
-// Stub wp_json_encode.
-namespace AIOPageBuilder\Domain\Storage\Profile;
-
-if ( ! function_exists( 'AIOPageBuilder\Domain\Storage\Profile\wp_json_encode' ) ) {
-	function wp_json_encode( $data ): string {
-		$r = \json_encode( $data );
-		return is_string( $r ) ? $r : '';
-	}
-}
-
-namespace AIOPageBuilder\Tests\Unit\Domain\Storage\Profile;
-
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Diff_Service;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
-use PHPUnit\Framework\TestCase;
-
-require_once dirname( __DIR__, 5 ) . '/src/Domain/Storage/Profile/Profile_Store_Interface.php';
+require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Store_Interface.php';
 
 /**
  * Fake Profile_Store that returns controlled profile data for diff tests.

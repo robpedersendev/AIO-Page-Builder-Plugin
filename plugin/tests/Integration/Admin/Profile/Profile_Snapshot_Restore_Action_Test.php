@@ -15,16 +15,23 @@
 
 namespace AIOPageBuilder\Tests\Integration\Admin\Profile;
 
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 4 );
+$fixtures    = dirname( __DIR__, 3 ) . '/fixtures/';
 
 // * Only test the restoration logic in Profile_Snapshot_History_Panel::handle_restore()
 // * directly by calling an internal helper. Rather than bootstrapping the full screen,
 // * we test the restore contract at the service boundary.
 
+require_once $fixtures . 'profile-restore-wp-stubs.php';
 require_once $plugin_root . '/tests/bootstrap_i18n_stub.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Data.php';
@@ -34,34 +41,9 @@ require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Helper
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Factory.php';
 require_once $plugin_root . '/src/Infrastructure/Config/Versions.php';
 
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
-
-// ---------------------------------------------------------------------------
-// Stubs
-// ---------------------------------------------------------------------------
-namespace AIOPageBuilder\Tests\Integration\Admin\Profile;
-
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
-use PHPUnit\Framework\TestCase;
-
-function wp_json_encode( $data ): string {
-	$r = \json_encode( $data );
-	return is_string( $r ) ? $r : '';
-}
-function error_log( string $m ): bool {
-	return true; }
-function gmdate( string $f, ?int $t = null ): string {
-	return \gmdate( $f, $t ); }
-
-// ---------------------------------------------------------------------------
-// In-memory Profile_Store that records writes for assertion.
-// ---------------------------------------------------------------------------
+/**
+ * In-memory Profile_Store that records writes for assertion.
+ */
 final class Spy_Profile_Store implements Profile_Store_Interface {
 	/** @var array<int, array<string, mixed>> */
 	public array $set_calls = array();
@@ -92,9 +74,9 @@ final class Spy_Profile_Store implements Profile_Store_Interface {
 	}
 }
 
-// ---------------------------------------------------------------------------
-// In-memory snapshot repository.
-// ---------------------------------------------------------------------------
+/**
+ * In-memory snapshot repository.
+ */
 final class Spy_Snapshot_Repo implements Profile_Snapshot_Repository_Interface {
 	/** @var array<string, Profile_Snapshot_Data> */
 	public array $store = array();

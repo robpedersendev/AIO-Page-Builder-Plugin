@@ -13,6 +13,9 @@
 
 namespace AIOPageBuilder\Tests\Integration\Export;
 
+use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Bundle_Schema;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
+use AIOPageBuilder\Infrastructure\Config\Versions;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -25,22 +28,19 @@ require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Data.p
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Repository_Interface.php';
 require_once $plugin_root . '/src/Infrastructure/Config/Versions.php';
 
-namespace AIOPageBuilder\Tests\Integration\Export;
-
-use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Bundle_Schema;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
-use AIOPageBuilder\Infrastructure\Config\Versions;
-use PHPUnit\Framework\TestCase;
-
+/**
+ * @param mixed $data Data.
+ * @return string
+ */
 function wp_json_encode( $data ): string {
 	$r = \json_encode( $data );
 	return is_string( $r ) ? $r : '';
 }
 
-// ---------------------------------------------------------------------------
-// Helpers mirroring the serialization and hydration logic in Export_Generator
-// and Restore_Pipeline without requiring full infrastructure.
-// ---------------------------------------------------------------------------
+/**
+ * Helpers mirroring the serialization and hydration logic in Export_Generator
+ * and Restore_Pipeline without requiring full infrastructure.
+ */
 final class Snapshot_Serializer {
 	/**
 	 * Mirrors Export_Generator::serialize_snapshot().

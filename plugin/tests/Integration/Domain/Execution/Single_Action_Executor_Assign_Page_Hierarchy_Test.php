@@ -25,35 +25,7 @@ require_once $plugin_root . '/src/Domain/Execution/Contracts/Execution_Action_Ty
 require_once $plugin_root . '/src/Domain/Execution/Executor/Execution_Handler_Interface.php';
 require_once $plugin_root . '/src/Domain/Execution/Executor/Execution_Dispatcher.php';
 require_once $plugin_root . '/src/Domain/Execution/Handlers/Assign_Page_Hierarchy_Handler.php';
-
-// ---------------------------------------------------------------------------
-// Minimal WP stubs required by Assign_Page_Hierarchy_Handler at load time.
-// ---------------------------------------------------------------------------
-namespace AIOPageBuilder\Domain\Execution\Handlers;
-
-if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\get_post' ) ) {
-	function get_post( int $id ) {
-		return null; }
-}
-if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\wp_update_post' ) ) {
-	function wp_update_post( array $args, bool $return_error = false ) {
-		return 0; }
-}
-if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\is_wp_error' ) ) {
-	function is_wp_error( $thing ): bool {
-		return false; }
-}
-if ( ! function_exists( 'AIOPageBuilder\Domain\Execution\Handlers\__' ) ) {
-	function __( string $text, string $domain = 'default' ): string {
-		return $text; }
-}
-
-namespace AIOPageBuilder\Tests\Integration\Domain\Execution;
-
-use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
-use AIOPageBuilder\Domain\Execution\Executor\Execution_Dispatcher;
-use AIOPageBuilder\Domain\Execution\Handlers\Assign_Page_Hierarchy_Handler;
-use PHPUnit\Framework\TestCase;
+require_once $plugin_root . '/tests/fixtures/execution-handlers-assign-page-hierarchy-wp-stubs.php';
 
 /**
  * Verifies ASSIGN_PAGE_HIERARCHY is fully wired into the execution engine.

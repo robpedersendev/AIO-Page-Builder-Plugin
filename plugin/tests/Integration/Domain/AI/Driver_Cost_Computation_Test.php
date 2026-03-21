@@ -56,7 +56,9 @@ if ( ! function_exists( 'AIOPageBuilder\Tests\Integration\Domain\AI\__' ) ) {
 	}
 }
 
-// Minimal secret store stub.
+/**
+ * Minimal secret store stub for driver cost integration tests.
+ */
 class Stub_Secret_Store_Cost implements \AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface {
 	public function get_credential_for_provider( string $provider_id ): ?string {
 		return 'test-key';

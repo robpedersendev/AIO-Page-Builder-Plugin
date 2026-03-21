@@ -12,6 +12,12 @@
 
 namespace AIOPageBuilder\Tests\Integration\Domain\Onboarding;
 
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Capture_Service;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -26,16 +32,6 @@ require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Helper
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Factory.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Capture_Service.php';
 require_once $plugin_root . '/src/Infrastructure/Config/Versions.php';
-
-namespace AIOPageBuilder\Tests\Integration\Domain\Onboarding;
-
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Capture_Service;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface;
-use PHPUnit\Framework\TestCase;
 
 // ---------------------------------------------------------------------------
 // WordPress action stubs — delegate to global WordPress stubs in bootstrap.php.
@@ -58,9 +54,9 @@ function error_log( string $msg ): bool {
 	return true;
 }
 
-// ---------------------------------------------------------------------------
-// Spy profile store.
-// ---------------------------------------------------------------------------
+/**
+ * Spy profile store for onboarding capture tests.
+ */
 final class Spy_Onboarding_Profile_Store implements Profile_Store_Interface {
 	/** @var array<string, mixed> */
 	private array $brand = array( 'name' => 'Onboarding Brand' );
@@ -83,9 +79,9 @@ final class Spy_Onboarding_Profile_Store implements Profile_Store_Interface {
 	}
 }
 
-// ---------------------------------------------------------------------------
-// In-memory snapshot repository.
-// ---------------------------------------------------------------------------
+/**
+ * In-memory snapshot repository for onboarding capture tests.
+ */
 final class Spy_Onboarding_Snapshot_Repo implements Profile_Snapshot_Repository_Interface {
 	/** @var array<int, Profile_Snapshot_Data> */
 	public array $saved = array();

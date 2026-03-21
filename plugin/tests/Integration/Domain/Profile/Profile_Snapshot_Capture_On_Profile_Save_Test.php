@@ -10,11 +10,24 @@
 
 namespace AIOPageBuilder\Tests\Integration\Domain\Profile;
 
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Capture_Service;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
+use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
 
 $plugin_root = dirname( __DIR__, 4 );
+$fixtures    = dirname( __DIR__, 3 ) . '/fixtures/';
+require_once $fixtures . 'profile-save-test-Settings_Service-stub.php';
+require_once $fixtures . 'profile-save-test-Template_Preference-stub.php';
+require_once $fixtures . 'profile-save-test-Option_Names-stub.php';
+
 require_once $plugin_root . '/tests/bootstrap_i18n_stub.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Snapshot_Data.php';
@@ -28,25 +41,43 @@ require_once $plugin_root . '/src/Infrastructure/Config/Versions.php';
 // ---------------------------------------------------------------------------
 // WordPress action/filter stubs.
 // ---------------------------------------------------------------------------
-namespace AIOPageBuilder\Tests\Integration\Domain\Profile;
-
 /** @var array<string, array<callable>> */
 $GLOBALS['_test_wp_actions'] = array();
 
+/**
+ * @param string $hook  Hook name.
+ * @param mixed  ...$args Arguments.
+ * @return void
+ */
 function do_action( string $hook, ...$args ): void {
 	\do_action( $hook, ...$args );
 }
 
+/**
+ * @param string   $hook          Hook name.
+ * @param callable $callback      Callback.
+ * @param int      $priority      Priority.
+ * @param int      $accepted_args Accepted args.
+ * @return true
+ */
 function add_action( string $hook, callable $callback, int $priority = 10, int $accepted_args = 1 ) {
 	\add_action( $hook, $callback, $priority, $accepted_args );
 	return true;
 }
 
+/**
+ * @param mixed $data Data.
+ * @return string
+ */
 function wp_json_encode( $data ): string {
 	$r = \json_encode( $data );
 	return is_string( $r ) ? $r : '';
 }
 
+/**
+ * @param string $msg Message.
+ * @return bool
+ */
 function error_log( string $msg ): bool {
 	return true;
 }
@@ -57,66 +88,14 @@ function error_log( string $msg ): bool {
 /** @var array<string, mixed> */
 $GLOBALS['_test_options'] = array();
 
-namespace AIOPageBuilder\Infrastructure\Settings;
-
-if ( ! class_exists( 'AIOPageBuilder\Infrastructure\Settings\Settings_Service' ) ) {
-	class Settings_Service {
-		public function get( string $key ): mixed {
-			return $GLOBALS['_test_options'][ $key ] ?? null;
-		}
-
-		public function set( string $key, mixed $value ): void {
-			$GLOBALS['_test_options'][ $key ] = $value;
-		}
-	}
-}
-
-namespace AIOPageBuilder\Domain\Profile;
-
-if ( ! class_exists( 'AIOPageBuilder\Domain\Profile\Template_Preference_Profile' ) ) {
-	class Template_Preference_Profile {
-		public function to_array(): array {
-			return array(); }
-		public static function from_array( array $a ): self {
-			return new self(); }
-	}
-}
-
-namespace AIOPageBuilder\Infrastructure\Config;
-
-if ( ! class_exists( 'AIOPageBuilder\Infrastructure\Config\Option_Names' ) ) {
-	class Option_Names {
-		public const PROFILE_CURRENT = 'aio_page_builder_profile_current';
-	}
-}
-
-namespace AIOPageBuilder\Domain\Storage\Profile;
-
-if ( ! function_exists( 'AIOPageBuilder\Domain\Storage\Profile\do_action' ) ) {
-	function do_action( string $hook, ...$args ): void {
-		\AIOPageBuilder\Tests\Integration\Domain\Profile\do_action( $hook, ...$args );
-	}
-}
-
-namespace AIOPageBuilder\Tests\Integration\Domain\Profile;
-
-use PHPUnit\Framework\TestCase;
+require_once $fixtures . 'profile-save-test-storage-do-action-stub.php';
 
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Normalizer.php';
 require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Store.php';
 
-// ---------------------------------------------------------------------------
-// In-memory snapshot repository for test assertions.
-// ---------------------------------------------------------------------------
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Helper;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Capture_Service;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
-use AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer;
-use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
-
+/**
+ * In-memory snapshot repository for test assertions.
+ */
 final class In_Memory_Snapshot_Repo implements Profile_Snapshot_Repository_Interface {
 	/** @var array<int, Profile_Snapshot_Data> */
 	public array $saved = array();
