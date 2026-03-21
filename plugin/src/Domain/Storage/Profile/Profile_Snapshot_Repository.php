@@ -126,10 +126,7 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 		$this->assert_table_identifier( $table );
 		$sql = 'SELECT * FROM %i WHERE snapshot_id = %s LIMIT 1';
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$row = $this->wpdb->get_row(
-			$this->wpdb->prepare( $sql, $table, $snapshot_id ),
-			ARRAY_A
-		);
+		$row = Wpdb_Prepared_Results::get_row( $this->wpdb, $sql, array( $table, $snapshot_id ), ARRAY_A );
 		if ( ! is_array( $row ) ) {
 			return null;
 		}

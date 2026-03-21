@@ -67,9 +67,8 @@ abstract class Abstract_Table_Repository implements Repository_Interface {
 	public function get_by_id( int $id ): ?array {
 		$table = $this->get_table_name();
 		$this->assert_sql_identifier( $table );
-		$sql      = 'SELECT * FROM %i WHERE id = %d LIMIT 1';
-		$prepared = $this->wpdb->prepare( $sql, $table, $id );
-		$row      = $this->wpdb->get_row( $prepared );
+		$sql = 'SELECT * FROM %i WHERE id = %d LIMIT 1';
+		$row = Wpdb_Prepared_Results::get_row( $this->wpdb, $sql, array( $table, $id ) );
 		if ( $row === null ) {
 			return null;
 		}

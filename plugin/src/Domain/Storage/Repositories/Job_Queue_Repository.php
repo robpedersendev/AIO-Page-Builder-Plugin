@@ -161,9 +161,8 @@ final class Job_Queue_Repository extends Abstract_Table_Repository implements Jo
 		$limit  = $limit > 0 ? $limit : 50;
 		$offset = $offset >= 0 ? $offset : 0;
 		$this->assert_sql_identifier( $table );
-		$sql      = 'SELECT * FROM %i WHERE queue_status = %s ORDER BY priority DESC, created_at ASC LIMIT %d OFFSET %d';
-		$prepared = $this->wpdb->prepare( $sql, $table, $status, $limit, $offset );
-		$rows     = $this->wpdb->get_results( $prepared );
+		$sql  = 'SELECT * FROM %i WHERE queue_status = %s ORDER BY priority DESC, created_at ASC LIMIT %d OFFSET %d';
+		$rows = Wpdb_Prepared_Results::get_results( $this->wpdb, $sql, array( $table, $status, $limit, $offset ) );
 		if ( ! is_array( $rows ) ) {
 			return array();
 		}

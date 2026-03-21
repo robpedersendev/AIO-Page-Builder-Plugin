@@ -62,16 +62,17 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		$payload_val = $payload !== null && $payload !== '' ? $payload : null;
 		$this->assert_table_identifier();
 		$sql    = 'INSERT INTO %i (`map_type`,`source_ref`,`target_ref`,`scope_ref`,`payload`,`schema_version`) VALUES (%s,%s,%s,%s,%s,%s)';
-		$result = $this->wpdb->query(
-			$this->wpdb->prepare(
-				$sql,
+		$result = Wpdb_Prepared_Results::query(
+			$this->wpdb,
+			$sql,
+			array(
 				$this->table,
 				$map_type,
 				$source_ref,
 				$target_ref,
 				$scope_val,
 				$payload_val,
-				self::SCHEMA_VERSION
+				self::SCHEMA_VERSION,
 			)
 		);
 		if ( $result !== 1 ) {

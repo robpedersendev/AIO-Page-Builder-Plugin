@@ -124,7 +124,7 @@ final class Uninstall_Cleanup_Service {
 		$count = 0;
 		foreach ( self::ACF_CACHE_TRANSIENT_PREFIXES as $prefix ) {
 			$like = $this->wpdb->esc_like( '_transient_' . $prefix ) . '%';
-			$ids  = $this->wpdb->get_col( $this->wpdb->prepare( "SELECT option_id FROM `{$table}` WHERE option_name LIKE %s", $like ) );
+			$ids  = Wpdb_Prepared_Results::get_col( $this->wpdb, 'SELECT option_id FROM %i WHERE option_name LIKE %s', array( $table, $like ) );
 			if ( is_array( $ids ) ) {
 				foreach ( $ids as $id ) {
 					$this->wpdb->delete( $table, array( 'option_id' => $id ) );
