@@ -74,7 +74,7 @@ final class Helper_Doc_Url_Resolver {
 			)
 		);
 
-		if ( ! \is_string( $url ) || $url === '' ) {
+		if ( $url === '' ) {
 			return $this->unavailable();
 		}
 

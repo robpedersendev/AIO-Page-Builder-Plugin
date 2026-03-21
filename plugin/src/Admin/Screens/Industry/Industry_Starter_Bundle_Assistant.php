@@ -15,7 +15,6 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Actions\Create_Plan_From_Starter_Bundle_Action;
 use AIOPageBuilder\Admin\ViewModels\Industry\Subtype_Starter_Bundle_Selection_View_Model;
-use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry;
@@ -28,9 +27,6 @@ final class Industry_Starter_Bundle_Assistant {
 
 	public const FIELD_NAME = 'aio_selected_starter_bundle_key';
 
-	/** @var Industry_Profile_Repository|null */
-	private ?Industry_Profile_Repository $profile_repo;
-
 	/** @var Industry_Starter_Bundle_Registry|null */
 	private ?Industry_Starter_Bundle_Registry $bundle_registry;
 
@@ -38,11 +34,9 @@ final class Industry_Starter_Bundle_Assistant {
 	private ?Industry_Subtype_Registry $subtype_registry;
 
 	public function __construct(
-		?Industry_Profile_Repository $profile_repo = null,
 		?Industry_Starter_Bundle_Registry $bundle_registry = null,
 		?Industry_Subtype_Registry $subtype_registry = null
 	) {
-		$this->profile_repo     = $profile_repo;
 		$this->bundle_registry  = $bundle_registry;
 		$this->subtype_registry = $subtype_registry;
 	}
@@ -157,7 +151,6 @@ final class Industry_Starter_Bundle_Assistant {
 						<a href="<?php echo \esc_url( $create_plan_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Create draft Build Plan from this bundle', 'aio-page-builder' ); ?></a>
 					</p>
 				<?php } ?>
-				<?php if ( ! empty( $bundles ) ) : ?>
 				<details class="aio-starter-bundle-details" style="margin-top: 0.5rem;">
 					<summary><?php \esc_html_e( 'What’s in each bundle?', 'aio-page-builder' ); ?></summary>
 					<ul class="aio-starter-bundle-list">
@@ -171,7 +164,6 @@ final class Industry_Starter_Bundle_Assistant {
 						<?php endforeach; ?>
 					</ul>
 				</details>
-				<?php endif; ?>
 			</td>
 		</tr>
 		<?php

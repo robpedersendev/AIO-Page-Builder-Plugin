@@ -157,10 +157,13 @@ final class Page_Templates_Directory_Screen {
 			$query_service = $this->container->get( 'large_library_query_service' );
 		}
 		if ( ! $query_service instanceof \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service ) {
-			$query_service = new \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service(
-				$this->container && $this->container->has( 'page_template_repository' ) ? $this->container->get( 'page_template_repository' ) : null,
-				null
-			);
+			$section_repo = $this->container && $this->container->has( 'section_template_repository' )
+				? $this->container->get( 'section_template_repository' )
+				: new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
+			$page_repo    = $this->container && $this->container->has( 'page_template_repository' )
+				? $this->container->get( 'page_template_repository' )
+				: new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
+			$query_service = new \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service( $section_repo, $page_repo );
 		}
 		return new Page_Template_Directory_State_Builder( $query_service );
 	}
@@ -341,7 +344,6 @@ final class Page_Templates_Directory_Screen {
 					$version       = (string) ( $row['version'] ?? '1' );
 					$section_count = (int) ( $row['section_count'] ?? 0 );
 					$purpose       = (string) ( $row['purpose_summary'] ?? '' );
-					$one_pager_url = ''; // * One-pager availability is shown on detail screen.
 					$detail_args   = array(
 						'page'     => Page_Template_Detail_Screen::SLUG,
 						'template' => $key,
@@ -372,20 +374,12 @@ final class Page_Templates_Directory_Screen {
 						<td><?php echo \esc_html( $section_count > 0 ? sprintf( /* translators: %d: number of sections */ __( '%d sections', 'aio-page-builder' ), $section_count ) : '—' ); ?></td>
 						<td><?php echo \esc_html( $version ); ?></td>
 						<td>
-							<?php if ( $one_pager_url !== '' ) : ?>
-								<a href="<?php echo \esc_url( $one_pager_url ); ?>"><?php \esc_html_e( 'One-pager', 'aio-page-builder' ); ?></a>
-							<?php else : ?>
-								<span class="aio-one-pager-unavailable"><?php \esc_html_e( 'Not available', 'aio-page-builder' ); ?></span>
-							<?php endif; ?>
+							<span class="aio-one-pager-unavailable"><?php \esc_html_e( 'Not available', 'aio-page-builder' ); ?></span>
 						</td>
 						<td><?php echo \esc_html( $status ); ?></td>
 						<td>
 							<a href="<?php echo \esc_url( $view_url ); ?>"><?php \esc_html_e( 'View detail', 'aio-page-builder' ); ?></a>
-							<?php if ( $one_pager_url !== '' ) : ?>
-								| <a href="<?php echo \esc_url( $one_pager_url ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'Open one-pager', 'aio-page-builder' ); ?></a>
-							<?php else : ?>
-								| <span class="aio-one-pager-unavailable" title="<?php echo \esc_attr__( 'One-pager not available.', 'aio-page-builder' ); ?>"><?php \esc_html_e( 'Open one-pager', 'aio-page-builder' ); ?></span>
-							<?php endif; ?>
+							| <span class="aio-one-pager-unavailable" title="<?php echo \esc_attr__( 'One-pager not available.', 'aio-page-builder' ); ?>"><?php \esc_html_e( 'Open one-pager', 'aio-page-builder' ); ?></span>
 							| <a href="<?php echo \esc_url( $preview_url ); ?>"><?php \esc_html_e( 'Structural preview', 'aio-page-builder' ); ?></a>
 							<?php if ( $in_compare ) : ?>
 								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'page', $key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>

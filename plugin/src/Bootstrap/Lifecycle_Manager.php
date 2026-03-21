@@ -235,16 +235,16 @@ final class Lifecycle_Manager {
 	}
 
 	private function init_options(): Lifecycle_Result {
-		$settings = new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
-
-		$installation_id = $settings->get( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_INSTALLATION_ID );
-		if ( ! is_string( $installation_id ) || trim( $installation_id ) === '' ) {
-			$settings->set( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_INSTALLATION_ID, \wp_generate_uuid4() );
+		// Scalar options use get_option/update_option; Settings_Service is array-shaped only (spec §43.13).
+		$installation_id = \get_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_INSTALLATION_ID, '' );
+		$installation_id = is_string( $installation_id ) ? trim( $installation_id ) : '';
+		if ( $installation_id === '' ) {
+			\update_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_INSTALLATION_ID, \wp_generate_uuid4() );
 		}
 
 		// First-run redirect is a real, single-use flag consumed by Bootstrap\Plugin (admin_init).
-		if ( $settings->get( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT ) === null ) {
-			$settings->set( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT, '1' );
+		if ( \get_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT, null ) === null ) {
+			\update_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT, '1' );
 		}
 
 		$version_state = new \AIOPageBuilder\Infrastructure\Config\Version_State_Service();
@@ -271,7 +271,7 @@ final class Lifecycle_Manager {
 		if ( ! $result['success'] ) {
 			return new Lifecycle_Result(
 				Lifecycle_Result::STATUS_BLOCKING_FAILURE,
-				\esc_html( ( $result['message'] !== '' && $result['message'] !== null ) ? $result['message'] : __( 'Custom table installation or upgrade failed.', 'aio-page-builder' ) ),
+				\esc_html( $result['message'] !== '' ? $result['message'] : __( 'Custom table installation or upgrade failed.', 'aio-page-builder' ) ),
 				'check_tables_schema',
 				array( 'failed_table' => $result['failed_table'] )
 			);

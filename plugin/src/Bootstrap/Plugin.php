@@ -198,7 +198,7 @@ final class Plugin {
 				deactivate_plugins( Constants::plugin_basename() );
 			}
 			\wp_die(
-				\esc_html( ( $result->message !== '' && $result->message !== null ) ? $result->message : 'Plugin activation failed.' ),
+				\esc_html( $result->message !== '' ? $result->message : 'Plugin activation failed.' ),
 				'Activation Failed',
 				array(
 					'response'  => 500,
@@ -262,8 +262,8 @@ final class Plugin {
 	/**
 	 * Registers the plugin personal data exporter (Tools → Export Personal Data). SPR-004.
 	 *
-	 * @param array<int, array{exporter_friendly_name: string, callback: callable}> $exporters
-	 * @return array<int, array{exporter_friendly_name: string, callback: callable}>
+	 * @param array<string, array{exporter_friendly_name: string, callback: callable}> $exporters
+	 * @return array<string, array{exporter_friendly_name: string, callback: callable}>
 	 */
 	public static function register_personal_data_exporter( array $exporters ): array {
 		$exporters['aio-page-builder'] = array(
@@ -278,8 +278,8 @@ final class Plugin {
 	/**
 	 * Registers the plugin personal data eraser (Tools → Erase Personal Data). SPR-004.
 	 *
-	 * @param array<int, array{eraser_friendly_name: string, callback: callable}> $erasers
-	 * @return array<int, array{eraser_friendly_name: string, callback: callable}>
+	 * @param array<string, array{eraser_friendly_name: string, callback: callable}> $erasers
+	 * @return array<string, array{eraser_friendly_name: string, callback: callable}>
 	 */
 	public static function register_personal_data_eraser( array $erasers ): array {
 		$erasers['aio-page-builder'] = array(

@@ -1,5 +1,7 @@
 parameters:
     level: 5
+    # Admin/Infrastructure consume Domain PHPDoc shapes; treating them as uncertain avoids false positives on redundant ??/isset.
+    treatPhpDocTypesAsCertain: false
     # Analyze plugin source only. Tests define global WordPress stubs (e.g. update_option with 2 params) that
     # conflict with php-stubs/wordpress-stubs (3 params including autoload); PHPStan merges those and breaks Domain analysis.
     paths:

@@ -51,10 +51,7 @@ final class Capability_Registrar {
 	 */
 	public static function remove_from_all_roles(): void {
 		$roles = \wp_roles();
-		if ( ! $roles instanceof \WP_Roles ) {
-			return;
-		}
-		$caps = Capabilities::get_all();
+		$caps  = Capabilities::get_all();
 		foreach ( $roles->roles as $role_key => $role_data ) {
 			$role = \get_role( $role_key );
 			if ( $role instanceof \WP_Role ) {

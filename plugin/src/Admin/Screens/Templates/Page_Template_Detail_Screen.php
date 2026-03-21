@@ -54,6 +54,8 @@ final class Page_Template_Detail_Screen {
 		}
 
 		$template_key = isset( $_GET['template'] ) ? \sanitize_key( (string) $_GET['template'] ) : '';
+		$last_result  = null;
+		$this->process_entity_style_save( $template_key, $last_result );
 		$request      = array(
 			'category_class' => isset( $_GET['category_class'] ) ? \sanitize_key( (string) $_GET['category_class'] ) : '',
 			'family'         => isset( $_GET['family'] ) ? \sanitize_key( (string) $_GET['family'] ) : '',
@@ -66,6 +68,11 @@ final class Page_Template_Detail_Screen {
 		if ( ! empty( $state['not_found'] ) ) {
 			$this->render_not_found( $state );
 			return;
+		}
+
+		$entity_style = $this->get_entity_style_state( $template_key, $last_result );
+		if ( $entity_style !== null ) {
+			$state['entity_style'] = $entity_style;
 		}
 
 		$state = $this->merge_industry_preview_state( $state );

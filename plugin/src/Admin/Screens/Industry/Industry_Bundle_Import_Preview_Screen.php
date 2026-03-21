@@ -66,7 +66,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 			Industry_Pack_Bundle_Service::PAYLOAD_QUESTION_PACKS => array(),
 			Industry_Pack_Bundle_Service::PAYLOAD_SITE_PROFILE => array(),
 			'pack_versions'                             => array(),
-			'site_profile'                              => false,
+			'has_site_industry_profile'                 => false,
 		);
 		if ( ! $this->container instanceof Service_Container ) {
 			return $state;
@@ -111,7 +111,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 		if ( $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
 			$repo                  = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
 			$profile               = $repo && \method_exists( $repo, 'get_profile' ) ? $repo->get_profile() : array();
-			$state['site_profile'] = ! empty( $profile['primary_industry_key'] );
+			$state['has_site_industry_profile'] = ! empty( $profile['primary_industry_key'] );
 		}
 		return $state;
 	}

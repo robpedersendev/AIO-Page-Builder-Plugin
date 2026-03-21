@@ -256,12 +256,10 @@ final class AI_Providers_Screen {
 					<tbody>
 						<?php foreach ( $provider_rows as $row ) : ?>
 							<?php
-							$credential      = $row['credential_status'] ?? array( 'label' => '—' );
-							$model_state     = $row['model_default_state'] ?? array( 'label' => '—' );
-							$test            = $row['connection_test_summary'];
-							$last_use        = $row['last_successful_use'] ?? null;
-							$test_btn_url    = $this->test_connection_url( $row['provider_id'] );
-							$update_cred_url = $this->update_credential_url( $row['provider_id'] );
+							$credential  = $row['credential_status'] ?? array( 'label' => '—' );
+							$model_state = $row['model_default_state'] ?? array( 'label' => '—' );
+							$test        = $row['connection_test_summary'];
+							$last_use    = $row['last_successful_use'] ?? null;
 							?>
 							<tr>
 								<td><strong><?php echo \esc_html( $row['label'] ?? $row['provider_id'] ); ?></strong></td>

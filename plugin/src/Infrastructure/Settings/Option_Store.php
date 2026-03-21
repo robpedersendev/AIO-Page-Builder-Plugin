@@ -33,8 +33,7 @@ final class Option_Store {
 
 	/** @return array<string, mixed> */
 	public function get_main_settings(): array {
-		$raw = $this->settings->get( self::KEY_MAIN );
-		return is_array( $raw ) ? $raw : array();
+		return $this->settings->get( self::KEY_MAIN );
 	}
 
 	/**
@@ -46,8 +45,7 @@ final class Option_Store {
 
 	/** @return array<string, mixed> */
 	public function get_reporting_settings(): array {
-		$raw = $this->settings->get( self::KEY_REPORTING );
-		return is_array( $raw ) ? $raw : array();
+		return $this->settings->get( self::KEY_REPORTING );
 	}
 
 	/**
@@ -59,8 +57,7 @@ final class Option_Store {
 
 	/** @return array<string, mixed> */
 	public function get_dependency_dismissals(): array {
-		$raw = $this->settings->get( self::KEY_DISMISSALS );
-		return is_array( $raw ) ? $raw : array();
+		return $this->settings->get( self::KEY_DISMISSALS );
 	}
 
 	/** @param array<string, mixed> $value */
@@ -70,8 +67,7 @@ final class Option_Store {
 
 	/** @return array<string, mixed> */
 	public function get_uninstall_prefs(): array {
-		$raw = $this->settings->get( self::KEY_UNINSTALL );
-		return is_array( $raw ) ? $raw : array();
+		return $this->settings->get( self::KEY_UNINSTALL );
 	}
 
 	/** @param array<string, mixed> $value */

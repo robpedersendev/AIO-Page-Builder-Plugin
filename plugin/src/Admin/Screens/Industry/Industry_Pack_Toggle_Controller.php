@@ -36,9 +36,6 @@ final class Industry_Pack_Toggle_Controller {
 	 */
 	public function get_disabled_pack_keys(): array {
 		$raw = $this->settings->get( self::STORAGE_KEY );
-		if ( ! \is_array( $raw ) ) {
-			return array();
-		}
 		$out = array();
 		foreach ( $raw as $value ) {
 			if ( \is_string( $value ) && \trim( $value ) !== '' ) {

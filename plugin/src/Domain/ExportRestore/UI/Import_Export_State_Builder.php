@@ -55,7 +55,8 @@ final class Import_Export_State_Builder {
 	 *   restore_scope_options: array<int, array{value: string, label: string, eligible_categories: array<int, string>}>,
 	 *   can_export: bool,
 	 *   can_import: bool,
-	 *   privacy_screen_url: string
+	 *   privacy_screen_url: string,
+	 *   template_library_lifecycle_summary?: array<string, mixed>
 	 * }
 	 */
 	public function build( ?array $validation_payload = null, ?array $restore_result_payload = null, ?array $manifest = null ): array {

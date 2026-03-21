@@ -99,7 +99,6 @@ final class Profile_Snapshot_History_Panel {
 			|| ! $this->container->has( 'profile_snapshot_repository' )
 			|| ! $this->container->has( 'profile_store' )
 			|| ! $this->container->has( 'profile_snapshot_factory' )
-			|| ! $this->container->has( 'profile_snapshot_repository' )
 		) {
 			\wp_safe_redirect( \add_query_arg( 'restore_error', 'service_unavailable', $redirect ) );
 			exit;

@@ -57,9 +57,8 @@ final class Build_Plan_Analytics_Screen {
 				$from    = $date_from !== '' ? $date_from : null;
 				$to      = $date_to !== '' ? $date_to : null;
 				$summary = $svc->get_analytics_summary( $from, $to );
-			} catch ( \Throwable $e ) {
+			} catch ( \Throwable ) {
 				// Observational; fail gracefully. Intentionally empty.
-				(void) $e;
 			}
 		}
 		$build_plans_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );

@@ -233,7 +233,7 @@ final class Plugin_Path_Manager {
 	 */
 	private function get_upload_basedir(): string {
 		if ( $this->upload_dir !== null ) {
-			return $this->upload_dir['basedir'] ?? '';
+			return $this->upload_dir['basedir'];
 		}
 		$upload = \wp_upload_dir();
 		if ( ! empty( $upload['error'] ) || empty( $upload['basedir'] ) ) {

@@ -64,6 +64,9 @@ final class Build_Plan_Workspace_Screen {
 	/** Bulk nonce action for Step 6 finalization (required contract). */
 	public const NONCE_ACTION_FINALIZE_BULK = 'aio_pb_finalize_plan_bulk';
 
+	/** Nonce for Step 3 navigation approve/deny row actions. */
+	public const NONCE_ACTION_NAVIGATION_REVIEW = 'aio_pb_build_plan_navigation_review';
+
 	/**
 	 * Nonce action prefix for JSON plan export; append sanitized `plan_id` (see workspace export handler).
 	 */
@@ -2052,6 +2055,7 @@ final class Build_Plan_Workspace_Screen {
 						<?php \esc_html_e( 'Finalize plan', 'aio-page-builder' ); ?>
 					</button>
 				</form>
+				<?php $this->render_confirmation_shell( $definition ); ?>
 			<?php endif; ?>
 			<?php
 			if ( $step_type === Build_Plan_Schema::STEP_TYPE_NAVIGATION && ! empty( $workspace['validation_summary']['messages'] ) ) {
@@ -2874,7 +2878,7 @@ final class Build_Plan_Workspace_Screen {
 		$confidence    = (string) ( $payload['overall_confidence'] ?? 'medium' );
 		?>
 		<div class="aio-step-overview">
-			<p class="aio-plan-summary"><?php echo \esc_html( ( $summary !== '' && $summary !== null ) ? $summary : __( 'No summary.', 'aio-page-builder' ) ); ?></p>
+			<p class="aio-plan-summary"><?php echo \esc_html( $summary !== '' ? $summary : __( 'No summary.', 'aio-page-builder' ) ); ?></p>
 			<p><strong><?php \esc_html_e( 'Planning mode:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $planning_mode ); ?> | <strong><?php \esc_html_e( 'Confidence:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $confidence ); ?></p>
 			<p class="aio-overview-actions"><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' ) ) . '&step=1' ) ); ?>" class="button button-primary"><?php \esc_html_e( 'Start review', 'aio-page-builder' ); ?></a></p>
 		</div>
@@ -2885,7 +2889,7 @@ final class Build_Plan_Workspace_Screen {
 		$site_flow = (string) ( $definition[ Build_Plan_Schema::KEY_SITE_FLOW_SUMMARY ] ?? '' );
 		?>
 		<div class="aio-step-hierarchy">
-			<p><?php echo \esc_html( ( $site_flow !== '' && $site_flow !== null ) ? $site_flow : __( 'No hierarchy or flow summary for this plan.', 'aio-page-builder' ) ); ?></p>
+			<p><?php echo \esc_html( $site_flow !== '' ? $site_flow : __( 'No hierarchy or flow summary for this plan.', 'aio-page-builder' ) ); ?></p>
 		</div>
 		<?php
 	}

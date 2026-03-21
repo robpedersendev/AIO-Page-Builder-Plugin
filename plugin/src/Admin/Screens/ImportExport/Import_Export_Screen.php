@@ -436,7 +436,7 @@ final class Import_Export_Screen {
 		$generator = $container->get( 'export_generator' );
 		$result    = $generator->generate( $mode, array() );
 		$payload   = $result->to_payload();
-		if ( $result->success() ) {
+		if ( $result->is_success() ) {
 			\wp_safe_redirect( $this->screen_url( 'export_created', null, $payload['package_filename'] ?? '' ) );
 		} else {
 			\wp_safe_redirect( $this->screen_url( 'error', $payload['message'] ?? 'export_failed' ) );

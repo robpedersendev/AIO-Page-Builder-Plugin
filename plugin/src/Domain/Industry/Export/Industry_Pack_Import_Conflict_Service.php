@@ -107,7 +107,7 @@ final class Industry_Pack_Import_Conflict_Service {
 	 * Analyzes bundle against local state and returns list of conflicts (no final_outcome set yet).
 	 *
 	 * @param array<string, mixed>                $bundle Valid bundle (manifest + payload).
-	 * @param array<string, array<string, mixed>> $local_state Map of category => array of existing keys (e.g. packs => array( 'realtor', 'plumber' ), starter_bundles => array( 'realtor_essentials' )). Optional: version by key, e.g. packs_versions => array( 'realtor' => '1' ).
+	 * @param array<string, array<string, mixed>> $local_state Map of category => array of existing keys (e.g. packs => array( 'realtor', 'plumber' ), starter_bundles => array( 'realtor_essentials' )). Optional: pack_versions => array, has_site_industry_profile => bool when site profile is already configured.
 	 * @return list<array<string, mixed>> Conflict items with object_key, category, conflict_type, proposed_resolution, warning_severity, message; final_outcome = null.
 	 */
 	public function analyze( array $bundle, array $local_state = array() ): array {
@@ -215,7 +215,7 @@ final class Industry_Pack_Import_Conflict_Service {
 		if ( ! isset( $bundle[ Industry_Pack_Bundle_Service::PAYLOAD_SITE_PROFILE ] ) || ! is_array( $bundle[ Industry_Pack_Bundle_Service::PAYLOAD_SITE_PROFILE ] ) ) {
 			return $conflicts;
 		}
-		$has_local = ! empty( $local_state['site_profile'] );
+		$has_local = ! empty( $local_state['has_site_industry_profile'] );
 		if ( $has_local ) {
 			$conflicts[] = $this->conflict_item( 'site_profile', Industry_Pack_Bundle_Service::PAYLOAD_SITE_PROFILE, self::CONFLICT_DUPLICATE_KEY, self::RESOLUTION_SKIP, self::SEVERITY_WARNING, 'Site industry profile already set. Choose replace or skip.' );
 		}

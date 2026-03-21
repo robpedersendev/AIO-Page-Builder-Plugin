@@ -183,7 +183,7 @@ final class Environment_Validator {
 					self::CATEGORY_PLATFORM,
 					self::SEVERITY_BLOCKING,
 					'wp_version_blocking',
-					sprintf( 'WordPress %s or newer is required. Current: %s.', $min_wp, ( $wp_ver !== '' && $wp_ver !== null ? $wp_ver : 'unknown' ) ),
+					sprintf( 'WordPress %s or newer is required. Current: %s.', $min_wp, ( $wp_ver !== '' ? $wp_ver : 'unknown' ) ),
 					true
 				)
 			);
@@ -308,7 +308,8 @@ final class Environment_Validator {
 			$theme = wp_get_theme();
 			$slug  = $theme->get_stylesheet();
 			if ( $slug !== '' && in_array( strtolower( $slug ), self::EXTENSION_PACK_THEMES, true ) ) {
-				$name = ( $theme->get( 'Name' ) !== '' && $theme->get( 'Name' ) !== null ) ? $theme->get( 'Name' ) : $slug;
+				$theme_name = (string) $theme->get( 'Name' );
+				$name       = $theme_name !== '' ? $theme_name : $slug;
 				$this->add(
 					new Validation_Result(
 						self::CATEGORY_EXTENSION_PACK,
@@ -323,7 +324,7 @@ final class Environment_Validator {
 		$this->load_plugin_api();
 		if ( function_exists( 'is_plugin_active' ) ) {
 			foreach ( self::EXTENSION_PACK_PLUGINS as $plugin_file ) {
-				if ( ! is_plugin_active( $plugin_file ) || ! isset( self::EXTENSION_PACK_PLUGIN_NAMES[ $plugin_file ] ) ) {
+				if ( ! is_plugin_active( $plugin_file ) ) {
 					continue;
 				}
 				$this->add(
@@ -351,8 +352,8 @@ final class Environment_Validator {
 			return;
 		}
 		$dir  = \wp_upload_dir( null, false );
-		$err  = isset( $dir['error'] ) ? (string) $dir['error'] : '';
-		$path = isset( $dir['basedir'] ) ? (string) $dir['basedir'] : '';
+		$err  = (string) $dir['error'];
+		$path = (string) $dir['basedir'];
 		if ( $err !== '' ) {
 			$this->add(
 				new Validation_Result(
@@ -525,7 +526,8 @@ final class Environment_Validator {
 		if ( ! is_readable( $path ) ) {
 			return null;
 		}
-		$data = get_plugin_data( $path, false, false );
-		return isset( $data['Version'] ) ? (string) $data['Version'] : null;
+		$data    = get_plugin_data( $path, false, false );
+		$version = (string) $data['Version'];
+		return $version !== '' ? $version : null;
 	}
 }

@@ -32,3 +32,7 @@ if ( ! defined( 'ARRAY_A' ) ) {
 
 // Load stub definitions so PHPStan can resolve global WordPress symbols (wp_unslash, etc.).
 require_once $wordpress_stubs;
+
+if ( ! defined( 'WP_PLUGIN_DIR' ) ) {
+	define( 'WP_PLUGIN_DIR', ABSPATH . 'wp-content/plugins' );
+}

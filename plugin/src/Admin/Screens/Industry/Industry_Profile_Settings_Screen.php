@@ -88,7 +88,7 @@ final class Industry_Profile_Settings_Screen {
 				: null;
 			$subtype_form_field       = new Industry_Subtype_Form_Field( $subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null );
 			$bundle_registry          = $this->get_starter_bundle_registry();
-			$starter_bundle_assistant = new Industry_Starter_Bundle_Assistant( $repo, $bundle_registry, $subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null );
+			$starter_bundle_assistant = new Industry_Starter_Bundle_Assistant( $bundle_registry, $subtype_registry instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Subtype_Registry ? $subtype_registry : null );
 			$starter_bundle_state     = $starter_bundle_assistant->build_state( $profile );
 			$toggle_controller        = $this->get_pack_toggle_controller();
 			$primary_pack_is_disabled = $primary !== '' && $toggle_controller !== null && ! $toggle_controller->is_pack_active( $primary );
@@ -120,7 +120,7 @@ final class Industry_Profile_Settings_Screen {
 			'toggle_controller'        => $toggle_controller,
 			'primary_pack_is_disabled' => $primary_pack_is_disabled,
 			'primary_industry_key'     => isset( $primary ) ? $primary : '',
-			'subtype_form_field'       => isset( $subtype_form_field ) ? $subtype_form_field : null,
+			'subtype_form_field'       => $subtype_form_field,
 		);
 	}
 

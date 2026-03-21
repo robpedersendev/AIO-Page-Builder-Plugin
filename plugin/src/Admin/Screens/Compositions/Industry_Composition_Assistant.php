@@ -71,8 +71,10 @@ final class Industry_Composition_Assistant {
 	 * @return void
 	 */
 	public function build_state( array $sections ): void {
-		$this->fit_by_key       = null;
-		$this->recommended_keys = null;
+		$this->fit_by_key            = null;
+		$this->recommended_keys     = null;
+		$this->last_section_result  = null;
+		$this->section_definitions  = null;
 
 		$profile = $this->profile_repository->get_profile();
 		$primary = isset( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] ) && is_string( $profile[ Industry_Profile_Schema::FIELD_PRIMARY_INDUSTRY_KEY ] )
@@ -87,7 +89,8 @@ final class Industry_Composition_Assistant {
 			$primary_pack = $this->pack_registry->get( $primary );
 		}
 
-		$result = $this->resolver->resolve( $profile, $primary_pack, $sections, array() );
+		$result                     = $this->resolver->resolve( $profile, $primary_pack, $sections, array() );
+		$this->section_definitions  = $sections;
 		if ( $this->substitute_engine !== null ) {
 			$this->last_section_result = $result;
 		}
