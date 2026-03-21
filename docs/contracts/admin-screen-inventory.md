@@ -2,7 +2,7 @@
 
 **Document type:** Contract for admin menu and screen routing (spec §49, §49.11).  
 **Governs:** Submenu slugs, screen classes, capability mapping, and Queue & Logs tabs.  
-**Guidance:** For operator and support workflows, see [admin-operator-guide.md](../guides/admin-operator-guide.md) and [support-triage-guide.md](../guides/support-triage-guide.md). User-facing KB index and full menu-to-article map: [index.md](../kb/index.md), [FILE_MAP.md](../kb/FILE_MAP.md). **Note:** The table in §2 is not exhaustive for every registered submenu; [FILE_MAP.md](../kb/FILE_MAP.md) reflects the full `Admin_Menu::register()` surface.
+**Guidance:** For operator and support workflows, see [admin-operator-guide.md](../guides/admin-operator-guide.md) and [support-triage-guide.md](../guides/support-triage-guide.md). User-facing KB index, glossary, and full menu-to-article map: [index.md](../kb/index.md), [concepts-and-glossary.md](../kb/concepts-and-glossary.md), [FILE_MAP.md](../kb/FILE_MAP.md). **Note:** The table in §2 is not exhaustive for every registered submenu; [FILE_MAP.md](../kb/FILE_MAP.md) reflects the full `Admin_Menu::register()` surface.
 
 ---
 
@@ -17,22 +17,22 @@
 
 | Submenu label           | Screen class / slug                         | Capability              |
 |-------------------------|---------------------------------------------|-------------------------|
-| Dashboard               | `Dashboard_Screen` / `aio-page-builder`    | (menu default)          |
+| Dashboard               | `Dashboard_Screen` / `aio-page-builder`    | `aio_view_logs`         |
 | Settings                | `Settings_Screen` / `aio-page-builder-settings` | `aio_manage_settings`   |
-| Diagnostics             | `Diagnostics_Screen` / `aio-page-builder-diagnostics` | `manage_options`        |
+| Diagnostics             | `Diagnostics_Screen` / `aio-page-builder-diagnostics` | `aio_view_sensitive_diagnostics` |
 | ACF Field Architecture  | `ACF_Architecture_Diagnostics_Screen` / `aio-page-builder-acf-diagnostics` | `aio_view_logs` |
 | Form Provider Health    | `Form_Provider_Health_Screen` / `aio-page-builder-form-provider-health` | `aio_view_logs` |
 | Onboarding & Profile    | `Onboarding_Screen` / `aio-page-builder-onboarding` | `aio_run_onboarding`    |
-| Crawl Sessions          | `Crawler_Sessions_Screen` / slug            | (crawler cap)           |
-| Crawl Comparison        | `Crawler_Comparison_Screen` / slug          | (crawler cap)           |
+| Crawl Sessions          | `Crawler_Sessions_Screen` / `aio-page-builder-crawler-sessions` | `aio_view_sensitive_diagnostics` |
+| Crawl Comparison        | `Crawler_Comparison_Screen` / `aio-page-builder-crawler-comparison` | `aio_view_sensitive_diagnostics` |
 | AI Runs                 | `AI_Runs_Screen` / `aio-page-builder-ai-runs` | `aio_view_ai_runs`      |
 | AI Providers            | `AI_Providers_Screen` / `aio-page-builder-ai-providers` | `aio_manage_ai_providers` |
 | Prompt Experiments      | `Prompt_Experiments_Screen` / `aio-page-builder-prompt-experiments` | `aio_manage_ai_providers` |
 | Build Plans             | `Build_Plans_Screen` / `aio-page-builder-build-plans` | `aio_view_build_plans`  |
 | Build Plan Analytics   | `Build_Plan_Analytics_Screen` / `aio-page-builder-build-plan-analytics` | `aio_view_build_plans`  |
-| **Page Templates**     | `Page_Templates_Directory_Screen` / `aio-page-builder-page-templates`   | `aio_view_build_plans` |
-| **Section Templates**  | `Section_Templates_Directory_Screen` / `aio-page-builder-section-templates` | `aio_view_build_plans` |
-| **Compositions**       | `Compositions_Screen` / `aio-page-builder-compositions` | `aio_view_build_plans` |
+| **Page Templates**     | `Page_Templates_Directory_Screen` / `aio-page-builder-page-templates`   | `aio_manage_page_templates` |
+| **Section Templates**  | `Section_Templates_Directory_Screen` / `aio-page-builder-section-templates` | `aio_manage_section_templates` |
+| **Compositions**       | `Compositions_Screen` / `aio-page-builder-compositions` | `aio_manage_compositions` |
 | **Queue & Logs**        | `Queue_Logs_Screen` / `aio-page-builder-queue-logs` | `aio_view_logs`         |
 | **Support Triage**     | `Support_Triage_Dashboard_Screen` / `aio-page-builder-support-triage` | `aio_view_logs`         |
 | **Post-Release Health**| `Post_Release_Health_Screen` / `aio-page-builder-post-release-health` | `aio_view_logs`         |

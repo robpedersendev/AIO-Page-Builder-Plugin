@@ -3,7 +3,7 @@
 **Audience:** Site administrators and operators.  
 **Spec:** §0.10.7, §49, §60.6, §59.15.  
 **Purpose:** Operational guidance for admin screens, provider setup, crawler, AI runs, Build Plans, execution/rollback, reporting disclosure, import/export, and uninstall.  
-**Knowledge base:** [KB index](../kb/index.md) — audience lanes, taxonomy, and [FILE_MAP.md](../kb/FILE_MAP.md) (every menu route → canonical article).
+**Knowledge base:** [KB index](../kb/index.md); [concepts-and-glossary.md](../kb/concepts-and-glossary.md) (terms and permissions); [FILE_MAP.md](../kb/FILE_MAP.md) (menu route → article).
 
 ---
 
@@ -27,7 +27,7 @@ Start at **Dashboard** for readiness and quick links. Use **Onboarding & Profile
 ## 2. Onboarding and profile
 
 - **Screen:** **AIO Page Builder → Onboarding & Profile** (`aio-page-builder-onboarding`).
-- **Capability:** `manage_options` (typical admin).
+- **Capability:** `aio_run_onboarding` (granted to **Administrator** by default; not part of the default **Editor** cap set unless your site adds it).
 
 Complete the guided steps to capture brand and business profile data. This data is used by the planner and AI; incomplete profile can affect plan quality. You can save a draft and return later. After completion, the profile is available for crawl interpretation and Build Plan generation. When the Industry Pack subsystem is enabled, **industry profile** (primary and optional secondary industry) can be set from the same area or from **Industry** submenu; it influences template recommendations, Build Plan scoring, and documentation overlays.
 
@@ -45,7 +45,7 @@ Configure one or more AI providers (credentials, model defaults). The UI does no
 ## 4. Crawl interpretation
 
 - **Screens:** **Crawl Sessions** (`aio-page-builder-crawler-sessions`), **Crawl Comparison** (`aio-page-builder-crawler-comparison`).
-- **Capability:** `manage_options` for Crawl Sessions (crawler capability as configured).
+- **Capability:** `aio_view_sensitive_diagnostics` for both (see [concepts-and-glossary.md](../kb/concepts-and-glossary.md) for defaults).
 
 Crawler runs are scoped to this site only. Sessions list shows Run ID, site host, status, discovered/accepted/excluded counts. Open a session to see pages for that run. Crawl rules: public-only, normalized URL identity, meaningful-page focus; no arbitrary host input. Use crawl results to understand site structure before or after AI runs; the planner uses this data when generating Build Plans.
 

@@ -3,7 +3,8 @@
 **Product:** Privately distributed WordPress plugin — AIO Page Builder.  
 **Spec:** [aio-page-builder-master-spec.md](../specs/aio-page-builder-master-spec.md).  
 **How to write KB articles:** [WRITING_STANDARD.md](WRITING_STANDARD.md).  
-**Workflow → doc routing:** [FILE_MAP.md](FILE_MAP.md).
+**Workflow → doc routing:** [FILE_MAP.md](FILE_MAP.md).  
+**Vocabulary and permissions (read this first):** [concepts-and-glossary.md](concepts-and-glossary.md).
 
 This index separates **end-user**, **operator/admin**, and **support** entry points, then groups topics by taxonomy. It does not duplicate procedures; it links to the single canonical page per workflow.
 
@@ -23,6 +24,7 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 ### Getting Started
 
+- [concepts-and-glossary.md](concepts-and-glossary.md) — Terms, default permissions, UI map, guide picker, FAQ.
 - [admin-operator-guide.md §1–§2](../guides/admin-operator-guide.md) — Menu overview, settings, onboarding.
 - [end-user-workflow-guide.md](../guides/end-user-workflow-guide.md) — Editor onboarding and Build Plan review.
 - [settings-registry-maintenance.md](operator/settings-registry-maintenance.md) — Registry seed actions on Settings (stub).

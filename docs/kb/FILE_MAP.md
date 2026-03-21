@@ -8,6 +8,14 @@
 
 ---
 
+## 0. Vocabulary and permissions (foundational)
+
+| Topic | Primary |
+|-------|---------|
+| Product terms, default role caps, UI map, which guide to open, terminology FAQ | [concepts-and-glossary.md](concepts-and-glossary.md) |
+
+---
+
 ## 1. Top-level and dashboard
 
 | Workflow / route | Primary | Secondary |

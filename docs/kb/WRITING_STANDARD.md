@@ -1,7 +1,8 @@
 # AIO Page Builder — Knowledge Base Writing Standard
 
 **Applies to:** All articles under `docs/kb/` and substantive additions to `docs/guides/*.md` that are indexed from the KB.  
-**Authority:** Product behavior is defined in [aio-page-builder-master-spec.md](../specs/aio-page-builder-master-spec.md); KB articles describe the implemented admin and editor experience, not future intent.
+**Authority:** Product behavior is defined in [aio-page-builder-master-spec.md](../specs/aio-page-builder-master-spec.md); KB articles describe the implemented admin and editor experience, not future intent.  
+**Vocabulary:** Use the same terms as the UI; see [concepts-and-glossary.md](concepts-and-glossary.md) for canonical definitions and capability names.
 
 ---
 
