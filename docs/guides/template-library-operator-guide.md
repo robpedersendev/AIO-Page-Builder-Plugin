@@ -29,11 +29,12 @@ Under **AIO Page Builder**:
 
 ## 2. Section Templates directory
 
+- **User-facing KB:** [section-templates-deep-dive.md](../kb/templates/section-templates-deep-dive.md) (browse, detail, helpers, previews, industry fit, edge cases).
 - **Screen:** **AIO Page Builder → Section Templates** (`aio-page-builder-section-templates`).
 - **Hierarchy:** Root (purpose-family tree) → Purpose (CTA/variant nodes) → List (section rows with key, name, category, status, version, helper, compare links).
 - **Filters:** `purpose_family`, `cta_classification`, `variation_family_key`, `status`, `search`, `all=1` to show all. Pagination: `paged`, `per_page` (capped by large-library limits).
 - **Breadcrumbs:** Navigate back up the hierarchy.
-- **Actions per row:** **View** (detail), **Add to compare** / **Remove from compare**, helper-doc link when template has a helper reference.
+- **Actions per row:** **View detail**, **Structural preview** (same destination as detail), **Open helper doc** when documentation resolves (otherwise disabled with tooltip), **Add to compare** / **Remove from compare**, optional **Use anyway** when industry fit is weak/discouraged.
 - **No execution:** Directory is observational. Building pages happens from Build Plans, not from this screen.
 - **Form sections:** Section templates with category **form_embed** (e.g. Form section) embed a form from a registered provider. On the **Section Template Detail** screen, a **Form binding** panel shows the current form provider, form identifier, and shortcode preview when valid. Set form_provider and form_id when editing a page that uses the form section (ACF fields). See [form-provider-operator-guide.md](form-provider-operator-guide.md) and [form-provider-integration-contract.md](../contracts/form-provider-integration-contract.md).
 
@@ -64,6 +65,7 @@ Under **AIO Page Builder**:
 
 **Section Template Detail**
 
+- **User-facing KB:** [section-templates-deep-dive.md](../kb/templates/section-templates-deep-dive.md).
 - **URL:** `admin.php?page=aio-page-builder-section-template-detail&section=<internal_key>`.
 - **Content:** Breadcrumbs, metadata panel (name, purpose family, CTA classification, category, status, version, deprecation if set, compatibility notes, field summary, helper-doc link), and **rendered preview** using synthetic data and the real section renderer.
 - **Preview:** Safe for viewing only; no insertion or publishing. Optional `reduced_motion=1` for reduced-motion preference.
