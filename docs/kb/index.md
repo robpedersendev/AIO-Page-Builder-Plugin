@@ -57,6 +57,7 @@ This index separates **end-user**, **operator/admin**, and **support** entry poi
 
 - [build-plan-overview.md](operator/build-plan-overview.md) — **Start here:** list, workspace, steps 1–9 (default labels), review vs execution, safety, item status, FAQ. Step stubs: nine `build-plan-step-*.md` files (linked from the overview).
 - [build-plan-review-existing-and-new-pages.md](operator/build-plan-review-existing-and-new-pages.md) — **Existing page changes** & **New pages** (`step=1` / `step=2`): approve, deny, bulk bars, edge cases.
+- [build-plan-hierarchy-navigation-tokens-seo.md](operator/build-plan-hierarchy-navigation-tokens-seo.md) — **Hierarchy, navigation, design tokens, SEO** (`step=3`–`6`): executable vs advisory, tokens, SEO v1 posture, troubleshooting.
 - [admin-operator-guide.md §6–§7](../guides/admin-operator-guide.md); [end-user-workflow-guide.md §2–§3](../guides/end-user-workflow-guide.md).
 
 ### Execution & Rollback

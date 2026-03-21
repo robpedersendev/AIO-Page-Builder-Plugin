@@ -175,6 +175,8 @@ This overview is the **home** for Build Plan documentation. Each step article li
 
 **Existing + new pages (review depth):** [build-plan-review-existing-and-new-pages.md](build-plan-review-existing-and-new-pages.md) — approve/deny/bulk for URL **`step=1`** and **`step=2`**.
 
+**Hierarchy, navigation, design tokens, SEO (indices `3`–`6`, UI steps 4–7):** [build-plan-hierarchy-navigation-tokens-seo.md](build-plan-hierarchy-navigation-tokens-seo.md) — executable vs advisory rows, token execution, SEO posture, edge cases.
+
 ---
 
 ## 11. Cross-links
