@@ -1,3 +1,4 @@
+# * Local parity: `cd plugin && composer run ci`, or repo-root `tools/ci-local.ps1` / `tools/ci-local.sh`.
 name: CI
 
 on:

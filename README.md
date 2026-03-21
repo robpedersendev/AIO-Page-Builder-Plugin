@@ -38,6 +38,19 @@ This plugin sends mandatory operational reports (install notification, periodic 
 
 ---
 
+## Local CI (GitHub Actions parity)
+
+The workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs from **`plugin/`**: `composer install --prefer-dist --no-progress`, then `composer run phpcs`, `composer run phpstan`, `composer run phpunit`. Optional **Plugin Check** uses Docker in `tools/plugin-check/`.
+
+| What | How |
+|------|-----|
+| **One-liner (host PHP)** | `cd plugin` then `composer run ci` (or `composer run ci:no-install` if `vendor/` is already installed). |
+| **Windows script (+ optional Plugin Check)** | From repo root: `powershell -NoProfile -ExecutionPolicy Bypass -File tools\ci-local.ps1` — add `-IncludePluginCheck` for Docker Plugin Check; `-StrictPluginCheck` fails on ERROR findings. (`pwsh` works the same if installed.) |
+| **Linux / macOS / Git Bash** | `SKIP_INSTALL=1 ./tools/ci-local.sh` skips install; `INCLUDE_PLUGIN_CHECK=1 STRICT_PLUGIN_CHECK=1 ./tools/ci-local.sh` runs Plugin Check strictly. |
+| **PHP 8.1–8.3 matrix in Docker** | `powershell -NoProfile -ExecutionPolicy Bypass -File tools\ci-matrix-docker.ps1` or `bash tools/ci-matrix-docker.sh` (slower; installs Composer inside each container). |
+
+---
+
 ## Documentation
 
 | Guide | Purpose |

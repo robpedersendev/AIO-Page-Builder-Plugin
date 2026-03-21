@@ -18,6 +18,19 @@
         "ext-zip": "Required for Composer to extract dist (zip) packages. Without it, use: composer install --prefer-source --no-progress"
     },
     "scripts": {
+        "ci": [
+            "Composer\\Config::disableProcessTimeout",
+            "@composer install --prefer-dist --no-progress",
+            "@phpcs",
+            "@phpstan",
+            "@phpunit"
+        ],
+        "ci:no-install": [
+            "Composer\\Config::disableProcessTimeout",
+            "@phpcs",
+            "@phpstan",
+            "@phpunit"
+        ],
         "phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml.dist",
         "phpcbf": "php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml.dist",
         "phpstan": "php -d memory_limit=1G vendor/bin/phpstan analyse -c phpstan.neon.dist --memory-limit=1G",

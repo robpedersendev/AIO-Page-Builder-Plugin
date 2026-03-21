@@ -49,3 +49,7 @@ Rationale: PHPUnit harness, quarantined legacy tree, and PHPStan bootstrap files
 CI (GitHub Actions)
 -------------------
 See .github/workflows/ci.yml job plugin-check. Uses the same compose stack; continues on error until the baseline is cleared (see workflow comment).
+
+Local full CI (php job + optional Plugin Check)
+------------------------------------------------
+From repo root: tools/ci-local.ps1 (Windows) or tools/ci-local.sh (Unix/Git Bash). See README "Local CI" and workflow comment on .github/workflows/ci.yml.
