@@ -27,6 +27,21 @@ final class Industry_Section_Recommendation_Resolver {
 	public const FIT_DISCOURAGED  = 'discouraged';
 	public const FIT_NEUTRAL      = 'neutral';
 
+	/** @var Industry_Read_Model_Cache_Service|null */
+	private ?Industry_Read_Model_Cache_Service $cache_service = null;
+
+	/** @var Industry_Cache_Key_Builder|null */
+	private ?Industry_Cache_Key_Builder $cache_key_builder = null;
+
+	/**
+	 * @param Industry_Read_Model_Cache_Service|null $cache_service Optional cache service for result caching.
+	 * @param Industry_Cache_Key_Builder|null         $cache_key_builder Optional key builder for cache keys.
+	 */
+	public function __construct( ?Industry_Read_Model_Cache_Service $cache_service = null, ?Industry_Cache_Key_Builder $cache_key_builder = null ) {
+		$this->cache_service     = $cache_service;
+		$this->cache_key_builder = $cache_key_builder;
+	}
+
 	private const SCORE_RECOMMENDED_MIN                = 20;
 	private const SCORE_DISCOURAGED_MAX                = -10;
 	private const POINTS_PACK_PREFERRED                = 50;
