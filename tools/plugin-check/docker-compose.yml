@@ -1,0 +1,55 @@
+# Ephemeral WordPress + MariaDB for WordPress Plugin Check (PCP).
+# The repo plugin is bind-mounted at wp-content/plugins/aio-page-builder.
+#
+# Usage (from this directory):
+#   export PLUGIN_SOURCE="/absolute/path/to/repo/plugin"   # optional; scripts set this
+#   docker compose up -d db wordpress
+#   docker compose run --rm wpcli wp core install ...  (see run-plugin-check.sh)
+
+services:
+  db:
+    image: mariadb:11.4
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: root
+    healthcheck:
+      test: [ "CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  wordpress:
+    image: wordpress:6.7-php8.2-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp_html:/var/www/html
+      - type: bind
+        source: ${PLUGIN_SOURCE:-../../plugin}
+        target: /var/www/html/wp-content/plugins/aio-page-builder
+
+  wpcli:
+    image: wordpress:cli-php8.2
+    depends_on:
+      - wordpress
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp_html:/var/www/html
+      - type: bind
+        source: ${PLUGIN_SOURCE:-../../plugin}
+        target: /var/www/html/wp-content/plugins/aio-page-builder
+
+volumes:
+  wp_html:

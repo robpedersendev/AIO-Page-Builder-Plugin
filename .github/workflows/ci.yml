@@ -49,3 +49,47 @@ jobs:
       - name: Run PHPUnit
         run: cd plugin && composer run phpunit
         continue-on-error: ${{ matrix.php != '8.1' }}
+
+  plugin-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Plugin Check (Docker + WP-CLI)
+        # * Full Plugin Check needs WordPress + DB + plugin-check; see tools/plugin-check/PROCEDURE.txt
+        # * Flip continue-on-error to false when the ERROR baseline is addressed.
+        continue-on-error: true
+        run: |
+          set -e
+          cd tools/plugin-check
+          export PLUGIN_SOURCE="${GITHUB_WORKSPACE}/plugin"
+          docker compose up -d db wordpress
+          for i in $(seq 1 45); do
+            if docker compose run --rm -T -u root wpcli wp core version --path=/var/www/html --allow-root >/dev/null 2>&1; then
+              break
+            fi
+            sleep 2
+          done
+          docker compose run --rm -T -u root wpcli wp core is-installed --path=/var/www/html --allow-root >/dev/null 2>&1 || \
+            docker compose run --rm -T -u root wpcli wp core install \
+              --url="http://localhost" --title="PCP" --admin_user=admin --admin_password=admin \
+              --admin_email=admin@example.test --path=/var/www/html --skip-email --allow-root
+          docker compose run --rm -T -u root wpcli wp plugin install plugin-check --activate --path=/var/www/html --allow-root
+          mkdir -p output
+          docker compose run --rm -T -u root wpcli wp plugin check aio-page-builder \
+            --path=/var/www/html \
+            --require=/var/www/html/wp-content/plugins/plugin-check/cli.php \
+            --format=json \
+            --allow-root \
+            2>/dev/null > output/plugin-check-report.json
+          php summarize-report.php output/plugin-check-report.json
+          php exit-if-errors.php output/plugin-check-report.json
+
+      - name: Upload Plugin Check report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-check-report
+          path: tools/plugin-check/output/plugin-check-report.json
+          if-no-files-found: ignore

@@ -21,7 +21,13 @@
         "phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml.dist",
         "phpcbf": "php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml.dist",
         "phpstan": "php -d memory_limit=512M vendor/bin/phpstan analyse -c phpstan.neon.dist",
-        "phpunit": "vendor/bin/phpunit -c phpunit.xml.dist"
+        "phpunit": "vendor/bin/phpunit -c phpunit.xml.dist",
+        "plugin-check": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php ../tools/plugin-check/compose-plugin-check.php"
+        ],
+        "plugin-check:summarize": "php ../tools/plugin-check/summarize-report.php ../tools/plugin-check/output/plugin-check-report.json",
+        "plugin-check:gate": "php ../tools/plugin-check/exit-if-errors.php ../tools/plugin-check/output/plugin-check-report.json"
     },
     "autoload": {
         "psr-4": {

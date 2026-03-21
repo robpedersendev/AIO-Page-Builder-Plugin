@@ -1,0 +1,43 @@
+Plugin Check (WordPress PCP) — AIO Page Builder
+================================================
+
+What this is
+------------
+Official Plugin Check runs as the wordpress.org "plugin-check" plugin inside a real WordPress site.
+WP-CLI command: wp plugin check <slug> with --require=.../plugin-check/cli.php so runtime checks can run.
+
+Repo-local runner
+-----------------
+Directory: tools/plugin-check/
+- docker-compose.yml — WordPress 6.7 (PHP 8.2) + MariaDB 11.4 + shared volume; plugin bind-mounted as aio-page-builder.
+- run-plugin-check.sh — Linux/macOS/Git Bash
+- run-plugin-check.ps1 — Windows PowerShell
+- compose-plugin-check.php — invoked by Composer from plugin/
+
+From repository root (after Docker is running):
+  cd tools/plugin-check
+  ./run-plugin-check.sh
+  # or
+  .\run-plugin-check.ps1
+
+From plugin/ (Composer, long timeout disabled):
+  composer run plugin-check
+
+Outputs (gitignored except .gitignore placeholder):
+  tools/plugin-check/output/plugin-check-report.json
+
+Summarize by category (human triage):
+  composer run plugin-check:summarize
+
+Fail if any ERROR-level rows exist (release gate helper; wp-cli often exits 0 anyway):
+  composer run plugin-check:gate
+
+Notes
+-----
+- wpcli runs as root with --allow-root so plugin-check can write to wp-content (wordpress image volume permissions).
+- PLUGIN_SOURCE defaults to ../../plugin relative to docker-compose.yml; override with env PLUGIN_SOURCE for unusual layouts.
+- First run downloads images and plugin-check zip (~10+ minutes possible).
+
+CI (GitHub Actions)
+-------------------
+See .github/workflows/ci.yml job plugin-check. Uses the same compose stack; continues on error until the baseline is cleared (see workflow comment).
