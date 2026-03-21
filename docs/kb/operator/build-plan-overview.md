@@ -69,6 +69,8 @@ Nothing in the plan list or workspace should be treated as “already done” on
 
 **Advisory-only items:** Some item types are **guidance or notes** (for example overview notes, hierarchy notes, or SEO text). They may **not** show **Execute** because there is **no direct automated action**—you use the information elsewhere or apply changes manually. Executable types include, for example, **new page**, **design token**, **hierarchy assignment**, and **new menu** items, subject to status and capabilities.
 
+**Deep dive — what each execution action does:** [build-plan-execution-actions.md](build-plan-execution-actions.md) (handlers, snapshots, rollback eligibility, risks).
+
 ---
 
 ## 5. Stepper: moving through steps 1–9 (default labels)
