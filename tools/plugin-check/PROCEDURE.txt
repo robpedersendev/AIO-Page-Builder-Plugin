@@ -42,6 +42,7 @@ Notes
 Troubleshooting
 ---------------
 - "WordPress failed to become ready": re-run ./run-plugin-check.sh (wait can be up to ~3 minutes). If it persists: cd tools/plugin-check && docker compose logs wordpress db (tail). Stale volume: docker compose down -v (removes DB/html volume; next run reinstalls WP).
+- PowerShell 7+ / composer run plugin-check: if docker compose fails with NativeCommandError on harmless lines like "Container ... Running", use the updated run-plugin-check.ps1 (uses PSNativeCommandUseErrorActionPreference = false and quiet wrapper).
 
 Gate scope (excludes)
 ---------------------
