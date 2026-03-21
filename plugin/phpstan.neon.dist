@@ -7,4 +7,4 @@ parameters:
         - vendor/*
         - node_modules/*
     bootstrapFiles:
-        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+        - phpstan-bootstrap.php

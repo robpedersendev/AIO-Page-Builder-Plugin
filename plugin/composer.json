@@ -11,7 +11,11 @@
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
-        }
+        },
+        "preferred-install": "dist"
+    },
+    "suggest": {
+        "ext-zip": "Required for Composer to extract dist (zip) packages. Without it, use: composer install --prefer-source --no-progress"
     },
     "scripts": {
         "phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml.dist",
