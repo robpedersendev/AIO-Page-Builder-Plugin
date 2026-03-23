@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections = array(
+$aio_pb_sections = array(
 	'hero_conv_01'          => 'Conversion hero. See doc-helper-hero_conv_01.',
 	'fb_value_prop_01'      => 'Value prop. See doc-helper-fb_value_prop_01.',
 	'ptf_service_flow_01'   => 'Service flow. See doc-helper-ptf_service_flow_01.',
@@ -23,16 +23,16 @@ $sections = array(
 	'lpu_contact_panel_01'  => 'Contact panel. See doc-helper-lpu_contact_panel_01.',
 	'cta_booking_02'        => 'Booking CTA. See doc-helper-cta_booking_02.',
 );
-$li       = '';
-foreach ( $sections as $k => $v ) {
-	$li .= '<li><strong>' . $k . '</strong>: ' . $v . '</li>';
+$aio_pb_li       = '';
+foreach ( $aio_pb_sections as $aio_pb_k => $aio_pb_v ) {
+	$aio_pb_li .= '<li><strong>' . $aio_pb_k . '</strong>: ' . $aio_pb_v . '</li>';
 }
-$purpose = 'Services hub conversion-led. Value prop and flow; consultation CTA; benefits and testimonial; cards and service CTA; expectations and guarantee; differentiator and quote CTA; contact panel; booking CTA.';
-$flow    = 'Conversion posture with four CTAs; drill-down and booking intent.';
+$aio_pb_purpose = 'Services hub conversion-led. Value prop and flow; consultation CTA; benefits and testimonial; cards and service CTA; expectations and guarantee; differentiator and quote CTA; contact panel; booking CTA.';
+$aio_pb_flow    = 'Conversion posture with four CTAs; drill-down and booking intent.';
 return array(
 	'documentation_id'          => 'doc-onepager-hub_services_conversion_01',
 	'documentation_type'        => 'page_template_one_pager',
-	'content_body'              => '<h3>Page purpose</h3><p>' . $purpose . '</p><h3>Page flow</h3><p>' . $flow . '</p><h3>CTA direction</h3><p>Hub aggregation with higher CTA intensity: consultation CTA → service detail CTA → quote request CTA → booking CTA. Emphasize section interplay and category-to-detail conversion.</p><h3>Section-by-section (ordered)</h3><ol>' . $li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO/FIFU:</strong> Container and spacing; map fields per section helper; hub meta. <strong>Hierarchy/navigation:</strong> Hub is parent to service detail pages. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; keep hub distinct from detail. <strong>Accessibility:</strong> One H1; logical heading order; contrast and focus order for CTAs.</p>',
+	'content_body'              => '<h3>Page purpose</h3><p>' . $aio_pb_purpose . '</p><h3>Page flow</h3><p>' . $aio_pb_flow . '</p><h3>CTA direction</h3><p>Hub aggregation with higher CTA intensity: consultation CTA → service detail CTA → quote request CTA → booking CTA. Emphasize section interplay and category-to-detail conversion.</p><h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO/FIFU:</strong> Container and spacing; map fields per section helper; hub meta. <strong>Hierarchy/navigation:</strong> Hub is parent to service detail pages. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; keep hub distinct from detail. <strong>Accessibility:</strong> One H1; logical heading order; contrast and focus order for CTAs.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'hub_services_conversion_01' ),
 	'generated_or_human_edited' => 'human_edited',

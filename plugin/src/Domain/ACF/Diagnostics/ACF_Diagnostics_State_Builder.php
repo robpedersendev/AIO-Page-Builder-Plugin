@@ -296,13 +296,13 @@ final class ACF_Diagnostics_State_Builder {
 			$summary = __( 'No sections with blueprints to evaluate.', 'aio-page-builder' );
 		} elseif ( $unsupported > 0 && $supported === 0 ) {
 			$status  = self::LPAGERY_BLOCKED;
-			$summary = sprintf( __( '%1$d section(s) with unsupported field patterns; %2$d partial.', 'aio-page-builder' ), $unsupported, $partial );
+			$summary = sprintf( /* translators: 1: unsupported section count, 2: partial count */ __( '%1$d section(s) with unsupported field patterns; %2$d partial.', 'aio-page-builder' ), $unsupported, $partial );
 		} elseif ( $unsupported > 0 ) {
 			$status  = self::LPAGERY_PARTIAL;
-			$summary = sprintf( __( '%1$d supported, %2$d unsupported, %3$d partial.', 'aio-page-builder' ), $supported, $unsupported, $partial );
+			$summary = sprintf( /* translators: 1: supported, 2: unsupported, 3: partial section counts */ __( '%1$d supported, %2$d unsupported, %3$d partial.', 'aio-page-builder' ), $supported, $unsupported, $partial );
 		} else {
 			$status  = self::LPAGERY_SUPPORTED;
-			$summary = sprintf( __( '%d section(s) with LPagery-compatible field patterns.', 'aio-page-builder' ), $supported );
+			$summary = sprintf( /* translators: %d: section count */ __( '%d section(s) with LPagery-compatible field patterns.', 'aio-page-builder' ), $supported );
 		}
 		return array(
 			'status'               => $status,

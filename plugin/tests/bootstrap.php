@@ -12,8 +12,8 @@ if ( ! function_exists( 'aio_page_builder_test_wpdb_prepare' ) ) {
 	/**
 	 * Minimal wpdb::prepare() simulation for unit-test stubs (supports %s, %d, %f, %i per WP 6.2+).
 	 *
-	 * @param string   $query SQL with placeholders.
-	 * @param mixed ...$args Arguments in placeholder order.
+	 * @param string $query SQL with placeholders.
+	 * @param mixed  ...$args Arguments in placeholder order.
 	 * @return string
 	 */
 	function aio_page_builder_test_wpdb_prepare( string $query, ...$args ): string {
@@ -24,19 +24,19 @@ if ( ! function_exists( 'aio_page_builder_test_wpdb_prepare' ) ) {
 			if ( '%' === $query[ $p ] && $p + 1 < $len ) {
 				$t = $query[ $p + 1 ];
 				if ( 's' === $t ) {
-					$v = $args[ $i++ ] ?? '';
+					$v    = $args[ $i++ ] ?? '';
 					$out .= "'" . addslashes( (string) $v ) . "'";
 					++$p;
 					continue;
 				}
 				if ( 'd' === $t ) {
-					$v = $args[ $i++ ] ?? 0;
+					$v    = $args[ $i++ ] ?? 0;
 					$out .= (string) (int) $v;
 					++$p;
 					continue;
 				}
 				if ( 'f' === $t ) {
-					$v = $args[ $i++ ] ?? 0.0;
+					$v    = $args[ $i++ ] ?? 0.0;
 					$out .= is_numeric( $v ) ? (string) (float) $v : '0';
 					++$p;
 					continue;
@@ -415,6 +415,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 	}
 }
 if ( ! class_exists( 'WP_Post' ) ) {
+	#[\AllowDynamicProperties]
 	class WP_Post {
 		public $ID;
 		public $post_type;
@@ -557,6 +558,52 @@ if ( ! class_exists( 'WP_Query' ) ) {
 					}
 				}
 				$posts = $by_type;
+			}
+
+			$simple_meta_key   = isset( $this->query['meta_key'] ) ? (string) $this->query['meta_key'] : '';
+			$simple_meta_value = $this->query['meta_value'] ?? null;
+			if ( $simple_meta_key !== '' && null !== $simple_meta_value && ( ! is_array( $meta_query ) || empty( $meta_query ) ) ) {
+				$filter_meta_key   = $simple_meta_key;
+				$filter_meta_value = $simple_meta_value;
+				$filtered          = array();
+				$meta              = $GLOBALS['_aio_post_meta'] ?? array();
+				foreach ( $posts as $post ) {
+					$id  = is_object( $post ) ? $post->ID : ( $post['ID'] ?? 0 );
+					$row = $meta[ (string) $id ] ?? array();
+					$val = $row[ $filter_meta_key ] ?? '';
+					if ( $val === '' && $filter_meta_key === '_aio_internal_key' ) {
+						if ( ! empty( $row['_aio_section_definition'] ) ) {
+							$dec = json_decode( $row['_aio_section_definition'], true );
+							$val = isset( $dec['internal_key'] ) ? (string) $dec['internal_key'] : '';
+						}
+						if ( $val === '' && ! empty( $row['_aio_page_template_definition'] ) ) {
+							$dec = json_decode( $row['_aio_page_template_definition'], true );
+							$val = isset( $dec['internal_key'] ) ? (string) $dec['internal_key'] : '';
+						}
+						if ( $val === '' && ! empty( $row['_aio_composition_definition'] ) ) {
+							$dec = json_decode( $row['_aio_composition_definition'], true );
+							$val = isset( $dec['composition_id'] ) ? (string) $dec['composition_id'] : '';
+						}
+						if ( $val === '' && ! empty( $row['_aio_snapshot_definition'] ) ) {
+							$dec = json_decode( $row['_aio_snapshot_definition'], true );
+							$val = isset( $dec['snapshot_id'] ) ? (string) $dec['snapshot_id'] : '';
+						}
+					}
+					if ( $val === '' && in_array( $filter_meta_key, array( '_aio_scope_type', '_aio_scope_id' ), true ) && ! empty( $row['_aio_snapshot_definition'] ) ) {
+						$dec = json_decode( $row['_aio_snapshot_definition'], true );
+						$val = $filter_meta_key === '_aio_scope_type' ? ( (string) ( $dec['scope_type'] ?? '' ) ) : ( (string) ( $dec['scope_id'] ?? '' ) );
+					}
+					if ( (string) $val === (string) $filter_meta_value ) {
+						$filtered[] = $post;
+					}
+				}
+				$this->found_posts = count( $filtered );
+				if ( $per_page > 0 ) {
+					$filtered = array_slice( $filtered, $offset, $per_page );
+				} elseif ( $offset > 0 ) {
+					$filtered = array_slice( $filtered, $offset );
+				}
+				return $filtered;
 			}
 
 			if ( ! is_array( $meta_query ) || empty( $meta_query ) ) {

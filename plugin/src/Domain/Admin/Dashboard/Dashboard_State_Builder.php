@@ -15,13 +15,14 @@ use AIOPageBuilder\Bootstrap\Environment_Validator;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\Reporting\UI\Logs_Monitoring_State_Builder;
+use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Types;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 
 /**
- * Assembles dashboard payload: readiness_cards, last_activity_cards, queue_warning_summary, critical_error_summary, quick_actions, welcome_state.
- * Permission filtering of quick_actions is applied when build() is called in a user context (current_user_can).
+ * Assembles dashboard payload: overview metrics, onboarding callout, readiness strip, explore links, queue/errors.
+ * Explore links are filtered by current_user_can when build() runs in an admin request.
  */
 final class Dashboard_State_Builder {
 
@@ -43,6 +44,15 @@ final class Dashboard_State_Builder {
 	/** @var object|null Job queue repository (list_by_status). */
 	private $job_queue_repository;
 
+	/** @var object|null Assignment_Map_Service (count_distinct_sources_for_map_types). */
+	private $assignment_map_service;
+
+	/** @var object|null Provider_Monthly_Spend_Service (get_spend_summary). */
+	private $provider_monthly_spend_service;
+
+	/** @var object|null Provider_Pricing_Registry (get_provider_ids). */
+	private $provider_pricing_registry;
+
 	/** @var Settings_Service */
 	private Settings_Service $settings;
 
@@ -51,41 +61,292 @@ final class Dashboard_State_Builder {
 		?object $crawl_snapshot_service = null,
 		?object $ai_run_repository = null,
 		?object $build_plan_repository = null,
-		?object $job_queue_repository = null
+		?object $job_queue_repository = null,
+		?object $assignment_map_service = null,
+		?object $provider_monthly_spend_service = null,
+		?object $provider_pricing_registry = null
 	) {
-		$this->settings               = $settings;
-		$this->crawl_snapshot_service = $crawl_snapshot_service;
-		$this->ai_run_repository      = $ai_run_repository;
-		$this->build_plan_repository  = $build_plan_repository;
-		$this->job_queue_repository   = $job_queue_repository;
+		$this->settings                       = $settings;
+		$this->crawl_snapshot_service         = $crawl_snapshot_service;
+		$this->ai_run_repository              = $ai_run_repository;
+		$this->build_plan_repository          = $build_plan_repository;
+		$this->job_queue_repository           = $job_queue_repository;
+		$this->assignment_map_service         = $assignment_map_service;
+		$this->provider_monthly_spend_service = $provider_monthly_spend_service;
+		$this->provider_pricing_registry      = $provider_pricing_registry;
 	}
 
 	/**
-	 * Builds full dashboard state. Quick actions are filtered by current user capability.
+	 * Builds full dashboard state.
 	 *
-	 * @return array{
-	 *   readiness_cards: array{environment: array, dependency: array, provider: array},
-	 *   last_activity_cards: array{last_crawl: array|null, last_ai_run: array|null, active_build_plans: array},
-	 *   queue_warning_summary: array{has_warnings: bool, pending_count: int, failed_count: int, message: string, queue_logs_url: string},
-	 *   critical_error_summary: array{count: int, items: list<array>, logs_url: string},
-	 *   quick_actions: list<array{label: string, url: string, capability: string}>,
-	 *   welcome_state: array{is_first_run: bool, is_resume: bool, onboarding_url: string}
-	 * }
+	 * @return array<string, mixed>
 	 */
 	public function build(): array {
-		$readiness_cards  = $this->build_readiness_cards();
+		$readiness        = $this->build_readiness_cards();
 		$last_activity    = $this->build_last_activity_cards();
 		$queue_summary    = $this->build_queue_warning_summary();
 		$critical_summary = $this->build_critical_error_summary();
-		$quick_actions    = $this->build_quick_actions_filtered();
 		$welcome_state    = $this->build_welcome_state();
 		return array(
-			'readiness_cards'        => $readiness_cards,
-			'last_activity_cards'    => $last_activity,
+			'overview_metrics'       => $this->build_overview_metrics( $last_activity, $readiness ),
+			'onboarding_callout'     => $this->build_onboarding_callout( $welcome_state ),
+			'readiness_strip'        => $this->build_readiness_strip( $readiness ),
+			'activity_pulse'         => $this->build_activity_pulse( $last_activity ),
 			'queue_warning_summary'  => $queue_summary,
 			'critical_error_summary' => $critical_summary,
-			'quick_actions'          => $quick_actions,
+			'explore_links'          => $this->build_explore_links_filtered(),
+			'footer_links'           => $this->build_footer_links(),
 			'welcome_state'          => $welcome_state,
+		);
+	}
+
+	/**
+	 * @param array{last_crawl: array|null, last_ai_run: array|null, active_build_plans: array} $last_activity
+	 * @param array{environment: array, dependency: array, provider: array}                     $readiness
+	 * @return array{built_pages: int, ai_spend_mtd_usd: float, ai_spend_label: string, active_plans: int, provider_ready: bool}
+	 */
+	private function build_overview_metrics( array $last_activity, array $readiness ): array {
+		$built = 0;
+		if ( $this->assignment_map_service !== null &&
+			method_exists( $this->assignment_map_service, 'count_distinct_sources_for_map_types' ) ) {
+			$built = (int) $this->assignment_map_service->count_distinct_sources_for_map_types(
+				array( Assignment_Types::PAGE_TEMPLATE, Assignment_Types::PAGE_COMPOSITION )
+			);
+		}
+		$spend_total = 0.0;
+		if ( $this->provider_monthly_spend_service !== null &&
+			$this->provider_pricing_registry !== null &&
+			method_exists( $this->provider_pricing_registry, 'get_provider_ids' ) &&
+			method_exists( $this->provider_monthly_spend_service, 'get_spend_summary' ) ) {
+			try {
+				foreach ( $this->provider_pricing_registry->get_provider_ids() as $pid ) {
+					$sum          = $this->provider_monthly_spend_service->get_spend_summary( (string) $pid );
+					$spend_total += isset( $sum['month_total'] ) ? (float) $sum['month_total'] : 0.0;
+				}
+			} catch ( \Throwable $e ) {
+				$spend_total = 0.0;
+			}
+		}
+		$spend_label = sprintf(
+			/* translators: %s: formatted USD amount */
+			__( '%s MTD', 'aio-page-builder' ),
+			'$' . number_format( $spend_total, 2 )
+		);
+		return array(
+			'built_pages'      => $built,
+			'ai_spend_mtd_usd' => $spend_total,
+			'ai_spend_label'   => $spend_label,
+			'active_plans'     => count( $last_activity['active_build_plans'] ),
+			'provider_ready'   => (bool) ( $readiness['provider']['ready'] ?? false ),
+		);
+	}
+
+	/**
+	 * @param array{is_first_run: bool, is_resume: bool, onboarding_url: string} $welcome
+	 * @return array{visible: bool, variant: string, headline: string, body: string, cta_label: string, url: string}
+	 */
+	private function build_onboarding_callout( array $welcome ): array {
+		$url = (string) ( $welcome['onboarding_url'] ?? '' );
+		if ( ! \current_user_can( Capabilities::RUN_ONBOARDING ) ) {
+			return array(
+				'visible'   => false,
+				'variant'   => 'none',
+				'headline'  => '',
+				'body'      => '',
+				'cta_label' => '',
+				'url'       => $url,
+			);
+		}
+		if ( ! empty( $welcome['is_first_run'] ) ) {
+			return array(
+				'visible'   => true,
+				'variant'   => 'hero',
+				'headline'  => __( 'Welcome — start onboarding', 'aio-page-builder' ),
+				'body'      => __( 'Connect your site profile, AI provider, and baseline context so crawls, plans, and builds stay aligned with how you work.', 'aio-page-builder' ),
+				'cta_label' => __( 'Begin setup', 'aio-page-builder' ),
+				'url'       => $url,
+			);
+		}
+		if ( ! empty( $welcome['is_resume'] ) ) {
+			return array(
+				'visible'   => true,
+				'variant'   => 'resume',
+				'headline'  => __( 'Finish onboarding', 'aio-page-builder' ),
+				'body'      => __( 'You have a saved session. Resume to continue profile, provider, and planning steps.', 'aio-page-builder' ),
+				'cta_label' => __( 'Resume onboarding', 'aio-page-builder' ),
+				'url'       => $url,
+			);
+		}
+		return array(
+			'visible'   => false,
+			'variant'   => 'none',
+			'headline'  => '',
+			'body'      => '',
+			'cta_label' => '',
+			'url'       => $url,
+		);
+	}
+
+	/**
+	 * @param array{environment: array, dependency: array, provider: array} $cards
+	 * @return array{all_ready: bool, summary: string, diagnostics_url: string}
+	 */
+	private function build_readiness_strip( array $cards ): array {
+		$env_ok  = ! empty( $cards['environment']['ready'] );
+		$dep_ok  = ! empty( $cards['dependency']['ready'] );
+		$prov_ok = ! empty( $cards['provider']['ready'] );
+		$all     = $env_ok && $dep_ok && $prov_ok;
+		$parts   = array(
+			$env_ok ? __( 'Environment OK', 'aio-page-builder' ) : __( 'Environment needs attention', 'aio-page-builder' ),
+			$dep_ok ? __( 'Dependencies OK', 'aio-page-builder' ) : __( 'Dependencies need attention', 'aio-page-builder' ),
+			$prov_ok ? __( 'AI provider ready', 'aio-page-builder' ) : __( 'AI provider not configured', 'aio-page-builder' ),
+		);
+		$base    = \admin_url( 'admin.php' );
+		$url     = \add_query_arg( array( 'page' => 'aio-page-builder-diagnostics' ), $base );
+		return array(
+			'all_ready'       => $all,
+			'summary'         => implode( ' · ', $parts ),
+			'diagnostics_url' => $url,
+		);
+	}
+
+	/**
+	 * @param array{last_crawl: array|null, last_ai_run: array|null, active_build_plans: array} $activity
+	 * @return array{last_crawl: array|null, last_ai_run: array|null, active_build_plans: array, plans_hub_url: string, ai_hub_url: string, crawler_url: string}
+	 */
+	private function build_activity_pulse( array $activity ): array {
+		$base = \admin_url( 'admin.php' );
+		return array(
+			'last_crawl'         => $activity['last_crawl'],
+			'last_ai_run'        => $activity['last_ai_run'],
+			'active_build_plans' => $activity['active_build_plans'],
+			'plans_hub_url'      => \add_query_arg( array( 'page' => 'aio-page-builder-build-plans' ), $base ),
+			'ai_hub_url'         => \add_query_arg(
+				array(
+					'page'    => 'aio-page-builder-ai-workspace',
+					'aio_tab' => 'ai_runs',
+				),
+				$base
+			),
+			'crawler_url'        => \add_query_arg( array( 'page' => 'aio-page-builder-crawler-sessions' ), $base ),
+		);
+	}
+
+	/**
+	 * @return list<array{title: string, description: string, url: string, capability: string}>
+	 */
+	private function build_explore_links_filtered(): array {
+		$all = $this->get_explore_link_definitions();
+		$out = array();
+		foreach ( $all as $item ) {
+			if ( \current_user_can( $item['capability'] ) ) {
+				$out[] = $item;
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * @return list<array{title: string, description: string, url: string, capability: string}>
+	 */
+	private function get_explore_link_definitions(): array {
+		$base = \admin_url( 'admin.php' );
+		return array(
+			array(
+				'title'       => __( 'Onboarding', 'aio-page-builder' ),
+				'description' => __( 'Profile, provider, and planning handoff.', 'aio-page-builder' ),
+				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-onboarding' ), $base ),
+				'capability'  => Capabilities::RUN_ONBOARDING,
+			),
+			array(
+				'title'       => __( 'AI workspace', 'aio-page-builder' ),
+				'description' => __( 'Runs, providers, experiments, and spend detail.', 'aio-page-builder' ),
+				'url'         => \add_query_arg(
+					array(
+						'page'    => 'aio-page-builder-ai-workspace',
+						'aio_tab' => 'ai_runs',
+					),
+					$base
+				),
+				'capability'  => Capabilities::VIEW_AI_RUNS,
+			),
+			array(
+				'title'       => __( 'AI providers & keys', 'aio-page-builder' ),
+				'description' => __( 'Credentials, models, caps, and connection tests.', 'aio-page-builder' ),
+				'url'         => \add_query_arg(
+					array(
+						'page'    => 'aio-page-builder-ai-workspace',
+						'aio_tab' => 'providers',
+					),
+					$base
+				),
+				'capability'  => Capabilities::MANAGE_AI_PROVIDERS,
+			),
+			array(
+				'title'       => __( 'Crawler', 'aio-page-builder' ),
+				'description' => __( 'Snapshot sessions and comparisons.', 'aio-page-builder' ),
+				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-crawler-sessions' ), $base ),
+				'capability'  => Capabilities::VIEW_SENSITIVE_DIAGNOSTICS,
+			),
+			array(
+				'title'       => __( 'Plans & analytics', 'aio-page-builder' ),
+				'description' => __( 'Build plans, analytics, and execution context.', 'aio-page-builder' ),
+				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-build-plans' ), $base ),
+				'capability'  => Capabilities::VIEW_BUILD_PLANS,
+			),
+			array(
+				'title'       => __( 'Template library', 'aio-page-builder' ),
+				'description' => __( 'Page templates, sections, compositions.', 'aio-page-builder' ),
+				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-page-templates' ), $base ),
+				'capability'  => Capabilities::ACCESS_TEMPLATE_LIBRARY,
+			),
+			array(
+				'title'       => __( 'Operations', 'aio-page-builder' ),
+				'description' => __( 'Queue, logs, triage, and post-release checks.', 'aio-page-builder' ),
+				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs' ), $base ),
+				'capability'  => Capabilities::VIEW_LOGS,
+			),
+			array(
+				'title'       => __( 'Diagnostics', 'aio-page-builder' ),
+				'description' => __( 'Environment, dependencies, ACF, and forms health.', 'aio-page-builder' ),
+				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-diagnostics' ), $base ),
+				'capability'  => Capabilities::VIEW_SENSITIVE_DIAGNOSTICS,
+			),
+			array(
+				'title'       => __( 'Settings', 'aio-page-builder' ),
+				'description' => __( 'Seeding, privacy, reporting, import/export.', 'aio-page-builder' ),
+				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-settings' ), $base ),
+				'capability'  => Capabilities::ACCESS_SETTINGS_HUB,
+			),
+			array(
+				'title'       => __( 'Industry workspace', 'aio-page-builder' ),
+				'description' => __( 'Profile, packs, reports, and comparisons.', 'aio-page-builder' ),
+				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-industry-profile' ), $base ),
+				'capability'  => Capabilities::ACCESS_INDUSTRY_WORKSPACE,
+			),
+		);
+	}
+
+	/**
+	 * @return array{privacy_url: string, import_export_url: string}
+	 */
+	private function build_footer_links(): array {
+		$base = \admin_url( 'admin.php' );
+		return array(
+			'privacy_url'       => \add_query_arg(
+				array(
+					'page'    => 'aio-page-builder-settings',
+					'aio_tab' => 'privacy',
+				),
+				$base
+			),
+			'import_export_url' => \add_query_arg(
+				array(
+					'page'    => 'aio-page-builder-settings',
+					'aio_tab' => 'import_export',
+				),
+				$base
+			),
 		);
 	}
 
@@ -120,9 +381,9 @@ final class Dashboard_State_Builder {
 		$first_blocking    = $blocking > 0 ? $validator->get_first_blocking_message() : null;
 		$env_message       = $blocking > 0
 			? ( ( $first_blocking !== '' && $first_blocking !== null ) ? $first_blocking : __( 'One or more checks failed.', 'aio-page-builder' ) )
-			: ( $warnings > 0 ? sprintf( __( '%d warning(s).', 'aio-page-builder' ), $warnings ) : __( 'Ready.', 'aio-page-builder' ) );
+			: ( $warnings > 0 ? sprintf( /* translators: %d: warning count */ __( '%d warning(s).', 'aio-page-builder' ), $warnings ) : __( 'Ready.', 'aio-page-builder' ) );
 		$dep_message       = $dep_blocking > 0
-			? sprintf( __( '%d required dependency issue(s).', 'aio-page-builder' ), $dep_blocking )
+			? sprintf( /* translators: %d: dependency issue count */ __( '%d required dependency issue(s).', 'aio-page-builder' ), $dep_blocking )
 			: ( $dependency_ready ? __( 'Dependencies met.', 'aio-page-builder' ) : __( 'Check diagnostics.', 'aio-page-builder' ) );
 
 		$provider_ready   = $this->has_provider_configured();
@@ -299,71 +560,6 @@ final class Dashboard_State_Builder {
 			'count'    => count( $all ),
 			'items'    => $out,
 			'logs_url' => $logs_url,
-		);
-	}
-
-	/**
-	 * Quick actions with capability check. Only includes actions the current user can perform.
-	 *
-	 * @return list<array{label: string, url: string, capability: string}>
-	 */
-	private function build_quick_actions_filtered(): array {
-		$all = $this->get_quick_actions_definitions();
-		$out = array();
-		foreach ( $all as $action ) {
-			if ( \current_user_can( $action['capability'] ) ) {
-				$out[] = $action;
-			}
-		}
-		return $out;
-	}
-
-	/**
-	 * @return list<array{label: string, url: string, capability: string}>
-	 */
-	private function get_quick_actions_definitions(): array {
-		$base = \admin_url( 'admin.php' );
-		return array(
-			array(
-				'label'      => __( 'Start / Resume Onboarding', 'aio-page-builder' ),
-				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-onboarding' ), $base ),
-				'capability' => Capabilities::RUN_ONBOARDING,
-			),
-			array(
-				'label'      => __( 'Diagnostics', 'aio-page-builder' ),
-				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-diagnostics' ), $base ),
-				'capability' => Capabilities::VIEW_SENSITIVE_DIAGNOSTICS,
-			),
-			array(
-				'label'      => __( 'Crawl Sessions', 'aio-page-builder' ),
-				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-crawler-sessions' ), $base ),
-				'capability' => Capabilities::VIEW_SENSITIVE_DIAGNOSTICS,
-			),
-			array(
-				'label'      => __( 'AI Runs', 'aio-page-builder' ),
-				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs' ), $base ),
-				'capability' => Capabilities::VIEW_AI_RUNS,
-			),
-			array(
-				'label'      => __( 'Build Plans', 'aio-page-builder' ),
-				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-build-plans' ), $base ),
-				'capability' => Capabilities::VIEW_BUILD_PLANS,
-			),
-			array(
-				'label'      => __( 'Queue & Logs', 'aio-page-builder' ),
-				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-queue-logs' ), $base ),
-				'capability' => Capabilities::VIEW_LOGS,
-			),
-			array(
-				'label'      => __( 'AI Providers', 'aio-page-builder' ),
-				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-ai-providers' ), $base ),
-				'capability' => Capabilities::MANAGE_AI_PROVIDERS,
-			),
-			array(
-				'label'      => __( 'Import / Export', 'aio-page-builder' ),
-				'url'        => \add_query_arg( array( 'page' => 'aio-page-builder-export-restore' ), $base ),
-				'capability' => Capabilities::EXPORT_DATA,
-			),
 		);
 	}
 

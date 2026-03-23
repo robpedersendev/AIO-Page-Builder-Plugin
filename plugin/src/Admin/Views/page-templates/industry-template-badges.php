@@ -1,76 +1,76 @@
 <?php
 /**
  * Renders industry recommendation badge and tooltip for one page template (industry-admin-screen-contract).
- * Expects $item_view (Industry_Page_Template_Directory_Item_View) or $badge_data (array with recommendation_status, explanation_snippet, hierarchy_fit, lpagery_fit).
+ * Expects $aio_pb_item_view (Industry_Page_Template_Directory_Item_View) or $aio_pb_badge_data (array with recommendation_status, explanation_snippet, hierarchy_fit, lpagery_fit).
  *
  * @package AIOPageBuilder
  */
 
 defined( 'ABSPATH' ) || exit;
 
-if ( ! isset( $item_view ) && ! isset( $badge_data ) ) {
+if ( ! isset( $aio_pb_item_view ) && ! isset( $aio_pb_badge_data ) ) {
 	return;
 }
 
-$badge_status  = '';
-$snippet       = '';
-$hierarchy_fit = '';
-$lpagery_fit   = '';
-if ( isset( $item_view ) && $item_view instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Directory_Item_View ) {
-	$badge_status  = $item_view->get_recommendation_status();
-	$snippet       = $item_view->get_explanation_snippet();
-	$hierarchy_fit = $item_view->get_hierarchy_fit();
-	$lpagery_fit   = $item_view->get_lpagery_fit();
-} elseif ( isset( $badge_data ) && is_array( $badge_data ) ) {
-	$badge_status  = (string) ( $badge_data['recommendation_status'] ?? $badge_data['fit_classification'] ?? '' );
-	$snippet       = (string) ( $badge_data['explanation_snippet'] ?? \implode( ', ', (array) ( $badge_data['explanation_reasons'] ?? array() ) ) );
-	$hierarchy_fit = (string) ( $badge_data['hierarchy_fit'] ?? '' );
-	$lpagery_fit   = (string) ( $badge_data['lpagery_fit'] ?? '' );
+$aio_pb_badge_status  = '';
+$aio_pb_snippet       = '';
+$aio_pb_hierarchy_fit = '';
+$aio_pb_lpagery_fit   = '';
+if ( isset( $aio_pb_item_view ) && $aio_pb_item_view instanceof \AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Directory_Item_View ) {
+	$aio_pb_badge_status  = $aio_pb_item_view->get_recommendation_status();
+	$aio_pb_snippet       = $aio_pb_item_view->get_explanation_snippet();
+	$aio_pb_hierarchy_fit = $aio_pb_item_view->get_hierarchy_fit();
+	$aio_pb_lpagery_fit   = $aio_pb_item_view->get_lpagery_fit();
+} elseif ( isset( $aio_pb_badge_data ) && is_array( $aio_pb_badge_data ) ) {
+	$aio_pb_badge_status  = (string) ( $aio_pb_badge_data['recommendation_status'] ?? $aio_pb_badge_data['fit_classification'] ?? '' );
+	$aio_pb_snippet       = (string) ( $aio_pb_badge_data['explanation_snippet'] ?? \implode( ', ', (array) ( $aio_pb_badge_data['explanation_reasons'] ?? array() ) ) );
+	$aio_pb_hierarchy_fit = (string) ( $aio_pb_badge_data['hierarchy_fit'] ?? '' );
+	$aio_pb_lpagery_fit   = (string) ( $aio_pb_badge_data['lpagery_fit'] ?? '' );
 }
 
-if ( $badge_status === '' && $hierarchy_fit === '' && $lpagery_fit === '' ) {
+if ( $aio_pb_badge_status === '' && $aio_pb_hierarchy_fit === '' && $aio_pb_lpagery_fit === '' ) {
 	return;
 }
 
-$label = $badge_status;
-if ( $badge_status === 'recommended' ) {
-	$label = __( 'Recommended', 'aio-page-builder' );
-} elseif ( $badge_status === 'allowed_weak_fit' ) {
-	$label = __( 'Weak fit', 'aio-page-builder' );
-} elseif ( $badge_status === 'discouraged' ) {
-	$label = __( 'Discouraged', 'aio-page-builder' );
-} elseif ( $badge_status === 'neutral' ) {
-	$label = __( 'Neutral', 'aio-page-builder' );
+$aio_pb_label = $aio_pb_badge_status;
+if ( $aio_pb_badge_status === 'recommended' ) {
+	$aio_pb_label = __( 'Recommended', 'aio-page-builder' );
+} elseif ( $aio_pb_badge_status === 'allowed_weak_fit' ) {
+	$aio_pb_label = __( 'Weak fit', 'aio-page-builder' );
+} elseif ( $aio_pb_badge_status === 'discouraged' ) {
+	$aio_pb_label = __( 'Discouraged', 'aio-page-builder' );
+} elseif ( $aio_pb_badge_status === 'neutral' ) {
+	$aio_pb_label = __( 'Neutral', 'aio-page-builder' );
 }
 
-$parts = array();
-if ( $snippet !== '' ) {
-	$parts[] = $snippet;
+$aio_pb_parts = array();
+if ( $aio_pb_snippet !== '' ) {
+	$aio_pb_parts[] = $aio_pb_snippet;
 }
-if ( $hierarchy_fit !== '' ) {
-	$parts[] = sprintf( /* translators: %s: hierarchy fit note */ __( 'Hierarchy: %s', 'aio-page-builder' ), $hierarchy_fit );
+if ( $aio_pb_hierarchy_fit !== '' ) {
+	$aio_pb_parts[] = sprintf( /* translators: %s: hierarchy fit note */ __( 'Hierarchy: %s', 'aio-page-builder' ), $aio_pb_hierarchy_fit );
 }
-if ( $lpagery_fit !== '' ) {
-	$parts[] = sprintf( /* translators: %s: LPagery fit note */ __( 'LPagery: %s', 'aio-page-builder' ), $lpagery_fit );
+if ( $aio_pb_lpagery_fit !== '' ) {
+	$aio_pb_parts[] = sprintf( /* translators: %s: LPagery fit note */ __( 'LPagery: %s', 'aio-page-builder' ), $aio_pb_lpagery_fit );
 }
-$badge_title = \implode( ' · ', $parts );
-if ( $badge_title === '' ) {
-	$badge_title = $label;
+$aio_pb_badge_title = \implode( ' · ', $aio_pb_parts );
+if ( $aio_pb_badge_title === '' ) {
+	$aio_pb_badge_title = $aio_pb_label;
 }
-$class = 'aio-industry-badge aio-industry-badge--' . \sanitize_html_class( $badge_status !== '' ? $badge_status : 'neutral' );
+$aio_pb_badge_class = 'aio-industry-badge aio-industry-badge--' . \sanitize_html_class( $aio_pb_badge_status !== '' ? $aio_pb_badge_status : 'neutral' );
 ?>
-<span class="<?php echo \esc_attr( $class ); ?>" title="<?php echo \esc_attr( $badge_title ); ?>" aria-label="<?php echo \esc_attr( $label !== '' ? $label : __( 'Industry fit', 'aio-page-builder' ) ); ?>">
-	<?php echo $label !== '' ? \esc_html( $label ) : '—'; ?>
-	<?php if ( $hierarchy_fit !== '' || $lpagery_fit !== '' ) : ?>
+<span class="<?php echo \esc_attr( $aio_pb_badge_class ); ?>" title="<?php echo \esc_attr( $aio_pb_badge_title ); ?>" aria-label="<?php echo \esc_attr( $aio_pb_label !== '' ? $aio_pb_label : __( 'Industry fit', 'aio-page-builder' ) ); ?>">
+	<?php echo $aio_pb_label !== '' ? \esc_html( $aio_pb_label ) : '—'; ?>
+	<?php if ( $aio_pb_hierarchy_fit !== '' || $aio_pb_lpagery_fit !== '' ) : ?>
 		<span class="aio-industry-badge-meta">
 			<?php
-			if ( $hierarchy_fit !== '' ) :
+			if ( $aio_pb_hierarchy_fit !== '' ) :
 				?>
-				<span class="aio-hierarchy-fit" title="<?php echo \esc_attr( $hierarchy_fit ); ?>">H</span><?php endif; ?>
+				<span class="aio-hierarchy-fit" title="<?php echo \esc_attr( $aio_pb_hierarchy_fit ); ?>">H</span><?php endif; ?>
 			<?php
-			if ( $lpagery_fit !== '' ) :
+			if ( $aio_pb_lpagery_fit !== '' ) :
 				?>
-				<span class="aio-lpagery-fit" title="<?php echo \esc_attr( $lpagery_fit ); ?>">L</span><?php endif; ?>
+				<span class="aio-lpagery-fit" title="<?php echo \esc_attr( $aio_pb_lpagery_fit ); ?>">L</span><?php endif; ?>
 		</span>
 	<?php endif; ?>
 </span>

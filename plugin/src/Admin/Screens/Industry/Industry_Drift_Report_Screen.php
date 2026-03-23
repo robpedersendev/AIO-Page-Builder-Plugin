@@ -81,7 +81,7 @@ final class Industry_Drift_Report_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Drift report.', 'aio-page-builder' ), 403 );
 		}
@@ -90,8 +90,10 @@ final class Industry_Drift_Report_Screen {
 		$items        = isset( $report['items'] ) && is_array( $report['items'] ) ? $report['items'] : array();
 		$generated_at = isset( $report['generated_at'] ) && is_string( $report['generated_at'] ) ? $report['generated_at'] : '';
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-drift-report" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php esc_html_e( 'Contract, schema, and convention drift. Advisory only; no auto-fix. Resolve or waive per maintenance policy.', 'aio-page-builder' ); ?>
 			</p>
@@ -140,7 +142,7 @@ final class Industry_Drift_Report_Screen {
 						</tbody>
 					</table>
 					<?php if ( count( $items ) > 100 ) : ?>
-						<p class="description"><?php echo esc_html( sprintf( __( 'Showing first 100 of %d.', 'aio-page-builder' ), count( $items ) ) ); ?></p>
+						<p class="description"><?php echo esc_html( sprintf( /* translators: %d: total drift items */ __( 'Showing first 100 of %d.', 'aio-page-builder' ), count( $items ) ) ); ?></p>
 					<?php endif; ?>
 				</section>
 			<?php endif; ?>
@@ -148,7 +150,9 @@ final class Industry_Drift_Report_Screen {
 			<p class="description" style="margin-top: 1.5em;">
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=' . Industry_Author_Dashboard_Screen::SLUG ) ); ?>"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
 			</p>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

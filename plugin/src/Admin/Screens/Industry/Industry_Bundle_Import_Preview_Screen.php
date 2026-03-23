@@ -154,14 +154,16 @@ final class Industry_Bundle_Import_Preview_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the industry bundle import preview.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->get_state();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-bundle-import-preview" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php \esc_html_e( 'Upload an industry pack bundle (JSON) to preview contents, review conflicts, choose scope, and apply.', 'aio-page-builder' ); ?>
 			</p>
@@ -175,7 +177,9 @@ final class Industry_Bundle_Import_Preview_Screen {
 			<?php else : ?>
 				<?php $this->render_upload_form(); ?>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

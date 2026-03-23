@@ -17,8 +17,8 @@ require_once __DIR__ . '/src/Infrastructure/Config/Capabilities.php';
 require_once __DIR__ . '/src/Bootstrap/Capability_Registrar.php';
 require_once __DIR__ . '/src/Bootstrap/Lifecycle_Manager.php';
 
-$lifecycle = new \AIOPageBuilder\Bootstrap\Lifecycle_Manager();
-$lifecycle->uninstall();
+$aio_page_builder_lifecycle = new \AIOPageBuilder\Bootstrap\Lifecycle_Manager();
+$aio_page_builder_lifecycle->uninstall();
 
 \AIOPageBuilder\Bootstrap\Capability_Registrar::remove_from_all_roles();
 

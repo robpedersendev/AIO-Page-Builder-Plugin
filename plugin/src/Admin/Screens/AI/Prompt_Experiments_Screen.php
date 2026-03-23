@@ -43,7 +43,7 @@ final class Prompt_Experiments_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage prompt experiments.', 'aio-page-builder' ), 403 );
 		}
@@ -53,8 +53,10 @@ final class Prompt_Experiments_Screen {
 		$definitions = $service ? $service->list_definitions() : array();
 		$ai_runs_url = \admin_url( 'admin.php?page=' . AI_Runs_Screen::SLUG );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-prompt-experiments" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description"><?php \esc_html_e( 'Define prompt-pack and provider/model experiment variants. Experiment runs are recorded separately and labeled in AI Runs. No automatic promotion to production.', 'aio-page-builder' ); ?></p>
 			<p><a href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'View AI Runs', 'aio-page-builder' ); ?></a></p>
 
@@ -109,7 +111,9 @@ final class Prompt_Experiments_Screen {
 				<h2 id="aio-add-heading"><?php \esc_html_e( 'Add or edit experiment', 'aio-page-builder' ); ?></h2>
 				<?php $this->render_form( $service, $definitions ); ?>
 			</section>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

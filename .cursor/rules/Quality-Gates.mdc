@@ -4,8 +4,10 @@ alwaysApply: true
 
 No code is complete until it passes linting, static analysis, and relevant tests.
 
-Treat Plugin Check findings as required review items even for private distribution.
+**Ship-blocking vs documented tooling debt:** A finding may be accepted in `phpcs.xml.dist`, `phpstan-baseline.neon`, or narrow `phpcs:ignore` / scoped disables only when (1) it is **industry-normal** for WordPress or PHPStan-in-WordPress projects, (2) it does **not** weaken **functionality, security, or usability**, and (3) it is **documented** (ruleset comment, baseline with path, or `docs/release/known-risk-register.md` §5). Those items **do not** revoke production-ready or ship-ability by themselves. Prefer fixing over ignoring; do not add new suppressions without that triage bar.
 
-Treat WordPress Coding Standards warnings as design feedback, not optional decoration.
+Treat Plugin Check findings as **required review**: triage every ERROR/WARNING; only items that meet the same non-blocking bar above may be deferred for ship (document in the risk register or QA closure).
+
+Treat WordPress Coding Standards warnings as design feedback; unresolved WPCS issues that touch security, escaping, capabilities, or data integrity remain **ship-blocking**.
 
 Every feature must include failure handling, logging, and uninstall/cleanup reasoning.

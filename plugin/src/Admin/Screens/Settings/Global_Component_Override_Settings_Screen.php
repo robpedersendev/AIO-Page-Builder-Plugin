@@ -12,7 +12,9 @@ namespace AIOPageBuilder\Admin\Screens\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\Forms\Global_Component_Override_Form_Builder;
+use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Repository;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -50,7 +52,7 @@ final class Global_Component_Override_Settings_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage global component overrides.', 'aio-page-builder' ), 403 );
 		}
@@ -59,14 +61,19 @@ final class Global_Component_Override_Settings_Screen {
 		$form_builder = $this->get_form_builder();
 
 		if ( $repo === null || $form_builder === null ) {
-			$diagnostics_url = \admin_url( 'admin.php?page=aio-page-builder-diagnostics' );
-			echo '<div class="wrap aio-page-builder-screen"><h1>' . \esc_html( $this->get_title() ) . '</h1>';
+			$diagnostics_url = Admin_Screen_Hub::tab_url( Diagnostics_Screen::SLUG, 'overview' );
+			if ( ! $embed_in_hub ) {
+				echo '<div class="wrap aio-page-builder-screen"><h1>' . \esc_html( $this->get_title() ) . '</h1>';
+			}
 			echo '<div class="notice notice-warning inline"><p>' . \esc_html__( 'Global component override settings are unavailable. The style repository or form builder could not be loaded.', 'aio-page-builder' ) . '</p>';
 			echo '<p>' . \sprintf(
 				/* translators: 1: link to diagnostics, 2: link text */
 				\esc_html__( 'You can try reloading this page or check the %1$s screen for dependency status.', 'aio-page-builder' ),
 				'<a href="' . \esc_url( $diagnostics_url ) . '">' . \esc_html__( 'Diagnostics', 'aio-page-builder' ) . '</a>'
-			) . '</p></div></div>';
+			) . '</p></div>';
+			if ( ! $embed_in_hub ) {
+				echo '</div>';
+			}
 			return;
 		}
 
@@ -96,8 +103,10 @@ final class Global_Component_Override_Settings_Screen {
 		$message = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
 		$by_comp = $form_builder->get_fields_by_component();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-global-component-overrides" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 
 			<?php if ( $message === 'success' ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Settings saved.', 'aio-page-builder' ); ?></p></div>
@@ -152,7 +161,9 @@ final class Global_Component_Override_Settings_Screen {
 				<?php \wp_nonce_field( self::NONCE_RESET, self::NONCE_RESET ); ?>
 				<button type="submit" class="button" onclick="return confirm('<?php echo \esc_js( __( 'Reset all component overrides to defaults?', 'aio-page-builder' ) ); ?>');"><?php \esc_html_e( 'Reset to defaults', 'aio-page-builder' ); ?></button>
 			</form>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

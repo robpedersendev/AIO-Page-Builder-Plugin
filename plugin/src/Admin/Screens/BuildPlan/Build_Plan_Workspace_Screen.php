@@ -23,11 +23,14 @@ use AIOPageBuilder\Domain\BuildPlan\UI\Components\Detail_Panel_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Message_Component;
 use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
 
 /**
  * Renders Build Plan detail with three-zone layout. Consumes UI state from Build_Plan_UI_State_Builder.
@@ -40,6 +43,14 @@ final class Build_Plan_Workspace_Screen {
 
 	public function __construct( ?Service_Container $container = null ) {
 		$this->container = $container;
+	}
+
+	/**
+	 * @param array<string, mixed> $data Structured audit payload (no secrets).
+	 */
+	private function log_debug_audit( array $data ): void {
+		$json = \wp_json_encode( $data );
+		Internal_Debug_Log::line( false !== $json ? $json : 'json_encode_failed' );
 	}
 
 	public function get_capability(): string {
@@ -240,7 +251,7 @@ final class Build_Plan_Workspace_Screen {
 
 		// Minimal audit log (no secrets).
 		if ( \is_object( $result ) && \method_exists( $result, 'get_status' ) ) {
-			\error_log( '[AIO Page Builder] Finalize plan result: ' . (string) $result->get_status() . ' plan_id=' . $plan_id );
+			Internal_Debug_Log::line( 'Finalize plan result: ' . (string) $result->get_status() . ' plan_id=' . $plan_id );
 		}
 
 		\wp_safe_redirect( \add_query_arg( array( 'finalize_result' => 'done' ), $redirect_url ) );
@@ -626,18 +637,16 @@ final class Build_Plan_Workspace_Screen {
 					'execution_origin' => $action,
 				);
 
-				\error_log(
-					'[AIO Page Builder] ' . \wp_json_encode(
-						array(
-							'event'            => 'token_execution_request',
-							'actor_id'         => (string) \get_current_user_id(),
-							'plan_id'          => $plan_id,
-							'item_ids'         => $item_ids_to_exec,
-							'token_targets'    => $token_targets,
-							'execution_origin' => $action,
-						)
+				$this->log_debug_audit(
+					array(
+						'event'            => 'token_execution_request',
+						'actor_id'         => (string) \get_current_user_id(),
+						'plan_id'          => $plan_id,
+						'item_ids'         => $item_ids_to_exec,
+						'token_targets'    => $token_targets,
+						'execution_origin' => $action,
 					)
-				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				);
 
 				$results = $this->container->get( 'execution_queue_service' )->request_bulk_execution(
 					$plan_id,
@@ -646,22 +655,20 @@ final class Build_Plan_Workspace_Screen {
 					array( 'run_immediately' => true )
 				);
 
-				\error_log(
-					'[AIO Page Builder] ' . \wp_json_encode(
-						array(
-							'event'            => 'token_execution_result',
-							'actor_id'         => (string) \get_current_user_id(),
-							'plan_id'          => $plan_id,
-							'execution_origin' => $action,
-							'overall_status'   => $results['status'] ?? 'error',
-							'completed_count'  => $results['completed_count'] ?? 0,
-							'failed_count'     => $results['failed_count'] ?? 0,
-							'refused_count'    => $results['refused_count'] ?? 0,
-							'partial_failure'  => $results['partial_failure'] ?? false,
-							'item_results'     => $results['item_results'] ?? array(),
-						)
+				$this->log_debug_audit(
+					array(
+						'event'            => 'token_execution_result',
+						'actor_id'         => (string) \get_current_user_id(),
+						'plan_id'          => $plan_id,
+						'execution_origin' => $action,
+						'overall_status'   => $results['status'] ?? 'error',
+						'completed_count'  => $results['completed_count'] ?? 0,
+						'failed_count'     => $results['failed_count'] ?? 0,
+						'refused_count'    => $results['refused_count'] ?? 0,
+						'partial_failure'  => $results['partial_failure'] ?? false,
+						'item_results'     => $results['item_results'] ?? array(),
 					)
-				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				);
 
 				\wp_safe_redirect( $redirect_url );
 				exit;
@@ -840,36 +847,32 @@ final class Build_Plan_Workspace_Screen {
 						\AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS
 					);
 				}
-				\error_log(
-					'[AIO Page Builder] ' . \wp_json_encode(
-						array(
-							'event'       => 'token_retry_status_update',
-							'plan_id'     => $plan_id,
-							'item_id'     => $item_id,
-							'updated'     => $updated,
-							'token_group' => $token_group,
-							'token_name'  => $token_name,
-							'new_status'  => \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS,
-						)
+				$this->log_debug_audit(
+					array(
+						'event'       => 'token_retry_status_update',
+						'plan_id'     => $plan_id,
+						'item_id'     => $item_id,
+						'updated'     => $updated,
+						'token_group' => $token_group,
+						'token_name'  => $token_name,
+						'new_status'  => \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS,
 					)
-				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				);
 			} elseif ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
 				return false;
 			}
 
-			\error_log(
-				'[AIO Page Builder] ' . \wp_json_encode(
-					array(
-						'event'            => 'token_execution_request',
-						'actor_id'         => (string) \get_current_user_id(),
-						'plan_id'          => $plan_id,
-						'item_id'          => $item_id,
-						'token_group'      => $token_group,
-						'token_name'       => $token_name,
-						'execution_origin' => $get_action,
-					)
+			$this->log_debug_audit(
+				array(
+					'event'            => 'token_execution_request',
+					'actor_id'         => (string) \get_current_user_id(),
+					'plan_id'          => $plan_id,
+					'item_id'          => $item_id,
+					'token_group'      => $token_group,
+					'token_name'       => $token_name,
+					'execution_origin' => $get_action,
 				)
-			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			);
 
 			$actor_context = array(
 				\AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract::ACTOR_ACTOR_TYPE => 'user',
@@ -885,21 +888,19 @@ final class Build_Plan_Workspace_Screen {
 				array( 'run_immediately' => true )
 			);
 
-			\error_log(
-				'[AIO Page Builder] ' . \wp_json_encode(
-					array(
-						'event'            => 'token_execution_result',
-						'actor_id'         => (string) \get_current_user_id(),
-						'plan_id'          => $plan_id,
-						'item_id'          => $item_id,
-						'token_group'      => $token_group,
-						'token_name'       => $token_name,
-						'execution_origin' => $get_action,
-						'overall_status'   => $results['status'] ?? 'error',
-						'item_results'     => $results['item_results'] ?? array(),
-					)
+			$this->log_debug_audit(
+				array(
+					'event'            => 'token_execution_result',
+					'actor_id'         => (string) \get_current_user_id(),
+					'plan_id'          => $plan_id,
+					'item_id'          => $item_id,
+					'token_group'      => $token_group,
+					'token_name'       => $token_name,
+					'execution_origin' => $get_action,
+					'overall_status'   => $results['status'] ?? 'error',
+					'item_results'     => $results['item_results'] ?? array(),
 				)
-			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			);
 
 			\wp_safe_redirect( $redirect_url );
 			exit;
@@ -1015,17 +1016,15 @@ final class Build_Plan_Workspace_Screen {
 				'execution_origin' => $action,
 			);
 
-			\error_log(
-				'[AIO Page Builder] ' . \wp_json_encode(
-					array(
-						'event'            => 'hierarchy_execution_request',
-						'actor_id'         => (string) \get_current_user_id(),
-						'plan_id'          => $plan_id,
-						'item_ids'         => $item_ids_to_exec,
-						'execution_origin' => $action,
-					)
+			$this->log_debug_audit(
+				array(
+					'event'            => 'hierarchy_execution_request',
+					'actor_id'         => (string) \get_current_user_id(),
+					'plan_id'          => $plan_id,
+					'item_ids'         => $item_ids_to_exec,
+					'execution_origin' => $action,
 				)
-			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			);
 
 			$results = $this->container->get( 'execution_queue_service' )->request_bulk_execution(
 				$plan_id,
@@ -1034,20 +1033,18 @@ final class Build_Plan_Workspace_Screen {
 				array( 'run_immediately' => true )
 			);
 
-			\error_log(
-				'[AIO Page Builder] ' . \wp_json_encode(
-					array(
-						'event'            => 'hierarchy_execution_result',
-						'actor_id'         => (string) \get_current_user_id(),
-						'plan_id'          => $plan_id,
-						'execution_origin' => $action,
-						'overall_status'   => $results['status'] ?? 'error',
-						'completed_count'  => $results['completed_count'] ?? 0,
-						'failed_count'     => $results['failed_count'] ?? 0,
-						'item_results'     => $results['item_results'] ?? array(),
-					)
+			$this->log_debug_audit(
+				array(
+					'event'            => 'hierarchy_execution_result',
+					'actor_id'         => (string) \get_current_user_id(),
+					'plan_id'          => $plan_id,
+					'execution_origin' => $action,
+					'overall_status'   => $results['status'] ?? 'error',
+					'completed_count'  => $results['completed_count'] ?? 0,
+					'failed_count'     => $results['failed_count'] ?? 0,
+					'item_results'     => $results['item_results'] ?? array(),
 				)
-			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			);
 
 			\wp_safe_redirect( $redirect_url );
 			exit;
@@ -1142,18 +1139,16 @@ final class Build_Plan_Workspace_Screen {
 						\AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS
 					);
 				}
-				\error_log(
-					'[AIO Page Builder] ' . \wp_json_encode(
-						array(
-							'event'      => 'hierarchy_retry_status_update',
-							'plan_id'    => $plan_id,
-							'item_id'    => $item_id,
-							'page_id'    => $page_id,
-							'updated'    => $updated,
-							'new_status' => \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS,
-						)
+				$this->log_debug_audit(
+					array(
+						'event'      => 'hierarchy_retry_status_update',
+						'plan_id'    => $plan_id,
+						'item_id'    => $item_id,
+						'page_id'    => $page_id,
+						'updated'    => $updated,
+						'new_status' => \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS,
 					)
-				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				);
 			}
 		} elseif ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
 				return false;
@@ -1167,19 +1162,17 @@ final class Build_Plan_Workspace_Screen {
 			'execution_origin' => $get_action,
 		);
 
-		\error_log(
-			'[AIO Page Builder] ' . \wp_json_encode(
-				array(
-					'event'            => 'hierarchy_execution_request',
-					'actor_id'         => (string) \get_current_user_id(),
-					'plan_id'          => $plan_id,
-					'item_id'          => $item_id,
-					'page_id'          => $page_id,
-					'parent_page_id'   => $parent_page_id,
-					'execution_origin' => $get_action,
-				)
+		$this->log_debug_audit(
+			array(
+				'event'            => 'hierarchy_execution_request',
+				'actor_id'         => (string) \get_current_user_id(),
+				'plan_id'          => $plan_id,
+				'item_id'          => $item_id,
+				'page_id'          => $page_id,
+				'parent_page_id'   => $parent_page_id,
+				'execution_origin' => $get_action,
 			)
-		); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		);
 
 		$results = $this->container->get( 'execution_queue_service' )->request_bulk_execution(
 			$plan_id,
@@ -1188,20 +1181,18 @@ final class Build_Plan_Workspace_Screen {
 			array( 'run_immediately' => true )
 		);
 
-		\error_log(
-			'[AIO Page Builder] ' . \wp_json_encode(
-				array(
-					'event'            => 'hierarchy_execution_result',
-					'actor_id'         => (string) \get_current_user_id(),
-					'plan_id'          => $plan_id,
-					'item_id'          => $item_id,
-					'page_id'          => $page_id,
-					'execution_origin' => $get_action,
-					'overall_status'   => $results['status'] ?? 'error',
-					'item_results'     => $results['item_results'] ?? array(),
-				)
+		$this->log_debug_audit(
+			array(
+				'event'            => 'hierarchy_execution_result',
+				'actor_id'         => (string) \get_current_user_id(),
+				'plan_id'          => $plan_id,
+				'item_id'          => $item_id,
+				'page_id'          => $page_id,
+				'execution_origin' => $get_action,
+				'overall_status'   => $results['status'] ?? 'error',
+				'item_results'     => $results['item_results'] ?? array(),
 			)
-		); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		);
 
 		\wp_safe_redirect( $redirect_url );
 		exit;
@@ -1314,17 +1305,15 @@ final class Build_Plan_Workspace_Screen {
 				'execution_origin' => $action,
 			);
 
-			\error_log(
-				'[AIO Page Builder] ' . \wp_json_encode(
-					array(
-						'event'            => 'create_menu_execution_request',
-						'actor_id'         => (string) \get_current_user_id(),
-						'plan_id'          => $plan_id,
-						'item_ids'         => $item_ids_to_exec,
-						'execution_origin' => $action,
-					)
+			$this->log_debug_audit(
+				array(
+					'event'            => 'create_menu_execution_request',
+					'actor_id'         => (string) \get_current_user_id(),
+					'plan_id'          => $plan_id,
+					'item_ids'         => $item_ids_to_exec,
+					'execution_origin' => $action,
 				)
-			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			);
 
 			$results = $this->container->get( 'execution_queue_service' )->request_bulk_execution(
 				$plan_id,
@@ -1333,20 +1322,18 @@ final class Build_Plan_Workspace_Screen {
 				array( 'run_immediately' => true )
 			);
 
-			\error_log(
-				'[AIO Page Builder] ' . \wp_json_encode(
-					array(
-						'event'            => 'create_menu_execution_result',
-						'actor_id'         => (string) \get_current_user_id(),
-						'plan_id'          => $plan_id,
-						'execution_origin' => $action,
-						'overall_status'   => $results['status'] ?? 'error',
-						'completed_count'  => $results['completed_count'] ?? 0,
-						'failed_count'     => $results['failed_count'] ?? 0,
-						'item_results'     => $results['item_results'] ?? array(),
-					)
+			$this->log_debug_audit(
+				array(
+					'event'            => 'create_menu_execution_result',
+					'actor_id'         => (string) \get_current_user_id(),
+					'plan_id'          => $plan_id,
+					'execution_origin' => $action,
+					'overall_status'   => $results['status'] ?? 'error',
+					'completed_count'  => $results['completed_count'] ?? 0,
+					'failed_count'     => $results['failed_count'] ?? 0,
+					'item_results'     => $results['item_results'] ?? array(),
 				)
-			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			);
 
 			\wp_safe_redirect( $redirect_url );
 			exit;
@@ -1439,18 +1426,16 @@ final class Build_Plan_Workspace_Screen {
 						\AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS
 					);
 				}
-				\error_log(
-					'[AIO Page Builder] ' . \wp_json_encode(
-						array(
-							'event'      => 'create_menu_retry_status_update',
-							'plan_id'    => $plan_id,
-							'item_id'    => $item_id,
-							'menu_name'  => $menu_name,
-							'updated'    => $updated,
-							'new_status' => \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS,
-						)
+				$this->log_debug_audit(
+					array(
+						'event'      => 'create_menu_retry_status_update',
+						'plan_id'    => $plan_id,
+						'item_id'    => $item_id,
+						'menu_name'  => $menu_name,
+						'updated'    => $updated,
+						'new_status' => \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::IN_PROGRESS,
 					)
-				); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				);
 			}
 		} elseif ( $item_status !== \AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses::APPROVED ) {
 				return false;
@@ -1464,18 +1449,16 @@ final class Build_Plan_Workspace_Screen {
 			'execution_origin' => $get_action,
 		);
 
-		\error_log(
-			'[AIO Page Builder] ' . \wp_json_encode(
-				array(
-					'event'            => 'create_menu_execution_request',
-					'actor_id'         => (string) \get_current_user_id(),
-					'plan_id'          => $plan_id,
-					'item_id'          => $item_id,
-					'menu_name'        => $menu_name,
-					'execution_origin' => $get_action,
-				)
+		$this->log_debug_audit(
+			array(
+				'event'            => 'create_menu_execution_request',
+				'actor_id'         => (string) \get_current_user_id(),
+				'plan_id'          => $plan_id,
+				'item_id'          => $item_id,
+				'menu_name'        => $menu_name,
+				'execution_origin' => $get_action,
 			)
-		); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		);
 
 		$results = $this->container->get( 'execution_queue_service' )->request_bulk_execution(
 			$plan_id,
@@ -1484,20 +1467,18 @@ final class Build_Plan_Workspace_Screen {
 			array( 'run_immediately' => true )
 		);
 
-		\error_log(
-			'[AIO Page Builder] ' . \wp_json_encode(
-				array(
-					'event'            => 'create_menu_execution_result',
-					'actor_id'         => (string) \get_current_user_id(),
-					'plan_id'          => $plan_id,
-					'item_id'          => $item_id,
-					'menu_name'        => $menu_name,
-					'execution_origin' => $get_action,
-					'overall_status'   => $results['status'] ?? 'error',
-					'item_results'     => $results['item_results'] ?? array(),
-				)
+		$this->log_debug_audit(
+			array(
+				'event'            => 'create_menu_execution_result',
+				'actor_id'         => (string) \get_current_user_id(),
+				'plan_id'          => $plan_id,
+				'item_id'          => $item_id,
+				'menu_name'        => $menu_name,
+				'execution_origin' => $get_action,
+				'overall_status'   => $results['status'] ?? 'error',
+				'item_results'     => $results['item_results'] ?? array(),
 			)
-		); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		);
 
 		\wp_safe_redirect( $redirect_url );
 		exit;
@@ -1716,7 +1697,7 @@ final class Build_Plan_Workspace_Screen {
 			'actor_id'     => (string) \get_current_user_id(),
 			'timestamp'    => gmdate( 'c' ),
 		);
-		\error_log( '[AIO Page Builder] ' . \wp_json_encode( $audit ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		$this->log_debug_audit( $audit );
 		$safe_filename = \preg_replace( '/[^a-zA-Z0-9._-]+/', '-', (string) ( $payload['plan_id'] ?? 'plan' ) );
 		if ( $safe_filename === '' ) {
 			$safe_filename = 'plan';
@@ -1875,7 +1856,7 @@ final class Build_Plan_Workspace_Screen {
 					<p><a href="<?php echo \esc_url( $export_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Export plan', 'aio-page-builder' ); ?></a></p>
 				<?php endif; ?>
 				<?php if ( $can_view_artifacts && (string) ( $rail['ai_run_ref'] ?? '' ) !== '' ) : ?>
-					<p><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=aio-page-builder-ai-runs&run_id=' . \rawurlencode( (string) $rail['ai_run_ref'] ) ) ); ?>" class="button button-secondary"><?php \esc_html_e( 'View source artifacts', 'aio-page-builder' ); ?></a></p>
+					<p><a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs', array( 'run_id' => (string) $rail['ai_run_ref'] ) ) ); ?>" class="button button-secondary"><?php \esc_html_e( 'View source artifacts', 'aio-page-builder' ); ?></a></p>
 				<?php endif; ?>
 			</div>
 		</div>
@@ -2252,6 +2233,7 @@ final class Build_Plan_Workspace_Screen {
 
 		if ( $bulk_done ) {
 			$msg = sprintf(
+				/* translators: %d: number of denied new-page recommendations */
 				_n( 'Denied %d eligible new page recommendation.', 'Denied %d eligible new page recommendations.', $bulk_count, 'aio-page-builder' ),
 				$bulk_count
 			);

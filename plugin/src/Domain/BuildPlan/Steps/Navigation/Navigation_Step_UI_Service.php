@@ -300,7 +300,7 @@ final class Navigation_Step_UI_Service {
 		return array(
 			array(
 				'severity' => 'info',
-				'message'  => sprintf( \_n( '%d navigation change pending review.', '%d navigation changes pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+				'message'  => sprintf( /* translators: %d: number of navigation changes */ \_n( '%d navigation change pending review.', '%d navigation changes pending review.', $eligible, 'aio-page-builder' ), $eligible ),
 				'level'    => 'step',
 			),
 		);

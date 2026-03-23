@@ -30,7 +30,10 @@ final class Dashboard_Provider implements Service_Provider_Interface {
 					$container->has( 'crawl_snapshot_service' ) ? $container->get( 'crawl_snapshot_service' ) : null,
 					$container->has( 'ai_run_repository' ) ? $container->get( 'ai_run_repository' ) : null,
 					$container->has( 'build_plan_repository' ) ? $container->get( 'build_plan_repository' ) : null,
-					$container->has( 'job_queue_repository' ) ? $container->get( 'job_queue_repository' ) : null
+					$container->has( 'job_queue_repository' ) ? $container->get( 'job_queue_repository' ) : null,
+					$container->has( 'assignment_map_service' ) ? $container->get( 'assignment_map_service' ) : null,
+					$container->has( 'provider_monthly_spend_service' ) ? $container->get( 'provider_monthly_spend_service' ) : null,
+					$container->has( 'provider_pricing_registry' ) ? $container->get( 'provider_pricing_registry' ) : null
 				);
 			}
 		);

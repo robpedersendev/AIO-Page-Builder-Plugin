@@ -15,11 +15,14 @@
  *
  * @package AIOPageBuilder
  *
- * Single entry point: this file loads only src/Bootstrap/Constants.php and src/Bootstrap/Plugin.
+ * Single entry point: loads Composer PSR-4 autoload (AIOPageBuilder\* → src/), then Constants and Plugin bootstrap.
  * Legacy PrivatePluginBase code is quarantined in plugin/legacy/ and is not loaded (see legacy/README.md).
  */
 
 defined( 'ABSPATH' ) || exit;
+
+// * Autoload registers all classes under src/; deploy must include vendor/ (run `composer install` in this directory).
+require_once __DIR__ . '/vendor/autoload.php';
 
 require_once __DIR__ . '/src/Bootstrap/Constants.php';
 require_once __DIR__ . '/src/Bootstrap/Plugin.php';

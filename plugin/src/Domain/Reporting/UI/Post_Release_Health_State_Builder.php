@@ -256,7 +256,13 @@ final class Post_Release_Health_State_Builder {
 				$rate * 100,
 				$in_period
 			),
-			'link_url'    => \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs' ), $base ),
+			'link_url'    => \add_query_arg(
+				array(
+					'page'    => 'aio-page-builder-ai-workspace',
+					'aio_tab' => 'ai_runs',
+				),
+				$base
+			),
 			'link_label'  => __( 'AI Runs', 'aio-page-builder' ),
 		);
 

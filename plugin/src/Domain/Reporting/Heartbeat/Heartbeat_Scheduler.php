@@ -68,7 +68,7 @@ final class Heartbeat_Scheduler {
 	 * @return void
 	 */
 	public static function run_heartbeat(): void {
-		$service = apply_filters( self::HEARTBEAT_SERVICE_FILTER, null );
+		$service = apply_filters( 'aio_page_builder_heartbeat_service', null );
 		if ( $service instanceof Heartbeat_Service ) {
 			$service->maybe_send();
 			return;

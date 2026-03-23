@@ -269,7 +269,7 @@ final class Existing_Page_Updates_UI_Service {
 		return array(
 			array(
 				'severity' => 'info',
-				'message'  => sprintf( \_n( '%d item pending review.', '%d items pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+				'message'  => sprintf( /* translators: %d: number of items */ \_n( '%d item pending review.', '%d items pending review.', $eligible, 'aio-page-builder' ), $eligible ),
 				'level'    => 'step',
 			),
 		);

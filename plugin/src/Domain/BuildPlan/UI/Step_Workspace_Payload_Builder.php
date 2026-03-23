@@ -257,7 +257,7 @@ final class Step_Workspace_Payload_Builder {
 		} else {
 			$messages[] = array(
 				'severity' => 'info',
-				'message'  => sprintf( \_n( '%d item pending review.', '%d items pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+				'message'  => sprintf( /* translators: %d: number of items */ \_n( '%d item pending review.', '%d items pending review.', $eligible, 'aio-page-builder' ), $eligible ),
 				'level'    => 'step',
 			);
 		}

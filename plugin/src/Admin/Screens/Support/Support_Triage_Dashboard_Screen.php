@@ -45,15 +45,17 @@ final class Support_Triage_Dashboard_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the support triage dashboard.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->build_state();
 		$state = $this->apply_filters( $state );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-support-triage" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-support-triage-description"><?php \esc_html_e( 'Aggregated view of degraded systems and support next steps. Use links to open the relevant screens.', 'aio-page-builder' ); ?></p>
 			<?php $this->render_filter_links( $state ); ?>
 			<?php
@@ -64,7 +66,9 @@ final class Support_Triage_Dashboard_Screen {
 			$this->render_import_export_failures( $state['import_export_failures'] );
 			$this->render_recommended_links( $state['recommended_links'] );
 			?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

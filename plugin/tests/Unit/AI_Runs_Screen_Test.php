@@ -23,6 +23,7 @@ final class AI_Runs_Screen_Test extends TestCase {
 
 	public function test_list_screen_has_correct_slug(): void {
 		$this->assertSame( 'aio-page-builder-ai-runs', AI_Runs_Screen::SLUG );
+		$this->assertSame( 'aio-page-builder-ai-workspace', AI_Runs_Screen::HUB_PAGE_SLUG );
 		$screen = new AI_Runs_Screen();
 		$this->assertNotEmpty( $screen->get_title() );
 	}

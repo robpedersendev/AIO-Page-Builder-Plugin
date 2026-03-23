@@ -216,7 +216,7 @@ final class Step_Item_List_Component {
 		?>
 		<tr class="aio-step-item-row <?php echo $is_detail_active ? 'aio-row-detail-active' : ''; ?>" data-item-id="<?php echo \esc_attr( $item_id ); ?>">
 			<td class="aio-col-select">
-				<input type="checkbox" class="aio-row-select" name="<?php echo \esc_attr( $selection_field_name ); ?>" value="<?php echo \esc_attr( $item_id ); ?>" <?php echo $is_selected ? ' checked="checked"' : ''; ?> aria-label="<?php echo \esc_attr( sprintf( __( 'Select item %s', 'aio-page-builder' ), $item_id ) ); ?>" />
+				<input type="checkbox" class="aio-row-select" name="<?php echo \esc_attr( $selection_field_name ); ?>" value="<?php echo \esc_attr( $item_id ); ?>" <?php echo $is_selected ? ' checked="checked"' : ''; ?> aria-label="<?php echo \esc_attr( sprintf( /* translators: %s: plan item id */ __( 'Select item %s', 'aio-page-builder' ), $item_id ) ); ?>" />
 			</td>
 			<?php foreach ( $columns as $col_key ) : ?>
 				<td class="aio-col-<?php echo \esc_attr( \sanitize_html_class( $col_key ) ); ?>"><?php echo isset( $summary[ $col_key ] ) ? \wp_kses_post( (string) $summary[ $col_key ] ) : '—'; ?></td>

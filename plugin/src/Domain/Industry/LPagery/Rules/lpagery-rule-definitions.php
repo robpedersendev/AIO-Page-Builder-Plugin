@@ -10,15 +10,15 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Industry\LPagery\Industry_LPagery_Rule_Registry;
 
-$v      = Industry_LPagery_Rule_Registry::SUPPORTED_SCHEMA_VERSION;
-$active = Industry_LPagery_Rule_Registry::STATUS_ACTIVE;
+$aio_pb_lpagery_schema_version = Industry_LPagery_Rule_Registry::SUPPORTED_SCHEMA_VERSION;
+$aio_pb_lpagery_status_active  = Industry_LPagery_Rule_Registry::STATUS_ACTIVE;
 
 return array(
 	array(
 		Industry_LPagery_Rule_Registry::FIELD_LPAGERY_RULE_KEY => 'cosmetology_nail_01',
 		Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY => 'cosmetology_nail',
-		Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => $v,
-		Industry_LPagery_Rule_Registry::FIELD_STATUS       => $active,
+		Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => $aio_pb_lpagery_schema_version,
+		Industry_LPagery_Rule_Registry::FIELD_STATUS       => $aio_pb_lpagery_status_active,
 		Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE => Industry_LPagery_Rule_Registry::POSTURE_OPTIONAL,
 		Industry_LPagery_Rule_Registry::FIELD_OPTIONAL_TOKEN_REFS => array( '{{service_name}}', '{{location_name}}', '{{booking_url}}' ),
 		Industry_LPagery_Rule_Registry::FIELD_HIERARCHY_GUIDANCE => 'Hub (services, gallery) then child-detail (service, staff). Local/location pages optional; one strong service-area page preferred over many thin pages.',
@@ -28,8 +28,8 @@ return array(
 	array(
 		Industry_LPagery_Rule_Registry::FIELD_LPAGERY_RULE_KEY => 'realtor_01',
 		Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY => 'realtor',
-		Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => $v,
-		Industry_LPagery_Rule_Registry::FIELD_STATUS       => $active,
+		Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => $aio_pb_lpagery_schema_version,
+		Industry_LPagery_Rule_Registry::FIELD_STATUS       => $aio_pb_lpagery_status_active,
 		Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE => Industry_LPagery_Rule_Registry::POSTURE_CENTRAL,
 		Industry_LPagery_Rule_Registry::FIELD_REQUIRED_TOKEN_REFS => array( '{{location_name}}', '{{service_title}}' ),
 		Industry_LPagery_Rule_Registry::FIELD_OPTIONAL_TOKEN_REFS => array( '{{valuation_url}}', '{{contact_phone}}' ),
@@ -40,8 +40,8 @@ return array(
 	array(
 		Industry_LPagery_Rule_Registry::FIELD_LPAGERY_RULE_KEY => 'plumber_01',
 		Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY => 'plumber',
-		Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => $v,
-		Industry_LPagery_Rule_Registry::FIELD_STATUS       => $active,
+		Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => $aio_pb_lpagery_schema_version,
+		Industry_LPagery_Rule_Registry::FIELD_STATUS       => $aio_pb_lpagery_status_active,
 		Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE => Industry_LPagery_Rule_Registry::POSTURE_CENTRAL,
 		Industry_LPagery_Rule_Registry::FIELD_REQUIRED_TOKEN_REFS => array( '{{location_name}}', '{{service_title}}' ),
 		Industry_LPagery_Rule_Registry::FIELD_OPTIONAL_TOKEN_REFS => array( '{{contact_phone}}', '{{emergency_phone}}', '{{service_area}}' ),
@@ -52,8 +52,8 @@ return array(
 	array(
 		Industry_LPagery_Rule_Registry::FIELD_LPAGERY_RULE_KEY => 'disaster_recovery_01',
 		Industry_LPagery_Rule_Registry::FIELD_INDUSTRY_KEY => 'disaster_recovery',
-		Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => $v,
-		Industry_LPagery_Rule_Registry::FIELD_STATUS       => $active,
+		Industry_LPagery_Rule_Registry::FIELD_VERSION_MARKER => $aio_pb_lpagery_schema_version,
+		Industry_LPagery_Rule_Registry::FIELD_STATUS       => $aio_pb_lpagery_status_active,
 		Industry_LPagery_Rule_Registry::FIELD_LPAGERY_POSTURE => Industry_LPagery_Rule_Registry::POSTURE_CENTRAL,
 		Industry_LPagery_Rule_Registry::FIELD_REQUIRED_TOKEN_REFS => array( '{{location_name}}', '{{service_title}}' ),
 		Industry_LPagery_Rule_Registry::FIELD_OPTIONAL_TOKEN_REFS => array( '{{contact_phone}}', '{{emergency_phone}}', '{{claims_assistance}}' ),

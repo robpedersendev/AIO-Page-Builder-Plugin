@@ -98,10 +98,7 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		}
 		$prepare_args = array_merge( array( $table ), $args );
 		$rows         = Wpdb_Prepared_Results::get_results( $this->wpdb, $sql, $prepare_args );
-		if ( ! is_array( $rows ) ) {
-			return array();
-		}
-		$out = array();
+		$out          = array();
 		foreach ( $rows as $row ) {
 			if ( is_object( $row ) ) {
 				$out[] = $this->row_to_record( $row );
@@ -132,9 +129,6 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 				array( $table )
 			);
 		}
-		if ( ! is_array( $col ) ) {
-			return array();
-		}
 		return array_values( array_filter( array_map( 'strval', $col ) ) );
 	}
 
@@ -154,10 +148,7 @@ final class Crawl_Snapshot_Repository extends Abstract_Table_Repository {
 		}
 		$prepare_args = array_merge( array( $table ), $args );
 		$rows         = Wpdb_Prepared_Results::get_results( $this->wpdb, $sql, $prepare_args );
-		if ( ! is_array( $rows ) ) {
-			return array();
-		}
-		$out = array();
+		$out          = array();
 		foreach ( $rows as $row ) {
 			if ( is_object( $row ) ) {
 				$out[] = $this->row_to_record( $row );

@@ -38,8 +38,7 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 		array $draft,
 		array $prefill
 	): array {
-		$m = new ReflectionMethod( Onboarding_UI_State_Builder::class, 'build_submission_warnings' );
-		$m->setAccessible( true );
+		$m      = new ReflectionMethod( Onboarding_UI_State_Builder::class, 'build_submission_warnings' );
 		$result = $m->invoke( $builder, $draft, $prefill );
 		$this->assertIsArray( $result );
 		return $result;

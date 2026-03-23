@@ -93,7 +93,7 @@ final class Industry_Subtype_Comparison_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the subtype comparison screen.', 'aio-page-builder' ), 403 );
 		}
@@ -103,8 +103,10 @@ final class Industry_Subtype_Comparison_Screen {
 		$parent_label  = $primary !== '' ? \ucfirst( \str_replace( array( '_', '-' ), ' ', $primary ) ) : __( 'Parent industry', 'aio-page-builder' );
 		$subtype_label = isset( $c['subtype_label'] ) && $c['subtype_label'] !== '' ? $c['subtype_label'] : __( 'Subtype', 'aio-page-builder' );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-subtype-comparison" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php \esc_html_e( 'Compare parent-industry vs subtype starter bundles and recommendation highlights. Read-only; no changes are applied.', 'aio-page-builder' ); ?>
 			</p>
@@ -212,7 +214,9 @@ final class Industry_Subtype_Comparison_Screen {
 					<?php endif; ?>
 				</section>
 			</div>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

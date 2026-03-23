@@ -222,14 +222,16 @@ final class Industry_Author_Dashboard_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Industry Author Dashboard.', 'aio-page-builder' ), 403 );
 		}
 		$vm = $this->get_view_model();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-author-dashboard" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php esc_html_e( 'Summary of pack health, completeness, release readiness, and coverage gaps. Internal use only; details are on linked screens.', 'aio-page-builder' ); ?>
 			</p>
@@ -309,7 +311,9 @@ final class Industry_Author_Dashboard_Screen {
 			<p class="description" style="margin-top: 1em;">
 				<?php esc_html_e( 'Dashboard reflects state at time of load. For latest validation, run the pre-release pipeline or open Health Report.', 'aio-page-builder' ); ?>
 			</p>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

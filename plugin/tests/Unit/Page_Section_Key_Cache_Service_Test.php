@@ -90,7 +90,7 @@ final class Page_Section_Key_Cache_Service_Test extends TestCase {
 	public function test_template_definition_saved_hook_invalidates_template_cache(): void {
 		$this->cache->set_for_template( 'pt_test', array( 'st_hero' ) );
 		$this->cache->listen_for_definition_changes();
-		do_action( 'aio_page_template_definition_saved', 'pt_test' );
+		do_action( 'aio_page_builder_page_template_definition_saved', 'pt_test' );
 		$this->assertNull( $this->cache->get_for_template( 'pt_test' ) );
 	}
 

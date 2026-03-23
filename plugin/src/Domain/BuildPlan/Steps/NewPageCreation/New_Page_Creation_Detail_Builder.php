@@ -132,7 +132,7 @@ final class New_Page_Creation_Detail_Builder {
 			return null;
 		}
 		\ob_start();
-		$view_model = $view_model;
+		$aio_pb_view_model = $view_model;
 		require \dirname( __DIR__, 4 ) . '/Admin/Views/build-plan/industry-plan-explanations.php';
 		$content = (string) \ob_get_clean();
 		if ( $content === '' ) {

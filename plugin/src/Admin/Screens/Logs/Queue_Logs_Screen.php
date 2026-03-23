@@ -100,19 +100,19 @@ final class Queue_Logs_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			return;
 		}
 		$tab    = $this->get_current_tab();
 		$state  = $this->build_state();
 		$health = ( new Reporting_Health_Summary_Builder() )->build();
-		$this->render_header( $tab );
+		$this->render_header( $embed_in_hub );
 		$this->render_reporting_health( $health );
 		$this->render_queue_health( $state['queue_health'] ?? array() );
 		$this->render_log_export_section( $state );
 		$this->render_tab_nav( $tab );
-		$this->render_tab_content( $tab, $state, $health );
+		$this->render_tab_content( $tab, $state, $health, $embed_in_hub );
 	}
 
 	private function get_current_tab(): string {
@@ -144,7 +144,10 @@ final class Queue_Logs_Screen {
 		return $builder->build();
 	}
 
-	private function render_header( string $tab ): void {
+	private function render_header( bool $embed_in_hub = false ): void {
+		if ( $embed_in_hub ) {
+			return;
+		}
 		?>
 		<div class="wrap aio-page-builder-screen aio-queue-logs" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
@@ -287,7 +290,7 @@ final class Queue_Logs_Screen {
 	 * @param array<string, mixed> $state Full state from Logs_Monitoring_State_Builder.
 	 * @param array<string, mixed> $health Health/readiness state (unused in this version).
 	 */
-	private function render_tab_content( string $tab, array $state, array $health ): void {
+	private function render_tab_content( string $tab, array $state, array $health, bool $embed_in_hub = false ): void {
 		switch ( $tab ) {
 			case self::TAB_QUEUE:
 				$this->render_queue_tab(
@@ -319,9 +322,9 @@ final class Queue_Logs_Screen {
 					\current_user_can( Capabilities::MANAGE_QUEUE_RECOVERY )
 				);
 		}
-		?>
-		</div>
-		<?php
+		if ( ! $embed_in_hub ) {
+			echo '</div>';
+		}
 	}
 
 	/**

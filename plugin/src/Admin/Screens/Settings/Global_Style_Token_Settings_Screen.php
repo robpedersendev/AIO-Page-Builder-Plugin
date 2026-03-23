@@ -50,7 +50,7 @@ final class Global_Style_Token_Settings_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage global style settings.', 'aio-page-builder' ), 403 );
 		}
@@ -59,7 +59,11 @@ final class Global_Style_Token_Settings_Screen {
 		$form_builder = $this->get_form_builder();
 
 		if ( $repo === null || $form_builder === null ) {
-			echo '<div class="wrap"><p>' . \esc_html__( 'Global style settings are unavailable.', 'aio-page-builder' ) . '</p></div>';
+			if ( $embed_in_hub ) {
+				echo '<p>' . \esc_html__( 'Global style settings are unavailable.', 'aio-page-builder' ) . '</p>';
+			} else {
+				echo '<div class="wrap"><p>' . \esc_html__( 'Global style settings are unavailable.', 'aio-page-builder' ) . '</p></div>';
+			}
 			return;
 		}
 
@@ -91,8 +95,10 @@ final class Global_Style_Token_Settings_Screen {
 		$message  = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
 		$by_group = $form_builder->get_fields_by_group();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-global-style-tokens" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 
 			<?php if ( $message === 'success' ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Settings saved.', 'aio-page-builder' ); ?></p></div>
@@ -148,7 +154,9 @@ final class Global_Style_Token_Settings_Screen {
 				<?php \wp_nonce_field( self::NONCE_RESET, self::NONCE_RESET ); ?>
 				<button type="submit" class="button" onclick="return confirm('<?php echo \esc_js( __( 'Reset all global token values to defaults?', 'aio-page-builder' ) ); ?>');"><?php \esc_html_e( 'Reset to defaults', 'aio-page-builder' ); ?></button>
 			</form>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

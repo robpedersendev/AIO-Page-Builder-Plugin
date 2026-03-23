@@ -57,7 +57,7 @@ final class Support_Triage_Test extends TestCase {
 					'domain'     => 'ai_runs',
 					'identifier' => 'run-abc-123',
 					'summary'    => 'failed — 2025-03-12 10:00:00',
-					'link_url'   => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-ai-runs&run_id=run-abc-123',
+					'link_url'   => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-ai-workspace&aio_tab=ai_runs&run_id=run-abc-123',
 					'link_label' => 'View AI run',
 				),
 			),

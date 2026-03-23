@@ -165,18 +165,18 @@ final class Large_Composition_Validator {
 			if ( $cta_count < $min_cta ) {
 				$cta_rule_violations[] = array(
 					'code'    => 'cta_count_below_minimum',
-					'message' => sprintf( __( 'Composition has %1$d CTA section(s); minimum for class %2$s is %3$d.', 'aio-page-builder' ), $cta_count, $template_class, $min_cta ),
+					'message' => sprintf( /* translators: 1: CTA count, 2: template class, 3: minimum CTA */ __( 'Composition has %1$d CTA section(s); minimum for class %2$s is %3$d.', 'aio-page-builder' ), $cta_count, $template_class, $min_cta ),
 				);
 				$blockers[]            = array(
 					'code'    => 'cta_count_below_minimum',
-					'message' => sprintf( __( 'Minimum %d CTA sections required for this class.', 'aio-page-builder' ), $min_cta ),
+					'message' => sprintf( /* translators: %d: minimum CTA sections */ __( 'Minimum %d CTA sections required for this class.', 'aio-page-builder' ), $min_cta ),
 				);
 			}
 			$non_cta_count = count( $cta_flags ) - $cta_count;
 			if ( $non_cta_count < self::NON_CTA_MIN ) {
 				$cta_rule_violations[] = array(
 					'code'    => 'non_cta_count_below_minimum',
-					'message' => sprintf( __( 'Composition has %1$d non-CTA section(s); minimum is %2$d.', 'aio-page-builder' ), $non_cta_count, self::NON_CTA_MIN ),
+					'message' => sprintf( /* translators: 1: non-CTA section count, 2: minimum required */ __( 'Composition has %1$d non-CTA section(s); minimum is %2$d.', 'aio-page-builder' ), $non_cta_count, self::NON_CTA_MIN ),
 				);
 				$blockers[]            = array(
 					'code'    => 'non_cta_count_below_minimum',
@@ -186,7 +186,7 @@ final class Large_Composition_Validator {
 			if ( $non_cta_count > self::NON_CTA_MAX ) {
 				$warnings[] = array(
 					'code'    => 'non_cta_count_above_max',
-					'message' => sprintf( __( 'Composition has %1$d non-CTA sections (max recommended %2$d).', 'aio-page-builder' ), $non_cta_count, self::NON_CTA_MAX ),
+					'message' => sprintf( /* translators: 1: non-CTA count, 2: recommended maximum */ __( 'Composition has %1$d non-CTA sections (max recommended %2$d).', 'aio-page-builder' ), $non_cta_count, self::NON_CTA_MAX ),
 				);
 			}
 		}
@@ -202,7 +202,7 @@ final class Large_Composition_Validator {
 				if ( ! $has_preview ) {
 					$preview_readiness_warnings[] = array(
 						'code'    => 'section_missing_preview',
-						'message' => sprintf( __( 'Section %s has no preview data.', 'aio-page-builder' ), $key ),
+						'message' => sprintf( /* translators: %s: section key */ __( 'Section %s has no preview data.', 'aio-page-builder' ), $key ),
 					);
 				}
 			}

@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Domain\AI\Pricing\Provider_Pricing_Registry;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -21,6 +22,9 @@ use AIOPageBuilder\Infrastructure\Container\Service_Container;
 final class AI_Runs_Screen {
 
 	public const SLUG = 'aio-page-builder-ai-runs';
+
+	/** Admin hub page slug (tabs: AI Runs, Providers, Experiments). */
+	public const HUB_PAGE_SLUG = 'aio-page-builder-ai-workspace';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -40,22 +44,23 @@ final class AI_Runs_Screen {
 	/**
 	 * Renders list of runs or run detail when run_id is present.
 	 *
+	 * @param bool $embed_in_hub When true, outer wrap and list h1 are omitted.
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( Capabilities::VIEW_AI_RUNS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view AI runs.', 'aio-page-builder' ) );
 		}
 		$run_id = isset( $_GET['run_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['run_id'] ) ) : '';
 		if ( $run_id !== '' ) {
 			$detail = new AI_Run_Detail_Screen( $this->container );
-			$detail->render( $run_id );
+			$detail->render( $run_id, $embed_in_hub );
 			return;
 		}
-		$this->render_list();
+		$this->render_list( $embed_in_hub );
 	}
 
-	private function render_list(): void {
+	private function render_list( bool $embed_in_hub = false ): void {
 		$runs            = array();
 		$spend_summaries = array();
 		if ( $this->container && $this->container->has( 'ai_run_repository' ) ) {
@@ -78,8 +83,10 @@ final class AI_Runs_Screen {
 			}
 		}
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-ai-runs" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-ai-runs-description"><?php \esc_html_e( 'Review AI runs and their artifact summaries. Raw prompts and provider responses are restricted.', 'aio-page-builder' ); ?></p>
 			<?php if ( ! empty( $spend_summaries ) ) : ?>
 			<section class="aio-spend-summary" aria-labelledby="aio-spend-summary-heading">
@@ -174,14 +181,16 @@ final class AI_Runs_Screen {
 								<td><?php echo \esc_html( (string) ( $meta['prompt_pack_ref'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['created_at'] ?? '' ) ); ?></td>
 								<td>
-									<a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG . '&run_id=' . \rawurlencode( $run_id ) ) ); ?>"><?php \esc_html_e( 'View details', 'aio-page-builder' ); ?></a>
+									<a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( self::HUB_PAGE_SLUG, 'ai_runs', array( 'run_id' => $run_id ) ) ); ?>"><?php \esc_html_e( 'View details', 'aio-page-builder' ); ?></a>
 								</td>
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
 				</table>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

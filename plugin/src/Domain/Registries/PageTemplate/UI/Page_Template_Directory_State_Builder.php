@@ -147,7 +147,7 @@ final class Page_Template_Directory_State_Builder {
 
 		if ( $search !== '' ) {
 			$segments[] = array(
-				'label' => sprintf( __( 'Search: %s', 'aio-page-builder' ), \esc_html( $search ) ),
+				'label' => sprintf( /* translators: %s: search query */ __( 'Search: %s', 'aio-page-builder' ), \esc_html( $search ) ),
 				'url'   => '',
 			);
 			return $segments;

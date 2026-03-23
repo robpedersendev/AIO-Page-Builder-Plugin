@@ -57,33 +57,26 @@ final class Constants {
 		$root              = dirname( __DIR__, 2 );
 		self::$plugin_dir  = \trailingslashit( $root );
 		self::$plugin_file = self::$plugin_dir . self::MAIN_FILE;
-		$dir_const         = 'AIO_PAGE_BUILDER_DIR';
-		$file_const        = 'AIO_PAGE_BUILDER_FILE';
-		$url_const         = 'AIO_PAGE_BUILDER_URL';
-		$ver_const         = 'AIO_PAGE_BUILDER_VERSION';
-		$base_const        = 'AIO_PAGE_BUILDER_BASENAME';
-		$min_wp            = 'AIO_PAGE_BUILDER_MIN_WP_VERSION';
-		$min_php           = 'AIO_PAGE_BUILDER_MIN_PHP_VERSION';
-		if ( ! defined( $dir_const ) ) {
-			define( $dir_const, self::$plugin_dir );
+		if ( ! \defined( 'AIO_PAGE_BUILDER_DIR' ) ) {
+			\define( 'AIO_PAGE_BUILDER_DIR', self::$plugin_dir );
 		}
-		if ( ! defined( $file_const ) ) {
-			define( $file_const, self::$plugin_file );
+		if ( ! \defined( 'AIO_PAGE_BUILDER_FILE' ) ) {
+			\define( 'AIO_PAGE_BUILDER_FILE', self::$plugin_file );
 		}
-		if ( ! defined( $url_const ) && function_exists( 'plugin_dir_url' ) ) {
-			define( $url_const, plugin_dir_url( self::$plugin_file ) );
+		if ( ! \defined( 'AIO_PAGE_BUILDER_URL' ) && \function_exists( 'plugin_dir_url' ) ) {
+			\define( 'AIO_PAGE_BUILDER_URL', \plugin_dir_url( self::$plugin_file ) );
 		}
-		if ( ! defined( $ver_const ) ) {
-			define( $ver_const, self::PLUGIN_VERSION );
+		if ( ! \defined( 'AIO_PAGE_BUILDER_VERSION' ) ) {
+			\define( 'AIO_PAGE_BUILDER_VERSION', self::PLUGIN_VERSION );
 		}
-		if ( ! defined( $base_const ) && function_exists( 'plugin_basename' ) ) {
-			define( $base_const, plugin_basename( self::$plugin_file ) );
+		if ( ! \defined( 'AIO_PAGE_BUILDER_BASENAME' ) && \function_exists( 'plugin_basename' ) ) {
+			\define( 'AIO_PAGE_BUILDER_BASENAME', \plugin_basename( self::$plugin_file ) );
 		}
-		if ( ! defined( $min_wp ) ) {
-			define( $min_wp, self::MIN_WP_VERSION );
+		if ( ! \defined( 'AIO_PAGE_BUILDER_MIN_WP_VERSION' ) ) {
+			\define( 'AIO_PAGE_BUILDER_MIN_WP_VERSION', self::MIN_WP_VERSION );
 		}
-		if ( ! defined( $min_php ) ) {
-			define( $min_php, self::MIN_PHP_VERSION );
+		if ( ! \defined( 'AIO_PAGE_BUILDER_MIN_PHP_VERSION' ) ) {
+			\define( 'AIO_PAGE_BUILDER_MIN_PHP_VERSION', self::MIN_PHP_VERSION );
 		}
 	}
 

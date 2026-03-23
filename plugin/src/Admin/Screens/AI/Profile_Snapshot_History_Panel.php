@@ -25,6 +25,7 @@ use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
 
 /**
  * Renders profile snapshot history list and restore actions.
@@ -134,18 +135,17 @@ final class Profile_Snapshot_History_Panel {
 		$post_restore = $factory->build( $store, 'restore_event', 'other', $snapshot_id );
 		$repo->save( $post_restore );
 
-		\error_log(
-			'[AIO Page Builder] ' . \wp_json_encode(
-				array(
-					'event'            => 'profile_snapshot_restore',
-					'actor_id'         => (string) \get_current_user_id(),
-					'source_snapshot'  => $snapshot_id,
-					'pre_backup_id'    => $pre_restore->snapshot_id,
-					'post_snapshot_id' => $post_restore->snapshot_id,
-					'restored_at'      => \gmdate( 'c' ),
-				)
+		$payload = \wp_json_encode(
+			array(
+				'event'            => 'profile_snapshot_restore',
+				'actor_id'         => (string) \get_current_user_id(),
+				'source_snapshot'  => $snapshot_id,
+				'pre_backup_id'    => $pre_restore->snapshot_id,
+				'post_snapshot_id' => $post_restore->snapshot_id,
+				'restored_at'      => \gmdate( 'c' ),
 			)
-		); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		);
+		Internal_Debug_Log::line( false !== $payload ? $payload : 'json_encode_failed' );
 
 		\wp_safe_redirect( \add_query_arg( 'restore_success', '1', $redirect ) );
 		exit;
@@ -160,7 +160,7 @@ final class Profile_Snapshot_History_Panel {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ) );
 		}
@@ -169,14 +169,18 @@ final class Profile_Snapshot_History_Panel {
 		$current_store = $this->get_profile_store();
 		$diff_service  = $this->get_diff_service();
 
-		echo '<div class="wrap">';
-		printf( '<h1>%s</h1>', \esc_html( $this->get_title() ) );
+		if ( ! $embed_in_hub ) {
+			echo '<div class="wrap">';
+			printf( '<h1>%s</h1>', \esc_html( $this->get_title() ) );
+		}
 
 		$this->render_admin_notices();
 
 		if ( empty( $snapshots ) ) {
 			echo '<p>' . \esc_html__( 'No profile snapshots have been captured yet. Snapshots are created automatically when your brand or business profile is saved or when an AI planning run completes.', 'aio-page-builder' ) . '</p>';
-			echo '</div>';
+			if ( ! $embed_in_hub ) {
+				echo '</div>';
+			}
 			return;
 		}
 
@@ -214,7 +218,9 @@ final class Profile_Snapshot_History_Panel {
 		}
 
 		echo '</tbody></table>';
-		echo '</div>';
+		if ( ! $embed_in_hub ) {
+			echo '</div>';
+		}
 	}
 
 	// -------------------------------------------------------------------------

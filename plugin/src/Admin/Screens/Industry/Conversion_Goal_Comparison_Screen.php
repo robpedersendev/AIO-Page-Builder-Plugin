@@ -164,15 +164,17 @@ final class Conversion_Goal_Comparison_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the conversion goal comparison screen.', 'aio-page-builder' ), 403 );
 		}
 		$state     = $this->get_state();
 		$scenarios = $state['scenarios'];
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-conversion-goal-comparison" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php esc_html_e( 'Compare no-goal, current goal, and optional alternate-goal bundle and Build Plan posture. Read-only; no changes are applied. Set or change your conversion goal in Industry Profile.', 'aio-page-builder' ); ?>
 			</p>
@@ -299,7 +301,9 @@ final class Conversion_Goal_Comparison_Screen {
 				<a href="<?php echo esc_url( $state['profile_url'] ); ?>"><?php esc_html_e( 'Industry Profile', 'aio-page-builder' ); ?></a>
 				<?php esc_html_e( '— set or change your conversion goal there. This screen does not apply changes.', 'aio-page-builder' ); ?>
 			</p>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

@@ -134,7 +134,7 @@ final class Industry_Style_Layer_Comparison_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the style layer comparison screen.', 'aio-page-builder' ), 403 );
 		}
@@ -148,8 +148,10 @@ final class Industry_Style_Layer_Comparison_Screen {
 		$token_rows       = $diff[ Industry_Style_Layer_Diff_Service::RESULT_TOKEN_DIFF_ROWS ];
 		$component_rows   = $diff[ Industry_Style_Layer_Diff_Service::RESULT_COMPONENT_DIFF_ROWS ];
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-style-layer-comparison" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php esc_html_e( 'Compare parent (industry) preset, goal overlay, and combined style outcome. Read-only; no style changes are applied from this screen.', 'aio-page-builder' ); ?>
 			</p>
@@ -249,7 +251,9 @@ final class Industry_Style_Layer_Comparison_Screen {
 					</p>
 				<?php endif; ?>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

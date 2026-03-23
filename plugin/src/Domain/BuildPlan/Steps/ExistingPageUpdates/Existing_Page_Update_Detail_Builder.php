@@ -92,7 +92,7 @@ final class Existing_Page_Update_Detail_Builder {
 			return null;
 		}
 		\ob_start();
-		$view_model = $view_model;
+		$aio_pb_view_model = $view_model;
 		require \dirname( __DIR__, 4 ) . '/Admin/Views/build-plan/industry-plan-explanations.php';
 		$content = (string) \ob_get_clean();
 		if ( $content === '' ) {
@@ -228,7 +228,7 @@ final class Existing_Page_Update_Detail_Builder {
 			}
 			$section_count = (int) ( $template_summary['section_count'] ?? 0 );
 			if ( $section_count > 0 ) {
-				$lines[] = \sprintf( \__( 'Sections: %d', 'aio-page-builder' ), $section_count );
+				$lines[] = \sprintf( /* translators: %d: section count */ \__( 'Sections: %d', 'aio-page-builder' ), $section_count );
 			}
 		}
 		$reason_short = (string) ( $reason_summary['reason_short'] ?? '' );

@@ -47,10 +47,10 @@ Troubleshooting
 Gate scope (excludes)
 ---------------------
 Runners pass:
-  --exclude-directories=tests,legacy
-  --exclude-files=phpstan-bootstrap.php,phpstan-wordpress-overrides.stub.php
+  --exclude-directories=tests,legacy,phpstan-fixtures,docs
+  --exclude-files=phpstan-bootstrap.php,phpstan-wordpress-overrides.stub.php,phpcs.xml.dist,phpstan.neon.dist,phpunit.xml.dist,.wp-env.json,.phpunit.result.cache
 
-Rationale: PHPUnit harness, quarantined legacy tree, and PHPStan bootstrap files are not part of the shipped runtime plugin surface. Findings there are triage noise for release quality. Anything under src/ remains in scope unless the Architect documents a separate waiver (e.g. generated registry docs batches).
+Rationale: PHPUnit harness, quarantined legacy tree, PHPStan/bootstrap/config files, and docs are not part of the shipped runtime plugin surface. Anything under src/ remains in scope unless the Architect documents a separate waiver.
 
 CI (GitHub Actions)
 -------------------

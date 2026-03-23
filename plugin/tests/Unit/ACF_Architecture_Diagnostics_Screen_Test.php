@@ -56,8 +56,7 @@ final class ACF_Architecture_Diagnostics_Screen_Test extends TestCase {
 		$screen = new ACF_Architecture_Diagnostics_Screen( null );
 		$ref    = new \ReflectionClass( $screen );
 		$method = $ref->getMethod( 'build_state' );
-		$method->setAccessible( true );
-		$state = $method->invoke( $screen );
+		$state  = $method->invoke( $screen );
 		$this->assertArrayHasKey( 'acf_diagnostics_summary', $state );
 		$this->assertArrayHasKey( 'field_architecture_health_card', $state );
 		$this->assertArrayHasKey( 'assignment_mismatch_groups', $state );

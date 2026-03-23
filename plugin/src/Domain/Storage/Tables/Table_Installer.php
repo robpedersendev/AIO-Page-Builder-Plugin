@@ -74,7 +74,7 @@ final class Table_Installer {
 	 * @return bool
 	 */
 	public function table_exists( string $suffix ): bool {
-		$full = Table_Names::full_name( $this->wpdb, $suffix );
+		$full   = Table_Names::full_name( $this->wpdb, $suffix );
 		$result = Wpdb_Prepared_Results::get_var( $this->wpdb, 'SHOW TABLES LIKE %s', array( $full ) );
 		return $result === $full;
 	}

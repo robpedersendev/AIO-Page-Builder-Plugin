@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections = array(
+$aio_pb_sections = array(
 	'hero_legal_01'            => 'Legal hero. See doc-helper-hero_legal_01.',
 	'lpu_privacy_highlight_01' => 'Privacy highlight. See doc-helper-lpu_privacy_highlight_01.',
 	'lpu_legal_summary_01'     => 'Legal summary. See doc-helper-lpu_legal_summary_01.',
@@ -21,16 +21,16 @@ $sections = array(
 	'lpu_footer_legal_01'      => 'Footer legal. See doc-helper-lpu_footer_legal_01.',
 	'cta_policy_utility_02'    => 'Policy CTA. See doc-helper-cta_policy_utility_02.',
 );
-$li       = '';
-foreach ( $sections as $k => $v ) {
-	$li .= '<li><strong>' . $k . '</strong>: ' . $v . '</li>';
+$aio_pb_li       = '';
+foreach ( $aio_pb_sections as $aio_pb_k => $aio_pb_v ) {
+	$aio_pb_li .= '<li><strong>' . $aio_pb_k . '</strong>: ' . $aio_pb_v . '</li>';
 }
-$purpose = 'Privacy page overview. Hero and privacy highlight; legal summary and policy CTA; policy body and explainer; reassurance and contact CTA; consent and trust disclosure; footer legal; close with policy CTA.';
-$flow    = 'Policy-safe semantics. Semantic headings and landmarks; softer CTA direction appropriate for utility pages.';
+$aio_pb_purpose = 'Privacy page overview. Hero and privacy highlight; legal summary and policy CTA; policy body and explainer; reassurance and contact CTA; consent and trust disclosure; footer legal; close with policy CTA.';
+$aio_pb_flow    = 'Policy-safe semantics. Semantic headings and landmarks; softer CTA direction appropriate for utility pages.';
 return array(
 	'documentation_id'          => 'doc-onepager-pt_privacy_overview_01',
 	'documentation_type'        => 'page_template_one_pager',
-	'content_body'              => '<h3>Page purpose</h3><p>' . $purpose . '</p><h3>Page flow</h3><p>' . $flow . '</p><h3>Section-by-section (ordered)</h3><ol>' . $li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO:</strong> Container and spacing; map fields per section helper; set meta for privacy. <strong>Hierarchy/navigation:</strong> Legal/privacy is top-level; do not conflate with marketing flows. <strong>Mistakes to avoid:</strong> Do not provide legal advice; do not stack adjacent CTAs. <strong>Accessibility:</strong> One H1; logical heading order; landmarks and contrast.</p>',
+	'content_body'              => '<h3>Page purpose</h3><p>' . $aio_pb_purpose . '</p><h3>Page flow</h3><p>' . $aio_pb_flow . '</p><h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO:</strong> Container and spacing; map fields per section helper; set meta for privacy. <strong>Hierarchy/navigation:</strong> Legal/privacy is top-level; do not conflate with marketing flows. <strong>Mistakes to avoid:</strong> Do not provide legal advice; do not stack adjacent CTAs. <strong>Accessibility:</strong> One H1; logical heading order; landmarks and contrast.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'pt_privacy_overview_01' ),
 	'generated_or_human_edited' => 'human_edited',

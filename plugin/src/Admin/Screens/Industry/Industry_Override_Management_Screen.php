@@ -48,7 +48,7 @@ final class Industry_Override_Management_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access industry override management.', 'aio-page-builder' ), 403 );
 		}
@@ -60,8 +60,10 @@ final class Industry_Override_Management_Screen {
 		$base_url = \admin_url( 'admin.php?page=' . self::SLUG );
 		$message  = $this->get_result_message();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-override-management" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1 class="wp-heading-inline"><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-override-management-description">
 				<?php \esc_html_e( 'View and manage industry recommendation overrides for sections, page templates, and Build Plan items. Remove clears the override so the default recommendation applies again.', 'aio-page-builder' ); ?>
 			</p>
@@ -78,7 +80,7 @@ final class Industry_Override_Management_Screen {
 			if ( ! empty( $conflicts ) ) :
 				?>
 				<div class="notice notice-warning aio-override-conflicts-notice" role="region" aria-label="<?php \esc_attr_e( 'Override conflict suggestions', 'aio-page-builder' ); ?>">
-					<p><strong><?php \esc_html_e( 'Suggested review:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( sprintf( _n( '%d override may be stale or point to a missing plan/item.', '%d overrides may be stale or point to missing plans/items.', count( $conflicts ), 'aio-page-builder' ), count( $conflicts ) ) ); ?></p>
+					<p><strong><?php \esc_html_e( 'Suggested review:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( sprintf( /* translators: %d: number of overrides needing review */ _n( '%d override may be stale or point to a missing plan/item.', '%d overrides may be stale or point to missing plans/items.', count( $conflicts ), 'aio-page-builder' ), count( $conflicts ) ) ); ?></p>
 					<ul class="aio-override-conflict-list" style="margin-left: 1.5em;">
 						<?php foreach ( array_slice( $conflicts, 0, 10 ) as $c ) : ?>
 							<li><?php echo \esc_html( (string) ( $c['override_ref'] ?? '' ) ); ?> — <?php echo \esc_html( (string) ( $c['suggested_review_action'] ?? '' ) ); ?></li>
@@ -142,7 +144,9 @@ final class Industry_Override_Management_Screen {
 					</tbody>
 				</table>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

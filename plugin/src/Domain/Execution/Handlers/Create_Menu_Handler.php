@@ -101,8 +101,8 @@ final class Create_Menu_Handler implements Execution_Handler_Interface {
 
 		return array(
 			'success'   => true,
-			/* translators: 1: menu name 2: menu term ID */
 			'message'   => \sprintf(
+				/* translators: 1: menu name, 2: menu term ID */
 				\__( 'Menu "%1$s" created (term ID %2$d).', 'aio-page-builder' ),
 				$menu_name,
 				$menu_id

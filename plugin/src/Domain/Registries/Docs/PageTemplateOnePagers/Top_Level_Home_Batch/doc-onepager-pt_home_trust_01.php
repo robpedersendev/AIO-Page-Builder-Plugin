@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections     = array(
+$aio_pb_sections     = array(
 	'hero_cred_01'              => 'Credibility hero. See doc-helper-hero_cred_01. Trust-first opener.',
 	'tp_trust_band_01'          => 'Trust band. See doc-helper-tp_trust_band_01. Reinforce credibility.',
 	'fb_why_choose_01'          => 'Why choose. See doc-helper-fb_why_choose_01. Differentiators.',
@@ -21,9 +21,9 @@ $sections     = array(
 	'ptf_expectations_01'       => 'Expectations. See doc-helper-ptf_expectations_01. Set scope.',
 	'cta_support_02'            => 'Support CTA. See doc-helper-cta_support_02. Final CTA for help.',
 );
-$section_list = '';
-foreach ( $sections as $key => $guidance ) {
-	$section_list .= '<li><strong>' . $key . '</strong>: ' . $guidance . '</li>';
+$aio_pb_section_list = '';
+foreach ( $aio_pb_sections as $aio_pb_key => $aio_pb_guidance ) {
+	$aio_pb_section_list .= '<li><strong>' . $aio_pb_key . '</strong>: ' . $aio_pb_guidance . '</li>';
 }
 
 return array(
@@ -32,7 +32,7 @@ return array(
 	'content_body'              => '<h3>Page purpose</h3><p>Home page trust-led. Lead with credibility and trust band; why choose and booking CTA; FAQ and cards; testimonial and inquiry CTA; support and differentiator; expectations; close with support CTA.</p>'
 		. '<h3>Page flow</h3><p>Trust-first opener; why choose and booking CTA; FAQ and cards reduce friction; testimonial and inquiry CTA; support and differentiator; expectations set scope; final CTA for help.</p>'
 		. '<h3>CTA direction</h3><p>Primary path: hero → booking CTA → inquiry CTA → support CTA. One primary action per CTA; avoid duplicate or competing CTAs.</p>'
-		. '<h3>Section-by-section (ordered)</h3><ol>' . $section_list . '</ol>'
+		. '<h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_section_list . '</ol>'
 		. '<h3>Page-wide notes</h3><p><strong>GeneratePress:</strong> Use for container and spacing; keep section order as defined. <strong>ACF:</strong> Map fields per section helper. <strong>AIOSEO:</strong> Set focus keyphrase and meta for home. <strong>FIFU:</strong> Use for hero and section images where applicable. <strong>Navigation/hierarchy:</strong> Home is top-level. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; do not repeat the same CTA copy; ensure last section is the final CTA. <strong>Accessibility:</strong> One H1 per page; logical heading order; sufficient contrast and focus order for all CTAs.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'pt_home_trust_01' ),

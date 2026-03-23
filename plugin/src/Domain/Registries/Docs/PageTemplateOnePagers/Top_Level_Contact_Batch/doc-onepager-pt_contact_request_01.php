@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections     = array(
+$aio_pb_sections     = array(
 	'hero_conv_02'              => 'Conversion hero. See doc-helper-hero_conv_02. Lead with request intent.',
 	'lpu_contact_panel_01'      => 'Contact panel. See doc-helper-lpu_contact_panel_01. Channels and contact methods.',
 	'lpu_contact_detail_01'     => 'Contact detail. See doc-helper-lpu_contact_detail_01. Address, phone, email.',
@@ -20,9 +20,9 @@ $sections     = array(
 	'lpu_support_escalation_01' => 'Support escalation. See doc-helper-lpu_support_escalation_01. Support and next steps.',
 	'cta_support_02'            => 'Support CTA. See doc-helper-cta_support_02. Final CTA.',
 );
-$section_list = '';
-foreach ( $sections as $key => $guidance ) {
-	$section_list .= '<li><strong>' . $key . '</strong>: ' . $guidance . '</li>';
+$aio_pb_section_list = '';
+foreach ( $aio_pb_sections as $aio_pb_key => $aio_pb_guidance ) {
+	$aio_pb_section_list .= '<li><strong>' . $aio_pb_key . '</strong>: ' . $aio_pb_guidance . '</li>';
 }
 
 return array(
@@ -31,7 +31,7 @@ return array(
 	'content_body'              => '<h3>Page purpose</h3><p>Contact page request-focused. Hero and contact panel/detail; contact CTA; form intro and inquiry support; reassurance and quote CTA; value prop and support band; support CTA.</p>'
 		. '<h3>Page flow</h3><p>Hero and contact info; contact CTA; form and inquiry; reassurance and quote CTA; value and support; final CTA.</p>'
 		. '<h3>CTA direction</h3><p>Primary path: contact CTA → quote request CTA → support CTA. One primary action per CTA block; present contact methods and reassurance before each conversion point. Do not make implementation promises about form processing or data handling.</p>'
-		. '<h3>Section-by-section (ordered)</h3><ol>' . $section_list . '</ol>'
+		. '<h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_section_list . '</ol>'
 		. '<h3>Page-wide notes</h3><p><strong>GeneratePress:</strong> Use for container and spacing; keep section order as defined. <strong>ACF:</strong> Map fields per section helper. <strong>AIOSEO:</strong> Set focus keyphrase and meta for contact. <strong>FIFU:</strong> Use for hero/section images where applicable. <strong>Navigation/hierarchy:</strong> Contact is top-level. <strong>Contact-method notes:</strong> Present channels and detail clearly; avoid vague "Get in touch" without clear next step. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; do not repeat the same CTA copy; ensure last section is the final CTA. <strong>Accessibility:</strong> One H1 per page; logical heading order; sufficient contrast and focus order for all CTAs and contact links.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'pt_contact_request_01' ),

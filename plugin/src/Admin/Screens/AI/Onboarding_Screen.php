@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
@@ -58,7 +59,7 @@ final class Onboarding_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access this page.', 'aio-page-builder' ) );
 		}
@@ -70,7 +71,7 @@ final class Onboarding_Screen {
 		}
 
 		$state = $this->get_ui_state();
-		$this->render_shell( $state );
+		$this->render_shell( $state, $embed_in_hub );
 	}
 
 	/**
@@ -343,9 +344,10 @@ final class Onboarding_Screen {
 
 	/**
 	 * @param array<string, mixed> $state Onboarding state (steps, blockers, nonce, etc.).
+	 * @param bool                 $embed_in_hub When true, outer wrap and h1 are omitted (hub provides chrome).
 	 * @return void
 	 */
-	private function render_shell( array $state ): void {
+	private function render_shell( array $state, bool $embed_in_hub = false ): void {
 		$current_step_key        = $state['current_step_key'] ?? Onboarding_Step_Keys::WELCOME;
 		$steps                   = $state['steps'] ?? array();
 		$is_blocked              = ! empty( $state['is_blocked'] );
@@ -367,8 +369,10 @@ final class Onboarding_Screen {
 			}
 		}
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-onboarding" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 
 			<?php if ( $saved ) : ?>
 				<div class="notice notice-success is-dismissible" role="status">
@@ -444,7 +448,9 @@ final class Onboarding_Screen {
 					<?php endif; ?>
 				</p>
 			</form>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -486,12 +492,10 @@ final class Onboarding_Screen {
 				$last_run_id      = $state['last_planning_run_id'] ?? null;
 				$last_run_post_id = $state['last_planning_run_post_id'] ?? null;
 				if ( $last_run_id !== null && $last_run_post_id !== null && (int) $last_run_post_id > 0 ) :
-					$run_url = \add_query_arg(
-						array(
-							'page'   => 'aio-page-builder-ai-runs',
-							'run_id' => $last_run_id,
-						),
-						\admin_url( 'admin.php' )
+					$run_url = Admin_Screen_Hub::tab_url(
+						AI_Runs_Screen::HUB_PAGE_SLUG,
+						'ai_runs',
+						array( 'run_id' => (string) $last_run_id )
 					);
 					?>
 					<p><?php \esc_html_e( 'Last run:', 'aio-page-builder' ); ?> <a href="<?php echo \esc_url( $run_url ); ?>"><?php echo \esc_html( $last_run_id ); ?></a></p>
@@ -1028,7 +1032,7 @@ final class Onboarding_Screen {
 				?>
 			</p>
 			<?php if ( is_array( $crawl_run_ids ) && count( $crawl_run_ids ) > 1 ) : ?>
-				<p class="description"><?php echo \esc_html( sprintf( __( '%d crawl runs available.', 'aio-page-builder' ), count( $crawl_run_ids ) ) ); ?></p>
+				<p class="description"><?php echo \esc_html( sprintf( /* translators: %d: number of stored crawl runs */ __( '%d crawl runs available.', 'aio-page-builder' ), count( $crawl_run_ids ) ) ); ?></p>
 			<?php endif; ?>
 		<?php else : ?>
 			<p><?php \esc_html_e( 'No crawl runs recorded yet.', 'aio-page-builder' ); ?></p>

@@ -236,13 +236,13 @@ final class Execution_Queue_Service {
 	private function bulk_message( int $completed, int $failed, int $refused ): string {
 		$parts = array();
 		if ( $completed > 0 ) {
-			$parts[] = sprintf( __( '%d completed.', 'aio-page-builder' ), $completed );
+			$parts[] = sprintf( /* translators: %d: completed job count */ __( '%d completed.', 'aio-page-builder' ), $completed );
 		}
 		if ( $failed > 0 ) {
-			$parts[] = sprintf( __( '%d failed.', 'aio-page-builder' ), $failed );
+			$parts[] = sprintf( /* translators: %d: failed job count */ __( '%d failed.', 'aio-page-builder' ), $failed );
 		}
 		if ( $refused > 0 ) {
-			$parts[] = sprintf( __( '%d refused.', 'aio-page-builder' ), $refused );
+			$parts[] = sprintf( /* translators: %d: refused job count */ __( '%d refused.', 'aio-page-builder' ), $refused );
 		}
 		return implode( ' ', $parts ) !== '' ? implode( ' ', $parts ) : __( 'No results.', 'aio-page-builder' );
 	}

@@ -36,7 +36,7 @@ final class Diagnostics_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access diagnostics.', 'aio-page-builder' ), 403 );
 		}
@@ -45,8 +45,10 @@ final class Diagnostics_Screen {
 		$results = $validator->get_results();
 		$passes  = $validator->passes();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-diagnostics" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php \esc_html_e( 'Environment and dependency checks. Blocking issues must be resolved for activation and key workflows.', 'aio-page-builder' ); ?>
 			</p>
@@ -87,7 +89,9 @@ final class Diagnostics_Screen {
 					<p><?php \esc_html_e( 'No validation results to display.', 'aio-page-builder' ); ?></p>
 				<?php endif; ?>
 			</section>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

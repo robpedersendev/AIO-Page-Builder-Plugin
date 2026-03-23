@@ -49,7 +49,7 @@ final class Page_Templates_Directory_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
@@ -80,8 +80,10 @@ final class Page_Templates_Directory_Screen {
 
 		$view = (string) ( $state['view'] ?? 'root' );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-page-templates-directory" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<?php
 			$docs_base = \apply_filters( 'aio_page_builder_docs_base_url', '' );
 			$guide_ref = ( is_string( $docs_base ) && $docs_base !== '' )
@@ -113,7 +115,9 @@ final class Page_Templates_Directory_Screen {
 				$this->render_list( $state );
 			}
 			?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

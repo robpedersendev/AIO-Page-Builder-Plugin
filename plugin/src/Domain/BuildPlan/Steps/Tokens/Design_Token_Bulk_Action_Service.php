@@ -18,6 +18,7 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
+use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
 
 /**
  * Single and bulk approve/deny for Step 4 (design tokens).
@@ -316,6 +317,7 @@ final class Design_Token_Bulk_Action_Service {
 			'actor'     => 'admin',
 			'timestamp' => gmdate( 'c' ),
 		);
-		\error_log( '[AIO Page Builder] ' . \wp_json_encode( $entry ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		$line  = \wp_json_encode( $entry );
+		Internal_Debug_Log::line( false !== $line ? $line : 'json_encode_failed' );
 	}
 }

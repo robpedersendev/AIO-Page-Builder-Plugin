@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="Private WordPress Plugin Standard">
-	<description>Project rules for a privately distributed WordPress plugin built to WordPress-style standards.</description>
+	<description>Project rules for a privately distributed WordPress plugin built to WordPress-style standards. Intentional rule relaxations below are non-blocking for ship only when documented and meeting docs/release/known-risk-register.md §5 (no impact on functionality, security, or usability).</description>
 
 	<file>src</file>
 	<file>tests</file>
@@ -119,10 +119,6 @@
 		<exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.newFound"/>
 		<exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.stringFound"/>
 	</rule>
-	<!-- Meta queries: known to be slow; optimize when profiling. -->
-	<rule ref="WordPress.DB.SlowDBQuery">
-		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_query"/>
-	</rule>
 	<!-- Boolean precedence: add parentheses where ambiguous. -->
 	<rule ref="Generic.CodeAnalysis.RequireExplicitBooleanOperatorPrecedence">
 		<exclude name="Generic.CodeAnalysis.RequireExplicitBooleanOperatorPrecedence.MissingParentheses"/>
@@ -141,10 +137,6 @@
 	<rule ref="Generic.Classes.DuplicateClassName">
 		<exclude name="Generic.Classes.DuplicateClassName.Found"/>
 	</rule>
-	<!-- Development/debug: error_log allowed in private distribution. -->
-	<rule ref="WordPress.PHP.DevelopmentFunctions">
-		<exclude name="WordPress.PHP.DevelopmentFunctions.error_log_error_log"/>
-	</rule>
 	<!-- Capabilities: custom caps not in WP core list. -->
 	<rule ref="WordPress.WP.Capabilities">
 		<exclude name="WordPress.WP.Capabilities.Unknown"/>
@@ -156,6 +148,27 @@
 	<!-- Property naming: allow camelCase for JSON/dto-style. -->
 	<rule ref="WordPress.NamingConventions.ValidVariableName">
 		<exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase"/>
+	</rule>
+	<!-- PrefixAllGlobals: register valid hook/function/variable prefixes (see WordPressCS wiki). -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="aio_page_builder"/>
+				<element value="aio_pb"/>
+				<element value="aio_acf"/>
+				<element value="aio_composition"/>
+				<element value="aiopagebuilder"/>
+			</property>
+		</properties>
+		<!-- PHPUnit fixtures and stubs intentionally mirror WP core signatures without plugin-prefixed global helpers. -->
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<!-- Prepared SQL only through Wpdb_Prepared_Results; WordPress has no higher-level API for these queries. -->
+	<rule ref="WordPress.DB.DirectDatabaseQuery.DirectQuery">
+		<exclude-pattern>*/Infrastructure/Db/Wpdb_Prepared_Results.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.DB.DirectDatabaseQuery.NoCaching">
+		<exclude-pattern>*/Infrastructure/Db/Wpdb_Prepared_Results.php</exclude-pattern>
 	</rule>
 
 	<config name="text_domain" value="aio-page-builder"/>

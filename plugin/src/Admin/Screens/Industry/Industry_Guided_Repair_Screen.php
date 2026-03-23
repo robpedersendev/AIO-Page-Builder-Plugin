@@ -179,7 +179,7 @@ final class Industry_Guided_Repair_Screen {
 		);
 	}
 
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access guided repair.', 'aio-page-builder' ), 403 );
 		}
@@ -188,8 +188,10 @@ final class Industry_Guided_Repair_Screen {
 		$links      = $vm->get_links();
 		$base       = \admin_url( 'admin.php?page=' . self::SLUG );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-guided-repair" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php \esc_html_e( 'Review repair suggestions for broken refs and stale overrides. Each action requires your confirmation. No automatic repairs.', 'aio-page-builder' ); ?>
 			</p>
@@ -284,7 +286,9 @@ final class Industry_Guided_Repair_Screen {
 					</tbody>
 				</table>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

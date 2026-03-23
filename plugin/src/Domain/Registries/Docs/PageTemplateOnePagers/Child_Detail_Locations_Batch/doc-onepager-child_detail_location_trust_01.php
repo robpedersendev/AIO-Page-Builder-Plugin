@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections = array(
+$aio_pb_sections = array(
 	'hero_local_01'          => 'Local hero. See doc-helper-hero_local_01.',
 	'fb_local_value_01'      => 'Local value. See doc-helper-fb_local_value_01.',
 	'tp_trust_band_01'       => 'Trust band. See doc-helper-tp_trust_band_01.',
@@ -25,16 +25,16 @@ $sections = array(
 	'lpu_contact_panel_01'   => 'Contact panel. See doc-helper-lpu_contact_panel_01.',
 	'cta_booking_01'         => 'Booking CTA. See doc-helper-cta_booking_01.',
 );
-$li       = '';
-foreach ( $sections as $k => $v ) {
-	$li .= '<li><strong>' . $k . '</strong>: ' . $v . '</li>';
+$aio_pb_li       = '';
+foreach ( $aio_pb_sections as $aio_pb_k => $aio_pb_v ) {
+	$aio_pb_li .= '<li><strong>' . $aio_pb_k . '</strong>: ' . $aio_pb_v . '</li>';
 }
-$purpose = 'Single location detail with local trust. Trust band, reassurance, guarantee before CTAs; contact and booking last.';
-$flow    = 'Local trust emphasis; reassurance and guarantee support visit/contact. Local action, contact, quote, directory nav, booking; last CTA booking.';
+$aio_pb_purpose = 'Single location detail with local trust. Trust band, reassurance, guarantee before CTAs; contact and booking last.';
+$aio_pb_flow    = 'Local trust emphasis; reassurance and guarantee support visit/contact. Local action, contact, quote, directory nav, booking; last CTA booking.';
 return array(
 	'documentation_id'          => 'doc-onepager-child_detail_location_trust_01',
 	'documentation_type'        => 'page_template_one_pager',
-	'content_body'              => '<h3>Page purpose</h3><p>' . $purpose . '</p><h3>Page flow</h3><p>' . $flow . '</p><h3>CTA direction</h3><p>Detail page: local action CTA → contact CTA → quote CTA → directory nav CTA → booking CTA (last). Location specificity; trust/support content prominent; child of Locations hub.</p><h3>Section-by-section (ordered)</h3><ol>' . $li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO/FIFU:</strong> Container and spacing; map fields per section helper; location meta and imagery. <strong>Hierarchy:</strong> Child detail under Locations hub. <strong>Local guidance:</strong> Reassurance and guarantee support visit intent. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; ensure last section is booking CTA. <strong>Accessibility:</strong> One H1; logical heading order; contrast and focus order for CTAs.</p>',
+	'content_body'              => '<h3>Page purpose</h3><p>' . $aio_pb_purpose . '</p><h3>Page flow</h3><p>' . $aio_pb_flow . '</p><h3>CTA direction</h3><p>Detail page: local action CTA → contact CTA → quote CTA → directory nav CTA → booking CTA (last). Location specificity; trust/support content prominent; child of Locations hub.</p><h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO/FIFU:</strong> Container and spacing; map fields per section helper; location meta and imagery. <strong>Hierarchy:</strong> Child detail under Locations hub. <strong>Local guidance:</strong> Reassurance and guarantee support visit intent. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; ensure last section is booking CTA. <strong>Accessibility:</strong> One H1; logical heading order; contrast and focus order for CTAs.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'child_detail_location_trust_01' ),
 	'generated_or_human_edited' => 'human_edited',

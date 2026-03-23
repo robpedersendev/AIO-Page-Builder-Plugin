@@ -127,10 +127,10 @@ final class Finalization_Step_UI_Service {
 					'heading'       => \__( 'Finalization queue', 'aio-page-builder' ),
 					'key'           => 'queue',
 					'content_lines' => array(
-						sprintf( \__( 'Publish-ready: %d', 'aio-page-builder' ), (int) $finalization_buckets['publish_ready'] ),
-						sprintf( \__( 'Blocked: %d', 'aio-page-builder' ), (int) $finalization_buckets['blocked'] ),
-						sprintf( \__( 'Failed: %d', 'aio-page-builder' ), (int) $finalization_buckets['failed'] ),
-						sprintf( \__( 'Deferred: %d', 'aio-page-builder' ), (int) $finalization_buckets['deferred'] ),
+						sprintf( /* translators: %d: publish-ready item count */ \__( 'Publish-ready: %d', 'aio-page-builder' ), (int) $finalization_buckets['publish_ready'] ),
+						sprintf( /* translators: %d: blocked item count */ \__( 'Blocked: %d', 'aio-page-builder' ), (int) $finalization_buckets['blocked'] ),
+						sprintf( /* translators: %d: failed item count */ \__( 'Failed: %d', 'aio-page-builder' ), (int) $finalization_buckets['failed'] ),
+						sprintf( /* translators: %d: deferred item count */ \__( 'Deferred: %d', 'aio-page-builder' ), (int) $finalization_buckets['deferred'] ),
 					),
 				),
 				array(
@@ -138,7 +138,7 @@ final class Finalization_Step_UI_Service {
 					'key'           => 'conflicts',
 					'content_lines' => $conflict_count > 0
 						? array_merge(
-							array( sprintf( \__( 'Conflicts detected: %d', 'aio-page-builder' ), (int) $conflict_count ) ),
+							array( sprintf( /* translators: %d: conflict count */ \__( 'Conflicts detected: %d', 'aio-page-builder' ), (int) $conflict_count ) ),
 							array_slice( $conflict_summary['messages'], 0, 3 )
 						)
 						: array( \__( 'No conflicts detected in the current plan state.', 'aio-page-builder' ) ),

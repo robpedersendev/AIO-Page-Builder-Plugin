@@ -293,7 +293,7 @@ final class SEO_Media_Step_UI_Service {
 		return array(
 			array(
 				'severity' => 'info',
-				'message'  => sprintf( \_n( '%d SEO item pending review.', '%d SEO items pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+				'message'  => sprintf( /* translators: %d: number of SEO items */ \_n( '%d SEO item pending review.', '%d SEO items pending review.', $eligible, 'aio-page-builder' ), $eligible ),
 				'level'    => 'step',
 			),
 		);

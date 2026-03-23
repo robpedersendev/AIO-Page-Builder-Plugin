@@ -319,7 +319,7 @@ final class New_Page_Creation_UI_Service {
 		return array(
 			array(
 				'severity' => 'info',
-				'message'  => sprintf( \_n( '%d new page pending review.', '%d new pages pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+				'message'  => sprintf( /* translators: %d: number of new pages */ \_n( '%d new page pending review.', '%d new pages pending review.', $eligible, 'aio-page-builder' ), $eligible ),
 				'level'    => 'step',
 			),
 			array(

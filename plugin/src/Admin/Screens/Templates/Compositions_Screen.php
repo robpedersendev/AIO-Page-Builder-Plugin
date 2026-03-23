@@ -48,26 +48,28 @@ final class Compositions_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
 		$view = isset( $_GET['view'] ) ? \sanitize_key( (string) $_GET['view'] ) : 'list';
 		if ( $view === 'build' ) {
-			$this->render_build_view();
+			$this->render_build_view( $embed_in_hub );
 			return;
 		}
-		$this->render_list_view();
+		$this->render_list_view( $embed_in_hub );
 	}
 
-	private function render_list_view(): void {
+	private function render_list_view( bool $embed_in_hub = false ): void {
 		$compositions = $this->get_compositions_list();
 		$base_url     = \admin_url( 'admin.php?page=' . self::SLUG );
 		$build_url    = $base_url . '&view=build';
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-compositions-screen" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-description">
 				<?php \esc_html_e( 'Governed custom page-template compositions assembled from section templates. Use Build to create or edit with category and CTA-aware section selection.', 'aio-page-builder' ); ?>
 			</p>
@@ -134,11 +136,13 @@ final class Compositions_Screen {
 					</tbody>
 				</table>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 
-	private function render_build_view(): void {
+	private function render_build_view( bool $embed_in_hub = false ): void {
 		$request             = array(
 			'view'                 => 'build',
 			'composition_id'       => isset( $_GET['composition_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['composition_id'] ) ) : '',
@@ -172,8 +176,10 @@ final class Compositions_Screen {
 		$one_pager_ready   = (bool) ( $state['one_pager_ready'] ?? false );
 		$list_url          = $base_url;
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-composition-builder" role="main" aria-label="<?php echo \esc_attr__( 'Composition builder', 'aio-page-builder' ); ?>">
 			<h1><?php \esc_html_e( 'Composition builder', 'aio-page-builder' ); ?></h1>
+		<?php endif; ?>
 			<p><a href="<?php echo \esc_url( $list_url ); ?>">&larr; <?php \esc_html_e( 'Back to Compositions', 'aio-page-builder' ); ?></a></p>
 
 			<?php if ( $current_composition !== null ) : ?>
@@ -275,11 +281,13 @@ final class Compositions_Screen {
 						<?php if ( $next_url !== '' ) : ?>
 							<a href="<?php echo \esc_url( $next_url ); ?>"><?php \esc_html_e( 'Next &rarr;', 'aio-page-builder' ); ?></a>
 						<?php endif; ?>
-						<span class="aio-pagination-info"><?php echo \esc_html( sprintf( __( 'Page %1$d of %2$d', 'aio-page-builder' ), $paged, $total_pages ) ); ?></span>
+						<span class="aio-pagination-info"><?php echo \esc_html( sprintf( /* translators: 1: current page, 2: total pages */ __( 'Page %1$d of %2$d', 'aio-page-builder' ), $paged, $total_pages ) ); ?></span>
 					</p>
 				<?php endif; ?>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

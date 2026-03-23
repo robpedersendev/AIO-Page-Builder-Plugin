@@ -109,9 +109,6 @@ final class Profile_Snapshot_Repository implements Profile_Snapshot_Repository_I
 				ARRAY_A
 			);
 		}
-		if ( ! is_array( $rows ) ) {
-			return array();
-		}
 		return \array_values( \array_filter( \array_map( array( $this, 'hydrate' ), $rows ) ) );
 	}
 

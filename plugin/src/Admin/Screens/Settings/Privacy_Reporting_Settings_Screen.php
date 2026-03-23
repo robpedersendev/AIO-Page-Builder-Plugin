@@ -44,14 +44,16 @@ final class Privacy_Reporting_Settings_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage privacy and reporting settings.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->get_state();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-privacy-reporting" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 
 			<section class="aio-disclosure" aria-labelledby="aio-reporting-disclosure-heading">
 				<h2 id="aio-reporting-disclosure-heading"><?php \esc_html_e( 'Reporting disclosure', 'aio-page-builder' ); ?></h2>
@@ -160,7 +162,9 @@ final class Privacy_Reporting_Settings_Screen {
 				<p><?php \esc_html_e( 'Controls are available when policy allows.', 'aio-page-builder' ); ?></p>
 			</section>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

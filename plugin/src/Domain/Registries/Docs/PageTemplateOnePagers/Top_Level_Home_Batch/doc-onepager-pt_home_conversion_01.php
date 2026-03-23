@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections     = array(
+$aio_pb_sections     = array(
 	'hero_conv_01'         => 'Conversion hero. See doc-helper-hero_conv_01. Lead with offer and primary CTA.',
 	'tp_testimonial_01'    => 'Testimonial proof. See doc-helper-tp_testimonial_01. Build trust early.',
 	'fb_value_prop_01'     => 'Value proposition. See doc-helper-fb_value_prop_01. One clear value message.',
@@ -21,9 +21,9 @@ $sections     = array(
 	'ptf_steps_01'         => 'Steps. See doc-helper-ptf_steps_01. Clear steps.',
 	'cta_trust_confirm_01' => 'Trust confirm CTA. See doc-helper-cta_trust_confirm_01. Final CTA; reassurance.',
 );
-$section_list = '';
-foreach ( $sections as $key => $guidance ) {
-	$section_list .= '<li><strong>' . $key . '</strong>: ' . $guidance . '</li>';
+$aio_pb_section_list = '';
+foreach ( $aio_pb_sections as $aio_pb_key => $aio_pb_guidance ) {
+	$aio_pb_section_list .= '<li><strong>' . $aio_pb_key . '</strong>: ' . $aio_pb_guidance . '</li>';
 }
 
 return array(
@@ -32,7 +32,7 @@ return array(
 	'content_body'              => '<h3>Page purpose</h3><p>Home page conversion-led. Lead with hero and proof, then consultation CTA; mid-page benefits and logos; contact CTA and panel; features and steps; close with trust CTA.</p>'
 		. '<h3>Page flow</h3><p>Opener establishes offer; proof and value prop build trust; first CTA captures interest; how-it-works and benefits explain; second CTA and contact panel support conversion; features and steps reinforce; final CTA confirms.</p>'
 		. '<h3>CTA direction</h3><p>Primary conversion path: hero → consultation CTA → contact CTA → trust CTA. Keep one primary action per CTA block; avoid duplicate or competing CTAs.</p>'
-		. '<h3>Section-by-section (ordered)</h3><ol>' . $section_list . '</ol>'
+		. '<h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_section_list . '</ol>'
 		. '<h3>Page-wide notes</h3><p><strong>GeneratePress:</strong> Use for container and spacing; keep section order as defined. <strong>ACF:</strong> Map fields per section helper. <strong>AIOSEO:</strong> Set focus keyphrase and meta for home. <strong>FIFU:</strong> Use for hero and section images where applicable. <strong>Navigation/hierarchy:</strong> Home is top-level; ensure nav reflects this. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; do not repeat the same CTA copy; ensure last section is the final CTA. <strong>Accessibility:</strong> One H1 per page; logical heading order; sufficient contrast and focus order for all CTAs.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'pt_home_conversion_01' ),

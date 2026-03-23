@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections     = array(
+$aio_pb_sections     = array(
 	'hero_cred_01'         => 'Credibility hero. See doc-helper-hero_cred_01. Trust-first opener.',
 	'mlp_team_grid_01'     => 'Team grid. See doc-helper-mlp_team_grid_01. Team/profile presentation.',
 	'fb_why_choose_01'     => 'Why choose. See doc-helper-fb_why_choose_01. Differentiators.',
@@ -21,9 +21,9 @@ $sections     = array(
 	'ptf_how_it_works_01'  => 'How it works. See doc-helper-ptf_how_it_works_01. Process.',
 	'cta_support_01'       => 'Support CTA. See doc-helper-cta_support_01. Final CTA.',
 );
-$section_list = '';
-foreach ( $sections as $key => $guidance ) {
-	$section_list .= '<li><strong>' . $key . '</strong>: ' . $guidance . '</li>';
+$aio_pb_section_list = '';
+foreach ( $aio_pb_sections as $aio_pb_key => $aio_pb_guidance ) {
+	$aio_pb_section_list .= '<li><strong>' . $aio_pb_key . '</strong>: ' . $aio_pb_guidance . '</li>';
 }
 
 return array(
@@ -32,7 +32,7 @@ return array(
 	'content_body'              => '<h3>Page purpose</h3><p>About page team-led. Hero and team grid; why choose and contact CTA; testimonial and FAQ; partners and inquiry CTA; contact panel and differentiator; how-it-works; support CTA.</p>'
 		. '<h3>Page flow</h3><p>Team and credibility; why choose and contact CTA; social proof and FAQ; partners and inquiry CTA; contact and differentiator; how-it-works; final CTA.</p>'
 		. '<h3>CTA direction</h3><p>Primary path: contact CTA → inquiry CTA → support CTA. One primary action per CTA block; team and proof sections build trust before each CTA.</p>'
-		. '<h3>Section-by-section (ordered)</h3><ol>' . $section_list . '</ol>'
+		. '<h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_section_list . '</ol>'
 		. '<h3>Page-wide notes</h3><p><strong>GeneratePress:</strong> Use for container and spacing; keep section order as defined. <strong>ACF:</strong> Map fields per section helper. <strong>AIOSEO:</strong> Set focus keyphrase and meta for about/team. <strong>FIFU:</strong> Use for hero and team/section images. <strong>Navigation/hierarchy:</strong> About is top-level. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; do not repeat the same CTA copy; ensure last section is the final CTA. <strong>Accessibility:</strong> One H1 per page; logical heading order; sufficient contrast and focus order for all CTAs.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'pt_about_team_01' ),

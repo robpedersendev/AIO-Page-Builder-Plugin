@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\AI\PromptPacks\Prompt_Pack_Registry_Repository_Interface;
 use AIOPageBuilder\Domain\AI\PromptPacks\Prompt_Pack_Schema;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Repository → storage: Object_Type_Keys::PROMPT_PACK (CPT).
@@ -43,31 +44,19 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 		if ( $key === '' || $version === '' ) {
 			return null;
 		}
-		$query = new \WP_Query(
-			array(
-				'post_type'              => $this->get_post_type(),
-				'posts_per_page'         => 1,
-				'no_found_rows'          => true,
-				'update_post_meta_cache' => true,
-				'meta_query'             => array(
-					array(
-						'key'     => self::META_INTERNAL_KEY,
-						'value'   => $key,
-						'compare' => '=',
-					),
-					array(
-						'key'     => self::META_PACK_VERSION,
-						'value'   => $version,
-						'compare' => '=',
-					),
-				),
-			)
+		global $wpdb;
+		$post_id = Wpdb_Prepared_Results::find_post_id_by_post_type_two_meta(
+			$wpdb,
+			$this->get_post_type(),
+			self::META_INTERNAL_KEY,
+			$key,
+			self::META_PACK_VERSION,
+			$version
 		);
-		$posts = $query->get_posts();
-		if ( empty( $posts ) ) {
+		if ( $post_id < 1 ) {
 			return null;
 		}
-		$record = $this->get_by_id( $posts[0]->ID );
+		$record = $this->get_by_id( $post_id );
 		return $record !== null && isset( $record['definition'] ) ? $record['definition'] : null;
 	}
 
@@ -82,21 +71,45 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 		if ( $key === '' ) {
 			return null;
 		}
+		global $wpdb;
+		if ( $wpdb instanceof \wpdb ) {
+			$ids = Wpdb_Prepared_Results::find_post_ids_by_post_type_meta_key_value(
+				$wpdb,
+				$this->get_post_type(),
+				self::META_INTERNAL_KEY,
+				$key,
+				50,
+				0,
+				'ID',
+				'ASC'
+			);
+			if ( $ids !== array() ) {
+				foreach ( $ids as $post_id ) {
+					$record = $this->get_by_id( $post_id );
+					if ( $record !== null && isset( $record['definition'] ) ) {
+						$def    = $record['definition'];
+						$status = $def[ Prompt_Pack_Schema::ROOT_STATUS ] ?? '';
+						if ( $status === Prompt_Pack_Schema::STATUS_ACTIVE ) {
+							return $def;
+						}
+					}
+				}
+				$record = $this->get_by_id( $ids[0] );
+				return $record !== null && isset( $record['definition'] ) ? $record['definition'] : null;
+			}
+		}
+		// phpcs:disable WordPress.DB.SlowDBQuery -- Unreachable in real WordPress when global $wpdb exists; used by PHPUnit stubs.
 		$query = new \WP_Query(
 			array(
 				'post_type'              => $this->get_post_type(),
 				'posts_per_page'         => 50,
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
-				'meta_query'             => array(
-					array(
-						'key'     => self::META_INTERNAL_KEY,
-						'value'   => $key,
-						'compare' => '=',
-					),
-				),
+				'meta_key'               => self::META_INTERNAL_KEY,
+				'meta_value'             => $key,
 			)
 		);
+		// phpcs:enable WordPress.DB.SlowDBQuery
 		$posts = $query->get_posts();
 		if ( empty( $posts ) ) {
 			return null;
@@ -210,31 +223,19 @@ final class Prompt_Pack_Repository extends Abstract_CPT_Repository implements Pr
 			if ( $key === '' || $version === '' ) {
 				return null;
 			}
-			$query = new \WP_Query(
-				array(
-					'post_type'              => $this->get_post_type(),
-					'posts_per_page'         => 1,
-					'no_found_rows'          => true,
-					'update_post_meta_cache' => true,
-					'meta_query'             => array(
-						array(
-							'key'     => self::META_INTERNAL_KEY,
-							'value'   => $key,
-							'compare' => '=',
-						),
-						array(
-							'key'     => self::META_PACK_VERSION,
-							'value'   => $version,
-							'compare' => '=',
-						),
-					),
-				)
+			global $wpdb;
+			$post_id = Wpdb_Prepared_Results::find_post_id_by_post_type_two_meta(
+				$wpdb,
+				$this->get_post_type(),
+				self::META_INTERNAL_KEY,
+				$key,
+				self::META_PACK_VERSION,
+				$version
 			);
-			$posts = $query->get_posts();
-			if ( empty( $posts ) ) {
+			if ( $post_id < 1 ) {
 				return null;
 			}
-			return $this->get_by_id( $posts[0]->ID );
+			return $this->get_by_id( $post_id );
 		}
 		$def = $this->get_definition_by_key( $key );
 		if ( $def === null ) {

@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
 use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -41,10 +42,11 @@ final class AI_Run_Detail_Screen {
 	/**
 	 * Renders detail for the given run_id (internal key).
 	 *
-	 * @param string $run_id Run ID (internal_key).
+	 * @param string $run_id       Run ID (internal_key).
+	 * @param bool   $embed_in_hub When true, outer wrap and h1 are omitted.
 	 * @return void
 	 */
-	public function render( string $run_id ): void {
+	public function render( string $run_id, bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( Capabilities::VIEW_AI_RUNS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view AI run details.', 'aio-page-builder' ) );
 		}
@@ -70,15 +72,21 @@ final class AI_Run_Detail_Screen {
 			}
 		}
 
-		$meta      = $run['run_metadata'] ?? array();
+		$meta      = is_array( $run ) ? ( $run['run_metadata'] ?? array() ) : array();
 		$meta_safe = AI_Run_Artifact_Service::redact_sensitive_values( $meta );
-		$list_url  = \admin_url( 'admin.php?page=' . self::SLUG );
+		$list_url  = Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs' );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-ai-run-detail" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p><a href="<?php echo \esc_url( $list_url ); ?>"><?php \esc_html_e( '&larr; Back to AI Runs', 'aio-page-builder' ); ?></a></p>
 			<?php if ( $run === null ) : ?>
 				<p class="aio-admin-notice"><?php \esc_html_e( 'Run not found.', 'aio-page-builder' ); ?></p>
+				<?php
+				if ( ! $embed_in_hub ) :
+					?>
+					</div><?php endif; ?>
 				<?php return; ?>
 			<?php endif; ?>
 
@@ -211,7 +219,9 @@ final class AI_Run_Detail_Screen {
 					</tbody>
 				</table>
 			</section>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

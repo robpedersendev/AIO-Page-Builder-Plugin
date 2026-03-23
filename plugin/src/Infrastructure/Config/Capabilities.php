@@ -46,6 +46,15 @@ final class Capabilities {
 	public const VIEW_AI_RUNS           = 'aio_view_ai_runs';
 	public const VIEW_VERSION_SNAPSHOTS = 'aio_view_version_snapshots';
 
+	/** Virtual menu gates: resolved via map_meta_cap (Hub_Menu_Capabilities) for merged admin hubs. */
+	public const ACCESS_SETTINGS_HUB         = 'aio_access_settings_hub';
+	public const ACCESS_IMPORT_EXPORT_TAB    = 'aio_access_import_export_tab';
+	public const ACCESS_AI_WORKSPACE         = 'aio_access_ai_workspace';
+	public const ACCESS_ONBOARDING_WORKSPACE = 'aio_access_onboarding_workspace';
+	public const ACCESS_PLANS_WORKSPACE      = 'aio_access_plans_workspace';
+	public const ACCESS_TEMPLATE_LIBRARY     = 'aio_access_template_library';
+	public const ACCESS_INDUSTRY_WORKSPACE   = 'aio_access_industry_workspace';
+
 	/** @var array<string>|null Full list cached for get_all(). */
 	private static ?array $all = null;
 
@@ -86,6 +95,13 @@ final class Capabilities {
 			self::MANAGE_DOCUMENTATION,
 			self::VIEW_AI_RUNS,
 			self::VIEW_VERSION_SNAPSHOTS,
+			self::ACCESS_SETTINGS_HUB,
+			self::ACCESS_IMPORT_EXPORT_TAB,
+			self::ACCESS_AI_WORKSPACE,
+			self::ACCESS_ONBOARDING_WORKSPACE,
+			self::ACCESS_PLANS_WORKSPACE,
+			self::ACCESS_TEMPLATE_LIBRARY,
+			self::ACCESS_INDUSTRY_WORKSPACE,
 		);
 		return self::$all;
 	}

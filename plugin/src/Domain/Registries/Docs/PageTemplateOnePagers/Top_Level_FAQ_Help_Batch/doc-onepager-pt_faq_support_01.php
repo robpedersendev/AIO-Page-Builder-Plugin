@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections     = array(
+$aio_pb_sections     = array(
 	'hero_edu_01'               => 'Education hero. See doc-helper-hero_edu_01. Support-focused opener.',
 	'ptf_faq_01'                => 'FAQ block. See doc-helper-ptf_faq_01. Core FAQ content.',
 	'ptf_faq_accordion_01'      => 'Accordion FAQ. See doc-helper-ptf_faq_accordion_01. Expandable Q&A.',
@@ -20,9 +20,9 @@ $sections     = array(
 	'ptf_policy_explainer_01'   => 'Policy explainer. See doc-helper-ptf_policy_explainer_01. Policy context.',
 	'cta_support_02'            => 'Support CTA. See doc-helper-cta_support_02. Final CTA.',
 );
-$section_list = '';
-foreach ( $sections as $key => $guidance ) {
-	$section_list .= '<li><strong>' . $key . '</strong>: ' . $guidance . '</li>';
+$aio_pb_section_list = '';
+foreach ( $aio_pb_sections as $aio_pb_key => $aio_pb_guidance ) {
+	$aio_pb_section_list .= '<li><strong>' . $aio_pb_key . '</strong>: ' . $aio_pb_guidance . '</li>';
 }
 
 return array(
@@ -31,7 +31,7 @@ return array(
 	'content_body'              => '<h3>Page purpose</h3><p>FAQ page support-focused. Hero and FAQ sections; support CTA; microproof and FAQ by category; escalation and contact CTA; explainers; final support CTA.</p>'
 		. '<h3>Page flow</h3><p>Educational opener; FAQ content; support CTA; microproof and categorized FAQ; escalation and contact CTA; explainers; close with support CTA.</p>'
 		. '<h3>CTA direction</h3><p>Primary path: support CTA → contact CTA → support CTA. One primary action per CTA block; explanatory flow and question grouping support help-seeking; avoid conflating with marketing conversion pages.</p>'
-		. '<h3>Section-by-section (ordered)</h3><ol>' . $section_list . '</ol>'
+		. '<h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_section_list . '</ol>'
 		. '<h3>Page-wide notes</h3><p><strong>GeneratePress:</strong> Use for container and spacing; keep section order as defined. <strong>ACF:</strong> Map fields per section helper. <strong>AIOSEO:</strong> Set focus keyphrase and meta for FAQ/support. <strong>FIFU:</strong> Use for hero/section images where applicable. <strong>Hierarchy:</strong> FAQ/help is top-level; ensure nav reflects support/help family. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; keep question grouping clear; ensure last section is the final CTA. <strong>Accessibility:</strong> One H1 per page; logical heading order; sufficient contrast and focus order for all CTAs and accordions.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'pt_faq_support_01' ),

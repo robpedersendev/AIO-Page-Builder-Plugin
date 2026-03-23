@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections = array(
+$aio_pb_sections = array(
 	'hero_local_01'          => 'Local hero. See doc-helper-hero_local_01.',
 	'fb_local_value_01'      => 'Local value. See doc-helper-fb_local_value_01.',
 	'mlp_location_info_01'   => 'Location info. See doc-helper-mlp_location_info_01.',
@@ -23,16 +23,16 @@ $sections = array(
 	'mlp_listing_01'         => 'Listing. See doc-helper-mlp_listing_01.',
 	'cta_directory_nav_01'   => 'Directory nav CTA. See doc-helper-cta_directory_nav_01.',
 );
-$li       = '';
-foreach ( $sections as $k => $v ) {
-	$li .= '<li><strong>' . $k . '</strong>: ' . $v . '</li>';
+$aio_pb_li       = '';
+foreach ( $aio_pb_sections as $aio_pb_k => $aio_pb_v ) {
+	$aio_pb_li .= '<li><strong>' . $aio_pb_k . '</strong>: ' . $aio_pb_v . '</li>';
 }
-$purpose = 'Locations hub regional. Local value and location info; local CTA; place highlight and card grid; reassurance and local CTA; contact detail and panel; expectations and contact CTA; listing; directory nav CTA.';
-$flow    = 'Regional emphasis; local and contact and directory CTAs for drill-down.';
+$aio_pb_purpose = 'Locations hub regional. Local value and location info; local CTA; place highlight and card grid; reassurance and local CTA; contact detail and panel; expectations and contact CTA; listing; directory nav CTA.';
+$aio_pb_flow    = 'Regional emphasis; local and contact and directory CTAs for drill-down.';
 return array(
 	'documentation_id'          => 'doc-onepager-hub_locations_regional_01',
 	'documentation_type'        => 'page_template_one_pager',
-	'content_body'              => '<h3>Page purpose</h3><p>' . $purpose . '</p><h3>Page flow</h3><p>' . $flow . '</p><h3>CTA direction</h3><p>Hub aggregation: local action CTA → local action CTA → contact CTA → directory nav CTA. Emphasize local navigation and regional drill-down; keep hub distinct from location detail pages.</p><h3>Section-by-section (ordered)</h3><ol>' . $li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO/FIFU:</strong> Container and spacing; map fields per section helper; hub meta. <strong>Hierarchy/navigation:</strong> Hub is parent to location/region pages. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs. <strong>Accessibility:</strong> One H1; logical heading order; contrast and focus order for CTAs.</p>',
+	'content_body'              => '<h3>Page purpose</h3><p>' . $aio_pb_purpose . '</p><h3>Page flow</h3><p>' . $aio_pb_flow . '</p><h3>CTA direction</h3><p>Hub aggregation: local action CTA → local action CTA → contact CTA → directory nav CTA. Emphasize local navigation and regional drill-down; keep hub distinct from location detail pages.</p><h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_li . '</ol><h3>Page-wide notes</h3><p><strong>GeneratePress/ACF/AIOSEO/FIFU:</strong> Container and spacing; map fields per section helper; hub meta. <strong>Hierarchy/navigation:</strong> Hub is parent to location/region pages. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs. <strong>Accessibility:</strong> One H1; logical heading order; contrast and focus order for CTAs.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'hub_locations_regional_01' ),
 	'generated_or_human_edited' => 'human_edited',

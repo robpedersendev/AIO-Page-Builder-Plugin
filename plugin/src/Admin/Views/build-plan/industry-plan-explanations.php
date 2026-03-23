@@ -1,7 +1,7 @@
 <?php
 /**
  * Renders industry-aware rationale and warnings for one Build Plan item (Prompt 365).
- * Expects $view_model from Industry_Build_Plan_Explanation_View_Model::from_item_payload().
+ * Expects $aio_pb_view_model from Industry_Build_Plan_Explanation_View_Model::from_item_payload().
  * Renders nothing when has_industry_data is false (generic fallback).
  *
  * @package AIOPageBuilder
@@ -9,83 +9,83 @@
 
 defined( 'ABSPATH' ) || exit;
 
-if ( ! isset( $view_model ) || ! is_array( $view_model ) || empty( $view_model['has_industry_data'] ) ) {
+if ( ! isset( $aio_pb_view_model ) || ! is_array( $aio_pb_view_model ) || empty( $aio_pb_view_model['has_industry_data'] ) ) {
 	return;
 }
 
-$summary_lines      = $view_model['summary_lines'] ?? array();
-$warning_badges     = $view_model['warning_badges'] ?? array();
-$fit_classification = (string) ( $view_model['fit_classification'] ?? 'neutral' );
-$source_refs        = $view_model['source_refs'] ?? array();
+$aio_pb_summary_lines      = $aio_pb_view_model['summary_lines'] ?? array();
+$aio_pb_warning_badges     = $aio_pb_view_model['warning_badges'] ?? array();
+$aio_pb_fit_classification = (string) ( $aio_pb_view_model['fit_classification'] ?? 'neutral' );
+$aio_pb_source_refs        = $aio_pb_view_model['source_refs'] ?? array();
 
-$fit_label = $fit_classification;
-if ( $fit_classification === 'recommended' ) {
-	$fit_label = __( 'Recommended', 'aio-page-builder' );
-} elseif ( $fit_classification === 'allowed_weak_fit' || $fit_classification === 'weak_fit' ) {
-	$fit_label = __( 'Weak fit', 'aio-page-builder' );
-} elseif ( $fit_classification === 'discouraged' ) {
-	$fit_label = __( 'Discouraged', 'aio-page-builder' );
+$aio_pb_fit_label = $aio_pb_fit_classification;
+if ( $aio_pb_fit_classification === 'recommended' ) {
+	$aio_pb_fit_label = __( 'Recommended', 'aio-page-builder' );
+} elseif ( $aio_pb_fit_classification === 'allowed_weak_fit' || $aio_pb_fit_classification === 'weak_fit' ) {
+	$aio_pb_fit_label = __( 'Weak fit', 'aio-page-builder' );
+} elseif ( $aio_pb_fit_classification === 'discouraged' ) {
+	$aio_pb_fit_label = __( 'Discouraged', 'aio-page-builder' );
 } else {
-	$fit_label = __( 'Neutral', 'aio-page-builder' );
+	$aio_pb_fit_label = __( 'Neutral', 'aio-page-builder' );
 }
 ?>
 <div class="aio-detail-section aio-detail-section-industry-explanation">
 	<h4 class="aio-detail-section-heading"><?php \esc_html_e( 'Industry context', 'aio-page-builder' ); ?></h4>
 	<div class="aio-detail-section-body">
-		<?php if ( $fit_classification !== 'neutral' ) : ?>
+		<?php if ( $aio_pb_fit_classification !== 'neutral' ) : ?>
 			<p class="aio-industry-fit-badge-wrap">
-				<span class="aio-industry-fit-badge aio-industry-fit-badge--<?php echo \esc_attr( \sanitize_html_class( $fit_classification ) ); ?>" aria-label="<?php echo \esc_attr( $fit_label ); ?>">
-					<?php echo \esc_html( $fit_label ); ?>
+				<span class="aio-industry-fit-badge aio-industry-fit-badge--<?php echo \esc_attr( \sanitize_html_class( $aio_pb_fit_classification ) ); ?>" aria-label="<?php echo \esc_attr( $aio_pb_fit_label ); ?>">
+					<?php echo \esc_html( $aio_pb_fit_label ); ?>
 				</span>
 			</p>
 		<?php endif; ?>
-		<?php if ( ! empty( $summary_lines ) ) : ?>
+		<?php if ( ! empty( $aio_pb_summary_lines ) ) : ?>
 			<ul class="aio-industry-summary-lines">
-				<?php foreach ( $summary_lines as $line ) : ?>
-					<li><?php echo \esc_html( $line ); ?></li>
+				<?php foreach ( $aio_pb_summary_lines as $aio_pb_line ) : ?>
+					<li><?php echo \esc_html( $aio_pb_line ); ?></li>
 				<?php endforeach; ?>
 			</ul>
 		<?php endif; ?>
-		<?php if ( ! empty( $warning_badges ) ) : ?>
+		<?php if ( ! empty( $aio_pb_warning_badges ) ) : ?>
 			<div class="aio-industry-warning-badges" role="group" aria-label="<?php \esc_attr_e( 'Industry warnings', 'aio-page-builder' ); ?>">
-				<?php foreach ( $warning_badges as $badge ) : ?>
-					<span class="aio-industry-warning-badge aio-industry-warning-badge--<?php echo \esc_attr( \sanitize_html_class( $badge['code'] ?? '' ) ); ?>" title="<?php echo \esc_attr( $badge['label'] ?? '' ); ?>">
-						<?php echo \esc_html( $badge['label'] ?? '' ); ?>
+				<?php foreach ( $aio_pb_warning_badges as $aio_pb_badge ) : ?>
+					<span class="aio-industry-warning-badge aio-industry-warning-badge--<?php echo \esc_attr( \sanitize_html_class( $aio_pb_badge['code'] ?? '' ) ); ?>" title="<?php echo \esc_attr( $aio_pb_badge['label'] ?? '' ); ?>">
+						<?php echo \esc_html( $aio_pb_badge['label'] ?? '' ); ?>
 					</span>
 				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>
-		<?php if ( ! empty( $source_refs ) ) : ?>
+		<?php if ( ! empty( $aio_pb_source_refs ) ) : ?>
 			<p class="aio-industry-source-refs description">
 				<?php \esc_html_e( 'Industry sources:', 'aio-page-builder' ); ?>
-				<?php echo \esc_html( implode( ', ', $source_refs ) ); ?>
+				<?php echo \esc_html( implode( ', ', $aio_pb_source_refs ) ); ?>
 			</p>
 		<?php endif; ?>
 		<?php
-		$conflict_results    = $view_model['conflict_results'] ?? array();
-		$explanation_summary = (string) ( $view_model['explanation_summary'] ?? '' );
-		if ( ! empty( $conflict_results ) || $explanation_summary !== '' ) :
+		$aio_pb_conflict_results    = $aio_pb_view_model['conflict_results'] ?? array();
+		$aio_pb_explanation_summary = (string) ( $aio_pb_view_model['explanation_summary'] ?? '' );
+		if ( ! empty( $aio_pb_conflict_results ) || $aio_pb_explanation_summary !== '' ) :
 			?>
 			<div class="aio-industry-conflict-wrap">
 				<?php require \dirname( __DIR__ ) . '/industry/industry-conflict-badges.php'; ?>
 			</div>
 		<?php endif; ?>
 		<?php
-		$compliance_cautions = $view_model['compliance_cautions'] ?? array();
-		if ( ! empty( $compliance_cautions ) && is_array( $compliance_cautions ) ) :
+		$aio_pb_compliance_cautions = $aio_pb_view_model['compliance_cautions'] ?? array();
+		if ( ! empty( $aio_pb_compliance_cautions ) && is_array( $aio_pb_compliance_cautions ) ) :
 			?>
 			<div class="aio-industry-compliance-cautions" role="group" aria-label="<?php \esc_attr_e( 'Advisory compliance notes', 'aio-page-builder' ); ?>">
 				<p class="aio-industry-compliance-cautions-intro description"><?php \esc_html_e( 'Advisory:', 'aio-page-builder' ); ?></p>
 				<ul class="aio-industry-compliance-cautions-list">
-					<?php foreach ( $compliance_cautions as $c ) : ?>
+					<?php foreach ( $aio_pb_compliance_cautions as $aio_pb_c ) : ?>
 						<?php
-						$summary  = isset( $c['caution_summary'] ) && is_string( $c['caution_summary'] ) ? $c['caution_summary'] : '';
-						$severity = isset( $c['severity'] ) && is_string( $c['severity'] ) ? $c['severity'] : 'info';
-						if ( $summary === '' ) {
+						$aio_pb_summary  = isset( $aio_pb_c['caution_summary'] ) && is_string( $aio_pb_c['caution_summary'] ) ? $aio_pb_c['caution_summary'] : '';
+						$aio_pb_severity = isset( $aio_pb_c['severity'] ) && is_string( $aio_pb_c['severity'] ) ? $aio_pb_c['severity'] : 'info';
+						if ( $aio_pb_summary === '' ) {
 							continue;
 						}
 						?>
-						<li class="aio-industry-compliance-caution aio-industry-compliance-caution--<?php echo \esc_attr( \sanitize_html_class( $severity ) ); ?>"><?php echo \esc_html( $summary ); ?></li>
+						<li class="aio-industry-compliance-caution aio-industry-compliance-caution--<?php echo \esc_attr( \sanitize_html_class( $aio_pb_severity ) ); ?>"><?php echo \esc_html( $aio_pb_summary ); ?></li>
 					<?php endforeach; ?>
 				</ul>
 			</div>

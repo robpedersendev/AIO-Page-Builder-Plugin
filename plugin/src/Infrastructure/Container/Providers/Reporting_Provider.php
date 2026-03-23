@@ -11,11 +11,21 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
-require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Heartbeat_Scheduler.php';
-require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Heartbeat_Service.php';
-require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Default_Heartbeat_Health_Provider.php';
-require_once __DIR__ . '/../../../Domain/Reporting/Heartbeat/Wp_Mail_Heartbeat_Transport.php';
+// * Manual requires: production bootstrap does not use Composer autoload; interfaces/results before classes that implement or type-hint them.
+$aio_pb_reporting_heartbeat_dir = __DIR__ . '/../../../Domain/Reporting/Heartbeat';
+require_once $aio_pb_reporting_heartbeat_dir . '/Heartbeat_Transport_Interface.php';
+require_once $aio_pb_reporting_heartbeat_dir . '/Heartbeat_Health_Provider_Interface.php';
+require_once $aio_pb_reporting_heartbeat_dir . '/Heartbeat_Result.php';
+require_once $aio_pb_reporting_heartbeat_dir . '/Heartbeat_Service.php';
+require_once $aio_pb_reporting_heartbeat_dir . '/Heartbeat_Scheduler.php';
+require_once $aio_pb_reporting_heartbeat_dir . '/Default_Heartbeat_Health_Provider.php';
+require_once $aio_pb_reporting_heartbeat_dir . '/Wp_Mail_Heartbeat_Transport.php';
 require_once __DIR__ . '/../../../Domain/Reporting/Payloads/Template_Library_Report_Summary_Builder.php';
+
+$aio_pb_reporting_install_dir = __DIR__ . '/../../../Domain/Reporting/Install';
+require_once $aio_pb_reporting_install_dir . '/Install_Notification_Transport_Interface.php';
+require_once $aio_pb_reporting_install_dir . '/Wp_Mail_Install_Transport.php';
+require_once $aio_pb_reporting_install_dir . '/Install_Notification_Service.php';
 
 use AIOPageBuilder\Domain\Reporting\Errors\Reporting_Redaction_Service;
 use AIOPageBuilder\Domain\Reporting\Heartbeat\Heartbeat_Service;
@@ -138,7 +148,7 @@ final class Reporting_Provider implements Service_Provider_Interface {
 			}
 		);
 		add_filter(
-			Heartbeat_Scheduler::HEARTBEAT_SERVICE_FILTER,
+			'aio_page_builder_heartbeat_service',
 			function () use ( $container ): ?Heartbeat_Service {
 				return $container->get( 'heartbeat_service' );
 			},

@@ -11,12 +11,12 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 return array_merge(
-	_calls_goal_caution_rules(),
-	_bookings_goal_caution_rules(),
-	_estimates_goal_caution_rules(),
-	_consultations_goal_caution_rules(),
-	_valuations_goal_caution_rules(),
-	_lead_capture_goal_caution_rules()
+	aio_page_builder_calls_goal_caution_rules(),
+	aio_page_builder_bookings_goal_caution_rules(),
+	aio_page_builder_estimates_goal_caution_rules(),
+	aio_page_builder_consultations_goal_caution_rules(),
+	aio_page_builder_valuations_goal_caution_rules(),
+	aio_page_builder_lead_capture_goal_caution_rules()
 );
 
 /**
@@ -24,7 +24,7 @@ return array_merge(
  *
  * @return array<int, array<string, mixed>>
  */
-function _calls_goal_caution_rules(): array {
+function aio_page_builder_calls_goal_caution_rules(): array {
 	return array(
 		array(
 			'goal_rule_key'              => 'goal_calls_urgency_language',
@@ -53,7 +53,7 @@ function _calls_goal_caution_rules(): array {
  *
  * @return array<int, array<string, mixed>>
  */
-function _bookings_goal_caution_rules(): array {
+function aio_page_builder_bookings_goal_caution_rules(): array {
 	return array(
 		array(
 			'goal_rule_key'              => 'goal_bookings_urgency_language',
@@ -82,7 +82,7 @@ function _bookings_goal_caution_rules(): array {
  *
  * @return array<int, array<string, mixed>>
  */
-function _estimates_goal_caution_rules(): array {
+function aio_page_builder_estimates_goal_caution_rules(): array {
 	return array(
 		array(
 			'goal_rule_key'   => 'goal_estimates_valuation_posture',
@@ -110,7 +110,7 @@ function _estimates_goal_caution_rules(): array {
  *
  * @return array<int, array<string, mixed>>
  */
-function _consultations_goal_caution_rules(): array {
+function aio_page_builder_consultations_goal_caution_rules(): array {
 	return array(
 		array(
 			'goal_rule_key'   => 'goal_consultations_claim_phrasing',
@@ -138,7 +138,7 @@ function _consultations_goal_caution_rules(): array {
  *
  * @return array<int, array<string, mixed>>
  */
-function _valuations_goal_caution_rules(): array {
+function aio_page_builder_valuations_goal_caution_rules(): array {
 	return array(
 		array(
 			'goal_rule_key'   => 'goal_valuations_valuation_posture',
@@ -166,7 +166,7 @@ function _valuations_goal_caution_rules(): array {
  *
  * @return array<int, array<string, mixed>>
  */
-function _lead_capture_goal_caution_rules(): array {
+function aio_page_builder_lead_capture_goal_caution_rules(): array {
 	return array(
 		array(
 			'goal_rule_key'   => 'goal_lead_capture_form_promises',

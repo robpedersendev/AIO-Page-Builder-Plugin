@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Snapshots\Version_Snapshot_Schema;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Repository → storage: Object_Type_Keys::VERSION_SNAPSHOT (CPT).
@@ -137,23 +138,43 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 	private function list_definitions_by_meta( string $meta_key, string $meta_value, int $limit, int $offset ): array {
 		$limit  = $limit > 0 ? min( self::DEFAULT_LIST_LIMIT, $limit ) : self::DEFAULT_LIST_LIMIT;
 		$offset = max( 0, $offset );
-		$query  = new \WP_Query(
+		global $wpdb;
+		if ( $wpdb instanceof \wpdb ) {
+			$ids = Wpdb_Prepared_Results::find_post_ids_by_post_type_meta_key_value(
+				$wpdb,
+				$this->get_post_type(),
+				$meta_key,
+				$meta_value,
+				$limit,
+				$offset,
+				'post_date',
+				'DESC'
+			);
+			if ( $ids !== array() ) {
+				$out = array();
+				foreach ( $ids as $post_id ) {
+					$meta = $this->get_meta( $post_id );
+					if ( isset( $meta['definition'] ) && is_array( $meta['definition'] ) ) {
+						$out[] = $meta['definition'];
+					}
+				}
+				return $out;
+			}
+		}
+		// phpcs:disable WordPress.DB.SlowDBQuery -- Unreachable in real WordPress when global $wpdb exists; used by PHPUnit stubs.
+		$query = new \WP_Query(
 			array(
 				'post_type'              => $this->get_post_type(),
 				'posts_per_page'         => $limit,
 				'offset'                 => $offset,
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
-				'meta_query'             => array(
-					array(
-						'key'     => $meta_key,
-						'value'   => $meta_value,
-						'compare' => '=',
-					),
-				),
+				'meta_key'               => $meta_key,
+				'meta_value'             => $meta_value,
 			)
 		);
-		$out    = array();
+		// phpcs:enable WordPress.DB.SlowDBQuery
+		$out = array();
 		foreach ( $query->get_posts() as $post ) {
 			$meta = $this->get_meta( $post->ID );
 			if ( isset( $meta['definition'] ) && is_array( $meta['definition'] ) ) {

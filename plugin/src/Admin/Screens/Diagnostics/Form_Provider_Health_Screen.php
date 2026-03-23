@@ -44,14 +44,16 @@ final class Form_Provider_Health_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access form provider health.', 'aio-page-builder' ), 403 );
 		}
 		$summary = $this->build_summary();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-form-provider-health" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-form-provider-health-description">
 				<?php \esc_html_e( 'Provider-backed form usage: availability, section and page template counts, and links to template diagnostics. Observational only.', 'aio-page-builder' ); ?>
 			</p>
@@ -61,9 +63,11 @@ final class Form_Provider_Health_Screen {
 			<?php $this->render_recent_failures( $summary['recent_failures_summary'] ?? array() ); ?>
 			<?php $this->render_links( $summary ); ?>
 			<p class="aio-form-provider-health-built-at" style="margin-top: 1.5em; color: #666;">
-				<?php echo \esc_html( sprintf( __( 'Summary built at %s (UTC).', 'aio-page-builder' ), $summary['built_at'] ?? '' ) ); ?>
+				<?php echo \esc_html( sprintf( /* translators: %s: UTC timestamp */ __( 'Summary built at %s (UTC).', 'aio-page-builder' ), $summary['built_at'] ?? '' ) ); ?>
 			</p>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

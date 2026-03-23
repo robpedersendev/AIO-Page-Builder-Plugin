@@ -111,7 +111,7 @@ final class Build_Plan_Template_Explanation_Builder implements Template_Explanat
 		}
 		$section_count = (int) ( $summary['section_count'] ?? 0 );
 		if ( $section_count > 0 ) {
-			$lines[] = \sprintf( \__( 'Sections: %d', 'aio-page-builder' ), $section_count );
+			$lines[] = \sprintf( /* translators: %d: section count */ \__( 'Sections: %d', 'aio-page-builder' ), $section_count );
 		}
 		$dep_status = (string) ( $summary['deprecation_status'] ?? 'active' );
 		if ( $dep_status === 'deprecated' ) {

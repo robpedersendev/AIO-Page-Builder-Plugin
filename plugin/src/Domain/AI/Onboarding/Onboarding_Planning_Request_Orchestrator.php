@@ -32,6 +32,7 @@ use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
 use AIOPageBuilder\Domain\AI\Validation\Validation_Report;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Provider_Connection_Test_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
 
 /**
  * Validates onboarding readiness, builds prompt package and input artifact, invokes provider, validates output, persists run.
@@ -513,9 +514,9 @@ final class Onboarding_Planning_Request_Orchestrator {
 		}
 		$summary = $spend_service->get_spend_summary( $provider_id );
 		if ( $summary['exceeded'] && ! $summary['override_enabled'] ) {
-			\error_log(
+			Internal_Debug_Log::line(
 				sprintf(
-					'[AIO Page Builder] Spend cap preflight blocked run for provider %s (spent $%.4f of $%.2f cap).',
+					'Spend cap preflight blocked run for provider %s (spent $%.4f of $%.2f cap).',
 					$provider_id,
 					$summary['month_total'],
 					$summary['cap']
@@ -526,8 +527,8 @@ final class Onboarding_Planning_Request_Orchestrator {
 				Planning_Request_Result::STATUS_BLOCKED,
 				'',
 				0,
-				/* translators: %1$s provider name, %2$s dollar amount spent, %3$s cap amount */
 				sprintf(
+					/* translators: 1: provider name, 2: amount spent, 3: cap amount */
 					__( 'Monthly spend cap for %1$s exceeded ($%2$s of $%3$s). Enable the override in AI Providers settings to allow additional runs.', 'aio-page-builder' ),
 					\esc_html( $provider_id ),
 					number_format( $summary['month_total'], 4 ),

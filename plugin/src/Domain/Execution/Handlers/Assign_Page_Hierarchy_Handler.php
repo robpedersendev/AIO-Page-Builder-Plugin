@@ -147,8 +147,8 @@ final class Assign_Page_Hierarchy_Handler implements Execution_Handler_Interface
 
 		return array(
 			'success'   => true,
-			/* translators: 1: page ID 2: old parent ID 3: new parent ID */
 			'message'   => \sprintf(
+				/* translators: 1: page ID, 2: previous parent ID, 3: new parent ID */
 				\__( 'Page %1$d post_parent changed from %2$d to %3$d.', 'aio-page-builder' ),
 				$page_id,
 				$old_parent,

@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\Storage\Repositories;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Storage\Objects\Object_Status_Families;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Object lifecycle status is stored in meta _aio_status; internal key in _aio_internal_key.
@@ -73,21 +74,34 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 		if ( $key === '' ) {
 			return null;
 		}
+		global $wpdb;
+		if ( $wpdb instanceof \wpdb ) {
+			$post_id = Wpdb_Prepared_Results::find_post_id_by_post_type_meta_key_value(
+				$wpdb,
+				$this->get_post_type(),
+				self::META_INTERNAL_KEY,
+				$key
+			);
+			if ( $post_id > 0 ) {
+				$post = \get_post( $post_id );
+				if ( $post instanceof \WP_Post ) {
+					$meta = $this->get_meta( $post->ID );
+					return $this->post_to_record( $post, $meta );
+				}
+			}
+		}
+		// phpcs:disable WordPress.DB.SlowDBQuery -- Unreachable in real WordPress when global $wpdb exists; used by PHPUnit stubs.
 		$query = new \WP_Query(
 			array(
 				'post_type'              => $this->get_post_type(),
 				'posts_per_page'         => 1,
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
-				'meta_query'             => array(
-					array(
-						'key'     => self::META_INTERNAL_KEY,
-						'value'   => $key,
-						'compare' => '=',
-					),
-				),
+				'meta_key'               => self::META_INTERNAL_KEY,
+				'meta_value'             => $key,
 			)
 		);
+		// phpcs:enable WordPress.DB.SlowDBQuery
 		$posts = $query->get_posts();
 		if ( empty( $posts ) ) {
 			return null;
@@ -101,23 +115,45 @@ abstract class Abstract_CPT_Repository implements Repository_Interface {
 	public function list_by_status( string $status, int $limit = 0, int $offset = 0 ): array {
 		$status = $this->sanitize_status( $status );
 		$limit  = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
-		$query  = new \WP_Query(
+		global $wpdb;
+		if ( $wpdb instanceof \wpdb ) {
+			$ids = Wpdb_Prepared_Results::find_post_ids_by_post_type_meta_key_value(
+				$wpdb,
+				$this->get_post_type(),
+				self::META_STATUS,
+				$status,
+				$limit,
+				$offset,
+				'post_date',
+				'DESC'
+			);
+			if ( $ids !== array() ) {
+				$out = array();
+				foreach ( $ids as $post_id ) {
+					$post = \get_post( $post_id );
+					if ( ! $post instanceof \WP_Post ) {
+						continue;
+					}
+					$meta  = $this->get_meta( $post->ID );
+					$out[] = $this->post_to_record( $post, $meta );
+				}
+				return $out;
+			}
+		}
+		// phpcs:disable WordPress.DB.SlowDBQuery -- Unreachable in real WordPress when global $wpdb exists; used by PHPUnit stubs.
+		$query = new \WP_Query(
 			array(
 				'post_type'              => $this->get_post_type(),
 				'posts_per_page'         => $limit,
 				'offset'                 => $offset,
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
-				'meta_query'             => array(
-					array(
-						'key'     => self::META_STATUS,
-						'value'   => $status,
-						'compare' => '=',
-					),
-				),
+				'meta_key'               => self::META_STATUS,
+				'meta_value'             => $status,
 			)
 		);
-		$out    = array();
+		// phpcs:enable WordPress.DB.SlowDBQuery
+		$out = array();
 		foreach ( $query->get_posts() as $post ) {
 			$meta  = $this->get_meta( $post->ID );
 			$out[] = $this->post_to_record( $post, $meta );

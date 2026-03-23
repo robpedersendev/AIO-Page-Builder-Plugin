@@ -47,7 +47,7 @@ final class Post_Release_Health_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the post-release health review.', 'aio-page-builder' ), 403 );
 		}
@@ -66,8 +66,10 @@ final class Post_Release_Health_Screen {
 		$scores  = $state['domain_health_scores'] ?? array();
 		$items   = $state['recommended_investigation_items'] ?? array();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-post-release-health" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-post-release-health-description"><?php \esc_html_e( 'Internal operational review for the selected period. Use links to open authoritative screens. No automatic product changes.', 'aio-page-builder' ); ?></p>
 
 			<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-post-release-health-filter" style="margin: 1em 0;">
@@ -136,7 +138,9 @@ final class Post_Release_Health_Screen {
 			</section>
 
 			<p><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=aio-page-builder-support-triage' ) ); ?>"><?php \esc_html_e( '&larr; Support Triage', 'aio-page-builder' ); ?></a></p>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

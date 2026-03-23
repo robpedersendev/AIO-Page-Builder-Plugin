@@ -120,7 +120,7 @@ final class Future_Subtype_Readiness_Screen {
 	/**
 	 * Renders the screen. Capability enforced by menu registration.
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Future subtype readiness screen.', 'aio-page-builder' ), 403 );
 		}
@@ -128,8 +128,10 @@ final class Future_Subtype_Readiness_Screen {
 		$promo = $vm->get_promotion_readiness_subtype_summary();
 		$links = $vm->get_links();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-future-subtype-readiness" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php esc_html_e( 'Summary of future-subtype readiness: subtype scaffold progress, promotion readiness, and blockers. Internal planning only; read-only.', 'aio-page-builder' ); ?>
 			</p>
@@ -159,7 +161,9 @@ final class Future_Subtype_Readiness_Screen {
 			<p class="description" style="margin-top: 1.5em;">
 				<a href="<?php echo esc_url( $links['author_dashboard'] ?? '#' ); ?>"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
 			</p>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

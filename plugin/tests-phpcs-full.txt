@@ -1,0 +1,269 @@
+.E......E.EEEEEE............................................  60 / 463 (13%)
+.......................................................E.... 120 / 463 (26%)
+EEE.EE...................................................... 180 / 463 (39%)
+............................................................ 240 / 463 (52%)
+............................................EE.............. 300 / 463 (65%)
+............................................................ 360 / 463 (78%)
+E........................................................... 420 / 463 (91%)
+...........................................                  463 / 463 (100%)
+
+
+
+FILE: ...lugins\AIO Page Builder\AIO-Page-Builder-Plugin\plugin\tests\bootstrap.php
+--------------------------------------------------------------------------------
+FOUND 2 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 641 | ERROR | Missing @throws tag in function comment
+     |       | (Squiz.Commenting.FunctionCommentThrowTag.Missing)
+ 643 | ERROR | All output should be run through an escaping function (see the
+     |       | Security sections in the WordPress Developer Handbooks), found
+     |       | '$message'.
+     |       | (WordPress.Security.EscapeOutput.ExceptionNotEscaped)
+--------------------------------------------------------------------------------
+
+
+FILE: ...n\tests\Integration\Admin\Profile\Profile_Snapshot_Restore_Action_Test.php
+--------------------------------------------------------------------------------
+FOUND 3 ERRORS AFFECTING 3 LINES
+--------------------------------------------------------------------------------
+ 44 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 16
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 65 | ERROR | You must use "/**" style comments for a class comment
+    |       | (Squiz.Commenting.ClassComment.WrongStyle)
+ 98 | ERROR | You must use "/**" style comments for a class comment
+    |       | (Squiz.Commenting.ClassComment.WrongStyle)
+--------------------------------------------------------------------------------
+
+
+FILE: ...Plugin\plugin\tests\Integration\Domain\AI\Driver_Cost_Computation_Test.php
+--------------------------------------------------------------------------------
+FOUND 1 ERROR AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 60 | ERROR | You must use "/**" style comments for a class comment
+    |       | (Squiz.Commenting.ClassComment.WrongStyle)
+--------------------------------------------------------------------------------
+
+
+FILE: ...ion\Domain\Execution\Single_Action_Executor_Assign_Page_Hierarchy_Test.php
+--------------------------------------------------------------------------------
+FOUND 2 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 32 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 14
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 51 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 14
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+--------------------------------------------------------------------------------
+
+
+FILE: ...s\Integration\Domain\Execution\Single_Action_Executor_Create_Menu_Test.php
+--------------------------------------------------------------------------------
+FOUND 2 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 31 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 13
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 69 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 13
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+--------------------------------------------------------------------------------
+
+
+FILE: ...tion\Domain\Onboarding\Profile_Snapshot_Capture_On_Onboarding_Run_Test.php
+--------------------------------------------------------------------------------
+FOUND 3 ERRORS AFFECTING 3 LINES
+--------------------------------------------------------------------------------
+ 30 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 13
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 64 | ERROR | You must use "/**" style comments for a class comment
+    |       | (Squiz.Commenting.ClassComment.WrongStyle)
+ 89 | ERROR | You must use "/**" style comments for a class comment
+    |       | (Squiz.Commenting.ClassComment.WrongStyle)
+--------------------------------------------------------------------------------
+
+
+FILE: ...tegration\Domain\Profile\Profile_Snapshot_Capture_On_Profile_Save_Test.php
+--------------------------------------------------------------------------------
+FOUND 6 ERRORS AFFECTING 6 LINES
+--------------------------------------------------------------------------------
+  31 | ERROR | There should be only one namespace declaration per file. The
+     |       | first declaration was found on line 11
+     |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+  60 | ERROR | There should be only one namespace declaration per file. The
+     |       | first declaration was found on line 11
+     |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+  74 | ERROR | There should be only one namespace declaration per file. The
+     |       | first declaration was found on line 11
+     |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+  85 | ERROR | There should be only one namespace declaration per file. The
+     |       | first declaration was found on line 11
+     |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+  93 | ERROR | There should be only one namespace declaration per file. The
+     |       | first declaration was found on line 11
+     |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 101 | ERROR | There should be only one namespace declaration per file. The
+     |       | first declaration was found on line 11
+     |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+--------------------------------------------------------------------------------
+
+
+FILE: ...in\plugin\tests\Integration\Export\Profile_Snapshot_Export_Import_Test.php
+--------------------------------------------------------------------------------
+FOUND 2 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 28 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 14
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 44 | ERROR | You must use "/**" style comments for a class comment
+    |       | (Squiz.Commenting.ClassComment.WrongStyle)
+--------------------------------------------------------------------------------
+
+
+FILE: ...lugin\plugin\tests\Unit\Domain\Analytics\BuildPlanAnalyticsServiceTest.php
+--------------------------------------------------------------------------------
+FOUND 4 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 10 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+ 10 | ERROR | Namespace declarations without a namespace name are not allowed.
+    |       | (Universal.Namespaces.DisallowDeclarationWithoutName.Forbidden)
+ 28 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 10
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 28 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+--------------------------------------------------------------------------------
+
+
+FILE: ...lugin\plugin\tests\Unit\Domain\Industry\IndustryBundleApplyServiceTest.php
+--------------------------------------------------------------------------------
+FOUND 4 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 10 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+ 10 | ERROR | Namespace declarations without a namespace name are not allowed.
+    |       | (Universal.Namespaces.DisallowDeclarationWithoutName.Forbidden)
+ 48 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 10
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 48 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+--------------------------------------------------------------------------------
+
+
+FILE: ...in\plugin\tests\Unit\Domain\Industry\IndustryBundleConflictScannerTest.php
+--------------------------------------------------------------------------------
+FOUND 4 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 10 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+ 10 | ERROR | Namespace declarations without a namespace name are not allowed.
+    |       | (Universal.Namespaces.DisallowDeclarationWithoutName.Forbidden)
+ 25 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 10
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 25 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+--------------------------------------------------------------------------------
+
+
+FILE: ...lder-Plugin\plugin\tests\Unit\Domain\Industry\IndustryPackRegistryTest.php
+--------------------------------------------------------------------------------
+FOUND 4 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 10 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+ 10 | ERROR | Namespace declarations without a namespace name are not allowed.
+    |       | (Universal.Namespaces.DisallowDeclarationWithoutName.Forbidden)
+ 37 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 10
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 37 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+--------------------------------------------------------------------------------
+
+
+FILE: ...n\tests\Unit\Domain\Storage\Profile\Profile_Snapshot_Diff_Service_Test.php
+--------------------------------------------------------------------------------
+FOUND 2 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 22 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 8
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 31 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 8
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+--------------------------------------------------------------------------------
+
+
+FILE: ...plugin\tests\Unit\Domain\Storage\Profile\Profile_Snapshot_Factory_Test.php
+--------------------------------------------------------------------------------
+FOUND 2 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 28 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 8
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 36 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 8
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+--------------------------------------------------------------------------------
+
+
+FILE: ...Plugin\plugin\tests\Unit\Infrastructure\Lifecycle\LifecycleManagerTest.php
+--------------------------------------------------------------------------------
+FOUND 4 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+  6 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+  6 | ERROR | Namespace declarations without a namespace name are not allowed.
+    |       | (Universal.Namespaces.DisallowDeclarationWithoutName.Forbidden)
+ 12 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 6
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 12 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+--------------------------------------------------------------------------------
+
+
+FILE: ...Plugin\plugin\tests\Unit\Infrastructure\Lifecycle\UninstallServiceTest.php
+--------------------------------------------------------------------------------
+FOUND 4 ERRORS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+  6 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+  6 | ERROR | Namespace declarations without a namespace name are not allowed.
+    |       | (Universal.Namespaces.DisallowDeclarationWithoutName.Forbidden)
+ 12 | ERROR | There should be only one namespace declaration per file. The
+    |       | first declaration was found on line 6
+    |       | (Universal.Namespaces.OneDeclarationPerFile.MultipleFound)
+ 12 | ERROR | Namespace declarations using the curly brace syntax are not
+    |       | allowed.
+    |       | (Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden)
+--------------------------------------------------------------------------------
+
+
+FILE: ...O-Page-Builder-Plugin\plugin\tests\Unit\Queue_Recovery_And_Health_Test.php
+--------------------------------------------------------------------------------
+FOUND 1 ERROR AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 214 | ERROR | date() is affected by runtime timezone changes which can cause
+     |       | date/time to be incorrectly displayed. Use gmdate() instead.
+     |       | (WordPress.DateTime.RestrictedFunctions.date_date)
+--------------------------------------------------------------------------------
+
+Time: 52.63 secs; Memory: 58MB
+

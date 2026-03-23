@@ -11,10 +11,10 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 return array_merge(
-	_calls_lead_capture_rules(),
-	_bookings_consultation_rules(),
-	_estimates_calls_rules(),
-	_consultation_lead_nurture_rules()
+	aio_page_builder_calls_lead_capture_rules(),
+	aio_page_builder_bookings_consultation_rules(),
+	aio_page_builder_estimates_calls_rules(),
+	aio_page_builder_consultation_lead_nurture_rules()
 );
 
 /**
@@ -22,7 +22,7 @@ return array_merge(
  *
  * @return array<int, array<string, mixed>>
  */
-function _calls_lead_capture_rules(): array {
+function aio_page_builder_calls_lead_capture_rules(): array {
 	return array(
 		array(
 			'secondary_goal_rule_key' => 'sec_calls_lead_capture_cta_confusion',
@@ -42,7 +42,7 @@ function _calls_lead_capture_rules(): array {
  *
  * @return array<int, array<string, mixed>>
  */
-function _bookings_consultation_rules(): array {
+function aio_page_builder_bookings_consultation_rules(): array {
 	return array(
 		array(
 			'secondary_goal_rule_key' => 'sec_bookings_consultation_messaging_overload',
@@ -62,7 +62,7 @@ function _bookings_consultation_rules(): array {
  *
  * @return array<int, array<string, mixed>>
  */
-function _estimates_calls_rules(): array {
+function aio_page_builder_estimates_calls_rules(): array {
 	return array(
 		array(
 			'secondary_goal_rule_key' => 'sec_estimates_calls_promise_ambiguity',
@@ -82,7 +82,7 @@ function _estimates_calls_rules(): array {
  *
  * @return array<int, array<string, mixed>>
  */
-function _consultation_lead_nurture_rules(): array {
+function aio_page_builder_consultation_lead_nurture_rules(): array {
 	return array(
 		array(
 			'secondary_goal_rule_key' => 'sec_consultation_lead_nurture_cta_confusion',

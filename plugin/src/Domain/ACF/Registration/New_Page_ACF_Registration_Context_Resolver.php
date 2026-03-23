@@ -76,7 +76,7 @@ class New_Page_ACF_Registration_Context_Resolver {
 		if ( ! $this->is_new_page_edit_context() ) {
 			return null;
 		}
-		$template_key = (string) \apply_filters( self::FILTER_NEW_PAGE_TEMPLATE_KEY, '' );
+		$template_key = (string) \apply_filters( 'aio_acf_registration_new_page_template_key', '' );
 		if ( $template_key !== '' ) {
 			if ( $this->section_key_cache !== null ) {
 				$cached = $this->section_key_cache->get_for_template( $template_key );
@@ -97,7 +97,7 @@ class New_Page_ACF_Registration_Context_Resolver {
 			}
 			return $section_keys;
 		}
-		$composition_id = (string) \apply_filters( self::FILTER_NEW_PAGE_COMPOSITION_ID, '' );
+		$composition_id = (string) \apply_filters( 'aio_acf_registration_new_page_composition_id', '' );
 		if ( $composition_id !== '' ) {
 			if ( $this->section_key_cache !== null ) {
 				$cached = $this->section_key_cache->get_for_composition( $composition_id );

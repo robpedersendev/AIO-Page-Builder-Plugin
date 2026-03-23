@@ -1,0 +1,148 @@
+<?php
+/**
+ * Shared admin hub tab navigation (query args, URLs, nav-tab output).
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Admin;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Helpers for tabbed hub screens under a single admin.php?page= slug.
+ */
+final class Admin_Screen_Hub {
+
+	public const QUERY_TAB    = 'aio_tab';
+	public const QUERY_SUBTAB = 'aio_subtab';
+
+	/**
+	 * Resolves a tab key from the request with a whitelist.
+	 *
+	 * @param string   $default Default tab key.
+	 * @param string[] $allowed Allowed tab keys.
+	 * @return string
+	 */
+	public static function current_tab( string $default, array $allowed ): string {
+		if ( ! isset( $_GET[ self::QUERY_TAB ] ) ) {
+			return $default;
+		}
+		$tab = \sanitize_key( (string) \wp_unslash( $_GET[ self::QUERY_TAB ] ) );
+		return \in_array( $tab, $allowed, true ) ? $tab : $default;
+	}
+
+	/**
+	 * Resolves a sub-tab key (second-level nav) with a whitelist.
+	 *
+	 * @param string   $default Default sub-tab key.
+	 * @param string[] $allowed Allowed keys.
+	 * @return string
+	 */
+	public static function current_subtab( string $default, array $allowed ): string {
+		if ( ! isset( $_GET[ self::QUERY_SUBTAB ] ) ) {
+			return $default;
+		}
+		$tab = \sanitize_key( (string) \wp_unslash( $_GET[ self::QUERY_SUBTAB ] ) );
+		return \in_array( $tab, $allowed, true ) ? $tab : $default;
+	}
+
+	/**
+	 * Builds an admin URL for a hub tab.
+	 *
+	 * @param string $page_slug Registered admin page slug.
+	 * @param string $tab       Tab key.
+	 * @param array  $extra     Extra query args (sanitized values).
+	 * @return string
+	 */
+	public static function tab_url( string $page_slug, string $tab, array $extra = array() ): string {
+		$args = \array_merge(
+			array(
+				'page'          => $page_slug,
+				self::QUERY_TAB => $tab,
+			),
+			$extra
+		);
+		return \add_query_arg( $args, \admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * Builds a URL including a sub-tab key.
+	 *
+	 * @param string $page_slug Registered admin page slug.
+	 * @param string $tab       Primary tab key.
+	 * @param string $subtab    Secondary tab key.
+	 * @param array  $extra     Extra query args.
+	 * @return string
+	 */
+	public static function subtab_url( string $page_slug, string $tab, string $subtab, array $extra = array() ): string {
+		$args = \array_merge(
+			array(
+				'page'             => $page_slug,
+				self::QUERY_TAB    => $tab,
+				self::QUERY_SUBTAB => $subtab,
+			),
+			$extra
+		);
+		return \add_query_arg( $args, \admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * Renders a WordPress nav-tab row for tabs the current user may access.
+	 *
+	 * @param string                                           $page_slug Hub page slug.
+	 * @param array<string, array{label: string, cap: string}> $tabs Tab definitions keyed by tab id.
+	 * @param string                                           $current   Active tab id.
+	 * @return void
+	 */
+	public static function render_nav_tabs( string $page_slug, array $tabs, string $current ): void {
+		echo '<h2 class="nav-tab-wrapper aio-nav-tab-wrapper">';
+		foreach ( $tabs as $key => $info ) {
+			if ( ! \current_user_can( $info['cap'] ) ) {
+				continue;
+			}
+			$active = ( $current === $key ) ? ' nav-tab-active' : '';
+			echo '<a href="' . \esc_url( self::tab_url( $page_slug, $key ) ) . '" class="nav-tab' . \esc_attr( $active ) . '">' . \esc_html( $info['label'] ) . '</a>';
+		}
+		echo '</h2>';
+	}
+
+	/**
+	 * Renders a secondary nav row (nested tabs) below the primary row.
+	 *
+	 * @param string                                           $page_slug Hub page slug.
+	 * @param string                                           $tab       Primary tab id (fixed in URLs).
+	 * @param array<string, array{label: string, cap: string}> $tabs Sub-tab definitions.
+	 * @param string                                           $current   Active sub-tab id.
+	 * @return void
+	 */
+	public static function render_subnav_tabs( string $page_slug, string $tab, array $tabs, string $current ): void {
+		echo '<h3 class="nav-tab-wrapper aio-nav-subtab-wrapper" style="margin-top:0.5em;padding-top:0.5em;border-top:1px solid #c3c4c7;">';
+		foreach ( $tabs as $key => $info ) {
+			if ( ! \current_user_can( $info['cap'] ) ) {
+				continue;
+			}
+			$active = ( $current === $key ) ? ' nav-tab-active' : '';
+			echo '<a href="' . \esc_url( self::subtab_url( $page_slug, $tab, $key ) ) . '" class="nav-tab' . \esc_attr( $active ) . '">' . \esc_html( $info['label'] ) . '</a>';
+		}
+		echo '</h3>';
+	}
+
+	/**
+	 * Picks the first tab key the user may access, or the default if none.
+	 *
+	 * @param string                            $default Default tab key.
+	 * @param array<string, array{cap: string}> $tabs Tab definitions keyed by id (label only for display elsewhere).
+	 * @return string
+	 */
+	public static function first_accessible_tab( string $default, array $tabs ): string {
+		foreach ( $tabs as $key => $info ) {
+			if ( \current_user_can( $info['cap'] ) ) {
+				return $key;
+			}
+		}
+		return $default;
+	}
+}

@@ -42,7 +42,7 @@ final class Build_Plan_Analytics_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		$date_from = isset( $_GET['date_from'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_from'] ) ) : '';
 		$date_to   = isset( $_GET['date_to'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_to'] ) ) : '';
 		$summary   = array(
@@ -64,8 +64,10 @@ final class Build_Plan_Analytics_Screen {
 		}
 		$build_plans_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-build-plan-analytics" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-analytics-intro"><?php \esc_html_e( 'Observational trends from Build Plan history. No changes to plans or execution.', 'aio-page-builder' ); ?></p>
 			<p><a href="<?php echo \esc_url( $build_plans_url ); ?>"><?php \esc_html_e( '&larr; Back to Build Plans', 'aio-page-builder' ); ?></a></p>
 
@@ -91,7 +93,9 @@ final class Build_Plan_Analytics_Screen {
 
 			<h2><?php \esc_html_e( 'Rollback frequency', 'aio-page-builder' ); ?></h2>
 			<?php $this->render_rollback_summary( $summary['rollback_frequency_summary'] ); ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -131,7 +135,7 @@ final class Build_Plan_Analytics_Screen {
 		$total_rejected = (int) ( $data['total_rejected'] ?? 0 );
 		$total_failed   = (int) ( $data['total_failed'] ?? 0 );
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Total rejected items: %1$d; total failed items: %2$d.', 'aio-page-builder' ), $total_rejected, $total_failed ) ); ?></p>
+		<p><?php echo \esc_html( sprintf( /* translators: 1: rejected count, 2: failed count */ __( 'Total rejected items: %1$d; total failed items: %2$d.', 'aio-page-builder' ), $total_rejected, $total_failed ) ); ?></p>
 		<?php if ( empty( $blockers ) ) : ?>
 			<p><?php \esc_html_e( 'No blocker categories in range.', 'aio-page-builder' ); ?></p>
 		<?php else : ?>
@@ -151,7 +155,7 @@ final class Build_Plan_Analytics_Screen {
 		$by_type = isset( $data['failures_by_item_type'] ) && is_array( $data['failures_by_item_type'] ) ? $data['failures_by_item_type'] : array();
 		$total   = (int) ( $data['total_failed_items'] ?? 0 );
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Total failed items: %d.', 'aio-page-builder' ), $total ) ); ?></p>
+		<p><?php echo \esc_html( sprintf( /* translators: %d: failed item count */ __( 'Total failed items: %d.', 'aio-page-builder' ), $total ) ); ?></p>
 		<?php if ( empty( $by_type ) ) : ?>
 			<p><?php \esc_html_e( 'No failures by type in range.', 'aio-page-builder' ); ?></p>
 		<?php else : ?>
@@ -171,7 +175,7 @@ final class Build_Plan_Analytics_Screen {
 		$total    = (int) ( $data['total_rollbacks'] ?? 0 );
 		$by_month = isset( $data['by_month'] ) && is_array( $data['by_month'] ) ? $data['by_month'] : array();
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Total rollbacks in range: %d.', 'aio-page-builder' ), $total ) ); ?></p>
+		<p><?php echo \esc_html( sprintf( /* translators: %d: rollback count */ __( 'Total rollbacks in range: %d.', 'aio-page-builder' ), $total ) ); ?></p>
 		<?php if ( ! empty( $by_month ) ) : ?>
 		<table class="widefat striped">
 			<thead><tr><th><?php \esc_html_e( 'Month', 'aio-page-builder' ); ?></th><th><?php \esc_html_e( 'Count', 'aio-page-builder' ); ?></th></tr></thead>

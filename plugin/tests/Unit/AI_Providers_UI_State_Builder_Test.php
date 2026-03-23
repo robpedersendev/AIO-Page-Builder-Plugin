@@ -75,7 +75,7 @@ final class AI_Providers_UI_State_Builder_Test extends TestCase {
 	 * Provider_rows: [ { provider_id: "openai", label: "OpenAI", credential_status: { state: "absent", label: "Not configured" },
 	 *   model_default_state: { model_id: null, label: "—" }, connection_test_summary: null, last_successful_use: null } ]
 	 * disclosure_blocks: [ { heading: "External transfer", content: "When you use AI providers..." }, { heading: "Cost", content: "AI requests consume tokens..." } ]
-	 * ai_runs_url: "http://example.org/wp-admin/admin.php?page=aio-page-builder-ai-runs"
+	 * ai_runs_url: "http://example.org/wp-admin/admin.php?page=aio-page-builder-ai-workspace&aio_tab=ai_runs"
 	 */
 	public function test_example_state_payload_structure(): void {
 		$state = $this->build_state_with_mocks();
@@ -87,7 +87,8 @@ final class AI_Providers_UI_State_Builder_Test extends TestCase {
 		$this->assertSame( 'absent', $row['credential_status']['state'] );
 		$this->assertArrayHasKey( 'heading', $state['disclosure_blocks'][0] );
 		$this->assertArrayHasKey( 'content', $state['disclosure_blocks'][0] );
-		$this->assertStringContainsString( 'aio-page-builder-ai-runs', $state['ai_runs_url'] );
+		$this->assertStringContainsString( 'aio-page-builder-ai-workspace', $state['ai_runs_url'] );
+		$this->assertStringContainsString( 'aio_tab=ai_runs', $state['ai_runs_url'] );
 	}
 
 	/**

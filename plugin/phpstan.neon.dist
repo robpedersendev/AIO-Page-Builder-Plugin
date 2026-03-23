@@ -1,3 +1,5 @@
+# Baseline suppressions are triaged only: industry-normal / analyzer-limitation items with no defect in
+# functionality, security, or usability per docs/release/known-risk-register.md §5.
 includes:
     - phpstan-baseline.neon
 

@@ -107,7 +107,7 @@ final class Industry_Style_Preset_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage style presets.', 'aio-page-builder' ), 403 );
 		}
@@ -115,8 +115,10 @@ final class Industry_Style_Preset_Screen {
 		$message           = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
 		$global_tokens_url = \admin_url( 'admin.php?page=' . \AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen::SLUG );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-style-preset" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 
 			<?php if ( $message === 'applied' ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Preset applied. Token values have been merged into global style settings.', 'aio-page-builder' ); ?></p></div>
@@ -169,7 +171,9 @@ final class Industry_Style_Preset_Screen {
 					</tbody>
 				</table>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

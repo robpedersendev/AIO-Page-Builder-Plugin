@@ -97,7 +97,7 @@ final class Industry_Starter_Bundle_Comparison_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the bundle comparison screen.', 'aio-page-builder' ), 403 );
 		}
@@ -106,8 +106,10 @@ final class Industry_Starter_Bundle_Comparison_Screen {
 		$diff_rows     = $state['diff_rows'];
 		$selected_keys = $state['selected_keys'];
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-bundle-comparison" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php esc_html_e( 'Compare two or more starter bundles (page emphasis, template refs, section refs, CTA and preset notes). Read-only; choose a bundle in Industry Profile to apply.', 'aio-page-builder' ); ?>
 			</p>
@@ -170,7 +172,9 @@ final class Industry_Starter_Bundle_Comparison_Screen {
 			<?php elseif ( count( $selected_keys ) === 1 ) : ?>
 				<p class="notice notice-info inline" style="margin: 1em 0;"><?php esc_html_e( 'Select at least two bundle keys to compare.', 'aio-page-builder' ); ?></p>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

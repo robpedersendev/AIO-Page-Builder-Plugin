@@ -175,16 +175,17 @@ final class Queue_Health_Summary_Builder {
 		$running = $counts[ Job_Queue_Status::RUNNING ] ?? 0;
 		$failed  = $counts[ Job_Queue_Status::FAILED ] ?? 0;
 		if ( $stale_count > 0 ) {
-			$parts[] = sprintf( __( '%d stale lock(s) detected.', 'aio-page-builder' ), $stale_count );
+			$parts[] = sprintf( /* translators: %d: stale lock count */ __( '%d stale lock(s) detected.', 'aio-page-builder' ), $stale_count );
 		}
 		if ( $bottleneck ) {
-			$parts[] = sprintf( __( 'Bottleneck: %d pending jobs.', 'aio-page-builder' ), $pending );
+			$parts[] = sprintf( /* translators: %d: pending job count */ __( 'Bottleneck: %d pending jobs.', 'aio-page-builder' ), $pending );
 		}
 		if ( $retry_eligible_count > 0 ) {
-			$parts[] = sprintf( __( '%d failed job(s) eligible for retry.', 'aio-page-builder' ), $retry_eligible_count );
+			$parts[] = sprintf( /* translators: %d: retry-eligible failed job count */ __( '%d failed job(s) eligible for retry.', 'aio-page-builder' ), $retry_eligible_count );
 		}
 		if ( empty( $parts ) ) {
 			$parts[] = sprintf(
+				/* translators: 1: pending, 2: running, 3: failed job counts */
 				__( 'Queue: %1$d pending, %2$d running, %3$d failed.', 'aio-page-builder' ),
 				$pending,
 				$running,

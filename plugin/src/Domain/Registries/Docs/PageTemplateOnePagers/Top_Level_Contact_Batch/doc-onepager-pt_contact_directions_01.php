@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sections     = array(
+$aio_pb_sections     = array(
 	'hero_local_01'             => 'Local hero. See doc-helper-hero_local_01. Location-focused opener.',
 	'lpu_contact_detail_01'     => 'Contact detail. See doc-helper-lpu_contact_detail_01. Address, phone, email.',
 	'mlp_location_info_01'      => 'Location info. See doc-helper-mlp_location_info_01. Map/directions context.',
@@ -20,9 +20,9 @@ $sections     = array(
 	'ptf_expectations_01'       => 'Expectations. See doc-helper-ptf_expectations_01. Set scope.',
 	'cta_local_action_02'       => 'Local action CTA. See doc-helper-cta_local_action_02. Final CTA.',
 );
-$section_list = '';
-foreach ( $sections as $key => $guidance ) {
-	$section_list .= '<li><strong>' . $key . '</strong>: ' . $guidance . '</li>';
+$aio_pb_section_list = '';
+foreach ( $aio_pb_sections as $aio_pb_key => $aio_pb_guidance ) {
+	$aio_pb_section_list .= '<li><strong>' . $aio_pb_key . '</strong>: ' . $aio_pb_guidance . '</li>';
 }
 
 return array(
@@ -31,7 +31,7 @@ return array(
 	'content_body'              => '<h3>Page purpose</h3><p>Contact page directions-led. Local hero and contact/location info; local CTA; contact panel and trust band; accessibility and contact CTA; local value and expectations; local CTA.</p>'
 		. '<h3>Page flow</h3><p>Location-focused opener; contact and location; local CTA; panel and trust; accessibility and contact CTA; value and expectations; final local CTA.</p>'
 		. '<h3>CTA direction</h3><p>Primary path: local action CTA → contact CTA → local action CTA. One primary action per CTA block; present location and contact method clearly. Do not make implementation promises about directions or map providers.</p>'
-		. '<h3>Section-by-section (ordered)</h3><ol>' . $section_list . '</ol>'
+		. '<h3>Section-by-section (ordered)</h3><ol>' . $aio_pb_section_list . '</ol>'
 		. '<h3>Page-wide notes</h3><p><strong>GeneratePress:</strong> Use for container and spacing; keep section order as defined. <strong>ACF:</strong> Map fields per section helper. <strong>AIOSEO:</strong> Set focus keyphrase and meta for contact/directions. <strong>FIFU:</strong> Use for hero/section images where applicable. <strong>Navigation/hierarchy:</strong> Contact is top-level. <strong>Contact-method notes:</strong> Present address and location info clearly; accessibility help supports inclusive contact. <strong>Mistakes to avoid:</strong> Do not stack adjacent CTAs; do not repeat the same CTA copy; ensure last section is the final CTA. <strong>Accessibility:</strong> One H1 per page; logical heading order; sufficient contrast and focus order for all CTAs and links.</p>',
 	'status'                    => 'active',
 	'source_reference'          => array( 'page_template_key' => 'pt_contact_directions_01' ),

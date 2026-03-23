@@ -11,6 +11,8 @@ namespace AIOPageBuilder\Admin\Screens\ImportExport;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Export_Mode_Keys;
 use AIOPageBuilder\Domain\ExportRestore\Contracts\Restore_Scope_Keys;
 use AIOPageBuilder\Domain\ExportRestore\Import\Import_Validation_Result;
@@ -127,8 +129,10 @@ final class Import_Export_Screen {
 		$validate_url      = \admin_url( 'admin-post.php?action=aio_import_export_validate' );
 		$restore_url       = \wp_nonce_url( \admin_url( 'admin-post.php?action=aio_import_export_confirm_restore' ), self::NONCE_RESTORE );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-import-export" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 
 			<p class="aio-description"><?php \esc_html_e( 'Create exports, inspect export history, validate restore packages, and run restore with explicit conflict resolution.', 'aio-page-builder' ); ?></p>
 
@@ -404,7 +408,9 @@ final class Import_Export_Screen {
 					<p><a href="<?php echo \esc_url( $state['privacy_screen_url'] ); ?>#aio-lifecycle-heading"><?php \esc_html_e( 'Full template library lifecycle and restore guidance', 'aio-page-builder' ); ?></a></p>
 				<?php endif; ?>
 			</section>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -616,8 +622,9 @@ final class Import_Export_Screen {
 
 	private function screen_url( string $status, ?string $code = null, string $filename = '' ): string {
 		$args = array(
-			'page'          => self::SLUG,
-			'aio_ie_status' => $status,
+			'page'                      => Settings_Screen::SLUG,
+			Admin_Screen_Hub::QUERY_TAB => 'import_export',
+			'aio_ie_status'             => $status,
 		);
 		if ( $code !== null ) {
 			$args['aio_ie_code'] = $code;

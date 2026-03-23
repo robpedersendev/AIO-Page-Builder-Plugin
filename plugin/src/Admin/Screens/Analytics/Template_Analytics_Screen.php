@@ -47,7 +47,7 @@ final class Template_Analytics_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		$date_from       = isset( $_GET['date_from'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_from'] ) ) : '';
 		$date_to         = isset( $_GET['date_to'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['date_to'] ) ) : '';
 		$template_family = isset( $_GET['template_family'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['template_family'] ) ) : '';
@@ -102,8 +102,10 @@ final class Template_Analytics_Screen {
 		$page_tpl_url     = \admin_url( 'admin.php?page=' . Page_Templates_Directory_Screen::SLUG );
 		$compositions_url = \admin_url( 'admin.php?page=' . Compositions_Screen::SLUG );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-template-analytics" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-analytics-intro"><?php \esc_html_e( 'Observational template usage, recommendation success, execution outcomes, and rollback frequency. No changes to plans or execution.', 'aio-page-builder' ); ?></p>
 			<p>
 				<a href="<?php echo \esc_url( $build_plans_url ); ?>"><?php \esc_html_e( 'Build Plans', 'aio-page-builder' ); ?></a> |
@@ -144,7 +146,9 @@ final class Template_Analytics_Screen {
 
 			<h2><?php \esc_html_e( 'Composition usage', 'aio-page-builder' ); ?></h2>
 			<?php $this->render_composition_usage( $summary['composition_usage'] ); ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -153,7 +157,7 @@ final class Template_Analytics_Screen {
 		$by_family = isset( $data['by_family'] ) && is_array( $data['by_family'] ) ? $data['by_family'] : array();
 		$by_class  = isset( $data['by_class'] ) && is_array( $data['by_class'] ) ? $data['by_class'] : array();
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Total plan items with template context (in range): %d.', 'aio-page-builder' ), $total ) ); ?></p>
+		<p><?php echo \esc_html( sprintf( /* translators: %d: count of plan items */ __( 'Total plan items with template context (in range): %d.', 'aio-page-builder' ), $total ) ); ?></p>
 		<?php if ( ! empty( $by_family ) ) : ?>
 		<h3><?php \esc_html_e( 'By template family', 'aio-page-builder' ); ?></h3>
 		<table class="widefat striped">
@@ -231,7 +235,17 @@ final class Template_Analytics_Screen {
 		$reasons = isset( $data['reasons'] ) && is_array( $data['reasons'] ) ? $data['reasons'] : array();
 		$total   = (int) ( $data['total'] ?? 0 );
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Total rejections/failures with recorded reason: %d.', 'aio-page-builder' ), $total ) ); ?></p>
+		<p>
+			<?php
+			echo \esc_html(
+				sprintf(
+					/* translators: %d: count of rejections or failures with a recorded reason */
+					__( 'Total rejections/failures with recorded reason: %d.', 'aio-page-builder' ),
+					$total
+				)
+			);
+			?>
+		</p>
 		<?php if ( empty( $reasons ) ) : ?>
 			<p><?php \esc_html_e( 'No rejection reasons in range.', 'aio-page-builder' ); ?></p>
 		<?php else : ?>
@@ -252,7 +266,7 @@ final class Template_Analytics_Screen {
 		$total_completed = (int) ( $data['total_completed'] ?? 0 );
 		$total_failed    = (int) ( $data['total_failed'] ?? 0 );
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Execution completed: %1$d; failed: %2$d (create_page, replace_page).', 'aio-page-builder' ), $total_completed, $total_failed ) ); ?></p>
+		<p><?php echo \esc_html( sprintf( /* translators: 1: completed count, 2: failed count */ __( 'Execution completed: %1$d; failed: %2$d (create_page, replace_page).', 'aio-page-builder' ), $total_completed, $total_failed ) ); ?></p>
 		<?php if ( empty( $by_family ) ) : ?>
 			<p><?php \esc_html_e( 'No execution outcome data by family in range.', 'aio-page-builder' ); ?></p>
 		<?php else : ?>
@@ -276,7 +290,7 @@ final class Template_Analytics_Screen {
 		$total    = (int) ( $data['total_rollbacks'] ?? 0 );
 		$by_month = isset( $data['by_month'] ) && is_array( $data['by_month'] ) ? $data['by_month'] : array();
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Total rollbacks in range: %d.', 'aio-page-builder' ), $total ) ); ?></p>
+		<p><?php echo \esc_html( sprintf( /* translators: %d: rollback count */ __( 'Total rollbacks in range: %d.', 'aio-page-builder' ), $total ) ); ?></p>
 		<?php if ( ! empty( $by_month ) ) : ?>
 		<table class="widefat striped">
 			<thead><tr><th><?php \esc_html_e( 'Month', 'aio-page-builder' ); ?></th><th><?php \esc_html_e( 'Count', 'aio-page-builder' ); ?></th></tr></thead>
@@ -296,7 +310,7 @@ final class Template_Analytics_Screen {
 		$by_status = isset( $data['by_status'] ) && is_array( $data['by_status'] ) ? $data['by_status'] : array();
 		$total     = (int) ( $data['total'] ?? 0 );
 		?>
-		<p><?php echo \esc_html( sprintf( __( 'Total compositions (inventory): %d.', 'aio-page-builder' ), $total ) ); ?></p>
+		<p><?php echo \esc_html( sprintf( /* translators: %d: composition count */ __( 'Total compositions (inventory): %d.', 'aio-page-builder' ), $total ) ); ?></p>
 		<?php if ( ! empty( $by_status ) ) : ?>
 		<table class="widefat striped">
 			<thead><tr><th><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th><th><?php \esc_html_e( 'Count', 'aio-page-builder' ); ?></th></tr></thead>

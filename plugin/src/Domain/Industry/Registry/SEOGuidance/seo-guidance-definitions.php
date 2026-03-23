@@ -10,15 +10,15 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Industry\Registry\Industry_SEO_Guidance_Registry;
 
-$v      = Industry_SEO_Guidance_Registry::SUPPORTED_SCHEMA_VERSION;
-$active = Industry_SEO_Guidance_Registry::STATUS_ACTIVE;
+$aio_pb_seo_schema_version = Industry_SEO_Guidance_Registry::SUPPORTED_SCHEMA_VERSION;
+$aio_pb_seo_status_active  = Industry_SEO_Guidance_Registry::STATUS_ACTIVE;
 
 return array(
 	array(
 		Industry_SEO_Guidance_Registry::FIELD_GUIDANCE_RULE_KEY => 'cosmetology_nail',
 		Industry_SEO_Guidance_Registry::FIELD_INDUSTRY_KEY => 'cosmetology_nail',
-		Industry_SEO_Guidance_Registry::FIELD_VERSION_MARKER => $v,
-		Industry_SEO_Guidance_Registry::FIELD_STATUS       => $active,
+		Industry_SEO_Guidance_Registry::FIELD_VERSION_MARKER => $aio_pb_seo_schema_version,
+		Industry_SEO_Guidance_Registry::FIELD_STATUS       => $aio_pb_seo_status_active,
 		Industry_SEO_Guidance_Registry::FIELD_TITLE_PATTERNS => 'Service Name | Business Name; Location Name | Salon Name. Keep under 60 chars; include primary keyword.',
 		Industry_SEO_Guidance_Registry::FIELD_H1_PATTERNS  => 'One primary H1 per page; service or location name; avoid duplicate H1s.',
 		Industry_SEO_Guidance_Registry::FIELD_LOCAL_SEO_POSTURE => 'Moderate: service-area or neighborhood pages optional; NAP consistency and reviews matter more than many thin local pages.',
@@ -30,8 +30,8 @@ return array(
 	array(
 		Industry_SEO_Guidance_Registry::FIELD_GUIDANCE_RULE_KEY => 'realtor',
 		Industry_SEO_Guidance_Registry::FIELD_INDUSTRY_KEY => 'realtor',
-		Industry_SEO_Guidance_Registry::FIELD_VERSION_MARKER => $v,
-		Industry_SEO_Guidance_Registry::FIELD_STATUS       => $active,
+		Industry_SEO_Guidance_Registry::FIELD_VERSION_MARKER => $aio_pb_seo_schema_version,
+		Industry_SEO_Guidance_Registry::FIELD_STATUS       => $aio_pb_seo_status_active,
 		Industry_SEO_Guidance_Registry::FIELD_TITLE_PATTERNS => 'Area or Service | Agent/Team Name; keep listing and market pages distinct; under 60 chars.',
 		Industry_SEO_Guidance_Registry::FIELD_H1_PATTERNS  => 'One primary H1; area name, service type, or property type; avoid generic "Welcome".',
 		Industry_SEO_Guidance_Registry::FIELD_LOCAL_SEO_POSTURE => 'Strong: neighborhood, market, and service-area pages are central; NAP, schema, and unique local content matter.',
@@ -43,8 +43,8 @@ return array(
 	array(
 		Industry_SEO_Guidance_Registry::FIELD_GUIDANCE_RULE_KEY => 'plumber',
 		Industry_SEO_Guidance_Registry::FIELD_INDUSTRY_KEY => 'plumber',
-		Industry_SEO_Guidance_Registry::FIELD_VERSION_MARKER => $v,
-		Industry_SEO_Guidance_Registry::FIELD_STATUS       => $active,
+		Industry_SEO_Guidance_Registry::FIELD_VERSION_MARKER => $aio_pb_seo_schema_version,
+		Industry_SEO_Guidance_Registry::FIELD_STATUS       => $aio_pb_seo_status_active,
 		Industry_SEO_Guidance_Registry::FIELD_TITLE_PATTERNS => 'Service in Area | Business Name; Emergency Service | Business Name. Under 60 chars; include service and area.',
 		Industry_SEO_Guidance_Registry::FIELD_H1_PATTERNS  => 'One primary H1; service name or "Service in [Area]"; clear and actionable.',
 		Industry_SEO_Guidance_Registry::FIELD_LOCAL_SEO_POSTURE => 'Strong: service-area and locality pages central; NAP, service area, and emergency visibility matter.',
@@ -56,8 +56,8 @@ return array(
 	array(
 		Industry_SEO_Guidance_Registry::FIELD_GUIDANCE_RULE_KEY => 'disaster_recovery',
 		Industry_SEO_Guidance_Registry::FIELD_INDUSTRY_KEY => 'disaster_recovery',
-		Industry_SEO_Guidance_Registry::FIELD_VERSION_MARKER => $v,
-		Industry_SEO_Guidance_Registry::FIELD_STATUS       => $active,
+		Industry_SEO_Guidance_Registry::FIELD_VERSION_MARKER => $aio_pb_seo_schema_version,
+		Industry_SEO_Guidance_Registry::FIELD_STATUS       => $aio_pb_seo_status_active,
 		Industry_SEO_Guidance_Registry::FIELD_TITLE_PATTERNS => 'Service Type | Business Name; 24/7 Emergency Restoration | Business. Under 60 chars; urgency and service clear.',
 		Industry_SEO_Guidance_Registry::FIELD_H1_PATTERNS  => 'One primary H1; service type or "24/7 [Service]"; emergency and availability clear.',
 		Industry_SEO_Guidance_Registry::FIELD_LOCAL_SEO_POSTURE => 'Strong: service-area and disaster-type pages matter; NAP, 24/7, and claims assistance visible.',

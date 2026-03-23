@@ -25,8 +25,7 @@ final class Industry_Pack_Family_Comparison_Screen_Test extends TestCase {
 	public function test_get_state_with_null_container_returns_bounded_structure(): void {
 		$screen = new Industry_Pack_Family_Comparison_Screen( null );
 		$method = new ReflectionMethod( Industry_Pack_Family_Comparison_Screen::class, 'get_state' );
-		$method->setAccessible( true );
-		$state = $method->invoke( $screen );
+		$state  = $method->invoke( $screen );
 		$this->assertIsArray( $state );
 		$this->assertArrayHasKey( 'rows', $state );
 		$this->assertArrayHasKey( 'generated_at', $state );
@@ -40,8 +39,7 @@ final class Industry_Pack_Family_Comparison_Screen_Test extends TestCase {
 	public function test_get_state_row_structure_when_rows_present(): void {
 		$screen = new Industry_Pack_Family_Comparison_Screen( null );
 		$method = new ReflectionMethod( Industry_Pack_Family_Comparison_Screen::class, 'get_state' );
-		$method->setAccessible( true );
-		$state = $method->invoke( $screen );
+		$state  = $method->invoke( $screen );
 		$this->assertIsArray( $state['rows'] );
 		$required_keys = array( 'pack_key', 'subtype_key', 'scope_label', 'band', 'total', 'gap_count', 'blocker_count' );
 		foreach ( $state['rows'] as $row ) {

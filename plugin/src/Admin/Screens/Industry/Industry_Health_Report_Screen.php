@@ -88,14 +88,16 @@ final class Industry_Health_Report_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the industry health report.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->get_state();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-health-report" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php \esc_html_e( 'Validation of industry packs, profile selections, starter bundles, and cross-registry refs. Internal use only; no automatic repairs.', 'aio-page-builder' ); ?>
 			</p>
@@ -181,7 +183,9 @@ final class Industry_Health_Report_Screen {
 					</table>
 				</section>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

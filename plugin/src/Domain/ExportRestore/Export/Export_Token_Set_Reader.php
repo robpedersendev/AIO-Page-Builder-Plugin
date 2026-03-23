@@ -54,9 +54,6 @@ final class Export_Token_Set_Reader {
 				ARRAY_A
 			);
 		}
-		if ( ! is_array( $rows ) ) {
-			return array();
-		}
 		$out = array();
 		foreach ( $rows as $row ) {
 			if ( ! is_array( $row ) ) {

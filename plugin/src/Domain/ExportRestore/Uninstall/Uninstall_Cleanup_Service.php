@@ -125,22 +125,18 @@ final class Uninstall_Cleanup_Service {
 		foreach ( self::ACF_CACHE_TRANSIENT_PREFIXES as $prefix ) {
 			$like = $this->wpdb->esc_like( '_transient_' . $prefix ) . '%';
 			$ids  = Wpdb_Prepared_Results::get_col( $this->wpdb, 'SELECT option_id FROM %i WHERE option_name LIKE %s', array( $table, $like ) );
-			if ( is_array( $ids ) ) {
-				foreach ( $ids as $id ) {
-					$this->wpdb->delete( $table, array( 'option_id' => $id ) );
-					if ( $this->wpdb->last_error === '' ) {
-						++$count;
-					}
+			foreach ( $ids as $id ) {
+				$this->wpdb->delete( $table, array( 'option_id' => $id ) );
+				if ( $this->wpdb->last_error === '' ) {
+					++$count;
 				}
 			}
 			$like_timeout = $this->wpdb->esc_like( '_transient_timeout_' . $prefix ) . '%';
-			$ids_timeout = Wpdb_Prepared_Results::get_col( $this->wpdb, 'SELECT option_id FROM %i WHERE option_name LIKE %s', array( $table, $like_timeout ) );
-			if ( is_array( $ids_timeout ) ) {
-				foreach ( $ids_timeout as $id ) {
-					$this->wpdb->delete( $table, array( 'option_id' => $id ) );
-					if ( $this->wpdb->last_error === '' ) {
-						++$count;
-					}
+			$ids_timeout  = Wpdb_Prepared_Results::get_col( $this->wpdb, 'SELECT option_id FROM %i WHERE option_name LIKE %s', array( $table, $like_timeout ) );
+			foreach ( $ids_timeout as $id ) {
+				$this->wpdb->delete( $table, array( 'option_id' => $id ) );
+				if ( $this->wpdb->last_error === '' ) {
+					++$count;
 				}
 			}
 		}

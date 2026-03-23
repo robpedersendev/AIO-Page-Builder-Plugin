@@ -131,8 +131,8 @@ final class Bulk_Template_Page_Build_Service {
 		$refused_pre = count( $slug_collision_item_ids );
 		$queued      = count( $job_refs );
 		$message     = $refused_pre > 0
-			? sprintf( __( '%1$d queued, %2$d blocked by slug conflict.', 'aio-page-builder' ), $queued, $refused_pre )
-			: sprintf( __( '%d actions queued.', 'aio-page-builder' ), $queued );
+			? sprintf( /* translators: 1: queued count, 2: blocked by slug conflict */ __( '%1$d queued, %2$d blocked by slug conflict.', 'aio-page-builder' ), $queued, $refused_pre )
+			: sprintf( /* translators: %d: queued action count */ __( '%d actions queued.', 'aio-page-builder' ), $queued );
 
 		return new Bulk_Template_Page_Build_Result(
 			$plan_id,
@@ -281,13 +281,13 @@ final class Bulk_Template_Page_Build_Service {
 
 		$message_parts = array();
 		if ( $completed > 0 ) {
-			$message_parts[] = sprintf( __( '%d completed.', 'aio-page-builder' ), $completed );
+			$message_parts[] = sprintf( /* translators: %d: completed job count */ __( '%d completed.', 'aio-page-builder' ), $completed );
 		}
 		if ( $failed > 0 ) {
-			$message_parts[] = sprintf( __( '%d failed.', 'aio-page-builder' ), $failed );
+			$message_parts[] = sprintf( /* translators: %d: failed job count */ __( '%d failed.', 'aio-page-builder' ), $failed );
 		}
 		if ( $refused > 0 ) {
-			$message_parts[] = sprintf( __( '%d refused.', 'aio-page-builder' ), $refused );
+			$message_parts[] = sprintf( /* translators: %d: refused job count */ __( '%d refused.', 'aio-page-builder' ), $refused );
 		}
 		$message = implode( ' ', $message_parts ) !== '' ? implode( ' ', $message_parts ) : __( 'No results.', 'aio-page-builder' );
 

@@ -230,8 +230,9 @@ final class Support_Triage_State_Builder {
 				'summary'    => (string) ( $run['status'] ?? '' ) . ' — ' . ( (string) ( $run['created_at'] ?? '' ) ),
 				'link_url'   => \add_query_arg(
 					array(
-						'page'   => 'aio-page-builder-ai-runs',
-						'run_id' => (string) ( $run['run_id'] ?? '' ),
+						'page'    => 'aio-page-builder-ai-workspace',
+						'aio_tab' => 'ai_runs',
+						'run_id'  => (string) ( $run['run_id'] ?? '' ),
 					),
 					$base
 				),
@@ -446,12 +447,24 @@ final class Support_Triage_State_Builder {
 		);
 		$out[] = array(
 			'label'       => __( 'AI Runs', 'aio-page-builder' ),
-			'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs' ), $base ),
+			'url'         => \add_query_arg(
+				array(
+					'page'    => 'aio-page-builder-ai-workspace',
+					'aio_tab' => 'ai_runs',
+				),
+				$base
+			),
 			'description' => __( 'View AI run history and status.', 'aio-page-builder' ),
 		);
 		$out[] = array(
 			'label'       => __( 'Import / Export', 'aio-page-builder' ),
-			'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-export-restore' ), $base ),
+			'url'         => \add_query_arg(
+				array(
+					'page'    => 'aio-page-builder-settings',
+					'aio_tab' => 'import_export',
+				),
+				$base
+			),
 			'description' => __( 'Preview import, review conflicts, confirm restore, export history.', 'aio-page-builder' ),
 		);
 		return $out;

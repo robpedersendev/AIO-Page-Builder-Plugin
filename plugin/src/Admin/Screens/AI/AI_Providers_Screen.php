@@ -47,7 +47,7 @@ final class AI_Providers_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage AI providers.', 'aio-page-builder' ), 403 );
 		}
@@ -60,8 +60,8 @@ final class AI_Providers_Screen {
 		$this->render_connection_test_notice();
 		$state = $this->get_state();
 		$this->render_disclosure( $state['disclosure_blocks'] );
-		$this->render_provider_list( $state['provider_rows'], $state['ai_runs_url'] );
-		$this->render_spend_cap_section( $state['provider_rows'] );
+		$this->render_provider_list( $state['provider_rows'], $state['ai_runs_url'], $embed_in_hub );
+		$this->render_spend_cap_section( $state['provider_rows'], $embed_in_hub );
 	}
 
 	private function render_connection_test_notice(): void {
@@ -188,7 +188,13 @@ final class AI_Providers_Screen {
 					'content' => __( 'AI requests consume tokens and may incur cost according to the provider’s pricing. Run connection tests and planning requests only when needed. This plugin does not manage billing or quotas.', 'aio-page-builder' ),
 				),
 			),
-			'ai_runs_url'       => \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs' ), \admin_url( 'admin.php' ) ),
+			'ai_runs_url'       => \add_query_arg(
+				array(
+					'page'    => AI_Runs_Screen::HUB_PAGE_SLUG,
+					'aio_tab' => 'ai_runs',
+				),
+				\admin_url( 'admin.php' )
+			),
 		);
 	}
 
@@ -231,12 +237,15 @@ final class AI_Providers_Screen {
 	/**
 	 * @param array<int, array> $provider_rows
 	 * @param string            $ai_runs_url
+	 * @param bool              $embed_in_hub  When true, omit outer wrap and H1 (hub provides them).
 	 * @return void
 	 */
-	private function render_provider_list( array $provider_rows, string $ai_runs_url ): void {
+	private function render_provider_list( array $provider_rows, string $ai_runs_url, bool $embed_in_hub = false ): void {
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-ai-providers" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-ai-providers-description"><?php \esc_html_e( 'Configure and inspect AI provider credentials, model defaults, and connection status. Keys are never shown in full after save.', 'aio-page-builder' ); ?></p>
 			<p><a href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'View AI Runs', 'aio-page-builder' ); ?></a></p>
 			<?php if ( count( $provider_rows ) === 0 ) : ?>
@@ -297,7 +306,9 @@ final class AI_Providers_Screen {
 					</tbody>
 				</table>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -334,9 +345,10 @@ final class AI_Providers_Screen {
 	 * Renders per-provider spend summary notices and cap settings forms.
 	 *
 	 * @param array<int, array> $provider_rows
+	 * @param bool              $embed_in_hub  When true, omit outer `wrap` on this section container.
 	 * @return void
 	 */
-	private function render_spend_cap_section( array $provider_rows ): void {
+	private function render_spend_cap_section( array $provider_rows, bool $embed_in_hub = false ): void {
 		if ( ! $this->container
 			|| ! $this->container->has( 'provider_monthly_spend_service' )
 			|| ! $this->container->has( 'provider_spend_cap_settings' ) ) {
@@ -345,9 +357,10 @@ final class AI_Providers_Screen {
 		/** @var Provider_Monthly_Spend_Service $spend_service */
 		$spend_service = $this->container->get( 'provider_monthly_spend_service' );
 		/** @var Provider_Spend_Cap_Settings $cap_settings */
-		$cap_settings = $this->container->get( 'provider_spend_cap_settings' );
+		$cap_settings     = $this->container->get( 'provider_spend_cap_settings' );
+		$spend_wrap_class = $embed_in_hub ? 'aio-ai-spend-cap-section' : 'wrap aio-ai-spend-cap-section';
 		?>
-		<div class="wrap aio-ai-spend-cap-section">
+		<div class="<?php echo \esc_attr( $spend_wrap_class ); ?>">
 			<h2><?php \esc_html_e( 'Monthly Spend Caps', 'aio-page-builder' ); ?></h2>
 			<p><?php \esc_html_e( 'Set a per-provider monthly spend cap to prevent unexpected costs. When exceeded, new AI runs are blocked unless the override is enabled. Cost tracking uses approximate rates; verify totals in your provider dashboard.', 'aio-page-builder' ); ?></p>
 			<?php

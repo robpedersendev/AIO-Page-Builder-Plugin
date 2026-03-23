@@ -41,7 +41,7 @@ final class Build_Plans_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		$plan_id = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
 		if ( $plan_id === '' && isset( $_GET['id'] ) ) {
 			$plan_id = \sanitize_text_field( \wp_unslash( (string) $_GET['id'] ) );
@@ -51,10 +51,10 @@ final class Build_Plans_Screen {
 			$workspace->render( $plan_id );
 			return;
 		}
-		$this->render_list();
+		$this->render_list( $embed_in_hub );
 	}
 
-	private function render_list(): void {
+	private function render_list( bool $embed_in_hub = false ): void {
 		$plans = array();
 		if ( $this->container && $this->container->has( 'build_plan_repository' ) ) {
 			try {
@@ -65,8 +65,10 @@ final class Build_Plans_Screen {
 			}
 		}
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-build-plans-list" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-build-plans-description"><?php \esc_html_e( 'Review and manage build plans. Open a plan to review steps and items.', 'aio-page-builder' ); ?></p>
 			<?php if ( count( $plans ) === 0 ) : ?>
 				<p class="aio-admin-notice"><?php \esc_html_e( 'No build plans yet. Create a plan from an AI Run.', 'aio-page-builder' ); ?></p>
@@ -100,7 +102,9 @@ final class Build_Plans_Screen {
 					</tbody>
 				</table>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

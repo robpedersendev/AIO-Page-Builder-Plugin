@@ -478,7 +478,7 @@ final class Tokens_Step_UI_Service {
 		return array(
 			array(
 				'severity' => 'info',
-				'message'  => sprintf( \_n( '%d token pending review.', '%d tokens pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+				'message'  => sprintf( /* translators: %d: number of tokens */ \_n( '%d token pending review.', '%d tokens pending review.', $eligible, 'aio-page-builder' ), $eligible ),
 				'level'    => 'step',
 			),
 		);

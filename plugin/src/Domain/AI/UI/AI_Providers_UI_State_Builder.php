@@ -72,7 +72,13 @@ final class AI_Providers_UI_State_Builder {
 			$provider_rows[] = $this->build_provider_row( $provider_id );
 		}
 		$disclosure_blocks = $this->build_disclosure_blocks();
-		$ai_runs_url       = \add_query_arg( array( 'page' => 'aio-page-builder-ai-runs' ), \admin_url( 'admin.php' ) );
+		$ai_runs_url       = \add_query_arg(
+			array(
+				'page'    => 'aio-page-builder-ai-workspace',
+				'aio_tab' => 'ai_runs',
+			),
+			\admin_url( 'admin.php' )
+		);
 		return array(
 			'provider_rows'     => $provider_rows,
 			'disclosure_blocks' => $disclosure_blocks,

@@ -53,14 +53,16 @@ final class ACF_Architecture_Diagnostics_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access ACF field architecture diagnostics.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->build_state();
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-acf-diagnostics" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="aio-acf-diagnostics-description">
 				<?php \esc_html_e( 'Health of programmatically registered field groups, blueprint-family coverage, page-assignment state, and LPagery compatibility. Observational only; use repair tool to rebuild from registry.', 'aio-page-builder' ); ?>
 			</p>
@@ -72,7 +74,9 @@ final class ACF_Architecture_Diagnostics_Screen {
 			$this->render_regeneration_summary( $state['regeneration_plan_summary'] );
 			$this->render_repair_entry( $state );
 			?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

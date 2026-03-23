@@ -1,0 +1,405 @@
+﻿php : Instructions for interpreting errors
+At C:\Users\Home\AppData\Local\Temp\ps-script-8273cbb6-b5e8-46ee-95f8-9706c3c22c36.ps1:78 char:105
++ ... in\plugin"; php -d memory_limit=512M vendor/bin/phpstan analyse -c ph ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Instructions for interpreting errors:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+---------
+
+Each error has an associated identifier, like `argument.type`
+or `return.missing`.
+
+Each error identifier has documentation at URL https://phpstan.org/error-identifiers/<identifier>
+This page contains code example, explanation why is this an error
+and instruction how to fix it.
+Before fixing the error, fetch the documentation page for its identifier.
+
+The error usually indicates a real bug or incorrect type in the code. Fix the underlying cause, do not just make the 
+error go away.
+Do not add `@phpstan-ignore` comments, `@phpstan-ignore-next-line` comments, or baseline entries to suppress the error.
+Do not use assert() or inline @var PHPDoc tag to override PHPStan's inferred type.
+Do not add type casts just to silence errors.
+Do not widen parameter or return types just to make the error go away.
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Reporting\Errors\Developer_Error_Reporting_Service.php                                                         
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  93     Offset 'retry_for_dedupe_key' on array{sent_dedupe_keys?: array<string>, retry_for_dedupe_key: string, retry_  
+         attempt_count?: int, retry_last_attempt_at?: string} on left side of ?? always exists and is not nullable.     
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                        
+  121    Offset 'failure_reason' on array{success: false, failure_reason: string} in isset() always exists and is not   
+         nullable.                                                                                                      
+         ≡ƒ¬¬  isset.offset                                                                                               
+  146    Right side of && is always true.                                                                               
+         ≡ƒ¬¬  booleanAnd.rightAlwaysTrue                                                                                 
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  149    Function update_option invoked with 3 parameters, 2 required.                                                  
+         ≡ƒ¬¬  arguments.count                                                                                            
+  160    Function update_option invoked with 3 parameters, 2 required.                                                  
+         ≡ƒ¬¬  arguments.count                                                                                            
+  165    Function update_option invoked with 3 parameters, 2 required.                                                  
+         ≡ƒ¬¬  arguments.count                                                                                            
+  184    Strict comparison using !== between non-empty-string and false will always evaluate to true.                   
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                                                    
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  184    Strict comparison using !== between non-empty-string and null will always evaluate to true.                    
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                                                    
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  185    Strict comparison using === between non-empty-string and false will always evaluate to false.                  
+         ≡ƒ¬¬  identical.alwaysFalse                                                                                      
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  194    Strict comparison using !== between non-empty-string|null and '' will always evaluate to true.                 
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                                                    
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  281    Function update_option invoked with 3 parameters, 2 required.                                                  
+         ≡ƒ¬¬  arguments.count                                                                                            
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Reporting\Errors\Reporting_Eligibility_Evaluator.php                   
+ ------ ----------------------------------------------------------------------- 
+  124    Comparison operation ">=" between int<min, 2> and 10 is always false.  
+         ≡ƒ¬¬  greaterOrEqual.alwaysFalse                                         
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Reporting\FormProvider\Form_Provider_Health_Summary_Service.php                                                
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  86     Offset 'status' on array{provider_key: string, status: string, message: string|null} in isset() always exists  
+         and is not nullable.                                                                                           
+         ≡ƒ¬¬  isset.offset                                                                                               
+  121    Call to function is_array() with array<string, mixed> will always evaluate to true.                            
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  144    Call to function is_array() with array<string, mixed> will always evaluate to true.                            
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------- 
+  Line   Reporting\Heartbeat\Default_Heartbeat_Health_Provider.php                                               
+ ------ -------------------------------------------------------------------------------------------------------- 
+  20     Constant AIOPageBuilder\Domain\Reporting\Heartbeat\Default_Heartbeat_Health_Provider::HEALTH_VALUES is  
+         unused.                                                                                                 
+         ≡ƒ¬¬  classConstant.unused                                                                                
+         ≡ƒÆí  See: https://phpstan.org/developing-extensions/always-used-class-constants                          
+ ------ -------------------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Reporting\Heartbeat\Heartbeat_Service.php                                                                      
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  99     Offset 'failure_reason' on array{success: false, failure_reason: string} in isset() always exists and is not   
+         nullable.                                                                                                      
+         ≡ƒ¬¬  isset.offset                                                                                               
+  122    Strict comparison using !== between non-empty-string and false will always evaluate to true.                   
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                                                    
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  123    Strict comparison using === between non-empty-string and false will always evaluate to false.                  
+         ≡ƒ¬¬  identical.alwaysFalse                                                                                      
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  132    Strict comparison using !== between non-empty-string|null and '' will always evaluate to true.                 
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                                                    
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  142    Function update_option invoked with 3 parameters, 2 required.                                                  
+         ≡ƒ¬¬  arguments.count                                                                                            
+  155    Function update_option invoked with 3 parameters, 2 required.                                                  
+         ≡ƒ¬¬  arguments.count                                                                                            
+  190    Offset 'last_successful_aiΓÇª' on array{last_successful_ai_run_at: string,                                       
+         last_successful_build_plan_execution_at: string, current_health_summary: string, current_queue_warning_count:  
+         int, current_unresolved_critical_error_count: int} on left side of ?? always exists and is not nullable.       
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                        
+  191    Offset 'last_successfulΓÇª' on array{last_successful_ai_run_at: string,                                          
+         last_successful_build_plan_execution_at: string, current_health_summary: string, current_queue_warning_count:  
+         int, current_unresolved_critical_error_count: int} on left side of ?? always exists and is not nullable.       
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                        
+  192    Offset 'current_healthΓÇª' on array{last_successful_ai_run_at: string, last_successful_build_plan_execution_at:  
+         string, current_health_summary: string, current_queue_warning_count: int,                                      
+         current_unresolved_critical_error_count: int} on left side of ?? always exists and is not nullable.            
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                        
+  193    Offset 'current_queueΓÇª' on array{last_successful_ai_run_at: string, last_successful_build_plan_execution_at:   
+         string, current_health_summary: string, current_queue_warning_count: int,                                      
+         current_unresolved_critical_error_count: int} on left side of ?? always exists and is not nullable.            
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                        
+  194    Offset 'current_unresolvedΓÇª' on array{last_successful_ai_run_at: string,                                       
+         last_successful_build_plan_execution_at: string, current_health_summary: string, current_queue_warning_count:  
+         int, current_unresolved_critical_error_count: int} on left side of ?? always exists and is not nullable.       
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                        
+  227    Function update_option invoked with 3 parameters, 2 required.                                                  
+         ≡ƒ¬¬  arguments.count                                                                                            
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Reporting\Install\Install_Notification_Service.php                                                             
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  77     Offset 'failure_reason' on array{success: false, failure_reason: string} in isset() always exists and is not   
+         nullable.                                                                                                      
+         ≡ƒ¬¬  isset.offset                                                                                               
+  96     Strict comparison using !== between non-empty-string and false will always evaluate to true.                   
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                                                    
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  97     Strict comparison using === between non-empty-string and false will always evaluate to false.                  
+         ≡ƒ¬¬  identical.alwaysFalse                                                                                      
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  106    Strict comparison using !== between non-empty-string|null and '' will always evaluate to true.                 
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                                                    
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  174    Function update_option invoked with 3 parameters, 2 required.                                                  
+         ≡ƒ¬¬  arguments.count                                                                                            
+  201    Function update_option invoked with 3 parameters, 2 required.                                                  
+         ≡ƒ¬¬  arguments.count                                                                                            
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------- 
+  Line   Reporting\Logs\Log_Export_Service.php                                                
+ ------ ------------------------------------------------------------------------------------- 
+  151    Function wp_json_encode invoked with 2 parameters, 1 required.                       
+         ≡ƒ¬¬  arguments.count                                                                  
+  152    Strict comparison using === between string and false will always evaluate to false.  
+         ≡ƒ¬¬  identical.alwaysFalse                                                            
+  515    Strict comparison using === between string and false will always evaluate to false.  
+         ≡ƒ¬¬  identical.alwaysFalse                                                            
+ ------ ------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Reporting\Payloads\Template_Library_Report_Summary_Builder.php                                                 
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  84     Call to function is_string() with string will always evaluate to true.                                         
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  113    Call to function is_array() with array<int, array<string, mixed>> will always evaluate to true.                
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+  117    Call to function is_array() with array<int, array<string, mixed>> will always evaluate to true.                
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+  121    Call to function is_array() with array<int, array<string, mixed>> will always evaluate to true.                
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------------- 
+  Line   Reporting\UI\Logs_Monitoring_State_Builder.php                                                               
+ ------ ------------------------------------------------------------------------------------------------------------- 
+  151    Offset 'created_at' on array{job_ref: string, job_type: string, queue_status: string, created_at: string,    
+         completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, ...} on left    
+         side of ?? always exists and is not nullable.                                                                
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                      
+  151    Offset 'created_at' on array{job_ref: string, job_type: string, queue_status: string, created_at: string,    
+         completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, ...} on left    
+         side of ?? always exists and is not nullable.                                                                
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                      
+  176    Offset 'completed_at' on array{job_ref: string, job_type: string, queue_status: string, created_at: string,  
+         completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, ...} on left    
+         side of ?? always exists and is not nullable.                                                                
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                      
+  176    Offset 'completed_at' on array{job_ref: string, job_type: string, queue_status: string, created_at: string,  
+         completed_at: string, failure_reason: string, related_plan_id: string, retry_eligible: bool, ...} on left    
+         side of ?? always exists and is not nullable.                                                                
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                      
+  176    Offset 'created_at' on *NEVER* on left side of ?? always exists and is not nullable.                         
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                      
+  176    Offset 'created_at' on *NEVER* on left side of ?? always exists and is not nullable.                         
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                      
+ ------ ------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------------- 
+  Line   Reporting\UI\Post_Release_Health_State_Builder.php                                                           
+ ------ ------------------------------------------------------------------------------------------------------------- 
+  77     Offset 'plan_review_trends' on array{plan_review_trends: array, common_blockers: array,                      
+         execution_failure_trends: array, rollback_frequency_summary: array} on left side of ?? always exists and is  
+         not nullable.                                                                                                
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                      
+  78     Offset 'rollback_frequencyΓÇª' on array{plan_review_trends: array, common_blockers: array,                     
+         execution_failure_trends: array, rollback_frequency_summary: array} on left side of ?? always exists and is  
+         not nullable.                                                                                                
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                      
+ ------ ------------------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------- 
+  Line   Reporting\UI\Privacy_Settings_State_Builder.php                                 
+ ------ -------------------------------------------------------------------------------- 
+  130    Call to function is_array() with non-empty-array will always evaluate to true.  
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                
+ ------ -------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   Storage\Migrations\Schema_Version_Tracker.php                         
+ ------ ---------------------------------------------------------------------- 
+  57     Call to function is_array() with array will always evaluate to true.  
+         ≡ƒ¬¬  function.alreadyNarrowedType                                      
+  93     Call to function is_array() with array will always evaluate to true.  
+         ≡ƒ¬¬  function.alreadyNarrowedType                                      
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   Storage\Migrations\Template_Library_Upgrade_Helper.php                
+ ------ ---------------------------------------------------------------------- 
+  44     Call to function is_array() with array will always evaluate to true.  
+         ≡ƒ¬¬  function.alreadyNarrowedType                                      
+ ------ ---------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Storage\Profile\Profile_Normalizer.php                                                                         
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  201    Call to function is_array() with array<string, mixed> will always evaluate to true.                            
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  233    Call to function is_array() with array<string, mixed> will always evaluate to true.                            
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  259    Call to function is_array() with array<string, mixed> will always evaluate to true.                            
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  285    Call to function is_array() with array<string, mixed> will always evaluate to true.                            
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  314    Call to function is_array() with array<string, mixed> will always evaluate to true.                            
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  365    Call to function is_string() with string will always evaluate to true.                                         
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Storage\Profile\Profile_Snapshot_Capture_Service.php                                                           
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  37     Property AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Capture_Service::$repository                   
+         (AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository) does not accept                            
+         AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface.                                   
+         ≡ƒ¬¬  assign.propertyType                                                                                        
+  93     Parameter #1 $store of method AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory::build() expects  
+         AIOPageBuilder\Domain\Storage\Profile\Profile_Store,                                                           
+         AIOPageBuilder\Domain\Storage\Profile\Profile_Store_Interface given.                                           
+         ≡ƒ¬¬  argument.type                                                                                              
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Storage\Profile\Profile_Snapshot_Diff_Service.php                                                              
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  72     Parameter #1 $array (list<string>) of array_values is already a list, call has no effect.                      
+         ≡ƒ¬¬  arrayValues.list                                                                                           
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  134    Call to function is_string() with string will always evaluate to true.                                         
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Storage\Profile\Profile_Snapshot_Factory.php                                                                   
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  55     Call to function is_array() with array<string, mixed> will always evaluate to true.                            
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  55     Offset 'brand_profile' on array{brand_profile: array<string, mixed>, business_profile: array<string, mixed>}   
+         on left side of ?? always exists and is not nullable.                                                          
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                        
+  58     Call to function is_array() with array<string, mixed> will always evaluate to true.                            
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                               
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+  58     Offset 'business_profile' on array{brand_profile: array<string, mixed>, business_profile: array<string, mixed  
+         >} on left side of ?? always exists and is not nullable.                                                       
+         ≡ƒ¬¬  nullCoalesce.offset                                                                                        
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   Storage\Profile\Profile_Store.php                                     
+ ------ ---------------------------------------------------------------------- 
+  232    Call to function is_array() with array will always evaluate to true.  
+         ≡ƒ¬¬  function.alreadyNarrowedType                                      
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------- 
+  Line   Storage\Repositories\AI_Run_Repository.php                                           
+ ------ ------------------------------------------------------------------------------------- 
+  59     Strict comparison using === between string and false will always evaluate to false.  
+         ≡ƒ¬¬  identical.alwaysFalse                                                            
+  99     Strict comparison using !== between string and false will always evaluate to true.   
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                          
+ ------ ------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------- 
+  Line   Storage\Repositories\Abstract_CPT_Repository.php                                             
+ ------ --------------------------------------------------------------------------------------------- 
+  133    Strict comparison using !== between non-empty-string and null will always evaluate to true.  
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                                  
+ ------ --------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------ 
+  Line   Storage\Repositories\Build_Plan_Repository.php                                      
+ ------ ------------------------------------------------------------------------------------ 
+  87     Strict comparison using !== between string and false will always evaluate to true.  
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                         
+ ------ ------------------------------------------------------------------------------------ 
+
+ ------ ------------------------------------------------------------------------------------- 
+  Line   Storage\Repositories\Composition_Repository.php                                      
+ ------ ------------------------------------------------------------------------------------- 
+  43     Strict comparison using !== between mixed and null will always evaluate to true.     
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                          
+         ≡ƒÆí  Type ''|null has already been eliminated from mixed.                             
+  62     Strict comparison using === between string and false will always evaluate to false.  
+         ≡ƒ¬¬  identical.alwaysFalse                                                            
+ ------ ------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------- 
+  Line   Storage\Repositories\Page_Template_Repository.php                                    
+ ------ ------------------------------------------------------------------------------------- 
+  61     Strict comparison using === between string and false will always evaluate to false.  
+         ≡ƒ¬¬  identical.alwaysFalse                                                            
+ ------ ------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------- 
+  Line   Storage\Repositories\Prompt_Pack_Repository.php                                      
+ ------ ------------------------------------------------------------------------------------- 
+  197    Strict comparison using === between string and false will always evaluate to false.  
+         ≡ƒ¬¬  identical.alwaysFalse                                                            
+ ------ ------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------- 
+  Line   Storage\Repositories\Section_Template_Repository.php                                 
+ ------ ------------------------------------------------------------------------------------- 
+  43     Strict comparison using !== between mixed and null will always evaluate to true.     
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                          
+         ≡ƒÆí  Type ''|null has already been eliminated from mixed.                             
+  62     Strict comparison using === between string and false will always evaluate to false.  
+         ≡ƒ¬¬  identical.alwaysFalse                                                            
+ ------ ------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------- 
+  Line   Storage\Repositories\Version_Snapshot_Repository.php                                 
+ ------ ------------------------------------------------------------------------------------- 
+  77     Strict comparison using === between string and false will always evaluate to false.  
+         ≡ƒ¬¬  identical.alwaysFalse                                                            
+ ------ ------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  Line   Storage\Tables\Table_Installer.php                                                                             
+ ------ --------------------------------------------------------------------------------------------------------------- 
+  55     Strict comparison using !== between non-empty-string and null will always evaluate to true.                    
+         ≡ƒ¬¬  notIdentical.alwaysTrue                                                                                    
+         ≡ƒÆí  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain  
+         : false in your phpstan.neon.dist.                                                                             
+ ------ --------------------------------------------------------------------------------------------------------------- 
+
+ [ERROR] Found 80 errors                                                                                               
+

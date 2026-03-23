@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Admin\Screens;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Bootstrap\Constants;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 
@@ -38,7 +39,7 @@ final class Settings_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		$seed_result                                  = isset( $_GET['aio_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_result'] ) : '';
 		$expansion_seed_result                        = isset( $_GET['aio_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_expansion_seed_result'] ) : '';
 		$hero_intro_batch_seed_result                 = isset( $_GET['aio_hero_intro_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hero_intro_batch_seed_result'] ) : '';
@@ -61,10 +62,12 @@ final class Settings_Screen {
 		$child_detail_product_seed_result             = isset( $_GET['aio_child_detail_product_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_product_seed_result'] ) : '';
 		$child_detail_profile_entity_seed_result      = isset( $_GET['aio_child_detail_profile_entity_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_profile_entity_seed_result'] ) : '';
 		$child_detail_variant_expansion_seed_result   = isset( $_GET['aio_child_detail_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_variant_expansion_seed_result'] ) : '';
-		$privacy_url                                  = \add_query_arg( array( 'page' => \AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen::SLUG ), \admin_url( 'admin.php' ) );
+		$privacy_url = Admin_Screen_Hub::tab_url( self::SLUG, 'privacy' );
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php
 				printf(
@@ -384,7 +387,9 @@ final class Settings_Screen {
 				<?php \wp_nonce_field( 'aio_seed_child_detail_variant_expansion_templates', 'aio_seed_child_detail_variant_expansion_nonce' ); ?>
 				<?php \submit_button( __( 'Seed child/detail variant expansion super-batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_variant_expansion_submit', false ); ?>
 			</form>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

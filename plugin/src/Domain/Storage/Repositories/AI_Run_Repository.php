@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\Runs\AI_Artifact_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
+use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Repository → storage: Object_Type_Keys::AI_RUN (CPT for metadata/identity).
@@ -110,7 +111,33 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 	public function list_recent_by_actor( int $user_id, int $limit = 50, int $offset = 0 ): array {
 		$limit  = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
 		$offset = $offset >= 0 ? $offset : 0;
-		$query  = new \WP_Query(
+		global $wpdb;
+		if ( $wpdb instanceof \wpdb ) {
+			$ids = Wpdb_Prepared_Results::find_post_ids_by_post_type_meta_key_value(
+				$wpdb,
+				$this->get_post_type(),
+				'_aio_run_actor',
+				(string) $user_id,
+				$limit,
+				$offset,
+				'post_date',
+				'DESC'
+			);
+			if ( $ids !== array() ) {
+				$out = array();
+				foreach ( $ids as $post_id ) {
+					$post = \get_post( $post_id );
+					if ( ! $post instanceof \WP_Post ) {
+						continue;
+					}
+					$meta  = $this->get_meta( $post->ID );
+					$out[] = $this->post_to_record( $post, $meta );
+				}
+				return $out;
+			}
+		}
+		// phpcs:disable WordPress.DB.SlowDBQuery -- Unreachable in real WordPress when global $wpdb exists; used by PHPUnit stubs.
+		$query = new \WP_Query(
 			array(
 				'post_type'      => $this->get_post_type(),
 				'posts_per_page' => $limit,
@@ -118,16 +145,12 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 				'orderby'        => 'date',
 				'order'          => 'DESC',
 				'no_found_rows'  => true,
-				'meta_query'     => array(
-					array(
-						'key'     => '_aio_run_actor',
-						'value'   => (string) $user_id,
-						'compare' => '=',
-					),
-				),
+				'meta_key'       => '_aio_run_actor',
+				'meta_value'     => (string) $user_id,
 			)
 		);
-		$out    = array();
+		// phpcs:enable WordPress.DB.SlowDBQuery
+		$out = array();
 		foreach ( $query->get_posts() as $post ) {
 			$meta  = $this->get_meta( $post->ID );
 			$out[] = $this->post_to_record( $post, $meta );

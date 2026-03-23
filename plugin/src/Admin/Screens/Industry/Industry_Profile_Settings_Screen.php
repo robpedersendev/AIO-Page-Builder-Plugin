@@ -169,7 +169,7 @@ final class Industry_Profile_Settings_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage industry profile.', 'aio-page-builder' ), 403 );
 		}
@@ -183,8 +183,10 @@ final class Industry_Profile_Settings_Screen {
 		$warnings       = $state['warnings'];
 		$result_message = isset( $_GET['aio_industry_result'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_industry_result'] ) ) : '';
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-profile-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 
 			<?php if ( $result_message === 'saved' ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Industry profile saved.', 'aio-page-builder' ); ?></p></div>
@@ -345,7 +347,9 @@ final class Industry_Profile_Settings_Screen {
 					</p>
 				</form>
 			</section>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

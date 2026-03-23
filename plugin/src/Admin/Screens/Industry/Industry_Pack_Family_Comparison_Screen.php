@@ -100,15 +100,17 @@ final class Industry_Pack_Family_Comparison_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! current_user_can( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Pack family comparison screen.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->get_state();
 		$rows  = $state['rows'];
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-industry-pack-family-comparison" role="main" aria-label="<?php echo esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<p class="description">
 				<?php esc_html_e( 'Compare launch-industry and subtype families by completeness band, coverage gaps, and blocker count. Internal only; read-only. See industry-pack-family-comparison-contract.md.', 'aio-page-builder' ); ?>
 			</p>
@@ -150,7 +152,9 @@ final class Industry_Pack_Family_Comparison_Screen {
 			<p class="description" style="margin-top: 1.5em;">
 				<a href="<?php echo esc_url( $state['dashboard_url'] ?? '#' ); ?>"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
 			</p>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 }

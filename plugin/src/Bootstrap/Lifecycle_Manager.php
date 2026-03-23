@@ -461,6 +461,7 @@ final class Lifecycle_Manager {
 		require_once $base . '/Registries/PageTemplate/Page_Template_Normalizer.php';
 		require_once $base . '/Storage/Repositories/Page_Template_Repository.php';
 		require_once $base . '/Registries/Composition/Composition_Schema.php';
+		require_once $base . '/Registries/Composition/Composition_Validation_Result.php';
 		require_once $base . '/Storage/Repositories/Composition_Repository.php';
 		require_once $base . '/Registries/PageTemplate/ExpansionPack/Page_Template_And_Composition_Expansion_Pack_Definitions.php';
 		require_once $base . '/Registries/PageTemplate/ExpansionPack/Page_Template_And_Composition_Expansion_Pack_Seeder.php';

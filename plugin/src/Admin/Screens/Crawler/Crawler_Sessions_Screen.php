@@ -64,7 +64,7 @@ final class Crawler_Sessions_Screen {
 	 *
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view crawl sessions.', 'aio-page-builder' ), 403 );
 		}
@@ -74,7 +74,7 @@ final class Crawler_Sessions_Screen {
 			$this->render_detail( $run_id );
 			return;
 		}
-		$this->render_list();
+		$this->render_list( $embed_in_hub );
 	}
 
 	private function maybe_handle_actions(): void {
@@ -103,7 +103,7 @@ final class Crawler_Sessions_Screen {
 		}
 	}
 
-	private function render_list(): void {
+	private function render_list( bool $embed_in_hub = false ): void {
 		$sessions = array();
 		if ( $this->container && $this->container->has( 'crawl_snapshot_service' ) ) {
 			try {
@@ -114,8 +114,10 @@ final class Crawler_Sessions_Screen {
 			}
 		}
 		?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-crawler-sessions" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
 			<?php $this->render_notice(); ?>
 			<p class="aio-crawler-readiness" aria-describedby="aio-crawler-rules"><?php \esc_html_e( 'Crawler runs are scoped to this site only. Sessions below are from the crawl snapshot table.', 'aio-page-builder' ); ?></p>
 			<div id="aio-crawler-rules" class="screen-reader-text"><?php \esc_html_e( 'Public-only, normalized URL identity, meaningful-page focus. No arbitrary host input.', 'aio-page-builder' ); ?></div>
@@ -187,7 +189,9 @@ final class Crawler_Sessions_Screen {
 					</tbody>
 				</table>
 			<?php endif; ?>
+		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 

@@ -12,54 +12,14 @@ namespace AIOPageBuilder\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
-use AIOPageBuilder\Admin\Screens\AI\AI_Providers_Screen;
-use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
-use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Profile_Snapshot_History_Panel;
-use AIOPageBuilder\Admin\Screens\AI\Prompt_Experiments_Screen;
-use AIOPageBuilder\Admin\Screens\Analytics\Template_Analytics_Screen;
-use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Analytics_Screen;
-use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
-use AIOPageBuilder\Admin\Screens\Templates\Compositions_Screen;
-use AIOPageBuilder\Admin\Screens\Docs\Documentation_Detail_Screen;
-use AIOPageBuilder\Admin\Screens\Templates\Page_Template_Detail_Screen;
-use AIOPageBuilder\Admin\Screens\Templates\Page_Templates_Directory_Screen;
-use AIOPageBuilder\Admin\Screens\Templates\Section_Template_Detail_Screen;
-use AIOPageBuilder\Admin\Screens\Templates\Section_Templates_Directory_Screen;
-use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
-use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
-use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
-use AIOPageBuilder\Admin\Screens\Diagnostics\ACF_Architecture_Diagnostics_Screen;
-use AIOPageBuilder\Admin\Screens\Diagnostics\Form_Provider_Health_Screen;
-use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
-use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
-use AIOPageBuilder\Admin\Screens\Operations\Post_Release_Health_Screen;
-use AIOPageBuilder\Admin\Screens\Support\Support_Triage_Dashboard_Screen;
-use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Bundle_Import_Preview_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Author_Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Guided_Repair_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Health_Report_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Drift_Report_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Maturity_Delta_Report_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Scaffold_Promotion_Readiness_Report_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Family_Comparison_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Stale_Content_Report_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Future_Industry_Readiness_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Future_Subtype_Readiness_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Override_Management_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Assistant;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Style_Preset_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Style_Layer_Comparison_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Conversion_Goal_Comparison_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Comparison_Screen;
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Subtype_Comparison_Screen;
-use AIOPageBuilder\Admin\Screens\Settings\Global_Component_Override_Settings_Screen;
-use AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen;
-use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Domain\Registries\PageTemplate\ExpansionPack\Page_Template_And_Composition_Expansion_Pack_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\TopLevelBatch\Top_Level_Marketing_Page_Template_Seeder;
@@ -153,53 +113,10 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_apply', array( $this, 'handle_industry_bundle_apply' ), 10 );
 
-		$dashboard            = new Dashboard_Screen( $this->container );
-		$settings             = new Settings_Screen();
-		$diagnostics          = new Diagnostics_Screen();
-		$acf_diagnostics      = new ACF_Architecture_Diagnostics_Screen( $this->container );
-		$form_provider_health = new Form_Provider_Health_Screen( $this->container );
-		$onboarding           = new Onboarding_Screen( $this->container );
-		$profile_snapshots    = new Profile_Snapshot_History_Panel( $this->container );
+		$dashboard         = new Dashboard_Screen( $this->container );
+		$profile_snapshots = new Profile_Snapshot_History_Panel( $this->container );
 		$profile_snapshots->register_hooks();
-		$crawler_sessions                      = new Crawler_Sessions_Screen( $this->container );
-		$crawler_comparison                    = new Crawler_Comparison_Screen( $this->container );
-		$ai_runs                               = new AI_Runs_Screen( $this->container );
-		$ai_providers                          = new AI_Providers_Screen( $this->container );
-		$prompt_experiments                    = new Prompt_Experiments_Screen( $this->container );
-		$build_plans                           = new Build_Plans_Screen( $this->container );
-		$page_templates_dir                    = new Page_Templates_Directory_Screen( $this->container );
-		$page_template_detail                  = new Page_Template_Detail_Screen( $this->container );
-		$section_templates_dir                 = new Section_Templates_Directory_Screen( $this->container );
-		$section_template_detail               = new Section_Template_Detail_Screen( $this->container );
-		$documentation_detail                  = new Documentation_Detail_Screen( $this->container );
-		$template_compare_screen               = new Template_Compare_Screen( $this->container );
-		$compositions_screen                   = new Compositions_Screen( $this->container );
-		$build_plan_analytics                  = new Build_Plan_Analytics_Screen( $this->container );
-		$template_analytics                    = new Template_Analytics_Screen( $this->container );
-		$queue_logs                            = new Queue_Logs_Screen( $this->container );
-		$support_triage                        = new Support_Triage_Dashboard_Screen( $this->container );
-		$post_release_health                   = new Post_Release_Health_Screen( $this->container );
-		$privacy_reporting                     = new Privacy_Reporting_Settings_Screen( $this->container );
-		$industry_profile                      = new Industry_Profile_Settings_Screen( $this->container );
-		$industry_author_dashboard             = new Industry_Author_Dashboard_Screen( $this->container );
-		$industry_health_report                = new Industry_Health_Report_Screen( $this->container );
-		$industry_stale_content_report         = new Industry_Stale_Content_Report_Screen( $this->container );
-		$industry_pack_family_comparison       = new Industry_Pack_Family_Comparison_Screen( $this->container );
-		$industry_future_readiness             = new Future_Industry_Readiness_Screen( $this->container );
-		$industry_future_subtype_readiness     = new Future_Subtype_Readiness_Screen( $this->container );
-		$industry_maturity_delta_report        = new Industry_Maturity_Delta_Report_Screen( $this->container );
-		$industry_drift_report                 = new Industry_Drift_Report_Screen( $this->container );
-		$industry_scaffold_promotion_readiness = new Industry_Scaffold_Promotion_Readiness_Report_Screen( $this->container );
-		$industry_guided_repair                = new Industry_Guided_Repair_Screen( $this->container );
-		$industry_subtype_comparison           = new Industry_Subtype_Comparison_Screen( $this->container );
-		$industry_bundle_comparison            = new Industry_Starter_Bundle_Comparison_Screen( $this->container );
-		$industry_goal_comparison              = new Conversion_Goal_Comparison_Screen( $this->container );
-		$industry_bundle_import_preview        = new Industry_Bundle_Import_Preview_Screen( $this->container );
-		$industry_style_preset                 = new Industry_Style_Preset_Screen( $this->container );
-		$industry_style_layer_comparison       = new Industry_Style_Layer_Comparison_Screen( $this->container );
-		$global_style_tokens                   = new Global_Style_Token_Settings_Screen( $this->container );
-		$global_component_overrides            = new Global_Component_Override_Settings_Screen( $this->container );
-		$import_export                         = new Import_Export_Screen( $this->container );
+		$hub_renderer = new \AIOPageBuilder\Admin\Admin_Menu_Hub_Renderer( $this->container, $profile_snapshots );
 
 		add_menu_page(
 			__( 'AIO Page Builder', 'aio-page-builder' ),
@@ -211,432 +128,7 @@ final class Admin_Menu {
 			59
 		);
 
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$dashboard->get_title(),
-			__( 'Dashboard', 'aio-page-builder' ),
-			$dashboard->get_capability(),
-			Dashboard_Screen::SLUG,
-			array( $dashboard, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$settings->get_title(),
-			__( 'Settings', 'aio-page-builder' ),
-			$settings->get_capability(),
-			Settings_Screen::SLUG,
-			array( $settings, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$diagnostics->get_title(),
-			__( 'Diagnostics', 'aio-page-builder' ),
-			$diagnostics->get_capability(),
-			Diagnostics_Screen::SLUG,
-			array( $diagnostics, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$acf_diagnostics->get_title(),
-			__( 'ACF Field Architecture', 'aio-page-builder' ),
-			$acf_diagnostics->get_capability(),
-			ACF_Architecture_Diagnostics_Screen::SLUG,
-			array( $acf_diagnostics, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$form_provider_health->get_title(),
-			__( 'Form Provider Health', 'aio-page-builder' ),
-			$form_provider_health->get_capability(),
-			Form_Provider_Health_Screen::SLUG,
-			array( $form_provider_health, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$onboarding->get_title(),
-			__( 'Onboarding & Profile', 'aio-page-builder' ),
-			$onboarding->get_capability(),
-			Onboarding_Screen::SLUG,
-			array( $onboarding, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$profile_snapshots->get_title(),
-			__( 'Profile History', 'aio-page-builder' ),
-			$profile_snapshots->get_capability(),
-			Profile_Snapshot_History_Panel::SLUG,
-			array( $profile_snapshots, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$crawler_sessions->get_title(),
-			__( 'Crawl Sessions', 'aio-page-builder' ),
-			$crawler_sessions->get_capability(),
-			Crawler_Sessions_Screen::SLUG,
-			array( $crawler_sessions, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$crawler_comparison->get_title(),
-			__( 'Crawl Comparison', 'aio-page-builder' ),
-			$crawler_comparison->get_capability(),
-			Crawler_Comparison_Screen::SLUG,
-			array( $crawler_comparison, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$ai_runs->get_title(),
-			__( 'AI Runs', 'aio-page-builder' ),
-			$ai_runs->get_capability(),
-			AI_Runs_Screen::SLUG,
-			array( $ai_runs, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$ai_providers->get_title(),
-			__( 'AI Providers', 'aio-page-builder' ),
-			$ai_providers->get_capability(),
-			AI_Providers_Screen::SLUG,
-			array( $ai_providers, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$prompt_experiments->get_title(),
-			__( 'Prompt Experiments', 'aio-page-builder' ),
-			$prompt_experiments->get_capability(),
-			Prompt_Experiments_Screen::SLUG,
-			array( $prompt_experiments, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$build_plans->get_title(),
-			__( 'Build Plans', 'aio-page-builder' ),
-			$build_plans->get_capability(),
-			Build_Plans_Screen::SLUG,
-			array( $build_plans, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$page_templates_dir->get_title(),
-			__( 'Page Templates', 'aio-page-builder' ),
-			$page_templates_dir->get_capability(),
-			Page_Templates_Directory_Screen::SLUG,
-			array( $page_templates_dir, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$page_template_detail->get_title(),
-			'', // * Hidden from menu; reachable via View link from directory.
-			$page_template_detail->get_capability(),
-			Page_Template_Detail_Screen::SLUG,
-			array( $page_template_detail, 'render' )
-		);
-		\remove_submenu_page( self::PARENT_SLUG, Page_Template_Detail_Screen::SLUG );
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$section_templates_dir->get_title(),
-			__( 'Section Templates', 'aio-page-builder' ),
-			$section_templates_dir->get_capability(),
-			Section_Templates_Directory_Screen::SLUG,
-			array( $section_templates_dir, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$section_template_detail->get_title(),
-			'', // * Hidden from menu; reachable via View link from section directory.
-			$section_template_detail->get_capability(),
-			Section_Template_Detail_Screen::SLUG,
-			array( $section_template_detail, 'render' )
-		);
-		\remove_submenu_page( self::PARENT_SLUG, Section_Template_Detail_Screen::SLUG );
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$documentation_detail->get_title(),
-			'', // * Hidden from menu; reachable via helper-doc links.
-			$documentation_detail->get_capability(),
-			Documentation_Detail_Screen::SLUG,
-			array( $documentation_detail, 'render' )
-		);
-		\remove_submenu_page( self::PARENT_SLUG, Documentation_Detail_Screen::SLUG );
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$template_compare_screen->get_title(),
-			__( 'Template Compare', 'aio-page-builder' ),
-			$template_compare_screen->get_capability(),
-			Template_Compare_Screen::SLUG,
-			array( $template_compare_screen, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$compositions_screen->get_title(),
-			__( 'Compositions', 'aio-page-builder' ),
-			$compositions_screen->get_capability(),
-			Compositions_Screen::SLUG,
-			array( $compositions_screen, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$build_plan_analytics->get_title(),
-			__( 'Build Plan Analytics', 'aio-page-builder' ),
-			$build_plan_analytics->get_capability(),
-			Build_Plan_Analytics_Screen::SLUG,
-			array( $build_plan_analytics, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$template_analytics->get_title(),
-			__( 'Template Analytics', 'aio-page-builder' ),
-			$template_analytics->get_capability(),
-			Template_Analytics_Screen::SLUG,
-			array( $template_analytics, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$queue_logs->get_title(),
-			__( 'Queue & Logs', 'aio-page-builder' ),
-			$queue_logs->get_capability(),
-			Queue_Logs_Screen::SLUG,
-			array( $queue_logs, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$support_triage->get_title(),
-			__( 'Support Triage', 'aio-page-builder' ),
-			$support_triage->get_capability(),
-			Support_Triage_Dashboard_Screen::SLUG,
-			array( $support_triage, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$post_release_health->get_title(),
-			__( 'Post-Release Health', 'aio-page-builder' ),
-			$post_release_health->get_capability(),
-			Post_Release_Health_Screen::SLUG,
-			array( $post_release_health, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$privacy_reporting->get_title(),
-			__( 'Privacy, Reporting & Settings', 'aio-page-builder' ),
-			$privacy_reporting->get_capability(),
-			Privacy_Reporting_Settings_Screen::SLUG,
-			array( $privacy_reporting, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_profile->get_title(),
-			__( 'Industry Profile', 'aio-page-builder' ),
-			$industry_profile->get_capability(),
-			Industry_Profile_Settings_Screen::SLUG,
-			array( $industry_profile, 'render' )
-		);
-
-		$industry_override_management = new Industry_Override_Management_Screen();
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_override_management->get_title(),
-			__( 'Industry Overrides', 'aio-page-builder' ),
-			$industry_override_management->get_capability(),
-			Industry_Override_Management_Screen::SLUG,
-			array( $industry_override_management, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_author_dashboard->get_title(),
-			__( 'Industry Author Dashboard', 'aio-page-builder' ),
-			$industry_author_dashboard->get_capability(),
-			Industry_Author_Dashboard_Screen::SLUG,
-			array( $industry_author_dashboard, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_health_report->get_title(),
-			__( 'Industry Health Report', 'aio-page-builder' ),
-			$industry_health_report->get_capability(),
-			Industry_Health_Report_Screen::SLUG,
-			array( $industry_health_report, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_stale_content_report->get_title(),
-			__( 'Stale content report', 'aio-page-builder' ),
-			$industry_stale_content_report->get_capability(),
-			Industry_Stale_Content_Report_Screen::SLUG,
-			array( $industry_stale_content_report, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_pack_family_comparison->get_title(),
-			__( 'Pack family comparison', 'aio-page-builder' ),
-			$industry_pack_family_comparison->get_capability(),
-			Industry_Pack_Family_Comparison_Screen::SLUG,
-			array( $industry_pack_family_comparison, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_future_readiness->get_title(),
-			__( 'Future industry readiness', 'aio-page-builder' ),
-			$industry_future_readiness->get_capability(),
-			Future_Industry_Readiness_Screen::SLUG,
-			array( $industry_future_readiness, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_future_subtype_readiness->get_title(),
-			__( 'Future subtype readiness', 'aio-page-builder' ),
-			$industry_future_subtype_readiness->get_capability(),
-			Future_Subtype_Readiness_Screen::SLUG,
-			array( $industry_future_subtype_readiness, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_maturity_delta_report->get_title(),
-			__( 'Maturity delta report', 'aio-page-builder' ),
-			$industry_maturity_delta_report->get_capability(),
-			Industry_Maturity_Delta_Report_Screen::SLUG,
-			array( $industry_maturity_delta_report, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_drift_report->get_title(),
-			__( 'Drift report', 'aio-page-builder' ),
-			$industry_drift_report->get_capability(),
-			Industry_Drift_Report_Screen::SLUG,
-			array( $industry_drift_report, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_scaffold_promotion_readiness->get_title(),
-			__( 'Scaffold promotion readiness', 'aio-page-builder' ),
-			$industry_scaffold_promotion_readiness->get_capability(),
-			Industry_Scaffold_Promotion_Readiness_Report_Screen::SLUG,
-			array( $industry_scaffold_promotion_readiness, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_guided_repair->get_title(),
-			__( 'Guided Repair', 'aio-page-builder' ),
-			$industry_guided_repair->get_capability(),
-			Industry_Guided_Repair_Screen::SLUG,
-			array( $industry_guided_repair, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_subtype_comparison->get_title(),
-			__( 'Subtype comparison', 'aio-page-builder' ),
-			$industry_subtype_comparison->get_capability(),
-			Industry_Subtype_Comparison_Screen::SLUG,
-			array( $industry_subtype_comparison, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_bundle_comparison->get_title(),
-			__( 'Bundle comparison', 'aio-page-builder' ),
-			$industry_bundle_comparison->get_capability(),
-			Industry_Starter_Bundle_Comparison_Screen::SLUG,
-			array( $industry_bundle_comparison, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_goal_comparison->get_title(),
-			__( 'Conversion goal comparison', 'aio-page-builder' ),
-			$industry_goal_comparison->get_capability(),
-			Conversion_Goal_Comparison_Screen::SLUG,
-			array( $industry_goal_comparison, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_bundle_import_preview->get_title(),
-			__( 'Industry Bundle Import', 'aio-page-builder' ),
-			$industry_bundle_import_preview->get_capability(),
-			Industry_Bundle_Import_Preview_Screen::SLUG,
-			array( $industry_bundle_import_preview, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_style_preset->get_title(),
-			__( 'Industry Style Preset', 'aio-page-builder' ),
-			$industry_style_preset->get_capability(),
-			Industry_Style_Preset_Screen::SLUG,
-			array( $industry_style_preset, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$industry_style_layer_comparison->get_title(),
-			__( 'Style layer comparison', 'aio-page-builder' ),
-			$industry_style_layer_comparison->get_capability(),
-			Industry_Style_Layer_Comparison_Screen::SLUG,
-			array( $industry_style_layer_comparison, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$global_style_tokens->get_title(),
-			__( 'Global Style Tokens', 'aio-page-builder' ),
-			$global_style_tokens->get_capability(),
-			Global_Style_Token_Settings_Screen::SLUG,
-			array( $global_style_tokens, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$global_component_overrides->get_title(),
-			__( 'Global Component Overrides', 'aio-page-builder' ),
-			$global_component_overrides->get_capability(),
-			Global_Component_Override_Settings_Screen::SLUG,
-			array( $global_component_overrides, 'render' )
-		);
-
-		add_submenu_page(
-			self::PARENT_SLUG,
-			$import_export->get_title(),
-			__( 'Import / Export', 'aio-page-builder' ),
-			$import_export->get_capability(),
-			Import_Export_Screen::SLUG,
-			array( $import_export, 'render' )
-		);
+		$hub_renderer->register_submenus( self::PARENT_SLUG );
 	}
 
 	/**
@@ -810,7 +302,7 @@ final class Admin_Menu {
 	 * @return void
 	 */
 	public function handle_apply_industry_style_preset(): void {
-		$redirect_url = \admin_url( 'admin.php?page=' . Industry_Style_Preset_Screen::SLUG );
+		$redirect_url = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'style' );
 		if ( ! isset( $_POST['aio_industry_style_preset_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_style_preset_nonce'] ) ), 'aio_apply_industry_style_preset' ) ) {
 			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
@@ -887,7 +379,7 @@ final class Admin_Menu {
 	 * @return void
 	 */
 	public function handle_guided_repair_migrate(): void {
-		$redirect = \admin_url( 'admin.php?page=' . Industry_Guided_Repair_Screen::SLUG );
+		$redirect = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'repair' );
 		if ( ! isset( $_POST['aio_guided_repair_migrate_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_guided_repair_migrate_nonce'] ) ), Industry_Guided_Repair_Screen::NONCE_ACTION_MIGRATE ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
@@ -920,7 +412,7 @@ final class Admin_Menu {
 	 * @return void
 	 */
 	public function handle_guided_repair_apply_ref(): void {
-		$redirect = \admin_url( 'admin.php?page=' . Industry_Guided_Repair_Screen::SLUG );
+		$redirect = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'repair' );
 		if ( ! isset( $_POST['aio_guided_repair_apply_ref_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_guided_repair_apply_ref_nonce'] ) ), Industry_Guided_Repair_Screen::NONCE_ACTION_APPLY_REF ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
@@ -957,7 +449,7 @@ final class Admin_Menu {
 	 * @return void
 	 */
 	public function handle_guided_repair_activate(): void {
-		$redirect = \admin_url( 'admin.php?page=' . Industry_Guided_Repair_Screen::SLUG );
+		$redirect = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'repair' );
 		if ( ! isset( $_POST['aio_guided_repair_activate_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_guided_repair_activate_nonce'] ) ), Industry_Guided_Repair_Screen::NONCE_ACTION_ACTIVATE ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
@@ -1005,7 +497,7 @@ final class Admin_Menu {
 	 * @return void
 	 */
 	public function handle_industry_bundle_preview(): void {
-		$redirect = \admin_url( 'admin.php?page=' . Industry_Bundle_Import_Preview_Screen::SLUG );
+		$redirect = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'import' );
 		if ( ! isset( $_POST['aio_industry_bundle_preview_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_bundle_preview_nonce'] ) ), 'aio_pb_preview_industry_bundle' ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Invalid request.', $redirect ) );
@@ -1020,7 +512,7 @@ final class Admin_Menu {
 		$upload_result = Industry_Bundle_Upload_Validator::validate_upload( $file );
 		if ( ! $upload_result['ok'] ) {
 			if ( $upload_result['log_reason'] !== '' ) {
-				\error_log( '[AIO Page Builder] Industry bundle upload rejected: ' . $upload_result['log_reason'] );
+				\AIOPageBuilder\Support\Logging\Internal_Debug_Log::line( 'Industry bundle upload rejected: ' . (string) ( $upload_result['log_reason'] ?? '' ) );
 			}
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', \rawurlencode( $upload_result['user_message'] ), $redirect ) );
 			exit;
@@ -1031,7 +523,7 @@ final class Admin_Menu {
 		);
 		if ( $parse_result['bundle'] === null ) {
 			if ( $parse_result['log_reason'] !== '' ) {
-				\error_log( '[AIO Page Builder] Industry bundle upload rejected: ' . $parse_result['log_reason'] );
+				\AIOPageBuilder\Support\Logging\Internal_Debug_Log::line( 'Industry bundle upload rejected: ' . (string) ( $parse_result['log_reason'] ?? '' ) );
 			}
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', \rawurlencode( $parse_result['user_message'] ), $redirect ) );
 			exit;
@@ -1075,7 +567,7 @@ final class Admin_Menu {
 	 * @return void
 	 */
 	public function handle_industry_bundle_apply(): void {
-		$redirect = \admin_url( 'admin.php?page=' . Industry_Bundle_Import_Preview_Screen::SLUG );
+		$redirect = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'import' );
 		if ( ! isset( $_POST['aio_industry_bundle_apply_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_industry_bundle_apply_nonce'] ) ), 'aio_pb_apply_industry_bundle' ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Invalid request.', $redirect ) );

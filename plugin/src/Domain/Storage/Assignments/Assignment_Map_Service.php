@@ -157,6 +157,31 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 	}
 
 	/**
+	 * Counts distinct source_ref values for any of the given map types (e.g. pages with template/composition assignments).
+	 *
+	 * @param string[] $map_types Assignment_Types constants.
+	 * @return int
+	 */
+	public function count_distinct_sources_for_map_types( array $map_types ): int {
+		$sanitized = array();
+		foreach ( $map_types as $t ) {
+			$m = $this->sanitize_map_type( (string) $t );
+			if ( $m !== '' ) {
+				$sanitized[] = $m;
+			}
+		}
+		if ( count( $sanitized ) === 0 ) {
+			return 0;
+		}
+		$this->assert_table_identifier();
+		$placeholders = implode( ', ', array_fill( 0, count( $sanitized ), '%s' ) );
+		$sql          = "SELECT COUNT(DISTINCT source_ref) FROM %i WHERE map_type IN ( {$placeholders} )";
+		$args         = array_merge( array( $this->table ), $sanitized );
+		$var          = Wpdb_Prepared_Results::get_var( $this->wpdb, $sql, $args );
+		return $var !== null && $var !== '' ? (int) $var : 0;
+	}
+
+	/**
 	 * Lists rows by map_type.
 	 *
 	 * @param string $map_type One of Assignment_Types constants.
@@ -174,7 +199,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		$this->assert_table_identifier();
 		$sql  = 'SELECT * FROM %i WHERE map_type = %s ORDER BY id ASC LIMIT %d OFFSET %d';
 		$rows = Wpdb_Prepared_Results::get_results( $this->wpdb, $sql, array( $this->table, $map_type, $limit, $offset ), \ARRAY_A );
-		return is_array( $rows ) ? $rows : array();
+		return $rows;
 	}
 
 	/**
@@ -195,7 +220,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		$this->assert_table_identifier();
 		$sql  = 'SELECT * FROM %i WHERE map_type = %s AND source_ref = %s ORDER BY id ASC LIMIT %d';
 		$rows = Wpdb_Prepared_Results::get_results( $this->wpdb, $sql, array( $this->table, $map_type, $source_ref, $limit ), \ARRAY_A );
-		return is_array( $rows ) ? $rows : array();
+		return $rows;
 	}
 
 	/**
@@ -217,10 +242,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		$this->assert_table_identifier();
 		$sql  = 'SELECT target_ref FROM %i WHERE map_type = %s AND source_ref = %s ORDER BY id ASC LIMIT %d';
 		$rows = Wpdb_Prepared_Results::get_col( $this->wpdb, $sql, array( $this->table, $map_type, $source_ref, $limit ) );
-		if ( ! is_array( $rows ) ) {
-			return array();
-		}
-		$out = array();
+		$out  = array();
 		foreach ( $rows as $ref ) {
 			if ( is_string( $ref ) && $ref !== '' ) {
 				$out[] = $ref;
@@ -287,7 +309,7 @@ final class Assignment_Map_Service implements Assignment_Map_Service_Interface {
 		$this->assert_table_identifier();
 		$sql  = 'SELECT * FROM %i WHERE map_type = %s AND target_ref = %s ORDER BY id ASC LIMIT %d';
 		$rows = Wpdb_Prepared_Results::get_results( $this->wpdb, $sql, array( $this->table, $map_type, $target_ref, $limit ), \ARRAY_A );
-		return is_array( $rows ) ? $rows : array();
+		return $rows;
 	}
 
 	private function sanitize_map_type( string $map_type ): string {

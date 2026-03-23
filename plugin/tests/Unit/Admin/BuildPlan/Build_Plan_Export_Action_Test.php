@@ -16,8 +16,8 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/../../../wordpress/' );
 final class Build_Plan_Export_Action_Test extends TestCase {
 
 	public function test_export_payload_redacts_sensitive_keys_in_definition_and_rail(): void {
-		$screen = new Build_Plan_Workspace_Screen( null );
-		$state  = array(
+		$screen  = new Build_Plan_Workspace_Screen( null );
+		$state   = array(
 			'plan_id'         => 'plan-abc',
 			'plan_post_id'    => 7,
 			'plan_definition' => array(
@@ -27,8 +27,7 @@ final class Build_Plan_Export_Action_Test extends TestCase {
 			'context_rail'    => array( 'token_secret' => 'y' ),
 			'stepper_steps'   => array( array( 'step_type' => 'overview' ) ),
 		);
-		$m      = new ReflectionMethod( Build_Plan_Workspace_Screen::class, 'build_export_payload_for_download' );
-		$m->setAccessible( true );
+		$m       = new ReflectionMethod( Build_Plan_Workspace_Screen::class, 'build_export_payload_for_download' );
 		$payload = $m->invoke( $screen, $state );
 		$this->assertSame( 1, $payload['export_version'] );
 		$this->assertSame( 'plan-abc', $payload['plan_id'] );

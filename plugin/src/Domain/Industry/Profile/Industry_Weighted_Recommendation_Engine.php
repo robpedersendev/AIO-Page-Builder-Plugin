@@ -263,14 +263,14 @@ final class Industry_Weighted_Recommendation_Engine {
 	 */
 	private function section_explanation_summary( array $reasons, array $source_refs, string $primary, array $secondary ): string {
 		if ( empty( $reasons ) ) {
-			return $primary !== '' ? sprintf( __( 'Industry: %s.', 'aio-page-builder' ), implode( ', ', array_merge( array( $primary ), $secondary ) ) ) : '';
+			return $primary !== '' ? sprintf( /* translators: %s: industry labels */ __( 'Industry: %s.', 'aio-page-builder' ), implode( ', ', array_merge( array( $primary ), $secondary ) ) ) : '';
 		}
 		$parts = array();
 		if ( $primary !== '' ) {
-			$parts[] = sprintf( __( 'Primary (%s)', 'aio-page-builder' ), $primary );
+			$parts[] = sprintf( /* translators: %s: primary industry label */ __( 'Primary (%s)', 'aio-page-builder' ), $primary );
 		}
 		if ( ! empty( $secondary ) ) {
-			$parts[] = sprintf( __( 'Secondary (%s)', 'aio-page-builder' ), implode( ', ', $secondary ) );
+			$parts[] = sprintf( /* translators: %s: secondary industry labels */ __( 'Secondary (%s)', 'aio-page-builder' ), implode( ', ', $secondary ) );
 		}
 		$prefix = implode( ', ', $parts );
 		return $prefix !== '' ? $prefix . ': ' . implode( ', ', $reasons ) : implode( ', ', $reasons );

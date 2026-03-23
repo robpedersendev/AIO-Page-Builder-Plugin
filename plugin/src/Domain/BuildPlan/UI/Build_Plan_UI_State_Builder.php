@@ -230,7 +230,7 @@ final class Build_Plan_UI_State_Builder {
 			: array();
 		$warnings_summary = array_slice( $warnings, 0, 5 );
 		if ( count( $warnings ) > 5 ) {
-			$warnings_summary[] = array( 'message' => sprintf( __( '+%d more', 'aio-page-builder' ), count( $warnings ) - 5 ) );
+			$warnings_summary[] = array( 'message' => sprintf( /* translators: %d: additional warning count */ __( '+%d more', 'aio-page-builder' ), count( $warnings ) - 5 ) );
 		}
 
 		$subtype_context = Subtype_Build_Plan_Explanation_View_Model::from_plan_definition( $definition );

@@ -41,7 +41,7 @@ final class Page_Template_And_Composition_Expansion_Pack_Seeder {
 		foreach ( Page_Template_And_Composition_Expansion_Pack_Definitions::page_template_definitions() as $definition ) {
 			$id = $page_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
-				$key      = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
+				$key = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
 				/* translators: %s: internal registry key. */
 				$errors[] = sprintf( __( 'Failed to save page template: %s', 'aio-page-builder' ), $key );
 				continue;
@@ -52,7 +52,7 @@ final class Page_Template_And_Composition_Expansion_Pack_Seeder {
 		foreach ( Page_Template_And_Composition_Expansion_Pack_Definitions::composition_definitions() as $definition ) {
 			$id = $composition_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
-				$comp_id  = (string) ( $definition[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? 'unknown' );
+				$comp_id = (string) ( $definition[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? 'unknown' );
 				/* translators: %s: internal registry key. */
 				$errors[] = sprintf( __( 'Failed to save composition: %s', 'aio-page-builder' ), $comp_id );
 				continue;

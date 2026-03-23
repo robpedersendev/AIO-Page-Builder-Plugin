@@ -209,8 +209,9 @@ final class ACF_Diagnostics_Service {
 		}
 		$pages_with_source = 0;
 		foreach ( array_keys( $page_ids ) as $page_ref ) {
-			if ( ctype_digit( $page_ref ) ) {
-				$source = $this->assignment_service->get_structural_source_for_page( (int) $page_ref );
+			$page_ref_str = (string) $page_ref;
+			if ( ctype_digit( $page_ref_str ) ) {
+				$source = $this->assignment_service->get_structural_source_for_page( (int) $page_ref_str );
 				if ( $source !== null ) {
 					++$pages_with_source;
 				}

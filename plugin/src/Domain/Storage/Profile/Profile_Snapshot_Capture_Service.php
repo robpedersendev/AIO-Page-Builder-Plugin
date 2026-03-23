@@ -18,6 +18,8 @@ namespace AIOPageBuilder\Domain\Storage\Profile;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
+
 /**
  * Registers WordPress action hooks to trigger snapshot capture on profile lifecycle events.
  */
@@ -92,22 +94,19 @@ final class Profile_Snapshot_Capture_Service {
 		try {
 			$snapshot = $this->factory->build( $store, $source, $scope_type, $scope_id );
 			$saved    = $this->repository->save( $snapshot );
-			\error_log(
-				'[AIO Page Builder] ' . \wp_json_encode(
-					array(
-						'event'       => 'profile_snapshot_captured',
-						'snapshot_id' => $snapshot->snapshot_id,
-						'source'      => $source,
-						'scope_type'  => $scope_type,
-						'scope_id'    => $scope_id,
-						'saved'       => $saved,
-					)
+			$payload  = \wp_json_encode(
+				array(
+					'event'       => 'profile_snapshot_captured',
+					'snapshot_id' => $snapshot->snapshot_id,
+					'source'      => $source,
+					'scope_type'  => $scope_type,
+					'scope_id'    => $scope_id,
+					'saved'       => $saved,
 				)
-			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			);
+			Internal_Debug_Log::line( false !== $payload ? $payload : 'json_encode_failed' );
 		} catch ( \Throwable $e ) {
-			\error_log(
-				'[AIO Page Builder] profile_snapshot_capture_failed source=' . $source . ' error=' . $e->getMessage()
-			); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			Internal_Debug_Log::line( 'profile_snapshot_capture_failed source=' . $source . ' error=' . $e->getMessage() );
 		}
 	}
 }

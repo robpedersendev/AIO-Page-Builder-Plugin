@@ -32,7 +32,7 @@ final class Media_Listing_Profile_Detail_Library_Batch_Seeder {
 		foreach ( Media_Listing_Profile_Detail_Library_Batch_Definitions::all_definitions() as $definition ) {
 			$id = $section_repo->save_definition( $definition );
 			if ( $id <= 0 ) {
-				$key      = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
+				$key = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? 'unknown' );
 				/* translators: %s: internal registry key. */
 				$errors[] = sprintf( __( 'Failed to save media/listing/profile section: %s', 'aio-page-builder' ), $key );
 				continue;

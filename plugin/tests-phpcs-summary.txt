@@ -1,0 +1,38 @@
+.E......E.EEEEEE............................................  60 / 463 (13%)
+.......................................................E.... 120 / 463 (26%)
+EEE.EE...................................................... 180 / 463 (39%)
+............................................................ 240 / 463 (52%)
+............................................EE.............. 300 / 463 (65%)
+............................................................ 360 / 463 (78%)
+E........................................................... 420 / 463 (91%)
+...........................................                  463 / 463 (100%)
+
+
+
+PHP CODE SNIFFER REPORT SUMMARY
+--------------------------------------------------------------------------------
+FILE                                                            ERRORS  WARNINGS
+--------------------------------------------------------------------------------
+... Builder\AIO-Page-Builder-Plugin\plugin\tests\bootstrap.php  2       0
+...tion\Admin\Profile\Profile_Snapshot_Restore_Action_Test.php  3       0
+...ests\Integration\Domain\AI\Driver_Cost_Computation_Test.php  1       0
+...ution\Single_Action_Executor_Assign_Page_Hierarchy_Test.php  2       0
+...omain\Execution\Single_Action_Executor_Create_Menu_Test.php  2       0
+...oarding\Profile_Snapshot_Capture_On_Onboarding_Run_Test.php  3       0
+...n\Profile\Profile_Snapshot_Capture_On_Profile_Save_Test.php  6       0
+...\Integration\Export\Profile_Snapshot_Export_Import_Test.php  2       0
+...Plugin\plugin\tests\Unit\Queue_Recovery_And_Health_Test.php  1       0
+...sts\Unit\Domain\Analytics\BuildPlanAnalyticsServiceTest.php  4       0
+...sts\Unit\Domain\Industry\IndustryBundleApplyServiceTest.php  4       0
+...\Unit\Domain\Industry\IndustryBundleConflictScannerTest.php  4       0
+...gin\tests\Unit\Domain\Industry\IndustryPackRegistryTest.php  4       0
+...main\Storage\Profile\Profile_Snapshot_Diff_Service_Test.php  2       0
+...it\Domain\Storage\Profile\Profile_Snapshot_Factory_Test.php  2       0
+...ests\Unit\Infrastructure\Lifecycle\LifecycleManagerTest.php  4       0
+...ests\Unit\Infrastructure\Lifecycle\UninstallServiceTest.php  4       0
+--------------------------------------------------------------------------------
+A TOTAL OF 50 ERRORS AND 0 WARNINGS WERE FOUND IN 17 FILES
+--------------------------------------------------------------------------------
+
+Time: 50.55 secs; Memory: 58MB
+

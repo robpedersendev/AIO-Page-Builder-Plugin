@@ -211,10 +211,17 @@ final class Environment_Validator {
 		}
 		$required = Dependency_Requirements::get_required();
 		foreach ( $required as $key => $def ) {
-			$file = $def['plugin_file'];
-			$name = $def['name'];
-			$min  = $def['min_version'];
-			if ( ! is_plugin_active( $file ) ) {
+			$files           = Dependency_Requirements::plugin_bootstrap_files( $def );
+			$name            = $def['name'];
+			$min             = $def['min_version'];
+			$active_basename = null;
+			foreach ( $files as $file ) {
+				if ( is_plugin_active( $file ) ) {
+					$active_basename = $file;
+					break;
+				}
+			}
+			if ( $active_basename === null ) {
 				$this->add(
 					new Validation_Result(
 						self::CATEGORY_REQUIRED_DEPENDENCY,
@@ -226,7 +233,7 @@ final class Environment_Validator {
 				);
 				continue;
 			}
-			$version = $this->get_plugin_version( $file );
+			$version = $this->get_plugin_version( $active_basename );
 			if ( $version !== null && ! version_compare( $version, $min, '>=' ) ) {
 				$this->add(
 					new Validation_Result(
@@ -248,9 +255,16 @@ final class Environment_Validator {
 		}
 		$optional = Dependency_Requirements::get_optional();
 		foreach ( $optional as $key => $def ) {
-			$file = $def['plugin_file'];
-			$name = $def['name'];
-			if ( ! is_plugin_active( $file ) ) {
+			$files = Dependency_Requirements::plugin_bootstrap_files( $def );
+			$name  = $def['name'];
+			$any   = false;
+			foreach ( $files as $file ) {
+				if ( is_plugin_active( $file ) ) {
+					$any = true;
+					break;
+				}
+			}
+			if ( ! $any ) {
 				$this->add(
 					new Validation_Result(
 						self::CATEGORY_OPTIONAL_INTEGRATION,
