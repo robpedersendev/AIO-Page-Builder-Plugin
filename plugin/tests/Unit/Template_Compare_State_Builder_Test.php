@@ -69,9 +69,9 @@ final class Template_Compare_State_Builder_Test extends TestCase {
 				'detail_url'            => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-section-template-detail&section=st01_hero_intro',
 			),
 		),
-		'base_url_sections'      => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-section-templates',
-		'base_url_pages'         => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-page-templates',
-		'compare_screen_url'     => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-template-compare',
+		'base_url_sections'      => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-page-templates&aio_tab=section_templates',
+		'base_url_pages'         => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-page-templates&aio_tab=page_templates',
+		'compare_screen_url'     => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-page-templates&aio_tab=compare',
 		'empty_message'          => '',
 	);
 
@@ -116,9 +116,9 @@ final class Template_Compare_State_Builder_Test extends TestCase {
 				'detail_url'            => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-page-template-detail&template=pt_marketing_landing',
 			),
 		),
-		'base_url_sections'      => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-section-templates',
-		'base_url_pages'         => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-page-templates',
-		'compare_screen_url'     => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-template-compare',
+		'base_url_sections'      => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-page-templates&aio_tab=section_templates',
+		'base_url_pages'         => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-page-templates&aio_tab=page_templates',
+		'compare_screen_url'     => 'http://example.org/wp-admin/admin.php?page=aio-page-builder-page-templates&aio_tab=compare',
 		'empty_message'          => '',
 	);
 

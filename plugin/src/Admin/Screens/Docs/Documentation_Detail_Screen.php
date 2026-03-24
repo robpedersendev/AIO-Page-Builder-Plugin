@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -38,7 +39,7 @@ final class Documentation_Detail_Screen {
 	}
 
 	public function render(): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
@@ -64,13 +65,13 @@ final class Documentation_Detail_Screen {
 			<hr class="wp-header-end" />
 			<p>
 				<?php
-				$back_url = \admin_url( 'admin.php?page=aio-page-builder-section-templates' );
+				$back_url = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_SECTION );
 				if ( $this->container !== null && $this->container->has( 'admin_router' ) ) {
 					$router = $this->container->get( 'admin_router' );
 					if ( $router instanceof \AIOPageBuilder\Infrastructure\AdminRouting\Admin_Router ) {
 						$back_url = $router->url( 'section_templates_directory', array() );
 						if ( $back_url === '' ) {
-							$back_url = \admin_url( 'admin.php?page=aio-page-builder-section-templates' );
+							$back_url = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_SECTION );
 						}
 					}
 				}

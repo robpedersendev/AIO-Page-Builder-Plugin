@@ -248,6 +248,28 @@ if ( ! function_exists( 'add_action' ) ) {
 		$GLOBALS['_aio_actions'][ $tag ][] = $callback;
 	}
 }
+if ( ! function_exists( 'has_action' ) ) {
+	/**
+	 * @param string        $tag
+	 * @param callable|bool $function_to_check
+	 * @return int|false
+	 */
+	function has_action( $tag, $function_to_check = false ) {
+		$list = $GLOBALS['_aio_actions'][ $tag ] ?? array();
+		if ( ! is_array( $list ) || $list === array() ) {
+			return false;
+		}
+		if ( $function_to_check === false ) {
+			return 10;
+		}
+		foreach ( $list as $cb ) {
+			if ( $cb === $function_to_check ) {
+				return 10;
+			}
+		}
+		return false;
+	}
+}
 if ( ! function_exists( 'do_action' ) ) {
 	function do_action( $tag, ...$args ) {
 		$callbacks = $GLOBALS['_aio_actions'][ $tag ] ?? array();
@@ -322,10 +344,40 @@ if ( ! class_exists( 'WP_User' ) ) {
 	class WP_User {
 		public $ID;
 		public $user_email;
+		/** @var array<string, bool> */
+		public $allcaps = array();
 		public function __construct( $id = 0, $email = '' ) {
 			$this->ID         = $id;
 			$this->user_email = $email;
 		}
+	}
+}
+if ( ! function_exists( 'get_userdata' ) ) {
+	/**
+	 * Test stub: returns WP_User with allcaps from $GLOBALS['_aio_get_userdata_allcaps'] when set.
+	 *
+	 * @param int $user_id User ID.
+	 * @return \WP_User|false
+	 */
+	function get_userdata( $user_id ) {
+		if ( ! isset( $GLOBALS['_aio_get_userdata_allcaps'] ) || ! is_array( $GLOBALS['_aio_get_userdata_allcaps'] ) ) {
+			return false;
+		}
+		$u          = new \WP_User();
+		$u->ID      = (int) $user_id;
+		$u->allcaps = $GLOBALS['_aio_get_userdata_allcaps'];
+		return $u;
+	}
+}
+if ( ! function_exists( 'is_multisite' ) ) {
+	function is_multisite() {
+		return isset( $GLOBALS['_aio_is_multisite'] ) ? (bool) $GLOBALS['_aio_is_multisite'] : false;
+	}
+}
+if ( ! function_exists( 'is_super_admin' ) ) {
+	function is_super_admin( $user_id = null ) {
+		unset( $user_id );
+		return ! empty( $GLOBALS['_aio_is_super_admin'] );
 	}
 }
 if ( ! function_exists( 'get_user_by' ) ) {
@@ -462,6 +514,26 @@ if ( ! function_exists( 'current_user_can' ) ) {
 			}
 		}
 		return isset( $GLOBALS['_aio_current_user_can_return'] ) ? (bool) $GLOBALS['_aio_current_user_can_return'] : false;
+	}
+}
+if ( ! function_exists( 'user_can' ) ) {
+	/**
+	 * Stub for Hub_Menu_Capabilities and similar; per-cap map in _aio_user_can_caps, else _aio_user_can_return.
+	 *
+	 * @param \WP_User|int $user User ID or object (ignored for cap map; tests set globals per cap).
+	 * @param string       $capability Capability name.
+	 * @param mixed        ...$args Extra args.
+	 * @return bool
+	 */
+	function user_can( $user, $capability, ...$args ) {
+		unset( $user, $args );
+		$cap = (string) $capability;
+		if ( ! empty( $GLOBALS['_aio_user_can_caps'] ) && is_array( $GLOBALS['_aio_user_can_caps'] ) ) {
+			if ( array_key_exists( $cap, $GLOBALS['_aio_user_can_caps'] ) ) {
+				return (bool) $GLOBALS['_aio_user_can_caps'][ $cap ];
+			}
+		}
+		return isset( $GLOBALS['_aio_user_can_return'] ) ? (bool) $GLOBALS['_aio_user_can_return'] : false;
 	}
 }
 if ( ! function_exists( 'get_post_meta' ) ) {
@@ -860,5 +932,74 @@ if ( ! function_exists( 'wp_update_nav_menu_item' ) ) {
 if ( ! function_exists( 'wp_delete_nav_menu' ) ) {
 	function wp_delete_nav_menu( $menu ) {
 		return true;
+	}
+}
+// * Stubs for template live preview ticket tests (session, multisite, headers).
+if ( ! function_exists( 'is_user_logged_in' ) ) {
+	function is_user_logged_in() {
+		return ! empty( $GLOBALS['_aio_is_logged_in'] );
+	}
+}
+if ( ! function_exists( 'get_current_user_id' ) ) {
+	function get_current_user_id() {
+		return isset( $GLOBALS['_aio_current_uid'] ) ? (int) $GLOBALS['_aio_current_uid'] : 0;
+	}
+}
+if ( ! function_exists( 'wp_get_session_token' ) ) {
+	function wp_get_session_token() {
+		return isset( $GLOBALS['_aio_session_token'] ) ? (string) $GLOBALS['_aio_session_token'] : '';
+	}
+}
+if ( ! function_exists( 'wp_salt' ) ) {
+	function wp_salt( $scheme = 'auth' ) {
+		return 'test-salt-' . (string) $scheme;
+	}
+}
+if ( ! function_exists( 'home_url' ) ) {
+	function home_url( $path = '', $scheme = null ) {
+		unset( $scheme );
+		return 'http://example.org' . ( $path !== '' ? '/' . ltrim( (string) $path, '/' ) : '/' );
+	}
+}
+if ( ! function_exists( 'get_current_blog_id' ) ) {
+	function get_current_blog_id() {
+		return isset( $GLOBALS['_aio_current_blog_id'] ) ? (int) $GLOBALS['_aio_current_blog_id'] : 1;
+	}
+}
+if ( ! function_exists( 'switch_to_blog' ) ) {
+	function switch_to_blog( $blog_id ) {
+		if ( ! isset( $GLOBALS['_aio_blog_stack'] ) ) {
+			$GLOBALS['_aio_blog_stack'] = array();
+		}
+		$GLOBALS['_aio_blog_stack'][] = get_current_blog_id();
+		$GLOBALS['_aio_current_blog_id'] = (int) $blog_id;
+		return true;
+	}
+}
+if ( ! function_exists( 'restore_current_blog' ) ) {
+	function restore_current_blog() {
+		if ( empty( $GLOBALS['_aio_blog_stack'] ) || ! is_array( $GLOBALS['_aio_blog_stack'] ) ) {
+			return false;
+		}
+		$prev = array_pop( $GLOBALS['_aio_blog_stack'] );
+		$GLOBALS['_aio_current_blog_id'] = (int) $prev;
+		return true;
+	}
+}
+if ( ! function_exists( 'status_header' ) ) {
+	function status_header( $code ) {
+		if ( ! isset( $GLOBALS['_aio_status_headers'] ) ) {
+			$GLOBALS['_aio_status_headers'] = array();
+		}
+		$GLOBALS['_aio_status_headers'][] = (int) $code;
+	}
+}
+if ( ! function_exists( 'header' ) ) {
+	function header( $header, $replace = true ) {
+		unset( $replace );
+		if ( ! isset( $GLOBALS['_aio_http_headers'] ) ) {
+			$GLOBALS['_aio_http_headers'] = array();
+		}
+		$GLOBALS['_aio_http_headers'][] = (string) $header;
 	}
 }

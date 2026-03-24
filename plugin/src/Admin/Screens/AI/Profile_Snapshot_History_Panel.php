@@ -60,7 +60,7 @@ final class Profile_Snapshot_History_Panel {
 	}
 
 	/**
-	 * Registers the admin-post restore handler. Must be called during admin_init or init.
+	 * Registers the admin-post restore handler. Called from Admin_Menu::register_admin_post_actions (admin_init priority 0).
 	 *
 	 * @return void
 	 */

@@ -128,4 +128,50 @@ final class Capabilities {
 	public static function is_plugin_capability( string $cap ): bool {
 		return in_array( $cap, self::get_all(), true );
 	}
+
+	/**
+	 * Site administrators (manage_options) and multisite super admins get full template registry access regardless of aio_* role grants.
+	 *
+	 * @param string $registry_cap Capabilities::MANAGE_* for the relevant registry surface.
+	 * @return bool
+	 */
+	public static function current_user_can_or_site_admin( string $registry_cap ): bool {
+		if ( \current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+		if ( \function_exists( 'is_multisite' ) && \is_multisite() && \function_exists( 'is_super_admin' ) && \is_super_admin() ) {
+			return true;
+		}
+		return \current_user_can( $registry_cap );
+	}
+
+	/**
+	 * Whether the capability is a WordPress meta cap that must be checked with a post/page ID (WP 6.1+).
+	 *
+	 * @param string $cap Capability name.
+	 * @return bool
+	 */
+	public static function is_meta_post_or_page_cap_without_object( string $cap ): bool {
+		return in_array(
+			$cap,
+			array( 'delete_post', 'delete_page', 'edit_post', 'edit_page', 'read_post', 'read_page' ),
+			true
+		);
+	}
+
+	/**
+	 * current_user_can() for admin routes and tab gates that only use primitive or plugin caps.
+	 *
+	 * * Never passes bare meta post/page caps to core — that triggers map_meta_cap() _doing_it_wrong (WP 6.1+).
+	 * * If a dynamic cap is ever miswired to a meta cap without an object ID, access is denied instead of logging.
+	 *
+	 * @param string $cap Capability string (from route registry or screen get_capability()).
+	 * @return bool
+	 */
+	public static function current_user_can_for_route( string $cap ): bool {
+		if ( self::is_meta_post_or_page_cap_without_object( $cap ) ) {
+			return false;
+		}
+		return \current_user_can( $cap );
+	}
 }

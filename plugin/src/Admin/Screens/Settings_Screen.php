@@ -23,6 +23,11 @@ final class Settings_Screen {
 
 	public const SLUG = 'aio-page-builder-settings';
 
+	/** Nested hub sub-tab under "General & seeding". */
+	public const SETTINGS_SUBTAB_OVERVIEW = 'overview';
+
+	public const SETTINGS_SUBTAB_SECTION_PAGE_TEMPLATES = 'section_page_templates';
+
 	/** Gated by plugin capability for settings (spec §44.3). */
 	private const CAPABILITY = Capabilities::MANAGE_SETTINGS;
 
@@ -37,31 +42,25 @@ final class Settings_Screen {
 	/**
 	 * Renders the screen. No business logic; markup only.
 	 *
+	 * @param string $settings_subtab Hub nested tab: overview or section/page template batches.
 	 * @return void
 	 */
-	public function render( bool $embed_in_hub = false ): void {
-		$seed_result                                  = isset( $_GET['aio_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_result'] ) : '';
-		$expansion_seed_result                        = isset( $_GET['aio_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_expansion_seed_result'] ) : '';
-		$hero_intro_batch_seed_result                 = isset( $_GET['aio_hero_intro_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hero_intro_batch_seed_result'] ) : '';
-		$trust_proof_batch_seed_result                = isset( $_GET['aio_trust_proof_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_trust_proof_batch_seed_result'] ) : '';
-		$fb_value_batch_seed_result                   = isset( $_GET['aio_fb_value_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_fb_value_batch_seed_result'] ) : '';
-		$ptf_batch_seed_result                        = isset( $_GET['aio_ptf_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_ptf_batch_seed_result'] ) : '';
-		$mlp_batch_seed_result                        = isset( $_GET['aio_mlp_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_mlp_batch_seed_result'] ) : '';
-		$lpu_batch_seed_result                        = isset( $_GET['aio_lpu_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_lpu_batch_seed_result'] ) : '';
-		$cta_super_seed_result                        = isset( $_GET['aio_cta_super_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_cta_super_seed_result'] ) : '';
-		$pt_comp_expansion_seed_result                = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
-		$top_level_marketing_seed_result              = isset( $_GET['aio_top_level_marketing_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_marketing_seed_result'] ) : '';
-		$top_level_legal_utility_seed_result          = isset( $_GET['aio_top_level_legal_utility_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_legal_utility_seed_result'] ) : '';
-		$top_level_edu_resource_authority_seed_result = isset( $_GET['aio_top_level_edu_resource_authority_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_edu_resource_authority_seed_result'] ) : '';
-		$top_level_variant_expansion_seed_result      = isset( $_GET['aio_top_level_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_variant_expansion_seed_result'] ) : '';
-		$hub_page_seed_result                         = isset( $_GET['aio_hub_page_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_page_seed_result'] ) : '';
-		$geographic_hub_seed_result                   = isset( $_GET['aio_geographic_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_geographic_hub_seed_result'] ) : '';
-		$nested_hub_seed_result                       = isset( $_GET['aio_nested_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_nested_hub_seed_result'] ) : '';
-		$hub_nested_hub_variant_expansion_seed_result = isset( $_GET['aio_hub_nested_hub_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_nested_hub_variant_expansion_seed_result'] ) : '';
-		$child_detail_seed_result                     = isset( $_GET['aio_child_detail_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_seed_result'] ) : '';
-		$child_detail_product_seed_result             = isset( $_GET['aio_child_detail_product_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_product_seed_result'] ) : '';
-		$child_detail_profile_entity_seed_result      = isset( $_GET['aio_child_detail_profile_entity_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_profile_entity_seed_result'] ) : '';
-		$child_detail_variant_expansion_seed_result   = isset( $_GET['aio_child_detail_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_variant_expansion_seed_result'] ) : '';
+	public function render( bool $embed_in_hub = false, string $settings_subtab = self::SETTINGS_SUBTAB_OVERVIEW ): void {
+		$settings_subtab = \sanitize_key( $settings_subtab );
+		if ( $settings_subtab === self::SETTINGS_SUBTAB_SECTION_PAGE_TEMPLATES ) {
+			$this->render_section_page_template_seeding( $embed_in_hub );
+			return;
+		}
+		$this->render_general_overview( $embed_in_hub );
+	}
+
+	/**
+	 * Overview: version blurb, privacy link, form template seed.
+	 *
+	 * @return void
+	 */
+	private function render_general_overview( bool $embed_in_hub ): void {
+		$seed_result = isset( $_GET['aio_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_result'] ) : '';
 		$privacy_url = Admin_Screen_Hub::tab_url( self::SLUG, 'privacy' );
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
@@ -93,6 +92,72 @@ final class Settings_Screen {
 				<?php \wp_nonce_field( 'aio_seed_form_templates', 'aio_seed_form_templates_nonce' ); ?>
 				<?php \submit_button( __( 'Seed form section and request page template', 'aio-page-builder' ), 'secondary', 'aio_seed_form_templates_submit', false ); ?>
 			</form>
+		<?php if ( ! $embed_in_hub ) : ?>
+		</div>
+		<?php endif; ?>
+		<?php
+	}
+
+	/**
+	 * Section and page template batch seeding UI.
+	 *
+	 * @return void
+	 */
+	private function render_section_page_template_seeding( bool $embed_in_hub ): void {
+		$seed_all_section_result                      = isset( $_GET['aio_seed_all_section_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_all_section_result'] ) : '';
+		$seed_all_page_result                         = isset( $_GET['aio_seed_all_page_result'] ) ? \sanitize_key( (string) $_GET['aio_seed_all_page_result'] ) : '';
+		$expansion_seed_result                        = isset( $_GET['aio_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_expansion_seed_result'] ) : '';
+		$hero_intro_batch_seed_result                 = isset( $_GET['aio_hero_intro_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hero_intro_batch_seed_result'] ) : '';
+		$trust_proof_batch_seed_result                = isset( $_GET['aio_trust_proof_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_trust_proof_batch_seed_result'] ) : '';
+		$fb_value_batch_seed_result                   = isset( $_GET['aio_fb_value_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_fb_value_batch_seed_result'] ) : '';
+		$ptf_batch_seed_result                        = isset( $_GET['aio_ptf_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_ptf_batch_seed_result'] ) : '';
+		$mlp_batch_seed_result                        = isset( $_GET['aio_mlp_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_mlp_batch_seed_result'] ) : '';
+		$lpu_batch_seed_result                        = isset( $_GET['aio_lpu_batch_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_lpu_batch_seed_result'] ) : '';
+		$cta_super_seed_result                        = isset( $_GET['aio_cta_super_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_cta_super_seed_result'] ) : '';
+		$pt_comp_expansion_seed_result                = isset( $_GET['aio_pt_comp_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_pt_comp_expansion_seed_result'] ) : '';
+		$top_level_marketing_seed_result              = isset( $_GET['aio_top_level_marketing_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_marketing_seed_result'] ) : '';
+		$top_level_legal_utility_seed_result          = isset( $_GET['aio_top_level_legal_utility_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_legal_utility_seed_result'] ) : '';
+		$top_level_edu_resource_authority_seed_result = isset( $_GET['aio_top_level_edu_resource_authority_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_edu_resource_authority_seed_result'] ) : '';
+		$top_level_variant_expansion_seed_result      = isset( $_GET['aio_top_level_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_top_level_variant_expansion_seed_result'] ) : '';
+		$hub_page_seed_result                         = isset( $_GET['aio_hub_page_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_page_seed_result'] ) : '';
+		$geographic_hub_seed_result                   = isset( $_GET['aio_geographic_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_geographic_hub_seed_result'] ) : '';
+		$nested_hub_seed_result                       = isset( $_GET['aio_nested_hub_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_nested_hub_seed_result'] ) : '';
+		$hub_nested_hub_variant_expansion_seed_result = isset( $_GET['aio_hub_nested_hub_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_hub_nested_hub_variant_expansion_seed_result'] ) : '';
+		$child_detail_seed_result                     = isset( $_GET['aio_child_detail_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_seed_result'] ) : '';
+		$child_detail_product_seed_result             = isset( $_GET['aio_child_detail_product_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_product_seed_result'] ) : '';
+		$child_detail_profile_entity_seed_result      = isset( $_GET['aio_child_detail_profile_entity_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_profile_entity_seed_result'] ) : '';
+		$child_detail_variant_expansion_seed_result   = isset( $_GET['aio_child_detail_variant_expansion_seed_result'] ) ? \sanitize_key( (string) $_GET['aio_child_detail_variant_expansion_seed_result'] ) : '';
+		?>
+		<?php if ( ! $embed_in_hub ) : ?>
+		<div class="wrap aio-page-builder-screen aio-page-builder-settings" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
+			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php endif; ?>
+
+			<?php if ( $seed_all_section_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'All section template batches seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $seed_all_section_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding one or more section batches failed. Check debug logs and registry permissions.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+			<?php if ( $seed_all_page_result === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'All page template batches seeded successfully.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $seed_all_page_result === 'error' ) : ?>
+				<div class="notice notice-error is-dismissible"><p><?php \esc_html_e( 'Seeding one or more page template batches failed. Seed the section library first; check debug logs.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2 class="title"><?php \esc_html_e( 'Bulk seed', 'aio-page-builder' ); ?></h2>
+			<p><?php \esc_html_e( 'Runs every section batch (expansion pack through gap-closing) or every page batch (page/composition expansion through page gap-closing) in order. Idempotent; can take a while.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0.5em 1em 0;display:inline-block;vertical-align:top;">
+				<input type="hidden" name="action" value="aio_seed_all_section_templates" />
+				<?php \wp_nonce_field( 'aio_seed_all_section_templates', 'aio_seed_all_section_templates_nonce' ); ?>
+				<?php \submit_button( __( 'Seed all section templates', 'aio-page-builder' ), 'primary', 'aio_seed_all_section_submit', false ); ?>
+			</form>
+			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;display:inline-block;vertical-align:top;">
+				<input type="hidden" name="action" value="aio_seed_all_page_templates" />
+				<?php \wp_nonce_field( 'aio_seed_all_page_templates', 'aio_seed_all_page_templates_nonce' ); ?>
+				<?php \submit_button( __( 'Seed all page templates', 'aio-page-builder' ), 'primary', 'aio_seed_all_page_submit', false ); ?>
+			</form>
+
+			<hr />
 
 			<?php if ( $expansion_seed_result === 'success' ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Section expansion pack seeded successfully.', 'aio-page-builder' ); ?></p></div>

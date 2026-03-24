@@ -98,9 +98,10 @@ final class Lifecycle_Manager {
 			'validate_environment',
 			'check_dependencies',
 			'init_options',
+			// * Before DB migration: ensures admins retain plugin caps if a later phase blocks (uninstall/reinstall recovery).
+			'register_capabilities',
 			'check_tables_schema',
 			'template_library_upgrade_compatibility',
-			'register_capabilities',
 			'register_schedules',
 			'seed_form_templates',
 			'seed_section_expansion_pack',

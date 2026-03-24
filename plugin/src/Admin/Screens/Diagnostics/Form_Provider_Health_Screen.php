@@ -14,6 +14,7 @@ namespace AIOPageBuilder\Admin\Screens\Diagnostics;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Reporting\FormProvider\Form_Provider_Health_Summary_Service;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -190,9 +191,8 @@ final class Form_Provider_Health_Screen {
 	 * @return void
 	 */
 	private function render_links( array $summary ): void {
-		$base        = \admin_url( 'admin.php' );
-		$section_url = \add_query_arg( array( 'page' => 'aio-page-builder-section-templates' ), $base );
-		$page_url    = \add_query_arg( array( 'page' => 'aio-page-builder-page-templates' ), $base );
+		$section_url = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_SECTION );
+		$page_url    = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_PAGE );
 		?>
 		<div class="aio-form-provider-health-links card" style="max-width: 800px; padding: 1em; margin: 1em 0;">
 			<h2 class="aio-form-provider-health-section-title"><?php \esc_html_e( 'Related screens', 'aio-page-builder' ); ?></h2>

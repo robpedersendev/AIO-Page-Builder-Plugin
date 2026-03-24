@@ -31,6 +31,9 @@ final class HelperDocUrlResolverTest extends TestCase {
 			public function get_by_id( string $documentation_id ): ?array { // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
 				return null;
 			}
+			public function get_by_page_template_key( string $page_template_key ): ?array { // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+				return null;
+			}
 		};
 		$router   = new Admin_Router();
 		$resolver = new Helper_Doc_Url_Resolver( $registry, $router );
@@ -49,6 +52,9 @@ final class HelperDocUrlResolverTest extends TestCase {
 			public function get_by_section_key( string $section_key ): ?array { // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
 				return array( 'documentation_id' => 'doc-helper-hero-intro' );
 			}
+			public function get_by_page_template_key( string $page_template_key ): ?array { // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+				return null;
+			}
 		};
 		$router   = new Admin_Router();
 		$resolver = new Helper_Doc_Url_Resolver( $registry, $router );
@@ -58,5 +64,26 @@ final class HelperDocUrlResolverTest extends TestCase {
 		$this->assertNotSame( '', $resolved['url'] );
 		$this->assertStringContainsString( 'admin.php', $resolved['url'] );
 		$this->assertStringContainsString( 'aio-page-builder-documentation-detail', $resolved['url'] );
+	}
+
+	public function test_resolve_for_page_template_returns_url_when_registry_has_one_pager_doc(): void {
+		$registry = new class() implements Documentation_Registry_Lookup_Interface {
+			public function get_by_id( string $documentation_id ): ?array { // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+				return null;
+			}
+			public function get_by_section_key( string $section_key ): ?array { // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+				return null;
+			}
+			public function get_by_page_template_key( string $page_template_key ): ?array { // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+				return array( 'documentation_id' => 'doc-onepager-pt_home_conversion_01' );
+			}
+		};
+		$router   = new Admin_Router();
+		$resolver = new Helper_Doc_Url_Resolver( $registry, $router );
+		$resolved = $resolver->resolve_for_page_template( 'pt_home_conversion_01' );
+
+		$this->assertTrue( $resolved['available'] );
+		$this->assertNotSame( '', $resolved['url'] );
+		$this->assertStringContainsString( 'doc-onepager-pt_home_conversion_01', $resolved['url'] );
 	}
 }

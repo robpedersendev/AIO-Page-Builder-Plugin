@@ -1,0 +1,420 @@
+/**
+ * AIO Page Builder — wp-admin surfaces (template library browse, hubs).
+ * Scoped to plugin screens; respects WP admin color schemes.
+ */
+
+/* * Template library hub: calmer tab row */
+.wrap.aio-hub-wrap {
+	max-width: 1400px;
+}
+
+.wrap.aio-hub-wrap > h1 {
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+.aio-nav-tab-wrapper.nav-tab-wrapper {
+	border: 1px solid #c3c4c7;
+	border-radius: 6px 6px 0 0;
+	padding: 0.35rem 0.35rem 0;
+	background: #f6f7f7;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.aio-nav-tab-wrapper .nav-tab {
+	border-radius: 4px 4px 0 0;
+	margin: 0 0.15rem -1px 0;
+	font-weight: 500;
+}
+
+.aio-nav-tab-wrapper .nav-tab.nav-tab-active {
+	background: #fff;
+	border-bottom-color: #fff;
+}
+
+/* * Onboarding wizard embedded in hub: fallback layout when Stripe theme class is absent */
+.wrap.aio-hub-wrap .aio-onboarding--hub-embed:not(.aio-onboarding--stripe) {
+	margin-top: 0;
+	padding: 1rem 1.25rem 1.5rem;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-top: 0;
+	border-radius: 0 0 6px 6px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--hub-embed:not(.aio-onboarding--stripe) .aio-onboarding-stepper {
+	margin: 0 0 1rem;
+	padding: 0.75rem 1rem;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--hub-embed:not(.aio-onboarding--stripe) .aio-onboarding-steps {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 0.75rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--hub-embed:not(.aio-onboarding--stripe) .aio-onboarding-step {
+	font-size: 12px;
+	font-weight: 500;
+	color: #50575e;
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--hub-embed:not(.aio-onboarding--stripe) .aio-onboarding-step.aio-step-current .aio-step-label {
+	color: #1d2327;
+	font-weight: 600;
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--hub-embed:not(.aio-onboarding--stripe) .aio-onboarding-content {
+	padding-top: 0.25rem;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-steps {
+	display: flex;
+	flex-wrap: wrap;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-content {
+	padding-top: 0.25rem;
+}
+
+/* * Onboarding wizard: Stripe-inspired panel */
+.aio-onboarding.aio-onboarding--stripe {
+	--aio-onb-surface: #ffffff;
+	--aio-onb-muted: #425466;
+	--aio-onb-border: #e6ebf1;
+	--aio-onb-accent: #635bff;
+	--aio-onb-accent-soft: rgba(99, 91, 255, 0.08);
+	--aio-onb-radius: 12px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	color: #0a2540;
+	background: linear-gradient(180deg, #f7f9fc 0%, var(--aio-onb-surface) 32%);
+	border: 1px solid var(--aio-onb-border);
+	border-radius: var(--aio-onb-radius);
+	box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.04);
+	padding: 1.25rem 1.5rem 1.75rem;
+}
+
+/* * Hub + Stripe: flush with primary nav tabs */
+.wrap.aio-hub-wrap .aio-onboarding--hub-embed.aio-onboarding--stripe {
+	margin-top: 0;
+	border-top: 0;
+	border-radius: 0 0 12px 12px;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-stepper {
+	background: var(--aio-onb-surface);
+	border: 1px solid var(--aio-onb-border);
+	border-radius: 10px;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	padding: 1rem 1.1rem;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-steps {
+	counter-reset: aio-onb-step;
+	gap: 0.5rem 1rem;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-step {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.35rem 0.65rem 0.35rem 0.15rem;
+	border-radius: 999px;
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: var(--aio-onb-muted);
+	background: transparent;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-step::before {
+	counter-increment: aio-onb-step;
+	content: counter(aio-onb-step);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.35rem;
+	height: 1.35rem;
+	border-radius: 50%;
+	font-size: 11px;
+	font-weight: 600;
+	color: #8898aa;
+	background: #f0f4f8;
+	border: 1px solid var(--aio-onb-border);
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--stripe .aio-onboarding-step.aio-step-current {
+	background: var(--aio-onb-accent-soft);
+	color: #0a2540;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-step.aio-step-current::before {
+	color: #fff;
+	background: var(--aio-onb-accent);
+	border-color: var(--aio-onb-accent);
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-step.aio-step-completed::before {
+	color: #0a2540;
+	background: #d1fae5;
+	border-color: #6ee7b7;
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--stripe .aio-onboarding-step-panel {
+	background: var(--aio-onb-surface);
+	border: 1px solid var(--aio-onb-border);
+	border-radius: 10px;
+	padding: 1.25rem 1.35rem 1.35rem;
+	margin-top: 0.75rem;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-step-panel h3 {
+	margin: 0 0 0.75rem;
+	font-size: 1.15rem;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: #0a2540;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-step-panel p,
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-step-panel .description {
+	color: var(--aio-onb-muted);
+	line-height: 1.55;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-step-panel .form-table th {
+	font-weight: 500;
+	color: #1a1f36;
+	padding-top: 0.85rem;
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--stripe .aio-onboarding-step-panel .form-table input[type="text"],
+.wrap.aio-hub-wrap .aio-onboarding--stripe .aio-onboarding-step-panel .form-table input[type="url"],
+.wrap.aio-hub-wrap .aio-onboarding--stripe .aio-onboarding-step-panel .form-table textarea,
+.wrap.aio-hub-wrap .aio-onboarding--stripe .aio-onboarding-step-panel .form-table select {
+	border-radius: 6px;
+	border-color: #cbd5e1;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-actions {
+	margin-top: 1.25rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--aio-onb-border);
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-actions .submit {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 0.65rem;
+	margin: 0;
+	padding: 0;
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--stripe .aio-onboarding-actions .button {
+	border-radius: 6px;
+	font-weight: 500;
+	padding: 0.35rem 0.9rem;
+	min-height: 36px;
+}
+
+.aio-onboarding.aio-onboarding--stripe .aio-onboarding-actions .button-primary {
+	background: var(--aio-onb-accent);
+	border-color: #5248e6;
+	box-shadow: 0 1px 2px rgba(99, 91, 255, 0.25);
+}
+
+.wrap.aio-hub-wrap .aio-onboarding--stripe .aio-onboarding-actions .button-primary:hover,
+.wrap.aio-hub-wrap .aio-onboarding--stripe .aio-onboarding-actions .button-primary:focus {
+	background: #5851ea;
+	border-color: #4b44d4;
+}
+
+.aio-onboarding.aio-onboarding--stripe .notice {
+	border-left-width: 4px;
+	border-radius: 6px;
+}
+
+/* * Template detail: live front-end preview iframe */
+.aio-live-preview-frame-wrap {
+	margin: 1rem 0 0;
+}
+.aio-live-preview-hint {
+	margin: 0 0 0.5rem;
+	font-size: 13px;
+	color: #50575e;
+}
+.aio-live-preview-frame {
+	display: block;
+	width: 100%;
+	min-height: 28rem;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	background: #fff;
+}
+
+/* * Directory browse: filters as a light panel */
+.aio-page-builder-screen .aio-directory-filters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0.65rem 1rem;
+	margin: 1rem 0 1.25rem;
+	padding: 1rem 1.1rem;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.aio-page-builder-screen .aio-directory-filters label {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #646970;
+	display: block;
+	margin-bottom: 0.25rem;
+}
+
+.aio-page-builder-screen .aio-directory-filters select,
+.aio-page-builder-screen .aio-directory-filters input[type="search"] {
+	min-width: 8rem;
+	border-radius: 4px;
+}
+
+.aio-page-builder-screen .aio-directory-filters .button {
+	border-radius: 4px;
+}
+
+/* * Breadcrumbs */
+.aio-breadcrumbs {
+	margin: 0 0 1rem;
+}
+
+.aio-breadcrumb-list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.35rem 0.5rem;
+	list-style: none;
+	margin: 0;
+	padding: 0.45rem 0.75rem;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	font-size: 13px;
+}
+
+.aio-breadcrumb-item a {
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.aio-breadcrumb-item a:hover,
+.aio-breadcrumb-item a:focus {
+	text-decoration: underline;
+}
+
+.aio-breadcrumb-sep {
+	color: #8c8f94;
+	font-weight: 400;
+}
+
+/* * Purpose / category browser lists */
+.aio-purpose-tree,
+.aio-l3-nodes,
+.aio-category-tree,
+.aio-family-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 0.65rem;
+}
+
+.aio-purpose-tree li,
+.aio-l3-nodes li,
+.aio-category-tree li,
+.aio-family-list li {
+	margin: 0;
+}
+
+.aio-purpose-tree a,
+.aio-l3-nodes a,
+.aio-category-tree a,
+.aio-family-list a {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	padding: 0.75rem 1rem;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	text-decoration: none;
+	font-weight: 500;
+	color: #1d2327;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.aio-purpose-tree a:hover,
+.aio-purpose-tree a:focus,
+.aio-l3-nodes a:hover,
+.aio-l3-nodes a:focus,
+.aio-category-tree a:hover,
+.aio-category-tree a:focus,
+.aio-family-list a:hover,
+.aio-family-list a:focus {
+	border-color: #2271b1;
+	box-shadow: 0 2px 6px rgba(34, 113, 177, 0.12);
+	background: #f0f6fc;
+}
+
+.aio-purpose-tree .count,
+.aio-l3-nodes .count,
+.aio-category-tree .count,
+.aio-family-list .count {
+	font-size: 12px;
+	font-weight: 500;
+	color: #646970;
+	white-space: nowrap;
+}
+
+/* * Empty / notice line */
+.aio-page-builder-screen .aio-description {
+	color: #50575e;
+	max-width: 70ch;
+	line-height: 1.55;
+}
+
+.aio-page-builder-screen .aio-admin-notice {
+	padding: 0.75rem 1rem;
+	background: #fcf9e8;
+	border-left: 4px solid #dba617;
+	border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.aio-purpose-tree a,
+	.aio-l3-nodes a,
+	.aio-category-tree a,
+	.aio-family-list a {
+		transition: none;
+	}
+}

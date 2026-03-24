@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Bootstrap\Environment_Validator;
+use AIOPageBuilder\Diagnostics\Environment_Diagnostics_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 
 /**
@@ -88,6 +89,34 @@ final class Diagnostics_Screen {
 				<?php else : ?>
 					<p><?php \esc_html_e( 'No validation results to display.', 'aio-page-builder' ); ?></p>
 				<?php endif; ?>
+			</section>
+
+			<section class="aio-diagnostics-live-preview" style="margin-top: 2em;" aria-labelledby="aio-diagnostics-live-preview-heading">
+				<h2 id="aio-diagnostics-live-preview-heading"><?php \esc_html_e( 'Live preview', 'aio-page-builder' ); ?></h2>
+				<?php
+				$lp = Environment_Diagnostics_Service::build_live_preview_snapshot();
+				?>
+				<table class="widefat striped">
+					<tbody>
+						<tr>
+							<th scope="row"><?php \esc_html_e( 'Hardening (opaque tickets + headers)', 'aio-page-builder' ); ?></th>
+							<td><?php echo ! empty( $lp['live_preview_hardening_enabled'] ) ? \esc_html__( 'Yes', 'aio-page-builder' ) : \esc_html__( 'No', 'aio-page-builder' ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php \esc_html_e( 'Ticket storage probe', 'aio-page-builder' ); ?></th>
+							<td><?php echo ! empty( $lp['ticket_storage_healthy'] ) ? \esc_html__( 'OK', 'aio-page-builder' ) : \esc_html__( 'Check failed', 'aio-page-builder' ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php \esc_html_e( 'Default shell mode', 'aio-page-builder' ); ?></th>
+							<td><code><?php echo \esc_html( isset( $lp['default_shell_mode'] ) ? (string) $lp['default_shell_mode'] : '' ); ?></code></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php \esc_html_e( 'Preview security headers', 'aio-page-builder' ); ?></th>
+							<td><?php echo ! empty( $lp['preview_security_headers'] ) ? \esc_html__( 'Enabled', 'aio-page-builder' ) : \esc_html__( 'Unknown', 'aio-page-builder' ); ?></td>
+						</tr>
+					</tbody>
+				</table>
+				<p class="description"><?php \esc_html_e( 'Template live preview uses short-lived opaque tickets, session-bound validation, and minimal CSP / frame / referrer policies on the preview route.', 'aio-page-builder' ); ?></p>
 			</section>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>

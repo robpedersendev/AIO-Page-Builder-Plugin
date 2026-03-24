@@ -18,6 +18,7 @@ use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 use AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Definition_Provider;
 use AIOPageBuilder\Domain\Registries\PageTemplate\UI\Section_Definition_Provider_For_Preview;
 use AIOPageBuilder\Domain\Registries\Section\Section_Schema;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 
 /**
  * Builds state for the template compare workspace: compare list, matrix of template_compare_row, base URLs.
@@ -58,9 +59,9 @@ final class Template_Compare_State_Builder {
 		$compare_list_keys = array_slice( array_values( array_unique( array_map( 'sanitize_key', $compare_list_keys ) ) ), 0, self::MAX_COMPARE_ITEMS );
 		$compare_list_keys = array_values( array_filter( $compare_list_keys, fn( string $k ): bool => $k !== '' ) );
 
-		$base_url_sections  = \admin_url( 'admin.php?page=aio-page-builder-section-templates' );
-		$base_url_pages     = \admin_url( 'admin.php?page=aio-page-builder-page-templates' );
-		$compare_screen_url = \admin_url( 'admin.php?page=aio-page-builder-template-compare' );
+		$base_url_sections  = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_SECTION );
+		$base_url_pages     = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_PAGE );
+		$compare_screen_url = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_COMPARE );
 
 		if ( count( $compare_list_keys ) === 0 ) {
 			return array(

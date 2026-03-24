@@ -17,6 +17,7 @@ use AIOPageBuilder\Domain\Industry\Overrides\Industry_Section_Override_Service;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Library_Read_Model_Builder;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Section_Recommendation_Resolver;
 use AIOPageBuilder\Domain\Registries\Section\UI\Section_Template_Directory_State_Builder;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
@@ -51,7 +52,7 @@ final class Section_Templates_Directory_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
@@ -218,7 +219,8 @@ final class Section_Templates_Directory_Screen {
 		$industry_view = (string) ( $state['industry_view'] ?? Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY );
 		?>
 		<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-directory-filters">
-			<input type="hidden" name="page" value="<?php echo \esc_attr( self::SLUG ); ?>" />
+			<input type="hidden" name="page" value="<?php echo \esc_attr( Template_Library_Hub_Urls::HUB_PAGE_SLUG ); ?>" />
+			<input type="hidden" name="<?php echo \esc_attr( Template_Library_Hub_Urls::QUERY_TAB ); ?>" value="<?php echo \esc_attr( Template_Library_Hub_Urls::TAB_SECTION ); ?>" />
 			<?php if ( $purpose !== '' ) : ?>
 				<input type="hidden" name="purpose_family" value="<?php echo \esc_attr( $purpose ); ?>" />
 			<?php endif; ?>
@@ -308,7 +310,7 @@ final class Section_Templates_Directory_Screen {
 		$purpose_labels = $state['purpose_labels'] ?? array();
 		$cta_labels     = $state['cta_labels'] ?? array();
 
-		$query_args = array( 'page' => self::SLUG );
+		$query_args = Template_Library_Hub_Urls::query_args_for_tab( Template_Library_Hub_Urls::TAB_SECTION );
 		if ( $purpose !== '' ) {
 			$query_args['purpose_family'] = $purpose;
 		}
@@ -426,9 +428,9 @@ final class Section_Templates_Directory_Screen {
 							<?php endif; ?>
 							| <a href="<?php echo \esc_url( $preview_url ); ?>"><?php \esc_html_e( 'Structural preview', 'aio-page-builder' ); ?></a>
 							<?php if ( $in_compare ) : ?>
-								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'section', $key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
+								| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'section', $key ) ); ?>" data-aio-compare-type="section" data-aio-compare-key="<?php echo \esc_attr( $key ); ?>" data-aio-compare-op="remove"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 							<?php else : ?>
-								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'section', $key ) ); ?>"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
+								| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'section', $key ) ); ?>" data-aio-compare-type="section" data-aio-compare-key="<?php echo \esc_attr( $key ); ?>" data-aio-compare-op="add"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
 							<?php endif; ?>
 							<?php if ( $section_override !== null ) : ?>
 								| <span class="aio-section-overridden" title="<?php echo \esc_attr( (string) ( $section_override['reason'] ?? '' ) ); ?>"><?php \esc_html_e( 'Overridden', 'aio-page-builder' ); ?></span>

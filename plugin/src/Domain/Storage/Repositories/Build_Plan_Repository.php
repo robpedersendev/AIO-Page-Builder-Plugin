@@ -17,6 +17,11 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\Execution\Executor\Plan_State_For_Execution_Interface;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 
+// * When this file is loaded via Composer PSR-4 only, bootstrap require order may not have run yet.
+require_once __DIR__ . '/Build_Plan_Repository_Interface.php';
+require_once __DIR__ . '/../../Execution/Executor/Plan_State_For_Execution_Interface.php';
+require_once __DIR__ . '/../../BuildPlan/Analytics/Build_Plan_List_Provider_Interface.php';
+
 /**
  * Repository → storage: Object_Type_Keys::BUILD_PLAN (CPT).
  * Internal key: plan_id (e.g. UUID). Status: pending_review | approved | rejected | in_progress | completed | superseded.

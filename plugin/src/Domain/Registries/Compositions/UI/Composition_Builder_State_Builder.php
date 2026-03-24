@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Domain\Registries\Compositions\UI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
+
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Schema;
 use AIOPageBuilder\Domain\Registries\Compositions\Validation\Large_Composition_Validator;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Filter_Result;
@@ -136,7 +138,10 @@ final class Composition_Builder_State_Builder {
 		$one_pager_ready = $current_composition !== null
 			&& ( (string) ( $current_composition[ Composition_Schema::FIELD_HELPER_ONE_PAGER_REF ] ?? '' ) ) !== '';
 
-		$base_url = \admin_url( 'admin.php?page=' . self::SCREEN_SLUG );
+		$base_url = Template_Library_Hub_Urls::tab_url(
+			Template_Library_Hub_Urls::TAB_COMPOSITIONS,
+			array( 'view' => 'build' )
+		);
 
 		return array(
 			'filter_state'             => $filter_state->to_array(),

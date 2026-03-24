@@ -197,6 +197,7 @@ require_once $aiopagebuilder_bootstrap_dir . '/../Admin/Screens/Settings/Global_
 require_once $aiopagebuilder_bootstrap_dir . '/../Admin/Screens/Settings/Privacy_Reporting_Settings_Screen.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Admin/Screens/Templates/Template_Compare_Screen.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Admin/Admin_Menu.php';
+require_once $aiopagebuilder_bootstrap_dir . '/../Admin/Admin_Assets.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Privacy/Personal_Data_Exporter.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Privacy/Personal_Data_Eraser.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Config/Capabilities.php';
@@ -268,12 +269,42 @@ final class Plugin {
 		$this->container = $registrar->container();
 		if ( is_admin() ) {
 			\AIOPageBuilder\Infrastructure\Config\Hub_Menu_Capabilities::register();
+			\AIOPageBuilder\Admin\Admin_Assets::register();
+			\AIOPageBuilder\Admin\Admin_Template_Compare_Ajax::register();
+			// * Onboarding POST must redirect before any admin HTML; otherwise wp_safe_redirect fails (headers already sent) and the user sees a blank page.
+			add_action( 'admin_init', array( $this, 'maybe_handle_onboarding_post_redirect' ), 0 );
+			// * Priority 0: admin-post.php dispatches admin_post_* after admin_init; those hooks are never registered on admin_menu.
+			add_action( 'admin_init', array( $this, 'register_admin_post_handlers' ), 0 );
+			add_action( 'admin_init', array( $this, 'maybe_repair_administrator_capabilities' ), 2 );
 			add_action( 'admin_init', array( $this, 'maybe_do_first_run_redirect' ), 5 );
 		}
 		add_filter( 'wp_privacy_personal_data_exporters', array( self::class, 'register_personal_data_exporter' ), 10, 1 );
 		add_filter( 'wp_privacy_personal_data_erasers', array( self::class, 'register_personal_data_eraser' ), 10, 1 );
+		$live_preview = new \AIOPageBuilder\Frontend\Template_Live_Preview_Controller( $this->container );
+		$live_preview->register();
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'register_admin_menu' ), 10 );
+		}
+	}
+
+	/**
+	 * Ensures roles with manage_options have all plugin caps when any are missing (e.g. activation halted early).
+	 *
+	 * @return void
+	 */
+	public function maybe_repair_administrator_capabilities(): void {
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		if ( \is_callable( array( \AIOPageBuilder\Bootstrap\Capability_Registrar::class, 'maybe_repair_administrator_caps' ) ) ) {
+			\AIOPageBuilder\Bootstrap\Capability_Registrar::maybe_repair_administrator_caps();
+			return;
+		}
+		// * Stale plugin copies may omit repair; register() is always present and re-applies role caps.
+		\AIOPageBuilder\Bootstrap\Capability_Registrar::register();
+		$uid = (int) \get_current_user_id();
+		if ( $uid > 0 && \function_exists( 'clean_user_cache' ) ) {
+			\clean_user_cache( $uid );
 		}
 	}
 
@@ -292,7 +323,11 @@ final class Plugin {
 			return;
 		}
 		\delete_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT );
-		\wp_safe_redirect( \admin_url( 'admin.php?page=aio-page-builder-dashboard' ) );
+		\wp_safe_redirect(
+			\admin_url(
+				'admin.php?page=' . \AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen::SLUG
+			)
+		);
 		exit;
 	}
 
@@ -326,6 +361,44 @@ final class Plugin {
 			},
 		);
 		return $erasers;
+	}
+
+	/**
+	 * Registers admin_post_* handlers. Must run on admin_init (not admin_menu) so wp-admin/admin-post.php can see them.
+	 *
+	 * @return void
+	 */
+	public function register_admin_post_handlers(): void {
+		\AIOPageBuilder\Admin\Admin_Post_Handler_Registrar::register_all( $this->container );
+	}
+
+	/**
+	 * Handles onboarding wizard POST and redirects before admin header output (see Onboarding_Screen::get_post_redirect_url).
+	 *
+	 * @return void
+	 */
+	public function maybe_handle_onboarding_post_redirect(): void {
+		$page = isset( $_GET['page'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['page'] ) ) : '';
+		if ( $page !== \AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen::SLUG ) {
+			return;
+		}
+		if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
+			return;
+		}
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in Onboarding_Screen::handle_post() via wp_verify_nonce().
+		if ( ! isset( $_POST[ \AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen::NONCE_ACTION ] ) ) {
+			return;
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		if ( ! \AIOPageBuilder\Infrastructure\Config\Capabilities::current_user_can_for_route( \AIOPageBuilder\Infrastructure\Config\Capabilities::RUN_ONBOARDING ) ) {
+			return;
+		}
+		$screen   = new \AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen( $this->container );
+		$redirect = $screen->get_post_redirect_url();
+		if ( $redirect !== null ) {
+			\wp_safe_redirect( $redirect );
+			exit;
+		}
 	}
 
 	/**

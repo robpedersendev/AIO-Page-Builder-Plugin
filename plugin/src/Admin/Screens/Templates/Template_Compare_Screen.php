@@ -14,6 +14,7 @@ namespace AIOPageBuilder\Admin\Screens\Templates;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Shared\UI\Template_Compare_State_Builder;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -30,8 +31,11 @@ final class Template_Compare_Screen {
 	/** Base user meta key for page template compare list (array of keys). Site-scoped in multisite via get_compare_meta_key(). */
 	public const USER_META_PAGE = '_aio_compare_page_templates';
 
-	/** Nonce action for add/remove. */
+	/** Nonce action for add/remove (GET redirect). */
 	private const NONCE_ACTION = 'aio_template_compare';
+
+	/** Nonce action for AJAX add/remove (no full-page redirect). */
+	public const NONCE_AJAX_ACTION = 'aio_template_compare_ajax';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -45,7 +49,7 @@ final class Template_Compare_Screen {
 	}
 
 	public function get_capability(): string {
-		return Capabilities::MANAGE_PAGE_TEMPLATES;
+		return Capabilities::ACCESS_TEMPLATE_LIBRARY;
 	}
 
 	/**
@@ -96,15 +100,14 @@ final class Template_Compare_Screen {
 	public static function get_compare_add_url( string $type, string $key ): string {
 		$key = \sanitize_key( $key );
 		if ( $key === '' ) {
-			return \admin_url( 'admin.php?page=' . self::SLUG );
+			return Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_COMPARE );
 		}
-		$url = \add_query_arg(
+		$url = Template_Library_Hub_Urls::tab_url(
+			Template_Library_Hub_Urls::TAB_COMPARE,
 			array(
-				'page' => self::SLUG,
 				'type' => $type === 'page' ? 'page' : 'section',
 				'add'  => $key,
-			),
-			\admin_url( 'admin.php' )
+			)
 		);
 		return \wp_nonce_url( $url, self::NONCE_ACTION, '_wpnonce' );
 	}
@@ -119,17 +122,76 @@ final class Template_Compare_Screen {
 	public static function get_compare_remove_url( string $type, string $key ): string {
 		$key = \sanitize_key( $key );
 		if ( $key === '' ) {
-			return \admin_url( 'admin.php?page=' . self::SLUG );
+			return Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_COMPARE );
 		}
-		$url = \add_query_arg(
+		$url = Template_Library_Hub_Urls::tab_url(
+			Template_Library_Hub_Urls::TAB_COMPARE,
 			array(
-				'page'   => self::SLUG,
 				'type'   => $type === 'page' ? 'page' : 'section',
 				'remove' => $key,
-			),
-			\admin_url( 'admin.php' )
+			)
 		);
 		return \wp_nonce_url( $url, self::NONCE_ACTION, '_wpnonce' );
+	}
+
+	/**
+	 * Adds or removes a template key in the current user's compare list (user meta). Used by GET redirect and AJAX.
+	 *
+	 * @param string $type 'section' or 'page'.
+	 * @param string $mode 'add' or 'remove'.
+	 * @param string $key  Template internal key.
+	 * @return array{ success: bool, keys: list<string>, message: string }
+	 */
+	public static function mutate_compare_list( string $type, string $mode, string $key ): array {
+		$key  = \sanitize_key( $key );
+		$type = $type === 'page' ? 'page' : 'section';
+		$mode = \sanitize_key( $mode );
+		if ( $key === '' ) {
+			return array(
+				'success' => false,
+				'keys'    => array(),
+				'message' => __( 'Invalid template key.', 'aio-page-builder' ),
+			);
+		}
+		if ( $mode !== 'add' && $mode !== 'remove' ) {
+			return array(
+				'success' => false,
+				'keys'    => array(),
+				'message' => __( 'Invalid operation.', 'aio-page-builder' ),
+			);
+		}
+		if ( ! Capabilities::current_user_can_or_site_admin( Capabilities::ACCESS_TEMPLATE_LIBRARY ) ) {
+			return array(
+				'success' => false,
+				'keys'    => array(),
+				'message' => __( 'You do not have permission to update the compare list.', 'aio-page-builder' ),
+			);
+		}
+		$user_id = \get_current_user_id();
+		if ( $user_id <= 0 ) {
+			return array(
+				'success' => false,
+				'keys'    => array(),
+				'message' => __( 'You must be logged in.', 'aio-page-builder' ),
+			);
+		}
+		$meta_key = self::get_compare_meta_key( $type );
+		$list     = self::get_compare_list( $type );
+		if ( $mode === 'add' ) {
+			if ( ! \in_array( $key, $list, true ) && \count( $list ) < Template_Compare_State_Builder::MAX_COMPARE_ITEMS ) {
+				$list[] = $key;
+				\update_user_meta( $user_id, $meta_key, $list );
+			}
+		} else {
+			$list = array_values( array_filter( $list, fn( string $k ): bool => $k !== $key ) );
+			\update_user_meta( $user_id, $meta_key, $list );
+		}
+		$list = self::get_compare_list( $type );
+		return array(
+			'success' => true,
+			'keys'    => $list,
+			'message' => '',
+		);
 	}
 
 	/**
@@ -138,7 +200,7 @@ final class Template_Compare_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
@@ -158,9 +220,9 @@ final class Template_Compare_Screen {
 				'type'                  => $type,
 				'compare_list_keys'     => array(),
 				'template_compare_rows' => array(),
-				'base_url_sections'     => \admin_url( 'admin.php?page=aio-page-builder-section-templates' ),
-				'base_url_pages'        => \admin_url( 'admin.php?page=aio-page-builder-page-templates' ),
-				'compare_screen_url'    => \admin_url( 'admin.php?page=' . self::SLUG ),
+				'base_url_sections'     => Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_SECTION ),
+				'base_url_pages'        => Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_PAGE ),
+				'compare_screen_url'    => Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_COMPARE ),
 				'empty_message'         => __( 'Add templates from the Section or Page Templates directory or detail screen to compare them.', 'aio-page-builder' ),
 			);
 		} else {
@@ -218,35 +280,24 @@ final class Template_Compare_Screen {
 		if ( $add === '' && $remove === '' ) {
 			return null;
 		}
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
 			return null;
 		}
 		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ), self::NONCE_ACTION ) ) {
 			return null;
 		}
-		$user_id = \get_current_user_id();
-		if ( $user_id <= 0 ) {
+		if ( \get_current_user_id() <= 0 ) {
 			return null;
 		}
-		$meta_key = self::get_compare_meta_key( $type );
-		$list     = self::get_compare_list( $type );
 		if ( $add !== '' ) {
-			if ( ! \in_array( $add, $list, true ) && count( $list ) < Template_Compare_State_Builder::MAX_COMPARE_ITEMS ) {
-				$list[] = $add;
-				\update_user_meta( $user_id, $meta_key, $list );
-			}
+			self::mutate_compare_list( $type, 'add', $add );
 		} elseif ( $remove !== '' ) {
-			$list = array_values( array_filter( $list, fn( string $k ): bool => $k !== $remove ) );
-			\update_user_meta( $user_id, $meta_key, $list );
+			self::mutate_compare_list( $type, 'remove', $remove );
 		}
-		$redirect = \add_query_arg(
-			array(
-				'page' => self::SLUG,
-				'type' => $type,
-			),
-			\admin_url( 'admin.php' )
+		return Template_Library_Hub_Urls::tab_url(
+			Template_Library_Hub_Urls::TAB_COMPARE,
+			array( 'type' => $type )
 		);
-		return $redirect;
 	}
 
 	/**
@@ -272,8 +323,8 @@ final class Template_Compare_Screen {
 	 */
 	private function render_empty_state( array $state ): void {
 		$msg   = (string) ( $state['empty_message'] ?? __( 'Add templates to compare from the directory or detail screen.', 'aio-page-builder' ) );
-		$url_s = (string) ( $state['base_url_sections'] ?? \admin_url( 'admin.php?page=aio-page-builder-section-templates' ) );
-		$url_p = (string) ( $state['base_url_pages'] ?? \admin_url( 'admin.php?page=aio-page-builder-page-templates' ) );
+		$url_s = (string) ( $state['base_url_sections'] ?? Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_SECTION ) );
+		$url_p = (string) ( $state['base_url_pages'] ?? Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_PAGE ) );
 		?>
 		<p class="aio-admin-notice"><?php echo \esc_html( $msg ); ?></p>
 		<ul>
@@ -343,7 +394,11 @@ final class Template_Compare_Screen {
 						<?php foreach ( $rows as $row ) : ?>
 							<td class="aio-compare-cell">
 								<a href="<?php echo \esc_url( (string) ( $row['detail_url'] ?? '#' ) ); ?>"><?php \esc_html_e( 'View', 'aio-page-builder' ); ?></a>
-								| <a href="<?php echo \esc_url( self::get_compare_remove_url( $type, (string) ( $row['template_key'] ?? '' ) ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
+								<?php
+								$row_key = (string) ( $row['template_key'] ?? '' );
+								$ctype   = $type === 'page' ? 'page' : 'section';
+								?>
+								| <a class="aio-compare-action" href="<?php echo \esc_url( self::get_compare_remove_url( $type, $row_key ) ); ?>" data-aio-compare-type="<?php echo \esc_attr( $ctype ); ?>" data-aio-compare-key="<?php echo \esc_attr( $row_key ); ?>" data-aio-compare-op="remove"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 							</td>
 						<?php endforeach; ?>
 					</tr>

@@ -14,6 +14,9 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Storage\Tables\Table_Names;
 use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
+// * When this file is loaded via Composer PSR-4 only, bootstrap require order may not have run yet.
+require_once __DIR__ . '/Assignment_Map_Service_Interface.php';
+
 /**
  * Assignment map table access. Callers must be authorized. All identifiers sanitized; prepared statements for SQL.
  */

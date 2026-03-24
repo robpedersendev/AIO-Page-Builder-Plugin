@@ -58,4 +58,54 @@ final class Capabilities_Test extends TestCase {
 		$this->assertFalse( Capabilities::is_plugin_capability( 'aio_fake_cap' ) );
 		$this->assertFalse( Capabilities::is_plugin_capability( '' ) );
 	}
+
+	public function test_current_user_can_or_site_admin_true_when_manage_options(): void {
+		$GLOBALS['_aio_current_user_can_caps'] = array(
+			'manage_options' => true,
+		);
+		$this->assertTrue( Capabilities::current_user_can_or_site_admin( Capabilities::MANAGE_SECTION_TEMPLATES ) );
+		unset( $GLOBALS['_aio_current_user_can_caps'] );
+	}
+
+	public function test_current_user_can_or_site_admin_falls_back_to_registry_cap(): void {
+		unset( $GLOBALS['_aio_current_user_can_caps'], $GLOBALS['_aio_current_user_can_return'] );
+		$GLOBALS['_aio_current_user_can_caps'] = array(
+			'manage_options'                    => false,
+			Capabilities::MANAGE_PAGE_TEMPLATES => true,
+		);
+		$this->assertTrue( Capabilities::current_user_can_or_site_admin( Capabilities::MANAGE_PAGE_TEMPLATES ) );
+		unset( $GLOBALS['_aio_current_user_can_caps'] );
+	}
+
+	public function test_current_user_can_or_site_admin_false_when_no_match(): void {
+		$GLOBALS['_aio_current_user_can_caps'] = array(
+			'manage_options' => false,
+		);
+		$this->assertFalse( Capabilities::current_user_can_or_site_admin( Capabilities::MANAGE_COMPOSITIONS ) );
+		unset( $GLOBALS['_aio_current_user_can_caps'] );
+	}
+
+	public function test_is_meta_post_or_page_cap_without_object_detects_core_meta_caps(): void {
+		$this->assertTrue( Capabilities::is_meta_post_or_page_cap_without_object( 'delete_post' ) );
+		$this->assertTrue( Capabilities::is_meta_post_or_page_cap_without_object( 'edit_page' ) );
+		$this->assertFalse( Capabilities::is_meta_post_or_page_cap_without_object( Capabilities::VIEW_LOGS ) );
+		$this->assertFalse( Capabilities::is_meta_post_or_page_cap_without_object( 'delete_posts' ) );
+	}
+
+	public function test_current_user_can_for_route_denies_bare_meta_caps_without_invoking_grant(): void {
+		unset( $GLOBALS['_aio_current_user_can_caps'], $GLOBALS['_aio_current_user_can_return'] );
+		$GLOBALS['_aio_current_user_can_return'] = true;
+		$this->assertFalse( Capabilities::current_user_can_for_route( 'delete_post' ) );
+		$this->assertFalse( Capabilities::current_user_can_for_route( 'edit_post' ) );
+		unset( $GLOBALS['_aio_current_user_can_return'] );
+	}
+
+	public function test_current_user_can_for_route_delegates_for_plugin_caps(): void {
+		unset( $GLOBALS['_aio_current_user_can_return'] );
+		$GLOBALS['_aio_current_user_can_caps'] = array(
+			Capabilities::VIEW_LOGS => true,
+		);
+		$this->assertTrue( Capabilities::current_user_can_for_route( Capabilities::VIEW_LOGS ) );
+		unset( $GLOBALS['_aio_current_user_can_caps'] );
+	}
 }

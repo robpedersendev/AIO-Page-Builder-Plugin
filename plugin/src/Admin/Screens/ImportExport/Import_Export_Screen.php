@@ -57,6 +57,14 @@ final class Import_Export_Screen {
 
 	public function __construct( ?Service_Container $container = null ) {
 		$this->container = $container;
+	}
+
+	/**
+	 * Registers admin-post handlers. Called on admin_init (not admin_menu) so admin-post.php can dispatch.
+	 *
+	 * @return void
+	 */
+	public function register_admin_post_handlers(): void {
 		\add_action( 'admin_post_aio_import_export_create_export', array( $this, 'handle_create_export' ), 10 );
 		\add_action( 'admin_post_aio_import_export_validate', array( $this, 'handle_validate' ), 10 );
 		\add_action( 'admin_post_aio_import_export_confirm_restore', array( $this, 'handle_confirm_restore' ), 10 );
@@ -74,9 +82,10 @@ final class Import_Export_Screen {
 	/**
 	 * Renders the screen. Capability enforced by menu; screen checks export/import caps per section.
 	 *
+	 * @param bool $embed_in_hub When true (Settings hub), omit outer wrap and H1 so the hub supplies chrome.
 	 * @return void
 	 */
-	public function render(): void {
+	public function render( bool $embed_in_hub = false ): void {
 		if ( ! \current_user_can( $this->get_capability() ) && ! \current_user_can( Capabilities::IMPORT_DATA ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access Import / Export.', 'aio-page-builder' ), 403 );
 		}

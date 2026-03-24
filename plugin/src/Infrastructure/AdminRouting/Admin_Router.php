@@ -70,9 +70,30 @@ final class Admin_Router {
 		if ( $route === null ) {
 			return '';
 		}
+		$tab_defaults = $this->template_library_hub_tab_defaults( $name );
+		if ( $tab_defaults !== array() ) {
+			$args = array_merge( $tab_defaults, $args );
+		}
 		$normalized         = $this->normalize_args( $route['args'], $args );
 		$normalized['page'] = $route['page'];
 		return add_query_arg( $normalized, admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * @return array<string, string>
+	 */
+	private function template_library_hub_tab_defaults( string $name ): array {
+		$name = sanitize_key( $name );
+		switch ( $name ) {
+			case 'section_templates_directory':
+				return array( Template_Library_Hub_Urls::QUERY_TAB => Template_Library_Hub_Urls::TAB_SECTION );
+			case 'page_templates_directory':
+				return array( Template_Library_Hub_Urls::QUERY_TAB => Template_Library_Hub_Urls::TAB_PAGE );
+			case 'template_compare':
+				return array( Template_Library_Hub_Urls::QUERY_TAB => Template_Library_Hub_Urls::TAB_COMPARE );
+			default:
+				return array();
+		}
 	}
 
 	/**
@@ -86,7 +107,7 @@ final class Admin_Router {
 		if ( $route === null ) {
 			return false;
 		}
-		return current_user_can( (string) $route['capability'] );
+		return Capabilities::current_user_can_for_route( (string) $route['capability'] );
 	}
 
 	/**
@@ -129,35 +150,38 @@ final class Admin_Router {
 	}
 
 	private function register_defaults(): void {
-		$this->register_route( 'dashboard', 'aio-page-builder-dashboard', Capabilities::MANAGE_SETTINGS );
+		// * Must match add_menu_page slug in Admin_Menu (Dashboard_Screen::SLUG) and dashboard capability (VIEW_LOGS).
+		$this->register_route( 'dashboard', 'aio-page-builder', Capabilities::VIEW_LOGS );
 		$this->register_route(
 			'section_templates_directory',
-			'aio-page-builder-section-templates',
+			Template_Library_Hub_Urls::HUB_PAGE_SLUG,
 			Capabilities::MANAGE_SECTION_TEMPLATES,
 			array(
-				'purpose_family'       => 'key',
-				'cta_classification'   => 'key',
-				'variation_family_key' => 'key',
-				'all'                  => 'bool',
-				'status'               => 'key',
-				'search'               => 'text',
-				'paged'                => 'int',
-				'per_page'             => 'int',
-				'industry_view'        => 'key',
+				Template_Library_Hub_Urls::QUERY_TAB => 'key',
+				'purpose_family'                     => 'key',
+				'cta_classification'                 => 'key',
+				'variation_family_key'               => 'key',
+				'all'                                => 'bool',
+				'status'                             => 'key',
+				'search'                             => 'text',
+				'paged'                              => 'int',
+				'per_page'                           => 'int',
+				'industry_view'                      => 'key',
 			)
 		);
 		$this->register_route(
 			'page_templates_directory',
-			'aio-page-builder-page-templates',
+			Template_Library_Hub_Urls::HUB_PAGE_SLUG,
 			Capabilities::MANAGE_PAGE_TEMPLATES,
 			array(
-				'category_class' => 'key',
-				'family'         => 'key',
-				'status'         => 'key',
-				'search'         => 'text',
-				'paged'          => 'int',
-				'per_page'       => 'int',
-				'industry_view'  => 'key',
+				Template_Library_Hub_Urls::QUERY_TAB => 'key',
+				'category_class'                     => 'key',
+				'family'                             => 'key',
+				'status'                             => 'key',
+				'search'                             => 'text',
+				'paged'                              => 'int',
+				'per_page'                           => 'int',
+				'industry_view'                      => 'key',
 			)
 		);
 		$this->register_route(
@@ -180,7 +204,15 @@ final class Admin_Router {
 				'reduced_motion' => 'bool',
 			)
 		);
-		$this->register_route( 'template_compare', 'aio-page-builder-template-compare', Capabilities::MANAGE_PAGE_TEMPLATES, array( 'type' => 'key' ) );
+		$this->register_route(
+			'template_compare',
+			Template_Library_Hub_Urls::HUB_PAGE_SLUG,
+			Capabilities::ACCESS_TEMPLATE_LIBRARY,
+			array(
+				Template_Library_Hub_Urls::QUERY_TAB => 'key',
+				'type'                               => 'key',
+			)
+		);
 		$this->register_route(
 			'documentation_detail',
 			'aio-page-builder-documentation-detail',

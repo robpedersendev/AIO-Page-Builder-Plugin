@@ -58,6 +58,7 @@ use AIOPageBuilder\Admin\Screens\Settings\Global_Component_Override_Settings_Scr
 use AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
+use AIOPageBuilder\Bootstrap\Capability_Registrar;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -329,7 +330,7 @@ final class Admin_Menu_Hub_Renderer {
 
 		\add_submenu_page(
 			$parent_slug,
-			$this->page_templates_dir->get_title(),
+			__( 'Template library', 'aio-page-builder' ),
 			__( 'Template library', 'aio-page-builder' ),
 			Capabilities::ACCESS_TEMPLATE_LIBRARY,
 			Page_Templates_Directory_Screen::SLUG,
@@ -374,35 +375,37 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	private function register_hidden_detail_pages( string $parent_slug ): void {
+		// * Use ACCESS_TEMPLATE_LIBRARY so wp-admin does not block deep links before render() (registry MANAGE_* alone can fail role merge).
+		$template_shell_cap = Capabilities::ACCESS_TEMPLATE_LIBRARY;
 		\add_submenu_page(
 			$parent_slug,
 			$this->page_template_detail->get_title(),
 			'',
-			$this->page_template_detail->get_capability(),
+			$template_shell_cap,
 			Page_Template_Detail_Screen::SLUG,
 			array( $this->page_template_detail, 'render' )
 		);
-		\remove_submenu_page( $parent_slug, Page_Template_Detail_Screen::SLUG );
 
 		\add_submenu_page(
 			$parent_slug,
 			$this->section_template_detail->get_title(),
 			'',
-			$this->section_template_detail->get_capability(),
+			$template_shell_cap,
 			Section_Template_Detail_Screen::SLUG,
 			array( $this->section_template_detail, 'render' )
 		);
-		\remove_submenu_page( $parent_slug, Section_Template_Detail_Screen::SLUG );
 
 		\add_submenu_page(
 			$parent_slug,
 			$this->documentation_detail->get_title(),
 			'',
-			$this->documentation_detail->get_capability(),
+			$template_shell_cap,
 			Documentation_Detail_Screen::SLUG,
 			array( $this->documentation_detail, 'render' )
 		);
-		\remove_submenu_page( $parent_slug, Documentation_Detail_Screen::SLUG );
+		// * Do not remove_submenu_page() here: Core user_can_access_admin_page() matches on $submenu
+		// * and uses the submenu capability (ACCESS_TEMPLATE_LIBRARY). Removing the row forces a parent
+		// * fallback and breaks deep links for roles without the parent cap. Empty titles are hidden in CSS.
 	}
 
 	/**
@@ -707,6 +710,16 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
+		$general_subtabs = array(
+			Settings_Screen::SETTINGS_SUBTAB_OVERVIEW => array(
+				'label' => __( 'Overview', 'aio-page-builder' ),
+				'cap'   => Capabilities::MANAGE_SETTINGS,
+			),
+			Settings_Screen::SETTINGS_SUBTAB_SECTION_PAGE_TEMPLATES => array(
+				'label' => __( 'Section & page templates', 'aio-page-builder' ),
+				'cap'   => Capabilities::MANAGE_SETTINGS,
+			),
+		);
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Settings', 'aio-page-builder' ); ?></h1>
@@ -717,7 +730,13 @@ final class Admin_Menu_Hub_Renderer {
 			} elseif ( $tab === 'import_export' ) {
 				$this->import_export->render( true );
 			} else {
-				$this->settings->render( true );
+				$sub_default = Admin_Screen_Hub::first_accessible_tab( Settings_Screen::SETTINGS_SUBTAB_OVERVIEW, $general_subtabs );
+				$subtab      = Admin_Screen_Hub::current_subtab( $sub_default, array_keys( $general_subtabs ) );
+				if ( ! isset( $general_subtabs[ $subtab ] ) || ! \current_user_can( $general_subtabs[ $subtab ]['cap'] ) ) {
+					$subtab = $sub_default;
+				}
+				Admin_Screen_Hub::render_subnav_tabs( Settings_Screen::SLUG, 'general', $general_subtabs, $subtab );
+				$this->settings->render( true, $subtab );
 			}
 			?>
 		</div>
@@ -790,7 +809,7 @@ final class Admin_Menu_Hub_Renderer {
 		);
 		$default = Admin_Screen_Hub::first_accessible_tab( 'onboarding', $tabs );
 		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
-		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
+		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
 		?>
@@ -938,22 +957,22 @@ final class Admin_Menu_Hub_Renderer {
 	}
 
 	/**
-	 * Template library hub.
+	 * Template library hub: Section templates, Page templates, compositions, compare (on-page tabs).
 	 *
 	 * @return void
 	 */
 	public function render_template_library_hub(): void {
-		if ( ! \current_user_can( Capabilities::ACCESS_TEMPLATE_LIBRARY ) ) {
+		if ( ! Capabilities::current_user_can_or_site_admin( Capabilities::ACCESS_TEMPLATE_LIBRARY ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the template library.', 'aio-page-builder' ), 403 );
 		}
-		$tabs    = array(
-			'page_templates'    => array(
-				'label' => __( 'Page templates', 'aio-page-builder' ),
-				'cap'   => $this->page_templates_dir->get_capability(),
-			),
+		$tabs = array(
 			'section_templates' => array(
 				'label' => __( 'Section templates', 'aio-page-builder' ),
 				'cap'   => $this->section_templates_dir->get_capability(),
+			),
+			'page_templates'    => array(
+				'label' => __( 'Page templates', 'aio-page-builder' ),
+				'cap'   => $this->page_templates_dir->get_capability(),
 			),
 			'compositions'      => array(
 				'label' => $this->compositions_screen->get_title(),
@@ -964,15 +983,49 @@ final class Admin_Menu_Hub_Renderer {
 				'cap'   => $this->template_compare_screen->get_capability(),
 			),
 		);
-		$default = Admin_Screen_Hub::first_accessible_tab( 'page_templates', $tabs );
-		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
-		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
+
+		$accessible_keys = array();
+		foreach ( $tabs as $key => $info ) {
+			if ( Capabilities::current_user_can_or_site_admin( $info['cap'] ) ) {
+				$accessible_keys[] = $key;
+			}
+		}
+
+		if ( $accessible_keys === array() && \current_user_can( 'manage_options' ) ) {
+			Capability_Registrar::register();
+			$uid = (int) \get_current_user_id();
+			if ( $uid > 0 && \function_exists( 'clean_user_cache' ) ) {
+				\clean_user_cache( $uid );
+			}
+			$accessible_keys = array();
+			foreach ( $tabs as $key => $info ) {
+				if ( Capabilities::current_user_can_or_site_admin( $info['cap'] ) ) {
+					$accessible_keys[] = $key;
+				}
+			}
+		}
+
+		if ( $accessible_keys === array() ) {
+			?>
+			<div class="wrap aio-hub-wrap">
+				<h1><?php echo \esc_html__( 'Template library', 'aio-page-builder' ); ?></h1>
+				<div class="notice notice-warning">
+					<p><?php \esc_html_e( 'You can open the template library, but no tabs are available for your role. Ask an administrator to grant section template, page template, composition, or related capabilities.', 'aio-page-builder' ); ?></p>
+				</div>
+			</div>
+			<?php
+			return;
+		}
+
+		$default = $accessible_keys[0];
+		$tab     = Admin_Screen_Hub::current_tab( $default, $accessible_keys );
+		if ( ! \in_array( $tab, $accessible_keys, true ) ) {
 			$tab = $default;
 		}
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Template library', 'aio-page-builder' ); ?></h1>
-			<?php Admin_Screen_Hub::render_nav_tabs( Page_Templates_Directory_Screen::SLUG, $tabs, $tab ); ?>
+			<?php Admin_Screen_Hub::render_nav_tabs( Page_Templates_Directory_Screen::SLUG, $tabs, $tab, array( Capabilities::class, 'current_user_can_or_site_admin' ) ); ?>
 			<?php
 			if ( $tab === 'section_templates' ) {
 				$this->section_templates_dir->render( true );

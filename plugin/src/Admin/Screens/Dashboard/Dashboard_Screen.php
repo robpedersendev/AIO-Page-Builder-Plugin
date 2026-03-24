@@ -41,7 +41,18 @@ final class Dashboard_Screen {
 	}
 
 	/**
-	 * Renders the Dashboard. Capability is enforced by menu registration.
+	 * Capability for add_menu_page() only. Hidden routes use remove_submenu_page(); WordPress
+	 * user_can_access_admin_page() then checks the parent menu capability, so it must align
+	 * with typical operators (manage_options). Screen bodies still use get_capability().
+	 *
+	 * @return string
+	 */
+	public function get_menu_capability(): string {
+		return 'manage_options';
+	}
+
+	/**
+	 * Renders the Dashboard. Enforces VIEW_LOGS here; menu registration uses get_menu_capability().
 	 *
 	 * @return void
 	 */

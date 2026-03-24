@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Domain\Registries\Section\UI;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 
 /**
  * Builds stable screen-state payloads for the section template directory: purpose tree (L2),
@@ -80,7 +81,7 @@ final class Section_Template_Directory_State_Builder {
 		$paged                = isset( $request_params['paged'] ) ? max( 1, (int) $request_params['paged'] ) : 1;
 		$per_page             = isset( $request_params['per_page'] ) ? max( 1, min( Large_Library_Query_Service::MAX_PER_PAGE, (int) $request_params['per_page'] ) ) : Large_Library_Query_Service::DEFAULT_PER_PAGE;
 
-		$base_url = \admin_url( 'admin.php?page=' . self::SCREEN_SLUG );
+		$base_url = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_SECTION );
 
 		$filters = array();
 		if ( $purpose_family !== '' ) {

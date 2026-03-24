@@ -330,6 +330,8 @@ final class Large_Library_Query_Service {
 			$section_count = is_array( $ordered ) ? count( $ordered ) : 0;
 			$version_arr   = $def[ Page_Template_Schema::FIELD_VERSION ] ?? array();
 			$version       = is_array( $version_arr ) ? (string) ( $version_arr['version'] ?? '1' ) : '1';
+			$one_pager     = $def[ Page_Template_Schema::FIELD_ONE_PAGER ] ?? array();
+			$one_pager_url = \is_array( $one_pager ) && isset( $one_pager['link'] ) ? (string) $one_pager['link'] : '';
 			$rows[]        = array(
 				'internal_key'            => (string) ( $def[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' ),
 				'name'                    => (string) ( $def[ Page_Template_Schema::FIELD_NAME ] ?? '' ),
@@ -341,6 +343,7 @@ final class Large_Library_Query_Service {
 				'preview_available'       => ( $preview_ref !== '' ),
 				'section_count'           => $section_count,
 				'version'                 => $version,
+				'one_pager_link'          => $one_pager_url,
 			);
 		}
 		return $rows;

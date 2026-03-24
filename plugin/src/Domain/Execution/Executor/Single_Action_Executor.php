@@ -198,7 +198,14 @@ final class Single_Action_Executor {
 			return false;
 		}
 		$cap = $actor[ Execution_Action_Contract::ACTOR_CAPABILITY_CHECKED ] ?? '';
-		return is_string( $cap ) && $cap !== '' && \current_user_can( $cap );
+		if ( ! is_string( $cap ) || $cap === '' ) {
+			return false;
+		}
+		// * WP 6.1+: delete_post/edit_post require a post ID; never check those meta caps without context.
+		if ( in_array( $cap, array( 'delete_post', 'delete_page', 'edit_post', 'edit_page' ), true ) ) {
+			return false;
+		}
+		return \current_user_can( $cap );
 	}
 
 	/**

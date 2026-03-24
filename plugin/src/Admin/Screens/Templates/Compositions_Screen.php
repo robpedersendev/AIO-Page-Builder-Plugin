@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Schema;
 use AIOPageBuilder\Domain\Registries\Compositions\UI\Composition_Builder_State_Builder;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -49,7 +50,7 @@ final class Compositions_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
@@ -63,8 +64,8 @@ final class Compositions_Screen {
 
 	private function render_list_view( bool $embed_in_hub = false ): void {
 		$compositions = $this->get_compositions_list();
-		$base_url     = \admin_url( 'admin.php?page=' . self::SLUG );
-		$build_url    = $base_url . '&view=build';
+		$base_url     = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_COMPOSITIONS );
+		$build_url    = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_COMPOSITIONS, array( 'view' => 'build' ) );
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-compositions-screen" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -121,7 +122,13 @@ final class Compositions_Screen {
 							$ordered       = $comp[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array();
 							$section_count = is_array( $ordered ) ? count( $ordered ) : 0;
 							$source_ref    = (string) ( $comp[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' );
-							$edit_url      = $base_url . '&view=build&composition_id=' . \rawurlencode( $comp_id );
+							$edit_url      = Template_Library_Hub_Urls::tab_url(
+								Template_Library_Hub_Urls::TAB_COMPOSITIONS,
+								array(
+									'view'           => 'build',
+									'composition_id' => $comp_id,
+								)
+							);
 							?>
 							<tr>
 								<td><?php echo \esc_html( $name ); ?></td>
@@ -174,7 +181,7 @@ final class Compositions_Screen {
 		$validation_codes  = $state['validation_codes'] ?? array();
 		$preview_readiness = (bool) ( $state['preview_readiness'] ?? true );
 		$one_pager_ready   = (bool) ( $state['one_pager_ready'] ?? false );
-		$list_url          = $base_url;
+		$list_url          = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_COMPOSITIONS );
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-composition-builder" role="main" aria-label="<?php echo \esc_attr__( 'Composition builder', 'aio-page-builder' ); ?>">
@@ -305,7 +312,8 @@ final class Compositions_Screen {
 		$composition_id = isset( $_GET['composition_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['composition_id'] ) ) : '';
 		?>
 		<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-directory-filters">
-			<input type="hidden" name="page" value="<?php echo \esc_attr( self::SLUG ); ?>" />
+			<input type="hidden" name="page" value="<?php echo \esc_attr( Template_Library_Hub_Urls::HUB_PAGE_SLUG ); ?>" />
+			<input type="hidden" name="<?php echo \esc_attr( Template_Library_Hub_Urls::QUERY_TAB ); ?>" value="<?php echo \esc_attr( Template_Library_Hub_Urls::TAB_COMPOSITIONS ); ?>" />
 			<input type="hidden" name="view" value="build" />
 			<?php if ( $composition_id !== '' ) : ?>
 				<input type="hidden" name="composition_id" value="<?php echo \esc_attr( $composition_id ); ?>" />
@@ -340,7 +348,6 @@ final class Compositions_Screen {
 	 */
 	private function builder_page_url( string $base_url, array $filter_state, int $paged ): string {
 		$params = array(
-			'page'  => self::SLUG,
 			'view'  => 'build',
 			'paged' => $paged,
 		);
@@ -352,7 +359,7 @@ final class Compositions_Screen {
 				$params[ $k ] = $filter_state[ $k ];
 			}
 		}
-		return $base_url . '&' . \http_build_query( $params );
+		return \add_query_arg( $params, $base_url );
 	}
 
 	/**

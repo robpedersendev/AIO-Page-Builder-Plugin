@@ -26,6 +26,7 @@ use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
 
 /**
  * Renders onboarding flow: steps, draft persistence, prefill, blocked state. No provider API or AI submission.
@@ -37,7 +38,8 @@ final class Onboarding_Screen {
 	/** Gated by plugin capability for onboarding (spec §44.3). */
 	private const CAPABILITY = Capabilities::RUN_ONBOARDING;
 
-	private const NONCE_ACTION = 'aio_onboarding_save';
+	/** Nonce action and wp_nonce_field() name for onboarding forms. */
+	public const NONCE_ACTION = 'aio_onboarding_save';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -60,18 +62,21 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access this page.', 'aio-page-builder' ) );
-		}
-
-		$redirect = $this->handle_post();
-		if ( $redirect !== null ) {
-			\wp_safe_redirect( $redirect );
-			exit;
 		}
 
 		$state = $this->get_ui_state();
 		$this->render_shell( $state, $embed_in_hub );
+	}
+
+	/**
+	 * Processes POST and returns a redirect URL. Call from admin_init before any HTML output (see Plugin::maybe_handle_onboarding_post_redirect).
+	 *
+	 * @return string|null Redirect URL or null when not an onboarding POST or no redirect applies.
+	 */
+	public function get_post_redirect_url(): ?string {
+		return $this->handle_post();
 	}
 
 	/**
@@ -96,27 +101,18 @@ final class Onboarding_Screen {
 		$draft           = $draft_service->get_draft();
 
 		if ( $action === 'save_draft' ) {
-			$this->persist_brand_profile_from_post( $draft );
-			$this->persist_business_profile_from_post( $draft );
-			$this->persist_template_preferences_from_post( $draft );
-			$this->persist_industry_profile_from_post();
+			$this->persist_all_wizard_fields_from_post( $draft );
 			$draft['overall_status'] = Onboarding_Statuses::DRAFT_SAVED;
 			$draft_service->save_draft( $draft );
-			$url = \add_query_arg(
+			return $this->hub_redirect_url(
 				array(
-					'page'  => self::SLUG,
 					'saved' => '1',
-				),
-				\admin_url( 'admin.php' )
+				)
 			);
-			return $url;
 		}
 
 		if ( $action === 'advance_step' ) {
-			$this->persist_brand_profile_from_post( $draft );
-			$this->persist_business_profile_from_post( $draft );
-			$this->persist_template_preferences_from_post( $draft );
-			$this->persist_industry_profile_from_post();
+			$this->persist_all_wizard_fields_from_post( $draft );
 			$ordered = Onboarding_Step_Keys::ordered();
 			$idx     = array_search( $draft['current_step_key'], $ordered, true );
 			if ( $idx !== false && $idx < count( $ordered ) - 1 ) {
@@ -130,11 +126,11 @@ final class Onboarding_Screen {
 				}
 				$draft_service->save_draft( $draft );
 			}
-			$url = \add_query_arg( array( 'page' => self::SLUG ), \admin_url( 'admin.php' ) );
-			return $url;
+			return $this->hub_redirect_url( array() );
 		}
 
 		if ( $action === 'go_back' ) {
+			$this->persist_all_wizard_fields_from_post( $draft );
 			$ordered = Onboarding_Step_Keys::ordered();
 			$idx     = array_search( $draft['current_step_key'], $ordered, true );
 			if ( $idx !== false && $idx > 0 ) {
@@ -144,21 +140,19 @@ final class Onboarding_Screen {
 				$draft['overall_status']         = Onboarding_Statuses::IN_PROGRESS;
 				$draft_service->save_draft( $draft );
 			}
-			$url = \add_query_arg( array( 'page' => self::SLUG ), \admin_url( 'admin.php' ) );
-			return $url;
+			return $this->hub_redirect_url( array() );
 		}
 
 		if ( $action === 'submit_planning_request' ) {
-			if ( ! \current_user_can( Capabilities::RUN_ONBOARDING ) || ! \current_user_can( Capabilities::RUN_AI_PLANS ) ) {
-				$url = \add_query_arg(
+			$this->persist_all_wizard_fields_from_post( $draft );
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::RUN_ONBOARDING )
+				|| ! Capabilities::current_user_can_for_route( Capabilities::RUN_AI_PLANS ) ) {
+				return $this->hub_redirect_url(
 					array(
-						'page'             => self::SLUG,
 						'planning_result'  => 'blocked',
 						'planning_message' => rawurlencode( __( 'You do not have permission to submit a planning request.', 'aio-page-builder' ) ),
-					),
-					\admin_url( 'admin.php' )
+					)
 				);
-				return $url;
 			}
 			if ( $this->container->has( 'onboarding_planning_request_orchestrator' ) ) {
 				$orchestrator  = $this->container->get( 'onboarding_planning_request_orchestrator' );
@@ -166,19 +160,39 @@ final class Onboarding_Screen {
 				$arr           = $result->to_array();
 				$transient_key = 'aio_onboarding_planning_result_' . \get_current_user_id();
 				\set_transient( $transient_key, $arr, 60 );
-				$url = \add_query_arg(
+				return $this->hub_redirect_url(
 					array(
-						'page'            => self::SLUG,
 						'planning_result' => $arr['status'],
 						'run_id'          => $arr['run_id'] !== '' ? rawurlencode( $arr['run_id'] ) : '',
-					),
-					\admin_url( 'admin.php' )
+					)
 				);
-				return $url;
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Builds a redirect URL back to the Onboarding hub tab (wizard), preserving aio_tab=onboarding.
+	 *
+	 * @param array<string, string> $extra Query args (values already sanitized for URL use where needed).
+	 * @return string
+	 */
+	private function hub_redirect_url( array $extra = array() ): string {
+		return Admin_Screen_Hub::tab_url( self::SLUG, 'onboarding', $extra );
+	}
+
+	/**
+	 * Merges POSTed wizard fields into profile and industry stores for every navigation action so incomplete onboarding retains input.
+	 *
+	 * @param array<string, mixed> $draft Current draft (used to gate template preference writes).
+	 * @return void
+	 */
+	private function persist_all_wizard_fields_from_post( array $draft ): void {
+		$this->persist_brand_profile_from_post( $draft );
+		$this->persist_business_profile_from_post( $draft );
+		$this->persist_template_preferences_from_post( $draft );
+		$this->persist_industry_profile_from_post();
 	}
 
 	/**
@@ -296,8 +310,13 @@ final class Onboarding_Screen {
 	 */
 	private function get_ui_state(): array {
 		if ( $this->container && $this->container->has( 'onboarding_ui_state_builder' ) ) {
-			$builder = $this->container->get( 'onboarding_ui_state_builder' );
-			return $builder->build_for_screen();
+			try {
+				$builder = $this->container->get( 'onboarding_ui_state_builder' );
+				return $builder->build_for_screen();
+			} catch ( \Throwable $e ) {
+				Internal_Debug_Log::line( 'onboarding_ui_state_builder failed: ' . $e->getMessage() );
+				return $this->minimal_state();
+			}
 		}
 		return $this->minimal_state();
 	}
@@ -344,12 +363,18 @@ final class Onboarding_Screen {
 
 	/**
 	 * @param array<string, mixed> $state Onboarding state (steps, blockers, nonce, etc.).
-	 * @param bool                 $embed_in_hub When true, outer wrap and h1 are omitted (hub provides chrome).
+	 * @param bool                 $embed_in_hub When true, top-level wrap/h1 are omitted; hub-embed inner wrapper is used (hub provides outer chrome).
 	 * @return void
 	 */
 	private function render_shell( array $state, bool $embed_in_hub = false ): void {
-		$current_step_key        = $state['current_step_key'] ?? Onboarding_Step_Keys::WELCOME;
-		$steps                   = $state['steps'] ?? array();
+		$current_step_key = $state['current_step_key'] ?? Onboarding_Step_Keys::WELCOME;
+		if ( ! in_array( $current_step_key, Onboarding_Step_Keys::ordered(), true ) ) {
+			$current_step_key = Onboarding_Step_Keys::WELCOME;
+		}
+		$steps = $state['steps'] ?? array();
+		if ( ! is_array( $steps ) || count( $steps ) === 0 ) {
+			$steps = $this->minimal_state()['steps'];
+		}
 		$is_blocked              = ! empty( $state['is_blocked'] );
 		$blockers                = $state['blockers'] ?? array();
 		$resume_message          = $state['resume_message'] ?? '';
@@ -370,8 +395,10 @@ final class Onboarding_Screen {
 		}
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
-		<div class="wrap aio-page-builder-screen aio-onboarding" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
+		<div class="wrap aio-page-builder-screen aio-onboarding aio-onboarding--stripe" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php else : ?>
+		<div class="aio-page-builder-screen aio-onboarding aio-onboarding--hub-embed aio-onboarding--stripe" role="region" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 		<?php endif; ?>
 
 			<?php if ( $saved ) : ?>
@@ -448,9 +475,7 @@ final class Onboarding_Screen {
 					<?php endif; ?>
 				</p>
 			</form>
-		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
-		<?php endif; ?>
 		<?php
 	}
 
@@ -518,6 +543,8 @@ final class Onboarding_Screen {
 				<?php $this->render_template_preferences_step( $state ); ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::REVIEW ) : ?>
 				<?php $this->render_review_step( $state ); ?>
+			<?php else : ?>
+				<p><?php \esc_html_e( 'This step could not be loaded. Use Next or Save draft after refreshing; if the problem persists, clear the onboarding draft from settings or contact support.', 'aio-page-builder' ); ?></p>
 			<?php endif; ?>
 		</div>
 		<?php

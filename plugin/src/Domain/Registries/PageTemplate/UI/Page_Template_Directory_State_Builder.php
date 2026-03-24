@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Filter_Result;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Pagination;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 
 /**
  * Builds stable screen-state payloads for the page template directory: tree nodes, list rows,
@@ -57,7 +58,7 @@ final class Page_Template_Directory_State_Builder {
 		$paged          = isset( $request_params['paged'] ) ? max( 1, (int) $request_params['paged'] ) : 1;
 		$per_page       = isset( $request_params['per_page'] ) ? max( 1, min( Large_Library_Query_Service::MAX_PER_PAGE, (int) $request_params['per_page'] ) ) : Large_Library_Query_Service::DEFAULT_PER_PAGE;
 
-		$base_url = \admin_url( 'admin.php?page=' . self::SCREEN_SLUG );
+		$base_url = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_PAGE );
 
 		$filters = array();
 		if ( $category_class !== '' && \in_array( $category_class, self::CATEGORY_ORDER, true ) ) {

@@ -33,6 +33,11 @@ final class Dashboard_Screen_Test extends TestCase {
 		$this->assertSame( \AIOPageBuilder\Infrastructure\Config\Capabilities::VIEW_LOGS, $screen->get_capability() );
 	}
 
+	public function test_dashboard_menu_capability_is_manage_options_for_wp_admin_access(): void {
+		$screen = new Dashboard_Screen();
+		$this->assertSame( 'manage_options', $screen->get_menu_capability() );
+	}
+
 	public function test_dashboard_has_non_empty_title(): void {
 		$screen = new Dashboard_Screen();
 		$this->assertNotEmpty( $screen->get_title() );

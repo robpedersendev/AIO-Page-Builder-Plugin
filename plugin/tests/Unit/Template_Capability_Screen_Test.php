@@ -52,9 +52,9 @@ final class Template_Capability_Screen_Test extends TestCase {
 		$this->assertSame( Capabilities::MANAGE_PAGE_TEMPLATES, $screen->get_capability() );
 	}
 
-	public function test_template_compare_requires_manage_page_templates(): void {
+	public function test_template_compare_requires_access_template_library(): void {
 		$screen = new Template_Compare_Screen( null );
-		$this->assertSame( Capabilities::MANAGE_PAGE_TEMPLATES, $screen->get_capability() );
+		$this->assertSame( Capabilities::ACCESS_TEMPLATE_LIBRARY, $screen->get_capability() );
 	}
 
 	public function test_compositions_requires_manage_compositions(): void {

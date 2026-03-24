@@ -16,7 +16,10 @@ use AIOPageBuilder\Admin\Forms\Entity_Style_Form_Builder;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Detail_State_Builder;
 use AIOPageBuilder\Domain\Styling\Entity_Style_UI_State_Builder;
+use AIOPageBuilder\Domain\Preview\Template_Live_Preview_State_Builder_Factory;
+use AIOPageBuilder\Frontend\Template_Live_Preview_Ticket_Service;
 use AIOPageBuilder\Domain\Preview\UI\Template_Preview_Presenter;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -49,7 +52,7 @@ final class Page_Template_Detail_Screen {
 	 * @return void
 	 */
 	public function render(): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
@@ -163,23 +166,11 @@ final class Page_Template_Detail_Screen {
 			<h2 class="aio-metadata-title"><?php echo \esc_html( $name ); ?></h2>
 			<?php if ( $template_key !== '' ) : ?>
 				<p class="aio-compare-actions">
-					<a href="
-					<?php
-					echo \esc_url(
-						\add_query_arg(
-							array(
-								'page' => Template_Compare_Screen::SLUG,
-								'type' => 'page',
-							),
-							\admin_url( 'admin.php' )
-						)
-					);
-					?>
-								"><?php \esc_html_e( 'Compare workspace', 'aio-page-builder' ); ?></a>
+					<a href="<?php echo \esc_url( Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_COMPARE, array( 'type' => 'page' ) ) ); ?>"><?php \esc_html_e( 'Compare workspace', 'aio-page-builder' ); ?></a>
 					<?php if ( $in_compare ) : ?>
-						| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'page', $template_key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
+						| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'page', $template_key ) ); ?>" data-aio-compare-type="page" data-aio-compare-key="<?php echo \esc_attr( $template_key ); ?>" data-aio-compare-op="remove"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 					<?php else : ?>
-						| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'page', $template_key ) ); ?>"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
+						| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'page', $template_key ) ); ?>" data-aio-compare-type="page" data-aio-compare-key="<?php echo \esc_attr( $template_key ); ?>" data-aio-compare-op="add"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
 					<?php endif; ?>
 				</p>
 			<?php endif; ?>
@@ -310,16 +301,64 @@ final class Page_Template_Detail_Screen {
 	 * @return void
 	 */
 	private function render_preview_panel( array $state ): void {
-		$html          = (string) ( $state['rendered_preview_html'] ?? '' );
-		$template_key  = (string) ( $state['template_key'] ?? '' );
+		$html         = (string) ( $state['rendered_preview_html'] ?? '' );
+		$template_key = (string) ( $state['template_key'] ?? '' );
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only toggle for preview UI; compared to literal.
+		$rm_ui         = isset( $_GET['reduced_motion'] ) && (string) \wp_unslash( $_GET['reduced_motion'] ) === '1';
 		$style_context = $this->get_preview_style_context( 'page', $template_key );
 		$presenter     = new Template_Preview_Presenter();
 		$title         = $presenter->get_preview_title( $html !== '' );
 		$label         = $presenter->get_preview_aria_label( $html !== '' );
+		$live_url      = $this->build_live_preview_url_page( $template_key );
+		$home_parsed   = \wp_parse_url( \home_url( '/' ) );
+		$live_origin   = '';
+		if ( \is_array( $home_parsed ) ) {
+			$live_origin = ( isset( $home_parsed['scheme'] ) ? $home_parsed['scheme'] . '://' : '' ) . ( $home_parsed['host'] ?? '' );
+			if ( $live_origin !== '' && isset( $home_parsed['port'] ) ) {
+				$live_origin .= ':' . (string) $home_parsed['port'];
+			}
+		}
 		?>
 		<section class="aio-preview-section" aria-label="<?php echo \esc_attr( $label ); ?>">
 			<h2 class="aio-preview-title"><?php echo \esc_html( $title ); ?></h2>
 			<p class="aio-preview-notice"><?php \esc_html_e( 'This preview uses synthetic data. If no rendered preview is available, the view is a structural preview only.', 'aio-page-builder' ); ?></p>
+			<?php if ( $live_url !== '' ) : ?>
+				<div
+					class="aio-live-preview-toolbar"
+					role="region"
+					aria-label="<?php echo \esc_attr__( 'Live preview controls', 'aio-page-builder' ); ?>"
+				>
+					<div class="aio-live-preview-viewport-switch" role="group" aria-label="<?php echo \esc_attr__( 'Preview viewport', 'aio-page-builder' ); ?>">
+						<button type="button" class="button aio-live-preview-view-btn is-active" data-aio-viewport="desktop"><?php \esc_html_e( 'Desktop', 'aio-page-builder' ); ?></button>
+						<button type="button" class="button aio-live-preview-view-btn" data-aio-viewport="tablet"><?php \esc_html_e( 'Tablet', 'aio-page-builder' ); ?></button>
+						<button type="button" class="button aio-live-preview-view-btn" data-aio-viewport="mobile"><?php \esc_html_e( 'Mobile', 'aio-page-builder' ); ?></button>
+					</div>
+					<label class="aio-live-preview-rm">
+						<input type="checkbox" class="aio-live-preview-rm-input" <?php \checked( $rm_ui ); ?> />
+						<?php \esc_html_e( 'Reduced motion', 'aio-page-builder' ); ?>
+					</label>
+					<button type="button" class="button aio-live-preview-open-tab"><?php \esc_html_e( 'Open in new tab', 'aio-page-builder' ); ?></button>
+					<button type="button" class="button aio-live-preview-regenerate"><?php \esc_html_e( 'Regenerate preview', 'aio-page-builder' ); ?></button>
+					<button type="button" class="button aio-live-preview-focus-frame"><?php \esc_html_e( 'Focus preview', 'aio-page-builder' ); ?></button>
+				</div>
+				<p class="screen-reader-text" aria-live="polite" id="aio-live-preview-status-page"><?php \esc_html_e( 'Live preview loading.', 'aio-page-builder' ); ?></p>
+				<div
+					class="aio-live-preview-frame-wrap aio-live-preview-viewport--desktop"
+					data-aio-live-preview-wrap="1"
+					data-aio-live-url="<?php echo \esc_url( $live_url ); ?>"
+					data-aio-live-origin="<?php echo \esc_attr( $live_origin ); ?>"
+				>
+					<p class="aio-live-preview-hint"><?php \esc_html_e( 'Live site preview (theme styles, animations):', 'aio-page-builder' ); ?></p>
+					<div class="aio-live-preview-loading" hidden><?php \esc_html_e( 'Loading preview…', 'aio-page-builder' ); ?></div>
+					<iframe
+						class="aio-live-preview-frame"
+						title="<?php echo \esc_attr__( 'Live template preview — themed output for this page template', 'aio-page-builder' ); ?>"
+						src="<?php echo \esc_url( $live_url ); ?>"
+						loading="lazy"
+						referrerpolicy="no-referrer"
+					></iframe>
+				</div>
+			<?php endif; ?>
 			<?php if ( $style_context !== null ) : ?>
 				<?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Inline preview context; base URL is from trusted builder. ?>
 				<link rel="stylesheet" href="<?php echo \esc_url( $style_context['base_stylesheet_url'] ); ?>" />
@@ -332,6 +371,52 @@ final class Page_Template_Detail_Screen {
 			</div>
 		</section>
 		<?php
+	}
+
+	/**
+	 * Signed front-end URL for full-theme live preview, or empty when not available.
+	 *
+	 * @param string $template_key Page template key.
+	 * @return string
+	 */
+	private function build_live_preview_url_page( string $template_key ): string {
+		$template_key = \sanitize_key( $template_key );
+		if ( $template_key === '' || ! \is_user_logged_in() ) {
+			return '';
+		}
+		$uid = (int) \get_current_user_id();
+		if ( $uid <= 0 ) {
+			return '';
+		}
+		$cc  = isset( $_GET['category_class'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['category_class'] ) ) : '';
+		$fam = isset( $_GET['family'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['family'] ) ) : '';
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only boolean flag; compared to literal.
+		$rm    = isset( $_GET['reduced_motion'] ) && (string) \wp_unslash( $_GET['reduced_motion'] ) === '1';
+		$extra = array();
+		if ( $cc !== '' ) {
+			$extra['category_class'] = $cc;
+		}
+		if ( $fam !== '' ) {
+			$extra['family'] = $fam;
+		}
+		if ( $rm ) {
+			$extra['reduced_motion'] = true;
+		}
+		$shell = isset( $_GET['aio_pb_preview_shell'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['aio_pb_preview_shell'] ) ) : '';
+		if ( $shell === 'compat' ) {
+			$extra['shell_mode'] = Template_Live_Preview_Ticket_Service::SHELL_COMPAT;
+		}
+		$issued = Template_Live_Preview_Ticket_Service::issue( Template_Live_Preview_Ticket_Service::TYPE_PAGE, $template_key, $uid, Template_Live_Preview_Ticket_Service::DEFAULT_TTL_SECONDS, $extra );
+		if ( $issued['ticket'] === '' ) {
+			return '';
+		}
+		return \add_query_arg(
+			array(
+				Template_Live_Preview_Ticket_Service::QUERY_FLAG => '1',
+				Template_Live_Preview_Ticket_Service::QUERY_TICKET => $issued['ticket'],
+			),
+			\home_url( '/' )
+		);
 	}
 
 	/**
@@ -365,7 +450,7 @@ final class Page_Template_Detail_Screen {
 		if ( ! isset( $_POST['action'] ) || \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) !== Entity_Style_UI_State_Builder::SAVE_ACTION ) {
 			return false;
 		}
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
 			return false;
 		}
 		$nonce_key = Entity_Style_UI_State_Builder::NONCE_ACTION;
@@ -556,92 +641,6 @@ final class Page_Template_Detail_Screen {
 	}
 
 	private function get_state_builder(): Page_Template_Detail_State_Builder {
-		$page_repo    = $this->container && $this->container->has( 'page_template_repository' ) ? $this->container->get( 'page_template_repository' ) : null;
-		$section_repo = $this->container && $this->container->has( 'section_template_repository' ) ? $this->container->get( 'section_template_repository' ) : null;
-		if ( ! $page_repo instanceof \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository ) {
-			$page_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository();
-		}
-		if ( ! $section_repo instanceof \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository ) {
-			$section_repo = new \AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository();
-		}
-
-		$page_provider    = new \AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Repository_Adapter( $page_repo );
-		$section_provider = new \AIOPageBuilder\Domain\Registries\PageTemplate\UI\Section_Template_Repository_Adapter( $section_repo );
-
-		$preview_generator = new \AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator();
-		$industry_dummy    = new \AIOPageBuilder\Domain\Industry\Preview\Industry_Dummy_Data_Generator();
-		$industry_key      = null;
-		if ( $this->container && $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
-			$store = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
-			if ( $store instanceof \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository ) {
-				$profile = $store->get_profile();
-				$primary = isset( $profile['primary_industry_key'] ) && \is_string( $profile['primary_industry_key'] ) ? \trim( $profile['primary_industry_key'] ) : '';
-				if ( $primary !== '' ) {
-					$industry_key = $primary;
-				}
-			}
-		}
-		$side_panel_builder = new \AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder();
-		$context_builder    = $this->container && $this->container->has( 'section_render_context_builder' ) ? $this->container->get( 'section_render_context_builder' ) : null;
-		if ( ! $context_builder instanceof \AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder ) {
-			$context_builder = new \AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder();
-		}
-		$section_renderer = $this->container && $this->container->has( 'section_renderer_base' ) ? $this->container->get( 'section_renderer_base' ) : null;
-		if ( ! $section_renderer instanceof \AIOPageBuilder\Domain\Rendering\Section\Section_Renderer_Base ) {
-			$section_renderer = new \AIOPageBuilder\Domain\Rendering\Section\Section_Renderer_Base();
-		}
-		$assembly_pipeline = $this->container && $this->container->has( 'native_block_assembly_pipeline' ) ? $this->container->get( 'native_block_assembly_pipeline' ) : null;
-		if ( ! $assembly_pipeline instanceof \AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline ) {
-			$assembly_pipeline = new \AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline( null, null );
-		}
-		$lpagery_compatibility = null;
-		if ( $this->container && $this->container->has( 'library_lpagery_compatibility_service' ) ) {
-			$lpagery_compatibility = $this->container->get( 'library_lpagery_compatibility_service' );
-		}
-		$preview_cache = null;
-		if ( $this->container && $this->container->has( 'preview_cache_service' ) ) {
-			$preview_cache = $this->container->get( 'preview_cache_service' );
-		}
-		if ( $preview_cache !== null && ! $preview_cache instanceof \AIOPageBuilder\Domain\Preview\Preview_Cache_Service ) {
-			$preview_cache = null;
-		}
-		$versioning_service  = null;
-		$deprecation_service = null;
-		if ( $this->container && $this->container->has( 'template_versioning_service' ) ) {
-			$v = $this->container->get( 'template_versioning_service' );
-			if ( $v instanceof \AIOPageBuilder\Domain\Registries\Versioning\Template_Versioning_Service ) {
-				$versioning_service = $v;
-			}
-		}
-		if ( $this->container && $this->container->has( 'template_deprecation_service' ) ) {
-			$d = $this->container->get( 'template_deprecation_service' );
-			if ( $d instanceof \AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service ) {
-				$deprecation_service = $d;
-			}
-		}
-		$form_reference_aggregator = null;
-		if ( $this->container && $this->container->has( 'form_provider_registry' ) ) {
-			$reg = $this->container->get( 'form_provider_registry' );
-			if ( $reg instanceof \AIOPageBuilder\Domain\FormProvider\Form_Provider_Registry ) {
-				$form_reference_aggregator = new \AIOPageBuilder\Domain\Rendering\FormProviders\Page_Form_Reference_Aggregator( $reg );
-			}
-		}
-
-		return new Page_Template_Detail_State_Builder(
-			$page_provider,
-			$section_provider,
-			$preview_generator,
-			$side_panel_builder,
-			$context_builder,
-			$section_renderer,
-			$assembly_pipeline,
-			$lpagery_compatibility,
-			$preview_cache,
-			$versioning_service,
-			$deprecation_service,
-			$form_reference_aggregator,
-			$industry_dummy,
-			$industry_key
-		);
+		return ( new Template_Live_Preview_State_Builder_Factory( $this->container ) )->create_page_builder();
 	}
 }

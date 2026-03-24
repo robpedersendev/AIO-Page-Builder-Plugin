@@ -130,6 +130,7 @@ final class Section_Template_Detail_State_Builder {
 
 		$purpose_family = isset( $request_params['purpose_family'] ) ? \sanitize_key( (string) $request_params['purpose_family'] ) : (string) ( $definition['section_purpose_family'] ?? 'other' );
 		$reduced_motion = ! empty( $request_params['reduced_motion'] );
+		$live_preview   = ! empty( $request_params['live_preview'] );
 
 		$context = Synthetic_Preview_Context::for_section(
 			$section_key,
@@ -162,7 +163,7 @@ final class Section_Template_Detail_State_Builder {
 
 		$preview_cache_hit     = false;
 		$rendered_preview_html = '';
-		$cache_key             = $this->preview_cache !== null ? $this->preview_cache->get_cache_key( $context, $definition ) : '';
+		$cache_key             = ( ! $live_preview && $this->preview_cache !== null ) ? $this->preview_cache->get_cache_key( $context, $definition ) : '';
 		if ( $cache_key !== '' && $this->preview_cache !== null ) {
 			$cached = $this->preview_cache->get( $cache_key );
 			if ( $cached !== null ) {
@@ -172,7 +173,7 @@ final class Section_Template_Detail_State_Builder {
 		}
 		if ( $rendered_preview_html === '' ) {
 			$rendered_preview_html = $this->render_preview_html( $definition, $field_values, array( 'reduced_motion' => $reduced_motion ) );
-			if ( $cache_key !== '' && $this->preview_cache !== null && $rendered_preview_html !== '' ) {
+			if ( ! $live_preview && $cache_key !== '' && $this->preview_cache !== null && $rendered_preview_html !== '' ) {
 				$version_hash = $this->preview_cache->definition_version_hash( $definition, Synthetic_Preview_Context::TYPE_SECTION );
 				$record       = new Preview_Cache_Record(
 					$cache_key,

@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\Reporting\UI\Logs_Monitoring_State_Builder;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Types;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
@@ -239,7 +240,7 @@ final class Dashboard_State_Builder {
 		$all = $this->get_explore_link_definitions();
 		$out = array();
 		foreach ( $all as $item ) {
-			if ( \current_user_can( $item['capability'] ) ) {
+			if ( Capabilities::current_user_can_for_route( $item['capability'] ) ) {
 				$out[] = $item;
 			}
 		}
@@ -297,7 +298,7 @@ final class Dashboard_State_Builder {
 			array(
 				'title'       => __( 'Template library', 'aio-page-builder' ),
 				'description' => __( 'Page templates, sections, compositions.', 'aio-page-builder' ),
-				'url'         => \add_query_arg( array( 'page' => 'aio-page-builder-page-templates' ), $base ),
+				'url'         => Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_SECTION ),
 				'capability'  => Capabilities::ACCESS_TEMPLATE_LIBRARY,
 			),
 			array(

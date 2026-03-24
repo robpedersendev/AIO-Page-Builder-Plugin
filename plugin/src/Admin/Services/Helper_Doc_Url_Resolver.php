@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Admin\Services;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
 use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry_Lookup_Interface;
 use AIOPageBuilder\Infrastructure\AdminRouting\Admin_Router;
 
@@ -71,6 +72,48 @@ final class Helper_Doc_Url_Resolver {
 			array(
 				'doc_id'  => $doc_id,
 				'section' => $section_key,
+			)
+		);
+
+		if ( $url === '' ) {
+			return $this->unavailable();
+		}
+
+		return array(
+			'available' => true,
+			'url'       => $url,
+			'message'   => '',
+			'doc_id'    => $doc_id,
+		);
+	}
+
+	/**
+	 * Resolves page-template one-pager documentation (registry lookup by page_template_key).
+	 *
+	 * @param string $page_template_key Page template internal_key.
+	 * @return array{available: bool, url: string, message: string, doc_id: string}
+	 */
+	public function resolve_for_page_template( string $page_template_key ): array {
+		$page_template_key = \sanitize_key( $page_template_key );
+		if ( $page_template_key === '' ) {
+			return $this->unavailable();
+		}
+
+		$doc = $this->registry->get_by_page_template_key( $page_template_key );
+		if ( ! \is_array( $doc ) ) {
+			return $this->unavailable();
+		}
+
+		$doc_id = isset( $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ) ? (string) $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] : '';
+		if ( $doc_id === '' ) {
+			return $this->unavailable();
+		}
+
+		$url = $this->router->url(
+			'documentation_detail',
+			array(
+				'doc_id'  => $doc_id,
+				'section' => '',
 			)
 		);
 

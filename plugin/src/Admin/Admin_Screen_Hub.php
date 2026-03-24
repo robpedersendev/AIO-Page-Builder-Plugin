@@ -95,12 +95,16 @@ final class Admin_Screen_Hub {
 	 * @param string                                           $page_slug Hub page slug.
 	 * @param array<string, array{label: string, cap: string}> $tabs Tab definitions keyed by tab id.
 	 * @param string                                           $current   Active tab id.
+	 * @param callable(string): bool|null                      $user_can_tab Optional cap check; defaults to current_user_can.
 	 * @return void
 	 */
-	public static function render_nav_tabs( string $page_slug, array $tabs, string $current ): void {
+	public static function render_nav_tabs( string $page_slug, array $tabs, string $current, ?callable $user_can_tab = null ): void {
+		$can = $user_can_tab ?? static function ( string $cap ): bool {
+			return \AIOPageBuilder\Infrastructure\Config\Capabilities::current_user_can_for_route( $cap );
+		};
 		echo '<h2 class="nav-tab-wrapper aio-nav-tab-wrapper">';
 		foreach ( $tabs as $key => $info ) {
-			if ( ! \current_user_can( $info['cap'] ) ) {
+			if ( ! $can( $info['cap'] ) ) {
 				continue;
 			}
 			$active = ( $current === $key ) ? ' nav-tab-active' : '';
@@ -116,12 +120,16 @@ final class Admin_Screen_Hub {
 	 * @param string                                           $tab       Primary tab id (fixed in URLs).
 	 * @param array<string, array{label: string, cap: string}> $tabs Sub-tab definitions.
 	 * @param string                                           $current   Active sub-tab id.
+	 * @param callable(string): bool|null                      $user_can_tab Optional cap check; defaults to current_user_can.
 	 * @return void
 	 */
-	public static function render_subnav_tabs( string $page_slug, string $tab, array $tabs, string $current ): void {
+	public static function render_subnav_tabs( string $page_slug, string $tab, array $tabs, string $current, ?callable $user_can_tab = null ): void {
+		$can = $user_can_tab ?? static function ( string $cap ): bool {
+			return \current_user_can( $cap );
+		};
 		echo '<h3 class="nav-tab-wrapper aio-nav-subtab-wrapper" style="margin-top:0.5em;padding-top:0.5em;border-top:1px solid #c3c4c7;">';
 		foreach ( $tabs as $key => $info ) {
-			if ( ! \current_user_can( $info['cap'] ) ) {
+			if ( ! $can( $info['cap'] ) ) {
 				continue;
 			}
 			$active = ( $current === $key ) ? ' nav-tab-active' : '';
@@ -139,7 +147,7 @@ final class Admin_Screen_Hub {
 	 */
 	public static function first_accessible_tab( string $default, array $tabs ): string {
 		foreach ( $tabs as $key => $info ) {
-			if ( \current_user_can( $info['cap'] ) ) {
+			if ( \AIOPageBuilder\Infrastructure\Config\Capabilities::current_user_can_for_route( $info['cap'] ) ) {
 				return $key;
 			}
 		}

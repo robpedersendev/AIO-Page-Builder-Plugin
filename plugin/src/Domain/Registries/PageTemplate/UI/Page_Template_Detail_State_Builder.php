@@ -18,6 +18,8 @@ use AIOPageBuilder\Domain\Preview\Preview_Cache_Service;
 use AIOPageBuilder\Domain\Preview\Preview_Side_Panel_Builder;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Context;
 use AIOPageBuilder\Domain\Preview\Synthetic_Preview_Data_Generator;
+use AIOPageBuilder\Domain\Registries\Documentation\Documentation_Schema;
+use AIOPageBuilder\Domain\Registries\Docs\Documentation_Registry;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
 use AIOPageBuilder\Domain\Rendering\FormProviders\Page_Form_Reference_Aggregator;
 use AIOPageBuilder\Domain\Registries\Versioning\Template_Deprecation_Service;
@@ -27,6 +29,7 @@ use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Blocks\Page_Block_Assembly_Result;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Renderer_Base;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 
 /**
  * Builds stable detail-state payload: template definition, side-panel metadata, used_sections,
@@ -126,9 +129,10 @@ final class Page_Template_Detail_State_Builder {
 			return $this->not_found_state( $template_key, $request_params );
 		}
 
-		$category_class = isset( $request_params['category_class'] ) ? \sanitize_key( (string) $request_params['category_class'] ) : (string) ( $definition['template_category_class'] ?? '' );
-		$family         = isset( $request_params['family'] ) ? \sanitize_key( (string) $request_params['family'] ) : (string) ( $definition['template_family'] ?? '' );
-		$reduced_motion = ! empty( $request_params['reduced_motion'] );
+		$category_class  = isset( $request_params['category_class'] ) ? \sanitize_key( (string) $request_params['category_class'] ) : (string) ( $definition['template_category_class'] ?? '' );
+		$family          = isset( $request_params['family'] ) ? \sanitize_key( (string) $request_params['family'] ) : (string) ( $definition['template_family'] ?? '' );
+		$reduced_motion  = ! empty( $request_params['reduced_motion'] );
+		$live_preview    = ! empty( $request_params['live_preview'] );
 
 		$context = Synthetic_Preview_Context::for_page(
 			$template_key,
@@ -152,10 +156,25 @@ final class Page_Template_Detail_State_Builder {
 		$used_sections  = $side_panel['used_sections'] ?? array();
 		$one_pager      = $definition['one_pager'] ?? array();
 		$one_pager_link = \is_array( $one_pager ) && isset( $one_pager['link'] ) ? (string) $one_pager['link'] : '';
+		if ( $one_pager_link === '' ) {
+			$doc = ( new Documentation_Registry() )->get_by_page_template_key( $template_key );
+			if ( \is_array( $doc ) ) {
+				$doc_id = (string) ( $doc[ Documentation_Schema::FIELD_DOCUMENTATION_ID ] ?? '' );
+				if ( $doc_id !== '' ) {
+					$one_pager_link = \add_query_arg(
+						array(
+							'page'   => 'aio-page-builder-documentation-detail',
+							'doc_id' => $doc_id,
+						),
+						\admin_url( 'admin.php' )
+					);
+				}
+			}
+		}
 
 		$preview_cache_hit     = false;
 		$rendered_preview_html = '';
-		$cache_key             = $this->preview_cache !== null ? $this->preview_cache->get_cache_key( $context, $definition ) : '';
+		$cache_key             = ( ! $live_preview && $this->preview_cache !== null ) ? $this->preview_cache->get_cache_key( $context, $definition ) : '';
 		if ( $cache_key !== '' && $this->preview_cache !== null ) {
 			$cached = $this->preview_cache->get( $cache_key );
 			if ( $cached !== null ) {
@@ -172,7 +191,7 @@ final class Page_Template_Detail_State_Builder {
 					'page_template'  => $definition,
 				)
 			);
-			if ( $cache_key !== '' && $this->preview_cache !== null && $rendered_preview_html !== '' ) {
+			if ( ! $live_preview && $cache_key !== '' && $this->preview_cache !== null && $rendered_preview_html !== '' ) {
 				$version_hash = $this->preview_cache->definition_version_hash( $definition, Synthetic_Preview_Context::TYPE_PAGE );
 				$record       = new Preview_Cache_Record(
 					$cache_key,
@@ -432,7 +451,7 @@ final class Page_Template_Detail_State_Builder {
 	 * @return array<int, array{label: string, url: string}>
 	 */
 	private function build_breadcrumbs( array $definition, string $category_class, string $family ): array {
-		$base_url = \admin_url( 'admin.php?page=' . Page_Template_Directory_State_Builder::SCREEN_SLUG );
+		$base_url = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_PAGE );
 		$segments = array(
 			array(
 				'label' => __( 'Page Templates', 'aio-page-builder' ),
@@ -477,7 +496,7 @@ final class Page_Template_Detail_State_Builder {
 	 * @return array<string, mixed>
 	 */
 	private function not_found_state( string $template_key, array $request_params ): array {
-		$base_url = \admin_url( 'admin.php?page=' . Page_Template_Directory_State_Builder::SCREEN_SLUG );
+		$base_url = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_PAGE );
 		return array(
 			'template_key'                => $template_key,
 			'definition'                  => array(),

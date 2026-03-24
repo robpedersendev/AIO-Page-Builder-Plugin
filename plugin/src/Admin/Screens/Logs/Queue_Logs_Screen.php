@@ -82,6 +82,14 @@ final class Queue_Logs_Screen {
 
 	public function __construct( ?Service_Container $container = null ) {
 		$this->container = $container;
+	}
+
+	/**
+	 * Registers admin-post handlers. Called on admin_init (not admin_menu) so admin-post.php can dispatch.
+	 *
+	 * @return void
+	 */
+	public function register_admin_post_handlers(): void {
 		\add_action( 'admin_post_aio_export_logs', array( $this, 'handle_export_logs' ), 10 );
 		\add_action( 'admin_post_aio_download_log_export', array( $this, 'handle_download_log_export' ), 10 );
 		\add_action( 'admin_post_aio_queue_recovery', array( $this, 'handle_queue_recovery' ), 10 );

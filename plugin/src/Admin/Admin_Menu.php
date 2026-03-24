@@ -20,6 +20,8 @@ use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Pack_Toggle_Controller;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Starter_Bundle_Assistant;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Style_Preset_Screen;
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Services\Settings_Template_Bulk_Seed_Service;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Domain\Registries\PageTemplate\ExpansionPack\Page_Template_And_Composition_Expansion_Pack_Seeder;
 use AIOPageBuilder\Domain\Registries\PageTemplate\TopLevelBatch\Top_Level_Marketing_Page_Template_Seeder;
@@ -54,7 +56,9 @@ use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Config\Settings_Seeding_Capability_Bridge;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
 
 /**
  * Registers admin menu and submenus. Screen rendering is delegated to screen classes.
@@ -71,12 +75,12 @@ final class Admin_Menu {
 	}
 
 	/**
-	 * Registers the top-level menu and Dashboard, Settings, Diagnostics, Crawler submenus.
-	 * Call from admin_menu action. Capability-aware; no mutation actions.
+	 * Registers admin_post_* callbacks. Call from admin_init priority 0 (see Plugin::register_admin_post_handlers).
+	 * wp-admin/admin-post.php never runs admin_menu, so hooks registered only there are invisible to form POSTs.
 	 *
 	 * @return void
 	 */
-	public function register(): void {
+	public function register_admin_post_actions(): void {
 		\add_action( 'admin_post_aio_seed_form_templates', array( $this, 'handle_seed_form_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_section_expansion_pack', array( $this, 'handle_seed_section_expansion_pack' ), 10 );
 		\add_action( 'admin_post_aio_seed_hero_intro_library_batch', array( $this, 'handle_seed_hero_intro_library_batch' ), 10 );
@@ -99,6 +103,8 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_seed_child_detail_product_templates', array( $this, 'handle_seed_child_detail_product_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_child_detail_profile_entity_templates', array( $this, 'handle_seed_child_detail_profile_entity_templates' ), 10 );
 		\add_action( 'admin_post_aio_seed_child_detail_variant_expansion_templates', array( $this, 'handle_seed_child_detail_variant_expansion_templates' ), 10 );
+		\add_action( 'admin_post_aio_seed_all_section_templates', array( $this, 'handle_seed_all_section_templates' ), 10 );
+		\add_action( 'admin_post_aio_seed_all_page_templates', array( $this, 'handle_seed_all_page_templates' ), 10 );
 		\add_action( 'admin_post_aio_save_industry_profile', array( $this, 'handle_save_industry_profile' ), 10 );
 		\add_action( 'admin_post_aio_toggle_industry_pack', array( $this, 'handle_toggle_industry_pack' ), 10 );
 		\add_action( 'admin_post_aio_apply_industry_style_preset', array( $this, 'handle_apply_industry_style_preset' ), 10 );
@@ -113,15 +119,26 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_apply', array( $this, 'handle_industry_bundle_apply' ), 10 );
 
+		$profile_snapshots_for_post = new Profile_Snapshot_History_Panel( $this->container );
+		$profile_snapshots_for_post->register_hooks();
+	}
+
+	/**
+	 * Registers the top-level menu and Dashboard, Settings, Diagnostics, Crawler submenus.
+	 * Call from admin_menu action. Capability-aware; no mutation actions.
+	 * admin_post_* hooks belong in register_admin_post_actions(), invoked from Admin_Post_Handler_Registrar on admin_init.
+	 *
+	 * @return void
+	 */
+	public function register(): void {
 		$dashboard         = new Dashboard_Screen( $this->container );
 		$profile_snapshots = new Profile_Snapshot_History_Panel( $this->container );
-		$profile_snapshots->register_hooks();
-		$hub_renderer = new \AIOPageBuilder\Admin\Admin_Menu_Hub_Renderer( $this->container, $profile_snapshots );
+		$hub_renderer      = new \AIOPageBuilder\Admin\Admin_Menu_Hub_Renderer( $this->container, $profile_snapshots );
 
 		add_menu_page(
 			__( 'AIO Page Builder', 'aio-page-builder' ),
 			__( 'AIO Page Builder', 'aio-page-builder' ),
-			$dashboard->get_capability(),
+			$dashboard->get_menu_capability(),
 			self::PARENT_SLUG,
 			array( $dashboard, 'render' ),
 			'dashicons-admin-generic',
@@ -627,35 +644,124 @@ final class Admin_Menu {
 	}
 
 	/**
+	 * Settings hub General & seeding: form templates require settings or both section and page registry caps.
+	 *
+	 * @return bool
+	 */
+	private function current_user_can_settings_hub_form_templates_seed(): bool {
+		return \current_user_can( Capabilities::MANAGE_SETTINGS )
+			|| ( \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES )
+				&& \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) );
+	}
+
+	/**
+	 * Settings hub: section library seeds — settings or section registry cap.
+	 *
+	 * @return bool
+	 */
+	private function current_user_can_settings_hub_section_batch_seed(): bool {
+		return \current_user_can( Capabilities::MANAGE_SETTINGS )
+			|| \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES );
+	}
+
+	/**
+	 * Settings hub: page template seeds — settings or page registry cap.
+	 *
+	 * @return bool
+	 */
+	private function current_user_can_settings_hub_page_batch_seed(): bool {
+		return \current_user_can( Capabilities::MANAGE_SETTINGS )
+			|| \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES );
+	}
+
+	/**
+	 * Settings hub: page + composition seeds — settings or both registry caps.
+	 *
+	 * @return bool
+	 */
+	private function current_user_can_settings_hub_page_and_composition_batch_seed(): bool {
+		return \current_user_can( Capabilities::MANAGE_SETTINGS )
+			|| ( \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES )
+				&& \current_user_can( Capabilities::MANAGE_COMPOSITIONS ) );
+	}
+
+	/**
+	 * Redirects to Settings → General & seeding → Section & page templates with query args.
+	 *
+	 * @param array<string, string> $query_args
+	 * @return void
+	 */
+	private function redirect_settings_section_page_seeding( array $query_args ): void {
+		\wp_safe_redirect(
+			Admin_Screen_Hub::subtab_url(
+				Settings_Screen::SLUG,
+				'general',
+				Settings_Screen::SETTINGS_SUBTAB_SECTION_PAGE_TEMPLATES,
+				$query_args
+			)
+		);
+		exit;
+	}
+
+	/**
 	 * Handles admin-post request to seed form section and request page template (form-provider-integration-contract).
 	 * Verifies nonce and capability; redirects back to Settings with result.
 	 *
 	 * @return void
 	 */
 	public function handle_seed_form_templates(): void {
+		$redirect_error = Admin_Screen_Hub::tab_url(
+			Settings_Screen::SLUG,
+			'general',
+			array( 'aio_seed_result' => 'error' )
+		);
 		if ( ! isset( $_POST['aio_seed_form_templates_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_form_templates_nonce'] ) ), 'aio_seed_form_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
+			\wp_safe_redirect( $redirect_error );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) || ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
+		// * Matches Settings hub "General & seeding" tab (MANAGE_SETTINGS), not only granular template caps.
+		if ( ! $this->current_user_can_settings_hub_form_templates_seed() ) {
+			\wp_safe_redirect( $redirect_error );
 			exit;
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
+			\wp_safe_redirect( $redirect_error );
 			exit;
 		}
-		$section_registry = $this->container->get( 'section_registry_service' );
-		$page_repo        = $this->container->get( 'page_template_repository' );
-		if ( ! $section_registry instanceof \AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service || ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_seed_result=error' ) );
+		try {
+			if ( ! $this->container->has( 'section_registry_service' ) || ! $this->container->has( 'page_template_repository' ) ) {
+				Internal_Debug_Log::line( 'seed_form_templates: section_registry_service or page_template_repository not registered' );
+				\wp_safe_redirect( $redirect_error );
+				exit;
+			}
+			$section_registry = $this->container->get( 'section_registry_service' );
+			$page_repo        = $this->container->get( 'page_template_repository' );
+			if ( ! $section_registry instanceof \AIOPageBuilder\Domain\Registries\Section\Section_Registry_Service || ! $page_repo instanceof Page_Template_Repository ) {
+				\wp_safe_redirect( $redirect_error );
+				exit;
+			}
+			$result      = Settings_Seeding_Capability_Bridge::run(
+				static function () use ( $section_registry, $page_repo ) {
+					return $section_registry->ensure_bundled_form_templates( $page_repo );
+				},
+				Capabilities::MANAGE_SECTION_TEMPLATES,
+				Capabilities::MANAGE_PAGE_TEMPLATES
+			);
+			$result_flag = $result['success'] ? 'success' : 'error';
+			\wp_safe_redirect(
+				Admin_Screen_Hub::tab_url(
+					Settings_Screen::SLUG,
+					'general',
+					array( 'aio_seed_result' => $result_flag )
+				)
+			);
+			exit;
+		} catch ( \Throwable $e ) {
+			Internal_Debug_Log::line( 'seed_form_templates failed: ' . $e->getMessage() );
+			\wp_safe_redirect( $redirect_error );
 			exit;
 		}
-		$result = $section_registry->ensure_bundled_form_templates( $page_repo );
-		$query  = $result['success'] ? 'aio_seed_result=success' : 'aio_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
 	}
 
 	/**
@@ -666,26 +772,31 @@ final class Admin_Menu {
 	public function handle_seed_section_expansion_pack(): void {
 		if ( ! isset( $_POST['aio_seed_expansion_pack_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_expansion_pack_nonce'] ) ), 'aio_seed_section_expansion_pack' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_expansion_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_expansion_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_expansion_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_expansion_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_expansion_seed_result' => 'error' ) );
 		}
-		$result = Section_Expansion_Pack_Seeder::run( $section_repo );
-		$query  = $result['success'] ? 'aio_expansion_seed_result=success' : 'aio_expansion_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $section_repo ) {
+				return Section_Expansion_Pack_Seeder::run( $section_repo );
+			},
+			Capabilities::MANAGE_SECTION_TEMPLATES
+		);
+		if ( ! $result['success'] && ! empty( $result['errors'] ) ) {
+			Internal_Debug_Log::line( 'seed_section_expansion_pack: ' . implode( '; ', $result['errors'] ) );
+		}
+		$query         = $result['success'] ? 'aio_expansion_seed_result=success' : 'aio_expansion_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -696,26 +807,28 @@ final class Admin_Menu {
 	public function handle_seed_hero_intro_library_batch(): void {
 		if ( ! isset( $_POST['aio_seed_hero_intro_batch_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_hero_intro_batch_nonce'] ) ), 'aio_seed_hero_intro_library_batch' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hero_intro_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_hero_intro_batch_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hero_intro_batch_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_hero_intro_batch_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hero_intro_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_hero_intro_batch_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hero_intro_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_hero_intro_batch_seed_result' => 'error' ) );
 		}
-		$result = Hero_Intro_Library_Batch_Seeder::run( $section_repo );
-		$query  = $result['success'] ? 'aio_hero_intro_batch_seed_result=success' : 'aio_hero_intro_batch_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $section_repo ) {
+				return Hero_Intro_Library_Batch_Seeder::run( $section_repo );
+			},
+			Capabilities::MANAGE_SECTION_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_hero_intro_batch_seed_result=success' : 'aio_hero_intro_batch_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -726,26 +839,28 @@ final class Admin_Menu {
 	public function handle_seed_trust_proof_library_batch(): void {
 		if ( ! isset( $_POST['aio_seed_trust_proof_batch_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_trust_proof_batch_nonce'] ) ), 'aio_seed_trust_proof_library_batch' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_trust_proof_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_trust_proof_batch_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_trust_proof_batch_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_trust_proof_batch_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_trust_proof_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_trust_proof_batch_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_trust_proof_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_trust_proof_batch_seed_result' => 'error' ) );
 		}
-		$result = Trust_Proof_Library_Batch_Seeder::run( $section_repo );
-		$query  = $result['success'] ? 'aio_trust_proof_batch_seed_result=success' : 'aio_trust_proof_batch_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $section_repo ) {
+				return Trust_Proof_Library_Batch_Seeder::run( $section_repo );
+			},
+			Capabilities::MANAGE_SECTION_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_trust_proof_batch_seed_result=success' : 'aio_trust_proof_batch_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -756,26 +871,28 @@ final class Admin_Menu {
 	public function handle_seed_feature_benefit_value_batch(): void {
 		if ( ! isset( $_POST['aio_seed_fb_value_batch_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_fb_value_batch_nonce'] ) ), 'aio_seed_feature_benefit_value_batch' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_fb_value_batch_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_fb_value_batch_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_fb_value_batch_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_fb_value_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_fb_value_batch_seed_result' => 'error' ) );
 		}
-		$result = Feature_Benefit_Value_Library_Batch_Seeder::run( $section_repo );
-		$query  = $result['success'] ? 'aio_fb_value_batch_seed_result=success' : 'aio_fb_value_batch_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $section_repo ) {
+				return Feature_Benefit_Value_Library_Batch_Seeder::run( $section_repo );
+			},
+			Capabilities::MANAGE_SECTION_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_fb_value_batch_seed_result=success' : 'aio_fb_value_batch_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -786,26 +903,28 @@ final class Admin_Menu {
 	public function handle_seed_process_timeline_faq_batch(): void {
 		if ( ! isset( $_POST['aio_seed_ptf_batch_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_ptf_batch_nonce'] ) ), 'aio_seed_process_timeline_faq_batch' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_ptf_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_ptf_batch_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_ptf_batch_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_ptf_batch_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_ptf_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_ptf_batch_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_ptf_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_ptf_batch_seed_result' => 'error' ) );
 		}
-		$result = Process_Timeline_FAQ_Library_Batch_Seeder::run( $section_repo );
-		$query  = $result['success'] ? 'aio_ptf_batch_seed_result=success' : 'aio_ptf_batch_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $section_repo ) {
+				return Process_Timeline_FAQ_Library_Batch_Seeder::run( $section_repo );
+			},
+			Capabilities::MANAGE_SECTION_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_ptf_batch_seed_result=success' : 'aio_ptf_batch_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -816,26 +935,28 @@ final class Admin_Menu {
 	public function handle_seed_media_listing_profile_batch(): void {
 		if ( ! isset( $_POST['aio_seed_mlp_batch_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_mlp_batch_nonce'] ) ), 'aio_seed_media_listing_profile_batch' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_mlp_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_mlp_batch_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_mlp_batch_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_mlp_batch_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_mlp_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_mlp_batch_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_mlp_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_mlp_batch_seed_result' => 'error' ) );
 		}
-		$result = Media_Listing_Profile_Detail_Library_Batch_Seeder::run( $section_repo );
-		$query  = $result['success'] ? 'aio_mlp_batch_seed_result=success' : 'aio_mlp_batch_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $section_repo ) {
+				return Media_Listing_Profile_Detail_Library_Batch_Seeder::run( $section_repo );
+			},
+			Capabilities::MANAGE_SECTION_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_mlp_batch_seed_result=success' : 'aio_mlp_batch_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -846,26 +967,28 @@ final class Admin_Menu {
 	public function handle_seed_legal_policy_utility_batch(): void {
 		if ( ! isset( $_POST['aio_seed_lpu_batch_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_lpu_batch_nonce'] ) ), 'aio_seed_legal_policy_utility_batch' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_lpu_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_lpu_batch_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_lpu_batch_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_lpu_batch_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_lpu_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_lpu_batch_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_lpu_batch_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_lpu_batch_seed_result' => 'error' ) );
 		}
-		$result = Legal_Policy_Utility_Library_Batch_Seeder::run( $section_repo );
-		$query  = $result['success'] ? 'aio_lpu_batch_seed_result=success' : 'aio_lpu_batch_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $section_repo ) {
+				return Legal_Policy_Utility_Library_Batch_Seeder::run( $section_repo );
+			},
+			Capabilities::MANAGE_SECTION_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_lpu_batch_seed_result=success' : 'aio_lpu_batch_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -876,26 +999,28 @@ final class Admin_Menu {
 	public function handle_seed_cta_super_library_batch(): void {
 		if ( ! isset( $_POST['aio_seed_cta_super_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_cta_super_nonce'] ) ), 'aio_seed_cta_super_library_batch' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_cta_super_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_cta_super_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_cta_super_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_cta_super_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_cta_super_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_cta_super_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_cta_super_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_cta_super_seed_result' => 'error' ) );
 		}
-		$result = CTA_Super_Library_Batch_Seeder::run( $section_repo );
-		$query  = $result['success'] ? 'aio_cta_super_seed_result=success' : 'aio_cta_super_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $section_repo ) {
+				return CTA_Super_Library_Batch_Seeder::run( $section_repo );
+			},
+			Capabilities::MANAGE_SECTION_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_cta_super_seed_result=success' : 'aio_cta_super_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -906,27 +1031,30 @@ final class Admin_Menu {
 	public function handle_seed_page_composition_expansion_pack(): void {
 		if ( ! isset( $_POST['aio_seed_pt_comp_expansion_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_pt_comp_expansion_nonce'] ) ), 'aio_seed_page_composition_expansion_pack' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_pt_comp_expansion_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) || ! \current_user_can( Capabilities::MANAGE_COMPOSITIONS ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_and_composition_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_pt_comp_expansion_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_pt_comp_expansion_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		$comp_repo = $this->container->get( 'composition_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository || ! $comp_repo instanceof Composition_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_pt_comp_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_pt_comp_expansion_seed_result' => 'error' ) );
 		}
-		$result = Page_Template_And_Composition_Expansion_Pack_Seeder::run( $page_repo, $comp_repo );
-		$query  = $result['success'] ? 'aio_pt_comp_expansion_seed_result=success' : 'aio_pt_comp_expansion_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo, $comp_repo ) {
+				return Page_Template_And_Composition_Expansion_Pack_Seeder::run( $page_repo, $comp_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES,
+			Capabilities::MANAGE_COMPOSITIONS
+		);
+		$query         = $result['success'] ? 'aio_pt_comp_expansion_seed_result=success' : 'aio_pt_comp_expansion_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -937,26 +1065,28 @@ final class Admin_Menu {
 	public function handle_seed_top_level_marketing_templates(): void {
 		if ( ! isset( $_POST['aio_seed_top_level_marketing_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_top_level_marketing_nonce'] ) ), 'aio_seed_top_level_marketing_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_marketing_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_marketing_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_marketing_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_marketing_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_marketing_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_marketing_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_marketing_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_marketing_seed_result' => 'error' ) );
 		}
-		$result = Top_Level_Marketing_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_top_level_marketing_seed_result=success' : 'aio_top_level_marketing_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Top_Level_Marketing_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_top_level_marketing_seed_result=success' : 'aio_top_level_marketing_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -967,26 +1097,28 @@ final class Admin_Menu {
 	public function handle_seed_top_level_legal_utility_templates(): void {
 		if ( ! isset( $_POST['aio_seed_top_level_legal_utility_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_top_level_legal_utility_nonce'] ) ), 'aio_seed_top_level_legal_utility_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_legal_utility_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_legal_utility_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_legal_utility_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_legal_utility_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_legal_utility_seed_result' => 'error' ) );
 		}
-		$result = Top_Level_Legal_Utility_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_top_level_legal_utility_seed_result=success' : 'aio_top_level_legal_utility_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Top_Level_Legal_Utility_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_top_level_legal_utility_seed_result=success' : 'aio_top_level_legal_utility_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -997,26 +1129,28 @@ final class Admin_Menu {
 	public function handle_seed_top_level_educational_resource_authority_templates(): void {
 		if ( ! isset( $_POST['aio_seed_top_level_edu_resource_authority_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_top_level_edu_resource_authority_nonce'] ) ), 'aio_seed_top_level_educational_resource_authority_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_edu_resource_authority_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_edu_resource_authority_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_edu_resource_authority_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_edu_resource_authority_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_edu_resource_authority_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_edu_resource_authority_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_edu_resource_authority_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_edu_resource_authority_seed_result' => 'error' ) );
 		}
-		$result = Top_Level_Educational_Resource_Authority_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_top_level_edu_resource_authority_seed_result=success' : 'aio_top_level_edu_resource_authority_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Top_Level_Educational_Resource_Authority_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_top_level_edu_resource_authority_seed_result=success' : 'aio_top_level_edu_resource_authority_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -1027,26 +1161,28 @@ final class Admin_Menu {
 	public function handle_seed_top_level_variant_expansion_templates(): void {
 		if ( ! isset( $_POST['aio_seed_top_level_variant_expansion_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_top_level_variant_expansion_nonce'] ) ), 'aio_seed_top_level_variant_expansion_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_variant_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_variant_expansion_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_variant_expansion_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_variant_expansion_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_variant_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_variant_expansion_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_top_level_variant_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_variant_expansion_seed_result' => 'error' ) );
 		}
-		$result = Top_Level_Variant_Expansion_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_top_level_variant_expansion_seed_result=success' : 'aio_top_level_variant_expansion_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Top_Level_Variant_Expansion_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_top_level_variant_expansion_seed_result=success' : 'aio_top_level_variant_expansion_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -1057,26 +1193,28 @@ final class Admin_Menu {
 	public function handle_seed_hub_page_templates(): void {
 		if ( ! isset( $_POST['aio_seed_hub_page_templates_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_hub_page_templates_nonce'] ) ), 'aio_seed_hub_page_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_page_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_hub_page_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_page_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_hub_page_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_page_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_hub_page_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_page_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_hub_page_seed_result' => 'error' ) );
 		}
-		$result = Hub_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_hub_page_seed_result=success' : 'aio_hub_page_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Hub_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_hub_page_seed_result=success' : 'aio_hub_page_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -1087,26 +1225,28 @@ final class Admin_Menu {
 	public function handle_seed_geographic_hub_templates(): void {
 		if ( ! isset( $_POST['aio_seed_geographic_hub_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_geographic_hub_nonce'] ) ), 'aio_seed_geographic_hub_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_geographic_hub_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_geographic_hub_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_geographic_hub_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_geographic_hub_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_geographic_hub_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_geographic_hub_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_geographic_hub_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_geographic_hub_seed_result' => 'error' ) );
 		}
-		$result = Geographic_Hub_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_geographic_hub_seed_result=success' : 'aio_geographic_hub_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Geographic_Hub_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_geographic_hub_seed_result=success' : 'aio_geographic_hub_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -1117,26 +1257,28 @@ final class Admin_Menu {
 	public function handle_seed_nested_hub_templates(): void {
 		if ( ! isset( $_POST['aio_seed_nested_hub_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_nested_hub_nonce'] ) ), 'aio_seed_nested_hub_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_nested_hub_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_nested_hub_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_nested_hub_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_nested_hub_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_nested_hub_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_nested_hub_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_nested_hub_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_nested_hub_seed_result' => 'error' ) );
 		}
-		$result = Nested_Hub_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_nested_hub_seed_result=success' : 'aio_nested_hub_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Nested_Hub_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_nested_hub_seed_result=success' : 'aio_nested_hub_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -1147,26 +1289,28 @@ final class Admin_Menu {
 	public function handle_seed_hub_nested_hub_variant_expansion_templates(): void {
 		if ( ! isset( $_POST['aio_seed_hub_nested_hub_variant_expansion_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_hub_nested_hub_variant_expansion_nonce'] ) ), 'aio_seed_hub_nested_hub_variant_expansion_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_nested_hub_variant_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_hub_nested_hub_variant_expansion_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_nested_hub_variant_expansion_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_hub_nested_hub_variant_expansion_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_nested_hub_variant_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_hub_nested_hub_variant_expansion_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_hub_nested_hub_variant_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_hub_nested_hub_variant_expansion_seed_result' => 'error' ) );
 		}
-		$result = Hub_Nested_Hub_Variant_Expansion_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_hub_nested_hub_variant_expansion_seed_result=success' : 'aio_hub_nested_hub_variant_expansion_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Hub_Nested_Hub_Variant_Expansion_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_hub_nested_hub_variant_expansion_seed_result=success' : 'aio_hub_nested_hub_variant_expansion_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -1177,26 +1321,28 @@ final class Admin_Menu {
 	public function handle_seed_child_detail_templates(): void {
 		if ( ! isset( $_POST['aio_seed_child_detail_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_child_detail_nonce'] ) ), 'aio_seed_child_detail_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_seed_result' => 'error' ) );
 		}
-		$result = Child_Detail_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_child_detail_seed_result=success' : 'aio_child_detail_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Child_Detail_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_child_detail_seed_result=success' : 'aio_child_detail_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -1207,26 +1353,28 @@ final class Admin_Menu {
 	public function handle_seed_child_detail_product_templates(): void {
 		if ( ! isset( $_POST['aio_seed_child_detail_product_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_child_detail_product_nonce'] ) ), 'aio_seed_child_detail_product_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_product_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_product_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_product_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_product_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_product_seed_result' => 'error' ) );
 		}
-		$result = Child_Detail_Product_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_child_detail_product_seed_result=success' : 'aio_child_detail_product_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Child_Detail_Product_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_child_detail_product_seed_result=success' : 'aio_child_detail_product_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -1237,26 +1385,28 @@ final class Admin_Menu {
 	public function handle_seed_child_detail_profile_entity_templates(): void {
 		if ( ! isset( $_POST['aio_seed_child_detail_profile_entity_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_child_detail_profile_entity_nonce'] ) ), 'aio_seed_child_detail_profile_entity_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_profile_entity_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_profile_entity_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_profile_entity_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_profile_entity_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_profile_entity_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_profile_entity_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_profile_entity_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_profile_entity_seed_result' => 'error' ) );
 		}
-		$result = Child_Detail_Profile_Entity_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_child_detail_profile_entity_seed_result=success' : 'aio_child_detail_profile_entity_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Child_Detail_Profile_Entity_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_child_detail_profile_entity_seed_result=success' : 'aio_child_detail_profile_entity_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
 	}
 
 	/**
@@ -1267,25 +1417,107 @@ final class Admin_Menu {
 	public function handle_seed_child_detail_variant_expansion_templates(): void {
 		if ( ! isset( $_POST['aio_seed_child_detail_variant_expansion_nonce'] ) ||
 			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_child_detail_variant_expansion_nonce'] ) ), 'aio_seed_child_detail_variant_expansion_templates' ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_variant_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_variant_expansion_seed_result' => 'error' ) );
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_variant_expansion_seed_result=error' ) );
-			exit;
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_variant_expansion_seed_result' => 'error' ) );
 		}
 		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_variant_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_variant_expansion_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&aio_child_detail_variant_expansion_seed_result=error' ) );
-			exit;
+			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_variant_expansion_seed_result' => 'error' ) );
 		}
-		$result = Child_Detail_Variant_Expansion_Page_Template_Seeder::run( $page_repo );
-		$query  = $result['success'] ? 'aio_child_detail_variant_expansion_seed_result=success' : 'aio_child_detail_variant_expansion_seed_result=error';
-		\wp_safe_redirect( \admin_url( 'admin.php?page=' . Settings_Screen::SLUG . '&' . $query ) );
-		exit;
+		$result        = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo ) {
+				return Child_Detail_Variant_Expansion_Page_Template_Seeder::run( $page_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES
+		);
+		$query         = $result['success'] ? 'aio_child_detail_variant_expansion_seed_result=success' : 'aio_child_detail_variant_expansion_seed_result=error';
+		$redirect_args = array();
+		parse_str( $query, $redirect_args );
+		$this->redirect_settings_section_page_seeding( $redirect_args );
+	}
+
+	/**
+	 * Seeds all section template batches in order (Settings → Section & page templates).
+	 *
+	 * @return void
+	 */
+	public function handle_seed_all_section_templates(): void {
+		$err = array( 'aio_seed_all_section_result' => 'error' );
+		if ( ! isset( $_POST['aio_seed_all_section_templates_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_all_section_templates_nonce'] ) ), 'aio_seed_all_section_templates' ) ) {
+			$this->redirect_settings_section_page_seeding( $err );
+		}
+		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( $err );
+		}
+		if ( ! $this->container instanceof Service_Container ) {
+			$this->redirect_settings_section_page_seeding( $err );
+		}
+		$section_repo = $this->container->get( 'section_template_repository' );
+		if ( ! $section_repo instanceof Section_Template_Repository ) {
+			$this->redirect_settings_section_page_seeding( $err );
+		}
+		$bulk = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $section_repo ) {
+				return Settings_Template_Bulk_Seed_Service::seed_all_sections( $section_repo );
+			},
+			Capabilities::MANAGE_SECTION_TEMPLATES
+		);
+		if ( ! empty( $bulk['success'] ) ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_seed_all_section_result' => 'success' ) );
+		}
+		if ( ! empty( $bulk['errors'] ) ) {
+			Internal_Debug_Log::line( 'seed_all_section_templates: ' . implode( '; ', $bulk['errors'] ) );
+		}
+		if ( $bulk['failed_step'] !== '' ) {
+			Internal_Debug_Log::line( 'seed_all_section_templates failed_step: ' . $bulk['failed_step'] );
+		}
+		$this->redirect_settings_section_page_seeding( $err );
+	}
+
+	/**
+	 * Seeds all page template batches in order (Settings → Section & page templates).
+	 *
+	 * @return void
+	 */
+	public function handle_seed_all_page_templates(): void {
+		$err = array( 'aio_seed_all_page_result' => 'error' );
+		if ( ! isset( $_POST['aio_seed_all_page_templates_nonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST['aio_seed_all_page_templates_nonce'] ) ), 'aio_seed_all_page_templates' ) ) {
+			$this->redirect_settings_section_page_seeding( $err );
+		}
+		if ( ! $this->current_user_can_settings_hub_page_batch_seed() || ! $this->current_user_can_settings_hub_page_and_composition_batch_seed() ) {
+			$this->redirect_settings_section_page_seeding( $err );
+		}
+		if ( ! $this->container instanceof Service_Container ) {
+			$this->redirect_settings_section_page_seeding( $err );
+		}
+		$page_repo = $this->container->get( 'page_template_repository' );
+		$comp_repo = $this->container->get( 'composition_repository' );
+		if ( ! $page_repo instanceof Page_Template_Repository || ! $comp_repo instanceof Composition_Repository ) {
+			$this->redirect_settings_section_page_seeding( $err );
+		}
+		$bulk = Settings_Seeding_Capability_Bridge::run(
+			static function () use ( $page_repo, $comp_repo ) {
+				return Settings_Template_Bulk_Seed_Service::seed_all_pages( $page_repo, $comp_repo );
+			},
+			Capabilities::MANAGE_PAGE_TEMPLATES,
+			Capabilities::MANAGE_COMPOSITIONS
+		);
+		if ( ! empty( $bulk['success'] ) ) {
+			$this->redirect_settings_section_page_seeding( array( 'aio_seed_all_page_result' => 'success' ) );
+		}
+		if ( ! empty( $bulk['errors'] ) ) {
+			Internal_Debug_Log::line( 'seed_all_page_templates: ' . implode( '; ', $bulk['errors'] ) );
+		}
+		if ( $bulk['failed_step'] !== '' ) {
+			Internal_Debug_Log::line( 'seed_all_page_templates failed_step: ' . $bulk['failed_step'] );
+		}
+		$this->redirect_settings_section_page_seeding( $err );
 	}
 }

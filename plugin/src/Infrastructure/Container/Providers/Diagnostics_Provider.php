@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Diagnostics\Preview_Audit_Log_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 use AIOPageBuilder\Support\Logging\Error_Record;
@@ -28,6 +29,14 @@ final class Diagnostics_Provider implements Service_Provider_Interface {
 			'logger',
 			function (): Logger_Interface {
 				return new Null_Logger();
+			}
+		);
+
+		$container->register(
+			'preview_audit_log',
+			static function () use ( $container ): Preview_Audit_Log_Service {
+				$logger = $container->get( 'logger' );
+				return new Preview_Audit_Log_Service( $logger );
 			}
 		);
 

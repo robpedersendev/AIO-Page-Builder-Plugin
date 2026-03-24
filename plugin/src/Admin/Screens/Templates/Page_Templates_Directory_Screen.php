@@ -16,7 +16,9 @@ use AIOPageBuilder\Admin\Screens\PageTemplates\Industry_Page_Template_Filter_Con
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Page_Template_Override_Service;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Directory_Read_Model_Builder;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Page_Template_Recommendation_Resolver;
+use AIOPageBuilder\Admin\Services\Helper_Doc_Url_Resolver;
 use AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Directory_State_Builder;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
@@ -50,7 +52,7 @@ final class Page_Templates_Directory_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
@@ -205,7 +207,6 @@ final class Page_Templates_Directory_Screen {
 	 * @return void
 	 */
 	private function render_filters( array $state ): void {
-		$base_url      = (string) ( $state['base_url'] ?? \admin_url( 'admin.php?page=' . self::SLUG ) );
 		$filters       = $state['filters'] ?? array();
 		$cat           = (string) ( $filters['category_class'] ?? '' );
 		$family        = (string) ( $filters['family'] ?? '' );
@@ -215,7 +216,8 @@ final class Page_Templates_Directory_Screen {
 		$industry_view = (string) ( $state['industry_view'] ?? Industry_Page_Template_Directory_Read_Model_Builder::VIEW_FULL_LIBRARY );
 		?>
 		<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-directory-filters">
-			<input type="hidden" name="page" value="<?php echo \esc_attr( self::SLUG ); ?>" />
+			<input type="hidden" name="page" value="<?php echo \esc_attr( Template_Library_Hub_Urls::HUB_PAGE_SLUG ); ?>" />
+			<input type="hidden" name="<?php echo \esc_attr( Template_Library_Hub_Urls::QUERY_TAB ); ?>" value="<?php echo \esc_attr( Template_Library_Hub_Urls::TAB_PAGE ); ?>" />
 			<?php if ( $cat !== '' ) : ?>
 				<input type="hidden" name="category_class" value="<?php echo \esc_attr( $cat ); ?>" />
 			<?php endif; ?>
@@ -302,7 +304,7 @@ final class Page_Templates_Directory_Screen {
 		$industry_page_template_overrides_by_key = $state['industry_page_template_overrides_by_key'] ?? array();
 		$industry_weighted_by_key                = $state['industry_weighted_by_key'] ?? array();
 
-		$query_args = array( 'page' => self::SLUG );
+		$query_args = Template_Library_Hub_Urls::query_args_for_tab( Template_Library_Hub_Urls::TAB_PAGE );
 		if ( $cat !== '' ) {
 			$query_args['category_class'] = $cat;
 		}
@@ -370,6 +372,17 @@ final class Page_Templates_Directory_Screen {
 					$weighted            = isset( $industry_weighted_by_key[ $key ] ) && is_array( $industry_weighted_by_key[ $key ] ) ? $industry_weighted_by_key[ $key ] : null;
 					$conflict_results    = ( $weighted !== null && ! empty( $weighted['conflict_results'] ) ) ? $weighted['conflict_results'] : array();
 					$explanation_summary = ( $weighted !== null && isset( $weighted['explanation_summary'] ) ) ? (string) $weighted['explanation_summary'] : '';
+					$one_pager_url       = (string) ( $row['one_pager_link'] ?? '' );
+					if ( $one_pager_url === '' && $this->container !== null && $this->container->has( 'helper_doc_url_resolver' ) ) {
+						$resolver = $this->container->get( 'helper_doc_url_resolver' );
+						if ( $resolver instanceof Helper_Doc_Url_Resolver ) {
+							$resolved = $resolver->resolve_for_page_template( $key );
+							if ( ! empty( $resolved['available'] ) && isset( $resolved['url'] ) && $resolved['url'] !== '' ) {
+								$one_pager_url = (string) $resolved['url'];
+							}
+						}
+					}
+					$one_pager_available = $one_pager_url !== '';
 					?>
 					<tr>
 						<td><code><?php echo \esc_html( $key ); ?></code></td>
@@ -378,17 +391,25 @@ final class Page_Templates_Directory_Screen {
 						<td><?php echo \esc_html( $section_count > 0 ? sprintf( /* translators: %d: number of sections */ __( '%d sections', 'aio-page-builder' ), $section_count ) : '—' ); ?></td>
 						<td><?php echo \esc_html( $version ); ?></td>
 						<td>
-							<span class="aio-one-pager-unavailable"><?php \esc_html_e( 'Not available', 'aio-page-builder' ); ?></span>
+							<?php if ( $one_pager_available ) : ?>
+								<a href="<?php echo \esc_url( $one_pager_url ); ?>"><?php \esc_html_e( 'Available', 'aio-page-builder' ); ?></a>
+							<?php else : ?>
+								<span class="aio-one-pager-unavailable"><?php \esc_html_e( 'Not available', 'aio-page-builder' ); ?></span>
+							<?php endif; ?>
 						</td>
 						<td><?php echo \esc_html( $status ); ?></td>
 						<td>
 							<a href="<?php echo \esc_url( $view_url ); ?>"><?php \esc_html_e( 'View detail', 'aio-page-builder' ); ?></a>
-							| <span class="aio-one-pager-unavailable" title="<?php echo \esc_attr__( 'One-pager not available.', 'aio-page-builder' ); ?>"><?php \esc_html_e( 'Open one-pager', 'aio-page-builder' ); ?></span>
+							<?php if ( $one_pager_available ) : ?>
+								| <a href="<?php echo \esc_url( $one_pager_url ); ?>"><?php \esc_html_e( 'Open one-pager', 'aio-page-builder' ); ?></a>
+							<?php else : ?>
+								| <span class="aio-one-pager-unavailable" title="<?php echo \esc_attr__( 'One-pager not available.', 'aio-page-builder' ); ?>"><?php \esc_html_e( 'Open one-pager', 'aio-page-builder' ); ?></span>
+							<?php endif; ?>
 							| <a href="<?php echo \esc_url( $preview_url ); ?>"><?php \esc_html_e( 'Structural preview', 'aio-page-builder' ); ?></a>
 							<?php if ( $in_compare ) : ?>
-								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'page', $key ) ); ?>"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
+								| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'page', $key ) ); ?>" data-aio-compare-type="page" data-aio-compare-key="<?php echo \esc_attr( $key ); ?>" data-aio-compare-op="remove"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 							<?php else : ?>
-								| <a href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'page', $key ) ); ?>"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
+								| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'page', $key ) ); ?>" data-aio-compare-type="page" data-aio-compare-key="<?php echo \esc_attr( $key ); ?>" data-aio-compare-op="add"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
 							<?php endif; ?>
 							<?php if ( $template_override !== null ) : ?>
 								| <span class="aio-template-overridden" title="<?php echo \esc_attr( (string) ( $template_override['reason'] ?? '' ) ); ?>"><?php \esc_html_e( 'Overridden', 'aio-page-builder' ); ?></span>
