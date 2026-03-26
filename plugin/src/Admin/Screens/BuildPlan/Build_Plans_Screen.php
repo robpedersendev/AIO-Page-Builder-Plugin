@@ -11,6 +11,9 @@ namespace AIOPageBuilder\Admin\Screens\BuildPlan;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Actions\Create_Build_Plan_From_AI_Run_Action;
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -47,6 +50,14 @@ final class Build_Plans_Screen {
 			$plan_id = \sanitize_text_field( \wp_unslash( (string) $_GET['id'] ) );
 		}
 		if ( $plan_id !== '' ) {
+			if ( isset( $_GET[ Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT ] ) ) {
+				$bp_flag = \sanitize_key( (string) \wp_unslash( (string) $_GET[ Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT ] ) );
+				if ( Create_Build_Plan_From_AI_Run_Action::RESULT_CREATED === $bp_flag ) {
+					?>
+					<div class="notice notice-success is-dismissible" role="status"><p><?php \esc_html_e( 'Build Plan created from the AI run. Review steps below.', 'aio-page-builder' ); ?></p></div>
+					<?php
+				}
+			}
 			$workspace = new Build_Plan_Workspace_Screen( $this->container );
 			$workspace->render( $plan_id );
 			return;
@@ -71,7 +82,18 @@ final class Build_Plans_Screen {
 		<?php endif; ?>
 			<p class="aio-build-plans-description"><?php \esc_html_e( 'Review and manage build plans. Open a plan to review steps and items.', 'aio-page-builder' ); ?></p>
 			<?php if ( count( $plans ) === 0 ) : ?>
-				<p class="aio-admin-notice"><?php \esc_html_e( 'No build plans yet. Create a plan from an AI Run.', 'aio-page-builder' ); ?></p>
+				<p class="aio-admin-notice">
+					<?php \esc_html_e( 'No build plans yet.', 'aio-page-builder' ); ?>
+					<?php if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) ) : ?>
+						<?php
+						$ai_runs_url = Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs' );
+						?>
+						<a href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'Open AI Runs', 'aio-page-builder' ); ?></a>
+						<?php \esc_html_e( '— open a completed run, then use “Create Build Plan from this run”.', 'aio-page-builder' ); ?>
+					<?php else : ?>
+						<?php \esc_html_e( 'Ask an administrator to create a plan from a completed AI run.', 'aio-page-builder' ); ?>
+					<?php endif; ?>
+				</p>
 			<?php else : ?>
 				<table class="wp-list-table widefat fixed striped">
 					<thead>

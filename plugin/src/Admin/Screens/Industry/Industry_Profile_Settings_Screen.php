@@ -325,7 +325,7 @@ final class Industry_Profile_Settings_Screen {
 						<tr>
 							<th scope="row"><label for="aio-secondary-industries"><?php echo \esc_html( $secondary_config['label'] ); ?></label></th>
 							<td>
-								<select name="<?php echo \esc_attr( $secondary_config['name'] ); ?>" id="aio-secondary-industries" multiple="multiple" size="5">
+								<select name="<?php echo \esc_attr( $secondary_config['name'] ); ?>" id="aio-secondary-industries" multiple="multiple" size="10">
 									<?php foreach ( $secondary_config['options'] as $value => $label ) : ?>
 										<option value="<?php echo \esc_attr( $value ); ?>" <?php echo \in_array( $value, $current_secondary, true ) ? ' selected="selected"' : ''; ?>><?php echo \esc_html( $label ); ?></option>
 									<?php endforeach; ?>

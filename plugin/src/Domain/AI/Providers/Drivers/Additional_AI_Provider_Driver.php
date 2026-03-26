@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\AI\Providers\Drivers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Planning\Planning_Structured_Output_Limits;
 use AIOPageBuilder\Domain\AI\Pricing\Provider_Cost_Calculator;
 use AIOPageBuilder\Domain\AI\Providers\Abstract_AI_Provider_Driver;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Error_Normalizer;
@@ -84,7 +85,7 @@ final class Additional_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 		);
 		$body     = array(
 			'model'      => $model,
-			'max_tokens' => max( 1, min( 4096, $max_tok ) ),
+			'max_tokens' => Planning_Structured_Output_Limits::clamp_for_provider_request( $max_tok ),
 			'messages'   => $messages,
 		);
 		if ( $system !== '' ) {

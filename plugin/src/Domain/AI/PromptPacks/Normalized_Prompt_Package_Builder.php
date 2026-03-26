@@ -65,6 +65,7 @@ final class Normalized_Prompt_Package_Builder {
 			Prompt_Pack_Schema::SEGMENT_TEMPLATE_FAMILY_GUIDANCE,
 			Prompt_Pack_Schema::SEGMENT_CTA_LAW_GUIDANCE,
 			Prompt_Pack_Schema::SEGMENT_HIERARCHY_ROLE_GUIDANCE,
+			Prompt_Pack_Schema::SEGMENT_GREENFIELD_PLANNING_DEPTH,
 			Prompt_Pack_Schema::SEGMENT_PROVIDER_NOTES,
 		);
 		foreach ( $system_segment_keys as $seg_key ) {

@@ -46,6 +46,9 @@ final class Artifact_Category_Keys {
 	/** §29.7 Usage/cost metadata. */
 	public const USAGE_METADATA = 'usage_metadata';
 
+	/** Optional second completion (expand pass) usage when present. */
+	public const EXPAND_PASS_USAGE = 'expand_pass_usage';
+
 	/** Placeholder for future build plan reference. */
 	public const BUILD_PLAN_REF = 'build_plan_ref';
 
@@ -61,6 +64,7 @@ final class Artifact_Category_Keys {
 		self::DROPPED_RECORD_REPORT,
 		self::RETRY_METADATA,
 		self::USAGE_METADATA,
+		self::EXPAND_PASS_USAGE,
 		self::BUILD_PLAN_REF,
 	);
 

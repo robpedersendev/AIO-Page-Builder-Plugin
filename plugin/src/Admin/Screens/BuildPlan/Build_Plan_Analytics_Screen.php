@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Admin\Screens\BuildPlan;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -64,12 +65,16 @@ final class Build_Plan_Analytics_Screen {
 			}
 		}
 		$build_plans_url = Admin_Screen_Hub::tab_url( Build_Plans_Screen::SLUG, 'build_plans' );
+		$ai_runs_url     = Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs' );
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-build-plan-analytics" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 		<?php endif; ?>
 			<p class="aio-analytics-intro"><?php \esc_html_e( 'Observational trends from Build Plan history. No changes to plans or execution.', 'aio-page-builder' ); ?></p>
+			<?php if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) ) : ?>
+				<p class="description"><?php \esc_html_e( 'To create a new plan, open a completed run under AI Runs and use “Create Build Plan from this run”.', 'aio-page-builder' ); ?> <a href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'AI Runs', 'aio-page-builder' ); ?></a></p>
+			<?php endif; ?>
 			<p><a href="<?php echo \esc_url( $build_plans_url ); ?>"><?php \esc_html_e( '&larr; Back to Build Plans', 'aio-page-builder' ); ?></a></p>
 
 			<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-analytics-filter">

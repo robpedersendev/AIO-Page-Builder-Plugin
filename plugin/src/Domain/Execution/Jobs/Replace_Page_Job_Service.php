@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\Rendering\Blocks\Native_Block_Assembly_Pipeline;
 use AIOPageBuilder\Domain\Rendering\Blocks\Page_Block_Assembly_Result;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiation_Payload_Builder;
 use AIOPageBuilder\Domain\Rendering\Page\Page_Instantiator;
+use AIOPageBuilder\Domain\Rendering\Section\Section_Guidance_Field_Value_Applier;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Render_Context_Builder;
 use AIOPageBuilder\Domain\Rendering\Section\Section_Renderer_Base;
 use AIOPageBuilder\Domain\Registries\PageTemplate\Page_Template_Schema;
@@ -147,7 +148,8 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 			return Replace_Page_Result::failure( __( 'Page template not found.', 'aio-page-builder' ), array( 'template_not_found' ), $snapshot_ref );
 		}
 
-		$assembly = $this->build_assembly_from_template( $template_key, $template_def );
+		$guidance_items = Section_Guidance_Field_Value_Applier::parse_guidance_items( $target );
+		$assembly       = $this->build_assembly_from_template( $template_key, $template_def, $guidance_items );
 		if ( $assembly === null || ! $assembly->is_valid() ) {
 			return Replace_Page_Result::failure(
 				__( 'Failed to build page content from template.', 'aio-page-builder' ),
@@ -197,7 +199,8 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 			return Replace_Page_Result::failure( __( 'Page template not found.', 'aio-page-builder' ), array( 'template_not_found' ), $snapshot_ref );
 		}
 
-		$assembly = $this->build_assembly_from_template( $template_key, $template_def );
+		$guidance_items = Section_Guidance_Field_Value_Applier::parse_guidance_items( $target );
+		$assembly       = $this->build_assembly_from_template( $template_key, $template_def, $guidance_items );
 		if ( $assembly === null || ! $assembly->is_valid() ) {
 			return Replace_Page_Result::failure(
 				__( 'Failed to build page content from template.', 'aio-page-builder' ),
@@ -319,11 +322,12 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 	/**
 	 * Builds Page_Block_Assembly_Result from template (same as Create_Page_Job_Service).
 	 *
-	 * @param string               $template_key
-	 * @param array<string, mixed> $template_def
+	 * @param string                      $template_key
+	 * @param array<string, mixed>        $template_def
+	 * @param list<array<string, string>> $guidance_items
 	 * @return Page_Block_Assembly_Result|null
 	 */
-	private function build_assembly_from_template( string $template_key, array $template_def ): ?Page_Block_Assembly_Result {
+	private function build_assembly_from_template( string $template_key, array $template_def, array $guidance_items = array() ): ?Page_Block_Assembly_Result {
 		$ordered = $template_def[ Page_Template_Schema::FIELD_ORDERED_SECTIONS ] ?? null;
 		if ( ! is_array( $ordered ) || empty( $ordered ) ) {
 			return null;
@@ -350,7 +354,9 @@ final class Replace_Page_Job_Service implements Replace_Page_Job_Service_Interfa
 				continue;
 			}
 
-			$built = $this->context_builder->build( $section_def, array(), $pos, null );
+			$row          = Section_Guidance_Field_Value_Applier::find_guidance_for_section( $guidance_items, $section_key );
+			$field_values = Section_Guidance_Field_Value_Applier::field_values_for_section( $section_def, $row );
+			$built        = $this->context_builder->build( $section_def, $field_values, $pos, null );
 			if ( $built['context'] === null ) {
 				continue;
 			}

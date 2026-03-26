@@ -145,7 +145,7 @@ final class Industry_Pack_Registry_Test extends TestCase {
 	public function test_builtin_pack_definitions_load_and_validate(): void {
 		$definitions = Industry_Pack_Registry::get_builtin_pack_definitions();
 		$this->assertIsArray( $definitions );
-		$this->assertGreaterThanOrEqual( 4, count( $definitions ), 'Expected at least cosmetology_nail, realtor, plumber, disaster_recovery' );
+		$this->assertGreaterThanOrEqual( 40, count( $definitions ), 'Expected core packs plus catalog verticals' );
 		$registry = new Industry_Pack_Registry();
 		$registry->load( $definitions );
 		$this->assertTrue( $registry->has_any() );

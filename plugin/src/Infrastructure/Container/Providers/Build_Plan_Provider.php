@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_Analytics_Service;
+use AIOPageBuilder\Domain\BuildPlan\Generation\AI_Run_To_Build_Plan_Service;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Item_Generator;
 use AIOPageBuilder\Domain\Industry\AI\Industry_Approval_Snapshot_Builder;
@@ -158,6 +159,16 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 					$container->get( 'build_plan_repository' ),
 					$container->get( 'build_plan_item_generator' ),
 					$scoring instanceof Build_Plan_Scoring_Interface ? $scoring : null
+				);
+			}
+		);
+		$container->register(
+			'ai_run_to_build_plan_service',
+			function () use ( $container ): AI_Run_To_Build_Plan_Service {
+				return new AI_Run_To_Build_Plan_Service(
+					$container->get( 'ai_run_service' ),
+					$container->get( 'ai_run_artifact_service' ),
+					$container->get( 'build_plan_generator' )
 				);
 			}
 		);

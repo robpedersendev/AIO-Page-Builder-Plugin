@@ -201,7 +201,14 @@ final class Onboarding_UI_State_Builder {
 	 * @return array<int, array{code: string, message: string}>
 	 */
 	private function build_submission_warnings( array $draft, array $prefill ): array {
-		$warnings       = array();
+		$warnings  = array();
+		$ctx_block = Onboarding_Planning_Context_Guard::get_blocking_message( $draft, $prefill );
+		if ( $ctx_block !== null ) {
+			$warnings[] = array(
+				'code'    => 'planning_context_incomplete',
+				'message' => $ctx_block,
+			);
+		}
 		$threshold_days = 30;
 		$settings       = $this->settings_service;
 		if ( $settings !== null ) {

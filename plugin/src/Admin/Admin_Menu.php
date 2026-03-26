@@ -117,6 +117,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_guided_repair_apply_ref', array( $this, 'handle_guided_repair_apply_ref' ), 10 );
 		\add_action( 'admin_post_aio_guided_repair_activate', array( $this, 'handle_guided_repair_activate' ), 10 );
 		\add_action( 'admin_post_aio_create_plan_from_bundle', array( $this, 'handle_create_plan_from_bundle' ), 10 );
+		\add_action( 'admin_post_aio_create_build_plan_from_ai_run', array( $this, 'handle_create_build_plan_from_ai_run' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_apply', array( $this, 'handle_industry_bundle_apply' ), 10 );
 
@@ -507,6 +508,15 @@ final class Admin_Menu {
 	 */
 	public function handle_create_plan_from_bundle(): void {
 		\AIOPageBuilder\Admin\Actions\Create_Plan_From_Starter_Bundle_Action::handle( $this->container );
+	}
+
+	/**
+	 * Creates a Build Plan from a completed AI run (normalized output).
+	 *
+	 * @return void
+	 */
+	public function handle_create_build_plan_from_ai_run(): void {
+		\AIOPageBuilder\Admin\Actions\Create_Build_Plan_From_AI_Run_Action::handle( $this->container );
 	}
 
 	/**

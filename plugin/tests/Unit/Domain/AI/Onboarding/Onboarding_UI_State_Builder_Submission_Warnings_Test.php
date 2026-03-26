@@ -25,6 +25,28 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/../../../../wordpress/' )
 
 final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCase {
 
+	/**
+	 * @return array<string, mixed>
+	 */
+	private function valid_draft_base(): array {
+		return array(
+			'goal_or_intent_text' => \str_repeat( 'x', 40 ),
+		);
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 */
+	private function valid_prefill_base(): array {
+		return array(
+			'profile' => array(
+				'business_profile' => array(
+					'business_name' => 'Test Business',
+				),
+			),
+		);
+	}
+
 	protected function tearDown(): void {
 		unset( $GLOBALS['_aio_get_post_by_id'] );
 		parent::tearDown();
@@ -86,9 +108,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				)
 			),
 		);
-		$draft                          = array( 'last_planning_run_post_id' => 10 );
-		$prefill                        = array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) );
-		$w                              = $this->invoke_warnings( $builder, $draft, $prefill );
+		$draft   = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 10 ) );
+		$prefill = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) ) );
+		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertSame( array(), $w );
 	}
 
@@ -118,9 +140,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				)
 			),
 		);
-		$draft                          = array( 'last_planning_run_post_id' => 10 );
-		$prefill                        = array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) );
-		$w                              = $this->invoke_warnings( $builder, $draft, $prefill );
+		$draft   = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 10 ) );
+		$prefill = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) ) );
+		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertCount( 1, $w );
 		$this->assertSame( 'profile_updated_since_last_run', $w[0]['code'] );
 	}
@@ -130,8 +152,8 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 		$repo     = $this->createMock( Profile_Snapshot_Repository_Interface::class );
 		$repo->method( 'get_all' )->willReturn( array() );
 		$builder = $this->base_builder( $repo, $settings );
-		$draft   = array( 'last_planning_run_post_id' => 0 );
-		$prefill = array( 'latest_crawl_session_timestamp' => '1990-01-01T00:00:00Z' );
+		$draft   = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 0 ) );
+		$prefill = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => '1990-01-01T00:00:00Z' ) );
 		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertCount( 1, $w );
 		$this->assertSame( 'stale_crawl_context', $w[0]['code'] );
@@ -163,9 +185,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				)
 			),
 		);
-		$draft                          = array( 'last_planning_run_post_id' => 10 );
-		$prefill                        = array( 'latest_crawl_session_timestamp' => '1990-01-01T00:00:00Z' );
-		$w                              = $this->invoke_warnings( $builder, $draft, $prefill );
+		$draft   = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 10 ) );
+		$prefill = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => '1990-01-01T00:00:00Z' ) );
+		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertCount( 2, $w );
 		$codes = array( $w[0]['code'], $w[1]['code'] );
 		$this->assertContains( 'profile_updated_since_last_run', $codes );
@@ -177,10 +199,22 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 		$repo     = $this->createMock( Profile_Snapshot_Repository_Interface::class );
 		$repo->method( 'get_all' )->willReturn( array() );
 		$builder = $this->base_builder( $repo, $settings );
-		$draft   = array();
-		$prefill = array();
+		$draft   = $this->valid_draft_base();
+		$prefill = $this->valid_prefill_base();
 		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertSame( array(), $w );
+	}
+
+	public function test_planning_context_incomplete_when_goal_too_short(): void {
+		$settings = new Settings_Service();
+		$repo     = $this->createMock( Profile_Snapshot_Repository_Interface::class );
+		$repo->method( 'get_all' )->willReturn( array() );
+		$builder = $this->base_builder( $repo, $settings );
+		$draft   = \array_merge( $this->valid_draft_base(), array( 'goal_or_intent_text' => 'short' ) );
+		$prefill = $this->valid_prefill_base();
+		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
+		$this->assertCount( 1, $w );
+		$this->assertSame( 'planning_context_incomplete', $w[0]['code'] );
 	}
 
 	public function test_custom_stale_threshold_from_main_settings(): void {
@@ -192,9 +226,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 		$repo = $this->createMock( Profile_Snapshot_Repository_Interface::class );
 		$repo->method( 'get_all' )->willReturn( array() );
 		$builder = $this->base_builder( $repo, $settings );
-		$draft   = array();
+		$draft   = $this->valid_draft_base();
 		// * 200 days ago — still "fresh" when threshold is 3650 days.
-		$prefill = array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 200 * 86400 ) );
+		$prefill = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 200 * 86400 ) ) );
 		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertSame( array(), $w );
 	}

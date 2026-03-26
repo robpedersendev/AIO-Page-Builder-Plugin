@@ -19,12 +19,15 @@ use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Readiness;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Planning_Context_Guard;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
 use AIOPageBuilder\Domain\AI\Onboarding\Planning_Request_Result;
 use AIOPageBuilder\Domain\Profile\Template_Preference_Profile;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Industry_Hub_Navigation_Advisor;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
@@ -36,6 +39,9 @@ use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 final class Onboarding_Screen {
 
 	public const SLUG = 'aio-page-builder-onboarding';
+
+	/** Query arg: AI run id after onboarding planning when redirecting to Industry hub (link back to AI Runs). */
+	public const QUERY_ONBOARDING_INDUSTRY_RUN = 'aio_onboarding_run';
 
 	/** Gated by plugin capability for onboarding (spec §44.3). */
 	private const CAPABILITY = Capabilities::RUN_ONBOARDING;
@@ -239,16 +245,44 @@ final class Onboarding_Screen {
 				\set_transient( $transient_key, $arr, 120 );
 				$this->debug_onboarding_line( 'submit_planning_request result_status=' . (string) ( $arr['status'] ?? '' ) );
 				if ( $arr['status'] === Planning_Request_Result::STATUS_SUCCESS
-					&& isset( $arr['run_id'] ) && is_string( $arr['run_id'] ) && $arr['run_id'] !== ''
-					&& Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) ) {
-					return Admin_Screen_Hub::tab_url(
-						AI_Runs_Screen::HUB_PAGE_SLUG,
-						'ai_runs',
-						array(
-							'run_id' => $arr['run_id'],
-							AI_Runs_Screen::QUERY_ONBOARDING_PLAN => AI_Runs_Screen::ONBOARDING_PLAN_SUCCESS_VALUE,
-						)
-					);
+					&& isset( $arr['run_id'] ) && is_string( $arr['run_id'] ) && $arr['run_id'] !== '' ) {
+					$run_post_id = isset( $arr['run_post_id'] ) ? (int) $arr['run_post_id'] : 0;
+					if ( Capabilities::current_user_can_for_route( Capabilities::ACCESS_INDUSTRY_WORKSPACE )
+						&& $this->container !== null
+						&& $this->container->has( 'onboarding_industry_hub_navigation_advisor' )
+						&& $run_post_id > 0 ) {
+						/** @var Onboarding_Industry_Hub_Navigation_Advisor $nav_advisor */
+						$nav_advisor    = $this->container->get( 'onboarding_industry_hub_navigation_advisor' );
+						$suggested      = $nav_advisor->suggest_navigation( $run_post_id );
+						$tab            = (string) ( $suggested['tab'] ?? 'profile' );
+						$subtab         = isset( $suggested['subtab'] ) && is_string( $suggested['subtab'] ) ? $suggested['subtab'] : null;
+						$extra_industry = array(
+							self::QUERY_ONBOARDING_INDUSTRY_RUN => $arr['run_id'],
+						);
+						if ( ( $tab === 'reports' || $tab === 'comparisons' ) && $subtab !== null && $subtab !== '' ) {
+							return Admin_Screen_Hub::subtab_url(
+								Industry_Profile_Settings_Screen::SLUG,
+								$tab,
+								$subtab,
+								$extra_industry
+							);
+						}
+						return Admin_Screen_Hub::tab_url(
+							Industry_Profile_Settings_Screen::SLUG,
+							$tab,
+							$extra_industry
+						);
+					}
+					if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) ) {
+						return Admin_Screen_Hub::tab_url(
+							AI_Runs_Screen::HUB_PAGE_SLUG,
+							'ai_runs',
+							array(
+								'run_id' => $arr['run_id'],
+								AI_Runs_Screen::QUERY_ONBOARDING_PLAN => AI_Runs_Screen::ONBOARDING_PLAN_SUCCESS_VALUE,
+							)
+						);
+					}
 				}
 				return $this->hub_redirect_url(
 					array(
@@ -295,11 +329,26 @@ final class Onboarding_Screen {
 	 * @param array<string, mixed> $draft Current draft (used to gate template preference writes).
 	 * @return void
 	 */
-	private function persist_all_wizard_fields_from_post( array $draft ): void {
+	private function persist_all_wizard_fields_from_post( array &$draft ): void {
 		$this->persist_brand_profile_from_post( $draft );
 		$this->persist_business_profile_from_post( $draft );
 		$this->persist_template_preferences_from_post( $draft );
 		$this->persist_industry_profile_from_post();
+		$this->merge_goal_intent_from_post_into_draft( $draft );
+	}
+
+	/**
+	 * Persists the site goal / intent string from the submission step into the onboarding draft.
+	 *
+	 * @param array<string, mixed> $draft Draft (mutated when POST field is present).
+	 * @return void
+	 */
+	private function merge_goal_intent_from_post_into_draft( array &$draft ): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before persist.
+		if ( ! isset( $_POST['aio_onboarding_goal_or_intent'] ) ) {
+			return;
+		}
+		$draft['goal_or_intent_text'] = \sanitize_textarea_field( \wp_unslash( (string) $_POST['aio_onboarding_goal_or_intent'] ) );
 	}
 
 	/**
@@ -718,6 +767,34 @@ final class Onboarding_Screen {
 					<?php $this->render_embedded_ai_providers_setup(); ?>
 				<?php endif; ?>
 				<p><?php \esc_html_e( 'Request an AI-generated plan from your profile and context. The plan will appear in AI Runs; you can then create a Build Plan from it.', 'aio-page-builder' ); ?></p>
+				<?php
+				$draft_for_goal = isset( $state['draft'] ) && is_array( $state['draft'] ) ? $state['draft'] : array();
+				$goal_val       = isset( $draft_for_goal['goal_or_intent_text'] ) && is_string( $draft_for_goal['goal_or_intent_text'] ) ? $draft_for_goal['goal_or_intent_text'] : '';
+				$min_goal       = Onboarding_Planning_Context_Guard::MIN_GOAL_LENGTH;
+				?>
+				<p>
+					<label for="aio_onboarding_goal_or_intent"><strong><?php \esc_html_e( 'Site goal and scope', 'aio-page-builder' ); ?></strong></label>
+				</p>
+				<p class="description">
+					<?php
+					echo \esc_html(
+						sprintf(
+							/* translators: %d: minimum character count for the site goal field */
+							__( 'Describe the overhaul or new site in detail (at least %d characters). Include audiences, offers, and any must-have pages so the planner can propose a full sitemap and template reuse.', 'aio-page-builder' ),
+							$min_goal
+						)
+					);
+					?>
+				</p>
+				<p>
+					<textarea
+						name="aio_onboarding_goal_or_intent"
+						id="aio_onboarding_goal_or_intent"
+						class="large-text"
+						rows="8"
+						form="<?php echo \esc_attr( self::MAIN_FORM_ID ); ?>"
+					><?php echo \esc_textarea( $goal_val ); ?></textarea>
+				</p>
 				<?php
 				$submission_warnings = isset( $state['submission_warnings'] ) && is_array( $state['submission_warnings'] ) ? $state['submission_warnings'] : array();
 				foreach ( $submission_warnings as $warning ) :

@@ -11,7 +11,9 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Actions\Create_Build_Plan_From_AI_Run_Action;
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
 use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -96,6 +98,28 @@ final class AI_Run_Detail_Screen {
 			}
 		}
 
+		$normalized_for_plan    = null;
+		$can_create_build_plan  = false;
+		$create_plan_help_text  = '';
+		$existing_build_plan_id = '';
+		if ( is_array( $run ) && $artifact_svc !== null && isset( $run['id'] ) ) {
+			$normalized_for_plan    = $artifact_svc->get( (int) $run['id'], Artifact_Category_Keys::NORMALIZED_OUTPUT );
+			$meta_for_plan          = is_array( $run['run_metadata'] ?? null ) ? $run['run_metadata'] : array();
+			$existing_build_plan_id = is_string( $meta_for_plan['build_plan_ref'] ?? null )
+				? trim( (string) $meta_for_plan['build_plan_ref'] )
+				: '';
+			if ( Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
+				$st = (string) ( $run['status'] ?? '' );
+				if ( $st !== 'completed' ) {
+					$create_plan_help_text = __( 'A Build Plan can be created only after the run completes successfully.', 'aio-page-builder' );
+				} elseif ( ! is_array( $normalized_for_plan ) ) {
+					$create_plan_help_text = __( 'This run has no normalized output, so a Build Plan cannot be generated.', 'aio-page-builder' );
+				} else {
+					$can_create_build_plan = true;
+				}
+			}
+		}
+
 		$meta      = is_array( $run ) ? ( $run['run_metadata'] ?? array() ) : array();
 		$meta_safe = AI_Run_Artifact_Service::redact_sensitive_values( $meta );
 		$list_url  = Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs' );
@@ -125,6 +149,22 @@ final class AI_Run_Detail_Screen {
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 		<?php endif; ?>
 			<p><a href="<?php echo \esc_url( $list_url ); ?>"><?php \esc_html_e( '&larr; Back to AI Runs', 'aio-page-builder' ); ?></a></p>
+			<?php
+			if ( isset( $_GET[ Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT ] ) ) {
+				$bp_flag = \sanitize_key( (string) \wp_unslash( (string) $_GET[ Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT ] ) );
+				$bp_msgs = array(
+					Create_Build_Plan_From_AI_Run_Action::RESULT_UNAUTHORIZED    => __( 'You do not have permission to create Build Plans.', 'aio-page-builder' ),
+					Create_Build_Plan_From_AI_Run_Action::RESULT_BAD_REQUEST    => __( 'The request could not be completed. Try again.', 'aio-page-builder' ),
+					Create_Build_Plan_From_AI_Run_Action::RESULT_GENERATION_FAILED => __( 'The Build Plan could not be generated from this run. Check validation and normalized output.', 'aio-page-builder' ),
+				);
+				if ( isset( $bp_msgs[ $bp_flag ] ) ) {
+					$bp_class = ( Create_Build_Plan_From_AI_Run_Action::RESULT_CREATED === $bp_flag ) ? 'notice-success' : 'notice-error';
+					?>
+					<div class="notice <?php echo \esc_attr( $bp_class ); ?> aio-ai-run-bp-notice" role="status"><p><?php echo \esc_html( $bp_msgs[ $bp_flag ] ); ?></p></div>
+					<?php
+				}
+			}
+			?>
 			<?php if ( $run === null ) : ?>
 				<p class="aio-admin-notice"><?php \esc_html_e( 'Run not found.', 'aio-page-builder' ); ?></p>
 				<?php
@@ -174,7 +214,17 @@ final class AI_Run_Detail_Screen {
 					break;
 				case self::SUBTAB_OVERVIEW:
 				default:
-					$this->render_subtab_overview( $run, $run_id, $meta_safe, $usage_data, $validation_report, $failover_attempts );
+					$this->render_subtab_overview(
+						$run,
+						$run_id,
+						$meta_safe,
+						$usage_data,
+						$validation_report,
+						$failover_attempts,
+						$can_create_build_plan,
+						$create_plan_help_text,
+						$existing_build_plan_id
+					);
 					break;
 			}
 			?>
@@ -192,9 +242,22 @@ final class AI_Run_Detail_Screen {
 	 * @param array<string, mixed>|null $usage_data
 	 * @param array<string, mixed>|null $validation_report
 	 * @param array<int, mixed>         $attempts
+	 * @param bool                      $can_create_build_plan  User may submit create-plan action.
+	 * @param string                    $create_plan_help_text  Shown when create is disabled.
+	 * @param string                    $existing_build_plan_id Linked plan id from metadata, if any.
 	 * @return void
 	 */
-	private function render_subtab_overview( array $run, string $run_id, array $meta_safe, ?array $usage_data, ?array $validation_report, array $attempts ): void {
+	private function render_subtab_overview(
+		array $run,
+		string $run_id,
+		array $meta_safe,
+		?array $usage_data,
+		?array $validation_report,
+		array $attempts,
+		bool $can_create_build_plan,
+		string $create_plan_help_text,
+		string $existing_build_plan_id
+	): void {
 		$effective = isset( $meta_safe['effective_provider_used'] ) && is_array( $meta_safe['effective_provider_used'] )
 			? $meta_safe['effective_provider_used']
 			: null;
@@ -215,6 +278,27 @@ final class AI_Run_Detail_Screen {
 			'experiment_variant_id',
 		);
 		?>
+			<?php if ( Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) : ?>
+			<section class="aio-run-build-plan-actions" aria-labelledby="aio-run-bp-heading">
+				<h2 id="aio-run-bp-heading"><?php \esc_html_e( 'Build Plan', 'aio-page-builder' ); ?></h2>
+				<?php if ( $existing_build_plan_id !== '' ) : ?>
+					<p>
+						<?php \esc_html_e( 'Linked plan:', 'aio-page-builder' ); ?>
+						<a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( Build_Plans_Screen::SLUG, 'build_plans', array( 'plan_id' => $existing_build_plan_id ) ) ); ?>"><code><?php echo \esc_html( $existing_build_plan_id ); ?></code></a>
+					</p>
+				<?php endif; ?>
+				<?php if ( $can_create_build_plan ) : ?>
+					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" class="aio-create-bp-from-run-form">
+						<input type="hidden" name="action" value="aio_create_build_plan_from_ai_run" />
+						<input type="hidden" name="run_id" value="<?php echo \esc_attr( $run_id ); ?>" />
+						<?php \wp_nonce_field( Create_Build_Plan_From_AI_Run_Action::NONCE_ACTION, Create_Build_Plan_From_AI_Run_Action::NONCE_NAME ); ?>
+						<?php \submit_button( __( 'Create Build Plan from this run', 'aio-page-builder' ), 'primary', 'submit', false ); ?>
+					</form>
+				<?php elseif ( $create_plan_help_text !== '' ) : ?>
+					<p class="description"><?php echo \esc_html( $create_plan_help_text ); ?></p>
+				<?php endif; ?>
+			</section>
+			<?php endif; ?>
 			<section class="aio-run-meta" aria-labelledby="aio-run-meta-heading">
 				<h2 id="aio-run-meta-heading"><?php \esc_html_e( 'Run metadata', 'aio-page-builder' ); ?></h2>
 				<table class="widefat striped">

@@ -115,7 +115,10 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 			$ai_run_service,
 			$connection_test_service,
 			$failover_service,
-			$container
+			$container,
+			null,
+			null,
+			null
 		);
 	}
 

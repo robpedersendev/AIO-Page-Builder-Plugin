@@ -21,7 +21,7 @@ final class Default_Planning_Prompt_Pack_Definition {
 
 	public const DEFAULT_INTERNAL_KEY = 'aio/build-plan-draft';
 
-	public const DEFAULT_VERSION = '2.0.0';
+	public const DEFAULT_VERSION = '2.2.0';
 
 	/**
 	 * Full pack definition for Prompt_Pack_Repository::save_definition().
@@ -51,6 +51,7 @@ final class Default_Planning_Prompt_Pack_Definition {
 				Prompt_Pack_Schema::SEGMENT_HIERARCHY_ROLE_GUIDANCE => self::segment_hierarchy(),
 				Prompt_Pack_Schema::SEGMENT_PROVIDER_NOTES => self::segment_provider_notes(),
 				Prompt_Pack_Schema::SEGMENT_SITE_ANALYSIS_INSTRUCTIONS => self::segment_site_analysis(),
+				Prompt_Pack_Schema::SEGMENT_GREENFIELD_PLANNING_DEPTH => self::segment_greenfield_planning_depth(),
 				Prompt_Pack_Schema::SEGMENT_PLANNING_INSTRUCTIONS => self::segment_planning_instructions(),
 			),
 			Prompt_Pack_Schema::ROOT_PLACEHOLDER_RULES => self::placeholder_rules(),
@@ -64,7 +65,7 @@ final class Default_Planning_Prompt_Pack_Definition {
 			Prompt_Pack_Schema::ROOT_CHANGELOG         => array(
 				array(
 					'version' => self::DEFAULT_VERSION,
-					'notes'   => 'Default seeded pack: exhaustive planning instructions, privacy and secret-handling rules, governed template library alignment.',
+					'notes'   => 'Greenfield depth rules, higher-output planning alignment; governed template library and privacy rules unchanged.',
 				),
 			),
 		);
@@ -220,6 +221,22 @@ TEXT;
 **Hierarchy roles**
 
 {{hierarchy_role_guidance}}
+TEXT;
+	}
+
+	private static function segment_greenfield_planning_depth(): string {
+		return <<<'TEXT'
+**Greenfield and empty-crawl depth (mandatory)**
+
+When `crawl_summary` is empty or contains no crawlable public pages, assume a **new or nearly empty site**. In that case:
+
+1. Set `run_summary.planning_mode` to `new_site` unless the operator goal clearly describes only a single landing page.
+2. Propose a **large, intentional sitemap**: include **at least thirty** distinct entries in `new_pages_to_create` unless the stated goal explicitly demands a smaller scope. Cover top-level entry points, hub/list pages, child/detail pages, and (where appropriate for the goal) nested pages such as service-area or topic children. Reuse governed `template_key` values where roles are similar. Use distinct `page_type` values (`hub`, `detail`, `service`, `location`, `faq`, `pricing`, `request`, `other`) across the set so the plan is not a single generic page repeated.
+3. Populate `site_structure.recommended_top_level_pages` and `site_structure.hierarchy_map` so navigation depth (parent → child → grandchild) is explicit. Use `parent_target_url` / `child_target_urls` on new-page objects when the schema provides them.
+4. For **every** proposed page, `section_guidance` must list **one object per template section** you intend the operator to fill, each with `section_key`, `intent`, `content_direction`, `must_include`, and `must_avoid` so execution can map to governed section templates and LPagery-safe tokens. Prefer section keys that appear in the registry summary for the chosen `template_key`.
+5. When crawl data is missing, `existing_page_changes` may be an empty array; record that gap under `warnings` and `assumptions`. When crawl data exists, include an entry for each discovered URL with a justified `action` (including `keep` where appropriate).
+
+Do not shrink the plan to a single new page when the operator is clearly building a full business site.
 TEXT;
 	}
 

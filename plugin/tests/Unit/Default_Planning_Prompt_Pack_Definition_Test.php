@@ -42,6 +42,7 @@ final class Default_Planning_Prompt_Pack_Definition_Test extends TestCase {
 		$segments = $def[ Prompt_Pack_Schema::ROOT_SEGMENTS ] ?? array();
 		$this->assertIsArray( $segments );
 		$this->assertNotEmpty( $segments[ Prompt_Pack_Schema::SEGMENT_SYSTEM_BASE ] );
+		$this->assertNotEmpty( $segments[ Prompt_Pack_Schema::SEGMENT_GREENFIELD_PLANNING_DEPTH ] );
 		$this->assertNotEmpty( $segments[ Prompt_Pack_Schema::SEGMENT_PLANNING_INSTRUCTIONS ] );
 	}
 }

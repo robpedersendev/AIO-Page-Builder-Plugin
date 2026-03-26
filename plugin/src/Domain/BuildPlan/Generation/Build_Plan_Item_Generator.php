@@ -160,7 +160,7 @@ final class Build_Plan_Item_Generator {
 				'purpose'             => (string) ( $rec['purpose'] ?? '' ),
 				'template_key'        => (string) ( $rec['template_key'] ?? '' ),
 				'menu_eligible'       => (bool) ( $rec['menu_eligible'] ?? false ),
-				'section_guidance'    => (string) ( $rec['section_guidance'] ?? '' ),
+				'section_guidance'    => $this->section_guidance_to_payload_string( $rec['section_guidance'] ?? null ),
 				'confidence'          => (string) ( $rec[ Build_Plan_Draft_Schema::NPC_CONFIDENCE ] ?? 'medium' ),
 			);
 			$this->merge_industry_metadata_into_payload( $payload, $rec );
@@ -409,5 +409,21 @@ final class Build_Plan_Item_Generator {
 		if ( array_key_exists( Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_HAS_WARNING, $record ) ) {
 			$payload['industry_has_warning'] = (bool) $record[ Industry_Build_Plan_Scoring_Service::RECORD_INDUSTRY_HAS_WARNING ];
 		}
+	}
+
+	/**
+	 * Stores section_guidance as JSON when the model returns structured rows (execution parses JSON back).
+	 *
+	 * @param mixed $value Raw section_guidance from normalized output.
+	 */
+	private function section_guidance_to_payload_string( $value ): string {
+		if ( is_array( $value ) ) {
+			$json = function_exists( 'wp_json_encode' ) ? \wp_json_encode( $value ) : \json_encode( $value );
+			return is_string( $json ) ? $json : '';
+		}
+		if ( is_string( $value ) ) {
+			return $value;
+		}
+		return '';
 	}
 }

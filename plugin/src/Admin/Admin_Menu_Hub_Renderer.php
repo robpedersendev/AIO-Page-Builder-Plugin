@@ -1130,37 +1130,38 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::ACCESS_INDUSTRY_WORKSPACE ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access industry tools.', 'aio-page-builder' ), 403 );
 		}
+		// * Order: everyday setup first (profile → style → import → repair), then customization, then advanced analysis last.
 		$primary         = array(
 			'profile'     => array(
-				'label' => $this->industry_profile->get_title(),
+				'label' => __( 'Industry & packs', 'aio-page-builder' ),
 				'cap'   => $this->industry_profile->get_capability(),
 			),
-			'overrides'   => array(
-				'label' => $this->industry_override_management->get_title(),
-				'cap'   => $this->industry_override_management->get_capability(),
-			),
-			'author'      => array(
-				'label' => $this->industry_author_dashboard->get_title(),
-				'cap'   => $this->industry_author_dashboard->get_capability(),
+			'style'       => array(
+				'label' => __( 'Look & style', 'aio-page-builder' ),
+				'cap'   => $this->industry_style_preset->get_capability(),
 			),
 			'import'      => array(
-				'label' => $this->industry_bundle_import_preview->get_title(),
+				'label' => __( 'Import bundles', 'aio-page-builder' ),
 				'cap'   => $this->industry_bundle_import_preview->get_capability(),
 			),
 			'repair'      => array(
-				'label' => $this->industry_guided_repair->get_title(),
+				'label' => __( 'Guided fixes', 'aio-page-builder' ),
 				'cap'   => $this->industry_guided_repair->get_capability(),
 			),
-			'style'       => array(
-				'label' => $this->industry_style_preset->get_title(),
-				'cap'   => $this->industry_style_preset->get_capability(),
+			'overrides'   => array(
+				'label' => __( 'Template overrides', 'aio-page-builder' ),
+				'cap'   => $this->industry_override_management->get_capability(),
+			),
+			'author'      => array(
+				'label' => __( 'Authoring', 'aio-page-builder' ),
+				'cap'   => $this->industry_author_dashboard->get_capability(),
 			),
 			'reports'     => array(
-				'label' => __( 'Reports & readiness', 'aio-page-builder' ),
+				'label' => __( 'Health & reports', 'aio-page-builder' ),
 				'cap'   => Capabilities::VIEW_LOGS,
 			),
 			'comparisons' => array(
-				'label' => __( 'Comparisons', 'aio-page-builder' ),
+				'label' => __( 'Compare options', 'aio-page-builder' ),
 				'cap'   => Capabilities::VIEW_LOGS,
 			),
 		);
@@ -1172,53 +1173,65 @@ final class Admin_Menu_Hub_Renderer {
 
 		$report_subs  = array(
 			'health'          => array(
-				'label' => $this->industry_health_report->get_title(),
+				'label' => __( 'Overview', 'aio-page-builder' ),
+				'hint'  => __( 'Quick check that your industry profile, packs, and bundles line up—start here if something looks wrong.', 'aio-page-builder' ),
 				'cap'   => $this->industry_health_report->get_capability(),
 			),
 			'stale'           => array(
-				'label' => $this->industry_stale_content_report->get_title(),
+				'label' => __( 'Stale content', 'aio-page-builder' ),
+				'hint'  => __( 'Finds content that may be outdated or needs a refresh.', 'aio-page-builder' ),
 				'cap'   => $this->industry_stale_content_report->get_capability(),
 			),
 			'drift'           => array(
-				'label' => $this->industry_drift_report->get_title(),
+				'label' => __( 'Drift', 'aio-page-builder' ),
+				'hint'  => __( 'Spots where the live site has moved away from your industry templates or rules.', 'aio-page-builder' ),
 				'cap'   => $this->industry_drift_report->get_capability(),
 			),
 			'maturity'        => array(
-				'label' => $this->industry_maturity_delta_report->get_title(),
+				'label' => __( 'Maturity', 'aio-page-builder' ),
+				'hint'  => __( 'Shows progress of your industry setup over time.', 'aio-page-builder' ),
 				'cap'   => $this->industry_maturity_delta_report->get_capability(),
 			),
 			'future_industry' => array(
-				'label' => $this->industry_future_readiness->get_title(),
+				'label' => __( 'Future industries', 'aio-page-builder' ),
+				'hint'  => __( 'Readiness view if you add or switch whole industries later.', 'aio-page-builder' ),
 				'cap'   => $this->industry_future_readiness->get_capability(),
 			),
 			'future_subtype'  => array(
-				'label' => $this->industry_future_subtype_readiness->get_title(),
+				'label' => __( 'Future subtypes', 'aio-page-builder' ),
+				'hint'  => __( 'Readiness view for narrower industry sub-types (e.g. a specialty within your field).', 'aio-page-builder' ),
 				'cap'   => $this->industry_future_subtype_readiness->get_capability(),
 			),
 			'scaffold'        => array(
-				'label' => $this->industry_scaffold_promotion_readiness->get_title(),
+				'label' => __( 'Promotion readiness', 'aio-page-builder' ),
+				'hint'  => __( 'Whether draft industry pieces are ready to promote to live use.', 'aio-page-builder' ),
 				'cap'   => $this->industry_scaffold_promotion_readiness->get_capability(),
 			),
 			'pack_family'     => array(
-				'label' => $this->industry_pack_family_comparison->get_title(),
+				'label' => __( 'Pack families', 'aio-page-builder' ),
+				'hint'  => __( 'Compare related industry pack groups side by side.', 'aio-page-builder' ),
 				'cap'   => $this->industry_pack_family_comparison->get_capability(),
 			),
 		);
 		$compare_subs = array(
 			'subtype'     => array(
-				'label' => $this->industry_subtype_comparison->get_title(),
+				'label' => __( 'Subtypes', 'aio-page-builder' ),
+				'hint'  => __( 'Compare industry sub-types (specialties) to pick or audit the right one.', 'aio-page-builder' ),
 				'cap'   => $this->industry_subtype_comparison->get_capability(),
 			),
 			'bundle'      => array(
-				'label' => $this->industry_bundle_comparison->get_title(),
+				'label' => __( 'Starter bundles', 'aio-page-builder' ),
+				'hint'  => __( 'Compare starter page/section bundles for your industry.', 'aio-page-builder' ),
 				'cap'   => $this->industry_bundle_comparison->get_capability(),
 			),
 			'goal'        => array(
-				'label' => $this->industry_goal_comparison->get_title(),
+				'label' => __( 'Goals', 'aio-page-builder' ),
+				'hint'  => __( 'Compare conversion goals and how they apply.', 'aio-page-builder' ),
 				'cap'   => $this->industry_goal_comparison->get_capability(),
 			),
 			'style_layer' => array(
-				'label' => $this->industry_style_layer_comparison->get_title(),
+				'label' => __( 'Style layers', 'aio-page-builder' ),
+				'hint'  => __( 'Compare style layer options for branding and polish.', 'aio-page-builder' ),
 				'cap'   => $this->industry_style_layer_comparison->get_capability(),
 			),
 		);
@@ -1239,8 +1252,31 @@ final class Admin_Menu_Hub_Renderer {
 		}
 
 		?>
-		<div class="wrap aio-hub-wrap">
+		<div class="wrap aio-hub-wrap aio-industry-hub">
 			<h1><?php echo \esc_html__( 'Industry', 'aio-page-builder' ); ?></h1>
+			<p class="description aio-industry-hub-intro">
+				<?php \esc_html_e( 'Start with Industry & packs and Look & style for setup. Import bundles and Guided fixes when you are moving content. Health & reports and Compare options are for checking quality—use them when you want a deeper review.', 'aio-page-builder' ); ?>
+			</p>
+			<?php
+			if ( isset( $_GET[ Onboarding_Screen::QUERY_ONBOARDING_INDUSTRY_RUN ] ) ) {
+				$onb_run = \sanitize_text_field( \wp_unslash( (string) $_GET[ Onboarding_Screen::QUERY_ONBOARDING_INDUSTRY_RUN ] ) );
+				if ( $onb_run !== '' && Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) ) {
+					$onb_run_url = Admin_Screen_Hub::tab_url(
+						AI_Runs_Screen::HUB_PAGE_SLUG,
+						'ai_runs',
+						array( 'run_id' => $onb_run )
+					);
+					?>
+					<div class="notice notice-success is-dismissible aio-onboarding-industry-run-notice" role="status">
+						<p>
+							<?php \esc_html_e( 'Planning from onboarding is saved as an AI run. You can open it anytime:', 'aio-page-builder' ); ?>
+							<a href="<?php echo \esc_url( $onb_run_url ); ?>"><?php \esc_html_e( 'View AI run', 'aio-page-builder' ); ?></a>
+						</p>
+					</div>
+					<?php
+				}
+			}
+			?>
 			<?php Admin_Screen_Hub::render_nav_tabs( Industry_Profile_Settings_Screen::SLUG, $primary, $tab ); ?>
 			<?php if ( $tab === 'reports' ) : ?>
 				<?php Admin_Screen_Hub::render_subnav_tabs( Industry_Profile_Settings_Screen::SLUG, 'reports', $report_subs, $subtab ); ?>

@@ -131,12 +131,12 @@ final class Admin_Screen_Hub {
 	/**
 	 * Renders a secondary nav row (nested tabs) below the primary row.
 	 *
-	 * @param string                                           $page_slug Hub page slug.
-	 * @param string                                           $tab       Primary tab id (fixed in URLs).
-	 * @param array<string, array{label: string, cap: string}> $tabs Sub-tab definitions.
-	 * @param string                                           $current   Active sub-tab id.
-	 * @param callable(string): bool|null                      $user_can_tab Optional cap check; defaults to Capabilities::current_user_can_for_route.
-	 * @param array<string, scalar|\Stringable>                $extra_query_args Merged into every subtab link (e.g. run_id for detail views).
+	 * @param string                                                          $page_slug Hub page slug.
+	 * @param string                                                          $tab       Primary tab id (fixed in URLs).
+	 * @param array<string, array{label: string, cap: string, hint?: string}> $tabs Sub-tab definitions; optional hint shown under the row for the active tab.
+	 * @param string                                                          $current   Active sub-tab id.
+	 * @param callable(string): bool|null                                     $user_can_tab Optional cap check; defaults to Capabilities::current_user_can_for_route.
+	 * @param array<string, scalar|\Stringable>                               $extra_query_args Merged into every subtab link (e.g. run_id for detail views).
 	 * @return void
 	 */
 	public static function render_subnav_tabs( string $page_slug, string $tab, array $tabs, string $current, ?callable $user_can_tab = null, array $extra_query_args = array() ): void {
@@ -149,9 +149,18 @@ final class Admin_Screen_Hub {
 				continue;
 			}
 			$active = ( $current === $key ) ? ' nav-tab-active' : '';
-			echo '<a href="' . \esc_url( self::subtab_url( $page_slug, $tab, $key, $extra_query_args ) ) . '" class="nav-tab' . \esc_attr( $active ) . '">' . \esc_html( $info['label'] ) . '</a>';
+			$hint   = isset( $info['hint'] ) && is_string( $info['hint'] ) ? $info['hint'] : '';
+			echo '<a href="' . \esc_url( self::subtab_url( $page_slug, $tab, $key, $extra_query_args ) ) . '" class="nav-tab' . \esc_attr( $active ) . '"';
+			if ( $hint !== '' ) {
+				echo ' title="' . \esc_attr( $hint ) . '"';
+			}
+			echo '>' . \esc_html( $info['label'] ) . '</a>';
 		}
 		echo '</h3>';
+		if ( isset( $tabs[ $current ] ) && is_array( $tabs[ $current ] ) && $can( $tabs[ $current ]['cap'] )
+			&& isset( $tabs[ $current ]['hint'] ) && is_string( $tabs[ $current ]['hint'] ) && $tabs[ $current ]['hint'] !== '' ) {
+			echo '<p class="description aio-hub-subtab-hint">' . \esc_html( $tabs[ $current ]['hint'] ) . '</p>';
+		}
 	}
 
 	/**

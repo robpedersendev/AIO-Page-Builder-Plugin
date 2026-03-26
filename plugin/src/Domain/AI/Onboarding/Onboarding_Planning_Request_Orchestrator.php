@@ -24,6 +24,13 @@ use AIOPageBuilder\Domain\AI\Providers\Failover\Failover_Result;
 use AIOPageBuilder\Domain\AI\Providers\Failover\Provider_Failover_Service;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Capability_Resolver;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Request_Context_Builder;
+use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
+use AIOPageBuilder\Domain\AI\Planning\Planning_Breadth_Constants;
+use AIOPageBuilder\Domain\AI\Planning\Planning_Expand_Pass_Runner;
+use AIOPageBuilder\Domain\AI\Planning\Planning_Per_Run_Budget_Estimator;
+use AIOPageBuilder\Domain\AI\Planning\Planning_Structured_Output_Limits;
+use AIOPageBuilder\Domain\AI\Planning\Planning_Thin_Output_Enrichment_Service;
+use AIOPageBuilder\Domain\Industry\Registry\Industry_Starter_Bundle_Registry;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
 use AIOPageBuilder\Domain\AI\Validation\AI_Output_Validator;
@@ -81,6 +88,15 @@ final class Onboarding_Planning_Request_Orchestrator {
 	/** @var Service_Container */
 	private Service_Container $container;
 
+	/** @var Planning_Thin_Output_Enrichment_Service|null */
+	private ?Planning_Thin_Output_Enrichment_Service $thin_output_enrichment;
+
+	/** @var Planning_Per_Run_Budget_Estimator|null */
+	private ?Planning_Per_Run_Budget_Estimator $budget_estimator;
+
+	/** @var Planning_Expand_Pass_Runner|null */
+	private ?Planning_Expand_Pass_Runner $expand_runner;
+
 	public function __construct(
 		Onboarding_Draft_Service $draft_service,
 		Onboarding_Prefill_Service $prefill_service,
@@ -93,7 +109,10 @@ final class Onboarding_Planning_Request_Orchestrator {
 		AI_Run_Service $run_service,
 		Provider_Connection_Test_Service $connection_test_service,
 		Provider_Failover_Service $failover_service,
-		Service_Container $container
+		Service_Container $container,
+		?Planning_Thin_Output_Enrichment_Service $thin_output_enrichment = null,
+		?Planning_Per_Run_Budget_Estimator $budget_estimator = null,
+		?Planning_Expand_Pass_Runner $expand_runner = null
 	) {
 		$this->draft_service           = $draft_service;
 		$this->prefill_service         = $prefill_service;
@@ -107,6 +126,9 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$this->connection_test_service = $connection_test_service;
 		$this->failover_service        = $failover_service;
 		$this->container               = $container;
+		$this->thin_output_enrichment  = $thin_output_enrichment;
+		$this->budget_estimator        = $budget_estimator;
+		$this->expand_runner           = $expand_runner;
 	}
 
 	/**
@@ -147,7 +169,21 @@ final class Onboarding_Planning_Request_Orchestrator {
 			);
 		}
 
-		$prefill     = $this->prefill_service->get_prefill_data( $draft );
+		$prefill   = $this->prefill_service->get_prefill_data( $draft );
+		$ctx_block = Onboarding_Planning_Context_Guard::get_blocking_message( $draft, $prefill );
+		if ( $ctx_block !== null ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_PLANNING_CONTEXT, '' );
+			return new Planning_Request_Result(
+				false,
+				Planning_Request_Result::STATUS_BLOCKED,
+				'',
+				0,
+				$ctx_block,
+				null,
+				null,
+				'planning_context_incomplete'
+			);
+		}
 		$provider_id = $this->pick_configured_provider_id( $prefill );
 		if ( $provider_id === null || $provider_id === '' ) {
 			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_NO_PROVIDER, '' );
@@ -224,7 +260,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 			if ( $ctx_builder instanceof Template_Recommendation_Context_Builder ) {
 				$built                                       = $ctx_builder->build(
 					array(
-						'max_templates'               => Template_Recommendation_Context_Builder::DEFAULT_MAX_TEMPLATES,
+						'max_templates'               => Planning_Breadth_Constants::TEMPLATE_RECOMMENDATION_CAP,
 						'template_preference_profile' => $template_preference_profile,
 					)
 				);
@@ -379,6 +415,22 @@ final class Onboarding_Planning_Request_Orchestrator {
 			);
 		}
 
+		if ( $this->budget_estimator !== null ) {
+			$upper     = $this->budget_estimator->estimate_full_run_upper_bound_usd( $provider_id, $model, $system_prompt, $user_message );
+			$suggested = $this->budget_estimator->get_suggested_planning_budget_usd();
+			if ( $upper === null ) {
+				Named_Debug_Log::event(
+					Named_Debug_Log_Event::ORCHESTRATOR_PER_RUN_BUDGET_UNKNOWN_PRICING,
+					'provider=' . $provider_id . ' model=' . $model
+				);
+			} else {
+				Named_Debug_Log::event(
+					Named_Debug_Log_Event::ORCHESTRATOR_PLANNING_COST_ESTIMATE,
+					'upper_est=' . (string) $upper . ' suggested_target_usd=' . (string) $suggested
+				);
+			}
+		}
+
 		$request_id         = 'aio-req-' . uniqid( '', true );
 		$normalized_request = $this->request_context_builder->build(
 			$request_id,
@@ -387,8 +439,8 @@ final class Onboarding_Planning_Request_Orchestrator {
 			$user_message,
 			array(
 				'structured_output_schema_ref' => $schema_ref,
-				'max_tokens'                   => 4096,
-				'timeout_seconds'              => 120,
+				'max_tokens'                   => Planning_Structured_Output_Limits::DEFAULT_MAX_OUTPUT_TOKENS,
+				'timeout_seconds'              => 180,
 			)
 		);
 
@@ -458,7 +510,76 @@ final class Onboarding_Planning_Request_Orchestrator {
 			$artifacts[ Artifact_Category_Keys::VALIDATION_REPORT ] = $validation_report->to_array();
 
 			if ( $validation_report->allows_build_plan_handoff() ) {
-				$normalized = $validation_report->get_normalized_output();
+				$normalized  = $validation_report->get_normalized_output();
+				$crawl_empty = empty( $artifact_options['crawl'] ?? array() );
+				$bundle_refs = array();
+				if ( isset( $artifact_options['industry_context'] ) && is_array( $artifact_options['industry_context'] ) ) {
+					$ic = $artifact_options['industry_context'];
+					if ( isset( $ic['subtype_bundle_refs'] ) && is_array( $ic['subtype_bundle_refs'] ) ) {
+						$bundle_refs = $ic['subtype_bundle_refs'];
+					}
+				}
+				$rec_ctx    = isset( $registry['template_recommendation_context'] ) && is_array( $registry['template_recommendation_context'] )
+					? $registry['template_recommendation_context']
+					: array();
+				$enrich_ctx = array(
+					'crawl_empty'                     => $crawl_empty,
+					'subtype_bundle_refs'             => $bundle_refs,
+					'template_recommendation_context' => $rec_ctx,
+				);
+
+				if ( $this->thin_output_enrichment !== null ) {
+					$pages_before = isset( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] ) && is_array( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+						? count( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+						: 0;
+					$normalized   = $this->thin_output_enrichment->enrich( $normalized, $enrich_ctx );
+					$pages_after  = isset( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] ) && is_array( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+						? count( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+						: 0;
+					if ( $pages_after > $pages_before ) {
+						Named_Debug_Log::event(
+							Named_Debug_Log_Event::ORCHESTRATOR_THIN_OUTPUT_ENRICHED,
+							'before=' . (string) $pages_before . ' after=' . (string) $pages_after . ' crawl_empty=' . ( $crawl_empty ? '1' : '0' )
+						);
+					}
+				}
+
+				$page_count = isset( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] ) && is_array( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+					? count( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+					: 0;
+				if ( $this->expand_runner !== null && $page_count < Planning_Breadth_Constants::MIN_NEW_PAGES_TARGET ) {
+					$allowed_keys = $this->collect_expand_allowed_template_keys( $registry, $artifact_options );
+					if ( $allowed_keys !== array() ) {
+						$expand_driver = $this->get_driver_for_provider( $effective_provider_id ) ?? $driver;
+						$exp           = $this->expand_runner->maybe_expand( $expand_driver, $effective_provider_id, $effective_model, $normalized, $allowed_keys, $goal );
+						$normalized    = $exp['normalized'];
+						if ( $exp['usage'] !== null ) {
+							$artifacts[ Artifact_Category_Keys::EXPAND_PASS_USAGE ] = $exp['usage'];
+							$this->maybe_record_run_cost( $effective_provider_id, $exp['usage'] );
+							$pc = isset( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] ) && is_array( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+								? count( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+								: 0;
+							Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_EXPAND_PASS_RAN, 'pages=' . (string) $pc );
+						}
+					}
+				}
+
+				if ( $this->thin_output_enrichment !== null ) {
+					$pages_before = isset( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] ) && is_array( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+						? count( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+						: 0;
+					$normalized   = $this->thin_output_enrichment->enrich( $normalized, $enrich_ctx );
+					$pages_after  = isset( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] ) && is_array( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+						? count( $normalized[ Build_Plan_Draft_Schema::KEY_NEW_PAGES_TO_CREATE ] )
+						: 0;
+					if ( $pages_after > $pages_before ) {
+						Named_Debug_Log::event(
+							Named_Debug_Log_Event::ORCHESTRATOR_THIN_OUTPUT_ENRICHED,
+							'before=' . (string) $pages_before . ' after=' . (string) $pages_after . ' phase=post_expand crawl_empty=' . ( $crawl_empty ? '1' : '0' )
+						);
+					}
+				}
+
 				$artifacts[ Artifact_Category_Keys::NORMALIZED_OUTPUT ] = $normalized;
 				$metadata['completed_at']                               = gmdate( 'Y-m-d\TH:i:s\Z' );
 				$post_id = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_COMPLETED, $artifacts );
@@ -661,5 +782,59 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$draft['last_planning_run_id']      = $run_id;
 		$draft['last_planning_run_post_id'] = $run_post_id;
 		$this->draft_service->save_draft( $draft );
+	}
+
+	/**
+	 * Distinct governed template_key values for the expand pass (registry + active starter bundles).
+	 *
+	 * @param array<string, mixed> $registry         Artifact `registry` slice (includes template_recommendation_context).
+	 * @param array<string, mixed> $artifact_options Options passed to Input_Artifact_Builder (industry_context, etc.).
+	 * @return list<string>
+	 */
+	private function collect_expand_allowed_template_keys( array $registry, array $artifact_options ): array {
+		$keys = array();
+		$rec  = isset( $registry['template_recommendation_context'] ) && is_array( $registry['template_recommendation_context'] )
+			? $registry['template_recommendation_context']
+			: array();
+		foreach ( $rec as $entry ) {
+			if ( ! is_array( $entry ) ) {
+				continue;
+			}
+			$tk = isset( $entry['template_key'] ) && is_string( $entry['template_key'] ) ? trim( $entry['template_key'] ) : '';
+			if ( $tk !== '' ) {
+				$keys[] = $tk;
+			}
+		}
+		if ( $this->container->has( Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY ) ) {
+			$bundle_reg = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_STARTER_BUNDLE_REGISTRY );
+			if ( $bundle_reg instanceof Industry_Starter_Bundle_Registry ) {
+				$ic   = isset( $artifact_options['industry_context'] ) && is_array( $artifact_options['industry_context'] )
+					? $artifact_options['industry_context']
+					: array();
+				$refs = isset( $ic['subtype_bundle_refs'] ) && is_array( $ic['subtype_bundle_refs'] ) ? $ic['subtype_bundle_refs'] : array();
+				foreach ( $refs as $ref ) {
+					if ( ! is_string( $ref ) || trim( $ref ) === '' ) {
+						continue;
+					}
+					$bundle = $bundle_reg->get( trim( $ref ) );
+					if ( $bundle === null || ( isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] ) && (string) $bundle[ Industry_Starter_Bundle_Registry::FIELD_STATUS ] !== Industry_Starter_Bundle_Registry::STATUS_ACTIVE ) ) {
+						continue;
+					}
+					$templates = isset( $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ] ) && is_array( $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ] )
+						? $bundle[ Industry_Starter_Bundle_Registry::FIELD_RECOMMENDED_PAGE_TEMPLATE_REFS ]
+						: array();
+					foreach ( $templates as $tk ) {
+						if ( ! is_string( $tk ) ) {
+							continue;
+						}
+						$tk = trim( $tk );
+						if ( $tk !== '' ) {
+							$keys[] = $tk;
+						}
+					}
+				}
+			}
+		}
+		return array_values( array_unique( array_filter( $keys ) ) );
 	}
 }

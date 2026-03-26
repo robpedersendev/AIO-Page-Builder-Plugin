@@ -94,6 +94,11 @@ final class AI_Run_Example_Payloads_Test extends TestCase {
 			),
 			'redacted' => false,
 		),
+		Artifact_Category_Keys::EXPAND_PASS_USAGE         => array(
+			'present'  => false,
+			'summary'  => '',
+			'redacted' => false,
+		),
 		Artifact_Category_Keys::BUILD_PLAN_REF            => array(
 			'present'  => false,
 			'summary'  => '',

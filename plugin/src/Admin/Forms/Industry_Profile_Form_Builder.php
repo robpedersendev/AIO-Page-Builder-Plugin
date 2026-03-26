@@ -55,7 +55,15 @@ final class Industry_Profile_Form_Builder {
 				$options[ $key ] = $name;
 			}
 		}
-		return $options;
+		$none_label = $options[''];
+		unset( $options[''] );
+		\uasort(
+			$options,
+			static function ( string $a, string $b ): int {
+				return \strnatcasecmp( $a, $b );
+			}
+		);
+		return array( '' => $none_label ) + $options;
 	}
 
 	/**
@@ -76,6 +84,12 @@ final class Industry_Profile_Form_Builder {
 				$options[ $key ] = $name;
 			}
 		}
+		\uasort(
+			$options,
+			static function ( string $a, string $b ): int {
+				return \strnatcasecmp( $a, $b );
+			}
+		);
 		return $options;
 	}
 

@@ -45,6 +45,8 @@ final class Prompt_Pack_Schema {
 	public const SEGMENT_CTA_LAW_GUIDANCE = 'cta_law_guidance';
 	/** Optional (Prompt 210): hierarchy role expectations. */
 	public const SEGMENT_HIERARCHY_ROLE_GUIDANCE = 'hierarchy_role_guidance';
+	/** Optional: depth and breadth when crawl is empty or site is new (large sitemap, section_guidance). */
+	public const SEGMENT_GREENFIELD_PLANNING_DEPTH = 'greenfield_planning_depth';
 
 	public const STATUS_ACTIVE     = 'active';
 	public const STATUS_INACTIVE   = 'inactive';
