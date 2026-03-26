@@ -13,6 +13,8 @@ namespace AIOPageBuilder\Domain\AI\Providers;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Base driver: credential check, error normalization, response envelope. Subclasses implement do_perform_request().
@@ -75,8 +77,10 @@ abstract class Abstract_AI_Provider_Driver implements AI_Provider_Interface {
 	public function request( array $request ): array {
 		$request_id = (string) ( $request['request_id'] ?? '' );
 		$model_used = (string) ( $request['model'] ?? 'unknown' );
+		Named_Debug_Log::event( Named_Debug_Log_Event::PROVIDER_REQUEST_START, 'provider=' . $this->provider_id . ' request_id=' . $request_id . ' model=' . $model_used );
 
 		if ( ! $this->secret_store->has_credential( $this->provider_id ) ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROVIDER_NO_CREDENTIAL, 'provider=' . $this->provider_id . ' request_id=' . $request_id );
 			return $this->error_normalizer->build_error_response(
 				$request_id,
 				$this->provider_id,
@@ -88,6 +92,7 @@ abstract class Abstract_AI_Provider_Driver implements AI_Provider_Interface {
 
 		$credential = $this->secret_store->get_credential_for_provider( $this->provider_id );
 		if ( $credential === null ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROVIDER_CREDENTIAL_RESOLVE_FAILED, 'provider=' . $this->provider_id . ' request_id=' . $request_id );
 			return $this->error_normalizer->build_error_response(
 				$request_id,
 				$this->provider_id,
@@ -100,6 +105,7 @@ abstract class Abstract_AI_Provider_Driver implements AI_Provider_Interface {
 		try {
 			$raw = $this->do_perform_request( $request, $credential );
 		} catch ( \Throwable $e ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROVIDER_REQUEST_EXCEPTION, 'provider=' . $this->provider_id . ' request_id=' . $request_id . ' class=' . \get_class( $e ) );
 			$category = $this->error_normalizer->map_exception_to_category( $e );
 			return $this->error_normalizer->build_error_response(
 				$request_id,
@@ -111,6 +117,7 @@ abstract class Abstract_AI_Provider_Driver implements AI_Provider_Interface {
 		}
 
 		if ( ! is_array( $raw ) ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROVIDER_RAW_RESPONSE_INVALID, 'provider=' . $this->provider_id . ' request_id=' . $request_id );
 			return $this->error_normalizer->build_error_response(
 				$request_id,
 				$this->provider_id,
@@ -121,6 +128,7 @@ abstract class Abstract_AI_Provider_Driver implements AI_Provider_Interface {
 		}
 
 		if ( ! empty( $raw['success'] ) ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROVIDER_RESPONSE_SUCCESS, 'provider=' . $this->provider_id . ' request_id=' . $request_id );
 			return $this->response_normalizer->build_success_response(
 				$request_id,
 				$this->provider_id,
@@ -135,6 +143,10 @@ abstract class Abstract_AI_Provider_Driver implements AI_Provider_Interface {
 		$code        = isset( $raw['error_code'] ) ? (string) $raw['error_code'] : null;
 		$message     = isset( $raw['error_message'] ) ? (string) $raw['error_message'] : null;
 		$category    = $this->error_normalizer->map_to_category( $http_status, $code, $message );
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::PROVIDER_RESPONSE_ERROR,
+			'provider=' . $this->provider_id . ' request_id=' . $request_id . ' category=' . $category . ' http=' . (string) $http_status
+		);
 		return $this->error_normalizer->build_error_response( $request_id, $this->provider_id, $model_used, $category, $message );
 	}
 

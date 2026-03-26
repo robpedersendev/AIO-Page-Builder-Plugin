@@ -12,7 +12,7 @@ namespace AIOPageBuilder\Admin\Actions;
 
 defined( 'ABSPATH' ) || exit;
 
-use AIOPageBuilder\Admin\Screens\Templates\Section_Templates_Directory_Screen;
+use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Schema;
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Section_Override_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -37,7 +37,7 @@ final class Save_Industry_Section_Override_Action {
 			\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_section_override=error' );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_section_override=error' );
 			exit;
 		}
@@ -69,7 +69,7 @@ final class Save_Industry_Section_Override_Action {
 				return $ref;
 			}
 		}
-		return \admin_url( 'admin.php?page=' . Section_Templates_Directory_Screen::SLUG );
+		return Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_SECTION );
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 }

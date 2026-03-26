@@ -15,6 +15,7 @@ namespace AIOPageBuilder\Admin\Screens\Logs;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Domain\Reporting\Logs\Log_Export_Service;
@@ -109,7 +110,7 @@ final class Queue_Logs_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			return;
 		}
 		$tab    = $this->get_current_tab();
@@ -219,7 +220,7 @@ final class Queue_Logs_Screen {
 	 * @param array<string, mixed> $state Full state including log_export.exportable_log_types.
 	 */
 	private function render_log_export_section( array $state ): void {
-		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA ) ) {
 			return;
 		}
 		$log_export = $state['log_export'] ?? array();
@@ -303,7 +304,7 @@ final class Queue_Logs_Screen {
 			case self::TAB_QUEUE:
 				$this->render_queue_tab(
 					$state['queue'] ?? array(),
-					\current_user_can( Capabilities::MANAGE_QUEUE_RECOVERY )
+					Capabilities::current_user_can_for_route( Capabilities::MANAGE_QUEUE_RECOVERY )
 				);
 				break;
 			case self::TAB_EXECUTION:
@@ -327,7 +328,7 @@ final class Queue_Logs_Screen {
 			default:
 				$this->render_queue_tab(
 					$state['queue'] ?? array(),
-					\current_user_can( Capabilities::MANAGE_QUEUE_RECOVERY )
+					Capabilities::current_user_can_for_route( Capabilities::MANAGE_QUEUE_RECOVERY )
 				);
 		}
 		if ( ! $embed_in_hub ) {
@@ -485,13 +486,13 @@ final class Queue_Logs_Screen {
 							<td><code><?php echo \esc_html( (string) ( $row['run_id'] ?? '' ) ); ?></code></td>
 							<td><span class="aio-badge"><?php echo \esc_html( (string) ( $row['status'] ?? '' ) ); ?></span></td>
 							<td><?php echo \esc_html( (string) ( $row['created_at'] ?? '' ) ); ?></td>
-							<td><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . AI_Runs_Screen::SLUG . '&run_id=' . \rawurlencode( (string) ( $row['run_id'] ?? '' ) ) ) ); ?>"><?php \esc_html_e( 'View details', 'aio-page-builder' ); ?></a></td>
+							<td><a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs', array( 'run_id' => (string) ( $row['run_id'] ?? '' ) ) ) ); ?>"><?php \esc_html_e( 'View details', 'aio-page-builder' ); ?></a></td>
 						</tr>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</tbody>
 		</table>
-		<p><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . AI_Runs_Screen::SLUG ) ); ?>" class="button button-secondary"><?php \esc_html_e( 'Open AI Runs', 'aio-page-builder' ); ?></a></p>
+		<p><a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs' ) ); ?>" class="button button-secondary"><?php \esc_html_e( 'Open AI Runs', 'aio-page-builder' ); ?></a></p>
 		<?php
 	}
 
@@ -609,7 +610,7 @@ final class Queue_Logs_Screen {
 			\wp_safe_redirect( $this->queue_logs_url( 'error', __( 'Security check failed.', 'aio-page-builder' ) ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_QUEUE_RECOVERY ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_QUEUE_RECOVERY ) ) {
 			\wp_safe_redirect( $this->queue_logs_url( 'error', __( 'You do not have permission to perform queue recovery.', 'aio-page-builder' ) ) );
 			exit;
 		}
@@ -642,7 +643,7 @@ final class Queue_Logs_Screen {
 			\wp_safe_redirect( $this->logs_url( 'error', __( 'Security check failed.', 'aio-page-builder' ) ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA ) ) {
 			\wp_safe_redirect( $this->logs_url( 'error', __( 'You do not have permission to export logs.', 'aio-page-builder' ) ) );
 			exit;
 		}
@@ -690,7 +691,7 @@ final class Queue_Logs_Screen {
 		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ), self::NONCE_DOWNLOAD_LOG ) ) {
 			\wp_die( \esc_html__( 'Invalid request.', 'aio-page-builder' ), 403 );
 		}
-		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to download log exports.', 'aio-page-builder' ), 403 );
 		}
 		$file = isset( $_GET['file'] ) ? \sanitize_file_name( \wp_unslash( $_GET['file'] ) ) : '';

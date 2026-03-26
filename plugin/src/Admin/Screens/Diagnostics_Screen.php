@@ -38,7 +38,7 @@ final class Diagnostics_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access diagnostics.', 'aio-page-builder' ), 403 );
 		}
 		$validator = new Environment_Validator();

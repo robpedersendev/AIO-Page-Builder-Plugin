@@ -60,8 +60,8 @@ final class Import_Export_State_Builder {
 	 * }
 	 */
 	public function build( ?array $validation_payload = null, ?array $restore_result_payload = null, ?array $manifest = null ): array {
-		$can_export = \current_user_can( Capabilities::EXPORT_DATA );
-		$can_import = \current_user_can( Capabilities::IMPORT_DATA );
+		$can_export = Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA );
+		$can_import = Capabilities::current_user_can_for_route( Capabilities::IMPORT_DATA );
 
 		$import_summary   = null;
 		$import_preview   = null;

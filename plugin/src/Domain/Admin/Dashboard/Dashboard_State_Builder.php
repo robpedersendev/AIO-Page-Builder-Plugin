@@ -23,7 +23,7 @@ use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 
 /**
  * Assembles dashboard payload: overview metrics, onboarding callout, readiness strip, explore links, queue/errors.
- * Explore links are filtered by current_user_can when build() runs in an admin request.
+ * Explore links are filtered by Capabilities::current_user_can_for_route when build() runs in an admin request.
  */
 final class Dashboard_State_Builder {
 
@@ -148,7 +148,7 @@ final class Dashboard_State_Builder {
 	 */
 	private function build_onboarding_callout( array $welcome ): array {
 		$url = (string) ( $welcome['onboarding_url'] ?? '' );
-		if ( ! \current_user_can( Capabilities::RUN_ONBOARDING ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::RUN_ONBOARDING ) ) {
 			return array(
 				'visible'   => false,
 				'variant'   => 'none',

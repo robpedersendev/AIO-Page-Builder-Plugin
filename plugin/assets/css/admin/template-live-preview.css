@@ -1,28 +1,37 @@
-/* Live template preview toolbar and responsive iframe shell (wp-admin). */
+/* Live template preview toolbar and responsive iframe shell (wp-admin). Inherits --aio-ds-* from aio-page-builder-admin.css when loaded. */
 
 .aio-live-preview-toolbar {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 0.5rem 0.75rem;
-	margin: 0.75rem 0 0.5rem;
+	gap: 0.55rem 0.85rem;
+	margin: 0.85rem 0 0.55rem;
+	padding: 0.65rem 0.85rem;
+	background: var(--aio-ds-surface-2, #f4f6fa);
+	border: 1px solid var(--aio-ds-border, #e1e6ef);
+	border-radius: var(--aio-ds-radius-md, 10px);
+	box-shadow: var(--aio-ds-shadow-xs, 0 1px 2px rgba(10, 15, 26, 0.05));
 }
 
 .aio-live-preview-viewport-switch .button {
-	margin-right: 0.25rem;
+	margin-right: 0.35rem;
+	border-radius: var(--aio-ds-radius-sm, 6px);
+	font-weight: 600;
 }
 
 .aio-live-preview-viewport-switch .button.is-active {
-	box-shadow: 0 0 0 1px #2271b1;
+	box-shadow: 0 0 0 2px var(--aio-ds-accent, #4f46e5);
+	border-color: var(--aio-ds-accent, #4f46e5);
 }
 
 .aio-live-preview-frame-wrap {
-	margin-top: 0.5rem;
-	border: 1px solid #c3c4c7;
-	border-radius: 4px;
-	background: #fff;
+	margin-top: 0.55rem;
+	border: 1px solid var(--aio-ds-border, #e1e6ef);
+	border-radius: var(--aio-ds-radius-md, 10px);
+	background: var(--aio-ds-surface, #fff);
 	overflow: auto;
 	max-height: 85vh;
+	box-shadow: var(--aio-ds-shadow-sm, 0 2px 8px rgba(10, 15, 26, 0.06));
 	transition: max-width 0.2s ease;
 }
 
@@ -47,13 +56,14 @@
 	width: 100%;
 	min-height: 240px;
 	border: 0;
-	background: #fff;
+	background: var(--aio-ds-surface, #fff);
 }
 
 .aio-live-preview-loading {
-	padding: 0.5rem 0.75rem;
+	padding: 0.55rem 0.85rem;
 	font-size: 13px;
-	color: #646970;
+	font-weight: 500;
+	color: var(--aio-ds-muted, #5c6578);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -131,6 +131,7 @@ final class Capabilities {
 
 	/**
 	 * Site administrators (manage_options) and multisite super admins get full template registry access regardless of aio_* role grants.
+	 * The primitive fallback uses current_user_can_for_route() so activation gaps align with the elevated-admin policy.
 	 *
 	 * @param string $registry_cap Capabilities::MANAGE_* for the relevant registry surface.
 	 * @return bool
@@ -142,7 +143,7 @@ final class Capabilities {
 		if ( \function_exists( 'is_multisite' ) && \is_multisite() && \function_exists( 'is_super_admin' ) && \is_super_admin() ) {
 			return true;
 		}
-		return \current_user_can( $registry_cap );
+		return self::current_user_can_for_route( $registry_cap );
 	}
 
 	/**
@@ -164,6 +165,7 @@ final class Capabilities {
 	 *
 	 * * Never passes bare meta post/page caps to core — that triggers map_meta_cap() _doing_it_wrong (WP 6.1+).
 	 * * If a dynamic cap is ever miswired to a meta cap without an object ID, access is denied instead of logging.
+	 * * Site administrators (manage_options) and network super admins pass every plugin capability here so hubs/tabs stay aligned with full admin access (activation gaps, map_meta_cap ordering).
 	 *
 	 * @param string $cap Capability string (from route registry or screen get_capability()).
 	 * @return bool
@@ -172,6 +174,27 @@ final class Capabilities {
 		if ( self::is_meta_post_or_page_cap_without_object( $cap ) ) {
 			return false;
 		}
+		if ( self::is_plugin_capability( $cap ) && self::current_user_is_elevated_site_admin() ) {
+			return true;
+		}
 		return \current_user_can( $cap );
+	}
+
+	/**
+	 * Whether the current user is a site admin (manage_options) or a multisite super admin.
+	 *
+	 * @return bool
+	 */
+	private static function current_user_is_elevated_site_admin(): bool {
+		if ( ! \is_user_logged_in() ) {
+			return false;
+		}
+		if ( \current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+		if ( \function_exists( 'is_multisite' ) && \is_multisite() && \function_exists( 'is_super_admin' ) && \is_super_admin() ) {
+			return true;
+		}
+		return false;
 	}
 }

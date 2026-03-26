@@ -1,6 +1,6 @@
 <?php
 /**
- * AI Run detail: metadata and artifact summaries with redaction and access gating (spec §29.8, §29.11).
+ * AI Run detail: metadata, artifact summaries, subtabs, and sensitive full prompt (spec §29.8, §29.11).
  *
  * @package AIOPageBuilder
  */
@@ -18,11 +18,16 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 /**
- * Renders a single AI run: run metadata (redacted) and artifact summaries. Raw content only if user has VIEW_SENSITIVE_DIAGNOSTICS.
+ * Renders a single AI run with on-page subtabs. Raw prompt and normalized package require VIEW_SENSITIVE_DIAGNOSTICS.
  */
 final class AI_Run_Detail_Screen {
 
 	public const SLUG = 'aio-page-builder-ai-runs';
+
+	public const SUBTAB_OVERVIEW    = 'overview';
+	public const SUBTAB_ARTIFACTS   = 'artifacts';
+	public const SUBTAB_VALIDATION  = 'validation';
+	public const SUBTAB_FULL_PROMPT = 'full_prompt';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -47,13 +52,24 @@ final class AI_Run_Detail_Screen {
 	 * @return void
 	 */
 	public function render( string $run_id, bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( Capabilities::VIEW_AI_RUNS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view AI run details.', 'aio-page-builder' ) );
 		}
-		$run              = null;
-		$artifact_summary = array();
-		$usage_data       = null;
-		$can_view_raw     = \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
+
+		$can_view_raw = Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
+
+		$allowed_subtabs = array( self::SUBTAB_OVERVIEW, self::SUBTAB_ARTIFACTS, self::SUBTAB_VALIDATION );
+		if ( $can_view_raw ) {
+			$allowed_subtabs[] = self::SUBTAB_FULL_PROMPT;
+		}
+		$current_sub = Admin_Screen_Hub::current_subtab( self::SUBTAB_OVERVIEW, $allowed_subtabs );
+
+		$run               = null;
+		$artifact_summary  = array();
+		$usage_data        = null;
+		$validation_report = null;
+		$dropped_report    = null;
+		$artifact_svc      = null;
 
 		if ( $this->container && $this->container->has( 'ai_run_service' ) && $this->container->has( 'ai_run_artifact_service' ) ) {
 			try {
@@ -66,6 +82,14 @@ final class AI_Run_Detail_Screen {
 					if ( is_array( $raw_usage ) ) {
 						$usage_data = $raw_usage;
 					}
+					$vr = $artifact_svc->get( (int) $run['id'], Artifact_Category_Keys::VALIDATION_REPORT );
+					if ( is_array( $vr ) ) {
+						$validation_report = $vr;
+					}
+					$dr = $artifact_svc->get( (int) $run['id'], Artifact_Category_Keys::DROPPED_RECORD_REPORT );
+					if ( is_array( $dr ) ) {
+						$dropped_report = $dr;
+					}
 				}
 			} catch ( \Throwable $e ) {
 				$run = null;
@@ -75,6 +99,26 @@ final class AI_Run_Detail_Screen {
 		$meta      = is_array( $run ) ? ( $run['run_metadata'] ?? array() ) : array();
 		$meta_safe = AI_Run_Artifact_Service::redact_sensitive_values( $meta );
 		$list_url  = Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs' );
+
+		$subtabs_def = array(
+			self::SUBTAB_OVERVIEW    => array(
+				'label' => __( 'Overview', 'aio-page-builder' ),
+				'cap'   => Capabilities::VIEW_AI_RUNS,
+			),
+			self::SUBTAB_ARTIFACTS   => array(
+				'label' => __( 'Artifacts', 'aio-page-builder' ),
+				'cap'   => Capabilities::VIEW_AI_RUNS,
+			),
+			self::SUBTAB_VALIDATION  => array(
+				'label' => __( 'Validation', 'aio-page-builder' ),
+				'cap'   => Capabilities::VIEW_AI_RUNS,
+			),
+			self::SUBTAB_FULL_PROMPT => array(
+				'label' => __( 'Full prompt', 'aio-page-builder' ),
+				'cap'   => Capabilities::VIEW_SENSITIVE_DIAGNOSTICS,
+			),
+		);
+
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-ai-run-detail" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -90,6 +134,87 @@ final class AI_Run_Detail_Screen {
 				<?php return; ?>
 			<?php endif; ?>
 
+			<p class="description">
+				<?php
+				echo \esc_html(
+					sprintf(
+						/* translators: %s: run internal key */
+						__( 'Run %s — use the subtabs below for metadata, stored artifacts, validation output, and (with permission) the full prompt sent to the provider.', 'aio-page-builder' ),
+						(string) ( $run['internal_key'] ?? $run_id )
+					)
+				);
+				?>
+			</p>
+
+			<?php
+			Admin_Screen_Hub::render_subnav_tabs(
+				AI_Runs_Screen::HUB_PAGE_SLUG,
+				'ai_runs',
+				$subtabs_def,
+				$current_sub,
+				null,
+				array( 'run_id' => $run_id )
+			);
+			?>
+
+			<?php
+			$failover_attempts = isset( $meta_safe['failover_attempt'] ) && is_array( $meta_safe['failover_attempt'] ) ? $meta_safe['failover_attempt'] : array();
+			?>
+			<div class="aio-run-detail-subpanel">
+			<?php
+			switch ( $current_sub ) {
+				case self::SUBTAB_ARTIFACTS:
+					$this->render_subtab_artifacts( $artifact_svc, (int) $run['id'], $can_view_raw, $artifact_summary );
+					break;
+				case self::SUBTAB_VALIDATION:
+					$this->render_subtab_validation( $validation_report, $dropped_report );
+					break;
+				case self::SUBTAB_FULL_PROMPT:
+					$this->render_subtab_full_prompt( $artifact_svc, (int) $run['id'], $can_view_raw );
+					break;
+				case self::SUBTAB_OVERVIEW:
+				default:
+					$this->render_subtab_overview( $run, $run_id, $meta_safe, $usage_data, $validation_report, $failover_attempts );
+					break;
+			}
+			?>
+			</div>
+		<?php if ( ! $embed_in_hub ) : ?>
+		</div>
+		<?php endif; ?>
+		<?php
+	}
+
+	/**
+	 * @param array<string, mixed>      $run
+	 * @param string                    $run_id
+	 * @param array<string, mixed>      $meta_safe
+	 * @param array<string, mixed>|null $usage_data
+	 * @param array<string, mixed>|null $validation_report
+	 * @param array<int, mixed>         $attempts
+	 * @return void
+	 */
+	private function render_subtab_overview( array $run, string $run_id, array $meta_safe, ?array $usage_data, ?array $validation_report, array $attempts ): void {
+		$effective = isset( $meta_safe['effective_provider_used'] ) && is_array( $meta_safe['effective_provider_used'] )
+			? $meta_safe['effective_provider_used']
+			: null;
+		$core_keys = array(
+			'actor',
+			'created_at',
+			'completed_at',
+			'provider_id',
+			'model_used',
+			'failover_attempt',
+			'effective_provider_used',
+			'prompt_pack_ref',
+			'retry_count',
+			'build_plan_ref',
+			'is_experiment',
+			'experiment_id',
+			'experiment_variant_label',
+			'experiment_variant_id',
+		);
+		?>
 			<section class="aio-run-meta" aria-labelledby="aio-run-meta-heading">
 				<h2 id="aio-run-meta-heading"><?php \esc_html_e( 'Run metadata', 'aio-page-builder' ); ?></h2>
 				<table class="widefat striped">
@@ -99,23 +224,16 @@ final class AI_Run_Detail_Screen {
 						<tr><th scope="row"><?php \esc_html_e( 'Actor', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['actor'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Created', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['created_at'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Completed', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['completed_at'] ?? '' ) ); ?></td></tr>
-						<tr><th scope="row"><?php \esc_html_e( 'Provider', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['provider_id'] ?? '' ) ); ?></td></tr>
-						<tr><th scope="row"><?php \esc_html_e( 'Model', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['model_used'] ?? '' ) ); ?></td></tr>
-						<?php
-						$attempts  = isset( $meta_safe['failover_attempt'] ) && is_array( $meta_safe['failover_attempt'] ) ? $meta_safe['failover_attempt'] : array();
-						$effective = isset( $meta_safe['effective_provider_used'] ) && is_array( $meta_safe['effective_provider_used'] )
-							? $meta_safe['effective_provider_used']
-							: null;
-						if ( count( $attempts ) > 1 && $effective !== null && ( (string) ( $effective['provider_id'] ?? '' ) ) !== '' ) :
-							?>
-						<tr><th scope="row"><?php \esc_html_e( 'Effective provider used', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $effective['provider_id'] ?? '' ) ); ?> (<?php echo \esc_html( (string) ( $effective['model_used'] ?? '' ) ); ?>)</td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Provider', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['provider_id'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Model', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['model_used'] ?? '' ) ); ?></td></tr>
+						<?php if ( count( $attempts ) > 1 && $effective !== null && AI_Run_Artifact_Service::format_run_metadata_value_for_display( $effective['provider_id'] ?? '' ) !== '' ) : ?>
+						<tr><th scope="row"><?php \esc_html_e( 'Effective provider used', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $effective['provider_id'] ?? '' ) ); ?> (<?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $effective['model_used'] ?? '' ) ); ?>)</td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Failover', 'aio-page-builder' ); ?></th><td><?php \esc_html_e( 'Primary failed; fallback was attempted. See attempt log below.', 'aio-page-builder' ); ?></td></tr>
 						<?php endif; ?>
 						<tr><th scope="row"><?php \esc_html_e( 'Prompt pack', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['prompt_pack_ref'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Retry count', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['retry_count'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Build plan ref', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['build_plan_ref'] ?? '' ) ); ?></td></tr>
 						<?php
-						// * Token usage and cost row — sourced from usage_metadata artifact (not run_metadata).
 						$prompt_tok     = isset( $usage_data['prompt_tokens'] ) ? (int) $usage_data['prompt_tokens'] : null;
 						$completion_tok = isset( $usage_data['completion_tokens'] ) ? (int) $usage_data['completion_tokens'] : null;
 						$total_tok      = isset( $usage_data['total_tokens'] ) ? (int) $usage_data['total_tokens'] : null;
@@ -144,13 +262,23 @@ final class AI_Run_Detail_Screen {
 						</tr>
 						<?php endif; ?>
 						<?php if ( ! empty( $meta_safe['is_experiment'] ) ) : ?>
-						<tr><th scope="row"><?php \esc_html_e( 'Experiment', 'aio-page-builder' ); ?></th><td><span class="aio-run-badge"><?php \esc_html_e( 'Experiment run', 'aio-page-builder' ); ?></span> <?php echo \esc_html( (string) ( $meta_safe['experiment_id'] ?? '' ) ); ?> — <?php echo \esc_html( (string) ( $meta_safe['experiment_variant_label'] ?? $meta_safe['experiment_variant_id'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Experiment', 'aio-page-builder' ); ?></th><td><span class="aio-run-badge"><?php \esc_html_e( 'Experiment run', 'aio-page-builder' ); ?></span> <?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['experiment_id'] ?? '' ) ); ?> — <?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['experiment_variant_label'] ?? $meta_safe['experiment_variant_id'] ?? '' ) ); ?></td></tr>
 						<?php endif; ?>
+						<?php foreach ( $meta_safe as $mk => $mv ) : ?>
+							<?php
+							if ( in_array( $mk, $core_keys, true ) ) {
+								continue;
+							}
+							$cell = is_scalar( $mv ) ? (string) $mv : (string) \wp_json_encode( $mv );
+							if ( strlen( $cell ) > 500 ) {
+								$cell = substr( $cell, 0, 500 ) . '…';
+							}
+							?>
+						<tr><th scope="row"><code><?php echo \esc_html( $mk ); ?></code></th><td><?php echo \esc_html( $cell ); ?></td></tr>
+						<?php endforeach; ?>
 					</tbody>
 				</table>
-				<?php
-				if ( ! empty( $attempts ) ) :
-					?>
+				<?php if ( ! empty( $attempts ) ) : ?>
 				<h3 id="aio-failover-heading"><?php \esc_html_e( 'Failover attempt log', 'aio-page-builder' ); ?></h3>
 				<table class="widefat striped" aria-describedby="aio-failover-heading">
 					<thead>
@@ -184,10 +312,49 @@ final class AI_Run_Detail_Screen {
 				<?php endif; ?>
 			</section>
 
+			<?php if ( $validation_report !== null ) : ?>
+			<section class="aio-run-validation-snapshot" aria-labelledby="aio-run-validation-snapshot-heading">
+				<h2 id="aio-run-validation-snapshot-heading"><?php \esc_html_e( 'Validation snapshot', 'aio-page-builder' ); ?></h2>
+				<p class="description"><?php \esc_html_e( 'Key fields from the stored validation report. Open the Validation subtab for the full JSON.', 'aio-page-builder' ); ?></p>
+				<table class="widefat striped">
+					<tbody>
+						<?php
+						$highlight_keys = array(
+							'blocking_failure_stage',
+							'final_validation_state',
+							'parse_status',
+							'top_level_valid',
+							'raw_capture_status',
+							'repair_attempted',
+							'repair_succeeded',
+						);
+						foreach ( $highlight_keys as $hk ) :
+							if ( ! array_key_exists( $hk, $validation_report ) ) {
+								continue;
+							}
+							$hv  = $validation_report[ $hk ];
+							$hvs = is_scalar( $hv ) ? (string) $hv : (string) \wp_json_encode( $hv );
+							?>
+						<tr><th scope="row"><code><?php echo \esc_html( $hk ); ?></code></th><td><?php echo \esc_html( $hvs ); ?></td></tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			</section>
+			<?php endif; ?>
+		<?php
+	}
+
+	/**
+	 * @param AI_Run_Artifact_Service|null                                               $artifact_svc
+	 * @param array<string, array{present: bool, summary: string|array, redacted: bool}> $artifact_summary
+	 * @return void
+	 */
+	private function render_subtab_artifacts( ?AI_Run_Artifact_Service $artifact_svc, int $run_post_id, bool $can_view_raw, array $artifact_summary ): void {
+		?>
 			<section class="aio-artifact-summary" aria-labelledby="aio-artifact-heading">
-				<h2 id="aio-artifact-heading"><?php \esc_html_e( 'Artifact summary', 'aio-page-builder' ); ?></h2>
+				<h2 id="aio-artifact-heading"><?php \esc_html_e( 'Artifacts', 'aio-page-builder' ); ?></h2>
 				<?php if ( ! $can_view_raw ) : ?>
-					<p class="description"><?php \esc_html_e( 'Raw prompt and provider response content is hidden. Users with sensitive diagnostics permission can see full content.', 'aio-page-builder' ); ?></p>
+					<p class="description"><?php \esc_html_e( 'Raw prompt, normalized prompt package, provider response, and input snapshot are restricted. Use the Full prompt subtab if you have sensitive diagnostics permission.', 'aio-page-builder' ); ?></p>
 				<?php endif; ?>
 				<table class="widefat striped">
 					<thead>
@@ -208,7 +375,7 @@ final class AI_Run_Detail_Screen {
 									<?php
 									$sum = $info['summary'];
 									if ( is_array( $sum ) ) {
-										echo \esc_html( wp_json_encode( $sum ) );
+										echo \esc_html( (string) \wp_json_encode( $sum ) );
 									} else {
 										echo \esc_html( (string) $sum );
 									}
@@ -218,10 +385,108 @@ final class AI_Run_Detail_Screen {
 						<?php endforeach; ?>
 					</tbody>
 				</table>
+
+				<h3 style="margin-top:1.5em;"><?php \esc_html_e( 'Full payloads', 'aio-page-builder' ); ?></h3>
+				<p class="description"><?php \esc_html_e( 'Expand each section to view pretty-printed JSON (or text) stored for this run.', 'aio-page-builder' ); ?></p>
+				<?php
+				foreach ( Artifact_Category_Keys::all() as $cat ) :
+					$payload = null;
+					if ( $artifact_svc !== null ) {
+						$payload = $artifact_svc->get( $run_post_id, $cat );
+					}
+					$present   = $payload !== null && $payload !== '';
+					$sensitive = in_array( $cat, Artifact_Category_Keys::REDACT_BEFORE_DISPLAY, true );
+					$blocked   = $sensitive && ! $can_view_raw;
+					?>
+				<details class="aio-artifact-details" style="margin-bottom:0.75em;border:1px solid #c3c4c7;padding:0.5em 0.75em;background:#fff;">
+					<summary><code><?php echo \esc_html( $cat ); ?></code>
+						<?php if ( ! $present ) : ?>
+							— <?php \esc_html_e( 'not stored', 'aio-page-builder' ); ?>
+						<?php elseif ( $blocked ) : ?>
+							— <?php \esc_html_e( 'restricted', 'aio-page-builder' ); ?>
+						<?php endif; ?>
+					</summary>
+					<?php if ( ! $present ) : ?>
+						<p class="description"><?php \esc_html_e( 'No artifact row for this category.', 'aio-page-builder' ); ?></p>
+					<?php elseif ( $blocked ) : ?>
+						<p class="description"><?php \esc_html_e( 'This category may contain prompts or site context. It is visible only to users with the sensitive diagnostics capability.', 'aio-page-builder' ); ?></p>
+					<?php else : ?>
+						<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $payload ) ); ?></pre>
+					<?php endif; ?>
+				</details>
+				<?php endforeach; ?>
 			</section>
-		<?php if ( ! $embed_in_hub ) : ?>
-		</div>
-		<?php endif; ?>
 		<?php
+	}
+
+	/**
+	 * @param array<string, mixed>|null $validation_report
+	 * @param array<string, mixed>|null $dropped_report
+	 * @return void
+	 */
+	private function render_subtab_validation( ?array $validation_report, ?array $dropped_report ): void {
+		?>
+			<section class="aio-run-validation-full" aria-labelledby="aio-run-validation-full-heading">
+				<h2 id="aio-run-validation-full-heading"><?php \esc_html_e( 'Validation report', 'aio-page-builder' ); ?></h2>
+				<?php if ( $validation_report === null ) : ?>
+					<p class="aio-admin-notice"><?php \esc_html_e( 'No validation report artifact was stored for this run.', 'aio-page-builder' ); ?></p>
+				<?php else : ?>
+					<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $validation_report ) ); ?></pre>
+				<?php endif; ?>
+			</section>
+			<section class="aio-run-dropped-records" aria-labelledby="aio-run-dropped-heading" style="margin-top:1.5em;">
+				<h2 id="aio-run-dropped-heading"><?php \esc_html_e( 'Dropped record report', 'aio-page-builder' ); ?></h2>
+				<?php if ( $dropped_report === null ) : ?>
+					<p class="description"><?php \esc_html_e( 'None stored.', 'aio-page-builder' ); ?></p>
+				<?php else : ?>
+					<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $dropped_report ) ); ?></pre>
+				<?php endif; ?>
+			</section>
+		<?php
+	}
+
+	/**
+	 * @param AI_Run_Artifact_Service|null $artifact_svc
+	 * @return void
+	 */
+	private function render_subtab_full_prompt( ?AI_Run_Artifact_Service $artifact_svc, int $run_post_id, bool $can_view_raw ): void {
+		if ( ! $can_view_raw ) {
+			echo '<p class="aio-admin-notice">' . \esc_html__( 'You do not have permission to view full prompt content.', 'aio-page-builder' ) . '</p>';
+			return;
+		}
+		$raw        = $artifact_svc !== null ? $artifact_svc->get( $run_post_id, Artifact_Category_Keys::RAW_PROMPT ) : null;
+		$normalized = $artifact_svc !== null ? $artifact_svc->get( $run_post_id, Artifact_Category_Keys::NORMALIZED_PROMPT_PACKAGE ) : null;
+		?>
+			<section class="aio-full-prompt-raw" aria-labelledby="aio-full-prompt-raw-heading">
+				<h2 id="aio-full-prompt-raw-heading"><?php \esc_html_e( 'Raw prompt (capture-ready)', 'aio-page-builder' ); ?></h2>
+				<p class="description"><?php \esc_html_e( 'Exact payload captured for provider dispatch (may include site context). Treat as sensitive.', 'aio-page-builder' ); ?></p>
+				<?php if ( $raw === null || $raw === '' ) : ?>
+					<p class="aio-admin-notice"><?php \esc_html_e( 'No raw prompt artifact was stored. Common causes: JSON encoding or post meta write failed for this payload (check debug log for ARTIFACT_STORE), or the run was created by a code path that does not persist prompts. If input_snapshot exists, the request context was still captured there.', 'aio-page-builder' ); ?></p>
+				<?php else : ?>
+					<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $raw ) ); ?></pre>
+				<?php endif; ?>
+			</section>
+			<section class="aio-full-prompt-normalized" aria-labelledby="aio-full-prompt-norm-heading" style="margin-top:1.5em;">
+				<h2 id="aio-full-prompt-norm-heading"><?php \esc_html_e( 'Normalized prompt package', 'aio-page-builder' ); ?></h2>
+				<p class="description"><?php \esc_html_e( 'Structured package assembled before the provider call. The stored copy omits the nested input_artifact when present (same data as the input_snapshot artifact) to keep meta writes reliable.', 'aio-page-builder' ); ?></p>
+				<?php if ( $normalized === null || $normalized === '' ) : ?>
+					<p class="aio-admin-notice"><?php \esc_html_e( 'No normalized prompt package artifact was stored. See the note for raw prompt above; full site context may still appear under Artifacts → input_snapshot.', 'aio-page-builder' ); ?></p>
+				<?php else : ?>
+					<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $normalized ) ); ?></pre>
+				<?php endif; ?>
+			</section>
+		<?php
+	}
+
+	/**
+	 * @param mixed $payload Artifact or metadata fragment.
+	 * @return string
+	 */
+	private static function format_payload_for_display( mixed $payload ): string {
+		if ( is_array( $payload ) || is_object( $payload ) ) {
+			$json = \wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			return $json !== false ? $json : '[encode_error]';
+		}
+		return (string) $payload;
 	}
 }

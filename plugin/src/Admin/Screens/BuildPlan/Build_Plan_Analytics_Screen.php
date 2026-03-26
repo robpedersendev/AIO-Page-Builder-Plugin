@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\BuildPlan;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -62,7 +63,7 @@ final class Build_Plan_Analytics_Screen {
 				unset( $e );
 			}
 		}
-		$build_plans_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
+		$build_plans_url = Admin_Screen_Hub::tab_url( Build_Plans_Screen::SLUG, 'build_plans' );
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-build-plan-analytics" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -72,7 +73,8 @@ final class Build_Plan_Analytics_Screen {
 			<p><a href="<?php echo \esc_url( $build_plans_url ); ?>"><?php \esc_html_e( '&larr; Back to Build Plans', 'aio-page-builder' ); ?></a></p>
 
 			<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-analytics-filter">
-				<input type="hidden" name="page" value="<?php echo \esc_attr( self::SLUG ); ?>" />
+				<input type="hidden" name="page" value="<?php echo \esc_attr( Build_Plans_Screen::SLUG ); ?>" />
+				<input type="hidden" name="<?php echo \esc_attr( Admin_Screen_Hub::QUERY_TAB ); ?>" value="bp_analytics" />
 				<p>
 					<label for="date_from"><?php \esc_html_e( 'From date (Y-m-d):', 'aio-page-builder' ); ?></label>
 					<input type="date" id="date_from" name="date_from" value="<?php echo \esc_attr( $date_from ); ?>" />

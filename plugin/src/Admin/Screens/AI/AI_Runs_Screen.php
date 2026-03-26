@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
+use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
 use AIOPageBuilder\Domain\AI\Pricing\Provider_Pricing_Registry;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -23,8 +25,14 @@ final class AI_Runs_Screen {
 
 	public const SLUG = 'aio-page-builder-ai-runs';
 
-	/** Admin hub page slug (tabs: AI Runs, Providers, Experiments). */
+	/** Admin hub page slug (tabs: AI Providers, AI Runs, Prompt Experiments). */
 	public const HUB_PAGE_SLUG = 'aio-page-builder-ai-workspace';
+
+	/** Query arg: set to {@see ONBOARDING_PLAN_SUCCESS_VALUE} when redirecting from onboarding after a successful planning run. */
+	public const QUERY_ONBOARDING_PLAN = 'aio_onboarding_plan';
+
+	/** Value for {@see QUERY_ONBOARDING_PLAN} after onboarding planning success. */
+	public const ONBOARDING_PLAN_SUCCESS_VALUE = 'success';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -48,7 +56,7 @@ final class AI_Runs_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( Capabilities::VIEW_AI_RUNS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view AI runs.', 'aio-page-builder' ) );
 		}
 		$run_id = isset( $_GET['run_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['run_id'] ) ) : '';
@@ -58,6 +66,48 @@ final class AI_Runs_Screen {
 			return;
 		}
 		$this->render_list( $embed_in_hub );
+	}
+
+	/**
+	 * After onboarding redirects here with QUERY_ONBOARDING_PLAN, shows the stored user message and clears the transient.
+	 *
+	 * @return void
+	 */
+	private function render_onboarding_plan_success_notice_if_needed(): void {
+		if ( ! isset( $_GET[ self::QUERY_ONBOARDING_PLAN ] ) ) {
+			return;
+		}
+		$flag = \sanitize_key( (string) \wp_unslash( (string) $_GET[ self::QUERY_ONBOARDING_PLAN ] ) );
+		if ( $flag !== self::ONBOARDING_PLAN_SUCCESS_VALUE ) {
+			return;
+		}
+		$transient_key = 'aio_onboarding_planning_result_' . (string) \get_current_user_id();
+		$stored        = \get_transient( $transient_key );
+		$message       = __( 'Your AI plan was generated successfully. Review this run, then create a Build Plan when you are ready.', 'aio-page-builder' );
+		if ( is_array( $stored ) && isset( $stored['user_message'] ) && is_string( $stored['user_message'] ) && $stored['user_message'] !== '' ) {
+			$message = $stored['user_message'];
+		}
+		\delete_transient( $transient_key );
+		$build_plans_url = '';
+		if ( Capabilities::current_user_can_for_route( Capabilities::ACCESS_PLANS_WORKSPACE ) ) {
+			$build_plans_url = Admin_Screen_Hub::tab_url(
+				Build_Plans_Screen::SLUG,
+				'build_plans',
+				array()
+			);
+		}
+		$onboarding_url = Admin_Screen_Hub::tab_url( Onboarding_Screen::SLUG, 'onboarding', array() );
+		?>
+		<div class="notice notice-success is-dismissible aio-onboarding-plan-success-notice" role="status">
+			<p><strong><?php echo \esc_html( $message ); ?></strong></p>
+			<p>
+				<?php if ( $build_plans_url !== '' ) : ?>
+					<a href="<?php echo \esc_url( $build_plans_url ); ?>" class="button button-primary"><?php \esc_html_e( 'Open Build Plans', 'aio-page-builder' ); ?></a>
+				<?php endif; ?>
+				<a href="<?php echo \esc_url( $onboarding_url ); ?>" class="button<?php echo $build_plans_url === '' ? ' button-primary' : ''; ?>"><?php \esc_html_e( 'Back to onboarding', 'aio-page-builder' ); ?></a>
+			</p>
+		</div>
+		<?php
 	}
 
 	private function render_list( bool $embed_in_hub = false ): void {
@@ -178,7 +228,7 @@ final class AI_Runs_Screen {
 								<td><?php echo \esc_html( (string) ( $run['status'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['provider_id'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['model_used'] ?? '' ) ); ?></td>
-								<td><?php echo \esc_html( (string) ( $meta['prompt_pack_ref'] ?? '' ) ); ?></td>
+								<td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta['prompt_pack_ref'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['created_at'] ?? '' ) ); ?></td>
 								<td>
 									<a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( self::HUB_PAGE_SLUG, 'ai_runs', array( 'run_id' => $run_id ) ) ); ?>"><?php \esc_html_e( 'View details', 'aio-page-builder' ); ?></a>

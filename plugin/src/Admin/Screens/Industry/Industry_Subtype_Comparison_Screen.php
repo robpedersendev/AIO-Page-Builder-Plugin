@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
@@ -84,7 +85,7 @@ final class Industry_Subtype_Comparison_Screen {
 			'primary_industry_key' => $primary,
 			'subtype_key'          => $subtype_key,
 			'comparison'           => $comparison,
-			'profile_url'          => \admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
+			'profile_url'          => Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'profile' ),
 		);
 	}
 
@@ -94,7 +95,7 @@ final class Industry_Subtype_Comparison_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the subtype comparison screen.', 'aio-page-builder' ), 403 );
 		}
 		$state         = $this->get_state();

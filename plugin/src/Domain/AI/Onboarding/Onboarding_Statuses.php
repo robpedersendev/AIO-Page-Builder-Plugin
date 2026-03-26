@@ -43,6 +43,12 @@ final class Onboarding_Statuses {
 	/** Per-step: step validation passed. */
 	public const STEP_COMPLETED = 'completed';
 
+	/** Per-step: step was visited but required fields are not yet satisfied (derived from live profile). */
+	public const STEP_INCOMPLETE = 'incomplete';
+
+	/** Per-step: user has passed this step in the flow, but stored profile still fails validation (softer than incomplete for future steps). */
+	public const STEP_VISITED_INCOMPLETE = 'visited_incomplete';
+
 	/** Per-step: step explicitly skipped (where allowed). */
 	public const STEP_SKIPPED = 'skipped';
 
@@ -75,6 +81,8 @@ final class Onboarding_Statuses {
 			self::STEP_NOT_STARTED,
 			self::STEP_IN_PROGRESS,
 			self::STEP_COMPLETED,
+			self::STEP_INCOMPLETE,
+			self::STEP_VISITED_INCOMPLETE,
 			self::STEP_SKIPPED,
 			self::STEP_BLOCKED,
 		);

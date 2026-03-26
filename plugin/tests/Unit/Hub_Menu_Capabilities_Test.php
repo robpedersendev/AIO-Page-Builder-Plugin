@@ -63,6 +63,42 @@ final class Hub_Menu_Capabilities_Test extends TestCase {
 		$this->assertSame( array( 'read' ), $out );
 	}
 
+	public function test_access_ai_workspace_maps_to_read_for_manage_options_without_aio_primitives(): void {
+		$GLOBALS['_aio_get_userdata_allcaps'] = array( 'manage_options' => true );
+		$initial                              = array( Capabilities::ACCESS_AI_WORKSPACE );
+		$out                                  = Hub_Menu_Capabilities::map_meta_cap(
+			$initial,
+			Capabilities::ACCESS_AI_WORKSPACE,
+			1,
+			array()
+		);
+		$this->assertSame( array( 'read' ), $out );
+	}
+
+	public function test_manage_ai_providers_maps_to_read_for_manage_options(): void {
+		$GLOBALS['_aio_get_userdata_allcaps'] = array( 'manage_options' => true );
+		$initial                              = array( Capabilities::MANAGE_AI_PROVIDERS );
+		$out                                  = Hub_Menu_Capabilities::map_meta_cap(
+			$initial,
+			Capabilities::MANAGE_AI_PROVIDERS,
+			1,
+			array()
+		);
+		$this->assertSame( array( 'read' ), $out );
+	}
+
+	public function test_manage_ai_providers_leaves_caps_when_not_site_admin(): void {
+		$GLOBALS['_aio_get_userdata_allcaps'] = array();
+		$initial                              = array( Capabilities::MANAGE_AI_PROVIDERS );
+		$out                                  = Hub_Menu_Capabilities::map_meta_cap(
+			$initial,
+			Capabilities::MANAGE_AI_PROVIDERS,
+			2,
+			array()
+		);
+		$this->assertSame( $initial, $out );
+	}
+
 	public function test_manage_section_templates_leaves_caps_when_not_site_admin(): void {
 		$GLOBALS['_aio_get_userdata_allcaps'] = array();
 		$initial                              = array( Capabilities::MANAGE_SECTION_TEMPLATES );
@@ -73,6 +109,42 @@ final class Hub_Menu_Capabilities_Test extends TestCase {
 			array()
 		);
 		$this->assertSame( $initial, $out );
+	}
+
+	public function test_view_ai_runs_maps_to_read_for_manage_options(): void {
+		$GLOBALS['_aio_get_userdata_allcaps'] = array( 'manage_options' => true );
+		$initial                              = array( Capabilities::VIEW_AI_RUNS );
+		$out                                  = Hub_Menu_Capabilities::map_meta_cap(
+			$initial,
+			Capabilities::VIEW_AI_RUNS,
+			1,
+			array()
+		);
+		$this->assertSame( array( 'read' ), $out );
+	}
+
+	public function test_view_ai_runs_leaves_caps_when_not_site_admin(): void {
+		$GLOBALS['_aio_get_userdata_allcaps'] = array();
+		$initial                              = array( Capabilities::VIEW_AI_RUNS );
+		$out                                  = Hub_Menu_Capabilities::map_meta_cap(
+			$initial,
+			Capabilities::VIEW_AI_RUNS,
+			2,
+			array()
+		);
+		$this->assertSame( $initial, $out );
+	}
+
+	public function test_view_ai_runs_maps_to_read_for_manage_ai_providers(): void {
+		$GLOBALS['_aio_get_userdata_allcaps'] = array( Capabilities::MANAGE_AI_PROVIDERS => true );
+		$initial                              = array( Capabilities::VIEW_AI_RUNS );
+		$out                                  = Hub_Menu_Capabilities::map_meta_cap(
+			$initial,
+			Capabilities::VIEW_AI_RUNS,
+			1,
+			array()
+		);
+		$this->assertSame( array( 'read' ), $out );
 	}
 
 	public function test_super_admin_maps_manage_section_to_read_when_multisite(): void {

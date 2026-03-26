@@ -9,6 +9,7 @@ namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Planning_Request_Orchestrator;
+use AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
 use AIOPageBuilder\Domain\AI\Onboarding\Planning_Request_Result;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
@@ -88,7 +89,10 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 
 		$profile_normalizer = new \AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer();
 		$profile_store      = new \AIOPageBuilder\Domain\Storage\Profile\Profile_Store( $settings, $profile_normalizer );
-		$prefill            = new \AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$secret_store       = $this->createMock( Provider_Secret_Store_Interface::class );
+		$secret_store->method( 'get_credential_state' )->willReturn( Provider_Secret_Store_Interface::STATE_ABSENT );
+		$secret_store->method( 'has_credential' )->willReturn( false );
+		$prefill            = new \AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service( $profile_store, $settings, null, $secret_store );
 
 		$prompt_pack_registry    = new Prompt_Pack_Registry_Service( new Stub_Prompt_Pack_Repo_For_Orchestrator() );
 		$container               = new Service_Container();

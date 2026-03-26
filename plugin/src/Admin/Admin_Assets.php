@@ -37,6 +37,25 @@ final class Admin_Assets {
 	public static function register(): void {
 		\add_action( 'admin_enqueue_scripts', array( self::class, 'enqueue' ), 10 );
 		\add_action( 'admin_head', array( self::class, 'print_hidden_template_library_submenu_css' ), 99 );
+		\add_filter( 'admin_body_class', array( self::class, 'filter_admin_body_class' ) );
+	}
+
+	/**
+	 * Applies the AIO design-system scope on all plugin admin pages (any `page=aio-page-builder*`).
+	 *
+	 * @param string $classes Space-separated body classes from Core.
+	 * @return string
+	 */
+	public static function filter_admin_body_class( string $classes ): string {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only routing for body class.
+		if ( ! isset( $_GET['page'] ) ) {
+			return $classes;
+		}
+		$page = \sanitize_key( (string) \wp_unslash( $_GET['page'] ) );
+		if ( $page !== '' && \strpos( $page, 'aio-page-builder' ) === 0 ) {
+			$classes .= ' aio-pb-ui';
+		}
+		return $classes;
 	}
 
 	/**
@@ -68,11 +87,17 @@ final class Admin_Assets {
 		if ( $page === '' || \strpos( $page, 'aio-page-builder' ) !== 0 ) {
 			return;
 		}
+		\wp_enqueue_style(
+			'aio-page-builder-admin-fonts',
+			'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+			array(),
+			null
+		);
 		$url = \trailingslashit( Constants::plugin_url() ) . 'assets/css/aio-page-builder-admin.css';
 		\wp_enqueue_style(
 			self::STYLE_HANDLE,
 			$url,
-			array(),
+			array( 'aio-page-builder-admin-fonts' ),
 			Constants::plugin_version()
 		);
 

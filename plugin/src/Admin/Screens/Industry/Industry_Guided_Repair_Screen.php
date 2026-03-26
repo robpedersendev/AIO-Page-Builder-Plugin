@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\ViewModels\Industry\Industry_Guided_Repair_View_Model;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Health_Check_Service;
@@ -49,10 +50,11 @@ final class Industry_Guided_Repair_Screen {
 
 	private function get_view_model(): Industry_Guided_Repair_View_Model {
 		$candidates = array();
+		$hub = Industry_Profile_Settings_Screen::SLUG;
 		$links      = array(
-			'health_report'       => \admin_url( 'admin.php?page=' . Industry_Health_Report_Screen::SLUG ),
-			'override_management' => \admin_url( 'admin.php?page=' . Industry_Override_Management_Screen::SLUG ),
-			'industry_profile'    => \admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
+			'health_report'       => Admin_Screen_Hub::subtab_url( $hub, 'reports', 'health' ),
+			'override_management' => Admin_Screen_Hub::tab_url( $hub, 'overrides' ),
+			'industry_profile'    => Admin_Screen_Hub::tab_url( $hub, 'profile' ),
 		);
 
 		$message      = '';
@@ -180,13 +182,13 @@ final class Industry_Guided_Repair_Screen {
 	}
 
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access guided repair.', 'aio-page-builder' ), 403 );
 		}
 		$vm         = $this->get_view_model();
 		$candidates = $vm->get_candidates();
 		$links      = $vm->get_links();
-		$base       = \admin_url( 'admin.php?page=' . self::SLUG );
+		$base       = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'repair' );
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-guided-repair" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">

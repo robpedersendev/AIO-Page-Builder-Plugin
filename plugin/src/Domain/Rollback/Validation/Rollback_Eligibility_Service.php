@@ -200,7 +200,7 @@ final class Rollback_Eligibility_Service {
 			}
 		}
 
-		if ( ! $skip_permission && ! \current_user_can( $required_cap ) ) {
+		if ( ! $skip_permission && ! Capabilities::current_user_can_for_route( $required_cap ) ) {
 			return Rollback_Eligibility_Result::ineligible(
 				array( Rollback_Blocking_Reasons::PERMISSION_DENIED ),
 				$action_type,

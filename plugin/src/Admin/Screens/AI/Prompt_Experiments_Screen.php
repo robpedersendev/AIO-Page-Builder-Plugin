@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Domain\AI\PromptPacks\Experiments\Prompt_Experiment_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -39,26 +40,99 @@ final class Prompt_Experiments_Screen {
 	}
 
 	/**
+	 * POST save: redirect URL for admin_init (see Admin_Early_Redirect_Coordinator).
+	 *
+	 * @return string|null
+	 */
+	public function get_post_redirect_url(): ?string {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
+			return null;
+		}
+		if ( ! isset( $_POST['aio_save_experiment'] ) || ! isset( $_POST['aio_experiment_nonce'] ) ) {
+			return null;
+		}
+		if ( ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_nonce'] ) ), 'aio_save_experiment' ) ) {
+			return null;
+		}
+		$service = $this->get_service();
+		if ( ! $service ) {
+			return null;
+		}
+		$name     = isset( $_POST['aio_experiment_name'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_name'] ) ) : '';
+		$desc     = isset( $_POST['aio_experiment_description'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_description'] ) ) : '';
+		$id       = isset( $_POST['aio_experiment_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_id'] ) ) : '';
+		$raw      = isset( $_POST['aio_experiment_variants'] ) ? \sanitize_textarea_field( \wp_unslash( (string) $_POST['aio_experiment_variants'] ) ) : '';
+		$variants = array();
+		foreach ( array_filter( array_map( 'trim', explode( "\n", $raw ) ) ) as $line ) {
+			$parts = array_map( 'trim', explode( '|', $line, 5 ) );
+			if ( count( $parts ) >= 5 ) {
+				$variants[] = array(
+					'variant_id'      => $parts[0],
+					'label'           => $parts[1],
+					'prompt_pack_ref' => array(
+						'internal_key' => $parts[2],
+						'version'      => $parts[3],
+					),
+					'provider_id'     => $parts[4],
+				);
+			}
+		}
+		$def    = array(
+			'id'          => $id,
+			'name'        => $name,
+			'description' => $desc,
+			'variants'    => $variants,
+		);
+		$result = $service->save_definition( $def );
+		return $result['ok']
+			? Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'experiments', array( 'saved' => '1' ) )
+			: Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'experiments', array( 'error' => $result['message'] ) );
+	}
+
+	/**
+	 * GET delete experiment: redirect URL for admin_init.
+	 *
+	 * @return string|null
+	 */
+	public function get_delete_redirect_url(): ?string {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
+			return null;
+		}
+		$delete = isset( $_GET['delete'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['delete'] ) ) : '';
+		if ( $delete === '' || ! isset( $_GET['_wpnonce'] ) ) {
+			return null;
+		}
+		if ( ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ), 'aio_delete_experiment_' . $delete ) ) {
+			return null;
+		}
+		$service = $this->get_service();
+		if ( ! $service || ! $service->delete_definition( $delete ) ) {
+			return null;
+		}
+		return Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'experiments', array( 'deleted' => '1' ) );
+	}
+
+	/**
 	 * Renders the Prompt Experiments screen.
 	 *
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage prompt experiments.', 'aio-page-builder' ), 403 );
 		}
-		$this->maybe_handle_save();
-		$this->maybe_handle_delete();
 		$service     = $this->get_service();
 		$definitions = $service ? $service->list_definitions() : array();
-		$ai_runs_url = \admin_url( 'admin.php?page=' . AI_Runs_Screen::SLUG );
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-prompt-experiments" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 		<?php endif; ?>
 			<p class="description"><?php \esc_html_e( 'Define prompt-pack and provider/model experiment variants. Experiment runs are recorded separately and labeled in AI Runs. No automatic promotion to production.', 'aio-page-builder' ); ?></p>
-			<p><a href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'View AI Runs', 'aio-page-builder' ); ?></a></p>
+			<?php if ( ! $embed_in_hub ) : ?>
+				<?php $ai_runs_url = Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs' ); ?>
+				<p><a href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'View AI Runs', 'aio-page-builder' ); ?></a></p>
+			<?php endif; ?>
 
 			<?php if ( empty( $definitions ) ) : ?>
 				<p class="aio-admin-notice"><?php \esc_html_e( 'No experiments defined. Add one below.', 'aio-page-builder' ); ?></p>
@@ -99,8 +173,21 @@ final class Prompt_Experiments_Screen {
 								<p class="description"><?php \esc_html_e( 'No experiment runs yet for this definition.', 'aio-page-builder' ); ?></p>
 							<?php endif; ?>
 							<p>
-								<a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG . '&edit=' . \rawurlencode( $exp_id ) ) ); ?>"><?php \esc_html_e( 'Edit', 'aio-page-builder' ); ?></a>
-								| <a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG . '&delete=' . \rawurlencode( $exp_id ) . '&_wpnonce=' . \wp_create_nonce( 'aio_delete_experiment_' . $exp_id ) ) ); ?>" onclick="return confirm('<?php echo \esc_attr( __( 'Delete this experiment definition?', 'aio-page-builder' ) ); ?>');"><?php \esc_html_e( 'Delete', 'aio-page-builder' ); ?></a>
+								<a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'experiments', array( 'edit' => $exp_id ) ) ); ?>"><?php \esc_html_e( 'Edit', 'aio-page-builder' ); ?></a>
+								| <a href="
+								<?php
+								echo \esc_url(
+									Admin_Screen_Hub::tab_url(
+										AI_Runs_Screen::HUB_PAGE_SLUG,
+										'experiments',
+										array(
+											'delete'   => $exp_id,
+											'_wpnonce' => \wp_create_nonce( 'aio_delete_experiment_' . $exp_id ),
+										)
+									)
+								);
+								?>
+											" onclick="return confirm('<?php echo \esc_attr( __( 'Delete this experiment definition?', 'aio-page-builder' ) ); ?>');"><?php \esc_html_e( 'Delete', 'aio-page-builder' ); ?></a>
 							</p>
 						</div>
 					<?php endforeach; ?>
@@ -181,62 +268,5 @@ final class Prompt_Experiments_Screen {
 			<p class="submit"><input type="submit" name="aio_save_experiment" class="button button-primary" value="<?php \esc_attr_e( 'Save experiment', 'aio-page-builder' ); ?>" /></p>
 		</form>
 		<?php
-	}
-
-	private function maybe_handle_save(): void {
-		if ( ! isset( $_POST['aio_save_experiment'] ) || ! isset( $_POST['aio_experiment_nonce'] ) ) {
-			return;
-		}
-		if ( ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_nonce'] ) ), 'aio_save_experiment' ) ) {
-			return;
-		}
-		$service = $this->get_service();
-		if ( ! $service ) {
-			return;
-		}
-		$name     = isset( $_POST['aio_experiment_name'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_name'] ) ) : '';
-		$desc     = isset( $_POST['aio_experiment_description'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_description'] ) ) : '';
-		$id       = isset( $_POST['aio_experiment_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['aio_experiment_id'] ) ) : '';
-		$raw      = isset( $_POST['aio_experiment_variants'] ) ? \sanitize_textarea_field( \wp_unslash( (string) $_POST['aio_experiment_variants'] ) ) : '';
-		$variants = array();
-		foreach ( array_filter( array_map( 'trim', explode( "\n", $raw ) ) ) as $line ) {
-			$parts = array_map( 'trim', explode( '|', $line, 5 ) );
-			if ( count( $parts ) >= 5 ) {
-				$variants[] = array(
-					'variant_id'      => $parts[0],
-					'label'           => $parts[1],
-					'prompt_pack_ref' => array(
-						'internal_key' => $parts[2],
-						'version'      => $parts[3],
-					),
-					'provider_id'     => $parts[4],
-				);
-			}
-		}
-		$def    = array(
-			'id'          => $id,
-			'name'        => $name,
-			'description' => $desc,
-			'variants'    => $variants,
-		);
-		$result = $service->save_definition( $def );
-		$url    = \admin_url( 'admin.php?page=' . self::SLUG . ( $result['ok'] ? '&saved=1' : '&error=' . \rawurlencode( $result['message'] ) ) );
-		\wp_safe_redirect( $url );
-		exit;
-	}
-
-	private function maybe_handle_delete(): void {
-		$delete = isset( $_GET['delete'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['delete'] ) ) : '';
-		if ( $delete === '' || ! isset( $_GET['_wpnonce'] ) ) {
-			return;
-		}
-		if ( ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ), 'aio_delete_experiment_' . $delete ) ) {
-			return;
-		}
-		$service = $this->get_service();
-		if ( $service && $service->delete_definition( $delete ) ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=' . self::SLUG . '&deleted=1' ) );
-			exit;
-		}
 	}
 }

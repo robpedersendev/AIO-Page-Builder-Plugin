@@ -104,6 +104,7 @@ final class Lifecycle_Manager {
 			'template_library_upgrade_compatibility',
 			'register_schedules',
 			'seed_form_templates',
+			'seed_default_prompt_pack',
 			'seed_section_expansion_pack',
 			'seed_section_gap_closing_batch',
 			'seed_page_composition_expansion_pack',
@@ -181,6 +182,8 @@ final class Lifecycle_Manager {
 				return $this->first_run_redirect_readiness();
 			case 'seed_form_templates':
 				return $this->seed_form_templates();
+			case 'seed_default_prompt_pack':
+				return $this->seed_default_prompt_pack();
 			case 'seed_section_expansion_pack':
 				return $this->seed_section_expansion_pack();
 			case 'seed_section_gap_closing_batch':
@@ -378,6 +381,50 @@ final class Lifecycle_Manager {
 				'section_id'            => $result['section_id'],
 				'page_id'               => $result['page_id'],
 				'errors'                => $result['errors'],
+			)
+		);
+	}
+
+	/**
+	 * Seeds default active planning prompt pack when none exists for build-plan-draft (spec §26, §59.8).
+	 *
+	 * @return Lifecycle_Result
+	 */
+	private function seed_default_prompt_pack(): Lifecycle_Result {
+		$base  = __DIR__ . '/../Domain';
+		$infra = __DIR__ . '/../Infrastructure';
+		require_once $base . '/Storage/Repositories/Repository_Interface.php';
+		require_once $base . '/Storage/Objects/Object_Status_Families.php';
+		require_once $base . '/Storage/Repositories/Abstract_CPT_Repository.php';
+		require_once $base . '/Storage/Objects/Object_Type_Keys.php';
+		require_once $infra . '/Config/Capabilities.php';
+		require_once $base . '/Storage/Objects/Post_Type_Registrar.php';
+		require_once $base . '/AI/PromptPacks/Prompt_Pack_Schema.php';
+		require_once $base . '/AI/PromptPacks/Prompt_Pack_Registry_Repository_Interface.php';
+		require_once $base . '/AI/PromptPacks/Prompt_Pack_Registry_Service.php';
+		require_once $base . '/AI/Validation/Build_Plan_Draft_Schema.php';
+		require_once $base . '/AI/PromptPacks/Seeds/Default_Planning_Prompt_Pack_Definition.php';
+		require_once $base . '/AI/PromptPacks/Seeds/Default_Planning_Prompt_Pack_Seeder.php';
+		require_once $base . '/Storage/Repositories/Prompt_Pack_Repository.php';
+
+		$registrar = new \AIOPageBuilder\Domain\Storage\Objects\Post_Type_Registrar();
+		$registrar->register();
+
+		$repo   = new \AIOPageBuilder\Domain\Storage\Repositories\Prompt_Pack_Repository();
+		$result = \AIOPageBuilder\Domain\AI\PromptPacks\Seeds\Default_Planning_Prompt_Pack_Seeder::run( $repo );
+		if ( $result['success'] ) {
+			\update_option( Option_Names::DEFAULT_PROMPT_PACK_SEEDED_V2, '1', true );
+		}
+
+		return new Lifecycle_Result(
+			Lifecycle_Result::STATUS_SUCCESS,
+			'',
+			'seed_default_prompt_pack',
+			array(
+				'default_prompt_pack_seeded'  => $result['success'] && ! $result['skipped'],
+				'default_prompt_pack_skipped' => $result['skipped'],
+				'post_id'                     => $result['post_id'],
+				'errors'                      => $result['errors'],
 			)
 		);
 	}

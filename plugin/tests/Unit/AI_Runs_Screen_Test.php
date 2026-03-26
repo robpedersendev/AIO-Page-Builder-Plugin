@@ -41,4 +41,16 @@ final class AI_Runs_Screen_Test extends TestCase {
 	public function test_detail_screen_uses_same_slug_as_list_for_routing(): void {
 		$this->assertSame( AI_Runs_Screen::SLUG, AI_Run_Detail_Screen::SLUG );
 	}
+
+	public function test_detail_subtab_keys_are_stable(): void {
+		$this->assertSame( 'overview', AI_Run_Detail_Screen::SUBTAB_OVERVIEW );
+		$this->assertSame( 'artifacts', AI_Run_Detail_Screen::SUBTAB_ARTIFACTS );
+		$this->assertSame( 'validation', AI_Run_Detail_Screen::SUBTAB_VALIDATION );
+		$this->assertSame( 'full_prompt', AI_Run_Detail_Screen::SUBTAB_FULL_PROMPT );
+	}
+
+	public function test_onboarding_plan_redirect_query_constants_are_stable(): void {
+		$this->assertSame( 'aio_onboarding_plan', AI_Runs_Screen::QUERY_ONBOARDING_PLAN );
+		$this->assertSame( 'success', AI_Runs_Screen::ONBOARDING_PLAN_SUCCESS_VALUE );
+	}
 }

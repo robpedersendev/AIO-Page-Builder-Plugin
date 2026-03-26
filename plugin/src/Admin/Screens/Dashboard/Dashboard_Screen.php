@@ -57,7 +57,7 @@ final class Dashboard_Screen {
 	 * @return void
 	 */
 	public function render(): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the dashboard.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->get_state();
@@ -252,7 +252,7 @@ final class Dashboard_Screen {
 				<h2><?php \esc_html_e( 'AI spend (this month)', 'aio-page-builder' ); ?></h2>
 				<p class="aio-dash-hero-stat"><?php echo \esc_html( (string) ( $metrics['ai_spend_label'] ?? '$0.00 MTD' ) ); ?></p>
 				<p class="aio-dash-hero-meta">
-					<?php if ( \current_user_can( Capabilities::VIEW_AI_RUNS ) && $ai_url !== '' ) : ?>
+					<?php if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) && $ai_url !== '' ) : ?>
 						<a href="<?php echo \esc_url( $ai_url ); ?>"><?php \esc_html_e( 'Open AI workspace for runs & detail', 'aio-page-builder' ); ?></a>
 					<?php else : ?>
 						<?php \esc_html_e( 'Estimated from recorded run costs.', 'aio-page-builder' ); ?>
@@ -263,7 +263,7 @@ final class Dashboard_Screen {
 				<h2><?php \esc_html_e( 'Active build plans', 'aio-page-builder' ); ?></h2>
 				<p class="aio-dash-hero-stat"><?php echo \esc_html( (string) (int) ( $metrics['active_plans'] ?? 0 ) ); ?></p>
 				<p class="aio-dash-hero-meta">
-					<?php if ( \current_user_can( Capabilities::VIEW_BUILD_PLANS ) && $plans_url !== '' ) : ?>
+					<?php if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) && $plans_url !== '' ) : ?>
 						<a href="<?php echo \esc_url( $plans_url ); ?>"><?php \esc_html_e( 'View plans & analytics', 'aio-page-builder' ); ?></a>
 					<?php else : ?>
 						<?php \esc_html_e( 'In progress, review, or approved.', 'aio-page-builder' ); ?>
@@ -289,7 +289,7 @@ final class Dashboard_Screen {
 		<div class="aio-dash-strip">
 			<span class="dashicons <?php echo ! empty( $strip['all_ready'] ) ? 'dashicons-yes-alt' : 'dashicons-warning'; ?>" style="color:<?php echo ! empty( $strip['all_ready'] ) ? '#00a32a' : '#dba617'; ?>;" aria-hidden="true"></span>
 			<span><?php echo \esc_html( (string) ( $strip['summary'] ?? '' ) ); ?></span>
-			<?php if ( \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) && $url !== '' ) : ?>
+			<?php if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) && $url !== '' ) : ?>
 				<span><a href="<?php echo \esc_url( $url ); ?>"><?php \esc_html_e( 'Full diagnostics', 'aio-page-builder' ); ?></a></span>
 			<?php endif; ?>
 		</div>
@@ -333,7 +333,7 @@ final class Dashboard_Screen {
 					<?php \esc_html_e( 'Last AI run:', 'aio-page-builder' ); ?>
 					<?php
 					$run = $pulse['last_ai_run'] ?? null;
-					if ( is_array( $run ) && ( $run['run_id'] ?? '' ) !== '' && \current_user_can( Capabilities::VIEW_AI_RUNS ) ) {
+					if ( is_array( $run ) && ( $run['run_id'] ?? '' ) !== '' && Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) ) {
 						$run_url = \add_query_arg(
 							array(
 								'page'    => 'aio-page-builder-ai-workspace',
@@ -357,7 +357,7 @@ final class Dashboard_Screen {
 				<li>
 					<?php
 					$plans = isset( $pulse['active_build_plans'] ) && is_array( $pulse['active_build_plans'] ) ? $pulse['active_build_plans'] : array();
-					if ( count( $plans ) > 0 && \current_user_can( Capabilities::VIEW_BUILD_PLANS ) ) {
+					if ( count( $plans ) > 0 && Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
 						$first    = $plans[0];
 						$plan_key = ( ( $first['title'] ?? '' ) !== '' && ( $first['title'] ?? '' ) !== null ) ? (string) $first['title'] : (string) ( $first['plan_id'] ?? '' );
 						$purl     = \add_query_arg(
@@ -414,13 +414,13 @@ final class Dashboard_Screen {
 		?>
 		<p class="aio-dash-footer-note">
 			<?php \esc_html_e( 'Operational reporting is disclosed under', 'aio-page-builder' ); ?>
-			<?php if ( \current_user_can( Capabilities::ACCESS_SETTINGS_HUB ) && $privacy !== '' ) : ?>
+			<?php if ( Capabilities::current_user_can_for_route( Capabilities::ACCESS_SETTINGS_HUB ) && $privacy !== '' ) : ?>
 				<a href="<?php echo \esc_url( $privacy ); ?>"><?php \esc_html_e( 'Privacy & reporting', 'aio-page-builder' ); ?></a>
 			<?php else : ?>
 				<?php \esc_html_e( 'Privacy & reporting (Settings)', 'aio-page-builder' ); ?>
 			<?php endif; ?>
 			<?php
-			if ( ( \current_user_can( Capabilities::EXPORT_DATA ) || \current_user_can( Capabilities::IMPORT_DATA ) ) && $ie !== '' ) :
+			if ( ( Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA ) || Capabilities::current_user_can_for_route( Capabilities::IMPORT_DATA ) ) && $ie !== '' ) :
 				?>
 				· <a href="<?php echo \esc_url( $ie ); ?>"><?php \esc_html_e( 'Import / Export', 'aio-page-builder' ); ?></a>
 			<?php endif; ?>

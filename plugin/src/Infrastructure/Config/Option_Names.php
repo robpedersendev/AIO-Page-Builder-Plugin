@@ -30,6 +30,9 @@ final class Option_Names {
 	/** Install notification sent state (dedupe); internal, spec ?46.2. */
 	public const INSTALL_NOTICE_STATE = self::PREFIX . 'install_notice_state';
 
+	/** Default planning prompt pack seeded or confirmed present (internal; avoids repeat scans). */
+	public const DEFAULT_PROMPT_PACK_SEEDED_V2 = self::PREFIX . 'default_prompt_pack_seeded_v2';
+
 	/** Reporting log (attempts and delivery status); internal, spec ?46.12. */
 	public const REPORTING_LOG = self::PREFIX . 'reporting_log';
 

@@ -13,6 +13,8 @@ namespace AIOPageBuilder\Admin\Screens\Diagnostics;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Domain\ACF\Diagnostics\ACF_Diagnostics_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -54,7 +56,7 @@ final class ACF_Architecture_Diagnostics_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access ACF field architecture diagnostics.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->build_state();
@@ -331,12 +333,12 @@ final class ACF_Architecture_Diagnostics_Screen {
 	 * @return void
 	 */
 	private function render_repair_entry( array $state ): void {
-		if ( ! \current_user_can( $this->get_repair_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_repair_capability() ) ) {
 			return;
 		}
 		$summary         = $state['acf_diagnostics_summary'] ?? array();
 		$readiness       = (string) ( $summary['repair_readiness'] ?? 'blocked' );
-		$diagnostics_url = \add_query_arg( array( 'page' => self::SLUG ), \admin_url( 'admin.php' ) );
+		$diagnostics_url = Admin_Screen_Hub::tab_url( Diagnostics_Screen::SLUG, 'acf' );
 		?>
 		<div class="aio-acf-diagnostics-repair card" style="max-width: 800px; padding: 1em; margin: 1em 0;">
 			<h2 class="aio-acf-diagnostics-section-title"><?php \esc_html_e( 'Repair actions', 'aio-page-builder' ); ?></h2>

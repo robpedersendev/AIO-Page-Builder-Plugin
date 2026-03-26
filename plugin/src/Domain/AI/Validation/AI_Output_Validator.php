@@ -12,6 +12,9 @@ namespace AIOPageBuilder\Domain\AI\Validation;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
+
 /**
  * Runs capture → parse → top-level → item-level (shape, enum, required, internal-ref) → normalization.
  * Supports one bounded repair attempt (caller invokes repair and re-calls validate with is_repair_attempt=true).
@@ -75,6 +78,10 @@ final class AI_Output_Validator {
 			);
 		}
 
+		if ( $schema_ref === Build_Plan_Draft_Schema::SCHEMA_REF ) {
+			$parsed = $this->coerce_build_plan_draft_top_level_objects( $parsed );
+		}
+
 		// Stage 3: top-level schema check.
 		if ( $schema_ref !== Build_Plan_Draft_Schema::SCHEMA_REF ) {
 			return $this->failed_report(
@@ -125,6 +132,10 @@ final class AI_Output_Validator {
 		$state      = count( $dropped ) > 0 ? Validation_Report::STATE_PARTIAL : Validation_Report::STATE_PASSED;
 		$repair_ok  = $is_repair_attempt && ( $state === Validation_Report::STATE_PASSED || $state === Validation_Report::STATE_PARTIAL );
 
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::OUTPUT_VALIDATION_OUTCOME,
+			'schema=' . $schema_ref . ' state=' . $state . ' dropped=' . (string) count( $dropped ) . ' repair_attempt=' . ( $is_repair_attempt ? '1' : '0' )
+		);
 		return new Validation_Report(
 			$raw_status,
 			Validation_Report::PARSE_OK,
@@ -168,6 +179,45 @@ final class AI_Output_Validator {
 		}
 		$decoded = json_decode( trim( $raw_input ), true );
 		return is_array( $decoded ) ? $decoded : null;
+	}
+
+	/**
+	 * Normalizes common model mistakes: site_purpose / site_structure / confidence returned as strings instead of objects.
+	 *
+	 * @param array<string, mixed> $parsed
+	 * @return array<string, mixed>
+	 */
+	private function coerce_build_plan_draft_top_level_objects( array $parsed ): array {
+		$out = $parsed;
+
+		$sp = $out[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ] ?? null;
+		if ( $sp !== null && ! is_array( $sp ) && is_scalar( $sp ) ) {
+			$s = trim( (string) $sp );
+			if ( $s !== '' ) {
+				$out[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ] = array( 'summary' => $s );
+			}
+		}
+
+		$ss = $out[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ] ?? null;
+		if ( $ss !== null && ! is_array( $ss ) && is_scalar( $ss ) ) {
+			$s = trim( (string) $ss );
+			if ( $s !== '' ) {
+				$out[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ] = array( 'navigation_summary' => $s );
+			}
+		}
+
+		$cf = $out[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ] ?? null;
+		if ( $cf !== null && ! is_array( $cf ) && is_string( $cf ) ) {
+			$c = trim( $cf );
+			if ( $c !== '' && in_array( $c, Build_Plan_Draft_Schema::ENUM_CONFIDENCE, true ) ) {
+				$out[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ] = array(
+					'overall'       => $c,
+					'planning_mode' => 'mixed',
+				);
+			}
+		}
+
+		return $out;
 	}
 
 	/**
@@ -424,6 +474,10 @@ final class AI_Output_Validator {
 		string $blocking_stage,
 		bool $is_repair_attempt
 	): Validation_Report {
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::OUTPUT_VALIDATION_FAILED,
+			'schema=' . $schema_ref . ' stage=' . $blocking_stage . ' raw=' . $raw_status . ' parse=' . $parse_status . ' repair_attempt=' . ( $is_repair_attempt ? '1' : '0' )
+		);
 		return new Validation_Report(
 			$raw_status,
 			$parse_status,

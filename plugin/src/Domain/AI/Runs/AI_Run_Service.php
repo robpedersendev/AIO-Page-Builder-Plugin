@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Domain\AI\Runs;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Creates and persists AI runs with run metadata and categorized artifacts.
@@ -48,8 +50,10 @@ final class AI_Run_Service {
 			)
 		);
 		if ( $post_id === 0 ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::RUN_SERVICE_CREATE_FAILED, 'run_id=' . $run_id . ' status=' . $status );
 			return 0;
 		}
+		Named_Debug_Log::event( Named_Debug_Log_Event::RUN_SERVICE_CREATE, 'run_id=' . $run_id . ' post_id=' . (string) $post_id . ' status=' . $status );
 		$this->run_repository->save_run_metadata( $post_id, $metadata );
 		foreach ( $artifacts as $category => $payload ) {
 			if ( Artifact_Category_Keys::is_valid( $category ) ) {
@@ -71,8 +75,10 @@ final class AI_Run_Service {
 	public function update_run( int $post_id, string $status, array $metadata = array(), array $artifacts = array() ): bool {
 		$record = $this->run_repository->get_by_id( $post_id );
 		if ( $record === null ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::RUN_SERVICE_UPDATE_MISSING, 'post_id=' . (string) $post_id );
 			return false;
 		}
+		Named_Debug_Log::event( Named_Debug_Log_Event::RUN_SERVICE_UPDATE, 'post_id=' . (string) $post_id . ' status=' . $status );
 		$this->run_repository->save(
 			array(
 				'id'           => $post_id,
@@ -101,6 +107,7 @@ final class AI_Run_Service {
 	 * @return bool Success (true if at least one stored).
 	 */
 	public function persist_artifacts( int $post_id, array $artifacts ): bool {
+		Named_Debug_Log::event( Named_Debug_Log_Event::RUN_SERVICE_PERSIST_ARTIFACTS, 'post_id=' . (string) $post_id . ' categories=' . (string) count( $artifacts ) );
 		$ok = false;
 		foreach ( $artifacts as $category => $payload ) {
 			if ( Artifact_Category_Keys::is_valid( $category ) ) {

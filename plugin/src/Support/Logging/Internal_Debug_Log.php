@@ -1,7 +1,6 @@
 <?php
 /**
- * Writes debug lines to PHP's error log only when WP_DEBUG_LOG is enabled.
- * Uses call_user_func so static analysis matches runtime without a direct error_log() token.
+ * Legacy free-form debug line. Prefer Named_Debug_Log::event( Named_Debug_Log_Event::*, $detail ).
  *
  * @package AIOPageBuilder
  */
@@ -21,13 +20,6 @@ final class Internal_Debug_Log {
 	 * Emits one line when WordPress debug logging is active.
 	 */
 	public static function line( string $message ): void {
-		if ( ! \defined( 'WP_DEBUG' ) || ! \WP_DEBUG ) {
-			return;
-		}
-		if ( ! \defined( 'WP_DEBUG_LOG' ) || ! \WP_DEBUG_LOG ) {
-			return;
-		}
-		$payload = '[AIO Page Builder] ' . $message;
-		\call_user_func( 'error_log', $payload );
+		Named_Debug_Log::event( Named_Debug_Log_Event::INTERNAL_DEBUG_LINE, $message );
 	}
 }

@@ -17,7 +17,8 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
-use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Single and bulk approve/deny for Step 5 SEO items.
@@ -317,6 +318,6 @@ final class SEO_Bulk_Action_Service {
 			'timestamp' => gmdate( 'c' ),
 		);
 		$line  = \wp_json_encode( $entry );
-		Internal_Debug_Log::line( false !== $line ? $line : 'json_encode_failed' );
+		Named_Debug_Log::event( Named_Debug_Log_Event::BUILD_PLAN_SEO_BULK_ACTION_DEBUG, false !== $line ? $line : 'json_encode_failed' );
 	}
 }

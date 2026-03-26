@@ -12,7 +12,8 @@ namespace AIOPageBuilder\Admin\Actions;
 
 defined( 'ABSPATH' ) || exit;
 
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Override_Management_Screen;
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Build_Plan_Item_Override_Service;
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Schema;
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Page_Template_Override_Service;
@@ -33,7 +34,7 @@ final class Remove_Industry_Override_Action {
 	 * @return void
 	 */
 	public static function handle(): void {
-		$redirect = \admin_url( 'admin.php?page=' . Industry_Override_Management_Screen::SLUG );
+		$redirect = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'overrides' );
 		$sep      = strpos( $redirect, '?' ) !== false ? '&' : '?';
 
 		if ( ! isset( $_POST[ self::NONCE_NAME ] ) ||
@@ -59,21 +60,21 @@ final class Remove_Industry_Override_Action {
 
 		$ok = false;
 		if ( $target_type === Industry_Override_Schema::TARGET_TYPE_SECTION ) {
-			if ( ! \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 				\wp_safe_redirect( $redirect . $sep . 'aio_override_remove=error' );
 				exit;
 			}
 			$service = new Industry_Section_Override_Service();
 			$ok      = $service->remove_override( $target_key );
 		} elseif ( $target_type === Industry_Override_Schema::TARGET_TYPE_PAGE_TEMPLATE ) {
-			if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 				\wp_safe_redirect( $redirect . $sep . 'aio_override_remove=error' );
 				exit;
 			}
 			$service = new Industry_Page_Template_Override_Service();
 			$ok      = $service->remove_override( $target_key );
 		} elseif ( $target_type === Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM ) {
-			if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
 				\wp_safe_redirect( $redirect . $sep . 'aio_override_remove=error' );
 				exit;
 			}

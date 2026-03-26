@@ -9,7 +9,6 @@
 
 namespace AIOPageBuilder\Tests\Unit;
 
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Health_Report_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Admin\Widgets\Industry_Status_Summary_Widget;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
@@ -42,6 +41,7 @@ require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Pack_Validat
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Pack_Registry.php';
 require_once $plugin_root . '/src/Domain/Industry/Registry/Industry_Starter_Bundle_Registry.php';
 require_once $plugin_root . '/src/Domain/Industry/Reporting/Industry_Health_Check_Service.php';
+require_once $plugin_root . '/src/Admin/Admin_Screen_Hub.php';
 require_once $plugin_root . '/src/Admin/Screens/Industry/Industry_Profile_Settings_Screen.php';
 require_once $plugin_root . '/src/Admin/Screens/Industry/Industry_Health_Report_Screen.php';
 require_once $plugin_root . '/src/Infrastructure/Container/Service_Provider_Interface.php';
@@ -62,7 +62,9 @@ final class Industry_Status_Summary_Widget_Test extends TestCase {
 		$this->assertNotEmpty( $vm['profile_url'] );
 		$this->assertNotEmpty( $vm['health_url'] );
 		$this->assertStringContainsString( Industry_Profile_Settings_Screen::SLUG, $vm['profile_url'] );
-		$this->assertStringContainsString( Industry_Health_Report_Screen::SLUG, $vm['health_url'] );
+		$this->assertStringContainsString( Industry_Profile_Settings_Screen::SLUG, $vm['health_url'] );
+		$this->assertStringContainsString( 'aio_tab=reports', $vm['health_url'] );
+		$this->assertStringContainsString( 'aio_subtab=health', $vm['health_url'] );
 	}
 
 	public function test_build_view_model_with_empty_primary_returns_not_configured(): void {

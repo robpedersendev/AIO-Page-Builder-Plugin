@@ -20,6 +20,8 @@ use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Assembles provider list, credential status, model defaults, connection-test summary, last successful use, disclosure.
@@ -61,6 +63,56 @@ final class AI_Providers_UI_State_Builder {
 	}
 
 	/**
+	 * Hub-wide credential trust indicator for the AI workspace (all tabs). Uses only non-secret signals:
+	 * whether a credential exists in the segregated store and whether a connection test succeeded.
+	 * Never includes key material or values suitable for logging as secrets.
+	 *
+	 * @return array{trust_level: string, trust_level_id: string, summary: string, detail: string}
+	 */
+	public function build_credential_trust_banner(): array {
+		$provider_ids  = $this->get_known_provider_ids();
+		$any_stored    = false;
+		$any_validated = false;
+		foreach ( $provider_ids as $provider_id ) {
+			if ( ! $this->secret_store->has_credential( $provider_id ) ) {
+				continue;
+			}
+			$any_stored = true;
+			$meta       = $this->provider_state_store->get( $provider_id );
+			$last_test  = isset( $meta['last_test_status'] ) ? (string) $meta['last_test_status'] : '';
+			if ( $last_test === 'success' ) {
+				$any_validated = true;
+				break;
+			}
+		}
+
+		if ( ! $any_stored ) {
+			return array(
+				'trust_level'    => 'none',
+				'trust_level_id' => 'aio-ai-credential-trust-none',
+				'summary'        => __( 'No API credentials in secure store', 'aio-page-builder' ),
+				'detail'         => __( 'Provider keys are not stored yet, or were removed. Nothing is written to general settings exports.', 'aio-page-builder' ),
+			);
+		}
+
+		if ( $any_validated ) {
+			return array(
+				'trust_level'    => 'validated',
+				'trust_level_id' => 'aio-ai-credential-trust-validated',
+				'summary'        => __( 'Credentials stored securely and connection verified', 'aio-page-builder' ),
+				'detail'         => __( 'At least one provider has a key in the segregated credential store and a successful connection test. Keys are never shown in the UI, included in exports, or written to logs by this plugin.', 'aio-page-builder' ),
+			);
+		}
+
+		return array(
+			'trust_level'    => 'stored',
+			'trust_level_id' => 'aio-ai-credential-trust-stored',
+			'summary'        => __( 'Credentials stored securely (validation pending)', 'aio-page-builder' ),
+			'detail'         => __( 'At least one API key is saved in the plugin secure store (not exportable). Run a connection test on the Providers tab to confirm access. Keys are never shown in full or logged.', 'aio-page-builder' ),
+		);
+	}
+
+	/**
 	 * Builds full UI state for the AI Providers screen.
 	 *
 	 * @return array{provider_rows: array<int, array>, disclosure_blocks: array<int, array>, ai_runs_url: string}
@@ -79,11 +131,13 @@ final class AI_Providers_UI_State_Builder {
 			),
 			\admin_url( 'admin.php' )
 		);
-		return array(
+		$state             = array(
 			'provider_rows'     => $provider_rows,
 			'disclosure_blocks' => $disclosure_blocks,
 			'ai_runs_url'       => $ai_runs_url,
 		);
+		Named_Debug_Log::event( Named_Debug_Log_Event::PROVIDERS_UI_STATE_BUILT, 'provider_rows=' . (string) count( $provider_rows ) );
+		return $state;
 	}
 
 	/**

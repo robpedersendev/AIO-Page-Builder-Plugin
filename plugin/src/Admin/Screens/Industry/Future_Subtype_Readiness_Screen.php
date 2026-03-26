@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\ViewModels\Industry\Future_Subtype_Readiness_View_Model;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Scaffold_Completeness_Report_Service;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Scaffold_Promotion_Readiness_Report_Service;
@@ -101,11 +102,11 @@ final class Future_Subtype_Readiness_Screen {
 			}
 		}
 
-		$base  = admin_url( 'admin.php' );
+		$hub   = Industry_Profile_Settings_Screen::SLUG;
 		$links = array(
-			'author_dashboard'   => $base . '?page=' . Industry_Author_Dashboard_Screen::SLUG,
-			'subtype_comparison' => $base . '?page=' . Industry_Subtype_Comparison_Screen::SLUG,
-			'scaffold_promotion' => $base . '?page=' . Industry_Scaffold_Promotion_Readiness_Report_Screen::SLUG,
+			'author_dashboard'   => Admin_Screen_Hub::tab_url( $hub, 'author' ),
+			'subtype_comparison' => Admin_Screen_Hub::subtab_url( $hub, 'comparisons', 'subtype' ),
+			'scaffold_promotion' => Admin_Screen_Hub::subtab_url( $hub, 'reports', 'scaffold' ),
 		);
 
 		return new Future_Subtype_Readiness_View_Model(
@@ -121,7 +122,7 @@ final class Future_Subtype_Readiness_Screen {
 	 * Renders the screen. Capability enforced by menu registration.
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Future subtype readiness screen.', 'aio-page-builder' ), 403 );
 		}
 		$vm    = $this->get_view_model();

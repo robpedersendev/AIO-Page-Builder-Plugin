@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Drift_Report_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -82,7 +83,7 @@ final class Industry_Drift_Report_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Drift report.', 'aio-page-builder' ), 403 );
 		}
 		$report       = $this->get_report();
@@ -148,7 +149,7 @@ final class Industry_Drift_Report_Screen {
 			<?php endif; ?>
 
 			<p class="description" style="margin-top: 1.5em;">
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=' . Industry_Author_Dashboard_Screen::SLUG ) ); ?>"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo esc_url( Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'author' ) ); ?>"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
 			</p>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>

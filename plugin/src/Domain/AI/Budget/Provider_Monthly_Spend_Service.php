@@ -15,6 +15,9 @@ namespace AIOPageBuilder\Domain\AI\Budget;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
+
 /**
  * Records run costs and provides spend summaries per provider for the current calendar month.
  *
@@ -54,7 +57,12 @@ final class Provider_Monthly_Spend_Service {
 		}
 		$key     = $this->option_key( $provider_id );
 		$current = (float) ( \get_option( $key, 0.0 ) ?? 0.0 );
-		\update_option( $key, round( $current + $cost_usd, 10 ), false );
+		$new     = round( $current + $cost_usd, 10 );
+		\update_option( $key, $new, false );
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::MONTHLY_SPEND_RECORDED,
+			'provider=' . $provider_id . ' delta=' . (string) $cost_usd . ' month_total=' . (string) $new
+		);
 	}
 
 	// -------------------------------------------------------------------------

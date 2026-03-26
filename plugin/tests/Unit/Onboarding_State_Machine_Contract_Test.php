@@ -47,6 +47,8 @@ final class Onboarding_State_Machine_Contract_Test extends TestCase {
 		$this->assertContains( Onboarding_Statuses::STEP_COMPLETED, $step );
 		$this->assertContains( Onboarding_Statuses::STEP_SKIPPED, $step );
 		$this->assertContains( Onboarding_Statuses::STEP_BLOCKED, $step );
-		$this->assertCount( 5, $step );
+		$this->assertContains( Onboarding_Statuses::STEP_INCOMPLETE, $step );
+		$this->assertContains( Onboarding_Statuses::STEP_VISITED_INCOMPLETE, $step );
+		$this->assertCount( 7, $step );
 	}
 }

@@ -11,7 +11,9 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\PromptPacks\Seeds\Default_Planning_Prompt_Pack_Seeder;
 use AIOPageBuilder\Domain\Storage\Objects\Post_Type_Registrar;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
@@ -35,6 +37,17 @@ final class Object_Registration_Provider implements Service_Provider_Interface {
 				$container->get( 'post_type_registrar' )->register();
 			},
 			20
+		);
+
+		\add_action(
+			'init',
+			static function (): void {
+				if ( \get_option( Option_Names::DEFAULT_PROMPT_PACK_SEEDED_V2, '' ) === '1' ) {
+					return;
+				}
+				Default_Planning_Prompt_Pack_Seeder::maybe_ensure_once();
+			},
+			25
 		);
 	}
 }

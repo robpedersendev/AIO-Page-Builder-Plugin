@@ -51,4 +51,12 @@ final class Onboarding_Step_Keys {
 			self::SUBMISSION,
 		);
 	}
+
+	/**
+	 * Zero-based index in ordered() or -1 when unknown.
+	 */
+	public static function index_of( string $key ): int {
+		$pos = array_search( $key, self::ordered(), true );
+		return $pos === false ? -1 : (int) $pos;
+	}
 }

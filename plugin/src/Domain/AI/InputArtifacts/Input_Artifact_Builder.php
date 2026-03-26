@@ -12,6 +12,9 @@ namespace AIOPageBuilder\Domain\AI\InputArtifacts;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
+
 /**
  * Builds input_artifact shape from approved sources. Rejects when required keys missing or prohibited keys present.
  */
@@ -37,6 +40,7 @@ final class Input_Artifact_Builder {
 		$version      = $prompt_pack_ref[ Input_Artifact_Schema::PROMPT_PACK_REF_VERSION ] ?? null;
 		if ( $internal_key === null || $version === null || $internal_key === '' || $version === '' ) {
 			$this->last_validation_errors[] = 'prompt_pack_ref must contain internal_key and version';
+			Named_Debug_Log::event( Named_Debug_Log_Event::INPUT_ARTIFACT_BUILD_FAIL, 'artifact_id=' . $artifact_id . ' reason=prompt_pack_ref' );
 			return null;
 		}
 
@@ -90,16 +94,19 @@ final class Input_Artifact_Builder {
 		$prohibited = Input_Artifact_Schema::find_prohibited_keys_in_array( $artifact );
 		if ( $prohibited !== array() ) {
 			$this->last_validation_errors[] = 'prohibited_keys: ' . implode( ', ', $prohibited );
+			Named_Debug_Log::event( Named_Debug_Log_Event::INPUT_ARTIFACT_BUILD_FAIL, 'artifact_id=' . $artifact_id . ' reason=prohibited_keys' );
 			return null;
 		}
 
 		foreach ( Input_Artifact_Schema::required_root_keys() as $key ) {
 			if ( ! array_key_exists( $key, $artifact ) ) {
 				$this->last_validation_errors[] = 'missing_required: ' . $key;
+				Named_Debug_Log::event( Named_Debug_Log_Event::INPUT_ARTIFACT_BUILD_FAIL, 'artifact_id=' . $artifact_id . ' reason=missing_required key=' . $key );
 				return null;
 			}
 		}
 
+		Named_Debug_Log::event( Named_Debug_Log_Event::INPUT_ARTIFACT_BUILD_OK, 'artifact_id=' . $artifact_id . ' pack_key=' . (string) $internal_key );
 		return $artifact;
 	}
 

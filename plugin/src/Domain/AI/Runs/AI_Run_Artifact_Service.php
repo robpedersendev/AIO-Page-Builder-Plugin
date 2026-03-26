@@ -12,6 +12,8 @@ namespace AIOPageBuilder\Domain\AI\Runs;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository; // * Kept for downstream compatibility; service now depends on AI_Artifact_Repository_Interface.
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Stores and retrieves artifacts by run and category. Builds review-safe payloads with redaction.
@@ -30,6 +32,29 @@ final class AI_Run_Artifact_Service {
 	}
 
 	/**
+	 * Formats a run metadata value for safe HTML table output (arrays/objects as JSON; avoids array-to-string notices).
+	 *
+	 * @param mixed $value Metadata fragment.
+	 * @return string
+	 */
+	public static function format_run_metadata_value_for_display( mixed $value ): string {
+		if ( is_bool( $value ) ) {
+			return $value ? '1' : '0';
+		}
+		if ( is_int( $value ) || is_float( $value ) ) {
+			return (string) $value;
+		}
+		if ( is_string( $value ) ) {
+			return $value;
+		}
+		if ( $value === null ) {
+			return '';
+		}
+		$json = \wp_json_encode( $value );
+		return false !== $json ? $json : '';
+	}
+
+	/**
 	 * Stores an artifact payload for a run (by post ID) and category.
 	 *
 	 * @param int    $run_post_id Run post ID.
@@ -39,9 +64,14 @@ final class AI_Run_Artifact_Service {
 	 */
 	public function store( int $run_post_id, string $category, mixed $payload ): bool {
 		if ( ! Artifact_Category_Keys::is_valid( $category ) ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ARTIFACT_STORE, 'post_id=' . (string) $run_post_id . ' category=invalid ok=0' );
 			return false;
 		}
-		return $this->run_repository->save_artifact_payload( $run_post_id, $category, $payload );
+		$ok = $this->run_repository->save_artifact_payload( $run_post_id, $category, $payload );
+		if ( ! $ok ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ARTIFACT_STORE, 'post_id=' . (string) $run_post_id . ' category=' . $category . ' ok=0' );
+		}
+		return $ok;
 	}
 
 	/**

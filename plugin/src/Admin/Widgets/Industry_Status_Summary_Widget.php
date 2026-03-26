@@ -12,7 +12,7 @@ namespace AIOPageBuilder\Admin\Widgets;
 
 defined( 'ABSPATH' ) || exit;
 
-use AIOPageBuilder\Admin\Screens\Industry\Industry_Health_Report_Screen;
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Profile_Settings_Screen;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Readiness_Result;
@@ -184,7 +184,7 @@ final class Industry_Status_Summary_Widget {
 	}
 
 	private static function health_url(): string {
-		return (string) \add_query_arg( array( 'page' => Industry_Health_Report_Screen::SLUG ), \admin_url( 'admin.php' ) );
+		return Admin_Screen_Hub::subtab_url( Industry_Profile_Settings_Screen::SLUG, 'reports', 'health' );
 	}
 
 	/**
@@ -194,7 +194,7 @@ final class Industry_Status_Summary_Widget {
 	 * @return void
 	 */
 	public static function render( Service_Container $container ): void {
-		if ( ! \current_user_can( self::get_required_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( self::get_required_capability() ) ) {
 			return;
 		}
 		$vm = self::build_view_model( $container );

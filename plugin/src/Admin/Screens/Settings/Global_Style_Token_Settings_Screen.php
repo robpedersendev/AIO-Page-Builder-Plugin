@@ -46,12 +46,47 @@ final class Global_Style_Token_Settings_Screen {
 	}
 
 	/**
+	 * Save/reset POST redirect for admin_init (Admin_Early_Redirect_Coordinator).
+	 *
+	 * @return string|null
+	 */
+	public function get_post_redirect_url(): ?string {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
+			return null;
+		}
+		$repo = $this->get_repository();
+		if ( $repo === null ) {
+			return null;
+		}
+		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::SAVE_ACTION ) {
+			if ( isset( $_POST[ self::NONCE_SAVE ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_SAVE ] ) ), self::NONCE_SAVE ) ) {
+				$raw_tokens = array();
+				if ( isset( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] ) && is_array( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] ) ) {
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then passed to collect_tokens_from_raw which sanitizes.
+					$raw_tokens = \wp_unslash( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] );
+				}
+				$tokens = $this->collect_tokens_from_raw( $raw_tokens );
+				$ok     = $repo->set_global_tokens( $tokens );
+				$msg    = $ok ? 'success' : 'error';
+				return \add_query_arg( self::QUERY_MSG, $msg, $this->get_settings_url() );
+			}
+		}
+		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::RESET_ACTION ) {
+			if ( isset( $_POST[ self::NONCE_RESET ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_RESET ] ) ), self::NONCE_RESET ) ) {
+				$repo->reset_to_defaults();
+				return \add_query_arg( self::QUERY_MSG, 'reset', $this->get_settings_url() );
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Renders the screen. Enforces capability; processes POST save/reset then redirects or outputs form.
 	 *
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage global style settings.', 'aio-page-builder' ), 403 );
 		}
 
@@ -65,31 +100,6 @@ final class Global_Style_Token_Settings_Screen {
 				echo '<div class="wrap"><p>' . \esc_html__( 'Global style settings are unavailable.', 'aio-page-builder' ) . '</p></div>';
 			}
 			return;
-		}
-
-		// * Process save: POST with nonce and SAVE_ACTION.
-		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::SAVE_ACTION ) {
-			if ( isset( $_POST[ self::NONCE_SAVE ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_SAVE ] ) ), self::NONCE_SAVE ) ) {
-				$raw_tokens = array();
-				if ( isset( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] ) && is_array( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] ) ) {
-					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then passed to collect_tokens_from_raw which sanitizes.
-					$raw_tokens = \wp_unslash( $_POST[ Global_Style_Token_Form_Builder::FORM_TOKENS_KEY ] );
-				}
-				$tokens = $this->collect_tokens_from_raw( $raw_tokens );
-				$ok     = $repo->set_global_tokens( $tokens );
-				$msg    = $ok ? 'success' : 'error';
-				\wp_safe_redirect( \add_query_arg( self::QUERY_MSG, $msg, $this->get_settings_url() ) );
-				exit;
-			}
-		}
-
-		// * Process reset: POST with nonce and RESET_ACTION.
-		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::RESET_ACTION ) {
-			if ( isset( $_POST[ self::NONCE_RESET ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_RESET ] ) ), self::NONCE_RESET ) ) {
-				$repo->reset_to_defaults();
-				\wp_safe_redirect( \add_query_arg( self::QUERY_MSG, 'reset', $this->get_settings_url() ) );
-				exit;
-			}
 		}
 
 		$message  = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';

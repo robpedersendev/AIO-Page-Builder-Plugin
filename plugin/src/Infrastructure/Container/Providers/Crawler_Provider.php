@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\Crawler\Classification\Crawl_Template_Family_Matcher;
 use AIOPageBuilder\Domain\Crawler\Classification\Duplicate_Detector;
 use AIOPageBuilder\Domain\Crawler\Classification\Meaningful_Page_Classifier;
+use AIOPageBuilder\Domain\Crawler\Execution\Crawl_Run_Processor;
 use AIOPageBuilder\Domain\Crawler\Discovery\URL_Discovery_Service;
 use AIOPageBuilder\Domain\Crawler\Extraction\Content_Summary_Extractor;
 use AIOPageBuilder\Domain\Crawler\Comparison\Recrawl_Comparison_Service;
@@ -122,6 +123,23 @@ final class Crawler_Provider implements Service_Provider_Interface {
 			'content_summary_extractor',
 			function (): Content_Summary_Extractor {
 				return new Content_Summary_Extractor();
+			}
+		);
+		$container->register(
+			'crawl_run_processor',
+			function () use ( $container ): Crawl_Run_Processor {
+				return new Crawl_Run_Processor(
+					$container->get( 'crawl_snapshot_service' ),
+					$container->get( 'crawl_profile_service' ),
+					$container->get( 'url_discovery_service' ),
+					$container->get( 'html_fetcher' ),
+					$container->get( 'meaningful_page_classifier' ),
+					$container->get( 'navigation_extractor' ),
+					$container->get( 'content_summary_extractor' ),
+					$container->get( 'url_normalizer' ),
+					$container->get( 'fetch_request_policy' ),
+					$container->get( 'crawl_enqueue_service' )
+				);
 			}
 		);
 		$container->register(

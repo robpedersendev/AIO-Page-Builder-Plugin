@@ -64,43 +64,64 @@ final class Crawler_Sessions_Screen {
 	 *
 	 * @return void
 	 */
-	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
-			\wp_die( \esc_html__( 'You do not have permission to view crawl sessions.', 'aio-page-builder' ), 403 );
-		}
-		$this->maybe_handle_actions();
-		$run_id = isset( $_GET['run_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['run_id'] ) ) : '';
-		if ( $run_id !== '' ) {
-			$this->render_detail( $run_id );
-			return;
-		}
-		$this->render_list( $embed_in_hub );
-	}
-
-	private function maybe_handle_actions(): void {
+	/**
+	 * POST start/retry crawl redirect for admin_init (Admin_Early_Redirect_Coordinator).
+	 *
+	 * @return string|null
+	 */
+	public function get_post_redirect_url(): ?string {
 		$action = isset( $_POST['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['action'] ) ) : '';
 		if ( $action === '' ) {
-			return;
+			return null;
 		}
-		if ( ! \current_user_can( Capabilities::RUN_ONBOARDING ) ) {
-			return;
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
+			return $this->build_redirect_with_notice( 'error', \__( 'You do not have permission to start or retry crawls.', 'aio-page-builder' ) );
 		}
 		if ( ! $this->container || ! $this->container->has( 'crawl_enqueue_service' ) ) {
-			return;
+			return $this->build_redirect_with_notice( 'error', \__( 'Crawler services are not available.', 'aio-page-builder' ) );
 		}
 		$svc = $this->container->get( 'crawl_enqueue_service' );
 		if ( $action === 'aio_pb_start_crawl' ) {
 			\check_admin_referer( 'aio_pb_start_crawl' );
 			$profile_key = isset( $_POST['crawl_profile_key'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['crawl_profile_key'] ) ) : '';
 			$out         = $svc->enqueue_start( array( 'crawl_profile_key' => $profile_key ), 'user:' . (string) \get_current_user_id() );
-			$this->redirect_with_notice( $out['success'] ? 'success' : 'error', (string) $out['message'] );
+			return $this->build_redirect_with_notice( $out['success'] ? 'success' : 'error', (string) $out['message'] );
 		}
 		if ( $action === 'aio_pb_retry_crawl' ) {
 			$crawl_id = isset( $_POST['crawl_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['crawl_id'] ) ) : '';
 			\check_admin_referer( 'aio_pb_retry_crawl_' . $crawl_id );
 			$out = $svc->enqueue_retry( $crawl_id, 'user:' . (string) \get_current_user_id() );
-			$this->redirect_with_notice( $out['success'] ? 'success' : 'error', (string) $out['message'] );
+			return $this->build_redirect_with_notice( $out['success'] ? 'success' : 'error', (string) $out['message'] );
 		}
+		return null;
+	}
+
+	/**
+	 * @param string $status success|error.
+	 * @param string $message Notice message.
+	 * @return string
+	 */
+	private function build_redirect_with_notice( string $status, string $message ): string {
+		return \add_query_arg(
+			array(
+				'page'              => self::SLUG,
+				'aio_crawl_status'  => $status,
+				'aio_crawl_message' => $message,
+			),
+			\admin_url( 'admin.php' )
+		);
+	}
+
+	public function render( bool $embed_in_hub = false ): void {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
+			\wp_die( \esc_html__( 'You do not have permission to view crawl sessions.', 'aio-page-builder' ), 403 );
+		}
+		$run_id = isset( $_GET['run_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['run_id'] ) ) : '';
+		if ( $run_id !== '' ) {
+			$this->render_detail( $run_id );
+			return;
+		}
+		$this->render_list( $embed_in_hub );
 	}
 
 	private function render_list( bool $embed_in_hub = false ): void {
@@ -193,19 +214,6 @@ final class Crawler_Sessions_Screen {
 		</div>
 		<?php endif; ?>
 		<?php
-	}
-
-	private function redirect_with_notice( string $status, string $message ): void {
-		$url = \add_query_arg(
-			array(
-				'page'              => self::SLUG,
-				'aio_crawl_status'  => $status,
-				'aio_crawl_message' => $message,
-			),
-			\admin_url( 'admin.php' )
-		);
-		\wp_safe_redirect( $url );
-		exit;
 	}
 
 	private function render_notice(): void {

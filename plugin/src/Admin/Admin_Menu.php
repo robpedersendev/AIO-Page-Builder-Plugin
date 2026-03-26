@@ -58,7 +58,8 @@ use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Config\Settings_Seeding_Capability_Bridge;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
-use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Registers admin menu and submenus. Screen rendering is delegated to screen classes.
@@ -161,7 +162,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
 			exit;
 		}
@@ -280,7 +281,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
 			exit;
 		}
@@ -325,7 +326,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
 			exit;
 		}
@@ -402,7 +403,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
@@ -435,7 +436,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
@@ -472,7 +473,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
@@ -520,7 +521,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Invalid request.', $redirect ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::IMPORT_DATA ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::IMPORT_DATA ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Permission denied.', $redirect ) );
 			exit;
 		}
@@ -529,7 +530,10 @@ final class Admin_Menu {
 		$upload_result = Industry_Bundle_Upload_Validator::validate_upload( $file );
 		if ( ! $upload_result['ok'] ) {
 			if ( $upload_result['log_reason'] !== '' ) {
-				\AIOPageBuilder\Support\Logging\Internal_Debug_Log::line( 'Industry bundle upload rejected: ' . (string) ( $upload_result['log_reason'] ?? '' ) );
+				Named_Debug_Log::event(
+					Named_Debug_Log_Event::ADMIN_MENU_INDUSTRY_BUNDLE_UPLOAD_REJECT,
+					(string) ( $upload_result['log_reason'] ?? '' )
+				);
 			}
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', \rawurlencode( $upload_result['user_message'] ), $redirect ) );
 			exit;
@@ -540,7 +544,10 @@ final class Admin_Menu {
 		);
 		if ( $parse_result['bundle'] === null ) {
 			if ( $parse_result['log_reason'] !== '' ) {
-				\AIOPageBuilder\Support\Logging\Internal_Debug_Log::line( 'Industry bundle upload rejected: ' . (string) ( $parse_result['log_reason'] ?? '' ) );
+				Named_Debug_Log::event(
+					Named_Debug_Log_Event::ADMIN_MENU_INDUSTRY_BUNDLE_PARSE_REJECT,
+					(string) ( $parse_result['log_reason'] ?? '' )
+				);
 			}
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', \rawurlencode( $parse_result['user_message'] ), $redirect ) );
 			exit;
@@ -590,7 +597,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Invalid request.', $redirect ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_preview_error', 'Permission denied.', $redirect ) );
 			exit;
 		}
@@ -649,9 +656,9 @@ final class Admin_Menu {
 	 * @return bool
 	 */
 	private function current_user_can_settings_hub_form_templates_seed(): bool {
-		return \current_user_can( Capabilities::MANAGE_SETTINGS )
-			|| ( \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES )
-				&& \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) );
+		return Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS )
+			|| ( Capabilities::current_user_can_for_route( Capabilities::MANAGE_SECTION_TEMPLATES )
+				&& Capabilities::current_user_can_for_route( Capabilities::MANAGE_PAGE_TEMPLATES ) );
 	}
 
 	/**
@@ -660,8 +667,8 @@ final class Admin_Menu {
 	 * @return bool
 	 */
 	private function current_user_can_settings_hub_section_batch_seed(): bool {
-		return \current_user_can( Capabilities::MANAGE_SETTINGS )
-			|| \current_user_can( Capabilities::MANAGE_SECTION_TEMPLATES );
+		return Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS )
+			|| Capabilities::current_user_can_for_route( Capabilities::MANAGE_SECTION_TEMPLATES );
 	}
 
 	/**
@@ -670,8 +677,8 @@ final class Admin_Menu {
 	 * @return bool
 	 */
 	private function current_user_can_settings_hub_page_batch_seed(): bool {
-		return \current_user_can( Capabilities::MANAGE_SETTINGS )
-			|| \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES );
+		return Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS )
+			|| Capabilities::current_user_can_for_route( Capabilities::MANAGE_PAGE_TEMPLATES );
 	}
 
 	/**
@@ -680,9 +687,9 @@ final class Admin_Menu {
 	 * @return bool
 	 */
 	private function current_user_can_settings_hub_page_and_composition_batch_seed(): bool {
-		return \current_user_can( Capabilities::MANAGE_SETTINGS )
-			|| ( \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES )
-				&& \current_user_can( Capabilities::MANAGE_COMPOSITIONS ) );
+		return Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS )
+			|| ( Capabilities::current_user_can_for_route( Capabilities::MANAGE_PAGE_TEMPLATES )
+				&& Capabilities::current_user_can_for_route( Capabilities::MANAGE_COMPOSITIONS ) );
 	}
 
 	/**
@@ -731,7 +738,7 @@ final class Admin_Menu {
 		}
 		try {
 			if ( ! $this->container->has( 'section_registry_service' ) || ! $this->container->has( 'page_template_repository' ) ) {
-				Internal_Debug_Log::line( 'seed_form_templates: section_registry_service or page_template_repository not registered' );
+				Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_MENU_SEED_FORM_TEMPLATES_NOT_REGISTERED, '' );
 				\wp_safe_redirect( $redirect_error );
 				exit;
 			}
@@ -758,7 +765,7 @@ final class Admin_Menu {
 			);
 			exit;
 		} catch ( \Throwable $e ) {
-			Internal_Debug_Log::line( 'seed_form_templates failed: ' . $e->getMessage() );
+			Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_MENU_SEED_FORM_TEMPLATES_EXCEPTION, $e->getMessage() );
 			\wp_safe_redirect( $redirect_error );
 			exit;
 		}
@@ -791,7 +798,7 @@ final class Admin_Menu {
 			Capabilities::MANAGE_SECTION_TEMPLATES
 		);
 		if ( ! $result['success'] && ! empty( $result['errors'] ) ) {
-			Internal_Debug_Log::line( 'seed_section_expansion_pack: ' . implode( '; ', $result['errors'] ) );
+			Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_MENU_SEED_SECTION_EXPANSION_ERRORS, implode( '; ', $result['errors'] ) );
 		}
 		$query         = $result['success'] ? 'aio_expansion_seed_result=success' : 'aio_expansion_seed_result=error';
 		$redirect_args = array();
@@ -1472,10 +1479,10 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_seed_all_section_result' => 'success' ) );
 		}
 		if ( ! empty( $bulk['errors'] ) ) {
-			Internal_Debug_Log::line( 'seed_all_section_templates: ' . implode( '; ', $bulk['errors'] ) );
+			Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_MENU_SEED_ALL_SECTION_TEMPLATES_ERRORS, implode( '; ', $bulk['errors'] ) );
 		}
 		if ( $bulk['failed_step'] !== '' ) {
-			Internal_Debug_Log::line( 'seed_all_section_templates failed_step: ' . $bulk['failed_step'] );
+			Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_MENU_SEED_ALL_SECTION_TEMPLATES_STEP, 'failed_step=' . (string) $bulk['failed_step'] );
 		}
 		$this->redirect_settings_section_page_seeding( $err );
 	}
@@ -1513,10 +1520,10 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_seed_all_page_result' => 'success' ) );
 		}
 		if ( ! empty( $bulk['errors'] ) ) {
-			Internal_Debug_Log::line( 'seed_all_page_templates: ' . implode( '; ', $bulk['errors'] ) );
+			Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_ERRORS, implode( '; ', $bulk['errors'] ) );
 		}
 		if ( $bulk['failed_step'] !== '' ) {
-			Internal_Debug_Log::line( 'seed_all_page_templates failed_step: ' . $bulk['failed_step'] );
+			Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_STEP, 'failed_step=' . (string) $bulk['failed_step'] );
 		}
 		$this->redirect_settings_section_page_seeding( $err );
 	}

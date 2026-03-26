@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Industry\Export\Industry_Pack_Bundle_Service;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Pack_Registry;
@@ -117,6 +118,26 @@ final class Industry_Bundle_Import_Preview_Screen {
 	}
 
 	/**
+	 * Clear preview (GET): redirect URL for admin_init (Admin_Early_Redirect_Coordinator).
+	 *
+	 * @return string|null
+	 */
+	public function get_clear_preview_redirect_url(): ?string {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
+			return null;
+		}
+		$uid           = \get_current_user_id();
+		$transient_key = \sprintf( self::TRANSIENT_PREVIEW, $uid );
+		$clear_nonce   = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! isset( $_GET['aio_bundle_cancel'] ) || $clear_nonce === '' || ! \wp_verify_nonce( $clear_nonce, self::NONCE_ACTION_CLEAR ) || ! \get_transient( $transient_key ) ) {
+			return null;
+		}
+		\delete_transient( $transient_key );
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( (string) $_SERVER['REQUEST_URI'] ) ) : '';
+		return \remove_query_arg( array( 'aio_bundle_cancel', '_wpnonce' ), $request_uri );
+	}
+
+	/**
 	 * Returns preview state from transient or default state for upload form.
 	 *
 	 * @return array<string, mixed>
@@ -124,15 +145,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 	private function get_state(): array {
 		$uid           = \get_current_user_id();
 		$transient_key = \sprintf( self::TRANSIENT_PREVIEW, $uid );
-		// * Clear preview: state-changing; requires nonce (SPR-007).
-		$clear_nonce = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ) : '';
-		if ( isset( $_GET['aio_bundle_cancel'] ) && $clear_nonce !== '' && \wp_verify_nonce( $clear_nonce, self::NONCE_ACTION_CLEAR ) && \get_transient( $transient_key ) ) {
-			\delete_transient( $transient_key );
-			$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( (string) $_SERVER['REQUEST_URI'] ) ) : '';
-			\wp_safe_redirect( \remove_query_arg( array( 'aio_bundle_cancel', '_wpnonce' ), $request_uri ) );
-			exit;
-		}
-		$preview = \get_transient( $transient_key );
+		$preview       = \get_transient( $transient_key );
 		if ( \is_array( $preview ) && ! empty( $preview['bundle'] ) ) {
 			return array(
 				'preview'       => true,
@@ -155,7 +168,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the industry bundle import preview.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->get_state();
@@ -192,9 +205,9 @@ final class Industry_Bundle_Import_Preview_Screen {
 		$included    = $state['included'];
 		$summary     = $state['summary'];
 		$bundle      = $state['bundle'];
-		$preview_url = \admin_url( 'admin.php?page=' . self::SLUG );
+		$preview_url = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'import' );
 		$cancel_url  = \wp_nonce_url( \add_query_arg( 'aio_bundle_cancel', '1', $preview_url ), self::NONCE_ACTION_CLEAR );
-		$can_apply   = \current_user_can( Capabilities::MANAGE_SETTINGS );
+		$can_apply   = Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS );
 		?>
 		<section class="aio-bundle-preview-summary" style="margin: 1.5em 0;">
 			<h2><?php \esc_html_e( 'Bundle summary', 'aio-page-builder' ); ?></h2>

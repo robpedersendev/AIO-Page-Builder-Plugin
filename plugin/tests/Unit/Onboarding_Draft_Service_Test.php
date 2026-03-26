@@ -38,6 +38,7 @@ final class Onboarding_Draft_Service_Test extends TestCase {
 		$this->assertSame( Onboarding_Draft_Service::DRAFT_VERSION, $draft['version'] );
 		$this->assertSame( Onboarding_Statuses::NOT_STARTED, $draft['overall_status'] );
 		$this->assertSame( Onboarding_Step_Keys::WELCOME, $draft['current_step_key'] );
+		$this->assertSame( 0, $draft['furthest_step_index'] );
 		$this->assertIsArray( $draft['step_statuses'] );
 		$this->assertArrayHasKey( Onboarding_Step_Keys::REVIEW, $draft['step_statuses'] );
 		$this->assertArrayNotHasKey( 'api_key', $draft );

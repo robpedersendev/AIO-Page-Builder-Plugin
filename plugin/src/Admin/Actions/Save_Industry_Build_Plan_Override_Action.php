@@ -37,7 +37,7 @@ final class Save_Industry_Build_Plan_Override_Action {
 			\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_plan_override=error' );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
 			\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_plan_override=error' );
 			exit;
 		}

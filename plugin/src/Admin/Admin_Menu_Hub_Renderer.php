@@ -59,6 +59,7 @@ use AIOPageBuilder\Admin\Screens\Settings\Global_Style_Token_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Bootstrap\Capability_Registrar;
+use AIOPageBuilder\Domain\AI\UI\AI_Providers_UI_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
@@ -688,7 +689,7 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	public function render_settings_hub(): void {
-		if ( ! \current_user_can( Capabilities::ACCESS_SETTINGS_HUB ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::ACCESS_SETTINGS_HUB ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access these settings.', 'aio-page-builder' ), 403 );
 		}
 		$tabs    = array(
@@ -707,7 +708,7 @@ final class Admin_Menu_Hub_Renderer {
 		);
 		$default = Admin_Screen_Hub::first_accessible_tab( 'general', $tabs );
 		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
-		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
+		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
 		$general_subtabs = array(
@@ -732,7 +733,7 @@ final class Admin_Menu_Hub_Renderer {
 			} else {
 				$sub_default = Admin_Screen_Hub::first_accessible_tab( Settings_Screen::SETTINGS_SUBTAB_OVERVIEW, $general_subtabs );
 				$subtab      = Admin_Screen_Hub::current_subtab( $sub_default, array_keys( $general_subtabs ) );
-				if ( ! isset( $general_subtabs[ $subtab ] ) || ! \current_user_can( $general_subtabs[ $subtab ]['cap'] ) ) {
+				if ( ! isset( $general_subtabs[ $subtab ] ) || ! Capabilities::current_user_can_for_route( $general_subtabs[ $subtab ]['cap'] ) ) {
 					$subtab = $sub_default;
 				}
 				Admin_Screen_Hub::render_subnav_tabs( Settings_Screen::SLUG, 'general', $general_subtabs, $subtab );
@@ -749,7 +750,7 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	public function render_diagnostics_hub(): void {
-		if ( ! \current_user_can( $this->diagnostics->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->diagnostics->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access diagnostics.', 'aio-page-builder' ), 403 );
 		}
 		$tabs    = array(
@@ -768,7 +769,7 @@ final class Admin_Menu_Hub_Renderer {
 		);
 		$default = Admin_Screen_Hub::first_accessible_tab( 'overview', $tabs );
 		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
-		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
+		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
 		?>
@@ -794,7 +795,7 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	public function render_onboarding_hub(): void {
-		if ( ! \current_user_can( Capabilities::ACCESS_ONBOARDING_WORKSPACE ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::ACCESS_ONBOARDING_WORKSPACE ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access onboarding.', 'aio-page-builder' ), 403 );
 		}
 		$tabs    = array(
@@ -828,46 +829,80 @@ final class Admin_Menu_Hub_Renderer {
 	}
 
 	/**
-	 * AI workspace hub (runs, providers, experiments).
+	 * AI workspace hub (providers, runs, experiments).
 	 *
 	 * @return void
 	 */
 	public function render_ai_workspace_hub(): void {
-		if ( ! \current_user_can( Capabilities::ACCESS_AI_WORKSPACE ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::ACCESS_AI_WORKSPACE ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access this workspace.', 'aio-page-builder' ), 403 );
 		}
+		$cap_map = Admin_Screen_Hub::ai_workspace_tab_caps();
 		$tabs    = array(
-			'ai_runs'     => array(
-				'label' => $this->ai_runs->get_title(),
-				'cap'   => Capabilities::VIEW_AI_RUNS,
-			),
 			'providers'   => array(
 				'label' => $this->ai_providers->get_title(),
-				'cap'   => $this->ai_providers->get_capability(),
+				'cap'   => $cap_map['providers'],
+			),
+			'ai_runs'     => array(
+				'label' => $this->ai_runs->get_title(),
+				'cap'   => $cap_map['ai_runs'],
 			),
 			'experiments' => array(
 				'label' => $this->prompt_experiments->get_title(),
-				'cap'   => $this->prompt_experiments->get_capability(),
+				'cap'   => $cap_map['experiments'],
 			),
 		);
-		$default = Admin_Screen_Hub::first_accessible_tab( 'ai_runs', $tabs );
+		$default = Admin_Screen_Hub::first_accessible_tab( 'providers', $tabs );
 		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
-		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
+		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'AI', 'aio-page-builder' ); ?></h1>
 			<?php Admin_Screen_Hub::render_nav_tabs( AI_Runs_Screen::HUB_PAGE_SLUG, $tabs, $tab ); ?>
+			<?php $this->render_ai_workspace_credential_trust_banner(); ?>
 			<?php
 			if ( $tab === 'providers' ) {
 				$this->ai_providers->render( true );
+			} elseif ( $tab === 'ai_runs' ) {
+				$this->ai_runs->render( true );
 			} elseif ( $tab === 'experiments' ) {
 				$this->prompt_experiments->render( true );
 			} else {
-				$this->ai_runs->render( true );
+				$this->ai_providers->render( true );
 			}
 			?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Non-secret indicator: whether credentials exist in the segregated store and whether a connection test passed.
+	 *
+	 * @return void
+	 */
+	private function render_ai_workspace_credential_trust_banner(): void {
+		if ( ! $this->container || ! $this->container->has( 'ai_providers_ui_state_builder' ) ) {
+			return;
+		}
+		$builder = $this->container->get( 'ai_providers_ui_state_builder' );
+		if ( ! $builder instanceof AI_Providers_UI_State_Builder ) {
+			return;
+		}
+		$trust = $builder->build_credential_trust_banner();
+		$level = isset( $trust['trust_level'] ) ? (string) $trust['trust_level'] : 'none';
+		$tid   = isset( $trust['trust_level_id'] ) ? (string) $trust['trust_level_id'] : 'aio-ai-credential-trust-none';
+		?>
+		<div
+			class="aio-ai-credential-trust-banner notice inline"
+			role="status"
+			id="<?php echo \esc_attr( $tid ); ?>"
+			data-aio-ai-credential-trust="<?php echo \esc_attr( $level ); ?>"
+			data-aio-ai-credential-trust-id="<?php echo \esc_attr( $tid ); ?>"
+		>
+			<p class="aio-ai-credential-trust-summary"><?php echo \esc_html( (string) ( $trust['summary'] ?? '' ) ); ?></p>
+			<p class="aio-ai-credential-trust-detail"><?php echo \esc_html( (string) ( $trust['detail'] ?? '' ) ); ?></p>
 		</div>
 		<?php
 	}
@@ -878,7 +913,7 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	public function render_crawler_hub(): void {
-		if ( ! \current_user_can( $this->crawler_sessions->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->crawler_sessions->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the crawler.', 'aio-page-builder' ), 403 );
 		}
 		$tabs    = array(
@@ -893,7 +928,7 @@ final class Admin_Menu_Hub_Renderer {
 		);
 		$default = Admin_Screen_Hub::first_accessible_tab( 'sessions', $tabs );
 		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
-		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
+		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
 		?>
@@ -917,7 +952,7 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	public function render_plans_hub(): void {
-		if ( ! \current_user_can( Capabilities::ACCESS_PLANS_WORKSPACE ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::ACCESS_PLANS_WORKSPACE ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access this workspace.', 'aio-page-builder' ), 403 );
 		}
 		$tabs    = array(
@@ -936,7 +971,7 @@ final class Admin_Menu_Hub_Renderer {
 		);
 		$default = Admin_Screen_Hub::first_accessible_tab( 'build_plans', $tabs );
 		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
-		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
+		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
 		?>
@@ -991,7 +1026,7 @@ final class Admin_Menu_Hub_Renderer {
 			}
 		}
 
-		if ( $accessible_keys === array() && \current_user_can( 'manage_options' ) ) {
+		if ( $accessible_keys === array() && Capabilities::current_user_can_for_route( 'manage_options' ) ) {
 			Capability_Registrar::register();
 			$uid = (int) \get_current_user_id();
 			if ( $uid > 0 && \function_exists( 'clean_user_cache' ) ) {
@@ -1047,7 +1082,7 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	public function render_operations_hub(): void {
-		if ( ! \current_user_can( $this->queue_logs->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->queue_logs->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access operations.', 'aio-page-builder' ), 403 );
 		}
 		$tabs    = array(
@@ -1066,7 +1101,7 @@ final class Admin_Menu_Hub_Renderer {
 		);
 		$default = Admin_Screen_Hub::first_accessible_tab( 'queue', $tabs );
 		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
-		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
+		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
 		?>
@@ -1092,7 +1127,7 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	public function render_industry_hub(): void {
-		if ( ! \current_user_can( Capabilities::ACCESS_INDUSTRY_WORKSPACE ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::ACCESS_INDUSTRY_WORKSPACE ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access industry tools.', 'aio-page-builder' ), 403 );
 		}
 		$primary         = array(
@@ -1131,7 +1166,7 @@ final class Admin_Menu_Hub_Renderer {
 		);
 		$default_primary = Admin_Screen_Hub::first_accessible_tab( 'profile', $primary );
 		$tab             = Admin_Screen_Hub::current_tab( $default_primary, array_keys( $primary ) );
-		if ( ! isset( $primary[ $tab ] ) || ! \current_user_can( $primary[ $tab ]['cap'] ) ) {
+		if ( ! isset( $primary[ $tab ] ) || ! Capabilities::current_user_can_for_route( $primary[ $tab ]['cap'] ) ) {
 			$tab = $default_primary;
 		}
 
@@ -1192,13 +1227,13 @@ final class Admin_Menu_Hub_Renderer {
 		if ( $tab === 'reports' ) {
 			$default_sub = Admin_Screen_Hub::first_accessible_tab( 'health', $report_subs );
 			$subtab      = Admin_Screen_Hub::current_subtab( $default_sub, array_keys( $report_subs ) );
-			if ( ! isset( $report_subs[ $subtab ] ) || ! \current_user_can( $report_subs[ $subtab ]['cap'] ) ) {
+			if ( ! isset( $report_subs[ $subtab ] ) || ! Capabilities::current_user_can_for_route( $report_subs[ $subtab ]['cap'] ) ) {
 				$subtab = $default_sub;
 			}
 		} elseif ( $tab === 'comparisons' ) {
 			$default_sub = Admin_Screen_Hub::first_accessible_tab( 'subtype', $compare_subs );
 			$subtab      = Admin_Screen_Hub::current_subtab( $default_sub, array_keys( $compare_subs ) );
-			if ( ! isset( $compare_subs[ $subtab ] ) || ! \current_user_can( $compare_subs[ $subtab ]['cap'] ) ) {
+			if ( ! isset( $compare_subs[ $subtab ] ) || ! Capabilities::current_user_can_for_route( $compare_subs[ $subtab ]['cap'] ) ) {
 				$subtab = $default_sub;
 			}
 		}
@@ -1265,7 +1300,7 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	public function render_styling_hub(): void {
-		if ( ! \current_user_can( $this->global_style_tokens->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->global_style_tokens->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access global styling.', 'aio-page-builder' ), 403 );
 		}
 		$tabs    = array(
@@ -1280,7 +1315,7 @@ final class Admin_Menu_Hub_Renderer {
 		);
 		$default = Admin_Screen_Hub::first_accessible_tab( 'tokens', $tabs );
 		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
-		if ( ! isset( $tabs[ $tab ] ) || ! \current_user_can( $tabs[ $tab ]['cap'] ) ) {
+		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
 		?>

@@ -18,6 +18,7 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Diff_Service;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Factory;
@@ -25,7 +26,8 @@ use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
-use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Renders profile snapshot history list and restore actions.
@@ -79,7 +81,7 @@ final class Profile_Snapshot_History_Panel {
 	 * @return void
 	 */
 	public function handle_restore(): void {
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to restore profile snapshots.', 'aio-page-builder' ), 403 );
 		}
 
@@ -89,7 +91,7 @@ final class Profile_Snapshot_History_Panel {
 		}
 
 		$snapshot_id = isset( $_POST['snapshot_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['snapshot_id'] ) ) : '';
-		$redirect    = \admin_url( 'admin.php?page=' . self::SLUG );
+		$redirect    = Admin_Screen_Hub::tab_url( Onboarding_Screen::SLUG, 'snapshots' );
 
 		if ( $snapshot_id === '' ) {
 			\wp_safe_redirect( \add_query_arg( 'restore_error', 'missing_id', $redirect ) );
@@ -145,7 +147,7 @@ final class Profile_Snapshot_History_Panel {
 				'restored_at'      => \gmdate( 'c' ),
 			)
 		);
-		Internal_Debug_Log::line( false !== $payload ? $payload : 'json_encode_failed' );
+		Named_Debug_Log::event( Named_Debug_Log_Event::PROFILE_SNAPSHOT_RESTORE_DEBUG, false !== $payload ? $payload : 'json_encode_failed' );
 
 		\wp_safe_redirect( \add_query_arg( 'restore_success', '1', $redirect ) );
 		exit;
@@ -161,7 +163,7 @@ final class Profile_Snapshot_History_Panel {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ) );
 		}
 

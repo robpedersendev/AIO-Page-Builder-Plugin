@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace AIOPageBuilder\Admin;
 
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -18,6 +20,19 @@ final class Admin_Screen_Hub {
 
 	public const QUERY_TAB    = 'aio_tab';
 	public const QUERY_SUBTAB = 'aio_subtab';
+
+	/**
+	 * AI workspace hub: tab id => capability (order: providers, ai_runs, experiments — keep sync with render_ai_workspace_hub).
+	 *
+	 * @return array<string, string>
+	 */
+	public static function ai_workspace_tab_caps(): array {
+		return array(
+			'ai_runs'     => Capabilities::VIEW_AI_RUNS,
+			'providers'   => Capabilities::MANAGE_AI_PROVIDERS,
+			'experiments' => Capabilities::MANAGE_AI_PROVIDERS,
+		);
+	}
 
 	/**
 	 * Resolves a tab key from the request with a whitelist.
@@ -95,7 +110,7 @@ final class Admin_Screen_Hub {
 	 * @param string                                           $page_slug Hub page slug.
 	 * @param array<string, array{label: string, cap: string}> $tabs Tab definitions keyed by tab id.
 	 * @param string                                           $current   Active tab id.
-	 * @param callable(string): bool|null                      $user_can_tab Optional cap check; defaults to current_user_can.
+	 * @param callable(string): bool|null                      $user_can_tab Optional cap check; defaults to Capabilities::current_user_can_for_route.
 	 * @return void
 	 */
 	public static function render_nav_tabs( string $page_slug, array $tabs, string $current, ?callable $user_can_tab = null ): void {
@@ -120,12 +135,13 @@ final class Admin_Screen_Hub {
 	 * @param string                                           $tab       Primary tab id (fixed in URLs).
 	 * @param array<string, array{label: string, cap: string}> $tabs Sub-tab definitions.
 	 * @param string                                           $current   Active sub-tab id.
-	 * @param callable(string): bool|null                      $user_can_tab Optional cap check; defaults to current_user_can.
+	 * @param callable(string): bool|null                      $user_can_tab Optional cap check; defaults to Capabilities::current_user_can_for_route.
+	 * @param array<string, scalar|\Stringable>                $extra_query_args Merged into every subtab link (e.g. run_id for detail views).
 	 * @return void
 	 */
-	public static function render_subnav_tabs( string $page_slug, string $tab, array $tabs, string $current, ?callable $user_can_tab = null ): void {
+	public static function render_subnav_tabs( string $page_slug, string $tab, array $tabs, string $current, ?callable $user_can_tab = null, array $extra_query_args = array() ): void {
 		$can = $user_can_tab ?? static function ( string $cap ): bool {
-			return \current_user_can( $cap );
+			return \AIOPageBuilder\Infrastructure\Config\Capabilities::current_user_can_for_route( $cap );
 		};
 		echo '<h3 class="nav-tab-wrapper aio-nav-subtab-wrapper" style="margin-top:0.5em;padding-top:0.5em;border-top:1px solid #c3c4c7;">';
 		foreach ( $tabs as $key => $info ) {
@@ -133,7 +149,7 @@ final class Admin_Screen_Hub {
 				continue;
 			}
 			$active = ( $current === $key ) ? ' nav-tab-active' : '';
-			echo '<a href="' . \esc_url( self::subtab_url( $page_slug, $tab, $key ) ) . '" class="nav-tab' . \esc_attr( $active ) . '">' . \esc_html( $info['label'] ) . '</a>';
+			echo '<a href="' . \esc_url( self::subtab_url( $page_slug, $tab, $key, $extra_query_args ) ) . '" class="nav-tab' . \esc_attr( $active ) . '">' . \esc_html( $info['label'] ) . '</a>';
 		}
 		echo '</h3>';
 	}

@@ -18,7 +18,8 @@ namespace AIOPageBuilder\Domain\Storage\Profile;
 
 defined( 'ABSPATH' ) || exit;
 
-use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Registers WordPress action hooks to trigger snapshot capture on profile lifecycle events.
@@ -104,9 +105,9 @@ final class Profile_Snapshot_Capture_Service {
 					'saved'       => $saved,
 				)
 			);
-			Internal_Debug_Log::line( false !== $payload ? $payload : 'json_encode_failed' );
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROFILE_SNAPSHOT_CAPTURE_DEBUG, false !== $payload ? $payload : 'json_encode_failed' );
 		} catch ( \Throwable $e ) {
-			Internal_Debug_Log::line( 'profile_snapshot_capture_failed source=' . $source . ' error=' . $e->getMessage() );
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROFILE_SNAPSHOT_CAPTURE_DEBUG, 'capture_failed source=' . $source . ' error=' . $e->getMessage() );
 		}
 	}
 }

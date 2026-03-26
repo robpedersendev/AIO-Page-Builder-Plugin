@@ -17,6 +17,8 @@ use AIOPageBuilder\Domain\AI\Providers\Provider_Capability_Resolver;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Request_Context_Builder;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Performs a minimal request to verify provider reachability and credential validity.
@@ -57,8 +59,10 @@ final class Provider_Connection_Test_Service {
 	 */
 	public function run_test( AI_Provider_Interface $driver ): Provider_Connection_Test_Result {
 		$provider_id = $driver->get_provider_id();
-		$model       = $this->capability_resolver->resolve_default_model_for_connection_test( $driver );
+		Named_Debug_Log::event( Named_Debug_Log_Event::CONNECTION_TEST_START, 'provider=' . $provider_id );
+		$model = $this->capability_resolver->resolve_default_model_for_connection_test( $driver );
 		if ( $model === null || $model === '' ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::CONNECTION_TEST_NO_MODEL, 'provider=' . $provider_id );
 			$result = new Provider_Connection_Test_Result(
 				false,
 				$provider_id,
@@ -102,6 +106,7 @@ final class Provider_Connection_Test_Service {
 				'Connection successful.'
 			);
 			$this->persist_result( $provider_id, $result, $tested_at );
+			Named_Debug_Log::event( Named_Debug_Log_Event::CONNECTION_TEST_OUTCOME, 'provider=' . $provider_id . ' ok=1 model=' . (string) ( $response['model_used'] ?? $model ) );
 			return $result;
 		}
 
@@ -118,6 +123,8 @@ final class Provider_Connection_Test_Service {
 			$user_message
 		);
 		$this->persist_result( $provider_id, $result, null );
+		$cat = isset( $normalized_error['category'] ) && is_string( $normalized_error['category'] ) ? $normalized_error['category'] : 'unknown';
+		Named_Debug_Log::event( Named_Debug_Log_Event::CONNECTION_TEST_OUTCOME, 'provider=' . $provider_id . ' ok=0 category=' . $cat );
 		return $result;
 	}
 
@@ -184,6 +191,7 @@ final class Provider_Connection_Test_Service {
 	 * @return void
 	 */
 	public function record_last_successful_use( string $provider_id, string $timestamp ): void {
+		Named_Debug_Log::event( Named_Debug_Log_Event::CONNECTION_LAST_SUCCESS_RECORDED, 'provider=' . $provider_id );
 		$health = $this->settings->get( Option_Names::PROVIDER_HEALTH_STATE );
 		if ( ! is_array( $health ) ) {
 			$health = array();

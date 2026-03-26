@@ -16,6 +16,8 @@ use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Assembles everything the onboarding screen needs to render: step list, current step, blocked state, prefill, nonce.
@@ -93,25 +95,30 @@ final class Onboarding_UI_State_Builder {
 		// When resuming from draft_saved, treat as in_progress for UI.
 		$effective_status = $overall_status === Onboarding_Statuses::DRAFT_SAVED ? Onboarding_Statuses::IN_PROGRESS : $overall_status;
 
-		$step_statuses = $draft['step_statuses'] ?? array();
-		$labels        = self::step_labels();
-		$steps         = array();
+		$labels   = self::step_labels();
+		$profile  = $prefill['profile'] ?? array();
+		$profile  = is_array( $profile ) ? $profile : array();
+		$furthest = isset( $draft['furthest_step_index'] ) ? (int) $draft['furthest_step_index'] : 0;
+		$cur_idx  = Onboarding_Step_Keys::index_of( $current_step_key );
+		$furthest = max( $furthest, $cur_idx >= 0 ? $cur_idx : 0 );
+		$steps    = array();
 		foreach ( Onboarding_Step_Keys::ordered() as $key ) {
+			$idx     = Onboarding_Step_Keys::index_of( $key );
 			$steps[] = array(
-				'key'        => $key,
-				'label'      => $labels[ $key ] ?? $key,
-				'status'     => $step_statuses[ $key ] ?? Onboarding_Statuses::STEP_NOT_STARTED,
-				'is_current' => $key === $current_step_key,
+				'key'         => $key,
+				'label'       => $labels[ $key ] ?? $key,
+				'status'      => Onboarding_Step_Readiness::display_status_for_step( $key, $current_step_key, $profile, $this->prefill_service, $furthest ),
+				'is_current'  => $key === $current_step_key,
+				'is_jumpable' => $key !== $current_step_key && $idx >= 0 && $idx <= $furthest,
 			);
 		}
 
 		$is_provider_ready = $this->prefill_service->is_provider_ready();
 		$is_at_review      = $current_step_key === Onboarding_Step_Keys::REVIEW;
-		$is_blocked        = $is_at_review && ! $is_provider_ready;
-		$blockers          = array();
-		if ( $is_at_review && ! $is_provider_ready ) {
-			$blockers[] = __( 'Configure an AI provider to continue.', 'aio-page-builder' );
-		}
+		$at_submission     = $current_step_key === Onboarding_Step_Keys::SUBMISSION;
+		$review_blockers   = Onboarding_Step_Readiness::get_review_blockers( $profile, $this->prefill_service );
+		$is_blocked        = ( $is_at_review || $at_submission ) && count( $review_blockers ) > 0;
+		$blockers          = ( $is_at_review || $at_submission ) ? $review_blockers : array();
 
 		$resume_message = $overall_status === Onboarding_Statuses::DRAFT_SAVED
 			? __( 'You have saved draft progress. You can continue below.', 'aio-page-builder' )
@@ -138,6 +145,10 @@ final class Onboarding_UI_State_Builder {
 		);
 
 		$state = $this->append_industry_question_pack_state( $state );
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::ONBOARDING_UI_STATE_BUILT,
+			'step=' . (string) ( $state['current_step_key'] ?? '' ) . ' provider_ready=' . ( ! empty( $state['is_provider_ready'] ) ? '1' : '0' ) . ' blocked=' . ( ! empty( $state['is_blocked'] ) ? '1' : '0' )
+		);
 		return $state;
 	}
 

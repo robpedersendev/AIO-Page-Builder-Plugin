@@ -46,7 +46,7 @@ final class Form_Provider_Health_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access form provider health.', 'aio-page-builder' ), 403 );
 		}
 		$summary = $this->build_summary();

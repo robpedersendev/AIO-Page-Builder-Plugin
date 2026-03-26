@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\ViewModels\Industry\Conversion_Goal_Preview_Influence_View_Model;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
@@ -87,8 +88,8 @@ final class Conversion_Goal_Comparison_Screen {
 		if ( $simulation_service === null ) {
 			return array(
 				'scenarios'            => array(),
-				'profile_url'          => admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
-				'current_url'          => admin_url( 'admin.php?page=' . self::SLUG ),
+				'profile_url'          => Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'profile' ),
+				'current_url'          => Admin_Screen_Hub::subtab_url( Industry_Profile_Settings_Screen::SLUG, 'comparisons', 'goal' ),
 				'alternate_goal_param' => self::PARAM_ALTERNATE_GOAL_KEY,
 				'error'                => 'missing_simulation_service',
 				'industry_loaded'      => $industry_loaded,
@@ -152,8 +153,8 @@ final class Conversion_Goal_Comparison_Screen {
 
 		return array(
 			'scenarios'            => $scenarios,
-			'profile_url'          => admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
-			'current_url'          => admin_url( 'admin.php?page=' . self::SLUG ),
+			'profile_url'          => Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'profile' ),
+			'current_url'          => Admin_Screen_Hub::subtab_url( Industry_Profile_Settings_Screen::SLUG, 'comparisons', 'goal' ),
 			'alternate_goal_param' => self::PARAM_ALTERNATE_GOAL_KEY,
 			'error'                => null,
 		);
@@ -165,7 +166,7 @@ final class Conversion_Goal_Comparison_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the conversion goal comparison screen.', 'aio-page-builder' ), 403 );
 		}
 		$state     = $this->get_state();
@@ -182,13 +183,15 @@ final class Conversion_Goal_Comparison_Screen {
 			<?php if ( isset( $state['error'] ) && $state['error'] === 'missing_simulation_service' ) : ?>
 				<div class="notice notice-warning inline" style="margin: 1em 0;" role="alert">
 					<p><?php esc_html_e( 'Conversion goal comparison is not available. The industry subsystem or comparison service is not loaded.', 'aio-page-builder' ); ?></p>
-					<p><a href="<?php echo esc_url( $state['profile_url'] ?? admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ) ); ?>"><?php esc_html_e( 'Industry Profile', 'aio-page-builder' ); ?></a></p>
+					<p><a href="<?php echo esc_url( $state['profile_url'] ?? Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'profile' ) ); ?>"><?php esc_html_e( 'Industry Profile', 'aio-page-builder' ); ?></a></p>
 				</div>
 				<?php return; ?>
 			<?php endif; ?>
 
-			<form method="get" action="<?php echo esc_url( $state['current_url'] ); ?>" class="aio-goal-comparison-form" style="margin: 1em 0;">
-				<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG ); ?>" />
+			<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" class="aio-goal-comparison-form" style="margin: 1em 0;">
+				<input type="hidden" name="page" value="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" />
+				<input type="hidden" name="<?php echo esc_attr( Admin_Screen_Hub::QUERY_TAB ); ?>" value="comparisons" />
+				<input type="hidden" name="<?php echo esc_attr( Admin_Screen_Hub::QUERY_SUBTAB ); ?>" value="goal" />
 				<label for="aio-alternate-goal-key"><?php esc_html_e( 'Compare with alternate goal key (optional)', 'aio-page-builder' ); ?></label>
 				<input type="text" id="aio-alternate-goal-key" name="<?php echo esc_attr( $state['alternate_goal_param'] ); ?>" value="<?php echo esc_attr( isset( $_GET[ self::PARAM_ALTERNATE_GOAL_KEY ] ) && is_string( $_GET[ self::PARAM_ALTERNATE_GOAL_KEY ] ) ? sanitize_text_field( wp_unslash( $_GET[ self::PARAM_ALTERNATE_GOAL_KEY ] ) ) : '' ); ?>" placeholder="<?php esc_attr_e( 'e.g. bookings, lead_capture', 'aio-page-builder' ); ?>" style="width: 100%; max-width: 280px; margin-right: 0.5em;" />
 				<button type="submit" class="button button-secondary"><?php esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>

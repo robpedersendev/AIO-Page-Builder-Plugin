@@ -108,4 +108,14 @@ final class Capabilities_Test extends TestCase {
 		$this->assertTrue( Capabilities::current_user_can_for_route( Capabilities::VIEW_LOGS ) );
 		unset( $GLOBALS['_aio_current_user_can_caps'] );
 	}
+
+	public function test_current_user_can_for_route_grants_plugin_caps_to_site_admin_without_primitive(): void {
+		unset( $GLOBALS['_aio_current_user_can_return'] );
+		$GLOBALS['_aio_is_logged_in']          = true;
+		$GLOBALS['_aio_current_user_can_caps'] = array(
+			'manage_options' => true,
+		);
+		$this->assertTrue( Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) );
+		unset( $GLOBALS['_aio_current_user_can_caps'], $GLOBALS['_aio_is_logged_in'] );
+	}
 }

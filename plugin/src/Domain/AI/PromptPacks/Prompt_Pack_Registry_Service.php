@@ -11,6 +11,9 @@ namespace AIOPageBuilder\Domain\AI\PromptPacks;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
+
 /**
  * Retrieves prompt packs from repository; filters by status, pack_type, schema_target_ref, provider compatibility.
  * Exposes planning guidance content for template-family and CTA-law injection (Prompt 210, template-family-planning-prompt-pack-addendum).
@@ -86,8 +89,12 @@ final class Prompt_Pack_Registry_Service {
 			if ( $provider_id !== null && ! $this->pack_supports_provider( $pack, $provider_id ) ) {
 				continue;
 			}
+			$key = (string) ( $pack[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' );
+			$ver = (string) ( $pack[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '' );
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROMPT_PACK_SELECT_RESULT, 'found=1 schema=' . $schema_target_ref . ' key=' . $key . ' version=' . $ver . ' provider=' . ( $provider_id ?? 'null' ) );
 			return $pack;
 		}
+		Named_Debug_Log::event( Named_Debug_Log_Event::PROMPT_PACK_SELECT_RESULT, 'found=0 schema=' . $schema_target_ref . ' provider=' . ( $provider_id ?? 'null' ) );
 		return null;
 	}
 

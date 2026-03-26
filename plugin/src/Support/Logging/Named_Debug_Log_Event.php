@@ -1,0 +1,155 @@
+<?php
+/**
+ * Master registry of named debug-log event ids (grep-friendly). Add a new const here for each new log site.
+ *
+ * String values use AIO_<DOMAIN>_<FEATURE>_<ACTION>. Prefer grouping comments by domain.
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Support\Logging;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Unique string per log call site. Do not reuse the same const for different behaviors.
+ */
+final class Named_Debug_Log_Event {
+
+	// -------------------------------------------------------------------------
+	// AI — onboarding planning orchestrator
+	// -------------------------------------------------------------------------
+	public const ORCHESTRATOR_SUBMIT_ENTER               = 'AIO_AI_ORCHESTRATOR_SUBMIT_ENTER';
+	public const ORCHESTRATOR_BLOCKED_NOT_SUBMISSION     = 'AIO_AI_ORCHESTRATOR_BLOCKED_NOT_SUBMISSION';
+	public const ORCHESTRATOR_BLOCKED_PROVIDER_NOT_READY = 'AIO_AI_ORCHESTRATOR_BLOCKED_PROVIDER_NOT_READY';
+	public const ORCHESTRATOR_BLOCKED_NO_PROVIDER        = 'AIO_AI_ORCHESTRATOR_BLOCKED_NO_PROVIDER';
+	public const ORCHESTRATOR_SPEND_CAP_BLOCKED          = 'AIO_AI_ORCHESTRATOR_SPEND_CAP_BLOCKED';
+	public const ORCHESTRATOR_BLOCKED_DRIVER_UNAVAILABLE = 'AIO_AI_ORCHESTRATOR_BLOCKED_DRIVER_UNAVAILABLE';
+	public const ORCHESTRATOR_PROMPT_PACK_SELECTED       = 'AIO_AI_ORCHESTRATOR_PROMPT_PACK_SELECTED';
+	public const ORCHESTRATOR_BLOCKED_NO_PROMPT_PACK     = 'AIO_AI_ORCHESTRATOR_BLOCKED_NO_PROMPT_PACK';
+	public const ORCHESTRATOR_INPUT_ARTIFACT_FAILED      = 'AIO_AI_ORCHESTRATOR_INPUT_ARTIFACT_FAILED';
+	public const ORCHESTRATOR_INPUT_ARTIFACT_BUILT       = 'AIO_AI_ORCHESTRATOR_INPUT_ARTIFACT_BUILT';
+	public const ORCHESTRATOR_PROMPT_PACKAGE_FAILED      = 'AIO_AI_ORCHESTRATOR_PROMPT_PACKAGE_FAILED';
+	public const ORCHESTRATOR_PROMPT_PACKAGE_BUILT       = 'AIO_AI_ORCHESTRATOR_PROMPT_PACKAGE_BUILT';
+	public const ORCHESTRATOR_BLOCKED_NO_MODEL           = 'AIO_AI_ORCHESTRATOR_BLOCKED_NO_MODEL';
+	public const ORCHESTRATOR_PROVIDER_CALL              = 'AIO_AI_ORCHESTRATOR_PROVIDER_CALL';
+	public const ORCHESTRATOR_RUN_COMPLETED              = 'AIO_AI_ORCHESTRATOR_RUN_COMPLETED';
+	public const ORCHESTRATOR_RUN_FAILED_VALIDATION      = 'AIO_AI_ORCHESTRATOR_RUN_FAILED_VALIDATION';
+	public const ORCHESTRATOR_RUN_PROVIDER_FAILED        = 'AIO_AI_ORCHESTRATOR_RUN_PROVIDER_FAILED';
+
+	// AI — provider driver
+	public const PROVIDER_REQUEST_START             = 'AIO_AI_PROVIDER_REQUEST_START';
+	public const PROVIDER_NO_CREDENTIAL             = 'AIO_AI_PROVIDER_NO_CREDENTIAL';
+	public const PROVIDER_CREDENTIAL_RESOLVE_FAILED = 'AIO_AI_PROVIDER_CREDENTIAL_RESOLVE_FAILED';
+	public const PROVIDER_REQUEST_EXCEPTION         = 'AIO_AI_PROVIDER_REQUEST_EXCEPTION';
+	public const PROVIDER_RAW_RESPONSE_INVALID      = 'AIO_AI_PROVIDER_RAW_RESPONSE_INVALID';
+	public const PROVIDER_RESPONSE_SUCCESS          = 'AIO_AI_PROVIDER_RESPONSE_SUCCESS';
+	public const PROVIDER_RESPONSE_ERROR            = 'AIO_AI_PROVIDER_RESPONSE_ERROR';
+
+	// AI — failover
+	public const FAILOVER_NO_ATTEMPT                  = 'AIO_AI_FAILOVER_NO_ATTEMPT';
+	public const FAILOVER_FALLBACK_DRIVER_MISSING     = 'AIO_AI_FAILOVER_FALLBACK_DRIVER_MISSING';
+	public const FAILOVER_FALLBACK_SCHEMA_UNSUPPORTED = 'AIO_AI_FAILOVER_FALLBACK_SCHEMA_UNSUPPORTED';
+	public const FAILOVER_FALLBACK_NO_MODEL           = 'AIO_AI_FAILOVER_FALLBACK_NO_MODEL';
+	public const FAILOVER_FALLBACK_REQUEST            = 'AIO_AI_FAILOVER_FALLBACK_REQUEST';
+	public const FAILOVER_FALLBACK_SUCCESS            = 'AIO_AI_FAILOVER_FALLBACK_SUCCESS';
+	public const FAILOVER_FALLBACK_FAILED             = 'AIO_AI_FAILOVER_FALLBACK_FAILED';
+
+	// AI — prompt packs & input artifact
+	public const PROMPT_PACK_SELECT_RESULT = 'AIO_AI_PROMPT_PACK_SELECT_RESULT';
+	public const PROMPT_PACKAGE_BUILD_OK   = 'AIO_AI_PROMPT_PACKAGE_BUILD_OK';
+	public const PROMPT_PACKAGE_BUILD_FAIL = 'AIO_AI_PROMPT_PACKAGE_BUILD_FAIL';
+	public const INPUT_ARTIFACT_BUILD_OK   = 'AIO_AI_INPUT_ARTIFACT_BUILD_OK';
+	public const INPUT_ARTIFACT_BUILD_FAIL = 'AIO_AI_INPUT_ARTIFACT_BUILD_FAIL';
+
+	// AI — validation
+	public const OUTPUT_VALIDATION_FAILED  = 'AIO_AI_OUTPUT_VALIDATION_FAILED';
+	public const OUTPUT_VALIDATION_OUTCOME = 'AIO_AI_OUTPUT_VALIDATION_OUTCOME';
+
+	// AI — runs & artifacts
+	public const RUN_SERVICE_CREATE            = 'AIO_AI_RUN_SERVICE_CREATE';
+	public const RUN_SERVICE_CREATE_FAILED     = 'AIO_AI_RUN_SERVICE_CREATE_FAILED';
+	public const RUN_SERVICE_UPDATE            = 'AIO_AI_RUN_SERVICE_UPDATE';
+	public const RUN_SERVICE_UPDATE_MISSING    = 'AIO_AI_RUN_SERVICE_UPDATE_MISSING';
+	public const RUN_SERVICE_PERSIST_ARTIFACTS = 'AIO_AI_RUN_SERVICE_PERSIST_ARTIFACTS';
+	public const ARTIFACT_STORE                = 'AIO_AI_ARTIFACT_STORE';
+	public const ARTIFACT_META_PERSIST_FAILED  = 'AIO_AI_ARTIFACT_META_PERSIST_FAILED';
+
+	// AI — onboarding draft / prefill / UI
+	public const ONBOARDING_DRAFT_SAVE     = 'AIO_AI_ONBOARDING_DRAFT_SAVE';
+	public const ONBOARDING_DRAFT_CLEAR    = 'AIO_AI_ONBOARDING_DRAFT_CLEAR';
+	public const ONBOARDING_PREFILL_BUILT  = 'AIO_AI_ONBOARDING_PREFILL_BUILT';
+	public const ONBOARDING_UI_STATE_BUILT = 'AIO_AI_ONBOARDING_UI_STATE_BUILT';
+
+	// AI — connection test
+	public const CONNECTION_TEST_START            = 'AIO_AI_CONNECTION_TEST_START';
+	public const CONNECTION_TEST_NO_MODEL         = 'AIO_AI_CONNECTION_TEST_NO_MODEL';
+	public const CONNECTION_TEST_OUTCOME          = 'AIO_AI_CONNECTION_TEST_OUTCOME';
+	public const CONNECTION_LAST_SUCCESS_RECORDED = 'AIO_AI_CONNECTION_LAST_SUCCESS_RECORDED';
+
+	// AI — experiments
+	public const EXPERIMENT_DEFINITION_SAVED            = 'AIO_AI_EXPERIMENT_DEFINITION_SAVED';
+	public const EXPERIMENT_DEFINITION_SAVE_FAILED      = 'AIO_AI_EXPERIMENT_DEFINITION_SAVE_FAILED';
+	public const EXPERIMENT_DEFINITION_DELETED          = 'AIO_AI_EXPERIMENT_DEFINITION_DELETED';
+	public const EXPERIMENT_DEFINITION_DELETE_NOT_FOUND = 'AIO_AI_EXPERIMENT_DEFINITION_DELETE_NOT_FOUND';
+	public const EXPERIMENT_RUN_RECORDED                = 'AIO_AI_EXPERIMENT_RUN_RECORDED';
+
+	// AI — budget
+	public const MONTHLY_SPEND_RECORDED = 'AIO_AI_MONTHLY_SPEND_RECORDED';
+
+	// AI — seeding
+	public const DEFAULT_PROMPT_PACK_SEED_RESULT = 'AIO_AI_DEFAULT_PROMPT_PACK_SEED_RESULT';
+
+	// AI — provider UI state
+	public const PROVIDERS_UI_STATE_BUILT = 'AIO_AI_PROVIDERS_UI_STATE_BUILT';
+	public const PROVIDER_STATE_MERGED    = 'AIO_AI_PROVIDER_STATE_MERGED';
+
+	// AI / profile snapshot
+	public const PROFILE_SNAPSHOT_CAPTURE_DEBUG = 'AIO_AI_PROFILE_SNAPSHOT_CAPTURE_DEBUG';
+	public const PROFILE_SNAPSHOT_RESTORE_DEBUG = 'AIO_AI_PROFILE_SNAPSHOT_RESTORE_DEBUG';
+
+	// AI — admin screens
+	public const ADMIN_ONBOARDING_TRACE                   = 'AIO_AI_ADMIN_ONBOARDING_TRACE';
+	public const ADMIN_ONBOARDING_UI_STATE_ERROR          = 'AIO_AI_ADMIN_ONBOARDING_UI_STATE_ERROR';
+	public const ADMIN_AI_PROVIDER_CONNECTION_TEST_POST   = 'AIO_AI_ADMIN_PROVIDER_CONNECTION_TEST_POST';
+	public const ADMIN_AI_PROVIDER_CREDENTIAL_UPDATE_POST = 'AIO_AI_ADMIN_PROVIDER_CREDENTIAL_UPDATE_POST';
+	public const ADMIN_AI_PROVIDER_SPEND_CAP_SAVE_POST    = 'AIO_AI_ADMIN_PROVIDER_SPEND_CAP_SAVE_POST';
+
+	// -------------------------------------------------------------------------
+	// Build Plan
+	// -------------------------------------------------------------------------
+	public const BUILD_PLAN_WORKSPACE_UI_STATE_DEBUG = 'AIO_BUILD_PLAN_WORKSPACE_UI_STATE_DEBUG';
+	public const BUILD_PLAN_WORKSPACE_FINALIZE       = 'AIO_BUILD_PLAN_WORKSPACE_FINALIZE';
+	public const BUILD_PLAN_SEO_BULK_ACTION_DEBUG    = 'AIO_BUILD_PLAN_SEO_BULK_ACTION_DEBUG';
+	public const BUILD_PLAN_DESIGN_TOKEN_BULK_DEBUG  = 'AIO_BUILD_PLAN_DESIGN_TOKEN_BULK_DEBUG';
+
+	// -------------------------------------------------------------------------
+	// Admin — menu / template seeding / industry bundle
+	// -------------------------------------------------------------------------
+	public const ADMIN_MENU_INDUSTRY_BUNDLE_UPLOAD_REJECT      = 'AIO_ADMIN_MENU_INDUSTRY_BUNDLE_UPLOAD_REJECT';
+	public const ADMIN_MENU_INDUSTRY_BUNDLE_PARSE_REJECT       = 'AIO_ADMIN_MENU_INDUSTRY_BUNDLE_PARSE_REJECT';
+	public const ADMIN_MENU_SEED_FORM_TEMPLATES_NOT_REGISTERED = 'AIO_ADMIN_MENU_SEED_FORM_TEMPLATES_NOT_REGISTERED';
+	public const ADMIN_MENU_SEED_FORM_TEMPLATES_EXCEPTION      = 'AIO_ADMIN_MENU_SEED_FORM_TEMPLATES_EXCEPTION';
+	public const ADMIN_MENU_SEED_SECTION_EXPANSION_ERRORS      = 'AIO_ADMIN_MENU_SEED_SECTION_EXPANSION_ERRORS';
+	public const ADMIN_MENU_SEED_ALL_SECTION_TEMPLATES_ERRORS  = 'AIO_ADMIN_MENU_SEED_ALL_SECTION_TEMPLATES_ERRORS';
+	public const ADMIN_MENU_SEED_ALL_SECTION_TEMPLATES_STEP    = 'AIO_ADMIN_MENU_SEED_ALL_SECTION_TEMPLATES_STEP';
+	public const ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_ERRORS     = 'AIO_ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_ERRORS';
+	public const ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_STEP       = 'AIO_ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_STEP';
+
+	// -------------------------------------------------------------------------
+	// Admin — routing / redirects
+	// -------------------------------------------------------------------------
+	public const ADMIN_EARLY_REDIRECT_DEBUG = 'AIO_ADMIN_EARLY_REDIRECT_DEBUG';
+
+	// -------------------------------------------------------------------------
+	// Crawler
+	// -------------------------------------------------------------------------
+	public const CRAWL_RUN_PROCESSOR_FAILED = 'AIO_CRAWL_RUN_PROCESSOR_FAILED';
+
+	// -------------------------------------------------------------------------
+	// Generic (prefer a domain-specific const above)
+	// -------------------------------------------------------------------------
+	public const INTERNAL_DEBUG_LINE = 'AIO_INTERNAL_DEBUG_LINE';
+}

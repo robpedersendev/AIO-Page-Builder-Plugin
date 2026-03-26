@@ -13,6 +13,8 @@ namespace AIOPageBuilder\Domain\AI\PromptPacks;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\InputArtifacts\Input_Artifact_Schema;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Assembles system_prompt and user_message from pack segments and resolved placeholders.
@@ -35,17 +37,20 @@ final class Normalized_Prompt_Package_Builder {
 		$version      = (string) ( $selected_pack[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '' );
 		if ( $internal_key === '' || $version === '' ) {
 			$errors[] = 'selected_pack missing internal_key or version';
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROMPT_PACKAGE_BUILD_FAIL, 'reason=pack_identity errors=' . (string) \wp_json_encode( $errors ) );
 			return new Prompt_Package_Result( false, null, $errors, $selected_pack );
 		}
 
 		$segments = $selected_pack[ Prompt_Pack_Schema::ROOT_SEGMENTS ] ?? array();
 		if ( ! is_array( $segments ) || empty( $segments[ Prompt_Pack_Schema::SEGMENT_SYSTEM_BASE ] ) ) {
 			$errors[] = 'selected_pack missing required segments.system_base';
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROMPT_PACKAGE_BUILD_FAIL, 'reason=segments key=' . $internal_key . ' errors=' . (string) \wp_json_encode( $errors ) );
 			return new Prompt_Package_Result( false, null, $errors, $selected_pack );
 		}
 
 		$placeholder_values = $this->resolve_placeholders( $selected_pack, $input_artifact, $errors );
 		if ( $errors !== array() ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::PROMPT_PACKAGE_BUILD_FAIL, 'reason=placeholders key=' . $internal_key . ' errors=' . (string) \wp_json_encode( $errors ) );
 			return new Prompt_Package_Result( false, null, $errors, $selected_pack );
 		}
 
@@ -121,6 +126,7 @@ final class Normalized_Prompt_Package_Builder {
 			),
 		);
 
+		Named_Debug_Log::event( Named_Debug_Log_Event::PROMPT_PACKAGE_BUILD_OK, 'key=' . $internal_key . ' version=' . $version );
 		return new Prompt_Package_Result( true, $package, array(), $selected_pack );
 	}
 
@@ -143,6 +149,7 @@ final class Normalized_Prompt_Package_Builder {
 		$registry_summary  = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_REGISTRY ] ?? array() );
 		$goal_text         = $this->extract_goal( $input_artifact );
 		$planning_guidance = $this->extract_planning_guidance( $input_artifact );
+		$industry_summary  = $this->summarize_section( $input_artifact[ Input_Artifact_Schema::ROOT_INDUSTRY_CONTEXT ] ?? array() );
 
 		$values = array(
 			'{{profile_summary}}'          => $profile_summary,
@@ -150,6 +157,7 @@ final class Normalized_Prompt_Package_Builder {
 			'{{registry_summary}}'         => $registry_summary,
 			'{{goal}}'                     => $goal_text,
 			'{{goal_or_intent}}'           => $goal_text,
+			'{{industry_context_summary}}' => $industry_summary,
 			'{{template_family_guidance}}' => $planning_guidance['template_family_guidance'],
 			'{{cta_law_rules}}'            => $planning_guidance['cta_law_rules'],
 			'{{hierarchy_role_guidance}}'  => $planning_guidance['hierarchy_role_guidance'],

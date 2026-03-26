@@ -64,8 +64,12 @@ final class Section_Template_Detail_Screen {
 		);
 
 		$entity_style_last_result = null;
-		if ( $section_key !== '' && $this->process_entity_style_save( $section_key, $entity_style_last_result ) ) {
-			return;
+		if ( $section_key !== '' ) {
+			$url = $this->resolve_entity_style_save_redirect( $section_key, $entity_style_last_result );
+			if ( $url !== null ) {
+				\wp_safe_redirect( $url );
+				exit;
+			}
 		}
 
 		$state_builder = $this->get_state_builder();
@@ -510,22 +514,39 @@ final class Section_Template_Detail_Screen {
 	private const ENTITY_STYLE_QUERY_MSG = 'aio_entity_style_msg';
 
 	/**
-	 * Processes POST save for per-entity styling. Redirects on success; sets $last_result on validation failure.
+	 * POST save redirect URL for admin_init (Admin_Early_Redirect_Coordinator).
+	 *
+	 * @return string|null
+	 */
+	public function get_entity_style_post_redirect_url(): ?string {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
+			return null;
+		}
+		$section_key = isset( $_GET['section'] ) ? \sanitize_key( (string) $_GET['section'] ) : '';
+		if ( $section_key === '' ) {
+			return null;
+		}
+		$last = null;
+		return $this->resolve_entity_style_save_redirect( $section_key, $last );
+	}
+
+	/**
+	 * Processes POST save for per-entity styling. Returns redirect URL on success; sets $last_result on validation failure.
 	 *
 	 * @param string                                                      $section_key
 	 * @param \AIOPageBuilder\Domain\Styling\Style_Validation_Result|null $last_result Set when validation fails (by reference).
-	 * @return bool True if redirect was sent (caller should return); false to continue rendering.
+	 * @return string|null Redirect URL on success; null when not handled or validation failed.
 	 */
-	private function process_entity_style_save( string $section_key, &$last_result ): bool {
+	private function resolve_entity_style_save_redirect( string $section_key, &$last_result ): ?string {
 		if ( ! isset( $_POST['action'] ) || \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) !== Entity_Style_UI_State_Builder::SAVE_ACTION ) {
-			return false;
+			return null;
 		}
 		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
-			return false;
+			return null;
 		}
 		$nonce_key = Entity_Style_UI_State_Builder::NONCE_ACTION;
 		if ( ! isset( $_POST[ $nonce_key ] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ $nonce_key ] ) ), $nonce_key ) ) {
-			return false;
+			return null;
 		}
 		$raw = array();
 		if ( isset( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] ) && \is_array( $_POST[ Entity_Style_Form_Builder::FORM_KEY ] ) ) {
@@ -536,13 +557,13 @@ final class Section_Template_Detail_Screen {
 		$sanitizer  = $this->container && $this->container->has( 'styles_json_sanitizer' ) ? $this->container->get( 'styles_json_sanitizer' ) : null;
 		$repo       = $this->container && $this->container->has( 'entity_style_payload_repository' ) ? $this->container->get( 'entity_style_payload_repository' ) : null;
 		if ( $normalizer === null || $sanitizer === null || $repo === null ) {
-			return false;
+			return null;
 		}
 		$normalized = $normalizer->normalize_entity_payload( $raw );
 		$result     = $sanitizer->sanitize_entity_payload( $normalized );
 		if ( $result->is_valid() ) {
 			$repo->persist_entity_payload_result( 'section_template', $section_key, $result );
-			$url = \add_query_arg(
+			return \add_query_arg(
 				array(
 					'page'                       => self::SLUG,
 					'section'                    => $section_key,
@@ -550,11 +571,9 @@ final class Section_Template_Detail_Screen {
 				),
 				\admin_url( 'admin.php' )
 			);
-			\wp_safe_redirect( $url );
-			exit;
 		}
 		$last_result = $result;
-		return false;
+		return null;
 	}
 
 	/**

@@ -13,6 +13,8 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Stores provider state for admin display and diagnostics.
@@ -70,5 +72,7 @@ final class AI_Provider_State_Store {
 		$cur         = isset( $all[ $key ] ) && is_array( $all[ $key ] ) ? $all[ $key ] : array();
 		$all[ $key ] = array_merge( $cur, $updates );
 		$this->settings->set( Option_Names::PB_AI_PROVIDERS, $all );
+		$hint = isset( $updates['last_test_status'] ) ? 'last_test_status' : ( isset( $updates['last_successful_use_at'] ) ? 'last_successful_use_at' : 'fields=' . (string) count( $updates ) );
+		Named_Debug_Log::event( Named_Debug_Log_Event::PROVIDER_STATE_MERGED, 'provider=' . $key . ' ' . $hint );
 	}
 }

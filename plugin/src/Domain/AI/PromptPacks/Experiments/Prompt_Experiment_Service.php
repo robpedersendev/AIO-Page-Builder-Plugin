@@ -16,6 +16,8 @@ use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Experiment definitions (stored in option); labels runs via metadata; builds comparison summaries.
@@ -82,6 +84,7 @@ final class Prompt_Experiment_Service {
 	public function save_definition( array $definition ): array {
 		$err = $this->validate_definition( $definition );
 		if ( $err !== '' ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::EXPERIMENT_DEFINITION_SAVE_FAILED, 'reason=validation' );
 			return array(
 				'ok'      => false,
 				'message' => $err,
@@ -109,6 +112,7 @@ final class Prompt_Experiment_Service {
 			$defs[] = $definition;
 		}
 		$this->set_experiments_option( array( self::DEFINITIONS_KEY => $defs ) );
+		Named_Debug_Log::event( Named_Debug_Log_Event::EXPERIMENT_DEFINITION_SAVED, 'id=' . $id );
 		return array(
 			'ok'      => true,
 			'message' => __( 'Experiment saved.', 'aio-page-builder' ),
@@ -133,9 +137,11 @@ final class Prompt_Experiment_Service {
 			)
 		);
 		if ( count( $defs ) === $before ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::EXPERIMENT_DEFINITION_DELETE_NOT_FOUND, 'id=' . $experiment_id );
 			return false;
 		}
 		$this->set_experiments_option( array( self::DEFINITIONS_KEY => $defs ) );
+		Named_Debug_Log::event( Named_Debug_Log_Event::EXPERIMENT_DEFINITION_DELETED, 'id=' . $experiment_id );
 		return true;
 	}
 
@@ -204,6 +210,10 @@ final class Prompt_Experiment_Service {
 		$message                                  = $post_id > 0
 			? __( 'Experiment run recorded. View in AI Runs.', 'aio-page-builder' )
 			: __( 'Failed to save experiment run.', 'aio-page-builder' );
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::EXPERIMENT_RUN_RECORDED,
+			'experiment_id=' . $experiment_id . ' variant=' . $variant_id . ' run_id=' . $run_id . ' post_id=' . (string) $post_id . ' status=' . $status
+		);
 		return new Experiment_Result( $run_id, $post_id, $status, $experiment_id, $variant_id, $variant_label, $message );
 	}
 

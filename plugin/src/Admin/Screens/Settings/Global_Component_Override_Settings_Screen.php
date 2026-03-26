@@ -48,12 +48,47 @@ final class Global_Component_Override_Settings_Screen {
 	}
 
 	/**
+	 * Save/reset POST redirect for admin_init (Admin_Early_Redirect_Coordinator).
+	 *
+	 * @return string|null
+	 */
+	public function get_post_redirect_url(): ?string {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
+			return null;
+		}
+		$repo = $this->get_repository();
+		if ( $repo === null ) {
+			return null;
+		}
+		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::SAVE_ACTION ) {
+			if ( isset( $_POST[ self::NONCE_SAVE ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_SAVE ] ) ), self::NONCE_SAVE ) ) {
+				$raw_overrides = array();
+				if ( isset( $_POST[ Global_Component_Override_Form_Builder::FORM_OVERRIDES_KEY ] ) && is_array( $_POST[ Global_Component_Override_Form_Builder::FORM_OVERRIDES_KEY ] ) ) {
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then passed to collect_overrides_from_raw which sanitizes.
+					$raw_overrides = \wp_unslash( $_POST[ Global_Component_Override_Form_Builder::FORM_OVERRIDES_KEY ] );
+				}
+				$overrides = $this->collect_overrides_from_raw( $raw_overrides );
+				$ok        = $repo->set_global_component_overrides( $overrides );
+				$msg       = $ok ? 'success' : 'error';
+				return \add_query_arg( self::QUERY_MSG, $msg, $this->get_settings_url() );
+			}
+		}
+		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::RESET_ACTION ) {
+			if ( isset( $_POST[ self::NONCE_RESET ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_RESET ] ) ), self::NONCE_RESET ) ) {
+				$repo->set_global_component_overrides( array() );
+				return \add_query_arg( self::QUERY_MSG, 'reset', $this->get_settings_url() );
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Renders the screen. Enforces capability; processes POST save/reset then redirects or outputs form.
 	 *
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage global component overrides.', 'aio-page-builder' ), 403 );
 		}
 
@@ -75,29 +110,6 @@ final class Global_Component_Override_Settings_Screen {
 				echo '</div>';
 			}
 			return;
-		}
-
-		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::SAVE_ACTION ) {
-			if ( isset( $_POST[ self::NONCE_SAVE ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_SAVE ] ) ), self::NONCE_SAVE ) ) {
-				$raw_overrides = array();
-				if ( isset( $_POST[ Global_Component_Override_Form_Builder::FORM_OVERRIDES_KEY ] ) && is_array( $_POST[ Global_Component_Override_Form_Builder::FORM_OVERRIDES_KEY ] ) ) {
-					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then passed to collect_overrides_from_raw which sanitizes.
-					$raw_overrides = \wp_unslash( $_POST[ Global_Component_Override_Form_Builder::FORM_OVERRIDES_KEY ] );
-				}
-				$overrides = $this->collect_overrides_from_raw( $raw_overrides );
-				$ok        = $repo->set_global_component_overrides( $overrides );
-				$msg       = $ok ? 'success' : 'error';
-				\wp_safe_redirect( \add_query_arg( self::QUERY_MSG, $msg, $this->get_settings_url() ) );
-				exit;
-			}
-		}
-
-		if ( isset( $_POST['action'] ) && \sanitize_text_field( \wp_unslash( $_POST['action'] ) ) === self::RESET_ACTION ) {
-			if ( isset( $_POST[ self::NONCE_RESET ] ) && \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_POST[ self::NONCE_RESET ] ) ), self::NONCE_RESET ) ) {
-				$repo->set_global_component_overrides( array() );
-				\wp_safe_redirect( \add_query_arg( self::QUERY_MSG, 'reset', $this->get_settings_url() ) );
-				exit;
-			}
 		}
 
 		$message = isset( $_GET[ self::QUERY_MSG ] ) ? \sanitize_text_field( \wp_unslash( $_GET[ self::QUERY_MSG ] ) ) : '';
@@ -168,7 +180,7 @@ final class Global_Component_Override_Settings_Screen {
 	}
 
 	private function get_settings_url(): string {
-		return \admin_url( 'admin.php?page=' . self::SLUG );
+		return Admin_Screen_Hub::tab_url( Global_Style_Token_Settings_Screen::SLUG, 'overrides' );
 	}
 
 	private function get_repository(): ?Global_Style_Settings_Repository {

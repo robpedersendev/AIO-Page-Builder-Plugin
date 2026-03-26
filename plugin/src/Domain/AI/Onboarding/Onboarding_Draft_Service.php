@@ -13,6 +13,8 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Persists and retrieves onboarding draft payload. No secrets; shape per contract §7.
@@ -48,6 +50,8 @@ final class Onboarding_Draft_Service {
 		$normalized               = $this->normalize_draft( $payload );
 		$normalized['updated_at'] = $this->iso8601_now();
 		$this->settings->set( Option_Names::ONBOARDING_DRAFT, $normalized );
+		$step = isset( $normalized['current_step_key'] ) && is_string( $normalized['current_step_key'] ) ? $normalized['current_step_key'] : '';
+		Named_Debug_Log::event( Named_Debug_Log_Event::ONBOARDING_DRAFT_SAVE, 'step=' . $step );
 		return true;
 	}
 
@@ -58,6 +62,7 @@ final class Onboarding_Draft_Service {
 	 */
 	public function clear_draft(): void {
 		$this->settings->set( Option_Names::ONBOARDING_DRAFT, $this->default_draft() );
+		Named_Debug_Log::event( Named_Debug_Log_Event::ONBOARDING_DRAFT_CLEAR, '' );
 	}
 
 	/**
@@ -74,6 +79,7 @@ final class Onboarding_Draft_Service {
 			'version'                   => self::DRAFT_VERSION,
 			'overall_status'            => Onboarding_Statuses::NOT_STARTED,
 			'current_step_key'          => Onboarding_Step_Keys::WELCOME,
+			'furthest_step_index'       => 0,
 			'step_statuses'             => $steps,
 			'profile_snapshot_ref'      => null,
 			'crawl_run_id_ref'          => null,
@@ -96,7 +102,8 @@ final class Onboarding_Draft_Service {
 		$step_statuses = $default['step_statuses'];
 		if ( isset( $raw['step_statuses'] ) && is_array( $raw['step_statuses'] ) ) {
 			foreach ( Onboarding_Step_Keys::ordered() as $key ) {
-				if ( isset( $raw['step_statuses'][ $key ] ) && is_string( $raw['step_statuses'][ $key ] ) ) {
+				if ( isset( $raw['step_statuses'][ $key ] ) && is_string( $raw['step_statuses'][ $key ] )
+					&& in_array( $raw['step_statuses'][ $key ], Onboarding_Statuses::step_statuses(), true ) ) {
 					$step_statuses[ $key ] = $raw['step_statuses'][ $key ];
 				}
 			}
@@ -123,10 +130,17 @@ final class Onboarding_Draft_Service {
 		if ( $last_run_post === 0 && $last_run_id === null ) {
 			$last_run_post = null;
 		}
+		$max_step_idx    = count( Onboarding_Step_Keys::ordered() ) - 1;
+		$cur_idx         = Onboarding_Step_Keys::index_of( $current );
+		$cur_idx_safe    = $cur_idx >= 0 ? $cur_idx : 0;
+		$furthest_stored = isset( $raw['furthest_step_index'] ) ? (int) $raw['furthest_step_index'] : $cur_idx_safe;
+		$furthest_stored = max( 0, min( $furthest_stored, $max_step_idx ) );
+		$furthest_stored = max( $furthest_stored, $cur_idx_safe );
 		return array(
 			'version'                   => isset( $raw['version'] ) && ( is_int( $raw['version'] ) || is_string( $raw['version'] ) ) ? $raw['version'] : $default['version'],
 			'overall_status'            => $overall,
 			'current_step_key'          => $current,
+			'furthest_step_index'       => $furthest_stored,
 			'step_statuses'             => $step_statuses,
 			'profile_snapshot_ref'      => isset( $raw['profile_snapshot_ref'] ) && ( is_string( $raw['profile_snapshot_ref'] ) || $raw['profile_snapshot_ref'] === null ) ? $raw['profile_snapshot_ref'] : $default['profile_snapshot_ref'],
 			'crawl_run_id_ref'          => isset( $raw['crawl_run_id_ref'] ) && ( is_string( $raw['crawl_run_id_ref'] ) || $raw['crawl_run_id_ref'] === null ) ? ( $raw['crawl_run_id_ref'] ? \sanitize_text_field( (string) $raw['crawl_run_id_ref'] ) : null ) : $default['crawl_run_id_ref'],

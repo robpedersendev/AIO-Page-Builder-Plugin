@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Read_Model_Builde
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Schema;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Override_Conflict_Detector;
 use AIOPageBuilder\Admin\Actions\Remove_Industry_Override_Action;
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Templates_Directory_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Section_Templates_Directory_Screen;
@@ -49,7 +50,7 @@ final class Industry_Override_Management_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access industry override management.', 'aio-page-builder' ), 403 );
 		}
 
@@ -57,7 +58,7 @@ final class Industry_Override_Management_Screen {
 		$filters = $this->get_filters_from_request();
 		$rows    = $builder->build( $filters );
 
-		$base_url = \admin_url( 'admin.php?page=' . self::SLUG );
+		$base_url = Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'overrides' );
 		$message  = $this->get_result_message();
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
@@ -92,8 +93,9 @@ final class Industry_Override_Management_Screen {
 				</div>
 			<?php endif; ?>
 
-			<form method="get" action="<?php echo \esc_url( $base_url ); ?>" class="aio-override-filters" style="margin: 1em 0;">
-				<input type="hidden" name="page" value="<?php echo \esc_attr( self::SLUG ); ?>" />
+			<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-override-filters" style="margin: 1em 0;">
+				<input type="hidden" name="page" value="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" />
+				<input type="hidden" name="<?php echo \esc_attr( Admin_Screen_Hub::QUERY_TAB ); ?>" value="overrides" />
 				<label for="aio-filter-target-type"><?php \esc_html_e( 'Type', 'aio-page-builder' ); ?></label>
 				<select name="target_type" id="aio-filter-target-type">
 					<option value=""><?php \esc_html_e( 'All', 'aio-page-builder' ); ?></option>
@@ -235,7 +237,7 @@ final class Industry_Override_Management_Screen {
 			return ' <a href="' . \esc_url( $url ) . '">' . \esc_html__( 'Section directory', 'aio-page-builder' ) . '</a>';
 		}
 		if ( $target_type === Industry_Override_Schema::TARGET_TYPE_PAGE_TEMPLATE ) {
-			$url = \admin_url( 'admin.php?page=' . Page_Templates_Directory_Screen::SLUG );
+			$url = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_PAGE );
 			return ' <a href="' . \esc_url( $url ) . '">' . \esc_html__( 'Template directory', 'aio-page-builder' ) . '</a>';
 		}
 		if ( $target_type === Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM && $plan_id !== null && $plan_id !== '' ) {
@@ -255,11 +257,11 @@ final class Industry_Override_Management_Screen {
 		$plan_id     = $row['plan_id'] ?? null;
 
 		$can_remove = false;
-		if ( $target_type === Industry_Override_Schema::TARGET_TYPE_SECTION && \current_user_can( \AIOPageBuilder\Infrastructure\Config\Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
+		if ( $target_type === Industry_Override_Schema::TARGET_TYPE_SECTION && Capabilities::current_user_can_for_route( Capabilities::MANAGE_SECTION_TEMPLATES ) ) {
 			$can_remove = true;
-		} elseif ( $target_type === Industry_Override_Schema::TARGET_TYPE_PAGE_TEMPLATE && \current_user_can( \AIOPageBuilder\Infrastructure\Config\Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
+		} elseif ( $target_type === Industry_Override_Schema::TARGET_TYPE_PAGE_TEMPLATE && Capabilities::current_user_can_for_route( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			$can_remove = true;
-		} elseif ( $target_type === Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM && \current_user_can( \AIOPageBuilder\Infrastructure\Config\Capabilities::APPROVE_BUILD_PLANS ) ) {
+		} elseif ( $target_type === Industry_Override_Schema::TARGET_TYPE_BUILD_PLAN_ITEM && Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
 			$can_remove = true;
 		}
 

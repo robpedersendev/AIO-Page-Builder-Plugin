@@ -32,7 +32,8 @@ use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
 use AIOPageBuilder\Domain\AI\Validation\Validation_Report;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Provider_Connection_Test_Service;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
-use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Validates onboarding readiness, builds prompt package and input artifact, invokes provider, validates output, persists run.
@@ -116,8 +117,10 @@ final class Onboarding_Planning_Request_Orchestrator {
 	public function submit(): Planning_Request_Result {
 		$draft        = $this->draft_service->get_draft();
 		$current_step = $draft['current_step_key'] ?? Onboarding_Step_Keys::WELCOME;
+		Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_SUBMIT_ENTER, 'step=' . $current_step );
 
 		if ( $current_step !== Onboarding_Step_Keys::SUBMISSION ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_NOT_SUBMISSION, 'step=' . $current_step );
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_BLOCKED,
@@ -131,6 +134,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		}
 
 		if ( ! $this->prefill_service->is_provider_ready() ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_PROVIDER_NOT_READY, '' );
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_BLOCKED,
@@ -146,6 +150,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$prefill     = $this->prefill_service->get_prefill_data( $draft );
 		$provider_id = $this->pick_configured_provider_id( $prefill );
 		if ( $provider_id === null || $provider_id === '' ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_NO_PROVIDER, '' );
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_BLOCKED,
@@ -166,6 +171,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 
 		$driver = $this->get_driver_for_provider( $provider_id );
 		if ( $driver === null ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_DRIVER_UNAVAILABLE, 'provider_id=' . $provider_id );
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_PROVIDER_FAILED,
@@ -187,6 +193,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$schema_ref = Build_Plan_Draft_Schema::SCHEMA_REF;
 		$pack       = $this->prompt_pack_registry->select_for_planning( $schema_ref, $provider_id );
 		if ( $pack === null ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_NO_PROMPT_PACK, 'schema=' . $schema_ref . ' provider=' . $provider_id );
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_BLOCKED,
@@ -199,9 +206,13 @@ final class Onboarding_Planning_Request_Orchestrator {
 			);
 		}
 
-		$prompt_pack_ref             = array(
+		$prompt_pack_ref = array(
 			Input_Artifact_Schema::PROMPT_PACK_REF_INTERNAL_KEY => (string) ( $pack[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' ),
 			Input_Artifact_Schema::PROMPT_PACK_REF_VERSION => (string) ( $pack[ Prompt_Pack_Schema::ROOT_VERSION ] ?? '' ),
+		);
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::ORCHESTRATOR_PROMPT_PACK_SELECTED,
+			'internal_key=' . $prompt_pack_ref[ Input_Artifact_Schema::PROMPT_PACK_REF_INTERNAL_KEY ] . ' version=' . $prompt_pack_ref[ Input_Artifact_Schema::PROMPT_PACK_REF_VERSION ]
 		);
 		$artifact_id                 = 'aio-artifact-' . uniqid( '', true );
 		$profile                     = $prefill['profile'] ?? array();
@@ -224,11 +235,12 @@ final class Onboarding_Planning_Request_Orchestrator {
 			}
 		}
 		$artifact_options = array(
-			'profile'   => $profile,
-			'crawl'     => array(),
-			'registry'  => $registry,
-			'goal'      => $goal,
-			'redaction' => array( Input_Artifact_Schema::REDACTION_APPLIED => false ),
+			'profile'           => $profile,
+			'crawl'             => array(),
+			'registry'          => $registry,
+			'goal'              => $goal,
+			'planning_guidance' => $this->prompt_pack_registry->get_planning_guidance_content(),
+			'redaction'         => array( Input_Artifact_Schema::REDACTION_APPLIED => false ),
 		);
 		if ( $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
 			$industry_repo = $this->container->get( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
@@ -293,6 +305,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$input_artifact = $this->input_artifact_builder->build( $artifact_id, $prompt_pack_ref, $artifact_options );
 		if ( $input_artifact === null ) {
 			$errors = $this->input_artifact_builder->get_last_validation_errors();
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_INPUT_ARTIFACT_FAILED, 'errors=' . (string) \wp_json_encode( $errors ) );
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_BLOCKED,
@@ -304,6 +317,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 				'input_artifact_failed'
 			);
 		}
+		Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_INPUT_ARTIFACT_BUILT, 'artifact_id=' . $artifact_id );
 
 		$build_options = array();
 		if ( $this->container->has( 'industry_prompt_pack_overlay_service' ) ) {
@@ -327,6 +341,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$package_result = $this->prompt_package_builder->build( $pack, $input_artifact, $build_options );
 		if ( ! $package_result->is_success() || $package_result->get_normalized_prompt_package() === null ) {
 			$errors = $package_result->get_validation_errors();
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_PROMPT_PACKAGE_FAILED, 'errors=' . (string) \wp_json_encode( $errors ) );
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_BLOCKED,
@@ -338,12 +353,14 @@ final class Onboarding_Planning_Request_Orchestrator {
 				'prompt_package_failed'
 			);
 		}
+		Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_PROMPT_PACKAGE_BUILT, 'pack_key=' . (string) ( $pack[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' ) );
 
 		$package       = $package_result->get_normalized_prompt_package();
 		$system_prompt = (string) ( $package['system_prompt'] ?? '' );
 		$user_message  = (string) ( $package['user_message'] ?? '' );
 		$model         = $this->capability_resolver->resolve_default_model_for_planning( $driver, $schema_ref );
 		if ( $model === null || $model === '' ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_NO_MODEL, 'provider=' . $provider_id );
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_PROVIDER_FAILED,
@@ -375,6 +392,10 @@ final class Onboarding_Planning_Request_Orchestrator {
 			)
 		);
 
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::ORCHESTRATOR_PROVIDER_CALL,
+			'request_id=' . $request_id . ' provider=' . $provider_id . ' model=' . $model
+		);
 		$response = $driver->request( $normalized_request );
 
 		$policy          = $this->failover_service->get_policy_for_primary( $provider_id );
@@ -416,9 +437,11 @@ final class Onboarding_Planning_Request_Orchestrator {
 			'system_prompt' => $system_prompt,
 			'user_message'  => $user_message,
 		);
-		$artifacts          = array(
+		// * Omit input_artifact from normalized package persistence: it duplicates INPUT_SNAPSHOT and can make
+		// * wp_json_encode / post meta writes fail silently, leaving raw_prompt + normalized missing in admin.
+		$artifacts = array(
 			Artifact_Category_Keys::RAW_PROMPT     => $raw_prompt_capture,
-			Artifact_Category_Keys::NORMALIZED_PROMPT_PACKAGE => $package,
+			Artifact_Category_Keys::NORMALIZED_PROMPT_PACKAGE => $this->slim_normalized_package_for_persistence( $package ),
 			Artifact_Category_Keys::INPUT_SNAPSHOT => $input_artifact,
 		);
 
@@ -443,6 +466,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 				$this->link_run_to_draft( $draft, $run_id, $post_id );
 				// * Record cost_usd against the monthly spend accumulator when pricing data is available.
 				$this->maybe_record_run_cost( $effective_provider_id, $response['usage'] ?? null );
+				Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_RUN_COMPLETED, 'run_id=' . $run_id . ' post_id=' . (string) $post_id );
 				// * Fires after a successful AI run so snapshot capture and other listeners can react.
 				\do_action( 'aio_pb_onboarding_run_completed', $run_id );
 				return new Planning_Request_Result(
@@ -460,6 +484,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 			$metadata['completed_at'] = gmdate( 'Y-m-d\TH:i:s\Z' );
 			$post_id                  = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_FAILED_VALIDATION, $artifacts );
 			$this->link_run_to_draft( $draft, $run_id, $post_id );
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_RUN_FAILED_VALIDATION, 'run_id=' . $run_id . ' post_id=' . (string) $post_id );
 			return new Planning_Request_Result(
 				false,
 				Planning_Request_Result::STATUS_VALIDATION_FAILED,
@@ -477,6 +502,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$metadata['completed_at'] = gmdate( 'Y-m-d\TH:i:s\Z' );
 		$post_id                  = $this->run_service->create_run( $run_id, $metadata, self::RUN_STATUS_FAILED, $artifacts );
 		$this->link_run_to_draft( $draft, $run_id, $post_id );
+		Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_RUN_PROVIDER_FAILED, 'run_id=' . $run_id . ' post_id=' . (string) $post_id );
 		$user_msg = $normalized_error['user_message'] ?? __( 'The AI provider returned an error. Check the run in AI Runs.', 'aio-page-builder' );
 		return new Planning_Request_Result(
 			false,
@@ -514,9 +540,10 @@ final class Onboarding_Planning_Request_Orchestrator {
 		}
 		$summary = $spend_service->get_spend_summary( $provider_id );
 		if ( $summary['exceeded'] && ! $summary['override_enabled'] ) {
-			Internal_Debug_Log::line(
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::ORCHESTRATOR_SPEND_CAP_BLOCKED,
 				sprintf(
-					'Spend cap preflight blocked run for provider %s (spent $%.4f of $%.2f cap).',
+					'provider=%s spent=%.4f cap=%.2f',
 					$provider_id,
 					$summary['month_total'],
 					$summary['cap']
@@ -575,6 +602,10 @@ final class Onboarding_Planning_Request_Orchestrator {
 	 * @return string|null
 	 */
 	private function pick_configured_provider_id( array $prefill ): ?string {
+		$from_store = $this->prefill_service->get_first_ready_provider_id();
+		if ( $from_store !== null && $from_store !== '' ) {
+			return $from_store;
+		}
 		$refs = $prefill['provider_refs'] ?? array();
 		foreach ( $refs as $ref ) {
 			if ( ! is_array( $ref ) ) {
@@ -599,6 +630,25 @@ final class Onboarding_Planning_Request_Orchestrator {
 			return $this->container->get( 'anthropic_provider_driver' );
 		}
 		return null;
+	}
+
+	/**
+	 * Persists a minimal normalized package: omit input_artifact (INPUT_SNAPSHOT) and raw_prompt_capture_ready
+	 * (duplicates system/user strings already on this object and in the raw_prompt artifact) to avoid oversized JSON.
+	 *
+	 * @param array<string, mixed> $package Full normalized package from Normalized_Prompt_Package_Builder.
+	 * @return array<string, mixed>
+	 */
+	private function slim_normalized_package_for_persistence( array $package ): array {
+		$ref = isset( $package['prompt_pack_ref'] ) && is_array( $package['prompt_pack_ref'] ) ? $package['prompt_pack_ref'] : array();
+		return array(
+			'prompt_pack_ref'   => $ref,
+			'schema_target_ref' => (string) ( $package['schema_target_ref'] ?? '' ),
+			'repair_prompt_ref' => (string) ( $package['repair_prompt_ref'] ?? '' ),
+			'input_artifact_id' => (string) ( $package['input_artifact_id'] ?? '' ),
+			'system_prompt'     => (string) ( $package['system_prompt'] ?? '' ),
+			'user_message'      => (string) ( $package['user_message'] ?? '' ),
+		);
 	}
 
 	/**

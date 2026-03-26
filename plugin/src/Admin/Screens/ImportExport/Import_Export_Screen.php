@@ -86,7 +86,7 @@ final class Import_Export_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) && ! \current_user_can( Capabilities::IMPORT_DATA ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) && ! Capabilities::current_user_can_for_route( Capabilities::IMPORT_DATA ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access Import / Export.', 'aio-page-builder' ), 403 );
 		}
 
@@ -433,7 +433,7 @@ final class Import_Export_Screen {
 			\wp_safe_redirect( $this->screen_url( 'error', 'nonce' ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA ) ) {
 			\wp_safe_redirect( $this->screen_url( 'error', 'capability' ) );
 			exit;
 		}
@@ -469,7 +469,7 @@ final class Import_Export_Screen {
 			\wp_safe_redirect( $this->screen_url( 'error', 'nonce' ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::IMPORT_DATA ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::IMPORT_DATA ) ) {
 			\wp_safe_redirect( $this->screen_url( 'error', 'capability' ) );
 			exit;
 		}
@@ -550,7 +550,7 @@ final class Import_Export_Screen {
 			\wp_safe_redirect( $this->screen_url( 'error', 'nonce' ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::IMPORT_DATA ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::IMPORT_DATA ) ) {
 			\wp_safe_redirect( $this->screen_url( 'error', 'capability' ) );
 			exit;
 		}
@@ -603,7 +603,7 @@ final class Import_Export_Screen {
 		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ), self::NONCE_DOWNLOAD ) ) {
 			\wp_die( \esc_html__( 'Invalid request.', 'aio-page-builder' ), 403 );
 		}
-		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to download exports.', 'aio-page-builder' ), 403 );
 		}
 		$filename = isset( $_GET['filename'] ) ? \sanitize_file_name( \wp_unslash( $_GET['filename'] ) ) : '';

@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 
 /**
  * Builds stable screen-state payloads for the section template directory: purpose tree (L2),
@@ -136,7 +137,7 @@ final class Section_Template_Directory_State_Builder {
 			);
 		}
 
-		$can_manage = \current_user_can( 'aio_view_build_plans' );
+		$can_manage = Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS );
 
 		return array(
 			'view'                 => $view,

@@ -195,6 +195,19 @@ final class Template_Compare_Screen {
 	}
 
 	/**
+	 * GET add/remove compare item: redirect URL for admin_init (Admin_Early_Redirect_Coordinator).
+	 *
+	 * @return string|null
+	 */
+	public function get_compare_get_redirect_url(): ?string {
+		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
+			return null;
+		}
+		$type = isset( $_GET['type'] ) && $_GET['type'] === 'page' ? 'page' : 'section';
+		return $this->maybe_handle_add_remove( $type );
+	}
+
+	/**
 	 * Renders compare workspace: capability check, handle add/remove then redirect, build state, render.
 	 *
 	 * @return void
@@ -204,12 +217,7 @@ final class Template_Compare_Screen {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
-		$type     = isset( $_GET['type'] ) && $_GET['type'] === 'page' ? 'page' : 'section';
-		$redirect = $this->maybe_handle_add_remove( $type );
-		if ( $redirect !== null ) {
-			\wp_safe_redirect( $redirect );
-			exit;
-		}
+		$type = isset( $_GET['type'] ) && $_GET['type'] === 'page' ? 'page' : 'section';
 
 		$compare_list  = self::get_compare_list( $type );
 		$state_builder = $this->container && $this->container->has( 'template_compare_state_builder' )

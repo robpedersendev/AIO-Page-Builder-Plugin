@@ -1,0 +1,19 @@
+---
+description: Use the central named debug log registry for any new debug.log instrumentation.
+globs: plugin/src/**/*.php
+alwaysApply: false
+---
+
+# Named debug logging (WP_DEBUG_LOG)
+
+- **Sink:** `AIOPageBuilder\Support\Logging\Named_Debug_Log::event( string $event_id, string $detail = '' )`  
+  Only emits when `WP_DEBUG` and `WP_DEBUG_LOG` are true. Never log secrets, API keys, tokens, or raw credentials.
+
+- **Event ids:** Add a **new public const** on `Named_Debug_Log_Event` for **each** distinct log call site.  
+  String values must stay unique and grep-friendly: `AIO_<DOMAIN>_<FEATURE>_<ACTION>` (see existing sections: AI, Build Plan, Admin menu, Crawler, etc.).
+
+- **Workflow for new features:**  
+  1. Add const(s) in `plugin/src/Support/Logging/Named_Debug_Log_Event.php` under the right domain section (or create a section).  
+  2. Call `Named_Debug_Log::event( Named_Debug_Log_Event::YOUR_CONST, 'safe_key=value …' );` at boundaries (start, success, failure, skip).
+
+- **Do not** introduce ad-hoc `error_log()` or unstructured `Internal_Debug_Log::line()` for new code; `Internal_Debug_Log::line()` maps to `INTERNAL_DEBUG_LINE` for legacy call sites only.

@@ -12,6 +12,7 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
+use AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface;
 use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Definitions;
 use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
@@ -36,6 +37,7 @@ require_once $plugin_root . '/src/Domain/Storage/Profile/Profile_Store.php';
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Statuses.php';
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Step_Keys.php';
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Draft_Service.php';
+require_once $plugin_root . '/src/Domain/AI/Secrets/Provider_Secret_Store_Interface.php';
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Prefill_Service.php';
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_UI_State_Builder.php';
 require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Schema.php';
@@ -45,12 +47,19 @@ require_once $plugin_root . '/src/Domain/Industry/Onboarding/Industry_Question_P
 
 final class Onboarding_UI_State_Builder_Test extends TestCase {
 
+	private function stub_secret_store_absent(): Provider_Secret_Store_Interface {
+		$store = $this->createMock( Provider_Secret_Store_Interface::class );
+		$store->method( 'get_credential_state' )->willReturn( Provider_Secret_Store_Interface::STATE_ABSENT );
+		$store->method( 'has_credential' )->willReturn( false );
+		return $store;
+	}
+
 	private function get_builder(): Onboarding_UI_State_Builder {
 		$settings      = new Settings_Service();
 		$normalizer    = new Profile_Normalizer();
 		$profile_store = new Profile_Store( $settings, $normalizer );
 		$draft_svc     = new Onboarding_Draft_Service( $settings );
-		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null, $this->stub_secret_store_absent() );
 		return new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc );
 	}
 
@@ -92,7 +101,7 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 		$draft_svc->save_draft( $draft );
 		$normalizer    = new Profile_Normalizer();
 		$profile_store = new Profile_Store( $settings, $normalizer );
-		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null, $this->stub_secret_store_absent() );
 		$builder       = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc );
 		$state         = $builder->build_for_screen();
 		$this->assertTrue( $state['is_blocked'] );
@@ -136,7 +145,7 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 		$normalizer    = new Profile_Normalizer();
 		$profile_store = new Profile_Store( $settings, $normalizer );
 		$draft_svc     = new Onboarding_Draft_Service( $settings );
-		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null, $this->stub_secret_store_absent() );
 		$builder       = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc, $repo, $qp_registry );
 		$state         = $builder->build_for_screen();
 		$this->assertIsArray( $state['industry_question_pack'] );
@@ -153,7 +162,7 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 		$normalizer    = new Profile_Normalizer();
 		$profile_store = new Profile_Store( $settings, $normalizer );
 		$draft_svc     = new Onboarding_Draft_Service( $settings );
-		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null, $this->stub_secret_store_absent() );
 		$builder       = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc, $repo, $qp_registry );
 		$state         = $builder->build_for_screen();
 		$this->assertNull( $state['industry_question_pack'] );

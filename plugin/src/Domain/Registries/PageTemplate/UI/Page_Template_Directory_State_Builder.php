@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Filter_Result;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Pagination;
 use AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service;
 use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 
 /**
  * Builds stable screen-state payloads for the page template directory: tree nodes, list rows,
@@ -106,7 +107,7 @@ final class Page_Template_Directory_State_Builder {
 			);
 		}
 
-		$can_manage = \current_user_can( 'aio_view_build_plans' );
+		$can_manage = Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS );
 
 		return array(
 			'view'                 => $view,

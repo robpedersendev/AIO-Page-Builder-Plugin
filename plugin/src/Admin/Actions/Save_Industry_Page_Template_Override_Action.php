@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Actions;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Templates_Directory_Screen;
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Override_Schema;
 use AIOPageBuilder\Domain\Industry\Overrides\Industry_Page_Template_Override_Service;
@@ -37,7 +38,7 @@ final class Save_Industry_Page_Template_Override_Action {
 			\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_template_override=error' );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_PAGE_TEMPLATES ) ) {
 			\wp_safe_redirect( $redirect . ( strpos( $redirect, '?' ) !== false ? '&' : '?' ) . 'aio_template_override=error' );
 			exit;
 		}
@@ -71,7 +72,7 @@ final class Save_Industry_Page_Template_Override_Action {
 				return $ref;
 			}
 		}
-		return \admin_url( 'admin.php?page=' . Page_Templates_Directory_Screen::SLUG );
+		return Admin_Screen_Hub::tab_url( Page_Templates_Directory_Screen::SLUG, 'page_templates' );
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 }

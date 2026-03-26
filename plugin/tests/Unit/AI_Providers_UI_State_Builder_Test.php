@@ -12,6 +12,7 @@ use AIOPageBuilder\Domain\AI\Providers\Provider_Capability_Resolver;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Request_Context_Builder;
 use AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface;
 use AIOPageBuilder\Domain\AI\UI\AI_Providers_UI_State_Builder;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 use PHPUnit\Framework\TestCase;
@@ -66,6 +67,38 @@ final class AI_Providers_UI_State_Builder_Test extends TestCase {
 	public function test_build_state_contains_no_secret_like_values(): void {
 		$state = $this->build_state_with_mocks();
 		$this->assertNoSecretKeysInArray( $state );
+	}
+
+	public function test_build_credential_trust_banner_none_when_no_stored_credentials(): void {
+		$builder = $this->make_builder_with_secret_has_credential( false );
+		$banner  = $builder->build_credential_trust_banner();
+		$this->assertSame( 'none', $banner['trust_level'] );
+		$this->assertSame( 'aio-ai-credential-trust-none', $banner['trust_level_id'] );
+		$this->assertArrayHasKey( 'summary', $banner );
+		$this->assertArrayHasKey( 'detail', $banner );
+		$this->assertNoSecretKeysInArray( $banner );
+	}
+
+	public function test_build_credential_trust_banner_stored_when_key_present_without_successful_test(): void {
+		$builder = $this->make_builder_with_secret_has_credential( true );
+		$banner  = $builder->build_credential_trust_banner();
+		$this->assertSame( 'stored', $banner['trust_level'] );
+		$this->assertSame( 'aio-ai-credential-trust-stored', $banner['trust_level_id'] );
+		$this->assertNoSecretKeysInArray( $banner );
+	}
+
+	public function test_build_credential_trust_banner_validated_when_key_and_successful_test(): void {
+		$GLOBALS['_aio_test_options'][ Option_Names::PB_AI_PROVIDERS ] = array(
+			'openai' => array(
+				'last_test_status' => 'success',
+			),
+		);
+		$builder = $this->make_builder_with_secret_has_credential( true );
+		$banner  = $builder->build_credential_trust_banner();
+		$this->assertSame( 'validated', $banner['trust_level'] );
+		$this->assertSame( 'aio-ai-credential-trust-validated', $banner['trust_level_id'] );
+		$this->assertNoSecretKeysInArray( $banner );
+		unset( $GLOBALS['_aio_test_options'][ Option_Names::PB_AI_PROVIDERS ] );
 	}
 
 	/**
@@ -134,5 +167,34 @@ final class AI_Providers_UI_State_Builder_Test extends TestCase {
 			$container
 		);
 		return $builder->build();
+	}
+
+	/**
+	 * @param bool $has_cred Whether the secret store reports a stored credential for known providers (e.g. openai).
+	 */
+	private function make_builder_with_secret_has_credential( bool $has_cred ): AI_Providers_UI_State_Builder {
+		$settings = new Settings_Service();
+
+		$connection_test = new Provider_Connection_Test_Service(
+			new Provider_Request_Context_Builder(),
+			new Provider_Capability_Resolver(),
+			$settings
+		);
+
+		$secret_store = $this->createMock( Provider_Secret_Store_Interface::class );
+		$secret_store->method( 'has_credential' )->willReturn( $has_cred );
+		$secret_store->method( 'get_credential_state' )->willReturn(
+			$has_cred ? Provider_Secret_Store_Interface::STATE_PENDING_VALIDATION : Provider_Secret_Store_Interface::STATE_ABSENT
+		);
+
+		$container = new Service_Container();
+
+		return new AI_Providers_UI_State_Builder(
+			$connection_test,
+			$secret_store,
+			new Provider_Capability_Resolver(),
+			$settings,
+			$container
+		);
 	}
 }

@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Coverage_Gap_Analyzer;
 use AIOPageBuilder\Domain\Industry\Reporting\Industry_Pack_Completeness_Report_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -91,7 +92,7 @@ final class Industry_Pack_Family_Comparison_Screen {
 		return array(
 			'rows'          => $rows,
 			'generated_at'  => gmdate( 'Y-m-d\TH:i:s\Z' ),
-			'dashboard_url' => admin_url( 'admin.php?page=' . Industry_Author_Dashboard_Screen::SLUG ),
+			'dashboard_url' => Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'author' ),
 		);
 	}
 
@@ -101,7 +102,7 @@ final class Industry_Pack_Family_Comparison_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the Pack family comparison screen.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->get_state();

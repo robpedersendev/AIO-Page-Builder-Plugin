@@ -271,8 +271,8 @@ final class Plugin {
 			\AIOPageBuilder\Infrastructure\Config\Hub_Menu_Capabilities::register();
 			\AIOPageBuilder\Admin\Admin_Assets::register();
 			\AIOPageBuilder\Admin\Admin_Template_Compare_Ajax::register();
-			// * Onboarding POST must redirect before any admin HTML; otherwise wp_safe_redirect fails (headers already sent) and the user sees a blank page.
-			add_action( 'admin_init', array( $this, 'maybe_handle_onboarding_post_redirect' ), 0 );
+			// * State-changing admin.php requests must redirect in admin_init (see Admin_Early_Redirect_Coordinator) before HTML output.
+			add_action( 'admin_init', array( $this, 'dispatch_early_admin_redirects' ), 0 );
 			// * Priority 0: admin-post.php dispatches admin_post_* after admin_init; those hooks are never registered on admin_menu.
 			add_action( 'admin_init', array( $this, 'register_admin_post_handlers' ), 0 );
 			add_action( 'admin_init', array( $this, 'maybe_repair_administrator_capabilities' ), 2 );
@@ -280,6 +280,7 @@ final class Plugin {
 		}
 		add_filter( 'wp_privacy_personal_data_exporters', array( self::class, 'register_personal_data_exporter' ), 10, 1 );
 		add_filter( 'wp_privacy_personal_data_erasers', array( self::class, 'register_personal_data_eraser' ), 10, 1 );
+		\add_action( \AIOPageBuilder\Domain\Crawler\Execution\Crawl_Run_Processor::CRON_HOOK, array( $this, 'run_crawl_processor_job' ), 10, 1 );
 		$live_preview = new \AIOPageBuilder\Frontend\Template_Live_Preview_Controller( $this->container );
 		$live_preview->register();
 		if ( is_admin() ) {
@@ -292,6 +293,29 @@ final class Plugin {
 	 *
 	 * @return void
 	 */
+	/**
+	 * WP-Cron hook: runs the bounded crawl processor for one crawl_run_id.
+	 *
+	 * @param mixed $crawl_run_id Scheduled event argument.
+	 * @return void
+	 */
+	public function run_crawl_processor_job( $crawl_run_id ): void {
+		if ( ! is_string( $crawl_run_id ) || $crawl_run_id === '' ) {
+			return;
+		}
+		if ( $this->container === null || ! $this->container->has( 'crawl_run_processor' ) ) {
+			return;
+		}
+		try {
+			$this->container->get( 'crawl_run_processor' )->process( $crawl_run_id );
+		} catch ( \Throwable $e ) {
+			\AIOPageBuilder\Support\Logging\Named_Debug_Log::event(
+				\AIOPageBuilder\Support\Logging\Named_Debug_Log_Event::CRAWL_RUN_PROCESSOR_FAILED,
+				'crawl_run_id=' . $crawl_run_id . ' ' . $e->getMessage()
+			);
+		}
+	}
+
 	public function maybe_repair_administrator_capabilities(): void {
 		if ( ! \current_user_can( 'manage_options' ) ) {
 			return;
@@ -314,7 +338,7 @@ final class Plugin {
 	 * @return void
 	 */
 	public function maybe_do_first_run_redirect(): void {
-		if ( ! \current_user_can( \AIOPageBuilder\Infrastructure\Config\Capabilities::MANAGE_SETTINGS ) ) {
+		if ( ! \AIOPageBuilder\Infrastructure\Config\Capabilities::current_user_can_for_route( \AIOPageBuilder\Infrastructure\Config\Capabilities::MANAGE_SETTINGS ) ) {
 			return;
 		}
 		$flag = \get_option( \AIOPageBuilder\Infrastructure\Config\Option_Names::PB_DO_FIRST_RUN_REDIRECT, '' );
@@ -373,32 +397,12 @@ final class Plugin {
 	}
 
 	/**
-	 * Handles onboarding wizard POST and redirects before admin header output (see Onboarding_Screen::get_post_redirect_url).
+	 * Delegates to Admin_Early_Redirect_Coordinator (onboarding, AI hub, build plan workspace, etc.).
 	 *
 	 * @return void
 	 */
-	public function maybe_handle_onboarding_post_redirect(): void {
-		$page = isset( $_GET['page'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['page'] ) ) : '';
-		if ( $page !== \AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen::SLUG ) {
-			return;
-		}
-		if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
-			return;
-		}
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in Onboarding_Screen::handle_post() via wp_verify_nonce().
-		if ( ! isset( $_POST[ \AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen::NONCE_ACTION ] ) ) {
-			return;
-		}
-		// phpcs:enable WordPress.Security.NonceVerification.Missing
-		if ( ! \AIOPageBuilder\Infrastructure\Config\Capabilities::current_user_can_for_route( \AIOPageBuilder\Infrastructure\Config\Capabilities::RUN_ONBOARDING ) ) {
-			return;
-		}
-		$screen   = new \AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen( $this->container );
-		$redirect = $screen->get_post_redirect_url();
-		if ( $redirect !== null ) {
-			\wp_safe_redirect( $redirect );
-			exit;
-		}
+	public function dispatch_early_admin_redirects(): void {
+		\AIOPageBuilder\Admin\Admin_Early_Redirect_Coordinator::dispatch( $this->container );
 	}
 
 	/**

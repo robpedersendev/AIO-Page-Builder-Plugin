@@ -15,10 +15,13 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\AI\Budget\Provider_Spend_Cap_Settings;
 use AIOPageBuilder\Domain\AI\Budget\Provider_Monthly_Spend_Service;
 use AIOPageBuilder\Domain\AI\Providers\AI_Provider_Interface;
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Domain\AI\UI\AI_Providers_UI_State_Builder;
 use AIOPageBuilder\Domain\AI\UI\AI_Provider_State_Store;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Renders provider management UI. No raw keys; credential status only. Mutating actions are capability- and nonce-protected.
@@ -26,6 +29,9 @@ use AIOPageBuilder\Infrastructure\Container\Service_Container;
 final class AI_Providers_Screen {
 
 	public const SLUG = 'aio-page-builder-ai-providers';
+
+	/** Hub tab key for {@see AI_Runs_Screen::HUB_PAGE_SLUG} (forms must POST here; legacy {@see self::SLUG} is removed from $submenu). */
+	private const HUB_TAB = 'providers';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -43,19 +49,31 @@ final class AI_Providers_Screen {
 	}
 
 	/**
+	 * Resolves POST (connection test, credential, spend cap) into a redirect URL. Call from admin_init before output
+	 * (see Plugin::maybe_handle_ai_providers_post_redirect); running after headers causes wp_safe_redirect to fail and exit mid-page.
+	 *
+	 * @return string|null Full redirect URL or null when this request is not a handled POST.
+	 */
+	public function get_post_redirect_url(): ?string {
+		$url = $this->maybe_resolve_test_connection_redirect();
+		if ( $url !== null ) {
+			return $url;
+		}
+		$url = $this->maybe_resolve_update_credential_redirect();
+		if ( $url !== null ) {
+			return $url;
+		}
+		return $this->maybe_resolve_save_spend_cap_redirect();
+	}
+
+	/**
 	 * Renders the AI Providers screen. Capability is enforced by menu registration; screen checks again.
 	 *
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage AI providers.', 'aio-page-builder' ), 403 );
-		}
-		$handled = $this->maybe_handle_test_connection()
-			|| $this->maybe_handle_update_credential()
-			|| $this->maybe_handle_save_spend_cap();
-		if ( $handled ) {
-			return;
 		}
 		$this->render_connection_test_notice();
 		$state = $this->get_state();
@@ -75,28 +93,28 @@ final class AI_Providers_Screen {
 	}
 
 	/**
-	 * Handles action=test_connection: nonce and capability check, runs test, redirects back with message.
+	 * Connection test POST: returns redirect URL or null.
 	 *
-	 * @return bool True if request was handled (redirect sent).
+	 * @return string|null
 	 */
-	private function maybe_handle_test_connection(): bool {
+	private function maybe_resolve_test_connection_redirect(): ?string {
 		$action      = isset( $_POST['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['action'] ) ) : '';
 		$provider_id = isset( $_POST['provider_id'] ) ? \sanitize_key( (string) $_POST['provider_id'] ) : '';
 		if ( $action !== 'aio_pb_test_ai_provider_connection' || $provider_id === '' ) {
-			return false;
+			return null;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_AI_PROVIDERS ) ) {
-			return false;
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_AI_PROVIDERS ) ) {
+			return null;
 		}
 		$nonce_action = 'aio_pb_test_ai_provider_connection_' . $provider_id;
 		\check_admin_referer( $nonce_action );
+		Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_AI_PROVIDER_CONNECTION_TEST_POST, 'provider=' . $provider_id );
 		if ( ! $this->container ) {
-			return false;
+			return null;
 		}
 		$driver = $this->get_driver_for_provider_id( $provider_id );
 		if ( $driver === null ) {
-			$this->redirect_back( 'error', __( 'Provider not found.', 'aio-page-builder' ) );
-			return true;
+			return $this->build_redirect_url( 'error', __( 'Provider not found.', 'aio-page-builder' ) );
 		}
 		try {
 			$test_service = $this->container->get( 'provider_connection_test_service' );
@@ -105,12 +123,11 @@ final class AI_Providers_Screen {
 			$message = $result->is_success()
 				? __( 'Connection test succeeded.', 'aio-page-builder' )
 				: $result->get_user_message();
-			$this->redirect_back( $result->is_success() ? 'success' : 'error', $message );
+			return $this->build_redirect_url( $result->is_success() ? 'success' : 'error', $message );
 		} catch ( \Throwable $e ) {
 			$this->persist_provider_state_after_test( $provider_id, false );
-			$this->redirect_back( 'error', __( 'Connection test failed.', 'aio-page-builder' ) );
+			return $this->build_redirect_url( 'error', __( 'Connection test failed.', 'aio-page-builder' ) );
 		}
-		return true;
 	}
 
 	private function get_driver_for_provider_id( string $provider_id ): ?AI_Provider_Interface {
@@ -124,48 +141,62 @@ final class AI_Providers_Screen {
 	}
 
 	/**
-	 * Handles action=update_credential: nonce and capability already checked in render(); redirects to Onboarding.
+	 * Update credential POST: returns redirect URL or null.
 	 *
-	 * @return bool True if request was handled (redirect sent).
+	 * @return string|null
 	 */
-	private function maybe_handle_update_credential(): bool {
+	private function maybe_resolve_update_credential_redirect(): ?string {
 		$action      = isset( $_POST['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['action'] ) ) : '';
 		$provider_id = isset( $_POST['provider_id'] ) ? \sanitize_key( (string) $_POST['provider_id'] ) : '';
 		if ( $action !== 'aio_pb_update_ai_provider_credential' || $provider_id === '' ) {
-			return false;
+			return null;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_AI_PROVIDERS ) ) {
-			return false;
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_AI_PROVIDERS ) ) {
+			return null;
 		}
 		$nonce_action = 'aio_pb_update_ai_provider_credential_' . $provider_id;
 		\check_admin_referer( $nonce_action );
+		Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_AI_PROVIDER_CREDENTIAL_UPDATE_POST, 'provider=' . $provider_id );
 		if ( ! $this->container ) {
-			return false;
+			return null;
 		}
 		$credential = isset( $_POST['provider_credential'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['provider_credential'] ) ) : '';
 		$credential = trim( $credential );
 		if ( $credential === '' ) {
-			$this->redirect_back( 'error', __( 'Credential is required.', 'aio-page-builder' ) );
-			return true;
+			return $this->build_redirect_url( 'error', __( 'Credential is required.', 'aio-page-builder' ) );
 		}
 		$secret_store = $this->container->get( 'provider_secret_store' );
 		$secret_store->set_credential( $provider_id, $credential );
 		$this->persist_provider_state_after_credential_update( $provider_id );
-		$this->redirect_back( 'success', __( 'Credential updated.', 'aio-page-builder' ) );
-		return true;
+		return $this->build_redirect_url( 'success', __( 'Credential updated.', 'aio-page-builder' ) );
 	}
 
-	private function redirect_back( string $status, string $message ): void {
-		$url = \add_query_arg(
+	/**
+	 * @return string Full admin URL with flash query args for the providers tab.
+	 */
+	private function build_redirect_url( string $status, string $message ): string {
+		return \add_query_arg(
 			array(
-				'page'                 => self::SLUG,
 				'aio_provider_message' => $message,
 				'aio_provider_status'  => $status,
 			),
+			$this->get_hub_providers_base_url()
+		);
+	}
+
+	/**
+	 * Admin URL for the AI workspace hub on the Providers tab (registered submenu; safe for POST).
+	 *
+	 * @return string
+	 */
+	private function get_hub_providers_base_url(): string {
+		return \add_query_arg(
+			array(
+				'page'                      => AI_Runs_Screen::HUB_PAGE_SLUG,
+				Admin_Screen_Hub::QUERY_TAB => self::HUB_TAB,
+			),
 			\admin_url( 'admin.php' )
 		);
-		\wp_safe_redirect( $url );
-		exit;
 	}
 
 	/**
@@ -190,8 +221,8 @@ final class AI_Providers_Screen {
 			),
 			'ai_runs_url'       => \add_query_arg(
 				array(
-					'page'    => AI_Runs_Screen::HUB_PAGE_SLUG,
-					'aio_tab' => 'ai_runs',
+					'page'                      => AI_Runs_Screen::HUB_PAGE_SLUG,
+					Admin_Screen_Hub::QUERY_TAB => 'ai_runs',
 				),
 				\admin_url( 'admin.php' )
 			),
@@ -247,7 +278,9 @@ final class AI_Providers_Screen {
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 		<?php endif; ?>
 			<p class="aio-ai-providers-description"><?php \esc_html_e( 'Configure and inspect AI provider credentials, model defaults, and connection status. Keys are never shown in full after save.', 'aio-page-builder' ); ?></p>
-			<p><a href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'View AI Runs', 'aio-page-builder' ); ?></a></p>
+			<?php if ( ! $embed_in_hub ) : ?>
+				<p><a href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'View AI Runs', 'aio-page-builder' ); ?></a></p>
+			<?php endif; ?>
 			<?php if ( count( $provider_rows ) === 0 ) : ?>
 				<p class="aio-admin-notice"><?php \esc_html_e( 'No providers available.', 'aio-page-builder' ); ?></p>
 			<?php else : ?>
@@ -265,12 +298,19 @@ final class AI_Providers_Screen {
 					<tbody>
 						<?php foreach ( $provider_rows as $row ) : ?>
 							<?php
-							$credential  = $row['credential_status'] ?? array( 'label' => '—' );
+							$credential  = $row['credential_status'] ?? array(
+								'label' => '—',
+								'state' => '',
+							);
+							$cred_state  = isset( $credential['state'] ) ? (string) $credential['state'] : '';
 							$model_state = $row['model_default_state'] ?? array( 'label' => '—' );
 							$test        = $row['connection_test_summary'];
 							$last_use    = $row['last_successful_use'] ?? null;
 							?>
-							<tr>
+							<tr
+								data-aio-provider-id="<?php echo \esc_attr( (string) ( $row['provider_id'] ?? '' ) ); ?>"
+								data-aio-provider-credential-state="<?php echo \esc_attr( $cred_state ); ?>"
+							>
 								<td><strong><?php echo \esc_html( $row['label'] ?? $row['provider_id'] ); ?></strong></td>
 								<td><?php echo \esc_html( $credential['label'] ); ?></td>
 								<td><?php echo \esc_html( $model_state['label'] ); ?></td>
@@ -287,13 +327,13 @@ final class AI_Providers_Screen {
 								</td>
 								<td><?php echo $last_use !== null ? \esc_html( $this->format_timestamp( $last_use ) ) : '—'; ?></td>
 								<td>
-									<form method="post" action="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG ) ); ?>" style="display:inline-block;margin-right:6px;">
+									<form method="post" action="<?php echo \esc_url( $this->get_hub_providers_base_url() ); ?>" style="display:inline-block;margin-right:6px;">
 										<input type="hidden" name="action" value="aio_pb_test_ai_provider_connection" />
 										<input type="hidden" name="provider_id" value="<?php echo \esc_attr( $row['provider_id'] ); ?>" />
 										<?php \wp_nonce_field( 'aio_pb_test_ai_provider_connection_' . $row['provider_id'] ); ?>
 										<button type="submit" class="button button-small"><?php \esc_html_e( 'Test connection', 'aio-page-builder' ); ?></button>
 									</form>
-									<form method="post" action="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG ) ); ?>" style="display:inline-block;">
+									<form method="post" action="<?php echo \esc_url( $this->get_hub_providers_base_url() ); ?>" style="display:inline-block;">
 										<input type="hidden" name="action" value="aio_pb_update_ai_provider_credential" />
 										<input type="hidden" name="provider_id" value="<?php echo \esc_attr( $row['provider_id'] ); ?>" />
 										<?php \wp_nonce_field( 'aio_pb_update_ai_provider_credential_' . $row['provider_id'] ); ?>
@@ -313,23 +353,23 @@ final class AI_Providers_Screen {
 	}
 
 	/**
-	 * Handles action=aio_pb_save_spend_cap: saves monthly spend cap settings per provider.
+	 * Save spend cap POST: returns redirect URL or null.
 	 *
-	 * @return bool True if handled and redirected.
+	 * @return string|null
 	 */
-	private function maybe_handle_save_spend_cap(): bool {
+	private function maybe_resolve_save_spend_cap_redirect(): ?string {
 		$action      = isset( $_POST['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['action'] ) ) : '';
 		$provider_id = isset( $_POST['provider_id'] ) ? \sanitize_key( (string) $_POST['provider_id'] ) : '';
 		if ( $action !== 'aio_pb_save_spend_cap' || $provider_id === '' ) {
-			return false;
+			return null;
 		}
-		if ( ! \current_user_can( Capabilities::MANAGE_AI_PROVIDERS ) ) {
-			$this->redirect_back( 'error', __( 'You do not have permission to change spend cap settings.', 'aio-page-builder' ) );
-			return true;
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_AI_PROVIDERS ) ) {
+			return $this->build_redirect_url( 'error', __( 'You do not have permission to change spend cap settings.', 'aio-page-builder' ) );
 		}
 		\check_admin_referer( 'aio_pb_save_spend_cap_' . $provider_id );
+		Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_AI_PROVIDER_SPEND_CAP_SAVE_POST, 'provider=' . $provider_id );
 		if ( ! $this->container ) {
-			return false;
+			return null;
 		}
 		$cap_raw  = isset( $_POST['monthly_cap_usd'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['monthly_cap_usd'] ) ) : '0';
 		$cap_usd  = max( 0.0, (float) $cap_raw );
@@ -337,8 +377,7 @@ final class AI_Providers_Screen {
 		/** @var Provider_Spend_Cap_Settings $cap_settings */
 		$cap_settings = $this->container->get( 'provider_spend_cap_settings' );
 		$cap_settings->save_settings( $provider_id, $cap_usd, $override );
-		$this->redirect_back( 'success', __( 'Spend cap settings saved.', 'aio-page-builder' ) );
-		return true;
+		return $this->build_redirect_url( 'success', __( 'Spend cap settings saved.', 'aio-page-builder' ) );
 	}
 
 	/**
@@ -413,7 +452,7 @@ final class AI_Providers_Screen {
 						<p><em><?php \esc_html_e( 'No spend recorded this month.', 'aio-page-builder' ); ?></em></p>
 					<?php endif; ?>
 
-					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG ) ); ?>">
+					<form method="post" action="<?php echo \esc_url( $this->get_hub_providers_base_url() ); ?>">
 						<input type="hidden" name="action" value="aio_pb_save_spend_cap" />
 						<input type="hidden" name="provider_id" value="<?php echo \esc_attr( $pid ); ?>" />
 						<?php \wp_nonce_field( 'aio_pb_save_spend_cap_' . $pid ); ?>

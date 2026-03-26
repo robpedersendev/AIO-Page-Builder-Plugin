@@ -14,6 +14,8 @@ namespace AIOPageBuilder\Admin\Screens\Support;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Domain\Reporting\UI\Support_Triage_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -46,7 +48,7 @@ final class Support_Triage_Dashboard_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the support triage dashboard.', 'aio-page-builder' ), 403 );
 		}
 		$state = $this->build_state();
@@ -132,9 +134,9 @@ final class Support_Triage_Dashboard_Screen {
 
 	/** @param array<string, mixed> $state */
 	private function render_filter_links( array $state ): void {
-		$base = \add_query_arg( array( 'page' => self::SLUG ), \admin_url( 'admin.php' ) );
+		$base = Admin_Screen_Hub::tab_url( Queue_Logs_Screen::SLUG, 'triage' );
 		?>
-		<div class="aio-support-triage-filters" style="margin: 1em 0;">
+		<div class="aio-support-triage-filters">
 			<span class="filter-label"><?php \esc_html_e( 'Filter:', 'aio-page-builder' ); ?></span>
 			<a href="<?php echo \esc_url( $base ); ?>"><?php \esc_html_e( 'All', 'aio-page-builder' ); ?></a>
 			| <a href="<?php echo \esc_url( \add_query_arg( 'domain', 'queue', $base ) ); ?>"><?php \esc_html_e( 'Queue', 'aio-page-builder' ); ?></a>
@@ -170,14 +172,14 @@ final class Support_Triage_Dashboard_Screen {
 	/** @param array<int, array<string, string>> $items */
 	private function render_degraded_systems( array $items ): void {
 		?>
-		<section class="aio-support-triage-section aio-degraded-systems" style="margin: 1.5em 0;" aria-labelledby="aio-triage-degraded-heading">
+		<section class="aio-support-triage-section aio-degraded-systems" aria-labelledby="aio-triage-degraded-heading">
 			<h2 id="aio-triage-degraded-heading"><?php \esc_html_e( 'Degraded systems', 'aio-page-builder' ); ?></h2>
 			<?php if ( empty( $items ) ) : ?>
 				<p class="aio-triage-none"><?php \esc_html_e( 'No degraded systems.', 'aio-page-builder' ); ?></p>
 			<?php else : ?>
-				<ul class="aio-triage-list" style="list-style: none; padding-left: 0;">
+				<ul class="aio-triage-list">
 					<?php foreach ( $items as $item ) : ?>
-						<li class="aio-triage-item" style="border-left: 4px solid #dba617; padding: 0.5em 0.75em; margin: 0.25em 0; background: #fcf9e8;">
+						<li class="aio-triage-item aio-triage-item--warning">
 							<strong><?php echo \esc_html( (string) ( $item['title'] ?? '' ) ); ?></strong> — <?php echo \esc_html( (string) ( $item['message'] ?? '' ) ); ?>
 							<a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a>
 						</li>
@@ -219,12 +221,12 @@ final class Support_Triage_Dashboard_Screen {
 		$rollback    = $state['rollback_candidates'] ?? array();
 		$base        = \admin_url( 'admin.php' );
 		?>
-		<section class="aio-support-triage-section aio-plans-rollback" style="margin: 1.5em 0;" aria-labelledby="aio-triage-plans-heading">
+		<section class="aio-support-triage-section aio-plans-rollback" aria-labelledby="aio-triage-plans-heading">
 			<h2 id="aio-triage-plans-heading"><?php \esc_html_e( 'Plans needing attention & rollback candidates', 'aio-page-builder' ); ?></h2>
 			<p class="description"><?php \esc_html_e( 'Plans in review or in progress; recent completed jobs that may be rollback-eligible (open plan to confirm).', 'aio-page-builder' ); ?></p>
 			<?php if ( ! empty( $stale_plans ) ) : ?>
-				<h3 style="font-size: 1em;"><?php \esc_html_e( 'Plans needing attention', 'aio-page-builder' ); ?></h3>
-				<ul style="list-style: none; padding-left: 0;">
+				<h3 class="aio-triage-subheading"><?php \esc_html_e( 'Plans needing attention', 'aio-page-builder' ); ?></h3>
+				<ul class="aio-triage-plans-plain">
 					<?php foreach ( $stale_plans as $plan ) : ?>
 						<?php $plan_id = (string) ( $plan['plan_id'] ?? '' ); ?>
 						<li><a href="
@@ -244,7 +246,7 @@ final class Support_Triage_Dashboard_Screen {
 				</ul>
 			<?php endif; ?>
 			<?php if ( ! empty( $rollback ) ) : ?>
-				<h3 style="font-size: 1em;"><?php \esc_html_e( 'Rollback candidates (recent completed)', 'aio-page-builder' ); ?></h3>
+				<h3 class="aio-triage-subheading"><?php \esc_html_e( 'Rollback candidates (recent completed)', 'aio-page-builder' ); ?></h3>
 				<table class="wp-list-table widefat fixed striped">
 					<thead><tr><th><?php \esc_html_e( 'Job type', 'aio-page-builder' ); ?></th><th><?php \esc_html_e( 'Plan', 'aio-page-builder' ); ?></th><th><?php \esc_html_e( 'Completed', 'aio-page-builder' ); ?></th><th><?php \esc_html_e( 'Action', 'aio-page-builder' ); ?></th></tr></thead>
 					<tbody>
@@ -269,12 +271,12 @@ final class Support_Triage_Dashboard_Screen {
 	/** @param array<int, array<string, string>> $items */
 	private function render_import_export_failures( array $items ): void {
 		?>
-		<section class="aio-support-triage-section aio-import-export" style="margin: 1.5em 0;" aria-labelledby="aio-triage-ie-heading">
+		<section class="aio-support-triage-section aio-import-export" aria-labelledby="aio-triage-ie-heading">
 			<h2 id="aio-triage-ie-heading"><?php \esc_html_e( 'Import / Export failures', 'aio-page-builder' ); ?></h2>
 			<?php if ( empty( $items ) ) : ?>
 				<p class="aio-triage-none"><?php \esc_html_e( 'No import/export failures recorded.', 'aio-page-builder' ); ?></p>
 			<?php else : ?>
-				<ul class="aio-triage-list" style="list-style: none; padding-left: 0;">
+				<ul class="aio-triage-list">
 					<?php foreach ( $items as $item ) : ?>
 						<li><?php echo \esc_html( (string) ( $item['message'] ?? '' ) ); ?> <a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a></li>
 					<?php endforeach; ?>
@@ -287,9 +289,9 @@ final class Support_Triage_Dashboard_Screen {
 	/** @param array<int, array<string, string>> $items */
 	private function render_recommended_links( array $items ): void {
 		?>
-		<section class="aio-support-triage-section aio-recommended-links" style="margin: 1.5em 0;" aria-labelledby="aio-triage-links-heading">
+		<section class="aio-support-triage-section aio-recommended-links" aria-labelledby="aio-triage-links-heading">
 			<h2 id="aio-triage-links-heading"><?php \esc_html_e( 'Recommended next steps', 'aio-page-builder' ); ?></h2>
-			<ul class="aio-triage-links" style="list-style: none; padding-left: 0; display: flex; flex-wrap: wrap; gap: 0.5em;">
+			<ul class="aio-triage-links">
 				<?php foreach ( $items as $item ) : ?>
 					<li><a href="<?php echo \esc_url( (string) ( $item['url'] ?? '#' ) ); ?>" class="button"><?php echo \esc_html( (string) ( $item['label'] ?? '' ) ); ?></a> <span class="description"><?php echo \esc_html( (string) ( $item['description'] ?? '' ) ); ?></span></li>
 				<?php endforeach; ?>

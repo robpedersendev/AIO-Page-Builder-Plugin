@@ -35,7 +35,8 @@ final class Onboarding_Provider implements Service_Provider_Interface {
 				return new Onboarding_Prefill_Service(
 					$container->get( 'profile_store' ),
 					$container->get( 'settings' ),
-					$crawl
+					$crawl,
+					$container->get( 'provider_secret_store' )
 				);
 			}
 		);

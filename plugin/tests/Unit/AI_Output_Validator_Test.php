@@ -96,6 +96,21 @@ final class AI_Output_Validator_Test extends TestCase {
 		$this->assertSame( 'top_level', $report->get_blocking_failure_stage() );
 	}
 
+	public function test_string_site_purpose_site_structure_and_confidence_are_coerced_to_objects(): void {
+		$payload = $this->minimal_valid_payload();
+		$payload[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ]   = 'Purpose as plain string from model.';
+		$payload[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ] = 'Nav summary as plain string.';
+		$payload[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ]     = 'high';
+		$report                                                 = $this->validator()->validate( $payload, Build_Plan_Draft_Schema::SCHEMA_REF, false );
+		$this->assertSame( Validation_Report::STATE_PASSED, $report->get_final_validation_state(), 'coercion should satisfy top-level object rules' );
+		$this->assertTrue( $report->allows_build_plan_handoff() );
+		$normalized = $report->get_normalized_output();
+		$this->assertIsArray( $normalized );
+		$this->assertSame( 'Purpose as plain string from model.', $normalized[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ]['summary'] ?? null );
+		$this->assertSame( 'Nav summary as plain string.', $normalized[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ]['navigation_summary'] ?? null );
+		$this->assertSame( 'high', $normalized[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ]['overall'] ?? null );
+	}
+
 	public function test_invalid_run_summary_enum_produces_failed_state(): void {
 		$payload = $this->minimal_valid_payload();
 		$payload[ Build_Plan_Draft_Schema::KEY_RUN_SUMMARY ]['planning_mode'] = 'invalid_mode';

@@ -56,11 +56,21 @@ final class Hub_Menu_Capabilities {
 			return array( 'do_not_allow' );
 		}
 		if ( $cap === Capabilities::ACCESS_AI_WORKSPACE ) {
-			if ( self::user_has_primitive_cap( $user_id, Capabilities::VIEW_AI_RUNS ) ||
+			if ( self::user_is_elevated_site_admin( $user_id ) ||
+				self::user_has_primitive_cap( $user_id, Capabilities::VIEW_AI_RUNS ) ||
 				self::user_has_primitive_cap( $user_id, Capabilities::MANAGE_AI_PROVIDERS ) ) {
 				return array( 'read' );
 			}
 			return array( 'do_not_allow' );
+		}
+		// * AI Runs list/detail: site admin when aio_view_ai_runs is missing; provider managers may view runs (same workspace).
+		if ( $cap === Capabilities::VIEW_AI_RUNS ) {
+			if ( self::user_is_elevated_site_admin( $user_id ) ) {
+				return array( 'read' );
+			}
+			if ( self::user_has_primitive_cap( $user_id, Capabilities::MANAGE_AI_PROVIDERS ) ) {
+				return array( 'read' );
+			}
 		}
 		if ( $cap === Capabilities::ACCESS_ONBOARDING_WORKSPACE ) {
 			if ( self::user_has_primitive_cap( $user_id, Capabilities::RUN_ONBOARDING ) ||
@@ -87,10 +97,11 @@ final class Hub_Menu_Capabilities {
 			}
 			return array( 'do_not_allow' );
 		}
-		// * Registry CPT caps: if role grants are missing (activation gap), site admins still manage the template library.
+		// * Registry / AI provider caps: if role grants are missing (activation gap), site admins still reach the screens.
 		if ( $cap === Capabilities::MANAGE_SECTION_TEMPLATES
 			|| $cap === Capabilities::MANAGE_PAGE_TEMPLATES
-			|| $cap === Capabilities::MANAGE_COMPOSITIONS ) {
+			|| $cap === Capabilities::MANAGE_COMPOSITIONS
+			|| $cap === Capabilities::MANAGE_AI_PROVIDERS ) {
 			if ( self::user_is_elevated_site_admin( $user_id ) ) {
 				return array( 'read' );
 			}

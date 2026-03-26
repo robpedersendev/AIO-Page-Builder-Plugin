@@ -41,7 +41,7 @@ final class Create_Plan_From_Starter_Bundle_Action {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_plan_result', 'error', $redirect_profile ) );
 			exit;
 		}
-		if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_bundle_plan_result', 'unauthorized', $redirect_profile ) );
 			exit;
 		}

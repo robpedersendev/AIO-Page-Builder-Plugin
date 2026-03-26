@@ -90,13 +90,18 @@ final class Crawl_Snapshot_Service {
 	}
 
 	/**
-	 * Lists crawl sessions (runs that have at least one page record). Merges option-stored session payloads where present.
+	 * Lists crawl sessions: merges runs from snapshot rows and from session options (runs with zero pages yet).
 	 *
 	 * @param int $limit Max sessions to return (default 50).
 	 * @return array<int, array<string, mixed>>
 	 */
 	public function list_sessions( int $limit = 50 ): array {
-		$run_ids  = $this->repository->list_crawl_run_ids( $limit );
+		$from_table = $this->repository->list_crawl_run_ids( $limit );
+		$from_opts  = $this->list_recent_session_run_ids_from_options( $limit );
+		$run_ids    = array_values( array_unique( array_merge( $from_table, $from_opts ) ) );
+		if ( count( $run_ids ) > $limit ) {
+			$run_ids = array_slice( $run_ids, 0, $limit );
+		}
 		$sessions = array();
 		foreach ( $run_ids as $run_id ) {
 			$payload = $this->get_session( $run_id );
@@ -127,6 +132,48 @@ final class Crawl_Snapshot_Service {
 			}
 		);
 		return $sessions;
+	}
+
+	/**
+	 * Lists recent crawl run ids stored as options (session metadata before any page rows exist).
+	 *
+	 * @param int $limit Max ids.
+	 * @return array<int, string>
+	 */
+	private function list_recent_session_run_ids_from_options( int $limit ): array {
+		global $wpdb;
+		if ( ! isset( $wpdb ) || ! ( $wpdb instanceof \wpdb ) || $limit <= 0 ) {
+			return array();
+		}
+		$like = $wpdb->esc_like( self::SESSION_OPTION_PREFIX ) . '%';
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- option_name listing by prefix; no object cache for this admin-only merge.
+		$names = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s ORDER BY option_id DESC LIMIT %d",
+				$like,
+				max( 1, $limit * 3 )
+			)
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( ! is_array( $names ) ) {
+			return array();
+		}
+		$prefix_len = strlen( self::SESSION_OPTION_PREFIX );
+		$out        = array();
+		foreach ( $names as $name ) {
+			if ( ! is_string( $name ) || $name === '' ) {
+				continue;
+			}
+			$id = substr( $name, $prefix_len );
+			if ( $id === '' ) {
+				continue;
+			}
+			$out[] = $id;
+			if ( count( $out ) >= $limit ) {
+				break;
+			}
+		}
+		return $out;
 	}
 
 	/**

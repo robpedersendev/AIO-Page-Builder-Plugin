@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Screens\Industry;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Registry\Industry_Style_Preset_Registry;
@@ -123,9 +124,9 @@ final class Industry_Style_Layer_Comparison_Screen {
 			'presets'          => $presets,
 			'selected_preset'  => $selected_preset,
 			'diff_result'      => $diff_result,
-			'profile_url'      => admin_url( 'admin.php?page=' . Industry_Profile_Settings_Screen::SLUG ),
-			'style_preset_url' => admin_url( 'admin.php?page=' . Industry_Style_Preset_Screen::SLUG ),
-			'current_url'      => admin_url( 'admin.php?page=' . self::SLUG ),
+			'profile_url'      => Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'profile' ),
+			'style_preset_url' => Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'style' ),
+			'current_url'      => Admin_Screen_Hub::subtab_url( Industry_Profile_Settings_Screen::SLUG, 'comparisons', 'style_layer' ),
 		);
 	}
 
@@ -135,7 +136,7 @@ final class Industry_Style_Layer_Comparison_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to access the style layer comparison screen.', 'aio-page-builder' ), 403 );
 		}
 		$state            = $this->get_state();
@@ -166,8 +167,10 @@ final class Industry_Style_Layer_Comparison_Screen {
 					<?php esc_html_e( 'No style presets are available for your current industry.', 'aio-page-builder' ); ?>
 				</p>
 			<?php else : ?>
-				<form method="get" action="<?php echo esc_url( $state['current_url'] ); ?>" class="aio-style-layer-comparison-form" style="margin: 1em 0;">
-					<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG ); ?>" />
+				<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" class="aio-style-layer-comparison-form" style="margin: 1em 0;">
+					<input type="hidden" name="page" value="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" />
+					<input type="hidden" name="<?php echo esc_attr( Admin_Screen_Hub::QUERY_TAB ); ?>" value="comparisons" />
+					<input type="hidden" name="<?php echo esc_attr( Admin_Screen_Hub::QUERY_SUBTAB ); ?>" value="style_layer" />
 					<label for="aio-preset-key"><?php esc_html_e( 'Preset to compare', 'aio-page-builder' ); ?></label>
 					<select id="aio-preset-key" name="<?php echo esc_attr( self::PARAM_PRESET_KEY ); ?>">
 						<?php

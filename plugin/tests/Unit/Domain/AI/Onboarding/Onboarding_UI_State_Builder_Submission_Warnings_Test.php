@@ -10,6 +10,7 @@ namespace AIOPageBuilder\Tests\Unit\Domain\AI\Onboarding;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
+use AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
@@ -44,11 +45,18 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 		return $result;
 	}
 
+	private function stub_secret_store_absent(): Provider_Secret_Store_Interface {
+		$store = $this->createMock( Provider_Secret_Store_Interface::class );
+		$store->method( 'get_credential_state' )->willReturn( Provider_Secret_Store_Interface::STATE_ABSENT );
+		$store->method( 'has_credential' )->willReturn( false );
+		return $store;
+	}
+
 	private function base_builder( Profile_Snapshot_Repository_Interface $repo, Settings_Service $settings ): Onboarding_UI_State_Builder {
 		$normalizer    = new Profile_Normalizer();
 		$profile_store = new Profile_Store( $settings, $normalizer );
 		$draft_svc     = new Onboarding_Draft_Service( $settings );
-		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null );
+		$prefill_svc   = new Onboarding_Prefill_Service( $profile_store, $settings, null, $this->stub_secret_store_absent() );
 		return new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc, null, null, $repo, $settings );
 	}
 

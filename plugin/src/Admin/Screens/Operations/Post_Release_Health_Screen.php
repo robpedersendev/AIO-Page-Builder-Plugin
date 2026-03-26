@@ -15,6 +15,8 @@ namespace AIOPageBuilder\Admin\Screens\Operations;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_Analytics_Service;
 use AIOPageBuilder\Domain\Reporting\UI\Post_Release_Health_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -48,7 +50,7 @@ final class Post_Release_Health_Screen {
 	 * @return void
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! \current_user_can( $this->get_capability() ) ) {
+		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to access the post-release health review.', 'aio-page-builder' ), 403 );
 		}
 
@@ -84,10 +86,11 @@ final class Post_Release_Health_Screen {
 				echo \esc_url(
 					\add_query_arg(
 						array(
-							'page'           => self::SLUG,
-							'export_summary' => '1',
-							'date_from'      => $summary['period_start'] ?? '',
-							'date_to'        => $summary['period_end'] ?? '',
+							'page'                      => Queue_Logs_Screen::SLUG,
+							Admin_Screen_Hub::QUERY_TAB => 'post_release',
+							'export_summary'            => '1',
+							'date_from'                 => $summary['period_start'] ?? '',
+							'date_to'                   => $summary['period_end'] ?? '',
 						),
 						\admin_url( 'admin.php' )
 					)
@@ -137,7 +140,7 @@ final class Post_Release_Health_Screen {
 				<?php endif; ?>
 			</section>
 
-			<p><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=aio-page-builder-support-triage' ) ); ?>"><?php \esc_html_e( '&larr; Support Triage', 'aio-page-builder' ); ?></a></p>
+			<p><a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( Queue_Logs_Screen::SLUG, 'triage' ) ); ?>"><?php \esc_html_e( '&larr; Support Triage', 'aio-page-builder' ); ?></a></p>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
 		<?php endif; ?>

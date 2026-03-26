@@ -13,9 +13,9 @@ namespace AIOPageBuilder\Admin\Screens\Analytics;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
-use AIOPageBuilder\Admin\Screens\Templates\Compositions_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Templates_Directory_Screen;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -97,10 +97,10 @@ final class Template_Analytics_Screen {
 			}
 		}
 
-		$build_plans_url  = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
-		$queue_logs_url   = \admin_url( 'admin.php?page=' . Queue_Logs_Screen::SLUG );
-		$page_tpl_url     = \admin_url( 'admin.php?page=' . Page_Templates_Directory_Screen::SLUG );
-		$compositions_url = \admin_url( 'admin.php?page=' . Compositions_Screen::SLUG );
+		$build_plans_url  = Admin_Screen_Hub::tab_url( Build_Plans_Screen::SLUG, 'build_plans' );
+		$queue_logs_url   = Admin_Screen_Hub::tab_url( Queue_Logs_Screen::SLUG, 'queue' );
+		$page_tpl_url     = Admin_Screen_Hub::tab_url( Page_Templates_Directory_Screen::SLUG, 'page_templates' );
+		$compositions_url = Admin_Screen_Hub::tab_url( Page_Templates_Directory_Screen::SLUG, 'compositions' );
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-template-analytics" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
@@ -115,7 +115,8 @@ final class Template_Analytics_Screen {
 			</p>
 
 			<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-analytics-filter">
-				<input type="hidden" name="page" value="<?php echo \esc_attr( self::SLUG ); ?>" />
+				<input type="hidden" name="page" value="<?php echo \esc_attr( Build_Plans_Screen::SLUG ); ?>" />
+				<input type="hidden" name="<?php echo \esc_attr( Admin_Screen_Hub::QUERY_TAB ); ?>" value="template_analytics" />
 				<p>
 					<label for="aio-date-from"><?php \esc_html_e( 'From date (Y-m-d):', 'aio-page-builder' ); ?></label>
 					<input type="date" id="aio-date-from" name="date_from" value="<?php echo \esc_attr( $date_from ); ?>" />

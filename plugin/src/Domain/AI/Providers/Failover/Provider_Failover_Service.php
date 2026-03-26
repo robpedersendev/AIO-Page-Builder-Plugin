@@ -18,6 +18,8 @@ use AIOPageBuilder\Domain\AI\Providers\Provider_Capability_Resolver;
 use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Resolves failover policy from config; attempts one fallback request when policy allows and capability matches.
@@ -85,6 +87,7 @@ final class Provider_Failover_Service {
 		);
 
 		if ( ! $policy->can_attempt_fallback( $primary_provider_id, 0 ) || ! $policy->is_eligible_category( $category ) ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::FAILOVER_NO_ATTEMPT, 'primary=' . $primary_provider_id . ' category=' . $category );
 			return array(
 				'response' => $primary_response,
 				'result'   => Failover_Result::primary_failure_no_fallback( $primary_provider_id, $primary_model, $category, $policy_snapshot ),
@@ -94,6 +97,7 @@ final class Provider_Failover_Service {
 		$fallback_id = $policy->get_fallback_provider_id();
 		$driver      = $this->get_driver_for_provider( $fallback_id, $container );
 		if ( $driver === null ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::FAILOVER_FALLBACK_DRIVER_MISSING, 'fallback_id=' . $fallback_id );
 			return array(
 				'response' => $primary_response,
 				'result'   => Failover_Result::primary_failure_no_fallback( $primary_provider_id, $primary_model, $category, $policy_snapshot ),
@@ -101,6 +105,7 @@ final class Provider_Failover_Service {
 		}
 
 		if ( ! $this->capability_resolver->supports_schema( $driver, $schema_ref ) ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::FAILOVER_FALLBACK_SCHEMA_UNSUPPORTED, 'fallback=' . $fallback_id . ' schema=' . $schema_ref );
 			return array(
 				'response' => $primary_response,
 				'result'   => Failover_Result::primary_failure_no_fallback( $primary_provider_id, $primary_model, $category, $policy_snapshot ),
@@ -109,6 +114,7 @@ final class Provider_Failover_Service {
 
 		$fallback_model = $this->capability_resolver->resolve_default_model_for_planning( $driver, $schema_ref );
 		if ( $fallback_model === null || $fallback_model === '' ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::FAILOVER_FALLBACK_NO_MODEL, 'fallback=' . $fallback_id );
 			return array(
 				'response' => $primary_response,
 				'result'   => Failover_Result::primary_failure_no_fallback( $primary_provider_id, $primary_model, $category, $policy_snapshot ),
@@ -119,6 +125,10 @@ final class Provider_Failover_Service {
 		$request_for_fallback          = $normalized_request;
 		$request_for_fallback['model'] = $fallback_model;
 
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::FAILOVER_FALLBACK_REQUEST,
+			'primary=' . $primary_provider_id . ' fallback=' . $fallback_id . ' model=' . $fallback_model
+		);
 		$response = $driver->request( $request_for_fallback );
 
 		$attempts[] = array(
@@ -129,12 +139,14 @@ final class Provider_Failover_Service {
 		);
 
 		if ( ! empty( $response['success'] ) ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::FAILOVER_FALLBACK_SUCCESS, 'fallback=' . $fallback_id );
 			return array(
 				'response' => $response,
 				'result'   => Failover_Result::fallback_success( $fallback_id, $fallback_model, $attempts, $policy_snapshot ),
 			);
 		}
 
+		Named_Debug_Log::event( Named_Debug_Log_Event::FAILOVER_FALLBACK_FAILED, 'fallback=' . $fallback_id );
 		return array(
 			'response' => $response,
 			'result'   => Failover_Result::fallback_failure( $fallback_id, $fallback_model, $attempts, $policy_snapshot ),

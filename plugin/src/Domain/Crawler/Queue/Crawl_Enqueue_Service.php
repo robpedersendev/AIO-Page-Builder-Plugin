@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Domain\Crawler\Queue;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Crawler\Execution\Crawl_Run_Processor;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Payload_Builder;
 use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
 
@@ -64,6 +65,7 @@ final class Crawl_Enqueue_Service {
 		}
 
 		$this->augment_session_payload( $crawl_id, $site_url, '', $settings, $created_by );
+		$this->schedule_processor( $crawl_id );
 		return array(
 			'success'  => true,
 			'crawl_id' => $crawl_id,
@@ -118,6 +120,7 @@ final class Crawl_Enqueue_Service {
 		}
 		$site_url = (string) ( $prior['site_url'] ?? '' );
 		$this->augment_session_payload( $crawl_id, $site_url, $prior_id, $settings, $created_by );
+		$this->schedule_processor( $crawl_id );
 		return array(
 			'success'  => true,
 			'crawl_id' => $crawl_id,
@@ -136,15 +139,48 @@ final class Crawl_Enqueue_Service {
 		if ( $existing === null ) {
 			return;
 		}
-		$existing['site_url']   = $site_url !== '' ? \esc_url_raw( $site_url ) : '';
-		$existing['status']     = 'queued';
-		$existing['retry_of']   = $retry_of !== '' ? \sanitize_text_field( $retry_of ) : '';
-		$existing['settings']   = is_array( $settings ) ? $settings : array();
-		$existing['created_by'] = \sanitize_text_field( $created_by );
-		$existing['created_at'] = gmdate( 'c' );
-		$existing['crawl_id']   = $crawl_id;
-		$option_key             = 'aio_page_builder_crawl_session_' . substr( preg_replace( '/[^a-zA-Z0-9_-]/', '', $crawl_id ), 0, 64 );
+		$existing['site_url'] = $site_url !== '' ? \esc_url_raw( $site_url ) : '';
+		$existing['retry_of'] = $retry_of !== '' ? \sanitize_text_field( $retry_of ) : '';
+		$prev_settings        = isset( $existing[ Crawl_Snapshot_Payload_Builder::SESSION_SETTINGS ] ) && is_array( $existing[ Crawl_Snapshot_Payload_Builder::SESSION_SETTINGS ] )
+			? $existing[ Crawl_Snapshot_Payload_Builder::SESSION_SETTINGS ]
+			: array();
+		$existing[ Crawl_Snapshot_Payload_Builder::SESSION_SETTINGS ] = array_merge( $prev_settings, is_array( $settings ) ? $settings : array() );
+		$existing['created_by']                                       = \sanitize_text_field( $created_by );
+		$existing['created_at']                                       = gmdate( 'c' );
+		$existing['crawl_id'] = $crawl_id;
+		$option_key           = 'aio_page_builder_crawl_session_' . substr( preg_replace( '/[^a-zA-Z0-9_-]/', '', $crawl_id ), 0, 64 );
 		\update_option( $option_key, $existing, false );
+	}
+
+	/**
+	 * Releases the per-site crawl lock after a run finishes (called by Crawl_Run_Processor).
+	 *
+	 * @param string $site_host Canonical host.
+	 * @return void
+	 */
+	public function release_lock_for_host( string $site_host ): void {
+		$host = strtolower( trim( $site_host ) );
+		if ( $host === '' ) {
+			return;
+		}
+		$this->release_lock( $host );
+	}
+
+	/**
+	 * Schedules WP-Cron to execute the crawl processor (spawn_cron when wp-cron is disabled).
+	 *
+	 * @param string $crawl_id Crawl run id.
+	 * @return void
+	 */
+	private function schedule_processor( string $crawl_id ): void {
+		$crawl_id = \sanitize_text_field( $crawl_id );
+		if ( $crawl_id === '' || ! \function_exists( 'wp_schedule_single_event' ) ) {
+			return;
+		}
+		\wp_schedule_single_event( \time(), Crawl_Run_Processor::CRON_HOOK, array( $crawl_id ) );
+		if ( \defined( 'DISABLE_WP_CRON' ) && \DISABLE_WP_CRON && \function_exists( 'spawn_cron' ) ) {
+			\spawn_cron();
+		}
 	}
 
 	private function acquire_lock( string $site_host ): bool {

@@ -30,7 +30,8 @@ use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
-use AIOPageBuilder\Support\Logging\Internal_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Renders Build Plan detail with three-zone layout. Consumes UI state from Build_Plan_UI_State_Builder.
@@ -41,6 +42,13 @@ final class Build_Plan_Workspace_Screen {
 	/** @var Service_Container|null */
 	private $container;
 
+	/**
+	 * Ensures export/POST/GET handlers run once per request (admin_init via Admin_Early_Redirect_Coordinator, then render() must not repeat).
+	 *
+	 * @var bool
+	 */
+	private static $early_handlers_dispatched = false;
+
 	public function __construct( ?Service_Container $container = null ) {
 		$this->container = $container;
 	}
@@ -50,7 +58,7 @@ final class Build_Plan_Workspace_Screen {
 	 */
 	private function log_debug_audit( array $data ): void {
 		$json = \wp_json_encode( $data );
-		Internal_Debug_Log::line( false !== $json ? $json : 'json_encode_failed' );
+		Named_Debug_Log::event( Named_Debug_Log_Event::BUILD_PLAN_WORKSPACE_UI_STATE_DEBUG, false !== $json ? $json : 'json_encode_failed' );
 	}
 
 	public function get_capability(): string {
@@ -134,6 +142,34 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	/**
+	 * Runs export + workspace POST/GET handlers before admin HTML (Admin_Early_Redirect_Coordinator on admin_init).
+	 * Order matches render(); each handler exits on redirect/download or returns false.
+	 *
+	 * @param string $plan_id Plan ID from request.
+	 * @return void
+	 */
+	public function dispatch_early_request_handlers( string $plan_id ): void {
+		if ( self::$early_handlers_dispatched ) {
+			return;
+		}
+		$plan_id = \sanitize_text_field( $plan_id );
+		if ( $plan_id === '' ) {
+			return;
+		}
+		$this->maybe_handle_export_plan( $plan_id );
+		$this->maybe_handle_step2_action( $plan_id );
+		$this->maybe_handle_step1_action( $plan_id );
+		$this->maybe_handle_step4_action( $plan_id );
+		$this->maybe_handle_step5_action( $plan_id );
+		$this->maybe_handle_navigation_action( $plan_id );
+		$this->maybe_handle_hierarchy_action( $plan_id );
+		$this->maybe_handle_create_menu_action( $plan_id );
+		$this->maybe_handle_rollback_request( $plan_id );
+		$this->maybe_handle_finalize_plan( $plan_id );
+		self::$early_handlers_dispatched = true;
+	}
+
+	/**
 	 * Renders workspace for the given plan_id. Exits with not-found message if plan missing.
 	 * Handles Step 2 then Step 1 actions before rendering.
 	 *
@@ -141,46 +177,7 @@ final class Build_Plan_Workspace_Screen {
 	 * @return void
 	 */
 	public function render( string $plan_id ): void {
-		$handled = $this->maybe_handle_export_plan( $plan_id );
-		if ( $handled ) {
-			return;
-		}
-		$handled = $this->maybe_handle_step2_action( $plan_id );
-		if ( $handled ) {
-			return;
-		}
-		$handled = $this->maybe_handle_step1_action( $plan_id );
-		if ( $handled ) {
-			return;
-		}
-		$handled = $this->maybe_handle_step4_action( $plan_id );
-		if ( $handled ) {
-			return;
-		}
-		$handled = $this->maybe_handle_step5_action( $plan_id );
-		if ( $handled ) {
-			return;
-		}
-		$handled = $this->maybe_handle_navigation_action( $plan_id );
-		if ( $handled ) {
-			return;
-		}
-		$handled = $this->maybe_handle_hierarchy_action( $plan_id );
-		if ( $handled ) {
-			return;
-		}
-		$handled = $this->maybe_handle_create_menu_action( $plan_id );
-		if ( $handled ) {
-			return;
-		}
-		$handled = $this->maybe_handle_rollback_request( $plan_id );
-		if ( $handled ) {
-			return;
-		}
-		$handled = $this->maybe_handle_finalize_plan( $plan_id );
-		if ( $handled ) {
-			return;
-		}
+		$this->dispatch_early_request_handlers( $plan_id );
 		$state = $this->get_state( $plan_id );
 		if ( $state === null ) {
 			$this->render_not_found( $plan_id );
@@ -197,7 +194,7 @@ final class Build_Plan_Workspace_Screen {
 	 * @return bool True if handled (redirect sent).
 	 */
 	private function maybe_handle_finalize_plan( string $plan_id ): bool {
-		if ( ! \current_user_can( Capabilities::FINALIZE_PLAN_ACTIONS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::FINALIZE_PLAN_ACTIONS ) ) {
 			return false;
 		}
 		if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || $_SERVER['REQUEST_METHOD'] !== 'POST' || ! isset( $_POST['aio_build_plan_action'] ) ) {
@@ -251,7 +248,10 @@ final class Build_Plan_Workspace_Screen {
 
 		// Minimal audit log (no secrets).
 		if ( \is_object( $result ) && \method_exists( $result, 'get_status' ) ) {
-			Internal_Debug_Log::line( 'Finalize plan result: ' . (string) $result->get_status() . ' plan_id=' . $plan_id );
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BUILD_PLAN_WORKSPACE_FINALIZE,
+				'status=' . (string) $result->get_status() . ' plan_id=' . $plan_id
+			);
 		}
 
 		\wp_safe_redirect( \add_query_arg( array( 'finalize_result' => 'done' ), $redirect_url ) );
@@ -265,7 +265,7 @@ final class Build_Plan_Workspace_Screen {
 	 * @return bool True if request was handled and redirect sent (exit); false to continue render.
 	 */
 	private function maybe_handle_step1_action( string $plan_id ): bool {
-		if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
 			return false;
 		}
 		$plan_id = \sanitize_text_field( $plan_id );
@@ -347,7 +347,7 @@ final class Build_Plan_Workspace_Screen {
 	 * @return bool True if request was handled and redirect sent (exit); false to continue render.
 	 */
 	private function maybe_handle_step2_action( string $plan_id ): bool {
-		if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
 			return false;
 		}
 		$plan_id = \sanitize_text_field( $plan_id );
@@ -449,7 +449,7 @@ final class Build_Plan_Workspace_Screen {
 	 * @return bool True if request was handled and redirect sent (exit); false to continue render.
 	 */
 	private function maybe_handle_navigation_action( string $plan_id ): bool {
-		if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
 			return false;
 		}
 		$plan_id = \sanitize_text_field( $plan_id );
@@ -552,7 +552,7 @@ final class Build_Plan_Workspace_Screen {
 			$is_bulk_execute = in_array( $action, array( 'bulk_execute_all_remaining_step4', 'bulk_execute_selected_step4' ), true );
 
 			if ( $is_bulk_execute ) {
-				if ( ! \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ) ) {
+				if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) ) {
 					return false;
 				}
 				if ( ! \wp_verify_nonce( $execute_nonce, self::NONCE_ACTION_EXECUTE_TOKEN_BULK ) ) {
@@ -674,7 +674,7 @@ final class Build_Plan_Workspace_Screen {
 				exit;
 			}
 
-			if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
 				return false;
 			}
 			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_BULK ) ) {
@@ -743,7 +743,7 @@ final class Build_Plan_Workspace_Screen {
 		}
 
 		if ( $is_review_action ) {
-			if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'design_token_bulk_action_service' ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'design_token_bulk_action_service' ) ) {
 				return false;
 			}
 			if ( ! \wp_verify_nonce( $nonce, $nonce_action ) ) {
@@ -768,7 +768,7 @@ final class Build_Plan_Workspace_Screen {
 		}
 
 		if ( $is_execute_action ) {
-			if ( ! \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
 				return false;
 			}
 			if ( ! \wp_verify_nonce( $nonce, $nonce_action ) ) {
@@ -940,7 +940,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( ! in_array( $action, $bulk_execute_actions, true ) ) {
 				return false;
 			}
-			if ( ! \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) ) {
 				return false;
 			}
 			if ( ! \wp_verify_nonce( $execute_nonce, self::NONCE_ACTION_EXECUTE_HIERARCHY_BULK ) ) {
@@ -1066,7 +1066,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( $row_nonce === '' || ! \wp_verify_nonce( $nonce, $row_nonce ) ) {
 			return false;
 		}
-		if ( ! \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
 			return false;
 		}
 
@@ -1229,7 +1229,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( ! in_array( $action, $bulk_execute_actions, true ) ) {
 				return false;
 			}
-			if ( ! \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) ) {
 				return false;
 			}
 			if ( ! \wp_verify_nonce( $execute_nonce, self::NONCE_ACTION_EXECUTE_CREATE_MENU_BULK ) ) {
@@ -1355,7 +1355,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( $row_nonce === '' || ! \wp_verify_nonce( $nonce, $row_nonce ) ) {
 			return false;
 		}
-		if ( ! \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
 			return false;
 		}
 
@@ -1502,7 +1502,7 @@ final class Build_Plan_Workspace_Screen {
 		);
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
-			if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) {
 				return false;
 			}
 			$action = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
@@ -1567,7 +1567,7 @@ final class Build_Plan_Workspace_Screen {
 			return false;
 		}
 
-		if ( ! \current_user_can( Capabilities::APPROVE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'seo_bulk_action_service' ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'seo_bulk_action_service' ) ) {
 			return false;
 		}
 
@@ -1598,7 +1598,7 @@ final class Build_Plan_Workspace_Screen {
 	 * @return bool True if request was handled and redirect sent; false to continue render.
 	 */
 	private function maybe_handle_rollback_request( string $plan_id ): bool {
-		if ( ! \current_user_can( Capabilities::EXECUTE_ROLLBACKS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_ROLLBACKS ) ) {
 			return false;
 		}
 		$plan_id = \sanitize_text_field( $plan_id );
@@ -1677,7 +1677,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( $plan_id === '' ) {
 			return false;
 		}
-		if ( ! \current_user_can( Capabilities::EXPORT_DATA ) && ! \current_user_can( Capabilities::DOWNLOAD_ARTIFACTS ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA ) && ! Capabilities::current_user_can_for_route( Capabilities::DOWNLOAD_ARTIFACTS ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to export build plans.', 'aio-page-builder' ), '', array( 'response' => 403 ) );
 		}
 		$nonce        = isset( $_GET['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['_wpnonce'] ) ) : '';
@@ -1775,8 +1775,8 @@ final class Build_Plan_Workspace_Screen {
 		$definition         = $state['plan_definition'] ?? array();
 		$current_step       = $steps[ $active_step_index ] ?? null;
 		$base_url           = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) );
-		$can_export         = \current_user_can( Capabilities::EXPORT_DATA ) || \current_user_can( Capabilities::DOWNLOAD_ARTIFACTS );
-		$can_view_artifacts = \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
+		$can_export         = Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA ) || Capabilities::current_user_can_for_route( Capabilities::DOWNLOAD_ARTIFACTS );
+		$can_view_artifacts = Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
 		$export_url         = '';
 		if ( $can_export && $plan_id !== '' ) {
 			$export_url = \add_query_arg(
@@ -1967,11 +1967,11 @@ final class Build_Plan_Workspace_Screen {
 		}
 		$selected_ids = array();
 		$capabilities = array(
-			'can_approve'        => \current_user_can( Capabilities::APPROVE_BUILD_PLANS ),
-			'can_execute'        => \current_user_can( Capabilities::EXECUTE_BUILD_PLANS ),
-			'can_view_artifacts' => \current_user_can( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ),
-			'can_rollback'       => \current_user_can( Capabilities::EXECUTE_ROLLBACKS ),
-			'can_finalize'       => \current_user_can( Capabilities::FINALIZE_PLAN_ACTIONS ),
+			'can_approve'        => Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ),
+			'can_execute'        => Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ),
+			'can_view_artifacts' => Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ),
+			'can_rollback'       => Capabilities::current_user_can_for_route( Capabilities::EXECUTE_ROLLBACKS ),
+			'can_finalize'       => Capabilities::current_user_can_for_route( Capabilities::FINALIZE_PLAN_ACTIONS ),
 		);
 		$builder      = $this->container->get( 'build_plan_ui_state_builder' );
 		$workspace    = $builder->build_step_workspace( $plan_id, $active_step_index, $capabilities, $detail_item_id, $selected_ids );
@@ -2033,7 +2033,7 @@ final class Build_Plan_Workspace_Screen {
 				<form method="post" style="margin: 12px 0;">
 					<?php echo \wp_nonce_field( self::NONCE_ACTION_FINALIZE_BULK, '_wpnonce', true, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					<input type="hidden" name="aio_build_plan_action" value="bulk_finalize_plan" />
-					<button type="submit" class="button button-primary" <?php echo \current_user_can( Capabilities::FINALIZE_PLAN_ACTIONS ) ? '' : 'disabled'; ?>>
+					<button type="submit" class="button button-primary" <?php echo Capabilities::current_user_can_for_route( Capabilities::FINALIZE_PLAN_ACTIONS ) ? '' : 'disabled'; ?>>
 						<?php \esc_html_e( 'Finalize plan', 'aio-page-builder' ); ?>
 					</button>
 				</form>

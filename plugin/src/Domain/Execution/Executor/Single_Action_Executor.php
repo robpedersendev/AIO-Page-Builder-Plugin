@@ -19,6 +19,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Contract;
 use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
+use AIOPageBuilder\Infrastructure\Config\Capabilities;
 
 /**
  * Reusable single-action execution flow. Handlers are registered on the dispatcher.
@@ -205,7 +206,7 @@ final class Single_Action_Executor {
 		if ( in_array( $cap, array( 'delete_post', 'delete_page', 'edit_post', 'edit_page' ), true ) ) {
 			return false;
 		}
-		return \current_user_can( $cap );
+		return Capabilities::current_user_can_for_route( $cap );
 	}
 
 	/**

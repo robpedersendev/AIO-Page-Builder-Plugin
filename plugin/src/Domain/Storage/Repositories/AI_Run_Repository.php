@@ -14,6 +14,8 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\AI\Runs\AI_Artifact_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Repository → storage: Object_Type_Keys::AI_RUN (CPT for metadata/identity).
@@ -95,9 +97,38 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 	 * @return bool Success.
 	 */
 	public function save_artifact_payload( int $post_id, string $category, mixed $payload ): bool {
-		$key  = self::META_ARTIFACT_PREFIX . $category;
-		$json = wp_json_encode( $payload );
+		$key   = self::META_ARTIFACT_PREFIX . $category;
+		$clean = self::sanitize_payload_for_meta_json( $payload );
+		$flags = defined( 'JSON_INVALID_UTF8_SUBSTITUTE' ) ? JSON_INVALID_UTF8_SUBSTITUTE : 0;
+		$depth = 2048;
+		$json  = \wp_json_encode( $clean, $flags, $depth );
+		if ( $json === false ) {
+			$json = \wp_json_encode( $clean, $flags | ( defined( 'JSON_PARTIAL_OUTPUT_ON_ERROR' ) ? JSON_PARTIAL_OUTPUT_ON_ERROR : 0 ), $depth );
+		}
 		return $json !== false && \update_post_meta( $post_id, $key, $json ) !== false;
+	}
+
+	/**
+	 * Recursively replaces non-finite floats so json_encode can persist provider payloads (PHP JSON rejects INF/NAN).
+	 *
+	 * @param mixed $value Payload fragment.
+	 * @return mixed
+	 */
+	private static function sanitize_payload_for_meta_json( mixed $value ): mixed {
+		if ( is_array( $value ) ) {
+			$out = array();
+			foreach ( $value as $k => $v ) {
+				$out[ $k ] = self::sanitize_payload_for_meta_json( $v );
+			}
+			return $out;
+		}
+		if ( is_string( $value ) && \function_exists( 'wp_check_invalid_utf8' ) ) {
+			return \wp_check_invalid_utf8( $value, true );
+		}
+		if ( is_float( $value ) && ( ! is_finite( $value ) ) ) {
+			return null;
+		}
+		return $value;
 	}
 
 	/**
