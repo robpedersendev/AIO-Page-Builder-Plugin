@@ -2,6 +2,14 @@
 /**
  * Privacy-safe aggregate counters for onboarding UX (event id + step key + time only).
  *
+ * **Event ids** (stable snake_case; see class constants):
+ * - `draft_save` — Save draft action.
+ * - `advance_blocked` — Next blocked by validation or review gate.
+ * - `step_advanced` — Next succeeded; step key is the **destination** step.
+ * - `submit_attempted` — Request AI plan submitted (before orchestrator).
+ *
+ * Payload has no free-text profile fields, no API keys, no user id.
+ *
  * Schema (option value, v1):
  * array{
  *   v: 1,
@@ -34,6 +42,7 @@ final class Onboarding_Telemetry {
 
 	public const EVENT_DRAFT_SAVE       = 'draft_save';
 	public const EVENT_ADVANCE_BLOCKED  = 'advance_blocked';
+	public const EVENT_STEP_ADVANCED    = 'step_advanced';
 	public const EVENT_SUBMIT_ATTEMPTED = 'submit_attempted';
 
 	private const RECENT_MAX = 40;

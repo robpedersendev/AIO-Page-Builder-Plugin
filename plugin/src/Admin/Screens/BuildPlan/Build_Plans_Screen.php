@@ -71,7 +71,7 @@ final class Build_Plans_Screen {
 		$orphans = $this->query_unversioned_build_plan_rows();
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
-		<div class="wrap aio-page-builder-screen aio-build-plans-list" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
+		<div class="wrap aio-page-builder-screen aio-build-plans-list" data-testid="aio-build-plans-list-screen" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 		<?php endif; ?>
 			<p class="aio-build-plans-description"><?php \esc_html_e( 'Plans are grouped by lineage (one site strategy split into versions). Open any version to review steps, see what is already applied, and execute remaining items.', 'aio-page-builder' ); ?></p>

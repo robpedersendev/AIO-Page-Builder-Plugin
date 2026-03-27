@@ -1,0 +1,20 @@
+import { defineConfig } from '@playwright/test';
+
+const baseURL = process.env.WP_BASE_URL ?? 'http://localhost:8888';
+
+export default defineConfig({
+	testDir: './tests',
+	fullyParallel: false,
+	retries: process.env.CI ? 1 : 0,
+	use: {
+		baseURL,
+		trace: 'on-first-retry',
+		screenshot: 'only-on-failure',
+		video: 'retain-on-failure',
+	},
+	expect: {
+		timeout: 15_000,
+	},
+	timeout: 60_000,
+	reporter: [['list'], ['html', { open: 'never' }]],
+});

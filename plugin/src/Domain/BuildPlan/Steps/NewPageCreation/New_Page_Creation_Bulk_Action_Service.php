@@ -6,6 +6,17 @@
  * Does not execute page creation. Build-all and build-selected set status to APPROVED for later execution.
  * Denied items are set to REJECTED and are excluded from execution and from the unresolved queue.
  *
+ * Implementation brief (master spec, docs/specs/aio-page-builder-master-spec.md):
+ * - §30.4–30.5: Plan status model and step-based UI (new page creation is a core step).
+ * - §30.7: Remaining-changes logic must include denied actions and unresolved filtering.
+ * - §30.8–30.9: Resume preserves decisions; bulk actions require clear scope (see §32.8 mutual exclusivity on other steps).
+ * - §32.5–32.7: Existing-page step analog — per-item deny, bulk deny all; logging/history expectations (§32.5) apply to review actions.
+ * - §33.1–33.7: New page step — list/metadata (§33.2–33.4), Build action (§33.5), Build All (§33.6), Build Selected (§33.7), dependencies (§33.8), post-build status (§33.9–33.10).
+ * Shipped wiring: {@see New_Page_Creation_Bulk_Action_Service}, admin {@see \AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Workspace_Screen::maybe_handle_step2_action()},
+ * persistence {@see \AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository}.
+ * Current transitions (pending → approved|rejected): per-row approve/deny; bulk approve all/selected; bulk deny all; bulk deny selected.
+ * Gap addressed vs prior backlog: deny-selected bulk path aligned with §33.7 phased selection. Item-level status history beyond final `status` field is not yet modeled (§33.9 / §32.5 audit trail — future work).
+ *
  * @package AIOPageBuilder
  */
 
@@ -82,8 +93,23 @@ final class New_Page_Creation_Bulk_Action_Service {
 		if ( empty( $item_ids ) ) {
 			return 0;
 		}
-		$item_id_set = array_flip( array_map( 'strval', $item_ids ) );
+		$item_id_set = array_fill_keys( array_map( 'strval', $item_ids ), true );
 		return $this->bulk_set_selected_eligible_status( $plan_post_id, $item_id_set, Build_Plan_Item_Statuses::APPROVED );
+	}
+
+	/**
+	 * Bulk deny selected pending new-page items in Step 2 (spec §33.7 symmetry with Build Selected Pages).
+	 *
+	 * @param int   $plan_post_id Plan post ID.
+	 * @param array $item_ids     Item ids to set to rejected (only pending eligible rows are updated).
+	 * @return int Number of items updated.
+	 */
+	public function bulk_deny_selected( int $plan_post_id, array $item_ids ): int {
+		if ( empty( $item_ids ) ) {
+			return 0;
+		}
+		$item_id_set = array_fill_keys( array_map( 'strval', $item_ids ), true );
+		return $this->bulk_set_selected_eligible_status( $plan_post_id, $item_id_set, Build_Plan_Item_Statuses::REJECTED );
 	}
 
 	/**

@@ -63,11 +63,20 @@ final class Onboarding_Screen {
 	 */
 	private const MAIN_FORM_ID = 'aio-onboarding-main';
 
+	/** Landmark target for skip link (must differ from {@see self::MAIN_FORM_ID}). */
+	private const STEP_CONTENT_REGION_ID = 'aio-onboarding-step-content';
+
 	/** Visible site-goal textarea id (no `name`; synced to {@see self::SUBMISSION_GOAL_POST_FIELD_ID}). */
 	private const SUBMISSION_GOAL_VISIBLE_FIELD_ID = 'aio_onboarding_goal_visible';
 
 	/** Hidden textarea inside the main form carrying `aio_onboarding_goal_or_intent` for POST. */
 	private const SUBMISSION_GOAL_POST_FIELD_ID = 'aio_onboarding_goal_post';
+
+	/** `aria-describedby` target for the site goal help text on the submission step. */
+	private const SUBMISSION_GOAL_HELP_ID = 'aio-onboarding-goal-help';
+
+	/** `aria-describedby` target wrapping non-blocking submission warnings. */
+	private const SUBMISSION_WARNINGS_GROUP_ID = 'aio-onboarding-submission-warnings';
 
 	private Service_Container $container;
 
@@ -233,6 +242,7 @@ final class Onboarding_Screen {
 				$this->bump_furthest_step_index( $draft );
 				$draft_service->save_draft( $draft );
 				$this->maybe_sync_build_plan_snapshot( $draft );
+				$this->record_onboarding_telemetry( Onboarding_Telemetry::EVENT_STEP_ADVANCED, $draft );
 				$this->debug_onboarding_line( 'advance ok: moved to step=' . $next );
 			}
 			return $this->hub_redirect_url( array() );
@@ -818,11 +828,40 @@ final class Onboarding_Screen {
 			}
 		}
 		?>
+		<style>
+			.aio-onboarding .aio-onboarding-skip-link.screen-reader-text:focus {
+				background: #f0f0f1;
+				border: 1px solid #4f94d4;
+				border-radius: 3px;
+				box-shadow: 0 0 2px 2px rgba(79, 148, 212, 0.4);
+				clip: auto !important;
+				clip-path: none;
+				color: #1d2327;
+				display: block;
+				font-size: 14px;
+				font-weight: 600;
+				height: auto;
+				left: 8px;
+				line-height: 1.5;
+				padding: 12px 16px;
+				text-decoration: none;
+				top: 8px;
+				width: auto;
+				z-index: 100000;
+			}
+			.aio-onboarding .aio-onboarding-step-link:focus-visible {
+				outline: 2px solid #2271b1;
+				outline-offset: 2px;
+				border-radius: 2px;
+			}
+		</style>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-onboarding aio-onboarding--stripe" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+			<a href="#<?php echo \esc_attr( self::STEP_CONTENT_REGION_ID ); ?>" class="screen-reader-text aio-onboarding-skip-link"><?php \esc_html_e( 'Skip to step content', 'aio-page-builder' ); ?></a>
 		<?php else : ?>
 		<div class="aio-page-builder-screen aio-onboarding aio-onboarding--hub-embed aio-onboarding--stripe" role="region" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
+			<a href="#<?php echo \esc_attr( self::STEP_CONTENT_REGION_ID ); ?>" class="screen-reader-text aio-onboarding-skip-link"><?php \esc_html_e( 'Skip to step content', 'aio-page-builder' ); ?></a>
 		<?php endif; ?>
 
 			<?php
@@ -905,7 +944,7 @@ final class Onboarding_Screen {
 				</ol>
 			</nav>
 
-			<section class="aio-onboarding-content" aria-labelledby="aio-onboarding-step-heading">
+			<section id="<?php echo \esc_attr( self::STEP_CONTENT_REGION_ID ); ?>" class="aio-onboarding-content" aria-labelledby="aio-onboarding-step-heading" tabindex="-1">
 				<h2 id="aio-onboarding-step-heading" class="screen-reader-text"><?php \esc_html_e( 'Current step', 'aio-page-builder' ); ?></h2>
 				<?php $this->render_step_content( $current_step_key, $state ); ?>
 			</section>
@@ -990,23 +1029,43 @@ final class Onboarding_Screen {
 				<p><?php \esc_html_e( 'Configure at least one AI provider (API key) to use AI planning. Credentials are stored securely and never shown in full after save.', 'aio-page-builder' ); ?></p>
 				<p class="description"><?php \esc_html_e( 'You can finish other profile steps first. Provider setup becomes required when you reach Review and Submission.', 'aio-page-builder' ); ?></p>
 				<p><?php \esc_html_e( 'Current readiness:', 'aio-page-builder' ); ?> <strong><?php echo $is_provider_ready ? \esc_html__( 'At least one provider is marked configured.', 'aio-page-builder' ) : \esc_html__( 'No provider configured yet.', 'aio-page-builder' ); ?></strong></p>
-				<div class="aio-onboarding-api-key-guide" role="region" aria-labelledby="aio-api-key-guide-heading">
-					<h4 id="aio-api-key-guide-heading"><?php \esc_html_e( 'How to get an API key', 'aio-page-builder' ); ?></h4>
-					<ol class="aio-onboarding-numbered-steps">
-						<li><?php \esc_html_e( 'Open the AI area of this plugin and go to the Providers tab (same controls are embedded below).', 'aio-page-builder' ); ?></li>
-						<li><?php \esc_html_e( 'Choose a provider (for example OpenAI). In another browser tab, sign in to that provider’s developer console and create a new secret API key with permission to use chat/completions.', 'aio-page-builder' ); ?></li>
-						<li><?php \esc_html_e( 'Copy the key, return here, paste it into the provider’s API key field, and save. Use “Test connection” if the screen offers it.', 'aio-page-builder' ); ?></li>
-						<li><?php \esc_html_e( 'Never share keys in support tickets or screenshots; rotate a key if it may have leaked.', 'aio-page-builder' ); ?></li>
-					</ol>
-					<p class="description">
-						<?php
-						$openai_keys = 'https://platform.openai.com/api-keys';
-						?>
-						<a href="<?php echo \esc_url( $openai_keys ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'OpenAI API keys (opens in a new tab)', 'aio-page-builder' ); ?></a>
-					</p>
-				</div>
+				<details class="aio-onboarding-api-key-guide-disclosure"<?php echo $is_provider_ready ? '' : ' open'; ?>>
+					<summary class="aio-onboarding-embed-summary" style="cursor:pointer;padding:0.35rem 0;">
+						<strong><?php \esc_html_e( 'How to get an API key', 'aio-page-builder' ); ?></strong>
+						<span class="description"> — <?php \esc_html_e( 'Expand for step-by-step setup and provider links.', 'aio-page-builder' ); ?></span>
+					</summary>
+					<div class="aio-onboarding-api-key-guide" role="region" aria-labelledby="aio-api-key-guide-heading" style="margin-top:0.65rem;">
+						<h4 id="aio-api-key-guide-heading" class="screen-reader-text"><?php \esc_html_e( 'How to get an API key', 'aio-page-builder' ); ?></h4>
+						<ol class="aio-onboarding-numbered-steps">
+							<li><?php \esc_html_e( 'Open the AI area of this plugin and go to the Providers tab (same controls are embedded below).', 'aio-page-builder' ); ?></li>
+							<li><?php \esc_html_e( 'Choose a provider (for example OpenAI). In another browser tab, sign in to that provider’s developer console and create a new secret API key with permission to use chat/completions.', 'aio-page-builder' ); ?></li>
+							<li><?php \esc_html_e( 'Copy the key, return here, paste it into the provider’s API key field, and save. Use “Test connection” if the screen offers it.', 'aio-page-builder' ); ?></li>
+							<li><?php \esc_html_e( 'Never share keys in support tickets or screenshots; rotate a key if it may have leaked.', 'aio-page-builder' ); ?></li>
+						</ol>
+						<p class="description">
+							<?php
+							$openai_keys = 'https://platform.openai.com/api-keys';
+							?>
+							<a href="<?php echo \esc_url( $openai_keys ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'OpenAI API keys (opens in a new tab)', 'aio-page-builder' ); ?></a>
+						</p>
+					</div>
+				</details>
 				<?php $this->render_embedded_ai_providers_setup( $state ); ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::SUBMISSION ) : ?>
+				<?php
+				$submission_warnings = isset( $state['submission_warnings'] ) && is_array( $state['submission_warnings'] ) ? $state['submission_warnings'] : array();
+				$goal_desc_ids       = array( self::SUBMISSION_GOAL_HELP_ID );
+				$warn_count          = 0;
+				foreach ( $submission_warnings as $w ) {
+					if ( is_array( $w ) && isset( $w['message'] ) && (string) $w['message'] !== '' ) {
+						++$warn_count;
+					}
+				}
+				if ( $warn_count > 0 ) {
+					$goal_desc_ids[] = self::SUBMISSION_WARNINGS_GROUP_ID;
+				}
+				$goal_aria_desc = implode( ' ', $goal_desc_ids );
+				?>
 				<?php if ( ! $is_provider_ready ) : ?>
 					<div class="notice notice-warning inline" role="status">
 						<p><?php \esc_html_e( 'Configure an AI provider before you can request a plan.', 'aio-page-builder' ); ?></p>
@@ -1026,10 +1085,7 @@ final class Onboarding_Screen {
 						<li><?php echo $is_provider_ready ? \esc_html__( 'AI provider: ready.', 'aio-page-builder' ) : \esc_html__( 'AI provider: not ready — configure keys before submitting.', 'aio-page-builder' ); ?></li>
 						<li><?php echo $crawl_id_sub !== '' ? \esc_html__( 'Crawl context: latest session will be included when available.', 'aio-page-builder' ) : \esc_html__( 'Crawl context: none linked (optional).', 'aio-page-builder' ); ?></li>
 						<li><?php echo ( $last_run_id !== null && is_string( $last_run_id ) && $last_run_id !== '' ) ? \esc_html__( 'Run context: you have a prior planning run on file; this submit starts a new provider request.', 'aio-page-builder' ) : \esc_html__( 'Run context: new planning request.', 'aio-page-builder' ); ?></li>
-						<?php
-						$sw = isset( $state['submission_warnings'] ) && is_array( $state['submission_warnings'] ) ? $state['submission_warnings'] : array();
-						if ( count( $sw ) > 0 ) :
-							?>
+						<?php if ( $warn_count > 0 ) : ?>
 						<li><?php \esc_html_e( 'Notes: review the warnings below before you submit.', 'aio-page-builder' ); ?></li>
 						<?php endif; ?>
 					</ul>
@@ -1042,7 +1098,7 @@ final class Onboarding_Screen {
 				<p>
 					<label for="<?php echo \esc_attr( self::SUBMISSION_GOAL_VISIBLE_FIELD_ID ); ?>"><strong><?php \esc_html_e( 'Site goal and scope', 'aio-page-builder' ); ?></strong></label>
 				</p>
-				<p class="description">
+				<p class="description" id="<?php echo \esc_attr( self::SUBMISSION_GOAL_HELP_ID ); ?>">
 					<?php
 					echo \esc_html(
 						sprintf(
@@ -1058,18 +1114,24 @@ final class Onboarding_Screen {
 						id="<?php echo \esc_attr( self::SUBMISSION_GOAL_VISIBLE_FIELD_ID ); ?>"
 						class="large-text"
 						rows="8"
+						aria-describedby="<?php echo \esc_attr( $goal_aria_desc ); ?>"
 					><?php echo \esc_textarea( $goal_val ); ?></textarea>
 				</p>
-				<?php
-				$submission_warnings = isset( $state['submission_warnings'] ) && is_array( $state['submission_warnings'] ) ? $state['submission_warnings'] : array();
-				foreach ( $submission_warnings as $warning ) :
-					if ( ! is_array( $warning ) || ! isset( $warning['message'] ) || (string) $warning['message'] === '' ) {
-						continue;
-					}
-					?>
-				<div class="notice notice-warning" role="status"><p><?php echo \esc_html( (string) $warning['message'] ); ?></p></div>
+				<?php if ( $warn_count > 0 ) : ?>
+				<div id="<?php echo \esc_attr( self::SUBMISSION_WARNINGS_GROUP_ID ); ?>" role="group" aria-label="<?php \esc_attr_e( 'Submission notices', 'aio-page-builder' ); ?>">
 					<?php
-				endforeach;
+					foreach ( $submission_warnings as $warning ) :
+						if ( ! is_array( $warning ) || ! isset( $warning['message'] ) || (string) $warning['message'] === '' ) {
+							continue;
+						}
+						?>
+				<div class="notice notice-warning" role="status"><p><?php echo \esc_html( (string) $warning['message'] ); ?></p></div>
+						<?php
+					endforeach;
+					?>
+				</div>
+				<?php endif; ?>
+				<?php
 				$last_run_id      = $state['last_planning_run_id'] ?? null;
 				$last_run_post_id = $state['last_planning_run_post_id'] ?? null;
 				if ( $last_run_id !== null && $last_run_post_id !== null && (int) $last_run_post_id > 0 ) :
@@ -1259,6 +1321,7 @@ final class Onboarding_Screen {
 		$animation          = isset( $prefs['animation_preference'] ) ? (string) $prefs['animation_preference'] : '';
 		$cta_intensity      = isset( $prefs['cta_intensity_preference'] ) ? (string) $prefs['cta_intensity_preference'] : '';
 		$reduced_motion     = ! empty( $prefs['reduced_motion_preference'] );
+		$has_extra_signals  = $proof_style !== '' || $content_density !== '' || $animation !== '' || $cta_intensity !== '' || $reduced_motion;
 		?>
 		<p><?php \esc_html_e( 'These preferences help guide template and page-style recommendations. They are advisory only and do not override structural or CTA rules.', 'aio-page-builder' ); ?></p>
 		<table class="form-table" role="presentation">
@@ -1285,6 +1348,14 @@ final class Onboarding_Screen {
 					</select>
 				</td>
 			</tr>
+		</table>
+		<details class="aio-onboarding-embed-disclosure"<?php echo $has_extra_signals ? ' open' : ''; ?>>
+			<summary class="aio-onboarding-embed-summary" style="cursor:pointer;padding:0.5rem 0;">
+				<strong><?php \esc_html_e( 'Additional template signals', 'aio-page-builder' ); ?></strong>
+				<span class="description"> — <?php \esc_html_e( 'Proof, density, motion, CTA intensity, and reduced motion.', 'aio-page-builder' ); ?></span>
+			</summary>
+			<div class="aio-onboarding-embed-details-inner" style="margin-top:0.75rem;">
+		<table class="form-table" role="presentation">
 			<tr>
 				<th scope="row"><label for="aio_template_preference_proof_style"><?php \esc_html_e( 'Proof style', 'aio-page-builder' ); ?></label></th>
 				<td>
@@ -1342,6 +1413,8 @@ final class Onboarding_Screen {
 				</td>
 			</tr>
 		</table>
+			</div>
+		</details>
 		<?php
 	}
 	/**
@@ -1681,24 +1754,33 @@ final class Onboarding_Screen {
 			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
 		$visual_ref = isset( $biz['visual_inspiration_references'] ) ? (string) $biz['visual_inspiration_references'] : '';
 		$sales_proc = isset( $biz['internal_sales_process_notes'] ) ? (string) $biz['internal_sales_process_notes'] : '';
+		$has_assets = trim( $visual_ref ) !== '' || trim( $sales_proc ) !== '';
 		?>
-		<p><?php \esc_html_e( 'Provide references to visual assets and any notes about your sales or content process. These guide template and copy decisions.', 'aio-page-builder' ); ?></p>
-		<table class="form-table" role="presentation">
-			<tr>
-				<th scope="row"><label for="aio_bp_biz_visual_ref"><?php \esc_html_e( 'Visual inspiration references', 'aio-page-builder' ); ?></label></th>
-				<td>
-					<textarea name="aio_bp_biz_visual_ref" id="aio_bp_biz_visual_ref" form="<?php echo \esc_attr( self::MAIN_FORM_ID ); ?>" class="large-text" rows="3"><?php echo \esc_textarea( $visual_ref ); ?></textarea>
-					<p class="description"><?php \esc_html_e( 'URLs or notes describing visual style, competitor sites, or design references.', 'aio-page-builder' ); ?></p>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row"><label for="aio_bp_biz_sales_process"><?php \esc_html_e( 'Sales process notes', 'aio-page-builder' ); ?></label></th>
-				<td>
-					<textarea name="aio_bp_biz_sales_process" id="aio_bp_biz_sales_process" form="<?php echo \esc_attr( self::MAIN_FORM_ID ); ?>" class="large-text" rows="3"><?php echo \esc_textarea( $sales_proc ); ?></textarea>
-					<p class="description"><?php \esc_html_e( 'Notes about how prospects engage and convert, to help sequence page content.', 'aio-page-builder' ); ?></p>
-				</td>
-			</tr>
-		</table>
+		<p><?php \esc_html_e( 'Optional context for templates and copy. Expand the section below to add references and notes.', 'aio-page-builder' ); ?></p>
+		<details class="aio-onboarding-embed-disclosure"<?php echo $has_assets ? ' open' : ''; ?>>
+			<summary class="aio-onboarding-embed-summary" style="cursor:pointer;padding:0.5rem 0;">
+				<strong><?php \esc_html_e( 'Visual references & sales notes', 'aio-page-builder' ); ?></strong>
+				<span class="description"> — <?php \esc_html_e( 'Optional fields for design and funnel context.', 'aio-page-builder' ); ?></span>
+			</summary>
+			<div class="aio-onboarding-embed-details-inner" style="margin-top:0.75rem;">
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><label for="aio_bp_biz_visual_ref"><?php \esc_html_e( 'Visual inspiration references', 'aio-page-builder' ); ?></label></th>
+						<td>
+							<textarea name="aio_bp_biz_visual_ref" id="aio_bp_biz_visual_ref" form="<?php echo \esc_attr( self::MAIN_FORM_ID ); ?>" class="large-text" rows="3"><?php echo \esc_textarea( $visual_ref ); ?></textarea>
+							<p class="description"><?php \esc_html_e( 'URLs or notes describing visual style, competitor sites, or design references.', 'aio-page-builder' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="aio_bp_biz_sales_process"><?php \esc_html_e( 'Sales process notes', 'aio-page-builder' ); ?></label></th>
+						<td>
+							<textarea name="aio_bp_biz_sales_process" id="aio_bp_biz_sales_process" form="<?php echo \esc_attr( self::MAIN_FORM_ID ); ?>" class="large-text" rows="3"><?php echo \esc_textarea( $sales_proc ); ?></textarea>
+							<p class="description"><?php \esc_html_e( 'Notes about how prospects engage and convert, to help sequence page content.', 'aio-page-builder' ); ?></p>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</details>
 		<?php
 	}
 
@@ -1757,8 +1839,11 @@ final class Onboarding_Screen {
 		<?php if ( $cc !== null && isset( $cc['headline'], $cc['detail'], $cc['next_step'] ) ) : ?>
 			<?php
 			$notice = $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_FAILED ? 'notice-error' : ( $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_STALE || $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_PARTIAL ? 'notice-warning' : 'notice-info' );
+			$crawl_phase      = isset( $cc['phase'] ) ? (string) $cc['phase'] : '';
+			$crawl_phase_lbl  = isset( $cc['phase_label'] ) ? (string) $cc['phase_label'] : '';
+			$crawl_aria       = (string) $cc['headline'] . ( $crawl_phase_lbl !== '' ? ' — ' . $crawl_phase_lbl : '' );
 			?>
-			<div class="notice <?php echo \esc_attr( $notice ); ?> inline" role="status" style="margin:1em 0;">
+			<div class="notice <?php echo \esc_attr( $notice ); ?> inline" role="status" style="margin:1em 0;" data-aio-crawl-phase="<?php echo \esc_attr( $crawl_phase ); ?>" aria-label="<?php echo \esc_attr( $crawl_aria ); ?>">
 				<p><strong><?php echo \esc_html( (string) $cc['headline'] ); ?></strong></p>
 				<p><?php echo \esc_html( (string) $cc['detail'] ); ?></p>
 				<p class="description"><?php echo \esc_html( (string) $cc['next_step'] ); ?></p>
@@ -1979,10 +2064,18 @@ final class Onboarding_Screen {
 			),
 			true
 		);
+		$cc_label = is_array( $cc ) && isset( $cc['phase_label'] ) ? (string) $cc['phase_label'] : '';
+		$crawler_summary = __( 'Crawler tools', 'aio-page-builder' );
+		if ( $cc_label !== '' ) {
+			$crawler_summary .= ' — ' . $cc_label;
+		}
 		?>
-		<details class="aio-onboarding-embed-disclosure"<?php if ( $open_auto ) : ?> open<?php endif; ?>>
+		<details class="aio-onboarding-embed-disclosure"<?php if ( $open_auto ) : ?> open<?php endif; ?> data-aio-crawl-phase="<?php echo \esc_attr( $phase ); ?>" aria-label="<?php echo \esc_attr( $crawler_summary ); ?>">
 			<summary class="aio-onboarding-embed-summary" style="cursor:pointer;padding:0.5rem 0;">
 				<strong><?php \esc_html_e( 'Crawler tools', 'aio-page-builder' ); ?></strong>
+				<?php if ( $cc_label !== '' ) : ?>
+					<span class="description"> (<?php echo \esc_html( $cc_label ); ?>)</span>
+				<?php endif; ?>
 				<span class="description"> — <?php \esc_html_e( 'Expand for start, retry, and session list (same as Crawler Sessions).', 'aio-page-builder' ); ?></span>
 			</summary>
 			<div class="aio-onboarding-embed-details-inner" style="margin-top:0.75rem;">

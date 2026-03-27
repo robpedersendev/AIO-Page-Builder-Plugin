@@ -38,7 +38,7 @@ final class Industry_Bundle_Apply_Service {
 	 * @param string                $scope One of SCOPE_*.
 	 * @param array<string, string> $decisions Map of "category|object_key" => "replace"|"skip".
 	 * @param int                   $user_id Current user ID.
-	 * @return array{ok: bool, bundle_id: string, error: string}
+	 * @return array{ok: bool, bundle_id: string, error: string, status?: string}
 	 */
 	public function apply( array $bundle, string $bundle_slug, string $scope, array $decisions, int $user_id ): array {
 		$bundle_slug = sanitize_key( $bundle_slug );
@@ -61,6 +61,7 @@ final class Industry_Bundle_Apply_Service {
 				'ok'        => false,
 				'bundle_id' => '',
 				'error'     => 'Invalid included_categories.',
+				'status'    => self::STATUS_FAILED,
 			);
 		}
 
@@ -114,6 +115,7 @@ final class Industry_Bundle_Apply_Service {
 			'ok'        => true,
 			'bundle_id' => $bundle_id,
 			'error'     => '',
+			'status'    => self::STATUS_APPLIED,
 		);
 	}
 

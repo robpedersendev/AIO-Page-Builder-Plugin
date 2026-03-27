@@ -361,7 +361,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_BULK ) ) {
 				return false;
 			}
-			if ( $action !== 'bulk_build_all_step2' && $action !== 'bulk_build_selected_step2' && $action !== 'bulk_deny_all_step2' ) {
+			if ( $action !== 'bulk_build_all_step2' && $action !== 'bulk_build_selected_step2' && $action !== 'bulk_deny_selected_step2' && $action !== 'bulk_deny_all_step2' ) {
 				return false;
 			}
 			if ( ! $this->container->has( 'new_page_creation_bulk_action_service' ) ) {
@@ -401,7 +401,27 @@ final class Build_Plan_Workspace_Screen {
 				$selected  = array_map( 'sanitize_text_field', $raw_step2 );
 				$selected  = array_values( array_filter( $selected ) );
 				if ( empty( $selected ) ) {
-					\wp_safe_redirect( \add_query_arg( array( 'step2_bulk_build_error' => 'none_selected' ), $redirect_url ) );
+					\wp_safe_redirect(
+						\add_query_arg(
+							array(
+								'step2_bulk_build_error' => $action === 'bulk_deny_selected_step2' ? 'none_selected_deny' : 'none_selected',
+							),
+							$redirect_url
+						)
+					);
+					exit;
+				}
+				if ( $action === 'bulk_deny_selected_step2' ) {
+					$count = (int) $service->bulk_deny_selected( $plan_post_id, $selected );
+					\wp_safe_redirect(
+						\add_query_arg(
+							array(
+								'step2_deny_selected_done' => '1',
+								'step2_deny_selected_count' => (string) $count,
+							),
+							$redirect_url
+						)
+					);
 					exit;
 				}
 				$service->bulk_approve_selected( $plan_post_id, $selected );
@@ -1822,7 +1842,7 @@ final class Build_Plan_Workspace_Screen {
 			);
 		}
 		?>
-		<div class="wrap aio-page-builder-screen aio-build-plan-workspace aio-build-plan-three-zone">
+		<div class="wrap aio-page-builder-screen aio-build-plan-workspace aio-build-plan-three-zone" data-testid="aio-build-plan-workspace-screen">
 			<aside class="aio-build-plan-context-rail" role="complementary" aria-label="<?php \esc_attr_e( 'Plan context and actions', 'aio-page-builder' ); ?>">
 				<?php $this->render_context_rail( $rail, $plan_id, $base_url, $export_url, $can_view_artifacts ); ?>
 			</aside>
@@ -2275,6 +2295,10 @@ final class Build_Plan_Workspace_Screen {
 		}
 
 		$step_messages = isset( $workspace['step_messages'] ) && is_array( $workspace['step_messages'] ) ? $workspace['step_messages'] : array();
+		$deny_sel_done = isset( $_GET['step2_deny_selected_done'] ) && $_GET['step2_deny_selected_done'] === '1';
+		$deny_sel_cnt  = isset( $_GET['step2_deny_selected_count'] ) && is_numeric( $_GET['step2_deny_selected_count'] )
+			? (int) $_GET['step2_deny_selected_count']
+			: 0;
 		$bulk_done     = isset( $_GET['step2_bulk_deny_done'] ) && $_GET['step2_bulk_deny_done'] === '1';
 		$bulk_count    = isset( $_GET['step2_bulk_deny_count'] ) && is_numeric( $_GET['step2_bulk_deny_count'] )
 			? (int) $_GET['step2_bulk_deny_count']
@@ -2283,6 +2307,21 @@ final class Build_Plan_Workspace_Screen {
 		$bulk_error    = isset( $_GET['step2_bulk_deny_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step2_bulk_deny_error'] ) ) : '';
 		$build_error   = isset( $_GET['step2_bulk_build_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step2_bulk_build_error'] ) ) : '';
 
+		if ( $deny_sel_done ) {
+			$msg = sprintf(
+				/* translators: %d: number of denied new-page recommendations */
+				_n( 'Denied %d selected new page recommendation.', 'Denied %d selected new page recommendations.', $deny_sel_cnt, 'aio-page-builder' ),
+				$deny_sel_cnt
+			);
+			array_unshift(
+				$step_messages,
+				array(
+					'severity' => 'success',
+					'message'  => $msg,
+					'level'    => 'step',
+				)
+			);
+		}
 		if ( $bulk_done ) {
 			$msg = sprintf(
 				/* translators: %d: number of denied new-page recommendations */
@@ -2322,9 +2361,13 @@ final class Build_Plan_Workspace_Screen {
 			);
 		}
 		if ( $build_error !== '' ) {
-			$err_msg = $build_error === 'none_selected'
-				? \__( 'Select one or more rows to build selected pages.', 'aio-page-builder' )
-				: \__( 'Bulk build selected failed.', 'aio-page-builder' );
+			if ( $build_error === 'none_selected' ) {
+				$err_msg = \__( 'Select one or more rows to build selected pages.', 'aio-page-builder' );
+			} elseif ( $build_error === 'none_selected_deny' ) {
+				$err_msg = \__( 'Select one or more rows to deny selected pages.', 'aio-page-builder' );
+			} else {
+				$err_msg = \__( 'Bulk build selected failed.', 'aio-page-builder' );
+			}
 			array_unshift(
 				$step_messages,
 				array(
@@ -2682,14 +2725,17 @@ final class Build_Plan_Workspace_Screen {
 	private function render_step2_bulk_forms( array $bulk_states, string $nonce_html, array $selected_ids ): void {
 		$build_all         = $bulk_states['apply_to_all_eligible'] ?? array();
 		$build_sel         = $bulk_states['apply_to_selected'] ?? array();
+		$deny_sel          = $bulk_states['deny_selected'] ?? array();
 		$deny_all          = $bulk_states['deny_all_eligible'] ?? array();
 		$clear_sel         = $bulk_states['clear_selection'] ?? array();
 		$build_all_enabled = ! empty( $build_all['enabled'] );
 		$build_sel_enabled = ! empty( $build_sel['enabled'] );
+		$deny_sel_enabled  = ! empty( $deny_sel['enabled'] );
 		$deny_enabled      = ! empty( $deny_all['enabled'] );
 		$clear_enabled     = ! empty( $clear_sel['enabled'] );
 		$build_all_count   = (int) ( $build_all['count_eligible'] ?? 0 );
 		$build_sel_count   = (int) ( $build_sel['count_selected'] ?? 0 );
+		$deny_sel_count    = (int) ( $deny_sel['count_selected'] ?? 0 );
 		$deny_count        = (int) ( $deny_all['count_eligible'] ?? 0 );
 		$plan_id           = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
 		$base_url          = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
@@ -2706,6 +2752,12 @@ final class Build_Plan_Workspace_Screen {
 				<?php \esc_html_e( 'Build Selected Pages', 'aio-page-builder' ); ?>
 				<?php if ( $build_sel_count > 0 ) : ?>
 					<span class="aio-bulk-count">(<?php echo (int) $build_sel_count; ?>)</span>
+				<?php endif; ?>
+			</button>
+			<button type="submit" name="aio_build_plan_action" value="bulk_deny_selected_step2" class="button button-secondary" <?php echo $deny_sel_enabled ? '' : ' disabled="disabled"'; ?>>
+				<?php \esc_html_e( 'Deny Selected Pages', 'aio-page-builder' ); ?>
+				<?php if ( $deny_sel_count > 0 ) : ?>
+					<span class="aio-bulk-count">(<?php echo (int) $deny_sel_count; ?>)</span>
 				<?php endif; ?>
 			</button>
 			<label style="margin: 0 0.75em;">

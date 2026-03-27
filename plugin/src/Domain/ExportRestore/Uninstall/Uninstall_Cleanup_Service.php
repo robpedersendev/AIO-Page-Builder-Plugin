@@ -20,6 +20,11 @@ use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 /**
  * Removes scheduled events and plugin-owned options, tables, CPTs, and ACF section-key cache transients.
  * Does not delete built pages (post type 'page'), post meta, or ACF field groups. Non-destructive for ACF values and handed-off groups (spec §53.5, §53.6, acf-uninstall-retention-contract, acf-uninstall-retained-data-matrix).
+ *
+ * Spec §53.6 mapping: export opportunity and cleanup choices are UI-level; this service runs only after
+ * {@see Option_Names::PB_UNINSTALL_CLEANUP_MODE} is {@see Uninstall_Cleanup_Service::cleanup_if_confirmed() confirmed_cleanup}.
+ * Option deletion uses {@see Uninstall_Option_Registry::removable_declared_option_keys()} plus industry-bundle dynamic keys
+ * handled first in {@see Uninstall_Cleanup_Service::remove_industry_bundle_apply_storage_options()}.
  */
 final class Uninstall_Cleanup_Service {
 
@@ -63,7 +68,9 @@ final class Uninstall_Cleanup_Service {
 		$this->clear_scheduled_events();
 		$scheduled_removed = true;
 
-		foreach ( Option_Names::all() as $option_key ) {
+		$options_removed += $this->remove_industry_bundle_apply_storage_options();
+
+		foreach ( Uninstall_Option_Registry::removable_declared_option_keys() as $option_key ) {
 			if ( delete_option( $option_key ) ) {
 				++$options_removed;
 			}
@@ -109,6 +116,55 @@ final class Uninstall_Cleanup_Service {
 			'acf_transients_removed' => $acf_transients_removed,
 			'built_pages_preserved'  => true,
 		);
+	}
+
+	/**
+	 * Removes per-bundle industry import options (payload/conflict snapshots) and registry merge state (spec §53.5).
+	 * Reads merge state and registry before deletion; not covered by Option_Names::all().
+	 *
+	 * @return int Number of option rows removed (each delete_option success increments).
+	 */
+	private function remove_industry_bundle_apply_storage_options(): int {
+		$removed  = 0;
+		$merge    = \get_option( Option_Names::PB_INDUSTRY_BUNDLE_MERGE_STATE, array() );
+		$registry = \get_option( Option_Names::PB_INDUSTRY_BUNDLE_REGISTRY, array() );
+		$ids      = array();
+		if ( \is_array( $merge ) && isset( $merge['apply_order'] ) && \is_array( $merge['apply_order'] ) ) {
+			foreach ( $merge['apply_order'] as $id ) {
+				if ( \is_string( $id ) && $id !== '' ) {
+					$ids[] = $id;
+				}
+			}
+		}
+		if ( \is_array( $registry ) ) {
+			foreach ( $registry as $row ) {
+				if ( \is_array( $row ) && isset( $row['bundle_id'] ) && \is_string( $row['bundle_id'] ) && $row['bundle_id'] !== '' ) {
+					$ids[] = $row['bundle_id'];
+				}
+			}
+		}
+		$ids = \array_values( \array_unique( \array_map( 'strval', $ids ) ) );
+		foreach ( $ids as $bundle_id ) {
+			$key = \sanitize_key( $bundle_id );
+			if ( $key === '' ) {
+				continue;
+			}
+			$payload_key   = 'aio_pb_industry_bundle_payload_' . $key;
+			$conflicts_key = 'aio_pb_industry_bundle_conflicts_' . $key;
+			if ( \delete_option( $payload_key ) ) {
+				++$removed;
+			}
+			if ( \delete_option( $conflicts_key ) ) {
+				++$removed;
+			}
+		}
+		if ( \delete_option( Option_Names::PB_INDUSTRY_BUNDLE_REGISTRY ) ) {
+			++$removed;
+		}
+		if ( \delete_option( Option_Names::PB_INDUSTRY_BUNDLE_MERGE_STATE ) ) {
+			++$removed;
+		}
+		return $removed;
 	}
 
 	/**

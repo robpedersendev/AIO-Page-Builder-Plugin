@@ -9,6 +9,8 @@ plugin/vendor/
 # -----------------------------------------------------------------------------
 .phpunit.result.cache
 coverage/
+playwright-report/
+test-results/
 *.log
 *.log.*
 plugin/phpcs*.txt

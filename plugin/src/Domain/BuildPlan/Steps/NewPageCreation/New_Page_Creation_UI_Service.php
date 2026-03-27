@@ -171,6 +171,11 @@ final class New_Page_Creation_UI_Service {
 				'label'          => \__( 'Build Selected Pages', 'aio-page-builder' ),
 				'count_selected' => $selected_count,
 			),
+			'deny_selected'                             => array(
+				'enabled'        => $pending_count > 0 && ! empty( $capabilities['can_approve'] ),
+				'label'          => \__( 'Deny Selected Pages', 'aio-page-builder' ),
+				'count_selected' => $selected_count,
+			),
 			Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(
 				'enabled'        => $pending_count > 0 && ! empty( $capabilities['can_approve'] ),
 				'label'          => \__( 'Deny All Eligible', 'aio-page-builder' ),
@@ -392,6 +397,11 @@ final class New_Page_Creation_UI_Service {
 				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_SELECTED => array(
 					'enabled'        => false,
 					'label'          => \__( 'Build Selected Pages', 'aio-page-builder' ),
+					'count_selected' => 0,
+				),
+				'deny_selected' => array(
+					'enabled'        => false,
+					'label'          => \__( 'Deny Selected Pages', 'aio-page-builder' ),
 					'count_selected' => 0,
 				),
 				Bulk_Action_Bar_Component::CONTROL_DENY_ALL => array(

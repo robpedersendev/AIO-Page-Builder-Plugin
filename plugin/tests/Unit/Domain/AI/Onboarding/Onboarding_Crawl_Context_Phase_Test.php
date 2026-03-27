@@ -14,6 +14,8 @@ final class Onboarding_Crawl_Context_Phase_Test extends TestCase {
 	public function test_none_when_no_run_id(): void {
 		$out = Onboarding_Crawl_Context_Phase::summarize( array( 'latest_crawl_run_id' => null ), null );
 		$this->assertSame( Onboarding_Crawl_Context_Phase::PHASE_NONE, $out['phase'] );
+		$this->assertArrayHasKey( 'phase_label', $out );
+		$this->assertNotSame( '', $out['phase_label'] );
 	}
 
 	public function test_running_when_started_without_end(): void {
@@ -30,11 +32,12 @@ final class Onboarding_Crawl_Context_Phase_Test extends TestCase {
 	}
 
 	public function test_completed_phase(): void {
-		$out = Onboarding_Crawl_Context_Phase::summarize(
+		$ended = \gmdate( 'c', \time() - 3600 );
+		$out   = Onboarding_Crawl_Context_Phase::summarize(
 			array(
 				'latest_crawl_run_id'           => 'run-2',
-				'latest_crawl_started_at'       => '2025-01-01T00:00:00Z',
-				'latest_crawl_ended_at'         => '2025-01-01T01:00:00Z',
+				'latest_crawl_started_at'       => \gmdate( 'c', \time() - 7200 ),
+				'latest_crawl_ended_at'         => $ended,
 				'latest_crawl_final_status'     => Crawl_Snapshot_Payload_Builder::SESSION_STATUS_COMPLETED,
 				'latest_crawl_total_discovered' => 10,
 				'latest_crawl_failed_count'     => 0,

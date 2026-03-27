@@ -9,9 +9,12 @@
     "lint:php": "composer run phpcs",
     "fix:php": "composer run phpcbf",
     "test:php": "composer run phpunit",
-    "analyse:php": "composer run phpstan"
+    "analyse:php": "composer run phpstan",
+    "test:e2e": "playwright test --config=e2e/playwright.config.ts",
+    "test:e2e:install": "playwright install --with-deps chromium"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "@wordpress/env": "^11.1.0"
   }
 }

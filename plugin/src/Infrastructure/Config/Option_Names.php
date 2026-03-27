@@ -153,6 +153,16 @@ final class Option_Names {
 	}
 
 	/**
+	 * Returns every option key declared on this class (full inventory for uninstall registry, audits).
+	 * This is a superset of {@see self::all()}; includes PB_* and styling keys not in the exportable list.
+	 *
+	 * @return list<string>
+	 */
+	public static function declared_option_keys(): array {
+		return self::known_values();
+	}
+
+	/**
 	 * Returns all option key values declared as public constants on this class.
 	 *
 	 * @return list<string>

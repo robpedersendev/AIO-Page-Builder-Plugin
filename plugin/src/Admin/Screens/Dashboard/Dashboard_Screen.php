@@ -62,7 +62,7 @@ final class Dashboard_Screen {
 		}
 		$state = $this->get_state();
 		?>
-		<div class="wrap aio-page-builder-screen aio-dashboard" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
+		<div class="wrap aio-page-builder-screen aio-dashboard" data-testid="aio-dashboard-screen" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1 class="aio-dashboard-title"><?php echo \esc_html( $this->get_title() ); ?></h1>
 			<style>
 				.aio-dashboard-shell { max-width: 1200px; }
@@ -278,14 +278,15 @@ final class Dashboard_Screen {
 		if ( empty( $metrics['visible'] ) || ! Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) ) {
 			return;
 		}
-		$agg = isset( $metrics['aggregate'] ) && is_array( $metrics['aggregate'] ) ? $metrics['aggregate'] : array();
-		$c   = isset( $agg['c'] ) && is_array( $agg['c'] ) ? $agg['c'] : array();
-		$rec = isset( $agg['recent'] ) && is_array( $agg['recent'] ) ? $agg['recent'] : array();
+		$agg    = isset( $metrics['aggregate'] ) && is_array( $metrics['aggregate'] ) ? $metrics['aggregate'] : array();
+		$c      = isset( $agg['c'] ) && is_array( $agg['c'] ) ? $agg['c'] : array();
+		$by_st = isset( $agg['by_step'] ) && is_array( $agg['by_step'] ) ? $agg['by_step'] : array();
+		$rec    = isset( $agg['recent'] ) && is_array( $agg['recent'] ) ? $agg['recent'] : array();
 		?>
 		<div class="aio-dash-onboard-metrics" role="region" aria-labelledby="aio-dash-onboard-metrics-h" style="margin:0 0 1.25rem;padding:1rem 1.15rem;border:1px solid #c3c4c7;border-radius:8px;background:#fff;">
 			<h2 id="aio-dash-onboard-metrics-h" style="margin:0 0 0.5rem;font-size:1rem;"><?php \esc_html_e( 'Onboarding activity (aggregate)', 'aio-page-builder' ); ?></h2>
 			<p class="description" style="margin:0 0 0.75rem;"><?php \esc_html_e( 'Coarse counters only (event type and step key). No form text or credentials.', 'aio-page-builder' ); ?></p>
-			<?php if ( count( $c ) === 0 && count( $rec ) === 0 ) : ?>
+			<?php if ( count( $c ) === 0 && count( $rec ) === 0 && count( $by_st ) === 0 ) : ?>
 				<p style="margin:0;"><em><?php \esc_html_e( 'No onboarding events recorded yet.', 'aio-page-builder' ); ?></em></p>
 			<?php else : ?>
 				<ul style="margin:0 0 0.75rem 1.1em;">
@@ -293,6 +294,30 @@ final class Dashboard_Screen {
 						<li><?php echo \esc_html( (string) $ev . ': ' . (string) (int) $n ); ?></li>
 					<?php endforeach; ?>
 				</ul>
+				<?php if ( count( $by_st ) > 0 ) : ?>
+					<p style="margin:0 0 0.35rem;font-size:0.85rem;color:#50575e;"><?php \esc_html_e( 'By step (event counts):', 'aio-page-builder' ); ?></p>
+					<ul style="margin:0 0 0.75rem 1.1em;font-size:0.85rem;color:#50575e;">
+						<?php
+						\ksort( $by_st );
+						foreach ( $by_st as $step_key => $evs ) {
+							if ( ! is_string( $step_key ) || $step_key === '' || ! is_array( $evs ) ) {
+								continue;
+							}
+							$parts = array();
+							foreach ( $evs as $ek => $cn ) {
+								if ( ! is_string( $ek ) || $ek === '' || ! is_numeric( $cn ) ) {
+									continue;
+								}
+								$parts[] = (string) $ek . '=' . (string) (int) $cn;
+							}
+							if ( $parts === array() ) {
+								continue;
+							}
+							echo '<li>' . \esc_html( $step_key . ': ' . implode( ', ', $parts ) ) . '</li>';
+						}
+						?>
+					</ul>
+				<?php endif; ?>
 				<?php if ( count( $rec ) > 0 ) : ?>
 					<p style="margin:0 0 0.35rem;font-size:0.85rem;color:#50575e;"><?php \esc_html_e( 'Recent (newest last):', 'aio-page-builder' ); ?></p>
 					<ul style="margin:0;padding-left:1.1em;font-size:0.85rem;color:#50575e;">

@@ -146,6 +146,10 @@ final class Industry_Bundle_Import_Preview_Screen {
 		$uid           = \get_current_user_id();
 		$transient_key = \sprintf( self::TRANSIENT_PREVIEW, $uid );
 		$preview       = \get_transient( $transient_key );
+
+		$apply_result  = isset( $_GET['aio_bundle_apply_result'] ) ? \sanitize_key( \wp_unslash( (string) $_GET['aio_bundle_apply_result'] ) ) : '';
+		$apply_success = $apply_result === 'applied';
+
 		if ( \is_array( $preview ) && ! empty( $preview['bundle'] ) ) {
 			return array(
 				'preview'       => true,
@@ -154,11 +158,14 @@ final class Industry_Bundle_Import_Preview_Screen {
 				'included'      => $preview['included'] ?? array(),
 				'summary'       => $preview['summary'] ?? array(),
 				'transient_key' => $transient_key,
+				'error'         => isset( $_GET['aio_bundle_preview_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['aio_bundle_preview_error'] ) ) : '',
+				'apply_success' => $apply_success,
 			);
 		}
 		return array(
-			'preview' => false,
-			'error'   => isset( $_GET['aio_bundle_preview_error'] ) ? \sanitize_text_field( \wp_unslash( $_GET['aio_bundle_preview_error'] ) ) : '',
+			'preview'       => false,
+			'error'         => isset( $_GET['aio_bundle_preview_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['aio_bundle_preview_error'] ) ) : '',
+			'apply_success' => $apply_success,
 		);
 	}
 
@@ -180,6 +187,12 @@ final class Industry_Bundle_Import_Preview_Screen {
 			<p class="description">
 				<?php \esc_html_e( 'Upload an industry pack bundle (JSON) to preview contents, review conflicts, choose scope, and apply.', 'aio-page-builder' ); ?>
 			</p>
+
+			<?php if ( ! empty( $state['apply_success'] ) ) : ?>
+				<div class="notice notice-success inline" role="status">
+					<p><?php \esc_html_e( 'Industry bundle applied successfully. You can upload another bundle to preview or import.', 'aio-page-builder' ); ?></p>
+				</div>
+			<?php endif; ?>
 
 			<?php if ( ! empty( $state['error'] ) ) : ?>
 				<div class="notice notice-error inline"><p><?php echo \esc_html( $state['error'] ); ?></p></div>
@@ -285,7 +298,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 								<?php \esc_html_e( 'Incoming content differs from local content. Choose replace or skip.', 'aio-page-builder' ); ?>
 							</p>
 							<label style="margin-right: 1em;">
-								<input type="radio" name="<?php echo $name; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" value="replace" />
+								<input type="radio" name="<?php echo $name; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" value="replace" checked="checked" />
 								<?php \esc_html_e( 'Replace', 'aio-page-builder' ); ?>
 							</label>
 							<label>

@@ -450,6 +450,34 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		}
 	}
 
+	/** Bulk deny selected updates only chosen pending items to rejected (spec §33.7). */
+	public function test_bulk_deny_selected_step2(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 792;
+		try {
+			$repo    = new Build_Plan_Repository();
+			$def     = $this->step2_plan_definition( 3 );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-bulk-deny-selected',
+					'post_title'      => 'Test Plan Bulk Deny Selected',
+					'status'          => 'publish',
+				)
+			);
+			$this->assertGreaterThan( 0, $post_id );
+			$bulk  = new New_Page_Creation_Bulk_Action_Service( $repo );
+			$count = $bulk->bulk_deny_selected( $post_id, array( 'plan_npc_0', 'plan_npc_2' ) );
+			$this->assertSame( 2, $count );
+			$def2  = $repo->get_plan_definition( $post_id );
+			$items = $def2[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ] ?? array();
+			$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $items[0]['status'] );
+			$this->assertSame( Build_Plan_Item_Statuses::PENDING, $items[1]['status'] );
+			$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $items[2]['status'] );
+		} finally {
+			unset( $GLOBALS['_aio_wp_insert_post_return'] );
+		}
+	}
+
 	/** Bulk deny all eligible updates all pending to rejected. */
 	public function test_bulk_deny_all_eligible_step2(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 790;

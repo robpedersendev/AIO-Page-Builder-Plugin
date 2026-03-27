@@ -30,19 +30,19 @@ final class Onboarding_Crawl_Context_Phase {
 
 	/**
 	 * @param array<string, mixed> $prefill Onboarding prefill from {@see Onboarding_Prefill_Service::get_prefill_data()}.
-	 * @return array{phase: string, is_stale: bool, headline: string, detail: string, next_step: string}
+	 * @return array{phase: string, phase_label: string, is_stale: bool, headline: string, detail: string, next_step: string}
 	 */
 	public static function summarize( array $prefill, ?Settings_Service $settings ): array {
 		$run_id = isset( $prefill['latest_crawl_run_id'] ) && is_string( $prefill['latest_crawl_run_id'] )
 			? \trim( $prefill['latest_crawl_run_id'] )
 			: '';
 		if ( $run_id === '' ) {
-			return array(
-				'phase'     => self::PHASE_NONE,
-				'is_stale'  => false,
-				'headline'  => __( 'No crawl recorded yet', 'aio-page-builder' ),
-				'detail'    => __( 'Crawl is optional. When you run one, the planner can use discovered pages as context.', 'aio-page-builder' ),
-				'next_step' => __( 'Expand the section below to start a crawl or open the full Crawler screen.', 'aio-page-builder' ),
+			return self::pack(
+				self::PHASE_NONE,
+				false,
+				__( 'No crawl recorded yet', 'aio-page-builder' ),
+				__( 'Crawl is optional. When you run one, the planner can use discovered pages as context.', 'aio-page-builder' ),
+				__( 'Expand the section below to start a crawl or open the full Crawler screen.', 'aio-page-builder' )
 			);
 		}
 
@@ -77,91 +77,130 @@ final class Onboarding_Crawl_Context_Phase {
 		if ( $ended === '' && $started !== '' ) {
 			$running = $fs === '' || $fs === Crawl_Snapshot_Payload_Builder::SESSION_STATUS_RUNNING || $fs === 'unknown';
 			if ( $running ) {
-				return array(
-					'phase'     => self::PHASE_RUNNING,
-					'is_stale'  => false,
-					'headline'  => __( 'Crawl in progress or queued', 'aio-page-builder' ),
-					'detail'    => sprintf(
+				return self::pack(
+					self::PHASE_RUNNING,
+					false,
+					__( 'Crawl in progress or queued', 'aio-page-builder' ),
+					sprintf(
 						/* translators: %s: crawl run id */
 						__( 'Latest run: %s. Refresh this step after the crawler finishes.', 'aio-page-builder' ),
 						$run_id
 					),
-					'next_step' => __( 'Wait for completion, or open Crawler Sessions to inspect status.', 'aio-page-builder' ),
+					__( 'Wait for completion, or open Crawler Sessions to inspect status.', 'aio-page-builder' )
 				);
 			}
 		}
 
 		if ( $ended !== '' && $is_stale ) {
-			return array(
-				'phase'     => self::PHASE_STALE,
-				'is_stale'  => true,
-				'headline'  => __( 'Crawl data may be outdated', 'aio-page-builder' ),
-				'detail'    => sprintf(
+			return self::pack(
+				self::PHASE_STALE,
+				true,
+				__( 'Crawl data may be outdated', 'aio-page-builder' ),
+				sprintf(
 					/* translators: 1: crawl run id, 2: max age in days */
 					__( 'Last run %1$s ended more than %2$d days ago. Consider a new crawl if the site changed.', 'aio-page-builder' ),
 					$run_id,
 					$threshold_days
 				),
-				'next_step' => __( 'Run a fresh crawl before another planning request if you need current pages.', 'aio-page-builder' ),
+				__( 'Run a fresh crawl before another planning request if you need current pages.', 'aio-page-builder' )
 			);
 		}
 
 		if ( $fs === Crawl_Snapshot_Payload_Builder::SESSION_STATUS_COMPLETED ) {
-			return array(
-				'phase'     => self::PHASE_COMPLETED,
-				'is_stale'  => false,
-				'headline'  => __( 'Latest crawl completed', 'aio-page-builder' ),
-				'detail'    => sprintf(
+			return self::pack(
+				self::PHASE_COMPLETED,
+				false,
+				__( 'Latest crawl completed', 'aio-page-builder' ),
+				sprintf(
 					/* translators: 1: run id, 2: discovered URL count */
 					__( 'Run %1$s finished. Discovered URLs: %2$d.', 'aio-page-builder' ),
 					$run_id,
 					$disc
 				),
-				'next_step' => __( 'You can continue onboarding; planning will use this context when available.', 'aio-page-builder' ),
+				__( 'You can continue onboarding; planning will use this context when available.', 'aio-page-builder' )
 			);
 		}
 
 		if ( $fs === Crawl_Snapshot_Payload_Builder::SESSION_STATUS_PARTIAL ) {
-			return array(
-				'phase'     => self::PHASE_PARTIAL,
-				'is_stale'  => false,
-				'headline'  => __( 'Latest crawl finished with partial results', 'aio-page-builder' ),
-				'detail'    => sprintf(
+			return self::pack(
+				self::PHASE_PARTIAL,
+				false,
+				__( 'Latest crawl finished with partial results', 'aio-page-builder' ),
+				sprintf(
 					/* translators: 1: run id, 2: failed URLs, 3: discovered URLs */
 					__( 'Run %1$s: some URLs failed (%2$d failed, %3$d discovered). Review the session for details.', 'aio-page-builder' ),
 					$run_id,
 					$failed,
 					$disc
 				),
-				'next_step' => __( 'You may retry or fix scope, then continue when ready.', 'aio-page-builder' ),
+				__( 'You may retry or fix scope, then continue when ready.', 'aio-page-builder' )
 			);
 		}
 
 		if ( $fs === Crawl_Snapshot_Payload_Builder::SESSION_STATUS_FAILED ) {
-			return array(
-				'phase'     => self::PHASE_FAILED,
-				'is_stale'  => false,
-				'headline'  => __( 'Latest crawl failed', 'aio-page-builder' ),
-				'detail'    => sprintf(
+			return self::pack(
+				self::PHASE_FAILED,
+				false,
+				__( 'Latest crawl failed', 'aio-page-builder' ),
+				sprintf(
 					/* translators: %s: crawl run id */
 					__( 'Run %s did not complete successfully. Open Crawler Sessions for the error and retry if offered.', 'aio-page-builder' ),
 					$run_id
 				),
-				'next_step' => __( 'Fix the crawl scope or site access, then retry.', 'aio-page-builder' ),
+				__( 'Fix the crawl scope or site access, then retry.', 'aio-page-builder' )
 			);
 		}
 
-		return array(
-			'phase'     => self::PHASE_UNKNOWN,
-			'is_stale'  => false,
-			'headline'  => __( 'Crawl status unclear', 'aio-page-builder' ),
-			'detail'    => sprintf(
+		return self::pack(
+			self::PHASE_UNKNOWN,
+			false,
+			__( 'Crawl status unclear', 'aio-page-builder' ),
+			sprintf(
 				/* translators: 1: run id, 2: raw status string */
 				__( 'Run %1$s: reported status “%2$s”. Open Crawler Sessions for full detail.', 'aio-page-builder' ),
 				$run_id,
 				$fs !== '' ? $fs : __( 'unknown', 'aio-page-builder' )
 			),
-			'next_step' => __( 'Refresh after the crawler updates, or retry from the crawler screen.', 'aio-page-builder' ),
+			__( 'Refresh after the crawler updates, or retry from the crawler screen.', 'aio-page-builder' )
 		);
+	}
+
+	/**
+	 * Stable shape for UI, telemetry, and data attributes.
+	 *
+	 * @return array{phase: string, phase_label: string, is_stale: bool, headline: string, detail: string, next_step: string}
+	 */
+	private static function pack( string $phase, bool $is_stale, string $headline, string $detail, string $next_step ): array {
+		return array(
+			'phase'       => $phase,
+			'phase_label' => self::short_label_for_phase( $phase ),
+			'is_stale'    => $is_stale,
+			'headline'    => $headline,
+			'detail'      => $detail,
+			'next_step'   => $next_step,
+		);
+	}
+
+	/**
+	 * Short machine-readable phase name for operators and assistive labels (paired with `phase`).
+	 */
+	private static function short_label_for_phase( string $phase ): string {
+		switch ( $phase ) {
+			case self::PHASE_NONE:
+				return __( 'No crawl', 'aio-page-builder' );
+			case self::PHASE_RUNNING:
+				return __( 'Running', 'aio-page-builder' );
+			case self::PHASE_COMPLETED:
+				return __( 'Completed', 'aio-page-builder' );
+			case self::PHASE_PARTIAL:
+				return __( 'Partial', 'aio-page-builder' );
+			case self::PHASE_FAILED:
+				return __( 'Failed', 'aio-page-builder' );
+			case self::PHASE_STALE:
+				return __( 'Stale', 'aio-page-builder' );
+			case self::PHASE_UNKNOWN:
+			default:
+				return __( 'Unknown', 'aio-page-builder' );
+		}
 	}
 }
