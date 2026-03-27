@@ -207,8 +207,12 @@ require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Config/Capabili
  */
 final class Plugin {
 
-	/** @var \AIOPageBuilder\Infrastructure\Container\Service_Container|null Container for bootstrap wiring; set in run(). */
-	private ?\AIOPageBuilder\Infrastructure\Container\Service_Container $container = null;
+	/**
+	 * Plugin service container. Assigned during {@see run()} before any WordPress hooks are registered that use it.
+	 *
+	 * @var \AIOPageBuilder\Infrastructure\Container\Service_Container
+	 */
+	private \AIOPageBuilder\Infrastructure\Container\Service_Container $container;
 
 	/**
 	 * Called on plugins_loaded. Instantiates the plugin and runs it.
@@ -303,7 +307,7 @@ final class Plugin {
 		if ( ! is_string( $crawl_run_id ) || $crawl_run_id === '' ) {
 			return;
 		}
-		if ( $this->container === null || ! $this->container->has( 'crawl_run_processor' ) ) {
+		if ( ! $this->container->has( 'crawl_run_processor' ) ) {
 			return;
 		}
 		try {

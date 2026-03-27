@@ -101,7 +101,7 @@ final class AI_Output_Validator_Test extends TestCase {
 		$payload[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ]   = 'Purpose as plain string from model.';
 		$payload[ Build_Plan_Draft_Schema::KEY_SITE_STRUCTURE ] = 'Nav summary as plain string.';
 		$payload[ Build_Plan_Draft_Schema::KEY_CONFIDENCE ]     = 'high';
-		$report                                                 = $this->validator()->validate( $payload, Build_Plan_Draft_Schema::SCHEMA_REF, false );
+		$report = $this->validator()->validate( $payload, Build_Plan_Draft_Schema::SCHEMA_REF, false );
 		$this->assertSame( Validation_Report::STATE_PASSED, $report->get_final_validation_state(), 'coercion should satisfy top-level object rules' );
 		$this->assertTrue( $report->allows_build_plan_handoff() );
 		$normalized = $report->get_normalized_output();

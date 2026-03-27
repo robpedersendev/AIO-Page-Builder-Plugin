@@ -49,7 +49,7 @@ final class Section_Guidance_Field_Value_Applier_Test extends TestCase {
 	}
 
 	public function test_field_values_split_across_multiple_text_fields(): void {
-		$def = array(
+		$def    = array(
 			'field_blueprint' => array(
 				Field_Blueprint_Schema::FIELDS => array(
 					array(
@@ -63,7 +63,7 @@ final class Section_Guidance_Field_Value_Applier_Test extends TestCase {
 				),
 			),
 		);
-		$row = array(
+		$row    = array(
 			'section_key'       => 'x',
 			'intent'            => 'First block.',
 			'content_direction' => 'Second block.',

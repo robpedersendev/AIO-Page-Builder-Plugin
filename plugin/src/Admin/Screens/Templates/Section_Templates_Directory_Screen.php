@@ -56,17 +56,13 @@ final class Section_Templates_Directory_Screen {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), 403 );
 		}
 
-		$state_builder = $this->get_state_builder();
-		$raw_paged     = null;
-		if ( isset( $_GET['paged'] ) ) {
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then cast to int for paged.
-			$raw_paged = \wp_unslash( $_GET['paged'] );
-		}
-		$raw_per_page = null;
-		if ( isset( $_GET['per_page'] ) ) {
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed then cast to int for per_page.
-			$raw_per_page = \wp_unslash( $_GET['per_page'] );
-		}
+		$state_builder                              = $this->get_state_builder();
+		$paged                                      = $this->get_positive_int_query_arg( 'paged', 1 );
+		$per_page                                   = $this->get_positive_int_query_arg(
+			'per_page',
+			\AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
+			\AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE
+		);
 		$request                                    = array(
 			'purpose_family'       => isset( $_GET['purpose_family'] ) ? \sanitize_key( \wp_unslash( $_GET['purpose_family'] ) ) : '',
 			'cta_classification'   => isset( $_GET['cta_classification'] ) ? \sanitize_key( \wp_unslash( $_GET['cta_classification'] ) ) : '',
@@ -440,7 +436,7 @@ final class Section_Templates_Directory_Screen {
 									<?php \wp_nonce_field( \AIOPageBuilder\Admin\Actions\Save_Industry_Section_Override_Action::NONCE_ACTION, \AIOPageBuilder\Admin\Actions\Save_Industry_Section_Override_Action::NONCE_NAME ); ?>
 									<input type="hidden" name="section_key" value="<?php echo \esc_attr( $key ); ?>" />
 									<input type="hidden" name="state" value="accepted" />
-									<input type="hidden" name="_wp_http_referer" value="<?php echo \esc_attr( \sanitize_text_field( \wp_unslash( isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '' ) ) ); ?>" />
+									<input type="hidden" name="_wp_http_referer" value="<?php echo \esc_attr( $this->get_current_request_uri() ); ?>" />
 									<button type="submit" class="button-link"><?php \esc_html_e( 'Use anyway', 'aio-page-builder' ); ?></button>
 								</form>
 							<?php endif; ?>
@@ -470,12 +466,51 @@ final class Section_Templates_Directory_Screen {
 			$prev_args = array_merge( $query_args, array( 'paged' => $page - 1 ) );
 			echo '<li><a href="' . \esc_url( \add_query_arg( $prev_args, $base_url ) ) . '">' . \esc_html__( 'Previous', 'aio-page-builder' ) . '</a></li>';
 		}
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $page and $total_pages are integers for %d.
-		echo '<li><span class="aio-pagination-info">' . sprintf( /* translators: 1: current page, 2: total pages */ \esc_html__( 'Page %1$d of %2$d', 'aio-page-builder' ), $page, $total_pages ) . '</span></li>';
+		echo '<li><span class="aio-pagination-info">' . \esc_html(
+			sprintf(
+				/* translators: 1: current page, 2: total pages */
+				\__( 'Page %1$s of %2$s', 'aio-page-builder' ),
+				\number_format_i18n( $page ),
+				\number_format_i18n( $total_pages )
+			)
+		) . '</span></li>';
 		if ( $page < $total_pages ) {
 			$next_args = array_merge( $query_args, array( 'paged' => $page + 1 ) );
 			echo '<li><a href="' . \esc_url( \add_query_arg( $next_args, $base_url ) ) . '">' . \esc_html__( 'Next', 'aio-page-builder' ) . '</a></li>';
 		}
 		echo '</ul></nav>';
+	}
+
+	/**
+	 * Reads a positive integer query arg with optional upper bound.
+	 *
+	 * @param string   $key Query arg name.
+	 * @param int      $default Default value.
+	 * @param int|null $max Optional maximum.
+	 * @return int
+	 */
+	private function get_positive_int_query_arg( string $key, int $default, ?int $max = null ): int {
+		$value = \filter_input( INPUT_GET, $key, FILTER_VALIDATE_INT );
+
+		if ( ! is_int( $value ) || $value < 1 ) {
+			return $default;
+		}
+
+		if ( $max !== null ) {
+			return min( $value, $max );
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Returns a sanitized current request URI for referer fields.
+	 *
+	 * @return string
+	 */
+	private function get_current_request_uri(): string {
+		$request_uri = \filter_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
+
+		return is_string( $request_uri ) ? $request_uri : '';
 	}
 }

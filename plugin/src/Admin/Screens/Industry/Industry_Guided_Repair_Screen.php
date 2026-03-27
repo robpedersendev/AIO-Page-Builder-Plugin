@@ -50,7 +50,7 @@ final class Industry_Guided_Repair_Screen {
 
 	private function get_view_model(): Industry_Guided_Repair_View_Model {
 		$candidates = array();
-		$hub = Industry_Profile_Settings_Screen::SLUG;
+		$hub        = Industry_Profile_Settings_Screen::SLUG;
 		$links      = array(
 			'health_report'       => Admin_Screen_Hub::subtab_url( $hub, 'reports', 'health' ),
 			'override_management' => Admin_Screen_Hub::tab_url( $hub, 'overrides' ),

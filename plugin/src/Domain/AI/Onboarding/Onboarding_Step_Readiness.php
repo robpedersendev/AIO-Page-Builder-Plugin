@@ -21,8 +21,8 @@ final class Onboarding_Step_Readiness {
 	/**
 	 * Whether stored profile + provider signals satisfy this step’s minimum requirements.
 	 *
-	 * @param string              $step_key Step key.
-	 * @param array<string, mixed> $profile  Full profile from Profile_Store::get_full_profile().
+	 * @param string                     $step_key Step key.
+	 * @param array<string, mixed>       $profile  Full profile from Profile_Store::get_full_profile().
 	 * @param Onboarding_Prefill_Service $prefill   For provider readiness.
 	 */
 	public static function step_requirements_met( string $step_key, array $profile, Onboarding_Prefill_Service $prefill ): bool {
@@ -32,8 +32,8 @@ final class Onboarding_Step_Readiness {
 	/**
 	 * Human-readable validation errors for the step (empty when satisfied).
 	 *
-	 * @param string              $step_key Step key.
-	 * @param array<string, mixed> $profile  Full profile.
+	 * @param string                     $step_key Step key.
+	 * @param array<string, mixed>       $profile  Full profile.
 	 * @param Onboarding_Prefill_Service $prefill  Prefill service.
 	 * @return array<int, string>
 	 */
@@ -56,7 +56,7 @@ final class Onboarding_Step_Readiness {
 				}
 				return $errs;
 			case Onboarding_Step_Keys::BRAND_PROFILE:
-				$pos  = isset( $brand['brand_positioning_summary'] ) ? trim( (string) $brand['brand_positioning_summary'] ) : '';
+				$pos   = isset( $brand['brand_positioning_summary'] ) ? trim( (string) $brand['brand_positioning_summary'] ) : '';
 				$voice = isset( $brand['brand_voice_summary'] ) ? trim( (string) $brand['brand_voice_summary'] ) : '';
 				if ( $pos === '' && $voice === '' ) {
 					return array( __( 'Enter a brand positioning summary and/or brand voice summary.', 'aio-page-builder' ) );
@@ -98,9 +98,9 @@ final class Onboarding_Step_Readiness {
 	/**
 	 * Display status for the stepper: completed, incomplete, in_progress, not_started.
 	 *
-	 * @param string              $step_key         Step key.
-	 * @param string              $current_step_key Active step.
-	 * @param array<string, mixed> $profile          Full profile.
+	 * @param string                     $step_key         Step key.
+	 * @param string                     $current_step_key Active step.
+	 * @param array<string, mixed>       $profile          Full profile.
 	 * @param Onboarding_Prefill_Service $prefill              Prefill.
 	 * @param int                        $furthest_step_index Highest step index the user has reached (0-based, ordered()).
 	 * @return string One of Onboarding_Statuses step constants.
@@ -136,7 +136,7 @@ final class Onboarding_Step_Readiness {
 	/**
 	 * Messages to show on Review when prior required data is still missing.
 	 *
-	 * @param array<string, mixed> $profile Full profile.
+	 * @param array<string, mixed>       $profile Full profile.
 	 * @param Onboarding_Prefill_Service $prefill Prefill.
 	 * @return array<int, string>
 	 */
@@ -158,9 +158,252 @@ final class Onboarding_Step_Readiness {
 	}
 
 	/**
+	 * Non-blocking quality hints for Review (thin, placeholder-like, or noisy input).
+	 *
+	 * @param array<string, mixed>       $profile Full profile.
+	 * @param Onboarding_Prefill_Service $prefill Prefill (unused; reserved for future crawl/provider signals).
+	 * @return array<int, string>
+	 */
+	public static function get_review_advisories( array $profile, Onboarding_Prefill_Service $prefill ): array {
+		unset( $prefill );
+		$biz   = isset( $profile[ Profile_Schema::ROOT_BUSINESS ] ) && is_array( $profile[ Profile_Schema::ROOT_BUSINESS ] )
+			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
+		$brand = isset( $profile[ Profile_Schema::ROOT_BRAND ] ) && is_array( $profile[ Profile_Schema::ROOT_BRAND ] )
+			? $profile[ Profile_Schema::ROOT_BRAND ] : array();
+
+		$out = array();
+
+		$bn = isset( $biz['business_name'] ) ? trim( (string) $biz['business_name'] ) : '';
+		if ( $bn !== '' && self::looks_like_placeholder_or_too_short( $bn, true ) ) {
+			$out[] = __( 'Business name still looks like a placeholder or is too short—use the real business name for better plans.', 'aio-page-builder' );
+		}
+
+		$bt = isset( $biz['business_type'] ) ? trim( (string) $biz['business_type'] ) : '';
+		if ( $bt !== '' && self::looks_like_placeholder_or_too_short( $bt, false ) ) {
+			$out[] = __( 'Business type looks generic. One concrete phrase (for example “B2B SaaS” or “Local retail”) helps planning.', 'aio-page-builder' );
+		}
+
+		$pos = isset( $brand['brand_positioning_summary'] ) ? trim( (string) $brand['brand_positioning_summary'] ) : '';
+		$voc = isset( $brand['brand_voice_summary'] ) ? trim( (string) $brand['brand_voice_summary'] ) : '';
+		if ( ( $pos !== '' || $voc !== '' ) && self::both_brand_summaries_weak( $pos, $voc ) ) {
+			$out[] = __( 'Brand positioning and/or voice look thin. Add a sentence or two so the planner understands tone and differentiation.', 'aio-page-builder' );
+		}
+
+		$aud = isset( $biz['target_audience_summary'] ) ? trim( (string) $biz['target_audience_summary'] ) : '';
+		if ( $aud !== '' && self::looks_like_placeholder_or_too_short( $aud, false ) ) {
+			$out[] = __( 'Target audience summary looks like a stub. A few specifics (who, pain, context) improve sitemap quality.', 'aio-page-builder' );
+		}
+
+		$off = isset( $biz['primary_offers_summary'] ) ? trim( (string) $biz['primary_offers_summary'] ) : '';
+		if ( $off !== '' && self::looks_like_placeholder_or_too_short( $off, false ) ) {
+			$out[] = __( 'Primary offers read as placeholder text. List real offers or services you want the site to sell.', 'aio-page-builder' );
+		}
+
+		$geo = isset( $biz['core_geographic_market'] ) ? trim( (string) $biz['core_geographic_market'] ) : '';
+		if ( $geo !== '' ) {
+			$geo_norm = self::normalize_placeholder_text( $geo );
+			if ( self::is_explicit_not_applicable_answer( $geo_norm ) ) {
+				$out[] = __( 'Geographic market is still marked as not applicable. Name regions, countries, or say “worldwide” so delivery scope is clear.', 'aio-page-builder' );
+			} elseif ( ! self::is_compact_geographic_market_label( $geo_norm ) && self::looks_like_placeholder_or_too_short( $geo, false ) ) {
+				$out[] = __( 'Geography looks underspecified. Name regions, countries, or “worldwide” with intent.', 'aio-page-builder' );
+			}
+		}
+
+		return array_values( array_unique( $out ) );
+	}
+
+	/**
+	 * Human label for provider credential_state (safe display).
+	 */
+	public static function describe_provider_credential_state( string $state ): string {
+		$s = strtolower( trim( $state ) );
+		switch ( $s ) {
+			case 'configured':
+				return __( 'Configured', 'aio-page-builder' );
+			case 'absent':
+			case '':
+				return __( 'Not configured', 'aio-page-builder' );
+			case 'invalid':
+			case 'error':
+				return __( 'Needs attention', 'aio-page-builder' );
+			default:
+				return __( 'Unknown', 'aio-page-builder' );
+		}
+	}
+
+	/**
 	 * @param mixed $v
 	 */
 	private static function non_empty_text( $v ): bool {
 		return is_string( $v ) && trim( $v ) !== '';
+	}
+
+	/**
+	 * True when both fields are non-empty but too short to be useful together.
+	 */
+	private static function both_brand_summaries_weak( string $pos, string $voc ): bool {
+		$p_len = strlen( $pos );
+		$v_len = strlen( $voc );
+		if ( $p_len === 0 && $v_len === 0 ) {
+			return false;
+		}
+		if ( $p_len > 0 && $v_len > 0 ) {
+			return ( $p_len < 12 && $v_len < 12 ) || ( self::looks_like_placeholder_or_too_short( $pos, false ) && self::looks_like_placeholder_or_too_short( $voc, false ) );
+		}
+		$only = $p_len > 0 ? $pos : $voc;
+		return self::looks_like_placeholder_or_too_short( $only, false );
+	}
+
+	/**
+	 * Normalizes free-text for placeholder / N/A checks (advisory only).
+	 */
+	private static function normalize_placeholder_text( string $text ): string {
+		$t = trim( $text );
+		return strtolower( preg_replace( '/\s+/', ' ', $t ) ?? $t );
+	}
+
+	/**
+	 * True when the user explicitly indicated “not applicable” (distinct from a vague short phrase).
+	 */
+	private static function is_explicit_not_applicable_answer( string $norm ): bool {
+		if ( $norm === '' ) {
+			return false;
+		}
+		$exact = array(
+			'na',
+			'n/a',
+			'n.a',
+			'n.a.',
+			'none',
+			'not applicable',
+			'not app',
+			'no scope',
+			'—',
+			'–',
+			'-',
+		);
+		foreach ( $exact as $e ) {
+			if ( $norm === $e ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Short but intentional geography labels (regions, macro labels) — avoids false “too short” advisories.
+	 */
+	private static function is_compact_geographic_market_label( string $norm ): bool {
+		if ( $norm === '' ) {
+			return false;
+		}
+		$tokens = array(
+			'uk',
+			'gb',
+			'us',
+			'usa',
+			'eu',
+			'uae',
+			'emea',
+			'apac',
+			'latam',
+			'amea',
+			'dach',
+			'benelux',
+			'nordics',
+			'mea',
+			'anz',
+			'sea',
+			'nyc',
+			'global',
+			'worldwide',
+			'world-wide',
+			'international',
+			'national',
+			'regional',
+			'local',
+			'remote',
+			'online',
+			'online-only',
+			'web-only',
+			'nationwide',
+			'statewide',
+			'citywide',
+			'world',
+		);
+		$short_iso_or_city = array(
+			'fr',
+			'de',
+			'es',
+			'it',
+			'nl',
+			'be',
+			'ch',
+			'at',
+			'ie',
+			'se',
+			'no',
+			'dk',
+			'fi',
+			'pl',
+			'pt',
+			'br',
+			'mx',
+			'in',
+			'jp',
+			'kr',
+			'au',
+			'nz',
+			'sg',
+			'ca',
+			'lon',
+			'par',
+			'ber',
+		);
+		return in_array( $norm, $tokens, true ) || in_array( $norm, $short_iso_or_city, true );
+	}
+
+	/**
+	 * Detects placeholder junk and empty-equivalent answers (advisory only).
+	 *
+	 * @param bool $strict When true, stricter minimum length (business name).
+	 */
+	private static function looks_like_placeholder_or_too_short( string $text, bool $strict ): bool {
+		$norm = self::normalize_placeholder_text( $text );
+		if ( $norm === '' ) {
+			return false;
+		}
+		$min = $strict ? 3 : 4;
+		if ( strlen( $norm ) < $min ) {
+			return true;
+		}
+		$junk = array(
+			'tbd',
+			'tba',
+			'na',
+			'n/a',
+			'none',
+			'nothing',
+			'todo',
+			'test',
+			'testing',
+			'placeholder',
+			'lorem',
+			'lorem ipsum',
+			'dummy',
+			'asdf',
+			'xxx',
+			'...',
+			'…',
+		);
+		foreach ( $junk as $j ) {
+			if ( $norm === $j ) {
+				return true;
+			}
+		}
+		if ( preg_match( '/^(lorem|test|placeholder|todo|tbd)\b/i', $norm ) === 1 ) {
+			return true;
+		}
+		return false;
 	}
 }

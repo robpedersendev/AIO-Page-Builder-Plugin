@@ -41,6 +41,8 @@ final class Dashboard_State_Builder_Test extends TestCase {
 		$this->assertArrayHasKey( 'explore_links', $state );
 		$this->assertArrayHasKey( 'footer_links', $state );
 		$this->assertArrayHasKey( 'welcome_state', $state );
+		$this->assertArrayHasKey( 'onboarding_metrics', $state );
+		$this->assertArrayHasKey( 'visible', $state['onboarding_metrics'] );
 	}
 
 	public function test_readiness_strip_has_summary_and_url(): void {

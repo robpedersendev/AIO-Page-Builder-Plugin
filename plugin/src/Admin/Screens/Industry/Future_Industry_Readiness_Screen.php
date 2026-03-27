@@ -121,7 +121,7 @@ final class Future_Industry_Readiness_Screen {
 			}
 		}
 
-		$hub = Industry_Profile_Settings_Screen::SLUG;
+		$hub   = Industry_Profile_Settings_Screen::SLUG;
 		$links = array(
 			'author_dashboard'       => Admin_Screen_Hub::tab_url( $hub, 'author' ),
 			'pack_family_comparison' => Admin_Screen_Hub::subtab_url( $hub, 'comparisons', 'pack_family' ),

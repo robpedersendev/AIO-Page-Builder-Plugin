@@ -51,11 +51,76 @@ jobs:
         run: cd plugin && composer run phpunit
         continue-on-error: ${{ matrix.php != '8.1' }}
 
+  package:
+    runs-on: ubuntu-latest
+    needs: php
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP for packaging
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: zip
+          coverage: none
+
+      - name: Build release package
+        run: php tools/build-release-package.php
+
+      - name: Upload release package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: packaged-plugin
+          path: |
+            dist/release/aio-page-builder.zip
+            dist/release/stage/aio-page-builder
+          if-no-files-found: error
+
+  smoke-install:
+    runs-on: ubuntu-latest
+    needs: package
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download packaged plugin artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: packaged-plugin
+          path: dist/release
+
+      - name: Smoke test packaged plugin activation (Docker + WP-CLI)
+        run: |
+          set -e
+          export PLUGIN_SOURCE="${GITHUB_WORKSPACE}/dist/release/stage/aio-page-builder"
+          cd tools/plugin-check
+          docker compose up -d db wordpress
+          for i in $(seq 1 45); do
+            if docker compose run --rm -T -u root wpcli wp core version --path=/var/www/html --allow-root >/dev/null 2>&1; then
+              break
+            fi
+            sleep 2
+          done
+          docker compose run --rm -T -u root wpcli wp core is-installed --path=/var/www/html --allow-root >/dev/null 2>&1 || \
+            docker compose run --rm -T -u root wpcli wp core install \
+              --url="http://localhost" --title="Packaged Plugin Smoke Test" --admin_user=admin --admin_password=admin \
+              --admin_email=admin@example.test --path=/var/www/html --skip-email --allow-root
+          docker compose run --rm -T -u root wpcli wp plugin activate aio-page-builder --path=/var/www/html --allow-root
+          docker compose run --rm -T -u root wpcli wp plugin list --status=active --path=/var/www/html --allow-root
+
   plugin-check:
     runs-on: ubuntu-latest
+    needs: package
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download packaged plugin artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: packaged-plugin
+          path: dist/release
 
       - name: Plugin Check (Docker + WP-CLI)
         # * Full Plugin Check needs WordPress + DB + plugin-check; see tools/plugin-check/PROCEDURE.txt
@@ -63,8 +128,8 @@ jobs:
         continue-on-error: true
         run: |
           set -e
+          export PLUGIN_SOURCE="${GITHUB_WORKSPACE}/dist/release/stage/aio-page-builder"
           cd tools/plugin-check
-          export PLUGIN_SOURCE="${GITHUB_WORKSPACE}/plugin"
           docker compose up -d db wordpress
           for i in $(seq 1 45); do
             if docker compose run --rm -T -u root wpcli wp core version --path=/var/www/html --allow-root >/dev/null 2>&1; then

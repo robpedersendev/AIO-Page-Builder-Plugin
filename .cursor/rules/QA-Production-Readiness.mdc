@@ -1,0 +1,29 @@
+---
+description: QA pass for production-readiness on every change set (edited, new, deleted files)
+alwaysApply: true
+---
+
+# Production QA pass (integration and stability)
+
+When changing this codebase, treat **CI parity** as a gate before considering work complete.
+
+## Scope
+
+1. **Identify the change set** — all files touched in the session (added, modified, removed). For deletes, confirm no remaining references (imports, autoload, PHPUnit suites, CI paths, tooling scripts).
+
+2. **Static analysis and style (from `plugin/`)**  
+   - `composer run phpcs`  
+   - `composer run phpstan`  
+
+3. **Tests**  
+   - `composer run phpunit`  
+
+4. **Release path when entry/bootstrap, tooling, packaging, or CI changes**  
+   - `php tools/release_preflight_check.php` against `plugin/` (default) or the staged plugin root when validating a package.  
+   - `php tools/build-release-package.php` and confirm preflight passes on the staged tree under `dist/release/stage/aio-page-builder`.  
+
+5. **Integration** — if the change affects the plugin bootstrap or autoloaders, ensure unit tests covering the entry point (`BootstrapTest`, `Plugin_Entry_Point_Test`, `Legacy_Bootstrap_Regression_Test` as applicable) still pass.
+
+## Outcome
+
+Do not report completion without a passing run of the above commands relevant to the change set. If a step fails, fix or document the failure per project quality gates before merge.

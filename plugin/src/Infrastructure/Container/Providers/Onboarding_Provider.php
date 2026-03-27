@@ -15,6 +15,7 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Build_Plan_Bootstrap_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Industry_Hub_Navigation_Advisor;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Telemetry;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Planning_Request_Orchestrator;
 use AIOPageBuilder\Domain\AI\Planning\Planning_Expand_Pass_Runner;
 use AIOPageBuilder\Domain\AI\Planning\Planning_Per_Run_Budget_Estimator;
@@ -32,6 +33,12 @@ final class Onboarding_Provider implements Service_Provider_Interface {
 			'onboarding_draft_service',
 			function () use ( $container ): Onboarding_Draft_Service {
 				return new Onboarding_Draft_Service( $container->get( 'settings' ) );
+			}
+		);
+		$container->register(
+			'onboarding_telemetry',
+			function () use ( $container ): Onboarding_Telemetry {
+				return new Onboarding_Telemetry( $container->get( 'settings' ) );
 			}
 		);
 		$container->register(

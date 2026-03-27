@@ -16,7 +16,9 @@ if ( PHP_SAPI !== 'cli' ) {
 	exit( 1 );
 }
 
-$base = $argc > 1 ? rtrim( $argv[1], DIRECTORY_SEPARATOR ) : dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'plugin';
+$base = isset( $argv[1] ) && is_string( $argv[1] ) && $argv[1] !== ''
+	? rtrim( $argv[1], DIRECTORY_SEPARATOR )
+	: dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'plugin';
 if ( ! is_dir( $base ) ) {
 	echo "FAIL: Not a directory: {$base}\n";
 	exit( 1 );
@@ -25,8 +27,9 @@ if ( ! is_dir( $base ) ) {
 $main_file = $base . DIRECTORY_SEPARATOR . 'aio-page-builder.php';
 $results   = array();
 $ok        = true;
+$content   = '';
 
-// 1. Main plugin file exists
+// 1. Main plugin file exists.
 if ( ! file_exists( $main_file ) || ! is_readable( $main_file ) ) {
 	$results[] = array( 'fail', 'Main plugin file missing or unreadable: aio-page-builder.php' );
 	$ok        = false;
@@ -34,7 +37,7 @@ if ( ! file_exists( $main_file ) || ! is_readable( $main_file ) ) {
 	$results[] = array( 'pass', 'Main plugin file present' );
 	$content   = (string) file_get_contents( $main_file );
 
-	// 2. Required headers (simple line match)
+	// 2. Required headers (simple line match).
 	$headers = array( 'Plugin Name', 'Version', 'Requires at least', 'Requires PHP', 'Text Domain' );
 	foreach ( $headers as $name ) {
 		$pattern = '/^\s*\*\s*' . preg_quote( $name, '/' ) . '\s*:\s*(.+)$/m';
@@ -46,7 +49,7 @@ if ( ! file_exists( $main_file ) || ! is_readable( $main_file ) ) {
 		}
 	}
 
-	// Version format sanity (x.y.z or x.y.z-rcN)
+	// Version format sanity (x.y.z or x.y.z-rcN).
 	if ( preg_match( '/^\s*\*\s*Version\s*:\s*(\S+)/m', $content, $m ) ) {
 		$ver = trim( (string) $m[1] );
 		if ( ! preg_match( '/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?$/', $ver ) ) {
@@ -55,8 +58,12 @@ if ( ! file_exists( $main_file ) || ! is_readable( $main_file ) ) {
 	}
 }
 
-// 3. Bootstrap files
-$bootstrap_files = array( 'src/Bootstrap/Constants.php', 'src/Bootstrap/Plugin.php' );
+// 3. Bootstrap files.
+$bootstrap_files = array(
+	'src/Bootstrap/Constants.php',
+	'src/Bootstrap/Plugin.php',
+	'src/Bootstrap/Internal_Autoloader.php',
+);
 foreach ( $bootstrap_files as $rel ) {
 	$path = $base . DIRECTORY_SEPARATOR . str_replace( '/', DIRECTORY_SEPARATOR, $rel );
 	if ( file_exists( $path ) && is_readable( $path ) ) {
@@ -67,7 +74,37 @@ foreach ( $bootstrap_files as $rel ) {
 	}
 }
 
-// 4. Development-only artifacts should be absent in production package
+// 4. Runtime autoload viability.
+$vendor_autoload_path   = $base . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+$internal_autoload_path = $base . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Bootstrap' . DIRECTORY_SEPARATOR . 'Internal_Autoloader.php';
+$references_vendor      = false !== strpos( $content, '/vendor/autoload.php' );
+$references_internal    = false !== strpos( $content, '/src/Bootstrap/Internal_Autoloader.php' );
+
+if ( file_exists( $vendor_autoload_path ) && is_readable( $vendor_autoload_path ) ) {
+	$results[] = array( 'pass', 'Composer runtime autoload present' );
+} else {
+	$results[] = array( 'warn', 'Composer runtime autoload absent (acceptable only when internal runtime autoloader is shipped)' );
+}
+
+if ( file_exists( $internal_autoload_path ) && is_readable( $internal_autoload_path ) ) {
+	$results[] = array( 'pass', 'Internal runtime autoloader present' );
+} else {
+	$results[] = array( 'fail', 'Internal runtime autoloader missing: src/Bootstrap/Internal_Autoloader.php' );
+	$ok        = false;
+}
+
+if ( $references_vendor && ! file_exists( $vendor_autoload_path ) && ! file_exists( $internal_autoload_path ) ) {
+	$results[] = array( 'fail', 'Main plugin file references vendor/autoload.php but no runtime autoloader is shippable' );
+	$ok        = false;
+}
+
+if ( $references_internal ) {
+	$results[] = array( 'pass', 'Main plugin file references internal runtime autoloader fallback' );
+} else {
+	$results[] = array( 'warn', 'Main plugin file does not reference the internal runtime autoloader fallback' );
+}
+
+// 5. Development-only artifacts should be absent in production package.
 $dev_artifacts = array( 'tests/bootstrap.php', 'phpstan.neon.dist', '.wp-env.json' );
 foreach ( $dev_artifacts as $rel ) {
 	$path = $base . DIRECTORY_SEPARATOR . str_replace( '/', DIRECTORY_SEPARATOR, $rel );
@@ -76,10 +113,10 @@ foreach ( $dev_artifacts as $rel ) {
 	}
 }
 
-// Output
+// Output.
 foreach ( $results as $r ) {
 	list( $status, $msg ) = $r;
-	$prefix = $status === 'pass' ? 'PASS' : ( $status === 'fail' ? 'FAIL' : 'WARN' );
+	$prefix = 'pass' === $status ? 'PASS' : ( 'fail' === $status ? 'FAIL' : 'WARN' );
 	echo "[{$prefix}] {$msg}\n";
 }
 
@@ -87,7 +124,7 @@ echo "\n";
 if ( $ok ) {
 	echo "Preflight summary: PASS (all required checks passed). Warnings may indicate dev-only content; exclude for production ZIP.\n";
 	exit( 0 );
-} else {
-	echo "Preflight summary: FAIL (one or more required checks failed). Do not ship until resolved.\n";
-	exit( 1 );
 }
+
+echo "Preflight summary: FAIL (one or more required checks failed). Do not ship until resolved.\n";
+exit( 1 );

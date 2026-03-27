@@ -13,3 +13,5 @@ Prefer native WordPress storage and APIs.
 Use namespaces and autoloading for new code.
 
 Avoid giant god classes and procedural sprawl.
+
+**Service container:** The bootstrap `Plugin` wires a non-null `Service_Container`; admin-post registration and hub/onboarding/build-plan admin entrypoints must receive that real container. See **Service-Container-Bootstrap.mdc** for contracts, tests, and verification.

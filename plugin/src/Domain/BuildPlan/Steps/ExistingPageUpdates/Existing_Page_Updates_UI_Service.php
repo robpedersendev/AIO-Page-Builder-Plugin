@@ -304,9 +304,9 @@ final class Existing_Page_Updates_UI_Service {
 			$messages[] = array(
 				'severity' => 'warning',
 				'message'  => sprintf(
-					/* translators: %d: number of rows that differ from prior plan version template */
+					/* translators: %d: number of pages that differ from prior plan version template */
 					\_n(
-						'One page matches the prior plan version but targets a different template.',
+						'%d page matches the prior plan version but targets a different template.',
 						'%d pages match the prior plan version but target a different template than that version.',
 						$lineage_drift_rows,
 						'aio-page-builder'

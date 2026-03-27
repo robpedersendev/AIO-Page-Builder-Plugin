@@ -78,6 +78,9 @@ final class AI_Providers_Screen {
 		$this->render_connection_test_notice();
 		$state = $this->get_state();
 		$this->render_disclosure( $state['disclosure_blocks'] );
+		if ( ! $embed_in_hub ) {
+			echo '<p class="description" style="margin:0.75em 0 0;">' . \esc_html__( 'Connection tests and planning runs use your provider account; token usage may incur cost. Exact pricing is set by the provider.', 'aio-page-builder' ) . '</p>';
+		}
 		$this->render_provider_list( $state['provider_rows'], $state['ai_runs_url'], $embed_in_hub );
 		$this->render_spend_cap_section( $state['provider_rows'], $embed_in_hub );
 	}
@@ -88,8 +91,12 @@ final class AI_Providers_Screen {
 		if ( $message === '' || $status === '' ) {
 			return;
 		}
-		$class = $status === 'success' ? 'notice-success' : 'notice-error';
-		echo '<div class="notice ' . \esc_attr( $class ) . ' is-dismissible"><p>' . \esc_html( $message ) . '</p></div>';
+		$class = $status === 'success' ? 'notice-success' : 'notice-warning';
+		echo '<div class="notice ' . \esc_attr( $class ) . ' is-dismissible"><p>' . \esc_html( $message ) . '</p>';
+		if ( $status !== 'success' ) {
+			echo '<p class="description">' . \esc_html__( 'Check the key, network, and provider status, then run Test connection again.', 'aio-page-builder' ) . '</p>';
+		}
+		echo '</div>';
 	}
 
 	/**

@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Bootstrap\Environment_Validator;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Telemetry;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\Reporting\UI\Logs_Monitoring_State_Builder;
 use AIOPageBuilder\Domain\Storage\Assignments\Assignment_Types;
@@ -90,7 +91,8 @@ final class Dashboard_State_Builder {
 		$welcome_state    = $this->build_welcome_state();
 		return array(
 			'overview_metrics'       => $this->build_overview_metrics( $last_activity, $readiness ),
-			'onboarding_callout'     => $this->build_onboarding_callout( $welcome_state ),
+			'onboarding_callout'     => $this->build_onboarding_callout( $welcome_state, $readiness ),
+			'onboarding_metrics'     => $this->build_onboarding_metrics(),
 			'readiness_strip'        => $this->build_readiness_strip( $readiness ),
 			'activity_pulse'         => $this->build_activity_pulse( $last_activity ),
 			'queue_warning_summary'  => $queue_summary,
@@ -144,47 +146,80 @@ final class Dashboard_State_Builder {
 
 	/**
 	 * @param array{is_first_run: bool, is_resume: bool, onboarding_url: string} $welcome
-	 * @return array{visible: bool, variant: string, headline: string, body: string, cta_label: string, url: string}
+	 * @param array{environment: array, dependency: array, provider: array}       $readiness
+	 * @return array{visible: bool, variant: string, headline: string, body: string, cta_label: string, url: string, dependency_lines: list<string>, reporting_note: string, settings_reporting_url: string, diagnostics_url: string}
 	 */
-	private function build_onboarding_callout( array $welcome ): array {
+	private function build_onboarding_callout( array $welcome, array $readiness ): array {
 		$url = (string) ( $welcome['onboarding_url'] ?? '' );
+		$base = \admin_url( 'admin.php' );
+		$diag = \add_query_arg( array( 'page' => 'aio-page-builder-diagnostics' ), $base );
+		$settings_privacy = \add_query_arg(
+			array(
+				'page'    => 'aio-page-builder-settings',
+				'aio_tab' => 'privacy',
+			),
+			$base
+		);
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::RUN_ONBOARDING ) ) {
 			return array(
-				'visible'   => false,
-				'variant'   => 'none',
-				'headline'  => '',
-				'body'      => '',
-				'cta_label' => '',
-				'url'       => $url,
+				'visible'           => false,
+				'variant'           => 'none',
+				'headline'          => '',
+				'body'              => '',
+				'cta_label'         => '',
+				'url'               => $url,
+				'dependency_lines'  => array(),
+				'reporting_note'    => '',
+				'settings_reporting_url' => $settings_privacy,
+				'diagnostics_url'   => $diag,
 			);
 		}
+		$dep_lines = array(
+			(string) ( $readiness['environment']['message'] ?? '' ),
+			(string) ( $readiness['dependency']['message'] ?? '' ),
+			(string) ( $readiness['provider']['message'] ?? '' ),
+		);
+		$dep_lines = array_values( array_filter( $dep_lines, static fn ( $s ) => $s !== '' ) );
+		$reporting = __( 'Private distribution: mandatory operational reporting includes install/heartbeat and health signals as described under Privacy & reporting. Payloads exclude API keys, credentials, and your page content.', 'aio-page-builder' );
 		if ( ! empty( $welcome['is_first_run'] ) ) {
 			return array(
-				'visible'   => true,
-				'variant'   => 'hero',
-				'headline'  => __( 'Welcome — start onboarding', 'aio-page-builder' ),
-				'body'      => __( 'Connect your site profile, AI provider, and baseline context so crawls, plans, and builds stay aligned with how you work.', 'aio-page-builder' ),
-				'cta_label' => __( 'Begin setup', 'aio-page-builder' ),
-				'url'       => $url,
+				'visible'              => true,
+				'variant'              => 'hero',
+				'headline'             => __( 'Welcome — orient and start onboarding', 'aio-page-builder' ),
+				'body'                 => __( 'This plugin plans structured pages and sections with optional AI-assisted runs. Next: capture your business profile, optionally connect a crawl, then configure an AI provider before you request a planning run.', 'aio-page-builder' ),
+				'cta_label'            => __( 'Begin onboarding', 'aio-page-builder' ),
+				'url'                  => $url,
+				'dependency_lines'     => $dep_lines,
+				'reporting_note'       => $reporting,
+				'settings_reporting_url' => $settings_privacy,
+				'diagnostics_url'      => $diag,
 			);
 		}
 		if ( ! empty( $welcome['is_resume'] ) ) {
 			return array(
-				'visible'   => true,
-				'variant'   => 'resume',
-				'headline'  => __( 'Finish onboarding', 'aio-page-builder' ),
-				'body'      => __( 'You have a saved session. Resume to continue profile, provider, and planning steps.', 'aio-page-builder' ),
-				'cta_label' => __( 'Resume onboarding', 'aio-page-builder' ),
-				'url'       => $url,
+				'visible'              => true,
+				'variant'              => 'resume',
+				'headline'             => __( 'Finish onboarding', 'aio-page-builder' ),
+				'body'                 => __( 'You have a saved session. Resume to continue profile, provider, and planning steps.', 'aio-page-builder' ),
+				'cta_label'            => __( 'Resume onboarding', 'aio-page-builder' ),
+				'url'                  => $url,
+				'dependency_lines'     => $dep_lines,
+				'reporting_note'       => __( 'Mandatory operational reporting applies; see Privacy & reporting for what is included and excluded.', 'aio-page-builder' ),
+				'settings_reporting_url' => $settings_privacy,
+				'diagnostics_url'      => $diag,
 			);
 		}
 		return array(
-			'visible'   => false,
-			'variant'   => 'none',
-			'headline'  => '',
-			'body'      => '',
-			'cta_label' => '',
-			'url'       => $url,
+			'visible'              => false,
+			'variant'              => 'none',
+			'headline'             => '',
+			'body'                 => '',
+			'cta_label'            => '',
+			'url'                  => $url,
+			'dependency_lines'     => array(),
+			'reporting_note'       => '',
+			'settings_reporting_url' => $settings_privacy,
+			'diagnostics_url'      => $diag,
 		);
 	}
 
@@ -561,6 +596,22 @@ final class Dashboard_State_Builder {
 			'count'    => count( $all ),
 			'items'    => $out,
 			'logs_url' => $logs_url,
+		);
+	}
+
+	/**
+	 * Aggregate onboarding UX counters (no PII). Visible only to sensitive-diagnostics capability.
+	 *
+	 * @return array{visible: bool, aggregate?: array<string, mixed>}
+	 */
+	private function build_onboarding_metrics(): array {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) ) {
+			return array( 'visible' => false );
+		}
+		$telemetry = new Onboarding_Telemetry( $this->settings );
+		return array(
+			'visible'   => true,
+			'aggregate' => $telemetry->get_aggregate(),
 		);
 	}
 

@@ -37,11 +37,11 @@ final class Admin_Early_Redirect_Coordinator {
 	/**
 	 * Runs registered early handlers until one redirects or none apply.
 	 *
-	 * @param Service_Container|null $container Plugin container.
+	 * @param Service_Container $container Plugin container from {@see \AIOPageBuilder\Bootstrap\Plugin::run()}.
 	 * @return void
 	 */
-	public static function dispatch( ?Service_Container $container ): void {
-		if ( $container === null || ! \is_admin() ) {
+	public static function dispatch( Service_Container $container ): void {
+		if ( ! \is_admin() ) {
 			return;
 		}
 		if ( ! isset( $_GET['page'] ) ) {

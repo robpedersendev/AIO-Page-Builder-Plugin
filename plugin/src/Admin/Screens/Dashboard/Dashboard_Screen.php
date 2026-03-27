@@ -168,6 +168,7 @@ final class Dashboard_Screen {
 			<div class="aio-dashboard-shell">
 		<?php
 		$this->render_onboarding_callout( $state['onboarding_callout'] );
+		$this->render_onboarding_metrics( $state['onboarding_metrics'] );
 		$this->render_metric_hero( $state['overview_metrics'], $state['activity_pulse'] );
 		$this->render_readiness_strip( $state['readiness_strip'] );
 		$this->render_queue_warnings( $state['queue_warning_summary'] );
@@ -205,7 +206,7 @@ final class Dashboard_Screen {
 	}
 
 	/**
-	 * @param array{visible: bool, variant: string, headline: string, body: string, cta_label: string, url: string} $callout
+	 * @param array{visible: bool, variant: string, headline: string, body: string, cta_label: string, url: string, dependency_lines?: list<string>, reporting_note?: string, settings_reporting_url?: string, diagnostics_url?: string} $callout
 	 * @return void
 	 */
 	private function render_onboarding_callout( array $callout ): void {
@@ -214,23 +215,108 @@ final class Dashboard_Screen {
 		}
 		$variant = (string) ( $callout['variant'] ?? '' );
 		if ( $variant === 'hero' ) {
+			$deps = isset( $callout['dependency_lines'] ) && is_array( $callout['dependency_lines'] ) ? $callout['dependency_lines'] : array();
+			$rep  = isset( $callout['reporting_note'] ) ? (string) $callout['reporting_note'] : '';
+			$set  = isset( $callout['settings_reporting_url'] ) ? (string) $callout['settings_reporting_url'] : '';
+			$diag = isset( $callout['diagnostics_url'] ) ? (string) $callout['diagnostics_url'] : '';
 			?>
 			<div class="aio-dash-onboard-hero" role="region" aria-label="<?php \esc_attr_e( 'Onboarding', 'aio-page-builder' ); ?>">
 				<h2><?php echo \esc_html( (string) ( $callout['headline'] ?? '' ) ); ?></h2>
 				<p><?php echo \esc_html( (string) ( $callout['body'] ?? '' ) ); ?></p>
+				<?php if ( count( $deps ) > 0 ) : ?>
+					<p style="margin:0.75rem 0 0.35rem;font-size:0.82rem;opacity:0.92;text-transform:uppercase;letter-spacing:0.05em;"><?php \esc_html_e( 'Dependency & readiness', 'aio-page-builder' ); ?></p>
+					<ul style="margin:0 0 1rem 1.2em;opacity:0.95;">
+						<?php foreach ( $deps as $line ) : ?>
+							<li><?php echo \esc_html( (string) $line ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+				<?php if ( $rep !== '' ) : ?>
+					<p style="margin:0 0 1rem;font-size:0.92rem;line-height:1.45;opacity:0.95;"><?php echo \esc_html( $rep ); ?>
+						<?php if ( Capabilities::current_user_can_for_route( Capabilities::ACCESS_SETTINGS_HUB ) && $set !== '' ) : ?>
+							<a style="color:#fff;text-decoration:underline;" href="<?php echo \esc_url( $set ); ?>"><?php \esc_html_e( 'Privacy & reporting', 'aio-page-builder' ); ?></a>
+						<?php endif; ?>
+						<?php if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) && $diag !== '' ) : ?>
+							<?php echo ' · '; ?>
+							<a style="color:#fff;text-decoration:underline;" href="<?php echo \esc_url( $diag ); ?>"><?php \esc_html_e( 'Diagnostics', 'aio-page-builder' ); ?></a>
+						<?php endif; ?>
+					</p>
+				<?php endif; ?>
 				<a class="button button-hero button-large" href="<?php echo \esc_url( (string) ( $callout['url'] ?? '' ) ); ?>"><?php echo \esc_html( (string) ( $callout['cta_label'] ?? '' ) ); ?></a>
 			</div>
 			<?php
 			return;
 		}
 		if ( $variant === 'resume' ) {
+			$rep  = isset( $callout['reporting_note'] ) ? (string) $callout['reporting_note'] : '';
+			$set  = isset( $callout['settings_reporting_url'] ) ? (string) $callout['settings_reporting_url'] : '';
+			$diag = isset( $callout['diagnostics_url'] ) ? (string) $callout['diagnostics_url'] : '';
 			?>
 			<div class="aio-dash-onboard-resume" role="region">
 				<p style="margin:0 0 0.5rem;"><strong><?php echo \esc_html( (string) ( $callout['headline'] ?? '' ) ); ?></strong> — <?php echo \esc_html( (string) ( $callout['body'] ?? '' ) ); ?></p>
+				<?php if ( $rep !== '' ) : ?>
+					<p class="description" style="margin:0 0 0.75rem;"><?php echo \esc_html( $rep ); ?>
+						<?php if ( Capabilities::current_user_can_for_route( Capabilities::ACCESS_SETTINGS_HUB ) && $set !== '' ) : ?>
+							<a href="<?php echo \esc_url( $set ); ?>"><?php \esc_html_e( 'Privacy & reporting', 'aio-page-builder' ); ?></a>
+						<?php endif; ?>
+						<?php if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) && $diag !== '' ) : ?>
+							<?php echo ' · '; ?>
+							<a href="<?php echo \esc_url( $diag ); ?>"><?php \esc_html_e( 'Diagnostics', 'aio-page-builder' ); ?></a>
+						<?php endif; ?>
+					</p>
+				<?php endif; ?>
 				<a class="button button-primary" href="<?php echo \esc_url( (string) ( $callout['url'] ?? '' ) ); ?>"><?php echo \esc_html( (string) ( $callout['cta_label'] ?? '' ) ); ?></a>
 			</div>
 			<?php
 		}
+	}
+
+	/**
+	 * @param array{visible: bool, aggregate?: array<string, mixed>} $metrics
+	 */
+	private function render_onboarding_metrics( array $metrics ): void {
+		if ( empty( $metrics['visible'] ) || ! Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) ) {
+			return;
+		}
+		$agg = isset( $metrics['aggregate'] ) && is_array( $metrics['aggregate'] ) ? $metrics['aggregate'] : array();
+		$c   = isset( $agg['c'] ) && is_array( $agg['c'] ) ? $agg['c'] : array();
+		$rec = isset( $agg['recent'] ) && is_array( $agg['recent'] ) ? $agg['recent'] : array();
+		?>
+		<div class="aio-dash-onboard-metrics" role="region" aria-labelledby="aio-dash-onboard-metrics-h" style="margin:0 0 1.25rem;padding:1rem 1.15rem;border:1px solid #c3c4c7;border-radius:8px;background:#fff;">
+			<h2 id="aio-dash-onboard-metrics-h" style="margin:0 0 0.5rem;font-size:1rem;"><?php \esc_html_e( 'Onboarding activity (aggregate)', 'aio-page-builder' ); ?></h2>
+			<p class="description" style="margin:0 0 0.75rem;"><?php \esc_html_e( 'Coarse counters only (event type and step key). No form text or credentials.', 'aio-page-builder' ); ?></p>
+			<?php if ( count( $c ) === 0 && count( $rec ) === 0 ) : ?>
+				<p style="margin:0;"><em><?php \esc_html_e( 'No onboarding events recorded yet.', 'aio-page-builder' ); ?></em></p>
+			<?php else : ?>
+				<ul style="margin:0 0 0.75rem 1.1em;">
+					<?php foreach ( $c as $ev => $n ) : ?>
+						<li><?php echo \esc_html( (string) $ev . ': ' . (string) (int) $n ); ?></li>
+					<?php endforeach; ?>
+				</ul>
+				<?php if ( count( $rec ) > 0 ) : ?>
+					<p style="margin:0 0 0.35rem;font-size:0.85rem;color:#50575e;"><?php \esc_html_e( 'Recent (newest last):', 'aio-page-builder' ); ?></p>
+					<ul style="margin:0;padding-left:1.1em;font-size:0.85rem;color:#50575e;">
+						<?php
+						$slice = array_slice( $rec, -8 );
+						foreach ( $slice as $row ) {
+							if ( ! is_array( $row ) ) {
+								continue;
+							}
+							$e = isset( $row['e'] ) ? (string) $row['e'] : '';
+							$s = isset( $row['s'] ) ? (string) $row['s'] : '';
+							$t = isset( $row['t'] ) ? (int) $row['t'] : 0;
+							if ( $e === '' || $t <= 0 ) {
+								continue;
+							}
+							$line = $e . ( $s !== '' ? '@' . $s : '' ) . ' · ' . gmdate( 'Y-m-d H:i', $t );
+							echo '<li>' . \esc_html( $line ) . '</li>';
+						}
+						?>
+					</ul>
+				<?php endif; ?>
+			<?php endif; ?>
+		</div>
+		<?php
 	}
 
 	/**
@@ -359,7 +445,7 @@ final class Dashboard_Screen {
 					$plans = isset( $pulse['active_build_plans'] ) && is_array( $pulse['active_build_plans'] ) ? $pulse['active_build_plans'] : array();
 					if ( count( $plans ) > 0 && Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
 						$first    = $plans[0];
-						$plan_key = ( ( $first['title'] ?? '' ) !== '' && ( $first['title'] ?? '' ) !== null ) ? (string) $first['title'] : (string) ( $first['plan_id'] ?? '' );
+						$plan_key = (string) ( $first['title'] ?? '' ) !== '' ? (string) $first['title'] : (string) ( $first['plan_id'] ?? '' );
 						$purl     = \add_query_arg(
 							array(
 								'page'    => 'aio-page-builder-build-plans',

@@ -38,9 +38,9 @@ final class Onboarding_Build_Plan_Bootstrap_Service {
 		Build_Plan_Repository $plan_repository,
 		Build_Plan_Lineage_Service $lineage_service
 	) {
-		$this->plan_generator   = $plan_generator;
-		$this->plan_repository  = $plan_repository;
-		$this->lineage_service  = $lineage_service;
+		$this->plan_generator  = $plan_generator;
+		$this->plan_repository = $plan_repository;
+		$this->lineage_service = $lineage_service;
 	}
 
 	/**
@@ -57,10 +57,10 @@ final class Onboarding_Build_Plan_Bootstrap_Service {
 		$draft['linked_build_plan_post_id'] = null;
 		$draft['linked_build_plan_key']     = null;
 
-		$shell       = Onboarding_Shell_Normalized_Output::minimal_array();
-		$cost_note   = Build_Plan_Schema::DEFAULT_ONBOARDING_AI_COST_USD_NOTE;
-		$fork_mode   = isset( $draft['build_plan_lineage_mode'] ) && $draft['build_plan_lineage_mode'] === 'fork';
-		$base_ctx    = array(
+		$shell     = Onboarding_Shell_Normalized_Output::minimal_array();
+		$cost_note = Build_Plan_Schema::DEFAULT_ONBOARDING_AI_COST_USD_NOTE;
+		$fork_mode = isset( $draft['build_plan_lineage_mode'] ) && $draft['build_plan_lineage_mode'] === 'fork';
+		$base_ctx  = array(
 			'onboarding_shell'           => true,
 			'estimated_ai_cost_usd_note' => $cost_note,
 		);
@@ -162,11 +162,11 @@ final class Onboarding_Build_Plan_Bootstrap_Service {
 				'provider_refs'             => $draft['provider_refs'] ?? array(),
 				'last_planning_run_id'      => $draft['last_planning_run_id'] ?? null,
 				'last_planning_run_post_id' => $draft['last_planning_run_post_id'] ?? null,
-				'linked_build_plan_post_id'  => $draft['linked_build_plan_post_id'] ?? null,
-				'linked_build_plan_key'      => $draft['linked_build_plan_key'] ?? null,
-				'build_plan_lineage_mode'    => $draft['build_plan_lineage_mode'] ?? 'new',
-				'fork_lineage_id'            => $draft['fork_lineage_id'] ?? '',
-				'fork_version_purpose'       => $draft['fork_version_purpose'] ?? '',
+				'linked_build_plan_post_id' => $draft['linked_build_plan_post_id'] ?? null,
+				'linked_build_plan_key'     => $draft['linked_build_plan_key'] ?? null,
+				'build_plan_lineage_mode'   => $draft['build_plan_lineage_mode'] ?? 'new',
+				'fork_lineage_id'           => $draft['fork_lineage_id'] ?? '',
+				'fork_version_purpose'      => $draft['fork_version_purpose'] ?? '',
 			),
 			'prefill_excerpt'          => array(
 				'current_site_url'               => $prefill['current_site_url'] ?? '',

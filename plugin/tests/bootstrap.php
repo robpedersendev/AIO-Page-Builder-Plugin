@@ -237,15 +237,45 @@ if ( ! function_exists( 'add_query_arg' ) ) {
 		return $url . $sep . rawurlencode( (string) $key_or_array ) . ( $value !== false ? '=' . rawurlencode( (string) $value ) : '' );
 	}
 }
+if ( ! function_exists( 'plugin_basename' ) ) {
+	function plugin_basename( $file ) {
+		return basename( dirname( (string) $file ) ) . '/' . basename( (string) $file );
+	}
+}
+if ( ! function_exists( 'plugin_dir_url' ) ) {
+	function plugin_dir_url( $file ) {
+		return 'http://example.org/wp-content/plugins/' . basename( dirname( (string) $file ) ) . '/';
+	}
+}
+if ( ! function_exists( 'register_activation_hook' ) ) {
+	function register_activation_hook( $file, $callback ) {
+		if ( ! isset( $GLOBALS['_aio_activation_hooks'] ) || ! is_array( $GLOBALS['_aio_activation_hooks'] ) ) {
+			$GLOBALS['_aio_activation_hooks'] = array();
+		}
+		$GLOBALS['_aio_activation_hooks'][ (string) $file ] = $callback;
+	}
+}
+if ( ! function_exists( 'register_deactivation_hook' ) ) {
+	function register_deactivation_hook( $file, $callback ) {
+		if ( ! isset( $GLOBALS['_aio_deactivation_hooks'] ) || ! is_array( $GLOBALS['_aio_deactivation_hooks'] ) ) {
+			$GLOBALS['_aio_deactivation_hooks'] = array();
+		}
+		$GLOBALS['_aio_deactivation_hooks'][ (string) $file ] = $callback;
+	}
+}
 if ( ! function_exists( 'add_action' ) ) {
 	function add_action( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
+		unset( $accepted_args );
 		if ( ! isset( $GLOBALS['_aio_actions'] ) || ! is_array( $GLOBALS['_aio_actions'] ) ) {
 			$GLOBALS['_aio_actions'] = array();
 		}
 		if ( ! isset( $GLOBALS['_aio_actions'][ $tag ] ) || ! is_array( $GLOBALS['_aio_actions'][ $tag ] ) ) {
 			$GLOBALS['_aio_actions'][ $tag ] = array();
 		}
-		$GLOBALS['_aio_actions'][ $tag ][] = $callback;
+		$GLOBALS['_aio_actions'][ $tag ][] = array(
+			'callback' => $callback,
+			'priority' => (int) $priority,
+		);
 	}
 }
 if ( ! function_exists( 'has_action' ) ) {
@@ -260,11 +290,17 @@ if ( ! function_exists( 'has_action' ) ) {
 			return false;
 		}
 		if ( $function_to_check === false ) {
+			$first = $list[0];
+			if ( is_array( $first ) && array_key_exists( 'priority', $first ) ) {
+				return (int) $first['priority'];
+			}
 			return 10;
 		}
-		foreach ( $list as $cb ) {
+		foreach ( $list as $entry ) {
+			$cb  = is_array( $entry ) && array_key_exists( 'callback', $entry ) ? $entry['callback'] : $entry;
+			$pri = is_array( $entry ) && isset( $entry['priority'] ) ? (int) $entry['priority'] : 10;
 			if ( $cb === $function_to_check ) {
-				return 10;
+				return $pri;
 			}
 		}
 		return false;
@@ -276,7 +312,25 @@ if ( ! function_exists( 'do_action' ) ) {
 		if ( ! is_array( $callbacks ) || $callbacks === array() ) {
 			return;
 		}
-		foreach ( $callbacks as $cb ) {
+		$entries = array();
+		foreach ( $callbacks as $entry ) {
+			if ( is_array( $entry ) && array_key_exists( 'callback', $entry ) ) {
+				$entries[] = $entry;
+			} else {
+				$entries[] = array(
+					'callback' => $entry,
+					'priority' => 10,
+				);
+			}
+		}
+		usort(
+			$entries,
+			static function ( array $a, array $b ): int {
+				return $a['priority'] <=> $b['priority'];
+			}
+		);
+		foreach ( $entries as $entry ) {
+			$cb = $entry['callback'];
 			if ( is_callable( $cb ) ) {
 				call_user_func_array( $cb, $args );
 			}
@@ -971,7 +1025,7 @@ if ( ! function_exists( 'switch_to_blog' ) ) {
 		if ( ! isset( $GLOBALS['_aio_blog_stack'] ) ) {
 			$GLOBALS['_aio_blog_stack'] = array();
 		}
-		$GLOBALS['_aio_blog_stack'][] = get_current_blog_id();
+		$GLOBALS['_aio_blog_stack'][]    = get_current_blog_id();
 		$GLOBALS['_aio_current_blog_id'] = (int) $blog_id;
 		return true;
 	}
@@ -981,7 +1035,7 @@ if ( ! function_exists( 'restore_current_blog' ) ) {
 		if ( empty( $GLOBALS['_aio_blog_stack'] ) || ! is_array( $GLOBALS['_aio_blog_stack'] ) ) {
 			return false;
 		}
-		$prev = array_pop( $GLOBALS['_aio_blog_stack'] );
+		$prev                            = array_pop( $GLOBALS['_aio_blog_stack'] );
 		$GLOBALS['_aio_current_blog_id'] = (int) $prev;
 		return true;
 	}

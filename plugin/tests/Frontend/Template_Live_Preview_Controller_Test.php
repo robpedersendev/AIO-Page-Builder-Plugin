@@ -14,8 +14,8 @@ use ReflectionMethod;
 final class Template_Live_Preview_Controller_Test extends TestCase {
 
 	public function test_http_status_for_ticket_code(): void {
-		$c        = new Template_Live_Preview_Controller( null );
-		$ref      = new ReflectionMethod( Template_Live_Preview_Controller::class, 'http_status_for_ticket_code' );
+		$c   = new Template_Live_Preview_Controller( null );
+		$ref = new ReflectionMethod( Template_Live_Preview_Controller::class, 'http_status_for_ticket_code' );
 		$ref->setAccessible( true );
 		$this->assertSame( 410, $ref->invoke( $c, 'expired' ) );
 		$this->assertSame( 410, $ref->invoke( $c, 'exhausted' ) );

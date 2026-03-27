@@ -19,6 +19,7 @@ use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Admin\Widgets\Industry_Status_Summary_Widget;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -53,7 +54,7 @@ final class SPR003_Capability_Alignment_Test extends TestCase {
 	}
 
 	public function test_onboarding_screen_uses_run_onboarding(): void {
-		$screen = new Onboarding_Screen( null );
+		$screen = new Onboarding_Screen( new Service_Container() );
 		$this->assertSame( Capabilities::RUN_ONBOARDING, $screen->get_capability() );
 	}
 

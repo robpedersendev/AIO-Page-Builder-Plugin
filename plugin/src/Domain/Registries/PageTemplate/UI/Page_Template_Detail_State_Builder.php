@@ -129,10 +129,10 @@ final class Page_Template_Detail_State_Builder {
 			return $this->not_found_state( $template_key, $request_params );
 		}
 
-		$category_class  = isset( $request_params['category_class'] ) ? \sanitize_key( (string) $request_params['category_class'] ) : (string) ( $definition['template_category_class'] ?? '' );
-		$family          = isset( $request_params['family'] ) ? \sanitize_key( (string) $request_params['family'] ) : (string) ( $definition['template_family'] ?? '' );
-		$reduced_motion  = ! empty( $request_params['reduced_motion'] );
-		$live_preview    = ! empty( $request_params['live_preview'] );
+		$category_class = isset( $request_params['category_class'] ) ? \sanitize_key( (string) $request_params['category_class'] ) : (string) ( $definition['template_category_class'] ?? '' );
+		$family         = isset( $request_params['family'] ) ? \sanitize_key( (string) $request_params['family'] ) : (string) ( $definition['template_family'] ?? '' );
+		$reduced_motion = ! empty( $request_params['reduced_motion'] );
+		$live_preview   = ! empty( $request_params['live_preview'] );
 
 		$context = Synthetic_Preview_Context::for_page(
 			$template_key,

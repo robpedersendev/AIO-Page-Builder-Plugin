@@ -53,7 +53,7 @@ final class Onboarding_Prefill_Service {
 	 * Returns prefill data for the onboarding screen. No secret values.
 	 *
 	 * @param array<string, mixed>|null $draft Current draft (optional); used to restore crawl_run_id_ref / goal if present.
-	 * @return array<string, mixed> Keys: profile (brand_profile, business_profile), current_site_url, crawl_run_ids, latest_crawl_run_id, latest_crawl_session_timestamp, provider_refs.
+	 * @return array<string, mixed> Keys: profile, current_site_url, crawl_run_ids, latest_crawl_run_id, latest_crawl_session_timestamp, latest_crawl_final_status, latest_crawl_started_at, latest_crawl_ended_at, latest_crawl_total_discovered, latest_crawl_failed_count, provider_refs.
 	 */
 	public function get_prefill_data( ?array $draft = null ): array {
 		$profile          = $this->profile_store->get_full_profile();
@@ -79,12 +79,22 @@ final class Onboarding_Prefill_Service {
 		}
 
 		$latest_crawl_session_timestamp = null;
+		$latest_crawl_final_status      = null;
+		$latest_crawl_started_at        = null;
+		$latest_crawl_ended_at          = null;
+		$latest_crawl_total_discovered  = 0;
+		$latest_crawl_failed_count      = 0;
 		if ( $this->crawl_snapshot_service !== null && is_string( $latest_crawl_run_id ) && $latest_crawl_run_id !== '' ) {
 			$sess = $this->crawl_snapshot_service->get_session( $latest_crawl_run_id );
 			if ( is_array( $sess ) ) {
-				$ended                          = isset( $sess['ended_at'] ) && is_string( $sess['ended_at'] ) ? \trim( $sess['ended_at'] ) : '';
-				$started                        = isset( $sess['started_at'] ) && is_string( $sess['started_at'] ) ? \trim( $sess['started_at'] ) : '';
+				$ended   = isset( $sess['ended_at'] ) && is_string( $sess['ended_at'] ) ? \trim( $sess['ended_at'] ) : '';
+				$started = isset( $sess['started_at'] ) && is_string( $sess['started_at'] ) ? \trim( $sess['started_at'] ) : '';
 				$latest_crawl_session_timestamp = $ended !== '' ? $ended : ( $started !== '' ? $started : null );
+				$latest_crawl_started_at        = $started !== '' ? $started : null;
+				$latest_crawl_ended_at          = $ended !== '' ? $ended : null;
+				$latest_crawl_final_status      = isset( $sess['final_status'] ) && is_string( $sess['final_status'] ) ? \trim( $sess['final_status'] ) : '';
+				$latest_crawl_total_discovered  = isset( $sess['total_discovered'] ) ? (int) $sess['total_discovered'] : 0;
+				$latest_crawl_failed_count      = isset( $sess['failed_count'] ) ? (int) $sess['failed_count'] : 0;
 			}
 		}
 
@@ -100,6 +110,11 @@ final class Onboarding_Prefill_Service {
 			'crawl_run_ids'                  => $crawl_run_ids,
 			'latest_crawl_run_id'            => $latest_crawl_run_id,
 			'latest_crawl_session_timestamp' => $latest_crawl_session_timestamp,
+			'latest_crawl_final_status'      => $latest_crawl_final_status,
+			'latest_crawl_started_at'        => $latest_crawl_started_at,
+			'latest_crawl_ended_at'          => $latest_crawl_ended_at,
+			'latest_crawl_total_discovered'  => $latest_crawl_total_discovered,
+			'latest_crawl_failed_count'      => $latest_crawl_failed_count,
 			'provider_refs'                  => $provider_refs,
 		);
 	}

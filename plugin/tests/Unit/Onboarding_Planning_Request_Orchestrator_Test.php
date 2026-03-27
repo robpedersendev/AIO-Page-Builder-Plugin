@@ -92,7 +92,7 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 		$secret_store       = $this->createMock( Provider_Secret_Store_Interface::class );
 		$secret_store->method( 'get_credential_state' )->willReturn( Provider_Secret_Store_Interface::STATE_ABSENT );
 		$secret_store->method( 'has_credential' )->willReturn( false );
-		$prefill            = new \AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service( $profile_store, $settings, null, $secret_store );
+		$prefill = new \AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service( $profile_store, $settings, null, $secret_store );
 
 		$prompt_pack_registry    = new Prompt_Pack_Registry_Service( new Stub_Prompt_Pack_Repo_For_Orchestrator() );
 		$container               = new Service_Container();

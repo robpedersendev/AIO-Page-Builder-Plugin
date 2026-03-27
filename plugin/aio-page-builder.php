@@ -15,14 +15,37 @@
  *
  * @package AIOPageBuilder
  *
- * Single entry point: loads Composer PSR-4 autoload (AIOPageBuilder\* → src/), then Constants and Plugin bootstrap.
+ * Single entry point: prefers Composer autoload when present, then falls back to the internal
+ * runtime autoloader so packaged releases do not require vendor/.
  * Legacy PrivatePluginBase code is quarantined in plugin/legacy/ and is not loaded (see legacy/README.md).
  */
 
 defined( 'ABSPATH' ) || exit;
 
-// * Autoload registers all classes under src/; deploy must include vendor/ (run `composer install` in this directory).
-require_once __DIR__ . '/vendor/autoload.php';
+$vendor_autoload   = __DIR__ . '/vendor/autoload.php';
+$internal_autoload = __DIR__ . '/src/Bootstrap/Internal_Autoloader.php';
+
+if ( is_readable( $vendor_autoload ) ) {
+	require_once $vendor_autoload;
+} elseif ( is_readable( $internal_autoload ) ) {
+	require_once $internal_autoload;
+	\AIOPageBuilder\Bootstrap\Internal_Autoloader::register();
+} else {
+	$message = 'AIO Page Builder is missing its runtime autoloader. Install the packaged release ZIP or run Composer in plugin/.';
+
+	if ( function_exists( 'wp_die' ) ) {
+		wp_die(
+			$message,
+			'AIO Page Builder',
+			array(
+				'response'  => 500,
+				'back_link' => true,
+			)
+		);
+	}
+
+	die( $message );
+}
 
 require_once __DIR__ . '/src/Bootstrap/Constants.php';
 require_once __DIR__ . '/src/Bootstrap/Plugin.php';

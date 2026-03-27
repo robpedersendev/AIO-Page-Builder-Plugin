@@ -8,6 +8,7 @@
 namespace AIOPageBuilder\Tests\Unit\Admin\BuildPlan;
 
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Workspace_Screen;
+use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -16,7 +17,7 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/../../../wordpress/' );
 final class Build_Plan_Export_Action_Test extends TestCase {
 
 	public function test_export_payload_redacts_sensitive_keys_in_definition_and_rail(): void {
-		$screen  = new Build_Plan_Workspace_Screen( null );
+		$screen  = new Build_Plan_Workspace_Screen( new Service_Container() );
 		$state   = array(
 			'plan_id'         => 'plan-abc',
 			'plan_post_id'    => 7,

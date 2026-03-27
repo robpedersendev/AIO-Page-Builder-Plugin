@@ -24,7 +24,7 @@ final class Existing_Page_Lineage_Template_Drift_Advisor_Test extends TestCase {
 	private function minimal_prior_definition( string $home_url, string $template_key ): array {
 		return array(
 			Build_Plan_Schema::KEY_STEPS => array(
-				0                            => array(),
+				0 => array(),
 				Existing_Page_Update_Bulk_Action_Service::STEP_INDEX_EXISTING_PAGE_CHANGES => array(
 					Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES,
 					Build_Plan_Item_Schema::KEY_ITEMS     => array(
@@ -45,10 +45,10 @@ final class Existing_Page_Lineage_Template_Drift_Advisor_Test extends TestCase {
 		$repo    = $this->createMock( Build_Plan_Repository_Interface::class );
 		$adv     = new Existing_Page_Lineage_Template_Drift_Advisor( $lineage, $repo );
 		$def     = array(
-			Build_Plan_Schema::KEY_PLAN_LINEAGE_ID   => 'lid-1',
-			Build_Plan_Schema::KEY_PLAN_VERSION_SEQ  => 1,
+			Build_Plan_Schema::KEY_PLAN_LINEAGE_ID  => 'lid-1',
+			Build_Plan_Schema::KEY_PLAN_VERSION_SEQ => 1,
 		);
-		$item = array(
+		$item    = array(
 			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
 				'current_page_url' => 'https://example.com/',
 				'template_key'     => 'tpl-b',
@@ -64,8 +64,8 @@ final class Existing_Page_Lineage_Template_Drift_Advisor_Test extends TestCase {
 		$repo->method( 'get_plan_definition' )->with( 42 )->willReturn(
 			$this->minimal_prior_definition( 'https://example.com/', 'home-template-a' )
 		);
-		$adv = new Existing_Page_Lineage_Template_Drift_Advisor( $lineage, $repo );
-		$def = array(
+		$adv  = new Existing_Page_Lineage_Template_Drift_Advisor( $lineage, $repo );
+		$def  = array(
 			Build_Plan_Schema::KEY_PLAN_LINEAGE_ID  => 'lid-1',
 			Build_Plan_Schema::KEY_PLAN_VERSION_SEQ => 2,
 		);
@@ -87,8 +87,8 @@ final class Existing_Page_Lineage_Template_Drift_Advisor_Test extends TestCase {
 		$repo->method( 'get_plan_definition' )->willReturn(
 			$this->minimal_prior_definition( 'https://example.com/', 'same-tpl' )
 		);
-		$adv = new Existing_Page_Lineage_Template_Drift_Advisor( $lineage, $repo );
-		$def = array(
+		$adv  = new Existing_Page_Lineage_Template_Drift_Advisor( $lineage, $repo );
+		$def  = array(
 			Build_Plan_Schema::KEY_PLAN_LINEAGE_ID  => 'lid-1',
 			Build_Plan_Schema::KEY_PLAN_VERSION_SEQ => 2,
 		);

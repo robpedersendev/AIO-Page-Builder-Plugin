@@ -18,6 +18,7 @@ namespace AIOPageBuilder\Tests\Unit;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Workspace_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -34,12 +35,12 @@ final class Build_Plan_Screen_Shell_Test extends TestCase {
 	}
 
 	public function test_list_screen_capability_is_view_build_plans(): void {
-		$screen = new Build_Plans_Screen();
+		$screen = new Build_Plans_Screen( new Service_Container() );
 		$this->assertSame( Capabilities::VIEW_BUILD_PLANS, $screen->get_capability() );
 	}
 
 	public function test_workspace_screen_capability_is_view_build_plans(): void {
-		$screen = new Build_Plan_Workspace_Screen();
+		$screen = new Build_Plan_Workspace_Screen( new Service_Container() );
 		$this->assertSame( Capabilities::VIEW_BUILD_PLANS, $screen->get_capability() );
 	}
 }

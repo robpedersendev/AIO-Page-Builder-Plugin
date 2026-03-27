@@ -1,0 +1,22 @@
+---
+description: Service container and admin bootstrap — Plugin, admin-post hooks, hub screens, tests
+alwaysApply: true
+---
+
+# Service container and admin bootstrap
+
+## Production code
+
+- **`Bootstrap\Plugin`**: Assigns a real `Service_Container` in `run()` before admin hooks use it. Do not reintroduce nullable `$container` for admin-post registration, early redirects, or admin menu registration paths.
+- **`Admin_Post_Handler_Registrar::register_all( Service_Container $container )`**: Requires a non-null container. Passing `null` is invalid (TypeError); admin-post handlers must not silently skip registration.
+- **`Admin_Early_Redirect_Coordinator::dispatch( Service_Container $container )`**: Requires the bootstrap container, not `null`.
+- **Constructors that require `Service_Container` (no optional/null container) for real admin entrypoints** include at least: `Onboarding_Screen`, `Build_Plans_Screen`, `Build_Plan_Workspace_Screen`, `Admin_Menu`, `Admin_Menu_Hub_Renderer`. When adding or changing admin wiring, pass the plugin container from `Plugin::run()` — do not add “null container” fallbacks for these screens.
+
+## Tests
+
+- For `Admin_Post_Handler_Registrar::register_all()` or any constructor that type-hints **`Service_Container` without `?`**, use `new Service_Container()` as a minimal stub unless the test must register specific services.
+- Do **not** pass `null` into non-nullable `Service_Container` parameters in tests (will fail at runtime and should fail static analysis).
+
+## Verification
+
+- After touching `plugin/src/Bootstrap/Plugin.php`, `plugin/src/Admin/Admin_Post_Handler_Registrar.php`, `plugin/src/Admin/Admin_Early_Redirect_Coordinator.php`, or the listed admin screens, run **PHPUnit** (and **PHPStan** on changed paths) per Quality-Gates.

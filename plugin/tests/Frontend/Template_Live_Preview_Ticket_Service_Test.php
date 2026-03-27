@@ -51,7 +51,7 @@ final class Template_Live_Preview_Ticket_Service_Test extends TestCase {
 		$GLOBALS['_aio_session_token']   = 'session-alpha';
 		$GLOBALS['_aio_current_blog_id'] = 1;
 
-		$issued = Template_Live_Preview_Ticket_Service::issue(
+		$issued                      = Template_Live_Preview_Ticket_Service::issue(
 			Template_Live_Preview_Ticket_Service::TYPE_SECTION,
 			'sec',
 			5,
@@ -70,7 +70,7 @@ final class Template_Live_Preview_Ticket_Service_Test extends TestCase {
 		$GLOBALS['_aio_session_token']   = 'session-alpha';
 		$GLOBALS['_aio_current_blog_id'] = 1;
 
-		$issued = Template_Live_Preview_Ticket_Service::issue(
+		$issued                        = Template_Live_Preview_Ticket_Service::issue(
 			Template_Live_Preview_Ticket_Service::TYPE_PAGE,
 			'k',
 			5,
@@ -89,7 +89,7 @@ final class Template_Live_Preview_Ticket_Service_Test extends TestCase {
 		$GLOBALS['_aio_session_token']   = 'session-alpha';
 		$GLOBALS['_aio_current_blog_id'] = 1;
 
-		$issued = Template_Live_Preview_Ticket_Service::issue(
+		$issued                          = Template_Live_Preview_Ticket_Service::issue(
 			Template_Live_Preview_Ticket_Service::TYPE_PAGE,
 			'k',
 			5,
@@ -115,7 +115,7 @@ final class Template_Live_Preview_Ticket_Service_Test extends TestCase {
 			600,
 			array( 'reduced_motion' => true )
 		);
-		$r = Template_Live_Preview_Ticket_Service::validate_and_consume( $issued['ticket'] );
+		$r      = Template_Live_Preview_Ticket_Service::validate_and_consume( $issued['ticket'] );
 		$this->assertTrue( $r['ok'] );
 		$this->assertNotNull( $r['record'] );
 		$this->assertTrue( ! empty( $r['record']['rm'] ) );

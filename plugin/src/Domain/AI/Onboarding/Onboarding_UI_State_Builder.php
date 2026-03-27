@@ -120,11 +120,29 @@ final class Onboarding_UI_State_Builder {
 		$is_blocked        = ( $is_at_review || $at_submission ) && count( $review_blockers ) > 0;
 		$blockers          = ( $is_at_review || $at_submission ) ? $review_blockers : array();
 
-		$resume_message = $overall_status === Onboarding_Statuses::DRAFT_SAVED
-			? __( 'You have saved draft progress. You can continue below.', 'aio-page-builder' )
-			: '';
+		$resume_message = '';
+		if ( $overall_status === Onboarding_Statuses::DRAFT_SAVED ) {
+			$resume_message = __( 'You have saved draft progress. You can continue below.', 'aio-page-builder' );
+		} elseif ( $current_step_key !== Onboarding_Step_Keys::WELCOME
+			&& in_array( $overall_status, array( Onboarding_Statuses::IN_PROGRESS, Onboarding_Statuses::BLOCKED, Onboarding_Statuses::READY_FOR_SUBMISSION ), true ) ) {
+			$step_lbl = self::step_labels()[ $current_step_key ] ?? $current_step_key;
+			$resume_message = sprintf(
+				/* translators: %s: current step label */
+				__( 'Resume: you are on “%s”. Use Save draft anytime; nothing is submitted until you request a plan.', 'aio-page-builder' ),
+				$step_lbl
+			);
+		}
 
 		$submission_warnings = $this->build_submission_warnings( $draft, $prefill );
+
+		$review_advisories = array();
+		if ( $is_at_review || $at_submission ) {
+			$review_advisories = Onboarding_Step_Readiness::get_review_advisories( $profile, $this->prefill_service );
+		}
+
+		$user_facing_status = Onboarding_User_Facing_Status::resolve( $draft, $current_step_key, $is_blocked );
+
+		$crawl_context = Onboarding_Crawl_Context_Phase::summarize( $prefill, $this->settings_service );
 
 		$state = array(
 			'current_step_key'          => $current_step_key,
@@ -132,6 +150,8 @@ final class Onboarding_UI_State_Builder {
 			'overall_status'            => $effective_status,
 			'is_blocked'                => $is_blocked,
 			'blockers'                  => $blockers,
+			'review_advisories'         => $review_advisories,
+			'user_facing_status'        => $user_facing_status,
 			'prefill'                   => $prefill,
 			'draft'                     => $draft,
 			'nonce'                     => \wp_create_nonce( 'aio_onboarding_save' ),
@@ -142,6 +162,7 @@ final class Onboarding_UI_State_Builder {
 			'submission_warnings'       => $submission_warnings,
 			'last_planning_run_id'      => $draft['last_planning_run_id'] ?? null,
 			'last_planning_run_post_id' => $draft['last_planning_run_post_id'] ?? null,
+			'crawl_context'             => $crawl_context,
 		);
 
 		$state = $this->append_industry_question_pack_state( $state );

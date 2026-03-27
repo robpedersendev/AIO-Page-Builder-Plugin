@@ -22,6 +22,9 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Crawl_Context_Phase;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Telemetry;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_User_Facing_Status;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Readiness;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Planning_Context_Guard;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
@@ -66,10 +69,9 @@ final class Onboarding_Screen {
 	/** Hidden textarea inside the main form carrying `aio_onboarding_goal_or_intent` for POST. */
 	private const SUBMISSION_GOAL_POST_FIELD_ID = 'aio_onboarding_goal_post';
 
-	/** @var Service_Container|null */
-	private $container;
+	private Service_Container $container;
 
-	public function __construct( ?Service_Container $container = null ) {
+	public function __construct( Service_Container $container ) {
 		$this->container = $container;
 	}
 
@@ -123,10 +125,6 @@ final class Onboarding_Screen {
 			$this->debug_onboarding_line( 'post rejected: missing aio_onboarding_action' );
 			return null;
 		}
-		if ( $this->container === null ) {
-			$this->debug_onboarding_line( 'post rejected: service container unavailable' );
-			return null;
-		}
 
 		$draft_service   = $this->container->get( 'onboarding_draft_service' );
 		$prefill_service = $this->container->get( 'onboarding_prefill_service' );
@@ -171,6 +169,7 @@ final class Onboarding_Screen {
 			}
 			$draft['overall_status'] = Onboarding_Statuses::DRAFT_SAVED;
 			$draft_service->save_draft( $draft );
+			$this->record_onboarding_telemetry( Onboarding_Telemetry::EVENT_DRAFT_SAVE, $draft );
 			return $this->hub_redirect_url(
 				array(
 					'saved' => '1',
@@ -198,6 +197,7 @@ final class Onboarding_Screen {
 					'advance blocked: validation failed for step=' . (string) ( $draft['current_step_key'] ?? '' )
 					. ' error_count=' . (string) count( $gate_errors )
 				);
+				$this->record_onboarding_telemetry( Onboarding_Telemetry::EVENT_ADVANCE_BLOCKED, $draft );
 				\set_transient( 'aio_onboarding_advance_validation_' . (string) \get_current_user_id(), $gate_errors, 120 );
 				return $this->hub_redirect_url( array( 'onboarding_validation' => '1' ) );
 			}
@@ -207,6 +207,7 @@ final class Onboarding_Screen {
 				$next = $ordered[ $idx + 1 ];
 				if ( $next === Onboarding_Step_Keys::REVIEW && ! $prefill_service->is_provider_ready() ) {
 					$this->debug_onboarding_line( 'advance blocked: provider not ready before review step' );
+					$this->record_onboarding_telemetry( Onboarding_Telemetry::EVENT_ADVANCE_BLOCKED, $draft );
 					\set_transient(
 						'aio_onboarding_advance_validation_' . (string) \get_current_user_id(),
 						array( __( 'Save an API key for at least one AI provider before Review.', 'aio-page-builder' ) ),
@@ -220,6 +221,7 @@ final class Onboarding_Screen {
 						$this->debug_onboarding_line(
 							'advance blocked: review gate before submission error_count=' . (string) count( $review_errs )
 						);
+						$this->record_onboarding_telemetry( Onboarding_Telemetry::EVENT_ADVANCE_BLOCKED, $draft );
 						\set_transient( 'aio_onboarding_advance_validation_' . (string) \get_current_user_id(), $review_errs, 120 );
 						return $this->hub_redirect_url( array( 'onboarding_validation' => '1' ) );
 					}
@@ -268,6 +270,7 @@ final class Onboarding_Screen {
 				);
 			}
 			if ( $this->container->has( 'onboarding_planning_request_orchestrator' ) ) {
+				$this->record_onboarding_telemetry( Onboarding_Telemetry::EVENT_SUBMIT_ATTEMPTED, $draft );
 				$orchestrator  = $this->container->get( 'onboarding_planning_request_orchestrator' );
 				$result        = $orchestrator->submit();
 				$arr           = $result->to_array();
@@ -313,7 +316,6 @@ final class Onboarding_Screen {
 						}
 					}
 					if ( Capabilities::current_user_can_for_route( Capabilities::ACCESS_INDUSTRY_WORKSPACE )
-						&& $this->container !== null
 						&& $this->container->has( 'onboarding_industry_hub_navigation_advisor' )
 						&& $run_post_id > 0 ) {
 						/** @var Onboarding_Industry_Hub_Navigation_Advisor $nav_advisor */
@@ -380,7 +382,7 @@ final class Onboarding_Screen {
 	 * @param array<string, mixed> $draft Draft (mutated).
 	 */
 	private function ensure_linked_shell_plan_for_draft( array &$draft, Onboarding_Draft_Service $draft_service ): bool {
-		if ( $this->container === null || ! $this->container->has( 'onboarding_build_plan_bootstrap_service' ) ) {
+		if ( ! $this->container->has( 'onboarding_build_plan_bootstrap_service' ) ) {
 			return true;
 		}
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
@@ -407,8 +409,7 @@ final class Onboarding_Screen {
 	 */
 	private function enrich_state_with_build_plan_lineages( array $state ): array {
 		$state['build_plan_lineages'] = array();
-		if ( $this->container !== null
-			&& Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
+		if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
 			$state['build_plan_lineages'] = $this->container->get( 'build_plan_lineage_service' )->list_lineages_for_onboarding_selector();
 		}
 		return $state;
@@ -441,7 +442,7 @@ final class Onboarding_Screen {
 	 * @param array<string, mixed> $draft Current draft.
 	 */
 	private function maybe_sync_build_plan_snapshot( array $draft ): void {
-		if ( $this->container === null || ! $this->container->has( 'onboarding_build_plan_bootstrap_service' ) ) {
+		if ( ! $this->container->has( 'onboarding_build_plan_bootstrap_service' ) ) {
 			return;
 		}
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
@@ -464,7 +465,7 @@ final class Onboarding_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function get_industry_profile_snapshot_for_plan(): array {
-		if ( $this->container === null || ! $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+		if ( ! $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
 			return array();
 		}
 		$repo = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
@@ -549,7 +550,7 @@ final class Onboarding_Screen {
 	private function persist_template_preferences_from_post( array $draft ): void {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before this method is called.
 		$current = $draft['current_step_key'] ?? '';
-		if ( $current !== Onboarding_Step_Keys::TEMPLATE_PREFERENCES || $this->container === null || ! $this->container->has( 'profile_store' ) ) {
+		if ( $current !== Onboarding_Step_Keys::TEMPLATE_PREFERENCES || ! $this->container->has( 'profile_store' ) ) {
 			return;
 		}
 		$raw           = array(
@@ -574,8 +575,7 @@ final class Onboarding_Screen {
 	 */
 	private function persist_industry_profile_from_post(): void {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before this method is called.
-		if ( $this->container === null
-			|| ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE )
+		if ( ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE )
 			|| ! $this->container->has( 'industry_question_pack_registry' ) ) {
 			return;
 		}
@@ -712,7 +712,7 @@ final class Onboarding_Screen {
 	 * @return array<string, mixed>
 	 */
 	private function get_ui_state(): array {
-		if ( $this->container && $this->container->has( 'onboarding_ui_state_builder' ) ) {
+		if ( $this->container->has( 'onboarding_ui_state_builder' ) ) {
 			try {
 				$builder = $this->container->get( 'onboarding_ui_state_builder' );
 				return $builder->build_for_screen();
@@ -743,25 +743,32 @@ final class Onboarding_Screen {
 				'is_jumpable' => false,
 			);
 		}
+		$ufs = Onboarding_User_Facing_Status::resolve( $draft, (string) ( $draft['current_step_key'] ?? Onboarding_Step_Keys::WELCOME ), false );
+		$cc  = Onboarding_Crawl_Context_Phase::summarize( array( 'latest_crawl_run_id' => null ), null );
 		return array(
-			'current_step_key'  => $draft['current_step_key'],
-			'steps'             => $steps,
-			'overall_status'    => $draft['overall_status'],
-			'is_blocked'        => false,
-			'blockers'          => array(),
-			'prefill'           => array(
-				'profile'             => array(),
-				'current_site_url'    => '',
-				'crawl_run_ids'       => array(),
-				'latest_crawl_run_id' => null,
-				'provider_refs'       => array(),
+			'current_step_key'   => $draft['current_step_key'],
+			'steps'              => $steps,
+			'overall_status'     => $draft['overall_status'],
+			'is_blocked'         => false,
+			'blockers'           => array(),
+			'review_advisories'  => array(),
+			'user_facing_status' => $ufs,
+			'prefill'            => array(
+				'profile'                        => array(),
+				'current_site_url'               => '',
+				'crawl_run_ids'                  => array(),
+				'latest_crawl_run_id'            => null,
+				'latest_crawl_session_timestamp' => null,
+				'provider_refs'                  => array(),
 			),
-			'draft'             => $draft,
-			'nonce'             => \wp_create_nonce( self::NONCE_ACTION ),
-			'nonce_action'      => self::NONCE_ACTION,
-			'can_save_draft'    => true,
-			'resume_message'    => '',
-			'is_provider_ready' => false,
+			'draft'              => $draft,
+			'nonce'              => \wp_create_nonce( self::NONCE_ACTION ),
+			'nonce_action'       => self::NONCE_ACTION,
+			'can_save_draft'     => true,
+			'resume_message'     => '',
+			'is_provider_ready'  => false,
+			'submission_warnings' => array(),
+			'crawl_context'       => $cc,
 		);
 	}
 
@@ -818,6 +825,15 @@ final class Onboarding_Screen {
 		<div class="aio-page-builder-screen aio-onboarding aio-onboarding--hub-embed aio-onboarding--stripe" role="region" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 		<?php endif; ?>
 
+			<?php
+			$ufs_banner = isset( $state['user_facing_status'] ) && is_array( $state['user_facing_status'] ) ? $state['user_facing_status'] : null;
+			if ( $ufs_banner !== null && isset( $ufs_banner['label'], $ufs_banner['hint'] ) && is_string( $ufs_banner['label'] ) && is_string( $ufs_banner['hint'] ) ) :
+				?>
+			<div class="notice aio-onboarding-ufs-banner" role="status" aria-live="polite" style="margin:1em 0;">
+				<p><strong><?php echo \esc_html( $ufs_banner['label'] ); ?></strong> — <?php echo \esc_html( $ufs_banner['hint'] ); ?></p>
+			</div>
+			<?php endif; ?>
+
 			<?php if ( $saved ) : ?>
 				<div class="notice notice-success is-dismissible" role="status">
 					<p><?php \esc_html_e( 'Draft saved. You can return later to continue.', 'aio-page-builder' ); ?></p>
@@ -825,7 +841,7 @@ final class Onboarding_Screen {
 			<?php endif; ?>
 
 			<?php if ( count( $advance_validation_msgs ) > 0 ) : ?>
-				<div class="notice notice-error" role="alert">
+				<div class="notice notice-warning" role="alert">
 					<p><strong><?php \esc_html_e( 'Complete this step before continuing:', 'aio-page-builder' ); ?></strong></p>
 					<ul>
 						<?php foreach ( $advance_validation_msgs as $msg ) : ?>
@@ -859,7 +875,7 @@ final class Onboarding_Screen {
 
 			<?php if ( $is_blocked && count( $blockers ) > 0 ) : ?>
 				<div class="notice notice-warning" role="alert" aria-live="polite">
-					<p><strong><?php \esc_html_e( 'Cannot proceed until:', 'aio-page-builder' ); ?></strong></p>
+					<p><strong><?php \esc_html_e( 'Required before planning:', 'aio-page-builder' ); ?></strong></p>
 					<ul>
 						<?php foreach ( $blockers as $blocker ) : ?>
 							<li><?php echo \esc_html( $blocker ); ?></li>
@@ -927,7 +943,7 @@ final class Onboarding_Screen {
 						<?php if ( ! empty( $state['is_blocked'] ) ) : ?>
 							<p class="aio-onboarding-ready"><?php \esc_html_e( 'Complete the required steps above before requesting a plan.', 'aio-page-builder' ); ?></p>
 						<?php else : ?>
-							<button type="submit" name="aio_onboarding_action" value="submit_planning_request" class="button button-primary"><?php \esc_html_e( 'Request AI plan', 'aio-page-builder' ); ?></button>
+							<button type="submit" name="aio_onboarding_action" value="submit_planning_request" class="button button-primary" onclick="return window.confirm(<?php echo \wp_json_encode( __( 'Send a planning request to your AI provider using this profile and context? External API usage may apply charges according to your provider account.', 'aio-page-builder' ) ); ?>);"><?php \esc_html_e( 'Request AI plan', 'aio-page-builder' ); ?></button>
 						<?php endif; ?>
 					<?php endif; ?>
 				</p>
@@ -972,6 +988,7 @@ final class Onboarding_Screen {
 				<?php $this->render_onboarding_welcome_step( $state ); ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::PROVIDER_SETUP ) : ?>
 				<p><?php \esc_html_e( 'Configure at least one AI provider (API key) to use AI planning. Credentials are stored securely and never shown in full after save.', 'aio-page-builder' ); ?></p>
+				<p class="description"><?php \esc_html_e( 'You can finish other profile steps first. Provider setup becomes required when you reach Review and Submission.', 'aio-page-builder' ); ?></p>
 				<p><?php \esc_html_e( 'Current readiness:', 'aio-page-builder' ); ?> <strong><?php echo $is_provider_ready ? \esc_html__( 'At least one provider is marked configured.', 'aio-page-builder' ) : \esc_html__( 'No provider configured yet.', 'aio-page-builder' ); ?></strong></p>
 				<div class="aio-onboarding-api-key-guide" role="region" aria-labelledby="aio-api-key-guide-heading">
 					<h4 id="aio-api-key-guide-heading"><?php \esc_html_e( 'How to get an API key', 'aio-page-builder' ); ?></h4>
@@ -988,16 +1005,35 @@ final class Onboarding_Screen {
 						<a href="<?php echo \esc_url( $openai_keys ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'OpenAI API keys (opens in a new tab)', 'aio-page-builder' ); ?></a>
 					</p>
 				</div>
-				<?php $this->render_embedded_ai_providers_setup(); ?>
+				<?php $this->render_embedded_ai_providers_setup( $state ); ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::SUBMISSION ) : ?>
 				<?php if ( ! $is_provider_ready ) : ?>
 					<div class="notice notice-warning inline" role="status">
 						<p><?php \esc_html_e( 'Configure an AI provider before you can request a plan.', 'aio-page-builder' ); ?></p>
 					</div>
-					<?php $this->render_embedded_ai_providers_setup(); ?>
+					<?php $this->render_embedded_ai_providers_setup( $state ); ?>
 				<?php endif; ?>
 				<p><?php \esc_html_e( 'Request an AI-generated plan from your profile and context. When the run completes, your onboarding Build Plan is filled with the AI output and opened for review.', 'aio-page-builder' ); ?></p>
 				<p class="description"><strong><?php \esc_html_e( 'API usage', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( Build_Plan_Schema::DEFAULT_ONBOARDING_AI_COST_USD_NOTE ); ?></p>
+				<?php
+				$prefill_sub  = $state['prefill'] ?? array();
+				$crawl_id_sub = isset( $prefill_sub['latest_crawl_run_id'] ) && is_string( $prefill_sub['latest_crawl_run_id'] ) ? trim( $prefill_sub['latest_crawl_run_id'] ) : '';
+				$last_run_id  = $state['last_planning_run_id'] ?? null;
+				?>
+				<div class="aio-onboarding-preflight" role="region" aria-labelledby="aio-preflight-heading" style="margin:1em 0;padding:0.75rem 1rem;border:1px solid #c3c4c7;border-radius:6px;background:#fcfcfc;">
+					<p id="aio-preflight-heading" style="margin:0 0 0.5rem;"><strong><?php \esc_html_e( 'Planning preflight', 'aio-page-builder' ); ?></strong></p>
+					<ul style="margin:0;padding-left:1.2em;">
+						<li><?php echo $is_provider_ready ? \esc_html__( 'AI provider: ready.', 'aio-page-builder' ) : \esc_html__( 'AI provider: not ready — configure keys before submitting.', 'aio-page-builder' ); ?></li>
+						<li><?php echo $crawl_id_sub !== '' ? \esc_html__( 'Crawl context: latest session will be included when available.', 'aio-page-builder' ) : \esc_html__( 'Crawl context: none linked (optional).', 'aio-page-builder' ); ?></li>
+						<li><?php echo ( $last_run_id !== null && is_string( $last_run_id ) && $last_run_id !== '' ) ? \esc_html__( 'Run context: you have a prior planning run on file; this submit starts a new provider request.', 'aio-page-builder' ) : \esc_html__( 'Run context: new planning request.', 'aio-page-builder' ); ?></li>
+						<?php
+						$sw = isset( $state['submission_warnings'] ) && is_array( $state['submission_warnings'] ) ? $state['submission_warnings'] : array();
+						if ( count( $sw ) > 0 ) :
+							?>
+						<li><?php \esc_html_e( 'Notes: review the warnings below before you submit.', 'aio-page-builder' ); ?></li>
+						<?php endif; ?>
+					</ul>
+				</div>
 				<?php
 				$draft_for_goal = isset( $state['draft'] ) && is_array( $state['draft'] ) ? $state['draft'] : array();
 				$goal_val       = isset( $draft_for_goal['goal_or_intent_text'] ) && is_string( $draft_for_goal['goal_or_intent_text'] ) ? $draft_for_goal['goal_or_intent_text'] : '';
@@ -1317,7 +1353,7 @@ final class Onboarding_Screen {
 	 */
 	private function persist_brand_profile_from_post( array $draft ): void {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before this method is called.
-		if ( $this->container === null || ! $this->container->has( 'profile_store' ) ) {
+		if ( ! $this->container->has( 'profile_store' ) ) {
 			$this->debug_onboarding_line( 'persist brand_profile skipped: profile_store unavailable' );
 			return;
 		}
@@ -1372,7 +1408,7 @@ final class Onboarding_Screen {
 	 */
 	private function persist_business_profile_from_post( array $draft ): void {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before this method is called.
-		if ( $this->container === null || ! $this->container->has( 'profile_store' ) ) {
+		if ( ! $this->container->has( 'profile_store' ) ) {
 			$this->debug_onboarding_line( 'persist business_profile skipped: profile_store unavailable' );
 			return;
 		}
@@ -1701,7 +1737,7 @@ final class Onboarding_Screen {
 			);
 			?>
 		</p>
-		<?php $this->render_embedded_crawler_sessions(); ?>
+		<?php $this->render_embedded_crawler_sessions( $state ); ?>
 		<?php
 	}
 
@@ -1713,30 +1749,25 @@ final class Onboarding_Screen {
 	 */
 	private function render_crawl_preferences_step( array $state ): void {
 		$prefill       = $state['prefill'] ?? array();
-		$latest_run_id = $prefill['latest_crawl_run_id'] ?? null;
 		$crawl_run_ids = $prefill['crawl_run_ids'] ?? array();
 		$crawler_url   = \add_query_arg( array( 'page' => Crawler_Sessions_Screen::SLUG ), \admin_url( 'admin.php' ) );
+		$cc            = isset( $state['crawl_context'] ) && is_array( $state['crawl_context'] ) ? $state['crawl_context'] : null;
 		?>
 		<p><?php \esc_html_e( 'Crawl your existing site to give the AI planner richer context about your current content structure and gaps.', 'aio-page-builder' ); ?></p>
-		<?php if ( $latest_run_id !== null && $latest_run_id !== '' ) : ?>
-			<p>
-				<?php
-				echo \esc_html(
-					sprintf(
-						/* translators: %s: crawl run ID */
-						__( 'Latest crawl run: %s', 'aio-page-builder' ),
-						(string) $latest_run_id
-					)
-				);
-				?>
-			</p>
-			<?php if ( is_array( $crawl_run_ids ) && count( $crawl_run_ids ) > 1 ) : ?>
-				<p class="description"><?php echo \esc_html( sprintf( /* translators: %d: number of stored crawl runs */ __( '%d crawl runs available.', 'aio-page-builder' ), count( $crawl_run_ids ) ) ); ?></p>
-			<?php endif; ?>
-		<?php else : ?>
-			<p><?php \esc_html_e( 'No crawl runs recorded yet.', 'aio-page-builder' ); ?></p>
+		<?php if ( $cc !== null && isset( $cc['headline'], $cc['detail'], $cc['next_step'] ) ) : ?>
+			<?php
+			$notice = $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_FAILED ? 'notice-error' : ( $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_STALE || $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_PARTIAL ? 'notice-warning' : 'notice-info' );
+			?>
+			<div class="notice <?php echo \esc_attr( $notice ); ?> inline" role="status" style="margin:1em 0;">
+				<p><strong><?php echo \esc_html( (string) $cc['headline'] ); ?></strong></p>
+				<p><?php echo \esc_html( (string) $cc['detail'] ); ?></p>
+				<p class="description"><?php echo \esc_html( (string) $cc['next_step'] ); ?></p>
+			</div>
 		<?php endif; ?>
-		<?php $this->render_embedded_crawler_sessions(); ?>
+		<?php if ( is_array( $crawl_run_ids ) && count( $crawl_run_ids ) > 1 ) : ?>
+			<p class="description"><?php echo \esc_html( sprintf( /* translators: %d: number of stored crawl runs */ __( '%d crawl runs stored.', 'aio-page-builder' ), count( $crawl_run_ids ) ) ); ?></p>
+		<?php endif; ?>
+		<?php $this->render_embedded_crawler_sessions( $state ); ?>
 		<p>
 			<a href="<?php echo \esc_url( $crawler_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Open Crawler Sessions in full view', 'aio-page-builder' ); ?></a>
 		</p>
@@ -1757,15 +1788,38 @@ final class Onboarding_Screen {
 			? $profile[ Profile_Schema::ROOT_BUSINESS ] : array();
 		$brand             = isset( $profile[ Profile_Schema::ROOT_BRAND ] ) && is_array( $profile[ Profile_Schema::ROOT_BRAND ] )
 			? $profile[ Profile_Schema::ROOT_BRAND ] : array();
+		$tpl               = isset( $profile[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] ) && is_array( $profile[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] )
+			? $profile[ Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE ] : array();
 		$provider_refs     = $prefill['provider_refs'] ?? array();
 		$is_provider_ready = ! empty( $state['is_provider_ready'] );
 		$biz_name          = isset( $biz['business_name'] ) && $biz['business_name'] !== '' ? (string) $biz['business_name'] : '';
 		$biz_type          = isset( $biz['business_type'] ) && $biz['business_type'] !== '' ? (string) $biz['business_type'] : '';
 		$audience          = isset( $biz['target_audience_summary'] ) && $biz['target_audience_summary'] !== '' ? (string) $biz['target_audience_summary'] : '';
+		$offers            = isset( $biz['primary_offers_summary'] ) && $biz['primary_offers_summary'] !== '' ? (string) $biz['primary_offers_summary'] : '';
+		$geo               = isset( $biz['core_geographic_market'] ) && $biz['core_geographic_market'] !== '' ? (string) $biz['core_geographic_market'] : '';
 		$positioning       = isset( $brand['brand_positioning_summary'] ) && $brand['brand_positioning_summary'] !== '' ? (string) $brand['brand_positioning_summary'] : '';
+		$voice             = isset( $brand['brand_voice_summary'] ) && $brand['brand_voice_summary'] !== '' ? (string) $brand['brand_voice_summary'] : '';
+		$site_url          = isset( $prefill['current_site_url'] ) && is_string( $prefill['current_site_url'] ) ? trim( $prefill['current_site_url'] ) : '';
+		$crawl_id          = isset( $prefill['latest_crawl_run_id'] ) && is_string( $prefill['latest_crawl_run_id'] ) ? trim( $prefill['latest_crawl_run_id'] ) : '';
+		$crawl_ts          = isset( $prefill['latest_crawl_session_timestamp'] ) && is_string( $prefill['latest_crawl_session_timestamp'] ) ? trim( $prefill['latest_crawl_session_timestamp'] ) : '';
+		$advisories        = isset( $state['review_advisories'] ) && is_array( $state['review_advisories'] ) ? $state['review_advisories'] : array();
 		?>
-		<p><?php \esc_html_e( 'Review your stored profile and provider readiness before requesting an AI plan.', 'aio-page-builder' ); ?></p>
-		<h4><?php \esc_html_e( 'Profile summary', 'aio-page-builder' ); ?></h4>
+		<p><?php \esc_html_e( 'This screen summarizes what planning will use. Required gaps are listed in the notice above; suggestions below are optional quality hints.', 'aio-page-builder' ); ?></p>
+		<?php
+		if ( count( $advisories ) > 0 ) :
+			?>
+			<div class="notice notice-info inline" role="region" aria-labelledby="aio-review-advisory-heading">
+				<p id="aio-review-advisory-heading"><strong><?php \esc_html_e( 'Suggestions to strengthen the plan', 'aio-page-builder' ); ?></strong></p>
+				<ul style="margin:0 0 0 1.2em;">
+					<?php foreach ( $advisories as $a ) : ?>
+						<?php if ( is_string( $a ) && $a !== '' ) : ?>
+							<li><?php echo \esc_html( $a ); ?></li>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		<?php endif; ?>
+		<h4><?php \esc_html_e( 'Business & brand summary', 'aio-page-builder' ); ?></h4>
 		<table class="form-table" role="presentation">
 			<tr>
 				<th scope="row"><?php \esc_html_e( 'Business name', 'aio-page-builder' ); ?></th>
@@ -1780,21 +1834,72 @@ final class Onboarding_Screen {
 				<td><?php echo $audience !== '' ? \esc_html( $audience ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
 			</tr>
 			<tr>
+				<th scope="row"><?php \esc_html_e( 'Primary offers', 'aio-page-builder' ); ?></th>
+				<td><?php echo $offers !== '' ? \esc_html( $offers ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php \esc_html_e( 'Geography', 'aio-page-builder' ); ?></th>
+				<td><?php echo $geo !== '' ? \esc_html( $geo ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
+			</tr>
+			<tr>
 				<th scope="row"><?php \esc_html_e( 'Brand positioning', 'aio-page-builder' ); ?></th>
 				<td><?php echo $positioning !== '' ? \esc_html( $positioning ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
 			</tr>
+			<tr>
+				<th scope="row"><?php \esc_html_e( 'Brand voice', 'aio-page-builder' ); ?></th>
+				<td><?php echo $voice !== '' ? \esc_html( $voice ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php \esc_html_e( 'Current site URL', 'aio-page-builder' ); ?></th>
+				<td><?php echo $site_url !== '' ? \esc_html( $site_url ) : '<em>' . \esc_html__( 'Not set', 'aio-page-builder' ) . '</em>'; ?></td>
+			</tr>
 		</table>
-		<h4><?php \esc_html_e( 'Provider readiness', 'aio-page-builder' ); ?></h4>
+		<h4><?php \esc_html_e( 'Template preferences', 'aio-page-builder' ); ?></h4>
+		<?php if ( count( $tpl ) > 0 ) : ?>
+			<table class="form-table" role="presentation">
+				<?php foreach ( $tpl as $k => $v ) : ?>
+					<?php if ( ! is_string( $k ) || $k === '' ) { continue; } ?>
+					<tr>
+						<th scope="row"><?php echo \esc_html( str_replace( '_', ' ', $k ) ); ?></th>
+						<td><?php echo \is_bool( $v ) ? ( $v ? \esc_html__( 'Yes', 'aio-page-builder' ) : \esc_html__( 'No', 'aio-page-builder' ) ) : \esc_html( (string) $v ); ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</table>
+		<?php else : ?>
+			<p class="description"><?php \esc_html_e( 'No template preference signals saved yet (optional).', 'aio-page-builder' ); ?></p>
+		<?php endif; ?>
+		<h4><?php \esc_html_e( 'Crawl context', 'aio-page-builder' ); ?></h4>
+		<?php if ( $crawl_id !== '' ) : ?>
+			<p><?php \esc_html_e( 'Latest crawl session:', 'aio-page-builder' ); ?> <code><?php echo \esc_html( $crawl_id ); ?></code>
+			<?php if ( $crawl_ts !== '' ) : ?>
+				<?php echo ' — '; ?>
+				<?php
+				$ts = \strtotime( $crawl_ts );
+				echo \esc_html( $ts !== false ? \wp_date( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), $ts ) : $crawl_ts );
+				?>
+			<?php endif; ?>
+			</p>
+		<?php else : ?>
+			<p class="description"><?php \esc_html_e( 'No crawl session linked yet. Crawl is optional; add one if you want the planner to read your public site.', 'aio-page-builder' ); ?></p>
+		<?php endif; ?>
+		<h4><?php \esc_html_e( 'AI provider readiness', 'aio-page-builder' ); ?></h4>
 		<?php if ( $is_provider_ready ) : ?>
 			<p class="aio-onboarding-ready"><?php \esc_html_e( 'At least one AI provider is configured and ready.', 'aio-page-builder' ); ?></p>
 		<?php else : ?>
-			<p class="aio-onboarding-not-ready"><?php \esc_html_e( 'No AI provider is configured. Add credentials below (same as AI → Providers), then use Save draft or refresh this step.', 'aio-page-builder' ); ?></p>
-			<?php $this->render_embedded_ai_providers_setup(); ?>
+			<p class="aio-onboarding-not-ready"><?php \esc_html_e( 'No AI provider is configured yet. Add credentials in the embedded area below (same as AI → Providers), then save a draft or refresh.', 'aio-page-builder' ); ?></p>
+					<?php $this->render_embedded_ai_providers_setup( $state ); ?>
 		<?php endif; ?>
 		<?php if ( count( $provider_refs ) > 0 ) : ?>
 			<ul aria-label="<?php \esc_attr_e( 'Provider status', 'aio-page-builder' ); ?>">
 				<?php foreach ( $provider_refs as $ref ) : ?>
-					<li><?php echo \esc_html( ( $ref['provider_id'] ?? '' ) . ': ' . ( $ref['credential_state'] ?? 'absent' ) ); ?></li>
+					<?php
+					if ( ! is_array( $ref ) ) {
+						continue;
+					}
+					$pid = isset( $ref['provider_id'] ) ? (string) $ref['provider_id'] : '';
+					$st  = isset( $ref['credential_state'] ) ? (string) $ref['credential_state'] : 'absent';
+					?>
+					<li><?php echo \esc_html( $pid . ': ' . Onboarding_Step_Readiness::describe_provider_credential_state( $st ) ); ?></li>
 				<?php endforeach; ?>
 			</ul>
 		<?php endif; ?>
@@ -1806,24 +1911,34 @@ final class Onboarding_Screen {
 	 *
 	 * @return void
 	 */
-	private function render_embedded_ai_providers_setup(): void {
-		if ( $this->container === null ) {
-			$this->render_ai_providers_external_link_only();
-			return;
-		}
+	private function render_embedded_ai_providers_setup( array $state ): void {
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_AI_PROVIDERS ) ) {
 			$this->render_ai_providers_external_link_only();
 			return;
 		}
+		$ready      = ! empty( $state['is_provider_ready'] );
+		$summary_ln = $ready
+			? __( 'AI provider: configured', 'aio-page-builder' )
+			: __( 'AI provider: not configured yet', 'aio-page-builder' );
 		?>
-		<div class="aio-onboarding-embed aio-onboarding-embed--ai-providers" role="region" aria-labelledby="aio-onboarding-embed-ai-providers-heading">
-			<h4 id="aio-onboarding-embed-ai-providers-heading" class="aio-onboarding-embed-title"><?php \esc_html_e( 'Provider credentials & connection tests', 'aio-page-builder' ); ?></h4>
-			<p class="description"><?php \esc_html_e( 'These controls match the AI Providers screen (AI → Providers tab). Submitting updates or tests will reload the admin; return to Onboarding to continue.', 'aio-page-builder' ); ?></p>
-			<?php
-			$providers_screen = new AI_Providers_Screen( $this->container );
-			$providers_screen->render( true );
-			?>
-		</div>
+		<details class="aio-onboarding-embed-disclosure"<?php if ( ! $ready ) : ?> open<?php endif; ?>>
+			<summary class="aio-onboarding-embed-summary" style="cursor:pointer;padding:0.5rem 0;">
+				<strong><?php echo \esc_html( $summary_ln ); ?></strong>
+				<span class="description"> — <?php \esc_html_e( 'Expand for credentials, model defaults, connection tests, and spend caps.', 'aio-page-builder' ); ?></span>
+			</summary>
+			<div class="aio-onboarding-embed-details-inner" style="margin-top:0.75rem;">
+				<p class="description"><?php \esc_html_e( 'Why this matters: planning calls your provider’s API; usage may incur cost per their pricing.', 'aio-page-builder' ); ?></p>
+				<p class="description"><?php \esc_html_e( 'What’s next: save a key, run “Test connection”, then continue the wizard. Submits here reload the admin.', 'aio-page-builder' ); ?></p>
+				<div class="aio-onboarding-embed aio-onboarding-embed--ai-providers" role="region" aria-labelledby="aio-onboarding-embed-ai-providers-heading">
+					<h4 id="aio-onboarding-embed-ai-providers-heading" class="aio-onboarding-embed-title"><?php \esc_html_e( 'Provider credentials & connection tests', 'aio-page-builder' ); ?></h4>
+					<p class="description"><?php \esc_html_e( 'These controls match the AI Providers screen (AI → Providers tab).', 'aio-page-builder' ); ?></p>
+					<?php
+					$providers_screen = new AI_Providers_Screen( $this->container );
+					$providers_screen->render( true );
+					?>
+				</div>
+			</div>
+		</details>
 		<?php
 	}
 
@@ -1847,24 +1962,44 @@ final class Onboarding_Screen {
 	 *
 	 * @return void
 	 */
-	private function render_embedded_crawler_sessions(): void {
-		if ( $this->container === null ) {
-			$this->render_crawler_external_link_only();
-			return;
-		}
+	private function render_embedded_crawler_sessions( array $state ): void {
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) ) {
 			$this->render_crawler_external_link_only();
 			return;
 		}
+		$cc        = isset( $state['crawl_context'] ) && is_array( $state['crawl_context'] ) ? $state['crawl_context'] : null;
+		$phase     = is_array( $cc ) && isset( $cc['phase'] ) ? (string) $cc['phase'] : Onboarding_Crawl_Context_Phase::PHASE_UNKNOWN;
+		$open_auto = in_array(
+			$phase,
+			array(
+				Onboarding_Crawl_Context_Phase::PHASE_NONE,
+				Onboarding_Crawl_Context_Phase::PHASE_FAILED,
+				Onboarding_Crawl_Context_Phase::PHASE_RUNNING,
+				Onboarding_Crawl_Context_Phase::PHASE_UNKNOWN,
+			),
+			true
+		);
 		?>
-		<div class="aio-onboarding-embed aio-onboarding-embed--crawler" role="region" aria-labelledby="aio-onboarding-embed-crawler-heading">
-			<h4 id="aio-onboarding-embed-crawler-heading" class="aio-onboarding-embed-title"><?php \esc_html_e( 'Start or review crawls', 'aio-page-builder' ); ?></h4>
-			<p class="description"><?php \esc_html_e( 'Same controls as Crawler Sessions. Starting or retrying a crawl redirects here; open Onboarding again to continue the wizard.', 'aio-page-builder' ); ?></p>
-			<?php
-			$crawler = new Crawler_Sessions_Screen( $this->container );
-			$crawler->render( true );
-			?>
-		</div>
+		<details class="aio-onboarding-embed-disclosure"<?php if ( $open_auto ) : ?> open<?php endif; ?>>
+			<summary class="aio-onboarding-embed-summary" style="cursor:pointer;padding:0.5rem 0;">
+				<strong><?php \esc_html_e( 'Crawler tools', 'aio-page-builder' ); ?></strong>
+				<span class="description"> — <?php \esc_html_e( 'Expand for start, retry, and session list (same as Crawler Sessions).', 'aio-page-builder' ); ?></span>
+			</summary>
+			<div class="aio-onboarding-embed-details-inner" style="margin-top:0.75rem;">
+				<?php if ( is_array( $cc ) && isset( $cc['detail'], $cc['next_step'] ) ) : ?>
+					<p class="description"><?php echo \esc_html( (string) $cc['detail'] ); ?></p>
+					<p class="description"><?php echo \esc_html( (string) $cc['next_step'] ); ?></p>
+				<?php endif; ?>
+				<div class="aio-onboarding-embed aio-onboarding-embed--crawler" role="region" aria-labelledby="aio-onboarding-embed-crawler-heading">
+					<h4 id="aio-onboarding-embed-crawler-heading" class="aio-onboarding-embed-title"><?php \esc_html_e( 'Start or review crawls', 'aio-page-builder' ); ?></h4>
+					<p class="description"><?php \esc_html_e( 'Starting or retrying a crawl may redirect; open Onboarding again to continue the wizard.', 'aio-page-builder' ); ?></p>
+					<?php
+					$crawler = new Crawler_Sessions_Screen( $this->container );
+					$crawler->render( true );
+					?>
+				</div>
+			</div>
+		</details>
 		<?php
 	}
 
@@ -1890,6 +2025,21 @@ final class Onboarding_Screen {
 	 * @param string $message Short diagnostic (no PII).
 	 * @return void
 	 */
+	/**
+	 * Coarse onboarding analytics (no PII). Skips when service not registered.
+	 *
+	 * @param array<string, mixed> $draft Draft for current step key.
+	 */
+	private function record_onboarding_telemetry( string $event_id, array $draft ): void {
+		if ( ! $this->container->has( 'onboarding_telemetry' ) ) {
+			return;
+		}
+		$step = isset( $draft['current_step_key'] ) && is_string( $draft['current_step_key'] ) ? $draft['current_step_key'] : '';
+		/** @var Onboarding_Telemetry $tel */
+		$tel = $this->container->get( 'onboarding_telemetry' );
+		$tel->record( $event_id, $step );
+	}
+
 	private function debug_onboarding_line( string $message ): void {
 		Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_ONBOARDING_TRACE, $message );
 	}

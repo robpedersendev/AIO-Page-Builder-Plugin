@@ -169,7 +169,7 @@ final class Industry_Override_Management_Screen {
 				$filters[ Industry_Override_Read_Model_Builder::FILTER_STATE ] = $v;
 			}
 		}
-		if ( isset( $_GET['reason_present'] ) && $_GET['reason_present'] === '1' ) {
+		if ( '1' === $this->get_query_string( 'reason_present' ) ) {
 			$filters[ Industry_Override_Read_Model_Builder::FILTER_REASON_PRESENT ] = true;
 		}
 		if ( isset( $_GET['industry_context_ref'] ) && is_string( $_GET['industry_context_ref'] ) ) {
@@ -284,5 +284,19 @@ final class Industry_Override_Management_Screen {
 			<button type="submit" class="button button-small"><?php \esc_html_e( 'Remove', 'aio-page-builder' ); ?></button>
 		</form>
 		<?php
+	}
+
+	/**
+	 * Returns a sanitized unslashed query-string value.
+	 *
+	 * @param string $key Query arg name.
+	 * @return string
+	 */
+	private function get_query_string( string $key ): string {
+		if ( ! isset( $_GET[ $key ] ) || ! is_string( $_GET[ $key ] ) ) {
+			return '';
+		}
+
+		return \sanitize_text_field( \wp_unslash( $_GET[ $key ] ) );
 	}
 }

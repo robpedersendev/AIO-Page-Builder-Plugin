@@ -39,8 +39,7 @@ use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
  */
 final class Build_Plan_Workspace_Screen {
 
-	/** @var Service_Container|null */
-	private $container;
+	private Service_Container $container;
 
 	/**
 	 * Ensures export/POST/GET handlers run once per request (admin_init via Admin_Early_Redirect_Coordinator, then render() must not repeat).
@@ -49,7 +48,7 @@ final class Build_Plan_Workspace_Screen {
 	 */
 	private static $early_handlers_dispatched = false;
 
-	public function __construct( ?Service_Container $container = null ) {
+	public function __construct( Service_Container $container ) {
 		$this->container = $container;
 	}
 
@@ -209,7 +208,7 @@ final class Build_Plan_Workspace_Screen {
 			return false;
 		}
 		$plan_id = \sanitize_text_field( $plan_id );
-		if ( $plan_id === '' || ! $this->container || ! $this->container->has( 'single_action_executor' ) || ! $this->container->has( 'build_plan_repository' ) ) {
+		if ( $plan_id === '' || ! $this->container->has( 'single_action_executor' ) || ! $this->container->has( 'build_plan_repository' ) ) {
 			return false;
 		}
 		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=6' );
@@ -283,7 +282,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( $action !== 'bulk_approve_step1' && $action !== 'bulk_approve_selected_step1' && $action !== 'bulk_deny_step1' ) {
 				return false;
 			}
-			if ( ! $this->container || ! $this->container->has( 'existing_page_update_bulk_action_service' ) ) {
+			if ( ! $this->container->has( 'existing_page_update_bulk_action_service' ) ) {
 				return false;
 			}
 			$state = $this->get_state( $plan_id );
@@ -325,7 +324,7 @@ final class Build_Plan_Workspace_Screen {
 				return false;
 			}
 			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
-			if ( $plan_post_id <= 0 || ! $this->container || ! $this->container->has( 'existing_page_update_bulk_action_service' ) ) {
+			if ( $plan_post_id <= 0 || ! $this->container->has( 'existing_page_update_bulk_action_service' ) ) {
 				return false;
 			}
 			$service = $this->container->get( 'existing_page_update_bulk_action_service' );
@@ -365,7 +364,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( $action !== 'bulk_build_all_step2' && $action !== 'bulk_build_selected_step2' && $action !== 'bulk_deny_all_step2' ) {
 				return false;
 			}
-			if ( ! $this->container || ! $this->container->has( 'new_page_creation_bulk_action_service' ) ) {
+			if ( ! $this->container->has( 'new_page_creation_bulk_action_service' ) ) {
 				return false;
 			}
 			$state = $this->get_state( $plan_id );
@@ -422,7 +421,7 @@ final class Build_Plan_Workspace_Screen {
 				return false;
 			}
 			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
-			if ( $plan_post_id <= 0 || ! $this->container || ! $this->container->has( 'new_page_creation_bulk_action_service' ) ) {
+			if ( $plan_post_id <= 0 || ! $this->container->has( 'new_page_creation_bulk_action_service' ) ) {
 				return false;
 			}
 			$service = $this->container->get( 'new_page_creation_bulk_action_service' );
@@ -468,7 +467,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( $action !== 'bulk_approve_navigation' && $action !== 'bulk_deny_navigation' ) {
 				return false;
 			}
-			if ( ! $this->container || ! $this->container->has( 'navigation_bulk_action_service' ) ) {
+			if ( ! $this->container->has( 'navigation_bulk_action_service' ) ) {
 				return false;
 			}
 			$state = $this->get_state( $plan_id );
@@ -499,7 +498,7 @@ final class Build_Plan_Workspace_Screen {
 				return false;
 			}
 			$plan_post_id = (int) ( $state['plan_post_id'] ?? 0 );
-			if ( $plan_post_id <= 0 || ! $this->container || ! $this->container->has( 'navigation_bulk_action_service' ) ) {
+			if ( $plan_post_id <= 0 || ! $this->container->has( 'navigation_bulk_action_service' ) ) {
 				return false;
 			}
 			$service = $this->container->get( 'navigation_bulk_action_service' );
@@ -558,7 +557,7 @@ final class Build_Plan_Workspace_Screen {
 				if ( ! \wp_verify_nonce( $execute_nonce, self::NONCE_ACTION_EXECUTE_TOKEN_BULK ) ) {
 					return false;
 				}
-				if ( ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+				if ( ! $this->container->has( 'execution_queue_service' ) ) {
 					return false;
 				}
 				$state = $this->get_state( $plan_id );
@@ -688,7 +687,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( $plan_post_id <= 0 ) {
 				return false;
 			}
-			if ( ! $this->container || ! $this->container->has( 'design_token_bulk_action_service' ) ) {
+			if ( ! $this->container->has( 'design_token_bulk_action_service' ) ) {
 				return false;
 			}
 
@@ -743,7 +742,7 @@ final class Build_Plan_Workspace_Screen {
 		}
 
 		if ( $is_review_action ) {
-			if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'design_token_bulk_action_service' ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) || ! $this->container->has( 'design_token_bulk_action_service' ) ) {
 				return false;
 			}
 			if ( ! \wp_verify_nonce( $nonce, $nonce_action ) ) {
@@ -768,7 +767,7 @@ final class Build_Plan_Workspace_Screen {
 		}
 
 		if ( $is_execute_action ) {
-			if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+			if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container->has( 'execution_queue_service' ) ) {
 				return false;
 			}
 			if ( ! \wp_verify_nonce( $nonce, $nonce_action ) ) {
@@ -946,7 +945,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( ! \wp_verify_nonce( $execute_nonce, self::NONCE_ACTION_EXECUTE_HIERARCHY_BULK ) ) {
 				return false;
 			}
-			if ( ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+			if ( ! $this->container->has( 'execution_queue_service' ) ) {
 				return false;
 			}
 
@@ -1066,7 +1065,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( $row_nonce === '' || ! \wp_verify_nonce( $nonce, $row_nonce ) ) {
 			return false;
 		}
-		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container->has( 'execution_queue_service' ) ) {
 			return false;
 		}
 
@@ -1235,7 +1234,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( ! \wp_verify_nonce( $execute_nonce, self::NONCE_ACTION_EXECUTE_CREATE_MENU_BULK ) ) {
 				return false;
 			}
-			if ( ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+			if ( ! $this->container->has( 'execution_queue_service' ) ) {
 				return false;
 			}
 
@@ -1355,7 +1354,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( $row_nonce === '' || ! \wp_verify_nonce( $nonce, $row_nonce ) ) {
 			return false;
 		}
-		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'execution_queue_service' ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::EXECUTE_BUILD_PLANS ) || ! $this->container->has( 'execution_queue_service' ) ) {
 			return false;
 		}
 
@@ -1510,7 +1509,7 @@ final class Build_Plan_Workspace_Screen {
 			if ( ! \wp_verify_nonce( $nonce, self::NONCE_ACTION_BULK ) ) {
 				return false;
 			}
-			if ( ! $this->container || ! $this->container->has( 'seo_bulk_action_service' ) ) {
+			if ( ! $this->container->has( 'seo_bulk_action_service' ) ) {
 				return false;
 			}
 			if ( $action !== 'bulk_approve_all_step5' && $action !== 'bulk_approve_selected_step5' && $action !== 'bulk_deny_all_step5' ) {
@@ -1567,7 +1566,7 @@ final class Build_Plan_Workspace_Screen {
 			return false;
 		}
 
-		if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) || ! $this->container || ! $this->container->has( 'seo_bulk_action_service' ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) || ! $this->container->has( 'seo_bulk_action_service' ) ) {
 			return false;
 		}
 
@@ -1620,7 +1619,7 @@ final class Build_Plan_Workspace_Screen {
 				\wp_safe_redirect( \add_query_arg( 'rollback_error', 'missing_snapshots', $redirect_url ) );
 				exit;
 			}
-			if ( ! $this->container || ! $this->container->has( 'rollback_eligibility_service' ) || ! $this->container->has( 'execution_queue_service' ) ) {
+			if ( ! $this->container->has( 'rollback_eligibility_service' ) || ! $this->container->has( 'execution_queue_service' ) ) {
 				\wp_safe_redirect( \add_query_arg( 'rollback_error', 'unavailable', $redirect_url ) );
 				exit;
 			}
@@ -1656,7 +1655,7 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	private function get_state( string $plan_id ): ?array {
-		if ( ! $this->container || ! $this->container->has( 'build_plan_ui_state_builder' ) ) {
+		if ( ! $this->container->has( 'build_plan_ui_state_builder' ) ) {
 			return null;
 		}
 		$builder = $this->container->get( 'build_plan_ui_state_builder' );
@@ -2010,7 +2009,7 @@ final class Build_Plan_Workspace_Screen {
 			echo '<div class="aio-empty-state"><p>' . \esc_html__( 'All recommendations in this step have already been resolved.', 'aio-page-builder' ) . '</p></div>';
 			return;
 		}
-		if ( ! $this->container || ! $this->container->has( 'build_plan_ui_state_builder' ) ) {
+		if ( ! $this->container->has( 'build_plan_ui_state_builder' ) ) {
 			echo '<div class="aio-empty-state"><p>' . \esc_html__( 'Item list is not available.', 'aio-page-builder' ) . '</p></div>';
 			return;
 		}
@@ -2144,7 +2143,7 @@ final class Build_Plan_Workspace_Screen {
 	 * @param string               $plan_id   Plan ID.
 	 */
 	private function inject_step1_action_urls( array &$workspace, string $plan_id ): void {
-		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$router = $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
 		$base   = $router ? (string) $router->url(
 			'build_plan_workspace',
 			array(
@@ -2213,7 +2212,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( ! isset( $workspace['preview_link'] ) || ! is_array( $workspace['preview_link'] ) ) {
 			return;
 		}
-		$router                           = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$router                           = $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
 		$workspace['preview_link']['url'] = $router
 			? (string) $router->url(
 				'build_plan_workspace',
@@ -2234,7 +2233,7 @@ final class Build_Plan_Workspace_Screen {
 	 * @param string               $plan_id  Plan ID.
 	 */
 	private function inject_step2_action_urls( array &$workspace, string $plan_id ): void {
-		$router = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$router = $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
 		$base   = $router ? (string) $router->url(
 			'build_plan_workspace',
 			array(
@@ -2347,7 +2346,7 @@ final class Build_Plan_Workspace_Screen {
 	 */
 	private function inject_step4_action_urls( array &$workspace, string $plan_id ): void {
 		$tokens_step_index = \AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service::STEP_INDEX_DESIGN_TOKENS;
-		$router            = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$router            = $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
 		$base              = $router
 			? (string) $router->url(
 				'build_plan_workspace',
@@ -2441,7 +2440,7 @@ final class Build_Plan_Workspace_Screen {
 	 */
 	private function inject_step5_action_urls( array &$workspace, string $plan_id ): void {
 		$seo_step_index = \AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Media_Step_UI_Service::STEP_INDEX_SEO;
-		$router         = $this->container && $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$router         = $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
 		$base           = $router
 			? (string) $router->url(
 				'build_plan_workspace',

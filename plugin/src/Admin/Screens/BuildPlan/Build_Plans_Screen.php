@@ -26,10 +26,9 @@ final class Build_Plans_Screen {
 
 	public const SLUG = 'aio-page-builder-build-plans';
 
-	/** @var Service_Container|null */
-	private $container;
+	private Service_Container $container;
 
-	public function __construct( ?Service_Container $container = null ) {
+	public function __construct( Service_Container $container ) {
 		$this->container = $container;
 	}
 
@@ -68,10 +67,7 @@ final class Build_Plans_Screen {
 	}
 
 	private function render_list( bool $embed_in_hub = false ): void {
-		$grouped = array();
-		if ( $this->container !== null ) {
-			$grouped = $this->container->get( 'build_plan_lineage_service' )->list_lineages_with_versions_for_admin();
-		}
+		$grouped = $this->container->get( 'build_plan_lineage_service' )->list_lineages_with_versions_for_admin();
 		$orphans = $this->query_unversioned_build_plan_rows();
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
@@ -184,7 +180,7 @@ final class Build_Plans_Screen {
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function query_unversioned_build_plan_rows(): array {
-		if ( ! $this->container || ! $this->container->has( 'build_plan_repository' ) ) {
+		if ( ! $this->container->has( 'build_plan_repository' ) ) {
 			return array();
 		}
 		try {

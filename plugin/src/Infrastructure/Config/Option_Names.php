@@ -63,6 +63,12 @@ final class Option_Names {
 	/** Onboarding draft state (secret-free; shape per onboarding-state-machine.md ?7). */
 	public const ONBOARDING_DRAFT = self::PREFIX . 'onboarding_draft';
 
+	/**
+	 * Aggregate onboarding telemetry (event ids, step keys, timestamps only; no PII).
+	 * Internal; shape {@see \AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Telemetry::OPTION_SHAPE_VERSION}.
+	 */
+	public const ONBOARDING_TELEMETRY_AGGREGATE = self::PREFIX . 'onboarding_telemetry_agg';
+
 	/** Prompt experiment definitions (Prompt 121; no secrets). */
 	public const PROMPT_EXPERIMENTS = self::PREFIX . 'prompt_experiments';
 
@@ -142,6 +148,7 @@ final class Option_Names {
 			self::UNINSTALL_PREFS,
 			self::PROVIDER_CONFIG_REF,
 			self::PROFILE_CURRENT,
+			self::ONBOARDING_TELEMETRY_AGGREGATE,
 		);
 	}
 

@@ -28,7 +28,6 @@ use AIOPageBuilder\Admin\Screens\Templates\Section_Templates_Directory_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
-use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics\ACF_Architecture_Diagnostics_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics\Form_Provider_Health_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
@@ -68,11 +67,7 @@ use AIOPageBuilder\Infrastructure\Container\Service_Container;
  */
 final class Admin_Menu_Hub_Renderer {
 
-	/** @var Service_Container|null */
-	private $container;
-
-	/** @var Dashboard_Screen */
-	private $dashboard;
+	private Service_Container $container;
 
 	/** @var Settings_Screen */
 	private $settings;
@@ -213,14 +208,13 @@ final class Admin_Menu_Hub_Renderer {
 	private $import_export;
 
 	/**
-	 * @param Service_Container|null         $container         Service container.
+	 * @param Service_Container              $container         Service container.
 	 * @param Profile_Snapshot_History_Panel $profile_snapshots Shared panel instance (hooks registered by caller).
 	 */
-	public function __construct( ?Service_Container $container, Profile_Snapshot_History_Panel $profile_snapshots ) {
+	public function __construct( Service_Container $container, Profile_Snapshot_History_Panel $profile_snapshots ) {
 		$this->container         = $container;
 		$this->profile_snapshots = $profile_snapshots;
 
-		$this->dashboard                             = new Dashboard_Screen( $this->container );
 		$this->settings                              = new Settings_Screen();
 		$this->privacy_reporting                     = new Privacy_Reporting_Settings_Screen( $this->container );
 		$this->diagnostics                           = new Diagnostics_Screen();
@@ -883,7 +877,7 @@ final class Admin_Menu_Hub_Renderer {
 	 * @return void
 	 */
 	private function render_ai_workspace_credential_trust_banner(): void {
-		if ( ! $this->container || ! $this->container->has( 'ai_providers_ui_state_builder' ) ) {
+		if ( ! $this->container->has( 'ai_providers_ui_state_builder' ) ) {
 			return;
 		}
 		$builder = $this->container->get( 'ai_providers_ui_state_builder' );

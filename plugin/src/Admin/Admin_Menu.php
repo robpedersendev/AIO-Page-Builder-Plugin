@@ -68,10 +68,9 @@ final class Admin_Menu {
 
 	private const PARENT_SLUG = 'aio-page-builder';
 
-	/** @var Service_Container|null */
-	private $container;
+	private Service_Container $container;
 
-	public function __construct( ?Service_Container $container = null ) {
+	public function __construct( Service_Container $container ) {
 		$this->container = $container;
 	}
 
@@ -164,10 +163,6 @@ final class Admin_Menu {
 			exit;
 		}
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
-			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
-			exit;
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=error' );
 			exit;
 		}
@@ -294,7 +289,7 @@ final class Admin_Menu {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
 			exit;
 		}
-		if ( ! $this->container instanceof Service_Container || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ) {
+		if ( ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ) {
 			\wp_safe_redirect( $redirect_url . '&aio_industry_result=toggle_error' );
 			exit;
 		}
@@ -328,10 +323,6 @@ final class Admin_Menu {
 			exit;
 		}
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_SETTINGS ) ) {
-			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
-			exit;
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			\wp_safe_redirect( $redirect_url . '&aio_style_preset_msg=error' );
 			exit;
 		}
@@ -411,7 +402,7 @@ final class Admin_Menu {
 		$deprecated_key = isset( $_POST['deprecated_pack_key'] ) && \is_string( $_POST['deprecated_pack_key'] )
 			? \trim( \sanitize_text_field( \wp_unslash( $_POST['deprecated_pack_key'] ) ) )
 			: '';
-		if ( $deprecated_key === '' || ! $this->container instanceof Service_Container || ! $this->container->has( 'industry_pack_migration_executor' ) ) {
+		if ( $deprecated_key === '' || ! $this->container->has( 'industry_pack_migration_executor' ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
@@ -448,7 +439,7 @@ final class Admin_Menu {
 			? \trim( \sanitize_text_field( \wp_unslash( $_POST['profile_value'] ) ) )
 			: '';
 		$allowed = array( \AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema::FIELD_SELECTED_STARTER_BUNDLE_KEY );
-		if ( $field === '' || ! \in_array( $field, $allowed, true ) || ! $this->container instanceof Service_Container || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+		if ( $field === '' || ! \in_array( $field, $allowed, true ) || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
@@ -481,7 +472,7 @@ final class Admin_Menu {
 		$industry_key = isset( $_POST['industry_pack_key'] ) && \is_string( $_POST['industry_pack_key'] )
 			? \trim( \sanitize_text_field( \wp_unslash( $_POST['industry_pack_key'] ) ) )
 			: '';
-		if ( $industry_key === '' || ! $this->container instanceof Service_Container || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ) {
+		if ( $industry_key === '' || ! $this->container->has( \AIOPageBuilder\Bootstrap\Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PACK_TOGGLE_CONTROLLER ) ) {
 			\wp_safe_redirect( \add_query_arg( 'aio_repair_result', 'error', $redirect ) );
 			exit;
 		}
@@ -564,7 +555,7 @@ final class Admin_Menu {
 		}
 		$bundle        = $parse_result['bundle'];
 		$screen        = new Industry_Bundle_Import_Preview_Screen( $this->container );
-		$settings      = $this->container instanceof Service_Container && $this->container->has( 'settings' ) ? $this->container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+		$settings      = $this->container->has( 'settings' ) ? $this->container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
 		$apply_service = new Industry_Bundle_Apply_Service(
 			$settings instanceof \AIOPageBuilder\Infrastructure\Settings\Settings_Service ? $settings : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service(),
 			new Industry_Bundle_Conflict_Scanner()
@@ -644,7 +635,7 @@ final class Admin_Menu {
 			}
 		}
 
-		$settings = $this->container instanceof Service_Container && $this->container->has( 'settings' ) ? $this->container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
+		$settings = $this->container->has( 'settings' ) ? $this->container->get( 'settings' ) : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service();
 		$apply    = new Industry_Bundle_Apply_Service(
 			$settings instanceof \AIOPageBuilder\Infrastructure\Settings\Settings_Service ? $settings : new \AIOPageBuilder\Infrastructure\Settings\Settings_Service(),
 			new Industry_Bundle_Conflict_Scanner()
@@ -742,10 +733,6 @@ final class Admin_Menu {
 			\wp_safe_redirect( $redirect_error );
 			exit;
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			\wp_safe_redirect( $redirect_error );
-			exit;
-		}
 		try {
 			if ( ! $this->container->has( 'section_registry_service' ) || ! $this->container->has( 'page_template_repository' ) ) {
 				Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_MENU_SEED_FORM_TEMPLATES_NOT_REGISTERED, '' );
@@ -794,9 +781,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_expansion_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_expansion_seed_result' => 'error' ) );
-		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_expansion_seed_result' => 'error' ) );
@@ -829,9 +813,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_hero_intro_batch_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_hero_intro_batch_seed_result' => 'error' ) );
-		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_hero_intro_batch_seed_result' => 'error' ) );
@@ -859,9 +840,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_trust_proof_batch_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_trust_proof_batch_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_trust_proof_batch_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
@@ -893,9 +871,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_fb_value_batch_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_fb_value_batch_seed_result' => 'error' ) );
-		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_fb_value_batch_seed_result' => 'error' ) );
@@ -923,9 +898,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_ptf_batch_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_ptf_batch_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_ptf_batch_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
@@ -957,9 +929,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_mlp_batch_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_mlp_batch_seed_result' => 'error' ) );
-		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_mlp_batch_seed_result' => 'error' ) );
@@ -987,9 +956,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_lpu_batch_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_lpu_batch_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_lpu_batch_seed_result' => 'error' ) );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
@@ -1021,9 +987,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_cta_super_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_cta_super_seed_result' => 'error' ) );
-		}
 		$section_repo = $this->container->get( 'section_template_repository' );
 		if ( ! $section_repo instanceof Section_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_cta_super_seed_result' => 'error' ) );
@@ -1051,9 +1014,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_pt_comp_expansion_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_page_and_composition_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_pt_comp_expansion_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_pt_comp_expansion_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
@@ -1087,9 +1047,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_marketing_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_marketing_seed_result' => 'error' ) );
-		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_marketing_seed_result' => 'error' ) );
@@ -1117,9 +1074,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_legal_utility_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_legal_utility_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_legal_utility_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
@@ -1151,9 +1105,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_edu_resource_authority_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_edu_resource_authority_seed_result' => 'error' ) );
-		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_edu_resource_authority_seed_result' => 'error' ) );
@@ -1181,9 +1132,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_variant_expansion_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_variant_expansion_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_top_level_variant_expansion_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
@@ -1215,9 +1163,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_hub_page_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_hub_page_seed_result' => 'error' ) );
-		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_hub_page_seed_result' => 'error' ) );
@@ -1245,9 +1190,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_geographic_hub_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_geographic_hub_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_geographic_hub_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
@@ -1279,9 +1221,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_nested_hub_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_nested_hub_seed_result' => 'error' ) );
-		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_nested_hub_seed_result' => 'error' ) );
@@ -1309,9 +1248,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_hub_nested_hub_variant_expansion_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_hub_nested_hub_variant_expansion_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_hub_nested_hub_variant_expansion_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
@@ -1343,9 +1279,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_seed_result' => 'error' ) );
-		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_seed_result' => 'error' ) );
@@ -1373,9 +1306,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_product_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_product_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_product_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
@@ -1407,9 +1337,6 @@ final class Admin_Menu {
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_profile_entity_seed_result' => 'error' ) );
 		}
-		if ( ! $this->container instanceof Service_Container ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_profile_entity_seed_result' => 'error' ) );
-		}
 		$page_repo = $this->container->get( 'page_template_repository' );
 		if ( ! $page_repo instanceof Page_Template_Repository ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_profile_entity_seed_result' => 'error' ) );
@@ -1437,9 +1364,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_variant_expansion_seed_result' => 'error' ) );
 		}
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_variant_expansion_seed_result' => 'error' ) );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( array( 'aio_child_detail_variant_expansion_seed_result' => 'error' ) );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );
@@ -1470,9 +1394,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( $err );
 		}
 		if ( ! $this->current_user_can_settings_hub_section_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( $err );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( $err );
 		}
 		$section_repo = $this->container->get( 'section_template_repository' );
@@ -1509,9 +1430,6 @@ final class Admin_Menu {
 			$this->redirect_settings_section_page_seeding( $err );
 		}
 		if ( ! $this->current_user_can_settings_hub_page_batch_seed() || ! $this->current_user_can_settings_hub_page_and_composition_batch_seed() ) {
-			$this->redirect_settings_section_page_seeding( $err );
-		}
-		if ( ! $this->container instanceof Service_Container ) {
 			$this->redirect_settings_section_page_seeding( $err );
 		}
 		$page_repo = $this->container->get( 'page_template_repository' );

@@ -11,6 +11,7 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_User_Facing_Status;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
 use AIOPageBuilder\Domain\AI\Secrets\Provider_Secret_Store_Interface;
 use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Definitions;
@@ -39,6 +40,8 @@ require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Step_Keys.php'
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Draft_Service.php';
 require_once $plugin_root . '/src/Domain/AI/Secrets/Provider_Secret_Store_Interface.php';
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Prefill_Service.php';
+require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_Step_Readiness.php';
+require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_User_Facing_Status.php';
 require_once $plugin_root . '/src/Domain/AI/Onboarding/Onboarding_UI_State_Builder.php';
 require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Schema.php';
 require_once $plugin_root . '/src/Domain/Industry/Profile/Industry_Profile_Repository.php';
@@ -51,6 +54,13 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 		$store = $this->createMock( Provider_Secret_Store_Interface::class );
 		$store->method( 'get_credential_state' )->willReturn( Provider_Secret_Store_Interface::STATE_ABSENT );
 		$store->method( 'has_credential' )->willReturn( false );
+		return $store;
+	}
+
+	private function stub_secret_store_ready(): Provider_Secret_Store_Interface {
+		$store = $this->createMock( Provider_Secret_Store_Interface::class );
+		$store->method( 'get_credential_state' )->willReturn( Provider_Secret_Store_Interface::STATE_CONFIGURED );
+		$store->method( 'has_credential' )->willReturn( true );
 		return $store;
 	}
 
@@ -82,6 +92,11 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 		$this->assertArrayHasKey( 'overall_status', $state );
 		$this->assertArrayHasKey( 'is_blocked', $state );
 		$this->assertArrayHasKey( 'blockers', $state );
+		$this->assertArrayHasKey( 'review_advisories', $state );
+		$this->assertArrayHasKey( 'user_facing_status', $state );
+		$this->assertIsArray( $state['user_facing_status'] );
+		$this->assertArrayHasKey( 'crawl_context', $state );
+		$this->assertIsArray( $state['crawl_context'] );
 		$this->assertArrayHasKey( 'prefill', $state );
 		$this->assertArrayHasKey( 'nonce', $state );
 		$this->assertArrayHasKey( 'is_provider_ready', $state );
@@ -89,6 +104,38 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 		$this->assertCount( 12, $state['steps'] );
 		$this->assertArrayHasKey( 'profile', $state['prefill'] );
 		$this->assertArrayHasKey( Profile_Schema::ROOT_TEMPLATE_PREFERENCE_PROFILE, $state['prefill']['profile'] );
+	}
+
+	public function test_at_review_with_valid_data_and_provider_shows_advisory_for_placeholder_business_name(): void {
+		$settings      = new Settings_Service();
+		$draft_svc     = new Onboarding_Draft_Service( $settings );
+		$draft         = $draft_svc->get_draft();
+		$draft['current_step_key'] = Onboarding_Step_Keys::REVIEW;
+		$draft['overall_status']   = Onboarding_Statuses::IN_PROGRESS;
+		$draft_svc->save_draft( $draft );
+		$normalizer    = new Profile_Normalizer();
+		$profile_store = new Profile_Store( $settings, $normalizer );
+		$profile_store->merge_business_profile(
+			array(
+				'business_name'             => 'test',
+				'business_type'             => 'Consulting',
+				'target_audience_summary'   => 'Small businesses needing structured sites.',
+				'primary_offers_summary'    => 'Implementation and templates.',
+				'core_geographic_market'    => 'United States',
+			)
+		);
+		$profile_store->merge_brand_profile(
+			array(
+				'brand_positioning_summary' => 'We simplify complex builds.',
+				'brand_voice_summary'       => 'Clear and direct.',
+			)
+		);
+		$prefill_svc = new Onboarding_Prefill_Service( $profile_store, $settings, null, $this->stub_secret_store_ready() );
+		$builder     = new Onboarding_UI_State_Builder( $draft_svc, $prefill_svc );
+		$state       = $builder->build_for_screen();
+		$this->assertFalse( $state['is_blocked'] );
+		$this->assertNotEmpty( $state['review_advisories'] );
+		$this->assertSame( Onboarding_User_Facing_Status::KEY_READY_FOR_REVIEW, $state['user_facing_status']['key'] ?? '' );
 	}
 
 	public function test_at_review_without_provider_sets_blocked(): void {

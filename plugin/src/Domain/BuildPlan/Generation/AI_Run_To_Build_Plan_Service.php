@@ -36,10 +36,10 @@ final class AI_Run_To_Build_Plan_Service {
 		Build_Plan_Generator $plan_generator,
 		Build_Plan_Repository $plan_repository
 	) {
-		$this->run_service       = $run_service;
-		$this->artifact_service  = $artifact_service;
-		$this->plan_generator    = $plan_generator;
-		$this->plan_repository   = $plan_repository;
+		$this->run_service      = $run_service;
+		$this->artifact_service = $artifact_service;
+		$this->plan_generator   = $plan_generator;
+		$this->plan_repository  = $plan_repository;
 	}
 
 	/**

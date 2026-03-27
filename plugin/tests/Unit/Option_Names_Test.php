@@ -28,7 +28,7 @@ final class Option_Names_Test extends TestCase {
 
 	public function test_all_returns_all_option_keys(): void {
 		$all = Option_Names::all();
-		$this->assertCount( 7, $all );
+		$this->assertCount( 8, $all );
 		$this->assertContains( Option_Names::MAIN_SETTINGS, $all );
 		$this->assertContains( Option_Names::VERSION_MARKERS, $all );
 		$this->assertContains( Option_Names::REPORTING_SETTINGS, $all );
@@ -36,6 +36,7 @@ final class Option_Names_Test extends TestCase {
 		$this->assertContains( Option_Names::UNINSTALL_PREFS, $all );
 		$this->assertContains( Option_Names::PROVIDER_CONFIG_REF, $all );
 		$this->assertContains( Option_Names::PROFILE_CURRENT, $all );
+		$this->assertContains( Option_Names::ONBOARDING_TELEMETRY_AGGREGATE, $all );
 	}
 
 	public function test_is_valid_accepts_all_constants(): void {

@@ -108,9 +108,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				)
 			),
 		);
-		$draft   = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 10 ) );
-		$prefill = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) ) );
-		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
+		$draft                          = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 10 ) );
+		$prefill                        = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) ) );
+		$w                              = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertSame( array(), $w );
 	}
 
@@ -140,9 +140,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				)
 			),
 		);
-		$draft   = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 10 ) );
-		$prefill = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) ) );
-		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
+		$draft                          = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 10 ) );
+		$prefill                        = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => gmdate( 'c', time() - 86400 ) ) );
+		$w                              = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertCount( 1, $w );
 		$this->assertSame( 'profile_updated_since_last_run', $w[0]['code'] );
 	}
@@ -185,9 +185,9 @@ final class Onboarding_UI_State_Builder_Submission_Warnings_Test extends TestCas
 				)
 			),
 		);
-		$draft   = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 10 ) );
-		$prefill = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => '1990-01-01T00:00:00Z' ) );
-		$w       = $this->invoke_warnings( $builder, $draft, $prefill );
+		$draft                          = \array_merge( $this->valid_draft_base(), array( 'last_planning_run_post_id' => 10 ) );
+		$prefill                        = \array_merge( $this->valid_prefill_base(), array( 'latest_crawl_session_timestamp' => '1990-01-01T00:00:00Z' ) );
+		$w                              = $this->invoke_warnings( $builder, $draft, $prefill );
 		$this->assertCount( 2, $w );
 		$codes = array( $w[0]['code'], $w[1]['code'] );
 		$this->assertContains( 'profile_updated_since_last_run', $codes );

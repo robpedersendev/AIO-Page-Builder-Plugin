@@ -133,8 +133,8 @@ final class Industry_Bundle_Import_Preview_Screen {
 			return null;
 		}
 		\delete_transient( $transient_key );
-		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( (string) $_SERVER['REQUEST_URI'] ) ) : '';
-		return \remove_query_arg( array( 'aio_bundle_cancel', '_wpnonce' ), $request_uri );
+
+		return \remove_query_arg( array( 'aio_bundle_cancel', '_wpnonce' ), $this->get_current_request_uri() );
 	}
 
 	/**
@@ -330,5 +330,16 @@ final class Industry_Bundle_Import_Preview_Screen {
 			</p>
 		</form>
 		<?php
+	}
+
+	/**
+	 * Returns the current request URI as a sanitized string.
+	 *
+	 * @return string
+	 */
+	private function get_current_request_uri(): string {
+		$request_uri = \filter_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
+
+		return is_string( $request_uri ) ? $request_uri : '';
 	}
 }

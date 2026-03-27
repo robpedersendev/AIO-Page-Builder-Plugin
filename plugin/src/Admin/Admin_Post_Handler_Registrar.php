@@ -6,6 +6,7 @@
  *
  * Covered groups: Admin_Menu (seeds, industry, bundles, guided repair, overrides), Queue_Logs_Screen,
  * Import_Export_Screen, Profile_Snapshot_History_Panel (via Admin_Menu::register_admin_post_actions).
+ * Call only from {@see \AIOPageBuilder\Bootstrap\Plugin::register_admin_post_handlers()} with the container from {@see \AIOPageBuilder\Bootstrap\Plugin::run()}.
  *
  * @package AIOPageBuilder
  */
@@ -28,10 +29,13 @@ final class Admin_Post_Handler_Registrar {
 	/**
 	 * Registers every admin_post_* callback used by the plugin.
 	 *
-	 * @param Service_Container|null $container Plugin service container.
+	 * Requires the real bootstrap {@see \AIOPageBuilder\Bootstrap\Plugin} container. Passing null is not supported;
+	 * admin-post handlers would not register and form POSTs to admin-post.php would not dispatch.
+	 *
+	 * @param Service_Container $container Plugin service container from {@see \AIOPageBuilder\Bootstrap\Plugin::run()}.
 	 * @return void
 	 */
-	public static function register_all( ?Service_Container $container ): void {
+	public static function register_all( Service_Container $container ): void {
 		$menu = new Admin_Menu( $container );
 		$menu->register_admin_post_actions();
 

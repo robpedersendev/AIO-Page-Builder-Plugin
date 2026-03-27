@@ -11,6 +11,10 @@ plugin/vendor/
 coverage/
 *.log
 *.log.*
+plugin/phpcs*.txt
+plugin/phpcs*.csv
+plugin/phpcs*.json
+plugin/tests-phpcs*.txt
 
 # -----------------------------------------------------------------------------
 # Environment files (secrets, local overrides)
@@ -28,6 +32,12 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+
+# -----------------------------------------------------------------------------
+# Release build output (tools/build-release-package.php → dist/release; legacy build/ may exist locally)
+# -----------------------------------------------------------------------------
+build/
+dist/
 
 # -----------------------------------------------------------------------------
 # Optional: WordPress local / dev artifacts
