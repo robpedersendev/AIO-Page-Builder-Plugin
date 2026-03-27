@@ -156,9 +156,10 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	 * @param string                    $item_id    Item id to update.
 	 * @param string                    $new_status New status (e.g. approved, completed).
 	 * @param array<string, mixed>|null $execution_artifact Optional artifact (e.g. post_id, target_post_id) for finalization publish.
+	 * @param array<string, mixed>|null $review_decision    Optional deny audit when status is rejected.
 	 * @return bool True if item was found and updated; false otherwise.
 	 */
-	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null ): bool {
+	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null, ?array $review_decision = null ): bool {
 		$definition = $this->get_plan_definition( $post_id );
 		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]

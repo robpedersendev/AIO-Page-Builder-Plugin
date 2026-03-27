@@ -1,14 +1,15 @@
 import { defineConfig } from '@playwright/test';
 
 const baseURL = process.env.WP_BASE_URL ?? 'http://localhost:8888';
+const isCi = Boolean( process.env.CI );
 
 export default defineConfig({
 	testDir: './tests',
 	fullyParallel: false,
-	retries: process.env.CI ? 1 : 0,
+	retries: isCi ? 1 : 0,
 	use: {
 		baseURL,
-		trace: 'on-first-retry',
+		trace: isCi ? 'retain-on-failure' : 'on-first-retry',
 		screenshot: 'only-on-failure',
 		video: 'retain-on-failure',
 	},
@@ -16,5 +17,9 @@ export default defineConfig({
 		timeout: 15_000,
 	},
 	timeout: 60_000,
-	reporter: [['list'], ['html', { open: 'never' }]],
+	reporter: [
+		[ 'list' ],
+		[ 'html', { open: 'never', outputFolder: 'playwright-report' } ],
+	],
+	outputDir: 'test-results',
 });

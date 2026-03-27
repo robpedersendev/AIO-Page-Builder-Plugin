@@ -23,8 +23,9 @@ use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
  *
  * Spec §53.6 mapping: export opportunity and cleanup choices are UI-level; this service runs only after
  * {@see Option_Names::PB_UNINSTALL_CLEANUP_MODE} is {@see Uninstall_Cleanup_Service::cleanup_if_confirmed() confirmed_cleanup}.
- * Option deletion uses {@see Uninstall_Option_Registry::removable_declared_option_keys()} plus industry-bundle dynamic keys
- * handled first in {@see Uninstall_Cleanup_Service::remove_industry_bundle_apply_storage_options()}.
+ * Option deletion uses {@see Uninstall_Option_Cleanup_Helper} with {@see Uninstall_Option_Registry} for declared keys,
+ * industry-bundle dynamic keys in {@see Uninstall_Cleanup_Service::remove_industry_bundle_apply_storage_options()},
+ * then prefix-scoped operational keys (crawl sessions, spend caps).
  */
 final class Uninstall_Cleanup_Service {
 
@@ -70,13 +71,11 @@ final class Uninstall_Cleanup_Service {
 
 		$options_removed += $this->remove_industry_bundle_apply_storage_options();
 
-		foreach ( Uninstall_Option_Registry::removable_declared_option_keys() as $option_key ) {
-			if ( delete_option( $option_key ) ) {
-				++$options_removed;
-			}
-		}
+		$options_removed += Uninstall_Option_Cleanup_Helper::delete_declared_options();
 
 		if ( $this->wpdb instanceof \wpdb ) {
+			$options_removed += Uninstall_Option_Cleanup_Helper::delete_options_matching_dynamic_prefixes( $this->wpdb );
+
 			$prefix = $this->wpdb->prefix;
 			foreach ( Table_Names::all() as $suffix ) {
 				$suffix = (string) $suffix;
@@ -149,8 +148,8 @@ final class Uninstall_Cleanup_Service {
 			if ( $key === '' ) {
 				continue;
 			}
-			$payload_key   = 'aio_pb_industry_bundle_payload_' . $key;
-			$conflicts_key = 'aio_pb_industry_bundle_conflicts_' . $key;
+			$payload_key   = Uninstall_Option_Registry::INDUSTRY_BUNDLE_PAYLOAD_PREFIX . $key;
+			$conflicts_key = Uninstall_Option_Registry::INDUSTRY_BUNDLE_CONFLICTS_PREFIX . $key;
 			if ( \delete_option( $payload_key ) ) {
 				++$removed;
 			}

@@ -51,6 +51,16 @@ final class Option_Names {
 	/** Provider config reference only; secrets live in separate storage (not in exportable blob). */
 	public const PROVIDER_CONFIG_REF = self::PREFIX . 'provider_config';
 
+	/**
+	 * Segregated provider credential storage (not in {@see self::all()}; never exported; removed on confirmed uninstall).
+	 */
+	public const PROVIDER_SECRETS = self::PREFIX . 'provider_secrets';
+
+	/**
+	 * Bounded operator audit log for queue recovery actions (spec §42.4); removed on confirmed uninstall.
+	 */
+	public const QUEUE_RECOVERY_AUDIT = self::PREFIX . 'queue_recovery_audit';
+
 	/** Provider health: connection_test_result and last_successful_use per provider (no secrets; spec ?49.9). */
 	public const PROVIDER_HEALTH_STATE = self::PREFIX . 'provider_health_state';
 

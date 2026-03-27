@@ -26,4 +26,13 @@ final class Uninstall_Option_Registry_Test extends TestCase {
 		$this->assertContains( Option_Names::PB_INDUSTRY_BUNDLE_REGISTRY, $keys );
 		$this->assertContains( Option_Names::PB_INDUSTRY_BUNDLE_MERGE_STATE, $keys );
 	}
+
+	public function test_dynamic_prefixes_cover_operational_option_patterns(): void {
+		$prefixes = Uninstall_Option_Registry::removable_dynamic_option_prefixes();
+		$this->assertContains( 'aio_pb_monthly_spend_', $prefixes );
+		$this->assertContains( 'aio_pb_spend_cap_', $prefixes );
+		$this->assertContains( 'aio_page_builder_crawl_session_', $prefixes );
+		$this->assertContains( 'aio_page_builder_crawl_lock_', $prefixes );
+		$this->assertSame( count( $prefixes ), count( array_unique( $prefixes ) ) );
+	}
 }

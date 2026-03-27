@@ -14,6 +14,7 @@ use AIOPageBuilder\Domain\Execution\Queue\Queue_Health_Summary_Builder;
 use AIOPageBuilder\Domain\Execution\Queue\Queue_Recovery_Repository_Interface;
 use AIOPageBuilder\Domain\Execution\Queue\Queue_Recovery_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Status;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -24,6 +25,7 @@ require_once $plugin_root . '/src/Domain/Execution/Queue/Queue_Recovery_Service.
 require_once $plugin_root . '/src/Domain/Execution/Queue/Queue_Health_Summary_Builder.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Job_Queue_Status.php';
 require_once $plugin_root . '/src/Domain/Execution/Contracts/Execution_Action_Types.php';
+require_once $plugin_root . '/src/Infrastructure/Config/Option_Names.php';
 
 /**
  * In-memory stub for Queue_Recovery_Repository_Interface (recovery tests).
@@ -198,7 +200,7 @@ final class Queue_Recovery_And_Health_Test extends TestCase {
 		$option_before           = \get_option( 'aio_page_builder_queue_recovery_audit', array() );
 		$service                 = new Queue_Recovery_Service( $repo, null );
 		$service->retry_job( 'job_log_1', 'user:42' );
-		$option_after = \get_option( 'aio_page_builder_queue_recovery_audit', array() );
+		$option_after = \get_option( Option_Names::QUEUE_RECOVERY_AUDIT, array() );
 		$this->assertIsArray( $option_after );
 		$this->assertGreaterThanOrEqual( count( $option_before ), count( $option_after ) );
 		$last = end( $option_after );

@@ -49,4 +49,19 @@ final class Uninstall_Option_Registry {
 	public static function removable_declared_option_keys(): array {
 		return Option_Names::declared_option_keys();
 	}
+
+	/**
+	 * Non-static option keys stored with a bounded prefix (per-provider spend caps, crawl sessions, etc.).
+	 * Each prefix is plugin-owned; removal uses a LIKE match on `wp_options.option_name` only for these literals.
+	 *
+	 * @return list<string>
+	 */
+	public static function removable_dynamic_option_prefixes(): array {
+		return array(
+			'aio_pb_monthly_spend_',
+			'aio_pb_spend_cap_',
+			'aio_page_builder_crawl_session_',
+			'aio_page_builder_crawl_lock_',
+		);
+	}
 }

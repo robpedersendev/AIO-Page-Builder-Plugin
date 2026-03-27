@@ -11,6 +11,15 @@
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
+$aio_page_builder_vendor_autoload   = __DIR__ . '/vendor/autoload.php';
+$aio_page_builder_internal_autoload = __DIR__ . '/src/Bootstrap/Internal_Autoloader.php';
+if ( is_readable( $aio_page_builder_vendor_autoload ) ) {
+	require_once $aio_page_builder_vendor_autoload;
+} elseif ( is_readable( $aio_page_builder_internal_autoload ) ) {
+	require_once $aio_page_builder_internal_autoload;
+	\AIOPageBuilder\Bootstrap\Internal_Autoloader::register();
+}
+
 require_once __DIR__ . '/src/Bootstrap/Constants.php';
 \AIOPageBuilder\Bootstrap\Constants::init();
 require_once __DIR__ . '/src/Infrastructure/Config/Capabilities.php';

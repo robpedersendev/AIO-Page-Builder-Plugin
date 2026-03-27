@@ -12,13 +12,12 @@ namespace AIOPageBuilder\Domain\AI\Secrets;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
+
 /**
  * Persists provider credentials in a single dedicated option. Not in Option_Names::all(); never exported.
  */
 final class Option_Based_Provider_Secret_Store implements Provider_Secret_Store_Interface {
-
-	/** Option key for secret material. Intentionally not in Option_Names so it is never exported. */
-	private const OPTION_KEY = 'aio_page_builder_provider_secrets';
 
 	/** @var array<string, array{value: string, state: string}> */
 	private array $cache = array();
@@ -76,6 +75,6 @@ final class Option_Based_Provider_Secret_Store implements Provider_Secret_Store_
 	}
 
 	private function persist(): void {
-		\update_option( self::OPTION_KEY, $this->cache, false );
+		\update_option( Option_Names::PROVIDER_SECRETS, $this->cache, false );
 	}
 }

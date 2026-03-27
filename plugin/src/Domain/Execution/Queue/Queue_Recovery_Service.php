@@ -17,6 +17,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Execution\Contracts\Execution_Action_Types;
 use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Status;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Performs retry and cancel recovery actions; logs all operator actions.
@@ -24,7 +25,6 @@ use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Status;
 final class Queue_Recovery_Service {
 
 	private const MAX_RETRY_COUNT = 5;
-	private const AUDIT_OPTION    = 'aio_page_builder_queue_recovery_audit';
 	private const AUDIT_MAX       = 100;
 
 	/** @var Queue_Recovery_Repository_Interface */
@@ -173,13 +173,13 @@ final class Queue_Recovery_Service {
 			'success'         => $success,
 			'recorded_at'     => current_time( 'mysql' ),
 		);
-		$log   = \get_option( self::AUDIT_OPTION, array() );
+		$log   = \get_option( Option_Names::QUEUE_RECOVERY_AUDIT, array() );
 		if ( ! is_array( $log ) ) {
 			$log = array();
 		}
 		$log[] = $entry;
 		$log   = array_slice( $log, -self::AUDIT_MAX );
-		\update_option( self::AUDIT_OPTION, $log, false );
+		\update_option( Option_Names::QUEUE_RECOVERY_AUDIT, $log, false );
 
 		if ( $this->logger !== null && method_exists( $this->logger, 'info' ) ) {
 			$this->logger->info( 'Queue recovery action', array( 'recovery' => $entry ) );
