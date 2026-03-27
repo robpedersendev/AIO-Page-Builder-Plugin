@@ -26,6 +26,8 @@ final class Build_Plan_Item_Schema {
 	public const KEY_BLOCKS_ITEM_IDS     = 'blocks_item_ids';
 	public const KEY_BLOCKING            = 'blocking';
 	public const KEY_STATUS              = 'status';
+	/** Optional structured review/deny audit (see {@see \AIOPageBuilder\Domain\BuildPlan\Build_Plan_Review_Decision_Meta}). */
+	public const KEY_REVIEW_DECISION     = 'review_decision';
 	public const KEY_SOURCE_SECTION      = 'source_section';
 	public const KEY_SOURCE_INDEX        = 'source_index';
 	public const KEY_CONFIDENCE          = 'confidence';

@@ -376,6 +376,7 @@ final class Build_Plan_Workspace_Screen {
 				return false;
 			}
 			$service = $this->container->get( 'new_page_creation_bulk_action_service' );
+			$actor   = (int) \get_current_user_id();
 			if ( $action === 'bulk_build_all_step2' ) {
 				$service->bulk_approve_all_eligible( $plan_post_id );
 			} elseif ( $action === 'bulk_deny_all_step2' ) {
@@ -384,7 +385,7 @@ final class Build_Plan_Workspace_Screen {
 					\wp_safe_redirect( \add_query_arg( array( 'step2_bulk_deny_error' => 'confirm_required' ), $redirect_url ) );
 					exit;
 				}
-				$count = (int) $service->bulk_deny_all_eligible( $plan_post_id );
+				$count = (int) $service->bulk_deny_all_eligible( $plan_post_id, $actor );
 				\wp_safe_redirect(
 					\add_query_arg(
 						array(
@@ -412,7 +413,7 @@ final class Build_Plan_Workspace_Screen {
 					exit;
 				}
 				if ( $action === 'bulk_deny_selected_step2' ) {
-					$count = (int) $service->bulk_deny_selected( $plan_post_id, $selected );
+					$count = (int) $service->bulk_deny_selected( $plan_post_id, $selected, $actor );
 					\wp_safe_redirect(
 						\add_query_arg(
 							array(
@@ -445,16 +446,20 @@ final class Build_Plan_Workspace_Screen {
 				return false;
 			}
 			$service = $this->container->get( 'new_page_creation_bulk_action_service' );
+			$actor   = (int) \get_current_user_id();
 			$updated = false;
 			if ( $get_action === 'approve_item' ) {
 				$updated = (bool) $service->approve_item( $plan_post_id, $item_id );
 			}
 			if ( $get_action === 'deny_item' ) {
-				$updated = (bool) $service->deny_item( $plan_post_id, $item_id );
+				$updated = (bool) $service->deny_item( $plan_post_id, $item_id, $actor );
 			}
-			$target = ( $get_action === 'deny_item' && $updated )
-				? \add_query_arg( array( 'step2_row_deny_done' => '1' ), $redirect_url )
-				: $redirect_url;
+			$target = $redirect_url;
+			if ( $get_action === 'deny_item' ) {
+				$target = $updated
+					? \add_query_arg( array( 'step2_row_deny_done' => '1' ), $redirect_url )
+					: \add_query_arg( array( 'step2_row_deny_failed' => '1' ), $redirect_url );
+			}
 			\wp_safe_redirect( $target );
 			exit;
 		}
@@ -1779,7 +1784,7 @@ final class Build_Plan_Workspace_Screen {
 	private function render_not_found( string $plan_id ): void {
 		$list_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
 		?>
-		<div class="wrap aio-page-builder-screen aio-build-plan-workspace" role="main" aria-label="<?php \esc_attr_e( 'Build Plan', 'aio-page-builder' ); ?>">
+		<div class="wrap aio-page-builder-screen aio-build-plan-workspace" data-testid="aio-build-plan-not-found" role="main" aria-label="<?php \esc_attr_e( 'Build Plan', 'aio-page-builder' ); ?>">
 			<h1><?php \esc_html_e( 'Build Plan', 'aio-page-builder' ); ?></h1>
 			<p class="aio-admin-notice"><?php \esc_html_e( 'Plan not found.', 'aio-page-builder' ); ?></p>
 			<p><a href="<?php echo \esc_url( $list_url ); ?>"><?php \esc_html_e( 'Back to Build Plans', 'aio-page-builder' ); ?></a></p>
@@ -2303,8 +2308,9 @@ final class Build_Plan_Workspace_Screen {
 		$bulk_count    = isset( $_GET['step2_bulk_deny_count'] ) && is_numeric( $_GET['step2_bulk_deny_count'] )
 			? (int) $_GET['step2_bulk_deny_count']
 			: 0;
-		$row_deny_done = isset( $_GET['step2_row_deny_done'] ) && $_GET['step2_row_deny_done'] === '1';
-		$bulk_error    = isset( $_GET['step2_bulk_deny_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step2_bulk_deny_error'] ) ) : '';
+		$row_deny_done   = isset( $_GET['step2_row_deny_done'] ) && $_GET['step2_row_deny_done'] === '1';
+		$row_deny_failed = isset( $_GET['step2_row_deny_failed'] ) && $_GET['step2_row_deny_failed'] === '1';
+		$bulk_error      = isset( $_GET['step2_bulk_deny_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step2_bulk_deny_error'] ) ) : '';
 		$build_error   = isset( $_GET['step2_bulk_build_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step2_bulk_build_error'] ) ) : '';
 
 		if ( $deny_sel_done ) {
@@ -2343,6 +2349,16 @@ final class Build_Plan_Workspace_Screen {
 				array(
 					'severity' => 'info',
 					'message'  => \__( 'Denied the selected new page recommendation.', 'aio-page-builder' ),
+					'level'    => 'step',
+				)
+			);
+		}
+		if ( $row_deny_failed ) {
+			array_unshift(
+				$step_messages,
+				array(
+					'severity' => 'warning',
+					'message'  => \__( 'That page recommendation could not be denied. It may already be resolved or is not eligible.', 'aio-page-builder' ),
 					'level'    => 'step',
 				)
 			);

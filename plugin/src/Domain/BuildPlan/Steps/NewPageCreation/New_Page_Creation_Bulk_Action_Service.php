@@ -15,7 +15,7 @@
  * Shipped wiring: {@see New_Page_Creation_Bulk_Action_Service}, admin {@see \AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Workspace_Screen::maybe_handle_step2_action()},
  * persistence {@see \AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository}.
  * Current transitions (pending → approved|rejected): per-row approve/deny; bulk approve all/selected; bulk deny all; bulk deny selected.
- * Gap addressed vs prior backlog: deny-selected bulk path aligned with §33.7 phased selection. Item-level status history beyond final `status` field is not yet modeled (§33.9 / §32.5 audit trail — future work).
+ * Gap addressed vs prior backlog: deny-selected bulk path aligned with §33.7 phased selection. Rejections store `review_decision` (actor, timestamp, source) via {@see Build_Plan_Review_Decision_Meta}.
  *
  * @package AIOPageBuilder
  */
@@ -26,6 +26,7 @@ namespace AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\BuildPlan\Build_Plan_Review_Decision_Meta;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
@@ -68,8 +69,8 @@ final class New_Page_Creation_Bulk_Action_Service {
 	 * @param string $item_id      Item id.
 	 * @return bool True if updated.
 	 */
-	public function deny_item( int $plan_post_id, string $item_id ): bool {
-		return $this->set_item_status_if_pending( $plan_post_id, $item_id, Build_Plan_Item_Statuses::REJECTED );
+	public function deny_item( int $plan_post_id, string $item_id, int $actor_user_id = 0 ): bool {
+		return $this->set_item_status_if_pending( $plan_post_id, $item_id, Build_Plan_Item_Statuses::REJECTED, $actor_user_id );
 	}
 
 	/**
@@ -79,7 +80,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 	 * @return int Number of items updated.
 	 */
 	public function bulk_approve_all_eligible( int $plan_post_id ): int {
-		return $this->bulk_set_all_eligible_status( $plan_post_id, Build_Plan_Item_Statuses::APPROVED );
+		return $this->bulk_set_all_eligible_status( $plan_post_id, Build_Plan_Item_Statuses::APPROVED, 0 );
 	}
 
 	/**
@@ -94,7 +95,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 			return 0;
 		}
 		$item_id_set = array_fill_keys( array_map( 'strval', $item_ids ), true );
-		return $this->bulk_set_selected_eligible_status( $plan_post_id, $item_id_set, Build_Plan_Item_Statuses::APPROVED );
+		return $this->bulk_set_selected_eligible_status( $plan_post_id, $item_id_set, Build_Plan_Item_Statuses::APPROVED, 0 );
 	}
 
 	/**
@@ -119,8 +120,8 @@ final class New_Page_Creation_Bulk_Action_Service {
 	 * @param int $plan_post_id Plan post ID.
 	 * @return int Number of items updated.
 	 */
-	public function bulk_deny_all_eligible( int $plan_post_id ): int {
-		return $this->bulk_set_all_eligible_status( $plan_post_id, Build_Plan_Item_Statuses::REJECTED );
+	public function bulk_deny_all_eligible( int $plan_post_id, int $actor_user_id = 0 ): int {
+		return $this->bulk_set_all_eligible_status( $plan_post_id, Build_Plan_Item_Statuses::REJECTED, $actor_user_id );
 	}
 
 	/**
@@ -176,7 +177,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 		);
 	}
 
-	private function set_item_status_if_pending( int $plan_post_id, string $item_id, string $new_status ): bool {
+	private function set_item_status_if_pending( int $plan_post_id, string $item_id, string $new_status, int $actor_user_id = 0 ): bool {
 		$definition = $this->repository->get_plan_definition( $plan_post_id );
 		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
@@ -209,7 +210,11 @@ final class New_Page_Creation_Bulk_Action_Service {
 			if ( $confidence === self::MIN_CONFIDENCE_EXCLUDE ) {
 				return false;
 			}
-			return $this->repository->update_plan_item_status( $plan_post_id, self::STEP_INDEX_NEW_PAGES, $item_id, $new_status );
+			$review = null;
+			if ( $new_status === Build_Plan_Item_Statuses::REJECTED ) {
+				$review = Build_Plan_Review_Decision_Meta::for_rejection( $actor_user_id, Build_Plan_Review_Decision_Meta::SOURCE_ROW );
+			}
+			return $this->repository->update_plan_item_status( $plan_post_id, self::STEP_INDEX_NEW_PAGES, $item_id, $new_status, null, $review );
 		}
 		return false;
 	}
@@ -221,7 +226,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 	 * @param string $new_status   New status (approved or rejected).
 	 * @return int Number of items updated.
 	 */
-	private function bulk_set_all_eligible_status( int $plan_post_id, string $new_status ): int {
+	private function bulk_set_all_eligible_status( int $plan_post_id, string $new_status, int $actor_user_id = 0 ): int {
 		$definition = $this->repository->get_plan_definition( $plan_post_id );
 		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
@@ -252,6 +257,12 @@ final class New_Page_Creation_Bulk_Action_Service {
 				continue;
 			}
 			$items[ $i ]['status'] = $new_status;
+			if ( $new_status === Build_Plan_Item_Statuses::REJECTED ) {
+				$items[ $i ][ Build_Plan_Item_Schema::KEY_REVIEW_DECISION ] = Build_Plan_Review_Decision_Meta::for_rejection(
+					$actor_user_id,
+					Build_Plan_Review_Decision_Meta::SOURCE_BULK_ALL
+				);
+			}
 			++$count;
 		}
 		if ( $count > 0 ) {
@@ -269,7 +280,7 @@ final class New_Page_Creation_Bulk_Action_Service {
 	 * @param string             $new_status  New status to set.
 	 * @return int Number of items updated.
 	 */
-	private function bulk_set_selected_eligible_status( int $plan_post_id, array $item_id_set, string $new_status ): int {
+	private function bulk_set_selected_eligible_status( int $plan_post_id, array $item_id_set, string $new_status, int $actor_user_id = 0 ): int {
 		$definition = $this->repository->get_plan_definition( $plan_post_id );
 		$steps      = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
 			? $definition[ Build_Plan_Schema::KEY_STEPS ]
@@ -304,6 +315,12 @@ final class New_Page_Creation_Bulk_Action_Service {
 				continue;
 			}
 			$items[ $i ]['status'] = $new_status;
+			if ( $new_status === Build_Plan_Item_Statuses::REJECTED ) {
+				$items[ $i ][ Build_Plan_Item_Schema::KEY_REVIEW_DECISION ] = Build_Plan_Review_Decision_Meta::for_rejection(
+					$actor_user_id,
+					Build_Plan_Review_Decision_Meta::SOURCE_BULK_SELECTED
+				);
+			}
 			++$count;
 		}
 		if ( $count > 0 ) {

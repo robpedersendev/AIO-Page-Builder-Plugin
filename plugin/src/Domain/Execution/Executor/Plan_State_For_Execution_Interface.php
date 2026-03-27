@@ -52,9 +52,10 @@ interface Plan_State_For_Execution_Interface {
 	 * @param string                    $item_id    Item id.
 	 * @param string                    $new_status New status.
 	 * @param array<string, mixed>|null $execution_artifact Optional artifact (e.g. post_id) to store on item.
+	 * @param array<string, mixed>|null $review_decision    Optional deny audit when status is rejected.
 	 * @return bool Success.
 	 */
-	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null ): bool;
+	public function update_plan_item_status( int $post_id, int $step_index, string $item_id, string $new_status, ?array $execution_artifact = null, ?array $review_decision = null ): bool;
 
 	/**
 	 * Saves the full plan definition for a plan post (e.g. to persist industry approval snapshot).

@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_List_Provider_Interface;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
+use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\Execution\Executor\Plan_State_For_Execution_Interface;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 
@@ -179,6 +180,9 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 				if ( $execution_artifact !== null ) {
 					$items[ $i ]['execution_artifact'] = $execution_artifact;
 				}
+				if ( $review_decision !== null && $new_status === Build_Plan_Item_Statuses::REJECTED ) {
+					$items[ $i ][ Build_Plan_Item_Schema::KEY_REVIEW_DECISION ] = $this->normalize_review_decision( $review_decision );
+				}
 				$updated = true;
 				break;
 			}
@@ -188,6 +192,25 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 		}
 		$definition[ Build_Plan_Schema::KEY_STEPS ][ $step_index ][ Build_Plan_Item_Schema::KEY_ITEMS ] = $items;
 		return $this->save_plan_definition( $post_id, $definition );
+	}
+
+	/**
+	 * @param array<string, mixed> $raw From {@see \AIOPageBuilder\Domain\BuildPlan\Build_Plan_Review_Decision_Meta::for_rejection()}.
+	 * @return array<string, mixed>
+	 */
+	private function normalize_review_decision( array $raw ): array {
+		$src = isset( $raw['source'] ) && is_string( $raw['source'] ) ? $raw['source'] : 'row';
+		if ( ! in_array( $src, array( 'row', 'bulk_all', 'bulk_selected' ), true ) ) {
+			$src = 'row';
+		}
+		$at = isset( $raw['decided_at'] ) && is_string( $raw['decided_at'] ) ? substr( $raw['decided_at'], 0, 40 ) : gmdate( 'c' );
+
+		return array(
+			'decision'      => 'rejected',
+			'decided_at'    => $at,
+			'actor_user_id' => isset( $raw['actor_user_id'] ) ? max( 0, (int) $raw['actor_user_id'] ) : 0,
+			'source'        => $src,
+		);
 	}
 
 	/**
