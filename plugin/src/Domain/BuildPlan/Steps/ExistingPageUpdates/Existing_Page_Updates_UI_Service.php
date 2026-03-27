@@ -15,6 +15,7 @@ namespace AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\BuildPlan\Lineage\Existing_Page_Lineage_Template_Drift_Advisor;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
@@ -34,6 +35,7 @@ final class Existing_Page_Updates_UI_Service {
 		'current_page_url',
 		'action',
 		'target_template',
+		'lineage_template_note',
 		'risk_level',
 	);
 
@@ -52,16 +54,21 @@ final class Existing_Page_Updates_UI_Service {
 	/** @var Existing_Page_Template_Change_Builder|null */
 	private $template_change_builder;
 
+	/** @var Existing_Page_Lineage_Template_Drift_Advisor|null */
+	private $lineage_template_drift_advisor;
+
 	public function __construct(
 		Build_Plan_Row_Action_Resolver $row_action_resolver,
 		Existing_Page_Update_Detail_Builder $detail_builder,
 		Existing_Page_Update_Bulk_Action_Service $bulk_action_service,
-		?Existing_Page_Template_Change_Builder $template_change_builder = null
+		?Existing_Page_Template_Change_Builder $template_change_builder = null,
+		?Existing_Page_Lineage_Template_Drift_Advisor $lineage_template_drift_advisor = null
 	) {
-		$this->row_action_resolver     = $row_action_resolver;
-		$this->detail_builder          = $detail_builder;
-		$this->bulk_action_service     = $bulk_action_service;
-		$this->template_change_builder = $template_change_builder;
+		$this->row_action_resolver            = $row_action_resolver;
+		$this->detail_builder                 = $detail_builder;
+		$this->bulk_action_service            = $bulk_action_service;
+		$this->template_change_builder        = $template_change_builder;
+		$this->lineage_template_drift_advisor = $lineage_template_drift_advisor;
 	}
 
 	/**
@@ -96,9 +103,10 @@ final class Existing_Page_Updates_UI_Service {
 			return $this->empty_workspace();
 		}
 
-		$items          = $this->eligible_items_from_step( $step );
-		$rows           = array();
-		$eligible_count = 0;
+		$items              = $this->eligible_items_from_step( $step );
+		$rows               = array();
+		$eligible_count     = 0;
+		$lineage_drift_rows = 0;
 		foreach ( $items as $item ) {
 			$item_id = (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' );
 			if ( $item_id === '' ) {
@@ -114,6 +122,7 @@ final class Existing_Page_Updates_UI_Service {
 				Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
 				Step_Item_List_Component::ROW_KEY_STATUS  => $status,
 				Step_Item_List_Component::ROW_KEY_STATUS_BADGE => $this->status_to_badge( $status ),
+				Step_Item_List_Component::ROW_KEY_STATUS_BADGE_LABEL => $this->workspace_status_label_for_existing_pages( $status ),
 				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => $summary_columns,
 				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS => $row_actions,
 				Step_Item_List_Component::ROW_KEY_IS_SELECTED => in_array( $item_id, $selected_item_ids, true ),
@@ -128,6 +137,24 @@ final class Existing_Page_Updates_UI_Service {
 				if ( ! empty( $template_summary['template_key'] ) && ( $row['summary_columns']['target_template'] ?? '' ) === '' ) {
 					$row['summary_columns']['target_template'] = $template_summary['template_key'];
 				}
+			}
+			if ( $this->lineage_template_drift_advisor !== null ) {
+				$item_for_lineage = $item;
+				$pl_merge         = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+					? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
+					: array();
+				$tt               = isset( $row['summary_columns']['target_template'] ) ? trim( (string) $row['summary_columns']['target_template'] ) : '';
+				if ( $tt !== '' ) {
+					$pl_merge['template_key'] = $tt;
+				}
+				$item_for_lineage[ Build_Plan_Item_Schema::KEY_PAYLOAD ] = $pl_merge;
+				$drift_note                                      = $this->lineage_template_drift_advisor->note_for_item( $plan_definition, $item_for_lineage );
+				$row['summary_columns']['lineage_template_note'] = $drift_note;
+				if ( $drift_note !== '' ) {
+					++$lineage_drift_rows;
+				}
+			} else {
+				$row['summary_columns']['lineage_template_note'] = '';
 			}
 			$rows[] = $row;
 		}
@@ -180,7 +207,7 @@ final class Existing_Page_Updates_UI_Service {
 			}
 		}
 
-		$step_messages = $this->step_messages( count( $rows ), $eligible_count );
+		$step_messages = $this->step_messages( count( $rows ), $eligible_count, $lineage_drift_rows );
 
 		return array(
 			'step_list_rows'     => $rows,
@@ -234,6 +261,30 @@ final class Existing_Page_Updates_UI_Service {
 		return $cols;
 	}
 
+	/**
+	 * Short label for the Status column: distinguishes applied updates from pending work.
+	 */
+	private function workspace_status_label_for_existing_pages( string $status ): string {
+		switch ( $status ) {
+			case Build_Plan_Item_Statuses::COMPLETED:
+				return \__( 'Change applied on site', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::APPROVED:
+				return \__( 'Approved — ready to apply', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::IN_PROGRESS:
+				return \__( 'Applying change…', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::PENDING:
+				return \__( 'Pending review', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::REJECTED:
+				return \__( 'Rejected', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::SKIPPED:
+				return \__( 'Skipped', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::FAILED:
+				return \__( 'Apply failed', 'aio-page-builder' );
+			default:
+				return $status;
+		}
+	}
+
 	private function status_to_badge( string $status ): string {
 		$map = array(
 			Build_Plan_Item_Statuses::PENDING     => 'pending',
@@ -247,32 +298,46 @@ final class Existing_Page_Updates_UI_Service {
 		return $map[ $status ] ?? $status;
 	}
 
-	private function step_messages( int $total, int $eligible ): array {
-		if ( $total === 0 ) {
-			return array(
-				array(
-					'severity' => 'info',
-					'message'  => \__( 'No recommendations were generated for this step.', 'aio-page-builder' ),
-					'level'    => 'step',
+	private function step_messages( int $total, int $eligible, int $lineage_drift_rows = 0 ): array {
+		$messages = array();
+		if ( $lineage_drift_rows > 0 ) {
+			$messages[] = array(
+				'severity' => 'warning',
+				'message'  => sprintf(
+					/* translators: %d: number of rows that differ from prior plan version template */
+					\_n(
+						'One page matches the prior plan version but targets a different template.',
+						'%d pages match the prior plan version but target a different template than that version.',
+						$lineage_drift_rows,
+						'aio-page-builder'
+					),
+					$lineage_drift_rows
 				),
+				'level'    => 'step',
 			);
+		}
+		if ( $total === 0 ) {
+			$messages[] = array(
+				'severity' => 'info',
+				'message'  => \__( 'No recommendations were generated for this step.', 'aio-page-builder' ),
+				'level'    => 'step',
+			);
+			return $messages;
 		}
 		if ( $eligible === 0 ) {
-			return array(
-				array(
-					'severity' => 'success',
-					'message'  => \__( 'All recommendations in this step have already been resolved.', 'aio-page-builder' ),
-					'level'    => 'step',
-				),
-			);
-		}
-		return array(
-			array(
-				'severity' => 'info',
-				'message'  => sprintf( /* translators: %d: number of items */ \_n( '%d item pending review.', '%d items pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+			$messages[] = array(
+				'severity' => 'success',
+				'message'  => \__( 'All recommendations in this step have already been resolved.', 'aio-page-builder' ),
 				'level'    => 'step',
-			),
+			);
+			return $messages;
+		}
+		$messages[] = array(
+			'severity' => 'info',
+			'message'  => sprintf( /* translators: %d: number of items */ \_n( '%d item pending review.', '%d items pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+			'level'    => 'step',
 		);
+		return $messages;
 	}
 
 	private function empty_workspace(): array {

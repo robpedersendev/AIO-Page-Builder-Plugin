@@ -236,16 +236,20 @@ final class Build_Plan_UI_State_Builder {
 		$subtype_context = Subtype_Build_Plan_Explanation_View_Model::from_plan_definition( $definition );
 
 		return array(
-			'plan_title'                => (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_TITLE ] ?? '' ),
-			'plan_id'                   => (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' ),
-			'ai_run_ref'                => (string) ( $definition[ Build_Plan_Schema::KEY_AI_RUN_REF ] ?? '' ),
-			'normalized_output_ref'     => (string) ( $definition[ Build_Plan_Schema::KEY_NORMALIZED_OUTPUT_REF ] ?? '' ),
-			'plan_status'               => (string) ( $definition[ Build_Plan_Schema::KEY_STATUS ] ?? '' ),
-			'site_purpose_summary'      => (string) ( $definition[ Build_Plan_Schema::KEY_SITE_PURPOSE_SUMMARY ] ?? '' ),
-			'site_flow_summary'         => (string) ( $definition[ Build_Plan_Schema::KEY_SITE_FLOW_SUMMARY ] ?? '' ),
-			'unresolved_counts_by_step' => $unresolved_by_step,
-			'warnings_summary'          => $warnings_summary,
-			'subtype_context'           => $subtype_context,
+			'plan_title'                  => (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_TITLE ] ?? '' ),
+			'plan_id'                     => (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' ),
+			'plan_lineage_id'             => (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_LINEAGE_ID ] ?? '' ),
+			'plan_version_label'          => (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_VERSION_LABEL ] ?? '' ),
+			'version_purpose_description' => (string) ( $definition[ Build_Plan_Schema::KEY_VERSION_PURPOSE_DESCRIPTION ] ?? '' ),
+			'estimated_ai_cost_usd_note'  => (string) ( $definition[ Build_Plan_Schema::KEY_ESTIMATED_AI_COST_USD_NOTE ] ?? '' ),
+			'ai_run_ref'                  => (string) ( $definition[ Build_Plan_Schema::KEY_AI_RUN_REF ] ?? '' ),
+			'normalized_output_ref'       => (string) ( $definition[ Build_Plan_Schema::KEY_NORMALIZED_OUTPUT_REF ] ?? '' ),
+			'plan_status'                 => (string) ( $definition[ Build_Plan_Schema::KEY_STATUS ] ?? '' ),
+			'site_purpose_summary'        => (string) ( $definition[ Build_Plan_Schema::KEY_SITE_PURPOSE_SUMMARY ] ?? '' ),
+			'site_flow_summary'           => (string) ( $definition[ Build_Plan_Schema::KEY_SITE_FLOW_SUMMARY ] ?? '' ),
+			'unresolved_counts_by_step'   => $unresolved_by_step,
+			'warnings_summary'            => $warnings_summary,
+			'subtype_context'             => $subtype_context,
 		);
 	}
 }

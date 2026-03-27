@@ -58,6 +58,27 @@ final class Build_Plan_Schema {
 	/** Optional: conversion goal overlay source when plan was generated with conversion goal (Prompt 498). */
 	public const KEY_GOAL_OVERLAY_SOURCE = 'goal_overlay_source';
 
+	/** Optional: secret-free onboarding wizard snapshot merged into the plan while the user completes onboarding. */
+	public const KEY_ONBOARDING_WIZARD_SNAPSHOT = 'onboarding_wizard_snapshot';
+
+	/** Optional: stable id shared by all versions of a plan lineage (e.g. UUID). */
+	public const KEY_PLAN_LINEAGE_ID = 'plan_lineage_id';
+
+	/** Optional: monotonic version within a lineage (1, 2, 3…). */
+	public const KEY_PLAN_VERSION_SEQ = 'plan_version_seq';
+
+	/** Optional: display label (e.g. 1.0, 2.0). */
+	public const KEY_PLAN_VERSION_LABEL = 'plan_version_label';
+
+	/** Optional: why this version exists (required for versions after the first). */
+	public const KEY_VERSION_PURPOSE_DESCRIPTION = 'version_purpose_description';
+
+	/** Optional: non-binding cost guidance for operators (e.g. onboarding AI run budget). */
+	public const KEY_ESTIMATED_AI_COST_USD_NOTE = 'estimated_ai_cost_usd_note';
+
+	/** Default disclosure bundled into onboarding-generated plans (non-binding; API pricing varies). */
+	public const DEFAULT_ONBOARDING_AI_COST_USD_NOTE = 'Roughly US $5 in API usage per successful onboarding planning run (actual provider cost varies).';
+
 	/** Status enum (spec §30.4, object-model §3.4). */
 	public const STATUS_PENDING_REVIEW = 'pending_review';
 	public const STATUS_APPROVED       = 'approved';

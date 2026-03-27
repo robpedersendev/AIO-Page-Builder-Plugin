@@ -87,7 +87,12 @@ final class Onboarding_Draft_Service {
 			'goal_or_intent_text'       => '',
 			'last_planning_run_id'      => null,
 			'last_planning_run_post_id' => null,
-			'updated_at'                => $this->iso8601_now(),
+			'linked_build_plan_post_id'  => null,
+			'linked_build_plan_key'      => null,
+			'build_plan_lineage_mode'    => 'new',
+			'fork_lineage_id'            => '',
+			'fork_version_purpose'         => '',
+			'updated_at'                 => $this->iso8601_now(),
 		);
 	}
 
@@ -130,6 +135,15 @@ final class Onboarding_Draft_Service {
 		if ( $last_run_post === 0 && $last_run_id === null ) {
 			$last_run_post = null;
 		}
+		$linked_bp_post = isset( $raw['linked_build_plan_post_id'] ) && ( is_int( $raw['linked_build_plan_post_id'] ) || ( is_string( $raw['linked_build_plan_post_id'] ) && $raw['linked_build_plan_post_id'] !== '' ) )
+			? (int) $raw['linked_build_plan_post_id']
+			: ( $default['linked_build_plan_post_id'] ?? null );
+		if ( $linked_bp_post === 0 ) {
+			$linked_bp_post = null;
+		}
+		$linked_bp_key   = isset( $raw['linked_build_plan_key'] ) && is_string( $raw['linked_build_plan_key'] ) && $raw['linked_build_plan_key'] !== ''
+			? $raw['linked_build_plan_key']
+			: ( $default['linked_build_plan_key'] ?? null );
 		$max_step_idx    = count( Onboarding_Step_Keys::ordered() ) - 1;
 		$cur_idx         = Onboarding_Step_Keys::index_of( $current );
 		$cur_idx_safe    = $cur_idx >= 0 ? $cur_idx : 0;
@@ -148,7 +162,12 @@ final class Onboarding_Draft_Service {
 			'goal_or_intent_text'       => isset( $raw['goal_or_intent_text'] ) && is_string( $raw['goal_or_intent_text'] ) ? \sanitize_textarea_field( $raw['goal_or_intent_text'] ) : $default['goal_or_intent_text'],
 			'last_planning_run_id'      => $last_run_id,
 			'last_planning_run_post_id' => $last_run_post,
-			'updated_at'                => isset( $raw['updated_at'] ) && is_string( $raw['updated_at'] ) ? $raw['updated_at'] : $default['updated_at'],
+			'linked_build_plan_post_id'  => $linked_bp_post,
+			'linked_build_plan_key'      => $linked_bp_key,
+			'build_plan_lineage_mode'    => isset( $raw['build_plan_lineage_mode'] ) && $raw['build_plan_lineage_mode'] === 'fork' ? 'fork' : 'new',
+			'fork_lineage_id'            => isset( $raw['fork_lineage_id'] ) && is_string( $raw['fork_lineage_id'] ) ? \sanitize_text_field( $raw['fork_lineage_id'] ) : '',
+			'fork_version_purpose'       => isset( $raw['fork_version_purpose'] ) && is_string( $raw['fork_version_purpose'] ) ? \sanitize_textarea_field( $raw['fork_version_purpose'] ) : '',
+			'updated_at'                 => isset( $raw['updated_at'] ) && is_string( $raw['updated_at'] ) ? $raw['updated_at'] : $default['updated_at'],
 		);
 	}
 

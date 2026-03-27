@@ -45,6 +45,9 @@ final class Step_Item_List_Component {
 	/** @var string Row payload key for status_badge. */
 	public const ROW_KEY_STATUS_BADGE = 'status_badge';
 
+	/** @var string Optional row payload: human label for Status_Badge_Component (execution / review state). */
+	public const ROW_KEY_STATUS_BADGE_LABEL = 'status_badge_label';
+
 	/** @var string Row payload key for summary_columns. */
 	public const ROW_KEY_SUMMARY_COLUMNS = 'summary_columns';
 
@@ -192,6 +195,7 @@ final class Step_Item_List_Component {
 			'actor'                    => \__( 'Actor', 'aio-page-builder' ),
 			'result'                   => \__( 'Result', 'aio-page-builder' ),
 			'rollback'                 => \__( 'Rollback', 'aio-page-builder' ),
+			'lineage_template_note'    => \__( 'Prior plan vs this plan', 'aio-page-builder' ),
 		);
 		return $labels[ $col_key ] ?? str_replace( '_', ' ', ucfirst( $col_key ) );
 	}
@@ -208,6 +212,7 @@ final class Step_Item_List_Component {
 	private function render_row( array $row, array $columns, ?string $detail_item_id, string $selection_field_name ): void {
 		$item_id          = (string) ( $row[ self::ROW_KEY_ITEM_ID ] ?? '' );
 		$badge            = (string) ( $row[ self::ROW_KEY_STATUS_BADGE ] ?? '' );
+		$badge_label      = isset( $row[ self::ROW_KEY_STATUS_BADGE_LABEL ] ) && is_string( $row[ self::ROW_KEY_STATUS_BADGE_LABEL ] ) ? $row[ self::ROW_KEY_STATUS_BADGE_LABEL ] : '';
 		$summary          = isset( $row[ self::ROW_KEY_SUMMARY_COLUMNS ] ) && is_array( $row[ self::ROW_KEY_SUMMARY_COLUMNS ] ) ? $row[ self::ROW_KEY_SUMMARY_COLUMNS ] : array();
 		$actions          = isset( $row[ self::ROW_KEY_ROW_ACTIONS ] ) && is_array( $row[ self::ROW_KEY_ROW_ACTIONS ] ) ? $row[ self::ROW_KEY_ROW_ACTIONS ] : array();
 		$is_selected      = ! empty( $row[ self::ROW_KEY_IS_SELECTED ] );
@@ -222,7 +227,13 @@ final class Step_Item_List_Component {
 				<td class="aio-col-<?php echo \esc_attr( \sanitize_html_class( $col_key ) ); ?>"><?php echo isset( $summary[ $col_key ] ) ? \wp_kses_post( (string) $summary[ $col_key ] ) : '—'; ?></td>
 			<?php endforeach; ?>
 			<td class="aio-col-status">
-				<?php $badge_component->render( array( 'status_badge' => $badge ) ); ?>
+				<?php
+				$badge_payload = array( 'status_badge' => $badge );
+				if ( $badge_label !== '' ) {
+					$badge_payload[ Status_Badge_Component::KEY_LABEL ] = $badge_label;
+				}
+				$badge_component->render( $badge_payload );
+				?>
 			</td>
 			<td class="aio-col-actions">
 				<?php $this->render_row_actions( $actions, $item_id ); ?>

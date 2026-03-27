@@ -19,6 +19,7 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
+use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
 
 /**
  * Produces step_list_rows, column_order, bulk_action_states, detail_panel (sections + row_actions), step_messages.
@@ -80,6 +81,7 @@ final class Step_Workspace_Payload_Builder {
 				'item_id'         => $item_id,
 				'status'          => $status,
 				'status_badge'    => $this->item_status_to_badge( $status ),
+				Step_Item_List_Component::ROW_KEY_STATUS_BADGE_LABEL => $this->generic_workspace_status_label( $status ),
 				'summary_columns' => $this->summary_columns_for_item( $item, $step_type ),
 				'row_actions'     => $row_actions,
 				'is_selected'     => in_array( $item_id, $selected_item_ids, true ),
@@ -166,6 +168,30 @@ final class Step_Workspace_Payload_Builder {
 			$out[] = $item;
 		}
 		return $out;
+	}
+
+	/**
+	 * Neutral status line for generic step tables (navigation, tokens, etc.).
+	 */
+	private function generic_workspace_status_label( string $status ): string {
+		switch ( $status ) {
+			case Build_Plan_Item_Statuses::COMPLETED:
+				return \__( 'Done', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::APPROVED:
+				return \__( 'Approved — pending execution', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::IN_PROGRESS:
+				return \__( 'In progress', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::PENDING:
+				return \__( 'Pending review', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::REJECTED:
+				return \__( 'Rejected', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::SKIPPED:
+				return \__( 'Skipped', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::FAILED:
+				return \__( 'Failed', 'aio-page-builder' );
+			default:
+				return $status;
+		}
 	}
 
 	private function item_status_to_badge( string $status ): string {

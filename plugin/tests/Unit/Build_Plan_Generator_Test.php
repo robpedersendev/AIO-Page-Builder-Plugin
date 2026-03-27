@@ -112,6 +112,19 @@ final class Build_Plan_Generator_Test extends TestCase {
 		unset( $GLOBALS['_aio_wp_insert_post_return'] );
 	}
 
+	public function test_generate_with_target_post_id_updates_existing_post(): void {
+		$repo   = new Build_Plan_Repository();
+		$gen    = new Build_Plan_Generator( $repo, new Build_Plan_Item_Generator() );
+		$result = $gen->generate(
+			$this->valid_normalized_output(),
+			'run-reuse',
+			'run-reuse:normalized_output',
+			array( 'target_post_id' => 77 )
+		);
+		$this->assertTrue( $result->is_success(), implode( ', ', $result->get_errors() ) );
+		$this->assertSame( 77, $result->get_plan_post_id() );
+	}
+
 	public function test_generated_plan_has_overview_and_confirmation_steps(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 1;
 		$repo                                  = new Build_Plan_Repository();

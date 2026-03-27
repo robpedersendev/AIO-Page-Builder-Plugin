@@ -32,6 +32,12 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 
 	public const META_PLAN_DEFINITION = '_aio_plan_definition';
 
+	/** Post meta: stable lineage UUID shared by all versions of a plan. */
+	public const META_PLAN_LINEAGE_ID = '_aio_plan_lineage_id';
+
+	/** Post meta: integer sequence within lineage (1, 2, 3…). */
+	public const META_PLAN_VERSION_SEQ = '_aio_plan_version_seq';
+
 	/** @inheritdoc */
 	protected function get_post_type(): string {
 		return Object_Type_Keys::BUILD_PLAN;
@@ -89,7 +95,26 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	 */
 	public function save_plan_definition( int $post_id, array $definition ): bool {
 		$json = \wp_json_encode( $definition );
-		return $json !== false && \update_post_meta( $post_id, self::META_PLAN_DEFINITION, $json ) !== false;
+		$ok   = $json !== false && \update_post_meta( $post_id, self::META_PLAN_DEFINITION, $json ) !== false;
+		if ( $ok ) {
+			$this->sync_lineage_meta_from_definition( $post_id, $definition );
+		}
+		return $ok;
+	}
+
+	/**
+	 * Mirrors lineage fields from the JSON definition into queryable post meta.
+	 *
+	 * @param array<string, mixed> $definition Plan root.
+	 */
+	private function sync_lineage_meta_from_definition( int $post_id, array $definition ): void {
+		$lid = isset( $definition[ Build_Plan_Schema::KEY_PLAN_LINEAGE_ID ] ) ? trim( (string) $definition[ Build_Plan_Schema::KEY_PLAN_LINEAGE_ID ] ) : '';
+		if ( $lid !== '' ) {
+			\update_post_meta( $post_id, self::META_PLAN_LINEAGE_ID, $lid );
+		}
+		if ( isset( $definition[ Build_Plan_Schema::KEY_PLAN_VERSION_SEQ ] ) ) {
+			\update_post_meta( $post_id, self::META_PLAN_VERSION_SEQ, (int) $definition[ Build_Plan_Schema::KEY_PLAN_VERSION_SEQ ] );
+		}
 	}
 
 	/**

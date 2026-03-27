@@ -1768,6 +1768,41 @@ final class Build_Plan_Workspace_Screen {
 		<?php
 	}
 
+	/**
+	 * Surfaces plan version, purpose, and cost note so reopened plans are self-explanatory.
+	 *
+	 * @param array<string, mixed> $definition Plan root.
+	 * @param array<string, mixed> $rail       Context rail (same keys when available).
+	 * @return void
+	 */
+	private function render_plan_version_banner( array $definition, array $rail ): void {
+		$ver     = (string) ( $rail['plan_version_label'] ?? $definition[ Build_Plan_Schema::KEY_PLAN_VERSION_LABEL ] ?? '' );
+		$purpose = (string) ( $rail['version_purpose_description'] ?? $definition[ Build_Plan_Schema::KEY_VERSION_PURPOSE_DESCRIPTION ] ?? '' );
+		$cost    = (string) ( $rail['estimated_ai_cost_usd_note'] ?? $definition[ Build_Plan_Schema::KEY_ESTIMATED_AI_COST_USD_NOTE ] ?? '' );
+		$lid     = (string) ( $rail['plan_lineage_id'] ?? $definition[ Build_Plan_Schema::KEY_PLAN_LINEAGE_ID ] ?? '' );
+		if ( $ver === '' && $purpose === '' && $cost === '' && $lid === '' ) {
+			return;
+		}
+		$list_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
+		?>
+		<div class="notice notice-info aio-build-plan-version-banner" role="region" aria-label="<?php \esc_attr_e( 'Plan version', 'aio-page-builder' ); ?>">
+			<?php if ( $ver !== '' ) : ?>
+				<p><strong><?php \esc_html_e( 'Version', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $ver ); ?></p>
+			<?php endif; ?>
+			<?php if ( $lid !== '' ) : ?>
+				<p class="description"><?php \esc_html_e( 'Lineage', 'aio-page-builder' ); ?> <code><?php echo \esc_html( $lid ); ?></code>
+					<a href="<?php echo \esc_url( $list_url ); ?>"><?php \esc_html_e( 'View all plans', 'aio-page-builder' ); ?></a></p>
+			<?php endif; ?>
+			<?php if ( $purpose !== '' ) : ?>
+				<p><strong><?php \esc_html_e( 'Purpose of this version', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $purpose ); ?></p>
+			<?php endif; ?>
+			<?php if ( $cost !== '' ) : ?>
+				<p class="description"><?php echo \esc_html( $cost ); ?></p>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
 	private function render_shell( array $state, int $active_step_index ): void {
 		$plan_id            = (string) ( $state['plan_id'] ?? '' );
 		$rail               = $state['context_rail'] ?? array();
@@ -1793,6 +1828,7 @@ final class Build_Plan_Workspace_Screen {
 				<?php $this->render_context_rail( $rail, $plan_id, $base_url, $export_url, $can_view_artifacts ); ?>
 			</aside>
 			<main class="aio-build-plan-main" id="aio-build-plan-main" aria-label="<?php \esc_attr_e( 'Build Plan steps and content', 'aio-page-builder' ); ?>">
+				<?php $this->render_plan_version_banner( $definition, $rail ); ?>
 				<div class="aio-build-plan-stepper">
 					<?php $this->render_stepper( $steps, $active_step_index, $base_url ); ?>
 				</div>
@@ -1812,6 +1848,23 @@ final class Build_Plan_Workspace_Screen {
 			<dl class="aio-context-rail-meta">
 				<dt><?php \esc_html_e( 'Plan ID', 'aio-page-builder' ); ?></dt>
 				<dd><code><?php echo \esc_html( (string) ( $rail['plan_id'] ?? '' ) ); ?></code></dd>
+				<?php
+				$rail_lid     = (string) ( $rail['plan_lineage_id'] ?? '' );
+				$rail_ver     = (string) ( $rail['plan_version_label'] ?? '' );
+				$rail_purpose = (string) ( $rail['version_purpose_description'] ?? '' );
+				?>
+				<?php if ( $rail_lid !== '' ) : ?>
+					<dt><?php \esc_html_e( 'Plan lineage', 'aio-page-builder' ); ?></dt>
+					<dd><code><?php echo \esc_html( $rail_lid ); ?></code></dd>
+				<?php endif; ?>
+				<?php if ( $rail_ver !== '' ) : ?>
+					<dt><?php \esc_html_e( 'Version label', 'aio-page-builder' ); ?></dt>
+					<dd><?php echo \esc_html( $rail_ver ); ?></dd>
+				<?php endif; ?>
+				<?php if ( $rail_purpose !== '' ) : ?>
+					<dt><?php \esc_html_e( 'Version purpose', 'aio-page-builder' ); ?></dt>
+					<dd><?php echo \esc_html( $rail_purpose ); ?></dd>
+				<?php endif; ?>
 				<dt><?php \esc_html_e( 'Source AI run', 'aio-page-builder' ); ?></dt>
 				<dd><code><?php echo \esc_html( (string) ( $rail['ai_run_ref'] ?? '' ) ); ?></code></dd>
 				<dt><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></dt>

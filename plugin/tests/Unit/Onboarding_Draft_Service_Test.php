@@ -43,6 +43,8 @@ final class Onboarding_Draft_Service_Test extends TestCase {
 		$this->assertArrayHasKey( Onboarding_Step_Keys::REVIEW, $draft['step_statuses'] );
 		$this->assertArrayNotHasKey( 'api_key', $draft );
 		$this->assertArrayNotHasKey( 'secret', $draft );
+		$this->assertNull( $draft['linked_build_plan_post_id'] );
+		$this->assertNull( $draft['linked_build_plan_key'] );
 	}
 
 	public function test_get_draft_returns_normalized_draft(): void {

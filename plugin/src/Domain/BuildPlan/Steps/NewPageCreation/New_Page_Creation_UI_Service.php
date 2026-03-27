@@ -130,6 +130,7 @@ final class New_Page_Creation_UI_Service {
 				Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
 				Step_Item_List_Component::ROW_KEY_STATUS  => $status,
 				Step_Item_List_Component::ROW_KEY_STATUS_BADGE => $this->status_to_badge( $status ),
+				Step_Item_List_Component::ROW_KEY_STATUS_BADGE_LABEL => $this->workspace_status_label_for_new_pages( $status ),
 				Step_Item_List_Component::ROW_KEY_SUMMARY_COLUMNS => $summary_columns,
 				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS => $row_actions,
 				Step_Item_List_Component::ROW_KEY_IS_SELECTED => in_array( $item_id, $selected_item_ids, true ),
@@ -281,6 +282,30 @@ final class New_Page_Creation_UI_Service {
 				$reasons
 			),
 		);
+	}
+
+	/**
+	 * Short label for the Status column: distinguishes built pages from pending suggestions.
+	 */
+	private function workspace_status_label_for_new_pages( string $status ): string {
+		switch ( $status ) {
+			case Build_Plan_Item_Statuses::COMPLETED:
+				return \__( 'Page created', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::APPROVED:
+				return \__( 'Approved — ready to build', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::IN_PROGRESS:
+				return \__( 'Building page…', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::PENDING:
+				return \__( 'Pending review', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::REJECTED:
+				return \__( 'Rejected', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::SKIPPED:
+				return \__( 'Skipped', 'aio-page-builder' );
+			case Build_Plan_Item_Statuses::FAILED:
+				return \__( 'Build failed', 'aio-page-builder' );
+			default:
+				return $status;
+		}
 	}
 
 	private function status_to_badge( string $status ): string {

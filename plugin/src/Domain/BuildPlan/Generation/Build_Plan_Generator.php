@@ -63,7 +63,7 @@ final class Build_Plan_Generator {
 	 * @param array<string, mixed> $normalized_output Validated normalized output (run_summary, site_purpose, existing_page_changes, etc.).
 	 * @param string               $ai_run_ref        Source AI run id.
 	 * @param string               $normalized_output_ref Reference to stored normalized output (e.g. run_id:normalized_output).
-	 * @param array<string, mixed> $context           Optional: profile_context_ref, crawl_snapshot_ref, registry_snapshot_ref.
+	 * @param array<string, mixed> $context           Optional: profile_context_ref, crawl_snapshot_ref, registry_snapshot_ref, target_post_id (int, replace plan post), onboarding_shell (bool, skip industry scoring for placeholders).
 	 * @return Plan_Generation_Result
 	 */
 	public function generate( array $normalized_output, string $ai_run_ref, string $normalized_output_ref, array $context = array() ): Plan_Generation_Result {
@@ -72,7 +72,7 @@ final class Build_Plan_Generator {
 			return Plan_Generation_Result::failure( $errors );
 		}
 
-		if ( $this->scoring_service !== null ) {
+		if ( $this->scoring_service !== null && empty( $context['onboarding_shell'] ) ) {
 			$normalized_output = $this->scoring_service->enrich_output( $normalized_output, $context );
 		}
 
@@ -165,8 +165,28 @@ final class Build_Plan_Generator {
 				'applied'             => ! empty( $context['goal_overlay_applied'] ),
 			);
 		}
+		if ( ! empty( $context['plan_lineage_id'] ) && is_string( $context['plan_lineage_id'] ) ) {
+			$definition[ Build_Plan_Schema::KEY_PLAN_LINEAGE_ID ] = trim( $context['plan_lineage_id'] );
+		}
+		if ( isset( $context['plan_version_seq'] ) && is_numeric( $context['plan_version_seq'] ) ) {
+			$definition[ Build_Plan_Schema::KEY_PLAN_VERSION_SEQ ] = (int) $context['plan_version_seq'];
+		}
+		if ( ! empty( $context['plan_version_label'] ) && is_string( $context['plan_version_label'] ) ) {
+			$definition[ Build_Plan_Schema::KEY_PLAN_VERSION_LABEL ] = trim( $context['plan_version_label'] );
+		}
+		if ( ! empty( $context['version_purpose_description'] ) && is_string( $context['version_purpose_description'] ) ) {
+			$definition[ Build_Plan_Schema::KEY_VERSION_PURPOSE_DESCRIPTION ] = trim( $context['version_purpose_description'] );
+		}
+		if ( ! empty( $context['estimated_ai_cost_usd_note'] ) && is_string( $context['estimated_ai_cost_usd_note'] ) ) {
+			$definition[ Build_Plan_Schema::KEY_ESTIMATED_AI_COST_USD_NOTE ] = trim( $context['estimated_ai_cost_usd_note'] );
+		}
 
-		$post_id = $this->repository->save( array( 'plan_definition' => $definition ) );
+		$save_payload = array( 'plan_definition' => $definition );
+		$target_id    = isset( $context['target_post_id'] ) ? (int) $context['target_post_id'] : 0;
+		if ( $target_id > 0 ) {
+			$save_payload['id'] = $target_id;
+		}
+		$post_id = $this->repository->save( $save_payload );
 		if ( $post_id === 0 ) {
 			return Plan_Generation_Result::failure( array( 'Failed to persist Build Plan.' ) );
 		}

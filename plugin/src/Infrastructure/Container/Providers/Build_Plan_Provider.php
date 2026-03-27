@@ -14,6 +14,8 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_Analytics_Service;
 use AIOPageBuilder\Domain\BuildPlan\Generation\AI_Run_To_Build_Plan_Service;
+use AIOPageBuilder\Domain\BuildPlan\Lineage\Build_Plan_Lineage_Service;
+use AIOPageBuilder\Domain\BuildPlan\Lineage\Existing_Page_Lineage_Template_Drift_Advisor;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Item_Generator;
 use AIOPageBuilder\Domain\Industry\AI\Industry_Approval_Snapshot_Builder;
@@ -163,12 +165,19 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 			}
 		);
 		$container->register(
+			'build_plan_lineage_service',
+			function () use ( $container ): Build_Plan_Lineage_Service {
+				return new Build_Plan_Lineage_Service( $container->get( 'build_plan_repository' ) );
+			}
+		);
+		$container->register(
 			'ai_run_to_build_plan_service',
 			function () use ( $container ): AI_Run_To_Build_Plan_Service {
 				return new AI_Run_To_Build_Plan_Service(
 					$container->get( 'ai_run_service' ),
 					$container->get( 'ai_run_artifact_service' ),
-					$container->get( 'build_plan_generator' )
+					$container->get( 'build_plan_generator' ),
+					$container->get( 'build_plan_repository' )
 				);
 			}
 		);
@@ -211,13 +220,23 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 			}
 		);
 		$container->register(
+			'existing_page_lineage_template_drift_advisor',
+			function () use ( $container ): Existing_Page_Lineage_Template_Drift_Advisor {
+				return new Existing_Page_Lineage_Template_Drift_Advisor(
+					$container->get( 'build_plan_lineage_service' ),
+					$container->get( 'build_plan_repository' )
+				);
+			}
+		);
+		$container->register(
 			'existing_page_updates_ui_service',
 			function () use ( $container ): Existing_Page_Updates_UI_Service {
 				return new Existing_Page_Updates_UI_Service(
 					$container->get( 'build_plan_row_action_resolver' ),
 					$container->get( 'existing_page_update_detail_builder' ),
 					$container->get( 'existing_page_update_bulk_action_service' ),
-					$container->get( 'existing_page_template_change_builder' )
+					$container->get( 'existing_page_template_change_builder' ),
+					$container->get( 'existing_page_lineage_template_drift_advisor' )
 				);
 			}
 		);

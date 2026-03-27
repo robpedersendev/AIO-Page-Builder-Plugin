@@ -12,8 +12,12 @@ namespace AIOPageBuilder\Admin\Screens\AI;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
+use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Build_Plan_Bootstrap_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
-use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Prefill_Service;
+use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
+use AIOPageBuilder\Domain\BuildPlan\Generation\AI_Run_To_Build_Plan_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
@@ -50,10 +54,17 @@ final class Onboarding_Screen {
 	public const NONCE_ACTION = 'aio_onboarding_save';
 
 	/**
-	 * HTML id of the wizard POST form. Step inputs render outside that form (embedded AI/Crawler UIs must not be nested in a form);
-	 * they associate via the form attribute so Next/Save draft submits all fields.
+	 * HTML id of the wizard POST form. Most step inputs render outside this form (embedded AI/Crawler UIs must not be nested in a form)
+	 * and associate via the HTML5 `form` attribute. The submission site-goal field uses a visible textarea plus a hidden field inside this form
+	 * synced by script because `form=""` association is unreliable for multipart text across browsers.
 	 */
 	private const MAIN_FORM_ID = 'aio-onboarding-main';
+
+	/** Visible site-goal textarea id (no `name`; synced to {@see self::SUBMISSION_GOAL_POST_FIELD_ID}). */
+	private const SUBMISSION_GOAL_VISIBLE_FIELD_ID = 'aio_onboarding_goal_visible';
+
+	/** Hidden textarea inside the main form carrying `aio_onboarding_goal_or_intent` for POST. */
+	private const SUBMISSION_GOAL_POST_FIELD_ID = 'aio_onboarding_goal_post';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -81,6 +92,7 @@ final class Onboarding_Screen {
 		}
 
 		$state = $this->get_ui_state();
+		$state = $this->enrich_state_with_build_plan_lineages( $state );
 		$this->render_shell( $state, $embed_in_hub );
 	}
 
@@ -143,12 +155,20 @@ final class Onboarding_Screen {
 			$draft['overall_status']           = Onboarding_Statuses::IN_PROGRESS;
 			$this->bump_furthest_step_index( $draft );
 			$draft_service->save_draft( $draft );
+			$this->maybe_sync_build_plan_snapshot( $draft );
 			return $this->hub_redirect_url( array() );
 		}
 
 		if ( $action === 'save_draft' ) {
 			$this->persist_all_wizard_fields_from_post( $draft );
 			$this->bump_furthest_step_index( $draft );
+			if ( ( $draft['current_step_key'] ?? '' ) === Onboarding_Step_Keys::WELCOME ) {
+				if ( ! $this->ensure_linked_shell_plan_for_draft( $draft, $draft_service ) ) {
+					return $this->hub_redirect_url( array( 'onboarding_validation' => '1' ) );
+				}
+			} else {
+				$this->maybe_sync_build_plan_snapshot( $draft );
+			}
 			$draft['overall_status'] = Onboarding_Statuses::DRAFT_SAVED;
 			$draft_service->save_draft( $draft );
 			return $this->hub_redirect_url(
@@ -160,6 +180,11 @@ final class Onboarding_Screen {
 
 		if ( $action === 'advance_step' ) {
 			$this->persist_all_wizard_fields_from_post( $draft );
+			if ( ( $draft['current_step_key'] ?? '' ) === Onboarding_Step_Keys::WELCOME ) {
+				if ( ! $this->ensure_linked_shell_plan_for_draft( $draft, $draft_service ) ) {
+					return $this->hub_redirect_url( array( 'onboarding_validation' => '1' ) );
+				}
+			}
 			$this->bump_furthest_step_index( $draft );
 			$prefill_fresh    = $this->container->get( 'onboarding_prefill_service' )->get_prefill_data( $draft );
 			$profile_for_gate = isset( $prefill_fresh['profile'] ) && is_array( $prefill_fresh['profile'] ) ? $prefill_fresh['profile'] : array();
@@ -205,6 +230,7 @@ final class Onboarding_Screen {
 				$draft['overall_status']                              = Onboarding_Statuses::IN_PROGRESS;
 				$this->bump_furthest_step_index( $draft );
 				$draft_service->save_draft( $draft );
+				$this->maybe_sync_build_plan_snapshot( $draft );
 				$this->debug_onboarding_line( 'advance ok: moved to step=' . $next );
 			}
 			return $this->hub_redirect_url( array() );
@@ -221,12 +247,16 @@ final class Onboarding_Screen {
 				$draft['step_statuses'][ $prev ] = Onboarding_Statuses::STEP_IN_PROGRESS;
 				$draft['overall_status']         = Onboarding_Statuses::IN_PROGRESS;
 				$draft_service->save_draft( $draft );
+				$this->maybe_sync_build_plan_snapshot( $draft );
 			}
 			return $this->hub_redirect_url( array() );
 		}
 
 		if ( $action === 'submit_planning_request' ) {
 			$this->persist_all_wizard_fields_from_post( $draft );
+			if ( ! $this->ensure_linked_shell_plan_for_draft( $draft, $draft_service ) ) {
+				return $this->hub_redirect_url( array( 'onboarding_validation' => '1' ) );
+			}
 			if ( ! Capabilities::current_user_can_for_route( Capabilities::RUN_ONBOARDING )
 				|| ! Capabilities::current_user_can_for_route( Capabilities::RUN_AI_PLANS ) ) {
 				$this->debug_onboarding_line( 'submit_planning_request blocked: missing capability' );
@@ -246,7 +276,42 @@ final class Onboarding_Screen {
 				$this->debug_onboarding_line( 'submit_planning_request result_status=' . (string) ( $arr['status'] ?? '' ) );
 				if ( $arr['status'] === Planning_Request_Result::STATUS_SUCCESS
 					&& isset( $arr['run_id'] ) && is_string( $arr['run_id'] ) && $arr['run_id'] !== '' ) {
-					$run_post_id = isset( $arr['run_post_id'] ) ? (int) $arr['run_post_id'] : 0;
+					$run_post_id    = isset( $arr['run_post_id'] ) ? (int) $arr['run_post_id'] : 0;
+					$draft_after    = $draft_service->get_draft();
+					$linked_bp_post = isset( $draft_after['linked_build_plan_post_id'] ) ? (int) $draft_after['linked_build_plan_post_id'] : 0;
+					if ( $this->container->has( 'ai_run_to_build_plan_service' )
+						&& Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
+						/** @var AI_Run_To_Build_Plan_Service $bp_svc */
+						$bp_svc    = $this->container->get( 'ai_run_to_build_plan_service' );
+						$bp_result = null;
+						if ( $linked_bp_post > 0 ) {
+							$bp_result = $bp_svc->create_from_completed_run( $arr['run_id'], $linked_bp_post );
+						}
+						if ( $bp_result === null || ! $bp_result->is_success() ) {
+							$bp_result = $bp_svc->create_from_completed_run( $arr['run_id'] );
+						}
+						if ( $bp_result->is_success() ) {
+							$plan_key                                 = (string) ( $bp_result->get_plan_id() ?? '' );
+							$draft_fresh                              = $draft_service->get_draft();
+							$draft_fresh['linked_build_plan_post_id'] = $bp_result->get_plan_post_id();
+							$draft_fresh['linked_build_plan_key']     = $plan_key !== '' ? $plan_key : ( $draft_fresh['linked_build_plan_key'] ?? null );
+							$draft_service->save_draft( $draft_fresh );
+							if ( $this->container->has( 'onboarding_build_plan_bootstrap_service' ) ) {
+								$prefill  = $this->container->get( 'onboarding_prefill_service' )->get_prefill_data( $draft_fresh );
+								$industry = $this->get_industry_profile_snapshot_for_plan();
+								/** @var Onboarding_Build_Plan_Bootstrap_Service $bootstrap */
+								$bootstrap = $this->container->get( 'onboarding_build_plan_bootstrap_service' );
+								$bootstrap->sync_wizard_snapshot( $bp_result->get_plan_post_id(), $draft_fresh, $prefill, $industry );
+							}
+							if ( $plan_key !== '' ) {
+								return Admin_Screen_Hub::tab_url(
+									Build_Plans_Screen::SLUG,
+									'build_plans',
+									array( 'plan_id' => $plan_key )
+								);
+							}
+						}
+					}
 					if ( Capabilities::current_user_can_for_route( Capabilities::ACCESS_INDUSTRY_WORKSPACE )
 						&& $this->container !== null
 						&& $this->container->has( 'onboarding_industry_hub_navigation_advisor' )
@@ -310,6 +375,106 @@ final class Onboarding_Screen {
 	}
 
 	/**
+	 * Creates a shell Build Plan when possible and saves the draft; then syncs wizard fields into plan meta.
+	 *
+	 * @param array<string, mixed> $draft Draft (mutated).
+	 */
+	private function ensure_linked_shell_plan_for_draft( array &$draft, Onboarding_Draft_Service $draft_service ): bool {
+		if ( $this->container === null || ! $this->container->has( 'onboarding_build_plan_bootstrap_service' ) ) {
+			return true;
+		}
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
+			return true;
+		}
+		/** @var Onboarding_Build_Plan_Bootstrap_Service $bootstrap */
+		$bootstrap = $this->container->get( 'onboarding_build_plan_bootstrap_service' );
+		$result    = $bootstrap->ensure_linked_shell_plan( $draft );
+		if ( $result !== null && ! $result->is_success() ) {
+			$draft_service->save_draft( $draft );
+			\set_transient( 'aio_onboarding_advance_validation_' . (string) \get_current_user_id(), $result->get_errors(), 120 );
+			return false;
+		}
+		$draft_service->save_draft( $draft );
+		$this->maybe_sync_build_plan_snapshot( $draft );
+		return true;
+	}
+
+	/**
+	 * Adds build plan lineage options for the welcome step.
+	 *
+	 * @param array<string, mixed> $state UI state.
+	 * @return array<string, mixed>
+	 */
+	private function enrich_state_with_build_plan_lineages( array $state ): array {
+		$state['build_plan_lineages'] = array();
+		if ( $this->container !== null
+			&& Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
+			$state['build_plan_lineages'] = $this->container->get( 'build_plan_lineage_service' )->list_lineages_for_onboarding_selector();
+		}
+		return $state;
+	}
+
+	/**
+	 * Reads build plan lineage mode and fork fields from POST into the draft.
+	 *
+	 * @param array<string, mixed> $draft Draft (mutated).
+	 */
+	private function merge_build_plan_lineage_from_post_into_draft( array &$draft ): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before persist.
+		if ( ! isset( $_POST['aio_onboarding_build_plan_mode'] ) ) {
+			return;
+		}
+		$mode                             = \sanitize_key( \wp_unslash( (string) $_POST['aio_onboarding_build_plan_mode'] ) );
+		$draft['build_plan_lineage_mode'] = $mode === 'fork' ? 'fork' : 'new';
+		if ( isset( $_POST['aio_onboarding_fork_lineage_id'] ) ) {
+			$draft['fork_lineage_id'] = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_onboarding_fork_lineage_id'] ) );
+		}
+		if ( isset( $_POST['aio_onboarding_fork_version_purpose'] ) ) {
+			$draft['fork_version_purpose'] = \sanitize_textarea_field( \wp_unslash( (string) $_POST['aio_onboarding_fork_version_purpose'] ) );
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+	}
+
+	/**
+	 * Updates the linked plan's onboarding snapshot when a plan post id is present.
+	 *
+	 * @param array<string, mixed> $draft Current draft.
+	 */
+	private function maybe_sync_build_plan_snapshot( array $draft ): void {
+		if ( $this->container === null || ! $this->container->has( 'onboarding_build_plan_bootstrap_service' ) ) {
+			return;
+		}
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
+			return;
+		}
+		$post_id = isset( $draft['linked_build_plan_post_id'] ) ? (int) $draft['linked_build_plan_post_id'] : 0;
+		if ( $post_id <= 0 ) {
+			return;
+		}
+		$prefill  = $this->container->get( 'onboarding_prefill_service' )->get_prefill_data( $draft );
+		$industry = $this->get_industry_profile_snapshot_for_plan();
+		/** @var Onboarding_Build_Plan_Bootstrap_Service $bootstrap */
+		$bootstrap = $this->container->get( 'onboarding_build_plan_bootstrap_service' );
+		$bootstrap->sync_wizard_snapshot( $post_id, $draft, $prefill, $industry );
+	}
+
+	/**
+	 * Returns the industry profile row for plan snapshots (no secrets).
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function get_industry_profile_snapshot_for_plan(): array {
+		if ( $this->container === null || ! $this->container->has( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE ) ) {
+			return array();
+		}
+		$repo = $this->container->get( Industry_Packs_Module::CONTAINER_KEY_INDUSTRY_PROFILE_STORE );
+		if ( ! $repo instanceof Industry_Profile_Repository ) {
+			return array();
+		}
+		return $repo->get_profile();
+	}
+
+	/**
 	 * Tracks the highest step index the user has opened so the stepper can allow jumping back to visited steps.
 	 *
 	 * @param array<string, mixed> $draft Draft (mutated).
@@ -330,6 +495,7 @@ final class Onboarding_Screen {
 	 * @return void
 	 */
 	private function persist_all_wizard_fields_from_post( array &$draft ): void {
+		$this->merge_build_plan_lineage_from_post_into_draft( $draft );
 		$this->persist_brand_profile_from_post( $draft );
 		$this->persist_business_profile_from_post( $draft );
 		$this->persist_template_preferences_from_post( $draft );
@@ -349,6 +515,29 @@ final class Onboarding_Screen {
 			return;
 		}
 		$draft['goal_or_intent_text'] = \sanitize_textarea_field( \wp_unslash( (string) $_POST['aio_onboarding_goal_or_intent'] ) );
+	}
+
+	/**
+	 * Hidden field inside the main form so the site goal is POSTed with Save draft / Request plan (visible field is outside the form).
+	 *
+	 * @param array<string, mixed> $state UI state including `draft`.
+	 * @return void
+	 */
+	private function render_submission_goal_post_field( array $state ): void {
+		$draft_for_goal = isset( $state['draft'] ) && is_array( $state['draft'] ) ? $state['draft'] : array();
+		$goal_val       = isset( $draft_for_goal['goal_or_intent_text'] ) && is_string( $draft_for_goal['goal_or_intent_text'] ) ? $draft_for_goal['goal_or_intent_text'] : '';
+		?>
+		<textarea
+			name="aio_onboarding_goal_or_intent"
+			id="<?php echo \esc_attr( self::SUBMISSION_GOAL_POST_FIELD_ID ); ?>"
+			class="screen-reader-text"
+			tabindex="-1"
+			aria-hidden="true"
+			rows="1"
+			cols="1"
+			style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"
+		><?php echo \esc_textarea( $goal_val ); ?></textarea>
+		<?php
 	}
 
 	/**
@@ -712,6 +901,9 @@ final class Onboarding_Screen {
 					|| $current_step_key === Onboarding_Step_Keys::SUBMISSION ) {
 					$this->render_wizard_hidden_profile_carryover_fields( $state );
 				}
+				if ( $current_step_key === Onboarding_Step_Keys::SUBMISSION ) {
+					$this->render_submission_goal_post_field( $state );
+				}
 				?>
 				<p class="submit">
 					<?php if ( $current_step_key !== Onboarding_Step_Keys::WELCOME ) : ?>
@@ -720,9 +912,18 @@ final class Onboarding_Screen {
 					<?php if ( $current_step_key !== Onboarding_Step_Keys::SUBMISSION ) : ?>
 						<button type="submit" name="aio_onboarding_action" value="save_draft" class="button"><?php \esc_html_e( 'Save draft', 'aio-page-builder' ); ?></button>
 						<?php if ( $current_step_key !== Onboarding_Step_Keys::REVIEW || empty( $state['is_blocked'] ) ) : ?>
-							<button type="submit" name="aio_onboarding_action" value="advance_step" class="button button-primary"><?php \esc_html_e( 'Next', 'aio-page-builder' ); ?></button>
+							<button type="submit" name="aio_onboarding_action" value="advance_step" class="button button-primary">
+								<?php
+								if ( $current_step_key === Onboarding_Step_Keys::WELCOME ) {
+									\esc_html_e( 'Get started', 'aio-page-builder' );
+								} else {
+									\esc_html_e( 'Next', 'aio-page-builder' );
+								}
+								?>
+							</button>
 						<?php endif; ?>
 					<?php else : ?>
+						<button type="submit" name="aio_onboarding_action" value="save_draft" class="button"><?php \esc_html_e( 'Save draft', 'aio-page-builder' ); ?></button>
 						<?php if ( ! empty( $state['is_blocked'] ) ) : ?>
 							<p class="aio-onboarding-ready"><?php \esc_html_e( 'Complete the required steps above before requesting a plan.', 'aio-page-builder' ); ?></p>
 						<?php else : ?>
@@ -730,6 +931,20 @@ final class Onboarding_Screen {
 						<?php endif; ?>
 					<?php endif; ?>
 				</p>
+				<?php if ( $current_step_key === Onboarding_Step_Keys::SUBMISSION ) : ?>
+					<script>
+					(function () {
+						var v = document.getElementById( <?php echo \wp_json_encode( self::SUBMISSION_GOAL_VISIBLE_FIELD_ID ); ?> );
+						var p = document.getElementById( <?php echo \wp_json_encode( self::SUBMISSION_GOAL_POST_FIELD_ID ); ?> );
+						var f = document.getElementById( <?php echo \wp_json_encode( self::MAIN_FORM_ID ); ?> );
+						if ( ! v || ! p || ! f ) { return; }
+						function sync() { p.value = v.value; }
+						v.addEventListener( 'input', sync );
+						v.addEventListener( 'change', sync );
+						f.addEventListener( 'submit', sync );
+					})();
+					</script>
+				<?php endif; ?>
 			</form>
 		</div>
 		<?php
@@ -754,10 +969,25 @@ final class Onboarding_Screen {
 		<div class="aio-onboarding-step-panel" data-step="<?php echo \esc_attr( $current_step_key ); ?>">
 			<h3><?php echo \esc_html( $label ); ?></h3>
 			<?php if ( $current_step_key === Onboarding_Step_Keys::WELCOME ) : ?>
-				<?php $this->render_onboarding_welcome_step(); ?>
+				<?php $this->render_onboarding_welcome_step( $state ); ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::PROVIDER_SETUP ) : ?>
 				<p><?php \esc_html_e( 'Configure at least one AI provider (API key) to use AI planning. Credentials are stored securely and never shown in full after save.', 'aio-page-builder' ); ?></p>
 				<p><?php \esc_html_e( 'Current readiness:', 'aio-page-builder' ); ?> <strong><?php echo $is_provider_ready ? \esc_html__( 'At least one provider is marked configured.', 'aio-page-builder' ) : \esc_html__( 'No provider configured yet.', 'aio-page-builder' ); ?></strong></p>
+				<div class="aio-onboarding-api-key-guide" role="region" aria-labelledby="aio-api-key-guide-heading">
+					<h4 id="aio-api-key-guide-heading"><?php \esc_html_e( 'How to get an API key', 'aio-page-builder' ); ?></h4>
+					<ol class="aio-onboarding-numbered-steps">
+						<li><?php \esc_html_e( 'Open the AI area of this plugin and go to the Providers tab (same controls are embedded below).', 'aio-page-builder' ); ?></li>
+						<li><?php \esc_html_e( 'Choose a provider (for example OpenAI). In another browser tab, sign in to that provider’s developer console and create a new secret API key with permission to use chat/completions.', 'aio-page-builder' ); ?></li>
+						<li><?php \esc_html_e( 'Copy the key, return here, paste it into the provider’s API key field, and save. Use “Test connection” if the screen offers it.', 'aio-page-builder' ); ?></li>
+						<li><?php \esc_html_e( 'Never share keys in support tickets or screenshots; rotate a key if it may have leaked.', 'aio-page-builder' ); ?></li>
+					</ol>
+					<p class="description">
+						<?php
+						$openai_keys = 'https://platform.openai.com/api-keys';
+						?>
+						<a href="<?php echo \esc_url( $openai_keys ); ?>" target="_blank" rel="noopener noreferrer"><?php \esc_html_e( 'OpenAI API keys (opens in a new tab)', 'aio-page-builder' ); ?></a>
+					</p>
+				</div>
 				<?php $this->render_embedded_ai_providers_setup(); ?>
 			<?php elseif ( $current_step_key === Onboarding_Step_Keys::SUBMISSION ) : ?>
 				<?php if ( ! $is_provider_ready ) : ?>
@@ -766,14 +996,15 @@ final class Onboarding_Screen {
 					</div>
 					<?php $this->render_embedded_ai_providers_setup(); ?>
 				<?php endif; ?>
-				<p><?php \esc_html_e( 'Request an AI-generated plan from your profile and context. The plan will appear in AI Runs; you can then create a Build Plan from it.', 'aio-page-builder' ); ?></p>
+				<p><?php \esc_html_e( 'Request an AI-generated plan from your profile and context. When the run completes, your onboarding Build Plan is filled with the AI output and opened for review.', 'aio-page-builder' ); ?></p>
+				<p class="description"><strong><?php \esc_html_e( 'API usage', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( Build_Plan_Schema::DEFAULT_ONBOARDING_AI_COST_USD_NOTE ); ?></p>
 				<?php
 				$draft_for_goal = isset( $state['draft'] ) && is_array( $state['draft'] ) ? $state['draft'] : array();
 				$goal_val       = isset( $draft_for_goal['goal_or_intent_text'] ) && is_string( $draft_for_goal['goal_or_intent_text'] ) ? $draft_for_goal['goal_or_intent_text'] : '';
 				$min_goal       = Onboarding_Planning_Context_Guard::MIN_GOAL_LENGTH;
 				?>
 				<p>
-					<label for="aio_onboarding_goal_or_intent"><strong><?php \esc_html_e( 'Site goal and scope', 'aio-page-builder' ); ?></strong></label>
+					<label for="<?php echo \esc_attr( self::SUBMISSION_GOAL_VISIBLE_FIELD_ID ); ?>"><strong><?php \esc_html_e( 'Site goal and scope', 'aio-page-builder' ); ?></strong></label>
 				</p>
 				<p class="description">
 					<?php
@@ -788,11 +1019,9 @@ final class Onboarding_Screen {
 				</p>
 				<p>
 					<textarea
-						name="aio_onboarding_goal_or_intent"
-						id="aio_onboarding_goal_or_intent"
+						id="<?php echo \esc_attr( self::SUBMISSION_GOAL_VISIBLE_FIELD_ID ); ?>"
 						class="large-text"
 						rows="8"
-						form="<?php echo \esc_attr( self::MAIN_FORM_ID ); ?>"
 					><?php echo \esc_textarea( $goal_val ); ?></textarea>
 				</p>
 				<?php
@@ -844,19 +1073,79 @@ final class Onboarding_Screen {
 	/**
 	 * Renders the welcome / overview step: README-style orientation, prerequisites, and step map.
 	 *
+	 * @param array<string, mixed> $state UI state including draft and build_plan_lineages.
 	 * @return void
 	 */
-	private function render_onboarding_welcome_step(): void {
-		$labels  = Onboarding_UI_State_Builder::step_labels();
-		$ordered = Onboarding_Step_Keys::ordered();
+	private function render_onboarding_welcome_step( array $state ): void {
+		$labels   = Onboarding_UI_State_Builder::step_labels();
+		$ordered  = Onboarding_Step_Keys::ordered();
+		$draft    = isset( $state['draft'] ) && is_array( $state['draft'] ) ? $state['draft'] : array();
+		$lineages = isset( $state['build_plan_lineages'] ) && is_array( $state['build_plan_lineages'] ) ? $state['build_plan_lineages'] : array();
+		$mode     = isset( $draft['build_plan_lineage_mode'] ) && $draft['build_plan_lineage_mode'] === 'fork' ? 'fork' : 'new';
+		$fork_lid = isset( $draft['fork_lineage_id'] ) && is_string( $draft['fork_lineage_id'] ) ? $draft['fork_lineage_id'] : '';
+		$fork_p   = isset( $draft['fork_version_purpose'] ) && is_string( $draft['fork_version_purpose'] ) ? $draft['fork_version_purpose'] : '';
+		$form_id  = self::MAIN_FORM_ID;
 		?>
 		<div class="aio-onboarding-welcome">
 			<div class="aio-onboarding-welcome-hero">
 				<p class="aio-onboarding-welcome-kicker"><?php \esc_html_e( 'Orientation', 'aio-page-builder' ); ?></p>
 				<p class="aio-onboarding-welcome-lead">
-					<?php \esc_html_e( 'This wizard builds a structured profile of your business, brand, and site so AIO Page Builder can generate an AI planning run you can turn into a Build Plan and real pages.', 'aio-page-builder' ); ?>
+					<?php \esc_html_e( 'This wizard builds a structured profile of your business, brand, and site. When you click Get started, a Build Plan is created for this run and kept updated with your answers until you request an AI plan—then you are taken to that plan.', 'aio-page-builder' ); ?>
 				</p>
 			</div>
+
+			<section class="aio-onboarding-welcome-card aio-onboarding-build-plan-choice" aria-labelledby="aio-welcome-bp-heading">
+				<h4 id="aio-welcome-bp-heading" class="aio-onboarding-welcome-card-title"><?php \esc_html_e( 'Build Plan for this run', 'aio-page-builder' ); ?></h4>
+				<p class="description">
+					<?php echo \esc_html( Build_Plan_Schema::DEFAULT_ONBOARDING_AI_COST_USD_NOTE ); ?>
+					<?php \esc_html_e( ' Each new version you add should include a short purpose so your team knows why it exists.', 'aio-page-builder' ); ?>
+				</p>
+				<fieldset class="aio-onboarding-fieldset">
+					<legend class="screen-reader-text"><?php \esc_html_e( 'New plan or continue existing', 'aio-page-builder' ); ?></legend>
+					<p>
+						<label>
+							<input type="radio" name="aio_onboarding_build_plan_mode" value="new" form="<?php echo \esc_attr( $form_id ); ?>" <?php \checked( $mode, 'new' ); ?> />
+							<?php \esc_html_e( 'Start a new Build Plan lineage (version 1.0)', 'aio-page-builder' ); ?>
+						</label>
+					</p>
+					<p>
+						<label>
+							<input type="radio" name="aio_onboarding_build_plan_mode" value="fork" form="<?php echo \esc_attr( $form_id ); ?>" <?php \checked( $mode, 'fork' ); ?> <?php echo count( $lineages ) === 0 ? 'disabled' : ''; ?> />
+							<?php \esc_html_e( 'Continue an existing plan — create the next version (e.g. 2.0)', 'aio-page-builder' ); ?>
+						</label>
+					</p>
+					<?php if ( count( $lineages ) === 0 ) : ?>
+						<p class="description"><?php \esc_html_e( 'No prior onboarded plan lineages found yet. Complete onboarding once to fork later.', 'aio-page-builder' ); ?></p>
+					<?php else : ?>
+						<p>
+							<label for="aio_onboarding_fork_lineage_id"><strong><?php \esc_html_e( 'Existing plan', 'aio-page-builder' ); ?></strong></label>
+							<select name="aio_onboarding_fork_lineage_id" id="aio_onboarding_fork_lineage_id" class="widefat" form="<?php echo \esc_attr( $form_id ); ?>">
+								<option value=""><?php \esc_html_e( 'Select…', 'aio-page-builder' ); ?></option>
+								<?php foreach ( $lineages as $row ) : ?>
+									<?php
+									if ( ! is_array( $row ) ) {
+										continue;
+									}
+									$lid = isset( $row['lineage_id'] ) ? (string) $row['lineage_id'] : '';
+									$ttl = isset( $row['display_title'] ) ? (string) $row['display_title'] : $lid;
+									$cnt = isset( $row['version_count'] ) ? (int) $row['version_count'] : 0;
+									?>
+									<option value="<?php echo \esc_attr( $lid ); ?>" <?php \selected( $fork_lid, $lid ); ?>>
+										<?php echo \esc_html( $ttl . ' (' . sprintf( /* translators: %d: version count */ \_n( '%d version', '%d versions', $cnt, 'aio-page-builder' ), $cnt ) . ')' ); ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+						</p>
+						<p>
+							<label for="aio_onboarding_fork_version_purpose"><strong><?php \esc_html_e( 'Purpose of this new version', 'aio-page-builder' ); ?></strong></label>
+							<span class="description"><?php \esc_html_e( 'Required when continuing a plan. Example: “Rebuild services hierarchy after rebrand.”', 'aio-page-builder' ); ?></span>
+						</p>
+						<p>
+							<textarea class="large-text" name="aio_onboarding_fork_version_purpose" id="aio_onboarding_fork_version_purpose" rows="3" form="<?php echo \esc_attr( $form_id ); ?>"><?php echo \esc_textarea( $fork_p ); ?></textarea>
+						</p>
+					<?php endif; ?>
+				</fieldset>
+			</section>
 
 			<div class="aio-onboarding-welcome-columns">
 				<section class="aio-onboarding-welcome-card" aria-labelledby="aio-welcome-why-heading">
@@ -883,7 +1172,7 @@ final class Onboarding_Screen {
 					<li><?php \esc_html_e( 'Crawl preferences and embedded crawler tools (when available) help align automated discovery with how you work.', 'aio-page-builder' ); ?></li>
 					<li><?php \esc_html_e( 'AI Provider setup stores keys in segregated storage—never echoed in full after save.', 'aio-page-builder' ); ?></li>
 					<li><?php \esc_html_e( 'Template preferences add advisory signals for page and section style.', 'aio-page-builder' ); ?></li>
-					<li><?php \esc_html_e( 'Review checks required data; Submission requests the plan (AI Run), which you can promote into a Build Plan.', 'aio-page-builder' ); ?></li>
+					<li><?php \esc_html_e( 'Review checks required data; Submission runs the AI planner and opens your linked Build Plan when the run completes.', 'aio-page-builder' ); ?></li>
 				</ol>
 			</section>
 

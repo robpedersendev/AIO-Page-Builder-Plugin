@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Build_Plan_Bootstrap_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Industry_Hub_Navigation_Advisor;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
@@ -31,6 +32,16 @@ final class Onboarding_Provider implements Service_Provider_Interface {
 			'onboarding_draft_service',
 			function () use ( $container ): Onboarding_Draft_Service {
 				return new Onboarding_Draft_Service( $container->get( 'settings' ) );
+			}
+		);
+		$container->register(
+			'onboarding_build_plan_bootstrap_service',
+			function () use ( $container ): Onboarding_Build_Plan_Bootstrap_Service {
+				return new Onboarding_Build_Plan_Bootstrap_Service(
+					$container->get( 'build_plan_generator' ),
+					$container->get( 'build_plan_repository' ),
+					$container->get( 'build_plan_lineage_service' )
+				);
 			}
 		);
 		$container->register(
