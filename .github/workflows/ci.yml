@@ -1,4 +1,6 @@
 # * Local parity: `cd plugin && composer run ci`, or repo-root `tools/ci-local.ps1` / `tools/ci-local.sh`.
+# * Required gates: job `php` (PHPCS/PHPStan/PHPUnit per matrix), `package`, `smoke-install`, `e2e`.
+# * Optional / advisory: `plugin-check` (continue-on-error until baseline cleared).
 name: CI
 
 on:
@@ -6,6 +8,10 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   php:
@@ -211,6 +217,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-e2e-artifacts
+          retention-days: 14
           path: |
             playwright-report
             test-results

@@ -419,6 +419,28 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 		}
 	}
 
+	/** Second deny on the same item is a no-op (idempotent / safe for stale UI). */
+	public function test_deny_item_step2_second_call_is_noop(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 8891;
+		try {
+			$repo    = new Build_Plan_Repository();
+			$def     = $this->step2_plan_definition( 1 );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-step2-deny-idem',
+					'post_title'      => 'Test Plan Step2 Deny Idem',
+					'status'          => 'publish',
+				)
+			);
+			$bulk    = new New_Page_Creation_Bulk_Action_Service( $repo );
+			$this->assertTrue( $bulk->deny_item( $post_id, 'plan_npc_0', 1 ) );
+			$this->assertFalse( $bulk->deny_item( $post_id, 'plan_npc_0', 1 ) );
+		} finally {
+			unset( $GLOBALS['_aio_wp_insert_post_return'] );
+		}
+	}
+
 	/** Deny item (reject) updates status via repository; denied item is terminal and not executed. */
 	public function test_deny_item_step2(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 889;
@@ -466,13 +488,48 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 			);
 			$this->assertGreaterThan( 0, $post_id );
 			$bulk  = new New_Page_Creation_Bulk_Action_Service( $repo );
-			$count = $bulk->bulk_deny_selected( $post_id, array( 'plan_npc_0', 'plan_npc_2' ) );
+			$count = $bulk->bulk_deny_selected( $post_id, array( 'plan_npc_0', 'plan_npc_2' ), 42 );
 			$this->assertSame( 2, $count );
 			$def2  = $repo->get_plan_definition( $post_id );
 			$items = $def2[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ] ?? array();
 			$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $items[0]['status'] );
 			$this->assertSame( Build_Plan_Item_Statuses::PENDING, $items[1]['status'] );
 			$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $items[2]['status'] );
+			$rd0 = $items[0][ Build_Plan_Item_Schema::KEY_REVIEW_DECISION ] ?? null;
+			$this->assertIsArray( $rd0 );
+			$this->assertSame( 42, (int) ( $rd0['actor_user_id'] ?? 0 ) );
+		} finally {
+			unset( $GLOBALS['_aio_wp_insert_post_return'] );
+		}
+	}
+
+	/** Bulk deny selected with mixed eligibility: only pending selected rows change; others unchanged. */
+	public function test_bulk_deny_selected_skips_non_pending_in_selection(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 7921;
+		try {
+			$repo    = new Build_Plan_Repository();
+			$def     = $this->step2_plan_definition( 3 );
+			$post_id = $repo->save(
+				array(
+					'plan_definition' => $def,
+					'internal_key'    => 'test-plan-bulk-deny-mixed',
+					'post_title'      => 'Test Mixed',
+					'status'          => 'publish',
+				)
+			);
+			$def0                                   = $repo->get_plan_definition( $post_id );
+			$items0                                 = $def0[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ];
+			$items0[0]['status']                    = Build_Plan_Item_Statuses::REJECTED;
+			$def0[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ] = $items0;
+			$repo->save_plan_definition( $post_id, $def0 );
+			$bulk  = new New_Page_Creation_Bulk_Action_Service( $repo );
+			$count = $bulk->bulk_deny_selected( $post_id, array( 'plan_npc_0', 'plan_npc_1' ), 0 );
+			$this->assertSame( 1, $count );
+			$def2  = $repo->get_plan_definition( $post_id );
+			$items = $def2[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ] ?? array();
+			$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $items[0]['status'] );
+			$this->assertSame( Build_Plan_Item_Statuses::REJECTED, $items[1]['status'] );
+			$this->assertSame( Build_Plan_Item_Statuses::PENDING, $items[2]['status'] );
 		} finally {
 			unset( $GLOBALS['_aio_wp_insert_post_return'] );
 		}

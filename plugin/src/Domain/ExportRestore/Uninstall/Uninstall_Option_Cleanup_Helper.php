@@ -15,7 +15,9 @@ use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 
 /**
  * Single entry point for option-row deletion used by {@see Uninstall_Cleanup_Service}.
- * Does not remove posts, terms, or uploads. Network options: none are registered today ({@see Uninstall_Option_Registry}).
+ * Does not remove posts, terms, or uploads. Declared keys use {@see delete_option()} only (blog options table).
+ * This plugin does not register site/network options today; if that changes, mirror with {@see delete_site_option()}
+ * in a dedicated path with explicit keys (spec §53.6 — conservative cleanup).
  */
 final class Uninstall_Option_Cleanup_Helper {
 
@@ -49,8 +51,24 @@ final class Uninstall_Option_Cleanup_Helper {
 				continue;
 			}
 			$like = $wpdb->esc_like( $prefix ) . '%';
-			$ids  = Wpdb_Prepared_Results::get_col( $wpdb, 'SELECT option_id FROM %i WHERE option_name LIKE %s', array( $table, $like ) );
-			foreach ( $ids as $id ) {
+			$rows = Wpdb_Prepared_Results::get_results(
+				$wpdb,
+				'SELECT option_id, option_name FROM %i WHERE option_name LIKE %s',
+				array( $table, $like ),
+				\ARRAY_A
+			);
+			foreach ( $rows as $row ) {
+				if ( ! is_array( $row ) ) {
+					continue;
+				}
+				$name = (string) ( $row['option_name'] ?? '' );
+				$id   = (int) ( $row['option_id'] ?? 0 );
+				if ( $id <= 0 || $name === '' ) {
+					continue;
+				}
+				if ( ! Uninstall_Dynamic_Option_Ownership::matches_plugin_owned_dynamic_key( $name, $prefix ) ) {
+					continue;
+				}
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Confirmed-uninstall option purge; caching not applicable.
 				$wpdb->delete( $table, array( 'option_id' => $id ) );
 				if ( $wpdb->last_error === '' ) {

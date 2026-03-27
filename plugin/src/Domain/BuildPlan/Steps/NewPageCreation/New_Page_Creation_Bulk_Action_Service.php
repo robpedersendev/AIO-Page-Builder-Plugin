@@ -101,16 +101,17 @@ final class New_Page_Creation_Bulk_Action_Service {
 	/**
 	 * Bulk deny selected pending new-page items in Step 2 (spec §33.7 symmetry with Build Selected Pages).
 	 *
-	 * @param int   $plan_post_id Plan post ID.
-	 * @param array $item_ids     Item ids to set to rejected (only pending eligible rows are updated).
+	 * @param int   $plan_post_id  Plan post ID.
+	 * @param array $item_ids      Item ids to set to rejected (only pending eligible rows are updated).
+	 * @param int   $actor_user_id Current user for review metadata (bulk selected source).
 	 * @return int Number of items updated.
 	 */
-	public function bulk_deny_selected( int $plan_post_id, array $item_ids ): int {
+	public function bulk_deny_selected( int $plan_post_id, array $item_ids, int $actor_user_id = 0 ): int {
 		if ( empty( $item_ids ) ) {
 			return 0;
 		}
 		$item_id_set = array_fill_keys( array_map( 'strval', $item_ids ), true );
-		return $this->bulk_set_selected_eligible_status( $plan_post_id, $item_id_set, Build_Plan_Item_Statuses::REJECTED );
+		return $this->bulk_set_selected_eligible_status( $plan_post_id, $item_id_set, Build_Plan_Item_Statuses::REJECTED, $actor_user_id );
 	}
 
 	/**

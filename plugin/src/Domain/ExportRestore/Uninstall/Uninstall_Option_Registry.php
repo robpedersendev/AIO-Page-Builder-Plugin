@@ -16,7 +16,17 @@ use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Single source of truth for which declared option keys uninstall attempts to delete.
- * Does not include: built page post meta, non-option storage, or foreign theme options.
+ *
+ * Intentionally never deleted via this registry (not exhaustive — see spec §53.5–53.6):
+ * - Built pages (post type `page`), post meta, media, terms.
+ * - Theme mods, `wp_options` rows not listed in {@see Option_Names::declared_option_keys()} and not matching
+ *   validated dynamic patterns in {@see Uninstall_Dynamic_Option_Ownership}.
+ * - Network-wide options: this plugin does not use {@see get_site_option()} for product data today; if added,
+ *   register keys explicitly and delete with {@see delete_site_option()} in uninstall (do not rely on blog `delete_option` alone).
+ *
+ * Partial install: {@see Uninstall_Option_Cleanup_Helper::delete_declared_options()} is safe when keys are absent
+ * ({@see delete_option()} no-op). Confirmed cleanup still runs scheduled unschedule, industry-bundle prerequisite,
+ * tables/CPT paths per {@see Uninstall_Cleanup_Service}.
  */
 final class Uninstall_Option_Registry {
 
