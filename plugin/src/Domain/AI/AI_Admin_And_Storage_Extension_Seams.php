@@ -34,6 +34,11 @@
  * Risks to avoid: provider branching in UI; secrets in repositories or artifacts; REST without
  * permission_callback; chat content bypassing validation/approval for canonical writes.
  *
+ * Template-lab MVP verification (release / QA): activate without provider secrets; open template library
+ * hub (template lab tab for elevated admins per cap matrix); create and fork a session; approve + apply
+ * with registry drift guard; create a build plan from a completed run with optional template-lab session id;
+ * export optional template-lab snapshot refs; confirm uninstall/registry policy for chat + telemetry options.
+ *
  * @package AIOPageBuilder
  */
 

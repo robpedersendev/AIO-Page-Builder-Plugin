@@ -42,6 +42,8 @@ final class Template_Lab_Canonical_Apply_Service {
 
 	private ?Template_Lab_Telemetry $telemetry;
 
+	private ?Template_Lab_Approved_Snapshot_Stale_Guard $stale_guard;
+
 	public function __construct(
 		AI_Chat_Session_Repository_Interface $chat,
 		AI_Run_Template_Lab_Apply_State_Port $run_apply_state,
@@ -51,7 +53,8 @@ final class Template_Lab_Canonical_Apply_Service {
 		Page_Template_AI_Draft_Translator $page_translator,
 		Section_Template_AI_Draft_Translator $section_translator,
 		?Template_Lab_Apply_Lineage_Snapshot_Recorder $lineage_recorder = null,
-		?Template_Lab_Telemetry $telemetry = null
+		?Template_Lab_Telemetry $telemetry = null,
+		?Template_Lab_Approved_Snapshot_Stale_Guard $stale_guard = null
 	) {
 		$this->chat                   = $chat;
 		$this->run_apply_state        = $run_apply_state;
@@ -62,6 +65,7 @@ final class Template_Lab_Canonical_Apply_Service {
 		$this->section_translator     = $section_translator;
 		$this->lineage_recorder       = $lineage_recorder;
 		$this->telemetry              = $telemetry;
+		$this->stale_guard            = $stale_guard;
 	}
 
 	/**
@@ -76,44 +80,71 @@ final class Template_Lab_Canonical_Apply_Service {
 		);
 		$session = $this->chat->get_session( $session_id );
 		if ( $session === null ) {
-			return array( 'ok' => false, 'code' => 'session_missing' );
+			return array(
+				'ok'   => false,
+				'code' => 'session_missing',
+			);
 		}
 		if ( ! Template_Lab_Access::actor_may_use_chat_session( $actor_user_id, $session ) ) {
-			return array( 'ok' => false, 'code' => 'forbidden' );
+			return array(
+				'ok'   => false,
+				'code' => 'forbidden',
+			);
 		}
 		$ref = $session['approved_snapshot_ref'] ?? null;
 		if ( ! is_array( $ref ) || $ref === array() ) {
-			return array( 'ok' => false, 'code' => 'bad_snapshot_ref' );
+			return array(
+				'ok'   => false,
+				'code' => 'bad_snapshot_ref',
+			);
 		}
 		$run_post_id = (int) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID ] ?? 0 );
 		$fp          = (string) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT ] ?? '' );
 		$target      = (string) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND ] ?? '' );
 		if ( $run_post_id <= 0 || $fp === '' || ! Template_Lab_Approved_Snapshot_Ref_Keys::is_valid_target_kind( $target ) ) {
-			return array( 'ok' => false, 'code' => 'bad_snapshot_ref' );
+			return array(
+				'ok'   => false,
+				'code' => 'bad_snapshot_ref',
+			);
 		}
 		$state = (string) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_STATE ] ?? Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_PENDING );
 		if ( $state === Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED ) {
 			Named_Debug_Log::event( Named_Debug_Log_Event::TEMPLATE_LAB_SNAPSHOT_APPROVE_IDEMPOTENT, 'run_post_id=' . (string) $run_post_id );
-			return array( 'ok' => true, 'code' => 'ok' );
+			return array(
+				'ok'   => true,
+				'code' => 'ok',
+			);
 		}
 		if ( ! $this->fingerprint_matches_trace( $run_post_id, $fp ) ) {
 			Named_Debug_Log::event( Named_Debug_Log_Event::TEMPLATE_LAB_SNAPSHOT_APPROVE_FAIL, 'reason=fingerprint run_post_id=' . (string) $run_post_id );
-			return array( 'ok' => false, 'code' => 'fingerprint_mismatch' );
+			return array(
+				'ok'   => false,
+				'code' => 'fingerprint_mismatch',
+			);
 		}
 		$norm = $this->artifacts->get( $run_post_id, Artifact_Category_Keys::NORMALIZED_OUTPUT );
 		if ( ! is_array( $norm ) || $norm === array() ) {
-			return array( 'ok' => false, 'code' => 'missing_normalized_output' );
+			return array(
+				'ok'   => false,
+				'code' => 'missing_normalized_output',
+			);
 		}
 		$ref[ Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_STATE ] = Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED;
 		if ( ! $this->chat->link_approved_snapshot( $session_id, $ref ) ) {
-			return array( 'ok' => false, 'code' => 'persist_failed' );
+			return array(
+				'ok'   => false,
+				'code' => 'persist_failed',
+			);
 		}
 		Named_Debug_Log::event(
 			Named_Debug_Log_Event::TEMPLATE_LAB_SNAPSHOT_APPROVED,
 			'run_post_id=' . (string) $run_post_id . ' target_kind=' . $target
 		);
 		$this->telemetry?->bump( Template_Lab_Telemetry::EVENT_SNAPSHOT_APPROVED );
-		return array( 'ok' => true, 'code' => 'ok' );
+		return array(
+			'ok'   => true,
+			'code' => 'ok',
+		);
 	}
 
 	public function apply_approved_snapshot( int $actor_user_id, string $session_id, string $target_kind ): Template_Lab_Canonical_Apply_Result {
@@ -168,6 +199,19 @@ final class Template_Lab_Canonical_Apply_Service {
 			Named_Debug_Log::event( Named_Debug_Log_Event::TEMPLATE_LAB_CANONICAL_APPLY_FAIL, 'reason=fingerprint' );
 			return Template_Lab_Canonical_Apply_Result::failure( Template_Lab_Canonical_Apply_Result::CODE_FINGERPRINT );
 		}
+		$val_rep = $this->artifacts->get( $run_post_id, Artifact_Category_Keys::VALIDATION_REPORT );
+		$trace   = $this->artifacts->get( $run_post_id, Artifact_Category_Keys::TEMPLATE_LAB_TRACE );
+		if ( is_array( $val_rep ) && is_array( $trace ) ) {
+			$vs = (string) ( $val_rep['schema_ref'] ?? '' );
+			$ts = (string) ( $trace['schema_ref'] ?? '' );
+			if ( $vs !== '' && $ts !== '' && $vs !== $ts ) {
+				Named_Debug_Log::event( Named_Debug_Log_Event::TEMPLATE_LAB_CANONICAL_APPLY_FAIL, 'reason=stale_schema_ref' );
+				return Template_Lab_Canonical_Apply_Result::failure(
+					Template_Lab_Canonical_Apply_Result::CODE_STALE_SNAPSHOT_CONTEXT,
+					array( 'schema_ref_mismatch' )
+				);
+			}
+		}
 		$prior = $this->run_apply_state->get_template_lab_canonical_apply_record( $run_post_id );
 		if ( is_array( $prior )
 			&& (string) ( $prior['artifact_fingerprint'] ?? '' ) === $fp
@@ -186,6 +230,16 @@ final class Template_Lab_Canonical_Apply_Service {
 		$norm = $this->artifacts->get( $run_post_id, Artifact_Category_Keys::NORMALIZED_OUTPUT );
 		if ( ! is_array( $norm ) || $norm === array() ) {
 			return Template_Lab_Canonical_Apply_Result::failure( Template_Lab_Canonical_Apply_Result::CODE_NO_ARTIFACT );
+		}
+		if ( $this->stale_guard instanceof Template_Lab_Approved_Snapshot_Stale_Guard ) {
+			$drift = $this->stale_guard->registry_drift_reason( $target_kind, $norm );
+			if ( $drift !== '' ) {
+				Named_Debug_Log::event( Named_Debug_Log_Event::TEMPLATE_LAB_CANONICAL_APPLY_FAIL, 'reason=stale_registry' );
+				return Template_Lab_Canonical_Apply_Result::failure(
+					Template_Lab_Canonical_Apply_Result::CODE_STALE_SNAPSHOT_CONTEXT,
+					array( $drift )
+				);
+			}
 		}
 		$draft = $this->build_draft_with_provenance( $norm, $ref, $run_post_id );
 		if ( $target_kind === Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION ) {
@@ -253,23 +307,23 @@ final class Template_Lab_Canonical_Apply_Service {
 	 */
 	private function build_draft_with_provenance( array $norm, array $ref, int $run_post_id ): array {
 		// * Canonical writes must originate from an approved snapshot handle, not raw chat or provider HTTP (translator enforces schema).
-		$safe_ref = array(
+		$safe_ref                       = array(
 			Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID         => $run_post_id,
 			Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT => (string) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT ] ?? '' ),
 			Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND       => (string) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND ] ?? '' ),
 			Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_STATE      => Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED,
 		);
-		$draft               = $norm;
+		$draft                          = $norm;
 		$draft['approved_snapshot_ref'] = $safe_ref;
-		$draft['ai_run_post_id']          = $run_post_id;
+		$draft['ai_run_post_id']        = $run_post_id;
 		if ( isset( $draft[ Composition_Schema::FIELD_COMPOSITION_ID ] ) ) {
 			if ( isset( $draft[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] ) && is_array( $draft[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] ) ) {
 				$reg = $draft[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ];
 			} else {
 				$reg = array();
 			}
-			$reg['template_lab_source']           = 'approved_snapshot_apply';
-			$reg['approved_artifact_fingerprint'] = (string) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT ] ?? '' );
+			$reg['template_lab_source']                               = 'approved_snapshot_apply';
+			$reg['approved_artifact_fingerprint']                     = (string) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT ] ?? '' );
 			$draft[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] = $reg;
 		}
 		return $draft;

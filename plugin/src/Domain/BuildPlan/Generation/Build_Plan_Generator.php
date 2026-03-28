@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\BuildPlan\Generation;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
+use AIOPageBuilder\Domain\BuildPlan\Build_Plan_Template_Lab_Context;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
@@ -179,6 +180,9 @@ final class Build_Plan_Generator {
 		}
 		if ( ! empty( $context['estimated_ai_cost_usd_note'] ) && is_string( $context['estimated_ai_cost_usd_note'] ) ) {
 			$definition[ Build_Plan_Schema::KEY_ESTIMATED_AI_COST_USD_NOTE ] = trim( $context['estimated_ai_cost_usd_note'] );
+		}
+		if ( ! empty( $context['template_lab_context'] ) && is_array( $context['template_lab_context'] ) ) {
+			$definition = Build_Plan_Template_Lab_Context::merge_into_definition( $definition, $context['template_lab_context'] );
 		}
 
 		$save_payload = array( 'plan_definition' => $definition );

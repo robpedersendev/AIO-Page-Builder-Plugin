@@ -9,8 +9,10 @@ use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Read_Port;
 use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
 use AIOPageBuilder\Domain\AI\TemplateLab\AI_Run_Template_Lab_Apply_State_Port;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Approved_Snapshot_Ref_Keys;
+use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Approved_Snapshot_Stale_Guard;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Apply_Result;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Apply_Service;
+use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Registry_Persist_Port;
 use AIOPageBuilder\Domain\AI\Translation\Composition_AI_Draft_Translator;
 use AIOPageBuilder\Domain\AI\Translation\Page_Template_AI_Draft_Translator;
@@ -33,7 +35,7 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 			Composition_Schema::FIELD_NAME                 => 'TL Apply',
 			Composition_Schema::FIELD_ORDERED_SECTION_LIST => array(
 				array(
-					Composition_Schema::SECTION_ITEM_KEY      => 'st_hero',
+					Composition_Schema::SECTION_ITEM_KEY => 'st_hero',
 					Composition_Schema::SECTION_ITEM_POSITION => 0,
 				),
 			),
@@ -46,7 +48,8 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 		AI_Chat_Session_Repository_Interface $chat,
 		AI_Run_Template_Lab_Apply_State_Port $run_state,
 		AI_Run_Artifact_Read_Port $artifacts,
-		Template_Lab_Canonical_Registry_Persist_Port $persist
+		Template_Lab_Canonical_Registry_Persist_Port $persist,
+		?Template_Lab_Approved_Snapshot_Stale_Guard $stale_guard = null
 	): Template_Lab_Canonical_Apply_Service {
 		return new Template_Lab_Canonical_Apply_Service(
 			$chat,
@@ -55,12 +58,15 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 			$persist,
 			new Composition_AI_Draft_Translator(),
 			new Page_Template_AI_Draft_Translator(),
-			new Section_Template_AI_Draft_Translator()
+			new Section_Template_AI_Draft_Translator(),
+			null,
+			null,
+			$stale_guard
 		);
 	}
 
 	public function test_apply_composition_succeeds_when_approved_and_trace_matches(): void {
-		$ref = array(
+		$ref  = array(
 			Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID         => 900,
 			Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT => 'fp9',
 			Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND       => Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION,
@@ -100,7 +106,10 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 		);
 		$persist = $this->createMock( Template_Lab_Canonical_Registry_Persist_Port::class );
 		$persist->expects( $this->once() )->method( 'persist_definition' )->willReturn(
-			array( 'internal_key' => 'comp_tl_apply_1', 'post_id' => 501 )
+			array(
+				'internal_key' => 'comp_tl_apply_1',
+				'post_id'      => 501,
+			)
 		);
 		$svc = $this->make_service( $chat, $run, $artifacts, $persist );
 		$r   = $svc->apply_approved_snapshot( 5, 'acs_x', Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION );
@@ -112,7 +121,7 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 	}
 
 	public function test_apply_rejects_when_not_approved(): void {
-		$ref = array(
+		$ref  = array(
 			Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID         => 1,
 			Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT => 'fp',
 			Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND       => Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION,
@@ -135,7 +144,7 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 	}
 
 	public function test_apply_is_idempotent_when_prior_record_matches(): void {
-		$ref = array(
+		$ref  = array(
 			Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID         => 800,
 			Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT => 'fpx',
 			Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND       => Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION,
@@ -178,7 +187,7 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 	}
 
 	public function test_apply_routes_page_template_through_persist_port(): void {
-		$ref = array(
+		$ref  = array(
 			Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID         => 701,
 			Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT => 'fpp',
 			Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND       => Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_PAGE,
@@ -194,9 +203,9 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 		$run = $this->createMock( AI_Run_Template_Lab_Apply_State_Port::class );
 		$run->method( 'get_template_lab_canonical_apply_record' )->willReturn( null );
 		$run->expects( $this->once() )->method( 'save_template_lab_canonical_apply_record' );
-		$ordered = array(
+		$ordered    = array(
 			array(
-				Page_Template_Schema::SECTION_ITEM_KEY      => 'st_a',
+				Page_Template_Schema::SECTION_ITEM_KEY => 'st_a',
 				Page_Template_Schema::SECTION_ITEM_POSITION => 0,
 				Page_Template_Schema::SECTION_ITEM_REQUIRED => true,
 			),
@@ -210,12 +219,15 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 			Page_Template_Schema::FIELD_SECTION_REQUIREMENTS => array( 'st_a' => array( 'required' => true ) ),
 			Page_Template_Schema::FIELD_COMPATIBILITY    => array( 'lpagery' => 'ok' ),
 			Page_Template_Schema::FIELD_ONE_PAGER        => array( Page_Template_Schema::ONE_PAGER_PURPOSE_SUMMARY => 'p' ),
-			Page_Template_Schema::FIELD_VERSION          => array( 'major' => 1, 'minor' => 0 ),
+			Page_Template_Schema::FIELD_VERSION          => array(
+				'major' => 1,
+				'minor' => 0,
+			),
 			Page_Template_Schema::FIELD_STATUS           => 'draft',
 			Page_Template_Schema::FIELD_DEFAULT_STRUCTURAL_ASSUMPTIONS => array(),
 			Page_Template_Schema::FIELD_ENDPOINT_OR_USAGE_NOTES => '',
 		);
-		$artifacts = $this->createMock( AI_Run_Artifact_Read_Port::class );
+		$artifacts  = $this->createMock( AI_Run_Artifact_Read_Port::class );
 		$artifacts->method( 'get' )->willReturnCallback(
 			function ( int $pid, string $cat ) use ( $page_draft ) {
 				if ( $cat === Artifact_Category_Keys::TEMPLATE_LAB_TRACE ) {
@@ -228,7 +240,12 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 		$persist->expects( $this->once() )->method( 'persist_definition' )->with(
 			Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_PAGE,
 			$this->anything()
-		)->willReturn( array( 'internal_key' => 'pt_tl_apply', 'post_id' => 909 ) );
+		)->willReturn(
+			array(
+				'internal_key' => 'pt_tl_apply',
+				'post_id'      => 909,
+			)
+		);
 		$svc = $this->make_service( $chat, $run, $artifacts, $persist );
 		$r   = $svc->apply_approved_snapshot( 3, 's3', Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_PAGE );
 		$this->assertTrue( $r->is_success() );
@@ -236,7 +253,7 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 	}
 
 	public function test_approve_marks_session_when_fingerprint_and_output_ok(): void {
-		$ref = array(
+		$ref  = array(
 			Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID         => 55,
 			Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT => 'f55',
 			Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND       => Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION,
@@ -271,5 +288,101 @@ final class Template_Lab_Canonical_Apply_Service_Test extends TestCase {
 		$svc     = $this->make_service( $chat, $run, $artifacts, $persist );
 		$out     = $svc->approve_pending_snapshot( 9, 'sess1' );
 		$this->assertTrue( $out['ok'] ?? false );
+	}
+
+	public function test_apply_blocks_when_registry_section_missing(): void {
+		$ref  = array(
+			Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID         => 910,
+			Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT => 'fp_stale',
+			Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND       => Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION,
+			Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_STATE      => Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED,
+		);
+		$chat = $this->createMock( AI_Chat_Session_Repository_Interface::class );
+		$chat->method( 'get_session' )->willReturn(
+			array(
+				'owner_user_id'         => 5,
+				'approved_snapshot_ref' => $ref,
+			)
+		);
+		$run = $this->createMock( AI_Run_Template_Lab_Apply_State_Port::class );
+		$run->method( 'get_template_lab_canonical_apply_record' )->willReturn( null );
+		$artifacts = $this->createMock( AI_Run_Artifact_Read_Port::class );
+		$artifacts->method( 'get' )->willReturnCallback(
+			function ( int $pid, string $cat ) {
+				if ( $cat === Artifact_Category_Keys::TEMPLATE_LAB_TRACE ) {
+					return array(
+						'artifact_fingerprint' => 'fp_stale',
+						'schema_ref'           => 'aio/tl-comp-v1',
+					);
+				}
+				if ( $cat === Artifact_Category_Keys::VALIDATION_REPORT ) {
+					return array(
+						'schema_ref'             => 'aio/tl-comp-v1',
+						'final_validation_state' => 'passed',
+					);
+				}
+				if ( $cat === Artifact_Category_Keys::NORMALIZED_OUTPUT ) {
+					return $this->sample_normalized_composition();
+				}
+				return null;
+			}
+		);
+		$persist = $this->createMock( Template_Lab_Canonical_Registry_Persist_Port::class );
+		$persist->expects( $this->never() )->method( 'persist_definition' );
+		$sections = $this->createMock( Section_Template_Repository::class );
+		$sections->method( 'get_definition_by_key' )->willReturn( null );
+		$guard = new Template_Lab_Approved_Snapshot_Stale_Guard( $sections );
+		$svc   = $this->make_service( $chat, $run, $artifacts, $persist, $guard );
+		$r     = $svc->apply_approved_snapshot( 5, 'acs_z', Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION );
+		$this->assertFalse( $r->is_success() );
+		$this->assertSame( Template_Lab_Canonical_Apply_Result::CODE_STALE_SNAPSHOT_CONTEXT, $r->get_code() );
+	}
+
+	public function test_apply_blocks_when_validation_schema_diverges_from_trace(): void {
+		$ref  = array(
+			Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID         => 911,
+			Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT => 'fp_schema',
+			Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_KIND       => Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION,
+			Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_STATE      => Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED,
+		);
+		$chat = $this->createMock( AI_Chat_Session_Repository_Interface::class );
+		$chat->method( 'get_session' )->willReturn(
+			array(
+				'owner_user_id'         => 5,
+				'approved_snapshot_ref' => $ref,
+			)
+		);
+		$run = $this->createMock( AI_Run_Template_Lab_Apply_State_Port::class );
+		$run->method( 'get_template_lab_canonical_apply_record' )->willReturn( null );
+		$artifacts = $this->createMock( AI_Run_Artifact_Read_Port::class );
+		$artifacts->method( 'get' )->willReturnCallback(
+			function ( int $pid, string $cat ) {
+				if ( $cat === Artifact_Category_Keys::TEMPLATE_LAB_TRACE ) {
+					return array(
+						'artifact_fingerprint' => 'fp_schema',
+						'schema_ref'           => 'aio/schema-a',
+					);
+				}
+				if ( $cat === Artifact_Category_Keys::VALIDATION_REPORT ) {
+					return array(
+						'schema_ref'             => 'aio/schema-b',
+						'final_validation_state' => 'passed',
+					);
+				}
+				if ( $cat === Artifact_Category_Keys::NORMALIZED_OUTPUT ) {
+					return $this->sample_normalized_composition();
+				}
+				return null;
+			}
+		);
+		$persist = $this->createMock( Template_Lab_Canonical_Registry_Persist_Port::class );
+		$persist->expects( $this->never() )->method( 'persist_definition' );
+		$sections = $this->createMock( Section_Template_Repository::class );
+		$sections->method( 'get_definition_by_key' )->willReturn( array( 'internal_key' => 'st_hero' ) );
+		$guard = new Template_Lab_Approved_Snapshot_Stale_Guard( $sections );
+		$svc   = $this->make_service( $chat, $run, $artifacts, $persist, $guard );
+		$r     = $svc->apply_approved_snapshot( 5, 'acs_schema', Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION );
+		$this->assertFalse( $r->is_success() );
+		$this->assertSame( Template_Lab_Canonical_Apply_Result::CODE_STALE_SNAPSHOT_CONTEXT, $r->get_code() );
 	}
 }

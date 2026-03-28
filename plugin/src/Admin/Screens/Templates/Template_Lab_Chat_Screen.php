@@ -202,6 +202,24 @@ final class Template_Lab_Chat_Screen {
 						<p><?php \esc_html_e( 'Select a session from the list or open one via a direct link.', 'aio-page-builder' ); ?></p>
 					<?php else : ?>
 						<p><strong><?php \esc_html_e( 'Session', 'aio-page-builder' ); ?>:</strong> <?php echo \esc_html( (string) ( $detail['session_id'] ?? '' ) ); ?></p>
+						<?php
+						$fork_src = (string) ( $detail['fork_source_session_id'] ?? '' );
+						if ( $fork_src !== '' ) :
+							?>
+						<p class="description">
+							<?php
+							echo \esc_html(
+								sprintf(
+									/* translators: %s: source session id */
+									__( 'Forked from session %s (original history unchanged).', 'aio-page-builder' ),
+									$fork_src
+								)
+							);
+							?>
+						</p>
+							<?php
+						endif;
+						?>
 						<p><strong><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?>:</strong> <?php echo \esc_html( (string) ( $detail['status'] ?? '' ) ); ?></p>
 						<?php
 						$has_snap = is_array( $detail['approved_snapshot_ref'] ?? null ) && $detail['approved_snapshot_ref'] !== array();
@@ -345,6 +363,25 @@ final class Template_Lab_Chat_Screen {
 						<p class="description"><?php \esc_html_e( 'Open a session to submit a prompt without REST.', 'aio-page-builder' ); ?></p>
 					<?php endif; ?>
 
+					<?php
+					if ( $detail !== null ) :
+						$msg_c = isset( $detail['messages'] ) && is_array( $detail['messages'] ) ? count( $detail['messages'] ) : 0;
+						$has_s = is_array( $detail['approved_snapshot_ref'] ?? null ) && $detail['approved_snapshot_ref'] !== array();
+						if ( $msg_c > 0 || $has_s ) :
+							?>
+					<h3><?php \esc_html_e( 'Fork session', 'aio-page-builder' ); ?></h3>
+					<p class="description"><?php \esc_html_e( 'Start a new working session from this one. Transcripts and approvals are not copied; you must approve any new snapshot separately.', 'aio-page-builder' ); ?></p>
+					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
+						<input type="hidden" name="action" value="<?php echo \esc_attr( Template_Lab_Chat_Admin_Actions::ACTION_FORK_SESSION ); ?>" />
+						<input type="hidden" name="<?php echo \esc_attr( Template_Lab_Chat_Admin_Actions::FIELD_FORK_SOURCE ); ?>" value="<?php echo \esc_attr( (string) ( $detail['session_id'] ?? '' ) ); ?>" />
+							<?php Template_Lab_Chat_Admin_Actions::nonce_field( 'fork' ); ?>
+							<?php \submit_button( __( 'Duplicate / fork from this session', 'aio-page-builder' ), 'secondary', 'submit', false ); ?>
+					</form>
+							<?php
+						endif;
+					endif;
+					?>
+
 					<h3><?php \esc_html_e( 'Actions', 'aio-page-builder' ); ?></h3>
 					<p class="description"><?php \esc_html_e( 'Provider generation is still driven by your orchestration/REST wiring; this screen records intent and approval/apply gates.', 'aio-page-builder' ); ?></p>
 				</div>
@@ -382,6 +419,12 @@ final class Template_Lab_Chat_Screen {
 		if ( $cp !== '' && isset( $cp_msg[ $cp ] ) ) {
 			$cls = $cp === 'ok' ? 'notice-success' : 'notice-error';
 			echo '<div class="notice ' . \esc_attr( $cls ) . ' is-dismissible"><p>' . \esc_html( $cp_msg[ $cp ] ) . '</p></div>';
+		}
+		$fk     = isset( $_GET[ Template_Lab_Chat_Admin_Actions::QUERY_FORK ] ) ? \sanitize_key( (string) \wp_unslash( $_GET[ Template_Lab_Chat_Admin_Actions::QUERY_FORK ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$fk_msg = Template_Lab_Admin_User_Messages::session_fork_messages();
+		if ( $fk !== '' && isset( $fk_msg[ $fk ] ) ) {
+			$cls = $fk === 'ok' ? 'notice-success' : 'notice-error';
+			echo '<div class="notice ' . \esc_attr( $cls ) . ' is-dismissible"><p>' . \esc_html( $fk_msg[ $fk ] ) . '</p></div>';
 		}
 	}
 

@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Approved_Snapshot_Stale_Guard;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Apply_Lineage_Snapshot_Recorder;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Apply_Service;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Telemetry;
@@ -90,7 +91,8 @@ final class Template_Lab_Provider implements Service_Provider_Interface {
 					new Page_Template_AI_Draft_Translator(),
 					new Section_Template_AI_Draft_Translator(),
 					$container->get( 'template_lab_apply_lineage_snapshot_recorder' ),
-					$container->get( 'template_lab_telemetry' )
+					$container->get( 'template_lab_telemetry' ),
+					new Template_Lab_Approved_Snapshot_Stale_Guard( $container->get( 'section_template_repository' ) )
 				);
 			}
 		);

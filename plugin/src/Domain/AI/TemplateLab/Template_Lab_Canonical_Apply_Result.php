@@ -13,17 +13,20 @@ defined( 'ABSPATH' ) || exit;
 
 final class Template_Lab_Canonical_Apply_Result {
 
-	public const CODE_OK               = 'ok';
-	public const CODE_ALREADY_APPLIED  = 'already_applied';
-	public const CODE_SESSION_MISSING  = 'session_missing';
-	public const CODE_FORBIDDEN        = 'forbidden';
-	public const CODE_NOT_APPROVED     = 'not_approved';
-	public const CODE_BAD_REF          = 'bad_snapshot_ref';
-	public const CODE_FINGERPRINT      = 'fingerprint_mismatch';
-	public const CODE_NO_ARTIFACT      = 'missing_normalized_output';
-	public const CODE_TRANSLATION      = 'translation_failed';
-	public const CODE_PERSIST          = 'persist_failed';
-	public const CODE_BAD_TARGET       = 'invalid_target_kind';
+	public const CODE_OK              = 'ok';
+	public const CODE_ALREADY_APPLIED = 'already_applied';
+	public const CODE_SESSION_MISSING = 'session_missing';
+	public const CODE_FORBIDDEN       = 'forbidden';
+	public const CODE_NOT_APPROVED    = 'not_approved';
+	public const CODE_BAD_REF         = 'bad_snapshot_ref';
+	public const CODE_FINGERPRINT     = 'fingerprint_mismatch';
+	public const CODE_NO_ARTIFACT     = 'missing_normalized_output';
+	public const CODE_TRANSLATION     = 'translation_failed';
+	public const CODE_PERSIST         = 'persist_failed';
+	public const CODE_BAD_TARGET      = 'invalid_target_kind';
+
+	/** Validation vs trace schema drift or registry dependency mismatch at apply time. */
+	public const CODE_STALE_SNAPSHOT_CONTEXT = 'stale_snapshot_context';
 
 	private bool $success;
 
@@ -40,8 +43,8 @@ final class Template_Lab_Canonical_Apply_Result {
 	private array $errors;
 
 	/**
-	 * @param self::CODE_*       $code
-	 * @param list<string>       $errors
+	 * @param self::CODE_* $code
+	 * @param list<string> $errors
 	 */
 	private function __construct(
 		bool $success,

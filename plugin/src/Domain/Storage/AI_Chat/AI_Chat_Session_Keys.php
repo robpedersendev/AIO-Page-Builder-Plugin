@@ -39,6 +39,9 @@ final class AI_Chat_Session_Keys {
 	/** JSON key: approved structured snapshot reference (artifact/registry handle). */
 	public const P_APPROVED_SNAPSHOT_REF = 'approved_snapshot_ref';
 
+	/** JSON key: source session id when this row was forked (provenance only). */
+	public const P_FORK_SOURCE_SESSION_ID = 'fork_source_session_id';
+
 	/** JSON key: optional retention floor (unix). */
 	public const P_RETENTION_NOT_BEFORE_UNIX = 'retention_not_before_unix';
 

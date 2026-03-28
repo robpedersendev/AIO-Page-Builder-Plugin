@@ -143,10 +143,60 @@ final class AI_Chat_Session_Repository extends Abstract_CPT_Repository implement
 			'status'                    => (string) ( $row['status'] ?? '' ),
 			'provider_thread_ref'       => (string) ( $payload[ AI_Chat_Session_Keys::P_PROVIDER_THREAD_REF ] ?? '' ),
 			'approved_snapshot_ref'     => $payload[ AI_Chat_Session_Keys::P_APPROVED_SNAPSHOT_REF ] ?? null,
+			'fork_source_session_id'    => (string) ( $payload[ AI_Chat_Session_Keys::P_FORK_SOURCE_SESSION_ID ] ?? '' ),
 			'retention_not_before_unix' => (int) ( $payload[ AI_Chat_Session_Keys::P_RETENTION_NOT_BEFORE_UNIX ] ?? 0 ),
 			'messages'                  => is_array( $payload[ AI_Chat_Session_Keys::P_MESSAGES ] ?? null ) ? $payload[ AI_Chat_Session_Keys::P_MESSAGES ] : array(),
 			'post_modified_gmt'         => $mod_gmt,
 		);
+	}
+
+	public function fork_session( int $actor_user_id, string $source_session_id, bool $operator_may_override_ownership = false ): string {
+		$src = $this->get_session( $source_session_id );
+		if ( $src === null ) {
+			return '';
+		}
+		$owner = (int) ( $src['owner_user_id'] ?? 0 );
+		if ( $actor_user_id <= 0 ) {
+			return '';
+		}
+		if ( ! $operator_may_override_ownership && $owner !== $actor_user_id ) {
+			return '';
+		}
+		$task = (string) ( $src['task_type'] ?? '' );
+		if ( $task === '' ) {
+			$task = 'template_lab';
+		}
+		$new_id = $this->create_session(
+			array(
+				'actor_user_id' => $actor_user_id,
+				'purpose'       => $task,
+			)
+		);
+		if ( $new_id === '' ) {
+			return '';
+		}
+		$row = $this->get_by_key( $new_id );
+		if ( $row === null ) {
+			return '';
+		}
+		$new_post_id = (int) ( $row['id'] ?? 0 );
+		if ( $new_post_id <= 0 ) {
+			return '';
+		}
+		$payload = $this->load_payload( $new_post_id );
+		$payload[ AI_Chat_Session_Keys::P_FORK_SOURCE_SESSION_ID ] = substr( \sanitize_text_field( $source_session_id ), 0, 128 );
+		$payload[ AI_Chat_Session_Keys::P_APPROVED_SNAPSHOT_REF ]  = null;
+		$payload[ AI_Chat_Session_Keys::P_MESSAGES ]               = array();
+		$payload[ AI_Chat_Session_Keys::P_PROVIDER_THREAD_REF ]    = '';
+		if ( ! $this->persist_payload_and_owner( $new_post_id, $payload, $actor_user_id ) ) {
+			return '';
+		}
+		$this->touch_modified( $new_post_id );
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::CHAT_SESSION_CREATED,
+			'post_id=' . (string) $new_post_id . ' fork_of=' . $source_session_id
+		);
+		return $new_id;
 	}
 
 	public function link_approved_snapshot( string $session_id, array $approved_snapshot_ref ): bool {

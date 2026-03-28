@@ -24,13 +24,21 @@ final class Template_Lab_Chat_Admin_Actions {
 
 	public const ACTION_SUBMIT_PROMPT = 'aio_template_lab_submit_chat_prompt';
 
+	public const ACTION_FORK_SESSION = 'aio_template_lab_fork_chat_session';
+
 	public const NONCE_CREATE = 'aio_template_lab_create_chat_session';
 
 	public const NONCE_PROMPT = 'aio_template_lab_submit_chat_prompt';
 
+	public const NONCE_FORK = 'aio_template_lab_fork_chat_session';
+
 	public const QUERY_CREATE = 'aio_tl_chat_create';
 
 	public const QUERY_PROMPT = 'aio_tl_chat_prompt';
+
+	public const QUERY_FORK = 'aio_tl_chat_fork';
+
+	public const FIELD_FORK_SOURCE = 'aio_tl_fork_source_session';
 
 	public static function handle_create_session( Service_Container $container ): void {
 		$base = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_TEMPLATE_LAB );
@@ -107,6 +115,39 @@ final class Template_Lab_Chat_Admin_Actions {
 		self::redirect( self::url_with_session( $session_id ), self::QUERY_PROMPT, $code );
 	}
 
+	public static function handle_fork_session( Service_Container $container ): void {
+		$base = Template_Library_Hub_Urls::tab_url( Template_Library_Hub_Urls::TAB_TEMPLATE_LAB );
+		if ( ! self::verify_nonce( self::NONCE_FORK, 'aio_tl_chat_fork_nonce' ) ) {
+			self::redirect( $base, self::QUERY_FORK, 'bad_nonce' );
+		}
+		if ( ! Template_Lab_Access::can_create_template_lab_sessions_via_admin_post() ) {
+			self::redirect( $base, self::QUERY_FORK, 'unauthorized' );
+		}
+		$uid = (int) \get_current_user_id();
+		if ( $uid <= 0 ) {
+			self::redirect( $base, self::QUERY_FORK, 'unauthorized' );
+		}
+		// phpcs:disable WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified above; sanitized below.
+		$source = isset( $_POST[ self::FIELD_FORK_SOURCE ] ) && is_string( $_POST[ self::FIELD_FORK_SOURCE ] )
+			? \sanitize_text_field( \wp_unslash( $_POST[ self::FIELD_FORK_SOURCE ] ) )
+			: '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( $source === '' ) {
+			self::redirect( $base, self::QUERY_FORK, 'bad_request' );
+		}
+		$chat = self::chat_repo( $container );
+		if ( $chat === null ) {
+			self::redirect( $base, self::QUERY_FORK, 'error' );
+		}
+		$op     = Template_Lab_Access::actor_is_privileged_site_operator();
+		$new_id = $chat->fork_session( $uid, $source, $op );
+		if ( $new_id === '' ) {
+			self::redirect( self::url_with_session( $source ), self::QUERY_FORK, 'error' );
+		}
+		$url = \add_query_arg( array( 'session_id' => rawurlencode( $new_id ) ), $base );
+		self::redirect( $url, self::QUERY_FORK, 'ok' );
+	}
+
 	private static function chat_repo( Service_Container $container ): ?AI_Chat_Session_Repository_Interface {
 		if ( ! $container->has( 'ai_chat_session_repository' ) ) {
 			return null;
@@ -140,8 +181,14 @@ final class Template_Lab_Chat_Admin_Actions {
 	 * @param 'create'|'prompt' $which
 	 */
 	public static function nonce_field( string $which ): void {
-		$action = $which === 'create' ? self::NONCE_CREATE : self::NONCE_PROMPT;
-		$name   = $which === 'create' ? 'aio_tl_chat_create_nonce' : 'aio_tl_chat_prompt_nonce';
-		\wp_nonce_field( $action, $name );
+		if ( $which === 'create' ) {
+			\wp_nonce_field( self::NONCE_CREATE, 'aio_tl_chat_create_nonce' );
+			return;
+		}
+		if ( $which === 'fork' ) {
+			\wp_nonce_field( self::NONCE_FORK, 'aio_tl_chat_fork_nonce' );
+			return;
+		}
+		\wp_nonce_field( self::NONCE_PROMPT, 'aio_tl_chat_prompt_nonce' );
 	}
 }

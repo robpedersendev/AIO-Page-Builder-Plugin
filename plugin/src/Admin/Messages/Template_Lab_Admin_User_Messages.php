@@ -51,6 +51,7 @@ final class Template_Lab_Admin_User_Messages {
 			'missing_normalized_output' => __( 'No normalized draft artifact for this run.', 'aio-page-builder' ),
 			'translation_failed'        => __( 'Draft could not be translated to canonical shape.', 'aio-page-builder' ),
 			'persist_failed'            => __( 'Could not persist canonical record.', 'aio-page-builder' ),
+			'stale_snapshot_context'    => __( 'This approved snapshot no longer matches the current registry or validation context. Regenerate or re-approve before applying.', 'aio-page-builder' ),
 			'error'                     => __( 'Apply failed.', 'aio-page-builder' ),
 		);
 	}
@@ -64,6 +65,19 @@ final class Template_Lab_Admin_User_Messages {
 			'bad_nonce'    => __( 'Security check failed. Try again.', 'aio-page-builder' ),
 			'unauthorized' => __( 'You are not allowed to create a session.', 'aio-page-builder' ),
 			'error'        => __( 'Could not create session.', 'aio-page-builder' ),
+		);
+	}
+
+	/**
+	 * @return array<string, string>
+	 */
+	public static function session_fork_messages(): array {
+		return array(
+			'ok'           => __( 'New session forked from the selected session.', 'aio-page-builder' ),
+			'bad_nonce'    => __( 'Security check failed. Try again.', 'aio-page-builder' ),
+			'unauthorized' => __( 'You are not allowed to fork this session.', 'aio-page-builder' ),
+			'bad_request'  => __( 'Choose a session to fork.', 'aio-page-builder' ),
+			'error'        => __( 'Could not fork session.', 'aio-page-builder' ),
 		);
 	}
 

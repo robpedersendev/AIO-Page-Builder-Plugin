@@ -3,7 +3,8 @@
  * Central template-lab capability policy (REST, admin screen, admin-post handlers, domain session gates).
  *
  * Matrix (defaults): screen and REST list/create use {@see Capabilities::MANAGE_COMPOSITIONS} with
- * {@see Capabilities::current_user_can_or_site_admin()} so site admins keep access if role grants lag.
+ * {@see Capabilities::current_user_can_or_site_admin()} so site admins and multisite super admins keep
+ * access if role grants lag (aligned with {@see Capabilities::current_user_can_for_route()} elevation).
  * Session read/write and prompt submission require the same gate plus per-session ownership checks in handlers
  * (except elevated site operators, which may operate on any session). Approve/apply use target-specific registry
  * capabilities via {@see self::capability_for_approved_target_kind()}.

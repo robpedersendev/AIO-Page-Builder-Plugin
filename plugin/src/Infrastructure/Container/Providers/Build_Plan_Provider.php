@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_Analytics_Service;
+use AIOPageBuilder\Domain\BuildPlan\Build_Plan_Template_Lab_Context_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\Generation\AI_Run_To_Build_Plan_Service;
 use AIOPageBuilder\Domain\BuildPlan\Lineage\Build_Plan_Lineage_Service;
 use AIOPageBuilder\Domain\BuildPlan\Lineage\Existing_Page_Lineage_Template_Drift_Advisor;
@@ -173,11 +174,20 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 		$container->register(
 			'ai_run_to_build_plan_service',
 			function () use ( $container ): AI_Run_To_Build_Plan_Service {
+				$resolver = null;
+				if ( $container->has( 'ai_chat_session_repository' ) ) {
+					$resolver = new Build_Plan_Template_Lab_Context_Resolver(
+						$container->get( 'ai_chat_session_repository' ),
+						$container->get( 'ai_run_repository' ),
+						$container->get( 'ai_run_artifact_service' )
+					);
+				}
 				return new AI_Run_To_Build_Plan_Service(
 					$container->get( 'ai_run_service' ),
 					$container->get( 'ai_run_artifact_service' ),
 					$container->get( 'build_plan_generator' ),
-					$container->get( 'build_plan_repository' )
+					$container->get( 'build_plan_repository' ),
+					$resolver
 				);
 			}
 		);

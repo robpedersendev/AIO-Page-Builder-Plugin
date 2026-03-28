@@ -27,13 +27,17 @@ final class Create_Build_Plan_From_AI_Run_Action {
 	public const NONCE_ACTION = 'aio_create_build_plan_from_ai_run';
 	public const PARAM_RUN_ID = 'run_id';
 
+	/** Optional: approved template-lab chat session id (must be approved + applied to canonical). */
+	public const PARAM_TEMPLATE_LAB_CHAT_SESSION = 'template_lab_chat_session_id';
+
 	/** Query arg on redirect: result code. */
 	public const QUERY_RESULT = 'aio_bp_from_run';
 
-	public const RESULT_CREATED           = 'created';
-	public const RESULT_UNAUTHORIZED      = 'unauthorized';
-	public const RESULT_BAD_REQUEST       = 'bad_request';
-	public const RESULT_GENERATION_FAILED = 'generation_failed';
+	public const RESULT_CREATED                    = 'created';
+	public const RESULT_UNAUTHORIZED               = 'unauthorized';
+	public const RESULT_BAD_REQUEST                = 'bad_request';
+	public const RESULT_GENERATION_FAILED          = 'generation_failed';
+	public const RESULT_TEMPLATE_LAB_LINK_REJECTED = 'tl_link_rejected';
 
 	/**
 	 * Handles POST: verify nonce and capability, create plan from run, redirect to plan workspace or run detail.
@@ -73,6 +77,14 @@ final class Create_Build_Plan_From_AI_Run_Action {
 			);
 		}
 
+		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed; sanitized below.
+		$tl_chat = '';
+		if ( isset( $_REQUEST[ self::PARAM_TEMPLATE_LAB_CHAT_SESSION ] ) && is_string( $_REQUEST[ self::PARAM_TEMPLATE_LAB_CHAT_SESSION ] ) ) {
+			$tl_chat = trim( (string) \wp_unslash( $_REQUEST[ self::PARAM_TEMPLATE_LAB_CHAT_SESSION ] ) );
+		}
+		// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$tl_chat = $tl_chat !== '' ? \sanitize_text_field( $tl_chat ) : '';
+
 		if ( ! $container->has( 'ai_run_service' ) || ! $container->has( 'ai_run_to_build_plan_service' ) ) {
 			self::redirect_to( $redirect_run, self::RESULT_BAD_REQUEST );
 		}
@@ -89,8 +101,20 @@ final class Create_Build_Plan_From_AI_Run_Action {
 			self::redirect_to( $redirect_run, self::RESULT_BAD_REQUEST );
 		}
 
-		$result = $service->create_from_completed_run( $run_id );
+		$actor = (int) \get_current_user_id();
+		$opts  = array(
+			'actor_user_id' => $actor,
+		);
+		if ( $tl_chat !== '' ) {
+			$opts['template_lab_chat_session_id'] = $tl_chat;
+		}
+
+		$result = $service->create_from_completed_run( $run_id, null, $opts );
 		if ( ! $result->is_success() || $result->get_plan_id() === null ) {
+			$errs = $result->get_errors();
+			if ( $tl_chat !== '' && isset( $errs[0] ) && strpos( (string) $errs[0], '[aio_tl_link]' ) === 0 ) {
+				self::redirect_to( $redirect_run, self::RESULT_TEMPLATE_LAB_LINK_REJECTED );
+			}
 			self::redirect_to( $redirect_run, self::RESULT_GENERATION_FAILED );
 		}
 

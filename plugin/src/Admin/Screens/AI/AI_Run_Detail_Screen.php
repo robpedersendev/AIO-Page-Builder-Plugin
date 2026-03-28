@@ -156,6 +156,7 @@ final class AI_Run_Detail_Screen {
 					Create_Build_Plan_From_AI_Run_Action::RESULT_UNAUTHORIZED    => __( 'You do not have permission to create Build Plans.', 'aio-page-builder' ),
 					Create_Build_Plan_From_AI_Run_Action::RESULT_BAD_REQUEST    => __( 'The request could not be completed. Try again.', 'aio-page-builder' ),
 					Create_Build_Plan_From_AI_Run_Action::RESULT_GENERATION_FAILED => __( 'The Build Plan could not be generated from this run. Check validation and normalized output.', 'aio-page-builder' ),
+					Create_Build_Plan_From_AI_Run_Action::RESULT_TEMPLATE_LAB_LINK_REJECTED => __( 'The optional template-lab session could not be linked. Use an approved snapshot that was applied to canonical templates, or leave the field empty.', 'aio-page-builder' ),
 				);
 				if ( isset( $bp_msgs[ $bp_flag ] ) ) {
 					$bp_class = ( Create_Build_Plan_From_AI_Run_Action::RESULT_CREATED === $bp_flag ) ? 'notice-success' : 'notice-error';
@@ -292,6 +293,11 @@ final class AI_Run_Detail_Screen {
 						<input type="hidden" name="action" value="aio_create_build_plan_from_ai_run" />
 						<input type="hidden" name="run_id" value="<?php echo \esc_attr( $run_id ); ?>" />
 						<?php \wp_nonce_field( Create_Build_Plan_From_AI_Run_Action::NONCE_ACTION, Create_Build_Plan_From_AI_Run_Action::NONCE_NAME ); ?>
+						<p class="description">
+							<label for="aio_tl_bp_chat_session"><?php \esc_html_e( 'Optional: template-lab chat session ID', 'aio-page-builder' ); ?></label><br />
+							<input type="text" class="regular-text" name="<?php echo \esc_attr( Create_Build_Plan_From_AI_Run_Action::PARAM_TEMPLATE_LAB_CHAT_SESSION ); ?>" id="aio_tl_bp_chat_session" value="" autocomplete="off" placeholder="acs_…" />
+							<?php \esc_html_e( 'When set, the plan records an informational link to an approved, applied template-lab artifact (canonical key). This does not execute template changes or bypass build-plan review.', 'aio-page-builder' ); ?>
+						</p>
 						<?php \submit_button( __( 'Create Build Plan from this run', 'aio-page-builder' ), 'primary', 'submit', false ); ?>
 					</form>
 				<?php elseif ( $create_plan_help_text !== '' ) : ?>

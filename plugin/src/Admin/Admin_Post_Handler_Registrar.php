@@ -75,5 +75,12 @@ final class Admin_Post_Handler_Registrar {
 			},
 			10
 		);
+		\add_action(
+			'admin_post_' . Template_Lab_Chat_Admin_Actions::ACTION_FORK_SESSION,
+			static function () use ( $container ): void {
+				Template_Lab_Chat_Admin_Actions::handle_fork_session( $container );
+			},
+			10
+		);
 	}
 }

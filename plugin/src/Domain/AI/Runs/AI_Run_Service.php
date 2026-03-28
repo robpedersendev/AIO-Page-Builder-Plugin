@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Domain\AI\Runs;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Run_Dispatch_Port;
 use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
@@ -27,9 +28,23 @@ final class AI_Run_Service {
 	/** @var AI_Run_Artifact_Service */
 	private $artifact_service;
 
-	public function __construct( AI_Run_Repository $run_repository, AI_Run_Artifact_Service $artifact_service ) {
-		$this->run_repository   = $run_repository;
-		$this->artifact_service = $artifact_service;
+	private ?Template_Lab_Run_Dispatch_Port $template_lab_dispatch;
+
+	public function __construct(
+		AI_Run_Repository $run_repository,
+		AI_Run_Artifact_Service $artifact_service,
+		?Template_Lab_Run_Dispatch_Port $template_lab_dispatch = null
+	) {
+		$this->run_repository        = $run_repository;
+		$this->artifact_service      = $artifact_service;
+		$this->template_lab_dispatch = $template_lab_dispatch;
+	}
+
+	/**
+	 * * Default `sync`; inject {@see Template_Lab_Run_Dispatch_Port} when a queue-backed path is wired.
+	 */
+	public function get_template_lab_dispatch_mode(): string {
+		return $this->template_lab_dispatch !== null ? $this->template_lab_dispatch->mode() : 'sync';
 	}
 
 	/**

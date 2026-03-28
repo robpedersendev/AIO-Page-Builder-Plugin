@@ -27,6 +27,13 @@ interface AI_Chat_Session_Repository_Interface {
 	public function create_session( array $context ): string;
 
 	/**
+	 * Creates a new session owned by the actor, linked to a source session id, without copying transcript or approval state.
+	 *
+	 * @param bool $operator_may_override_ownership When true, owner check is skipped (caller must verify privileged operator).
+	 */
+	public function fork_session( int $actor_user_id, string $source_session_id, bool $operator_may_override_ownership = false ): string;
+
+	/**
 	 * @param array<string, mixed> $message role, body_ref or redacted summary, optional ai_run_post_id.
 	 */
 	public function append_message( string $session_id, array $message ): bool;
