@@ -74,7 +74,7 @@ final class Post_Type_Registrar_Test extends TestCase {
 			Object_Type_Keys::PROMPT_PACK      => Capabilities::MANAGE_PROMPT_PACKS,
 			Object_Type_Keys::DOCUMENTATION    => Capabilities::MANAGE_DOCUMENTATION,
 			Object_Type_Keys::VERSION_SNAPSHOT => Capabilities::VIEW_VERSION_SNAPSHOTS,
-			Object_Type_Keys::AI_CHAT_SESSION => Capabilities::MANAGE_COMPOSITIONS,
+			Object_Type_Keys::AI_CHAT_SESSION  => Capabilities::MANAGE_COMPOSITIONS,
 		);
 		foreach ( $expected_caps as $post_type => $expected_cap ) {
 			$args = $registered[ $post_type ] ?? array();
