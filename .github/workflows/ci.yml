@@ -206,11 +206,13 @@ jobs:
           echo "WordPress did not respond in time."
           exit 1
 
+      # * Seed path: wp-content/plugins/<basename of first .wp-env.json plugins[]> — override with AIO_E2E_WP_PLUGIN_DIR if needed.
       - name: Run Playwright E2E (smoke and accessibility)
         run: npm run test:e2e
         env:
           CI: true
           WP_BASE_URL: http://localhost:8888
+          AIO_E2E_PLAN_ID: e2e-step2-deny
 
       - name: Upload Playwright artifacts on failure
         if: failure()

@@ -8,6 +8,7 @@
 namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\AI\Validation\AI_Output_Validator;
+use AIOPageBuilder\Domain\AI\Validation\AI_Template_Lab_Draft_Schema_Refs;
 use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
 use AIOPageBuilder\Domain\AI\Validation\Dropped_Record_Report;
 use AIOPageBuilder\Domain\AI\Validation\Normalized_Output_Builder;
@@ -21,6 +22,7 @@ require_once $plugin_root . '/src/Domain/AI/Validation/Build_Plan_Draft_Schema.p
 require_once $plugin_root . '/src/Domain/AI/Validation/Dropped_Record_Report.php';
 require_once $plugin_root . '/src/Domain/AI/Validation/Validation_Report.php';
 require_once $plugin_root . '/src/Domain/AI/Validation/Normalized_Output_Builder.php';
+require_once $plugin_root . '/src/Domain/AI/Validation/AI_Template_Lab_Draft_Schema_Refs.php';
 require_once $plugin_root . '/src/Domain/AI/Validation/AI_Output_Validator.php';
 
 final class AI_Output_Validator_Test extends TestCase {
@@ -265,5 +267,43 @@ final class AI_Output_Validator_Test extends TestCase {
 		$this->assertSame( 1, $arr['index'] );
 		$this->assertSame( 'invalid_enum', $arr['reason'] );
 		$this->assertSame( array( 'action' ), $arr['errors'] );
+	}
+
+	public function test_composition_draft_valid_does_not_allow_build_plan_handoff(): void {
+		$payload = array(
+			AI_Template_Lab_Draft_Schema_Refs::KEY_AI_DRAFT_VERSION => AI_Template_Lab_Draft_Schema_Refs::DRAFT_VERSION_VALUE,
+			'ordered_section_list' => array(
+				array(
+					'section_key' => 'hero_intro',
+					'position'    => 0,
+				),
+			),
+		);
+		$json    = wp_json_encode( $payload );
+		$json_s  = is_string( $json ) ? $json : '{}';
+		$report  = $this->validator()->validate( $json_s, AI_Template_Lab_Draft_Schema_Refs::COMPOSITION_DRAFT, false );
+		$this->assertSame( Validation_Report::STATE_PASSED, $report->get_final_validation_state() );
+		$this->assertNotNull( $report->get_normalized_output() );
+		$this->assertFalse( $report->allows_build_plan_handoff() );
+	}
+
+	public function test_repair_result_requires_boolean_repair_accepted(): void {
+		$bad = array(
+			AI_Template_Lab_Draft_Schema_Refs::KEY_AI_DRAFT_VERSION => AI_Template_Lab_Draft_Schema_Refs::DRAFT_VERSION_VALUE,
+			'repair_accepted' => 'yes',
+		);
+		$j1  = wp_json_encode( $bad );
+		$j1s = is_string( $j1 ) ? $j1 : '{}';
+		$r1  = $this->validator()->validate( $j1s, AI_Template_Lab_Draft_Schema_Refs::REPAIR_RESULT, false );
+		$this->assertSame( Validation_Report::STATE_FAILED, $r1->get_final_validation_state() );
+
+		$good = array(
+			AI_Template_Lab_Draft_Schema_Refs::KEY_AI_DRAFT_VERSION => AI_Template_Lab_Draft_Schema_Refs::DRAFT_VERSION_VALUE,
+			'repair_accepted' => true,
+		);
+		$j2   = wp_json_encode( $good );
+		$j2s  = is_string( $j2 ) ? $j2 : '{}';
+		$r2   = $this->validator()->validate( $j2s, AI_Template_Lab_Draft_Schema_Refs::REPAIR_RESULT, false );
+		$this->assertSame( Validation_Report::STATE_PASSED, $r2->get_final_validation_state() );
 	}
 }

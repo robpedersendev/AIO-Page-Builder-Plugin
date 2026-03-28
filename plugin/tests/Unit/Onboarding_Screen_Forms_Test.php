@@ -138,18 +138,18 @@ final class Onboarding_Screen_Forms_Test extends TestCase {
 		);
 	}
 
-	/** Review step must show profile summary labels. */
+	/** Review step must show business/brand summary and provider readiness headings. */
 	public function test_review_step_shows_profile_summary(): void {
 		$src = $this->screen_source();
 		$this->assertStringContainsString(
-			'Profile summary',
+			'Business & brand summary',
 			$src,
-			'Review step must contain a profile summary section.'
+			'Review step must contain the business and brand summary section.'
 		);
 		$this->assertStringContainsString(
-			'Provider readiness',
+			'AI provider readiness',
 			$src,
-			'Review step must contain a provider readiness section.'
+			'Review step must contain the AI provider readiness section.'
 		);
 	}
 

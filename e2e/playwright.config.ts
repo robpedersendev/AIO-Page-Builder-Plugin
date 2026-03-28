@@ -5,6 +5,7 @@ const isCi = Boolean( process.env.CI );
 
 export default defineConfig({
 	testDir: './tests',
+	globalSetup: './global-setup.ts',
 	fullyParallel: false,
 	retries: isCi ? 1 : 0,
 	use: {

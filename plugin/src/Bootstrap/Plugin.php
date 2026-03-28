@@ -167,6 +167,7 @@ require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Container/Provi
 require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Container/Providers/Registries_Provider.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Container/Providers/AI_Validation_Provider.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Container/Providers/AI_Provider_Base_Provider.php';
+require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Container/Providers/AI_Router_Provider.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Container/Providers/AI_Failover_Provider.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Container/Providers/AI_Provider_Drivers_Provider.php';
 require_once $aiopagebuilder_bootstrap_dir . '/../Infrastructure/Container/Providers/AI_Prompt_Pack_Provider.php';
@@ -262,6 +263,7 @@ final class Plugin {
 	/**
 	 * Runtime entry point. Runs after WordPress has loaded.
 	 * Wires bootstrap through Module_Registrar; no ad hoc service instantiation here.
+	 * Extension topology (template lab, scoped chat UX, router seams): {@see \AIOPageBuilder\Domain\AI\AI_Admin_And_Storage_Extension_Seams}.
 	 *
 	 * @return void
 	 */

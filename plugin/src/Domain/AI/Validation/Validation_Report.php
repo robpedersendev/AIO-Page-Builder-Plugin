@@ -154,6 +154,9 @@ final class Validation_Report {
 
 	/** Whether this report allows Build Plan handoff (passed or partial with normalized output). */
 	public function allows_build_plan_handoff(): bool {
+		if ( $this->schema_ref !== Build_Plan_Draft_Schema::SCHEMA_REF ) {
+			return false;
+		}
 		return ( $this->final_validation_state === self::STATE_PASSED || $this->final_validation_state === self::STATE_PARTIAL )
 			&& $this->normalized_output !== null;
 	}

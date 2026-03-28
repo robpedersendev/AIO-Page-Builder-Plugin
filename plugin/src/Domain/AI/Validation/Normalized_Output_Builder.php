@@ -25,6 +25,9 @@ final class Normalized_Output_Builder {
 	 * @return array<string, mixed> Plugin-owned structure for later Build Plan consumption.
 	 */
 	public function build( array $validated_payload, string $schema_ref ): array {
+		if ( AI_Template_Lab_Draft_Schema_Refs::is_registered( $schema_ref ) ) {
+			return $validated_payload;
+		}
 		if ( $schema_ref !== Build_Plan_Draft_Schema::SCHEMA_REF ) {
 			return array();
 		}

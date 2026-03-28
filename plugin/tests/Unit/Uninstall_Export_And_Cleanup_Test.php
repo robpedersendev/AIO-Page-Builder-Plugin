@@ -7,9 +7,20 @@
 
 namespace AIOPageBuilder\Tests\Unit;
 
+use AIOPageBuilder\Domain\ExportRestore\Export\Export_Token_Set_Reader;
 use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Cleanup_Service;
 use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Export_Prompt_Service;
 use AIOPageBuilder\Domain\ExportRestore\Uninstall\Uninstall_Result;
+use AIOPageBuilder\Domain\Registries\Export\Registry_Export_Serializer;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Normalizer;
+use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
+use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\Documentation_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\Version_Snapshot_Repository;
+use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 use PHPUnit\Framework\TestCase;
 
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/wordpress/' );
@@ -114,10 +125,16 @@ final class Uninstall_Export_And_Cleanup_Test extends TestCase {
 		$generator = new \AIOPageBuilder\Domain\ExportRestore\Export\Export_Generator(
 			new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager(),
 			new \AIOPageBuilder\Infrastructure\Settings\Settings_Service(),
-			new \AIOPageBuilder\Domain\Storage\Profile\Profile_Store( new \AIOPageBuilder\Infrastructure\Settings\Option_Store( 'aio_page_builder_profile_current' ) ),
-			new \AIOPageBuilder\Domain\Registries\Export\Registry_Export_Serializer(),
-			$this->createMock( \AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository::class ),
-			$this->createMock( \AIOPageBuilder\Domain\ExportRestore\Export\Export_Token_Set_Reader::class ),
+			new Profile_Store( new Settings_Service(), new Profile_Normalizer() ),
+			new Registry_Export_Serializer(
+				new Section_Template_Repository(),
+				new Page_Template_Repository(),
+				new Composition_Repository(),
+				new Documentation_Repository(),
+				new Version_Snapshot_Repository()
+			),
+			new Build_Plan_Repository(),
+			new Export_Token_Set_Reader( new \wpdb() ),
 			new \AIOPageBuilder\Domain\ExportRestore\Export\Export_Manifest_Builder(),
 			new \AIOPageBuilder\Domain\ExportRestore\Export\Export_Zip_Packager( new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager() ),
 			null
@@ -150,10 +167,16 @@ final class Uninstall_Export_And_Cleanup_Test extends TestCase {
 		$generator = new \AIOPageBuilder\Domain\ExportRestore\Export\Export_Generator(
 			new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager(),
 			new \AIOPageBuilder\Infrastructure\Settings\Settings_Service(),
-			new \AIOPageBuilder\Domain\Storage\Profile\Profile_Store( new \AIOPageBuilder\Infrastructure\Settings\Option_Store( 'aio_page_builder_profile_current' ) ),
-			new \AIOPageBuilder\Domain\Registries\Export\Registry_Export_Serializer(),
-			$this->createMock( \AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository::class ),
-			$this->createMock( \AIOPageBuilder\Domain\ExportRestore\Export\Export_Token_Set_Reader::class ),
+			new Profile_Store( new Settings_Service(), new Profile_Normalizer() ),
+			new Registry_Export_Serializer(
+				new Section_Template_Repository(),
+				new Page_Template_Repository(),
+				new Composition_Repository(),
+				new Documentation_Repository(),
+				new Version_Snapshot_Repository()
+			),
+			new Build_Plan_Repository(),
+			new Export_Token_Set_Reader( new \wpdb() ),
 			new \AIOPageBuilder\Domain\ExportRestore\Export\Export_Manifest_Builder(),
 			new \AIOPageBuilder\Domain\ExportRestore\Export\Export_Zip_Packager( new \AIOPageBuilder\Infrastructure\Files\Plugin_Path_Manager() ),
 			null

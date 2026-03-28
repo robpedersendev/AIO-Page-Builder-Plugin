@@ -32,6 +32,7 @@ use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
+use AIOPageBuilder\Support\Testing\Redirect_Capture_Exception;
 
 /**
  * Renders Build Plan detail with three-zone layout. Consumes UI state from Build_Plan_UI_State_Builder.
@@ -460,10 +461,25 @@ final class Build_Plan_Workspace_Screen {
 					? \add_query_arg( array( 'step2_row_deny_done' => '1' ), $redirect_url )
 					: \add_query_arg( array( 'step2_row_deny_failed' => '1' ), $redirect_url );
 			}
-			\wp_safe_redirect( $target );
-			exit;
+			$this->redirect_and_end_request( $target );
 		}
 		return false;
+	}
+
+	/**
+	 * Sends redirect and ends the request; PHPUnit sets $GLOBALS['_aio_pb_test_capture_redirect'] to throw Redirect_Capture_Exception instead of exit.
+	 *
+	 * @param string $location Safe redirect URL.
+	 * @return never
+	 * @throws Redirect_Capture_Exception When the PHPUnit harness enables redirect capture.
+	 */
+	private function redirect_and_end_request( string $location ): void {
+		if ( isset( $GLOBALS['_aio_pb_test_capture_redirect'] ) && $GLOBALS['_aio_pb_test_capture_redirect'] ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Test-only path; exception carries URL for assertions, not HTML output.
+			throw new Redirect_Capture_Exception( $location );
+		}
+		\wp_safe_redirect( $location );
+		exit;
 	}
 
 	/**
@@ -2299,19 +2315,19 @@ final class Build_Plan_Workspace_Screen {
 			$detail['row_actions'] = $this->add_urls_to_approve_deny( $detail['row_actions'], $detail_item_id, $base, $nonce );
 		}
 
-		$step_messages = isset( $workspace['step_messages'] ) && is_array( $workspace['step_messages'] ) ? $workspace['step_messages'] : array();
-		$deny_sel_done = isset( $_GET['step2_deny_selected_done'] ) && $_GET['step2_deny_selected_done'] === '1';
-		$deny_sel_cnt  = isset( $_GET['step2_deny_selected_count'] ) && is_numeric( $_GET['step2_deny_selected_count'] )
+		$step_messages   = isset( $workspace['step_messages'] ) && is_array( $workspace['step_messages'] ) ? $workspace['step_messages'] : array();
+		$deny_sel_done   = isset( $_GET['step2_deny_selected_done'] ) && $_GET['step2_deny_selected_done'] === '1';
+		$deny_sel_cnt    = isset( $_GET['step2_deny_selected_count'] ) && is_numeric( $_GET['step2_deny_selected_count'] )
 			? (int) $_GET['step2_deny_selected_count']
 			: 0;
-		$bulk_done     = isset( $_GET['step2_bulk_deny_done'] ) && $_GET['step2_bulk_deny_done'] === '1';
-		$bulk_count    = isset( $_GET['step2_bulk_deny_count'] ) && is_numeric( $_GET['step2_bulk_deny_count'] )
+		$bulk_done       = isset( $_GET['step2_bulk_deny_done'] ) && $_GET['step2_bulk_deny_done'] === '1';
+		$bulk_count      = isset( $_GET['step2_bulk_deny_count'] ) && is_numeric( $_GET['step2_bulk_deny_count'] )
 			? (int) $_GET['step2_bulk_deny_count']
 			: 0;
 		$row_deny_done   = isset( $_GET['step2_row_deny_done'] ) && $_GET['step2_row_deny_done'] === '1';
 		$row_deny_failed = isset( $_GET['step2_row_deny_failed'] ) && $_GET['step2_row_deny_failed'] === '1';
 		$bulk_error      = isset( $_GET['step2_bulk_deny_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step2_bulk_deny_error'] ) ) : '';
-		$build_error   = isset( $_GET['step2_bulk_build_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step2_bulk_build_error'] ) ) : '';
+		$build_error     = isset( $_GET['step2_bulk_build_error'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step2_bulk_build_error'] ) ) : '';
 
 		if ( $deny_sel_done ) {
 			$msg = sprintf(

@@ -20,7 +20,10 @@ use AIOPageBuilder\Domain\AI\PromptPacks\Normalized_Prompt_Package_Builder;
 use AIOPageBuilder\Domain\AI\PromptPacks\Prompt_Pack_Registry_Service;
 use AIOPageBuilder\Domain\AI\PromptPacks\Prompt_Pack_Schema;
 use AIOPageBuilder\Domain\AI\Providers\AI_Provider_Interface;
+use AIOPageBuilder\Domain\AI\Providers\AI_Structured_Response_Guard;
 use AIOPageBuilder\Domain\AI\Providers\Failover\Failover_Result;
+use AIOPageBuilder\Domain\AI\Routing\AI_Provider_Router_Interface;
+use AIOPageBuilder\Domain\AI\Routing\AI_Routing_Task;
 use AIOPageBuilder\Domain\AI\Providers\Failover\Provider_Failover_Service;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Capability_Resolver;
 use AIOPageBuilder\Domain\AI\Providers\Provider_Request_Context_Builder;
@@ -88,6 +91,9 @@ final class Onboarding_Planning_Request_Orchestrator {
 	/** @var Service_Container */
 	private Service_Container $container;
 
+	/** @var AI_Provider_Router_Interface */
+	private AI_Provider_Router_Interface $provider_router;
+
 	/** @var Planning_Thin_Output_Enrichment_Service|null */
 	private ?Planning_Thin_Output_Enrichment_Service $thin_output_enrichment;
 
@@ -97,6 +103,9 @@ final class Onboarding_Planning_Request_Orchestrator {
 	/** @var Planning_Expand_Pass_Runner|null */
 	private ?Planning_Expand_Pass_Runner $expand_runner;
 
+	/**
+	 * @param AI_Provider_Router_Interface $provider_router Task-scoped primary provider resolution (spec §25.1).
+	 */
 	public function __construct(
 		Onboarding_Draft_Service $draft_service,
 		Onboarding_Prefill_Service $prefill_service,
@@ -110,6 +119,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		Provider_Connection_Test_Service $connection_test_service,
 		Provider_Failover_Service $failover_service,
 		Service_Container $container,
+		AI_Provider_Router_Interface $provider_router,
 		?Planning_Thin_Output_Enrichment_Service $thin_output_enrichment = null,
 		?Planning_Per_Run_Budget_Estimator $budget_estimator = null,
 		?Planning_Expand_Pass_Runner $expand_runner = null
@@ -126,6 +136,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 		$this->connection_test_service = $connection_test_service;
 		$this->failover_service        = $failover_service;
 		$this->container               = $container;
+		$this->provider_router         = $provider_router;
 		$this->thin_output_enrichment  = $thin_output_enrichment;
 		$this->budget_estimator        = $budget_estimator;
 		$this->expand_runner           = $expand_runner;
@@ -184,8 +195,8 @@ final class Onboarding_Planning_Request_Orchestrator {
 				'planning_context_incomplete'
 			);
 		}
-		$provider_id = $this->pick_configured_provider_id( $prefill );
-		if ( $provider_id === null || $provider_id === '' ) {
+		$picked = $this->pick_configured_provider_id( $prefill );
+		if ( $picked === null || $picked === '' ) {
 			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_NO_PROVIDER, '' );
 			return new Planning_Request_Result(
 				false,
@@ -198,6 +209,25 @@ final class Onboarding_Planning_Request_Orchestrator {
 				'no_configured_provider'
 			);
 		}
+
+		$route = $this->provider_router->resolve_route(
+			AI_Routing_Task::ONBOARDING_PLANNING,
+			array( 'preferred_provider_id' => $picked )
+		);
+		if ( ! $route->is_valid() ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_NO_PROVIDER, 'reason=invalid_route' );
+			return new Planning_Request_Result(
+				false,
+				Planning_Request_Result::STATUS_BLOCKED,
+				'',
+				0,
+				__( 'AI provider routing is misconfigured.', 'aio-page-builder' ),
+				null,
+				null,
+				'provider_route_invalid'
+			);
+		}
+		$provider_id = $route->get_primary_provider_id();
 
 		// * Spend cap preflight: block run if cap exceeded and override is not enabled.
 		$spend_blocked = $this->check_spend_cap_preflight( $provider_id );
@@ -391,10 +421,13 @@ final class Onboarding_Planning_Request_Orchestrator {
 		}
 		Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_PROMPT_PACKAGE_BUILT, 'pack_key=' . (string) ( $pack[ Prompt_Pack_Schema::ROOT_INTERNAL_KEY ] ?? '' ) );
 
-		$package       = $package_result->get_normalized_prompt_package();
-		$system_prompt = (string) ( $package['system_prompt'] ?? '' );
-		$user_message  = (string) ( $package['user_message'] ?? '' );
-		$model         = $this->capability_resolver->resolve_default_model_for_planning( $driver, $schema_ref );
+		$package        = $package_result->get_normalized_prompt_package();
+		$system_prompt  = (string) ( $package['system_prompt'] ?? '' );
+		$user_message   = (string) ( $package['user_message'] ?? '' );
+		$model_override = $route->get_primary_model_override();
+		$model          = ( $model_override !== null && $model_override !== '' )
+			? $model_override
+			: $this->capability_resolver->resolve_default_model_for_planning( $driver, $schema_ref );
 		if ( $model === null || $model === '' ) {
 			Named_Debug_Log::event( Named_Debug_Log_Event::ORCHESTRATOR_BLOCKED_NO_MODEL, 'provider=' . $provider_id );
 			return new Planning_Request_Result(
@@ -468,6 +501,8 @@ final class Onboarding_Planning_Request_Orchestrator {
 			$response        = $fallback_bag['response'];
 			$failover_result = $fallback_bag['result'];
 		}
+
+		$response = AI_Structured_Response_Guard::ensure_json_channel_valid( $normalized_request, $response );
 
 		$effective_provider_id = $failover_result->get_effective_provider_id();
 		$effective_model       = $failover_result->get_effective_model_used();

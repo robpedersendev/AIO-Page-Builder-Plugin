@@ -63,6 +63,9 @@ require_once $plugin_root . '/src/Domain/AI/Providers/Provider_Response_Normaliz
 require_once $plugin_root . '/src/Domain/AI/Providers/Failover/Provider_Failover_Policy.php';
 require_once $plugin_root . '/src/Domain/AI/Providers/Failover/Failover_Result.php';
 require_once $plugin_root . '/src/Domain/AI/Providers/Failover/Provider_Failover_Service.php';
+require_once $plugin_root . '/src/Domain/AI/Routing/AI_Provider_Route_Result.php';
+require_once $plugin_root . '/src/Domain/AI/Routing/AI_Provider_Router_Interface.php';
+require_once $plugin_root . '/src/Domain/AI/Routing/Default_AI_Provider_Router.php';
 
 /** Stub repository: no packs, so select_for_planning returns null when we get that far. */
 final class Stub_Prompt_Pack_Repo_For_Orchestrator implements \AIOPageBuilder\Domain\AI\PromptPacks\Prompt_Pack_Registry_Repository_Interface {
@@ -116,6 +119,7 @@ final class Onboarding_Planning_Request_Orchestrator_Test extends TestCase {
 			$connection_test_service,
 			$failover_service,
 			$container,
+			new \AIOPageBuilder\Domain\AI\Routing\Default_AI_Provider_Router( $settings ),
 			null,
 			null,
 			null

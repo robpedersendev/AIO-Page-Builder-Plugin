@@ -135,6 +135,7 @@ final class Onboarding_Provider implements Service_Provider_Interface {
 					$container->get( 'provider_connection_test_service' ),
 					$container->get( 'provider_failover_service' ),
 					$container,
+					$container->get( 'ai_provider_router' ),
 					$thin_enrichment,
 					$container->get( 'planning_per_run_budget_estimator' ),
 					$container->get( 'planning_expand_pass_runner' )

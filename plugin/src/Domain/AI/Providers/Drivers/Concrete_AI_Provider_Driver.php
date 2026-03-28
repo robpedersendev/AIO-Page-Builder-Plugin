@@ -194,6 +194,17 @@ final class Concrete_AI_Provider_Driver extends Abstract_AI_Provider_Driver {
 			$raw_meta['model'] = $decoded['model'];
 		}
 
+		$opts = isset( $normalized_request['options'] ) && is_array( $normalized_request['options'] )
+			? $normalized_request['options']
+			: array();
+		if ( isset( $opts['openai_thread_id'] ) && is_string( $opts['openai_thread_id'] ) ) {
+			$t = trim( $opts['openai_thread_id'] );
+			if ( $t !== '' ) {
+				// * Client-owned conversation correlation only; canonical state remains local after Apply.
+				$raw_meta['client_thread_ref'] = $t;
+			}
+		}
+
 		return array(
 			'success'               => true,
 			'structured_payload'    => $structured_payload,

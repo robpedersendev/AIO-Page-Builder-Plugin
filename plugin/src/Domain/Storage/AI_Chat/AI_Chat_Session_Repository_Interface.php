@@ -1,0 +1,43 @@
+<?php
+/**
+ * Persistence seam for scoped template-lab / planning chat UX (spec §10.5 session grouping, privacy).
+ *
+ * Chat rows are not canonical for templates or build plans. Approved structured payloads must still
+ * be written through registry repositories after explicit user action. Session content may include
+ * site context—extend Personal_Data_Exporter/Eraser when implementing concrete storage.
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+namespace AIOPageBuilder\Domain\Storage\AI_Chat;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Repository surface for a future CPT/table implementation. No default registration in container yet.
+ */
+interface AI_Chat_Session_Repository_Interface {
+
+	/**
+	 * @param array<string, mixed> $context actor_user_id, purpose (e.g. template_lab), optional provider_thread_ref.
+	 * @return string New session id or empty string on failure.
+	 */
+	public function create_session( array $context ): string;
+
+	/**
+	 * @param array<string, mixed> $message role, body_ref or redacted summary, optional ai_run_post_id.
+	 */
+	public function append_message( string $session_id, array $message ): bool;
+
+	/**
+	 * @return array<string, mixed>|null
+	 */
+	public function get_session( string $session_id ): ?array;
+
+	/**
+	 * @param array<string, mixed> $approved_snapshot_ref References normalized artifact or registry write handle.
+	 */
+	public function link_approved_snapshot( string $session_id, array $approved_snapshot_ref ): bool;
+}

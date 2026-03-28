@@ -64,6 +64,16 @@ if ( ! defined( 'AIOPAGEBUILDER_TEST_PLUGIN_INCLUDES' ) ) {
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/wordpress/' );
 }
+if ( ! class_exists( 'wpdb', false ) ) {
+	// phpcs:disable PEAR.NamingConventions.ValidClassName.StartWithCapital -- Mirrors core global class name.
+	/**
+	 * Minimal wpdb stub for constructing export readers when WordPress is not fully loaded.
+	 */
+	class wpdb {
+		public string $prefix = 'wp_';
+	}
+	// phpcs:enable PEAR.NamingConventions.ValidClassName.StartWithCapital
+}
 if ( ! function_exists( 'is_admin' ) ) {
 	function is_admin() {
 		return false;
@@ -1055,5 +1065,18 @@ if ( ! function_exists( 'header' ) ) {
 			$GLOBALS['_aio_http_headers'] = array();
 		}
 		$GLOBALS['_aio_http_headers'][] = (string) $header;
+	}
+}
+if ( ! function_exists( 'wp_safe_redirect' ) ) {
+	/**
+	 * Test stub when redirect capture is off; set $GLOBALS['_aio_pb_test_capture_redirect'] for Build Plan workspace tests.
+	 *
+	 * @param string $location Redirect target.
+	 * @throws \RuntimeException Always; indicates an unexpected redirect in unit tests.
+	 */
+	function wp_safe_redirect( $location, $status = 302, $x_redirect_by = 'WordPress' ) {
+		unset( $status, $x_redirect_by );
+		// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Test harness: message is for failures, not HTML output.
+		throw new \RuntimeException( 'wp_safe_redirect:' . (string) $location );
 	}
 }

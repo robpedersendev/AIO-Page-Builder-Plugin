@@ -47,6 +47,11 @@
             "AIOPageBuilder\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "AIOPageBuilder\\Tests\\": "tests/"
+        }
+    },
     "require-dev": {
         "wp-coding-standards/wpcs": "^3.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",

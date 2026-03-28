@@ -82,6 +82,10 @@ final class AI_Output_Validator {
 			$parsed = $this->coerce_build_plan_draft_top_level_objects( $parsed );
 		}
 
+		if ( AI_Template_Lab_Draft_Schema_Refs::is_registered( $schema_ref ) ) {
+			return $this->validate_ai_template_lab_draft( $parsed, $schema_ref, $raw_status, $is_repair_attempt );
+		}
+
 		// Stage 3: top-level schema check.
 		if ( $schema_ref !== Build_Plan_Draft_Schema::SCHEMA_REF ) {
 			return $this->failed_report(
@@ -463,6 +467,141 @@ final class AI_Output_Validator {
 	 * @param bool                                                                                     $is_repair_attempt
 	 * @return Validation_Report
 	 */
+	/**
+	 * Minimal shape validation for template-lab AI drafts (canonical registry translation is a separate apply step).
+	 *
+	 * @param array<string, mixed> $parsed
+	 */
+	private function validate_ai_template_lab_draft(
+		array $parsed,
+		string $schema_ref,
+		string $raw_status,
+		bool $is_repair_attempt
+	): Validation_Report {
+		$record_results = array();
+		$dropped        = array();
+
+		$ver = isset( $parsed[ AI_Template_Lab_Draft_Schema_Refs::KEY_AI_DRAFT_VERSION ] )
+			? (string) $parsed[ AI_Template_Lab_Draft_Schema_Refs::KEY_AI_DRAFT_VERSION ]
+			: '';
+		if ( $ver !== AI_Template_Lab_Draft_Schema_Refs::DRAFT_VERSION_VALUE ) {
+			return $this->failed_report(
+				$raw_status,
+				Validation_Report::PARSE_OK,
+				false,
+				$schema_ref,
+				$record_results,
+				$dropped,
+				null,
+				self::STAGE_TOP_LEVEL,
+				$is_repair_attempt
+			);
+		}
+
+		$ok = false;
+		switch ( $schema_ref ) {
+			case AI_Template_Lab_Draft_Schema_Refs::COMPOSITION_DRAFT:
+				$ok = $this->is_valid_composition_draft_shape( $parsed );
+				break;
+			case AI_Template_Lab_Draft_Schema_Refs::PAGE_TEMPLATE_DRAFT:
+				$ok = $this->is_valid_page_template_draft_shape( $parsed );
+				break;
+			case AI_Template_Lab_Draft_Schema_Refs::SECTION_TEMPLATE_DRAFT:
+				$ok = $this->is_valid_section_template_draft_shape( $parsed );
+				break;
+			case AI_Template_Lab_Draft_Schema_Refs::REPAIR_RESULT:
+				$ok = $this->is_valid_repair_result_shape( $parsed );
+				break;
+			default:
+				$ok = false;
+		}
+
+		if ( ! $ok ) {
+			return $this->failed_report(
+				$raw_status,
+				Validation_Report::PARSE_OK,
+				false,
+				$schema_ref,
+				$record_results,
+				$dropped,
+				null,
+				self::STAGE_ITEM,
+				$is_repair_attempt
+			);
+		}
+
+		$normalized = $this->normalized_output_builder->build( $parsed, $schema_ref );
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::OUTPUT_VALIDATION_OUTCOME,
+			'schema=' . $schema_ref . ' state=' . Validation_Report::STATE_PASSED . ' dropped=0 repair_attempt=' . ( $is_repair_attempt ? '1' : '0' )
+		);
+		return new Validation_Report(
+			$raw_status,
+			Validation_Report::PARSE_OK,
+			true,
+			$schema_ref,
+			$record_results,
+			$dropped,
+			$normalized,
+			Validation_Report::STATE_PASSED,
+			null,
+			$is_repair_attempt,
+			false
+		);
+	}
+
+	/**
+	 * @param array<string, mixed> $parsed
+	 */
+	private function is_valid_composition_draft_shape( array $parsed ): bool {
+		if ( ! isset( $parsed['ordered_section_list'] ) || ! is_array( $parsed['ordered_section_list'] ) ) {
+			return false;
+		}
+		foreach ( $parsed['ordered_section_list'] as $item ) {
+			if ( ! is_array( $item ) ) {
+				return false;
+			}
+			$key = isset( $item['section_key'] ) ? trim( (string) $item['section_key'] ) : '';
+			if ( $key === '' ) {
+				return false;
+			}
+			if ( ! array_key_exists( 'position', $item ) || ! is_int( $item['position'] ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @param array<string, mixed> $parsed
+	 */
+	private function is_valid_page_template_draft_shape( array $parsed ): bool {
+		$ik = isset( $parsed['internal_key'] ) ? trim( (string) $parsed['internal_key'] ) : '';
+		if ( $ik === '' ) {
+			return false;
+		}
+		if ( ! isset( $parsed['ordered_sections'] ) || ! is_array( $parsed['ordered_sections'] ) ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @param array<string, mixed> $parsed
+	 */
+	private function is_valid_section_template_draft_shape( array $parsed ): bool {
+		$ik = isset( $parsed['internal_key'] ) ? trim( (string) $parsed['internal_key'] ) : '';
+		$nm = isset( $parsed['name'] ) ? trim( (string) $parsed['name'] ) : '';
+		return $ik !== '' && $nm !== '';
+	}
+
+	/**
+	 * @param array<string, mixed> $parsed
+	 */
+	private function is_valid_repair_result_shape( array $parsed ): bool {
+		return array_key_exists( 'repair_accepted', $parsed ) && is_bool( $parsed['repair_accepted'] );
+	}
+
 	private function failed_report(
 		string $raw_status,
 		string $parse_status,
