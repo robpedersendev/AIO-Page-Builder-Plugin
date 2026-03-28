@@ -71,4 +71,28 @@ final class Default_AI_Provider_Router_Test extends TestCase {
 		$route  = $router->resolve_route( AI_Routing_Task::TEMPLATE_LAB_REPAIR, array() );
 		$this->assertFalse( $route->is_valid() );
 	}
+
+	public function test_unknown_task_provider_falls_back_when_fallback_configured(): void {
+		$settings = new Settings_Service();
+		$settings->set(
+			Option_Names::PROVIDER_CONFIG_REF,
+			array(
+				'task_routing'         => array(
+					AI_Routing_Task::TEMPLATE_LAB_REPAIR => array(
+						'provider_id' => 'unknown_vendor',
+						'model'       => 'should-not-win',
+					),
+				),
+				'fallback_provider_id' => 'anthropic',
+				'fallback_model'       => 'claude-fallback',
+			)
+		);
+		$router = new Default_AI_Provider_Router( $settings );
+		$route  = $router->resolve_route( AI_Routing_Task::TEMPLATE_LAB_REPAIR, array() );
+		$this->assertTrue( $route->is_valid() );
+		$this->assertSame( 'anthropic', $route->get_primary_provider_id() );
+		$this->assertSame( 'claude-fallback', $route->get_primary_model_override() );
+		$this->assertSame( 'anthropic', $route->get_fallback_provider_id() );
+		$this->assertSame( 'claude-fallback', $route->get_fallback_model_override() );
+	}
 }

@@ -331,6 +331,7 @@ final class Page_Templates_Directory_Screen {
 					<th scope="col"><?php \esc_html_e( 'Version', 'aio-page-builder' ); ?></th>
 					<th scope="col"><?php \esc_html_e( 'One-pager', 'aio-page-builder' ); ?></th>
 					<th scope="col"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th>
+					<th scope="col"><?php \esc_html_e( 'Source', 'aio-page-builder' ); ?></th>
 					<th scope="col"><?php \esc_html_e( 'Actions', 'aio-page-builder' ); ?></th>
 				</tr>
 			</thead>
@@ -379,6 +380,7 @@ final class Page_Templates_Directory_Screen {
 						}
 					}
 					$one_pager_available = $one_pager_url !== '';
+					$ai_badge            = (string) ( $row['ai_source_badge'] ?? __( 'Manual', 'aio-page-builder' ) );
 					?>
 					<tr>
 						<td><code><?php echo \esc_html( $key ); ?></code></td>
@@ -394,6 +396,7 @@ final class Page_Templates_Directory_Screen {
 							<?php endif; ?>
 						</td>
 						<td><?php echo \esc_html( $status ); ?></td>
+						<td><?php echo \esc_html( $ai_badge ); ?></td>
 						<td>
 							<a href="<?php echo \esc_url( $view_url ); ?>"><?php \esc_html_e( 'View detail', 'aio-page-builder' ); ?></a>
 							<?php if ( $one_pager_available ) : ?>

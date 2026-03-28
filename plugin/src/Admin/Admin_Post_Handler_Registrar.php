@@ -17,6 +17,7 @@ namespace AIOPageBuilder\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Actions\Template_Lab_Canonical_Admin_Actions;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -44,5 +45,20 @@ final class Admin_Post_Handler_Registrar {
 
 		$import_export = new Import_Export_Screen( $container );
 		$import_export->register_admin_post_handlers();
+
+		\add_action(
+			'admin_post_' . Template_Lab_Canonical_Admin_Actions::ACTION_APPROVE,
+			static function () use ( $container ): void {
+				Template_Lab_Canonical_Admin_Actions::handle_approve( $container );
+			},
+			10
+		);
+		\add_action(
+			'admin_post_' . Template_Lab_Canonical_Admin_Actions::ACTION_APPLY,
+			static function () use ( $container ): void {
+				Template_Lab_Canonical_Admin_Actions::handle_apply( $container );
+			},
+			10
+		);
 	}
 }

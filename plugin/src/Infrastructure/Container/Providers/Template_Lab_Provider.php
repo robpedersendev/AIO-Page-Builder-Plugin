@@ -11,10 +11,15 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Apply_Service;
+use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Registry_Persist_Service;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Chat_Application_Service;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Run_Orchestrator;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Validation_Port;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Validation_Port_Default;
+use AIOPageBuilder\Domain\AI\Translation\Composition_AI_Draft_Translator;
+use AIOPageBuilder\Domain\AI\Translation\Page_Template_AI_Draft_Translator;
+use AIOPageBuilder\Domain\AI\Translation\Section_Template_AI_Draft_Translator;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 
@@ -43,6 +48,30 @@ final class Template_Lab_Provider implements Service_Provider_Interface {
 				return new Template_Lab_Chat_Application_Service(
 					$container->get( 'ai_chat_session_repository' ),
 					$container->get( 'ai_run_service' )
+				);
+			}
+		);
+		$container->register(
+			'template_lab_canonical_registry_persist_service',
+			function () use ( $container ): Template_Lab_Canonical_Registry_Persist_Service {
+				return new Template_Lab_Canonical_Registry_Persist_Service(
+					$container->get( 'composition_repository' ),
+					$container->get( 'page_template_repository' ),
+					$container->get( 'section_template_repository' )
+				);
+			}
+		);
+		$container->register(
+			'template_lab_canonical_apply_service',
+			function () use ( $container ): Template_Lab_Canonical_Apply_Service {
+				return new Template_Lab_Canonical_Apply_Service(
+					$container->get( 'ai_chat_session_repository' ),
+					$container->get( 'ai_run_repository' ),
+					$container->get( 'ai_run_artifact_service' ),
+					$container->get( 'template_lab_canonical_registry_persist_service' ),
+					new Composition_AI_Draft_Translator(),
+					new Page_Template_AI_Draft_Translator(),
+					new Section_Template_AI_Draft_Translator()
 				);
 			}
 		);

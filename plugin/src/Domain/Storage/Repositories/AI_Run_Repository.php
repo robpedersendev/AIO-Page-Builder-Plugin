@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\Storage\Repositories;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\Runs\AI_Artifact_Repository_Interface;
+use AIOPageBuilder\Domain\AI\TemplateLab\AI_Run_Template_Lab_Apply_State_Port;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
@@ -22,7 +23,7 @@ use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
  * Internal key: run_id (e.g. UUID). Status: pending_generation | completed | failed_validation | failed.
  * Run metadata and artifact payloads stored in post meta; raw vs normalized kept separate.
  */
-final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Artifact_Repository_Interface {
+final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Artifact_Repository_Interface, AI_Run_Template_Lab_Apply_State_Port {
 
 	/** Meta key for run metadata (actor, timestamps, provider, model, prompt_pack_ref, retry_count, build_plan_ref). */
 	public const META_RUN_METADATA = '_aio_run_metadata';
@@ -231,5 +232,28 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 			$base['run_metadata'] = $meta['run_metadata'];
 		}
 		return $base;
+	}
+
+	/** Meta: last template-lab canonical apply (idempotency; secrets-free). */
+	public const META_TEMPLATE_LAB_CANONICAL_APPLY = '_aio_template_lab_canonical_apply';
+
+	/**
+	 * @return array<string, mixed>|null
+	 */
+	public function get_template_lab_canonical_apply_record( int $post_id ): ?array {
+		$raw = \get_post_meta( $post_id, self::META_TEMPLATE_LAB_CANONICAL_APPLY, true );
+		if ( ! is_string( $raw ) || $raw === '' ) {
+			return null;
+		}
+		$decoded = json_decode( $raw, true );
+		return is_array( $decoded ) ? $decoded : null;
+	}
+
+	/**
+	 * @param array<string, mixed> $record
+	 */
+	public function save_template_lab_canonical_apply_record( int $post_id, array $record ): bool {
+		$json = wp_json_encode( $record );
+		return $json !== false && \update_post_meta( $post_id, self::META_TEMPLATE_LAB_CANONICAL_APPLY, $json ) !== false;
 	}
 }

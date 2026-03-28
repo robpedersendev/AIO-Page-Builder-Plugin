@@ -344,6 +344,7 @@ final class Large_Library_Query_Service {
 				'section_count'           => $section_count,
 				'version'                 => $version,
 				'one_pager_link'          => $one_pager_url,
+				'ai_source_badge'         => Registry_AI_Provenance_Helper::source_badge_label_for_page_template( $def ),
 			);
 		}
 		return $rows;

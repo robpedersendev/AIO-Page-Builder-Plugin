@@ -19,7 +19,7 @@ use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
  * Stores and retrieves artifacts by run and category. Builds review-safe payloads with redaction.
  * Access to raw artifacts is gated by caller/capability; this service does not check caps.
  */
-final class AI_Run_Artifact_Service {
+final class AI_Run_Artifact_Service implements AI_Run_Artifact_Read_Port {
 
 	/** Placeholder shown when content is redacted. */
 	private const REDACTED_PLACEHOLDER = '[redacted]';

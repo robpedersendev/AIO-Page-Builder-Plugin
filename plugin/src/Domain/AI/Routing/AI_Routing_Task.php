@@ -26,16 +26,22 @@ final class AI_Routing_Task {
 
 	public const TEMPLATE_LAB_REPAIR = 'template_lab_repair';
 
+	public const BUILD_PLAN_GENERATION = 'build_plan_generation';
+
+	public const TEMPLATE_LAB_CHAT = 'template_lab_chat';
+
 	/**
 	 * @return array<int, string>
 	 */
 	public static function all(): array {
 		return array(
 			self::ONBOARDING_PLANNING,
+			self::BUILD_PLAN_GENERATION,
 			self::TEMPLATE_LAB_COMPOSITION_DRAFT,
 			self::TEMPLATE_LAB_PAGE_TEMPLATE_DRAFT,
 			self::TEMPLATE_LAB_SECTION_TEMPLATE_DRAFT,
 			self::TEMPLATE_LAB_REPAIR,
+			self::TEMPLATE_LAB_CHAT,
 		);
 	}
 }

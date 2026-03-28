@@ -29,6 +29,7 @@ use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Readiness;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Planning_Context_Guard;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Keys;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_UI_State_Builder;
+use AIOPageBuilder\Domain\AI\UI\AI_Provider_Admin_Capability_Summary_Builder;
 use AIOPageBuilder\Domain\AI\Onboarding\Planning_Request_Result;
 use AIOPageBuilder\Domain\Profile\Template_Preference_Profile;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Schema;
@@ -756,14 +757,14 @@ final class Onboarding_Screen {
 		$ufs = Onboarding_User_Facing_Status::resolve( $draft, (string) ( $draft['current_step_key'] ?? Onboarding_Step_Keys::WELCOME ), false );
 		$cc  = Onboarding_Crawl_Context_Phase::summarize( array( 'latest_crawl_run_id' => null ), null );
 		return array(
-			'current_step_key'   => $draft['current_step_key'],
-			'steps'              => $steps,
-			'overall_status'     => $draft['overall_status'],
-			'is_blocked'         => false,
-			'blockers'           => array(),
-			'review_advisories'  => array(),
-			'user_facing_status' => $ufs,
-			'prefill'            => array(
+			'current_step_key'    => $draft['current_step_key'],
+			'steps'               => $steps,
+			'overall_status'      => $draft['overall_status'],
+			'is_blocked'          => false,
+			'blockers'            => array(),
+			'review_advisories'   => array(),
+			'user_facing_status'  => $ufs,
+			'prefill'             => array(
 				'profile'                        => array(),
 				'current_site_url'               => '',
 				'crawl_run_ids'                  => array(),
@@ -771,12 +772,12 @@ final class Onboarding_Screen {
 				'latest_crawl_session_timestamp' => null,
 				'provider_refs'                  => array(),
 			),
-			'draft'              => $draft,
-			'nonce'              => \wp_create_nonce( self::NONCE_ACTION ),
-			'nonce_action'       => self::NONCE_ACTION,
-			'can_save_draft'     => true,
-			'resume_message'     => '',
-			'is_provider_ready'  => false,
+			'draft'               => $draft,
+			'nonce'               => \wp_create_nonce( self::NONCE_ACTION ),
+			'nonce_action'        => self::NONCE_ACTION,
+			'can_save_draft'      => true,
+			'resume_message'      => '',
+			'is_provider_ready'   => false,
 			'submission_warnings' => array(),
 			'crawl_context'       => $cc,
 		);
@@ -872,6 +873,8 @@ final class Onboarding_Screen {
 				<p><strong><?php echo \esc_html( $ufs_banner['label'] ); ?></strong> — <?php echo \esc_html( $ufs_banner['hint'] ); ?></p>
 			</div>
 			<?php endif; ?>
+
+			<?php $this->render_ai_provider_capability_summary_if_available(); ?>
 
 			<?php if ( $saved ) : ?>
 				<div class="notice notice-success is-dismissible" role="status">
@@ -1838,10 +1841,10 @@ final class Onboarding_Screen {
 		<p><?php \esc_html_e( 'Crawl your existing site to give the AI planner richer context about your current content structure and gaps.', 'aio-page-builder' ); ?></p>
 		<?php if ( $cc !== null && isset( $cc['headline'], $cc['detail'], $cc['next_step'] ) ) : ?>
 			<?php
-			$notice = $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_FAILED ? 'notice-error' : ( $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_STALE || $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_PARTIAL ? 'notice-warning' : 'notice-info' );
-			$crawl_phase      = isset( $cc['phase'] ) ? (string) $cc['phase'] : '';
-			$crawl_phase_lbl  = isset( $cc['phase_label'] ) ? (string) $cc['phase_label'] : '';
-			$crawl_aria       = (string) $cc['headline'] . ( $crawl_phase_lbl !== '' ? ' — ' . $crawl_phase_lbl : '' );
+			$notice          = $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_FAILED ? 'notice-error' : ( $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_STALE || $cc['phase'] === Onboarding_Crawl_Context_Phase::PHASE_PARTIAL ? 'notice-warning' : 'notice-info' );
+			$crawl_phase     = isset( $cc['phase'] ) ? (string) $cc['phase'] : '';
+			$crawl_phase_lbl = isset( $cc['phase_label'] ) ? (string) $cc['phase_label'] : '';
+			$crawl_aria      = (string) $cc['headline'] . ( $crawl_phase_lbl !== '' ? ' — ' . $crawl_phase_lbl : '' );
 			?>
 			<div class="notice <?php echo \esc_attr( $notice ); ?> inline" role="status" style="margin:1em 0;" data-aio-crawl-phase="<?php echo \esc_attr( $crawl_phase ); ?>" aria-label="<?php echo \esc_attr( $crawl_aria ); ?>">
 				<p><strong><?php echo \esc_html( (string) $cc['headline'] ); ?></strong></p>
@@ -1943,7 +1946,11 @@ final class Onboarding_Screen {
 		<?php if ( count( $tpl ) > 0 ) : ?>
 			<table class="form-table" role="presentation">
 				<?php foreach ( $tpl as $k => $v ) : ?>
-					<?php if ( ! is_string( $k ) || $k === '' ) { continue; } ?>
+					<?php
+					if ( ! is_string( $k ) || $k === '' ) {
+						continue;
+					}
+					?>
 					<tr>
 						<th scope="row"><?php echo \esc_html( str_replace( '_', ' ', $k ) ); ?></th>
 						<td><?php echo \is_bool( $v ) ? ( $v ? \esc_html__( 'Yes', 'aio-page-builder' ) : \esc_html__( 'No', 'aio-page-builder' ) ) : \esc_html( (string) $v ); ?></td>
@@ -2006,7 +2013,13 @@ final class Onboarding_Screen {
 			? __( 'AI provider: configured', 'aio-page-builder' )
 			: __( 'AI provider: not configured yet', 'aio-page-builder' );
 		?>
-		<details class="aio-onboarding-embed-disclosure"<?php if ( ! $ready ) : ?> open<?php endif; ?>>
+		<?php
+		// * opening is a static boolean attribute fragment; class string is literal.
+		printf(
+			'<details class="aio-onboarding-embed-disclosure"%s>',
+			! $ready ? ' open' : ''
+		);
+		?>
 			<summary class="aio-onboarding-embed-summary" style="cursor:pointer;padding:0.5rem 0;">
 				<strong><?php echo \esc_html( $summary_ln ); ?></strong>
 				<span class="description"> — <?php \esc_html_e( 'Expand for credentials, model defaults, connection tests, and spend caps.', 'aio-page-builder' ); ?></span>
@@ -2052,9 +2065,9 @@ final class Onboarding_Screen {
 			$this->render_crawler_external_link_only();
 			return;
 		}
-		$cc        = isset( $state['crawl_context'] ) && is_array( $state['crawl_context'] ) ? $state['crawl_context'] : null;
-		$phase     = is_array( $cc ) && isset( $cc['phase'] ) ? (string) $cc['phase'] : Onboarding_Crawl_Context_Phase::PHASE_UNKNOWN;
-		$open_auto = in_array(
+		$cc              = isset( $state['crawl_context'] ) && is_array( $state['crawl_context'] ) ? $state['crawl_context'] : null;
+		$phase           = is_array( $cc ) && isset( $cc['phase'] ) ? (string) $cc['phase'] : Onboarding_Crawl_Context_Phase::PHASE_UNKNOWN;
+		$open_auto       = in_array(
 			$phase,
 			array(
 				Onboarding_Crawl_Context_Phase::PHASE_NONE,
@@ -2064,13 +2077,20 @@ final class Onboarding_Screen {
 			),
 			true
 		);
-		$cc_label = is_array( $cc ) && isset( $cc['phase_label'] ) ? (string) $cc['phase_label'] : '';
+		$cc_label        = is_array( $cc ) && isset( $cc['phase_label'] ) ? (string) $cc['phase_label'] : '';
 		$crawler_summary = __( 'Crawler tools', 'aio-page-builder' );
 		if ( $cc_label !== '' ) {
 			$crawler_summary .= ' — ' . $cc_label;
 		}
 		?>
-		<details class="aio-onboarding-embed-disclosure"<?php if ( $open_auto ) : ?> open<?php endif; ?> data-aio-crawl-phase="<?php echo \esc_attr( $phase ); ?>" aria-label="<?php echo \esc_attr( $crawler_summary ); ?>">
+		<?php
+		printf(
+			'<details class="aio-onboarding-embed-disclosure"%s data-aio-crawl-phase="%s" aria-label="%s">',
+			$open_auto ? ' open' : '',
+			\esc_attr( $phase ),
+			\esc_attr( $crawler_summary )
+		);
+		?>
 			<summary class="aio-onboarding-embed-summary" style="cursor:pointer;padding:0.5rem 0;">
 				<strong><?php \esc_html_e( 'Crawler tools', 'aio-page-builder' ); ?></strong>
 				<?php if ( $cc_label !== '' ) : ?>
@@ -2112,13 +2132,6 @@ final class Onboarding_Screen {
 	}
 
 	/**
-	 * Writes one debug line for onboarding POST/persist tracing. Requires WP_DEBUG and WP_DEBUG_LOG (see Named_Debug_Log).
-	 * Does not log field values.
-	 *
-	 * @param string $message Short diagnostic (no PII).
-	 * @return void
-	 */
-	/**
 	 * Coarse onboarding analytics (no PII). Skips when service not registered.
 	 *
 	 * @param array<string, mixed> $draft Draft for current step key.
@@ -2133,6 +2146,13 @@ final class Onboarding_Screen {
 		$tel->record( $event_id, $step );
 	}
 
+	/**
+	 * Writes one debug line for onboarding POST/persist tracing. Requires WP_DEBUG and WP_DEBUG_LOG (see Named_Debug_Log).
+	 * Does not log field values.
+	 *
+	 * @param string $message Short diagnostic (no PII).
+	 * @return void
+	 */
 	private function debug_onboarding_line( string $message ): void {
 		Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_ONBOARDING_TRACE, $message );
 	}
@@ -2156,5 +2176,52 @@ final class Onboarding_Screen {
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		sort( $keys );
 		return $keys === array() ? '(none)' : implode( ',', $keys );
+	}
+
+	/**
+	 * Read-only provider capability summary (no secrets).
+	 *
+	 * @return void
+	 */
+	private function render_ai_provider_capability_summary_if_available(): void {
+		if ( ! $this->container->has( 'ai_provider_capability_summary_builder' ) ) {
+			return;
+		}
+		$builder = $this->container->get( 'ai_provider_capability_summary_builder' );
+		if ( ! $builder instanceof AI_Provider_Admin_Capability_Summary_Builder ) {
+			return;
+		}
+		$rows = $builder->build_rows();
+		if ( $rows === array() ) {
+			return;
+		}
+		?>
+		<div class="aio-onboarding-provider-cap-summary" style="margin:1em 0;padding:8px 12px;border:1px solid #c3c4c7;background:#fcfcfc;">
+			<h2 class="hndle"><?php \esc_html_e( 'AI provider capabilities (summary)', 'aio-page-builder' ); ?></h2>
+			<p class="description"><?php \esc_html_e( 'Operational metadata only. API keys stay in the secure store and are never listed here.', 'aio-page-builder' ); ?></p>
+			<table class="widefat striped" style="max-width:720px;">
+				<thead>
+					<tr>
+						<th scope="col"><?php \esc_html_e( 'Provider', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Credential', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Structured output', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Attachments', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Models', 'aio-page-builder' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php foreach ( $rows as $r ) : ?>
+					<tr>
+						<td><code><?php echo \esc_html( (string) ( $r['provider_id'] ?? '' ) ); ?></code></td>
+						<td><?php echo ! empty( $r['credential_configured'] ) ? \esc_html__( 'Stored', 'aio-page-builder' ) : \esc_html__( 'Not stored', 'aio-page-builder' ); ?></td>
+						<td><?php echo ! empty( $r['structured_output_supported'] ) ? \esc_html__( 'Yes', 'aio-page-builder' ) : \esc_html__( 'No', 'aio-page-builder' ); ?></td>
+						<td><?php echo ! empty( $r['file_attachment_supported'] ) ? \esc_html__( 'Yes', 'aio-page-builder' ) : \esc_html__( 'No', 'aio-page-builder' ); ?></td>
+						<td><?php echo \esc_html( (string) (int) ( $r['models_count'] ?? 0 ) ); ?></td>
+					</tr>
+				<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+		<?php
 	}
 }

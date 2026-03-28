@@ -20,6 +20,7 @@ use AIOPageBuilder\Domain\AI\Providers\Drivers\Additional_AI_Provider_Driver;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Concrete_AI_Provider_Driver;
 use AIOPageBuilder\Domain\AI\Providers\Drivers\Provider_Connection_Test_Service;
 use AIOPageBuilder\Domain\AI\Secrets\Option_Based_Provider_Secret_Store;
+use AIOPageBuilder\Domain\AI\UI\AI_Provider_Admin_Capability_Summary_Builder;
 use AIOPageBuilder\Domain\AI\UI\AI_Providers_UI_State_Builder;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
@@ -117,6 +118,16 @@ final class AI_Provider_Drivers_Provider implements Service_Provider_Interface {
 					$container->get( 'provider_capability_resolver' ),
 					$container->get( 'settings' ),
 					$container
+				);
+			}
+		);
+
+		$container->register(
+			'ai_provider_capability_summary_builder',
+			function () use ( $container ): AI_Provider_Admin_Capability_Summary_Builder {
+				return new AI_Provider_Admin_Capability_Summary_Builder(
+					$container,
+					$container->get( 'provider_secret_store' )
 				);
 			}
 		);

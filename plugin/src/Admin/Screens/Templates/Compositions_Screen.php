@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Admin\Screens\Templates;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Schema;
+use AIOPageBuilder\Domain\Registries\Shared\Registry_AI_Provenance_Helper;
 use AIOPageBuilder\Domain\Registries\Compositions\UI\Composition_Builder_State_Builder;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
@@ -107,6 +108,7 @@ final class Compositions_Screen {
 							<th scope="col"><?php \esc_html_e( 'ID', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Validation', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Source', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Sections', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Source template', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Actions', 'aio-page-builder' ); ?></th>
@@ -122,6 +124,7 @@ final class Compositions_Screen {
 							$ordered       = $comp[ Composition_Schema::FIELD_ORDERED_SECTION_LIST ] ?? array();
 							$section_count = is_array( $ordered ) ? count( $ordered ) : 0;
 							$source_ref    = (string) ( $comp[ Composition_Schema::FIELD_SOURCE_TEMPLATE_REF ] ?? '' );
+							$source_badge  = Registry_AI_Provenance_Helper::source_badge_label_for_composition( $comp );
 							$edit_url      = Template_Library_Hub_Urls::tab_url(
 								Template_Library_Hub_Urls::TAB_COMPOSITIONS,
 								array(
@@ -135,6 +138,7 @@ final class Compositions_Screen {
 								<td><code><?php echo \esc_html( $comp_id ); ?></code></td>
 								<td><?php echo \esc_html( $status ); ?></td>
 								<td><?php echo \esc_html( $val_status ); ?></td>
+								<td><?php echo \esc_html( $source_badge ); ?></td>
 								<td><?php echo (int) $section_count; ?></td>
 								<td><?php echo $source_ref !== '' ? \esc_html( $source_ref ) : '—'; ?></td>
 								<td><a href="<?php echo \esc_url( $edit_url ); ?>"><?php \esc_html_e( 'Edit', 'aio-page-builder' ); ?></a></td>
