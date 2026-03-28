@@ -5,6 +5,7 @@
 
 namespace AIOPageBuilder\Tests\Unit;
 
+use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Keys;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 use AIOPageBuilder\Domain\Storage\Repositories\AI_Chat_Session_Repository;
 use PHPUnit\Framework\TestCase;
@@ -114,5 +115,49 @@ final class AI_Chat_Session_Repository_Test extends TestCase {
 		$s = $this->repo->get_session( $key );
 		$this->assertIsArray( $s['approved_snapshot_ref'] ?? null );
 		$this->assertSame( 'snap_1', (string) ( $s['approved_snapshot_ref']['snapshot_id'] ?? '' ) );
+	}
+
+	public function test_anonymize_transcript_no_match_is_idempotent_ok(): void {
+		$this->assertTrue( $this->repo->anonymize_transcript( 'acs_nonexistent' ) );
+	}
+
+	public function test_anonymize_transcript_clears_messages_and_provider_thread(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 9040;
+		$key                                   = $this->repo->create_session( array( 'actor_user_id' => 2 ) );
+		$post                                  = new \WP_Post(
+			array(
+				'ID'                => 9040,
+				'post_type'         => Object_Type_Keys::AI_CHAT_SESSION,
+				'post_title'        => $key,
+				'post_status'       => 'publish',
+				'post_name'         => $key,
+				'post_modified_gmt' => '2022-06-01 10:00:00',
+			)
+		);
+		$GLOBALS['_aio_wp_query_posts']        = array( $post );
+		$GLOBALS['_aio_get_post_by_id']        = array( 9040 => $post );
+		$this->assertTrue(
+			$this->repo->append_message(
+				$key,
+				array(
+					'role'            => 'user',
+					'content_preview' => 'SECRET_USER_TEXT',
+				)
+			)
+		);
+		$this->assertTrue( $this->repo->set_provider_thread_ref( $key, 'provider_thread_xyz' ) );
+		$before = $this->repo->get_session( $key );
+		$this->assertIsArray( $before );
+		$this->assertNotSame( '', (string) ( $before['provider_thread_ref'] ?? '' ) );
+		$this->assertTrue( $this->repo->anonymize_transcript( $key ) );
+		$after = $this->repo->get_session( $key );
+		$this->assertIsArray( $after );
+		$this->assertSame( '', (string) ( $after['provider_thread_ref'] ?? 'x' ) );
+		$this->assertCount( 1, $after['messages'] ?? array() );
+		$this->assertSame( '[erased]', (string) ( $after['messages'][0]['content_preview'] ?? '' ) );
+		$this->assertGreaterThan( 0, (int) ( json_decode( (string) ( $GLOBALS['_aio_post_meta']['9040'][ AI_Chat_Session_Keys::META_PAYLOAD ] ?? '{}' ), true )[ AI_Chat_Session_Keys::P_TRANSCRIPT_ANONYMIZED_UNIX ] ?? 0 ) );
+		$this->assertTrue( $this->repo->anonymize_transcript( $key ) );
+		$after2 = $this->repo->get_session( $key );
+		$this->assertSame( '[erased]', (string) ( $after2['messages'][0]['content_preview'] ?? '' ) );
 	}
 }

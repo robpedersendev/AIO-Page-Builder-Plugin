@@ -15,6 +15,7 @@ use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Read_Port;
 use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
 use AIOPageBuilder\Domain\AI\Translation\Composition_AI_Draft_Translator;
 use AIOPageBuilder\Domain\AI\Translation\Page_Template_AI_Draft_Translator;
+use AIOPageBuilder\Domain\Registries\Composition\Composition_Schema;
 use AIOPageBuilder\Domain\AI\Translation\Section_Template_AI_Draft_Translator;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
@@ -230,6 +231,7 @@ final class Template_Lab_Canonical_Apply_Service {
 	 * @return array<string, mixed>
 	 */
 	private function build_draft_with_provenance( array $norm, array $ref, int $run_post_id ): array {
+		// * Canonical writes must originate from an approved snapshot handle, not raw chat or provider HTTP (translator enforces schema).
 		$safe_ref = array(
 			Template_Lab_Approved_Snapshot_Ref_Keys::RUN_POST_ID         => $run_post_id,
 			Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT => (string) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT ] ?? '' ),
@@ -239,6 +241,16 @@ final class Template_Lab_Canonical_Apply_Service {
 		$draft               = $norm;
 		$draft['approved_snapshot_ref'] = $safe_ref;
 		$draft['ai_run_post_id']          = $run_post_id;
+		if ( isset( $draft[ Composition_Schema::FIELD_COMPOSITION_ID ] ) ) {
+			if ( isset( $draft[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] ) && is_array( $draft[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] ) ) {
+				$reg = $draft[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ];
+			} else {
+				$reg = array();
+			}
+			$reg['template_lab_source']           = 'approved_snapshot_apply';
+			$reg['approved_artifact_fingerprint'] = (string) ( $ref[ Template_Lab_Approved_Snapshot_Ref_Keys::ARTIFACT_FINGERPRINT ] ?? '' );
+			$draft[ Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF ] = $reg;
+		}
 		return $draft;
 	}
 }

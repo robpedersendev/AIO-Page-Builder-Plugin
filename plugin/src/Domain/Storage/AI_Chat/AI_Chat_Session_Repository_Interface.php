@@ -52,6 +52,12 @@ interface AI_Chat_Session_Repository_Interface {
 	public function set_provider_thread_ref( string $session_id, string $ref ): bool;
 
 	/**
+	 * Replaces message previews and provider thread ref with placeholders; preserves session shell and approved snapshot ref.
+	 * Idempotent when already anonymized. Does not delete canonical registry records.
+	 */
+	public function anonymize_transcript( string $session_id ): bool;
+
+	/**
 	 * Recent sessions for a WordPress user (owner), newest modified first.
 	 *
 	 * @return list<array<string, mixed>> Summary rows: session_id, post_id, status, task_type, message_count, post_modified_gmt.

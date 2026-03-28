@@ -713,6 +713,23 @@ if ( ! class_exists( 'WP_Query' ) ) {
 			$this->query = is_array( $query ) ? $query : array();
 		}
 
+		/**
+		 * Mirrors WP_Query `fields => 'ids'` so repository list helpers receive integer IDs in tests.
+		 *
+		 * @param list<\WP_Post|array<string, mixed>> $posts
+		 * @return list<\WP_Post|array<string, mixed>|int>
+		 */
+		private function maybe_map_to_ids( array $posts ): array {
+			if ( ( $this->query['fields'] ?? '' ) !== 'ids' ) {
+				return $posts;
+			}
+			$out = array();
+			foreach ( $posts as $post ) {
+				$out[] = is_object( $post ) ? (int) ( $post->ID ?? 0 ) : (int) ( $post['ID'] ?? 0 );
+			}
+			return $out;
+		}
+
 		public function get_posts() {
 			$posts      = isset( $GLOBALS['_aio_wp_query_posts'] ) ? $GLOBALS['_aio_wp_query_posts'] : array();
 			$post_type  = $this->query['post_type'] ?? '';
@@ -774,7 +791,7 @@ if ( ! class_exists( 'WP_Query' ) ) {
 				} elseif ( $offset > 0 ) {
 					$filtered = array_slice( $filtered, $offset );
 				}
-				return $filtered;
+				return $this->maybe_map_to_ids( $filtered );
 			}
 
 			if ( ! is_array( $meta_query ) || empty( $meta_query ) ) {
@@ -784,7 +801,7 @@ if ( ! class_exists( 'WP_Query' ) ) {
 				} elseif ( $offset > 0 ) {
 					$posts = array_slice( $posts, $offset );
 				}
-				return $posts;
+				return $this->maybe_map_to_ids( $posts );
 			}
 			$filter_meta_key   = null;
 			$filter_meta_value = null;
@@ -806,7 +823,7 @@ if ( ! class_exists( 'WP_Query' ) ) {
 				} elseif ( $offset > 0 ) {
 					$posts = array_slice( $posts, $offset );
 				}
-				return $posts;
+				return $this->maybe_map_to_ids( $posts );
 			}
 			$filtered = array();
 			$meta     = $GLOBALS['_aio_post_meta'] ?? array();
@@ -846,7 +863,7 @@ if ( ! class_exists( 'WP_Query' ) ) {
 			} elseif ( $offset > 0 ) {
 				$filtered = array_slice( $filtered, $offset );
 			}
-			return $filtered;
+			return $this->maybe_map_to_ids( $filtered );
 		}
 	}
 }

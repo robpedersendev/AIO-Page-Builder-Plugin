@@ -113,6 +113,24 @@ foreach ( $dev_artifacts as $rel ) {
 	}
 }
 
+// 6. Template-lab / chat / apply runtime files (private distribution must not omit these).
+$template_lab_runtime = array(
+	'src/Admin/Screens/Templates/Template_Lab_Chat_Screen.php',
+	'src/Admin/Actions/Template_Lab_Canonical_Admin_Actions.php',
+	'src/Admin/Actions/Template_Lab_Chat_Admin_Actions.php',
+	'src/Domain/AI/TemplateLab/Template_Lab_Canonical_Apply_Service.php',
+	'src/Infrastructure/Rest/AI_Chat_REST_Controller.php',
+);
+foreach ( $template_lab_runtime as $rel ) {
+	$path = $base . DIRECTORY_SEPARATOR . str_replace( '/', DIRECTORY_SEPARATOR, $rel );
+	if ( file_exists( $path ) && is_readable( $path ) ) {
+		$results[] = array( 'pass', "Template-lab runtime file: {$rel}" );
+	} else {
+		$results[] = array( 'fail', "Missing template-lab runtime file: {$rel}" );
+		$ok        = false;
+	}
+}
+
 // Output.
 foreach ( $results as $r ) {
 	list( $status, $msg ) = $r;

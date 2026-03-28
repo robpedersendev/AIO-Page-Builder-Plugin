@@ -61,6 +61,9 @@ final class Build_Plan_Schema {
 	/** Optional: secret-free onboarding wizard snapshot merged into the plan while the user completes onboarding. */
 	public const KEY_ONBOARDING_WIZARD_SNAPSHOT = 'onboarding_wizard_snapshot';
 
+	/** Optional: informational template-lab linkage (run id, target kind, canonical key); not execution authority. */
+	public const KEY_TEMPLATE_LAB_CONTEXT = 'template_lab_context';
+
 	/** Optional: stable id shared by all versions of a plan lineage (e.g. UUID). */
 	public const KEY_PLAN_LINEAGE_ID = 'plan_lineage_id';
 

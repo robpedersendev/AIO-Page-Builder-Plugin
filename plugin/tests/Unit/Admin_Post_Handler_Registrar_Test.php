@@ -11,6 +11,7 @@
 namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Admin\Actions\Template_Lab_Canonical_Admin_Actions;
+use AIOPageBuilder\Admin\Actions\Template_Lab_Chat_Admin_Actions;
 use AIOPageBuilder\Admin\Admin_Post_Handler_Registrar;
 use AIOPageBuilder\Admin\Screens\AI\Profile_Snapshot_History_Panel;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -35,5 +36,7 @@ final class Admin_Post_Handler_Registrar_Test extends TestCase {
 		$this->assertNotFalse( \has_action( 'admin_post_' . Profile_Snapshot_History_Panel::ACTION_RESTORE ) );
 		$this->assertNotFalse( \has_action( 'admin_post_' . Template_Lab_Canonical_Admin_Actions::ACTION_APPROVE ) );
 		$this->assertNotFalse( \has_action( 'admin_post_' . Template_Lab_Canonical_Admin_Actions::ACTION_APPLY ) );
+		$this->assertNotFalse( \has_action( 'admin_post_' . Template_Lab_Chat_Admin_Actions::ACTION_CREATE_SESSION ) );
+		$this->assertNotFalse( \has_action( 'admin_post_' . Template_Lab_Chat_Admin_Actions::ACTION_SUBMIT_PROMPT ) );
 	}
 }

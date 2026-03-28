@@ -196,6 +196,39 @@ final class AI_Chat_Session_Repository extends Abstract_CPT_Repository implement
 		return true;
 	}
 
+	public function anonymize_transcript( string $session_id ): bool {
+		$row = $this->get_by_key( $session_id );
+		if ( $row === null ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::CHAT_SESSION_TRANSCRIPT_ANONYMIZED, 'result=no_match' );
+			return true;
+		}
+		$id      = (int) ( $row['id'] ?? 0 );
+		$payload = $this->load_payload( $id );
+		if ( (int) ( $payload[ AI_Chat_Session_Keys::P_TRANSCRIPT_ANONYMIZED_UNIX ] ?? 0 ) > 0 ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::CHAT_SESSION_TRANSCRIPT_ANONYMIZED, 'post_id=' . (string) $id . ' result=idempotent' );
+			return true;
+		}
+		$payload[ AI_Chat_Session_Keys::P_PROVIDER_THREAD_REF ]           = '';
+		$payload[ AI_Chat_Session_Keys::P_MESSAGES ]                      = array(
+			array(
+				'role'            => 'system',
+				'created_at'      => \gmdate( 'c' ),
+				'content_preview' => '[erased]',
+				'ai_run_post_id'  => 0,
+				'meta'            => array(),
+				'has_body_ref'    => false,
+			),
+		);
+		$payload[ AI_Chat_Session_Keys::P_TRANSCRIPT_ANONYMIZED_UNIX ] = time();
+		$owner = (int) \get_post_meta( $id, AI_Chat_Session_Keys::META_OWNER, true );
+		if ( ! $this->persist_payload_and_owner( $id, $payload, $owner ) ) {
+			return false;
+		}
+		$this->touch_modified( $id );
+		Named_Debug_Log::event( Named_Debug_Log_Event::CHAT_SESSION_TRANSCRIPT_ANONYMIZED, 'post_id=' . (string) $id . ' result=ok' );
+		return true;
+	}
+
 	public function set_provider_thread_ref( string $session_id, string $ref ): bool {
 		$row = $this->get_by_key( $session_id );
 		if ( $row === null ) {
@@ -273,6 +306,7 @@ final class AI_Chat_Session_Repository extends Abstract_CPT_Repository implement
 			AI_Chat_Session_Keys::P_APPROVED_SNAPSHOT_REF => null,
 			AI_Chat_Session_Keys::P_RETENTION_NOT_BEFORE_UNIX => 0,
 			AI_Chat_Session_Keys::P_MESSAGES              => array(),
+			AI_Chat_Session_Keys::P_TRANSCRIPT_ANONYMIZED_UNIX => 0,
 		);
 	}
 

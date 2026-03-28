@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Domain\AI\TemplateLab;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Routing\AI_Routing_Task;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Keys;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
@@ -68,6 +69,7 @@ final class Template_Lab_Chat_Application_Service {
 				'actor'              => (string) $actor_user_id,
 				'chat_session_key'   => $session_key,
 				'template_lab_shell' => true,
+				'routing_task'       => AI_Routing_Task::TEMPLATE_LAB_CHAT,
 			),
 			'pending_generation'
 		);

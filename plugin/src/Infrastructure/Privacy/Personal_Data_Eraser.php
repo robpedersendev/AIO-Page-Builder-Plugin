@@ -102,7 +102,14 @@ final class Personal_Data_Eraser {
 		$chat_repo = new AI_Chat_Session_Repository();
 		$chat_ids  = $chat_repo->list_post_ids_for_owner( $user_id, self::PER_PAGE, $offset );
 		foreach ( $chat_ids as $cid ) {
-			if ( $cid > 0 && \wp_delete_post( $cid, true ) ) {
+			if ( $cid <= 0 ) {
+				continue;
+			}
+			$sid = (string) \get_post_meta( $cid, '_aio_internal_key', true );
+			if ( $sid !== '' ) {
+				$chat_repo->anonymize_transcript( $sid );
+			}
+			if ( \wp_delete_post( $cid, true ) ) {
 				$items_removed = true;
 			}
 		}

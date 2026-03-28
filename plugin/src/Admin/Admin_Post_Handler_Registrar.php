@@ -18,6 +18,7 @@ namespace AIOPageBuilder\Admin;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Actions\Template_Lab_Canonical_Admin_Actions;
+use AIOPageBuilder\Admin\Actions\Template_Lab_Chat_Admin_Actions;
 use AIOPageBuilder\Admin\Screens\ImportExport\Import_Export_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -57,6 +58,20 @@ final class Admin_Post_Handler_Registrar {
 			'admin_post_' . Template_Lab_Canonical_Admin_Actions::ACTION_APPLY,
 			static function () use ( $container ): void {
 				Template_Lab_Canonical_Admin_Actions::handle_apply( $container );
+			},
+			10
+		);
+		\add_action(
+			'admin_post_' . Template_Lab_Chat_Admin_Actions::ACTION_CREATE_SESSION,
+			static function () use ( $container ): void {
+				Template_Lab_Chat_Admin_Actions::handle_create_session( $container );
+			},
+			10
+		);
+		\add_action(
+			'admin_post_' . Template_Lab_Chat_Admin_Actions::ACTION_SUBMIT_PROMPT,
+			static function () use ( $container ): void {
+				Template_Lab_Chat_Admin_Actions::handle_submit_prompt( $container );
 			},
 			10
 		);

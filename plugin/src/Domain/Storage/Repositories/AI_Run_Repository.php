@@ -66,7 +66,64 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 		// * Indexed for privacy exporter/eraser (actor-linked queries).
 		$actor = isset( $data['actor'] ) ? (string) $data['actor'] : '';
 		\update_post_meta( $post_id, '_aio_run_actor', $actor );
+		$surface = self::infer_run_surface( $data );
+		if ( $surface !== null ) {
+			\update_post_meta( $post_id, self::META_RUN_SURFACE, $surface );
+		}
 		return true;
+	}
+
+	/** Post meta: coarse surface for diagnostics (template_lab | build_plan | other). Secrets-free. */
+	public const META_RUN_SURFACE = '_aio_run_surface';
+
+	/**
+	 * @param array<string, mixed> $data Run metadata being saved.
+	 */
+	private static function infer_run_surface( array $data ): ?string {
+		if ( isset( $data['template_lab'] ) && is_array( $data['template_lab'] ) ) {
+			return 'template_lab';
+		}
+		if ( ! empty( $data['template_lab_shell'] ) ) {
+			return 'template_lab';
+		}
+		$bp = $data['build_plan_ref'] ?? null;
+		if ( is_string( $bp ) && $bp !== '' ) {
+			return 'build_plan';
+		}
+		if ( is_array( $bp ) && $bp !== array() ) {
+			return 'build_plan';
+		}
+		return null;
+	}
+
+	/**
+	 * Lists recent run post IDs whose surface meta matches (empty $surface returns recent ignoring surface).
+	 *
+	 * @return list<int>
+	 */
+	public function list_recent_post_ids_by_surface( string $surface, int $limit = 50, int $offset = 0 ): array {
+		$limit  = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
+		$offset = max( 0, $offset );
+		$args   = array(
+			'post_type'              => $this->get_post_type(),
+			'posts_per_page'         => $limit,
+			'offset'                 => $offset,
+			'orderby'                => 'date',
+			'order'                  => 'DESC',
+			'no_found_rows'          => true,
+			'fields'                 => 'ids',
+			'update_post_meta_cache' => false,
+		);
+		if ( $surface !== '' ) {
+			$args['meta_key']   = self::META_RUN_SURFACE;
+			$args['meta_value'] = $surface;
+		}
+		$query = new \WP_Query( $args );
+		$ids   = array();
+		foreach ( $query->get_posts() as $id ) {
+			$ids[] = (int) $id;
+		}
+		return $ids;
 	}
 
 	/**

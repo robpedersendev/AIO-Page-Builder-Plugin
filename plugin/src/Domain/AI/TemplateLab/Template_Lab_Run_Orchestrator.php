@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Domain\AI\TemplateLab;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Routing\AI_Routing_Task;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
 use AIOPageBuilder\Domain\AI\Validation\Validation_Report;
@@ -50,8 +51,13 @@ final class Template_Lab_Run_Orchestrator {
 		string $schema_ref,
 		?string $chat_session_key = null,
 		int $timeout_seconds = 300,
-		int $max_repairs = 2
+		int $max_repairs = 2,
+		string $routing_task = ''
 	): int {
+		if ( $routing_task === '' ) {
+			$routing_task = AI_Routing_Task::TEMPLATE_LAB_COMPOSITION_DRAFT;
+		}
+		$run_metadata['routing_task']    = $routing_task;
 		$run_metadata[ self::META_BLOCK ] = array(
 			'state'            => Template_Lab_Run_States::QUEUED,
 			'schema_ref'       => $schema_ref,

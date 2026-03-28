@@ -38,4 +38,7 @@ final class AI_Chat_Session_Keys {
 
 	/** JSON key: list of message records. */
 	public const P_MESSAGES = 'messages';
+
+	/** JSON key: unix time when transcript was anonymized (idempotent erase). */
+	public const P_TRANSCRIPT_ANONYMIZED_UNIX = 'transcript_anonymized_unix';
 }

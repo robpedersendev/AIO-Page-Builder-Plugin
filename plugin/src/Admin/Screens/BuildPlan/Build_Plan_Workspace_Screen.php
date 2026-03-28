@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Steps\ExistingPageUpdates\Existing_Page_Update_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Bulk_Action_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Bulk_Action_Service;
+use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Template_Lab_Provenance_Admin;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Bulk_Action_Bar_Component;
@@ -3015,6 +3016,18 @@ final class Build_Plan_Workspace_Screen {
 		?>
 		<div class="aio-step-overview">
 			<p class="aio-plan-summary"><?php echo \esc_html( $summary !== '' ? $summary : __( 'No summary.', 'aio-page-builder' ) ); ?></p>
+			<?php
+			$tl_lines = Build_Plan_Template_Lab_Provenance_Admin::lines( $definition );
+			if ( $tl_lines !== array() ) :
+				?>
+			<div class="notice notice-info inline aio-build-plan-template-lab-prov" style="margin:12px 0;">
+				<?php foreach ( $tl_lines as $ln ) : ?>
+					<p><?php echo \esc_html( $ln ); ?></p>
+				<?php endforeach; ?>
+			</div>
+				<?php
+			endif;
+			?>
 			<p><strong><?php \esc_html_e( 'Planning mode:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $planning_mode ); ?> | <strong><?php \esc_html_e( 'Confidence:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $confidence ); ?></p>
 			<p class="aio-overview-actions"><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' ) ) . '&step=1' ) ); ?>" class="button button-primary"><?php \esc_html_e( 'Start review', 'aio-page-builder' ); ?></a></p>
 		</div>
