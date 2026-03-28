@@ -47,6 +47,7 @@ use AIOPageBuilder\Infrastructure\Container\Providers\Repositories_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Storage_Services_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Profile_Snapshot_Provider;
 use AIOPageBuilder\Infrastructure\Container\Providers\Styling_Provider;
+use AIOPageBuilder\Infrastructure\Container\Providers\Template_Lab_Provider;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 
 /**
@@ -115,6 +116,7 @@ final class Module_Registrar {
 			new AI_Regression_Harness_Provider(),
 			new AI_Experiments_Provider(),
 			new AI_Runs_Provider(),
+			new Template_Lab_Provider(),
 			new Storage_Services_Provider(),
 			new Profile_Snapshot_Provider(),
 			new ExportRestore_Provider(),

@@ -40,4 +40,28 @@ interface AI_Chat_Session_Repository_Interface {
 	 * @param array<string, mixed> $approved_snapshot_ref References normalized artifact or registry write handle.
 	 */
 	public function link_approved_snapshot( string $session_id, array $approved_snapshot_ref ): bool;
+
+	/**
+	 * Updates session lifecycle status (_aio_status). Invalid statuses are rejected.
+	 */
+	public function update_status( string $session_id, string $status ): bool;
+
+	/**
+	 * Persists an external provider thread reference (opaque id only; no secrets).
+	 */
+	public function set_provider_thread_ref( string $session_id, string $ref ): bool;
+
+	/**
+	 * Recent sessions for a WordPress user (owner), newest modified first.
+	 *
+	 * @return list<array<string, mixed>> Summary rows: session_id, post_id, status, task_type, message_count, post_modified_gmt.
+	 */
+	public function list_recent_for_owner( int $owner_user_id, int $limit = 20, int $offset = 0 ): array;
+
+	/**
+	 * Post IDs owned by user (paginated) for privacy erase.
+	 *
+	 * @return list<int>
+	 */
+	public function list_post_ids_for_owner( int $owner_user_id, int $limit, int $offset ): array;
 }

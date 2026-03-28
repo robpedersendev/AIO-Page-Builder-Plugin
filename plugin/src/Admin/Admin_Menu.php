@@ -50,6 +50,7 @@ use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Validator;
 use AIOPageBuilder\Domain\Industry\Import\Industry_Bundle_Apply_Service;
 use AIOPageBuilder\Domain\Industry\Import\Industry_Bundle_Conflict_Scanner;
+use AIOPageBuilder\Domain\Onboarding\Onboarding_And_Build_Plan_Reset_Service;
 use AIOPageBuilder\Domain\Registries\Section\ProcessTimelineFaqBatch\Process_Timeline_FAQ_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Registries\Section\TrustProofBatch\Trust_Proof_Library_Batch_Seeder;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
@@ -119,6 +120,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_create_build_plan_from_ai_run', array( $this, 'handle_create_build_plan_from_ai_run' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_apply', array( $this, 'handle_industry_bundle_apply' ), 10 );
+		\add_action( 'admin_post_aio_reset_onboarding_build_plans', array( $this, 'handle_reset_onboarding_build_plans' ), 10 );
 
 		$profile_snapshots_for_post = new Profile_Snapshot_History_Panel( $this->container );
 		$profile_snapshots_for_post->register_hooks();
@@ -1454,5 +1456,35 @@ final class Admin_Menu {
 			Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_STEP, 'failed_step=' . (string) $bulk['failed_step'] );
 		}
 		$this->redirect_settings_section_page_seeding( $err );
+	}
+
+	/**
+	 * Clears onboarding wizard state and deletes all Build Plan posts. Privacy hub; capability {@see Capabilities::MANAGE_REPORTING_AND_PRIVACY}.
+	 *
+	 * @return void
+	 */
+	public function handle_reset_onboarding_build_plans(): void {
+		$redirect_base = Admin_Screen_Hub::tab_url( Settings_Screen::SLUG, 'privacy' );
+		$fail          = static function () use ( $redirect_base ): void {
+			\wp_safe_redirect( \add_query_arg( array( 'aio_reset_obp' => 'error' ), $redirect_base ) );
+			exit;
+		};
+		if ( ! isset( $_POST['_wpnonce'] ) ||
+			! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ), 'aio_reset_onboarding_build_plans' ) ) {
+			$fail();
+		}
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_REPORTING_AND_PRIVACY ) ) {
+			$fail();
+		}
+		if ( ! $this->container->has( 'onboarding_build_plan_reset_service' ) ) {
+			$fail();
+		}
+		$svc = $this->container->get( 'onboarding_build_plan_reset_service' );
+		if ( ! $svc instanceof Onboarding_And_Build_Plan_Reset_Service ) {
+			$fail();
+		}
+		$svc->reset();
+		\wp_safe_redirect( \add_query_arg( array( 'aio_reset_obp' => 'success' ), $redirect_base ) );
+		exit;
 	}
 }

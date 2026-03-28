@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Build_Plan_Bootstrap_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
+use AIOPageBuilder\Domain\Onboarding\Onboarding_And_Build_Plan_Reset_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Industry_Hub_Navigation_Advisor;
 use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Telemetry;
@@ -33,6 +34,15 @@ final class Onboarding_Provider implements Service_Provider_Interface {
 			'onboarding_draft_service',
 			function () use ( $container ): Onboarding_Draft_Service {
 				return new Onboarding_Draft_Service( $container->get( 'settings' ) );
+			}
+		);
+		$container->register(
+			'onboarding_build_plan_reset_service',
+			function () use ( $container ): Onboarding_And_Build_Plan_Reset_Service {
+				return new Onboarding_And_Build_Plan_Reset_Service(
+					$container->get( 'onboarding_draft_service' ),
+					$container->get( 'settings' )
+				);
 			}
 		);
 		$container->register(

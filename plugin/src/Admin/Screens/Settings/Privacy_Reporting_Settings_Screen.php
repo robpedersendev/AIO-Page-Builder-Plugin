@@ -11,6 +11,8 @@ namespace AIOPageBuilder\Admin\Screens\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\Settings_Screen;
 use AIOPageBuilder\Domain\Reporting\UI\Privacy_Settings_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
@@ -48,12 +50,34 @@ final class Privacy_Reporting_Settings_Screen {
 		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage privacy and reporting settings.', 'aio-page-builder' ), 403 );
 		}
-		$state = $this->get_state();
+		$state       = $this->get_state();
+		$reset_flash = isset( $_GET['aio_reset_obp'] ) ? \sanitize_key( (string) \wp_unslash( (string) $_GET['aio_reset_obp'] ) ) : '';
 		?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-privacy-reporting" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 		<?php endif; ?>
+
+			<?php if ( $reset_flash === 'success' ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php \esc_html_e( 'Onboarding wizard state was reset and all build plans were removed. Profiles, AI runs, and the template library were not changed.', 'aio-page-builder' ); ?></p></div>
+			<?php elseif ( $reset_flash === 'error' ) : ?>
+				<div class="notice notice-error"><p><?php \esc_html_e( 'Could not reset onboarding and build plans. Check permissions and try again.', 'aio-page-builder' ); ?></p></div>
+			<?php endif; ?>
+
+			<section class="aio-onboarding-build-plan-reset" aria-labelledby="aio-reset-obp-heading" style="margin: 1.5em 0; padding: 1em; border: 1px solid #c3c4c7; background: #fcf9e8;">
+				<h2 id="aio-reset-obp-heading"><?php \esc_html_e( 'Reset onboarding and build plans', 'aio-page-builder' ); ?></h2>
+				<p><?php \esc_html_e( 'Use this to start the onboarding wizard from scratch and remove every build plan. Site profile, industry settings, AI provider configuration, AI runs, built pages, and template library content are kept.', 'aio-page-builder' ); ?></p>
+				<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
+					<?php \wp_nonce_field( 'aio_reset_onboarding_build_plans' ); ?>
+					<input type="hidden" name="action" value="aio_reset_onboarding_build_plans" />
+					<p>
+						<button type="submit" class="button button-secondary" onclick="return window.confirm(<?php echo \wp_json_encode( __( 'This permanently deletes all build plans and clears onboarding progress. Continue?', 'aio-page-builder' ) ); ?>);">
+							<?php \esc_html_e( 'Reset onboarding & delete all build plans', 'aio-page-builder' ); ?>
+						</button>
+					</p>
+				</form>
+				<p class="description"><?php \esc_html_e( 'To re-seed section/page templates or the default prompt pack, use Settings → General & seeding or Section & page templates (same actions as plugin activation).', 'aio-page-builder' ); ?> <a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( Settings_Screen::SLUG, Settings_Screen::SETTINGS_SUBTAB_OVERVIEW ) ); ?>"><?php \esc_html_e( 'Open Settings', 'aio-page-builder' ); ?></a></p>
+			</section>
 
 			<section class="aio-disclosure" aria-labelledby="aio-reporting-disclosure-heading">
 				<h2 id="aio-reporting-disclosure-heading"><?php \esc_html_e( 'Reporting disclosure', 'aio-page-builder' ); ?></h2>

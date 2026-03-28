@@ -14,8 +14,8 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 
 /**
- * Registers section template, page template, composition, build plan, AI run, prompt pack,
- * documentation, and version snapshot CPTs. No metaboxes, columns, or REST mutation.
+ * Registers section template, page template, composition, build plan, AI run, AI chat session,
+ * prompt pack, documentation, and version snapshot CPTs. No metaboxes, columns, or REST mutation.
  * Built pages remain standard WordPress pages; they are not registered here.
  */
 final class Post_Type_Registrar {
@@ -31,6 +31,7 @@ final class Post_Type_Registrar {
 		$this->register_composition();
 		$this->register_build_plan();
 		$this->register_ai_run();
+		$this->register_ai_chat_session();
 		$this->register_prompt_pack();
 		$this->register_documentation();
 		$this->register_version_snapshot();
@@ -227,6 +228,35 @@ final class Post_Type_Registrar {
 					'item_updated'       => __( 'AI run updated.', 'aio-page-builder' ),
 				),
 				Capabilities::VIEW_AI_RUNS,
+				array( 'title', 'custom-fields' )
+			)
+		);
+	}
+
+	private function register_ai_chat_session(): void {
+		$key = Object_Type_Keys::AI_CHAT_SESSION;
+		\register_post_type(
+			$key,
+			$this->base_args(
+				$key,
+				array(
+					'name'               => _x( 'AI Chat Sessions', 'post type general name', 'aio-page-builder' ),
+					'singular_name'      => _x( 'AI Chat Session', 'post type singular name', 'aio-page-builder' ),
+					'menu_name'          => _x( 'AI Chat Sessions', 'admin menu', 'aio-page-builder' ),
+					'add_new'            => _x( 'Add New', 'AI chat session', 'aio-page-builder' ),
+					'add_new_item'       => __( 'Add New AI Chat Session', 'aio-page-builder' ),
+					'edit_item'          => __( 'Edit AI Chat Session', 'aio-page-builder' ),
+					'new_item'           => __( 'New AI Chat Session', 'aio-page-builder' ),
+					'view_item'          => __( 'View AI Chat Session', 'aio-page-builder' ),
+					'view_items'         => __( 'View AI Chat Sessions', 'aio-page-builder' ),
+					'search_items'       => __( 'Search AI Chat Sessions', 'aio-page-builder' ),
+					'not_found'          => __( 'No AI chat sessions found.', 'aio-page-builder' ),
+					'not_found_in_trash' => __( 'No AI chat sessions found in Trash.', 'aio-page-builder' ),
+					'all_items'          => __( 'AI Chat Sessions', 'aio-page-builder' ),
+					'item_published'     => __( 'AI chat session published.', 'aio-page-builder' ),
+					'item_updated'       => __( 'AI chat session updated.', 'aio-page-builder' ),
+				),
+				Capabilities::MANAGE_COMPOSITIONS,
 				array( 'title', 'custom-fields' )
 			)
 		);

@@ -52,6 +52,9 @@ final class Artifact_Category_Keys {
 	/** Placeholder for future build plan reference. */
 	public const BUILD_PLAN_REF = 'build_plan_ref';
 
+	/** Template-lab trace metadata (session id, schema ref, snapshot ref, safe provider ids); no raw payloads. */
+	public const TEMPLATE_LAB_TRACE = 'template_lab_trace';
+
 	/** All categories (for iteration). */
 	public const ALL = array(
 		self::RAW_PROMPT,
@@ -66,6 +69,7 @@ final class Artifact_Category_Keys {
 		self::USAGE_METADATA,
 		self::EXPAND_PASS_USAGE,
 		self::BUILD_PLAN_REF,
+		self::TEMPLATE_LAB_TRACE,
 	);
 
 	/** Categories that must be redacted before user-facing display or export. */

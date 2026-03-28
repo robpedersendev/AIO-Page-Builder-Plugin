@@ -17,9 +17,9 @@ require_once $plugin_root . '/src/Domain/Storage/Objects/Object_Type_Keys.php';
 
 final class Object_Type_Keys_Test extends TestCase {
 
-	public function test_all_returns_eight_plugin_object_types(): void {
+	public function test_all_returns_nine_plugin_object_types(): void {
 		$all = Object_Type_Keys::all();
-		$this->assertCount( 8, $all );
+		$this->assertCount( 9, $all );
 		$this->assertContains( Object_Type_Keys::SECTION_TEMPLATE, $all );
 		$this->assertContains( Object_Type_Keys::PAGE_TEMPLATE, $all );
 		$this->assertContains( Object_Type_Keys::COMPOSITION, $all );
@@ -45,6 +45,7 @@ final class Object_Type_Keys_Test extends TestCase {
 		$this->assertSame( 'aio_prompt_pack', Object_Type_Keys::PROMPT_PACK );
 		$this->assertSame( 'aio_documentation', Object_Type_Keys::DOCUMENTATION );
 		$this->assertSame( 'aio_version_snapshot', Object_Type_Keys::VERSION_SNAPSHOT );
+		$this->assertSame( 'aio_ai_chat_session', Object_Type_Keys::AI_CHAT_SESSION );
 	}
 
 	public function test_is_plugin_object_true_for_all_registered(): void {

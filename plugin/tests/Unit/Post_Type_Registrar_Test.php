@@ -34,10 +34,10 @@ final class Post_Type_Registrar_Test extends TestCase {
 		parent::tearDown();
 	}
 
-	public function test_register_registers_all_eight_cpts(): void {
+	public function test_register_registers_all_nine_cpts(): void {
 		$this->registrar->register();
 		$registered = $GLOBALS['_aio_registered_post_types'] ?? array();
-		$this->assertCount( 8, $registered, 'All 8 plugin object CPTs must be registered' );
+		$this->assertCount( 9, $registered, 'All 9 plugin object CPTs must be registered' );
 		foreach ( Object_Type_Keys::all() as $key ) {
 			$this->assertArrayHasKey( $key, $registered, "CPT must be registered: {$key}" );
 		}
@@ -74,6 +74,7 @@ final class Post_Type_Registrar_Test extends TestCase {
 			Object_Type_Keys::PROMPT_PACK      => Capabilities::MANAGE_PROMPT_PACKS,
 			Object_Type_Keys::DOCUMENTATION    => Capabilities::MANAGE_DOCUMENTATION,
 			Object_Type_Keys::VERSION_SNAPSHOT => Capabilities::VIEW_VERSION_SNAPSHOTS,
+			Object_Type_Keys::AI_CHAT_SESSION => Capabilities::MANAGE_COMPOSITIONS,
 		);
 		foreach ( $expected_caps as $post_type => $expected_cap ) {
 			$args = $registered[ $post_type ] ?? array();

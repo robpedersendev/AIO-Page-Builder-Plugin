@@ -25,6 +25,8 @@ final class Template_Library_Hub_Urls {
 	public const TAB_COMPOSITIONS = 'compositions';
 	public const TAB_COMPARE      = 'compare';
 
+	public const TAB_TEMPLATE_LAB = 'template_lab';
+
 	/**
 	 * @param array<string, mixed> $extra Query args merged after hub args.
 	 */

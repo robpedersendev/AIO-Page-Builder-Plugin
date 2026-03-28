@@ -117,7 +117,7 @@ final class Named_Debug_Log_Event {
 	public const PROFILE_SNAPSHOT_RESTORE_DEBUG = 'AIO_AI_PROFILE_SNAPSHOT_RESTORE_DEBUG';
 
 	// AI — admin screens
-	public const ADMIN_ONBOARDING_TRACE                   = 'AIO_AI_ADMIN_ONBOARDING_TRACE';
+	public const ADMIN_ONBOARDING_TRACE = 'AIO_AI_ADMIN_ONBOARDING_TRACE';
 	/** Onboarding aggregate telemetry (debug mirror; safe keys only). */
 	public const ONBOARDING_TELEMETRY_RECORD              = 'AIO_AI_ONBOARDING_TELEMETRY_RECORD';
 	public const ADMIN_ONBOARDING_UI_STATE_ERROR          = 'AIO_AI_ADMIN_ONBOARDING_UI_STATE_ERROR';
@@ -145,6 +145,8 @@ final class Named_Debug_Log_Event {
 	public const ADMIN_MENU_SEED_ALL_SECTION_TEMPLATES_STEP    = 'AIO_ADMIN_MENU_SEED_ALL_SECTION_TEMPLATES_STEP';
 	public const ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_ERRORS     = 'AIO_ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_ERRORS';
 	public const ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_STEP       = 'AIO_ADMIN_MENU_SEED_ALL_PAGE_TEMPLATES_STEP';
+	/** Onboarding wizard + Build Plan CPT reset (operator action; counts only). */
+	public const ADMIN_ONBOARDING_BUILD_PLAN_RESET = 'AIO_ADMIN_ONBOARDING_BUILD_PLAN_RESET';
 
 	// -------------------------------------------------------------------------
 	// Admin — routing / redirects
@@ -155,6 +157,31 @@ final class Named_Debug_Log_Event {
 	// Crawler
 	// -------------------------------------------------------------------------
 	public const CRAWL_RUN_PROCESSOR_FAILED = 'AIO_CRAWL_RUN_PROCESSOR_FAILED';
+
+	// AI — chat sessions (template-lab persistence boundary)
+	public const CHAT_SESSION_CREATED                = 'AIO_AI_CHAT_SESSION_CREATED';
+	public const CHAT_SESSION_MESSAGE_APPENDED       = 'AIO_AI_CHAT_SESSION_MESSAGE_APPENDED';
+	public const CHAT_SESSION_MESSAGE_APPEND_FAILED  = 'AIO_AI_CHAT_SESSION_MESSAGE_APPEND_FAILED';
+	public const CHAT_SESSION_STATUS_UPDATED         = 'AIO_AI_CHAT_SESSION_STATUS_UPDATED';
+	public const CHAT_SESSION_STATUS_UPDATE_FAILED   = 'AIO_AI_CHAT_SESSION_STATUS_UPDATE_FAILED';
+	public const CHAT_SESSION_SNAPSHOT_LINKED        = 'AIO_AI_CHAT_SESSION_SNAPSHOT_LINKED';
+	public const CHAT_SESSION_PROVIDER_THREAD_LINKED = 'AIO_AI_CHAT_SESSION_PROVIDER_THREAD_LINKED';
+
+	// Privacy — chat sessions (summary only)
+	public const PRIVACY_CHAT_EXPORT_SUMMARY = 'AIO_PRIVACY_CHAT_EXPORT_SUMMARY';
+	public const PRIVACY_CHAT_ERASE_SUMMARY  = 'AIO_PRIVACY_CHAT_ERASE_SUMMARY';
+
+	// AI — template-lab run state machine
+	public const TEMPLATE_LAB_RUN_ENTER_STATE        = 'AIO_AI_TEMPLATE_LAB_RUN_ENTER_STATE';
+	public const TEMPLATE_LAB_PROVIDER_REQUEST_START = 'AIO_AI_TEMPLATE_LAB_PROVIDER_REQUEST_START';
+	public const TEMPLATE_LAB_PROVIDER_REQUEST_END   = 'AIO_AI_TEMPLATE_LAB_PROVIDER_REQUEST_END';
+	public const TEMPLATE_LAB_VALIDATION_PASS        = 'AIO_AI_TEMPLATE_LAB_VALIDATION_PASS';
+	public const TEMPLATE_LAB_VALIDATION_FAIL        = 'AIO_AI_TEMPLATE_LAB_VALIDATION_FAIL';
+	public const TEMPLATE_LAB_REPAIR_START           = 'AIO_AI_TEMPLATE_LAB_REPAIR_START';
+	public const TEMPLATE_LAB_REPAIR_END             = 'AIO_AI_TEMPLATE_LAB_REPAIR_END';
+	public const TEMPLATE_LAB_ARTIFACT_SAVE          = 'AIO_AI_TEMPLATE_LAB_ARTIFACT_SAVE';
+	public const TEMPLATE_LAB_TERMINAL               = 'AIO_AI_TEMPLATE_LAB_TERMINAL';
+	public const TEMPLATE_LAB_IDEMPOTENT_SKIP        = 'AIO_AI_TEMPLATE_LAB_IDEMPOTENT_SKIP';
 
 	// -------------------------------------------------------------------------
 	// Generic (prefer a domain-specific const above)

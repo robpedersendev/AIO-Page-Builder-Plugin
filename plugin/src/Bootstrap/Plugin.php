@@ -292,6 +292,13 @@ final class Plugin {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'register_admin_menu' ), 10 );
 		}
+		add_action(
+			'rest_api_init',
+			function (): void {
+				$controller = new \AIOPageBuilder\Infrastructure\Rest\AI_Chat_REST_Controller( $this->container );
+				$controller->register_routes();
+			}
+		);
 	}
 
 	/**

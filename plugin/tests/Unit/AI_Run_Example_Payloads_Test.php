@@ -104,6 +104,11 @@ final class AI_Run_Example_Payloads_Test extends TestCase {
 			'summary'  => '',
 			'redacted' => false,
 		),
+		Artifact_Category_Keys::TEMPLATE_LAB_TRACE        => array(
+			'present'  => false,
+			'summary'  => '',
+			'redacted' => false,
+		),
 	);
 
 	public function test_example_run_metadata_has_required_keys(): void {

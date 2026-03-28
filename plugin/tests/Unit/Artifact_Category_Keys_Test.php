@@ -24,6 +24,7 @@ final class Artifact_Category_Keys_Test extends TestCase {
 		$this->assertContains( Artifact_Category_Keys::RAW_PROMPT, $all );
 		$this->assertContains( Artifact_Category_Keys::NORMALIZED_OUTPUT, $all );
 		$this->assertContains( Artifact_Category_Keys::VALIDATION_REPORT, $all );
+		$this->assertContains( Artifact_Category_Keys::TEMPLATE_LAB_TRACE, $all );
 	}
 
 	public function test_is_valid_accepts_all_constants(): void {

@@ -43,6 +43,9 @@ final class Object_Type_Keys {
 	/** Version Snapshot (§10.8). */
 	public const VERSION_SNAPSHOT = self::PREFIX . 'version_snapshot';
 
+	/** Scoped template-lab / planning chat session (§10.5 UX grouping); not canonical registry state. */
+	public const AI_CHAT_SESSION = self::PREFIX . 'ai_chat_session';
+
 	/** @var array<int, string>|null */
 	private static ?array $all = null;
 
@@ -64,6 +67,7 @@ final class Object_Type_Keys {
 			self::PROMPT_PACK,
 			self::DOCUMENTATION,
 			self::VERSION_SNAPSHOT,
+			self::AI_CHAT_SESSION,
 		);
 		return self::$all;
 	}

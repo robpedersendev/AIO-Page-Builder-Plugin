@@ -4,7 +4,7 @@
  * wp-admin/admin-post.php runs admin_init then dispatches admin_post_{$action}; it never runs admin_menu.
  * Any handler for forms posting to admin-post.php must be registered here (via admin_init priority 0 in Plugin).
  *
- * Covered groups: Admin_Menu (seeds, industry, bundles, guided repair, overrides), Queue_Logs_Screen,
+ * Covered groups: Admin_Menu (seeds, industry, bundles, guided repair, overrides, onboarding/build-plan reset), Queue_Logs_Screen,
  * Import_Export_Screen, Profile_Snapshot_History_Panel (via Admin_Menu::register_admin_post_actions).
  * Call only from {@see \AIOPageBuilder\Bootstrap\Plugin::register_admin_post_handlers()} with the container from {@see \AIOPageBuilder\Bootstrap\Plugin::run()}.
  *

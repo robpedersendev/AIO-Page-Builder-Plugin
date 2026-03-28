@@ -11,6 +11,8 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
+use AIOPageBuilder\Domain\Storage\Repositories\AI_Chat_Session_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
@@ -84,6 +86,12 @@ final class Repositories_Provider implements Service_Provider_Interface {
 			'ai_run_repository',
 			function (): AI_Run_Repository {
 				return new AI_Run_Repository();
+			}
+		);
+		$container->register(
+			'ai_chat_session_repository',
+			function (): AI_Chat_Session_Repository_Interface {
+				return new AI_Chat_Session_Repository();
 			}
 		);
 		$container->register(

@@ -33,6 +33,9 @@ final class Object_Status_Families {
 	/** Version Snapshot. */
 	public const SNAPSHOT_WORKFLOW = array( 'active', 'superseded' );
 
+	/** AI chat session (template-lab UX); not AI run workflow. */
+	public const CHAT_SESSION_LIFECYCLE = array( 'active', 'idle', 'archived', 'closed' );
+
 	/**
 	 * Object type (Object_Type_Keys constant) → list of allowed status slugs.
 	 * Custom status registration is managed by the bootstrap layer; these families are the authoritative status set for validation.
@@ -48,6 +51,7 @@ final class Object_Status_Families {
 		Object_Type_Keys::PROMPT_PACK      => self::DRAFT_ACTIVE_INACTIVE_DEPRECATED,
 		Object_Type_Keys::DOCUMENTATION    => self::DRAFT_ACTIVE_ARCHIVED,
 		Object_Type_Keys::VERSION_SNAPSHOT => self::SNAPSHOT_WORKFLOW,
+		Object_Type_Keys::AI_CHAT_SESSION => self::CHAT_SESSION_LIFECYCLE,
 	);
 
 	/**

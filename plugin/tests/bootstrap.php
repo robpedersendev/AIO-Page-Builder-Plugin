@@ -645,6 +645,41 @@ if ( ! function_exists( 'wp_update_post' ) ) {
 		return $wp_error && $ret === 0 ? new \WP_Error( 'update_failed', 'Stub' ) : $ret;
 	}
 }
+if ( ! function_exists( 'wp_delete_post' ) ) {
+	/**
+	 * Records deletions in $_aio_wp_deleted_posts; optionally filters $_aio_wp_query_posts by ID.
+	 *
+	 * @param int  $post_id
+	 * @param bool $force_delete
+	 * @return \stdClass|false
+	 */
+	function wp_delete_post( $post_id = 0, $force_delete = false ) {
+		unset( $force_delete );
+		$id = (int) $post_id;
+		if ( ! isset( $GLOBALS['_aio_wp_deleted_posts'] ) || ! is_array( $GLOBALS['_aio_wp_deleted_posts'] ) ) {
+			$GLOBALS['_aio_wp_deleted_posts'] = array();
+		}
+		$GLOBALS['_aio_wp_deleted_posts'][] = $id;
+		if ( isset( $GLOBALS['_aio_wp_query_posts'] ) && is_array( $GLOBALS['_aio_wp_query_posts'] ) ) {
+			$GLOBALS['_aio_wp_query_posts'] = array_values(
+				array_filter(
+					$GLOBALS['_aio_wp_query_posts'],
+					static function ( $p ) use ( $id ) {
+						$pid = is_object( $p ) ? (int) ( $p->ID ?? 0 ) : (int) ( $p['ID'] ?? 0 );
+						return $pid !== $id;
+					}
+				)
+			);
+		}
+		if ( $id <= 0 ) {
+			return false;
+		}
+		if ( array_key_exists( '_aio_wp_delete_post_return', $GLOBALS ) ) {
+			return $GLOBALS['_aio_wp_delete_post_return'];
+		}
+		return (object) array( 'ID' => $id );
+	}
+}
 if ( ! class_exists( 'WP_Error' ) ) {
 	class WP_Error {
 		public $code;

@@ -15,8 +15,11 @@ namespace AIOPageBuilder\Infrastructure\Privacy;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
+use AIOPageBuilder\Domain\Storage\Repositories\AI_Chat_Session_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Repository;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Erases or anonymizes personal data for a user (by email) for the WordPress Tools → Erase Personal Data flow.
@@ -96,9 +99,22 @@ final class Personal_Data_Eraser {
 			}
 		}
 
-		$runs_done = count( $runs ) < self::PER_PAGE;
-		$jobs_done = count( $jobs ) < self::PER_PAGE;
-		$done      = $runs_done && $jobs_done;
+		$chat_repo = new AI_Chat_Session_Repository();
+		$chat_ids  = $chat_repo->list_post_ids_for_owner( $user_id, self::PER_PAGE, $offset );
+		foreach ( $chat_ids as $cid ) {
+			if ( $cid > 0 && \wp_delete_post( $cid, true ) ) {
+				$items_removed = true;
+			}
+		}
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::PRIVACY_CHAT_ERASE_SUMMARY,
+			'page=' . (string) $page . ' chat_deleted=' . (string) count( $chat_ids )
+		);
+
+		$runs_done  = count( $runs ) < self::PER_PAGE;
+		$jobs_done  = count( $jobs ) < self::PER_PAGE;
+		$chats_done = count( $chat_ids ) < self::PER_PAGE;
+		$done       = $runs_done && $jobs_done && $chats_done;
 
 		return array(
 			'items_removed'  => $items_removed,

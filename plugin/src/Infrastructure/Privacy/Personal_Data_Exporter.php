@@ -14,8 +14,11 @@ namespace AIOPageBuilder\Infrastructure\Privacy;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
+use AIOPageBuilder\Domain\Storage\Repositories\AI_Chat_Session_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\AI_Run_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Job_Queue_Repository;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Exports personal data for a user (by email) for the WordPress Tools → Export Personal Data flow.
@@ -32,6 +35,9 @@ final class Personal_Data_Exporter {
 
 	/** Exporter group: User preferences (compare lists, preview cache). */
 	public const GROUP_USER_PREFS = 'aio-user-prefs';
+
+	/** Exporter group: Template-lab chat sessions (bounded summaries; no full transcripts). */
+	public const GROUP_CHAT_SESSIONS = 'aio-chat-sessions';
 
 	/**
 	 * Exports personal data for the given email address (paginated).
@@ -73,9 +79,20 @@ final class Personal_Data_Exporter {
 			$export_items[] = self::job_to_export_item( $job );
 		}
 
-		$runs_done = count( $runs ) < self::PER_PAGE;
-		$jobs_done = count( $jobs ) < self::PER_PAGE;
-		$done      = $runs_done && $jobs_done;
+		$chat_repo = new AI_Chat_Session_Repository();
+		$sessions  = $chat_repo->list_recent_for_owner( $user_id, self::PER_PAGE, $offset );
+		foreach ( $sessions as $row ) {
+			$export_items[] = self::chat_session_to_export_item( $row, $chat_repo );
+		}
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::PRIVACY_CHAT_EXPORT_SUMMARY,
+			'page=' . (string) $page . ' chat_items=' . (string) count( $sessions )
+		);
+
+		$runs_done  = count( $runs ) < self::PER_PAGE;
+		$jobs_done  = count( $jobs ) < self::PER_PAGE;
+		$chats_done = count( $sessions ) < self::PER_PAGE;
+		$done       = $runs_done && $jobs_done && $chats_done;
 
 		return array(
 			'data' => $export_items,
@@ -178,6 +195,47 @@ final class Personal_Data_Exporter {
 	 * @param array<string, mixed> $job
 	 * @return array{group_id: string, group_label: string, item_id: string, data: array<int, array{name: string, value: string}>}
 	 */
+	/**
+	 * @param array<string, mixed> $row From AI_Chat_Session_Repository::list_recent_for_owner.
+	 */
+	private static function chat_session_to_export_item( array $row, AI_Chat_Session_Repository $repo ): array {
+		$session_id = (string) ( $row['session_id'] ?? '' );
+		$detail     = $session_id !== '' ? $repo->get_session( $session_id ) : null;
+		$has_snap   = is_array( $detail ) && isset( $detail['approved_snapshot_ref'] ) && is_array( $detail['approved_snapshot_ref'] ) && $detail['approved_snapshot_ref'] !== array();
+		$data       = array(
+			array(
+				'name'  => __( 'Session ID', 'aio-page-builder' ),
+				'value' => $session_id,
+			),
+			array(
+				'name'  => __( 'Status', 'aio-page-builder' ),
+				'value' => (string) ( $row['status'] ?? '' ),
+			),
+			array(
+				'name'  => __( 'Task type', 'aio-page-builder' ),
+				'value' => (string) ( $row['task_type'] ?? '' ),
+			),
+			array(
+				'name'  => __( 'Message count', 'aio-page-builder' ),
+				'value' => (string) (int) ( $row['message_count'] ?? 0 ),
+			),
+			array(
+				'name'  => __( 'Last modified (GMT)', 'aio-page-builder' ),
+				'value' => (string) ( $row['post_modified_gmt'] ?? '' ),
+			),
+			array(
+				'name'  => __( 'Has approved snapshot reference', 'aio-page-builder' ),
+				'value' => $has_snap ? __( 'Yes', 'aio-page-builder' ) : __( 'No', 'aio-page-builder' ),
+			),
+		);
+		return array(
+			'group_id'    => self::GROUP_CHAT_SESSIONS,
+			'group_label' => __( 'AIO Page Builder – Template-lab chat sessions', 'aio-page-builder' ),
+			'item_id'     => 'chat-session-' . ( $session_id !== '' ? $session_id : (string) ( $row['post_id'] ?? '0' ) ),
+			'data'        => $data,
+		);
+	}
+
 	private static function job_to_export_item( array $job ): array {
 		$job_ref = (string) ( $job['job_ref'] ?? '' );
 		$data    = array(

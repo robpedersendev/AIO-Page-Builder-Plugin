@@ -26,6 +26,7 @@ use AIOPageBuilder\Admin\Screens\Templates\Page_Templates_Directory_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Section_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Section_Templates_Directory_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
+use AIOPageBuilder\Admin\Screens\Templates\Template_Lab_Chat_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Comparison_Screen;
 use AIOPageBuilder\Admin\Screens\Crawler\Crawler_Sessions_Screen;
 use AIOPageBuilder\Admin\Screens\Diagnostics\ACF_Architecture_Diagnostics_Screen;
@@ -128,6 +129,9 @@ final class Admin_Menu_Hub_Renderer {
 
 	/** @var Compositions_Screen */
 	private $compositions_screen;
+
+	/** @var Template_Lab_Chat_Screen */
+	private $template_lab_chat_screen;
 
 	/** @var Build_Plan_Analytics_Screen */
 	private $build_plan_analytics;
@@ -234,6 +238,7 @@ final class Admin_Menu_Hub_Renderer {
 		$this->documentation_detail                  = new Documentation_Detail_Screen( $this->container );
 		$this->template_compare_screen               = new Template_Compare_Screen( $this->container );
 		$this->compositions_screen                   = new Compositions_Screen( $this->container );
+		$this->template_lab_chat_screen              = new Template_Lab_Chat_Screen( $this->container );
 		$this->build_plan_analytics                  = new Build_Plan_Analytics_Screen( $this->container );
 		$this->template_analytics                    = new Template_Analytics_Screen( $this->container );
 		$this->queue_logs                            = new Queue_Logs_Screen( $this->container );
@@ -1011,6 +1016,10 @@ final class Admin_Menu_Hub_Renderer {
 				'label' => $this->template_compare_screen->get_title(),
 				'cap'   => $this->template_compare_screen->get_capability(),
 			),
+			'template_lab'      => array(
+				'label' => $this->template_lab_chat_screen->get_title(),
+				'cap'   => $this->template_lab_chat_screen->get_capability(),
+			),
 		);
 
 		$accessible_keys = array();
@@ -1062,6 +1071,8 @@ final class Admin_Menu_Hub_Renderer {
 				$this->compositions_screen->render( true );
 			} elseif ( $tab === 'compare' ) {
 				$this->template_compare_screen->render( true );
+			} elseif ( $tab === 'template_lab' ) {
+				$this->template_lab_chat_screen->render( true );
 			} else {
 				$this->page_templates_dir->render( true );
 			}
