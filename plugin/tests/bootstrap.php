@@ -542,6 +542,9 @@ if ( ! class_exists( 'WP_Post' ) ) {
 			foreach ( $props as $k => $v ) {
 				$this->$k = $v;
 			}
+			if ( ! isset( $this->post_modified_gmt ) ) {
+				$this->post_modified_gmt = '';
+			}
 		}
 	}
 }
@@ -699,6 +702,67 @@ if ( ! class_exists( 'WP_Error' ) ) {
 if ( ! function_exists( 'is_wp_error' ) ) {
 	function is_wp_error( $thing ) {
 		return $thing instanceof \WP_Error;
+	}
+}
+if ( ! class_exists( 'WP_REST_Response' ) ) {
+	class WP_REST_Response {
+		public mixed $data;
+
+		public int $status;
+
+		public function __construct( $data = null, $status = 200 ) {
+			$this->data   = $data;
+			$this->status = (int) $status;
+		}
+	}
+}
+if ( ! class_exists( 'WP_REST_Request' ) ) {
+	class WP_REST_Request implements \ArrayAccess {
+		/** @var array<string, mixed> */
+		private array $params = array();
+
+		/**
+		 * @param array<string, mixed> $params Merged route + JSON/body params for tests.
+		 */
+		public function __construct( string $method = '', string $route = '', array $params = array() ) {
+			unset( $method, $route );
+			$this->params = $params;
+		}
+
+		public function get_param( $key ) {
+			$k = (string) $key;
+			return $this->params[ $k ] ?? null;
+		}
+
+		public function offsetExists( $offset ): bool {
+			return array_key_exists( (string) $offset, $this->params );
+		}
+
+		/**
+		 * @param string $offset
+		 * @return mixed
+		 */
+		#[\ReturnTypeWillChange]
+		public function offsetGet( $offset ) {
+			return $this->params[ (string) $offset ] ?? null;
+		}
+
+		/**
+		 * @param string $offset
+		 * @param mixed  $value
+		 */
+		#[\ReturnTypeWillChange]
+		public function offsetSet( $offset, $value ): void {
+			$this->params[ (string) $offset ] = $value;
+		}
+
+		/**
+		 * @param string $offset
+		 */
+		#[\ReturnTypeWillChange]
+		public function offsetUnset( $offset ): void {
+			unset( $this->params[ (string) $offset ] );
+		}
 	}
 }
 if ( ! class_exists( 'WP_Query' ) ) {

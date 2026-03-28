@@ -11,10 +11,13 @@ namespace AIOPageBuilder\Domain\AI\TemplateLab;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Planning\AI_Prompt_Pack_Keys;
 use AIOPageBuilder\Domain\AI\Routing\AI_Routing_Task;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Keys;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 final class Template_Lab_Chat_Application_Service {
 
@@ -70,6 +73,7 @@ final class Template_Lab_Chat_Application_Service {
 				'chat_session_key'   => $session_key,
 				'template_lab_shell' => true,
 				'routing_task'       => AI_Routing_Task::TEMPLATE_LAB_CHAT,
+				'prompt_pack_ref'    => AI_Prompt_Pack_Keys::for_routing_task( AI_Routing_Task::TEMPLATE_LAB_CHAT ),
 			),
 			'pending_generation'
 		);
@@ -79,6 +83,10 @@ final class Template_Lab_Chat_Application_Service {
 				'code' => 'run_create_failed',
 			);
 		}
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::TEMPLATE_LAB_CHAT_PROMPT_RUN_CREATED,
+			'run_post_id=' . (string) $post_id . ' pack=' . AI_Prompt_Pack_Keys::TEMPLATE_LAB_CHAT
+		);
 		return array(
 			'ok'          => true,
 			'run_post_id' => $post_id,

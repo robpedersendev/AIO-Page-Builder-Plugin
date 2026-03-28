@@ -7,6 +7,8 @@ namespace AIOPageBuilder\Tests\Unit;
 
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
+use AIOPageBuilder\Domain\AI\Planning\AI_Prompt_Pack_Keys;
+use AIOPageBuilder\Domain\AI\Routing\AI_Routing_Task;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Run_Orchestrator;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Run_States;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Validation_Port;
@@ -171,6 +173,50 @@ final class Template_Lab_Run_Orchestrator_Test extends TestCase {
 		$this->orch->mark_requesting_provider( $pid );
 		$this->assertSame( Template_Lab_Run_States::COMPLETED, $this->orch->process_provider_response( $pid, 'x' ) );
 		$this->assertSame( Template_Lab_Run_States::COMPLETED, $this->orch->process_provider_response( $pid, 'x' ) );
+	}
+
+	public function test_create_run_sets_prompt_pack_ref_from_routing_task(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 8105;
+		$this->port->reports                   = array( $this->make_pass_report() );
+		$pid                                   = $this->orch->create_template_lab_run(
+			'run-pack',
+			array( 'actor' => '1' ),
+			'aio/test',
+			null,
+			300,
+			2,
+			AI_Routing_Task::TEMPLATE_LAB_PAGE_TEMPLATE_DRAFT
+		);
+		$meta                                  = $this->repo->get_run_metadata( $pid );
+		$this->assertSame(
+			AI_Prompt_Pack_Keys::TEMPLATE_LAB_PAGE_TEMPLATE_DRAFT,
+			(string) ( $meta['prompt_pack_ref'] ?? '' )
+		);
+	}
+
+	public function test_passed_validation_without_normalized_output_exhausts_repairs_then_fails(): void {
+		$bad                                   = new Validation_Report(
+			Validation_Report::RAW_CAPTURE_OK,
+			Validation_Report::PARSE_OK,
+			true,
+			'aio/test',
+			array(),
+			array(),
+			null,
+			Validation_Report::STATE_PASSED,
+			null,
+			false,
+			false
+		);
+		$GLOBALS['_aio_wp_insert_post_return'] = 8106;
+		$this->port->reports                   = array( $bad, $bad, $bad );
+		$pid                                   = $this->orch->create_template_lab_run( 'run-null-norm', array( 'actor' => '1' ), 'aio/test', null, 300, 2 );
+		$this->stub_run_post( $pid );
+		$this->orch->mark_requesting_provider( $pid );
+		$this->orch->process_provider_response( $pid, '{}' );
+		$this->orch->process_provider_response( $pid, '{}' );
+		$end = $this->orch->process_provider_response( $pid, '{}' );
+		$this->assertSame( Template_Lab_Run_States::FAILED, $end );
 	}
 
 	public function test_timeout_terminal(): void {

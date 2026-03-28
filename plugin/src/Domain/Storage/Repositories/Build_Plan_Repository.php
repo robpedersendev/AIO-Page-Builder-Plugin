@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\Storage\Repositories;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_List_Provider_Interface;
+use AIOPageBuilder\Domain\BuildPlan\Build_Plan_Template_Lab_Context;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
@@ -95,6 +96,12 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	 * @return bool Success.
 	 */
 	public function save_plan_definition( int $post_id, array $definition ): bool {
+		if ( array_key_exists( Build_Plan_Schema::KEY_TEMPLATE_LAB_CONTEXT, $definition ) ) {
+			$tl = $definition[ Build_Plan_Schema::KEY_TEMPLATE_LAB_CONTEXT ];
+			$definition[ Build_Plan_Schema::KEY_TEMPLATE_LAB_CONTEXT ] = Build_Plan_Template_Lab_Context::sanitize(
+				is_array( $tl ) ? $tl : null
+			);
+		}
 		$json = \wp_json_encode( $definition );
 		$ok   = $json !== false && \update_post_meta( $post_id, self::META_PLAN_DEFINITION, $json ) !== false;
 		if ( $ok ) {

@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Chat_Application_Service;
-use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Config\Template_Lab_Access;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 final class AI_Chat_REST_Controller {
@@ -134,7 +134,7 @@ final class AI_Chat_REST_Controller {
 	}
 
 	public function can_manage_template_lab(): bool {
-		return Capabilities::current_user_can_or_site_admin( Capabilities::MANAGE_COMPOSITIONS );
+		return Template_Lab_Access::can_manage_template_lab();
 	}
 
 	/**

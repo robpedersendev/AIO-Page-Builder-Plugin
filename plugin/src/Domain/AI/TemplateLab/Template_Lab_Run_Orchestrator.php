@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Domain\AI\TemplateLab;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\Planning\AI_Prompt_Pack_Keys;
 use AIOPageBuilder\Domain\AI\Routing\AI_Routing_Task;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\AI\Runs\Artifact_Category_Keys;
@@ -57,7 +58,8 @@ final class Template_Lab_Run_Orchestrator {
 		if ( $routing_task === '' ) {
 			$routing_task = AI_Routing_Task::TEMPLATE_LAB_COMPOSITION_DRAFT;
 		}
-		$run_metadata['routing_task']    = $routing_task;
+		$run_metadata['routing_task']     = $routing_task;
+		$run_metadata['prompt_pack_ref']  = AI_Prompt_Pack_Keys::for_routing_task( $routing_task );
 		$run_metadata[ self::META_BLOCK ] = array(
 			'state'            => Template_Lab_Run_States::QUEUED,
 			'schema_ref'       => $schema_ref,
@@ -93,6 +95,13 @@ final class Template_Lab_Run_Orchestrator {
 		if ( ! is_array( $tl ) ) {
 			return Template_Lab_Run_States::FAILED;
 		}
+		$tl['process_round']      = (int) ( $tl['process_round'] ?? 0 ) + 1;
+		$meta[ self::META_BLOCK ] = $tl;
+		$this->run_repo->save_run_metadata( $post_id, $meta );
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::TEMPLATE_LAB_PROCESS_PROVIDER_ROUND,
+			'post_id=' . (string) $post_id . ' round=' . (string) $tl['process_round']
+		);
 		$start   = (int) ( $tl['started_at_unix'] ?? 0 );
 		$timeout = (int) ( $tl['timeout_seconds'] ?? 300 );
 		if ( $start > 0 && ( $now - $start ) > $timeout ) {
