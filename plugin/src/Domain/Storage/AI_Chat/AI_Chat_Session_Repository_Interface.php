@@ -78,4 +78,11 @@ interface AI_Chat_Session_Repository_Interface {
 	 * @return list<int>
 	 */
 	public function list_post_ids_for_owner( int $owner_user_id, int $limit, int $offset ): array;
+
+	/**
+	 * Export-only: rows with non-empty approved_snapshot_ref; refs sanitized, no transcript bodies.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_export_safe_approved_snapshot_rows( int $limit = 500 ): array;
 }

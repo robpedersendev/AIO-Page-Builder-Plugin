@@ -79,6 +79,12 @@ final class Option_Names {
 	 */
 	public const ONBOARDING_TELEMETRY_AGGREGATE = self::PREFIX . 'onboarding_telemetry_agg';
 
+	/**
+	 * Coarse template-lab counters (event key => int); no prompts, bodies, or secrets.
+	 * Shape: array{ v: int, c: array<string,int>, updated_at?: string }.
+	 */
+	public const TEMPLATE_LAB_TELEMETRY_AGGREGATE = self::PREFIX . 'template_lab_telemetry_agg';
+
 	/** Prompt experiment definitions (Prompt 121; no secrets). */
 	public const PROMPT_EXPERIMENTS = self::PREFIX . 'prompt_experiments';
 

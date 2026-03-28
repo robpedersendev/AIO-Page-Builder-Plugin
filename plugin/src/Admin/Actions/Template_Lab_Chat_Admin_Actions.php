@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin\Actions;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Chat_Application_Service;
+use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Telemetry;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
 use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Template_Lab_Access;
@@ -60,6 +61,12 @@ final class Template_Lab_Chat_Admin_Actions {
 		);
 		if ( $sid === '' ) {
 			self::redirect( $base, self::QUERY_CREATE, 'error' );
+		}
+		if ( $container->has( 'template_lab_telemetry' ) ) {
+			$tel = $container->get( 'template_lab_telemetry' );
+			if ( $tel instanceof Template_Lab_Telemetry ) {
+				$tel->bump( Template_Lab_Telemetry::EVENT_SESSION_CREATED );
+			}
 		}
 		$url = \add_query_arg( array( 'session_id' => rawurlencode( $sid ) ), $base );
 		self::redirect( $url, self::QUERY_CREATE, 'ok' );

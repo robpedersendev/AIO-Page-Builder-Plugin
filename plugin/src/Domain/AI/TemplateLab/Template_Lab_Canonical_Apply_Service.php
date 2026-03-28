@@ -40,6 +40,8 @@ final class Template_Lab_Canonical_Apply_Service {
 
 	private ?Template_Lab_Apply_Lineage_Snapshot_Recorder $lineage_recorder;
 
+	private ?Template_Lab_Telemetry $telemetry;
+
 	public function __construct(
 		AI_Chat_Session_Repository_Interface $chat,
 		AI_Run_Template_Lab_Apply_State_Port $run_apply_state,
@@ -48,7 +50,8 @@ final class Template_Lab_Canonical_Apply_Service {
 		Composition_AI_Draft_Translator $composition_translator,
 		Page_Template_AI_Draft_Translator $page_translator,
 		Section_Template_AI_Draft_Translator $section_translator,
-		?Template_Lab_Apply_Lineage_Snapshot_Recorder $lineage_recorder = null
+		?Template_Lab_Apply_Lineage_Snapshot_Recorder $lineage_recorder = null,
+		?Template_Lab_Telemetry $telemetry = null
 	) {
 		$this->chat                   = $chat;
 		$this->run_apply_state        = $run_apply_state;
@@ -58,6 +61,7 @@ final class Template_Lab_Canonical_Apply_Service {
 		$this->page_translator        = $page_translator;
 		$this->section_translator     = $section_translator;
 		$this->lineage_recorder       = $lineage_recorder;
+		$this->telemetry              = $telemetry;
 	}
 
 	/**
@@ -108,10 +112,23 @@ final class Template_Lab_Canonical_Apply_Service {
 			Named_Debug_Log_Event::TEMPLATE_LAB_SNAPSHOT_APPROVED,
 			'run_post_id=' . (string) $run_post_id . ' target_kind=' . $target
 		);
+		$this->telemetry?->bump( Template_Lab_Telemetry::EVENT_SNAPSHOT_APPROVED );
 		return array( 'ok' => true, 'code' => 'ok' );
 	}
 
 	public function apply_approved_snapshot( int $actor_user_id, string $session_id, string $target_kind ): Template_Lab_Canonical_Apply_Result {
+		$result = $this->apply_approved_snapshot_inner( $actor_user_id, $session_id, $target_kind );
+		if ( $this->telemetry instanceof Template_Lab_Telemetry ) {
+			if ( $result->is_success() && ! $result->is_already_applied() ) {
+				$this->telemetry->bump( Template_Lab_Telemetry::EVENT_CANONICAL_APPLY_OK );
+			} elseif ( ! $result->is_success() ) {
+				$this->telemetry->bump( Template_Lab_Telemetry::EVENT_CANONICAL_APPLY_FAIL );
+			}
+		}
+		return $result;
+	}
+
+	private function apply_approved_snapshot_inner( int $actor_user_id, string $session_id, string $target_kind ): Template_Lab_Canonical_Apply_Result {
 		Named_Debug_Log::event(
 			Named_Debug_Log_Event::TEMPLATE_LAB_CANONICAL_APPLY_ATTEMPT,
 			'target_kind=' . $target_kind . ' session_id_len=' . (string) strlen( $session_id )

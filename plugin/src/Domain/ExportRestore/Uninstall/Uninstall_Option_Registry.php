@@ -27,6 +27,9 @@ use AIOPageBuilder\Infrastructure\Config\Option_Names;
  * Partial install: {@see Uninstall_Option_Cleanup_Helper::delete_declared_options()} is safe when keys are absent
  * ({@see delete_option()} no-op). Confirmed cleanup still runs scheduled unschedule, industry-bundle prerequisite,
  * tables/CPT paths per {@see Uninstall_Cleanup_Service}.
+ *
+ * Template-lab: {@see \AIOPageBuilder\Infrastructure\Config\Option_Names::TEMPLATE_LAB_TELEMETRY_AGGREGATE} is removed
+ * with other declared keys. Chat sessions and AI runs are plugin CPTs removed via {@see Object_Type_Keys::all()}.
  */
 final class Uninstall_Option_Registry {
 

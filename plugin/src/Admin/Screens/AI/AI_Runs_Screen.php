@@ -113,10 +113,12 @@ final class AI_Runs_Screen {
 	private function render_list( bool $embed_in_hub = false ): void {
 		$runs            = array();
 		$spend_summaries = array();
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only list filter (GET).
+		$surface_filter = isset( $_GET['aio_run_surface'] ) ? \sanitize_key( (string) \wp_unslash( (string) $_GET['aio_run_surface'] ) ) : '';
 		if ( $this->container && $this->container->has( 'ai_run_repository' ) ) {
 			try {
 				$repo = $this->container->get( 'ai_run_repository' );
-				$runs = $repo->list_recent( 50, 0 );
+				$runs = $repo->list_recent( 50, 0, $surface_filter );
 			} catch ( \Throwable $e ) {
 				$runs = array();
 			}
@@ -138,6 +140,17 @@ final class AI_Runs_Screen {
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 		<?php endif; ?>
 			<p class="aio-ai-runs-description"><?php \esc_html_e( 'Review AI runs and their artifact summaries. Raw prompts and provider responses are restricted.', 'aio-page-builder' ); ?></p>
+			<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-ai-runs-filters" style="margin-bottom:1em;">
+				<input type="hidden" name="page" value="<?php echo \esc_attr( self::HUB_PAGE_SLUG ); ?>" />
+				<input type="hidden" name="<?php echo \esc_attr( Admin_Screen_Hub::QUERY_TAB ); ?>" value="ai_runs" />
+				<label for="aio_run_surface"><?php \esc_html_e( 'Surface', 'aio-page-builder' ); ?></label>
+				<select name="aio_run_surface" id="aio_run_surface">
+					<option value=""><?php \esc_html_e( 'All runs', 'aio-page-builder' ); ?></option>
+					<option value="template_lab" <?php selected( $surface_filter, 'template_lab' ); ?>><?php \esc_html_e( 'Template lab', 'aio-page-builder' ); ?></option>
+					<option value="build_plan" <?php selected( $surface_filter, 'build_plan' ); ?>><?php \esc_html_e( 'Build plan', 'aio-page-builder' ); ?></option>
+				</select>
+				<button type="submit" class="button"><?php \esc_html_e( 'Filter', 'aio-page-builder' ); ?></button>
+			</form>
 			<?php if ( ! empty( $spend_summaries ) ) : ?>
 			<section class="aio-spend-summary" aria-labelledby="aio-spend-summary-heading">
 				<h2 id="aio-spend-summary-heading" style="font-size:1em;margin-bottom:0.5em;"><?php \esc_html_e( 'Month-to-date spend by provider', 'aio-page-builder' ); ?></h2>
@@ -199,6 +212,7 @@ final class AI_Runs_Screen {
 					<thead>
 						<tr>
 							<th scope="col"><?php \esc_html_e( 'Run ID', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Surface', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Provider', 'aio-page-builder' ); ?></th>
 							<th scope="col"><?php \esc_html_e( 'Model', 'aio-page-builder' ); ?></th>
@@ -210,8 +224,9 @@ final class AI_Runs_Screen {
 					<tbody>
 						<?php foreach ( $runs as $run ) : ?>
 							<?php
-							$meta   = $run['run_metadata'] ?? array();
-							$run_id = (string) ( $run['internal_key'] ?? $run['post_title'] ?? '' );
+							$meta    = $run['run_metadata'] ?? array();
+							$run_id  = (string) ( $run['internal_key'] ?? $run['post_title'] ?? '' );
+							$surface = (string) ( $run['run_surface'] ?? '' );
 							?>
 							<?php
 							$is_experiment    = ! empty( $meta['is_experiment'] );
@@ -225,6 +240,7 @@ final class AI_Runs_Screen {
 							if ( $is_experiment ) :
 								?>
 								<span class="aio-run-badge" aria-label="<?php esc_attr_e( 'Experiment run', 'aio-page-builder' ); ?>"><?php echo \esc_html( $experiment_label ? $experiment_label : __( 'Experiment', 'aio-page-builder' ) ); ?></span><?php endif; ?></td>
+								<td><?php echo $surface !== '' ? \esc_html( $surface ) : \esc_html( \__( '—', 'aio-page-builder' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $run['status'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['provider_id'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['model_used'] ?? '' ) ); ?></td>

@@ -53,4 +53,10 @@ final class Registry_AI_Provenance_Helper {
 			? __( 'AI-assisted', 'aio-page-builder' )
 			: __( 'Manual', 'aio-page-builder' );
 	}
+
+	public static function source_badge_label_for_section_template( array $definition ): string {
+		return self::section_template_has_ai_trace( $definition )
+			? __( 'AI-assisted', 'aio-page-builder' )
+			: __( 'Manual', 'aio-page-builder' );
+	}
 }

@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Bootstrap\Environment_Validator;
 use AIOPageBuilder\Diagnostics\Environment_Diagnostics_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 
 /**
  * Renders environment and dependency validation results. No placeholder; real state only.
@@ -118,6 +119,33 @@ final class Diagnostics_Screen {
 				</table>
 				<p class="description"><?php \esc_html_e( 'Template live preview uses short-lived opaque tickets, session-bound validation, and minimal CSP / frame / referrer policies on the preview route.', 'aio-page-builder' ); ?></p>
 			</section>
+
+			<?php
+			$tl_tel = \get_option( Option_Names::TEMPLATE_LAB_TELEMETRY_AGGREGATE, array() );
+			$tl_c   = is_array( $tl_tel ) && isset( $tl_tel['c'] ) && is_array( $tl_tel['c'] ) ? $tl_tel['c'] : array();
+			?>
+			<?php if ( $tl_c !== array() ) : ?>
+			<section class="aio-diagnostics-template-lab-telemetry" style="margin-top: 2em;" aria-labelledby="aio-diagnostics-tl-tel-heading">
+				<h2 id="aio-diagnostics-tl-tel-heading"><?php \esc_html_e( 'Template lab (aggregate counters)', 'aio-page-builder' ); ?></h2>
+				<p class="description"><?php \esc_html_e( 'Coarse local counts only; no prompts, transcripts, or provider payloads.', 'aio-page-builder' ); ?></p>
+				<table class="widefat striped">
+					<thead>
+						<tr>
+							<th scope="col"><?php \esc_html_e( 'Event', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Count', 'aio-page-builder' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ( $tl_c as $ek => $cnt ) : ?>
+							<tr>
+								<td><code><?php echo \esc_html( (string) $ek ); ?></code></td>
+								<td><?php echo \esc_html( (string) (int) $cnt ); ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			</section>
+			<?php endif; ?>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
 		<?php endif; ?>

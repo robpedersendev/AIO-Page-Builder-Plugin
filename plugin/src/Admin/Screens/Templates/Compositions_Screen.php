@@ -13,7 +13,9 @@ namespace AIOPageBuilder\Admin\Screens\Templates;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Schema;
+use AIOPageBuilder\Domain\Registries\Shared\Canonical_AI_Lineage_Display_Helper;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_AI_Provenance_Helper;
+use AIOPageBuilder\Domain\Storage\Repositories\Version_Snapshot_Repository;
 use AIOPageBuilder\Domain\Registries\Compositions\UI\Composition_Builder_State_Builder;
 use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
@@ -204,6 +206,28 @@ final class Compositions_Screen {
 					<?php endif; ?>
 				</p>
 			<?php endif; ?>
+			<?php
+			if ( $current_composition !== null && $this->container !== null
+				&& $this->container->has( 'composition_repository' ) && $this->container->has( 'version_snapshot_repository' ) ) {
+				$comp_id = (string) ( $current_composition[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
+				$c_repo  = $this->container->get( 'composition_repository' );
+				$vs_repo = $this->container->get( 'version_snapshot_repository' );
+				if ( $c_repo instanceof Composition_Repository && $vs_repo instanceof Version_Snapshot_Repository && $comp_id !== '' ) {
+					$c_row = $c_repo->get_by_key( $comp_id );
+					if ( is_array( $c_row ) ) {
+						$pid   = (int) ( $c_row['id'] ?? 0 );
+						$state = Canonical_AI_Lineage_Display_Helper::build_state(
+							Canonical_AI_Lineage_Display_Helper::TARGET_COMPOSITION,
+							$pid,
+							$comp_id,
+							$current_composition,
+							$vs_repo
+						);
+						Canonical_AI_Lineage_Display_Helper::render_notice( $state );
+					}
+				}
+			}
+			?>
 
 			<?php if ( count( $cta_warnings ) > 0 ) : ?>
 				<div class="notice notice-warning inline">

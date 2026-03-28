@@ -15,6 +15,10 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Admin\Forms\Entity_Style_Form_Builder;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Domain\Registries\Section\UI\Section_Template_Detail_State_Builder;
+use AIOPageBuilder\Domain\Registries\Shared\Canonical_AI_Lineage_Display_Helper;
+use AIOPageBuilder\Domain\Registries\Shared\Registry_AI_Provenance_Helper;
+use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
+use AIOPageBuilder\Domain\Storage\Repositories\Version_Snapshot_Repository;
 use AIOPageBuilder\Domain\Styling\Entity_Style_UI_State_Builder;
 use AIOPageBuilder\Domain\Preview\Template_Live_Preview_State_Builder_Factory;
 use AIOPageBuilder\Frontend\Template_Live_Preview_Ticket_Service;
@@ -220,11 +224,49 @@ final class Section_Template_Detail_Screen {
 				<?php endif; ?>
 				<dt><?php \esc_html_e( 'Deprecation', 'aio-page-builder' ); ?></dt>
 				<dd><?php echo $is_deprecated ? \esc_html__( 'Deprecated', 'aio-page-builder' ) : \esc_html__( 'Active', 'aio-page-builder' ); ?></dd>
+				<?php
+				$ai_src_sec = '';
+				if ( $this->container !== null && $this->container->has( 'section_template_repository' ) && $section_key !== '' ) {
+					$srepo = $this->container->get( 'section_template_repository' );
+					if ( $srepo instanceof Section_Template_Repository ) {
+						$row_s = $srepo->get_by_key( $section_key );
+						$def_s = is_array( $row_s ) && isset( $row_s['definition'] ) && is_array( $row_s['definition'] ) ? $row_s['definition'] : null;
+						if ( is_array( $def_s ) ) {
+							$ai_src_sec = Registry_AI_Provenance_Helper::source_badge_label_for_section_template( $def_s );
+						}
+					}
+				}
+				?>
+				<?php if ( $ai_src_sec !== '' ) : ?>
+					<dt><?php \esc_html_e( 'AI provenance', 'aio-page-builder' ); ?></dt>
+					<dd><?php echo \esc_html( $ai_src_sec ); ?></dd>
+				<?php endif; ?>
 				<?php if ( $field_ref !== '' ) : ?>
 					<dt><?php \esc_html_e( 'Field blueprint', 'aio-page-builder' ); ?></dt>
 					<dd><code><?php echo \esc_html( $field_ref ); ?></code></dd>
 				<?php endif; ?>
 			</dl>
+			<?php
+			if ( $this->container !== null && $section_key !== ''
+				&& $this->container->has( 'section_template_repository' ) && $this->container->has( 'version_snapshot_repository' ) ) {
+				$srepo = $this->container->get( 'section_template_repository' );
+				$vs    = $this->container->get( 'version_snapshot_repository' );
+				if ( $srepo instanceof Section_Template_Repository && $vs instanceof Version_Snapshot_Repository ) {
+					$row_s = $srepo->get_by_key( $section_key );
+					if ( is_array( $row_s ) && isset( $row_s['definition'] ) && is_array( $row_s['definition'] ) ) {
+						$pid   = (int) ( $row_s['id'] ?? 0 );
+						$state = Canonical_AI_Lineage_Display_Helper::build_state(
+							Canonical_AI_Lineage_Display_Helper::TARGET_SECTION_TEMPLATE,
+							$pid,
+							$section_key,
+							$row_s['definition'],
+							$vs
+						);
+						Canonical_AI_Lineage_Display_Helper::render_notice( $state );
+					}
+				}
+			}
+			?>
 			<?php if ( $helper_ref !== '' || ! empty( $helper_state['available'] ) ) : ?>
 				<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Helper documentation', 'aio-page-builder' ); ?></h3>
 				<?php if ( ! empty( $helper_state['available'] ) && (string) ( $helper_state['url'] ?? '' ) !== '' ) : ?>

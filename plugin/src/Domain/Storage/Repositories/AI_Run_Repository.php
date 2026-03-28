@@ -254,19 +254,23 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 	 * @param int $offset Offset for pagination.
 	 * @return list<array<string, mixed>>
 	 */
-	public function list_recent( int $limit = 50, int $offset = 0 ): array {
+	public function list_recent( int $limit = 50, int $offset = 0, string $surface = '' ): array {
 		$limit = $limit > 0 ? $limit : self::DEFAULT_LIST_LIMIT;
-		$query = new \WP_Query(
-			array(
-				'post_type'              => $this->get_post_type(),
-				'posts_per_page'         => $limit,
-				'offset'                 => $offset,
-				'orderby'                => 'date',
-				'order'                  => 'DESC',
-				'no_found_rows'          => true,
-				'update_post_meta_cache' => true,
-			)
+		$args  = array(
+			'post_type'              => $this->get_post_type(),
+			'posts_per_page'         => $limit,
+			'offset'                 => $offset,
+			'orderby'                => 'date',
+			'order'                  => 'DESC',
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => true,
 		);
+		if ( $surface !== '' ) {
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Admin AI run list filter; paginated.
+			$args['meta_key']    = self::META_RUN_SURFACE;
+			$args['meta_value']  = $surface;
+		}
+		$query = new \WP_Query( $args );
 		$out   = array();
 		foreach ( $query->get_posts() as $post ) {
 			$meta  = $this->get_meta( $post->ID );
@@ -287,6 +291,12 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 		$base = parent::post_to_record( $post, $meta );
 		if ( isset( $meta['run_metadata'] ) && is_array( $meta['run_metadata'] ) ) {
 			$base['run_metadata'] = $meta['run_metadata'];
+		}
+		$pid = (int) ( $base['id'] ?? 0 );
+		if ( $pid > 0 ) {
+			$base['run_surface'] = (string) \get_post_meta( $pid, self::META_RUN_SURFACE, true );
+		} else {
+			$base['run_surface'] = '';
 		}
 		return $base;
 	}

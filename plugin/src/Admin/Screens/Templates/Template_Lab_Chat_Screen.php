@@ -26,6 +26,7 @@ use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\Messages\Template_Lab_Admin_User_Messages;
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
+use AIOPageBuilder\Admin\Screens\Settings\Privacy_Reporting_Settings_Screen;
 use AIOPageBuilder\Domain\AI\Routing\AI_Provider_Router_Interface;
 use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -103,6 +104,33 @@ final class Template_Lab_Chat_Screen {
 			<p class="aio-admin-notice">
 				<?php \esc_html_e( 'Generate draft → Approve snapshot → Apply to composition or page template (apply is not executed from this screen).', 'aio-page-builder' ); ?>
 			</p>
+			<div class="notice notice-info inline" role="note">
+				<p>
+					<?php \esc_html_e( 'Generation calls external AI providers when configured; usage may incur provider cost. Nothing here becomes canonical until you approve and apply.', 'aio-page-builder' ); ?>
+					<?php
+					$priv_url = '';
+					if ( Capabilities::current_user_can_for_route( Capabilities::MANAGE_REPORTING_AND_PRIVACY ) ) {
+						$priv_url = Admin_Screen_Hub::tab_url( Privacy_Reporting_Settings_Screen::SLUG, 'privacy_reporting', array() );
+					}
+					$prov_url = '';
+					if ( Capabilities::current_user_can_for_route( Capabilities::MANAGE_AI_PROVIDERS ) ) {
+						$prov_url = Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_providers', array() );
+					}
+					?>
+					<?php if ( $prov_url !== '' ) : ?>
+						<a href="<?php echo \esc_url( $prov_url ); ?>"><?php \esc_html_e( 'AI provider settings', 'aio-page-builder' ); ?></a>
+					<?php endif; ?>
+					<?php if ( $prov_url !== '' && $priv_url !== '' ) : ?>
+						<?php echo ' '; ?>
+					<?php endif; ?>
+					<?php if ( $priv_url !== '' ) : ?>
+						<a href="<?php echo \esc_url( $priv_url ); ?>"><?php \esc_html_e( 'Privacy & reporting', 'aio-page-builder' ); ?></a>
+					<?php endif; ?>
+					<?php if ( $prov_url === '' && $priv_url === '' ) : ?>
+						<?php \esc_html_e( 'Ask a site administrator about provider setup and operational reporting disclosures.', 'aio-page-builder' ); ?>
+					<?php endif; ?>
+				</p>
+			</div>
 			<p>
 				<span class="screen-reader-text"><?php \esc_html_e( 'REST API', 'aio-page-builder' ); ?></span>
 				<code><?php echo \esc_html( $rest_base ); ?></code>

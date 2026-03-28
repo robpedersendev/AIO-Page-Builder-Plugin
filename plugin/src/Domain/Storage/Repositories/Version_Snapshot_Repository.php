@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Domain\Storage\Repositories;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Apply_Lineage_Snapshot_Recorder;
 use AIOPageBuilder\Domain\Registries\Snapshots\Version_Snapshot_Schema;
 use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 use AIOPageBuilder\Infrastructure\Db\Wpdb_Prepared_Results;
@@ -179,6 +180,42 @@ final class Version_Snapshot_Repository extends Abstract_CPT_Repository {
 			$meta = $this->get_meta( $post->ID );
 			if ( isset( $meta['definition'] ) && is_array( $meta['definition'] ) ) {
 				$out[] = $meta['definition'];
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Returns template-lab canonical-apply lineage snapshots pointing at a registry row (newest first; bounded scan).
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	public function list_template_lab_apply_snapshots_for_canonical( int $canonical_post_id, string $canonical_internal_key, int $limit = 40 ): array {
+		$canonical_post_id      = max( 0, $canonical_post_id );
+		$canonical_internal_key = trim( (string) $canonical_internal_key );
+		$limit                  = max( 1, min( 80, $limit ) );
+		if ( $canonical_post_id <= 0 || $canonical_internal_key === '' ) {
+			return array();
+		}
+		$candidates = $this->list_definitions_by_scope_id( Template_Lab_Apply_Lineage_Snapshot_Recorder::SCOPE_ID, 200, 0 );
+		$out        = array();
+		foreach ( $candidates as $def ) {
+			if ( ! is_array( $def ) ) {
+				continue;
+			}
+			$refs = $def[ Version_Snapshot_Schema::FIELD_OBJECT_REFS ] ?? null;
+			if ( ! is_array( $refs ) ) {
+				continue;
+			}
+			if ( (int) ( $refs['canonical_post_id'] ?? 0 ) !== $canonical_post_id ) {
+				continue;
+			}
+			if ( (string) ( $refs['canonical_internal_key'] ?? '' ) !== $canonical_internal_key ) {
+				continue;
+			}
+			$out[] = $def;
+			if ( count( $out ) >= $limit ) {
+				break;
 			}
 		}
 		return $out;

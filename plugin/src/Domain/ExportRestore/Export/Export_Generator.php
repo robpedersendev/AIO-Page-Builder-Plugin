@@ -21,6 +21,7 @@ use AIOPageBuilder\Domain\ExportRestore\Validation\Template_Library_Export_Valid
 use AIOPageBuilder\Domain\Styling\Entity_Style_Payload_Schema;
 use AIOPageBuilder\Domain\Styling\Global_Style_Settings_Schema;
 use AIOPageBuilder\Domain\Registries\Export\Registry_Export_Serializer;
+use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Data;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface;
 use AIOPageBuilder\Domain\Storage\Profile\Profile_Store;
@@ -77,6 +78,9 @@ final class Export_Generator {
 	/** @var Profile_Snapshot_Repository_Interface|null Optional snapshot repository for including profile history in exports (v2). */
 	private ?Profile_Snapshot_Repository_Interface $snapshot_repository;
 
+	/** @var AI_Chat_Session_Repository_Interface|null Optional chat sessions for template-lab snapshot ref export. */
+	private ?AI_Chat_Session_Repository_Interface $ai_chat_session_repository;
+
 	public function __construct(
 		Plugin_Path_Manager $path_manager,
 		Settings_Service $settings,
@@ -90,7 +94,8 @@ final class Export_Generator {
 		?Support_Package_Generator $support_package_generator = null,
 		?Template_Library_Export_Validator $template_library_export_validator = null,
 		?ACF_Local_JSON_Mirror_Service $acf_mirror_service = null,
-		?Profile_Snapshot_Repository_Interface $snapshot_repository = null
+		?Profile_Snapshot_Repository_Interface $snapshot_repository = null,
+		?AI_Chat_Session_Repository_Interface $ai_chat_session_repository = null
 	) {
 		$this->path_manager                      = $path_manager;
 		$this->settings                          = $settings;
@@ -105,6 +110,7 @@ final class Export_Generator {
 		$this->template_library_export_validator = $template_library_export_validator;
 		$this->acf_mirror_service                = $acf_mirror_service;
 		$this->snapshot_repository               = $snapshot_repository;
+		$this->ai_chat_session_repository        = $ai_chat_session_repository;
 	}
 
 	/**
@@ -277,7 +283,7 @@ final class Export_Generator {
 				break;
 			case Export_Mode_Keys::SUPPORT_BUNDLE:
 				$redact           = true;
-				$optional_allowed = array( 'logs', 'reporting_history', 'acf_field_groups_mirror' );
+				$optional_allowed = array( 'logs', 'reporting_history', 'acf_field_groups_mirror', 'template_lab_snapshot_refs' );
 				$excluded         = array( 'raw_ai_artifacts', 'normalized_ai_outputs', 'crawl_snapshots', 'rollback_snapshots' );
 				break;
 			case Export_Mode_Keys::TEMPLATE_ONLY_EXPORT:
@@ -393,6 +399,16 @@ final class Export_Generator {
 		if ( in_array( 'uninstall_restore_metadata', $included, true ) ) {
 			$prefs = $this->settings->get( Option_Names::UNINSTALL_PREFS );
 			$this->write_json_dir( $staging_dir . 'settings', 'uninstall_restore_metadata.json', $prefs );
+		}
+		if ( in_array( 'template_lab_snapshot_refs', $included, true ) && $this->ai_chat_session_repository instanceof AI_Chat_Session_Repository_Interface ) {
+			$tl_dir = $staging_dir . 'template_lab';
+			if ( ! is_dir( $tl_dir ) ) {
+				wp_mkdir_p( $tl_dir );
+			}
+			$this->write_json_file(
+				$tl_dir . '/approved_snapshot_refs.json',
+				Template_Lab_Snapshot_Refs_Export_Assembler::build( $this->ai_chat_session_repository )
+			);
 		}
 		if ( in_array( 'acf_field_groups_mirror', $included, true ) && $this->acf_mirror_service !== null ) {
 			$mirror_dir = $staging_dir . 'acf_field_groups_mirror';

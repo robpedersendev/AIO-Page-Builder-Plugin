@@ -18,6 +18,9 @@ use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 final class Template_Lab_Apply_Lineage_Snapshot_Recorder {
 
+	/** Scope id stored on version snapshot posts for template-lab canonical applies (query + export). */
+	public const SCOPE_ID = 'template_lab_canonical_apply';
+
 	private Version_Snapshot_Repository $snapshots;
 
 	public function __construct( Version_Snapshot_Repository $snapshots ) {
@@ -42,7 +45,7 @@ final class Template_Lab_Apply_Lineage_Snapshot_Recorder {
 		$definition    = array(
 			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID    => $snapshot_id,
 			Version_Snapshot_Schema::FIELD_SCOPE_TYPE     => Version_Snapshot_Schema::SCOPE_BUILD_CONTEXT,
-			Version_Snapshot_Schema::FIELD_SCOPE_ID       => 'template_lab_canonical_apply',
+			Version_Snapshot_Schema::FIELD_SCOPE_ID       => self::SCOPE_ID,
 			Version_Snapshot_Schema::FIELD_CREATED_AT     => gmdate( 'Y-m-d\TH:i:s\Z' ),
 			Version_Snapshot_Schema::FIELD_SCHEMA_VERSION => '1',
 			Version_Snapshot_Schema::FIELD_STATUS         => Version_Snapshot_Schema::STATUS_ACTIVE,

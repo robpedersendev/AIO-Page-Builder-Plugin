@@ -26,9 +26,16 @@ final class Template_Lab_Chat_Application_Service {
 
 	private AI_Run_Service $runs;
 
-	public function __construct( AI_Chat_Session_Repository_Interface $chat, AI_Run_Service $runs ) {
-		$this->chat = $chat;
-		$this->runs = $runs;
+	private ?Template_Lab_Telemetry $telemetry;
+
+	public function __construct(
+		AI_Chat_Session_Repository_Interface $chat,
+		AI_Run_Service $runs,
+		?Template_Lab_Telemetry $telemetry = null
+	) {
+		$this->chat      = $chat;
+		$this->runs      = $runs;
+		$this->telemetry = $telemetry;
 	}
 
 	/**
@@ -86,6 +93,7 @@ final class Template_Lab_Chat_Application_Service {
 			Named_Debug_Log_Event::TEMPLATE_LAB_CHAT_PROMPT_RUN_CREATED,
 			'run_post_id=' . (string) $post_id . ' pack=' . AI_Prompt_Pack_Keys::TEMPLATE_LAB_CHAT
 		);
+		$this->telemetry?->bump( Template_Lab_Telemetry::EVENT_PROMPT_SUBMITTED );
 		return array(
 			'ok'          => true,
 			'run_post_id' => $post_id,

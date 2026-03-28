@@ -31,6 +31,7 @@ final class Settings_Service {
 		Option_Names::INDUSTRY_PROFILE               => array(),
 		Option_Names::ONBOARDING_DRAFT               => array(),
 		Option_Names::ONBOARDING_TELEMETRY_AGGREGATE => array(),
+		Option_Names::TEMPLATE_LAB_TELEMETRY_AGGREGATE => array(),
 		Option_Names::PROMPT_EXPERIMENTS             => array( 'definitions' => array() ),
 		Option_Names::DISABLED_INDUSTRY_PACKS        => array(),
 		Option_Names::PB_INDUSTRY_BUNDLE_REGISTRY    => array(),

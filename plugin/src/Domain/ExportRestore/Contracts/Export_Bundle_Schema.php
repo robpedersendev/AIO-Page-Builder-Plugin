@@ -59,6 +59,7 @@ final class Export_Bundle_Schema {
 		'reporting_history',
 		'rollback_snapshots',
 		'acf_field_groups_mirror',
+		'template_lab_snapshot_refs',
 	);
 
 	/** Permanently excluded; must never appear in export (spec §52.6). */
@@ -84,6 +85,7 @@ final class Export_Bundle_Schema {
 		'logs',
 		'docs',
 		'acf_field_groups_mirror',
+		'template_lab',
 	);
 
 	/**

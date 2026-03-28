@@ -169,6 +169,7 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$template_library_validator = $container->has( 'template_library_export_validator' ) ? $container->get( 'template_library_export_validator' ) : null;
 				$acf_mirror_service         = $container->has( 'acf_local_json_mirror_service' ) ? $container->get( 'acf_local_json_mirror_service' ) : null;
 				$snapshot_repo              = $container->has( 'profile_snapshot_repository' ) ? $container->get( 'profile_snapshot_repository' ) : null;
+				$chat_repo = $container->has( 'ai_chat_session_repository' ) ? $container->get( 'ai_chat_session_repository' ) : null;
 				return new Export_Generator(
 					$container->get( 'plugin_path_manager' ),
 					$container->get( 'settings' ),
@@ -182,7 +183,8 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 					$container->get( 'support_package_generator' ),
 					$template_library_validator,
 					$acf_mirror_service,
-					$snapshot_repo instanceof \AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface ? $snapshot_repo : null
+					$snapshot_repo instanceof \AIOPageBuilder\Domain\Storage\Profile\Profile_Snapshot_Repository_Interface ? $snapshot_repo : null,
+					$chat_repo instanceof \AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface ? $chat_repo : null
 				);
 			}
 		);

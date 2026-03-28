@@ -15,7 +15,9 @@ defined( 'ABSPATH' ) || exit;
 use AIOPageBuilder\Admin\Forms\Entity_Style_Form_Builder;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Domain\Registries\PageTemplate\UI\Page_Template_Detail_State_Builder;
+use AIOPageBuilder\Domain\Registries\Shared\Canonical_AI_Lineage_Display_Helper;
 use AIOPageBuilder\Domain\Registries\Shared\Registry_AI_Provenance_Helper;
+use AIOPageBuilder\Domain\Storage\Repositories\Version_Snapshot_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Styling\Entity_Style_UI_State_Builder;
 use AIOPageBuilder\Domain\Preview\Template_Live_Preview_State_Builder_Factory;
@@ -221,6 +223,27 @@ final class Page_Template_Detail_Screen {
 					<dd><?php echo \esc_html( $ai_src ); ?></dd>
 				<?php endif; ?>
 			</dl>
+			<?php
+			if ( $this->container !== null && $template_key !== ''
+				&& $this->container->has( 'page_template_repository' ) && $this->container->has( 'version_snapshot_repository' ) ) {
+				$pt_repo = $this->container->get( 'page_template_repository' );
+				$vs_repo = $this->container->get( 'version_snapshot_repository' );
+				if ( $pt_repo instanceof Page_Template_Repository && $vs_repo instanceof Version_Snapshot_Repository ) {
+					$row = $pt_repo->get_by_key( $template_key );
+					if ( is_array( $row ) && isset( $row['definition'] ) && is_array( $row['definition'] ) ) {
+						$pid   = (int) ( $row['id'] ?? 0 );
+						$state = Canonical_AI_Lineage_Display_Helper::build_state(
+							Canonical_AI_Lineage_Display_Helper::TARGET_PAGE_TEMPLATE,
+							$pid,
+							$template_key,
+							$row['definition'],
+							$vs_repo
+						);
+						Canonical_AI_Lineage_Display_Helper::render_notice( $state );
+					}
+				}
+			}
+			?>
 			<?php if ( count( $used_sections ) > 0 ) : ?>
 				<h3 class="aio-metadata-subtitle"><?php \esc_html_e( 'Used sections', 'aio-page-builder' ); ?></h3>
 				<ol class="aio-used-sections-list">

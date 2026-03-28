@@ -329,6 +329,50 @@ final class AI_Chat_Session_Repository extends Abstract_CPT_Repository implement
 		return $out;
 	}
 
+	public function list_export_safe_approved_snapshot_rows( int $limit = 500 ): array {
+		$limit = max( 1, min( 2000, $limit ) );
+		// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Export-only; bounded post list; meta clause limits to approved sessions.
+		$query = new \WP_Query(
+			array(
+				'post_type'              => $this->get_post_type(),
+				'post_status'            => 'any',
+				'posts_per_page'         => $limit,
+				'orderby'                => 'modified',
+				'order'                  => 'DESC',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => true,
+				'meta_query'             => array(
+					array(
+						'key'     => AI_Chat_Session_Keys::META_HAS_APPROVED_SNAPSHOT,
+						'value'   => '1',
+						'compare' => '=',
+					),
+				),
+			)
+		);
+		// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+		$out = array();
+		foreach ( $query->get_posts() as $post ) {
+			if ( ! $post instanceof \WP_Post ) {
+				continue;
+			}
+			$id      = (int) $post->ID;
+			$payload = $this->load_payload( $id );
+			$ref     = $payload[ AI_Chat_Session_Keys::P_APPROVED_SNAPSHOT_REF ] ?? null;
+			if ( ! is_array( $ref ) || $ref === array() ) {
+				continue;
+			}
+			$sid   = (string) \get_post_meta( $id, self::META_INTERNAL_KEY, true );
+			$out[] = array(
+				'session_id'            => $sid,
+				'task_type'             => (string) ( $payload[ AI_Chat_Session_Keys::P_TASK_TYPE ] ?? '' ),
+				'approved_snapshot_ref' => $this->sanitize_snapshot_ref( $ref ),
+				'post_modified_gmt'     => (string) $post->post_modified_gmt,
+			);
+		}
+		return $out;
+	}
+
 	public function list_recent_for_owner( int $owner_user_id, int $limit = 20, int $offset = 0 ): array {
 		$owner_user_id = max( 0, $owner_user_id );
 		$limit         = max( 1, min( 100, $limit ) );

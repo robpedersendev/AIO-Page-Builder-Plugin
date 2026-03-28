@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Apply_Lineage_Snapshot_Recorder;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Apply_Service;
+use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Telemetry;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Registry_Persist_Service;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Chat_Application_Service;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Run_Orchestrator;
@@ -27,6 +28,12 @@ use AIOPageBuilder\Infrastructure\Container\Service_Provider_Interface;
 final class Template_Lab_Provider implements Service_Provider_Interface {
 
 	public function register( Service_Container $container ): void {
+		$container->register(
+			'template_lab_telemetry',
+			function () use ( $container ): Template_Lab_Telemetry {
+				return new Template_Lab_Telemetry( $container->get( 'settings' ) );
+			}
+		);
 		$container->register(
 			'template_lab_validation_port',
 			function () use ( $container ): Template_Lab_Validation_Port {
@@ -48,7 +55,8 @@ final class Template_Lab_Provider implements Service_Provider_Interface {
 			function () use ( $container ): Template_Lab_Chat_Application_Service {
 				return new Template_Lab_Chat_Application_Service(
 					$container->get( 'ai_chat_session_repository' ),
-					$container->get( 'ai_run_service' )
+					$container->get( 'ai_run_service' ),
+					$container->get( 'template_lab_telemetry' )
 				);
 			}
 		);
@@ -81,7 +89,8 @@ final class Template_Lab_Provider implements Service_Provider_Interface {
 					new Composition_AI_Draft_Translator(),
 					new Page_Template_AI_Draft_Translator(),
 					new Section_Template_AI_Draft_Translator(),
-					$container->get( 'template_lab_apply_lineage_snapshot_recorder' )
+					$container->get( 'template_lab_apply_lineage_snapshot_recorder' ),
+					$container->get( 'template_lab_telemetry' )
 				);
 			}
 		);
