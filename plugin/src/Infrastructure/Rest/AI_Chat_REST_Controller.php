@@ -35,6 +35,28 @@ final class AI_Chat_REST_Controller {
 					'methods'             => 'GET',
 					'callback'            => array( $this, 'get_sessions' ),
 					'permission_callback' => array( $this, 'can_manage_template_lab' ),
+					'args'                => array(
+						'status'    => array(
+							'type'              => 'string',
+							'required'          => false,
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'task_type' => array(
+							'type'              => 'string',
+							'required'          => false,
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'approved'  => array(
+							'type'              => 'string',
+							'required'          => false,
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'search'    => array(
+							'type'              => 'string',
+							'required'          => false,
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+					),
 				),
 				array(
 					'methods'             => 'POST',
@@ -134,7 +156,7 @@ final class AI_Chat_REST_Controller {
 	}
 
 	public function can_manage_template_lab(): bool {
-		return Template_Lab_Access::can_manage_template_lab();
+		return Template_Lab_Access::can_use_template_lab_rest_routes();
 	}
 
 	/**
@@ -142,13 +164,18 @@ final class AI_Chat_REST_Controller {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function get_sessions( $request ) {
-		unset( $request );
 		$uid = (int) \get_current_user_id();
 		if ( $uid <= 0 ) {
 			return new \WP_Error( 'aio_chat_not_authenticated', __( 'Authentication required.', 'aio-page-builder' ), array( 'status' => 401 ) );
 		}
-		$repo = $this->get_chat_repo();
-		$list = $repo->list_recent_for_owner( $uid, 50, 0 );
+		$repo    = $this->get_chat_repo();
+		$filters = array(
+			'status'    => (string) $request->get_param( 'status' ),
+			'task_type' => (string) $request->get_param( 'task_type' ),
+			'approved'  => (string) $request->get_param( 'approved' ),
+			'search'    => (string) $request->get_param( 'search' ),
+		);
+		$list    = $repo->list_for_owner_with_filters( $uid, $filters, 50, 0 );
 		return new \WP_REST_Response( array( 'sessions' => $list ), 200 );
 	}
 
@@ -164,7 +191,7 @@ final class AI_Chat_REST_Controller {
 		if ( $data === null ) {
 			return new \WP_Error( 'aio_chat_not_found', __( 'Session not found.', 'aio-page-builder' ), array( 'status' => 404 ) );
 		}
-		if ( (int) ( $data['owner_user_id'] ?? 0 ) !== $uid && ! \current_user_can( 'manage_options' ) ) {
+		if ( ! Template_Lab_Access::actor_may_use_chat_session( $uid, $data ) ) {
 			return new \WP_Error( 'aio_chat_forbidden', __( 'You cannot access this session.', 'aio-page-builder' ), array( 'status' => 403 ) );
 		}
 		return new \WP_REST_Response( $this->sanitize_session_for_response( $data ), 200 );
@@ -294,10 +321,7 @@ final class AI_Chat_REST_Controller {
 		if ( $s === null ) {
 			return false;
 		}
-		if ( \current_user_can( 'manage_options' ) ) {
-			return true;
-		}
-		return (int) ( $s['owner_user_id'] ?? 0 ) === $user_id;
+		return Template_Lab_Access::actor_may_use_chat_session( $user_id, $s );
 	}
 
 	/**

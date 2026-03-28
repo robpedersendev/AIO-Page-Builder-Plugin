@@ -20,6 +20,12 @@ final class AI_Chat_Session_Keys {
 
 	public const META_OWNER = '_aio_chat_owner_user_id';
 
+	/** Queryable copy of payload task_type (synced on save). */
+	public const META_TASK_TYPE = '_aio_chat_task_type';
+
+	/** Queryable flag: 1 when approved_snapshot_ref is non-empty. */
+	public const META_HAS_APPROVED_SNAPSHOT = '_aio_chat_has_approved_snapshot';
+
 	public const MAX_MESSAGES = 200;
 
 	public const MAX_CONTENT_PREVIEW = 500;

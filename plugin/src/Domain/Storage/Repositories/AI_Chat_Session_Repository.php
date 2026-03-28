@@ -208,8 +208,8 @@ final class AI_Chat_Session_Repository extends Abstract_CPT_Repository implement
 			Named_Debug_Log::event( Named_Debug_Log_Event::CHAT_SESSION_TRANSCRIPT_ANONYMIZED, 'post_id=' . (string) $id . ' result=idempotent' );
 			return true;
 		}
-		$payload[ AI_Chat_Session_Keys::P_PROVIDER_THREAD_REF ]           = '';
-		$payload[ AI_Chat_Session_Keys::P_MESSAGES ]                      = array(
+		$payload[ AI_Chat_Session_Keys::P_PROVIDER_THREAD_REF ]        = '';
+		$payload[ AI_Chat_Session_Keys::P_MESSAGES ]                   = array(
 			array(
 				'role'            => 'system',
 				'created_at'      => \gmdate( 'c' ),
@@ -246,6 +246,89 @@ final class AI_Chat_Session_Repository extends Abstract_CPT_Repository implement
 		return true;
 	}
 
+	public function list_for_owner_with_filters( int $owner_user_id, array $filters, int $limit = 25, int $offset = 0 ): array {
+		$owner_user_id = max( 0, $owner_user_id );
+		$limit         = max( 1, min( 100, $limit ) );
+		$offset        = max( 0, $offset );
+		$meta_query    = array(
+			'relation' => 'AND',
+			array(
+				'key'   => AI_Chat_Session_Keys::META_OWNER,
+				'value' => (string) $owner_user_id,
+			),
+		);
+		$status        = isset( $filters['status'] ) ? \sanitize_key( (string) $filters['status'] ) : '';
+		if ( $status !== '' ) {
+			$meta_query[] = array(
+				'key'   => self::META_STATUS,
+				'value' => $status,
+			);
+		}
+		$task_type = isset( $filters['task_type'] ) ? \sanitize_key( (string) $filters['task_type'] ) : '';
+		if ( $task_type !== '' ) {
+			$meta_query[] = array(
+				'key'   => AI_Chat_Session_Keys::META_TASK_TYPE,
+				'value' => $task_type,
+			);
+		}
+		$approved = isset( $filters['approved'] ) ? \sanitize_key( (string) $filters['approved'] ) : '';
+		if ( $approved === '1' ) {
+			$meta_query[] = array(
+				'key'   => AI_Chat_Session_Keys::META_HAS_APPROVED_SNAPSHOT,
+				'value' => '1',
+			);
+		} elseif ( $approved === '0' ) {
+			$meta_query[] = array(
+				'relation' => 'OR',
+				array(
+					'key'   => AI_Chat_Session_Keys::META_HAS_APPROVED_SNAPSHOT,
+					'value' => '0',
+				),
+				array(
+					'key'     => AI_Chat_Session_Keys::META_HAS_APPROVED_SNAPSHOT,
+					'compare' => 'NOT EXISTS',
+				),
+			);
+		}
+		$args   = array(
+			'post_type'              => $this->get_post_type(),
+			'post_status'            => 'any',
+			'posts_per_page'         => $limit,
+			'offset'                 => $offset,
+			'orderby'                => 'modified',
+			'order'                  => 'DESC',
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => true,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Bounded, owner-scoped admin list; few meta clauses.
+			'meta_query'             => $meta_query,
+		);
+		$search = isset( $filters['search'] ) ? trim( \sanitize_text_field( (string) $filters['search'] ) ) : '';
+		if ( $search !== '' ) {
+			$args['s'] = $search;
+		}
+		$query = new \WP_Query( $args );
+		$out   = array();
+		foreach ( $query->get_posts() as $post ) {
+			if ( ! $post instanceof \WP_Post ) {
+				continue;
+			}
+			$sid = (string) \get_post_meta( $post->ID, self::META_INTERNAL_KEY, true );
+			$pl  = $this->load_payload( (int) $post->ID );
+			$this->sync_query_meta_from_payload( (int) $post->ID, $pl );
+			$mc    = is_array( $pl[ AI_Chat_Session_Keys::P_MESSAGES ] ?? null ) ? count( $pl[ AI_Chat_Session_Keys::P_MESSAGES ] ) : 0;
+			$st    = (string) \get_post_meta( $post->ID, self::META_STATUS, true );
+			$out[] = array(
+				'session_id'        => $sid,
+				'post_id'           => (int) $post->ID,
+				'status'            => $st,
+				'task_type'         => (string) ( $pl[ AI_Chat_Session_Keys::P_TASK_TYPE ] ?? '' ),
+				'message_count'     => $mc,
+				'post_modified_gmt' => (string) $post->post_modified_gmt,
+			);
+		}
+		return $out;
+	}
+
 	public function list_recent_for_owner( int $owner_user_id, int $limit = 20, int $offset = 0 ): array {
 		$owner_user_id = max( 0, $owner_user_id );
 		$limit         = max( 1, min( 100, $limit ) );
@@ -260,11 +343,13 @@ final class AI_Chat_Session_Repository extends Abstract_CPT_Repository implement
 				'order'                  => 'DESC',
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
+				// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Owner-scoped list; paginated.
 				'meta_key'               => AI_Chat_Session_Keys::META_OWNER,
 				'meta_value'             => (string) $owner_user_id,
+				// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 			)
 		);
-		$out           = array();
+		$out = array();
 		foreach ( $query->get_posts() as $post ) {
 			if ( ! $post instanceof \WP_Post ) {
 				continue;
@@ -337,7 +422,21 @@ final class AI_Chat_Session_Repository extends Abstract_CPT_Repository implement
 		if ( $owner_user_id > 0 ) {
 			\update_post_meta( $post_id, AI_Chat_Session_Keys::META_OWNER, (string) $owner_user_id );
 		}
+		$this->sync_query_meta_from_payload( $post_id, $payload );
 		return true;
+	}
+
+	/**
+	 * @param array<string, mixed> $payload
+	 */
+	private function sync_query_meta_from_payload( int $post_id, array $payload ): void {
+		$tt = isset( $payload[ AI_Chat_Session_Keys::P_TASK_TYPE ] ) ? \sanitize_key( (string) $payload[ AI_Chat_Session_Keys::P_TASK_TYPE ] ) : '';
+		if ( $tt !== '' ) {
+			\update_post_meta( $post_id, AI_Chat_Session_Keys::META_TASK_TYPE, $tt );
+		}
+		$ref = $payload[ AI_Chat_Session_Keys::P_APPROVED_SNAPSHOT_REF ] ?? null;
+		$has = is_array( $ref ) && $ref !== array();
+		\update_post_meta( $post_id, AI_Chat_Session_Keys::META_HAS_APPROVED_SNAPSHOT, $has ? '1' : '0' );
 	}
 
 	private function touch_modified( int $post_id ): void {

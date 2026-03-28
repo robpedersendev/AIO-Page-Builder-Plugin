@@ -33,20 +33,25 @@ final class Default_AI_Provider_Router implements AI_Provider_Router_Interface {
 			? $config_array['task_routing']
 			: array();
 
-		$fallback_id = isset( $config_array['fallback_provider_id'] ) && is_string( $config_array['fallback_provider_id'] )
+		$allowed = array( 'openai', 'anthropic' );
+
+		$global_fallback_id          = isset( $config_array['fallback_provider_id'] ) && is_string( $config_array['fallback_provider_id'] )
 			? trim( $config_array['fallback_provider_id'] )
 			: '';
-		$fallback_model_raw = isset( $config_array['fallback_model'] ) && is_string( $config_array['fallback_model'] )
+		$fallback_model_raw          = isset( $config_array['fallback_model'] ) && is_string( $config_array['fallback_model'] )
 			? trim( $config_array['fallback_model'] )
 			: '';
-		$fallback_model       = $fallback_model_raw !== '' ? $fallback_model_raw : null;
-		$fallback_for_result  = in_array( $fallback_id, array( 'openai', 'anthropic' ), true ) ? $fallback_id : null;
-		$fallback_model_clean = $fallback_for_result !== null ? $fallback_model : null;
+		$global_fallback_model       = $fallback_model_raw !== '' ? $fallback_model_raw : null;
+		$global_fallback_ok          = in_array( $global_fallback_id, $allowed, true ) ? $global_fallback_id : null;
+		$global_fallback_model_clean = $global_fallback_ok !== null ? $global_fallback_model : null;
 
 		$preferred = isset( $context['preferred_provider_id'] ) ? trim( (string) $context['preferred_provider_id'] ) : '';
 
-		$provider_id    = '';
-		$model_override = null;
+		$provider_id            = '';
+		$model_override         = null;
+		$task_fallback_disabled = false;
+		$task_fallback_id       = '';
+		$task_fallback_model    = null;
 
 		if ( isset( $task_routing[ $task ] ) && is_array( $task_routing[ $task ] ) ) {
 			$slice = $task_routing[ $task ];
@@ -57,6 +62,16 @@ final class Default_AI_Provider_Router implements AI_Provider_Router_Interface {
 				$m = trim( $slice['model'] );
 				if ( $m !== '' ) {
 					$model_override = $m;
+				}
+			}
+			$task_fallback_disabled = ! empty( $slice['fallback_disabled'] );
+			if ( isset( $slice['fallback_provider_id'] ) && is_string( $slice['fallback_provider_id'] ) ) {
+				$task_fallback_id = trim( $slice['fallback_provider_id'] );
+			}
+			if ( isset( $slice['fallback_model'] ) && is_string( $slice['fallback_model'] ) ) {
+				$tfm = trim( $slice['fallback_model'] );
+				if ( $tfm !== '' ) {
+					$task_fallback_model = $tfm;
 				}
 			}
 		}
@@ -72,12 +87,30 @@ final class Default_AI_Provider_Router implements AI_Provider_Router_Interface {
 			$provider_id = $primary !== '' ? $primary : 'openai';
 		}
 
-		if ( ! in_array( $provider_id, array( 'openai', 'anthropic' ), true ) ) {
-			if ( $fallback_for_result !== null ) {
-				$provider_id    = $fallback_for_result;
-				$model_override = $fallback_model_clean ?? $model_override;
-			} else {
+		if ( ! in_array( $provider_id, $allowed, true ) ) {
+			if ( $task_fallback_disabled || $global_fallback_ok === null ) {
 				return AI_Provider_Route_Result::invalid();
+			}
+			$provider_id    = $global_fallback_ok;
+			$model_override = $global_fallback_model_clean ?? $model_override;
+		}
+
+		$fallback_for_result  = null;
+		$fallback_model_clean = null;
+		if ( ! $task_fallback_disabled ) {
+			if ( $task_fallback_id !== '' && in_array( $task_fallback_id, $allowed, true ) ) {
+				$eff_fb = $task_fallback_id;
+				$eff_fm = $task_fallback_model;
+			} elseif ( $task_fallback_id !== '' ) {
+				$eff_fb = $global_fallback_ok;
+				$eff_fm = $global_fallback_model_clean;
+			} else {
+				$eff_fb = $global_fallback_ok;
+				$eff_fm = $global_fallback_model_clean;
+			}
+			if ( $eff_fb !== null && $eff_fb !== $provider_id ) {
+				$fallback_for_result  = $eff_fb;
+				$fallback_model_clean = $eff_fm;
 			}
 		}
 

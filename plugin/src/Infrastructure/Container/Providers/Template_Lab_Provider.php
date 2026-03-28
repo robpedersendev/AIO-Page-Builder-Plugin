@@ -11,6 +11,7 @@ namespace AIOPageBuilder\Infrastructure\Container\Providers;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Apply_Lineage_Snapshot_Recorder;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Apply_Service;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Registry_Persist_Service;
 use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Chat_Application_Service;
@@ -62,6 +63,14 @@ final class Template_Lab_Provider implements Service_Provider_Interface {
 			}
 		);
 		$container->register(
+			'template_lab_apply_lineage_snapshot_recorder',
+			function () use ( $container ): Template_Lab_Apply_Lineage_Snapshot_Recorder {
+				return new Template_Lab_Apply_Lineage_Snapshot_Recorder(
+					$container->get( 'version_snapshot_repository' )
+				);
+			}
+		);
+		$container->register(
 			'template_lab_canonical_apply_service',
 			function () use ( $container ): Template_Lab_Canonical_Apply_Service {
 				return new Template_Lab_Canonical_Apply_Service(
@@ -71,7 +80,8 @@ final class Template_Lab_Provider implements Service_Provider_Interface {
 					$container->get( 'template_lab_canonical_registry_persist_service' ),
 					new Composition_AI_Draft_Translator(),
 					new Page_Template_AI_Draft_Translator(),
-					new Section_Template_AI_Draft_Translator()
+					new Section_Template_AI_Draft_Translator(),
+					$container->get( 'template_lab_apply_lineage_snapshot_recorder' )
 				);
 			}
 		);

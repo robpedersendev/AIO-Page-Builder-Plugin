@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\AI\Routing\AI_Routing_Task;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Keys;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
+use AIOPageBuilder\Infrastructure\Config\Template_Lab_Access;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
@@ -41,9 +42,7 @@ final class Template_Lab_Chat_Application_Service {
 				'code' => 'session_not_found',
 			);
 		}
-		$owner_ok = (int) ( $session['owner_user_id'] ?? 0 ) === $actor_user_id
-			|| \current_user_can( 'manage_options' );
-		if ( ! $owner_ok ) {
+		if ( ! Template_Lab_Access::actor_may_use_chat_session( $actor_user_id, $session ) ) {
 			return array(
 				'ok'   => false,
 				'code' => 'forbidden',

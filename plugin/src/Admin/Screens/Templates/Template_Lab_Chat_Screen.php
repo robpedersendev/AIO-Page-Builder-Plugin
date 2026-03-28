@@ -24,10 +24,12 @@ use AIOPageBuilder\Domain\Storage\Repositories\Composition_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Page_Template_Repository;
 use AIOPageBuilder\Domain\Storage\Repositories\Section_Template_Repository;
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Messages\Template_Lab_Admin_User_Messages;
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Domain\AI\Routing\AI_Provider_Router_Interface;
 use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Config\Template_Lab_Access;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 final class Template_Lab_Chat_Screen {
@@ -52,7 +54,7 @@ final class Template_Lab_Chat_Screen {
 	 * @param bool $embed_in_hub When true, skip outer wrap (hub provides heading).
 	 */
 	public function render( bool $embed_in_hub = false ): void {
-		if ( ! Capabilities::current_user_can_or_site_admin( $this->get_capability() ) ) {
+		if ( ! Template_Lab_Access::can_access_template_lab_shell() ) {
 			\wp_die( \esc_html__( 'You do not have permission to view this page.', 'aio-page-builder' ), '', array( 'response' => 403 ) );
 		}
 
@@ -63,7 +65,23 @@ final class Template_Lab_Chat_Screen {
 		}
 
 		$uid        = (int) \get_current_user_id();
-		$sessions   = $uid > 0 ? $repo->list_recent_for_owner( $uid, 25, 0 ) : array();
+		$f_status   = isset( $_GET['aio_tl_f_status'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['aio_tl_f_status'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$f_task     = isset( $_GET['aio_tl_f_task'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['aio_tl_f_task'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$f_approved = isset( $_GET['aio_tl_f_approved'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['aio_tl_f_approved'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$f_search   = isset( $_GET['aio_tl_f_search'] ) ? \sanitize_text_field( (string) \wp_unslash( $_GET['aio_tl_f_search'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$sessions   = $uid > 0
+			? $repo->list_for_owner_with_filters(
+				$uid,
+				array(
+					'status'    => $f_status,
+					'task_type' => $f_task,
+					'approved'  => $f_approved,
+					'search'    => $f_search,
+				),
+				25,
+				0
+			)
+			: array();
 		$active     = isset( $_GET['session_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['session_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only navigation.
 		$detail     = $active !== '' ? $repo->get_session( $active ) : null;
 		$rest_base  = \esc_url( \rest_url( 'aio-page-builder/v1' ) );
@@ -74,7 +92,7 @@ final class Template_Lab_Chat_Screen {
 		<div class="wrap aio-page-builder-screen aio-template-lab-screen">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
 		<?php else : ?>
-		<div class="aio-template-lab-screen">
+		<div class="aio-template-lab-screen" role="region" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 		<?php endif; ?>
 			<?php $this->render_admin_notices(); ?>
 			<?php $this->render_provider_capability_summary(); ?>
@@ -92,10 +110,44 @@ final class Template_Lab_Chat_Screen {
 			<input type="hidden" id="aio-template-lab-rest-nonce" value="<?php echo \esc_attr( $rest_nonce ); ?>" />
 
 			<div class="aio-template-lab-columns" style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
-				<div class="aio-template-lab-sessions" style="flex:1;min-width:220px;max-width:360px;">
+				<div class="aio-template-lab-sessions" style="flex:1;min-width:220px;max-width:360px;" role="region" aria-label="<?php \esc_attr_e( 'Template lab sessions', 'aio-page-builder' ); ?>">
 					<h2><?php \esc_html_e( 'Sessions', 'aio-page-builder' ); ?></h2>
+					<form method="get" action="<?php echo \esc_url( \admin_url( 'admin.php' ) ); ?>" class="aio-template-lab-session-filters" style="margin-bottom:12px;">
+						<input type="hidden" name="page" value="<?php echo \esc_attr( Template_Library_Hub_Urls::HUB_PAGE_SLUG ); ?>" />
+						<input type="hidden" name="<?php echo \esc_attr( Template_Library_Hub_Urls::QUERY_TAB ); ?>" value="<?php echo \esc_attr( Template_Library_Hub_Urls::TAB_TEMPLATE_LAB ); ?>" />
+						<?php if ( $active !== '' ) : ?>
+							<input type="hidden" name="session_id" value="<?php echo \esc_attr( $active ); ?>" />
+						<?php endif; ?>
+						<p>
+							<label for="aio_tl_f_status"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></label><br />
+							<input type="text" name="aio_tl_f_status" id="aio_tl_f_status" value="<?php echo \esc_attr( $f_status ); ?>" class="regular-text" />
+						</p>
+						<p>
+							<label for="aio_tl_f_task"><?php \esc_html_e( 'Task type', 'aio-page-builder' ); ?></label><br />
+							<input type="text" name="aio_tl_f_task" id="aio_tl_f_task" value="<?php echo \esc_attr( $f_task ); ?>" class="regular-text" />
+						</p>
+						<p>
+							<label for="aio_tl_f_approved"><?php \esc_html_e( 'Approved snapshot', 'aio-page-builder' ); ?></label><br />
+							<select name="aio_tl_f_approved" id="aio_tl_f_approved">
+								<option value=""><?php \esc_html_e( 'Any', 'aio-page-builder' ); ?></option>
+								<option value="1" <?php \selected( $f_approved, '1' ); ?>><?php \esc_html_e( 'Present', 'aio-page-builder' ); ?></option>
+								<option value="0" <?php \selected( $f_approved, '0' ); ?>><?php \esc_html_e( 'Not present', 'aio-page-builder' ); ?></option>
+							</select>
+						</p>
+						<p>
+							<label for="aio_tl_f_search"><?php \esc_html_e( 'Search session id', 'aio-page-builder' ); ?></label><br />
+							<input type="search" name="aio_tl_f_search" id="aio_tl_f_search" value="<?php echo \esc_attr( $f_search ); ?>" class="regular-text" />
+						</p>
+						<p><button type="submit" class="button"><?php \esc_html_e( 'Apply filters', 'aio-page-builder' ); ?></button></p>
+					</form>
 					<?php if ( $sessions === array() ) : ?>
-						<p><?php \esc_html_e( 'No sessions yet. Create one via the REST API or a future control here.', 'aio-page-builder' ); ?></p>
+						<p>
+							<?php
+							echo ( $f_status !== '' || $f_task !== '' || $f_approved !== '' || $f_search !== '' )
+								? \esc_html__( 'No sessions match the current filters.', 'aio-page-builder' )
+								: \esc_html__( 'No sessions yet. Create one with the button below or via the REST API.', 'aio-page-builder' );
+							?>
+						</p>
 					<?php else : ?>
 						<ul class="ul-disc">
 							<?php foreach ( $sessions as $row ) : ?>
@@ -116,7 +168,7 @@ final class Template_Lab_Chat_Screen {
 						</ul>
 					<?php endif; ?>
 				</div>
-				<div class="aio-template-lab-workspace" style="flex:2;min-width:280px;">
+				<div class="aio-template-lab-workspace" style="flex:2;min-width:280px;" role="region" aria-label="<?php \esc_attr_e( 'Working session', 'aio-page-builder' ); ?>">
 					<h2><?php \esc_html_e( 'Working session', 'aio-page-builder' ); ?></h2>
 					<?php if ( $detail === null ) : ?>
 						<p><?php \esc_html_e( 'Select a session from the list or open one via a direct link.', 'aio-page-builder' ); ?></p>
@@ -144,10 +196,12 @@ final class Template_Lab_Chat_Screen {
 						$applied_ok  = is_array( $apply_rec ) && (string) ( $apply_rec['canonical_internal_key'] ?? '' ) !== '';
 						$can_approve = $has_snap
 							&& Template_Lab_Approved_Snapshot_Ref_Keys::is_valid_target_kind( $target_k )
-							&& $approval_state !== Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED;
+							&& $approval_state !== Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED
+							&& Template_Lab_Access::current_user_can_approve_or_apply_for_target( $target_k );
 						$can_apply   = $has_snap
 							&& $approval_state === Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED
-							&& Template_Lab_Approved_Snapshot_Ref_Keys::is_valid_target_kind( $target_k );
+							&& Template_Lab_Approved_Snapshot_Ref_Keys::is_valid_target_kind( $target_k )
+							&& Template_Lab_Access::current_user_can_approve_or_apply_for_target( $target_k );
 						?>
 						<p><strong><?php \esc_html_e( 'Apply status', 'aio-page-builder' ); ?>:</strong>
 							<?php
@@ -208,8 +262,14 @@ final class Template_Lab_Chat_Screen {
 								<input type="hidden" name="action" value="<?php echo \esc_attr( Template_Lab_Canonical_Admin_Actions::ACTION_APPROVE ); ?>" />
 								<input type="hidden" name="<?php echo \esc_attr( Template_Lab_Canonical_Admin_Actions::FIELD_SESSION ); ?>" value="<?php echo \esc_attr( (string) ( $detail['session_id'] ?? '' ) ); ?>" />
 								<?php Template_Lab_Canonical_Admin_Actions::nonce_field( 'approve' ); ?>
-								<?php \submit_button( __( 'Approve snapshot for apply', 'aio-page-builder' ), 'secondary', 'submit', false ); ?>
+								<?php \submit_button( __( 'Approve snapshot for apply', 'aio-page-builder' ), 'secondary', 'aio_tl_approve_submit', false, array( 'id' => 'aio_tl_approve_submit' ) ); ?>
 							</form>
+							<?php
+						elseif ( $has_snap && Template_Lab_Approved_Snapshot_Ref_Keys::is_valid_target_kind( $target_k )
+							&& $approval_state !== Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED
+							&& ! Template_Lab_Access::current_user_can_approve_or_apply_for_target( $target_k ) ) :
+							?>
+							<p class="description"><?php \esc_html_e( 'You can view this session, but approving this snapshot requires the registry capability for the selected target.', 'aio-page-builder' ); ?></p>
 						<?php endif; ?>
 						<?php if ( $can_apply ) : ?>
 							<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" class="aio-template-lab-apply-form">
@@ -217,11 +277,13 @@ final class Template_Lab_Chat_Screen {
 								<input type="hidden" name="<?php echo \esc_attr( Template_Lab_Canonical_Admin_Actions::FIELD_SESSION ); ?>" value="<?php echo \esc_attr( (string) ( $detail['session_id'] ?? '' ) ); ?>" />
 								<input type="hidden" name="<?php echo \esc_attr( Template_Lab_Canonical_Admin_Actions::FIELD_TARGET ); ?>" value="<?php echo \esc_attr( $target_k ); ?>" />
 								<?php Template_Lab_Canonical_Admin_Actions::nonce_field( 'apply' ); ?>
-								<?php \submit_button( __( 'Apply approved snapshot to canonical registry', 'aio-page-builder' ), 'primary', 'submit', false ); ?>
+								<?php \submit_button( __( 'Apply approved snapshot to canonical registry', 'aio-page-builder' ), 'primary', 'aio_tl_apply_submit', false, array( 'id' => 'aio_tl_apply_submit' ) ); ?>
 							</form>
+						<?php elseif ( $has_snap && $approval_state === Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED && ! Template_Lab_Access::current_user_can_approve_or_apply_for_target( $target_k ) ) : ?>
+							<p class="description"><?php \esc_html_e( 'Apply is not available for your role on this target type.', 'aio-page-builder' ); ?></p>
 						<?php endif; ?>
 						<h3><?php \esc_html_e( 'Transcript (previews only)', 'aio-page-builder' ); ?></h3>
-						<ul class="aio-chat-transcript" style="list-style:none;padding-left:0;">
+						<ul class="aio-chat-transcript" style="list-style:none;padding-left:0;" aria-label="<?php \esc_attr_e( 'Chat transcript previews', 'aio-page-builder' ); ?>">
 							<?php
 							$msgs = isset( $detail['messages'] ) && is_array( $detail['messages'] ) ? $detail['messages'] : array();
 							foreach ( $msgs as $m ) :
@@ -270,68 +332,25 @@ final class Template_Lab_Chat_Screen {
 
 	private function render_admin_notices(): void {
 		$ap     = isset( $_GET[ Template_Lab_Canonical_Admin_Actions::QUERY_APPROVE ] ) ? \sanitize_key( (string) \wp_unslash( $_GET[ Template_Lab_Canonical_Admin_Actions::QUERY_APPROVE ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$ap_msg = array(
-			'ok'                        => __( 'Snapshot approved for apply.', 'aio-page-builder' ),
-			'bad_nonce'                 => __( 'Security check failed. Try again.', 'aio-page-builder' ),
-			'unauthorized'              => __( 'You are not allowed to approve this snapshot.', 'aio-page-builder' ),
-			'bad_request'               => __( 'Could not approve: invalid request.', 'aio-page-builder' ),
-			'session_missing'           => __( 'Session not found.', 'aio-page-builder' ),
-			'fingerprint_mismatch'      => __( 'Snapshot does not match the AI run fingerprint.', 'aio-page-builder' ),
-			'missing_normalized_output' => __( 'No validated draft artifact is available for this run.', 'aio-page-builder' ),
-			'persist_failed'            => __( 'Could not save approval state.', 'aio-page-builder' ),
-			'error'                     => __( 'Approval failed.', 'aio-page-builder' ),
-		);
+		$ap_msg = Template_Lab_Admin_User_Messages::approve_result_messages();
 		if ( $ap !== '' && isset( $ap_msg[ $ap ] ) ) {
 			$cls = $ap === 'ok' ? 'notice-success' : 'notice-error';
 			echo '<div class="notice ' . \esc_attr( $cls ) . ' is-dismissible"><p>' . \esc_html( $ap_msg[ $ap ] ) . '</p></div>';
 		}
 		$ay     = isset( $_GET[ Template_Lab_Canonical_Admin_Actions::QUERY_APPLY ] ) ? \sanitize_key( (string) \wp_unslash( $_GET[ Template_Lab_Canonical_Admin_Actions::QUERY_APPLY ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$ay_msg = array(
-			'ok'                        => __( 'Canonical registry updated from the approved snapshot.', 'aio-page-builder' ),
-			'already_applied'           => __( 'This snapshot was already applied; no duplicate write.', 'aio-page-builder' ),
-			'bad_nonce'                 => __( 'Security check failed. Try again.', 'aio-page-builder' ),
-			'unauthorized'              => __( 'You are not allowed to run apply for this target.', 'aio-page-builder' ),
-			'forbidden'                 => __( 'You are not allowed to run apply for this target.', 'aio-page-builder' ),
-			'bad_request'               => __( 'Could not apply: invalid request.', 'aio-page-builder' ),
-			'session_missing'           => __( 'Session not found.', 'aio-page-builder' ),
-			'not_approved'              => __( 'Snapshot is not approved yet.', 'aio-page-builder' ),
-			'bad_ref'                   => __( 'Snapshot reference is incomplete.', 'aio-page-builder' ),
-			'bad_snapshot_ref'          => __( 'Snapshot reference is incomplete.', 'aio-page-builder' ),
-			'invalid_target_kind'       => __( 'Invalid apply target.', 'aio-page-builder' ),
-			'bad_target'                => __( 'Apply target does not match the approved snapshot.', 'aio-page-builder' ),
-			'fingerprint'               => __( 'Snapshot fingerprint no longer matches the run.', 'aio-page-builder' ),
-			'missing_normalized_output' => __( 'No normalized draft artifact for this run.', 'aio-page-builder' ),
-			'translation_failed'        => __( 'Draft could not be translated to canonical shape.', 'aio-page-builder' ),
-			'persist_failed'            => __( 'Could not persist canonical record.', 'aio-page-builder' ),
-			'error'                     => __( 'Apply failed.', 'aio-page-builder' ),
-		);
+		$ay_msg = Template_Lab_Admin_User_Messages::apply_result_messages();
 		if ( $ay !== '' && isset( $ay_msg[ $ay ] ) ) {
 			$cls = ( $ay === 'ok' || $ay === 'already_applied' ) ? 'notice-success' : 'notice-error';
 			echo '<div class="notice ' . \esc_attr( $cls ) . ' is-dismissible"><p>' . \esc_html( $ay_msg[ $ay ] ) . '</p></div>';
 		}
 		$cc     = isset( $_GET[ Template_Lab_Chat_Admin_Actions::QUERY_CREATE ] ) ? \sanitize_key( (string) \wp_unslash( $_GET[ Template_Lab_Chat_Admin_Actions::QUERY_CREATE ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$cc_msg = array(
-			'ok'           => __( 'Session created.', 'aio-page-builder' ),
-			'bad_nonce'    => __( 'Security check failed. Try again.', 'aio-page-builder' ),
-			'unauthorized' => __( 'You are not allowed to create a session.', 'aio-page-builder' ),
-			'error'        => __( 'Could not create session.', 'aio-page-builder' ),
-		);
+		$cc_msg = Template_Lab_Admin_User_Messages::session_create_messages();
 		if ( $cc !== '' && isset( $cc_msg[ $cc ] ) ) {
 			$cls = $cc === 'ok' ? 'notice-success' : 'notice-error';
 			echo '<div class="notice ' . \esc_attr( $cls ) . ' is-dismissible"><p>' . \esc_html( $cc_msg[ $cc ] ) . '</p></div>';
 		}
 		$cp     = isset( $_GET[ Template_Lab_Chat_Admin_Actions::QUERY_PROMPT ] ) ? \sanitize_key( (string) \wp_unslash( $_GET[ Template_Lab_Chat_Admin_Actions::QUERY_PROMPT ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$cp_msg = array(
-			'ok'                => __( 'Prompt recorded (session updated).', 'aio-page-builder' ),
-			'bad_nonce'         => __( 'Security check failed. Try again.', 'aio-page-builder' ),
-			'unauthorized'      => __( 'You are not allowed to submit a prompt.', 'aio-page-builder' ),
-			'bad_request'       => __( 'Invalid prompt or session.', 'aio-page-builder' ),
-			'session_not_found' => __( 'Session not found.', 'aio-page-builder' ),
-			'forbidden'         => __( 'You cannot use this session.', 'aio-page-builder' ),
-			'append_failed'     => __( 'Could not store the message.', 'aio-page-builder' ),
-			'run_create_failed' => __( 'Could not create the AI run shell.', 'aio-page-builder' ),
-			'error'             => __( 'Prompt submit failed.', 'aio-page-builder' ),
-		);
+		$cp_msg = Template_Lab_Admin_User_Messages::prompt_submit_messages();
 		if ( $cp !== '' && isset( $cp_msg[ $cp ] ) ) {
 			$cls = $cp === 'ok' ? 'notice-success' : 'notice-error';
 			echo '<div class="notice ' . \esc_attr( $cls ) . ' is-dismissible"><p>' . \esc_html( $cp_msg[ $cp ] ) . '</p></div>';

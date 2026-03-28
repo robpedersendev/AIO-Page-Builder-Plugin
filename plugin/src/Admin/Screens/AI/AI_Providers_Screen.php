@@ -16,10 +16,16 @@ use AIOPageBuilder\Domain\AI\Budget\Provider_Spend_Cap_Settings;
 use AIOPageBuilder\Domain\AI\Budget\Provider_Monthly_Spend_Service;
 use AIOPageBuilder\Domain\AI\Providers\AI_Provider_Interface;
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Domain\AI\Routing\AI_Provider_Routing_Settings_Sanitizer;
+use AIOPageBuilder\Domain\AI\Routing\AI_Provider_Routing_Task_Labels;
+use AIOPageBuilder\Domain\AI\Routing\AI_Routing_Task;
+use AIOPageBuilder\Domain\AI\UI\AI_Provider_Routing_Diagnostics_Builder;
 use AIOPageBuilder\Domain\AI\UI\AI_Providers_UI_State_Builder;
 use AIOPageBuilder\Domain\AI\UI\AI_Provider_State_Store;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
@@ -55,6 +61,10 @@ final class AI_Providers_Screen {
 	 * @return string|null Full redirect URL or null when this request is not a handled POST.
 	 */
 	public function get_post_redirect_url(): ?string {
+		$url = $this->maybe_resolve_save_routing_redirect();
+		if ( $url !== null ) {
+			return $url;
+		}
 		$url = $this->maybe_resolve_test_connection_redirect();
 		if ( $url !== null ) {
 			return $url;
@@ -75,6 +85,7 @@ final class AI_Providers_Screen {
 		if ( ! Capabilities::current_user_can_for_route( $this->get_capability() ) ) {
 			\wp_die( \esc_html__( 'You do not have permission to manage AI providers.', 'aio-page-builder' ), 403 );
 		}
+		$this->render_routing_save_notice();
 		$this->render_connection_test_notice();
 		$state = $this->get_state();
 		$this->render_disclosure( $state['disclosure_blocks'] );
@@ -82,7 +93,331 @@ final class AI_Providers_Screen {
 			echo '<p class="description" style="margin:0.75em 0 0;">' . \esc_html__( 'Connection tests and planning runs use your provider account; token usage may incur cost. Exact pricing is set by the provider.', 'aio-page-builder' ) . '</p>';
 		}
 		$this->render_provider_list( $state['provider_rows'], $state['ai_runs_url'], $embed_in_hub );
+		$this->render_task_routing_section( $state['provider_rows'], $embed_in_hub );
+		$this->render_routing_diagnostics_section( $embed_in_hub );
 		$this->render_spend_cap_section( $state['provider_rows'], $embed_in_hub );
+	}
+
+	private function render_routing_save_notice(): void {
+		$message = isset( $_GET['aio_route_message'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['aio_route_message'] ) ) : '';
+		$status  = isset( $_GET['aio_route_status'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['aio_route_status'] ) ) : '';
+		if ( $message === '' || $status === '' ) {
+			return;
+		}
+		$class = $status === 'success' ? 'notice-success' : 'notice-error';
+		echo '<div class="notice ' . \esc_attr( $class ) . ' is-dismissible"><p>' . \esc_html( $message ) . '</p></div>';
+	}
+
+	/**
+	 * @return string|null
+	 */
+	private function maybe_resolve_save_routing_redirect(): ?string {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- check_admin_referer() runs when action matches routing save.
+		$action = isset( $_POST['action'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['action'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		if ( $action !== 'aio_pb_save_ai_provider_routing' ) {
+			return null;
+		}
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_AI_PROVIDERS ) ) {
+			return null;
+		}
+		\check_admin_referer( 'aio_pb_save_ai_provider_routing' );
+		Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_AI_PROVIDER_ROUTING_SAVE_POST, 'result=attempt' );
+		if ( ! $this->container || ! $this->container->has( 'settings' ) ) {
+			return $this->build_routing_redirect_url( 'error', __( 'Settings are unavailable.', 'aio-page-builder' ) );
+		}
+		/** @var Settings_Service $settings */
+		$settings = $this->container->get( 'settings' );
+		$existing = $settings->get( Option_Names::PROVIDER_CONFIG_REF );
+		$payload  = $this->extract_routing_payload_from_post();
+		if ( $payload === null ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_AI_PROVIDER_ROUTING_SAVE_POST, 'result=reject reason=bad_payload' );
+			return $this->build_routing_redirect_url( 'error', __( 'Invalid routing form payload.', 'aio-page-builder' ) );
+		}
+		$allowed = $this->get_allowed_provider_ids();
+		$merged  = AI_Provider_Routing_Settings_Sanitizer::merge_into_config( $existing, $payload, $allowed );
+		if ( ! ( $merged['ok'] ?? false ) ) {
+			$code = (string) ( $merged['error_code'] ?? 'error' );
+			Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_AI_PROVIDER_ROUTING_SAVE_POST, 'result=reject reason=' . $code );
+			return $this->build_routing_redirect_url( 'error', $this->map_routing_error_message( $code ) );
+		}
+		$settings->set( Option_Names::PROVIDER_CONFIG_REF, $merged['merged'] );
+		Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_AI_PROVIDER_ROUTING_SAVE_POST, 'result=ok' );
+		return $this->build_routing_redirect_url( 'success', __( 'Provider routing saved.', 'aio-page-builder' ) );
+	}
+
+	/**
+	 * @return list<string>
+	 */
+	private function get_allowed_provider_ids(): array {
+		$ids = array();
+		if ( $this->container && $this->container->has( 'openai_provider_driver' ) ) {
+			$ids[] = 'openai';
+		}
+		if ( $this->container && $this->container->has( 'anthropic_provider_driver' ) ) {
+			$ids[] = 'anthropic';
+		}
+		return $ids !== array() ? $ids : array( 'openai', 'anthropic' );
+	}
+
+	/**
+	 * @return array<string, mixed>|null
+	 */
+	private function extract_routing_payload_from_post(): ?array {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in maybe_resolve_save_routing_redirect().
+		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nested form array; each field sanitized below.
+		$out = null;
+		if ( isset( $_POST['aio_pb_ai_routing'] ) && is_array( $_POST['aio_pb_ai_routing'] ) ) {
+			$raw = \wp_unslash( $_POST['aio_pb_ai_routing'] );
+			if ( is_array( $raw ) ) {
+				$built   = array(
+					'primary_provider_id'  => isset( $raw['primary_provider_id'] ) ? \sanitize_key( (string) $raw['primary_provider_id'] ) : '',
+					'fallback_provider_id' => isset( $raw['fallback_provider_id'] ) ? \sanitize_key( (string) $raw['fallback_provider_id'] ) : '',
+					'fallback_model'       => isset( $raw['fallback_model'] ) ? \sanitize_text_field( (string) $raw['fallback_model'] ) : '',
+					'task_routing'         => array(),
+				);
+				$task_in = isset( $raw['task'] ) && is_array( $raw['task'] ) ? $raw['task'] : array();
+				foreach ( AI_Routing_Task::all() as $tid ) {
+					if ( ! isset( $task_in[ $tid ] ) || ! is_array( $task_in[ $tid ] ) ) {
+						continue;
+					}
+					$t                             = $task_in[ $tid ];
+					$built['task_routing'][ $tid ] = array(
+						'provider_id'          => isset( $t['provider_id'] ) ? \sanitize_key( (string) $t['provider_id'] ) : '',
+						'model'                => isset( $t['model'] ) ? \sanitize_text_field( (string) $t['model'] ) : '',
+						'fallback_provider_id' => isset( $t['fallback_provider_id'] ) ? \sanitize_key( (string) $t['fallback_provider_id'] ) : '',
+						'fallback_model'       => isset( $t['fallback_model'] ) ? \sanitize_text_field( (string) $t['fallback_model'] ) : '',
+						'fallback_disabled'    => ! empty( $t['fallback_disabled'] ),
+					);
+				}
+				$out = $built;
+			}
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		return $out;
+	}
+
+	private function map_routing_error_message( string $code ): string {
+		$map = array(
+			AI_Provider_Routing_Settings_Sanitizer::ERROR_INVALID_GLOBAL_PRIMARY  => __( 'Save rejected: choose a valid default primary provider.', 'aio-page-builder' ),
+			AI_Provider_Routing_Settings_Sanitizer::ERROR_INVALID_GLOBAL_FALLBACK => __( 'Save rejected: fallback provider is not registered.', 'aio-page-builder' ),
+			AI_Provider_Routing_Settings_Sanitizer::ERROR_GLOBAL_FALLBACK_CHAIN   => __( 'Save rejected: default primary and fallback must differ when both are set.', 'aio-page-builder' ),
+			AI_Provider_Routing_Settings_Sanitizer::ERROR_INVALID_TASK_PRIMARY    => __( 'Save rejected: a task uses an unknown primary provider.', 'aio-page-builder' ),
+			AI_Provider_Routing_Settings_Sanitizer::ERROR_INVALID_TASK_FALLBACK   => __( 'Save rejected: a task uses an unknown fallback provider.', 'aio-page-builder' ),
+			AI_Provider_Routing_Settings_Sanitizer::ERROR_TASK_FALLBACK_CHAIN     => __( 'Save rejected: a task’s primary and fallback cannot be the same.', 'aio-page-builder' ),
+		);
+		return $map[ $code ] ?? __( 'Save rejected: routing validation failed.', 'aio-page-builder' );
+	}
+
+	private function build_routing_redirect_url( string $status, string $message ): string {
+		return \add_query_arg(
+			array(
+				'aio_route_message' => $message,
+				'aio_route_status'  => $status,
+			),
+			$this->get_hub_providers_base_url()
+		);
+	}
+
+	/**
+	 * @param array<int, array> $provider_rows
+	 */
+	private function render_task_routing_section( array $provider_rows, bool $embed_in_hub = false ): void {
+		if ( ! $this->container || ! $this->container->has( 'settings' ) ) {
+			return;
+		}
+		/** @var Settings_Service $settings */
+		$settings = $this->container->get( 'settings' );
+		$cfg      = $settings->get( Option_Names::PROVIDER_CONFIG_REF );
+		$primary  = isset( $cfg['primary_provider_id'] ) && is_string( $cfg['primary_provider_id'] ) ? \sanitize_key( $cfg['primary_provider_id'] ) : 'openai';
+		$fb_id    = isset( $cfg['fallback_provider_id'] ) && is_string( $cfg['fallback_provider_id'] ) ? \sanitize_key( $cfg['fallback_provider_id'] ) : '';
+		$fb_model = isset( $cfg['fallback_model'] ) && is_string( $cfg['fallback_model'] ) ? $cfg['fallback_model'] : '';
+		$tasks    = isset( $cfg['task_routing'] ) && is_array( $cfg['task_routing'] ) ? $cfg['task_routing'] : array();
+		$opts     = $this->get_allowed_provider_ids();
+		$wrap     = $embed_in_hub ? 'aio-ai-provider-routing-section' : 'wrap aio-ai-provider-routing-section';
+		?>
+		<div class="<?php echo \esc_attr( $wrap ); ?>">
+			<h2><?php \esc_html_e( 'Task routing (providers & models)', 'aio-page-builder' ); ?></h2>
+			<p class="description"><?php \esc_html_e( 'These settings only choose which registered provider and optional model handle each task. API keys and other secrets stay in the provider secret store—not here.', 'aio-page-builder' ); ?></p>
+			<form method="post" action="<?php echo \esc_url( $this->get_hub_providers_base_url() ); ?>">
+				<input type="hidden" name="action" value="aio_pb_save_ai_provider_routing" />
+				<?php \wp_nonce_field( 'aio_pb_save_ai_provider_routing' ); ?>
+				<h3><?php \esc_html_e( 'Site defaults', 'aio-page-builder' ); ?></h3>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><label for="aio_route_primary"><?php \esc_html_e( 'Default primary provider', 'aio-page-builder' ); ?></label></th>
+						<td>
+							<select name="aio_pb_ai_routing[primary_provider_id]" id="aio_route_primary">
+								<?php foreach ( $opts as $pid ) : ?>
+									<option value="<?php echo \esc_attr( $pid ); ?>" <?php \selected( $primary, $pid ); ?>><?php echo \esc_html( $pid ); ?></option>
+								<?php endforeach; ?>
+							</select>
+							<p class="description"><?php \esc_html_e( 'Used when a task does not override the primary provider.', 'aio-page-builder' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="aio_route_fallback"><?php \esc_html_e( 'Default fallback provider', 'aio-page-builder' ); ?></label></th>
+						<td>
+							<select name="aio_pb_ai_routing[fallback_provider_id]" id="aio_route_fallback">
+								<option value=""><?php \esc_html_e( '— None —', 'aio-page-builder' ); ?></option>
+								<?php foreach ( $opts as $pid ) : ?>
+									<option value="<?php echo \esc_attr( $pid ); ?>" <?php \selected( $fb_id, $pid ); ?>><?php echo \esc_html( $pid ); ?></option>
+								<?php endforeach; ?>
+							</select>
+							<p class="description"><?php \esc_html_e( 'Optional secondary route for failover UX; must differ from the default primary when set.', 'aio-page-builder' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="aio_route_fallback_model"><?php \esc_html_e( 'Default fallback model (optional)', 'aio-page-builder' ); ?></label></th>
+						<td>
+							<input name="aio_pb_ai_routing[fallback_model]" id="aio_route_fallback_model" type="text" class="regular-text" value="<?php echo \esc_attr( $fb_model ); ?>" autocomplete="off" />
+						</td>
+					</tr>
+				</table>
+				<h3><?php \esc_html_e( 'Per-task overrides', 'aio-page-builder' ); ?></h3>
+				<p class="description"><?php \esc_html_e( 'Leave primary empty to inherit the site default. Leave fallback empty to inherit the site fallback. Check “no fallback” to disable failover hints for that task.', 'aio-page-builder' ); ?></p>
+				<table class="widefat striped">
+					<thead>
+						<tr>
+							<th scope="col"><?php \esc_html_e( 'Task', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Primary provider', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Primary model', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Fallback provider', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Fallback model', 'aio-page-builder' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'No fallback', 'aio-page-builder' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+					<?php foreach ( AI_Routing_Task::all() as $task_id ) : ?>
+						<?php
+						$slice = isset( $tasks[ $task_id ] ) && is_array( $tasks[ $task_id ] ) ? $tasks[ $task_id ] : array();
+						$tp    = isset( $slice['provider_id'] ) && is_string( $slice['provider_id'] ) ? \sanitize_key( $slice['provider_id'] ) : '';
+						$tm    = isset( $slice['model'] ) && is_string( $slice['model'] ) ? $slice['model'] : '';
+						$tff   = isset( $slice['fallback_provider_id'] ) && is_string( $slice['fallback_provider_id'] ) ? \sanitize_key( $slice['fallback_provider_id'] ) : '';
+						$tfm   = isset( $slice['fallback_model'] ) && is_string( $slice['fallback_model'] ) ? $slice['fallback_model'] : '';
+						$fdis  = ! empty( $slice['fallback_disabled'] );
+						$fname = 'aio_pb_ai_routing[task][' . $task_id . ']';
+						?>
+						<tr>
+							<th scope="row">
+								<?php echo \esc_html( AI_Provider_Routing_Task_Labels::label_for( $task_id ) ); ?>
+								<p class="description"><?php \esc_html_e( 'Routing only; does not change secrets.', 'aio-page-builder' ); ?></p>
+							</th>
+							<td>
+								<select name="<?php echo \esc_attr( $fname . '[provider_id]' ); ?>" aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'primary provider', 'aio-page-builder' ) ); ?>">
+									<option value=""><?php \esc_html_e( 'Inherit default', 'aio-page-builder' ); ?></option>
+									<?php foreach ( $opts as $pid ) : ?>
+										<option value="<?php echo \esc_attr( $pid ); ?>" <?php \selected( $tp, $pid ); ?>><?php echo \esc_html( $pid ); ?></option>
+									<?php endforeach; ?>
+								</select>
+							</td>
+							<td>
+								<input type="text" class="regular-text" name="<?php echo \esc_attr( $fname . '[model]' ); ?>" value="<?php echo \esc_attr( $tm ); ?>" autocomplete="off" aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'primary model', 'aio-page-builder' ) ); ?>" />
+							</td>
+							<td>
+								<select name="<?php echo \esc_attr( $fname . '[fallback_provider_id]' ); ?>" <?php \disabled( $fdis ); ?> aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'fallback provider', 'aio-page-builder' ) ); ?>">
+									<option value=""><?php \esc_html_e( 'Inherit default', 'aio-page-builder' ); ?></option>
+									<?php foreach ( $opts as $pid ) : ?>
+										<option value="<?php echo \esc_attr( $pid ); ?>" <?php \selected( $tff, $pid ); ?>><?php echo \esc_html( $pid ); ?></option>
+									<?php endforeach; ?>
+								</select>
+							</td>
+							<td>
+								<input type="text" class="regular-text" name="<?php echo \esc_attr( $fname . '[fallback_model]' ); ?>" value="<?php echo \esc_attr( $tfm ); ?>" autocomplete="off" <?php \disabled( $fdis ); ?> aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'fallback model', 'aio-page-builder' ) ); ?>" />
+							</td>
+							<td>
+								<label>
+									<input type="checkbox" name="<?php echo \esc_attr( $fname . '[fallback_disabled]' ); ?>" value="1" <?php \checked( $fdis ); ?> />
+									<?php \esc_html_e( 'Disable', 'aio-page-builder' ); ?>
+								</label>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+					</tbody>
+				</table>
+				<?php
+				$warn = false;
+				foreach ( $provider_rows as $row ) {
+					$cred = isset( $row['credential_status']['state'] ) ? (string) $row['credential_status']['state'] : '';
+					if ( $cred !== '' && $cred !== 'configured' ) {
+						$warn = true;
+					}
+				}
+				if ( $warn ) :
+					?>
+					<div class="notice notice-warning inline"><p><?php \esc_html_e( 'Some providers are not fully configured. Routing can be saved, but runs may fail until credentials are stored and validated.', 'aio-page-builder' ); ?></p></div>
+				<?php endif; ?>
+				<p><button type="submit" class="button button-primary"><?php \esc_html_e( 'Save routing', 'aio-page-builder' ); ?></button></p>
+			</form>
+		</div>
+		<?php
+	}
+
+	private function render_routing_diagnostics_section( bool $embed_in_hub = false ): void {
+		if ( ! Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) ) {
+			return;
+		}
+		if ( ! $this->container || ! $this->container->has( 'ai_provider_routing_diagnostics_builder' ) ) {
+			return;
+		}
+		$b = $this->container->get( 'ai_provider_routing_diagnostics_builder' );
+		if ( ! $b instanceof AI_Provider_Routing_Diagnostics_Builder ) {
+			return;
+		}
+		$rows = $b->build_task_rows();
+		$wrap = $embed_in_hub ? 'aio-ai-routing-diagnostics' : 'wrap aio-ai-routing-diagnostics';
+		?>
+		<div class="<?php echo \esc_attr( $wrap ); ?>">
+			<h2><?php \esc_html_e( 'Routing diagnostics (redacted)', 'aio-page-builder' ); ?></h2>
+			<p class="description"><?php \esc_html_e( 'Read-only summary for support: resolved routes, structured-output expectations, and credential readiness. No API keys or raw provider payloads.', 'aio-page-builder' ); ?></p>
+			<table class="widefat striped">
+				<thead>
+					<tr>
+						<th scope="col"><?php \esc_html_e( 'Task', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Primary', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Fallback', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Inherit primary', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Inherit fallback', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Structured schema', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Structured OK', 'aio-page-builder' ); ?></th>
+						<th scope="col"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php foreach ( $rows as $r ) : ?>
+					<tr>
+						<td><code><?php echo \esc_html( (string) ( $r['task_id'] ?? '' ) ); ?></code><br /><span class="description"><?php echo \esc_html( (string) ( $r['task_label'] ?? '' ) ); ?></span></td>
+						<td><code><?php echo \esc_html( (string) ( $r['primary_provider_id'] ?? '' ) ); ?></code>
+							<?php if ( (string) ( $r['primary_model'] ?? '' ) !== '' ) : ?>
+								<br /><code><?php echo \esc_html( (string) $r['primary_model'] ); ?></code>
+							<?php endif; ?>
+						</td>
+						<td>
+							<?php if ( ! empty( $r['fallback_disabled'] ) ) : ?>
+								<?php \esc_html_e( 'Disabled', 'aio-page-builder' ); ?>
+							<?php elseif ( (string) ( $r['fallback_provider_id'] ?? '' ) !== '' ) : ?>
+								<code><?php echo \esc_html( (string) $r['fallback_provider_id'] ); ?></code>
+							<?php else : ?>
+								<?php \esc_html_e( '—', 'aio-page-builder' ); ?>
+							<?php endif; ?>
+						</td>
+						<td><?php echo ! empty( $r['inherit_global_primary'] ) ? \esc_html__( 'Yes', 'aio-page-builder' ) : \esc_html__( 'No', 'aio-page-builder' ); ?></td>
+						<td><?php echo ! empty( $r['inherit_global_fallback'] ) ? \esc_html__( 'Yes', 'aio-page-builder' ) : \esc_html__( 'No', 'aio-page-builder' ); ?></td>
+						<td><code><?php echo \esc_html( (string) ( $r['structured_schema'] ?? '' ) ); ?></code></td>
+						<td>
+							<?php
+							$s = $r['structured_supported'] ?? null;
+							echo $s === null ? \esc_html__( 'n/a', 'aio-page-builder' ) : ( $s ? \esc_html__( 'Yes', 'aio-page-builder' ) : \esc_html__( 'No', 'aio-page-builder' ) );
+							?>
+						</td>
+						<td><?php echo \esc_html( (string) ( $r['status_summary'] ?? '' ) ); ?></td>
+					</tr>
+				<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+		<?php
 	}
 
 	private function render_connection_test_notice(): void {

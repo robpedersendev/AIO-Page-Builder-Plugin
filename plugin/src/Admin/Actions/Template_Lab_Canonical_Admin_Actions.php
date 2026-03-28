@@ -16,6 +16,7 @@ use AIOPageBuilder\Domain\AI\TemplateLab\Template_Lab_Canonical_Apply_Service;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
 use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
+use AIOPageBuilder\Infrastructure\Config\Template_Lab_Access;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
 
 final class Template_Lab_Canonical_Admin_Actions {
@@ -66,7 +67,7 @@ final class Template_Lab_Canonical_Admin_Actions {
 		if ( ! Template_Lab_Approved_Snapshot_Ref_Keys::is_valid_target_kind( $tk ) ) {
 			self::redirect( self::url_with_session( $session_id ), self::QUERY_APPROVE, 'bad_request' );
 		}
-		if ( ! Capabilities::current_user_can_for_route( self::capability_for_target( $tk ) ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Template_Lab_Access::capability_for_approved_target_kind( $tk ) ) ) {
 			self::redirect( self::url_with_session( $session_id ), self::QUERY_APPROVE, 'unauthorized' );
 		}
 		$out = $svc->approve_pending_snapshot( $uid, $session_id );
@@ -90,7 +91,7 @@ final class Template_Lab_Canonical_Admin_Actions {
 		if ( $uid <= 0 ) {
 			self::redirect( $url, self::QUERY_APPLY, 'unauthorized' );
 		}
-		if ( ! Capabilities::current_user_can_for_route( self::capability_for_target( $target ) ) ) {
+		if ( ! Capabilities::current_user_can_for_route( Template_Lab_Access::capability_for_approved_target_kind( $target ) ) ) {
 			self::redirect( self::url_with_session( $session_id ), self::QUERY_APPLY, 'unauthorized' );
 		}
 		$svc = self::apply_service( $container );
@@ -125,16 +126,6 @@ final class Template_Lab_Canonical_Admin_Actions {
 			return '';
 		}
 		return \sanitize_text_field( \wp_unslash( $_POST[ self::FIELD_SESSION ] ) );
-	}
-
-	private static function capability_for_target( string $target_kind ): string {
-		if ( $target_kind === Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION ) {
-			return Capabilities::MANAGE_COMPOSITIONS;
-		}
-		if ( $target_kind === Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_PAGE ) {
-			return Capabilities::MANAGE_PAGE_TEMPLATES;
-		}
-		return Capabilities::MANAGE_SECTION_TEMPLATES;
 	}
 
 	private static function redirect_base(): string {

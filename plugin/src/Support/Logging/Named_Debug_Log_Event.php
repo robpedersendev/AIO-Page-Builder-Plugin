@@ -124,6 +124,7 @@ final class Named_Debug_Log_Event {
 	public const ADMIN_AI_PROVIDER_CONNECTION_TEST_POST   = 'AIO_AI_ADMIN_PROVIDER_CONNECTION_TEST_POST';
 	public const ADMIN_AI_PROVIDER_CREDENTIAL_UPDATE_POST = 'AIO_AI_ADMIN_PROVIDER_CREDENTIAL_UPDATE_POST';
 	public const ADMIN_AI_PROVIDER_SPEND_CAP_SAVE_POST    = 'AIO_AI_ADMIN_PROVIDER_SPEND_CAP_SAVE_POST';
+	public const ADMIN_AI_PROVIDER_ROUTING_SAVE_POST      = 'AIO_AI_ADMIN_PROVIDER_ROUTING_SAVE_POST';
 
 	// -------------------------------------------------------------------------
 	// Build Plan
@@ -195,6 +196,7 @@ final class Named_Debug_Log_Event {
 	public const TEMPLATE_LAB_CANONICAL_APPLY_OK                = 'AIO_AI_TEMPLATE_LAB_CANONICAL_APPLY_OK';
 	public const TEMPLATE_LAB_CANONICAL_APPLY_FAIL              = 'AIO_AI_TEMPLATE_LAB_CANONICAL_APPLY_FAIL';
 	public const TEMPLATE_LAB_CANONICAL_APPLY_IDEMPOTENT        = 'AIO_AI_TEMPLATE_LAB_CANONICAL_APPLY_IDEMPOTENT';
+	public const TEMPLATE_LAB_APPLY_LINEAGE_SNAPSHOT_FAIL       = 'AIO_AI_TEMPLATE_LAB_APPLY_LINEAGE_SNAPSHOT_FAIL';
 
 	/** Template-lab chat path recorded a user prompt and created a shell run (no prompt body in detail). */
 	public const TEMPLATE_LAB_CHAT_PROMPT_RUN_CREATED = 'AIO_AI_TEMPLATE_LAB_CHAT_PROMPT_RUN_CREATED';

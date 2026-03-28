@@ -65,6 +65,14 @@ interface AI_Chat_Session_Repository_Interface {
 	public function list_recent_for_owner( int $owner_user_id, int $limit = 20, int $offset = 0 ): array;
 
 	/**
+	 * Owner-scoped session list with optional filters (server-side; uses indexed meta when available).
+	 *
+	 * @param array{status?:string,task_type?:string,approved?:string,search?:string} $filters approved: '' (any), '1' (has approved ref), '0' (no approved ref).
+	 * @return list<array<string, mixed>> Same row shape as {@see list_recent_for_owner()}.
+	 */
+	public function list_for_owner_with_filters( int $owner_user_id, array $filters, int $limit = 25, int $offset = 0 ): array;
+
+	/**
 	 * Post IDs owned by user (paginated) for privacy erase.
 	 *
 	 * @return list<int>

@@ -72,6 +72,47 @@ final class Default_AI_Provider_Router_Test extends TestCase {
 		$this->assertFalse( $route->is_valid() );
 	}
 
+	public function test_invalid_primary_with_task_fallback_disabled_returns_invalid(): void {
+		$settings = new Settings_Service();
+		$settings->set(
+			Option_Names::PROVIDER_CONFIG_REF,
+			array(
+				'task_routing'          => array(
+					AI_Routing_Task::TEMPLATE_LAB_REPAIR => array(
+						'provider_id'        => 'unknown_vendor',
+						'fallback_disabled'  => true,
+					),
+				),
+				'fallback_provider_id' => 'anthropic',
+			)
+		);
+		$router = new Default_AI_Provider_Router( $settings );
+		$route  = $router->resolve_route( AI_Routing_Task::TEMPLATE_LAB_REPAIR, array() );
+		$this->assertFalse( $route->is_valid() );
+	}
+
+	public function test_per_task_fallback_overrides_global_in_route_result(): void {
+		$settings = new Settings_Service();
+		$settings->set(
+			Option_Names::PROVIDER_CONFIG_REF,
+			array(
+				'primary_provider_id'   => 'openai',
+				'fallback_provider_id'  => 'anthropic',
+				'task_routing'          => array(
+					AI_Routing_Task::TEMPLATE_LAB_CHAT => array(
+						'provider_id'          => 'anthropic',
+						'fallback_provider_id' => 'openai',
+					),
+				),
+			)
+		);
+		$router = new Default_AI_Provider_Router( $settings );
+		$route  = $router->resolve_route( AI_Routing_Task::TEMPLATE_LAB_CHAT, array() );
+		$this->assertTrue( $route->is_valid() );
+		$this->assertSame( 'anthropic', $route->get_primary_provider_id() );
+		$this->assertSame( 'openai', $route->get_fallback_provider_id() );
+	}
+
 	public function test_unknown_task_provider_falls_back_when_fallback_configured(): void {
 		$settings = new Settings_Service();
 		$settings->set(
@@ -92,7 +133,7 @@ final class Default_AI_Provider_Router_Test extends TestCase {
 		$this->assertTrue( $route->is_valid() );
 		$this->assertSame( 'anthropic', $route->get_primary_provider_id() );
 		$this->assertSame( 'claude-fallback', $route->get_primary_model_override() );
-		$this->assertSame( 'anthropic', $route->get_fallback_provider_id() );
-		$this->assertSame( 'claude-fallback', $route->get_fallback_model_override() );
+		$this->assertNull( $route->get_fallback_provider_id() );
+		$this->assertNull( $route->get_fallback_model_override() );
 	}
 }

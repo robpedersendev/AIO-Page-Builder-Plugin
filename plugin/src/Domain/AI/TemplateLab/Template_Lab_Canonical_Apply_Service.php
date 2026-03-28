@@ -18,6 +18,7 @@ use AIOPageBuilder\Domain\AI\Translation\Page_Template_AI_Draft_Translator;
 use AIOPageBuilder\Domain\Registries\Composition\Composition_Schema;
 use AIOPageBuilder\Domain\AI\Translation\Section_Template_AI_Draft_Translator;
 use AIOPageBuilder\Domain\Storage\AI_Chat\AI_Chat_Session_Repository_Interface;
+use AIOPageBuilder\Infrastructure\Config\Template_Lab_Access;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
@@ -37,6 +38,8 @@ final class Template_Lab_Canonical_Apply_Service {
 
 	private Section_Template_AI_Draft_Translator $section_translator;
 
+	private ?Template_Lab_Apply_Lineage_Snapshot_Recorder $lineage_recorder;
+
 	public function __construct(
 		AI_Chat_Session_Repository_Interface $chat,
 		AI_Run_Template_Lab_Apply_State_Port $run_apply_state,
@@ -44,7 +47,8 @@ final class Template_Lab_Canonical_Apply_Service {
 		Template_Lab_Canonical_Registry_Persist_Port $registry_persist,
 		Composition_AI_Draft_Translator $composition_translator,
 		Page_Template_AI_Draft_Translator $page_translator,
-		Section_Template_AI_Draft_Translator $section_translator
+		Section_Template_AI_Draft_Translator $section_translator,
+		?Template_Lab_Apply_Lineage_Snapshot_Recorder $lineage_recorder = null
 	) {
 		$this->chat                   = $chat;
 		$this->run_apply_state        = $run_apply_state;
@@ -52,7 +56,8 @@ final class Template_Lab_Canonical_Apply_Service {
 		$this->registry_persist       = $registry_persist;
 		$this->composition_translator = $composition_translator;
 		$this->page_translator        = $page_translator;
-		$this->section_translator    = $section_translator;
+		$this->section_translator     = $section_translator;
+		$this->lineage_recorder       = $lineage_recorder;
 	}
 
 	/**
@@ -69,7 +74,7 @@ final class Template_Lab_Canonical_Apply_Service {
 		if ( $session === null ) {
 			return array( 'ok' => false, 'code' => 'session_missing' );
 		}
-		if ( ! $this->actor_may_use_session( $actor_user_id, $session ) ) {
+		if ( ! Template_Lab_Access::actor_may_use_chat_session( $actor_user_id, $session ) ) {
 			return array( 'ok' => false, 'code' => 'forbidden' );
 		}
 		$ref = $session['approved_snapshot_ref'] ?? null;
@@ -118,7 +123,7 @@ final class Template_Lab_Canonical_Apply_Service {
 		if ( $session === null ) {
 			return Template_Lab_Canonical_Apply_Result::failure( Template_Lab_Canonical_Apply_Result::CODE_SESSION_MISSING );
 		}
-		if ( ! $this->actor_may_use_session( $actor_user_id, $session ) ) {
+		if ( ! Template_Lab_Access::actor_may_use_chat_session( $actor_user_id, $session ) ) {
 			return Template_Lab_Canonical_Apply_Result::failure( Template_Lab_Canonical_Apply_Result::CODE_FORBIDDEN );
 		}
 		$ref = $session['approved_snapshot_ref'] ?? null;
@@ -203,18 +208,17 @@ final class Template_Lab_Canonical_Apply_Service {
 			Named_Debug_Log_Event::TEMPLATE_LAB_CANONICAL_APPLY_OK,
 			'target_kind=' . $target_kind . ' canonical_post_id=' . (string) $save['post_id']
 		);
-		return Template_Lab_Canonical_Apply_Result::ok( $save['internal_key'], $save['post_id'] );
-	}
-
-	/**
-	 * @param array<string, mixed> $session
-	 */
-	private function actor_may_use_session( int $actor_user_id, array $session ): bool {
-		$owner = (int) ( $session['owner_user_id'] ?? 0 );
-		if ( $actor_user_id > 0 && $owner === $actor_user_id ) {
-			return true;
+		if ( $this->lineage_recorder instanceof Template_Lab_Apply_Lineage_Snapshot_Recorder ) {
+			$this->lineage_recorder->record(
+				$actor_user_id,
+				$target_kind,
+				$save['post_id'],
+				$save['internal_key'],
+				$run_post_id,
+				$fp
+			);
 		}
-		return \current_user_can( 'manage_options' );
+		return Template_Lab_Canonical_Apply_Result::ok( $save['internal_key'], $save['post_id'] );
 	}
 
 	private function fingerprint_matches_trace( int $run_post_id, string $fingerprint ): bool {
